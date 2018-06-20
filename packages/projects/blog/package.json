@@ -1,0 +1,19 @@
+{
+  "name": "blog",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/ws": "^5.1.2",
+    "graphql-yoga": "^1.14.10",
+    "join-monster": "^2.0.16",
+    "knex": "^0.14.6",
+    "sqlite3": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/knex": "^0.14.14",
+    "nodemon": "^1.17.5",
+    "typescript": "2.9.2"
+  }
+}

@@ -6,6 +6,8 @@
   },
   "dependencies": {
     "@types/ws": "^5.1.2",
+    "apollo-codegen": "^0.20.0",
+    "apollo-codegen-typescript": "^0.20.0",
     "graphql-yoga": "^1.14.10",
     "join-monster": "^2.0.16",
     "knex": "^0.14.6",

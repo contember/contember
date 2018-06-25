@@ -9,10 +9,10 @@ let graphQLSchema = new GraphQLSchema({
 
 const fileData = printSchema(graphQLSchema);
 
-fs.writeFile(__dirname + '/schema.graphql', fileData, error => console.error(error));
+fs.writeFile(__dirname + '/schemxa.graphql', fileData, error => console.error(error));
 
-let typesUsed = Object.values(graphQLSchema.getTypeMap())
-console.log(typesUsed)
+console.log(6)
+
 // const result = generate
 const server = new GraphQLServer({
   schema: graphQLSchema,

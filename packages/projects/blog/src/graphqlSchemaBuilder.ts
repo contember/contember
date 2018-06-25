@@ -1,4 +1,4 @@
-import model, { isField, isHasManyInversedRelation, isHasOneOwnerRelation, isManyHasManyOwnerRelation, isRelation } from './model';
+import model, { getEntity, isField, isHasManyInversedRelation, isHasOneOwnerRelation, isManyHasManyOwnerRelation, isRelation } from './model';
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -23,6 +23,8 @@ import {
   GraphQLOutputType
 } from "graphql/type/definition";
 import joinMonster from 'join-monster'
+import createJoinMonsterRelation from "./joinMonster/joinMonsterRelationFactory";
+import { buildWhere } from "./whereMonster";
 
 type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
 
@@ -169,6 +171,21 @@ const getListQuery = (typeName: string): FieldConfig => {
     args: {
       where: {type: getEntityWhereType(typeName)},
     },
+    where: (tableAlias: string, args: any, context: any, sqlAstNode: any) => {
+      // sqlAstNode.children.push({
+      //   "args": {},
+      //   "type": "table",
+      //   "name": "Author",
+      //   "as": "author",
+      //   "children": [],
+      //   "fieldName": "author",
+      //   "grabMany": false,
+      //   sqlJoin: (t1: string, t2: string) => `${t1}.author_id = ${t2}.id`
+      // })
+      // console.log(JSON.stringify(sqlAstNode, null, 4))
+
+      return buildWhere(model, getEntity(model, typeName))(tableAlias, args.where || {})
+    },
     resolve: resolver([]),
   }
 }
@@ -199,9 +216,12 @@ const finalizeWhereType = (name: string) => {
   }
 }
 
+const relationFactory = createJoinMonsterRelation(model)
 
 const finalizeEntityType = (entityName: string) => {
   const entity = model.entities[entityName]
+  const entityRelationFactory = relationFactory(entity)
+
   const fieldsConfig = getEntityFieldsPrototype(entityName)
   for (let fieldName in entity.fields) {
     const field = entity.fields[fieldName]
@@ -215,62 +235,15 @@ const finalizeEntityType = (entityName: string) => {
       }
     } else if (isRelation(field)) {
       const targetType = getEntityType(field.target);
-      const targetEntity = model.entities[field.target]
       let type: GraphQLOutputType;
-      let joinMonsterRelation: JoinMonsterRelation<any, any>;
+      let joinMonsterRelation = entityRelationFactory(field);
+
       if (isHasOneOwnerRelation(field)) {
         type = field.nullable ? targetType : new GraphQLNonNull(targetType)
-        joinMonsterRelation = {
-          sqlJoin: (tableName, secondTableName) => {
-            return `${tableName}.${field.joiningColumn.columnName} = ${secondTableName}.${targetEntity.primary}`
-          }
-        }
       } else if (isManyHasManyOwnerRelation(field)) {
         type = new GraphQLList(new GraphQLNonNull(targetType));
-        joinMonsterRelation = {
-          junction: {
-            sqlTable: field.joiningTable.tableName,
-            uniqueKey: [field.joiningTable.joiningColumn.columnName, field.joiningTable.inverseJoiningColumn.columnName],
-            sqlBatch: {
-              parentKey: entity.primary,
-              thisKey: field.joiningTable.joiningColumn.columnName,
-              sqlJoin: (tableName, targetTable) => {
-                return `${tableName}.${field.joiningTable.inverseJoiningColumn.columnName} = ${targetTable}.${targetEntity.primary}`
-              }
-            }
-          }
-        }
       } else if (isHasManyInversedRelation(field)) {
         type = new GraphQLList(new GraphQLNonNull(targetType))
-
-        const targetRelation = targetEntity.fields[field.ownedBy]
-        if (!isRelation(targetRelation)) {
-          throw new Error('definition error')
-        } else if (isManyHasManyOwnerRelation(targetRelation)) {
-          joinMonsterRelation = {
-            junction: {
-              sqlTable: targetRelation.joiningTable.tableName,
-              uniqueKey: [targetRelation.joiningTable.joiningColumn.columnName, targetRelation.joiningTable.inverseJoiningColumn.columnName],
-              sqlBatch: {
-                parentKey: entity.primary,
-                thisKey: targetRelation.joiningTable.inverseJoiningColumn.columnName,
-                sqlJoin: (tableName, targetTable) => {
-                  return `${tableName}.${targetRelation.joiningTable.joiningColumn.columnName} = ${targetTable}.${targetEntity.primary}`
-                }
-              }
-            }
-          }
-        } else if (isHasOneOwnerRelation(targetRelation)) {
-          joinMonsterRelation = {
-            sqlBatch: {
-              thisKey: targetRelation.joiningColumn.columnName,
-              parentKey: entity.primary,
-            }
-          }
-        } else {
-          throw new Error('impl error')
-        }
-
       } else {
         throw new Error('not impl')
       }
@@ -278,6 +251,9 @@ const finalizeEntityType = (entityName: string) => {
         type: type,
         args: {
           where: {type: getEntityWhereType(field.target)},
+        },
+        where: (tableAlias: string, args: any, context: any, sqlAstNode: any) => {
+          return ''
         },
         ...joinMonsterRelation
       }
@@ -290,6 +266,7 @@ const finalizeEntityType = (entityName: string) => {
 }
 
 const resolver = (result: any) => (parent: any, args: any, context: any, resolveInfo: any) => {
+  console.log(arguments)
   return joinMonster(resolveInfo, context, (sql: string) => {
     console.log(sql)
     return Promise.resolve(result)

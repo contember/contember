@@ -1,11 +1,11 @@
-interface Entity
+export interface Entity
 {
   primary: string
   tableName: string
   fields: { [name: string]: Field | Relation }
 }
 
-interface Field
+export interface Field
 {
   type: Type
   columnName: string
@@ -36,6 +36,22 @@ export const isManyHasManyOwnerRelation = (obj: Relation): obj is ManyHasManyOwn
 
 export const isHasManyInversedRelation = (obj: Relation): obj is HasManyRelation => {
   return obj.relation === 'many' && (obj as HasManyRelation).ownedBy !== undefined
+}
+
+export const getEntity = (schema: Schema, entityName: string): Entity => {
+  return schema.entities[entityName];
+}
+
+export const getField = (schema: Schema, entityName: string, fieldName: string): Field | Relation => {
+  return getEntity(schema, entityName).fields[fieldName];
+}
+
+export const getRelation = (schema: Schema, entityName: string, fieldName: string): Relation => {
+  const relation = getField(schema, entityName, fieldName)
+  if (!isRelation(relation)) {
+    throw new Error()
+  }
+  return relation
 }
 
 interface HasManyRelation
@@ -75,7 +91,7 @@ interface ManyHasManyOwnerRelation
   inversedBy: string
 }
 
-interface Schema
+export interface Schema
 {
   enums: { [name: string]: string[] }
   entities: { [name: string]: Entity }
@@ -90,6 +106,14 @@ export default {
     locale: ['cs', 'en'],
   },
   entities: {
+    Author: {
+      primary: 'id',
+      tableName: 'Author',
+      fields: {
+        id: {type: 'uuid', columnName: 'id'},
+        name: {type: 'string', columnName: 'name'},
+      }
+    },
     Category: {
       primary: 'id',
       tableName: 'Category',
@@ -120,6 +144,7 @@ export default {
       fields: {
         id: {type: 'uuid', columnName: 'id'},
         publishedAt: {type: 'datetime', columnName: 'publishedAt'},
+        author: {relation: 'one', target: 'Author', joiningColumn: {columnName: 'author_id', onDelete: 'cascade'}},
         locales: {relation: 'many', target: 'PostLocale', ownedBy: 'post'},
         sites: {relation: 'many', target: 'PostSite', ownedBy: 'post'},
         categories: {

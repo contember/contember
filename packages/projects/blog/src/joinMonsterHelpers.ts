@@ -4,8 +4,9 @@ export interface JoinMonsterEntityMapping
   uniqueKey: string | string[]
 }
 
+export type Join = (tableName: string, secondTableName: string, args: any) => string;
 type JoinedRelation<TArgs = { [argName: string]: any }> = {
-  sqlJoin: (tableName: string, secondTableName: string, args: TArgs) => string
+  sqlJoin: Join
 }
 
 type BatchedRelation = {
@@ -40,8 +41,9 @@ type Junction<TContext, TArgs> = {
 
 export type JoinMonsterRelation<TContext, TArgs = { [argName: string]: any }> = JoinedRelation | BatchedRelation | Junction<TContext, TArgs>
 
+type Where = (tableName: string, args: any, context: any, sqlAstNode: any) => (string | Promise<string>)
 export type JoinMonsterFieldMapping<TContext, TArgs = { [argName: string]: any }> = {
-  where?: (tableName: string, args: TArgs, context: TContext, sqlAstNode: any) => (string | Promise<string>)
+  where?: Where,
   orderBy?: { [columns: string]: 'asc' | 'desc' }
 } & ({
   sqlColumn: string
@@ -50,4 +52,22 @@ export type JoinMonsterFieldMapping<TContext, TArgs = { [argName: string]: any }
 } | {
   sqlExpr: (string | Promise<string>)
 } | JoinMonsterRelation<TContext, TArgs> | {})
+
+
+//incomplete
+export interface SqlAstTableNode
+{
+  args: any
+  type: 'table',
+  name: string,
+  as: string,
+  orderBy?: {[column: string] : 'DESC' | 'ASC'},
+  children: SqlAstNode[],
+  fieldName: string,
+  where?: Where,
+  sqlJoin?: Join,
+  grabMany: boolean
+}
+
+export type SqlAstNode = SqlAstTableNode
 

@@ -1,4 +1,4 @@
-import { Entity, getEntity, isField, isHasManyInversedRelation, isHasOneOwnerRelation, isManyHasManyOwnerRelation, isRelation, Schema } from "../model";
+import { acceptFieldVisitor, acceptRelationTypeVisitor, Entity, Schema } from "../model";
 import { Condition, default as buildCondition } from "./conditionBuilder";
 import { joinParts } from "./utils";
 
@@ -20,18 +20,13 @@ class SubQueryBuilder
   schema: Schema;
   rootEntity: Entity;
 
-  private wheres: {
-    joinPath: string[],
-    field: string,
-    condition: Condition<any>,
-  }[] = []
+  private joins: string[][] = []
 
   constructor(schema: Schema, rootEntity: Entity)
   {
     this.schema = schema;
     this.rootEntity = rootEntity;
   }
-
 
 
   getSql(): string
@@ -44,55 +39,67 @@ class SubQueryBuilder
     `
   }
 
+  join(joinPath: string[])
+  {
+    this.joins.push(joinPath)
+    return this.alias(joinPath)
+  }
+
   buildJoins(): string
   {
     let sqlExpr: string[] = []
     const joined: string[][] = []
-    for (let where of this.wheres) {
+    for (let joinPath of this.joins) {
       let currentFrom = this.rootEntity
-      for (let i = 0; i < where.joinPath.length; i++) {
-        const partialJoinPath = where.joinPath.slice(0, i + 1)
-        const relation = currentFrom.fields[where.joinPath[i]];
-        if (!isRelation(relation)) {
-          throw new Error()
-        }
-        const targetEntity = getEntity(this.schema, relation.target);
+      for (let i = 0; i < joinPath.length; i++) {
+        const partialJoinPath = joinPath.slice(0, i + 1)
+
+        const targetEntity = acceptFieldVisitor(this.schema, currentFrom, joinPath[i], {
+          visitColumn: () => {
+            throw new Error();
+          },
+          visitRelation: (entity, relation, targetEntity) => {
+            return targetEntity
+          }
+        })
 
         if (joined.includes(partialJoinPath)) {
           currentFrom = targetEntity
           continue;
         }
-        const fromAlias = this.alias(where.joinPath.slice(0, i))
-        const toAlias = this.alias(partialJoinPath)
-        if (isHasOneOwnerRelation(relation)) {
-          sqlExpr.push(`JOIN ${targetEntity.tableName} AS ${toAlias} ON ${toAlias}.${targetEntity.primary} = ${fromAlias}.${relation.joiningColumn.columnName}`)
-        } else if (isManyHasManyOwnerRelation(relation)) {
-          const joiningAlias = `${fromAlias}_x_${toAlias}`
-          sqlExpr.push(`JOIN ${relation.joiningTable.tableName} AS ${joiningAlias} 
-          ON ${joiningAlias}.${relation.joiningTable.joiningColumn.columnName} = ${fromAlias}.${currentFrom.primary}`)
-          sqlExpr.push(`JOIN ${targetEntity.tableName}.${toAlias}
-          ON ${toAlias}.${targetEntity.primary} = ${joiningAlias}.${relation.joiningTable.inverseJoiningColumn.columnName}`)
-        } else if (isHasManyInversedRelation(relation)) {
-          const targetRelation = targetEntity.fields[relation.ownedBy]
-          if (!isRelation(targetRelation)) {
-            throw new Error('definition error')
-          }
+        joined.push(partialJoinPath)
 
-          if (isManyHasManyOwnerRelation(targetRelation)) {
+        const fromAlias = this.alias(joinPath.slice(0, i))
+        const toAlias = this.alias(partialJoinPath)
+
+        acceptRelationTypeVisitor(this.schema, currentFrom, joinPath[i], {
+          visitOneHasOneOwner: (entity, relation, targetEntity) => {
+            sqlExpr.push(`JOIN ${targetEntity.tableName} AS ${toAlias} ON ${toAlias}.${targetEntity.primary} = ${fromAlias}.${relation.joiningColumn.columnName}`)
+          },
+          visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
+            sqlExpr.push(`JOIN ${targetEntity.tableName} AS ${toAlias} ON ${toAlias}.${targetRelation.joiningColumn.columnName} = ${fromAlias}.${entity.primary}`)
+          },
+          visitManyHasOne: (entity, relation, targetEntity) => {
+            sqlExpr.push(`JOIN ${targetEntity.tableName} AS ${toAlias} ON ${toAlias}.${targetEntity.primary} = ${fromAlias}.${relation.joiningColumn.columnName}`)
+          },
+          visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
+            sqlExpr.push(`JOIN ${targetEntity.tableName} AS ${toAlias} ON ${toAlias}.${targetRelation.joiningColumn.columnName} = ${fromAlias}.${entity.primary}`)
+          },
+          visitManyHasManyOwner: (entity, relation, targetEntity) => {
+            const joiningAlias = `${fromAlias}_x_${toAlias}`
+            sqlExpr.push(`JOIN ${relation.joiningTable.tableName} AS ${joiningAlias} 
+          ON ${joiningAlias}.${relation.joiningTable.joiningColumn.columnName} = ${fromAlias}.${currentFrom.primary}`)
+            sqlExpr.push(`JOIN ${targetEntity.tableName}.${toAlias}
+          ON ${toAlias}.${targetEntity.primary} = ${joiningAlias}.${relation.joiningTable.inverseJoiningColumn.columnName}`)
+          },
+          visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
             const joiningAlias = `${fromAlias}_x_${toAlias}`
             sqlExpr.push(`JOIN ${targetRelation.joiningTable.tableName} AS ${joiningAlias} 
           ON ${joiningAlias}.${targetRelation.joiningTable.inverseJoiningColumn.columnName} = ${fromAlias}.${currentFrom.primary}`)
             sqlExpr.push(`JOIN ${targetEntity.tableName}.${toAlias}
           ON ${toAlias}.${targetEntity.primary} = ${joiningAlias}.${targetRelation.joiningTable.joiningColumn.columnName}`)
-          } else if (isHasOneOwnerRelation(targetRelation)) {
-            sqlExpr.push(`JOIN ${targetEntity.tableName} AS ${toAlias} ON ${toAlias}.${targetRelation.joiningColumn.columnName} = ${fromAlias}.${targetEntity.primary}`)
-          } else {
-            throw new Error('definition error')
-          }
-        }
-
-
-        joined.push(partialJoinPath)
+          },
+        })
         currentFrom = targetEntity
       }
     }
@@ -107,19 +114,13 @@ class SubQueryBuilder
 }
 
 
-const buildSubQuery = (schema: Schema, entity: Entity) => (relationName: string, relationWhere: Where) => {
-  const relation = entity.fields[relationName]
-  if (!isRelation(relation)) {
-    throw new Error()
-  }
+type JoinCallback = (joinPath: string[]) => string;
 
-}
-
-const buildWhere = (schema: Schema, entity: Entity) => (tableName: string, where: Where): string => {
+const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, joinPath: string[] = []) => (tableName: string, where: Where): string => {
 
 
   const buildWhereParts = (where: Where): string[] => {
-    const parts = []
+    const parts: string[] = []
     if (where.and !== undefined) {
       parts.push(joinParts(where.and.map((where: Where) => joinParts(buildWhereParts(where), 'AND')), 'AND'))
     }
@@ -133,19 +134,23 @@ const buildWhere = (schema: Schema, entity: Entity) => (tableName: string, where
       if (fieldName === 'and' || fieldName === 'or' || fieldName === 'not') {
         continue
       }
-      let field = entity.fields[fieldName];
-      if (!field) {
-        throw new Error('Field ' + fieldName + ' not found')
-      }
 
-      if (isField(field)) {
-        const condition: Condition<any> = where[fieldName];
-        parts.push(buildCondition(tableName, field.columnName)(condition))
-      } else if (isRelation(field)) {
-
-      } else {
-        throw new Error('impl error')
-      }
+      parts.push(acceptFieldVisitor(schema, entity, fieldName, {
+        visitColumn: (entity, column) => {
+          const condition: Condition<any> = where[column.name];
+          return buildCondition(tableName, column.columnName)(condition)
+        },
+        visitHasOne: (entity, relation, targetEntity) => {
+          const newJoinPath = [...joinPath, fieldName]
+          const alias = joinCallback(newJoinPath)
+          return buildWhere(schema, targetEntity, joinCallback, newJoinPath)(alias, where[fieldName])
+        },
+        visitHasMany: (entity, relation, targetEntity) => {
+          const subQueryBuilder = new SubQueryBuilder(schema, entity)
+          const whereExpr = buildWhere(schema, targetEntity, subQueryBuilder.join, [fieldName])(subQueryBuilder.join([fieldName]), where[fieldName])
+          return `${tableName}.${entity.primary} IN (${subQueryBuilder.getSql()} WHERE ${whereExpr})`
+        }
+      }))
     }
 
     return parts

@@ -1,4 +1,4 @@
-import model, { getEntity, isField, isHasManyInversedRelation, isHasOneOwnerRelation, isManyHasManyOwnerRelation, isRelation } from './model';
+import model, { acceptFieldVisitor, acceptRelationTypeVisitor, Entity, FieldVisitor, getEntity, RelationByTypeVisitor } from './model';
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -13,7 +13,7 @@ import {
   GraphQLString,
   Kind
 } from "graphql";
-import { JoinMonsterEntityMapping, JoinMonsterFieldMapping, JoinMonsterRelation } from "./joinMonsterHelpers";
+import { Join, JoinMonsterEntityMapping, JoinMonsterFieldMapping, SqlAstNode } from "./joinMonsterHelpers";
 import {
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfigArgumentMap,
@@ -154,37 +154,94 @@ const getEntityWhereType = singletonFactory(name => {
 
 const getPrimaryWhere = (entityName: string): GraphQLFieldConfigArgumentMap => {
   let entity = model.entities[entityName];
-  let name = entity.primary
-  let field = entity.fields[name];
-  if (!isField(field)) {
-    throw new Error("Only simple field can be a primary");
-  }
 
-  return {
-    [name]: {type: getBasicType(field.type)}
-  }
+  return acceptFieldVisitor(model, entity, entity.primary, {
+    visitRelation: () => {
+      throw new Error('Only simple field can be a primary')
+    },
+    visitColumn: (entity, column) => ({[column.name]: {type: getBasicType(column.type)}}),
+  });
 };
 
-const getListQuery = (typeName: string): FieldConfig => {
+
+const getListQuery = (entityName: string): FieldConfig => {
   return {
-    type: new GraphQLList(getEntityType(typeName)),
+    type: new GraphQLList(getEntityType(entityName)),
     args: {
-      where: {type: getEntityWhereType(typeName)},
+      where: {type: getEntityWhereType(entityName)},
     },
     where: (tableAlias: string, args: any, context: any, sqlAstNode: any) => {
-      // sqlAstNode.children.push({
-      //   "args": {},
-      //   "type": "table",
-      //   "name": "Author",
-      //   "as": "author",
-      //   "children": [],
-      //   "fieldName": "author",
-      //   "grabMany": false,
-      //   sqlJoin: (t1: string, t2: string) => `${t1}.author_id = ${t2}.id`
-      // })
-      // console.log(JSON.stringify(sqlAstNode, null, 4))
 
-      return buildWhere(model, getEntity(model, typeName))(tableAlias, args.where || {})
+      const usedNames: string[] = []
+      const visitNode = (sqlAstNode: any) => {
+        if (sqlAstNode.type === 'table' && sqlAstNode.as) {
+          usedNames.push(sqlAstNode.as)
+        }
+        if (sqlAstNode.children) {
+          (sqlAstNode.children as any[]).forEach(it => visitNode(it))
+        }
+      }
+
+      const generateName = (fieldName: string): string => {
+        let name = fieldName
+        while (usedNames.includes(name)) {
+          name += "_"
+        }
+        return name
+      }
+      visitNode(sqlAstNode)
+      const joiner = (sqlAstNode: SqlAstNode, entity: Entity) => (joinPath: string[]): string => {
+        const fieldName = joinPath[0]
+        let subNode = sqlAstNode.children.find(it => it.fieldName === fieldName)
+        if (!subNode) {
+          const notSupported = () => {
+            throw new Error('Only has one relation can be joined this way')
+          }
+          const joiningInfo = acceptRelationTypeVisitor(model, entity, fieldName, {
+            visitManyHasManyInversed: notSupported,
+            visitManyHasManyOwner: notSupported,
+            visitOneHasMany: notSupported,
+
+            visitManyHasOne: (entity, relation, targetEntity, targetRelation) => {
+              return {
+                name: relation.target,
+                sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primary}`
+              }
+            },
+            visitOneHasOneOwner: (entity, relation, targetEntity, targetRelation) => {
+              return {
+                name: relation.target,
+                sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primary}`
+              }
+            },
+            visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
+              return {
+                name: relation.target,
+                sqlJoin: (t1, t2) => `${t1}.${entity.primary} = ${t2}.${targetRelation.joiningColumn.columnName}`
+              }
+            }
+          } as RelationByTypeVisitor<{ name: string, sqlJoin: Join }>)
+          subNode = {
+            args: {},
+            type: "table",
+            as: generateName(fieldName),
+            children: [],
+            fieldName: fieldName,
+            grabMany: false,
+            ...joiningInfo
+          }
+          sqlAstNode.children.push(subNode)
+        }
+        if (joinPath.length > 1) {
+          return joiner(subNode, getEntity(model, subNode.name))(joinPath.slice(1))
+        }
+        return subNode.as
+      }
+
+      console.log(JSON.stringify(sqlAstNode, null, 4))
+
+      const entity = getEntity(model, entityName)
+      return buildWhere(model, entity, joiner(sqlAstNode, entity))(tableAlias, args.where || {})
     },
     resolve: resolver([]),
   }
@@ -205,14 +262,10 @@ const finalizeWhereType = (name: string) => {
   const whereFieldsPrototype = getEntityWhereFieldsPrototype(name)
   let entity = model.entities[name];
   for (let fieldName in entity.fields) {
-    const field = entity.fields[fieldName]
-    if (isField(field)) {
-      whereFieldsPrototype[fieldName] = {type: getConditionType(field.type)}
-    } else if (isRelation(field)) {
-      whereFieldsPrototype[fieldName] = {type: getEntityWhereType(field.target)}
-    } else {
-      throw new Error();
-    }
+    whereFieldsPrototype[fieldName] = acceptFieldVisitor(model, name, fieldName, {
+      visitColumn: (entity, column) => ({type: getConditionType(column.type)}),
+      visitRelation: (entity, relation) => ({type: getEntityWhereType(relation.target)}),
+    })
   }
 }
 
@@ -224,44 +277,37 @@ const finalizeEntityType = (entityName: string) => {
 
   const fieldsConfig = getEntityFieldsPrototype(entityName)
   for (let fieldName in entity.fields) {
-    const field = entity.fields[fieldName]
-    let fieldMapping: JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>;
-    if (isField(field)) {
-      const basicType = getBasicType(field.type)
-      const type = field.nullable ? basicType : new GraphQLNonNull(basicType)
-      fieldMapping = {
-        type: type,
-        sqlColumn: field.columnName,
-      }
-    } else if (isRelation(field)) {
-      const targetType = getEntityType(field.target);
-      let type: GraphQLOutputType;
-      let joinMonsterRelation = entityRelationFactory(field);
 
-      if (isHasOneOwnerRelation(field)) {
-        type = field.nullable ? targetType : new GraphQLNonNull(targetType)
-      } else if (isManyHasManyOwnerRelation(field)) {
-        type = new GraphQLList(new GraphQLNonNull(targetType));
-      } else if (isHasManyInversedRelation(field)) {
-        type = new GraphQLList(new GraphQLNonNull(targetType))
-      } else {
-        throw new Error('not impl')
-      }
-      fieldMapping = {
+    const type: GraphQLOutputType = acceptFieldVisitor(model, entity, fieldName, {
+      visitColumn: (entity, column) => {
+        const basicType = getBasicType(column.type)
+        return column.nullable ? basicType : new GraphQLNonNull(basicType)
+      },
+      visitHasMany: (entity, relation) => {
+        return new GraphQLList(new GraphQLNonNull(getEntityType(relation.target)))
+      },
+      visitHasOne: (entity, relation) => {
+        return relation.nullable ? getEntityType(relation.target) : new GraphQLNonNull(getEntityType(relation.target))
+      },
+    } as FieldVisitor<GraphQLOutputType>)
+
+    fieldsConfig[fieldName] = acceptFieldVisitor(model, entity, fieldName, {
+      visitColumn: (entity, column) => ({
+        type: type,
+        sqlColumn: column.columnName,
+      }),
+      visitRelation: (entity, relation) => ({
         type: type,
         args: {
-          where: {type: getEntityWhereType(field.target)},
+          where: {type: getEntityWhereType(relation.target)},
         },
         where: (tableAlias: string, args: any, context: any, sqlAstNode: any) => {
           return ''
         },
-        ...joinMonsterRelation
-      }
-    } else {
-      throw new Error();
-    }
+        ...entityRelationFactory(relation)
+      })
+    } as FieldVisitor<JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>>);
 
-    fieldsConfig[fieldName] = fieldMapping;
   }
 }
 

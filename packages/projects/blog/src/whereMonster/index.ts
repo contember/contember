@@ -147,7 +147,7 @@ const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, 
         },
         visitHasMany: (entity, relation, targetEntity) => {
           const subQueryBuilder = new SubQueryBuilder(schema, entity)
-          const whereExpr = buildWhere(schema, targetEntity, subQueryBuilder.join, [fieldName])(subQueryBuilder.join([fieldName]), where[fieldName])
+          const whereExpr = buildWhere(schema, targetEntity, subQueryBuilder.join.bind(subQueryBuilder), [fieldName])(subQueryBuilder.join([fieldName]), where[fieldName])
           return `${tableName}.${entity.primary} IN (${subQueryBuilder.getSql()} WHERE ${whereExpr})`
         }
       }))

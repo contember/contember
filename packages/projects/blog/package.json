@@ -11,6 +11,7 @@
     "graphql-yoga": "^1.14.10",
     "join-monster": "^2.0.16",
     "knex": "^0.14.6",
+    "node-pg-migrate": "^3.5.1",
     "sqlite3": "^4.0.0"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { joinParts } from "./utils";
+import { escapeParameter, expression, quoteIdentifier } from "../sql/utils"
 
 export interface Condition<T>
 {
@@ -17,19 +17,6 @@ export interface Condition<T>
   gte?: T,
 }
 
-const literal = (val: any): string => {
-  if (null == val) return 'NULL';
-  if (Array.isArray(val)) {
-    const vals = val.map(literal)
-    return "(" + vals.join(", ") + ")"
-  }
-
-  const backslash = ~val.indexOf('\\');
-  const prefix = backslash ? 'E' : '';
-  const escaped = val.replace(/'/g, "''").replace(/\\/g, '\\\\');
-  return prefix + "'" + escaped + "'";
-}
-
 
 const buildCondition = (tableName: string, columnName: string) => (condition: Condition<any>): string => {
   const parameters: any[] = []
@@ -37,23 +24,23 @@ const buildCondition = (tableName: string, columnName: string) => (condition: Co
   const buildParts = (condition: Condition<any>): string[] => {
     const parts = []
     if (condition.and !== undefined) {
-      parts.push(joinParts(condition.and.map(it => joinParts(buildParts(it), 'AND')), 'AND'))
+      parts.push(expression.and(condition.and.map(it => expression.and(buildParts(it)))))
     }
     if (condition.or !== undefined) {
-      parts.push(joinParts(condition.or.map(it => joinParts(buildParts(it), 'AND')), 'OR'))
+      parts.push(expression.or(condition.or.map(it => expression.and(buildParts(it)))))
     }
     if (condition.not !== undefined) {
-      parts.push(joinParts(buildParts(condition.not), 'AND', true))
+      parts.push(expression.not(expression.and(buildParts(condition.not))))
     }
 
-    const fqn = `${tableName}.${columnName}`
+    const fqn = quoteIdentifier(tableName, columnName)
 
     if (condition.eq !== undefined) {
       parameters.push(condition.eq)
       parts.push(`${fqn} = ?`)
     }
     if (condition.null !== undefined) {
-      const not = condition.null ? '' : 'NOT ';
+      const not = condition.null ? '' : 'NOT '
       parts.push(`${fqn} IS ${not}NULL`)
     }
     if (condition.notEq !== undefined) {
@@ -88,8 +75,8 @@ const buildCondition = (tableName: string, columnName: string) => (condition: Co
   }
 
   let i = 0
-  return joinParts(buildParts(condition), 'AND').replace(/\?/g, () => {
-    return literal(parameters[i++])
+  return expression.and(buildParts(condition)).replace(/\?/g, () => {
+    return escapeParameter(parameters[i++])
   })
 
 }

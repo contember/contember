@@ -4,7 +4,7 @@ export interface JoinMonsterEntityMapping
   uniqueKey: string | string[]
 }
 
-export type Join = (tableName: string, secondTableName: string, args: any) => string;
+export type Join = (tableName: string, secondTableName: string, args: any) => string
 type JoinedRelation<TArgs = { [argName: string]: any }> = {
   sqlJoin: Join
 }
@@ -61,7 +61,7 @@ export interface SqlAstTableNode
   type: 'table',
   name: string,
   as: string,
-  orderBy?: {[column: string] : 'DESC' | 'ASC'},
+  orderBy?: { [column: string]: 'DESC' | 'ASC' },
   children: SqlAstNode[],
   fieldName: string,
   where?: Where,
@@ -69,5 +69,7 @@ export interface SqlAstTableNode
   grabMany: boolean
 }
 
-export type SqlAstNode = SqlAstTableNode
+export const isSqlAstTableNode = (node: SqlAstNode): node is SqlAstTableNode => node.type === 'table'
+
+export type SqlAstNode = SqlAstTableNode | { type: string, children: SqlAstNode[] }
 

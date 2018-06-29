@@ -1,6 +1,7 @@
 export interface Entity
 {
   name: string
+  pluralName?: string
   primary: string
   tableName: string
   fields: { [name: string]: Column | Relation }
@@ -22,14 +23,12 @@ export const isColumn = (obj: Column | Relation): obj is Column => {
   return (obj as Column).type !== undefined
 }
 
-
 export const isRelation = (obj: Column | Relation): obj is Relation => {
   return (obj as Relation).relation !== undefined
 }
 
-
 export const getEntity = (schema: Schema, entityName: string): Entity => {
-  return schema.entities[entityName];
+  return schema.entities[entityName]
 }
 
 export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, fieldName: string, visitor: FieldVisitor<T>): T => {
@@ -138,7 +137,7 @@ export interface ColumnVisitor<T>
 
 export interface RelationVisitor<T>
 {
-  visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): T;
+  visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): T
 }
 
 export type FieldVisitor<T> = ColumnVisitor<T> & (RelationVisitor<T> | RelationByTypeVisitor<T> | RelationByGenericTypeVisitor<T>)
@@ -151,18 +150,18 @@ export interface RelationByTypeVisitor<T>
 
   visitOneHasOneOwner(entity: Entity, relation: OneHasOneOwnerRelation, targetEntity: Entity, targetRelation: OneHasOneInversedRelation | null): T
 
-  visitOneHasOneInversed(entity: Entity, relation: OneHasOneInversedRelation, targetEntity: Entity, targetRelation: OneHasOneOwnerRelation): T;
+  visitOneHasOneInversed(entity: Entity, relation: OneHasOneInversedRelation, targetEntity: Entity, targetRelation: OneHasOneOwnerRelation): T
 
-  visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null): T;
+  visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null): T
 
-  visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation): T;
+  visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation): T
 }
 
 export interface RelationByGenericTypeVisitor<T>
 {
-  visitHasMany(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): T;
+  visitHasMany(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): T
 
-  visitHasOne(entity: Entity, relation: Relation & NullableRelation, targetEntity: Entity, targetRelation: Relation | null): T;
+  visitHasOne(entity: Entity, relation: Relation & NullableRelation, targetEntity: Entity, targetRelation: Relation | null): T
 }
 
 export enum RelationType
@@ -228,32 +227,11 @@ interface JoiningTableRelation
 
 
 export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InversedRelation
-const isOneHasManyRelation = (relation: Relation): relation is OneHasManyRelation => {
-  return relation.relation === RelationType.OneHasMany
-}
-
 export type ManyHasOneRelation = Relation<RelationType.ManyHasOne> & OwnerRelation & JoiningColumnRelation & NullableRelation
-const isManyHasOneRelation = (relation: Relation): relation is ManyHasOneRelation => {
-  return relation.relation === RelationType.ManyHasOne
-}
-
 export type OneHasOneInversedRelation = Relation<RelationType.OneHasOne> & InversedRelation & NullableRelation
-const isOneHasOneInversedRelation = (relation: Relation): relation is OneHasOneInversedRelation => {
-  return relation.relation === RelationType.OneHasOne && isInversedRelation(relation)
-}
 export type OneHasOneOwnerRelation = Relation<RelationType.OneHasOne> & OwnerRelation & JoiningColumnRelation & NullableRelation
-const isOneHasOneOwnerRelation = (relation: Relation): relation is OneHasOneOwnerRelation => {
-  return relation.relation === RelationType.OneHasOne && isOwnerRelation(relation)
-}
-
 export type ManyHasManyInversedRelation = Relation<RelationType.ManyHasMany> & InversedRelation
-const isManyHasManyInversedRelation = (relation: Relation): relation is ManyHasManyInversedRelation => {
-  return relation.relation === RelationType.ManyHasMany && isInversedRelation(relation)
-}
 export type ManyHasManyOwnerRelation = Relation<RelationType.ManyHasMany> & OwnerRelation & JoiningTableRelation
-const isManyHasManyOwnerRelation = (relation: Relation): relation is ManyHasManyOwnerRelation => {
-  return relation.relation === RelationType.ManyHasMany && isOwnerRelation(relation)
-}
 
 export interface Schema
 {
@@ -262,7 +240,7 @@ export interface Schema
 }
 
 
-type Type = string;
+type Type = string
 
 export default {
   enums: {

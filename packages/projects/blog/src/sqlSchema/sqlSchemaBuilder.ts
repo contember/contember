@@ -1,7 +1,7 @@
-import { acceptFieldVisitor, Entity, Schema } from './model'
+import { acceptFieldVisitor, Entity, Schema } from '../model'
 import { ColumnDefinitions, MigrationBuilder } from 'node-pg-migrate'
 
-const buildSql = (schema: Schema, migrationBuilder: MigrationBuilder) => {
+const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
   const getPrimaryType = (entity: Entity) => {
     return acceptFieldVisitor(schema, entity, entity.primary, {
       visitColumn: (entity, column) => column.type,
@@ -66,7 +66,7 @@ const buildSql = (schema: Schema, migrationBuilder: MigrationBuilder) => {
 
           },
         },
-      );
+      )
     }
     migrationBuilder.createTable(entity.tableName, columns)
   }
@@ -109,9 +109,9 @@ const buildSql = (schema: Schema, migrationBuilder: MigrationBuilder) => {
           visitOneHasMany: () => {
           },
         },
-      );
+      )
     }
   }
 }
 
-export default buildSql
+export default buildSqlSchema

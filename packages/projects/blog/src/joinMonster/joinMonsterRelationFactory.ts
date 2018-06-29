@@ -1,5 +1,5 @@
-import { acceptRelationTypeVisitor, Entity, getEntity, Relation, RelationByTypeVisitor, Schema } from "../model";
-import { JoinMonsterRelation } from "../joinMonsterHelpers";
+import { acceptRelationTypeVisitor, Entity, getEntity, Relation, RelationByTypeVisitor, Schema } from "../model"
+import { JoinMonsterRelation } from "../joinMonsterHelpers"
 
 const createJoinMonsterRelation = (schema: Schema) => (entity: Entity) => (relation: Relation): JoinMonsterRelation<any, any> => {
   const targetEntity = getEntity(schema, relation.target)
@@ -69,4 +69,4 @@ const createJoinMonsterRelation = (schema: Schema) => (entity: Entity) => (relat
 }
 
 
-export default createJoinMonsterRelation;
+export default createJoinMonsterRelation

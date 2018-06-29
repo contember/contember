@@ -259,6 +259,7 @@ export default {
     },
     Category: {
       name: 'Category',
+      pluralName: 'Categories',
       primary: 'id',
       tableName: 'Category',
       fields: {

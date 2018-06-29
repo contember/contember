@@ -57,7 +57,11 @@ const completeEntityType = (schema: Schema) => {
           type: type,
           sqlColumn: column.columnName,
         }),
-        visitRelation: (entity, relation) => ({
+        visitHasOne: (entity, relation) => ({
+          type: type,
+          ...entityRelationFactory(relation)
+        }),
+        visitHasMany: (entity, relation) => ({
           type: type,
           args: {
             where: {type: getEntityWhereType(relation.target)},
@@ -66,7 +70,7 @@ const completeEntityType = (schema: Schema) => {
             return ''
           },
           ...entityRelationFactory(relation)
-        })
+        }),
       } as FieldVisitor<JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>>)
     }
   }

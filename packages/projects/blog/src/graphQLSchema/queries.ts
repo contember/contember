@@ -51,7 +51,6 @@ const getByPrimaryQuery = (schema: Schema) => {
 }
 
 const getQueries = (schema: Schema) => {
-
   return (entityName: string) => {
     const entity = getEntity(schema, entityName)
     return {

@@ -12,7 +12,7 @@ const buildGraphQlSchema = (schema: Schema) => {
 
   const entityNames = Object.keys(schema.entities)
   entityNames.forEach(getEntityType(schema))
-  entityNames.forEach(getEntityWhereType)
+  entityNames.forEach(name => getEntityWhereType(name))
 
   const queries = entityNames.reduce<{ [queryName: string]: FieldConfig }>((queries, entityName) => {
     return {
@@ -25,7 +25,6 @@ const buildGraphQlSchema = (schema: Schema) => {
   entityNames.forEach(completeEntityWhereType(schema))
 
   return new GraphQLObjectType({
-    description: 'global query object',
     name: 'Query',
     fields: () => ({
       version: {

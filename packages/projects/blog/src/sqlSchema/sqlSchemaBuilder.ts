@@ -40,6 +40,13 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
                 type: getPrimaryType(targetEntity),
                 notNull: true,
               }
+            }, {
+              constraints: {
+                primaryKey: [
+                  relation.joiningTable.joiningColumn.columnName,
+                  relation.joiningTable.inverseJoiningColumn.columnName,
+                ]
+              }
             })
           },
           visitOneHasOneOwner: (entity, relation, targetEntity) => {
@@ -94,11 +101,19 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
               }
             })
           },
-          visitOneHasOneOwner: () => {
+          visitOneHasOneOwner: (entity, relation, targetEntity) => {
+            migrationBuilder.createIndex(entity.tableName, relation.joiningColumn.columnName, {unique: true})
+            migrationBuilder.createConstraint(entity.tableName, `fk_${entity.tableName}_${relation.name}`, {
+              foreignKeys: {
+                columns: relation.joiningColumn.columnName,
+                references: `"${targetEntity.tableName}"(${targetEntity.primary})`
+              }
+            })
           },
           visitOneHasOneInversed: () => {
           },
           visitManyHasOne: (entity, relation, targetEntity) => {
+            migrationBuilder.createIndex(entity.tableName, relation.joiningColumn.columnName)
             migrationBuilder.createConstraint(entity.tableName, `fk_${entity.tableName}_${relation.name}`, {
               foreignKeys: {
                 columns: relation.joiningColumn.columnName,

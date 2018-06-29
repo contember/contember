@@ -33,7 +33,7 @@ const buildCondition = (tableName: string, columnName: string) => (condition: Co
       parts.push(expression.not(expression.and(buildParts(condition.not))))
     }
 
-    const fqn = quoteIdentifier(tableName, columnName)
+    const fqn = `${tableName}.${quoteIdentifier(columnName)}`
 
     if (condition.eq !== undefined) {
       parameters.push(condition.eq)

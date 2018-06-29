@@ -7,6 +7,8 @@ import { JoinMonsterEntityMapping, JoinMonsterFieldMapping } from "../joinMonste
 import getColumnType from "./columns";
 import { getEntityWhereType } from "./where";
 import { quoteIdentifier } from "../sql/utils";
+import { buildWhere } from "../whereMonster";
+import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils";
 
 const getEntityFieldsPrototype = singletonFactory<GraphQLFieldConfigMap<any, any>>(name => ({}))
 
@@ -61,13 +63,14 @@ const completeEntityType = (schema: Schema) => {
           type: type,
           ...entityRelationFactory(relation)
         }),
-        visitHasMany: (entity, relation) => ({
+        visitHasMany: (entity, relation, targetEntity) => ({
           type: type,
           args: {
             where: {type: getEntityWhereType(relation.target)},
           },
           where: (tableAlias: string, args: any, context: any, sqlAstNode: any) => {
-            return ''
+            const createAlias = aliasInAst(sqlAstNode)
+            return buildWhere(schema, targetEntity, joinToAst(schema, createAlias)(sqlAstNode, targetEntity))(tableAlias, args.where || {})
           },
           ...entityRelationFactory(relation)
         }),

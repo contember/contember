@@ -1,5 +1,5 @@
 import { isSqlAstTableNode, Join, SqlAstNode, SqlAstTableNode } from "../joinMonsterHelpers"
-import { createAlias } from "../sql/utils"
+import { createAlias, quoteIdentifier } from "../sql/utils"
 import { acceptRelationTypeVisitor, Entity, getEntity, RelationByTypeVisitor, Schema } from "../model"
 
 const aliasInAst = (sqlAstNode: SqlAstNode) => {
@@ -32,19 +32,19 @@ const joinToAst = (schema: Schema, createAlias: (name: string) => string) => {
 
         visitManyHasOne: (entity, relation, targetEntity, targetRelation) => {
           return {
-            name: relation.target,
+            name: quoteIdentifier(targetEntity.tableName),
             sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primary}`
           }
         },
         visitOneHasOneOwner: (entity, relation, targetEntity, targetRelation) => {
           return {
-            name: relation.target,
+            name: quoteIdentifier(targetEntity.tableName),
             sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primary}`
           }
         },
         visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
           return {
-            name: relation.target,
+            name: quoteIdentifier(targetEntity.tableName),
             sqlJoin: (t1, t2) => `${t1}.${entity.primary} = ${t2}.${targetRelation.joiningColumn.columnName}`
           }
         }

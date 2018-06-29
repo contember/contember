@@ -1,5 +1,6 @@
 import { acceptRelationTypeVisitor, Entity, getEntity, Relation, RelationByTypeVisitor, Schema } from "../model"
 import { JoinMonsterRelation } from "../joinMonsterHelpers"
+import { quoteIdentifier } from "../sql/utils";
 
 const createJoinMonsterRelation = (schema: Schema) => (entity: Entity) => (relation: Relation): JoinMonsterRelation<any, any> => {
   const targetEntity = getEntity(schema, relation.target)
@@ -22,7 +23,7 @@ const createJoinMonsterRelation = (schema: Schema) => (entity: Entity) => (relat
       visitManyHasManyOwner: (entity, relation, targetEntity) => {
         return {
           junction: {
-            sqlTable: relation.joiningTable.tableName,
+            sqlTable: quoteIdentifier(relation.joiningTable.tableName),
             uniqueKey: [relation.joiningTable.joiningColumn.columnName, relation.joiningTable.inverseJoiningColumn.columnName],
             sqlBatch: {
               parentKey: entity.primary,
@@ -37,7 +38,7 @@ const createJoinMonsterRelation = (schema: Schema) => (entity: Entity) => (relat
       visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
         return {
           junction: {
-            sqlTable: targetRelation.joiningTable.tableName,
+            sqlTable: quoteIdentifier(targetRelation.joiningTable.tableName),
             uniqueKey: [targetRelation.joiningTable.joiningColumn.columnName, targetRelation.joiningTable.inverseJoiningColumn.columnName],
             sqlBatch: {
               parentKey: entity.primary,

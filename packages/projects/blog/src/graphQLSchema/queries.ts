@@ -10,11 +10,10 @@ import joinMonster from "join-monster";
 type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
 
 const resolver = (result: any) => (parent: any, args: any, context: any, resolveInfo: any) => {
-  console.log(arguments)
   return joinMonster(resolveInfo, context, (sql: string) => {
     console.log(sql)
-    return Promise.resolve(result)
-  })
+    return context.db.raw(sql)
+  }, {dialect: 'pg'})
 }
 
 const getListQuery = (schema: Schema) => {
@@ -22,6 +21,8 @@ const getListQuery = (schema: Schema) => {
   const getEntityTypeInSchema = getEntityType(schema)
 
   return (entityName: string): FieldConfig => {
+    const entity = getEntity(schema, entityName)
+
     return {
       type: new GraphQLList(getEntityTypeInSchema(entityName)),
       args: {
@@ -29,7 +30,6 @@ const getListQuery = (schema: Schema) => {
       },
       where: (tableAlias: string, args: any, context: any, sqlAstNode: SqlAstNode) => {
         const createAlias = aliasInAst(sqlAstNode)
-        const entity = getEntity(schema, entityName)
 
         return buildWhere(schema, entity, joinToAst(schema, createAlias)(sqlAstNode, entity))(tableAlias, args.where || {})
       },

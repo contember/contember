@@ -10,8 +10,6 @@ import { quoteIdentifier } from "../sql/utils";
 import { buildWhere } from "../whereMonster";
 import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils";
 
-const getEntityFieldsPrototype = singletonFactory<GraphQLFieldConfigMap<any, any>>(name => ({}))
-
 const entitySingleton = singletonFactory<GraphQLObjectType, Schema>((name, schema: Schema) => {
   const entity = getEntity(schema, name)
   const entityMapping: JoinMonsterEntityMapping = {
@@ -21,14 +19,14 @@ const entitySingleton = singletonFactory<GraphQLObjectType, Schema>((name, schem
 
   return new GraphQLObjectType({
     name: name,
-    fields: () => getEntityFieldsPrototype(name),
+    fields: () => getEntityFields(schema)(name),
     ...entityMapping
   } as GraphQLObjectTypeConfig<any, any>)
 })
 
 const getEntityType = (schema: Schema) => (entityName: string) => entitySingleton(entityName, schema)
 
-const completeEntityType = (schema: Schema) => {
+const getEntityFields = (schema: Schema) => {
   const relationFactory = createJoinMonsterRelation(schema)
   const getEntityTypeInSchema = getEntityType(schema)
 
@@ -38,7 +36,7 @@ const completeEntityType = (schema: Schema) => {
     const getBasicType = getColumnType(schema)
     const entityRelationFactory = relationFactory(entity)
 
-    const fieldsConfig = getEntityFieldsPrototype(entityName)
+    const fields: GraphQLFieldConfigMap<any, any> = {}
     for (let fieldName in entity.fields) {
 
       const type: GraphQLOutputType = acceptFieldVisitor(schema, entity, fieldName, {
@@ -54,7 +52,7 @@ const completeEntityType = (schema: Schema) => {
         },
       } as FieldVisitor<GraphQLOutputType>)
 
-      fieldsConfig[fieldName] = acceptFieldVisitor(schema, entity, fieldName, {
+      fields[fieldName] = acceptFieldVisitor(schema, entity, fieldName, {
         visitColumn: (entity, column) => ({
           type: type,
           sqlColumn: column.columnName,
@@ -66,7 +64,7 @@ const completeEntityType = (schema: Schema) => {
         visitHasMany: (entity, relation, targetEntity) => ({
           type: type,
           args: {
-            where: {type: getEntityWhereType(relation.target)},
+            where: {type: getEntityWhereType(schema)(relation.target)},
           },
           where: (tableAlias: string, args: any, context: any, sqlAstNode: any) => {
             const createAlias = aliasInAst(sqlAstNode)
@@ -76,7 +74,8 @@ const completeEntityType = (schema: Schema) => {
         }),
       } as FieldVisitor<JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>>)
     }
+    return fields
   }
 }
 
-export { getEntityType, completeEntityType }
+export { getEntityType }

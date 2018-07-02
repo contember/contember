@@ -5,30 +5,34 @@ import { GraphQLInputObjectType, GraphQLList } from "graphql";
 import getColumnType from "./columns";
 import { getConditionType } from "./conditions";
 
-const getEntityWhereFieldsPrototype = singletonFactory<GraphQLInputFieldConfigMap>(name => ({}))
 
-const getEntityWhereType = singletonFactory(name => {
-  const fieldPrototypes = getEntityWhereFieldsPrototype(name)
+const whereSingleton = singletonFactory((name, schema: Schema) => {
   const where: GraphQLInputObjectType = new GraphQLInputObjectType({
     name: name + "Where",
-    fields: () => fieldPrototypes,
+    fields: () => getEntityWhereFields(schema)(name, where),
   })
-  fieldPrototypes.and = {type: new GraphQLList(new GraphQLNonNull(where))}
-  fieldPrototypes.or = {type: new GraphQLList(new GraphQLNonNull(where))}
-  fieldPrototypes.not = {type: where}
 
   return where
 })
-const completeEntityWhereType = (schema: Schema) => (name: string) => {
-  const whereFieldsPrototype = getEntityWhereFieldsPrototype(name)
+
+const getEntityWhereType = (schema: Schema) => (name: string) => whereSingleton(name, schema)
+
+
+const getEntityWhereFields = (schema: Schema) => (name: string, where: GraphQLInputObjectType) => {
+  const fields: GraphQLInputFieldConfigMap = {}
   const getConditionTypeInSchema = getConditionType(schema)
   let entity = schema.entities[name]
   for (let fieldName in entity.fields) {
-    whereFieldsPrototype[fieldName] = acceptFieldVisitor(schema, name, fieldName, {
+    fields[fieldName] = acceptFieldVisitor(schema, name, fieldName, {
       visitColumn: (entity, column) => ({type: getConditionTypeInSchema(column.type)}),
-      visitRelation: (entity, relation) => ({type: getEntityWhereType(relation.target)}),
+      visitRelation: (entity, relation) => ({type: getEntityWhereType(schema)(relation.target)}),
     })
   }
+  fields.and = {type: new GraphQLList(new GraphQLNonNull(where))}
+  fields.or = {type: new GraphQLList(new GraphQLNonNull(where))}
+  fields.not = {type: where}
+
+  return fields
 }
 
 const getPrimaryWhereArgs = (schema: Schema) => {
@@ -50,5 +54,4 @@ const getPrimaryWhereArgs = (schema: Schema) => {
 export {
   getEntityWhereType,
   getPrimaryWhereArgs,
-  completeEntityWhereType,
 }

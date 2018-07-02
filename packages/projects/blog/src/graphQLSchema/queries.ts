@@ -46,7 +46,10 @@ const getByPrimaryQuery = (schema: Schema) => {
         where: {type: getPrimaryWhereType(schema)(entityName)}
       },
       where: (tableName: string, args: any, context: any) => {
-        return `${tableName}.${schema.entities[entityName].primary} = ${escapeParameter(args.id)}`
+        const entity = schema.entities[entityName]
+        return buildWhere(schema, entity, () => {
+          throw new Error()
+        })(tableName, args.where || {})
       },
       resolve: resolver,
     }

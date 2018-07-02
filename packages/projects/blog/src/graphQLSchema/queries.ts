@@ -3,15 +3,16 @@ import { getEntity, Schema } from "../model";
 import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils";
 import { GraphQLFieldConfig, GraphQLList } from "graphql";
 import { JoinMonsterFieldMapping, SqlAstNode } from "../joinMonsterHelpers";
-import { getEntityWhereType, getPrimaryWhereArgs } from "./where";
+import { getEntityWhereType, getPrimaryWhereType } from "./where";
 import { getEntityType } from "./entities";
 import joinMonster from "join-monster";
+import { Context } from "../types";
+import { escapeParameter } from "../sql/utils";
 
 type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
 
-const resolver = (parent: any, args: any, context: any, resolveInfo: any) => {
+const resolver = (parent: any, args: any, context: Context, resolveInfo: any) => {
   return joinMonster(resolveInfo, context, (sql: string) => {
-    console.log(sql)
     return context.db.raw(sql)
   }, {dialect: 'pg'})
 }
@@ -41,9 +42,11 @@ const getByPrimaryQuery = (schema: Schema) => {
   return (entityName: string): FieldConfig => {
     return {
       type: getEntityType(schema)(entityName),
-      args: getPrimaryWhereArgs(schema)(entityName),
+      args: {
+        where: {type: getPrimaryWhereType(schema)(entityName)}
+      },
       where: (tableName: string, args: any, context: any) => {
-        return `${tableName}.${schema.entities[entityName].primary[0]} = ${args.id}`
+        return `${tableName}.${schema.entities[entityName].primary} = ${escapeParameter(args.id)}`
       },
       resolve: resolver,
     }

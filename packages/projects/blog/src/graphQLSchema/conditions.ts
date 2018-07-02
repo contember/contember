@@ -3,11 +3,12 @@ import singletonFactory from "../utils/singletonFactory"
 import { GraphQLNonNull } from "graphql/type/definition"
 import { GraphQLBoolean, GraphQLInputObjectType, GraphQLList } from "graphql"
 import getColumnType from "./columns";
+import { capitalizeFirstLetter } from "../utils/strings";
 
 const conditionSingleton = singletonFactory((typeName, schema: Schema) => {
   const basicType = getColumnType(schema)(typeName)
   const condition: GraphQLInputObjectType = new GraphQLInputObjectType({
-    name: typeName + "Condition",
+    name: capitalizeFirstLetter(typeName) + "Condition",
     fields: () => ({
       and: {type: new GraphQLList(new GraphQLNonNull(condition))},
       or: {type: new GraphQLList(new GraphQLNonNull(condition))},

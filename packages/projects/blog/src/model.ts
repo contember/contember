@@ -31,6 +31,20 @@ export const getEntity = (schema: Schema, entityName: string): Entity => {
   return schema.entities[entityName]
 }
 
+
+export const acceptEveryFieldVisitor = <T>(schema: Schema, entity: string | Entity, visitor: FieldVisitor<T>): {[fieldName: string]: T} => {
+  let entityObj: Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
+  if (!entityObj) {
+    throw new Error(`entity ${entity} not found`)
+  }
+  const result: { [fieldName: string]: T } = {}
+  for (let field in entityObj.fields) {
+    result[field] = acceptFieldVisitor(schema, entityObj, field, visitor)
+  }
+  return result
+}
+
+
 export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, fieldName: string, visitor: FieldVisitor<T>): T => {
   let entityObj: Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
   if (!entityObj) {

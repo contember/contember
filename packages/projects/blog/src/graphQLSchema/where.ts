@@ -1,14 +1,15 @@
 import singletonFactory from "../utils/singletonFactory";
-import { GraphQLFieldConfigArgumentMap, GraphQLInputFieldConfigMap, GraphQLNonNull } from "graphql/type/definition";
+import { GraphQLInputFieldConfigMap, GraphQLNonNull } from "graphql/type/definition";
 import { acceptFieldVisitor, getEntity, Schema } from "../model";
 import { GraphQLInputObjectType, GraphQLList } from "graphql";
 import getColumnType from "./columns";
 import { getConditionType } from "./conditions";
+import { capitalizeFirstLetter } from "../utils/strings";
 
 
 const whereSingleton = singletonFactory((name, schema: Schema) => {
   const where: GraphQLInputObjectType = new GraphQLInputObjectType({
-    name: name + "Where",
+    name: capitalizeFirstLetter(name) + "Where",
     fields: () => getEntityWhereFields(schema)(name, where),
   })
 
@@ -35,23 +36,24 @@ const getEntityWhereFields = (schema: Schema) => (name: string, where: GraphQLIn
   return fields
 }
 
-const getPrimaryWhereArgs = (schema: Schema) => {
+const uniqueWhereSingleton = singletonFactory((entityName: string, schema: Schema) => {
+  const entity = getEntity(schema, entityName)
   const getBasicType = getColumnType(schema)
 
-  return (entityName: string): GraphQLFieldConfigArgumentMap => {
-    let entity = getEntity(schema, entityName)
-
-    return acceptFieldVisitor(schema, entity, entity.primary, {
+  return new GraphQLInputObjectType({
+    name: capitalizeFirstLetter(entityName) + "UniqueWhere",
+    fields: () => acceptFieldVisitor(schema, entity, entity.primary, {
       visitRelation: () => {
         throw new Error('Only simple field can be a primary')
       },
       visitColumn: (entity, column) => ({[column.name]: {type: getBasicType(column.type)}}),
     })
-  }
-}
+  })
+})
 
+const getPrimaryWhereType = (schema: Schema) => (entityName: string) => uniqueWhereSingleton(entityName, schema)
 
 export {
   getEntityWhereType,
-  getPrimaryWhereArgs,
+  getPrimaryWhereType,
 }

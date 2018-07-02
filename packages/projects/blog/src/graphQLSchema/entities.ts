@@ -9,8 +9,9 @@ import { getEntityWhereType } from "./where";
 import { quoteIdentifier } from "../sql/utils";
 import { buildWhere } from "../whereMonster";
 import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils";
+import { capitalizeFirstLetter } from "../utils/strings";
 
-const entitySingleton = singletonFactory<GraphQLObjectType, Schema>((name, schema: Schema) => {
+const entitySingleton = singletonFactory<GraphQLObjectType, string, Schema>((name, schema: Schema) => {
   const entity = getEntity(schema, name)
   const entityMapping: JoinMonsterEntityMapping = {
     sqlTable: quoteIdentifier(entity.tableName),
@@ -18,7 +19,7 @@ const entitySingleton = singletonFactory<GraphQLObjectType, Schema>((name, schem
   }
 
   return new GraphQLObjectType({
-    name: name,
+    name: capitalizeFirstLetter(name),
     fields: () => getEntityFields(schema)(name),
     ...entityMapping
   } as GraphQLObjectTypeConfig<any, any>)

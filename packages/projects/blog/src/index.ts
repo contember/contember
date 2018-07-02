@@ -1,14 +1,12 @@
 import { GraphQLServer } from 'graphql-yoga'
 import buildGraphQlSchema from './graphQLSchema/graphqlSchemaBuilder'
-import { GraphQLSchema, printSchema } from "graphql"
+import { printSchema } from "graphql"
 import * as fs from 'fs'
 import buildSql from "./sqlSchema/sqlSchemaBuilder"
 import model from "./model"
 import * as knex from 'knex'
 
-let graphQLSchema = new GraphQLSchema({
-  query: buildGraphQlSchema(model)
-})
+let graphQLSchema = buildGraphQlSchema(model)
 
 let builderClass = require('node-pg-migrate/dist/migration-builder').default
 let migrationBuilder = new builderClass({}, {
@@ -23,6 +21,7 @@ const fileData = printSchema(graphQLSchema)
 fs.writeFile(__dirname + '/schema.graphql', fileData, error => console.error(error))
 
 const connection = knex({
+  debug: true,
   client: 'pg',
   connection: {
     host: '127.0.0.1',

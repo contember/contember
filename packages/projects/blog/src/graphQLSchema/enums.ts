@@ -2,6 +2,7 @@ import singletonFactory from "../utils/singletonFactory"
 import { GraphQLEnumValueConfigMap } from "graphql/type/definition"
 import { GraphQLEnumType } from "graphql"
 import { Schema } from "../model"
+import { capitalizeFirstLetter } from "../utils/strings";
 
 const enumSingleton = singletonFactory((name, schema: Schema) => {
   if (schema.enums[name] === undefined) {
@@ -14,7 +15,7 @@ const enumSingleton = singletonFactory((name, schema: Schema) => {
   }
 
   return new GraphQLEnumType({
-    name: name,
+    name: capitalizeFirstLetter(name),
     values: valuesConfig
   })
 })

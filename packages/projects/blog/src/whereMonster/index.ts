@@ -13,7 +13,7 @@ type ComposedWhere = {
 //workaround
 type FieldWhere = { [name: string]: Condition<any> | any }
 
-type Where = ComposedWhere & FieldWhere & any
+export type Where = ComposedWhere & FieldWhere & any
 
 
 class SubQueryBuilder

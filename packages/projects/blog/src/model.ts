@@ -82,12 +82,12 @@ export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, f
     typeof (visitor as RelationByGenericTypeVisitor<T>).visitHasMany !== "undefined")(visitor)) {
 
     return acceptRelationTypeVisitor(schema, entityObj, fieldName, {
-      visitManyHasManyInversed: visitor.visitHasMany,
-      visitManyHasManyOwner: visitor.visitHasMany,
-      visitOneHasMany: visitor.visitHasMany,
-      visitOneHasOneInversed: visitor.visitHasOne,
-      visitOneHasOneOwner: visitor.visitHasOne,
-      visitManyHasOne: visitor.visitHasOne,
+      visitManyHasManyInversed: visitor.visitHasMany.bind(visitor),
+      visitManyHasManyOwner: visitor.visitHasMany.bind(visitor),
+      visitOneHasMany: visitor.visitHasMany.bind(visitor),
+      visitOneHasOneInversed: visitor.visitHasOne.bind(visitor),
+      visitOneHasOneOwner: visitor.visitHasOne.bind(visitor),
+      visitManyHasOne: visitor.visitHasOne.bind(visitor),
     })
   }
   if ((<T>(visitor: FieldVisitor<T>): visitor is (ColumnVisitor<T> & RelationByTypeVisitor<T>) =>

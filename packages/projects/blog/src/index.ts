@@ -1,12 +1,13 @@
 import { GraphQLServer } from 'graphql-yoga'
-import buildGraphQlSchema from './graphQLSchema/graphqlSchemaBuilder'
+import GraphQlSchemaBuilder from './graphQLSchema/GraphQlSchemaBuilder'
 import { printSchema } from "graphql"
 import * as fs from 'fs'
 import buildSql from "./sqlSchema/sqlSchemaBuilder"
 import model from "./model"
 import * as knex from 'knex'
 
-let graphQLSchema = buildGraphQlSchema(model)
+const builder = new GraphQlSchemaBuilder(model)
+let graphQLSchema = builder.build()
 
 let builderClass = require('node-pg-migrate/dist/migration-builder').default
 let migrationBuilder = new builderClass({}, {

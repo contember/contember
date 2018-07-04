@@ -80,10 +80,10 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
       )
 
     const createAndConnect = (input: CreateInput) =>
-      this.insertBuilder.onAfterInsert(primaryInversed => this.inserter.insert(targetEntity.name, input)
-        .then(primaryOwner =>
-          this.joinManyHasMany(targetRelation, primaryOwner, primaryInversed)
-        )
+      this.insertBuilder.onAfterInsert(async (primaryInversed) => {
+          const primaryOwner = await this.inserter.insert(targetEntity.name, input)
+          return await this.joinManyHasMany(targetRelation, primaryOwner, primaryInversed)
+        }
       )
 
     for (let element of relationData) {
@@ -115,11 +115,10 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
       )
 
     const createAndConnect = (input: CreateInput) =>
-      this.insertBuilder.onAfterInsert(primary =>
-        this.inserter.insert(targetEntity.name, input)
-          .then(primaryInversed =>
-            this.joinManyHasMany(relation, primary, primaryInversed)
-          )
+      this.insertBuilder.onAfterInsert(async (primary) => {
+          const primaryInversed = await this.inserter.insert(targetEntity.name, input)
+          return await this.joinManyHasMany(relation, primary, primaryInversed)
+        }
       )
 
     for (let relationInput of relationData) {

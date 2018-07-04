@@ -54,13 +54,11 @@ export default class MutationProvider
         const primary = this.schema.entities[entityName].primary
         return `${tableName}.${primary} = ${escapeParameter(context.primary)}`
       },
-      resolve: (parent, args, context: Context, resolveInfo) => {
-        return insertData(this.schema, context.db)(entityName, args.data)
-          .then(primary => {
-            return joinMonster(resolveInfo, {...context, primary}, (sql) => {
-              return context.db.raw(sql)
-            }, {dialect: 'pg'})
-          })
+      resolve: async (parent, args, context: Context, resolveInfo) => {
+        const primary = await insertData(this.schema, context.db)(entityName, args.data)
+        return await joinMonster(resolveInfo, {...context, primary}, (sql) => {
+          return context.db.raw(sql)
+        }, {dialect: 'pg'})
       },
     }
   }

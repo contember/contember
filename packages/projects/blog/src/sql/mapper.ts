@@ -36,16 +36,14 @@ export class InsertBuilder
     this.afterInsert.push(callback)
   }
 
-  insertRow(): Promise<PrimaryValue>
+  async insertRow(): Promise<PrimaryValue>
   {
     const qb = this.db.queryBuilder().table(this.tableName)
-    return promiseAllObject(this.rowData)
-      .then(rowData => qb.insert(rowData, this.primaryColumn))
-      .then(returning => returning[0])
-      .then(primary => {
-        return Promise.all(this.afterInsert.map(callback => callback(primary)))
-          .then(() => primary)
-      })
+    const rowData = await promiseAllObject(this.rowData)
+    const returning = await qb.insert(rowData, this.primaryColumn)
+    await Promise.all(this.afterInsert.map(callback => callback(returning[0])))
+
+    return returning[0]
   }
 }
 

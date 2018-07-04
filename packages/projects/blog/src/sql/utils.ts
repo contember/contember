@@ -1,4 +1,13 @@
-export const escapeParameter = (val: any): string => {
+import { ColumnValue, GenericValueLike } from "./types";
+
+export const resolveValue = <T extends ColumnValue>(value: GenericValueLike<T>): PromiseLike<T> => {
+  if (typeof value === "function") {
+    value = value()
+  }
+  return Promise.resolve(value)
+}
+
+export const escapeParameter = (val: ColumnValue): string => {
   if (val === null) {
     return 'NULL'
   }

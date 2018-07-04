@@ -7,7 +7,6 @@ import { getEntityWhereType, getPrimaryWhereType } from "./where";
 import { getEntityType } from "./entities";
 import joinMonster from "join-monster";
 import { Context } from "../types";
-import { escapeParameter } from "../sql/utils";
 
 type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
 

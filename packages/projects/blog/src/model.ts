@@ -10,6 +10,7 @@ export interface Entity
 export interface Column
 {
   name: string
+  default?: any | (() => any);
   type: Type
   columnName: string
   unique?: boolean
@@ -211,7 +212,7 @@ export const isOwnerRelation = (relation: Relation): relation is OwnerRelation =
   return !isInversedRelation(relation)
 }
 
-interface JoiningColumnRelation
+export interface JoiningColumnRelation
 {
   joiningColumn: {
     columnName: string,

@@ -1,3 +1,5 @@
+import { isIt } from "./utils/type";
+
 export interface Entity
 {
   name: string
@@ -33,7 +35,7 @@ export const getEntity = (schema: Schema, entityName: string): Entity => {
 }
 
 
-export const acceptEveryFieldVisitor = <T>(schema: Schema, entity: string | Entity, visitor: FieldVisitor<T>): {[fieldName: string]: T} => {
+export const acceptEveryFieldVisitor = <T>(schema: Schema, entity: string | Entity, visitor: FieldVisitor<T>): { [fieldName: string]: T } => {
   let entityObj: Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
   if (!entityObj) {
     throw new Error(`entity ${entity} not found`)
@@ -63,8 +65,7 @@ export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, f
   }
   const targetEntity = getEntity(schema, field.target)
 
-  if ((<T>(visitor: FieldVisitor<T>): visitor is (ColumnVisitor<T> & RelationVisitor<T>) =>
-    typeof (visitor as RelationVisitor<T>).visitRelation !== "undefined")(visitor)) {
+  if (isIt<ColumnVisitor<T> & RelationVisitor<T>>(visitor, 'visitRelation')) {
     let targetRelation = null
     if (isOwnerRelation(field)) {
       targetRelation = field.inversedBy ? (targetEntity.fields[field.inversedBy] || null) : null
@@ -78,9 +79,8 @@ export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, f
     }
     return visitor.visitRelation(entityObj, field, targetEntity, targetRelation)
   }
-  if ((<T>(visitor: FieldVisitor<T>): visitor is (ColumnVisitor<T> & RelationByGenericTypeVisitor<T>) =>
-    typeof (visitor as RelationByGenericTypeVisitor<T>).visitHasMany !== "undefined")(visitor)) {
 
+  if (isIt<ColumnVisitor<T> & RelationByGenericTypeVisitor<T>>(visitor, 'visitHasMany')) {
     return acceptRelationTypeVisitor(schema, entityObj, fieldName, {
       visitManyHasManyInversed: visitor.visitHasMany.bind(visitor),
       visitManyHasManyOwner: visitor.visitHasMany.bind(visitor),
@@ -90,9 +90,8 @@ export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, f
       visitManyHasOne: visitor.visitHasOne.bind(visitor),
     })
   }
-  if ((<T>(visitor: FieldVisitor<T>): visitor is (ColumnVisitor<T> & RelationByTypeVisitor<T>) =>
-    typeof (visitor as RelationByTypeVisitor<T>).visitManyHasManyInversed !== "undefined")(visitor)) {
 
+  if (isIt<ColumnVisitor<T> & RelationByTypeVisitor<T>>(visitor, 'visitManyHasManyInversed')) {
     return acceptRelationTypeVisitor(schema, entityObj, fieldName, visitor)
   }
   throw new Error()

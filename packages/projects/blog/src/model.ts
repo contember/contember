@@ -5,6 +5,7 @@ export interface Entity
   name: string
   pluralName?: string
   primary: string
+  primaryColumn: string
   tableName: string
   fields: { [name: string]: Column | Relation }
 }
@@ -265,6 +266,7 @@ export default {
     Author: {
       name: 'Author',
       primary: 'id',
+      primaryColumn: 'id',
       tableName: 'Author',
       fields: {
         id: {name: 'id', type: 'uuid', columnName: 'id'},
@@ -275,6 +277,7 @@ export default {
       name: 'Category',
       pluralName: 'Categories',
       primary: 'id',
+      primaryColumn: 'id',
       tableName: 'Category',
       fields: {
         id: {name: 'id', type: 'uuid', columnName: 'id'},
@@ -285,6 +288,7 @@ export default {
     CategoryLocale: {
       name: 'CategoryLocale',
       primary: 'id',
+      primaryColumn: 'id',
       tableName: 'CategoryLocale',
       fields: {
         id: {name: 'id', type: 'uuid', columnName: 'id'},
@@ -305,6 +309,7 @@ export default {
     Post: {
       name: 'Post',
       primary: 'id',
+      primaryColumn: 'id',
       tableName: 'Post',
       fields: {
         id: {name: 'id', type: 'uuid', columnName: 'id'},
@@ -334,6 +339,7 @@ export default {
     PostLocale: {
       name: 'PostLocale',
       primary: 'id',
+      primaryColumn: 'id',
       tableName: 'PostLocale',
       fields: {
         id: {name: 'id', type: 'uuid', columnName: 'id'},
@@ -353,6 +359,7 @@ export default {
     PostSite: {
       name: 'PostSite',
       primary: 'id',
+      primaryColumn: 'id',
       tableName: 'PostSite',
       fields: {
         id: {name: 'id', type: 'uuid', columnName: 'id'},
@@ -380,6 +387,7 @@ export default {
     Site: {
       name: 'Site',
       primary: 'id',
+      primaryColumn: 'id',
       tableName: 'Site',
       fields: {
         id: {name: 'id', type: 'uuid', columnName: 'id'},

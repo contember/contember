@@ -44,7 +44,7 @@ export default class MutationProvider
         data: {type: new GraphQLNonNull(this.getCreateEntityInput(entityName))}
       },
       where: (tableName: string, args: any, context: any) => {
-        const primary = this.schema.entities[entityName].primary
+        const primary = this.schema.entities[entityName].primaryColumn
         return `${tableName}.${primary} = ${escapeParameter(context.primary)}`
       },
       resolve: async (parent, args, context: Context, resolveInfo) => {

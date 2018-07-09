@@ -248,7 +248,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
       this.insertBuilder.onAfterInsert(value =>
         this.db.table(entity.tableName)
           .update(relation.joiningColumn.columnName, value)
-          .where(entity.primary, primary)
+          .where(entity.primaryColumn, primary)
       )
   }
 

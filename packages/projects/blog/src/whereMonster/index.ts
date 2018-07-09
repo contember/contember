@@ -34,7 +34,7 @@ class SubQueryBuilder
   {
     const rootAlias = this.alias([])
     const joins = this.buildJoins()
-    return `SELECT ${quoteIdentifier(rootAlias, this.rootEntity.primary)} 
+    return `SELECT ${quoteIdentifier(rootAlias, this.rootEntity.primaryColumn)} 
     FROM ${quoteIdentifier(this.rootEntity.tableName)} AS ${quoteIdentifier(rootAlias)}
    ${joins}
     `
@@ -82,26 +82,26 @@ class SubQueryBuilder
 
         acceptRelationTypeVisitor(this.schema, currentFrom, joinPath[i], {
           visitOneHasOneOwner: (entity, relation, targetEntity) => {
-            sqlExpr.push(joinTargetEntity(relation.joiningColumn.columnName, targetEntity.primary))
+            sqlExpr.push(joinTargetEntity(relation.joiningColumn.columnName, targetEntity.primaryColumn))
           },
           visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
-            sqlExpr.push(joinTargetEntity(entity.primary, targetRelation.joiningColumn.columnName))
+            sqlExpr.push(joinTargetEntity(entity.primaryColumn, targetRelation.joiningColumn.columnName))
           },
           visitManyHasOne: (entity, relation, targetEntity) => {
-            sqlExpr.push(joinTargetEntity(relation.joiningColumn.columnName, targetEntity.primary))
+            sqlExpr.push(joinTargetEntity(relation.joiningColumn.columnName, targetEntity.primaryColumn))
           },
           visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
-            sqlExpr.push(joinTargetEntity(entity.primary, targetRelation.joiningColumn.columnName))
+            sqlExpr.push(joinTargetEntity(entity.primaryColumn, targetRelation.joiningColumn.columnName))
           },
           visitManyHasManyOwner: (entity, relation, targetEntity) => {
             const joiningAlias = `${fromAlias}_x_${toAlias}`
-            sqlExpr.push(join(relation.joiningTable.tableName, joiningAlias, fromAlias)(entity.primary, relation.joiningTable.joiningColumn.columnName))
-            sqlExpr.push(join(targetEntity.tableName, toAlias, joiningAlias)(relation.joiningTable.inverseJoiningColumn.columnName, targetEntity.primary))
+            sqlExpr.push(join(relation.joiningTable.tableName, joiningAlias, fromAlias)(entity.primaryColumn, relation.joiningTable.joiningColumn.columnName))
+            sqlExpr.push(join(targetEntity.tableName, toAlias, joiningAlias)(relation.joiningTable.inverseJoiningColumn.columnName, targetEntity.primaryColumn))
           },
           visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
             const joiningAlias = `${fromAlias}_x_${toAlias}`
-            sqlExpr.push(join(targetRelation.joiningTable.tableName, joiningAlias, fromAlias)(entity.primary, targetRelation.joiningTable.inverseJoiningColumn.columnName))
-            sqlExpr.push(join(targetEntity.tableName, toAlias, joiningAlias)(targetRelation.joiningTable.joiningColumn.columnName, targetEntity.primary))
+            sqlExpr.push(join(targetRelation.joiningTable.tableName, joiningAlias, fromAlias)(entity.primaryColumn, targetRelation.joiningTable.inverseJoiningColumn.columnName))
+            sqlExpr.push(join(targetEntity.tableName, toAlias, joiningAlias)(targetRelation.joiningTable.joiningColumn.columnName, targetEntity.primaryColumn))
           },
         })
         currentFrom = targetEntity

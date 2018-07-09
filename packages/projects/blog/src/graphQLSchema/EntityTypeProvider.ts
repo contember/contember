@@ -34,7 +34,7 @@ export default class EntityTypeProvider
     const entity = getEntity(this.schema, entityName)
     const entityMapping: JoinMonsterEntityMapping = {
       sqlTable: quoteIdentifier(entity.tableName),
-      uniqueKey: entity.primary,
+      uniqueKey: entity.primaryColumn,
     }
 
     return new GraphQLObjectType({

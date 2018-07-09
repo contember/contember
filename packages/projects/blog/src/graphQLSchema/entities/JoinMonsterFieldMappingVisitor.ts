@@ -43,10 +43,10 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
         sqlTable: quoteIdentifier(targetRelation.joiningTable.tableName),
         uniqueKey: [targetRelation.joiningTable.joiningColumn.columnName, targetRelation.joiningTable.inverseJoiningColumn.columnName],
         sqlBatch: {
-          parentKey: entity.primary,
+          parentKey: entity.primaryColumn,
           thisKey: targetRelation.joiningTable.inverseJoiningColumn.columnName,
           sqlJoin: (tableName, targetTable) => {
-            return `${tableName}.${targetRelation.joiningTable.joiningColumn.columnName} = ${targetTable}.${targetEntity.primary}`
+            return `${tableName}.${targetRelation.joiningTable.joiningColumn.columnName} = ${targetTable}.${targetEntity.primaryColumn}`
           }
         }
       },
@@ -61,10 +61,10 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
         sqlTable: quoteIdentifier(relation.joiningTable.tableName),
         uniqueKey: [relation.joiningTable.joiningColumn.columnName, relation.joiningTable.inverseJoiningColumn.columnName],
         sqlBatch: {
-          parentKey: entity.primary,
+          parentKey: entity.primaryColumn,
           thisKey: relation.joiningTable.joiningColumn.columnName,
           sqlJoin: (tableName, targetTable) => {
-            return `${tableName}.${relation.joiningTable.inverseJoiningColumn.columnName} = ${targetTable}.${targetEntity.primary}`
+            return `${tableName}.${relation.joiningTable.inverseJoiningColumn.columnName} = ${targetTable}.${targetEntity.primaryColumn}`
           }
         }
       },
@@ -76,7 +76,7 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
   {
     return {
       sqlJoin: (tableName, secondTableName) => {
-        return `${tableName}.${relation.joiningColumn.columnName} = ${secondTableName}.${targetEntity.primary}`
+        return `${tableName}.${relation.joiningColumn.columnName} = ${secondTableName}.${targetEntity.primaryColumn}`
       }
     }
   }
@@ -86,7 +86,7 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     return {
       sqlBatch: {
         thisKey: targetRelation.joiningColumn.columnName,
-        parentKey: entity.primary,
+        parentKey: entity.primaryColumn,
       },
       ...this.getHasManyMapping(relation, targetEntity),
     }
@@ -96,7 +96,7 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
   {
     return {
       sqlJoin: (tableName, secondTableName) => {
-        return `${tableName}.${entity.primary} = ${secondTableName}.${targetRelation.joiningColumn.columnName}`
+        return `${tableName}.${entity.primaryColumn} = ${secondTableName}.${targetRelation.joiningColumn.columnName}`
       },
     }
   }
@@ -105,7 +105,7 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
   {
     return {
       sqlJoin: (tableName, secondTableName) => {
-        return `${tableName}.${relation.joiningColumn.columnName} = ${secondTableName}.${targetEntity.primary}`
+        return `${tableName}.${relation.joiningColumn.columnName} = ${secondTableName}.${targetEntity.primaryColumn}`
       },
     }
   }

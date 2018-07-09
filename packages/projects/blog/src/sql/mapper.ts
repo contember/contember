@@ -61,14 +61,8 @@ export class RowInserter
   insert(entityName: string, data: CreateInput): Promise<PrimaryValue>
   {
     const entity = getEntity(this.schema, entityName)
-    const primaryColumn = acceptFieldVisitor(this.schema, entity, entity.primary, {
-      visitColumn: (entity, column) => column.columnName,
-      visitRelation: () => {
-        throw new Error()
-      }
-    })
 
-    const insertBuilder = new InsertBuilder(entity.tableName, primaryColumn, this.db)
+    const insertBuilder = new InsertBuilder(entity.tableName, entity.primaryColumn, this.db)
     acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(data, insertBuilder, this, this.db))
 
     return insertBuilder.insertRow()

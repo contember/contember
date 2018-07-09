@@ -47,21 +47,21 @@ const joinToAst = (schema: Schema, createAlias: (name: string) => string) => {
           return {
             name: quoteIdentifier(targetEntity.tableName),
             children: createChildren(targetEntity),
-            sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primary}`
+            sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primaryColumn}`
           }
         },
         visitOneHasOneOwner: (entity, relation, targetEntity, targetRelation) => {
           return {
             name: quoteIdentifier(targetEntity.tableName),
             children: createChildren(targetEntity),
-            sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primary}`
+            sqlJoin: (t1, t2) => `${t1}.${relation.joiningColumn.columnName} = ${t2}.${targetEntity.primaryColumn}`
           }
         },
         visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
           return {
             name: quoteIdentifier(targetEntity.tableName),
             children: createChildren(targetEntity),
-            sqlJoin: (t1, t2) => `${t1}.${entity.primary} = ${t2}.${targetRelation.joiningColumn.columnName}`
+            sqlJoin: (t1, t2) => `${t1}.${entity.primaryColumn} = ${t2}.${targetRelation.joiningColumn.columnName}`
           }
         }
       } as RelationByTypeVisitor<{ name: string, sqlJoin: Join, children: SqlAstNode[] }>)

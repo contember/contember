@@ -1,11 +1,12 @@
 import { buildWhere } from "../whereMonster";
 import { getEntity, Schema } from "../model";
 import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils";
-import { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLList } from "graphql";
+import { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLList, GraphQLNonNull } from "graphql";
 import { JoinMonsterFieldMapping, SqlAstNode } from "../joinMonsterHelpers";
 import { GraphQLFieldConfigMap } from "graphql/type/definition";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
+import { escapeParameter } from "../sql/utils";
 
 type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
 
@@ -40,13 +41,12 @@ export default class QueryProvider
     return {
       type: this.entityTypeProvider.getEntity(entityName),
       args: {
-        where: {type: this.whereTypeProvider.getEntityUniqueWhereType(entityName)}
+        where: {type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName))}
       },
       where: (tableName: string, args: any, context: any) => {
-        const entity = this.schema.entities[entityName]
-        return buildWhere(this.schema, entity, () => {
-          throw new Error()
-        })(tableName, args.where || {})
+        const entity = this.schema.entities[entityName];
+        const primary = entity.primaryColumn
+        return `${tableName}.${primary} = ${escapeParameter(args.where[entity.primary])}`
       },
       resolve: this.resolver,
     }

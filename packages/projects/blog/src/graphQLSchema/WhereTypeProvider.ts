@@ -4,6 +4,7 @@ import { acceptFieldVisitor, FieldVisitor, getEntity, Schema } from "../model";
 import { GraphQLInputObjectType, GraphQLList } from "graphql";
 import { capitalizeFirstLetter } from "../utils/strings";
 import ColumnTypeResolver from "./ColumnTypeResolver";
+import ConditionTypeProvider from "./ConditionTypeProvider";
 
 
 export default class WhereTypeProvider
@@ -13,11 +14,13 @@ export default class WhereTypeProvider
   private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))
   private uniqueWhereSingleton = singletonFactory(name => this.createEntityUniqueWhereType(name))
   private columnTypeResolver: ColumnTypeResolver;
+  private conditionTypeProvider: ConditionTypeProvider;
 
-  constructor(schema: Schema, columnTypeResolver: ColumnTypeResolver)
+  constructor(schema: Schema, columnTypeResolver: ColumnTypeResolver, conditionTypeProvider: ConditionTypeProvider)
   {
     this.schema = schema;
     this.columnTypeResolver = columnTypeResolver;
+    this.conditionTypeProvider = conditionTypeProvider;
   }
 
   getEntityWhereType(entityName: string): GraphQLInputObjectType
@@ -62,7 +65,7 @@ export default class WhereTypeProvider
 
     for (let fieldName in entity.fields) {
       fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
-        visitColumn: (entity, column) => ({type: this.columnTypeResolver.getType(column.type)}),
+        visitColumn: (entity, column) => ({type: this.conditionTypeProvider.getCondition(column.type)}),
         visitRelation: (entity, relation) => ({type: this.getEntityWhereType(relation.target)}),
       } as FieldVisitor<GraphQLInputFieldConfig>)
     }

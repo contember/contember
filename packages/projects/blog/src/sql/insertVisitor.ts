@@ -21,7 +21,7 @@ import {
   CreateRelationInput,
   PrimaryValue,
   PrimaryValueLike,
-  RelationConnectionInput
+  UniqueWhere
 } from "./types";
 import { InsertBuilder, RowInserter } from "./mapper";
 import { isIt } from "../utils/type";
@@ -29,7 +29,7 @@ import { isIt } from "../utils/type";
 
 interface RelationInputProcessor
 {
-  connect(input: RelationConnectionInput): void;
+  connect(input: UniqueWhere): void;
 
   create(input: CreateInput): void;
 }
@@ -90,7 +90,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     for (let element of relationData) {
       this.processRelationInput(element, new class implements RelationInputProcessor
       {
-        connect(input: RelationConnectionInput): void
+        connect(input: UniqueWhere): void
         {
           connect(input[targetEntity.primary])
         }
@@ -125,7 +125,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     for (let relationInput of relationData) {
       this.processRelationInput(relationInput, new class implements RelationInputProcessor
       {
-        connect(input: RelationConnectionInput): void
+        connect(input: UniqueWhere): void
         {
           connect(input[targetEntity.primary])
         }
@@ -153,7 +153,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
 
     this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
-      connect(input: RelationConnectionInput): void
+      connect(input: UniqueWhere): void
       {
         addColumnData(input[targetEntity.primary])
       }
@@ -177,7 +177,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     for (let relationInput of relationData) {
       this.processRelationInput(relationInput, new class implements RelationInputProcessor
       {
-        connect(input: RelationConnectionInput): void
+        connect(input: UniqueWhere): void
         {
           updateOwner(input[targetEntity.primary])
         }
@@ -197,7 +197,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
 
     this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
-      connect(input: RelationConnectionInput): void
+      connect(input: UniqueWhere): void
       {
         updateOwner(input[targetEntity.primary])
       }
@@ -220,7 +220,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
 
     this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
-      connect(input: RelationConnectionInput): void
+      connect(input: UniqueWhere): void
       {
         addColumnData(input[targetEntity.primary])
       }

@@ -1,13 +1,5 @@
-import { acceptFieldVisitor, FieldVisitor, getEntity, Schema } from "../model";
-import {
-  GraphQLFieldConfig,
-  GraphQLFieldConfigMap,
-  GraphQLInputFieldConfig,
-  GraphQLInputFieldConfigMap,
-  GraphQLInputObjectType,
-  GraphQLList,
-  GraphQLNonNull
-} from "graphql";
+import { acceptFieldVisitor, getEntity, Schema } from "../model";
+import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLNonNull } from "graphql";
 import singletonFactory from "../utils/singletonFactory";
 import { capitalizeFirstLetter } from "../utils/strings";
 import { Context } from "../types";
@@ -18,7 +10,8 @@ import insertData from "../sql/mapper";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
 import ColumnTypeResolver from "./ColumnTypeResolver";
-import ConnectInputVisitor from "./mutations/update/ConnectInputVisitor";
+import ConnectInputVisitor from "./mutations/create/ConnectInputVisitor";
+import InputFieldVisitor from "./mutations/create/InputFieldVisitor";
 
 type RelationDefinition = { entityName: string, relationName: string }
 
@@ -103,25 +96,7 @@ export default class MutationProvider
           if (fieldName === entity.primary) {
             continue //todo maybe optional?
           }
-          fields[fieldName] = acceptFieldVisitor(this.schema, entityName, fieldName, {
-            visitColumn: (entity, column) => {
-              const type = this.columnTypeResolver.getType(column.type)
-              return {
-                type: column.nullable ? type : new GraphQLNonNull(type),
-              }
-            },
-            visitHasOne: (entity, relation) => {
-              const type = this.getCreateEntityConnectionInput(entity.name, relation.name)
-              return {
-                type: relation.nullable ? type : new GraphQLNonNull(type),
-              }
-            },
-            visitHasMany: (entity, relation) => {
-              return {
-                type: new GraphQLList(new GraphQLNonNull(this.getCreateEntityConnectionInput(entity.name, relation.name)))
-              }
-            },
-          } as FieldVisitor<GraphQLInputFieldConfig>)
+          fields[fieldName] = acceptFieldVisitor(this.schema, entityName, fieldName, new InputFieldVisitor(this.columnTypeResolver, this))
         }
 
         return fields

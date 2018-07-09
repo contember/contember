@@ -56,14 +56,27 @@ export default class MutationProvider
     }
   }
 
-  getDeleteMutation(entityName: string): GraphQLFieldConfig<any, any>
+  getDeleteMutation(entityName: string): GraphQLFieldConfig<any, any> & JoinMonsterFieldMapping<any, any>
   {
     return {
       type: this.entityTypeProvider.getEntity(entityName),
       args: {
         where: {type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName))},
       },
-      resolve: () => console.log(JSON.stringify(arguments)),
+      where: (tableName: string, args: any, context: any) => {
+        const entity = this.schema.entities[entityName];
+        const primary = entity.primaryColumn
+        return `${tableName}.${primary} = ${escapeParameter(args.where[entity.primary])}`
+      },
+      resolve: async (parent, args, context: Context, resolveInfo) => {
+        const response = await joinMonster(resolveInfo, context, (sql) => {
+          return context.db.raw(sql)
+        }, {dialect: 'pg'})
+        const entity = getEntity(this.schema, entityName)
+        await context.db(entity.tableName).andWhere(entity.primaryColumn, args.where[entity.primary]).delete()
+
+        return response
+      },
     }
   }
 

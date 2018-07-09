@@ -5,6 +5,9 @@ import * as fs from 'fs'
 import buildSql from "./sqlSchema/sqlSchemaBuilder"
 import model from "./model"
 import * as knex from 'knex'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 const builder = new GraphQlSchemaBuilder(model)
 let graphQLSchema = builder.build()
@@ -25,11 +28,11 @@ const connection = knex({
   debug: true,
   client: 'pg',
   connection: {
-    host: '127.0.0.1',
-    port: 65432,
-    user: 'cms',
-    password: '123',
-    database: 'cms',
+    host: process.env.DB_HOST as string,
+    port: process.env.DB_PORT as string,
+    user: process.env.DB_USER as string,
+    password: process.env.DB_PASSWORD as string,
+    database: process.env.DB_DATABASE as string,
   }
 })
 
@@ -38,7 +41,7 @@ const server = new GraphQLServer({
   schema: graphQLSchema,
   context: {
     db: connection,
-  }
+  },
 
 })
-server.start(() => console.log('Server is running on localhost:4000'))
+server.start({port: process.env.SERVER_PORT}, (options) => console.log(`Server is running on localhost:${options.port}`))

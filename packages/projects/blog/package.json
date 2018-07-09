@@ -2,10 +2,10 @@
   "name": "blog",
   "private": true,
   "scripts": {
-    "build": "tsc"
+    "build": "tsc -p .",
+    "start": "concurrently \"tsc -w -p .\" \"nodemon dist/index.js\""
   },
   "dependencies": {
-    "@types/ws": "^5.1.2",
     "apollo-codegen": "^0.20.0",
     "apollo-codegen-typescript": "^0.20.0",
     "graphql-yoga": "^1.14.10",
@@ -17,8 +17,12 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@types/dotenv": "^4.0.3",
     "@types/knex": "^0.14.14",
     "@types/uuid": "^3.4.3",
+    "@types/ws": "^5.1.2",
+    "concurrently": "^3.6.0",
+    "dotenv": "^6.0.0",
     "nodemon": "^1.17.5",
     "typescript": "2.9.2"
   }

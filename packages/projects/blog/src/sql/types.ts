@@ -10,7 +10,7 @@ export type PrimaryValueLike = GenericValueLike<PrimaryValue>
 
 export interface CreateInput
 {
-  [column: string]: ColumnValue | CreateOneRelationInput | CreateOneRelationInput[]
+  [column: string]: ColumnValue | CreateOneRelationInput | CreateManyRelationInput
 }
 
 export type CreateOneRelationInput = ConnectRelationInput | CreateRelationInput
@@ -18,7 +18,4 @@ export type CreateManyRelationInput = CreateOneRelationInput[]
 
 export type RelationConnectionInput = { [field: string]: PrimaryValue };
 export type ConnectRelationInput = { connect: RelationConnectionInput };
-export const isConnectRelationInput = (input: CreateOneRelationInput): input is ConnectRelationInput => (input as ConnectRelationInput).connect !== undefined
-
 export type CreateRelationInput = { create: CreateInput };
-export const isCreateRelationInput = (input: CreateOneRelationInput): input is CreateRelationInput => (input as CreateRelationInput).create !== undefined

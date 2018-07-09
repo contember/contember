@@ -14,16 +14,17 @@ import * as Knex from 'knex';
 import * as uuidv4 from 'uuid/v4'
 import {
   ColumnValueLike,
+  ConnectRelationInput,
   CreateInput,
   CreateManyRelationInput,
   CreateOneRelationInput,
-  isConnectRelationInput,
-  isCreateRelationInput,
+  CreateRelationInput,
   PrimaryValue,
   PrimaryValueLike,
   RelationConnectionInput
 } from "./types";
 import { InsertBuilder, RowInserter } from "./mapper";
+import { isIt } from "../utils/type";
 
 
 interface RelationInputProcessor
@@ -269,11 +270,11 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
       return
     }
     const relations = []
-    if (isConnectRelationInput(input)) {
+    if (isIt<ConnectRelationInput>(input, 'connect')) {
       relations.push('connect')
       processor.connect(input.connect)
     }
-    if (isCreateRelationInput(input)) {
+    if (isIt<CreateRelationInput>(input, 'create')) {
       relations.push('create')
       processor.create(input.create)
     }

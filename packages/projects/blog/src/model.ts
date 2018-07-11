@@ -225,19 +225,21 @@ export interface NullableRelation
   nullable?: boolean
 }
 
+export type JoiningTable = {
+  tableName: string,
+  joiningColumn: {
+    columnName: string,
+    onDelete: 'cascade' | 'restrict' | 'set null',
+  },
+  inverseJoiningColumn: {
+    columnName: string,
+    onDelete: 'cascade' | 'restrict' | 'set null',
+  },
+};
+
 interface JoiningTableRelation
 {
-  joiningTable: {
-    tableName: string,
-    joiningColumn: {
-      columnName: string,
-      onDelete: 'cascade' | 'restrict' | 'set null',
-    },
-    inverseJoiningColumn: {
-      columnName: string,
-      onDelete: 'cascade' | 'restrict' | 'set null',
-    },
-  }
+  joiningTable: JoiningTable
 }
 
 

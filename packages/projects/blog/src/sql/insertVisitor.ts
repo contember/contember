@@ -23,7 +23,7 @@ import {
   PrimaryValueLike,
   UniqueWhere
 } from "./types";
-import { InsertBuilder, RowInserter } from "./mapper";
+import { InsertBuilder, Mapper } from "./mapper";
 import { isIt } from "../utils/type";
 
 
@@ -39,14 +39,14 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
 {
   private data: CreateInput;
   private insertBuilder: InsertBuilder;
-  private inserter: RowInserter;
+  private mapper: Mapper;
   private db: Knex;
 
-  constructor(data: CreateInput, insertBuilder: InsertBuilder, inserter: RowInserter, db: Knex)
+  constructor(data: CreateInput, insertBuilder: InsertBuilder, mapper: Mapper, db: Knex)
   {
     this.data = data;
     this.insertBuilder = insertBuilder;
-    this.inserter = inserter;
+    this.mapper = mapper;
     this.db = db;
   }
 
@@ -77,13 +77,13 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
 
     const connect = (primary: PrimaryValue) =>
       this.insertBuilder.onAfterInsert(primaryInversed =>
-        this.joinManyHasMany(targetRelation, primary, primaryInversed)
+        this.mapper.connectJunction(targetEntity, targetRelation, {[targetEntity.primary]: primary}, {[entity.primary]: primaryInversed})
       )
 
     const createAndConnect = (input: CreateInput) =>
       this.insertBuilder.onAfterInsert(async (primaryInversed) => {
-          const primaryOwner = await this.inserter.insert(targetEntity.name, input)
-          return await this.joinManyHasMany(targetRelation, primaryOwner, primaryInversed)
+          const primaryOwner = await this.mapper.insert(targetEntity.name, input)
+          return await this.mapper.connectJunction(targetEntity, targetRelation, {[targetEntity.primary]: primaryOwner}, {[entity.primary]: primaryInversed})
         }
       )
 
@@ -112,13 +112,13 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
 
     const connect = (value: PrimaryValue) =>
       this.insertBuilder.onAfterInsert(primary =>
-        this.joinManyHasMany(relation, primary, value)
+        this.mapper.connectJunction(entity, relation, {[entity.primary]: primary}, {[targetEntity.primary]: value})
       )
 
     const createAndConnect = (input: CreateInput) =>
       this.insertBuilder.onAfterInsert(async (primary) => {
-          const primaryInversed = await this.inserter.insert(targetEntity.name, input)
-          return await this.joinManyHasMany(relation, primary, primaryInversed)
+          const primaryInversed = await this.mapper.insert(targetEntity.name, input)
+          return await this.mapper.connectJunction(entity, relation, {[entity.primary]: primary}, {[targetEntity.primary]: primaryInversed})
         }
       )
 
@@ -145,22 +145,22 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     if (relationData === undefined) {
       return
     }
-    const addColumnData = (value: PrimaryValueLike) =>
+    const connectRelation = (value: PrimaryValueLike) =>
       this.insertBuilder.addColumnData(relation.joiningColumn.columnName, value)
 
-    const createRelation = (input: CreateInput) =>
-      this.inserter.insert(targetEntity.name, input)
+    const createInversedEntity = (input: CreateInput) =>
+      this.mapper.insert(targetEntity.name, input)
 
     this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
       connect(input: UniqueWhere): void
       {
-        addColumnData(input[targetEntity.primary])
+        connectRelation(input[targetEntity.primary])
       }
 
       create(input: CreateInput): void
       {
-        addColumnData(createRelation((input)))
+        connectRelation(createInversedEntity((input)))
       }
     })
   }
@@ -216,7 +216,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
       this.insertBuilder.addColumnData(relation.joiningColumn.columnName, data)
 
     const createRelation = (data: CreateInput) =>
-      this.inserter.insert(targetEntity.name, data)
+      this.mapper.insert(targetEntity.name, data)
 
     this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
@@ -233,16 +233,6 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
   }
 
 
-  private joinManyHasMany(relation: ManyHasManyOwnerRelation, value: PrimaryValue, inversedValue: PrimaryValue)
-  {
-    const joiningTable = relation.joiningTable
-    return this.db.table(joiningTable.tableName)
-      .insert({
-        [joiningTable.joiningColumn.columnName]: value,
-        [joiningTable.inverseJoiningColumn.columnName]: inversedValue,
-      })
-  }
-
   private updateHasOneOwner(entity: Entity, relation: OneHasOneOwnerRelation | ManyHasOneRelation)
   {
     return (primary: PrimaryValue) =>
@@ -257,7 +247,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
   {
     return (data: CreateInput) =>
       this.insertBuilder.onAfterInsert(primary =>
-        this.inserter.insert(entity.name, {
+        this.mapper.insert(entity.name, {
           ...data,
           [relation.name]: {connect: {[entity.primary]: primary}}
         })

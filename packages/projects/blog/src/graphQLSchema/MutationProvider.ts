@@ -13,7 +13,7 @@ import { Context } from "../types";
 import joinMonster from "join-monster";
 import { JoinMonsterFieldMapping } from "../joinMonsterHelpers";
 import { escapeParameter } from "../sql/utils";
-import insertData from "../sql/mapper";
+import {insertData, updateData} from "../sql/mapper";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
 import ColumnTypeResolver from "./ColumnTypeResolver";
@@ -109,7 +109,8 @@ export default class MutationProvider
         return `${tableName}.${primary} = ${escapeParameter(args.where[entity.primary])}`
       },
       resolve: async (parent, args, context: Context, resolveInfo) => {
-        console.log(args)
+        await updateData(this.schema, context.db)(entityName, args.where, args.data)
+
         return await joinMonster(resolveInfo, context, (sql) => {
           return context.db.raw(sql)
         }, {dialect: 'pg'})

@@ -1,5 +1,12 @@
-import { acceptFieldVisitor, getEntity, Schema } from "../model";
-import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLNonNull } from "graphql";
+import { acceptFieldVisitor, FieldVisitor, getEntity, Schema } from "../model";
+import {
+  GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
+  GraphQLInputFieldConfig,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputObjectType,
+  GraphQLNonNull
+} from "graphql";
 import singletonFactory from "../utils/singletonFactory";
 import { capitalizeFirstLetter } from "../utils/strings";
 import { Context } from "../types";
@@ -10,8 +17,11 @@ import insertData from "../sql/mapper";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
 import ColumnTypeResolver from "./ColumnTypeResolver";
-import ConnectInputVisitor from "./mutations/create/ConnectInputVisitor";
-import InputFieldVisitor from "./mutations/create/InputFieldVisitor";
+import CreateEntityRelationInputFieldVisitor from "./mutations/CreateEntityRelationInputFieldVisitor";
+import CreateEntityInputFieldVisitor from "./mutations/CreateEntityInputFieldVisitor";
+import UpdateEntityRelationInputFieldVisitor from "./mutations/UpdateEntityRelationInputFieldVisitor";
+import UpdateEntityInputFieldVisitor from "./mutations/UpdateEntityInputFieldVisitor";
+
 
 type RelationDefinition = { entityName: string, relationName: string }
 
@@ -26,7 +36,12 @@ export default class MutationProvider
     this.createCreateEntityInput(id.entityName, id.withoutRelation)
   )
 
-  private createEntityConnectionInputs = singletonFactory((id: RelationDefinition) => this.createCreateEntityConnectionInput(id.entityName, id.relationName))
+  private updateEntityInputs = singletonFactory<GraphQLInputObjectType, { entityName: string, withoutRelation?: string }>(id =>
+    this.createUpdateEntityInput(id.entityName, id.withoutRelation)
+  )
+
+  private createEntityRelationInputs = singletonFactory((id: RelationDefinition) => this.createCreateEntityRelationInput(id.entityName, id.relationName))
+  private updateEntityRelationInputs = singletonFactory((id: RelationDefinition) => this.createUpdateEntityRelationInput(id.entityName, id.relationName))
 
   constructor(schema: Schema, whereTypeProvider: WhereTypeProvider, entityTypeProvider: EntityTypeProvider, columnTypeResolver: ColumnTypeResolver)
   {
@@ -86,6 +101,7 @@ export default class MutationProvider
       type: this.entityTypeProvider.getEntity(entityName),
       args: {
         where: {type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName))},
+        data: {type: new GraphQLNonNull(this.getUpdateEntityInput(entityName))}
       },
       where: (tableName: string, args: any, context: any) => {
         const entity = this.schema.entities[entityName];
@@ -93,6 +109,7 @@ export default class MutationProvider
         return `${tableName}.${primary} = ${escapeParameter(args.where[entity.primary])}`
       },
       resolve: async (parent, args, context: Context, resolveInfo) => {
+        console.log(args)
         return await joinMonster(resolveInfo, context, (sql) => {
           return context.db.raw(sql)
         }, {dialect: 'pg'})
@@ -120,31 +137,62 @@ export default class MutationProvider
 
     return new GraphQLInputObjectType({
       name: capitalizeFirstLetter(entityName) + withoutSuffix + "CreateInput",
-      fields: () => {
-        const fields: GraphQLInputFieldConfigMap = {}
-        let entity = getEntity(this.schema, entityName);
-        for (let fieldName in entity.fields) {
-          if (withoutRelation && fieldName === withoutRelation) {
-            continue
-          }
-          if (fieldName === entity.primary) {
-            continue //todo maybe optional?
-          }
-          fields[fieldName] = acceptFieldVisitor(this.schema, entityName, fieldName, new InputFieldVisitor(this.columnTypeResolver, this))
-        }
-
-        return fields
-      }
+      fields: () => this.createEntityFields(new CreateEntityInputFieldVisitor(this.columnTypeResolver, this), entityName, withoutRelation),
     })
   }
 
-  getCreateEntityConnectionInput(entityName: string, relationName: string)
+
+  getUpdateEntityInput(entityName: string, withoutRelation?: string): GraphQLInputObjectType
   {
-    return this.createEntityConnectionInputs({entityName, relationName})
+    return this.updateEntityInputs({entityName, withoutRelation})
   }
 
-  createCreateEntityConnectionInput(entityName: string, relationName: string): GraphQLInputObjectType
+  private createUpdateEntityInput(entityName: string, withoutRelation?: string)
   {
-    return acceptFieldVisitor(this.schema, entityName, relationName, new ConnectInputVisitor(this.schema, this.whereTypeProvider, this))
+    const withoutSuffix = withoutRelation ? "Without" + capitalizeFirstLetter(withoutRelation) : ''
+
+    return new GraphQLInputObjectType({
+      name: capitalizeFirstLetter(entityName) + withoutSuffix + "UpdateInput",
+      fields: () => this.createEntityFields(new UpdateEntityInputFieldVisitor(this.columnTypeResolver, this), entityName, withoutRelation),
+    })
+  }
+
+  private createEntityFields(visitor: FieldVisitor<GraphQLInputFieldConfig | undefined>, entityName: string, withoutRelation?: string)
+  {
+    const fields: GraphQLInputFieldConfigMap = {}
+    let entity = getEntity(this.schema, entityName);
+    for (let fieldName in entity.fields) {
+      if (withoutRelation && fieldName === withoutRelation) {
+        continue
+      }
+      const result = acceptFieldVisitor(this.schema, entityName, fieldName, visitor);
+      if (result !== undefined) {
+        fields[fieldName] = result
+      }
+    }
+
+    return fields
+  }
+
+
+  getCreateEntityRelationInput(entityName: string, relationName: string)
+  {
+    return this.createEntityRelationInputs({entityName, relationName})
+  }
+
+  private createCreateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType
+  {
+    return acceptFieldVisitor(this.schema, entityName, relationName, new CreateEntityRelationInputFieldVisitor(this.schema, this.whereTypeProvider, this))
+  }
+
+
+  getUpdateEntityRelationInput(entityName: string, relationName: string)
+  {
+    return this.updateEntityRelationInputs({entityName, relationName})
+  }
+
+  private createUpdateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType
+  {
+    return acceptFieldVisitor(this.schema, entityName, relationName, new UpdateEntityRelationInputFieldVisitor(this.schema, this.whereTypeProvider, this))
   }
 }

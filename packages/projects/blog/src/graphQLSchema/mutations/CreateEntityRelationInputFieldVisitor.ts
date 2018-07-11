@@ -1,10 +1,10 @@
-import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../../model";
+import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../model";
 import { GraphQLInputObjectType } from "graphql";
-import { capitalizeFirstLetter } from "../../../utils/strings";
-import MutationProvider from "../../MutationProvider";
-import WhereTypeProvider from "../../WhereTypeProvider";
+import { capitalizeFirstLetter } from "../../utils/strings";
+import MutationProvider from "../MutationProvider";
+import WhereTypeProvider from "../WhereTypeProvider";
 
-export default class ConnectInputVisitor implements ColumnVisitor<GraphQLInputObjectType>, RelationVisitor<GraphQLInputObjectType>
+export default class CreateEntityRelationInputFieldVisitor implements ColumnVisitor<GraphQLInputObjectType>, RelationVisitor<GraphQLInputObjectType>
 {
   private whereTypeBuilder: WhereTypeProvider;
   private mutationBuilder: MutationProvider;
@@ -23,7 +23,7 @@ export default class ConnectInputVisitor implements ColumnVisitor<GraphQLInputOb
   visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation): GraphQLInputObjectType
   {
     return new GraphQLInputObjectType({
-      name: capitalizeFirstLetter(entity.name) + "Create" + capitalizeFirstLetter(relation.name) + "Input",
+      name: capitalizeFirstLetter(entity.name) + "Create" + capitalizeFirstLetter(relation.name) + "EntityRelationInput",
       fields: () => {
         return {
           connect: {

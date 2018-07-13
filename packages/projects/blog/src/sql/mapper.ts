@@ -9,25 +9,21 @@ import { acceptEveryFieldVisitor, getColumnName, getEntity } from "../schema/mod
 import { isUniqueWhere } from "../schema/inputUtils";
 
 
-type OnAfterInsertCallback = ((id: PrimaryValue) => PromiseLike<any>)
-type OnAfterUpdateCallback = (() => PromiseLike<any>)
-
-
 export class InsertBuilder
 {
   private rowData: { [columnName: string]: PromiseLike<ColumnValue> } = {}
-  private afterInsert: OnAfterInsertCallback[] = []
 
-  private tableName: string;
-  private primaryColumn: string;
-  private db: Knex;
+  private tableName: string
+  private primaryColumn: string
+  private db: Knex
+  private insertPromise: Promise<PrimaryValue>
 
-  constructor(tableName: string, primaryColumn: string, db: Knex)
+  constructor(tableName: string, primaryColumn: string, db: Knex, firer: PromiseLike<void>)
   {
     this.tableName = tableName;
     this.primaryColumn = primaryColumn;
     this.db = db;
-
+    this.insertPromise = this.createInsertPromise(firer)
   }
 
   addColumnData(columnName: string, value: ColumnValueLike)
@@ -35,17 +31,17 @@ export class InsertBuilder
     this.rowData[columnName] = resolveValue(value)
   }
 
-  onAfterInsert(callback: OnAfterInsertCallback)
-  {
-    this.afterInsert.push(callback)
-  }
-
   async insertRow(): Promise<PrimaryValue>
   {
+    return this.insertPromise
+  }
+
+  private async createInsertPromise(firer: PromiseLike<void>)
+  {
+    await firer
     const qb = this.db(this.tableName)
     const rowData = await promiseAllObject(this.rowData)
     const returning = await qb.insert(rowData, this.primaryColumn)
-    await Promise.all(this.afterInsert.map(callback => callback(returning[0])))
 
     return returning[0]
   }
@@ -55,20 +51,21 @@ export class InsertBuilder
 export class UpdateBuilder
 {
   private rowData: { [columnName: string]: PromiseLike<ColumnValue> } = {}
-  private afterUpdate: OnAfterUpdateCallback[] = []
-  private beforeUpdate: PromiseLike<any>[] = []
 
   private tableName: string
   private db: Knex
   private where: { [columnName: string]: PromiseLike<ColumnValue> } = {}
 
-  constructor(tableName: string, where: { [columnName: string]: ColumnValueLike }, db: Knex)
+  private updatePromise: Promise<number>
+
+  constructor(tableName: string, where: { [columnName: string]: ColumnValueLike }, db: Knex, firer: PromiseLike<void>)
   {
     this.tableName = tableName;
     this.db = db
     for (let columnName in where) {
       this.where[columnName] = resolveValue(where[columnName])
     }
+    this.updatePromise = this.createUpdatePromise(firer)
   }
 
   addColumnData(columnName: string, value: ColumnValueLike)
@@ -76,20 +73,14 @@ export class UpdateBuilder
     this.rowData[columnName] = resolveValue(value)
   }
 
-  onAfterUpdate(callback: OnAfterUpdateCallback)
-  {
-    this.afterUpdate.push(callback)
-  }
-
-  onBeforeUpdate(promise: PromiseLike<any>)
-  {
-    this.beforeUpdate.push(promise)
-  }
-
   async updateRow()
   {
-    await Promise.all(this.beforeUpdate)
+    return this.updatePromise
+  }
 
+  private async createUpdatePromise(firer: PromiseLike<void>)
+  {
+    await firer
     const qb = this.db(this.tableName)
 
     qb.where(await promiseAllObject(this.where))
@@ -100,7 +91,6 @@ export class UpdateBuilder
       affectedRows = await qb.update(await promiseAllObject(this.rowData))
     }
 
-    await Promise.all(this.afterUpdate.map(callback => callback()))
     return affectedRows
   }
 }
@@ -131,10 +121,18 @@ export class Mapper
   {
     const entity = getEntity(this.schema, entityName)
 
-    const insertBuilder = new InsertBuilder(entity.tableName, entity.primaryColumn, this.db)
-    acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(data, insertBuilder, this, this.db))
+    let resolver: (() => any) = () => {
+      throw new Error()
+    }
+    const insertBuilder = new InsertBuilder(entity.tableName, entity.primaryColumn, this.db, new Promise(resolve => resolver = resolve))
+    const promises = acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(data, insertBuilder, this))
+    resolver()
 
-    return await insertBuilder.insertRow()
+    const result = await insertBuilder.insertRow()
+
+    await Promise.all(Object.values(promises).filter(it => !!it))
+
+    return result
   }
 
   async update(entityName: string, where: UniqueWhere, data: UpdateDataInput): Promise<number>
@@ -142,11 +140,17 @@ export class Mapper
     const entity = getEntity(this.schema, entityName)
 
     const primaryValue = await this.getPrimaryValue(entity, where);
-    const updateBuilder = new UpdateBuilder(entity.tableName, {[entity.primary]: primaryValue}, this.db)
     if (primaryValue === undefined) {
       return Promise.resolve(0)
     }
-    acceptEveryFieldVisitor(this.schema, entity, new UpdateVisitor(primaryValue, data, updateBuilder, this, this.db))
+    let resolver: (() => any) = () => {
+      throw new Error()
+    }
+    const updateBuilder = new UpdateBuilder(entity.tableName, {[entity.primary]: primaryValue}, this.db, new Promise(resolve => resolver = resolve))
+    const promises = acceptEveryFieldVisitor(this.schema, entity, new UpdateVisitor(primaryValue, data, updateBuilder, this))
+    resolver()
+
+    await Promise.all(Object.values(promises).filter(it => !!it))
 
     return await updateBuilder.updateRow()
   }

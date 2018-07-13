@@ -100,7 +100,6 @@ class SubQueryBuilder
     return sqlExpr.join("\n")
   }
 
-
   alias(path: string[])
   {
     return "root_" + path.join('_')

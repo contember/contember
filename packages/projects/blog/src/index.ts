@@ -21,7 +21,8 @@ buildSql(model, migrationBuilder)
 const sql = (migrationBuilder as any).getSql()
 fs.writeFile(__dirname + "/schema.sql", sql, error => console.error(error))
 
-const fileData = printSchema(graphQLSchema)
+const fileData = printSchema(graphQLSchema, {commentDescriptions: true})
+
 fs.writeFile(__dirname + '/schema.graphql', fileData, error => console.error(error))
 
 const connection = knex({

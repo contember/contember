@@ -58,7 +58,7 @@ export default class WhereTypeProvider
 
     return new GraphQLInputObjectType({
       name: capitalizeFirstLetter(entityName) + "UniqueWhere",
-      description: description,
+      // description: description, generates invalid schema file
       fields: () => this.getUniqueWhereFields(entity),
     })
   }

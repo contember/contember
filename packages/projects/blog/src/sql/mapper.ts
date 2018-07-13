@@ -42,7 +42,7 @@ export class InsertBuilder
 
   async insertRow(): Promise<PrimaryValue>
   {
-    const qb = this.db.queryBuilder().table(this.tableName)
+    const qb = this.db(this.tableName)
     const rowData = await promiseAllObject(this.rowData)
     const returning = await qb.insert(rowData, this.primaryColumn)
     await Promise.all(this.afterInsert.map(callback => callback(returning[0])))
@@ -90,7 +90,7 @@ export class UpdateBuilder
   {
     await Promise.all(this.beforeUpdate)
 
-    const qb = this.db.queryBuilder().table(this.tableName)
+    const qb = this.db(this.tableName)
 
     qb.where(await promiseAllObject(this.where))
 
@@ -154,7 +154,7 @@ export class Mapper
   async delete(entityName: string, where: UniqueWhere): Promise<number>
   {
     const entity = getEntity(this.schema, entityName)
-    return await this.db.where(this.getUniqueWhereArgs(entity, where)).delete()
+    return await this.db(entity.tableName).where(this.getUniqueWhereArgs(entity, where)).delete()
   }
 
   async connectJunction(owningEntity: Entity, relation: ManyHasManyOwnerRelation, ownerUnique: UniqueWhere, inversedUnique: UniqueWhere)

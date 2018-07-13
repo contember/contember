@@ -9,7 +9,7 @@ import {
   OneHasOneInversedRelation,
   OneHasOneOwnerRelation,
   RelationByTypeVisitor
-} from "../model";
+} from "../schema/model";
 import * as Knex from 'knex';
 import {
   ConnectRelationInput,
@@ -29,7 +29,7 @@ import {
   UpdateSpecifiedRelationInput,
   UpsertRelationInput,
   UpsertSpecifiedRelationInput
-} from "./types";
+} from "../schema/input";
 import { Mapper, UpdateBuilder } from "./mapper";
 import { isIt } from "../utils/type";
 

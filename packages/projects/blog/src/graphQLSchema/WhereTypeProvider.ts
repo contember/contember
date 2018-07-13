@@ -1,10 +1,12 @@
 import singletonFactory from "../utils/singletonFactory";
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull } from "graphql/type/definition";
-import { acceptFieldVisitor, FieldVisitor, getEntity, Schema } from "../model";
+import { Entity, FieldVisitor, JoiningColumnRelation, Schema } from "../schema/model";
 import { GraphQLInputObjectType, GraphQLList } from "graphql";
 import { capitalizeFirstLetter } from "../utils/strings";
 import ColumnTypeResolver from "./ColumnTypeResolver";
 import ConditionTypeProvider from "./ConditionTypeProvider";
+import { isIt } from "../utils/type";
+import { acceptFieldVisitor, getEntity } from "../schema/modelUtils";
 
 
 export default class WhereTypeProvider

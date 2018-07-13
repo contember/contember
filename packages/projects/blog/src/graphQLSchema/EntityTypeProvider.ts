@@ -1,6 +1,6 @@
 import singletonFactory from "../utils/singletonFactory";
 import { GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLOutputType } from "graphql";
-import { acceptFieldVisitor, getEntity, Schema } from "../model";
+import { Schema } from "../schema/model";
 import { JoinMonsterEntityMapping, JoinMonsterFieldMapping } from "../joinMonsterHelpers";
 import { quoteIdentifier } from "../sql/utils";
 import { capitalizeFirstLetter } from "../utils/strings";
@@ -8,6 +8,7 @@ import ColumnTypeResolver from "./ColumnTypeResolver";
 import WhereTypeProvider from "./WhereTypeProvider";
 import FieldTypeVisitor from "./entities/FieldTypeVisitor";
 import JoinMonsterFieldMappingVisitor from "./entities/JoinMonsterFieldMappingVisitor";
+import { acceptFieldVisitor, getEntity } from "../schema/modelUtils";
 
 export default class EntityTypeProvider
 {

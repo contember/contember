@@ -1,7 +1,8 @@
-import { acceptFieldVisitor, FieldVisitor, getEntity, Schema } from "../model";
+import { FieldVisitor, Schema } from "../schema/model";
 import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
+  GraphQLFieldResolver,
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
@@ -10,10 +11,9 @@ import {
 import singletonFactory from "../utils/singletonFactory";
 import { capitalizeFirstLetter } from "../utils/strings";
 import { Context } from "../types";
-import joinMonster from "join-monster";
 import { JoinMonsterFieldMapping } from "../joinMonsterHelpers";
 import { escapeParameter } from "../sql/utils";
-import {insertData, updateData} from "../sql/mapper";
+import { insertData, updateData } from "../sql/mapper";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
 import ColumnTypeResolver from "./ColumnTypeResolver";
@@ -21,6 +21,7 @@ import CreateEntityRelationInputFieldVisitor from "./mutations/CreateEntityRelat
 import CreateEntityInputFieldVisitor from "./mutations/CreateEntityInputFieldVisitor";
 import UpdateEntityRelationInputFieldVisitor from "./mutations/UpdateEntityRelationInputFieldVisitor";
 import UpdateEntityInputFieldVisitor from "./mutations/UpdateEntityInputFieldVisitor";
+import { acceptFieldVisitor, getEntity } from "../schema/modelUtils";
 
 
 type RelationDefinition = { entityName: string, relationName: string }
@@ -31,6 +32,7 @@ export default class MutationProvider
   private whereTypeProvider: WhereTypeProvider
   private entityTypeProvider: EntityTypeProvider
   private columnTypeResolver: ColumnTypeResolver
+  private resolver: GraphQLFieldResolver<any, any>;
 
   private createEntityInputs = singletonFactory<GraphQLInputObjectType, { entityName: string, withoutRelation?: string }>(id =>
     this.createCreateEntityInput(id.entityName, id.withoutRelation)
@@ -43,12 +45,13 @@ export default class MutationProvider
   private createEntityRelationInputs = singletonFactory((id: RelationDefinition) => this.createCreateEntityRelationInput(id.entityName, id.relationName))
   private updateEntityRelationInputs = singletonFactory((id: RelationDefinition) => this.createUpdateEntityRelationInput(id.entityName, id.relationName))
 
-  constructor(schema: Schema, whereTypeProvider: WhereTypeProvider, entityTypeProvider: EntityTypeProvider, columnTypeResolver: ColumnTypeResolver)
+  constructor(schema: Schema, whereTypeProvider: WhereTypeProvider, entityTypeProvider: EntityTypeProvider, columnTypeResolver: ColumnTypeResolver, resolver: GraphQLFieldResolver<any, any>)
   {
     this.schema = schema
     this.whereTypeProvider = whereTypeProvider
     this.entityTypeProvider = entityTypeProvider
     this.columnTypeResolver = columnTypeResolver
+    this.resolver = resolver;
   }
 
   getCreateMutation(entityName: string): GraphQLFieldConfig<any, any> & JoinMonsterFieldMapping<any, any>
@@ -64,9 +67,7 @@ export default class MutationProvider
       },
       resolve: async (parent, args, context: Context, resolveInfo) => {
         const primary = await insertData(this.schema, context.db)(entityName, args.data)
-        return await joinMonster(resolveInfo, {...context, primary}, (sql) => {
-          return context.db.raw(sql)
-        }, {dialect: 'pg'})
+        return await this.resolver(parent, args, {...context, primary}, resolveInfo)
       },
     }
   }
@@ -84,9 +85,7 @@ export default class MutationProvider
         return `${tableName}.${primary} = ${escapeParameter(args.where[entity.primary])}`
       },
       resolve: async (parent, args, context: Context, resolveInfo) => {
-        const response = await joinMonster(resolveInfo, context, (sql) => {
-          return context.db.raw(sql)
-        }, {dialect: 'pg'})
+        const response = await this.resolver(parent, args, context, resolveInfo)
         const entity = getEntity(this.schema, entityName)
         await context.db(entity.tableName).andWhere(entity.primaryColumn, args.where[entity.primary]).delete()
 
@@ -111,9 +110,7 @@ export default class MutationProvider
       resolve: async (parent, args, context: Context, resolveInfo) => {
         await updateData(this.schema, context.db)(entityName, args.where, args.data)
 
-        return await joinMonster(resolveInfo, context, (sql) => {
-          return context.db.raw(sql)
-        }, {dialect: 'pg'})
+        return await this.resolver(parent, args, context, resolveInfo)
       },
     }
   }

@@ -1,11 +1,12 @@
-import { acceptEveryFieldVisitor, acceptFieldVisitor, Entity, getEntity, JoiningColumnRelation, ManyHasManyOwnerRelation, Schema } from "../model";
+import { Entity, JoiningColumnRelation, ManyHasManyOwnerRelation, Schema } from "../schema/model";
 import * as Knex from 'knex';
 import { promiseAllObject } from "../utils/promises";
-import { ColumnValue, ColumnValueLike, CreateInput, PrimaryValue, UniqueWhere, UpdateInput } from "./types";
+import { ColumnValue, ColumnValueLike, CreateInput, PrimaryValue, UniqueWhere, UpdateInput } from "../schema/input";
 import { resolveValue } from "./utils";
 import InsertVisitor from "./insertVisitor";
 import UpdateVisitor from "./updateVisitor";
 import { isIt } from "../utils/type";
+import { acceptEveryFieldVisitor, acceptFieldVisitor, getEntity } from "../schema/modelUtils";
 
 
 type OnAfterInsertCallback = ((id: PrimaryValue) => PromiseLike<any>)

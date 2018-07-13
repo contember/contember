@@ -1,4 +1,4 @@
-import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../model";
+import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../schema/model";
 import { GraphQLNonNull, GraphQLOutputType } from "graphql/type/definition";
 import ColumnTypeResolver from "../ColumnTypeResolver";
 import EntityTypeProvider from "../EntityTypeProvider";

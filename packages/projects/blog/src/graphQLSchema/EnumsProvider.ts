@@ -1,7 +1,7 @@
 import singletonFactory from "../utils/singletonFactory"
 import { GraphQLEnumValueConfigMap } from "graphql/type/definition"
 import { GraphQLEnumType } from "graphql"
-import { Schema } from "../model"
+import { Schema } from "../schema/model"
 import { capitalizeFirstLetter } from "../utils/strings";
 
 export default class EnumsProvider

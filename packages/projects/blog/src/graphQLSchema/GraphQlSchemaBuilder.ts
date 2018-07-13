@@ -1,4 +1,4 @@
-import { Schema } from "../model";
+import { Schema } from "../schema/model";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
 import ColumnTypeResolver from "./ColumnTypeResolver";
@@ -28,7 +28,7 @@ export default class GraphQlSchemaBuilder
     this.whereTypeProvider = new WhereTypeProvider(this.schema, this.columnTypeResolver, this.conditionTypeProvider)
     this.entityTypeProvider = new EntityTypeProvider(this.schema, this.columnTypeResolver, this.whereTypeProvider)
     this.queryProvider = new QueryProvider(this.schema, this.whereTypeProvider, this.entityTypeProvider, resolver)
-    this.mutationProvider = new MutationProvider(this.schema, this.whereTypeProvider, this.entityTypeProvider, this.columnTypeResolver)
+    this.mutationProvider = new MutationProvider(this.schema, this.whereTypeProvider, this.entityTypeProvider, this.columnTypeResolver, resolver)
   }
 
   build()

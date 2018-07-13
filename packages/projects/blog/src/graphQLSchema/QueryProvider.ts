@@ -1,5 +1,5 @@
 import { buildWhere } from "../whereMonster";
-import { getEntity, Schema } from "../model";
+import { Schema } from "../schema/model";
 import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils";
 import { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLList, GraphQLNonNull } from "graphql";
 import { JoinMonsterFieldMapping, SqlAstNode } from "../joinMonsterHelpers";
@@ -7,6 +7,7 @@ import { GraphQLFieldConfigMap } from "graphql/type/definition";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
 import { escapeParameter } from "../sql/utils";
+import { getEntity } from "../schema/modelUtils";
 
 type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
 

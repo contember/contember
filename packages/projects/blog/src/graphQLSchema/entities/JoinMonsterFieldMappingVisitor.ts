@@ -11,14 +11,16 @@ import {
   Relation,
   RelationByTypeVisitor,
   Schema
-} from "../../model";
+} from "../../schema/model";
 import { JoinMonsterFieldMapping } from "../../joinMonsterHelpers";
 import { quoteIdentifier } from "../../sql/utils";
-import { buildWhere, Where } from "../../whereMonster";
+import { buildWhere } from "../../whereMonster";
 import { aliasInAst, joinToAst } from "../../joinMonster/sqlAstNodeUtils";
 import WhereTypeProvider from "../WhereTypeProvider";
+import { Where } from "../../schema/input";
+import { GraphQLInputObjectType } from "graphql";
 
-export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<JoinMonsterFieldMapping<any, any>>, RelationByTypeVisitor<JoinMonsterFieldMapping<any, any> & { args?: { where: Where } }>
+export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<JoinMonsterFieldMapping<any, any>>, RelationByTypeVisitor<JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }>
 {
   private schema: Schema;
   private whereTypeProvider: WhereTypeProvider;
@@ -36,7 +38,7 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     };
   }
 
-  visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation): JoinMonsterFieldMapping<any, any> & { args?: { where: Where } }
+  visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation): JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }
   {
     return {
       junction: {
@@ -54,7 +56,7 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     }
   }
 
-  visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null): JoinMonsterFieldMapping<any, any> & { args?: { where: Where } }
+  visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null): JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }
   {
     return {
       junction: {

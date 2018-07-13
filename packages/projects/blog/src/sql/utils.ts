@@ -1,4 +1,4 @@
-import { ColumnValue, GenericValueLike } from "./types";
+import { ColumnValue, GenericValueLike } from "../schema/input";
 
 export const resolveValue = <T extends ColumnValue>(value: GenericValueLike<T>): PromiseLike<T> => {
   if (typeof value === "function") {

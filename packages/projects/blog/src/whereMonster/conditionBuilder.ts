@@ -1,21 +1,5 @@
 import { escapeParameter, expression, quoteIdentifier } from "../sql/utils"
-
-export interface Condition<T>
-{
-  and?: Condition<T>[],
-  or?: Condition<T>[],
-  not?: Condition<T>,
-
-  eq?: T,
-  null?: boolean,
-  notEq?: T,
-  in?: T[],
-  notIn?: T[],
-  lt?: T,
-  lte?: T,
-  gt?: T,
-  gte?: T,
-}
+import { Condition } from "../schema/input";
 
 
 const buildCondition = (tableName: string, columnName: string) => (condition: Condition<any>): string => {

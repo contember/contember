@@ -1,4 +1,4 @@
-import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../model";
+import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../schema/model";
 import { GraphQLInputObjectType } from "graphql";
 import { capitalizeFirstLetter } from "../../utils/strings";
 import MutationProvider from "../MutationProvider";

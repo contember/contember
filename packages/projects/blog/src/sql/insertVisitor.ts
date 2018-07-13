@@ -9,7 +9,7 @@ import {
   OneHasOneInversedRelation,
   OneHasOneOwnerRelation,
   RelationByTypeVisitor
-} from "../model";
+} from "../schema/model";
 import * as Knex from 'knex';
 import * as uuidv4 from 'uuid/v4'
 import {
@@ -22,7 +22,7 @@ import {
   PrimaryValue,
   PrimaryValueLike,
   UniqueWhere
-} from "./types";
+} from "../schema/input";
 import { InsertBuilder, Mapper } from "./mapper";
 import { isIt } from "../utils/type";
 

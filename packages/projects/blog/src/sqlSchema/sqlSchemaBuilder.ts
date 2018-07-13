@@ -1,5 +1,6 @@
-import { acceptFieldVisitor, Entity, Schema } from '../model'
+import { Entity, Schema } from '../schema/model'
 import { ColumnDefinitions, MigrationBuilder } from 'node-pg-migrate'
+import { acceptFieldVisitor } from "../schema/modelUtils";
 
 const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
   const getPrimaryType = (entity: Entity) => {

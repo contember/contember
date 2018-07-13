@@ -1,6 +1,7 @@
 import { isSqlAstTableNode, Join, SqlAstNode, SqlAstTableNode } from "../joinMonsterHelpers"
 import { createAlias, quoteIdentifier } from "../sql/utils"
-import { acceptFieldVisitor, acceptRelationTypeVisitor, Entity, getEntity, RelationByTypeVisitor, Schema } from "../model"
+import { Entity, RelationByTypeVisitor, Schema } from "../schema/model"
+import { acceptFieldVisitor, acceptRelationTypeVisitor, getEntity } from "../schema/modelUtils";
 
 const aliasInAst = (sqlAstNode: SqlAstNode) => {
   const usedNames: string[] = []
@@ -31,7 +32,9 @@ const joinToAst = (schema: Schema, createAlias: (name: string) => string) => {
             type: "column",
             name: entity.primary,
             fieldName: acceptFieldVisitor(schema, entity, entity.primary, {
-              visitRelation: () => {throw new Error()},
+              visitRelation: () => {
+                throw new Error()
+              },
               visitColumn: (entity, column) => column.columnName,
             }),
             as: "primary"

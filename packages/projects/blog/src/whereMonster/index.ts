@@ -1,19 +1,9 @@
-import { acceptFieldVisitor, acceptRelationTypeVisitor, Entity, Relation, Schema } from "../model"
-import { Condition, default as buildCondition } from "./conditionBuilder"
+import { Entity, Relation, Schema } from "../schema/model"
+import buildCondition from "./conditionBuilder"
 import { expression, quoteIdentifier } from "../sql/utils"
 import { arrayEquals } from "../utils/arrays";
-
-
-type ComposedWhere = {
-  and?: Where[]
-  or?: Where[]
-  not?: Where
-}
-
-//workaround
-type FieldWhere = { [name: string]: Condition<any> | any }
-
-export type Where = ComposedWhere & FieldWhere & any
+import { acceptFieldVisitor, acceptRelationTypeVisitor } from "../schema/modelUtils";
+import { Condition, Where } from "../schema/input";
 
 
 class SubQueryBuilder

@@ -1,6 +1,5 @@
+import { Condition } from "../schema/input"
 import { escapeParameter, expression, quoteIdentifier } from "../sql/utils"
-import { Condition } from "../schema/input";
-
 
 const buildCondition = (tableName: string, columnName: string) => (condition: Condition<any>): string => {
   const parameters: any[] = []
@@ -24,7 +23,7 @@ const buildCondition = (tableName: string, columnName: string) => (condition: Co
       parts.push(`${fqn} = ?`)
     }
     if (condition.null !== undefined) {
-      const not = condition.null ? '' : 'NOT '
+      const not = condition.null ? "" : "NOT "
       parts.push(`${fqn} IS ${not}NULL`)
     }
     if (condition.notEq !== undefined) {

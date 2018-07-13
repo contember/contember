@@ -1,35 +1,34 @@
-import singletonFactory from "../utils/singletonFactory"
-import { GraphQLEnumValueConfigMap } from "graphql/type/definition"
 import { GraphQLEnumType } from "graphql"
+import { GraphQLEnumValueConfigMap } from "graphql/type/definition"
 import { Schema } from "../schema/model"
-import { capitalizeFirstLetter } from "../utils/strings";
+import singletonFactory from "../utils/singletonFactory"
+import { capitalizeFirstLetter } from "../utils/strings"
 
 export default class EnumsProvider
 {
-  private schema: Schema;
+  private schema: Schema
 
   private enums = singletonFactory(name => this.createEnum(name))
 
   constructor(schema: Schema)
   {
-    this.schema = schema;
+    this.schema = schema
   }
 
-  getEnum(name: string): GraphQLEnumType
+  public getEnum(name: string): GraphQLEnumType
   {
     return this.enums(name)
   }
 
-  hasEnum(name: string): boolean
+  public hasEnum(name: string): boolean
   {
     return this.schema.enums[name] !== undefined
   }
 
-
   private createEnum(name: string): GraphQLEnumType
   {
     const valuesConfig: GraphQLEnumValueConfigMap = {}
-    for (let val of this.schema.enums[name]) {
+    for (const val of this.schema.enums[name]) {
       valuesConfig[val] = {value: val}
     }
 

@@ -1,20 +1,19 @@
-import { graphql } from "graphql";
-import GraphQlSchemaBuilder from "../src/graphQLSchema/GraphQlSchemaBuilder";
-import model from "../src/model";
-import * as knex from 'knex'
-import * as mockKnex from 'mock-knex'
-import { expect } from 'chai'
-import { maskErrors } from "graphql-errors";
-
+import { expect } from "chai"
+import { graphql } from "graphql"
+import { maskErrors } from "graphql-errors"
+import * as knex from "knex"
+import * as mockKnex from "mock-knex"
+import GraphQlSchemaBuilder from "../src/graphQLSchema/GraphQlSchemaBuilder"
+import model from "../src/model"
 
 const builder = new GraphQlSchemaBuilder(model)
-let graphQLSchema = builder.build()
+const graphQLSchema = builder.build()
 
 maskErrors(graphQLSchema)
 
 const connection = knex({
   // debug: true,
-  client: 'pg',
+  client: "pg",
 })
 
 mockKnex.mock(connection)
@@ -23,20 +22,18 @@ tracker.install()
 
 const genericTaggedString = (strings: TemplateStringsArray, ...values: string[]) => {
   return strings.reduce((combined, string, i) => {
-    return combined + string + (i < values.length ? values[i] : '')
+    return combined + string + (i < values.length ? values[i] : "")
   }, "")
-};
-const SQL = (strings: TemplateStringsArray, ...values: string[]) => genericTaggedString(strings, ...values).replace(/\s+/g, ' ').trim()
+}
+const SQL = (strings: TemplateStringsArray, ...values: string[]) => genericTaggedString(strings, ...values).replace(/\s+/g, " ").trim()
 const GQL = genericTaggedString
 
-interface SqlQuery
-{
+interface SqlQuery {
   sql: string
   response: object[]
 }
 
-interface Test
-{
+interface Test {
   query: string
   executes: SqlQuery[]
   return: object
@@ -48,9 +45,9 @@ const uuid = (number: number) => {
 
 const execute = async (test: Test) => {
   tracker.install()
-  tracker.on('query', (query, step) => {
-    const queryDefinition = test.executes[step - 1];
-    expect(query.sql.replace(/\s+/g, ' ')).equals(queryDefinition.sql)
+  tracker.on("query", (query, step) => {
+    const queryDefinition = test.executes[step - 1]
+    expect(query.sql.replace(/\s+/g, " ")).equals(queryDefinition.sql)
     query.response(queryDefinition.response)
 
   })
@@ -58,10 +55,9 @@ const execute = async (test: Test) => {
   tracker.uninstall()
 }
 
+describe("Queries", () => {
 
-describe('Queries', () => {
-
-  it('Post with author by id query', async () => {
+  it("Post with author by id query", async () => {
     await execute({
       query: GQL`
         query {
@@ -98,7 +94,7 @@ describe('Queries', () => {
     })
   })
 
-  it('Posts with locales query', async () => {
+  it("Posts with locales query", async () => {
     await execute({
       query: GQL`
         query {
@@ -124,8 +120,8 @@ describe('Queries', () => {
         },
         {
           sql: SQL`
-          SELECT "locales"."id" AS "id", "locales"."locale" AS "locale", "locales"."title" AS "title", "locales"."post_id" AS "post_id" 
-          FROM "PostLocale" "locales" 
+          SELECT "locales"."id" AS "id", "locales"."locale" AS "locale", "locales"."title" AS "title", "locales"."post_id" AS "post_id"
+          FROM "PostLocale" "locales"
           WHERE "locales"."post_id" IN ('${uuid(1)}','${uuid(2)}')`,
           response: [
             {id: uuid(3), locale: "cs", title: "ahoj svete", post_id: uuid(1)},
@@ -167,4 +163,4 @@ describe('Queries', () => {
       }
     })
   })
-});
+})

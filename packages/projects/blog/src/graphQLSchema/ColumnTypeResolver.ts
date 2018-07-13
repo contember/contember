@@ -1,36 +1,36 @@
 import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLScalarType, GraphQLString } from "graphql"
-import { GraphQLUUID } from "./customTypes"
 import { Schema } from "../schema/model"
-import EnumsProvider from "./EnumsProvider";
+import { GraphQLUUID } from "./customTypes"
+import EnumsProvider from "./EnumsProvider"
 
 export default class ColumnTypeResolver
 {
-  private schema: Schema;
-  private enumsProvider: EnumsProvider;
+  private schema: Schema
+  private enumsProvider: EnumsProvider
 
   constructor(schema: Schema, enumsProvider: EnumsProvider)
   {
-    this.schema = schema;
-    this.enumsProvider = enumsProvider;
+    this.schema = schema
+    this.enumsProvider = enumsProvider
   }
 
-  getType(type: string): GraphQLScalarType | GraphQLEnumType
+  public getType(type: string): GraphQLScalarType | GraphQLEnumType
   {
     switch (type) {
-      case 'int':
-      case 'integer':
+      case "int":
+      case "integer":
         return GraphQLInt
-      case 'string':
+      case "string":
         return GraphQLString
-      case 'uuid':
+      case "uuid":
         return GraphQLUUID
-      case 'float':
+      case "float":
         return GraphQLFloat
-      case 'bool':
-      case 'boolean':
+      case "bool":
+      case "boolean":
         return GraphQLBoolean
-      case 'datetime':
-        return GraphQLString //todo
+      case "datetime":
+        return GraphQLString // todo
     }
     if (this.enumsProvider.hasEnum(type)) {
       return this.enumsProvider.getEnum(type)

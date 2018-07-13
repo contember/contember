@@ -1,7 +1,7 @@
 import { isSqlAstTableNode, Join, SqlAstNode, SqlAstTableNode } from "../joinMonsterHelpers"
-import { createAlias, quoteIdentifier } from "../sql/utils"
 import { Entity, RelationByTypeVisitor, Schema } from "../schema/model"
-import { acceptFieldVisitor, acceptRelationTypeVisitor, getEntity } from "../schema/modelUtils";
+import { acceptFieldVisitor, acceptRelationTypeVisitor, getEntity } from "../schema/modelUtils"
+import { createAlias, quoteIdentifier } from "../sql/utils"
 
 const aliasInAst = (sqlAstNode: SqlAstNode) => {
   const usedNames: string[] = []
@@ -24,7 +24,7 @@ const joinToAst = (schema: Schema, createAlias: (name: string) => string) => {
     let subNode: SqlAstTableNode = sqlAstNode.children.find(it => isSqlAstTableNode(it) && it.fieldName === fieldName) as SqlAstTableNode
     if (!subNode) {
       const notSupported = () => {
-        throw new Error('Only has one relation can be joined this way')
+        throw new Error("Only has one relation can be joined this way")
       }
       const createChildren = (entity: Entity) => {
         return [
@@ -72,7 +72,7 @@ const joinToAst = (schema: Schema, createAlias: (name: string) => string) => {
         args: {},
         type: "table",
         as: createAlias(fieldName),
-        fieldName: fieldName,
+        fieldName,
         grabMany: false,
         ...joiningInfo
       }

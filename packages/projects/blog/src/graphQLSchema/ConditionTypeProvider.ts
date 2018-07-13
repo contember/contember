@@ -1,22 +1,22 @@
-import singletonFactory from "../utils/singletonFactory"
-import { GraphQLNonNull } from "graphql/type/definition"
 import { GraphQLBoolean, GraphQLInputObjectType, GraphQLList } from "graphql"
-import { capitalizeFirstLetter } from "../utils/strings";
-import ColumnTypeResolver from "./ColumnTypeResolver";
+import { GraphQLNonNull } from "graphql/type/definition"
+import singletonFactory from "../utils/singletonFactory"
+import { capitalizeFirstLetter } from "../utils/strings"
+import ColumnTypeResolver from "./ColumnTypeResolver"
 
 export default class ConditionTypeProvider
 {
-  private columnTypeResolver: ColumnTypeResolver;
+  private columnTypeResolver: ColumnTypeResolver
   private conditions = singletonFactory(name => this.createCondition(name))
 
   constructor(columnTypeResolver: ColumnTypeResolver)
   {
-    this.columnTypeResolver = columnTypeResolver;
+    this.columnTypeResolver = columnTypeResolver
   }
 
-  getCondition(typeName: string): GraphQLInputObjectType
+  public getCondition(typeName: string): GraphQLInputObjectType
   {
-    return this.conditions(typeName);
+    return this.conditions(typeName)
   }
 
   private createCondition(typeName: string)

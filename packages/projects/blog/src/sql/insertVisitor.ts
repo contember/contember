@@ -1,3 +1,13 @@
+import * as uuidv4 from "uuid/v4"
+import {
+  ConnectRelationInput,
+  CreateDataInput,
+  CreateManyRelationInput,
+  CreateOneRelationInput,
+  CreateRelationInput,
+  PrimaryValue,
+  UniqueWhere
+} from "../schema/input"
 import {
   Column,
   ColumnVisitor,
@@ -9,20 +19,9 @@ import {
   OneHasOneInversedRelation,
   OneHasOneOwnerRelation,
   RelationByTypeVisitor
-} from "../schema/model";
-import * as uuidv4 from 'uuid/v4'
-import {
-  ConnectRelationInput,
-  CreateDataInput,
-  CreateManyRelationInput,
-  CreateOneRelationInput,
-  CreateRelationInput,
-  PrimaryValue,
-  UniqueWhere
-} from "../schema/input";
-import { InsertBuilder, Mapper } from "./mapper";
-import { isIt } from "../utils/type";
-
+} from "../schema/model"
+import { isIt } from "../utils/type"
+import { InsertBuilder, Mapper } from "./mapper"
 
 interface RelationInputProcessor
 {
@@ -31,21 +30,20 @@ interface RelationInputProcessor
   create(input: CreateDataInput): PromiseLike<void>
 }
 
-
 export default class InsertVisitor implements ColumnVisitor<void>, RelationByTypeVisitor<PromiseLike<any>>
 {
-  private data: CreateDataInput;
-  private insertBuilder: InsertBuilder;
-  private mapper: Mapper;
+  private data: CreateDataInput
+  private insertBuilder: InsertBuilder
+  private mapper: Mapper
 
   constructor(data: CreateDataInput, insertBuilder: InsertBuilder, mapper: Mapper)
   {
-    this.data = data;
-    this.insertBuilder = insertBuilder;
-    this.mapper = mapper;
+    this.data = data
+    this.insertBuilder = insertBuilder
+    this.mapper = mapper
   }
 
-  visitColumn(entity: Entity, column: Column): void
+  public visitColumn(entity: Entity, column: Column): void
   {
     this.insertBuilder.addColumnData(column.columnName, (() => {
       if (this.data[column.name] !== undefined) {
@@ -60,23 +58,23 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
       if (entity.primary === column.name) {
         return this.resolvePrimaryGenerator(column)()
       }
-    })());
+    })())
   }
 
-  visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation)
+  public visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation)
   {
     const insertBuilder = this.insertBuilder
     const mapper = this.mapper
 
     return this.processManyRelationInput(this.data[relation.name] as CreateManyRelationInput, new class implements RelationInputProcessor
     {
-      async connect(input: UniqueWhere)
+      public async connect(input: UniqueWhere)
       {
         const primaryInversed = await insertBuilder.insertRow()
         await mapper.connectJunction(targetEntity, targetRelation, {[targetEntity.primary]: input[targetEntity.primary]}, {[entity.primary]: primaryInversed})
       }
 
-      async create(input: CreateDataInput)
+      public async create(input: CreateDataInput)
       {
         const primaryInversed = await insertBuilder.insertRow()
         const primaryOwner = await mapper.insert(targetEntity.name, input)
@@ -85,20 +83,20 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null)
+  public visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null)
   {
     const insertBuilder = this.insertBuilder
     const mapper = this.mapper
 
     return this.processManyRelationInput(this.data[relation.name] as CreateManyRelationInput, new class implements RelationInputProcessor
     {
-      async connect(input: UniqueWhere)
+      public async connect(input: UniqueWhere)
       {
         const primary = await insertBuilder.insertRow()
         await mapper.connectJunction(entity, relation, {[entity.primary]: primary}, {[targetEntity.primary]: input[targetEntity.primary]})
       }
 
-      async create(input: CreateDataInput)
+      public async create(input: CreateDataInput)
       {
         const primary = await insertBuilder.insertRow()
         const primaryInversed = await mapper.insert(targetEntity.name, input)
@@ -107,34 +105,33 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-
-  visitManyHasOne(entity: Entity, relation: ManyHasOneRelation, targetEntity: Entity, targetRelation: OneHasManyRelation | null)
+  public visitManyHasOne(entity: Entity, relation: ManyHasOneRelation, targetEntity: Entity, targetRelation: OneHasManyRelation | null)
   {
     const insertBuilder = this.insertBuilder
     const mapper = this.mapper
 
     return this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
-      async connect(input: UniqueWhere)
+      public async connect(input: UniqueWhere)
       {
         insertBuilder.addColumnData(relation.joiningColumn.columnName, input[targetEntity.primary])
       }
 
-      async create(input: CreateDataInput)
+      public async create(input: CreateDataInput)
       {
         insertBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity.name, input))
       }
     })
   }
 
-  visitOneHasMany(entity: Entity, relation: OneHasManyRelation, targetEntity: Entity, targetRelation: ManyHasOneRelation)
+  public visitOneHasMany(entity: Entity, relation: OneHasManyRelation, targetEntity: Entity, targetRelation: ManyHasOneRelation)
   {
     const insertBuilder = this.insertBuilder
     const mapper = this.mapper
 
     return this.processManyRelationInput(this.data[relation.name] as CreateManyRelationInput, new class implements RelationInputProcessor
     {
-      async connect(input: UniqueWhere)
+      public async connect(input: UniqueWhere)
       {
         const value = await insertBuilder.insertRow()
         await mapper.update(targetEntity.name, input, {
@@ -144,7 +141,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      async create(input: CreateDataInput)
+      public async create(input: CreateDataInput)
       {
         const primary = await insertBuilder.insertRow()
         await mapper.insert(targetEntity.name, {
@@ -157,14 +154,14 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  visitOneHasOneInversed(entity: Entity, relation: OneHasOneInversedRelation, targetEntity: Entity, targetRelation: OneHasOneOwnerRelation)
+  public visitOneHasOneInversed(entity: Entity, relation: OneHasOneInversedRelation, targetEntity: Entity, targetRelation: OneHasOneOwnerRelation)
   {
     const insertBuilder = this.insertBuilder
     const mapper = this.mapper
 
     return this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
-      async connect(input: UniqueWhere)
+      public async connect(input: UniqueWhere)
       {
         const value = await insertBuilder.insertRow()
         await mapper.update(targetEntity.name, input, {
@@ -174,7 +171,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      async create(input: CreateDataInput)
+      public async create(input: CreateDataInput)
       {
         const primary = await insertBuilder.insertRow()
         await mapper.insert(targetEntity.name, {
@@ -187,26 +184,24 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-
-  visitOneHasOneOwner(entity: Entity, relation: OneHasOneOwnerRelation, targetEntity: Entity, targetRelation: OneHasOneInversedRelation | null)
+  public visitOneHasOneOwner(entity: Entity, relation: OneHasOneOwnerRelation, targetEntity: Entity, targetRelation: OneHasOneInversedRelation | null)
   {
-    const insertBuilder = this.insertBuilder;
-    const mapper = this.mapper;
+    const insertBuilder = this.insertBuilder
+    const mapper = this.mapper
 
     return this.processRelationInput(this.data[relation.name] as CreateOneRelationInput, new class implements RelationInputProcessor
     {
-      async connect(input: UniqueWhere)
+      public async connect(input: UniqueWhere)
       {
         insertBuilder.addColumnData(relation.joiningColumn.columnName, input[targetEntity.primary])
       }
 
-      async create(input: CreateDataInput)
+      public async create(input: CreateDataInput)
       {
         insertBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity.name, input))
       }
     })
   }
-
 
   private processRelationInput(input: CreateOneRelationInput | undefined, processor: RelationInputProcessor): PromiseLike<any>
   {
@@ -215,12 +210,12 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     }
     const relations = []
     let result: PromiseLike<void> | null = null
-    if (isIt<ConnectRelationInput>(input, 'connect')) {
-      relations.push('connect')
+    if (isIt<ConnectRelationInput>(input, "connect")) {
+      relations.push("connect")
       result = processor.connect(input.connect)
     }
-    if (isIt<CreateRelationInput>(input, 'create')) {
-      relations.push('create')
+    if (isIt<CreateRelationInput>(input, "create")) {
+      relations.push("create")
       result = processor.create(input.create)
     }
 
@@ -240,7 +235,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
       return Promise.resolve(undefined)
     }
     const promises = []
-    for (let element of input) {
+    for (const element of input) {
       const result = this.processRelationInput(element, processor)
       promises.push(result)
     }
@@ -252,6 +247,6 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
     if (column.type === "uuid") {
       return uuidv4
     }
-    throw new Error('not implemented')
+    throw new Error("not implemented")
   }
 }

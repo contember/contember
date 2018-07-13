@@ -13,7 +13,7 @@ const arrayEquals = (a: any, b: any): boolean => {
       return false
     }
   }
-  return true;
+  return true
 }
 
 export { arrayEquals }

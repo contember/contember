@@ -1,6 +1,6 @@
-import { Entity, Schema } from '../schema/model'
-import { ColumnDefinitions, MigrationBuilder } from 'node-pg-migrate'
-import { acceptFieldVisitor } from "../schema/modelUtils";
+import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
+import { Entity, Schema } from "../schema/model"
+import { acceptFieldVisitor } from "../schema/modelUtils"
 
 const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
   const getPrimaryType = (entity: Entity) => {
@@ -12,15 +12,15 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
     })
   }
 
-  for (let enumName in schema.enums) {
+  for (const enumName in schema.enums) {
     const values = schema.enums[enumName]
     migrationBuilder.createType(enumName, values)
   }
 
-  for (let entityName in schema.entities) {
+  for (const entityName in schema.entities) {
     const entity = schema.entities[entityName]
     const columns: ColumnDefinitions = {}
-    for (let fieldName in entity.fields) {
+    for (const fieldName in entity.fields) {
       acceptFieldVisitor(schema, entity, fieldName, {
           visitColumn: (entity, column) => {
             columns[column.columnName] = {
@@ -79,10 +79,9 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
     migrationBuilder.createTable(entity.tableName, columns)
   }
 
-
-  for (let entityName in schema.entities) {
+  for (const entityName in schema.entities) {
     const entity = schema.entities[entityName]
-    for (let fieldName in entity.fields) {
+    for (const fieldName in entity.fields) {
       acceptFieldVisitor(schema, entity, fieldName, {
           visitColumn: () => {
           },

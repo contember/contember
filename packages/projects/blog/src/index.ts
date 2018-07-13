@@ -1,19 +1,19 @@
-import { GraphQLServer } from 'graphql-yoga'
-import GraphQlSchemaBuilder from './graphQLSchema/GraphQlSchemaBuilder'
+import * as dotenv from "dotenv"
+import * as fs from "fs"
 import { printSchema } from "graphql"
-import * as fs from 'fs'
-import buildSql from "./sqlSchema/sqlSchemaBuilder"
+import { GraphQLServer } from "graphql-yoga"
+import * as knex from "knex"
+import GraphQlSchemaBuilder from "./graphQLSchema/GraphQlSchemaBuilder"
 import model from "./model"
-import * as knex from 'knex'
-import * as dotenv from 'dotenv'
+import buildSql from "./sqlSchema/sqlSchemaBuilder"
 
 dotenv.config()
 
 const builder = new GraphQlSchemaBuilder(model)
-let graphQLSchema = builder.build()
+const graphQLSchema = builder.build()
 
-let builderClass = require('node-pg-migrate/dist/migration-builder').default
-let migrationBuilder = new builderClass({}, {
+const builderClass = require("node-pg-migrate/dist/migration-builder").default
+const migrationBuilder = new builderClass({}, {
   query: null,
   select: null,
 })
@@ -23,11 +23,11 @@ fs.writeFile(__dirname + "/schema.sql", sql, error => console.error(error))
 
 const fileData = printSchema(graphQLSchema, {commentDescriptions: true})
 
-fs.writeFile(__dirname + '/schema.graphql', fileData, error => console.error(error))
+fs.writeFile(__dirname + "/schema.graphql", fileData, error => console.error(error))
 
 const connection = knex({
   debug: true,
-  client: 'pg',
+  client: "pg",
   connection: {
     host: process.env.DB_HOST as string,
     port: process.env.DB_PORT as string,
@@ -45,4 +45,4 @@ const server = new GraphQLServer({
   },
 
 })
-server.start({port: process.env.SERVER_PORT}, (options) => console.log(`Server is running on localhost:${options.port}`))
+server.start({port: process.env.SERVER_PORT}, options => console.log(`Server is running on localhost:${options.port}`))

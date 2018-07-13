@@ -1,14 +1,14 @@
-import { Schema } from "../schema/model";
-import WhereTypeProvider from "./WhereTypeProvider";
-import EntityTypeProvider from "./EntityTypeProvider";
-import ColumnTypeResolver from "./ColumnTypeResolver";
-import EnumsProvider from "./EnumsProvider";
-import MutationProvider from "./MutationProvider";
-import { GraphQLFieldConfig, GraphQLObjectType, GraphQLSchema } from "graphql";
-import { JoinMonsterFieldMapping } from "../joinMonsterHelpers";
-import QueryProvider from "./QueryProvider";
-import resolver from "./resolver";
-import ConditionTypeProvider from "./ConditionTypeProvider";
+import { GraphQLFieldConfig, GraphQLObjectType, GraphQLSchema } from "graphql"
+import { JoinMonsterFieldMapping } from "../joinMonsterHelpers"
+import { Schema } from "../schema/model"
+import ColumnTypeResolver from "./ColumnTypeResolver"
+import ConditionTypeProvider from "./ConditionTypeProvider"
+import EntityTypeProvider from "./EntityTypeProvider"
+import EnumsProvider from "./EnumsProvider"
+import MutationProvider from "./MutationProvider"
+import QueryProvider from "./QueryProvider"
+import resolver from "./resolver"
+import WhereTypeProvider from "./WhereTypeProvider"
 
 export default class GraphQlSchemaBuilder
 {
@@ -31,13 +31,13 @@ export default class GraphQlSchemaBuilder
     this.mutationProvider = new MutationProvider(this.schema, this.whereTypeProvider, this.entityTypeProvider, this.columnTypeResolver, resolver)
   }
 
-  build()
+  public build()
   {
     type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
 
     return new GraphQLSchema({
       query: new GraphQLObjectType({
-        name: 'Query',
+        name: "Query",
         fields: () => Object.keys(this.schema.entities).reduce<{ [queryName: string]: FieldConfig }>((queries, entityName) => {
           return {
             ...this.queryProvider.getQueries(entityName),
@@ -46,7 +46,7 @@ export default class GraphQlSchemaBuilder
         }, {})
       }),
       mutation: new GraphQLObjectType({
-        name: 'Mutation',
+        name: "Mutation",
         fields: () => Object.keys(this.schema.entities).reduce<{ [queryName: string]: FieldConfig }>((mutations, entityName) => {
           return {
             ...this.mutationProvider.getMutations(entityName),

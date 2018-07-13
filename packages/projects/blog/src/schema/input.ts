@@ -1,15 +1,52 @@
-export type ConnectRelationInput = { connect: UniqueWhere }
-export type CreateRelationInput = { create: CreateDataInput }
+export interface ConnectRelationInput
+{
+  connect: UniqueWhere
+}
 
-export type DisconnectSpecifiedRelationInput = { disconnect: UniqueWhere }
-export type DeleteSpecifiedRelationInput = { delete: UniqueWhere }
-export type UpdateSpecifiedRelationInput = { update: { where: UniqueWhere, data: UpdateDataInput } }
-export type UpsertSpecifiedRelationInput = { upsert: { where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput } }
+export interface CreateRelationInput
+{
+  create: CreateDataInput
+}
 
-export type DisconnectRelationInput = { disconnect: true }
-export type UpdateRelationInput = { update: UpdateDataInput }
-export type DeleteRelationInput = { delete: true }
-export type UpsertRelationInput = { upsert: { update: UpdateDataInput, create: CreateDataInput } }
+export interface DisconnectSpecifiedRelationInput
+{
+  disconnect: UniqueWhere
+}
+
+export interface DeleteSpecifiedRelationInput
+{
+  delete: UniqueWhere
+}
+
+export interface UpdateSpecifiedRelationInput
+{
+  update: { where: UniqueWhere, data: UpdateDataInput }
+}
+
+export interface UpsertSpecifiedRelationInput
+{
+  upsert: { where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput }
+}
+
+export interface DisconnectRelationInput
+{
+  disconnect: true
+}
+
+export interface UpdateRelationInput
+{
+  update: UpdateDataInput
+}
+
+export interface DeleteRelationInput
+{
+  delete: true
+}
+
+export interface UpsertRelationInput
+{
+  upsert: { update: UpdateDataInput, create: CreateDataInput }
+}
 
 export interface CreateDataInput
 {
@@ -18,7 +55,6 @@ export interface CreateDataInput
 
 export type CreateOneRelationInput = ConnectRelationInput | CreateRelationInput
 export type CreateManyRelationInput = CreateOneRelationInput[]
-
 
 export interface UpdateDataInput
 {
@@ -51,7 +87,6 @@ export interface ListQueryInput
   where?: Where
 }
 
-
 export type UpdateOneRelationInput =
   CreateRelationInput
   | ConnectRelationInput
@@ -59,19 +94,17 @@ export type UpdateOneRelationInput =
   | DisconnectRelationInput
   | UpdateRelationInput
   | UpsertRelationInput
-export type UpdateManyRelationInput = (
-  CreateRelationInput
+export type UpdateManyRelationInput = Array<CreateRelationInput
   | ConnectRelationInput
   | DeleteSpecifiedRelationInput
   | DisconnectSpecifiedRelationInput
   | UpdateSpecifiedRelationInput
-  | UpsertSpecifiedRelationInput
-  )[]
+  | UpsertSpecifiedRelationInput>
 
 export interface Condition<T>
 {
-  and?: Condition<T>[],
-  or?: Condition<T>[],
+  and?: Array<Condition<T>>,
+  or?: Array<Condition<T>>,
   not?: Condition<T>,
 
   eq?: T,
@@ -95,16 +128,27 @@ export type GenericValueLike<T> = T | PromiseLike<T> | (() => T | PromiseLike<T>
 export type ColumnValueLike = GenericValueLike<ColumnValue>
 export type PrimaryValueLike = GenericValueLike<PrimaryValue>
 
-export type UniqueWhere = { [field: string]: PrimaryValue }
+export interface UniqueWhere
+{
+  [field: string]: PrimaryValue
+}
 
-export type ComposedWhere = {
+export interface ComposedWhere
+{
   and?: Where[]
   or?: Where[]
   not?: Where
 }
 
-//workaround
-type ColumnWhere = { [name: string]: Condition<any> }
-type RelationWhere = { [name: string]: /* Where */ any }
+// workaround
+interface ColumnWhere
+{
+  [name: string]: Condition<any>
+}
+
+interface RelationWhere
+{
+  [name: string]: /* Where */ any
+}
 
 export type Where = ComposedWhere & ColumnWhere & RelationWhere

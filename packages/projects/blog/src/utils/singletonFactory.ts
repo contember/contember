@@ -2,7 +2,7 @@ const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: A
   const created: { [name: string]: T } = {}
   const recursionGuard: string[] = []
   return (name: Id, args?: Args): T => {
-    const idString = typeof name === 'string' ? name : JSON.stringify(name)
+    const idString = typeof name === "string" ? name : JSON.stringify(name)
     if (created[idString]) {
       return created[idString]
     }

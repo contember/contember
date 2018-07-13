@@ -1,3 +1,4 @@
+import { isIt } from "../utils/type"
 import {
   Column,
   ColumnVisitor,
@@ -18,8 +19,7 @@ import {
   RelationType,
   RelationVisitor,
   Schema
-} from "./model";
-import { isIt } from "../utils/type";
+} from "./model"
 
 export const getEntity = (schema: Schema, entityName: string): Entity => {
   return schema.entities[entityName]
@@ -29,29 +29,28 @@ export const getColumnName = (schema: Schema, entity: Entity, fieldName: string)
   return acceptFieldVisitor(schema, entity, fieldName, {
     visitColumn: (entity, column) => column.name,
     visitRelation: (entity, relation) => {
-      if (isIt<JoiningColumnRelation>(relation, 'joiningColumn')) {
+      if (isIt<JoiningColumnRelation>(relation, "joiningColumn")) {
         return relation.joiningColumn.columnName
       }
-      throw new Error('Not an owning side')
+      throw new Error("Not an owning side")
     }
   })
 }
 
 export const acceptEveryFieldVisitor = <T>(schema: Schema, entity: string | Entity, visitor: FieldVisitor<T>): { [fieldName: string]: T } => {
-  let entityObj: Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
+  const entityObj: Entity = typeof entity === "string" ? getEntity(schema, entity) : entity
   if (!entityObj) {
     throw new Error(`entity ${entity} not found`)
   }
   const result: { [fieldName: string]: T } = {}
-  for (let field in entityObj.fields) {
+  for (const field in entityObj.fields) {
     result[field] = acceptFieldVisitor(schema, entityObj, field, visitor)
   }
   return result
 }
 
-
 export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, fieldName: string, visitor: FieldVisitor<T>): T => {
-  let entityObj: Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
+  const entityObj: Entity = typeof entity === "string" ? getEntity(schema, entity) : entity
   if (!entityObj) {
     throw new Error(`entity ${entity} not found`)
   }
@@ -59,15 +58,15 @@ export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, f
   if (!field) {
     throw new Error(`field ${fieldName} of entity ${entityObj.name} not found`)
   }
-  if (isIt<Column>(field, 'type')) {
+  if (isIt<Column>(field, "type")) {
     return visitor.visitColumn(entityObj, field)
   }
-  if (!isIt<Relation>(field, 'target')) {
+  if (!isIt<Relation>(field, "target")) {
     throw new Error()
   }
   const targetEntity = getEntity(schema, field.target)
 
-  if (isIt<ColumnVisitor<T> & RelationVisitor<T>>(visitor, 'visitRelation')) {
+  if (isIt<ColumnVisitor<T> & RelationVisitor<T>>(visitor, "visitRelation")) {
     let targetRelation = null
     if (isOwnerRelation(field)) {
       targetRelation = field.inversedBy ? (targetEntity.fields[field.inversedBy] || null) : null
@@ -76,13 +75,13 @@ export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, f
     } else {
       throw new Error()
     }
-    if (targetRelation && !isIt<Relation>(targetRelation, 'target')) {
+    if (targetRelation && !isIt<Relation>(targetRelation, "target")) {
       throw new Error()
     }
     return visitor.visitRelation(entityObj, field, targetEntity, targetRelation)
   }
 
-  if (isIt<ColumnVisitor<T> & RelationByGenericTypeVisitor<T>>(visitor, 'visitHasMany')) {
+  if (isIt<ColumnVisitor<T> & RelationByGenericTypeVisitor<T>>(visitor, "visitHasMany")) {
     return acceptRelationTypeVisitor(schema, entityObj, fieldName, {
       visitManyHasManyInversed: visitor.visitHasMany.bind(visitor),
       visitManyHasManyOwner: visitor.visitHasMany.bind(visitor),
@@ -93,15 +92,14 @@ export const acceptFieldVisitor = <T>(schema: Schema, entity: string | Entity, f
     })
   }
 
-  if (isIt<ColumnVisitor<T> & RelationByTypeVisitor<T>>(visitor, 'visitManyHasManyInversed')) {
+  if (isIt<ColumnVisitor<T> & RelationByTypeVisitor<T>>(visitor, "visitManyHasManyInversed")) {
     return acceptRelationTypeVisitor(schema, entityObj, fieldName, visitor)
   }
   throw new Error()
 }
 
-
 export const acceptRelationTypeVisitor = <T>(schema: Schema, entity: string | Entity, relationName: string, visitor: RelationByTypeVisitor<T>): T => {
-  let entityObj: Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
+  const entityObj: Entity = typeof entity === "string" ? getEntity(schema, entity) : entity
   if (!entityObj) {
     throw new Error(`entity ${entity} not found`)
   }
@@ -109,14 +107,14 @@ export const acceptRelationTypeVisitor = <T>(schema: Schema, entity: string | En
   if (!relation) {
     throw new Error(`relation ${relationName} of entity ${entityObj.name} not found`)
   }
-  if (!isIt<Relation>(relation, 'target')) {
+  if (!isIt<Relation>(relation, "target")) {
     throw new Error(`field ${relationName} is not a relation`)
   }
   const targetEntity = getEntity(schema, relation.target)
 
   if (isInversedRelation(relation)) {
     const targetRelation = targetEntity.fields[relation.ownedBy]
-    if (!isIt<Relation>(targetRelation, 'target')) {
+    if (!isIt<Relation>(targetRelation, "target")) {
       throw new Error()
     }
     switch (relation.relation) {

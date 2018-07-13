@@ -1,15 +1,14 @@
+import { Condition, Where } from "../schema/input"
 import { Entity, Relation, Schema } from "../schema/model"
-import buildCondition from "./conditionBuilder"
+import { acceptFieldVisitor, acceptRelationTypeVisitor } from "../schema/modelUtils"
 import { expression, quoteIdentifier } from "../sql/utils"
-import { arrayEquals } from "../utils/arrays";
-import { acceptFieldVisitor, acceptRelationTypeVisitor } from "../schema/modelUtils";
-import { Condition, Where } from "../schema/input";
-
+import { arrayEquals } from "../utils/arrays"
+import buildCondition from "./conditionBuilder"
 
 class SubQueryBuilder
 {
-  schema: Schema
-  rootEntity: Entity
+  public schema: Schema
+  public rootEntity: Entity
 
   private joins: string[][] = []
 
@@ -19,18 +18,17 @@ class SubQueryBuilder
     this.rootEntity = rootEntity
   }
 
-
-  getSql(): string
+  public getSql(): string
   {
     const rootAlias = this.alias([])
     const joins = this.buildJoins()
-    return `SELECT ${quoteIdentifier(rootAlias, this.rootEntity.primaryColumn)} 
+    return `SELECT ${quoteIdentifier(rootAlias, this.rootEntity.primaryColumn)}
     FROM ${quoteIdentifier(this.rootEntity.tableName)} AS ${quoteIdentifier(rootAlias)}
    ${joins}
     `
   }
 
-  join(joinPath: string[])
+  public join(joinPath: string[])
   {
     this.joins.push(joinPath)
     return this.alias(joinPath)
@@ -38,9 +36,9 @@ class SubQueryBuilder
 
   private buildJoins(): string
   {
-    let sqlExpr: string[] = []
+    const sqlExpr: string[] = []
     const joined: string[][] = []
-    for (let joinPath of this.joins) {
+    for (const joinPath of this.joins) {
       let currentFrom = this.rootEntity
       for (let i = 0; i < joinPath.length; i++) {
         const partialJoinPath = joinPath.slice(0, i + 1)
@@ -64,7 +62,7 @@ class SubQueryBuilder
         const toAlias = this.alias(partialJoinPath)
 
         const join = (tableName: string, as: string, fromAlias: string) => (fromColumn: string, toColumn: string): string => {
-          return `JOIN ${quoteIdentifier(tableName)} AS ${quoteIdentifier(as)} 
+          return `JOIN ${quoteIdentifier(tableName)} AS ${quoteIdentifier(as)}
             ON ${quoteIdentifier(fromAlias, fromColumn)} = ${quoteIdentifier(as, toColumn)}`
         }
 
@@ -100,12 +98,11 @@ class SubQueryBuilder
     return sqlExpr.join("\n")
   }
 
-  alias(path: string[])
+  public alias(path: string[])
   {
-    return "root_" + path.join('_')
+    return "root_" + path.join("_")
   }
 }
-
 
 type JoinCallback = (joinPath: string[]) => string
 
@@ -122,8 +119,8 @@ const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, 
     if (where.not !== undefined) {
       parts.push(expression.not(expression.and(buildWhereParts(where.not))))
     }
-    for (let fieldName in where) {
-      if (fieldName === 'and' || fieldName === 'or' || fieldName === 'not') {
+    for (const fieldName in where) {
+      if (fieldName === "and" || fieldName === "or" || fieldName === "not") {
         continue
       }
 
@@ -155,6 +152,5 @@ const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, 
 
   return expression.and(buildWhereParts(where))
 }
-
 
 export { buildWhere }

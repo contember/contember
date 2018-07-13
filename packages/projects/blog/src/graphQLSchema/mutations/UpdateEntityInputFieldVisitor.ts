@@ -1,20 +1,20 @@
-import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../schema/model";
-import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from "graphql";
-import ColumnTypeResolver from "../ColumnTypeResolver";
-import MutationProvider from "../MutationProvider";
+import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from "graphql"
+import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../schema/model"
+import ColumnTypeResolver from "../ColumnTypeResolver"
+import MutationProvider from "../MutationProvider"
 
 export default class UpdateEntityInputFieldVisitor implements ColumnVisitor<GraphQLInputFieldConfig | undefined>, RelationByGenericTypeVisitor<GraphQLInputFieldConfig | undefined>
 {
-  private columnTypeResolver: ColumnTypeResolver;
-  private mutationProvider: MutationProvider;
+  private columnTypeResolver: ColumnTypeResolver
+  private mutationProvider: MutationProvider
 
   constructor(columnTypeResolver: ColumnTypeResolver, mutationProvider: MutationProvider)
   {
-    this.columnTypeResolver = columnTypeResolver;
-    this.mutationProvider = mutationProvider;
+    this.columnTypeResolver = columnTypeResolver
+    this.mutationProvider = mutationProvider
   }
 
-  visitColumn(entity: Entity, column: Column): GraphQLInputFieldConfig | undefined
+  public visitColumn(entity: Entity, column: Column): GraphQLInputFieldConfig | undefined
   {
     if (entity.primary === column.name) {
       return undefined
@@ -24,14 +24,14 @@ export default class UpdateEntityInputFieldVisitor implements ColumnVisitor<Grap
     }
   }
 
-  visitHasOne(entity: Entity, relation: Relation & NullableRelation): GraphQLInputFieldConfig
+  public visitHasOne(entity: Entity, relation: Relation & NullableRelation): GraphQLInputFieldConfig
   {
     return {
       type: this.mutationProvider.getUpdateEntityRelationInput(entity.name, relation.name),
     }
   }
 
-  visitHasMany(entity: Entity, relation: Relation): GraphQLInputFieldConfig
+  public visitHasMany(entity: Entity, relation: Relation): GraphQLInputFieldConfig
   {
     return {
       type: new GraphQLList(new GraphQLNonNull(this.mutationProvider.getUpdateEntityRelationInput(entity.name, relation.name)))

@@ -6,13 +6,13 @@ export interface Entity
   primaryColumn: string
   tableName: string
   fields: { [name: string]: Column | Relation }
-  unique?: { fields: string[] }[]
+  unique?: Array<{ fields: string[] }>
 }
 
 export interface Column
 {
   name: string
-  default?: any | (() => any);
+  default?: any | (() => any)
   type: string
   columnName: string
   unique?: boolean
@@ -21,7 +21,6 @@ export interface Column
     [name: string]: any,
   }
 }
-
 
 export interface ColumnVisitor<T>
 {
@@ -59,10 +58,10 @@ export interface RelationByGenericTypeVisitor<T>
 
 export enum RelationType
 {
-  OneHasOne = 'OneHasOne',
-  OneHasMany = 'OneHasMany',
-  ManyHasOne = 'ManyHasOne',
-  ManyHasMany = 'ManyHasMany',
+  OneHasOne = "OneHasOne",
+  OneHasMany = "OneHasMany",
+  ManyHasOne = "ManyHasOne",
+  ManyHasMany = "ManyHasMany",
 }
 
 export interface Relation<T extends RelationType = RelationType>
@@ -86,7 +85,7 @@ export interface JoiningColumnRelation
 {
   joiningColumn: {
     columnName: string,
-    onDelete: 'cascade' | 'restrict' | 'set null',
+    onDelete: "cascade" | "restrict" | "set null",
   }
 }
 
@@ -95,23 +94,23 @@ export interface NullableRelation
   nullable?: boolean
 }
 
-export type JoiningTable = {
+export interface JoiningTable
+{
   tableName: string,
   joiningColumn: {
     columnName: string,
-    onDelete: 'cascade' | 'restrict' | 'set null',
+    onDelete: "cascade" | "restrict" | "set null",
   },
   inverseJoiningColumn: {
     columnName: string,
-    onDelete: 'cascade' | 'restrict' | 'set null',
+    onDelete: "cascade" | "restrict" | "set null",
   },
-};
+}
 
 interface JoiningTableRelation
 {
   joiningTable: JoiningTable
 }
-
 
 export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InversedRelation
 export type ManyHasOneRelation = Relation<RelationType.ManyHasOne> & OwnerRelation & JoiningColumnRelation & NullableRelation

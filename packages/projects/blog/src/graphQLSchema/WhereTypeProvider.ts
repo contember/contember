@@ -49,15 +49,46 @@ export default class WhereTypeProvider
   {
     const entity = getEntity(this.schema, entityName)
 
+    const combinations: string[] = []
+    const uniqueKeys: string[][] = [[entity.primary], ...(entity.unique || []).map(it => it.fields)]
+    for (let uniqueKey of uniqueKeys) {
+      combinations.push(uniqueKey.join(', '))
+    }
+    const description = `Valid combinations are: (${combinations.join('), (')})`
+
     return new GraphQLInputObjectType({
       name: capitalizeFirstLetter(entityName) + "UniqueWhere",
-      fields: () => acceptFieldVisitor(this.schema, entity, entity.primary, {
-        visitRelation: () => {
-          throw new Error('Only simple field can be a primary')
-        },
-        visitColumn: (entity, column) => ({[column.name]: {type: this.columnTypeResolver.getType(column.type)}}),
-      })
+      description: description,
+      fields: () => this.getUniqueWhereFields(entity),
     })
+  }
+
+  private getUniqueWhereFields(entity: Entity)
+  {
+    const uniqueKeys: string[][] = [[entity.primary], ...(entity.unique || []).map(it => it.fields)]
+    const fields: GraphQLInputFieldConfigMap = {}
+    for (let uniqueKey of uniqueKeys) {
+      for (let field of uniqueKey) {
+        if (fields[field] !== undefined) {
+          continue
+        }
+        fields[field] = acceptFieldVisitor(this.schema, entity, field, {
+          visitRelation: (entity, relation, targetEntity) => {
+            if (isIt<JoiningColumnRelation>(relation, 'joiningColumn')) {
+              return acceptFieldVisitor(this.schema, targetEntity, targetEntity.primary, {
+                visitColumn: (entity, column) => ({type: this.columnTypeResolver.getType(column.type)}),
+                visitRelation: () => {
+                  throw new Error()
+                },
+              })
+            }
+            throw new Error('Only column or owning relation can be a part of unique kkey')
+          },
+          visitColumn: (entity, column) => ({type: this.columnTypeResolver.getType(column.type)}),
+        })
+      }
+    }
+    return fields
   }
 
   private getEntityWhereFields(name: string, where: GraphQLInputObjectType)

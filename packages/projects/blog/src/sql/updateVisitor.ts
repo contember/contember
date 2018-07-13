@@ -13,7 +13,7 @@ import {
 import * as Knex from 'knex';
 import {
   ConnectRelationInput,
-  CreateInput,
+  CreateDataInput,
   CreateManyRelationInput,
   CreateRelationInput,
   DeleteRelationInput,
@@ -22,7 +22,7 @@ import {
   DisconnectSpecifiedRelationInput,
   PrimaryValue,
   UniqueWhere,
-  UpdateInput,
+  UpdateDataInput,
   UpdateManyRelationInput,
   UpdateOneRelationInput,
   UpdateRelationInput,
@@ -38,11 +38,11 @@ interface HasOneRelationInputProcessor
 {
   connect(input: UniqueWhere): void | PromiseLike<void>
 
-  create(input: CreateInput): void | PromiseLike<void>
+  create(input: CreateDataInput): void | PromiseLike<void>
 
-  update(input: UpdateInput): void | PromiseLike<void>
+  update(input: UpdateDataInput): void | PromiseLike<void>
 
-  upsert(update: UpdateInput, create: CreateInput): void | PromiseLike<void>
+  upsert(update: UpdateDataInput, create: CreateDataInput): void | PromiseLike<void>
 
   disconnect(): void | PromiseLike<void>
 
@@ -53,11 +53,11 @@ interface HasManyRelationInputProcessor
 {
   connect(input: UniqueWhere): void | PromiseLike<void>
 
-  create(input: CreateInput): void | PromiseLike<void>
+  create(input: CreateDataInput): void | PromiseLike<void>
 
-  update(where: UniqueWhere, input: UpdateInput): void | PromiseLike<void>
+  update(where: UniqueWhere, input: UpdateDataInput): void | PromiseLike<void>
 
-  upsert(where: UniqueWhere, update: UpdateInput, create: CreateInput): void | PromiseLike<void>
+  upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput): void | PromiseLike<void>
 
   disconnect(where: UniqueWhere): void | PromiseLike<void>
 
@@ -68,12 +68,12 @@ interface HasManyRelationInputProcessor
 export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTypeVisitor<void>
 {
   private primaryValue: PrimaryValue
-  private data: CreateInput;
+  private data: CreateDataInput;
   private updateBuilder: UpdateBuilder;
   private mapper: Mapper;
   private db: Knex;
 
-  constructor(primaryValue: PrimaryValue, data: CreateInput, updateBuilder: UpdateBuilder, mapper: Mapper, db: Knex)
+  constructor(primaryValue: PrimaryValue, data: CreateDataInput, updateBuilder: UpdateBuilder, mapper: Mapper, db: Knex)
   {
     this.primaryValue = primaryValue
     this.data = data;
@@ -110,7 +110,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         onAfterUpdate(async () => await connect(input))
       }
 
-      create(input: CreateInput): void
+      create(input: CreateDataInput): void
       {
         onAfterUpdate(async () => {
             const primaryOwner = await mapper.insert(targetEntity.name, input)
@@ -134,7 +134,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         )
       }
 
-      update(where: UniqueWhere, input: UpdateInput): void
+      update(where: UniqueWhere, input: UpdateDataInput): void
       {
         onAfterUpdate(async () => {
           //fixme should check if relation really exists
@@ -143,7 +143,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      upsert(where: UniqueWhere, update: UpdateInput, create: CreateInput): void
+      upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput): void
       {
         onAfterUpdate(async () => {
           //fixme should check if relation really exists
@@ -183,7 +183,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         )
       }
 
-      create(input: CreateInput): void
+      create(input: CreateDataInput): void
       {
         onAfterUpdate(async () => {
             const primaryOwner = await mapper.insert(targetEntity.name, input)
@@ -207,7 +207,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         )
       }
 
-      update(where: UniqueWhere, input: UpdateInput): void
+      update(where: UniqueWhere, input: UpdateDataInput): void
       {
         onAfterUpdate(async () => {
           //fixme should check if relation really exists
@@ -217,7 +217,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      upsert(where: UniqueWhere, update: UpdateInput, create: CreateInput): void
+      upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput): void
       {
         onAfterUpdate(async () => {
           //fixme should check if relation really exists
@@ -249,7 +249,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.getPrimaryValue(targetEntity, input))
       }
 
-      create(input: CreateInput): void
+      create(input: CreateDataInput): void
       {
         updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity.name, input))
       }
@@ -268,7 +268,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         updateBuilder.addColumnData(relation.joiningColumn.columnName, null)
       }
 
-      async update(input: UpdateInput)
+      async update(input: UpdateDataInput)
       {
         const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         updateBuilder.onAfterUpdate(() =>
@@ -276,7 +276,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         )
       }
 
-      async upsert(update: UpdateInput, create: CreateInput)
+      async upsert(update: UpdateDataInput, create: CreateDataInput)
       {
         const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         if (!inversedPrimary) {
@@ -309,7 +309,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         }))
       }
 
-      create(input: CreateInput): void
+      create(input: CreateDataInput): void
       {
         onAfterUpdate(async () => {
             return await mapper.insert(targetEntity.name, {
@@ -334,7 +334,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         )
       }
 
-      update(where: UniqueWhere, input: UpdateInput): void
+      update(where: UniqueWhere, input: UpdateDataInput): void
       {
         onAfterUpdate(async () => {
           //fixme should check if relation really exists
@@ -345,7 +345,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      upsert(where: UniqueWhere, update: UpdateInput, create: CreateInput): void
+      upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput): void
       {
         onAfterUpdate(async () => {
           //fixme should check if relation really exists
@@ -383,7 +383,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      create(input: CreateInput): void
+      create(input: CreateDataInput): void
       {
         onAfterUpdate(async () => {
           await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, {[targetRelation.name]: {disconnect: true}})
@@ -409,7 +409,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         )
       }
 
-      update(input: UpdateInput): void
+      update(input: UpdateDataInput): void
       {
         onAfterUpdate(async () => {
           await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, {[targetRelation.name]: {
@@ -419,7 +419,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      upsert(update: UpdateInput, create: CreateInput): void
+      upsert(update: UpdateDataInput, create: CreateDataInput): void
       {
         onAfterUpdate(async () => {
           const result = await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, {
@@ -454,7 +454,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.getPrimaryValue(targetEntity, input))
       }
 
-      create(input: CreateInput): void
+      create(input: CreateDataInput): void
       {
         updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity.name, input))
       }
@@ -473,7 +473,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         updateBuilder.addColumnData(relation.joiningColumn.columnName, null)
       }
 
-      async update(input: UpdateInput)
+      async update(input: UpdateDataInput)
       {
         const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         updateBuilder.onAfterUpdate(() =>
@@ -481,7 +481,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         )
       }
 
-      async upsert(update: UpdateInput, create: CreateInput)
+      async upsert(update: UpdateDataInput, create: CreateDataInput)
       {
         const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         if (!inversedPrimary) {

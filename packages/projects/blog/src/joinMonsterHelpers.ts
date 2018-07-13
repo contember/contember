@@ -41,9 +41,10 @@ type Junction<TContext, TArgs> = {
 
 export type JoinMonsterRelation<TContext, TArgs = { [argName: string]: any }> = JoinedRelation | BatchedRelation | Junction<TContext, TArgs>
 
-type Where = (tableName: string, args: any, context: any, sqlAstNode: any) => (string | Promise<string>)
+type Where<TContext, TArgs = { [argName: string]: any }> = (tableName: string, args: TArgs, context: TContext, sqlAstNode: SqlAstNode) => (string | Promise<string>)
+
 export type JoinMonsterFieldMapping<TContext, TArgs = { [argName: string]: any }> = {
-  where?: Where,
+  where?: Where<TContext, TArgs>,
   orderBy?: { [columns: string]: 'asc' | 'desc' }
 } & ({
   sqlColumn: string
@@ -64,7 +65,7 @@ export interface SqlAstTableNode
   orderBy?: { [column: string]: 'DESC' | 'ASC' },
   children: SqlAstNode[],
   fieldName: string,
-  where?: Where,
+  where?: Where<any>,
   sqlJoin?: Join,
   grabMany: boolean
 }

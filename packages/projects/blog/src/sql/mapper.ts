@@ -1,12 +1,12 @@
-import { Entity, JoiningColumnRelation, ManyHasManyOwnerRelation, Schema } from "../schema/model";
+import { Entity, ManyHasManyOwnerRelation, Schema } from "../schema/model";
 import * as Knex from 'knex';
 import { promiseAllObject } from "../utils/promises";
-import { ColumnValue, ColumnValueLike, CreateInput, PrimaryValue, UniqueWhere, UpdateInput } from "../schema/input";
+import { ColumnValue, ColumnValueLike, CreateDataInput, PrimaryValue, UniqueWhere, UpdateDataInput } from "../schema/input";
 import { resolveValue } from "./utils";
 import InsertVisitor from "./insertVisitor";
 import UpdateVisitor from "./updateVisitor";
-import { isIt } from "../utils/type";
-import { acceptEveryFieldVisitor, acceptFieldVisitor, getEntity } from "../schema/modelUtils";
+import { acceptEveryFieldVisitor, getColumnName, getEntity } from "../schema/modelUtils";
+import { isUniqueWhere } from "../schema/inputUtils";
 
 
 type OnAfterInsertCallback = ((id: PrimaryValue) => PromiseLike<any>)
@@ -120,14 +120,14 @@ export class Mapper
   async selectField(entityName: string, where: UniqueWhere, fieldName: string)
   {
     const entity = getEntity(this.schema, entityName)
-    const columnName = this.getColumnName(entity, fieldName)
+    const columnName = getColumnName(this.schema, entity, fieldName)
 
     const result = await this.db.table(entity.name).select(columnName).where(entity.primaryColumn, await this.getPrimaryValue(entity, where))
 
     return result[0] !== undefined ? result[0][columnName] : undefined
   }
 
-  async insert(entityName: string, data: CreateInput): Promise<PrimaryValue>
+  async insert(entityName: string, data: CreateDataInput): Promise<PrimaryValue>
   {
     const entity = getEntity(this.schema, entityName)
 
@@ -137,7 +137,7 @@ export class Mapper
     return await insertBuilder.insertRow()
   }
 
-  async update(entityName: string, where: UniqueWhere, data: UpdateInput): Promise<number>
+  async update(entityName: string, where: UniqueWhere, data: UpdateDataInput): Promise<number>
   {
     const entity = getEntity(this.schema, entityName)
 
@@ -154,11 +154,7 @@ export class Mapper
   async delete(entityName: string, where: UniqueWhere): Promise<number>
   {
     const entity = getEntity(this.schema, entityName)
-    const primaryValue = await this.getPrimaryValue(entity, where);
-    if (primaryValue === undefined) {
-      return Promise.resolve(0)
-    }
-    return await this.db.where(entity.primaryColumn, {[entity.primaryColumn]: primaryValue}).delete()
+    return await this.db.where(this.getUniqueWhereArgs(entity, where)).delete()
   }
 
   async connectJunction(owningEntity: Entity, relation: ManyHasManyOwnerRelation, ownerUnique: UniqueWhere, inversedUnique: UniqueWhere)
@@ -198,43 +194,46 @@ export class Mapper
       return where[entity.primary]
     }
 
-    const whereArgs: { [columnName: string]: ColumnValue } = {}
-    //todo check that it is unique
-    for (let field in where) {
-      whereArgs[this.getColumnName(entity, field)] = where[field]
-    }
-
+    const whereArgs = this.getUniqueWhereArgs(entity, where)
     const result = await this.db.table(entity.name).select(entity.primaryColumn).where(whereArgs)
 
     return result[0] !== undefined ? result[0][entity.primaryColumn] : undefined
   }
 
-  private getColumnName(entity: Entity, fieldName: string)
+  getUniqueWhereArgs(entity: Entity, where: UniqueWhere): { [columnName: string]: ColumnValue }
   {
-    return acceptFieldVisitor(this.schema, entity, fieldName, {
-      visitColumn: (entity, column) => column.name,
-      visitRelation: (entity, relation) => {
-        if (isIt<JoiningColumnRelation>(relation, 'joiningColumn')) {
-          return relation.joiningColumn.columnName
-        }
-        throw new Error('Not an owning side')
-      }
-    })
+    if (!isUniqueWhere(entity, where)) {
+      throw new Error("Unique where is not unique")
+    }
+    const whereArgs: { [columnName: string]: ColumnValue } = {}
+    //todo check that it is unique
+    for (let field in where) {
+      whereArgs[getColumnName(this.schema, entity, field)] = where[field]
+    }
+
+    return whereArgs
   }
 }
 
-const insertData = (schema: Schema, db: Knex) => (entityName: string, data: CreateInput) => {
+const insertData = (schema: Schema, db: Knex) => (entityName: string, data: CreateDataInput) => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.insert(entityName, data)
   })
 }
 
-const updateData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere, data: UpdateInput) => {
+const updateData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere, data: UpdateDataInput) => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.update(entityName, where, data)
   })
 }
 
-export {insertData, updateData};
+const deleteData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere) => {
+  return db.transaction(trx => {
+    const mapper = new Mapper(schema, trx)
+    return mapper.delete(entityName, where)
+  })
+}
+
+export { insertData, updateData, deleteData };

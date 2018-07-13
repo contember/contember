@@ -1,17 +1,17 @@
 export type ConnectRelationInput = { connect: UniqueWhere }
-export type CreateRelationInput = { create: CreateInput }
+export type CreateRelationInput = { create: CreateDataInput }
 
 export type DisconnectSpecifiedRelationInput = { disconnect: UniqueWhere }
 export type DeleteSpecifiedRelationInput = { delete: UniqueWhere }
-export type UpdateSpecifiedRelationInput = { update: { where: UniqueWhere, data: UpdateInput } }
-export type UpsertSpecifiedRelationInput = { upsert: { where: UniqueWhere, update: UpdateInput, create: CreateInput } }
+export type UpdateSpecifiedRelationInput = { update: { where: UniqueWhere, data: UpdateDataInput } }
+export type UpsertSpecifiedRelationInput = { upsert: { where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput } }
 
 export type DisconnectRelationInput = { disconnect: true }
-export type UpdateRelationInput = { update: UpdateInput }
+export type UpdateRelationInput = { update: UpdateDataInput }
 export type DeleteRelationInput = { delete: true }
-export type UpsertRelationInput = { upsert: { update: UpdateInput, create: CreateInput } }
+export type UpsertRelationInput = { upsert: { update: UpdateDataInput, create: CreateDataInput } }
 
-export interface CreateInput
+export interface CreateDataInput
 {
   [column: string]: ColumnValue | CreateOneRelationInput | CreateManyRelationInput
 }
@@ -20,10 +20,37 @@ export type CreateOneRelationInput = ConnectRelationInput | CreateRelationInput
 export type CreateManyRelationInput = CreateOneRelationInput[]
 
 
-export interface UpdateInput
+export interface UpdateDataInput
 {
   [column: string]: ColumnValue | UpdateOneRelationInput | UpdateManyRelationInput
 }
+
+export interface UpdateInput
+{
+  where: UniqueWhere
+  data: UpdateDataInput
+}
+
+export interface CreateInput
+{
+  data: CreateDataInput
+}
+
+export interface DeleteInput
+{
+  where: UniqueWhere
+}
+
+export interface UniqueQueryInput
+{
+  where: UniqueWhere
+}
+
+export interface ListQueryInput
+{
+  where?: Where
+}
+
 
 export type UpdateOneRelationInput =
   CreateRelationInput

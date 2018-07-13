@@ -1,18 +1,40 @@
 import {
   Column,
   ColumnVisitor,
-  Entity, FieldVisitor, InversedRelation, ManyHasManyInversedRelation,
+  Entity,
+  FieldVisitor,
+  InversedRelation,
+  JoiningColumnRelation,
+  ManyHasManyInversedRelation,
   ManyHasManyOwnerRelation,
   ManyHasOneRelation,
   OneHasManyRelation,
   OneHasOneInversedRelation,
-  OneHasOneOwnerRelation, OwnerRelation,
-  Relation, RelationByGenericTypeVisitor, RelationByTypeVisitor, RelationType, RelationVisitor, Schema
+  OneHasOneOwnerRelation,
+  OwnerRelation,
+  Relation,
+  RelationByGenericTypeVisitor,
+  RelationByTypeVisitor,
+  RelationType,
+  RelationVisitor,
+  Schema
 } from "./model";
 import { isIt } from "../utils/type";
 
 export const getEntity = (schema: Schema, entityName: string): Entity => {
   return schema.entities[entityName]
+}
+
+export const getColumnName = (schema: Schema, entity: Entity, fieldName: string) => {
+  return acceptFieldVisitor(schema, entity, fieldName, {
+    visitColumn: (entity, column) => column.name,
+    visitRelation: (entity, relation) => {
+      if (isIt<JoiningColumnRelation>(relation, 'joiningColumn')) {
+        return relation.joiningColumn.columnName
+      }
+      throw new Error('Not an owning side')
+    }
+  })
 }
 
 export const acceptEveryFieldVisitor = <T>(schema: Schema, entity: string | Entity, visitor: FieldVisitor<T>): { [fieldName: string]: T } => {

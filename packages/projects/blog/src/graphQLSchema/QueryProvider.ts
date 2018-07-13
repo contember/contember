@@ -1,15 +1,17 @@
 import { buildWhere } from "../whereMonster";
 import { Schema } from "../schema/model";
 import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils";
-import { GraphQLFieldConfig, GraphQLFieldResolver, GraphQLList, GraphQLNonNull } from "graphql";
-import { JoinMonsterFieldMapping, SqlAstNode } from "../joinMonsterHelpers";
-import { GraphQLFieldConfigMap } from "graphql/type/definition";
+import { GraphQLError, GraphQLFieldConfig, GraphQLFieldResolver, GraphQLList, GraphQLNonNull } from "graphql";
+import { JoinMonsterFieldMapping } from "../joinMonsterHelpers";
 import WhereTypeProvider from "./WhereTypeProvider";
 import EntityTypeProvider from "./EntityTypeProvider";
-import { escapeParameter } from "../sql/utils";
 import { getEntity } from "../schema/modelUtils";
+import { ListQueryInput, UniqueQueryInput } from "../schema/input";
+import buildUniqueWhere from "../whereMonster/uniqueWhereBuilder";
+import { Context } from "../types";
+import { isUniqueWhere } from "../schema/inputUtils";
 
-type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
+type FieldConfig<TArgs> = JoinMonsterFieldMapping<Context, TArgs> & GraphQLFieldConfig<Context, any, TArgs>
 
 
 export default class QueryProvider
@@ -27,33 +29,37 @@ export default class QueryProvider
     this.resolver = resolver
   }
 
-  getQueries(entityName: string): GraphQLFieldConfigMap<any, any>
+  getQueries(entityName: string): { [fieldName: string]: FieldConfig<any> }
   {
     const entity = getEntity(this.schema, entityName)
     return {
-      [entityName]: this.getByPrimaryQuery(entityName),
+      [entityName]: this.getByUniqueQuery(entityName),
       [entity.pluralName || (entityName + "s")]: this.getListQuery(entityName),
     }
   }
 
 
-  private getByPrimaryQuery(entityName: string): FieldConfig
+  private getByUniqueQuery(entityName: string): FieldConfig<UniqueQueryInput>
   {
+    const entity = getEntity(this.schema, entityName)
     return {
       type: this.entityTypeProvider.getEntity(entityName),
       args: {
         where: {type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName))}
       },
-      where: (tableName: string, args: any, context: any) => {
-        const entity = this.schema.entities[entityName];
-        const primary = entity.primaryColumn
-        return `${tableName}.${primary} = ${escapeParameter(args.where[entity.primary])}`
+      where: (tableName, args) => {
+        return buildUniqueWhere(this.schema, entity)(tableName, args.where)
       },
-      resolve: this.resolver,
+      resolve: (parent, args, context, info) => {
+        if (!isUniqueWhere(entity, args.where)) {
+          throw new GraphQLError('Input where is not unique')
+        }
+        return this.resolver(parent, args, context, info)
+      },
     }
   }
 
-  private getListQuery(entityName: string): FieldConfig
+  private getListQuery(entityName: string): FieldConfig<ListQueryInput>
   {
     const entity = getEntity(this.schema, entityName)
 
@@ -62,7 +68,7 @@ export default class QueryProvider
       args: {
         where: {type: this.whereTypeProvider.getEntityWhereType(entityName)},
       },
-      where: (tableAlias: string, args: any, context: any, sqlAstNode: SqlAstNode) => {
+      where: (tableAlias, args, context, sqlAstNode) => {
         const createAlias = aliasInAst(sqlAstNode)
 
         return buildWhere(this.schema, entity, joinToAst(this.schema, createAlias)(sqlAstNode, entity))(tableAlias, args.where || {})

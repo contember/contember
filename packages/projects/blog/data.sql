@@ -1,3 +1,5 @@
+create extension if not EXISTS "uuid-ossp";
+
 INSERT INTO "Category" VALUES
 	(uuid_generate_v4()),
 	(uuid_generate_v4()),
@@ -21,9 +23,17 @@ INSERT INTO "Author" VALUES
 	(uuid_generate_v4(), 'author 2'),
 	(uuid_generate_v4(), 'author 3');
 
-INSERT INTO "Site" VALUES
-	(uuid_generate_v4(), 'site1.cz'),
-	(uuid_generate_v4(), 'site2.cz');
+
+INSERT INTO "SiteSetting" VALUES
+	(uuid_generate_v4(), 'https://site1.cz'),
+	(uuid_generate_v4(), 'https://site2.cz');
+
+INSERT INTO "Site" (id, name, setting_id)
+	SELECT
+		uuid_generate_v4(),
+		substring("SiteSetting".url FROM 9),
+		"SiteSetting".id
+	FROM "SiteSetting";
 
 
 INSERT INTO "Post"

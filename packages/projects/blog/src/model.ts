@@ -14,6 +14,7 @@ export default {
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         name: {name: "name", type: "string", columnName: "name"},
+        posts: {name: "posts", relation: RelationType.OneHasMany, target: "Post", ownedBy: "author"}
       }
     },
     Category: {
@@ -57,7 +58,13 @@ export default {
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         publishedAt: {name: "publishedAt", type: "datetime", columnName: "publishedAt"},
-        author: {name: "author", relation: RelationType.ManyHasOne, target: "Author", joiningColumn: {columnName: "author_id", onDelete: "cascade"}},
+        author: {
+          name: "author",
+          relation: RelationType.ManyHasOne,
+          target: "Author",
+          joiningColumn: {columnName: "author_id", onDelete: "cascade"},
+          inversedBy: "posts"
+        },
         locales: {name: "locales", relation: RelationType.OneHasMany, target: "PostLocale", ownedBy: "post"},
         sites: {name: "sites", relation: RelationType.OneHasMany, target: "PostSite", ownedBy: "post"},
         categories: {
@@ -91,6 +98,7 @@ export default {
           name: "post",
           relation: RelationType.ManyHasOne,
           target: "Post",
+          inversedBy: "locales",
           joiningColumn: {
             columnName: "post_id",
             onDelete: "cascade",
@@ -111,6 +119,7 @@ export default {
           name: "post",
           relation: RelationType.ManyHasOne,
           target: "Post",
+          inversedBy: "sites",
           joiningColumn: {
             columnName: "post_id",
             onDelete: "cascade",
@@ -136,7 +145,24 @@ export default {
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         name: {name: "name", type: "string", columnName: "name"},
+        setting: {
+          name: "setting", relation: RelationType.OneHasOne, inversedBy: "site", target: "SiteSetting", nullable: false, joiningColumn: {
+            columnName: "setting_id",
+            onDelete: "cascade"
+          }
+        }
       },
-    }
+    },
+    SiteSetting: {
+      name: "SiteSetting",
+      primary: "id",
+      primaryColumn: "id",
+      tableName: "SiteSetting",
+      fields: {
+        id: {name: "id", type: "uuid", columnName: "id"},
+        url: {name: "url", type: "string", columnName: "url"},
+        site: {name: "site", relation: RelationType.OneHasOne, ownedBy: "setting", target: "Site"}
+      }
+    },
   }
 } as Schema

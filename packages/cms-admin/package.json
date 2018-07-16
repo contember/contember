@@ -1,6 +1,11 @@
 {
   "name": "cms-admin",
   "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "webpack-dev-server --mode=development --debug --devtool cheap-module-source-map --output-pathinfo --history-api-fallback --hot --inline --progress --colors --port 3001 --output-public-path http://localhost:3001/",
+    "build": "webpack --mode=production --colors"
+  },
   "dependencies": {
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
@@ -13,6 +18,11 @@
     "@types/react": "^16.4.6",
     "@types/react-dom": "^16.0.6",
     "@types/react-redux": "5.0.20",
-    "@types/redux-actions": "^2.3.0"
+    "@types/redux-actions": "^2.3.0",
+    "awesome-typescript-loader": "^5.2.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4"
   }
 }

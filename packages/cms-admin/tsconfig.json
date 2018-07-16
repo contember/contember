@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "sourceMap": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "strict": true,
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "lib": [
+      "esnext",
+      "dom",
+      "esnext.asynciterable"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "types"
+    ]
+  }
+}

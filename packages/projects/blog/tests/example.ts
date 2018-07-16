@@ -480,8 +480,7 @@ describe("Queries", () => {
     })
   })
 
-  it('Categories with posts (many has many inversed)', async () => {
-    throw new Error('WIP')
+  it('Categories with posts and author (many has many inversed + many has one)', async () => {
     await execute({
       query: GQL`
         query {
@@ -489,6 +488,9 @@ describe("Queries", () => {
             id
             posts {
               id
+              author {
+                name
+              }
             }
           }
         }`,
@@ -506,107 +508,86 @@ describe("Queries", () => {
           ]
         },
         {
-          sql: SQL``,
-          response: [
-            {
-              'pos#cat': uuid(1) + uuid(3),
-              id: uuid(3),
-              post_id: uuid(1),
-            },
-            {
-              'pos#cat': uuid(1) + uuid(4),
-              id: uuid(4),
-              post_id: uuid(1),
-            },
-            {
-              'pos#cat': uuid(2) + uuid(5),
-              id: uuid(5),
-              post_id: uuid(2),
-            },
-            {
-              'pos#cat': uuid(2) + uuid(3),
-              id: uuid(3),
-              post_id: uuid(2),
-            },
-          ]
-        },
-        {
           sql: SQL`SELECT
-					   "locales"."id" AS "id",
-					   "locales"."name" AS "name",
-					   "locales"."category_id" AS "category_id"
-				   FROM "CategoryLocale" "locales"
-				   WHERE "locales"."locale" = 'cs' AND "locales"."category_id" IN
-						('${uuid(3)}','${uuid(4)}','${uuid(5)}')`,
+					   NULLIF(CONCAT("_PostCateg"."post_id", "_PostCateg"."category_id"), '') AS "pos#cat",
+					   "posts"."id" AS "id",
+					   "author"."id" AS "author__id",
+					   "author"."name" AS "author__name",
+					   "_PostCateg"."category_id" AS "category_id"
+				   FROM "PostCategories" "_PostCateg"
+					   LEFT JOIN "Post" "posts" ON "_PostCateg".post_id = "posts".id
+					   LEFT JOIN "Author" "author" ON "posts".author_id = "author".id
+				   WHERE "_PostCateg"."category_id" IN ('${uuid(1)}','${uuid(2)}')`,
           response: [
             {
-              id: uuid(6),
-              name: "Kategorie 1",
-              category_id: uuid(3),
+              'pos#cat': uuid(3) + uuid(1),
+              id: uuid(3),
+              author__id: uuid(6),
+              author__name: 'John',
+              category_id: uuid(1),
             },
             {
-              id: uuid(7),
-              name: "Kategorie 2",
-              category_id: uuid(4),
+              'pos#cat': uuid(4) + uuid(1),
+              id: uuid(4),
+              author__id: uuid(7),
+              author__name: 'Jack',
+              category_id: uuid(1),
             },
             {
-              id: uuid(8),
-              name: "Kategorie 3",
-              category_id: uuid(5),
+              'pos#cat': uuid(4) + uuid(2),
+              id: uuid(4),
+              author__id: uuid(7),
+              author__name: 'Jack',
+              category_id: uuid(2),
+            },
+            {
+              'pos#cat': uuid(5) + uuid(2),
+              id: uuid(5),
+              author__id: uuid(7),
+              author__name: 'Jack',
+              category_id: uuid(2),
             },
           ]
         }
       ],
       return: {
         "data": {
-          "Posts": [
+          "Categories": [
             {
-              "categories": [
-                {
-                  "id": uuid(3),
-                  "locales": [
-                    {
-                      "id": uuid(6),
-                      "name": "Kategorie 1"
-                    },
-                  ],
-                },
-                {
-                  "id": uuid(4),
-                  "locales": [
-                    {
-                      "id": uuid(7),
-                      "name": "Kategorie 2",
-                    },
-                  ],
-                },
-              ],
               "id": uuid(1),
-            },
-            {
-              "categories": [
+              "posts": [
                 {
-                  "id": uuid(5),
-                  "locales": [
-                    {
-                      "id": uuid(8),
-                      "name": "Kategorie 3",
-                    },
-                  ],
+                  "author": {
+                    "name": "John",
+                  },
+                  "id": uuid(3),
                 },
                 {
-                  "id": uuid(3),
-                  "locales": [
-                    {
-                      "id": uuid(6),
-                      "name": "Kategorie 1",
-                    },
-                  ],
+                  "author": {
+                    "name": "Jack"
+                  },
+                  "id": uuid(4),
                 },
               ],
-              "id": uuid(2),
             },
-          ],
+            {
+              "id": uuid(2),
+              "posts": [
+                {
+                  "author": {
+                    "name": "Jack",
+                  },
+                  "id": uuid(4)
+                },
+                {
+                  "author": {
+                    "name": "Jack"
+                  },
+                  "id": uuid(5),
+                },
+              ],
+            }
+          ]
         }
       }
     })

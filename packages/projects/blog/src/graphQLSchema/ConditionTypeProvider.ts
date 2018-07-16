@@ -1,8 +1,8 @@
 import { GraphQLBoolean, GraphQLInputObjectType, GraphQLList } from "graphql"
 import { GraphQLNonNull } from "graphql/type/definition"
 import singletonFactory from "../utils/singletonFactory"
-import { capitalizeFirstLetter } from "../utils/strings"
 import ColumnTypeResolver from "./ColumnTypeResolver"
+import { GqlTypeName } from "./utils"
 
 export default class ConditionTypeProvider
 {
@@ -23,7 +23,7 @@ export default class ConditionTypeProvider
   {
     const basicType = this.columnTypeResolver.getType(typeName)
     const condition: GraphQLInputObjectType = new GraphQLInputObjectType({
-      name: capitalizeFirstLetter(typeName) + "Condition",
+      name: GqlTypeName`${typeName}Condition`,
       fields: () => ({
         and: {type: new GraphQLList(new GraphQLNonNull(condition))},
         or: {type: new GraphQLList(new GraphQLNonNull(condition))},

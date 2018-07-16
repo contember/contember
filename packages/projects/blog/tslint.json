@@ -5,6 +5,13 @@
   ],
   "jsRules": {},
   "rules": {
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
+    "object-literal-sort-keys": [
+      false
+    ],
     "trailing-comma": [
       false
     ],

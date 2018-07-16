@@ -34,11 +34,12 @@ export default class GraphQlSchemaBuilder
   public build()
   {
     type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
+    interface FieldConfigMap { [queryName: string]: FieldConfig }
 
     return new GraphQLSchema({
       query: new GraphQLObjectType({
         name: "Query",
-        fields: () => Object.keys(this.schema.entities).reduce<{ [queryName: string]: FieldConfig }>((queries, entityName) => {
+        fields: () => Object.keys(this.schema.entities).reduce<FieldConfigMap>((queries, entityName) => {
           return {
             ...this.queryProvider.getQueries(entityName),
             ...queries,
@@ -47,7 +48,7 @@ export default class GraphQlSchemaBuilder
       }),
       mutation: new GraphQLObjectType({
         name: "Mutation",
-        fields: () => Object.keys(this.schema.entities).reduce<{ [queryName: string]: FieldConfig }>((mutations, entityName) => {
+        fields: () => Object.keys(this.schema.entities).reduce<FieldConfigMap>((mutations, entityName) => {
           return {
             ...this.mutationProvider.getMutations(entityName),
             ...mutations,

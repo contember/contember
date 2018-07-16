@@ -20,7 +20,12 @@ export default class QueryProvider
   private entityTypeProvider: EntityTypeProvider
   private resolver: GraphQLFieldResolver<any, any>
 
-  constructor(schema: Schema, whereTypeProvider: WhereTypeProvider, entityTypeProvider: EntityTypeProvider, resolver: GraphQLFieldResolver<any, any>)
+  constructor(
+    schema: Schema,
+    whereTypeProvider: WhereTypeProvider,
+    entityTypeProvider: EntityTypeProvider,
+    resolver: GraphQLFieldResolver<any, any>
+  )
   {
     this.schema = schema
     this.whereTypeProvider = whereTypeProvider
@@ -69,7 +74,8 @@ export default class QueryProvider
       where: (tableAlias, args, context, sqlAstNode) => {
         const createAlias = aliasInAst(sqlAstNode)
 
-        return buildWhere(this.schema, entity, joinToAst(this.schema, createAlias)(sqlAstNode, entity))(tableAlias, args.where || {})
+        const joinCallback = joinToAst(this.schema, createAlias)(sqlAstNode, entity)
+        return buildWhere(this.schema, entity, joinCallback)(tableAlias, args.where || {})
       },
       resolve: this.resolver,
     }

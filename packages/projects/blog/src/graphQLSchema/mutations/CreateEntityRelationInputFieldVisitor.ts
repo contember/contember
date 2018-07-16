@@ -1,10 +1,12 @@
 import { GraphQLInputObjectType } from "graphql"
 import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../schema/model"
-import { capitalizeFirstLetter } from "../../utils/strings"
 import MutationProvider from "../MutationProvider"
+import { GqlTypeName } from "../utils"
 import WhereTypeProvider from "../WhereTypeProvider"
 
-export default class CreateEntityRelationInputFieldVisitor implements ColumnVisitor<GraphQLInputObjectType>, RelationVisitor<GraphQLInputObjectType>
+export default class CreateEntityRelationInputFieldVisitor
+  implements ColumnVisitor<GraphQLInputObjectType>,
+    RelationVisitor<GraphQLInputObjectType>
 {
   private whereTypeBuilder: WhereTypeProvider
   private mutationBuilder: MutationProvider
@@ -23,14 +25,15 @@ export default class CreateEntityRelationInputFieldVisitor implements ColumnVisi
   public visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation): GraphQLInputObjectType
   {
     return new GraphQLInputObjectType({
-      name: capitalizeFirstLetter(entity.name) + "Create" + capitalizeFirstLetter(relation.name) + "EntityRelationInput",
+      name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
       fields: () => {
+        const targetName = targetRelation ? targetRelation.name : undefined
         return {
           connect: {
             type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
           },
           create: {
-            type: this.mutationBuilder.getCreateEntityInput(targetEntity.name, targetRelation ? targetRelation.name : undefined)
+            type: this.mutationBuilder.getCreateEntityInput(targetEntity.name, targetName)
           }
         }
       }

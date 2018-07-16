@@ -7,6 +7,7 @@ import { capitalizeFirstLetter } from "../utils/strings"
 import { isIt } from "../utils/type"
 import ColumnTypeResolver from "./ColumnTypeResolver"
 import ConditionTypeProvider from "./ConditionTypeProvider"
+import { GqlTypeName } from "./utils"
 
 export default class WhereTypeProvider
 {
@@ -37,7 +38,7 @@ export default class WhereTypeProvider
   private createEntityWhereType(entityName: string)
   {
     const where: GraphQLInputObjectType = new GraphQLInputObjectType({
-      name: capitalizeFirstLetter(entityName) + "Where",
+      name: GqlTypeName`${entityName}Where`,
       fields: () => this.getEntityWhereFields(entityName, where),
     })
 
@@ -96,6 +97,9 @@ export default class WhereTypeProvider
     const entity = this.schema.entities[name]
 
     for (const fieldName in entity.fields) {
+      if (!entity.fields.hasOwnProperty(fieldName)) {
+        continue
+      }
       fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
         visitColumn: (entity, column) => ({type: this.conditionTypeProvider.getCondition(column.type)}),
         visitRelation: (entity, relation) => ({type: this.getEntityWhereType(relation.target)}),

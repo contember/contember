@@ -20,7 +20,10 @@ import { quoteIdentifier } from "../../sql/utils"
 import { buildWhere } from "../../whereMonster"
 import WhereTypeProvider from "../WhereTypeProvider"
 
-export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<JoinMonsterFieldMapping<any, any>>, RelationByTypeVisitor<JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }>
+type JoinMonsterFieldMappingWithWhere = JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }
+export default class JoinMonsterFieldMappingVisitor
+  implements ColumnVisitor<JoinMonsterFieldMapping<any, any>>,
+    RelationByTypeVisitor<JoinMonsterFieldMappingWithWhere>
 {
   private schema: Schema
   private whereTypeProvider: WhereTypeProvider
@@ -38,7 +41,12 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     }
   }
 
-  public visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation): JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }
+  public visitManyHasManyInversed(
+    entity: Entity,
+    relation: ManyHasManyInversedRelation,
+    targetEntity: Entity,
+    targetRelation: ManyHasManyOwnerRelation
+  ): JoinMonsterFieldMappingWithWhere
   {
     return {
       junction: {
@@ -56,7 +64,12 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     }
   }
 
-  public visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null): JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }
+  public visitManyHasManyOwner(
+    entity: Entity,
+    relation: ManyHasManyOwnerRelation,
+    targetEntity: Entity,
+    targetRelation: ManyHasManyInversedRelation | null
+  ): JoinMonsterFieldMappingWithWhere
   {
     return {
       junction: {
@@ -74,7 +87,12 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     }
   }
 
-  public visitManyHasOne(entity: Entity, relation: ManyHasOneRelation, targetEntity: Entity, targetRelation: OneHasManyRelation | null): JoinMonsterFieldMapping<any, any>
+  public visitManyHasOne(
+    entity: Entity,
+    relation: ManyHasOneRelation,
+    targetEntity: Entity,
+    targetRelation: OneHasManyRelation | null
+  ): JoinMonsterFieldMapping<any, any>
   {
     return {
       sqlJoin: (tableName, secondTableName) => {
@@ -83,7 +101,12 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     }
   }
 
-  public visitOneHasMany(entity: Entity, relation: OneHasManyRelation, targetEntity: Entity, targetRelation: ManyHasOneRelation)
+  public visitOneHasMany(
+    entity: Entity,
+    relation: OneHasManyRelation,
+    targetEntity: Entity,
+    targetRelation: ManyHasOneRelation
+  ): JoinMonsterFieldMappingWithWhere
   {
     return {
       sqlBatch: {
@@ -94,7 +117,12 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     }
   }
 
-  public visitOneHasOneInversed(entity: Entity, relation: OneHasOneInversedRelation, targetEntity: Entity, targetRelation: OneHasOneOwnerRelation): JoinMonsterFieldMapping<any, any>
+  public visitOneHasOneInversed(
+    entity: Entity,
+    relation: OneHasOneInversedRelation,
+    targetEntity: Entity,
+    targetRelation: OneHasOneOwnerRelation
+  ): JoinMonsterFieldMapping<any, any>
   {
     return {
       sqlJoin: (tableName, secondTableName) => {
@@ -103,7 +131,12 @@ export default class JoinMonsterFieldMappingVisitor implements ColumnVisitor<Joi
     }
   }
 
-  public visitOneHasOneOwner(entity: Entity, relation: OneHasOneOwnerRelation, targetEntity: Entity, targetRelation: OneHasOneInversedRelation | null): JoinMonsterFieldMapping<any, any>
+  public visitOneHasOneOwner(
+    entity: Entity,
+    relation: OneHasOneOwnerRelation,
+    targetEntity: Entity,
+    targetRelation: OneHasOneInversedRelation | null
+  ): JoinMonsterFieldMapping<any, any>
   {
     return {
       sqlJoin: (tableName, secondTableName) => {

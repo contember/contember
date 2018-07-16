@@ -3,7 +3,9 @@ import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGe
 import ColumnTypeResolver from "../ColumnTypeResolver"
 import MutationProvider from "../MutationProvider"
 
-export default class UpdateEntityInputFieldVisitor implements ColumnVisitor<GraphQLInputFieldConfig | undefined>, RelationByGenericTypeVisitor<GraphQLInputFieldConfig | undefined>
+export default class UpdateEntityInputFieldVisitor
+  implements ColumnVisitor<GraphQLInputFieldConfig | undefined>,
+    RelationByGenericTypeVisitor<GraphQLInputFieldConfig | undefined>
 {
   private columnTypeResolver: ColumnTypeResolver
   private mutationProvider: MutationProvider
@@ -33,8 +35,9 @@ export default class UpdateEntityInputFieldVisitor implements ColumnVisitor<Grap
 
   public visitHasMany(entity: Entity, relation: Relation): GraphQLInputFieldConfig
   {
+    const type = this.mutationProvider.getUpdateEntityRelationInput(entity.name, relation.name)
     return {
-      type: new GraphQLList(new GraphQLNonNull(this.mutationProvider.getUpdateEntityRelationInput(entity.name, relation.name)))
+      type: new GraphQLList(new GraphQLNonNull(type))
     }
   }
 }

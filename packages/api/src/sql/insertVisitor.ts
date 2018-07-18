@@ -1,4 +1,3 @@
-import * as uuidv4 from "uuid/v4"
 import {
   ConnectRelationInput,
   CreateDataInput,
@@ -22,6 +21,7 @@ import {
 } from "../schema/model"
 import { isIt } from "../utils/type"
 import { InsertBuilder, Mapper } from "./mapper"
+import { uuid } from "../utils/uuid";
 
 interface RelationInputProcessor
 {
@@ -245,7 +245,7 @@ export default class InsertVisitor implements ColumnVisitor<void>, RelationByTyp
   private resolvePrimaryGenerator(column: Column): () => PrimaryValue
   {
     if (column.type === "uuid") {
-      return uuidv4
+      return uuid
     }
     throw new Error("not implemented")
   }

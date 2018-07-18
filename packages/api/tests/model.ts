@@ -1,4 +1,4 @@
-import { RelationType, Schema } from "./schema/model"
+import { RelationType, Schema } from "../src/schema/model"
 
 export default {
   enums: {

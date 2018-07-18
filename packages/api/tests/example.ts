@@ -4,7 +4,7 @@ import { maskErrors } from "graphql-errors"
 import * as knex from "knex"
 import * as mockKnex from "mock-knex"
 import GraphQlSchemaBuilder from "../src/graphQLSchema/GraphQlSchemaBuilder"
-import model from "../src/model"
+import model from "./model"
 
 const builder = new GraphQlSchemaBuilder(model)
 const graphQLSchema = builder.build()

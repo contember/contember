@@ -1,4 +1,5 @@
 import * as Knex from "knex"
+import * as Bluebird from "bluebird"
 import { ColumnValue, ColumnValueLike, CreateDataInput, PrimaryValue, UniqueWhere, UpdateDataInput } from "../schema/input"
 import { isUniqueWhere } from "../schema/inputUtils"
 import { Entity, ManyHasManyOwnerRelation, Schema } from "../schema/model"

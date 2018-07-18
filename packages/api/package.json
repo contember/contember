@@ -1,6 +1,9 @@
 {
-  "name": "blog",
+  "name": "cms-api",
+  "version": "0.0.1",
   "private": true,
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "build": "tsc -p .",
     "start": "concurrently \"tsc -w -p .\" \"nodemon dist/src/index.js\""

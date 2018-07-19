@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "concurrently \"tsc -w -p .\" \"nodemon dist/src/index.js\"",
-    "test": "mocha --require ts-node/register --ui bdd ./tests/*.ts ./tests/cases/unit/*.ts"
+    "test": "mocha --require ts-node/register --ui bdd ./tests/cases/**/*.ts"
   },
   "dependencies": {
     "apollo-codegen": "^0.20.0",

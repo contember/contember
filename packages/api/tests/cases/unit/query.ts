@@ -14,10 +14,11 @@ describe("Queries", () => {
         }`,
       executes: [
         {
-          sql: SQL`SELECT
-             "Post"."id" AS "id"
-           FROM "Post" "Post"
-           WHERE "Post"."id" = '${testUuid(1)}'`,
+          sql: SQL`
+            SELECT "Post"."id" AS "id"
+            FROM "Post" "Post"
+            WHERE "Post"."id" = '${testUuid(1)}'
+          `,
           response: [{id: testUuid(1)}]
         }
       ],
@@ -48,8 +49,9 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-			  SELECT "Posts"."id" AS "id"
-			  FROM "Post" "Posts"`,
+            SELECT "Posts"."id" AS "id"
+            FROM "Post" "Posts"
+          `,
           response: [
             {id: testUuid(1)},
             {id: testUuid(2)},
@@ -57,9 +59,10 @@ describe("Queries", () => {
         },
         {
           sql: SQL`
-          SELECT "locales"."id" AS "id", "locales"."locale" AS "locale", "locales"."title" AS "title", "locales"."post_id" AS "post_id"
-          FROM "PostLocale" "locales"
-          WHERE "locales"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')`,
+            SELECT "locales"."id" AS "id", "locales"."locale" AS "locale", "locales"."title" AS "title", "locales"."post_id" AS "post_id"
+            FROM "PostLocale" "locales"
+            WHERE "locales"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')
+          `,
           response: [
             {id: testUuid(3), locale: "cs", title: "ahoj svete", post_id: testUuid(1)},
             {id: testUuid(4), locale: "en", title: "hello world", post_id: testUuid(1)},
@@ -115,11 +118,13 @@ describe("Queries", () => {
         }`,
       executes: [
         {
-          sql: SQL`SELECT
-					   "Posts"."id" AS "id",
-					   "author"."id" AS "author__id",
-					   "author"."name" AS "author__name"
-				   FROM "Post" "Posts" LEFT JOIN "Author" "author" ON "Posts".author_id = "author".id`,
+          sql: SQL`
+            SELECT
+              "Posts"."id" AS "id",
+              "author"."id" AS "author__id",
+              "author"."name" AS "author__name"
+            FROM "Post" "Posts" LEFT JOIN "Author" "author" ON "Posts".author_id = "author".id
+          `,
           response: [
             {
               id: testUuid(1),
@@ -171,13 +176,15 @@ describe("Queries", () => {
       }`,
       executes: [
         {
-          sql: SQL`SELECT
-					   "Sites"."id" AS "id",
-					   "Sites"."name" AS "name",
-					   "setting"."id" AS "setting__id",
-					   "setting"."url" AS "setting__url"
-				   FROM "Site" "Sites" LEFT JOIN "SiteSetting" "setting"
-						   ON "Sites".setting_id = "setting".id`,
+          sql: SQL`
+            SELECT
+              "Sites"."id" AS "id",
+              "Sites"."name" AS "name",
+              "setting"."id" AS "setting__id",
+              "setting"."url" AS "setting__url"
+            FROM "Site" "Sites"
+            LEFT JOIN "SiteSetting" "setting" ON "Sites".setting_id = "setting".id
+          `,
           response: [
             {
               id: testUuid(1),
@@ -233,13 +240,15 @@ describe("Queries", () => {
       }`,
       executes: [
         {
-          sql: SQL`SELECT
-					   "SiteSettin"."id" AS "id",
-					   "SiteSettin"."url" AS "url",
-					   "site"."id" AS "site__id",
-					   "site"."name" AS "site__name"
-				   FROM "SiteSetting" "SiteSettin"
-					   LEFT JOIN "Site" "site" ON "SiteSettin".id = "site".setting_id`,
+          sql: SQL`
+            SELECT
+              "SiteSettin"."id" AS "id",
+              "SiteSettin"."url" AS "url",
+              "site"."id" AS "site__id",
+              "site"."name" AS "site__name"
+            FROM "SiteSetting" "SiteSettin"
+            LEFT JOIN "Site" "site" ON "SiteSettin".id = "site".setting_id
+          `,
           response: [
             {
               id: testUuid(1),
@@ -298,8 +307,7 @@ describe("Queries", () => {
         }`,
       executes: [
         {
-          sql: SQL`SELECT "Posts"."id" AS "id"
-				   FROM "Post" "Posts"`,
+          sql: SQL`SELECT "Posts"."id" AS "id" FROM "Post" "Posts"`,
           response: [
             {
               id: testUuid(1),
@@ -310,13 +318,15 @@ describe("Queries", () => {
           ]
         },
         {
-          sql: SQL`SELECT
-             NULLIF(CONCAT("_PostCateg"."post_id", "_PostCateg"."category_id"), '') AS "pos#cat",
-             "categories"."id" AS "id",
-             "_PostCateg"."post_id" AS "post_id"
-           FROM "PostCategories" "_PostCateg"
-             LEFT JOIN "Category" "categories" ON "_PostCateg".category_id = "categories".id
-           WHERE "_PostCateg"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')`,
+          sql: SQL`
+            SELECT
+              NULLIF(CONCAT("_PostCateg"."post_id", "_PostCateg"."category_id"), '') AS "pos#cat",
+              "categories"."id" AS "id",
+              "_PostCateg"."post_id" AS "post_id"
+            FROM "PostCategories" "_PostCateg"
+            LEFT JOIN "Category" "categories" ON "_PostCateg".category_id = "categories".id
+            WHERE "_PostCateg"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')
+          `,
           response: [
             {
               'pos#cat': testUuid(1) + testUuid(3),
@@ -341,13 +351,14 @@ describe("Queries", () => {
           ]
         },
         {
-          sql: SQL`SELECT
-             "locales"."id" AS "id",
-             "locales"."name" AS "name",
-             "locales"."category_id" AS "category_id"
-           FROM "CategoryLocale" "locales"
-           WHERE "locales"."locale" = 'cs' AND "locales"."category_id" IN
-            ('${testUuid(3)}','${testUuid(4)}','${testUuid(5)}')`,
+          sql: SQL`
+            SELECT
+              "locales"."id" AS "id",
+              "locales"."name" AS "name",
+              "locales"."category_id" AS "category_id"
+            FROM "CategoryLocale" "locales"
+            WHERE "locales"."locale" = 'cs' AND "locales"."category_id" IN ('${testUuid(3)}','${testUuid(4)}','${testUuid(5)}')
+          `,
           response: [
             {
               id: testUuid(6),
@@ -438,8 +449,7 @@ describe("Queries", () => {
         }`,
       executes: [
         {
-          sql: SQL`SELECT "Categories"."id" AS "id"
-				   FROM "Category" "Categories"`,
+          sql: SQL`SELECT "Categories"."id" AS "id" FROM "Category" "Categories"`,
           response: [
             {
               id: testUuid(1),
@@ -450,16 +460,18 @@ describe("Queries", () => {
           ]
         },
         {
-          sql: SQL`SELECT
-             NULLIF(CONCAT("_PostCateg"."post_id", "_PostCateg"."category_id"), '') AS "pos#cat",
-             "posts"."id" AS "id",
-             "author"."id" AS "author__id",
-             "author"."name" AS "author__name",
-             "_PostCateg"."category_id" AS "category_id"
-           FROM "PostCategories" "_PostCateg"
-             LEFT JOIN "Post" "posts" ON "_PostCateg".post_id = "posts".id
-             LEFT JOIN "Author" "author" ON "posts".author_id = "author".id
-           WHERE "_PostCateg"."category_id" IN ('${testUuid(1)}','${testUuid(2)}')`,
+          sql: SQL`
+            SELECT
+              NULLIF(CONCAT("_PostCateg"."post_id", "_PostCateg"."category_id"), '') AS "pos#cat",
+              "posts"."id" AS "id",
+              "author"."id" AS "author__id",
+              "author"."name" AS "author__name",
+              "_PostCateg"."category_id" AS "category_id"
+            FROM "PostCategories" "_PostCateg"
+            LEFT JOIN "Post" "posts" ON "_PostCateg".post_id = "posts".id
+            LEFT JOIN "Author" "author" ON "posts".author_id = "author".id
+            WHERE "_PostCateg"."category_id" IN ('${testUuid(1)}','${testUuid(2)}')
+          `,
           response: [
             {
               'pos#cat': testUuid(3) + testUuid(1),

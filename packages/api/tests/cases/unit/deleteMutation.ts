@@ -16,13 +16,15 @@ describe('Delete mutation', () => {
         }`,
       executes: [
         {
-          sql: SQL`SELECT
-					   "deletePost"."id" AS "id",
-					   "author"."id" AS "author__id",
-					   "author"."name" AS "author__name"
-				   FROM "Post" "deletePost"
-					   LEFT JOIN "Author" "author" ON "deletePost".author_id = "author".id
-				   WHERE "deletePost"."id" = '${testUuid(1)}'`,
+          sql: SQL`
+            SELECT
+              "deletePost"."id" AS "id",
+              "author"."id" AS "author__id",
+              "author"."name" AS "author__name"
+            FROM "Post" "deletePost"
+            LEFT JOIN "Author" "author" ON "deletePost".author_id = "author".id
+            WHERE "deletePost"."id" = '${testUuid(1)}'
+          `,
           response: [
             {
               id: testUuid(1),

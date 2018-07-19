@@ -18,8 +18,7 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`insert into "Author" ("id", "name") values ($1, $2)
-		  returning "id"`,
+          sql: SQL`insert into "Author" ("id", "name") values ($1, $2) returning "id"`,
           parameters: [testUuid(1), "John"],
           response: [testUuid(1),]
         },
@@ -28,9 +27,11 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`SELECT "createAuth"."id" AS "id"
-				   FROM "Author" "createAuth"
-				   WHERE "createAuth"."id" = '${testUuid(1)}'`,
+          sql: SQL`
+            SELECT "createAuth"."id" AS "id"
+            FROM "Author" "createAuth"
+            WHERE "createAuth"."id" = '${testUuid(1)}'
+          `,
           response: [{id: testUuid(1)}],
         }
       ],
@@ -59,14 +60,12 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`insert into "SiteSetting" ("id", "url") values ($1, $2)
-		  returning "id"`,
+          sql: SQL`insert into "SiteSetting" ("id", "url") values ($1, $2) returning "id"`,
           parameters: [testUuid(2), "https://mangoweb.cz"],
           response: [testUuid(2),]
         },
         {
-          sql: SQL`insert into "Site" ("id", "name", "setting_id") values ($1, $2, $3)
-		  returning "id"`,
+          sql: SQL`insert into "Site" ("id", "name", "setting_id") values ($1, $2, $3) returning "id"`,
           parameters: [testUuid(1), "Mangoweb", testUuid(2)],
           response: [testUuid(1),]
         },
@@ -75,10 +74,11 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`SELECT 
-                "createSite"."id" AS "id"
-                FROM "Site" "createSite" 
-                WHERE "createSite"."id" = '${testUuid(1)}'`,
+          sql: SQL`
+            SELECT "createSite"."id" AS "id"
+            FROM "Site" "createSite" 
+            WHERE "createSite"."id" = '${testUuid(1)}'
+          `,
           response: [{id: testUuid(1)}],
         }
       ],
@@ -107,14 +107,12 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`insert into "SiteSetting" ("id", "url") values ($1, $2)
-		  returning "id"`,
+          sql: SQL`insert into "SiteSetting" ("id", "url") values ($1, $2) returning "id"`,
           parameters: [testUuid(1), "https://mangoweb.cz"],
           response: [testUuid(1),]
         },
         {
-          sql: SQL`insert into "Site" ("id", "name", "setting_id") values ($1, $2, $3)
-		  returning "id"`,
+          sql: SQL`insert into "Site" ("id", "name", "setting_id") values ($1, $2, $3) returning "id"`,
           parameters: [testUuid(2), "Mangoweb", testUuid(1)],
           response: [testUuid(2),]
         },
@@ -123,10 +121,11 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`SELECT 
-                "createSite"."id" AS "id"
-                FROM "SiteSetting" "createSite" 
-                WHERE "createSite"."id" = '${testUuid(1)}'`,
+          sql: SQL`
+            SELECT "createSite"."id" AS "id"
+            FROM "SiteSetting" "createSite" 
+            WHERE "createSite"."id" = '${testUuid(1)}'
+          `,
           response: [{id: testUuid(1)}],
         }
       ],
@@ -161,26 +160,22 @@ describe('Insert mutation', () => {
           sql: SQL`BEGIN;`,
         },
         {
-          sql: SQL`insert into "Author" ("id", "name") values ($1, $2)
-		  returning "id"`,
+          sql: SQL`insert into "Author" ("id", "name") values ($1, $2) returning "id"`,
           parameters: [testUuid(2), 'John'],
           response: [testUuid(2)],
         },
         {
-          sql: SQL`insert into "Post" ("author_id", "id", "publishedAt") values ($1, $2, $3)
-		  returning "id"`,
+          sql: SQL`insert into "Post" ("author_id", "id", "publishedAt") values ($1, $2, $3) returning "id"`,
           parameters: [testUuid(2), testUuid(1), '2018-06-11'],
           response: [testUuid(1)],
         },
         {
-          sql: SQL`insert into "PostLocale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
-		  returning "id"`,
+          sql: SQL`insert into "PostLocale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4) returning "id"`,
           parameters: [testUuid(3), 'cs', testUuid(1), 'Ahoj svete'],
           response: [testUuid(3)],
         },
         {
-          sql: SQL`insert into "PostLocale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
-		  returning "id"`,
+          sql: SQL`insert into "PostLocale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4) returning "id"`,
           parameters: [testUuid(4), 'en', testUuid(1), 'Hello world'],
           response: [testUuid(4)],
         },
@@ -188,10 +183,11 @@ describe('Insert mutation', () => {
           sql: 'COMMIT;',
         },
         {
-          sql: SQL`SELECT
-					   "createPost"."id" AS "id"
-				   FROM "Post" "createPost"
-				   WHERE "createPost"."id" = '${testUuid(1)}'`,
+          sql: SQL`
+            SELECT "createPost"."id" AS "id"
+            FROM "Post" "createPost"
+            WHERE "createPost"."id" = '${testUuid(1)}'
+          `,
           response: [{id: testUuid(1),}]
         }
       ],

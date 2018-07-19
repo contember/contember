@@ -25,6 +25,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.22",
     "@types/chai": "^4.1.4",
     "@types/dotenv": "^4.0.3",
     "@types/knex": "^0.14.14",

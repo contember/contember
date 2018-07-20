@@ -4,7 +4,6 @@ import { maskErrors } from "graphql-errors"
 import * as knex from "knex"
 import * as mockKnex from "mock-knex"
 import GraphQlSchemaBuilder from "../../src/graphQLSchema/GraphQlSchemaBuilder"
-import model from "../model"
 import { testUuid } from "./testUuid";
 import * as uuid from "../../src/utils/uuid";
 import * as sinon from 'sinon';
@@ -21,14 +20,14 @@ export interface SqlQuery
 
 export interface Test
 {
-  schema?: Schema
+  schema: Schema
   query: string
   executes: SqlQuery[]
   return: object
 }
 
 export const execute = async (test: Test) => {
-  const builder = new GraphQlSchemaBuilder(test.schema || model)
+  const builder = new GraphQlSchemaBuilder(test.schema)
   const graphQLSchema = builder.build()
 
   maskErrors(graphQLSchema)
@@ -52,8 +51,8 @@ export const execute = async (test: Test) => {
       query.response([])
       return
     }
-    // console.log(query.sql)
-    // console.log(query.bindings)
+    console.log(query.sql)
+    console.log(query.bindings)
     if (!queryDefinition) {
       throw new Error(`Unexpected query #${step} '${query.sql}'`)
     }

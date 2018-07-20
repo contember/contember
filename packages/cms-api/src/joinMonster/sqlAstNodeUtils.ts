@@ -87,7 +87,7 @@ class NodeJoiningInfoVisitor implements RelationByTypeVisitor<JoiningInfo | neve
         }),
         as: "primary",
         children: []
-      } as SqlAstNode
+      }
     ]
   }
 

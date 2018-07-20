@@ -1,4 +1,5 @@
 import {
+  GraphQLBoolean,
   GraphQLError,
   GraphQLFieldConfig,
   GraphQLFieldResolver,
@@ -24,6 +25,7 @@ import UpdateEntityInputFieldVisitor from "./mutations/UpdateEntityInputFieldVis
 import UpdateEntityRelationInputFieldVisitor from "./mutations/UpdateEntityRelationInputFieldVisitor"
 import { GqlTypeName } from "./utils"
 import WhereTypeProvider from "./WhereTypeProvider"
+import { GraphQLInputType } from "graphql/type/definition";
 
 interface RelationDefinition
 {
@@ -47,11 +49,11 @@ export default class MutationProvider
   private columnTypeResolver: ColumnTypeResolver
   private resolver: GraphQLFieldResolver<any, any>
 
-  private createEntityInputs = singletonFactory<GraphQLInputObjectType, EntityDefinition>(id =>
+  private createEntityInputs = singletonFactory<GraphQLInputType, EntityDefinition>(id =>
     this.createCreateEntityInput(id.entityName, id.withoutRelation)
   )
 
-  private updateEntityInputs = singletonFactory<GraphQLInputObjectType, EntityDefinition>(id =>
+  private updateEntityInputs = singletonFactory<GraphQLInputType, EntityDefinition>(id =>
     this.createUpdateEntityInput(id.entityName, id.withoutRelation)
   )
 
@@ -151,7 +153,7 @@ export default class MutationProvider
     }
   }
 
-  public getCreateEntityInput(entityName: string, withoutRelation?: string): GraphQLInputObjectType
+  public getCreateEntityInput(entityName: string, withoutRelation?: string): GraphQLInputType
   {
     return this.createEntityInputs({entityName, withoutRelation})
   }
@@ -160,14 +162,19 @@ export default class MutationProvider
   {
     const withoutSuffix = withoutRelation ? GqlTypeName`Without${withoutRelation}` : ""
 
+    const entity = getEntity(this.schema, entityName)
+    if (Object.keys(entity.fields).filter(it => it !== entity.primary && it !== withoutRelation).length === 0) {
+      return GraphQLBoolean
+    }
     const visitor = new CreateEntityInputFieldVisitor(this.columnTypeResolver, this)
+
     return new GraphQLInputObjectType({
       name: GqlTypeName`${entityName}${withoutSuffix}CreateInput`,
       fields: () => this.createEntityFields(visitor, entityName, withoutRelation),
     })
   }
 
-  public getUpdateEntityInput(entityName: string, withoutRelation?: string): GraphQLInputObjectType
+  public getUpdateEntityInput(entityName: string, withoutRelation?: string): GraphQLInputType
   {
     return this.updateEntityInputs({entityName, withoutRelation})
   }
@@ -191,6 +198,11 @@ export default class MutationProvider
   private createUpdateEntityInput(entityName: string, withoutRelation?: string)
   {
     const withoutSuffix = withoutRelation ? GqlTypeName`Without${withoutRelation}` : ""
+
+    const entity = getEntity(this.schema, entityName)
+    if (Object.keys(entity.fields).filter(it => it !== entity.primary && it !== withoutRelation).length === 0) {
+      return GraphQLBoolean
+    }
 
     const visitor = new UpdateEntityInputFieldVisitor(this.columnTypeResolver, this)
     return new GraphQLInputObjectType({

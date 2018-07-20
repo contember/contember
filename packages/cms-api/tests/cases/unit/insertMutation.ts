@@ -1,11 +1,16 @@
 import { execute } from "../../src/test";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
-import { OnDelete, RelationType, Schema } from "../../../src/schema/model";
+import SchemaBuilder from "../../../src/schema/builder/SchemaBuilder";
 
 describe('Insert mutation', () => {
   it('insert author (no relations)', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Author", entity => entity
+          .column("name", c => c.type('string'))
+        )
+        .buildSchema(),
       query: GQL`
         mutation {
           createAuthor(data: {name: "John"}) {
@@ -18,7 +23,8 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`insert into "Author" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "author" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(1), "John"],
           response: [testUuid(1),]
         },
@@ -29,7 +35,7 @@ describe('Insert mutation', () => {
         {
           sql: SQL`
             SELECT "createAuth"."id" AS "id"
-            FROM "Author" "createAuth"
+            FROM "author" "createAuth"
             WHERE "createAuth"."id" = '${testUuid(1)}'
           `,
           response: [{id: testUuid(1)}],
@@ -48,6 +54,15 @@ describe('Insert mutation', () => {
 
   it('insert site with settings (one has one owner relation', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Site", entity => entity
+          .column("name", c => c.type('string'))
+          .oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+        )
+        .entity('SiteSetting', e => e
+          .column('url', c => c.type('string'))
+        )
+        .buildSchema(),
       query: GQL`
         mutation {
           createSite(data: {name: "Mangoweb", setting: {create: {url: "https://mangoweb.cz"}}}) {
@@ -60,12 +75,14 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`insert into "SiteSetting" ("id", "url") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(2), "https://mangoweb.cz"],
           response: [testUuid(2),]
         },
         {
-          sql: SQL`insert into "Site" ("id", "name", "setting_id") values ($1, $2, $3) returning "id"`,
+          sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
+		  returning "id"`,
           parameters: [testUuid(1), "Mangoweb", testUuid(2)],
           response: [testUuid(1),]
         },
@@ -76,7 +93,7 @@ describe('Insert mutation', () => {
         {
           sql: SQL`
             SELECT "createSite"."id" AS "id"
-            FROM "Site" "createSite" 
+            FROM "site" "createSite" 
             WHERE "createSite"."id" = '${testUuid(1)}'
           `,
           response: [{id: testUuid(1)}],
@@ -95,6 +112,15 @@ describe('Insert mutation', () => {
 
   it('insert setting with site (one has one inversed relation)', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Site", entity => entity
+          .column("name", c => c.type('string'))
+          .oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+        )
+        .entity('SiteSetting', e => e
+          .column('url', c => c.type('string'))
+        )
+        .buildSchema(),
       query: GQL`
         mutation {
           createSiteSetting(data: {url: "https://mangoweb.cz", site: {create: {name: "Mangoweb"}}}) {
@@ -107,12 +133,14 @@ describe('Insert mutation', () => {
           response: [],
         },
         {
-          sql: SQL`insert into "SiteSetting" ("id", "url") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(1), "https://mangoweb.cz"],
           response: [testUuid(1),]
         },
         {
-          sql: SQL`insert into "Site" ("id", "name", "setting_id") values ($1, $2, $3) returning "id"`,
+          sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
+		  returning "id"`,
           parameters: [testUuid(2), "Mangoweb", testUuid(1)],
           response: [testUuid(2),]
         },
@@ -123,7 +151,7 @@ describe('Insert mutation', () => {
         {
           sql: SQL`
             SELECT "createSite"."id" AS "id"
-            FROM "SiteSetting" "createSite" 
+            FROM "site_setting" "createSite" 
             WHERE "createSite"."id" = '${testUuid(1)}'
           `,
           response: [{id: testUuid(1)}],
@@ -141,6 +169,21 @@ describe('Insert mutation', () => {
 
   it('insert posts with locales and author (one has many + many has one)', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .enum('locale', ['cs', 'en'])
+        .entity("Post", e => e
+          .column("publishedAt", c => c.type("datetime"))
+          .manyHasOne("author", r => r.target("Author"))
+          .oneHasMany("locales", r => r.target("PostLocale"))
+        )
+        .entity('PostLocale', e => e
+          .column('locale', c => c.type('locale'))
+          .column('title', c => c.type('string'))
+        )
+        .entity("Author", e => e
+          .column("name", c => c.type('string'))
+        )
+        .buildSchema(),
       query: GQL`
         mutation {
           createPost(data: {
@@ -160,22 +203,26 @@ describe('Insert mutation', () => {
           sql: SQL`BEGIN;`,
         },
         {
-          sql: SQL`insert into "Author" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "author" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(2), 'John'],
           response: [testUuid(2)],
         },
         {
-          sql: SQL`insert into "Post" ("author_id", "id", "publishedAt") values ($1, $2, $3) returning "id"`,
+          sql: SQL`insert into "post" ("author_id", "id", "published_at") values ($1, $2, $3)
+		  returning "id"`,
           parameters: [testUuid(2), testUuid(1), '2018-06-11'],
           response: [testUuid(1)],
         },
         {
-          sql: SQL`insert into "PostLocale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4) returning "id"`,
+          sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
+		  returning "id"`,
           parameters: [testUuid(3), 'cs', testUuid(1), 'Ahoj svete'],
           response: [testUuid(3)],
         },
         {
-          sql: SQL`insert into "PostLocale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4) returning "id"`,
+          sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
+		  returning "id"`,
           parameters: [testUuid(4), 'en', testUuid(1), 'Hello world'],
           response: [testUuid(4)],
         },
@@ -185,7 +232,7 @@ describe('Insert mutation', () => {
         {
           sql: SQL`
             SELECT "createPost"."id" AS "id"
-            FROM "Post" "createPost"
+            FROM "post" "createPost"
             WHERE "createPost"."id" = '${testUuid(1)}'
           `,
           response: [{id: testUuid(1),}]
@@ -201,53 +248,17 @@ describe('Insert mutation', () => {
     })
   })
 
-  const postWithCategorySchema: Schema = {
-    enums: {},
-    entities: {
-      Category: {
-        name: "Category",
-        pluralName: "Categories",
-        primary: "id",
-        primaryColumn: "id",
-        tableName: "Category",
-        fields: {
-          id: {name: "id", type: "uuid", columnName: "id"},
-          name: {name: "name", type: "string", columnName: "name"},
-          posts: {name: "posts", relation: RelationType.ManyHasMany, target: "Post", ownedBy: "categories"},
-        }
-      },
-      Post: {
-        name: "Post",
-        primary: "id",
-        primaryColumn: "id",
-        tableName: "Post",
-        fields: {
-          id: {name: "id", type: "uuid", columnName: "id"},
-          name: {name: "name", type: "string", columnName: "name"},
-          categories: {
-            name: "categories",
-            relation: RelationType.ManyHasMany,
-            target: "Category",
-            inversedBy: "posts",
-            joiningTable: {
-              tableName: "PostCategories",
-              joiningColumn: {
-                columnName: "post_id",
-                onDelete: OnDelete.cascade
-              },
-              inverseJoiningColumn: {
-                columnName: "category_id",
-                onDelete: OnDelete.cascade
-              }
-            }
-          },
-        }
-      },
-    }
-  }
   it('insert post with categories (many has many, owning)', async () => {
     await execute({
-      schema: postWithCategorySchema,
+      schema: new SchemaBuilder()
+        .entity("Post", e => e
+          .column('name', c => c.type('string'))
+          .manyHasMany('categories', r => r.target('Category'))
+        )
+        .entity('Category', e => e
+          .column('name', c => c.type('string'))
+        )
+        .buildSchema(),
       query: GQL`
         mutation {
           createPost(data: {name: "Hello world", categories: [{create: {name: "Category 1"}}, {create: {name: "Category 2"}}]}) {
@@ -260,33 +271,36 @@ describe('Insert mutation', () => {
           sql: SQL`BEGIN;`,
         },
         {
-          sql: SQL`insert into "Post" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "post" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(1), 'Hello world'],
           response: [testUuid(1)],
         },
         {
-          sql: SQL`insert into "Category" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "category" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(2), 'Category 1'],
           response: [testUuid(2)],
         },
         {
-          sql: SQL`insert into "Category" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "category" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(3), 'Category 2'],
           response: [testUuid(3)],
         },
         {
-          sql: SQL`insert into "PostCategories" ("category_id", "post_id") values ($1, $2)`,
+          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
           parameters: [testUuid(2), testUuid(1)],
         },
         {
-          sql: SQL`insert into "PostCategories" ("category_id", "post_id") values ($1, $2)`,
+          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
           parameters: [testUuid(3), testUuid(1)],
         },
         {
           sql: SQL`COMMIT;`,
         },
         {
-          sql: SQL`SELECT "createPost"."id" AS "id" FROM "Post" "createPost" WHERE "createPost"."id" = '${testUuid(1)}'`,
+          sql: SQL`SELECT "createPost"."id" AS "id" FROM "post" "createPost" WHERE "createPost"."id" = '${testUuid(1)}'`,
           response: [{id: testUuid(1)}],
         }
       ],
@@ -302,7 +316,15 @@ describe('Insert mutation', () => {
 
   it('insert category with posts (many has many, inversed)', async () => {
     await execute({
-      schema: postWithCategorySchema,
+      schema: new SchemaBuilder()
+        .entity("Post", e => e
+          .column('name', c => c.type('string'))
+          .manyHasMany('categories', r => r.target('Category').inversedBy('posts'))
+        )
+        .entity('Category', e => e
+          .column('name', c => c.type('string'))
+        )
+        .buildSchema(),
       query: GQL`
         mutation {
           createCategory(data: {name: "Hello world", posts: [{create: {name: "Post 1"}}, {create: {name: "Post 2"}}]}) {
@@ -315,33 +337,36 @@ describe('Insert mutation', () => {
           sql: SQL`BEGIN;`,
         },
         {
-          sql: SQL`insert into "Category" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "category" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(1), 'Hello world'],
           response: [testUuid(1)],
         },
         {
-          sql: SQL`insert into "Post" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "post" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(2), 'Post 1'],
           response: [testUuid(2)],
         },
         {
-          sql: SQL`insert into "Post" ("id", "name") values ($1, $2) returning "id"`,
+          sql: SQL`insert into "post" ("id", "name") values ($1, $2)
+		  returning "id"`,
           parameters: [testUuid(3), 'Post 2'],
           response: [testUuid(3)],
         },
         {
-          sql: SQL`insert into "PostCategories" ("category_id", "post_id") values ($1, $2)`,
+          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
           parameters: [testUuid(1), testUuid(2)],
         },
         {
-          sql: SQL`insert into "PostCategories" ("category_id", "post_id") values ($1, $2)`,
+          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
           parameters: [testUuid(1), testUuid(3)],
         },
         {
           sql: SQL`COMMIT;`,
         },
         {
-          sql: SQL`SELECT "createCate"."id" AS "id" FROM "Category" "createCate" WHERE "createCate"."id" = '${testUuid(1)}'`,
+          sql: SQL`SELECT "createCate"."id" AS "id" FROM "category" "createCate" WHERE "createCate"."id" = '${testUuid(1)}'`,
           response: [{id: testUuid(1)}],
         }
       ],

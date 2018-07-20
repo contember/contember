@@ -1,11 +1,16 @@
 import { execute } from "../../src/test";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
+import SchemaBuilder from "../../../src/schema/builder/SchemaBuilder";
 
 describe("Queries", () => {
 
   it("Post by id query", async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Post", entity => entity
+          .column("title", column => column.type('string')))
+        .buildSchema(),
       query: GQL`
         query {
           Post(where: {id: "${testUuid(1)}"}) {
@@ -16,7 +21,7 @@ describe("Queries", () => {
         {
           sql: SQL`
             SELECT "Post"."id" AS "id"
-            FROM "Post" "Post"
+            FROM "post" "Post"
             WHERE "Post"."id" = '${testUuid(1)}'
           `,
           response: [{id: testUuid(1)}]
@@ -34,6 +39,15 @@ describe("Queries", () => {
 
   it("Posts with locales query (one has many)", async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Post", entity => entity
+          .oneHasMany("locales", relation => relation.target("PostLocale").ownedBy("post")),
+        )
+        .entity("PostLocale", entity => entity
+          .column("locale", column => column.type("string"))
+          .column("title", column => column.type("string"))
+        )
+        .buildSchema(),
       query: GQL`
         query {
           Posts {
@@ -49,8 +63,8 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-            SELECT "Posts"."id" AS "id"
-            FROM "Post" "Posts"
+			  SELECT "Posts"."id" AS "id"
+			  FROM "post" "Posts"
           `,
           response: [
             {id: testUuid(1)},
@@ -60,7 +74,7 @@ describe("Queries", () => {
         {
           sql: SQL`
             SELECT "locales"."id" AS "id", "locales"."locale" AS "locale", "locales"."title" AS "title", "locales"."post_id" AS "post_id"
-            FROM "PostLocale" "locales"
+            FROM "post_locale" "locales"
             WHERE "locales"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')
           `,
           response: [
@@ -106,6 +120,14 @@ describe("Queries", () => {
 
   it("Post with author query (many has one)", async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Post", entity => entity
+          .manyHasOne("author", relation => relation.target("Author")),
+        )
+        .entity("Author", entity => entity
+          .column("name", column => column.type("string"))
+        )
+        .buildSchema(),
       query: GQL`
         query {
           Posts {
@@ -119,11 +141,11 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-            SELECT
-              "Posts"."id" AS "id",
-              "author"."id" AS "author__id",
-              "author"."name" AS "author__name"
-            FROM "Post" "Posts" LEFT JOIN "Author" "author" ON "Posts".author_id = "author".id
+			  SELECT
+				  "Posts"."id" AS "id",
+				  "author"."id" AS "author__id",
+				  "author"."name" AS "author__name"
+			  FROM "post" "Posts" LEFT JOIN "author" "author" ON "Posts".author_id = "author".id
           `,
           response: [
             {
@@ -164,6 +186,15 @@ describe("Queries", () => {
 
   it('Sites with settings (one-has-one owner)', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Site", entity => entity
+          .column("name", column => column.type("string"))
+          .manyHasOne("setting", relation => relation.target("SiteSetting")),
+        )
+        .entity("SiteSetting", entity => entity
+          .column("url", column => column.type("string"))
+        )
+        .buildSchema(),
       query: GQL`query {
         Sites {
           id
@@ -177,13 +208,13 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-            SELECT
-              "Sites"."id" AS "id",
-              "Sites"."name" AS "name",
-              "setting"."id" AS "setting__id",
-              "setting"."url" AS "setting__url"
-            FROM "Site" "Sites"
-            LEFT JOIN "SiteSetting" "setting" ON "Sites".setting_id = "setting".id
+			  SELECT
+				  "Sites"."id" AS "id",
+				  "Sites"."name" AS "name",
+				  "setting"."id" AS "setting__id",
+				  "setting"."url" AS "setting__url"
+			  FROM "site" "Sites"
+				  LEFT JOIN "site_setting" "setting" ON "Sites".setting_id = "setting".id
           `,
           response: [
             {
@@ -228,6 +259,15 @@ describe("Queries", () => {
 
   it('Settings with sites (one-has-one inversed)', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Site", entity => entity
+          .column("name", column => column.type("string"))
+          .oneHasOne("setting", relation => relation.target("SiteSetting").inversedBy("site")),
+        )
+        .entity("SiteSetting", entity => entity
+          .column("url", column => column.type("string"))
+        )
+        .buildSchema(),
       query: GQL`query {
         SiteSettings {
           id
@@ -241,13 +281,13 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-            SELECT
-              "SiteSettin"."id" AS "id",
-              "SiteSettin"."url" AS "url",
-              "site"."id" AS "site__id",
-              "site"."name" AS "site__name"
-            FROM "SiteSetting" "SiteSettin"
-            LEFT JOIN "Site" "site" ON "SiteSettin".id = "site".setting_id
+			  SELECT
+				  "SiteSettin"."id" AS "id",
+				  "SiteSettin"."url" AS "url",
+				  "site"."id" AS "site__id",
+				  "site"."name" AS "site__name"
+			  FROM "site_setting" "SiteSettin"
+				  LEFT JOIN "site" "site" ON "SiteSettin".id = "site".setting_id
           `,
           response: [
             {
@@ -292,6 +332,19 @@ describe("Queries", () => {
 
   it('Posts with categories and its cz locale (many has many owner + one has many)', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .enum("locale", ['cs', 'en'])
+        .entity("Post", entity => entity
+          .manyHasMany("categories", relation => relation.target("Category")),
+        )
+        .entity("Category", entity => entity
+          .oneHasMany("locales", relation => relation.target("CategoryLocale"))
+        )
+        .entity("CategoryLocale", entity => entity
+          .column("name", column => column.type("string"))
+          .column("locale", column => column.type("locale"))
+        )
+        .buildSchema(),
       query: GQL`
         query {
           Posts {
@@ -307,7 +360,8 @@ describe("Queries", () => {
         }`,
       executes: [
         {
-          sql: SQL`SELECT "Posts"."id" AS "id" FROM "Post" "Posts"`,
+          sql: SQL`SELECT "Posts"."id" AS "id"
+				   FROM "post" "Posts"`,
           response: [
             {
               id: testUuid(1),
@@ -320,12 +374,12 @@ describe("Queries", () => {
         {
           sql: SQL`
             SELECT
-              NULLIF(CONCAT("_PostCateg"."post_id", "_PostCateg"."category_id"), '') AS "pos#cat",
+              NULLIF(CONCAT("_post_cate"."post_id", "_post_cate"."category_id"), '') AS "pos#cat",
               "categories"."id" AS "id",
-              "_PostCateg"."post_id" AS "post_id"
-            FROM "PostCategories" "_PostCateg"
-            LEFT JOIN "Category" "categories" ON "_PostCateg".category_id = "categories".id
-            WHERE "_PostCateg"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')
+              "_post_cate"."post_id" AS "post_id"
+            FROM "post_categories" "_post_cate"
+            LEFT JOIN "category" "categories" ON "_post_cate".category_id = "categories".id
+            WHERE "_post_cate"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')
           `,
           response: [
             {
@@ -356,7 +410,7 @@ describe("Queries", () => {
               "locales"."id" AS "id",
               "locales"."name" AS "name",
               "locales"."category_id" AS "category_id"
-            FROM "CategoryLocale" "locales"
+            FROM "category_locale" "locales"
             WHERE "locales"."locale" = 'cs' AND "locales"."category_id" IN ('${testUuid(3)}','${testUuid(4)}','${testUuid(5)}')
           `,
           response: [
@@ -435,6 +489,18 @@ describe("Queries", () => {
 
   it('Categories with posts and author (many has many inversed + many has one)', async () => {
     await execute({
+      schema: new SchemaBuilder()
+        .entity("Post", entity => entity
+          .manyHasMany("categories", relation => relation.target("Category").inversedBy("posts"))
+          .manyHasOne("author", relation => relation.target("Author"))
+        )
+        .entity("Category", entity => entity
+          .pluralName("Categories")
+        )
+        .entity("Author", entity => entity
+          .column("name", column => column.type("string"))
+        )
+        .buildSchema(),
       query: GQL`
         query {
           Categories {
@@ -449,7 +515,8 @@ describe("Queries", () => {
         }`,
       executes: [
         {
-          sql: SQL`SELECT "Categories"."id" AS "id" FROM "Category" "Categories"`,
+          sql: SQL`SELECT "Categories"."id" AS "id"
+				   FROM "category" "Categories"`,
           response: [
             {
               id: testUuid(1),
@@ -462,15 +529,15 @@ describe("Queries", () => {
         {
           sql: SQL`
             SELECT
-              NULLIF(CONCAT("_PostCateg"."post_id", "_PostCateg"."category_id"), '') AS "pos#cat",
+              NULLIF(CONCAT("_post_cate"."post_id", "_post_cate"."category_id"), '') AS "pos#cat",
               "posts"."id" AS "id",
               "author"."id" AS "author__id",
               "author"."name" AS "author__name",
-              "_PostCateg"."category_id" AS "category_id"
-            FROM "PostCategories" "_PostCateg"
-            LEFT JOIN "Post" "posts" ON "_PostCateg".post_id = "posts".id
-            LEFT JOIN "Author" "author" ON "posts".author_id = "author".id
-            WHERE "_PostCateg"."category_id" IN ('${testUuid(1)}','${testUuid(2)}')
+              "_post_cate"."category_id" AS "category_id"
+            FROM "post_categories" "_post_cate"
+            LEFT JOIN "post" "posts" ON "_post_cate".post_id = "posts".id
+            LEFT JOIN "author" "author" ON "posts".author_id = "author".id
+            WHERE "_post_cate"."category_id" IN ('${testUuid(1)}','${testUuid(2)}')
           `,
           response: [
             {

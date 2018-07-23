@@ -97,12 +97,14 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
               foreignKeys: {
                 columns: relation.joiningTable.joiningColumn.columnName,
                 references: `"${entity.tableName}"(${entity.primary})`,
+                onDelete: "cascade",
               }
             })
             migrationBuilder.createConstraint(relation.joiningTable.tableName, `fk_${relation.joiningTable.tableName}_${targetEntity.name}`, {
               foreignKeys: {
                 columns: relation.joiningTable.inverseJoiningColumn.columnName,
                 references: `"${targetEntity.tableName}"(${entity.primary})`,
+                onDelete: "cascade",
               }
             })
           },
@@ -114,7 +116,8 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
             migrationBuilder.createConstraint(entity.tableName, `fk_${entity.tableName}_${relation.name}`, {
               foreignKeys: {
                 columns: relation.joiningColumn.columnName,
-                references: `"${targetEntity.tableName}"(${targetEntity.primary})`
+                references: `"${targetEntity.tableName}"(${targetEntity.primary})`,
+                onDelete: relation.joiningColumn.onDelete,
               }
             })
           },
@@ -125,7 +128,8 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
             migrationBuilder.createConstraint(entity.tableName, `fk_${entity.tableName}_${relation.name}`, {
               foreignKeys: {
                 columns: relation.joiningColumn.columnName,
-                references: `"${targetEntity.tableName}"(${targetEntity.primary})`
+                references: `"${targetEntity.tableName}"(${targetEntity.primary})`,
+                onDelete: relation.joiningColumn.onDelete,
               }
             })
           },

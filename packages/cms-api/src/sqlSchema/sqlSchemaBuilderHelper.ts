@@ -11,3 +11,5 @@ const getSql = (schema: Schema): string => {
   buildSqlSchema(schema, migrationBuilder)
   return (migrationBuilder as any).getSql()
 }
+
+export default getSql

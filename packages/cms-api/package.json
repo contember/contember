@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc -p .",
-    "start": "concurrently \"tsc -w -p .\" \"nodemon dist/src/index.js\"",
+    "build": "tsc -p tsconfig.json",
+    "start": "tsc -w -p tsconfig.json",
     "test": "mocha --require ts-node/register --ui bdd ./tests/cases/**/*.ts"
   },
   "dependencies": {

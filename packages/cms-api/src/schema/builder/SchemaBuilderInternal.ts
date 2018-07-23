@@ -42,7 +42,7 @@ export default class SchemaBuilderInternal
       pluralName: options.pluralName || this.conventions.getPlural(name),
       primary: primaryName,
       primaryColumn: primaryField.options.columnName || this.conventions.getColumnName(primaryName),
-      unique: (options.unique || []).map(it => ({fields: it})),
+      unique: this.createUnique(options, fieldOptions),
       fields: {},
       tableName: options.tableName || this.conventions.getTableName(name),
     }
@@ -155,5 +155,19 @@ export default class SchemaBuilderInternal
         primary: true,
       },
     }
+  }
+
+  private createUnique(options: EntityOptions, fieldOptions: FieldOptionsMap): Array<{ fields: string[], name: string }>
+  {
+    const unique = (options.unique || []).map(it => ({fields: it.fields, name: it.name || it.fields.join('_')}))
+    for (let fieldName in fieldOptions) {
+      let options = fieldOptions[fieldName]
+      if (options.type === FieldType.Column && options.options.unique) {
+        unique.push({fields: [fieldName], name: fieldName})
+      } else if (options.type === FieldType.OneHasOne) {
+        unique.push(({fields: [fieldName], name: fieldName}))
+      }
+    }
+    return unique
   }
 }

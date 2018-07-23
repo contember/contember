@@ -1,6 +1,6 @@
 import { RelationType, Schema } from "../src/schema/model"
 
-export default {
+const schema: Schema = {
   enums: {
     siteVisibility: ["visible", "hidden"],
     locale: ["cs", "en"],
@@ -8,9 +8,11 @@ export default {
   entities: {
     Author: {
       name: "Author",
+      pluralName: "Authors",
       primary: "id",
       primaryColumn: "id",
       tableName: "Author",
+      unique: [],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         name: {name: "name", type: "string", columnName: "name"},
@@ -23,6 +25,7 @@ export default {
       primary: "id",
       primaryColumn: "id",
       tableName: "Category",
+      unique: [],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         locales: {name: "locales", relation: RelationType.OneHasMany, target: "CategoryLocale", ownedBy: "category"},
@@ -31,9 +34,11 @@ export default {
     },
     CategoryLocale: {
       name: "CategoryLocale",
+      pluralName: "CategoryLocales",
       primary: "id",
       primaryColumn: "id",
       tableName: "CategoryLocale",
+      unique: [],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         name: {name: "name", type: "string", columnName: "name"},
@@ -52,9 +57,11 @@ export default {
     },
     Post: {
       name: "Post",
+      pluralName: "Posts",
       primary: "id",
       primaryColumn: "id",
       tableName: "Post",
+      unique: [],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         publishedAt: {name: "publishedAt", type: "datetime", columnName: "publishedAt"},
@@ -88,10 +95,11 @@ export default {
     },
     PostLocale: {
       name: "PostLocale",
+      pluralName: "PostLocales",
       primary: "id",
       primaryColumn: "id",
       tableName: "PostLocale",
-      unique: [{fields: ["post", "locale"]}],
+      unique: [{fields: ["post", "locale"], name: "unique_post_locale"}],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         post: {
@@ -110,9 +118,11 @@ export default {
     },
     PostSite: {
       name: "PostSite",
+      pluralName: "PostSites",
       primary: "id",
       primaryColumn: "id",
       tableName: "PostSite",
+      unique: [],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         post: {
@@ -139,9 +149,11 @@ export default {
     },
     Site: {
       name: "Site",
+      pluralName: "Sites",
       primary: "id",
       primaryColumn: "id",
       tableName: "Site",
+      unique: [],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         name: {name: "name", type: "string", columnName: "name"},
@@ -155,9 +167,11 @@ export default {
     },
     SiteSetting: {
       name: "SiteSetting",
+      pluralName: "SiteSettings",
       primary: "id",
       primaryColumn: "id",
       tableName: "SiteSetting",
+      unique: [],
       fields: {
         id: {name: "id", type: "uuid", columnName: "id"},
         url: {name: "url", type: "string", columnName: "url"},
@@ -165,4 +179,6 @@ export default {
       }
     },
   }
-} as Schema
+}
+
+export default schema

@@ -167,18 +167,12 @@ describe('Insert mutation', () => {
     })
   })
 
-  it('insert posts with locales and author (one has many + many has one)', async () => {
+  it('insert posts with author (many has one)', async () => {
     await execute({
       schema: new SchemaBuilder()
-        .enum('locale', ['cs', 'en'])
         .entity("Post", e => e
           .column("publishedAt", c => c.type("datetime"))
           .manyHasOne("author", r => r.target("Author"))
-          .oneHasMany("locales", r => r.target("PostLocale"))
-        )
-        .entity('PostLocale', e => e
-          .column('locale', c => c.type('locale'))
-          .column('title', c => c.type('string'))
         )
         .entity("Author", e => e
           .column("name", c => c.type('string'))
@@ -189,10 +183,6 @@ describe('Insert mutation', () => {
           createPost(data: {
             publishedAt: "2018-06-11",
             author: {create: {name: "John"}}
-            locales: [
-              {create: {locale: cs, title: "Ahoj svete"}}
-              {create: {locale: en, title: "Hello world"}}
-            ]
           }) {
             id
           }
@@ -215,16 +205,75 @@ describe('Insert mutation', () => {
           response: [testUuid(1)],
         },
         {
-          sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
+          sql: 'COMMIT;',
+        },
+        {
+          sql: SQL`
+            SELECT "createPost"."id" AS "id"
+            FROM "post" "createPost"
+            WHERE "createPost"."id" = '${testUuid(1)}'
+          `,
+          response: [{id: testUuid(1),}]
+        }
+      ],
+      return: {
+        "data": {
+          "createPost": {
+            "id": testUuid(1),
+          },
+        }
+      }
+    })
+  })
+
+
+  it('insert posts with locales (one has many)', async () => {
+    await execute({
+      schema: new SchemaBuilder()
+        .enum('locale', ['cs', 'en'])
+        .entity("Post", e => e
+          .column("publishedAt", c => c.type("datetime"))
+          .oneHasMany("locales", r => r.target("PostLocale"))
+        )
+        .entity('PostLocale', e => e
+          .column('locale', c => c.type('locale'))
+          .column('title', c => c.type('string'))
+        )
+        .buildSchema(),
+      query: GQL`
+        mutation {
+          createPost(data: {
+            publishedAt: "2018-06-11",
+            locales: [
+              {create: {locale: cs, title: "Ahoj svete"}}
+              {create: {locale: en, title: "Hello world"}}
+            ]
+          }) {
+            id
+          }
+        }
+      `,
+      executes: [
+        {
+          sql: SQL`BEGIN;`,
+        },
+        {
+          sql: SQL`insert into "post" ("id", "published_at") values ($1, $2)
 		  returning "id"`,
-          parameters: [testUuid(3), 'cs', testUuid(1), 'Ahoj svete'],
-          response: [testUuid(3)],
+          parameters: [testUuid(1), '2018-06-11'],
+          response: [testUuid(1)],
         },
         {
           sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
 		  returning "id"`,
-          parameters: [testUuid(4), 'en', testUuid(1), 'Hello world'],
-          response: [testUuid(4)],
+          parameters: [testUuid(2), 'cs', testUuid(1), 'Ahoj svete'],
+          response: [testUuid(2)],
+        },
+        {
+          sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
+		  returning "id"`,
+          parameters: [testUuid(3), 'en', testUuid(1), 'Hello world'],
+          response: [testUuid(3)],
         },
         {
           sql: 'COMMIT;',

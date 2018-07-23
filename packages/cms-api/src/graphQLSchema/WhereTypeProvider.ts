@@ -50,7 +50,7 @@ export default class WhereTypeProvider
     const entity = getEntity(this.schema, entityName)
 
     const combinations: string[] = []
-    const uniqueKeys: string[][] = [[entity.primary], ...(entity.unique || []).map(it => it.fields)]
+    const uniqueKeys: string[][] = [[entity.primary], ...entity.unique.map(it => it.fields)]
     for (const uniqueKey of uniqueKeys) {
       combinations.push(uniqueKey.join(", "))
     }
@@ -65,7 +65,7 @@ export default class WhereTypeProvider
 
   private getUniqueWhereFields(entity: Entity)
   {
-    const uniqueKeys: string[][] = [[entity.primary], ...(entity.unique || []).map(it => it.fields)]
+    const uniqueKeys: string[][] = [[entity.primary], ...entity.unique.map(it => it.fields)]
     const fields: GraphQLInputFieldConfigMap = {}
     for (const uniqueKey of uniqueKeys) {
       for (const field of uniqueKey) {

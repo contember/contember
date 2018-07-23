@@ -7,11 +7,17 @@ import { ManyHasOneRelationBuilder, ManyHasOneRelationOptions } from "./ManyHasO
 
 export type FieldConfigurator<B, O> = (builder: B) => FieldBuilder<O>
 
+
+export type UniqueOptions = {
+  fields: string[]
+  name?: string
+}
+
 export type EntityOptions = {
   pluralName?: string
   primary?: string
   tableName?: string
-  unique?: string[][]
+  unique?: UniqueOptions[]
 }
 
 export enum FieldType
@@ -53,9 +59,9 @@ export class EntityBuilder
     return new EntityBuilder({...this.options, tableName}, this.fields)
   }
 
-  unique(...fields: string[]): EntityBuilder
+  unique(fields: string[]): EntityBuilder
   {
-    return new EntityBuilder({...this.options, unique: [...(this.options.unique || []), fields]}, this.fields)
+    return new EntityBuilder({...this.options, unique: [...(this.options.unique || []), {fields: fields}]}, this.fields)
   }
 
   column(name: string, configurator: FieldConfigurator<ColumnBuilder, ColumnOptions>): EntityBuilder

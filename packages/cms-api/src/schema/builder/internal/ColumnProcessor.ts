@@ -17,7 +17,6 @@ export default class ColumnProcessor implements FieldProcessor<ColumnOptions>
       columnName: options.columnName || this.conventions.getColumnName(fieldName),
       type: options.type,
       nullable: options.nullable || true,
-      unique: options.unique || false,
       name: fieldName,
     })
   }

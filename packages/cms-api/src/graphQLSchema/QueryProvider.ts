@@ -38,7 +38,7 @@ export default class QueryProvider
     const entity = getEntity(this.schema, entityName)
     return {
       [entityName]: this.getByUniqueQuery(entityName),
-      [entity.pluralName || (entityName + "s")]: this.getListQuery(entityName),
+      [entity.pluralName]: this.getListQuery(entityName),
     }
   }
 

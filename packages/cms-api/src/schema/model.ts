@@ -1,12 +1,12 @@
 export interface Entity
 {
   name: string
-  pluralName?: string
+  pluralName: string
   primary: string
   primaryColumn: string
   tableName: string
   fields: { [name: string]: Column | AnyRelation }
-  unique?: Array<{ fields: string[] }>
+  unique: Array<{ fields: string[], name: string }>
 }
 
 export interface Column
@@ -15,8 +15,7 @@ export interface Column
   default?: any | (() => any)
   type: string
   columnName: string
-  unique?: boolean
-  nullable?: boolean
+  nullable: boolean
   options?: {
     [name: string]: any,
   }

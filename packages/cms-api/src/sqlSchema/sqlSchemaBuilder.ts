@@ -1,6 +1,6 @@
 import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
 import { Entity, Schema } from "../schema/model"
-import { acceptFieldVisitor } from "../schema/modelUtils"
+import { acceptFieldVisitor, getColumnName } from "../schema/modelUtils"
 
 const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
   const getPrimaryType = (entity: Entity) => {
@@ -81,6 +81,11 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
 
   for (const entityName in schema.entities) {
     const entity = schema.entities[entityName]
+
+    for (const unique of entity.unique) {
+      migrationBuilder.createIndex(entity.tableName, unique.fields.map(name => getColumnName(schema, entity, name)), {unique: true})
+    }
+
     for (const fieldName in entity.fields) {
       acceptFieldVisitor(schema, entity, fieldName, {
           visitColumn: () => {
@@ -102,7 +107,10 @@ const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
             })
           },
           visitOneHasOneOwner: (entity, relation, targetEntity) => {
-            migrationBuilder.createIndex(entity.tableName, relation.joiningColumn.columnName, {unique: true})
+            if (!entity.unique.find(it => it.fields.length === 1 && it.fields[0] === relation.name)) {
+              migrationBuilder.createIndex(entity.tableName, relation.joiningColumn.columnName, {unique: true})
+            }
+
             migrationBuilder.createConstraint(entity.tableName, `fk_${entity.tableName}_${relation.name}`, {
               foreignKeys: {
                 columns: relation.joiningColumn.columnName,

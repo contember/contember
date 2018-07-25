@@ -2,7 +2,7 @@ import KnexQuery from '../../core/db/KnexQuery'
 import KnexQueryable from '../../core/db/KnexQueryable'
 
 class ProjectByIdQuery extends KnexQuery<ProjectByIdQuery.Result> {
-  constructor(private projectId: string) {
+  constructor(private readonly projectId: string) {
     super();
   }
 

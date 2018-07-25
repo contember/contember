@@ -5,8 +5,7 @@ export default class Env {
     public readonly DB_USER: string,
     public readonly DB_PASSWORD: string,
     public readonly DB_DATABASE: string,
-  ) {
-  }
+  ) {}
 
   static fromUnsafe(unsafe: any): Env {
     const getString = (key: keyof Env): string => {

@@ -5,8 +5,10 @@ import QueryHandlerAccessor from './QueryHandlerAccessor'
 import Knex = require('knex')
 
 export default class KnexQueryable implements Queryable {
-  constructor(private db: DatabaseConnection, private handlerAccessor: QueryHandlerAccessor<KnexQueryable>) {
-  }
+  constructor(
+    private readonly db: DatabaseConnection,
+    private readonly handlerAccessor: QueryHandlerAccessor<KnexQueryable>,
+  ) {}
 
   getHandler(): QueryHandler<KnexQueryable> {
     return this.handlerAccessor.get()

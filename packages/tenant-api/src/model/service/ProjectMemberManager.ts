@@ -5,7 +5,10 @@ import KnexQueryable from '../../core/db/KnexQueryable'
 import * as uuid from 'uuid'
 
 class ProjectMemberManager {
-  constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: DatabaseConnection) {}
+  constructor(
+    private readonly queryHandler: QueryHandler<KnexQueryable>,
+    private readonly db: DatabaseConnection,
+  ) {}
 
   async addProjectMember(projectId: string, personId: string): Promise<ProjectMemberManager.AddProjectMemberResponse> {
     try {

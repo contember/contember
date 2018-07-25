@@ -3,7 +3,7 @@ import KnexQueryable from '../../core/db/KnexQueryable'
 import ApiKey from '../type/ApiKey'
 
 class ApiKeyByTokenQuery extends KnexQuery<ApiKeyByTokenQuery.Result> {
-  constructor(private token: string) {
+  constructor(private readonly token: string) {
     super();
   }
 

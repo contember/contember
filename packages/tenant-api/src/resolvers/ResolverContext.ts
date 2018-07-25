@@ -1,4 +1,5 @@
 export default class ResolverContext {
-  constructor(public readonly personId: string) {
-  }
+  constructor(
+    public readonly personId: string,
+  ) {}
 }

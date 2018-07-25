@@ -4,8 +4,9 @@ import ResolverContext from '../ResolverContext'
 import ProjectMemberManager from '../../model/service/ProjectMemberManager'
 
 export default class AddProjectMemberMutationResolver implements MutationResolvers.Resolvers {
-  constructor(private readonly projectMemberManager: ProjectMemberManager) {
-  }
+  constructor(
+    private readonly projectMemberManager: ProjectMemberManager,
+  ) {}
 
   async addProjectMember(parent: any, args: MutationResolvers.AddProjectMemberArgs, context: ResolverContext, info: GraphQLResolveInfo): Promise<AddProjectMemberResponse> {
     const result = await this.projectMemberManager.addProjectMember(args.projectId, args.personId)

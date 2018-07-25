@@ -2,7 +2,7 @@ import KnexQuery from '../../core/db/KnexQuery'
 import KnexQueryable from '../../core/db/KnexQueryable'
 
 class PersonByEmailQuery extends KnexQuery<PersonByEmailQuery.Result> {
-  constructor(private email: string) {
+  constructor(private readonly email: string) {
     super();
   }
 

@@ -2,7 +2,7 @@ import KnexQuery from '../../core/db/KnexQuery'
 import KnexQueryable from '../../core/db/KnexQueryable'
 
 class PersonByIdQuery extends KnexQuery<PersonByIdQuery.Result> {
-  constructor(private personId: string) {
+  constructor(private readonly personId: string) {
     super();
   }
 

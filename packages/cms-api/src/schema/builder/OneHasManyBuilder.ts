@@ -1,16 +1,10 @@
 import { JoiningColumn, OnDelete } from "../model"
-import { FieldBuilder } from "./FieldConfigurator"
+import FieldBuilder from "./FieldBuilder"
 
-type PartialOptions<K extends keyof OneHasManyRelationOptions> = Partial<OneHasManyRelationOptions> & Pick<OneHasManyRelationOptions, K>
+type PartialOptions<K extends keyof OneHasManyBuilder.Options> = Partial<OneHasManyBuilder.Options> & Pick<OneHasManyBuilder.Options, K>
 
-export type OneHasManyRelationOptions = {
-  target: string
-  ownedBy?: string
-  ownerJoiningColumn?: Partial<JoiningColumn>
-  ownerNullable?: boolean
-}
 
-export class OneHasManyRelationBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
+class OneHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
 {
   private options: O
 
@@ -21,34 +15,34 @@ export class OneHasManyRelationBuilder<O extends PartialOptions<never> = Partial
     } as O
   }
 
-  target(target: string): OneHasManyRelationBuilder<O & PartialOptions<'target'>>
+  target(target: string): OneHasManyBuilder<O & PartialOptions<'target'>>
   {
-    return new OneHasManyRelationBuilder<O & PartialOptions<'target'>>({...(this.options as object), target} as O & PartialOptions<'target'>)
+    return new OneHasManyBuilder<O & PartialOptions<'target'>>({...(this.options as object), target} as O & PartialOptions<'target'>)
   }
 
-  ownedBy(ownedBy: string): OneHasManyRelationBuilder<O>
+  ownedBy(ownedBy: string): OneHasManyBuilder<O>
   {
-    return new OneHasManyRelationBuilder<O>({...(this.options as object), ownedBy} as O)
+    return new OneHasManyBuilder<O>({...(this.options as object), ownedBy} as O)
   }
 
-  ownerJoiningColumn(columnName: string): OneHasManyRelationBuilder<O>
+  ownerJoiningColumn(columnName: string): OneHasManyBuilder<O>
   {
-    return new OneHasManyRelationBuilder<O>({...(this.options as object), ownerJoiningColumn: {...this.options.ownerJoiningColumn, columnName}} as O)
+    return new OneHasManyBuilder<O>({...(this.options as object), ownerJoiningColumn: {...this.options.ownerJoiningColumn, columnName}} as O)
   }
 
-  onDelete(onDelete: OnDelete): OneHasManyRelationBuilder<O>
+  onDelete(onDelete: OnDelete): OneHasManyBuilder<O>
   {
-    return new OneHasManyRelationBuilder<O>({...(this.options as object), ownerJoiningColumn: {...this.options.ownerJoiningColumn, onDelete}} as O)
+    return new OneHasManyBuilder<O>({...(this.options as object), ownerJoiningColumn: {...this.options.ownerJoiningColumn, onDelete}} as O)
   }
 
-  ownerNotNull(): OneHasManyRelationBuilder<O>
+  ownerNotNull(): OneHasManyBuilder<O>
   {
-    return new OneHasManyRelationBuilder<O>({...(this.options as object), ownerNullable: false} as O)
+    return new OneHasManyBuilder<O>({...(this.options as object), ownerNullable: false} as O)
   }
 
-  ownerNullable(): OneHasManyRelationBuilder<O>
+  ownerNullable(): OneHasManyBuilder<O>
   {
-    return new OneHasManyRelationBuilder<O>({...(this.options as object), ownerNullable: true} as O)
+    return new OneHasManyBuilder<O>({...(this.options as object), ownerNullable: true} as O)
   }
 
   getOption(): O
@@ -56,3 +50,15 @@ export class OneHasManyRelationBuilder<O extends PartialOptions<never> = Partial
     return this.options
   }
 }
+
+namespace OneHasManyBuilder
+{
+  export type Options = {
+    target: string
+    ownedBy?: string
+    ownerJoiningColumn?: Partial<JoiningColumn>
+    ownerNullable?: boolean
+  }
+}
+
+export default OneHasManyBuilder

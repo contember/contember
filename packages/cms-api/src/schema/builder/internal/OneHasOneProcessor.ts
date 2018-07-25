@@ -1,9 +1,9 @@
-import { OneHasOneRelationOptions } from "../OneHasOneBuilder"
-import { FieldProcessor, FieldRegistrar } from "./FieldProcessor"
+import OneHasOneBuilder from "../OneHasOneBuilder"
+import FieldProcessor from "./FieldProcessor"
 import { JoiningColumn, OnDelete, OneHasOneInversedRelation, OneHasOneOwnerRelation, RelationType } from "../../model"
-import { NamingConventions } from "../NamingConventions";
+import NamingConventions from "../NamingConventions";
 
-export default class OneHasOneProcessor implements FieldProcessor<OneHasOneRelationOptions>
+export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuilder.Options>
 {
   private conventions: NamingConventions
 
@@ -12,15 +12,15 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneRelat
     this.conventions = conventions
   }
 
-  public process(entityName: string, fieldName: string, options: OneHasOneRelationOptions, registerField: FieldRegistrar): void
+  public process(entityName: string, fieldName: string, options: OneHasOneBuilder.Options, registerField: FieldProcessor.FieldRegistrar): void
   {
     registerField(entityName, this.createOneHasOneOwner(options, fieldName))
     if (options.inversedBy) {
-      registerField(options.target, this.createOneHasOneInversed(options as OneHasOneRelationOptions & { inversedBy: string }, entityName, fieldName))
+      registerField(options.target, this.createOneHasOneInversed(options as OneHasOneBuilder.Options & { inversedBy: string }, entityName, fieldName))
     }
   }
 
-  private createOneHasOneInversed(options: OneHasOneRelationOptions & { inversedBy: string }, entityName: string, fieldName: string): OneHasOneInversedRelation
+  private createOneHasOneInversed(options: OneHasOneBuilder.Options & { inversedBy: string }, entityName: string, fieldName: string): OneHasOneInversedRelation
   {
     return {
       name: options.inversedBy,
@@ -31,7 +31,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneRelat
     }
   }
 
-  private createOneHasOneOwner(options: OneHasOneRelationOptions, fieldName: string): OneHasOneOwnerRelation
+  private createOneHasOneOwner(options: OneHasOneBuilder.Options, fieldName: string): OneHasOneOwnerRelation
   {
     const joiningColumn: Partial<JoiningColumn> = options.joiningColumn || {}
 

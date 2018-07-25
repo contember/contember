@@ -1,9 +1,9 @@
-import { FieldProcessor, FieldRegistrar } from "./FieldProcessor"
-import { OneHasManyRelationOptions } from "../OneHasManyBuilder"
+import FieldProcessor from "./FieldProcessor"
+import OneHasManyBuilder from "../OneHasManyBuilder"
 import { ManyHasOneRelation, OnDelete, OneHasManyRelation, RelationType } from "../../model"
-import { NamingConventions } from "../NamingConventions";
+import NamingConventions from "../NamingConventions";
 
-export default class OneHasManyProcessor implements FieldProcessor<OneHasManyRelationOptions>
+export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBuilder.Options>
 {
   private conventions: NamingConventions
 
@@ -12,7 +12,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyRel
     this.conventions = conventions
   }
 
-  process(entityName: string, fieldName: string, options: OneHasManyRelationOptions, registerField: FieldRegistrar): void
+  process(entityName: string, fieldName: string, options: OneHasManyBuilder.Options, registerField: FieldProcessor.FieldRegistrar): void
   {
     const optionsFinalized = {
       ...options,
@@ -22,7 +22,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyRel
     registerField(entityName, this.createInversed(optionsFinalized, fieldName))
   }
 
-  private createInversed(options: OneHasManyRelationOptions & { ownedBy: string }, fieldName: string): OneHasManyRelation
+  private createInversed(options: OneHasManyBuilder.Options & { ownedBy: string }, fieldName: string): OneHasManyRelation
   {
     return {
       name: fieldName,
@@ -32,7 +32,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyRel
     }
   }
 
-  private createOwning(options: OneHasManyRelationOptions & { ownedBy: string }, entityName: string, fieldName: string): ManyHasOneRelation
+  private createOwning(options: OneHasManyBuilder.Options & { ownedBy: string }, entityName: string, fieldName: string): ManyHasOneRelation
   {
     const joiningColumn = options.ownerJoiningColumn || {}
 

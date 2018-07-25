@@ -1,9 +1,9 @@
-import { FieldProcessor, FieldRegistrar } from "./FieldProcessor"
+import FieldProcessor from "./FieldProcessor"
 import { ManyHasOneRelation, OnDelete, OneHasManyRelation, RelationType } from "../../model"
-import { ManyHasOneRelationOptions } from "../ManyHasOneBuilder"
-import { NamingConventions } from "../NamingConventions";
+import ManyHasOneBuilder from "../ManyHasOneBuilder"
+import NamingConventions from "../NamingConventions";
 
-export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneRelationOptions>
+export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBuilder.Options>
 {
   private conventions: NamingConventions
 
@@ -12,17 +12,17 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneRel
     this.conventions = conventions
   }
 
-  public process(entityName: string, fieldName: string, options: ManyHasOneRelationOptions, registerField: FieldRegistrar): void
+  public process(entityName: string, fieldName: string, options: ManyHasOneBuilder.Options, registerField: FieldProcessor.FieldRegistrar): void
   {
     registerField(entityName, this.createManyHasOneOwning(options, fieldName))
     if (options.inversedBy) {
-      const inversed = this.createManyHasOneInversed(options as ManyHasOneRelationOptions & { inversedBy: string }, entityName, fieldName)
+      const inversed = this.createManyHasOneInversed(options as ManyHasOneBuilder.Options & { inversedBy: string }, entityName, fieldName)
       registerField(options.target, inversed)
     }
   }
 
 
-  private createManyHasOneInversed(options: ManyHasOneRelationOptions & { inversedBy: string }, entityName: string, fieldName: string): OneHasManyRelation
+  private createManyHasOneInversed(options: ManyHasOneBuilder.Options & { inversedBy: string }, entityName: string, fieldName: string): OneHasManyRelation
   {
     return {
       name: options.inversedBy,
@@ -32,7 +32,7 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneRel
     }
   }
 
-  private createManyHasOneOwning(options: ManyHasOneRelationOptions, fieldName: string): ManyHasOneRelation
+  private createManyHasOneOwning(options: ManyHasOneBuilder.Options, fieldName: string): ManyHasOneRelation
   {
     const joiningColumn = options.joiningColumn || {}
     return {

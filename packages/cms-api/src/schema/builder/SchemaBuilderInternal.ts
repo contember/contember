@@ -1,20 +1,21 @@
 import { AnyRelation, Column, Entity, Schema } from "../model"
-import { EntityOptions, FieldOptions, FieldOptionsMap, FieldType } from "./EntityBuilder"
+import EntityBuilder from "./EntityBuilder"
 import { SchemaBuilderError } from "./SchemaBuilder"
 import { Error } from "tslint/lib/error"
-import { FieldProcessor } from "./internal/FieldProcessor"
+import FieldProcessor from "./internal/FieldProcessor"
 import ColumnProcessor from "./internal/ColumnProcessor"
 import ManyHasManyProcessor from "./internal/ManyHasManyProcessor"
 import OneHasOneProcessor from "./internal/OneHasOneProcessor"
 import OneHasManyProcessor from "./internal/OneHasManyProcessor"
 import ManyHasOneProcessor from "./internal/ManyHasOneProcessor"
-import { NamingConventions } from "./NamingConventions";
+import NamingConventions from "./NamingConventions";
+import FieldBuilder from "./FieldBuilder";
 
 export default class SchemaBuilderInternal
 {
   private entities: { [name: string]: Entity } = {}
 
-  private fieldOptions: { [entity: string]: FieldOptionsMap } = {}
+  private fieldOptions: { [entity: string]: FieldBuilder.Map } = {}
 
   private enums: { [name: string]: string[] } = {}
 
@@ -25,7 +26,7 @@ export default class SchemaBuilderInternal
     this.conventions = conventions
   }
 
-  public addEntity(name: string, options: EntityOptions, fieldOptions: FieldOptionsMap): void
+  public addEntity(name: string, options: EntityBuilder.EntityOptions, fieldOptions: FieldBuilder.Map): void
   {
     this.fieldOptions[name] = fieldOptions
     const primaryName = this.getPrimaryFieldName(options, name, fieldOptions)
@@ -33,7 +34,7 @@ export default class SchemaBuilderInternal
       fieldOptions[primaryName] = this.createDefaultPrimary(primaryName)
     }
     const primaryField = fieldOptions[primaryName]
-    if (primaryField.type !== FieldType.Column) {
+    if (primaryField.type !== FieldBuilder.Type.Column) {
       throw new SchemaBuilderError(`${name}: Primary field must be a column`)
     }
 
@@ -80,20 +81,20 @@ export default class SchemaBuilderInternal
 
   private createProcessor(entityName: string, fieldName: string): FieldProcessor<any>
   {
-    const field: FieldOptions = this.fieldOptions[entityName][fieldName]
+    const field: FieldBuilder.Options = this.fieldOptions[entityName][fieldName]
 
-    if (field.type === FieldType.Column) {
+    if (field.type === FieldBuilder.Type.Column) {
       return new ColumnProcessor(this.conventions)
     }
     this.checkTarget(entityName, fieldName, field.options)
     switch (field.type) {
-      case FieldType.ManyHasMany:
+      case FieldBuilder.Type.ManyHasMany:
         return new ManyHasManyProcessor(this.conventions)
-      case FieldType.OneHasOne:
+      case FieldBuilder.Type.OneHasOne:
         return new OneHasOneProcessor(this.conventions)
-      case FieldType.OneHasMany:
+      case FieldBuilder.Type.OneHasMany:
         return new OneHasManyProcessor(this.conventions)
-      case FieldType.ManyHasOne:
+      case FieldBuilder.Type.ManyHasOne:
         return new ManyHasOneProcessor(this.conventions)
     }
 
@@ -120,15 +121,15 @@ export default class SchemaBuilderInternal
   }
 
 
-  private getPrimaryFieldName(entityOptions: EntityOptions, entityName: string, fields: FieldOptionsMap)
+  private getPrimaryFieldName(entityOptions: EntityBuilder.EntityOptions, entityName: string, fields: FieldBuilder.Map)
   {
     let primary: string[] = []
     if (entityOptions.primary) {
       primary.push(entityOptions.primary)
     }
     for (let name in fields) {
-      const field: FieldOptions = fields[name]
-      if (field.type !== FieldType.Column) {
+      const field: FieldBuilder.Options = fields[name]
+      if (field.type !== FieldBuilder.Type.Column) {
         continue
       }
       if (!field.options.primary) {
@@ -145,10 +146,10 @@ export default class SchemaBuilderInternal
     return primary.length === 1 ? primary[0] : this.conventions.getPrimaryField()
   }
 
-  private createDefaultPrimary(fieldName: string): FieldOptions
+  private createDefaultPrimary(fieldName: string): FieldBuilder.Options
   {
     return {
-      type: FieldType.Column,
+      type: FieldBuilder.Type.Column,
       options: {
         nullable: false,
         type: "uuid",
@@ -157,14 +158,14 @@ export default class SchemaBuilderInternal
     }
   }
 
-  private createUnique(options: EntityOptions, fieldOptions: FieldOptionsMap): Array<{ fields: string[], name: string }>
+  private createUnique(options: EntityBuilder.EntityOptions, fieldOptions: FieldBuilder.Map): Array<{ fields: string[], name: string }>
   {
     const unique = (options.unique || []).map(it => ({fields: it.fields, name: it.name || it.fields.join('_')}))
     for (let fieldName in fieldOptions) {
       let options = fieldOptions[fieldName]
-      if (options.type === FieldType.Column && options.options.unique) {
+      if (options.type === FieldBuilder.Type.Column && options.options.unique) {
         unique.push({fields: [fieldName], name: fieldName})
-      } else if (options.type === FieldType.OneHasOne) {
+      } else if (options.type === FieldBuilder.Type.OneHasOne) {
         unique.push(({fields: [fieldName], name: fieldName}))
       }
     }

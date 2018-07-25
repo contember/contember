@@ -1,17 +1,9 @@
 import { JoiningColumn, OnDelete } from "../model"
-import { FieldBuilder } from "./FieldConfigurator"
+import FieldBuilder from "./FieldBuilder"
 
-type PartialOptions<K extends keyof OneHasOneRelationOptions> = Partial<OneHasOneRelationOptions> & Pick<OneHasOneRelationOptions, K>
+type PartialOptions<K extends keyof OneHasOneBuilder.Options> = Partial<OneHasOneBuilder.Options> & Pick<OneHasOneBuilder.Options, K>
 
-export type OneHasOneRelationOptions = {
-  target: string
-  inversedBy?: string
-  joiningColumn?: Partial<JoiningColumn>
-  nullable?: boolean
-  inversedNullable?: boolean
-}
-
-export class OneHasOneRelationBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
+class OneHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
 {
   private options: O
 
@@ -22,34 +14,34 @@ export class OneHasOneRelationBuilder<O extends PartialOptions<never> = PartialO
     } as O
   }
 
-  target(target: string): OneHasOneRelationBuilder<O & PartialOptions<'target'>>
+  target(target: string): OneHasOneBuilder<O & PartialOptions<'target'>>
   {
-    return new OneHasOneRelationBuilder<O & PartialOptions<'target'>>({...(this.options as object), target} as O & PartialOptions<'target'>)
+    return new OneHasOneBuilder<O & PartialOptions<'target'>>({...(this.options as object), target} as O & PartialOptions<'target'>)
   }
 
-  inversedBy(inversedBy: string): OneHasOneRelationBuilder<O>
+  inversedBy(inversedBy: string): OneHasOneBuilder<O>
   {
-    return new OneHasOneRelationBuilder<O>({...(this.options as object), inversedBy} as O)
+    return new OneHasOneBuilder<O>({...(this.options as object), inversedBy} as O)
   }
 
-  joiningColumn(columnName: string): OneHasOneRelationBuilder<O>
+  joiningColumn(columnName: string): OneHasOneBuilder<O>
   {
-    return new OneHasOneRelationBuilder<O>({...(this.options as object), joiningColumn: {...this.options.joiningColumn, columnName}} as O)
+    return new OneHasOneBuilder<O>({...(this.options as object), joiningColumn: {...this.options.joiningColumn, columnName}} as O)
   }
 
-  onDelete(onDelete: OnDelete): OneHasOneRelationBuilder<O>
+  onDelete(onDelete: OnDelete): OneHasOneBuilder<O>
   {
-    return new OneHasOneRelationBuilder<O>({...(this.options as object), joiningColumn: {...this.options.joiningColumn, onDelete}} as O)
+    return new OneHasOneBuilder<O>({...(this.options as object), joiningColumn: {...this.options.joiningColumn, onDelete}} as O)
   }
 
-  notNull(): OneHasOneRelationBuilder<O>
+  notNull(): OneHasOneBuilder<O>
   {
-    return new OneHasOneRelationBuilder<O>({...(this.options as object), nullable: false} as O)
+    return new OneHasOneBuilder<O>({...(this.options as object), nullable: false} as O)
   }
 
-  inversedNotNull(): OneHasOneRelationBuilder<O>
+  inversedNotNull(): OneHasOneBuilder<O>
   {
-    return new OneHasOneRelationBuilder<O>({...(this.options as object), inversedNullable: false} as O)
+    return new OneHasOneBuilder<O>({...(this.options as object), inversedNullable: false} as O)
   }
 
   getOption(): O
@@ -57,3 +49,17 @@ export class OneHasOneRelationBuilder<O extends PartialOptions<never> = PartialO
     return this.options
   }
 }
+
+namespace OneHasOneBuilder
+{
+  export type Options = {
+    target: string
+    inversedBy?: string
+    joiningColumn?: Partial<JoiningColumn>
+    nullable?: boolean
+    inversedNullable?: boolean
+  }
+}
+
+
+export default OneHasOneBuilder

@@ -1,6 +1,6 @@
 import { Schema } from "../model"
-import { EntityBuilder } from "./EntityBuilder"
-import { DefaultNamingConventions, NamingConventions } from "./NamingConventions";
+import EntityBuilder from "./EntityBuilder"
+import NamingConventions from "./NamingConventions";
 import SchemaBuilderInternal from "./SchemaBuilderInternal";
 
 
@@ -12,7 +12,7 @@ export default class SchemaBuilder
   private enums: { [name: string]: string[] } = {}
   private conventions: NamingConventions
 
-  constructor(conventions: NamingConventions = new DefaultNamingConventions())
+  constructor(conventions: NamingConventions = new NamingConventions.Default())
   {
     this.conventions = conventions
   }

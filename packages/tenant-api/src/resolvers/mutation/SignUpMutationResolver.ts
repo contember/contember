@@ -9,8 +9,10 @@ import ImplementationException from '../../core/exceptions/ImplementationExcepti
 import ProjectsByPersonQuery from '../../model/queries/ProjectsByPersonQuery'
 
 export default class SignUpMutationResolver implements MutationResolvers.Resolvers {
-  constructor(private readonly signUpManager: SignUpManager, private readonly queryHandler: QueryHandler<KnexQueryable>) {
-  }
+  constructor(
+    private readonly signUpManager: SignUpManager,
+    private readonly queryHandler: QueryHandler<KnexQueryable>,
+  ) {}
 
   async signUp(parent: any, args: MutationResolvers.SignUpArgs, context: ResolverContext, info: GraphQLResolveInfo): Promise<SignUpResponse> {
     const result = await this.signUpManager.signUp(args.email, args.password)

@@ -1,5 +1,5 @@
 export default class ImplementationException {
-  constructor(private readonly message: string = '') {
-
-  }
+  constructor(
+    public readonly message: string = '',
+  ) {}
 }

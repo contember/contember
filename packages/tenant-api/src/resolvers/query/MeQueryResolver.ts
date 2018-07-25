@@ -8,8 +8,9 @@ import ImplementationException from '../../core/exceptions/ImplementationExcepti
 import ProjectsByPersonQuery from '../../model/queries/ProjectsByPersonQuery'
 
 export default class MeQueryResolver implements QueryResolvers.Resolvers {
-  constructor(private readonly queryHandler: QueryHandler<KnexQueryable>) {
-  }
+  constructor(
+    private readonly queryHandler: QueryHandler<KnexQueryable>,
+  ) {}
 
   async me(parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo): Promise<Person> {
     const personId = context.personId // TODO: may NOT exist

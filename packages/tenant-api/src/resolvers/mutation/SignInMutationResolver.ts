@@ -9,8 +9,10 @@ import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
 import ProjectsByPersonQuery from '../../model/queries/ProjectsByPersonQuery'
 
 export default class SignInMutationResolver implements MutationResolvers.Resolvers {
-  constructor(private signInManager: SignInManager, private readonly queryHandler: QueryHandler<KnexQueryable>) {
-  }
+  constructor(
+    private readonly signInManager: SignInManager,
+    private readonly queryHandler: QueryHandler<KnexQueryable>,
+  ) {}
 
   async signIn(parent: any, args: MutationResolvers.SignInArgs, context: ResolverContext, info: GraphQLResolveInfo): Promise<SignInResponse> {
     const result = await this.signInManager.signIn(args.email, args.password)

@@ -1,8 +1,8 @@
-import { FieldProcessor, FieldRegistrar } from "./FieldProcessor"
-import { ColumnOptions } from "../ColumnBuilder"
-import { NamingConventions } from "../NamingConventions";
+import FieldProcessor from "./FieldProcessor"
+import ColumnBuilder from "../ColumnBuilder"
+import NamingConventions from "../NamingConventions";
 
-export default class ColumnProcessor implements FieldProcessor<ColumnOptions>
+export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Options>
 {
   private conventions: NamingConventions
 
@@ -11,7 +11,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnOptions>
     this.conventions = conventions
   }
 
-  public process(entityName: string, fieldName: string, options: ColumnOptions, registerField: FieldRegistrar): void
+  public process(entityName: string, fieldName: string, options: ColumnBuilder.Options, registerField: FieldProcessor.FieldRegistrar): void
   {
     registerField(entityName, {
       columnName: options.columnName || this.conventions.getColumnName(fieldName),

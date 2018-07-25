@@ -1,9 +1,9 @@
-import { FieldProcessor, FieldRegistrar } from "./FieldProcessor"
-import { ManyHasManyRelationOptions } from "../ManyHasManyBuilder"
+import FieldProcessor from "./FieldProcessor"
+import ManyHasManyBuilder from "../ManyHasManyBuilder"
 import { JoiningTable, ManyHasManyInversedRelation, ManyHasManyOwnerRelation, OnDelete, RelationType } from "../../model"
-import { NamingConventions } from "../NamingConventions";
+import NamingConventions from "../NamingConventions";
 
-export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyRelationOptions>
+export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyBuilder.Options>
 {
   private conventions: NamingConventions
 
@@ -12,7 +12,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyR
     this.conventions = conventions
   }
 
-  public process(entityName: string, fieldName: string, options: ManyHasManyRelationOptions, registerField: FieldRegistrar): void
+  public process(entityName: string, fieldName: string, options: ManyHasManyBuilder.Options, registerField: FieldProcessor.FieldRegistrar): void
   {
     registerField(entityName, this.createManyHasManyOwner(options, entityName, fieldName))
     if (options.inversedBy) {
@@ -34,7 +34,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyR
     }
   }
 
-  private createManyHasManyOwner(options: ManyHasManyRelationOptions, entityName: string, fieldName: string): ManyHasManyOwnerRelation
+  private createManyHasManyOwner(options: ManyHasManyBuilder.Options, entityName: string, fieldName: string): ManyHasManyOwnerRelation
   {
     let joiningTable: JoiningTable | undefined = options.joiningTable
     if (!joiningTable) {

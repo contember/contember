@@ -1,49 +1,17 @@
-import { FieldBuilder } from "./FieldConfigurator"
-import { ColumnBuilder, ColumnOptions } from "./ColumnBuilder"
-import { OneHasOneRelationBuilder, OneHasOneRelationOptions } from "./OneHasOneBuilder"
-import { ManyHasManyRelationBuilder, ManyHasManyRelationOptions } from "./ManyHasManyBuilder"
-import { OneHasManyRelationBuilder, OneHasManyRelationOptions } from "./OneHasManyBuilder"
-import { ManyHasOneRelationBuilder, ManyHasOneRelationOptions } from "./ManyHasOneBuilder"
+import FieldBuilder from "./FieldBuilder"
+import ColumnBuilder from "./ColumnBuilder"
+import OneHasOneBuilder from "./OneHasOneBuilder"
+import ManyHasManyBuilder from "./ManyHasManyBuilder"
+import OneHasManyBuilder from "./OneHasManyBuilder"
+import ManyHasOneBuilder from "./ManyHasOneBuilder"
 
-export type FieldConfigurator<B, O> = (builder: B) => FieldBuilder<O>
-
-
-export type UniqueOptions = {
-  fields: string[]
-  name?: string
-}
-
-export type EntityOptions = {
-  pluralName?: string
-  primary?: string
-  tableName?: string
-  unique?: UniqueOptions[]
-}
-
-export enum FieldType
+class EntityBuilder
 {
-  Column = 'column',
-  ManyHasMany = 'manyHasMany',
-  OneHasOne = 'oneHasOne',
-  OneHasMany = 'oneHasMany',
-  ManyHasOne = 'manyHasOne',
-}
+  private options: EntityBuilder.EntityOptions
 
-export type FieldOptions =
-  { type: FieldType.Column, options: ColumnOptions }
-  | { type: FieldType.OneHasOne, options: OneHasOneRelationOptions }
-  | { type: FieldType.ManyHasMany, options: ManyHasManyRelationOptions }
-  | { type: FieldType.OneHasMany, options: OneHasManyRelationOptions }
-  | { type: FieldType.ManyHasOne, options: ManyHasOneRelationOptions }
-export type FieldOptionsMap = { [name: string]: FieldOptions }
+  private fields: FieldBuilder.Map
 
-export class EntityBuilder
-{
-  private options: EntityOptions
-
-  private fields: FieldOptionsMap
-
-  constructor(options: Partial<EntityOptions>, fields: FieldOptionsMap = {})
+  constructor(options: Partial<EntityBuilder.EntityOptions>, fields: FieldBuilder.Map = {})
   {
     this.options = options
     this.fields = fields
@@ -64,44 +32,63 @@ export class EntityBuilder
     return new EntityBuilder({...this.options, unique: [...(this.options.unique || []), {fields: fields}]}, this.fields)
   }
 
-  column(name: string, configurator: FieldConfigurator<ColumnBuilder, ColumnOptions>): EntityBuilder
+  column(name: string, configurator: EntityBuilder.FieldConfigurator<ColumnBuilder, ColumnBuilder.Options>): EntityBuilder
   {
     const options = configurator(new ColumnBuilder({})).getOption()
-    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldType.Column, options: options}})
+    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldBuilder.Type.Column, options: options}})
   }
 
-  oneHasOne(name: string, configurator: FieldConfigurator<OneHasOneRelationBuilder, OneHasOneRelationOptions>): EntityBuilder
+  oneHasOne(name: string, configurator: EntityBuilder.FieldConfigurator<OneHasOneBuilder, OneHasOneBuilder.Options>): EntityBuilder
   {
-    const options = configurator(new OneHasOneRelationBuilder({})).getOption()
-    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldType.OneHasOne, options}})
+    const options = configurator(new OneHasOneBuilder({})).getOption()
+    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldBuilder.Type.OneHasOne, options}})
   }
 
-  manyHasMany(name: string, configurator: FieldConfigurator<ManyHasManyRelationBuilder, ManyHasManyRelationOptions>): EntityBuilder
+  manyHasMany(name: string, configurator: EntityBuilder.FieldConfigurator<ManyHasManyBuilder, ManyHasManyBuilder.Options>): EntityBuilder
   {
-    const options = configurator(new ManyHasManyRelationBuilder({})).getOption()
-    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldType.ManyHasMany, options}})
+    const options = configurator(new ManyHasManyBuilder({})).getOption()
+    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldBuilder.Type.ManyHasMany, options}})
   }
 
-  oneHasMany(name: string, configurator: FieldConfigurator<OneHasManyRelationBuilder, OneHasManyRelationOptions>): EntityBuilder
+  oneHasMany(name: string, configurator: EntityBuilder.FieldConfigurator<OneHasManyBuilder, OneHasManyBuilder.Options>): EntityBuilder
   {
-    const options = configurator(new OneHasManyRelationBuilder({})).getOption()
-    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldType.OneHasMany, options}})
+    const options = configurator(new OneHasManyBuilder({})).getOption()
+    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldBuilder.Type.OneHasMany, options}})
   }
 
 
-  manyHasOne(name: string, configurator: FieldConfigurator<ManyHasOneRelationBuilder, ManyHasOneRelationOptions>): EntityBuilder
+  manyHasOne(name: string, configurator: EntityBuilder.FieldConfigurator<ManyHasOneBuilder, ManyHasOneBuilder.Options>): EntityBuilder
   {
-    const options = configurator(new ManyHasOneRelationBuilder({})).getOption()
-    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldType.ManyHasOne, options}})
+    const options = configurator(new ManyHasOneBuilder({})).getOption()
+    return new EntityBuilder(this.options, {...this.fields, [name]: {type: FieldBuilder.Type.ManyHasOne, options}})
   }
 
-  getOptions(): EntityOptions
+  getOptions(): EntityBuilder.EntityOptions
   {
     return this.options
   }
 
-  getFields(): FieldOptionsMap
+  getFields(): FieldBuilder.Map
   {
     return this.fields
   }
 }
+
+namespace EntityBuilder
+{
+  export type FieldConfigurator<B, O> = (builder: B) => FieldBuilder<O>
+
+  export type UniqueOptions = {
+    fields: string[]
+    name?: string
+  }
+
+  export type EntityOptions = {
+    pluralName?: string
+    primary?: string
+    tableName?: string
+    unique?: UniqueOptions[]
+  }
+}
+
+export default EntityBuilder

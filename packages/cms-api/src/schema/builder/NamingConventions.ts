@@ -1,4 +1,4 @@
-export interface NamingConventions
+interface NamingConventions
 {
   getPrimaryField(): string;
 
@@ -15,42 +15,47 @@ export interface NamingConventions
   getJoiningTableColumnNames(owningEntity: string, owningRelation: string, inversedEntity: string, inversedRelation?: string): [string, string];
 }
 
-const toUnderscore = (s: string) => s.replace(/([A-Z]+)/g, (x, y) => "_" + y.toLowerCase()).replace(/^_/, "")
-
-export class DefaultNamingConventions implements NamingConventions
+namespace NamingConventions
 {
-  getPrimaryField(): string
-  {
-    return 'id'
-  }
+  const toUnderscore = (s: string) => s.replace(/([A-Z]+)/g, (x, y) => "_" + y.toLowerCase()).replace(/^_/, "")
 
-  getPlural(name: string): string
+  export class Default implements NamingConventions
   {
-    return name + 's'
-  }
+    getPrimaryField(): string
+    {
+      return 'id'
+    }
 
-  getColumnName(fieldName: string): string
-  {
-    return toUnderscore(fieldName)
-  }
+    getPlural(name: string): string
+    {
+      return name + 's'
+    }
 
-  getTableName(entityName: string): string
-  {
-    return toUnderscore(entityName)
-  }
+    getColumnName(fieldName: string): string
+    {
+      return toUnderscore(fieldName)
+    }
 
-  getJoiningColumnName(relationName: string): string
-  {
-    return toUnderscore(relationName) + '_id'
-  }
+    getTableName(entityName: string): string
+    {
+      return toUnderscore(entityName)
+    }
 
-  getJoiningTableName(entity: string, relation: string): string
-  {
-    return toUnderscore(entity) + '_' + toUnderscore(relation)
-  }
+    getJoiningColumnName(relationName: string): string
+    {
+      return toUnderscore(relationName) + '_id'
+    }
 
-  getJoiningTableColumnNames(owningEntity: string, owningRelation: string, inversedEntity: string, inversedRelation?: string): [string, string]
-  {
-    return [toUnderscore(owningEntity) + '_id', toUnderscore(inversedEntity === owningEntity ? owningRelation : inversedEntity) + '_id']
+    getJoiningTableName(entity: string, relation: string): string
+    {
+      return toUnderscore(entity) + '_' + toUnderscore(relation)
+    }
+
+    getJoiningTableColumnNames(owningEntity: string, owningRelation: string, inversedEntity: string, inversedRelation?: string): [string, string]
+    {
+      return [toUnderscore(owningEntity) + '_id', toUnderscore(inversedEntity === owningEntity ? owningRelation : inversedEntity) + '_id']
+    }
   }
 }
+
+export default NamingConventions

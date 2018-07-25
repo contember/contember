@@ -1,16 +1,9 @@
 import { JoiningTable } from "../model"
-import { FieldBuilder } from "./FieldConfigurator"
+import FieldBuilder from "./FieldBuilder"
 
-type PartialOptions<K extends keyof ManyHasManyRelationOptions> = Partial<ManyHasManyRelationOptions> & Pick<ManyHasManyRelationOptions, K>
+type PartialOptions<K extends keyof ManyHasManyBuilder.Options> = Partial<ManyHasManyBuilder.Options> & Pick<ManyHasManyBuilder.Options, K>
 
-
-export type ManyHasManyRelationOptions = {
-  target: string
-  inversedBy?: string
-  joiningTable?: JoiningTable
-}
-
-export class ManyHasManyRelationBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
+class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
 {
   private options: O
 
@@ -21,22 +14,22 @@ export class ManyHasManyRelationBuilder<O extends PartialOptions<never> = Partia
     } as O
   }
 
-  target(target: string): ManyHasManyRelationBuilder<O & PartialOptions<'target'>>
+  target(target: string): ManyHasManyBuilder<O & PartialOptions<'target'>>
   {
-    return new ManyHasManyRelationBuilder<O & PartialOptions<'target'>>({
+    return new ManyHasManyBuilder<O & PartialOptions<'target'>>({
       ...(this.options as object),
       target
     } as O & PartialOptions<'target'>)
   }
 
-  inversedBy(inversedBy: string): ManyHasManyRelationBuilder<O>
+  inversedBy(inversedBy: string): ManyHasManyBuilder<O>
   {
-    return new ManyHasManyRelationBuilder<O>({...(this.options as object), inversedBy} as O)
+    return new ManyHasManyBuilder<O>({...(this.options as object), inversedBy} as O)
   }
 
-  joiningTable(joiningTable: JoiningTable): ManyHasManyRelationBuilder<O>
+  joiningTable(joiningTable: JoiningTable): ManyHasManyBuilder<O>
   {
-    return new ManyHasManyRelationBuilder<O>({...(this.options as object), joiningTable} as O)
+    return new ManyHasManyBuilder<O>({...(this.options as object), joiningTable} as O)
   }
 
   getOption(): O
@@ -44,3 +37,14 @@ export class ManyHasManyRelationBuilder<O extends PartialOptions<never> = Partia
     return this.options
   }
 }
+
+namespace ManyHasManyBuilder
+{
+  export type Options = {
+    target: string
+    inversedBy?: string
+    joiningTable?: JoiningTable
+  }
+}
+
+export default ManyHasManyBuilder

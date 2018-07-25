@@ -1,16 +1,7 @@
-import { FieldBuilder } from "./FieldConfigurator"
+import FieldBuilder from "./FieldBuilder"
 
 
-export type ColumnOptions = {
-  type: string
-  columnName?: string
-  unique?: boolean
-  nullable?: boolean
-  primary?: boolean
-}
-type PartialColumnOptions<K extends keyof ColumnOptions> = Partial<ColumnOptions> & Pick<ColumnOptions, K>
-
-export class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O>
+class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O>
 {
   private options: O
 
@@ -54,3 +45,18 @@ export class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumn
     return this.options
   }
 }
+
+namespace ColumnBuilder
+{
+  export type Options = {
+    type: string
+    columnName?: string
+    unique?: boolean
+    nullable?: boolean
+    primary?: boolean
+  }
+}
+
+type PartialColumnOptions<K extends keyof ColumnBuilder.Options> = Partial<ColumnBuilder.Options> & Pick<ColumnBuilder.Options, K>
+
+export default ColumnBuilder

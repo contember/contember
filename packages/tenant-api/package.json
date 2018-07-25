@@ -1,0 +1,34 @@
+{
+  "name": "tentant-api",
+  "version": "0.0.0",
+  "dependencies": {
+    "@types/bcrypt": "^2.0.0",
+    "@types/knex": "^0.14.17",
+    "@types/uuid": "^3.4.3",
+    "apollo": "^1.5.0",
+    "apollo-server": "^2.0.0",
+    "apollo-server-express": "^2.0.0",
+    "bcrypt": "^3.0.0",
+    "graphql": "^0.13.2",
+    "graphql-code-generator": "^0.10.3",
+    "graphql-codegen-typescript-template": "^0.10.3",
+    "knex": "^0.15.2",
+    "ts-node": "^7.0.0",
+    "typescript": "^2.9.2",
+    "uuid": "^3.3.2"
+  },
+  "resolutions": {
+    "graphql-extensions": "0.1.0",
+    "body-parser": "1.18.3",
+    "depd": "1.1.2",
+    "http-errors": "1.6.3",
+    "iconv-lite": "0.4.23",
+    "qs": "6.5.2",
+    "raw-body": "2.3.3",
+    "setprototypeof": "1.1.0",
+    "statuses": "1.5.0"
+  },
+  "scripts": {
+    "prebuild": "CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/schema/tenant.graphql.ts --template typescript --skip-documents --out ./generated"
+  }
+}

@@ -26,7 +26,7 @@
     "@types/bluebird": "^3.5.22",
     "@types/chai": "^4.1.4",
     "@types/dotenv": "^4.0.3",
-    "@types/knex": "^0.14.14",
+    "@types/knex": "^0.14.16",
     "@types/mocha": "^5.2.4",
     "@types/mock-knex": "^0.3.2",
     "@types/sinon": "^5.0.1",

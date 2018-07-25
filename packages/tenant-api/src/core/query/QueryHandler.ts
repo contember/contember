@@ -1,7 +1,7 @@
 import Query from './Query'
 import Queryable from './Queryable'
 
-export default class QueryHandler<Q extends Queryable> {
+export default class QueryHandler<Q extends Queryable<Q>> {
   constructor(
     private readonly queryable: Q,
   ) {}

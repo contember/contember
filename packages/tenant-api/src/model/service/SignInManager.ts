@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt'
 import {SignInErrorCode} from '../../../generated/types'
-import QueryHandler from '../../core/db/QueryHandler'
-import KnexQueryable from '../../core/db/KnexQueryable'
+import QueryHandler from '../../core/query/QueryHandler'
+import KnexQueryable from '../../core/knex/KnexQueryable'
 import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import ApiKeyManager from './ApiKeyManager'
 

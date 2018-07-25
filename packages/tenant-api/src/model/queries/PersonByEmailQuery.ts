@@ -1,5 +1,5 @@
-import KnexQuery from '../../core/db/KnexQuery'
-import KnexQueryable from '../../core/db/KnexQueryable'
+import KnexQuery from '../../core/knex/KnexQuery'
+import KnexQueryable from '../../core/knex/KnexQueryable'
 
 class PersonByEmailQuery extends KnexQuery<PersonByEmailQuery.Result> {
   constructor(private readonly email: string) {

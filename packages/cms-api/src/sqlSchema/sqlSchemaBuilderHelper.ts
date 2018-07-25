@@ -3,7 +3,7 @@ import buildSqlSchema from "./sqlSchemaBuilder";
 
 
 const getSql = (schema: Schema): string => {
-  const builderClass = require("node-pg-migrate/dist/migration-builder").default
+  const builderClass = require("node-pg-migrate/dist/migration-builder")
   const migrationBuilder = new builderClass({}, {
     query: null,
     select: null,

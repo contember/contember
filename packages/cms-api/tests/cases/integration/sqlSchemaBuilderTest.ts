@@ -3,6 +3,7 @@ import { expect } from "chai"
 import getSql from "../../../src/sqlSchema/sqlSchemaBuilderHelper";
 import { SQL } from "../../src/tags";
 import { OnDelete } from "../../../src/schema/model";
+import 'mocha'
 
 const test = (test: { builder: (builder: SchemaBuilder) => SchemaBuilder, sql: string }) => {
   let builder = test.builder(new SchemaBuilder()).buildSchema();

@@ -2,6 +2,7 @@ import { execute } from "../../src/test";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
 import SchemaBuilder from "../../../src/schema/builder/SchemaBuilder";
+import 'mocha'
 
 describe("Queries", () => {
 
@@ -63,8 +64,8 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-			  SELECT "Posts"."id" AS "id"
-			  FROM "post" "Posts"
+            SELECT "Posts"."id" AS "id"
+            FROM "post" "Posts"
           `,
           response: [
             {id: testUuid(1)},
@@ -141,11 +142,11 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-			  SELECT
-				  "Posts"."id" AS "id",
-				  "author"."id" AS "author__id",
-				  "author"."name" AS "author__name"
-			  FROM "post" "Posts" LEFT JOIN "author" "author" ON "Posts".author_id = "author".id
+            SELECT
+              "Posts"."id" AS "id",
+              "author"."id" AS "author__id",
+              "author"."name" AS "author__name"
+            FROM "post" "Posts" LEFT JOIN "author" "author" ON "Posts".author_id = "author".id
           `,
           response: [
             {
@@ -208,13 +209,13 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-			  SELECT
-				  "Sites"."id" AS "id",
-				  "Sites"."name" AS "name",
-				  "setting"."id" AS "setting__id",
-				  "setting"."url" AS "setting__url"
-			  FROM "site" "Sites"
-				  LEFT JOIN "site_setting" "setting" ON "Sites".setting_id = "setting".id
+            SELECT
+              "Sites"."id" AS "id",
+              "Sites"."name" AS "name",
+              "setting"."id" AS "setting__id",
+              "setting"."url" AS "setting__url"
+            FROM "site" "Sites"
+              LEFT JOIN "site_setting" "setting" ON "Sites".setting_id = "setting".id
           `,
           response: [
             {
@@ -281,13 +282,13 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`
-			  SELECT
-				  "SiteSettin"."id" AS "id",
-				  "SiteSettin"."url" AS "url",
-				  "site"."id" AS "site__id",
-				  "site"."name" AS "site__name"
-			  FROM "site_setting" "SiteSettin"
-				  LEFT JOIN "site" "site" ON "SiteSettin".id = "site".setting_id
+            SELECT
+              "SiteSettin"."id" AS "id",
+              "SiteSettin"."url" AS "url",
+              "site"."id" AS "site__id",
+              "site"."name" AS "site__name"
+            FROM "site_setting" "SiteSettin"
+              LEFT JOIN "site" "site" ON "SiteSettin".id = "site".setting_id
           `,
           response: [
             {
@@ -361,7 +362,7 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`SELECT "Posts"."id" AS "id"
-				   FROM "post" "Posts"`,
+                   FROM "post" "Posts"`,
           response: [
             {
               id: testUuid(1),
@@ -516,7 +517,7 @@ describe("Queries", () => {
       executes: [
         {
           sql: SQL`SELECT "Categories"."id" AS "id"
-				   FROM "category" "Categories"`,
+                   FROM "category" "Categories"`,
           response: [
             {
               id: testUuid(1),

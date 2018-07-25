@@ -1,5 +1,4 @@
 import * as Knex from "knex"
-import * as Bluebird from "bluebird"
 import { ColumnValue, ColumnValueLike, CreateDataInput, PrimaryValue, UniqueWhere, UpdateDataInput } from "../schema/input"
 import { isUniqueWhere } from "../schema/inputUtils"
 import { Entity, ManyHasManyOwnerRelation, Schema } from "../schema/model"
@@ -217,21 +216,21 @@ export class Mapper
   }
 }
 
-const insertData = (schema: Schema, db: Knex) => (entityName: string, data: CreateDataInput) => {
+const insertData = (schema: Schema, db: Knex) => (entityName: string, data: CreateDataInput): PromiseLike<PrimaryValue> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.insert(entityName, data)
   })
 }
 
-const updateData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere, data: UpdateDataInput) => {
+const updateData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere, data: UpdateDataInput): PromiseLike<number> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.update(entityName, where, data)
   })
 }
 
-const deleteData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere) => {
+const deleteData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere): PromiseLike<number> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.delete(entityName, where)

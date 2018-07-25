@@ -1,13 +1,13 @@
-import DatabaseConnection from '../../core/db/DatabaseConnection'
+import KnexConnection from '../../core/knex/KnexConnection'
 import {AddProjectMemberErrorCode} from '../../../generated/types'
-import QueryHandler from '../../core/db/QueryHandler'
-import KnexQueryable from '../../core/db/KnexQueryable'
+import QueryHandler from '../../core/query/QueryHandler'
+import KnexQueryable from '../../core/knex/KnexQueryable'
 import * as uuid from 'uuid'
 
 class ProjectMemberManager {
   constructor(
     private readonly queryHandler: QueryHandler<KnexQueryable>,
-    private readonly db: DatabaseConnection,
+    private readonly db: KnexConnection,
   ) {}
 
   async addProjectMember(projectId: string, personId: string): Promise<ProjectMemberManager.AddProjectMemberResponse> {

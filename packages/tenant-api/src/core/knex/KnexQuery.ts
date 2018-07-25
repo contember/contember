@@ -1,4 +1,4 @@
-import Query from './Query'
+import Query from '../query/Query'
 import KnexQueryable from './KnexQueryable'
 import ImplementationException from '../exceptions/ImplementationException'
 

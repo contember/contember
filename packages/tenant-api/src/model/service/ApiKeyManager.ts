@@ -1,15 +1,15 @@
 import * as crypto from 'crypto'
-import DatabaseConnection from '../../core/db/DatabaseConnection'
+import KnexConnection from '../../core/knex/KnexConnection'
 import * as uuid from 'uuid'
-import KnexQueryable from '../../core/db/KnexQueryable'
-import QueryHandler from '../../core/db/QueryHandler'
+import KnexQueryable from '../../core/knex/KnexQueryable'
+import QueryHandler from '../../core/query/QueryHandler'
 import ApiKey from '../type/ApiKey'
 import ApiKeyByTokenQuery from '../queries/ApiKeyByTokenQuery'
 
 class ApiKeyManager {
   constructor(
     private readonly queryHandler: QueryHandler<KnexQueryable>,
-    private readonly db: DatabaseConnection,
+    private readonly db: KnexConnection,
   ) {}
 
   async verify(token: string): Promise<ApiKeyManager.VerifyResult> {

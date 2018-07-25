@@ -1,7 +1,7 @@
-import * as Knex from "knex"
+import * as Knex from 'knex'
 import * as Bluebird from 'bluebird'
 
-export default class DatabaseConnection {
+export default class KnexConnection {
   constructor(
     private readonly knex: Knex,
   ) {}

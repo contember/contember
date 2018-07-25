@@ -1,5 +1,5 @@
-import KnexQuery from '../../core/db/KnexQuery'
-import KnexQueryable from '../../core/db/KnexQueryable'
+import KnexQuery from '../../core/knex/KnexQuery'
+import KnexQueryable from '../../core/knex/KnexQueryable'
 import ApiKey from '../type/ApiKey'
 
 class ApiKeyByTokenQuery extends KnexQuery<ApiKeyByTokenQuery.Result> {

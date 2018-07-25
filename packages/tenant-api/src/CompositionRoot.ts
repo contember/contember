@@ -4,11 +4,11 @@ import {DocumentNode} from 'graphql'
 import typeDefs from './schema/tenant.graphql'
 import Resolver from './resolvers/Resolver'
 import SignInMutationResolver from './resolvers/mutation/SignInMutationResolver'
-import DatabaseConnection from './core/db/DatabaseConnection'
+import KnexConnection from './core/knex/KnexConnection'
 import Env from './Env'
-import QueryHandler from './core/db/QueryHandler'
-import KnexQueryable from './core/db/KnexQueryable'
-import QueryHandlerAccessor from './core/db/QueryHandlerAccessor'
+import QueryHandler from './core/query/QueryHandler'
+import KnexQueryable from './core/knex/KnexQueryable'
+import QueryHandlerAccessor from './core/query/QueryHandlerAccessor'
 import SignInManager from './model/service/SignInManager'
 import SignUpManager from './model/service/SignUpManager'
 import SignUpMutationResolver from './resolvers/mutation/SignUpMutationResolver'
@@ -78,7 +78,7 @@ export default class CompositionRoot {
     return new MeQueryResolver(queryHandler)
   }
 
-  private createProjectMemberManager(queryHandler: QueryHandler<KnexQueryable>, db: DatabaseConnection): ProjectMemberManager {
+  private createProjectMemberManager(queryHandler: QueryHandler<KnexQueryable>, db: KnexConnection): ProjectMemberManager {
     return new ProjectMemberManager(queryHandler, db)
   }
 
@@ -86,15 +86,15 @@ export default class CompositionRoot {
     return new SignInManager(queryHandler, apiKeyManager)
   }
 
-  private createSignUpManager(queryHandler: QueryHandler<KnexQueryable>, db: DatabaseConnection): SignUpManager {
+  private createSignUpManager(queryHandler: QueryHandler<KnexQueryable>, db: KnexConnection): SignUpManager {
     return new SignUpManager(queryHandler, db)
   }
 
-  private createApiKeyManager(queryHandler: QueryHandler<KnexQueryable>, db: DatabaseConnection): ApiKeyManager {
+  private createApiKeyManager(queryHandler: QueryHandler<KnexQueryable>, db: KnexConnection): ApiKeyManager {
     return new ApiKeyManager(queryHandler, db)
   }
 
-  private createQueryHandler(db: DatabaseConnection): QueryHandler<KnexQueryable> {
+  private createQueryHandler(db: KnexConnection): QueryHandler<KnexQueryable> {
     const accessor = new class implements QueryHandlerAccessor<KnexQueryable> {
       get(): QueryHandler<KnexQueryable> {
         return handler
@@ -107,8 +107,8 @@ export default class CompositionRoot {
     return handler
   }
 
-  private createDatabaseConnection(env: Env): DatabaseConnection {
-    return new DatabaseConnection(knex({
+  private createDatabaseConnection(env: Env): KnexConnection {
+    return new KnexConnection(knex({
       debug: true,
       client: 'pg',
       connection: {

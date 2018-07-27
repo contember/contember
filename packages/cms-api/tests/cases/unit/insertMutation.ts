@@ -339,12 +339,14 @@ describe('Insert mutation', () => {
           response: [testUuid(3)],
         },
         {
-          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
-          parameters: [testUuid(2), testUuid(1)],
+          sql: SQL`insert into "post_categories" ("category_id", "post_id")
+          values ('${testUuid(2)}', '${testUuid(1)}')
+          on conflict do nothing`,
         },
         {
-          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
-          parameters: [testUuid(3), testUuid(1)],
+          sql: SQL`insert into "post_categories" ("category_id", "post_id")
+          values ('${testUuid(3)}', '${testUuid(1)}')
+          on conflict do nothing`,
         },
         {
           sql: SQL`COMMIT;`,
@@ -405,12 +407,14 @@ describe('Insert mutation', () => {
           response: [testUuid(3)],
         },
         {
-          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
-          parameters: [testUuid(1), testUuid(2)],
+          sql: SQL`insert into "post_categories" ("category_id", "post_id")
+          values ('${testUuid(1)}', '${testUuid(2)}')
+          on conflict do nothing`,
         },
         {
-          sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)`,
-          parameters: [testUuid(1), testUuid(3)],
+          sql: SQL`insert into "post_categories" ("category_id", "post_id")
+          values ('${testUuid(1)}', '${testUuid(3)}')
+          on conflict do nothing`,
         },
         {
           sql: SQL`COMMIT;`,

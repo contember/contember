@@ -224,10 +224,10 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
       public async delete()
       {
-        const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         updateBuilder.addColumnData(relation.joiningColumn.columnName, null)
+        const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         await updateBuilder.updateRow()
-        mapper.delete(targetEntity.name, {[targetEntity.primary]: inversedPrimary})
+        await mapper.delete(targetEntity.name, {[targetEntity.primary]: inversedPrimary})
       }
 
       public async disconnect()
@@ -243,10 +243,14 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
       public async upsert(update: UpdateDataInput, create: CreateDataInput)
       {
-        const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
-        if (!inversedPrimary) {
-          updateBuilder.addColumnData(relation.joiningColumn.columnName, await mapper.insert(targetEntity.name, create))
-        } else {
+        const select = mapper.selectField(entity.name, primaryUnique, relation.name)
+
+        const value = select.then<undefined | PromiseLike<PrimaryValue>>(primary => primary ? undefined : mapper.insert(targetEntity.name, create))
+        //addColumnData has to be called synchronously
+        updateBuilder.addColumnData(relation.joiningColumn.columnName, value)
+
+        const inversedPrimary = await select
+        if (inversedPrimary) {
           await mapper.update(targetEntity.name, {[targetEntity.primary]: inversedPrimary}, update)
         }
       }
@@ -293,19 +297,17 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
       public async update(where: UniqueWhere, input: UpdateDataInput)
       {
-        // fixme should check if relation really exists
         await mapper.update(targetEntity.name, {...where, [targetRelation.name]: primaryValue}, {
           ...input,
-          [targetRelation.name]: {connect: thisPrimary}
+          // [targetRelation.name]: {connect: thisPrimary}
         })
       }
 
       public async upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput)
       {
-        // fixme should check if relation really exists
         const result = await mapper.update(targetEntity.name, {...where, [targetRelation.name]: primaryValue}, {
           ...update,
-          [targetRelation.name]: {connect: thisPrimary}
+          // [targetRelation.name]: {connect: thisPrimary}
         })
         if (result === 0) {
           await mapper.insert(targetEntity.name, {
@@ -354,20 +356,12 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
       public async update(input: UpdateDataInput)
       {
-        await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, {
-          [targetRelation.name]: {
-            ...input,
-            [targetRelation.name]: {connect: thisPrimary}
-          }
-        })
+        await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, input)
       }
 
       public async upsert(update: UpdateDataInput, create: CreateDataInput)
       {
-        const result = await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, {
-          ...update,
-          [targetRelation.name]: {connect: thisPrimary}
-        })
+        const result = await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, update)
         if (result === 0) {
           await mapper.insert(targetEntity.name, {
             ...create,
@@ -383,15 +377,26 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     const relationData = this.data[relation.name] as UpdateOneRelationInput
     const updateBuilder = this.updateBuilder
     const mapper = this.mapper
-    const primaryUnique = {[entity.primary]: this.primaryValue}
+    const primaryValue = this.primaryValue;
+    const primaryUnique = {[entity.primary]: primaryValue}
 
     return this.processHasOneRelationInput(relationData, new class implements HasOneRelationInputProcessor
     {
       public async connect(input: UniqueWhere)
       {
-        await mapper.update(entity.name, {[relation.name]: await mapper.getPrimaryValue(targetEntity, input)}, {[relation.name]: {disconnect: true}})
-
-        updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.getPrimaryValue(targetEntity, input))
+        updateBuilder.addColumnData(relation.joiningColumn.columnName, async () => {
+          const relationPrimary = await mapper.getPrimaryValue(targetEntity, input);
+          const currentOwner = await mapper.selectField(entity.name, {[relation.name]: relationPrimary}, entity.primary)
+          if (currentOwner === primaryValue) {
+            return undefined
+          }
+          if (currentOwner) {
+            await mapper.update(entity.name, {
+              [entity.primary]: currentOwner,
+            }, {[relation.name]: {disconnect: true}})
+          }
+          return relationPrimary
+        })
       }
 
       public async create(input: CreateDataInput)
@@ -401,9 +406,9 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
       public async delete()
       {
-        const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         updateBuilder.addColumnData(relation.joiningColumn.columnName, null)
-        mapper.delete(targetEntity.name, {[targetEntity.primary]: inversedPrimary})
+        const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
+        await mapper.delete(targetEntity.name, {[targetEntity.primary]: inversedPrimary})
       }
 
       public async disconnect()
@@ -414,15 +419,19 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
       public async update(input: UpdateDataInput)
       {
         const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
-        mapper.update(targetEntity.name, {[targetEntity.primary]: inversedPrimary}, input)
+        await mapper.update(targetEntity.name, {[targetEntity.primary]: inversedPrimary}, input)
       }
 
       public async upsert(update: UpdateDataInput, create: CreateDataInput)
       {
-        const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
-        if (!inversedPrimary) {
-          updateBuilder.addColumnData(relation.joiningColumn.columnName, await mapper.insert(targetEntity.name, create))
-        } else {
+        const select = mapper.selectField(entity.name, primaryUnique, relation.name)
+
+        const value = select.then<undefined | PromiseLike<PrimaryValue>>(primary => primary ? undefined : mapper.insert(targetEntity.name, create))
+        //addColumnData has to be called synchronously
+        updateBuilder.addColumnData(relation.joiningColumn.columnName, value)
+
+        const inversedPrimary = await select
+        if (inversedPrimary) {
           await mapper.update(targetEntity.name, {[targetEntity.primary]: inversedPrimary}, update)
         }
       }

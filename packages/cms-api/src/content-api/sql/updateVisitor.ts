@@ -245,9 +245,14 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
       {
         const select = mapper.selectField(entity.name, primaryUnique, relation.name)
 
-        const value = select.then<undefined | PromiseLike<PrimaryValue>>(primary => primary ? undefined : mapper.insert(targetEntity.name, create))
         //addColumnData has to be called synchronously
-        updateBuilder.addColumnData(relation.joiningColumn.columnName, value)
+        updateBuilder.addColumnData(relation.joiningColumn.columnName, async () => {
+          const primary = await select
+          if (primary) {
+            return undefined
+          }
+          return mapper.insert(targetEntity.name, create)
+        })
 
         const inversedPrimary = await select
         if (inversedPrimary) {
@@ -426,9 +431,14 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
       {
         const select = mapper.selectField(entity.name, primaryUnique, relation.name)
 
-        const value = select.then<undefined | PromiseLike<PrimaryValue>>(primary => primary ? undefined : mapper.insert(targetEntity.name, create))
         //addColumnData has to be called synchronously
-        updateBuilder.addColumnData(relation.joiningColumn.columnName, value)
+        updateBuilder.addColumnData(relation.joiningColumn.columnName, async () => {
+          const primary = await select
+          if (primary) {
+            return undefined
+          }
+          return mapper.insert(targetEntity.name, create)
+      })
 
         const inversedPrimary = await select
         if (inversedPrimary) {

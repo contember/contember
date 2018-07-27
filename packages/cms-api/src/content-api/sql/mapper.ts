@@ -85,8 +85,13 @@ export class UpdateBuilder
 
     let affectedRows = 0
 
-    if (Object.keys(this.rowData).length > 0) {
-      affectedRows = await qb.update(await promiseAllObject(this.rowData))
+    const rowData = await promiseAllObject(this.rowData)
+    const rowDataFiltered = Object.keys(rowData)
+      .filter(key => rowData[key] !== undefined)
+      .reduce((result: object, key: string) => ({...result, [key]: rowData[key]}), {})
+
+    if (Object.keys(rowDataFiltered).length > 0) {
+      affectedRows = await qb.update(rowDataFiltered)
     }
 
     return affectedRows
@@ -109,7 +114,7 @@ export class Mapper
     const entity = getEntity(this.schema, entityName)
     const columnName = getColumnName(this.schema, entity, fieldName)
 
-    const result = await this.db.table(entity.name).select(columnName).where(entity.primaryColumn, await this.getPrimaryValue(entity, where))
+    const result = await this.db.table(entity.name).select(columnName).where(this.getUniqueWhereArgs(entity, where))
 
     return result[0] !== undefined ? result[0][columnName] : undefined
   }
@@ -143,7 +148,7 @@ export class Mapper
     let resolver: (() => any) = () => {
       throw new Error()
     }
-    const updateBuilder = new UpdateBuilder(entity.tableName, {[entity.primary]: primaryValue}, this.db, new Promise(resolve => resolver = resolve))
+    const updateBuilder = new UpdateBuilder(entity.tableName, this.getUniqueWhereArgs(entity, where), this.db, new Promise(resolve => resolver = resolve))
     const promises = acceptEveryFieldVisitor(this.schema, entity, new UpdateVisitor(primaryValue, data, updateBuilder, this))
     resolver()
 
@@ -163,19 +168,14 @@ export class Mapper
     const joiningTable = relation.joiningTable
     const primaryValue = await this.getPrimaryValue(owningEntity, ownerUnique)
     const inversedPrimaryValue = await this.getPrimaryValue(getEntity(this.schema, relation.target), inversedUnique)
-    const subquery = this.db.table(joiningTable.tableName)
-      .where({
-        [joiningTable.joiningColumn.columnName]: primaryValue,
-        [joiningTable.inverseJoiningColumn.columnName]: inversedPrimaryValue,
-      })
-      .select("?", "1")
 
-    await this.db.table(joiningTable.tableName)
-      .whereNotExists(subquery)
+    const insert = this.db.table(joiningTable.tableName)
       .insert({
         [joiningTable.joiningColumn.columnName]: primaryValue,
         [joiningTable.inverseJoiningColumn.columnName]: inversedPrimaryValue,
       })
+
+    await this.db.raw(insert.toString() + ' on conflict do nothing')
   }
 
   public async disconnectJunction(owningEntity: Entity, relation: ManyHasManyOwnerRelation, ownerUnique: UniqueWhere, inversedUnique: UniqueWhere)
@@ -207,7 +207,6 @@ export class Mapper
       throw new Error("Unique where is not unique")
     }
     const whereArgs: { [columnName: string]: ColumnValue } = {}
-    // todo check that it is unique
     for (const field in where) {
       whereArgs[getColumnName(this.schema, entity, field)] = where[field]
     }

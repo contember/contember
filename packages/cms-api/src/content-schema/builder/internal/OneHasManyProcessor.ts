@@ -40,7 +40,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
       name: options.ownedBy,
       target: entityName,
       inversedBy: fieldName,
-      nullable: options.ownerNullable,
+      nullable: options.ownerNullable !== undefined ? options.ownerNullable : true,
       relation: RelationType.ManyHasOne,
       joiningColumn: {
         columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(options.ownedBy),

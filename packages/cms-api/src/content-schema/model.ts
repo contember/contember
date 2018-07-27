@@ -106,7 +106,7 @@ export interface JoiningColumnRelation
 
 export interface NullableRelation
 {
-  nullable?: boolean
+  nullable: boolean
 }
 
 export interface JoiningTable

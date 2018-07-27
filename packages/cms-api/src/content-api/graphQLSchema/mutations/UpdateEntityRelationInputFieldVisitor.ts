@@ -63,7 +63,10 @@ export default class UpdateEntityRelationInputFieldVisitor
 
   public visitHasMany(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): GraphQLInputObjectType
   {
-    const canDisconnect = targetRelation && isIt<NullableRelation>(targetRelation, 'nullable') ? targetRelation.nullable : true
+    let canDisconnect: boolean = true
+    if (targetRelation && isIt<NullableRelation>(targetRelation, 'nullable')) {
+      canDisconnect = targetRelation.nullable
+    }
 
     return new GraphQLInputObjectType({
       name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,

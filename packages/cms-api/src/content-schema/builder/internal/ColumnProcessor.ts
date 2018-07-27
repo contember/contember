@@ -16,7 +16,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
     registerField(entityName, {
       columnName: options.columnName || this.conventions.getColumnName(fieldName),
       type: options.type,
-      nullable: options.nullable || true,
+      nullable: options.nullable === undefined ? true : options.nullable,
       name: fieldName,
     })
   }

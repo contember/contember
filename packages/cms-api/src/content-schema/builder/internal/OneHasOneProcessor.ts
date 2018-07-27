@@ -27,7 +27,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
       ownedBy: fieldName,
       target: entityName,
       relation: RelationType.OneHasOne,
-      nullable: options.inversedNullable || true,
+      nullable: options.inversedNullable === undefined ? true : options.inversedNullable,
     }
   }
 
@@ -38,7 +38,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
     return {
       name: fieldName,
       inversedBy: options.inversedBy,
-      nullable: options.nullable || true,
+      nullable: options.nullable === undefined ? true :  options.nullable,
       relation: RelationType.OneHasOne,
       target: options.target,
       joiningColumn: {

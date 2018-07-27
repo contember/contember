@@ -140,7 +140,6 @@ export interface ComposedWhere
   not?: Where
 }
 
-// workaround
 interface ColumnWhere
 {
   [name: string]: Condition<any>
@@ -148,7 +147,7 @@ interface ColumnWhere
 
 interface RelationWhere
 {
-  [name: string]: /* Where */ any
+  [name: string]: Where
 }
 
 export type Where = ComposedWhere & ColumnWhere & RelationWhere

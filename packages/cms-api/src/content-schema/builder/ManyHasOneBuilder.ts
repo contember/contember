@@ -1,48 +1,56 @@
 import { JoiningColumn, OnDelete } from "../model"
 import FieldBuilder from "./FieldBuilder"
+import { AddEntityCallback, EntityConfigurator } from "./SchemaBuilder";
 
 type PartialOptions<K extends keyof ManyHasOneBuilder.Options> = Partial<ManyHasOneBuilder.Options> & Pick<ManyHasOneBuilder.Options, K>
 
 class ManyHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
 {
   private options: O
+  private addEntity: AddEntityCallback
 
-  constructor(options: O)
+  constructor(options: O, addEntity: AddEntityCallback)
   {
-    this.options = {
-      ...(options as object),
-    } as O
+    this.options = options
+    this.addEntity = addEntity
   }
 
-  target(target: string): ManyHasOneBuilder<O & PartialOptions<'target'>>
+  target(target: string, configurator?: EntityConfigurator): ManyHasOneBuilder<O & PartialOptions<'target'>>
   {
-    return new ManyHasOneBuilder<O & PartialOptions<'target'>>({...(this.options as object), target} as O & PartialOptions<'target'>)
+    if (configurator) {
+      this.addEntity(target, configurator)
+    }
+    return this.withOption('target', target)
   }
 
   inversedBy(inversedBy: string): ManyHasOneBuilder<O>
   {
-    return new ManyHasOneBuilder<O>({...(this.options as object), inversedBy} as O)
+    return this.withOption('inversedBy', inversedBy)
   }
 
   joiningColumn(columnName: string): ManyHasOneBuilder<O>
   {
-    return new ManyHasOneBuilder<O>({...(this.options as object), joiningColumn: {...this.options.joiningColumn, columnName}} as O)
+    return this.withOption('joiningColumn', {...this.options.joiningColumn, columnName})
   }
 
   onDelete(onDelete: OnDelete): ManyHasOneBuilder<O>
   {
-    return new ManyHasOneBuilder<O>({...(this.options as object), joiningColumn: {...this.options.joiningColumn, onDelete}} as O)
+    return this.withOption('joiningColumn', {...this.options.joiningColumn, onDelete})
   }
 
   notNull(): ManyHasOneBuilder<O>
   {
-    return new ManyHasOneBuilder<O>({...(this.options as object), nullable: false} as O)
+    return this.withOption('nullable', false)
   }
-
 
   getOption(): O
   {
     return this.options
+  }
+
+  private withOption<K extends keyof ManyHasOneBuilder.Options>(key: K, value: ManyHasOneBuilder.Options[K])
+  {
+    return new ManyHasOneBuilder<O & PartialOptions<K>>({...(this.options as object), [key]: value} as O & PartialOptions<K>, this.addEntity)
   }
 }
 

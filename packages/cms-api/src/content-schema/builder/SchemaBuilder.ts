@@ -4,11 +4,12 @@ import NamingConventions from "./NamingConventions";
 import SchemaBuilderInternal from "./SchemaBuilderInternal";
 
 
-export type EntityConfigurator<E> = (entityBuilder: EntityBuilder) => EntityBuilder
+export type EntityConfigurator = (entityBuilder: EntityBuilder) => EntityBuilder
+export type AddEntityCallback = (name: string, configurator: EntityConfigurator) => void
 
 export default class SchemaBuilder
 {
-  private entities: { [name: string]: EntityConfigurator<any> } = {}
+  private entities: { [name: string]: EntityConfigurator } = {}
   private enums: { [name: string]: string[] } = {}
   private conventions: NamingConventions
 
@@ -23,7 +24,7 @@ export default class SchemaBuilder
     return this
   }
 
-  public entity(name: string, configurator: EntityConfigurator<any>): SchemaBuilder
+  public entity(name: string, configurator: EntityConfigurator): SchemaBuilder
   {
     this.entities[name] = configurator
     return this
@@ -33,12 +34,16 @@ export default class SchemaBuilder
   {
     const builder = new SchemaBuilderInternal(this.conventions)
 
-    for (let name in this.entities) {
-      const configurator = this.entities[name]
-      const entityBuilder: EntityBuilder = configurator(new EntityBuilder({}, {}))
+    const addEntity = (name: string, configurator: EntityConfigurator): void => {
+      const entityBuilder: EntityBuilder = configurator(new EntityBuilder({}, {}, addEntity))
       const entityOptions = entityBuilder.getOptions()
       const fields = entityBuilder.getFields()
       builder.addEntity(name, entityOptions, fields)
+
+    }
+    for (let name in this.entities) {
+      const configurator = this.entities[name]
+      addEntity(name, configurator)
     }
     Object.keys(this.enums).forEach(name => builder.addEnum(name, this.enums[name]))
 

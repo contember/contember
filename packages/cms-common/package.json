@@ -1,0 +1,15 @@
+{
+  "name": "cms-common",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "tsc -w -p tsconfig.json"
+  },
+
+  "devDependencies": {
+    "ts-node": "^7.0.0",
+    "tslint": "^5.10.0",
+    "typescript": "2.9.2"
+  }
+}

@@ -1,7 +1,7 @@
 /* tslint:disable */
 import { GraphQLResolveInfo } from "graphql";
 
-export type Resolver<Result, Args = any> = (
+type Resolver<Result, Args = any> = (
 	parent: any,
 	args: Args,
 	context: any,
@@ -105,7 +105,7 @@ export namespace QueryResolvers {
 		me?: MeResolver;
 	}
 
-	export type MeResolver<R = Person> = Resolver<R>;
+	export type MeResolver = Resolver<Person>;
 }
 
 export namespace PersonResolvers {
@@ -115,9 +115,9 @@ export namespace PersonResolvers {
 		projects?: ProjectsResolver;
 	}
 
-	export type IdResolver<R = string> = Resolver<R>;
-	export type EmailResolver<R = string> = Resolver<R>;
-	export type ProjectsResolver<R = ReadonlyArray<Project>> = Resolver<R>;
+	export type IdResolver = Resolver<string>;
+	export type EmailResolver = Resolver<string>;
+	export type ProjectsResolver = Resolver<ReadonlyArray<Project>>;
 }
 
 export namespace ProjectResolvers {
@@ -126,8 +126,8 @@ export namespace ProjectResolvers {
 		name?: NameResolver;
 	}
 
-	export type IdResolver<R = string> = Resolver<R>;
-	export type NameResolver<R = string> = Resolver<R>;
+	export type IdResolver = Resolver<string>;
+	export type NameResolver = Resolver<string>;
 }
 
 export namespace MutationResolvers {
@@ -137,27 +137,22 @@ export namespace MutationResolvers {
 		addProjectMember?: AddProjectMemberResolver;
 	}
 
-	export type SignUpResolver<R = SignUpResponse | null> = Resolver<
-		R,
-		SignUpArgs
-	>;
+	export type SignUpResolver = Resolver<SignUpResponse | null, SignUpArgs>;
 	export interface SignUpArgs {
 		email: string;
 		password: string;
 	}
 
-	export type SignInResolver<R = SignInResponse | null> = Resolver<
-		R,
-		SignInArgs
-	>;
+	export type SignInResolver = Resolver<SignInResponse | null, SignInArgs>;
 	export interface SignInArgs {
 		email: string;
 		password: string;
 	}
 
-	export type AddProjectMemberResolver<
-		R = AddProjectMemberResponse | null
-	> = Resolver<R, AddProjectMemberArgs>;
+	export type AddProjectMemberResolver = Resolver<
+		AddProjectMemberResponse | null,
+		AddProjectMemberArgs
+	>;
 	export interface AddProjectMemberArgs {
 		projectId: string;
 		personId: string;
@@ -171,9 +166,9 @@ export namespace SignUpResponseResolvers {
 		result?: ResultResolver;
 	}
 
-	export type OkResolver<R = boolean> = Resolver<R>;
-	export type ErrorsResolver<R = ReadonlyArray<SignUpError>> = Resolver<R>;
-	export type ResultResolver<R = SignUpResult | null> = Resolver<R>;
+	export type OkResolver = Resolver<boolean>;
+	export type ErrorsResolver = Resolver<ReadonlyArray<SignUpError>>;
+	export type ResultResolver = Resolver<SignUpResult | null>;
 }
 
 export namespace SignUpErrorResolvers {
@@ -183,9 +178,9 @@ export namespace SignUpErrorResolvers {
 		developerMessage?: DeveloperMessageResolver;
 	}
 
-	export type CodeResolver<R = SignUpErrorCode> = Resolver<R>;
-	export type EndPersonMessageResolver<R = string | null> = Resolver<R>;
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>;
+	export type CodeResolver = Resolver<SignUpErrorCode>;
+	export type EndPersonMessageResolver = Resolver<string | null>;
+	export type DeveloperMessageResolver = Resolver<string | null>;
 }
 
 export namespace SignUpResultResolvers {
@@ -193,7 +188,7 @@ export namespace SignUpResultResolvers {
 		person?: PersonResolver;
 	}
 
-	export type PersonResolver<R = Person> = Resolver<R>;
+	export type PersonResolver = Resolver<Person>;
 }
 
 export namespace SignInResponseResolvers {
@@ -203,9 +198,9 @@ export namespace SignInResponseResolvers {
 		result?: ResultResolver;
 	}
 
-	export type OkResolver<R = boolean> = Resolver<R>;
-	export type ErrorsResolver<R = ReadonlyArray<SignInError>> = Resolver<R>;
-	export type ResultResolver<R = SignInResult | null> = Resolver<R>;
+	export type OkResolver = Resolver<boolean>;
+	export type ErrorsResolver = Resolver<ReadonlyArray<SignInError>>;
+	export type ResultResolver = Resolver<SignInResult | null>;
 }
 
 export namespace SignInErrorResolvers {
@@ -215,9 +210,9 @@ export namespace SignInErrorResolvers {
 		developerMessage?: DeveloperMessageResolver;
 	}
 
-	export type CodeResolver<R = SignInErrorCode> = Resolver<R>;
-	export type EndUserMessageResolver<R = string | null> = Resolver<R>;
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>;
+	export type CodeResolver = Resolver<SignInErrorCode>;
+	export type EndUserMessageResolver = Resolver<string | null>;
+	export type DeveloperMessageResolver = Resolver<string | null>;
 }
 
 export namespace SignInResultResolvers {
@@ -226,8 +221,8 @@ export namespace SignInResultResolvers {
 		person?: PersonResolver;
 	}
 
-	export type TokenResolver<R = string> = Resolver<R>;
-	export type PersonResolver<R = Person> = Resolver<R>;
+	export type TokenResolver = Resolver<string>;
+	export type PersonResolver = Resolver<Person>;
 }
 
 export namespace AddProjectMemberResponseResolvers {
@@ -236,10 +231,8 @@ export namespace AddProjectMemberResponseResolvers {
 		errors?: ErrorsResolver;
 	}
 
-	export type OkResolver<R = boolean> = Resolver<R>;
-	export type ErrorsResolver<
-		R = ReadonlyArray<AddProjectMemberError>
-	> = Resolver<R>;
+	export type OkResolver = Resolver<boolean>;
+	export type ErrorsResolver = Resolver<ReadonlyArray<AddProjectMemberError>>;
 }
 
 export namespace AddProjectMemberErrorResolvers {
@@ -249,7 +242,7 @@ export namespace AddProjectMemberErrorResolvers {
 		developerMessage?: DeveloperMessageResolver;
 	}
 
-	export type CodeResolver<R = AddProjectMemberErrorCode> = Resolver<R>;
-	export type EndUserMessageResolver<R = string | null> = Resolver<R>;
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>;
+	export type CodeResolver = Resolver<AddProjectMemberErrorCode>;
+	export type EndUserMessageResolver = Resolver<string | null>;
+	export type DeveloperMessageResolver = Resolver<string | null>;
 }

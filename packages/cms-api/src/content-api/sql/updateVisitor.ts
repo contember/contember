@@ -1,4 +1,5 @@
 import {
+  ColumnValue,
   ConnectRelationInput,
   CreateDataInput,
   CreateManyRelationInput,
@@ -65,11 +66,11 @@ interface HasManyRelationInputProcessor
 export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTypeVisitor<PromiseLike<any>>
 {
   private primaryValue: PrimaryValue
-  private data: CreateDataInput
+  private data: UpdateDataInput
   private updateBuilder: UpdateBuilder
   private mapper: Mapper
 
-  constructor(primaryValue: PrimaryValue, data: CreateDataInput, updateBuilder: UpdateBuilder, mapper: Mapper)
+  constructor(primaryValue: PrimaryValue, data: UpdateDataInput, updateBuilder: UpdateBuilder, mapper: Mapper)
   {
     this.primaryValue = primaryValue
     this.data = data
@@ -80,7 +81,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
   public visitColumn(entity: Entity, column: Column): void
   {
     if (this.data[column.name] !== undefined) {
-      this.updateBuilder.addColumnData(column.columnName, this.data[column.name])
+      this.updateBuilder.addColumnData(column.columnName, this.data[column.name] as ColumnValue)
     }
   }
 
@@ -438,7 +439,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
             return undefined
           }
           return mapper.insert(targetEntity.name, create)
-      })
+        })
 
         const inversedPrimary = await select
         if (inversedPrimary) {

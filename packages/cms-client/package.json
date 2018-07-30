@@ -8,6 +8,7 @@
     "test": "mocha --require ts-node/register --ui bdd ./tests/cases/**/*.ts"
   },
   "dependencies": {
+    "cms-common": "^0.0.0",
     "graphql-request": "^1.7.0"
   },
   "devDependencies": {

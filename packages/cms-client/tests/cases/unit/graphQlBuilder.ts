@@ -1,6 +1,6 @@
 import 'mocha'
 import { expect } from "chai"
-import { QueryBuilder } from "../../../src/graphQlBuilder/QueryBuilder";
+import QueryBuilder from "../../../src/graphQlBuilder/QueryBuilder";
 import { ObjectBuilder } from "../../../src/graphQlBuilder/ObjectBuilder";
 import { Literal } from "../../../src/graphQlBuilder/Literal";
 

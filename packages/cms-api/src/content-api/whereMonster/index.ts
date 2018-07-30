@@ -127,7 +127,7 @@ const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, 
       const joinedWhere = (entity: Entity, relation: Relation, targetEntity: Entity) => {
         const newJoinPath = [...joinPath, fieldName]
         const alias = joinCallback(newJoinPath)
-        return buildWhere(schema, targetEntity, joinCallback, newJoinPath, canJoinHasMany)(quoteIdentifier(alias), where[fieldName])
+        return buildWhere(schema, targetEntity, joinCallback, newJoinPath, canJoinHasMany)(quoteIdentifier(alias), where[fieldName] as Where)
       }
       parts.push(acceptFieldVisitor(schema, entity, fieldName, {
         visitColumn: (entity, column) => {
@@ -140,7 +140,7 @@ const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, 
             return joinedWhere(entity, relation, targetEntity)
           }
           const subQueryBuilder = new SubQueryBuilder(schema, entity)
-          const whereExpr = buildWhere(schema, targetEntity, joinPath => subQueryBuilder.join(joinPath), [fieldName], true)(quoteIdentifier(subQueryBuilder.join([fieldName])), where[fieldName])
+          const whereExpr = buildWhere(schema, targetEntity, joinPath => subQueryBuilder.join(joinPath), [fieldName], true)(quoteIdentifier(subQueryBuilder.join([fieldName])), where[fieldName] as Where)
           const fqn = `${tableName}.${quoteIdentifier(entity.primary)}`
           return `${fqn} IN (${subQueryBuilder.getSql()} WHERE ${whereExpr})`
         }

@@ -48,7 +48,7 @@ export class InsertBuilder
 
 export class UpdateBuilder
 {
-  private rowData: { [columnName: string]: PromiseLike<ColumnValue> } = {}
+  private rowData: { [columnName: string]: PromiseLike<ColumnValue<undefined>> } = {}
 
   private tableName: string
   private db: Knex
@@ -66,7 +66,7 @@ export class UpdateBuilder
     this.updatePromise = this.createUpdatePromise(firer)
   }
 
-  public addColumnData(columnName: string, value: ColumnValueLike)
+  public addColumnData(columnName: string, value: ColumnValueLike<undefined>)
   {
     this.rowData[columnName] = resolveValue(value)
   }

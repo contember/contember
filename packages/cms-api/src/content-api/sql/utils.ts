@@ -1,6 +1,6 @@
 import { ColumnValue, GenericValueLike } from "../../content-schema/input"
 
-export const resolveValue = <T extends ColumnValue>(value: GenericValueLike<T>): PromiseLike<T> => {
+export const resolveValue = <T>(value: GenericValueLike<T>): PromiseLike<T> => {
   if (typeof value === "function") {
     value = value()
   }

@@ -10,6 +10,7 @@ import OneHasManyProcessor from "./internal/OneHasManyProcessor"
 import ManyHasOneProcessor from "./internal/ManyHasOneProcessor"
 import NamingConventions from "./NamingConventions";
 import FieldBuilder from "./FieldBuilder";
+import ColumnBuilder from "./ColumnBuilder";
 
 export default class SchemaBuilderInternal
 {
@@ -37,6 +38,8 @@ export default class SchemaBuilderInternal
     if (primaryField.type !== FieldBuilder.Type.Column) {
       throw new SchemaBuilderError(`${name}: Primary field must be a column`)
     }
+    primaryField.options.primary = true
+    primaryField.options.nullable = false
 
     this.entities[name] = {
       name: name,

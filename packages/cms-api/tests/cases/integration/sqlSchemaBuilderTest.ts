@@ -20,7 +20,7 @@ describe('Create SQL schema', () => {
           .column("registeredAt", c => c.type('datetime'))
         ),
       sql: SQL`CREATE TABLE "author" (
-        "id"            uuid PRIMARY KEY,
+        "id"            uuid PRIMARY KEY NOT NULL,
         "name"          text,
         "email"         text,
         "registered_at" timestamp
@@ -41,12 +41,12 @@ describe('Create SQL schema', () => {
           .column("name", c => c.type('string'))
         ),
       sql: SQL`CREATE TABLE "post" (
-        "id"        uuid PRIMARY KEY,
+        "id"        uuid PRIMARY KEY NOT NULL,
         "title"     text,
         "author_id" uuid
       );
       CREATE TABLE "author" (
-        "id"   uuid PRIMARY KEY,
+        "id"   uuid PRIMARY KEY NOT NULL,
         "name" text
       );
       CREATE INDEX "post_author_id_index"
@@ -68,11 +68,11 @@ describe('Create SQL schema', () => {
           .column('locale', c => c.type('string'))
         ),
       sql: SQL`CREATE TABLE "post" (
-        "id" uuid PRIMARY KEY
+        "id" uuid PRIMARY KEY NOT NULL
       );
       CREATE TABLE "post_locale" (
         "post_id" uuid NOT NULL,
-        "id"      uuid PRIMARY KEY,
+        "id"      uuid PRIMARY KEY NOT NULL,
         "title"   text,
         "locale"  text
       );
@@ -101,11 +101,11 @@ describe('Create SQL schema', () => {
         CONSTRAINT "post_categories_pkey" PRIMARY KEY ("post_id", "category_id")
       );
       CREATE TABLE "post" (
-        "id"    uuid PRIMARY KEY,
+        "id"    uuid PRIMARY KEY NOT NULL,
         "title" text
       );
       CREATE TABLE "category" (
-        "id"    uuid PRIMARY KEY,
+        "id"    uuid PRIMARY KEY NOT NULL,
         "title" text
       );
       ALTER TABLE "post_categories"
@@ -126,12 +126,12 @@ describe('Create SQL schema', () => {
           .column('url', c => c.type('string'))
         ),
       sql: SQL`CREATE TABLE "site" (
-        "id"         uuid PRIMARY KEY,
+        "id"         uuid PRIMARY KEY NOT NULL,
         "name"       text,
         "setting_id" uuid
       );
       CREATE TABLE "site_setting" (
-        "id"  uuid PRIMARY KEY,
+        "id"  uuid PRIMARY KEY NOT NULL,
         "url" text
       );
       CREATE UNIQUE INDEX "site_setting_id_unique_index"

@@ -1,8 +1,8 @@
-import SchemaBuilder from "../../../src/schema/builder/SchemaBuilder";
+import SchemaBuilder from "../../../src/content-schema/builder/SchemaBuilder";
 import { expect } from "chai"
-import getSql from "../../../src/sqlSchema/sqlSchemaBuilderHelper";
+import getSql from "../../../src/content-api/sqlSchema/sqlSchemaBuilderHelper";
 import { SQL } from "../../src/tags";
-import { OnDelete } from "../../../src/schema/model";
+import { OnDelete } from "../../../src/content-schema/model";
 import 'mocha'
 
 const test = (test: { builder: (builder: SchemaBuilder) => SchemaBuilder, sql: string }) => {

@@ -1,4 +1,4 @@
-import { RelationType, Schema } from "../src/schema/model"
+import { RelationType, Schema } from "../src/content-schema/model"
 
 const schema: Schema = {
   enums: {

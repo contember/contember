@@ -3,11 +3,11 @@ import { graphql } from "graphql"
 import { maskErrors } from "graphql-errors"
 import * as knex from "knex"
 import * as mockKnex from "mock-knex"
-import GraphQlSchemaBuilder from "../../src/graphQLSchema/GraphQlSchemaBuilder"
+import GraphQlSchemaBuilder from "../../src/content-api/graphQLSchema/GraphQlSchemaBuilder"
 import { testUuid } from "./testUuid";
 import * as uuid from "../../src/utils/uuid";
 import * as sinon from 'sinon';
-import { Schema } from "../../src/schema/model";
+import { Schema } from "../../src/content-schema/model";
 
 
 

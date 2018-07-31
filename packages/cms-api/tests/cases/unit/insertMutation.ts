@@ -1,7 +1,7 @@
 import { execute } from "../../src/test";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
-import SchemaBuilder from "../../../src/schema/builder/SchemaBuilder";
+import SchemaBuilder from "../../../src/content-schema/builder/SchemaBuilder";
 import 'mocha'
 
 describe('Insert mutation', () => {

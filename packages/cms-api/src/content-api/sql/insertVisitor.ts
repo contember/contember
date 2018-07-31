@@ -6,7 +6,7 @@ import {
   CreateRelationInput,
   PrimaryValue,
   UniqueWhere
-} from "../../schema/input"
+} from "../../content-schema/input"
 import {
   Column,
   ColumnVisitor,
@@ -18,7 +18,7 @@ import {
   OneHasOneInversedRelation,
   OneHasOneOwnerRelation,
   RelationByTypeVisitor
-} from "../../schema/model"
+} from "../../content-schema/model"
 import { isIt } from "../../utils/type"
 import { InsertBuilder, Mapper } from "./mapper"
 import { uuid } from "../../utils/uuid";

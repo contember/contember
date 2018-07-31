@@ -1,7 +1,7 @@
 import getSql from "./content-api/sqlSchema/sqlSchemaBuilderHelper";
 import GraphQlSchemaBuilder from "./content-api/graphQLSchema/GraphQlSchemaBuilder";
-import SchemaBuilder from "./schema/builder/SchemaBuilder"
+import SchemaBuilder from "./content-schema/builder/SchemaBuilder"
 
-export * from './schema/model'
+export * from './content-schema/model'
 
 export { getSql as getSqlSchema, GraphQlSchemaBuilder, SchemaBuilder }

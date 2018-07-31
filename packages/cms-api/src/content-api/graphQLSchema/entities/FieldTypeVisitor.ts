@@ -1,6 +1,6 @@
 import { GraphQLList } from "graphql"
 import { GraphQLNonNull, GraphQLOutputType } from "graphql/type/definition"
-import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../../schema/model"
+import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../../content-schema/model"
 import ColumnTypeResolver from "../ColumnTypeResolver"
 import EntityTypeProvider from "../EntityTypeProvider"
 

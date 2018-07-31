@@ -1,5 +1,5 @@
 import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLScalarType, GraphQLString } from "graphql"
-import { Schema } from "../../schema/model"
+import { Schema } from "../../content-schema/model"
 import { GraphQLUUID } from "./customTypes"
 import EnumsProvider from "./EnumsProvider"
 

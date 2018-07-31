@@ -1,5 +1,5 @@
 import { GraphQLInputObjectType } from "graphql"
-import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../../schema/model"
+import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../../content-schema/model"
 import MutationProvider from "../MutationProvider"
 import { GqlTypeName } from "../utils"
 import WhereTypeProvider from "../WhereTypeProvider"

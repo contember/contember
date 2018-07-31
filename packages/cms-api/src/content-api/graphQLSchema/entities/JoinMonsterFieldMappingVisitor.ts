@@ -1,7 +1,7 @@
 import { GraphQLInputObjectType } from "graphql"
 import { aliasInAst, joinToAst } from "../../joinMonster/sqlAstNodeUtils"
 import { JoinMonsterFieldMapping } from "../../joinMonsterHelpers"
-import { Where } from "../../../schema/input"
+import { Where } from "../../../content-schema/input"
 import {
   Column,
   ColumnVisitor,
@@ -15,7 +15,7 @@ import {
   Relation,
   RelationByTypeVisitor,
   Schema
-} from "../../../schema/model"
+} from "../../../content-schema/model"
 import { quoteIdentifier } from "../../sql/utils"
 import { buildWhere } from "../../whereMonster"
 import WhereTypeProvider from "../WhereTypeProvider"

@@ -1,4 +1,4 @@
-import { Condition } from "../../schema/input"
+import { Condition } from "../../content-schema/input"
 import { escapeParameter, expression, quoteIdentifier } from "../sql/utils"
 
 const buildCondition = (tableName: string, columnName: string) => (condition: Condition<any>): string => {

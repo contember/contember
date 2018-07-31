@@ -7,8 +7,8 @@ import {
   OneHasOneOwnerRelation,
   RelationByTypeVisitor,
   Schema
-} from "../../schema/model"
-import { acceptFieldVisitor, acceptRelationTypeVisitor, getEntity } from "../../schema/modelUtils"
+} from "../../content-schema/model"
+import { acceptFieldVisitor, acceptRelationTypeVisitor, getEntity } from "../../content-schema/modelUtils"
 import { createAlias, quoteIdentifier } from "../sql/utils"
 
 const aliasInAst = (sqlAstNode: SqlAstNode) => {

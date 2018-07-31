@@ -16,7 +16,7 @@ import {
   UpdateSpecifiedRelationInput,
   UpsertRelationInput,
   UpsertSpecifiedRelationInput
-} from "../../schema/input"
+} from "../../content-schema/input"
 import {
   Column,
   ColumnVisitor,
@@ -28,7 +28,7 @@ import {
   OneHasOneInversedRelation,
   OneHasOneOwnerRelation,
   RelationByTypeVisitor
-} from "../../schema/model"
+} from "../../content-schema/model"
 import { isIt } from "../../utils/type"
 import { Mapper, UpdateBuilder } from "./mapper"
 

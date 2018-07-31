@@ -1,6 +1,6 @@
-import { UniqueWhere } from "../../schema/input"
-import { Entity, Schema } from "../../schema/model"
-import { getColumnName } from "../../schema/modelUtils"
+import { UniqueWhere } from "../../content-schema/input"
+import { Entity, Schema } from "../../content-schema/model"
+import { getColumnName } from "../../content-schema/modelUtils"
 import { escapeParameter, quoteIdentifier } from "../sql/utils"
 
 const buildUniqueWhere = (schema: Schema, entity: Entity) => (tableName: string, where: UniqueWhere) => {

@@ -1,4 +1,4 @@
-import { Schema } from "../../schema/model"
+import { Schema } from "../../content-schema/model"
 import buildSqlSchema from "./sqlSchemaBuilder";
 
 

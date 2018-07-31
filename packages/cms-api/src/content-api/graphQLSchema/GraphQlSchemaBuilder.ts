@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLObjectType, GraphQLSchema } from "graphql"
 import { JoinMonsterFieldMapping } from "../joinMonsterHelpers"
-import { Schema } from "../../schema/model"
+import { Schema } from "../../content-schema/model"
 import ColumnTypeResolver from "./ColumnTypeResolver"
 import ConditionTypeProvider from "./ConditionTypeProvider"
 import EntityTypeProvider from "./EntityTypeProvider"

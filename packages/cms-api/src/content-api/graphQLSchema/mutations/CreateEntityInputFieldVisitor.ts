@@ -1,5 +1,5 @@
 import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from "graphql"
-import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../../schema/model"
+import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../../content-schema/model"
 import ColumnTypeResolver from "../ColumnTypeResolver"
 import MutationProvider from "../MutationProvider"
 

@@ -1,7 +1,8 @@
-import getSql from "./content-api/sqlSchema/sqlSchemaBuilderHelper";
-import GraphQlSchemaBuilder from "./content-api/graphQLSchema/GraphQlSchemaBuilder";
-import SchemaBuilder from "./content-schema/builder/SchemaBuilder"
+import CompositionRoot from './CompositionRoot'
+import Env from './Env'
+import Project from './tenant-api/Project'
+import SchemaBuilder from './content-schema/builder/SchemaBuilder'
+import getSql from "./content-api/sqlSchema/sqlSchemaBuilderHelper"
 
 export * from './content-schema/model'
-
-export { getSql as getSqlSchema, GraphQlSchemaBuilder, SchemaBuilder }
+export { getSql as getSqlSchema, CompositionRoot, Env, Project, SchemaBuilder }

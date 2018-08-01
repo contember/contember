@@ -1,4 +1,5 @@
 dist/
 node_modules/
+src/tenant-api/types.ts
 yarn-error.log
 .env

@@ -70,9 +70,7 @@ class ApiKeyManager {
         return null
 
       case ApiKey.Type.SESSION:
-        const expiration = new Date()
-        expiration.setTime(Date.now() + 30 * 60 * 1000)
-        return expiration
+        return new Date(Date.now() + 30 * 60 * 1000)
     }
   }
 }

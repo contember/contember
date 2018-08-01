@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
+    "prebuild": "CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/tenant-api/schema/tenant.graphql.ts --template typescript --skip-documents --out ./src/tenant-api/schema/types.ts",
     "build": "tsc -p tsconfig.json",
     "start": "tsc -w -p tsconfig.json",
     "test": "mocha --require ts-node/register --ui bdd ./tests/cases/**/*.ts"
@@ -13,6 +14,8 @@
     "apollo-codegen": "^0.20.0",
     "apollo-codegen-typescript": "^0.20.0",
     "graphql": "^0.13.2",
+    "graphql-code-generator": "^0.10.3",
+    "graphql-codegen-typescript-template": "^0.10.3",
     "graphql-errors": "^2.1.0",
     "graphql-tag": "^2.9.2",
     "graphql-tools": "^3.0.5",

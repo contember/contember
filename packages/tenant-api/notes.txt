@@ -1,4 +1,0 @@
-learn how to write knex queries without SQL injection
-improve transaction handling
-go-style error handling vs. exceptions
-validate input UUID in resolvers

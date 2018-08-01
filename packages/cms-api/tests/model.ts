@@ -1,4 +1,4 @@
-import { RelationType, Schema } from "../src/content-schema/model"
+import { OnDelete, RelationType, Schema } from "../src/content-schema/model"
 
 const schema: Schema = {
   enums: {
@@ -14,8 +14,8 @@ const schema: Schema = {
       tableName: "Author",
       unique: [],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
-        name: {name: "name", type: "string", columnName: "name"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
+        name: {name: "name", type: "string", columnName: "name", nullable: false},
         posts: {name: "posts", relation: RelationType.OneHasMany, target: "Post", ownedBy: "author"}
       }
     },
@@ -27,7 +27,7 @@ const schema: Schema = {
       tableName: "Category",
       unique: [],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
         locales: {name: "locales", relation: RelationType.OneHasMany, target: "CategoryLocale", ownedBy: "category"},
         posts: {name: "posts", relation: RelationType.ManyHasMany, target: "Post", ownedBy: "categories"},
       }
@@ -40,9 +40,9 @@ const schema: Schema = {
       tableName: "CategoryLocale",
       unique: [],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
-        name: {name: "name", type: "string", columnName: "name"},
-        locale: {name: "locale", type: "locale", columnName: "locale"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
+        name: {name: "name", type: "string", columnName: "name", nullable: false},
+        locale: {name: "locale", type: "locale", columnName: "locale", nullable: false},
         category: {
           name: "category",
           relation: RelationType.ManyHasOne,
@@ -50,7 +50,7 @@ const schema: Schema = {
           inversedBy: "locales",
           joiningColumn: {
             columnName: "category_id",
-            onDelete: "restrict",
+            onDelete: OnDelete.restrict,
           }
         },
       }
@@ -63,13 +63,13 @@ const schema: Schema = {
       tableName: "Post",
       unique: [],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
-        publishedAt: {name: "publishedAt", type: "datetime", columnName: "publishedAt"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
+        publishedAt: {name: "publishedAt", type: "datetime", columnName: "publishedAt", nullable: false},
         author: {
           name: "author",
           relation: RelationType.ManyHasOne,
           target: "Author",
-          joiningColumn: {columnName: "author_id", onDelete: "cascade"},
+          joiningColumn: {columnName: "author_id", onDelete: OnDelete.cascade},
           inversedBy: "posts"
         },
         locales: {name: "locales", relation: RelationType.OneHasMany, target: "PostLocale", ownedBy: "post"},
@@ -83,11 +83,11 @@ const schema: Schema = {
             tableName: "PostCategories",
             joiningColumn: {
               columnName: "post_id",
-              onDelete: "cascade"
+              onDelete: OnDelete.cascade
             },
             inverseJoiningColumn: {
               columnName: "category_id",
-              onDelete: "cascade"
+              onDelete: OnDelete.cascade
             }
           }
         },
@@ -99,9 +99,9 @@ const schema: Schema = {
       primary: "id",
       primaryColumn: "id",
       tableName: "PostLocale",
-      unique: [{fields: ["post", "locale"], name: "unique_post_locale"}],
+      unique: [{fields: ["post", "locale"], name: "post_locale"}],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
         post: {
           name: "post",
           relation: RelationType.ManyHasOne,
@@ -109,11 +109,11 @@ const schema: Schema = {
           inversedBy: "locales",
           joiningColumn: {
             columnName: "post_id",
-            onDelete: "cascade",
+            onDelete: OnDelete.cascade,
           }
         },
-        locale: {name: "locale", type: "locale", columnName: "locale"},
-        title: {name: "title", type: "string", columnName: "title"},
+        locale: {name: "locale", type: "locale", columnName: "locale", nullable: false},
+        title: {name: "title", type: "string", columnName: "title", nullable: false},
       }
     },
     PostSite: {
@@ -124,7 +124,7 @@ const schema: Schema = {
       tableName: "PostSite",
       unique: [],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
         post: {
           name: "post",
           relation: RelationType.ManyHasOne,
@@ -132,7 +132,7 @@ const schema: Schema = {
           inversedBy: "sites",
           joiningColumn: {
             columnName: "post_id",
-            onDelete: "cascade",
+            onDelete: OnDelete.cascade,
           }
         },
         site: {
@@ -141,10 +141,10 @@ const schema: Schema = {
           target: "Site",
           joiningColumn: {
             columnName: "site_id",
-            onDelete: "cascade"
+            onDelete: OnDelete.cascade
           }
         },
-        visibility: {name: "visibility", type: "siteVisibility", columnName: "visibility"},
+        visibility: {name: "visibility", type: "siteVisibility", columnName: "visibility", nullable: false},
       }
     },
     Site: {
@@ -155,12 +155,12 @@ const schema: Schema = {
       tableName: "Site",
       unique: [],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
-        name: {name: "name", type: "string", columnName: "name"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
+        name: {name: "name", type: "string", columnName: "name", nullable: false},
         setting: {
           name: "setting", relation: RelationType.OneHasOne, inversedBy: "site", target: "SiteSetting", nullable: false, joiningColumn: {
             columnName: "setting_id",
-            onDelete: "cascade"
+            onDelete: OnDelete.cascade
           }
         }
       },
@@ -173,8 +173,8 @@ const schema: Schema = {
       tableName: "SiteSetting",
       unique: [],
       fields: {
-        id: {name: "id", type: "uuid", columnName: "id"},
-        url: {name: "url", type: "string", columnName: "url"},
+        id: {name: "id", type: "uuid", columnName: "id", nullable: false},
+        url: {name: "url", type: "string", columnName: "url", nullable: false},
         site: {name: "site", relation: RelationType.OneHasOne, ownedBy: "setting", target: "Site"}
       }
     },

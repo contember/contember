@@ -1,0 +1,26 @@
+{
+  "name": "cms-admin",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc --build --verbose",
+    "start": "tsc --build --verbose --watch"
+  },
+  "dependencies": {
+    "@blueprintjs/core": "^3.0.1",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.2",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-actions": "^2.4.0",
+    "redux-thunk": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.4.6",
+    "@types/react-redux": "5.0.20",
+    "@types/redux-actions": "^2.3.0",
+    "typescript": "^3.0.1"
+  }
+}

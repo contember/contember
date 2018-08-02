@@ -48,6 +48,7 @@ const schema: Schema = {
           relation: RelationType.ManyHasOne,
           target: "Category",
           inversedBy: "locales",
+          nullable: false,
           joiningColumn: {
             columnName: "category_id",
             onDelete: OnDelete.restrict,
@@ -69,6 +70,7 @@ const schema: Schema = {
           name: "author",
           relation: RelationType.ManyHasOne,
           target: "Author",
+          nullable: false,
           joiningColumn: {columnName: "author_id", onDelete: OnDelete.cascade},
           inversedBy: "posts"
         },
@@ -107,6 +109,7 @@ const schema: Schema = {
           relation: RelationType.ManyHasOne,
           target: "Post",
           inversedBy: "locales",
+          nullable: false,
           joiningColumn: {
             columnName: "post_id",
             onDelete: OnDelete.cascade,
@@ -130,6 +133,7 @@ const schema: Schema = {
           relation: RelationType.ManyHasOne,
           target: "Post",
           inversedBy: "sites",
+          nullable: false,
           joiningColumn: {
             columnName: "post_id",
             onDelete: OnDelete.cascade,
@@ -139,6 +143,7 @@ const schema: Schema = {
           name: "site",
           relation: RelationType.ManyHasOne,
           target: "Site",
+          nullable: false,
           joiningColumn: {
             columnName: "site_id",
             onDelete: OnDelete.cascade
@@ -175,7 +180,7 @@ const schema: Schema = {
       fields: {
         id: {name: "id", type: "uuid", columnName: "id", nullable: false},
         url: {name: "url", type: "string", columnName: "url", nullable: false},
-        site: {name: "site", relation: RelationType.OneHasOne, ownedBy: "setting", target: "Site"}
+        site: {name: "site", relation: RelationType.OneHasOne, ownedBy: "setting", nullable: false, target: "Site"}
       }
     },
   }

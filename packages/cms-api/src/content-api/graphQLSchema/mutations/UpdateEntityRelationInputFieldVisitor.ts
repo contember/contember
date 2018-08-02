@@ -1,9 +1,9 @@
 import { GraphQLBoolean, GraphQLInputObjectType } from "graphql"
-import { ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor, Schema } from "../../schema/model"
+import { ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor, Schema } from "../../../content-schema/model"
 import MutationProvider from "../MutationProvider"
 import { GqlTypeName } from "../utils"
 import WhereTypeProvider from "../WhereTypeProvider"
-import { isIt } from "../../utils/type";
+import { isIt } from "../../../utils/type";
 
 export default class UpdateEntityRelationInputFieldVisitor
   implements ColumnVisitor<GraphQLInputObjectType>,

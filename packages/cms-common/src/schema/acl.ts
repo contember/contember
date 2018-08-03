@@ -25,27 +25,35 @@ namespace Acl {
 		fieldName: string
 	}
 
-	type PredicateVariable = string //{ name: string }
-	type PredicateDefinition = Input.Where<PredicateVariable>
+	export type PredicateVariable = string //{ name: string }
+	export type PredicateDefinition = Input.Where<PredicateVariable>
 
-	interface EntityPermissions {
-		predicates: { [name: string]: PredicateDefinition }
+	export type PredicateMap = { [name: string]: PredicateDefinition }
+
+	export interface EntityPermissions {
+		predicates: PredicateMap
 		operations: EntityOperations
 	}
 
-	interface EntityOperations {
+	export interface EntityOperations {
 		read?: FieldPermissions
 		create?: FieldPermissions
 		update?: FieldPermissions
-		delete?: PredicateReference
+		delete?: Predicate
 	}
 
-	type FieldPermissions = { [field: string]: PredicateReference }
-	type PredicateReference = string | true
+	export type FieldPermissions = { [field: string]: Predicate }
 
-	interface RolePermissions {
+	export type PredicateReference = string
+	export type Predicate = PredicateReference | true
+
+	export interface RolePermissions {
 		inherits?: string[]
-		entities: { [entity: string]: EntityPermissions }
+		entities: Permissions
+	}
+
+	export interface Permissions {
+		[entity: string]: EntityPermissions
 	}
 
 	export type Roles = { [role: string]: RolePermissions }

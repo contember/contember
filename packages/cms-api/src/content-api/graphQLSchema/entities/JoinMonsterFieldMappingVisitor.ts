@@ -1,40 +1,26 @@
 import { GraphQLInputObjectType } from "graphql"
 import { aliasInAst, joinToAst } from "../../joinMonster/sqlAstNodeUtils"
 import { JoinMonsterFieldMapping } from "../../joinMonsterHelpers"
-import { Where } from "../../../content-schema/input"
-import {
-  Column,
-  ColumnVisitor,
-  Entity,
-  ManyHasManyInversedRelation,
-  ManyHasManyOwnerRelation,
-  ManyHasOneRelation,
-  OneHasManyRelation,
-  OneHasOneInversedRelation,
-  OneHasOneOwnerRelation,
-  Relation,
-  RelationByTypeVisitor,
-  Schema
-} from "../../../content-schema/model"
+import { Model, Input } from "cms-common"
 import { quoteIdentifier } from "../../sql/utils"
 import { buildWhere } from "../../whereMonster"
 import WhereTypeProvider from "../WhereTypeProvider"
 
 type JoinMonsterFieldMappingWithWhere = JoinMonsterFieldMapping<any, any> & { args?: { where: { type: GraphQLInputObjectType } } }
 export default class JoinMonsterFieldMappingVisitor
-  implements ColumnVisitor<JoinMonsterFieldMapping<any, any>>,
-    RelationByTypeVisitor<JoinMonsterFieldMappingWithWhere>
+  implements Model.ColumnVisitor<JoinMonsterFieldMapping<any, any>>,
+    Model.RelationByTypeVisitor<JoinMonsterFieldMappingWithWhere>
 {
-  private schema: Schema
+  private schema: Model.Schema
   private whereTypeProvider: WhereTypeProvider
 
-  constructor(schema: Schema, whereTypeProvider: WhereTypeProvider)
+  constructor(schema: Model.Schema, whereTypeProvider: WhereTypeProvider)
   {
     this.schema = schema
     this.whereTypeProvider = whereTypeProvider
   }
 
-  public visitColumn(entity: Entity, column: Column): JoinMonsterFieldMapping<any, any>
+  public visitColumn(entity: Model.Entity, column: Model.Column): JoinMonsterFieldMapping<any, any>
   {
     return {
       sqlColumn: column.columnName,
@@ -42,10 +28,10 @@ export default class JoinMonsterFieldMappingVisitor
   }
 
   public visitManyHasManyInversed(
-    entity: Entity,
-    relation: ManyHasManyInversedRelation,
-    targetEntity: Entity,
-    targetRelation: ManyHasManyOwnerRelation
+    entity: Model.Entity,
+    relation: Model.ManyHasManyInversedRelation,
+    targetEntity: Model.Entity,
+    targetRelation: Model.ManyHasManyOwnerRelation
   ): JoinMonsterFieldMappingWithWhere
   {
     return {
@@ -65,10 +51,10 @@ export default class JoinMonsterFieldMappingVisitor
   }
 
   public visitManyHasManyOwner(
-    entity: Entity,
-    relation: ManyHasManyOwnerRelation,
-    targetEntity: Entity,
-    targetRelation: ManyHasManyInversedRelation | null
+    entity: Model.Entity,
+    relation: Model.ManyHasManyOwnerRelation,
+    targetEntity: Model.Entity,
+    targetRelation: Model.ManyHasManyInversedRelation | null
   ): JoinMonsterFieldMappingWithWhere
   {
     return {
@@ -88,10 +74,10 @@ export default class JoinMonsterFieldMappingVisitor
   }
 
   public visitManyHasOne(
-    entity: Entity,
-    relation: ManyHasOneRelation,
-    targetEntity: Entity,
-    targetRelation: OneHasManyRelation | null
+    entity: Model.Entity,
+    relation: Model.ManyHasOneRelation,
+    targetEntity: Model.Entity,
+    targetRelation: Model.OneHasManyRelation | null
   ): JoinMonsterFieldMapping<any, any>
   {
     return {
@@ -102,10 +88,10 @@ export default class JoinMonsterFieldMappingVisitor
   }
 
   public visitOneHasMany(
-    entity: Entity,
-    relation: OneHasManyRelation,
-    targetEntity: Entity,
-    targetRelation: ManyHasOneRelation
+    entity: Model.Entity,
+    relation: Model.OneHasManyRelation,
+    targetEntity: Model.Entity,
+    targetRelation: Model.ManyHasOneRelation
   ): JoinMonsterFieldMappingWithWhere
   {
     return {
@@ -118,10 +104,10 @@ export default class JoinMonsterFieldMappingVisitor
   }
 
   public visitOneHasOneInversed(
-    entity: Entity,
-    relation: OneHasOneInversedRelation,
-    targetEntity: Entity,
-    targetRelation: OneHasOneOwnerRelation
+    entity: Model.Entity,
+    relation: Model.OneHasOneInversedRelation,
+    targetEntity: Model.Entity,
+    targetRelation: Model.OneHasOneOwnerRelation
   ): JoinMonsterFieldMapping<any, any>
   {
     return {
@@ -132,10 +118,10 @@ export default class JoinMonsterFieldMappingVisitor
   }
 
   public visitOneHasOneOwner(
-    entity: Entity,
-    relation: OneHasOneOwnerRelation,
-    targetEntity: Entity,
-    targetRelation: OneHasOneInversedRelation | null
+    entity: Model.Entity,
+    relation: Model.OneHasOneOwnerRelation,
+    targetEntity: Model.Entity,
+    targetRelation: Model.OneHasOneInversedRelation | null
   ): JoinMonsterFieldMapping<any, any>
   {
     return {
@@ -145,13 +131,13 @@ export default class JoinMonsterFieldMappingVisitor
     }
   }
 
-  public getHasManyMapping(relation: Relation, targetEntity: Entity)
+  public getHasManyMapping(relation: Model.Relation, targetEntity: Model.Entity)
   {
     return {
       args: {
         where: {type: this.whereTypeProvider.getEntityWhereType(relation.target)},
       },
-      where: (tableAlias: string, args: { where: Where }, context: any, sqlAstNode: any) => {
+      where: (tableAlias: string, args: { where: Input.Where }, context: any, sqlAstNode: any) => {
         const createAlias = aliasInAst(sqlAstNode)
         return buildWhere(this.schema, targetEntity, joinToAst(this.schema, createAlias)(sqlAstNode, targetEntity))(tableAlias, args.where || {})
       },

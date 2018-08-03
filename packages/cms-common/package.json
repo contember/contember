@@ -2,6 +2,8 @@
   "name": "cms-common",
   "version": "0.0.0",
   "private": true,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "tsc -w -p tsconfig.json"

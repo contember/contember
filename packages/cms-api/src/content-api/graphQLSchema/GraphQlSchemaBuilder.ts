@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLObjectType, GraphQLSchema } from "graphql"
 import { JoinMonsterFieldMapping } from "../joinMonsterHelpers"
-import { Schema } from "../../content-schema/model"
+import { Model } from "cms-common"
 import ColumnTypeResolver from "./ColumnTypeResolver"
 import ConditionTypeProvider from "./ConditionTypeProvider"
 import EntityTypeProvider from "./EntityTypeProvider"
@@ -12,7 +12,7 @@ import WhereTypeProvider from "./WhereTypeProvider"
 
 export default class GraphQlSchemaBuilder
 {
-  private schema: Schema
+  private schema: Model.Schema
   private columnTypeResolver: ColumnTypeResolver
   private conditionTypeProvider: ConditionTypeProvider
   private whereTypeProvider: WhereTypeProvider
@@ -20,7 +20,7 @@ export default class GraphQlSchemaBuilder
   private queryProvider: QueryProvider
   private mutationProvider: MutationProvider
 
-  constructor(schema: Schema)
+  constructor(schema: Model.Schema)
   {
     this.schema = schema
     this.columnTypeResolver = new ColumnTypeResolver(schema, new EnumsProvider(schema))

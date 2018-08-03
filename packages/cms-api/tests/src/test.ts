@@ -7,7 +7,7 @@ import GraphQlSchemaBuilder from "../../src/content-api/graphQLSchema/GraphQlSch
 import { testUuid } from "./testUuid";
 import * as uuid from "../../src/utils/uuid";
 import * as sinon from 'sinon';
-import { Schema } from "../../src/content-schema/model";
+import { Model } from "cms-common";
 
 
 
@@ -20,7 +20,7 @@ export interface SqlQuery
 
 export interface Test
 {
-  schema: Schema
+  schema: Model.Schema
   query: string
   executes: SqlQuery[]
   return: object

@@ -1,13 +1,5 @@
 import { isSqlAstTableNode, Join, SqlAstNode, SqlAstTableNode } from "../joinMonsterHelpers"
-import {
-  Entity,
-  ManyHasOneRelation,
-  OneHasManyRelation,
-  OneHasOneInversedRelation,
-  OneHasOneOwnerRelation,
-  RelationByTypeVisitor,
-  Schema
-} from "../../content-schema/model"
+import { Model } from "cms-common"
 import { acceptFieldVisitor, acceptRelationTypeVisitor, getEntity } from "../../content-schema/modelUtils"
 import { createAlias, quoteIdentifier } from "../sql/utils"
 
@@ -33,11 +25,11 @@ const notSupported = (): never => {
   throw new Error("Only has one relation can be joined this way")
 }
 
-class NodeJoiningInfoVisitor implements RelationByTypeVisitor<JoiningInfo | never>
+class NodeJoiningInfoVisitor implements Model.RelationByTypeVisitor<JoiningInfo | never>
 {
-  private schema: Schema
+  private schema: Model.Schema
 
-  constructor(schema: Schema)
+  constructor(schema: Model.Schema)
   {
     this.schema = schema
   }
@@ -46,7 +38,7 @@ class NodeJoiningInfoVisitor implements RelationByTypeVisitor<JoiningInfo | neve
   public visitManyHasManyOwner = notSupported
   public visitOneHasMany = notSupported
 
-  public visitManyHasOne(entity: Entity, relation: ManyHasOneRelation, targetEntity: Entity, targetRelation: OneHasManyRelation | null): JoiningInfo
+  public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasManyRelation | null): JoiningInfo
   {
     return {
       name: quoteIdentifier(targetEntity.tableName),
@@ -55,7 +47,7 @@ class NodeJoiningInfoVisitor implements RelationByTypeVisitor<JoiningInfo | neve
     }
   }
 
-  public visitOneHasOneInversed(entity: Entity, relation: OneHasOneInversedRelation, targetEntity: Entity, targetRelation: OneHasOneOwnerRelation): JoiningInfo
+  public visitOneHasOneInversed(entity: Model.Entity, relation: Model.OneHasOneInversedRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasOneOwnerRelation): JoiningInfo
   {
     return {
       name: quoteIdentifier(targetEntity.tableName),
@@ -64,7 +56,7 @@ class NodeJoiningInfoVisitor implements RelationByTypeVisitor<JoiningInfo | neve
     }
   }
 
-  public visitOneHasOneOwner(entity: Entity, relation: OneHasOneOwnerRelation, targetEntity: Entity, targetRelation: OneHasOneInversedRelation | null): JoiningInfo
+  public visitOneHasOneOwner(entity: Model.Entity, relation: Model.OneHasOneOwnerRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasOneInversedRelation | null): JoiningInfo
   {
     return {
       name: quoteIdentifier(targetEntity.tableName),
@@ -73,7 +65,7 @@ class NodeJoiningInfoVisitor implements RelationByTypeVisitor<JoiningInfo | neve
     }
   }
 
-  private createChildren(entity: Entity): SqlAstNode[]
+  private createChildren(entity: Model.Entity): SqlAstNode[]
   {
     return [
       {
@@ -93,8 +85,8 @@ class NodeJoiningInfoVisitor implements RelationByTypeVisitor<JoiningInfo | neve
 
 }
 
-const joinToAst = (schema: Schema, createAlias: (name: string) => string) => {
-  const joiner = (sqlAstNode: SqlAstNode, entity: Entity) => (joinPath: string[]): string => {
+const joinToAst = (schema: Model.Schema, createAlias: (name: string) => string) => {
+  const joiner = (sqlAstNode: SqlAstNode, entity: Model.Entity) => (joinPath: string[]): string => {
     const fieldName = joinPath[0]
     let subNode: SqlAstTableNode = sqlAstNode.children.find(it => isSqlAstTableNode(it) && it.fieldName === fieldName) as SqlAstTableNode
     if (!subNode) {

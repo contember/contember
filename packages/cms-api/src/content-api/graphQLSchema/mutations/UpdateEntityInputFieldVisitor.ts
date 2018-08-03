@@ -1,11 +1,11 @@
 import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from "graphql"
-import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../../content-schema/model"
+import { Model } from "cms-common"
 import ColumnTypeResolver from "../ColumnTypeResolver"
 import MutationProvider from "../MutationProvider"
 
 export default class UpdateEntityInputFieldVisitor
-  implements ColumnVisitor<GraphQLInputFieldConfig | undefined>,
-    RelationByGenericTypeVisitor<GraphQLInputFieldConfig | undefined>
+  implements Model.ColumnVisitor<GraphQLInputFieldConfig | undefined>,
+    Model.RelationByGenericTypeVisitor<GraphQLInputFieldConfig | undefined>
 {
   private columnTypeResolver: ColumnTypeResolver
   private mutationProvider: MutationProvider
@@ -16,7 +16,7 @@ export default class UpdateEntityInputFieldVisitor
     this.mutationProvider = mutationProvider
   }
 
-  public visitColumn(entity: Entity, column: Column): GraphQLInputFieldConfig | undefined
+  public visitColumn(entity: Model.Entity, column: Model.Column): GraphQLInputFieldConfig | undefined
   {
     if (entity.primary === column.name) {
       return undefined
@@ -26,14 +26,14 @@ export default class UpdateEntityInputFieldVisitor
     }
   }
 
-  public visitHasOne(entity: Entity, relation: Relation & NullableRelation): GraphQLInputFieldConfig
+  public visitHasOne(entity: Model.Entity, relation: Model.Relation & Model.NullableRelation): GraphQLInputFieldConfig
   {
     return {
       type: this.mutationProvider.getUpdateEntityRelationInput(entity.name, relation.name),
     }
   }
 
-  public visitHasMany(entity: Entity, relation: Relation): GraphQLInputFieldConfig
+  public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLInputFieldConfig
   {
     const type = this.mutationProvider.getUpdateEntityRelationInput(entity.name, relation.name)
     return {

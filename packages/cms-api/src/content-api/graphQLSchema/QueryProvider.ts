@@ -1,9 +1,8 @@
 import { GraphQLError, GraphQLFieldConfig, GraphQLFieldResolver, GraphQLList, GraphQLNonNull } from "graphql"
 import { aliasInAst, joinToAst } from "../joinMonster/sqlAstNodeUtils"
 import { JoinMonsterFieldMapping } from "../joinMonsterHelpers"
-import { ListQueryInput, UniqueQueryInput } from "../../content-schema/input"
 import { isUniqueWhere } from "../../content-schema/inputUtils"
-import { Schema } from "../../content-schema/model"
+import { Model, Input } from "cms-common"
 import { getEntity } from "../../content-schema/modelUtils"
 import { Context } from "../types"
 import { buildWhere } from "../whereMonster"
@@ -15,13 +14,13 @@ type FieldConfig<TArgs> = JoinMonsterFieldMapping<Context, TArgs> & GraphQLField
 
 export default class QueryProvider
 {
-  private schema: Schema
+  private schema: Model.Schema
   private whereTypeProvider: WhereTypeProvider
   private entityTypeProvider: EntityTypeProvider
   private resolver: GraphQLFieldResolver<any, any>
 
   constructor(
-    schema: Schema,
+    schema: Model.Schema,
     whereTypeProvider: WhereTypeProvider,
     entityTypeProvider: EntityTypeProvider,
     resolver: GraphQLFieldResolver<any, any>
@@ -42,7 +41,7 @@ export default class QueryProvider
     }
   }
 
-  private getByUniqueQuery(entityName: string): FieldConfig<UniqueQueryInput>
+  private getByUniqueQuery(entityName: string): FieldConfig<Input.UniqueQueryInput>
   {
     const entity = getEntity(this.schema, entityName)
     return {
@@ -62,7 +61,7 @@ export default class QueryProvider
     }
   }
 
-  private getListQuery(entityName: string): FieldConfig<ListQueryInput>
+  private getListQuery(entityName: string): FieldConfig<Input.ListQueryInput>
   {
     const entity = getEntity(this.schema, entityName)
 

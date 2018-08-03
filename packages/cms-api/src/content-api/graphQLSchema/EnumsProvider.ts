@@ -1,16 +1,16 @@
 import { GraphQLEnumType } from "graphql"
 import { GraphQLEnumValueConfigMap } from "graphql/type/definition"
-import { Schema } from "../../content-schema/model"
+import { Model } from "cms-common"
 import singletonFactory from "../../utils/singletonFactory"
 import { capitalizeFirstLetter } from "../../utils/strings"
 
 export default class EnumsProvider
 {
-  private schema: Schema
+  private schema: Model.Schema
 
   private enums = singletonFactory(name => this.createEnum(name))
 
-  constructor(schema: Schema)
+  constructor(schema: Model.Schema)
   {
     this.schema = schema
   }

@@ -1,14 +1,14 @@
 import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLScalarType, GraphQLString } from "graphql"
-import { Schema } from "../../content-schema/model"
+import { Model } from "cms-common"
 import { GraphQLUUID } from "./customTypes"
 import EnumsProvider from "./EnumsProvider"
 
 export default class ColumnTypeResolver
 {
-  private schema: Schema
+  private schema: Model.Schema
   private enumsProvider: EnumsProvider
 
-  constructor(schema: Schema, enumsProvider: EnumsProvider)
+  constructor(schema: Model.Schema, enumsProvider: EnumsProvider)
   {
     this.schema = schema
     this.enumsProvider = enumsProvider

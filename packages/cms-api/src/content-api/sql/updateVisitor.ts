@@ -1,47 +1,16 @@
-import {
-  ColumnValue,
-  ConnectRelationInput,
-  CreateDataInput,
-  CreateManyRelationInput,
-  CreateRelationInput,
-  DeleteRelationInput,
-  DeleteSpecifiedRelationInput,
-  DisconnectRelationInput,
-  DisconnectSpecifiedRelationInput,
-  PrimaryValue,
-  UniqueWhere,
-  UpdateDataInput,
-  UpdateManyRelationInput,
-  UpdateOneRelationInput,
-  UpdateRelationInput,
-  UpdateSpecifiedRelationInput,
-  UpsertRelationInput,
-  UpsertSpecifiedRelationInput
-} from "../../content-schema/input"
-import {
-  Column,
-  ColumnVisitor,
-  Entity,
-  ManyHasManyInversedRelation,
-  ManyHasManyOwnerRelation,
-  ManyHasOneRelation,
-  OneHasManyRelation,
-  OneHasOneInversedRelation,
-  OneHasOneOwnerRelation,
-  RelationByTypeVisitor
-} from "../../content-schema/model"
+import { Input, Model } from "cms-common"
 import { isIt } from "../../utils/type"
 import { Mapper, UpdateBuilder } from "./mapper"
 
 interface HasOneRelationInputProcessor
 {
-  connect(input: UniqueWhere): PromiseLike<void>
+  connect(input: Input.UniqueWhere): PromiseLike<void>
 
-  create(input: CreateDataInput): PromiseLike<void>
+  create(input: Input.CreateDataInput): PromiseLike<void>
 
-  update(input: UpdateDataInput): PromiseLike<void>
+  update(input: Input.UpdateDataInput): PromiseLike<void>
 
-  upsert(update: UpdateDataInput, create: CreateDataInput): PromiseLike<void>
+  upsert(update: Input.UpdateDataInput, create: Input.CreateDataInput): PromiseLike<void>
 
   disconnect(): PromiseLike<void>
 
@@ -50,27 +19,27 @@ interface HasOneRelationInputProcessor
 
 interface HasManyRelationInputProcessor
 {
-  connect(input: UniqueWhere): PromiseLike<void>
+  connect(input: Input.UniqueWhere): PromiseLike<void>
 
-  create(input: CreateDataInput): PromiseLike<void>
+  create(input: Input.CreateDataInput): PromiseLike<void>
 
-  update(where: UniqueWhere, input: UpdateDataInput): PromiseLike<void>
+  update(where: Input.UniqueWhere, input: Input.UpdateDataInput): PromiseLike<void>
 
-  upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput): PromiseLike<void>
+  upsert(where: Input.UniqueWhere, update: Input.UpdateDataInput, create: Input.CreateDataInput): PromiseLike<void>
 
-  disconnect(where: UniqueWhere): PromiseLike<void>
+  disconnect(where: Input.UniqueWhere): PromiseLike<void>
 
-  delete(where: UniqueWhere): PromiseLike<void>
+  delete(where: Input.UniqueWhere): PromiseLike<void>
 }
 
-export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTypeVisitor<PromiseLike<any>>
+export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.RelationByTypeVisitor<PromiseLike<any>>
 {
-  private primaryValue: PrimaryValue
-  private data: UpdateDataInput
+  private primaryValue: Input.PrimaryValue
+  private data: Input.UpdateDataInput
   private updateBuilder: UpdateBuilder
   private mapper: Mapper
 
-  constructor(primaryValue: PrimaryValue, data: UpdateDataInput, updateBuilder: UpdateBuilder, mapper: Mapper)
+  constructor(primaryValue: Input.PrimaryValue, data: Input.UpdateDataInput, updateBuilder: UpdateBuilder, mapper: Mapper)
   {
     this.primaryValue = primaryValue
     this.data = data
@@ -78,16 +47,16 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     this.mapper = mapper
   }
 
-  public visitColumn(entity: Entity, column: Column): void
+  public visitColumn(entity: Model.Entity, column: Model.Column): void
   {
     if (this.data[column.name] !== undefined) {
-      this.updateBuilder.addColumnData(column.columnName, this.data[column.name] as ColumnValue)
+      this.updateBuilder.addColumnData(column.columnName, this.data[column.name] as Input.ColumnValue)
     }
   }
 
-  public visitManyHasManyInversed(entity: Entity, relation: ManyHasManyInversedRelation, targetEntity: Entity, targetRelation: ManyHasManyOwnerRelation)
+  public visitManyHasManyInversed(entity: Model.Entity, relation: Model.ManyHasManyInversedRelation, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation)
   {
-    const relationData = this.data[relation.name] as CreateManyRelationInput
+    const relationData = this.data[relation.name] as Input.CreateManyRelationInput
     if (relationData === undefined) {
       return Promise.resolve(undefined)
     }
@@ -95,41 +64,41 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
     const mapper = this.mapper
 
-    const connect = (primaryUnique: UniqueWhere) => mapper.connectJunction(targetEntity, targetRelation, primaryUnique, thisUnique)
-    const disconnect = (primaryUnique: UniqueWhere) => mapper.disconnectJunction(targetEntity, targetRelation, primaryUnique, thisUnique)
+    const connect = (primaryUnique: Input.UniqueWhere) => mapper.connectJunction(targetEntity, targetRelation, primaryUnique, thisUnique)
+    const disconnect = (primaryUnique: Input.UniqueWhere) => mapper.disconnectJunction(targetEntity, targetRelation, primaryUnique, thisUnique)
 
     return this.processHasManyRelationInput(relationData, new class implements HasManyRelationInputProcessor
     {
-      public async connect(input: UniqueWhere)
+      public async connect(input: Input.UniqueWhere)
       {
         await connect(input)
       }
 
-      public async create(input: CreateDataInput)
+      public async create(input: Input.CreateDataInput)
       {
         const primaryOwner = await mapper.insert(targetEntity.name, input)
         await connect({[targetEntity.primary]: primaryOwner})
       }
 
-      public async delete(where: UniqueWhere)
+      public async delete(where: Input.UniqueWhere)
       {
         await disconnect(where)
         await mapper.delete(targetEntity.name, where)
       }
 
-      public async disconnect(where: UniqueWhere)
+      public async disconnect(where: Input.UniqueWhere)
       {
         await disconnect(where)
       }
 
-      public async update(where: UniqueWhere, input: UpdateDataInput)
+      public async update(where: Input.UniqueWhere, input: Input.UpdateDataInput)
       {
         // fixme should check if relation really exists
         await mapper.update(targetEntity.name, where, input)
         await connect(where)
       }
 
-      public async upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput)
+      public async upsert(where: Input.UniqueWhere, update: Input.UpdateDataInput, create: Input.CreateDataInput)
       {
         // fixme should check if relation really exists
         const result = await mapper.update(targetEntity.name, where, update)
@@ -144,9 +113,9 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  public visitManyHasManyOwner(entity: Entity, relation: ManyHasManyOwnerRelation, targetEntity: Entity, targetRelation: ManyHasManyInversedRelation | null)
+  public visitManyHasManyOwner(entity: Model.Entity, relation: Model.ManyHasManyOwnerRelation, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyInversedRelation | null)
   {
-    const relationData = this.data[relation.name] as UpdateManyRelationInput
+    const relationData = this.data[relation.name] as Input.UpdateManyRelationInput
     if (relationData === undefined) {
       return Promise.resolve(undefined)
     }
@@ -154,34 +123,34 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
     const mapper = this.mapper
 
-    const connect = (inversedUnique: UniqueWhere) => mapper.connectJunction(entity, relation, primaryUnique, inversedUnique)
-    const disconnect = (inversedUnique: UniqueWhere) => mapper.disconnectJunction(entity, relation, primaryUnique, inversedUnique)
+    const connect = (inversedUnique: Input.UniqueWhere) => mapper.connectJunction(entity, relation, primaryUnique, inversedUnique)
+    const disconnect = (inversedUnique: Input.UniqueWhere) => mapper.disconnectJunction(entity, relation, primaryUnique, inversedUnique)
 
     return this.processHasManyRelationInput(relationData, new class implements HasManyRelationInputProcessor
     {
-      public async connect(input: UniqueWhere)
+      public async connect(input: Input.UniqueWhere)
       {
         await connect(input)
       }
 
-      public async create(input: CreateDataInput)
+      public async create(input: Input.CreateDataInput)
       {
         const primaryOwner = await mapper.insert(targetEntity.name, input)
         await connect({[targetEntity.primary]: primaryOwner})
       }
 
-      public async delete(where: UniqueWhere)
+      public async delete(where: Input.UniqueWhere)
       {
         await disconnect(where)
         await mapper.delete(targetEntity.name, where)
       }
 
-      public async disconnect(where: UniqueWhere)
+      public async disconnect(where: Input.UniqueWhere)
       {
         await disconnect(where)
       }
 
-      public async update(where: UniqueWhere, input: UpdateDataInput)
+      public async update(where: Input.UniqueWhere, input: Input.UpdateDataInput)
       {
         // fixme should check if relation really exists
         await mapper.update(targetEntity.name, where, input)
@@ -189,7 +158,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         await connect(where)
       }
 
-      public async upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput)
+      public async upsert(where: Input.UniqueWhere, update: Input.UpdateDataInput, create: Input.CreateDataInput)
       {
         // fixme should check if relation really exists
         const result = await mapper.update(targetEntity.name, where, update)
@@ -204,21 +173,21 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  public visitManyHasOne(entity: Entity, relation: ManyHasOneRelation, targetEntity: Entity, targetRelation: OneHasManyRelation | null)
+  public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasManyRelation | null)
   {
-    const relationData = this.data[relation.name] as UpdateOneRelationInput
+    const relationData = this.data[relation.name] as Input.UpdateOneRelationInput
     const updateBuilder = this.updateBuilder
     const mapper = this.mapper
     const primaryUnique = {[entity.primary]: this.primaryValue}
 
     return this.processHasOneRelationInput(relationData, new class implements HasOneRelationInputProcessor
     {
-      public async connect(input: UniqueWhere)
+      public async connect(input: Input.UniqueWhere)
       {
         updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.getPrimaryValue(targetEntity, input))
       }
 
-      public async create(input: CreateDataInput)
+      public async create(input: Input.CreateDataInput)
       {
         updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity.name, input))
       }
@@ -236,13 +205,13 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         updateBuilder.addColumnData(relation.joiningColumn.columnName, null)
       }
 
-      public async update(input: UpdateDataInput)
+      public async update(input: Input.UpdateDataInput)
       {
         const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         await mapper.update(targetEntity.name, {[targetEntity.primary]: inversedPrimary}, input)
       }
 
-      public async upsert(update: UpdateDataInput, create: CreateDataInput)
+      public async upsert(update: Input.UpdateDataInput, create: Input.CreateDataInput)
       {
         const select = mapper.selectField(entity.name, primaryUnique, relation.name)
 
@@ -263,9 +232,9 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  public visitOneHasMany(entity: Entity, relation: OneHasManyRelation, targetEntity: Entity, targetRelation: ManyHasOneRelation)
+  public visitOneHasMany(entity: Model.Entity, relation: Model.OneHasManyRelation, targetEntity: Model.Entity, targetRelation: Model.ManyHasOneRelation)
   {
-    const relationData = this.data[relation.name] as CreateManyRelationInput
+    const relationData = this.data[relation.name] as Input.CreateManyRelationInput
     if (relationData === undefined) {
       return Promise.resolve(undefined)
     }
@@ -276,14 +245,14 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
     return this.processHasManyRelationInput(relationData, new class implements HasManyRelationInputProcessor
     {
-      public async connect(input: UniqueWhere)
+      public async connect(input: Input.UniqueWhere)
       {
         await mapper.update(targetEntity.name, input, {
           [targetRelation.name]: {connect: thisPrimary}
         })
       }
 
-      public async create(input: CreateDataInput)
+      public async create(input: Input.CreateDataInput)
       {
         await mapper.insert(targetEntity.name, {
           ...input,
@@ -291,17 +260,17 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      public async delete(where: UniqueWhere)
+      public async delete(where: Input.UniqueWhere)
       {
         await mapper.delete(targetEntity.name, {...where, [targetRelation.name]: primaryValue})
       }
 
-      public async disconnect(where: UniqueWhere)
+      public async disconnect(where: Input.UniqueWhere)
       {
         await mapper.update(targetEntity.name, {...where, [targetRelation.name]: primaryValue}, {[targetRelation.name]: {disconnect: true}})
       }
 
-      public async update(where: UniqueWhere, input: UpdateDataInput)
+      public async update(where: Input.UniqueWhere, input: Input.UpdateDataInput)
       {
         await mapper.update(targetEntity.name, {...where, [targetRelation.name]: primaryValue}, {
           ...input,
@@ -309,7 +278,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      public async upsert(where: UniqueWhere, update: UpdateDataInput, create: CreateDataInput)
+      public async upsert(where: Input.UniqueWhere, update: Input.UpdateDataInput, create: Input.CreateDataInput)
       {
         const result = await mapper.update(targetEntity.name, {...where, [targetRelation.name]: primaryValue}, {
           ...update,
@@ -325,9 +294,9 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  public visitOneHasOneInversed(entity: Entity, relation: OneHasOneInversedRelation, targetEntity: Entity, targetRelation: OneHasOneOwnerRelation)
+  public visitOneHasOneInversed(entity: Model.Entity, relation: Model.OneHasOneInversedRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasOneOwnerRelation)
   {
-    const relationData = this.data[relation.name] as UpdateOneRelationInput
+    const relationData = this.data[relation.name] as Input.UpdateOneRelationInput
     const thisPrimary = {[entity.primary]: this.primaryValue}
 
     const mapper = this.mapper
@@ -336,12 +305,12 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
     return this.processHasOneRelationInput(relationData, new class implements HasOneRelationInputProcessor
     {
-      public async connect(where: UniqueWhere)
+      public async connect(where: Input.UniqueWhere)
       {
         await mapper.update(targetEntity.name, where, {[targetRelation.name]: {connect: thisPrimary}})
       }
 
-      public async create(input: CreateDataInput)
+      public async create(input: Input.CreateDataInput)
       {
         await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, {[targetRelation.name]: {disconnect: true}})
         await mapper.insert(targetEntity.name, {
@@ -360,12 +329,12 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, {[targetRelation.name]: {disconnect: true}})
       }
 
-      public async update(input: UpdateDataInput)
+      public async update(input: Input.UpdateDataInput)
       {
         await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, input)
       }
 
-      public async upsert(update: UpdateDataInput, create: CreateDataInput)
+      public async upsert(update: Input.UpdateDataInput, create: Input.CreateDataInput)
       {
         const result = await mapper.update(targetEntity.name, {[targetRelation.name]: primaryValue}, update)
         if (result === 0) {
@@ -378,9 +347,9 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  public visitOneHasOneOwner(entity: Entity, relation: OneHasOneOwnerRelation, targetEntity: Entity, targetRelation: OneHasOneInversedRelation | null)
+  public visitOneHasOneOwner(entity: Model.Entity, relation: Model.OneHasOneOwnerRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasOneInversedRelation | null)
   {
-    const relationData = this.data[relation.name] as UpdateOneRelationInput
+    const relationData = this.data[relation.name] as Input.UpdateOneRelationInput
     const updateBuilder = this.updateBuilder
     const mapper = this.mapper
     const primaryValue = this.primaryValue;
@@ -388,7 +357,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
 
     return this.processHasOneRelationInput(relationData, new class implements HasOneRelationInputProcessor
     {
-      public async connect(input: UniqueWhere)
+      public async connect(input: Input.UniqueWhere)
       {
         updateBuilder.addColumnData(relation.joiningColumn.columnName, async () => {
           const relationPrimary = await mapper.getPrimaryValue(targetEntity, input);
@@ -405,7 +374,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         })
       }
 
-      public async create(input: CreateDataInput)
+      public async create(input: Input.CreateDataInput)
       {
         updateBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity.name, input))
       }
@@ -422,13 +391,13 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
         updateBuilder.addColumnData(relation.joiningColumn.columnName, null)
       }
 
-      public async update(input: UpdateDataInput)
+      public async update(input: Input.UpdateDataInput)
       {
         const inversedPrimary = await mapper.selectField(entity.name, primaryUnique, relation.name)
         await mapper.update(targetEntity.name, {[targetEntity.primary]: inversedPrimary}, input)
       }
 
-      public async upsert(update: UpdateDataInput, create: CreateDataInput)
+      public async upsert(update: Input.UpdateDataInput, create: Input.CreateDataInput)
       {
         const select = mapper.selectField(entity.name, primaryUnique, relation.name)
 
@@ -449,34 +418,34 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     })
   }
 
-  private processHasOneRelationInput(input: UpdateOneRelationInput | undefined, processor: HasOneRelationInputProcessor): PromiseLike<any>
+  private processHasOneRelationInput(input: Input.UpdateOneRelationInput | undefined, processor: HasOneRelationInputProcessor): PromiseLike<any>
   {
     if (input === undefined) {
       return Promise.resolve(undefined)
     }
     const operation = []
     let result
-    if (isIt<ConnectRelationInput>(input, "connect")) {
+    if (isIt<Input.ConnectRelationInput>(input, "connect")) {
       operation.push("connect")
       result = processor.connect(input.connect)
     }
-    if (isIt<CreateRelationInput>(input, "create")) {
+    if (isIt<Input.CreateRelationInput>(input, "create")) {
       operation.push("create")
       result = processor.create(input.create)
     }
-    if (isIt<DeleteRelationInput>(input, "delete")) {
+    if (isIt<Input.DeleteRelationInput>(input, "delete")) {
       operation.push("delete")
       result = processor.delete()
     }
-    if (isIt<DisconnectRelationInput>(input, "disconnect")) {
+    if (isIt<Input.DisconnectRelationInput>(input, "disconnect")) {
       operation.push("disconnect")
       result = processor.disconnect()
     }
-    if (isIt<UpdateRelationInput>(input, "update")) {
+    if (isIt<Input.UpdateRelationInput>(input, "update")) {
       operation.push("update")
       result = processor.update(input.update)
     }
-    if (isIt<UpsertRelationInput>(input, "upsert")) {
+    if (isIt<Input.UpsertRelationInput>(input, "upsert")) {
       operation.push("upsert")
       result = processor.upsert(input.upsert.update, input.upsert.create)
     }
@@ -491,7 +460,7 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     return result
   }
 
-  private processHasManyRelationInput(input: UpdateManyRelationInput | undefined, processor: HasManyRelationInputProcessor): PromiseLike<any>
+  private processHasManyRelationInput(input: Input.UpdateManyRelationInput | undefined, processor: HasManyRelationInputProcessor): PromiseLike<any>
   {
     if (input === undefined) {
       return Promise.resolve(undefined)
@@ -500,27 +469,27 @@ export default class UpdateVisitor implements ColumnVisitor<void>, RelationByTyp
     for (const element of input) {
       const operation = []
       let result
-      if (isIt<ConnectRelationInput>(element, "connect")) {
+      if (isIt<Input.ConnectRelationInput>(element, "connect")) {
         operation.push("connect")
         result = processor.connect(element.connect)
       }
-      if (isIt<CreateRelationInput>(element, "create")) {
+      if (isIt<Input.CreateRelationInput>(element, "create")) {
         operation.push("create")
         result = processor.create(element.create)
       }
-      if (isIt<DeleteSpecifiedRelationInput>(element, "delete")) {
+      if (isIt<Input.DeleteSpecifiedRelationInput>(element, "delete")) {
         operation.push("delete")
         result = processor.delete(element.delete)
       }
-      if (isIt<DisconnectSpecifiedRelationInput>(element, "disconnect")) {
+      if (isIt<Input.DisconnectSpecifiedRelationInput>(element, "disconnect")) {
         operation.push("disconnect")
         result = processor.disconnect(element.disconnect)
       }
-      if (isIt<UpdateSpecifiedRelationInput>(element, "update")) {
+      if (isIt<Input.UpdateSpecifiedRelationInput>(element, "update")) {
         operation.push("update")
         result = processor.update(element.update.where, element.update.data)
       }
-      if (isIt<UpsertSpecifiedRelationInput>(element, "upsert")) {
+      if (isIt<Input.UpsertSpecifiedRelationInput>(element, "upsert")) {
         operation.push("upsert")
         result = processor.upsert(element.upsert.where, element.upsert.update, element.upsert.create)
       }

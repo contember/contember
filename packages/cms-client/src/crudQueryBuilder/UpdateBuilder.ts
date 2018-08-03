@@ -1,8 +1,9 @@
-import { ObjectBuilder } from "../graphQlBuilder/ObjectBuilder";
-import { UniqueWhere, UpdateDataInput } from "cms-common/dist/schema/input";
+import ObjectBuilder from "../graphQlBuilder/ObjectBuilder";
 import UpdateDataBuilder from "./UpdateDataBuilder";
 import DataBuilder from "./DataBuilder";
-import { Literal } from "../graphQlBuilder/Literal";
+import Literal from "../graphQlBuilder/Literal";
+
+import { Input } from "cms-common";
 
 
 export default class UpdateBuilder
@@ -13,12 +14,12 @@ export default class UpdateBuilder
   {
   }
 
-  where(where: UniqueWhere<Literal>)
+  where(where: Input.UniqueWhere<Literal>)
   {
     return new UpdateBuilder(this.objectBuilder.argument('where', where))
   }
 
-  data(data: DataBuilder.DataLike<UpdateDataInput<Literal>, UpdateDataBuilder>)
+  data(data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>)
   {
     return new UpdateBuilder(this.objectBuilder.argument('data', DataBuilder.resolveData(data, UpdateDataBuilder)))
   }

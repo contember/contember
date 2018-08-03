@@ -1,10 +1,11 @@
-import { CreateDataInput, UniqueWhere, UpdateDataInput, UpdateOneRelationInput } from "cms-common/src/schema/input";
 import DataBuilder from './DataBuilder'
 import CreateDataBuilder from "./CreateDataBuilder";
 import UpdateDataBuilder from "./UpdateDataBuilder";
-import { Literal } from "../graphQlBuilder/Literal";
+import Literal from "../graphQlBuilder/Literal";
 
-export default class UpdateOneRelationBuilder<D extends UpdateOneRelationInput<Literal> | undefined = UpdateOneRelationInput<Literal>>
+import { Input } from "cms-common";
+
+export default class UpdateOneRelationBuilder<D extends Input.UpdateOneRelationInput<Literal> | undefined = Input.UpdateOneRelationInput<Literal>>
 {
   constructor(
     public readonly data: D = undefined as D
@@ -12,12 +13,12 @@ export default class UpdateOneRelationBuilder<D extends UpdateOneRelationInput<L
   {
   }
 
-  public create(data: DataBuilder.DataLike<CreateDataInput<Literal>, CreateDataBuilder>)
+  public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>)
   {
     return new UpdateOneRelationBuilder({create: DataBuilder.resolveData(data, CreateDataBuilder)})
   }
 
-  public connect(where: UniqueWhere<Literal>)
+  public connect(where: Input.UniqueWhere<Literal>)
   {
     return new UpdateOneRelationBuilder({connect: where})
   }
@@ -32,14 +33,14 @@ export default class UpdateOneRelationBuilder<D extends UpdateOneRelationInput<L
     return new UpdateOneRelationBuilder({disconnect: true})
   }
 
-  public update(data: DataBuilder.DataLike<UpdateDataInput<Literal>, UpdateDataBuilder>)
+  public update(data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>)
   {
     return new UpdateOneRelationBuilder({update: DataBuilder.resolveData(data, UpdateDataBuilder)})
   }
 
   public upsert(
-    update: DataBuilder.DataLike<UpdateDataInput<Literal>, UpdateDataBuilder>,
-    create: DataBuilder.DataLike<CreateDataInput<Literal>, CreateDataBuilder>)
+    update: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>,
+    create: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>)
   {
     return new UpdateOneRelationBuilder({
       upsert: {

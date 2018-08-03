@@ -1,13 +1,13 @@
-import { ObjectBuilder } from "./ObjectBuilder";
-import { Literal } from "./Literal";
-import { RootObjectBuilder } from "./RootObjectBuilder";
+import ObjectBuilder from "./ObjectBuilder";
+import Literal from "./Literal";
+import RootObjectBuilder from "./RootObjectBuilder";
 
 interface GenericObjectBuilder
 {
   readonly objects: { [name: string]: ObjectBuilder }
 }
 
-export class QueryCompiler
+export default class QueryCompiler
 {
   constructor(
     private operation: 'query' | 'mutation',

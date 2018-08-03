@@ -1,6 +1,6 @@
 import OneHasOneBuilder from "../OneHasOneBuilder"
 import FieldProcessor from "./FieldProcessor"
-import { JoiningColumn, OnDelete, OneHasOneInversedRelation, OneHasOneOwnerRelation, RelationType } from "../../model"
+import { Model } from "cms-common"
 import NamingConventions from "../NamingConventions";
 
 export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuilder.Options>
@@ -20,30 +20,30 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
     }
   }
 
-  private createOneHasOneInversed(options: OneHasOneBuilder.Options & { inversedBy: string }, entityName: string, fieldName: string): OneHasOneInversedRelation
+  private createOneHasOneInversed(options: OneHasOneBuilder.Options & { inversedBy: string }, entityName: string, fieldName: string): Model.OneHasOneInversedRelation
   {
     return {
       name: options.inversedBy,
       ownedBy: fieldName,
       target: entityName,
-      relation: RelationType.OneHasOne,
+      relation: Model.RelationType.OneHasOne,
       nullable: options.inversedNullable === undefined ? true : options.inversedNullable,
     }
   }
 
-  private createOneHasOneOwner(options: OneHasOneBuilder.Options, fieldName: string): OneHasOneOwnerRelation
+  private createOneHasOneOwner(options: OneHasOneBuilder.Options, fieldName: string): Model.OneHasOneOwnerRelation
   {
-    const joiningColumn: Partial<JoiningColumn> = options.joiningColumn || {}
+    const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
 
     return {
       name: fieldName,
       inversedBy: options.inversedBy,
       nullable: options.nullable === undefined ? true :  options.nullable,
-      relation: RelationType.OneHasOne,
+      relation: Model.RelationType.OneHasOne,
       target: options.target,
       joiningColumn: {
         columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
-        onDelete: joiningColumn.onDelete || OnDelete.restrict,
+        onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
       },
     }
   }

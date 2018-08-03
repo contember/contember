@@ -1,6 +1,6 @@
-import { RootObjectBuilder } from "./RootObjectBuilder";
-import { QueryCompiler } from "./QueryCompiler";
-import { Literal } from "./Literal";
+import RootObjectBuilder from "./RootObjectBuilder";
+import QueryCompiler from "./QueryCompiler";
+import Literal from "./Literal";
 
 class QueryBuilder
 {

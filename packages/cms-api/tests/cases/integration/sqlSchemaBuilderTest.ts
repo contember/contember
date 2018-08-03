@@ -2,7 +2,7 @@ import SchemaBuilder from "../../../src/content-schema/builder/SchemaBuilder";
 import { expect } from "chai"
 import getSql from "../../../src/content-api/sqlSchema/sqlSchemaBuilderHelper";
 import { SQL } from "../../src/tags";
-import { OnDelete } from "../../../src/content-schema/model";
+import { Model } from "cms-common";
 import 'mocha'
 
 const test = (test: { builder: (builder: SchemaBuilder) => SchemaBuilder, sql: string }) => {
@@ -35,7 +35,7 @@ describe('Create SQL schema', () => {
       builder: builder => builder
         .entity("Post", e => e
           .column('title', c => c.type('string'))
-          .manyHasOne('author', r => r.target('Author').onDelete(OnDelete.cascade))
+          .manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade))
         )
         .entity("Author", e => e
           .column("name", c => c.type('string'))

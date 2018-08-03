@@ -1,13 +1,13 @@
-import { ColumnValue, GenericValueLike } from "../../content-schema/input"
+import { Input } from "cms-common"
 
-export const resolveValue = <T>(value: GenericValueLike<T>): PromiseLike<T> => {
+export const resolveValue = <T>(value: Input.GenericValueLike<T>): PromiseLike<T> => {
   if (typeof value === "function") {
     value = value()
   }
   return Promise.resolve(value)
 }
 
-export const escapeParameter = (val: ColumnValue): string => {
+export const escapeParameter = (val: Input.ColumnValue): string => {
   if (val === null) {
     return "NULL"
   }

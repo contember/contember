@@ -1,9 +1,10 @@
-import { CreateDataInput, CreateOneRelationInput, UniqueWhere } from "cms-common/src/schema/input";
 import DataBuilder from "./DataBuilder";
 import CreateDataBuilder from "./CreateDataBuilder";
-import { Literal } from "../graphQlBuilder/Literal";
+import Literal from "../graphQlBuilder/Literal";
 
-export default class CreateOneRelationBuilder<D extends CreateOneRelationInput<Literal> | undefined = CreateOneRelationInput<Literal>>
+import { Input } from "cms-common";
+
+export default class CreateOneRelationBuilder<D extends Input.CreateOneRelationInput<Literal> | undefined = Input.CreateOneRelationInput<Literal>>
 {
   constructor(
     public readonly data: D = undefined as D
@@ -11,12 +12,12 @@ export default class CreateOneRelationBuilder<D extends CreateOneRelationInput<L
   {
   }
 
-  public create(data: DataBuilder.DataLike<CreateDataInput<Literal>, CreateDataBuilder>)
+  public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>)
   {
     return new CreateOneRelationBuilder({create: DataBuilder.resolveData(data, CreateDataBuilder)})
   }
 
-  public connect(where: UniqueWhere<Literal>)
+  public connect(where: Input.UniqueWhere<Literal>)
   {
     return new CreateOneRelationBuilder({connect: where})
   }

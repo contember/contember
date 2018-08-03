@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLOutputType } from "graphql"
 import { JoinMonsterEntityMapping, JoinMonsterFieldMapping } from "../joinMonsterHelpers"
-import { Schema } from "../../content-schema/model"
+import { Model } from "cms-common"
 import { acceptFieldVisitor, getEntity } from "../../content-schema/modelUtils"
 import { quoteIdentifier } from "../sql/utils"
 import singletonFactory from "../../utils/singletonFactory"
@@ -12,13 +12,13 @@ import WhereTypeProvider from "./WhereTypeProvider"
 
 export default class EntityTypeProvider
 {
-  private schema: Schema
+  private schema: Model.Schema
   private columnTypeResolver: ColumnTypeResolver
   private whereTypeProvider: WhereTypeProvider
 
   private entities = singletonFactory(name => this.createEntity(name))
 
-  constructor(schema: Schema, columnTypeResolver: ColumnTypeResolver, whereTypeProvider: WhereTypeProvider)
+  constructor(schema: Model.Schema, columnTypeResolver: ColumnTypeResolver, whereTypeProvider: WhereTypeProvider)
   {
     this.schema = schema
     this.columnTypeResolver = columnTypeResolver

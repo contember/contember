@@ -1,7 +1,6 @@
 import * as Knex from "knex"
-import { ColumnValue, ColumnValueLike, CreateDataInput, PrimaryValue, UniqueWhere, UpdateDataInput } from "../../content-schema/input"
+import { Input, Model } from "cms-common"
 import { isUniqueWhere } from "../../content-schema/inputUtils"
-import { Entity, ManyHasManyOwnerRelation, Schema } from "../../content-schema/model"
 import { acceptEveryFieldVisitor, getColumnName, getEntity } from "../../content-schema/modelUtils"
 import { promiseAllObject } from "../../utils/promises"
 import InsertVisitor from "./insertVisitor"
@@ -10,12 +9,12 @@ import { resolveValue } from "./utils"
 
 export class InsertBuilder
 {
-  private rowData: { [columnName: string]: PromiseLike<ColumnValue> } = {}
+  private rowData: { [columnName: string]: PromiseLike<Input.ColumnValue> } = {}
 
   private tableName: string
   private primaryColumn: string
   private db: Knex
-  private insertPromise: Promise<PrimaryValue>
+  private insertPromise: Promise<Input.PrimaryValue>
 
   constructor(tableName: string, primaryColumn: string, db: Knex, firer: PromiseLike<void>)
   {
@@ -25,12 +24,12 @@ export class InsertBuilder
     this.insertPromise = this.createInsertPromise(firer)
   }
 
-  public addColumnData(columnName: string, value: ColumnValueLike)
+  public addColumnData(columnName: string, value: Input.ColumnValueLike)
   {
     this.rowData[columnName] = resolveValue(value)
   }
 
-  public async insertRow(): Promise<PrimaryValue>
+  public async insertRow(): Promise<Input.PrimaryValue>
   {
     return this.insertPromise
   }
@@ -48,15 +47,15 @@ export class InsertBuilder
 
 export class UpdateBuilder
 {
-  private rowData: { [columnName: string]: PromiseLike<ColumnValue<undefined>> } = {}
+  private rowData: { [columnName: string]: PromiseLike<Input.ColumnValue<undefined>> } = {}
 
   private tableName: string
   private db: Knex
-  private where: { [columnName: string]: PromiseLike<ColumnValue> } = {}
+  private where: { [columnName: string]: PromiseLike<Input.ColumnValue> } = {}
 
   private updatePromise: Promise<number>
 
-  constructor(tableName: string, where: { [columnName: string]: ColumnValueLike }, db: Knex, firer: PromiseLike<void>)
+  constructor(tableName: string, where: { [columnName: string]: Input.ColumnValueLike }, db: Knex, firer: PromiseLike<void>)
   {
     this.tableName = tableName
     this.db = db
@@ -66,7 +65,7 @@ export class UpdateBuilder
     this.updatePromise = this.createUpdatePromise(firer)
   }
 
-  public addColumnData(columnName: string, value: ColumnValueLike<undefined>)
+  public addColumnData(columnName: string, value: Input.ColumnValueLike<undefined>)
   {
     this.rowData[columnName] = resolveValue(value)
   }
@@ -100,16 +99,16 @@ export class UpdateBuilder
 
 export class Mapper
 {
-  private schema: Schema
+  private schema: Model.Schema
   private db: Knex
 
-  constructor(schema: Schema, db: Knex)
+  constructor(schema: Model.Schema, db: Knex)
   {
     this.schema = schema
     this.db = db
   }
 
-  public async selectField(entityName: string, where: UniqueWhere, fieldName: string)
+  public async selectField(entityName: string, where: Input.UniqueWhere, fieldName: string)
   {
     const entity = getEntity(this.schema, entityName)
     const columnName = getColumnName(this.schema, entity, fieldName)
@@ -119,7 +118,7 @@ export class Mapper
     return result[0] !== undefined ? result[0][columnName] : undefined
   }
 
-  public async insert(entityName: string, data: CreateDataInput): Promise<PrimaryValue>
+  public async insert(entityName: string, data: Input.CreateDataInput): Promise<Input.PrimaryValue>
   {
     const entity = getEntity(this.schema, entityName)
 
@@ -137,7 +136,7 @@ export class Mapper
     return result
   }
 
-  public async update(entityName: string, where: UniqueWhere, data: UpdateDataInput): Promise<number>
+  public async update(entityName: string, where: Input.UniqueWhere, data: Input.UpdateDataInput): Promise<number>
   {
     const entity = getEntity(this.schema, entityName)
 
@@ -157,13 +156,13 @@ export class Mapper
     return await updateBuilder.updateRow()
   }
 
-  public async delete(entityName: string, where: UniqueWhere): Promise<number>
+  public async delete(entityName: string, where: Input.UniqueWhere): Promise<number>
   {
     const entity = getEntity(this.schema, entityName)
     return await this.db(entity.tableName).where(this.getUniqueWhereArgs(entity, where)).delete()
   }
 
-  public async connectJunction(owningEntity: Entity, relation: ManyHasManyOwnerRelation, ownerUnique: UniqueWhere, inversedUnique: UniqueWhere)
+  public async connectJunction(owningEntity: Model.Entity, relation: Model.ManyHasManyOwnerRelation, ownerUnique: Input.UniqueWhere, inversedUnique: Input.UniqueWhere)
   {
     const joiningTable = relation.joiningTable
     const primaryValue = await this.getPrimaryValue(owningEntity, ownerUnique)
@@ -178,7 +177,7 @@ export class Mapper
     await this.db.raw(insert.toString() + ' on conflict do nothing')
   }
 
-  public async disconnectJunction(owningEntity: Entity, relation: ManyHasManyOwnerRelation, ownerUnique: UniqueWhere, inversedUnique: UniqueWhere)
+  public async disconnectJunction(owningEntity: Model.Entity, relation: Model.ManyHasManyOwnerRelation, ownerUnique: Input.UniqueWhere, inversedUnique: Input.UniqueWhere)
   {
     const joiningTable = relation.joiningTable
     await this.db.table(joiningTable.tableName)
@@ -189,7 +188,7 @@ export class Mapper
       .delete()
   }
 
-  public async getPrimaryValue(entity: Entity, where: UniqueWhere)
+  public async getPrimaryValue(entity: Model.Entity, where: Input.UniqueWhere)
   {
     if (where[entity.primary] !== undefined) {
       return where[entity.primary]
@@ -201,12 +200,12 @@ export class Mapper
     return result[0] !== undefined ? result[0][entity.primaryColumn] : undefined
   }
 
-  public getUniqueWhereArgs(entity: Entity, where: UniqueWhere): { [columnName: string]: ColumnValue }
+  public getUniqueWhereArgs(entity: Model.Entity, where: Input.UniqueWhere): { [columnName: string]: Input.ColumnValue }
   {
     if (!isUniqueWhere(entity, where)) {
       throw new Error("Unique where is not unique")
     }
-    const whereArgs: { [columnName: string]: ColumnValue } = {}
+    const whereArgs: { [columnName: string]: Input.ColumnValue } = {}
     for (const field in where) {
       whereArgs[getColumnName(this.schema, entity, field)] = where[field]
     }
@@ -215,21 +214,21 @@ export class Mapper
   }
 }
 
-const insertData = (schema: Schema, db: Knex) => (entityName: string, data: CreateDataInput): PromiseLike<PrimaryValue> => {
+const insertData = (schema: Model.Schema, db: Knex) => (entityName: string, data: Input.CreateDataInput): PromiseLike<Input.PrimaryValue> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.insert(entityName, data)
   })
 }
 
-const updateData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere, data: UpdateDataInput): PromiseLike<number> => {
+const updateData = (schema: Model.Schema, db: Knex) => (entityName: string, where: Input.UniqueWhere, data: Input.UpdateDataInput): PromiseLike<number> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.update(entityName, where, data)
   })
 }
 
-const deleteData = (schema: Schema, db: Knex) => (entityName: string, where: UniqueWhere): PromiseLike<number> => {
+const deleteData = (schema: Model.Schema, db: Knex) => (entityName: string, where: Input.UniqueWhere): PromiseLike<number> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.delete(entityName, where)

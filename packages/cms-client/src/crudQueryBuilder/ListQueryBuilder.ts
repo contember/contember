@@ -1,6 +1,7 @@
-import { ObjectBuilder } from "../graphQlBuilder/ObjectBuilder";
-import { Where } from "cms-common/dist/schema/input";
-import { Literal } from "../graphQlBuilder/Literal";
+import ObjectBuilder from "../graphQlBuilder/ObjectBuilder";
+import Literal from "../graphQlBuilder/Literal";
+
+import { Input } from "cms-common";
 
 export default class ListQueryBuilder
 {
@@ -10,7 +11,7 @@ export default class ListQueryBuilder
   {
   }
 
-  where(where: Where<Literal>)
+  where(where: Input.Where<Literal>)
   {
     return new ListQueryBuilder(this.objectBuilder.argument('where', where))
   }

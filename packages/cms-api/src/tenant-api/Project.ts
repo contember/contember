@@ -1,4 +1,4 @@
-import {Schema} from '../content-schema/model'
+import { Model } from 'cms-common'
 
 interface Project {
   readonly uuid: string
@@ -13,7 +13,7 @@ namespace Project {
     readonly uuid: string
     readonly slug: string
     readonly name: string
-    readonly schema: Schema
+    readonly schema: Model.Schema
   }
 
   export interface DatabaseCredentials {

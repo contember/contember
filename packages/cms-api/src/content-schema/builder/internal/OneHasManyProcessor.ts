@@ -1,6 +1,6 @@
 import FieldProcessor from "./FieldProcessor"
 import OneHasManyBuilder from "../OneHasManyBuilder"
-import { ManyHasOneRelation, OnDelete, OneHasManyRelation, RelationType } from "../../model"
+import { Model } from "cms-common"
 import NamingConventions from "../NamingConventions";
 
 export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBuilder.Options>
@@ -22,17 +22,17 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
     registerField(entityName, this.createInversed(optionsFinalized, fieldName))
   }
 
-  private createInversed(options: OneHasManyBuilder.Options & { ownedBy: string }, fieldName: string): OneHasManyRelation
+  private createInversed(options: OneHasManyBuilder.Options & { ownedBy: string }, fieldName: string): Model.OneHasManyRelation
   {
     return {
       name: fieldName,
       ownedBy: options.ownedBy,
-      relation: RelationType.OneHasMany,
+      relation: Model.RelationType.OneHasMany,
       target: options.target,
     }
   }
 
-  private createOwning(options: OneHasManyBuilder.Options & { ownedBy: string }, entityName: string, fieldName: string): ManyHasOneRelation
+  private createOwning(options: OneHasManyBuilder.Options & { ownedBy: string }, entityName: string, fieldName: string): Model.ManyHasOneRelation
   {
     const joiningColumn = options.ownerJoiningColumn || {}
 
@@ -41,10 +41,10 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
       target: entityName,
       inversedBy: fieldName,
       nullable: options.ownerNullable !== undefined ? options.ownerNullable : true,
-      relation: RelationType.ManyHasOne,
+      relation: Model.RelationType.ManyHasOne,
       joiningColumn: {
         columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(options.ownedBy),
-        onDelete: joiningColumn.onDelete || OnDelete.restrict,
+        onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
       },
     }
   }

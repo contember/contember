@@ -1,6 +1,6 @@
 import FieldProcessor from "./FieldProcessor"
 import ManyHasManyBuilder from "../ManyHasManyBuilder"
-import { JoiningTable, ManyHasManyInversedRelation, ManyHasManyOwnerRelation, OnDelete, RelationType } from "../../model"
+import { Model } from "cms-common"
 import NamingConventions from "../NamingConventions";
 
 export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyBuilder.Options>
@@ -24,30 +24,30 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
     inversedBy: string,
     entityName: string,
     fieldName: string
-  ): ManyHasManyInversedRelation
+  ): Model.ManyHasManyInversedRelation
   {
     return {
       name: inversedBy,
       ownedBy: fieldName,
       target: entityName,
-      relation: RelationType.ManyHasMany,
+      relation: Model.RelationType.ManyHasMany,
     }
   }
 
-  private createManyHasManyOwner(options: ManyHasManyBuilder.Options, entityName: string, fieldName: string): ManyHasManyOwnerRelation
+  private createManyHasManyOwner(options: ManyHasManyBuilder.Options, entityName: string, fieldName: string): Model.ManyHasManyOwnerRelation
   {
-    let joiningTable: JoiningTable | undefined = options.joiningTable
+    let joiningTable: Model.JoiningTable | undefined = options.joiningTable
     if (!joiningTable) {
       const columnNames = this.conventions.getJoiningTableColumnNames(entityName, fieldName, options.target, options.inversedBy)
       joiningTable = {
         tableName: this.conventions.getJoiningTableName(entityName, fieldName),
-        joiningColumn: {columnName: columnNames[0], onDelete: OnDelete.cascade},
-        inverseJoiningColumn: {columnName: columnNames[1], onDelete: OnDelete.cascade},
+        joiningColumn: {columnName: columnNames[0], onDelete: Model.OnDelete.cascade},
+        inverseJoiningColumn: {columnName: columnNames[1], onDelete: Model.OnDelete.cascade},
       }
     }
 
     return {
-      relation: RelationType.ManyHasMany,
+      relation: Model.RelationType.ManyHasMany,
       name: fieldName,
       inversedBy: options.inversedBy,
       target: options.target,

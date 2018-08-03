@@ -1,10 +1,10 @@
 import { GraphQLList } from "graphql"
 import { GraphQLNonNull, GraphQLOutputType } from "graphql"
-import { Column, ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor } from "../../../content-schema/model"
+import { Model } from "cms-common"
 import ColumnTypeResolver from "../ColumnTypeResolver"
 import EntityTypeProvider from "../EntityTypeProvider"
 
-export default class FieldTypeVisitor implements ColumnVisitor<GraphQLOutputType>, RelationByGenericTypeVisitor<GraphQLOutputType>
+export default class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType>
 {
   private columnTypeResolver: ColumnTypeResolver
   private entityTypeProvider: EntityTypeProvider
@@ -15,18 +15,18 @@ export default class FieldTypeVisitor implements ColumnVisitor<GraphQLOutputType
     this.entityTypeProvider = entityTypeProvider
   }
 
-  public visitColumn(entity: Entity, column: Column): GraphQLOutputType
+  public visitColumn(entity: Model.Entity, column: Model.Column): GraphQLOutputType
   {
     const basicType = this.columnTypeResolver.getType(column.type)
     return column.nullable ? basicType : new GraphQLNonNull(basicType)
   }
 
-  public visitHasMany(entity: Entity, relation: Relation): GraphQLOutputType
+  public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLOutputType
   {
     return new GraphQLList(new GraphQLNonNull(this.entityTypeProvider.getEntity(relation.target)))
   }
 
-  public visitHasOne(entity: Entity, relation: Relation & NullableRelation): GraphQLOutputType
+  public visitHasOne(entity: Model.Entity, relation: Model.Relation & Model.NullableRelation): GraphQLOutputType
   {
     const entityType = this.entityTypeProvider.getEntity(relation.target)
     return relation.nullable ? entityType : new GraphQLNonNull(entityType)

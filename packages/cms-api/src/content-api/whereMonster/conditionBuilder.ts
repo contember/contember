@@ -1,10 +1,10 @@
-import { Condition } from "../../content-schema/input"
+import { Input } from "cms-common"
 import { escapeParameter, expression, quoteIdentifier } from "../sql/utils"
 
-const buildCondition = (tableName: string, columnName: string) => (condition: Condition<any>): string => {
+const buildCondition = (tableName: string, columnName: string) => (condition: Input.Condition<any>): string => {
   const parameters: any[] = []
 
-  const buildParts = (condition: Condition<any>): string[] => {
+  const buildParts = (condition: Input.Condition<any>): string[] => {
     const parts = []
     if (condition.and !== undefined) {
       parts.push(expression.and(condition.and.map(it => expression.and(buildParts(it)))))

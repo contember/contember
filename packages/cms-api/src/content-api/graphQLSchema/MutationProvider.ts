@@ -9,9 +9,8 @@ import {
   GraphQLNonNull
 } from "graphql"
 import { JoinMonsterFieldMapping } from "../joinMonsterHelpers"
-import { CreateInput, DeleteInput, UpdateInput } from "../../content-schema/input"
+import { Input, Model } from "cms-common"
 import { isUniqueWhere } from "../../content-schema/inputUtils"
-import { FieldVisitor, Schema } from "../../content-schema/model"
 import { acceptFieldVisitor, getEntity } from "../../content-schema/modelUtils"
 import { deleteData, insertData, updateData } from "../sql/mapper"
 import { Context } from "../types"
@@ -43,7 +42,7 @@ type FieldConfig<TArgs> = JoinMonsterFieldMapping<Context, TArgs> & GraphQLField
 
 export default class MutationProvider
 {
-  private schema: Schema
+  private schema: Model.Schema
   private whereTypeProvider: WhereTypeProvider
   private entityTypeProvider: EntityTypeProvider
   private columnTypeResolver: ColumnTypeResolver
@@ -66,7 +65,7 @@ export default class MutationProvider
   )
 
   constructor(
-    schema: Schema,
+    schema: Model.Schema,
     whereTypeProvider: WhereTypeProvider,
     entityTypeProvider: EntityTypeProvider,
     columnTypeResolver: ColumnTypeResolver,
@@ -89,7 +88,7 @@ export default class MutationProvider
     }
   }
 
-  public getCreateMutation(entityName: string): FieldConfig<CreateInput>
+  public getCreateMutation(entityName: string): FieldConfig<Input.CreateInput>
   {
     return {
       type: new GraphQLNonNull(this.entityTypeProvider.getEntity(entityName)),
@@ -107,7 +106,7 @@ export default class MutationProvider
     }
   }
 
-  public getDeleteMutation(entityName: string): FieldConfig<DeleteInput>
+  public getDeleteMutation(entityName: string): FieldConfig<Input.DeleteInput>
   {
     const entity = getEntity(this.schema, entityName)
     return {
@@ -130,7 +129,7 @@ export default class MutationProvider
     }
   }
 
-  public getUpdateMutation(entityName: string): FieldConfig<UpdateInput>
+  public getUpdateMutation(entityName: string): FieldConfig<Input.UpdateInput>
   {
     const entity = getEntity(this.schema, entityName)
     return {
@@ -211,7 +210,7 @@ export default class MutationProvider
     })
   }
 
-  private createEntityFields(visitor: FieldVisitor<GraphQLInputFieldConfig | undefined>, entityName: string, withoutRelation?: string)
+  private createEntityFields(visitor: Model.FieldVisitor<GraphQLInputFieldConfig | undefined>, entityName: string, withoutRelation?: string)
   {
     const fields: GraphQLInputFieldConfigMap = {}
     const entity = getEntity(this.schema, entityName)

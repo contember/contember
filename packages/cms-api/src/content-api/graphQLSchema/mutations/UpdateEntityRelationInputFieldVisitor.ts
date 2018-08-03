@@ -1,18 +1,18 @@
 import { GraphQLBoolean, GraphQLInputObjectType } from "graphql"
-import { ColumnVisitor, Entity, NullableRelation, Relation, RelationByGenericTypeVisitor, Schema } from "../../../content-schema/model"
+import { Model } from "cms-common"
 import MutationProvider from "../MutationProvider"
 import { GqlTypeName } from "../utils"
 import WhereTypeProvider from "../WhereTypeProvider"
 import { isIt } from "../../../utils/type";
 
 export default class UpdateEntityRelationInputFieldVisitor
-  implements ColumnVisitor<GraphQLInputObjectType>,
-    RelationByGenericTypeVisitor<GraphQLInputObjectType>
+  implements Model.ColumnVisitor<GraphQLInputObjectType>,
+    Model.RelationByGenericTypeVisitor<GraphQLInputObjectType>
 {
   private whereTypeBuilder: WhereTypeProvider
   private mutationBuilder: MutationProvider
 
-  constructor(schema: Schema, whereTypeBuilder: WhereTypeProvider, mutationBuilder: MutationProvider)
+  constructor(schema: Model.Schema, whereTypeBuilder: WhereTypeProvider, mutationBuilder: MutationProvider)
   {
     this.whereTypeBuilder = whereTypeBuilder
     this.mutationBuilder = mutationBuilder
@@ -23,7 +23,7 @@ export default class UpdateEntityRelationInputFieldVisitor
     throw new Error()
   }
 
-  public visitHasOne(entity: Entity, relation: Relation & NullableRelation, targetEntity: Entity, targetRelation: Relation | null): GraphQLInputObjectType
+  public visitHasOne(entity: Model.Entity, relation: Model.Relation & Model.NullableRelation, targetEntity: Model.Entity, targetRelation: Model.Relation | null): GraphQLInputObjectType
   {
     return new GraphQLInputObjectType({
       name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
@@ -61,10 +61,10 @@ export default class UpdateEntityRelationInputFieldVisitor
     })
   }
 
-  public visitHasMany(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): GraphQLInputObjectType
+  public visitHasMany(entity: Model.Entity, relation: Model.Relation, targetEntity: Model.Entity, targetRelation: Model.Relation | null): GraphQLInputObjectType
   {
     let canDisconnect: boolean = true
-    if (targetRelation && isIt<NullableRelation>(targetRelation, 'nullable')) {
+    if (targetRelation && isIt<Model.NullableRelation>(targetRelation, 'nullable')) {
       canDisconnect = targetRelation.nullable
     }
 

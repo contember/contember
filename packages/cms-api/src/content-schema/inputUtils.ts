@@ -1,7 +1,6 @@
-import { UniqueWhere } from "./input"
-import { Entity } from "./model"
+import { Input, Model } from "cms-common"
 
-export const isUniqueWhere = (entity: Entity, where: UniqueWhere): boolean => {
+export const isUniqueWhere = (entity: Model.Entity, where: Input.UniqueWhere): boolean => {
   if (where[entity.primary] !== undefined) {
     return true
   }

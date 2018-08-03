@@ -1,8 +1,9 @@
-import { ObjectBuilder } from "../graphQlBuilder/ObjectBuilder";
+import ObjectBuilder from "../graphQlBuilder/ObjectBuilder";
 import DataBuilder from "./DataBuilder";
 import CreateDataBuilder from "./CreateDataBuilder";
-import { CreateDataInput } from "../../../cms-common/src/schema/input";
-import { Literal } from "../graphQlBuilder/Literal";
+import Literal from "../graphQlBuilder/Literal";
+
+import { Input } from "cms-common";
 
 
 export default class CreateBuilder
@@ -14,7 +15,7 @@ export default class CreateBuilder
   }
 
 
-  data(data: DataBuilder.DataLike<CreateDataInput<Literal>, CreateDataBuilder>)
+  data(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>)
   {
     return new CreateBuilder(this.objectBuilder.argument('data', DataBuilder.resolveData(data, CreateDataBuilder)))
   }

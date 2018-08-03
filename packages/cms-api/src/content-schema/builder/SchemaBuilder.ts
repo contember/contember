@@ -1,4 +1,4 @@
-import { Schema } from "../model"
+import { Model } from "cms-common"
 import EntityBuilder from "./EntityBuilder"
 import NamingConventions from "./NamingConventions";
 import SchemaBuilderInternal from "./SchemaBuilderInternal";
@@ -30,7 +30,7 @@ export default class SchemaBuilder
     return this
   }
 
-  public buildSchema(): Schema
+  public buildSchema(): Model.Schema
   {
     const builder = new SchemaBuilderInternal(this.conventions)
 

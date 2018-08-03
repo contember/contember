@@ -1,9 +1,9 @@
 import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate"
-import { Entity, Schema } from "../../content-schema/model"
+import { Model } from "cms-common"
 import { acceptFieldVisitor, getColumnName } from "../../content-schema/modelUtils"
 
-const buildSqlSchema = (schema: Schema, migrationBuilder: MigrationBuilder) => {
-  const getPrimaryType = (entity: Entity) => {
+const buildSqlSchema = (schema: Model.Schema, migrationBuilder: MigrationBuilder) => {
+  const getPrimaryType = (entity: Model.Entity) => {
     return acceptFieldVisitor(schema, entity, entity.primary, {
       visitColumn: (entity, column) => column.type,
       visitRelation: () => {

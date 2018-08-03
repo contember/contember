@@ -1,8 +1,8 @@
-import { Schema } from "../../content-schema/model"
+import { Model } from "cms-common"
 import buildSqlSchema from "./sqlSchemaBuilder";
 
 
-const getSql = (schema: Schema): string => {
+const getSql = (schema: Model.Schema): string => {
   const builderClass = require("node-pg-migrate/dist/migration-builder")
   const migrationBuilder = new builderClass({}, {
     query: null,

@@ -1,5 +1,4 @@
-import { Condition, Where } from "../../content-schema/input"
-import { Entity, Relation, Schema } from "../../content-schema/model"
+import { Input, Model } from "cms-common"
 import { acceptFieldVisitor, acceptRelationTypeVisitor } from "../../content-schema/modelUtils"
 import { expression, quoteIdentifier } from "../sql/utils"
 import { arrayEquals } from "../../utils/arrays"
@@ -7,12 +6,12 @@ import buildCondition from "./conditionBuilder"
 
 class SubQueryBuilder
 {
-  public schema: Schema
-  public rootEntity: Entity
+  public schema: Model.Schema
+  public rootEntity: Model.Entity
 
   private joins: string[][] = []
 
-  constructor(schema: Schema, rootEntity: Entity)
+  constructor(schema: Model.Schema, rootEntity: Model.Entity)
   {
     this.schema = schema
     this.rootEntity = rootEntity
@@ -106,15 +105,15 @@ class SubQueryBuilder
 
 type JoinCallback = (joinPath: string[]) => string
 
-const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, joinPath: string[] = [], canJoinHasMany: boolean = false) => (tableName: string, where: Where): string => {
+const buildWhere = (schema: Model.Schema, entity: Model.Entity, joinCallback: JoinCallback, joinPath: string[] = [], canJoinHasMany: boolean = false) => (tableName: string, where: Input.Where): string => {
 
-  const buildWhereParts = (where: Where): string[] => {
+  const buildWhereParts = (where: Input.Where): string[] => {
     const parts: string[] = []
     if (where.and !== undefined) {
-      parts.push(expression.and(where.and.map((where: Where) => expression.and(buildWhereParts(where)))))
+      parts.push(expression.and(where.and.map((where: Input.Where) => expression.and(buildWhereParts(where)))))
     }
     if (where.or !== undefined) {
-      parts.push(expression.or(where.or.map((where: Where) => expression.and(buildWhereParts(where)))))
+      parts.push(expression.or(where.or.map((where: Input.Where) => expression.and(buildWhereParts(where)))))
     }
     if (where.not !== undefined) {
       parts.push(expression.not(expression.and(buildWhereParts(where.not))))
@@ -124,14 +123,14 @@ const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, 
         continue
       }
 
-      const joinedWhere = (entity: Entity, relation: Relation, targetEntity: Entity) => {
+      const joinedWhere = (entity: Model.Entity, relation: Model.Relation, targetEntity: Model.Entity) => {
         const newJoinPath = [...joinPath, fieldName]
         const alias = joinCallback(newJoinPath)
-        return buildWhere(schema, targetEntity, joinCallback, newJoinPath, canJoinHasMany)(quoteIdentifier(alias), where[fieldName] as Where)
+        return buildWhere(schema, targetEntity, joinCallback, newJoinPath, canJoinHasMany)(quoteIdentifier(alias), where[fieldName] as Input.Where)
       }
       parts.push(acceptFieldVisitor(schema, entity, fieldName, {
         visitColumn: (entity, column) => {
-          const condition: Condition<any> = where[column.name]
+          const condition: Input.Condition<any> = where[column.name]
           return buildCondition(tableName, column.columnName)(condition)
         },
         visitHasOne: joinedWhere,
@@ -140,7 +139,7 @@ const buildWhere = (schema: Schema, entity: Entity, joinCallback: JoinCallback, 
             return joinedWhere(entity, relation, targetEntity)
           }
           const subQueryBuilder = new SubQueryBuilder(schema, entity)
-          const whereExpr = buildWhere(schema, targetEntity, joinPath => subQueryBuilder.join(joinPath), [fieldName], true)(quoteIdentifier(subQueryBuilder.join([fieldName])), where[fieldName] as Where)
+          const whereExpr = buildWhere(schema, targetEntity, joinPath => subQueryBuilder.join(joinPath), [fieldName], true)(quoteIdentifier(subQueryBuilder.join([fieldName])), where[fieldName] as Input.Where)
           const fqn = `${tableName}.${quoteIdentifier(entity.primary)}`
           return `${fqn} IN (${subQueryBuilder.getSql()} WHERE ${whereExpr})`
         }

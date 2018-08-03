@@ -1,5 +1,5 @@
 import FieldProcessor from "./FieldProcessor"
-import { ManyHasOneRelation, OnDelete, OneHasManyRelation, RelationType } from "../../model"
+import { Model } from "cms-common"
 import ManyHasOneBuilder from "../ManyHasOneBuilder"
 import NamingConventions from "../NamingConventions";
 
@@ -22,28 +22,28 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
   }
 
 
-  private createManyHasOneInversed(options: ManyHasOneBuilder.Options & { inversedBy: string }, entityName: string, fieldName: string): OneHasManyRelation
+  private createManyHasOneInversed(options: ManyHasOneBuilder.Options & { inversedBy: string }, entityName: string, fieldName: string): Model.OneHasManyRelation
   {
     return {
       name: options.inversedBy,
       ownedBy: fieldName,
       target: entityName,
-      relation: RelationType.OneHasMany,
+      relation: Model.RelationType.OneHasMany,
     }
   }
 
-  private createManyHasOneOwning(options: ManyHasOneBuilder.Options, fieldName: string): ManyHasOneRelation
+  private createManyHasOneOwning(options: ManyHasOneBuilder.Options, fieldName: string): Model.ManyHasOneRelation
   {
     const joiningColumn = options.joiningColumn || {}
     return {
       name: fieldName,
       inversedBy: options.inversedBy,
       nullable: options.nullable === undefined ? true : options.nullable,
-      relation: RelationType.ManyHasOne,
+      relation: Model.RelationType.ManyHasOne,
       target: options.target,
       joiningColumn: {
         columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
-        onDelete: joiningColumn.onDelete || OnDelete.restrict,
+        onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
       },
     }
   }

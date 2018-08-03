@@ -1,4 +1,4 @@
-import { JoiningColumn, OnDelete } from "../model"
+import { Model } from "cms-common"
 import FieldBuilder from "./FieldBuilder"
 import { AddEntityCallback, EntityConfigurator } from "./SchemaBuilder";
 
@@ -33,7 +33,7 @@ class ManyHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>>
     return this.withOption('joiningColumn', {...this.options.joiningColumn, columnName})
   }
 
-  onDelete(onDelete: OnDelete): ManyHasOneBuilder<O>
+  onDelete(onDelete: Model.OnDelete): ManyHasOneBuilder<O>
   {
     return this.withOption('joiningColumn', {...this.options.joiningColumn, onDelete})
   }
@@ -59,7 +59,7 @@ namespace ManyHasOneBuilder
   export type Options = {
     target: string
     inversedBy?: string
-    joiningColumn?: Partial<JoiningColumn>
+    joiningColumn?: Partial<Model.JoiningColumn>
     nullable?: boolean
   }
 }

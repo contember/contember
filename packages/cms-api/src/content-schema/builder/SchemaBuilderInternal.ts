@@ -1,4 +1,4 @@
-import { AnyRelation, Column, Entity, Schema } from "../model"
+import { Model } from "cms-common"
 import EntityBuilder from "./EntityBuilder"
 import { SchemaBuilderError } from "./SchemaBuilder"
 import { Error } from "tslint/lib/error"
@@ -10,11 +10,10 @@ import OneHasManyProcessor from "./internal/OneHasManyProcessor"
 import ManyHasOneProcessor from "./internal/ManyHasOneProcessor"
 import NamingConventions from "./NamingConventions";
 import FieldBuilder from "./FieldBuilder";
-import ColumnBuilder from "./ColumnBuilder";
 
 export default class SchemaBuilderInternal
 {
-  private entities: { [name: string]: Entity } = {}
+  private entities: { [name: string]: Model.Entity } = {}
 
   private fieldOptions: { [entity: string]: FieldBuilder.Map } = {}
 
@@ -57,7 +56,7 @@ export default class SchemaBuilderInternal
     this.enums[name] = values
   }
 
-  public createSchema(): Schema
+  public createSchema(): Model.Schema
   {
     for (let entityName in this.fieldOptions) {
       let primaryField = this.entities[entityName].primary
@@ -112,7 +111,7 @@ export default class SchemaBuilderInternal
     }
   }
 
-  private registerField(entityName: string, field: Column | AnyRelation)
+  private registerField(entityName: string, field: Model.Column | Model.AnyRelation)
   {
     if (!this.entities[entityName]) {
       throw new SchemaBuilderError(`Undefined entity ${entityName}`)

@@ -1,6 +1,6 @@
 import { GraphQLInputObjectType, GraphQLList } from "graphql"
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull } from "graphql/type/definition"
-import { Entity, FieldVisitor, JoiningColumnRelation, Schema } from "../../content-schema/model"
+import { Model } from "cms-common"
 import { acceptFieldVisitor, getEntity } from "../../content-schema/modelUtils"
 import singletonFactory from "../../utils/singletonFactory"
 import { capitalizeFirstLetter } from "../../utils/strings"
@@ -11,14 +11,14 @@ import { GqlTypeName } from "./utils"
 
 export default class WhereTypeProvider
 {
-  private schema: Schema
+  private schema: Model.Schema
 
   private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))
   private uniqueWhereSingleton = singletonFactory(name => this.createEntityUniqueWhereType(name))
   private columnTypeResolver: ColumnTypeResolver
   private conditionTypeProvider: ConditionTypeProvider
 
-  constructor(schema: Schema, columnTypeResolver: ColumnTypeResolver, conditionTypeProvider: ConditionTypeProvider)
+  constructor(schema: Model.Schema, columnTypeResolver: ColumnTypeResolver, conditionTypeProvider: ConditionTypeProvider)
   {
     this.schema = schema
     this.columnTypeResolver = columnTypeResolver
@@ -63,7 +63,7 @@ export default class WhereTypeProvider
     })
   }
 
-  private getUniqueWhereFields(entity: Entity)
+  private getUniqueWhereFields(entity: Model.Entity)
   {
     const uniqueKeys: string[][] = [[entity.primary], ...entity.unique.map(it => it.fields)]
     const fields: GraphQLInputFieldConfigMap = {}
@@ -74,7 +74,7 @@ export default class WhereTypeProvider
         }
         fields[field] = acceptFieldVisitor(this.schema, entity, field, {
           visitRelation: (entity, relation, targetEntity) => {
-            if (isIt<JoiningColumnRelation>(relation, "joiningColumn")) {
+            if (isIt<Model.JoiningColumnRelation>(relation, "joiningColumn")) {
               return acceptFieldVisitor(this.schema, targetEntity, targetEntity.primary, {
                 visitColumn: (entity, column) => ({type: this.columnTypeResolver.getType(column.type)}),
                 visitRelation: () => {
@@ -103,7 +103,7 @@ export default class WhereTypeProvider
       fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
         visitColumn: (entity, column) => ({type: this.conditionTypeProvider.getCondition(column.type)}),
         visitRelation: (entity, relation) => ({type: this.getEntityWhereType(relation.target)}),
-      } as FieldVisitor<GraphQLInputFieldConfig>)
+      } as Model.FieldVisitor<GraphQLInputFieldConfig>)
     }
 
     fields.and = {type: new GraphQLList(new GraphQLNonNull(where))}

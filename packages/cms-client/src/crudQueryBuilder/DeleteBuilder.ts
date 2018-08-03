@@ -1,6 +1,7 @@
-import { ObjectBuilder } from "../graphQlBuilder/ObjectBuilder";
-import { UniqueWhere } from "cms-common/dist/schema/input";
-import { Literal } from "../graphQlBuilder/Literal";
+import ObjectBuilder from "../graphQlBuilder/ObjectBuilder";
+import Literal from "../graphQlBuilder/Literal";
+
+import { Input } from "cms-common";
 
 
 export default class DeleteBuilder
@@ -11,7 +12,7 @@ export default class DeleteBuilder
   {
   }
 
-  where(where: UniqueWhere<Literal>)
+  where(where: Input.UniqueWhere<Literal>)
   {
     return new DeleteBuilder(this.objectBuilder.argument('where', where))
   }

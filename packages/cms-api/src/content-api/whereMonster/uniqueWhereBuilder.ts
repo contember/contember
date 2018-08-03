@@ -1,9 +1,8 @@
-import { UniqueWhere } from "../../content-schema/input"
-import { Entity, Schema } from "../../content-schema/model"
+import { Input, Model } from "cms-common"
 import { getColumnName } from "../../content-schema/modelUtils"
 import { escapeParameter, quoteIdentifier } from "../sql/utils"
 
-const buildUniqueWhere = (schema: Schema, entity: Entity) => (tableName: string, where: UniqueWhere) => {
+const buildUniqueWhere = (schema: Model.Schema, entity: Model.Entity) => (tableName: string, where: Input.UniqueWhere) => {
   const parts = []
   for (const field in where) {
     const columnName = getColumnName(schema, entity, field)

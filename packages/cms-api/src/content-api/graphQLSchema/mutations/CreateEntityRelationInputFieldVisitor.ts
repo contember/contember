@@ -1,17 +1,17 @@
 import { GraphQLInputObjectType } from "graphql"
-import { ColumnVisitor, Entity, Relation, RelationVisitor, Schema } from "../../../content-schema/model"
+import { Model } from "cms-common"
 import MutationProvider from "../MutationProvider"
 import { GqlTypeName } from "../utils"
 import WhereTypeProvider from "../WhereTypeProvider"
 
 export default class CreateEntityRelationInputFieldVisitor
-  implements ColumnVisitor<GraphQLInputObjectType>,
-    RelationVisitor<GraphQLInputObjectType>
+  implements Model.ColumnVisitor<GraphQLInputObjectType>,
+    Model.RelationVisitor<GraphQLInputObjectType>
 {
   private whereTypeBuilder: WhereTypeProvider
   private mutationBuilder: MutationProvider
 
-  constructor(schema: Schema, whereTypeBuilder: WhereTypeProvider, mutationBuilder: MutationProvider)
+  constructor(schema: Model.Schema, whereTypeBuilder: WhereTypeProvider, mutationBuilder: MutationProvider)
   {
     this.whereTypeBuilder = whereTypeBuilder
     this.mutationBuilder = mutationBuilder
@@ -22,7 +22,7 @@ export default class CreateEntityRelationInputFieldVisitor
     throw new Error()
   }
 
-  public visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation): GraphQLInputObjectType
+  public visitRelation(entity: Model.Entity, relation: Model.Relation, targetEntity: Model.Entity, targetRelation: Model.Relation): GraphQLInputObjectType
   {
     return new GraphQLInputObjectType({
       name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,

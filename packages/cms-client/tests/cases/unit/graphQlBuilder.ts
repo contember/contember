@@ -1,19 +1,17 @@
 import 'mocha'
 import { expect } from "chai"
-import QueryBuilder from "../../../src/graphQlBuilder/QueryBuilder";
-import { ObjectBuilder } from "../../../src/graphQlBuilder/ObjectBuilder";
-import { Literal } from "../../../src/graphQlBuilder/Literal";
+import { GraphQlBuilder } from "../../../src";
 
 describe('GraphQlQueryBuilder', () => {
   it('construct simple query', () => {
-    const query = new QueryBuilder()
+    const query = new GraphQlBuilder.QueryBuilder()
       .query(builder => builder
         .object('Post', object => object
           .argument('where', {id: '123'})
           .field('id')
           .field('publishedAt')
-          .object('locales', new ObjectBuilder()
-            .argument('where', {locale: {eq: new Literal('cs')}})
+          .object('locales', new GraphQlBuilder.ObjectBuilder()
+            .argument('where', {locale: {eq: new GraphQlBuilder.Literal('cs')}})
             .field('id')
             .field('title')
           )

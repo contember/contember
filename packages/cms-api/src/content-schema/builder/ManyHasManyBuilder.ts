@@ -1,4 +1,4 @@
-import { JoiningTable } from "../model"
+import { Model } from "cms-common"
 import FieldBuilder from "./FieldBuilder"
 import { AddEntityCallback, EntityConfigurator } from "./SchemaBuilder";
 
@@ -28,7 +28,7 @@ class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>
     return this.withOption('inversedBy', inversedBy)
   }
 
-  joiningTable(joiningTable: JoiningTable): ManyHasManyBuilder<O>
+  joiningTable(joiningTable: Model.JoiningTable): ManyHasManyBuilder<O>
   {
     return this.withOption('joiningTable', joiningTable)
   }
@@ -49,7 +49,7 @@ namespace ManyHasManyBuilder
   export type Options = {
     target: string
     inversedBy?: string
-    joiningTable?: JoiningTable
+    joiningTable?: Model.JoiningTable
   }
 }
 

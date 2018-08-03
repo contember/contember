@@ -1,11 +1,10 @@
 import 'mocha'
-import CrudQueryBuilder from "../../../src/crudQueryBuilder";
-import DeleteBuilder from "../../../src/crudQueryBuilder/DeleteBuilder";
+import { CrudQueryBuilder } from "../../../src";
 import { expect } from "chai"
 
 describe('crud query builder', () => {
   it('complex mutation', () => {
-    const builder = new CrudQueryBuilder()
+    const builder = new CrudQueryBuilder.CrudQueryBuilder()
       .update('updatePost', builder => builder
         .where({id: '123'})
         .data(data => data
@@ -18,7 +17,7 @@ describe('crud query builder', () => {
         .column('id')
         .relation('author', o => o.field('name'))
       )
-      .delete('deleteCategory', new DeleteBuilder().where({id: '123'}).column('id'))
+      .delete('deleteCategory', new CrudQueryBuilder.DeleteBuilder().where({id: '123'}).column('id'))
       .create('createAuthor', builder => builder
         .column('name')
         .data(builder => builder
@@ -50,7 +49,7 @@ describe('crud query builder', () => {
   })
 
   it('query', () => {
-    const builder = new CrudQueryBuilder()
+    const builder = new CrudQueryBuilder.CrudQueryBuilder()
       .list('Posts', q => q
         .where({foo: {eq: "bar"}})
         .column('title')

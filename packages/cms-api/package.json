@@ -8,7 +8,7 @@
     "prebuild": "CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/tenant-api/schema/tenant.graphql.ts --template typescript --skip-documents --out ./src/tenant-api/schema/types.ts",
     "build": "tsc --build --verbose",
     "start": "tsc --build --verbose --watch",
-    "test": "mocha --require ts-node/register --ui bdd ./tests/cases/**/*.ts"
+    "test": "mocha --ui bdd ./dist/tests/cases/**/*.js"
   },
   "dependencies": {
     "apollo-server-express": "^2.0.0",

@@ -2,13 +2,12 @@
   "name": "cms-api",
   "version": "0.0.0",
   "private": true,
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
   "scripts": {
     "prebuild": "CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/tenant-api/schema/tenant.graphql.ts --template typescript --skip-documents --out ./src/tenant-api/schema/types.ts",
-    "build": "tsc -p tsconfig.json",
-    "build-tests": "tsc -p tsconfig.tests.json",
-    "start": "tsc -w -p tsconfig.json",
+    "build": "tsc --build --verbose",
+    "start": "tsc --build --verbose --watch",
     "test": "mocha --require ts-node/register --ui bdd ./tests/cases/**/*.ts"
   },
   "dependencies": {

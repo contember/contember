@@ -32,7 +32,7 @@ describe('crud query builder', () => {
       )
 
     expect(builder.getGql()).equals(`mutation {
-	updatePost(where: {id: "123"}, data: {name: "John", locales: [{update: {where: {id: "123"}, data: {foo: "bar"}}}], author: {create: {name: "John"}}}) {
+	updatePost(where: {id: "123"}, data: {name: "John", locales: [{update: {where: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}}, {create: {name: "foo"}}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}) {
 		id
 		author {
 			name

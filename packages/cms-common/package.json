@@ -5,13 +5,13 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "start": "tsc -w -p tsconfig.json"
+    "build": "tsc --build --verbose",
+    "start": "tsc --build --verbose --watch"
   },
 
   "devDependencies": {
     "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
-    "typescript": "2.9.2"
+    "typescript": "^3.0.1"
   }
 }

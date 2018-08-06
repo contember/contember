@@ -12,4 +12,9 @@ export default class KnexConnection {
   queryBuilder(): Knex.QueryBuilder {
     return this.knex.queryBuilder()
   }
+
+  raw(sql: string): Knex.Raw
+  {
+    return this.knex.raw(sql)
+  }
 }

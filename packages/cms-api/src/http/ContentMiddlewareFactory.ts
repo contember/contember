@@ -6,8 +6,9 @@ export default class ContentMiddlewareFactory {
     return (req, res: ContentMiddlewareFactoryMiddlewareFactory.ResponseWithContentMiddleware, next) => {
       if (typeof res.locals.contentMiddleware !== 'undefined') {
         res.locals.contentMiddleware(req, res, next)
+      } else {
+        next()
       }
-      next()
     }
   }
 }

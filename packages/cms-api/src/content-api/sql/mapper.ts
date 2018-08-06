@@ -6,6 +6,7 @@ import { promiseAllObject } from "../../utils/promises"
 import InsertVisitor from "./insertVisitor"
 import UpdateVisitor from "./updateVisitor"
 import { resolveValue } from "./utils"
+import KnexConnection from "../../core/knex/KnexConnection";
 
 export class InsertBuilder
 {
@@ -214,21 +215,21 @@ export class Mapper
   }
 }
 
-const insertData = (schema: Model.Schema, db: Knex) => (entityName: string, data: Input.CreateDataInput): PromiseLike<Input.PrimaryValue> => {
+const insertData = (schema: Model.Schema, db: KnexConnection) => (entityName: string, data: Input.CreateDataInput): PromiseLike<Input.PrimaryValue> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.insert(entityName, data)
   })
 }
 
-const updateData = (schema: Model.Schema, db: Knex) => (entityName: string, where: Input.UniqueWhere, data: Input.UpdateDataInput): PromiseLike<number> => {
+const updateData = (schema: Model.Schema, db: KnexConnection) => (entityName: string, where: Input.UniqueWhere, data: Input.UpdateDataInput): PromiseLike<number> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.update(entityName, where, data)
   })
 }
 
-const deleteData = (schema: Model.Schema, db: Knex) => (entityName: string, where: Input.UniqueWhere): PromiseLike<number> => {
+const deleteData = (schema: Model.Schema, db: KnexConnection) => (entityName: string, where: Input.UniqueWhere): PromiseLike<number> => {
   return db.transaction(trx => {
     const mapper = new Mapper(schema, trx)
     return mapper.delete(entityName, where)

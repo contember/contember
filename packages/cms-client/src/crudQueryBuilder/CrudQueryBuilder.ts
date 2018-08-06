@@ -1,30 +1,29 @@
-import UpdateBuilder from "./UpdateBuilder";
-import QueryBuilder from "../graphQlBuilder/QueryBuilder";
-import RootObjectBuilder from "../graphQlBuilder/RootObjectBuilder";
-import ListQueryBuilder from "./ListQueryBuilder";
-import GetQueryBuilder from "./GetQueryBuilder";
-import CreateBuilder from "./CreateBuilder";
-import DeleteBuilder from "./DeleteBuilder";
+import UpdateBuilder from './UpdateBuilder'
+import QueryBuilder from '../graphQlBuilder/QueryBuilder'
+import RootObjectBuilder from '../graphQlBuilder/RootObjectBuilder'
+import ListQueryBuilder from './ListQueryBuilder'
+import GetQueryBuilder from './GetQueryBuilder'
+import CreateBuilder from './CreateBuilder'
+import DeleteBuilder from './DeleteBuilder'
 
 type Mutations = 'create' | 'update' | 'delete'
 type Queries = 'get' | 'list'
 
 type Variables = {
-  [key: string]: any;
-};
-type Client<T extends any> = (query: string | object, variables?: Variables) => PromiseLike<T>;
+  [key: string]: any
+}
+type Client<T extends any> = (query: string | object, variables?: Variables) => PromiseLike<T>
 
-export default class CrudQueryBuilder
-{
+export default class CrudQueryBuilder {
   constructor(
     private type: undefined | 'query' | 'mutation' = undefined,
-    private rootObjectBuilder: RootObjectBuilder = new RootObjectBuilder(),
-  )
-  {
-  }
+    private rootObjectBuilder: RootObjectBuilder = new RootObjectBuilder()
+  ) {}
 
-  public list(name: string, query: ((builder: ListQueryBuilder) => ListQueryBuilder) | ListQueryBuilder): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Mutations>>
-  {
+  public list(
+    name: string,
+    query: ((builder: ListQueryBuilder) => ListQueryBuilder) | ListQueryBuilder
+  ): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Mutations>> {
     if (this.type === 'mutation') {
       throw new Error('Cannot combine queries and mutations')
     }
@@ -34,8 +33,10 @@ export default class CrudQueryBuilder
     return new CrudQueryBuilder('query', this.rootObjectBuilder.object(name, query.objectBuilder))
   }
 
-  public get(name: string, query: ((builder: GetQueryBuilder) => GetQueryBuilder<true>) | GetQueryBuilder<true>): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Mutations>>
-  {
+  public get(
+    name: string,
+    query: ((builder: GetQueryBuilder) => GetQueryBuilder<true>) | GetQueryBuilder<true>
+  ): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Mutations>> {
     if (this.type === 'mutation') {
       throw new Error('Cannot combine queries and mutations')
     }
@@ -45,8 +46,10 @@ export default class CrudQueryBuilder
     return new CrudQueryBuilder('query', this.rootObjectBuilder.object(name, query.objectBuilder))
   }
 
-  public update(name: string, query: ((builder: UpdateBuilder) => UpdateBuilder) | UpdateBuilder): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Queries>>
-  {
+  public update(
+    name: string,
+    query: ((builder: UpdateBuilder) => UpdateBuilder) | UpdateBuilder
+  ): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Queries>> {
     if (this.type === 'query') {
       throw new Error('Cannot combine queries and mutations')
     }
@@ -56,8 +59,10 @@ export default class CrudQueryBuilder
     return new CrudQueryBuilder('mutation', this.rootObjectBuilder.object(name, query.objectBuilder))
   }
 
-  public create(name: string, query: ((builder: CreateBuilder) => CreateBuilder) | CreateBuilder): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Queries>>
-  {
+  public create(
+    name: string,
+    query: ((builder: CreateBuilder) => CreateBuilder) | CreateBuilder
+  ): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Queries>> {
     if (this.type === 'query') {
       throw new Error('Cannot combine queries and mutations')
     }
@@ -67,8 +72,10 @@ export default class CrudQueryBuilder
     return new CrudQueryBuilder('mutation', this.rootObjectBuilder.object(name, query.objectBuilder))
   }
 
-  public delete(name: string, query: ((builder: DeleteBuilder) => DeleteBuilder) | DeleteBuilder): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Queries>>
-  {
+  public delete(
+    name: string,
+    query: ((builder: DeleteBuilder) => DeleteBuilder) | DeleteBuilder
+  ): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Queries>> {
     if (this.type === 'query') {
       throw new Error('Cannot combine queries and mutations')
     }
@@ -78,8 +85,7 @@ export default class CrudQueryBuilder
     return new CrudQueryBuilder('mutation', this.rootObjectBuilder.object(name, query.objectBuilder))
   }
 
-  getGql(): string
-  {
+  getGql(): string {
     const builder = new QueryBuilder()
     switch (this.type) {
       case 'mutation':
@@ -91,8 +97,7 @@ export default class CrudQueryBuilder
     }
   }
 
-  async execute<T>(client: Client<T>, variables?: Variables): Promise<T>
-  {
+  async execute<T>(client: Client<T>, variables?: Variables): Promise<T> {
     return await client(this.getGql(), variables)
   }
 }

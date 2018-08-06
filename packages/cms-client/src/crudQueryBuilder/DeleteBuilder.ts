@@ -1,29 +1,20 @@
-import ObjectBuilder from "../graphQlBuilder/ObjectBuilder";
-import Literal from "../graphQlBuilder/Literal";
+import ObjectBuilder from '../graphQlBuilder/ObjectBuilder'
+import Literal from '../graphQlBuilder/Literal'
 
-import { Input } from "cms-common";
+import { Input } from 'cms-common'
 
+export default class DeleteBuilder {
+  constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-export default class DeleteBuilder
-{
-  constructor(
-    public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()
-  )
-  {
-  }
-
-  where(where: Input.UniqueWhere<Literal>)
-  {
+  where(where: Input.UniqueWhere<Literal>) {
     return new DeleteBuilder(this.objectBuilder.argument('where', where))
   }
 
-  column(name: string)
-  {
+  column(name: string) {
     return new DeleteBuilder(this.objectBuilder.field(name))
   }
 
-  relation(name: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder))
-  {
+  relation(name: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder)) {
     if (!(builder instanceof ObjectBuilder)) {
       builder = builder(new ObjectBuilder())
     }

@@ -1,6 +1,7 @@
-import * as Knex from "knex"
+import KnexConnection from "../core/knex/KnexConnection";
 
 export interface Context
 {
-  db: Knex
+  db: KnexConnection
+  identityId: string
 }

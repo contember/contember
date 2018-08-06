@@ -6,6 +6,7 @@ import Project from '../tenant-api/Project'
 import KnexConnection from '../core/knex/KnexConnection'
 import GraphQlSchemaBuilder from '../content-api/graphQLSchema/GraphQlSchemaBuilder'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
+import { Context } from "../content-api/types";
 
 class ContentMiddlewareFactoryMiddlewareFactory {
   constructor(
@@ -41,7 +42,7 @@ class ContentMiddlewareFactoryMiddlewareFactory {
       const contentExpress = express()
       const contentApollo = new ApolloServer({
         schema: dataSchema,
-        context: () => {
+        context: (): Context => {
           if (res.locals.authResult === undefined) {
             throw new AuthenticationError('/content endpoint requires authorization, see /tenant endpoint and signIn() mutation')
           }

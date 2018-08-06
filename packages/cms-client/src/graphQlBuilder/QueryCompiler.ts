@@ -1,37 +1,30 @@
-import ObjectBuilder from "./ObjectBuilder";
-import Literal from "./Literal";
-import RootObjectBuilder from "./RootObjectBuilder";
+import ObjectBuilder from './ObjectBuilder'
+import Literal from './Literal'
+import RootObjectBuilder from './RootObjectBuilder'
 
-interface GenericObjectBuilder
-{
+interface GenericObjectBuilder {
   readonly objects: { [name: string]: ObjectBuilder }
 }
 
-export default class QueryCompiler
-{
-  constructor(
-    private operation: 'query' | 'mutation',
-    private builder: RootObjectBuilder)
-  {
+export default class QueryCompiler {
+  constructor(private operation: 'query' | 'mutation', private builder: RootObjectBuilder) {}
 
-  }
-
-  public create(): string
-  {
+  public create(): string {
     return `${this.operation} {
-${this.formatObject(this.builder).join("\n")}     
+${this.formatObject(this.builder).join('\n')}     
 }`
   }
 
-  private formatObject(builder: GenericObjectBuilder): string[]
-  {
+  private formatObject(builder: GenericObjectBuilder): string[] {
     const result = []
 
     for (let alias in builder.objects) {
       const subObject = builder.objects[alias]
-      result.push(alias + (subObject.objectName ? `: ${subObject.objectName}` : '') + this.formatArgs(subObject.args, 0) + ' {')
+      result.push(
+        alias + (subObject.objectName ? `: ${subObject.objectName}` : '') + this.formatArgs(subObject.args, 0) + ' {'
+      )
       for (let fieldName of subObject.fields) {
-        result.push("\t" + fieldName)
+        result.push('\t' + fieldName)
       }
 
       const formatted = this.formatObject(subObject)
@@ -39,21 +32,20 @@ ${this.formatObject(this.builder).join("\n")}
       result.push('}')
     }
 
-    return result.map(val => "\t" + val)
+    return result.map(val => '\t' + val)
   }
 
-  private formatArgs(args: any, level: number): string
-  {
+  private formatArgs(args: any, level: number): string {
     if (args === null) {
-      return "NULL"
+      return 'NULL'
     }
 
-    if (typeof args === "number") {
+    if (typeof args === 'number') {
       return args.toString()
     }
 
-    if (typeof args === "boolean") {
-      return args ? "true" : "false"
+    if (typeof args === 'boolean') {
+      return args ? 'true' : 'false'
     }
     if (typeof args === 'string') {
       return JSON.stringify(args)
@@ -61,13 +53,13 @@ ${this.formatObject(this.builder).join("\n")}
 
     if (Array.isArray(args)) {
       const vals = args.map(val => this.formatArgs(val, level + 1))
-      return "[" + vals.join(", ") + "]"
+      return '[' + vals.join(', ') + ']'
     }
     if (args instanceof Literal) {
       return args.value
     }
 
-    if (typeof args === "object") {
+    if (typeof args === 'object') {
       let result = ''
       for (let key in args) {
         result += `${key}: ${this.formatArgs(args[key], level + 1)}, `

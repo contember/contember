@@ -1,8 +1,5 @@
 {
   "files": [],
   "include": [],
-  "references": [
-    {"path": "./src"},
-    {"path": "./tests"}
-  ]
+  "references": [{ "path": "./src" }, { "path": "./tests" }]
 }

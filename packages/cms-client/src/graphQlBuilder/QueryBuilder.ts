@@ -1,11 +1,9 @@
-import RootObjectBuilder from "./RootObjectBuilder";
-import QueryCompiler from "./QueryCompiler";
-import Literal from "./Literal";
+import RootObjectBuilder from './RootObjectBuilder'
+import QueryCompiler from './QueryCompiler'
+import Literal from './Literal'
 
-class QueryBuilder
-{
-  query(builder: ((builder: RootObjectBuilder) => RootObjectBuilder) | RootObjectBuilder): string
-  {
+class QueryBuilder {
+  query(builder: ((builder: RootObjectBuilder) => RootObjectBuilder) | RootObjectBuilder): string {
     if (!(builder instanceof RootObjectBuilder)) {
       builder = builder(new RootObjectBuilder())
     }
@@ -13,8 +11,7 @@ class QueryBuilder
     return compiler.create()
   }
 
-  mutation(builder: ((builder: RootObjectBuilder) => RootObjectBuilder) | RootObjectBuilder): string
-  {
+  mutation(builder: ((builder: RootObjectBuilder) => RootObjectBuilder) | RootObjectBuilder): string {
     if (!(builder instanceof RootObjectBuilder)) {
       builder = builder(new RootObjectBuilder())
     }
@@ -23,16 +20,12 @@ class QueryBuilder
   }
 }
 
-namespace QueryBuilder
-{
-  export interface Object
-  {
+namespace QueryBuilder {
+  export interface Object {
     [key: string]: Value
   }
 
-  export interface List extends Array<Value>
-  {
-  }
+  export interface List extends Array<Value> {}
 
   export type AtomicValue = string | null | number | boolean | Literal
   export type Value = AtomicValue | Object | List

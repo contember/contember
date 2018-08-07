@@ -4,20 +4,20 @@ import Literal from '../graphQlBuilder/Literal'
 import { Input } from 'cms-common'
 
 export default class DeleteBuilder {
-  constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
+	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-  where(where: Input.UniqueWhere<Literal>) {
-    return new DeleteBuilder(this.objectBuilder.argument('where', where))
-  }
+	where(where: Input.UniqueWhere<Literal>) {
+		return new DeleteBuilder(this.objectBuilder.argument('where', where))
+	}
 
-  column(name: string) {
-    return new DeleteBuilder(this.objectBuilder.field(name))
-  }
+	column(name: string) {
+		return new DeleteBuilder(this.objectBuilder.field(name))
+	}
 
-  relation(name: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder)) {
-    if (!(builder instanceof ObjectBuilder)) {
-      builder = builder(new ObjectBuilder())
-    }
-    return new DeleteBuilder(this.objectBuilder.object(name, builder))
-  }
+	relation(name: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder)) {
+		if (!(builder instanceof ObjectBuilder)) {
+			builder = builder(new ObjectBuilder())
+		}
+		return new DeleteBuilder(this.objectBuilder.object(name, builder))
+	}
 }

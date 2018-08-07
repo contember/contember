@@ -5,35 +5,35 @@ import Literal from '../graphQlBuilder/Literal'
 import { Input } from 'cms-common'
 
 export default class CreateDataBuilder {
-  constructor(public readonly data: Input.CreateDataInput<Literal> = {}) {}
+	constructor(public readonly data: Input.CreateDataInput<Literal> = {}) {}
 
-  public set(fieldName: string, value: Input.ColumnValue<Literal>) {
-    return new CreateDataBuilder({ ...this.data, [fieldName]: value })
-  }
+	public set(fieldName: string, value: Input.ColumnValue<Literal>) {
+		return new CreateDataBuilder({ ...this.data, [fieldName]: value })
+	}
 
-  public many(
-    fieldName: string,
-    data: DataBuilder.DataLike<Input.CreateManyRelationInput<Literal>, CreateManyRelationBuilder>
-  ) {
-    return new CreateDataBuilder({
-      ...this.data,
-      [fieldName]: DataBuilder.resolveData(data, CreateManyRelationBuilder)
-    })
-  }
+	public many(
+		fieldName: string,
+		data: DataBuilder.DataLike<Input.CreateManyRelationInput<Literal>, CreateManyRelationBuilder>
+	) {
+		return new CreateDataBuilder({
+			...this.data,
+			[fieldName]: DataBuilder.resolveData(data, CreateManyRelationBuilder)
+		})
+	}
 
-  public one(
-    fieldName: string,
-    data: DataBuilder.DataLike<
-      Input.CreateOneRelationInput<Literal>,
-      CreateOneRelationBuilder,
-      CreateOneRelationBuilder<undefined>
-    >
-  ) {
-    const value = DataBuilder.resolveData<
-      Input.CreateOneRelationInput<Literal>,
-      CreateOneRelationBuilder,
-      CreateOneRelationBuilder<undefined>
-    >(data, CreateOneRelationBuilder)
-    return new CreateDataBuilder({ ...this.data, [fieldName]: value })
-  }
+	public one(
+		fieldName: string,
+		data: DataBuilder.DataLike<
+			Input.CreateOneRelationInput<Literal>,
+			CreateOneRelationBuilder,
+			CreateOneRelationBuilder<undefined>
+		>
+	) {
+		const value = DataBuilder.resolveData<
+			Input.CreateOneRelationInput<Literal>,
+			CreateOneRelationBuilder,
+			CreateOneRelationBuilder<undefined>
+		>(data, CreateOneRelationBuilder)
+		return new CreateDataBuilder({ ...this.data, [fieldName]: value })
+	}
 }

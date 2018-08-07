@@ -32,6 +32,7 @@ export default class SignUp extends React.Component<{}, State> {
 						this.setState({ loading: false, error: !result.ok, message: result.message })
 					}}
 				>
+					{this.state.message}
 					<FormGroup label="Email">
 						<InputGroup
 							value={this.state.email}

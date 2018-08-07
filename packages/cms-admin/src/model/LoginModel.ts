@@ -20,7 +20,7 @@ export class LoginModel {
 			window.localStorage.setItem('auth-token', signIn.result.token)
 			return { ok: true }
 		} else {
-			return { ok: false, message: signIn.errors.map((err: any) => err.endUserMessage).join(', ') }
+			return { ok: false, message: signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', ') }
 		}
 	}
 
@@ -29,7 +29,7 @@ export class LoginModel {
 		if (signUp.ok) {
 			return { ok: true }
 		} else {
-			return { ok: false, message: signUp.errors.map((err: any) => err.endUserMessage).join(', ') }
+			return { ok: false, message: signUp.errors.map((err: any) => err.endUserMessage || err.code).join(', ') }
 		}
 	}
 }
@@ -40,6 +40,7 @@ const loginRequest = `
 			ok
 			errors {
 				endUserMessage
+				code
 			}
 			result {
 				token
@@ -54,6 +55,7 @@ const singupRequest = `
 			ok
 			errors {
 				endUserMessage
+				code
 			}
 		}
 	}

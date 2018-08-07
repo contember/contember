@@ -51,7 +51,7 @@ export default class Login extends React.Component<{}, State> {
 							onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })}
 						/>
 					</FormGroup>
-					<Button type="submit" disabled={this.state.loading}>
+					<Button type="submit" loading={this.state.loading}>
 						Login
 					</Button>
 				</form>

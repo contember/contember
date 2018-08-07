@@ -5,6 +5,8 @@ interface OperationResult {
 	message?: string
 }
 
+export const LOCALSTORAGE_AUTH_TOKEN_KEY = 'auth-token'
+
 export class LoginModel {
 	static instance?: LoginModel
 
@@ -17,7 +19,7 @@ export class LoginModel {
 	async logIn(email: string, password: string): Promise<OperationResult> {
 		const { signIn } = await request(loginRequest, { email, password })
 		if (signIn.ok) {
-			window.localStorage.setItem('auth-token', signIn.result.token)
+			window.localStorage.setItem(LOCALSTORAGE_AUTH_TOKEN_KEY, signIn.result.token)
 			return { ok: true }
 		} else {
 			return { ok: false, message: signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', ') }

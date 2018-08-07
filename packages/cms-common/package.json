@@ -1,16 +1,16 @@
 {
-  "name": "cms-common",
-  "version": "0.0.0",
-  "private": true,
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
-  "scripts": {
-    "build": "tsc --build --verbose",
-    "start": "tsc --build --verbose --watch"
-  },
-  "devDependencies": {
-    "ts-node": "^7.0.0",
-    "tslint": "^5.10.0",
-    "typescript": "^3.0.1"
-  }
+	"name": "cms-common",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {
+		"build": "tsc --build --verbose",
+		"start": "tsc --build --verbose --watch"
+	},
+	"devDependencies": {
+		"ts-node": "^7.0.0",
+		"tslint": "^5.10.0",
+		"typescript": "^3.0.1"
+	}
 }

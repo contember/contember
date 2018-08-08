@@ -1,0 +1,46 @@
+.shape
+	display: inline-block
+	vertical-align: middle
+	line-height: inherit
+
+	&-defs
+		+size(0)
+		+absolute
+		visibility: hidden
+		overflow: hidden
+
+	// Shapes default dimensions
+	&-plus
+		+size(20px)
+		stroke: #000
+		fill: #000
+
+
+	// ... here comes other shape dimensions
+
+
+	/**
+	 * Fill parent view
+	 */
+	&.view-fill
+		+size(100%)
+		display: block
+
+	/**
+	 * Position and center shape absolutely
+	 */
+	&.view-abs
+		+absolute
+		margin: auto
+
+	/**
+	 * Mirrored views
+	 */
+	&.view-180deg
+		transform: rotate(180deg)
+
+	&.view-90deg
+		transform: rotate(90deg)
+
+	&.view-270deg
+		transform: rotate(270deg)

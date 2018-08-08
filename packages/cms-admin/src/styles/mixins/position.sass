@@ -1,0 +1,34 @@
+// Usage:
+		+absolute(top right bottom left)
+		+absolute(top horizontal bottom)
+		+absolute(vertical horizontal)
+		+absolute(offset)
+
+	Examples:
+		+absolute(1px 2px 3px 4px) // position: absolute; top: 1px; right: 2px; bottom: 3px; left: 4px
+
+		+absolute(1px 2px 3px) // position: absolute; top: 1px; right: 2px; bottom: 3px; left: 2px
+
+		+absolute(1px 2px) // position: absolute; top: 1px; right: 2px; bottom: 1px; left: 2px
+
+		+absolute(1px) // position: absolute; top: 1px; right: 1px; bottom: 1px; left: 1px
+
+		+absolute(1px null null 2px) // position: absolute; top: 1px; left: 2px
+
+	All the other position mixins behave identically
+
+
+=absolute($properties: null null null null)
+	+position(absolute, $properties)
+
+
+=fixed($properties: null null null null)
+	+position(fixed, $properties)
+
+
+=relative($properties: null null null null)
+	+position(relative, $properties)
+
+
+=sticky($properties: null null null null)
+	+position(sticky, $properties)

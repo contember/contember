@@ -17,8 +17,7 @@ export default class Mapper {
 		this.db = db
 	}
 
-	public async selectField(entityName: string, where: Input.UniqueWhere, fieldName: string) {
-		const entity = getEntity(this.schema, entityName)
+	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
 		const result = await this.db
@@ -29,9 +28,7 @@ export default class Mapper {
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
 
-	public async insert(entityName: string, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
-		const entity = getEntity(this.schema, entityName)
-
+	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
 		let resolver: (() => any) = () => {
 			throw new Error()
 		}
@@ -51,9 +48,7 @@ export default class Mapper {
 		return result
 	}
 
-	public async update(entityName: string, where: Input.UniqueWhere, data: Input.UpdateDataInput): Promise<number> {
-		const entity = getEntity(this.schema, entityName)
-
+	public async update(entity: Model.Entity, where: Input.UniqueWhere, data: Input.UpdateDataInput): Promise<number> {
 		const primaryValue = await this.getPrimaryValue(entity, where)
 		if (primaryValue === undefined) {
 			return Promise.resolve(0)
@@ -79,8 +74,7 @@ export default class Mapper {
 		return await updateBuilder.updateRow()
 	}
 
-	public async delete(entityName: string, where: Input.UniqueWhere): Promise<number> {
-		const entity = getEntity(this.schema, entityName)
+	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<number> {
 		return await this.db(entity.tableName)
 			.where(this.getUniqueWhereArgs(entity, where))
 			.delete()
@@ -159,7 +153,8 @@ const insertData = (schema: Model.Schema, db: KnexConnection) => (
 ): PromiseLike<Input.PrimaryValue> => {
 	return db.transaction(trx => {
 		const mapper = new Mapper(schema, trx)
-		return mapper.insert(entityName, data)
+		const entity = getEntity(schema, entityName)
+		return mapper.insert(entity, data)
 	})
 }
 
@@ -170,7 +165,8 @@ const updateData = (schema: Model.Schema, db: KnexConnection) => (
 ): PromiseLike<number> => {
 	return db.transaction(trx => {
 		const mapper = new Mapper(schema, trx)
-		return mapper.update(entityName, where, data)
+		const entity = getEntity(schema, entityName)
+		return mapper.update(entity, where, data)
 	})
 }
 
@@ -180,7 +176,8 @@ const deleteData = (schema: Model.Schema, db: KnexConnection) => (
 ): PromiseLike<number> => {
 	return db.transaction(trx => {
 		const mapper = new Mapper(schema, trx)
-		return mapper.delete(entityName, where)
+		const entity = getEntity(schema, entityName)
+		return mapper.delete(entity, where)
 	})
 }
 

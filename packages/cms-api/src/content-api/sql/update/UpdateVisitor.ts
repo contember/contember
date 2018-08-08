@@ -1,6 +1,7 @@
 import { Input, Model } from 'cms-common'
-import { isIt } from '../../utils/type'
-import { Mapper, UpdateBuilder } from './mapper'
+import { isIt } from '../../../utils/type'
+import Mapper from '../mapper'
+import UpdateBuilder from './UpdateBuilder'
 
 interface HasOneRelationInputProcessor {
 	connect(input: Input.UniqueWhere): PromiseLike<void>

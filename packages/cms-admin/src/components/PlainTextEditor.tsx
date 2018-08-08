@@ -4,10 +4,7 @@ import { Editor } from 'slate-react'
 
 /**
  * The plain text example.
- *
- * @type {Component}
  */
-
 export default class PlainTextEditor extends React.Component {
 
 	/**

@@ -1,7 +1,8 @@
 import { Input, Model } from 'cms-common'
-import { isIt } from '../../utils/type'
-import { InsertBuilder, Mapper } from './mapper'
-import { uuid } from '../../utils/uuid'
+import { isIt } from '../../../utils/type'
+import Mapper from '../mapper'
+import { uuid } from '../../../utils/uuid'
+import InsertBuilder from './InsertBuilder'
 
 interface RelationInputProcessor {
 	connect(input: Input.UniqueWhere): PromiseLike<void>

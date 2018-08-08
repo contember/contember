@@ -33,6 +33,7 @@
     "slate": "^0.34.7"
   },
   "devDependencies": {
+    "@types/is-hotkey": "^0.1.0",
     "@types/react": "^16.4.6",
     "@types/react-redux": "5.0.20",
     "@types/reactstrap": "^6.0.0",

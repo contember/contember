@@ -3,13 +3,13 @@ import styled from 'react-emotion'
 
 export const Button = styled('span')`
 	cursor: pointer;
-	color: ${props =>
+	color: ${(props: any) =>
 	props.reversed
 		? props.active ? 'white' : '#aaa'
 		: props.active ? 'black' : '#ccc'};
 `
 
-export const Icon = styled(({ className, ...rest }) => {
+export const Icon = styled(({ className, ...rest } : any) => {
 	return <span className={`material-icons ${className}`} {...rest} />
 })`
 	font-size: 18px;
@@ -37,5 +37,5 @@ export const Image = styled('img')`
 	display: block;
 	max-width: 100%;
 	max-height: 20em;
-	box-shadow: ${props => (props.selected ? '0 0 0 2px blue;' : 'none')};
+	box-shadow: ${(props: any) => (props.selected ? '0 0 0 2px blue;' : 'none')};
 `

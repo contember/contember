@@ -34,57 +34,41 @@ const isCodeHotkey = isKeyHotkey('mod+`')
  */
 
 export default class RichEditor extends React.Component {
+
 	/**
 	 * Deserialize the initial editor value.
-	 *
-	 * @type {Object}
 	 */
-
 	state = {
 		value: Plain.deserialize(''),
 	}
 
 	/**
 	 * Check if the current selection has a mark with `type` in it.
-	 *
-	 * @param {String} type
-	 * @return {Boolean}
 	 */
-
-	hasMark = type => {
+	hasMark = (type: string) => {
 		const { value } = this.state
-		return value.activeMarks.some(mark => mark.type == type)
+		return value.activeMarks.some((mark: any) => mark.type == type)
 	}
 
 	/**
 	 * Check if the any of the currently selected blocks are of `type`.
-	 *
-	 * @param {String} type
-	 * @return {Boolean}
 	 */
-
-	hasBlock = type => {
+	hasBlock = (type: string) => {
 		const { value } = this.state
-		return value.blocks.some(node => node.type == type)
+		return value.blocks.some((node: any) => node.type == type)
 	}
 
 	/**
 	 * Check whether the current selection has a link in it.
-	 *
-	 * @return {Boolean} hasLinks
 	 */
-
 	hasLinks = () => {
 		const { value } = this.state
-		return value.inlines.some(inline => inline.type == 'link')
+		return value.inlines.some((inline: any) => inline.type == 'link')
 	}
 
 	/**
 	 * Render.
-	 *
-	 * @return {Element}
 	 */
-
 	render() {
 		return (
 			<div>
@@ -123,19 +107,14 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * Render a mark-toggling toolbar button.
-	 *
-	 * @param {String} type
-	 * @param {String} icon
-	 * @return {Element}
 	 */
-
-	renderMarkButton = (type, icon) => {
+	renderMarkButton = (type: string, icon: string) => {
 		const isActive = this.hasMark(type)
 
 		return (
 			<Button
 				active={isActive}
-				onMouseDown={event => this.onClickMark(event, type)}
+				onMouseDown={(event: any) => this.onClickMark(event, type)}
 			>
 				<Icon>{icon}</Icon>
 			</Button>
@@ -144,13 +123,8 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * Render a block-toggling toolbar button.
-	 *
-	 * @param {String} type
-	 * @param {String} icon
-	 * @return {Element}
 	 */
-
-	renderBlockButton = (type, icon) => {
+	renderBlockButton = (type: string, icon: string) => {
 		let isActive = this.hasBlock(type)
 
 		if (['numbered-list', 'bulleted-list'].includes(type)) {
@@ -162,7 +136,7 @@ export default class RichEditor extends React.Component {
 		return (
 			<Button
 				active={isActive}
-				onMouseDown={event => this.onClickBlock(event, type)}
+				onMouseDown={(event: any) => this.onClickBlock(event, type)}
 			>
 				<Icon>{icon}</Icon>
 			</Button>
@@ -171,12 +145,8 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * Render a Slate node.
-	 *
-	 * @param {Object} props
-	 * @return {Element}
 	 */
-
-	renderNode = props => {
+	renderNode = (props: any) => {
 		const { attributes, children, node, isFocused } = props
 
 		switch (node.type) {
@@ -212,12 +182,8 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * Render a Slate mark.
-	 *
-	 * @param {Object} props
-	 * @return {Element}
 	 */
-
-	renderMark = props => {
+	renderMark = (props: any) => {
 		const { children, mark, attributes } = props
 
 		switch (mark.type) {
@@ -234,23 +200,15 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * On change, save the new `value`.
-	 *
-	 * @param {Change} change
 	 */
-
-	onChange = ({ value }) => {
+	onChange = ({ value }: any) => {
 		this.setState({ value })
 	}
 
 	/**
 	 * On key down, if it's a formatting command toggle a mark.
-	 *
-	 * @param {Event} event
-	 * @param {Change} change
-	 * @return {Change}
 	 */
-
-	onKeyDown = (event, change) => {
+	onKeyDown = (event: KeyboardEvent, change: any) => {
 		let mark
 
 		if (isBoldHotkey(event)) {
@@ -272,12 +230,8 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * When a mark button is clicked, toggle the current mark.
-	 *
-	 * @param {Event} event
-	 * @param {String} type
 	 */
-
-	onClickMark = (event, type) => {
+	onClickMark = (event: MouseEvent, type: any) => {
 		event.preventDefault()
 		const { value } = this.state
 		const change = value.change().toggleMark(type)
@@ -286,12 +240,8 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * When a block button is clicked, toggle the block type.
-	 *
-	 * @param {Event} event
-	 * @param {String} type
 	 */
-
-	onClickBlock = (event, type) => {
+	onClickBlock = (event: MouseEvent, type: any) => {
 		event.preventDefault()
 		const { value } = this.state
 		const change = value.change()
@@ -313,8 +263,8 @@ export default class RichEditor extends React.Component {
 		} else {
 			// Handle the extra wrapping required for list buttons.
 			const isList = this.hasBlock('list-item')
-			const isType = value.blocks.some(block => {
-				return !!document.getClosest(block.key, parent => parent.type == type)
+			const isType = value.blocks.some((block: any) => {
+				return !!document.getClosest(block.key, (parent: any) => parent.type == type)
 			})
 
 			if (isList && isType) {
@@ -339,11 +289,8 @@ export default class RichEditor extends React.Component {
 	/**
 	 * When clicking a link, if the selection has a link in it, remove the link.
 	 * Otherwise, add a new link with an href and text.
-	 *
-	 * @param {Event} event
 	 */
-
-	onClickLink = event => {
+	onClickLink = (event: MouseEvent) => {
 		event.preventDefault()
 		const { value } = this.state
 		const hasLinks = this.hasLinks()
@@ -355,8 +302,8 @@ export default class RichEditor extends React.Component {
 			const href = window.prompt('Enter the URL of the link:')
 			change.call(wrapLink, href)
 		} else {
-			const href = window.prompt('Enter the URL of the link:')
-			const text = window.prompt('Enter the text for the link:')
+			const href = '' + window.prompt('Enter the URL of the link:')
+			const text = '' + window.prompt('Enter the text for the link:')
 
 			change
 				.insertText(text)
@@ -369,11 +316,8 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * On clicking the image button, prompt for an image and insert it.
-	 *
-	 * @param {Event} event
 	 */
-
-	onClickImage = event => {
+	onClickImage = (event: MouseEvent) => {
 		event.preventDefault()
 		const src = window.prompt('Enter the URL of the image:')
 		if (!src) return
@@ -385,12 +329,8 @@ export default class RichEditor extends React.Component {
 
 	/**
 	 * On paste, if the text is a link, wrap the selection in a link.
-	 *
-	 * @param {Event} event
-	 * @param {Change} change
 	 */
-
-	onPaste = (event, change) => {
+	onPaste = (event: any, change: any) => {
 		if (change.value.isCollapsed) return
 
 		const transfer = getEventTransfer(event)
@@ -408,13 +348,8 @@ export default class RichEditor extends React.Component {
 
 	 /**
 	 * On drop, insert the image wherever it is dropped.
-	 *
-	 * @param {Event} event
-	 * @param {Change} change
-	 * @param {Editor} editor
 	 */
-
-	onDropOrPaste = (event, change, editor) => {
+	onDropOrPaste = (event: any, change: any, editor: any) => {
 		const target = getEventRange(event, change.value)
 		if (!target && event.type == 'drop') return
 
@@ -428,7 +363,7 @@ export default class RichEditor extends React.Component {
 				if (mime != 'image') continue
 
 				reader.addEventListener('load', () => {
-					editor.change(c => {
+					editor.change((c: any) => {
 						c.call(insertImage, reader.result, target)
 					})
 				})
@@ -450,12 +385,8 @@ export default class RichEditor extends React.Component {
 
 /**
  * A change helper to standardize wrapping links.
- *
- * @param {Change} change
- * @param {String} href
  */
-
-function wrapLink(change, href) {
+function wrapLink(change: any, href: string) {
 	change.wrapInline({
 		type: 'link',
 		data: { href },
@@ -466,34 +397,22 @@ function wrapLink(change, href) {
 
 /**
  * A change helper to standardize unwrapping links.
- *
- * @param {Change} change
  */
-
-function unwrapLink(change) {
+function unwrapLink(change: any) {
 	change.unwrapInline('link')
 }
 
-/*
+/**
  * A function to determine whether a URL has an image extension.
- *
- * @param {String} url
- * @return {Boolean}
  */
-
-function isImage(url) {
+function isImage(url: string) {
 	return !!imageExtensions.find(url.endsWith)
 }
 
 /**
  * A change function to standardize inserting images.
- *
- * @param {Change} change
- * @param {String} src
- * @param {Range} target
  */
-
-function insertImage(change, src, target) {
+function insertImage(change: any, src: string, target: any) {
 	if (target) {
 		change.select(target)
 	}

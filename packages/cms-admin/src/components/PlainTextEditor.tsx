@@ -9,22 +9,17 @@ import { Editor } from 'slate-react'
  */
 
 export default class PlainTextEditor extends React.Component {
+
 	/**
 	 * Deserialize the initial editor value.
-	 *
-	 * @type {Object}
 	 */
-
 	state = {
 		value: Plain.deserialize(''),
 	}
 
 	/**
 	 * Render the editor.
-	 *
-	 * @return {Component} component
 	 */
-
 	render() {
 		return (
 			<Editor
@@ -37,11 +32,8 @@ export default class PlainTextEditor extends React.Component {
 
 	/**
 	 * On change.
-	 *
-	 * @param {Change} change
 	 */
-
-	onChange = ({ value }) => {
+	onChange = ({ value }: any) => {
 		this.setState({ value })
 	}
 }

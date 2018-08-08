@@ -2,8 +2,8 @@
 	"name": "cms-client",
 	"version": "0.0.0",
 	"private": true,
-	"main": "dist/index.js",
-	"typings": "dist/index.d.ts",
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"build": "tsc --build --verbose",
 		"start": "tsc --build --verbose --watch",

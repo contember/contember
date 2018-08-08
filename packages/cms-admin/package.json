@@ -10,16 +10,32 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.0.1",
+    "@blueprintjs/datetime": "^3.0.0",
+    "@blueprintjs/icons": "^3.0.0",
+    "@blueprintjs/select": "^3.0.0",
+    "@blueprintjs/table": "^3.0.0",
+    "bootstrap": "^4.1.1",
+    "bourbon": "^5.1.0",
+    "emotion": "^9.2.6",
+    "image-extensions": "^1.1.0",
+    "immutable": "^3.8.2",
+    "is-url": "^1.2.4",
+    "material-design-icons": "^3.0.1",
     "react": "^16.4.1",
     "react-dom": "^16.4.2",
+    "react-emotion": "^9.2.6",
     "react-redux": "^5.0.7",
+    "reactstrap": "^6.3.0",
     "redux": "^4.0.0",
     "redux-actions": "^2.4.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "slate-react": "^0.13.4",
+    "slate": "^0.34.7"
   },
   "devDependencies": {
     "@types/react": "^16.4.6",
     "@types/react-redux": "5.0.20",
+    "@types/reactstrap": "^6.0.0",
     "@types/redux-actions": "^2.3.0",
     "typescript": "^3.0.1"
   }

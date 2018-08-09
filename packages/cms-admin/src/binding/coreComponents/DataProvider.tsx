@@ -1,10 +1,8 @@
 import * as React from 'react'
-import { GraphQlBuilder } from 'cms-client'
-import DataContext, { DataContextValue } from './DataContext'
-import EntityMarker from '../dao/EntityMarker'
-import FieldContext, { FieldContextValue } from './FieldContext'
-import FieldMarker from '../dao/FieldMarker'
 import RootEntityMarker from '../dao/RootEntityMarker'
+import TreeToQueryConverter from '../model/TreeToQueryConverter'
+import DataContext, { DataContextValue } from './DataContext'
+import FieldContext from './FieldContext'
 
 export interface DataProviderProps {}
 
@@ -36,43 +34,9 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 			return
 		}
 
-		const entityMarker = this.rootContext.content
+		const converter = new TreeToQueryConverter(this.rootContext)
 
-		if (entityMarker instanceof EntityMarker) {
-			const queryBuilder = new GraphQlBuilder.QueryBuilder()
-			const registerQueryPart = (
-				context: FieldContextValue,
-				builder: GraphQlBuilder.ObjectBuilder
-			): GraphQlBuilder.ObjectBuilder => {
-				if (context instanceof EntityMarker) {
-					for (const field in context.fields) {
-						const fieldValue: FieldContextValue = context.fields[field]
+		console.log(converter.convert())
 
-						if (fieldValue instanceof FieldMarker) {
-							builder = builder.field(fieldValue.name)
-						} else if (fieldValue instanceof EntityMarker) {
-							builder = builder.object(field, builder => registerQueryPart(fieldValue, builder))
-
-							if (fieldValue.where) {
-								builder = builder.argument('where', fieldValue.where)
-							}
-						}
-					}
-				}
-
-				return builder
-			}
-
-			const query = queryBuilder.query(builder =>
-				builder.object(entityMarker.entityName, object => {
-					if (entityMarker.where) {
-						object = object.argument('where', entityMarker.where)
-					}
-
-					return registerQueryPart(entityMarker, object)
-				})
-			)
-			console.log(query)
-		}
 	}
 }

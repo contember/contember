@@ -1,6 +1,6 @@
 import * as React from 'react'
-import EntityAccessor from './EntityAccessor'
-import FieldAccessor from './FieldAccessor'
+import EntityAccessor from '../dao/EntityAccessor'
+import FieldAccessor from '../dao/FieldAccessor'
 
 export type DataContextValue = undefined | FieldAccessor | EntityAccessor
 

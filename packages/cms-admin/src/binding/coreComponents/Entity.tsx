@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { EntityName } from './bindingTypes'
+import { EntityName } from '../bindingTypes'
 import DataContext, { DataContextValue } from './DataContext'
 import EntityContext, { EntityContextValue } from './EntityContext'
-import EntityMarker from './EntityMarker'
+import EntityMarker from '../dao/EntityMarker'
 import FieldContext, { FieldContextValue } from './FieldContext'
 import LoadingSpinner from './LoadingSpinner'
-import RootEntityMarker from './RootEntityMarker'
+import RootEntityMarker from '../dao/RootEntityMarker'
 
 export interface EntityProps {
 	name: EntityName

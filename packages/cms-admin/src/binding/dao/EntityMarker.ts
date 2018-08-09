@@ -1,5 +1,5 @@
-import { EntityName, FieldName } from './bindingTypes'
-import { FieldContextValue } from './FieldContext'
+import { EntityName, FieldName } from '../bindingTypes'
+import { FieldContextValue } from '../coreComponents/FieldContext'
 
 export type EntityFields = {
 	[name in FieldName]?: FieldContextValue

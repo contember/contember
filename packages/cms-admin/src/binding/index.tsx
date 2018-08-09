@@ -1,9 +1,9 @@
 
-import Entity from './Entity'
-import Field from './Field'
-import FieldAccessor from './FieldAccessor'
-import OneToMany from './OneToMany'
-import OneToOne from './OneToOne'
+import Entity from './coreComponents/Entity'
+import Field from './coreComponents/Field'
+import FieldAccessor from './dao/FieldAccessor'
+import OneToMany from './coreComponents/OneToMany'
+import OneToOne from './coreComponents/OneToOne'
 
 export {
 	Entity,
@@ -12,3 +12,6 @@ export {
 	OneToMany,
 	OneToOne,
 }
+
+export * from './facade'
+

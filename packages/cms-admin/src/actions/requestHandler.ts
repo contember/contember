@@ -10,7 +10,7 @@ const handleRequest = (request: RequestState, previous: RequestState): ActionCre
   //do stuff
 
   window.setTimeout(() => {
-    dispatch(createAction(VIEW_REPLACE, () => ({...request, loading: false}))())
+    dispatch(createAction(VIEW_REPLACE, () => ({route: request, loading: false}))())
   }, 1000)
 }
 

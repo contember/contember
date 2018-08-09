@@ -1,12 +1,11 @@
-export default interface ViewState
-{
-  loading: boolean,
-  name: string | null
-  id: string | null
+import RequestState from './request'
+
+export default interface ViewState {
+	loading: boolean
+	route: RequestState | null
 }
 
 export const emptyViewState: ViewState = {
-  loading: false,
-  name: null,
-  id: null,
+	loading: false,
+	route: null
 }

@@ -36,6 +36,8 @@ export default class TreeToQueryConverter {
 		builder: GraphQlBuilder.ObjectBuilder
 	): GraphQlBuilder.ObjectBuilder {
 		if (context instanceof EntityMarker) {
+			builder = builder.field('id')
+
 			for (const field in context.fields) {
 				const fieldValue: FieldContextValue = context.fields[field]
 

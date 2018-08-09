@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { GraphQlBuilder } from 'cms-client'
 import DataContext, { DataContextValue } from './DataContext'
+import EntityMarker from './EntityMarker'
 import FieldContext, { FieldContextValue } from './FieldContext'
+import FieldMarker from './FieldMarker'
+import RootEntityMarker from './RootEntityMarker'
 
 export interface DataProviderProps {}
 
@@ -14,10 +17,10 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 		data: undefined
 	}
 
-	protected rootContext?: FieldContextValue
+	protected rootContext?: RootEntityMarker
 
 	public render() {
-		this.rootContext = {}
+		this.rootContext = new RootEntityMarker()
 
 		return (
 			<FieldContext.Provider value={this.rootContext}>
@@ -27,28 +30,31 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 	}
 
 	public componentDidMount() {
-		console.log('The structure is', this.rootContext)
+		console.log('The structure is', this.rootContext!.content)
 
-		const rootContext = this.rootContext
+		if (this.rootContext === undefined) {
+			return
+		}
 
-		if (rootContext !== undefined) {
+		const entityMarker = this.rootContext.content
+
+		if (entityMarker instanceof EntityMarker) {
 			const queryBuilder = new GraphQlBuilder.QueryBuilder()
-			const registerQueryPart = (context: FieldContextValue, builder: GraphQlBuilder.ObjectBuilder): GraphQlBuilder.ObjectBuilder => {
-				if (Array.isArray(context)) {
-					for (const item of context) {
-						builder = registerQueryPart(item, builder)
-					}
-				} else if (typeof context === 'object') {
-					for (const field in context) {
-						if (typeof context[field] === 'boolean') {
-							builder = builder.field(field)
-						} else {
-							const fieldValue = context[field]
+			const registerQueryPart = (
+				context: FieldContextValue,
+				builder: GraphQlBuilder.ObjectBuilder
+			): GraphQlBuilder.ObjectBuilder => {
+				if (context instanceof EntityMarker) {
+					for (const field in context.fields) {
+						const fieldValue: FieldContextValue = context.fields[field]
 
-							if (fieldValue !== undefined) {
-								builder = builder.object(field, builder =>
-									registerQueryPart(fieldValue, builder)
-								)
+						if (fieldValue instanceof FieldMarker) {
+							builder = builder.field(fieldValue.name)
+						} else if (fieldValue instanceof EntityMarker) {
+							builder = builder.object(field, builder => registerQueryPart(fieldValue, builder))
+
+							if (fieldValue.where) {
+								builder = builder.argument('where', fieldValue.where)
 							}
 						}
 					}
@@ -58,10 +64,12 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 			}
 
 			const query = queryBuilder.query(builder =>
-				builder.object('Post', (object) => {
-					// builder.argument()
+				builder.object(entityMarker.entityName, object => {
+					if (entityMarker.where) {
+						object = object.argument('where', entityMarker.where)
+					}
 
-					return registerQueryPart(rootContext, object)
+					return registerQueryPart(entityMarker, object)
 				})
 			)
 			console.log(query)

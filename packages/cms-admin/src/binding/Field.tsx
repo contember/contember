@@ -3,7 +3,9 @@ import { FieldName } from './bindingTypes'
 import DataContext, { DataContextValue } from './DataContext'
 import EntityAccessor from './EntityAccessor'
 import EntityContext, { EntityContextValue } from './EntityContext'
+import EntityMarker from './EntityMarker'
 import FieldAccessor from './FieldAccessor'
+import FieldMarker from './FieldMarker'
 
 export interface FieldProps {
 	name: FieldName
@@ -37,8 +39,8 @@ export default class Field extends React.Component<FieldProps> {
 	}
 
 	public componentDidMount() {
-		if (this.entityContext) {
-			this.entityContext[this.props.name] = true
+		if (this.entityContext instanceof EntityMarker) {
+			this.entityContext.fields[this.props.name] = new FieldMarker(this.props.name)
 		}
 	}
 }

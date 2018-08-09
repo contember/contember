@@ -2,7 +2,6 @@ import * as React from 'react'
 import { FieldName } from './bindingTypes'
 import DataContext, { DataContextValue } from './DataContext'
 import EntityAccessor from './EntityAccessor'
-import { EntityContextValue } from './EntityContext'
 import OneToRelation from './OneToRelation'
 
 export interface OneToManyProps {
@@ -14,7 +13,7 @@ export interface OneToManyProps {
 export default class OneToMany extends React.Component<OneToManyProps> {
 
 	public render() {
-		return <OneToRelation field={this.props.field} setNewEntityContext={this.setNewEntityContent}>
+		return <OneToRelation field={this.props.field}>
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
@@ -32,11 +31,5 @@ export default class OneToMany extends React.Component<OneToManyProps> {
 				}}
 			</DataContext.Consumer>
 		</OneToRelation>
-	}
-
-	protected setNewEntityContent = (entityContext: EntityContextValue, newFieldContext: EntityContextValue[]) => {
-		if (newFieldContext.length > 0) {
-			entityContext[this.props.field] = newFieldContext
-		}
 	}
 }

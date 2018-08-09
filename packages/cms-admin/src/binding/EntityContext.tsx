@@ -1,11 +1,9 @@
 import * as React from 'react'
-import { FieldName } from './bindingTypes'
-import { FieldContextValue } from './FieldContext'
+import EntityMarker from './EntityMarker'
+import RootEntityMarker from './RootEntityMarker'
 
-export type EntityContextValue = {
-	[name in FieldName]?: FieldContextValue
-}
+export type EntityContextValue = RootEntityMarker | EntityMarker
 
-const entityContext = React.createContext<EntityContextValue>({})
+const entityContext = React.createContext<EntityContextValue>(new RootEntityMarker())
 
 export default entityContext

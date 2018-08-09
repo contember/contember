@@ -1,44 +1,37 @@
 import * as React from 'react'
 import { InputGroup, FormGroup, Card, Elevation, H1, Button } from '@blueprintjs/core'
-import { LoginModel } from '../../model/LoginModel'
+import { connect } from 'react-redux'
+import { login } from '../../actions/auth'
+import State from '../../state'
+import { Dispatch } from '../../actions/types'
+import { AuthStatus } from '../../state/auth'
 
-interface State {
-	email: string
-	password: string
-	loading: boolean
-	error: boolean
-	message?: string
-}
-
-export default class Login extends React.Component<{}, State> {
-	state: State = {
+class Login extends React.PureComponent<Login.Props, Login.State> {
+	state: Login.State = {
 		email: '',
-		password: '',
-		loading: false,
-		error: false
+		password: ''
 	}
 
-	loginModel = LoginModel.create()
-
 	render() {
+		const loading = this.props.status === AuthStatus.LOADING
+
 		return (
 			<Card elevation={Elevation.ONE}>
 				<H1>Login</H1>
 				<form
 					onSubmit={async e => {
 						e.preventDefault()
-						this.setState({ loading: true })
-						const result = await this.loginModel.logIn(this.state.email, this.state.password)
-						this.setState({ loading: false, error: !result.ok, message: result.message })
+						const result = await this.props.login(this.state.email, this.state.password)
+						// this.setState({ loading: false, error: !result.ok, message: result.message })
 					}}
 				>
-					{this.state.message}
+					{this.props.errorMessage}
 					<FormGroup label="Email">
 						<InputGroup
 							value={this.state.email}
 							autoComplete="username"
 							type="email"
-							disabled={this.state.loading}
+							disabled={loading}
 							onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ email: e.currentTarget.value })}
 						/>
 					</FormGroup>
@@ -47,11 +40,11 @@ export default class Login extends React.Component<{}, State> {
 							type="password"
 							autoComplete="current-password"
 							value={this.state.password}
-							disabled={this.state.loading}
+							disabled={loading}
 							onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })}
 						/>
 					</FormGroup>
-					<Button type="submit" loading={this.state.loading}>
+					<Button type="submit" loading={loading}>
 						Login
 					</Button>
 				</form>
@@ -59,3 +52,28 @@ export default class Login extends React.Component<{}, State> {
 		)
 	}
 }
+
+namespace Login {
+	export interface DispatchProps {
+		login: (email: string, password: string) => void
+	}
+
+	export interface StateProps {
+		errorMessage: string | null
+		status: AuthStatus | null
+	}
+
+	export type Props = DispatchProps & StateProps
+
+	export interface State {
+		email: string
+		password: string
+	}
+}
+
+export default connect<Login.StateProps, Login.DispatchProps, {}, State>(
+	({ auth }) => ({ errorMessage: auth.errorMessage, status: auth.status }),
+	(dispatch: Dispatch) => ({
+		login: (email: string, password: string) => dispatch(login(email, password))
+	})
+)(Login)

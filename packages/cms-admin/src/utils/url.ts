@@ -1,3 +1,5 @@
+import RequestState from "../state/request";
+
 function decode(str: string)
 {
   return decodeURIComponent(str.replace(/\+/g, ' '))
@@ -25,12 +27,12 @@ export function parseParams(query: string): { [key: string]: string }
 
 }
 
-export function buildParams(params: { [key: string]: string | null }): string
+export function buildParams(params: { [key: string]: string | undefined }): string
 {
   let result = ''
   for (let key in params) {
     const value = params[key]
-    if (value === null) {
+    if (value === undefined) {
       continue
     }
     result += key + '=' + encodeURIComponent(value) + "&"
@@ -40,4 +42,9 @@ export function buildParams(params: { [key: string]: string | null }): string
   }
 
   return '?' + result.substring(0, result.length - 1)
+}
+
+
+export function buildUrlFromRequest(request: RequestState): string {
+	return '/' + buildParams(request)
 }

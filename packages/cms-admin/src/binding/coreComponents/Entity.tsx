@@ -13,37 +13,36 @@ export interface EntityProps {
 	where?: any
 }
 
-
 export default class Entity extends React.Component<EntityProps> {
-
 	protected fields?: FieldContextValue
 	protected newContext?: EntityContextValue
 
 	public render() {
-		return <FieldContext.Consumer>
-			{(fieldContext: FieldContextValue) => {
-				this.fields = fieldContext
-				this.newContext = fieldContext instanceof EntityMarker ? fieldContext : new EntityMarker(
-					this.props.name,
-					{},
-					this.props.where
-				)
+		return (
+			<FieldContext.Consumer>
+				{(fieldContext: FieldContextValue) => {
+					this.fields = fieldContext
+					this.newContext =
+						fieldContext instanceof EntityMarker
+							? fieldContext
+							: new EntityMarker(this.props.name, {}, this.props.where)
 
-				return <EntityContext.Provider value={this.newContext}>
-					<DataContext.Consumer>
-						{(data: DataContextValue) => {
-							if (data === undefined) {
-								const LoadingOverlay = this.props.loadingOverlay || LoadingSpinner
-								return <LoadingOverlay>
-									{this.props.children}
-								</LoadingOverlay>
-							}
-							return this.props.children
-						}}
-					</DataContext.Consumer>
-				</EntityContext.Provider>
-			}}
-		</FieldContext.Consumer>
+					return (
+						<EntityContext.Provider value={this.newContext}>
+							<DataContext.Consumer>
+								{(data: DataContextValue) => {
+									if (data === undefined) {
+										const LoadingOverlay = this.props.loadingOverlay || LoadingSpinner
+										return <LoadingOverlay>{this.props.children}</LoadingOverlay>
+									}
+									return this.props.children
+								}}
+							</DataContext.Consumer>
+						</EntityContext.Provider>
+					)
+				}}
+			</FieldContext.Consumer>
+		)
 	}
 
 	public componentDidMount() {

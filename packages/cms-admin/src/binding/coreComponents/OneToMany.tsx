@@ -9,27 +9,29 @@ export interface OneToManyProps {
 	children: (unlink: () => void) => React.ReactNode
 }
 
-
 export default class OneToMany extends React.Component<OneToManyProps> {
-
 	public render() {
-		return <OneToRelation field={this.props.field}>
-			<DataContext.Consumer>
-				{(data: DataContextValue) => {
-					if (data instanceof EntityAccessor) {
-						const field = data.data[this.props.field]
+		return (
+			<OneToRelation field={this.props.field}>
+				<DataContext.Consumer>
+					{(data: DataContextValue) => {
+						if (data instanceof EntityAccessor) {
+							const field = data.data[this.props.field]
 
-						if (Array.isArray(field)) {
-							return field.map((datum: DataContextValue, i: number) => {
-								return <DataContext.Provider value={datum} key={i}>
-									{datum instanceof EntityAccessor && this.props.children(datum.unlink)}
-								</DataContext.Provider>
-							})
+							if (Array.isArray(field)) {
+								return field.map((datum: DataContextValue, i: number) => {
+									return (
+										<DataContext.Provider value={datum} key={i}>
+											{datum instanceof EntityAccessor && this.props.children(datum.unlink)}
+										</DataContext.Provider>
+									)
+								})
+							}
 						}
-					}
-					return this.props.children(() => undefined)
-				}}
-			</DataContext.Consumer>
-		</OneToRelation>
+						return this.props.children(() => undefined)
+					}}
+				</DataContext.Consumer>
+			</OneToRelation>
+		)
 	}
 }

@@ -4,13 +4,8 @@ import EntityMarker from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
 import RootEntityMarker from '../dao/RootEntityMarker'
 
-
 export default class TreeToQueryConverter {
-
-
-	constructor(private rem: RootEntityMarker) {
-	}
-
+	constructor(private rem: RootEntityMarker) {}
 
 	public convert(): string | undefined {
 		const entityMarker = this.rem.content
@@ -29,7 +24,6 @@ export default class TreeToQueryConverter {
 			)
 		}
 	}
-
 
 	private registerQueryPart(
 		context: FieldContextValue,

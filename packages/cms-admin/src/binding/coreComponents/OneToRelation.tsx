@@ -1,31 +1,29 @@
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import EntityContext, { EntityContextValue } from './EntityContext'
 import EntityMarker from '../dao/EntityMarker'
-import FieldContext, { FieldContextValue } from './FieldContext'
 import RootEntityMarker from '../dao/RootEntityMarker'
+import EntityContext, { EntityContextValue } from './EntityContext'
+import FieldContext from './FieldContext'
 
 export interface OneToRelationProps {
 	field: FieldName
 }
 
-
 export default class OneToRelation extends React.Component<OneToRelationProps> {
-
 	protected entityContext?: EntityContextValue
 	protected newFieldContext?: RootEntityMarker
 
 	public render() {
-		return <EntityContext.Consumer>
-			{(entityContext: EntityContextValue) => {
-				this.entityContext = entityContext
-				this.newFieldContext = new RootEntityMarker()
+		return (
+			<EntityContext.Consumer>
+				{(entityContext: EntityContextValue) => {
+					this.entityContext = entityContext
+					this.newFieldContext = new RootEntityMarker()
 
-				return <FieldContext.Provider value={this.newFieldContext}>
-					{this.props.children}
-				</FieldContext.Provider>
-			}}
-		</EntityContext.Consumer>
+					return <FieldContext.Provider value={this.newFieldContext}>{this.props.children}</FieldContext.Provider>
+				}}
+			</EntityContext.Consumer>
+		)
 	}
 
 	public componentDidMount() {

@@ -12,30 +12,32 @@ export interface FieldProps {
 	children?: (data: FieldAccessor) => React.ReactNode
 }
 
-
 export default class Field extends React.Component<FieldProps> {
-
 	protected entityContext?: EntityContextValue
 
 	public render() {
-		return <EntityContext.Consumer>
-			{(entityContext: EntityContextValue) => {
-				this.entityContext = entityContext
+		return (
+			<EntityContext.Consumer>
+				{(entityContext: EntityContextValue) => {
+					this.entityContext = entityContext
 
-				return <DataContext.Consumer>
-					{(data: DataContextValue) => {
-						if (data instanceof EntityAccessor) {
-							const fieldData = data.data[this.props.name]
+					return (
+						<DataContext.Consumer>
+							{(data: DataContextValue) => {
+								if (data instanceof EntityAccessor) {
+									const fieldData = data.data[this.props.name]
 
-							if (this.props.children && fieldData instanceof FieldAccessor) {
-								return this.props.children(fieldData)
-							}
-						}
-						return null
-					}}
-				</DataContext.Consumer>
-			}}
-		</EntityContext.Consumer>
+									if (this.props.children && fieldData instanceof FieldAccessor) {
+										return this.props.children(fieldData)
+									}
+								}
+								return null
+							}}
+						</DataContext.Consumer>
+					)
+				}}
+			</EntityContext.Consumer>
+		)
 	}
 
 	public componentDidMount() {

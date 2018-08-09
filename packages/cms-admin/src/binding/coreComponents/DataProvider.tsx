@@ -37,6 +37,5 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 		const converter = new TreeToQueryConverter(this.rootContext)
 
 		console.log(converter.convert())
-
 	}
 }

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { GraphQlBuilder } from 'cms-client'
 import DataContext, { DataContextValue } from './DataContext'
-import EntityMarker from './EntityMarker'
+import EntityMarker from '../dao/EntityMarker'
 import FieldContext, { FieldContextValue } from './FieldContext'
-import FieldMarker from './FieldMarker'
-import RootEntityMarker from './RootEntityMarker'
+import FieldMarker from '../dao/FieldMarker'
+import RootEntityMarker from '../dao/RootEntityMarker'
 
 export interface DataProviderProps {}
 

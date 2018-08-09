@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { FieldName } from './bindingTypes'
+import { FieldName } from '../bindingTypes'
 import DataContext, { DataContextValue } from './DataContext'
-import EntityAccessor from './EntityAccessor'
+import EntityAccessor from '../dao/EntityAccessor'
 import OneToRelation from './OneToRelation'
 
 export interface OneToManyProps {

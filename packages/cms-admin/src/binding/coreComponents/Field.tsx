@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { FieldName } from './bindingTypes'
+import { FieldName } from '../bindingTypes'
 import DataContext, { DataContextValue } from './DataContext'
-import EntityAccessor from './EntityAccessor'
+import EntityAccessor from '../dao/EntityAccessor'
 import EntityContext, { EntityContextValue } from './EntityContext'
-import EntityMarker from './EntityMarker'
-import FieldAccessor from './FieldAccessor'
-import FieldMarker from './FieldMarker'
+import EntityMarker from '../dao/EntityMarker'
+import FieldAccessor from '../dao/FieldAccessor'
+import FieldMarker from '../dao/FieldMarker'
 
 export interface FieldProps {
 	name: FieldName

@@ -1,5 +1,5 @@
-import { FieldName } from './bindingTypes'
-import { DataContextValue } from './DataContext'
+import { FieldName } from '../bindingTypes'
+import { DataContextValue } from '../coreComponents/DataContext'
 
 export default class EntityAccessor {
 

@@ -1,4 +1,4 @@
-import { FieldContextValue } from './FieldContext'
+import { FieldContextValue } from '../coreComponents/FieldContext'
 
 export default class RootEntityMarker {
 

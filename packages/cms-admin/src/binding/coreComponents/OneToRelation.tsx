@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { FieldName } from './bindingTypes'
+import { FieldName } from '../bindingTypes'
 import EntityContext, { EntityContextValue } from './EntityContext'
-import EntityMarker from './EntityMarker'
+import EntityMarker from '../dao/EntityMarker'
 import FieldContext, { FieldContextValue } from './FieldContext'
-import RootEntityMarker from './RootEntityMarker'
+import RootEntityMarker from '../dao/RootEntityMarker'
 
 export interface OneToRelationProps {
 	field: FieldName

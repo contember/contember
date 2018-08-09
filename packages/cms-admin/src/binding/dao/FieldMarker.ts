@@ -1,4 +1,4 @@
-import { FieldName } from './bindingTypes'
+import { FieldName } from '../bindingTypes'
 
 export default class FieldMarker {
 

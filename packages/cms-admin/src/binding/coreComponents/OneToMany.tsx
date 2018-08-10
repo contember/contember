@@ -6,7 +6,7 @@ import OneToRelation from './OneToRelation'
 
 export interface OneToManyProps {
 	field: FieldName
-	children: (unlink: () => void) => React.ReactNode
+	children: (unlink?: () => void) => React.ReactNode
 }
 
 export default class OneToMany extends React.Component<OneToManyProps> {

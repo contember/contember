@@ -4,7 +4,7 @@ import { SET_TOKEN, SET_ERROR, SET_LOADING } from '../reducer/auth'
 
 export const login = (email: string, password: string): ActionCreator => async (dispatch, getState, services) => {
 	dispatch(createAction(SET_LOADING)())
-	const { signIn } = await services.tenantClient.request(loginRequest, { email, password })
+	const { signIn } = await services.tenantClient.request(loginMutation, { email, password })
 	if (signIn.ok) {
 		dispatch(createAction(SET_TOKEN, () => signIn.result.token)())
 	} else {
@@ -14,7 +14,7 @@ export const login = (email: string, password: string): ActionCreator => async (
 	}
 }
 
-const loginRequest = `
+const loginMutation = `
 	mutation($email: String!, $password: String!) {
 		signIn(email: $email, password: $password) {
 			ok

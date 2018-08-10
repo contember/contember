@@ -6,6 +6,10 @@ class LocalStorageManager {
 	set(key: LocalStorageManager.Keys, value: string) {
 		return localStorage.setItem(key, value)
 	}
+
+	unset(key: LocalStorageManager.Keys) {
+		return localStorage.removeItem(key)
+	}
 }
 
 namespace LocalStorageManager {

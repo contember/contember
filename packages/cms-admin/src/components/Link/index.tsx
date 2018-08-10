@@ -12,18 +12,27 @@ class Link extends React.PureComponent<Link.Props, Link.State> {
 		this.props.goTo()
 	}
 
+	defaultComponent: React.StatelessComponent<Link.InnerProps> = () => (
+		<a href={this.props.url} onClick={this.onClick}>
+			{this.props.children}
+		</a>
+	)
+
 	render() {
-		return (
-			<a href={this.props.url} onClick={this.onClick}>
-				{this.props.children}
-			</a>
-		)
+		const Component = this.props.Component || this.defaultComponent
+		return <Component href={this.props.url} onClick={this.onClick} />
 	}
 }
 
 namespace Link {
+	export interface InnerProps {
+		href: string
+		onClick: React.MouseEventHandler
+	}
+
 	export interface OwnProps {
 		requestChange: RequestChange
+		Component?: React.ComponentType<InnerProps>
 	}
 
 	export interface DispatchProps {

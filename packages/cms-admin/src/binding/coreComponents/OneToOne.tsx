@@ -18,7 +18,7 @@ export default class OneToOne extends React.Component<OneToOneProps> {
 						if (data instanceof EntityAccessor) {
 							const field = data.data[this.props.field]
 
-							if (!Array.isArray(field) && field instanceof EntityAccessor) {
+							if (field instanceof EntityAccessor) {
 								return <DataContext.Provider value={field}>{this.renderChildren(field.unlink)}</DataContext.Provider>
 							}
 						}

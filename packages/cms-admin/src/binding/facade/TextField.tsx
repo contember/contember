@@ -24,6 +24,6 @@ export default class TextField extends React.Component<TextFieldProps> {
 	}
 
 	private generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLInputElement>) => {
-		data.onChange(e.target.value)
+		data.onChange && data.onChange(e.target.value)
 	}
 }

@@ -1,7 +1,9 @@
 import { FieldName } from '../bindingTypes'
 import { DataContextValue } from '../coreComponents/DataContext'
 
-export type EntityData = { [name in FieldName]: DataContextValue | DataContextValue[] }
+export type FieldData = DataContextValue | DataContextValue[]
+
+export type EntityData = { [name in FieldName]: FieldData }
 
 export default class EntityAccessor {
 	constructor(
@@ -9,4 +11,8 @@ export default class EntityAccessor {
 		public readonly data: EntityData,
 		public readonly unlink?: () => void
 	) {}
+
+	withUpdatedField(field: FieldName, newData: FieldData): EntityAccessor {
+		return new EntityAccessor(this.primaryKey, { ...this.data, [field]: newData }, this.unlink)
+	}
 }

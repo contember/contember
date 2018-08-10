@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "cms-client": "^0.0.0",
+    "cms-common": "^0.0.0",
     "@blueprintjs/core": "^3.0.1",
     "@blueprintjs/datetime": "^3.0.0",
     "@blueprintjs/icons": "^3.0.0",

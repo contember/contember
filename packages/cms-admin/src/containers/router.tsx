@@ -21,6 +21,11 @@ function getHandler<N extends RouteName>(name: N): RouteHandler<N> {
 	return routeMap[name] as RouteHandler<N>
 }
 
+function renderRoute(route:RequestState): React.ReactNode {
+	const handler = getHandler(route.name)
+	return handler ? handler(route) : '404'
+}
+
 export default connect<{ loading: boolean; route: RequestState | null }, {}, {}, State>(
 	({ view: { loading, route } }) => ({
 		loading,
@@ -35,7 +40,7 @@ export default connect<{ loading: boolean; route: RequestState | null }, {}, {},
 				<Link requestChange={dashboardRequest('foo')}>Dashboard</Link>
 			</div>
 			{loading && <div>Loading overlay</div>}
-			<div>{route && getHandler(route.name)(route)}</div>
+			<div>{route && renderRoute(route)}</div>
 		</div>
 	)
 })

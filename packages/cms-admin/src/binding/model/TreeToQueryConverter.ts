@@ -1,4 +1,4 @@
-import * as GraphQlBuilder from 'cms-client/dist/src/graphQlBuilder'
+import { CrudQueryBuilder } from 'cms-client'
 import { FieldContextValue } from '../coreComponents/FieldContext'
 import EntityMarker from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
@@ -11,37 +11,35 @@ export default class TreeToQueryConverter {
 		const entityMarker = this.rem.content
 
 		if (entityMarker instanceof EntityMarker) {
-			const queryBuilder = new GraphQlBuilder.QueryBuilder()
+			const queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 
-			return queryBuilder.query(builder =>
-				builder.object(entityMarker.entityName, object => {
-					if (entityMarker.where) {
-						object = object.argument('where', entityMarker.where)
-					}
+			return queryBuilder.get(entityMarker.entityName, object => {
+				if (entityMarker.where) {
+					object = object.where(entityMarker.where)
+				}
 
-					return this.registerQueryPart(entityMarker, object)
-				})
-			)
+				return this.registerQueryPart(entityMarker, object)
+			}).getGql()
 		}
 	}
 
 	private registerQueryPart(
 		context: FieldContextValue,
-		builder: GraphQlBuilder.ObjectBuilder
-	): GraphQlBuilder.ObjectBuilder {
+		builder: CrudQueryBuilder.GetQueryBuilder
+	): CrudQueryBuilder.GetQueryBuilder {
 		if (context instanceof EntityMarker) {
-			builder = builder.field('id')
+			builder = builder.column('id')
 
 			for (const field in context.fields) {
 				const fieldValue: FieldContextValue = context.fields[field]
 
 				if (fieldValue instanceof FieldMarker) {
-					builder = builder.field(fieldValue.name)
+					builder = builder.column(fieldValue.name)
 				} else if (fieldValue instanceof EntityMarker) {
-					builder = builder.object(field, builder => this.registerQueryPart(fieldValue, builder))
+					builder = builder.relation(field, builder => this.registerQueryPart(fieldValue, builder))
 
 					if (fieldValue.where) {
-						builder = builder.argument('where', fieldValue.where)
+						builder = builder.where(fieldValue.where)
 					}
 				}
 			}

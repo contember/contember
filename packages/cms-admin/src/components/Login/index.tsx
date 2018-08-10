@@ -21,8 +21,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 				<form
 					onSubmit={async e => {
 						e.preventDefault()
-						const result = await this.props.login(this.state.email, this.state.password)
-						// this.setState({ loading: false, error: !result.ok, message: result.message })
+						await this.props.login(this.state.email, this.state.password)
 					}}
 				>
 					{this.props.errorMessage}

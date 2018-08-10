@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { Input } from 'cms-common'
+import { GraphQlBuilder } from 'cms-client'
 import { EntityName } from '../bindingTypes'
 import DataContext, { DataContextValue } from './DataContext'
 import EntityContext, { EntityContextValue } from './EntityContext'
@@ -10,7 +12,7 @@ import RootEntityMarker from '../dao/RootEntityMarker'
 export interface EntityProps {
 	name: EntityName
 	loadingOverlay?: React.ComponentClass
-	where?: any
+	where?: Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal>
 }
 
 export default class Entity extends React.Component<EntityProps> {

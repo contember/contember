@@ -6,7 +6,7 @@ import { Input } from 'cms-common'
 export default class GetQueryBuilder<HasWhere extends boolean = false> {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	where(where: Input.Where<Literal>) {
+	where(where: Input.UniqueWhere<Literal>) {
 		return new GetQueryBuilder<true>(this.objectBuilder.argument('where', where))
 	}
 

@@ -25,7 +25,7 @@ class GraphqlClient {
 			} else {
 				throw new GraphqlClient.GraphqlClientError(
 					{ query, variables },
-					{ status: response.status, body: await response.text() }
+					{ status: response.status, body: result }
 				)
 			}
 		} else {
@@ -45,11 +45,12 @@ namespace GraphqlClient {
 			let message = 'An GraphQL error occured'
 			if (
 				typeof response === 'object' &&
-				Array.isArray(response.error) &&
-				response.error[0] &&
-				response.error[0].message
+				typeof response.body === 'object' &&
+				Array.isArray(response.body.errors) &&
+				response.body.errors[0] &&
+				response.body.errors[0].message
 			) {
-				message = response.error[0].message
+				message = response.body.errors[0].message
 			} else if (response.status) {
 				message = `API responded with ${response.status} status code`
 			}

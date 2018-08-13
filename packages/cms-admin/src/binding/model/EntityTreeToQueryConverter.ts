@@ -36,11 +36,12 @@ export default class EntityTreeToQueryConverter {
 				if (fieldValue instanceof FieldMarker) {
 					builder = builder.column(fieldValue.name)
 				} else if (fieldValue instanceof EntityMarker) {
-					builder = builder.relation(field, builder => this.registerQueryPart(fieldValue, builder))
-
-					if (fieldValue.where) {
-						builder = builder.where(fieldValue.where)
-					}
+					builder = builder.relation(field, builder => {
+						if (fieldValue.where) {
+							builder = builder.where(fieldValue.where)
+						}
+						return this.registerQueryPart(fieldValue, builder)
+					})
 				}
 			}
 		}

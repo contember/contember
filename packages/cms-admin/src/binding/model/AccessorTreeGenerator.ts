@@ -18,7 +18,7 @@ export default class AccessorTreeGenerator {
 		const marker: EntityMarker = this.structure.content
 		const data = this.initialData[marker.entityName]
 
-		let entityAccessor: EntityAccessor = this.updateFields(data, marker.fields, (fieldName, newData) => {
+		let entityAccessor: EntityAccessor = this.updateFields(data, marker, (fieldName, newData) => {
 			entityAccessor = entityAccessor.withUpdatedField(fieldName, newData)
 
 			updateData(entityAccessor)
@@ -29,12 +29,13 @@ export default class AccessorTreeGenerator {
 
 	private updateFields(
 		data: any,
-		fields: EntityFields,
+		marker: EntityMarker,
 		onUpdate: (updatedField: FieldName, updatedData: FieldData) => void,
 		onUnlink?: () => void
 	): EntityAccessor {
 		const entityData: EntityData = {}
 		const id = data[AccessorTreeGenerator.PRIMARY_KEY_NAME]
+		const fields = marker.fields
 
 		for (const fieldName in fields) {
 			if (fieldName === AccessorTreeGenerator.PRIMARY_KEY_NAME) {
@@ -52,7 +53,7 @@ export default class AccessorTreeGenerator {
 						oneToManyData.push(
 							this.updateFields(
 								fieldData[i],
-								field.fields,
+								field,
 								(updatedField: FieldName, updatedData: FieldData) => {
 									const entityAccessor = oneToManyData[i]
 									if (entityAccessor instanceof EntityAccessor) {
@@ -75,7 +76,7 @@ export default class AccessorTreeGenerator {
 				if (field instanceof EntityMarker) {
 					entityData[fieldName] = this.updateFields(
 						fieldData,
-						field.fields,
+						field,
 						(updatedField: FieldName, updatedData: FieldData) => {
 							const accessor = entityData[fieldName]
 							if (accessor instanceof EntityAccessor) {
@@ -87,12 +88,12 @@ export default class AccessorTreeGenerator {
 				}
 			} else {
 				const onChange = (newValue: any) => {
-					onUpdate(fieldName, new FieldAccessor(newValue, onChange))
+					onUpdate(fieldName, new FieldAccessor(fieldName, newValue, onChange))
 				}
-				entityData[fieldName] = new FieldAccessor(fieldData, onChange)
+				entityData[fieldName] = new FieldAccessor(fieldName, fieldData, onChange)
 			}
 		}
 
-		return new EntityAccessor(id, entityData, onUnlink)
+		return new EntityAccessor(marker.entityName, id, entityData, onUnlink)
 	}
 }

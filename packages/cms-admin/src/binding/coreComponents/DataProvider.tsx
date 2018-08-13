@@ -4,21 +4,42 @@ import { AccessorTreeGenerator, EntityTreeToQueryConverter } from '../model'
 import PersistQueryGenerator from '../model/PersistQueryGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import FieldContext from './FieldContext'
+import { connect } from 'react-redux'
+import State from '../../state'
+import { ContentStatus } from '../../state/content'
+import { getData } from '../../actions/content'
+import { Dispatch } from '../../actions/types'
 
 export interface DataProviderProps {
 	children: (persist: () => void) => React.ReactNode
 }
+export interface DataProviderDispatchProps {
+	getData: (query: string) => void
+}
+export interface DataProviderStateProps {
+	data: any
+	ready: boolean
+}
+type DataProviderInnerProps = DataProviderProps & DataProviderDispatchProps & DataProviderStateProps
 
 export interface DataProviderState {
 	data?: DataContextValue
 }
 
-export default class DataProvider extends React.Component<DataProviderProps, DataProviderState> {
+class DataProvider extends React.Component<DataProviderInnerProps, DataProviderState, boolean> {
 	public state: DataProviderState = {
 		data: undefined
 	}
 
-	protected rootContext?: RootEntityMarker
+	protected rootContext?: RootEntityMarker = new RootEntityMarker()
+
+	componentDidUpdate(prevProps: DataProviderInnerProps) {
+		if (!this.rootContext) return
+		if (prevProps.ready !== this.props.ready && this.props.data !== prevProps.data) {
+			const accessTreeGenerator = new AccessorTreeGenerator(this.rootContext, this.props.data)
+			accessTreeGenerator.generateLiveTree(newData => this.setState({ data: newData }))
+		}
+	}
 
 	protected persistedData?: object
 
@@ -31,8 +52,6 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 	}
 
 	public render() {
-		this.rootContext = new RootEntityMarker()
-
 		return (
 			<FieldContext.Provider value={this.rootContext}>
 				<DataContext.Provider value={this.state.data}>{this.props.children(this.triggerPersist)}</DataContext.Provider>
@@ -48,47 +67,19 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 		}
 
 		const converter = new EntityTreeToQueryConverter(this.rootContext)
-
-		console.log(converter.convert())
-
-		this.persistedData = {
-			Post: {
-				id: '1011c518-de96-4cd7-99a6-ee262e85d148',
-				publishedAt: 'Fri Aug 10 2018 09:47:04 GMT+0200 (Central European Summer Time)',
-				author: {
-					id: 'ceb000df-94fd-4a7e-88f1-15c3be1f2a80',
-					name: 'author 1'
-				},
-				categories: [
-					{
-						id: '3408a11a-3b52-4ee7-a274-f16af574f76a',
-						locales: [
-							{
-								id: 'a6a387a0-363e-4128-be48-c2e26bec2a9b',
-								name: 'category - 3'
-							},
-							{
-								id: '223e3379-7ec7-443e-8e50-3bb6cf54b28d',
-								name: 'kategorie - 8'
-							}
-						]
-					}
-				],
-				locales: [
-					{
-						id: 'd75576c5-5be0-41e8-b5e8-d403ada4c9b7',
-						title: 'post - 1'
-					},
-					{
-						id: 'f809e03a-40bb-4140-b951-ff8b319cf588',
-						title: 'článek - 11'
-					}
-				]
-			}
+		const query = converter.convert()
+		if (query) {
+			this.props.getData(query)
 		}
-
-		const generator = new AccessorTreeGenerator(this.rootContext, this.persistedData)
-
-		generator.generateLiveTree(newData => this.setState({ data: newData }))
 	}
 }
+
+export default connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderProps, State>(
+	({ content }) => ({
+		data: content.data,
+		ready: content.state === ContentStatus.LOADED
+	}),
+	(dispatch: Dispatch) => ({
+		getData: (query: string) => dispatch(getData('blog', 'prod', query))
+	})
+)(DataProvider)

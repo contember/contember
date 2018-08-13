@@ -5,20 +5,24 @@ import rootReducer from '../reducer'
 import State from '../state'
 import LocalStorageManager from '../model/LocalStorageManager'
 import GraphqlClient from '../model/GraphqlClient'
+import ContentClientFactory from '../model/ContentClientFactory'
 import { createAction } from 'redux-actions'
 import { SET_TOKEN } from '../reducer/auth'
 
 export interface Services {
 	localStorageManager: LocalStorageManager
 	tenantClient: GraphqlClient
+	contentClientFactory: ContentClientFactory
 }
 
 export function createServices(): Services {
 	const localStorageManager = new LocalStorageManager()
 	const tenantClient = new GraphqlClient('http://localhost:4000/tenant')
+	const contentClientFactory = new ContentClientFactory('http://localhost:4000')
 	return {
 		localStorageManager,
-		tenantClient
+		tenantClient,
+		contentClientFactory
 	}
 }
 

@@ -14,7 +14,7 @@ export default handleActions<ContentState, any>(
 		[CONTENT_SET_LOADING]: (state, action: Action<any>) => {
 			return { ...emptyContentState, data: null, state: ContentStatus.LOADING }
 		},
-		[CONTENT_SET_LOADING]: (state, action: Action<any>) => {
+		[CONTENT_SET_NONE]: (state, action: Action<any>) => {
 			return { ...emptyContentState, data: null, state: ContentStatus.NONE }
 		}
 	},

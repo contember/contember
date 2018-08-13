@@ -94,6 +94,6 @@ export default class AccessorTreeGenerator {
 			}
 		}
 
-		return new EntityAccessor(marker.entityName, id, entityData, onUnlink)
+		return new EntityAccessor(marker.entityName, marker.where, id, entityData, onUnlink)
 	}
 }

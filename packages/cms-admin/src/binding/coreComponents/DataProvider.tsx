@@ -1,4 +1,5 @@
 import * as React from 'react'
+import EntityAccessor from '../dao/EntityAccessor'
 import RootEntityMarker from '../dao/RootEntityMarker'
 import { AccessorTreeGenerator, EntityTreeToQueryConverter } from '../model'
 import PersistQueryGenerator from '../model/PersistQueryGenerator'
@@ -41,13 +42,11 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		}
 	}
 
-	protected persistedData?: object
-
 	protected triggerPersist = () => {
-		if (this.persistedData && this.rootContext) {
-			const generator = new PersistQueryGenerator(this.persistedData, this.rootContext)
+		if (this.props.data && this.state.data instanceof EntityAccessor) {
+			const generator = new PersistQueryGenerator(this.props.data, this.state.data)
 
-			console.log(generator.generatePersistQuery())
+			console.log('QQ', generator.generatePersistQuery())
 		}
 	}
 

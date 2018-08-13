@@ -6,6 +6,9 @@ import FieldAccessor from '../dao/FieldAccessor'
 import RootEntityMarker from '../dao/RootEntityMarker'
 
 export default class AccessorTreeGenerator {
+
+	private static PRIMARY_KEY_NAME = 'id'
+
 	public constructor(
 		private structure: RootEntityMarker,
 		private initialData: any,
@@ -37,10 +40,10 @@ export default class AccessorTreeGenerator {
 		onUpdate: (updatedField: FieldName, updatedData: FieldData) => void
 	): EntityAccessor {
 		const entityData: EntityData = {}
-		const id = data.id
+		const id = data[AccessorTreeGenerator.PRIMARY_KEY_NAME]
 
 		for (const fieldName in fields) {
-			if (fieldName === 'id') {
+			if (fieldName === AccessorTreeGenerator.PRIMARY_KEY_NAME) {
 				continue
 			}
 

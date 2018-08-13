@@ -6,7 +6,7 @@ import { Input } from 'cms-common'
 export default class ListQueryBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	where(where: Input.Where<Literal>) {
+	where(where: Input.Where<Input.Condition<Input.ColumnValue<Literal>>>) {
 		return new ListQueryBuilder(this.objectBuilder.argument('where', where))
 	}
 

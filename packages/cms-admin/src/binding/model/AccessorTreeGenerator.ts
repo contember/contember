@@ -6,18 +6,11 @@ import FieldAccessor from '../dao/FieldAccessor'
 import RootEntityMarker from '../dao/RootEntityMarker'
 
 export default class AccessorTreeGenerator {
-
 	private static PRIMARY_KEY_NAME = 'id'
 
-	public constructor(
-		private structure: RootEntityMarker,
-		private initialData: any,
-		private updateData: (newData: DataContextValue) => void
-	) {
-		this.update()
-	}
+	public constructor(private structure: RootEntityMarker, private initialData: any) {}
 
-	private update() {
+	public generateLiveTree(updateData: (newData: DataContextValue) => void) {
 		if (!(this.structure.content instanceof EntityMarker)) {
 			return
 		}
@@ -28,10 +21,10 @@ export default class AccessorTreeGenerator {
 		let entityAccessor: EntityAccessor = this.updateFields(data, marker.fields, (fieldName, newData) => {
 			entityAccessor = entityAccessor.withUpdatedField(fieldName, newData)
 
-			this.updateData(entityAccessor)
+			updateData(entityAccessor)
 		})
 
-		this.updateData(entityAccessor)
+		updateData(entityAccessor)
 	}
 
 	private updateFields(
@@ -57,17 +50,22 @@ export default class AccessorTreeGenerator {
 
 					for (let i = 0, len = fieldData.length; i < len; i++) {
 						oneToManyData.push(
-							this.updateFields(fieldData[i], field.fields, (updatedField: FieldName, updatedData: FieldData) => {
-								const entityAccessor = oneToManyData[i]
-								if (entityAccessor instanceof EntityAccessor) {
-									oneToManyData[i] = entityAccessor.withUpdatedField(updatedField, updatedData)
+							this.updateFields(
+								fieldData[i],
+								field.fields,
+								(updatedField: FieldName, updatedData: FieldData) => {
+									const entityAccessor = oneToManyData[i]
+									if (entityAccessor instanceof EntityAccessor) {
+										oneToManyData[i] = entityAccessor.withUpdatedField(updatedField, updatedData)
 
+										onUpdate(fieldName, oneToManyData)
+									}
+								},
+								() => {
+									oneToManyData[i] = undefined
 									onUpdate(fieldName, oneToManyData)
 								}
-							}, () => {
-								oneToManyData[i] = undefined
-								onUpdate(fieldName, oneToManyData)
-							})
+							)
 						)
 					}
 

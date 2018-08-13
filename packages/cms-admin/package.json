@@ -24,6 +24,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.2",
     "react-redux": "^5.0.7",
+    "react-table": "^6.8.6",
     "reactstrap": "^6.3.0",
     "redux": "^4.0.0",
     "redux-actions": "^2.4.0",
@@ -36,6 +37,7 @@
     "@types/is-hotkey": "^0.1.0",
     "@types/react": "^16.4.6",
     "@types/react-redux": "5.0.20",
+    "@types/react-table": "^6.7.12",
     "@types/reactstrap": "^6.0.0",
     "@types/redux-actions": "^2.3.0",
     "typescript": "^3.0.1"

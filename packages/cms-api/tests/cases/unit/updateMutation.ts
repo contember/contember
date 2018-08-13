@@ -6,13 +6,15 @@ import { testUuid } from '../../src/testUuid'
 import 'mocha'
 
 describe('update', () => {
-	const selectUpdatePostSql = {
-		sql: SQL`SELECT
-            "updatePost"."id" AS "id"
-            FROM "post" "updatePost"
-            WHERE "updatePost"."id" = '${testUuid(2)}'`,
-		response: [{ id: testUuid(2) }]
-	}
+	const selectUpdatePostSql = sqlTransaction([
+		{
+			sql: SQL`select "root_"."id" as "root_id"
+               from "post" as "root_"
+               where "root_"."id" = $1`,
+			response: [{ root_id: testUuid(2) }],
+			parameters: [testUuid(2)]
+		}
+	])
 
 	describe('columns (author)', () => {
 		it('update name', async () => {
@@ -41,16 +43,15 @@ describe('update', () => {
 					{
 						sql: SQL`COMMIT;`
 					},
-					{
-						sql: SQL`SELECT "updateAuth"."id" AS "id"
-                   FROM "author" "updateAuth"
-                   WHERE "updateAuth"."id" = '${testUuid(1)}'`,
-						response: [
-							{
-								id: testUuid(1)
-							}
-						]
-					}
+					...sqlTransaction([
+						{
+							sql: SQL`select "root_"."id" as "root_id"
+                     from "author" as "root_"
+                     where "root_"."id" = $1`,
+							response: [{ root_id: testUuid(1) }],
+							parameters: [testUuid(1)]
+						}
+					])
 				],
 				return: {
 					data: {
@@ -110,7 +111,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -142,7 +143,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -181,7 +182,7 @@ describe('update', () => {
 							parameters: ['John', testUuid(1)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -220,7 +221,7 @@ describe('update', () => {
 							parameters: ['Jack', testUuid(1)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -265,7 +266,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -297,7 +298,7 @@ describe('update', () => {
 							parameters: [null, testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -341,7 +342,7 @@ describe('update', () => {
 							parameters: [testUuid(1)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -404,7 +405,7 @@ describe('update', () => {
 							response: [testUuid(1)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -443,7 +444,7 @@ describe('update', () => {
 							parameters: ['Hello', 'cs', testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -482,7 +483,7 @@ describe('update', () => {
 							parameters: ['Hello', 'cs', testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -520,7 +521,7 @@ describe('update', () => {
 							parameters: [testUuid(1), 'cs', testUuid(2), 'World']
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -551,7 +552,7 @@ describe('update', () => {
 							parameters: ['cs', testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -583,7 +584,7 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -615,7 +616,7 @@ describe('update', () => {
 							parameters: [null, testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -639,13 +640,15 @@ describe('update', () => {
 		.buildSchema()
 
 	describe('one has one owner (site and setting)', () => {
-		const selectUpdateSiteSql = {
-			sql: SQL`SELECT
-              "updateSite"."id" AS "id"
-              FROM "site" "updateSite"
-              WHERE "updateSite"."id" = '${testUuid(2)}'`,
-			response: [{ id: testUuid(2) }]
-		}
+		const selectUpdateSiteSql = sqlTransaction([
+			{
+				sql: SQL`select "root_"."id" as "root_id"
+               from "site" as "root_"
+               where "root_"."id" = $1`,
+				response: [{ root_id: testUuid(2) }],
+				parameters: [testUuid(2)]
+			}
+		])
 
 		it('create', async () => {
 			await execute({
@@ -673,7 +676,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -712,7 +715,7 @@ describe('update', () => {
 							parameters: ['http://mangoweb.cz', testUuid(1)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -745,7 +748,7 @@ describe('update', () => {
 							response: [{ id: testUuid(2) }]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -784,7 +787,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -829,7 +832,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -874,7 +877,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -919,7 +922,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -951,7 +954,7 @@ describe('update', () => {
 							parameters: [null, testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -995,7 +998,7 @@ describe('update', () => {
 							parameters: [testUuid(1)]
 						}
 					]),
-					selectUpdateSiteSql
+					...selectUpdateSiteSql
 				],
 				return: {
 					data: {
@@ -1009,13 +1012,15 @@ describe('update', () => {
 	})
 
 	describe('one has one inversed (site and setting)', () => {
-		const selectUpdateSiteSettingSql = {
-			sql: SQL`SELECT
-              "updateSite"."id" AS "id"
-              FROM "site_setting" "updateSite"
-              WHERE "updateSite"."id" = '${testUuid(2)}'`,
-			response: [{ id: testUuid(2) }]
-		}
+		const selectUpdateSiteSettingSql = sqlTransaction([
+			{
+				sql: SQL`select "root_"."id" as "root_id"
+               from "site_setting" as "root_"
+               where "root_"."id" = $1`,
+				response: [{ root_id: testUuid(2) }],
+				parameters: [testUuid(2)]
+			}
+		])
 
 		it('create', async () => {
 			await execute({
@@ -1050,7 +1055,7 @@ describe('update', () => {
 							response: [testUuid(1)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1089,7 +1094,7 @@ describe('update', () => {
 							response: [testUuid(1)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1128,7 +1133,7 @@ describe('update', () => {
 							parameters: ['Mangoweb', testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1167,7 +1172,7 @@ describe('update', () => {
 							parameters: ['Mangoweb', testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1206,7 +1211,7 @@ describe('update', () => {
 							response: [testUuid(1)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1245,7 +1250,7 @@ describe('update', () => {
 							parameters: [null, testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1276,7 +1281,7 @@ describe('update', () => {
 							parameters: [testUuid(2)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1309,7 +1314,7 @@ describe('update', () => {
 							response: [{ id: testUuid(1) }]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1348,7 +1353,7 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1393,7 +1398,7 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)]
 						}
 					]),
-					selectUpdateSiteSettingSql
+					...selectUpdateSiteSettingSql
 				],
 				return: {
 					data: {
@@ -1436,7 +1441,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -1474,7 +1479,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -1510,7 +1515,7 @@ describe('update', () => {
 							parameters: [testUuid(1)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -1541,7 +1546,7 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)]
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -1579,7 +1584,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -1620,7 +1625,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -1667,7 +1672,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdatePostSql
+					...selectUpdatePostSql
 				],
 				return: {
 					data: {
@@ -1681,13 +1686,15 @@ describe('update', () => {
 	})
 
 	describe('many has many inversed (category posts)', () => {
-		const selectUpdateCategorySql = {
-			sql: SQL`SELECT
-            "updateCate"."id" AS "id"
-            FROM "category" "updateCate"
-            WHERE "updateCate"."id" = '${testUuid(2)}'`,
-			response: [{ id: testUuid(2) }]
-		}
+		const selectUpdateCategorySql = sqlTransaction([
+			{
+				sql: SQL`select "root_"."id" as "root_id"
+               from "category" as "root_"
+               where "root_"."id" = $1`,
+				response: [{ root_id: testUuid(2) }],
+				parameters: [testUuid(2)]
+			}
+		])
 
 		it('connect', async () => {
 			await execute({
@@ -1709,7 +1716,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdateCategorySql
+					...selectUpdateCategorySql
 				],
 				return: {
 					data: {
@@ -1747,7 +1754,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdateCategorySql
+					...selectUpdateCategorySql
 				],
 				return: {
 					data: {
@@ -1783,7 +1790,7 @@ describe('update', () => {
 							parameters: [testUuid(1)]
 						}
 					]),
-					selectUpdateCategorySql
+					...selectUpdateCategorySql
 				],
 				return: {
 					data: {
@@ -1814,7 +1821,7 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)]
 						}
 					]),
-					selectUpdateCategorySql
+					...selectUpdateCategorySql
 				],
 				return: {
 					data: {
@@ -1852,7 +1859,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdateCategorySql
+					...selectUpdateCategorySql
 				],
 				return: {
 					data: {
@@ -1893,7 +1900,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdateCategorySql
+					...selectUpdateCategorySql
 				],
 				return: {
 					data: {
@@ -1940,7 +1947,7 @@ describe('update', () => {
               on conflict do nothing`
 						}
 					]),
-					selectUpdateCategorySql
+					...selectUpdateCategorySql
 				],
 				return: {
 					data: {

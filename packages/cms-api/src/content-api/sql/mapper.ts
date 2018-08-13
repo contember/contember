@@ -7,6 +7,13 @@ import InsertBuilder from './insert/InsertBuilder'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
 import UpdateBuilder from './update/UpdateBuilder'
+import ObjectNode from '../graphQlResolver/ObjectNode'
+import SelectHydrator from './select/SelectHydrator'
+import SelectBuilder from './select/SelectBuilder'
+import JoinBuilder from './select/JoinBuilder'
+import WhereBuilder from './select/WhereBuilder'
+import ConditionBuilder from './select/ConditionBuilder'
+import Path from './select/Path'
 
 export default class Mapper {
 	private schema: Model.Schema
@@ -26,6 +33,65 @@ export default class Mapper {
 			.where(this.getUniqueWhereArgs(entity, where))
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
+	}
+
+	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>) {
+		const hydrator = new SelectHydrator()
+		const qb = this.db.queryBuilder()
+		const rows = await this.selectRows(hydrator, qb, entity, input, selector => selector.select(entity, input))
+		return await hydrator.hydrateAll(rows)
+	}
+
+	public async selectOne(entity: Model.Entity, input: ObjectNode<Input.UniqueQueryInput>) {
+		const hydrator = new SelectHydrator()
+		const qb = this.db.queryBuilder()
+		const rows = await this.selectRows(hydrator, qb, entity, input, selector => selector.selectOne(entity, input))
+		const row = rows[0] ? await hydrator.hydrateRow(rows[0]) : null
+		return row
+	}
+
+	public async selectGrouped(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, columnName: string) {
+		const hydrator = new SelectHydrator()
+		const qb = this.db.queryBuilder()
+		const path = new Path([])
+		const groupingKey = '__grouping_key'
+		qb.select(`${path.getAlias()}.${columnName} as ${groupingKey}`)
+
+		const rows = await this.selectRows(hydrator, qb, entity, input, selector => selector.select(entity, input))
+		return await hydrator.hydrateGroups(rows, groupingKey)
+	}
+
+	private async selectRows(
+		hydrator: SelectHydrator,
+		qb: Knex.QueryBuilder,
+		entity: Model.Entity,
+		input: ObjectNode,
+		selectHandler: (selector: SelectBuilder) => Promise<void>
+	) {
+		let resolver: (() => any) = () => {
+			throw new Error()
+		}
+		const joinBuilder = new JoinBuilder(this.schema)
+		const conditionBuilder = new ConditionBuilder()
+		const whereBuilder = new WhereBuilder(this.schema, joinBuilder, conditionBuilder)
+
+		const path = new Path([])
+		qb.from(`${entity.tableName} as ${path.getAlias()}`)
+		const selector = new SelectBuilder(
+			this.schema,
+			joinBuilder,
+			whereBuilder,
+			this,
+			qb,
+			hydrator,
+			new Promise(resolve => (resolver = resolve))
+		)
+		const selectPromise = selectHandler(selector)
+		resolver()
+		const rows = await selector.rows
+		await selectPromise
+
+		return rows
 	}
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
@@ -117,6 +183,22 @@ export default class Mapper {
 			.delete()
 	}
 
+	public async fetchJunction(
+		relation: Model.ManyHasManyOwnerRelation,
+		values: Input.PrimaryValue[],
+		column: Model.JoiningColumn
+	): Promise<object[]> {
+		const joiningTable = relation.joiningTable
+
+		const whereColumn = column.columnName
+		const result = await this.db
+			.table(joiningTable.tableName)
+			.select([joiningTable.inverseJoiningColumn.columnName, joiningTable.joiningColumn.columnName])
+			.whereIn(whereColumn, values)
+
+		return result
+	}
+
 	public async getPrimaryValue(entity: Model.Entity, where: Input.UniqueWhere) {
 		if (where[entity.primary] !== undefined) {
 			return where[entity.primary]
@@ -181,4 +263,26 @@ const deleteData = (schema: Model.Schema, db: KnexConnection) => (
 	})
 }
 
-export { insertData, updateData, deleteData }
+const selectData = (schema: Model.Schema, db: KnexConnection) => (
+	entityName: string,
+	input: ObjectNode<Input.ListQueryInput>
+): PromiseLike<object[]> => {
+	return db.transaction(trx => {
+		const mapper = new Mapper(schema, trx)
+		const entity = getEntity(schema, entityName)
+		return mapper.select(entity, input)
+	})
+}
+
+const selectOne = (schema: Model.Schema, db: KnexConnection) => (
+	entityName: string,
+	input: ObjectNode<Input.UniqueQueryInput>
+): PromiseLike<object | null> => {
+	return db.transaction(trx => {
+		const mapper = new Mapper(schema, trx)
+		const entity = getEntity(schema, entityName)
+		return mapper.selectOne(entity, input)
+	})
+}
+
+export { insertData, updateData, deleteData, selectData, selectOne }

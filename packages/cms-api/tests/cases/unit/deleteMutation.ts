@@ -1,5 +1,5 @@
 import { Model } from 'cms-common'
-import { execute } from '../../src/test'
+import { execute, sqlTransaction } from '../../src/test'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
 import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
@@ -22,38 +22,33 @@ describe('Delete mutation', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`
-            SELECT
-              "deletePost"."id" AS "id",
-              "author"."id" AS "author__id",
-              "author"."name" AS "author__name"
-            FROM "post" "deletePost"
-            LEFT JOIN "author" "author" ON "deletePost".author_id = "author".id
-            WHERE "deletePost"."id" = '${testUuid(1)}'
-          `,
-					response: [
-						{
-							id: testUuid(1),
-							author__id: testUuid(2),
-							author__name: 'John'
-						}
-					]
-				},
-				{
-					sql: SQL`BEGIN;`,
-					response: []
-				},
-				{
-					sql: SQL`delete from "post"
+				...sqlTransaction([
+					{
+						sql: SQL`select
+                     "root_"."id" as "root_id",
+                     "root_author"."id" as "root_author_id",
+                     "root_author"."name" as "root_author_name"
+                   from "post" as "root_" 
+                     left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
+                   where "root_"."id" = $1`,
+						parameters: [testUuid(1)],
+						response: [
+							{
+								root_id: testUuid(1),
+								root_author_id: testUuid(2),
+								root_author_name: 'John'
+							}
+						]
+					}
+				]),
+				...sqlTransaction([
+					{
+						sql: SQL`delete from "post"
 		  where "id" = $1`,
-					parameters: [testUuid(1)],
-					response: []
-				},
-				{
-					sql: SQL`COMMIT;`,
-					response: []
-				}
+						parameters: [testUuid(1)],
+						response: []
+					}
+				])
 			],
 			return: {
 				data: {

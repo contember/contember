@@ -1,5 +1,4 @@
-import { GraphQLFieldConfig, GraphQLObjectType, GraphQLSchema } from 'graphql'
-import { JoinMonsterFieldMapping } from '../joinMonsterHelpers'
+import { GraphQLFieldConfigMap, GraphQLObjectType, GraphQLSchema } from 'graphql'
 import { Model } from 'cms-common'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import ConditionTypeProvider from './ConditionTypeProvider'
@@ -7,8 +6,8 @@ import EntityTypeProvider from './EntityTypeProvider'
 import EnumsProvider from './EnumsProvider'
 import MutationProvider from './MutationProvider'
 import QueryProvider from './QueryProvider'
-import resolver from './resolver'
 import WhereTypeProvider from './WhereTypeProvider'
+import ReadResolver from '../graphQlResolver/ReadResolver'
 
 export default class GraphQlSchemaBuilder {
 	private schema: Model.Schema
@@ -25,27 +24,23 @@ export default class GraphQlSchemaBuilder {
 		this.conditionTypeProvider = new ConditionTypeProvider(this.columnTypeResolver)
 		this.whereTypeProvider = new WhereTypeProvider(this.schema, this.columnTypeResolver, this.conditionTypeProvider)
 		this.entityTypeProvider = new EntityTypeProvider(this.schema, this.columnTypeResolver, this.whereTypeProvider)
-		this.queryProvider = new QueryProvider(this.schema, this.whereTypeProvider, this.entityTypeProvider, resolver)
+		const readResolver = new ReadResolver(schema)
+		this.queryProvider = new QueryProvider(this.schema, this.whereTypeProvider, this.entityTypeProvider, readResolver)
 		this.mutationProvider = new MutationProvider(
 			this.schema,
 			this.whereTypeProvider,
 			this.entityTypeProvider,
 			this.columnTypeResolver,
-			resolver
+			readResolver
 		)
 	}
 
 	public build() {
-		type FieldConfig = JoinMonsterFieldMapping<any, any> & GraphQLFieldConfig<any, any>
-		interface FieldConfigMap {
-			[queryName: string]: FieldConfig
-		}
-
 		return new GraphQLSchema({
 			query: new GraphQLObjectType({
 				name: 'Query',
 				fields: () =>
-					Object.keys(this.schema.entities).reduce<FieldConfigMap>((queries, entityName) => {
+					Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
 						return {
 							...this.queryProvider.getQueries(entityName),
 							...queries
@@ -55,7 +50,7 @@ export default class GraphQlSchemaBuilder {
 			mutation: new GraphQLObjectType({
 				name: 'Mutation',
 				fields: () =>
-					Object.keys(this.schema.entities).reduce<FieldConfigMap>((mutations, entityName) => {
+					Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((mutations, entityName) => {
 						return {
 							...this.mutationProvider.getMutations(entityName),
 							...mutations

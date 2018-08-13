@@ -87,6 +87,8 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 			}
 		}
 
-		new AccessorTreeGenerator(this.rootContext, this.persistedData, newData => this.setState({ data: newData }))
+		const generator = new AccessorTreeGenerator(this.rootContext, this.persistedData)
+
+		generator.generateLiveTree(newData => this.setState({ data: newData }))
 	}
 }

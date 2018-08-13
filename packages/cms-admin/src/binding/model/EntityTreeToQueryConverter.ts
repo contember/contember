@@ -4,7 +4,7 @@ import EntityMarker from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
 import RootEntityMarker from '../dao/RootEntityMarker'
 
-export default class TreeToQueryConverter {
+export default class EntityTreeToQueryConverter {
 	constructor(private rem: RootEntityMarker) {}
 
 	public convert(): string | undefined {

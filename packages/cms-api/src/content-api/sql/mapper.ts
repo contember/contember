@@ -24,6 +24,13 @@ export default class Mapper {
 		this.db = db
 	}
 
+	public static run(schema: Model.Schema, db: KnexConnection, cb: (mapper: Mapper) => void) {
+		return db.transaction(trx => {
+			const mapper = new Mapper(schema, trx)
+			return cb(mapper)
+		})
+	}
+
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
@@ -228,61 +235,3 @@ export default class Mapper {
 		return whereArgs
 	}
 }
-
-const insertData = (schema: Model.Schema, db: KnexConnection) => (
-	entityName: string,
-	data: Input.CreateDataInput
-): PromiseLike<Input.PrimaryValue> => {
-	return db.transaction(trx => {
-		const mapper = new Mapper(schema, trx)
-		const entity = getEntity(schema, entityName)
-		return mapper.insert(entity, data)
-	})
-}
-
-const updateData = (schema: Model.Schema, db: KnexConnection) => (
-	entityName: string,
-	where: Input.UniqueWhere,
-	data: Input.UpdateDataInput
-): PromiseLike<number> => {
-	return db.transaction(trx => {
-		const mapper = new Mapper(schema, trx)
-		const entity = getEntity(schema, entityName)
-		return mapper.update(entity, where, data)
-	})
-}
-
-const deleteData = (schema: Model.Schema, db: KnexConnection) => (
-	entityName: string,
-	where: Input.UniqueWhere
-): PromiseLike<number> => {
-	return db.transaction(trx => {
-		const mapper = new Mapper(schema, trx)
-		const entity = getEntity(schema, entityName)
-		return mapper.delete(entity, where)
-	})
-}
-
-const selectData = (schema: Model.Schema, db: KnexConnection) => (
-	entityName: string,
-	input: ObjectNode<Input.ListQueryInput>
-): PromiseLike<object[]> => {
-	return db.transaction(trx => {
-		const mapper = new Mapper(schema, trx)
-		const entity = getEntity(schema, entityName)
-		return mapper.select(entity, input)
-	})
-}
-
-const selectOne = (schema: Model.Schema, db: KnexConnection) => (
-	entityName: string,
-	input: ObjectNode<Input.UniqueQueryInput>
-): PromiseLike<object | null> => {
-	return db.transaction(trx => {
-		const mapper = new Mapper(schema, trx)
-		const entity = getEntity(schema, entityName)
-		return mapper.selectOne(entity, input)
-	})
-}
-
-export { insertData, updateData, deleteData, selectData, selectOne }

@@ -6,15 +6,13 @@ import { testUuid } from '../../src/testUuid'
 import 'mocha'
 
 describe('update', () => {
-	const selectUpdatePostSql = sqlTransaction([
-		{
-			sql: SQL`select "root_"."id" as "root_id"
+	const selectUpdatePostSql = {
+		sql: SQL`select "root_"."id" as "root_id"
                from "post" as "root_"
                where "root_"."id" = $1`,
-			response: [{ root_id: testUuid(2) }],
-			parameters: [testUuid(2)]
-		}
-	])
+		response: [{ root_id: testUuid(2) }],
+		parameters: [testUuid(2)]
+	}
 
 	describe('columns (author)', () => {
 		it('update name', async () => {
@@ -31,19 +29,13 @@ describe('update', () => {
         }
       }`,
 				executes: [
-					{
-						sql: SQL`BEGIN;`
-					},
-					{
-						sql: SQL`update "author"
-            set "name" = $1
-            where "id" = $2`,
-						parameters: ['John', testUuid(1)]
-					},
-					{
-						sql: SQL`COMMIT;`
-					},
 					...sqlTransaction([
+						{
+							sql: SQL`update "author"
+              set "name" = $1
+              where "id" = $2`,
+							parameters: ['John', testUuid(1)]
+						},
 						{
 							sql: SQL`select "root_"."id" as "root_id"
                      from "author" as "root_"
@@ -109,9 +101,9 @@ describe('update', () => {
               set "author_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -141,9 +133,9 @@ describe('update', () => {
               set "author_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -180,9 +172,9 @@ describe('update', () => {
               set "name" = $1
               where "id" = $2`,
 							parameters: ['John', testUuid(1)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -219,9 +211,9 @@ describe('update', () => {
               set "name" = $1
               where "id" = $2`,
 							parameters: ['Jack', testUuid(1)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -264,9 +256,9 @@ describe('update', () => {
               set "author_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -296,9 +288,9 @@ describe('update', () => {
               set "author_id" = $1
               where "id" = $2`,
 							parameters: [null, testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -340,9 +332,9 @@ describe('update', () => {
 							sql: SQL`delete from "author"
               where "id" = $1`,
 							parameters: [testUuid(1)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -403,9 +395,9 @@ describe('update', () => {
               returning "id"`,
 							parameters: [testUuid(1), 'cs', testUuid(2), 'Hello'],
 							response: [testUuid(1)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -442,9 +434,9 @@ describe('update', () => {
               set "title" = $1
               where "locale" = $2 and "post_id" = $3`,
 							parameters: ['Hello', 'cs', testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -481,9 +473,9 @@ describe('update', () => {
               set "title" = $1
               where "locale" = $2 and "post_id" = $3`,
 							parameters: ['Hello', 'cs', testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -519,9 +511,9 @@ describe('update', () => {
 							sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
               returning "id"`,
 							parameters: [testUuid(1), 'cs', testUuid(2), 'World']
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -550,9 +542,9 @@ describe('update', () => {
 							sql: SQL`delete from "post_locale"
               where "locale" = $1 and "post_id" = $2`,
 							parameters: ['cs', testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -582,9 +574,9 @@ describe('update', () => {
               set "post_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(2), testUuid(1)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -614,9 +606,9 @@ describe('update', () => {
               set "post_id" = $1
               where "id" = $2 and "post_id" = $3`,
 							parameters: [null, testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -640,15 +632,13 @@ describe('update', () => {
 		.buildSchema()
 
 	describe('one has one owner (site and setting)', () => {
-		const selectUpdateSiteSql = sqlTransaction([
-			{
-				sql: SQL`select "root_"."id" as "root_id"
+		const selectUpdateSiteSql = {
+			sql: SQL`select "root_"."id" as "root_id"
                from "site" as "root_"
                where "root_"."id" = $1`,
-				response: [{ root_id: testUuid(2) }],
-				parameters: [testUuid(2)]
-			}
-		])
+			response: [{ root_id: testUuid(2) }],
+			parameters: [testUuid(2)]
+		}
 
 		it('create', async () => {
 			await execute({
@@ -674,9 +664,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -713,9 +703,9 @@ describe('update', () => {
               set "url" = $1
               where "id" = $2`,
 							parameters: ['http://mangoweb.cz', testUuid(1)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -746,9 +736,9 @@ describe('update', () => {
                        where "setting_id" = $1`,
 							parameters: [testUuid(1)],
 							response: [{ id: testUuid(2) }]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -785,9 +775,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -830,9 +820,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -875,9 +865,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -920,9 +910,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -952,9 +942,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [null, testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -996,9 +986,9 @@ describe('update', () => {
 							sql: SQL`delete from "site_setting"
               where "id" = $1`,
 							parameters: [testUuid(1)]
-						}
-					]),
-					...selectUpdateSiteSql
+						},
+						selectUpdateSiteSql
+					])
 				],
 				return: {
 					data: {
@@ -1012,15 +1002,13 @@ describe('update', () => {
 	})
 
 	describe('one has one inversed (site and setting)', () => {
-		const selectUpdateSiteSettingSql = sqlTransaction([
-			{
-				sql: SQL`select "root_"."id" as "root_id"
+		const selectUpdateSiteSettingSql = {
+			sql: SQL`select "root_"."id" as "root_id"
                from "site_setting" as "root_"
                where "root_"."id" = $1`,
-				response: [{ root_id: testUuid(2) }],
-				parameters: [testUuid(2)]
-			}
-		])
+			response: [{ root_id: testUuid(2) }],
+			parameters: [testUuid(2)]
+		}
 
 		it('create', async () => {
 			await execute({
@@ -1053,9 +1041,9 @@ describe('update', () => {
               returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: [testUuid(1)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1092,9 +1080,9 @@ describe('update', () => {
               returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: [testUuid(1)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1131,9 +1119,9 @@ describe('update', () => {
               set "name" = $1
               where "setting_id" = $2`,
 							parameters: ['Mangoweb', testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1170,9 +1158,9 @@ describe('update', () => {
               set "name" = $1
               where "setting_id" = $2`,
 							parameters: ['Mangoweb', testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1209,9 +1197,9 @@ describe('update', () => {
               returning "id"`,
 							parameters: [testUuid(1), 'Mgw', testUuid(2)],
 							response: [testUuid(1)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1248,9 +1236,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "setting_id" = $2`,
 							parameters: [null, testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1279,9 +1267,9 @@ describe('update', () => {
 							sql: SQL`delete from "site"
               where "setting_id" = $1`,
 							parameters: [testUuid(2)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1312,9 +1300,9 @@ describe('update', () => {
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ id: testUuid(1) }]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1351,9 +1339,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(2), testUuid(1)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1396,9 +1384,9 @@ describe('update', () => {
               set "setting_id" = $1
               where "id" = $2`,
 							parameters: [testUuid(2), testUuid(1)]
-						}
-					]),
-					...selectUpdateSiteSettingSql
+						},
+						selectUpdateSiteSettingSql
+					])
 				],
 				return: {
 					data: {
@@ -1439,9 +1427,9 @@ describe('update', () => {
 								2
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -1477,9 +1465,9 @@ describe('update', () => {
 								2
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -1513,9 +1501,9 @@ describe('update', () => {
 							sql: SQL`delete from "category"
               where "id" = $1`,
 							parameters: [testUuid(1)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -1544,9 +1532,9 @@ describe('update', () => {
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(2), testUuid(1)]
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -1582,9 +1570,9 @@ describe('update', () => {
 								2
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -1623,9 +1611,9 @@ describe('update', () => {
 								2
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -1670,9 +1658,9 @@ describe('update', () => {
 								2
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdatePostSql
+						},
+						selectUpdatePostSql
+					])
 				],
 				return: {
 					data: {
@@ -1686,15 +1674,13 @@ describe('update', () => {
 	})
 
 	describe('many has many inversed (category posts)', () => {
-		const selectUpdateCategorySql = sqlTransaction([
-			{
-				sql: SQL`select "root_"."id" as "root_id"
+		const selectUpdateCategorySql = {
+			sql: SQL`select "root_"."id" as "root_id"
                from "category" as "root_"
                where "root_"."id" = $1`,
-				response: [{ root_id: testUuid(2) }],
-				parameters: [testUuid(2)]
-			}
-		])
+			response: [{ root_id: testUuid(2) }],
+			parameters: [testUuid(2)]
+		}
 
 		it('connect', async () => {
 			await execute({
@@ -1714,9 +1700,9 @@ describe('update', () => {
 								1
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdateCategorySql
+						},
+						selectUpdateCategorySql
+					])
 				],
 				return: {
 					data: {
@@ -1752,9 +1738,9 @@ describe('update', () => {
 								1
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdateCategorySql
+						},
+						selectUpdateCategorySql
+					])
 				],
 				return: {
 					data: {
@@ -1788,9 +1774,9 @@ describe('update', () => {
 							sql: SQL`delete from "post"
               where "id" = $1`,
 							parameters: [testUuid(1)]
-						}
-					]),
-					...selectUpdateCategorySql
+						},
+						selectUpdateCategorySql
+					])
 				],
 				return: {
 					data: {
@@ -1819,9 +1805,9 @@ describe('update', () => {
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
-						}
-					]),
-					...selectUpdateCategorySql
+						},
+						selectUpdateCategorySql
+					])
 				],
 				return: {
 					data: {
@@ -1857,9 +1843,9 @@ describe('update', () => {
 								1
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdateCategorySql
+						},
+						selectUpdateCategorySql
+					])
 				],
 				return: {
 					data: {
@@ -1898,9 +1884,9 @@ describe('update', () => {
 								1
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdateCategorySql
+						},
+						selectUpdateCategorySql
+					])
 				],
 				return: {
 					data: {
@@ -1945,9 +1931,9 @@ describe('update', () => {
 								1
 							)}')
               on conflict do nothing`
-						}
-					]),
-					...selectUpdateCategorySql
+						},
+						selectUpdateCategorySql
+					])
 				],
 				return: {
 					data: {

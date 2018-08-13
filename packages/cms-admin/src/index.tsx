@@ -18,68 +18,73 @@ window.onpopstate = e => {
 export const root = (
 	<div>
 		<Provider store={store}>
-			{/*<Router />*/}
-			<DataProvider>
-				{persist => {
-					return (
-						<Entity name="Post" where={{ id: '1' }}>
-							<TextField name="publishedAt" />
-							<OneToOne field="author">
-								<Entity name="Author">
-									<TextField name="name" />
-								</Entity>
-							</OneToOne>
-							<OneToOne field="author">
-								{unlink => {
-									return (
-										<Entity name="Author">
-											<TextField name="name" />
-											<button type="button" onClick={unlink}>
-												×
-											</button>
-										</Entity>
-									)
-								}}
-							</OneToOne>
-							<OneToMany field="categories">
-								{unlink => {
-									return (
-										<Entity name="Category">
-											<OneToMany field="locales">
-												{unlink => {
-													return (
-														<Entity name="CategoryLocale" where={{ locale: { eq: new GraphQlBuilder.Literal('cs') } }}>
-															<TextField name="name" />
-															<button type="button" onClick={unlink}>
-																×
-															</button>
-														</Entity>
-													)
-												}}
-											</OneToMany>
-											<button type="button" onClick={unlink}>
-												×
-											</button>
-										</Entity>
-									)
-								}}
-							</OneToMany>
-							<OneToMany field="locales">
-								{unlink => {
-									return (
-										<Entity name="PostLocale">
-											<TextField name="title" />
-											<button type="button" onClick={unlink}>
-												×
-											</button>
-										</Entity>
-									)
-								}}
-							</OneToMany>
-						</Entity>
-					)
-				}}
-			</DataProvider>
+			<>
+				<Router />
+				<DataProvider>
+					{persist => {
+						return (
+							<Entity name="Post" where={{ id: '1' }}>
+								<TextField name="publishedAt" />
+								<OneToOne field="author">
+									<Entity name="Author">
+										<TextField name="name" />
+									</Entity>
+								</OneToOne>
+								<OneToOne field="author">
+									{unlink => {
+										return (
+											<Entity name="Author">
+												<TextField name="name" />
+												<button type="button" onClick={unlink}>
+													×
+												</button>
+											</Entity>
+										)
+									}}
+								</OneToOne>
+								<OneToMany field="categories">
+									{unlink => {
+										return (
+											<Entity name="Category">
+												<OneToMany field="locales">
+													{unlink => {
+														return (
+															<Entity
+																name="CategoryLocale"
+																where={{ locale: { eq: new GraphQlBuilder.Literal('cs') } }}
+															>
+																<TextField name="name" />
+																<button type="button" onClick={unlink}>
+																	×
+																</button>
+															</Entity>
+														)
+													}}
+												</OneToMany>
+												<button type="button" onClick={unlink}>
+													×
+												</button>
+											</Entity>
+										)
+									}}
+								</OneToMany>
+								<OneToMany field="locales">
+									{unlink => {
+										return (
+											<Entity name="PostLocale">
+												<TextField name="title" />
+												<button type="button" onClick={unlink}>
+													×
+												</button>
+											</Entity>
+										)
+									}}
+								</OneToMany>
+							</Entity>
+						)
+					}}
+				</DataProvider>
+			</>
 		</Provider>
 	</div>
 )

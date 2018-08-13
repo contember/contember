@@ -16,7 +16,7 @@ export interface SqlQuery {
 }
 
 export interface Test {
-	schema: Model.Schema
+	schema: Pick<Model.Schema, 'enums' | 'entities'>
 	query: string
 	executes: SqlQuery[]
 	return: object

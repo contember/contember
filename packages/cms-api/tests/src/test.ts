@@ -8,6 +8,7 @@ import { testUuid } from './testUuid'
 import * as uuid from '../../src/utils/uuid'
 import * as sinon from 'sinon'
 import { Model } from 'cms-common'
+import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 
 export interface SqlQuery {
 	sql: string
@@ -35,7 +36,7 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 }
 
 export const execute = async (test: Test) => {
-	const builder = new GraphQlSchemaBuilder(test.schema)
+	const builder = new GraphQlSchemaBuilderFactory().create(test.schema)
 	const graphQLSchema = builder.build()
 
 	// console.log(printSchema(graphQLSchema))

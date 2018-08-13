@@ -4,12 +4,20 @@ import * as express from 'express'
 import Container from '../core/di/Container'
 import Project from '../tenant-api/Project'
 import KnexConnection from '../core/knex/KnexConnection'
-import GraphQlSchemaBuilder from '../content-api/graphQLSchema/GraphQlSchemaBuilder'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
+import GraphQlSchemaBuilderFactory from '../content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { Context } from '../content-api/types'
 
 class ContentMiddlewareFactoryMiddlewareFactory {
-	constructor(private projectContainers: Array<Container<{ project: Project; knexConnection: KnexConnection }>>) {}
+	constructor(
+		private projectContainers: Array<
+			Container<{
+				project: Project
+				knexConnection: KnexConnection
+				graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
+			}>
+		>
+	) {}
 
 	create(): RequestHandler {
 		return (req, res: AuthMiddlewareFactory.ResponseWithAuthResult, next) => {
@@ -34,7 +42,7 @@ class ContentMiddlewareFactoryMiddlewareFactory {
 				return
 			}
 
-			const dataSchemaBuilder = new GraphQlSchemaBuilder(stage.schema.model) // TODO: should also depend on identityId
+			const dataSchemaBuilder = projectContainer.get('graphQlSchemaBuilderFactory').create(stage.schema.model) // TODO: should also depend on identityId
 			const dataSchema = dataSchemaBuilder.build()
 
 			const contentExpress = express()

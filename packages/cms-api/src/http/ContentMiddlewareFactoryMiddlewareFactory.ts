@@ -34,7 +34,7 @@ class ContentMiddlewareFactoryMiddlewareFactory {
 				return
 			}
 
-			const dataSchemaBuilder = new GraphQlSchemaBuilder(stage.schema) // TODO: should also depend on identityId
+			const dataSchemaBuilder = new GraphQlSchemaBuilder(stage.schema.model) // TODO: should also depend on identityId
 			const dataSchema = dataSchemaBuilder.build()
 
 			const contentExpress = express()

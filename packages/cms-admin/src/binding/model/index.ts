@@ -1,4 +1,4 @@
 import AccessorTreeGenerator from './AccessorTreeGenerator'
-import TreeToQueryConverter from './TreeToQueryConverter'
+import EntityTreeToQueryConverter from './EntityTreeToQueryConverter'
 
-export { AccessorTreeGenerator, TreeToQueryConverter }
+export { AccessorTreeGenerator, EntityTreeToQueryConverter }

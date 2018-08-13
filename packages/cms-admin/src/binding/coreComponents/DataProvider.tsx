@@ -1,6 +1,6 @@
 import * as React from 'react'
 import RootEntityMarker from '../dao/RootEntityMarker'
-import { AccessorTreeGenerator, TreeToQueryConverter } from '../model'
+import { AccessorTreeGenerator, EntityTreeToQueryConverter } from '../model'
 import PersistQueryGenerator from '../model/PersistQueryGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import FieldContext from './FieldContext'
@@ -47,7 +47,7 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 			return
 		}
 
-		const converter = new TreeToQueryConverter(this.rootContext)
+		const converter = new EntityTreeToQueryConverter(this.rootContext)
 
 		console.log(converter.convert())
 

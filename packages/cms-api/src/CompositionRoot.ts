@@ -20,6 +20,7 @@ import AuthMiddlewareFactory from './http/AuthMiddlewareFactory'
 import TenantMiddlewareFactory from './http/TenantMiddlewareFactory'
 import ContentMiddlewareFactoryMiddlewareFactory from './http/ContentMiddlewareFactoryMiddlewareFactory'
 import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
+import GraphQlSchemaBuilderFactory from './content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 
 class CompositionRoot {
 	composeServer(env: Env, projects: Array<Project>): Express {
@@ -77,6 +78,7 @@ class CompositionRoot {
 						})
 					)
 				})
+				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
 				.build()
 		})
 	}

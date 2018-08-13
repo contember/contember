@@ -1,10 +1,13 @@
 import * as React from 'react'
 import RootEntityMarker from '../dao/RootEntityMarker'
 import { AccessorTreeGenerator, TreeToQueryConverter } from '../model'
+import PersistQueryGenerator from '../model/PersistQueryGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import FieldContext from './FieldContext'
 
-export interface DataProviderProps {}
+export interface DataProviderProps {
+	children: (persist: () => void) => React.ReactNode
+}
 
 export interface DataProviderState {
 	data?: DataContextValue
@@ -17,12 +20,22 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 
 	protected rootContext?: RootEntityMarker
 
+	protected persistedData?: object
+
+	protected triggerPersist = () => {
+		if (this.persistedData && this.rootContext) {
+			const generator = new PersistQueryGenerator(this.persistedData, this.rootContext)
+
+			console.log(generator.generatePersistQuery())
+		}
+	}
+
 	public render() {
 		this.rootContext = new RootEntityMarker()
 
 		return (
 			<FieldContext.Provider value={this.rootContext}>
-				<DataContext.Provider value={this.state.data}>{this.props.children}</DataContext.Provider>
+				<DataContext.Provider value={this.state.data}>{this.props.children(this.triggerPersist)}</DataContext.Provider>
 			</FieldContext.Provider>
 		)
 	}
@@ -38,7 +51,7 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 
 		console.log(converter.convert())
 
-		const testResponse = {
+		this.persistedData = {
 			Post: {
 				id: '1011c518-de96-4cd7-99a6-ee262e85d148',
 				publishedAt: 'Fri Aug 10 2018 09:47:04 GMT+0200 (Central European Summer Time)',
@@ -74,6 +87,6 @@ export default class DataProvider extends React.Component<DataProviderProps, Dat
 			}
 		}
 
-		new AccessorTreeGenerator(this.rootContext, testResponse, newData => this.setState({ data: newData }))
+		new AccessorTreeGenerator(this.rootContext, this.persistedData, newData => this.setState({ data: newData }))
 	}
 }

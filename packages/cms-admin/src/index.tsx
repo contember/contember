@@ -23,7 +23,7 @@ export const root = (
 				<DataProvider>
 					{persist => {
 						return (
-							<Entity name="Post" where={{ id: '1' }}>
+							<Entity name="Post" where={{ id: '387ffd96-4a35-412b-922b-fe49480fd1f1' }}>
 								<TextField name="publishedAt" />
 								<OneToOne field="author">
 									<Entity name="Author">
@@ -80,6 +80,7 @@ export const root = (
 										)
 									}}
 								</OneToMany>
+								<button type="button" onClick={persist}>Save!</button>
 							</Entity>
 						)
 					}}

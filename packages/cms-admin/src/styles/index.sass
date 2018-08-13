@@ -5,27 +5,33 @@
 // ## Settings, variables and animations
 @import 'variables'
 @import 'animations'
+$icon-font-path: "~@blueprintjs/icons/resources/icons"
 
 // ## Mixins
-@import 'mixins/*'
+// @import 'mixins/*'
+@import 'mixins/media'
+@import 'mixins/position'
 
 // ## Frameworks
 @import 'bootstrap'
-@import '~@blueprintjs/core/lib/css/blueprint.css'
-@import '~@blueprintjs/datetime/lib/css/blueprint-datetime.css'
-@import '~@blueprintjs/icons/lib/css/blueprint-icons.css'
-@import '~@blueprintjs/select/lib/css/blueprint-select.css'
-@import '~@blueprintjs/table/lib/css/table.css'
+@import '~@blueprintjs/core/src/blueprint'
+@import '~@blueprintjs/datetime/src/blueprint-datetime'
+@import '~@blueprintjs/icons/src/blueprint-icons'
+@import '~@blueprintjs/select/src/blueprint-select'
+@import '~@blueprintjs/table/src/table'
 
 // ## Web styles
 @import 'global'
 
 // ## Abstract
-@import 'abstract/*'
+// @import 'abstract/*'
+@import 'abstract/accessible'
 
 // ## Components
-@import 'parts/*'
+// @import 'parts/*'
+@import 'parts/editor'
+@import 'parts/shape'
 
 // ## Compositions
-@import 'comps/*'
+// @import 'comps/*'
 

@@ -24,9 +24,7 @@ describe('Insert mutation', () => {
 		  returning "id"`,
 						parameters: [testUuid(1), 'John'],
 						response: [testUuid(1)]
-					}
-				]),
-				...sqlTransaction([
+					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "author" as "root_"
@@ -63,27 +61,19 @@ describe('Insert mutation', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`BEGIN;`,
-					response: []
-				},
-				{
-					sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
-		  returning "id"`,
-					parameters: [testUuid(2), 'https://mangoweb.cz'],
-					response: [testUuid(2)]
-				},
-				{
-					sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
-		  returning "id"`,
-					parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
-					response: [testUuid(1)]
-				},
-				{
-					sql: SQL`COMMIT;`,
-					response: []
-				},
 				...sqlTransaction([
+					{
+						sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
+            returning "id"`,
+						parameters: [testUuid(2), 'https://mangoweb.cz'],
+						response: [testUuid(2)]
+					},
+					{
+						sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
+		  returning "id"`,
+						parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
+						response: [testUuid(1)]
+					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "site" as "root_"
@@ -120,27 +110,19 @@ describe('Insert mutation', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`BEGIN;`,
-					response: []
-				},
-				{
-					sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
-		  returning "id"`,
-					parameters: [testUuid(1), 'https://mangoweb.cz'],
-					response: [testUuid(1)]
-				},
-				{
-					sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
-		  returning "id"`,
-					parameters: [testUuid(2), 'Mangoweb', testUuid(1)],
-					response: [testUuid(2)]
-				},
-				{
-					sql: SQL`COMMIT;`,
-					response: []
-				},
 				...sqlTransaction([
+					{
+						sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
+            returning "id"`,
+						parameters: [testUuid(1), 'https://mangoweb.cz'],
+						response: [testUuid(1)]
+					},
+					{
+						sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
+		  returning "id"`,
+						parameters: [testUuid(2), 'Mangoweb', testUuid(1)],
+						response: [testUuid(2)]
+					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "site_setting" as "root_"
@@ -179,25 +161,19 @@ describe('Insert mutation', () => {
         }
       `,
 			executes: [
-				{
-					sql: SQL`BEGIN;`
-				},
-				{
-					sql: SQL`insert into "author" ("id", "name") values ($1, $2)
-		  returning "id"`,
-					parameters: [testUuid(2), 'John'],
-					response: [testUuid(2)]
-				},
-				{
-					sql: SQL`insert into "post" ("author_id", "id", "published_at") values ($1, $2, $3)
-		  returning "id"`,
-					parameters: [testUuid(2), testUuid(1), '2018-06-11'],
-					response: [testUuid(1)]
-				},
-				{
-					sql: 'COMMIT;'
-				},
 				...sqlTransaction([
+					{
+						sql: SQL`insert into "author" ("id", "name") values ($1, $2)
+            returning "id"`,
+						parameters: [testUuid(2), 'John'],
+						response: [testUuid(2)]
+					},
+					{
+						sql: SQL`insert into "post" ("author_id", "id", "published_at") values ($1, $2, $3)
+		  returning "id"`,
+						parameters: [testUuid(2), testUuid(1), '2018-06-11'],
+						response: [testUuid(1)]
+					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "post" as "root_"
@@ -246,31 +222,25 @@ describe('Insert mutation', () => {
         }
       `,
 			executes: [
-				{
-					sql: SQL`BEGIN;`
-				},
-				{
-					sql: SQL`insert into "post" ("id", "published_at") values ($1, $2)
-		  returning "id"`,
-					parameters: [testUuid(1), '2018-06-11'],
-					response: [testUuid(1)]
-				},
-				{
-					sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
-		  returning "id"`,
-					parameters: [testUuid(2), 'cs', testUuid(1), 'Ahoj svete'],
-					response: [testUuid(2)]
-				},
-				{
-					sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
-		  returning "id"`,
-					parameters: [testUuid(3), 'en', testUuid(1), 'Hello world'],
-					response: [testUuid(3)]
-				},
-				{
-					sql: 'COMMIT;'
-				},
 				...sqlTransaction([
+					{
+						sql: SQL`insert into "post" ("id", "published_at") values ($1, $2)
+            returning "id"`,
+						parameters: [testUuid(1), '2018-06-11'],
+						response: [testUuid(1)]
+					},
+					{
+						sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
+		  returning "id"`,
+						parameters: [testUuid(2), 'cs', testUuid(1), 'Ahoj svete'],
+						response: [testUuid(2)]
+					},
+					{
+						sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
+		  returning "id"`,
+						parameters: [testUuid(3), 'en', testUuid(1), 'Hello world'],
+						response: [testUuid(3)]
+					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "post" as "root_"
@@ -306,41 +276,35 @@ describe('Insert mutation', () => {
         }
       `,
 			executes: [
-				{
-					sql: SQL`BEGIN;`
-				},
-				{
-					sql: SQL`insert into "post" ("id", "name") values ($1, $2)
+				...sqlTransaction([
+					{
+						sql: SQL`insert into "post" ("id", "name") values ($1, $2)
+            returning "id"`,
+						parameters: [testUuid(1), 'Hello world'],
+						response: [testUuid(1)]
+					},
+					{
+						sql: SQL`insert into "category" ("id", "name") values ($1, $2)
 		  returning "id"`,
-					parameters: [testUuid(1), 'Hello world'],
-					response: [testUuid(1)]
-				},
-				{
-					sql: SQL`insert into "category" ("id", "name") values ($1, $2)
+						parameters: [testUuid(2), 'Category 1'],
+						response: [testUuid(2)]
+					},
+					{
+						sql: SQL`insert into "category" ("id", "name") values ($1, $2)
 		  returning "id"`,
-					parameters: [testUuid(2), 'Category 1'],
-					response: [testUuid(2)]
-				},
-				{
-					sql: SQL`insert into "category" ("id", "name") values ($1, $2)
-		  returning "id"`,
-					parameters: [testUuid(3), 'Category 2'],
-					response: [testUuid(3)]
-				},
-				{
-					sql: SQL`insert into "post_categories" ("category_id", "post_id")
+						parameters: [testUuid(3), 'Category 2'],
+						response: [testUuid(3)]
+					},
+					{
+						sql: SQL`insert into "post_categories" ("category_id", "post_id")
           values ('${testUuid(2)}', '${testUuid(1)}')
           on conflict do nothing`
-				},
-				{
-					sql: SQL`insert into "post_categories" ("category_id", "post_id")
+					},
+					{
+						sql: SQL`insert into "post_categories" ("category_id", "post_id")
           values ('${testUuid(3)}', '${testUuid(1)}')
           on conflict do nothing`
-				},
-				{
-					sql: SQL`COMMIT;`
-				},
-				...sqlTransaction([
+					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "post" as "root_"
@@ -378,41 +342,35 @@ describe('Insert mutation', () => {
         }
       `,
 			executes: [
-				{
-					sql: SQL`BEGIN;`
-				},
-				{
-					sql: SQL`insert into "category" ("id", "name") values ($1, $2)
+				...sqlTransaction([
+					{
+						sql: SQL`insert into "category" ("id", "name") values ($1, $2)
+            returning "id"`,
+						parameters: [testUuid(1), 'Hello world'],
+						response: [testUuid(1)]
+					},
+					{
+						sql: SQL`insert into "post" ("id", "name") values ($1, $2)
 		  returning "id"`,
-					parameters: [testUuid(1), 'Hello world'],
-					response: [testUuid(1)]
-				},
-				{
-					sql: SQL`insert into "post" ("id", "name") values ($1, $2)
+						parameters: [testUuid(2), 'Post 1'],
+						response: [testUuid(2)]
+					},
+					{
+						sql: SQL`insert into "post" ("id", "name") values ($1, $2)
 		  returning "id"`,
-					parameters: [testUuid(2), 'Post 1'],
-					response: [testUuid(2)]
-				},
-				{
-					sql: SQL`insert into "post" ("id", "name") values ($1, $2)
-		  returning "id"`,
-					parameters: [testUuid(3), 'Post 2'],
-					response: [testUuid(3)]
-				},
-				{
-					sql: SQL`insert into "post_categories" ("category_id", "post_id")
+						parameters: [testUuid(3), 'Post 2'],
+						response: [testUuid(3)]
+					},
+					{
+						sql: SQL`insert into "post_categories" ("category_id", "post_id")
           values ('${testUuid(1)}', '${testUuid(2)}')
           on conflict do nothing`
-				},
-				{
-					sql: SQL`insert into "post_categories" ("category_id", "post_id")
+					},
+					{
+						sql: SQL`insert into "post_categories" ("category_id", "post_id")
           values ('${testUuid(1)}', '${testUuid(3)}')
           on conflict do nothing`
-				},
-				{
-					sql: SQL`COMMIT;`
-				},
-				...sqlTransaction([
+					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "category" as "root_"

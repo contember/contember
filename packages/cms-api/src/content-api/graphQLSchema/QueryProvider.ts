@@ -29,9 +29,7 @@ export default class QueryProvider {
 			args: {
 				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) }
 			},
-			resolve: async (parent, args, context, info) => {
-				return await this.readResolver.resolveGetQuery(entity, parent, args, context, info)
-			}
+			resolve: this.readResolver.resolveGetQuery(entity)
 		}
 	}
 
@@ -43,9 +41,7 @@ export default class QueryProvider {
 			args: {
 				where: { type: this.whereTypeProvider.getEntityWhereType(entityName) }
 			},
-			resolve: async (parent, args, context, info) => {
-				return await this.readResolver.resolveListQuery(entity, parent, args, context, info)
-			}
+			resolve: this.readResolver.resolveListQuery(entity)
 		}
 	}
 }

@@ -39,9 +39,7 @@ describe('Delete mutation', () => {
 								root_author_name: 'John'
 							}
 						]
-					}
-				]),
-				...sqlTransaction([
+					},
 					{
 						sql: SQL`delete from "post"
 		  where "id" = $1`,

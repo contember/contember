@@ -1,5 +1,5 @@
 import { Model } from 'cms-common'
-import { execute } from '../../src/test'
+import { execute, sqlTransaction } from '../../src/test'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
 import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
@@ -18,28 +18,23 @@ describe('Insert mutation', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`BEGIN;`,
-					response: []
-				},
-				{
-					sql: SQL`insert into "author" ("id", "name") values ($1, $2)
+				...sqlTransaction([
+					{
+						sql: SQL`insert into "author" ("id", "name") values ($1, $2)
 		  returning "id"`,
-					parameters: [testUuid(1), 'John'],
-					response: [testUuid(1)]
-				},
-				{
-					sql: SQL`COMMIT;`,
-					response: []
-				},
-				{
-					sql: SQL`
-            SELECT "createAuth"."id" AS "id"
-            FROM "author" "createAuth"
-            WHERE "createAuth"."id" = '${testUuid(1)}'
-          `,
-					response: [{ id: testUuid(1) }]
-				}
+						parameters: [testUuid(1), 'John'],
+						response: [testUuid(1)]
+					}
+				]),
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "author" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -88,14 +83,15 @@ describe('Insert mutation', () => {
 					sql: SQL`COMMIT;`,
 					response: []
 				},
-				{
-					sql: SQL`
-            SELECT "createSite"."id" AS "id"
-            FROM "site" "createSite" 
-            WHERE "createSite"."id" = '${testUuid(1)}'
-          `,
-					response: [{ id: testUuid(1) }]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "site" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -144,14 +140,15 @@ describe('Insert mutation', () => {
 					sql: SQL`COMMIT;`,
 					response: []
 				},
-				{
-					sql: SQL`
-            SELECT "createSite"."id" AS "id"
-            FROM "site_setting" "createSite" 
-            WHERE "createSite"."id" = '${testUuid(1)}'
-          `,
-					response: [{ id: testUuid(1) }]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "site_setting" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -200,14 +197,15 @@ describe('Insert mutation', () => {
 				{
 					sql: 'COMMIT;'
 				},
-				{
-					sql: SQL`
-            SELECT "createPost"."id" AS "id"
-            FROM "post" "createPost"
-            WHERE "createPost"."id" = '${testUuid(1)}'
-          `,
-					response: [{ id: testUuid(1) }]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -272,14 +270,15 @@ describe('Insert mutation', () => {
 				{
 					sql: 'COMMIT;'
 				},
-				{
-					sql: SQL`
-            SELECT "createPost"."id" AS "id"
-            FROM "post" "createPost"
-            WHERE "createPost"."id" = '${testUuid(1)}'
-          `,
-					response: [{ id: testUuid(1) }]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -341,12 +340,15 @@ describe('Insert mutation', () => {
 				{
 					sql: SQL`COMMIT;`
 				},
-				{
-					sql: SQL`SELECT "createPost"."id" AS "id" FROM "post" "createPost" WHERE "createPost"."id" = '${testUuid(
-						1
-					)}'`,
-					response: [{ id: testUuid(1) }]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -410,12 +412,15 @@ describe('Insert mutation', () => {
 				{
 					sql: SQL`COMMIT;`
 				},
-				{
-					sql: SQL`SELECT "createCate"."id" AS "id" FROM "category" "createCate" WHERE "createCate"."id" = '${testUuid(
-						1
-					)}'`,
-					response: [{ id: testUuid(1) }]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "category" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {

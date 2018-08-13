@@ -1,14 +1,13 @@
 import { GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLOutputType } from 'graphql'
-import { JoinMonsterEntityMapping, JoinMonsterFieldMapping } from '../joinMonsterHelpers'
 import { Model } from 'cms-common'
-import { acceptFieldVisitor, getEntity } from '../../content-schema/modelUtils'
-import { quoteIdentifier } from '../sql/utils'
+import { acceptFieldVisitor, getEntity as getEntityFromSchema } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import FieldTypeVisitor from './entities/FieldTypeVisitor'
-import JoinMonsterFieldMappingVisitor from './entities/JoinMonsterFieldMappingVisitor'
+import FieldArgsVisitor from './entities/FieldArgsVisitor'
 import { GqlTypeName } from './utils'
 import WhereTypeProvider from './WhereTypeProvider'
+import { GraphQLFieldResolver } from 'graphql/type/definition'
 
 export default class EntityTypeProvider {
 	private schema: Model.Schema
@@ -28,22 +27,15 @@ export default class EntityTypeProvider {
 	}
 
 	private createEntity(entityName: string) {
-		const entity = getEntity(this.schema, entityName)
-		const entityMapping: JoinMonsterEntityMapping = {
-			sqlTable: quoteIdentifier(entity.tableName),
-			uniqueKey: entity.primaryColumn
-		}
-
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}`,
-			fields: () => this.getEntityFields(entityName),
-			...entityMapping
+			fields: () => this.getEntityFields(entityName)
 		} as GraphQLObjectTypeConfig<any, any>)
 	}
 
 	private getEntityFields(entityName: string) {
-		const entity = getEntity(this.schema, entityName)
-		const fields: { [field: string]: GraphQLFieldConfig<any, any> & JoinMonsterFieldMapping<any, any> } = {}
+		const entity = getEntityFromSchema(this.schema, entityName)
+		const fields: { [field: string]: GraphQLFieldConfig<any, any> } = {}
 
 		for (const fieldName in entity.fields) {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
@@ -53,10 +45,17 @@ export default class EntityTypeProvider {
 			const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this)
 			const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, fieldName, fieldTypeVisitor)
 
-			const joinMonsterVisitor = new JoinMonsterFieldMappingVisitor(this.schema, this.whereTypeProvider)
+			const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider)
+			const fieldResolver: GraphQLFieldResolver<any, any> = (source, args, context, info) => {
+				if (!info.path) {
+					return undefined
+				}
+				return source[info.path.key]
+			}
 			fields[fieldName] = {
 				type,
-				...acceptFieldVisitor(this.schema, entity, fieldName, joinMonsterVisitor)
+				args: acceptFieldVisitor(this.schema, entity, fieldName, fieldArgsVisitor),
+				resolve: fieldResolver
 			}
 		}
 		return fields

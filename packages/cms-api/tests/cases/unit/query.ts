@@ -1,5 +1,5 @@
 import { Model } from 'cms-common'
-import { execute } from '../../src/test'
+import { execute, sqlTransaction } from '../../src/test'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
 import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
@@ -18,19 +18,52 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`
-            SELECT "Post"."id" AS "id"
-            FROM "post" "Post"
-            WHERE "Post"."id" = '${testUuid(1)}'
-          `,
-					response: [{ id: testUuid(1) }]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_id: testUuid(1) }],
+						parameters: [testUuid(1)]
+					}
+				])
 			],
 			return: {
 				data: {
 					Post: {
 						id: testUuid(1)
+					}
+				}
+			}
+		})
+	})
+
+	it('Field alias', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity => entity.column('title', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        query {
+          Post(where: {id: "${testUuid(1)}"}) {
+            heading: title
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."title" as "root_heading"
+                     from "post" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{ root_heading: 'Hello' }],
+						parameters: [testUuid(1)]
+					}
+				])
+			],
+			return: {
+				data: {
+					Post: {
+						heading: 'Hello'
 					}
 				}
 			}
@@ -62,25 +95,28 @@ describe('Queries', () => {
         }
       `,
 			executes: [
-				{
-					sql: SQL`
-            SELECT "Posts"."id" AS "id"
-            FROM "post" "Posts"
-          `,
-					response: [{ id: testUuid(1) }, { id: testUuid(2) }]
-				},
-				{
-					sql: SQL`
-            SELECT "locales"."id" AS "id", "locales"."locale" AS "locale", "locales"."title" AS "title", "locales"."post_id" AS "post_id"
-            FROM "post_locale" "locales"
-            WHERE "locales"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')
-          `,
-					response: [
-						{ id: testUuid(3), locale: 'cs', title: 'ahoj svete', post_id: testUuid(1) },
-						{ id: testUuid(4), locale: 'en', title: 'hello world', post_id: testUuid(1) },
-						{ id: testUuid(5), locale: 'cs', title: 'dalsi clanek', post_id: testUuid(2) }
-					]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"`,
+						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }]
+					},
+					{
+						sql: SQL`select
+                       "root_"."post_id" as "__grouping_key",
+                       "root_"."id" as "root_id",
+                       "root_"."locale" as "root_locale",
+                       "root_"."title" as "root_title"
+                     from "post_locale" as "root_"
+                     where ("root_"."post_id" in ($1, $2))`,
+						parameters: [testUuid(1), testUuid(2)],
+						response: [
+							{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
+							{ root_id: testUuid(4), root_locale: 'en', root_title: 'hello world', __grouping_key: testUuid(1) },
+							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) }
+						]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -133,27 +169,30 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`
-            SELECT
-              "Posts"."id" AS "id",
-              "author"."id" AS "author__id",
-              "author"."name" AS "author__name"
-            FROM "post" "Posts" LEFT JOIN "author" "author" ON "Posts".author_id = "author".id
+				...sqlTransaction([
+					{
+						sql: SQL`
+              select
+                "root_"."id" as "root_id",
+                "root_author"."id" as "root_author_id",
+                "root_author"."id" as "root_author_id",
+                "root_author"."name" as "root_author_name"
+              from "post" as "root_" left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
           `,
-					response: [
-						{
-							id: testUuid(1),
-							author__id: testUuid(2),
-							author__name: 'John'
-						},
-						{
-							id: testUuid(3),
-							author__id: testUuid(4),
-							author__name: 'Jack'
-						}
-					]
-				}
+						response: [
+							{
+								root_id: testUuid(1),
+								root_author_id: testUuid(2),
+								root_author_name: 'John'
+							},
+							{
+								root_id: testUuid(3),
+								root_author_id: testUuid(4),
+								root_author_name: 'Jack'
+							}
+						]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -199,31 +238,33 @@ describe('Queries', () => {
         }
       }`,
 			executes: [
-				{
-					sql: SQL`
-            SELECT
-              "Sites"."id" AS "id",
-              "Sites"."name" AS "name",
-              "setting"."id" AS "setting__id",
-              "setting"."url" AS "setting__url"
-            FROM "site" "Sites"
-              LEFT JOIN "site_setting" "setting" ON "Sites".setting_id = "setting".id
-          `,
-					response: [
-						{
-							id: testUuid(1),
-							name: 'Site 1',
-							setting__id: testUuid(2),
-							setting__url: 'http://site1.cz'
-						},
-						{
-							id: testUuid(3),
-							name: 'Site 2',
-							setting__id: testUuid(4),
-							setting__url: 'http://site2.cz'
-						}
-					]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`
+                select
+                  "root_"."id" as "root_id",
+                  "root_"."name" as "root_name",
+                  "root_setting"."id" as "root_setting_id",
+                  "root_setting"."id" as "root_setting_id",
+                  "root_setting"."url" as "root_setting_url"
+                from "site" as "root_" left join "site_setting" as "root_setting" on "root_"."setting_id" = "root_setting"."id"`,
+
+						response: [
+							{
+								root_id: testUuid(1),
+								root_name: 'Site 1',
+								root_setting_id: testUuid(2),
+								root_setting_url: 'http://site1.cz'
+							},
+							{
+								root_id: testUuid(3),
+								root_name: 'Site 2',
+								root_setting_id: testUuid(4),
+								root_setting_url: 'http://site2.cz'
+							}
+						]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -271,31 +312,32 @@ describe('Queries', () => {
         }
       }`,
 			executes: [
-				{
-					sql: SQL`
-            SELECT
-              "SiteSettin"."id" AS "id",
-              "SiteSettin"."url" AS "url",
-              "site"."id" AS "site__id",
-              "site"."name" AS "site__name"
-            FROM "site_setting" "SiteSettin"
-              LEFT JOIN "site" "site" ON "SiteSettin".id = "site".setting_id
-          `,
-					response: [
-						{
-							id: testUuid(1),
-							url: 'http://site1.cz',
-							site__id: testUuid(2),
-							site__name: 'Site 1'
-						},
-						{
-							id: testUuid(3),
-							url: 'http://site2.cz',
-							site__id: testUuid(4),
-							site__name: 'Site 2'
-						}
-					]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`
+              select
+                "root_"."id" as "root_id",
+                "root_"."url" as "root_url",
+                "root_site"."id" as "root_site_id",
+                "root_site"."id" as "root_site_id",
+                "root_site"."name" as "root_site_name"
+              from "site_setting" as "root_" left join "site" as "root_site" on "root_"."id" = "root_site"."setting_id"`,
+						response: [
+							{
+								root_id: testUuid(1),
+								root_url: 'http://site1.cz',
+								root_site_id: testUuid(2),
+								root_site_name: 'Site 1'
+							},
+							{
+								root_id: testUuid(3),
+								root_url: 'http://site2.cz',
+								root_site_id: testUuid(4),
+								root_site_name: 'Site 2'
+							}
+						]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -327,7 +369,11 @@ describe('Queries', () => {
 			schema: new SchemaBuilder()
 				.enum('locale', ['cs', 'en'])
 				.entity('Post', entity => entity.manyHasMany('categories', relation => relation.target('Category')))
-				.entity('Category', entity => entity.oneHasMany('locales', relation => relation.target('CategoryLocale')))
+				.entity('Category', entity =>
+					entity
+						.column('visible', c => c.type(Model.ColumnType.Bool))
+						.oneHasMany('locales', relation => relation.target('CategoryLocale'))
+				)
 				.entity('CategoryLocale', entity =>
 					entity
 						.column('name', column => column.type(Model.ColumnType.String))
@@ -340,6 +386,7 @@ describe('Queries', () => {
             id
             categories {
               id
+              visible
               locales(where: {locale: {eq: cs}}) {
                 id
                 name
@@ -348,80 +395,96 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`SELECT "Posts"."id" AS "id"
-                   FROM "post" "Posts"`,
-					response: [
-						{
-							id: testUuid(1)
-						},
-						{
-							id: testUuid(2)
-						}
-					]
-				},
-				{
-					sql: SQL`
-            SELECT
-              NULLIF(CONCAT("_post_cate"."post_id", "_post_cate"."category_id"), '') AS "pos#cat",
-              "categories"."id" AS "id",
-              "_post_cate"."post_id" AS "post_id"
-            FROM "post_categories" "_post_cate"
-            LEFT JOIN "category" "categories" ON "_post_cate".category_id = "categories".id
-            WHERE "_post_cate"."post_id" IN ('${testUuid(1)}','${testUuid(2)}')
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"`,
+						response: [
+							{
+								root_id: testUuid(1)
+							},
+							{
+								root_id: testUuid(2)
+							}
+						]
+					},
+					{
+						sql: SQL`select "category_id",
+                       "post_id"
+                     from "post_categories"
+                     where "post_id" in ($1, $2)`,
+						parameters: [testUuid(1), testUuid(2)],
+						response: [
+							{
+								category_id: testUuid(3),
+								post_id: testUuid(1)
+							},
+							{
+								category_id: testUuid(4),
+								post_id: testUuid(1)
+							},
+							{
+								category_id: testUuid(5),
+								post_id: testUuid(2)
+							},
+							{
+								category_id: testUuid(3),
+								post_id: testUuid(2)
+							}
+						]
+					},
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."visible" as "root_visible",
+                       "root_"."id" as "root_id"
+                     from "category" as "root_"
+                     where ("root_"."id" in ($1, $2, $3))`,
+						parameters: [testUuid(3), testUuid(4), testUuid(5)],
+						response: [
+							{
+								root_id: testUuid(3),
+								root_visible: true
+							},
+							{
+								root_id: testUuid(4),
+								root_visible: true
+							},
+							{
+								root_id: testUuid(5),
+								root_visible: true
+							}
+						]
+					},
+					{
+						sql: SQL`
+              select
+                "root_"."category_id" as "__grouping_key",
+                "root_"."id" as "root_id",
+                "root_"."name" as "root_name"
+              from "category_locale" as "root_"
+              where ("root_"."locale" = $1) and ("root_"."category_id" in ($2, $3, $4))
           `,
-					response: [
-						{
-							'pos#cat': testUuid(1) + testUuid(3),
-							id: testUuid(3),
-							post_id: testUuid(1)
-						},
-						{
-							'pos#cat': testUuid(1) + testUuid(4),
-							id: testUuid(4),
-							post_id: testUuid(1)
-						},
-						{
-							'pos#cat': testUuid(2) + testUuid(5),
-							id: testUuid(5),
-							post_id: testUuid(2)
-						},
-						{
-							'pos#cat': testUuid(2) + testUuid(3),
-							id: testUuid(3),
-							post_id: testUuid(2)
-						}
-					]
-				},
-				{
-					sql: SQL`
-            SELECT
-              "locales"."id" AS "id",
-              "locales"."name" AS "name",
-              "locales"."category_id" AS "category_id"
-            FROM "category_locale" "locales"
-            WHERE "locales"."locale" = 'cs' AND "locales"."category_id" IN ('${testUuid(3)}','${testUuid(
-						4
-					)}','${testUuid(5)}')
-          `,
-					response: [
-						{
-							id: testUuid(6),
-							name: 'Kategorie 1',
-							category_id: testUuid(3)
-						},
-						{
-							id: testUuid(7),
-							name: 'Kategorie 2',
-							category_id: testUuid(4)
-						},
-						{
-							id: testUuid(8),
-							name: 'Kategorie 3',
-							category_id: testUuid(5)
-						}
-					]
-				}
+						parameters: ['cs', testUuid(3), testUuid(4), testUuid(5)],
+						response: [
+							{
+								root_id: testUuid(6),
+								root_name: 'Kategorie 1',
+								__grouping_key: testUuid(3)
+							},
+							{
+								root_id: testUuid(7),
+								root_name: 'Kategorie 2',
+								__grouping_key: testUuid(4)
+							},
+							{
+								root_id: testUuid(8),
+								root_name: 'Kategorie 3',
+								__grouping_key: testUuid(5)
+							}
+						]
+					}
+				])
 			],
 			return: {
 				data: {
@@ -430,6 +493,7 @@ describe('Queries', () => {
 							categories: [
 								{
 									id: testUuid(3),
+									visible: true,
 									locales: [
 										{
 											id: testUuid(6),
@@ -439,6 +503,7 @@ describe('Queries', () => {
 								},
 								{
 									id: testUuid(4),
+									visible: true,
 									locales: [
 										{
 											id: testUuid(7),
@@ -453,6 +518,7 @@ describe('Queries', () => {
 							categories: [
 								{
 									id: testUuid(5),
+									visible: true,
 									locales: [
 										{
 											id: testUuid(8),
@@ -462,6 +528,7 @@ describe('Queries', () => {
 								},
 								{
 									id: testUuid(3),
+									visible: true,
 									locales: [
 										{
 											id: testUuid(6),
@@ -502,62 +569,73 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`SELECT "Categories"."id" AS "id"
-                   FROM "category" "Categories"`,
-					response: [
-						{
-							id: testUuid(1)
-						},
-						{
-							id: testUuid(2)
-						}
-					]
-				},
-				{
-					sql: SQL`
-            SELECT
-              NULLIF(CONCAT("_post_cate"."post_id", "_post_cate"."category_id"), '') AS "pos#cat",
-              "posts"."id" AS "id",
-              "author"."id" AS "author__id",
-              "author"."name" AS "author__name",
-              "_post_cate"."category_id" AS "category_id"
-            FROM "post_categories" "_post_cate"
-            LEFT JOIN "post" "posts" ON "_post_cate".post_id = "posts".id
-            LEFT JOIN "author" "author" ON "posts".author_id = "author".id
-            WHERE "_post_cate"."category_id" IN ('${testUuid(1)}','${testUuid(2)}')
-          `,
-					response: [
-						{
-							'pos#cat': testUuid(3) + testUuid(1),
-							id: testUuid(3),
-							author__id: testUuid(6),
-							author__name: 'John',
-							category_id: testUuid(1)
-						},
-						{
-							'pos#cat': testUuid(4) + testUuid(1),
-							id: testUuid(4),
-							author__id: testUuid(7),
-							author__name: 'Jack',
-							category_id: testUuid(1)
-						},
-						{
-							'pos#cat': testUuid(4) + testUuid(2),
-							id: testUuid(4),
-							author__id: testUuid(7),
-							author__name: 'Jack',
-							category_id: testUuid(2)
-						},
-						{
-							'pos#cat': testUuid(5) + testUuid(2),
-							id: testUuid(5),
-							author__id: testUuid(7),
-							author__name: 'Jack',
-							category_id: testUuid(2)
-						}
-					]
-				}
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "category" as "root_"`,
+						response: [
+							{
+								root_id: testUuid(1)
+							},
+							{
+								root_id: testUuid(2)
+							}
+						]
+					},
+					{
+						sql: SQL`select
+                       "category_id",
+                       "post_id"
+                     from "post_categories"
+                     where "category_id" in ($1, $2)`,
+						parameters: [testUuid(1), testUuid(2)],
+						response: [
+							{
+								category_id: testUuid(1),
+								post_id: testUuid(3)
+							},
+							{
+								category_id: testUuid(1),
+								post_id: testUuid(4)
+							},
+							{
+								category_id: testUuid(2),
+								post_id: testUuid(4)
+							},
+							{
+								category_id: testUuid(2),
+								post_id: testUuid(5)
+							}
+						]
+					},
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_author"."id" as "root_author_id",
+                       "root_author"."name" as "root_author_name",
+                       "root_"."id" as "root_id"
+                     from "post" as "root_" left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
+                     where ("root_"."id" in ($1, $2, $3))          `,
+						parameters: [testUuid(3), testUuid(4), testUuid(5)],
+						response: [
+							{
+								root_id: testUuid(3),
+								root_author_id: testUuid(6),
+								root_author_name: 'John'
+							},
+							{
+								root_id: testUuid(4),
+								root_author_id: testUuid(7),
+								root_author_name: 'Jack'
+							},
+							{
+								root_id: testUuid(5),
+								root_author_id: testUuid(7),
+								root_author_name: 'Jack'
+							}
+						]
+					}
+				])
 			],
 			return: {
 				data: {

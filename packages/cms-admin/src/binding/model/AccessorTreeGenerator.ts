@@ -18,13 +18,13 @@ export default class AccessorTreeGenerator {
 		const marker: EntityMarker = this.structure.content
 		const data = this.initialData[marker.entityName]
 
-		let entityAccessor: EntityAccessor = this.updateFields(data, marker, (fieldName, newData) => {
-			entityAccessor = entityAccessor.withUpdatedField(fieldName, newData)
+		let entityAccessor: EntityAccessor | null = this.updateFields(data, marker, (fieldName, newData) => {
+			entityAccessor = entityAccessor!.withUpdatedField(fieldName, newData)
 
 			updateData(entityAccessor)
 		})
 
-		updateData(entityAccessor)
+		updateData(entityAccessor || undefined)
 	}
 
 	private updateFields(
@@ -32,8 +32,9 @@ export default class AccessorTreeGenerator {
 		marker: EntityMarker,
 		onUpdate: (updatedField: FieldName, updatedData: FieldData) => void,
 		onUnlink?: () => void
-	): EntityAccessor {
+	): EntityAccessor | null {
 		const entityData: EntityData = {}
+		if(!data) return null
 		const id = data[AccessorTreeGenerator.PRIMARY_KEY_NAME]
 		const fields = marker.fields
 
@@ -50,31 +51,30 @@ export default class AccessorTreeGenerator {
 					const oneToManyData: DataContextValue[] = []
 
 					for (let i = 0, len = fieldData.length; i < len; i++) {
-						oneToManyData.push(
-							this.updateFields(
-								fieldData[i],
-								field,
-								(updatedField: FieldName, updatedData: FieldData) => {
-									const entityAccessor = oneToManyData[i]
-									if (entityAccessor instanceof EntityAccessor) {
-										oneToManyData[i] = entityAccessor.withUpdatedField(updatedField, updatedData)
+						const accessor = this.updateFields(
+							fieldData[i],
+							field,
+							(updatedField: FieldName, updatedData: FieldData) => {
+								const entityAccessor = oneToManyData[i]
+								if (entityAccessor instanceof EntityAccessor) {
+									oneToManyData[i] = entityAccessor.withUpdatedField(updatedField, updatedData)
 
-										onUpdate(fieldName, oneToManyData)
-									}
-								},
-								() => {
-									oneToManyData[i] = undefined
 									onUpdate(fieldName, oneToManyData)
 								}
-							)
+							},
+							() => {
+								oneToManyData[i] = undefined
+								onUpdate(fieldName, oneToManyData)
+							}
 						)
+						if(accessor) oneToManyData.push(accessor)
 					}
 
 					entityData[fieldName] = oneToManyData
 				}
 			} else if (typeof fieldData === 'object') {
 				if (field instanceof EntityMarker) {
-					entityData[fieldName] = this.updateFields(
+					const accessor = this.updateFields(
 						fieldData,
 						field,
 						(updatedField: FieldName, updatedData: FieldData) => {
@@ -85,6 +85,7 @@ export default class AccessorTreeGenerator {
 						},
 						() => onUpdate(fieldName, undefined)
 					)
+					if(accessor) entityData[fieldName] = accessor
 				}
 			} else {
 				const onChange = (newValue: any) => {

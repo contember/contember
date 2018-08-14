@@ -1,6 +1,5 @@
-type Obj = { [key: string]: string | undefined }
-
-export interface Request extends Obj {
+import { RecursiveStringObject } from "../utils/url";
+export interface Request extends RecursiveStringObject {
 	name: string
 }
 
@@ -12,22 +11,19 @@ export interface ProjectRequest extends Request {
 	project: string
 }
 
-export interface DashboardRequest extends ProjectRequest {
-	name: 'dashboard'
+export interface StageRequest extends ProjectRequest {
+	stage: string
 }
 
-export interface EntityListRequest extends ProjectRequest {
-	name: 'entity_list'
-	entityGroupName: string
+type PageParameters = RecursiveStringObject
+
+export interface PageRequest<P extends PageParameters> extends StageRequest {
+	name: 'project_page'
+	pageName: string
+	parameters: P
 }
 
-export interface EntityEditRequest extends ProjectRequest {
-	name: 'entity_edit'
-	entity: string
-	entityId: string
-}
-
-type RequestState = LoginRequest | DashboardRequest | EntityListRequest | EntityEditRequest
+type RequestState = LoginRequest | PageRequest<any>
 
 export default RequestState
 
@@ -38,25 +34,16 @@ export const emptyRequestState: RequestState = {
 export type RequestChange = () => RequestState
 
 export const loginRequest = (): RequestChange => (): LoginRequest => ({ name: 'login' })
-export const dashboardRequest = (project: string): RequestChange => (): DashboardRequest => ({
-	name: 'dashboard',
-	project
-})
-export const entityListRequest = (
+
+export const pageRequest = <P extends PageParameters>(
 	project: string,
-	entityGroupName: string
-): RequestChange => (): EntityListRequest => ({
-	name: 'entity_list',
+	stage: string,
+	pageName: string,
+	parameters: P
+): RequestChange => (): PageRequest<P> => ({
+	name: 'project_page',
 	project,
-	entityGroupName
-})
-export const entityEditRequest = (
-	project: string,
-	entity: string,
-	entityId: string
-): RequestChange => (): EntityEditRequest => ({
-	name: 'entity_edit',
-	project,
-	entity,
-	entityId
+	stage,
+	pageName,
+	parameters
 })

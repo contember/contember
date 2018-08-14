@@ -8,7 +8,7 @@ import FieldContext from './FieldContext'
 import { connect } from 'react-redux'
 import State from '../../state'
 import { ContentStatus } from '../../state/content'
-import { getData } from '../../actions/content'
+import { getData, putData } from '../../actions/content'
 import { Dispatch } from '../../actions/types'
 
 export interface DataProviderProps {
@@ -16,6 +16,7 @@ export interface DataProviderProps {
 }
 export interface DataProviderDispatchProps {
 	getData: (query: string) => void
+	putData: (query: string) => Promise<void>
 }
 export interface DataProviderStateProps {
 	data: any
@@ -45,8 +46,10 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 	protected triggerPersist = () => {
 		if (this.props.data && this.state.data instanceof EntityAccessor) {
 			const generator = new PersistQueryGenerator(this.props.data, this.state.data)
-
-			console.log('QQ', generator.generatePersistQuery())
+			const query = generator.generatePersistQuery()
+			if(query) {
+				this.props.putData(query)
+			}
 		}
 	}
 
@@ -79,6 +82,7 @@ export default connect<DataProviderStateProps, DataProviderDispatchProps, DataPr
 		ready: content.state === ContentStatus.LOADED
 	}),
 	(dispatch: Dispatch) => ({
-		getData: (query: string) => dispatch(getData('blog', 'prod', query))
+		getData: (query: string) => dispatch(getData('blog', 'prod', query)),
+		putData: (query: string) => dispatch(putData('blog', 'prod', query))
 	})
 )(DataProvider)

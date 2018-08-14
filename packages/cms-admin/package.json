@@ -5,8 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "build": "tsc --build --verbose",
-    "start": "tsc --build --verbose --watch"
+    "build": "tsc --build --verbose"
   },
   "dependencies": {
     "cms-client": "^0.0.0",

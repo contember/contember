@@ -5,8 +5,7 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"build": "tsc --build --verbose",
-		"start": "tsc --build --verbose --watch"
+		"build": "tsc --build --verbose"
 	},
 	"devDependencies": {
 		"ts-node": "^7.0.0",

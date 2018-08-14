@@ -6,7 +6,6 @@
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"build": "tsc --build --verbose",
-		"start": "tsc --build --verbose --watch",
 		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js"
 	},
 	"dependencies": {

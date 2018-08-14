@@ -114,7 +114,7 @@ export class Mapper
     const entity = getEntity(this.schema, entityName)
     const columnName = getColumnName(this.schema, entity, fieldName)
 
-    const result = await this.db.table(entity.name).select(columnName).where(this.getUniqueWhereArgs(entity, where))
+    const result = await this.db.table(entity.tableName).select(columnName).where(this.getUniqueWhereArgs(entity, where))
 
     return result[0] !== undefined ? result[0][columnName] : undefined
   }
@@ -196,7 +196,7 @@ export class Mapper
     }
 
     const whereArgs = this.getUniqueWhereArgs(entity, where)
-    const result = await this.db.table(entity.name).select(entity.primaryColumn).where(whereArgs)
+    const result = await this.db.table(entity.tableName).select(entity.primaryColumn).where(whereArgs)
 
     return result[0] !== undefined ? result[0][entity.primaryColumn] : undefined
   }

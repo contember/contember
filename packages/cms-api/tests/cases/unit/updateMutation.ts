@@ -25,7 +25,7 @@ describe('update', () => {
           .buildSchema(),
         query: GQL`mutation {
         updateAuthor(
-            where: {id: "${testUuid(1)}"}, 
+            where: {id: "${testUuid(1)}"},
             data: {name: "John"}
           ) {
           id
@@ -95,7 +95,7 @@ describe('update', () => {
         schema: postWithAuthor,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {author: {create: {name: "John"}}}
           ) {
           id
@@ -134,7 +134,7 @@ describe('update', () => {
         schema: postWithAuthor,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {author: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -166,7 +166,7 @@ describe('update', () => {
         schema: postWithAuthor,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {author: {update: {name: "John"}}}
           ) {
           id
@@ -176,7 +176,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "author_id"
-                       from "Post"
+                       from "post"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [{author_id: testUuid(1)}],
@@ -205,7 +205,7 @@ describe('update', () => {
         schema: postWithAuthor,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {author: {upsert: {create: {name: "John"}, update: {name: "Jack"}}}}
           ) {
           id
@@ -215,7 +215,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "author_id"
-                       from "Post"
+                       from "post"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [{author_id: testUuid(1)}],
@@ -244,7 +244,7 @@ describe('update', () => {
         schema: postWithAuthor,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {author: {upsert: {create: {name: "John"}, update: {name: "Jack"}}}}
           ) {
           id
@@ -254,7 +254,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "author_id"
-                       from "Post"
+                       from "post"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [],
@@ -290,7 +290,7 @@ describe('update', () => {
         schema: postWithNullableAuthor,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {author: {disconnect: true}}
           ) {
           id
@@ -322,7 +322,7 @@ describe('update', () => {
         schema: postWithNullableAuthor,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {author: {delete: true}}
           ) {
           id
@@ -332,7 +332,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "author_id"
-                       from "Post"
+                       from "post"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [{author_id: testUuid(1)}],
@@ -389,7 +389,7 @@ describe('update', () => {
         schema: postWithLocale,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {locales: [{create: {title: "Hello", locale: "cs"}}]}
           ) {
           id
@@ -421,7 +421,7 @@ describe('update', () => {
         schema: postWithLocale,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {locales: [{update: {where: {locale: "cs"}, data: {title: "Hello"}}}]}
           ) {
           id
@@ -431,7 +431,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "PostLocale"
+                       from "post_locale"
                        where "locale" = $1 and "post_id" = $2`,
               parameters: ['cs', testUuid(2)],
               response: [{id: testUuid(1)}],
@@ -460,7 +460,7 @@ describe('update', () => {
         schema: postWithLocale,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {locales: [{upsert: {where: {locale: "cs"}, update: {title: "Hello"}, create: {title: "World"}}}]}
           ) {
           id
@@ -470,7 +470,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "PostLocale"
+                       from "post_locale"
                        where "locale" = $1 and "post_id" = $2`,
               parameters: ['cs', testUuid(2)],
               response: [{id: testUuid(1)}],
@@ -499,7 +499,7 @@ describe('update', () => {
         schema: postWithLocale,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {locales: [{upsert: {where: {locale: "cs"}, update: {title: "Hello"}, create: {title: "World", locale: "cs"}}}]}
           ) {
           id
@@ -509,7 +509,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "PostLocale"
+                       from "post_locale"
                        where "locale" = $1 and "post_id" = $2`,
               parameters: ['cs', testUuid(2)],
               response: [],
@@ -538,7 +538,7 @@ describe('update', () => {
         schema: postWithLocale,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {locales: [{delete: {locale: "cs"}}]}
           ) {
           id
@@ -569,7 +569,7 @@ describe('update', () => {
         schema: postWithLocale,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {locales: [{connect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -602,7 +602,7 @@ describe('update', () => {
         schema: postWithNullableLocale,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {locales: [{disconnect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -656,7 +656,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {create: {url: "http://mangoweb.cz"}}}
           ) {
           id
@@ -694,7 +694,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {update: {url: "http://mangoweb.cz"}}}
           ) {
           id
@@ -704,7 +704,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "setting_id"
-                       from "Site"
+                       from "site"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [{setting_id: testUuid(1)}],
@@ -733,7 +733,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -743,7 +743,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(1)],
               response: [{id: testUuid(2)}],
@@ -766,7 +766,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -776,7 +776,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(1)],
               response: [],
@@ -805,7 +805,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -815,7 +815,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(1)],
               response: [{id: testUuid(3)}],
@@ -850,7 +850,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {upsert: {update: {url: "http://mangoweb.cz"}, create: {url: "http://mgw.cz"}}}}
           ) {
           id
@@ -860,7 +860,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "setting_id"
-                       from "Site"
+                       from "site"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [],
@@ -895,7 +895,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {upsert: {update: {url: "http://mangoweb.cz"}, create: {url: "http://mgw.cz"}}}}
           ) {
           id
@@ -905,7 +905,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "setting_id"
-                       from "Site"
+                       from "site"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [],
@@ -940,7 +940,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {disconnect: true}}
           ) {
           id
@@ -973,7 +973,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {setting: {delete: true}}
           ) {
           id
@@ -983,7 +983,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "setting_id"
-                       from "Site"
+                       from "site"
                        where "id" = $1`,
               parameters: [testUuid(2)],
               response: [{setting_id: testUuid(1)}],
@@ -1028,7 +1028,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {create: {name: "Mangoweb"}}}
           ) {
           id
@@ -1038,7 +1038,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [{id: testUuid(3)}],
@@ -1073,7 +1073,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {create: {name: "Mangoweb"}}}
           ) {
           id
@@ -1083,7 +1083,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [],
@@ -1112,7 +1112,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {update: {name: "Mangoweb"}}}
           ) {
           id
@@ -1122,7 +1122,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [{id: testUuid(1)}],
@@ -1151,7 +1151,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {upsert: {update: {name: "Mangoweb"}, create: {name: "Mgw"}}}}
           ) {
           id
@@ -1161,7 +1161,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [{id: testUuid(1)}],
@@ -1190,7 +1190,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
            data: {site: {upsert: {update: {name: "Mangoweb"}, create: {name: "Mgw"}}}}
           ) {
           id
@@ -1200,7 +1200,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [],
@@ -1229,7 +1229,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {disconnect: true}}
           ) {
           id
@@ -1239,7 +1239,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [{id: testUuid(1)}],
@@ -1268,7 +1268,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {delete: true}}
           ) {
           id
@@ -1299,7 +1299,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -1309,7 +1309,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [{id: testUuid(1)}],
@@ -1333,7 +1333,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -1343,7 +1343,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [],
@@ -1372,7 +1372,7 @@ describe('update', () => {
         schema: siteSettingSchema,
         query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {site: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -1382,7 +1382,7 @@ describe('update', () => {
           ...sqlTransaction([
             {
               sql: SQL`select "id"
-                       from "Site"
+                       from "site"
                        where "setting_id" = $1`,
               parameters: [testUuid(2)],
               response: [{id: testUuid(3)}],
@@ -1431,7 +1431,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {categories: [{connect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1440,7 +1440,7 @@ describe('update', () => {
         executes: [
           ...sqlTransaction([
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}')
               on conflict do nothing`,
             },
           ]),
@@ -1461,7 +1461,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {categories: [{create: {name: "Lorem"}}]}
           ) {
           id
@@ -1476,7 +1476,7 @@ describe('update', () => {
               response: [testUuid(1)],
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}')
               on conflict do nothing`,
             },
           ]),
@@ -1497,7 +1497,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {categories: [{delete: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1533,7 +1533,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {categories: [{disconnect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1564,7 +1564,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {categories: [{update: {where: {id: "${testUuid(1)}"}, data: {name: "Lorem"}}}]}
           ) {
           id
@@ -1579,7 +1579,7 @@ describe('update', () => {
               parameters: ['Lorem', testUuid(1)],
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}')
               on conflict do nothing`
             },
           ]),
@@ -1600,7 +1600,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {categories: [{upsert: {where: {id: "${testUuid(1)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           id
@@ -1616,7 +1616,7 @@ describe('update', () => {
               response: 1,
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}')
               on conflict do nothing`
             },
           ]),
@@ -1637,7 +1637,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {categories: [{upsert: {where: {id: "${testUuid(1)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           id
@@ -1659,7 +1659,7 @@ describe('update', () => {
               response: [testUuid(1)],
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(2)}')
               on conflict do nothing`
             },
           ]),
@@ -1691,7 +1691,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {posts: [{connect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1700,7 +1700,7 @@ describe('update', () => {
         executes: [
           ...sqlTransaction([
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}')
               on conflict do nothing`,
             },
           ]),
@@ -1721,7 +1721,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {posts: [{create: {title: "Lorem"}}]}
           ) {
           id
@@ -1736,7 +1736,7 @@ describe('update', () => {
               response: [testUuid(1)],
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}')
               on conflict do nothing`,
             },
           ]),
@@ -1757,7 +1757,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {posts: [{delete: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1793,7 +1793,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {posts: [{disconnect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1824,7 +1824,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {posts: [{update: {where: {id: "${testUuid(1)}"}, data: {title: "Lorem"}}}]}
           ) {
           id
@@ -1839,7 +1839,7 @@ describe('update', () => {
               parameters: ['Lorem', testUuid(1)],
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}')
               on conflict do nothing`
             },
           ]),
@@ -1860,7 +1860,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {posts: [{upsert: {where: {id: "${testUuid(1)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
           ) {
           id
@@ -1876,7 +1876,7 @@ describe('update', () => {
               response: 1,
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}')
               on conflict do nothing`
             },
           ]),
@@ -1897,7 +1897,7 @@ describe('update', () => {
         schema: postWithCategories,
         query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"}, 
+            where: {id: "${testUuid(2)}"},
             data: {posts: [{upsert: {where: {id: "${testUuid(1)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
           ) {
           id
@@ -1919,7 +1919,7 @@ describe('update', () => {
               response: [testUuid(1)],
             },
             {
-              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}') 
+              sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(1)}')
               on conflict do nothing`
             },
           ]),

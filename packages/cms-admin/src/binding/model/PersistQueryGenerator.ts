@@ -28,6 +28,8 @@ export default class PersistQueryGenerator {
 					builder = builder.where(accessor.where as Input.UniqueWhere<GraphQlBuilder.Literal>)
 				}
 
+				builder = builder.column(PersistQueryGenerator.PRIMARY_KEY_NAME)
+
 				return builder.data(builder =>
 					this.attachUpdateQueryPart(this.persistedData[accessor.entityName], this.currentData, builder)
 				)
@@ -47,8 +49,6 @@ export default class PersistQueryGenerator {
 		currentData: EntityAccessor,
 		builder: CrudQueryBuilder.UpdateDataBuilder
 	): CrudQueryBuilder.UpdateDataBuilder {
-		console.log('aa', persistedData, currentData)
-
 		for (const fieldName in persistedData) {
 			const persistedField = persistedData[fieldName]
 			const accessor = currentData.data[fieldName]
@@ -62,13 +62,15 @@ export default class PersistQueryGenerator {
 					const innerAccessor = Array.isArray(accessor) ? accessor : []
 
 					for (const field of persistedField) {
-						const persistedId = field[PersistQueryGenerator.PRIMARY_KEY_NAME]
+						const persistedId: string = field[PersistQueryGenerator.PRIMARY_KEY_NAME]
 						const currentById = innerAccessor.find(
-							element => element instanceof EntityAccessor && element.primaryKey === persistedId
+							(element): element is EntityAccessor  => element instanceof EntityAccessor && element.primaryKey === persistedId
 						)
 
 						if (currentById) {
-							//builder = builder.update(innerAccessor)
+							builder = builder.update({ [PersistQueryGenerator.PRIMARY_KEY_NAME]: persistedId }, builder => {
+								return this.attachUpdateQueryPart(field, currentById, builder)
+							})
 						} else {
 							builder = builder.disconnect({ [PersistQueryGenerator.PRIMARY_KEY_NAME]: persistedId })
 						}

@@ -26,7 +26,7 @@ namespace Acl {
 	}
 
 	export type PredicateVariable = string //{ name: string }
-	export type PredicateDefinition = Input.Where<VariableCondition>
+	export type PredicateDefinition = Input.Where<PredicateVariable>
 
 	export type PredicateMap = { [name: string]: PredicateDefinition }
 
@@ -58,22 +58,6 @@ namespace Acl {
 
 	export type Roles = { [role: string]: RolePermissions }
 	export type Variables = { [name: string]: Variable }
-
-	export interface VariableCondition {
-		and?: VariableCondition[]
-		or?: VariableCondition[]
-		not?: VariableCondition
-
-		eq?: PredicateVariable
-		null?: PredicateVariable
-		notEq?: PredicateVariable
-		in?: PredicateVariable
-		notIn?: PredicateVariable
-		lt?: PredicateVariable
-		lte?: PredicateVariable
-		gt?: PredicateVariable
-		gte?: PredicateVariable
-	}
 
 	export interface Schema {
 		variables: Acl.Variables

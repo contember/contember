@@ -1,4 +1,5 @@
-import { RecursiveStringObject } from "../utils/url";
+import { RecursiveStringObject } from '../utils/url'
+
 export interface Request extends RecursiveStringObject {
 	name: string
 }

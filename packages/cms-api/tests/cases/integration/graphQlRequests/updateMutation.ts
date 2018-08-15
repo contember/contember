@@ -1,8 +1,8 @@
-import { execute, sqlTransaction } from '../../src/test'
+import { execute, sqlTransaction } from '../../../src/test'
 import { Model } from 'cms-common'
-import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
-import { GQL, SQL } from '../../src/tags'
-import { testUuid } from '../../src/testUuid'
+import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
+import { GQL, SQL } from '../../../src/tags'
+import { testUuid } from '../../../src/testUuid'
 import 'mocha'
 
 describe('update', () => {

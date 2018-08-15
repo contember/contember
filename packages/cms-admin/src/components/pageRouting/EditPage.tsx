@@ -4,6 +4,7 @@ import { ParametersContext } from './Pages'
 
 interface EditPageProps {
 	entity: string
+	layout: React.ComponentType<{children: React.ReactNode}>
 }
 
 export default class EditPage extends React.Component<EditPageProps> {
@@ -12,18 +13,21 @@ export default class EditPage extends React.Component<EditPageProps> {
 	}
 
 	render(): React.ReactNode {
+		const Layout = this.props.layout
 		return (
-			<ParametersContext.Consumer>
-				{({ id }: { id: string }) => (
-					<DataProvider>
-						{persist => (
-							<Entity name={this.props.entity} where={{ id }}>
-								{this.props.children}
-							</Entity>
-						)}
-					</DataProvider>
-				)}
-			</ParametersContext.Consumer>
+			<Layout>
+				<ParametersContext.Consumer>
+					{({ id }: { id: string }) => (
+						<DataProvider>
+							{persist => (
+								<Entity name={this.props.entity} where={{ id }}>
+									{this.props.children}
+								</Entity>
+							)}
+						</DataProvider>
+					)}
+				</ParametersContext.Consumer>
+			</Layout>
 		)
 	}
 }

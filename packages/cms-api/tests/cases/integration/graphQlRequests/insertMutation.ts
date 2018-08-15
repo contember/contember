@@ -1,8 +1,8 @@
 import { Model } from 'cms-common'
-import { execute, sqlTransaction } from '../../src/test'
-import { GQL, SQL } from '../../src/tags'
-import { testUuid } from '../../src/testUuid'
-import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
+import { execute, sqlTransaction } from '../../../src/test'
+import { GQL, SQL } from '../../../src/tags'
+import { testUuid } from '../../../src/testUuid'
+import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
 import 'mocha'
 
 describe('Insert mutation', () => {

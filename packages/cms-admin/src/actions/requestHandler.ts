@@ -9,9 +9,7 @@ const handleRequest = (request: RequestState, previous: RequestState): ActionCre
   dispatch(createAction(VIEW_REPLACE, () => ({...getState().view, loading: true}))())
   //do stuff
 
-  window.setTimeout(() => {
-    dispatch(createAction(VIEW_REPLACE, () => ({route: request, loading: false}))())
-  }, 1000)
+	dispatch(createAction(VIEW_REPLACE, () => ({route: request, loading: false}))())
 }
 
 export default handleRequest

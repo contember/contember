@@ -59,7 +59,7 @@ export default class WhereBuilder {
 
 			acceptFieldVisitor(this.schema, entity, fieldName, {
 				visitColumn: (entity, column) => {
-					const condition: Input.Condition<any> = where[column.name]
+					const condition: Input.Condition<Input.ColumnValue> = where[column.name] as Input.Condition<Input.ColumnValue>
 					this.conditionBuilder.build(qb, tableName, column.columnName, condition)
 				},
 				visitOneHasOneInversed: joinedWhere,

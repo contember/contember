@@ -126,14 +126,14 @@ namespace Input {
 		[field: string]: PrimaryValue<E>
 	}
 
-	export interface ComposedWhere<C> {
+	export type ComposedWhere<C> = {
 		and?: Where<C>[]
 		or?: Where<C>[]
 		not?: Where<C>
 	}
 
 	export interface FieldWhere<C> {
-		[name: string]: C | Where<C>
+		[name: string]: C | Where<C> | undefined | Where<C>[] //last one if for ComposedWhere
 	}
 
 	export type Where<C = Condition> = ComposedWhere<C> & FieldWhere<C>

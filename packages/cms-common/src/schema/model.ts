@@ -9,7 +9,7 @@ namespace Model {
 		unique: Array<{ fields: string[]; name: string }>
 	}
 
-	export type FieldType = RelationType | ColumnType;
+	export type FieldType = RelationType | ColumnType
 	export interface Field<T extends FieldType> {
 		type: T
 	}
@@ -34,46 +34,47 @@ namespace Model {
 		Bool = 'Bool',
 		Enum = 'Enum',
 		DateTime = 'DateTime',
-		Date = 'Date',
+		Date = 'Date'
 	}
 
-	export type Column<T extends ColumnType> = Field<T> & ColumnDefinitionByType<T> & {
-		name: string
-		columnName: string
-	}
+	export type Column<T extends ColumnType> = Field<T> &
+		ColumnDefinitionByType<T> & {
+			name: string
+			columnName: string
+		}
 
 	export interface ColumnTypeDefinition<T extends ColumnType = ColumnType> {
 		type: T
 		columnType: string
 		nullable: boolean
-		default?: string|number|boolean|null
+		default?: string | number | boolean | null
 	}
 
-	export type ColumnByType<T extends ColumnType, A = AnyColumn> = A extends {type: T} ? A : never
-	export type ColumnDefinitionByType<T extends ColumnType, A = AnyColumnDefinition> = A extends {type: T} ? A : never
+	export type ColumnByType<T extends ColumnType, A = AnyColumn> = A extends { type: T } ? A : never
+	export type ColumnDefinitionByType<T extends ColumnType, A = AnyColumnDefinition> = A extends { type: T } ? A : never
 
 	export interface UuidColumnDefinition extends ColumnTypeDefinition<ColumnType.Uuid> {
-		columnType: "uuid"
+		columnType: 'uuid'
 		default?: undefined
 	}
 
 	export interface StringColumnDefinition extends ColumnTypeDefinition<ColumnType.String> {
-		columnType: "text"
+		columnType: 'text'
 		default?: string
 	}
 
 	export interface IntColumnDefinition extends ColumnTypeDefinition<ColumnType.Int> {
-		columnType: "integer"
+		columnType: 'integer'
 		default?: number
 	}
 
 	export interface DoubleColumnDefinition extends ColumnTypeDefinition<ColumnType.Double> {
-		columnType: "double precision"
+		columnType: 'double precision'
 		default?: number
 	}
 
 	export interface BoolColumnDefinition extends ColumnTypeDefinition<ColumnType.Bool> {
-		columnType: "boolean"
+		columnType: 'boolean'
 		default?: boolean
 	}
 
@@ -84,13 +85,13 @@ namespace Model {
 	}
 
 	export interface DateTimeColumnDefinition extends ColumnTypeDefinition<ColumnType.DateTime> {
-		columnType: "timestamp"
-		default?: "now"
+		columnType: 'timestamp'
+		default?: 'now'
 	}
 
 	export interface DateColumnDefinition extends ColumnTypeDefinition<ColumnType.Date> {
-		columnType: "date"
-		default?: "now"
+		columnType: 'date'
+		default?: 'now'
 	}
 
 	export interface ColumnVisitor<T> {

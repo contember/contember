@@ -1,3 +1,4 @@
+import { Model } from "cms-common"
 import { execute } from "../../src/test";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
@@ -9,7 +10,7 @@ describe('Insert mutation', () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Author", entity => entity
-          .column("name", c => c.type('string'))
+          .column("name", c => c.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -57,11 +58,11 @@ describe('Insert mutation', () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Site", entity => entity
-          .column("name", c => c.type('string'))
+          .column("name", c => c.type(Model.ColumnType.String))
           .oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
         )
         .entity('SiteSetting', e => e
-          .column('url', c => c.type('string'))
+          .column('url', c => c.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -115,11 +116,11 @@ describe('Insert mutation', () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Site", entity => entity
-          .column("name", c => c.type('string'))
+          .column("name", c => c.type(Model.ColumnType.String))
           .oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
         )
         .entity('SiteSetting', e => e
-          .column('url', c => c.type('string'))
+          .column('url', c => c.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -172,11 +173,11 @@ describe('Insert mutation', () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Post", e => e
-          .column("publishedAt", c => c.type("datetime"))
+          .column("publishedAt", c => c.type(Model.ColumnType.DateTime))
           .manyHasOne("author", r => r.target("Author"))
         )
         .entity("Author", e => e
-          .column("name", c => c.type('string'))
+          .column("name", c => c.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -233,12 +234,12 @@ describe('Insert mutation', () => {
       schema: new SchemaBuilder()
         .enum('locale', ['cs', 'en'])
         .entity("Post", e => e
-          .column("publishedAt", c => c.type("datetime"))
+          .column("publishedAt", c => c.type(Model.ColumnType.DateTime))
           .oneHasMany("locales", r => r.target("PostLocale"))
         )
         .entity('PostLocale', e => e
-          .column('locale', c => c.type('locale'))
-          .column('title', c => c.type('string'))
+          .column('locale', c => c.type(Model.ColumnType.Enum, {enumName: 'locale'}))
+          .column('title', c => c.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -302,11 +303,11 @@ describe('Insert mutation', () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Post", e => e
-          .column('name', c => c.type('string'))
+          .column('name', c => c.type(Model.ColumnType.String))
           .manyHasMany('categories', r => r.target('Category'))
         )
         .entity('Category', e => e
-          .column('name', c => c.type('string'))
+          .column('name', c => c.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -370,11 +371,11 @@ describe('Insert mutation', () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Post", e => e
-          .column('name', c => c.type('string'))
+          .column('name', c => c.type(Model.ColumnType.String))
           .manyHasMany('categories', r => r.target('Category').inversedBy('posts'))
         )
         .entity('Category', e => e
-          .column('name', c => c.type('string'))
+          .column('name', c => c.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`

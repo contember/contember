@@ -5,23 +5,96 @@ namespace Model {
 		primary: string
 		primaryColumn: string
 		tableName: string
-		fields: { [name: string]: Column | AnyRelation }
+		fields: { [name: string]: AnyField }
 		unique: Array<{ fields: string[]; name: string }>
 	}
 
-	export interface Column {
+	export type FieldType = RelationType | ColumnType;
+	export interface Field<T extends FieldType> {
+		type: T
+	}
+
+	export type AnyField = AnyColumn | AnyRelation
+	export type AnyColumn = Column<ColumnType>
+	export type AnyColumnDefinition =
+		| UuidColumnDefinition
+		| StringColumnDefinition
+		| IntColumnDefinition
+		| DoubleColumnDefinition
+		| BoolColumnDefinition
+		| EnumColumnDefinition
+		| DateTimeColumnDefinition
+		| DateColumnDefinition
+
+	export enum ColumnType {
+		Uuid = 'Uuid',
+		String = 'String',
+		Int = 'Integer',
+		Double = 'Double',
+		Bool = 'Bool',
+		Enum = 'Enum',
+		DateTime = 'DateTime',
+		Date = 'Date',
+	}
+
+	export type Column<T extends ColumnType> = Field<T> & ColumnDefinitionByType<T> & {
 		name: string
-		default?: any | (() => any)
-		type: string
 		columnName: string
+	}
+
+	export interface ColumnTypeDefinition<T extends ColumnType = ColumnType> {
+		type: T
+		columnType: string
 		nullable: boolean
-		options?: {
-			[name: string]: any
-		}
+		default?: string|number|boolean|null
+	}
+
+	export type ColumnByType<T extends ColumnType, A = AnyColumn> = A extends {type: T} ? A : never
+	export type ColumnDefinitionByType<T extends ColumnType, A = AnyColumnDefinition> = A extends {type: T} ? A : never
+
+	export interface UuidColumnDefinition extends ColumnTypeDefinition<ColumnType.Uuid> {
+		columnType: "uuid"
+		default?: undefined
+	}
+
+	export interface StringColumnDefinition extends ColumnTypeDefinition<ColumnType.String> {
+		columnType: "text"
+		default?: string
+	}
+
+	export interface IntColumnDefinition extends ColumnTypeDefinition<ColumnType.Int> {
+		columnType: "integer"
+		default?: number
+	}
+
+	export interface DoubleColumnDefinition extends ColumnTypeDefinition<ColumnType.Double> {
+		columnType: "double precision"
+		default?: number
+	}
+
+	export interface BoolColumnDefinition extends ColumnTypeDefinition<ColumnType.Bool> {
+		columnType: "boolean"
+		default?: boolean
+	}
+
+	export interface EnumColumnDefinition extends ColumnTypeDefinition<ColumnType.Enum> {
+		columnType: string
+		enumName: string
+		default?: string
+	}
+
+	export interface DateTimeColumnDefinition extends ColumnTypeDefinition<ColumnType.DateTime> {
+		columnType: "timestamp"
+		default?: "now"
+	}
+
+	export interface DateColumnDefinition extends ColumnTypeDefinition<ColumnType.Date> {
+		columnType: "date"
+		default?: "now"
 	}
 
 	export interface ColumnVisitor<T> {
-		visitColumn(entity: Entity, column: Column): T
+		visitColumn(entity: Entity, column: AnyColumn): T
 	}
 
 	export interface RelationVisitor<T> {
@@ -101,9 +174,9 @@ namespace Model {
 		| ManyHasManyInversedRelation
 		| ManyHasManyOwnerRelation
 
-	export interface Relation<T extends RelationType = RelationType> {
+	export interface Relation<T extends RelationType = RelationType> extends Field<T> {
 		name: string
-		relation: T
+		type: T
 		target: string
 	}
 

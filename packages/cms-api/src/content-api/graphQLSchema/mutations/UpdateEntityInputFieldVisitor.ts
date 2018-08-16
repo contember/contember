@@ -16,13 +16,13 @@ export default class UpdateEntityInputFieldVisitor
     this.mutationProvider = mutationProvider
   }
 
-  public visitColumn(entity: Model.Entity, column: Model.Column): GraphQLInputFieldConfig | undefined
+  public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLInputFieldConfig | undefined
   {
     if (entity.primary === column.name) {
       return undefined
     }
     return {
-      type: this.columnTypeResolver.getType(column.type),
+      type: this.columnTypeResolver.getType(column),
     }
   }
 

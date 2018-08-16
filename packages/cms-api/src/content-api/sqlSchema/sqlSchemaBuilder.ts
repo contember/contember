@@ -5,7 +5,7 @@ import { acceptFieldVisitor, getColumnName } from "../../content-schema/modelUti
 const buildSqlSchema = (schema: Model.Schema, migrationBuilder: MigrationBuilder) => {
   const getPrimaryType = (entity: Model.Entity) => {
     return acceptFieldVisitor(schema, entity, entity.primary, {
-      visitColumn: (entity, column) => column.type,
+      visitColumn: (entity, column) => column.columnType,
       visitRelation: () => {
         throw new Error()
       },
@@ -25,7 +25,7 @@ const buildSqlSchema = (schema: Model.Schema, migrationBuilder: MigrationBuilder
           visitColumn: (entity, column) => {
             columns[column.columnName] = {
               primaryKey: entity.primary === column.name,
-              type: schema.enums[column.type] !== undefined ? `"${column.type}"` : column.type,
+              type: column.type === Model.ColumnType.Enum ? `"${column.columnType}"` : column.columnType,
               notNull: !column.nullable,
             }
           },
@@ -62,7 +62,7 @@ const buildSqlSchema = (schema: Model.Schema, migrationBuilder: MigrationBuilder
           visitManyHasOne: (entity, relation, targetEntity) => {
             columns[relation.joiningColumn.columnName] = {
               type: acceptFieldVisitor(schema, targetEntity, targetEntity.primary, {
-                visitColumn: (entity, column) => column.type,
+                visitColumn: (entity, column) => column.columnType,
                 visitRelation: () => {
                   throw new Error()
                 },

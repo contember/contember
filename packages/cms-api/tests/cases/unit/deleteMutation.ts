@@ -1,3 +1,4 @@
+import { Model } from "cms-common"
 import { execute } from "../../src/test";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
@@ -12,7 +13,7 @@ describe('Delete mutation', () => {
           .manyHasOne("author", relation => relation.target("Author"))
         )
         .entity("Author", entity => entity
-          .column("name", column => column.type("string"))
+          .column("name", column => column.type(Model.ColumnType.String))
         )
         .buildSchema()),
       query: GQL`

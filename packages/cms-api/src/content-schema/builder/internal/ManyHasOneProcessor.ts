@@ -28,7 +28,7 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
       name: options.inversedBy,
       ownedBy: fieldName,
       target: entityName,
-      relation: Model.RelationType.OneHasMany,
+      type: Model.RelationType.OneHasMany,
     }
   }
 
@@ -39,7 +39,7 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
       name: fieldName,
       inversedBy: options.inversedBy,
       nullable: options.nullable === undefined ? true : options.nullable,
-      relation: Model.RelationType.ManyHasOne,
+      type: Model.RelationType.ManyHasOne,
       target: options.target,
       joiningColumn: {
         columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),

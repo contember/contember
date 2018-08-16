@@ -15,9 +15,9 @@ describe('Create SQL schema', () => {
     test({
       builder: builder => builder
         .entity("Author", e => e
-          .column("name", c => c.type('string'))
-          .column("email", c => c.type('string').unique())
-          .column("registeredAt", c => c.type('datetime'))
+          .column("name", c => c.type(Model.ColumnType.String))
+          .column("email", c => c.type(Model.ColumnType.String).unique())
+          .column("registeredAt", c => c.type(Model.ColumnType.DateTime))
         ),
       sql: SQL`CREATE TABLE "author" (
         "id"            uuid PRIMARY KEY NOT NULL,
@@ -34,11 +34,11 @@ describe('Create SQL schema', () => {
     test({
       builder: builder => builder
         .entity("Post", e => e
-          .column('title', c => c.type('string'))
+          .column('title', c => c.type(Model.ColumnType.String))
           .manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade))
         )
         .entity("Author", e => e
-          .column("name", c => c.type('string'))
+          .column("name", c => c.type(Model.ColumnType.String))
         ),
       sql: SQL`CREATE TABLE "post" (
         "id"        uuid PRIMARY KEY NOT NULL,
@@ -64,8 +64,8 @@ describe('Create SQL schema', () => {
         )
         .entity('PostLocale', e => e
           .unique(['post', 'locale'])
-          .column('title', c => c.type('string'))
-          .column('locale', c => c.type('string'))
+          .column('title', c => c.type(Model.ColumnType.String))
+          .column('locale', c => c.type(Model.ColumnType.String))
         ),
       sql: SQL`CREATE TABLE "post" (
         "id" uuid PRIMARY KEY NOT NULL
@@ -89,11 +89,11 @@ describe('Create SQL schema', () => {
     test({
       builder: builder => builder
         .entity('Post', e => e
-          .column('title', c => c.type('string'))
+          .column('title', c => c.type(Model.ColumnType.String))
           .manyHasMany('categories', r => r.target('Category'))
         )
         .entity('Category', e => e
-          .column('title', c => c.type('string'))
+          .column('title', c => c.type(Model.ColumnType.String))
         ),
       sql: SQL`CREATE TABLE "post_categories" (
         "post_id"     uuid NOT NULL,
@@ -119,11 +119,11 @@ describe('Create SQL schema', () => {
     test({
       builder: builder => builder
         .entity("Site", entity => entity
-          .column("name", c => c.type('string'))
+          .column("name", c => c.type(Model.ColumnType.String))
           .oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
         )
         .entity('SiteSetting', e => e
-          .column('url', c => c.type('string'))
+          .column('url', c => c.type(Model.ColumnType.String))
         ),
       sql: SQL`CREATE TABLE "site" (
         "id"         uuid PRIMARY KEY NOT NULL,

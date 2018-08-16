@@ -20,7 +20,7 @@ export default class JoinMonsterFieldMappingVisitor
     this.whereTypeProvider = whereTypeProvider
   }
 
-  public visitColumn(entity: Model.Entity, column: Model.Column): JoinMonsterFieldMapping<any, any>
+  public visitColumn(entity: Model.Entity, column: Model.AnyColumn): JoinMonsterFieldMapping<any, any>
   {
     return {
       sqlColumn: column.columnName,

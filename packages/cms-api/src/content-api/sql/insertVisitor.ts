@@ -23,21 +23,40 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
     this.mapper = mapper
   }
 
-  public visitColumn(entity: Model.Entity, column: Model.Column): void
+  public visitColumn(entity: Model.Entity, column: Model.AnyColumn): void
   {
     this.insertBuilder.addColumnData(column.columnName, (() => {
       if (this.data[column.name] !== undefined) {
-        return this.data[column.name]
+        return this.data[column.name] as Input.ColumnValueLike // TODO: find out why this.data may contain wrong types
       }
-      if (column.default) {
-        if (typeof column.default === "function") {
-          return column.default()
-        }
-        return column.default
+
+      switch (column.type) {
+        case Model.ColumnType.String:
+        case Model.ColumnType.Int:
+        case Model.ColumnType.Enum:
+        case Model.ColumnType.Double:
+        case Model.ColumnType.Bool:
+          if (typeof column.default !== "undefined" ) {
+            return column.default
+          }
+          break
+        case Model.ColumnType.DateTime:
+        case Model.ColumnType.Date:
+          if (column.default === "now") {
+            return new Date().toISOString()
+          }
+          break
+        case Model.ColumnType.Uuid:
+          break
+        default:
+          ((x: never) => {})(column)
       }
+
       if (entity.primary === column.name) {
         return this.resolvePrimaryGenerator(column)()
       }
+
+      throw new Error("NoData")
     })())
   }
 
@@ -222,9 +241,9 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
     return Promise.all(promises)
   }
 
-  private resolvePrimaryGenerator(column: Model.Column): () => Input.PrimaryValue
+  private resolvePrimaryGenerator(column: Model.AnyColumn): () => Input.PrimaryValue
   {
-    if (column.type === "uuid") {
+    if (column.type === Model.ColumnType.Uuid) {
       return uuid
     }
     throw new Error("not implemented")

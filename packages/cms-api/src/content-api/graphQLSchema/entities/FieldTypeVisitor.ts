@@ -15,9 +15,9 @@ export default class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutp
     this.entityTypeProvider = entityTypeProvider
   }
 
-  public visitColumn(entity: Model.Entity, column: Model.Column): GraphQLOutputType
+  public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLOutputType
   {
-    const basicType = this.columnTypeResolver.getType(column.type)
+    const basicType = this.columnTypeResolver.getType(column)
     return column.nullable ? basicType : new GraphQLNonNull(basicType)
   }
 

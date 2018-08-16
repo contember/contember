@@ -30,7 +30,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
       name: inversedBy,
       ownedBy: fieldName,
       target: entityName,
-      relation: Model.RelationType.ManyHasMany,
+      type: Model.RelationType.ManyHasMany,
     }
   }
 
@@ -47,7 +47,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
     }
 
     return {
-      relation: Model.RelationType.ManyHasMany,
+      type: Model.RelationType.ManyHasMany,
       name: fieldName,
       inversedBy: options.inversedBy,
       target: options.target,

@@ -14,27 +14,29 @@ export default class ColumnTypeResolver
     this.enumsProvider = enumsProvider
   }
 
-  public getType(type: string): GraphQLScalarType | GraphQLEnumType
+  public getType(column: Model.AnyColumn): GraphQLScalarType | GraphQLEnumType
   {
-    switch (type) {
-      case "int":
-      case "integer":
+    switch (column.type) {
+      case Model.ColumnType.Int:
         return GraphQLInt
-      case "string":
+      case Model.ColumnType.String:
         return GraphQLString
-      case "uuid":
+      case Model.ColumnType.Uuid:
         return GraphQLUUID
-      case "float":
+      case Model.ColumnType.Double:
         return GraphQLFloat
-      case "bool":
-      case "boolean":
+      case Model.ColumnType.Bool:
         return GraphQLBoolean
-      case "datetime":
+      case Model.ColumnType.DateTime:
+      case Model.ColumnType.Date:
         return GraphQLString // todo
+      case Model.ColumnType.Enum:
+        if (this.enumsProvider.hasEnum(column.enumName)) {
+          return this.enumsProvider.getEnum(column.enumName)
+        }
+        throw new Error(`Undefined enum ${column.enumName}`)
+      default:
+        (({}: never): never => { throw new Error })(column)
     }
-    if (this.enumsProvider.hasEnum(type)) {
-      return this.enumsProvider.getEnum(type)
-    }
-    throw new Error(`Undefined type ${type}`)
   }
 }

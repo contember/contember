@@ -16,12 +16,12 @@ export default class CreateEntityInputFieldVisitor
     this.mutationProvider = mutationProvider
   }
 
-  public visitColumn(entity: Model.Entity, column: Model.Column): GraphQLInputFieldConfig | undefined
+  public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLInputFieldConfig | undefined
   {
     if (entity.primary === column.name) {
       return undefined
     }
-    const type = this.columnTypeResolver.getType(column.type)
+    const type = this.columnTypeResolver.getType(column)
     return {
       type: column.nullable ? type : new GraphQLNonNull(type),
     }

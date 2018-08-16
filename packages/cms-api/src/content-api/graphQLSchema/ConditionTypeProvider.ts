@@ -1,3 +1,4 @@
+import { Model } from "cms-common"
 import { GraphQLBoolean, GraphQLInputObjectType, GraphQLList } from "graphql"
 import { GraphQLNonNull } from "graphql/type/definition"
 import singletonFactory from "../../utils/singletonFactory"
@@ -7,23 +8,24 @@ import { GqlTypeName } from "./utils"
 export default class ConditionTypeProvider
 {
   private columnTypeResolver: ColumnTypeResolver
-  private conditions = singletonFactory(name => this.createCondition(name))
+  private conditions = singletonFactory<GraphQLInputObjectType, Model.AnyColumn>(column => this.createCondition(column))
 
   constructor(columnTypeResolver: ColumnTypeResolver)
   {
     this.columnTypeResolver = columnTypeResolver
   }
 
-  public getCondition(typeName: string): GraphQLInputObjectType
+  public getCondition(column: Model.AnyColumn): GraphQLInputObjectType
   {
-    return this.conditions(typeName)
+    return this.conditions(column)
   }
 
-  private createCondition(typeName: string)
+  private createCondition(column: Model.AnyColumn)
   {
-    const basicType = this.columnTypeResolver.getType(typeName)
-    const condition: GraphQLInputObjectType = new GraphQLInputObjectType({
-      name: GqlTypeName`${typeName}Condition`,
+      const basicType = this.columnTypeResolver.getType(column)
+
+      const condition: GraphQLInputObjectType = new GraphQLInputObjectType({
+      name: GqlTypeName`${column.name}Condition`, // TODO ?
       fields: () => ({
         and: {type: new GraphQLList(new GraphQLNonNull(condition))},
         or: {type: new GraphQLList(new GraphQLNonNull(condition))},

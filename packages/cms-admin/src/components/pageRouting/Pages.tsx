@@ -33,6 +33,9 @@ function isPageElement(el: any): el is PageElement {
 
 export const ParametersContext = React.createContext<any>({})
 
+/**
+ * Pages element specifies collection of pages (component Page or component with getPageName static method).
+ */
 class Pages extends React.Component<PagesProps & PagesStateProps> {
 	render() {
 		if (!this.props.children) return null

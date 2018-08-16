@@ -11,7 +11,8 @@
     "prebuild": "env CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/tenant-api/schema/tenant.graphql.ts --template typescript --skip-documents --out ./src/tenant-api/schema/types.ts",
     "build": "tsc --build --verbose",
     "test": "mocha --ui bdd ./dist/tests/cases/**/*.js",
-    "test:debug": "mocha --inspect --ui bdd"
+    "test:debug": "mocha --inspect --ui bdd",
+    "test:clean": "rm -rf ./dist && npm run build && npm run test"
   },
   "dependencies": {
     "apollo-server-express": "^2.0.0",

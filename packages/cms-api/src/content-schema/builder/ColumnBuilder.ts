@@ -1,4 +1,5 @@
 import FieldBuilder from "./FieldBuilder"
+import { Model } from "cms-common"
 
 
 class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O>
@@ -15,9 +16,9 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
     return new ColumnBuilder<O>({...(this.options as object), columnName} as O)
   }
 
-  public type(type: string): ColumnBuilder<O & PartialColumnOptions<'type'>>
+  public type(type: Model.ColumnType, typeOptions: ColumnBuilder.TypeOptions = {}): ColumnBuilder<O & PartialColumnOptions<'type'>>
   {
-    return new ColumnBuilder<O & PartialColumnOptions<'type'>>({...(this.options as object), type: type} as O & PartialColumnOptions<'type'>)
+    return new ColumnBuilder<O & PartialColumnOptions<'type'>>({...(this.options as object), type: type, ...typeOptions} as O & PartialColumnOptions<'type'>)
   }
 
   public nullable(): ColumnBuilder<O>
@@ -48,8 +49,13 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 
 namespace ColumnBuilder
 {
+  export type TypeOptions = {
+    enumName?: string
+  }
+
   export type Options = {
-    type: string
+    type: Model.ColumnType
+    enumName?: string
     columnName?: string
     unique?: boolean
     nullable?: boolean

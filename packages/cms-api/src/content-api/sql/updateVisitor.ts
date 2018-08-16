@@ -47,7 +47,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
     this.mapper = mapper
   }
 
-  public visitColumn(entity: Model.Entity, column: Model.Column): void
+  public visitColumn(entity: Model.Entity, column: Model.AnyColumn): void
   {
     if (this.data[column.name] !== undefined) {
       this.updateBuilder.addColumnData(column.columnName, this.data[column.name] as Input.ColumnValue)

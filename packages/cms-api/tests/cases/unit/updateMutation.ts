@@ -1,4 +1,5 @@
 import { execute, sqlTransaction } from "../../src/test";
+import { Model } from "cms-common"
 import SchemaBuilder from "../../../src/content-schema/builder/SchemaBuilder";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
@@ -20,7 +21,7 @@ describe('update', () => {
       await execute({
         schema: new SchemaBuilder()
           .entity('Author', e => e
-            .column('name', c => c.type('string'))
+            .column('name', c => c.type(Model.ColumnType.String))
           )
           .buildSchema(),
         query: GQL`mutation {
@@ -72,10 +73,10 @@ describe('update', () => {
     const postWithAuthor = new SchemaBuilder()
       .entity('Post', e => e
         .manyHasOne('author', r => r.target('Author').notNull().inversedBy('posts'))
-        .column('title', c => c.type('string'))
+        .column('title', c => c.type(Model.ColumnType.String))
       )
       .entity('Author', e => e
-        .column('name', c => c.type('string'))
+        .column('name', c => c.type(Model.ColumnType.String))
       )
       .buildSchema()
 
@@ -85,7 +86,7 @@ describe('update', () => {
         .manyHasOne('author', r => r.target('Author').inversedBy('posts'))
       )
       .entity('Author', e => e
-        .column('name', c => c.type('string'))
+        .column('name', c => c.type(Model.ColumnType.String))
       )
       .buildSchema()
 
@@ -368,8 +369,8 @@ describe('update', () => {
       .entity('Post', e => e
         .oneHasMany('locales', r => r.ownedBy('post').target('PostLocale', e => e
           .unique(['locale', 'post'])
-          .column('title', c => c.type('string'))
-          .column('locale', c => c.type('string'))
+          .column('title', c => c.type(Model.ColumnType.String))
+          .column('locale', c => c.type(Model.ColumnType.String))
         ))
       )
       .buildSchema()
@@ -378,8 +379,8 @@ describe('update', () => {
       .entity('Post', e => e
         .oneHasMany('locales', r => r.ownedBy('post').ownerNotNull().target('PostLocale', e => e
           .unique(['locale', 'post'])
-          .column('title', c => c.type('string'))
-          .column('locale', c => c.type('string'))
+          .column('title', c => c.type(Model.ColumnType.String))
+          .column('locale', c => c.type(Model.ColumnType.String))
         ))
       )
       .buildSchema()
@@ -634,9 +635,9 @@ describe('update', () => {
 
   const siteSettingSchema = new SchemaBuilder()
     .entity("Site", entity => entity
-      .column("name", c => c.type('string'))
+      .column("name", c => c.type(Model.ColumnType.String))
       .oneHasOne('setting', r => r.inversedBy('site').target('SiteSetting', e => e
-        .column('url', c => c.type('string'))
+        .column('url', c => c.type(Model.ColumnType.String))
       ))
     )
     .buildSchema()
@@ -1417,10 +1418,10 @@ describe('update', () => {
   const postWithCategories = new SchemaBuilder()
     .entity('Post', e => e
       .manyHasMany('categories', r => r.target('Category').inversedBy('posts'))
-      .column('title', c => c.type('string'))
+      .column('title', c => c.type(Model.ColumnType.String))
     )
     .entity('Category', e => e
-      .column('name', c => c.type('string'))
+      .column('name', c => c.type(Model.ColumnType.String))
     )
     .buildSchema()
 

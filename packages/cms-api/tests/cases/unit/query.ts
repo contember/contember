@@ -1,3 +1,4 @@
+import { Model } from "cms-common"
 import { execute } from "../../src/test";
 import { GQL, SQL } from "../../src/tags";
 import { testUuid } from "../../src/testUuid";
@@ -10,7 +11,7 @@ describe("Queries", () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Post", entity => entity
-          .column("title", column => column.type('string')))
+          .column("title", column => column.type(Model.ColumnType.String)))
         .buildSchema(),
       query: GQL`
         query {
@@ -45,8 +46,8 @@ describe("Queries", () => {
           .oneHasMany("locales", relation => relation.target("PostLocale").ownedBy("post")),
         )
         .entity("PostLocale", entity => entity
-          .column("locale", column => column.type("string"))
-          .column("title", column => column.type("string"))
+          .column("locale", column => column.type(Model.ColumnType.String))
+          .column("title", column => column.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -126,7 +127,7 @@ describe("Queries", () => {
           .manyHasOne("author", relation => relation.target("Author")),
         )
         .entity("Author", entity => entity
-          .column("name", column => column.type("string"))
+          .column("name", column => column.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`
@@ -189,11 +190,11 @@ describe("Queries", () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Site", entity => entity
-          .column("name", column => column.type("string"))
+          .column("name", column => column.type(Model.ColumnType.String))
           .manyHasOne("setting", relation => relation.target("SiteSetting")),
         )
         .entity("SiteSetting", entity => entity
-          .column("url", column => column.type("string"))
+          .column("url", column => column.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`query {
@@ -262,11 +263,11 @@ describe("Queries", () => {
     await execute({
       schema: new SchemaBuilder()
         .entity("Site", entity => entity
-          .column("name", column => column.type("string"))
+          .column("name", column => column.type(Model.ColumnType.String))
           .oneHasOne("setting", relation => relation.target("SiteSetting").inversedBy("site")),
         )
         .entity("SiteSetting", entity => entity
-          .column("url", column => column.type("string"))
+          .column("url", column => column.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`query {
@@ -342,8 +343,8 @@ describe("Queries", () => {
           .oneHasMany("locales", relation => relation.target("CategoryLocale"))
         )
         .entity("CategoryLocale", entity => entity
-          .column("name", column => column.type("string"))
-          .column("locale", column => column.type("locale"))
+          .column("name", column => column.type(Model.ColumnType.String))
+          .column("locale", column => column.type(Model.ColumnType.Enum, {enumName: "locale"}))
         )
         .buildSchema(),
       query: GQL`
@@ -499,7 +500,7 @@ describe("Queries", () => {
           .pluralName("Categories")
         )
         .entity("Author", entity => entity
-          .column("name", column => column.type("string"))
+          .column("name", column => column.type(Model.ColumnType.String))
         )
         .buildSchema(),
       query: GQL`

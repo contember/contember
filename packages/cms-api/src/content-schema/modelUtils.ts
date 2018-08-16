@@ -38,10 +38,10 @@ export const acceptFieldVisitor = <T>(schema: Model.Schema, entity: string | Mod
   if (!field) {
     throw new Error(`field ${fieldName} of entity ${entityObj.name} not found`)
   }
-  if (isIt<Model.Column>(field, "type")) {
+  if (isIt<Model.AnyColumn>(field, "columnType")) {
     return visitor.visitColumn(entityObj, field)
   }
-  if (!isIt<Model.Relation>(field, "target")) {
+  if (!isIt<Model.AnyRelation>(field, "target")) {
     throw new Error()
   }
   const targetEntity = getEntity(schema, field.target)
@@ -97,7 +97,7 @@ export const acceptRelationTypeVisitor = <T>(schema: Model.Schema, entity: strin
     if (!isIt<Model.Relation>(targetRelation, "target")) {
       throw new Error()
     }
-    switch (relation.relation) {
+    switch (relation.type) {
       case Model.RelationType.ManyHasMany:
         return visitor.visitManyHasManyInversed(entityObj, relation as Model.ManyHasManyInversedRelation, targetEntity, targetRelation as Model.ManyHasManyOwnerRelation)
       case Model.RelationType.OneHasOne:
@@ -109,7 +109,7 @@ export const acceptRelationTypeVisitor = <T>(schema: Model.Schema, entity: strin
   } else if (isOwnerRelation(relation)) {
     const targetRelation = relation.inversedBy ? targetEntity.fields[relation.inversedBy] : null
 
-    switch (relation.relation) {
+    switch (relation.type) {
       case Model.RelationType.ManyHasMany:
         return visitor.visitManyHasManyOwner(entityObj, relation as Model.ManyHasManyOwnerRelation, targetEntity, targetRelation as Model.ManyHasManyInversedRelation)
       case Model.RelationType.OneHasOne:

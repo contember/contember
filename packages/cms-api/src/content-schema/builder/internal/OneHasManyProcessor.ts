@@ -27,7 +27,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
     return {
       name: fieldName,
       ownedBy: options.ownedBy,
-      relation: Model.RelationType.OneHasMany,
+      type: Model.RelationType.OneHasMany,
       target: options.target,
     }
   }
@@ -41,7 +41,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
       target: entityName,
       inversedBy: fieldName,
       nullable: options.ownerNullable !== undefined ? options.ownerNullable : true,
-      relation: Model.RelationType.ManyHasOne,
+      type: Model.RelationType.ManyHasOne,
       joiningColumn: {
         columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(options.ownedBy),
         onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,

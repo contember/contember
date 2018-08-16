@@ -7,7 +7,7 @@ interface FieldProcessor<O>
 
 namespace FieldProcessor
 {
-  export type FieldRegistrar = (entityName: string, field: Model.Column | Model.AnyRelation) => void
+  export type FieldRegistrar = (entityName: string, field: Model.AnyField) => void
 }
 
 export default FieldProcessor

@@ -111,7 +111,7 @@ export default class SchemaBuilderInternal
     }
   }
 
-  private registerField(entityName: string, field: Model.Column | Model.AnyRelation)
+  private registerField(entityName: string, field: Model.AnyColumn | Model.AnyRelation)
   {
     if (!this.entities[entityName]) {
       throw new SchemaBuilderError(`Undefined entity ${entityName}`)
@@ -154,7 +154,7 @@ export default class SchemaBuilderInternal
       type: FieldBuilder.Type.Column,
       options: {
         nullable: false,
-        type: "uuid",
+        type: Model.ColumnType.Uuid,
         primary: true,
       },
     }

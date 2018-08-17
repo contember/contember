@@ -27,7 +27,8 @@
 		"knex": "^0.14.6",
 		"node-pg-migrate": "^3.5.1",
 		"pg": "^7.4.3",
-		"uuid": "^3.3.2"
+		"uuid": "^3.3.2",
+		"fast-deep-equal": "^2.0.1"
 	},
 	"devDependencies": {
 		"@types/bluebird": "3.5.22",

@@ -25,7 +25,7 @@ export default class ConditionTypeProvider
       const basicType = this.columnTypeResolver.getType(column)
 
       const condition: GraphQLInputObjectType = new GraphQLInputObjectType({
-      name: GqlTypeName`${column.name}Condition`, // TODO ?
+      name: GqlTypeName`${column.name}Condition`,
       fields: () => ({
         and: {type: new GraphQLList(new GraphQLNonNull(condition))},
         or: {type: new GraphQLList(new GraphQLNonNull(condition))},

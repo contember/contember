@@ -27,7 +27,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
   {
     this.insertBuilder.addColumnData(column.columnName, (() => {
       if (this.data[column.name] !== undefined) {
-        return this.data[column.name] as Input.ColumnValueLike // TODO: find out why this.data may contain wrong types
+        return this.data[column.name] as Input.ColumnValue
       }
 
       switch (column.type) {

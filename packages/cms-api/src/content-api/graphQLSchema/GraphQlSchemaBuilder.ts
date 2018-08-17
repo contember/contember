@@ -1,19 +1,11 @@
 import { GraphQLFieldConfigMap, GraphQLObjectType, GraphQLSchema } from 'graphql'
 import { Model } from 'cms-common'
-import ColumnTypeResolver from './ColumnTypeResolver'
-import ConditionTypeProvider from './ConditionTypeProvider'
-import EntityTypeProvider from './EntityTypeProvider'
 import MutationProvider from './MutationProvider'
 import QueryProvider from './QueryProvider'
-import WhereTypeProvider from './WhereTypeProvider'
 
 export default class GraphQlSchemaBuilder {
 	constructor(
 		private schema: Model.Schema,
-		private columnTypeResolver: ColumnTypeResolver,
-		private conditionTypeProvider: ConditionTypeProvider,
-		private whereTypeProvider: WhereTypeProvider,
-		private entityTypeProvider: EntityTypeProvider,
 		private queryProvider: QueryProvider,
 		private mutationProvider: MutationProvider
 	) {}

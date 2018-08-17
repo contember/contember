@@ -27,14 +27,6 @@ export default class GraphQlSchemaBuilderFactory {
 			mutationResolver
 		)
 
-		return new GraphQlSchemaBuilder(
-			schema,
-			columnTypeResolver,
-			conditionTypeProvider,
-			whereTypeProvider,
-			entityTypeProvider,
-			queryProvider,
-			mutationProvider
-		)
+		return new GraphQlSchemaBuilder(schema, queryProvider, mutationProvider)
 	}
 }

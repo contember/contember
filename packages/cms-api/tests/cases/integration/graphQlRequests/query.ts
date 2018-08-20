@@ -108,7 +108,7 @@ describe('Queries', () => {
                        "root_"."locale" as "root_locale",
                        "root_"."title" as "root_title"
                      from "post_locale" as "root_"
-                     where ("root_"."post_id" in ($1, $2))`,
+                     where "root_"."post_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
 							{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
@@ -412,7 +412,7 @@ describe('Queries', () => {
 						sql: SQL`select "category_id",
                        "post_id"
                      from "post_categories"
-                     where "post_id" in ($1, $2)`,
+                     where "post_categories"."post_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
 							{
@@ -439,7 +439,7 @@ describe('Queries', () => {
                        "root_"."visible" as "root_visible",
                        "root_"."id" as "root_id"
                      from "category" as "root_"
-                     where ("root_"."id" in ($1, $2, $3))`,
+                     where "root_"."id" in ($1, $2, $3)`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
 						response: [
 							{
@@ -463,7 +463,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name"
               from "category_locale" as "root_"
-              where ((("root_"."locale" = $1))) and ("root_"."category_id" in ($2, $3, $4))
+              where "root_"."locale" = $1 and "root_"."category_id" in ($2, $3, $4)
           `,
 						parameters: ['cs', testUuid(3), testUuid(4), testUuid(5)],
 						response: [
@@ -587,7 +587,7 @@ describe('Queries', () => {
                        "category_id",
                        "post_id"
                      from "post_categories"
-                     where "category_id" in ($1, $2)`,
+                     where "post_categories"."category_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
 							{
@@ -616,7 +616,7 @@ describe('Queries', () => {
                        "root_author"."name" as "root_author_name",
                        "root_"."id" as "root_id"
                      from "post" as "root_" left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
-                     where ("root_"."id" in ($1, $2, $3))          `,
+                     where "root_"."id" in ($1, $2, $3)`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
 						response: [
 							{

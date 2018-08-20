@@ -9,6 +9,7 @@ import * as sinon from 'sinon'
 import { Acl, Model } from 'cms-common'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
+import KnexConnection from '../../src/core/knex/KnexConnection'
 
 export interface SqlQuery {
 	sql: string
@@ -82,7 +83,7 @@ export const execute = async (test: Test) => {
 		query.response(queryDefinition.response || [])
 	})
 	const response = await graphql(graphQLSchema, test.query, null, {
-		db: connection,
+		db: new KnexConnection(connection),
 		identityVariables: test.variables || {}
 	})
 	// console.log(response)

@@ -47,12 +47,28 @@ export default class Mapper {
 	public async select(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>
-	): Promise<SelectHydrator.ResultObjects> {
+	): Promise<SelectHydrator.ResultObjects>
+	public async select(
+		entity: Model.Entity,
+		input: ObjectNode<Input.ListQueryInput>,
+		indexBy: string
+	): Promise<SelectHydrator.IndexedResultObjects>
+	public async select(
+		entity: Model.Entity,
+		input: ObjectNode<Input.ListQueryInput>,
+		indexBy?: string
+	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		const hydrator = new SelectHydrator()
 		const qb = this.db.queryBuilder()
+		let indexByAlias: string | null = null
+		if (indexBy) {
+			const path = new Path([])
+			indexByAlias = path.for(indexBy).getAlias()
+			qb.select([path.getAlias(), getColumnName(this.schema, entity, indexBy)], indexByAlias)
+		}
 		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.select(entity, input))
 
-		return await hydrator.hydrateAll(rows)
+		return await (indexByAlias !== null ? hydrator.hydrateAll(rows, indexByAlias) : hydrator.hydrateAll(rows))
 	}
 
 	public async selectGrouped(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, columnName: string) {

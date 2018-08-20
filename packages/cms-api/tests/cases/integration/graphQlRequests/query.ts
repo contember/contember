@@ -141,7 +141,8 @@ describe('Queries', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."id" as "root_id"
+						sql: SQL`select "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
                      from "post" as "root_"`,
 						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }]
 					},
@@ -218,21 +219,38 @@ describe('Queries', () => {
 						sql: SQL`
               select
                 "root_"."id" as "root_id",
-                "root_author"."id" as "root_author_id",
-                "root_author"."id" as "root_author_id",
-                "root_author"."name" as "root_author_name"
-              from "post" as "root_" left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
+                "root_"."author_id" as "root_author"
+              from "post" as "root_"
           `,
 						response: [
 							{
 								root_id: testUuid(1),
-								root_author_id: testUuid(2),
-								root_author_name: 'John'
+								root_author: testUuid(2)
 							},
 							{
 								root_id: testUuid(3),
-								root_author_id: testUuid(4),
-								root_author_name: 'Jack'
+								root_author: testUuid(4)
+							}
+						]
+					},
+					{
+						sql: SQL`
+              select
+                "root_"."id" as "root_id",
+                "root_"."id" as "root_id",
+                "root_"."name" as "root_name"
+              from "author" as "root_"
+              where "root_"."id" in ($1, $2)
+          `,
+						parameters: [testUuid(2), testUuid(4)],
+						response: [
+							{
+								root_id: testUuid(2),
+								root_name: 'John'
+							},
+							{
+								root_id: testUuid(4),
+								root_name: 'Jack'
 							}
 						]
 					}
@@ -288,23 +306,40 @@ describe('Queries', () => {
                 select
                   "root_"."id" as "root_id",
                   "root_"."name" as "root_name",
-                  "root_setting"."id" as "root_setting_id",
-                  "root_setting"."id" as "root_setting_id",
-                  "root_setting"."url" as "root_setting_url"
-                from "site" as "root_" left join "site_setting" as "root_setting" on "root_"."setting_id" = "root_setting"."id"`,
+                  "root_"."setting_id" as "root_setting"
+                from "site" as "root_"`,
 
 						response: [
 							{
 								root_id: testUuid(1),
 								root_name: 'Site 1',
-								root_setting_id: testUuid(2),
-								root_setting_url: 'http://site1.cz'
+								root_setting: testUuid(2)
 							},
 							{
 								root_id: testUuid(3),
 								root_name: 'Site 2',
-								root_setting_id: testUuid(4),
-								root_setting_url: 'http://site2.cz'
+								root_setting: testUuid(4)
+							}
+						]
+					},
+					{
+						sql: SQL`
+                select
+                  "root_"."id" as "root_id",
+                  "root_"."id" as "root_id",
+                  "root_"."url" as "root_url"
+                from "site_setting" as "root_"
+                where "root_"."id" in ($1, $2)
+              `,
+						parameters: [testUuid(2), testUuid(4)],
+						response: [
+							{
+								root_id: testUuid(2),
+								root_url: 'http://site1.cz'
+							},
+							{
+								root_id: testUuid(4),
+								root_url: 'http://site2.cz'
 							}
 						]
 					}
@@ -358,26 +393,40 @@ describe('Queries', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`
-              select
-                "root_"."id" as "root_id",
-                "root_"."url" as "root_url",
-                "root_site"."id" as "root_site_id",
-                "root_site"."id" as "root_site_id",
-                "root_site"."name" as "root_site_name"
-              from "site_setting" as "root_" left join "site" as "root_site" on "root_"."id" = "root_site"."setting_id"`,
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id",
+                       "root_"."url" as "root_url"
+                     from "site_setting" as "root_"`,
 						response: [
 							{
 								root_id: testUuid(1),
-								root_url: 'http://site1.cz',
-								root_site_id: testUuid(2),
-								root_site_name: 'Site 1'
+								root_url: 'http://site1.cz'
 							},
 							{
 								root_id: testUuid(3),
-								root_url: 'http://site2.cz',
-								root_site_id: testUuid(4),
-								root_site_name: 'Site 2'
+								root_url: 'http://site2.cz'
+							}
+						]
+					},
+					{
+						sql: SQL`select
+                       "root_"."setting_id" as "root_setting",
+                       "root_"."id" as "root_id",
+                       "root_"."name" as "root_name"
+                     from "site" as "root_"
+                     where "root_"."setting_id" in ($1, $2)`,
+						parameters: [testUuid(1), testUuid(3)],
+						response: [
+							{
+								root_id: testUuid(2),
+								root_setting: testUuid(1),
+								root_name: 'Site 1'
+							},
+							{
+								root_id: testUuid(4),
+								root_setting: testUuid(3),
+								root_name: 'Site 2'
 							}
 						]
 					}
@@ -441,7 +490,9 @@ describe('Queries', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."id" as "root_id"
+						sql: SQL`select 
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
                      from "post" as "root_"`,
 						response: [
 							{
@@ -478,8 +529,7 @@ describe('Queries', () => {
 						]
 					},
 					{
-						sql: SQL`select
-                       "root_"."id" as "root_id",
+						sql: SQL`select "root_"."id" as "root_id",  
                        "root_"."visible" as "root_visible",
                        "root_"."id" as "root_id"
                      from "category" as "root_"
@@ -615,7 +665,9 @@ describe('Queries', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."id" as "root_id"
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
                      from "category" as "root_"`,
 						response: [
 							{
@@ -655,28 +707,43 @@ describe('Queries', () => {
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_author"."id" as "root_author_id",
-                       "root_author"."id" as "root_author_id",
-                       "root_author"."name" as "root_author_name",
-                       "root_"."id" as "root_id"
-                     from "post" as "root_" left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
-                     where "root_"."id" in ($1, $2, $3)`,
+                       "root_"."author_id" as "root_author"
+                     from "post" as "root_"
+                     where "root_"."id" in ($1, $2, $3)
+          `,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
 						response: [
 							{
 								root_id: testUuid(3),
-								root_author_id: testUuid(6),
-								root_author_name: 'John'
+								root_author: testUuid(6)
 							},
 							{
 								root_id: testUuid(4),
-								root_author_id: testUuid(7),
-								root_author_name: 'Jack'
+								root_author: testUuid(7)
 							},
 							{
 								root_id: testUuid(5),
-								root_author_id: testUuid(7),
-								root_author_name: 'Jack'
+								root_author: testUuid(7)
+							}
+						]
+					},
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id",
+                       "root_"."name" as "root_name"
+                     from "author" as "root_"
+                     where "root_"."id" in ($1, $2)
+          `,
+						parameters: [testUuid(6), testUuid(7)],
+						response: [
+							{
+								root_id: testUuid(6),
+								root_name: 'John'
+							},
+							{
+								root_id: testUuid(7),
+								root_name: 'Jack'
 							}
 						]
 					}

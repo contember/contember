@@ -1,10 +1,10 @@
 import { Input, Model } from 'cms-common'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
-import { acceptFieldVisitor, acceptRelationTypeVisitor } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor, acceptRelationTypeVisitor, getColumnName } from '../../../content-schema/modelUtils'
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
-import HasManyFetchVisitor from './HasManyFetchVisitor'
+import RelationFetchVisitor from './RelationFetchVisitor'
 import Mapper from '../mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
@@ -45,11 +45,8 @@ export default class SelectBuilder {
 				visitColumn: async (entity, column) => {
 					this.addColumn(path, column, field.alias)
 				},
-				visitHasMany: async (entity, relation, targetEntity) => {
-					await this.addHasMany(field as ObjectNode, path, entity, targetEntity)
-				},
-				visitHasOne: async (entity, relation, targetEntity) => {
-					this.addHasOne(field as ObjectNode, path, entity, targetEntity)
+				visitRelation: async (entity, relation, targetEntity) => {
+					await this.addRelation(field as ObjectNode, path, entity)
 				}
 			})
 			if (promise) {
@@ -69,21 +66,25 @@ export default class SelectBuilder {
 		this.qb.select([tableAlias, column.columnName], columnAlias)
 	}
 
-	private async addHasMany(
-		object: ObjectNode<Input.ListQueryInput>,
-		path: Path,
-		entity: Model.Entity,
-		targetEntity: Model.Entity
-	) {
-		const ids = this.getColumnValues(path.for(targetEntity.primary))
-		const fetchVisitor = new HasManyFetchVisitor(this.schema, this.mapper, ids, object)
-
-		const group = acceptRelationTypeVisitor(this.schema, entity, object.name, fetchVisitor)
-		this.hydrator.addGroupPromise(path.for(object.alias), path.for(entity.primary), group)
-		await group
+	private async addRelation(object: ObjectNode<Input.ListQueryInput>, path: Path, entity: Model.Entity) {
+		const idsGetter = (fieldName: string) => {
+			const columnName = getColumnName(this.schema, entity, fieldName)
+			return this.getColumnValues(path.for(fieldName), columnName)
+		}
+		const fetchVisitor = new RelationFetchVisitor(
+			this.schema,
+			this.mapper,
+			idsGetter,
+			object,
+			(parentKey, data, defaultValue) => {
+				this.hydrator.addPromise(path.for(object.alias), path.for(parentKey), data, defaultValue)
+			}
+		)
+		acceptRelationTypeVisitor(this.schema, entity, object.name, fetchVisitor)
 	}
 
 	private addHasOne(object: ObjectNode, path: Path, entity: Model.Entity, targetEntity: Model.Entity): void {
+		//not currently used, maybe in the future
 		const targetPath = path.for(object.alias)
 
 		const primaryPath = this.joinBuilder.join(this.qb, targetPath, entity, object.name)
@@ -97,9 +98,10 @@ export default class SelectBuilder {
 		return await this.qb.getResult()
 	}
 
-	private async getColumnValues(column: Path): Promise<Input.PrimaryValue[]> {
+	private async getColumnValues(columnPath: Path, columnName: string): Promise<Input.PrimaryValue[]> {
+		this.qb.select([columnPath.back().getAlias(), columnName], columnPath.getAlias())
 		const rows = await this.rows
-		const columnAlias = column.getAlias()
-		return rows.map(it => it[columnAlias])
+		const columnAlias = columnPath.getAlias()
+		return rows.map(it => it[columnAlias]).filter((val, index, all) => all.indexOf(val) === index)
 	}
 }

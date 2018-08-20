@@ -232,7 +232,9 @@ describe('Queries with acl', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "root_"."id" as "root_id"
+							sql: SQL`select 
+                         "root_"."id" as "root_id",
+                         "root_"."id" as "root_id"
                        from "post" as "root_"`,
 							parameters: [],
 							response: [

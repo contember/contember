@@ -1,17 +1,13 @@
 import { Input, Model } from 'cms-common'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
-import {
-	acceptEveryFieldVisitor,
-	acceptFieldVisitor,
-	acceptRelationTypeVisitor
-} from '../../../content-schema/modelUtils'
-import * as Knex from 'knex'
+import { acceptFieldVisitor, acceptRelationTypeVisitor } from '../../../content-schema/modelUtils'
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import HasManyFetchVisitor from './HasManyFetchVisitor'
 import Mapper from '../mapper'
 import WhereBuilder from './WhereBuilder'
+import QueryBuilder from '../../../core/knex/QueryBuilder'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
@@ -21,7 +17,7 @@ export default class SelectBuilder {
 		private readonly joinBuilder: JoinBuilder,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
-		private readonly qb: Knex.QueryBuilder,
+		private readonly qb: QueryBuilder,
 		private readonly hydrator: SelectHydrator,
 		private readonly firer: PromiseLike<void>
 	) {
@@ -80,7 +76,7 @@ export default class SelectBuilder {
 		const columnAlias = columnPath.getAlias()
 
 		this.hydrator.addColumn(columnPath)
-		this.qb.select(`${tableAlias}.${column.columnName} as ${columnAlias}`)
+		this.qb.select([tableAlias, column.columnName], columnAlias)
 	}
 
 	private async addHasMany(
@@ -108,7 +104,7 @@ export default class SelectBuilder {
 
 	private async createRowsPromise(firer: PromiseLike<void>): Promise<SelectHydrator.Rows> {
 		await firer
-		return await this.qb
+		return await this.qb.getResult()
 	}
 
 	private async getColumnValues(column: Path): Promise<Input.PrimaryValue[]> {

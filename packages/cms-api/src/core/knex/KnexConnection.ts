@@ -1,4 +1,5 @@
 import * as Knex from 'knex'
+import KnexWrapper from './KnexWrapper'
 
 export default class KnexConnection {
 	constructor(private readonly knex: Knex) {}
@@ -13,5 +14,9 @@ export default class KnexConnection {
 
 	raw(sql: string): Knex.Raw {
 		return this.knex.raw(sql)
+	}
+
+	wrapper(): KnexWrapper {
+		return new KnexWrapper(this.knex)
 	}
 }

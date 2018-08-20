@@ -1,13 +1,13 @@
 import { resolveValue } from '../utils'
 import { promiseAllObject } from '../../../utils/promises'
-import * as Knex from 'knex'
 import { Input } from 'cms-common'
+import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 export default class UpdateBuilder {
 	private rowData: { [columnName: string]: PromiseLike<Input.ColumnValue<undefined>> } = {}
 
 	private tableName: string
-	private db: Knex
+	private db: KnexWrapper
 	private where: { [columnName: string]: PromiseLike<Input.ColumnValue> } = {}
 
 	private updatePromise: Promise<number>
@@ -15,7 +15,7 @@ export default class UpdateBuilder {
 	constructor(
 		tableName: string,
 		where: { [columnName: string]: Input.ColumnValueLike },
-		db: Knex,
+		db: KnexWrapper,
 		firer: PromiseLike<void>
 	) {
 		this.tableName = tableName
@@ -36,7 +36,8 @@ export default class UpdateBuilder {
 
 	private async createUpdatePromise(firer: PromiseLike<void>) {
 		await firer
-		const qb = this.db(this.tableName)
+		const qb = this.db.queryBuilder()
+		qb.table(this.tableName)
 
 		qb.where(await promiseAllObject(this.where))
 

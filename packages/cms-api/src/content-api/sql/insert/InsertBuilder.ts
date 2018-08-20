@@ -2,16 +2,17 @@ import { resolveValue } from '../utils'
 import { promiseAllObject } from '../../../utils/promises'
 import * as Knex from 'knex'
 import { Input } from 'cms-common'
+import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 export default class InsertBuilder {
 	private rowData: { [columnName: string]: PromiseLike<Input.ColumnValue> } = {}
 
 	private tableName: string
 	private primaryColumn: string
-	private db: Knex
+	private db: KnexWrapper
 	private insertPromise: Promise<Input.PrimaryValue>
 
-	constructor(tableName: string, primaryColumn: string, db: Knex, firer: PromiseLike<void>) {
+	constructor(tableName: string, primaryColumn: string, db: KnexWrapper, firer: PromiseLike<void>) {
 		this.tableName = tableName
 		this.primaryColumn = primaryColumn
 		this.db = db
@@ -26,9 +27,10 @@ export default class InsertBuilder {
 		return this.insertPromise
 	}
 
-	private async createInsertPromise(firer: PromiseLike<void>) {
+	private async createInsertPromise(firer: PromiseLike<void>): Promise<Input.PrimaryValue> {
 		await firer
-		const qb = this.db(this.tableName)
+		const qb = this.db.queryBuilder()
+		qb.table(this.tableName)
 		const rowData = await promiseAllObject(this.rowData)
 		const returning = await qb.insert(rowData, this.primaryColumn)
 

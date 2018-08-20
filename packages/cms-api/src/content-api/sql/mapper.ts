@@ -1,4 +1,3 @@
-import * as Knex from 'knex'
 import { Input, Model } from 'cms-common'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
 import { acceptEveryFieldVisitor, getColumnName, getEntity } from '../../content-schema/modelUtils'
@@ -14,18 +13,20 @@ import JoinBuilder from './select/JoinBuilder'
 import WhereBuilder from './select/WhereBuilder'
 import ConditionBuilder from './select/ConditionBuilder'
 import Path from './select/Path'
+import QueryBuilder from '../../core/knex/QueryBuilder'
+import KnexWrapper from '../../core/knex/KnexWrapper'
 
 export default class Mapper {
 	private schema: Model.Schema
-	private db: Knex
+	private db: KnexWrapper
 
-	constructor(schema: Model.Schema, db: Knex) {
+	constructor(schema: Model.Schema, db: KnexWrapper) {
 		this.schema = schema
 		this.db = db
 	}
 
 	public static run(schema: Model.Schema, db: KnexConnection, cb: (mapper: Mapper) => void) {
-		return db.transaction(trx => {
+		return db.wrapper().transaction(trx => {
 			const mapper = new Mapper(schema, trx)
 			return cb(mapper)
 		})
@@ -34,10 +35,11 @@ export default class Mapper {
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
-		const result = await this.db
-			.table(entity.tableName)
-			.select(columnName)
-			.where(this.getUniqueWhereArgs(entity, where))
+		const qb = this.db.queryBuilder()
+		qb.from(entity.tableName)
+		qb.select(columnName)
+		qb.where(this.getUniqueWhereArgs(entity, where))
+		const result = await qb.getResult()
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
@@ -45,16 +47,17 @@ export default class Mapper {
 	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>) {
 		const hydrator = new SelectHydrator()
 		const qb = this.db.queryBuilder()
-		const rows = await this.selectRows(hydrator, qb, entity, input, selector => selector.select(entity, input))
+		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.select(entity, input))
+
 		return await hydrator.hydrateAll(rows)
 	}
 
 	public async selectOne(entity: Model.Entity, input: ObjectNode<Input.UniqueQueryInput>) {
 		const hydrator = new SelectHydrator()
 		const qb = this.db.queryBuilder()
-		const rows = await this.selectRows(hydrator, qb, entity, input, selector => selector.selectOne(entity, input))
-		const row = rows[0] ? await hydrator.hydrateRow(rows[0]) : null
-		return row
+		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.selectOne(entity, input))
+
+		return rows[0] ? await hydrator.hydrateRow(rows[0]) : null
 	}
 
 	public async selectGrouped(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, columnName: string) {
@@ -62,17 +65,16 @@ export default class Mapper {
 		const qb = this.db.queryBuilder()
 		const path = new Path([])
 		const groupingKey = '__grouping_key'
-		qb.select(`${path.getAlias()}.${columnName} as ${groupingKey}`)
+		qb.select([path.getAlias(), columnName], groupingKey)
 
-		const rows = await this.selectRows(hydrator, qb, entity, input, selector => selector.select(entity, input))
+		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.select(entity, input))
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
 	private async selectRows(
 		hydrator: SelectHydrator,
-		qb: Knex.QueryBuilder,
+		qb: QueryBuilder,
 		entity: Model.Entity,
-		input: ObjectNode,
 		selectHandler: (selector: SelectBuilder) => Promise<void>
 	) {
 		let resolver: (() => any) = () => {
@@ -83,7 +85,8 @@ export default class Mapper {
 		const whereBuilder = new WhereBuilder(this.schema, joinBuilder, conditionBuilder)
 
 		const path = new Path([])
-		qb.from(`${entity.tableName} as ${path.getAlias()}`)
+		qb.from(entity.tableName, path.getAlias())
+
 		const selector = new SelectBuilder(
 			this.schema,
 			joinBuilder,
@@ -148,9 +151,10 @@ export default class Mapper {
 	}
 
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<number> {
-		return await this.db(entity.tableName)
-			.where(this.getUniqueWhereArgs(entity, where))
-			.delete()
+		const qb = this.db.queryBuilder()
+		qb.from(entity.tableName)
+		qb.where(this.getUniqueWhereArgs(entity, where))
+		return await qb.delete()
 	}
 
 	public async connectJunction(
@@ -163,12 +167,12 @@ export default class Mapper {
 		const primaryValue = await this.getPrimaryValue(owningEntity, ownerUnique)
 		const inversedPrimaryValue = await this.getPrimaryValue(getEntity(this.schema, relation.target), inversedUnique)
 
-		const insert = this.db.table(joiningTable.tableName).insert({
+		const qb = this.db.queryBuilder()
+		qb.table(joiningTable.tableName)
+		return await qb.insertIgnore({
 			[joiningTable.joiningColumn.columnName]: primaryValue,
 			[joiningTable.inverseJoiningColumn.columnName]: inversedPrimaryValue
 		})
-
-		await this.db.raw(insert.toString() + ' on conflict do nothing')
 	}
 
 	public async disconnectJunction(
@@ -178,16 +182,17 @@ export default class Mapper {
 		inversedUnique: Input.UniqueWhere
 	) {
 		const joiningTable = relation.joiningTable
-		await this.db
-			.table(joiningTable.tableName)
-			.where({
-				[joiningTable.joiningColumn.columnName]: await this.getPrimaryValue(owningEntity, ownerUnique),
-				[joiningTable.inverseJoiningColumn.columnName]: await this.getPrimaryValue(
-					getEntity(this.schema, relation.target),
-					inversedUnique
-				)
-			})
-			.delete()
+		const qb = this.db.queryBuilder()
+		qb.table(joiningTable.tableName)
+
+		qb.where({
+			[joiningTable.joiningColumn.columnName]: await this.getPrimaryValue(owningEntity, ownerUnique),
+			[joiningTable.inverseJoiningColumn.columnName]: await this.getPrimaryValue(
+				getEntity(this.schema, relation.target),
+				inversedUnique
+			)
+		})
+		return await qb.delete()
 	}
 
 	public async fetchJunction(
@@ -198,12 +203,13 @@ export default class Mapper {
 		const joiningTable = relation.joiningTable
 
 		const whereColumn = column.columnName
-		const result = await this.db
-			.table(joiningTable.tableName)
-			.select([joiningTable.inverseJoiningColumn.columnName, joiningTable.joiningColumn.columnName])
-			.whereIn(whereColumn, values)
+		const qb = this.db.queryBuilder()
+		qb.from(joiningTable.tableName)
+		qb.select(joiningTable.inverseJoiningColumn.columnName)
+		qb.select(joiningTable.joiningColumn.columnName)
+		qb.where(clause => clause.in([joiningTable.tableName, whereColumn], values))
 
-		return result
+		return await qb.getResult()
 	}
 
 	public async getPrimaryValue(entity: Model.Entity, where: Input.UniqueWhere) {
@@ -212,22 +218,24 @@ export default class Mapper {
 		}
 
 		const whereArgs = this.getUniqueWhereArgs(entity, where)
-		const result = await this.db
-			.table(entity.tableName)
-			.select(entity.primaryColumn)
-			.where(whereArgs)
+		const qb = this.db.queryBuilder()
+		qb.from(entity.tableName)
+		qb.select(entity.primaryColumn)
+		qb.where(whereArgs)
+
+		const result = await qb.getResult()
 
 		return result[0] !== undefined ? result[0][entity.primaryColumn] : undefined
 	}
 
-	public getUniqueWhereArgs(
+	private getUniqueWhereArgs(
 		entity: Model.Entity,
 		where: Input.UniqueWhere
-	): { [columnName: string]: Input.ColumnValue } {
+	): { [columnName: string]: string | number } {
 		if (!isUniqueWhere(entity, where)) {
 			throw new Error('Unique where is not unique')
 		}
-		const whereArgs: { [columnName: string]: Input.ColumnValue } = {}
+		const whereArgs: { [columnName: string]: string | number } = {}
 		for (const field in where) {
 			whereArgs[getColumnName(this.schema, entity, field)] = where[field]
 		}

@@ -63,7 +63,7 @@ describe('Queries with acl', () => {
                        "root_"."id" as "root_id",
                        "root_"."title" as "root_title"
                      from "post_locale" as "root_"
-                     where (("root_"."locale" in ($1)))`,
+                     where "root_"."locale" in ($1)`,
 							parameters: ['cs'],
 							response: [
 								{
@@ -116,7 +116,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          "root_"."title" as "root_title"
                        from "post_locale" as "root_"
-                       where ((("root_"."title" = $1) and ("root_"."locale" in ($2))) and ("root_"."locale" in ($3)))`,
+                       where "root_"."title" = $1 and "root_"."locale" in ($2) and "root_"."locale" in ($3)`,
 							parameters: ['foo', 'cs', 'cs'],
 							response: [
 								{
@@ -199,7 +199,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          "root_"."title" as "root_title"
                        from "post_locale" as "root_"
-                       where ((false))`,
+                       where false`,
 							parameters: [],
 							response: []
 						}
@@ -250,7 +250,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          "root_"."title" as "root_title"
                        from "post_locale" as "root_"
-                       where (("root_"."locale" in ($1))) and ("root_"."post_id" in ($2, $3))`,
+                       where "root_"."locale" in ($1) and "root_"."post_id" in ($2, $3)`,
 							parameters: ['cs', testUuid(1), testUuid(2)],
 							response: [
 								{

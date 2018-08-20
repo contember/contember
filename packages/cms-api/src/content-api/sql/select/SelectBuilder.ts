@@ -34,16 +34,6 @@ export default class SelectBuilder {
 		await promise
 	}
 
-	public async selectOne(entity: Model.Entity, input: ObjectNode<Input.UniqueQueryInput>, path?: Path) {
-		path = path || new Path([])
-		const promise = this.selectInternal(entity, path, input)
-		const where = input.args.where
-		if (where) {
-			this.whereBuilder.buildUnique(this.qb, entity, path, where)
-		}
-		await promise
-	}
-
 	private async selectInternal(entity: Model.Entity, path: Path, input: ObjectNode) {
 		if (!input.fields.find(it => it.name === entity.primary && it.alias === entity.primary)) {
 			this.addColumn(path, entity.fields[entity.primary] as Model.AnyColumn, entity.primary)

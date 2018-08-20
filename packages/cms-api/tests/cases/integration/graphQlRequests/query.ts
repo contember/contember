@@ -38,6 +38,48 @@ describe('Queries', () => {
 		})
 	})
 
+	it('Post locale by post and locale (composed unique)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity
+						.column('title', column => column.type(Model.ColumnType.String))
+						.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post'))
+				)
+				.entity('PostLocale', entity =>
+					entity
+						.unique(['locale', 'post'])
+						.column('locale', column => column.type(Model.ColumnType.String))
+						.column('title', column => column.type(Model.ColumnType.String))
+				)
+				.buildSchema(),
+			query: GQL`
+        query {
+          PostLocale(where: {post: "${testUuid(1)}", locale: "cs"}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post_locale" as "root_"
+                     where "root_"."locale" = $1 and "root_"."post_id" = $2`,
+						parameters: ['cs', testUuid(1)],
+						response: [{ root_id: testUuid(2) }]
+					}
+				])
+			],
+			return: {
+				data: {
+					PostLocale: {
+						id: testUuid(2)
+					}
+				}
+			}
+		})
+	})
+
 	it('Field alias', async () => {
 		await execute({
 			schema: new SchemaBuilder()
@@ -52,7 +94,9 @@ describe('Queries', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."title" as "root_heading"
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."title" as "root_heading"
                      from "post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_heading: 'Hello' }],

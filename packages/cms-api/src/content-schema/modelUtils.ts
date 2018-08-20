@@ -17,6 +17,17 @@ export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldN
 	})
 }
 
+export const getTargetEntity = (
+	schema: Model.Schema,
+	entity: Model.Entity,
+	relationName: string
+): Model.Entity | null => {
+	return acceptFieldVisitor(schema, entity, relationName, {
+		visitColumn: () => null,
+		visitRelation: (entity, relation, targetEntity) => targetEntity
+	})
+}
+
 export const acceptEveryFieldVisitor = <T>(
 	schema: Model.Schema,
 	entity: string | Model.Entity,

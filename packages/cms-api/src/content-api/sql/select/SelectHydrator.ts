@@ -3,7 +3,12 @@ import Path from './Path'
 class SelectHydrator {
 	private columns: Path[] = []
 	private entities: Path[] = []
-	private groupPromises: { path: Path; parentKeyPath: Path; data: PromiseLike<any> }[] = []
+	private promises: {
+		path: Path
+		parentKeyPath: Path
+		data: PromiseLike<SelectHydrator.NestedData>
+		defaultValue: SelectHydrator.NestedDefaultValue
+	}[] = []
 
 	public addEntity(primaryPath: Path) {
 		this.entities.push(primaryPath)
@@ -13,14 +18,19 @@ class SelectHydrator {
 		this.columns.push(path)
 	}
 
-	public addGroupPromise(path: Path, parentKeyPath: Path, data: PromiseLike<SelectHydrator.GroupedObjects>) {
-		this.groupPromises.push({ path, parentKeyPath, data })
+	public addPromise(
+		path: Path,
+		parentKeyPath: Path,
+		data: PromiseLike<SelectHydrator.NestedData>,
+		defaultValue: SelectHydrator.NestedDefaultValue
+	) {
+		this.promises.push({ path, parentKeyPath, data, defaultValue })
 	}
 
-	async hydrateGroups(rows: SelectHydrator.Rows, groupingKey: string): Promise<SelectHydrator.GroupedObjects> {
+	async hydrateGroups(rows: SelectHydrator.Rows, groupBy: string): Promise<SelectHydrator.GroupedObjects> {
 		const result: SelectHydrator.GroupedObjects = {}
 		for (let row of rows) {
-			const key = row[groupingKey]
+			const key = row[groupBy]
 			if (!result[key]) {
 				result[key] = []
 			}
@@ -29,7 +39,21 @@ class SelectHydrator {
 		return result
 	}
 
-	async hydrateAll(rows: SelectHydrator.Rows): Promise<SelectHydrator.ResultObjects> {
+	async hydrateAll(rows: SelectHydrator.Rows): Promise<SelectHydrator.ResultObjects>
+	async hydrateAll(rows: SelectHydrator.Rows, indexBy: string): Promise<SelectHydrator.IndexedResultObjects>
+
+	async hydrateAll(
+		rows: SelectHydrator.Rows,
+		indexBy?: string
+	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
+		if (indexBy) {
+			const result: SelectHydrator.IndexedResultObjects = {}
+			for (let row of rows) {
+				result[row[indexBy]] = await this.hydrateRow(row)
+			}
+			return result
+		}
+
 		return Promise.all(rows.map(row => this.hydrateRow(row)))
 	}
 
@@ -52,14 +76,14 @@ class SelectHydrator {
 				currentObject[last] = row[columnPath.getAlias()]
 			}
 		}
-		for (let { path, parentKeyPath, data } of this.groupPromises) {
+		for (let { path, parentKeyPath, data, defaultValue } of this.promises) {
 			const awaitedData = await data
 			const pathTmp = [...path.path]
 			const last = pathTmp.pop() as string
 			const currentObject = pathTmp.reduce((obj, part) => (obj && obj[part]) || undefined, result)
 			const parentValue = row[parentKeyPath.getAlias()]
 			if (currentObject && parentValue) {
-				currentObject[last] = awaitedData[parentValue] || []
+				currentObject[last] = awaitedData[parentValue] || defaultValue
 			}
 		}
 
@@ -73,7 +97,10 @@ namespace SelectHydrator {
 
 	export type ResultObject = { [key: string]: any }
 	export type ResultObjects = ResultObject[]
+	export type IndexedResultObjects = { [key: string]: ResultObject }
 	export type GroupedObjects = { [groupingKey: string]: ResultObjects }
+	export type NestedData = GroupedObjects | IndexedResultObjects
+	export type NestedDefaultValue = [] | null
 }
 
 export default SelectHydrator

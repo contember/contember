@@ -26,18 +26,29 @@ describe('Delete mutation', () => {
 					{
 						sql: SQL`select
                      "root_"."id" as "root_id",
-                       "root_author"."id" as "root_author_id",
-                       "root_author"."id" as "root_author_id",
-                     "root_author"."name" as "root_author_name"
-                   from "post" as "root_" 
-                     left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
+                      "root_"."author_id" as "root_author"
+                     from "post" as "root_" 
                    where "root_"."id" = $1`,
 						parameters: [testUuid(1)],
 						response: [
 							{
 								root_id: testUuid(1),
-								root_author_id: testUuid(2),
-								root_author_name: 'John'
+								root_author: testUuid(2)
+							}
+						]
+					},
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id",
+                       "root_"."name" as "root_name"
+                     from "author" as "root_"
+                     where "root_"."id" in ($1)`,
+						parameters: [testUuid(2)],
+						response: [
+							{
+								root_id: testUuid(2),
+								root_name: 'John'
 							}
 						]
 					},

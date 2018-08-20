@@ -1,5 +1,5 @@
 import Path from './Path'
-import { acceptFieldVisitor, acceptRelationTypeVisitor } from '../../../content-schema/modelUtils'
+import { acceptRelationTypeVisitor, getTargetEntity } from '../../../content-schema/modelUtils'
 import { Model } from 'cms-common'
 import JoinVisitor from './JoinVisitor'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
@@ -19,12 +19,10 @@ export default class JoinBuilder {
 			)
 		}
 
-		const targetEntity = acceptFieldVisitor(this.schema, entity, relationName, {
-			visitColumn: () => {
-				throw new Error()
-			},
-			visitRelation: (_a, _b, targetEntity) => targetEntity
-		})
+		const targetEntity = getTargetEntity(this.schema, entity, relationName)
+		if (!targetEntity) {
+			throw new Error()
+		}
 
 		const primaryPath = path.for(targetEntity.primary)
 		qb.select([path.getAlias(), targetEntity.primaryColumn], primaryPath.getAlias())

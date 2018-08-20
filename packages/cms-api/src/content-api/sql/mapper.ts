@@ -44,20 +44,15 @@ export default class Mapper {
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
 
-	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>) {
+	public async select(
+		entity: Model.Entity,
+		input: ObjectNode<Input.ListQueryInput>
+	): Promise<SelectHydrator.ResultObjects> {
 		const hydrator = new SelectHydrator()
 		const qb = this.db.queryBuilder()
 		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.select(entity, input))
 
 		return await hydrator.hydrateAll(rows)
-	}
-
-	public async selectOne(entity: Model.Entity, input: ObjectNode<Input.UniqueQueryInput>) {
-		const hydrator = new SelectHydrator()
-		const qb = this.db.queryBuilder()
-		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.selectOne(entity, input))
-
-		return rows[0] ? await hydrator.hydrateRow(rows[0]) : null
 	}
 
 	public async selectGrouped(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, columnName: string) {

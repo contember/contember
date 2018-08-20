@@ -13,7 +13,7 @@ import ObjectNode from './ObjectNode'
 import { getArgumentValues } from 'graphql/execution/values'
 
 export default class GraphQlQueryAstFactory {
-	public create(info: GraphQLResolveInfo): ObjectNode {
+	public create<Args = any>(info: GraphQLResolveInfo): ObjectNode<Args> {
 		const node = this.mergeAllFieldNodes(info.fieldNodes)
 		const parentType = info.parentType
 		if (!(parentType instanceof GraphQLObjectType)) {

@@ -1,4 +1,4 @@
-import { acceptFieldVisitor, getColumnName } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
 import { Input, Model } from 'cms-common'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
@@ -130,15 +130,6 @@ export default class WhereBuilder {
 				}
 			})
 		}
-	}
-
-	public buildUnique(qb: QueryBuilder, entity: Model.Entity, path: Path, where: Input.UniqueWhere): void {
-		qb.where(clause => {
-			for (let field in where) {
-				const columnName = getColumnName(this.schema, entity, field)
-				clause.compare([path.getAlias(), columnName], '=', where[field])
-			}
-		})
 	}
 
 	private transformWhereToPrimaryCondition(where: Input.Where, primaryField: string): Input.Condition<never> | null {

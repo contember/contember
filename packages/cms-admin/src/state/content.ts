@@ -4,12 +4,17 @@ export enum ContentStatus {
 	LOADED
 }
 
-export default interface ContentState {
-	data: any
+export interface ContentRequestState {
 	state: ContentStatus
+	data: any
+}
+
+export type ContentRequestsState = { [key: string]: ContentRequestState }
+
+export default interface ContentState {
+	requests: ContentRequestsState
 }
 
 export const emptyContentState: ContentState = {
-	data: null,
-	state: ContentStatus.NONE
+	requests: {}
 }

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { getData, putData } from '../../actions/content'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
-import { ContentStatus } from '../../state/content'
+import { ContentStatus, ContentRequestsState } from '../../state/content'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
@@ -16,17 +16,17 @@ import MetaOperationsContext, { MetaOperationsContextValue } from './MetaOperati
 export interface DataProviderProps {}
 
 export interface DataProviderDispatchProps {
-	getData: (query: string) => void
+	getData: (query: string) => Promise<string>
 	putData: (query: string) => Promise<void>
 }
 export interface DataProviderStateProps {
-	data: any
-	ready: boolean
+	requests: ContentRequestsState
 }
 type DataProviderInnerProps = DataProviderProps & DataProviderDispatchProps & DataProviderStateProps
 
 export interface DataProviderState {
 	data?: DataContextValue
+	id?: string
 }
 
 class DataProvider extends React.Component<DataProviderInnerProps, DataProviderState, boolean> {
@@ -37,8 +37,12 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 	protected entityTree?: EntityMarker
 
 	protected triggerPersist = () => {
-		if (this.props.data && this.state.data instanceof EntityAccessor) {
-			const generator = new PersistQueryGenerator(this.props.data, this.state.data)
+		if (!this.state.id) {
+			return
+		}
+		const data = this.props.requests[this.state.id].data
+		if (data && this.state.data instanceof EntityAccessor) {
+			const generator = new PersistQueryGenerator(data, this.state.data)
 			const query = generator.generatePersistQuery()
 
 			if (query) {
@@ -49,12 +53,17 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(this.triggerPersist)
 
-	componentDidUpdate(prevProps: DataProviderInnerProps) {
-		if (!this.entityTree) {
+	componentDidUpdate(prevProps: DataProviderInnerProps, prevState: DataProviderState) {
+		if (!this.entityTree || !this.state.id) {
 			return
 		}
-		if (this.props.ready && prevProps.ready !== this.props.ready && this.props.data !== prevProps.data) {
-			const accessTreeGenerator = new AccessorTreeGenerator(this.entityTree, this.props.data)
+		const prevReq = prevProps.requests[this.state.id]
+		const req = this.props.requests[this.state.id]
+		if (
+			req.state === ContentStatus.LOADED &&
+			((prevReq.state !== req.state && req.data !== prevReq.data) || this.state.id !== prevState.id)
+		) {
+			const accessTreeGenerator = new AccessorTreeGenerator(this.entityTree, req.data)
 			accessTreeGenerator.generateLiveTree(newData => this.setState({ data: newData }))
 		}
 	}
@@ -67,7 +76,9 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		) : null
 	}
 
-	public componentDidMount() {
+	protected unmounted: boolean = false
+
+	public async componentDidMount() {
 		const generator = new EntityTreeGenerator(this.props.children)
 
 		this.entityTree = generator.generate()
@@ -77,15 +88,19 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		const converter = new EntityTreeToQueryConverter(this.entityTree)
 		const query = converter.convert()
 		if (query) {
-			this.props.getData(query)
+			const id = await this.props.getData(query)
+			if (!this.unmounted) this.setState({ id })
 		}
+	}
+
+	public componentWillUnmount() {
+		this.unmounted = true
 	}
 }
 
 export default connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderProps, State>(
 	({ content }) => ({
-		data: content.data,
-		ready: content.state === ContentStatus.LOADED
+		requests: content.requests
 	}),
 	(dispatch: Dispatch) => ({
 		getData: (query: string) => dispatch(getData('blog', 'prod', query)),

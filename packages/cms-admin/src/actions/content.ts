@@ -5,18 +5,21 @@ import GraphqlClient from '../model/GraphqlClient'
 import { pushRequest } from './request'
 import { loginRequest } from '../state/request'
 
+let idCounter = 1
+
 export const getData = (project: string, stage: string, query: string): ActionCreator => async (
 	dispatch,
 	getState,
 	services
 ) => {
-	dispatch(createAction(CONTENT_SET_LOADING)())
+	const id = (idCounter++).toString(16)
+	dispatch(createAction(CONTENT_SET_LOADING, () => ({ id }))())
 	const apiToken = getState().auth.token
 	try {
 		const data = await services.contentClientFactory.create(project, stage).request(query, {}, apiToken || undefined)
-		dispatch(createAction(CONTENT_SET_DATA, () => data)())
+		dispatch(createAction(CONTENT_SET_DATA, () => ({ id, data }))())
 	} catch (error) {
-		dispatch(createAction(CONTENT_SET_NONE)())
+		dispatch(createAction(CONTENT_SET_NONE, () => ({ id }))())
 		if (error instanceof GraphqlClient.GraphqlServerError) {
 			try {
 				const json = JSON.parse(error.response.body)
@@ -36,6 +39,7 @@ export const getData = (project: string, stage: string, query: string): ActionCr
 		}
 		throw error
 	}
+	return id
 }
 
 export const putData = (project: string, stage: string, query: string): ActionCreator => async (

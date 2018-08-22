@@ -25,6 +25,10 @@ namespace Acl {
 		fieldName: string
 	}
 
+	export interface VariablesMap {
+		[name: string]: string | number | (string | number)[]
+	}
+
 	export type PredicateVariable = string //{ name: string }
 	export type PredicateDefinition = Input.Where<PredicateVariable>
 

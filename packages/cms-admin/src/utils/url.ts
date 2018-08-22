@@ -1,53 +1,56 @@
+import * as pathToRegexp from 'path-to-regexp'
 import RequestState from '../state/request'
 
-export type RecursiveStringObject = { [key: string]: string | RecursiveStringObject | undefined }
-
-function decode(str: string) {
-	const component = decodeURIComponent(str.replace(/\+/g, ' '))
-	try {
-		return JSON.parse(component)
-	} catch {
-		return component
-	}
+type RouteName = RequestState['name']
+type RequestByName<K extends RouteName, T = RequestState> = T extends { name: K } ? T : never
+interface RouteConfigWithoutMapping {
+	path: string
+	paramsToObject?: undefined
+	objectToParams?: undefined
 }
+interface RouteConfigWithMapping<N, T extends {} = any> {
+	path: string
+	paramsToObject: (params: T) => { [K in Exclude<keyof N, 'name'>]: N[K] }
+	objectToParams: (params: N) => T
+}
+export type RouteConfig<N> = RouteConfigWithMapping<N> | RouteConfigWithoutMapping
+export type RouteMap<N extends RouteName = RouteName> = { [K in N]: RouteConfig<RequestByName<N>> }
 
-export function parseParams(query: string): RecursiveStringObject {
-	if (!query) return {}
-	if (query.charAt(0) === '?') {
-		query = query.slice(1)
-	}
-	const pairs = query.split('&')
-	const result: any = {}
-	for (let i = 0; i < pairs.length; i++) {
-		const value = pairs[i]
-		const index = value.indexOf('=')
-		if (index > -1) {
-			result[decode(value.slice(0, index))] = decode(value.slice(index + 1))
-		} else if (value.length) {
-			result[decode(value)] = ''
+export function pathToRequestState(routes: RouteMap, path: string): RequestState | null {
+	for (const [name, config] of Object.entries(routes)) {
+		const params = matchesPath(config.path, path)
+		if (params) {
+			const obj = config.paramsToObject ? config.paramsToObject({ ...params }) : params
+			return { name: name as RequestState['name'], ...obj } as RequestState
 		}
 	}
-
-	return result
+	return null
 }
 
-export function buildParams(params: RecursiveStringObject): string {
-	let result = ''
-	for (let key in params) {
-		const value = params[key]
-		if (value === undefined) {
-			continue
-		}
-		const component = typeof value === 'string' ? value : JSON.stringify(value)
-		result += key + '=' + encodeURIComponent(component) + '&'
-	}
-	if (result === '') {
-		return ''
-	}
+type CacheValue = [pathToRegexp.Key[], RegExp]
+const compiledRoutesCache = new Map<string, CacheValue>()
+type StringObject = { [key: string]: string }
 
-	return '?' + result.substring(0, result.length - 1)
+export function matchesPath(path: string, url: string): StringObject | null {
+	let keys: pathToRegexp.Key[] = []
+	let regexp: RegExp
+	if (compiledRoutesCache.has(path)) {
+		;[keys, regexp] = compiledRoutesCache.get(path) as CacheValue
+	} else {
+		regexp = pathToRegexp(path, keys)
+		compiledRoutesCache.set(path, [keys, regexp])
+	}
+	const match = regexp.exec(url)
+	if (match) {
+		return match.slice(1).reduce((acc, value, i) => ({ ...acc, [keys[i].name]: value }), {})
+	}
+	return null
 }
 
-export function buildUrlFromRequest(request: RequestState): string {
-	return '/' + buildParams(request)
+export function requestStateToPath(routes: RouteMap, state: RequestState): string {
+	const func = routes[state.name].objectToParams
+	const params = func ? func(state) : state
+	return pathToRegexp.compile(routes[state.name].path)(params, {
+		encode: (val, token) => (token.name.toString() === 'path' ? val : encodeURIComponent(val))
+	})
 }

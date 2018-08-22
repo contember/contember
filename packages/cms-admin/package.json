@@ -22,6 +22,7 @@
 		"is-url": "^1.2.4",
 		"material-design-icons": "^3.0.1",
 		"moment": "^2.22.2",
+		"path-to-regexp": "^2.3.0",
 		"react": "^16.4.1",
 		"react-dom": "^16.4.2",
 		"react-redux": "^5.0.7",

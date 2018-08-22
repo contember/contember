@@ -1,0 +1,66 @@
+type Mutation {
+  createTest(data: TestCreateInput!): Test!
+  updateTest(where: TestUniqueWhere!, data: TestUpdateInput!): Test
+}
+
+type Query {
+  Test(where: TestUniqueWhere!): Test
+  Tests(where: TestWhere): [Test]
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  eq: String
+  null: Boolean
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+}
+
+type Test {
+  id: UUID!
+  c: String
+}
+
+input TestCreateInput {
+  a: String
+}
+
+input TestUniqueWhere {
+  id: UUID
+}
+
+input TestUpdateInput {
+  b: String
+}
+
+input TestWhere {
+  id: UUIDCondition
+  c: StringCondition
+  and: [TestWhere!]
+  or: [TestWhere!]
+  not: TestWhere
+}
+
+scalar UUID
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  eq: UUID
+  null: Boolean
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}

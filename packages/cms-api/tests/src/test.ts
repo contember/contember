@@ -82,13 +82,15 @@ export const execute = async (test: Test) => {
 		}
 		query.response(queryDefinition.response || [])
 	})
-	const response = await graphql(graphQLSchema, test.query, null, {
-		db: new KnexConnection(connection),
-		identityVariables: test.variables || {}
-	})
-	// console.log(response)
-	expect(response).deep.equal(test.return)
-	tracker.uninstall()
-
-	uuidStub.restore()
+	try {
+		const response = await graphql(graphQLSchema, test.query, null, {
+			db: new KnexConnection(connection),
+			identityVariables: test.variables || {}
+		})
+		// console.log(response)
+		expect(response).deep.equal(test.return)
+	} finally {
+		tracker.uninstall()
+		uuidStub.restore()
+	}
 }

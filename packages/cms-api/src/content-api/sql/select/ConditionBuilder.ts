@@ -47,6 +47,12 @@ export default class ConditionBuilder {
 			if (condition.gte !== undefined) {
 				qb.where(fqn, '>=', condition.gte)
 			}
+			if (condition.never) {
+				qb.whereRaw('false')
+			}
+			if (condition.always) {
+				qb.whereRaw('true')
+			}
 		})
 	}
 }

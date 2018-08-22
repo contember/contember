@@ -7,6 +7,7 @@ import KnexConnection from '../core/knex/KnexConnection'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from '../content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { Context } from '../content-api/types'
+import AllowAllPermissionFactory from '../acl/AllowAllPermissionFactory'
 
 class ContentMiddlewareFactoryMiddlewareFactory {
 	constructor(
@@ -42,7 +43,10 @@ class ContentMiddlewareFactoryMiddlewareFactory {
 				return
 			}
 
-			const dataSchemaBuilder = projectContainer.get('graphQlSchemaBuilderFactory').create(stage.schema.model) // TODO: should also depend on identityId
+			const permissions = new AllowAllPermissionFactory().create(stage.schema.model)
+			const dataSchemaBuilder = projectContainer
+				.get('graphQlSchemaBuilderFactory')
+				.create(stage.schema.model, permissions) // TODO: should also depend on identityId
 			const dataSchema = dataSchemaBuilder.build()
 
 			const contentExpress = express()

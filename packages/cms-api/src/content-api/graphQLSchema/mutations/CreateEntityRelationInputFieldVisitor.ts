@@ -1,18 +1,19 @@
 import { GraphQLInputObjectType } from 'graphql'
 import { Model } from 'cms-common'
-import MutationProvider from '../MutationProvider'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
+import Authorizator from '../../../acl/Authorizator'
+import { Accessor } from '../../../utils/accessor'
+import EntityInputProvider from './EntityInputProvider'
+import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 
 export default class CreateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<GraphQLInputObjectType>, Model.RelationVisitor<GraphQLInputObjectType> {
-	private whereTypeBuilder: WhereTypeProvider
-	private mutationBuilder: MutationProvider
-
-	constructor(schema: Model.Schema, whereTypeBuilder: WhereTypeProvider, mutationBuilder: MutationProvider) {
-		this.whereTypeBuilder = whereTypeBuilder
-		this.mutationBuilder = mutationBuilder
-	}
+	constructor(
+		private authorizator: Authorizator,
+		private whereTypeBuilder: WhereTypeProvider,
+		private createEntityInputProviderAccessor: Accessor<EntityInputProvider<Authorizator.Operation.create>>
+	) {}
 
 	public visitColumn(): GraphQLInputObjectType {
 		throw new Error()
@@ -28,14 +29,21 @@ export default class CreateEntityRelationInputFieldVisitor
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
 			fields: () => {
 				const targetName = targetRelation ? targetRelation.name : undefined
-				return {
-					connect: {
+				const fields: GraphQLInputFieldConfigMap = {}
+
+				//todo this is not so easy, connect may require update of one of sides
+				if (this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+					fields['connect'] = {
 						type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
-					},
-					create: {
-						type: this.mutationBuilder.getCreateEntityInput(targetEntity.name, targetName)
 					}
 				}
+
+				if (this.authorizator.isAllowed(Authorizator.Operation.create, targetEntity.name)) {
+					fields['create'] = {
+						type: this.createEntityInputProviderAccessor.get().getInput(targetEntity.name, targetName)
+					}
+				}
+				return fields
 			}
 		})
 	}

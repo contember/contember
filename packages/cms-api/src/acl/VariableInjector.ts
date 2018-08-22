@@ -1,10 +1,7 @@
 import { Acl, Input } from 'cms-common'
 
 class VariableInjector {
-	public inject(
-		where: Input.Where<Acl.PredicateVariable>,
-		variables: Acl.VariablesMap
-	): Input.Where<Input.Condition<Input.ColumnValue>> {
+	public inject(where: Input.Where<Acl.PredicateVariable>, variables: Acl.VariablesMap): Input.Where {
 		return Object.keys(where).reduce((result, key) => {
 			const value = where[key]
 			if (value === undefined) {
@@ -20,7 +17,7 @@ class VariableInjector {
 		}, {})
 	}
 
-	private createCondition(variable: any): Input.Condition<Input.ColumnValue> {
+	private createCondition(variable: any): Input.Condition {
 		if (variable === undefined) {
 			return { never: true }
 		}

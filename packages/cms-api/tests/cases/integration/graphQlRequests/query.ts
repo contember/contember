@@ -463,7 +463,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name"
               from "category_locale" as "root_"
-              where ("root_"."locale" = $1) and ("root_"."category_id" in ($2, $3, $4))
+              where ((("root_"."locale" = $1))) and ("root_"."category_id" in ($2, $3, $4))
           `,
 						parameters: ['cs', testUuid(3), testUuid(4), testUuid(5)],
 						response: [
@@ -611,6 +611,7 @@ describe('Queries', () => {
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
+                       "root_author"."id" as "root_author_id",
                        "root_author"."id" as "root_author_id",
                        "root_author"."name" as "root_author_name",
                        "root_"."id" as "root_id"

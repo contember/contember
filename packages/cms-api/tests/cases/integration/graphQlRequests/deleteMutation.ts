@@ -26,7 +26,8 @@ describe('Delete mutation', () => {
 					{
 						sql: SQL`select
                      "root_"."id" as "root_id",
-                     "root_author"."id" as "root_author_id",
+                       "root_author"."id" as "root_author_id",
+                       "root_author"."id" as "root_author_id",
                      "root_author"."name" as "root_author_name"
                    from "post" as "root_" 
                      left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"

@@ -17,7 +17,8 @@ export default class FieldArgsVisitor
 		relation: Model.ManyHasManyInversedRelation,
 		targetEntity: Model.Entity
 	) {
-		return this.getHasManyArgs(relation, targetEntity)
+		const where = this.getWhereArg(relation)
+		return { where }
 	}
 
 	public visitManyHasManyOwner(
@@ -25,32 +26,35 @@ export default class FieldArgsVisitor
 		relation: Model.ManyHasManyOwnerRelation,
 		targetEntity: Model.Entity
 	) {
-		return this.getHasManyArgs(relation, targetEntity)
+		const where = this.getWhereArg(relation)
+		return { where }
 	}
 
 	public visitOneHasMany(entity: Model.Entity, relation: Model.OneHasManyRelation, targetEntity: Model.Entity) {
-		return this.getHasManyArgs(relation, targetEntity)
-	}
-
-	private getHasManyArgs(relation: Model.Relation, targetEntity: Model.Entity) {
-		return {
-			where: { type: this.whereTypeProvider.getEntityWhereType(relation.target) }
-		}
+		const where = this.getWhereArg(relation)
+		return { where }
 	}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
 		return undefined
 	}
 
-	public visitManyHasOne() {
-		return undefined
+	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation) {
+		const where = this.getWhereArg(relation)
+		return { where }
 	}
 
-	public visitOneHasOneInversed() {
-		return undefined
+	public visitOneHasOneInversed(entity: Model.Entity, relation: Model.OneHasOneInversedRelation) {
+		const where = this.getWhereArg(relation)
+		return { where }
 	}
 
-	public visitOneHasOneOwner() {
-		return undefined
+	public visitOneHasOneOwner(entity: Model.Entity, relation: Model.OneHasOneOwnerRelation) {
+		const where = this.getWhereArg(relation)
+		return { where }
+	}
+
+	private getWhereArg(relation: Model.Relation) {
+		return { type: this.whereTypeProvider.getEntityWhereType(relation.target) }
 	}
 }

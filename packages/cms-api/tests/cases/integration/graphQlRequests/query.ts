@@ -1066,4 +1066,71 @@ describe('Queries', () => {
 			}
 		})
 	})
+
+	it('Post with author filtered by name (where many has one)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author')))
+				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        query {
+          Posts {
+            id
+            author (where: {name: {eq: "John"}}) {
+              id
+            }
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."author_id" as "root_author"
+                     from "post" as "root_"`,
+						response: [
+							{
+								root_id: testUuid(1),
+								root_author: testUuid(2)
+							},
+							{
+								root_id: testUuid(3),
+								root_author: testUuid(4)
+							}
+						]
+					},
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
+                     from "author" as "root_"
+                     where "root_"."id" in ($1, $2) and "root_"."name" = $3`,
+						parameters: [testUuid(2), testUuid(4), 'John'],
+						response: [
+							{
+								root_id: testUuid(2)
+							}
+						]
+					}
+				])
+			],
+			return: {
+				data: {
+					Posts: [
+						{
+							id: testUuid(1),
+							author: {
+								id: testUuid(2)
+							}
+						},
+						{
+							id: testUuid(3),
+							author: null
+						}
+					]
+				}
+			}
+		})
+	})
 })

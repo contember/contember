@@ -155,7 +155,7 @@ type Mutation {
 }
 
 type Post {
-  Author: Author
+  author(where: AuthorWhere): Author
   id: UUID!
   publishedAt: DateTime
   locales(where: PostLocaleWhere): [PostLocale!]
@@ -173,7 +173,7 @@ input PostCreateCategoriesEntityRelationInput {
 }
 
 input PostCreateInput {
-  Author: PostCreateAuthorEntityRelationInput
+  author: PostCreateAuthorEntityRelationInput
   publishedAt: DateTime
   locales: [PostCreateLocalesEntityRelationInput!]
   categories: [PostCreateCategoriesEntityRelationInput!]
@@ -187,7 +187,7 @@ input PostCreateLocalesEntityRelationInput {
 type PostLocale {
   id: UUID!
   title: String
-  Post: Post
+  Post(where: PostWhere): Post
 }
 
 input PostLocaleCreateInput {
@@ -268,7 +268,7 @@ input PostUpdateCategoriesRelationInput {
 }
 
 input PostUpdateInput {
-  Author: PostUpdateAuthorEntityRelationInput
+  author: PostUpdateAuthorEntityRelationInput
   publishedAt: DateTime
   locales: [PostUpdateLocalesEntityRelationInput!]
   categories: [PostUpdateCategoriesEntityRelationInput!]
@@ -306,7 +306,7 @@ input PostUpsertLocalesRelationInput {
 }
 
 input PostWhere {
-  Author: AuthorWhere
+  author: AuthorWhere
   id: UUIDCondition
   publishedAt: DateTimeCondition
   locales: PostLocaleWhere
@@ -329,25 +329,25 @@ input PostWithoutAuthorUpdateInput {
 }
 
 input PostWithoutCategoriesCreateInput {
-  Author: PostCreateAuthorEntityRelationInput
+  author: PostCreateAuthorEntityRelationInput
   publishedAt: DateTime
   locales: [PostCreateLocalesEntityRelationInput!]
 }
 
 input PostWithoutCategoriesUpdateInput {
-  Author: PostUpdateAuthorEntityRelationInput
+  author: PostUpdateAuthorEntityRelationInput
   publishedAt: DateTime
   locales: [PostUpdateLocalesEntityRelationInput!]
 }
 
 input PostWithoutLocalesCreateInput {
-  Author: PostCreateAuthorEntityRelationInput
+  author: PostCreateAuthorEntityRelationInput
   publishedAt: DateTime
   categories: [PostCreateCategoriesEntityRelationInput!]
 }
 
 input PostWithoutLocalesUpdateInput {
-  Author: PostUpdateAuthorEntityRelationInput
+  author: PostUpdateAuthorEntityRelationInput
   publishedAt: DateTime
   categories: [PostUpdateCategoriesEntityRelationInput!]
 }

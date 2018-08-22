@@ -32,15 +32,15 @@ const testSchema = async (test: Test) => {
 	const textSchema = printSchema(graphQlSchema)
 
 	const filename = path.join(__dirname, test.graphQlSchemaFile)
-	let expectedSchema: Promise<string>
+	let expectedSchema: string
 	try {
-		expectedSchema = readFile(filename, { encoding: 'utf8' })
+		expectedSchema = await readFile(filename, { encoding: 'utf8' })
 	} catch (e) {
 		await writeFile(filename, textSchema, { encoding: 'utf8' })
 		throw new Error(`Schema file ${filename} not found, creating with current schema`)
 	}
 	if (expectedSchema) {
-		expect(textSchema).equals(await expectedSchema)
+		expect(textSchema).equals(expectedSchema)
 	}
 }
 
@@ -50,7 +50,9 @@ describe('build gql schema from model schema', () => {
 			schema: builder =>
 				builder
 					.entity('Author', e =>
-						e.column('name', c => c.type(Model.ColumnType.String)).oneHasMany('posts', r => r.target('Post'))
+						e
+							.column('name', c => c.type(Model.ColumnType.String))
+							.oneHasMany('posts', r => r.target('Post').ownedBy('author'))
 					)
 					.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 					.entity('Post', e =>

@@ -1,0 +1,153 @@
+type Mutation {
+  createRoot(data: RootCreateInput!): Root!
+  deleteRoot(where: RootUniqueWhere!): Root
+  updateRoot(where: RootUniqueWhere!, data: RootUpdateInput!): Root
+  createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntity!
+  deleteOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  updateOneHasManyEntity(where: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntity
+}
+
+type OneHasManyEntity {
+  id: UUID!
+  a: String
+  Root: Root
+}
+
+input OneHasManyEntityCreateInput {
+  a: String
+  Root: OneHasManyEntityCreateRootEntityRelationInput
+}
+
+input OneHasManyEntityCreateRootEntityRelationInput {
+  connect: RootUniqueWhere
+  create: Boolean
+}
+
+input OneHasManyEntityUniqueWhere {
+  id: UUID
+}
+
+input OneHasManyEntityUpdateInput {
+  a: String
+  Root: OneHasManyEntityUpdateRootEntityRelationInput
+}
+
+input OneHasManyEntityUpdateRootEntityRelationInput {
+  create: Boolean
+  update: Boolean
+  upsert: OneHasManyEntityUpsertRootRelationInput
+  connect: RootUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input OneHasManyEntityUpsertRootRelationInput {
+  update: Boolean
+  create: Boolean
+}
+
+input OneHasManyEntityWhere {
+  id: UUIDCondition
+  a: StringCondition
+  Root: RootWhere
+  and: [OneHasManyEntityWhere!]
+  or: [OneHasManyEntityWhere!]
+  not: OneHasManyEntityWhere
+}
+
+input OneHasManyEntityWithoutRootCreateInput {
+  a: String
+}
+
+input OneHasManyEntityWithoutRootUpdateInput {
+  a: String
+}
+
+type Query {
+  Root(where: RootUniqueWhere!): Root
+  Roots(where: RootWhere): [Root]
+  OneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  OneHasManyEntitys(where: OneHasManyEntityWhere): [OneHasManyEntity]
+}
+
+type Root {
+  id: UUID!
+  r(where: OneHasManyEntityWhere): [OneHasManyEntity!]
+}
+
+input RootCreateInput {
+  r: [RootCreateREntityRelationInput!]
+}
+
+input RootCreateREntityRelationInput {
+  connect: OneHasManyEntityUniqueWhere
+  create: OneHasManyEntityWithoutRootCreateInput
+}
+
+input RootUniqueWhere {
+  id: UUID
+}
+
+input RootUpdateInput {
+  r: [RootUpdateREntityRelationInput!]
+}
+
+input RootUpdateREntityRelationInput {
+  create: OneHasManyEntityWithoutRootCreateInput
+  update: RootUpdateRRelationInput
+  upsert: RootUpsertRRelationInput
+  delete: OneHasManyEntityUniqueWhere
+  connect: OneHasManyEntityUniqueWhere
+  disconnect: OneHasManyEntityUniqueWhere
+}
+
+input RootUpdateRRelationInput {
+  where: OneHasManyEntityUniqueWhere
+  data: OneHasManyEntityWithoutRootUpdateInput
+}
+
+input RootUpsertRRelationInput {
+  where: OneHasManyEntityUniqueWhere
+  update: OneHasManyEntityWithoutRootUpdateInput
+  create: OneHasManyEntityWithoutRootCreateInput
+}
+
+input RootWhere {
+  id: UUIDCondition
+  r: OneHasManyEntityWhere
+  and: [RootWhere!]
+  or: [RootWhere!]
+  not: RootWhere
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  eq: String
+  null: Boolean
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+}
+
+scalar UUID
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  eq: UUID
+  null: Boolean
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}

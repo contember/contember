@@ -791,4 +791,279 @@ describe('Queries', () => {
 			}
 		})
 	})
+
+	it('Post by author name (where one has many)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author')))
+				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        query {
+          Posts(where: {author: {name: {eq: "John"}}}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_author"."id" as "root_author_id"
+                     from "post" as "root_" left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
+                     where "root_author"."name" = $1`,
+						parameters: ['John'],
+						response: [
+							{
+								root_id: testUuid(1)
+							},
+							{
+								root_id: testUuid(3)
+							}
+						]
+					}
+				])
+			],
+			return: {
+				data: {
+					Posts: [
+						{
+							id: testUuid(1)
+						},
+						{
+							id: testUuid(3)
+						}
+					]
+				}
+			}
+		})
+	})
+
+	it('Author by post title (where many has one)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity
+						.manyHasOne('author', relation => relation.target('Author').inversedBy('posts'))
+						.column('title', column => column.type(Model.ColumnType.String))
+				)
+				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        query {
+          Authors(where: {posts: {title: {eq: "Hello"}}}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "author" as "root_"
+                     where "root_"."id" in (select "root_"."author_id"
+                                            from "post" as "root_"
+                                            where "root_"."title" = $1)`,
+						parameters: ['Hello'],
+						response: [
+							{
+								root_id: testUuid(1)
+							},
+							{
+								root_id: testUuid(3)
+							}
+						]
+					}
+				])
+			],
+			return: {
+				data: {
+					Authors: [
+						{
+							id: testUuid(1)
+						},
+						{
+							id: testUuid(3)
+						}
+					]
+				}
+			}
+		})
+	})
+
+	it('Post by category name (where many has many owner)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity.manyHasMany('categories', relation =>
+						relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					)
+				)
+				.buildSchema(),
+			query: GQL`
+        query {
+          Posts(where: {categories: {name: {eq: "Stuff"}}}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"
+                     where "root_"."id" in (select "junction_"."post_id"
+                                            from "post_categories" as "junction_" inner join "category" as "root_" on "junction_"."category_id" = "root_"."id"
+                                            where "root_"."name" = $1)`,
+						parameters: ['Stuff'],
+						response: [
+							{
+								root_id: testUuid(1)
+							},
+							{
+								root_id: testUuid(3)
+							}
+						]
+					}
+				])
+			],
+			return: {
+				data: {
+					Posts: [
+						{
+							id: testUuid(1)
+						},
+						{
+							id: testUuid(3)
+						}
+					]
+				}
+			}
+		})
+	})
+
+	it('Post by category ids (where many has many owner)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity.manyHasMany('categories', relation =>
+						relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					)
+				)
+				.buildSchema(),
+			query: GQL`
+        query {
+          Posts(where: {categories: {id: {in: ["${testUuid(10)}", "${testUuid(11)}"]}}}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "post" as "root_"
+                     where "root_"."id" in (select "junction_"."post_id"
+                                            from "post_categories" as "junction_" inner join "category" as "root_" on "junction_"."category_id" = "root_"."id"
+                                            where "root_"."id" in ($1, $2))`,
+						parameters: [testUuid(10), testUuid(11)],
+						response: [
+							{
+								root_id: testUuid(1)
+							},
+							{
+								root_id: testUuid(3)
+							}
+						]
+					}
+				])
+			],
+			return: {
+				data: {
+					Posts: [
+						{
+							id: testUuid(1)
+						},
+						{
+							id: testUuid(3)
+						}
+					]
+				}
+			}
+		})
+	})
+
+	it('Posts with locales query with where (one has many)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post'))
+				)
+				.entity('PostLocale', entity =>
+					entity
+						.column('locale', column => column.type(Model.ColumnType.String))
+						.column('title', column => column.type(Model.ColumnType.String))
+				)
+				.buildSchema(),
+			query: GQL`
+        query {
+          Posts {
+            id
+            locales(where: {locale: {eq: "cs"}}) {
+              id
+              locale
+              title
+            }
+          }
+        }
+      `,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
+                     from "post" as "root_"`,
+						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }]
+					},
+					{
+						sql: SQL`select
+                       "root_"."post_id" as "__grouping_key",
+                       "root_"."id" as "root_id",
+                       "root_"."locale" as "root_locale",
+                       "root_"."title" as "root_title"
+                     from "post_locale" as "root_"
+                     where "root_"."locale" = $1 and "root_"."post_id" in ($2, $3)`,
+						parameters: ['cs', testUuid(1), testUuid(2)],
+						response: [
+							{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
+							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) }
+						]
+					}
+				])
+			],
+			return: {
+				data: {
+					Posts: [
+						{
+							id: testUuid(1),
+							locales: [
+								{
+									id: testUuid(3),
+									locale: 'cs',
+									title: 'ahoj svete'
+								}
+							]
+						},
+						{
+							id: testUuid(2),
+							locales: [
+								{
+									id: testUuid(5),
+									locale: 'cs',
+									title: 'dalsi clanek'
+								}
+							]
+						}
+					]
+				}
+			}
+		})
+	})
 })

@@ -1,14 +1,14 @@
 import { expect } from 'chai'
-import { graphql, printSchema } from 'graphql'
+import { graphql } from 'graphql'
 import { maskErrors } from 'graphql-errors'
 import * as knex from 'knex'
 import * as mockKnex from 'mock-knex'
-import GraphQlSchemaBuilder from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilder'
 import { testUuid } from './testUuid'
 import * as uuid from '../../src/utils/uuid'
 import * as sinon from 'sinon'
-import { Model } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
+import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
 
 export interface SqlQuery {
 	sql: string
@@ -36,7 +36,8 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 }
 
 export const execute = async (test: Test) => {
-	const builder = new GraphQlSchemaBuilderFactory().create(test.schema)
+	const permissions: Acl.Permissions = new AllowAllPermissionFactory().create(test.schema)
+	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, permissions)
 	const graphQLSchema = builder.build()
 
 	// console.log(printSchema(graphQLSchema))

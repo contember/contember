@@ -1,19 +1,21 @@
 import { GraphQLBoolean, GraphQLInputObjectType } from 'graphql'
 import { Model } from 'cms-common'
-import MutationProvider from '../MutationProvider'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
 import { isIt } from '../../../utils/type'
+import { Accessor } from '../../../utils/accessor'
+import EntityInputProvider from './EntityInputProvider'
+import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
+import Authorizator from '../../../acl/Authorizator'
 
 export default class UpdateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<GraphQLInputObjectType>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType> {
-	private whereTypeBuilder: WhereTypeProvider
-	private mutationBuilder: MutationProvider
-
-	constructor(schema: Model.Schema, whereTypeBuilder: WhereTypeProvider, mutationBuilder: MutationProvider) {
-		this.whereTypeBuilder = whereTypeBuilder
-		this.mutationBuilder = mutationBuilder
-	}
+	constructor(
+		private authorizator: Authorizator,
+		private whereTypeBuilder: WhereTypeProvider,
+		private updateEntityInputProviderAccessor: Accessor<EntityInputProvider<Authorizator.Operation.update>>,
+		private createEntityInputProvider: EntityInputProvider<Authorizator.Operation.create>
+	) {}
 
 	public visitColumn(): GraphQLInputObjectType {
 		throw new Error()
@@ -28,16 +30,25 @@ export default class UpdateEntityRelationInputFieldVisitor
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
 			fields: () => {
+				const withoutRelation = targetRelation ? targetRelation.name : undefined
+
+				const updateInput = {
+					type: this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
+				}
+				const createInput = { type: this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation) }
 				const whereInput = { type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name) }
 
-				const withoutRelation = targetRelation ? targetRelation.name : undefined
-				const updateInput = { type: this.mutationBuilder.getUpdateEntityInput(targetEntity.name, withoutRelation) }
-				const createInput = { type: this.mutationBuilder.getCreateEntityInput(targetEntity.name, withoutRelation) }
-
-				return {
-					create: createInput,
-					update: updateInput,
-					upsert: {
+				const fields: GraphQLInputFieldConfigMap = {}
+				if (this.authorizator.isAllowed(Authorizator.Operation.create, targetEntity.name)) {
+					fields['create'] = createInput
+				}
+				if (this.authorizator.isAllowed(Authorizator.Operation.update, targetEntity.name)) {
+					fields['update'] = updateInput
+				}
+				if (
+					this.authorizator.isAllowed([Authorizator.Operation.update, Authorizator.Operation.create], targetEntity.name)
+				) {
+					fields['upsert'] = {
 						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 							fields: () => ({
@@ -45,20 +56,26 @@ export default class UpdateEntityRelationInputFieldVisitor
 								create: createInput
 							})
 						})
-					},
-
-					connect: whereInput,
-					...(relation.nullable
-						? {
-								disconnect: {
-									type: GraphQLBoolean
-								},
-								delete: {
-									type: GraphQLBoolean
-								}
-						  }
-						: {})
+					}
 				}
+
+				//fixme this is not so easy, connect may require update of one of sides
+				if (this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+					fields['connect'] = whereInput
+				}
+
+				//fixme this is not so easy, disconnect may require update of one of sides
+				if (relation.nullable) {
+					fields['disconnect'] = { type: GraphQLBoolean }
+				}
+
+				if (relation.nullable && this.authorizator.isAllowed(Authorizator.Operation.delete, targetEntity.name)) {
+					if (relation.nullable) {
+						fields['delete'] = { type: GraphQLBoolean }
+					}
+				}
+
+				return fields
 			}
 		})
 	}
@@ -78,13 +95,21 @@ export default class UpdateEntityRelationInputFieldVisitor
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
 			fields: () => {
 				const withoutRelation = targetRelation ? targetRelation.name : undefined
-				const createInput = { type: this.mutationBuilder.getCreateEntityInput(targetEntity.name, withoutRelation) }
-				const updateInput = { type: this.mutationBuilder.getUpdateEntityInput(targetEntity.name, withoutRelation) }
 
+				const createInput = { type: this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation) }
+				const updateInput = {
+					type: this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
+				}
 				const whereInput = { type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name) }
-				return {
-					create: createInput,
-					update: {
+
+				const fields: GraphQLInputFieldConfigMap = {}
+
+				if (this.authorizator.isAllowed(Authorizator.Operation.create, targetEntity.name)) {
+					fields['create'] = createInput
+				}
+
+				if (this.authorizator.isAllowed(Authorizator.Operation.update, targetEntity.name)) {
+					fields['update'] = {
 						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
 							fields: () => ({
@@ -92,8 +117,13 @@ export default class UpdateEntityRelationInputFieldVisitor
 								data: updateInput
 							})
 						})
-					},
-					upsert: {
+					}
+				}
+
+				if (
+					this.authorizator.isAllowed([Authorizator.Operation.update, Authorizator.Operation.create], targetEntity.name)
+				) {
+					fields['upsert'] = {
 						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 							fields: () => ({
@@ -102,15 +132,24 @@ export default class UpdateEntityRelationInputFieldVisitor
 								create: createInput
 							})
 						})
-					},
-					delete: whereInput,
-					connect: whereInput,
-					...(canDisconnect
-						? {
-								disconnect: whereInput
-						  }
-						: {})
+					}
 				}
+
+				if (this.authorizator.isAllowed(Authorizator.Operation.delete, targetEntity.name)) {
+					fields['delete'] = whereInput
+				}
+
+				//fixme this is not so easy, connect may require update of one of sides
+				if (this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+					fields['connect'] = whereInput
+				}
+
+				//fixme this is not so easy, disconnect may require update of one of sides
+				if (canDisconnect && this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+					fields['disconnect'] = whereInput
+				}
+
+				return fields
 			}
 		})
 	}

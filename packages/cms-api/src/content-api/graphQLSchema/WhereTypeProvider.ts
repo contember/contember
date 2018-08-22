@@ -8,30 +8,24 @@ import { isIt } from '../../utils/type'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import ConditionTypeProvider from './ConditionTypeProvider'
 import { GqlTypeName } from './utils'
+import Authorizator from '../../acl/Authorizator'
 
 export default class WhereTypeProvider {
-	private schema: Model.Schema
-
 	private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))
 	private uniqueWhereSingleton = singletonFactory(name => this.createEntityUniqueWhereType(name))
-	private columnTypeResolver: ColumnTypeResolver
-	private conditionTypeProvider: ConditionTypeProvider
 
 	constructor(
-		schema: Model.Schema,
-		columnTypeResolver: ColumnTypeResolver,
-		conditionTypeProvider: ConditionTypeProvider
-	) {
-		this.schema = schema
-		this.columnTypeResolver = columnTypeResolver
-		this.conditionTypeProvider = conditionTypeProvider
-	}
+		private readonly schema: Model.Schema,
+		private readonly authorizator: Authorizator,
+		private readonly columnTypeResolver: ColumnTypeResolver,
+		private readonly conditionTypeProvider: ConditionTypeProvider
+	) {}
 
 	public getEntityWhereType(entityName: string): GraphQLInputObjectType {
 		return this.whereSingleton(entityName)
 	}
 
-	public getEntityUniqueWhereType(entityName: string) {
+	public getEntityUniqueWhereType(entityName: string): GraphQLInputObjectType {
 		return this.uniqueWhereSingleton(entityName)
 	}
 
@@ -48,7 +42,11 @@ export default class WhereTypeProvider {
 		const entity = getEntity(this.schema, entityName)
 
 		const combinations: string[] = []
-		const uniqueKeys: string[][] = [[entity.primary], ...Object.values(entity.unique).map(it => it.fields)]
+		const uniqueKeys: string[][] = [[entity.primary], ...Object.values(entity.unique)
+			.map(it => it.fields)]
+			.filter(uniqueKey =>
+				uniqueKey.every(it => this.authorizator.isAllowed(Authorizator.Operation.read, entityName, it))
+			)
 		for (const uniqueKey of uniqueKeys) {
 			combinations.push(uniqueKey.join(', '))
 		}
@@ -57,12 +55,11 @@ export default class WhereTypeProvider {
 		return new GraphQLInputObjectType({
 			name: capitalizeFirstLetter(entityName) + 'UniqueWhere',
 			// description: description, generates invalid schema file
-			fields: () => this.getUniqueWhereFields(entity)
+			fields: () => this.getUniqueWhereFields(entity, uniqueKeys)
 		})
 	}
 
-	private getUniqueWhereFields(entity: Model.Entity) {
-		const uniqueKeys: string[][] = [[entity.primary], ...Object.values(entity.unique).map(it => it.fields)]
+	private getUniqueWhereFields(entity: Model.Entity, uniqueKeys: string[][]) {
 		const fields: GraphQLInputFieldConfigMap = {}
 		for (const uniqueKey of uniqueKeys) {
 			for (const field of uniqueKey) {
@@ -79,7 +76,7 @@ export default class WhereTypeProvider {
 								}
 							})
 						}
-						throw new Error('Only column or owning relation can be a part of unique kkey')
+						throw new Error('Only column or owning relation can be a part of unique key')
 					},
 					visitColumn: (entity, column) => ({ type: this.columnTypeResolver.getType(column) })
 				})
@@ -96,6 +93,10 @@ export default class WhereTypeProvider {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
 				continue
 			}
+			if (!this.authorizator.isAllowed(Authorizator.Operation.read, entity.name, fieldName)) {
+				continue
+			}
+
 			fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
 				visitColumn: (entity, column) => ({ type: this.conditionTypeProvider.getCondition(column) }),
 				visitRelation: (entity, relation) => ({ type: this.getEntityWhereType(relation.target) })

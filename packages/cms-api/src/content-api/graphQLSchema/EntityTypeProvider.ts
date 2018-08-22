@@ -7,20 +7,18 @@ import FieldTypeVisitor from './entities/FieldTypeVisitor'
 import FieldArgsVisitor from './entities/FieldArgsVisitor'
 import { GqlTypeName } from './utils'
 import WhereTypeProvider from './WhereTypeProvider'
+import Authorizator from '../../acl/Authorizator'
 import { GraphQLFieldResolver } from 'graphql/type/definition'
 
 export default class EntityTypeProvider {
-	private schema: Model.Schema
-	private columnTypeResolver: ColumnTypeResolver
-	private whereTypeProvider: WhereTypeProvider
-
 	private entities = singletonFactory(name => this.createEntity(name))
 
-	constructor(schema: Model.Schema, columnTypeResolver: ColumnTypeResolver, whereTypeProvider: WhereTypeProvider) {
-		this.schema = schema
-		this.columnTypeResolver = columnTypeResolver
-		this.whereTypeProvider = whereTypeProvider
-	}
+	constructor(
+		private schema: Model.Schema,
+		private authorizator: Authorizator,
+		private columnTypeResolver: ColumnTypeResolver,
+		private whereTypeProvider: WhereTypeProvider
+	) {}
 
 	public getEntity(entityName: string): GraphQLObjectType {
 		return this.entities(entityName)
@@ -39,6 +37,9 @@ export default class EntityTypeProvider {
 
 		for (const fieldName in entity.fields) {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
+				continue
+			}
+			if (!this.authorizator.isAllowed(Authorizator.Operation.read, entityName, fieldName)) {
 				continue
 			}
 

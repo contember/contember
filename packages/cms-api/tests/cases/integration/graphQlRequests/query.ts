@@ -961,8 +961,8 @@ describe('Queries', () => {
 						sql: SQL`select "root_"."id" as "root_id"
                      from "post" as "root_"
                      where "root_"."id" in (select "junction_"."post_id"
-                                            from "post_categories" as "junction_" inner join "category" as "root_" on "junction_"."category_id" = "root_"."id"
-                                            where "root_"."id" in ($1, $2))`,
+                                            from "post_categories" as "junction_"
+                                            where "junction_"."category_id" in ($1, $2))`,
 						parameters: [testUuid(10), testUuid(11)],
 						response: [
 							{

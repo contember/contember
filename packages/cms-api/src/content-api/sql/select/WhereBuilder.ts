@@ -82,17 +82,9 @@ export default class WhereBuilder {
 					}
 					const relationWhere = where[fieldName] as Input.Where
 
-					whereClause.in([tableName, entity.primaryColumn], qb => {
-						qb.from(targetRelation.joiningTable.tableName, 'junction_')
-						qb.select(['junction_', targetRelation.joiningTable.inverseJoiningColumn.columnName])
-						qb.join(targetEntity.tableName, 'root_', clause =>
-							clause.compareColumns(['junction_', targetRelation.joiningTable.joiningColumn.columnName], '=', [
-								'root_',
-								targetEntity.primary
-							])
-						)
-						qb.where(clause => this.buildInternal(qb, clause, targetEntity, new Path([]), relationWhere, true))
-					})
+					whereClause.in([tableName, entity.primaryColumn], qb =>
+						this.createManyHasManySubquery(qb, relationWhere, targetEntity, targetRelation.joiningTable, 'inversed')
+					)
 				},
 				visitManyHasManyOwner: (entity, relation, targetEntity) => {
 					if (allowManyJoin) {
@@ -102,17 +94,9 @@ export default class WhereBuilder {
 
 					const relationWhere = where[fieldName] as Input.Where
 
-					whereClause.in([tableName, entity.primaryColumn], qb => {
-						qb.from(relation.joiningTable.tableName, 'junction_')
-						qb.select(['junction_', relation.joiningTable.joiningColumn.columnName])
-						qb.join(targetEntity.tableName, 'root_', clause =>
-							clause.compareColumns(['junction_', relation.joiningTable.inverseJoiningColumn.columnName], '=', [
-								'root_',
-								targetEntity.primary
-							])
-						)
-						qb.where(clause => this.buildInternal(qb, clause, targetEntity, new Path([]), relationWhere, true))
-					})
+					whereClause.in([tableName, entity.primaryColumn], qb =>
+						this.createManyHasManySubquery(qb, relationWhere, targetEntity, relation.joiningTable, 'owner')
+					)
 				},
 				visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
 					if (allowManyJoin) {
@@ -130,6 +114,31 @@ export default class WhereBuilder {
 				}
 			})
 		}
+	}
+
+	private createManyHasManySubquery(
+		qb: QueryBuilder,
+		relationWhere: Input.Where,
+		targetEntity: Model.Entity,
+		joiningTable: Model.JoiningTable,
+		fromSide: 'owner' | 'inversed'
+	) {
+		const fromColumn =
+			fromSide === 'owner' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
+		const toColumn =
+			fromSide === 'owner' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
+		qb.from(joiningTable.tableName, 'junction_')
+		qb.select(['junction_', fromColumn])
+		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
+		if (primaryCondition !== null) {
+			qb.where(whereClause => this.conditionBuilder.build(whereClause, 'junction_', toColumn, primaryCondition))
+			return
+		}
+
+		qb.join(targetEntity.tableName, 'root_', clause =>
+			clause.compareColumns(['junction_', toColumn], '=', ['root_', targetEntity.primary])
+		)
+		qb.where(clause => this.buildInternal(qb, clause, targetEntity, new Path([]), relationWhere, true))
 	}
 
 	private transformWhereToPrimaryCondition(where: Input.Where, primaryField: string): Input.Condition<never> | null {

@@ -10,7 +10,7 @@ type Mutation {
 type OneHasManyEntity {
   id: UUID!
   a: String
-  Root: Root
+  Root(where: RootWhere): Root
 }
 
 input OneHasManyEntityCreateInput {

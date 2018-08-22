@@ -1,4 +1,4 @@
-import { applyMiddleware, createStore, Middleware, Store, compose, Reducer } from 'redux'
+import { applyMiddleware, createStore, Middleware, Store as ReduxStore, compose, Reducer } from 'redux'
 
 import thunk from 'redux-thunk'
 import rootReducer from '../reducer'
@@ -6,8 +6,9 @@ import State from '../state'
 import LocalStorageManager from '../model/LocalStorageManager'
 import GraphqlClient from '../model/GraphqlClient'
 import ContentClientFactory from '../model/ContentClientFactory'
-import { createAction } from 'redux-actions'
+import { Dispatch } from '../actions/types'
 import { SET_TOKEN } from '../reducer/auth'
+import { createAction } from 'redux-actions'
 
 export interface Services {
 	localStorageManager: LocalStorageManager
@@ -26,9 +27,13 @@ export function createServices(): Services {
 	}
 }
 
+export interface Store extends ReduxStore<State> {
+	dispatch: Dispatch
+}
+
 export function persistState(services: Services) {
-	return (next: Function) => (reducer: Reducer, initialState: State): Store<State> => {
-		const store: Store<State> = next(reducer, initialState)
+	return (next: Function) => (reducer: Reducer, initialState: State): Store => {
+		const store: Store = next(reducer, initialState)
 
 		const persistedApiToken = services.localStorageManager.get(LocalStorageManager.Keys.API_TOKEN)
 		if (persistedApiToken) {
@@ -49,12 +54,13 @@ export function persistState(services: Services) {
 	}
 }
 
-export function configureStore(initialState: State): Store<State, any> {
+export function configureStore(initialState: State): Store {
 	const composeEnhancers: typeof compose = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 	const services = createServices()
 	const middlewares: Middleware[] = [thunk.withExtraArgument(services)]
 
 	const middlewareEnhancer = applyMiddleware(...middlewares)
 
-	return createStore(rootReducer, initialState, composeEnhancers(middlewareEnhancer, persistState(services)))
+	// "as any" is a workaround for typescript exceeding max call stack size (tsc's bug)
+	return (createStore as any)(rootReducer, initialState, composeEnhancers(middlewareEnhancer, persistState(services)))
 }

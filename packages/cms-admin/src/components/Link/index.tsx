@@ -1,10 +1,11 @@
 import * as React from 'react'
-import RequestState, { RequestChange } from '../../state/request'
-import { buildUrlFromRequest } from '../../utils/url'
+import { RequestChange } from '../../state/request'
+import { requestStateToPath } from '../../utils/url'
 import { connect } from 'react-redux'
 import State from '../../state'
 import { Dispatch } from '../../actions/types'
 import { pushRequest } from '../../actions/request'
+import routes from '../../routes'
 
 class Link extends React.PureComponent<Link.Props, Link.State> {
 	onClick: React.MouseEventHandler = e => {
@@ -49,8 +50,8 @@ namespace Link {
 }
 
 export default connect<Link.StateProps, Link.DispatchProps, Link.OwnProps, State>(
-	({ view }, { requestChange }) => ({
-		url: buildUrlFromRequest(requestChange())
+	({ view, projectsConfigs }, { requestChange }) => ({
+		url: requestStateToPath(routes(projectsConfigs.configs), requestChange())
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) })
 )(Link)

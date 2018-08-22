@@ -65,7 +65,8 @@ class ContentMiddlewareFactoryMiddlewareFactory {
 
 					return {
 						db: db,
-						identityId: res.locals.authResult.identityId
+						identityId: res.locals.authResult.identityId,
+						identityVariables: {} ///todo by identity
 					}
 				}
 			})

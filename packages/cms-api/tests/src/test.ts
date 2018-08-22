@@ -17,7 +17,9 @@ export interface SqlQuery {
 }
 
 export interface Test {
-	schema: Pick<Model.Schema, 'enums' | 'entities'>
+	schema: Model.Schema
+	permissions?: Acl.Permissions
+	variables?: Acl.VariablesMap
 	query: string
 	executes: SqlQuery[]
 	return: object
@@ -36,7 +38,7 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 }
 
 export const execute = async (test: Test) => {
-	const permissions: Acl.Permissions = new AllowAllPermissionFactory().create(test.schema)
+	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
 	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, permissions)
 	const graphQLSchema = builder.build()
 
@@ -59,7 +61,7 @@ export const execute = async (test: Test) => {
 	let failed: number | null = null
 	tracker.on('query', (query, step) => {
 		const queryDefinition = test.executes[step - 1]
-		if (failed === step - 1 && query.sql === 'ROLLBACK;') {
+		if (query.sql === 'ROLLBACK;') {
 			query.response([])
 			return
 		}
@@ -79,7 +81,10 @@ export const execute = async (test: Test) => {
 		}
 		query.response(queryDefinition.response || [])
 	})
-	const response = await graphql(graphQLSchema, test.query, null, { db: connection })
+	const response = await graphql(graphQLSchema, test.query, null, {
+		db: connection,
+		identityVariables: test.variables || {}
+	})
 	// console.log(response)
 	expect(response).deep.equal(test.return)
 	tracker.uninstall()

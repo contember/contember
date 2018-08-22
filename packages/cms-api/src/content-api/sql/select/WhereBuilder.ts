@@ -21,11 +21,11 @@ export default class WhereBuilder {
 		allowManyJoin: boolean = false
 	): void {
 		const tableName = path.getAlias()
-		if (where.and !== undefined) {
+		if (where.and !== undefined && where.and.length > 0) {
 			const expr = where.and
 			qb.andWhere(qb => expr.map((where: Input.Where) => this.build(qb, entity, path, where)))
 		}
-		if (where.or !== undefined) {
+		if (where.or !== undefined && where.or.length > 0) {
 			const expr = where.or
 			qb.andWhere(qb => expr.map((where: Input.Where) => qb.orWhere(qb => this.build(qb, entity, path, where))))
 		}

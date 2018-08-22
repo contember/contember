@@ -11,6 +11,16 @@ export default class GraphQlSchemaBuilder {
 	) {}
 
 	public build() {
+		const mutations = Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>(
+			(mutations, entityName) => {
+				return {
+					...this.mutationProvider.getMutations(entityName),
+					...mutations
+				}
+			},
+			{}
+		)
+
 		return new GraphQLSchema({
 			query: new GraphQLObjectType({
 				name: 'Query',
@@ -22,16 +32,14 @@ export default class GraphQlSchemaBuilder {
 						}
 					}, {})
 			}),
-			mutation: new GraphQLObjectType({
-				name: 'Mutation',
-				fields: () =>
-					Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((mutations, entityName) => {
-						return {
-							...this.mutationProvider.getMutations(entityName),
-							...mutations
-						}
-					}, {})
-			})
+			...(Object.keys(mutations).length > 0
+				? {
+						mutation: new GraphQLObjectType({
+							name: 'Mutation',
+							fields: () => mutations
+						})
+				  }
+				: {})
 		})
 	}
 }

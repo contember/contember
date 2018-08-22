@@ -19,6 +19,8 @@ import EntityInputProvider from './mutations/EntityInputProvider'
 import ReadResolver from '../graphQlResolver/ReadResolver'
 import Authorizator from '../../acl/Authorizator'
 import MutationResolver from '../graphQlResolver/MutationResolver'
+import VariableInjector from '../../acl/VariableInjector'
+import PredicatesInjector from '../../acl/PredicatesInjector'
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -27,7 +29,9 @@ export default class GraphQlSchemaBuilderFactory {
 		const conditionTypeProvider = new ConditionTypeProvider(columnTypeResolver)
 		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
 		const entityTypeProvider = new EntityTypeProvider(schema, authorizator, columnTypeResolver, whereTypeProvider)
-		const readResolver = new ReadResolver(schema)
+		const variableInjector = new VariableInjector()
+		const predicatesInjector = new PredicatesInjector(schema, permissions, variableInjector)
+		const readResolver = new ReadResolver(schema, predicatesInjector)
 		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, readResolver)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<Authorizator.Operation.create>>()

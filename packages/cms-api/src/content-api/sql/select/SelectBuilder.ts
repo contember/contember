@@ -49,6 +49,10 @@ export default class SelectBuilder {
 	}
 
 	private async selectInternal(entity: Model.Entity, path: Path, input: ObjectNode) {
+		if (!input.fields.find(it => it.name === entity.primary && it.alias === entity.primary)) {
+			this.addColumn(path, entity.fields[entity.primary] as Model.AnyColumn, entity.primary)
+		}
+
 		const promises: Promise<void>[] = []
 		for (let field of input.fields) {
 			const promise = acceptFieldVisitor(this.schema, entity, field.name, {

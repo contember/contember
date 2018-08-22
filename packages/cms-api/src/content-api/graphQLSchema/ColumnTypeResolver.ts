@@ -1,6 +1,6 @@
 import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLScalarType, GraphQLString } from 'graphql'
 import { Model } from 'cms-common'
-import { GraphQLUUID } from './customTypes'
+import { GraphQLDate, GraphQLDateTime, GraphQLUUID } from './customTypes'
 import EnumsProvider from './EnumsProvider'
 
 export default class ColumnTypeResolver {
@@ -12,7 +12,7 @@ export default class ColumnTypeResolver {
 		this.enumsProvider = enumsProvider
 	}
 
-	public getType(column: Model.AnyColumn): GraphQLScalarType | GraphQLEnumType {
+	public getType(column: Model.AnyColumnDefinition): GraphQLScalarType | GraphQLEnumType {
 		switch (column.type) {
 			case Model.ColumnType.Int:
 				return GraphQLInt
@@ -25,8 +25,9 @@ export default class ColumnTypeResolver {
 			case Model.ColumnType.Bool:
 				return GraphQLBoolean
 			case Model.ColumnType.DateTime:
+				return GraphQLDateTime
 			case Model.ColumnType.Date:
-				return GraphQLString // todo
+				return GraphQLDate
 			case Model.ColumnType.Enum:
 				if (this.enumsProvider.hasEnum(column.enumName)) {
 					return this.enumsProvider.getEnum(column.enumName)

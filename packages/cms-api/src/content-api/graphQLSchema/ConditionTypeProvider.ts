@@ -1,5 +1,5 @@
 import { Model } from 'cms-common'
-import { GraphQLBoolean, GraphQLInputObjectType, GraphQLList } from 'graphql'
+import { GraphQLBoolean, GraphQLEnumType, GraphQLInputObjectType, GraphQLList, GraphQLScalarType } from 'graphql'
 import { GraphQLNonNull } from 'graphql/type/definition'
 import singletonFactory from '../../utils/singletonFactory'
 import ColumnTypeResolver from './ColumnTypeResolver'
@@ -7,35 +7,37 @@ import { GqlTypeName } from './utils'
 
 export default class ConditionTypeProvider {
 	private columnTypeResolver: ColumnTypeResolver
-	private conditions = singletonFactory<GraphQLInputObjectType, Model.AnyColumn>(column => this.createCondition(column))
+	private conditions = singletonFactory<GraphQLInputObjectType, string, GraphQLScalarType | GraphQLEnumType>(
+		(name, type) => this.createCondition(type)
+	)
 
 	constructor(columnTypeResolver: ColumnTypeResolver) {
 		this.columnTypeResolver = columnTypeResolver
 	}
 
-	public getCondition(column: Model.AnyColumn): GraphQLInputObjectType {
-		return this.conditions(column)
+	public getCondition(column: Model.AnyColumnDefinition): GraphQLInputObjectType {
+		const basicType = this.columnTypeResolver.getType(column)
+		return this.conditions(basicType.name, basicType)
 	}
 
-	private createCondition(column: Model.AnyColumn) {
-		const basicType = this.columnTypeResolver.getType(column)
-
+	private createCondition(type: GraphQLScalarType | GraphQLEnumType): GraphQLInputObjectType {
+		const suffix = type instanceof GraphQLEnumType ? 'Enum' : ''
 		const condition: GraphQLInputObjectType = new GraphQLInputObjectType({
-			name: GqlTypeName`${column.name}Condition`,
+			name: GqlTypeName`${type.name}${suffix}Condition`,
 			fields: () => ({
 				and: { type: new GraphQLList(new GraphQLNonNull(condition)) },
 				or: { type: new GraphQLList(new GraphQLNonNull(condition)) },
 				not: { type: condition },
 
-				eq: { type: basicType },
+				eq: { type: type },
 				null: { type: GraphQLBoolean },
-				notEq: { type: basicType },
-				in: { type: new GraphQLList(new GraphQLNonNull(basicType)) },
-				notIn: { type: new GraphQLList(new GraphQLNonNull(basicType)) },
-				lt: { type: basicType },
-				lte: { type: basicType },
-				gt: { type: basicType },
-				gte: { type: basicType }
+				notEq: { type: type },
+				in: { type: new GraphQLList(new GraphQLNonNull(type)) },
+				notIn: { type: new GraphQLList(new GraphQLNonNull(type)) },
+				lt: { type: type },
+				lte: { type: type },
+				gt: { type: type },
+				gte: { type: type }
 			})
 		})
 		return condition

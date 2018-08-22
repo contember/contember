@@ -104,7 +104,7 @@ namespace Input {
 		| UpsertSpecifiedRelationInput<E>
 	>
 
-	export interface Condition<T> {
+	export interface Condition<T = ColumnValue> {
 		and?: Array<Condition<T>>
 		or?: Array<Condition<T>>
 		not?: Condition<T>
@@ -118,6 +118,8 @@ namespace Input {
 		lte?: T
 		gt?: T
 		gte?: T
+		never?: true
+		always?: true
 	}
 
 	export interface UniqueWhere<E = never> {
@@ -134,7 +136,7 @@ namespace Input {
 		[name: string]: C | Where<C>
 	}
 
-	export type Where<C = Condition<ColumnValue<never>>> = ComposedWhere<C> & FieldWhere<C>
+	export type Where<C = Condition> = ComposedWhere<C> & FieldWhere<C>
 }
 
 export default Input

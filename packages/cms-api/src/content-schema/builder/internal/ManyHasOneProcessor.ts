@@ -44,7 +44,7 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 		const joiningColumn = options.joiningColumn || {}
 		return {
 			name: fieldName,
-			inversedBy: options.inversedBy,
+			...(typeof options.inversedBy === 'undefined' ? {} : { inversedBy: options.inversedBy }),
 			nullable: options.nullable === undefined ? true : options.nullable,
 			type: Model.RelationType.ManyHasOne,
 			target: options.target,

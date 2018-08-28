@@ -1,17 +1,23 @@
 import { Model } from 'cms-common'
-import buildSqlSchema from './sqlSchemaBuilder'
+import diffSchemas from '../../content-schema/differ/diffSchemas'
+import SqlMigrator from './SqlMigrator'
+import SchemaBuilder from '../../content-schema/builder/SchemaBuilder'
 
-const getSql = (schema: Model.Schema): string => {
+export function createMigrationBuilder() {
 	const builderClass = require('node-pg-migrate/dist/migration-builder')
-	const migrationBuilder = new builderClass(
+	return new builderClass(
 		{},
 		{
 			query: null,
 			select: null
 		}
 	)
-	buildSqlSchema(schema, migrationBuilder)
-	return (migrationBuilder as any).getSql()
+}
+
+const getSql = (schema: Model.Schema): string => {
+	const emptySchema = new SchemaBuilder().buildSchema()
+	const diff = diffSchemas(emptySchema, schema)
+	return SqlMigrator.applyDiff(emptySchema, diff)
 }
 
 export default getSql

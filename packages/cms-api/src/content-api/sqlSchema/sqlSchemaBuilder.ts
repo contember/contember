@@ -80,7 +80,8 @@ const buildSqlSchema = (schema: Model.Schema, migrationBuilder: MigrationBuilder
 	for (const entityName in schema.entities) {
 		const entity = schema.entities[entityName]
 
-		for (const unique of entity.unique) {
+		for (const uniqueName in entity.unique) {
+			const unique = entity.unique[uniqueName]
 			migrationBuilder.createIndex(entity.tableName, unique.fields.map(name => getColumnName(schema, entity, name)), {
 				unique: true
 			})
@@ -115,7 +116,7 @@ const buildSqlSchema = (schema: Model.Schema, migrationBuilder: MigrationBuilder
 					)
 				},
 				visitOneHasOneOwner: (entity, relation, targetEntity) => {
-					if (!entity.unique.find(it => it.fields.length === 1 && it.fields[0] === relation.name)) {
+					if (!Object.values(entity.unique).find(it => it.fields.length === 1 && it.fields[0] === relation.name)) {
 						migrationBuilder.createIndex(entity.tableName, relation.joiningColumn.columnName, { unique: true })
 					}
 

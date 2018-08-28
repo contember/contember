@@ -6,7 +6,7 @@ namespace Model {
 		primaryColumn: string
 		tableName: string
 		fields: { [name: string]: AnyField }
-		unique: Array<{ fields: string[]; name: string }>
+		unique: UniqueConstraints
 	}
 
 	export type FieldType = RelationType | ColumnType
@@ -234,6 +234,15 @@ namespace Model {
 	export interface Schema {
 		enums: { [name: string]: string[] }
 		entities: { [name: string]: Entity }
+	}
+
+	interface UniqueConstraints {
+		[name: string]: UniqueConstraint
+	}
+
+	export interface UniqueConstraint {
+		fields: string[]
+		name: string
 	}
 }
 

@@ -4,8 +4,8 @@ export const isUniqueWhere = (entity: Model.Entity, where: Input.UniqueWhere): b
 	if (where[entity.primary] !== undefined) {
 		return true
 	}
-	uniqueKeys: for (const unique of entity.unique.map(it => it.fields)) {
-		for (const field of unique) {
+	uniqueKeys: for (const uniqueName in entity.unique) {
+		for (const field of entity.unique[uniqueName].fields) {
 			if (where[field] === undefined) {
 				continue uniqueKeys
 			}

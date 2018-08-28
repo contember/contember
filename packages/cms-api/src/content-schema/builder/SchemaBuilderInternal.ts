@@ -155,17 +155,18 @@ export default class SchemaBuilderInternal {
 		}
 	}
 
-	private createUnique(
-		options: EntityBuilder.EntityOptions,
-		fieldOptions: FieldBuilder.Map
-	): Array<{ fields: string[]; name: string }> {
-		const unique = (options.unique || []).map(it => ({ fields: it.fields, name: it.name || it.fields.join('_') }))
+	private createUnique(options: EntityBuilder.EntityOptions, fieldOptions: FieldBuilder.Map): Model.UniqueConstraints {
+		const unique: Model.UniqueConstraints = {}
+		for (const singleUnique of options.unique || []) {
+			const name = singleUnique.name || singleUnique.fields.join('_')
+			unique[name] = { fields: singleUnique.fields, name: name }
+		}
 		for (let fieldName in fieldOptions) {
 			let options = fieldOptions[fieldName]
 			if (options.type === FieldBuilder.Type.Column && options.options.unique) {
-				unique.push({ fields: [fieldName], name: fieldName })
+				unique[fieldName] = { fields: [fieldName], name: fieldName }
 			} else if (options.type === FieldBuilder.Type.OneHasOne) {
-				unique.push({ fields: [fieldName], name: fieldName })
+				unique[fieldName] = { fields: [fieldName], name: fieldName }
 			}
 		}
 		return unique

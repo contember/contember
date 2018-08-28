@@ -19,11 +19,9 @@ export default class EditPage extends React.Component<EditPageProps> {
 				<ParametersContext.Consumer>
 					{({ id }: { id: string }) => (
 						<DataProvider>
-							{/*persist => (
-								<Entity name={this.props.entity} where={{ id }}>
-									{this.props.children}
-								</Entity>
-							)*/}
+							<Entity name={this.props.entity} where={{ id }}>
+								{this.props.children}
+							</Entity>
 						</DataProvider>
 					)}
 				</ParametersContext.Consumer>

@@ -58,7 +58,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 		return {
 			type: Model.RelationType.ManyHasMany,
 			name: fieldName,
-			inversedBy: options.inversedBy,
+			...(typeof options.inversedBy === 'undefined' ? {} : { inversedBy: options.inversedBy }),
 			target: options.target,
 			joiningTable: joiningTable
 		}

@@ -6,7 +6,6 @@ import ReferenceMarker from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
 import { ReferenceMarkerProvider } from './DataMarkerProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
-import OneToRelation from './OneToRelation'
 
 export interface OneToOneProps {
 	field: FieldName
@@ -16,30 +15,19 @@ export interface OneToOneProps {
 export default class OneToOne extends React.Component<OneToOneProps> {
 	public render() {
 		return (
-			<OneToRelation field={this.props.field}>
-				<DataContext.Consumer>
-					{(data: DataContextValue) => {
-						if (data instanceof EntityAccessor) {
-							const field = data.data[this.props.field]
+			<DataContext.Consumer>
+				{(data: DataContextValue) => {
+					if (data instanceof EntityAccessor) {
+						const field = data.data[this.props.field]
 
-							if (field instanceof EntityAccessor) {
-								return <DataContext.Provider value={field}>{this.renderChildren(field.unlink)}</DataContext.Provider>
-							}
+						if (field instanceof EntityAccessor) {
+							return <DataContext.Provider value={field}>{this.props.children}</DataContext.Provider>
 						}
-						return this.renderChildren()
-					}}
-				</DataContext.Consumer>
-			</OneToRelation>
+					}
+				}}
+			</DataContext.Consumer>
 		)
 	}
-
-	protected renderChildren(unlink?: () => void): React.ReactNode {
-		if (typeof this.props.children === 'function') {
-			return this.props.children(unlink)
-		}
-		return this.props.children
-	}
-
 
 	public static generateReferenceMarker(props: OneToOneProps, referredEntity: EntityMarker): ReferenceMarker {
 		return new ReferenceMarker(props.field, referredEntity)

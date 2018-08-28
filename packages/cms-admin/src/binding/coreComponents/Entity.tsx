@@ -3,8 +3,10 @@ import { Input } from 'cms-common'
 import { GraphQlBuilder } from 'cms-client'
 import { EntityName } from '../bindingTypes'
 import DataContext, { DataContextValue } from './DataContext'
+import { EntityMarkerProvider } from './DataMarkerProvider'
+import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import EntityContext, { EntityContextValue } from './EntityContext'
-import EntityMarker from '../dao/EntityMarker'
+import EntityMarker, { EntityFields } from '../dao/EntityMarker'
 import FieldContext, { FieldContextValue } from './FieldContext'
 import LoadingSpinner from './LoadingSpinner'
 import RootEntityMarker from '../dao/RootEntityMarker'
@@ -56,4 +58,10 @@ export default class Entity extends React.Component<EntityProps> {
 			}
 		}
 	}
+
+	static generateEntityMarker(props: EntityProps, childrenFields: EntityFields): EntityMarker {
+		return new EntityMarker(props.name, childrenFields, props.where)
+	}
 }
+
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof Entity, EntityMarkerProvider>

@@ -72,7 +72,7 @@ export default class EntityTreeGenerator {
 					const processed = this.processNode(children)
 
 					if ('generateEntityMarker' in dataMarker && dataMarker.generateEntityMarker) {
-						return dataMarker.generateEntityMarker(node.props, this.mapNodeResulToEntityFields(processed))
+						return dataMarker.generateEntityMarker(node.props, this.mapNodeResultToEntityFields(processed))
 					}
 
 					if (
@@ -94,7 +94,7 @@ export default class EntityTreeGenerator {
 		return this.processNode(children)
 	}
 
-	private mapNodeResulToEntityFields(result: RawNodeResult): EntityFields {
+	private mapNodeResultToEntityFields(result: RawNodeResult): EntityFields {
 		const fields: EntityFields = {}
 
 		if (!result) {

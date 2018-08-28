@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
+import EntityMarker from '../dao/EntityMarker'
+import ReferenceMarker from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
 import EntityAccessor from '../dao/EntityAccessor'
+import { ReferenceMarkerProvider } from './DataMarkerProvider'
+import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import OneToRelation from './OneToRelation'
 
 export interface OneToManyProps {
 	field: FieldName
-	children: (unlink?: () => void) => React.ReactNode
 }
 
 export default class OneToMany extends React.Component<OneToManyProps> {
@@ -22,16 +25,22 @@ export default class OneToMany extends React.Component<OneToManyProps> {
 								return field.map((datum: DataContextValue, i: number) => {
 									return (
 										<DataContext.Provider value={datum} key={i}>
-											{datum instanceof EntityAccessor && this.props.children(datum.unlink)}
+											{datum instanceof EntityAccessor && this.props.children}
 										</DataContext.Provider>
 									)
 								})
 							}
 						}
-						return this.props.children(() => undefined)
+						return this.props.children
 					}}
 				</DataContext.Consumer>
 			</OneToRelation>
 		)
 	}
+
+	public static generateReferenceMarker(props: OneToManyProps, referredEntity: EntityMarker): ReferenceMarker {
+		return new ReferenceMarker(props.field, referredEntity)
+	}
 }
+
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof OneToMany, ReferenceMarkerProvider>

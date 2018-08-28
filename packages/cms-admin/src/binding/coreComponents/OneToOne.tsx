@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import DataContext, { DataContextValue } from './DataContext'
 import EntityAccessor from '../dao/EntityAccessor'
+import EntityMarker from '../dao/EntityMarker'
+import ReferenceMarker from '../dao/ReferenceMarker'
+import DataContext, { DataContextValue } from './DataContext'
+import { ReferenceMarkerProvider } from './DataMarkerProvider'
+import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import OneToRelation from './OneToRelation'
 
 export interface OneToOneProps {
@@ -35,4 +39,11 @@ export default class OneToOne extends React.Component<OneToOneProps> {
 		}
 		return this.props.children
 	}
+
+
+	public static generateReferenceMarker(props: OneToOneProps, referredEntity: EntityMarker): ReferenceMarker {
+		return new ReferenceMarker(props.field, referredEntity)
+	}
 }
+
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof OneToOne, ReferenceMarkerProvider>

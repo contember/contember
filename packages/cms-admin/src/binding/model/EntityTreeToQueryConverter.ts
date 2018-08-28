@@ -1,7 +1,7 @@
 import { CrudQueryBuilder } from 'cms-client'
-import { FieldContextValue } from '../coreComponents/FieldContext'
 import EntityMarker from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
+import Marker from '../dao/Marker'
 import RootEntityMarker from '../dao/RootEntityMarker'
 
 export default class EntityTreeToQueryConverter {
@@ -24,24 +24,26 @@ export default class EntityTreeToQueryConverter {
 	}
 
 	private registerQueryPart(
-		context: FieldContextValue,
+		context: Marker,
 		builder: CrudQueryBuilder.GetQueryBuilder
 	): CrudQueryBuilder.GetQueryBuilder {
 		if (context instanceof EntityMarker) {
 			builder = builder.column('id')
 
 			for (const field in context.fields) {
-				const fieldValue: FieldContextValue = context.fields[field]
+				const fieldValue: Marker = context.fields[field]
 
-				if (fieldValue instanceof FieldMarker) {
-					builder = builder.column(fieldValue.name)
-				} else if (fieldValue instanceof EntityMarker) {
-					builder = builder.relation(field, builder => {
-						if (fieldValue.where) {
-							builder = builder.where(fieldValue.where)
-						}
-						return this.registerQueryPart(fieldValue, builder)
-					})
+				if (fieldValue) {
+					if (fieldValue instanceof FieldMarker) {
+						builder = builder.column(fieldValue.name)
+					} else {
+						builder = builder.relation(field, builder => {
+							if (fieldValue.where) {
+								builder = builder.where(fieldValue.where)
+							}
+							return this.registerQueryPart(fieldValue, builder)
+						})
+					}
 				}
 			}
 		}

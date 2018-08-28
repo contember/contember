@@ -41,7 +41,7 @@ export default class EntityTreeGenerator {
 
 				if (processed) {
 					if (Array.isArray(processed)) {
-						mapped = mapped.concat(...processed)
+						mapped = mapped.concat(processed)
 					} else {
 						mapped.push(processed)
 					}

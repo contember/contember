@@ -1,3 +1,5 @@
+import deepCopy from '../utils/deepCopy'
+
 namespace Model {
 	export interface Entity {
 		name: string
@@ -234,6 +236,13 @@ namespace Model {
 	export interface Schema {
 		enums: { [name: string]: string[] }
 		entities: { [name: string]: Entity }
+	}
+
+	export function getColumnDefinition<T extends ColumnType>(column: Column<T>): ColumnDefinitionByType<T> {
+		const definition = deepCopy(column)
+		delete definition.name
+		delete definition.columnName
+		return definition
 	}
 
 	interface UniqueConstraints {

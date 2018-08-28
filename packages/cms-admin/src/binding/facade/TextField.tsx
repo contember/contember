@@ -1,3 +1,4 @@
+import { FormGroup, IFormGroupProps, InputGroup } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../bindingTypes'
@@ -9,6 +10,7 @@ import FieldMarker from '../dao/FieldMarker'
 
 export interface TextFieldProps {
 	name: FieldName
+	label?: IFormGroupProps['label']
 }
 
 export default class TextField extends React.Component<TextFieldProps> {
@@ -17,9 +19,9 @@ export default class TextField extends React.Component<TextFieldProps> {
 			<Field name={this.props.name}>
 				{(data: FieldAccessor<string>): React.ReactNode => {
 					return (
-						<div>
-							<input type={'text'} value={data.currentValue} onChange={this.generateOnChange(data)} />
-						</div>
+						<FormGroup label={this.props.label}>
+							<InputGroup value={data.currentValue} onChange={this.generateOnChange(data)} />
+						</FormGroup>
 					)
 				}}
 			</Field>

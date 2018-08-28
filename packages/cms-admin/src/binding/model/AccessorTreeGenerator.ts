@@ -1,21 +1,21 @@
 import { FieldName } from '../bindingTypes'
 import { DataContextValue } from '../coreComponents/DataContext'
 import EntityAccessor, { EntityData, FieldData } from '../dao/EntityAccessor'
-import EntityMarker, { EntityFields } from '../dao/EntityMarker'
+import EntityMarker from '../dao/EntityMarker'
 import FieldAccessor from '../dao/FieldAccessor'
-import RootEntityMarker from '../dao/RootEntityMarker'
+import Marker from '../dao/Marker'
 
 export default class AccessorTreeGenerator {
 	private static PRIMARY_KEY_NAME = 'id'
 
-	public constructor(private structure: RootEntityMarker, private initialData: any) {}
+	public constructor(private structure: Marker, private initialData: any) {}
 
 	public generateLiveTree(updateData: (newData: DataContextValue) => void) {
-		if (!(this.structure.content instanceof EntityMarker)) {
+		if (!(this.structure instanceof EntityMarker)) {
 			return
 		}
 
-		const marker: EntityMarker = this.structure.content
+		const marker: EntityMarker = this.structure
 		const data = this.initialData[marker.entityName]
 
 		let entityAccessor: EntityAccessor | null = this.updateFields(data, marker, (fieldName, newData) => {

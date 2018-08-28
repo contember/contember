@@ -13,9 +13,8 @@ import PersistQueryGenerator from '../model/PersistQueryGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import MetaOperationsContext, { MetaOperationsContextValue } from './MetaOperationsContext'
 
-export interface DataProviderProps {
-	//children: (triggerPersist: () => void) => React.ReactNode
-}
+export interface DataProviderProps {}
+
 export interface DataProviderDispatchProps {
 	getData: (query: string) => void
 	putData: (query: string) => Promise<void>
@@ -48,9 +47,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		}
 	}
 
-	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(
-		this.triggerPersist
-	)
+	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(this.triggerPersist)
 
 	componentDidUpdate(prevProps: DataProviderInnerProps) {
 		if (!this.entityTree) {
@@ -67,9 +64,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 			<MetaOperationsContext.Provider value={this.metaOperations}>
 				<DataContext.Provider value={this.state.data}>{this.props.children}</DataContext.Provider>
 			</MetaOperationsContext.Provider>
-		) : (
-			null
-		)
+		) : null
 	}
 
 	public componentDidMount() {

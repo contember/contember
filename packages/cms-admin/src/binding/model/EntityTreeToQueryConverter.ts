@@ -2,13 +2,12 @@ import { CrudQueryBuilder } from 'cms-client'
 import EntityMarker from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
 import Marker from '../dao/Marker'
-import RootEntityMarker from '../dao/RootEntityMarker'
 
 export default class EntityTreeToQueryConverter {
-	constructor(private rem: RootEntityMarker) {}
+	constructor(private marker: Marker) {}
 
 	public convert(): string | undefined {
-		const entityMarker = this.rem.content
+		const entityMarker = this.marker
 
 		if (entityMarker instanceof EntityMarker) {
 			const queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()

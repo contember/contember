@@ -2,8 +2,8 @@ import * as React from 'react'
 import DataMarkerProvider from '../coreComponents/DataMarkerProvider'
 import EntityMarker, { EntityFields } from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
+import Marker from '../dao/Marker'
 import ReferenceMarker from '../dao/ReferenceMarker'
-import RootEntityMarker from '../dao/RootEntityMarker'
 
 type NodeResult = FieldMarker | EntityMarker | ReferenceMarker
 type RawNodeResult = NodeResult | NodeResult[] | undefined
@@ -11,21 +11,21 @@ type RawNodeResult = NodeResult | NodeResult[] | undefined
 export default class EntityTreeGenerator {
 	public constructor(private sourceTree: React.ReactNode) {}
 
-	public generate(): RootEntityMarker {
+	public generate(): Marker {
 		const processed = this.processNode(this.sourceTree)
 
 		if (!processed) {
-			return new RootEntityMarker()
+			return undefined
 		}
 
 		if (!Array.isArray(processed)) {
-			return new RootEntityMarker(processed)
+			return processed
 		}
 
 		if (processed.length === 1) {
-			return new RootEntityMarker(processed[0])
+			return processed[0]
 		}
-		return new RootEntityMarker()
+		return undefined
 	}
 
 	private processNode(node: React.ReactNode): RawNodeResult {

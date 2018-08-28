@@ -5,8 +5,8 @@ import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentStatus } from '../../state/content'
 import EntityAccessor from '../dao/EntityAccessor'
+import Marker from '../dao/Marker'
 import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
-import RootEntityMarker from '../dao/RootEntityMarker'
 import { AccessorTreeGenerator, EntityTreeToQueryConverter } from '../model'
 import EntityTreeGenerator from '../model/EntityTreeGenerator'
 import PersistQueryGenerator from '../model/PersistQueryGenerator'
@@ -34,7 +34,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		data: undefined
 	}
 
-	protected entityTree?: RootEntityMarker = new RootEntityMarker()
+	protected entityTree: Marker
 
 	protected triggerPersist = () => {
 		if (this.props.data && this.state.data instanceof EntityAccessor) {
@@ -72,7 +72,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 		this.entityTree = generator.generate()
 
-		console.log('The structure is', this.entityTree!.content)
+		console.log('The structure is', this.entityTree!)
 
 		const converter = new EntityTreeToQueryConverter(this.entityTree)
 		const query = converter.convert()

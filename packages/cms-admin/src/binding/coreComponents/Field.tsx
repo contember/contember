@@ -1,11 +1,8 @@
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import DataContext, { DataContextValue } from './DataContext'
 import EntityAccessor from '../dao/EntityAccessor'
-import EntityContext, { EntityContextValue } from './EntityContext'
-import EntityMarker from '../dao/EntityMarker'
 import FieldAccessor from '../dao/FieldAccessor'
-import FieldMarker from '../dao/FieldMarker'
+import DataContext, { DataContextValue } from './DataContext'
 
 export interface FieldProps {
 	name: FieldName
@@ -13,36 +10,21 @@ export interface FieldProps {
 }
 
 export default class Field extends React.Component<FieldProps> {
-	protected entityContext?: EntityContextValue
 
 	public render() {
 		return (
-			<EntityContext.Consumer>
-				{(entityContext: EntityContextValue) => {
-					this.entityContext = entityContext
+			<DataContext.Consumer>
+				{(data: DataContextValue) => {
+					if (data instanceof EntityAccessor) {
+						const fieldData = data.data[this.props.name]
 
-					return (
-						<DataContext.Consumer>
-							{(data: DataContextValue) => {
-								if (data instanceof EntityAccessor) {
-									const fieldData = data.data[this.props.name]
-
-									if (this.props.children && fieldData instanceof FieldAccessor) {
-										return this.props.children(fieldData)
-									}
-								}
-								return null
-							}}
-						</DataContext.Consumer>
-					)
+						if (this.props.children && fieldData instanceof FieldAccessor) {
+							return this.props.children(fieldData)
+						}
+					}
+					return null
 				}}
-			</EntityContext.Consumer>
+			</DataContext.Consumer>
 		)
-	}
-
-	public componentDidMount() {
-		if (this.entityContext instanceof EntityMarker) {
-			this.entityContext.fields[this.props.name] = new FieldMarker(this.props.name)
-		}
 	}
 }

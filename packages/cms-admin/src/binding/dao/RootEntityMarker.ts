@@ -1,5 +1,5 @@
-import { FieldContextValue } from '../coreComponents/FieldContext'
+import Marker from './Marker'
 
 export default class RootEntityMarker {
-	constructor(public content?: FieldContextValue) {}
+	constructor(public content?: Marker) {}
 }

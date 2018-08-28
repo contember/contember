@@ -5,14 +5,16 @@ import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentStatus } from '../../state/content'
 import EntityAccessor from '../dao/EntityAccessor'
+import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
 import RootEntityMarker from '../dao/RootEntityMarker'
 import { AccessorTreeGenerator, EntityTreeToQueryConverter } from '../model'
 import EntityTreeGenerator from '../model/EntityTreeGenerator'
 import PersistQueryGenerator from '../model/PersistQueryGenerator'
 import DataContext, { DataContextValue } from './DataContext'
+import MetaOperationsContext, { MetaOperationsContextValue } from './MetaOperationsContext'
 
 export interface DataProviderProps {
-	//children: (persist: () => void) => React.ReactNode
+	//children: (triggerPersist: () => void) => React.ReactNode
 }
 export interface DataProviderDispatchProps {
 	getData: (query: string) => void
@@ -35,16 +37,6 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 	protected entityTree?: RootEntityMarker = new RootEntityMarker()
 
-	componentDidUpdate(prevProps: DataProviderInnerProps) {
-		if (!this.entityTree) {
-			return
-		}
-		if (this.props.ready && prevProps.ready !== this.props.ready && this.props.data !== prevProps.data) {
-			const accessTreeGenerator = new AccessorTreeGenerator(this.entityTree, this.props.data)
-			accessTreeGenerator.generateLiveTree(newData => this.setState({ data: newData }))
-		}
-	}
-
 	protected triggerPersist = () => {
 		if (this.props.data && this.state.data instanceof EntityAccessor) {
 			const generator = new PersistQueryGenerator(this.props.data, this.state.data)
@@ -56,9 +48,25 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		}
 	}
 
+	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(
+		this.triggerPersist
+	)
+
+	componentDidUpdate(prevProps: DataProviderInnerProps) {
+		if (!this.entityTree) {
+			return
+		}
+		if (this.props.ready && prevProps.ready !== this.props.ready && this.props.data !== prevProps.data) {
+			const accessTreeGenerator = new AccessorTreeGenerator(this.entityTree, this.props.data)
+			accessTreeGenerator.generateLiveTree(newData => this.setState({ data: newData }))
+		}
+	}
+
 	public render() {
 		return this.state.data ? (
-			<DataContext.Provider value={this.state.data}>{this.props.children}</DataContext.Provider>
+			<MetaOperationsContext.Provider value={this.metaOperations}>
+				<DataContext.Provider value={this.state.data}>{this.props.children}</DataContext.Provider>
+			</MetaOperationsContext.Provider>
 		) : (
 			null
 		)

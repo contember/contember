@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
+import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker from '../dao/ReferenceMarker'
@@ -24,6 +25,7 @@ export default class OneToOne extends React.Component<OneToOneProps> {
 							return <DataContext.Provider value={field}>{this.props.children}</DataContext.Provider>
 						}
 					}
+					throw new DataBindingError('Corrupted data')
 				}}
 			</DataContext.Consumer>
 		)

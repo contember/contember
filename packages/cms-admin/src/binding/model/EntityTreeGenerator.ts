@@ -1,5 +1,6 @@
 import * as React from 'react'
 import DataMarkerProvider from '../coreComponents/DataMarkerProvider'
+import DataBindingError from '../dao/DataBindingError'
 import EntityMarker, { EntityFields } from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
 import ReferenceMarker from '../dao/ReferenceMarker'
@@ -26,7 +27,8 @@ export default class EntityTreeGenerator {
 		if (entityMarker instanceof EntityMarker) {
 			return entityMarker
 		}
-		return undefined
+
+		return this.reportInvalidTreeError(entityMarker)
 	}
 
 	private processNode(node: React.ReactNode): RawNodeResult {
@@ -69,20 +71,31 @@ export default class EntityTreeGenerator {
 					return dataMarker.generateFieldMarkers(node.props)
 				}
 
-				if (children) {
-					const processed = this.processNode(children)
-
-					if ('generateEntityMarker' in dataMarker && dataMarker.generateEntityMarker) {
-						return dataMarker.generateEntityMarker(node.props, this.mapNodeResultToEntityFields(processed))
+				if ('generateEntityMarker' in dataMarker && dataMarker.generateEntityMarker) {
+					if (children) {
+						return dataMarker.generateEntityMarker(
+							node.props,
+							this.mapNodeResultToEntityFields(this.processNode(children))
+						)
 					}
+					throw new DataBindingError(
+						'An <Entity /> component must have children that refer to its fields as otherwise, it would be redundant.'
+					)
+				}
+				if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
+					if (children) {
+						const processed = this.processNode(children)
 
-					if (
-						'generateReferenceMarker' in dataMarker &&
-						dataMarker.generateReferenceMarker &&
-						processed instanceof EntityMarker
-					) {
-						return dataMarker.generateReferenceMarker(node.props, processed)
+						if (processed instanceof EntityMarker) {
+							return dataMarker.generateReferenceMarker(node.props, processed)
+						}
+						throw new DataBindingError(
+							'A relation component must have an <Entity /> component (or equivalent) as its child.'
+						)
 					}
+					throw new DataBindingError(
+						'A relation component without children detected. All <Repeater /> and similar components must have children.'
+					)
 				}
 
 				return undefined
@@ -112,10 +125,23 @@ export default class EntityTreeGenerator {
 			} else if (marker instanceof ReferenceMarker) {
 				fields[marker.name] = marker.reference
 			} else {
-				// Marker is an EntityMarker, which should not appear here. Throw error?
+				throw new DataBindingError(
+					'Detected a sub-entity directly within another one. Use a <Repeater /> or a similar component for relations.'
+				)
 			}
 		}
 
 		return fields
+	}
+
+	private reportInvalidTreeError(marker: FieldMarker | ReferenceMarker | undefined): never {
+		if (marker) {
+			const kind = marker instanceof FieldMarker ? 'field' : 'relation'
+
+			throw new DataBindingError(
+				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within an <Entity />.`
+			)
+		}
+		throw new DataBindingError('Empty form discovered. Try adding some fields…')
 	}
 }

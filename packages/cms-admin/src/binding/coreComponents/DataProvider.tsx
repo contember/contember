@@ -5,7 +5,7 @@ import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentStatus } from '../../state/content'
 import EntityAccessor from '../dao/EntityAccessor'
-import Marker from '../dao/Marker'
+import EntityMarker from '../dao/EntityMarker'
 import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
 import { AccessorTreeGenerator, EntityTreeToQueryConverter } from '../model'
 import EntityTreeGenerator from '../model/EntityTreeGenerator'
@@ -34,7 +34,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		data: undefined
 	}
 
-	protected entityTree: Marker
+	protected entityTree?: EntityMarker
 
 	protected triggerPersist = () => {
 		if (this.props.data && this.state.data instanceof EntityAccessor) {

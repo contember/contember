@@ -31,9 +31,16 @@ export default class EntityTreeGenerator {
 		return this.reportInvalidTreeError(entityMarker)
 	}
 
-	private processNode(node: React.ReactNode): RawNodeResult {
+	private processNode(node: React.ReactNode | Function): RawNodeResult {
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
 			return undefined
+		}
+
+		if (typeof node === 'function') {
+			throw new DataBindingError(
+				'Render props (functions as React Component children) are not supported within the schema. ' +
+				'Please refer to the documentation.'
+			)
 		}
 
 		if (Array.isArray(node)) {

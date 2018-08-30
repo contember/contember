@@ -86,7 +86,7 @@ export default class EntityTreeGenerator {
 						)
 					}
 					throw new DataBindingError(
-						'An <Entity /> component must have children that refer to its fields as otherwise, it would be redundant.'
+						`Each ${node.type.displayName} component must have children that refer to its fields as otherwise, it would be redundant.`
 					)
 				}
 				if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
@@ -97,11 +97,11 @@ export default class EntityTreeGenerator {
 							return dataMarker.generateReferenceMarker(node.props, processed)
 						}
 						throw new DataBindingError(
-							'A relation component must have an <Entity /> component (or equivalent) as its child.'
+							`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
 						)
 					}
 					throw new DataBindingError(
-						'A relation component without children detected. All <Repeater /> and similar components must have children.'
+						`Each ${node.type.displayName} component must have children.`
 					)
 				}
 

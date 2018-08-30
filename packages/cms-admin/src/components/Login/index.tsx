@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InputGroup, FormGroup, Card, Elevation, H1, Button } from '@blueprintjs/core'
+import { InputGroup, FormGroup, Card, Elevation, H1, Button, Checkbox, Callout } from '@blueprintjs/core'
 import { connect } from 'react-redux'
 import { login } from '../../actions/auth'
 import State from '../../state'
@@ -9,45 +9,64 @@ import { AuthStatus } from '../../state/auth'
 class Login extends React.PureComponent<Login.Props, Login.State> {
 	state: Login.State = {
 		email: '',
-		password: ''
+		password: '',
+		rememberMe: false
 	}
 
 	render() {
 		const loading = this.props.status === AuthStatus.LOADING
 
 		return (
-			<Card elevation={Elevation.ONE}>
-				<H1>Login</H1>
-				<form
-					onSubmit={async e => {
-						e.preventDefault()
-						await this.props.login(this.state.email, this.state.password)
-					}}
-				>
-					{this.props.errorMessage}
-					<FormGroup label="Email">
-						<InputGroup
-							value={this.state.email}
-							autoComplete="username"
-							type="email"
+			<div className="login-wrap">
+				<Card elevation={Elevation.ONE} className="login-card">
+					<div className="login-site">
+						<img src="https://www.mangoweb.cz/images/logo.png" className="login-siteLogo" />
+						<h1 className="login-siteName">manGoweb CMS</h1>
+					</div>
+					<form
+						onSubmit={async e => {
+							e.preventDefault()
+							await this.props.login(this.state.email, this.state.password)
+						}}
+					>
+						{this.props.errorMessage && (
+							<Callout intent="danger" icon={null}>
+								{this.props.errorMessage}
+							</Callout>
+						)}
+						<FormGroup label="Email">
+							<InputGroup
+								value={this.state.email}
+								autoComplete="username"
+								type="email"
+								disabled={loading}
+								onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ email: e.currentTarget.value })}
+							/>
+						</FormGroup>
+						<FormGroup label="Password">
+							<InputGroup
+								type="password"
+								autoComplete="current-password"
+								value={this.state.password}
+								disabled={loading}
+								onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })}
+							/>
+						</FormGroup>
+						<Checkbox
 							disabled={loading}
-							onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ email: e.currentTarget.value })}
-						/>
-					</FormGroup>
-					<FormGroup label="Password">
-						<InputGroup
-							type="password"
-							autoComplete="current-password"
-							value={this.state.password}
-							disabled={loading}
-							onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })}
-						/>
-					</FormGroup>
-					<Button type="submit" loading={loading}>
-						Login
-					</Button>
-				</form>
-			</Card>
+							checked={this.state.rememberMe}
+							onChange={(e: React.FormEvent<HTMLInputElement>) =>
+								this.setState({ rememberMe: e.currentTarget.checked })
+							}
+						>
+							Remember me
+						</Checkbox>
+						<Button type="submit" loading={loading} intent="primary">
+							Login
+						</Button>
+					</form>
+				</Card>
+			</div>
 		)
 	}
 }
@@ -67,6 +86,7 @@ namespace Login {
 	export interface State {
 		email: string
 		password: string
+		rememberMe: boolean
 	}
 }
 

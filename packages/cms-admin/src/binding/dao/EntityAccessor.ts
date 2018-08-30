@@ -1,5 +1,5 @@
-import { Input } from 'cms-common'
 import { GraphQlBuilder } from 'cms-client'
+import { Input } from 'cms-common'
 import { EntityName, FieldName } from '../bindingTypes'
 import { DataContextValue } from '../coreComponents/DataContext'
 

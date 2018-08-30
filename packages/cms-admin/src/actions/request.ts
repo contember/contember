@@ -8,7 +8,7 @@ import routes, { PageNotFound } from '../routes'
 
 export const pushRequest = (requestChange: RequestChange): ActionCreator => (dispatch, getState) => {
 	const previousRequest = getState().request
-	const request: RequestState = { ...requestChange() }
+	const request: RequestState = { ...requestChange(previousRequest) }
 	dispatch(createAction(REQUEST_REPLACE, () => request)())
 
 	window.history.pushState({}, document.title, requestStateToPath(routes(getState().projectsConfigs.configs), request))

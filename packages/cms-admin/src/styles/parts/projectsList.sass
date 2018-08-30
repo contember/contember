@@ -1,0 +1,16 @@
+.projectsList
+	&-item
+		padding: 1em 0
+		display: block
+		color: inherit
+		text-decoration: none
+		position: relative
+
+		&:not(:last-child)::after
+			+absolute(null -1em 0 -1em)
+			content: ''
+			background: rgba(16, 22, 26, 0.15)
+			height: 1px
+
+		&:last-child
+			padding-bottom: 0

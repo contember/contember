@@ -8,6 +8,7 @@ export const login = (email: string, password: string): ActionCreator => async (
 	const { signIn } = await services.tenantClient.request(loginMutation, { email, password })
 	if (signIn.ok) {
 		dispatch(createAction(SET_TOKEN, () => signIn.result.token)())
+		dispatch(pushRequest(() => ({ name: 'projects_list' })))
 	} else {
 		dispatch(
 			createAction(SET_ERROR, () => signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', '))()

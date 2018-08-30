@@ -8,6 +8,10 @@ export interface LoginRequest extends Request {
 	name: 'login'
 }
 
+export interface ProjectsListRequest extends Request {
+	name: 'projects_list'
+}
+
 export interface ProjectRequest extends Request {
 	project: string
 }
@@ -29,7 +33,7 @@ export interface PageRequest<P extends PageParameters> extends StageRequest {
 	parameters: P
 }
 
-type RequestState = LoginRequest | PageRequest<any>
+type RequestState = LoginRequest | ProjectsListRequest | PageRequest<any>
 
 export default RequestState
 

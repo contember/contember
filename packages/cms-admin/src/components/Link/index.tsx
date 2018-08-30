@@ -50,8 +50,8 @@ namespace Link {
 }
 
 export default connect<Link.StateProps, Link.DispatchProps, Link.OwnProps, State>(
-	({ view, projectsConfigs }, { requestChange }) => ({
-		url: requestStateToPath(routes(projectsConfigs.configs), requestChange())
+	({ view, projectsConfigs, request }, { requestChange }) => ({
+		url: requestStateToPath(routes(projectsConfigs.configs), requestChange(request))
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) })
 )(Link)

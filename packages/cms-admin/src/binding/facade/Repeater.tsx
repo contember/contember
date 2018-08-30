@@ -12,6 +12,8 @@ export interface RepeaterProps extends OneToManyProps {
 
 export default class Repeater extends React.Component<RepeaterProps> {
 
+	static displayName = 'Repeater'
+
 	public render() {
 		return <ul>
 			<OneToMany {...this.props}>

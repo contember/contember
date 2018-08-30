@@ -13,6 +13,9 @@ export interface OneToManyProps {
 }
 
 export default class OneToMany extends React.Component<OneToManyProps> {
+
+	static displayName = 'OneToMany'
+
 	public render() {
 		return (
 			<DataContext.Consumer>

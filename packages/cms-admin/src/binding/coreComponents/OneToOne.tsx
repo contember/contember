@@ -14,6 +14,9 @@ export interface OneToOneProps {
 }
 
 export default class OneToOne extends React.Component<OneToOneProps> {
+
+	static displayName = 'OneToOne'
+
 	public render() {
 		return (
 			<DataContext.Consumer>

@@ -13,6 +13,9 @@ export interface EntityProps {
 }
 
 export default class Entity extends React.Component<EntityProps> {
+
+	static displayName = 'Entity'
+
 	public render() {
 		return this.props.children
 	}

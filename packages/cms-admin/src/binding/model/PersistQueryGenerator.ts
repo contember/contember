@@ -1,8 +1,7 @@
 import { CrudQueryBuilder } from 'cms-client'
 import * as GraphQlBuilder from 'cms-client/dist/src/graphQlBuilder'
 import { Input } from 'cms-common'
-import { DataContextValue } from '../coreComponents/DataContext'
-import EntityAccessor, { FieldData } from '../dao/EntityAccessor'
+import EntityAccessor from '../dao/EntityAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 
 export default class PersistQueryGenerator {

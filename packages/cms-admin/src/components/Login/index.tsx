@@ -17,8 +17,8 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 		const loading = this.props.status === AuthStatus.LOADING
 
 		return (
-			<div className="login-wrap">
-				<Card elevation={Elevation.ONE} className="login-card">
+			<div className="centerCard-wrap">
+				<Card elevation={Elevation.ONE} className="centerCard">
 					<div className="login-site">
 						<img src="https://www.mangoweb.cz/images/logo.png" className="login-siteLogo" />
 						<h1 className="login-siteName">manGoweb CMS</h1>

@@ -1,22 +1,23 @@
 import { Acl, Input, Model } from 'cms-common'
 import ObjectNode from '../content-api/graphQlResolver/ObjectNode'
-import VariableInjector from './VariableInjector'
 import { acceptFieldVisitor } from '../content-schema/modelUtils'
 import FieldNode from '../content-api/graphQlResolver/FieldNode'
+import PredicateFactory from "./PredicateFactory";
+import Authorizator from "./Authorizator";
 
 class PredicatesInjector {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly permissions: Acl.Permissions,
-		private readonly variableInjector: VariableInjector
-	) {}
+		private readonly predicateFactory: PredicateFactory,
+	) {
+	}
 
 	public inject(entity: Model.Entity, objectNode: ObjectNode<Input.ListQueryInput>, variables: Acl.VariablesMap) {
 		const restrictedWhere = this.injectToWhere(objectNode.args.where || {}, entity, variables)
 		const where = this.createWhere(entity, objectNode.fields.map(it => it.name), restrictedWhere, variables)
 		const fields = this.injectToFields(objectNode, entity, variables)
 
-		return new ObjectNode(objectNode.name, objectNode.alias, fields, { ...objectNode.args, where })
+		return new ObjectNode(objectNode.name, objectNode.alias, fields, {...objectNode.args, where})
 	}
 
 	private injectToFields(
@@ -46,53 +47,12 @@ class PredicatesInjector {
 		where: Input.Where,
 		variables: Acl.VariablesMap
 	): Input.Where {
-		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
-		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
-		if (!entityPermissions || !entityPermissions.operations.read) {
-			return neverCondition
-		}
+		const predicatesWhere: Input.Where | null = this.predicateFactory.create(entity, fieldNames, variables, Authorizator.Operation.read)
 
-		const predicates = this.getRequiredPredicates(fieldNames, entityPermissions.operations.read)
-		if (predicates === false) {
-			return neverCondition
-		}
-
-		const predicatesWhere: Input.Where[] = predicates.reduce(
-			(result: Input.Where[], name: Acl.PredicateReference): Input.Where[] => {
-				if (!entityPermissions.predicates[name]) {
-					throw new Error(`${entity.name}: Undefined predicate ${name}`)
-				}
-				const predicateWhere: Input.Where = this.variableInjector.inject(entityPermissions.predicates[name], variables)
-				return [...result, predicateWhere]
-			},
-			[]
-		)
-
-		return {
-			and: [where, ...predicatesWhere].filter(it => Object.keys(it).length > 0)
-		}
+		return {and: [where, predicatesWhere].filter(it => Object.keys(it).length > 0)}
 	}
 
-	private getRequiredPredicates(
-		fieldNames: string[],
-		fieldPermissions: Acl.FieldPermissions
-	): Acl.PredicateReference[] | false {
-		const predicates: Acl.PredicateReference[] = []
-		for (let name of fieldNames) {
-			const fieldPredicate = fieldPermissions[name]
-			if (!fieldPredicate) {
-				return false
-			}
-			if (fieldPredicate === true) {
-				continue
-			}
-			if (!predicates.includes(fieldPredicate)) {
-				predicates.push(fieldPredicate)
-			}
-		}
-		return predicates
-	}
 
 	private injectToWhere(where: Input.Where, entity: Model.Entity, variables: Acl.VariablesMap): Input.Where {
 		const resultWhere: Input.Where = {}

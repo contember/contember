@@ -24,7 +24,7 @@ export default class ReadResolver {
 		const queryAst = new GraphQlQueryAstFactory().create(resolveInfo)
 		const queryWithPredicates = this.predicatesInjector.inject(entity, queryAst, context.identityVariables)
 
-		return await this.mapperRunner.run(context.db, async mapper => {
+		return await this.mapperRunner.run(context.db, context.identityVariables, async mapper => {
 			return await mapper.select(entity, queryWithPredicates)
 		})
 	}
@@ -43,7 +43,7 @@ export default class ReadResolver {
 		})
 		const queryExpandedWithPredicates = this.predicatesInjector.inject(entity, queryExpanded, context.identityVariables)
 
-		return await this.mapperRunner.run(context.db, async mapper => {
+		return await this.mapperRunner.run(context.db, context.identityVariables, async mapper => {
 			return (await mapper.select(entity, queryExpandedWithPredicates))[0] || null
 		})
 	}

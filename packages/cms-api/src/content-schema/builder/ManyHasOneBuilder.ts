@@ -1,67 +1,61 @@
-import { Model } from "cms-common"
-import FieldBuilder from "./FieldBuilder"
-import { AddEntityCallback, EntityConfigurator } from "./SchemaBuilder";
+import { Model } from 'cms-common'
+import FieldBuilder from './FieldBuilder'
+import { AddEntityCallback, EntityConfigurator } from './SchemaBuilder'
 
-type PartialOptions<K extends keyof ManyHasOneBuilder.Options> = Partial<ManyHasOneBuilder.Options> & Pick<ManyHasOneBuilder.Options, K>
+type PartialOptions<K extends keyof ManyHasOneBuilder.Options> = Partial<ManyHasOneBuilder.Options> &
+	Pick<ManyHasOneBuilder.Options, K>
 
-class ManyHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
-{
-  private options: O
-  private addEntity: AddEntityCallback
+class ManyHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
+	private options: O
+	private addEntity: AddEntityCallback
 
-  constructor(options: O, addEntity: AddEntityCallback)
-  {
-    this.options = options
-    this.addEntity = addEntity
-  }
+	constructor(options: O, addEntity: AddEntityCallback) {
+		this.options = options
+		this.addEntity = addEntity
+	}
 
-  target(target: string, configurator?: EntityConfigurator): ManyHasOneBuilder<O & PartialOptions<'target'>>
-  {
-    if (configurator) {
-      this.addEntity(target, configurator)
-    }
-    return this.withOption('target', target)
-  }
+	target(target: string, configurator?: EntityConfigurator): ManyHasOneBuilder<O & PartialOptions<'target'>> {
+		if (configurator) {
+			this.addEntity(target, configurator)
+		}
+		return this.withOption('target', target)
+	}
 
-  inversedBy(inversedBy: string): ManyHasOneBuilder<O>
-  {
-    return this.withOption('inversedBy', inversedBy)
-  }
+	inversedBy(inversedBy: string): ManyHasOneBuilder<O> {
+		return this.withOption('inversedBy', inversedBy)
+	}
 
-  joiningColumn(columnName: string): ManyHasOneBuilder<O>
-  {
-    return this.withOption('joiningColumn', {...this.options.joiningColumn, columnName})
-  }
+	joiningColumn(columnName: string): ManyHasOneBuilder<O> {
+		return this.withOption('joiningColumn', { ...this.options.joiningColumn, columnName })
+	}
 
-  onDelete(onDelete: Model.OnDelete): ManyHasOneBuilder<O>
-  {
-    return this.withOption('joiningColumn', {...this.options.joiningColumn, onDelete})
-  }
+	onDelete(onDelete: Model.OnDelete): ManyHasOneBuilder<O> {
+		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete })
+	}
 
-  notNull(): ManyHasOneBuilder<O>
-  {
-    return this.withOption('nullable', false)
-  }
+	notNull(): ManyHasOneBuilder<O> {
+		return this.withOption('nullable', false)
+	}
 
-  getOption(): O
-  {
-    return this.options
-  }
+	getOption(): O {
+		return this.options
+	}
 
-  private withOption<K extends keyof ManyHasOneBuilder.Options>(key: K, value: ManyHasOneBuilder.Options[K])
-  {
-    return new ManyHasOneBuilder<O & PartialOptions<K>>({...(this.options as object), [key]: value} as O & PartialOptions<K>, this.addEntity)
-  }
+	private withOption<K extends keyof ManyHasOneBuilder.Options>(key: K, value: ManyHasOneBuilder.Options[K]) {
+		return new ManyHasOneBuilder<O & PartialOptions<K>>(
+			{ ...(this.options as object), [key]: value } as O & PartialOptions<K>,
+			this.addEntity
+		)
+	}
 }
 
-namespace ManyHasOneBuilder
-{
-  export type Options = {
-    target: string
-    inversedBy?: string
-    joiningColumn?: Partial<Model.JoiningColumn>
-    nullable?: boolean
-  }
+namespace ManyHasOneBuilder {
+	export type Options = {
+		target: string
+		inversedBy?: string
+		joiningColumn?: Partial<Model.JoiningColumn>
+		nullable?: boolean
+	}
 }
 
 export default ManyHasOneBuilder

@@ -1,95 +1,95 @@
-import {gql} from 'apollo-server-express'
-import {DocumentNode} from "graphql"
+import { gql } from 'apollo-server-express'
+import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
-  schema {
-    query: Query
-    mutation: Mutation
-  }
+	schema {
+		query: Query
+		mutation: Mutation
+	}
 
-  type Query {
-    me: Person!
-  }
+	type Query {
+		me: Person!
+	}
 
-  type Mutation {
-    signUp(email: String!, password: String!): SignUpResponse
-    signIn(email: String!, password: String!): SignInResponse
-    addProjectMember(projectId: String!, personId: String!): AddProjectMemberResponse 
-  }
+	type Mutation {
+		signUp(email: String!, password: String!): SignUpResponse
+		signIn(email: String!, password: String!): SignInResponse
+		addProjectMember(projectId: String!, personId: String!): AddProjectMemberResponse
+	}
 
-  # === signUp ===
-  type SignUpResponse {
-      ok: Boolean!
-      errors: [SignUpError!]!
-      result: SignUpResult
-  }
-  
-  type SignUpError {
-      code: SignUpErrorCode!
-      endPersonMessage: String
-      developerMessage: String
-  }
-  
-  enum SignUpErrorCode {
-      EMAIL_ALREADY_EXISTS
-  }
-  
-  type SignUpResult {
-      person: Person!
-  }
+	# === signUp ===
+	type SignUpResponse {
+		ok: Boolean!
+		errors: [SignUpError!]!
+		result: SignUpResult
+	}
 
-  # === signIn ===
-  type SignInResponse {
-    ok: Boolean!
-    errors: [SignInError!]!
-    result: SignInResult
-  }
+	type SignUpError {
+		code: SignUpErrorCode!
+		endPersonMessage: String
+		developerMessage: String
+	}
 
-  type SignInError {
-    code: SignInErrorCode!
-    endUserMessage: String
-    developerMessage: String
-  }
+	enum SignUpErrorCode {
+		EMAIL_ALREADY_EXISTS
+	}
 
-  enum SignInErrorCode {
-    UNKNOWN_EMAIL
-    INVALID_PASSWORD
-  }
+	type SignUpResult {
+		person: Person!
+	}
 
-  type SignInResult {
-    token: String!
-    person: Person!
-  }
+	# === signIn ===
+	type SignInResponse {
+		ok: Boolean!
+		errors: [SignInError!]!
+		result: SignInResult
+	}
 
-  # === addProjectMember ===
-  type AddProjectMemberResponse {
-    ok: Boolean!
-    errors: [AddProjectMemberError!]!
-  }
+	type SignInError {
+		code: SignInErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
 
-  type AddProjectMemberError {
-    code: AddProjectMemberErrorCode!
-    endUserMessage: String
-    developerMessage: String
-  }
-  
-  enum AddProjectMemberErrorCode {
-    PROJECT_NOT_FOUND
-    PERSON_NOT_FOUND
-    ALREADY_MEMBER
-  }
+	enum SignInErrorCode {
+		UNKNOWN_EMAIL
+		INVALID_PASSWORD
+	}
 
-  # === common ===
-  type Person {
-    id: String!
-    email: String!
-    projects: [Project!]!
-  }
+	type SignInResult {
+		token: String!
+		person: Person!
+	}
 
-  type Project {
-    id: String!
-    name: String!
-  }
+	# === addProjectMember ===
+	type AddProjectMemberResponse {
+		ok: Boolean!
+		errors: [AddProjectMemberError!]!
+	}
+
+	type AddProjectMemberError {
+		code: AddProjectMemberErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum AddProjectMemberErrorCode {
+		PROJECT_NOT_FOUND
+		PERSON_NOT_FOUND
+		ALREADY_MEMBER
+	}
+
+	# === common ===
+	type Person {
+		id: String!
+		email: String!
+		projects: [Project!]!
+	}
+
+	type Project {
+		id: String!
+		name: String!
+	}
 `
 
 export default schema

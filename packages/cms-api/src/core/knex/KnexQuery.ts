@@ -3,17 +3,17 @@ import KnexQueryable from './KnexQueryable'
 import ImplementationException from '../exceptions/ImplementationException'
 
 export default abstract class KnexQuery<T> implements Query<KnexQueryable, T> {
-  abstract async fetch(queryable: KnexQueryable): Promise<T>
+	abstract async fetch(queryable: KnexQueryable): Promise<T>
 
-  protected fetchOneOrNull<R>(rows: Array<R>): R|null {
-    if (rows.length === 0) {
-      return null
-    }
+	protected fetchOneOrNull<R>(rows: Array<R>): R | null {
+		if (rows.length === 0) {
+			return null
+		}
 
-    if (rows.length > 1) {
-      throw new ImplementationException()
-    }
+		if (rows.length > 1) {
+			throw new ImplementationException()
+		}
 
-    return rows[0]
-  }
+		return rows[0]
+	}
 }

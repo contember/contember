@@ -14,7 +14,7 @@ export default class KnexWrapper {
 	}
 
 	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]) {
-		return this.knex.raw(sql, bindings)
+		return this.knex.raw(sql, bindings as any)
 	}
 
 	formatter(qb: Knex.QueryBuilder): Formatter {

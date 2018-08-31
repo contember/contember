@@ -125,7 +125,7 @@ export default class Mapper {
 			this.db,
 			new Promise(resolve => (resolver = resolve))
 		)
-		const promises = acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(data, insertBuilder, this))
+		const promises = acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(this.schema, data, insertBuilder, this))
 		resolver()
 
 		const result = await insertBuilder.insertRow()

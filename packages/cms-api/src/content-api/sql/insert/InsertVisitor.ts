@@ -3,6 +3,7 @@ import { isIt } from '../../../utils/type'
 import Mapper from '../mapper'
 import { uuid } from '../../../utils/uuid'
 import InsertBuilder from './InsertBuilder'
+import { acceptFieldVisitor } from "../../../content-schema/modelUtils";
 
 interface RelationInputProcessor {
 	connect(input: Input.UniqueWhere): PromiseLike<void>
@@ -11,15 +12,12 @@ interface RelationInputProcessor {
 }
 
 export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.RelationByTypeVisitor<PromiseLike<any>> {
-	private data: Input.CreateDataInput
-	private insertBuilder: InsertBuilder
-	private mapper: Mapper
 
-	constructor(data: Input.CreateDataInput, insertBuilder: InsertBuilder, mapper: Mapper) {
-		this.data = data
-		this.insertBuilder = insertBuilder
-		this.mapper = mapper
-	}
+	constructor(
+		private readonly schema: Model.Schema,
+		private readonly data: Input.CreateDataInput,
+		private readonly insertBuilder: InsertBuilder,
+		private readonly mapper: Mapper) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
 		this.insertBuilder.addColumnData(
@@ -56,7 +54,8 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				throw new Error('NoData')
-			})()
+			})(),
+			column.columnType
 		)
 	}
 
@@ -140,16 +139,17 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 	) {
 		const insertBuilder = this.insertBuilder
 		const mapper = this.mapper
+		const that = this
 
 		return this.processRelationInput(
 			this.data[relation.name] as Input.CreateOneRelationInput,
 			new class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
-					insertBuilder.addColumnData(relation.joiningColumn.columnName, input[targetEntity.primary])
+					insertBuilder.addColumnData(relation.joiningColumn.columnName, input[targetEntity.primary], that.getPrimaryColumnType(targetEntity))
 				}
 
 				public async create(input: Input.CreateDataInput) {
-					insertBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity, input))
+					insertBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity, input), that.getPrimaryColumnType(targetEntity))
 				}
 			}()
 		)
@@ -231,16 +231,17 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 	) {
 		const insertBuilder = this.insertBuilder
 		const mapper = this.mapper
+		const that = this
 
 		return this.processRelationInput(
 			this.data[relation.name] as Input.CreateOneRelationInput,
 			new class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
-					insertBuilder.addColumnData(relation.joiningColumn.columnName, input[targetEntity.primary])
+					insertBuilder.addColumnData(relation.joiningColumn.columnName, input[targetEntity.primary], that.getPrimaryColumnType(targetEntity))
 				}
 
 				public async create(input: Input.CreateDataInput) {
-					insertBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity, input))
+					insertBuilder.addColumnData(relation.joiningColumn.columnName, mapper.insert(targetEntity, input), that.getPrimaryColumnType(targetEntity))
 				}
 			}()
 		)
@@ -294,5 +295,15 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 			return uuid
 		}
 		throw new Error('not implemented')
+	}
+
+	private getPrimaryColumnType(entity: Model.Entity): string
+	{
+		return acceptFieldVisitor(this.schema, entity, entity.primary, {
+			visitColumn: (entity, column) => column.columnType,
+			visitRelation: () => {
+				throw new Error()
+			}
+		})
 	}
 }

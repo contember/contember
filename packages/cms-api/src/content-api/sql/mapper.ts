@@ -15,21 +15,15 @@ import ConditionBuilder from './select/ConditionBuilder'
 import Path from './select/Path'
 import QueryBuilder from '../../core/knex/QueryBuilder'
 import KnexWrapper from '../../core/knex/KnexWrapper'
+import PredicateFactory from "../../acl/PredicateFactory";
 
 export default class Mapper {
-	private schema: Model.Schema
-	private db: KnexWrapper
 
-	constructor(schema: Model.Schema, db: KnexWrapper) {
-		this.schema = schema
-		this.db = db
-	}
-
-	public static run(schema: Model.Schema, db: KnexConnection, cb: (mapper: Mapper) => void) {
-		return db.wrapper().transaction(trx => {
-			const mapper = new Mapper(schema, trx)
-			return cb(mapper)
-		})
+	constructor(
+		private readonly schema: Model.Schema,
+		private readonly db: KnexWrapper,
+		private readonly predicateFactory: PredicateFactory,
+	) {
 	}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {

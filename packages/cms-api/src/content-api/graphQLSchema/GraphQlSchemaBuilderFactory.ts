@@ -23,6 +23,7 @@ import VariableInjector from '../../acl/VariableInjector'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicateFactory from "../../acl/PredicateFactory";
+import MapperRunner from "../sql/MapperRunner";
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -35,7 +36,8 @@ export default class GraphQlSchemaBuilderFactory {
 		const predicatesFactory = new PredicateFactory(permissions, variableInjector)
 		const predicatesInjector = new PredicatesInjector(schema, predicatesFactory)
 		const uniqueWhereExpander = new UniqueWhereExpander(schema)
-		const readResolver = new ReadResolver(schema, predicatesInjector, uniqueWhereExpander)
+		const mapperRunner = new MapperRunner(schema, predicatesFactory)
+		const readResolver = new ReadResolver(mapperRunner, predicatesInjector, uniqueWhereExpander)
 		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, readResolver)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<Authorizator.Operation.create>>()
@@ -83,7 +85,7 @@ export default class GraphQlSchemaBuilderFactory {
 		)
 		updateEntityInputProviderAccessor.set(updateEntityInputProvider)
 
-		const mutationResolver = new MutationResolver(schema, uniqueWhereExpander)
+		const mutationResolver = new MutationResolver(mapperRunner, uniqueWhereExpander)
 		const mutationProvider = new MutationProvider(
 			schema,
 			authorizator,

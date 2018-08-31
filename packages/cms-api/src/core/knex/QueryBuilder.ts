@@ -10,6 +10,11 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return this.wrapper.formatter(this.qb)
 	}
 
+	public with(alias: string, callback: QueryBuilder.Callback): void
+	{
+		this.qb.with(alias, qb => callback(new QueryBuilder(this.wrapper, qb)))
+	}
+
 	public from(tableName: string, alias?: string): void {
 		if (alias) {
 			this.qb.from(`${tableName} as ${alias}`)
@@ -29,6 +34,11 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		} else {
 			this.qb.select(`${columnFqn}`)
 		}
+	}
+
+	public selectValue(value: Value, type: string, alias?: string): void {
+		const sql = `? :: ${type}` + (alias ? ` as ${alias}` : '')
+		this.qb.select(this.raw(sql, value as Value))
 	}
 
 	public where(where: { [columName: string]: Value }): void
@@ -67,10 +77,16 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	}
 
 	public async insert(data: { [column: string]: Value }): Promise<number>
-
 	public async insert(data: { [column: string]: Value }, returning: string): Promise<(number | string)[]>
 	public async insert(data: { [column: string]: Value }, returning?: string): Promise<number | (number | string)[]> {
 		return await this.qb.insert(data, returning)
+	}
+
+	public async insertFrom(tableName: string, columns: string[], callback: QueryBuilder.Callback): Promise<number>
+	public async insertFrom(tableName: string, columns: string[], callback: QueryBuilder.Callback, returning: string): Promise<(number | string)[]>
+	public async insertFrom(tableName: string, columns: string[], callback: QueryBuilder.Callback, returning?: string): Promise<number | (number | string)[]> {
+		this.qb.into(this.raw('?? (' + columns.map(() => '??').join(', ') + ')', tableName, ...columns))
+		return await this.qb.insert((qb: Knex.QueryBuilder) => callback(new QueryBuilder(this.wrapper, qb)), returning)
 	}
 
 	public async insertIgnore(data: any): Promise<number> {
@@ -106,7 +122,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		if (raw === null) {
 			raw = this.wrapper.raw('true')
 		}
-		return [`${tableName} as ${alias || tableName}`, raw]
+		return [`${tableName} as ${alias || tableName}`, raw as Knex.Raw]
 	}
 }
 

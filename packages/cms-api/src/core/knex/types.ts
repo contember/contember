@@ -1,6 +1,7 @@
 import * as Knex from 'knex'
 
 export type Value =
+	| null
 	| string
 	| number
 	| boolean

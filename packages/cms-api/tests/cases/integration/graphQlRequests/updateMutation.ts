@@ -90,8 +90,12 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "author" ("id", "name") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as name) 
+							insert into "author" ("id", "name") 
+							select "root_"."id", "root_"."name" 
+							from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'John'],
 							response: [testUuid(1)]
 						},
@@ -246,8 +250,12 @@ describe('update', () => {
 							response: []
 						},
 						{
-							sql: SQL`insert into "author" ("id", "name") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as name) 
+							insert into "author" ("id", "name") 
+							select "root_"."id", "root_"."name"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'John'],
 							response: [testUuid(1)]
 						},
@@ -391,9 +399,13 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
-              returning "id"`,
-							parameters: [testUuid(1), 'cs', testUuid(2), 'Hello'],
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as title, $3 :: text as locale, $4 :: uuid as post_id) 
+							insert into "post_locale" ("id", "title", "locale", "post_id") 
+							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
+              from "root_"
+							returning "id"`,
+							parameters: [testUuid(1), 'Hello', 'cs', testUuid(2)],
 							response: [testUuid(1)]
 						},
 						selectUpdatePostSql
@@ -508,9 +520,13 @@ describe('update', () => {
 							response: []
 						},
 						{
-							sql: SQL`insert into "post_locale" ("id", "locale", "post_id", "title") values ($1, $2, $3, $4)
-              returning "id"`,
-							parameters: [testUuid(1), 'cs', testUuid(2), 'World']
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as title, $3 :: text as locale, $4 :: uuid as post_id) 
+							insert into "post_locale" ("id", "title", "locale", "post_id") 
+							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
+              from "root_"
+							returning "id"`,
+							parameters: [testUuid(1), 'World', 'cs', testUuid(2)]
 						},
 						selectUpdatePostSql
 					])
@@ -654,8 +670,12 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as url) 
+							insert into "site_setting" ("id", "url") 
+							select "root_"."id", "root_"."url"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'http://mangoweb.cz'],
 							response: [testUuid(1)]
 						},
@@ -855,8 +875,12 @@ describe('update', () => {
 							response: []
 						},
 						{
-							sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as url) 
+							insert into "site_setting" ("id", "url") 
+							select "root_"."id", "root_"."url"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'http://mgw.cz'],
 							response: [testUuid(1)]
 						},
@@ -900,8 +924,12 @@ describe('update', () => {
 							response: []
 						},
 						{
-							sql: SQL`insert into "site_setting" ("id", "url") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as url) 
+							insert into "site_setting" ("id", "url") 
+							select "root_"."id", "root_"."url"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'http://mgw.cz'],
 							response: [testUuid(1)]
 						},
@@ -1037,8 +1065,12 @@ describe('update', () => {
 							parameters: [null, testUuid(2)]
 						},
 						{
-							sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+							insert into "site" ("id", "name", "setting_id") 
+							select "root_"."id", "root_"."name", "root_"."setting_id"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: [testUuid(1)]
 						},
@@ -1076,8 +1108,12 @@ describe('update', () => {
 							response: []
 						},
 						{
-							sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+							insert into "site" ("id", "name", "setting_id") 
+							select "root_"."id", "root_"."name", "root_"."setting_id"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: [testUuid(1)]
 						},
@@ -1193,8 +1229,12 @@ describe('update', () => {
 							response: []
 						},
 						{
-							sql: SQL`insert into "site" ("id", "name", "setting_id") values ($1, $2, $3)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+							insert into "site" ("id", "name", "setting_id") 
+							select "root_"."id", "root_"."name", "root_"."setting_id"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'Mgw', testUuid(2)],
 							response: [testUuid(1)]
 						},
@@ -1455,8 +1495,12 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "category" ("id", "name") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as name) 
+							insert into "category" ("id", "name") 
+							select "root_"."id", "root_"."name"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
 							response: [testUuid(1)]
 						},
@@ -1648,8 +1692,12 @@ describe('update', () => {
 							response: 0
 						},
 						{
-							sql: SQL`insert into "category" ("id", "name") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as name) 
+							insert into "category" ("id", "name") 
+							select "root_"."id", "root_"."name"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
 							response: [testUuid(1)]
 						},
@@ -1728,8 +1776,12 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "post" ("id", "title") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as title) 
+							insert into "post" ("id", "title") 
+							select "root_"."id", "root_"."title"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
 							response: [testUuid(1)]
 						},
@@ -1921,8 +1973,12 @@ describe('update', () => {
 							response: 0
 						},
 						{
-							sql: SQL`insert into "post" ("id", "title") values ($1, $2)
-              returning "id"`,
+							sql: SQL`with "root_" as 
+							(select $1 :: uuid as id, $2 :: text as title) 
+							insert into "post" ("id", "title") 
+							select "root_"."id", "root_"."title"
+              from "root_"
+							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
 							response: [testUuid(1)]
 						},

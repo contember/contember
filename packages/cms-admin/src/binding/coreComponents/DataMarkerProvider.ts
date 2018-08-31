@@ -24,6 +24,7 @@ export interface ReferenceMarkerProvider extends DataBindingComponent {
 
 type DataMarkerProvider = Partial<
 	EntityMarkerProvider | FieldMarkerProvider | MultipleFieldMarkerProvider | ReferenceMarkerProvider
-> & DataBindingComponent
+> &
+	DataBindingComponent
 
 export default DataMarkerProvider

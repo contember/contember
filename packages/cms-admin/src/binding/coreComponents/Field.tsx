@@ -11,7 +11,6 @@ export interface FieldProps {
 }
 
 export default class Field extends React.Component<FieldProps> {
-
 	public render() {
 		return (
 			<DataContext.Consumer>

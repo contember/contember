@@ -1,9 +1,7 @@
 {
-  "extends": "../tsconfig.settings.json",
-  "compilerOptions": {
-    "outDir": "../dist/src"
-  },
-  "references": [
-    {"path": "../../../packages/cms-client/src"}
-  ]
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src"
+	},
+	"references": [{ "path": "../../../packages/cms-client/src" }]
 }

@@ -1,4 +1,3 @@
-declare interface Window
-{
-  devToolsExtension?(): (args?: any) => any;
+declare interface Window {
+	devToolsExtension?(): (args?: any) => any
 }

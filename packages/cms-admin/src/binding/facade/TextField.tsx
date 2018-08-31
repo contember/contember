@@ -14,7 +14,6 @@ export interface TextFieldProps {
 }
 
 export default class TextField extends React.Component<TextFieldProps> {
-
 	static displayName = 'TextField'
 
 	public render() {

@@ -1,5 +1,5 @@
 import { Button, Icon, Image, Toolbar } from './EditorComponents'
-import { Editor, getEventRange, getEventTransfer  } from 'slate-react'
+import { Editor, getEventRange, getEventTransfer } from 'slate-react'
 import { isKeyHotkey } from 'is-hotkey'
 // import { Value } from 'slate'
 import * as React from 'react'
@@ -34,12 +34,11 @@ const isCodeHotkey = isKeyHotkey('mod+`')
  */
 
 export default class RichEditor extends React.Component {
-
 	/**
 	 * Deserialize the initial editor value.
 	 */
 	state = {
-		value: Plain.deserialize(''),
+		value: Plain.deserialize('')
 	}
 
 	/**
@@ -112,10 +111,7 @@ export default class RichEditor extends React.Component {
 		const isActive = this.hasMark(type)
 
 		return (
-			<Button
-				active={isActive}
-				onMouseDown={(event: any) => this.onClickMark(event, type)}
-			>
+			<Button active={isActive} onMouseDown={(event: any) => this.onClickMark(event, type)}>
 				<Icon>{icon}</Icon>
 			</Button>
 		)
@@ -134,10 +130,7 @@ export default class RichEditor extends React.Component {
 		}
 
 		return (
-			<Button
-				active={isActive}
-				onMouseDown={(event: any) => this.onClickBlock(event, type)}
-			>
+			<Button active={isActive} onMouseDown={(event: any) => this.onClickBlock(event, type)}>
 				<Icon>{icon}</Icon>
 			</Button>
 		)
@@ -158,7 +151,7 @@ export default class RichEditor extends React.Component {
 				return <h1 {...attributes}>{children}</h1>
 			case 'heading-two':
 				return <h2 {...attributes}>{children}</h2>
-				case 'heading-three':
+			case 'heading-three':
 				return <h3 {...attributes}>{children}</h3>
 			case 'list-item':
 				return <li {...attributes}>{children}</li>
@@ -273,11 +266,7 @@ export default class RichEditor extends React.Component {
 					.unwrapBlock('bulleted-list')
 					.unwrapBlock('numbered-list')
 			} else if (isList) {
-				change
-					.unwrapBlock(
-						type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
-					)
-					.wrapBlock(type)
+				change.unwrapBlock(type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list').wrapBlock(type)
 			} else {
 				change.setBlocks('list-item').wrapBlock(type)
 			}
@@ -346,7 +335,7 @@ export default class RichEditor extends React.Component {
 		return true
 	}
 
-	 /**
+	/**
 	 * On drop, insert the image wherever it is dropped.
 	 */
 	onDropOrPaste = (event: any, change: any, editor: any) => {
@@ -378,9 +367,6 @@ export default class RichEditor extends React.Component {
 			change.call(insertImage, text, target)
 		}
 	}
-
-
-
 }
 
 /**
@@ -389,7 +375,7 @@ export default class RichEditor extends React.Component {
 function wrapLink(change: any, href: string) {
 	change.wrapInline({
 		type: 'link',
-		data: { href },
+		data: { href }
 	})
 
 	change.collapseToEnd()
@@ -420,6 +406,6 @@ function insertImage(change: any, src: string, target: any) {
 	change.insertBlock({
 		type: 'image',
 		isVoid: true,
-		data: { src },
+		data: { src }
 	})
 }

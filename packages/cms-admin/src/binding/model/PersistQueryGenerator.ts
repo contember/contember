@@ -63,7 +63,8 @@ export default class PersistQueryGenerator {
 					for (const field of persistedField) {
 						const persistedId: string = field[PersistQueryGenerator.PRIMARY_KEY_NAME]
 						const currentById = innerAccessor.find(
-							(element): element is EntityAccessor  => element instanceof EntityAccessor && element.primaryKey === persistedId
+							(element): element is EntityAccessor =>
+								element instanceof EntityAccessor && element.primaryKey === persistedId
 						)
 
 						if (currentById) {

@@ -6,25 +6,18 @@ import { Editor } from 'slate-react'
  * The plain text example.
  */
 export default class PlainTextEditor extends React.Component {
-
 	/**
 	 * Deserialize the initial editor value.
 	 */
 	state = {
-		value: Plain.deserialize(''),
+		value: Plain.deserialize('')
 	}
 
 	/**
 	 * Render the editor.
 	 */
 	render() {
-		return (
-			<Editor
-				placeholder="Enter some plain text..."
-				value={this.state.value}
-				onChange={this.onChange}
-			/>
-		)
+		return <Editor placeholder="Enter some plain text..." value={this.state.value} onChange={this.onChange} />
 	}
 
 	/**
@@ -34,5 +27,3 @@ export default class PlainTextEditor extends React.Component {
 		this.setState({ value })
 	}
 }
-
-

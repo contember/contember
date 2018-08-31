@@ -395,8 +395,8 @@ describe('Queries', () => {
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."id" as "root_id",
-                       "root_"."url" as "root_url"
+                       "root_"."url" as "root_url",
+                       "root_"."id" as "root_id"
                      from "site_setting" as "root_"`,
 						response: [
 							{
@@ -529,8 +529,10 @@ describe('Queries', () => {
 						]
 					},
 					{
-						sql: SQL`select "root_"."id" as "root_id",  
+						sql: SQL`select
+                       "root_"."id" as "root_id",
                        "root_"."visible" as "root_visible",
+                       "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "category" as "root_"
                      where "root_"."id" in ($1, $2, $3)`,
@@ -707,7 +709,8 @@ describe('Queries', () => {
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."author_id" as "root_author"
+                       "root_"."author_id" as "root_author",
+                       "root_"."id" as "root_id"
                      from "post" as "root_"
                      where "root_"."id" in ($1, $2, $3)
           `,

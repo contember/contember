@@ -22,6 +22,7 @@ import MutationResolver from '../graphQlResolver/MutationResolver'
 import VariableInjector from '../../acl/VariableInjector'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
+import PredicateFactory from "../../acl/PredicateFactory";
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -31,7 +32,8 @@ export default class GraphQlSchemaBuilderFactory {
 		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
 		const entityTypeProvider = new EntityTypeProvider(schema, authorizator, columnTypeResolver, whereTypeProvider)
 		const variableInjector = new VariableInjector()
-		const predicatesInjector = new PredicatesInjector(schema, permissions, variableInjector)
+		const predicatesFactory = new PredicateFactory(permissions, variableInjector)
+		const predicatesInjector = new PredicatesInjector(schema, predicatesFactory)
 		const uniqueWhereExpander = new UniqueWhereExpander(schema)
 		const readResolver = new ReadResolver(schema, predicatesInjector, uniqueWhereExpander)
 		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, readResolver)

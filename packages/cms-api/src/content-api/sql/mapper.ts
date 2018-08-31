@@ -1,7 +1,6 @@
-import { Input, Model } from 'cms-common'
+import { Input, Model, Acl } from 'cms-common'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
 import { acceptEveryFieldVisitor, getColumnName, getEntity } from '../../content-schema/modelUtils'
-import KnexConnection from '../../core/knex/KnexConnection'
 import InsertBuilder from './insert/InsertBuilder'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
@@ -16,12 +15,14 @@ import Path from './select/Path'
 import QueryBuilder from '../../core/knex/QueryBuilder'
 import KnexWrapper from '../../core/knex/KnexWrapper'
 import PredicateFactory from "../../acl/PredicateFactory";
+import Authorizator from "../../acl/Authorizator";
 
 export default class Mapper {
 
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly db: KnexWrapper,
+		private readonly variables: Acl.VariablesMap,
 		private readonly predicateFactory: PredicateFactory,
 	) {
 	}
@@ -113,13 +114,22 @@ export default class Mapper {
 		let resolver: (() => any) = () => {
 			throw new Error()
 		}
+		const where = this.predicateFactory.create(entity, Object.keys(data), this.variables, Authorizator.Operation.create)
 		const insertBuilder = new InsertBuilder(
 			entity.tableName,
 			entity.primaryColumn,
 			this.db,
+			(qb) => {
+				const joinBuilder = new JoinBuilder(this.schema)
+				const conditionBuilder = new ConditionBuilder()
+				const whereBuilder = new WhereBuilder(this.schema, joinBuilder, conditionBuilder)
+				whereBuilder.build(qb, entity, new Path([]), where)
+			},
 			new Promise(resolve => (resolver = resolve))
 		)
 		const promises = acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(this.schema, data, insertBuilder, this))
+
+
 		resolver()
 
 		const result = await insertBuilder.insertRow()

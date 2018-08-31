@@ -42,11 +42,11 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	}
 
 	public where(where: { [columName: string]: Value }): void
-	public where(whereCondition: (whereClause: ConditionBuilder) => void): void
-	public where(where: ((whereClause: ConditionBuilder) => void) | { [columName: string]: Value }): void {
+	public where(whereCondition: QueryBuilder.WhereCallback): void
+	public where(where: (QueryBuilder.WhereCallback) | { [columName: string]: Value }): void {
 		if (typeof where === 'function') {
 			const builder = new ConditionBuilder.ConditionStringBuilder(this)
-			where(builder)
+			where(builder, this)
 			const sql = builder.getSql()
 			if (sql) {
 				this.qb.where(sql)
@@ -128,6 +128,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 
 namespace QueryBuilder {
 	export type Callback = (qb: QueryBuilder) => void
+	export type WhereCallback = (whereClause: ConditionBuilder, qb: QueryBuilder<any>) => void
 
 	type ColumnFqn = string
 	type TableAliasAndColumn = [string, string]

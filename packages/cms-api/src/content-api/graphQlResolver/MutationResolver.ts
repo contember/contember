@@ -27,7 +27,7 @@ export default class MutationResolver {
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, args.where)
 		const queryExpanded = queryAst.withArg<Input.ListQueryInput>('where', whereExpanded)
 
-		return await this.mapperRunner.run(context.db, async mapper => {
+		return await this.mapperRunner.run(context.db, context.identityVariables, async mapper => {
 			await mapper.update(entity, args.where, args.data)
 
 			return (await mapper.select(entity, queryExpanded))[0] || null
@@ -42,7 +42,7 @@ export default class MutationResolver {
 	) => {
 		const objectAst = new GraphQlQueryAstFactory().create(info)
 
-		return await this.mapperRunner.run(context.db, async mapper => {
+		return await this.mapperRunner.run(context.db, context.identityVariables, async mapper => {
 			const primary = await mapper.insert(entity, args.data)
 
 			const whereArgs = {where: {[entity.primary]: {eq: primary}}}
@@ -70,7 +70,7 @@ export default class MutationResolver {
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, args.where)
 		const queryExpanded = queryAst.withArg<Input.ListQueryInput>('where', whereExpanded)
 
-		return await this.mapperRunner.run(context.db, async mapper => {
+		return await this.mapperRunner.run(context.db, context.identityVariables,async mapper => {
 			const result = (await mapper.select(entity, queryExpanded))[0] || null
 
 			await mapper.delete(entity, args.where)

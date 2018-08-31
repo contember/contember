@@ -48,6 +48,68 @@ describe('Insert mutation', () => {
 		})
 	})
 
+	it('insert author (with acl)', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Author', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+				.buildSchema(),
+			permissions: {
+				Author: {
+					predicates: {
+						name_predicate: {name: 'name_variable'},
+					},
+					operations: {
+						create: {
+							id: true,
+							name: 'name_predicate',
+						},
+						read: {
+							id: true,
+						}
+					},
+				},
+			},
+			variables: {
+				name_variable: ['John', 'Jack'],
+			},
+			query: GQL`
+        mutation {
+          createAuthor(data: {name: "John"}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`with "root_" as 
+						(select $1 :: uuid as id, $2 :: text as name) 
+						insert into "author" ("id", "name") 
+						select "root_"."id", "root_"."name"
+            from "root_"
+						where "root_"."name" in ($3, $4)
+						returning "id"`,
+						parameters: [testUuid(1), 'John', 'John', 'Jack'],
+						response: [testUuid(1)]
+					},
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "author" as "root_"
+                     where "root_"."id" = $1`,
+						response: [{root_id: testUuid(1)}],
+						parameters: [testUuid(1)]
+					}
+				])
+			],
+			return: {
+				data: {
+					createAuthor: {
+						id: testUuid(1)
+					}
+				}
+			}
+		})
+	})
+
 	it('insert site with settings (one has one owner relation', async () => {
 		await execute({
 			schema: new SchemaBuilder()

@@ -1,6 +1,6 @@
 import PredicateFactory from "../../acl/PredicateFactory";
 import Mapper from "./mapper";
-import { Model } from 'cms-common'
+import { Model, Acl } from 'cms-common'
 import KnexConnection from "../../core/knex/KnexConnection";
 
 class MapperRunner {
@@ -10,9 +10,9 @@ class MapperRunner {
 	) {
 	}
 
-	public run(db: KnexConnection, cb: (mapper: Mapper) => void) {
+	public run(db: KnexConnection, variables: Acl.VariablesMap, cb: (mapper: Mapper) => void) {
 		return db.wrapper().transaction(trx => {
-			const mapper = new Mapper(this.schema, trx, this.predicateFactory)
+			const mapper = new Mapper(this.schema, trx, variables, this.predicateFactory)
 			return cb(mapper)
 		})
 	}

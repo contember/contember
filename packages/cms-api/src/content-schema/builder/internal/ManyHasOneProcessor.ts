@@ -1,50 +1,57 @@
-import FieldProcessor from "./FieldProcessor"
-import { Model } from "cms-common"
-import ManyHasOneBuilder from "../ManyHasOneBuilder"
-import NamingConventions from "../NamingConventions";
+import FieldProcessor from './FieldProcessor'
+import { Model } from 'cms-common'
+import ManyHasOneBuilder from '../ManyHasOneBuilder'
+import NamingConventions from '../NamingConventions'
 
-export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBuilder.Options>
-{
-  private conventions: NamingConventions
+export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBuilder.Options> {
+	private conventions: NamingConventions
 
-  constructor(conventions: NamingConventions)
-  {
-    this.conventions = conventions
-  }
+	constructor(conventions: NamingConventions) {
+		this.conventions = conventions
+	}
 
-  public process(entityName: string, fieldName: string, options: ManyHasOneBuilder.Options, registerField: FieldProcessor.FieldRegistrar): void
-  {
-    registerField(entityName, this.createManyHasOneOwning(options, fieldName))
-    if (options.inversedBy) {
-      const inversed = this.createManyHasOneInversed(options as ManyHasOneBuilder.Options & { inversedBy: string }, entityName, fieldName)
-      registerField(options.target, inversed)
-    }
-  }
+	public process(
+		entityName: string,
+		fieldName: string,
+		options: ManyHasOneBuilder.Options,
+		registerField: FieldProcessor.FieldRegistrar
+	): void {
+		registerField(entityName, this.createManyHasOneOwning(options, fieldName))
+		if (options.inversedBy) {
+			const inversed = this.createManyHasOneInversed(
+				options as ManyHasOneBuilder.Options & { inversedBy: string },
+				entityName,
+				fieldName
+			)
+			registerField(options.target, inversed)
+		}
+	}
 
+	private createManyHasOneInversed(
+		options: ManyHasOneBuilder.Options & { inversedBy: string },
+		entityName: string,
+		fieldName: string
+	): Model.OneHasManyRelation {
+		return {
+			name: options.inversedBy,
+			ownedBy: fieldName,
+			target: entityName,
+			type: Model.RelationType.OneHasMany
+		}
+	}
 
-  private createManyHasOneInversed(options: ManyHasOneBuilder.Options & { inversedBy: string }, entityName: string, fieldName: string): Model.OneHasManyRelation
-  {
-    return {
-      name: options.inversedBy,
-      ownedBy: fieldName,
-      target: entityName,
-      type: Model.RelationType.OneHasMany,
-    }
-  }
-
-  private createManyHasOneOwning(options: ManyHasOneBuilder.Options, fieldName: string): Model.ManyHasOneRelation
-  {
-    const joiningColumn = options.joiningColumn || {}
-    return {
-      name: fieldName,
-      inversedBy: options.inversedBy,
-      nullable: options.nullable === undefined ? true : options.nullable,
-      type: Model.RelationType.ManyHasOne,
-      target: options.target,
-      joiningColumn: {
-        columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
-        onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
-      },
-    }
-  }
+	private createManyHasOneOwning(options: ManyHasOneBuilder.Options, fieldName: string): Model.ManyHasOneRelation {
+		const joiningColumn = options.joiningColumn || {}
+		return {
+			name: fieldName,
+			inversedBy: options.inversedBy,
+			nullable: options.nullable === undefined ? true : options.nullable,
+			type: Model.RelationType.ManyHasOne,
+			target: options.target,
+			joiningColumn: {
+				columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
+				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict
+			}
+		}
+	}
 }

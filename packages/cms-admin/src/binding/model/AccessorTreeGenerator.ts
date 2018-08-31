@@ -28,7 +28,7 @@ export default class AccessorTreeGenerator {
 		onUnlink?: () => void
 	): EntityAccessor | null {
 		const entityData: EntityData = {}
-		if(!data) return null
+		if (!data) return null
 		const id = data[AccessorTreeGenerator.PRIMARY_KEY_NAME]
 		const fields = marker.fields
 
@@ -61,7 +61,7 @@ export default class AccessorTreeGenerator {
 								onUpdate(fieldName, oneToManyData)
 							}
 						)
-						if(accessor) oneToManyData.push(accessor)
+						if (accessor) oneToManyData.push(accessor)
 					}
 
 					entityData[fieldName] = oneToManyData
@@ -79,7 +79,7 @@ export default class AccessorTreeGenerator {
 						},
 						() => onUpdate(fieldName, undefined)
 					)
-					if(accessor) entityData[fieldName] = accessor
+					if (accessor) entityData[fieldName] = accessor
 				}
 			} else {
 				const onChange = (newValue: any) => {

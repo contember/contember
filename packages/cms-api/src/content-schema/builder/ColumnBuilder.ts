@@ -1,68 +1,65 @@
-import FieldBuilder from "./FieldBuilder"
-import { Model } from "cms-common"
+import FieldBuilder from './FieldBuilder'
+import { Model } from 'cms-common'
 
+class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O> {
+	private options: O
 
-class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O>
-{
-  private options: O
+	constructor(options: O) {
+		this.options = options
+	}
 
-  constructor(options: O)
-  {
-    this.options = options
-  }
+	public columnName(columnName: string): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...(this.options as object), columnName } as O)
+	}
 
-  public columnName(columnName: string): ColumnBuilder<O>
-  {
-    return new ColumnBuilder<O>({...(this.options as object), columnName} as O)
-  }
+	public type(
+		type: Model.ColumnType,
+		typeOptions: ColumnBuilder.TypeOptions = {}
+	): ColumnBuilder<O & PartialColumnOptions<'type'>> {
+		return new ColumnBuilder<O & PartialColumnOptions<'type'>>({
+			...(this.options as object),
+			type: type,
+			...typeOptions
+		} as O & PartialColumnOptions<'type'>)
+	}
 
-  public type(type: Model.ColumnType, typeOptions: ColumnBuilder.TypeOptions = {}): ColumnBuilder<O & PartialColumnOptions<'type'>>
-  {
-    return new ColumnBuilder<O & PartialColumnOptions<'type'>>({...(this.options as object), type: type, ...typeOptions} as O & PartialColumnOptions<'type'>)
-  }
+	public nullable(): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...(this.options as object), nullable: true } as O)
+	}
 
-  public nullable(): ColumnBuilder<O>
-  {
-    return new ColumnBuilder<O>({...(this.options as object), nullable: true} as O)
-  }
+	public notNull(): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...(this.options as object), nullable: false } as O)
+	}
 
-  public notNull(): ColumnBuilder<O>
-  {
-    return new ColumnBuilder<O>({...(this.options as object), nullable: false} as O)
-  }
+	public unique(): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...(this.options as object), unique: true } as O)
+	}
 
-  public unique(): ColumnBuilder<O>
-  {
-    return new ColumnBuilder<O>({...(this.options as object), unique: true} as O)
-  }
+	public primary(): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...(this.options as object), primary: true } as O)
+	}
 
-  public primary(): ColumnBuilder<O>
-  {
-    return new ColumnBuilder<O>({...(this.options as object), primary: true} as O)
-  }
-
-  getOption(): O
-  {
-    return this.options
-  }
+	getOption(): O {
+		return this.options
+	}
 }
 
-namespace ColumnBuilder
-{
-  export type TypeOptions = {
-    enumName?: string
-  }
+namespace ColumnBuilder {
+	export type TypeOptions = {
+		enumName?: string
+	}
 
-  export type Options = {
-    type: Model.ColumnType
-    enumName?: string
-    columnName?: string
-    unique?: boolean
-    nullable?: boolean
-    primary?: boolean
-  }
+	export type Options = {
+		type: Model.ColumnType
+		enumName?: string
+		columnName?: string
+		unique?: boolean
+		nullable?: boolean
+		primary?: boolean
+	}
 }
 
-type PartialColumnOptions<K extends keyof ColumnBuilder.Options> = Partial<ColumnBuilder.Options> & Pick<ColumnBuilder.Options, K>
+type PartialColumnOptions<K extends keyof ColumnBuilder.Options> = Partial<ColumnBuilder.Options> &
+	Pick<ColumnBuilder.Options, K>
 
 export default ColumnBuilder

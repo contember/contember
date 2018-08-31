@@ -9,12 +9,16 @@ export function Toolbar({ ...rest }: any) {
 	return <div className="editor-toolbar" {...rest} />
 }
 
-export function Button(props:any) {
-	return <span className={classNames({
-		'editor-button': true,
-		'is-active': props.active,
-		'is-reversed': props.reversed
-	})} />
+export function Button(props: any) {
+	return (
+		<span
+			className={classNames({
+				'editor-button': true,
+				'is-active': props.active,
+				'is-reversed': props.reversed
+			})}
+		/>
+	)
 }
 
 export function Icon({ className, ...rest }: any) {
@@ -22,8 +26,12 @@ export function Icon({ className, ...rest }: any) {
 }
 
 export function Image(props: any) {
-	return <img className={classNames({
-		'editor-image': true,
-		'is-selected': props.selected
-	})} />
+	return (
+		<img
+			className={classNames({
+				'editor-image': true,
+				'is-selected': props.selected
+			})}
+		/>
+	)
 }

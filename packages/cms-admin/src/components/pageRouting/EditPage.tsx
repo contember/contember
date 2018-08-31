@@ -4,7 +4,7 @@ import { ParametersContext } from './Pages'
 
 interface EditPageProps {
 	entity: string
-	layout: React.ComponentType<{children: React.ReactNode}>
+	layout: React.ComponentType<{ children: React.ReactNode }>
 }
 
 export default class EditPage extends React.Component<EditPageProps> {

@@ -39,7 +39,7 @@ export default class EntityTreeGenerator {
 		if (typeof node === 'function') {
 			throw new DataBindingError(
 				'Render props (functions as React Component children) are not supported within the schema. ' +
-				'Please refer to the documentation.'
+					'Please refer to the documentation.'
 			)
 		}
 
@@ -86,7 +86,9 @@ export default class EntityTreeGenerator {
 						)
 					}
 					throw new DataBindingError(
-						`Each ${node.type.displayName} component must have children that refer to its fields as otherwise, it would be redundant.`
+						`Each ${
+							node.type.displayName
+						} component must have children that refer to its fields as otherwise, it would be redundant.`
 					)
 				}
 				if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
@@ -100,9 +102,7 @@ export default class EntityTreeGenerator {
 							`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
 						)
 					}
-					throw new DataBindingError(
-						`Each ${node.type.displayName} component must have children.`
-					)
+					throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
 				}
 
 				return undefined

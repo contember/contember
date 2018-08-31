@@ -23,10 +23,7 @@ class GraphqlClient {
 			if (response.ok && !result.errors && result.data) {
 				return result.data
 			} else {
-				throw new GraphqlClient.GraphqlClientError(
-					{ query, variables },
-					{ status: response.status, body: result }
-				)
+				throw new GraphqlClient.GraphqlClientError({ query, variables }, { status: response.status, body: result })
 			}
 		} else {
 			throw new GraphqlClient.GraphqlServerError(

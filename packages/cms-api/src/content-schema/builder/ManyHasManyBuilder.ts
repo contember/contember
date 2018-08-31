@@ -1,56 +1,52 @@
-import { Model } from "cms-common"
-import FieldBuilder from "./FieldBuilder"
-import { AddEntityCallback, EntityConfigurator } from "./SchemaBuilder";
+import { Model } from 'cms-common'
+import FieldBuilder from './FieldBuilder'
+import { AddEntityCallback, EntityConfigurator } from './SchemaBuilder'
 
-type PartialOptions<K extends keyof ManyHasManyBuilder.Options> = Partial<ManyHasManyBuilder.Options> & Pick<ManyHasManyBuilder.Options, K>
+type PartialOptions<K extends keyof ManyHasManyBuilder.Options> = Partial<ManyHasManyBuilder.Options> &
+	Pick<ManyHasManyBuilder.Options, K>
 
-class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O>
-{
-  private options: O
-  private addEntity: AddEntityCallback
+class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
+	private options: O
+	private addEntity: AddEntityCallback
 
-  constructor(options: O, addEntity: AddEntityCallback)
-  {
-    this.options = options
-    this.addEntity = addEntity;
-  }
+	constructor(options: O, addEntity: AddEntityCallback) {
+		this.options = options
+		this.addEntity = addEntity
+	}
 
-  target(target: string, configurator?: EntityConfigurator): ManyHasManyBuilder<O & PartialOptions<'target'>>
-  {
-    if (configurator) {
-      this.addEntity(target, configurator)
-    }
-    return this.withOption('target', target)
-  }
+	target(target: string, configurator?: EntityConfigurator): ManyHasManyBuilder<O & PartialOptions<'target'>> {
+		if (configurator) {
+			this.addEntity(target, configurator)
+		}
+		return this.withOption('target', target)
+	}
 
-  inversedBy(inversedBy: string): ManyHasManyBuilder<O>
-  {
-    return this.withOption('inversedBy', inversedBy)
-  }
+	inversedBy(inversedBy: string): ManyHasManyBuilder<O> {
+		return this.withOption('inversedBy', inversedBy)
+	}
 
-  joiningTable(joiningTable: Model.JoiningTable): ManyHasManyBuilder<O>
-  {
-    return this.withOption('joiningTable', joiningTable)
-  }
+	joiningTable(joiningTable: Model.JoiningTable): ManyHasManyBuilder<O> {
+		return this.withOption('joiningTable', joiningTable)
+	}
 
-  getOption(): O
-  {
-    return this.options
-  }
+	getOption(): O {
+		return this.options
+	}
 
-  private withOption<K extends keyof ManyHasManyBuilder.Options>(key: K, value: ManyHasManyBuilder.Options[K])
-  {
-    return new ManyHasManyBuilder<O & PartialOptions<K>>({...(this.options as object), [key]: value} as O & PartialOptions<K>, this.addEntity)
-  }
+	private withOption<K extends keyof ManyHasManyBuilder.Options>(key: K, value: ManyHasManyBuilder.Options[K]) {
+		return new ManyHasManyBuilder<O & PartialOptions<K>>(
+			{ ...(this.options as object), [key]: value } as O & PartialOptions<K>,
+			this.addEntity
+		)
+	}
 }
 
-namespace ManyHasManyBuilder
-{
-  export type Options = {
-    target: string
-    inversedBy?: string
-    joiningTable?: Model.JoiningTable
-  }
+namespace ManyHasManyBuilder {
+	export type Options = {
+		target: string
+		inversedBy?: string
+		joiningTable?: Model.JoiningTable
+	}
 }
 
 export default ManyHasManyBuilder

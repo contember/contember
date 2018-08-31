@@ -15,10 +15,10 @@ export const pushRequest = (requestChange: RequestChange): ActionCreator => (dis
 }
 
 export const populateRequest = (location: Location): ActionCreator => (dispatch, getState) => {
-	const params = parseParams(location.search) as any as RequestState
+	const params = (parseParams(location.search) as any) as RequestState
 
 	const request: RequestState = {
-	  ...params
+		...params
 	}
 
 	const previousRequest = getState().request

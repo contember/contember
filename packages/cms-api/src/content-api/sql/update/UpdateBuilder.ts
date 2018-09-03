@@ -1,7 +1,14 @@
 import { resolveValue } from '../utils'
 import { promiseAllObject } from '../../../utils/promises'
-import { Input } from 'cms-common'
+import { Input, Model } from 'cms-common'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
+import { getColumnName, getColumnType } from "../../../content-schema/modelUtils";
+
+type ColumnValue = {
+	value: PromiseLike<Input.ColumnValue<undefined>>
+	columnName: string
+	columnType: string
+}
 
 export default class UpdateBuilder {
 	public readonly update: Promise<number>
@@ -9,20 +16,16 @@ export default class UpdateBuilder {
 		throw new Error()
 	}
 
-	private db: KnexWrapper
-	private tableName: string
-	private rowData: { [columnName: string]: PromiseLike<Input.ColumnValue<undefined>> } = {}
+	private rowData: ColumnValue[] = []
 
 	private where: { [columnName: string]: PromiseLike<Input.ColumnValue> } = {}
 
 	constructor(
-		tableName: string,
+		private readonly schema: Model.Schema,
+		private readonly entity: Model.Entity,
 		where: { [columnName: string]: Input.ColumnValueLike },
-		db: KnexWrapper,
+		private readonly db: KnexWrapper,
 	) {
-		this.tableName = tableName
-		this.db = db
-
 		for (const columnName in where) {
 			this.where[columnName] = resolveValue(where[columnName])
 		}
@@ -36,28 +39,27 @@ export default class UpdateBuilder {
 		return this.update
 	}
 
-	public addColumnData(columnName: string, value: Input.ColumnValueLike<undefined>) {
-		this.rowData[columnName] = resolveValue(value)
+	public addFieldValue(fieldName: string, value: Input.ColumnValueLike<undefined>) {
+		const columnName = getColumnName(this.schema, this.entity, fieldName)
+		const columnType = getColumnType(this.schema, this.entity, fieldName)
+		this.rowData.push({columnName, value: resolveValue(value), columnType})
 	}
 
 	private async createUpdatePromise(blocker: PromiseLike<void>) {
 		await blocker
 		const qb = this.db.queryBuilder()
-		qb.table(this.tableName)
+		qb.table(this.entity.tableName)
 
 		qb.where(await promiseAllObject(this.where))
 
-		let affectedRows = 0
+		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
+		const resolvedData = this.rowData.map((it, index) => ({...it, value: resolvedValues[index]}))
+			.filter(it => it.value !== undefined)
+			.reduce((result: object, item) => ({...result, [item.columnName]: item.value}), {})
 
-		const rowData = await promiseAllObject(this.rowData)
-		const rowDataFiltered = Object.keys(rowData)
-			.filter(key => rowData[key] !== undefined)
-			.reduce((result: object, key: string) => ({ ...result, [key]: rowData[key] }), {})
-
-		if (Object.keys(rowDataFiltered).length > 0) {
-			affectedRows = await qb.update(rowDataFiltered)
+		if (Object.keys(resolvedData).length === 0) {
+			return 0
 		}
-
-		return affectedRows
+		return await qb.update(resolvedData)
 	}
 }

@@ -13,7 +13,7 @@ export default class KnexWrapper {
 		return new QueryBuilder(this, this.knex.queryBuilder())
 	}
 
-	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]) {
+	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw {
 		return this.knex.raw(sql, bindings as any)
 	}
 

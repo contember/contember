@@ -7,13 +7,25 @@ export const getEntity = (schema: Model.Schema, entityName: string): Model.Entit
 
 export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldName: string) => {
 	return acceptFieldVisitor(schema, entity, fieldName, {
-		visitColumn: (entity, column) => column.name,
+		visitColumn: (entity, column) => column.columnName,
 		visitRelation: (entity, relation) => {
 			if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 				return relation.joiningColumn.columnName
 			}
 			throw new Error('Not an owning side')
 		}
+	})
+}
+
+export const getColumnType = (schema: Model.Schema, entity: Model.Entity, fieldName: string): string => {
+	return acceptFieldVisitor(schema, entity, fieldName, {
+		visitColumn: (entity, column) => column.columnType,
+		visitRelation: (entity, relation, targetEntity) => {
+			if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
+				return getColumnType(schema, targetEntity, targetEntity.primary)
+			}
+			throw new Error('Not an owning side')
+		},
 	})
 }
 

@@ -46,7 +46,7 @@ export default class GraphQlSchemaBuilderFactory {
 		const conditionBuilder = new ConditionBuilder()
 		const whereBuilder = new WhereBuilder(schema, joinBuilder, conditionBuilder)
 		const selectBuilderFactory = new SelectBuilderFactory(schema, joinBuilder, whereBuilder)
-		const insertBuilderFactory = new InsertBuilderFactory(whereBuilder)
+		const insertBuilderFactory = new InsertBuilderFactory(schema, whereBuilder)
 		const mapperRunner = new MapperRunner(schema, predicatesFactory, selectBuilderFactory, insertBuilderFactory)
 		const readResolver = new ReadResolver(mapperRunner, predicatesInjector, uniqueWhereExpander)
 		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, readResolver)

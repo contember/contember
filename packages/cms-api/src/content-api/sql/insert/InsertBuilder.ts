@@ -4,6 +4,7 @@ import KnexWrapper from '../../../core/knex/KnexWrapper'
 import { Value } from "../../../core/knex/types";
 import WhereBuilder from "../select/WhereBuilder";
 import Path from "../select/Path";
+import { getColumnName, getColumnType } from "../../../content-schema/modelUtils";
 
 type ColumnValue = {
 	value: PromiseLike<Input.ColumnValue>
@@ -21,6 +22,7 @@ export default class InsertBuilder {
 	private where: Input.Where = {}
 
 	constructor(
+		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
 		private readonly db: KnexWrapper,
 		private readonly whereBuilder: WhereBuilder,
@@ -29,7 +31,9 @@ export default class InsertBuilder {
 		this.insert = this.createInsertPromise(blocker)
 	}
 
-	public addColumnData(columnName: string, value: Input.ColumnValueLike, columnType: string) {
+	public addFieldValue(fieldName: string, value: Input.ColumnValueLike) {
+		const columnName = getColumnName(this.schema, this.entity, fieldName)
+		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		this.rowData.push({columnName, value: resolveValue(value), columnType})
 	}
 

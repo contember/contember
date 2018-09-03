@@ -4,38 +4,44 @@ import { Input } from 'cms-common'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 export default class UpdateBuilder {
+	public readonly update: Promise<number>
+	private firer: (() => void) = () => {
+		throw new Error()
+	}
+
+	private db: KnexWrapper
+	private tableName: string
 	private rowData: { [columnName: string]: PromiseLike<Input.ColumnValue<undefined>> } = {}
 
-	private tableName: string
-	private db: KnexWrapper
 	private where: { [columnName: string]: PromiseLike<Input.ColumnValue> } = {}
-
-	private updatePromise: Promise<number>
 
 	constructor(
 		tableName: string,
 		where: { [columnName: string]: Input.ColumnValueLike },
 		db: KnexWrapper,
-		firer: PromiseLike<void>
 	) {
 		this.tableName = tableName
 		this.db = db
+
 		for (const columnName in where) {
 			this.where[columnName] = resolveValue(where[columnName])
 		}
-		this.updatePromise = this.createUpdatePromise(firer)
+
+		const blocker: Promise<void> = new Promise(resolver => this.firer = resolver)
+		this.update = this.createUpdatePromise(blocker)
+	}
+
+	public async execute(): Promise<number> {
+		this.firer()
+		return this.update
 	}
 
 	public addColumnData(columnName: string, value: Input.ColumnValueLike<undefined>) {
 		this.rowData[columnName] = resolveValue(value)
 	}
 
-	public async updateRow() {
-		return this.updatePromise
-	}
-
-	private async createUpdatePromise(firer: PromiseLike<void>) {
-		await firer
+	private async createUpdatePromise(blocker: PromiseLike<void>) {
+		await blocker
 		const qb = this.db.queryBuilder()
 		qb.table(this.tableName)
 

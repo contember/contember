@@ -203,7 +203,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				public async delete() {
 					updateBuilder.addColumnData(relation.joiningColumn.columnName, null)
 					const inversedPrimary = await mapper.selectField(entity, primaryUnique, relation.name)
-					await updateBuilder.updateRow()
+					await updateBuilder.update
 					await mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
 				}
 

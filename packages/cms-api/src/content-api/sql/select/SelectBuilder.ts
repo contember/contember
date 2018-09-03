@@ -11,6 +11,9 @@ import QueryBuilder from '../../../core/knex/QueryBuilder'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
+	private firer: () => void = () => {
+		throw new Error()
+	}
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -19,9 +22,15 @@ export default class SelectBuilder {
 		private readonly mapper: Mapper,
 		private readonly qb: QueryBuilder,
 		private readonly hydrator: SelectHydrator,
-		private readonly firer: PromiseLike<void>
 	) {
-		this.rows = this.createRowsPromise(firer)
+		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
+		this.rows = this.createRowsPromise(blocker)
+	}
+
+	public async execute(): Promise<SelectHydrator.Rows>
+	{
+		this.firer()
+		return await this.rows
 	}
 
 	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, path?: Path) {
@@ -93,8 +102,8 @@ export default class SelectBuilder {
 		this.select(targetEntity, object, targetPath)
 	}
 
-	private async createRowsPromise(firer: PromiseLike<void>): Promise<SelectHydrator.Rows> {
-		await firer
+	private async createRowsPromise(blocker: PromiseLike<void>): Promise<SelectHydrator.Rows> {
+		await blocker
 		return await this.qb.getResult()
 	}
 

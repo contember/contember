@@ -115,7 +115,7 @@ export default class Mapper {
 		}
 
 		const uniqueWhereArgs = this.getUniqueWhereArgs(entity, where);
-		const updateBuilder = new UpdateBuilder(entity.tableName, uniqueWhereArgs, this.db)
+		const updateBuilder = new UpdateBuilder(this.schema, entity, uniqueWhereArgs, this.db)
 
 		const updateVisitor = new UpdateVisitor(primaryValue, data, updateBuilder, this)
 		const promises = acceptEveryFieldVisitor(this.schema, entity, updateVisitor)

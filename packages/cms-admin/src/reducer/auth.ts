@@ -5,6 +5,7 @@ import { Reducer } from 'redux'
 export const SET_TOKEN = 'set_token'
 export const SET_ERROR = 'set_error'
 export const SET_LOADING = 'set_loading'
+export const SET_LOGOUT = 'set_logout'
 
 export default handleActions<AuthState, any>(
 	{
@@ -16,6 +17,9 @@ export default handleActions<AuthState, any>(
 		},
 		[SET_LOADING]: (state: AuthState, action: Action<undefined>): AuthState => {
 			return { ...state, errorMessage: null, status: AuthStatus.LOADING }
+		},
+		[SET_LOGOUT]: (state: AuthState, action: Action<undefined>): AuthState => {
+			return { ...state, errorMessage: null, token: null, status: AuthStatus.NOT_LOGGED_IN }
 		}
 	},
 	emptyAuthState

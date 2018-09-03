@@ -1,21 +1,19 @@
 import { Input, Model, Acl } from 'cms-common'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
 import { acceptEveryFieldVisitor, getColumnName, getEntity } from '../../content-schema/modelUtils'
-import InsertBuilder from './insert/InsertBuilder'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
 import UpdateBuilder from './update/UpdateBuilder'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import SelectBuilder from './select/SelectBuilder'
-import JoinBuilder from './select/JoinBuilder'
-import WhereBuilder from './select/WhereBuilder'
-import ConditionBuilder from './select/ConditionBuilder'
 import Path from './select/Path'
 import QueryBuilder from '../../core/knex/QueryBuilder'
 import KnexWrapper from '../../core/knex/KnexWrapper'
 import PredicateFactory from "../../acl/PredicateFactory";
 import Authorizator from "../../acl/Authorizator";
+import SelectBuilderFactory from "./select/SelectBuilderFactory";
+import InsertBuilderFactory from "./insert/InsertBuilderFactory";
 
 export default class Mapper {
 
@@ -24,6 +22,8 @@ export default class Mapper {
 		private readonly db: KnexWrapper,
 		private readonly variables: Acl.VariablesMap,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly selectBuilderFactory: SelectBuilderFactory,
+		private readonly insertBuilderFactory: InsertBuilderFactory,
 	) {
 	}
 
@@ -83,56 +83,25 @@ export default class Mapper {
 		entity: Model.Entity,
 		selectHandler: (selector: SelectBuilder) => Promise<void>
 	) {
-		let resolver: (() => any) = () => {
-			throw new Error()
-		}
-		const joinBuilder = new JoinBuilder(this.schema)
-		const conditionBuilder = new ConditionBuilder()
-		const whereBuilder = new WhereBuilder(this.schema, joinBuilder, conditionBuilder)
-
 		const path = new Path([])
 		qb.from(entity.tableName, path.getAlias())
 
-		const selector = new SelectBuilder(
-			this.schema,
-			joinBuilder,
-			whereBuilder,
-			this,
-			qb,
-			hydrator,
-			new Promise(resolve => (resolver = resolve))
-		)
+		const selector = this.selectBuilderFactory.create(this, qb, hydrator)
 		const selectPromise = selectHandler(selector)
-		resolver()
-		const rows = await selector.rows
+		const rows = await selector.execute()
 		await selectPromise
 
 		return rows
 	}
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
-		let resolver: (() => any) = () => {
-			throw new Error()
-		}
+
 		const where = this.predicateFactory.create(entity, Object.keys(data), this.variables, Authorizator.Operation.create)
-		const insertBuilder = new InsertBuilder(
-			entity.tableName,
-			entity.primaryColumn,
-			this.db,
-			(qb) => {
-				const joinBuilder = new JoinBuilder(this.schema)
-				const conditionBuilder = new ConditionBuilder()
-				const whereBuilder = new WhereBuilder(this.schema, joinBuilder, conditionBuilder)
-				whereBuilder.build(qb, entity, new Path([]), where)
-			},
-			new Promise(resolve => (resolver = resolve))
-		)
+		const insertBuilder = this.insertBuilderFactory.create(entity, this.db)
+		insertBuilder.addWhere(where)
 		const promises = acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(this.schema, data, insertBuilder, this))
 
-
-		resolver()
-
-		const result = await insertBuilder.insertRow()
+		const result = await insertBuilder.execute()
 
 		await Promise.all(Object.values(promises).filter(it => !!it))
 
@@ -144,25 +113,17 @@ export default class Mapper {
 		if (primaryValue === undefined) {
 			return Promise.resolve(0)
 		}
-		let resolver: (() => any) = () => {
-			throw new Error()
-		}
-		const updateBuilder = new UpdateBuilder(
-			entity.tableName,
-			this.getUniqueWhereArgs(entity, where),
-			this.db,
-			new Promise(resolve => (resolver = resolve))
-		)
-		const promises = acceptEveryFieldVisitor(
-			this.schema,
-			entity,
-			new UpdateVisitor(primaryValue, data, updateBuilder, this)
-		)
-		resolver()
+
+		const uniqueWhereArgs = this.getUniqueWhereArgs(entity, where);
+		const updateBuilder = new UpdateBuilder(entity.tableName, uniqueWhereArgs, this.db)
+
+		const updateVisitor = new UpdateVisitor(primaryValue, data, updateBuilder, this)
+		const promises = acceptEveryFieldVisitor(this.schema, entity, updateVisitor)
+		const executeResult = updateBuilder.execute()
 
 		await Promise.all(Object.values(promises).filter(it => !!it))
 
-		return await updateBuilder.updateRow()
+		return await executeResult
 	}
 
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<number> {

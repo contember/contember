@@ -24,6 +24,11 @@ import PredicatesInjector from '../../acl/PredicatesInjector'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicateFactory from "../../acl/PredicateFactory";
 import MapperRunner from "../sql/MapperRunner";
+import SelectBuilderFactory from "../sql/select/SelectBuilderFactory";
+import JoinBuilder from "../sql/select/JoinBuilder";
+import WhereBuilder from "../sql/select/WhereBuilder";
+import ConditionBuilder from "../sql/select/ConditionBuilder";
+import InsertBuilderFactory from "../sql/insert/InsertBuilderFactory";
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -36,7 +41,13 @@ export default class GraphQlSchemaBuilderFactory {
 		const predicatesFactory = new PredicateFactory(permissions, variableInjector)
 		const predicatesInjector = new PredicatesInjector(schema, predicatesFactory)
 		const uniqueWhereExpander = new UniqueWhereExpander(schema)
-		const mapperRunner = new MapperRunner(schema, predicatesFactory)
+
+		const joinBuilder = new JoinBuilder(schema)
+		const conditionBuilder = new ConditionBuilder()
+		const whereBuilder = new WhereBuilder(schema, joinBuilder, conditionBuilder)
+		const selectBuilderFactory = new SelectBuilderFactory(schema, joinBuilder, whereBuilder)
+		const insertBuilderFactory = new InsertBuilderFactory(whereBuilder)
+		const mapperRunner = new MapperRunner(schema, predicatesFactory, selectBuilderFactory, insertBuilderFactory)
 		const readResolver = new ReadResolver(mapperRunner, predicatesInjector, uniqueWhereExpander)
 		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, readResolver)
 

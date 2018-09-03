@@ -5,7 +5,7 @@ import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import RelationFetchVisitor from './RelationFetchVisitor'
-import Mapper from '../mapper'
+import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 

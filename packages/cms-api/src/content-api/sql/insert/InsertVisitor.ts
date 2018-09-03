@@ -1,6 +1,6 @@
 import { Input, Model } from 'cms-common'
 import { isIt } from '../../../utils/type'
-import Mapper from '../mapper'
+import Mapper from '../Mapper'
 import { uuid } from '../../../utils/uuid'
 import InsertBuilder from './InsertBuilder'
 

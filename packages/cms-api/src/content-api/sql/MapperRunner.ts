@@ -1,5 +1,5 @@
 import PredicateFactory from "../../acl/PredicateFactory";
-import Mapper from "./mapper";
+import Mapper from "./Mapper";
 import { Acl, Model } from 'cms-common'
 import KnexConnection from "../../core/knex/KnexConnection";
 import SelectBuilderFactory from "./select/SelectBuilderFactory";

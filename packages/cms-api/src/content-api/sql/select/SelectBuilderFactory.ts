@@ -2,7 +2,7 @@ import JoinBuilder from "./JoinBuilder";
 import WhereBuilder from "./WhereBuilder";
 import { Model } from 'cms-common'
 import SelectBuilder from "./SelectBuilder";
-import Mapper from "../mapper";
+import Mapper from "../Mapper";
 import SelectHydrator from "./SelectHydrator";
 import QueryBuilder from "../../../core/knex/QueryBuilder";
 

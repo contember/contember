@@ -1,7 +1,7 @@
 import { Input, Model } from 'cms-common'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import SelectHydrator from './SelectHydrator'
-import Mapper from '../mapper'
+import Mapper from '../Mapper'
 import FieldNode from '../../graphQlResolver/FieldNode'
 
 type JoiningColumns = { sourceColumn: Model.JoiningColumn; targetColumn: Model.JoiningColumn }

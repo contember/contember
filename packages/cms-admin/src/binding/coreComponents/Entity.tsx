@@ -9,7 +9,7 @@ import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 export interface EntityProps {
 	name: EntityName
 	loadingOverlay?: React.ComponentClass
-	where?: Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal>
+	where?: Input.Where<GraphQlBuilder.Literal>
 }
 
 export default class Entity extends React.Component<EntityProps> {

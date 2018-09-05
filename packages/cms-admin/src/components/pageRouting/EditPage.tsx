@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DataProvider, Entity } from '../../binding'
+import { SingleEntityDataProvider, Entity } from '../../binding'
 import { ParametersContext } from './Pages'
 
 interface EditPageProps {
@@ -18,11 +18,11 @@ export default class EditPage extends React.Component<EditPageProps> {
 			<Layout>
 				<ParametersContext.Consumer>
 					{({ id }: { id: string }) => (
-						<DataProvider>
-							<Entity name={this.props.entity} where={{ id }}>
+						<SingleEntityDataProvider where={{ id }}>
+							<Entity name={this.props.entity}>
 								{this.props.children}
 							</Entity>
-						</DataProvider>
+						</SingleEntityDataProvider>
 					)}
 				</ParametersContext.Consumer>
 			</Layout>

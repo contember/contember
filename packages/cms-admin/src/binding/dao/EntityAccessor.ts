@@ -10,7 +10,7 @@ export type EntityData = { [name in FieldName]: FieldData }
 export default class EntityAccessor {
 	constructor(
 		public readonly entityName: EntityName,
-		public readonly where: Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal>,
+		public readonly where: Input.Where<GraphQlBuilder.Literal> | undefined,
 		public readonly primaryKey: string | undefined,
 		public readonly data: EntityData,
 		public readonly unlink?: () => void

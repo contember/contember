@@ -1,12 +1,15 @@
 import { CrudQueryBuilder } from 'cms-client'
+import DataBindingError from '../dao/DataBindingError'
 import EntityMarker from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
 import Marker from '../dao/Marker'
+import { GraphQlBuilder } from 'cms-client'
+import { Input } from 'cms-common'
 
 export default class EntityTreeToQueryConverter {
 	constructor(private marker: EntityMarker | undefined) {}
 
-	public convert(): string | undefined {
+	public convertToGetQuery(where: Input.UniqueWhere<GraphQlBuilder.Literal>): string | undefined {
 		const entityMarker = this.marker
 
 		if (entityMarker) {
@@ -15,19 +18,23 @@ export default class EntityTreeToQueryConverter {
 			return queryBuilder
 				.get(`get${entityMarker.entityName}`, object => {
 					if (entityMarker.where) {
-						object = object.where(entityMarker.where)
+						throw new DataBindingError(
+							'When selecting a single item, it does not make sense for a top-level Entity to have a where clause.'
+						)
 					}
 
-					return this.registerQueryPart(entityMarker, object)
+					return this.registerListQueryPart(entityMarker,
+						new CrudQueryBuilder.ListQueryBuilder(object.where(where).objectBuilder)
+					)
 				})
 				.getGql()
 		}
 	}
 
-	private registerQueryPart(
+	private registerListQueryPart(
 		context: EntityMarker,
-		builder: CrudQueryBuilder.GetQueryBuilder
-	): CrudQueryBuilder.GetQueryBuilder {
+		builder: CrudQueryBuilder.ListQueryBuilder
+	): CrudQueryBuilder.ListQueryBuilder {
 		builder = builder.column('id')
 
 		for (const field in context.fields) {
@@ -41,7 +48,7 @@ export default class EntityTreeToQueryConverter {
 						if (fieldValue.where) {
 							builder = builder.where(fieldValue.where)
 						}
-						return this.registerQueryPart(fieldValue, builder)
+						return this.registerListQueryPart(fieldValue, builder)
 					})
 				}
 			}

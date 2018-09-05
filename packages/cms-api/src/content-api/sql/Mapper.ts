@@ -14,6 +14,8 @@ import PredicateFactory from "../../acl/PredicateFactory";
 import Authorizator from "../../acl/Authorizator";
 import SelectBuilderFactory from "./select/SelectBuilderFactory";
 import InsertBuilderFactory from "./insert/InsertBuilderFactory";
+import UpdateBuilderFactory from "./update/UpdateBuilderFactory";
+import UniqueWhereExpander from "../graphQlResolver/UniqueWhereExpander";
 
 export default class Mapper {
 
@@ -24,6 +26,8 @@ export default class Mapper {
 		private readonly predicateFactory: PredicateFactory,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
+		private readonly updateBuilderFactory: UpdateBuilderFactory,
+		private readonly uniqueWhereExpander: UniqueWhereExpander,
 	) {
 	}
 
@@ -114,8 +118,14 @@ export default class Mapper {
 			return Promise.resolve(0)
 		}
 
-		const uniqueWhereArgs = this.getUniqueWhereArgs(entity, where);
-		const updateBuilder = new UpdateBuilder(this.schema, entity, uniqueWhereArgs, this.db)
+		this.checkUniqueWhere(entity, where)
+
+		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
+		const updateBuilder = this.updateBuilderFactory.create(entity, this.db, uniqueWhere)
+
+		const predicateWhere = this.predicateFactory.create(entity, Object.keys(data), this.variables, Authorizator.Operation.update)
+		updateBuilder.addOldWhere(predicateWhere)
+		updateBuilder.addNewWhere(predicateWhere)
 
 		const updateVisitor = new UpdateVisitor(primaryValue, data, updateBuilder, this)
 		const promises = acceptEveryFieldVisitor(this.schema, entity, updateVisitor)
@@ -217,5 +227,11 @@ export default class Mapper {
 		}
 
 		return whereArgs
+	}
+
+	private checkUniqueWhere(entity: Model.Entity, where: Input.UniqueWhere): void {
+		if (!isUniqueWhere(entity, where)) {
+			throw new Error('Unique where is not unique')
+		}
 	}
 }

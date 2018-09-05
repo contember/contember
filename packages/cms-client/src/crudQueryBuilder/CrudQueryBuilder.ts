@@ -1,8 +1,9 @@
+import UnboundedGetQueryBuilder from './UnboundedGetQueryBuilder'
 import UpdateBuilder from './UpdateBuilder'
 import QueryBuilder from '../graphQlBuilder/QueryBuilder'
 import RootObjectBuilder from '../graphQlBuilder/RootObjectBuilder'
 import ListQueryBuilder from './ListQueryBuilder'
-import GetQueryBuilder from './GetQueryBuilder'
+import BoundedGetQueryBuilder from './BoundedGetQueryBuilder'
 import CreateBuilder from './CreateBuilder'
 import DeleteBuilder from './DeleteBuilder'
 
@@ -35,13 +36,13 @@ export default class CrudQueryBuilder {
 
 	public get(
 		name: string,
-		query: ((builder: GetQueryBuilder) => GetQueryBuilder<true>) | GetQueryBuilder<true>
+		query: ((builder: UnboundedGetQueryBuilder) => BoundedGetQueryBuilder) | BoundedGetQueryBuilder
 	): Pick<CrudQueryBuilder, Exclude<keyof CrudQueryBuilder, Mutations>> {
 		if (this.type === 'mutation') {
 			throw new Error('Cannot combine queries and mutations')
 		}
 		if (typeof query === 'function') {
-			query = query(new GetQueryBuilder())
+			query = query(new UnboundedGetQueryBuilder())
 		}
 		return new CrudQueryBuilder('query', this.rootObjectBuilder.object(name, query.objectBuilder))
 	}

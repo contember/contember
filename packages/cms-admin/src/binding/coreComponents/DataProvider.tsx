@@ -3,17 +3,19 @@ import { connect } from 'react-redux'
 import { getData, putData } from '../../actions/content'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
-import { ContentStatus, ContentRequestsState } from '../../state/content'
+import { ContentRequestsState, ContentStatus } from '../../state/content'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
-import { AccessorTreeGenerator, EntityTreeToQueryConverter } from '../model'
+import { AccessorTreeGenerator } from '../model'
 import EntityTreeGenerator from '../model/EntityTreeGenerator'
 import PersistQueryGenerator from '../model/PersistQueryGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import MetaOperationsContext, { MetaOperationsContextValue } from './MetaOperationsContext'
 
-export interface DataProviderProps {}
+export interface DataProviderOwnProps {
+	generateReadQuery: (rootMarker?: EntityMarker) => string | undefined
+}
 
 export interface DataProviderDispatchProps {
 	getData: (query: string) => Promise<string>
@@ -22,7 +24,7 @@ export interface DataProviderDispatchProps {
 export interface DataProviderStateProps {
 	requests: ContentRequestsState
 }
-type DataProviderInnerProps = DataProviderProps & DataProviderDispatchProps & DataProviderStateProps
+type DataProviderInnerProps = DataProviderOwnProps & DataProviderDispatchProps & DataProviderStateProps
 
 export interface DataProviderState {
 	data?: DataContextValue
@@ -85,8 +87,8 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 		console.log('The structure is', this.entityTree!)
 
-		const converter = new EntityTreeToQueryConverter(this.entityTree)
-		const query = converter.convert()
+		const query = this.props.generateReadQuery(this.entityTree)
+
 		if (query) {
 			const id = await this.props.getData(query)
 			if (!this.unmounted) this.setState({ id })
@@ -98,7 +100,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 	}
 }
 
-export default connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderProps, State>(
+export default connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps, State>(
 	({ content }) => ({
 		requests: content.requests
 	}),

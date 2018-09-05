@@ -115,7 +115,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return await this.qb.update(data)
 	}
 
-	public async updateFrom(tableName: string, columns: { [columnName: string]: QueryBuilder.ColumnExpression }, callback: QueryBuilder.Callback): Promise<AffectedRows> {
+	public async updateFrom(tableName: string, columns: QueryBuilder.ColumnExpressionMap, callback: QueryBuilder.Callback): Promise<AffectedRows> {
 		const updateData = Object.entries(columns)
 			.map(([key, value]): [string, Knex.Raw] => {
 				if (typeof value === 'function') {

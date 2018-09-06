@@ -100,6 +100,7 @@ export default class SqlMigrator {
 				notNull: true
 			}
 		})
+		this.createEventTrigger(entity.tableName)
 	}
 
 	private removeEntity(modification: RemoveEntityModification) {
@@ -182,6 +183,7 @@ export default class SqlMigrator {
 						}
 					}
 				)
+				this.createEventTrigger(relation.joiningTable.tableName)
 			},
 			visitManyHasManyInversed: () => {}
 		})
@@ -278,6 +280,19 @@ export default class SqlMigrator {
 
 	private getNewEntity(name: string): Model.Entity {
 		return this.newSchema.entities[name]
+	}
+
+	private createEventTrigger(tableName: string) {
+		this.builder.createTrigger(tableName, 'log_event', {
+			when: 'AFTER',
+			operation: ['INSERT', 'UPDATE', 'DELETE'],
+			level: 'ROW',
+			function: {
+				schema: 'system',
+				name: 'trigger_event'
+			},
+			language: ''
+		})
 	}
 
 	private getPrimaryType(entity: Model.Entity): string {

@@ -27,7 +27,6 @@ export default class OneToOne extends React.Component<OneToOneProps> {
 							return <DataContext.Provider value={field}>{this.props.children}</DataContext.Provider>
 						}
 					}
-					throw new DataBindingError('Corrupted data')
 				}}
 			</DataContext.Consumer>
 		)

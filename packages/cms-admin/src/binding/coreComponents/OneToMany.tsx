@@ -23,16 +23,13 @@ export default class OneToMany extends React.Component<OneToManyProps> {
 						const field = data.data[this.props.field]
 
 						if (Array.isArray(field)) {
-							return field.map((datum: DataContextValue, i: number) => {
-								return (
-									<DataContext.Provider value={datum} key={i}>
-										{datum instanceof EntityAccessor && this.props.children}
-									</DataContext.Provider>
-								)
-							})
+							return field.map((datum: DataContextValue, i: number) => (
+								<DataContext.Provider value={datum} key={i}>
+									{datum instanceof EntityAccessor && this.props.children}
+								</DataContext.Provider>
+							))
 						}
 					}
-					throw new DataBindingError('Corrupted data')
 				}}
 			</DataContext.Consumer>
 		)

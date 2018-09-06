@@ -1,0 +1,73 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+
+CREATE FUNCTION "system"."make_diff"(old jsonb, new jsonb) RETURNS jsonb AS $$
+
+  DECLARE col record;
+  DECLARE diff jsonb := '{}'::jsonb;
+
+  BEGIN
+    FOR col IN SELECT n.key, n.value FROM jsonb_each(old) o, jsonb_each(new) n
+               WHERE n.key = o.key AND n.value IS DISTINCT FROM o.value
+    LOOP
+      diff := diff || jsonb_build_object(col.key, col.value);
+    END LOOP;
+
+    RETURN diff;
+  END;
+
+$$ LANGUAGE  plpgsql;
+
+
+CREATE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
+
+  DECLARE new_event_id uuid := gen_random_uuid();
+  DECLARE new_event_type text;
+  DECLARE new_event_data jsonb;
+  DECLARE current_stage record;
+
+  BEGIN
+    CASE TG_OP
+      WHEN 'INSERT' THEN
+        new_event_type := 'create';
+        new_event_data := jsonb_build_object(
+          'tableName', TG_TABLE_NAME,
+          'rowId', NEW.id::text,
+          'values', to_jsonb(NEW) - 'id'
+        );
+
+      WHEN 'UPDATE' THEN
+        new_event_type := 'update';
+        new_event_data := jsonb_build_object(
+          'tableName', TG_TABLE_NAME,
+          'rowId', OLD.id::text,
+          'values', "system"."make_diff"(to_jsonb(OLD), to_jsonb(NEW))
+        );
+
+      WHEN 'DELETE' THEN
+        new_event_type := 'delete';
+        new_event_data := jsonb_build_object(
+          'tableName', TG_TABLE_NAME,
+          'rowId', OLD.id::text
+        );
+
+      ELSE
+        RAISE EXCEPTION 'Unknown TG_OP value %', TG_OP;
+    END CASE;
+
+    SELECT "id", "event_id" FROM "system"."stage"
+    WHERE "slug" = right(TG_TABLE_SCHEMA, -length('stage_'))
+    FOR NO KEY UPDATE
+    INTO current_stage;
+
+    INSERT INTO "system"."event" ("id", "type", "data", "previous_id")
+    VALUES (new_event_id, new_event_type, new_event_data, current_stage.event_id);
+
+    UPDATE "system"."stage"
+    SET "event_id" = new_event_id
+    WHERE "id" = current_stage.id;
+
+    RETURN NULL;
+  END;
+
+$$ LANGUAGE plpgsql;

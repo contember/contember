@@ -1,0 +1,8 @@
+@import 'toRelative'
+
+// A function that turns a (unitless) number in pixels into rem
+	Usage:
+		rem(16)   // Returns 1rem (based on $base-font-size)
+		rem(16px) // Returns 1rem (based on $base-font-size)
+@function rem($value)
+	@return _toRelative($value, $base-font-size, 1rem)

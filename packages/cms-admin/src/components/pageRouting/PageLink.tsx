@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Link from '../Link'
+import Link, { InnerProps } from '../Link'
 import { pageRequest } from '../../state/request'
 import { connect } from 'react-redux'
 import State from '../../state'
@@ -19,7 +19,10 @@ class PageLink<P> extends React.Component<any | Props<P>> {
 	render() {
 		const changed = this.props.change()
 		return (
-			<Link requestChange={pageRequest(this.props.project, this.props.stage, changed.name, changed.params)}>
+			<Link
+				Component={this.props.Component}
+				requestChange={pageRequest(this.props.project, this.props.stage, changed.name, changed.params)}
+			>
 				{this.props.children}
 			</Link>
 		)
@@ -31,8 +34,9 @@ interface StateProps {
 	stage: string
 }
 
-interface PageLinkProps<P> {
+export interface PageLinkProps<P> {
 	change: PageChange<P>
+	Component?: React.ComponentType<InnerProps>
 }
 
 type Props<P> = PageLinkProps<P> & StateProps

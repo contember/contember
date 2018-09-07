@@ -1,0 +1,29 @@
+.layout
+	&-navbar
+		+sticky(0 null null 0)
+		+size(100% null)
+		display: flex
+		justify-content: space-between
+		align-items: center
+		min-height: $layout-navbar-height
+		padding: 0 rem(10px)
+		z-index: $zindex-sticky
+		background-color: $layout-background-color
+		color: $layout-text-color
+
+	&-container
+		display: flex
+
+	&-side
+		+sticky($layout-navbar-height null null)
+		width: rem(160px)
+		height: calc(100vh - #{$layout-navbar-height})
+		z-index: $zindex-sticky
+		background-color: $layout-background-color
+		color: $layout-text-color
+
+	&-content
+		padding: rem(25px)
+
+		&-title
+			margin: 0

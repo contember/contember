@@ -1,0 +1,8 @@
+@import './toScalar'
+
+
+@function _toRelative($value, $font-size, $factor)
+	@if not unitless($value)
+		$value: toScalar($value)
+
+	@return ($value / $font-size) * 1px * $factor

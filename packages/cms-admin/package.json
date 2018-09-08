@@ -13,14 +13,13 @@
 		"@blueprintjs/icons": "^3.0.0",
 		"@blueprintjs/select": "^3.0.0",
 		"@blueprintjs/table": "^3.0.0",
-		"bootstrap": "^4.1.1",
+		"bootstrap": "4.1.1",
 		"bourbon": "^5.1.0",
 		"classnames": "^2.2.6",
 		"cms-client": "^0.0.0",
 		"cms-common": "^0.0.0",
 		"immutable": "^3.8.2",
 		"is-url": "^1.2.4",
-		"material-design-icons": "^3.0.1",
 		"moment": "^2.22.2",
 		"path-to-regexp": "^2.3.0",
 		"react": "^16.4.1",
@@ -31,8 +30,9 @@
 		"redux": "^4.0.0",
 		"redux-actions": "^2.4.0",
 		"redux-thunk": "^2.3.0",
-		"slate": "^0.34.7",
-		"slate-react": "^0.13.4"
+		"slate": "^0.40.2",
+		"slate-html-serializer": "^0.7.2",
+		"slate-react": "^0.18.5"
 	},
 	"devDependencies": {
 		"@types/classnames": "^2.2.6",
@@ -42,6 +42,9 @@
 		"@types/react-table": "^6.7.12",
 		"@types/reactstrap": "^6.0.0",
 		"@types/redux-actions": "^2.3.0",
+		"@types/slate": "^0.40.0",
+		"@types/slate-html-serializer": "^0.6.2",
+		"@types/slate-react": "^0.18.0",
 		"typescript": "^3.0.1"
 	}
 }

@@ -11,6 +11,8 @@ import FieldMarker from '../dao/FieldMarker'
 export interface TextFieldProps {
 	name: FieldName
 	label?: IFormGroupProps['label']
+	large?: boolean
+	inlineLabel?: boolean
 }
 
 export default class TextField extends React.Component<TextFieldProps> {
@@ -21,8 +23,8 @@ export default class TextField extends React.Component<TextFieldProps> {
 			<Field name={this.props.name}>
 				{(data: FieldAccessor<string>): React.ReactNode => {
 					return (
-						<FormGroup label={this.props.label}>
-							<InputGroup value={data.currentValue} onChange={this.generateOnChange(data)} />
+						<FormGroup label={this.props.label} inline={this.props.inlineLabel}>
+							<InputGroup value={data.currentValue} onChange={this.generateOnChange(data)} large={this.props.large} />
 						</FormGroup>
 					)
 				}}

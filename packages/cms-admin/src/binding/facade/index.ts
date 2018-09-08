@@ -1,6 +1,6 @@
-import PersistButton from './PersistButton'
-import Repeater from './Repeater'
-import TextField from './TextField'
-import UnlinkButton from './UnlinkButton'
-
-export { PersistButton, Repeater, TextField, UnlinkButton }
+export { default as PersistButton } from './PersistButton'
+export { default as Repeater } from './Repeater'
+export { default as TextField } from './TextField'
+export { default as TextareaField } from './TextareaField'
+export { default as UnlinkButton } from './UnlinkButton'
+export { default as RichTextField } from './RichTextField'

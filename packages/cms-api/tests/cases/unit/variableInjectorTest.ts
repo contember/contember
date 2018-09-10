@@ -4,7 +4,10 @@ import VariableInjector from '../../../src/acl/VariableInjector'
 
 describe('variable injector', () => {
 	it('injects variable', () => {
-		const injector = new VariableInjector()
+		const injector = new VariableInjector({
+				site: [1, 2],
+				locale: 'cs'
+			})
 		const result = injector.inject(
 			{
 				and: [
@@ -20,10 +23,6 @@ describe('variable injector', () => {
 						foo: 'bar'
 					}
 				]
-			},
-			{
-				site: [1, 2],
-				locale: 'cs'
 			}
 		)
 

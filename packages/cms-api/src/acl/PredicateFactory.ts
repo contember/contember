@@ -9,7 +9,7 @@ class PredicateFactory {
 	) {
 	}
 
-	public create(entity: Model.Entity, fieldNames: string[], variables: Acl.VariablesMap, operation: Authorizator.Operation): Input.Where {
+	public create(entity: Model.Entity, fieldNames: string[], operation: Authorizator.Operation): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = {[entity.primary]: {never: true}}
 
@@ -45,7 +45,7 @@ class PredicateFactory {
 				if (!entityPermissions.predicates[name]) {
 					throw new Error(`${entity.name}: Undefined predicate ${name}`)
 				}
-				const predicateWhere: Input.Where = this.variableInjector.inject(entityPermissions.predicates[name], variables)
+				const predicateWhere: Input.Where = this.variableInjector.inject(entityPermissions.predicates[name])
 				return [...result, predicateWhere]
 			},
 			[]

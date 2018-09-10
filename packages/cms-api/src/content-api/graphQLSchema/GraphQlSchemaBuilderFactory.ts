@@ -16,20 +16,11 @@ import UpdateEntityRelationInputFieldVisitor from './mutations/UpdateEntityRelat
 import UpdateEntityRelationInputProvider from './mutations/UpdateEntityRelationInputProvider'
 import UpdateEntityInputFieldVisitor from './mutations/UpdateEntityInputFieldVisitor'
 import EntityInputProvider from './mutations/EntityInputProvider'
-import ReadResolver from '../graphQlResolver/ReadResolver'
 import Authorizator from '../../acl/Authorizator'
-import MutationResolver from '../graphQlResolver/MutationResolver'
-import VariableInjector from '../../acl/VariableInjector'
-import PredicatesInjector from '../../acl/PredicatesInjector'
-import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
-import PredicateFactory from "../../acl/PredicateFactory";
-import MapperRunner from "../sql/MapperRunner";
-import SelectBuilderFactory from "../sql/select/SelectBuilderFactory";
-import JoinBuilder from "../sql/select/JoinBuilder";
-import WhereBuilder from "../sql/select/WhereBuilder";
-import ConditionBuilder from "../sql/select/ConditionBuilder";
-import InsertBuilderFactory from "../sql/insert/InsertBuilderFactory";
-import UpdateBuilderFactory from "../sql/update/UpdateBuilderFactory";
+import ExecutionContainerFactory from "../graphQlResolver/ExecutionContainerFactory";
+import ReadResolverFactory from "../graphQlResolver/ReadResolverFactory";
+import GraphQlQueryAstFactory from "../graphQlResolver/GraphQlQueryAstFactory";
+import MutationResolverFactory from "../graphQlResolver/MutationResolverFactory";
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -38,20 +29,11 @@ export default class GraphQlSchemaBuilderFactory {
 		const conditionTypeProvider = new ConditionTypeProvider(columnTypeResolver)
 		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
 		const entityTypeProvider = new EntityTypeProvider(schema, authorizator, columnTypeResolver, whereTypeProvider)
-		const variableInjector = new VariableInjector()
-		const predicatesFactory = new PredicateFactory(permissions, variableInjector)
-		const predicatesInjector = new PredicatesInjector(schema, predicatesFactory)
-		const uniqueWhereExpander = new UniqueWhereExpander(schema)
 
-		const joinBuilder = new JoinBuilder(schema)
-		const conditionBuilder = new ConditionBuilder()
-		const whereBuilder = new WhereBuilder(schema, joinBuilder, conditionBuilder)
-		const selectBuilderFactory = new SelectBuilderFactory(schema, joinBuilder, whereBuilder)
-		const insertBuilderFactory = new InsertBuilderFactory(schema, whereBuilder)
-		const updateBuilderFactory = new UpdateBuilderFactory(schema, whereBuilder)
-		const mapperRunner = new MapperRunner(schema, predicatesFactory, selectBuilderFactory, insertBuilderFactory, updateBuilderFactory, uniqueWhereExpander)
-		const readResolver = new ReadResolver(mapperRunner, predicatesInjector, uniqueWhereExpander)
-		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, readResolver)
+		const executionContainerFactory = new ExecutionContainerFactory(schema, permissions)
+		const readResolverFactory = new ReadResolverFactory(executionContainerFactory)
+		const queryAstFactory = new GraphQlQueryAstFactory()
+		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, queryAstFactory, readResolverFactory)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<Authorizator.Operation.create>>()
 		const createEntityRelationInputFieldVisitor = new CreateEntityRelationInputFieldVisitor(
@@ -98,7 +80,7 @@ export default class GraphQlSchemaBuilderFactory {
 		)
 		updateEntityInputProviderAccessor.set(updateEntityInputProvider)
 
-		const mutationResolver = new MutationResolver(mapperRunner, uniqueWhereExpander)
+		const mutationResolverFactory = new MutationResolverFactory(executionContainerFactory)
 		const mutationProvider = new MutationProvider(
 			schema,
 			authorizator,
@@ -107,7 +89,8 @@ export default class GraphQlSchemaBuilderFactory {
 			columnTypeResolver,
 			createEntityInputProvider,
 			updateEntityInputProvider,
-			mutationResolver
+			queryAstFactory,
+			mutationResolverFactory
 		)
 
 		return new GraphQlSchemaBuilder(schema, queryProvider, mutationProvider)

@@ -14,6 +14,7 @@ namespace Project {
 		readonly slug: string
 		readonly name: string
 		readonly schema: Schema
+		readonly migration: string
 	}
 
 	export interface DatabaseCredentials {

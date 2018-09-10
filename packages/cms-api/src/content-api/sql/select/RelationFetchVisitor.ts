@@ -88,7 +88,6 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 		const junctionValues = await this.mapper.fetchJunction(relation, ids, joiningColumns.sourceColumn)
 
 		const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary)
-		const joiningTable = relation.joiningTable
 		const inversedJoiningColumn = joiningColumns.targetColumn.columnName
 		const inversedIds = junctionValues
 			.map((it: any) => it[inversedJoiningColumn])

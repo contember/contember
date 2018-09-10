@@ -47,14 +47,14 @@ describe('predicates injector', () => {
 	}
 
 	it('injects predicate', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector()))
+		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
 			'PostLocale',
 			[new FieldNode('id', 'id'), new FieldNode('title', 'title')],
 			{}
 		)
-		const result = injector.inject(schema.entities['PostLocale'], obj, { localeVariable: ['cs'] })
+		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({
 			and: [
@@ -70,14 +70,14 @@ describe('predicates injector', () => {
 	})
 
 	it('injects predicate and ignore duplicates', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector()))
+		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
 			'PostLocale',
 			[new FieldNode('id', 'id'), new FieldNode('title', 'title'), new FieldNode('content', 'content')],
 			{}
 		)
-		const result = injector.inject(schema.entities['PostLocale'], obj, { localeVariable: ['cs'] })
+		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({
 			and: [
@@ -93,14 +93,14 @@ describe('predicates injector', () => {
 	})
 
 	it('merges predicate with explicit where', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector()))
+		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
 			'PostLocale',
 			[new FieldNode('id', 'id'), new FieldNode('title', 'title')],
 			{ where: { id: { in: [1, 2] } } }
 		)
-		const result = injector.inject(schema.entities['PostLocale'], obj, { localeVariable: ['cs'] })
+		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({
 			and: [
@@ -112,29 +112,33 @@ describe('predicates injector', () => {
 					]
 				},
 				{
-					locale: { in: ['cs'] }
+					and: [
+						{
+							locale: { in: ['cs'] }
+						}
+					]
 				}
 			]
 		})
 	})
 
 	it('does not injects predicate when not requesting restricted', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector()))
+		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {})
-		const result = injector.inject(schema.entities['PostLocale'], obj, { localeVariable: ['cs'] })
+		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({ and: [] })
 	})
 
 	it('injects predicate to nested field', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector()))
+		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
 		const obj: ObjectNode = new ObjectNode(
 			'Post',
 			'Post',
 			[new FieldNode('id', 'id'), new ObjectNode('locales', 'locales', [new FieldNode('title', 'title')], {})],
 			{}
 		)
-		const result = injector.inject(schema.entities['Post'], obj, { localeVariable: ['cs'] })
+		const result = injector.inject(schema.entities['Post'], obj)
 
 		expect(result.args.where).deep.eq({
 			and: []
@@ -156,11 +160,11 @@ describe('predicates injector', () => {
 	})
 
 	it('injects predicate to where', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector()))
+		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {
 			where: { title: { eq: 'abc' } }
 		})
-		const result = injector.inject(schema.entities['PostLocale'], obj, { localeVariable: ['cs'] })
+		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({
 			and: [
@@ -183,7 +187,7 @@ describe('predicates injector', () => {
 	})
 
 	it('injects predicate to nested where', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector()))
+		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
 		const obj: ObjectNode = new ObjectNode(
 			'Post',
 			'Post',
@@ -193,7 +197,7 @@ describe('predicates injector', () => {
 			],
 			{}
 		)
-		const result = injector.inject(schema.entities['Post'], obj, { localeVariable: ['cs'] })
+		const result = injector.inject(schema.entities['Post'], obj)
 
 		expect(result.args.where).deep.eq({
 			and: []
@@ -209,7 +213,11 @@ describe('predicates injector', () => {
 							title: { eq: 'abc' }
 						},
 						{
-							locale: { in: ['cs'] }
+							and: [
+								{
+									locale: { in: ['cs'] }
+								}
+							]
 						}
 					]
 				}

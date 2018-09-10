@@ -6,14 +6,17 @@ import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
 import ReadResolver from '../graphQlResolver/ReadResolver'
+import ReadResolverFactory from "../graphQlResolver/ReadResolverFactory";
+import GraphQlQueryAstFactory from "../graphQlResolver/GraphQlQueryAstFactory";
 
 export default class QueryProvider {
 	constructor(
-		private schema: Model.Schema,
-		private authorizator: Authorizator,
-		private whereTypeProvider: WhereTypeProvider,
-		private entityTypeProvider: EntityTypeProvider,
-		private readonly readResolver: ReadResolver
+		private readonly schema: Model.Schema,
+		private readonly authorizator: Authorizator,
+		private readonly whereTypeProvider: WhereTypeProvider,
+		private readonly entityTypeProvider: EntityTypeProvider,
+		private readonly queryAstAFactory: GraphQlQueryAstFactory,
+		private readonly readResolverFactory: ReadResolverFactory,
 	) {}
 
 	public getQueries(entityName: string): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {
@@ -34,7 +37,8 @@ export default class QueryProvider {
 			args: {
 				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) }
 			},
-			resolve: this.readResolver.resolveGetQuery(entity)
+			resolve: (parent, args, context, info) =>
+				this.readResolverFactory.create(context).resolveGetQuery(entity, this.queryAstAFactory.create(info))
 		}
 	}
 
@@ -46,7 +50,8 @@ export default class QueryProvider {
 			args: {
 				where: { type: this.whereTypeProvider.getEntityWhereType(entityName) }
 			},
-			resolve: this.readResolver.resolveListQuery(entity)
+			resolve: (parent, args, context, info) =>
+				this.readResolverFactory.create(context).resolveListQuery(entity, this.queryAstAFactory.create(info))
 		}
 	}
 }

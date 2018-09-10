@@ -3,7 +3,6 @@ import { isUniqueWhere } from '../../content-schema/inputUtils'
 import { acceptEveryFieldVisitor, getColumnName, getEntity } from '../../content-schema/modelUtils'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
-import UpdateBuilder from './update/UpdateBuilder'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import SelectBuilder from './select/SelectBuilder'
@@ -16,14 +15,15 @@ import SelectBuilderFactory from "./select/SelectBuilderFactory";
 import InsertBuilderFactory from "./insert/InsertBuilderFactory";
 import UpdateBuilderFactory from "./update/UpdateBuilderFactory";
 import UniqueWhereExpander from "../graphQlResolver/UniqueWhereExpander";
+import PredicatesInjector from "../../acl/PredicatesInjector";
 
 export default class Mapper {
 
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly db: KnexWrapper,
-		private readonly variables: Acl.VariablesMap,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
@@ -100,7 +100,7 @@ export default class Mapper {
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
 
-		const where = this.predicateFactory.create(entity, Object.keys(data), this.variables, Authorizator.Operation.create)
+		const where = this.predicateFactory.create(entity, Object.keys(data), Authorizator.Operation.create)
 		const insertBuilder = this.insertBuilderFactory.create(entity, this.db)
 		insertBuilder.addWhere(where)
 		const promises = acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(this.schema, data, insertBuilder, this))
@@ -123,7 +123,7 @@ export default class Mapper {
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 		const updateBuilder = this.updateBuilderFactory.create(entity, this.db, uniqueWhere)
 
-		const predicateWhere = this.predicateFactory.create(entity, Object.keys(data), this.variables, Authorizator.Operation.update)
+		const predicateWhere = this.predicateFactory.create(entity, Object.keys(data), Authorizator.Operation.update)
 		updateBuilder.addOldWhere(predicateWhere)
 		updateBuilder.addNewWhere(predicateWhere)
 

@@ -6,7 +6,6 @@ import SchemaMigrator from '../../../src/content-schema/differ/SchemaMigrator'
 import SqlMigrator from '../../../src/content-api/sqlSchema/SqlMigrator'
 import { expect } from 'chai'
 import { SQL } from '../../src/tags'
-import 'mocha'
 
 function testDiffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema, expectedDiff: SchemaDiff) {
 	const actual = diffSchemas(originalSchema, updatedSchema)
@@ -471,9 +470,10 @@ describe('Diff schemas', () => {
 		}
 		const sql = SQL`CREATE TABLE "category" ( "id" uuid PRIMARY KEY NOT NULL );
 			  CREATE TABLE "post_categories" (
+				"id"          uuid PRIMARY KEY NOT NULL,
 				"post_id"     uuid NOT NULL REFERENCES "post"("id") ON DELETE cascade,
 				"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE cascade,
-				CONSTRAINT "post_categories_pkey" PRIMARY KEY ("post_id", "category_id")
+				CONSTRAINT "post_categories_uniq_post_id_category_id" UNIQUE ("post_id", "category_id")
 			  );
 			  ALTER TABLE "category" ADD "title" text;`
 		it('diff schemas', () => {

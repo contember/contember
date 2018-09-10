@@ -155,6 +155,11 @@ export default class SqlMigrator {
 				this.builder.createTable(
 					relation.joiningTable.tableName,
 					{
+						id: {
+							primaryKey: true,
+							type: 'uuid',
+							notNull: true
+						},
 						[relation.joiningTable.joiningColumn.columnName]: {
 							type: this.getPrimaryType(entity),
 							notNull: true,
@@ -170,7 +175,7 @@ export default class SqlMigrator {
 					},
 					{
 						constraints: {
-							primaryKey: [
+							unique: [
 								relation.joiningTable.joiningColumn.columnName,
 								relation.joiningTable.inverseJoiningColumn.columnName
 							]

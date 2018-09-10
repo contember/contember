@@ -1,3 +1,8 @@
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
 type Mutation {
   createTest(data: TestCreateInput!): Test!
   updateTest(where: TestUniqueWhere!, data: TestUpdateInput!): Test
@@ -24,12 +29,18 @@ input StringCondition {
 }
 
 type Test {
+  _meta: TestMeta
   id: UUID!
   c: String
 }
 
 input TestCreateInput {
   a: String
+}
+
+type TestMeta {
+  id: FieldMeta
+  c: FieldMeta
 }
 
 input TestUniqueWhere {

@@ -5,6 +5,8 @@ import QueryBuilder from './QueryBuilder'
 type ConditionBuilderCallback = (builder: ConditionBuilder) => void
 
 interface ConditionBuilder {
+	isEmpty(): boolean
+
 	and(callback: ConditionBuilderCallback): void
 
 	or(callback: ConditionBuilderCallback): void
@@ -104,6 +106,10 @@ namespace ConditionBuilder {
 			const sql = this.expressions.join(` ${operator} `)
 
 			return this.qb.raw(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, ...this.formatter.bindings)
+		}
+
+		isEmpty(): boolean {
+			return this.expressions.length === 0
 		}
 
 		private wrapColumnName(columnName: QueryBuilder.ColumnIdentifier): string {

@@ -1,11 +1,10 @@
-import { Input, Model, Acl } from 'cms-common'
+import { Input, Model } from 'cms-common'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
 import { acceptEveryFieldVisitor, getColumnName, getEntity } from '../../content-schema/modelUtils'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
-import SelectBuilder from './select/SelectBuilder'
 import Path from './select/Path'
 import QueryBuilder from '../../core/knex/QueryBuilder'
 import KnexWrapper from '../../core/knex/KnexWrapper'
@@ -63,7 +62,7 @@ export default class Mapper {
 			indexByAlias = path.for(indexBy).getAlias()
 			qb.select([path.getAlias(), getColumnName(this.schema, entity, indexBy)], indexByAlias)
 		}
-		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.select(entity, input))
+		const rows = await this.selectRows(hydrator, qb, entity, input)
 
 		return await (indexByAlias !== null ? hydrator.hydrateAll(rows, indexByAlias) : hydrator.hydrateAll(rows))
 	}
@@ -75,7 +74,7 @@ export default class Mapper {
 		const groupingKey = '__grouping_key'
 		qb.select([path.getAlias(), columnName], groupingKey)
 
-		const rows = await this.selectRows(hydrator, qb, entity, selector => selector.select(entity, input))
+		const rows = await this.selectRows(hydrator, qb, entity, input)
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
@@ -83,13 +82,13 @@ export default class Mapper {
 		hydrator: SelectHydrator,
 		qb: QueryBuilder,
 		entity: Model.Entity,
-		selectHandler: (selector: SelectBuilder) => Promise<void>
+		input: ObjectNode<Input.ListQueryInput>
 	) {
 		const path = new Path([])
 		qb.from(entity.tableName, path.getAlias())
 
 		const selector = this.selectBuilderFactory.create(this, qb, hydrator)
-		const selectPromise = selectHandler(selector)
+		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input))
 		const rows = await selector.execute()
 		await selectPromise
 

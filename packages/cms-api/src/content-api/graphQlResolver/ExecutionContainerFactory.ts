@@ -21,6 +21,13 @@ class ExecutionContainerFactory {
 
 	public create(context: Context): Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }> {
 		const innerDic = new Container.Builder({})
+
+			.addService('variableInjector', () => new VariableInjector(context.identityVariables))
+			.addService(
+				'predicateFactory',
+				({ variableInjector }) => new PredicateFactory(this.permissions, variableInjector)
+			)
+			.addService('predicatesInjector', ({ predicateFactory }) => new PredicatesInjector(this.schema, predicateFactory))
 			.addService('joinBuilder', () => new JoinBuilder(this.schema))
 			.addService('conditionBuilder', () => new ConditionBuilder())
 			.addService(
@@ -29,17 +36,10 @@ class ExecutionContainerFactory {
 			)
 			.addService(
 				'selectBuilderFactory',
-				({ joinBuilder, whereBuilder }) => new SelectBuilderFactory(this.schema, joinBuilder, whereBuilder)
+				({ joinBuilder, whereBuilder, predicateFactory, }) => new SelectBuilderFactory(this.schema, joinBuilder, whereBuilder, predicateFactory)
 			)
 			.addService('insertBuilderFactory', ({ whereBuilder }) => new InsertBuilderFactory(this.schema, whereBuilder))
 			.addService('updateBuilderFactory', ({ whereBuilder }) => new UpdateBuilderFactory(this.schema, whereBuilder))
-
-			.addService('variableInjector', () => new VariableInjector(context.identityVariables))
-			.addService(
-				'predicateFactory',
-				({ variableInjector }) => new PredicateFactory(this.permissions, variableInjector)
-			)
-			.addService('predicatesInjector', ({ predicateFactory }) => new PredicatesInjector(this.schema, predicateFactory))
 			.addService('uniqueWhereExpander', () => new UniqueWhereExpander(this.schema))
 
 			.addService(
@@ -66,8 +66,8 @@ class ExecutionContainerFactory {
 
 			.addService(
 				'readResolver',
-				({ mapperRunner, predicatesInjector, uniqueWhereExpander }) =>
-					new ReadResolver(mapperRunner, predicatesInjector, uniqueWhereExpander)
+				({ mapperRunner, uniqueWhereExpander }) =>
+					new ReadResolver(mapperRunner, uniqueWhereExpander)
 			)
 			.addService(
 				'mutationResolver',

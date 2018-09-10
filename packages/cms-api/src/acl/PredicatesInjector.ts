@@ -10,34 +10,13 @@ class PredicatesInjector {
 
 	public inject(entity: Model.Entity, objectNode: ObjectNode<Input.ListQueryInput>) {
 		const restrictedWhere = this.injectToWhere(objectNode.args.where || {}, entity)
-		const where = this.createWhere(entity, objectNode.fields.map(it => it.name), restrictedWhere)
-		const fields = this.injectToFields(objectNode, entity)
+		const where = this.createWhere(entity, [entity.primary], restrictedWhere)
 
-		return new ObjectNode(objectNode.name, objectNode.alias, fields, { ...objectNode.args, where })
-	}
-
-	private injectToFields(
-		objectNode: ObjectNode<Input.ListQueryInput>,
-		entity: Model.Entity
-	): (ObjectNode | FieldNode)[] {
-		return objectNode.fields.map(field => {
-			if (!(field instanceof ObjectNode)) {
-				return field
-			}
-
-			const targetEntity = acceptFieldVisitor(this.schema, entity, field.name, {
-				visitColumn: () => {
-					throw new Error()
-				},
-				visitRelation: (_a, _b, targetEntity) => targetEntity
-			})
-
-			return this.inject(targetEntity, field)
-		})
+		return new ObjectNode(objectNode.name, objectNode.alias, objectNode.fields, { ...objectNode.args, where })
 	}
 
 	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {
-		const predicatesWhere: Input.Where | null = this.predicateFactory.create(
+		const predicatesWhere: Input.Where = this.predicateFactory.create(
 			entity,
 			fieldNames,
 			Authorizator.Operation.read

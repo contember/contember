@@ -2,15 +2,14 @@ import { Input, Model } from 'cms-common'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import ObjectNode from './ObjectNode'
-import MapperRunner from "../sql/MapperRunner"
+import MapperRunner from '../sql/MapperRunner'
 
 export default class ReadResolver {
 	constructor(
 		private readonly mapperRunner: MapperRunner,
 		private readonly predicatesInjector: PredicatesInjector,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
-	) {
-	}
+		private readonly uniqueWhereExpander: UniqueWhereExpander
+	) {}
 
 	public async resolveListQuery(entity: Model.Entity, queryAst: ObjectNode<Input.ListQueryInput>) {
 		const queryWithPredicates = this.predicatesInjector.inject(entity, queryAst)

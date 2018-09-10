@@ -1,17 +1,13 @@
 import { Acl, Input, Model } from 'cms-common'
 import VariableInjector from './VariableInjector'
-import Authorizator from "./Authorizator";
+import Authorizator from './Authorizator'
 
 class PredicateFactory {
-	constructor(
-		private readonly permissions: Acl.Permissions,
-		private readonly variableInjector: VariableInjector
-	) {
-	}
+	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {}
 
 	public create(entity: Model.Entity, fieldNames: string[], operation: Authorizator.Operation): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
-		const neverCondition: Input.Where = {[entity.primary]: {never: true}}
+		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
 		if (!entityPermissions) {
 			return neverCondition
@@ -28,7 +24,7 @@ class PredicateFactory {
 			}
 			predicates = [deletePredicate]
 		} else {
-			const fieldPermissions = entityPermissions.operations[operation];
+			const fieldPermissions = entityPermissions.operations[operation]
 			if (fieldPermissions === undefined) {
 				return neverCondition
 			}
@@ -38,7 +34,6 @@ class PredicateFactory {
 			}
 			predicates = operationPredicates
 		}
-
 
 		const predicatesWhere: Input.Where[] = predicates.reduce(
 			(result: Input.Where[], name: Acl.PredicateReference): Input.Where[] => {
@@ -54,10 +49,13 @@ class PredicateFactory {
 			return {}
 		}
 
-		return {and: predicatesWhere}
+		return { and: predicatesWhere }
 	}
 
-	private getRequiredPredicates(fieldNames: string[], fieldPermissions: Acl.FieldPermissions): Acl.PredicateReference[] | false {
+	private getRequiredPredicates(
+		fieldNames: string[],
+		fieldPermissions: Acl.FieldPermissions
+	): Acl.PredicateReference[] | false {
 		const predicates: Acl.PredicateReference[] = []
 		for (let name of fieldNames) {
 			const fieldPredicate = fieldPermissions[name]

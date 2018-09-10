@@ -21,14 +21,13 @@ export default class SelectBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
 		private readonly qb: QueryBuilder,
-		private readonly hydrator: SelectHydrator,
+		private readonly hydrator: SelectHydrator
 	) {
 		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
 		this.rows = this.createRowsPromise(blocker)
 	}
 
-	public async execute(): Promise<SelectHydrator.Rows>
-	{
+	public async execute(): Promise<SelectHydrator.Rows> {
 		this.firer()
 		return await this.rows
 	}

@@ -17,10 +17,10 @@ import UpdateEntityRelationInputProvider from './mutations/UpdateEntityRelationI
 import UpdateEntityInputFieldVisitor from './mutations/UpdateEntityInputFieldVisitor'
 import EntityInputProvider from './mutations/EntityInputProvider'
 import Authorizator from '../../acl/Authorizator'
-import ExecutionContainerFactory from "../graphQlResolver/ExecutionContainerFactory";
-import ReadResolverFactory from "../graphQlResolver/ReadResolverFactory";
-import GraphQlQueryAstFactory from "../graphQlResolver/GraphQlQueryAstFactory";
-import MutationResolverFactory from "../graphQlResolver/MutationResolverFactory";
+import ExecutionContainerFactory from '../graphQlResolver/ExecutionContainerFactory'
+import ReadResolverFactory from '../graphQlResolver/ReadResolverFactory'
+import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
+import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -33,7 +33,14 @@ export default class GraphQlSchemaBuilderFactory {
 		const executionContainerFactory = new ExecutionContainerFactory(schema, permissions)
 		const readResolverFactory = new ReadResolverFactory(executionContainerFactory)
 		const queryAstFactory = new GraphQlQueryAstFactory()
-		const queryProvider = new QueryProvider(schema, authorizator, whereTypeProvider, entityTypeProvider, queryAstFactory, readResolverFactory)
+		const queryProvider = new QueryProvider(
+			schema,
+			authorizator,
+			whereTypeProvider,
+			entityTypeProvider,
+			queryAstFactory,
+			readResolverFactory
+		)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<Authorizator.Operation.create>>()
 		const createEntityRelationInputFieldVisitor = new CreateEntityRelationInputFieldVisitor(

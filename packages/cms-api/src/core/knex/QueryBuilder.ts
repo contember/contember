@@ -13,8 +13,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return this.wrapper.formatter(this.qb)
 	}
 
-	public with(alias: string, callback: QueryBuilder.Callback): void
-	{
+	public with(alias: string, callback: QueryBuilder.Callback): void {
 		this.qb.with(alias, qb => callback(new QueryBuilder(this.wrapper, qb)))
 	}
 
@@ -85,20 +84,36 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return await this.qb.insert(data, returning)
 	}
 
-	public async insertFrom(tableName: string, columns: { [columnName: string]: QueryBuilder.ColumnExpression }, callback: QueryBuilder.Callback): Promise<AffectedRows>
-	public async insertFrom(tableName: string, columns: { [columnName: string]: QueryBuilder.ColumnExpression }, callback: QueryBuilder.Callback, returning: string): Promise<Returning[]>
-	public async insertFrom(tableName: string, columns: { [columnName: string]: QueryBuilder.ColumnExpression }, callback: QueryBuilder.Callback, returning?: string): Promise<AffectedRows | Returning[]> {
+	public async insertFrom(
+		tableName: string,
+		columns: { [columnName: string]: QueryBuilder.ColumnExpression },
+		callback: QueryBuilder.Callback
+	): Promise<AffectedRows>
+	public async insertFrom(
+		tableName: string,
+		columns: { [columnName: string]: QueryBuilder.ColumnExpression },
+		callback: QueryBuilder.Callback,
+		returning: string
+	): Promise<Returning[]>
+	public async insertFrom(
+		tableName: string,
+		columns: { [columnName: string]: QueryBuilder.ColumnExpression },
+		callback: QueryBuilder.Callback,
+		returning?: string
+	): Promise<AffectedRows | Returning[]> {
 		const columnNames = Object.keys(columns)
 		this.qb.into(this.raw('?? (' + columnNames.map(() => '??').join(', ') + ')', tableName, ...columnNames))
 		return await this.qb.insert((qb: Knex.QueryBuilder) => {
 			const queryBuilder = new QueryBuilder(this.wrapper, qb)
 			Object.values(columns)
-				.map((value): Knex.Raw => {
-					if (typeof value === 'function') {
-						return value(new QueryBuilder.ColumnExpressionFactory(queryBuilder))
+				.map(
+					(value): Knex.Raw => {
+						if (typeof value === 'function') {
+							return value(new QueryBuilder.ColumnExpressionFactory(queryBuilder))
+						}
+						return value
 					}
-					return value
-				})
+				)
 				.forEach(raw => queryBuilder.qb.select(raw))
 
 			callback(queryBuilder)
@@ -115,15 +130,21 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return await this.qb.update(data)
 	}
 
-	public async updateFrom(tableName: string, columns: QueryBuilder.ColumnExpressionMap, callback: QueryBuilder.Callback): Promise<AffectedRows> {
+	public async updateFrom(
+		tableName: string,
+		columns: QueryBuilder.ColumnExpressionMap,
+		callback: QueryBuilder.Callback
+	): Promise<AffectedRows> {
 		const updateData = Object.entries(columns)
-			.map(([key, value]): [string, Knex.Raw] => {
-				if (typeof value === 'function') {
-					return [key, value(new QueryBuilder.ColumnExpressionFactory(this))]
+			.map(
+				([key, value]): [string, Knex.Raw] => {
+					if (typeof value === 'function') {
+						return [key, value(new QueryBuilder.ColumnExpressionFactory(this))]
+					}
+					return [key, value]
 				}
-				return [key, value]
-			})
-			.reduce((result, [key, value]) => ({...result, [key]: value}), {})
+			)
+			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
 		this.qb.table(tableName).update(updateData)
 		const updateSql = this.qb.toSQL()
 		const fromQb = this.wrapper.queryBuilder()
@@ -132,7 +153,11 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		if (!selectSql.sql.startsWith('select *')) {
 			throw new Error()
 		}
-		const query = this.wrapper.raw(updateSql.sql + ' ' + selectSql.sql.substring('select *'.length), ...updateSql.bindings, ...selectSql.bindings)
+		const query = this.wrapper.raw(
+			updateSql.sql + ' ' + selectSql.sql.substring('select *'.length),
+			...updateSql.bindings,
+			...selectSql.bindings
+		)
 		return await query
 	}
 
@@ -181,10 +206,7 @@ namespace QueryBuilder {
 	}
 
 	export class ColumnExpressionFactory {
-		constructor(
-			private readonly qb: QueryBuilder<any>,
-		) {
-		}
+		constructor(private readonly qb: QueryBuilder<any>) {}
 
 		public select(columnName: QueryBuilder.ColumnIdentifier): Knex.Raw {
 			const columnFqn = QueryBuilder.toFqn(columnName)
@@ -196,8 +218,7 @@ namespace QueryBuilder {
 			return this.qb.raw('?', value)
 		}
 
-		public raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw
-		{
+		public raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw {
 			return this.qb.raw(sql, ...bindings)
 		}
 	}

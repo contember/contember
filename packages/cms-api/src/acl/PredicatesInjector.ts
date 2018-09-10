@@ -2,27 +2,23 @@ import { Input, Model } from 'cms-common'
 import ObjectNode from '../content-api/graphQlResolver/ObjectNode'
 import { acceptFieldVisitor } from '../content-schema/modelUtils'
 import FieldNode from '../content-api/graphQlResolver/FieldNode'
-import PredicateFactory from "./PredicateFactory";
-import Authorizator from "./Authorizator";
+import PredicateFactory from './PredicateFactory'
+import Authorizator from './Authorizator'
 
 class PredicatesInjector {
-	constructor(
-		private readonly schema: Model.Schema,
-		private readonly predicateFactory: PredicateFactory,
-	) {
-	}
+	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
 	public inject(entity: Model.Entity, objectNode: ObjectNode<Input.ListQueryInput>) {
 		const restrictedWhere = this.injectToWhere(objectNode.args.where || {}, entity)
 		const where = this.createWhere(entity, objectNode.fields.map(it => it.name), restrictedWhere)
 		const fields = this.injectToFields(objectNode, entity)
 
-		return new ObjectNode(objectNode.name, objectNode.alias, fields, {...objectNode.args, where})
+		return new ObjectNode(objectNode.name, objectNode.alias, fields, { ...objectNode.args, where })
 	}
 
 	private injectToFields(
 		objectNode: ObjectNode<Input.ListQueryInput>,
-		entity: Model.Entity,
+		entity: Model.Entity
 	): (ObjectNode | FieldNode)[] {
 		return objectNode.fields.map(field => {
 			if (!(field instanceof ObjectNode)) {
@@ -40,17 +36,15 @@ class PredicatesInjector {
 		})
 	}
 
-	private createWhere(
-		entity: Model.Entity,
-		fieldNames: string[],
-		where: Input.Where,
-	): Input.Where {
+	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {
+		const predicatesWhere: Input.Where | null = this.predicateFactory.create(
+			entity,
+			fieldNames,
+			Authorizator.Operation.read
+		)
 
-		const predicatesWhere: Input.Where | null = this.predicateFactory.create(entity, fieldNames, Authorizator.Operation.read)
-
-		return {and: [where, predicatesWhere].filter(it => Object.keys(it).length > 0)}
+		return { and: [where, predicatesWhere].filter(it => Object.keys(it).length > 0) }
 	}
-
 
 	private injectToWhere(where: Input.Where, entity: Model.Entity): Input.Where {
 		const resultWhere: Input.Where = {}

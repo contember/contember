@@ -6,8 +6,8 @@ import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
 import ReadResolver from '../graphQlResolver/ReadResolver'
-import ReadResolverFactory from "../graphQlResolver/ReadResolverFactory";
-import GraphQlQueryAstFactory from "../graphQlResolver/GraphQlQueryAstFactory";
+import ReadResolverFactory from '../graphQlResolver/ReadResolverFactory'
+import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 
 export default class QueryProvider {
 	constructor(
@@ -16,7 +16,7 @@ export default class QueryProvider {
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly queryAstAFactory: GraphQlQueryAstFactory,
-		private readonly readResolverFactory: ReadResolverFactory,
+		private readonly readResolverFactory: ReadResolverFactory
 	) {}
 
 	public getQueries(entityName: string): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {

@@ -9,16 +9,15 @@ import SelectBuilder from './select/SelectBuilder'
 import Path from './select/Path'
 import QueryBuilder from '../../core/knex/QueryBuilder'
 import KnexWrapper from '../../core/knex/KnexWrapper'
-import PredicateFactory from "../../acl/PredicateFactory";
-import Authorizator from "../../acl/Authorizator";
-import SelectBuilderFactory from "./select/SelectBuilderFactory";
-import InsertBuilderFactory from "./insert/InsertBuilderFactory";
-import UpdateBuilderFactory from "./update/UpdateBuilderFactory";
-import UniqueWhereExpander from "../graphQlResolver/UniqueWhereExpander";
-import PredicatesInjector from "../../acl/PredicatesInjector";
+import PredicateFactory from '../../acl/PredicateFactory'
+import Authorizator from '../../acl/Authorizator'
+import SelectBuilderFactory from './select/SelectBuilderFactory'
+import InsertBuilderFactory from './insert/InsertBuilderFactory'
+import UpdateBuilderFactory from './update/UpdateBuilderFactory'
+import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
+import PredicatesInjector from '../../acl/PredicatesInjector'
 
 export default class Mapper {
-
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly db: KnexWrapper,
@@ -27,9 +26,8 @@ export default class Mapper {
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
-	) {
-	}
+		private readonly uniqueWhereExpander: UniqueWhereExpander
+	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
@@ -99,11 +97,14 @@ export default class Mapper {
 	}
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
-
 		const where = this.predicateFactory.create(entity, Object.keys(data), Authorizator.Operation.create)
 		const insertBuilder = this.insertBuilderFactory.create(entity, this.db)
 		insertBuilder.addWhere(where)
-		const promises = acceptEveryFieldVisitor(this.schema, entity, new InsertVisitor(this.schema, data, insertBuilder, this))
+		const promises = acceptEveryFieldVisitor(
+			this.schema,
+			entity,
+			new InsertVisitor(this.schema, data, insertBuilder, this)
+		)
 
 		const result = await insertBuilder.execute()
 

@@ -67,7 +67,7 @@ export default class UpdateBuilder {
 		}
 
 		qb.with('newData_', qb => {
-			resolvedData.forEach(value => qb.selectValue(value.value as Value, value.columnType, value.columnName))
+			resolvedData.forEach(value => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName))
 			const columns = new Set(resolvedData.map(it => it.columnName))
 			const allColumns: string[] = Object.values(
 				acceptEveryFieldVisitor(this.schema, this.entity, {

@@ -29,23 +29,26 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		this.from(tableName, alias)
 	}
 
-	public select(columnName: QueryBuilder.ColumnIdentifier, alias?: string): void {
-		const columnFqn = QueryBuilder.toFqn(columnName)
-		if (alias) {
-			this.qb.select(`${columnFqn} as ${alias}`)
+	public select(columnName: QueryBuilder.ColumnIdentifier, alias?: string): void
+	public select(callback: QueryBuilder.ColumnExpression, alias?: string): void
+	public select(expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression, alias?: string): void {
+		let raw: Knex.Raw
+		if (typeof expr === 'function') {
+			raw = expr(new QueryBuilder.ColumnExpressionFactory(this))
+		} else if (typeof expr === 'string' || Array.isArray(expr)){
+			raw = this.raw('??', QueryBuilder.toFqn(expr))
 		} else {
-			this.qb.select(`${columnFqn}`)
+			raw = expr
 		}
-	}
-
-	public selectValue(value: Value, type: string, alias?: string): void {
-		const sql = `? :: ${type}` + (alias ? ` as ${alias}` : '')
-		this.qb.select(this.raw(sql, value as Value))
+		if (alias) {
+			raw = this.raw((raw as any).sql + ' as ??', ...(raw as any).bindings, alias)
+		}
+		this.qb.select(raw)
 	}
 
 	public where(where: { [columName: string]: Value }): void
-	public where(whereCondition: QueryBuilder.WhereCallback): void
-	public where(where: (QueryBuilder.WhereCallback) | { [columName: string]: Value }): void {
+	public where(whereCondition: QueryBuilder.ConditionCallback): void
+	public where(where: (QueryBuilder.ConditionCallback) | { [columName: string]: Value }): void {
 		if (typeof where === 'function') {
 			const builder = new ConditionBuilder.ConditionStringBuilder(this)
 			where(builder, this)
@@ -190,7 +193,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 
 namespace QueryBuilder {
 	export type Callback = (qb: QueryBuilder) => void
-	export type WhereCallback = (whereClause: ConditionBuilder, qb: QueryBuilder<any>) => void
+	export type ConditionCallback = (whereClause: ConditionBuilder, qb: QueryBuilder<any>) => void
 
 	type ColumnFqn = string
 	type TableAliasAndColumn = [string, string]
@@ -215,7 +218,14 @@ namespace QueryBuilder {
 
 		public selectValue(value: Value, type?: string): Knex.Raw {
 			const sql = '?' + (type ? ` :: ${type}` : '')
-			return this.qb.raw('?', value)
+			return this.qb.raw(sql, value)
+		}
+
+		public selectCondition(condition: ConditionCallback): Knex.Raw
+		{
+			const builder = new ConditionBuilder.ConditionStringBuilder(this.qb)
+			condition(builder, this.qb)
+			return builder.getSql() || this.qb.raw('null')
 		}
 
 		public raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw {

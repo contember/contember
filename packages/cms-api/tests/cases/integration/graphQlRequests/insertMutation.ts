@@ -21,7 +21,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "author" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -82,7 +82,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "author" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -130,7 +130,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as url) 
+						(select $1 :: uuid as "id", $2 :: text as "url") 
 						insert into "site_setting" ("id", "url") 
 						select "root_"."id", "root_"."url"
             from "root_"
@@ -140,7 +140,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+						(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 						insert into "site" ("id", "name", "setting_id") 
 						select "root_"."id", "root_"."name", "root_"."setting_id"
             from "root_"
@@ -187,7 +187,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as url) 
+						(select $1 :: uuid as "id", $2 :: text as "url") 
 						insert into "site_setting" ("id", "url") 
 						select "root_"."id", "root_"."url"
             from "root_"
@@ -197,7 +197,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+						(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 						insert into "site" ("id", "name", "setting_id") 
 						select "root_"."id", "root_"."name", "root_"."setting_id"
             from "root_"
@@ -246,7 +246,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "author" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -256,7 +256,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: timestamp as published_at, $3 :: uuid as author_id) 
+						(select $1 :: uuid as "id", $2 :: timestamp as "published_at", $3 :: uuid as "author_id") 
 						insert into "post" ("id", "published_at", "author_id") 
 						select "root_"."id", "root_"."published_at", "root_"."author_id"
             from "root_"
@@ -315,7 +315,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: timestamp as published_at) 
+						(select $1 :: uuid as "id", $2 :: timestamp as "published_at") 
 						insert into "post" ("id", "published_at") 
 						select "root_"."id", "root_"."published_at"
             from "root_"
@@ -325,7 +325,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as post_id, $2 :: uuid as id, $3 :: locale as locale, $4 :: text as title) 
+						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: locale as "locale", $4 :: text as "title") 
 						insert into "post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"
@@ -335,7 +335,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as post_id, $2 :: uuid as id, $3 :: locale as locale, $4 :: text as title) 
+						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: locale as "locale", $4 :: text as "title") 
 						insert into "post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"
@@ -381,7 +381,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "post" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -391,7 +391,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "category" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -401,7 +401,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "category" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -459,7 +459,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "category" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -469,7 +469,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "post" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -479,7 +479,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as id, $2 :: text as name) 
+						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "post" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"

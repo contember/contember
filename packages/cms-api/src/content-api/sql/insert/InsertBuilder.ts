@@ -53,7 +53,7 @@ export default class InsertBuilder {
 		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
 		const resolvedData = this.rowData.map((it, index) => ({ ...it, value: resolvedValues[index] }))
 		qb.with('root_', qb => {
-			resolvedData.forEach(value => qb.selectValue(value.value as Value, value.columnType, value.columnName))
+			resolvedData.forEach(value => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName))
 		})
 
 		const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(

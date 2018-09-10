@@ -32,7 +32,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`with "newData_" as (select
-                  $1 :: text as name,
+                  $1 :: text as "name",
                   "root_"."id"
                 from "author" as "root_"
                 where "root_"."id" = $2) update "author"
@@ -95,7 +95,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as name) 
+							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "author" ("id", "name") 
 							select "root_"."id", "root_"."name" 
 							from "root_"
@@ -107,7 +107,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as author_id,
+                 $1 :: uuid as "author_id",
                  "root_"."id",
                  "root_"."title"
                from "post" as "root_"
@@ -145,7 +145,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as author_id,
+                 $1 :: uuid as "author_id",
                  "root_"."id",
                  "root_"."title"
                from "post" as "root_"
@@ -190,7 +190,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as name,
+                 $1 :: text as "name",
                  "root_"."id"
                from "author" as "root_"
                where "root_"."id" = $2) update "author"
@@ -233,7 +233,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "newData_" as (select
-                                             $1 :: text as name,
+                                             $1 :: text as "name",
                                              "root_"."id"
                                            from "author" as "root_"
                                            where "root_"."id" = $2) update "author"
@@ -276,7 +276,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as name) 
+							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "author" ("id", "name") 
 							select "root_"."id", "root_"."name"
               from "root_"
@@ -287,7 +287,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as author_id,
+                 $1 :: uuid as "author_id",
                  "root_"."id",
                  "root_"."title"
                from "post" as "root_"
@@ -325,7 +325,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as author_id,
+                 $1 :: uuid as "author_id",
                  "root_"."id"
                from "post" as "root_"
                where "root_"."id" = $2) update "post"
@@ -369,7 +369,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as author_id,
+                 $1 :: uuid as "author_id",
                  "root_"."id"
                from "post" as "root_"
                where "root_"."id" = $2) update "post"
@@ -441,7 +441,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as title, $3 :: text as locale, $4 :: uuid as post_id) 
+							(select $1 :: uuid as "id", $2 :: text as "title", $3 :: text as "locale", $4 :: uuid as "post_id") 
 							insert into "post_locale" ("id", "title", "locale", "post_id") 
 							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
               from "root_"
@@ -485,7 +485,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as title,
+                 $1 :: text as "title",
                  "root_"."id",
                  "root_"."locale",
                  "root_"."post_id"
@@ -531,7 +531,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as title,
+                 $1 :: text as "title",
                  "root_"."id",
                  "root_"."locale",
                  "root_"."post_id"
@@ -576,7 +576,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as title, $3 :: text as locale, $4 :: uuid as post_id) 
+							(select $1 :: uuid as "id", $2 :: text as "title", $3 :: text as "locale", $4 :: uuid as "post_id") 
 							insert into "post_locale" ("id", "title", "locale", "post_id") 
 							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
               from "root_"
@@ -643,7 +643,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as post_id,
+                 $1 :: uuid as "post_id",
                  "root_"."id",
                  "root_"."title",
                  "root_"."locale"
@@ -682,7 +682,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as post_id,
+                 $1 :: uuid as "post_id",
                  "root_"."id",
                  "root_"."title",
                  "root_"."locale"
@@ -740,7 +740,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as url) 
+							(select $1 :: uuid as "id", $2 :: text as "url") 
 							insert into "site_setting" ("id", "url") 
 							select "root_"."id", "root_"."url"
               from "root_"
@@ -751,7 +751,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -796,7 +796,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as url,
+                 $1 :: text as "url",
                  "root_"."id"
                from "site_setting" as "root_"
                where "root_"."id" = $2) update "site_setting"
@@ -873,7 +873,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -918,7 +918,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -930,7 +930,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -975,7 +975,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as url,
+                 $1 :: text as "url",
                  "root_"."id"
                from "site_setting" as "root_"
                where "root_"."id" = $2) update "site_setting"
@@ -1019,7 +1019,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as url) 
+							(select $1 :: uuid as "id", $2 :: text as "url") 
 							insert into "site_setting" ("id", "url") 
 							select "root_"."id", "root_"."url"
               from "root_"
@@ -1030,7 +1030,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1068,7 +1068,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1113,7 +1113,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1173,7 +1173,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1184,7 +1184,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+							(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 							insert into "site" ("id", "name", "setting_id") 
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
@@ -1227,7 +1227,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+							(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 							insert into "site" ("id", "name", "setting_id") 
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
@@ -1271,7 +1271,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as name,
+                 $1 :: text as "name",
                  "root_"."id",
                  "root_"."setting_id"
                from "site" as "root_"
@@ -1316,7 +1316,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as name,
+                 $1 :: text as "name",
                  "root_"."id",
                  "root_"."setting_id"
                from "site" as "root_"
@@ -1360,7 +1360,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as name, $3 :: uuid as setting_id) 
+							(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 							insert into "site" ("id", "name", "setting_id") 
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
@@ -1404,7 +1404,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1513,7 +1513,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1558,7 +1558,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1570,7 +1570,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: uuid as setting_id,
+                 $1 :: uuid as "setting_id",
                  "root_"."id",
                  "root_"."name"
                from "site" as "root_"
@@ -1650,7 +1650,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as name) 
+							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "category" ("id", "name") 
 							select "root_"."id", "root_"."name"
               from "root_"
@@ -1760,7 +1760,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as name,
+                 $1 :: text as "name",
                  "root_"."id"
                from "category" as "root_"
                where "root_"."id" = $2) update "category"
@@ -1805,7 +1805,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as name,
+                 $1 :: text as "name",
                  "root_"."id"
                from "category" as "root_"
                where "root_"."id" = $2) update "category"
@@ -1851,7 +1851,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as name,
+                 $1 :: text as "name",
                  "root_"."id"
                from "category" as "root_"
                where "root_"."id" = $2) update "category"
@@ -1862,7 +1862,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as name) 
+							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "category" ("id", "name") 
 							select "root_"."id", "root_"."name"
               from "root_"
@@ -1946,7 +1946,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as title) 
+							(select $1 :: uuid as "id", $2 :: text as "title") 
 							insert into "post" ("id", "title") 
 							select "root_"."id", "root_"."title"
               from "root_"
@@ -2056,7 +2056,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as title,
+                 $1 :: text as "title",
                  "root_"."id"
                from "post" as "root_"
                where "root_"."id" = $2) update "post"
@@ -2101,7 +2101,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as title,
+                 $1 :: text as "title",
                  "root_"."id"
                from "post" as "root_"
                where "root_"."id" = $2) update "post"
@@ -2147,7 +2147,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as title,
+                 $1 :: text as "title",
                  "root_"."id"
                from "post" as "root_"
                where "root_"."id" = $2) update "post"
@@ -2158,7 +2158,7 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`with "root_" as 
-							(select $1 :: uuid as id, $2 :: text as title) 
+							(select $1 :: uuid as "id", $2 :: text as "title") 
 							insert into "post" ("id", "title") 
 							select "root_"."id", "root_"."title"
               from "root_"
@@ -2224,7 +2224,7 @@ describe('update', () => {
 						{
 							sql: SQL`with "newData_" as
               (select
-                 $1 :: text as name,
+                 $1 :: text as "name",
                  "root_"."id"
                from "author" as "root_"
                where "root_"."id" = $2) update "author"

@@ -70,9 +70,9 @@ describe('knex query builder', () => {
 		await execute({
 			query: async qb => {
 				qb.with('root_', qb => {
-					qb.selectValue('Hello', 'text', 'title')
-					qb.selectValue(1, 'int', 'id')
-					qb.selectValue(null, 'text', 'content')
+					qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
+					qb.select(expr => expr.selectValue(1, 'int'), 'id')
+					qb.select(expr => expr.selectValue(null, 'text'), 'content')
 				})
 				await qb.insertFrom(
 					'author',
@@ -87,7 +87,7 @@ describe('knex query builder', () => {
 				)
 			},
 			sql: SQL`
-				with "root_" as (select $1 :: text as title, $2 :: int as id, $3 :: text as content) 
+				with "root_" as (select $1 :: text as "title", $2 :: int as "id", $3 :: text as "content") 
 				insert into "author" ("id", "title") 
 					select "id", "title" from "root_" returning "id"`,
 			parameters: ['Hello', 1, null]
@@ -98,9 +98,9 @@ describe('knex query builder', () => {
 		await execute({
 			query: async qb => {
 				qb.with('root_', qb => {
-					qb.selectValue('Hello', 'text', 'title')
-					qb.selectValue(1, 'int', 'id')
-					qb.selectValue(null, 'text', 'content')
+					qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
+					qb.select(expr => expr.selectValue(1, 'int'), 'id')
+					qb.select(expr => expr.selectValue(null, 'text'), 'content')
 				})
 				await qb.updateFrom(
 					'author',
@@ -114,11 +114,25 @@ describe('knex query builder', () => {
 				)
 			},
 			sql: SQL`with "root_" as (select
-                                  $1 :: text as title,
-                                  $2 :: int as id,
-                                  $3 :: text as content) update "author"
+                                  $1 :: text as "title",
+                                  $2 :: int as "id",
+                                  $3 :: text as "content") update "author"
       set "id" = "root_"."id", "title" = "root_"."title" from "root_"`,
 			parameters: ['Hello', 1, null]
+		})
+	})
+
+	it('constructs select with condition', async () => {
+		await execute({
+			query: async qb => {
+				qb.select(expr => expr.selectCondition(condition => condition.or(condition => {
+					condition.compare('foo', '>=', 1)
+					condition.compare('foo', '<=', 0)
+				})), 'bar')
+				await qb.getResult()
+			},
+			sql: SQL`select ("foo" >= $1 or "foo" <= $2) as "bar"`,
+			parameters: [1, 0],
 		})
 	})
 })

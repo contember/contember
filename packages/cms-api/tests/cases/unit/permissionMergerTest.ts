@@ -2,12 +2,12 @@ import 'mocha'
 import { Acl, Model } from 'cms-common'
 import { expect } from 'chai'
 import PermissionFactory from '../../../src/acl/PermissionFactory'
-import SchemaBuilder from "../../../src/content-schema/builder/SchemaBuilder";
+import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
 
 interface Test {
-	acl: Acl.Schema,
-	roles: string[],
-	result: Acl.Permissions,
+	acl: Acl.Schema
+	roles: string[]
+	result: Acl.Permissions
 }
 
 const execute = (test: Test) => {
@@ -71,7 +71,7 @@ describe('permission merger', () => {
 						}
 					}
 				}
-			},
+			}
 		})
 	})
 
@@ -142,7 +142,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: {bar: {eq: 'abc'}}
+									foo: { bar: { eq: 'abc' } }
 								},
 								operations: {
 									read: {
@@ -158,7 +158,7 @@ describe('permission merger', () => {
 			result: {
 				Entity1: {
 					predicates: {
-						foo: {bar: {eq: 'abc'}}
+						foo: { bar: { eq: 'abc' } }
 					},
 					operations: {
 						read: {
@@ -193,7 +193,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: {bar: {eq: 'abc'}}
+									foo: { bar: { eq: 'abc' } }
 								},
 								operations: {
 									read: {
@@ -216,7 +216,7 @@ describe('permission merger', () => {
 						}
 					}
 				}
-			},
+			}
 		})
 	})
 
@@ -229,7 +229,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									bar: {lorem: {eq: 'ipsum'}}
+									bar: { lorem: { eq: 'ipsum' } }
 								},
 								operations: {
 									read: {
@@ -244,7 +244,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: {bar: {eq: 'abc'}}
+									foo: { bar: { eq: 'abc' } }
 								},
 								operations: {
 									read: {
@@ -261,7 +261,7 @@ describe('permission merger', () => {
 				Entity1: {
 					predicates: {
 						__merge__bar__foo: {
-							or: [{lorem: {eq: 'ipsum'}}, {bar: {eq: 'abc'}}]
+							or: [{ lorem: { eq: 'ipsum' } }, { bar: { eq: 'abc' } }]
 						}
 					},
 					operations: {
@@ -284,7 +284,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									bar: {lorem: {eq: 'ipsum'}}
+									bar: { lorem: { eq: 'ipsum' } }
 								},
 								operations: {
 									delete: 'bar'
@@ -296,7 +296,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: {bar: {eq: 'abc'}}
+									foo: { bar: { eq: 'abc' } }
 								},
 								operations: {
 									delete: 'foo'
@@ -311,7 +311,7 @@ describe('permission merger', () => {
 				Entity1: {
 					predicates: {
 						__merge__bar__foo: {
-							or: [{lorem: {eq: 'ipsum'}}, {bar: {eq: 'abc'}}]
+							or: [{ lorem: { eq: 'ipsum' } }, { bar: { eq: 'abc' } }]
 						}
 					},
 					operations: {
@@ -331,7 +331,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: {lorem: {eq: 'ipsum'}}
+									foo: { lorem: { eq: 'ipsum' } }
 								},
 								operations: {
 									read: {
@@ -346,7 +346,7 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: {bar: {eq: 'abc'}}
+									foo: { bar: { eq: 'abc' } }
 								},
 								operations: {
 									read: {
@@ -362,8 +362,8 @@ describe('permission merger', () => {
 			result: {
 				Entity1: {
 					predicates: {
-						foo: {lorem: {eq: 'ipsum'}},
-						foo_: {bar: {eq: 'abc'}}
+						foo: { lorem: { eq: 'ipsum' } },
+						foo_: { bar: { eq: 'abc' } }
 					},
 					operations: {
 						read: {
@@ -373,7 +373,7 @@ describe('permission merger', () => {
 						}
 					}
 				}
-			},
+			}
 		})
 	})
 
@@ -386,41 +386,41 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: {lorem: {eq: 'ipsum'}},
-									bar: {lorem: {eq: 'ipsum'}},
+									foo: { lorem: { eq: 'ipsum' } },
+									bar: { lorem: { eq: 'ipsum' } }
 								},
 								operations: {
 									read: {
 										title: 'foo',
 										description: 'bar',
-										content: 'bar',
+										content: 'bar'
 									}
 								}
 							}
 						}
-					},
+					}
 				}
 			},
 			roles: ['role1'],
 			result: {
 				Entity1: {
 					predicates: {
-						foo: {lorem: {eq: 'ipsum'}},
-						bar: {lorem: {eq: 'ipsum'}},
+						foo: { lorem: { eq: 'ipsum' } },
+						bar: { lorem: { eq: 'ipsum' } },
 						__merge__foo__bar: {
-							or: [{lorem: {eq: 'ipsum'}}, {lorem: {eq: 'ipsum'}}]
-						},
+							or: [{ lorem: { eq: 'ipsum' } }, { lorem: { eq: 'ipsum' } }]
+						}
 					},
 					operations: {
 						read: {
 							id: '__merge__foo__bar',
 							title: 'foo',
 							description: 'bar',
-							content: 'bar',
+							content: 'bar'
 						}
 					}
 				}
-			},
+			}
 		})
 	})
 })

@@ -1,11 +1,8 @@
 import { Acl, Model } from 'cms-common'
-import { getEntity } from "../content-schema/modelUtils";
+import { getEntity } from '../content-schema/modelUtils'
 
 export default class PermissionFactory {
-	constructor(
-		private readonly schema: Model.Schema,
-	) {
-	}
+	constructor(private readonly schema: Model.Schema) {}
 
 	public create(acl: Acl.Schema, roles: string[]): Acl.Permissions {
 		let result: Acl.Permissions = {}
@@ -45,10 +42,15 @@ export default class PermissionFactory {
 					.filter((value, index, array): value is string => array.indexOf(value) === index)
 
 				let idPermissions: Acl.PredicateReference = fieldPermissions[entity.primary] as Acl.PredicateReference
-				const predicates = {...entityPermissions.predicates}
+				const predicates = { ...entityPermissions.predicates }
 
 				for (let predicateReference of predicateReferences) {
-					const [predicateDefinition, predicate] = this.mergePredicates(predicates, idPermissions, predicates, predicateReference)
+					const [predicateDefinition, predicate] = this.mergePredicates(
+						predicates,
+						idPermissions,
+						predicates,
+						predicateReference
+					)
 					if (typeof predicate !== 'string' || predicateDefinition === undefined) {
 						throw new Error('should not happen')
 					}
@@ -62,7 +64,7 @@ export default class PermissionFactory {
 	}
 
 	private mergePermissions(left: Acl.Permissions, right: Acl.Permissions): Acl.Permissions {
-		const result = {...left}
+		const result = { ...left }
 		for (let entityName in right) {
 			if (result[entityName] !== undefined) {
 				result[entityName] = this.mergeEntityPermissions(result[entityName], right[entityName])
@@ -76,7 +78,6 @@ export default class PermissionFactory {
 	private mergeEntityPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions): Acl.EntityPermissions {
 		let predicates: Acl.PredicateMap = {}
 		const operations: Acl.EntityOperations = {}
-
 
 		const operationNames: (keyof Pick<Acl.EntityOperations, 'create' | 'read' | 'update'>)[] = [
 			'create',
@@ -93,7 +94,7 @@ export default class PermissionFactory {
 				right.predicates,
 				rightFieldPermissions
 			)
-			predicates = {...predicates, ...operationPredicates}
+			predicates = { ...predicates, ...operationPredicates }
 			if (Object.keys(fieldPermissions).length > 0) {
 				operations[operation] = fieldPermissions
 			}
@@ -127,7 +128,7 @@ export default class PermissionFactory {
 		const fields: Acl.FieldPermissions = {}
 		const predicates: Acl.PredicateMap = {}
 
-		for (let field in {...leftFieldPermissions, ...rightFieldPermissions}) {
+		for (let field in { ...leftFieldPermissions, ...rightFieldPermissions }) {
 			const [predicateDefinition, predicate] = this.mergePredicates(
 				leftPredicates,
 				leftFieldPermissions[field],

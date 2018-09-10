@@ -56,21 +56,21 @@ describe('Insert mutation', () => {
 			permissions: {
 				Author: {
 					predicates: {
-						name_predicate: {name: 'name_variable'},
+						name_predicate: { name: 'name_variable' }
 					},
 					operations: {
 						create: {
 							id: true,
-							name: 'name_predicate',
+							name: 'name_predicate'
 						},
 						read: {
-							id: true,
+							id: true
 						}
-					},
-				},
+					}
+				}
 			},
 			variables: {
-				name_variable: ['John', 'Jack'],
+				name_variable: ['John', 'Jack']
 			},
 			query: GQL`
         mutation {
@@ -95,7 +95,7 @@ describe('Insert mutation', () => {
 						sql: SQL`select "root_"."id" as "root_id"
                      from "author" as "root_"
                      where "root_"."id" = $1`,
-						response: [{root_id: testUuid(1)}],
+						response: [{ root_id: testUuid(1) }],
 						parameters: [testUuid(1)]
 					}
 				])

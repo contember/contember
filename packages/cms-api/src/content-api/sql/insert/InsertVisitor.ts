@@ -11,12 +11,12 @@ interface RelationInputProcessor {
 }
 
 export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.RelationByTypeVisitor<PromiseLike<any>> {
-
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly data: Input.CreateDataInput,
 		private readonly insertBuilder: InsertBuilder,
-		private readonly mapper: Mapper) {}
+		private readonly mapper: Mapper
+	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
 		this.insertBuilder.addFieldValue(

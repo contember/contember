@@ -3,14 +3,10 @@ import { GraphQLError } from 'graphql'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
 import ObjectNode from './ObjectNode'
 import UniqueWhereExpander from './UniqueWhereExpander'
-import MapperRunner from "../sql/MapperRunner";
+import MapperRunner from '../sql/MapperRunner'
 
 export default class MutationResolver {
-	constructor(
-		private readonly mapperRunner: MapperRunner,
-		private readonly uniqueWhereExpander: UniqueWhereExpander
-	) {
-	}
+	constructor(private readonly mapperRunner: MapperRunner, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
 	public async resolveUpdate(entity: Model.Entity, queryAst: ObjectNode<Input.UpdateInput>) {
 		if (!isUniqueWhere(entity, queryAst.args.where)) {
@@ -27,11 +23,10 @@ export default class MutationResolver {
 	}
 
 	public async resolveCreate(entity: Model.Entity, queryAst: ObjectNode<Input.CreateInput>) {
-
 		return await this.mapperRunner.run(async mapper => {
 			const primary = await mapper.insert(entity, queryAst.args.data)
 
-			const whereArgs = {where: {[entity.primary]: {eq: primary}}}
+			const whereArgs = { where: { [entity.primary]: { eq: primary } } }
 			const objectWithArgs = new ObjectNode<Input.ListQueryInput>(
 				queryAst.name,
 				queryAst.alias,

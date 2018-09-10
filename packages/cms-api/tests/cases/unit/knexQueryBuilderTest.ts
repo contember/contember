@@ -4,7 +4,7 @@ import * as mockKnex from 'mock-knex'
 import * as knex from 'knex'
 import KnexWrapper from '../../../src/core/knex/KnexWrapper'
 import { SQL } from '../../src/tags'
-import QueryBuilder from "../../../src/core/knex/QueryBuilder";
+import QueryBuilder from '../../../src/core/knex/QueryBuilder'
 
 interface Test {
 	query: (qb: QueryBuilder) => void
@@ -21,7 +21,6 @@ const execute = async (test: Test) => {
 	mockKnex.mock(connection)
 	const wrapper = new KnexWrapper(connection)
 	const qb = wrapper.queryBuilder()
-
 
 	const tracker = mockKnex.getTracker()
 	tracker.install()
@@ -63,7 +62,7 @@ describe('knex query builder', () => {
                  inner join "bar" as "bar"
                    on ("bar"."a" = $1 or "bar"."a" = $2 or not("bar"."b" = $3)) and "bar"."c" in ($4, $5, $6) and "bar"."d" is null and not("bar"."d" is null)
                       and "bar"."e" <= "bar"."f"`,
-			parameters: [1, 2, 1, 1, 2, 3,]
+			parameters: [1, 2, 1, 1, 2, 3]
 		})
 	})
 
@@ -75,20 +74,24 @@ describe('knex query builder', () => {
 					qb.selectValue(1, 'int', 'id')
 					qb.selectValue(null, 'text', 'content')
 				})
-				await qb.insertFrom('author', {
-					id: expr => expr.select('id'),
-					title: expr => expr.select('title'),
-				}, qb => {
-					qb.table('root_')
-				}, 'id')
+				await qb.insertFrom(
+					'author',
+					{
+						id: expr => expr.select('id'),
+						title: expr => expr.select('title')
+					},
+					qb => {
+						qb.table('root_')
+					},
+					'id'
+				)
 			},
 			sql: SQL`
 				with "root_" as (select $1 :: text as title, $2 :: int as id, $3 :: text as content) 
 				insert into "author" ("id", "title") 
 					select "id", "title" from "root_" returning "id"`,
-			parameters: ['Hello', 1, null],
+			parameters: ['Hello', 1, null]
 		})
-
 	})
 
 	it('constructs update with cte', async () => {
@@ -99,19 +102,23 @@ describe('knex query builder', () => {
 					qb.selectValue(1, 'int', 'id')
 					qb.selectValue(null, 'text', 'content')
 				})
-				await qb.updateFrom('author', {
-					id: expr => expr.select(['root_', 'id']),
-					title: expr => expr.select(['root_', 'title']),
-				}, qb => {
-					qb.table('root_')
-				})
+				await qb.updateFrom(
+					'author',
+					{
+						id: expr => expr.select(['root_', 'id']),
+						title: expr => expr.select(['root_', 'title'])
+					},
+					qb => {
+						qb.table('root_')
+					}
+				)
 			},
 			sql: SQL`with "root_" as (select
                                   $1 :: text as title,
                                   $2 :: int as id,
                                   $3 :: text as content) update "author"
       set "id" = "root_"."id", "title" = "root_"."title" from "root_"`,
-			parameters: ['Hello', 1, null],
+			parameters: ['Hello', 1, null]
 		})
 	})
 })

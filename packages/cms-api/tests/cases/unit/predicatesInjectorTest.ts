@@ -6,7 +6,7 @@ import { Acl, Model } from 'cms-common'
 import PredicatesInjector from '../../../src/acl/PredicatesInjector'
 import ObjectNode from '../../../src/content-api/graphQlResolver/ObjectNode'
 import FieldNode from '../../../src/content-api/graphQlResolver/FieldNode'
-import PredicateFactory from "../../../src/acl/PredicateFactory";
+import PredicateFactory from '../../../src/acl/PredicateFactory'
 
 describe('predicates injector', () => {
 	const schema = new SchemaBuilder()
@@ -47,7 +47,10 @@ describe('predicates injector', () => {
 	}
 
 	it('injects predicate', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
+		)
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
 			'PostLocale',
@@ -61,7 +64,7 @@ describe('predicates injector', () => {
 				{
 					and: [
 						{
-							locale: {in: ['cs']}
+							locale: { in: ['cs'] }
 						}
 					]
 				}
@@ -70,7 +73,10 @@ describe('predicates injector', () => {
 	})
 
 	it('injects predicate and ignore duplicates', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
+		)
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
 			'PostLocale',
@@ -93,7 +99,10 @@ describe('predicates injector', () => {
 	})
 
 	it('merges predicate with explicit where', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
+		)
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
 			'PostLocale',
@@ -123,7 +132,10 @@ describe('predicates injector', () => {
 	})
 
 	it('does not injects predicate when not requesting restricted', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
+		)
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {})
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
@@ -131,7 +143,10 @@ describe('predicates injector', () => {
 	})
 
 	it('injects predicate to nested field', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
+		)
 		const obj: ObjectNode = new ObjectNode(
 			'Post',
 			'Post',
@@ -160,7 +175,10 @@ describe('predicates injector', () => {
 	})
 
 	it('injects predicate to where', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
+		)
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {
 			where: { title: { eq: 'abc' } }
 		})
@@ -187,7 +205,10 @@ describe('predicates injector', () => {
 	})
 
 	it('injects predicate to nested where', () => {
-		const injector = new PredicatesInjector(schema, new PredicateFactory(permissions, new VariableInjector({localeVariable: ['cs']})))
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
+		)
 		const obj: ObjectNode = new ObjectNode(
 			'Post',
 			'Post',

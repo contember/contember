@@ -1,8 +1,7 @@
 import { Acl, Input } from 'cms-common'
 
 class VariableInjector {
-	constructor(private readonly variables: Acl.VariablesMap) {
-	}
+	constructor(private readonly variables: Acl.VariablesMap) {}
 
 	public inject(where: Input.Where<Acl.PredicateVariable>): Input.Where {
 		return Object.keys(where).reduce((result, key) => {

@@ -1,7 +1,5 @@
 export default class Path {
-	constructor(
-		public readonly path: string[],
-		public readonly rootAlias = 'root_') {}
+	constructor(public readonly path: string[], public readonly rootAlias = 'root_') {}
 
 	public back() {
 		const newPath = [...this.path]

@@ -970,7 +970,7 @@ describe('update', () => {
                        from "site"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{setting_id: testUuid(1)}]
+							response: [{ setting_id: testUuid(1) }]
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -982,7 +982,7 @@ describe('update', () => {
               set "url" = "newData_"."url" from "newData_"
               where "site_setting"."id" = $3`,
 							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)],
-							response: [],
+							response: []
 						},
 						selectUpdateSiteSql
 					])
@@ -1793,7 +1793,9 @@ describe('update', () => {
 				query: GQL`mutation {
         updatePost(
             where: {id: "${testUuid(2)}"},
-            data: {categories: [{upsert: {where: {id: "${testUuid(1)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
+            data: {categories: [{upsert: {where: {id: "${testUuid(
+							1
+						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           id
         }
@@ -1837,7 +1839,9 @@ describe('update', () => {
 				query: GQL`mutation {
         updatePost(
             where: {id: "${testUuid(2)}"},
-            data: {categories: [{upsert: {where: {id: "${testUuid(1)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
+            data: {categories: [{upsert: {where: {id: "${testUuid(
+							1
+						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           id
         }
@@ -2182,7 +2186,6 @@ describe('update', () => {
 		})
 	})
 
-
 	describe('acl', () => {
 		it('update name', async () => {
 			await execute({
@@ -2200,21 +2203,21 @@ describe('update', () => {
 				permissions: {
 					Author: {
 						predicates: {
-							name_predicate: {name: 'name_variable'},
+							name_predicate: { name: 'name_variable' }
 						},
 						operations: {
 							update: {
 								id: true,
-								name: 'name_predicate',
+								name: 'name_predicate'
 							},
 							read: {
-								id: true,
+								id: true
 							}
-						},
-					},
+						}
+					}
 				},
 				variables: {
-					name_variable: ['John', 'Jack'],
+					name_variable: ['John', 'Jack']
 				},
 				executes: [
 					...sqlTransaction([
@@ -2233,7 +2236,7 @@ describe('update', () => {
 							sql: SQL`select "root_"."id" as "root_id"
                      from "author" as "root_"
                      where "root_"."id" = $1`,
-							response: [{root_id: testUuid(1)}],
+							response: [{ root_id: testUuid(1) }],
 							parameters: [testUuid(1)]
 						}
 					])
@@ -2248,5 +2251,4 @@ describe('update', () => {
 			})
 		})
 	})
-
 })

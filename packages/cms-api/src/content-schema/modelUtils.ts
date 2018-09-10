@@ -25,7 +25,7 @@ export const getColumnType = (schema: Model.Schema, entity: Model.Entity, fieldN
 				return getColumnType(schema, targetEntity, targetEntity.primary)
 			}
 			throw new Error('Not an owning side')
-		},
+		}
 	})
 }
 

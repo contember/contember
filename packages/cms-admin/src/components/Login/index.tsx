@@ -20,8 +20,8 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 			<div className="centerCard-wrap">
 				<Card elevation={Elevation.ONE} className="centerCard">
 					<div className="login-site">
-						<img src="https://www.mangoweb.cz/images/logo.png" className="login-siteLogo" />
-						<h1 className="login-siteName">manGoweb CMS</h1>
+						<img src="https://www.mangoweb.cz/images/logo.png" className="login-site-logo" />
+						<h1 className="login-site-name">manGoweb CMS</h1>
 					</div>
 					<form
 						onSubmit={async e => {

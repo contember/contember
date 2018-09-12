@@ -379,7 +379,9 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`delete from "author"
-              where "id" = $1`,
+              where "id" in (select "root_"."id"
+                             from "author" as "root_"
+                             where "root_"."id" = $1)`,
 							parameters: [testUuid(1)]
 						},
 						selectUpdatePostSql
@@ -611,7 +613,9 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`delete from "post_locale"
-              where "locale" = $1 and "post_id" = $2`,
+              where "id" in (select "root_"."id"
+                             from "post_locale" as "root_"
+                             where "root_"."locale" = $1 and "root_"."post_id" = $2)`,
 							parameters: ['cs', testUuid(2)]
 						},
 						selectUpdatePostSql
@@ -1124,7 +1128,9 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`delete from "site_setting"
-              where "id" = $1`,
+              where "id" in (select "root_"."id"
+                             from "site_setting" as "root_"
+                             where "root_"."id" = $1)`,
 							parameters: [testUuid(1)]
 						},
 						selectUpdateSiteSql
@@ -1441,7 +1447,9 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`delete from "site"
-              where "setting_id" = $1`,
+              where "id" in (select "root_"."id"
+                             from "site" as "root_"
+                             where "root_"."setting_id" = $1)`,
 							parameters: [testUuid(2)]
 						},
 						selectUpdateSiteSettingSql
@@ -1697,7 +1705,9 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`delete from "category"
-              where "id" = $1`,
+              where "id" in (select "root_"."id"
+                             from "category" as "root_"
+                             where "root_"."id" = $1)`,
 							parameters: [testUuid(1)]
 						},
 						selectUpdatePostSql
@@ -1993,7 +2003,9 @@ describe('update', () => {
 						},
 						{
 							sql: SQL`delete from "post"
-              where "id" = $1`,
+              where "id" in (select "root_"."id"
+                             from "post" as "root_"
+                             where "root_"."id" = $1)`,
 							parameters: [testUuid(1)]
 						},
 						selectUpdateCategorySql

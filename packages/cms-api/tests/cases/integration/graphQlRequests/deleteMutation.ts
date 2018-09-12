@@ -54,7 +54,9 @@ describe('Delete mutation', () => {
 					},
 					{
 						sql: SQL`delete from "post"
-		  where "id" = $1`,
+            where "id" in (select "root_"."id"
+                           from "post" as "root_"
+                           where "root_"."id" = $1)`,
 						parameters: [testUuid(1)],
 						response: []
 					}
@@ -66,6 +68,68 @@ describe('Delete mutation', () => {
 						author: {
 							name: 'John'
 						},
+						id: testUuid(1)
+					}
+				}
+			}
+		})
+	})
+
+	it('delete post with acl', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity => entity
+					.column('locale', c => c.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        mutation {
+          deletePost(where: {id: "${testUuid(1)}"}) {
+            id
+          }
+        }`,
+			permissions: {
+				Post: {
+					predicates: {
+						locale_predicate: {locale: 'locale_variable'}
+					},
+					operations: {
+						delete: 'locale_predicate',
+						read: {
+							id: true
+						}
+					}
+				}
+			},
+			variables: {
+				locale_variable: ['cs']
+			},
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select
+                     "root_"."id" as "root_id"
+                     from "post" as "root_" 
+                   where "root_"."id" = $1`,
+						parameters: [testUuid(1)],
+						response: [
+							{
+								root_id: testUuid(1),
+							}
+						]
+					},
+					{
+						sql: SQL`delete from "post"
+            where "id" in (select "root_"."id"
+                           from "post" as "root_"
+                           where "root_"."id" = $1 and "root_"."locale" in ($2))`,
+						parameters: [testUuid(1), 'cs'],
+						response: []
+					}
+				])
+			],
+			return: {
+				data: {
+					deletePost: {
 						id: testUuid(1)
 					}
 				}

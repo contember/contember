@@ -3,9 +3,12 @@ import VariableInjector from './VariableInjector'
 import Authorizator from './Authorizator'
 
 class PredicateFactory {
-	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {}
+	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {
+	}
 
-	public create(entity: Model.Entity, fieldNames: string[], operation: Authorizator.Operation): Input.Where {
+	public create(entity: Model.Entity, operation: Authorizator.Operation.delete): Input.Where
+	public create(entity: Model.Entity, operation: Authorizator.Operation.update | Authorizator.Operation.read | Authorizator.Operation.create, fieldNames: string[]): Input.Where
+	public create(entity: Model.Entity, operation: Authorizator.Operation, fieldNames?: string[]): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
@@ -24,6 +27,9 @@ class PredicateFactory {
 			}
 			predicates = [deletePredicate]
 		} else {
+			if (fieldNames === undefined) {
+				throw new Error()
+			}
 			const fieldPermissions = entityPermissions.operations[operation]
 			if (fieldPermissions === undefined) {
 				return neverCondition

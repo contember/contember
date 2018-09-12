@@ -14,6 +14,21 @@ namespace Input {
 
 	export type ColumnValueLike<E = never> = GenericValueLike<ColumnValue<E>>
 
+	export enum UpdateRelationOperation {
+		connect = 'connect',
+		disconnect = 'disconnect',
+		create = 'create',
+		update = 'update',
+		upsert = 'upsert',
+		delete = 'delete',
+	}
+
+
+	export enum CreateRelationOperation {
+		connect = 'connect',
+		create = 'create',
+	}
+
 	export interface ConnectRelationInput<E = never> {
 		connect: UniqueWhere<E>
 	}

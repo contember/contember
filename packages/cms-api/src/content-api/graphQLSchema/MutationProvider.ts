@@ -9,6 +9,7 @@ import Authorizator from '../../acl/Authorizator'
 import EntityInputProvider from './mutations/EntityInputProvider'
 import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
+import { filterObject } from "../../utils/object";
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
 
@@ -19,40 +20,41 @@ export default class MutationProvider {
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly columnTypeResolver: ColumnTypeResolver,
-		private readonly createEntityInputProvider: EntityInputProvider<Acl.Operation.create>,
-		private readonly updateEntityInputProvider: EntityInputProvider<Acl.Operation.update>,
+		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
+		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
 		private readonly queryAstAFactory: GraphQlQueryAstFactory,
 		private readonly mutationResolverFactory: MutationResolverFactory
 	) {}
 
 	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {
-		const mutations: { [fieldName: string]: FieldConfig<any> } = {}
-		if (this.authorizator.isAllowed(Acl.Operation.create, entityName)) {
-			mutations[`create${entityName}`] = this.getCreateMutation(entityName)
-		}
-		if (this.authorizator.isAllowed(Acl.Operation.delete, entityName)) {
-			mutations[`delete${entityName}`] = this.getDeleteMutation(entityName)
-		}
-		if (this.authorizator.isAllowed(Acl.Operation.update, entityName)) {
-			mutations[`update${entityName}`] = this.getUpdateMutation(entityName)
-		}
+		const mutations: { [fieldName: string]: FieldConfig<any> | undefined } = {}
+		mutations[`create${entityName}`] = this.getCreateMutation(entityName)
+		mutations[`delete${entityName}`] = this.getDeleteMutation(entityName)
+		mutations[`update${entityName}`] = this.getUpdateMutation(entityName)
 
-		return mutations
+		return filterObject<FieldConfig<any>, FieldConfig<any> | undefined>(mutations, (key, value): value is FieldConfig<any> => value !== undefined)
 	}
 
-	private getCreateMutation(entityName: string): FieldConfig<Input.CreateInput> {
+	private getCreateMutation(entityName: string): FieldConfig<Input.CreateInput> | undefined {
 		const entity = getEntity(this.schema, entityName)
+		const dataType = this.createEntityInputProvider.getInput(entityName)
+		if (dataType === undefined) {
+			return undefined
+		}
 		return {
 			type: new GraphQLNonNull(this.entityTypeProvider.getEntity(entityName)),
 			args: {
-				data: { type: new GraphQLNonNull(this.createEntityInputProvider.getInput(entityName)) }
+				data: { type: new GraphQLNonNull(dataType) }
 			},
 			resolve: (parent, args, context, info) =>
 				this.mutationResolverFactory.create(context).resolveCreate(entity, this.queryAstAFactory.create(info))
 		}
 	}
 
-	private getDeleteMutation(entityName: string): FieldConfig<Input.DeleteInput> {
+	private getDeleteMutation(entityName: string): FieldConfig<Input.DeleteInput> | undefined {
+		if (!this.authorizator.isAllowed(Acl.Operation.delete, entityName)) {
+			return undefined
+		}
 		const entity = getEntity(this.schema, entityName)
 		return {
 			type: this.entityTypeProvider.getEntity(entityName),
@@ -64,13 +66,17 @@ export default class MutationProvider {
 		}
 	}
 
-	public getUpdateMutation(entityName: string): FieldConfig<Input.UpdateInput> {
+	public getUpdateMutation(entityName: string): FieldConfig<Input.UpdateInput> | undefined {
 		const entity = getEntity(this.schema, entityName)
+		const dataType = this.updateEntityInputProvider.getInput(entityName)
+		if (dataType === undefined) {
+			return undefined
+		}
 		return {
 			type: this.entityTypeProvider.getEntity(entityName),
 			args: {
 				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
-				data: { type: new GraphQLNonNull(this.updateEntityInputProvider.getInput(entityName)) }
+				data: { type: new GraphQLNonNull(dataType) }
 			},
 			resolve: (parent, args, context, info) =>
 				this.mutationResolverFactory.create(context).resolveUpdate(entity, this.queryAstAFactory.create(info))

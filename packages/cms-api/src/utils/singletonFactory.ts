@@ -1,9 +1,10 @@
 const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: Args) => T) => {
 	const created: { [name: string]: T } = {}
+	const createdIds = new Set<string>()
 	const recursionGuard: string[] = []
 	return (name: Id, args?: Args): T => {
 		const idString = typeof name === 'string' ? name : JSON.stringify(name)
-		if (created[idString]) {
+		if (createdIds.has(idString)) {
 			return created[idString]
 		}
 		if (recursionGuard.includes(idString)) {
@@ -15,6 +16,8 @@ const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: A
 			throw new Error('impl error')
 		}
 		created[idString] = val
+		createdIds.add(idString)
+
 		return val
 	}
 }

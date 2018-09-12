@@ -6,11 +6,11 @@ import Authorizator from '../../../acl/Authorizator'
 import singletonFactory from '../../../utils/singletonFactory'
 import { GraphQLInputType } from 'graphql/type/definition'
 
-export default class EntityInputProvider<
-	Operation extends Acl.Operation.create | Acl.Operation.update
+class EntityInputProvider<
+	Operation extends EntityInputProvider.Type.create | EntityInputProvider.Type.update
 > {
 	private entityInputs = singletonFactory<
-		GraphQLInputType,
+		GraphQLInputType | undefined,
 		{
 			entityName: string
 			withoutRelation?: string
@@ -24,7 +24,7 @@ export default class EntityInputProvider<
 		private visitor: Model.FieldVisitor<GraphQLInputFieldConfig | undefined>
 	) {}
 
-	public getInput(entityName: string, withoutRelation?: string): GraphQLInputType {
+	public getInput(entityName: string, withoutRelation?: string): GraphQLInputType | undefined {
 		return this.entityInputs({ entityName, withoutRelation })
 	}
 
@@ -32,19 +32,32 @@ export default class EntityInputProvider<
 		const withoutSuffix = withoutRelation ? GqlTypeName`Without${withoutRelation}` : ''
 
 		const entity = getEntity(this.schema, entityName)
+		const operation: Acl.Operation = (() => {
+			switch (this.operation) {
+				case EntityInputProvider.Type.create:
+					return Acl.Operation.create
+				case EntityInputProvider.Type.update:
+					return Acl.Operation.update
+				default:
+					throw new Error()
+			}
+		})()
+		if (!this.authorizator.isAllowed(operation, entity.name, entity.primary)) {
+			return undefined
+		}
 
-		const fields = Object.keys(entity.fields)
+		const fieldNames = Object.keys(entity.fields)
 			.filter(it => it !== entity.primary)
 			.filter(it => it !== withoutRelation)
-			.filter(it => this.authorizator.isAllowed(this.operation, entityName, it))
 
-		if (fields.length === 0) {
-			return GraphQLBoolean
+		const fields = this.createEntityFields(entityName, fieldNames, withoutRelation)
+		if (Object.keys(fields).length === 0) {
+			return this.operation === EntityInputProvider.Type.create ? GraphQLBoolean : undefined
 		}
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}${withoutSuffix}${this.operation}Input`,
-			fields: () => this.createEntityFields(entityName, fields, withoutRelation)
+			fields: () => fields
 		})
 	}
 
@@ -63,3 +76,12 @@ export default class EntityInputProvider<
 		return fields
 	}
 }
+
+namespace EntityInputProvider {
+	export enum Type {
+		create = 'create',
+		update = 'update',
+	}
+}
+
+export default EntityInputProvider

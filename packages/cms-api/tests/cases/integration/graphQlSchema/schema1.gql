@@ -34,9 +34,9 @@ input AuthorUpdatePostsEntityRelationInput {
   create: PostWithoutAuthorCreateInput
   update: AuthorUpdatePostsRelationInput
   upsert: AuthorUpsertPostsRelationInput
-  delete: PostUniqueWhere
   connect: PostUniqueWhere
   disconnect: PostUniqueWhere
+  delete: PostUniqueWhere
 }
 
 input AuthorUpdatePostsRelationInput {
@@ -103,9 +103,9 @@ input CategoryUpdatePostsEntityRelationInput {
   create: PostWithoutCategoriesCreateInput
   update: CategoryUpdatePostsRelationInput
   upsert: CategoryUpsertPostsRelationInput
-  delete: PostUniqueWhere
   connect: PostUniqueWhere
   disconnect: PostUniqueWhere
+  delete: PostUniqueWhere
 }
 
 input CategoryUpdatePostsRelationInput {
@@ -292,9 +292,9 @@ input PostUpdateCategoriesEntityRelationInput {
   create: CategoryWithoutPostsCreateInput
   update: PostUpdateCategoriesRelationInput
   upsert: PostUpsertCategoriesRelationInput
-  delete: CategoryUniqueWhere
   connect: CategoryUniqueWhere
   disconnect: CategoryUniqueWhere
+  delete: CategoryUniqueWhere
 }
 
 input PostUpdateCategoriesRelationInput {
@@ -313,9 +313,9 @@ input PostUpdateLocalesEntityRelationInput {
   create: PostLocaleWithoutPostCreateInput
   update: PostUpdateLocalesRelationInput
   upsert: PostUpsertLocalesRelationInput
-  delete: PostLocaleUniqueWhere
   connect: PostLocaleUniqueWhere
   disconnect: PostLocaleUniqueWhere
+  delete: PostLocaleUniqueWhere
 }
 
 input PostUpdateLocalesRelationInput {

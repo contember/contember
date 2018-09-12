@@ -9,6 +9,7 @@ import ColumnTypeResolver from './ColumnTypeResolver'
 import ConditionTypeProvider from './ConditionTypeProvider'
 import { GqlTypeName } from './utils'
 import Authorizator from '../../acl/Authorizator'
+import { FieldAccessVisitor } from "./FieldAccessVisitor";
 
 export default class WhereTypeProvider {
 	private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))
@@ -45,7 +46,7 @@ export default class WhereTypeProvider {
 		const uniqueKeys: string[][] = [[entity.primary], ...Object.values(entity.unique)
 			.map(it => it.fields)]
 			.filter(uniqueKey =>
-				uniqueKey.every(it => this.authorizator.isAllowed(Acl.Operation.read, entityName, it))
+				uniqueKey.every(it => acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator)))
 			)
 		for (const uniqueKey of uniqueKeys) {
 			combinations.push(uniqueKey.join(', '))
@@ -93,7 +94,7 @@ export default class WhereTypeProvider {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
 				continue
 			}
-			if (!this.authorizator.isAllowed(Acl.Operation.read, entity.name, fieldName)) {
+			if (!acceptFieldVisitor(this.schema, name, fieldName, new FieldAccessVisitor(Acl.Operation.read, this.authorizator))) {
 				continue
 			}
 

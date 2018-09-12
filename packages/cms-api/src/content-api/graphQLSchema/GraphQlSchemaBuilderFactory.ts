@@ -16,11 +16,12 @@ import UpdateEntityRelationInputFieldVisitor from './mutations/UpdateEntityRelat
 import UpdateEntityRelationInputProvider from './mutations/UpdateEntityRelationInputProvider'
 import UpdateEntityInputFieldVisitor from './mutations/UpdateEntityInputFieldVisitor'
 import EntityInputProvider from './mutations/EntityInputProvider'
-import Authorizator from '../../acl/Authorizator'
 import ExecutionContainerFactory from '../graphQlResolver/ExecutionContainerFactory'
 import ReadResolverFactory from '../graphQlResolver/ReadResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
+import UpdateEntityRelationAllowedOperationsVisitor from "./mutations/UpdateEntityRelationAllowedOperationsVisitor";
+import CreateEntityRelationAllowedOperationsVisitor from "./mutations/CreateEntityRelationAllowedOperationsVisitor";
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -42,45 +43,52 @@ export default class GraphQlSchemaBuilderFactory {
 			readResolverFactory
 		)
 
-		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<Acl.Operation.create>>()
+		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputProvider.Type.create>>()
+		const createEntityRelationAllowedOperationsVisitor = new CreateEntityRelationAllowedOperationsVisitor(authorizator)
 		const createEntityRelationInputFieldVisitor = new CreateEntityRelationInputFieldVisitor(
-			authorizator,
+			schema,
 			whereTypeProvider,
-			createEntityInputProviderAccessor
+			createEntityInputProviderAccessor,
+			createEntityRelationAllowedOperationsVisitor,
 		)
 		const createEntityRelationInputProvider = new CreateEntityRelationInputProvider(
 			schema,
 			createEntityRelationInputFieldVisitor
 		)
 		const createEntityInputFieldVisitor = new CreateEntityInputFieldVisitor(
+			schema,
+			authorizator,
 			columnTypeResolver,
 			createEntityRelationInputProvider
 		)
 		const createEntityInputProvider = new EntityInputProvider(
-			Acl.Operation.create,
+			EntityInputProvider.Type.create,
 			schema,
 			authorizator,
 			createEntityInputFieldVisitor
 		)
 		createEntityInputProviderAccessor.set(createEntityInputProvider)
 
-		const updateEntityInputProviderAccessor = new Accessor<EntityInputProvider<Acl.Operation.update>>()
+		const updateEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputProvider.Type.update>>()
+		const updateEntityRelationAllowedOperationsVisitor = new UpdateEntityRelationAllowedOperationsVisitor(authorizator)
 		const updateEntityRelationInputFieldVisitor = new UpdateEntityRelationInputFieldVisitor(
-			authorizator,
+			schema,
 			whereTypeProvider,
 			updateEntityInputProviderAccessor,
-			createEntityInputProvider
+			createEntityInputProvider,
+			updateEntityRelationAllowedOperationsVisitor,
 		)
 		const updateEntityRelationInputProvider = new UpdateEntityRelationInputProvider(
 			schema,
 			updateEntityRelationInputFieldVisitor
 		)
 		const updateEntityInputFieldVisitor = new UpdateEntityInputFieldVisitor(
+			authorizator,
 			columnTypeResolver,
 			updateEntityRelationInputProvider
 		)
 		const updateEntityInputProvider = new EntityInputProvider(
-			Acl.Operation.update,
+			EntityInputProvider.Type.update,
 			schema,
 			authorizator,
 			updateEntityInputFieldVisitor

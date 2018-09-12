@@ -54,6 +54,9 @@ class PredicateFactory {
 		if (predicatesWhere.length === 0) {
 			return {}
 		}
+		if (predicatesWhere.length === 1) {
+			return predicatesWhere[0]
+		}
 
 		return { and: predicatesWhere }
 	}

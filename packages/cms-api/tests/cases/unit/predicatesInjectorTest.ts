@@ -62,11 +62,7 @@ describe('predicates injector', () => {
 		expect(result.args.where).deep.eq({
 			and: [
 				{
-					and: [
-						{
-							locale: { in: ['cs'] }
-						}
-					]
+					locale: { in: ['cs'] }
 				}
 			]
 		})
@@ -88,11 +84,7 @@ describe('predicates injector', () => {
 		expect(result.args.where).deep.eq({
 			and: [
 				{
-					and: [
-						{
-							locale: { in: ['cs'] }
-						}
-					]
+					locale: { in: ['cs'] }
 				}
 			]
 		})
@@ -119,24 +111,16 @@ describe('predicates injector', () => {
 							id: { in: [1, 2] }
 						},
 						{
-							and: [
-								{
-									locale: {
-										in: [
-											"cs"
-										]
-									}
-								}
-							]
+							locale: {
+								in: [
+									"cs"
+								]
+							}
 						}
 					]
 				},
 				{
-					and: [
-						{
-							locale: { in: ['cs'] }
-						}
-					]
+					locale: { in: ['cs'] }
 				}
 			]
 		})
@@ -160,20 +144,12 @@ describe('predicates injector', () => {
 							title: { eq: 'abc' }
 						},
 						{
-							and: [
-								{
-									locale: { in: ['cs'] }
-								}
-							]
+							locale: { in: ['cs'] }
 						}
 					]
 				},
 				{
-					and: [
-						{
-							locale: {in: ['cs']}
-						}
-					]
+					locale: {in: ['cs']}
 				}
 			]
 		})

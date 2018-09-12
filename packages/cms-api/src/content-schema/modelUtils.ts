@@ -191,10 +191,10 @@ export const acceptRelationTypeVisitor = <T>(
 	throw new Error()
 }
 
-const isInversedRelation = (relation: Model.Relation): relation is Model.InversedRelation => {
+export const isInversedRelation = (relation: Model.Relation): relation is Model.InversedRelation => {
 	return (relation as Model.InversedRelation).ownedBy !== undefined
 }
 
-const isOwnerRelation = (relation: Model.Relation): relation is Model.OwnerRelation => {
+export const isOwnerRelation = (relation: Model.Relation): relation is Model.OwnerRelation => {
 	return !isInversedRelation(relation)
 }

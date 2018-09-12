@@ -1,21 +1,24 @@
 import { GraphQLInputObjectType } from 'graphql'
-import { Acl, Model } from 'cms-common'
+import { Acl, Input, Model } from 'cms-common'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
-import Authorizator from '../../../acl/Authorizator'
 import { Accessor } from '../../../utils/accessor'
 import EntityInputProvider from './EntityInputProvider'
 import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
+import CreateEntityRelationAllowedOperationsVisitor from "./CreateEntityRelationAllowedOperationsVisitor";
+import { acceptFieldVisitor } from "../../../content-schema/modelUtils";
 
 export default class CreateEntityRelationInputFieldVisitor
-	implements Model.ColumnVisitor<GraphQLInputObjectType>, Model.RelationVisitor<GraphQLInputObjectType> {
+	implements Model.ColumnVisitor<never>, Model.RelationVisitor<GraphQLInputObjectType | undefined> {
 	constructor(
-		private authorizator: Authorizator,
-		private whereTypeBuilder: WhereTypeProvider,
-		private createEntityInputProviderAccessor: Accessor<EntityInputProvider<Acl.Operation.create>>
-	) {}
+		private readonly schema: Model.Schema,
+		private readonly whereTypeBuilder: WhereTypeProvider,
+		private readonly createEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputProvider.Type.create>>,
+		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor,
+	) {
+	}
 
-	public visitColumn(): GraphQLInputObjectType {
+	public visitColumn(): never {
 		throw new Error()
 	}
 
@@ -24,27 +27,29 @@ export default class CreateEntityRelationInputFieldVisitor
 		relation: Model.Relation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.Relation
-	): GraphQLInputObjectType {
+	): GraphQLInputObjectType | undefined {
+		const targetName = targetRelation ? targetRelation.name : undefined
+		const fields: GraphQLInputFieldConfigMap = {}
+		const allowedOperations = acceptFieldVisitor(this.schema, entity, relation.name, this.createEntityRelationAllowedOperationsVisitor)
+
+		if (allowedOperations.includes(Input.CreateRelationOperation.connect)) {
+			fields[Input.CreateRelationOperation.connect] = {
+				type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
+			}
+		}
+
+		const createInput = this.createEntityInputProviderAccessor.get().getInput(targetEntity.name, targetName);
+		if (allowedOperations.includes(Input.CreateRelationOperation.create) && createInput !== undefined) {
+			fields[Input.CreateRelationOperation.create] = {
+				type: createInput
+			}
+		}
+		if (Object.keys(fields).length === 0) {
+			return undefined
+		}
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
-			fields: () => {
-				const targetName = targetRelation ? targetRelation.name : undefined
-				const fields: GraphQLInputFieldConfigMap = {}
-
-				//todo this is not so easy, connect may require update of one of sides
-				if (this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)) {
-					fields['connect'] = {
-						type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
-					}
-				}
-
-				if (this.authorizator.isAllowed(Acl.Operation.create, targetEntity.name)) {
-					fields['create'] = {
-						type: this.createEntityInputProviderAccessor.get().getInput(targetEntity.name, targetName)
-					}
-				}
-				return fields
-			}
+			fields: () => fields,
 		})
 	}
 }

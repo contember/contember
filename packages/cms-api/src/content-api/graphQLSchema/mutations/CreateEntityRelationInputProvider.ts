@@ -6,7 +6,7 @@ import { Model } from 'cms-common'
 
 export default class CreateEntityRelationInputProvider {
 	private createEntityRelationInputs = singletonFactory<
-		GraphQLInputObjectType,
+		GraphQLInputObjectType | undefined,
 		{ entityName: string; relationName: string }
 	>(id => this.createCreateEntityRelationInput(id.entityName, id.relationName))
 
@@ -15,11 +15,11 @@ export default class CreateEntityRelationInputProvider {
 		private readonly createEntityRelationInputFieldVisitor: CreateEntityRelationInputFieldVisitor
 	) {}
 
-	public getCreateEntityRelationInput(entityName: string, relationName: string) {
+	public getCreateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
 		return this.createEntityRelationInputs({ entityName, relationName })
 	}
 
-	private createCreateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType {
+	private createCreateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
 		return acceptFieldVisitor(this.schema, entityName, relationName, this.createEntityRelationInputFieldVisitor)
 	}
 }

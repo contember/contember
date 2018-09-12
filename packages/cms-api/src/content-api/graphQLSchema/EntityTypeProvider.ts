@@ -9,6 +9,7 @@ import { GqlTypeName } from './utils'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
 import { GraphQLFieldResolver } from 'graphql/type/definition'
+import { FieldAccessVisitor } from "./FieldAccessVisitor";
 
 export default class EntityTypeProvider {
 	private entities = singletonFactory(name => this.createEntity(name))
@@ -53,7 +54,7 @@ export default class EntityTypeProvider {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
 				continue
 			}
-			if (!this.authorizator.isAllowed(Acl.Operation.read, entityName, fieldName)) {
+			if (!acceptFieldVisitor(this.schema, entity, fieldName, new FieldAccessVisitor(Acl.Operation.read, this.authorizator))) {
 				continue
 			}
 

@@ -6,7 +6,6 @@ type FieldMeta {
 type Mutation {
   createRoot(data: RootCreateInput!): Root!
   deleteRoot(where: RootUniqueWhere!): Root
-  updateRoot(where: RootUniqueWhere!, data: RootUpdateInput!): Root
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntity!
   deleteOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
 }
@@ -15,15 +14,23 @@ type OneHasManyEntity {
   _meta: OneHasManyEntityMeta
   id: UUID!
   a: String
+  Root(where: RootWhere): Root
 }
 
 input OneHasManyEntityCreateInput {
   a: String
+  Root: OneHasManyEntityCreateRootEntityRelationInput
+}
+
+input OneHasManyEntityCreateRootEntityRelationInput {
+  connect: RootUniqueWhere
+  create: Boolean
 }
 
 type OneHasManyEntityMeta {
   id: FieldMeta
   a: FieldMeta
+  Root: FieldMeta
 }
 
 input OneHasManyEntityUniqueWhere {
@@ -33,6 +40,7 @@ input OneHasManyEntityUniqueWhere {
 input OneHasManyEntityWhere {
   id: UUIDCondition
   a: StringCondition
+  Root: RootWhere
   and: [OneHasManyEntityWhere!]
   or: [OneHasManyEntityWhere!]
   not: OneHasManyEntityWhere
@@ -71,17 +79,6 @@ type RootMeta {
 
 input RootUniqueWhere {
   id: UUID
-}
-
-input RootUpdateInput {
-  r: [RootUpdateREntityRelationInput!]
-}
-
-input RootUpdateREntityRelationInput {
-  create: OneHasManyEntityWithoutRootCreateInput
-  delete: OneHasManyEntityUniqueWhere
-  connect: OneHasManyEntityUniqueWhere
-  disconnect: OneHasManyEntityUniqueWhere
 }
 
 input RootWhere {

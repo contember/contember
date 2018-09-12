@@ -6,7 +6,7 @@ import { Model } from 'cms-common'
 
 export default class UpdateEntityRelationInputProvider {
 	private updateEntityRelationInputs = singletonFactory<
-		GraphQLInputObjectType,
+		GraphQLInputObjectType | undefined,
 		{
 			entityName: string
 			relationName: string
@@ -18,11 +18,11 @@ export default class UpdateEntityRelationInputProvider {
 		private readonly updateEntityRelationInputFieldVisitor: UpdateEntityRelationInputFieldVisitor
 	) {}
 
-	public getUpdateEntityRelationInput(entityName: string, relationName: string) {
+	public getUpdateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
 		return this.updateEntityRelationInputs({ entityName, relationName })
 	}
 
-	private createUpdateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType {
+	private createUpdateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
 		return acceptFieldVisitor(this.schema, entityName, relationName, this.updateEntityRelationInputFieldVisitor)
 	}
 }

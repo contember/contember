@@ -130,8 +130,9 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 
 	public async insertIgnore(data: any): Promise<AffectedRows> {
 		this.qb.insert(data)
-		const sql = this.qb.toString() + ' on conflict do nothing'
-		return await this.wrapper.raw(sql)
+		const qbSql = this.qb.toSQL()
+		const sql = qbSql.sql + ' on conflict do nothing'
+		return await this.wrapper.raw(sql, ...qbSql.bindings)
 	}
 
 	public async update(data: { [column: string]: Value }): Promise<AffectedRows> {

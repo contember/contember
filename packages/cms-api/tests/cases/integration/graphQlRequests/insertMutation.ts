@@ -411,13 +411,15 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`insert into "post_categories" ("category_id", "post_id")
-          values ('${testUuid(2)}', '${testUuid(1)}')
-          on conflict do nothing`
+          values ($1, $2)
+          on conflict do nothing`,
+						parameters: [testUuid(2), testUuid(1)]
 					},
 					{
 						sql: SQL`insert into "post_categories" ("category_id", "post_id")
-          values ('${testUuid(3)}', '${testUuid(1)}')
-          on conflict do nothing`
+          values ($1, $2)
+          on conflict do nothing`,
+						parameters: [testUuid(3), testUuid(1)]
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
@@ -489,13 +491,15 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`insert into "post_categories" ("category_id", "post_id")
-          values ('${testUuid(1)}', '${testUuid(2)}')
-          on conflict do nothing`
+          values ($1, $2)
+          on conflict do nothing`,
+						parameters: [testUuid(1), testUuid(2)]
 					},
 					{
 						sql: SQL`insert into "post_categories" ("category_id", "post_id")
-          values ('${testUuid(1)}', '${testUuid(3)}')
-          on conflict do nothing`
+          values ($1, $2)
+          on conflict do nothing`,
+						parameters: [testUuid(1), testUuid(3)]
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"

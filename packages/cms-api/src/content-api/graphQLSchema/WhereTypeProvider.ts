@@ -1,6 +1,6 @@
 import { GraphQLInputObjectType, GraphQLList } from 'graphql'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull } from 'graphql/type/definition'
-import { Model } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import { acceptFieldVisitor, getEntity } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
 import { capitalizeFirstLetter } from '../../utils/strings'
@@ -45,7 +45,7 @@ export default class WhereTypeProvider {
 		const uniqueKeys: string[][] = [[entity.primary], ...Object.values(entity.unique)
 			.map(it => it.fields)]
 			.filter(uniqueKey =>
-				uniqueKey.every(it => this.authorizator.isAllowed(Authorizator.Operation.read, entityName, it))
+				uniqueKey.every(it => this.authorizator.isAllowed(Acl.Operation.read, entityName, it))
 			)
 		for (const uniqueKey of uniqueKeys) {
 			combinations.push(uniqueKey.join(', '))
@@ -93,7 +93,7 @@ export default class WhereTypeProvider {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
 				continue
 			}
-			if (!this.authorizator.isAllowed(Authorizator.Operation.read, entity.name, fieldName)) {
+			if (!this.authorizator.isAllowed(Acl.Operation.read, entity.name, fieldName)) {
 				continue
 			}
 

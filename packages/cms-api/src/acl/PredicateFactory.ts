@@ -1,14 +1,13 @@
 import { Acl, Input, Model } from 'cms-common'
 import VariableInjector from './VariableInjector'
-import Authorizator from './Authorizator'
 
 class PredicateFactory {
 	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {
 	}
 
-	public create(entity: Model.Entity, operation: Authorizator.Operation.delete): Input.Where
-	public create(entity: Model.Entity, operation: Authorizator.Operation.update | Authorizator.Operation.read | Authorizator.Operation.create, fieldNames: string[]): Input.Where
-	public create(entity: Model.Entity, operation: Authorizator.Operation, fieldNames?: string[]): Input.Where {
+	public create(entity: Model.Entity, operation: Acl.Operation.delete): Input.Where
+	public create(entity: Model.Entity, operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create, fieldNames: string[]): Input.Where
+	public create(entity: Model.Entity, operation: Acl.Operation, fieldNames?: string[]): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
@@ -17,7 +16,7 @@ class PredicateFactory {
 		}
 
 		let predicates: Acl.PredicateReference[]
-		if (operation === Authorizator.Operation.delete) {
+		if (operation === Acl.Operation.delete) {
 			const deletePredicate = entityPermissions.operations.delete
 			if (deletePredicate === undefined || deletePredicate === false) {
 				return neverCondition

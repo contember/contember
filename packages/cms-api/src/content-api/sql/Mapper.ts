@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Acl, Input, Model } from 'cms-common'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
 import { acceptEveryFieldVisitor, getColumnName, getEntity } from '../../content-schema/modelUtils'
 import InsertVisitor from './insert/InsertVisitor'
@@ -9,7 +9,6 @@ import Path from './select/Path'
 import QueryBuilder from '../../core/knex/QueryBuilder'
 import KnexWrapper from '../../core/knex/KnexWrapper'
 import PredicateFactory from '../../acl/PredicateFactory'
-import Authorizator from '../../acl/Authorizator'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
 import InsertBuilderFactory from './insert/InsertBuilderFactory'
 import UpdateBuilderFactory from './update/UpdateBuilderFactory'
@@ -98,7 +97,7 @@ export default class Mapper {
 	}
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
-		const where = this.predicateFactory.create(entity, Authorizator.Operation.create, Object.keys(data))
+		const where = this.predicateFactory.create(entity, Acl.Operation.create, Object.keys(data))
 		const insertBuilder = this.insertBuilderFactory.create(entity, this.db)
 		insertBuilder.addWhere(where)
 		const promises = acceptEveryFieldVisitor(
@@ -125,7 +124,7 @@ export default class Mapper {
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 		const updateBuilder = this.updateBuilderFactory.create(entity, this.db, uniqueWhere)
 
-		const predicateWhere = this.predicateFactory.create(entity, Authorizator.Operation.update, Object.keys(data))
+		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, Object.keys(data))
 		updateBuilder.addOldWhere(predicateWhere)
 		updateBuilder.addNewWhere(predicateWhere)
 
@@ -145,7 +144,7 @@ export default class Mapper {
 			qb.from(entity.tableName, 'root_')
 			qb.select(['root_', entity.primaryColumn])
 			const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-			const predicate = this.predicateFactory.create(entity, Authorizator.Operation.delete)
+			const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
 			this.whereBuilder.build(qb, entity, new Path([]), {and: [uniqueWhere, predicate]})
 		}))
 

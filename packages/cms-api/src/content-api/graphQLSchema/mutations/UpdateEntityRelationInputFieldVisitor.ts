@@ -1,5 +1,5 @@
 import { GraphQLBoolean, GraphQLInputObjectType } from 'graphql'
-import { Model } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
 import { isIt } from '../../../utils/type'
@@ -13,8 +13,8 @@ export default class UpdateEntityRelationInputFieldVisitor
 	constructor(
 		private authorizator: Authorizator,
 		private whereTypeBuilder: WhereTypeProvider,
-		private updateEntityInputProviderAccessor: Accessor<EntityInputProvider<Authorizator.Operation.update>>,
-		private createEntityInputProvider: EntityInputProvider<Authorizator.Operation.create>
+		private updateEntityInputProviderAccessor: Accessor<EntityInputProvider<Acl.Operation.update>>,
+		private createEntityInputProvider: EntityInputProvider<Acl.Operation.create>
 	) {}
 
 	public visitColumn(): GraphQLInputObjectType {
@@ -39,14 +39,14 @@ export default class UpdateEntityRelationInputFieldVisitor
 				const whereInput = { type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name) }
 
 				const fields: GraphQLInputFieldConfigMap = {}
-				if (this.authorizator.isAllowed(Authorizator.Operation.create, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.create, targetEntity.name)) {
 					fields['create'] = createInput
 				}
-				if (this.authorizator.isAllowed(Authorizator.Operation.update, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.update, targetEntity.name)) {
 					fields['update'] = updateInput
 				}
 				if (
-					this.authorizator.isAllowed([Authorizator.Operation.update, Authorizator.Operation.create], targetEntity.name)
+					this.authorizator.isAllowed([Acl.Operation.update, Acl.Operation.create], targetEntity.name)
 				) {
 					fields['upsert'] = {
 						type: new GraphQLInputObjectType({
@@ -60,7 +60,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 				}
 
 				//fixme this is not so easy, connect may require update of one of sides
-				if (this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)) {
 					fields['connect'] = whereInput
 				}
 
@@ -69,7 +69,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 					fields['disconnect'] = { type: GraphQLBoolean }
 				}
 
-				if (relation.nullable && this.authorizator.isAllowed(Authorizator.Operation.delete, targetEntity.name)) {
+				if (relation.nullable && this.authorizator.isAllowed(Acl.Operation.delete, targetEntity.name)) {
 					if (relation.nullable) {
 						fields['delete'] = { type: GraphQLBoolean }
 					}
@@ -104,11 +104,11 @@ export default class UpdateEntityRelationInputFieldVisitor
 
 				const fields: GraphQLInputFieldConfigMap = {}
 
-				if (this.authorizator.isAllowed(Authorizator.Operation.create, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.create, targetEntity.name)) {
 					fields['create'] = createInput
 				}
 
-				if (this.authorizator.isAllowed(Authorizator.Operation.update, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.update, targetEntity.name)) {
 					fields['update'] = {
 						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
@@ -121,7 +121,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 				}
 
 				if (
-					this.authorizator.isAllowed([Authorizator.Operation.update, Authorizator.Operation.create], targetEntity.name)
+					this.authorizator.isAllowed([Acl.Operation.update, Acl.Operation.create], targetEntity.name)
 				) {
 					fields['upsert'] = {
 						type: new GraphQLInputObjectType({
@@ -135,17 +135,17 @@ export default class UpdateEntityRelationInputFieldVisitor
 					}
 				}
 
-				if (this.authorizator.isAllowed(Authorizator.Operation.delete, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.delete, targetEntity.name)) {
 					fields['delete'] = whereInput
 				}
 
 				//fixme this is not so easy, connect may require update of one of sides
-				if (this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)) {
 					fields['connect'] = whereInput
 				}
 
 				//fixme this is not so easy, disconnect may require update of one of sides
-				if (canDisconnect && this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+				if (canDisconnect && this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)) {
 					fields['disconnect'] = whereInput
 				}
 

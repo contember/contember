@@ -1,13 +1,13 @@
 import { GraphQLBoolean, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType } from 'graphql'
 import { acceptFieldVisitor, getEntity } from '../../../content-schema/modelUtils'
 import { GqlTypeName } from '../utils'
-import { Model } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import Authorizator from '../../../acl/Authorizator'
 import singletonFactory from '../../../utils/singletonFactory'
 import { GraphQLInputType } from 'graphql/type/definition'
 
 export default class EntityInputProvider<
-	Operation extends Authorizator.Operation.create | Authorizator.Operation.update
+	Operation extends Acl.Operation.create | Acl.Operation.update
 > {
 	private entityInputs = singletonFactory<
 		GraphQLInputType,

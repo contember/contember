@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Acl, Input, Model } from 'cms-common'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { acceptFieldVisitor, acceptRelationTypeVisitor, getColumnName } from '../../../content-schema/modelUtils'
 import SelectHydrator from './SelectHydrator'
@@ -9,7 +9,6 @@ import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from "../../../acl/PredicateFactory";
-import Authorizator from "../../../acl/Authorizator";
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
@@ -57,7 +56,7 @@ export default class SelectBuilder {
 			}
 			const promise = acceptFieldVisitor(this.schema, entity, field.name, {
 				visitColumn: async (entity, column) => {
-					const fieldPredicate = entity.primary === column.name ? undefined : this.predicateFactory.create(entity, Authorizator.Operation.read, [column.name])
+					const fieldPredicate = entity.primary === column.name ? undefined : this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
 					this.addColumn(entity, path, column, field.alias, fieldPredicate)
 
 				},

@@ -1,5 +1,5 @@
 import { GraphQLInputObjectType } from 'graphql'
-import { Model } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
 import Authorizator from '../../../acl/Authorizator'
@@ -12,7 +12,7 @@ export default class CreateEntityRelationInputFieldVisitor
 	constructor(
 		private authorizator: Authorizator,
 		private whereTypeBuilder: WhereTypeProvider,
-		private createEntityInputProviderAccessor: Accessor<EntityInputProvider<Authorizator.Operation.create>>
+		private createEntityInputProviderAccessor: Accessor<EntityInputProvider<Acl.Operation.create>>
 	) {}
 
 	public visitColumn(): GraphQLInputObjectType {
@@ -32,13 +32,13 @@ export default class CreateEntityRelationInputFieldVisitor
 				const fields: GraphQLInputFieldConfigMap = {}
 
 				//todo this is not so easy, connect may require update of one of sides
-				if (this.authorizator.isAllowed(Authorizator.Operation.read, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)) {
 					fields['connect'] = {
 						type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
 					}
 				}
 
-				if (this.authorizator.isAllowed(Authorizator.Operation.create, targetEntity.name)) {
+				if (this.authorizator.isAllowed(Acl.Operation.create, targetEntity.name)) {
 					fields['create'] = {
 						type: this.createEntityInputProviderAccessor.get().getInput(targetEntity.name, targetName)
 					}

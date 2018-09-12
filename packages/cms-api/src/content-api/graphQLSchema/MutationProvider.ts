@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLNonNull } from 'graphql'
-import { Input, Model } from 'cms-common'
+import { Acl, Input, Model } from 'cms-common'
 import { getEntity } from '../../content-schema/modelUtils'
 import { Context } from '../types'
 import ColumnTypeResolver from './ColumnTypeResolver'
@@ -19,21 +19,21 @@ export default class MutationProvider {
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly columnTypeResolver: ColumnTypeResolver,
-		private readonly createEntityInputProvider: EntityInputProvider<Authorizator.Operation.create>,
-		private readonly updateEntityInputProvider: EntityInputProvider<Authorizator.Operation.update>,
+		private readonly createEntityInputProvider: EntityInputProvider<Acl.Operation.create>,
+		private readonly updateEntityInputProvider: EntityInputProvider<Acl.Operation.update>,
 		private readonly queryAstAFactory: GraphQlQueryAstFactory,
 		private readonly mutationResolverFactory: MutationResolverFactory
 	) {}
 
 	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {
 		const mutations: { [fieldName: string]: FieldConfig<any> } = {}
-		if (this.authorizator.isAllowed(Authorizator.Operation.create, entityName)) {
+		if (this.authorizator.isAllowed(Acl.Operation.create, entityName)) {
 			mutations[`create${entityName}`] = this.getCreateMutation(entityName)
 		}
-		if (this.authorizator.isAllowed(Authorizator.Operation.delete, entityName)) {
+		if (this.authorizator.isAllowed(Acl.Operation.delete, entityName)) {
 			mutations[`delete${entityName}`] = this.getDeleteMutation(entityName)
 		}
-		if (this.authorizator.isAllowed(Authorizator.Operation.update, entityName)) {
+		if (this.authorizator.isAllowed(Acl.Operation.update, entityName)) {
 			mutations[`update${entityName}`] = this.getUpdateMutation(entityName)
 		}
 

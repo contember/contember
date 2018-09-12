@@ -1,9 +1,7 @@
-import { Input, Model } from 'cms-common'
+import { Acl, Input, Model } from 'cms-common'
 import ObjectNode from '../content-api/graphQlResolver/ObjectNode'
 import { acceptFieldVisitor } from '../content-schema/modelUtils'
-import FieldNode from '../content-api/graphQlResolver/FieldNode'
 import PredicateFactory from './PredicateFactory'
-import Authorizator from './Authorizator'
 
 class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
@@ -18,7 +16,7 @@ class PredicatesInjector {
 	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {
 		const predicatesWhere: Input.Where = this.predicateFactory.create(
 			entity,
-			Authorizator.Operation.read,
+			Acl.Operation.read,
 			fieldNames,
 		)
 

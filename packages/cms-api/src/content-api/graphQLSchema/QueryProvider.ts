@@ -1,11 +1,10 @@
 import { GraphQLFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
-import { Input, Model } from 'cms-common'
+import { Acl, Input, Model } from 'cms-common'
 import { getEntity } from '../../content-schema/modelUtils'
 import { Context } from '../types'
 import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
-import ReadResolver from '../graphQlResolver/ReadResolver'
 import ReadResolverFactory from '../graphQlResolver/ReadResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 
@@ -21,7 +20,7 @@ export default class QueryProvider {
 
 	public getQueries(entityName: string): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {
 		const entity = getEntity(this.schema, entityName)
-		if (!this.authorizator.isAllowed(Authorizator.Operation.read, entityName)) {
+		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
 			return {}
 		}
 		return {

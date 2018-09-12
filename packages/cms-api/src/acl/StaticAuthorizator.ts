@@ -4,7 +4,7 @@ import Authorizator from './Authorizator'
 export default class StaticAuthorizator implements Authorizator {
 	constructor(private readonly permissions: Acl.Permissions) {}
 
-	isAllowed(operation: Authorizator.Operation | Authorizator.Operation[], entity: string, field?: string): boolean {
+	isAllowed(operation: Acl.Operation | Acl.Operation[], entity: string, field?: string): boolean {
 		if (!this.permissions[entity]) {
 			return false
 		}
@@ -12,7 +12,7 @@ export default class StaticAuthorizator implements Authorizator {
 		const operations = Array.isArray(operation) ? operation : [operation]
 
 		return operations.every(operation => {
-			if (operation === Authorizator.Operation.delete) {
+			if (operation === Acl.Operation.delete) {
 				return !!entityPermissions.operations.delete
 			}
 			const fieldPermissions = entityPermissions.operations[operation]

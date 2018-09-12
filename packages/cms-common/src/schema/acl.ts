@@ -39,6 +39,13 @@ namespace Acl {
 		operations: EntityOperations
 	}
 
+	export enum Operation {
+		read = 'read',
+		create = 'create',
+		update = 'update',
+		delete = 'delete'
+	}
+
 	export interface EntityOperations {
 		read?: FieldPermissions
 		create?: FieldPermissions

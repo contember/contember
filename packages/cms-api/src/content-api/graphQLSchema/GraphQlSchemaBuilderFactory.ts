@@ -42,7 +42,7 @@ export default class GraphQlSchemaBuilderFactory {
 			readResolverFactory
 		)
 
-		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<Authorizator.Operation.create>>()
+		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<Acl.Operation.create>>()
 		const createEntityRelationInputFieldVisitor = new CreateEntityRelationInputFieldVisitor(
 			authorizator,
 			whereTypeProvider,
@@ -57,14 +57,14 @@ export default class GraphQlSchemaBuilderFactory {
 			createEntityRelationInputProvider
 		)
 		const createEntityInputProvider = new EntityInputProvider(
-			Authorizator.Operation.create,
+			Acl.Operation.create,
 			schema,
 			authorizator,
 			createEntityInputFieldVisitor
 		)
 		createEntityInputProviderAccessor.set(createEntityInputProvider)
 
-		const updateEntityInputProviderAccessor = new Accessor<EntityInputProvider<Authorizator.Operation.update>>()
+		const updateEntityInputProviderAccessor = new Accessor<EntityInputProvider<Acl.Operation.update>>()
 		const updateEntityRelationInputFieldVisitor = new UpdateEntityRelationInputFieldVisitor(
 			authorizator,
 			whereTypeProvider,
@@ -80,7 +80,7 @@ export default class GraphQlSchemaBuilderFactory {
 			updateEntityRelationInputProvider
 		)
 		const updateEntityInputProvider = new EntityInputProvider(
-			Authorizator.Operation.update,
+			Acl.Operation.update,
 			schema,
 			authorizator,
 			updateEntityInputFieldVisitor

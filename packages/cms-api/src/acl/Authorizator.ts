@@ -1,22 +1,15 @@
-interface Authorizator {
-	isAllowed(operation: Authorizator.Operation, entity: string): boolean
+import { Acl } from 'cms-common'
 
-	isAllowed(operation: Authorizator.Operation[], entity: string): boolean
+interface Authorizator {
+	isAllowed(operation: Acl.Operation, entity: string): boolean
+
+	isAllowed(operation: Acl.Operation[], entity: string): boolean
 
 	isAllowed(
-		operation: Authorizator.Operation.create | Authorizator.Operation.read | Authorizator.Operation.update,
+		operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update,
 		entity: string,
 		field: string
 	): boolean
-}
-
-namespace Authorizator {
-	export enum Operation {
-		read = 'read',
-		create = 'create',
-		update = 'update',
-		delete = 'delete'
-	}
 }
 
 export default Authorizator

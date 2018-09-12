@@ -1,5 +1,5 @@
 import { GraphQLBoolean, GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLOutputType } from 'graphql'
-import { Model } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import { acceptFieldVisitor, getEntity as getEntityFromSchema } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
 import ColumnTypeResolver from './ColumnTypeResolver'
@@ -53,7 +53,7 @@ export default class EntityTypeProvider {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
 				continue
 			}
-			if (!this.authorizator.isAllowed(Authorizator.Operation.read, entityName, fieldName)) {
+			if (!this.authorizator.isAllowed(Acl.Operation.read, entityName, fieldName)) {
 				continue
 			}
 

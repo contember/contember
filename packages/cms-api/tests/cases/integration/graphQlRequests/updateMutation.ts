@@ -1625,10 +1625,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(
-								2
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(1), testUuid(2)]
 						},
 						selectUpdatePostSql
 					])
@@ -1667,10 +1666,9 @@ describe('update', () => {
 							response: [testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(
-								2
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1779,10 +1777,9 @@ describe('update', () => {
 							parameters: ['Lorem', testUuid(1), testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(
-								2
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1825,10 +1822,9 @@ describe('update', () => {
 							response: 1
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(
-								2
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1881,10 +1877,9 @@ describe('update', () => {
 							response: [testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(1)}', '${testUuid(
-								2
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1923,10 +1918,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(
-								1
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -1965,10 +1959,9 @@ describe('update', () => {
 							response: [testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(
-								1
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -2077,10 +2070,9 @@ describe('update', () => {
 							parameters: ['Lorem', testUuid(1), testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(
-								1
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(2), testUuid(1)]
 						},
 						selectUpdateCategorySql
 					])
@@ -2123,10 +2115,9 @@ describe('update', () => {
 							response: 1
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(
-								1
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -2179,10 +2170,9 @@ describe('update', () => {
 							response: [testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ('${testUuid(2)}', '${testUuid(
-								1
-							)}')
-              on conflict do nothing`
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
+              on conflict do nothing`,
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])

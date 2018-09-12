@@ -50,7 +50,8 @@ class ExecutionContainerFactory {
 					selectBuilderFactory,
 					insertBuilderFactory,
 					updateBuilderFactory,
-					uniqueWhereExpander
+					uniqueWhereExpander,
+					whereBuilder,
 				}) =>
 					new MapperFactory(
 						this.schema,
@@ -59,7 +60,8 @@ class ExecutionContainerFactory {
 						selectBuilderFactory,
 						insertBuilderFactory,
 						updateBuilderFactory,
-						uniqueWhereExpander
+						uniqueWhereExpander,
+						whereBuilder,
 					)
 			)
 			.addService('mapperRunner', ({ mapperFactory }) => new MapperRunner(context.db.wrapper(), mapperFactory))

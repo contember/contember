@@ -57,7 +57,7 @@ export default class SelectBuilder {
 			}
 			const promise = acceptFieldVisitor(this.schema, entity, field.name, {
 				visitColumn: async (entity, column) => {
-					const fieldPredicate = entity.primary === column.name ? undefined : this.predicateFactory.create(entity, [column.name], Authorizator.Operation.read)
+					const fieldPredicate = entity.primary === column.name ? undefined : this.predicateFactory.create(entity, Authorizator.Operation.read, [column.name])
 					this.addColumn(entity, path, column, field.alias, fieldPredicate)
 
 				},

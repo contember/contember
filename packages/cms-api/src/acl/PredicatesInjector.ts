@@ -18,8 +18,8 @@ class PredicatesInjector {
 	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {
 		const predicatesWhere: Input.Where = this.predicateFactory.create(
 			entity,
+			Authorizator.Operation.read,
 			fieldNames,
-			Authorizator.Operation.read
 		)
 
 		return { and: [where, predicatesWhere].filter(it => Object.keys(it).length > 0) }

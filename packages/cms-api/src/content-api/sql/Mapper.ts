@@ -15,6 +15,7 @@ import InsertBuilderFactory from './insert/InsertBuilderFactory'
 import UpdateBuilderFactory from './update/UpdateBuilderFactory'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../../acl/PredicatesInjector'
+import WhereBuilder from "./select/WhereBuilder";
 
 export default class Mapper {
 	constructor(
@@ -25,7 +26,8 @@ export default class Mapper {
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
-		private readonly uniqueWhereExpander: UniqueWhereExpander
+		private readonly uniqueWhereExpander: UniqueWhereExpander,
+		private readonly whereBuilder: WhereBuilder,
 	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
@@ -96,7 +98,7 @@ export default class Mapper {
 	}
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
-		const where = this.predicateFactory.create(entity, Object.keys(data), Authorizator.Operation.create)
+		const where = this.predicateFactory.create(entity, Authorizator.Operation.create, Object.keys(data))
 		const insertBuilder = this.insertBuilderFactory.create(entity, this.db)
 		insertBuilder.addWhere(where)
 		const promises = acceptEveryFieldVisitor(
@@ -123,7 +125,7 @@ export default class Mapper {
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 		const updateBuilder = this.updateBuilderFactory.create(entity, this.db, uniqueWhere)
 
-		const predicateWhere = this.predicateFactory.create(entity, Object.keys(data), Authorizator.Operation.update)
+		const predicateWhere = this.predicateFactory.create(entity, Authorizator.Operation.update, Object.keys(data))
 		updateBuilder.addOldWhere(predicateWhere)
 		updateBuilder.addNewWhere(predicateWhere)
 
@@ -139,7 +141,14 @@ export default class Mapper {
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<number> {
 		const qb = this.db.queryBuilder()
 		qb.from(entity.tableName)
-		qb.where(this.getUniqueWhereArgs(entity, where))
+		qb.where(condition => condition.in(entity.primaryColumn, qb => {
+			qb.from(entity.tableName, 'root_')
+			qb.select(['root_', entity.primaryColumn])
+			const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
+			const predicate = this.predicateFactory.create(entity, Authorizator.Operation.delete)
+			this.whereBuilder.build(qb, entity, new Path([]), {and: [uniqueWhere, predicate]})
+		}))
+
 		return await qb.delete()
 	}
 

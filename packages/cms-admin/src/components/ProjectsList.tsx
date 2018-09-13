@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { StageConfig } from './Admin'
+import { ProjectConfig } from '../state/projectsConfigs'
 import { H1, Card } from '@blueprintjs/core'
 import Link from './Link'
 
 interface ProjectsListProps {
-	configs: StageConfig[]
+	configs: ProjectConfig[]
 }
 
 export default class ProjectsList extends React.Component<ProjectsListProps, {}> {
@@ -22,7 +22,8 @@ export default class ProjectsList extends React.Component<ProjectsListProps, {}>
 									project: config.project,
 									stage: config.stage,
 									pageName: 'dashboard',
-									parameters: {}
+									parameters: {},
+									dimensions: {}
 								})}
 								Component={props => (
 									<a {...props} className="projectsList-item">

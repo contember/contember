@@ -7,6 +7,7 @@ export default (map: ProjectConfig[]): RouteMap => {
 	const configResolver = (project: string, stage: string) => map.find(c => c.project === project && c.stage === stage)
 	return {
 		login: { path: '/' },
+		projects_list: { path: '/projects' },
 		project_page: {
 			path: '/p/:project/:stage/:dimensions/:path(.*)',
 			encodeParams: (name, value) => {

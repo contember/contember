@@ -7,6 +7,7 @@ import { ActionButton, Toolbar } from './utils'
 import { PARAGRAPH_RULE } from './rules'
 import { Config, BOLD, ITALIC, UNDERLINED, LINK } from './configs'
 import { FormGroup, Classes } from '@blueprintjs/core'
+import cn from 'classnames'
 
 const DEFAULT_NODE = 'paragraph'
 
@@ -51,7 +52,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						<ActionButton config={LINK} icon="link" value={this.state.value} onChange={this.onChange} />
 					</Toolbar>
 					<Editor
-						className={Classes.INPUT}
+						className={cn(Classes.INPUT, 'input-autoHeight')}
 						spellCheck
 						plugins={this.plugins}
 						value={this.state.value}

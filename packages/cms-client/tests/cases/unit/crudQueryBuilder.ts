@@ -57,9 +57,9 @@ describe('crud query builder', () => {
 				.where({ foo: { eq: 'bar' } })
 				.column('title')
 				.relation('author', o => o.column('name'))
-		)
+		, 'myPostsAlias')
 		expect(builder.getGql()).equals(`query {
-	Posts(where: {foo: {eq: "bar"}}) {
+	myPostsAlias: Posts(where: {foo: {eq: "bar"}}) {
 		title
 		author {
 			name

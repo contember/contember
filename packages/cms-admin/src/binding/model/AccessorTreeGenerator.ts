@@ -9,7 +9,7 @@ export default class AccessorTreeGenerator {
 
 	public constructor(private marker: EntityMarker, private initialData: any) {}
 
-	public generateLiveTree(updateData: (newData: DataContextValue) => void) {
+	public generateLiveTree(updateData: (newData: DataContextValue | DataContextValue[]) => void) {
 		const data = this.initialData[this.marker.entityName]
 
 		let entityAccessor: EntityAccessor | null = this.updateFields(data, this.marker, (fieldName, newData) => {

@@ -27,7 +27,7 @@ export interface DataProviderStateProps {
 type DataProviderInnerProps = DataProviderOwnProps & DataProviderDispatchProps & DataProviderStateProps
 
 export interface DataProviderState {
-	data?: DataContextValue
+	data?: DataContextValue | DataContextValue[]
 	id?: string
 }
 
@@ -71,11 +71,19 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 	}
 
 	public render() {
-		return this.state.data ? (
+		if (!this.state.data) {
+			return null
+		}
+
+		const data = Array.isArray(this.state.data) ? this.state.data : [this.state.data]
+
+		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>
-				<DataContext.Provider value={this.state.data}>{this.props.children}</DataContext.Provider>
+				{data.map((value, i) => (
+					<DataContext.Provider value={value} key={i}>{this.props.children}</DataContext.Provider>
+				))}
 			</MetaOperationsContext.Provider>
-		) : null
+		)
 	}
 
 	protected unmounted: boolean = false
@@ -91,7 +99,9 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 		if (query) {
 			const id = await this.props.getData(query)
-			if (!this.unmounted) this.setState({ id })
+			if (!this.unmounted) {
+				this.setState({ id })
+			}
 		}
 	}
 

@@ -1,6 +1,6 @@
 import { Acl, Input, Model } from 'cms-common'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
-import { acceptEveryFieldVisitor, getColumnName, getEntity } from '../../content-schema/modelUtils'
+import { acceptEveryFieldVisitor, getColumnName, getEntity, getTargetEntity } from '../../content-schema/modelUtils'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
@@ -161,12 +161,40 @@ export default class Mapper {
 		const joiningTable = relation.joiningTable
 		const primaryValue = await this.getPrimaryValue(owningEntity, ownerUnique)
 		const inversedPrimaryValue = await this.getPrimaryValue(getEntity(this.schema, relation.target), inversedUnique)
+		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
+		let inversePredicate: Input.Where = {}
+		let inversedEntity: Model.Entity | null = null
+		if (relation.inversedBy) {
+			inversedEntity = getTargetEntity(this.schema, owningEntity, relation.name)
+			if (!inversedEntity) {
+				throw new Error()
+			}
+			inversePredicate = this.predicateFactory.create(inversedEntity, Acl.Operation.update, [relation.inversedBy])
+		}
 
 		const qb = this.db.insertBuilder()
 			.into(joiningTable.tableName)
 			.values({
-				[joiningTable.joiningColumn.columnName]: primaryValue,
-				[joiningTable.inverseJoiningColumn.columnName]: inversedPrimaryValue
+				[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(primaryValue),
+				[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimaryValue),
+			})
+			.with('t', qb => qb.select(expr => expr.selectValue(null)))
+			.from(qb => {
+				qb.from('t')
+
+				if (Object.keys(owningPredicate).length > 0) {
+					const owningPath = new Path([], 'owning')
+					qb.join(owningEntity.tableName, 'owning', condition =>
+						condition.compare(['owning', owningEntity.primaryColumn], '=', primaryValue))
+					this.whereBuilder.build(qb, owningEntity, owningPath, owningPredicate)
+				}
+				if (inversedEntity && Object.keys(inversePredicate).length > 0) {
+					const inversedEntityConst = inversedEntity
+					const inversedPath = new Path([], 'inversed')
+					qb.join(inversedEntity.tableName, 'inversed', condition =>
+						condition.compare(['inversed', inversedEntityConst.primaryColumn], '=', inversedPrimaryValue))
+					this.whereBuilder.build(qb, inversedEntity, inversedPath, inversePredicate)
+				}
 			})
 			.onConflict(InsertBuilder.ConflictAction.doNothing)
 
@@ -179,17 +207,43 @@ export default class Mapper {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	) {
+
 		const joiningTable = relation.joiningTable
+		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
+		const targetEntity = getEntity(this.schema, relation.target)
+		if (!targetEntity) {
+			throw new Error()
+		}
+		let inversePredicate: Input.Where = {}
+		if (relation.inversedBy) {
+			inversePredicate = this.predicateFactory.create(targetEntity, Acl.Operation.update, [relation.inversedBy])
+		}
+
 		const qb = this.db.queryBuilder()
 		qb.table(joiningTable.tableName)
+		qb.where(cond => cond.in(joiningTable.joiningColumn.columnName, qb => {
+			qb.select(['root_', owningEntity.primaryColumn])
+			qb.from(owningEntity.tableName, 'root_')
+			this.whereBuilder.build(qb, owningEntity, new Path([]), {
+				and: [
+					this.uniqueWhereExpander.expand(owningEntity, ownerUnique),
+					owningPredicate,
+				]
+			})
+		}))
+		qb.where(cond => cond.in(joiningTable.inverseJoiningColumn.columnName, qb => {
+			qb.from(targetEntity.tableName, 'root_')
+			qb.select(['root_', targetEntity.primaryColumn])
 
-		qb.where({
-			[joiningTable.joiningColumn.columnName]: await this.getPrimaryValue(owningEntity, ownerUnique),
-			[joiningTable.inverseJoiningColumn.columnName]: await this.getPrimaryValue(
-				getEntity(this.schema, relation.target),
-				inversedUnique
-			)
-		})
+			this.whereBuilder.build(qb, targetEntity, new Path([]), {
+				and: [
+					this.uniqueWhereExpander.expand(targetEntity, inversedUnique),
+					inversePredicate,
+				]
+			})
+		}))
+
+
 		return await qb.delete()
 	}
 

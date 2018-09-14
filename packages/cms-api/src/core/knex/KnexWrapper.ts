@@ -1,6 +1,7 @@
 import * as Knex from 'knex'
 import QueryBuilder from './QueryBuilder'
 import { Formatter, Value } from './types'
+import InsertBuilder from "./InsertBuilder";
 
 export default class KnexWrapper {
 	constructor(public readonly knex: Knex) {}
@@ -11,6 +12,10 @@ export default class KnexWrapper {
 
 	queryBuilder(): QueryBuilder {
 		return new QueryBuilder(this, this.knex.queryBuilder())
+	}
+
+	insertBuilder(): InsertBuilder.NewInsertBuilder {
+		return InsertBuilder.create(this)
 	}
 
 	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw {

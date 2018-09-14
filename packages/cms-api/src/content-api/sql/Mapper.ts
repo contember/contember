@@ -15,6 +15,7 @@ import UpdateBuilderFactory from './update/UpdateBuilderFactory'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import WhereBuilder from "./select/WhereBuilder";
+import InsertBuilder from "../../core/knex/InsertBuilder";
 
 export default class Mapper {
 	constructor(
@@ -161,12 +162,15 @@ export default class Mapper {
 		const primaryValue = await this.getPrimaryValue(owningEntity, ownerUnique)
 		const inversedPrimaryValue = await this.getPrimaryValue(getEntity(this.schema, relation.target), inversedUnique)
 
-		const qb = this.db.queryBuilder()
-		qb.table(joiningTable.tableName)
-		return await qb.insertIgnore({
-			[joiningTable.joiningColumn.columnName]: primaryValue,
-			[joiningTable.inverseJoiningColumn.columnName]: inversedPrimaryValue
-		})
+		const qb = this.db.insertBuilder()
+			.into(joiningTable.tableName)
+			.values({
+				[joiningTable.joiningColumn.columnName]: primaryValue,
+				[joiningTable.inverseJoiningColumn.columnName]: inversedPrimaryValue
+			})
+			.onConflict(InsertBuilder.ConflictAction.doNothing)
+
+		return await qb.execute()
 	}
 
 	public async disconnectJunction(

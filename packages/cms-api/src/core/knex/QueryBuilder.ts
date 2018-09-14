@@ -85,56 +85,6 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return await this.qb.delete()
 	}
 
-	public async insert(data: { [column: string]: Value }): Promise<number>
-	public async insert(data: { [column: string]: Value }, returning: string): Promise<Returning[]>
-	public async insert(data: { [column: string]: Value }, returning?: string): Promise<AffectedRows | Returning[]> {
-		return await this.qb.insert(data, returning)
-	}
-
-	public async insertFrom(
-		tableName: string,
-		columns: { [columnName: string]: QueryBuilder.ColumnExpression },
-		callback: QueryBuilder.Callback
-	): Promise<AffectedRows>
-	public async insertFrom(
-		tableName: string,
-		columns: { [columnName: string]: QueryBuilder.ColumnExpression },
-		callback: QueryBuilder.Callback,
-		returning: string
-	): Promise<Returning[]>
-	public async insertFrom(
-		tableName: string,
-		columns: { [columnName: string]: QueryBuilder.ColumnExpression },
-		callback: QueryBuilder.Callback,
-		returning?: string
-	): Promise<AffectedRows | Returning[]> {
-		const columnNames = Object.keys(columns)
-		this.qb.into(this.raw('?? (' + columnNames.map(() => '??').join(', ') + ')', tableName, ...columnNames))
-		return await this.qb.insert((qb: Knex.QueryBuilder) => {
-			const queryBuilder = new QueryBuilder(this.wrapper, qb)
-			Object.values(columns)
-				.map(
-					(value): Knex.Raw | undefined => {
-						if (typeof value === 'function') {
-							return value(new QueryBuilder.ColumnExpressionFactory(queryBuilder))
-						}
-						return value
-					}
-				)
-				.filter((it): it is Knex.Raw => it !== undefined)
-				.forEach(raw => queryBuilder.qb.select(raw))
-
-			callback(queryBuilder)
-		}, returning)
-	}
-
-	public async insertIgnore(data: any): Promise<AffectedRows> {
-		this.qb.insert(data)
-		const qbSql = this.qb.toSQL()
-		const sql = qbSql.sql + ' on conflict do nothing'
-		return await this.wrapper.raw(sql, ...qbSql.bindings)
-	}
-
 	public async update(data: { [column: string]: Value }): Promise<AffectedRows> {
 		return await this.qb.update(data)
 	}

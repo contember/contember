@@ -4,10 +4,10 @@ import * as mockKnex from 'mock-knex'
 import * as knex from 'knex'
 import KnexWrapper from '../../../src/core/knex/KnexWrapper'
 import { SQL } from '../../src/tags'
-import QueryBuilder from '../../../src/core/knex/QueryBuilder'
+import InsertBuilder from "../../../src/core/knex/InsertBuilder";
 
 interface Test {
-	query: (qb: QueryBuilder) => void
+	query: (wrapper: KnexWrapper) => void
 	sql: string
 	parameters: any[]
 }
@@ -20,7 +20,6 @@ const execute = async (test: Test) => {
 
 	mockKnex.mock(connection)
 	const wrapper = new KnexWrapper(connection)
-	const qb = wrapper.queryBuilder()
 
 	const tracker = mockKnex.getTracker()
 	tracker.install()
@@ -31,7 +30,7 @@ const execute = async (test: Test) => {
 		executed = true
 		query.response(null)
 	})
-	await test.query(qb)
+	await test.query(wrapper)
 	expect(executed).equals(true)
 	tracker.uninstall()
 }
@@ -39,7 +38,8 @@ const execute = async (test: Test) => {
 describe('knex query builder', () => {
 	it('constructs "on"', async () => {
 		await execute({
-			query: async qb => {
+			query: async wrapper => {
+				const qb = wrapper.queryBuilder()
 				qb.select(['foo', 'id'])
 				qb.table('foo')
 				qb.join('bar', 'bar', clause => {
@@ -68,35 +68,38 @@ describe('knex query builder', () => {
 
 	it('constructs insert with cte', async () => {
 		await execute({
-			query: async qb => {
-				qb.with('root_', qb => {
-					qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
-					qb.select(expr => expr.selectValue(1, 'int'), 'id')
-					qb.select(expr => expr.selectValue(null, 'text'), 'content')
-				})
-				await qb.insertFrom(
-					'author',
-					{
+			query: async wrapper => {
+				const builder = wrapper.insertBuilder()
+					.with('root_', qb => {
+						qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
+						qb.select(expr => expr.selectValue(1, 'int'), 'id')
+						qb.select(expr => expr.selectValue(null, 'text'), 'content')
+					})
+					.into('author')
+					.values({
 						id: expr => expr.select('id'),
 						title: expr => expr.select('title')
-					},
-					qb => {
+					})
+					.from(qb => {
 						qb.table('root_')
-					},
-					'id'
-				)
+					})
+					.returning('id')
+					.onConflict(InsertBuilder.ConflictAction.doNothing)
+				await builder.execute()
 			},
 			sql: SQL`
 				with "root_" as (select $1 :: text as "title", $2 :: int as "id", $3 :: text as "content") 
 				insert into "author" ("id", "title") 
-					select "id", "title" from "root_" returning "id"`,
+					select "id", "title" from "root_"
+        on conflict do nothing returning "id"`,
 			parameters: ['Hello', 1, null]
 		})
 	})
 
 	it('constructs update with cte', async () => {
 		await execute({
-			query: async qb => {
+			query: async wrapper => {
+				const qb = wrapper.queryBuilder()
 				qb.with('root_', qb => {
 					qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
 					qb.select(expr => expr.selectValue(1, 'int'), 'id')
@@ -124,7 +127,8 @@ describe('knex query builder', () => {
 
 	it('constructs select with condition', async () => {
 		await execute({
-			query: async qb => {
+			query: async wrapper => {
+				const qb = wrapper.queryBuilder()
 				qb.select(expr => expr.selectCondition(condition => condition.or(condition => {
 					condition.compare('foo', '>=', 1)
 					condition.compare('foo', '<=', 0)

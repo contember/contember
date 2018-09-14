@@ -49,26 +49,27 @@ export default class InsertBuilder {
 
 	private async createInsertPromise(blocker: PromiseLike<void>): Promise<Input.PrimaryValue> {
 		await blocker
-		const qb = this.db.queryBuilder()
-		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
-		const resolvedData = this.rowData.map((it, index) => ({ ...it, value: resolvedValues[index] }))
-		qb.with('root_', qb => {
-			resolvedData.forEach(value => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName))
-		})
 
+		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
+		const resolvedData = this.rowData.map((it, index) => ({...it, value: resolvedValues[index]}))
 		const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
-			(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
+			(result, item) => ({...result, [item.columnName]: expr => expr.select(['root_', item.columnName])}),
 			{}
 		)
-		const returning = await qb.insertFrom(
-			this.entity.tableName,
-			insertData,
-			qb => {
+		const qb = this.db.insertBuilder()
+			.with('root_', qb => {
+				resolvedData.forEach(value => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName))
+			})
+			.into(this.entity.tableName)
+			.values(insertData)
+			.from(qb => {
 				qb.from('root_')
 				this.whereBuilder.build(qb, this.entity, new Path([]), this.where)
-			},
-			this.entity.primaryColumn
-		)
+			})
+			.returning(this.entity.primaryColumn)
+
+
+		const returning = await qb.execute()
 
 		return returning[0]
 	}

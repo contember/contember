@@ -6,6 +6,12 @@ import KnexWrapper from './KnexWrapper'
 type AffectedRows = number
 type Returning = number | string
 
+interface Raw
+{
+	sql: string
+	bindings: (Value | Knex.QueryBuilder)[]
+}
+
 class QueryBuilder<R = { [columnName: string]: any }[]> {
 	constructor(public readonly wrapper: KnexWrapper, public readonly qb: Knex.QueryBuilder) {}
 
@@ -17,12 +23,14 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		this.qb.with(alias, qb => callback(new QueryBuilder(this.wrapper, qb)))
 	}
 
-	public from(tableName: string, alias?: string): void {
-		if (alias) {
-			this.qb.from(`${tableName} as ${alias}`)
+	public from(tableName: string | Knex.Raw, alias?: string): void {
+		let raw: Knex.Raw
+		if (typeof tableName === 'string') {
+			raw = this.raw('??', tableName)
 		} else {
-			this.qb.from(`${tableName}`)
+			raw = tableName
 		}
+		this.qb.from(this.aliasRaw(raw, alias))
 	}
 
 	public table(tableName: string, alias?: string): void {
@@ -44,10 +52,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		} else {
 			raw = expr
 		}
-		if (alias) {
-			raw = this.raw((raw as any).sql + ' as ??', ...(raw as any).bindings, alias)
-		}
-		this.qb.select(raw)
+		this.qb.select(this.aliasRaw(raw, alias))
 	}
 
 	public where(where: { [columName: string]: Value }): void
@@ -145,6 +150,14 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 			raw = this.wrapper.raw('true')
 		}
 		return [`${tableName} as ${alias || tableName}`, raw as Knex.Raw]
+	}
+
+	private aliasRaw(raw: Knex.Raw, alias?: string)
+	{
+		if (!alias) {
+			return raw
+		}
+		return this.raw((raw as any as Raw).sql + ' as ??', ...(raw as any as Raw).bindings, alias)
 	}
 }
 

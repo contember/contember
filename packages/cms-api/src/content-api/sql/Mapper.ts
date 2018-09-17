@@ -181,9 +181,8 @@ export default class Mapper {
 				[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(primaryValue),
 				[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimaryValue)
 			})
-			.with('t', qb => qb.select(expr => expr.selectValue(null)))
 			.from(qb => {
-				qb.from('t')
+				qb.from(qb.raw('(values (null))'), 't')
 
 				if (Object.keys(owningPredicate).length > 0) {
 					const owningPath = new Path([], 'owning')

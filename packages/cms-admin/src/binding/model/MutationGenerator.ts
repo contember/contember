@@ -1,19 +1,22 @@
 import { CrudQueryBuilder } from 'cms-client'
 import * as GraphQlBuilder from 'cms-client/dist/src/graphQlBuilder'
 import { Input } from 'cms-common'
+import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import EntityAccessor from '../dao/EntityAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 
-export default class PersistQueryGenerator {
+export default class MutationGenerator {
 	private static PRIMARY_KEY_NAME = 'id'
 
-	public constructor(private persistedData: any, private currentData: EntityAccessor) {}
+	public constructor(private persistedData: any, private currentData: AccessorTreeRoot) {}
 
 	public generatePersistQuery(): string | undefined {
-		const accessor = this.currentData
+		const accessor = this.currentData.root
 		const crudQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 
-		if (accessor.primaryKey === undefined) {
+		return ''
+
+		/*if (accessor.primaryKey === undefined) {
 			return crudQueryBuilder
 				.create(`create${accessor.entityName}`, builder => {
 					return builder.data(builder => this.attachCreateQueryPart(this.currentData, builder))
@@ -27,13 +30,13 @@ export default class PersistQueryGenerator {
 					builder = builder.where(accessor.where as Input.UniqueWhere<GraphQlBuilder.Literal>)
 				}
 
-				builder = builder.column(PersistQueryGenerator.PRIMARY_KEY_NAME)
+				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
 
 				return builder.data(builder =>
 					this.attachUpdateQueryPart(this.persistedData[accessor.entityName], this.currentData, builder)
 				)
 			})
-			.getGql()
+			.getGql()*/
 	}
 
 	private attachCreateQueryPart(
@@ -61,18 +64,18 @@ export default class PersistQueryGenerator {
 					const innerAccessor = Array.isArray(accessor) ? accessor : []
 
 					for (const field of persistedField) {
-						const persistedId: string = field[PersistQueryGenerator.PRIMARY_KEY_NAME]
+						const persistedId: string = field[MutationGenerator.PRIMARY_KEY_NAME]
 						const currentById = innerAccessor.find(
 							(element): element is EntityAccessor =>
 								element instanceof EntityAccessor && element.primaryKey === persistedId
 						)
 
 						if (currentById) {
-							builder = builder.update({ [PersistQueryGenerator.PRIMARY_KEY_NAME]: persistedId }, builder => {
+							builder = builder.update({ [MutationGenerator.PRIMARY_KEY_NAME]: persistedId }, builder => {
 								return this.attachUpdateQueryPart(field, currentById, builder)
 							})
 						} else {
-							builder = builder.disconnect({ [PersistQueryGenerator.PRIMARY_KEY_NAME]: persistedId })
+							builder = builder.disconnect({ [MutationGenerator.PRIMARY_KEY_NAME]: persistedId })
 						}
 					}
 
@@ -87,7 +90,7 @@ export default class PersistQueryGenerator {
 					builder = builder.one(fieldName, builder => {
 						if (accessor.primaryKey !== undefined) {
 							return builder
-								.connect({ [PersistQueryGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey })
+								.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey })
 								.update(builder => {
 									return this.attachUpdateQueryPart(persistedField, accessor, builder)
 								})

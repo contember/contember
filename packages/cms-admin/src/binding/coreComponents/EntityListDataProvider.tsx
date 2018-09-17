@@ -1,28 +1,36 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
-import EntityMarker from '../dao/EntityMarker'
-import EntityTreeToQueryConverter from '../model/EntityTreeToQueryConverter'
+import MarkerTreeRoot from '../dao/MarkerTreeRoot'
+import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
+import { MarkerTreeRootProvider } from './DataMarkerProvider'
 import DataProvider from './DataProvider'
+import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 interface EntityListDataProviderProps {
 	where?: Input.Where<GraphQlBuilder.Literal>
 }
 
 export default class EntityListDataProvider extends React.Component<EntityListDataProviderProps> {
-	private generateReadQuery = (rootMarker?: EntityMarker) => {
-		if (!rootMarker) {
-			return undefined
-		}
-		const converter = new EntityTreeToQueryConverter(rootMarker)
-		const query = converter.convertToListQuery(this.props.where)
-
-		console.log('q', query)
-
-		return query
-	}
+	public static displayName = 'EntityListDataProvider'
 
 	public render() {
-		return <DataProvider generateReadQuery={this.generateReadQuery}>{this.props.children}</DataProvider>
+		const markerTreeGenerator = new MarkerTreeGenerator(
+			<EntityListDataProvider {...this.props}>{this.props.children}</EntityListDataProvider>
+		)
+
+		return <DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
+	}
+
+	public static generateMarkerTreeRoot(
+		props: EntityListDataProviderProps,
+		treeRoot: MarkerTreeRoot['root']
+	): MarkerTreeRoot {
+		return MarkerTreeRoot.createInstance(treeRoot, {
+			where: props.where,
+			whereType: 'nonUnique'
+		})
 	}
 }
+
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof EntityListDataProvider, MarkerTreeRootProvider>

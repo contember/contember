@@ -43,6 +43,7 @@
 		"@types/knex": "^0.14.16",
 		"@types/mocha": "^5.2.4",
 		"@types/mock-knex": "^0.3.2",
+		"@types/pg": "^7.4.10",
 		"@types/sinon": "^5.0.1",
 		"@types/uuid": "^3.4.3",
 		"@types/ws": "^5.1.2",

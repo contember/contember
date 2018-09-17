@@ -158,7 +158,7 @@ export default class SchemaBuilderInternal {
 	private createUnique(options: EntityBuilder.EntityOptions, fieldOptions: FieldBuilder.Map): Model.UniqueConstraints {
 		const unique: Model.UniqueConstraints = {}
 		for (const singleUnique of options.unique || []) {
-			const name = singleUnique.name || singleUnique.fields.join('_')
+			const name = singleUnique.name || 'unique_' + singleUnique.fields.join('_')
 			unique[name] = { fields: singleUnique.fields, name: name }
 		}
 		for (let fieldName in fieldOptions) {

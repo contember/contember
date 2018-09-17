@@ -280,7 +280,7 @@ describe('Diff schemas', () => {
 					modification: 'createUniqueConstraint',
 					entityName: 'PostLocale',
 					unique: {
-						name: 'post_locale',
+						name: 'unique_post_locale',
 						fields: ['post', 'locale']
 					}
 				}
@@ -291,7 +291,7 @@ describe('Diff schemas', () => {
 			CREATE INDEX "post_locale_post_id_index" ON "post_locale" ("post_id");
 			ALTER TABLE "post_locale" ADD "title" text;
 			ALTER TABLE "post_locale" ADD "locale" text;
-			ALTER TABLE "post_locale" ADD CONSTRAINT "post_locale" UNIQUE ("post_id", "locale");`
+			ALTER TABLE "post_locale" ADD CONSTRAINT "unique_post_locale" UNIQUE ("post_id", "locale");`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})

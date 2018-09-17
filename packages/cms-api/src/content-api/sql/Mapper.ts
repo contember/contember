@@ -200,7 +200,7 @@ export default class Mapper {
 					this.whereBuilder.build(qb, inversedEntity, inversedPath, inversePredicate)
 				}
 			})
-			.onConflict(InsertBuilder.ConflictAction.doNothing)
+			.onConflict(InsertBuilder.ConflictActionType.doNothing)
 
 		return await qb.execute()
 	}

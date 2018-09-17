@@ -8,8 +8,8 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		private readonly wrapper: KnexWrapper,
 		private readonly intoTable: string | undefined,
 		private readonly cte: { [alias: string]: QueryBuilder.Callback },
-		private readonly columns: { [columnName: string]: QueryBuilder.ColumnExpression } | undefined,
-		private readonly onConflictAction: InsertBuilder.ConflictAction | undefined,
+		private readonly columns: InsertBuilder.Values | undefined,
+		private readonly conflictAction: InsertBuilder.ConflictAction | undefined,
 		private readonly returningColumn: string | undefined,
 		private readonly insertFrom: QueryBuilder.Callback | undefined
 	) {}
@@ -32,7 +32,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			this.intoTable,
 			{ ...this.cte, [alias]: callback },
 			this.columns,
-			this.onConflictAction,
+			this.conflictAction,
 			this.returningColumn,
 			this.insertFrom
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
@@ -44,27 +44,36 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			tableName,
 			this.cte,
 			this.columns,
-			this.onConflictAction,
+			this.conflictAction,
 			this.returningColumn,
 			this.insertFrom
 		) as InsertBuilder.InsertBuilderState<Result, Filled | 'into'>
 	}
 
-	public values(columns: {
-		[columnName: string]: QueryBuilder.ColumnExpression
-	}): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
+	public values(columns: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
 		return new InsertBuilder<Result, Filled | 'values'>(
 			this.wrapper,
 			this.intoTable,
 			this.cte,
 			columns,
-			this.onConflictAction,
+			this.conflictAction,
 			this.returningColumn,
 			this.insertFrom
 		) as InsertBuilder.InsertBuilderState<Result, Filled | 'values'>
 	}
 
-	public onConflict(conflictAction: InsertBuilder.ConflictAction): InsertBuilder.InsertBuilderState<Result, Filled> {
+	public onConflict(type: InsertBuilder.ConflictActionType.update, target: InsertBuilder.ConflictTarget, values: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled>
+	public onConflict(type: InsertBuilder.ConflictActionType.doNothing): InsertBuilder.InsertBuilderState<Result, Filled>
+	public onConflict(type: InsertBuilder.ConflictActionType, target?: InsertBuilder.ConflictTarget, values?: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled> {
+		let conflictAction: InsertBuilder.ConflictAction
+		if (type === InsertBuilder.ConflictActionType.update && values && target) {
+			conflictAction = {type, values, target}
+		} else if (type === InsertBuilder.ConflictActionType.doNothing) {
+			conflictAction = {type}
+		} else {
+			throw Error()
+		}
+
 		return new InsertBuilder<Result, Filled>(
 			this.wrapper,
 			this.intoTable,
@@ -82,7 +91,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			this.intoTable,
 			this.cte,
 			this.columns,
-			this.onConflictAction,
+			this.conflictAction,
 			column,
 			this.insertFrom
 		) as InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled>
@@ -94,7 +103,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			this.intoTable,
 			this.cte,
 			this.columns,
-			this.onConflictAction,
+			this.conflictAction,
 			this.returningColumn,
 			from
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
@@ -117,27 +126,35 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			qb.into(this.wrapper.raw('?? (' + columnNames.map(() => '??').join(', ') + ')', into, ...columnNames))
 			qb.insert((qb: Knex.QueryBuilder) => {
 				const queryBuilder = new QueryBuilder(this.wrapper, qb)
-				const values = Object.values(this.getColumnValues(queryBuilder))
+				const values = Object.values(this.getColumnValues(queryBuilder, columns))
 				values.forEach(raw => queryBuilder.qb.select(raw))
 				insertFrom(queryBuilder)
 			})
 		} else {
 			qb.into(into)
-			qb.insert(this.getColumnValues(new QueryBuilder(this.wrapper, qb)))
+			qb.insert(this.getColumnValues(new QueryBuilder(this.wrapper, qb), columns))
 		}
 
 		const qbSql = qb.toSQL()
 		let sql: string = qbSql.sql
 		let bindings = qbSql.bindings
 
-		switch (this.onConflictAction) {
-			case undefined:
-				break
-			case InsertBuilder.ConflictAction.doNothing:
-				sql += ' on conflict do nothing'
-				break
-			default:
-				throw Error()
+		if (this.conflictAction) {
+			switch (this.conflictAction.type) {
+				case InsertBuilder.ConflictActionType.doNothing:
+					sql += ' on conflict do nothing'
+					break
+				case InsertBuilder.ConflictActionType.update:
+					const values = this.getColumnValues(new QueryBuilder(this.wrapper, qb), this.conflictAction.values)
+					const updateExpr = Object.keys(values).join(' = ?, ') + ' = ?'
+					sql += ' on conflict (?) do update set ' + updateExpr
+					const indexExpr = this.wrapper.raw(this.conflictAction.target.map(() => '??').join(', '), ...this.conflictAction.target)
+					bindings.push(indexExpr)
+					bindings.push(...Object.values(values))
+					break;
+				default:
+					throw Error()
+			}
 		}
 		if (this.returningColumn) {
 			sql += ' returning ??'
@@ -154,13 +171,8 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		}
 	}
 
-	private getColumnValues(queryBuilder: QueryBuilder): { [column: string]: Knex.Raw } {
-		const columns = this.columns
-		if (columns === undefined) {
-			throw Error()
-		}
-
-		return Object.entries(columns)
+	private getColumnValues(queryBuilder: QueryBuilder, values: InsertBuilder.Values): { [column: string]: Knex.Raw } {
+		return Object.entries(values)
 			.map(
 				([key, value]): [string, Knex.Raw | undefined] => {
 					if (typeof value === 'function') {
@@ -192,10 +204,19 @@ namespace InsertBuilder {
 
 	export type NewInsertBuilder = InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
 
-	export enum ConflictAction {
-		doNothing = 'doNothing'
-		// update = 'update',
+	export enum ConflictActionType {
+		doNothing = 'doNothing',
+		update = 'update',
 	}
+
+	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression }
+
+	export type ConflictAction =
+		{type: ConflictActionType.doNothing}
+		| {type: ConflictActionType.update, values: Values, target: ConflictTarget}
+
+	export type IndexColumns = string[]
+	export type ConflictTarget = IndexColumns
 }
 
 export default InsertBuilder

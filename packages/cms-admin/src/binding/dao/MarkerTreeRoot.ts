@@ -15,17 +15,17 @@ export interface EntityListTreeConstraints {
 
 export type MarkerTreeConstraints = SingleEntityTreeConstraints | EntityListTreeConstraints
 
-export default class MarkerTreeRoot {
+export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
 	private constructor(
 		public readonly id: TreeId,
 		public readonly root: EntityMarker,
-		public readonly constraints: MarkerTreeConstraints
+		public readonly constraints: C
 	) {}
 
 	private static getNewTreeId: () => TreeId = (() => {
 		let id = 0
 
-		return () => (id++).toFixed(0)
+		return () => `treeRoot${(id++).toFixed(0)}`
 	})()
 
 	public static createInstance(rootMarker: MarkerTreeRoot['root'], constraints: MarkerTreeRoot['constraints']): MarkerTreeRoot {

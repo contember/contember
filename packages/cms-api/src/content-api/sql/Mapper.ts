@@ -14,8 +14,8 @@ import InsertBuilderFactory from './insert/InsertBuilderFactory'
 import UpdateBuilderFactory from './update/UpdateBuilderFactory'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../../acl/PredicatesInjector'
-import WhereBuilder from "./select/WhereBuilder";
-import InsertBuilder from "../../core/knex/InsertBuilder";
+import WhereBuilder from './select/WhereBuilder'
+import InsertBuilder from '../../core/knex/InsertBuilder'
 
 export default class Mapper {
 	constructor(
@@ -27,7 +27,7 @@ export default class Mapper {
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
-		private readonly whereBuilder: WhereBuilder,
+		private readonly whereBuilder: WhereBuilder
 	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
@@ -141,13 +141,15 @@ export default class Mapper {
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<number> {
 		const qb = this.db.queryBuilder()
 		qb.from(entity.tableName)
-		qb.where(condition => condition.in(entity.primaryColumn, qb => {
-			qb.from(entity.tableName, 'root_')
-			qb.select(['root_', entity.primaryColumn])
-			const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-			const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-			this.whereBuilder.build(qb, entity, new Path([]), {and: [uniqueWhere, predicate]})
-		}))
+		qb.where(condition =>
+			condition.in(entity.primaryColumn, qb => {
+				qb.from(entity.tableName, 'root_')
+				qb.select(['root_', entity.primaryColumn])
+				const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
+				const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
+				this.whereBuilder.build(qb, entity, new Path([]), { and: [uniqueWhere, predicate] })
+			})
+		)
 
 		return await qb.delete()
 	}
@@ -172,11 +174,12 @@ export default class Mapper {
 			inversePredicate = this.predicateFactory.create(inversedEntity, Acl.Operation.update, [relation.inversedBy])
 		}
 
-		const qb = this.db.insertBuilder()
+		const qb = this.db
+			.insertBuilder()
 			.into(joiningTable.tableName)
 			.values({
 				[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(primaryValue),
-				[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimaryValue),
+				[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimaryValue)
 			})
 			.with('t', qb => qb.select(expr => expr.selectValue(null)))
 			.from(qb => {
@@ -185,14 +188,16 @@ export default class Mapper {
 				if (Object.keys(owningPredicate).length > 0) {
 					const owningPath = new Path([], 'owning')
 					qb.join(owningEntity.tableName, 'owning', condition =>
-						condition.compare(['owning', owningEntity.primaryColumn], '=', primaryValue))
+						condition.compare(['owning', owningEntity.primaryColumn], '=', primaryValue)
+					)
 					this.whereBuilder.build(qb, owningEntity, owningPath, owningPredicate)
 				}
 				if (inversedEntity && Object.keys(inversePredicate).length > 0) {
 					const inversedEntityConst = inversedEntity
 					const inversedPath = new Path([], 'inversed')
 					qb.join(inversedEntity.tableName, 'inversed', condition =>
-						condition.compare(['inversed', inversedEntityConst.primaryColumn], '=', inversedPrimaryValue))
+						condition.compare(['inversed', inversedEntityConst.primaryColumn], '=', inversedPrimaryValue)
+					)
 					this.whereBuilder.build(qb, inversedEntity, inversedPath, inversePredicate)
 				}
 			})
@@ -207,7 +212,6 @@ export default class Mapper {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	) {
-
 		const joiningTable = relation.joiningTable
 		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
 		const targetEntity = getEntity(this.schema, relation.target)
@@ -221,28 +225,25 @@ export default class Mapper {
 
 		const qb = this.db.queryBuilder()
 		qb.table(joiningTable.tableName)
-		qb.where(cond => cond.in(joiningTable.joiningColumn.columnName, qb => {
-			qb.select(['root_', owningEntity.primaryColumn])
-			qb.from(owningEntity.tableName, 'root_')
-			this.whereBuilder.build(qb, owningEntity, new Path([]), {
-				and: [
-					this.uniqueWhereExpander.expand(owningEntity, ownerUnique),
-					owningPredicate,
-				]
+		qb.where(cond =>
+			cond.in(joiningTable.joiningColumn.columnName, qb => {
+				qb.select(['root_', owningEntity.primaryColumn])
+				qb.from(owningEntity.tableName, 'root_')
+				this.whereBuilder.build(qb, owningEntity, new Path([]), {
+					and: [this.uniqueWhereExpander.expand(owningEntity, ownerUnique), owningPredicate]
+				})
 			})
-		}))
-		qb.where(cond => cond.in(joiningTable.inverseJoiningColumn.columnName, qb => {
-			qb.from(targetEntity.tableName, 'root_')
-			qb.select(['root_', targetEntity.primaryColumn])
+		)
+		qb.where(cond =>
+			cond.in(joiningTable.inverseJoiningColumn.columnName, qb => {
+				qb.from(targetEntity.tableName, 'root_')
+				qb.select(['root_', targetEntity.primaryColumn])
 
-			this.whereBuilder.build(qb, targetEntity, new Path([]), {
-				and: [
-					this.uniqueWhereExpander.expand(targetEntity, inversedUnique),
-					inversePredicate,
-				]
+				this.whereBuilder.build(qb, targetEntity, new Path([]), {
+					and: [this.uniqueWhereExpander.expand(targetEntity, inversedUnique), inversePredicate]
+				})
 			})
-		}))
-
+		)
 
 		return await qb.delete()
 	}

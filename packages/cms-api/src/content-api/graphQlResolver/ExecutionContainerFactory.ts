@@ -36,7 +36,8 @@ class ExecutionContainerFactory {
 			)
 			.addService(
 				'selectBuilderFactory',
-				({ joinBuilder, whereBuilder, predicateFactory, }) => new SelectBuilderFactory(this.schema, joinBuilder, whereBuilder, predicateFactory)
+				({ joinBuilder, whereBuilder, predicateFactory }) =>
+					new SelectBuilderFactory(this.schema, joinBuilder, whereBuilder, predicateFactory)
 			)
 			.addService('insertBuilderFactory', ({ whereBuilder }) => new InsertBuilderFactory(this.schema, whereBuilder))
 			.addService('updateBuilderFactory', ({ whereBuilder }) => new UpdateBuilderFactory(this.schema, whereBuilder))
@@ -51,7 +52,7 @@ class ExecutionContainerFactory {
 					insertBuilderFactory,
 					updateBuilderFactory,
 					uniqueWhereExpander,
-					whereBuilder,
+					whereBuilder
 				}) =>
 					new MapperFactory(
 						this.schema,
@@ -61,15 +62,14 @@ class ExecutionContainerFactory {
 						insertBuilderFactory,
 						updateBuilderFactory,
 						uniqueWhereExpander,
-						whereBuilder,
+						whereBuilder
 					)
 			)
 			.addService('mapperRunner', ({ mapperFactory }) => new MapperRunner(context.db.wrapper(), mapperFactory))
 
 			.addService(
 				'readResolver',
-				({ mapperRunner, uniqueWhereExpander }) =>
-					new ReadResolver(mapperRunner, uniqueWhereExpander)
+				({ mapperRunner, uniqueWhereExpander }) => new ReadResolver(mapperRunner, uniqueWhereExpander)
 			)
 			.addService(
 				'mutationResolver',

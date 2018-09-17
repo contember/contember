@@ -9,7 +9,7 @@ import Authorizator from '../../acl/Authorizator'
 import EntityInputProvider from './mutations/EntityInputProvider'
 import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
-import { filterObject } from "../../utils/object";
+import { filterObject } from '../../utils/object'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
 
@@ -32,7 +32,10 @@ export default class MutationProvider {
 		mutations[`delete${entityName}`] = this.getDeleteMutation(entityName)
 		mutations[`update${entityName}`] = this.getUpdateMutation(entityName)
 
-		return filterObject<FieldConfig<any>, FieldConfig<any> | undefined>(mutations, (key, value): value is FieldConfig<any> => value !== undefined)
+		return filterObject<FieldConfig<any>, FieldConfig<any> | undefined>(
+			mutations,
+			(key, value): value is FieldConfig<any> => value !== undefined
+		)
 	}
 
 	private getCreateMutation(entityName: string): FieldConfig<Input.CreateInput> | undefined {

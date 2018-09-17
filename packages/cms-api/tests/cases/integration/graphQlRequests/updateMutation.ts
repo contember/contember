@@ -1668,7 +1668,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)]
 						},
 						selectUpdatePostSql
 					])
@@ -1779,7 +1779,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)]
 						},
 						selectUpdatePostSql
 					])
@@ -1824,7 +1824,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)]
 						},
 						selectUpdatePostSql
 					])
@@ -1879,7 +1879,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)]
 						},
 						selectUpdatePostSql
 					])
@@ -1920,7 +1920,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)]
 						},
 						selectUpdateCategorySql
 					])
@@ -1961,7 +1961,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)]
 						},
 						selectUpdateCategorySql
 					])
@@ -2117,7 +2117,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)]
 						},
 						selectUpdateCategorySql
 					])
@@ -2172,7 +2172,7 @@ describe('update', () => {
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id") values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)]
 						},
 						selectUpdateCategorySql
 					])
@@ -2256,42 +2256,40 @@ describe('update', () => {
 		it('update m:n', async () => {
 			await execute({
 				schema: new SchemaBuilder()
-					.entity('Post', e => e
-						.column('name', c => c.type(Model.ColumnType.String))
-						.manyHasMany('categories', r => r
-							.target('Category', e => e
-								.column('name', c => c.type(Model.ColumnType.String))
+					.entity('Post', e =>
+						e
+							.column('name', c => c.type(Model.ColumnType.String))
+							.manyHasMany('categories', r =>
+								r.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))).inversedBy('posts')
 							)
-							.inversedBy('posts')
-						)
 					)
 					.buildSchema(),
 				permissions: {
 					Post: {
 						predicates: {
 							post_name_predicate: {
-								name: 'post_name_variable',
-							},
+								name: 'post_name_variable'
+							}
 						},
 						operations: {
 							read: {
-								id: true,
+								id: true
 							},
 							update: {
 								id: true,
-								categories: 'post_name_predicate',
+								categories: 'post_name_predicate'
 							}
-						},
+						}
 					},
 					Category: {
 						predicates: {
 							category_name_predicate: {
-								name: 'category_name_variable',
-							},
+								name: 'category_name_variable'
+							}
 						},
 						operations: {
 							read: {
-								id: true,
+								id: true
 							},
 							update: {
 								posts: 'category_name_predicate'
@@ -2301,7 +2299,7 @@ describe('update', () => {
 				},
 				variables: {
 					post_name_variable: ['Lorem ipsum', 'Dolor sit'],
-					category_name_variable: ['foo', 'bar'],
+					category_name_variable: ['foo', 'bar']
 				},
 				query: GQL`mutation  {
           updatePost(where: {id: "${testUuid(1)}"}, data: {categories: [
@@ -2323,7 +2321,7 @@ describe('update', () => {
                        from "Category" as "root_"
                        where "root_"."id" = $4 and
                              "root_"."name" in ($5, $6))`,
-						parameters: [testUuid(1), 'Lorem ipsum', 'Dolor sit', testUuid(3), 'foo', 'bar'],
+						parameters: [testUuid(1), 'Lorem ipsum', 'Dolor sit', testUuid(3), 'foo', 'bar']
 					},
 					{
 						sql: SQL`with "t" as (select $1) 
@@ -2338,23 +2336,33 @@ describe('update', () => {
               where "owning"."name" in ($6, $7) and
                     "inversed"."name" in ($8, $9)
             on conflict do nothing`,
-						parameters: [null, testUuid(1), testUuid(2), testUuid(1), testUuid(2), 'Lorem ipsum', 'Dolor sit', 'foo', 'bar']
+						parameters: [
+							null,
+							testUuid(1),
+							testUuid(2),
+							testUuid(1),
+							testUuid(2),
+							'Lorem ipsum',
+							'Dolor sit',
+							'foo',
+							'bar'
+						]
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "post" as "root_"
                      where "root_"."id" = $1`,
-						response: [{root_id: testUuid(1)}],
+						response: [{ root_id: testUuid(1) }],
 						parameters: [testUuid(1)]
-					},
+					}
 				]),
 				return: {
 					data: {
 						updatePost: {
-							id: "123e4567-e89b-12d3-a456-000000000001"
+							id: '123e4567-e89b-12d3-a456-000000000001'
 						}
 					}
-				},
+				}
 			})
 		})
 	})

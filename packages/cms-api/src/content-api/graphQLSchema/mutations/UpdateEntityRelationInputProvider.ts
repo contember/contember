@@ -22,7 +22,10 @@ export default class UpdateEntityRelationInputProvider {
 		return this.updateEntityRelationInputs({ entityName, relationName })
 	}
 
-	private createUpdateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
+	private createUpdateEntityRelationInput(
+		entityName: string,
+		relationName: string
+	): GraphQLInputObjectType | undefined {
 		return acceptFieldVisitor(this.schema, entityName, relationName, this.updateEntityRelationInputFieldVisitor)
 	}
 }

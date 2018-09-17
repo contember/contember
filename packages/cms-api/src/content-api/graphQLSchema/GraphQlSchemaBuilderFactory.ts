@@ -20,8 +20,8 @@ import ExecutionContainerFactory from '../graphQlResolver/ExecutionContainerFact
 import ReadResolverFactory from '../graphQlResolver/ReadResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
-import UpdateEntityRelationAllowedOperationsVisitor from "./mutations/UpdateEntityRelationAllowedOperationsVisitor";
-import CreateEntityRelationAllowedOperationsVisitor from "./mutations/CreateEntityRelationAllowedOperationsVisitor";
+import UpdateEntityRelationAllowedOperationsVisitor from './mutations/UpdateEntityRelationAllowedOperationsVisitor'
+import CreateEntityRelationAllowedOperationsVisitor from './mutations/CreateEntityRelationAllowedOperationsVisitor'
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -49,7 +49,7 @@ export default class GraphQlSchemaBuilderFactory {
 			schema,
 			whereTypeProvider,
 			createEntityInputProviderAccessor,
-			createEntityRelationAllowedOperationsVisitor,
+			createEntityRelationAllowedOperationsVisitor
 		)
 		const createEntityRelationInputProvider = new CreateEntityRelationInputProvider(
 			schema,
@@ -76,7 +76,7 @@ export default class GraphQlSchemaBuilderFactory {
 			whereTypeProvider,
 			updateEntityInputProviderAccessor,
 			createEntityInputProvider,
-			updateEntityRelationAllowedOperationsVisitor,
+			updateEntityRelationAllowedOperationsVisitor
 		)
 		const updateEntityRelationInputProvider = new UpdateEntityRelationInputProvider(
 			schema,

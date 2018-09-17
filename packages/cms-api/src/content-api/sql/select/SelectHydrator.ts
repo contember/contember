@@ -58,14 +58,14 @@ class SelectHydrator {
 	}
 
 	async hydrateRow(row: SelectHydrator.Row): Promise<SelectHydrator.ResultObject> {
-		const result: SelectHydrator.ResultObject = {_meta: {}}
+		const result: SelectHydrator.ResultObject = { _meta: {} }
 		for (let primaryPath of this.entities) {
 			if (row[primaryPath.getAlias()] === null) {
 				continue
 			}
 			primaryPath.path
 				.slice(0, primaryPath.path.length - 1)
-				.reduce((obj, part) => (obj[part] = obj[part] || {_meta: {}}), result)
+				.reduce((obj, part) => (obj[part] = obj[part] || { _meta: {} }), result)
 		}
 
 		for (let columnPath of this.columns) {
@@ -76,7 +76,7 @@ class SelectHydrator {
 			const updatable = row[columnPath.getAlias() + SelectHydrator.ColumnFlagSuffixes.updatable]
 			currentObject._meta[last] = {
 				readable,
-				updatable,
+				updatable
 			}
 
 			if (currentObject) {
@@ -110,7 +110,7 @@ namespace SelectHydrator {
 	export type NestedDefaultValue = [] | null
 	export enum ColumnFlagSuffixes {
 		readable = '__readable',
-		updatable = '__updatable',
+		updatable = '__updatable'
 	}
 }
 

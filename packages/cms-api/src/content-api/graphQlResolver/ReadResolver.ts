@@ -4,11 +4,7 @@ import ObjectNode from './ObjectNode'
 import MapperRunner from '../sql/MapperRunner'
 
 export default class ReadResolver {
-	constructor(
-		private readonly mapperRunner: MapperRunner,
-		private readonly uniqueWhereExpander: UniqueWhereExpander
-	) {
-	}
+	constructor(private readonly mapperRunner: MapperRunner, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
 	public async resolveListQuery(entity: Model.Entity, queryAst: ObjectNode<Input.ListQueryInput>) {
 		return await this.mapperRunner.run(async mapper => {

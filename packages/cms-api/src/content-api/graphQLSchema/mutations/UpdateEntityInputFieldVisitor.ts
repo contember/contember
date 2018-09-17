@@ -2,7 +2,7 @@ import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from 'cms-common'
 import ColumnTypeResolver from '../ColumnTypeResolver'
 import UpdateEntityRelationInputProvider from './UpdateEntityRelationInputProvider'
-import Authorizator from "../../../acl/Authorizator";
+import Authorizator from '../../../acl/Authorizator'
 
 export default class UpdateEntityInputFieldVisitor
 	implements
@@ -26,7 +26,10 @@ export default class UpdateEntityInputFieldVisitor
 		}
 	}
 
-	public visitHasOne(entity: Model.Entity, relation: Model.Relation & Model.NullableRelation): GraphQLInputFieldConfig | undefined {
+	public visitHasOne(
+		entity: Model.Entity,
+		relation: Model.Relation & Model.NullableRelation
+	): GraphQLInputFieldConfig | undefined {
 		const type = this.updateEntityRelationInputProvider.getUpdateEntityRelationInput(entity.name, relation.name)
 		if (type === undefined) {
 			return undefined

@@ -19,7 +19,10 @@ export default class CreateEntityRelationInputProvider {
 		return this.createEntityRelationInputs({ entityName, relationName })
 	}
 
-	private createCreateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
+	private createCreateEntityRelationInput(
+		entityName: string,
+		relationName: string
+	): GraphQLInputObjectType | undefined {
 		return acceptFieldVisitor(this.schema, entityName, relationName, this.createEntityRelationInputFieldVisitor)
 	}
 }

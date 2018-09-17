@@ -7,7 +7,7 @@ import UpdateBuilderFactory from './update/UpdateBuilderFactory'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import KnexWrapper from '../../core/knex/KnexWrapper'
 import PredicatesInjector from '../../acl/PredicatesInjector'
-import WhereBuilder from "./select/WhereBuilder";
+import WhereBuilder from './select/WhereBuilder'
 
 class MapperFactory {
 	constructor(
@@ -18,7 +18,7 @@ class MapperFactory {
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
-		private readonly whereBuilder: WhereBuilder,
+		private readonly whereBuilder: WhereBuilder
 	) {}
 
 	public create(trx: KnexWrapper): Mapper {
@@ -31,7 +31,7 @@ class MapperFactory {
 			this.insertBuilderFactory,
 			this.updateBuilderFactory,
 			this.uniqueWhereExpander,
-			this.whereBuilder,
+			this.whereBuilder
 		)
 	}
 }

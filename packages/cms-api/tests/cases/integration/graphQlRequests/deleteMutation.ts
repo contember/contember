@@ -78,8 +78,7 @@ describe('Delete mutation', () => {
 	it('delete post with acl', async () => {
 		await execute({
 			schema: new SchemaBuilder()
-				.entity('Post', entity => entity
-					.column('locale', c => c.type(Model.ColumnType.String)))
+				.entity('Post', entity => entity.column('locale', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
 			query: GQL`
         mutation {
@@ -90,7 +89,7 @@ describe('Delete mutation', () => {
 			permissions: {
 				Post: {
 					predicates: {
-						locale_predicate: {locale: 'locale_variable'}
+						locale_predicate: { locale: 'locale_variable' }
 					},
 					operations: {
 						delete: 'locale_predicate',
@@ -113,7 +112,7 @@ describe('Delete mutation', () => {
 						parameters: [testUuid(1)],
 						response: [
 							{
-								root_id: testUuid(1),
+								root_id: testUuid(1)
 							}
 						]
 					},

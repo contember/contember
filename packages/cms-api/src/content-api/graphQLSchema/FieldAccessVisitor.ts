@@ -1,14 +1,11 @@
 import { Acl, Model } from 'cms-common'
-import Authorizator from "../../acl/Authorizator";
+import Authorizator from '../../acl/Authorizator'
 
-export class FieldAccessVisitor
-	implements Model.ColumnVisitor<boolean>, Model.RelationVisitor<boolean> {
-
+export class FieldAccessVisitor implements Model.ColumnVisitor<boolean>, Model.RelationVisitor<boolean> {
 	constructor(
 		private readonly operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update,
-		private readonly authorizator: Authorizator,
-	) {
-	}
+		private readonly authorizator: Authorizator
+	) {}
 
 	visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
 		return this.authorizator.isAllowed(this.operation, entity.name, column.name)

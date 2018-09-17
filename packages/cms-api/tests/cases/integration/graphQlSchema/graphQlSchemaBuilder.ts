@@ -121,18 +121,18 @@ describe('build gql schema from model schema', () => {
 					Root: {
 						predicates: {},
 						operations: {
-							create: {id: true},
-							update: {id: true},
-							read: {id: true},
+							create: { id: true },
+							update: { id: true },
+							read: { id: true },
 							delete: true
 						}
 					},
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
-							create: {id: true, a: true, Root: true},
-							update: {id: true, a: true, Root: true},
-							read: {id: true, a: true}
+							create: { id: true, a: true, Root: true },
+							update: { id: true, a: true, Root: true },
+							read: { id: true, a: true }
 						}
 					}
 				}),
@@ -147,17 +147,17 @@ describe('build gql schema from model schema', () => {
 					Root: {
 						predicates: {},
 						operations: {
-							create: {id: true, r: true},
-							update: {id: true, r: true},
-							read: {id: true, r: true},
+							create: { id: true, r: true },
+							update: { id: true, r: true },
+							read: { id: true, r: true },
 							delete: true
 						}
 					},
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
-							create: {id: true, a: true, Root: true},
-							read: {id: true, a: true},
+							create: { id: true, a: true, Root: true },
+							read: { id: true, a: true },
 							delete: true
 						}
 					}
@@ -173,7 +173,7 @@ describe('build gql schema from model schema', () => {
 					Root: {
 						predicates: {},
 						operations: {
-							update: { id: true, r: true, Root: true, },
+							update: { id: true, r: true, Root: true },
 							read: { id: true, r: true },
 							delete: true
 						}
@@ -181,7 +181,7 @@ describe('build gql schema from model schema', () => {
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
-							update: {id: true, a: true, Root: true, },
+							update: { id: true, a: true, Root: true },
 							read: { id: true, a: true },
 							delete: true
 						}

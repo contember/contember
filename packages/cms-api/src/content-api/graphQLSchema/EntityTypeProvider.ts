@@ -1,4 +1,10 @@
-import { GraphQLBoolean, GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLOutputType } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLObjectType,
+	GraphQLObjectTypeConfig,
+	GraphQLOutputType
+} from 'graphql'
 import { Acl, Model } from 'cms-common'
 import { acceptFieldVisitor, getEntity as getEntityFromSchema } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
@@ -9,15 +15,15 @@ import { GqlTypeName } from './utils'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
 import { GraphQLFieldResolver } from 'graphql/type/definition'
-import { FieldAccessVisitor } from "./FieldAccessVisitor";
+import { FieldAccessVisitor } from './FieldAccessVisitor'
 
 export default class EntityTypeProvider {
 	private entities = singletonFactory(name => this.createEntity(name))
 	private fieldMeta = new GraphQLObjectType({
 		name: 'FieldMeta',
 		fields: {
-			readable: {type: GraphQLBoolean},
-			updatable: {type: GraphQLBoolean},
+			readable: { type: GraphQLBoolean },
+			updatable: { type: GraphQLBoolean }
 		}
 	})
 
@@ -46,7 +52,7 @@ export default class EntityTypeProvider {
 		fields['_meta'] = {
 			type: new GraphQLObjectType({
 				name: GqlTypeName`${entityName}Meta`,
-				fields: metaFields,
+				fields: metaFields
 			})
 		}
 
@@ -54,7 +60,14 @@ export default class EntityTypeProvider {
 			if (!entity.fields.hasOwnProperty(fieldName)) {
 				continue
 			}
-			if (!acceptFieldVisitor(this.schema, entity, fieldName, new FieldAccessVisitor(Acl.Operation.read, this.authorizator))) {
+			if (
+				!acceptFieldVisitor(
+					this.schema,
+					entity,
+					fieldName,
+					new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
+				)
+			) {
 				continue
 			}
 
@@ -74,7 +87,7 @@ export default class EntityTypeProvider {
 				resolve: fieldResolver
 			}
 			metaFields[fieldName] = {
-				type: this.fieldMeta,
+				type: this.fieldMeta
 			}
 		}
 		return fields

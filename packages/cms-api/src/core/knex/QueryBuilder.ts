@@ -34,12 +34,12 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	public select(expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression, alias?: string): void {
 		let raw: Knex.Raw
 		if (typeof expr === 'function') {
-			const cbRaw = expr(new QueryBuilder.ColumnExpressionFactory(this));
+			const cbRaw = expr(new QueryBuilder.ColumnExpressionFactory(this))
 			if (cbRaw === undefined) {
 				return
 			}
 			raw = cbRaw
-		} else if (typeof expr === 'string' || Array.isArray(expr)){
+		} else if (typeof expr === 'string' || Array.isArray(expr)) {
 			raw = this.raw('??', QueryBuilder.toFqn(expr))
 		} else {
 			raw = expr
@@ -155,7 +155,9 @@ namespace QueryBuilder {
 	type ColumnFqn = string
 	type TableAliasAndColumn = [string, string]
 	export type ColumnIdentifier = ColumnFqn | TableAliasAndColumn
-	export type ColumnExpression = Knex.Raw | ((expressionFactory: QueryBuilder.ColumnExpressionFactory) => Knex.Raw | undefined)
+	export type ColumnExpression =
+		| Knex.Raw
+		| ((expressionFactory: QueryBuilder.ColumnExpressionFactory) => Knex.Raw | undefined)
 	export type ColumnExpressionMap = { [columnName: string]: QueryBuilder.ColumnExpression }
 
 	export function toFqn(columnName: ColumnIdentifier): string {
@@ -178,8 +180,7 @@ namespace QueryBuilder {
 			return this.qb.raw(sql, value)
 		}
 
-		public selectCondition(condition: ConditionCallback): Knex.Raw | undefined
-		{
+		public selectCondition(condition: ConditionCallback): Knex.Raw | undefined {
 			const builder = new ConditionBuilder.ConditionStringBuilder(this.qb)
 			condition(builder, this.qb)
 			return builder.getSql() || undefined

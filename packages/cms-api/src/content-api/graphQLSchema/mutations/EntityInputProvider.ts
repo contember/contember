@@ -6,9 +6,7 @@ import Authorizator from '../../../acl/Authorizator'
 import singletonFactory from '../../../utils/singletonFactory'
 import { GraphQLInputType } from 'graphql/type/definition'
 
-class EntityInputProvider<
-	Operation extends EntityInputProvider.Type.create | EntityInputProvider.Type.update
-> {
+class EntityInputProvider<Operation extends EntityInputProvider.Type.create | EntityInputProvider.Type.update> {
 	private entityInputs = singletonFactory<
 		GraphQLInputType | undefined,
 		{
@@ -80,7 +78,7 @@ class EntityInputProvider<
 namespace EntityInputProvider {
 	export enum Type {
 		create = 'create',
-		update = 'update',
+		update = 'update'
 	}
 }
 

@@ -28,7 +28,7 @@ const execute = async (test: Test) => {
 		expect(query.sql.replace(/\s+/g, ' ')).equals(test.sql.replace(/\s+/g, ' '))
 		expect(query.bindings).deep.equals(test.parameters)
 		executed = true
-		query.response(null)
+		query.response({rows: [], rowCount: 0})
 	})
 	await test.query(wrapper)
 	expect(executed).equals(true)
@@ -85,7 +85,7 @@ describe('knex query builder', () => {
 						qb.table('root_')
 					})
 					.returning('id')
-					.onConflict(InsertBuilder.ConflictAction.doNothing)
+					.onConflict(InsertBuilder.ConflictActionType.doNothing)
 				await builder.execute()
 			},
 			sql: SQL`
@@ -94,6 +94,36 @@ describe('knex query builder', () => {
 					select "id", "title" from "root_"
         on conflict do nothing returning "id"`,
 			parameters: ['Hello', 1, null]
+		})
+	})
+
+	it('constructs insert with on conflict update', async () => {
+		await execute({
+			query: async wrapper => {
+				const builder = wrapper
+					.insertBuilder()
+					.into('author')
+					.values({
+						id: expr => expr.selectValue('123'),
+						title: expr => expr.select('title'),
+					})
+					.from(qb => {
+						qb.table('foo')
+					})
+					.returning('id')
+					.onConflict(InsertBuilder.ConflictActionType.update, ['id'], {
+						id: expr => expr.selectValue('123'),
+						title: expr => expr.select('title'),
+					})
+				await builder.execute()
+			},
+			sql: SQL`insert into "author" ("id", "title")
+        select
+          $1,
+          "title"
+        from "foo"
+      on conflict ("id") do update set id = $2, title = "title" returning "id"`,
+			parameters: ['123', '123']
 		})
 	})
 

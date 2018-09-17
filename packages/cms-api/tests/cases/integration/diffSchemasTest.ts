@@ -6,6 +6,7 @@ import SchemaMigrator from '../../../src/content-schema/differ/SchemaMigrator'
 import SqlMigrator from '../../../src/content-api/sqlSchema/SqlMigrator'
 import { expect } from 'chai'
 import { SQL } from '../../src/tags'
+import 'mocha'
 
 function testDiffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema, expectedDiff: SchemaDiff) {
 	const actual = diffSchemas(originalSchema, updatedSchema)
@@ -179,7 +180,7 @@ describe('Diff schemas', () => {
 		}
 		const sql = SQL`CREATE TABLE "post" ( "id" uuid PRIMARY KEY NOT NULL );
 			ALTER TABLE "post" ADD "title" text;
-			ALTER TABLE "post" ADD "author_id" uuid REFERENCES "author"."id" ON DELETE cascade;
+			ALTER TABLE "post" ADD "author_id" uuid REFERENCES "author"("id") ON DELETE cascade;
 			CREATE INDEX "post_author_id_index" ON "post" ("author_id");`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
@@ -286,7 +287,7 @@ describe('Diff schemas', () => {
 			]
 		}
 		const sql = SQL`CREATE TABLE "post_locale" ( "id" uuid PRIMARY KEY NOT NULL );
-			ALTER TABLE "post_locale" ADD "post_id" uuid NOT NULL REFERENCES "post"."id" ON DELETE restrict;
+			ALTER TABLE "post_locale" ADD "post_id" uuid NOT NULL REFERENCES "post"("id") ON DELETE restrict;
 			CREATE INDEX "post_locale_post_id_index" ON "post_locale" ("post_id");
 			ALTER TABLE "post_locale" ADD "title" text;
 			ALTER TABLE "post_locale" ADD "locale" text;
@@ -470,8 +471,8 @@ describe('Diff schemas', () => {
 		}
 		const sql = SQL`CREATE TABLE "category" ( "id" uuid PRIMARY KEY NOT NULL );
 			  CREATE TABLE "post_categories" (
-				"post_id"     uuid NOT NULL REFERENCES "post"."id" ON DELETE cascade,
-				"category_id" uuid NOT NULL REFERENCES "category"."id" ON DELETE cascade,
+				"post_id"     uuid NOT NULL REFERENCES "post"("id") ON DELETE cascade,
+				"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE cascade,
 				CONSTRAINT "post_categories_pkey" PRIMARY KEY ("post_id", "category_id")
 			  );
 			  ALTER TABLE "category" ADD "title" text;`
@@ -587,7 +588,7 @@ describe('Diff schemas', () => {
 		const sql = SQL`CREATE TABLE "site" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TABLE "site_setting" ( "id" uuid PRIMARY KEY NOT NULL );
 			ALTER TABLE "site" ADD "name" text;
-			ALTER TABLE "site" ADD "setting_id" uuid UNIQUE REFERENCES "site_setting"."id" ON DELETE restrict;
+			ALTER TABLE "site" ADD "setting_id" uuid UNIQUE REFERENCES "site_setting"("id") ON DELETE restrict;
 			ALTER TABLE "site_setting" ADD "url" text;`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)

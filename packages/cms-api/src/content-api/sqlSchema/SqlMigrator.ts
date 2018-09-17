@@ -132,10 +132,7 @@ export default class SqlMigrator {
 					[relation.joiningColumn.columnName]: {
 						type: this.getPrimaryType(targetEntity),
 						notNull: !relation.nullable,
-						references: {
-							schema: targetEntity.tableName,
-							name: targetEntity.primaryColumn
-						},
+						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
 						onDelete: relation.joiningColumn.onDelete
 					}
 				})
@@ -148,10 +145,7 @@ export default class SqlMigrator {
 						type: this.getPrimaryType(targetEntity),
 						notNull: !relation.nullable,
 						unique: true,
-						references: {
-							schema: targetEntity.tableName,
-							name: targetEntity.primaryColumn
-						},
+						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
 						onDelete: relation.joiningColumn.onDelete
 					}
 				})
@@ -164,19 +158,13 @@ export default class SqlMigrator {
 						[relation.joiningTable.joiningColumn.columnName]: {
 							type: this.getPrimaryType(entity),
 							notNull: true,
-							references: {
-								schema: entity.tableName,
-								name: entity.primaryColumn
-							},
+							references: `"${entity.tableName}"("${entity.primaryColumn}")`,
 							onDelete: relation.joiningTable.joiningColumn.onDelete
 						},
 						[relation.joiningTable.inverseJoiningColumn.columnName]: {
 							type: this.getPrimaryType(targetEntity),
 							notNull: true,
-							references: {
-								schema: targetEntity.tableName,
-								name: targetEntity.primaryColumn
-							},
+							references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
 							onDelete: relation.joiningTable.inverseJoiningColumn.onDelete
 						}
 					},

@@ -1,6 +1,7 @@
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
 import * as Knex from 'knex'
+import { QueryResult } from "pg";
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>> {
 	private constructor(
@@ -143,7 +144,14 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			bindings.push(this.returningColumn)
 		}
 
-		return await this.wrapper.raw(sql, ...qbSql.bindings)
+		const result: QueryResult = await this.wrapper.raw(sql, ...qbSql.bindings)
+
+		const returningColumn = this.returningColumn
+		if (returningColumn) {
+			return result.rows.map(it => it[returningColumn]) as Result
+		} else {
+			return result.rowCount as Result
+		}
 	}
 
 	private getColumnValues(queryBuilder: QueryBuilder): { [column: string]: Knex.Raw } {

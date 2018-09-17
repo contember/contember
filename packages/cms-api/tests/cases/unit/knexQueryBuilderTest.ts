@@ -4,7 +4,7 @@ import * as mockKnex from 'mock-knex'
 import * as knex from 'knex'
 import KnexWrapper from '../../../src/core/knex/KnexWrapper'
 import { SQL } from '../../src/tags'
-import InsertBuilder from "../../../src/core/knex/InsertBuilder";
+import InsertBuilder from '../../../src/core/knex/InsertBuilder'
 
 interface Test {
 	query: (wrapper: KnexWrapper) => void
@@ -69,7 +69,8 @@ describe('knex query builder', () => {
 	it('constructs insert with cte', async () => {
 		await execute({
 			query: async wrapper => {
-				const builder = wrapper.insertBuilder()
+				const builder = wrapper
+					.insertBuilder()
 					.with('root_', qb => {
 						qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
 						qb.select(expr => expr.selectValue(1, 'int'), 'id')
@@ -129,14 +130,20 @@ describe('knex query builder', () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper.queryBuilder()
-				qb.select(expr => expr.selectCondition(condition => condition.or(condition => {
-					condition.compare('foo', '>=', 1)
-					condition.compare('foo', '<=', 0)
-				})), 'bar')
+				qb.select(
+					expr =>
+						expr.selectCondition(condition =>
+							condition.or(condition => {
+								condition.compare('foo', '>=', 1)
+								condition.compare('foo', '<=', 0)
+							})
+						),
+					'bar'
+				)
 				await qb.getResult()
 			},
 			sql: SQL`select ("foo" >= $1 or "foo" <= $2) as "bar"`,
-			parameters: [1, 0],
+			parameters: [1, 0]
 		})
 	})
 })

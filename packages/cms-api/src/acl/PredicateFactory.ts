@@ -2,11 +2,14 @@ import { Acl, Input, Model } from 'cms-common'
 import VariableInjector from './VariableInjector'
 
 class PredicateFactory {
-	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {
-	}
+	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {}
 
 	public create(entity: Model.Entity, operation: Acl.Operation.delete): Input.Where
-	public create(entity: Model.Entity, operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create, fieldNames: string[]): Input.Where
+	public create(
+		entity: Model.Entity,
+		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
+		fieldNames: string[]
+	): Input.Where
 	public create(entity: Model.Entity, operation: Acl.Operation, fieldNames?: string[]): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }

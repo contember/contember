@@ -51,14 +51,17 @@ export default class InsertBuilder {
 		await blocker
 
 		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
-		const resolvedData = this.rowData.map((it, index) => ({...it, value: resolvedValues[index]}))
+		const resolvedData = this.rowData.map((it, index) => ({ ...it, value: resolvedValues[index] }))
 		const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
-			(result, item) => ({...result, [item.columnName]: expr => expr.select(['root_', item.columnName])}),
+			(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
 			{}
 		)
-		const qb = this.db.insertBuilder()
+		const qb = this.db
+			.insertBuilder()
 			.with('root_', qb => {
-				resolvedData.forEach(value => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName))
+				resolvedData.forEach(value =>
+					qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName)
+				)
 			})
 			.into(this.entity.tableName)
 			.values(insertData)
@@ -67,7 +70,6 @@ export default class InsertBuilder {
 				this.whereBuilder.build(qb, this.entity, new Path([]), this.where)
 			})
 			.returning(this.entity.primaryColumn)
-
 
 		const returning = await qb.execute()
 

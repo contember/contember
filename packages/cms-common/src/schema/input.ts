@@ -20,13 +20,12 @@ namespace Input {
 		create = 'create',
 		update = 'update',
 		upsert = 'upsert',
-		delete = 'delete',
+		delete = 'delete'
 	}
-
 
 	export enum CreateRelationOperation {
 		connect = 'connect',
-		create = 'create',
+		create = 'create'
 	}
 
 	export interface ConnectRelationInput<E = never> {

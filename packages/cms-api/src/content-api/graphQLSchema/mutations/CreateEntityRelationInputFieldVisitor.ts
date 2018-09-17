@@ -5,8 +5,8 @@ import WhereTypeProvider from '../WhereTypeProvider'
 import { Accessor } from '../../../utils/accessor'
 import EntityInputProvider from './EntityInputProvider'
 import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
-import CreateEntityRelationAllowedOperationsVisitor from "./CreateEntityRelationAllowedOperationsVisitor";
-import { acceptFieldVisitor } from "../../../content-schema/modelUtils";
+import CreateEntityRelationAllowedOperationsVisitor from './CreateEntityRelationAllowedOperationsVisitor'
+import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
 
 export default class CreateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationVisitor<GraphQLInputObjectType | undefined> {
@@ -14,9 +14,8 @@ export default class CreateEntityRelationInputFieldVisitor
 		private readonly schema: Model.Schema,
 		private readonly whereTypeBuilder: WhereTypeProvider,
 		private readonly createEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputProvider.Type.create>>,
-		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor,
-	) {
-	}
+		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor
+	) {}
 
 	public visitColumn(): never {
 		throw new Error()
@@ -30,7 +29,12 @@ export default class CreateEntityRelationInputFieldVisitor
 	): GraphQLInputObjectType | undefined {
 		const targetName = targetRelation ? targetRelation.name : undefined
 		const fields: GraphQLInputFieldConfigMap = {}
-		const allowedOperations = acceptFieldVisitor(this.schema, entity, relation.name, this.createEntityRelationAllowedOperationsVisitor)
+		const allowedOperations = acceptFieldVisitor(
+			this.schema,
+			entity,
+			relation.name,
+			this.createEntityRelationAllowedOperationsVisitor
+		)
 
 		if (allowedOperations.includes(Input.CreateRelationOperation.connect)) {
 			fields[Input.CreateRelationOperation.connect] = {
@@ -38,7 +42,7 @@ export default class CreateEntityRelationInputFieldVisitor
 			}
 		}
 
-		const createInput = this.createEntityInputProviderAccessor.get().getInput(targetEntity.name, targetName);
+		const createInput = this.createEntityInputProviderAccessor.get().getInput(targetEntity.name, targetName)
 		if (allowedOperations.includes(Input.CreateRelationOperation.create) && createInput !== undefined) {
 			fields[Input.CreateRelationOperation.create] = {
 				type: createInput
@@ -49,7 +53,7 @@ export default class CreateEntityRelationInputFieldVisitor
 		}
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
-			fields: () => fields,
+			fields: () => fields
 		})
 	}
 }

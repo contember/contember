@@ -8,7 +8,7 @@ import RelationFetchVisitor from './RelationFetchVisitor'
 import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
-import PredicateFactory from "../../../acl/PredicateFactory";
+import PredicateFactory from '../../../acl/PredicateFactory'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
@@ -23,7 +23,7 @@ export default class SelectBuilder {
 		private readonly predicateFactory: PredicateFactory,
 		private readonly mapper: Mapper,
 		private readonly qb: QueryBuilder,
-		private readonly hydrator: SelectHydrator,
+		private readonly hydrator: SelectHydrator
 	) {
 		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
 		this.rows = this.createRowsPromise(blocker)
@@ -56,9 +56,11 @@ export default class SelectBuilder {
 			}
 			const promise = acceptFieldVisitor(this.schema, entity, field.name, {
 				visitColumn: async (entity, column) => {
-					const fieldPredicate = entity.primary === column.name ? undefined : this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
+					const fieldPredicate =
+						entity.primary === column.name
+							? undefined
+							: this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
 					this.addColumn(entity, path, column, field.alias, fieldPredicate)
-
 				},
 				visitRelation: async (entity, relation, targetEntity) => {
 					await this.addRelation(field as ObjectNode, path, entity)
@@ -72,17 +74,25 @@ export default class SelectBuilder {
 		await Promise.all(Object.values(promises))
 	}
 
-	private addColumn(entity: Model.Entity, path: Path, column: Model.AnyColumn, alias: string, predicate?: Input.Where): void {
+	private addColumn(
+		entity: Model.Entity,
+		path: Path,
+		column: Model.AnyColumn,
+		alias: string,
+		predicate?: Input.Where
+	): void {
 		const columnPath = path.for(alias)
 		const tableAlias = path.getAlias()
 		const columnAlias = columnPath.getAlias()
 
 		if (predicate) {
-			this.qb.select(expr => expr.selectCondition(condition => {
-					this.whereBuilder.buildInternal(this.qb, condition, entity, path, predicate)
-
-				}
-			), columnAlias + SelectHydrator.ColumnFlagSuffixes.readable)
+			this.qb.select(
+				expr =>
+					expr.selectCondition(condition => {
+						this.whereBuilder.buildInternal(this.qb, condition, entity, path, predicate)
+					}),
+				columnAlias + SelectHydrator.ColumnFlagSuffixes.readable
+			)
 		}
 
 		this.hydrator.addColumn(columnPath)

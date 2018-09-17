@@ -74,12 +74,12 @@ describe('Queries with acl', () => {
 								{
 									root_id: testUuid(1),
 									root_title: 'foo',
-									root_title__readable: false,
+									root_title__readable: false
 								},
 								{
 									root_id: testUuid(2),
 									root_title: 'bar',
-									root_title__readable: true,
+									root_title__readable: true
 								}
 							]
 						}
@@ -93,18 +93,18 @@ describe('Queries with acl', () => {
 								title: null,
 								_meta: {
 									title: {
-										readable: false,
-									},
-								},
+										readable: false
+									}
+								}
 							},
 							{
 								id: testUuid(2),
 								title: 'bar',
 								_meta: {
 									title: {
-										readable: true,
-									},
-								},
+										readable: true
+									}
+								}
 							}
 						]
 					}
@@ -140,7 +140,7 @@ describe('Queries with acl', () => {
 								{
 									root_id: testUuid(1),
 									root_title: 'foo',
-									root_title__readable: true,
+									root_title__readable: true
 								}
 							]
 						}
@@ -279,13 +279,13 @@ describe('Queries with acl', () => {
 									__grouping_key: testUuid(1),
 									root_id: testUuid(3),
 									root_title: 'foo',
-									root_title__readable: false,
+									root_title__readable: false
 								},
 								{
 									__grouping_key: testUuid(2),
 									root_id: testUuid(4),
 									root_title: 'bar',
-									root_title__readable: true,
+									root_title__readable: true
 								}
 							]
 						}
@@ -298,7 +298,7 @@ describe('Queries with acl', () => {
 								locales: [
 									{
 										id: testUuid(3),
-										title: null,
+										title: null
 									}
 								]
 							},
@@ -417,7 +417,7 @@ describe('Queries with acl', () => {
 								{
 									root_id: testUuid(3),
 									root_name: 'John',
-									root_name__readable: true,
+									root_name__readable: true
 								}
 							]
 						}

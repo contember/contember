@@ -60,7 +60,7 @@ export default class QueryGenerator {
 			if (entityWhere) {
 				listQueryBuilder = listQueryBuilder.where({
 					and: [entityWhere, subTree.root.where]
-				} as Input.Where<GraphQlBuilder.Literal>) // TODO: This is necessary for the time being because TS…
+				} as Input.Where<GraphQlBuilder.Literal>) // TODO: This cast is necessary for the time being because TS…
 			} else {
 				listQueryBuilder = listQueryBuilder.where(subTree.constraints.where)
 			}
@@ -112,7 +112,7 @@ export default class QueryGenerator {
 			}
 		}
 
-		// Ideally, this would have been a `return`, not a `yield`, and the return type should have been something slightly
+		// Ideally, this would have been a `return`, not a `yield`, and the return type would have been something slightly
 		// different. Unfortunately, https://github.com/Microsoft/TypeScript/issues/2983 prevents this but it's not too big
 		// of a deal.
 		yield builder

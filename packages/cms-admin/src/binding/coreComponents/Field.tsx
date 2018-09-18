@@ -3,7 +3,10 @@ import { FieldName } from '../bindingTypes'
 import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor from '../dao/EntityAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
+import FieldMarker from '../dao/FieldMarker'
 import DataContext, { DataContextValue } from './DataContext'
+import { FieldMarkerProvider } from './DataMarkerProvider'
+import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 export interface FieldProps {
 	name: FieldName
@@ -11,6 +14,8 @@ export interface FieldProps {
 }
 
 export default class Field extends React.Component<FieldProps> {
+	public static displayName = 'Field'
+
 	public render() {
 		return (
 			<DataContext.Consumer>
@@ -27,4 +32,10 @@ export default class Field extends React.Component<FieldProps> {
 			</DataContext.Consumer>
 		)
 	}
+
+	public static generateFieldMarker(props: FieldProps): FieldMarker {
+		return new FieldMarker(props.name)
+	}
 }
+
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof Field, FieldMarkerProvider>

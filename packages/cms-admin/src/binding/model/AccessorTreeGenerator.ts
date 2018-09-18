@@ -1,34 +1,46 @@
 import { FieldName } from '../bindingTypes'
 import { DataContextValue } from '../coreComponents/DataContext'
+import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import EntityAccessor, { EntityData, FieldData } from '../dao/EntityAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import FieldAccessor from '../dao/FieldAccessor'
+import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 
 export default class AccessorTreeGenerator {
 	private static PRIMARY_KEY_NAME = 'id'
 
-	public constructor(private marker: EntityMarker, private initialData: any) {}
+	public constructor(private tree: MarkerTreeRoot, private allInitialData: any) {}
 
-	public generateLiveTree(updateData: (newData: DataContextValue | DataContextValue[]) => void) {
-		const data = this.initialData[this.marker.entityName]
+	public generateLiveTree(updateData: (newData?: AccessorTreeRoot) => void): void {
+		let data: any = this.allInitialData[this.tree.id]
 
-		let entityAccessor: EntityAccessor | null = this.updateFields(data, this.marker, (fieldName, newData) => {
-			entityAccessor = entityAccessor!.withUpdatedField(fieldName, newData)
+		if (!data) {
+			return
+		}
 
-			updateData(entityAccessor)
-		})
+		if (!Array.isArray(data)) {
+			data = [data]
+		}
 
-		updateData(entityAccessor || undefined)
+		const entityAccessors: Array<EntityAccessor> = (data as any[]).map((datum, i) => this.updateFields(
+			datum, this.tree.root, (fieldName, newData) => {
+				entityAccessors[i] = entityAccessors[i].withUpdatedField(fieldName, newData)
+
+				updateData(AccessorTreeRoot.createInstance(this.tree, entityAccessors))
+			}
+		))
+		updateData(AccessorTreeRoot.createInstance(this.tree, entityAccessors))
 	}
 
 	private updateFields(
-		data: any,
+		data: {
+			[fieldName: string]: any
+		},
 		marker: EntityMarker,
 		onUpdate: (updatedField: FieldName, updatedData: FieldData) => void,
 		onUnlink?: () => void
-	): EntityAccessor | null {
+	): EntityAccessor {
 		const entityData: EntityData = {}
-		if (!data) return null
 		const id = data[AccessorTreeGenerator.PRIMARY_KEY_NAME]
 		const fields = marker.fields
 

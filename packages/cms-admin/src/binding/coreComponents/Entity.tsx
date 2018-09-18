@@ -8,7 +8,6 @@ import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 export interface EntityProps {
 	name: EntityName
-	loadingOverlay?: React.ComponentClass
 	where?: Input.Where<GraphQlBuilder.Literal>
 }
 

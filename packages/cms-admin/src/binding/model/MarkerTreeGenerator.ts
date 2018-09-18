@@ -71,6 +71,10 @@ export default class MarkerTreeGenerator {
 				// React.Component
 				const dataMarker = node.type as DataMarkerProvider & (React.ComponentClass<any> | React.SFC<any>)
 
+				if ('generateSyntheticChildren' in dataMarker && dataMarker.generateSyntheticChildren) {
+					children = dataMarker.generateSyntheticChildren(node.props)
+				}
+
 				if ('generateFieldMarker' in dataMarker && dataMarker.generateFieldMarker) {
 					return dataMarker.generateFieldMarker(node.props)
 				}

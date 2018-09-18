@@ -1,3 +1,4 @@
+import * as React from 'react'
 import EntityMarker, { EntityFields } from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
@@ -27,12 +28,17 @@ export interface ReferenceMarkerProvider extends DataBindingComponent {
 	generateReferenceMarker: (props: any, referredEntity: ReferenceMarker['reference']) => ReferenceMarker
 }
 
+export interface SyntheticChildrenProvider extends DataBindingComponent {
+	generateSyntheticChildren: (props: any) => React.ReactNode
+}
+
 type DataMarkerProvider = Partial<
 	| EntityMarkerProvider
 	| FieldMarkerProvider
 	| MarkerTreeRootProvider
 	| MultipleFieldMarkerProvider
 	| ReferenceMarkerProvider
+	| SyntheticChildrenProvider
 > &
 	DataBindingComponent
 

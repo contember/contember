@@ -148,7 +148,7 @@ export default class MarkerTreeGenerator {
 			} else if (marker instanceof ReferenceMarker) {
 				fields[marker.name] = marker.reference
 			} else if (marker instanceof MarkerTreeRoot) {
-				fields[`__root_${marker.id}`] = marker
+				fields[marker.placeholderName] = marker
 			} else {
 				throw new DataBindingError(
 					'Detected a sub-entity directly within another one. Use a <Repeater /> or a similar component for relations.'

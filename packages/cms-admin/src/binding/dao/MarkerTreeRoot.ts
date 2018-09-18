@@ -28,6 +28,10 @@ export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTree
 		return () => `treeRoot${(id++).toFixed(0)}`
 	})()
 
+	public get placeholderName(): string {
+		return `__root_${this.id}`
+	}
+
 	public static createInstance(rootMarker: MarkerTreeRoot['root'], constraints: MarkerTreeRoot['constraints']): MarkerTreeRoot {
 		return new MarkerTreeRoot(MarkerTreeRoot.getNewTreeId(), rootMarker, constraints)
 	}

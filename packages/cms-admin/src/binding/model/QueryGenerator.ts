@@ -46,7 +46,7 @@ export default class QueryGenerator {
 			this.registerListQueryPart(subTree.root, listQueryBuilder)
 		)
 
-		return baseQueryBuilder.get(subTree.root.entityName, listQueryBuilder, this.tree.id)
+		return baseQueryBuilder.get(subTree.root.entityName, listQueryBuilder, subTree.id)
 	}
 
 	private addListQuery(
@@ -59,7 +59,7 @@ export default class QueryGenerator {
 		if (subTree.constraints.where) {
 			if (entityWhere) {
 				listQueryBuilder = listQueryBuilder.where({
-					and: [entityWhere, this.tree.root.where]
+					and: [entityWhere, subTree.root.where]
 				} as Input.Where<GraphQlBuilder.Literal>) // TODO: This is necessary for the time being because TS…
 			} else {
 				listQueryBuilder = listQueryBuilder.where(subTree.constraints.where)
@@ -74,7 +74,7 @@ export default class QueryGenerator {
 		)
 
 		// This naming convention is unfortunate & temporary
-		return baseQueryBuilder.list(`${this.tree.root.entityName}s`, listQueryBuilder, subTree.id)
+		return baseQueryBuilder.list(`${subTree.root.entityName}s`, listQueryBuilder, subTree.id)
 	}
 
 	private *registerListQueryPart(
@@ -98,7 +98,7 @@ export default class QueryGenerator {
 
 					for (const item of this.registerListQueryPart(fieldValue, subBuilder)) {
 						if (item instanceof CrudQueryBuilder.ListQueryBuilder) {
-							// This branch will only get executed at most once per
+							// This branch will only get executed at most once per recursive call
 							subBuilder = new CrudQueryBuilder.ListQueryBuilder(item.objectBuilder)
 						} else {
 							yield item

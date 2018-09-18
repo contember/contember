@@ -52,6 +52,12 @@ export default class AccessorTreeGenerator {
 			const fieldData: any = data[fieldName]
 			const field = fields[fieldName]
 
+			if (field instanceof MarkerTreeRoot) {
+				entityData[fieldName] = this.updateFields(this.allInitialData[field.id], field.root, () => undefined)
+				continue
+			}
+
+
 			if (Array.isArray(fieldData)) {
 				if (field instanceof EntityMarker) {
 					const oneToManyData: DataContextValue[] = []

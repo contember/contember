@@ -101,7 +101,7 @@ describe('update', () => {
 							from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'John'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 
 						{
@@ -282,7 +282,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'John'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -382,7 +382,8 @@ describe('update', () => {
               where "id" in (select "root_"."id"
                              from "author" as "root_"
                              where "root_"."id" = $1)`,
-							parameters: [testUuid(1)]
+							parameters: [testUuid(1)],
+							response: 1,
 						},
 						selectUpdatePostSql
 					])
@@ -449,7 +450,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Hello', 'cs', testUuid(2)],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						selectUpdatePostSql
 					])
@@ -538,7 +539,8 @@ describe('update', () => {
                  "root_"."locale",
                  "root_"."post_id"
                from "post_locale" as "root_"
-               where "root_"."locale" = $2 and "root_"."post_id" = $3) update "post_locale"
+               where "root_"."locale" = $2 and "root_"."post_id" = $3) 
+							update "post_locale"
               set "title" = "newData_"."title" from "newData_"
               where "post_locale"."locale" = $4 and "post_locale"."post_id" = $5`,
 							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)]
@@ -583,7 +585,8 @@ describe('update', () => {
 							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
               from "root_"
 							returning "id"`,
-							parameters: [testUuid(1), 'World', 'cs', testUuid(2)]
+							parameters: [testUuid(1), 'World', 'cs', testUuid(2)],
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						selectUpdatePostSql
 					])
@@ -616,7 +619,8 @@ describe('update', () => {
               where "id" in (select "root_"."id"
                              from "post_locale" as "root_"
                              where "root_"."locale" = $1 and "root_"."post_id" = $2)`,
-							parameters: ['cs', testUuid(2)]
+							parameters: ['cs', testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql
 					])
@@ -750,7 +754,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'http://mangoweb.cz'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1029,7 +1033,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'http://mgw.cz'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1131,7 +1135,8 @@ describe('update', () => {
               where "id" in (select "root_"."id"
                              from "site_setting" as "root_"
                              where "root_"."id" = $1)`,
-							parameters: [testUuid(1)]
+							parameters: [testUuid(1)],
+							response: 1,
 						},
 						selectUpdateSiteSql
 					])
@@ -1196,7 +1201,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						selectUpdateSiteSettingSql
 					])
@@ -1239,7 +1244,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						selectUpdateSiteSettingSql
 					])
@@ -1372,7 +1377,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mgw', testUuid(2)],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						selectUpdateSiteSettingSql
 					])
@@ -1450,7 +1455,8 @@ describe('update', () => {
               where "id" in (select "root_"."id"
                              from "site" as "root_"
                              where "root_"."setting_id" = $1)`,
-							parameters: [testUuid(2)]
+							parameters: [testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSettingSql
 					])
@@ -1625,14 +1631,10 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "post_categories"
-              ("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)]
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1668,17 +1670,13 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]}
 						},
 						{
-							sql: SQL`insert into "post_categories"
-              ("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)]
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1708,14 +1706,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`delete from "post_categories"
-              where "post_id" in
-                    (select "root_"."id"
-                     from "post" as "root_"
-                     where "root_"."id" = $1)
-                    and "category_id" in
-                        (select "root_"."id"
-                         from "category" as "root_"
-                         where "root_"."id" = $2)`,
+              where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(2), testUuid(1)]
 						},
 						{
@@ -1723,7 +1714,8 @@ describe('update', () => {
               where "id" in (select "root_"."id"
                              from "category" as "root_"
                              where "root_"."id" = $1)`,
-							parameters: [testUuid(1)]
+							parameters: [testUuid(1)],
+							response: 1,
 						},
 						selectUpdatePostSql
 					])
@@ -1753,14 +1745,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`delete from "post_categories"
-              where "post_id" in
-                    (select "root_"."id"
-                     from "post" as "root_"
-                     where "root_"."id" = $1)
-                    and "category_id" in
-                        (select "root_"."id"
-                         from "category" as "root_"
-                         where "root_"."id" = $2)`,
+              where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(2), testUuid(1)]
 						},
 						selectUpdatePostSql
@@ -1801,14 +1786,10 @@ describe('update', () => {
 							parameters: ['Lorem', testUuid(1), testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories"
-              ("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)]
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1851,14 +1832,10 @@ describe('update', () => {
 							response: 1
 						},
 						{
-							sql: SQL`insert into "post_categories" 
-							("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)]
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1908,17 +1885,13 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						{
-							sql: SQL`insert into "post_categories" 
-							("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1)]
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						selectUpdatePostSql
 					])
@@ -1957,14 +1930,10 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "post_categories" 
-							("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id") 
+							values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)]
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -2000,17 +1969,13 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]}
 						},
 						{
-							sql: SQL`insert into "post_categories" 
-							("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)]
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -2040,14 +2005,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`delete from "post_categories"
-              where "post_id" in
-                    (select "root_"."id"
-                     from "post" as "root_"
-                     where "root_"."id" = $1)
-                    and "category_id" in
-                        (select "root_"."id"
-                         from "category" as "root_"
-                         where "root_"."id" = $2)`,
+              where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
 						},
 						{
@@ -2055,7 +2013,8 @@ describe('update', () => {
               where "id" in (select "root_"."id"
                              from "post" as "root_"
                              where "root_"."id" = $1)`,
-							parameters: [testUuid(1)]
+							parameters: [testUuid(1)],
+							response: 1,
 						},
 						selectUpdateCategorySql
 					])
@@ -2085,14 +2044,7 @@ describe('update', () => {
 					...sqlTransaction([
 						{
 							sql: SQL`delete from "post_categories"
-              where "post_id" in
-                    (select "root_"."id"
-                     from "post" as "root_"
-                     where "root_"."id" = $1)
-                    and "category_id" in
-                        (select "root_"."id"
-                         from "category" as "root_"
-                         where "root_"."id" = $2)`,
+              where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(1), testUuid(2)]
 						},
 						selectUpdateCategorySql
@@ -2133,14 +2085,10 @@ describe('update', () => {
 							parameters: ['Lorem', testUuid(1), testUuid(1)]
 						},
 						{
-							sql: SQL`insert into "post_categories"
-              ("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)]
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -2183,14 +2131,10 @@ describe('update', () => {
 							response: 1
 						},
 						{
-							sql: SQL`insert into "post_categories"
-              ("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)]
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -2240,17 +2184,13 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
-							response: [testUuid(1)]
+							response: {rows: [{id: testUuid(1)}]},
 						},
 						{
-							sql: SQL`insert into "post_categories"
-              ("post_id", "category_id")
-                select
-                  $1,
-                  $2
-                from (values (null)) as "t"
+							sql: SQL`insert into "post_categories" ("category_id", "post_id")
+              values ($1, $2)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2)]
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						selectUpdateCategorySql
 					])
@@ -2389,38 +2329,67 @@ describe('update', () => {
 				}`,
 				executes: sqlTransaction([
 					{
-						sql: SQL`delete from "post_categories"
-            where "post_id" in
-                  (select "root_"."id"
-                   from "post" as "root_"
-                   where "root_"."id" = $1 and "root_"."name" in ($2, $3))
-                  and "category_id" in
-                      (select "root_"."id"
-                       from "category" as "root_"
-                       where "root_"."id" = $4 and
-                             "root_"."name" in ($5, $6))`,
-						parameters: [testUuid(1), 'Lorem ipsum', 'Dolor sit', testUuid(3), 'foo', 'bar']
-					},
-					{
-						sql: SQL`insert into
-              "post_categories" ("post_id", "category_id")
-              select
-                $1,
-                $2
-              from (values (null)) as "t" inner join "post" as "owning" on "owning"."id" = $3
-                inner join "category" as "inversed" on "inversed"."id" = $4
-              where "owning"."name" in ($5, $6) and "inversed"."name" in ($7, $8)
-            on conflict do nothing`,
+						sql: SQL`with "data" as
+            (select
+               "owning"."id" as "post_id",
+               "inversed"."id" as "category_id",
+               true as "selected"
+             from (values (null)) as "t" inner join "post" as "owning" on true
+               inner join "category" as "inversed" on true
+             where "owning"."name" in ($1, $2) and "owning"."id" = $3 and "inversed"."name" in ($4, $5) and
+                   "inversed"."id" = $6), 
+								"insert" as
+              (insert into "post_categories" ("post_id", "category_id")
+                select
+                  "data"."post_id",
+                  "data"."category_id"
+                from "data"
+              on conflict do nothing
+              returning true as inserted)
+            select
+              coalesce(data.selected, false) as "selected",
+              coalesce(insert.inserted, false) as "inserted"
+            from (values (null)) as "t" left join "data" as "data" on true
+              left join "insert" as "insert" on true`,
 						parameters: [
-							testUuid(1),
-							testUuid(2),
-							testUuid(1),
-							testUuid(2),
 							'Lorem ipsum',
 							'Dolor sit',
+							testUuid(1),
 							'foo',
-							'bar'
-						]
+							'bar',
+							testUuid(2),
+						],
+						response: [{selected: true, inserted: true}],
+					},
+					{
+						sql: SQL`with "data" as
+            (select
+               "owning"."id" as "post_id",
+               "inversed"."id" as "category_id",
+               true as "selected"
+             from (values (null)) as "t" inner join "post" as "owning" on true
+               inner join "category" as "inversed" on true
+             where "owning"."name" in ($1, $2) and "owning"."id" = $3 and "inversed"."name" in ($4, $5) and
+                   "inversed"."id" = $6),
+                "delete" as
+              (delete from "post_categories"
+              using "data" as "data"
+              where "post_categories"."post_id" = "data"."post_id" and "post_categories"."category_id" = "data"."category_id"
+              returning true as deleted)
+            select
+              coalesce(data.selected, false) as "selected",
+              coalesce(delete.deleted, false) as "deleted"
+            from (values (null)) as "t" left join "data" as "data" on true
+              left join "delete" as "delete" on true`,
+						parameters: [
+							'Lorem ipsum',
+							'Dolor sit',
+							testUuid(1),
+							'foo',
+							'bar',
+							testUuid(3),
+						],
+						response: [{selected: true, deleted: true}],
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"

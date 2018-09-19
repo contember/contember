@@ -6,6 +6,7 @@ import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import { getColumnName, getColumnType } from '../../../content-schema/modelUtils'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
+import Mapper from "../Mapper";
 
 type ColumnValue = {
 	value: PromiseLike<Input.ColumnValue>
@@ -72,6 +73,9 @@ export default class InsertBuilder {
 			.returning(this.entity.primaryColumn)
 
 		const returning = await qb.execute()
+		if (returning === null) {
+			throw new Mapper.NoResultError()
+		}
 
 		return returning[0]
 	}

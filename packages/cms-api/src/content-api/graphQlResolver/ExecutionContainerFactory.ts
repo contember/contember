@@ -15,6 +15,7 @@ import UniqueWhereExpander from './UniqueWhereExpander'
 import MapperRunner from '../sql/MapperRunner'
 import ReadResolver from './ReadResolver'
 import MutationResolver from './MutationResolver'
+import JunctionTableManager from "../sql/JunctionTableManager";
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Model.Schema, private readonly permissions: Acl.Permissions) {}
@@ -43,6 +44,17 @@ class ExecutionContainerFactory {
 			.addService('updateBuilderFactory', ({ whereBuilder }) => new UpdateBuilderFactory(this.schema, whereBuilder))
 			.addService('uniqueWhereExpander', () => new UniqueWhereExpander(this.schema))
 
+			.addService('connectJunctionHandler', ({}) => new JunctionTableManager.JunctionConnectHandler())
+			.addService('disconnectJunctionHandler', ({}) => new JunctionTableManager.JunctionDisconnectHandler())
+			.addService('junctionTableManager', (
+				{
+					uniqueWhereExpander,
+					predicateFactory,
+					whereBuilder,
+					connectJunctionHandler,
+					disconnectJunctionHandler,
+				}) => new JunctionTableManager(this.schema, predicateFactory, uniqueWhereExpander, whereBuilder, connectJunctionHandler, disconnectJunctionHandler))
+
 			.addService(
 				'mapperFactory',
 				({
@@ -52,7 +64,8 @@ class ExecutionContainerFactory {
 					insertBuilderFactory,
 					updateBuilderFactory,
 					uniqueWhereExpander,
-					whereBuilder
+					whereBuilder,
+					junctionTableManager,
 				}) =>
 					new MapperFactory(
 						this.schema,
@@ -62,7 +75,8 @@ class ExecutionContainerFactory {
 						insertBuilderFactory,
 						updateBuilderFactory,
 						uniqueWhereExpander,
-						whereBuilder
+						whereBuilder,
+						junctionTableManager,
 					)
 			)
 			.addService('mapperRunner', ({ mapperFactory }) => new MapperRunner(context.db.wrapper(), mapperFactory))

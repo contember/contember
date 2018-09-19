@@ -27,7 +27,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'John'],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]},
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
@@ -89,7 +89,7 @@ describe('Insert mutation', () => {
 						where "root_"."name" in ($3, $4)
 						returning "id"`,
 						parameters: [testUuid(1), 'John', 'John', 'Jack'],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]},
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
@@ -136,7 +136,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'https://mangoweb.cz'],
-						response: [testUuid(2)]
+						response: {rows: [{id: testUuid(2)}]},
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -146,7 +146,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]},
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
@@ -193,7 +193,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'https://mangoweb.cz'],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]},
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -203,7 +203,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'Mangoweb', testUuid(1)],
-						response: [testUuid(2)]
+						response: {rows: [{id: testUuid(2)}]},
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
@@ -252,7 +252,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'John'],
-						response: [testUuid(2)]
+						response: {rows: [{id: testUuid(2)}]},
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -262,14 +262,14 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), '2018-06-11', testUuid(2)],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]},
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_id: testUuid(1) }],
-						parameters: [testUuid(1)]
+						parameters: [testUuid(1)],
 					}
 				])
 			],
@@ -321,7 +321,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), '2018-06-11'],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]},
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -331,7 +331,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), testUuid(2), 'cs', 'Ahoj svete'],
-						response: [testUuid(2)]
+						response: {rows: [{id: testUuid(2)}]},
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -341,7 +341,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), testUuid(3), 'en', 'Hello world'],
-						response: [testUuid(3)]
+						response: {rows: [{id: testUuid(3)}]},
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
@@ -387,7 +387,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'Hello world'],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]},
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -397,7 +397,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'Category 1'],
-						response: [testUuid(2)]
+						response: {rows: [{id: testUuid(2)}]},
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -407,7 +407,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(3), 'Category 2'],
-						response: [testUuid(3)]
+						response: {rows: [{id: testUuid(3)}]},
 					},
 					{
 						sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -467,7 +467,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'Hello world'],
-						response: [testUuid(1)]
+						response: {rows: [{id: testUuid(1)}]}
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -477,7 +477,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'Post 1'],
-						response: [testUuid(2)]
+						response: {rows: [{id: testUuid(2)}]}
 					},
 					{
 						sql: SQL`with "root_" as 
@@ -487,7 +487,7 @@ describe('Insert mutation', () => {
             from "root_"
 						returning "id"`,
 						parameters: [testUuid(3), 'Post 2'],
-						response: [testUuid(3)]
+						response: {rows: [{id: testUuid(3)}]}
 					},
 					{
 						sql: SQL`insert into "post_categories" ("category_id", "post_id")

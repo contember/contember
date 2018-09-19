@@ -1,6 +1,6 @@
 import { Acl, Input, Model } from 'cms-common'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
-import { acceptEveryFieldVisitor, getColumnName, getEntity, getTargetEntity } from '../../content-schema/modelUtils'
+import { acceptEveryFieldVisitor, getColumnName } from '../../content-schema/modelUtils'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
@@ -15,9 +15,9 @@ import UpdateBuilderFactory from './update/UpdateBuilderFactory'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
-import InsertBuilder from '../../core/knex/InsertBuilder'
+import JunctionTableManager from "./JunctionTableManager";
 
-export default class Mapper {
+class Mapper {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly db: KnexWrapper,
@@ -27,8 +27,10 @@ export default class Mapper {
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
-		private readonly whereBuilder: WhereBuilder
-	) {}
+		private readonly whereBuilder: WhereBuilder,
+		private readonly junctionTableManager: JunctionTableManager,
+	) {
+	}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
@@ -109,7 +111,9 @@ export default class Mapper {
 
 		const result = await insertBuilder.execute()
 
+
 		await Promise.all(Object.values(promises).filter(it => !!it))
+
 
 		return result
 	}
@@ -135,10 +139,16 @@ export default class Mapper {
 
 		await Promise.all(Object.values(promises).filter(it => !!it))
 
-		return await executeResult
+		const affectedRows = await executeResult
+
+		if (affectedRows === 0) {
+			throw new Mapper.NoResultError()
+		}
+
+		return affectedRows || 0
 	}
 
-	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<number> {
+	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
 		const qb = this.db.queryBuilder()
 		qb.from(entity.tableName)
 		qb.where(condition =>
@@ -147,11 +157,15 @@ export default class Mapper {
 				qb.select(['root_', entity.primaryColumn])
 				const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 				const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-				this.whereBuilder.build(qb, entity, new Path([]), { and: [uniqueWhere, predicate] })
+				this.whereBuilder.build(qb, entity, new Path([]), {and: [uniqueWhere, predicate]})
 			})
 		)
 
-		return await qb.delete()
+		const affectedRows = await qb.delete()
+
+		if (affectedRows !== 1) {
+			throw new Mapper.NoResultError()
+		}
 	}
 
 	public async connectJunction(
@@ -159,50 +173,8 @@ export default class Mapper {
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
-	) {
-		const joiningTable = relation.joiningTable
-		const primaryValue = await this.getPrimaryValue(owningEntity, ownerUnique)
-		const inversedPrimaryValue = await this.getPrimaryValue(getEntity(this.schema, relation.target), inversedUnique)
-		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
-		let inversePredicate: Input.Where = {}
-		let inversedEntity: Model.Entity | null = null
-		if (relation.inversedBy) {
-			inversedEntity = getTargetEntity(this.schema, owningEntity, relation.name)
-			if (!inversedEntity) {
-				throw new Error()
-			}
-			inversePredicate = this.predicateFactory.create(inversedEntity, Acl.Operation.update, [relation.inversedBy])
-		}
-
-		const qb = this.db
-			.insertBuilder()
-			.into(joiningTable.tableName)
-			.values({
-				[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(primaryValue),
-				[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimaryValue)
-			})
-			.from(qb => {
-				qb.from(qb.raw('(values (null))'), 't')
-
-				if (Object.keys(owningPredicate).length > 0) {
-					const owningPath = new Path([], 'owning')
-					qb.join(owningEntity.tableName, 'owning', condition =>
-						condition.compare(['owning', owningEntity.primaryColumn], '=', primaryValue)
-					)
-					this.whereBuilder.build(qb, owningEntity, owningPath, owningPredicate)
-				}
-				if (inversedEntity && Object.keys(inversePredicate).length > 0) {
-					const inversedEntityConst = inversedEntity
-					const inversedPath = new Path([], 'inversed')
-					qb.join(inversedEntity.tableName, 'inversed', condition =>
-						condition.compare(['inversed', inversedEntityConst.primaryColumn], '=', inversedPrimaryValue)
-					)
-					this.whereBuilder.build(qb, inversedEntity, inversedPath, inversePredicate)
-				}
-			})
-			.onConflict(InsertBuilder.ConflictActionType.doNothing)
-
-		return await qb.execute()
+	): Promise<void> {
+		await this.junctionTableManager.connectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
 	public async disconnectJunction(
@@ -210,41 +182,8 @@ export default class Mapper {
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
-	) {
-		const joiningTable = relation.joiningTable
-		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
-		const targetEntity = getEntity(this.schema, relation.target)
-		if (!targetEntity) {
-			throw new Error()
-		}
-		let inversePredicate: Input.Where = {}
-		if (relation.inversedBy) {
-			inversePredicate = this.predicateFactory.create(targetEntity, Acl.Operation.update, [relation.inversedBy])
-		}
-
-		const qb = this.db.queryBuilder()
-		qb.table(joiningTable.tableName)
-		qb.where(cond =>
-			cond.in(joiningTable.joiningColumn.columnName, qb => {
-				qb.select(['root_', owningEntity.primaryColumn])
-				qb.from(owningEntity.tableName, 'root_')
-				this.whereBuilder.build(qb, owningEntity, new Path([]), {
-					and: [this.uniqueWhereExpander.expand(owningEntity, ownerUnique), owningPredicate]
-				})
-			})
-		)
-		qb.where(cond =>
-			cond.in(joiningTable.inverseJoiningColumn.columnName, qb => {
-				qb.from(targetEntity.tableName, 'root_')
-				qb.select(['root_', targetEntity.primaryColumn])
-
-				this.whereBuilder.build(qb, targetEntity, new Path([]), {
-					and: [this.uniqueWhereExpander.expand(targetEntity, inversedUnique), inversePredicate]
-				})
-			})
-		)
-
-		return await qb.delete()
+	): Promise<void> {
+		await this.junctionTableManager.disconnectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
 	public async fetchJunction(
@@ -301,3 +240,10 @@ export default class Mapper {
 		}
 	}
 }
+
+namespace Mapper {
+	export class NoResultError extends Error {
+	}
+}
+
+export default Mapper

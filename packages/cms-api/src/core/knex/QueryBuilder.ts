@@ -19,8 +19,12 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return this.wrapper.formatter(this.qb)
 	}
 
-	public with(alias: string, callback: QueryBuilder.Callback): void {
-		this.qb.with(alias, qb => callback(new QueryBuilder(this.wrapper, qb)))
+	public with(alias: string, select: QueryBuilder.Callback | Knex.Raw): void {
+		if (typeof select === 'function') {
+			this.qb.with(alias, qb => select(new QueryBuilder(this.wrapper, qb)))
+		} else {
+			this.qb.with(alias, select)
+		}
 	}
 
 	public from(tableName: string | Knex.Raw, alias?: string): void {
@@ -59,7 +63,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	public where(whereCondition: QueryBuilder.ConditionCallback): void
 	public where(where: (QueryBuilder.ConditionCallback) | { [columName: string]: Value }): void {
 		if (typeof where === 'function') {
-			const builder = new ConditionBuilder.ConditionStringBuilder(this)
+			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
 			where(builder, this)
 			const sql = builder.getSql()
 			if (sql) {
@@ -86,8 +90,8 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return await this.qb
 	}
 
-	public async delete(): Promise<number> {
-		return await this.qb.delete()
+	public async delete(returning?: string | Knex.Raw): Promise<number> {
+		return await this.qb.delete(returning as string)
 	}
 
 	public async update(data: { [column: string]: Value }): Promise<AffectedRows> {
@@ -142,7 +146,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	): [string, Knex.Raw] {
 		let raw: Knex.Raw | null = null
 		if (joinCondition) {
-			const builder = new ConditionBuilder.ConditionStringBuilder(this)
+			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
 			joinCondition(builder)
 			raw = builder.getSql()
 		}
@@ -194,7 +198,7 @@ namespace QueryBuilder {
 		}
 
 		public selectCondition(condition: ConditionCallback): Knex.Raw | undefined {
-			const builder = new ConditionBuilder.ConditionStringBuilder(this.qb)
+			const builder = new ConditionBuilder.ConditionStringBuilder(this.qb.wrapper)
 			condition(builder, this.qb)
 			return builder.getSql() || undefined
 		}

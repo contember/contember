@@ -10,9 +10,10 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		private readonly cte: { [alias: string]: QueryBuilder.Callback },
 		private readonly columns: InsertBuilder.Values | undefined,
 		private readonly conflictAction: InsertBuilder.ConflictAction | undefined,
-		private readonly returningColumn: string | undefined,
+		private readonly returningColumn: string | Knex.Raw | undefined,
 		private readonly insertFrom: QueryBuilder.Callback | undefined
-	) {}
+	) {
+	}
 
 	public static create(wrapper: KnexWrapper): InsertBuilder.NewInsertBuilder {
 		return new InsertBuilder(
@@ -30,7 +31,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		return new InsertBuilder<Result, Filled>(
 			this.wrapper,
 			this.intoTable,
-			{ ...this.cte, [alias]: callback },
+			{...this.cte, [alias]: callback},
 			this.columns,
 			this.conflictAction,
 			this.returningColumn,
@@ -85,7 +86,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
-	public returning(column: string): InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled> {
+	public returning(column: string | Knex.Raw): InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled> {
 		return new InsertBuilder<InsertBuilder.Returning[], Filled>(
 			this.wrapper,
 			this.intoTable,
@@ -109,7 +110,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
-	public async execute(): Promise<Result> {
+	public createQuery(): Knex.Raw {
 		const columns = this.columns
 		const into = this.intoTable
 
@@ -161,11 +162,16 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			bindings.push(this.returningColumn)
 		}
 
-		const result: QueryResult = await this.wrapper.raw(sql, ...qbSql.bindings)
+		return this.wrapper.raw(sql, ...qbSql.bindings)
+	}
+
+	public async execute(): Promise<Result> {
+
+		const result: QueryResult = await this.createQuery()
 
 		const returningColumn = this.returningColumn
 		if (returningColumn) {
-			return result.rows.map(it => it[returningColumn]) as Result
+			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]): result) as Result
 		} else {
 			return result.rowCount as Result
 		}
@@ -182,7 +188,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 				}
 			)
 			.filter((it): it is [string, Knex.Raw] => it[1] !== undefined)
-			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
+			.reduce((result, [key, value]) => ({...result, [key]: value}), {})
 	}
 }
 
@@ -191,13 +197,11 @@ namespace InsertBuilder {
 	export type Returning = number | string
 	export type InsertResult = AffectedRows | Returning[]
 
-	export type InsertBuilderWithoutExecute<
-		Result extends InsertResult,
-		Filled extends keyof InsertBuilder<Result, Filled>
-	> = Pick<InsertBuilder<Result, Filled>, Exclude<keyof InsertBuilder<Result, Filled>, 'execute'>>
+	export type InsertBuilderWithoutExecute<Result extends InsertResult,
+		Filled extends keyof InsertBuilder<Result, Filled>> = Pick<InsertBuilder<Result, Filled>, Exclude<keyof InsertBuilder<Result, Filled>, 'execute' | 'createQuery'>>
 
 	export type InsertBuilderState<Result extends InsertResult, Filled extends keyof InsertBuilder<Result, Filled>> =
-		| 'into'
+			| 'into'
 		| 'values' extends Filled
 		? InsertBuilder<Result, Filled>
 		: InsertBuilderWithoutExecute<Result, Filled>
@@ -212,8 +216,8 @@ namespace InsertBuilder {
 	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression }
 
 	export type ConflictAction =
-		{type: ConflictActionType.doNothing}
-		| {type: ConflictActionType.update, values: Values, target: ConflictTarget}
+		{ type: ConflictActionType.doNothing }
+		| { type: ConflictActionType.update, values: Values, target: ConflictTarget }
 
 	export type IndexColumns = string[]
 	export type ConflictTarget = IndexColumns

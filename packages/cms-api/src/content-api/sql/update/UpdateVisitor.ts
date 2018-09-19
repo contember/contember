@@ -157,9 +157,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				public async update(where: Input.UniqueWhere, input: Input.UpdateDataInput) {
-					// fixme should check if relation really exists
 					await mapper.update(targetEntity, where, input)
-					// fixme it should already exist
 					await connect(where)
 				}
 

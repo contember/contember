@@ -14,7 +14,7 @@ type ColumnValue = {
 }
 
 export default class UpdateBuilder {
-	public readonly update: Promise<number>
+	public readonly update: Promise<number | null>
 	private firer: (() => void) = () => {
 		throw new Error()
 	}
@@ -35,7 +35,7 @@ export default class UpdateBuilder {
 		this.update = this.createUpdatePromise(blocker)
 	}
 
-	public async execute(): Promise<number> {
+	public async execute(): Promise<number | null> {
 		this.firer()
 		return this.update
 	}
@@ -63,7 +63,7 @@ export default class UpdateBuilder {
 			.map((it, index) => ({ ...it, value: resolvedValues[index] }))
 			.filter(it => it.value !== undefined)
 		if (Object.keys(resolvedData).length === 0) {
-			return 0
+			return null
 		}
 
 		qb.with('newData_', qb => {

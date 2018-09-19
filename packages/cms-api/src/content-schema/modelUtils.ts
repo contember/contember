@@ -2,7 +2,11 @@ import { isIt } from '../utils/type'
 import { Model } from 'cms-common'
 
 export const getEntity = (schema: Model.Schema, entityName: string): Model.Entity => {
-	return schema.entities[entityName]
+	const entity = schema.entities[entityName]
+	if (!entity) {
+		throw new Error(`Entity ${entityName} not found`)
+	}
+	return entity
 }
 
 export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldName: string) => {

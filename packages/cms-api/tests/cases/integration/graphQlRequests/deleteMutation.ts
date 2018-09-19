@@ -58,7 +58,7 @@ describe('Delete mutation', () => {
                            from "post" as "root_"
                            where "root_"."id" = $1)`,
 						parameters: [testUuid(1)],
-						response: []
+						response: 1,
 					}
 				])
 			],
@@ -122,7 +122,7 @@ describe('Delete mutation', () => {
                            from "post" as "root_"
                            where "root_"."id" = $1 and "root_"."locale" in ($2))`,
 						parameters: [testUuid(1), 'cs'],
-						response: []
+						response: 1,
 					}
 				])
 			],

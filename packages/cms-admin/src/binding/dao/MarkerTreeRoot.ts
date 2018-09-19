@@ -31,7 +31,11 @@ export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTree
 	) {}
 
 	public get placeholderName(): string {
-		return this.associatedField || `__root_${this.id}`
+		return this.associatedField ? MarkerTreeRoot.getPlaceholderName(this.associatedField) : `__root_${this.id}`
+	}
+
+	public static getPlaceholderName(associatedField: FieldName): string {
+		return `${associatedField}__data`
 	}
 
 	public static createInstance(

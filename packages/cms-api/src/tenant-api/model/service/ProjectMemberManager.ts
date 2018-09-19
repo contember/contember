@@ -15,7 +15,7 @@ class ProjectMemberManager {
 				.insert({
 					id: uuid.v4(),
 					project_id: projectId,
-					person_id: personId
+					person_id: personId,
 				})
 
 			return new ProjectMemberManager.AddProjectMemberResponseOk()

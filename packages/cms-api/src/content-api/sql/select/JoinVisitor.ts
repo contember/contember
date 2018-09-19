@@ -13,8 +13,8 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 			{
 				tableName: targetEntity.tableName,
 				sourceColumn: relation.joiningColumn.columnName,
-				targetColumn: targetEntity.primaryColumn
-			}
+				targetColumn: targetEntity.primaryColumn,
+			},
 		]
 	}
 
@@ -28,8 +28,8 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 			{
 				tableName: targetEntity.tableName,
 				sourceColumn: entity.primaryColumn,
-				targetColumn: targetRelation.joiningColumn.columnName
-			}
+				targetColumn: targetRelation.joiningColumn.columnName,
+			},
 		]
 	}
 
@@ -42,8 +42,8 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 			{
 				tableName: targetEntity.tableName,
 				sourceColumn: relation.joiningColumn.columnName,
-				targetColumn: targetEntity.primaryColumn
-			}
+				targetColumn: targetEntity.primaryColumn,
+			},
 		]
 	}
 
@@ -58,8 +58,8 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 				tableName: targetEntity.tableName,
 				sourceColumn: entity.primaryColumn,
 				targetColumn: targetRelation.joiningColumn.columnName,
-				many: true
-			}
+				many: true,
+			},
 		]
 	}
 
@@ -78,15 +78,15 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 				targetAlias: joiningAlias,
 				sourceColumn: entity.primaryColumn,
 				targetColumn: relation.joiningTable.joiningColumn.columnName,
-				many: true
+				many: true,
 			},
 			{
 				tableName: targetEntity.tableName,
 				sourceAlias: joiningAlias,
 				targetAlias: targetAlias,
 				sourceColumn: relation.joiningTable.inverseJoiningColumn.columnName,
-				targetColumn: targetEntity.primaryColumn
-			}
+				targetColumn: targetEntity.primaryColumn,
+			},
 		]
 	}
 
@@ -106,15 +106,15 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 				targetAlias: joiningAlias,
 				sourceColumn: entity.primaryColumn,
 				targetColumn: targetRelation.joiningTable.inverseJoiningColumn.columnName,
-				many: true
+				many: true,
 			},
 			{
 				tableName: targetEntity.tableName,
 				sourceAlias: joiningAlias,
 				targetAlias: targetAlias,
 				sourceColumn: targetRelation.joiningTable.joiningColumn.columnName,
-				targetColumn: targetEntity.primaryColumn
-			}
+				targetColumn: targetEntity.primaryColumn,
+			},
 		]
 	}
 }

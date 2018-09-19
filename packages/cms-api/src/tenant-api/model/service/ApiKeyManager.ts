@@ -46,7 +46,7 @@ class ApiKeyManager {
 				identity_id: identityId,
 				enabled: true,
 				expires_at: this.getExpiration(type),
-				created_at: new Date()
+				created_at: new Date(),
 			})
 
 		return token
@@ -91,7 +91,7 @@ namespace ApiKeyManager {
 	export const enum VerifyErrorCode {
 		NOT_FOUND = 'not_found',
 		DISABLED = 'disabled',
-		EXPIRED = 'expired'
+		EXPIRED = 'expired',
 	}
 }
 

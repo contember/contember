@@ -19,7 +19,7 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 		return new ColumnBuilder<O & PartialColumnOptions<'type'>>({
 			...(this.options as object),
 			type: type,
-			...typeOptions
+			...typeOptions,
 		} as O & PartialColumnOptions<'type'>)
 	}
 

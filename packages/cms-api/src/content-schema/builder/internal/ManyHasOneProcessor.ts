@@ -36,7 +36,7 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 			name: options.inversedBy,
 			ownedBy: fieldName,
 			target: entityName,
-			type: Model.RelationType.OneHasMany
+			type: Model.RelationType.OneHasMany,
 		}
 	}
 
@@ -50,8 +50,8 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 			target: options.target,
 			joiningColumn: {
 				columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
-				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict
-			}
+				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
+			},
 		}
 	}
 }

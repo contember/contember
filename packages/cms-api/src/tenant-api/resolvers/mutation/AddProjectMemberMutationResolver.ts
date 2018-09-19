@@ -17,13 +17,13 @@ export default class AddProjectMemberMutationResolver implements MutationResolve
 		if (!result.ok) {
 			return {
 				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode }))
+				errors: result.errors.map(errorCode => ({ code: errorCode })),
 			}
 		}
 
 		return {
 			ok: true,
-			errors: []
+			errors: [],
 		}
 	}
 }

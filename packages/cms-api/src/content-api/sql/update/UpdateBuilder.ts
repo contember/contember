@@ -79,7 +79,7 @@ export default class UpdateBuilder {
 					visitManyHasManyInversed: () => null,
 					visitManyHasManyOwner: () => null,
 					visitOneHasOneInversed: () => null,
-					visitOneHasMany: () => null
+					visitOneHasMany: () => null,
 				})
 			).filter((it): it is string => it !== null)
 
@@ -99,7 +99,7 @@ export default class UpdateBuilder {
 		return await qb.updateFrom(this.entity.tableName, columns, qb => {
 			qb.from('newData_')
 			this.whereBuilder.build(qb, this.entity, new Path([], this.entity.tableName), {
-				and: [this.uniqueWhere, this.oldWhere]
+				and: [this.uniqueWhere, this.oldWhere],
 			})
 			this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
 		})

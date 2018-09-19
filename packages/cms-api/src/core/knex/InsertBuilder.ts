@@ -1,7 +1,7 @@
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
 import * as Knex from 'knex'
-import { QueryResult } from "pg";
+import { QueryResult } from 'pg'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>> {
 	private constructor(
@@ -12,8 +12,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		private readonly conflictAction: InsertBuilder.ConflictAction | undefined,
 		private readonly returningColumn: string | Knex.Raw | undefined,
 		private readonly insertFrom: QueryBuilder.Callback | undefined
-	) {
-	}
+	) {}
 
 	public static create(wrapper: KnexWrapper): InsertBuilder.NewInsertBuilder {
 		return new InsertBuilder(
@@ -31,7 +30,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		return new InsertBuilder<Result, Filled>(
 			this.wrapper,
 			this.intoTable,
-			{...this.cte, [alias]: callback},
+			{ ...this.cte, [alias]: callback },
 			this.columns,
 			this.conflictAction,
 			this.returningColumn,
@@ -63,14 +62,22 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		) as InsertBuilder.InsertBuilderState<Result, Filled | 'values'>
 	}
 
-	public onConflict(type: InsertBuilder.ConflictActionType.update, target: InsertBuilder.ConflictTarget, values: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled>
+	public onConflict(
+		type: InsertBuilder.ConflictActionType.update,
+		target: InsertBuilder.ConflictTarget,
+		values: InsertBuilder.Values
+	): InsertBuilder.InsertBuilderState<Result, Filled>
 	public onConflict(type: InsertBuilder.ConflictActionType.doNothing): InsertBuilder.InsertBuilderState<Result, Filled>
-	public onConflict(type: InsertBuilder.ConflictActionType, target?: InsertBuilder.ConflictTarget, values?: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled> {
+	public onConflict(
+		type: InsertBuilder.ConflictActionType,
+		target?: InsertBuilder.ConflictTarget,
+		values?: InsertBuilder.Values
+	): InsertBuilder.InsertBuilderState<Result, Filled> {
 		let conflictAction: InsertBuilder.ConflictAction
 		if (type === InsertBuilder.ConflictActionType.update && values && target) {
-			conflictAction = {type, values, target}
+			conflictAction = { type, values, target }
 		} else if (type === InsertBuilder.ConflictActionType.doNothing) {
-			conflictAction = {type}
+			conflictAction = { type }
 		} else {
 			throw Error()
 		}
@@ -149,10 +156,13 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 					const values = this.getColumnValues(new QueryBuilder(this.wrapper, qb), this.conflictAction.values)
 					const updateExpr = Object.keys(values).join(' = ?, ') + ' = ?'
 					sql += ' on conflict (?) do update set ' + updateExpr
-					const indexExpr = this.wrapper.raw(this.conflictAction.target.map(() => '??').join(', '), ...this.conflictAction.target)
+					const indexExpr = this.wrapper.raw(
+						this.conflictAction.target.map(() => '??').join(', '),
+						...this.conflictAction.target
+					)
 					bindings.push(indexExpr)
 					bindings.push(...Object.values(values))
-					break;
+					break
 				default:
 					throw Error()
 			}
@@ -166,12 +176,11 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	}
 
 	public async execute(): Promise<Result> {
-
 		const result: QueryResult = await this.createQuery()
 
 		const returningColumn = this.returningColumn
 		if (returningColumn) {
-			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]): result) as Result
+			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]) : result) as Result
 		} else {
 			return result.rowCount as Result
 		}
@@ -188,7 +197,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 				}
 			)
 			.filter((it): it is [string, Knex.Raw] => it[1] !== undefined)
-			.reduce((result, [key, value]) => ({...result, [key]: value}), {})
+			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
 	}
 }
 
@@ -197,11 +206,13 @@ namespace InsertBuilder {
 	export type Returning = number | string
 	export type InsertResult = AffectedRows | Returning[]
 
-	export type InsertBuilderWithoutExecute<Result extends InsertResult,
-		Filled extends keyof InsertBuilder<Result, Filled>> = Pick<InsertBuilder<Result, Filled>, Exclude<keyof InsertBuilder<Result, Filled>, 'execute' | 'createQuery'>>
+	export type InsertBuilderWithoutExecute<
+		Result extends InsertResult,
+		Filled extends keyof InsertBuilder<Result, Filled>
+	> = Pick<InsertBuilder<Result, Filled>, Exclude<keyof InsertBuilder<Result, Filled>, 'execute' | 'createQuery'>>
 
 	export type InsertBuilderState<Result extends InsertResult, Filled extends keyof InsertBuilder<Result, Filled>> =
-			| 'into'
+		| 'into'
 		| 'values' extends Filled
 		? InsertBuilder<Result, Filled>
 		: InsertBuilderWithoutExecute<Result, Filled>
@@ -216,8 +227,8 @@ namespace InsertBuilder {
 	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression }
 
 	export type ConflictAction =
-		{ type: ConflictActionType.doNothing }
-		| { type: ConflictActionType.update, values: Values, target: ConflictTarget }
+		| { type: ConflictActionType.doNothing }
+		| { type: ConflictActionType.update; values: Values; target: ConflictTarget }
 
 	export type IndexColumns = string[]
 	export type ConflictTarget = IndexColumns

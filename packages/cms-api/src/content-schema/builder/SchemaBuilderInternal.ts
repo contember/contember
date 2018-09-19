@@ -44,7 +44,7 @@ export default class SchemaBuilderInternal {
 			primaryColumn: primaryField.options.columnName || this.conventions.getColumnName(primaryName),
 			unique: this.createUnique(options, fieldOptions),
 			fields: {},
-			tableName: options.tableName || this.conventions.getTableName(name)
+			tableName: options.tableName || this.conventions.getTableName(name),
 		}
 	}
 
@@ -66,7 +66,7 @@ export default class SchemaBuilderInternal {
 
 		return {
 			enums: this.enums,
-			entities: this.entities
+			entities: this.entities,
 		}
 	}
 
@@ -150,8 +150,8 @@ export default class SchemaBuilderInternal {
 			options: {
 				nullable: false,
 				type: Model.ColumnType.Uuid,
-				primary: true
-			}
+				primary: true,
+			},
 		}
 	}
 

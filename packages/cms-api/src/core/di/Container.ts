@@ -5,7 +5,7 @@ class Container<M extends Container.ServiceTypeMap> {
 	constructor(private factories: Container.ServiceFactoryMap<M>) {
 		Object.keys(this.factories).forEach(name => {
 			Object.defineProperty(this.accessors, name, {
-				get: this.get.bind(this, name)
+				get: this.get.bind(this, name),
 			})
 		})
 	}

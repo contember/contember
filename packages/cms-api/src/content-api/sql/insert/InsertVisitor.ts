@@ -169,8 +169,8 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 					const value = await insertBuilder.insert
 					await mapper.update(targetEntity, input, {
 						[targetRelation.name]: {
-							connect: { [relation.name]: value }
-						}
+							connect: { [relation.name]: value },
+						},
 					})
 				}
 
@@ -179,8 +179,8 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 					await mapper.insert(targetEntity, {
 						...input,
 						[targetRelation.name]: {
-							connect: { [entity.primary]: primary }
-						}
+							connect: { [entity.primary]: primary },
+						},
 					})
 				}
 			}()
@@ -203,8 +203,8 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 					const value = await insertBuilder.insert
 					await mapper.update(targetEntity, input, {
 						[targetRelation.name]: {
-							connect: { [entity.primary]: value }
-						}
+							connect: { [entity.primary]: value },
+						},
 					})
 				}
 
@@ -213,8 +213,8 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 					await mapper.insert(targetEntity, {
 						...input,
 						[targetRelation.name]: {
-							connect: { [entity.primary]: primary }
-						}
+							connect: { [entity.primary]: primary },
+						},
 					})
 				}
 			}()

@@ -73,8 +73,8 @@ class CompositionRoot {
 								port: project.dbCredentials.port,
 								user: project.dbCredentials.user,
 								password: project.dbCredentials.password,
-								database: project.dbCredentials.database
-							}
+								database: project.dbCredentials.database,
+							},
 						})
 					)
 				})
@@ -97,8 +97,8 @@ class CompositionRoot {
 							port: env.DB_PORT,
 							user: env.DB_USER,
 							password: env.DB_PASSWORD,
-							database: env.DB_DATABASE
-						}
+							database: env.DB_DATABASE,
+						},
 					})
 				)
 			})
@@ -107,7 +107,7 @@ class CompositionRoot {
 					new KnexQueryable(knexConnection, {
 						get(): QueryHandler<KnexQueryable> {
 							return handler
-						}
+						},
 					})
 				)
 
@@ -147,13 +147,15 @@ class CompositionRoot {
 				({ meQueryResolver, signUpMutationResolver, signInMutationResolver, addProjectMemberMutationResolver }) => {
 					return {
 						Query: {
-							me: meQueryResolver.me.bind(meQueryResolver)
+							me: meQueryResolver.me.bind(meQueryResolver),
 						},
 						Mutation: {
 							signUp: signUpMutationResolver.signUp.bind(signUpMutationResolver),
 							signIn: signInMutationResolver.signIn.bind(signInMutationResolver),
-							addProjectMember: addProjectMemberMutationResolver.addProjectMember.bind(addProjectMemberMutationResolver)
-						}
+							addProjectMember: addProjectMemberMutationResolver.addProjectMember.bind(
+								addProjectMemberMutationResolver
+							),
+						},
 					}
 				}
 			)

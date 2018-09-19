@@ -37,8 +37,8 @@ export default class ConditionTypeProvider {
 				lt: { type: type },
 				lte: { type: type },
 				gt: { type: type },
-				gte: { type: type }
-			})
+				gte: { type: type },
+			}),
 		})
 		return condition
 	}

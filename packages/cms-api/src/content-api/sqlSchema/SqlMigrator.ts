@@ -14,7 +14,7 @@ import {
 	CreateRelationModification,
 	CreateEnumModification,
 	RemoveEnumModification,
-	UpdateEnumModification
+	UpdateEnumModification,
 } from '../../content-schema/differ/modifications'
 import { MigrationBuilder } from 'node-pg-migrate'
 import SchemaMigrator from '../../content-schema/differ/SchemaMigrator'
@@ -97,8 +97,8 @@ export default class SqlMigrator {
 			[primaryColumn.name]: {
 				primaryKey: true,
 				type: primaryColumn.type === Model.ColumnType.Enum ? `"${primaryColumn.columnType}"` : primaryColumn.columnType,
-				notNull: true
-			}
+				notNull: true,
+			},
 		})
 		this.createEventTrigger(entity.tableName)
 	}
@@ -119,8 +119,8 @@ export default class SqlMigrator {
 		this.builder.addColumn(entity.tableName, {
 			[column.columnName]: {
 				type: column.type === Model.ColumnType.Enum ? `"${column.columnType}"` : column.columnType,
-				notNull: !column.nullable
-			}
+				notNull: !column.nullable,
+			},
 		})
 	}
 
@@ -134,8 +134,8 @@ export default class SqlMigrator {
 						type: this.getPrimaryType(targetEntity),
 						notNull: !relation.nullable,
 						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-						onDelete: relation.joiningColumn.onDelete
-					}
+						onDelete: relation.joiningColumn.onDelete,
+					},
 				})
 				this.builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 			},
@@ -147,8 +147,8 @@ export default class SqlMigrator {
 						notNull: !relation.nullable,
 						unique: true,
 						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-						onDelete: relation.joiningColumn.onDelete
-					}
+						onDelete: relation.joiningColumn.onDelete,
+					},
 				})
 			},
 			visitOneHasOneInversed: () => {},
@@ -165,27 +165,27 @@ export default class SqlMigrator {
 							type: this.getPrimaryType(entity),
 							notNull: true,
 							references: `"${entity.tableName}"("${entity.primaryColumn}")`,
-							onDelete: relation.joiningTable.joiningColumn.onDelete
+							onDelete: relation.joiningTable.joiningColumn.onDelete,
 						},
 						[relation.joiningTable.inverseJoiningColumn.columnName]: {
 							type: this.getPrimaryType(targetEntity),
 							notNull: true,
 							references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-							onDelete: relation.joiningTable.inverseJoiningColumn.onDelete
-						}
+							onDelete: relation.joiningTable.inverseJoiningColumn.onDelete,
+						},
 					},
 					{
 						constraints: {
 							unique: [
 								relation.joiningTable.joiningColumn.columnName,
-								relation.joiningTable.inverseJoiningColumn.columnName
-							]
-						}
+								relation.joiningTable.inverseJoiningColumn.columnName,
+							],
+						},
 					}
 				)
 				this.createEventTrigger(relation.joiningTable.tableName)
 			},
-			visitManyHasManyInversed: () => {}
+			visitManyHasManyInversed: () => {},
 		})
 	}
 
@@ -205,7 +205,7 @@ export default class SqlMigrator {
 			visitManyHasManyOwner: ({}, relation, {}, _) => {
 				this.builder.dropTable(relation.joiningTable.tableName)
 			},
-			visitManyHasManyInversed: () => {}
+			visitManyHasManyInversed: () => {},
 		})
 	}
 
@@ -221,7 +221,7 @@ export default class SqlMigrator {
 		this.builder.alterColumn(entity.tableName, field.columnName, {
 			type: modification.definition.columnType,
 			default: modification.definition.default,
-			allowNull: modification.definition.nullable
+			allowNull: modification.definition.nullable,
 		})
 	}
 
@@ -249,7 +249,7 @@ export default class SqlMigrator {
 				},
 				visitManyHasManyInversed: () => {
 					throw new Error('Cannot create unique key on m:m inversed relation')
-				}
+				},
 			})
 		})
 		this.builder.addConstraint(entity.tableName, modification.unique.name, { unique: columns })

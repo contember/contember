@@ -32,18 +32,18 @@ export default class UpdateEntityRelationInputFieldVisitor
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
 		const whereInput = {
-			type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
+			type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
 		}
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
-					type: createInputType
+					type: createInputType,
 			  }
 			: undefined
 		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
 		const updateInput = updateInputType
 			? {
-					type: updateInputType
+					type: updateInputType,
 			  }
 			: undefined
 		const upsertInput =
@@ -53,13 +53,13 @@ export default class UpdateEntityRelationInputFieldVisitor
 							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 							fields: () => ({
 								update: updateInput,
-								create: createInput
-							})
-						})
+								create: createInput,
+							}),
+						}),
 				  }
 				: undefined
 		const booleanInput = {
-			type: GraphQLBoolean
+			type: GraphQLBoolean,
 		}
 
 		const fields = {
@@ -68,7 +68,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 			[Input.UpdateRelationOperation.upsert]: upsertInput,
 			[Input.UpdateRelationOperation.connect]: whereInput,
 			[Input.UpdateRelationOperation.disconnect]: booleanInput,
-			[Input.UpdateRelationOperation.delete]: booleanInput
+			[Input.UpdateRelationOperation.delete]: booleanInput,
 		}
 
 		const filteredFields = this.filterAllowedOperations(entity, relation, fields)
@@ -78,7 +78,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
-			fields: () => filteredFields
+			fields: () => filteredFields,
 		})
 	}
 
@@ -91,18 +91,18 @@ export default class UpdateEntityRelationInputFieldVisitor
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
 		const whereInput = {
-			type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
+			type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
 		}
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
-					type: createInputType
+					type: createInputType,
 			  }
 			: undefined
 		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
 		const updateInput = updateInputType
 			? {
-					type: updateInputType
+					type: updateInputType,
 			  }
 			: undefined
 
@@ -112,9 +112,9 @@ export default class UpdateEntityRelationInputFieldVisitor
 						name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
 						fields: () => ({
 							where: whereInput,
-							data: updateInput
-						})
-					})
+							data: updateInput,
+						}),
+					}),
 			  }
 			: undefined
 
@@ -126,9 +126,9 @@ export default class UpdateEntityRelationInputFieldVisitor
 							fields: () => ({
 								where: whereInput,
 								update: updateInput,
-								create: createInput
-							})
-						})
+								create: createInput,
+							}),
+						}),
 				  }
 				: undefined
 
@@ -138,7 +138,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 			[Input.UpdateRelationOperation.upsert]: upsertInput,
 			[Input.UpdateRelationOperation.connect]: whereInput,
 			[Input.UpdateRelationOperation.disconnect]: whereInput,
-			[Input.UpdateRelationOperation.delete]: whereInput
+			[Input.UpdateRelationOperation.delete]: whereInput,
 		}
 		const filteredFields = this.filterAllowedOperations(entity, relation, fields)
 		if (Object.keys(filteredFields).length === 0) {
@@ -147,7 +147,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
-			fields: () => filteredFields
+			fields: () => filteredFields,
 		})
 	}
 

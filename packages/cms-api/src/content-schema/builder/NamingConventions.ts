@@ -55,7 +55,7 @@ namespace NamingConventions {
 		): [string, string] {
 			return [
 				toUnderscore(owningEntity) + '_id',
-				toUnderscore(inversedEntity === owningEntity ? owningRelation : inversedEntity) + '_id'
+				toUnderscore(inversedEntity === owningEntity ? owningRelation : inversedEntity) + '_id',
 			]
 		}
 	}

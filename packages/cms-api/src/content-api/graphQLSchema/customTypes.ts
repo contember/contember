@@ -8,7 +8,7 @@ export const GraphQLUUID: GraphQLScalarType = new GraphQLScalarType({
 	parseValue: str => String(str),
 	parseLiteral: function parseLiteral(ast) {
 		return ast.kind === Kind.STRING ? ast.value : undefined
-	}
+	},
 })
 
 export const GraphQLDate: GraphQLScalarType = new GraphQLScalarType({
@@ -17,7 +17,7 @@ export const GraphQLDate: GraphQLScalarType = new GraphQLScalarType({
 	parseValue: str => String(str),
 	parseLiteral: function parseLiteral(ast) {
 		return ast.kind === Kind.STRING ? ast.value : undefined
-	}
+	},
 })
 
 export const GraphQLDateTime: GraphQLScalarType = new GraphQLScalarType({
@@ -26,5 +26,5 @@ export const GraphQLDateTime: GraphQLScalarType = new GraphQLScalarType({
 	parseValue: str => String(str),
 	parseLiteral: function parseLiteral(ast) {
 		return ast.kind === Kind.STRING ? ast.value : undefined
-	}
+	},
 })

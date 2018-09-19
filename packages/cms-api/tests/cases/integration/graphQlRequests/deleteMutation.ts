@@ -33,9 +33,9 @@ describe('Delete mutation', () => {
 						response: [
 							{
 								root_id: testUuid(1),
-								root_author: testUuid(2)
-							}
-						]
+								root_author: testUuid(2),
+							},
+						],
 					},
 					{
 						sql: SQL`select
@@ -48,9 +48,9 @@ describe('Delete mutation', () => {
 						response: [
 							{
 								root_id: testUuid(2),
-								root_name: 'John'
-							}
-						]
+								root_name: 'John',
+							},
+						],
 					},
 					{
 						sql: SQL`delete from "post"
@@ -59,19 +59,19 @@ describe('Delete mutation', () => {
                            where "root_"."id" = $1)`,
 						parameters: [testUuid(1)],
 						response: 1,
-					}
-				])
+					},
+				]),
 			],
 			return: {
 				data: {
 					deletePost: {
 						author: {
-							name: 'John'
+							name: 'John',
 						},
-						id: testUuid(1)
-					}
-				}
-			}
+						id: testUuid(1),
+					},
+				},
+			},
 		})
 	})
 
@@ -89,18 +89,18 @@ describe('Delete mutation', () => {
 			permissions: {
 				Post: {
 					predicates: {
-						locale_predicate: { locale: 'locale_variable' }
+						locale_predicate: { locale: 'locale_variable' },
 					},
 					operations: {
 						delete: 'locale_predicate',
 						read: {
-							id: true
-						}
-					}
-				}
+							id: true,
+						},
+					},
+				},
 			},
 			variables: {
-				locale_variable: ['cs']
+				locale_variable: ['cs'],
 			},
 			executes: [
 				...sqlTransaction([
@@ -112,9 +112,9 @@ describe('Delete mutation', () => {
 						parameters: [testUuid(1)],
 						response: [
 							{
-								root_id: testUuid(1)
-							}
-						]
+								root_id: testUuid(1),
+							},
+						],
 					},
 					{
 						sql: SQL`delete from "post"
@@ -123,16 +123,16 @@ describe('Delete mutation', () => {
                            where "root_"."id" = $1 and "root_"."locale" in ($2))`,
 						parameters: [testUuid(1), 'cs'],
 						response: 1,
-					}
-				])
+					},
+				]),
 			],
 			return: {
 				data: {
 					deletePost: {
-						id: testUuid(1)
-					}
-				}
-			}
+						id: testUuid(1),
+					},
+				},
+			},
 		})
 	})
 })

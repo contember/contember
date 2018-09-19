@@ -29,7 +29,7 @@ export default class EnumsProvider {
 
 		return new GraphQLEnumType({
 			name: capitalizeFirstLetter(name),
-			values: valuesConfig
+			values: valuesConfig,
 		})
 	}
 }

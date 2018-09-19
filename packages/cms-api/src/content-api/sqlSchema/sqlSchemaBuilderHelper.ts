@@ -9,7 +9,7 @@ export function createMigrationBuilder() {
 		{},
 		{
 			query: null,
-			select: null
+			select: null,
 		}
 	)
 }

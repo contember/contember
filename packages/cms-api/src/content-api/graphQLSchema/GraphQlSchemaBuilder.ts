@@ -15,7 +15,7 @@ export default class GraphQlSchemaBuilder {
 			(mutations, entityName) => {
 				return {
 					...this.mutationProvider.getMutations(entityName),
-					...mutations
+					...mutations,
 				}
 			},
 			{}
@@ -28,18 +28,18 @@ export default class GraphQlSchemaBuilder {
 					Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
 						return {
 							...this.queryProvider.getQueries(entityName),
-							...queries
+							...queries,
 						}
-					}, {})
+					}, {}),
 			}),
 			...(Object.keys(mutations).length > 0
 				? {
 						mutation: new GraphQLObjectType({
 							name: 'Mutation',
-							fields: () => mutations
-						})
+							fields: () => mutations,
+						}),
 				  }
-				: {})
+				: {}),
 		})
 	}
 }

@@ -31,7 +31,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 			name: inversedBy,
 			ownedBy: fieldName,
 			target: entityName,
-			type: Model.RelationType.ManyHasMany
+			type: Model.RelationType.ManyHasMany,
 		}
 	}
 
@@ -51,7 +51,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 			joiningTable = {
 				tableName: this.conventions.getJoiningTableName(entityName, fieldName),
 				joiningColumn: { columnName: columnNames[0], onDelete: Model.OnDelete.cascade },
-				inverseJoiningColumn: { columnName: columnNames[1], onDelete: Model.OnDelete.cascade }
+				inverseJoiningColumn: { columnName: columnNames[1], onDelete: Model.OnDelete.cascade },
 			}
 		}
 
@@ -60,7 +60,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 			name: fieldName,
 			...(typeof options.inversedBy === 'undefined' ? {} : { inversedBy: options.inversedBy }),
 			target: options.target,
-			joiningTable: joiningTable
+			joiningTable: joiningTable,
 		}
 	}
 }

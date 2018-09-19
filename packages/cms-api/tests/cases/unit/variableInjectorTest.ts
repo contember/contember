@@ -6,38 +6,38 @@ describe('variable injector', () => {
 	it('injects variable', () => {
 		const injector = new VariableInjector({
 			site: [1, 2],
-			locale: 'cs'
+			locale: 'cs',
 		})
 		const result = injector.inject({
 			and: [
 				{
 					post: {
-						site: 'site'
-					}
+						site: 'site',
+					},
 				},
 				{
-					locale: 'locale'
+					locale: 'locale',
 				},
 				{
-					foo: 'bar'
-				}
-			]
+					foo: 'bar',
+				},
+			],
 		})
 
 		expect(result).deep.eq({
 			and: [
 				{
 					post: {
-						site: { in: [1, 2] }
-					}
+						site: { in: [1, 2] },
+					},
 				},
 				{
-					locale: { eq: 'cs' }
+					locale: { eq: 'cs' },
 				},
 				{
-					foo: { never: true }
-				}
-			]
+					foo: { never: true },
+				},
+			],
 		})
 	})
 })

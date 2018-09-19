@@ -4,7 +4,7 @@ import {
 	GraphQLNonNull,
 	GraphQLObjectType,
 	GraphQLOutputType,
-	GraphQLResolveInfo
+	GraphQLResolveInfo,
 } from 'graphql'
 import { SelectionSetNode } from 'graphql/language/ast'
 import FieldNode from './FieldNode'
@@ -43,9 +43,9 @@ export default class GraphQlQueryAstFactory {
 				...(dest.selectionSet as SelectionSetNode),
 				selections: [
 					...(dest.selectionSet ? dest.selectionSet.selections : []),
-					...(src.selectionSet ? src.selectionSet.selections : [])
-				]
-			}
+					...(src.selectionSet ? src.selectionSet.selections : []),
+				],
+			},
 		}
 	}
 

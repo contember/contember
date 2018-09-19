@@ -1,9 +1,9 @@
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
 import * as Knex from 'knex'
-import { QueryResult } from "pg";
-import { Value } from "./types";
-import ConditionBuilder from "./ConditionBuilder";
+import { QueryResult } from 'pg'
+import { Value } from './types'
+import ConditionBuilder from './ConditionBuilder'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>> {
 	private constructor(
@@ -12,29 +12,24 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		private readonly cte: { [alias: string]: QueryBuilder.Callback },
 		private readonly returningColumn: string | Knex.Raw | undefined,
 		private readonly usingTables: { [alias: string]: string },
-		private readonly wheres: (Knex.Raw | { [columName: string]: Value })[],
-	) {
-	}
+		private readonly wheres: (Knex.Raw | { [columName: string]: Value })[]
+	) {}
 
 	public static create(wrapper: KnexWrapper): DeleteBuilder.NewDeleteBuilder {
-		return new DeleteBuilder(
-			wrapper,
-			undefined,
-			{},
-			undefined,
-			{},
-			[],
-		) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
+		return new DeleteBuilder(wrapper, undefined, {}, undefined, {}, []) as DeleteBuilder.DeleteBuilderState<
+			DeleteBuilder.AffectedRows,
+			never
+		>
 	}
 
 	public with(alias: string, callback: QueryBuilder.Callback): DeleteBuilder.DeleteBuilderState<Result, Filled> {
 		return new DeleteBuilder<Result, Filled>(
 			this.wrapper,
 			this.fromTable,
-			{...this.cte, [alias]: callback},
+			{ ...this.cte, [alias]: callback },
 			this.returningColumn,
 			this.usingTables,
-			this.wheres,
+			this.wheres
 		) as DeleteBuilder.DeleteBuilderState<Result, Filled>
 	}
 
@@ -45,13 +40,15 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 			this.cte,
 			this.returningColumn,
 			this.usingTables,
-			this.wheres,
+			this.wheres
 		) as DeleteBuilder.DeleteBuilderState<Result, Filled | 'from'>
 	}
 
 	public where(where: { [columName: string]: Value }): DeleteBuilder.DeleteBuilderState<Result, Filled>
 	public where(whereCondition: DeleteBuilder.ConditionCallback): DeleteBuilder.DeleteBuilderState<Result, Filled>
-	public where(where: (DeleteBuilder.ConditionCallback) | { [columName: string]: Value }): DeleteBuilder.DeleteBuilderState<Result, Filled> {
+	public where(
+		where: (DeleteBuilder.ConditionCallback) | { [columName: string]: Value }
+	): DeleteBuilder.DeleteBuilderState<Result, Filled> {
 		const newWheres = [...this.wheres]
 		if (typeof where === 'function') {
 			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
@@ -69,7 +66,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 			this.cte,
 			this.returningColumn,
 			this.usingTables,
-			newWheres,
+			newWheres
 		) as DeleteBuilder.DeleteBuilderState<Result, Filled>
 	}
 
@@ -79,11 +76,10 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 			this.fromTable,
 			this.cte,
 			this.returningColumn,
-			{...this.usingTables, [alias || tableName]: tableName},
-			this.wheres,
+			{ ...this.usingTables, [alias || tableName]: tableName },
+			this.wheres
 		) as DeleteBuilder.DeleteBuilderState<Result, Filled>
 	}
-
 
 	public returning(column: string | Knex.Raw): DeleteBuilder.DeleteBuilderState<DeleteBuilder.Returning[], Filled> {
 		return new DeleteBuilder<DeleteBuilder.Returning[], Filled>(
@@ -92,7 +88,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 			this.cte,
 			column,
 			this.usingTables,
-			this.wheres,
+			this.wheres
 		) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.Returning[], Filled>
 	}
 
@@ -108,7 +104,9 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 
 		const usingBindings: any = []
 		Object.entries(this.usingTables).forEach(([alias, table]) => usingBindings.push(alias, table))
-		const using = Object.keys(this.usingTables).map(() => '?? as ??').join(', ')
+		const using = Object.keys(this.usingTables)
+			.map(() => '?? as ??')
+			.join(', ')
 
 		qb.from(this.wrapper.raw('??' + (using ? ' using ' + using : ''), fromTable, ...usingBindings))
 
@@ -129,7 +127,6 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 	}
 
 	public async execute(): Promise<Result> {
-
 		const result: QueryResult = await this.createQuery()
 
 		const returningColumn = this.returningColumn
@@ -147,12 +144,15 @@ namespace DeleteBuilder {
 	export type DeleteResult = AffectedRows | Returning[]
 	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 
-	export type DeleteBuilderWithoutExecute<Result extends DeleteResult,
-		Filled extends keyof DeleteBuilder<Result, Filled>> = Pick<DeleteBuilder<Result, Filled>, Exclude<keyof DeleteBuilder<Result, Filled>, 'execute' | 'createQuery'>>
+	export type DeleteBuilderWithoutExecute<
+		Result extends DeleteResult,
+		Filled extends keyof DeleteBuilder<Result, Filled>
+	> = Pick<DeleteBuilder<Result, Filled>, Exclude<keyof DeleteBuilder<Result, Filled>, 'execute' | 'createQuery'>>
 
-	export type DeleteBuilderState<Result extends DeleteResult, Filled extends keyof DeleteBuilder<Result, Filled>> = 'from' extends Filled
-		? DeleteBuilder<Result, Filled>
-		: DeleteBuilderWithoutExecute<Result, Filled>
+	export type DeleteBuilderState<
+		Result extends DeleteResult,
+		Filled extends keyof DeleteBuilder<Result, Filled>
+	> = 'from' extends Filled ? DeleteBuilder<Result, Filled> : DeleteBuilderWithoutExecute<Result, Filled>
 
 	export type NewDeleteBuilder = DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
 }

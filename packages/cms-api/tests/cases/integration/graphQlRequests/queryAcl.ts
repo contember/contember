@@ -23,23 +23,23 @@ describe('Queries with acl', () => {
 				operations: {
 					read: {
 						id: true,
-						locales: true
-					}
-				}
+						locales: true,
+					},
+				},
 			},
 			PostLocale: {
 				predicates: {
 					localePredicate: {
-						locale: 'localeVariable'
-					}
+						locale: 'localeVariable',
+					},
 				},
 				operations: {
 					read: {
 						id: true,
-						title: 'localePredicate'
-					}
-				}
-			}
+						title: 'localePredicate',
+					},
+				},
+			},
 		}
 
 		it('querying id and title', async () => {
@@ -47,7 +47,7 @@ describe('Queries with acl', () => {
 				schema: schema,
 				permissions: permissions,
 				variables: {
-					localeVariable: ['cs']
+					localeVariable: ['cs'],
 				},
 				query: GQL`
         query {
@@ -74,16 +74,16 @@ describe('Queries with acl', () => {
 								{
 									root_id: testUuid(1),
 									root_title: 'foo',
-									root_title__readable: false
+									root_title__readable: false,
 								},
 								{
 									root_id: testUuid(2),
 									root_title: 'bar',
-									root_title__readable: true
-								}
-							]
-						}
-					])
+									root_title__readable: true,
+								},
+							],
+						},
+					]),
 				],
 				return: {
 					data: {
@@ -93,22 +93,22 @@ describe('Queries with acl', () => {
 								title: null,
 								_meta: {
 									title: {
-										readable: false
-									}
-								}
+										readable: false,
+									},
+								},
 							},
 							{
 								id: testUuid(2),
 								title: 'bar',
 								_meta: {
 									title: {
-										readable: true
-									}
-								}
-							}
-						]
-					}
-				}
+										readable: true,
+									},
+								},
+							},
+						],
+					},
+				},
 			})
 		})
 
@@ -117,7 +117,7 @@ describe('Queries with acl', () => {
 				schema: schema,
 				permissions: permissions,
 				variables: {
-					localeVariable: ['cs']
+					localeVariable: ['cs'],
 				},
 				query: GQL`
         query {
@@ -140,22 +140,22 @@ describe('Queries with acl', () => {
 								{
 									root_id: testUuid(1),
 									root_title: 'foo',
-									root_title__readable: true
-								}
-							]
-						}
-					])
+									root_title__readable: true,
+								},
+							],
+						},
+					]),
 				],
 				return: {
 					data: {
 						PostLocales: [
 							{
 								id: testUuid(1),
-								title: 'foo'
-							}
-						]
-					}
-				}
+								title: 'foo',
+							},
+						],
+					},
+				},
 			})
 		})
 
@@ -164,7 +164,7 @@ describe('Queries with acl', () => {
 				schema: schema,
 				permissions: permissions,
 				variables: {
-					localeVariable: ['cs']
+					localeVariable: ['cs'],
 				},
 				query: GQL`
         query {
@@ -181,21 +181,21 @@ describe('Queries with acl', () => {
 							parameters: [],
 							response: [
 								{
-									root_id: testUuid(1)
-								}
-							]
-						}
-					])
+									root_id: testUuid(1),
+								},
+							],
+						},
+					]),
 				],
 				return: {
 					data: {
 						PostLocales: [
 							{
-								id: testUuid(1)
-							}
-						]
-					}
-				}
+								id: testUuid(1),
+							},
+						],
+					},
+				},
 			})
 		})
 
@@ -220,15 +220,15 @@ describe('Queries with acl', () => {
                          "root_"."title" as "root_title"
                        from "post_locale" as "root_"`,
 							parameters: [],
-							response: []
-						}
-					])
+							response: [],
+						},
+					]),
 				],
 				return: {
 					data: {
-						PostLocales: []
-					}
-				}
+						PostLocales: [],
+					},
+				},
 			})
 		})
 
@@ -237,7 +237,7 @@ describe('Queries with acl', () => {
 				schema: schema,
 				permissions: permissions,
 				variables: {
-					localeVariable: ['cs']
+					localeVariable: ['cs'],
 				},
 				query: GQL`
         query {
@@ -258,12 +258,12 @@ describe('Queries with acl', () => {
 							parameters: [],
 							response: [
 								{
-									root_id: testUuid(1)
+									root_id: testUuid(1),
 								},
 								{
-									root_id: testUuid(2)
-								}
-							]
+									root_id: testUuid(2),
+								},
+							],
 						},
 						{
 							sql: SQL`select
@@ -279,17 +279,17 @@ describe('Queries with acl', () => {
 									__grouping_key: testUuid(1),
 									root_id: testUuid(3),
 									root_title: 'foo',
-									root_title__readable: false
+									root_title__readable: false,
 								},
 								{
 									__grouping_key: testUuid(2),
 									root_id: testUuid(4),
 									root_title: 'bar',
-									root_title__readable: true
-								}
-							]
-						}
-					])
+									root_title__readable: true,
+								},
+							],
+						},
+					]),
 				],
 				return: {
 					data: {
@@ -298,21 +298,21 @@ describe('Queries with acl', () => {
 								locales: [
 									{
 										id: testUuid(3),
-										title: null
-									}
-								]
+										title: null,
+									},
+								],
 							},
 							{
 								locales: [
 									{
 										id: testUuid(4),
-										title: 'bar'
-									}
-								]
-							}
-						]
-					}
-				}
+										title: 'bar',
+									},
+								],
+							},
+						],
+					},
+				},
 			})
 		})
 	})
@@ -339,33 +339,33 @@ describe('Queries with acl', () => {
 				operations: {
 					read: {
 						id: true,
-						author: true
-					}
-				}
+						author: true,
+					},
+				},
 			},
 			Author: {
 				predicates: {
 					countryPredicate: {
 						country: {
-							name: 'countryVariable'
-						}
-					}
+							name: 'countryVariable',
+						},
+					},
 				},
 				operations: {
 					read: {
 						id: true,
-						name: 'countryPredicate'
-					}
-				}
+						name: 'countryPredicate',
+					},
+				},
 			},
 			Country: {
 				predicates: {},
 				operations: {
 					read: {
-						id: true
-					}
-				}
-			}
+						id: true,
+					},
+				},
+			},
 		}
 
 		it('querying post + author name', async () => {
@@ -373,7 +373,7 @@ describe('Queries with acl', () => {
 				schema: schema,
 				permissions: permissions,
 				variables: {
-					countryVariable: ['Czechia']
+					countryVariable: ['Czechia'],
 				},
 				query: GQL`
         query {
@@ -395,13 +395,13 @@ describe('Queries with acl', () => {
 							response: [
 								{
 									root_id: testUuid(1),
-									root_author: testUuid(3)
+									root_author: testUuid(3),
 								},
 								{
 									root_id: testUuid(2),
-									root_author: testUuid(4)
-								}
-							]
+									root_author: testUuid(4),
+								},
+							],
 						},
 						{
 							sql: SQL`select
@@ -417,28 +417,28 @@ describe('Queries with acl', () => {
 								{
 									root_id: testUuid(3),
 									root_name: 'John',
-									root_name__readable: true
-								}
-							]
-						}
-					])
+									root_name__readable: true,
+								},
+							],
+						},
+					]),
 				],
 				return: {
 					data: {
 						Posts: [
 							{
 								author: {
-									name: 'John'
+									name: 'John',
 								},
-								id: testUuid(1)
+								id: testUuid(1),
 							},
 							{
 								author: null,
-								id: testUuid(2)
-							}
-						]
-					}
-				}
+								id: testUuid(2),
+							},
+						],
+					},
+				},
 			})
 		})
 	})

@@ -14,7 +14,7 @@ namespace FieldBuilder {
 		ManyHasMany = 'manyHasMany',
 		OneHasOne = 'oneHasOne',
 		OneHasMany = 'oneHasMany',
-		ManyHasOne = 'manyHasOne'
+		ManyHasOne = 'manyHasOne',
 	}
 
 	export type Options =

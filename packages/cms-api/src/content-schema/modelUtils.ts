@@ -17,7 +17,7 @@ export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldN
 				return relation.joiningColumn.columnName
 			}
 			throw new Error('Not an owning side')
-		}
+		},
 	})
 }
 
@@ -29,7 +29,7 @@ export const getColumnType = (schema: Model.Schema, entity: Model.Entity, fieldN
 				return getColumnType(schema, targetEntity, targetEntity.primary)
 			}
 			throw new Error('Not an owning side')
-		}
+		},
 	})
 }
 
@@ -40,7 +40,7 @@ export const getTargetEntity = (
 ): Model.Entity | null => {
 	return acceptFieldVisitor(schema, entity, relationName, {
 		visitColumn: () => null,
-		visitRelation: (entity, relation, targetEntity) => targetEntity
+		visitRelation: (entity, relation, targetEntity) => targetEntity,
 	})
 }
 
@@ -104,7 +104,7 @@ export const acceptFieldVisitor = <T>(
 			visitOneHasMany: visitor.visitHasMany.bind(visitor),
 			visitOneHasOneInversed: visitor.visitHasOne.bind(visitor),
 			visitOneHasOneOwner: visitor.visitHasOne.bind(visitor),
-			visitManyHasOne: visitor.visitHasOne.bind(visitor)
+			visitManyHasOne: visitor.visitHasOne.bind(visitor),
 		})
 	}
 

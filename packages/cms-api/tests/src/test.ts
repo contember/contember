@@ -29,12 +29,12 @@ export interface Test {
 export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 	return [
 		{
-			sql: 'BEGIN;'
+			sql: 'BEGIN;',
 		},
 		...executes,
 		{
-			sql: 'COMMIT;'
-		}
+			sql: 'COMMIT;',
+		},
 	]
 }
 
@@ -49,7 +49,7 @@ export const execute = async (test: Test) => {
 
 	const connection = knex({
 		// debug: true,
-		client: 'pg'
+		client: 'pg',
 	})
 
 	mockKnex.mock(connection)
@@ -85,7 +85,7 @@ export const execute = async (test: Test) => {
 	try {
 		const response = await graphql(graphQLSchema, test.query, null, {
 			db: new KnexConnection(connection),
-			identityVariables: test.variables || {}
+			identityVariables: test.variables || {},
 		})
 		// console.log(response)
 		expect(response).deep.equal(test.return)

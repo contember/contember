@@ -18,7 +18,7 @@ import {
 	UpdateEnumModification,
 	UpdateEntityNameModification,
 	UpdateFieldNameModification,
-	CreateRelationInverseSideModification
+	CreateRelationInverseSideModification,
 } from './modifications'
 import { acceptFieldVisitor } from '../modelUtils'
 
@@ -106,7 +106,7 @@ export default class SchemaMigrator {
 		}
 		this.schema.entities[modification.newEntityName] = {
 			...deepCopy(this.schema.entities[modification.entityName]),
-			name: modification.newEntityName
+			name: modification.newEntityName,
 		}
 		delete this.schema.entities[modification.entityName]
 	}
@@ -177,7 +177,7 @@ export default class SchemaMigrator {
 			},
 			visitManyHasManyInversed: (entity, relation, {}, {}) => {
 				delete entity.fields[relation.name]
-			}
+			},
 		})
 	}
 
@@ -188,7 +188,7 @@ export default class SchemaMigrator {
 		const entity = this.schema.entities[modification.entityName]
 		entity.fields[modification.newFieldName] = {
 			...deepCopy(entity.fields[modification.fieldName]),
-			name: modification.newFieldName
+			name: modification.newFieldName,
 		}
 		delete entity.fields[modification.fieldName]
 	}

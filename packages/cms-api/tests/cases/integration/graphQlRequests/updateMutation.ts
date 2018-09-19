@@ -11,7 +11,7 @@ describe('update', () => {
                from "post" as "root_"
                where "root_"."id" = $1`,
 		response: [{ root_id: testUuid(2) }],
-		parameters: [testUuid(2)]
+		parameters: [testUuid(2)],
 	}
 
 	describe('columns (author)', () => {
@@ -38,24 +38,24 @@ describe('update', () => {
                 where "root_"."id" = $2) update "author"
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
-							parameters: ['John', testUuid(1), testUuid(1)]
+							parameters: ['John', testUuid(1), testUuid(1)],
 						},
 						{
 							sql: SQL`select "root_"."id" as "root_id"
                      from "author" as "root_"
                      where "root_"."id" = $1`,
 							response: [{ root_id: testUuid(1) }],
-							parameters: [testUuid(1)]
-						}
-					])
+							parameters: [testUuid(1)],
+						},
+					]),
 				],
 				return: {
 					data: {
 						updateAuthor: {
-							id: testUuid(1)
-						}
-					}
-				}
+							id: testUuid(1),
+						},
+					},
+				},
 			})
 		})
 	})
@@ -101,7 +101,7 @@ describe('update', () => {
 							from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'John'],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 
 						{
@@ -114,18 +114,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "post"
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -152,18 +152,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "post"
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -185,7 +185,7 @@ describe('update', () => {
                        from "post"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ author_id: testUuid(1) }]
+							response: [{ author_id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -196,18 +196,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "author"
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
-							parameters: ['John', testUuid(1), testUuid(1)]
+							parameters: ['John', testUuid(1), testUuid(1)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -229,7 +229,7 @@ describe('update', () => {
                        from "post"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ author_id: testUuid(1) }]
+							response: [{ author_id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as (select
@@ -239,18 +239,18 @@ describe('update', () => {
                                            where "root_"."id" = $2) update "author"
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
-							parameters: ['Jack', testUuid(1), testUuid(1)]
+							parameters: ['Jack', testUuid(1), testUuid(1)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -272,7 +272,7 @@ describe('update', () => {
                        from "post"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: []
+							response: [],
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -282,7 +282,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'John'],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -294,18 +294,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "post"
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -331,18 +331,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "post"
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
-							parameters: [null, testUuid(2), testUuid(2)]
+							parameters: [null, testUuid(2), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -364,7 +364,7 @@ describe('update', () => {
                        from "post"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ author_id: testUuid(1) }]
+							response: [{ author_id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -375,7 +375,7 @@ describe('update', () => {
                where "root_"."id" = $2) update "post"
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
-							parameters: [null, testUuid(2), testUuid(2)]
+							parameters: [null, testUuid(2), testUuid(2)],
 						},
 						{
 							sql: SQL`delete from "author"
@@ -385,16 +385,16 @@ describe('update', () => {
 							parameters: [testUuid(1)],
 							response: 1,
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 	})
@@ -450,18 +450,18 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Hello', 'cs', testUuid(2)],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -483,7 +483,7 @@ describe('update', () => {
                        from "post_locale"
                        where "locale" = $1 and "post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
-							response: [{ id: testUuid(1) }]
+							response: [{ id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -496,18 +496,18 @@ describe('update', () => {
                where "root_"."locale" = $2 and "root_"."post_id" = $3) update "post_locale"
               set "title" = "newData_"."title" from "newData_"
               where "post_locale"."locale" = $4 and "post_locale"."post_id" = $5`,
-							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)]
+							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -529,7 +529,7 @@ describe('update', () => {
                        from "post_locale"
                        where "locale" = $1 and "post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
-							response: [{ id: testUuid(1) }]
+							response: [{ id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -543,18 +543,18 @@ describe('update', () => {
 							update "post_locale"
               set "title" = "newData_"."title" from "newData_"
               where "post_locale"."locale" = $4 and "post_locale"."post_id" = $5`,
-							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)]
+							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -576,7 +576,7 @@ describe('update', () => {
                        from "post_locale"
                        where "locale" = $1 and "post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
-							response: []
+							response: [],
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -586,18 +586,18 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'World', 'cs', testUuid(2)],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -622,16 +622,16 @@ describe('update', () => {
 							parameters: ['cs', testUuid(2)],
 							response: 1,
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -659,18 +659,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "post_locale"
               set "post_id" = "newData_"."post_id" from "newData_"
               where "post_locale"."id" = $3`,
-							parameters: [testUuid(2), testUuid(1), testUuid(1)]
+							parameters: [testUuid(2), testUuid(1), testUuid(1)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -698,18 +698,18 @@ describe('update', () => {
                where "root_"."id" = $2 and "root_"."post_id" = $3) update "post_locale"
               set "post_id" = "newData_"."post_id" from "newData_"
               where "post_locale"."id" = $4 and "post_locale"."post_id" = $5`,
-							parameters: [null, testUuid(1), testUuid(2), testUuid(1), testUuid(2)]
+							parameters: [null, testUuid(1), testUuid(2), testUuid(1), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 	})
@@ -730,7 +730,7 @@ describe('update', () => {
                from "site" as "root_"
                where "root_"."id" = $1`,
 			response: [{ root_id: testUuid(2) }],
-			parameters: [testUuid(2)]
+			parameters: [testUuid(2)],
 		}
 
 		it('create', async () => {
@@ -754,7 +754,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'http://mangoweb.cz'],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -766,18 +766,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -799,7 +799,7 @@ describe('update', () => {
                        from "site"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ setting_id: testUuid(1) }]
+							response: [{ setting_id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -810,18 +810,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site_setting"
               set "url" = "newData_"."url" from "newData_"
               where "site_setting"."id" = $3`,
-							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)]
+							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -843,18 +843,18 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(1)],
-							response: [{ id: testUuid(2) }]
+							response: [{ id: testUuid(2) }],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -876,7 +876,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(1)],
-							response: []
+							response: [],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -888,18 +888,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -921,7 +921,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(1)],
-							response: [{ id: testUuid(3) }]
+							response: [{ id: testUuid(3) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -933,7 +933,7 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [null, testUuid(3), testUuid(3)]
+							parameters: [null, testUuid(3), testUuid(3)],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -945,18 +945,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -978,7 +978,7 @@ describe('update', () => {
                        from "site"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ setting_id: testUuid(1) }]
+							response: [{ setting_id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -990,18 +990,18 @@ describe('update', () => {
               set "url" = "newData_"."url" from "newData_"
               where "site_setting"."id" = $3`,
 							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)],
-							response: []
+							response: [],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1023,7 +1023,7 @@ describe('update', () => {
                        from "site"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: []
+							response: [],
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1033,7 +1033,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'http://mgw.cz'],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1045,18 +1045,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1083,18 +1083,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [null, testUuid(2), testUuid(2)]
+							parameters: [null, testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1116,7 +1116,7 @@ describe('update', () => {
                        from "site"
                        where "id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ setting_id: testUuid(1) }]
+							response: [{ setting_id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1128,7 +1128,7 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [null, testUuid(2), testUuid(2)]
+							parameters: [null, testUuid(2), testUuid(2)],
 						},
 						{
 							sql: SQL`delete from "site_setting"
@@ -1138,16 +1138,16 @@ describe('update', () => {
 							parameters: [testUuid(1)],
 							response: 1,
 						},
-						selectUpdateSiteSql
-					])
+						selectUpdateSiteSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSite: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 	})
@@ -1158,7 +1158,7 @@ describe('update', () => {
                from "site_setting" as "root_"
                where "root_"."id" = $1`,
 			response: [{ root_id: testUuid(2) }],
-			parameters: [testUuid(2)]
+			parameters: [testUuid(2)],
 		}
 
 		it('create', async () => {
@@ -1179,7 +1179,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(3) }]
+							response: [{ id: testUuid(3) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1191,7 +1191,7 @@ describe('update', () => {
                where "root_"."setting_id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."setting_id" = $3`,
-							parameters: [null, testUuid(2), testUuid(2)]
+							parameters: [null, testUuid(2), testUuid(2)],
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1201,18 +1201,18 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1234,7 +1234,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: []
+							response: [],
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1244,18 +1244,18 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1277,7 +1277,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }]
+							response: [{ id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1289,18 +1289,18 @@ describe('update', () => {
                where "root_"."setting_id" = $2) update "site"
               set "name" = "newData_"."name" from "newData_"
               where "site"."setting_id" = $3`,
-							parameters: ['Mangoweb', testUuid(2), testUuid(2)]
+							parameters: ['Mangoweb', testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1322,7 +1322,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }]
+							response: [{ id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1334,18 +1334,18 @@ describe('update', () => {
                where "root_"."setting_id" = $2) update "site"
               set "name" = "newData_"."name" from "newData_"
               where "site"."setting_id" = $3`,
-							parameters: ['Mangoweb', testUuid(2), testUuid(2)]
+							parameters: ['Mangoweb', testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1367,7 +1367,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: []
+							response: [],
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1377,18 +1377,18 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mgw', testUuid(2)],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1410,7 +1410,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }]
+							response: [{ id: testUuid(1) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1422,18 +1422,18 @@ describe('update', () => {
                where "root_"."setting_id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."setting_id" = $3`,
-							parameters: [null, testUuid(2), testUuid(2)]
+							parameters: [null, testUuid(2), testUuid(2)],
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1458,16 +1458,16 @@ describe('update', () => {
 							parameters: [testUuid(2)],
 							response: 1,
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1489,18 +1489,18 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }]
+							response: [{ id: testUuid(1) }],
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1522,7 +1522,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: []
+							response: [],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1534,18 +1534,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [testUuid(2), testUuid(1), testUuid(1)]
+							parameters: [testUuid(2), testUuid(1), testUuid(1)],
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1567,7 +1567,7 @@ describe('update', () => {
                        from "site"
                        where "setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(3) }]
+							response: [{ id: testUuid(3) }],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1579,7 +1579,7 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [null, testUuid(3), testUuid(3)]
+							parameters: [null, testUuid(3), testUuid(3)],
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1591,18 +1591,18 @@ describe('update', () => {
                where "root_"."id" = $2) update "site"
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
-							parameters: [testUuid(2), testUuid(1), testUuid(1)]
+							parameters: [testUuid(2), testUuid(1), testUuid(1)],
 						},
-						selectUpdateSiteSettingSql
-					])
+						selectUpdateSiteSettingSql,
+					]),
 				],
 				return: {
 					data: {
 						updateSiteSetting: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 	})
@@ -1636,16 +1636,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1670,7 +1670,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
-							response: {rows: [{id: testUuid(1)}]}
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -1678,16 +1678,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1707,7 +1707,7 @@ describe('update', () => {
 						{
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
-							parameters: [testUuid(2), testUuid(1)]
+							parameters: [testUuid(2), testUuid(1)],
 						},
 						{
 							sql: SQL`delete from "category"
@@ -1717,16 +1717,16 @@ describe('update', () => {
 							parameters: [testUuid(1)],
 							response: 1,
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1746,18 +1746,18 @@ describe('update', () => {
 						{
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
-							parameters: [testUuid(2), testUuid(1)]
+							parameters: [testUuid(2), testUuid(1)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1783,7 +1783,7 @@ describe('update', () => {
                where "root_"."id" = $2) update "category"
               set "name" = "newData_"."name" from "newData_"
               where "category"."id" = $3`,
-							parameters: ['Lorem', testUuid(1), testUuid(1)]
+							parameters: ['Lorem', testUuid(1), testUuid(1)],
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -1791,16 +1791,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1829,7 +1829,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "category"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
-							response: 1
+							response: 1,
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -1837,16 +1837,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1875,7 +1875,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "category"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
-							response: 0
+							response: 0,
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1885,7 +1885,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -1893,16 +1893,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
 						},
-						selectUpdatePostSql
-					])
+						selectUpdatePostSql,
+					]),
 				],
 				return: {
 					data: {
 						updatePost: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 	})
@@ -1913,7 +1913,7 @@ describe('update', () => {
                from "category" as "root_"
                where "root_"."id" = $1`,
 			response: [{ root_id: testUuid(2) }],
-			parameters: [testUuid(2)]
+			parameters: [testUuid(2)],
 		}
 
 		it('connect', async () => {
@@ -1935,16 +1935,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
 						},
-						selectUpdateCategorySql
-					])
+						selectUpdateCategorySql,
+					]),
 				],
 				return: {
 					data: {
 						updateCategory: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -1969,7 +1969,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
-							response: {rows: [{id: testUuid(1)}]}
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -1977,16 +1977,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
 						},
-						selectUpdateCategorySql
-					])
+						selectUpdateCategorySql,
+					]),
 				],
 				return: {
 					data: {
 						updateCategory: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -2006,7 +2006,7 @@ describe('update', () => {
 						{
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
-							parameters: [testUuid(1), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2)],
 						},
 						{
 							sql: SQL`delete from "post"
@@ -2016,16 +2016,16 @@ describe('update', () => {
 							parameters: [testUuid(1)],
 							response: 1,
 						},
-						selectUpdateCategorySql
-					])
+						selectUpdateCategorySql,
+					]),
 				],
 				return: {
 					data: {
 						updateCategory: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -2045,18 +2045,18 @@ describe('update', () => {
 						{
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
-							parameters: [testUuid(1), testUuid(2)]
+							parameters: [testUuid(1), testUuid(2)],
 						},
-						selectUpdateCategorySql
-					])
+						selectUpdateCategorySql,
+					]),
 				],
 				return: {
 					data: {
 						updateCategory: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -2082,7 +2082,7 @@ describe('update', () => {
                where "root_"."id" = $2) update "post"
               set "title" = "newData_"."title" from "newData_"
               where "post"."id" = $3`,
-							parameters: ['Lorem', testUuid(1), testUuid(1)]
+							parameters: ['Lorem', testUuid(1), testUuid(1)],
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -2090,16 +2090,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
 						},
-						selectUpdateCategorySql
-					])
+						selectUpdateCategorySql,
+					]),
 				],
 				return: {
 					data: {
 						updateCategory: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -2128,7 +2128,7 @@ describe('update', () => {
               set "title" = "newData_"."title" from "newData_"
               where "post"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
-							response: 1
+							response: 1,
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -2136,16 +2136,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
 						},
-						selectUpdateCategorySql
-					])
+						selectUpdateCategorySql,
+					]),
 				],
 				return: {
 					data: {
 						updateCategory: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 
@@ -2174,7 +2174,7 @@ describe('update', () => {
               set "title" = "newData_"."title" from "newData_"
               where "post"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
-							response: 0
+							response: 0,
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -2184,7 +2184,7 @@ describe('update', () => {
               from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
-							response: {rows: [{id: testUuid(1)}]},
+							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
@@ -2192,16 +2192,16 @@ describe('update', () => {
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
 						},
-						selectUpdateCategorySql
-					])
+						selectUpdateCategorySql,
+					]),
 				],
 				return: {
 					data: {
 						updateCategory: {
-							id: testUuid(2)
-						}
-					}
-				}
+							id: testUuid(2),
+						},
+					},
+				},
 			})
 		})
 	})
@@ -2223,21 +2223,21 @@ describe('update', () => {
 				permissions: {
 					Author: {
 						predicates: {
-							name_predicate: { name: 'name_variable' }
+							name_predicate: { name: 'name_variable' },
 						},
 						operations: {
 							update: {
 								id: true,
-								name: 'name_predicate'
+								name: 'name_predicate',
 							},
 							read: {
-								id: true
-							}
-						}
-					}
+								id: true,
+							},
+						},
+					},
 				},
 				variables: {
-					name_variable: ['John', 'Jack']
+					name_variable: ['John', 'Jack'],
 				},
 				executes: [
 					...sqlTransaction([
@@ -2250,24 +2250,24 @@ describe('update', () => {
                where "root_"."id" = $2) update "author"
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3 and "author"."name" in ($4, $5) and "newData_"."name" in ($6, $7)`,
-							parameters: ['John', testUuid(1), testUuid(1), 'John', 'Jack', 'John', 'Jack']
+							parameters: ['John', testUuid(1), testUuid(1), 'John', 'Jack', 'John', 'Jack'],
 						},
 						{
 							sql: SQL`select "root_"."id" as "root_id"
                      from "author" as "root_"
                      where "root_"."id" = $1`,
 							response: [{ root_id: testUuid(1) }],
-							parameters: [testUuid(1)]
-						}
-					])
+							parameters: [testUuid(1)],
+						},
+					]),
 				],
 				return: {
 					data: {
 						updateAuthor: {
-							id: testUuid(1)
-						}
-					}
-				}
+							id: testUuid(1),
+						},
+					},
+				},
 			})
 		})
 
@@ -2286,38 +2286,38 @@ describe('update', () => {
 					Post: {
 						predicates: {
 							post_name_predicate: {
-								name: 'post_name_variable'
-							}
+								name: 'post_name_variable',
+							},
 						},
 						operations: {
 							read: {
-								id: true
+								id: true,
 							},
 							update: {
 								id: true,
-								categories: 'post_name_predicate'
-							}
-						}
+								categories: 'post_name_predicate',
+							},
+						},
 					},
 					Category: {
 						predicates: {
 							category_name_predicate: {
-								name: 'category_name_variable'
-							}
+								name: 'category_name_variable',
+							},
 						},
 						operations: {
 							read: {
-								id: true
+								id: true,
 							},
 							update: {
-								posts: 'category_name_predicate'
-							}
-						}
-					}
+								posts: 'category_name_predicate',
+							},
+						},
+					},
 				},
 				variables: {
 					post_name_variable: ['Lorem ipsum', 'Dolor sit'],
-					category_name_variable: ['foo', 'bar']
+					category_name_variable: ['foo', 'bar'],
 				},
 				query: GQL`mutation  {
           updatePost(where: {id: "${testUuid(1)}"}, data: {categories: [
@@ -2351,15 +2351,8 @@ describe('update', () => {
               coalesce(insert.inserted, false) as "inserted"
             from (values (null)) as "t" left join "data" as "data" on true
               left join "insert" as "insert" on true`,
-						parameters: [
-							'Lorem ipsum',
-							'Dolor sit',
-							testUuid(1),
-							'foo',
-							'bar',
-							testUuid(2),
-						],
-						response: [{selected: true, inserted: true}],
+						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(2)],
+						response: [{ selected: true, inserted: true }],
 					},
 					{
 						sql: SQL`with "data" as
@@ -2381,31 +2374,24 @@ describe('update', () => {
               coalesce(delete.deleted, false) as "deleted"
             from (values (null)) as "t" left join "data" as "data" on true
               left join "delete" as "delete" on true`,
-						parameters: [
-							'Lorem ipsum',
-							'Dolor sit',
-							testUuid(1),
-							'foo',
-							'bar',
-							testUuid(3),
-						],
-						response: [{selected: true, deleted: true}],
+						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(3)],
+						response: [{ selected: true, deleted: true }],
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_id: testUuid(1) }],
-						parameters: [testUuid(1)]
-					}
+						parameters: [testUuid(1)],
+					},
 				]),
 				return: {
 					data: {
 						updatePost: {
-							id: '123e4567-e89b-12d3-a456-000000000001'
-						}
-					}
-				}
+							id: '123e4567-e89b-12d3-a456-000000000001',
+						},
+					},
+				},
 			})
 		})
 	})

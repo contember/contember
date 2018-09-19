@@ -64,7 +64,7 @@ describe('build gql schema from model schema', () => {
 							.manyHasMany('categories', r => r.target('Category').inversedBy('posts'))
 					),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
-			graphQlSchemaFile: 'schema1.gql'
+			graphQlSchemaFile: 'schema1.gql',
 		})
 	})
 
@@ -83,35 +83,38 @@ describe('build gql schema from model schema', () => {
 					operations: {
 						create: {
 							id: true,
-							a: true
+							a: true,
 						},
 						update: {
 							id: true,
-							b: true
+							b: true,
 						},
 						read: {
 							id: true,
-							c: true
-						}
-					}
-				}
+							c: true,
+						},
+					},
+				},
 			}),
-			graphQlSchemaFile: 'schema2.gql'
+			graphQlSchemaFile: 'schema2.gql',
 		})
 	})
 
 	describe('one has many', () => {
 		const oneHasManySchema = (builder: SchemaBuilder) =>
-			builder.entity('Root', e => e
-				.column('foo', c => c.type(Model.ColumnType.String))
-				.oneHasMany('r', r => r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2'))
+			builder.entity('Root', e =>
+				e
+					.column('foo', c => c.type(Model.ColumnType.String))
+					.oneHasMany('r', r =>
+						r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2')
+					)
 			)
 
 		it('all allowed', async () => {
 			await testSchema({
 				schema: oneHasManySchema,
 				permissions: schema => new AllowAllPermissionFactory().create(schema),
-				graphQlSchemaFile: 'schema3.gql'
+				graphQlSchemaFile: 'schema3.gql',
 			})
 		})
 
@@ -125,19 +128,19 @@ describe('build gql schema from model schema', () => {
 							create: { id: true },
 							update: { id: true },
 							read: { id: true },
-							delete: true
-						}
+							delete: true,
+						},
 					},
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
 							create: { id: true, a: true, r2: true },
 							update: { id: true, a: true, r2: true },
-							read: { id: true, a: true }
-						}
-					}
+							read: { id: true, a: true },
+						},
+					},
 				}),
-				graphQlSchemaFile: 'schema4.gql'
+				graphQlSchemaFile: 'schema4.gql',
 			})
 		})
 
@@ -151,19 +154,19 @@ describe('build gql schema from model schema', () => {
 							create: { id: true, r: true },
 							update: { id: true, r: true },
 							read: { id: true, r: true },
-							delete: true
-						}
+							delete: true,
+						},
 					},
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
 							create: { id: true, a: true, r2: true },
 							read: { id: true, a: true },
-							delete: true
-						}
-					}
+							delete: true,
+						},
+					},
 				}),
-				graphQlSchemaFile: 'schema5.gql'
+				graphQlSchemaFile: 'schema5.gql',
 			})
 		})
 
@@ -176,19 +179,19 @@ describe('build gql schema from model schema', () => {
 						operations: {
 							update: { id: true, r: true },
 							read: { id: true, r: true },
-							delete: true
-						}
+							delete: true,
+						},
 					},
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
 							update: { id: true, a: true, r2: true },
 							read: { id: true, a: true },
-							delete: true
-						}
-					}
+							delete: true,
+						},
+					},
 				}),
-				graphQlSchemaFile: 'schema6.gql'
+				graphQlSchemaFile: 'schema6.gql',
 			})
 		})
 	})

@@ -28,7 +28,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 		const joiningTable = targetRelation.joiningTable
 		const columns: JoiningColumns = {
 			sourceColumn: joiningTable.inverseJoiningColumn,
-			targetColumn: joiningTable.joiningColumn
+			targetColumn: joiningTable.joiningColumn,
 		}
 		const groups = this.createManyHasManyGroups(entity, targetEntity, targetRelation, columns)
 		this.dataCallback(entity.primary, groups, [])
@@ -43,7 +43,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 		const joiningTable = relation.joiningTable
 		const columns: JoiningColumns = {
 			sourceColumn: joiningTable.joiningColumn,
-			targetColumn: joiningTable.inverseJoiningColumn
+			targetColumn: joiningTable.inverseJoiningColumn,
 		}
 		const groups = this.createManyHasManyGroups(entity, targetEntity, relation, columns)
 		this.dataCallback(entity.primary, groups, [])
@@ -60,7 +60,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 			(async () => {
 				const whereWithParentId = {
 					...this.object.args.where,
-					[targetRelation.name]: { [entity.primary]: { in: await this.parentIdsGetter(entity.primary) } }
+					[targetRelation.name]: { [entity.primary]: { in: await this.parentIdsGetter(entity.primary) } },
 				}
 				const objectNode = new ObjectNode<Input.ListQueryInput>(
 					this.object.name,
@@ -68,7 +68,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 					this.object.fields,
 					{
 						...this.object.args,
-						where: whereWithParentId
+						where: whereWithParentId,
 					}
 				)
 
@@ -104,8 +104,8 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 				where: {
 					and: [objectNode.args.where, { [targetEntity.primary]: { in: inversedIds } }].filter(
 						(it): it is Input.Where => it !== undefined
-					)
-				}
+					),
+				},
 			}
 		)
 		const result = await this.mapper.select(targetEntity, queryWithWhere)
@@ -151,12 +151,12 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 				const idsWhere: Input.Where = {
 					[targetRelation.name]: {
 						[entity.primary]: {
-							in: ids
-						}
-					}
+							in: ids,
+						},
+					},
 				}
 				const where: Input.Where = {
-					and: [idsWhere, this.object.args.where].filter((it): it is Input.Where => it !== undefined)
+					and: [idsWhere, this.object.args.where].filter((it): it is Input.Where => it !== undefined),
 				}
 				const objectWithWhere = this.object.withArg('where', where)
 
@@ -178,11 +178,11 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 				const ids = await this.parentIdsGetter(relation.name)
 				const idsWhere: Input.Where = {
 					[targetEntity.primary]: {
-						in: ids
-					}
+						in: ids,
+					},
 				}
 				const where: Input.Where = {
-					and: [idsWhere, this.object.args.where].filter((it): it is Input.Where => it !== undefined)
+					and: [idsWhere, this.object.args.where].filter((it): it is Input.Where => it !== undefined),
 				}
 				const objectWithWhere = this.object.withArg('where', where)
 
@@ -204,11 +204,11 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 				const ids = await this.parentIdsGetter(relation.name)
 				const idsWhere: Input.Where = {
 					[targetEntity.primary]: {
-						in: ids
-					}
+						in: ids,
+					},
 				}
 				const where: Input.Where = {
-					and: [idsWhere, this.object.args.where].filter((it): it is Input.Where => it !== undefined)
+					and: [idsWhere, this.object.args.where].filter((it): it is Input.Where => it !== undefined),
 				}
 				const objectWithWhere = this.object.withArg('where', where)
 

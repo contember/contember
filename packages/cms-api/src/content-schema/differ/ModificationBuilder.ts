@@ -11,7 +11,7 @@ export default class ModificationBuilder {
 
 	public getDiff(): SchemaDiff {
 		return {
-			modifications: [...this.entities, ...this.modifications]
+			modifications: [...this.entities, ...this.modifications],
 		}
 	}
 
@@ -25,17 +25,17 @@ export default class ModificationBuilder {
 				primaryColumn: updatedEntity.primaryColumn,
 				tableName: updatedEntity.tableName,
 				fields: {
-					[updatedEntity.primary]: deepCopy(updatedEntity.fields[updatedEntity.primary])
+					[updatedEntity.primary]: deepCopy(updatedEntity.fields[updatedEntity.primary]),
 				},
-				unique: {}
-			}
+				unique: {},
+			},
 		})
 	}
 
 	public removeEntity(entityName: string) {
 		this.modifications.push({
 			modification: 'removeEntity',
-			entityName: entityName
+			entityName: entityName,
 		})
 	}
 
@@ -43,7 +43,7 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'updateEntityPluralName',
 			entityName: entityName,
-			pluralName: pluralName
+			pluralName: pluralName,
 		})
 	}
 
@@ -51,7 +51,7 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'updateEntityTableName',
 			entityName: entityName,
-			tableName: tableName
+			tableName: tableName,
 		})
 	}
 
@@ -71,7 +71,7 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'removeField',
 			entityName: entityName,
-			fieldName: fieldName
+			fieldName: fieldName,
 		})
 	}
 
@@ -80,7 +80,7 @@ export default class ModificationBuilder {
 			modification: 'updateColumnName',
 			entityName: entityName,
 			fieldName: fieldName,
-			columnName: columnName
+			columnName: columnName,
 		})
 	}
 
@@ -89,7 +89,7 @@ export default class ModificationBuilder {
 			modification: 'updateColumnDefinition',
 			entityName: entityName,
 			fieldName: fieldName,
-			definition: definition
+			definition: definition,
 		})
 	}
 
@@ -104,7 +104,7 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'createUniqueConstraint',
 			entityName: updatedEntity.name,
-			unique: deepCopy(unique)
+			unique: deepCopy(unique),
 		})
 	}
 
@@ -112,7 +112,7 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'removeUniqueConstraint',
 			entityName: entityName,
-			constraintName: uniqueName
+			constraintName: uniqueName,
 		})
 	}
 
@@ -120,14 +120,14 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'createEnum',
 			enumName: enumName,
-			values: deepCopy(this.updatedSchema.enums[enumName])
+			values: deepCopy(this.updatedSchema.enums[enumName]),
 		})
 	}
 
 	public removeEnum(enumName: string) {
 		this.modifications.push({
 			modification: 'removeEnum',
-			enumName: enumName
+			enumName: enumName,
 		})
 	}
 
@@ -135,7 +135,7 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'updateEnum',
 			enumName: enumName,
-			values: deepCopy(this.updatedSchema.enums[enumName])
+			values: deepCopy(this.updatedSchema.enums[enumName]),
 		})
 	}
 }

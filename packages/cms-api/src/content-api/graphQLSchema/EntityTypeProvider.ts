@@ -3,7 +3,7 @@ import {
 	GraphQLFieldConfig,
 	GraphQLObjectType,
 	GraphQLObjectTypeConfig,
-	GraphQLOutputType
+	GraphQLOutputType,
 } from 'graphql'
 import { Acl, Model } from 'cms-common'
 import { acceptFieldVisitor, getEntity as getEntityFromSchema } from '../../content-schema/modelUtils'
@@ -23,8 +23,8 @@ export default class EntityTypeProvider {
 		name: 'FieldMeta',
 		fields: {
 			readable: { type: GraphQLBoolean },
-			updatable: { type: GraphQLBoolean }
-		}
+			updatable: { type: GraphQLBoolean },
+		},
 	})
 
 	constructor(
@@ -41,7 +41,7 @@ export default class EntityTypeProvider {
 	private createEntity(entityName: string) {
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}`,
-			fields: () => this.getEntityFields(entityName)
+			fields: () => this.getEntityFields(entityName),
 		} as GraphQLObjectTypeConfig<any, any>)
 	}
 
@@ -52,8 +52,8 @@ export default class EntityTypeProvider {
 		fields['_meta'] = {
 			type: new GraphQLObjectType({
 				name: GqlTypeName`${entityName}Meta`,
-				fields: metaFields
-			})
+				fields: metaFields,
+			}),
 		}
 
 		for (const fieldName in entity.fields) {
@@ -84,10 +84,10 @@ export default class EntityTypeProvider {
 			fields[fieldName] = {
 				type,
 				args: acceptFieldVisitor(this.schema, entity, fieldName, fieldArgsVisitor),
-				resolve: fieldResolver
+				resolve: fieldResolver,
 			}
 			metaFields[fieldName] = {
-				type: this.fieldMeta
+				type: this.fieldMeta,
 			}
 		}
 		return fields

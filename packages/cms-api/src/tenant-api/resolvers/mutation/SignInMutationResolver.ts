@@ -25,13 +25,13 @@ export default class SignInMutationResolver implements MutationResolvers.Resolve
 		if (!result.ok) {
 			return {
 				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode }))
+				errors: result.errors.map(errorCode => ({ code: errorCode })),
 			}
 		}
 
 		const [personRow, projectRows] = await Promise.all([
 			this.queryHandler.fetch(new PersonByIdQuery(result.personId)),
-			this.queryHandler.fetch(new ProjectsByPersonQuery(result.personId))
+			this.queryHandler.fetch(new ProjectsByPersonQuery(result.personId)),
 		])
 
 		if (personRow === null) {
@@ -46,9 +46,9 @@ export default class SignInMutationResolver implements MutationResolvers.Resolve
 				person: {
 					id: personRow.id,
 					email: personRow.email,
-					projects: projectRows
-				}
-			}
+					projects: projectRows,
+				},
+			},
 		}
 	}
 }

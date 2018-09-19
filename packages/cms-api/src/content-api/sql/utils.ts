@@ -62,7 +62,7 @@ export const expression = {
 	},
 	not: (expression: string): string => {
 		return `NOT(${expression})`
-	}
+	},
 }
 
 export const createAlias = (usedNames: string[]) => (...namePath: string[]): string => {

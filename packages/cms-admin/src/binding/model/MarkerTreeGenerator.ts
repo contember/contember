@@ -67,66 +67,70 @@ export default class MarkerTreeGenerator {
 		if ('type' in node) {
 			children = node.props.children
 
-			if (!(typeof node.type === 'string')) {
-				// React.Component
-				const dataMarker = node.type as DataMarkerProvider & (React.ComponentClass<any> | React.SFC<any>)
+			if (typeof node.type === 'symbol' || typeof node.type === 'string') {
+				// React.Fragment or other non-component
+				return this.processNode(children)
+			}
 
-				if ('generateSyntheticChildren' in dataMarker && dataMarker.generateSyntheticChildren) {
-					children = dataMarker.generateSyntheticChildren(node.props)
-				}
+			// React.Component
 
-				if ('generateFieldMarker' in dataMarker && dataMarker.generateFieldMarker) {
-					return dataMarker.generateFieldMarker(node.props)
-				}
+			const dataMarker = node.type as DataMarkerProvider & (React.ComponentClass<any> | React.SFC<any>)
 
-				if ('generateFieldMarkers' in dataMarker && dataMarker.generateFieldMarkers) {
-					return dataMarker.generateFieldMarkers(node.props)
-				}
+			if ('generateSyntheticChildren' in dataMarker && dataMarker.generateSyntheticChildren) {
+				children = dataMarker.generateSyntheticChildren(node.props)
+			}
 
-				if ('generateEntityMarker' in dataMarker && dataMarker.generateEntityMarker) {
-					if (children) {
-						return dataMarker.generateEntityMarker(
-							node.props,
-							this.mapNodeResultToEntityFields(this.processNode(children))
-						)
-					}
-					throw new DataBindingError(
-						`Each ${
-							node.type.displayName
-						} component must have children that refer to its fields as otherwise, it would be redundant.`
+			if ('generateFieldMarker' in dataMarker && dataMarker.generateFieldMarker) {
+				return dataMarker.generateFieldMarker(node.props)
+			}
+
+			if ('generateFieldMarkers' in dataMarker && dataMarker.generateFieldMarkers) {
+				return dataMarker.generateFieldMarkers(node.props)
+			}
+
+			if ('generateEntityMarker' in dataMarker && dataMarker.generateEntityMarker) {
+				if (children) {
+					return dataMarker.generateEntityMarker(
+						node.props,
+						this.mapNodeResultToEntityFields(this.processNode(children))
 					)
 				}
-
-				if ('generateMarkerTreeRoot' in dataMarker && dataMarker.generateMarkerTreeRoot) {
-					if (children) {
-						const processed = this.processNode(children)
-
-						if (processed instanceof EntityMarker) {
-							return dataMarker.generateMarkerTreeRoot(node.props, processed)
-						}
-						throw new DataBindingError(
-							`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
-						)
-					}
-					throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
-				}
-
-				if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
-					if (children) {
-						const processed = this.processNode(children)
-
-						if (processed instanceof EntityMarker) {
-							return dataMarker.generateReferenceMarker(node.props, processed)
-						}
-						throw new DataBindingError(
-							`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
-						)
-					}
-					throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
-				}
-
-				return undefined
+				throw new DataBindingError(
+					`Each ${
+						node.type.displayName
+					} component must have children that refer to its fields as otherwise, it would be redundant.`
+				)
 			}
+
+			if ('generateMarkerTreeRoot' in dataMarker && dataMarker.generateMarkerTreeRoot) {
+				if (children) {
+					const processed = this.processNode(children)
+
+					if (processed instanceof EntityMarker) {
+						return dataMarker.generateMarkerTreeRoot(node.props, processed)
+					}
+					throw new DataBindingError(
+						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
+					)
+				}
+				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
+			}
+
+			if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
+				if (children) {
+					const processed = this.processNode(children)
+
+					if (processed instanceof EntityMarker) {
+						return dataMarker.generateReferenceMarker(node.props, processed)
+					}
+					throw new DataBindingError(
+						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
+					)
+				}
+				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
+			}
+
+			return undefined
 		} else if ('children' in node) {
 			// React Portal
 			children = node.children

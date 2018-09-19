@@ -136,7 +136,7 @@ export default class WhereBuilder {
 		}
 
 		qb.join(targetEntity.tableName, 'root_', clause =>
-			clause.compareColumns(['junction_', toColumn], '=', ['root_', targetEntity.primary])
+			clause.compareColumns(['junction_', toColumn], SqlConditionBuilder.Operator.eq, ['root_', targetEntity.primary])
 		)
 		qb.where(clause => this.buildInternal(qb, clause, targetEntity, new Path([]), relationWhere, true))
 	}

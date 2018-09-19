@@ -130,6 +130,10 @@ export default class MarkerTreeGenerator {
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
 			}
 
+			if (children) {
+				return this.processNode(children)
+			}
+
 			return undefined
 		} else if ('children' in node) {
 			// React Portal

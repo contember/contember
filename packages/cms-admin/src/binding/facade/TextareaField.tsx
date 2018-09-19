@@ -1,10 +1,10 @@
-import { FormGroup, IFormGroupProps, InputGroup, TextArea, ITextAreaProps } from '@blueprintjs/core'
+import { FormGroup, IFormGroupProps, TextArea } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../bindingTypes'
-import { FieldMarkerProvider } from '../coreComponents/MarkerProvider'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
 import Field from '../coreComponents/Field'
+import { FieldMarkerProvider } from '../coreComponents/MarkerProvider'
 import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
 

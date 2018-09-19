@@ -1,13 +1,12 @@
-import { FormGroup, IFormGroupProps, InputGroup, TextArea, ITextAreaProps } from '@blueprintjs/core'
+import { IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
-import { ChangeEvent } from 'react'
+import RichEditor from '../../components/RichEditor'
 import { FieldName } from '../bindingTypes'
-import { FieldMarkerProvider } from '../coreComponents/MarkerProvider'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
 import Field from '../coreComponents/Field'
+import { FieldMarkerProvider } from '../coreComponents/MarkerProvider'
 import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
-import RichEditor from '../../components/RichEditor'
 
 export interface RichTextFieldProps {
 	name: FieldName

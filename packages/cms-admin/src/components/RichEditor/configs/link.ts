@@ -1,4 +1,4 @@
-import { Config, simpleMarkPlugin, simpleMarkRule } from './utils'
+import { RichEditorPluginConfig, simpleMarkPlugin, simpleMarkRule } from './utils'
 import { Change, Value } from 'slate'
 
 /**
@@ -15,7 +15,7 @@ const wrapLink = (href: string) => (change: Change) =>
  */
 const unwrapLink = () => (change: Change) => change.removeMark('link')
 
-export const LINK: Config = {
+const LINK: RichEditorPluginConfig = {
 	node: 'mark',
 	type: 'link',
 	plugin: simpleMarkPlugin('link', 'a', ['href']),
@@ -46,3 +46,5 @@ export const LINK: Config = {
 		return change
 	}
 }
+
+export default LINK

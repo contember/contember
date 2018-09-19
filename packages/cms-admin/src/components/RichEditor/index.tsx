@@ -5,7 +5,7 @@ import HtmlSerializer from 'slate-html-serializer'
 import { Value, Change } from 'slate'
 import { ActionButton, Toolbar } from './utils'
 import { PARAGRAPH_RULE } from './rules'
-import { Config, BOLD, ITALIC, UNDERLINED, LINK } from './configs'
+import { RichEditorPluginConfig, BOLD, ITALIC, UNDERLINED, LINK } from './configs'
 import { FormGroup, Classes } from '@blueprintjs/core'
 import cn from 'classnames'
 
@@ -26,7 +26,7 @@ export interface RichTextFieldState {
 	value: Value
 }
 
-const CONFIGS: Config[] = [BOLD, ITALIC, UNDERLINED, LINK]
+const CONFIGS: RichEditorPluginConfig[] = [BOLD, ITALIC, UNDERLINED, LINK]
 
 export default class RichEditor extends React.Component<RichEditorProps, RichTextFieldState> {
 	serializer: HtmlSerializer
@@ -52,7 +52,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						<ActionButton config={LINK} icon="link" value={this.state.value} onChange={this.onChange} />
 					</Toolbar>
 					<Editor
-						className={cn(Classes.INPUT, 'input-autoHeight')}
+						className={cn(Classes.INPUT, 'input', 'view-autoHeight')}
 						spellCheck
 						plugins={this.plugins}
 						value={this.state.value}
@@ -98,34 +98,6 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 				change.insertText('\n')
 			}
 			return true
-
-			const { value } = change
-			const { selection } = value
-			const { start, end, isExpanded } = selection
-			if (isExpanded) {
-				return
-			}
-
-			const { startBlock } = value
-			if (start.offset == 0 && startBlock.text.length == 0) {
-				if (startBlock.type == DEFAULT_NODE) {
-					return
-				}
-
-				event.preventDefault()
-				change.setBlocks(DEFAULT_NODE)
-
-				return
-			}
-			if (end.offset != startBlock.text.length) return
-
-			if (startBlock.type != 'heading') {
-				return
-			}
-
-			event.preventDefault()
-			change.splitBlock(1).setBlocks(DEFAULT_NODE)
-			return
 		} else {
 			return
 		}

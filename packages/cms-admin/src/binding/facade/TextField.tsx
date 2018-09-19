@@ -1,4 +1,4 @@
-import { FormGroup, IFormGroupProps, InputGroup } from '@blueprintjs/core'
+import { FormGroup, IFormGroupProps, InputGroup, IInputGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../bindingTypes'
@@ -11,7 +11,7 @@ import FieldMarker from '../dao/FieldMarker'
 export interface TextFieldProps {
 	name: FieldName
 	label?: IFormGroupProps['label']
-	large?: boolean
+	large?: IInputGroupProps['large']
 	inlineLabel?: boolean
 }
 

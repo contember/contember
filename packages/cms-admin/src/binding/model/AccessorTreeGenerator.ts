@@ -22,13 +22,13 @@ export default class AccessorTreeGenerator {
 			data = [data]
 		}
 
-		const entityAccessors: Array<EntityAccessor> = (data as any[]).map((datum, i) => this.updateFields(
-			datum, tree.root, (fieldName, newData) => {
+		const entityAccessors: Array<EntityAccessor> = (data as any[]).map((datum, i) =>
+			this.updateFields(datum, tree.root, (fieldName, newData) => {
 				entityAccessors[i] = entityAccessors[i].withUpdatedField(fieldName, newData)
 
 				updateData(AccessorTreeRoot.createInstance(tree, entityAccessors))
-			}
-		))
+			}),
+		)
 		return AccessorTreeRoot.createInstance(tree, entityAccessors)
 	}
 
@@ -38,7 +38,7 @@ export default class AccessorTreeGenerator {
 		},
 		marker: EntityMarker,
 		onUpdate: (updatedField: FieldName, updatedData: FieldData) => void,
-		onUnlink?: () => void
+		onUnlink?: () => void,
 	): EntityAccessor {
 		const entityData: EntityData = {}
 		const id = data[AccessorTreeGenerator.PRIMARY_KEY_NAME]
@@ -56,7 +56,6 @@ export default class AccessorTreeGenerator {
 				entityData[fieldName] = this.generateSubTree(field, () => undefined)
 				continue
 			}
-
 
 			if (Array.isArray(fieldData)) {
 				if (field instanceof EntityMarker) {
@@ -77,7 +76,7 @@ export default class AccessorTreeGenerator {
 							() => {
 								oneToManyData[i] = undefined
 								onUpdate(fieldName, oneToManyData)
-							}
+							},
 						)
 						if (accessor) oneToManyData.push(accessor)
 					}
@@ -95,7 +94,7 @@ export default class AccessorTreeGenerator {
 								onUpdate(fieldName, accessor.withUpdatedField(updatedField, updatedData))
 							}
 						},
-						() => onUpdate(fieldName, undefined)
+						() => onUpdate(fieldName, undefined),
 					)
 					if (accessor) entityData[fieldName] = accessor
 				}

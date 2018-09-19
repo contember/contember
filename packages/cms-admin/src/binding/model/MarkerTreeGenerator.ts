@@ -40,7 +40,7 @@ export default class MarkerTreeGenerator {
 		if (typeof node === 'function') {
 			throw new DataBindingError(
 				'Render props (functions as React Component children) are not supported within the schema. ' +
-					'Please refer to the documentation.'
+					'Please refer to the documentation.',
 			)
 		}
 
@@ -88,13 +88,13 @@ export default class MarkerTreeGenerator {
 				if (children) {
 					return dataMarker.generateEntityMarker(
 						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children))
+						this.mapNodeResultToEntityFields(this.processNode(children)),
 					)
 				}
 				throw new DataBindingError(
 					`Each ${
 						node.type.displayName
-					} component must have children that refer to its fields as otherwise, it would be redundant.`
+					} component must have children that refer to its fields as otherwise, it would be redundant.`,
 				)
 			}
 
@@ -106,7 +106,7 @@ export default class MarkerTreeGenerator {
 						return dataMarker.generateMarkerTreeRoot(node.props, processed)
 					}
 					throw new DataBindingError(
-						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
+						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`,
 					)
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
@@ -120,7 +120,7 @@ export default class MarkerTreeGenerator {
 						return dataMarker.generateReferenceMarker(node.props, processed)
 					}
 					throw new DataBindingError(
-						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`
+						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`,
 					)
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
@@ -159,7 +159,7 @@ export default class MarkerTreeGenerator {
 				fields[marker.placeholderName] = marker
 			} else {
 				throw new DataBindingError(
-					'Detected a sub-entity directly within another one. Use a <Repeater /> or a similar component for relations.'
+					'Detected a sub-entity directly within another one. Use a <Repeater /> or a similar component for relations.',
 				)
 			}
 		}
@@ -171,14 +171,14 @@ export default class MarkerTreeGenerator {
 		if (marker) {
 			if (marker instanceof EntityMarker) {
 				throw new DataBindingError(
-					`Top-level <Entity /> discovered. Any entity (or equivalent) components need to be used from within a DataProvider.`
+					`Top-level <Entity /> discovered. Any entity (or equivalent) components need to be used from within a DataProvider.`,
 				)
 			}
 
 			const kind = marker instanceof FieldMarker ? 'field' : 'relation'
 
 			throw new DataBindingError(
-				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within an <Entity />.`
+				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within an <Entity />.`,
 			)
 		}
 		throw new DataBindingError('Empty form discovered. Try adding some fields…')

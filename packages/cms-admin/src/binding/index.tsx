@@ -15,7 +15,7 @@ export {
 	OneToMany,
 	SelectField,
 	SingleEntityDataProvider,
-	UnlinkButton
+	UnlinkButton,
 }
 
 export * from './facade'

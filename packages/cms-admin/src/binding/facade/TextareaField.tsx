@@ -2,7 +2,7 @@ import { FormGroup, IFormGroupProps, InputGroup, TextArea, ITextAreaProps } from
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../bindingTypes'
-import { FieldMarkerProvider } from '../coreComponents/DataMarkerProvider'
+import { FieldMarkerProvider } from '../coreComponents/MarkerProvider'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
 import Field from '../coreComponents/Field'
 import FieldAccessor from '../dao/FieldAccessor'

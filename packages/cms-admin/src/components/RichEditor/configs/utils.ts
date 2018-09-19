@@ -3,7 +3,7 @@ import { Rule } from 'slate-html-serializer'
 import * as React from 'react'
 import { Change, Value, Mark } from 'slate'
 
-export interface Config {
+export interface RichEditorPluginConfig {
 	node: 'mark' | 'block'
 	type: string
 	plugin: Plugin
@@ -50,14 +50,11 @@ export function simpleMarkRule(markType: string, htmlTag: string | string[], att
 	}
 }
 
-export const simpleMarkToggle = (markType: string): Config['onToggle'] => (value: Value): Change =>
+export const simpleMarkToggle = (markType: string): RichEditorPluginConfig['onToggle'] => (value: Value): Change =>
 	value.change().toggleMark(markType)
 
-export function simpleMarkConfig(markType: string, htmlTags: string | string[]): Config {
+export function simpleMarkConfig(markType: string, htmlTags: string | [string, ...string[]]): RichEditorPluginConfig {
 	const tags = Array.isArray(htmlTags) ? htmlTags : [htmlTags]
-	if (tags.length === 0) {
-		throw new Error('You must pass at least one HTML tag name')
-	}
 	return {
 		node: 'mark',
 		type: markType,

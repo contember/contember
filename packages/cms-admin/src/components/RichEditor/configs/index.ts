@@ -1,7 +1,5 @@
-import { simpleMarkConfig } from './utils'
-
-export { Config } from './utils'
-export const BOLD = simpleMarkConfig('bold', ['strong', 'b'])
-export const ITALIC = simpleMarkConfig('italic', ['em', 'i'])
-export const UNDERLINED = simpleMarkConfig('underlined', ['u'])
-export { LINK } from './link'
+export { RichEditorPluginConfig } from './utils'
+export { default as BOLD } from './bold'
+export { default as ITALIC } from './italic'
+export { default as UNDERLINED } from './underlined'
+export { default as LINK } from './link'

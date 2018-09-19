@@ -38,7 +38,7 @@ export default class TextAreaField extends React.Component<TextAreaFieldProps> {
 	}
 
 	private generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLTextAreaElement>) => {
-		const str = this.props.singleLine ? e.target.value.replace('\n', '') : e.target.value
+		const str = this.props.singleLine ? e.target.value.replace(/\n/g, ' ') : e.target.value
 		data.onChange && data.onChange(str)
 	}
 

@@ -25,7 +25,7 @@ export default class QueryProvider {
 		}
 		return {
 			[entityName]: this.getByUniqueQuery(entityName),
-			[entity.pluralName]: this.getListQuery(entityName)
+			[entity.pluralName]: this.getListQuery(entityName),
 		}
 	}
 
@@ -34,10 +34,10 @@ export default class QueryProvider {
 		return {
 			type: this.entityTypeProvider.getEntity(entityName),
 			args: {
-				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) }
+				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 			},
 			resolve: (parent, args, context, info) =>
-				this.readResolverFactory.create(context).resolveGetQuery(entity, this.queryAstAFactory.create(info))
+				this.readResolverFactory.create(context).resolveGetQuery(entity, this.queryAstAFactory.create(info)),
 		}
 	}
 
@@ -47,10 +47,10 @@ export default class QueryProvider {
 		return {
 			type: new GraphQLList(this.entityTypeProvider.getEntity(entityName)),
 			args: {
-				where: { type: this.whereTypeProvider.getEntityWhereType(entityName) }
+				where: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
 			},
 			resolve: (parent, args, context, info) =>
-				this.readResolverFactory.create(context).resolveListQuery(entity, this.queryAstAFactory.create(info))
+				this.readResolverFactory.create(context).resolveListQuery(entity, this.queryAstAFactory.create(info)),
 		}
 	}
 }

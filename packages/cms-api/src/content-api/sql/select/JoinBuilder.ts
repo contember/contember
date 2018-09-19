@@ -3,7 +3,7 @@ import { acceptRelationTypeVisitor, getTargetEntity } from '../../../content-sch
 import { Model } from 'cms-common'
 import JoinVisitor from './JoinVisitor'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
-import ConditionBuilder from "../../../core/knex/ConditionBuilder";
+import ConditionBuilder from '../../../core/knex/ConditionBuilder'
 
 export default class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}
@@ -16,7 +16,10 @@ export default class JoinBuilder {
 			const targetAlias = join.targetAlias || path.getAlias()
 
 			qb.leftJoin(join.tableName, targetAlias, clause =>
-				clause.compareColumns([sourceAlias, join.sourceColumn], ConditionBuilder.Operator.eq, [targetAlias, join.targetColumn])
+				clause.compareColumns([sourceAlias, join.sourceColumn], ConditionBuilder.Operator.eq, [
+					targetAlias,
+					join.targetColumn,
+				])
 			)
 		}
 

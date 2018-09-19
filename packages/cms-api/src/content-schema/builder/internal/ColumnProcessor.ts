@@ -24,7 +24,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 		const common = {
 			name: fieldName,
 			columnName: options.columnName || this.conventions.getColumnName(fieldName),
-			nullable: options.nullable === undefined ? true : options.nullable
+			nullable: options.nullable === undefined ? true : options.nullable,
 		}
 
 		switch (type) {

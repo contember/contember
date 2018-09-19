@@ -21,8 +21,8 @@ export default class AllowAllPermissionFactory {
 					read: fieldPermissions,
 					update: fieldPermissions,
 					create: fieldPermissions,
-					delete: true
-				}
+					delete: true,
+				},
 			}
 		}
 

@@ -24,7 +24,7 @@ export default class CreateEntityInputFieldVisitor
 		}
 		const type = this.columnTypeResolver.getType(column)
 		return {
-			type: column.nullable ? type : new GraphQLNonNull(type)
+			type: column.nullable ? type : new GraphQLNonNull(type),
 		}
 	}
 
@@ -37,7 +37,7 @@ export default class CreateEntityInputFieldVisitor
 			return undefined
 		}
 		return {
-			type: relation.nullable ? type : new GraphQLNonNull(type)
+			type: relation.nullable ? type : new GraphQLNonNull(type),
 		}
 	}
 
@@ -47,7 +47,7 @@ export default class CreateEntityInputFieldVisitor
 			return undefined
 		}
 		return {
-			type: new GraphQLList(new GraphQLNonNull(type))
+			type: new GraphQLList(new GraphQLNonNull(type)),
 		}
 	}
 }

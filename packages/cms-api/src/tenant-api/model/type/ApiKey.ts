@@ -10,7 +10,7 @@ namespace ApiKey {
 
 	export const enum Type {
 		SESSION = 'session',
-		PERMANENT = 'permanent'
+		PERMANENT = 'permanent',
 	}
 }
 

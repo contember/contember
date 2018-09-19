@@ -64,7 +64,7 @@ export default class SelectBuilder {
 				},
 				visitRelation: async (entity, relation, targetEntity) => {
 					await this.addRelation(field as ObjectNode, path, entity)
-				}
+				},
 			})
 			if (promise) {
 				promises.push(promise)

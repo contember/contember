@@ -255,14 +255,14 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 			new class implements HasManyRelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					await mapper.update(targetEntity, input, {
-						[targetRelation.name]: { connect: thisPrimary }
+						[targetRelation.name]: { connect: thisPrimary },
 					})
 				}
 
 				public async create(input: Input.CreateDataInput) {
 					await mapper.insert(targetEntity, {
 						...input,
-						[targetRelation.name]: { connect: thisPrimary }
+						[targetRelation.name]: { connect: thisPrimary },
 					})
 				}
 
@@ -283,7 +283,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						targetEntity,
 						{ ...where, [targetRelation.name]: primaryValue },
 						{
-							...input
+							...input,
 							// [targetRelation.name]: {connect: thisPrimary}
 						}
 					)
@@ -294,14 +294,14 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						targetEntity,
 						{ ...where, [targetRelation.name]: primaryValue },
 						{
-							...update
+							...update,
 							// [targetRelation.name]: {connect: thisPrimary}
 						}
 					)
 					if (result === 0) {
 						await mapper.insert(targetEntity, {
 							...create,
-							[targetRelation.name]: { connect: thisPrimary }
+							[targetRelation.name]: { connect: thisPrimary },
 						})
 					}
 				}
@@ -337,7 +337,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 					)
 					await mapper.insert(targetEntity, {
 						...input,
-						[targetRelation.name]: { connect: thisPrimary }
+						[targetRelation.name]: { connect: thisPrimary },
 					})
 				}
 
@@ -362,7 +362,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 					if (result === 0) {
 						await mapper.insert(targetEntity, {
 							...create,
-							[targetRelation.name]: { connect: thisPrimary }
+							[targetRelation.name]: { connect: thisPrimary },
 						})
 					}
 				}
@@ -396,7 +396,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 							await mapper.update(
 								entity,
 								{
-									[entity.primary]: currentOwner
+									[entity.primary]: currentOwner,
 								},
 								{ [relation.name]: { disconnect: true } }
 							)

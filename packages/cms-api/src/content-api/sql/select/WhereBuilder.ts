@@ -111,7 +111,7 @@ export default class WhereBuilder {
 						qb.from(targetEntity.tableName, 'root_')
 						qb.where(clause => this.buildInternal(qb, clause, targetEntity, new Path([]), relationWhere, true))
 					})
-				}
+				},
 			})
 		}
 	}

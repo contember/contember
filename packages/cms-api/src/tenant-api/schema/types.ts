@@ -86,18 +86,18 @@ export interface AddProjectMemberMutationArgs {
 }
 
 export enum SignUpErrorCode {
-	EMAIL_ALREADY_EXISTS = 'EMAIL_ALREADY_EXISTS'
+	EMAIL_ALREADY_EXISTS = 'EMAIL_ALREADY_EXISTS',
 }
 
 export enum SignInErrorCode {
 	UNKNOWN_EMAIL = 'UNKNOWN_EMAIL',
-	INVALID_PASSWORD = 'INVALID_PASSWORD'
+	INVALID_PASSWORD = 'INVALID_PASSWORD',
 }
 
 export enum AddProjectMemberErrorCode {
 	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
 	PERSON_NOT_FOUND = 'PERSON_NOT_FOUND',
-	ALREADY_MEMBER = 'ALREADY_MEMBER'
+	ALREADY_MEMBER = 'ALREADY_MEMBER',
 }
 
 export namespace QueryResolvers {

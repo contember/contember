@@ -76,7 +76,7 @@ class SelectHydrator {
 			const updatable = row[columnPath.getAlias() + SelectHydrator.ColumnFlagSuffixes.updatable]
 			currentObject._meta[last] = {
 				readable,
-				updatable
+				updatable,
 			}
 
 			if (currentObject) {
@@ -110,7 +110,7 @@ namespace SelectHydrator {
 	export type NestedDefaultValue = [] | null
 	export enum ColumnFlagSuffixes {
 		readable = '__readable',
-		updatable = '__updatable'
+		updatable = '__updatable',
 	}
 }
 

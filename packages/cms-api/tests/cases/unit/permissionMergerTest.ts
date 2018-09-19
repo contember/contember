@@ -32,11 +32,11 @@ describe('permission merger', () => {
 								predicates: {},
 								operations: {
 									read: {
-										id: true
-									}
-								}
-							}
-						}
+										id: true,
+									},
+								},
+							},
+						},
 					},
 					role2: {
 						inherits: ['role1'],
@@ -45,13 +45,13 @@ describe('permission merger', () => {
 								predicates: {},
 								operations: {
 									read: {
-										id: true
-									}
-								}
-							}
-						}
-					}
-				}
+										id: true,
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role2'],
 			result: {
@@ -59,19 +59,19 @@ describe('permission merger', () => {
 					predicates: {},
 					operations: {
 						read: {
-							id: true
-						}
-					}
+							id: true,
+						},
+					},
 				},
 				Entity2: {
 					predicates: {},
 					operations: {
 						read: {
-							id: true
-						}
-					}
-				}
-			}
+							id: true,
+						},
+					},
+				},
+			},
 		})
 	})
 
@@ -86,11 +86,11 @@ describe('permission merger', () => {
 								predicates: {},
 								operations: {
 									read: {
-										id: true
-									}
-								}
-							}
-						}
+										id: true,
+									},
+								},
+							},
+						},
 					},
 					role2: {
 						entities: {
@@ -98,13 +98,13 @@ describe('permission merger', () => {
 								predicates: {},
 								operations: {
 									read: {
-										title: true
-									}
-								}
-							}
-						}
-					}
-				}
+										title: true,
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role1', 'role2'],
 			result: {
@@ -113,11 +113,11 @@ describe('permission merger', () => {
 					operations: {
 						read: {
 							id: true,
-							title: true
-						}
-					}
-				}
-			}
+							title: true,
+						},
+					},
+				},
+			},
 		})
 	})
 
@@ -132,42 +132,42 @@ describe('permission merger', () => {
 								predicates: {},
 								operations: {
 									read: {
-										id: true
-									}
-								}
-							}
-						}
+										id: true,
+									},
+								},
+							},
+						},
 					},
 					role2: {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: { bar: { eq: 'abc' } }
+									foo: { bar: { eq: 'abc' } },
 								},
 								operations: {
 									read: {
-										title: 'foo'
-									}
-								}
-							}
-						}
-					}
-				}
+										title: 'foo',
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role1', 'role2'],
 			result: {
 				Entity1: {
 					predicates: {
-						foo: { bar: { eq: 'abc' } }
+						foo: { bar: { eq: 'abc' } },
 					},
 					operations: {
 						read: {
 							id: true,
-							title: 'foo'
-						}
-					}
-				}
-			}
+							title: 'foo',
+						},
+					},
+				},
+			},
 		})
 	})
 
@@ -183,27 +183,27 @@ describe('permission merger', () => {
 								operations: {
 									read: {
 										id: true,
-										title: true
-									}
-								}
-							}
-						}
+										title: true,
+									},
+								},
+							},
+						},
 					},
 					role2: {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: { bar: { eq: 'abc' } }
+									foo: { bar: { eq: 'abc' } },
 								},
 								operations: {
 									read: {
-										title: 'foo'
-									}
-								}
-							}
-						}
-					}
-				}
+										title: 'foo',
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role1', 'role2'],
 			result: {
@@ -212,11 +212,11 @@ describe('permission merger', () => {
 					operations: {
 						read: {
 							id: true,
-							title: true
-						}
-					}
-				}
-			}
+							title: true,
+						},
+					},
+				},
+			},
 		})
 	})
 
@@ -229,49 +229,49 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									bar: { lorem: { eq: 'ipsum' } }
+									bar: { lorem: { eq: 'ipsum' } },
 								},
 								operations: {
 									read: {
 										id: true,
-										title: 'bar'
-									}
-								}
-							}
-						}
+										title: 'bar',
+									},
+								},
+							},
+						},
 					},
 					role2: {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: { bar: { eq: 'abc' } }
+									foo: { bar: { eq: 'abc' } },
 								},
 								operations: {
 									read: {
-										title: 'foo'
-									}
-								}
-							}
-						}
-					}
-				}
+										title: 'foo',
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role1', 'role2'],
 			result: {
 				Entity1: {
 					predicates: {
 						__merge__bar__foo: {
-							or: [{ lorem: { eq: 'ipsum' } }, { bar: { eq: 'abc' } }]
-						}
+							or: [{ lorem: { eq: 'ipsum' } }, { bar: { eq: 'abc' } }],
+						},
 					},
 					operations: {
 						read: {
 							id: true,
-							title: '__merge__bar__foo'
-						}
-					}
-				}
-			}
+							title: '__merge__bar__foo',
+						},
+					},
+				},
+			},
 		})
 	})
 
@@ -284,41 +284,41 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									bar: { lorem: { eq: 'ipsum' } }
+									bar: { lorem: { eq: 'ipsum' } },
 								},
 								operations: {
-									delete: 'bar'
-								}
-							}
-						}
+									delete: 'bar',
+								},
+							},
+						},
 					},
 					role2: {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: { bar: { eq: 'abc' } }
+									foo: { bar: { eq: 'abc' } },
 								},
 								operations: {
-									delete: 'foo'
-								}
-							}
-						}
-					}
-				}
+									delete: 'foo',
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role1', 'role2'],
 			result: {
 				Entity1: {
 					predicates: {
 						__merge__bar__foo: {
-							or: [{ lorem: { eq: 'ipsum' } }, { bar: { eq: 'abc' } }]
-						}
+							or: [{ lorem: { eq: 'ipsum' } }, { bar: { eq: 'abc' } }],
+						},
 					},
 					operations: {
-						delete: '__merge__bar__foo'
-					}
-				}
-			}
+						delete: '__merge__bar__foo',
+					},
+				},
+			},
 		})
 	})
 
@@ -331,49 +331,49 @@ describe('permission merger', () => {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: { lorem: { eq: 'ipsum' } }
+									foo: { lorem: { eq: 'ipsum' } },
 								},
 								operations: {
 									read: {
 										id: true,
-										title: 'foo'
-									}
-								}
-							}
-						}
+										title: 'foo',
+									},
+								},
+							},
+						},
 					},
 					role2: {
 						entities: {
 							Entity1: {
 								predicates: {
-									foo: { bar: { eq: 'abc' } }
+									foo: { bar: { eq: 'abc' } },
 								},
 								operations: {
 									read: {
-										content: 'foo'
-									}
-								}
-							}
-						}
-					}
-				}
+										content: 'foo',
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role1', 'role2'],
 			result: {
 				Entity1: {
 					predicates: {
 						foo: { lorem: { eq: 'ipsum' } },
-						foo_: { bar: { eq: 'abc' } }
+						foo_: { bar: { eq: 'abc' } },
 					},
 					operations: {
 						read: {
 							id: true,
 							title: 'foo',
-							content: 'foo_'
-						}
-					}
-				}
-			}
+							content: 'foo_',
+						},
+					},
+				},
+			},
 		})
 	})
 
@@ -387,19 +387,19 @@ describe('permission merger', () => {
 							Entity1: {
 								predicates: {
 									foo: { lorem: { eq: 'ipsum' } },
-									bar: { lorem: { eq: 'ipsum' } }
+									bar: { lorem: { eq: 'ipsum' } },
 								},
 								operations: {
 									read: {
 										title: 'foo',
 										description: 'bar',
-										content: 'bar'
-									}
-								}
-							}
-						}
-					}
-				}
+										content: 'bar',
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			roles: ['role1'],
 			result: {
@@ -408,19 +408,19 @@ describe('permission merger', () => {
 						foo: { lorem: { eq: 'ipsum' } },
 						bar: { lorem: { eq: 'ipsum' } },
 						__merge__foo__bar: {
-							or: [{ lorem: { eq: 'ipsum' } }, { lorem: { eq: 'ipsum' } }]
-						}
+							or: [{ lorem: { eq: 'ipsum' } }, { lorem: { eq: 'ipsum' } }],
+						},
 					},
 					operations: {
 						read: {
 							id: '__merge__foo__bar',
 							title: 'foo',
 							description: 'bar',
-							content: 'bar'
-						}
-					}
-				}
-			}
+							content: 'bar',
+						},
+					},
+				},
+			},
 		})
 	})
 })

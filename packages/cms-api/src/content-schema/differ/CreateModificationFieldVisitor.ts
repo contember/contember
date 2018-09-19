@@ -9,7 +9,7 @@ export default class CreateFieldVisitor
 		return {
 			modification: 'createColumn',
 			entityName: this.entity.name,
-			field: deepCopy(updatedColumn)
+			field: deepCopy(updatedColumn),
 		}
 	}
 
@@ -23,7 +23,7 @@ export default class CreateFieldVisitor
 			modification: 'createRelation',
 			entityName: this.entity.name,
 			owningSide: relation,
-			...(targetRelation ? { inverseSide: targetRelation } : {})
+			...(targetRelation ? { inverseSide: targetRelation } : {}),
 		}
 	}
 
@@ -41,7 +41,7 @@ export default class CreateFieldVisitor
 			modification: 'createRelation',
 			entityName: this.entity.name,
 			owningSide: relation,
-			...(targetRelation ? { inverseSide: targetRelation } : {})
+			...(targetRelation ? { inverseSide: targetRelation } : {}),
 		}
 	}
 
@@ -59,7 +59,7 @@ export default class CreateFieldVisitor
 			modification: 'createRelation',
 			entityName: this.entity.name,
 			owningSide: relation,
-			...(targetRelation ? { inverseSide: targetRelation } : {})
+			...(targetRelation ? { inverseSide: targetRelation } : {}),
 		}
 	}
 

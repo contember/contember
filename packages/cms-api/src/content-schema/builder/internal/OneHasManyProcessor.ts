@@ -18,7 +18,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 	): void {
 		const optionsFinalized = {
 			...options,
-			ownedBy: options.ownedBy || entityName
+			ownedBy: options.ownedBy || entityName,
 		}
 		registerField(optionsFinalized.target, this.createOwning(optionsFinalized, entityName, fieldName))
 		registerField(entityName, this.createInversed(optionsFinalized, fieldName))
@@ -32,7 +32,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 			name: fieldName,
 			ownedBy: options.ownedBy,
 			type: Model.RelationType.OneHasMany,
-			target: options.target
+			target: options.target,
 		}
 	}
 
@@ -51,8 +51,8 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 			type: Model.RelationType.ManyHasOne,
 			joiningColumn: {
 				columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(options.ownedBy),
-				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict
-			}
+				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
+			},
 		}
 	}
 }

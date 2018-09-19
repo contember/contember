@@ -75,7 +75,7 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 						visitRelation: () => {
 							builder.removeField(entityName, fieldName)
 							builder.createField(updatedEntity, fieldName)
-						}
+						},
 					})
 				},
 				visitRelation: ({}, updatedRelation: Model.AnyRelation, {}, _) => {
@@ -89,9 +89,9 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 								builder.removeField(entityName, fieldName)
 								builder.createField(updatedEntity, fieldName)
 							}
-						}
+						},
 					})
-				}
+				},
 			})
 		}
 

@@ -22,7 +22,7 @@ export default class UpdateEntityInputFieldVisitor
 			return undefined
 		}
 		return {
-			type: this.columnTypeResolver.getType(column)
+			type: this.columnTypeResolver.getType(column),
 		}
 	}
 
@@ -35,7 +35,7 @@ export default class UpdateEntityInputFieldVisitor
 			return undefined
 		}
 		return {
-			type: type
+			type: type,
 		}
 	}
 
@@ -45,7 +45,7 @@ export default class UpdateEntityInputFieldVisitor
 			return undefined
 		}
 		return {
-			type: new GraphQLList(new GraphQLNonNull(type))
+			type: new GraphQLList(new GraphQLNonNull(type)),
 		}
 	}
 }

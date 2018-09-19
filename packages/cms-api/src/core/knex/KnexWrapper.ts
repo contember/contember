@@ -2,7 +2,7 @@ import * as Knex from 'knex'
 import QueryBuilder from './QueryBuilder'
 import { Formatter, Value } from './types'
 import InsertBuilder from './InsertBuilder'
-import DeleteBuilder from "./DeleteBuilder";
+import DeleteBuilder from './DeleteBuilder'
 
 export default class KnexWrapper {
 	constructor(public readonly knex: Knex) {}

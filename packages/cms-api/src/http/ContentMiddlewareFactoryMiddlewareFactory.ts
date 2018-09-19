@@ -66,14 +66,14 @@ class ContentMiddlewareFactoryMiddlewareFactory {
 					return {
 						db: db,
 						identityId: res.locals.authResult.identityId,
-						identityVariables: {} ///todo by identity
+						identityVariables: {}, ///todo by identity
 					}
-				}
+				},
 			})
 
 			contentApollo.applyMiddleware({
 				app: contentExpress,
-				path: req.originalUrl
+				path: req.originalUrl,
 			})
 
 			res.locals.contentMiddleware = contentExpress

@@ -26,24 +26,24 @@ describe('predicates injector', () => {
 			operations: {
 				read: {
 					id: true,
-					locales: true
-				}
-			}
+					locales: true,
+				},
+			},
 		},
 		PostLocale: {
 			predicates: {
 				localePredicate: {
-					locale: 'localeVariable'
-				}
+					locale: 'localeVariable',
+				},
 			},
 			operations: {
 				read: {
 					id: 'localePredicate',
 					title: 'localePredicate',
-					content: 'localePredicate'
-				}
-			}
-		}
+					content: 'localePredicate',
+				},
+			},
+		},
 	}
 
 	it('injects predicate', () => {
@@ -57,9 +57,9 @@ describe('predicates injector', () => {
 		expect(result.args.where).deep.eq({
 			and: [
 				{
-					locale: { in: ['cs'] }
-				}
-			]
+					locale: { in: ['cs'] },
+				},
+			],
 		})
 	})
 
@@ -79,9 +79,9 @@ describe('predicates injector', () => {
 		expect(result.args.where).deep.eq({
 			and: [
 				{
-					locale: { in: ['cs'] }
-				}
-			]
+					locale: { in: ['cs'] },
+				},
+			],
 		})
 	})
 
@@ -91,7 +91,7 @@ describe('predicates injector', () => {
 			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
 		)
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {
-			where: { id: { in: [1, 2] } }
+			where: { id: { in: [1, 2] } },
 		})
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
@@ -100,19 +100,19 @@ describe('predicates injector', () => {
 				{
 					and: [
 						{
-							id: { in: [1, 2] }
+							id: { in: [1, 2] },
 						},
 						{
 							locale: {
-								in: ['cs']
-							}
-						}
-					]
+								in: ['cs'],
+							},
+						},
+					],
 				},
 				{
-					locale: { in: ['cs'] }
-				}
-			]
+					locale: { in: ['cs'] },
+				},
+			],
 		})
 	})
 
@@ -122,7 +122,7 @@ describe('predicates injector', () => {
 			new PredicateFactory(permissions, new VariableInjector({ localeVariable: ['cs'] }))
 		)
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {
-			where: { title: { eq: 'abc' } }
+			where: { title: { eq: 'abc' } },
 		})
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
@@ -131,17 +131,17 @@ describe('predicates injector', () => {
 				{
 					and: [
 						{
-							title: { eq: 'abc' }
+							title: { eq: 'abc' },
 						},
 						{
-							locale: { in: ['cs'] }
-						}
-					]
+							locale: { in: ['cs'] },
+						},
+					],
 				},
 				{
-					locale: { in: ['cs'] }
-				}
-			]
+					locale: { in: ['cs'] },
+				},
+			],
 		})
 	})
 })

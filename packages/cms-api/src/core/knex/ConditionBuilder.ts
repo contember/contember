@@ -1,7 +1,7 @@
 import * as Knex from 'knex'
 import { Formatter, Value } from './types'
 import QueryBuilder from './QueryBuilder'
-import KnexWrapper from "./KnexWrapper";
+import KnexWrapper from './KnexWrapper'
 
 type ConditionBuilderCallback = (builder: ConditionBuilder) => void
 
@@ -37,7 +37,6 @@ interface ConditionBuilder {
 }
 
 namespace ConditionBuilder {
-
 	export enum Operator {
 		'notEq' = '!=',
 		'eq' = '=',
@@ -50,8 +49,7 @@ namespace ConditionBuilder {
 	export class ConditionStringBuilder implements ConditionBuilder {
 		public readonly expressions: Knex.Raw[] = []
 
-		constructor(private readonly wrapper: KnexWrapper) {
-		}
+		constructor(private readonly wrapper: KnexWrapper) {}
 
 		and(callback: ConditionBuilderCallback): void {
 			this.invokeCallback(callback, ['and', false])
@@ -89,7 +87,9 @@ namespace ConditionBuilder {
 			if (!Object.values(Operator).includes(operator)) {
 				throw new Error(`Operator ${operator} is not supported`)
 			}
-			this.expressions.push(this.wrapper.raw(`?? ${operator} ??`, QueryBuilder.toFqn(columnName1), QueryBuilder.toFqn(columnName2)))
+			this.expressions.push(
+				this.wrapper.raw(`?? ${operator} ??`, QueryBuilder.toFqn(columnName1), QueryBuilder.toFqn(columnName2))
+			)
 		}
 
 		in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | QueryBuilder.Callback): void {
@@ -115,10 +115,10 @@ namespace ConditionBuilder {
 			if (this.expressions.length === 0) {
 				return null
 			}
-			const sql = this.expressions.map(it => (it as any as Raw).sql).join(` ${operator} `)
+			const sql = this.expressions.map(it => ((it as any) as Raw).sql).join(` ${operator} `)
 
 			const bindings: (Value | Knex.QueryBuilder)[] = []
-			this.expressions.map(it => (it as any as Raw).bindings).forEach(it => bindings.push(...it))
+			this.expressions.map(it => ((it as any) as Raw).bindings).forEach(it => bindings.push(...it))
 
 			return this.wrapper.raw(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, ...bindings)
 		}

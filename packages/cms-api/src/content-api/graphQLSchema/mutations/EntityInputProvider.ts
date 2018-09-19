@@ -55,7 +55,7 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}${withoutSuffix}${this.operation}Input`,
-			fields: () => fields
+			fields: () => fields,
 		})
 	}
 
@@ -78,7 +78,7 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 namespace EntityInputProvider {
 	export enum Type {
 		create = 'create',
-		update = 'update'
+		update = 'update',
 	}
 }
 

@@ -6,7 +6,7 @@ import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import { getColumnName, getColumnType } from '../../../content-schema/modelUtils'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
-import Mapper from "../Mapper";
+import Mapper from '../Mapper'
 
 type ColumnValue = {
 	value: PromiseLike<Input.ColumnValue>

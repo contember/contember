@@ -14,7 +14,7 @@ export default class MeQueryResolver implements QueryResolvers.Resolvers {
 		const personId = context.personId // TODO: may NOT exist
 		const [personRow, projectRows] = await Promise.all([
 			this.queryHandler.fetch(new PersonByIdQuery(personId)),
-			this.queryHandler.fetch(new ProjectsByPersonQuery(personId))
+			this.queryHandler.fetch(new ProjectsByPersonQuery(personId)),
 		])
 
 		if (personRow === null) {
@@ -24,7 +24,7 @@ export default class MeQueryResolver implements QueryResolvers.Resolvers {
 		return {
 			id: personRow.id,
 			email: personRow.email,
-			projects: projectRows
+			projects: projectRows,
 		}
 	}
 }

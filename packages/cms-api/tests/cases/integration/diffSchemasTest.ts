@@ -46,16 +46,16 @@ describe('Diff schemas', () => {
 								name: 'id',
 								nullable: false,
 								type: Model.ColumnType.Uuid,
-								columnType: 'uuid'
-							}
+								columnType: 'uuid',
+							},
 						},
 						name: 'Author',
 						pluralName: 'Authors',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'author',
-						unique: {}
-					}
+						unique: {},
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -65,8 +65,8 @@ describe('Diff schemas', () => {
 						name: 'name',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
+						columnType: 'text',
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -76,8 +76,8 @@ describe('Diff schemas', () => {
 						name: 'email',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
+						columnType: 'text',
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -87,18 +87,18 @@ describe('Diff schemas', () => {
 						name: 'registeredAt',
 						nullable: true,
 						type: Model.ColumnType.Date,
-						columnType: 'date'
-					}
+						columnType: 'date',
+					},
 				},
 				{
 					modification: 'createUniqueConstraint',
 					entityName: 'Author',
 					unique: {
 						name: 'unique_email',
-						fields: ['email']
-					}
-				}
-			]
+						fields: ['email'],
+					},
+				},
+			],
 		}
 		const sql = SQL`CREATE TABLE "author" ( "id" uuid PRIMARY KEY NOT NULL );
 			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "author" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
@@ -140,16 +140,16 @@ describe('Diff schemas', () => {
 								name: 'id',
 								nullable: false,
 								type: Model.ColumnType.Uuid,
-								columnType: 'uuid'
-							}
+								columnType: 'uuid',
+							},
 						},
 						name: 'Post',
 						pluralName: 'Posts',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'post',
-						unique: {}
-					}
+						unique: {},
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -159,8 +159,8 @@ describe('Diff schemas', () => {
 						name: 'title',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
+						columnType: 'text',
+					},
 				},
 				{
 					modification: 'createRelation',
@@ -171,12 +171,12 @@ describe('Diff schemas', () => {
 						target: 'Author',
 						joiningColumn: {
 							columnName: 'author_id',
-							onDelete: Model.OnDelete.cascade
+							onDelete: Model.OnDelete.cascade,
 						},
-						nullable: true
-					}
-				}
-			]
+						nullable: true,
+					},
+				},
+			],
 		}
 		const sql = SQL`CREATE TABLE "post" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
@@ -223,16 +223,16 @@ describe('Diff schemas', () => {
 								name: 'id',
 								nullable: false,
 								type: Model.ColumnType.Uuid,
-								columnType: 'uuid'
-							}
+								columnType: 'uuid',
+							},
 						},
 						name: 'PostLocale',
 						pluralName: 'PostLocales',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'post_locale',
-						unique: {}
-					}
+						unique: {},
+					},
 				},
 				{
 					modification: 'createRelation',
@@ -244,16 +244,16 @@ describe('Diff schemas', () => {
 						inversedBy: 'locales',
 						joiningColumn: {
 							columnName: 'post_id',
-							onDelete: Model.OnDelete.restrict
+							onDelete: Model.OnDelete.restrict,
 						},
-						nullable: false
+						nullable: false,
 					},
 					inverseSide: {
 						name: 'locales',
 						type: Model.RelationType.OneHasMany,
 						target: 'PostLocale',
-						ownedBy: 'post'
-					}
+						ownedBy: 'post',
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -263,8 +263,8 @@ describe('Diff schemas', () => {
 						name: 'title',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
+						columnType: 'text',
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -274,18 +274,18 @@ describe('Diff schemas', () => {
 						name: 'locale',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
+						columnType: 'text',
+					},
 				},
 				{
 					modification: 'createUniqueConstraint',
 					entityName: 'PostLocale',
 					unique: {
 						name: 'unique_post_locale',
-						fields: ['post', 'locale']
-					}
-				}
-			]
+						fields: ['post', 'locale'],
+					},
+				},
+			],
 		}
 		const sql = SQL`CREATE TABLE "post_locale" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_locale" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
@@ -315,7 +315,7 @@ describe('Diff schemas', () => {
 					primaryColumn: 'id',
 					tableName: 'post',
 					fields: {},
-					unique: {}
+					unique: {},
 				},
 				PostLocale: {
 					name: 'PostLocale',
@@ -330,15 +330,15 @@ describe('Diff schemas', () => {
 							target: 'Post',
 							joiningColumn: {
 								columnName: 'post_id',
-								onDelete: Model.OnDelete.restrict
+								onDelete: Model.OnDelete.restrict,
 							},
-							nullable: true
-						}
+							nullable: true,
+						},
 					},
-					unique: {}
-				}
+					unique: {},
+				},
 			},
-			enums: {}
+			enums: {},
 		}
 		const updatedSchema: Model.Schema = {
 			entities: {
@@ -353,10 +353,10 @@ describe('Diff schemas', () => {
 							name: 'locales',
 							type: Model.RelationType.OneHasMany,
 							target: 'PostLocale',
-							ownedBy: 'post'
-						}
+							ownedBy: 'post',
+						},
 					},
-					unique: {}
+					unique: {},
 				},
 				PostLocale: {
 					name: 'PostLocale',
@@ -372,15 +372,15 @@ describe('Diff schemas', () => {
 							target: 'Post',
 							joiningColumn: {
 								columnName: 'post_id',
-								onDelete: Model.OnDelete.restrict
+								onDelete: Model.OnDelete.restrict,
 							},
-							nullable: true
-						}
+							nullable: true,
+						},
 					},
-					unique: {}
-				}
+					unique: {},
+				},
 			},
-			enums: {}
+			enums: {},
 		}
 
 		const diff: SchemaDiff = {
@@ -392,10 +392,10 @@ describe('Diff schemas', () => {
 						name: 'locales',
 						type: Model.RelationType.OneHasMany,
 						target: 'PostLocale',
-						ownedBy: 'post'
-					}
-				}
-			]
+						ownedBy: 'post',
+					},
+				},
+			],
 		}
 		const sql = SQL``
 		it('apply diff', () => {
@@ -427,16 +427,16 @@ describe('Diff schemas', () => {
 								name: 'id',
 								nullable: false,
 								type: Model.ColumnType.Uuid,
-								columnType: 'uuid'
-							}
+								columnType: 'uuid',
+							},
 						},
 						name: 'Category',
 						pluralName: 'Categories',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'category',
-						unique: {}
-					}
+						unique: {},
+					},
 				},
 				{
 					modification: 'createRelation',
@@ -449,14 +449,14 @@ describe('Diff schemas', () => {
 							tableName: 'post_categories',
 							joiningColumn: {
 								columnName: 'post_id',
-								onDelete: Model.OnDelete.cascade
+								onDelete: Model.OnDelete.cascade,
 							},
 							inverseJoiningColumn: {
 								columnName: 'category_id',
-								onDelete: Model.OnDelete.cascade
-							}
-						}
-					}
+								onDelete: Model.OnDelete.cascade,
+							},
+						},
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -466,10 +466,10 @@ describe('Diff schemas', () => {
 						name: 'title',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
-				}
-			]
+						columnType: 'text',
+					},
+				},
+			],
 		}
 		const sql = SQL`CREATE TABLE "category" ( "id" uuid PRIMARY KEY NOT NULL );
 			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "category" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
@@ -513,16 +513,16 @@ describe('Diff schemas', () => {
 								name: 'id',
 								nullable: false,
 								type: Model.ColumnType.Uuid,
-								columnType: 'uuid'
-							}
+								columnType: 'uuid',
+							},
 						},
 						name: 'Site',
 						pluralName: 'Sites',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'site',
-						unique: {}
-					}
+						unique: {},
+					},
 				},
 				{
 					modification: 'createEntity',
@@ -533,16 +533,16 @@ describe('Diff schemas', () => {
 								name: 'id',
 								nullable: false,
 								type: Model.ColumnType.Uuid,
-								columnType: 'uuid'
-							}
+								columnType: 'uuid',
+							},
 						},
 						name: 'SiteSetting',
 						pluralName: 'SiteSettings',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'site_setting',
-						unique: {}
-					}
+						unique: {},
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -552,8 +552,8 @@ describe('Diff schemas', () => {
 						name: 'name',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
+						columnType: 'text',
+					},
 				},
 				{
 					modification: 'createRelation',
@@ -565,17 +565,17 @@ describe('Diff schemas', () => {
 						inversedBy: 'site',
 						joiningColumn: {
 							columnName: 'setting_id',
-							onDelete: Model.OnDelete.restrict
+							onDelete: Model.OnDelete.restrict,
 						},
-						nullable: true
+						nullable: true,
 					},
 					inverseSide: {
 						name: 'site',
 						type: Model.RelationType.OneHasOne,
 						target: 'Site',
 						ownedBy: 'setting',
-						nullable: true
-					}
+						nullable: true,
+					},
 				},
 				{
 					modification: 'createColumn',
@@ -585,10 +585,10 @@ describe('Diff schemas', () => {
 						name: 'url',
 						nullable: true,
 						type: Model.ColumnType.String,
-						columnType: 'text'
-					}
-				}
-			]
+						columnType: 'text',
+					},
+				},
+			],
 		}
 		const sql = SQL`CREATE TABLE "site" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
@@ -625,13 +625,13 @@ describe('Diff schemas', () => {
 				{
 					modification: 'removeField',
 					entityName: 'Post',
-					fieldName: 'author'
+					fieldName: 'author',
 				},
 				{
 					modification: 'removeEntity',
-					entityName: 'Author'
-				}
-			]
+					entityName: 'Author',
+				},
+			],
 		}
 		const sql = SQL`ALTER TABLE "post" DROP "author_id";
 			DROP TABLE "author";`
@@ -663,7 +663,7 @@ describe('Diff schemas', () => {
 				{
 					modification: 'createEnum',
 					enumName: 'postStatus',
-					values: ['publish', 'draft', 'auto-draft']
+					values: ['publish', 'draft', 'auto-draft'],
 				},
 				{
 					modification: 'createColumn',
@@ -674,10 +674,10 @@ describe('Diff schemas', () => {
 						nullable: true,
 						type: Model.ColumnType.Enum,
 						columnType: 'postStatus',
-						enumName: 'postStatus'
-					}
-				}
-			]
+						enumName: 'postStatus',
+					},
+				},
+			],
 		}
 		const sql = SQL`CREATE DOMAIN "postStatus" AS text CHECK (VALUE IN('publish','draft','auto-draft'));
 				ALTER TABLE "post" ADD "status" "postStatus";`
@@ -714,9 +714,9 @@ describe('Diff schemas', () => {
 				{
 					modification: 'updateEnum',
 					enumName: 'postStatus',
-					values: ['publish', 'draft', 'auto-draft', "SQL', 'injection"]
-				}
-			]
+					values: ['publish', 'draft', 'auto-draft', "SQL', 'injection"],
+				},
+			],
 		}
 		const sql = SQL`ALTER DOMAIN "postStatus" CHECK (VALUE IN('publish','draft','auto-draft','SQL\\', \\'injection'));`
 		it('diff schemas', () => {
@@ -747,13 +747,13 @@ describe('Diff schemas', () => {
 				{
 					modification: 'removeField',
 					entityName: 'Post',
-					fieldName: 'status'
+					fieldName: 'status',
 				},
 				{
 					modification: 'removeEnum',
-					enumName: 'postStatus'
-				}
-			]
+					enumName: 'postStatus',
+				},
+			],
 		}
 		const sql = SQL`ALTER TABLE "post" DROP "status";
 				DROP DOMAIN "postStatus";`
@@ -792,10 +792,10 @@ describe('Diff schemas', () => {
 					definition: {
 						type: Model.ColumnType.DateTime,
 						columnType: 'timestamp',
-						nullable: true
-					}
-				}
-			]
+						nullable: true,
+					},
+				},
+			],
 		}
 		const sql = SQL`ALTER TABLE "author"
 						ALTER "registered_at" SET DATA TYPE timestamp,
@@ -823,14 +823,14 @@ describe('Diff schemas', () => {
 				{
 					modification: 'updateEntityName',
 					entityName: 'Author',
-					newEntityName: 'User'
+					newEntityName: 'User',
 				},
 				{
 					modification: 'updateEntityPluralName',
 					entityName: 'User',
-					pluralName: 'Users'
-				}
-			]
+					pluralName: 'Users',
+				},
+			],
 		}
 		const sql = SQL``
 		it('apply diff', () => {
@@ -854,9 +854,9 @@ describe('Diff schemas', () => {
 					modification: 'updateFieldName',
 					entityName: 'Author',
 					fieldName: 'firstName',
-					newFieldName: 'name'
-				}
-			]
+					newFieldName: 'name',
+				},
+			],
 		}
 		const sql = SQL``
 		it('apply diff', () => {

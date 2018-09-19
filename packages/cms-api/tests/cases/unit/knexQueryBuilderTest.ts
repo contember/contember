@@ -5,7 +5,7 @@ import * as knex from 'knex'
 import KnexWrapper from '../../../src/core/knex/KnexWrapper'
 import { SQL } from '../../src/tags'
 import InsertBuilder from '../../../src/core/knex/InsertBuilder'
-import ConditionBuilder from "../../../src/core/knex/ConditionBuilder";
+import ConditionBuilder from '../../../src/core/knex/ConditionBuilder'
 
 interface Test {
 	query: (wrapper: KnexWrapper) => void
@@ -16,7 +16,7 @@ interface Test {
 const execute = async (test: Test) => {
 	const connection = knex({
 		// debug: true,
-		client: 'pg'
+		client: 'pg',
 	})
 
 	mockKnex.mock(connection)
@@ -29,7 +29,7 @@ const execute = async (test: Test) => {
 		expect(query.sql.replace(/\s+/g, ' ')).equals(test.sql.replace(/\s+/g, ' '))
 		expect(query.bindings).deep.equals(test.parameters)
 		executed = true
-		query.response({rows: [], rowCount: 0})
+		query.response({ rows: [], rowCount: 0 })
 	})
 	await test.query(wrapper)
 	expect(executed).equals(true)
@@ -96,7 +96,7 @@ describe('knex query builder', () => {
                  inner join "bar" as "bar"
                    on ("bar"."a" = $1 or "bar"."a" = $2 or not("bar"."b" = $3)) and "bar"."c" in ($4, $5, $6) and "bar"."d" is null and not("bar"."d" is null)
                       and "bar"."e" <= "bar"."f"`,
-			parameters: [1, 2, 1, 1, 2, 3]
+			parameters: [1, 2, 1, 1, 2, 3],
 		})
 	})
 
@@ -113,7 +113,7 @@ describe('knex query builder', () => {
 					.into('author')
 					.values({
 						id: expr => expr.select('id'),
-						title: expr => expr.select('title')
+						title: expr => expr.select('title'),
 					})
 					.from(qb => {
 						qb.table('root_')
@@ -127,7 +127,7 @@ describe('knex query builder', () => {
 				insert into "author" ("id", "title") 
 					select "id", "title" from "root_"
         on conflict do nothing returning "id"`,
-			parameters: ['Hello', 1, null]
+			parameters: ['Hello', 1, null],
 		})
 	})
 
@@ -157,7 +157,7 @@ describe('knex query builder', () => {
           "title"
         from "foo"
       on conflict ("id") do update set id = $2, title = "title" returning "id"`,
-			parameters: ['123', '123']
+			parameters: ['123', '123'],
 		})
 	})
 
@@ -174,7 +174,7 @@ describe('knex query builder', () => {
 					'author',
 					{
 						id: expr => expr.select(['root_', 'id']),
-						title: expr => expr.select(['root_', 'title'])
+						title: expr => expr.select(['root_', 'title']),
 					},
 					qb => {
 						qb.table('root_')
@@ -186,7 +186,7 @@ describe('knex query builder', () => {
                                   $2 :: int as "id",
                                   $3 :: text as "content") update "author"
       set "id" = "root_"."id", "title" = "root_"."title" from "root_"`,
-			parameters: ['Hello', 1, null]
+			parameters: ['Hello', 1, null],
 		})
 	})
 
@@ -207,20 +207,20 @@ describe('knex query builder', () => {
 				await qb.getResult()
 			},
 			sql: SQL`select ("foo" >= $1 or "foo" <= $2) as "bar"`,
-			parameters: [1, 0]
+			parameters: [1, 0],
 		})
 	})
-
 
 	it('constructs delete', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.deleteBuilder()
-				.with('data', qb => qb.from('abc'))
-				.from('bar')
-				.using('data')
-				.where(cond => cond.compare(['data', 'a'], ConditionBuilder.Operator.gte, 1))
-				.returning('xyz')
+				const qb = wrapper
+					.deleteBuilder()
+					.with('data', qb => qb.from('abc'))
+					.from('bar')
+					.using('data')
+					.where(cond => cond.compare(['data', 'a'], ConditionBuilder.Operator.gte, 1))
+					.returning('xyz')
 				await qb.execute()
 			},
 			sql: SQL`with "data" as 

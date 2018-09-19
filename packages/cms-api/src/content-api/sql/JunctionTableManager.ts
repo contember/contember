@@ -1,15 +1,15 @@
-import { getEntity } from "../../content-schema/modelUtils";
-import Path from "./select/Path";
-import Mapper from "./Mapper";
-import UniqueWhereExpander from "../graphQlResolver/UniqueWhereExpander";
-import WhereBuilder from "./select/WhereBuilder";
-import PredicateFactory from "../../acl/PredicateFactory";
-import KnexWrapper from "../../core/knex/KnexWrapper";
+import { getEntity } from '../../content-schema/modelUtils'
+import Path from './select/Path'
+import Mapper from './Mapper'
+import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
+import WhereBuilder from './select/WhereBuilder'
+import PredicateFactory from '../../acl/PredicateFactory'
+import KnexWrapper from '../../core/knex/KnexWrapper'
 import { Acl, Input, Model } from 'cms-common'
-import { isUniqueWhere } from "../../content-schema/inputUtils";
-import InsertBuilder from "../../core/knex/InsertBuilder";
-import QueryBuilder from "../../core/knex/QueryBuilder";
-import ConditionBuilder from "../../core/knex/ConditionBuilder";
+import { isUniqueWhere } from '../../content-schema/inputUtils'
+import InsertBuilder from '../../core/knex/InsertBuilder'
+import QueryBuilder from '../../core/knex/QueryBuilder'
+import ConditionBuilder from '../../core/knex/ConditionBuilder'
 
 class JunctionTableManager {
 	constructor(
@@ -18,9 +18,8 @@ class JunctionTableManager {
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly connectJunctionHandler: JunctionTableManager.JunctionConnectHandler,
-		private readonly disconnectJunctionHandler: JunctionTableManager.JunctionDisconnectHandler,
-	) {
-	}
+		private readonly disconnectJunctionHandler: JunctionTableManager.JunctionDisconnectHandler
+	) {}
 
 	public async connectJunction(
 		db: KnexWrapper,
@@ -29,7 +28,14 @@ class JunctionTableManager {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	): Promise<void> {
-		await this.executeJunctionModification(db, owningEntity, relation, ownerUnique, inversedUnique, this.connectJunctionHandler)
+		await this.executeJunctionModification(
+			db,
+			owningEntity,
+			relation,
+			ownerUnique,
+			inversedUnique,
+			this.connectJunctionHandler
+		)
 	}
 
 	public async disconnectJunction(
@@ -39,7 +45,14 @@ class JunctionTableManager {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	): Promise<void> {
-		await this.executeJunctionModification(db, owningEntity, relation, ownerUnique, inversedUnique, this.disconnectJunctionHandler)
+		await this.executeJunctionModification(
+			db,
+			owningEntity,
+			relation,
+			ownerUnique,
+			inversedUnique,
+			this.disconnectJunctionHandler
+		)
 	}
 
 	private async executeJunctionModification(
@@ -71,23 +84,19 @@ class JunctionTableManager {
 			await handler.executeSimple(db, joiningTable, ownerPrimary, inversedPrimary)
 		} else {
 			const ownerWhere: Input.Where = {
-				and: [
-					owningPredicate,
-					this.uniqueWhereExpander.expand(owningEntity, ownerUnique),
-				]
+				and: [owningPredicate, this.uniqueWhereExpander.expand(owningEntity, ownerUnique)],
 			}
 
 			const inversedWhere: Input.Where = {
-				and: [
-					inversePredicate,
-					this.uniqueWhereExpander.expand(inversedEntity, inversedUnique),
-				]
+				and: [inversePredicate, this.uniqueWhereExpander.expand(inversedEntity, inversedUnique)],
 			}
 
 			const dataCallback: QueryBuilder.Callback = qb => {
-
 				qb.select(expr => expr.select(['owning', owningEntity.primaryColumn]), joiningTable.joiningColumn.columnName)
-				qb.select(expr => expr.select(['inversed', inversedEntity.primaryColumn]), joiningTable.inverseJoiningColumn.columnName)
+				qb.select(
+					expr => expr.select(['inversed', inversedEntity.primaryColumn]),
+					joiningTable.inverseJoiningColumn.columnName
+				)
 				qb.select(expr => expr.raw('true'), 'selected')
 
 				qb.from(qb.raw('(values (null))'), 't')
@@ -99,10 +108,9 @@ class JunctionTableManager {
 				this.whereBuilder.build(qb, inversedEntity, new Path([], 'inversed'), inversedWhere)
 			}
 
-			await handler.executeComplex(db, joiningTable, dataCallback);
+			await handler.executeComplex(db, joiningTable, dataCallback)
 		}
 	}
-
 
 	private checkUniqueWhere(entity: Model.Entity, where: Input.UniqueWhere): void {
 		if (!isUniqueWhere(entity, where)) {
@@ -117,27 +125,25 @@ namespace JunctionTableManager {
 			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
-			inversedPrimary: Input.PrimaryValue,
-		): Promise<void>;
+			inversedPrimary: Input.PrimaryValue
+		): Promise<void>
 
 		executeComplex(
 			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
-			dataCallback: QueryBuilder.Callback,
-		): Promise<void>;
+			dataCallback: QueryBuilder.Callback
+		): Promise<void>
 	}
 
-
 	export class JunctionConnectHandler implements JunctionHandler {
-
-
 		async executeSimple(
 			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
-			inversedPrimary: Input.PrimaryValue,
+			inversedPrimary: Input.PrimaryValue
 		): Promise<void> {
-			await db.insertBuilder()
+			await db
+				.insertBuilder()
 				.into(joiningTable.tableName)
 				.values({
 					[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(ownerPrimary),
@@ -150,10 +156,8 @@ namespace JunctionTableManager {
 		async executeComplex(
 			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
-			dataCallback: QueryBuilder.Callback,
+			dataCallback: QueryBuilder.Callback
 		): Promise<void> {
-
-
 			const qb = db.queryBuilder()
 			qb.with('data', dataCallback)
 
@@ -162,7 +166,8 @@ namespace JunctionTableManager {
 				.into(joiningTable.tableName)
 				.values({
 					[joiningTable.joiningColumn.columnName]: expr => expr.select(['data', joiningTable.joiningColumn.columnName]),
-					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.select(['data', joiningTable.inverseJoiningColumn.columnName])
+					[joiningTable.inverseJoiningColumn.columnName]: expr =>
+						expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),
 				})
 				.returning(db.raw('true as inserted'))
 				.from(qb => qb.from('data'))
@@ -183,7 +188,6 @@ namespace JunctionTableManager {
 	}
 
 	export class JunctionDisconnectHandler implements JunctionHandler {
-
 		public async executeSimple(
 			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
@@ -192,9 +196,7 @@ namespace JunctionTableManager {
 		): Promise<void> {
 			const qb = db.queryBuilder()
 			qb.table(joiningTable.tableName)
-			qb.where(cond =>
-				cond.compare(joiningTable.joiningColumn.columnName, ConditionBuilder.Operator.eq, ownerPrimary)
-			)
+			qb.where(cond => cond.compare(joiningTable.joiningColumn.columnName, ConditionBuilder.Operator.eq, ownerPrimary))
 			qb.where(cond =>
 				cond.compare(joiningTable.inverseJoiningColumn.columnName, ConditionBuilder.Operator.eq, inversedPrimary)
 			)
@@ -205,16 +207,25 @@ namespace JunctionTableManager {
 		public async executeComplex(
 			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
-			dataCallback: QueryBuilder.Callback,
+			dataCallback: QueryBuilder.Callback
 		): Promise<void> {
 			const qb = db.queryBuilder()
 
-			const deleteQb = db.deleteBuilder()
+			const deleteQb = db
+				.deleteBuilder()
 				.from(joiningTable.tableName)
 				.using('data')
 				.where(cond => {
-					cond.compareColumns([joiningTable.tableName, joiningTable.joiningColumn.columnName], ConditionBuilder.Operator.eq, ['data', joiningTable.joiningColumn.columnName])
-					cond.compareColumns([joiningTable.tableName, joiningTable.inverseJoiningColumn.columnName], ConditionBuilder.Operator.eq, ['data', joiningTable.inverseJoiningColumn.columnName])
+					cond.compareColumns(
+						[joiningTable.tableName, joiningTable.joiningColumn.columnName],
+						ConditionBuilder.Operator.eq,
+						['data', joiningTable.joiningColumn.columnName]
+					)
+					cond.compareColumns(
+						[joiningTable.tableName, joiningTable.inverseJoiningColumn.columnName],
+						ConditionBuilder.Operator.eq,
+						['data', joiningTable.inverseJoiningColumn.columnName]
+					)
 				})
 				.returning(db.raw('true as deleted'))
 

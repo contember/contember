@@ -82,7 +82,7 @@ export default class PermissionFactory {
 		const operationNames: (keyof Pick<Acl.EntityOperations, 'create' | 'read' | 'update'>)[] = [
 			'create',
 			'read',
-			'update'
+			'update',
 		]
 
 		for (let operation of operationNames) {
@@ -115,7 +115,7 @@ export default class PermissionFactory {
 
 		return {
 			predicates: predicates,
-			operations: operations
+			operations: operations,
 		}
 	}
 
@@ -169,9 +169,9 @@ export default class PermissionFactory {
 			}
 			return [
 				{
-					or: [leftPredicate, rightPredicate]
+					or: [leftPredicate, rightPredicate],
 				} as Acl.PredicateDefinition,
-				predicateName
+				predicateName,
 			]
 		} else if (leftReference !== undefined) {
 			return [leftPredicates[leftReference], leftReference]

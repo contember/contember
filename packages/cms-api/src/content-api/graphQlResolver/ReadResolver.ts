@@ -16,7 +16,7 @@ export default class ReadResolver {
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, queryAst.args.where)
 		const queryExpanded = new ObjectNode(queryAst.name, queryAst.alias, queryAst.fields, {
 			...queryAst.args,
-			where: whereExpanded
+			where: whereExpanded,
 		})
 
 		return await this.mapperRunner.run(async mapper => {

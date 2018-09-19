@@ -24,7 +24,7 @@ class SignUpManager {
 				.insert({
 					id: identityId,
 					parent_id: null,
-					roles: JSON.stringify([]) // TODO: try without JSON.stringify
+					roles: JSON.stringify([]), // TODO: try without JSON.stringify
 				})
 
 			await this.db
@@ -34,7 +34,7 @@ class SignUpManager {
 					id: personId,
 					email: email,
 					password_hash: await bcrypt.hash(password, 10),
-					identity_id: identityId
+					identity_id: identityId,
 				})
 		})
 

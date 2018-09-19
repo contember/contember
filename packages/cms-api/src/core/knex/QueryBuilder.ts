@@ -6,8 +6,7 @@ import KnexWrapper from './KnexWrapper'
 type AffectedRows = number
 type Returning = number | string
 
-interface Raw
-{
+interface Raw {
 	sql: string
 	bindings: (Value | Knex.QueryBuilder)[]
 }
@@ -156,12 +155,11 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return [`${tableName} as ${alias || tableName}`, raw as Knex.Raw]
 	}
 
-	private aliasRaw(raw: Knex.Raw, alias?: string)
-	{
+	private aliasRaw(raw: Knex.Raw, alias?: string) {
 		if (!alias) {
 			return raw
 		}
-		return this.raw((raw as any as Raw).sql + ' as ??', ...(raw as any as Raw).bindings, alias)
+		return this.raw(((raw as any) as Raw).sql + ' as ??', ...((raw as any) as Raw).bindings, alias)
 	}
 }
 

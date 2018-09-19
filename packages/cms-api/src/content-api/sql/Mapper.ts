@@ -15,7 +15,7 @@ import UpdateBuilderFactory from './update/UpdateBuilderFactory'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
-import JunctionTableManager from "./JunctionTableManager";
+import JunctionTableManager from './JunctionTableManager'
 
 class Mapper {
 	constructor(
@@ -28,9 +28,8 @@ class Mapper {
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly whereBuilder: WhereBuilder,
-		private readonly junctionTableManager: JunctionTableManager,
-	) {
-	}
+		private readonly junctionTableManager: JunctionTableManager
+	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
@@ -111,9 +110,7 @@ class Mapper {
 
 		const result = await insertBuilder.execute()
 
-
 		await Promise.all(Object.values(promises).filter(it => !!it))
-
 
 		return result
 	}
@@ -157,7 +154,7 @@ class Mapper {
 				qb.select(['root_', entity.primaryColumn])
 				const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 				const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-				this.whereBuilder.build(qb, entity, new Path([]), {and: [uniqueWhere, predicate]})
+				this.whereBuilder.build(qb, entity, new Path([]), { and: [uniqueWhere, predicate] })
 			})
 		)
 
@@ -242,8 +239,7 @@ class Mapper {
 }
 
 namespace Mapper {
-	export class NoResultError extends Error {
-	}
+	export class NoResultError extends Error {}
 }
 
 export default Mapper

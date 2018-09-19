@@ -24,17 +24,17 @@ describe('Queries', () => {
                      from "post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_id: testUuid(1) }],
-						parameters: [testUuid(1)]
-					}
-				])
+						parameters: [testUuid(1)],
+					},
+				]),
 			],
 			return: {
 				data: {
 					Post: {
-						id: testUuid(1)
-					}
-				}
-			}
+						id: testUuid(1),
+					},
+				},
+			},
 		})
 	})
 
@@ -66,17 +66,17 @@ describe('Queries', () => {
                      from "post_locale" as "root_"
                      where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 						parameters: ['cs', testUuid(1)],
-						response: [{ root_id: testUuid(2) }]
-					}
-				])
+						response: [{ root_id: testUuid(2) }],
+					},
+				]),
 			],
 			return: {
 				data: {
 					PostLocale: {
-						id: testUuid(2)
-					}
-				}
-			}
+						id: testUuid(2),
+					},
+				},
+			},
 		})
 	})
 
@@ -100,17 +100,17 @@ describe('Queries', () => {
                      from "post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_heading: 'Hello' }],
-						parameters: [testUuid(1)]
-					}
-				])
+						parameters: [testUuid(1)],
+					},
+				]),
 			],
 			return: {
 				data: {
 					Post: {
-						heading: 'Hello'
-					}
-				}
-			}
+						heading: 'Hello',
+					},
+				},
+			},
 		})
 	})
 
@@ -144,7 +144,7 @@ describe('Queries', () => {
 						sql: SQL`select "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "post" as "root_"`,
-						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }]
+						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
 					},
 					{
 						sql: SQL`select
@@ -158,10 +158,10 @@ describe('Queries', () => {
 						response: [
 							{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
 							{ root_id: testUuid(4), root_locale: 'en', root_title: 'hello world', __grouping_key: testUuid(1) },
-							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) }
-						]
-					}
-				])
+							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) },
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -172,14 +172,14 @@ describe('Queries', () => {
 								{
 									id: testUuid(3),
 									locale: 'cs',
-									title: 'ahoj svete'
+									title: 'ahoj svete',
 								},
 								{
 									id: testUuid(4),
 									locale: 'en',
-									title: 'hello world'
-								}
-							]
+									title: 'hello world',
+								},
+							],
 						},
 						{
 							id: testUuid(2),
@@ -187,13 +187,13 @@ describe('Queries', () => {
 								{
 									id: testUuid(5),
 									locale: 'cs',
-									title: 'dalsi clanek'
-								}
-							]
-						}
-					]
-				}
-			}
+									title: 'dalsi clanek',
+								},
+							],
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -225,13 +225,13 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(1),
-								root_author: testUuid(2)
+								root_author: testUuid(2),
 							},
 							{
 								root_id: testUuid(3),
-								root_author: testUuid(4)
-							}
-						]
+								root_author: testUuid(4),
+							},
+						],
 					},
 					{
 						sql: SQL`
@@ -246,15 +246,15 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(2),
-								root_name: 'John'
+								root_name: 'John',
 							},
 							{
 								root_id: testUuid(4),
-								root_name: 'Jack'
-							}
-						]
-					}
-				])
+								root_name: 'Jack',
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -263,19 +263,19 @@ describe('Queries', () => {
 							id: testUuid(1),
 							author: {
 								id: testUuid(2),
-								name: 'John'
-							}
+								name: 'John',
+							},
 						},
 						{
 							id: testUuid(3),
 							author: {
 								id: testUuid(4),
-								name: 'Jack'
-							}
-						}
-					]
-				}
-			}
+								name: 'Jack',
+							},
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -313,14 +313,14 @@ describe('Queries', () => {
 							{
 								root_id: testUuid(1),
 								root_name: 'Site 1',
-								root_setting: testUuid(2)
+								root_setting: testUuid(2),
 							},
 							{
 								root_id: testUuid(3),
 								root_name: 'Site 2',
-								root_setting: testUuid(4)
-							}
-						]
+								root_setting: testUuid(4),
+							},
+						],
 					},
 					{
 						sql: SQL`
@@ -335,15 +335,15 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(2),
-								root_url: 'http://site1.cz'
+								root_url: 'http://site1.cz',
 							},
 							{
 								root_id: testUuid(4),
-								root_url: 'http://site2.cz'
-							}
-						]
-					}
-				])
+								root_url: 'http://site2.cz',
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -353,20 +353,20 @@ describe('Queries', () => {
 							name: 'Site 1',
 							setting: {
 								id: testUuid(2),
-								url: 'http://site1.cz'
-							}
+								url: 'http://site1.cz',
+							},
 						},
 						{
 							id: testUuid(3),
 							name: 'Site 2',
 							setting: {
 								id: testUuid(4),
-								url: 'http://site2.cz'
-							}
-						}
-					]
-				}
-			}
+								url: 'http://site2.cz',
+							},
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -401,13 +401,13 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(1),
-								root_url: 'http://site1.cz'
+								root_url: 'http://site1.cz',
 							},
 							{
 								root_id: testUuid(3),
-								root_url: 'http://site2.cz'
-							}
-						]
+								root_url: 'http://site2.cz',
+							},
+						],
 					},
 					{
 						sql: SQL`select
@@ -421,16 +421,16 @@ describe('Queries', () => {
 							{
 								root_id: testUuid(2),
 								root_setting: testUuid(1),
-								root_name: 'Site 1'
+								root_name: 'Site 1',
 							},
 							{
 								root_id: testUuid(4),
 								root_setting: testUuid(3),
-								root_name: 'Site 2'
-							}
-						]
-					}
-				])
+								root_name: 'Site 2',
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -440,20 +440,20 @@ describe('Queries', () => {
 							url: 'http://site1.cz',
 							site: {
 								id: testUuid(2),
-								name: 'Site 1'
-							}
+								name: 'Site 1',
+							},
 						},
 						{
 							id: testUuid(3),
 							url: 'http://site2.cz',
 							site: {
 								name: 'Site 2',
-								id: testUuid(4)
-							}
-						}
-					]
-				}
-			}
+								id: testUuid(4),
+							},
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -496,12 +496,12 @@ describe('Queries', () => {
                      from "post" as "root_"`,
 						response: [
 							{
-								root_id: testUuid(1)
+								root_id: testUuid(1),
 							},
 							{
-								root_id: testUuid(2)
-							}
-						]
+								root_id: testUuid(2),
+							},
+						],
 					},
 					{
 						sql: SQL`select "category_id",
@@ -512,21 +512,21 @@ describe('Queries', () => {
 						response: [
 							{
 								category_id: testUuid(3),
-								post_id: testUuid(1)
+								post_id: testUuid(1),
 							},
 							{
 								category_id: testUuid(4),
-								post_id: testUuid(1)
+								post_id: testUuid(1),
 							},
 							{
 								category_id: testUuid(5),
-								post_id: testUuid(2)
+								post_id: testUuid(2),
 							},
 							{
 								category_id: testUuid(3),
-								post_id: testUuid(2)
-							}
-						]
+								post_id: testUuid(2),
+							},
+						],
 					},
 					{
 						sql: SQL`select
@@ -540,17 +540,17 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(3),
-								root_visible: true
+								root_visible: true,
 							},
 							{
 								root_id: testUuid(4),
-								root_visible: true
+								root_visible: true,
 							},
 							{
 								root_id: testUuid(5),
-								root_visible: true
-							}
-						]
+								root_visible: true,
+							},
+						],
 					},
 					{
 						sql: SQL`
@@ -566,21 +566,21 @@ describe('Queries', () => {
 							{
 								root_id: testUuid(6),
 								root_name: 'Kategorie 1',
-								__grouping_key: testUuid(3)
+								__grouping_key: testUuid(3),
 							},
 							{
 								root_id: testUuid(7),
 								root_name: 'Kategorie 2',
-								__grouping_key: testUuid(4)
+								__grouping_key: testUuid(4),
 							},
 							{
 								root_id: testUuid(8),
 								root_name: 'Kategorie 3',
-								__grouping_key: testUuid(5)
-							}
-						]
-					}
-				])
+								__grouping_key: testUuid(5),
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -593,9 +593,9 @@ describe('Queries', () => {
 									locales: [
 										{
 											id: testUuid(6),
-											name: 'Kategorie 1'
-										}
-									]
+											name: 'Kategorie 1',
+										},
+									],
 								},
 								{
 									id: testUuid(4),
@@ -603,12 +603,12 @@ describe('Queries', () => {
 									locales: [
 										{
 											id: testUuid(7),
-											name: 'Kategorie 2'
-										}
-									]
-								}
+											name: 'Kategorie 2',
+										},
+									],
+								},
 							],
-							id: testUuid(1)
+							id: testUuid(1),
 						},
 						{
 							categories: [
@@ -618,9 +618,9 @@ describe('Queries', () => {
 									locales: [
 										{
 											id: testUuid(8),
-											name: 'Kategorie 3'
-										}
-									]
+											name: 'Kategorie 3',
+										},
+									],
 								},
 								{
 									id: testUuid(3),
@@ -628,16 +628,16 @@ describe('Queries', () => {
 									locales: [
 										{
 											id: testUuid(6),
-											name: 'Kategorie 1'
-										}
-									]
-								}
+											name: 'Kategorie 1',
+										},
+									],
+								},
 							],
-							id: testUuid(2)
-						}
-					]
-				}
-			}
+							id: testUuid(2),
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -673,12 +673,12 @@ describe('Queries', () => {
                      from "category" as "root_"`,
 						response: [
 							{
-								root_id: testUuid(1)
+								root_id: testUuid(1),
 							},
 							{
-								root_id: testUuid(2)
-							}
-						]
+								root_id: testUuid(2),
+							},
+						],
 					},
 					{
 						sql: SQL`select
@@ -690,21 +690,21 @@ describe('Queries', () => {
 						response: [
 							{
 								category_id: testUuid(1),
-								post_id: testUuid(3)
+								post_id: testUuid(3),
 							},
 							{
 								category_id: testUuid(1),
-								post_id: testUuid(4)
+								post_id: testUuid(4),
 							},
 							{
 								category_id: testUuid(2),
-								post_id: testUuid(4)
+								post_id: testUuid(4),
 							},
 							{
 								category_id: testUuid(2),
-								post_id: testUuid(5)
-							}
-						]
+								post_id: testUuid(5),
+							},
+						],
 					},
 					{
 						sql: SQL`select
@@ -718,17 +718,17 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(3),
-								root_author: testUuid(6)
+								root_author: testUuid(6),
 							},
 							{
 								root_id: testUuid(4),
-								root_author: testUuid(7)
+								root_author: testUuid(7),
 							},
 							{
 								root_id: testUuid(5),
-								root_author: testUuid(7)
-							}
-						]
+								root_author: testUuid(7),
+							},
+						],
 					},
 					{
 						sql: SQL`select
@@ -742,15 +742,15 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(6),
-								root_name: 'John'
+								root_name: 'John',
 							},
 							{
 								root_id: testUuid(7),
-								root_name: 'Jack'
-							}
-						]
-					}
-				])
+								root_name: 'Jack',
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -760,38 +760,38 @@ describe('Queries', () => {
 							posts: [
 								{
 									author: {
-										name: 'John'
+										name: 'John',
 									},
-									id: testUuid(3)
+									id: testUuid(3),
 								},
 								{
 									author: {
-										name: 'Jack'
+										name: 'Jack',
 									},
-									id: testUuid(4)
-								}
-							]
+									id: testUuid(4),
+								},
+							],
 						},
 						{
 							id: testUuid(2),
 							posts: [
 								{
 									author: {
-										name: 'Jack'
+										name: 'Jack',
 									},
-									id: testUuid(4)
+									id: testUuid(4),
 								},
 								{
 									author: {
-										name: 'Jack'
+										name: 'Jack',
 									},
-									id: testUuid(5)
-								}
-							]
-						}
-					]
-				}
-			}
+									id: testUuid(5),
+								},
+							],
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -818,27 +818,27 @@ describe('Queries', () => {
 						parameters: ['John'],
 						response: [
 							{
-								root_id: testUuid(1)
+								root_id: testUuid(1),
 							},
 							{
-								root_id: testUuid(3)
-							}
-						]
-					}
-				])
+								root_id: testUuid(3),
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
 					Posts: [
 						{
-							id: testUuid(1)
+							id: testUuid(1),
 						},
 						{
-							id: testUuid(3)
-						}
-					]
-				}
-			}
+							id: testUuid(3),
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -869,27 +869,27 @@ describe('Queries', () => {
 						parameters: ['Hello'],
 						response: [
 							{
-								root_id: testUuid(1)
+								root_id: testUuid(1),
 							},
 							{
-								root_id: testUuid(3)
-							}
-						]
-					}
-				])
+								root_id: testUuid(3),
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
 					Authors: [
 						{
-							id: testUuid(1)
+							id: testUuid(1),
 						},
 						{
-							id: testUuid(3)
-						}
-					]
-				}
-			}
+							id: testUuid(3),
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -919,27 +919,27 @@ describe('Queries', () => {
 						parameters: ['Stuff'],
 						response: [
 							{
-								root_id: testUuid(1)
+								root_id: testUuid(1),
 							},
 							{
-								root_id: testUuid(3)
-							}
-						]
-					}
-				])
+								root_id: testUuid(3),
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
 					Posts: [
 						{
-							id: testUuid(1)
+							id: testUuid(1),
 						},
 						{
-							id: testUuid(3)
-						}
-					]
-				}
-			}
+							id: testUuid(3),
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -969,27 +969,27 @@ describe('Queries', () => {
 						parameters: [testUuid(10), testUuid(11)],
 						response: [
 							{
-								root_id: testUuid(1)
+								root_id: testUuid(1),
 							},
 							{
-								root_id: testUuid(3)
-							}
-						]
-					}
-				])
+								root_id: testUuid(3),
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
 					Posts: [
 						{
-							id: testUuid(1)
+							id: testUuid(1),
 						},
 						{
-							id: testUuid(3)
-						}
-					]
-				}
-			}
+							id: testUuid(3),
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -1023,7 +1023,7 @@ describe('Queries', () => {
 						sql: SQL`select "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "post" as "root_"`,
-						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }]
+						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
 					},
 					{
 						sql: SQL`select
@@ -1036,10 +1036,10 @@ describe('Queries', () => {
 						parameters: ['cs', testUuid(1), testUuid(2)],
 						response: [
 							{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
-							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) }
-						]
-					}
-				])
+							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) },
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -1050,9 +1050,9 @@ describe('Queries', () => {
 								{
 									id: testUuid(3),
 									locale: 'cs',
-									title: 'ahoj svete'
-								}
-							]
+									title: 'ahoj svete',
+								},
+							],
 						},
 						{
 							id: testUuid(2),
@@ -1060,13 +1060,13 @@ describe('Queries', () => {
 								{
 									id: testUuid(5),
 									locale: 'cs',
-									title: 'dalsi clanek'
-								}
-							]
-						}
-					]
-				}
-			}
+									title: 'dalsi clanek',
+								},
+							],
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -1095,13 +1095,13 @@ describe('Queries', () => {
 						response: [
 							{
 								root_id: testUuid(1),
-								root_author: testUuid(2)
+								root_author: testUuid(2),
 							},
 							{
 								root_id: testUuid(3),
-								root_author: testUuid(4)
-							}
-						]
+								root_author: testUuid(4),
+							},
+						],
 					},
 					{
 						sql: SQL`select
@@ -1112,11 +1112,11 @@ describe('Queries', () => {
 						parameters: [testUuid(2), testUuid(4), 'John'],
 						response: [
 							{
-								root_id: testUuid(2)
-							}
-						]
-					}
-				])
+								root_id: testUuid(2),
+							},
+						],
+					},
+				]),
 			],
 			return: {
 				data: {
@@ -1124,16 +1124,16 @@ describe('Queries', () => {
 						{
 							id: testUuid(1),
 							author: {
-								id: testUuid(2)
-							}
+								id: testUuid(2),
+							},
 						},
 						{
 							id: testUuid(3),
-							author: null
-						}
-					]
-				}
-			}
+							author: null,
+						},
+					],
+				},
+			},
 		})
 	})
 })

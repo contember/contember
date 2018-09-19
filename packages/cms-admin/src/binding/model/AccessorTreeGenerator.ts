@@ -12,24 +12,24 @@ export default class AccessorTreeGenerator {
 	public constructor(private tree: MarkerTreeRoot, private allInitialData: any) {}
 
 	public generateLiveTree(updateData: (newData?: AccessorTreeRoot) => void): void {
-		let data: any = this.allInitialData[this.tree.id]
+		updateData(this.generateSubTree(this.tree, updateData))
+	}
 
-		if (!data) {
-			return
-		}
+	private generateSubTree(tree: MarkerTreeRoot, updateData: (newData?: AccessorTreeRoot) => void): AccessorTreeRoot {
+		let data: any = this.allInitialData[tree.id]
 
 		if (!Array.isArray(data)) {
 			data = [data]
 		}
 
 		const entityAccessors: Array<EntityAccessor> = (data as any[]).map((datum, i) => this.updateFields(
-			datum, this.tree.root, (fieldName, newData) => {
+			datum, tree.root, (fieldName, newData) => {
 				entityAccessors[i] = entityAccessors[i].withUpdatedField(fieldName, newData)
 
-				updateData(AccessorTreeRoot.createInstance(this.tree, entityAccessors))
+				updateData(AccessorTreeRoot.createInstance(tree, entityAccessors))
 			}
 		))
-		updateData(AccessorTreeRoot.createInstance(this.tree, entityAccessors))
+		return AccessorTreeRoot.createInstance(tree, entityAccessors)
 	}
 
 	private updateFields(
@@ -53,7 +53,7 @@ export default class AccessorTreeGenerator {
 			const field = fields[fieldName]
 
 			if (field instanceof MarkerTreeRoot) {
-				entityData[fieldName] = this.updateFields(this.allInitialData[field.id], field.root, () => undefined)
+				entityData[fieldName] = this.generateSubTree(field, () => undefined)
 				continue
 			}
 

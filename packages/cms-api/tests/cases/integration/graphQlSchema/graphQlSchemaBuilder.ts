@@ -102,8 +102,9 @@ describe('build gql schema from model schema', () => {
 
 	describe('one has many', () => {
 		const oneHasManySchema = (builder: SchemaBuilder) =>
-			builder.entity('Root', e =>
-				e.oneHasMany('r', r => r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))))
+			builder.entity('Root', e => e
+				.column('foo', c => c.type(Model.ColumnType.String))
+				.oneHasMany('r', r => r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2'))
 			)
 
 		it('all allowed', async () => {
@@ -130,8 +131,8 @@ describe('build gql schema from model schema', () => {
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
-							create: { id: true, a: true, Root: true },
-							update: { id: true, a: true, Root: true },
+							create: { id: true, a: true, r2: true },
+							update: { id: true, a: true, r2: true },
 							read: { id: true, a: true }
 						}
 					}
@@ -156,7 +157,7 @@ describe('build gql schema from model schema', () => {
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
-							create: { id: true, a: true, Root: true },
+							create: { id: true, a: true, r2: true },
 							read: { id: true, a: true },
 							delete: true
 						}
@@ -173,7 +174,7 @@ describe('build gql schema from model schema', () => {
 					Root: {
 						predicates: {},
 						operations: {
-							update: { id: true, r: true, Root: true },
+							update: { id: true, r: true },
 							read: { id: true, r: true },
 							delete: true
 						}
@@ -181,7 +182,7 @@ describe('build gql schema from model schema', () => {
 					OneHasManyEntity: {
 						predicates: {},
 						operations: {
-							update: { id: true, a: true, Root: true },
+							update: { id: true, a: true, r2: true },
 							read: { id: true, a: true },
 							delete: true
 						}

@@ -26,7 +26,7 @@ input OneHasManyEntityCreateInput {
 
 input OneHasManyEntityCreateR2EntityRelationInput {
   connect: RootUniqueWhere
-  create: Boolean
+  create: RootWithoutRCreateInput
 }
 
 type OneHasManyEntityMeta {
@@ -45,8 +45,8 @@ input OneHasManyEntityUpdateInput {
 }
 
 input OneHasManyEntityUpdateR2EntityRelationInput {
-  create: Boolean
-  update: Boolean
+  create: RootWithoutRCreateInput
+  update: RootWithoutRUpdateInput
   upsert: OneHasManyEntityUpsertR2RelationInput
   connect: RootUniqueWhere
   disconnect: Boolean
@@ -54,8 +54,8 @@ input OneHasManyEntityUpdateR2EntityRelationInput {
 }
 
 input OneHasManyEntityUpsertR2RelationInput {
-  update: Boolean
-  create: Boolean
+  update: RootWithoutRUpdateInput
+  create: RootWithoutRCreateInput
 }
 
 input OneHasManyEntityWhere {
@@ -85,10 +85,12 @@ type Query {
 type Root {
   _meta: RootMeta
   id: UUID!
+  foo: String
   r(where: OneHasManyEntityWhere): [OneHasManyEntity!]
 }
 
 input RootCreateInput {
+  foo: String
   r: [RootCreateREntityRelationInput!]
 }
 
@@ -99,6 +101,7 @@ input RootCreateREntityRelationInput {
 
 type RootMeta {
   id: FieldMeta
+  foo: FieldMeta
   r: FieldMeta
 }
 
@@ -107,6 +110,7 @@ input RootUniqueWhere {
 }
 
 input RootUpdateInput {
+  foo: String
   r: [RootUpdateREntityRelationInput!]
 }
 
@@ -132,10 +136,19 @@ input RootUpsertRRelationInput {
 
 input RootWhere {
   id: UUIDCondition
+  foo: StringCondition
   r: OneHasManyEntityWhere
   and: [RootWhere!]
   or: [RootWhere!]
   not: RootWhere
+}
+
+input RootWithoutRCreateInput {
+  foo: String
+}
+
+input RootWithoutRUpdateInput {
+  foo: String
 }
 
 input StringCondition {

@@ -20,10 +20,6 @@ export interface MarkerTreeRootProvider extends DataBindingComponent {
 	generateMarkerTreeRoot: (props: any, treeRoot: MarkerTreeRoot['root']) => MarkerTreeRoot
 }
 
-export interface MultipleFieldMarkerProvider extends DataBindingComponent {
-	generateFieldMarkers: (props: any) => FieldMarker[]
-}
-
 export interface ReferenceMarkerProvider extends DataBindingComponent {
 	generateReferenceMarker: (props: any, referredEntity: ReferenceMarker['reference']) => ReferenceMarker
 }
@@ -32,14 +28,13 @@ export interface SyntheticChildrenProvider extends DataBindingComponent {
 	generateSyntheticChildren: (props: any) => React.ReactNode
 }
 
-type DataMarkerProvider = Partial<
+type MarkerProvider = Partial<
 	| EntityMarkerProvider
 	| FieldMarkerProvider
 	| MarkerTreeRootProvider
-	| MultipleFieldMarkerProvider
 	| ReferenceMarkerProvider
 	| SyntheticChildrenProvider
 > &
 	DataBindingComponent
 
-export default DataMarkerProvider
+export default MarkerProvider

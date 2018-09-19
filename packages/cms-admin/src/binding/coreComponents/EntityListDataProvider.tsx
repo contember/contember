@@ -4,7 +4,7 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
-import { MarkerTreeRootProvider } from './DataMarkerProvider'
+import { MarkerTreeRootProvider } from './MarkerProvider'
 import DataProvider from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 

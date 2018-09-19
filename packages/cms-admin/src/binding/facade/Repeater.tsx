@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ReferenceMarkerProvider } from '../coreComponents/DataMarkerProvider'
+import { ReferenceMarkerProvider } from '../coreComponents/MarkerProvider'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
 import OneToMany, { OneToManyProps } from '../coreComponents/OneToMany'
 import EntityMarker from '../dao/EntityMarker'

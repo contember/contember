@@ -3,7 +3,7 @@ import { Input } from 'cms-common'
 import * as React from 'react'
 import { EntityName } from '../bindingTypes'
 import EntityMarker, { EntityFields } from '../dao/EntityMarker'
-import { EntityMarkerProvider } from './DataMarkerProvider'
+import { EntityMarkerProvider } from './MarkerProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 export interface EntityProps {

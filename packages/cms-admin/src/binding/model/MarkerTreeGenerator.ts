@@ -1,5 +1,5 @@
 import * as React from 'react'
-import DataMarkerProvider from '../coreComponents/DataMarkerProvider'
+import MarkerProvider from '../coreComponents/MarkerProvider'
 import DataBindingError from '../dao/DataBindingError'
 import EntityMarker, { EntityFields } from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
@@ -74,7 +74,7 @@ export default class MarkerTreeGenerator {
 
 			// React.Component
 
-			const dataMarker = node.type as DataMarkerProvider & (React.ComponentClass<any> | React.SFC<any>)
+			const dataMarker = node.type as MarkerProvider & (React.ComponentClass<any> | React.SFC<any>)
 
 			if ('generateSyntheticChildren' in dataMarker && dataMarker.generateSyntheticChildren) {
 				children = dataMarker.generateSyntheticChildren(node.props)
@@ -82,10 +82,6 @@ export default class MarkerTreeGenerator {
 
 			if ('generateFieldMarker' in dataMarker && dataMarker.generateFieldMarker) {
 				return dataMarker.generateFieldMarker(node.props)
-			}
-
-			if ('generateFieldMarkers' in dataMarker && dataMarker.generateFieldMarkers) {
-				return dataMarker.generateFieldMarkers(node.props)
 			}
 
 			if ('generateEntityMarker' in dataMarker && dataMarker.generateEntityMarker) {

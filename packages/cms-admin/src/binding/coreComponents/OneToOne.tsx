@@ -4,7 +4,7 @@ import EntityAccessor from '../dao/EntityAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
-import { ReferenceMarkerProvider } from './DataMarkerProvider'
+import { ReferenceMarkerProvider } from './MarkerProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 export interface OneToOneProps {

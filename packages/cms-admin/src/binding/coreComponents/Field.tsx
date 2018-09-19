@@ -5,7 +5,7 @@ import EntityAccessor from '../dao/EntityAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
 import DataContext, { DataContextValue } from './DataContext'
-import { FieldMarkerProvider } from './DataMarkerProvider'
+import { FieldMarkerProvider } from './MarkerProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 export interface FieldProps {

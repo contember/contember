@@ -27,7 +27,7 @@ export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTree
 		public readonly id: TreeId,
 		public readonly root: EntityMarker,
 		public readonly constraints: C,
-		public readonly associatedField?: FieldName
+		public readonly associatedField?: FieldName,
 	) {}
 
 	public get placeholderName(): string {
@@ -41,7 +41,7 @@ export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTree
 	public static createInstance(
 		rootMarker: MarkerTreeRoot['root'],
 		constraints: MarkerTreeRoot['constraints'],
-		associatedField?: FieldName
+		associatedField?: FieldName,
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(MarkerTreeRoot.getNewTreeId(), rootMarker, constraints, associatedField)
 	}

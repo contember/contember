@@ -31,11 +31,11 @@ export default class QueryGenerator {
 
 	private addGetQuery(
 		baseQueryBuilder: QueryBuilder,
-		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>
+		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>,
 	): QueryBuilder {
 		if (subTree.root.where) {
 			throw new DataBindingError(
-				'When selecting a single item, it does not make sense for a top-level Entity to have a where clause.'
+				'When selecting a single item, it does not make sense for a top-level Entity to have a where clause.',
 			)
 		}
 
@@ -43,7 +43,7 @@ export default class QueryGenerator {
 		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder(boundedQueryBuilder.objectBuilder)
 		;[baseQueryBuilder, listQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerListQueryPart(subTree.root, listQueryBuilder)
+			this.registerListQueryPart(subTree.root, listQueryBuilder),
 		)
 
 		return baseQueryBuilder.get(subTree.root.entityName, listQueryBuilder, subTree.id)
@@ -51,7 +51,7 @@ export default class QueryGenerator {
 
 	private addListQuery(
 		baseQueryBuilder: QueryBuilder,
-		subTree: MarkerTreeRoot<EntityListTreeConstraints>
+		subTree: MarkerTreeRoot<EntityListTreeConstraints>,
 	): QueryBuilder {
 		const entityWhere = subTree.root.where
 		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder()
@@ -59,7 +59,7 @@ export default class QueryGenerator {
 		if (subTree.constraints.where) {
 			if (entityWhere) {
 				listQueryBuilder = listQueryBuilder.where({
-					and: [entityWhere, subTree.root.where]
+					and: [entityWhere, subTree.root.where],
 				} as Input.Where<GraphQlBuilder.Literal>) // TODO: This cast is necessary for the time being because TS…
 			} else {
 				listQueryBuilder = listQueryBuilder.where(subTree.constraints.where)
@@ -70,7 +70,7 @@ export default class QueryGenerator {
 
 		;[baseQueryBuilder, listQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerListQueryPart(subTree.root, listQueryBuilder)
+			this.registerListQueryPart(subTree.root, listQueryBuilder),
 		)
 
 		// This naming convention is unfortunate & temporary
@@ -79,7 +79,7 @@ export default class QueryGenerator {
 
 	private *registerListQueryPart(
 		context: EntityMarker,
-		builder: CrudQueryBuilder.ListQueryBuilder
+		builder: CrudQueryBuilder.ListQueryBuilder,
 	): IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder> {
 		builder = builder.column('id')
 
@@ -120,7 +120,7 @@ export default class QueryGenerator {
 
 	private addMarkerTreeRootQueries(
 		baseQueryBuilder: QueryBuilder,
-		subTrees: IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder>
+		subTrees: IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder>,
 	): [QueryBuilder, CrudQueryBuilder.ListQueryBuilder] {
 		let listQueryBuilder: CrudQueryBuilder.ListQueryBuilder | undefined = undefined
 

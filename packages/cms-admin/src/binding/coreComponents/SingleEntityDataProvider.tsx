@@ -18,7 +18,7 @@ export default class SingleEntityDataProvider extends React.Component<SingleEnti
 
 	public render() {
 		const markerTreeGenerator = new MarkerTreeGenerator(
-			<SingleEntityDataProvider {...this.props}>{this.props.children}</SingleEntityDataProvider>
+			<SingleEntityDataProvider {...this.props}>{this.props.children}</SingleEntityDataProvider>,
 		)
 
 		return <DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
@@ -26,15 +26,15 @@ export default class SingleEntityDataProvider extends React.Component<SingleEnti
 
 	public static generateMarkerTreeRoot(
 		props: SingleEntityDataProviderProps,
-		treeRoot: MarkerTreeRoot['root']
+		treeRoot: MarkerTreeRoot['root'],
 	): MarkerTreeRoot {
 		return MarkerTreeRoot.createInstance(
 			treeRoot,
 			{
 				where: props.where,
-				whereType: 'unique'
+				whereType: 'unique',
 			},
-			props.associatedField
+			props.associatedField,
 		)
 	}
 }

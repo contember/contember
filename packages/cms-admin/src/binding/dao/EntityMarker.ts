@@ -9,6 +9,6 @@ export default class EntityMarker {
 	constructor(
 		public readonly entityName: EntityName,
 		public fields: EntityFields,
-		public readonly where?: Input.Where<GraphQlBuilder.Literal>
+		public readonly where?: Input.Where<GraphQlBuilder.Literal>,
 	) {}
 }

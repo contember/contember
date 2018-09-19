@@ -18,7 +18,7 @@ export default class EntityListDataProvider extends React.Component<EntityListDa
 
 	public render() {
 		const markerTreeGenerator = new MarkerTreeGenerator(
-			<EntityListDataProvider {...this.props}>{this.props.children}</EntityListDataProvider>
+			<EntityListDataProvider {...this.props}>{this.props.children}</EntityListDataProvider>,
 		)
 
 		return <DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
@@ -26,15 +26,15 @@ export default class EntityListDataProvider extends React.Component<EntityListDa
 
 	public static generateMarkerTreeRoot(
 		props: EntityListDataProviderProps,
-		treeRoot: MarkerTreeRoot['root']
+		treeRoot: MarkerTreeRoot['root'],
 	): MarkerTreeRoot {
 		return MarkerTreeRoot.createInstance(
 			treeRoot,
 			{
 				where: props.where,
-				whereType: 'nonUnique'
+				whereType: 'nonUnique',
 			},
-			props.associatedField
+			props.associatedField,
 		)
 	}
 }

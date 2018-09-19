@@ -33,7 +33,7 @@ export interface DataProviderState {
 
 class DataProvider extends React.Component<DataProviderInnerProps, DataProviderState, boolean> {
 	public state: DataProviderState = {
-		data: undefined
+		data: undefined,
 	}
 
 	protected triggerPersist = () => {
@@ -109,10 +109,10 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 export default connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps, State>(
 	({ content }) => ({
-		requests: content.requests
+		requests: content.requests,
 	}),
 	(dispatch: Dispatch) => ({
 		getData: (query: string) => dispatch(getData('blog', 'prod', query)),
-		putData: (query: string) => dispatch(putData('blog', 'prod', query))
-	})
+		putData: (query: string) => dispatch(putData('blog', 'prod', query)),
+	}),
 )(DataProvider)

@@ -41,7 +41,7 @@ export default class MutationGenerator {
 
 	private attachCreateQueryPart(
 		currentData: EntityAccessor,
-		builder: CrudQueryBuilder.CreateDataBuilder
+		builder: CrudQueryBuilder.CreateDataBuilder,
 	): CrudQueryBuilder.CreateDataBuilder {
 		return builder
 	}
@@ -49,7 +49,7 @@ export default class MutationGenerator {
 	private attachUpdateQueryPart(
 		persistedData: any,
 		currentData: EntityAccessor,
-		builder: CrudQueryBuilder.UpdateDataBuilder
+		builder: CrudQueryBuilder.UpdateDataBuilder,
 	): CrudQueryBuilder.UpdateDataBuilder {
 		for (const fieldName in persistedData) {
 			const persistedField = persistedData[fieldName]
@@ -67,7 +67,7 @@ export default class MutationGenerator {
 						const persistedId: string = field[MutationGenerator.PRIMARY_KEY_NAME]
 						const currentById = innerAccessor.find(
 							(element): element is EntityAccessor =>
-								element instanceof EntityAccessor && element.primaryKey === persistedId
+								element instanceof EntityAccessor && element.primaryKey === persistedId,
 						)
 
 						if (currentById) {
@@ -89,11 +89,9 @@ export default class MutationGenerator {
 				} else if (accessor instanceof EntityAccessor) {
 					builder = builder.one(fieldName, builder => {
 						if (accessor.primaryKey !== undefined) {
-							return builder
-								.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey })
-								.update(builder => {
-									return this.attachUpdateQueryPart(persistedField, accessor, builder)
-								})
+							return builder.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey }).update(builder => {
+								return this.attachUpdateQueryPart(persistedField, accessor, builder)
+							})
 						}
 						return builder.create(builder => {
 							return this.attachCreateQueryPart(accessor, builder)

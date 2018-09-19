@@ -10,15 +10,10 @@ export default class EntityAccessor {
 		public readonly entityName: EntityName,
 		public readonly primaryKey: string | undefined,
 		public readonly data: EntityData,
-		public readonly unlink?: () => void
+		public readonly unlink?: () => void,
 	) {}
 
 	withUpdatedField(field: FieldName, newData: FieldData): EntityAccessor {
-		return new EntityAccessor(
-			this.entityName,
-			this.primaryKey,
-			{ ...this.data, [field]: newData },
-			this.unlink
-		)
+		return new EntityAccessor(this.entityName, this.primaryKey, { ...this.data, [field]: newData }, this.unlink)
 	}
 }

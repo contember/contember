@@ -28,13 +28,13 @@ export default class ConditionBuilder {
 			const columnIdentifier: QueryBuilder.ColumnIdentifier = [tableName, columnName]
 
 			if (condition.eq !== undefined) {
-				clause.compare(columnIdentifier, '=', condition.eq)
+				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.eq, condition.eq)
 			}
 			if (condition.null !== undefined) {
 				condition.null ? clause.null(columnIdentifier) : clause.not(clause => clause.null(columnIdentifier))
 			}
 			if (condition.notEq !== undefined) {
-				clause.compare(columnIdentifier, '!=', condition.notEq)
+				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.notEq, condition.notEq)
 			}
 			if (condition.in !== undefined) {
 				clause.in(columnIdentifier, condition.in)
@@ -44,16 +44,16 @@ export default class ConditionBuilder {
 				clause.not(clause => clause.in(columnIdentifier, values))
 			}
 			if (condition.lt !== undefined) {
-				clause.compare(columnIdentifier, '<', condition.lt)
+				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.lt, condition.lt)
 			}
 			if (condition.lte !== undefined) {
-				clause.compare(columnIdentifier, '<=', condition.lte)
+				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.lte, condition.lte)
 			}
 			if (condition.gt !== undefined) {
-				clause.compare(columnIdentifier, '>', condition.gt)
+				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.gt, condition.gt)
 			}
 			if (condition.gte !== undefined) {
-				clause.compare(columnIdentifier, '>=', condition.gte)
+				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.gte, condition.gte)
 			}
 			if (condition.never) {
 				clause.raw('false')

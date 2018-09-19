@@ -5,6 +5,7 @@ import * as knex from 'knex'
 import KnexWrapper from '../../../src/core/knex/KnexWrapper'
 import { SQL } from '../../src/tags'
 import InsertBuilder from '../../../src/core/knex/InsertBuilder'
+import ConditionBuilder from "../../../src/core/knex/ConditionBuilder";
 
 interface Test {
 	query: (wrapper: KnexWrapper) => void
@@ -36,6 +37,39 @@ const execute = async (test: Test) => {
 }
 
 describe('knex query builder', () => {
+	it('constructs condition', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper.queryBuilder()
+				qb.table('foo')
+				qb.where(cond => {
+					cond.compare('a', ConditionBuilder.Operator.eq, 1)
+					cond.compare('b', ConditionBuilder.Operator.notEq, 2)
+					cond.compare('c', ConditionBuilder.Operator.lt, 3)
+					cond.compare('d', ConditionBuilder.Operator.lte, 4)
+					cond.compare('e', ConditionBuilder.Operator.gt, 5)
+					cond.compare('f', ConditionBuilder.Operator.gte, 6)
+
+					cond.compareColumns('z', ConditionBuilder.Operator.eq, ['foo', 'x'])
+
+					cond.in('o', [1, 2, 3])
+					cond.in('m', qb => qb.select(expr => expr.selectValue(1)))
+
+					cond.null('n')
+
+					cond.raw('false')
+				})
+
+				await qb.getResult()
+			},
+			sql: SQL`select *
+               from "foo"
+               where "a" = $1 and "b" != $2 and "c" < $3 and "d" <= $4 and "e" > $5 and "f" >= $6 and "z" = "foo"."x" and "o" in ($7, $8, $9) and
+                     "m" in (select $10) and "n" is null and false`,
+			parameters: [1, 2, 3, 4, 5, 6, 1, 2, 3, 1],
+		})
+	})
+
 	it('constructs "on"', async () => {
 		await execute({
 			query: async wrapper => {
@@ -44,15 +78,15 @@ describe('knex query builder', () => {
 				qb.table('foo')
 				qb.join('bar', 'bar', clause => {
 					clause.or(clause => {
-						clause.compare(['bar', 'a'], '=', 1)
-						clause.compare(['bar', 'a'], '=', 2)
-						clause.not(clause => clause.compare(['bar', 'b'], '=', 1))
+						clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 1)
+						clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 2)
+						clause.not(clause => clause.compare(['bar', 'b'], ConditionBuilder.Operator.eq, 1))
 					})
 					clause.and(clause => {
 						clause.in(['bar', 'c'], [1, 2, 3])
 						clause.null(['bar', 'd'])
 						clause.not(clause => clause.null(['bar', 'd']))
-						clause.compareColumns(['bar', 'e'], '<=', ['bar', 'f'])
+						clause.compareColumns(['bar', 'e'], ConditionBuilder.Operator.lte, ['bar', 'f'])
 					})
 				})
 				await qb.getResult()
@@ -164,8 +198,8 @@ describe('knex query builder', () => {
 					expr =>
 						expr.selectCondition(condition =>
 							condition.or(condition => {
-								condition.compare('foo', '>=', 1)
-								condition.compare('foo', '<=', 0)
+								condition.compare('foo', ConditionBuilder.Operator.gte, 1)
+								condition.compare('foo', ConditionBuilder.Operator.lte, 0)
 							})
 						),
 					'bar'
@@ -174,6 +208,27 @@ describe('knex query builder', () => {
 			},
 			sql: SQL`select ("foo" >= $1 or "foo" <= $2) as "bar"`,
 			parameters: [1, 0]
+		})
+	})
+
+
+	it('constructs delete', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper.deleteBuilder()
+				.with('data', qb => qb.from('abc'))
+				.from('bar')
+				.using('data')
+				.where(cond => cond.compare(['data', 'a'], ConditionBuilder.Operator.gte, 1))
+				.returning('xyz')
+				await qb.execute()
+			},
+			sql: SQL`with "data" as 
+			(select * from "abc") 
+			delete from "bar" 
+			using "data" as "data" 
+			where "data"."a" >= $1 returning "xyz"`,
+			parameters: [1],
 		})
 	})
 })

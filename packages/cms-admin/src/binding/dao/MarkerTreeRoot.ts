@@ -1,5 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
+import { FieldName } from '../bindingTypes'
 import EntityMarker from './EntityMarker'
 import { TreeId } from './TreeId'
 
@@ -16,23 +17,28 @@ export interface EntityListTreeConstraints {
 export type MarkerTreeConstraints = SingleEntityTreeConstraints | EntityListTreeConstraints
 
 export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
-	private constructor(
-		public readonly id: TreeId,
-		public readonly root: EntityMarker,
-		public readonly constraints: C
-	) {}
-
 	private static getNewTreeId: () => TreeId = (() => {
 		let id = 0
 
 		return () => `treeRoot${(id++).toFixed(0)}`
 	})()
 
+	private constructor(
+		public readonly id: TreeId,
+		public readonly root: EntityMarker,
+		public readonly constraints: C,
+		public readonly associatedField?: FieldName
+	) {}
+
 	public get placeholderName(): string {
-		return `__root_${this.id}`
+		return this.associatedField || `__root_${this.id}`
 	}
 
-	public static createInstance(rootMarker: MarkerTreeRoot['root'], constraints: MarkerTreeRoot['constraints']): MarkerTreeRoot {
-		return new MarkerTreeRoot(MarkerTreeRoot.getNewTreeId(), rootMarker, constraints)
+	public static createInstance(
+		rootMarker: MarkerTreeRoot['root'],
+		constraints: MarkerTreeRoot['constraints'],
+		associatedField?: FieldName
+	): MarkerTreeRoot {
+		return new MarkerTreeRoot(MarkerTreeRoot.getNewTreeId(), rootMarker, constraints, associatedField)
 	}
 }

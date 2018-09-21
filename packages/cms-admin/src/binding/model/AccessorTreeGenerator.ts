@@ -2,6 +2,7 @@ import { FieldName } from '../bindingTypes'
 import { DataContextValue } from '../coreComponents/DataContext'
 import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import EntityAccessor, { EntityData, FieldData } from '../dao/EntityAccessor'
+import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import FieldAccessor from '../dao/FieldAccessor'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
@@ -64,37 +65,37 @@ export default class AccessorTreeGenerator {
 
 			if (Array.isArray(fieldData)) {
 				if (field instanceof EntityMarker) {
-					const oneToManyData: DataContextValue[] = []
+					const collectionAccessor = new EntityCollectionAccessor([])
 
 					for (let i = 0, len = fieldData.length; i < len; i++) {
 						const accessor = this.updateFields(
 							fieldData[i],
 							field,
 							(updatedField: FieldName, updatedData: FieldData) => {
-								const entityAccessor = oneToManyData[i]
-								if (entityAccessor instanceof EntityAccessor) {
-									oneToManyData[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
+								const entityAccessor = collectionAccessor.entities[i]
+								if (entityAccessor) {
+									collectionAccessor.entities[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
 
-									onUpdate(fieldName, oneToManyData)
+									onUpdate(fieldName, collectionAccessor)
 								}
 							},
 							(replacement) => {
-								const entityAccessor = oneToManyData[i]
-								if (entityAccessor instanceof EntityAccessor) {
-									oneToManyData[i] = this.asNewEntity(entityAccessor, replacement)
+								const entityAccessor = collectionAccessor.entities[i]
+								if (entityAccessor) {
+									collectionAccessor.entities[i] = this.asNewEntity(entityAccessor, replacement)
 
-									onUpdate(fieldName, oneToManyData)
+									onUpdate(fieldName, collectionAccessor)
 								}
 							},
 							() => {
-								oneToManyData[i] = undefined
-								onUpdate(fieldName, oneToManyData)
+								collectionAccessor.entities[i] = undefined
+								onUpdate(fieldName, collectionAccessor)
 							},
 						)
-						oneToManyData.push(accessor)
+						collectionAccessor.entities.push(accessor)
 					}
 
-					entityData[fieldName] = oneToManyData
+					entityData[fieldName] = collectionAccessor
 				}
 			} else if (typeof fieldData === 'object') {
 				if (field instanceof EntityMarker) {

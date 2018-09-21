@@ -36,7 +36,7 @@ export default class MutationGenerator {
 					this.attachUpdateQueryPart(this.persistedData[accessor.entityName], this.currentData, builder)
 				)
 			})
-			.getGql()*/
+			.getGql()
 	}
 
 	private attachCreateQueryPart(
@@ -100,13 +100,9 @@ export default class MutationGenerator {
 				}
 			} else {
 				// If the reference was undefined but we've added it, we need to insert the rows from here
-				/*
-
-
-				 */
 			}
 		}
 
-		return builder
+		return builder*/
 	}
 }

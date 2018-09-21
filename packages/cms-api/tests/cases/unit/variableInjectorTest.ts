@@ -1,43 +1,75 @@
 import 'mocha'
 import { expect } from 'chai'
 import VariableInjector from '../../../src/acl/VariableInjector'
+import SchemaBuilder from "../../../src/content-schema/builder/SchemaBuilder";
+import { Model } from 'cms-common'
 
 describe('variable injector', () => {
 	it('injects variable', () => {
-		const injector = new VariableInjector({
+		const schema = new SchemaBuilder()
+			.enum('locale', ['cs', 'en'])
+			.entity('PostLocale', e => e
+				.column('locale', c => c.type(Model.ColumnType.Enum, {enumName: 'locale'}))
+				.column('foo', c => c.type(Model.ColumnType.String))
+				.column('public', c => c.type(Model.ColumnType.Bool))
+				.manyHasOne('post', r => r
+					.target('Post', e => e
+						.manyHasOne('site', r => r
+							.target('Site', e => e)
+						)
+					)
+				)
+			)
+			.buildSchema()
+
+		const injector = new VariableInjector(schema, {
 			site: [1, 2],
 			locale: 'cs',
 		})
-		const result = injector.inject({
-			and: [
+		const result = injector.inject(schema.entities['PostLocale'], {
+			or: [
 				{
-					post: {
-						site: 'site',
-					},
+					public: {eq: true},
 				},
 				{
-					locale: 'locale',
-				},
-				{
-					foo: 'bar',
-				},
-			],
+					and: [
+						{
+							post: {
+								site: 'site',
+							},
+						},
+						{
+							locale: 'locale',
+						},
+						{
+							foo: 'bar',
+						},
+					]
+				}
+			]
 		})
 
 		expect(result).deep.eq({
-			and: [
+			or: [
 				{
-					post: {
-						site: { in: [1, 2] },
-					},
+					public: {eq: true},
 				},
 				{
-					locale: { eq: 'cs' },
-				},
-				{
-					foo: { never: true },
-				},
-			],
+					and: [
+						{
+							post: {
+								site: {id: {in: [1, 2]}},
+							},
+						},
+						{
+							locale: {eq: 'cs'},
+						},
+						{
+							foo: {never: true},
+						},
+					],
+				}
+			]
 		})
 	})
 })

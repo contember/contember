@@ -30,7 +30,7 @@ namespace Acl {
 	}
 
 	export type PredicateVariable = string //{ name: string }
-	export type PredicateDefinition = Input.Where<PredicateVariable>
+	export type PredicateDefinition = Input.Where<PredicateVariable | Input.Condition>
 
 	export type PredicateMap = { [name: string]: PredicateDefinition }
 

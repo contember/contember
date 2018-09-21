@@ -1,7 +1,8 @@
 import { EntityName, FieldName } from '../bindingTypes'
 import { DataContextValue } from '../coreComponents/DataContext'
+import EntityCollectionAccessor from './EntityCollectionAccessor'
 
-export type FieldData = DataContextValue | DataContextValue[]
+export type FieldData = DataContextValue | EntityCollectionAccessor
 
 export type EntityData = { [name in FieldName]: FieldData }
 

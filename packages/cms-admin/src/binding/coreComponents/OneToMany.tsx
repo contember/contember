@@ -2,6 +2,7 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor from '../dao/EntityAccessor'
+import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
@@ -22,10 +23,10 @@ export default class OneToMany extends React.Component<OneToManyProps> {
 					if (data instanceof EntityAccessor) {
 						const field = data.data[this.props.field]
 
-						if (Array.isArray(field)) {
-							return field.map((datum: DataContextValue, i: number) => (
-								<DataContext.Provider value={datum} key={i}>
-									{datum instanceof EntityAccessor && this.props.children}
+						if (field instanceof EntityCollectionAccessor) {
+							return field.entities.map((datum: EntityAccessor | undefined, i: number) => (
+								datum && <DataContext.Provider value={datum} key={i}>
+									{this.props.children}
 								</DataContext.Provider>
 							))
 						}

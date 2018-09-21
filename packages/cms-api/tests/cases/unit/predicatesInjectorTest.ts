@@ -88,7 +88,7 @@ describe('predicates injector', () => {
 	it('merges predicate with explicit where', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, {localeVariable: ['cs'] }))
+			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
 		)
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {
 			where: { id: { in: [1, 2] } },

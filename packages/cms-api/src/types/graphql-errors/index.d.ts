@@ -3,6 +3,5 @@ declare module 'graphql-errors' {
 
 	export function maskErrors(schema: GraphQLSchema, handler?: (err: Error) => void): void
 
-	export class UserError extends Error {
-	}
+	export class UserError extends Error {}
 }

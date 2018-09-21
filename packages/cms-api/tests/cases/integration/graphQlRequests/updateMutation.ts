@@ -2331,7 +2331,7 @@ describe('update', () => {
 				permissions: {
 					Author: {
 						predicates: {
-							name_predicate: {name: {never: true}},
+							name_predicate: { name: { never: true } },
 						},
 						operations: {
 							update: {
@@ -2358,34 +2358,32 @@ describe('update', () => {
                where "root_"."id" = $2) update "author"
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3 and false and false`,
-							parameters: ['John', testUuid(1), testUuid(1),],
+							parameters: ['John', testUuid(1), testUuid(1)],
 							response: 0,
 						},
 						{
 							sql: SQL`select "root_"."id" as "root_id"
                      from "author" as "root_"
                      where "root_"."id" = $1`,
-							response: [{root_id: testUuid(1)}],
+							response: [{ root_id: testUuid(1) }],
 							parameters: [testUuid(1)],
 						},
 					]),
 				],
 				return: {
-					"data": {
-						"updateAuthor": null,
+					data: {
+						updateAuthor: null,
 					},
-					"errors": [
+					errors: [
 						{
-							"locations": [
+							locations: [
 								{
-									"column": 9,
-									"line": 2,
+									column: 9,
+									line: 2,
 								},
 							],
-							"message": "Mutation failed, operation denied by ACL rules",
-							"path": [
-								"updateAuthor",
-							],
+							message: 'Mutation failed, operation denied by ACL rules',
+							path: ['updateAuthor'],
 						},
 					],
 				},

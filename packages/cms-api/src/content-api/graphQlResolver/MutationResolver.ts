@@ -4,8 +4,8 @@ import { isUniqueWhere } from '../../content-schema/inputUtils'
 import ObjectNode from './ObjectNode'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import MapperRunner from '../sql/MapperRunner'
-import Mapper from "../sql/Mapper";
-import { UserError } from "graphql-errors";
+import Mapper from '../sql/Mapper'
+import { UserError } from 'graphql-errors'
 
 export default class MutationResolver {
 	constructor(private readonly mapperRunner: MapperRunner, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
@@ -24,7 +24,7 @@ export default class MutationResolver {
 				if (!(e instanceof Mapper.NoResultError)) {
 					throw e
 				}
-				throw new UserError('Mutation failed, operation denied by ACL rules');
+				throw new UserError('Mutation failed, operation denied by ACL rules')
 			}
 
 			return (await mapper.select(entity, queryExpanded))[0] || null
@@ -40,7 +40,7 @@ export default class MutationResolver {
 				if (!(e instanceof Mapper.NoResultError)) {
 					throw e
 				}
-				throw new UserError('Mutation failed, operation denied by ACL rules');
+				throw new UserError('Mutation failed, operation denied by ACL rules')
 			}
 
 			const whereArgs = { where: { [entity.primary]: { eq: primary } } }
@@ -71,7 +71,7 @@ export default class MutationResolver {
 				if (!(e instanceof Mapper.NoResultError)) {
 					throw e
 				}
-				throw new UserError('Mutation failed, operation denied by ACL rules');
+				throw new UserError('Mutation failed, operation denied by ACL rules')
 			}
 
 			return result

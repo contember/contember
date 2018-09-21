@@ -50,7 +50,10 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 								<HTMLSelect
 									value={currentValueEntity.primaryKey}
 									onChange={e => {
-										// TODO
+										const newPrimaryKey = e.currentTarget.value
+										const newAccessor = subTreeData.find((accessor) => accessor.primaryKey === newPrimaryKey)
+
+										newAccessor && currentValueEntity.replaceWith(newAccessor)
 									}}
 									options={subTreeData.map(datum => {
 										const optionField = datum.data[this.props.optionFieldName]

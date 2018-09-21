@@ -14,7 +14,7 @@ import KnexConnection from '../../src/core/knex/KnexConnection'
 export interface SqlQuery {
 	sql: string
 	parameters?: any[]
-	response?: any[] | any
+	response: any[] | any
 }
 
 export interface Test {
@@ -30,10 +30,12 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 	return [
 		{
 			sql: 'BEGIN;',
+			response: 1,
 		},
 		...executes,
 		{
 			sql: 'COMMIT;',
+			response: 1,
 		},
 	]
 }

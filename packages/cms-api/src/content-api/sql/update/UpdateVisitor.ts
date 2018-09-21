@@ -96,20 +96,21 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				public async update(where: Input.UniqueWhere, input: Input.UpdateDataInput) {
-					// fixme should check if relation really exists
 					await mapper.update(targetEntity, where, input)
 					await connect(where)
 				}
 
 				public async upsert(where: Input.UniqueWhere, update: Input.UpdateDataInput, create: Input.CreateDataInput) {
-					// fixme should check if relation really exists
-					const result = await mapper.update(targetEntity, where, update)
-					if (result > 0) {
-						// fixme it should already exist
+					try {
+						await mapper.update(targetEntity, where, update)
 						await connect(where)
-					} else {
-						const primaryValue = await mapper.insert(targetEntity, create)
-						await connect({ [targetEntity.primary]: primaryValue })
+					} catch (e) {
+						if (e instanceof Mapper.NoResultError) {
+							const primaryValue = await mapper.insert(targetEntity, create)
+							await connect({ [targetEntity.primary]: primaryValue })
+						} else {
+							throw e
+						}
 					}
 				}
 			}()
@@ -162,14 +163,16 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				public async upsert(where: Input.UniqueWhere, update: Input.UpdateDataInput, create: Input.CreateDataInput) {
-					// fixme should check if relation really exists
-					const result = await mapper.update(targetEntity, where, update)
-					if (result > 0) {
-						// fixme it should already exist
+					try {
+						await mapper.update(targetEntity, where, update)
 						await connect(where)
-					} else {
-						const primaryValue = await mapper.insert(targetEntity, create)
-						await connect({ [targetEntity.primary]: primaryValue })
+					} catch (e) {
+						if (e instanceof Mapper.NoResultError) {
+							const primaryValue = await mapper.insert(targetEntity, create)
+							await connect({ [targetEntity.primary]: primaryValue })
+						} else {
+							throw e
+						}
 					}
 				}
 			}()

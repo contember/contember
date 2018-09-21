@@ -138,7 +138,7 @@ class Mapper {
 
 		const affectedRows = await executeResult
 
-		if (affectedRows === 0) {
+		if (affectedRows !== 1 && affectedRows !== null) {
 			throw new Mapper.NoResultError()
 		}
 

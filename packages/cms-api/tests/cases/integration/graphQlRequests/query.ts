@@ -1136,4 +1136,120 @@ describe('Queries', () => {
 			},
 		})
 	})
+
+	it('Post locale ordered by author name', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('PostLocale', entity =>
+					entity.manyHasOne('post', r =>
+						r.target('Post', e =>
+							e.manyHasOne('author', r =>
+								r.target('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+							)
+						)
+					)
+				)
+				.buildSchema(),
+			query: GQL`
+        query {
+          PostLocales(orderBy: [{post: {author: {name: asc}}}, {id: desc}]) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_post"."id" as "root_post_id",
+                       "root_post_author"."id" as "root_post_author_id"
+                     from "post_locale" as "root_" left join "post" as "root_post" on "root_"."post_id" = "root_post"."id"
+                       left join "author" as "root_post_author" on "root_post"."author_id" = "root_post_author"."id"
+                     order by "root_post_author"."name" asc, "root_"."id" desc`,
+						response: [{ root_id: testUuid(2) }],
+					},
+				]),
+			],
+			return: {
+				data: {
+					PostLocales: [
+						{
+							id: testUuid(2),
+						},
+					],
+				},
+			},
+		})
+	})
+
+	it('Post with ordered locales', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('PostLocale', entity => entity.manyHasOne('post', r => r.target('Post', e => e).inversedBy('locales')))
+				.buildSchema(),
+			query: GQL`
+        query {
+          Posts {
+            id
+	          locales(orderBy: {id: desc}) {
+		          id
+	          }
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
+                     from "post" as "root_"`,
+						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					},
+					{
+						sql: SQL`select
+                       "root_"."post_id" as "__grouping_key",
+                       "root_"."id" as "root_id"
+                     from "post_locale" as "root_"
+                     where "root_"."post_id" in ($1, $2)
+                     order by "root_"."id" desc`,
+						parameters: [testUuid(1), testUuid(2)],
+						response: [
+							{ __grouping_key: testUuid(1), root_id: testUuid(3) },
+							{ __grouping_key: testUuid(1), root_id: testUuid(4) },
+							{ __grouping_key: testUuid(2), root_id: testUuid(4) },
+							{ __grouping_key: testUuid(2), root_id: testUuid(5) },
+						],
+					},
+				]),
+			],
+			return: {
+				data: {
+					Posts: [
+						{
+							id: '123e4567-e89b-12d3-a456-000000000001',
+							locales: [
+								{
+									id: '123e4567-e89b-12d3-a456-000000000003',
+								},
+								{
+									id: '123e4567-e89b-12d3-a456-000000000004',
+								},
+							],
+						},
+						{
+							id: '123e4567-e89b-12d3-a456-000000000002',
+							locales: [
+								{
+									id: '123e4567-e89b-12d3-a456-000000000004',
+								},
+								{
+									id: '123e4567-e89b-12d3-a456-000000000005',
+								},
+							],
+						},
+					],
+				},
+			},
+		})
+	})
 })

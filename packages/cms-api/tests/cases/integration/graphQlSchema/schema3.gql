@@ -35,6 +35,12 @@ type OneHasManyEntityMeta {
   r2: FieldMeta
 }
 
+input OneHasManyEntityOrderBy {
+  id: OrderDirection
+  a: OrderDirection
+  r2: RootOrderBy
+}
+
 input OneHasManyEntityUniqueWhere {
   id: UUID
 }
@@ -75,18 +81,23 @@ input OneHasManyEntityWithoutR2UpdateInput {
   a: String
 }
 
+enum OrderDirection {
+  asc
+  desc
+}
+
 type Query {
   Root(where: RootUniqueWhere!): Root
-  Roots(where: RootWhere): [Root]
+  Roots(where: RootWhere, orderBy: [RootOrderBy!]): [Root]
   OneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
-  OneHasManyEntitys(where: OneHasManyEntityWhere): [OneHasManyEntity]
+  OneHasManyEntitys(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!]): [OneHasManyEntity]
 }
 
 type Root {
   _meta: RootMeta
   id: UUID!
   foo: String
-  r(where: OneHasManyEntityWhere): [OneHasManyEntity!]
+  r(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!]): [OneHasManyEntity!]
 }
 
 input RootCreateInput {
@@ -103,6 +114,11 @@ type RootMeta {
   id: FieldMeta
   foo: FieldMeta
   r: FieldMeta
+}
+
+input RootOrderBy {
+  id: OrderDirection
+  foo: OrderDirection
 }
 
 input RootUniqueWhere {

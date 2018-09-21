@@ -68,7 +68,7 @@ export const execute = async (test: Test) => {
 			query.response([])
 			return
 		}
-		// console.log(query.sql)
+		console.log(query.sql)
 		// console.log(query.bindings)
 		if (!queryDefinition) {
 			throw new Error(`Unexpected query #${step} '${query.sql}'`)

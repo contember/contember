@@ -1,14 +1,17 @@
 import { Model } from 'cms-common'
 import WhereTypeProvider from '../WhereTypeProvider'
 import { GraphQLFieldConfigArgumentMap } from 'graphql/type/definition'
+import OrderByTypeProvider from '../OrderByTypeProvider'
+import { GraphQLList, GraphQLNonNull } from 'graphql'
 
 export default class FieldArgsVisitor
 	implements
 		Model.ColumnVisitor<GraphQLFieldConfigArgumentMap | undefined>,
 		Model.RelationByTypeVisitor<GraphQLFieldConfigArgumentMap | undefined> {
-	private whereTypeProvider: WhereTypeProvider
-
-	constructor(whereTypeProvider: WhereTypeProvider) {
+	constructor(
+		private readonly whereTypeProvider: WhereTypeProvider,
+		private readonly orderByTypeProvider: OrderByTypeProvider
+	) {
 		this.whereTypeProvider = whereTypeProvider
 	}
 
@@ -18,7 +21,8 @@ export default class FieldArgsVisitor
 		targetEntity: Model.Entity
 	) {
 		const where = this.getWhereArg(relation)
-		return { where }
+		const orderBy = this.getOrderByArgs(relation)
+		return { where, orderBy }
 	}
 
 	public visitManyHasManyOwner(
@@ -27,12 +31,14 @@ export default class FieldArgsVisitor
 		targetEntity: Model.Entity
 	) {
 		const where = this.getWhereArg(relation)
-		return { where }
+		const orderBy = this.getOrderByArgs(relation)
+		return { where, orderBy }
 	}
 
 	public visitOneHasMany(entity: Model.Entity, relation: Model.OneHasManyRelation, targetEntity: Model.Entity) {
 		const where = this.getWhereArg(relation)
-		return { where }
+		const orderBy = this.getOrderByArgs(relation)
+		return { where, orderBy }
 	}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
@@ -56,5 +62,9 @@ export default class FieldArgsVisitor
 
 	private getWhereArg(relation: Model.Relation) {
 		return { type: this.whereTypeProvider.getEntityWhereType(relation.target) }
+	}
+
+	private getOrderByArgs(relation: Model.Relation) {
+		return { type: new GraphQLList(new GraphQLNonNull(this.orderByTypeProvider.getEntityOrderByType(relation.target))) }
 	}
 }

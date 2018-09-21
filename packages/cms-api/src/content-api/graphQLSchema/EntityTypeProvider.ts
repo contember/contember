@@ -16,6 +16,7 @@ import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
 import { GraphQLFieldResolver } from 'graphql/type/definition'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
+import OrderByTypeProvider from './OrderByTypeProvider'
 
 export default class EntityTypeProvider {
 	private entities = singletonFactory(name => this.createEntity(name))
@@ -28,10 +29,11 @@ export default class EntityTypeProvider {
 	})
 
 	constructor(
-		private schema: Model.Schema,
-		private authorizator: Authorizator,
-		private columnTypeResolver: ColumnTypeResolver,
-		private whereTypeProvider: WhereTypeProvider
+		private readonly schema: Model.Schema,
+		private readonly authorizator: Authorizator,
+		private readonly columnTypeResolver: ColumnTypeResolver,
+		private readonly whereTypeProvider: WhereTypeProvider,
+		private readonly orderByTypeProvider: OrderByTypeProvider
 	) {}
 
 	public getEntity(entityName: string): GraphQLObjectType {
@@ -74,7 +76,7 @@ export default class EntityTypeProvider {
 			const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this)
 			const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, fieldName, fieldTypeVisitor)
 
-			const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider)
+			const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)
 			const fieldResolver: GraphQLFieldResolver<any, any> = (source, args, context, info) => {
 				if (!info.path) {
 					return undefined

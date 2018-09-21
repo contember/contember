@@ -9,6 +9,7 @@ import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
+import OrderByBuilder from './OrderByBuilder'
 import { assertNever } from 'cms-common'
 
 export default class SelectBuilder {
@@ -21,6 +22,7 @@ export default class SelectBuilder {
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly whereBuilder: WhereBuilder,
+		private readonly orderByBuilder: OrderByBuilder,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly mapper: Mapper,
 		private readonly qb: QueryBuilder,
@@ -42,6 +44,11 @@ export default class SelectBuilder {
 		if (where) {
 			this.whereBuilder.build(this.qb, entity, path, where)
 		}
+		const orderBy = input.args.orderBy
+		if (orderBy) {
+			this.orderByBuilder.build(this.qb, entity, path, orderBy)
+		}
+
 		await promise
 	}
 

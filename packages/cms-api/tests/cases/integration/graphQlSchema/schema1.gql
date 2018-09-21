@@ -2,7 +2,7 @@ type Author {
   _meta: AuthorMeta
   id: UUID!
   name: String
-  posts(where: PostWhere): [Post!]
+  posts(where: PostWhere, orderBy: [PostOrderBy!]): [Post!]
 }
 
 input AuthorCreateInput {
@@ -19,6 +19,11 @@ type AuthorMeta {
   id: FieldMeta
   name: FieldMeta
   posts: FieldMeta
+}
+
+input AuthorOrderBy {
+  id: OrderDirection
+  name: OrderDirection
 }
 
 input AuthorUniqueWhere {
@@ -71,7 +76,7 @@ type Category {
   _meta: CategoryMeta
   id: UUID!
   name: String
-  posts(where: PostWhere): [Post!]
+  posts(where: PostWhere, orderBy: [PostOrderBy!]): [Post!]
 }
 
 input CategoryCreateInput {
@@ -88,6 +93,11 @@ type CategoryMeta {
   id: FieldMeta
   name: FieldMeta
   posts: FieldMeta
+}
+
+input CategoryOrderBy {
+  id: OrderDirection
+  name: OrderDirection
 }
 
 input CategoryUniqueWhere {
@@ -173,13 +183,18 @@ type Mutation {
   updateAuthor(where: AuthorUniqueWhere!, data: AuthorUpdateInput!): Author
 }
 
+enum OrderDirection {
+  asc
+  desc
+}
+
 type Post {
   _meta: PostMeta
   author(where: AuthorWhere): Author
   id: UUID!
   publishedAt: DateTime
-  locales(where: PostLocaleWhere): [PostLocale!]
-  categories(where: CategoryWhere): [Category!]
+  locales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!]): [PostLocale!]
+  categories(where: CategoryWhere, orderBy: [CategoryOrderBy!]): [Category!]
 }
 
 input PostCreateAuthorEntityRelationInput {
@@ -225,6 +240,12 @@ type PostLocaleMeta {
   id: FieldMeta
   title: FieldMeta
   Post: FieldMeta
+}
+
+input PostLocaleOrderBy {
+  id: OrderDirection
+  title: OrderDirection
+  Post: PostOrderBy
 }
 
 input PostLocaleUniqueWhere {
@@ -273,6 +294,12 @@ type PostMeta {
   publishedAt: FieldMeta
   locales: FieldMeta
   categories: FieldMeta
+}
+
+input PostOrderBy {
+  author: AuthorOrderBy
+  id: OrderDirection
+  publishedAt: OrderDirection
 }
 
 input PostUniqueWhere {
@@ -389,13 +416,13 @@ input PostWithoutLocalesUpdateInput {
 
 type Query {
   Post(where: PostUniqueWhere!): Post
-  Posts(where: PostWhere): [Post]
+  Posts(where: PostWhere, orderBy: [PostOrderBy!]): [Post]
   PostLocale(where: PostLocaleUniqueWhere!): PostLocale
-  PostLocales(where: PostLocaleWhere): [PostLocale]
+  PostLocales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!]): [PostLocale]
   Category(where: CategoryUniqueWhere!): Category
-  Categorys(where: CategoryWhere): [Category]
+  Categorys(where: CategoryWhere, orderBy: [CategoryOrderBy!]): [Category]
   Author(where: AuthorUniqueWhere!): Author
-  Authors(where: AuthorWhere): [Author]
+  Authors(where: AuthorWhere, orderBy: [AuthorOrderBy!]): [Author]
 }
 
 input StringCondition {

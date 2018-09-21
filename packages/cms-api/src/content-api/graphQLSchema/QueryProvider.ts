@@ -7,12 +7,14 @@ import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
 import ReadResolverFactory from '../graphQlResolver/ReadResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
+import OrderByTypeProvider from './OrderByTypeProvider'
 
 export default class QueryProvider {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly whereTypeProvider: WhereTypeProvider,
+		private readonly orderByTypeProvider: OrderByTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly queryAstAFactory: GraphQlQueryAstFactory,
 		private readonly readResolverFactory: ReadResolverFactory
@@ -48,6 +50,9 @@ export default class QueryProvider {
 			type: new GraphQLList(this.entityTypeProvider.getEntity(entityName)),
 			args: {
 				where: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
+				orderBy: {
+					type: new GraphQLList(new GraphQLNonNull(this.orderByTypeProvider.getEntityOrderByType(entityName))),
+				},
 			},
 			resolve: (parent, args, context, info) =>
 				this.readResolverFactory.create(context).resolveListQuery(entity, this.queryAstAFactory.create(info)),

@@ -8,9 +8,14 @@ type Mutation {
   updateTest(where: TestUniqueWhere!, data: TestUpdateInput!): Test
 }
 
+enum OrderDirection {
+  asc
+  desc
+}
+
 type Query {
   Test(where: TestUniqueWhere!): Test
-  Tests(where: TestWhere): [Test]
+  Tests(where: TestWhere, orderBy: [TestOrderBy!]): [Test]
 }
 
 input StringCondition {
@@ -41,6 +46,11 @@ input TestCreateInput {
 type TestMeta {
   id: FieldMeta
   c: FieldMeta
+}
+
+input TestOrderBy {
+  id: OrderDirection
+  c: OrderDirection
 }
 
 input TestUniqueWhere {

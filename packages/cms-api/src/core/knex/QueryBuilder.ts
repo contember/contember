@@ -73,6 +73,10 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		}
 	}
 
+	public orderBy(columnName: QueryBuilder.ColumnIdentifier, direction: 'asc' | 'desc' = 'asc'): void {
+		this.qb.orderBy(QueryBuilder.toFqn(columnName), direction)
+	}
+
 	public join(tableName: string, alias?: string, joinCondition?: (joinClause: ConditionBuilder) => void): void {
 		this.qb.join(...this.buildJoinArguments(tableName, alias, joinCondition))
 	}

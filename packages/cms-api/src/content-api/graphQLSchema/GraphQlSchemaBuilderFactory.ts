@@ -22,6 +22,7 @@ import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 import UpdateEntityRelationAllowedOperationsVisitor from './mutations/UpdateEntityRelationAllowedOperationsVisitor'
 import CreateEntityRelationAllowedOperationsVisitor from './mutations/CreateEntityRelationAllowedOperationsVisitor'
+import OrderByTypeProvider from './OrderByTypeProvider'
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -29,7 +30,14 @@ export default class GraphQlSchemaBuilderFactory {
 		const columnTypeResolver = new ColumnTypeResolver(schema, new EnumsProvider(schema))
 		const conditionTypeProvider = new ConditionTypeProvider(columnTypeResolver)
 		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
-		const entityTypeProvider = new EntityTypeProvider(schema, authorizator, columnTypeResolver, whereTypeProvider)
+		const orderByTypeProvider = new OrderByTypeProvider(schema, authorizator)
+		const entityTypeProvider = new EntityTypeProvider(
+			schema,
+			authorizator,
+			columnTypeResolver,
+			whereTypeProvider,
+			orderByTypeProvider
+		)
 
 		const executionContainerFactory = new ExecutionContainerFactory(schema, permissions)
 		const readResolverFactory = new ReadResolverFactory(executionContainerFactory)
@@ -38,6 +46,7 @@ export default class GraphQlSchemaBuilderFactory {
 			schema,
 			authorizator,
 			whereTypeProvider,
+			orderByTypeProvider,
 			entityTypeProvider,
 			queryAstFactory,
 			readResolverFactory

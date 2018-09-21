@@ -99,6 +99,7 @@ namespace Input {
 
 	export interface ListQueryInput<E = never> {
 		where?: Where<Condition<ColumnValue<E>>>
+		orderBy?: OrderBy[]
 	}
 
 	export type UpdateOneRelationInput<E = never> =
@@ -117,6 +118,17 @@ namespace Input {
 		| UpdateSpecifiedRelationInput<E>
 		| UpsertSpecifiedRelationInput<E>
 	>
+
+	export enum OrderDirection {
+		asc = 'asc',
+		desc = 'desc'
+	}
+
+	export type FieldOrderBy = OrderDirection | OrderBy
+
+	export interface OrderBy {
+		[fieldName: string]: FieldOrderBy
+	}
 
 	export interface Condition<T = ColumnValue> {
 		and?: Array<Condition<T>>

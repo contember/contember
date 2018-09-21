@@ -24,7 +24,11 @@ export default class AccessorTreeGenerator {
 
 		const entityAccessors: Array<EntityAccessor> = (data as any[]).map((datum, i) =>
 			this.updateFields(datum, tree.root, (fieldName, newData) => {
-				entityAccessors[i] = entityAccessors[i].withUpdatedField(fieldName, newData)
+				entityAccessors[i] = this.withUpdatedField(entityAccessors[i], fieldName, newData)
+
+				updateData(AccessorTreeRoot.createInstance(tree, entityAccessors))
+			}, (newEntityAccessor) => {
+				entityAccessors[i] = newEntityAccessor
 
 				updateData(AccessorTreeRoot.createInstance(tree, entityAccessors))
 			}),
@@ -38,6 +42,7 @@ export default class AccessorTreeGenerator {
 		},
 		marker: EntityMarker,
 		onUpdate: (updatedField: FieldName, updatedData: FieldData) => void,
+		onReplace: (replacement: EntityAccessor) => void,
 		onUnlink?: () => void,
 	): EntityAccessor {
 		const entityData: EntityData = {}
@@ -68,7 +73,15 @@ export default class AccessorTreeGenerator {
 							(updatedField: FieldName, updatedData: FieldData) => {
 								const entityAccessor = oneToManyData[i]
 								if (entityAccessor instanceof EntityAccessor) {
-									oneToManyData[i] = entityAccessor.withUpdatedField(updatedField, updatedData)
+									oneToManyData[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
+
+									onUpdate(fieldName, oneToManyData)
+								}
+							},
+							(replacement) => {
+								const entityAccessor = oneToManyData[i]
+								if (entityAccessor instanceof EntityAccessor) {
+									oneToManyData[i] = this.asNewEntity(entityAccessor, replacement)
 
 									onUpdate(fieldName, oneToManyData)
 								}
@@ -78,25 +91,30 @@ export default class AccessorTreeGenerator {
 								onUpdate(fieldName, oneToManyData)
 							},
 						)
-						if (accessor) oneToManyData.push(accessor)
+						oneToManyData.push(accessor)
 					}
 
 					entityData[fieldName] = oneToManyData
 				}
 			} else if (typeof fieldData === 'object') {
 				if (field instanceof EntityMarker) {
-					const accessor = this.updateFields(
+					entityData[fieldName] = this.updateFields(
 						fieldData,
 						field,
 						(updatedField: FieldName, updatedData: FieldData) => {
-							const accessor = entityData[fieldName]
-							if (accessor instanceof EntityAccessor) {
-								onUpdate(fieldName, accessor.withUpdatedField(updatedField, updatedData))
+							const entityAccessor = entityData[fieldName]
+							if (entityAccessor instanceof EntityAccessor) {
+								onUpdate(fieldName, this.withUpdatedField(entityAccessor, updatedField, updatedData))
+							}
+						},
+						(replacement) => {
+							const entityAccessor = entityData[fieldName]
+							if (entityAccessor instanceof EntityAccessor) {
+								onUpdate(fieldName, this.asNewEntity(entityAccessor, replacement))
 							}
 						},
 						() => onUpdate(fieldName, undefined),
 					)
-					if (accessor) entityData[fieldName] = accessor
 				}
 			} else {
 				const onChange = (newValue: any) => {
@@ -106,6 +124,24 @@ export default class AccessorTreeGenerator {
 			}
 		}
 
-		return new EntityAccessor(marker.entityName, id, entityData, onUnlink)
+		return new EntityAccessor(marker.entityName, id, entityData, onReplace, onUnlink)
+	}
+
+
+	private withUpdatedField(original: EntityAccessor, field: FieldName, newData: FieldData): EntityAccessor {
+		return new EntityAccessor(
+			original.entityName,
+			original.primaryKey,
+			{ ...original.data, [field]: newData },
+			original.replaceWith,
+			original.unlink,
+		)
+	}
+
+	private asNewEntity(original: EntityAccessor, replacement: EntityAccessor): EntityAccessor {
+		// TODO: we also need to update the callbacks inside replacement.data
+		return new EntityAccessor(
+			replacement.entityName, replacement.primaryKey, replacement.data, original.replaceWith, original.unlink
+		)
 	}
 }

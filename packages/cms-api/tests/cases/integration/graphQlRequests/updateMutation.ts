@@ -39,6 +39,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
 							parameters: ['John', testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						{
 							sql: SQL`select "root_"."id" as "root_id"
@@ -115,6 +116,7 @@ describe('update', () => {
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -153,6 +155,7 @@ describe('update', () => {
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -197,6 +200,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
 							parameters: ['John', testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -240,6 +244,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
 							parameters: ['Jack', testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -295,6 +300,7 @@ describe('update', () => {
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -332,6 +338,7 @@ describe('update', () => {
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -376,6 +383,7 @@ describe('update', () => {
               set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						{
 							sql: SQL`delete from "author"
@@ -497,6 +505,7 @@ describe('update', () => {
               set "title" = "newData_"."title" from "newData_"
               where "post_locale"."locale" = $4 and "post_locale"."post_id" = $5`,
 							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -544,6 +553,7 @@ describe('update', () => {
               set "title" = "newData_"."title" from "newData_"
               where "post_locale"."locale" = $4 and "post_locale"."post_id" = $5`,
 							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -660,6 +670,7 @@ describe('update', () => {
               set "post_id" = "newData_"."post_id" from "newData_"
               where "post_locale"."id" = $3`,
 							parameters: [testUuid(2), testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -699,6 +710,7 @@ describe('update', () => {
               set "post_id" = "newData_"."post_id" from "newData_"
               where "post_locale"."id" = $4 and "post_locale"."post_id" = $5`,
 							parameters: [null, testUuid(1), testUuid(2), testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -767,6 +779,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -811,6 +824,7 @@ describe('update', () => {
               set "url" = "newData_"."url" from "newData_"
               where "site_setting"."id" = $3`,
 							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -889,6 +903,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -934,6 +949,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(3), testUuid(3)],
+							response: 1,
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -946,6 +962,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -990,7 +1007,7 @@ describe('update', () => {
               set "url" = "newData_"."url" from "newData_"
               where "site_setting"."id" = $3`,
 							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)],
-							response: [],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -1046,6 +1063,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -1084,6 +1102,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -1129,6 +1148,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						{
 							sql: SQL`delete from "site_setting"
@@ -1192,6 +1212,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1290,6 +1311,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: ['Mangoweb', testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1335,6 +1357,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: ['Mangoweb', testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1423,6 +1446,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1535,6 +1559,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(2), testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1580,6 +1605,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(3), testUuid(3)],
+							response: 1,
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1592,6 +1618,7 @@ describe('update', () => {
               set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(2), testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1635,6 +1662,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -1677,6 +1705,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -1708,6 +1737,7 @@ describe('update', () => {
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(2), testUuid(1)],
+							response: 1,
 						},
 						{
 							sql: SQL`delete from "category"
@@ -1747,6 +1777,7 @@ describe('update', () => {
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(2), testUuid(1)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -1784,12 +1815,14 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "category"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -1836,6 +1869,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -1892,6 +1926,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -1934,6 +1969,7 @@ describe('update', () => {
 							values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateCategorySql,
 					]),
@@ -1976,6 +2012,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateCategorySql,
 					]),
@@ -2007,6 +2044,7 @@ describe('update', () => {
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						{
 							sql: SQL`delete from "post"
@@ -2046,6 +2084,7 @@ describe('update', () => {
 							sql: SQL`delete from "post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(1), testUuid(2)],
+							response: 1,
 						},
 						selectUpdateCategorySql,
 					]),
@@ -2083,12 +2122,14 @@ describe('update', () => {
               set "title" = "newData_"."title" from "newData_"
               where "post"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
+							response: 1,
 						},
 						{
 							sql: SQL`insert into "post_categories" ("category_id", "post_id")
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateCategorySql,
 					]),
@@ -2135,6 +2176,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateCategorySql,
 					]),
@@ -2191,6 +2233,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(2), testUuid(1)],
+							response: 1,
 						},
 						selectUpdateCategorySql,
 					]),
@@ -2251,6 +2294,7 @@ describe('update', () => {
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3 and "author"."name" in ($4, $5) and "newData_"."name" in ($6, $7)`,
 							parameters: ['John', testUuid(1), testUuid(1), 'John', 'Jack', 'John', 'Jack'],
+							response: 1,
 						},
 						{
 							sql: SQL`select "root_"."id" as "root_id"
@@ -2267,6 +2311,83 @@ describe('update', () => {
 							id: testUuid(1),
 						},
 					},
+				},
+			})
+		})
+
+		it('update name - denied', async () => {
+			await execute({
+				schema: new SchemaBuilder()
+					.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					.buildSchema(),
+				query: GQL`mutation {
+        updateAuthor(
+            where: {id: "${testUuid(1)}"},
+            data: {name: "John"}
+          ) {
+          id
+        }
+      }`,
+				permissions: {
+					Author: {
+						predicates: {
+							name_predicate: {name: {never: true}},
+						},
+						operations: {
+							update: {
+								id: true,
+								name: 'name_predicate',
+							},
+							read: {
+								id: true,
+							},
+						},
+					},
+				},
+				variables: {
+					name_variable: ['John', 'Jack'],
+				},
+				executes: [
+					...sqlTransaction([
+						{
+							sql: SQL`with "newData_" as
+              (select
+                 $1 :: text as "name",
+                 "root_"."id"
+               from "author" as "root_"
+               where "root_"."id" = $2) update "author"
+              set "name" = "newData_"."name" from "newData_"
+              where "author"."id" = $3 and false and false`,
+							parameters: ['John', testUuid(1), testUuid(1),],
+							response: 0,
+						},
+						{
+							sql: SQL`select "root_"."id" as "root_id"
+                     from "author" as "root_"
+                     where "root_"."id" = $1`,
+							response: [{root_id: testUuid(1)}],
+							parameters: [testUuid(1)],
+						},
+					]),
+				],
+				return: {
+					"data": {
+						"updateAuthor": null,
+					},
+					"errors": [
+						{
+							"locations": [
+								{
+									"column": 9,
+									"line": 2,
+								},
+							],
+							"message": "Mutation failed, operation denied by ACL rules",
+							"path": [
+								"updateAuthor",
+							],
+						},
+					],
 				},
 			})
 		})

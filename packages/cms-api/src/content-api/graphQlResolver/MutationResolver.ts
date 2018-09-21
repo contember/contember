@@ -4,6 +4,8 @@ import { isUniqueWhere } from '../../content-schema/inputUtils'
 import ObjectNode from './ObjectNode'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import MapperRunner from '../sql/MapperRunner'
+import Mapper from "../sql/Mapper";
+import { UserError } from "graphql-errors";
 
 export default class MutationResolver {
 	constructor(private readonly mapperRunner: MapperRunner, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
@@ -16,7 +18,14 @@ export default class MutationResolver {
 		const queryExpanded = queryAst.withArg<Input.ListQueryInput>('where', whereExpanded)
 
 		return await this.mapperRunner.run(async mapper => {
-			await mapper.update(entity, queryAst.args.where, queryAst.args.data)
+			try {
+				await mapper.update(entity, queryAst.args.where, queryAst.args.data)
+			} catch (e) {
+				if (!(e instanceof Mapper.NoResultError)) {
+					throw e
+				}
+				throw new UserError('Mutation failed, operation denied by ACL rules');
+			}
 
 			return (await mapper.select(entity, queryExpanded))[0] || null
 		})
@@ -24,7 +33,15 @@ export default class MutationResolver {
 
 	public async resolveCreate(entity: Model.Entity, queryAst: ObjectNode<Input.CreateInput>) {
 		return await this.mapperRunner.run(async mapper => {
-			const primary = await mapper.insert(entity, queryAst.args.data)
+			let primary: Input.PrimaryValue
+			try {
+				primary = await mapper.insert(entity, queryAst.args.data)
+			} catch (e) {
+				if (!(e instanceof Mapper.NoResultError)) {
+					throw e
+				}
+				throw new UserError('Mutation failed, operation denied by ACL rules');
+			}
 
 			const whereArgs = { where: { [entity.primary]: { eq: primary } } }
 			const objectWithArgs = new ObjectNode<Input.ListQueryInput>(
@@ -48,7 +65,14 @@ export default class MutationResolver {
 		return await this.mapperRunner.run(async mapper => {
 			const result = (await mapper.select(entity, queryExpanded))[0] || null
 
-			await mapper.delete(entity, queryAst.args.where)
+			try {
+				await mapper.delete(entity, queryAst.args.where)
+			} catch (e) {
+				if (!(e instanceof Mapper.NoResultError)) {
+					throw e
+				}
+				throw new UserError('Mutation failed, operation denied by ACL rules');
+			}
 
 			return result
 		})

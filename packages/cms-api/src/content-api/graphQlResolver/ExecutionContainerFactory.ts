@@ -16,6 +16,7 @@ import MapperRunner from '../sql/MapperRunner'
 import ReadResolver from './ReadResolver'
 import MutationResolver from './MutationResolver'
 import JunctionTableManager from '../sql/JunctionTableManager'
+import OrderByBuilder from '../sql/select/OrderByBuilder'
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Model.Schema, private readonly permissions: Acl.Permissions) {}
@@ -35,10 +36,11 @@ class ExecutionContainerFactory {
 				'whereBuilder',
 				({ joinBuilder, conditionBuilder }) => new WhereBuilder(this.schema, joinBuilder, conditionBuilder)
 			)
+			.addService('orderByBuilder', ({ joinBuilder }) => new OrderByBuilder(this.schema, joinBuilder))
 			.addService(
 				'selectBuilderFactory',
-				({ joinBuilder, whereBuilder, predicateFactory }) =>
-					new SelectBuilderFactory(this.schema, joinBuilder, whereBuilder, predicateFactory)
+				({ joinBuilder, whereBuilder, orderByBuilder, predicateFactory }) =>
+					new SelectBuilderFactory(this.schema, joinBuilder, whereBuilder, orderByBuilder, predicateFactory)
 			)
 			.addService('insertBuilderFactory', ({ whereBuilder }) => new InsertBuilderFactory(this.schema, whereBuilder))
 			.addService('updateBuilderFactory', ({ whereBuilder }) => new UpdateBuilderFactory(this.schema, whereBuilder))

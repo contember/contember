@@ -6,12 +6,14 @@ import Mapper from '../Mapper'
 import SelectHydrator from './SelectHydrator'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
+import OrderByBuilder from './OrderByBuilder'
 
 export default class SelectBuilderFactory {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly whereBuilder: WhereBuilder,
+		private readonly orderByBuilder: OrderByBuilder,
 		private readonly predicateFactory: PredicateFactory
 	) {}
 
@@ -20,6 +22,7 @@ export default class SelectBuilderFactory {
 			this.schema,
 			this.joinBuilder,
 			this.whereBuilder,
+			this.orderByBuilder,
 			this.predicateFactory,
 			mapper,
 			qb,

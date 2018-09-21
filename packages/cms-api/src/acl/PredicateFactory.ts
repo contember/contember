@@ -48,7 +48,7 @@ class PredicateFactory {
 				if (!entityPermissions.predicates[name]) {
 					throw new Error(`${entity.name}: Undefined predicate ${name}`)
 				}
-				const predicateWhere: Input.Where = this.variableInjector.inject(entityPermissions.predicates[name])
+				const predicateWhere: Input.Where = this.variableInjector.inject(entity, entityPermissions.predicates[name])
 				return [...result, predicateWhere]
 			},
 			[]

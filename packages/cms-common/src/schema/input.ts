@@ -146,7 +146,7 @@ namespace Input {
 		not?: Where<C>
 	}
 
-	export interface FieldWhere<C> {
+	export interface FieldWhere<C = Condition> {
 		[name: string]: C | Where<C> | undefined | Where<C>[] //last one if for ComposedWhere
 	}
 

@@ -23,7 +23,7 @@ class ExecutionContainerFactory {
 	public create(context: Context): Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }> {
 		const innerDic = new Container.Builder({})
 
-			.addService('variableInjector', () => new VariableInjector(context.identityVariables))
+			.addService('variableInjector', () => new VariableInjector(this.schema, context.identityVariables))
 			.addService(
 				'predicateFactory',
 				({ variableInjector }) => new PredicateFactory(this.permissions, variableInjector)

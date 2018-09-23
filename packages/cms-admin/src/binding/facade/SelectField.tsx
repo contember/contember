@@ -34,6 +34,7 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 						const fieldAccessor = data.data[MarkerTreeRoot.getPlaceholderName(this.props.name)]
 						const currentValueEntity = data.data[this.props.name]
 
+						// TODO this fails when `currentValueEntity` is `null` which may legitimately happen.
 						if (!(fieldAccessor instanceof AccessorTreeRoot) || !(currentValueEntity instanceof EntityAccessor)) {
 							throw new DataBindingError('Corrupted data')
 						}

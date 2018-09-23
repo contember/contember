@@ -23,11 +23,14 @@ export default class OneToMany extends React.Component<OneToManyProps> {
 						const field = data.data[this.props.field]
 
 						if (field instanceof EntityCollectionAccessor) {
-							return field.entities.map((datum: EntityAccessor | undefined, i: number) => (
+							return <>
+								{field.entities.map((datum: EntityAccessor | undefined, i: number) => (
 								datum && <DataContext.Provider value={datum} key={i}>
 									{this.props.children}
 								</DataContext.Provider>
-							))
+								))}
+								<button type="button" onClick={field.appendNew}>+</button>
+							</>
 						}
 					}
 				}}

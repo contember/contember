@@ -154,7 +154,7 @@ export default class MarkerTreeGenerator {
 			if (marker instanceof FieldMarker) {
 				fields[marker.name] = marker
 			} else if (marker instanceof ReferenceMarker) {
-				fields[marker.name] = marker.reference
+				fields[marker.fieldName] = marker
 			} else if (marker instanceof MarkerTreeRoot) {
 				fields[marker.placeholderName] = marker
 			} else {

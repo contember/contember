@@ -63,7 +63,7 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 										}
 										return {
 											value: datum.primaryKey!,
-											label: optionField.currentValue,
+											label: (optionField.currentValue || '').toString(),
 										}
 									})}
 								/>

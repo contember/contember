@@ -13,6 +13,10 @@ interface ReceivedFieldData {
 	[fieldName: string]: any
 }
 
+type OnUpdate = (updatedField: FieldName, updatedData: FieldData) => void
+type OnReplace = (replacement: EntityAccessor) => void
+type OnUnlink = () => void
+
 export default class AccessorTreeGenerator {
 	private static PRIMARY_KEY_NAME = 'id'
 
@@ -51,9 +55,9 @@ export default class AccessorTreeGenerator {
 	private updateFields(
 		data: ReceivedFieldData | undefined,
 		marker: EntityMarker,
-		onUpdate: (updatedField: FieldName, updatedData: FieldData) => void,
-		onReplace: (replacement: EntityAccessor) => void,
-		onUnlink?: () => void,
+		onUpdate: OnUpdate,
+		onReplace: OnReplace,
+		onUnlink?: OnUnlink,
 	): EntityAccessor {
 		const entityData: EntityData = {}
 		const id = data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : undefined
@@ -71,62 +75,9 @@ export default class AccessorTreeGenerator {
 				entityData[fieldName] = this.generateSubTree(field, () => undefined)
 			} else if (field instanceof ReferenceMarker) {
 				if (field.expectedCount === ExpectedCount.One) {
-					entityData[fieldName] = this.updateFields(
-						fieldData,
-						field.reference,
-						(updatedField: FieldName, updatedData: FieldData) => {
-							const entityAccessor = entityData[fieldName]
-							if (entityAccessor instanceof EntityAccessor) {
-								onUpdate(fieldName, this.withUpdatedField(entityAccessor, updatedField, updatedData))
-							}
-						},
-						replacement => {
-							const entityAccessor = entityData[fieldName]
-							if (entityAccessor instanceof EntityAccessor) {
-								onUpdate(fieldName, this.asDifferentEntity(entityAccessor, replacement))
-							}
-						},
-						() => onUpdate(fieldName, undefined),
-					)
+					entityData[fieldName] = this.generateOneReference(fieldData, field, onUpdate, entityData)
 				} else if (field.expectedCount === ExpectedCount.Many) {
-					const generateNewAccessor = (i: number): EntityAccessor => {
-						return this.updateFields(
-							Array.isArray(fieldData) ? fieldData[i] : undefined,
-							field.reference,
-							(updatedField: FieldName, updatedData: FieldData) => {
-								const entityAccessor = collectionAccessor.entities[i]
-								if (entityAccessor) {
-									collectionAccessor.entities[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
-
-									onUpdate(fieldName, collectionAccessor)
-								}
-							},
-							replacement => {
-								const entityAccessor = collectionAccessor.entities[i]
-								if (entityAccessor) {
-									collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement)
-
-									onUpdate(fieldName, collectionAccessor)
-								}
-							},
-							() => {
-								collectionAccessor.entities[i] = undefined
-								onUpdate(fieldName, collectionAccessor)
-							},
-						)
-					}
-					const collectionAccessor = new EntityCollectionAccessor([], () => {
-						collectionAccessor.entities.push(generateNewAccessor(collectionAccessor.entities.length))
-						onUpdate(fieldName, collectionAccessor)
-					})
-
-					if (Array.isArray(fieldData)) {
-						for (let i = 0, len = fieldData.length; i < len; i++) {
-							collectionAccessor.entities.push(generateNewAccessor(i))
-						}
-					}
-
-					entityData[fieldName] = collectionAccessor
+					entityData[fieldName] = this.generateManyReference(fieldData, field, onUpdate)
 				} else {
 					return assertNever(field.expectedCount)
 				}
@@ -139,6 +90,72 @@ export default class AccessorTreeGenerator {
 		}
 
 		return new EntityAccessor(marker.entityName, id, entityData, onReplace, onUnlink)
+	}
+
+	private generateOneReference(
+		fieldData: any,
+		field: ReferenceMarker,
+		onUpdate: OnUpdate,
+		entityData: EntityData,
+	): EntityAccessor {
+		return this.updateFields(
+			fieldData,
+			field.reference,
+			(updatedField: FieldName, updatedData: FieldData) => {
+				const entityAccessor = entityData[field.fieldName]
+				if (entityAccessor instanceof EntityAccessor) {
+					onUpdate(field.fieldName, this.withUpdatedField(entityAccessor, updatedField, updatedData))
+				}
+			},
+			replacement => {
+				const entityAccessor = entityData[field.fieldName]
+				if (entityAccessor instanceof EntityAccessor) {
+					onUpdate(field.fieldName, this.asDifferentEntity(entityAccessor, replacement))
+				}
+			},
+			() => onUpdate(field.fieldName, undefined),
+		)
+	}
+
+	private generateManyReference(fieldData: any, field: ReferenceMarker, onUpdate: OnUpdate): EntityCollectionAccessor {
+		const generateNewAccessor = (i: number): EntityAccessor => {
+			return this.updateFields(
+				Array.isArray(fieldData) ? fieldData[i] : undefined,
+				field.reference,
+				(updatedField: FieldName, updatedData: FieldData) => {
+					const entityAccessor = collectionAccessor.entities[i]
+					if (entityAccessor) {
+						collectionAccessor.entities[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
+
+						onUpdate(field.fieldName, collectionAccessor)
+					}
+				},
+				replacement => {
+					const entityAccessor = collectionAccessor.entities[i]
+					if (entityAccessor) {
+						collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement)
+
+						onUpdate(field.fieldName, collectionAccessor)
+					}
+				},
+				() => {
+					collectionAccessor.entities[i] = undefined
+					onUpdate(field.fieldName, collectionAccessor)
+				},
+			)
+		}
+		const collectionAccessor = new EntityCollectionAccessor([], () => {
+			collectionAccessor.entities.push(generateNewAccessor(collectionAccessor.entities.length))
+			onUpdate(field.fieldName, collectionAccessor)
+		})
+
+		if (Array.isArray(fieldData)) {
+			for (let i = 0, len = fieldData.length; i < len; i++) {
+				collectionAccessor.entities.push(generateNewAccessor(i))
+			}
+		}
+
+		return collectionAccessor
 	}
 
 	private withUpdatedField(original: EntityAccessor, field: FieldName, newData: FieldData): EntityAccessor {

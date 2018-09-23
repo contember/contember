@@ -5,6 +5,7 @@ import EntityMarker from '../dao/EntityMarker'
 import FieldMarker from '../dao/FieldMarker'
 import Marker from '../dao/Marker'
 import MarkerTreeRoot, { EntityListTreeConstraints, SingleEntityTreeConstraints } from '../dao/MarkerTreeRoot'
+import ReferenceMarker from '../dao/ReferenceMarker'
 
 type Mutations = 'create' | 'update' | 'delete'
 type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQueryBuilder.CrudQueryBuilder, Mutations>>
@@ -86,29 +87,27 @@ export default class QueryGenerator {
 		for (const field in context.fields) {
 			const fieldValue: Marker = context.fields[field]
 
-			if (fieldValue) {
-				if (fieldValue instanceof FieldMarker) {
-					builder = builder.column(fieldValue.name)
-				} else if (fieldValue instanceof EntityMarker) {
-					let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
+			if (fieldValue instanceof FieldMarker) {
+				builder = builder.column(fieldValue.name)
+			} else if (fieldValue instanceof ReferenceMarker) {
+				let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
 
-					if (fieldValue.where) {
-						subBuilder = subBuilder.where(fieldValue.where)
-					}
-
-					for (const item of this.registerListQueryPart(fieldValue, subBuilder)) {
-						if (item instanceof CrudQueryBuilder.ListQueryBuilder) {
-							// This branch will only get executed at most once per recursive call
-							subBuilder = new CrudQueryBuilder.ListQueryBuilder(item.objectBuilder)
-						} else {
-							yield item
-						}
-					}
-
-					builder = builder.relation(field, subBuilder)
-				} else {
-					yield fieldValue
+				if (fieldValue.reference.where) {
+					subBuilder = subBuilder.where(fieldValue.reference.where)
 				}
+
+				for (const item of this.registerListQueryPart(fieldValue.reference, subBuilder)) {
+					if (item instanceof CrudQueryBuilder.ListQueryBuilder) {
+						// This branch will only get executed at most once per recursive call
+						subBuilder = new CrudQueryBuilder.ListQueryBuilder(item.objectBuilder)
+					} else {
+						yield item
+					}
+				}
+
+				builder = builder.relation(field, subBuilder)
+			} else {
+				yield fieldValue
 			}
 		}
 

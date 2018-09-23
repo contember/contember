@@ -2,10 +2,10 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityMarker from '../dao/EntityMarker'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
-import { ReferenceMarkerProvider } from './MarkerProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
+import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface OneToOneProps {
 	field: FieldName
@@ -32,7 +32,7 @@ export default class OneToOne extends React.Component<OneToOneProps> {
 	}
 
 	public static generateReferenceMarker(props: OneToOneProps, referredEntity: EntityMarker): ReferenceMarker {
-		return new ReferenceMarker(props.field, referredEntity)
+		return new ReferenceMarker(props.field, ExpectedCount.One, referredEntity)
 	}
 }
 

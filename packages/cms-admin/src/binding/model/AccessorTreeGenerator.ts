@@ -1,16 +1,19 @@
 import { assertNever } from 'cms-common'
 import { FieldName } from '../bindingTypes'
 import AccessorTreeRoot from '../dao/AccessorTreeRoot'
+import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor, { EntityData, FieldData } from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityMarker from '../dao/EntityMarker'
-import FieldAccessor from '../dao/FieldAccessor'
+import FieldAccessor, { Scalar } from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
 
+type ReceivedField = Scalar | ReceivedFieldData | Array<ReceivedFieldData | undefined>
+
 interface ReceivedFieldData {
-	[fieldName: string]: any
+	[fieldName: string]: ReceivedField
 }
 
 type OnUpdate = (updatedField: FieldName, updatedData: FieldData) => void
@@ -60,7 +63,7 @@ export default class AccessorTreeGenerator {
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
 		const entityData: EntityData = {}
-		const id = data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : undefined
+		const id = (data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : undefined) as string | undefined
 		const fields = marker.fields
 
 		for (const fieldName in fields) {
@@ -75,17 +78,62 @@ export default class AccessorTreeGenerator {
 				entityData[fieldName] = this.generateSubTree(field, () => undefined)
 			} else if (field instanceof ReferenceMarker) {
 				if (field.expectedCount === ExpectedCount.One) {
-					entityData[fieldName] = this.generateOneReference(fieldData, field, onUpdate, entityData)
+					if (Array.isArray(fieldData)) {
+						throw new DataBindingError(
+							`Received a collection of entities for field '${field.fieldName}' where a single '${field.reference.entityName}' entity was expected. ` +
+							`Perhaps you wanted to use a <Repeater />?`
+						)
+					} else if (fieldData === null) {
+						entityData[fieldName] = undefined
+					} else if (typeof fieldData === 'object' || fieldData === undefined) {
+						entityData[fieldName] = this.generateOneReference(fieldData, field, onUpdate, entityData)
+					} else {
+						throw new DataBindingError(
+							`Received a scalar value for field '${field.fieldName}' where a single '${field.reference.entityName}' entity was expected.` +
+							`Perhaps you meant to use a variant of <Field />?`
+						)
+					}
 				} else if (field.expectedCount === ExpectedCount.Many) {
-					entityData[fieldName] = this.generateManyReference(fieldData, field, onUpdate)
+					if (Array.isArray(fieldData)) {
+						entityData[fieldName] = this.generateManyReference(fieldData, field, onUpdate)
+					} else if (fieldData === undefined) {
+						this.panic()
+					} else if (typeof fieldData === 'object') {
+						// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
+						// relation is unlinked, e.g. a Person does not have a linked Nationality.
+						throw new DataBindingError(
+							`Received a referenced entity for field '${field.fieldName}' where a collection of '${field.reference.entityName}' entities was expected.` +
+							`Perhaps you wanted to use a <SingleReference />?`
+						)
+					} else {
+						throw new DataBindingError(
+							`Received a scalar value for field '${field.fieldName}' where a collection of '${field.reference.entityName}' entities was expected.` +
+							`Perhaps you meant to use a variant of <Field />?`
+						)
+					}
 				} else {
 					return assertNever(field.expectedCount)
 				}
 			} else if (field instanceof FieldMarker) {
-				const onChange = (newValue: any) => {
-					onUpdate(fieldName, new FieldAccessor(fieldName, newValue, onChange))
+				if (Array.isArray(fieldData)) {
+					throw new DataBindingError(
+						`Received a collection of referenced entities where a single '${field.name}' field was expected. ` +
+						`Perhaps you wanted to use a <Repeater />?`
+					)
+				} else if (typeof fieldData === 'object' && fieldData !== null) {
+					throw new DataBindingError(
+						`Received a referenced entity where a single '${field.name}' field was expected. ` +
+						`Perhaps you wanted to use a <SingleReference />?`
+					)
+				} else {
+					const onChange = (newValue: Scalar) => {
+						onUpdate(fieldName, new FieldAccessor(fieldName, newValue, onChange))
+					}
+					// `fieldData` will be `undefined` when a repeater creates a clone based on no data.
+					entityData[fieldName] = new FieldAccessor(fieldName, fieldData === undefined ? null : fieldData, onChange)
 				}
-				entityData[fieldName] = new FieldAccessor(fieldName, fieldData, onChange)
+			} else {
+				assertNever(field)
 			}
 		}
 
@@ -93,7 +141,7 @@ export default class AccessorTreeGenerator {
 	}
 
 	private generateOneReference(
-		fieldData: any,
+		fieldData: ReceivedFieldData | undefined,
 		field: ReferenceMarker,
 		onUpdate: OnUpdate,
 		entityData: EntityData,
@@ -117,7 +165,11 @@ export default class AccessorTreeGenerator {
 		)
 	}
 
-	private generateManyReference(fieldData: any, field: ReferenceMarker, onUpdate: OnUpdate): EntityCollectionAccessor {
+	private generateManyReference(
+		fieldData: Array<ReceivedFieldData | undefined>,
+		field: ReferenceMarker,
+		onUpdate: OnUpdate,
+	): EntityCollectionAccessor {
 		const generateNewAccessor = (i: number): EntityAccessor => {
 			return this.updateFields(
 				Array.isArray(fieldData) ? fieldData[i] : undefined,
@@ -149,10 +201,8 @@ export default class AccessorTreeGenerator {
 			onUpdate(field.fieldName, collectionAccessor)
 		})
 
-		if (Array.isArray(fieldData)) {
-			for (let i = 0, len = fieldData.length; i < len; i++) {
-				collectionAccessor.entities.push(generateNewAccessor(i))
-			}
+		for (let i = 0, len = fieldData.length; i < len; i++) {
+			collectionAccessor.entities.push(generateNewAccessor(i))
 		}
 
 		return collectionAccessor
@@ -176,6 +226,12 @@ export default class AccessorTreeGenerator {
 			replacement.data,
 			original.replaceWith,
 			original.unlink,
+		)
+	}
+
+	private panic(): never {
+		throw new DataBindingError(
+			`Something went horribly wrong. This is almost definitely a bug. Please report whatever you can.`
 		)
 	}
 }

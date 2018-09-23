@@ -21,10 +21,10 @@ export default class TextField extends React.Component<TextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>): React.ReactNode => {
+				{(data: FieldAccessor<string | undefined, string>): React.ReactNode => {
 					return (
 						<FormGroup label={this.props.label} inline={this.props.inlineLabel}>
-							<InputGroup value={data.currentValue} onChange={this.generateOnChange(data)} large={this.props.large} />
+							<InputGroup value={data.currentValue || ''} onChange={this.generateOnChange(data)} large={this.props.large} />
 						</FormGroup>
 					)
 				}}
@@ -32,7 +32,7 @@ export default class TextField extends React.Component<TextFieldProps> {
 		)
 	}
 
-	private generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLInputElement>) => {
+	private generateOnChange = (data: FieldAccessor<string | undefined, string>) => (e: ChangeEvent<HTMLInputElement>) => {
 		data.onChange && data.onChange(e.target.value)
 	}
 

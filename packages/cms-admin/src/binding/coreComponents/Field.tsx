@@ -10,7 +10,7 @@ import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 export interface FieldProps {
 	name: FieldName
-	children?: (data: FieldAccessor) => React.ReactNode
+	children?: (data: FieldAccessor<any>) => React.ReactNode
 }
 
 export default class Field extends React.Component<FieldProps> {

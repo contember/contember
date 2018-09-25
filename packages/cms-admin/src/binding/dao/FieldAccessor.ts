@@ -1,6 +1,4 @@
-import { FieldName } from '../bindingTypes'
-
-export type Scalar = string | number | boolean | null
+import { FieldName, Scalar } from '../bindingTypes'
 
 export default class FieldAccessor<Persisted extends Scalar = Scalar, Produced extends Persisted = Persisted> {
 	constructor(

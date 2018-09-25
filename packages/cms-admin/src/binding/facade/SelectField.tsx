@@ -47,16 +47,17 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 						}
 
 						if (Array.isArray(subTreeData)) {
+							const normalizedData = subTreeData.filter((accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor)
 							return (
 								<HTMLSelect
 									value={currentValueEntity.primaryKey}
 									onChange={e => {
 										const newPrimaryKey = e.currentTarget.value
-										const newAccessor = subTreeData.find((accessor) => accessor.primaryKey === newPrimaryKey)
+										const newAccessor = normalizedData.find((accessor) => accessor.primaryKey === newPrimaryKey)
 
 										newAccessor && currentValueEntity.replaceWith(newAccessor)
 									}}
-									options={subTreeData.map(datum => {
+									options={normalizedData.map(datum => {
 										const optionField = datum.data[this.props.optionFieldName]
 
 										if (!(optionField instanceof FieldAccessor)) {

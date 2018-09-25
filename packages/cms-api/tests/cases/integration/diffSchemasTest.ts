@@ -94,7 +94,7 @@ describe('Diff schemas', () => {
 					modification: 'createUniqueConstraint',
 					entityName: 'Author',
 					unique: {
-						name: 'email',
+						name: 'unique_email',
 						fields: ['email']
 					}
 				}
@@ -105,7 +105,7 @@ describe('Diff schemas', () => {
 			  ALTER TABLE "author" ADD "name" text;
 			  ALTER TABLE "author" ADD "email" text;
 			  ALTER TABLE "author" ADD "registered_at" date;
-			  ALTER TABLE "author" ADD CONSTRAINT "email" UNIQUE ("email");`
+			  ALTER TABLE "author" ADD CONSTRAINT "unique_email" UNIQUE ("email");`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})

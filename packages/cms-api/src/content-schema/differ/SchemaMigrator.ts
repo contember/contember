@@ -132,7 +132,8 @@ export default class SchemaMigrator {
 		}
 		if (modification.owningSide.type === Model.RelationType.OneHasOne) {
 			const fieldName = modification.owningSide.name
-			owningEntity.unique[fieldName] = { name: fieldName, fields: [fieldName] }
+			const uniqueName = 'unique_' + fieldName
+			owningEntity.unique[uniqueName] = { name: uniqueName, fields: [fieldName] }
 		}
 	}
 

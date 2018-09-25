@@ -162,11 +162,12 @@ export default class SchemaBuilderInternal {
 			unique[name] = { fields: singleUnique.fields, name: name }
 		}
 		for (let fieldName in fieldOptions) {
-			let options = fieldOptions[fieldName]
+			const options = fieldOptions[fieldName]
+			const uniqueName = 'unique_' + fieldName
 			if (options.type === FieldBuilder.Type.Column && options.options.unique) {
-				unique[fieldName] = { fields: [fieldName], name: fieldName }
+				unique[uniqueName] = { fields: [fieldName], name: uniqueName }
 			} else if (options.type === FieldBuilder.Type.OneHasOne) {
-				unique[fieldName] = { fields: [fieldName], name: fieldName }
+				unique[uniqueName] = { fields: [fieldName], name: uniqueName }
 			}
 		}
 		return unique

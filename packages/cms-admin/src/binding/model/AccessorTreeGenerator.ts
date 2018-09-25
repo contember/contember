@@ -4,6 +4,7 @@ import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor, { EntityData, FieldData } from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
+import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import FieldAccessor, { Scalar } from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
@@ -80,8 +81,9 @@ export default class AccessorTreeGenerator {
 				if (field.expectedCount === ExpectedCount.One) {
 					if (Array.isArray(fieldData)) {
 						throw new DataBindingError(
-							`Received a collection of entities for field '${field.fieldName}' where a single '${field.reference.entityName}' entity was expected. ` +
-							`Perhaps you wanted to use a <Repeater />?`
+							`Received a collection of entities for field '${field.fieldName}' where a single '${
+								field.reference.entityName
+							}' entity was expected. ` + `Perhaps you wanted to use a <Repeater />?`,
 						)
 					} else if (fieldData === null) {
 						entityData[fieldName] = undefined
@@ -89,8 +91,9 @@ export default class AccessorTreeGenerator {
 						entityData[fieldName] = this.generateOneReference(fieldData, field, onUpdate, entityData)
 					} else {
 						throw new DataBindingError(
-							`Received a scalar value for field '${field.fieldName}' where a single '${field.reference.entityName}' entity was expected.` +
-							`Perhaps you meant to use a variant of <Field />?`
+							`Received a scalar value for field '${field.fieldName}' where a single '${
+								field.reference.entityName
+							}' entity was expected.` + `Perhaps you meant to use a variant of <Field />?`,
 						)
 					}
 				} else if (field.expectedCount === ExpectedCount.Many) {
@@ -102,13 +105,15 @@ export default class AccessorTreeGenerator {
 						// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
 						// relation is unlinked, e.g. a Person does not have a linked Nationality.
 						throw new DataBindingError(
-							`Received a referenced entity for field '${field.fieldName}' where a collection of '${field.reference.entityName}' entities was expected.` +
-							`Perhaps you wanted to use a <SingleReference />?`
+							`Received a referenced entity for field '${field.fieldName}' where a collection of '${
+								field.reference.entityName
+							}' entities was expected.` + `Perhaps you wanted to use a <SingleReference />?`,
 						)
 					} else {
 						throw new DataBindingError(
-							`Received a scalar value for field '${field.fieldName}' where a collection of '${field.reference.entityName}' entities was expected.` +
-							`Perhaps you meant to use a variant of <Field />?`
+							`Received a scalar value for field '${field.fieldName}' where a collection of '${
+								field.reference.entityName
+							}' entities was expected.` + `Perhaps you meant to use a variant of <Field />?`,
 						)
 					}
 				} else {
@@ -118,12 +123,12 @@ export default class AccessorTreeGenerator {
 				if (Array.isArray(fieldData)) {
 					throw new DataBindingError(
 						`Received a collection of referenced entities where a single '${field.name}' field was expected. ` +
-						`Perhaps you wanted to use a <Repeater />?`
+							`Perhaps you wanted to use a <Repeater />?`,
 					)
 				} else if (typeof fieldData === 'object' && fieldData !== null) {
 					throw new DataBindingError(
 						`Received a referenced entity where a single '${field.name}' field was expected. ` +
-						`Perhaps you wanted to use a <SingleReference />?`
+							`Perhaps you wanted to use a <SingleReference />?`,
 					)
 				} else {
 					const onChange = (newValue: Scalar) => {
@@ -191,8 +196,22 @@ export default class AccessorTreeGenerator {
 					}
 				},
 				() => {
-					collectionAccessor.entities[i] = undefined
-					onUpdate(field.fieldName, collectionAccessor)
+					const currentEntity = collectionAccessor.entities[i]
+					if (currentEntity instanceof EntityAccessor) {
+						const id = currentEntity.primaryKey
+
+						if (id === undefined) {
+							collectionAccessor.entities[i] = undefined
+						} else {
+							collectionAccessor.entities[i] = new EntityForRemovalAccessor(
+								id,
+								currentEntity.entityName,
+								currentEntity.data,
+								currentEntity.replaceWith,
+							)
+						}
+						onUpdate(field.fieldName, collectionAccessor)
+					}
 				},
 			)
 		}
@@ -231,7 +250,7 @@ export default class AccessorTreeGenerator {
 
 	private panic(): never {
 		throw new DataBindingError(
-			`Something went horribly wrong. This is almost definitely a bug. Please report whatever you can.`
+			`Something went horribly wrong. This is almost definitely a bug. Please report whatever you can.`,
 		)
 	}
 }

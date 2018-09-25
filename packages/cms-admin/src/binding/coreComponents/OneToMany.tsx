@@ -2,6 +2,7 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
+import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
@@ -23,14 +24,21 @@ export default class OneToMany extends React.Component<OneToManyProps> {
 						const field = data.data[this.props.field]
 
 						if (field instanceof EntityCollectionAccessor) {
-							return <>
-								{field.entities.map((datum: EntityAccessor | undefined, i: number) => (
-								datum && <DataContext.Provider value={datum} key={i}>
-									{this.props.children}
-								</DataContext.Provider>
-								))}
-								<button type="button" onClick={field.appendNew}>+</button>
-							</>
+							return (
+								<>
+									{field.entities.map(
+										(datum: EntityAccessor | EntityForRemovalAccessor | undefined, i: number) =>
+											datum instanceof EntityAccessor && (
+												<DataContext.Provider value={datum} key={i}>
+													{this.props.children}
+												</DataContext.Provider>
+											),
+									)}
+									<button type="button" onClick={field.appendNew}>
+										+
+									</button>
+								</>
+							)
 						}
 					}
 				}}

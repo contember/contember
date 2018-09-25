@@ -1,28 +1,22 @@
 import { assertNever } from 'cms-common'
-import { FieldName } from '../bindingTypes'
+import { FieldName, ReceivedEntityData, Scalar } from '../bindingTypes'
 import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor, { EntityData, FieldData } from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import EntityMarker from '../dao/EntityMarker'
-import FieldAccessor, { Scalar } from '../dao/FieldAccessor'
+import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
-
-type ReceivedField = Scalar | ReceivedFieldData | Array<ReceivedFieldData | undefined>
-
-interface ReceivedFieldData {
-	[fieldName: string]: ReceivedField
-}
 
 type OnUpdate = (updatedField: FieldName, updatedData: FieldData) => void
 type OnReplace = (replacement: EntityAccessor) => void
 type OnUnlink = () => void
 
 export default class AccessorTreeGenerator {
-	private static PRIMARY_KEY_NAME = 'id'
+	private static PRIMARY_KEY_NAME: 'id' = 'id'
 
 	public constructor(private tree: MarkerTreeRoot, private allInitialData: any) {}
 
@@ -57,14 +51,14 @@ export default class AccessorTreeGenerator {
 	}
 
 	private updateFields(
-		data: ReceivedFieldData | undefined,
+		data: ReceivedEntityData<undefined> | undefined,
 		marker: EntityMarker,
 		onUpdate: OnUpdate,
 		onReplace: OnReplace,
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
 		const entityData: EntityData = {}
-		const id = (data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : undefined) as string | undefined
+		const id = data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : undefined
 		const fields = marker.fields
 
 		for (const fieldName in fields) {
@@ -97,10 +91,8 @@ export default class AccessorTreeGenerator {
 						)
 					}
 				} else if (field.expectedCount === ExpectedCount.Many) {
-					if (Array.isArray(fieldData)) {
+					if (Array.isArray(fieldData) || fieldData === undefined) {
 						entityData[fieldName] = this.generateManyReference(fieldData, field, onUpdate)
-					} else if (fieldData === undefined) {
-						this.panic()
 					} else if (typeof fieldData === 'object') {
 						// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
 						// relation is unlinked, e.g. a Person does not have a linked Nationality.
@@ -146,7 +138,7 @@ export default class AccessorTreeGenerator {
 	}
 
 	private generateOneReference(
-		fieldData: ReceivedFieldData | undefined,
+		fieldData: ReceivedEntityData<undefined> | undefined,
 		field: ReferenceMarker,
 		onUpdate: OnUpdate,
 		entityData: EntityData,
@@ -171,7 +163,7 @@ export default class AccessorTreeGenerator {
 	}
 
 	private generateManyReference(
-		fieldData: Array<ReceivedFieldData | undefined>,
+		fieldData: Array<ReceivedEntityData<undefined> | undefined> | undefined,
 		field: ReferenceMarker,
 		onUpdate: OnUpdate,
 	): EntityCollectionAccessor {
@@ -220,6 +212,9 @@ export default class AccessorTreeGenerator {
 			onUpdate(field.fieldName, collectionAccessor)
 		})
 
+		if (!Array.isArray(fieldData)) {
+			fieldData = [fieldData]
+		}
 		for (let i = 0, len = fieldData.length; i < len; i++) {
 			collectionAccessor.entities.push(generateNewAccessor(i))
 		}
@@ -245,12 +240,6 @@ export default class AccessorTreeGenerator {
 			replacement.data,
 			original.replaceWith,
 			original.unlink,
-		)
-	}
-
-	private panic(): never {
-		throw new DataBindingError(
-			`Something went horribly wrong. This is almost definitely a bug. Please report whatever you can.`,
 		)
 	}
 }

@@ -13,6 +13,7 @@ import OneToOne from '../coreComponents/OneToOne'
 import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor from '../dao/EntityAccessor'
+import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 
@@ -46,8 +47,8 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 							throw new DataBindingError('Corrupted data')
 						}
 
-						if (Array.isArray(subTreeData)) {
-							const normalizedData = subTreeData.filter((accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor)
+						if (subTreeData instanceof EntityCollectionAccessor) {
+							const normalizedData = subTreeData.entities.filter((accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor)
 							return (
 								<HTMLSelect
 									value={currentValueEntity.primaryKey}

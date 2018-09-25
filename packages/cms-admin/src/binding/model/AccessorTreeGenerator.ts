@@ -31,6 +31,10 @@ export default class AccessorTreeGenerator {
 			data = [data]
 		}
 
+		const createAccessorTreeRoot = (): AccessorTreeRoot => {
+			// TODO, proper addNew callback
+			return AccessorTreeRoot.createInstance(tree, new EntityCollectionAccessor(entityAccessors, () => {}, tree.root))
+		}
 		const entityAccessors: Array<EntityAccessor> = (data as any[]).map((datum, i) =>
 			this.updateFields(
 				datum,
@@ -38,16 +42,16 @@ export default class AccessorTreeGenerator {
 				(fieldName, newData) => {
 					entityAccessors[i] = this.withUpdatedField(entityAccessors[i], fieldName, newData)
 
-					updateData(AccessorTreeRoot.createInstance(tree, entityAccessors))
+					updateData(createAccessorTreeRoot())
 				},
 				newEntityAccessor => {
 					entityAccessors[i] = newEntityAccessor
 
-					updateData(AccessorTreeRoot.createInstance(tree, entityAccessors))
+					updateData(createAccessorTreeRoot())
 				},
 			),
 		)
-		return AccessorTreeRoot.createInstance(tree, entityAccessors)
+		return createAccessorTreeRoot()
 	}
 
 	private updateFields(

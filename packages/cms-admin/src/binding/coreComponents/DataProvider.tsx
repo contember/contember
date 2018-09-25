@@ -5,6 +5,7 @@ import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentRequestsState, ContentStatus } from '../../state/content'
 import AccessorTreeRoot from '../dao/AccessorTreeRoot'
+import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
 import AccessorTreeGenerator from '../model/AccessorTreeGenerator'
@@ -73,7 +74,8 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 			return null
 		}
 
-		const data = Array.isArray(this.state.data.root) ? this.state.data.root : [this.state.data.root]
+		const data =
+			this.state.data.root instanceof EntityCollectionAccessor ? this.state.data.root.entities : [this.state.data.root]
 
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>

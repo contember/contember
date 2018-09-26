@@ -54,11 +54,11 @@ describe('Queries with acl', () => {
           listPostLocale {
             id
             title
-	          _meta {
-		          title {
-			          readable
-		          }
-	          }
+#	          _meta {
+#		          title {
+#			          readable
+#		          }
+#	          }
           }
         }`,
 				executes: [
@@ -66,20 +66,19 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         "root_"."locale" in ($1) as "root_title__readable",
-                         "root_"."title" as "root_title"
+                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"`,
 							parameters: ['cs'],
 							response: [
 								{
 									root_id: testUuid(1),
-									root_title: 'foo',
-									root_title__readable: false,
+									root_title: null,
+									// root_title__readable: false,
 								},
 								{
 									root_id: testUuid(2),
 									root_title: 'bar',
-									root_title__readable: true,
+									// root_title__readable: true,
 								},
 							],
 						},
@@ -91,20 +90,20 @@ describe('Queries with acl', () => {
 							{
 								id: testUuid(1),
 								title: null,
-								_meta: {
-									title: {
-										readable: false,
-									},
-								},
+								// _meta: {
+								// 	title: {
+								// 		readable: false,
+								// 	},
+								// },
 							},
 							{
 								id: testUuid(2),
 								title: 'bar',
-								_meta: {
-									title: {
-										readable: true,
-									},
-								},
+								// _meta: {
+								// 	title: {
+								// 		readable: true,
+								// 	},
+								// },
 							},
 						],
 					},
@@ -131,8 +130,7 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         "root_"."locale" in ($1) as "root_title__readable",
-                         "root_"."title" as "root_title"
+                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"
                        where "root_"."title" = $2 and "root_"."locale" in ($3)`,
 							parameters: ['cs', 'foo', 'cs'],
@@ -216,8 +214,7 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         false as "root_title__readable",
-                         "root_"."title" as "root_title"
+                         case when false then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"`,
 							parameters: [],
 							response: [],
@@ -269,8 +266,7 @@ describe('Queries with acl', () => {
 							sql: SQL`select
                          "root_"."post_id" as "__grouping_key",
                          "root_"."id" as "root_id",
-                         "root_"."locale" in ($1) as "root_title__readable",
-                         "root_"."title" as "root_title"
+                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"
                        where "root_"."post_id" in ($2, $3) and false`,
 							parameters: ['cs', testUuid(1), testUuid(2)],
@@ -278,14 +274,12 @@ describe('Queries with acl', () => {
 								{
 									__grouping_key: testUuid(1),
 									root_id: testUuid(3),
-									root_title: 'foo',
-									root_title__readable: false,
+									root_title: null,
 								},
 								{
 									__grouping_key: testUuid(2),
 									root_id: testUuid(4),
 									root_title: 'bar',
-									root_title__readable: true,
 								},
 							],
 						},
@@ -408,8 +402,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          "root_"."id" as "root_id",
                          "root_country"."id" as "root_country_id",
-                         "root_country"."name" in ($1) as "root_name__readable",
-                         "root_"."name" as "root_name"
+                         case when "root_country"."name" in ($1) then "root_"."name" else null end as "root_name"
                        from "public"."author" as "root_" left join "public"."country" as "root_country" on "root_"."country_id" = "root_country"."id"
                        where "root_"."id" in ($2, $3)`,
 							parameters: ['Czechia', testUuid(3), testUuid(4)],
@@ -417,7 +410,6 @@ describe('Queries with acl', () => {
 								{
 									root_id: testUuid(3),
 									root_name: 'John',
-									root_name__readable: true,
 								},
 							],
 						},

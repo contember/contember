@@ -109,13 +109,13 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			qb.into(this.wrapper.raw('??.?? (' + columnNames.map(() => '??').join(', ') + ')', this.schema, into, ...columnNames))
 			qb.insert((qb: Knex.QueryBuilder) => {
 				const queryBuilder = new QueryBuilder(this.wrapper, qb, this.schema)
-				const values = Object.values(this.getColumnValues(queryBuilder, columns))
+				const values = Object.values(this.getColumnValues(columns))
 				values.forEach(raw => queryBuilder.qb.select(raw))
 				insertFrom(queryBuilder)
 			})
 		} else {
 			qb.into(this.wrapper.raw('??.??', this.schema, into))
-			qb.insert(this.getColumnValues(new QueryBuilder(this.wrapper, qb, this.schema), columns))
+			qb.insert(this.getColumnValues(columns))
 		}
 
 		const qbSql = qb.toSQL()
@@ -128,7 +128,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 					sql += ' on conflict do nothing'
 					break
 				case InsertBuilder.ConflictActionType.update:
-					const values = this.getColumnValues(new QueryBuilder(this.wrapper, qb, this.schema), this.options.conflictAction.values)
+					const values = this.getColumnValues(this.options.conflictAction.values)
 					const updateExpr = Object.keys(values).join(' = ?, ') + ' = ?'
 					sql += ' on conflict (?) do update set ' + updateExpr
 					const indexExpr = this.wrapper.raw(
@@ -161,12 +161,12 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		}
 	}
 
-	private getColumnValues(queryBuilder: QueryBuilder, values: InsertBuilder.Values): { [column: string]: Knex.Raw } {
+	private getColumnValues(values: InsertBuilder.Values): { [column: string]: Knex.Raw } {
 		return Object.entries(values)
 			.map(
 				([key, value]): [string, Knex.Raw | undefined] => {
 					if (typeof value === 'function') {
-						return [key, value(new QueryBuilder.ColumnExpressionFactory(queryBuilder))]
+						return [key, value(new QueryBuilder.ColumnExpressionFactory(this.wrapper))]
 					}
 					return [key, value]
 				}

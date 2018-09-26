@@ -54,11 +54,12 @@ describe('Queries with acl', () => {
           listPostLocale {
             id
             title
-#	          _meta {
-#		          title {
-#			          readable
-#		          }
-#	          }
+	          _meta {
+		          title {
+			          readable
+			          updatable
+		          }
+	          }
           }
         }`,
 				executes: [
@@ -66,19 +67,23 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title"
+                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title",
+                         "root_"."locale" in ($2) as "root__meta_title_readable",
+                         false as "root__meta_title_updatable"
                        from "public"."post_locale" as "root_"`,
-							parameters: ['cs'],
+							parameters: ['cs', 'cs'],
 							response: [
 								{
 									root_id: testUuid(1),
 									root_title: null,
-									// root_title__readable: false,
+									root__meta_title_readable: false,
+									root__meta_title_updatable: false,
 								},
 								{
 									root_id: testUuid(2),
 									root_title: 'bar',
-									// root_title__readable: true,
+									root__meta_title_readable: true,
+									root__meta_title_updatable: false,
 								},
 							],
 						},
@@ -90,20 +95,22 @@ describe('Queries with acl', () => {
 							{
 								id: testUuid(1),
 								title: null,
-								// _meta: {
-								// 	title: {
-								// 		readable: false,
-								// 	},
-								// },
+								_meta: {
+									title: {
+										readable: false,
+										updatable: false,
+									},
+								},
 							},
 							{
 								id: testUuid(2),
 								title: 'bar',
-								// _meta: {
-								// 	title: {
-								// 		readable: true,
-								// 	},
-								// },
+								_meta: {
+									title: {
+										readable: true,
+										updatable: false,
+									},
+								},
 							},
 						],
 					},

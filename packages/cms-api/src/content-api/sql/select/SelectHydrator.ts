@@ -53,17 +53,16 @@ class SelectHydrator {
 	}
 
 	async hydrateRow(row: SelectHydrator.Row): Promise<SelectHydrator.ResultObject> {
-		const result: SelectHydrator.ResultObject = { _meta: {} }
+		const result: SelectHydrator.ResultObject = {}
 
 		for (let columnPath of this.columns) {
 			const path = [...columnPath.path]
 			const last: string = path.pop() as string
-			const currentObject = path.reduce((obj, part) => (obj && obj[part]) || undefined, result)
+			const currentObject = path.reduce((obj, part) => obj[part] = obj[part] || {}, result)
 
-			if (currentObject) {
-				currentObject[last] = row[columnPath.getAlias()]
-			}
+			currentObject[last] = row[columnPath.getAlias()]
 		}
+
 		for (let { path, parentKeyPath, data, defaultValue } of this.promises) {
 			const awaitedData = await data
 			const pathTmp = [...path.path]
@@ -89,10 +88,6 @@ namespace SelectHydrator {
 	export type GroupedObjects = { [groupingKey: string]: ResultObjects }
 	export type NestedData = GroupedObjects | IndexedResultObjects
 	export type NestedDefaultValue = [] | null
-	export enum ColumnFlagSuffixes {
-		readable = '__readable',
-		updatable = '__updatable',
-	}
 }
 
 export default SelectHydrator

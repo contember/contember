@@ -5,7 +5,7 @@ import {
 	GraphQLObjectTypeConfig,
 	GraphQLOutputType,
 } from 'graphql'
-import { Acl, Model } from 'cms-common'
+import { Acl, Input, Model } from 'cms-common'
 import { acceptFieldVisitor, getEntity as getEntityFromSchema } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
 import ColumnTypeResolver from './ColumnTypeResolver'
@@ -23,8 +23,8 @@ export default class EntityTypeProvider {
 	private fieldMeta = new GraphQLObjectType({
 		name: 'FieldMeta',
 		fields: {
-			readable: { type: GraphQLBoolean },
-			updatable: { type: GraphQLBoolean },
+			[Input.FieldMeta.readable]: { type: GraphQLBoolean },
+			[Input.FieldMeta.updatable]: { type: GraphQLBoolean },
 		},
 	})
 

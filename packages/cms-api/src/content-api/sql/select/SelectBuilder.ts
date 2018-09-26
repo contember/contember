@@ -9,6 +9,7 @@ import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
+import assertNever from "../../../../../cms-common/src/utils/assertNever";
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
@@ -46,7 +47,7 @@ export default class SelectBuilder {
 
 	private async selectInternal(entity: Model.Entity, path: Path, input: ObjectNode) {
 		if (!input.fields.find(it => it.name === entity.primary && it.alias === entity.primary)) {
-			this.addColumn(entity, path, entity.fields[entity.primary] as Model.AnyColumn, entity.primary)
+			this.addColumn(path.for(entity.primaryColumn), entity.fields[entity.primary] as Model.AnyColumn)
 		}
 
 		const promises: Promise<void>[] = []
@@ -54,13 +55,14 @@ export default class SelectBuilder {
 			if (field.name === '_meta') {
 				continue
 			}
+
 			const promise = acceptFieldVisitor(this.schema, entity, field.name, {
 				visitColumn: async (entity, column) => {
-					const fieldPredicate =
-						entity.primary === column.name
-							? undefined
-							: this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
-					this.addColumn(entity, path, column, field.alias, fieldPredicate)
+
+					const columnPath = path.for(field.alias)
+
+					this.addMetaFlag(entity, column, columnPath, Acl.Operation.read)
+					this.addColumn(columnPath, column)
 				},
 				visitRelation: async (entity, relation, targetEntity) => {
 					await this.addRelation(field as ObjectNode, path, entity)
@@ -74,26 +76,35 @@ export default class SelectBuilder {
 		await Promise.all(Object.values(promises))
 	}
 
-	private addColumn(
-		entity: Model.Entity,
-		path: Path,
-		column: Model.AnyColumn,
-		alias: string,
-		predicate?: Input.Where
-	): void {
-		const columnPath = path.for(alias)
-		const tableAlias = path.getAlias()
-		const columnAlias = columnPath.getAlias()
-
-		if (predicate) {
-			this.qb.select(
-				expr =>
-					expr.selectCondition(condition => {
-						this.whereBuilder.buildInternal(this.qb, condition, entity, path, predicate)
-					}),
-				columnAlias + SelectHydrator.ColumnFlagSuffixes.readable
-			)
+	private addMetaFlag(entity: Model.Entity, column: Model.AnyColumn, path: Path, operation: Acl.Operation.read | Acl.Operation.update) {
+		if (entity.primary === column.name) {
+			return
 		}
+		const fieldPredicate = this.predicateFactory.create(entity, operation, [column.name])
+
+		let suffix: string = (() => {
+			switch (operation) {
+				case Acl.Operation.read:
+					return SelectHydrator.ColumnFlagSuffixes.readable
+				case Acl.Operation.update:
+					return SelectHydrator.ColumnFlagSuffixes.updatable
+				default:
+					return assertNever(operation)
+			}
+		})()
+
+		this.qb.select(
+			expr =>
+				expr.selectCondition(condition => {
+					this.whereBuilder.buildInternal(this.qb, condition, entity, path.back(), fieldPredicate)
+				}),
+			path.getAlias() + suffix
+		)
+	}
+
+	private addColumn(columnPath: Path, column: Model.AnyColumn): void {
+		const tableAlias = columnPath.back().getAlias()
+		const columnAlias = columnPath.getAlias()
 
 		this.hydrator.addColumn(columnPath)
 		this.qb.select([tableAlias, column.columnName], columnAlias)

@@ -74,12 +74,12 @@ class SelectHydrator {
 			const currentObject = path.reduce((obj, part) => (obj && obj[part]) || undefined, result)
 			const readable = row[columnPath.getAlias() + SelectHydrator.ColumnFlagSuffixes.readable] !== false
 			const updatable = row[columnPath.getAlias() + SelectHydrator.ColumnFlagSuffixes.updatable]
-			currentObject._meta[last] = {
-				readable,
-				updatable,
-			}
 
 			if (currentObject) {
+				currentObject._meta[last] = {
+					readable,
+					updatable,
+				}
 				currentObject[last] = readable ? row[columnPath.getAlias()] : null
 			}
 		}

@@ -88,6 +88,7 @@ export default class EntityTypeProvider {
 			}
 			metaFields[fieldName] = {
 				type: this.fieldMeta,
+				resolve: fieldResolver,
 			}
 		}
 		return fields

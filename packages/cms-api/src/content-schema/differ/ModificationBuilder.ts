@@ -20,7 +20,6 @@ export default class ModificationBuilder {
 			modification: 'createEntity',
 			entity: {
 				name: updatedEntity.name,
-				pluralName: updatedEntity.pluralName,
 				primary: updatedEntity.primary,
 				primaryColumn: updatedEntity.primaryColumn,
 				tableName: updatedEntity.tableName,
@@ -36,14 +35,6 @@ export default class ModificationBuilder {
 		this.modifications.push({
 			modification: 'removeEntity',
 			entityName: entityName,
-		})
-	}
-
-	public updateEntityPluralName(entityName: string, pluralName: string) {
-		this.modifications.push({
-			modification: 'updateEntityPluralName',
-			entityName: entityName,
-			pluralName: pluralName,
 		})
 	}
 

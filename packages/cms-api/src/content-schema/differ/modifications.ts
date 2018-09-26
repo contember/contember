@@ -16,12 +16,6 @@ export interface UpdateEntityNameModification {
 	newEntityName: string
 }
 
-export interface UpdateEntityPluralNameModification {
-	modification: 'updateEntityPluralName'
-	entityName: string
-	pluralName: string
-}
-
 export interface UpdateEntityTableNameModification {
 	modification: 'updateEntityTableName'
 	entityName: string
@@ -107,7 +101,6 @@ export type Modification =
 	| CreateEntityModification
 	| RemoveEntityModification
 	| UpdateEntityNameModification
-	| UpdateEntityPluralNameModification
 	| UpdateEntityTableNameModification
 	| CreateColumnModification
 	| CreateRelationModification

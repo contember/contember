@@ -50,7 +50,6 @@ describe('Diff schemas', () => {
 							},
 						},
 						name: 'Author',
-						pluralName: 'Authors',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'author',
@@ -144,7 +143,6 @@ describe('Diff schemas', () => {
 							},
 						},
 						name: 'Post',
-						pluralName: 'Posts',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'post',
@@ -227,7 +225,6 @@ describe('Diff schemas', () => {
 							},
 						},
 						name: 'PostLocale',
-						pluralName: 'PostLocales',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'post_locale',
@@ -310,7 +307,6 @@ describe('Diff schemas', () => {
 			entities: {
 				Post: {
 					name: 'Post',
-					pluralName: 'Posts',
 					primary: 'id',
 					primaryColumn: 'id',
 					tableName: 'post',
@@ -319,7 +315,6 @@ describe('Diff schemas', () => {
 				},
 				PostLocale: {
 					name: 'PostLocale',
-					pluralName: 'PostLocales',
 					primary: 'id',
 					primaryColumn: 'id',
 					tableName: 'post_locale',
@@ -344,7 +339,6 @@ describe('Diff schemas', () => {
 			entities: {
 				Post: {
 					name: 'Post',
-					pluralName: 'Posts',
 					primary: 'id',
 					primaryColumn: 'id',
 					tableName: 'post',
@@ -360,7 +354,6 @@ describe('Diff schemas', () => {
 				},
 				PostLocale: {
 					name: 'PostLocale',
-					pluralName: 'PostLocales',
 					primary: 'id',
 					primaryColumn: 'id',
 					tableName: 'post_locale',
@@ -414,7 +407,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category'))
 			)
-			.entity('Category', e => e.pluralName('Categories').column('title', c => c.type(Model.ColumnType.String)))
+			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
 		const diff: SchemaDiff = {
 			modifications: [
@@ -431,7 +424,6 @@ describe('Diff schemas', () => {
 							},
 						},
 						name: 'Category',
-						pluralName: 'Categories',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'category',
@@ -517,7 +509,6 @@ describe('Diff schemas', () => {
 							},
 						},
 						name: 'Site',
-						pluralName: 'Sites',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'site',
@@ -537,7 +528,6 @@ describe('Diff schemas', () => {
 							},
 						},
 						name: 'SiteSetting',
-						pluralName: 'SiteSettings',
 						primary: 'id',
 						primaryColumn: 'id',
 						tableName: 'site_setting',
@@ -824,11 +814,6 @@ describe('Diff schemas', () => {
 					modification: 'updateEntityName',
 					entityName: 'Author',
 					newEntityName: 'User',
-				},
-				{
-					modification: 'updateEntityPluralName',
-					entityName: 'User',
-					pluralName: 'Users',
 				},
 			],
 		}

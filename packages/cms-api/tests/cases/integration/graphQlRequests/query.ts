@@ -13,7 +13,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Post(where: {id: "${testUuid(1)}"}) {
+          getPost(where: {id: "${testUuid(1)}"}) {
             id
           }
         }`,
@@ -30,7 +30,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Post: {
+					getPost: {
 						id: testUuid(1),
 					},
 				},
@@ -55,7 +55,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          PostLocale(where: {post: "${testUuid(1)}", locale: "cs"}) {
+          getPostLocale(where: {post: "${testUuid(1)}", locale: "cs"}) {
             id
           }
         }`,
@@ -72,7 +72,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					PostLocale: {
+					getPostLocale: {
 						id: testUuid(2),
 					},
 				},
@@ -87,7 +87,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Post(where: {id: "${testUuid(1)}"}) {
+          getPost(where: {id: "${testUuid(1)}"}) {
             heading: title
           }
         }`,
@@ -106,7 +106,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Post: {
+					getPost: {
 						heading: 'Hello',
 					},
 				},
@@ -128,7 +128,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts {
+          listPost {
             id
             locales {
               id
@@ -166,7 +166,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: testUuid(1),
 							locales: [
@@ -206,7 +206,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts {
+          listPost {
             id
             author {
               id
@@ -259,7 +259,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: testUuid(1),
 							author: {
@@ -291,7 +291,7 @@ describe('Queries', () => {
 				.entity('SiteSetting', entity => entity.column('url', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
 			query: GQL`query {
-        Sites {
+        listSite {
           id
           name
           setting {
@@ -348,7 +348,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Sites: [
+					listSite: [
 						{
 							id: testUuid(1),
 							name: 'Site 1',
@@ -382,7 +382,7 @@ describe('Queries', () => {
 				.entity('SiteSetting', entity => entity.column('url', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
 			query: GQL`query {
-        SiteSettings {
+        listSiteSetting {
           id
           url
           site {
@@ -435,7 +435,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					SiteSettings: [
+					listSiteSetting: [
 						{
 							id: testUuid(1),
 							url: 'http://site1.cz',
@@ -476,7 +476,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts {
+          listPost {
             id
             categories {
               id
@@ -586,7 +586,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							categories: [
 								{
@@ -651,12 +651,12 @@ describe('Queries', () => {
 						.manyHasMany('categories', relation => relation.target('Category').inversedBy('posts'))
 						.manyHasOne('author', relation => relation.target('Author'))
 				)
-				.entity('Category', entity => entity.pluralName('Categories'))
+				.entity('Category', entity => entity)
 				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
 			query: GQL`
         query {
-          Categories {
+          listCategory {
             id
             posts {
               id
@@ -756,7 +756,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Categories: [
+					listCategory: [
 						{
 							id: testUuid(1),
 							posts: [
@@ -805,7 +805,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts(where: {author: {name: {eq: "John"}}}) {
+          listPost(where: {author: {name: {eq: "John"}}}) {
             id
           }
         }`,
@@ -831,7 +831,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: testUuid(1),
 						},
@@ -856,7 +856,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Authors(where: {posts: {title: {eq: "Hello"}}}) {
+          listAuthor(where: {posts: {title: {eq: "Hello"}}}) {
             id
           }
         }`,
@@ -882,7 +882,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Authors: [
+					listAuthor: [
 						{
 							id: testUuid(1),
 						},
@@ -906,7 +906,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts(where: {categories: {name: {eq: "Stuff"}}}) {
+          listPost(where: {categories: {name: {eq: "Stuff"}}}) {
             id
           }
         }`,
@@ -932,7 +932,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: testUuid(1),
 						},
@@ -956,7 +956,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts(where: {categories: {id: {in: ["${testUuid(10)}", "${testUuid(11)}"]}}}) {
+          listPost(where: {categories: {id: {in: ["${testUuid(10)}", "${testUuid(11)}"]}}}) {
             id
           }
         }`,
@@ -982,7 +982,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: testUuid(1),
 						},
@@ -1009,7 +1009,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts {
+          listPost {
             id
             locales(where: {locale: {eq: "cs"}}) {
               id
@@ -1046,7 +1046,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: testUuid(1),
 							locales: [
@@ -1081,7 +1081,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts {
+          listPost {
             id
             author (where: {name: {eq: "John"}}) {
               id
@@ -1123,7 +1123,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: testUuid(1),
 							author: {
@@ -1155,7 +1155,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          PostLocales(orderBy: [{post: {author: {name: asc}}}, {id: desc}]) {
+          listPostLocale(orderBy: [{post: {author: {name: asc}}}, {id: desc}]) {
             id
           }
         }`,
@@ -1175,7 +1175,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					PostLocales: [
+					listPostLocale: [
 						{
 							id: testUuid(2),
 						},
@@ -1192,7 +1192,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Posts {
+          listPost {
             id
             locales(orderBy: {id: desc}) {
               id
@@ -1227,7 +1227,7 @@ describe('Queries', () => {
 			],
 			return: {
 				data: {
-					Posts: [
+					listPost: [
 						{
 							id: '123e4567-e89b-12d3-a456-000000000001',
 							locales: [
@@ -1266,7 +1266,7 @@ describe('Queries', () => {
 						.manyHasMany('categories', r =>
 							r
 								.target('Category', e =>
-									e.pluralName('Categories').column('title', c => c.type(Model.ColumnType.String))
+									e.column('title', c => c.type(Model.ColumnType.String))
 								)
 								.inversedBy('posts')
 						)
@@ -1274,7 +1274,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Categories {
+          listCategory {
             id
             title
             posts(where: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
@@ -1334,7 +1334,7 @@ describe('Queries', () => {
 			]),
 			return: {
 				data: {
-					Categories: [
+					listCategory: [
 						{
 							id: testUuid(1),
 							posts: [
@@ -1388,7 +1388,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Authors {
+          listAuthor {
             id
             name
             posts(where: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
@@ -1433,7 +1433,7 @@ describe('Queries', () => {
 			]),
 			return: {
 				data: {
-					Authors: [
+					listAuthor: [
 						{
 							id: testUuid(1),
 							posts: [
@@ -1471,7 +1471,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          Authors(orderBy: [{name: asc}], offset: 2, limit: 3) {
+          listAuthor(orderBy: [{name: asc}], offset: 2, limit: 3) {
             id
             name
           }
@@ -1491,7 +1491,7 @@ describe('Queries', () => {
 			]),
 			return: {
 				data: {
-					Authors: [
+					listAuthor: [
 						{
 							id: testUuid(1),
 							name: 'John',

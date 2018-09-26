@@ -45,9 +45,6 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 		const originalFields = new Set(Object.keys(originalEntity.fields))
 		const originalUnique = new Set(Object.keys(originalEntity.unique))
 
-		if (updatedEntity.pluralName !== originalEntity.pluralName) {
-			builder.updateEntityPluralName(entityName, updatedEntity.pluralName)
-		}
 		if (updatedEntity.tableName !== originalEntity.tableName) {
 			builder.updateEntityTableName(entityName, updatedEntity.tableName)
 		}

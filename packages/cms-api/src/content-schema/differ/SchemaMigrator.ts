@@ -4,7 +4,6 @@ import {
 	Modification,
 	CreateEntityModification,
 	RemoveEntityModification,
-	UpdateEntityPluralNameModification,
 	UpdateEntityTableNameModification,
 	CreateColumnModification,
 	CreateRelationModification,
@@ -44,9 +43,6 @@ export default class SchemaMigrator {
 				break
 			case 'updateEntityName':
 				this.updateEntityName(modification)
-				break
-			case 'updateEntityPluralName':
-				this.updateEntityPluralName(modification)
 				break
 			case 'updateEntityTableName':
 				this.updateEntityTableName(modification)
@@ -109,10 +105,6 @@ export default class SchemaMigrator {
 			name: modification.newEntityName,
 		}
 		delete this.schema.entities[modification.entityName]
-	}
-
-	private updateEntityPluralName(modification: UpdateEntityPluralNameModification) {
-		this.schema.entities[modification.entityName].pluralName = modification.pluralName
 	}
 
 	private updateEntityTableName(modification: UpdateEntityTableNameModification) {

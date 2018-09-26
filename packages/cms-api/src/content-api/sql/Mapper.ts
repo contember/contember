@@ -20,7 +20,7 @@ import JunctionTableManager from './JunctionTableManager'
 class Mapper {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly db: KnexWrapper,
+		public readonly db: KnexWrapper,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
@@ -70,14 +70,18 @@ class Mapper {
 		return await (indexByAlias !== null ? hydrator.hydrateAll(rows, indexByAlias) : hydrator.hydrateAll(rows))
 	}
 
-	public async selectGrouped(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, columnName: string) {
+	public async selectGrouped(
+		entity: Model.Entity,
+		input: ObjectNode<Input.ListQueryInput>,
+		relation: Model.JoiningColumnRelation & Model.Relation
+	) {
 		const hydrator = new SelectHydrator()
 		const qb = this.db.queryBuilder()
 		const path = new Path([])
 		const groupingKey = '__grouping_key'
-		qb.select([path.getAlias(), columnName], groupingKey)
+		qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
 
-		const rows = await this.selectRows(hydrator, qb, entity, input)
+		const rows = await this.selectRows(hydrator, qb, entity, input, relation.name)
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
@@ -85,13 +89,14 @@ class Mapper {
 		hydrator: SelectHydrator,
 		qb: QueryBuilder,
 		entity: Model.Entity,
-		input: ObjectNode<Input.ListQueryInput>
+		input: ObjectNode<Input.ListQueryInput>,
+		groupBy?: string
 	) {
 		const path = new Path([])
 		qb.from(entity.tableName, path.getAlias())
 
 		const selector = this.selectBuilderFactory.create(this, qb, hydrator)
-		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input))
+		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input), path, groupBy)
 		const rows = await selector.execute()
 		await selectPromise
 
@@ -183,23 +188,6 @@ class Mapper {
 		await this.junctionTableManager.disconnectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
-	public async fetchJunction(
-		relation: Model.ManyHasManyOwnerRelation,
-		values: Input.PrimaryValue[],
-		column: Model.JoiningColumn
-	): Promise<object[]> {
-		const joiningTable = relation.joiningTable
-
-		const whereColumn = column.columnName
-		const qb = this.db.queryBuilder()
-		qb.from(joiningTable.tableName)
-		qb.select(joiningTable.inverseJoiningColumn.columnName)
-		qb.select(joiningTable.joiningColumn.columnName)
-		qb.where(clause => clause.in([joiningTable.tableName, whereColumn], values))
-
-		return await qb.getResult()
-	}
-
 	public async getPrimaryValue(entity: Model.Entity, where: Input.UniqueWhere) {
 		if (where[entity.primary] !== undefined) {
 			return where[entity.primary]
@@ -240,6 +228,8 @@ class Mapper {
 
 namespace Mapper {
 	export class NoResultError extends Error {}
+
+	export type JoiningColumns = { sourceColumn: Model.JoiningColumn; targetColumn: Model.JoiningColumn }
 }
 
 export default Mapper

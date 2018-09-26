@@ -1,4 +1,4 @@
-import { GraphQLFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
+import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Input, Model } from 'cms-common'
 import { getEntity } from '../../content-schema/modelUtils'
 import { Context } from '../types'
@@ -53,6 +53,8 @@ export default class QueryProvider {
 				orderBy: {
 					type: new GraphQLList(new GraphQLNonNull(this.orderByTypeProvider.getEntityOrderByType(entityName))),
 				},
+				offset: { type: GraphQLInt },
+				limit: { type: GraphQLInt },
 			},
 			resolve: (parent, args, context, info) =>
 				this.readResolverFactory.create(context).resolveListQuery(entity, this.queryAstAFactory.create(info)),

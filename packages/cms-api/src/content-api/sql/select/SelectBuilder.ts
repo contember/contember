@@ -4,16 +4,20 @@ import { acceptFieldVisitor, acceptRelationTypeVisitor, getColumnName } from '..
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
-import RelationFetchVisitor from './RelationFetchVisitor'
 import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
 import OrderByBuilder from './OrderByBuilder'
+import RelationFetchVisitorFactory from './RelationFetchVisitorFactory'
+import LimitByGroupWrapper from '../../../core/knex/LimitByGroupWrapper'
 import { assertNever } from 'cms-common'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
+
+	private queryWrapper: LimitByGroupWrapper | null = null
+
 	private firer: () => void = () => {
 		throw new Error()
 	}
@@ -26,7 +30,8 @@ export default class SelectBuilder {
 		private readonly predicateFactory: PredicateFactory,
 		private readonly mapper: Mapper,
 		private readonly qb: QueryBuilder,
-		private readonly hydrator: SelectHydrator
+		private readonly hydrator: SelectHydrator,
+		private readonly relationFetchVisitorFactory: RelationFetchVisitorFactory
 	) {
 		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
 		this.rows = this.createRowsPromise(blocker)
@@ -37,16 +42,33 @@ export default class SelectBuilder {
 		return await this.rows
 	}
 
-	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, path?: Path) {
-		path = path || new Path([])
+	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, path: Path, groupBy?: string) {
 		const promise = this.selectInternal(entity, path, input)
 		const where = input.args.where
 		if (where) {
 			this.whereBuilder.build(this.qb, entity, path, where)
 		}
 		const orderBy = input.args.orderBy
-		if (orderBy) {
-			this.orderByBuilder.build(this.qb, entity, path, orderBy)
+
+		if (groupBy) {
+			const groupByColumn = getColumnName(this.schema, entity, groupBy)
+			this.queryWrapper = new LimitByGroupWrapper(
+				[path.getAlias(), groupByColumn],
+				(orderable, qb) => {
+					if (orderBy) {
+						this.orderByBuilder.build(this.qb, orderable, entity, new Path([]), orderBy)
+					}
+				},
+				input.args.offset,
+				input.args.limit
+			)
+		} else {
+			if (orderBy) {
+				this.orderByBuilder.build(this.qb, this.qb, entity, path, orderBy)
+			}
+			if (input.args.limit) {
+				this.qb.limit(input.args.limit, input.args.offset)
+			}
 		}
 
 		await promise
@@ -126,8 +148,8 @@ export default class SelectBuilder {
 			const columnName = getColumnName(this.schema, entity, fieldName)
 			return this.getColumnValues(path.for(fieldName), columnName)
 		}
-		const fetchVisitor = new RelationFetchVisitor(
-			this.schema,
+
+		const fetchVisitor = this.relationFetchVisitorFactory.create(
 			this.mapper,
 			idsGetter,
 			object,
@@ -150,6 +172,9 @@ export default class SelectBuilder {
 
 	private async createRowsPromise(blocker: PromiseLike<void>): Promise<SelectHydrator.Rows> {
 		await blocker
+		if (this.queryWrapper) {
+			return await this.queryWrapper.getResult(this.qb)
+		}
 		return await this.qb.getResult()
 	}
 

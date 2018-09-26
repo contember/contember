@@ -100,6 +100,8 @@ namespace Input {
 	export interface ListQueryInput<E = never> {
 		where?: Where<Condition<ColumnValue<E>>>
 		orderBy?: OrderBy[]
+		offset?: number
+		limit?: number
 	}
 
 	export type UpdateOneRelationInput<E = never> =

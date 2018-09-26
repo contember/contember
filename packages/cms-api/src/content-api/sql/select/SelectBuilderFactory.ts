@@ -7,6 +7,7 @@ import SelectHydrator from './SelectHydrator'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
 import OrderByBuilder from './OrderByBuilder'
+import RelationFetchVisitorFactory from './RelationFetchVisitorFactory'
 
 export default class SelectBuilderFactory {
 	constructor(
@@ -14,7 +15,8 @@ export default class SelectBuilderFactory {
 		private readonly joinBuilder: JoinBuilder,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderByBuilder: OrderByBuilder,
-		private readonly predicateFactory: PredicateFactory
+		private readonly predicateFactory: PredicateFactory,
+		private readonly relationFetchVisitorFactory: RelationFetchVisitorFactory
 	) {}
 
 	create(mapper: Mapper, qb: QueryBuilder, hydrator: SelectHydrator): SelectBuilder {
@@ -26,7 +28,8 @@ export default class SelectBuilderFactory {
 			this.predicateFactory,
 			mapper,
 			qb,
-			hydrator
+			hydrator,
+			this.relationFetchVisitorFactory
 		)
 	}
 }

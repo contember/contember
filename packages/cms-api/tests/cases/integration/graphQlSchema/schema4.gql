@@ -79,16 +79,16 @@ enum OrderDirection {
 }
 
 type Query {
-  Root(where: RootUniqueWhere!): Root
-  Roots(where: RootWhere, orderBy: [RootOrderBy!]): [Root]
-  OneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
-  OneHasManyEntitys(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!]): [OneHasManyEntity]
+  getRoot(where: RootUniqueWhere!): Root
+  listRoot(where: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
+  getOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  listOneHasManyEntity(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
 }
 
 type Root {
   _meta: RootMeta
   id: UUID!
-  r(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!]): [OneHasManyEntity!]
+  r(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
 }
 
 input RootCreateInput {

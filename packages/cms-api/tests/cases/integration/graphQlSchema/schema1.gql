@@ -2,7 +2,7 @@ type Author {
   _meta: AuthorMeta
   id: UUID!
   name: String
-  posts(where: PostWhere, orderBy: [PostOrderBy!]): [Post!]
+  posts(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
 }
 
 input AuthorCreateInput {
@@ -76,7 +76,7 @@ type Category {
   _meta: CategoryMeta
   id: UUID!
   name: String
-  posts(where: PostWhere, orderBy: [PostOrderBy!]): [Post!]
+  posts(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
 }
 
 input CategoryCreateInput {
@@ -193,8 +193,8 @@ type Post {
   author(where: AuthorWhere): Author
   id: UUID!
   publishedAt: DateTime
-  locales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!]): [PostLocale!]
-  categories(where: CategoryWhere, orderBy: [CategoryOrderBy!]): [Category!]
+  locales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  categories(where: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]
 }
 
 input PostCreateAuthorEntityRelationInput {
@@ -415,14 +415,14 @@ input PostWithoutLocalesUpdateInput {
 }
 
 type Query {
-  Post(where: PostUniqueWhere!): Post
-  Posts(where: PostWhere, orderBy: [PostOrderBy!]): [Post]
-  PostLocale(where: PostLocaleUniqueWhere!): PostLocale
-  PostLocales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!]): [PostLocale]
-  Category(where: CategoryUniqueWhere!): Category
-  Categorys(where: CategoryWhere, orderBy: [CategoryOrderBy!]): [Category]
-  Author(where: AuthorUniqueWhere!): Author
-  Authors(where: AuthorWhere, orderBy: [AuthorOrderBy!]): [Author]
+  getPost(where: PostUniqueWhere!): Post
+  listPost(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  getPostLocale(where: PostLocaleUniqueWhere!): PostLocale
+  listPostLocale(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  getCategory(where: CategoryUniqueWhere!): Category
+  listCategory(where: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
+  getAuthor(where: AuthorUniqueWhere!): Author
+  listAuthor(where: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
 }
 
 input StringCondition {

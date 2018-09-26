@@ -14,8 +14,8 @@ enum OrderDirection {
 }
 
 type Query {
-  Test(where: TestUniqueWhere!): Test
-  Tests(where: TestWhere, orderBy: [TestOrderBy!]): [Test]
+  getTest(where: TestUniqueWhere!): Test
+  listTest(where: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
 }
 
 input StringCondition {

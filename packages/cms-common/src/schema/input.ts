@@ -165,6 +165,11 @@ namespace Input {
 	}
 
 	export type Where<C = Condition> = ComposedWhere<C> & FieldWhere<C>
+
+	export enum FieldMeta {
+		readable = 'readable',
+		updatable = 'updatable',
+	}
 }
 
 export default Input

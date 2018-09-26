@@ -11,7 +11,6 @@ import PredicateFactory from '../../../acl/PredicateFactory'
 import OrderByBuilder from './OrderByBuilder'
 import RelationFetchVisitorFactory from './RelationFetchVisitorFactory'
 import LimitByGroupWrapper from '../../../core/knex/LimitByGroupWrapper'
-import { assertNever } from 'cms-common'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
@@ -82,13 +81,13 @@ export default class SelectBuilder {
 		const promises: Promise<void>[] = []
 		for (let field of input.fields) {
 			if (field.name === '_meta') {
+				this.processMetaFields(field as ObjectNode, path, entity);
 				continue
 			}
 
 			const promise = acceptFieldVisitor(this.schema, entity, field.name, {
 				visitColumn: async (entity, column) => {
 					const columnPath = path.for(field.alias)
-
 					this.addColumn(entity, columnPath, column)
 				},
 				visitRelation: async (entity, relation, targetEntity) => {
@@ -103,35 +102,34 @@ export default class SelectBuilder {
 		await Promise.all(Object.values(promises))
 	}
 
-	private addMetaFlag(
-		entity: Model.Entity,
-		column: Model.AnyColumn,
-		path: Path,
-		operation: Acl.Operation.read | Acl.Operation.update
-	) {
-		if (entity.primary === column.name) {
+	private processMetaFields(field: ObjectNode, path: Path, entity: Model.Entity) {
+		for (let metaField of (field as ObjectNode).fields) {
+			const columnPath = path.for(field.alias).for(metaField.alias)
+			for (let metaInfo of (metaField as ObjectNode).fields) {
+				if (metaInfo.name === Input.FieldMeta.updatable) {
+					this.addMetaFlag(entity, metaField.name, path, columnPath.for(metaInfo.alias), Acl.Operation.update)
+				}
+				if (metaInfo.name === Input.FieldMeta.readable) {
+					this.addMetaFlag(entity, metaField.name, path, columnPath.for(metaInfo.alias), Acl.Operation.read)
+				}
+			}
+		}
+	}
+
+	private addMetaFlag(entity: Model.Entity, fieldName: string, tablePath: Path, metaPath: Path, operation: Acl.Operation.read | Acl.Operation.update) {
+		if (entity.primary === fieldName) {
 			return
 		}
-		const fieldPredicate = this.predicateFactory.create(entity, operation, [column.name])
-
-		let suffix: string = (() => {
-			switch (operation) {
-				case Acl.Operation.read:
-					return SelectHydrator.ColumnFlagSuffixes.readable
-				case Acl.Operation.update:
-					return SelectHydrator.ColumnFlagSuffixes.updatable
-				default:
-					return assertNever(operation)
-			}
-		})()
+		const fieldPredicate = this.predicateFactory.create(entity, operation, [fieldName])
 
 		this.qb.select(
 			expr =>
 				expr.selectCondition(condition => {
-					this.whereBuilder.buildInternal(this.qb, condition, entity, path.back(), fieldPredicate)
+					this.whereBuilder.buildInternal(this.qb, condition, entity, tablePath, fieldPredicate)
 				}),
-			path.getAlias() + suffix
+			metaPath.getAlias()
 		)
+		this.hydrator.addColumn(metaPath)
 	}
 
 	private addColumn(entity: Model.Entity, columnPath: Path, column: Model.AnyColumn): void {

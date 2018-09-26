@@ -27,7 +27,7 @@ describe('Delete mutation', () => {
 						sql: SQL`select
                      "root_"."id" as "root_id",
                       "root_"."author_id" as "root_author"
-                     from "post" as "root_" 
+                     from "public"."post" as "root_" 
                    where "root_"."id" = $1`,
 						parameters: [testUuid(1)],
 						response: [
@@ -42,7 +42,7 @@ describe('Delete mutation', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id",
                        "root_"."name" as "root_name"
-                     from "author" as "root_"
+                     from "public"."author" as "root_"
                      where "root_"."id" in ($1)`,
 						parameters: [testUuid(2)],
 						response: [
@@ -53,9 +53,9 @@ describe('Delete mutation', () => {
 						],
 					},
 					{
-						sql: SQL`delete from "post"
+						sql: SQL`delete from "public"."post"
             where "id" in (select "root_"."id"
-                           from "post" as "root_"
+                           from "public"."post" as "root_"
                            where "root_"."id" = $1)`,
 						parameters: [testUuid(1)],
 						response: 1,
@@ -107,7 +107,7 @@ describe('Delete mutation', () => {
 					{
 						sql: SQL`select
                      "root_"."id" as "root_id"
-                     from "post" as "root_" 
+                     from "public"."post" as "root_" 
                    where "root_"."id" = $1`,
 						parameters: [testUuid(1)],
 						response: [
@@ -117,9 +117,9 @@ describe('Delete mutation', () => {
 						],
 					},
 					{
-						sql: SQL`delete from "post"
+						sql: SQL`delete from "public"."post"
             where "id" in (select "root_"."id"
-                           from "post" as "root_"
+                           from "public"."post" as "root_"
                            where "root_"."id" = $1 and "root_"."locale" in ($2))`,
 						parameters: [testUuid(1), 'cs'],
 						response: 1,

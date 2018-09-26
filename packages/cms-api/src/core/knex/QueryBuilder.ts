@@ -13,13 +13,13 @@ interface Raw {
 }
 
 class QueryBuilder<R = { [columnName: string]: any }[]> {
-	constructor(public readonly wrapper: KnexWrapper, public readonly qb: Knex.QueryBuilder) {}
+	constructor(public readonly wrapper: KnexWrapper, public readonly qb: Knex.QueryBuilder, private readonly schema: string) {}
 
 	public with(alias: string, select: QueryBuilder.Callback | Knex.Raw | QueryBuilder<any>): void {
 		if (select instanceof QueryBuilder) {
 			this.qb.with(alias, select.getSql())
 		} else if (typeof select === 'function') {
-			this.qb.with(alias, qb => select(new QueryBuilder(this.wrapper, qb)))
+			this.qb.with(alias, qb => select(new QueryBuilder(this.wrapper, qb, this.schema)))
 		} else {
 			this.qb.with(alias, select)
 		}
@@ -28,7 +28,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	public from(tableName: string | Knex.Raw, alias?: string): void {
 		let raw: Knex.Raw
 		if (typeof tableName === 'string') {
-			raw = this.raw('??', tableName)
+			raw = this.raw('??.??', this.schema, tableName)
 		} else {
 			raw = tableName
 		}
@@ -112,7 +112,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 			)
 			.filter(it => it[1] !== undefined)
 			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
-		this.qb.table(tableName).update(updateData)
+		this.qb.table(this.raw('??.??', this.schema, tableName)).update(updateData)
 		const updateSql = this.qb.toSQL()
 		const fromQb = this.wrapper.queryBuilder()
 		callback(fromQb)
@@ -141,7 +141,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		tableName: string,
 		alias?: string,
 		joinCondition?: (joinClause: ConditionBuilder) => void
-	): [string, Knex.Raw] {
+	): [Knex.Raw, Knex.Raw] {
 		let raw: Knex.Raw | null = null
 		if (joinCondition) {
 			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
@@ -151,7 +151,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		if (raw === null) {
 			raw = this.wrapper.raw('true')
 		}
-		return [`${tableName} as ${alias || tableName}`, raw as Knex.Raw]
+		return [this.raw('??.?? as ??', this.schema, tableName, alias || tableName), raw]
 	}
 
 	private aliasRaw(raw: Knex.Raw, alias?: string) {

@@ -68,7 +68,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          "root_"."locale" in ($1) as "root_title__readable",
                          "root_"."title" as "root_title"
-                       from "post_locale" as "root_"`,
+                       from "public"."post_locale" as "root_"`,
 							parameters: ['cs'],
 							response: [
 								{
@@ -133,7 +133,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          "root_"."locale" in ($1) as "root_title__readable",
                          "root_"."title" as "root_title"
-                       from "post_locale" as "root_"
+                       from "public"."post_locale" as "root_"
                        where "root_"."title" = $2 and "root_"."locale" in ($3)`,
 							parameters: ['cs', 'foo', 'cs'],
 							response: [
@@ -177,7 +177,7 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                        "root_"."id" as "root_id"
-                     from "post_locale" as "root_"`,
+                     from "public"."post_locale" as "root_"`,
 							parameters: [],
 							response: [
 								{
@@ -218,7 +218,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          false as "root_title__readable",
                          "root_"."title" as "root_title"
-                       from "post_locale" as "root_"`,
+                       from "public"."post_locale" as "root_"`,
 							parameters: [],
 							response: [],
 						},
@@ -254,7 +254,7 @@ describe('Queries with acl', () => {
 							sql: SQL`select 
                          "root_"."id" as "root_id",
                          "root_"."id" as "root_id"
-                       from "post" as "root_"`,
+                       from "public"."post" as "root_"`,
 							parameters: [],
 							response: [
 								{
@@ -271,7 +271,7 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id",
                          "root_"."locale" in ($1) as "root_title__readable",
                          "root_"."title" as "root_title"
-                       from "post_locale" as "root_"
+                       from "public"."post_locale" as "root_"
                        where "root_"."post_id" in ($2, $3) and false`,
 							parameters: ['cs', testUuid(1), testUuid(2)],
 							response: [
@@ -390,7 +390,7 @@ describe('Queries with acl', () => {
 							sql: SQL`select
                          "root_"."id" as "root_id",
                          "root_"."author_id" as "root_author"
-                       from "post" as "root_"`,
+                       from "public"."post" as "root_"`,
 							parameters: [],
 							response: [
 								{
@@ -410,7 +410,7 @@ describe('Queries with acl', () => {
                          "root_country"."id" as "root_country_id",
                          "root_country"."name" in ($1) as "root_name__readable",
                          "root_"."name" as "root_name"
-                       from "author" as "root_" left join "country" as "root_country" on "root_"."country_id" = "root_country"."id"
+                       from "public"."author" as "root_" left join "public"."country" as "root_country" on "root_"."country_id" = "root_country"."id"
                        where "root_"."id" in ($2, $3)`,
 							parameters: ['Czechia', testUuid(3), testUuid(4)],
 							response: [

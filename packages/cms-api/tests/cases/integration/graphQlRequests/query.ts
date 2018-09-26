@@ -21,7 +21,7 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
-                     from "post" as "root_"
+                     from "public"."post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_id: testUuid(1) }],
 						parameters: [testUuid(1)],
@@ -63,7 +63,7 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
-                     from "post_locale" as "root_"
+                     from "public"."post_locale" as "root_"
                      where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 						parameters: ['cs', testUuid(1)],
 						response: [{ root_id: testUuid(2) }],
@@ -97,7 +97,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."title" as "root_heading"
-                     from "post" as "root_"
+                     from "public"."post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_heading: 'Hello' }],
 						parameters: [testUuid(1)],
@@ -144,7 +144,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
-                     from "post" as "root_"`,
+                     from "public"."post" as "root_"`,
 						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
 					},
 					{
@@ -153,7 +153,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."locale" as "root_locale",
                        "root_"."title" as "root_title"
-                     from "post_locale" as "root_"
+                     from "public"."post_locale" as "root_"
                      where "root_"."post_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
@@ -221,7 +221,7 @@ describe('Queries', () => {
               select
                 "root_"."id" as "root_id",
                 "root_"."author_id" as "root_author"
-              from "post" as "root_"
+              from "public"."post" as "root_"
 						`,
 						response: [
 							{
@@ -240,7 +240,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name"
-              from "author" as "root_"
+              from "public"."author" as "root_"
               where "root_"."id" in ($1, $2)
 						`,
 						parameters: [testUuid(2), testUuid(4)],
@@ -308,7 +308,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name",
                 "root_"."setting_id" as "root_setting"
-              from "site" as "root_"`,
+              from "public"."site" as "root_"`,
 
 						response: [
 							{
@@ -329,7 +329,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."id" as "root_id",
                 "root_"."url" as "root_url"
-              from "site_setting" as "root_"
+              from "public"."site_setting" as "root_"
               where "root_"."id" in ($1, $2)
 						`,
 						parameters: [testUuid(2), testUuid(4)],
@@ -398,7 +398,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."url" as "root_url",
                        "root_"."id" as "root_id"
-                     from "site_setting" as "root_"`,
+                     from "public"."site_setting" as "root_"`,
 						response: [
 							{
 								root_id: testUuid(1),
@@ -415,7 +415,7 @@ describe('Queries', () => {
                        "root_"."setting_id" as "root_setting",
                        "root_"."id" as "root_id",
                        "root_"."name" as "root_name"
-                     from "site" as "root_"
+                     from "public"."site" as "root_"
                      where "root_"."setting_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(3)],
 						response: [
@@ -494,7 +494,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
-                     from "post" as "root_"`,
+                     from "public"."post" as "root_"`,
 						response: [
 							{
 								root_id: testUuid(1),
@@ -508,7 +508,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "junction_"."category_id",
                        "junction_"."post_id"
-                     from "post_categories" as "junction_"
+                     from "public"."post_categories" as "junction_"
                      where "junction_"."post_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
@@ -536,7 +536,7 @@ describe('Queries', () => {
                        "root_"."visible" as "root_visible",
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
-                     from "category" as "root_"
+                     from "public"."category" as "root_"
                      where "root_"."id" in ($1, $2, $3)`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
 						response: [
@@ -560,7 +560,7 @@ describe('Queries', () => {
                 "root_"."category_id" as "__grouping_key",
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name"
-              from "category_locale" as "root_"
+              from "public"."category_locale" as "root_"
               where "root_"."locale" = $1 and "root_"."category_id" in ($2, $3, $4)
 						`,
 						parameters: ['cs', testUuid(3), testUuid(4), testUuid(5)],
@@ -672,7 +672,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
-                     from "category" as "root_"`,
+                     from "public"."category" as "root_"`,
 						response: [
 							{
 								root_id: testUuid(1),
@@ -686,7 +686,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "junction_"."category_id",
                        "junction_"."post_id"
-                     from "post_categories" as "junction_"
+                     from "public"."post_categories" as "junction_"
                      where "junction_"."category_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
@@ -713,7 +713,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."author_id" as "root_author",
                        "root_"."id" as "root_id"
-                     from "post" as "root_"
+                     from "public"."post" as "root_"
                      where "root_"."id" in ($1, $2, $3)
 						`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
@@ -737,7 +737,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id",
                        "root_"."name" as "root_name"
-                     from "author" as "root_"
+                     from "public"."author" as "root_"
                      where "root_"."id" in ($1, $2)
 						`,
 						parameters: [testUuid(6), testUuid(7)],
@@ -815,7 +815,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_author"."id" as "root_author_id"
-                     from "post" as "root_" left join "author" as "root_author" on "root_"."author_id" = "root_author"."id"
+                     from "public"."post" as "root_" left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
                      where "root_author"."name" = $1`,
 						parameters: ['John'],
 						response: [
@@ -864,9 +864,9 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
-                     from "author" as "root_"
+                     from "public"."author" as "root_"
                      where "root_"."id" in (select "root_"."author_id"
-                                            from "post" as "root_"
+                                            from "public"."post" as "root_"
                                             where "root_"."title" = $1)`,
 						parameters: ['Hello'],
 						response: [
@@ -914,9 +914,9 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
-                     from "post" as "root_"
+                     from "public"."post" as "root_"
                      where "root_"."id" in (select "junction_"."post_id"
-                                            from "post_categories" as "junction_" inner join "category" as "root_" on "junction_"."category_id" = "root_"."id"
+                                            from "public"."post_categories" as "junction_" inner join "public"."category" as "root_" on "junction_"."category_id" = "root_"."id"
                                             where "root_"."name" = $1)`,
 						parameters: ['Stuff'],
 						response: [
@@ -964,9 +964,9 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
-                     from "post" as "root_"
+                     from "public"."post" as "root_"
                      where "root_"."id" in (select "junction_"."post_id"
-                                            from "post_categories" as "junction_"
+                                            from "public"."post_categories" as "junction_"
                                             where "junction_"."category_id" in ($1, $2))`,
 						parameters: [testUuid(10), testUuid(11)],
 						response: [
@@ -1025,7 +1025,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
-                     from "post" as "root_"`,
+                     from "public"."post" as "root_"`,
 						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
 					},
 					{
@@ -1034,7 +1034,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."locale" as "root_locale",
                        "root_"."title" as "root_title"
-                     from "post_locale" as "root_"
+                     from "public"."post_locale" as "root_"
                      where "root_"."locale" = $1 and "root_"."post_id" in ($2, $3)`,
 						parameters: ['cs', testUuid(1), testUuid(2)],
 						response: [
@@ -1094,7 +1094,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."author_id" as "root_author"
-                     from "post" as "root_"`,
+                     from "public"."post" as "root_"`,
 						response: [
 							{
 								root_id: testUuid(1),
@@ -1110,7 +1110,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
-                     from "author" as "root_"
+                     from "public"."author" as "root_"
                      where "root_"."id" in ($1, $2) and "root_"."name" = $3`,
 						parameters: [testUuid(2), testUuid(4), 'John'],
 						response: [
@@ -1166,8 +1166,8 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_post"."id" as "root_post_id",
                        "root_post_author"."id" as "root_post_author_id"
-                     from "post_locale" as "root_" left join "post" as "root_post" on "root_"."post_id" = "root_post"."id"
-                       left join "author" as "root_post_author" on "root_post"."author_id" = "root_post_author"."id"
+                     from "public"."post_locale" as "root_" left join "public"."post" as "root_post" on "root_"."post_id" = "root_post"."id"
+                       left join "public"."author" as "root_post_author" on "root_post"."author_id" = "root_post_author"."id"
                      order by "root_post_author"."name" asc, "root_"."id" desc`,
 						response: [{ root_id: testUuid(2) }],
 					},
@@ -1205,14 +1205,14 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
-                     from "post" as "root_"`,
+                     from "public"."post" as "root_"`,
 						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
 					},
 					{
 						sql: SQL`select
                        "root_"."post_id" as "__grouping_key",
                        "root_"."id" as "root_id"
-                     from "post_locale" as "root_"
+                     from "public"."post_locale" as "root_"
                      where "root_"."post_id" in ($1, $2)
                      order by "root_"."id" desc`,
 						parameters: [testUuid(1), testUuid(2)],
@@ -1289,7 +1289,7 @@ describe('Queries', () => {
                      "root_"."id" as "root_id",
                      "root_"."title" as "root_title",
                      "root_"."id" as "root_id"
-                   from "category" as "root_"`,
+                   from "public"."category" as "root_"`,
 					parameters: [],
 					response: [{ root_id: testUuid(1), root_title: 'Hello' }, { root_id: testUuid(2), root_title: 'World' }],
 				},
@@ -1301,12 +1301,12 @@ describe('Queries', () => {
              row_number()
              over( partition by "junction_"."category_id"
                order by "root_"."title" asc) as "rowNumber_"
-           from "post_categories" as "junction_" inner join "post" as "root_" on "junction_"."post_id" = "root_"."id"
+           from "public"."post_categories" as "junction_" inner join "public"."post" as "root_" on "junction_"."post_id" = "root_"."id"
            where "junction_"."category_id" in ($1, $2) and "root_"."locale" = $3
            order by "root_"."title" asc)
           select
             "data".*
-          from "data"
+          from "public"."data"
           where
             "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
 					parameters: [testUuid(1), testUuid(2), 'cs', 1, 3],
@@ -1322,7 +1322,7 @@ describe('Queries', () => {
                      "root_"."id" as "root_id",
                      "root_"."title" as "root_title",
                      "root_"."id" as "root_id"
-                   from "post" as "root_"
+                   from "public"."post" as "root_"
                    where "root_"."id" in ($1, $2, $3)`,
 					parameters: [testUuid(10), testUuid(11), testUuid(12)],
 					response: [
@@ -1403,7 +1403,7 @@ describe('Queries', () => {
                      "root_"."id" as "root_id",
                      "root_"."name" as "root_name",
                      "root_"."id" as "root_id"
-                   from "author" as "root_"`,
+                   from "public"."author" as "root_"`,
 					parameters: [],
 					response: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
 				},
@@ -1417,11 +1417,11 @@ describe('Queries', () => {
              over(
                partition by "root_"."author_id"
                order by "root_"."title" asc) as "rowNumber_"
-           from "post" as "root_"
+           from "public"."post" as "root_"
            where "root_"."locale" = $1 and "root_"."author_id" in ($2, $3)
            order by "root_"."title" asc)
           select "data".*
-          from "data"
+          from "public"."data"
           where "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
 					parameters: ['cs', testUuid(1), testUuid(2), 1, 3],
 					response: [
@@ -1481,7 +1481,7 @@ describe('Queries', () => {
 					sql: SQL`select
                      "root_"."id" as "root_id",
                      "root_"."name" as "root_name"
-                   from "author" as "root_"
+                   from "public"."author" as "root_"
                    order by "root_"."name" asc
                    limit $1
                    offset $2`,

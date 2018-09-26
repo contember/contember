@@ -75,7 +75,7 @@ class CompositionRoot {
 								password: project.dbCredentials.password,
 								database: project.dbCredentials.database,
 							},
-						})
+						}), project.slug
 					)
 				})
 				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
@@ -99,7 +99,7 @@ class CompositionRoot {
 							password: env.DB_PASSWORD,
 							database: env.DB_DATABASE,
 						},
-					})
+					}), 'tenant'
 				)
 			})
 			.addService('queryHandler', ({ knexConnection }) => {

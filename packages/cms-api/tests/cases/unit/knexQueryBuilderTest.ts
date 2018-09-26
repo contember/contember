@@ -21,7 +21,7 @@ const execute = async (test: Test) => {
 	})
 
 	mockKnex.mock(connection)
-	const wrapper = new KnexWrapper(connection)
+	const wrapper = new KnexWrapper(connection, 'public')
 
 	const tracker = mockKnex.getTracker()
 	tracker.install()
@@ -64,7 +64,7 @@ describe('knex query builder', () => {
 				await qb.getResult()
 			},
 			sql: SQL`select *
-               from "foo"
+               from "public"."foo"
                where "a" = $1 and "b" != $2 and "c" < $3 and "d" <= $4 and "e" > $5 and "f" >= $6 and "z" = "foo"."x" and "o" in ($7, $8, $9) and
                      "m" in (select $10) and "n" is null and false`,
 			parameters: [1, 2, 3, 4, 5, 6, 1, 2, 3, 1],
@@ -93,8 +93,8 @@ describe('knex query builder', () => {
 				await qb.getResult()
 			},
 			sql: SQL`select "foo"."id"
-               from "foo"
-                 inner join "bar" as "bar"
+               from "public"."foo"
+                 inner join "public"."bar" as "bar"
                    on ("bar"."a" = $1 or "bar"."a" = $2 or not("bar"."b" = $3)) and "bar"."c" in ($4, $5, $6) and "bar"."d" is null and not("bar"."d" is null)
                       and "bar"."e" <= "bar"."f"`,
 			parameters: [1, 2, 1, 1, 2, 3],
@@ -125,8 +125,8 @@ describe('knex query builder', () => {
 			},
 			sql: SQL`
 				with "root_" as (select $1 :: text as "title", $2 :: int as "id", $3 :: text as "content") 
-				insert into "author" ("id", "title") 
-					select "id", "title" from "root_"
+				insert into "public"."author" ("id", "title") 
+					select "id", "title" from "public"."root_"
         on conflict do nothing returning "id"`,
 			parameters: ['Hello', 1, null],
 		})
@@ -152,11 +152,11 @@ describe('knex query builder', () => {
 					})
 				await builder.execute()
 			},
-			sql: SQL`insert into "author" ("id", "title")
+			sql: SQL`insert into "public"."author" ("id", "title")
         select
           $1,
           "title"
-        from "foo"
+        from "public"."foo"
       on conflict ("id") do update set id = $2, title = "title" returning "id"`,
 			parameters: ['123', '123'],
 		})
@@ -185,8 +185,8 @@ describe('knex query builder', () => {
 			sql: SQL`with "root_" as (select
                                   $1 :: text as "title",
                                   $2 :: int as "id",
-                                  $3 :: text as "content") update "author"
-      set "id" = "root_"."id", "title" = "root_"."title" from "root_"`,
+                                  $3 :: text as "content") update "public"."author"
+      set "id" = "root_"."id", "title" = "root_"."title" from "public"."root_"`,
 			parameters: ['Hello', 1, null],
 		})
 	})
@@ -225,8 +225,8 @@ describe('knex query builder', () => {
 				await qb.execute()
 			},
 			sql: SQL`with "data" as 
-			(select * from "abc") 
-			delete from "bar" 
+			(select * from "public"."abc") 
+			delete from "public"."bar" 
 			using "data" as "data" 
 			where "data"."a" >= $1 returning "xyz"`,
 			parameters: [1],
@@ -273,8 +273,8 @@ describe('knex query builder', () => {
 			sql: SQL`with "data" as 
 			(select "foo"."bar", 
 				 row_number() over( partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_" 
-			 from "foo" order by "foo"."ipsum" asc) 
-			select "data".* from "data" where "data"."rowNumber_" > $1 and "data"."rowNumber_" <= $2`,
+			 from "public"."foo" order by "foo"."ipsum" asc) 
+			select "data".* from "public"."data" where "data"."rowNumber_" > $1 and "data"."rowNumber_" <= $2`,
 			parameters: [1, 4],
 		})
 	})

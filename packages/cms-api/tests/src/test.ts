@@ -68,8 +68,8 @@ export const execute = async (test: Test) => {
 			query.response([])
 			return
 		}
-		console.log(query.sql)
-		console.log(query.bindings)
+		// console.log(query.sql)
+		// console.log(query.bindings)
 		if (!queryDefinition) {
 			throw new Error(`Unexpected query #${step} '${query.sql}'`)
 		}
@@ -86,7 +86,7 @@ export const execute = async (test: Test) => {
 	})
 	try {
 		const response = await graphql(graphQLSchema, test.query, null, {
-			db: new KnexConnection(connection),
+			db: new KnexConnection(connection, 'public'),
 			identityVariables: test.variables || {},
 		})
 		// console.log(response)

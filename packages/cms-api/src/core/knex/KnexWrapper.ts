@@ -5,22 +5,22 @@ import InsertBuilder from './InsertBuilder'
 import DeleteBuilder from './DeleteBuilder'
 
 export default class KnexWrapper {
-	constructor(public readonly knex: Knex) {}
+	constructor(public readonly knex: Knex, private readonly schema: string) {}
 
 	async transaction<T>(transactionScope: (wrapper: KnexWrapper) => Promise<T> | void): Promise<T> {
-		return await this.knex.transaction(knex => transactionScope(new KnexWrapper(knex)))
+		return await this.knex.transaction(knex => transactionScope(new KnexWrapper(knex, this.schema)))
 	}
 
 	queryBuilder<R = { [columnName: string]: any }[]>(): QueryBuilder<R> {
-		return new QueryBuilder(this, this.knex.queryBuilder())
+		return new QueryBuilder(this, this.knex.queryBuilder(), this.schema)
 	}
 
 	insertBuilder(): InsertBuilder.NewInsertBuilder {
-		return InsertBuilder.create(this)
+		return InsertBuilder.create(this, this.schema)
 	}
 
 	deleteBuilder(): DeleteBuilder.NewDeleteBuilder {
-		return DeleteBuilder.create(this)
+		return DeleteBuilder.create(this, this.schema)
 	}
 
 	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw {

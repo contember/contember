@@ -2,17 +2,12 @@ import Path from './Path'
 
 class SelectHydrator {
 	private columns: Path[] = []
-	private entities: Path[] = []
 	private promises: {
 		path: Path
 		parentKeyPath: Path
 		data: PromiseLike<SelectHydrator.NestedData>
 		defaultValue: SelectHydrator.NestedDefaultValue
 	}[] = []
-
-	public addEntity(primaryPath: Path) {
-		this.entities.push(primaryPath)
-	}
 
 	public addColumn(path: Path) {
 		this.columns.push(path)
@@ -59,14 +54,6 @@ class SelectHydrator {
 
 	async hydrateRow(row: SelectHydrator.Row): Promise<SelectHydrator.ResultObject> {
 		const result: SelectHydrator.ResultObject = { _meta: {} }
-		for (let primaryPath of this.entities) {
-			if (row[primaryPath.getAlias()] === null) {
-				continue
-			}
-			primaryPath.path
-				.slice(0, primaryPath.path.length - 1)
-				.reduce((obj, part) => (obj[part] = obj[part] || { _meta: {} }), result)
-		}
 
 		for (let columnPath of this.columns) {
 			const path = [...columnPath.path]

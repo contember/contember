@@ -11,7 +11,7 @@ export default class KnexWrapper {
 		return await this.knex.transaction(knex => transactionScope(new KnexWrapper(knex)))
 	}
 
-	queryBuilder(): QueryBuilder {
+	queryBuilder<R = { [columnName: string]: any }[]>(): QueryBuilder<R> {
 		return new QueryBuilder(this, this.knex.queryBuilder())
 	}
 

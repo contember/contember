@@ -72,15 +72,9 @@ class SelectHydrator {
 			const path = [...columnPath.path]
 			const last: string = path.pop() as string
 			const currentObject = path.reduce((obj, part) => (obj && obj[part]) || undefined, result)
-			const readable = row[columnPath.getAlias() + SelectHydrator.ColumnFlagSuffixes.readable] !== false
-			const updatable = row[columnPath.getAlias() + SelectHydrator.ColumnFlagSuffixes.updatable]
 
 			if (currentObject) {
-				currentObject._meta[last] = {
-					readable,
-					updatable,
-				}
-				currentObject[last] = readable ? row[columnPath.getAlias()] : null
+				currentObject[last] = row[columnPath.getAlias()]
 			}
 		}
 		for (let { path, parentKeyPath, data, defaultValue } of this.promises) {

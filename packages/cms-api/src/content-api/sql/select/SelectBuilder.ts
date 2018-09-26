@@ -76,7 +76,7 @@ export default class SelectBuilder {
 
 	private async selectInternal(entity: Model.Entity, path: Path, input: ObjectNode) {
 		if (!input.fields.find(it => it.name === entity.primary && it.alias === entity.primary)) {
-			this.addColumn(path.for(entity.primaryColumn), entity.fields[entity.primary] as Model.AnyColumn)
+			this.addColumn(entity, path.for(entity.primaryColumn), entity.fields[entity.primary] as Model.AnyColumn)
 		}
 
 		const promises: Promise<void>[] = []
@@ -89,8 +89,7 @@ export default class SelectBuilder {
 				visitColumn: async (entity, column) => {
 					const columnPath = path.for(field.alias)
 
-					this.addMetaFlag(entity, column, columnPath, Acl.Operation.read)
-					this.addColumn(columnPath, column)
+					this.addColumn(entity, columnPath, column)
 				},
 				visitRelation: async (entity, relation, targetEntity) => {
 					await this.addRelation(field as ObjectNode, path, entity)
@@ -135,12 +134,32 @@ export default class SelectBuilder {
 		)
 	}
 
-	private addColumn(columnPath: Path, column: Model.AnyColumn): void {
+	private addColumn(entity: Model.Entity, columnPath: Path, column: Model.AnyColumn): void {
 		const tableAlias = columnPath.back().getAlias()
 		const columnAlias = columnPath.getAlias()
 
 		this.hydrator.addColumn(columnPath)
-		this.qb.select([tableAlias, column.columnName], columnAlias)
+
+		const fieldPredicate = entity.primary === column.name
+			? undefined
+			: this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
+
+		if (!fieldPredicate || Object.keys(fieldPredicate).length === 0) {
+			this.qb.select([tableAlias, column.columnName], columnAlias)
+
+		} else {
+			this.qb.select(expr => expr
+				.case(caseExpr => caseExpr
+					.when(
+						whenExpr => whenExpr.selectCondition(condition =>
+							this.whereBuilder.buildInternal(this.qb, condition, entity, columnPath.back(), fieldPredicate)
+						),
+						thenExpr => thenExpr.select([tableAlias, column.columnName])
+					)
+					.else(elseExpr => elseExpr.raw('null'))
+				), columnAlias)
+		}
+
 	}
 
 	private async addRelation(object: ObjectNode<Input.ListQueryInput>, path: Path, entity: Model.Entity) {

@@ -3,6 +3,7 @@ import ConditionBuilder from './ConditionBuilder'
 import { Value } from './types'
 import KnexWrapper from './KnexWrapper'
 import WindowFunction from './WindowFunction'
+import CaseStatement from "./CaseStatement";
 
 type AffectedRows = number
 type Returning = number | string
@@ -42,7 +43,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	public select(columnName: QueryBuilder.ColumnIdentifier, alias?: string): void
 	public select(callback: QueryBuilder.ColumnExpression, alias?: string): void
 	public select(expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression, alias?: string): void {
-		let raw = QueryBuilder.columnExpressionToRaw(this, expr)
+		let raw = QueryBuilder.columnExpressionToRaw(this.wrapper, expr)
 		if (raw === undefined) {
 			return
 		}
@@ -54,7 +55,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	public where(where: (QueryBuilder.ConditionCallback) | { [columName: string]: Value }): void {
 		if (typeof where === 'function') {
 			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
-			where(builder, this)
+			where(builder)
 			const sql = builder.getSql()
 			if (sql) {
 				this.qb.where(sql)
@@ -105,7 +106,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 			.map(
 				([key, value]): [string, Knex.Raw | undefined] => {
 					if (typeof value === 'function') {
-						return [key, value(new QueryBuilder.ColumnExpressionFactory(this))]
+						return [key, value(new QueryBuilder.ColumnExpressionFactory(this.wrapper))]
 					}
 					return [key, value]
 				}
@@ -164,7 +165,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 
 namespace QueryBuilder {
 	export type Callback = (qb: QueryBuilder) => void
-	export type ConditionCallback = (whereClause: ConditionBuilder, qb: QueryBuilder<any>) => void
+	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 
 	type ColumnFqn = string
 	type TableAliasAndColumn = [string, string]
@@ -182,42 +183,46 @@ namespace QueryBuilder {
 	}
 
 	export function columnExpressionToRaw(
-		qb: QueryBuilder<any>,
+		wrapper: KnexWrapper,
 		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression
 	): Knex.Raw | undefined {
 		if (typeof expr === 'function') {
-			return expr(new QueryBuilder.ColumnExpressionFactory(qb))
+			return expr(new QueryBuilder.ColumnExpressionFactory(wrapper))
 		} else if (typeof expr === 'string' || Array.isArray(expr)) {
-			return qb.raw('??', QueryBuilder.toFqn(expr))
+			return wrapper.raw('??', QueryBuilder.toFqn(expr))
 		}
 		return expr
 	}
 
 	export class ColumnExpressionFactory {
-		constructor(private readonly qb: QueryBuilder<any>) {}
+		constructor(private readonly wrapper: KnexWrapper) {}
 
 		public select(columnName: QueryBuilder.ColumnIdentifier): Knex.Raw {
 			const columnFqn = QueryBuilder.toFqn(columnName)
-			return this.qb.raw('??', columnFqn)
+			return this.wrapper.raw('??', columnFqn)
 		}
 
 		public selectValue(value: Value, type?: string): Knex.Raw {
 			const sql = '?' + (type ? ` :: ${type}` : '')
-			return this.qb.raw(sql, value)
+			return this.wrapper.raw(sql, value)
 		}
 
 		public selectCondition(condition: ConditionCallback): Knex.Raw | undefined {
-			const builder = new ConditionBuilder.ConditionStringBuilder(this.qb.wrapper)
-			condition(builder, this.qb)
+			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
+			condition(builder)
 			return builder.getSql() || undefined
 		}
 
 		public raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw {
-			return this.qb.raw(sql, ...bindings)
+			return this.wrapper.raw(sql, ...bindings)
 		}
 
 		public window(callback: (windowFunction: WindowFunction<false>) => WindowFunction<true>): Knex.Raw {
-			return callback(WindowFunction.createEmpty(this.qb)).buildRaw()
+			return callback(WindowFunction.createEmpty(this.wrapper)).buildRaw()
+		}
+
+		public case(callback: (caseStatement: CaseStatement) => CaseStatement): Knex.Raw {
+			return callback(CaseStatement.createEmpty(this.wrapper)).createExpression()
 		}
 	}
 

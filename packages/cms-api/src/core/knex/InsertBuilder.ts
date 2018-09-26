@@ -4,38 +4,49 @@ import * as Knex from 'knex'
 import { QueryResult } from 'pg'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>> {
-	private constructor(private readonly wrapper: KnexWrapper, private readonly options: InsertBuilder.Options) {}
+	private constructor(
+		private readonly wrapper: KnexWrapper,
+		private readonly options: InsertBuilder.Options,
+		private readonly schema: string,
+	) {}
 
-	public static create(wrapper: KnexWrapper): InsertBuilder.NewInsertBuilder {
-		return new InsertBuilder(wrapper, {
-			intoTable: undefined,
-			cte: {},
-			columns: undefined,
-			conflictAction: undefined,
-			returningColumn: undefined,
-			insertFrom: undefined,
-		}) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
+	public static create(wrapper: KnexWrapper, schema: string): InsertBuilder.NewInsertBuilder {
+		return new InsertBuilder(
+			wrapper,
+			{
+				intoTable: undefined,
+				cte: {},
+				columns: undefined,
+				conflictAction: undefined,
+				returningColumn: undefined,
+				insertFrom: undefined
+			},
+			schema
+		) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
 	}
 
 	public with(alias: string, callback: QueryBuilder.Callback): InsertBuilder.InsertBuilderState<Result, Filled> {
-		return new InsertBuilder<Result, Filled>(this.wrapper, {
-			...this.options,
-			cte: { ...this.options.cte, [alias]: callback },
-		}) as InsertBuilder.InsertBuilderState<Result, Filled>
+		return new InsertBuilder<Result, Filled>(
+			this.wrapper,
+			{ ...this.options, cte: { ...this.options.cte, [alias]: callback } },
+			this.schema
+		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
 	public into(intoTable: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {
-		return new InsertBuilder<Result, Filled | 'into'>(this.wrapper, {
-			...this.options,
-			intoTable,
-		}) as InsertBuilder.InsertBuilderState<Result, Filled | 'into'>
+		return new InsertBuilder<Result, Filled | 'into'>(
+			this.wrapper,
+			{...this.options, intoTable},
+			this.schema
+		) as InsertBuilder.InsertBuilderState<Result, Filled | 'into'>
 	}
 
 	public values(columns: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
-		return new InsertBuilder<Result, Filled | 'values'>(this.wrapper, {
-			...this.options,
-			columns,
-		}) as InsertBuilder.InsertBuilderState<Result, Filled | 'values'>
+		return new InsertBuilder<Result, Filled | 'values'>(
+			this.wrapper,
+			{ ...this.options, columns},
+			this.schema
+		) as InsertBuilder.InsertBuilderState<Result, Filled | 'values'>
 	}
 
 	public onConflict(
@@ -58,24 +69,27 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			throw Error()
 		}
 
-		return new InsertBuilder<Result, Filled>(this.wrapper, {
-			...this.options,
-			conflictAction,
-		}) as InsertBuilder.InsertBuilderState<Result, Filled>
+		return new InsertBuilder<Result, Filled>(
+			this.wrapper,
+			{ ...this.options, conflictAction },
+			this.schema
+		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
 	public returning(column: string | Knex.Raw): InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled> {
-		return new InsertBuilder<InsertBuilder.Returning[], Filled>(this.wrapper, {
-			...this.options,
-			returningColumn: column,
-		}) as InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled>
+		return new InsertBuilder<InsertBuilder.Returning[], Filled>(
+			this.wrapper,
+			{...this.options, returningColumn: column},
+			this.schema
+		) as InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled>
 	}
 
 	public from(from: QueryBuilder.Callback): InsertBuilder.InsertBuilderState<Result, Filled> {
-		return new InsertBuilder<Result, Filled>(this.wrapper, {
-			...this.options,
-			insertFrom: from,
-		}) as InsertBuilder.InsertBuilderState<Result, Filled>
+		return new InsertBuilder<Result, Filled>(
+			this.wrapper,
+			{ ...this.options, insertFrom: from },
+			this.schema
+		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
 	public createQuery(): Knex.Raw {
@@ -87,23 +101,21 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		}
 
 		const qb = this.wrapper.knex.queryBuilder()
-		Object.entries(this.options.cte).forEach(([alias, cb]) =>
-			qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb)))
-		)
+		Object.entries(this.options.cte).forEach(([alias, cb]) => qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb, this.schema))))
 
 		const insertFrom = this.options.insertFrom
 		if (insertFrom !== undefined) {
 			const columnNames = Object.keys(columns)
-			qb.into(this.wrapper.raw('?? (' + columnNames.map(() => '??').join(', ') + ')', into, ...columnNames))
+			qb.into(this.wrapper.raw('??.?? (' + columnNames.map(() => '??').join(', ') + ')', this.schema, into, ...columnNames))
 			qb.insert((qb: Knex.QueryBuilder) => {
-				const queryBuilder = new QueryBuilder(this.wrapper, qb)
+				const queryBuilder = new QueryBuilder(this.wrapper, qb, this.schema)
 				const values = Object.values(this.getColumnValues(queryBuilder, columns))
 				values.forEach(raw => queryBuilder.qb.select(raw))
 				insertFrom(queryBuilder)
 			})
 		} else {
-			qb.into(into)
-			qb.insert(this.getColumnValues(new QueryBuilder(this.wrapper, qb), columns))
+			qb.into(this.wrapper.raw('??.??', this.schema, into))
+			qb.insert(this.getColumnValues(new QueryBuilder(this.wrapper, qb, this.schema), columns))
 		}
 
 		const qbSql = qb.toSQL()
@@ -116,7 +128,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 					sql += ' on conflict do nothing'
 					break
 				case InsertBuilder.ConflictActionType.update:
-					const values = this.getColumnValues(new QueryBuilder(this.wrapper, qb), this.options.conflictAction.values)
+					const values = this.getColumnValues(new QueryBuilder(this.wrapper, qb, this.schema), this.options.conflictAction.values)
 					const updateExpr = Object.keys(values).join(' = ?, ') + ' = ?'
 					sql += ' on conflict (?) do update set ' + updateExpr
 					const indexExpr = this.wrapper.raw(
@@ -170,11 +182,11 @@ namespace InsertBuilder {
 	export type InsertResult = AffectedRows | Returning[]
 
 	export interface Options {
-		intoTable: string | undefined
-		cte: { [alias: string]: QueryBuilder.Callback }
-		columns: InsertBuilder.Values | undefined
-		conflictAction: InsertBuilder.ConflictAction | undefined
-		returningColumn: string | Knex.Raw | undefined
+		intoTable: string | undefined,
+		cte: { [alias: string]: QueryBuilder.Callback },
+		columns: InsertBuilder.Values | undefined,
+		conflictAction: InsertBuilder.ConflictAction | undefined,
+		returningColumn: string | Knex.Raw | undefined,
 		insertFrom: QueryBuilder.Callback | undefined
 	}
 

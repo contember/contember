@@ -6,6 +6,7 @@ import KnexWrapper from '../../../src/core/knex/KnexWrapper'
 import { SQL } from '../../src/tags'
 import InsertBuilder from '../../../src/core/knex/InsertBuilder'
 import ConditionBuilder from '../../../src/core/knex/ConditionBuilder'
+import LimitByGroupWrapper from '../../../src/core/knex/LimitByGroupWrapper'
 
 interface Test {
 	query: (wrapper: KnexWrapper) => void
@@ -229,6 +230,52 @@ describe('knex query builder', () => {
 			using "data" as "data" 
 			where "data"."a" >= $1 returning "xyz"`,
 			parameters: [1],
+		})
+	})
+
+	it('constructs window function', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper.queryBuilder()
+				qb.select(expr =>
+					expr.window(window =>
+						window
+							.orderBy(['foo', 'bar'], 'desc')
+							.rowNumber()
+							.partitionBy(['lorem', 'ipsum'])
+					)
+				)
+
+				await qb.getResult()
+			},
+			sql: SQL`select row_number()
+      over(
+        partition by "lorem"."ipsum"
+        order by "foo"."bar" desc)`,
+			parameters: [],
+		})
+	})
+
+	it('applies limit by group', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper.queryBuilder()
+				qb.select(['foo', 'bar'])
+				qb.from('foo')
+
+				await new LimitByGroupWrapper(
+					['foo', 'lorem'],
+					orderable => orderable.orderBy(['foo', 'ipsum']),
+					1,
+					3
+				).getResult(qb)
+			},
+			sql: SQL`with "data" as 
+			(select "foo"."bar", 
+				 row_number() over( partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_" 
+			 from "foo" order by "foo"."ipsum" asc) 
+			select "data".* from "data" where "data"."rowNumber_" > $1 and "data"."rowNumber_" <= $2`,
+			parameters: [1, 4],
 		})
 	})
 })

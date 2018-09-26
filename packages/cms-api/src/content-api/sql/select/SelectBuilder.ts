@@ -179,16 +179,6 @@ export default class SelectBuilder {
 		acceptRelationTypeVisitor(this.schema, entity, object.name, fetchVisitor)
 	}
 
-	private addHasOne(object: ObjectNode, path: Path, entity: Model.Entity, targetEntity: Model.Entity): void {
-		//not currently used, maybe in the future
-		const targetPath = path.for(object.alias)
-
-		const primaryPath = this.joinBuilder.join(this.qb, targetPath, entity, object.name)
-		this.hydrator.addEntity(primaryPath)
-
-		this.select(targetEntity, object, targetPath)
-	}
-
 	private async createRowsPromise(blocker: PromiseLike<void>): Promise<SelectHydrator.Rows> {
 		await blocker
 		if (this.queryWrapper) {

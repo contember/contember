@@ -1589,4 +1589,71 @@ describe('Queries', () => {
 			},
 		})
 	})
+
+
+	it('fragments', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Author', e => e
+					.column('name', c => c.type(Model.ColumnType.String))
+					.oneHasMany('posts', r => r.target('Post', e => e.column('title', c => c.type(Model.ColumnType.String))))
+				)
+				.buildSchema(),
+			query: GQL`
+				fragment PostData on Post {
+					id
+					title
+				}
+        fragment AuthorData on Author {
+					id
+					name
+        }
+        fragment AuthorPosts on Author {
+	        posts {
+		        ...PostData
+	        }
+        }
+				fragment AuthorWithPost on Author {
+					...AuthorData
+					...AuthorPosts
+				}
+        query {
+          listAuthor {
+	          ...AuthorWithPost
+          }
+        }`,
+			executes: sqlTransaction([
+				{
+					sql: SQL`select
+                     "root_"."id" as "root_id",
+                     "root_"."name" as "root_name",
+                     "root_"."id" as "root_id"
+                   from "public"."author" as "root_"`,
+					parameters: [],
+					response: [{ root_id: testUuid(1), root_name: 'John' }],
+				},
+				{
+					sql: SQL`select
+                     "root_"."author_id" as "__grouping_key",
+                     "root_"."id" as "root_id",
+                     "root_"."title" as "root_title"
+                   from "public"."post" as "root_"
+                   where "root_"."author_id" in ($1)`,
+					parameters: [testUuid(1)],
+					response: [],
+				},
+			]),
+			return: {
+				data: {
+					listAuthor: [
+						{
+							id: testUuid(1),
+							name: 'John',
+							posts: [],
+						},
+					],
+				},
+			},
+		})
+	})
 })

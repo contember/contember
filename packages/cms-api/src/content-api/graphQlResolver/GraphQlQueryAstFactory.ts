@@ -1,5 +1,6 @@
 import {
 	FieldNode as GraphQlFieldNode,
+	FragmentSpreadNode, GraphQLField,
 	GraphQLList,
 	GraphQLNonNull,
 	GraphQLObjectType,
@@ -55,22 +56,44 @@ export default class GraphQlQueryAstFactory {
 		node: GraphQlFieldNode
 	): ObjectNode | FieldNode {
 		const name = node.name.value
-		const field = parentType.getFields()[name]
-		const type = field.type
 		const alias = node.alias ? node.alias.value : name
 		if (!node.selectionSet) {
 			return new FieldNode(name, alias)
 		}
+		const field = parentType.getFields()[name]
+		const type = field.type
+		const resolvedType = this.resolveObjectType(type)
+
+		const fields: (FieldNode | ObjectNode)[] = this.processSelectionSet(info, resolvedType, node.selectionSet)
+
+		return new ObjectNode(name, alias, fields, getArgumentValues(field, node, info.variableValues))
+	}
+
+	private processSelectionSet(
+		info: GraphQLResolveInfo,
+		parentType: GraphQLObjectType,
+		selectionSet: SelectionSetNode
+	): (FieldNode | ObjectNode)[] {
 		const fields: (FieldNode | ObjectNode)[] = []
-		for (let subNode of node.selectionSet.selections) {
+		for (let subNode of selectionSet.selections) {
 			if (isIt<GraphQlFieldNode>(subNode, 'kind', 'Field')) {
-				fields.push(this.createFromNode(info, this.resolveObjectType(type), subNode))
+				fields.push(this.createFromNode(info, parentType, subNode))
+			} else if (isIt<FragmentSpreadNode>(subNode, 'kind', 'FragmentSpread')) {
+				const fragmentDefinition = info.fragments[subNode.name.value]
+				if (!fragmentDefinition) {
+					throw new Error(`Fragment definition ${subNode.name.value} not found`)
+				}
+				const typeName = fragmentDefinition.typeCondition.name.value
+				const subField = info.schema.getType(typeName)
+				if (!(subField instanceof GraphQLObjectType)) {
+					throw new Error()
+				}
+				fields.push(...this.processSelectionSet(info, subField as GraphQLObjectType, fragmentDefinition.selectionSet))
 			} else {
 				throw new Error('FragmentSpread and InlineFragment are not supported yet')
 			}
 		}
-
-		return new ObjectNode(name, alias, fields, getArgumentValues(field, node, info.variableValues))
+		return fields
 	}
 
 	private resolveObjectType(type: GraphQLOutputType): GraphQLObjectType {

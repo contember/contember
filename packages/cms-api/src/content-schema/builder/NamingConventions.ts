@@ -1,8 +1,6 @@
 interface NamingConventions {
 	getPrimaryField(): string
 
-	getPlural(name: string): string
-
 	getColumnName(fieldName: string): string
 
 	getTableName(entityName: string): string
@@ -25,10 +23,6 @@ namespace NamingConventions {
 	export class Default implements NamingConventions {
 		getPrimaryField(): string {
 			return 'id'
-		}
-
-		getPlural(name: string): string {
-			return name + 's'
 		}
 
 		getColumnName(fieldName: string): string {

@@ -39,7 +39,6 @@ export default class SchemaBuilderInternal {
 
 		this.entities[name] = {
 			name: name,
-			pluralName: options.pluralName || this.conventions.getPlural(name),
 			primary: primaryName,
 			primaryColumn: primaryField.options.columnName || this.conventions.getColumnName(primaryName),
 			unique: this.createUnique(options, fieldOptions),

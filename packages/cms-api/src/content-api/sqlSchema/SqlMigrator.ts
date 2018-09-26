@@ -81,7 +81,6 @@ export default class SqlMigrator {
 				this.updateEnum(modification)
 				break
 			case 'updateEntityName':
-			case 'updateEntityPluralName':
 			case 'updateFieldName':
 			case 'createRelationInverseSide':
 				break

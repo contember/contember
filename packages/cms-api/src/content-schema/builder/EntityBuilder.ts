@@ -23,10 +23,6 @@ class EntityBuilder {
 		this.addEntity = addEntity
 	}
 
-	pluralName(pluralName: string): EntityBuilder {
-		return new EntityBuilder({ ...this.options, pluralName }, this.fields, this.addEntity)
-	}
-
 	tableName(tableName: string): EntityBuilder {
 		return new EntityBuilder({ ...this.options, tableName }, this.fields, this.addEntity)
 	}
@@ -110,7 +106,6 @@ namespace EntityBuilder {
 	}
 
 	export type EntityOptions = {
-		pluralName?: string
 		primary?: string
 		tableName?: string
 		unique?: UniqueOptions[]

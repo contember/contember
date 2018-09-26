@@ -26,8 +26,8 @@ export default class QueryProvider {
 			return {}
 		}
 		return {
-			[entityName]: this.getByUniqueQuery(entityName),
-			[entity.pluralName]: this.getListQuery(entityName),
+			['get' + entityName]: this.getByUniqueQuery(entityName),
+			['list' + entityName]: this.getListQuery(entityName),
 		}
 	}
 

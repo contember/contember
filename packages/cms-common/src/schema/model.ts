@@ -3,7 +3,6 @@ import deepCopy from '../utils/deepCopy'
 namespace Model {
 	export interface Entity {
 		name: string
-		pluralName: string
 		primary: string
 		primaryColumn: string
 		tableName: string

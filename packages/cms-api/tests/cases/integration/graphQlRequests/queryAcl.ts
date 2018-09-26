@@ -51,7 +51,7 @@ describe('Queries with acl', () => {
 				},
 				query: GQL`
         query {
-          PostLocales {
+          listPostLocale {
             id
             title
 	          _meta {
@@ -87,7 +87,7 @@ describe('Queries with acl', () => {
 				],
 				return: {
 					data: {
-						PostLocales: [
+						listPostLocale: [
 							{
 								id: testUuid(1),
 								title: null,
@@ -121,7 +121,7 @@ describe('Queries with acl', () => {
 				},
 				query: GQL`
         query {
-          PostLocales(where: {title: {eq: "foo"}}) {
+          listPostLocale(where: {title: {eq: "foo"}}) {
             id
             title
           }
@@ -148,7 +148,7 @@ describe('Queries with acl', () => {
 				],
 				return: {
 					data: {
-						PostLocales: [
+						listPostLocale: [
 							{
 								id: testUuid(1),
 								title: 'foo',
@@ -168,7 +168,7 @@ describe('Queries with acl', () => {
 				},
 				query: GQL`
         query {
-          PostLocales {
+          listPostLocale {
             id
           }
         }`,
@@ -189,7 +189,7 @@ describe('Queries with acl', () => {
 				],
 				return: {
 					data: {
-						PostLocales: [
+						listPostLocale: [
 							{
 								id: testUuid(1),
 							},
@@ -206,7 +206,7 @@ describe('Queries with acl', () => {
 				variables: {},
 				query: GQL`
         query {
-          PostLocales {
+          listPostLocale {
             id
             title
           }
@@ -226,7 +226,7 @@ describe('Queries with acl', () => {
 				],
 				return: {
 					data: {
-						PostLocales: [],
+						listPostLocale: [],
 					},
 				},
 			})
@@ -241,7 +241,7 @@ describe('Queries with acl', () => {
 				},
 				query: GQL`
         query {
-          Posts {
+          listPost {
             locales {
               id
               title
@@ -293,7 +293,7 @@ describe('Queries with acl', () => {
 				],
 				return: {
 					data: {
-						Posts: [
+						listPost: [
 							{
 								locales: [
 									{
@@ -377,7 +377,7 @@ describe('Queries with acl', () => {
 				},
 				query: GQL`
         query {
-          Posts {
+          listPost {
             id
             author {
               name
@@ -425,7 +425,7 @@ describe('Queries with acl', () => {
 				],
 				return: {
 					data: {
-						Posts: [
+						listPost: [
 							{
 								author: {
 									name: 'John',

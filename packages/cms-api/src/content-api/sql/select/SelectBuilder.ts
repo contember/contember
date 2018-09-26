@@ -126,6 +126,9 @@ export default class SelectBuilder {
 			expr =>
 				expr.selectCondition(condition => {
 					this.whereBuilder.buildInternal(this.qb, condition, entity, tablePath, fieldPredicate)
+					if (condition.isEmpty()) {
+						condition.raw('true')
+					}
 				}),
 			metaPath.getAlias()
 		)

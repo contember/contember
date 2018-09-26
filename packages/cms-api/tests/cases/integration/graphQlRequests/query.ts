@@ -137,11 +137,12 @@ describe('Queries', () => {
             }
           }
         }
-      `,
+			`,
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."id" as "root_id",
+						sql: SQL`select
+                       "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "post" as "root_"`,
 						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
@@ -221,7 +222,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."author_id" as "root_author"
               from "post" as "root_"
-          `,
+						`,
 						response: [
 							{
 								root_id: testUuid(1),
@@ -241,7 +242,7 @@ describe('Queries', () => {
                 "root_"."name" as "root_name"
               from "author" as "root_"
               where "root_"."id" in ($1, $2)
-          `,
+						`,
 						parameters: [testUuid(2), testUuid(4)],
 						response: [
 							{
@@ -303,11 +304,11 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`
-                select
-                  "root_"."id" as "root_id",
-                  "root_"."name" as "root_name",
-                  "root_"."setting_id" as "root_setting"
-                from "site" as "root_"`,
+              select
+                "root_"."id" as "root_id",
+                "root_"."name" as "root_name",
+                "root_"."setting_id" as "root_setting"
+              from "site" as "root_"`,
 
 						response: [
 							{
@@ -324,13 +325,13 @@ describe('Queries', () => {
 					},
 					{
 						sql: SQL`
-                select
-                  "root_"."id" as "root_id",
-                  "root_"."id" as "root_id",
-                  "root_"."url" as "root_url"
-                from "site_setting" as "root_"
-                where "root_"."id" in ($1, $2)
-              `,
+              select
+                "root_"."id" as "root_id",
+                "root_"."id" as "root_id",
+                "root_"."url" as "root_url"
+              from "site_setting" as "root_"
+              where "root_"."id" in ($1, $2)
+						`,
 						parameters: [testUuid(2), testUuid(4)],
 						response: [
 							{
@@ -490,7 +491,7 @@ describe('Queries', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select 
+						sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "post" as "root_"`,
@@ -504,10 +505,11 @@ describe('Queries', () => {
 						],
 					},
 					{
-						sql: SQL`select "category_id",
-                       "post_id"
-                     from "post_categories"
-                     where "post_categories"."post_id" in ($1, $2)`,
+						sql: SQL`select
+                       "junction_"."category_id",
+                       "junction_"."post_id"
+                     from "post_categories" as "junction_"
+                     where "junction_"."post_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
 							{
@@ -560,7 +562,7 @@ describe('Queries', () => {
                 "root_"."name" as "root_name"
               from "category_locale" as "root_"
               where "root_"."locale" = $1 and "root_"."category_id" in ($2, $3, $4)
-          `,
+						`,
 						parameters: ['cs', testUuid(3), testUuid(4), testUuid(5)],
 						response: [
 							{
@@ -682,10 +684,10 @@ describe('Queries', () => {
 					},
 					{
 						sql: SQL`select
-                       "category_id",
-                       "post_id"
-                     from "post_categories"
-                     where "post_categories"."category_id" in ($1, $2)`,
+                       "junction_"."category_id",
+                       "junction_"."post_id"
+                     from "post_categories" as "junction_"
+                     where "junction_"."category_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: [
 							{
@@ -713,7 +715,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id"
                      from "post" as "root_"
                      where "root_"."id" in ($1, $2, $3)
-          `,
+						`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
 						response: [
 							{
@@ -737,7 +739,7 @@ describe('Queries', () => {
                        "root_"."name" as "root_name"
                      from "author" as "root_"
                      where "root_"."id" in ($1, $2)
-          `,
+						`,
 						parameters: [testUuid(6), testUuid(7)],
 						response: [
 							{
@@ -1016,11 +1018,12 @@ describe('Queries', () => {
             }
           }
         }
-      `,
+			`,
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."id" as "root_id",
+						sql: SQL`select
+                       "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "post" as "root_"`,
 						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
@@ -1191,9 +1194,9 @@ describe('Queries', () => {
         query {
           Posts {
             id
-	          locales(orderBy: {id: desc}) {
-		          id
-	          }
+            locales(orderBy: {id: desc}) {
+              id
+            }
           }
         }`,
 			executes: [
@@ -1246,6 +1249,256 @@ describe('Queries', () => {
 									id: '123e4567-e89b-12d3-a456-000000000005',
 								},
 							],
+						},
+					],
+				},
+			},
+		})
+	})
+
+	it('many has many with where, limit and orderBy', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', e =>
+					e
+						.column('title', c => c.type(Model.ColumnType.String))
+						.column('locale', c => c.type(Model.ColumnType.String))
+						.manyHasMany('categories', r =>
+							r
+								.target('Category', e =>
+									e.pluralName('Categories').column('title', c => c.type(Model.ColumnType.String))
+								)
+								.inversedBy('posts')
+						)
+				)
+				.buildSchema(),
+			query: GQL`
+        query {
+          Categories {
+            id
+            title
+            posts(where: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
+              id
+              title
+            }
+          }
+        }`,
+			executes: sqlTransaction([
+				{
+					sql: SQL`select
+                     "root_"."id" as "root_id",
+                     "root_"."title" as "root_title",
+                     "root_"."id" as "root_id"
+                   from "category" as "root_"`,
+					parameters: [],
+					response: [{ root_id: testUuid(1), root_title: 'Hello' }, { root_id: testUuid(2), root_title: 'World' }],
+				},
+				{
+					sql: SQL`with "data" as
+          (select
+             "junction_"."category_id",
+             "junction_"."post_id",
+             row_number()
+             over( partition by "junction_"."category_id"
+               order by "root_"."title" asc) as "rowNumber_"
+           from "post_categories" as "junction_" inner join "post" as "root_" on "junction_"."post_id" = "root_"."id"
+           where "junction_"."category_id" in ($1, $2) and "root_"."locale" = $3
+           order by "root_"."title" asc)
+          select
+            "data".*
+          from "data"
+          where
+            "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
+					parameters: [testUuid(1), testUuid(2), 'cs', 1, 3],
+					response: [
+						{ category_id: testUuid(1), post_id: testUuid(10) },
+						{ category_id: testUuid(1), post_id: testUuid(11) },
+						{ category_id: testUuid(2), post_id: testUuid(10) },
+						{ category_id: testUuid(2), post_id: testUuid(12) },
+					],
+				},
+				{
+					sql: SQL`select
+                     "root_"."id" as "root_id",
+                     "root_"."title" as "root_title",
+                     "root_"."id" as "root_id"
+                   from "post" as "root_"
+                   where "root_"."id" in ($1, $2, $3)`,
+					parameters: [testUuid(10), testUuid(11), testUuid(12)],
+					response: [
+						{ root_id: testUuid(12), root_title: 'A' },
+						{ root_id: testUuid(11), root_title: 'B' },
+						{ root_id: testUuid(10), root_title: 'C' },
+					],
+				},
+			]),
+			return: {
+				data: {
+					Categories: [
+						{
+							id: testUuid(1),
+							posts: [
+								{
+									id: testUuid(10),
+									title: 'C',
+								},
+								{
+									id: testUuid(11),
+									title: 'B',
+								},
+							],
+							title: 'Hello',
+						},
+						{
+							id: testUuid(2),
+							posts: [
+								{
+									id: testUuid(10),
+									title: 'C',
+								},
+								{
+									id: testUuid(12),
+									title: 'A',
+								},
+							],
+							title: 'World',
+						},
+					],
+				},
+			},
+		})
+	})
+
+	it('one has many with where, limit and orderBy', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Author', e =>
+					e
+						.column('name', c => c.type(Model.ColumnType.String))
+						.oneHasMany('posts', r =>
+							r
+								.target('Post', e =>
+									e
+										.column('title', c => c.type(Model.ColumnType.String))
+										.column('locale', c => c.type(Model.ColumnType.String))
+								)
+								.ownedBy('author')
+						)
+				)
+				.buildSchema(),
+			query: GQL`
+        query {
+          Authors {
+            id
+            name
+            posts(where: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
+              id
+              title
+            }
+          }
+        }`,
+			executes: sqlTransaction([
+				{
+					sql: SQL`select
+                     "root_"."id" as "root_id",
+                     "root_"."name" as "root_name",
+                     "root_"."id" as "root_id"
+                   from "author" as "root_"`,
+					parameters: [],
+					response: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+				},
+				{
+					sql: SQL`with "data" as
+          (select
+             "root_"."author_id" as "__grouping_key",
+             "root_"."id" as "root_id",
+             "root_"."title" as "root_title",
+             row_number()
+             over(
+               partition by "root_"."author_id"
+               order by "root_"."title" asc) as "rowNumber_"
+           from "post" as "root_"
+           where "root_"."locale" = $1 and "root_"."author_id" in ($2, $3)
+           order by "root_"."title" asc)
+          select "data".*
+          from "data"
+          where "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
+					parameters: ['cs', testUuid(1), testUuid(2), 1, 3],
+					response: [
+						{ __grouping_key: testUuid(1), root_id: testUuid(10), root_title: 'A' },
+						{ __grouping_key: testUuid(1), root_id: testUuid(11), root_title: 'B' },
+						{ __grouping_key: testUuid(2), root_id: testUuid(12), root_title: 'C' },
+					],
+				},
+			]),
+			return: {
+				data: {
+					Authors: [
+						{
+							id: testUuid(1),
+							posts: [
+								{
+									id: testUuid(10),
+									title: 'A',
+								},
+								{
+									id: testUuid(11),
+									title: 'B',
+								},
+							],
+							name: 'John',
+						},
+						{
+							id: testUuid(2),
+							posts: [
+								{
+									id: testUuid(12),
+									title: 'C',
+								},
+							],
+							name: 'Jack',
+						},
+					],
+				},
+			},
+		})
+	})
+
+	it('root limit and order', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        query {
+          Authors(orderBy: [{name: asc}], offset: 2, limit: 3) {
+            id
+            name
+          }
+        }`,
+			executes: sqlTransaction([
+				{
+					sql: SQL`select
+                     "root_"."id" as "root_id",
+                     "root_"."name" as "root_name"
+                   from "author" as "root_"
+                   order by "root_"."name" asc
+                   limit $1
+                   offset $2`,
+					parameters: [3, 2],
+					response: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+				},
+			]),
+			return: {
+				data: {
+					Authors: [
+						{
+							id: testUuid(1),
+							name: 'John',
+						},
+						{
+							id: testUuid(2),
+							name: 'Jack',
 						},
 					],
 				},

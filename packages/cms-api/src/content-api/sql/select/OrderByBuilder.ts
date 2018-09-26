@@ -7,11 +7,23 @@ import { getColumnName, getTargetEntity } from '../../../content-schema/modelUti
 class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}
 
-	public build(qb: QueryBuilder, entity: Model.Entity, path: Path, orderBy: Input.OrderBy[]): void {
-		orderBy.forEach(fieldOrderBy => this.buildOne(qb, entity, path, fieldOrderBy))
+	public build(
+		qb: QueryBuilder,
+		orderable: QueryBuilder.Orderable,
+		entity: Model.Entity,
+		path: Path,
+		orderBy: Input.OrderBy[]
+	): void {
+		orderBy.forEach(fieldOrderBy => this.buildOne(qb, orderable, entity, path, fieldOrderBy))
 	}
 
-	private buildOne(qb: QueryBuilder, entity: Model.Entity, path: Path, orderBy: Input.FieldOrderBy) {
+	private buildOne(
+		qb: QueryBuilder,
+		orderable: QueryBuilder.Orderable,
+		entity: Model.Entity,
+		path: Path,
+		orderBy: Input.FieldOrderBy
+	) {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
 			throw new Error()
@@ -20,7 +32,7 @@ class OrderByBuilder {
 
 		if (typeof value === 'string') {
 			const columnName = getColumnName(this.schema, entity, fieldName)
-			qb.orderBy([path.getAlias(), columnName], value as Input.OrderDirection)
+			orderable.orderBy([path.getAlias(), columnName], value as Input.OrderDirection)
 		} else {
 			const targetEntity = getTargetEntity(this.schema, entity, fieldName)
 			if (!targetEntity) {
@@ -28,7 +40,7 @@ class OrderByBuilder {
 			}
 			const newPath = path.for(fieldName)
 			this.joinBuilder.join(qb, newPath, entity, fieldName)
-			this.buildOne(qb, targetEntity, newPath, value)
+			this.buildOne(qb, orderable, targetEntity, newPath, value)
 		}
 	}
 }

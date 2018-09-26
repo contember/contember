@@ -16,7 +16,11 @@ class PredicatesInjector {
 	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {
 		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames)
 
-		return { and: [where, predicatesWhere].filter(it => Object.keys(it).length > 0) }
+		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
+		if (and.length === 0) {
+			return {}
+		}
+		return { and: and }
 	}
 
 	private injectToWhere(where: Input.Where, entity: Model.Entity): Input.Where {

@@ -3,20 +3,18 @@ import ObjectNode from '../../graphQlResolver/ObjectNode'
 import SelectHydrator from './SelectHydrator'
 import Mapper from '../Mapper'
 import FieldNode from '../../graphQlResolver/FieldNode'
+import JunctionFetcher from './JunctionFetcher'
+import KnexWrapper from '../../../core/knex/KnexWrapper'
 
-type JoiningColumns = { sourceColumn: Model.JoiningColumn; targetColumn: Model.JoiningColumn }
-
-export default class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
+class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 	constructor(
 		private readonly schema: Model.Schema,
+		private readonly junctionFetcher: JunctionFetcher,
 		private readonly mapper: Mapper,
+		private readonly db: KnexWrapper,
 		private readonly parentIdsGetter: (fieldName: string) => PromiseLike<Input.PrimaryValue[]>,
 		private readonly object: ObjectNode<Input.ListQueryInput>,
-		private readonly dataCallback: (
-			parentKey: string,
-			data: Promise<SelectHydrator.NestedData>,
-			defaultValue: SelectHydrator.NestedDefaultValue
-		) => void
+		private readonly dataCallback: RelationFetchVisitor.DataCallback
 	) {}
 
 	public visitManyHasManyInversed(
@@ -26,7 +24,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 		targetRelation: Model.ManyHasManyOwnerRelation
 	): void {
 		const joiningTable = targetRelation.joiningTable
-		const columns: JoiningColumns = {
+		const columns: Mapper.JoiningColumns = {
 			sourceColumn: joiningTable.inverseJoiningColumn,
 			targetColumn: joiningTable.joiningColumn,
 		}
@@ -41,7 +39,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 		targetRelation: Model.ManyHasManyInversedRelation | null
 	): void {
 		const joiningTable = relation.joiningTable
-		const columns: JoiningColumns = {
+		const columns: Mapper.JoiningColumns = {
 			sourceColumn: joiningTable.joiningColumn,
 			targetColumn: joiningTable.inverseJoiningColumn,
 		}
@@ -72,7 +70,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 					}
 				)
 
-				return this.mapper.selectGrouped(targetEntity, objectNode, targetRelation.joiningColumn.columnName)
+				return this.mapper.selectGrouped(targetEntity, objectNode, targetRelation)
 			})(),
 			[]
 		)
@@ -82,10 +80,17 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 		entity: Model.Entity,
 		targetEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		joiningColumns: JoiningColumns
+		joiningColumns: Mapper.JoiningColumns
 	): Promise<SelectHydrator.GroupedObjects> {
 		const ids = await this.parentIdsGetter(entity.primary)
-		const junctionValues = await this.mapper.fetchJunction(relation, ids, joiningColumns.sourceColumn)
+		const junctionValues = await this.junctionFetcher.fetchJunction(
+			this.db,
+			relation,
+			ids,
+			joiningColumns,
+			targetEntity,
+			this.object
+		)
 
 		const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary)
 		const inversedJoiningColumn = joiningColumns.targetColumn.columnName
@@ -100,11 +105,8 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 			objectNode.alias,
 			[...objectNode.fields, primaryField],
 			{
-				...objectNode.args,
 				where: {
-					and: [objectNode.args.where, { [targetEntity.primary]: { in: inversedIds } }].filter(
-						(it): it is Input.Where => it !== undefined
-					),
+					[targetEntity.primary]: { in: inversedIds },
 				},
 			}
 		)
@@ -115,7 +117,7 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 
 	private buildManyHasManyGroups(
 		entity: Model.Entity,
-		joiningColumns: JoiningColumns,
+		joiningColumns: Mapper.JoiningColumns,
 		resultObjects: SelectHydrator.ResultObjects,
 		junctionValues: SelectHydrator.Rows
 	): SelectHydrator.GroupedObjects {
@@ -218,3 +220,13 @@ export default class RelationFetchVisitor implements Model.RelationByTypeVisitor
 		)
 	}
 }
+
+namespace RelationFetchVisitor {
+	export type DataCallback = (
+		parentKey: string,
+		data: Promise<SelectHydrator.NestedData>,
+		defaultValue: SelectHydrator.NestedDefaultValue
+	) => void
+}
+
+export default RelationFetchVisitor

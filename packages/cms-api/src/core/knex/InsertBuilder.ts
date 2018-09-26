@@ -6,59 +6,41 @@ import { QueryResult } from 'pg'
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>> {
 	private constructor(
 		private readonly wrapper: KnexWrapper,
-		private readonly intoTable: string | undefined,
-		private readonly cte: { [alias: string]: QueryBuilder.Callback },
-		private readonly columns: InsertBuilder.Values | undefined,
-		private readonly conflictAction: InsertBuilder.ConflictAction | undefined,
-		private readonly returningColumn: string | Knex.Raw | undefined,
-		private readonly insertFrom: QueryBuilder.Callback | undefined
+		private readonly options: InsertBuilder.Options,
 	) {}
 
 	public static create(wrapper: KnexWrapper): InsertBuilder.NewInsertBuilder {
 		return new InsertBuilder(
 			wrapper,
-			undefined,
-			{},
-			undefined,
-			undefined,
-			undefined,
-			undefined
+			{
+				intoTable: undefined,
+				cte: {},
+				columns: undefined,
+				conflictAction: undefined,
+				returningColumn: undefined,
+				insertFrom: undefined
+			}
 		) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
 	}
 
 	public with(alias: string, callback: QueryBuilder.Callback): InsertBuilder.InsertBuilderState<Result, Filled> {
 		return new InsertBuilder<Result, Filled>(
 			this.wrapper,
-			this.intoTable,
-			{ ...this.cte, [alias]: callback },
-			this.columns,
-			this.conflictAction,
-			this.returningColumn,
-			this.insertFrom
+			{ ...this.options, cte: { ...this.options.cte, [alias]: callback } }
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
-	public into(tableName: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {
+	public into(intoTable: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {
 		return new InsertBuilder<Result, Filled | 'into'>(
 			this.wrapper,
-			tableName,
-			this.cte,
-			this.columns,
-			this.conflictAction,
-			this.returningColumn,
-			this.insertFrom
+			{...this.options, intoTable}
 		) as InsertBuilder.InsertBuilderState<Result, Filled | 'into'>
 	}
 
 	public values(columns: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
 		return new InsertBuilder<Result, Filled | 'values'>(
 			this.wrapper,
-			this.intoTable,
-			this.cte,
-			columns,
-			this.conflictAction,
-			this.returningColumn,
-			this.insertFrom
+			{ ...this.options, columns}
 		) as InsertBuilder.InsertBuilderState<Result, Filled | 'values'>
 	}
 
@@ -84,51 +66,36 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 
 		return new InsertBuilder<Result, Filled>(
 			this.wrapper,
-			this.intoTable,
-			this.cte,
-			this.columns,
-			conflictAction,
-			this.returningColumn,
-			this.insertFrom
+			{ ...this.options, conflictAction }
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
 	public returning(column: string | Knex.Raw): InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled> {
 		return new InsertBuilder<InsertBuilder.Returning[], Filled>(
 			this.wrapper,
-			this.intoTable,
-			this.cte,
-			this.columns,
-			this.conflictAction,
-			column,
-			this.insertFrom
+			{...this.options, returningColumn: column}
 		) as InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled>
 	}
 
 	public from(from: QueryBuilder.Callback): InsertBuilder.InsertBuilderState<Result, Filled> {
 		return new InsertBuilder<Result, Filled>(
 			this.wrapper,
-			this.intoTable,
-			this.cte,
-			this.columns,
-			this.conflictAction,
-			this.returningColumn,
-			from
+			{ ...this.options, insertFrom: from }
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
 	public createQuery(): Knex.Raw {
-		const columns = this.columns
-		const into = this.intoTable
+		const columns = this.options.columns
+		const into = this.options.intoTable
 
 		if (into === undefined || columns === undefined) {
 			throw Error()
 		}
 
 		const qb = this.wrapper.knex.queryBuilder()
-		Object.entries(this.cte).forEach(([alias, cb]) => qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb))))
+		Object.entries(this.options.cte).forEach(([alias, cb]) => qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb))))
 
-		const insertFrom = this.insertFrom
+		const insertFrom = this.options.insertFrom
 		if (insertFrom !== undefined) {
 			const columnNames = Object.keys(columns)
 			qb.into(this.wrapper.raw('?? (' + columnNames.map(() => '??').join(', ') + ')', into, ...columnNames))
@@ -147,18 +114,18 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		let sql: string = qbSql.sql
 		let bindings = qbSql.bindings
 
-		if (this.conflictAction) {
-			switch (this.conflictAction.type) {
+		if (this.options.conflictAction) {
+			switch (this.options.conflictAction.type) {
 				case InsertBuilder.ConflictActionType.doNothing:
 					sql += ' on conflict do nothing'
 					break
 				case InsertBuilder.ConflictActionType.update:
-					const values = this.getColumnValues(new QueryBuilder(this.wrapper, qb), this.conflictAction.values)
+					const values = this.getColumnValues(new QueryBuilder(this.wrapper, qb), this.options.conflictAction.values)
 					const updateExpr = Object.keys(values).join(' = ?, ') + ' = ?'
 					sql += ' on conflict (?) do update set ' + updateExpr
 					const indexExpr = this.wrapper.raw(
-						this.conflictAction.target.map(() => '??').join(', '),
-						...this.conflictAction.target
+						this.options.conflictAction.target.map(() => '??').join(', '),
+						...this.options.conflictAction.target
 					)
 					bindings.push(indexExpr)
 					bindings.push(...Object.values(values))
@@ -167,9 +134,9 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 					throw Error()
 			}
 		}
-		if (this.returningColumn) {
+		if (this.options.returningColumn) {
 			sql += ' returning ??'
-			bindings.push(this.returningColumn)
+			bindings.push(this.options.returningColumn)
 		}
 
 		return this.wrapper.raw(sql, ...qbSql.bindings)
@@ -178,7 +145,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	public async execute(): Promise<Result> {
 		const result: QueryResult = await this.createQuery()
 
-		const returningColumn = this.returningColumn
+		const returningColumn = this.options.returningColumn
 		if (returningColumn) {
 			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]) : result) as Result
 		} else {
@@ -205,6 +172,15 @@ namespace InsertBuilder {
 	export type AffectedRows = number
 	export type Returning = number | string
 	export type InsertResult = AffectedRows | Returning[]
+
+	export interface Options {
+		intoTable: string | undefined,
+		cte: { [alias: string]: QueryBuilder.Callback },
+		columns: InsertBuilder.Values | undefined,
+		conflictAction: InsertBuilder.ConflictAction | undefined,
+		returningColumn: string | Knex.Raw | undefined,
+		insertFrom: QueryBuilder.Callback | undefined
+	}
 
 	export type InsertBuilderWithoutExecute<
 		Result extends InsertResult,

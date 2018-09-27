@@ -48,7 +48,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 
 		return {
 			name: fieldName,
-			inversedBy: options.inversedBy,
+			...(typeof options.inversedBy === 'undefined' ? {} : { inversedBy: options.inversedBy }),
 			nullable: options.nullable === undefined ? true : options.nullable,
 			type: Model.RelationType.OneHasOne,
 			target: options.target,

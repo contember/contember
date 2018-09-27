@@ -17,7 +17,8 @@
 	"bin": {
 		"migrations-create": "dist/src/bin/migrations-create.js",
 		"migrations-continue": "dist/src/bin/migrations-continue.js",
-		"migrations-clear": "dist/src/bin/migrations-clear.js"
+		"migrations-clear": "dist/src/bin/migrations-clear.js",
+		"migrations-generate": "dist/src/bin/migrations-generate.js"
 	},
 	"dependencies": {
 		"apollo-server-express": "^2.0.0",

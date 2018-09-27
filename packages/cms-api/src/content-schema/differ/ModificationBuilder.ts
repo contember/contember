@@ -9,10 +9,11 @@ export default class ModificationBuilder {
 
 	constructor(private readonly originalSchema: Model.Schema, private readonly updatedSchema: Model.Schema) {}
 
-	public getDiff(): SchemaDiff {
-		return {
+	public getDiff(): SchemaDiff | null {
+		const diff = {
 			modifications: [...this.entities, ...this.modifications],
 		}
+		return diff.modifications.length > 0 ? diff : null
 	}
 
 	public createEntity(updatedEntity: Model.Entity) {

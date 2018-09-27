@@ -6,7 +6,7 @@ import SchemaMigrator from './SchemaMigrator'
 import { SchemaDiff } from './modifications'
 import ModificationBuilder from './ModificationBuilder'
 
-export default function diffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema): SchemaDiff {
+export default function diffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema): SchemaDiff | null {
 	const builder = new ModificationBuilder(originalSchema, updatedSchema)
 
 	const originalEnums = new Set(Object.keys(originalSchema.enums))
@@ -83,6 +83,8 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 						},
 						visitRelation: ({}, originalRelation: Model.AnyRelation, {}, _) => {
 							if (!deepEqual(updatedRelation, originalRelation)) {
+								console.log(originalRelation)
+								console.log(updatedRelation)
 								builder.removeField(entityName, fieldName)
 								builder.createField(updatedEntity, fieldName)
 							}
@@ -125,7 +127,8 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 
 	const diff = builder.getDiff()
 
-	if (!deepEqual(updatedSchema, SchemaMigrator.applyDiff(originalSchema, diff))) {
+	const appliedDiff = diff === null ? updatedSchema : SchemaMigrator.applyDiff(originalSchema, diff)
+	if (!deepEqual(updatedSchema, appliedDiff)) {
 		throw new ImplementationException('Updated schema cannot be recreated by the generated diff!')
 	}
 

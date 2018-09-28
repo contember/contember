@@ -7,12 +7,12 @@ import DataContext, { DataContextValue } from './DataContext'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
 
-export interface OneToOneProps {
+export interface ToOneProps {
 	field: FieldName
 	children: React.ReactNode | ((unlink?: () => void) => React.ReactNode)
 }
 
-export default class OneToOne extends React.Component<OneToOneProps> {
+export default class ToOne extends React.Component<ToOneProps> {
 	static displayName = 'OneToOne'
 
 	public render() {
@@ -31,9 +31,9 @@ export default class OneToOne extends React.Component<OneToOneProps> {
 		)
 	}
 
-	public static generateReferenceMarker(props: OneToOneProps, referredEntity: EntityMarker): ReferenceMarker {
+	public static generateReferenceMarker(props: ToOneProps, referredEntity: EntityMarker): ReferenceMarker {
 		return new ReferenceMarker(props.field, ExpectedCount.One, referredEntity)
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof OneToOne, ReferenceMarkerProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof ToOne, ReferenceMarkerProvider>

@@ -1,11 +1,11 @@
 import * as React from 'react'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from '../coreComponents/MarkerProvider'
-import OneToMany, { OneToManyProps } from '../coreComponents/OneToMany'
+import ToMany, { ToManyProps } from '../coreComponents/ToMany'
 import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker from '../dao/ReferenceMarker'
 
-export interface RepeaterProps extends OneToManyProps {}
+export interface RepeaterProps extends ToManyProps {}
 
 export default class Repeater extends React.Component<RepeaterProps> {
 	static displayName = 'Repeater'
@@ -13,15 +13,15 @@ export default class Repeater extends React.Component<RepeaterProps> {
 	public render() {
 		return (
 			<ul>
-				<OneToMany {...this.props}>
+				<ToMany {...this.props}>
 					<li>{this.props.children}</li>
-				</OneToMany>
+				</ToMany>
 			</ul>
 		)
 	}
 
 	public static generateReferenceMarker(props: RepeaterProps, referredEntity: EntityMarker): ReferenceMarker {
-		return OneToMany.generateReferenceMarker(props, referredEntity)
+		return ToMany.generateReferenceMarker(props, referredEntity)
 	}
 }
 

@@ -9,7 +9,7 @@ import Entity from '../coreComponents/Entity'
 import EntityListDataProvider from '../coreComponents/EntityListDataProvider'
 import Field from '../coreComponents/Field'
 import { SyntheticChildrenProvider } from '../coreComponents/MarkerProvider'
-import OneToOne from '../coreComponents/OneToOne'
+import ToOne from '../coreComponents/ToOne'
 import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor from '../dao/EntityAccessor'
@@ -87,11 +87,11 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 						<Field name={props.optionFieldName} />
 					</Entity>
 				</EntityListDataProvider>
-				<OneToOne field={props.name}>
+				<ToOne field={props.name}>
 					<Entity name={props.entityName}>
 						<Field name={props.optionFieldName} />
 					</Entity>
-				</OneToOne>
+				</ToOne>
 			</>
 		)
 	}

@@ -9,11 +9,11 @@ import DataContext, { DataContextValue } from './DataContext'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
 
-export interface OneToManyProps {
+export interface ToManyProps {
 	field: FieldName
 }
 
-export default class OneToMany extends React.Component<OneToManyProps> {
+export default class ToMany extends React.Component<ToManyProps> {
 	static displayName = 'OneToMany'
 
 	public render() {
@@ -46,9 +46,9 @@ export default class OneToMany extends React.Component<OneToManyProps> {
 		)
 	}
 
-	public static generateReferenceMarker(props: OneToManyProps, referredEntity: EntityMarker): ReferenceMarker {
+	public static generateReferenceMarker(props: ToManyProps, referredEntity: EntityMarker): ReferenceMarker {
 		return new ReferenceMarker(props.field, ExpectedCount.Many, referredEntity)
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof OneToMany, ReferenceMarkerProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof ToMany, ReferenceMarkerProvider>

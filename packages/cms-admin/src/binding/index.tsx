@@ -1,7 +1,7 @@
 import Entity from './coreComponents/Entity'
 import EntityListDataProvider from './coreComponents/EntityListDataProvider'
-import OneToMany from './coreComponents/OneToMany'
-import OneToOne from './coreComponents/OneToOne'
+import ToMany from './coreComponents/ToMany'
+import ToOne from './coreComponents/ToOne'
 import SingleEntityDataProvider from './coreComponents/SingleEntityDataProvider'
 import FieldAccessor from './dao/FieldAccessor'
 import SelectField from './facade/SelectField'
@@ -11,8 +11,8 @@ export {
 	Entity,
 	EntityListDataProvider,
 	FieldAccessor,
-	OneToOne,
-	OneToMany,
+	ToOne,
+	ToMany,
 	SelectField,
 	SingleEntityDataProvider,
 	UnlinkButton,

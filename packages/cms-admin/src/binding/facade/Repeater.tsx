@@ -1,9 +1,15 @@
+import { Button } from '@blueprintjs/core'
 import * as React from 'react'
+import DataContext, { DataContextValue } from '../coreComponents/DataContext'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from '../coreComponents/MarkerProvider'
 import ToMany, { ToManyProps } from '../coreComponents/ToMany'
+import EntityAccessor from '../dao/EntityAccessor'
+import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
+import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker from '../dao/ReferenceMarker'
+import UnlinkButton from './UnlinkButton'
 
 export interface RepeaterProps extends ToManyProps {}
 
@@ -12,11 +18,32 @@ export default class Repeater extends React.Component<RepeaterProps> {
 
 	public render() {
 		return (
-			<ul>
-				<ToMany {...this.props}>
-					<li>{this.props.children}</li>
-				</ToMany>
-			</ul>
+			<DataContext.Consumer>
+				{(data: DataContextValue) => {
+					if (data instanceof EntityAccessor) {
+						const field = data.data[this.props.field]
+
+						if (field instanceof EntityCollectionAccessor) {
+							return (
+								<>
+									{field.entities.map(
+										(datum: EntityAccessor | EntityForRemovalAccessor | undefined, i: number) =>
+											datum instanceof EntityAccessor && (
+												<DataContext.Provider value={datum} key={i}>
+													{this.props.children}
+													<UnlinkButton />
+												</DataContext.Provider>
+											),
+									)}
+									<Button icon="plus" onClick={field.appendNew}>
+										Add new
+									</Button>
+								</>
+							)
+						}
+					}
+				}}
+			</DataContext.Consumer>
 		)
 	}
 

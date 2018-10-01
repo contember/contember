@@ -1,49 +1,57 @@
 #!/usr/bin/env node
 import pgMigrate from 'node-pg-migrate'
-import { parseConfig, DatabaseCredentials } from '../tenant-api/config'
-const fs = require('fs')
+import { DatabaseCredentials, parseConfig } from '../tenant-api/config'
+import { readFile } from 'fs'
+import { promisify } from 'util'
+import Command from "../core/cli/Command";
 
-async function migrate(db: DatabaseCredentials, schema: string, dir: string) {
-	await pgMigrate({
-		databaseUrl: db,
-		dir: dir,
-		schema: schema,
-		migrationsTable: 'migrations',
-		checkOrder: true,
-		direction: 'up',
-		count: Infinity,
-		ignorePattern: '^\\..*$',
-		createSchema: true,
-		singleTransaction: true,
-		log: (msg: string) => {
-			console.log('    ' + msg.replace(/\n/g, '\n    '))
-		},
-	})
-}
+const fsRead = promisify(readFile)
 
-const migrationsDir = `${__dirname}/../../../src/migrations`
 
-const configFileName = process.argv[2]
-if (typeof configFileName === 'undefined') {
-	console.log(`Usage: node ${process.argv[1]} path/to/config.yaml`)
-	process.exit(1)
-}
+const command = new class extends Command<{ configFileName: string }> {
 
-fs.readFile(configFileName, async (e: Error, file: string) => {
-	if (e) throw e
-
-	const config = parseConfig(file, (error: string) => {
-		console.log(error + '\n')
-		process.exit(2)
-	})
-
-	console.log('Executing tenant schema migrations')
-	await migrate(config.tenant.db, 'tenant', `${migrationsDir}/tenant`)
-
-	console.log('\n')
-	for (const project of config.projects) {
-		console.log(`Executing event schema migrations for project ${project.slug}`)
-		await migrate(project.dbCredentials, 'system', `${migrationsDir}/project`)
-		console.log('\n')
+	protected parseArguments(argv: string[]): { configFileName: string } {
+		if (typeof argv[2] !== 'string') {
+			throw new Command.InvalidArgumentError(`Usage: node ${process.argv[1]} path/to/config.yaml`)
+		}
+		return { configFileName: argv[2] }
 	}
-})
+
+	protected async execute(args: { configFileName: string }): Promise<void> {
+
+		const migrationsDir = `${__dirname}/../../../src/migrations`
+		const file = await fsRead(args.configFileName, { encoding: 'utf8' })
+		const config = parseConfig(file)
+
+		console.log('Executing tenant schema migrations')
+		await this.migrate(config.tenant.db, 'tenant', `${migrationsDir}/tenant`)
+
+		console.log('\n')
+		for (const project of config.projects) {
+			console.log(`Executing event schema migrations for project ${project.slug}`)
+			await this.migrate(project.dbCredentials, 'system', `${migrationsDir}/project`)
+			console.log('\n')
+		}
+	}
+
+	private async migrate(db: DatabaseCredentials, schema: string, dir: string) {
+		await pgMigrate({
+			databaseUrl: db,
+			dir: dir,
+			schema: schema,
+			migrationsTable: 'migrations',
+			checkOrder: true,
+			direction: 'up',
+			count: Infinity,
+			ignorePattern: '^\\..*$',
+			createSchema: true,
+			singleTransaction: true,
+			log: (msg: string) => {
+				console.log('    ' + msg.replace(/\n/g, '\n    '))
+			},
+		})
+	}
+}
+
+command.run()
+

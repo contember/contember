@@ -1,5 +1,5 @@
 import Project from './Project'
-const yaml = require('js-yaml')
+import * as yaml from 'js-yaml'
 
 export type DatabaseCredentials = Project.DatabaseCredentials
 
@@ -10,7 +10,14 @@ export interface Config {
 	projects: Array<Project>
 }
 
-function checkDatabaseCredentials(json: any, path: string, error: (e: string) => void) {
+class InvalidConfigError extends Error { }
+
+function error(err: string): never {
+	throw new InvalidConfigError(err)
+}
+
+
+function checkDatabaseCredentials(json: any, path: string): void {
 	if (typeof json.host === 'undefined') {
 		error(`Undefined property ${path}.host in config file`)
 	}
@@ -28,14 +35,14 @@ function checkDatabaseCredentials(json: any, path: string, error: (e: string) =>
 	}
 }
 
-function checkConfigStructure(json: any, error: (e: string) => void) {
+function checkConfigStructure(json: any): void {
 	if (typeof json.tenant === 'undefined') {
 		error('Undefined property tenant in config file')
 	}
 	if (typeof json.tenant.db === 'undefined') {
 		error('Undefined property tenant.db in config file')
 	}
-	checkDatabaseCredentials(json.tenant.db, 'tenant.db', error)
+	checkDatabaseCredentials(json.tenant.db, 'tenant.db')
 	if (typeof json.projects === 'undefined') {
 		error('Undefined property projects in config file')
 	}
@@ -75,13 +82,31 @@ function checkConfigStructure(json: any, error: (e: string) => void) {
 		if (typeof project.dbCredentials === 'undefined') {
 			error(`Property projects[${i}].dbCredentials should be an array in config file`)
 		}
-		checkDatabaseCredentials(project.dbCredentials, `projects[${i}].dbCredentials`, error)
+		checkDatabaseCredentials(project.dbCredentials, `projects[${i}].dbCredentials`)
 		i++
 	}
 }
 
-export function parseConfig(input: string, error: (e: string) => void): Config {
+function replaceEnv(data: any): any {
+	if (Array.isArray(data)) {
+		return data.map(it => replaceEnv(it))
+	}
+	if (typeof data === 'string') {
+		return data.replace(/^%env\.(\w+)%$/, (match, name) => {
+			return String(process.env[name]);
+		})
+	}
+	if (typeof data === 'object') {
+		return Object.entries(data)
+			.map(([key, value]: [string, any]) => [key, replaceEnv(value)])
+			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
+	}
+	return data
+}
+
+export function parseConfig(input: string): Config {
 	const parsed = yaml.safeLoad(input)
-	checkConfigStructure(parsed, error)
-	return parsed
+	checkConfigStructure(parsed)
+	const configWithEnv = replaceEnv(parsed)
+	return configWithEnv
 }

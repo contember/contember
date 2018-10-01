@@ -38,10 +38,11 @@
 		"fast-deep-equal": "^2.0.1"
 	},
 	"devDependencies": {
-		"@types/bluebird": "3.5.22",
 		"@types/bcrypt": "^2.0.0",
+		"@types/bluebird": "3.5.22",
 		"@types/chai": "^4.1.4",
 		"@types/dotenv": "^4.0.3",
+		"@types/js-yaml": "^3.11.2",
 		"@types/knex": "^0.14.16",
 		"@types/mocha": "^5.2.4",
 		"@types/mock-knex": "^0.3.2",

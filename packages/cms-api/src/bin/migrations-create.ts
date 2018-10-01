@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { zeroPad } from '../utils/zeroPad'
+import { writeFile, realpath } from 'fs'
+import { promisify } from 'util'
+import Command from "../core/cli/Command";
 
-const fs = require('fs')
+const fsWrite = promisify(writeFile)
+const fsRealpath = promisify(realpath)
 
 const now = new Date()
 const year = now.getFullYear()
@@ -12,15 +16,29 @@ const minutes = zeroPad(now.getMinutes(), 2)
 const seconds = zeroPad(now.getSeconds(), 2)
 const prefix = `${year}-${month}-${day}-${hours}${minutes}${seconds}`
 
-const type = process.argv[2]
-const name = process.argv[3]
 
-if (!['project', 'tenant'].includes(type) || typeof name === 'undefined') {
-	console.log(`Usage: node ${process.argv[1]} project|tenant name`)
-	process.exit(1)
+interface Args {
+	type: 'project' | 'tenant'
+	name: string
 }
 
-fs.writeFile(`${__dirname}/../../../src/migrations/${type}/${prefix}-${name}.sql`, '', (e: Error) => {
-	if (e) throw e
-	console.log('ok')
-})
+const command = new class extends Command<Args> {
+	protected async execute(args: Args): Promise<void> {
+		const filename = `${__dirname}/../../../src/migrations/${args.type}/${prefix}-${args.name}.sql`;
+		await fsWrite(filename, '', { encoding: 'utf8' })
+		console.log(await fsRealpath(filename))
+	}
+
+	protected parseArguments(argv: string[]): Args {
+		const type = argv[2]
+		const name = argv[3]
+
+		if (!(type === 'project' || type === 'tenant') || typeof name === 'undefined') {
+			throw new Command.InvalidArgumentError(`Usage: node ${argv[1]} project|tenant name`)
+		}
+		return { type, name }
+	}
+}
+
+command.run()
+

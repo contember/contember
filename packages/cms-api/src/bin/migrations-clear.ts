@@ -1,47 +1,53 @@
 #!/usr/bin/env node
-import { parseConfig, DatabaseCredentials } from '../tenant-api/config'
+import { DatabaseCredentials, parseConfig } from '../tenant-api/config'
 import * as Knex from 'knex'
-const fs = require('fs')
+import { readFile } from 'fs'
+import { promisify } from 'util'
+import Command from "../core/cli/Command";
 
-const configFileName = process.argv[2]
-if (typeof configFileName === 'undefined') {
-	console.log(`Usage: node ${process.argv[1]} path/to/config.yaml`)
-	process.exit(1)
-}
+const fsRead = promisify(readFile)
 
-async function clear(db: DatabaseCredentials, schemas: string[]) {
-	await Knex({
-		debug: false,
-		client: 'pg',
-		connection: db,
-	}).transaction(async trx => {
-		await Promise.all(
-			schemas.map(async schema => {
-				await trx.raw('DROP SCHEMA IF EXISTS ?? CASCADE', [schema])
-				console.log(`Dropped schema ${schema} in DB ${db.database}`)
-			})
-		)
-	})
-}
 
-fs.readFile(configFileName, async (e: Error, file: string) => {
-	if (e) throw e
+const command = new class extends Command<{ configFileName: string }> {
 
-	const config = parseConfig(file, (error: string) => {
-		console.log(error + '\n')
-		process.exit(2)
-	})
-
-	const queries = []
-
-	queries.push(clear(config.tenant.db, ['tenant']))
-
-	for (const project of config.projects) {
-		const schemas = [...project.stages.map(stage => 'stage_' + stage.slug), 'system']
-		queries.push(clear(project.dbCredentials, schemas))
+	protected parseArguments(argv: string[]): { configFileName: string } {
+		if (typeof argv[2] !== 'string') {
+			throw new Command.InvalidArgumentError(`Usage: node ${process.argv[1]} path/to/config.yaml`)
+		}
+		return { configFileName: argv[2] }
 	}
 
-	await Promise.all(queries)
-	console.log('\n')
-	process.exit(0)
-})
+	protected async execute(args: { configFileName: string }): Promise<void> {
+
+		const file = await fsRead(args.configFileName, { encoding: 'utf8' })
+		const config = parseConfig(file)
+
+		const queries = []
+
+		queries.push(this.clear(config.tenant.db, ['tenant']))
+
+		for (const project of config.projects) {
+			const schemas = [...project.stages.map(stage => 'stage_' + stage.slug), 'system']
+			queries.push(this.clear(project.dbCredentials, schemas))
+		}
+
+		await Promise.all(queries)
+	}
+
+	private async clear(db: DatabaseCredentials, schemas: string[]) {
+		await Knex({
+			debug: false,
+			client: 'pg',
+			connection: db,
+		}).transaction(async trx => {
+			await Promise.all(
+				schemas.map(async schema => {
+					await trx.raw('DROP SCHEMA IF EXISTS ?? CASCADE', [schema])
+					console.log(`Dropped schema ${schema} in DB ${db.database}`)
+				})
+			)
+		})
+	}
+}
+
+command.run()

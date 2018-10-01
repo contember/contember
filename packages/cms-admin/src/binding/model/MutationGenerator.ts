@@ -1,108 +1,187 @@
-import { CrudQueryBuilder } from 'cms-client'
-import * as GraphQlBuilder from 'cms-client/dist/src/graphQlBuilder'
-import { Input } from 'cms-common'
-import AccessorTreeRoot from '../dao/AccessorTreeRoot'
+import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
+import { assertNever, Input } from 'cms-common'
+import { ReceivedData, ReceivedEntityData } from '../bindingTypes'
+import AccessorTreeRoot, { RootAccessor } from '../dao/AccessorTreeRoot'
 import EntityAccessor from '../dao/EntityAccessor'
+import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
+import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 
+type Queries = 'get' | 'list'
+type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQueryBuilder.CrudQueryBuilder, Queries>>
+
 export default class MutationGenerator {
-	private static PRIMARY_KEY_NAME = 'id'
+	private static readonly PRIMARY_KEY_NAME = 'id'
 
 	public constructor(private persistedData: any, private currentData: AccessorTreeRoot) {}
 
-	public generatePersistQuery(): string | undefined {
-		const accessor = this.currentData.root
-		const crudQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
-
-		return ''
-
-		/*if (accessor.primaryKey === undefined) {
-			return crudQueryBuilder
-				.create(`create${accessor.entityName}`, builder => {
-					return builder.data(builder => this.attachCreateQueryPart(this.currentData, builder))
-				})
-				.getGql()
-		}
-
-		return crudQueryBuilder
-			.update(`update${accessor.entityName}`, builder => {
-				if (accessor.where) {
-					builder = builder.where(accessor.where as Input.UniqueWhere<GraphQlBuilder.Literal>)
-				}
-
-				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
-
-				return builder.data(builder =>
-					this.attachUpdateQueryPart(this.persistedData[accessor.entityName], this.currentData, builder)
-				)
-			})
-			.getGql()
+	public getPersistMutation(): string {
+		const builder = this.addSubMutation(this.persistedData[this.currentData.id], this.currentData.root)
+		return builder.getGql()
 	}
 
-	private attachCreateQueryPart(
+	private addSubMutation(data: ReceivedData, entity: RootAccessor, queryBuilder?: QueryBuilder): QueryBuilder {
+		if (!queryBuilder) {
+			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
+		}
+
+		if (entity instanceof EntityAccessor) {
+			if (entity.primaryKey === undefined) {
+				queryBuilder = this.addCreateMutation(entity, queryBuilder)
+			} else if (!Array.isArray(data)) {
+				queryBuilder = this.addUpdateMutation(entity, data, queryBuilder)
+			}
+		} else if (entity instanceof EntityForRemovalAccessor) {
+			queryBuilder = this.addDeleteMutation(entity, queryBuilder)
+		} else if (entity instanceof EntityCollectionAccessor) {
+			if (Array.isArray(data)) {
+				const entityCount = entity.entities.length
+
+				for (let entityI = 0, dataI = 0; entityI < entityCount; entityI++) {
+					const currentEntity = entity.entities[entityI]
+
+					if (currentEntity instanceof EntityAccessor || currentEntity instanceof EntityForRemovalAccessor) {
+						queryBuilder = this.addSubMutation(data[dataI++], currentEntity, queryBuilder)
+					} else if (currentEntity === undefined) {
+						// Do nothing. This was a non-persisted entity that was subsequently deleted.
+						// No need to create it only to delete it again…
+					} else {
+						assertNever(currentEntity)
+					}
+				}
+			}
+		} else {
+			assertNever(entity)
+		}
+
+		return queryBuilder
+	}
+
+	private addDeleteMutation(entity: EntityForRemovalAccessor, queryBuilder?: QueryBuilder): QueryBuilder {
+		if (!queryBuilder) {
+			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
+		}
+
+		return queryBuilder.delete(
+			`delete${entity.entityName}`,
+			builder => {
+				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+				return builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: entity.primaryKey })
+			},
+			`delete${entity.entityName}_${entity.primaryKey}`,
+		)
+	}
+
+	private addUpdateMutation(
+		entity: EntityAccessor,
+		data: ReceivedEntityData,
+		queryBuilder?: QueryBuilder,
+	): QueryBuilder {
+		if (!queryBuilder) {
+			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
+		}
+
+		return queryBuilder.update(`update${entity.entityName}`, builder => {
+			if (!entity.primaryKey) {
+				return builder
+			}
+
+			builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+			builder = builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: entity.primaryKey })
+
+			return builder.data(builder => this.registerUpdateMutationPart(entity, data, builder))
+		})
+	}
+
+	private addCreateMutation(entity: EntityAccessor, queryBuilder?: QueryBuilder): QueryBuilder {
+		if (!queryBuilder) {
+			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
+		}
+
+		return queryBuilder.create(`create${entity.entityName}`, builder => {
+			builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+			console.log('top-level create')
+			return builder // TODO
+		})
+	}
+
+	private registerCreateMutationPart(
 		currentData: EntityAccessor,
 		builder: CrudQueryBuilder.CreateDataBuilder,
 	): CrudQueryBuilder.CreateDataBuilder {
+		console.log('inner create')
 		return builder
 	}
 
-	private attachUpdateQueryPart(
-		persistedData: any,
+	private registerUpdateMutationPart(
 		currentData: EntityAccessor,
+		persistedData: ReceivedEntityData,
 		builder: CrudQueryBuilder.UpdateDataBuilder,
 	): CrudQueryBuilder.UpdateDataBuilder {
 		for (const fieldName in persistedData) {
 			const persistedField = persistedData[fieldName]
 			const accessor = currentData.data[fieldName]
 
-			if (typeof persistedField === 'string') {
-				if (accessor instanceof FieldAccessor && persistedField !== accessor.currentValue) {
+			if (accessor instanceof FieldAccessor) {
+				if (persistedField !== accessor.currentValue) {
 					builder = builder.set(fieldName, accessor.currentValue)
 				}
-			} else if (Array.isArray(persistedField)) {
-				builder = builder.many(fieldName, builder => {
-					const innerAccessor = Array.isArray(accessor) ? accessor : []
-
-					for (const field of persistedField) {
-						const persistedId: string = field[MutationGenerator.PRIMARY_KEY_NAME]
-						const currentById = innerAccessor.find(
-							(element): element is EntityAccessor =>
-								element instanceof EntityAccessor && element.primaryKey === persistedId,
-						)
-
-						if (currentById) {
-							builder = builder.update({ [MutationGenerator.PRIMARY_KEY_NAME]: persistedId }, builder => {
-								return this.attachUpdateQueryPart(field, currentById, builder)
-							})
-						} else {
-							builder = builder.disconnect({ [MutationGenerator.PRIMARY_KEY_NAME]: persistedId })
-						}
-					}
-
-					return builder
-				})
-			} else if (typeof persistedField === 'object') {
-				if (accessor === undefined) {
+			} else if (accessor instanceof EntityAccessor) {
+				if (persistedField && typeof persistedField === 'object' && !Array.isArray(persistedField)) {
 					builder = builder.one(fieldName, builder => {
-						return builder.disconnect()
-					})
-				} else if (accessor instanceof EntityAccessor) {
-					builder = builder.one(fieldName, builder => {
-						if (accessor.primaryKey !== undefined) {
-							return builder.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey }).update(builder => {
-								return this.attachUpdateQueryPart(persistedField, accessor, builder)
+						if (accessor.primaryKey === undefined) {
+							return builder.create(builder => {
+								return this.registerCreateMutationPart(accessor, builder)
 							})
 						}
-						return builder.create(builder => {
-							return this.attachCreateQueryPart(accessor, builder)
+						return builder.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey }).update(builder => {
+							return this.registerUpdateMutationPart(accessor, persistedField, builder)
 						})
 					})
 				}
+			} else if (accessor instanceof EntityCollectionAccessor) {
+				if (Array.isArray(persistedField)) {
+					builder = builder.many(fieldName, builder => {
+						for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {
+							const innerAccessor = accessor.entities[i]
+
+							if (innerAccessor instanceof EntityAccessor) {
+								if (innerAccessor.primaryKey) {
+									builder = builder.update(
+										{
+											[MutationGenerator.PRIMARY_KEY_NAME]: innerAccessor.primaryKey,
+										},
+										builder => {
+											return this.registerUpdateMutationPart(innerAccessor, persistedField[i], builder)
+										},
+									)
+								}
+							} else if (innerAccessor instanceof EntityForRemovalAccessor) {
+								builder = builder.disconnect({
+									[MutationGenerator.PRIMARY_KEY_NAME]: innerAccessor.primaryKey,
+								})
+							} else if (innerAccessor === undefined) {
+								// Do nothing
+							} else {
+								assertNever(innerAccessor)
+							}
+						}
+						return builder
+					})
+				}
+			} else if (accessor instanceof EntityForRemovalAccessor) {
+				builder = builder.one(fieldName, builder => {
+					return builder.disconnect()
+				})
+			} else if (accessor instanceof AccessorTreeRoot) {
+				// Do nothing: we don't support persisting nested queries (yet?).
+			} else if (accessor === undefined) {
+				// Do nothing.
 			} else {
-				// If the reference was undefined but we've added it, we need to insert the rows from here
+				assertNever(accessor)
 			}
 		}
 
-		return builder*/
+		return builder
 	}
 }

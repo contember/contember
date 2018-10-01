@@ -17,7 +17,7 @@ async function migrate(db: DatabaseCredentials, schema: string, dir: string) {
 		singleTransaction: true,
 		log: (msg: string) => {
 			console.log('    ' + msg.replace(/\n/g, '\n    '))
-		}
+		},
 	})
 }
 

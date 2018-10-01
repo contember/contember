@@ -13,7 +13,7 @@ async function clear(db: DatabaseCredentials, schemas: string[]) {
 	await Knex({
 		debug: false,
 		client: 'pg',
-		connection: db
+		connection: db,
 	}).transaction(async trx => {
 		await Promise.all(
 			schemas.map(async schema => {

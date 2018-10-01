@@ -159,7 +159,7 @@ export default class SqlMigrator {
 						id: {
 							primaryKey: true,
 							type: 'uuid',
-							notNull: true
+							notNull: true,
 						},
 						[relation.joiningTable.joiningColumn.columnName]: {
 							type: this.getPrimaryType(entity),
@@ -289,9 +289,9 @@ export default class SqlMigrator {
 			level: 'ROW',
 			function: {
 				schema: 'system',
-				name: 'trigger_event'
+				name: 'trigger_event',
 			},
-			language: ''
+			language: '',
 		})
 	}
 

@@ -68,7 +68,7 @@ export default class MutationGenerator {
 				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
 				return builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
-			`delete${entity.entityName}_${entity.primaryKey}`,
+			`delete${entity.entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`,
 		)
 	}
 
@@ -81,16 +81,22 @@ export default class MutationGenerator {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		return queryBuilder.update(`update${entity.entityName}`, builder => {
-			if (!entity.primaryKey) {
-				return builder
-			}
+		const primaryKey = entity.primaryKey
 
-			builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
-			builder = builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: entity.primaryKey })
+		if (!primaryKey) {
+			return queryBuilder
+		}
 
-			return builder.data(builder => this.registerUpdateMutationPart(entity, data, builder))
-		})
+		return queryBuilder.update(
+			`update${entity.entityName}`,
+			builder => {
+				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+				builder = builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: primaryKey })
+
+				return builder.data(builder => this.registerUpdateMutationPart(entity, data, builder))
+			},
+			`update${entity.entityName}_${this.primaryKeyToAlias(primaryKey)}`,
+		)
 	}
 
 	private addCreateMutation(entity: EntityAccessor, queryBuilder?: QueryBuilder): QueryBuilder {
@@ -109,7 +115,47 @@ export default class MutationGenerator {
 		currentData: EntityAccessor,
 		builder: CrudQueryBuilder.CreateDataBuilder,
 	): CrudQueryBuilder.CreateDataBuilder {
-		console.log('inner create')
+		for (const fieldName in currentData.data) {
+			const accessor = currentData.data[fieldName]
+
+			if (accessor instanceof FieldAccessor) {
+				builder = builder.set(fieldName, accessor.currentValue)
+			} else if (accessor instanceof EntityAccessor) {
+				builder = builder.one(fieldName, builder => {
+					return builder.create(builder => {
+						return this.registerCreateMutationPart(accessor, builder)
+					})
+				})
+			} else if (accessor instanceof EntityCollectionAccessor) {
+				builder = builder.many(fieldName, builder => {
+					for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {
+						const innerAccessor = accessor.entities[i]
+
+						if (innerAccessor instanceof EntityAccessor) {
+							builder = builder.create(builder => {
+								return this.registerCreateMutationPart(innerAccessor, builder)
+							})
+						} else if (innerAccessor instanceof EntityForRemovalAccessor) {
+							// Do nothing
+						} else if (innerAccessor === undefined) {
+							// Do nothing
+						} else {
+							assertNever(innerAccessor)
+						}
+					}
+					return builder
+				})
+			} else if (accessor instanceof EntityForRemovalAccessor) {
+				// Do nothing: this should never happen.
+			} else if (accessor instanceof AccessorTreeRoot) {
+				// Do nothing: we don't support persisting nested queries (yet?).
+			} else if (accessor === undefined) {
+				// Do nothing.
+			} else {
+				assertNever(accessor)
+			}
+		}
+
 		return builder
 	}
 
@@ -146,7 +192,11 @@ export default class MutationGenerator {
 							const innerAccessor = accessor.entities[i]
 
 							if (innerAccessor instanceof EntityAccessor) {
-								if (innerAccessor.primaryKey) {
+								if (innerAccessor.primaryKey === undefined) {
+									builder = builder.create(builder => {
+										return this.registerCreateMutationPart(innerAccessor, builder)
+									})
+								} else {
 									builder = builder.update(
 										{
 											[MutationGenerator.PRIMARY_KEY_NAME]: innerAccessor.primaryKey,
@@ -183,5 +233,9 @@ export default class MutationGenerator {
 		}
 
 		return builder
+	}
+
+	private primaryKeyToAlias(primaryKey: string): string {
+		return `_${primaryKey.replace(/-/g, '')}`
 	}
 }

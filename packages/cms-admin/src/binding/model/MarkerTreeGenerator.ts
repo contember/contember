@@ -59,6 +59,10 @@ export default class MarkerTreeGenerator {
 				}
 			}
 
+			if (mapped.length === 1) {
+				return mapped[0]
+			}
+
 			return mapped
 		}
 

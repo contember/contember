@@ -9,7 +9,7 @@ import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
-import assertNever from '../../../../../cms-common/src/utils/assertNever'
+import { assertNever } from 'cms-common'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>

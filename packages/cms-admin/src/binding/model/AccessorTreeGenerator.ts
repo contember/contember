@@ -16,7 +16,7 @@ type OnReplace = (replacement: EntityAccessor) => void
 type OnUnlink = () => void
 
 export default class AccessorTreeGenerator {
-	private static PRIMARY_KEY_NAME: 'id' = 'id'
+	private static readonly PRIMARY_KEY_NAME = 'id'
 
 	public constructor(private tree: MarkerTreeRoot, private allInitialData: any) {}
 
@@ -25,33 +25,48 @@ export default class AccessorTreeGenerator {
 	}
 
 	private generateSubTree(tree: MarkerTreeRoot, updateData: (newData?: AccessorTreeRoot) => void): AccessorTreeRoot {
-		let data: any = this.allInitialData[tree.id]
+		const data: ReceivedEntityData<undefined> = this.allInitialData[tree.id]
 
-		if (!Array.isArray(data)) {
-			data = [data]
-		}
+		if (Array.isArray(data)) {
+			const createAccessorTreeRoot = (): AccessorTreeRoot => {
+				// TODO, proper addNew callback
+				return AccessorTreeRoot.createInstance(tree, new EntityCollectionAccessor(entityAccessors, () => {}, tree.root))
+			}
+			const entityAccessors: Array<EntityAccessor> = data.map((datum, i) =>
+				this.updateFields(
+					datum,
+					tree.root,
+					(fieldName, newData) => {
+						entityAccessors[i] = this.withUpdatedField(entityAccessors[i], fieldName, newData)
 
-		const createAccessorTreeRoot = (): AccessorTreeRoot => {
-			// TODO, proper addNew callback
-			return AccessorTreeRoot.createInstance(tree, new EntityCollectionAccessor(entityAccessors, () => {}, tree.root))
-		}
-		const entityAccessors: Array<EntityAccessor> = (data as any[]).map((datum, i) =>
-			this.updateFields(
-				datum,
+						updateData(createAccessorTreeRoot())
+					},
+					newEntityAccessor => {
+						entityAccessors[i] = newEntityAccessor
+
+						updateData(createAccessorTreeRoot())
+					},
+				),
+			)
+			return createAccessorTreeRoot()
+		} else {
+			const createAccessorTreeRoot = (): AccessorTreeRoot => AccessorTreeRoot.createInstance(tree, entityAccessor)
+			let entityAccessor: EntityAccessor = this.updateFields(
+				data,
 				tree.root,
 				(fieldName, newData) => {
-					entityAccessors[i] = this.withUpdatedField(entityAccessors[i], fieldName, newData)
+					entityAccessor = this.withUpdatedField(entityAccessor, fieldName, newData)
 
 					updateData(createAccessorTreeRoot())
 				},
 				newEntityAccessor => {
-					entityAccessors[i] = newEntityAccessor
+					entityAccessor = newEntityAccessor
 
 					updateData(createAccessorTreeRoot())
 				},
-			),
-		)
-		return createAccessorTreeRoot()
+			)
+			return createAccessorTreeRoot()
+		}
 	}
 
 	private updateFields(

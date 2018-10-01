@@ -13,7 +13,7 @@ export interface ToOneProps {
 }
 
 export default class ToOne extends React.Component<ToOneProps> {
-	static displayName = 'OneToOne'
+	static displayName = 'ToOne'
 
 	public render() {
 		return (

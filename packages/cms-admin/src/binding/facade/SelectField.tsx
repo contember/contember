@@ -1,4 +1,4 @@
-import { HTMLSelect } from '@blueprintjs/core'
+import { FormGroup, HTMLSelect, IFormGroupProps } from '@blueprintjs/core'
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
@@ -19,6 +19,7 @@ import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 
 export interface SelectFieldProps {
 	name: FieldName
+	label: IFormGroupProps['label']
 	entityName: EntityName
 	optionFieldName: FieldName
 	where?: Input.Where<GraphQlBuilder.Literal>
@@ -48,28 +49,32 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 						}
 
 						if (subTreeData instanceof EntityCollectionAccessor) {
-							const normalizedData = subTreeData.entities.filter((accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor)
+							const normalizedData = subTreeData.entities.filter(
+								(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor,
+							)
 							return (
-								<HTMLSelect
-									value={currentValueEntity.primaryKey}
-									onChange={e => {
-										const newPrimaryKey = e.currentTarget.value
-										const newAccessor = normalizedData.find((accessor) => accessor.primaryKey === newPrimaryKey)
+								<FormGroup label={this.props.label}>
+									<HTMLSelect
+										value={currentValueEntity.primaryKey}
+										onChange={e => {
+											const newPrimaryKey = e.currentTarget.value
+											const newAccessor = normalizedData.find(accessor => accessor.primaryKey === newPrimaryKey)
 
-										newAccessor && currentValueEntity.replaceWith(newAccessor)
-									}}
-									options={normalizedData.map(datum => {
-										const optionField = datum.data[this.props.optionFieldName]
+											newAccessor && currentValueEntity.replaceWith(newAccessor)
+										}}
+										options={normalizedData.map(datum => {
+											const optionField = datum.data[this.props.optionFieldName]
 
-										if (!(optionField instanceof FieldAccessor)) {
-											throw new DataBindingError('Corrupted data')
-										}
-										return {
-											value: datum.primaryKey!,
-											label: (optionField.currentValue || '').toString(),
-										}
-									})}
-								/>
+											if (!(optionField instanceof FieldAccessor)) {
+												throw new DataBindingError('Corrupted data')
+											}
+											return {
+												value: datum.primaryKey!,
+												label: (optionField.currentValue || '').toString(),
+											}
+										})}
+									/>
+								</FormGroup>
 							)
 						}
 					}

@@ -14,7 +14,7 @@ export interface ToManyProps {
 }
 
 export default class ToMany extends React.Component<ToManyProps> {
-	static displayName = 'OneToMany'
+	static displayName = 'ToMany'
 
 	public render() {
 		return (
@@ -24,20 +24,13 @@ export default class ToMany extends React.Component<ToManyProps> {
 						const field = data.data[this.props.field]
 
 						if (field instanceof EntityCollectionAccessor) {
-							return (
-								<>
-									{field.entities.map(
-										(datum: EntityAccessor | EntityForRemovalAccessor | undefined, i: number) =>
-											datum instanceof EntityAccessor && (
-												<DataContext.Provider value={datum} key={i}>
-													{this.props.children}
-												</DataContext.Provider>
-											),
-									)}
-									<button type="button" onClick={field.appendNew}>
-										+
-									</button>
-								</>
+							return field.entities.map(
+								(datum: EntityAccessor | EntityForRemovalAccessor | undefined, i: number) =>
+									datum instanceof EntityAccessor && (
+										<DataContext.Provider value={datum} key={i}>
+											{this.props.children}
+										</DataContext.Provider>
+									),
 							)
 						}
 					}

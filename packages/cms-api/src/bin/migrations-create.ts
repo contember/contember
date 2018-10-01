@@ -2,7 +2,7 @@
 import { zeroPad } from '../utils/zeroPad'
 import { writeFile, realpath } from 'fs'
 import { promisify } from 'util'
-import Command from "../core/cli/Command";
+import Command from '../core/cli/Command'
 
 const fsWrite = promisify(writeFile)
 const fsRealpath = promisify(realpath)
@@ -16,7 +16,6 @@ const minutes = zeroPad(now.getMinutes(), 2)
 const seconds = zeroPad(now.getSeconds(), 2)
 const prefix = `${year}-${month}-${day}-${hours}${minutes}${seconds}`
 
-
 interface Args {
 	type: 'project' | 'tenant'
 	name: string
@@ -24,7 +23,7 @@ interface Args {
 
 const command = new class extends Command<Args> {
 	protected async execute(args: Args): Promise<void> {
-		const filename = `${__dirname}/../../../src/migrations/${args.type}/${prefix}-${args.name}.sql`;
+		const filename = `${__dirname}/../../../src/migrations/${args.type}/${prefix}-${args.name}.sql`
 		await fsWrite(filename, '', { encoding: 'utf8' })
 		console.log(await fsRealpath(filename))
 	}
@@ -38,7 +37,6 @@ const command = new class extends Command<Args> {
 		}
 		return { type, name }
 	}
-}
+}()
 
 command.run()
-

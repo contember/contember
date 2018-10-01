@@ -3,13 +3,11 @@ import { DatabaseCredentials, parseConfig } from '../tenant-api/config'
 import * as Knex from 'knex'
 import { readFile } from 'fs'
 import { promisify } from 'util'
-import Command from "../core/cli/Command";
+import Command from '../core/cli/Command'
 
 const fsRead = promisify(readFile)
 
-
 const command = new class extends Command<{ configFileName: string }> {
-
 	protected parseArguments(argv: string[]): { configFileName: string } {
 		if (typeof argv[2] !== 'string') {
 			throw new Command.InvalidArgumentError(`Usage: node ${process.argv[1]} path/to/config.yaml`)
@@ -18,7 +16,6 @@ const command = new class extends Command<{ configFileName: string }> {
 	}
 
 	protected async execute(args: { configFileName: string }): Promise<void> {
-
 		const file = await fsRead(args.configFileName, { encoding: 'utf8' })
 		const config = parseConfig(file)
 
@@ -48,6 +45,6 @@ const command = new class extends Command<{ configFileName: string }> {
 			)
 		})
 	}
-}
+}()
 
 command.run()

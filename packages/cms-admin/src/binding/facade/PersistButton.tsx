@@ -1,3 +1,4 @@
+import { Button, Intent } from '@blueprintjs/core'
 import * as React from 'react'
 import MetaOperationsContext, { MetaOperationsContextValue } from '../coreComponents/MetaOperationsContext'
 
@@ -8,9 +9,9 @@ export default class PersistButton extends React.Component {
 				{(value: MetaOperationsContextValue) => {
 					if (value) {
 						return (
-							<button type="button" onClick={value.triggerPersist}>
+							<Button icon="floppy-disk" onClick={value.triggerPersist} intent={Intent.SUCCESS} large={true}>
 								Save!
-							</button>
+							</Button>
 						)
 					}
 				}}

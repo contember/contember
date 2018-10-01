@@ -1,5 +1,5 @@
-import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
-import { assertNever, Input } from 'cms-common'
+import { CrudQueryBuilder } from 'cms-client'
+import { assertNever } from 'cms-common'
 import { ReceivedData, ReceivedEntityData } from '../bindingTypes'
 import AccessorTreeRoot, { RootAccessor } from '../dao/AccessorTreeRoot'
 import EntityAccessor from '../dao/EntityAccessor'
@@ -15,9 +15,13 @@ export default class MutationGenerator {
 
 	public constructor(private persistedData: any, private currentData: AccessorTreeRoot) {}
 
-	public getPersistMutation(): string {
-		const builder = this.addSubMutation(this.persistedData[this.currentData.id], this.currentData.root)
-		return builder.getGql()
+	public getPersistMutation(): string | undefined {
+		try {
+			const builder = this.addSubMutation(this.persistedData[this.currentData.id], this.currentData.root)
+			return builder.getGql()
+		} catch (e) {
+			return undefined
+		}
 	}
 
 	private addSubMutation(data: ReceivedData, entity: RootAccessor, queryBuilder?: QueryBuilder): QueryBuilder {

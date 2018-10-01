@@ -1,5 +1,4 @@
 abstract class Command<Args> {
-
 	protected abstract parseArguments(argv: string[]): Args
 
 	protected abstract async execute(args: Args): Promise<void>
@@ -23,8 +22,7 @@ abstract class Command<Args> {
 }
 
 namespace Command {
-	export class InvalidArgumentError extends Error {
-	}
+	export class InvalidArgumentError extends Error {}
 }
 
 export default Command

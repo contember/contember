@@ -3,7 +3,6 @@ import { ApolloServer } from 'apollo-server-express'
 import typeDefs from './tenant-api/schema/tenant.graphql'
 import SignInMutationResolver from './tenant-api/resolvers/mutation/SignInMutationResolver'
 import KnexConnection from './core/knex/KnexConnection'
-import Env from './Env'
 import QueryHandler from './core/query/QueryHandler'
 import KnexQueryable from './core/knex/KnexQueryable'
 import SignInManager from './tenant-api/model/service/SignInManager'
@@ -21,10 +20,11 @@ import TenantMiddlewareFactory from './http/TenantMiddlewareFactory'
 import ContentMiddlewareFactoryMiddlewareFactory from './http/ContentMiddlewareFactoryMiddlewareFactory'
 import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from './content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
+import { DatabaseCredentials } from './tenant-api/config'
 
 class CompositionRoot {
-	composeServer(env: Env, projects: Array<Project>): Express {
-		const tenantContainer = this.createTenantContainer(env)
+	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<Project>): Express {
+		const tenantContainer = this.createTenantContainer(tenantDbCredentials)
 		const projectContainers = this.createProjectContainers(projects)
 
 		const masterContainer = new Container.Builder({})
@@ -84,22 +84,15 @@ class CompositionRoot {
 		})
 	}
 
-	private createTenantContainer(env: Env) {
+	private createTenantContainer(tenantDbCredentials: DatabaseCredentials) {
 		return new Container.Builder({})
-			.addService('env', () => env)
 
-			.addService('knexConnection', ({ env }) => {
+			.addService('knexConnection', () => {
 				return new KnexConnection(
 					knex({
 						debug: false,
 						client: 'pg',
-						connection: {
-							host: env.DB_HOST,
-							port: env.DB_PORT,
-							user: env.DB_USER,
-							password: env.DB_PASSWORD,
-							database: env.DB_DATABASE,
-						},
+						connection: tenantDbCredentials,
 					}),
 					'tenant'
 				)

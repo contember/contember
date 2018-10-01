@@ -8,14 +8,16 @@ export interface Config {
 		db: DatabaseCredentials
 	}
 	projects: Array<Project>
+	server: {
+		port: number
+	}
 }
 
-class InvalidConfigError extends Error { }
+class InvalidConfigError extends Error {}
 
 function error(err: string): never {
 	throw new InvalidConfigError(err)
 }
-
 
 function checkDatabaseCredentials(json: any, path: string): void {
 	if (typeof json.host === 'undefined') {
@@ -93,8 +95,11 @@ function replaceEnv(data: any): any {
 	}
 	if (typeof data === 'string') {
 		return data.replace(/^%env\.(\w+)%$/, (match, name) => {
-			return String(process.env[name]);
+			return String(process.env[name])
 		})
+	}
+	if (data === null) {
+		return data
 	}
 	if (typeof data === 'object') {
 		return Object.entries(data)

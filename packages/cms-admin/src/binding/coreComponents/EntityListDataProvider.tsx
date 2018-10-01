@@ -21,7 +21,9 @@ export default class EntityListDataProvider extends React.Component<EntityListDa
 			<EntityListDataProvider {...this.props}>{this.props.children}</EntityListDataProvider>,
 		)
 
-		return <DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
+		return <DataProvider markerTree={markerTreeGenerator.generate()}>
+			{this.props.children}
+		</DataProvider>
 	}
 
 	public static generateMarkerTreeRoot(

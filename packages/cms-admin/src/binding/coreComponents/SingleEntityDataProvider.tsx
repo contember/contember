@@ -4,9 +4,9 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
-import { MarkerTreeRootProvider } from './MarkerProvider'
 import DataProvider from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
+import { MarkerTreeRootProvider } from './MarkerProvider'
 
 interface SingleEntityDataProviderProps {
 	associatedField?: FieldName
@@ -21,7 +21,9 @@ export default class SingleEntityDataProvider extends React.Component<SingleEnti
 			<SingleEntityDataProvider {...this.props}>{this.props.children}</SingleEntityDataProvider>,
 		)
 
-		return <DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
+		return <DataProvider markerTree={markerTreeGenerator.generate()}>
+			{this.props.children}
+		</DataProvider>
 	}
 
 	public static generateMarkerTreeRoot(

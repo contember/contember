@@ -8,6 +8,7 @@ import AccessorTreeRoot from '../dao/AccessorTreeRoot'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
+import { PersistButton } from '../facade'
 import AccessorTreeGenerator from '../model/AccessorTreeGenerator'
 import MutationGenerator from '../model/MutationGenerator'
 import QueryGenerator from '../model/QueryGenerator'
@@ -85,6 +86,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 						{this.props.children}
 					</DataContext.Provider>
 				))}
+				<PersistButton />
 			</MetaOperationsContext.Provider>
 		)
 	}

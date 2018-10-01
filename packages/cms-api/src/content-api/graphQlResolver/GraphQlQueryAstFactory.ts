@@ -1,6 +1,7 @@
 import {
 	FieldNode as GraphQlFieldNode,
-	FragmentSpreadNode, GraphQLField,
+	FragmentSpreadNode,
+	GraphQLField,
 	GraphQLList,
 	GraphQLNonNull,
 	GraphQLObjectType,

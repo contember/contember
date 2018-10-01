@@ -9,17 +9,21 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 	private constructor(
 		private readonly wrapper: KnexWrapper,
 		private readonly options: DeleteBuilder.Options,
-		private readonly schema: string,
+		private readonly schema: string
 	) {}
 
 	public static create(wrapper: KnexWrapper, schema: string): DeleteBuilder.NewDeleteBuilder {
-		return new DeleteBuilder(wrapper, {
-			fromTable: undefined,
-			cte: {},
-			returningColumn: undefined,
-			usingTables: {},
-			wheres: []
-		}, schema) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
+		return new DeleteBuilder(
+			wrapper,
+			{
+				fromTable: undefined,
+				cte: {},
+				returningColumn: undefined,
+				usingTables: {},
+				wheres: [],
+			},
+			schema
+		) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
 	}
 
 	public with(alias: string, callback: QueryBuilder.Callback): DeleteBuilder.DeleteBuilderState<Result, Filled> {
@@ -85,7 +89,9 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		}
 
 		const qb = this.wrapper.knex.queryBuilder()
-		Object.entries(this.options.cte).forEach(([alias, cb]) => qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb, this.schema))))
+		Object.entries(this.options.cte).forEach(([alias, cb]) =>
+			qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb, this.schema)))
+		)
 
 		const usingBindings: any = []
 		Object.entries(this.options.usingTables).forEach(([alias, table]) => usingBindings.push(alias, table))
@@ -130,10 +136,10 @@ namespace DeleteBuilder {
 	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 
 	export interface Options {
-		fromTable: string | undefined,
-		cte: { [alias: string]: QueryBuilder.Callback },
-		returningColumn: string | Knex.Raw | undefined,
-		usingTables: { [alias: string]: string },
+		fromTable: string | undefined
+		cte: { [alias: string]: QueryBuilder.Callback }
+		returningColumn: string | Knex.Raw | undefined
+		usingTables: { [alias: string]: string }
 		wheres: (Knex.Raw | { [columName: string]: Value })[]
 	}
 

@@ -9,7 +9,7 @@ import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
-import assertNever from "../../../../../cms-common/src/utils/assertNever";
+import assertNever from '../../../../../cms-common/src/utils/assertNever'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
@@ -58,7 +58,6 @@ export default class SelectBuilder {
 
 			const promise = acceptFieldVisitor(this.schema, entity, field.name, {
 				visitColumn: async (entity, column) => {
-
 					const columnPath = path.for(field.alias)
 
 					this.addMetaFlag(entity, column, columnPath, Acl.Operation.read)
@@ -76,7 +75,12 @@ export default class SelectBuilder {
 		await Promise.all(Object.values(promises))
 	}
 
-	private addMetaFlag(entity: Model.Entity, column: Model.AnyColumn, path: Path, operation: Acl.Operation.read | Acl.Operation.update) {
+	private addMetaFlag(
+		entity: Model.Entity,
+		column: Model.AnyColumn,
+		path: Path,
+		operation: Acl.Operation.read | Acl.Operation.update
+	) {
 		if (entity.primary === column.name) {
 			return
 		}

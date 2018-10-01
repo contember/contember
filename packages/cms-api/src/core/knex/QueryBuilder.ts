@@ -3,7 +3,7 @@ import ConditionBuilder from './ConditionBuilder'
 import { Value } from './types'
 import KnexWrapper from './KnexWrapper'
 import WindowFunction from './WindowFunction'
-import CaseStatement from "./CaseStatement";
+import CaseStatement from './CaseStatement'
 
 type AffectedRows = number
 type Returning = number | string
@@ -14,7 +14,11 @@ interface Raw {
 }
 
 class QueryBuilder<R = { [columnName: string]: any }[]> {
-	constructor(public readonly wrapper: KnexWrapper, public readonly qb: Knex.QueryBuilder, private readonly schema: string) {}
+	constructor(
+		public readonly wrapper: KnexWrapper,
+		public readonly qb: Knex.QueryBuilder,
+		private readonly schema: string
+	) {}
 
 	public with(alias: string, select: QueryBuilder.Callback | Knex.Raw | QueryBuilder<any>): void {
 		if (select instanceof QueryBuilder) {

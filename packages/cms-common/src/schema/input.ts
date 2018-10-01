@@ -168,7 +168,7 @@ namespace Input {
 
 	export enum FieldMeta {
 		readable = 'readable',
-		updatable = 'updatable',
+		updatable = 'updatable'
 	}
 }
 

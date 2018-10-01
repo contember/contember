@@ -1,4 +1,10 @@
-import { GraphQLBoolean, GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLOutputType, } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLObjectType,
+	GraphQLObjectTypeConfig,
+	GraphQLOutputType,
+} from 'graphql'
 import { Acl, Input, Model } from 'cms-common'
 import { acceptFieldVisitor, getEntity as getEntityFromSchema } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
@@ -30,15 +36,13 @@ export default class EntityTypeProvider {
 		},
 	})
 
-
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider
-	) {
-	}
+	) {}
 
 	public getEntity(entityName: string): GraphQLObjectType {
 		return this.entities(entityName)

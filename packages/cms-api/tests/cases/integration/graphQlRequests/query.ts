@@ -1264,11 +1264,7 @@ describe('Queries', () => {
 						.column('title', c => c.type(Model.ColumnType.String))
 						.column('locale', c => c.type(Model.ColumnType.String))
 						.manyHasMany('categories', r =>
-							r
-								.target('Category', e =>
-									e.column('title', c => c.type(Model.ColumnType.String))
-								)
-								.inversedBy('posts')
+							r.target('Category', e => e.column('title', c => c.type(Model.ColumnType.String))).inversedBy('posts')
 						)
 				)
 				.buildSchema(),
@@ -1515,7 +1511,7 @@ describe('Queries', () => {
 				Author: {
 					predicates: {
 						name_eq: {
-							name: {eq: 'John'},
+							name: { eq: 'John' },
 						},
 					},
 					operations: {
@@ -1525,9 +1521,9 @@ describe('Queries', () => {
 						},
 						update: {
 							name: 'name_eq',
-						}
+						},
 					},
-				}
+				},
 			},
 			query: GQL`
         query {
@@ -1579,24 +1575,24 @@ describe('Queries', () => {
 									readable1: true,
 									readable2: true,
 									updatable1: false,
-								}
+								},
 							},
-							name1: "John",
-							name2: "John",
-						}
-					]
+							name1: 'John',
+							name2: 'John',
+						},
+					],
 				},
 			},
 		})
 	})
 
-
 	it('fragments', async () => {
 		await execute({
 			schema: new SchemaBuilder()
-				.entity('Author', e => e
-					.column('name', c => c.type(Model.ColumnType.String))
-					.oneHasMany('posts', r => r.target('Post', e => e.column('title', c => c.type(Model.ColumnType.String))))
+				.entity('Author', e =>
+					e
+						.column('name', c => c.type(Model.ColumnType.String))
+						.oneHasMany('posts', r => r.target('Post', e => e.column('title', c => c.type(Model.ColumnType.String))))
 				)
 				.buildSchema(),
 			query: GQL`

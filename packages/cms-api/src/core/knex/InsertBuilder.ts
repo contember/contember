@@ -7,7 +7,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	private constructor(
 		private readonly wrapper: KnexWrapper,
 		private readonly options: InsertBuilder.Options,
-		private readonly schema: string,
+		private readonly schema: string
 	) {}
 
 	public static create(wrapper: KnexWrapper, schema: string): InsertBuilder.NewInsertBuilder {
@@ -19,7 +19,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 				columns: undefined,
 				conflictAction: undefined,
 				returningColumn: undefined,
-				insertFrom: undefined
+				insertFrom: undefined,
 			},
 			schema
 		) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
@@ -36,7 +36,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	public into(intoTable: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {
 		return new InsertBuilder<Result, Filled | 'into'>(
 			this.wrapper,
-			{...this.options, intoTable},
+			{ ...this.options, intoTable },
 			this.schema
 		) as InsertBuilder.InsertBuilderState<Result, Filled | 'into'>
 	}
@@ -44,7 +44,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	public values(columns: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
 		return new InsertBuilder<Result, Filled | 'values'>(
 			this.wrapper,
-			{ ...this.options, columns},
+			{ ...this.options, columns },
 			this.schema
 		) as InsertBuilder.InsertBuilderState<Result, Filled | 'values'>
 	}
@@ -79,7 +79,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	public returning(column: string | Knex.Raw): InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled> {
 		return new InsertBuilder<InsertBuilder.Returning[], Filled>(
 			this.wrapper,
-			{...this.options, returningColumn: column},
+			{ ...this.options, returningColumn: column },
 			this.schema
 		) as InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled>
 	}
@@ -101,12 +101,16 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		}
 
 		const qb = this.wrapper.knex.queryBuilder()
-		Object.entries(this.options.cte).forEach(([alias, cb]) => qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb, this.schema))))
+		Object.entries(this.options.cte).forEach(([alias, cb]) =>
+			qb.with(alias, qb => cb(new QueryBuilder(this.wrapper, qb, this.schema)))
+		)
 
 		const insertFrom = this.options.insertFrom
 		if (insertFrom !== undefined) {
 			const columnNames = Object.keys(columns)
-			qb.into(this.wrapper.raw('??.?? (' + columnNames.map(() => '??').join(', ') + ')', this.schema, into, ...columnNames))
+			qb.into(
+				this.wrapper.raw('??.?? (' + columnNames.map(() => '??').join(', ') + ')', this.schema, into, ...columnNames)
+			)
 			qb.insert((qb: Knex.QueryBuilder) => {
 				const queryBuilder = new QueryBuilder(this.wrapper, qb, this.schema)
 				const values = Object.values(this.getColumnValues(columns))
@@ -182,11 +186,11 @@ namespace InsertBuilder {
 	export type InsertResult = AffectedRows | Returning[]
 
 	export interface Options {
-		intoTable: string | undefined,
-		cte: { [alias: string]: QueryBuilder.Callback },
-		columns: InsertBuilder.Values | undefined,
-		conflictAction: InsertBuilder.ConflictAction | undefined,
-		returningColumn: string | Knex.Raw | undefined,
+		intoTable: string | undefined
+		cte: { [alias: string]: QueryBuilder.Callback }
+		columns: InsertBuilder.Values | undefined
+		conflictAction: InsertBuilder.ConflictAction | undefined
+		returningColumn: string | Knex.Raw | undefined
 		insertFrom: QueryBuilder.Callback | undefined
 	}
 

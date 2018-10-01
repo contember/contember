@@ -81,7 +81,7 @@ export default class SelectBuilder {
 		const promises: Promise<void>[] = []
 		for (let field of input.fields) {
 			if (field.name === '_meta') {
-				this.processMetaFields(field as ObjectNode, path, entity);
+				this.processMetaFields(field as ObjectNode, path, entity)
 				continue
 			}
 
@@ -116,7 +116,13 @@ export default class SelectBuilder {
 		}
 	}
 
-	private addMetaFlag(entity: Model.Entity, fieldName: string, tablePath: Path, metaPath: Path, operation: Acl.Operation.read | Acl.Operation.update) {
+	private addMetaFlag(
+		entity: Model.Entity,
+		fieldName: string,
+		tablePath: Path,
+		metaPath: Path,
+		operation: Acl.Operation.read | Acl.Operation.update
+	) {
 		if (entity.primary === fieldName) {
 			return
 		}
@@ -141,26 +147,30 @@ export default class SelectBuilder {
 
 		this.hydrator.addColumn(columnPath)
 
-		const fieldPredicate = entity.primary === column.name
-			? undefined
-			: this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
+		const fieldPredicate =
+			entity.primary === column.name
+				? undefined
+				: this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
 
 		if (!fieldPredicate || Object.keys(fieldPredicate).length === 0) {
 			this.qb.select([tableAlias, column.columnName], columnAlias)
-
 		} else {
-			this.qb.select(expr => expr
-				.case(caseExpr => caseExpr
-					.when(
-						whenExpr => whenExpr.selectCondition(condition =>
-							this.whereBuilder.buildInternal(this.qb, condition, entity, columnPath.back(), fieldPredicate)
-						),
-						thenExpr => thenExpr.select([tableAlias, column.columnName])
-					)
-					.else(elseExpr => elseExpr.raw('null'))
-				), columnAlias)
+			this.qb.select(
+				expr =>
+					expr.case(caseExpr =>
+						caseExpr
+							.when(
+								whenExpr =>
+									whenExpr.selectCondition(condition =>
+										this.whereBuilder.buildInternal(this.qb, condition, entity, columnPath.back(), fieldPredicate)
+									),
+								thenExpr => thenExpr.select([tableAlias, column.columnName])
+							)
+							.else(elseExpr => elseExpr.raw('null'))
+					),
+				columnAlias
+			)
 		}
-
 	}
 
 	private async addRelation(object: ObjectNode<Input.ListQueryInput>, path: Path, entity: Model.Entity) {

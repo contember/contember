@@ -58,7 +58,7 @@ class SelectHydrator {
 		for (let columnPath of this.columns) {
 			const path = [...columnPath.path]
 			const last: string = path.pop() as string
-			const currentObject = path.reduce((obj, part) => obj[part] = obj[part] || {}, result)
+			const currentObject = path.reduce((obj, part) => (obj[part] = obj[part] || {}), result)
 
 			currentObject[last] = row[columnPath.getAlias()]
 		}

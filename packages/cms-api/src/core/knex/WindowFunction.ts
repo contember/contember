@@ -1,6 +1,6 @@
 import QueryBuilder from './QueryBuilder'
 import * as Knex from 'knex'
-import KnexWrapper from "./KnexWrapper";
+import KnexWrapper from './KnexWrapper'
 
 class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable {
 	private constructor(

@@ -119,7 +119,7 @@ class Initialize {
 			const currentMigration = await handler.fetch(new LatestMigrationByCurrentEventQuery(currentStageRow.event_id))
 			const currentMigrationFile = currentMigration === null ? '' : currentMigration.data.file
 
-			if (currentMigrationFile > stage.migration) {
+			if (currentMigrationFile > `${stage.migration}.sql`) {
 				throw new Error(
 					`Cannot revert to migration ${stage.migration} in project ${this.project.slug} (stage ${
 						stage.slug

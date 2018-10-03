@@ -22,7 +22,8 @@ class SelectHydrator {
 		this.promises.push({ path, parentKeyPath, data, defaultValue })
 	}
 
-	async hydrateGroups(rows: SelectHydrator.Rows, groupBy: string): Promise<SelectHydrator.GroupedObjects> {
+	public async hydrateGroups(rows: SelectHydrator.Rows, groupBy: string): Promise<SelectHydrator.GroupedObjects> {
+		await Promise.all(this.promises.map(it => it.data))
 		const result: SelectHydrator.GroupedObjects = {}
 		for (let row of rows) {
 			const key = row[groupBy]
@@ -34,13 +35,14 @@ class SelectHydrator {
 		return result
 	}
 
-	async hydrateAll(rows: SelectHydrator.Rows): Promise<SelectHydrator.ResultObjects>
-	async hydrateAll(rows: SelectHydrator.Rows, indexBy: string): Promise<SelectHydrator.IndexedResultObjects>
+	public async hydrateAll(rows: SelectHydrator.Rows): Promise<SelectHydrator.ResultObjects>
+	public async hydrateAll(rows: SelectHydrator.Rows, indexBy: string): Promise<SelectHydrator.IndexedResultObjects>
 
-	async hydrateAll(
+	public async hydrateAll(
 		rows: SelectHydrator.Rows,
 		indexBy?: string
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
+		await Promise.all(this.promises.map(it => it.data))
 		if (indexBy) {
 			const result: SelectHydrator.IndexedResultObjects = {}
 			for (let row of rows) {
@@ -52,7 +54,7 @@ class SelectHydrator {
 		return Promise.all(rows.map(row => this.hydrateRow(row)))
 	}
 
-	async hydrateRow(row: SelectHydrator.Row): Promise<SelectHydrator.ResultObject> {
+	private async hydrateRow(row: SelectHydrator.Row): Promise<SelectHydrator.ResultObject> {
 		const result: SelectHydrator.ResultObject = {}
 
 		for (let columnPath of this.columns) {

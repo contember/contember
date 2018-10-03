@@ -9,6 +9,7 @@ import StageByIdForUpdateQuery from './model/queries/StageByIdForUpdateQuery'
 import KnexQueryable from '../core/knex/KnexQueryable'
 import QueryHandler from '../core/query/QueryHandler'
 import LatestMigrationByCurrentEventQuery from './model/queries/LatestMigrationByCurrentEventQuery'
+import Command from "../core/cli/Command";
 
 const fs = require('fs')
 const exists = promisify(fs.exists)
@@ -94,7 +95,8 @@ class Initialize {
 	}
 
 	private async runMigrationsForStage(stage: Project.Stage) {
-		const migrationPath = this.migrationsDir + '/' + stage.migration
+		const migrationPath = this.migrationsDir + '/' + stage.migration + '.sql'
+		console.log(migrationPath)
 		if (!(await exists(migrationPath)) || !(await lstat(migrationPath)).isFile()) {
 			throw new Error(
 				`Migration ${stage.migration} does not exist in project ${this.project.slug} (stage ${stage.slug})`
@@ -102,7 +104,7 @@ class Initialize {
 		}
 
 		await this.projectDb.transaction(async trx => {
-			await trx.raw('SET tenant.identity_id = ??', [identityId]) // TODO: why is this needed??
+			await trx.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
 
 			const handler = new QueryHandler(
 				new KnexQueryable(new KnexConnection(trx, 'system'), {
@@ -124,17 +126,13 @@ class Initialize {
 				)
 			}
 
-			await trx.raw(trx.raw('SET SCHEMA ?', ['stage_' + stage.slug]).toQuery()) // calling trx.raw directly throws syntax error for some reason
+			await trx.raw('SET search_path TO ??', 'stage_' + stage.slug)
 
 			const files: string[] = await readDir(this.migrationsDir)
-			const stats = await Promise.all(files.map(file => lstat(this.migrationsDir + '/' + file)))
-			const migrations = files
-				.filter((file: string, index: number) => {
-					return (
-						file.endsWith('.sql') && file > currentMigrationFile && file <= stage.migration && stats[index].isFile()
-					)
-				})
-				.sort()
+
+			const migrations = await Promise.all(files
+				.filter(file => file.endsWith('.sql') && file > currentMigrationFile && file <= `${stage.migration}.sql`)
+				.filter(async file => (await lstat(this.migrationsDir + '/' + file)).isFile()))
 
 			if (migrations.length === 0) {
 				console.log(`No migrations to execute for project ${this.project.slug} (stage ${stage.slug})`)
@@ -142,7 +140,7 @@ class Initialize {
 			}
 
 			let previousId = currentStageRow.event_id
-			for (const file of migrations) {
+			for (const file of migrations.sort()) {
 				const migrationPath = this.migrationsDir + '/' + file
 				console.log(`Executing migration ${migrationPath} for project ${this.project.slug} (stage ${stage.slug})`)
 				await trx.raw((await readFile(migrationPath)).toString())
@@ -165,42 +163,55 @@ class Initialize {
 	}
 }
 
-;(async () => {
-	const file = await readFile(configFileName)
+interface Args
+{
+	configFileName: string
+	projectsDir: string
+}
 
-	const config = parseConfig(file, (error: string) => {
-		console.log(error + '\n')
-		process.exit(2)
-	})
+const command = new class extends Command<Args> {
 
-	const tenantDb = new KnexConnection(
-		Knex({
-			debug: false,
-			client: 'pg',
-			connection: config.tenant.db,
-		}),
-		'tenant'
-	)
+	protected parseArguments(argv: string[]): Args {
+		const configFileName = argv[2]
+		const projectsDir = argv[3]
+		if (typeof configFileName === 'undefined' || typeof projectsDir === 'undefined') {
+			throw new Command.InvalidArgumentError(`Usage: node ${argv[1]} path/to/config.yaml path/to/projectsDir`)
+		}
+		return { configFileName, projectsDir }
+	}
 
-	await Promise.all(
-		config.projects.map(async project => {
-			const migrationsDir = `${projectsDir}/${project.slug}/generated`
-			const projectDb = new KnexConnection(
-				Knex({
-					debug: false,
-					client: 'pg',
-					connection: project.dbCredentials,
-				}),
-				'system'
-			)
-			await projectDb.wrapper().raw('SET tenant.identity_id = ??', identityId)
-			const init = new Initialize(tenantDb, projectDb, project, migrationsDir)
-			await init.createOrUpdateProject()
-			await init.createInitEvent()
-			await init.initStages()
-		})
-	)
+	protected async execute({ configFileName, projectsDir }: Args): Promise<void> {
+		const file = await readFile(configFileName, { encoding: 'utf8' })
 
-	console.log('Done')
-	process.exit(0)
-})()
+		const config = parseConfig(file)
+
+		const tenantDb = new KnexConnection(
+			Knex({
+				debug: false,
+				client: 'pg',
+				connection: config.tenant.db,
+			}),
+			'tenant'
+		)
+
+		await Promise.all(
+			config.projects.map(async project => {
+				const migrationsDir = `${projectsDir}/${project.slug}/migrations`
+				const projectDb = new KnexConnection(
+					Knex({
+						debug: false,
+						client: 'pg',
+						connection: project.dbCredentials,
+					}),
+					'system'
+				)
+
+				const init = new Initialize(tenantDb, projectDb, project, migrationsDir)
+				await init.createOrUpdateProject()
+				await init.createInitEvent()
+				await init.initStages()
+			})
+		)
+	}
+}
+command.run()

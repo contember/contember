@@ -64,20 +64,17 @@ class CompositionRoot {
 			return new Container.Builder({})
 				.addService('project', () => project)
 				.addService('knexConnection', ({ project }) => {
-					return new KnexConnection(
-						knex({
-							debug: true,
-							client: 'pg',
-							connection: {
-								host: project.dbCredentials.host,
-								port: project.dbCredentials.port,
-								user: project.dbCredentials.user,
-								password: project.dbCredentials.password,
-								database: project.dbCredentials.database,
-							},
-						}),
-						project.slug
-					)
+					return knex({
+						debug: true,
+						client: 'pg',
+						connection: {
+							host: project.dbCredentials.host,
+							port: project.dbCredentials.port,
+							user: project.dbCredentials.user,
+							password: project.dbCredentials.password,
+							database: project.dbCredentials.database,
+						},
+					})
 				})
 				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
 				.build()

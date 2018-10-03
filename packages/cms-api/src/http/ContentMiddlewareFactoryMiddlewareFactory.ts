@@ -8,13 +8,14 @@ import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from '../content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { Context } from '../content-api/types'
 import AllowAllPermissionFactory from '../acl/AllowAllPermissionFactory'
+import * as Knex from 'knex'
 
 class ContentMiddlewareFactoryMiddlewareFactory {
 	constructor(
 		private projectContainers: Array<
 			Container<{
 				project: Project
-				knexConnection: KnexConnection
+				knexConnection: Knex
 				graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
 			}>
 		>
@@ -63,8 +64,9 @@ class ContentMiddlewareFactoryMiddlewareFactory {
 						throw new AuthenticationError(`Auth failure: ${res.locals.authResult.error}`)
 					}
 
+					const knexConnection = new KnexConnection(db, 'stage_' + stage.slug);
 					return {
-						db: db,
+						db: knexConnection,
 						identityId: res.locals.authResult.identityId,
 						identityVariables: {}, ///todo by identity
 					}

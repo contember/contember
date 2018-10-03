@@ -10,19 +10,11 @@ export type RootAccessor = (EntityAccessor | EntityForRemovalAccessor) | EntityC
 export default class AccessorTreeRoot {
 	public readonly id: TreeId
 
-	private constructor(
+	public constructor(
 		markerTreeRoot: MarkerTreeRoot,
 		public readonly root: RootAccessor,
 		public readonly entityName: EntityName,
 	) {
 		this.id = markerTreeRoot.id
-	}
-
-	public static createInstance(
-		markerTreeRoot: MarkerTreeRoot,
-		accessorRoot: RootAccessor,
-		entityName: EntityName,
-	): AccessorTreeRoot {
-		return new AccessorTreeRoot(markerTreeRoot, accessorRoot, entityName)
 	}
 }

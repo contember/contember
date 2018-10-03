@@ -30,7 +30,7 @@ export default class AccessorTreeGenerator {
 		if (Array.isArray(data)) {
 			const createAccessorTreeRoot = (): AccessorTreeRoot => {
 				// TODO, proper addNew callback
-				return AccessorTreeRoot.createInstance(tree, new EntityCollectionAccessor(entityAccessors, () => {}), tree.entityName)
+				return new AccessorTreeRoot(tree, new EntityCollectionAccessor(entityAccessors, () => {}), tree.entityName)
 			}
 			const entityAccessors: Array<EntityAccessor> = data.map((datum, i) =>
 				this.updateFields(
@@ -50,7 +50,7 @@ export default class AccessorTreeGenerator {
 			)
 			return createAccessorTreeRoot()
 		} else {
-			const createAccessorTreeRoot = (): AccessorTreeRoot => AccessorTreeRoot.createInstance(tree, entityAccessor, tree.entityName)
+			const createAccessorTreeRoot = (): AccessorTreeRoot => new AccessorTreeRoot(tree, entityAccessor, tree.entityName)
 			let entityAccessor: EntityAccessor = this.updateFields(
 				data,
 				tree.fields,

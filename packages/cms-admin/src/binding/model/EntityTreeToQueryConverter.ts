@@ -13,7 +13,7 @@ export default class EntityTreeToQueryConverter {
 			const queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 
 			return queryBuilder
-				.get(entityMarker.entityName, object => {
+				.get(`get${entityMarker.entityName}`, object => {
 					if (entityMarker.where) {
 						object = object.where(entityMarker.where)
 					}

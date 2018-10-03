@@ -56,9 +56,13 @@ class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 		this.dataCallback(
 			entity.primary,
 			(async () => {
+				const ids = await this.parentIdsGetter(entity.primary)
+				if (ids.length === 0) {
+					return {}
+				}
 				const whereWithParentId = {
 					...this.object.args.where,
-					[targetRelation.name]: { [entity.primary]: { in: await this.parentIdsGetter(entity.primary) } },
+					[targetRelation.name]: { [entity.primary]: { in: ids } },
 				}
 				const objectNode = new ObjectNode<Input.ListQueryInput>(
 					this.object.name,
@@ -83,6 +87,9 @@ class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 		joiningColumns: Mapper.JoiningColumns
 	): Promise<SelectHydrator.GroupedObjects> {
 		const ids = await this.parentIdsGetter(entity.primary)
+		if (ids.length === 0) {
+			return {}
+		}
 		const junctionValues = await this.junctionFetcher.fetchJunction(
 			this.db,
 			relation,
@@ -150,6 +157,9 @@ class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 			entity.primary,
 			(async () => {
 				const ids = await this.parentIdsGetter(entity.primary)
+				if (ids.length === 0) {
+					return {}
+				}
 				const idsWhere: Input.Where = {
 					[targetRelation.name]: {
 						[entity.primary]: {
@@ -178,6 +188,9 @@ class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 			entity.primary,
 			(async () => {
 				const ids = await this.parentIdsGetter(relation.name)
+				if (ids.length === 0) {
+					return {}
+				}
 				const idsWhere: Input.Where = {
 					[targetEntity.primary]: {
 						in: ids,
@@ -204,6 +217,9 @@ class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 			relation.name,
 			(async () => {
 				const ids = await this.parentIdsGetter(relation.name)
+				if (ids.length === 0) {
+					return {}
+				}
 				const idsWhere: Input.Where = {
 					[targetEntity.primary]: {
 						in: ids,

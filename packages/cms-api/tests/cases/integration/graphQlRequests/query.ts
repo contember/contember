@@ -280,6 +280,45 @@ describe('Queries', () => {
 		})
 	})
 
+
+	it('Post with author query with no result', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author')))
+				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        query {
+          listPost {
+            id
+            author {
+              id
+              name
+            }
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`
+              select
+                "root_"."id" as "root_id",
+                "root_"."author_id" as "root_author"
+              from "public"."post" as "root_"
+						`,
+						response: [],
+					},
+				]),
+			],
+			return: {
+				data: {
+					listPost: [],
+				},
+			},
+		})
+	})
+
+
 	it('Sites with settings (one-has-one owner)', async () => {
 		await execute({
 			schema: new SchemaBuilder()

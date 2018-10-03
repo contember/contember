@@ -6,6 +6,7 @@ import SchemaMigrator from '../../../src/content-schema/differ/SchemaMigrator'
 import SqlMigrator from '../../../src/content-api/sqlSchema/SqlMigrator'
 import { expect } from 'chai'
 import { SQL } from '../../src/tags'
+import 'mocha'
 
 function testDiffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema, expectedDiff: SchemaDiff) {
 	const actual = diffSchemas(originalSchema, updatedSchema)

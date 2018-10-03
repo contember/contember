@@ -126,7 +126,7 @@ describe('knex query builder', () => {
 			sql: SQL`
 				with "root_" as (select $1 :: text as "title", $2 :: int as "id", $3 :: text as "content") 
 				insert into "public"."author" ("id", "title") 
-					select "id", "title" from "public"."root_"
+					select "id", "title" from "root_"
         on conflict do nothing returning "id"`,
 			parameters: ['Hello', 1, null],
 		})
@@ -186,7 +186,7 @@ describe('knex query builder', () => {
                                   $1 :: text as "title",
                                   $2 :: int as "id",
                                   $3 :: text as "content") update "public"."author"
-      set "id" = "root_"."id", "title" = "root_"."title" from "public"."root_"`,
+      set "id" = "root_"."id", "title" = "root_"."title" from "root_"`,
 			parameters: ['Hello', 1, null],
 		})
 	})
@@ -274,7 +274,7 @@ describe('knex query builder', () => {
 			(select "foo"."bar", 
 				 row_number() over( partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_" 
 			 from "public"."foo" order by "foo"."ipsum" asc) 
-			select "data".* from "public"."data" where "data"."rowNumber_" > $1 and "data"."rowNumber_" <= $2`,
+			select "data".* from "data" where "data"."rowNumber_" > $1 and "data"."rowNumber_" <= $2`,
 			parameters: [1, 4],
 		})
 	})

@@ -36,7 +36,7 @@ describe('update', () => {
                   "root_"."id"
                 from "public"."author" as "root_"
                 where "root_"."id" = $2) update "public"."author"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
 							parameters: ['John', testUuid(1), testUuid(1)],
 							response: 1,
@@ -99,7 +99,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "public"."author" ("id", "name") 
 							select "root_"."id", "root_"."name" 
-							from "public"."root_"
+							from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'John'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -113,7 +113,7 @@ describe('update', () => {
                  "root_"."title"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "author_id" = "newData_"."author_id" from "public"."newData_"
+              set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 							response: 1,
@@ -152,7 +152,7 @@ describe('update', () => {
                  "root_"."title"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "author_id" = "newData_"."author_id" from "public"."newData_"
+              set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 							response: 1,
@@ -197,7 +197,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."author" as "root_"
                where "root_"."id" = $2) update "public"."author"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
 							parameters: ['John', testUuid(1), testUuid(1)],
 							response: 1,
@@ -241,7 +241,7 @@ describe('update', () => {
                                              "root_"."id"
                                            from "public"."author" as "root_"
                                            where "root_"."id" = $2) update "public"."author"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3`,
 							parameters: ['Jack', testUuid(1), testUuid(1)],
 							response: 1,
@@ -284,7 +284,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "public"."author" ("id", "name") 
 							select "root_"."id", "root_"."name"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'John'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -297,7 +297,7 @@ describe('update', () => {
                  "root_"."title"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "author_id" = "newData_"."author_id" from "public"."newData_"
+              set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 							response: 1,
@@ -335,7 +335,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "author_id" = "newData_"."author_id" from "public"."newData_"
+              set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
 							response: 1,
@@ -380,7 +380,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "author_id" = "newData_"."author_id" from "public"."newData_"
+              set "author_id" = "newData_"."author_id" from "newData_"
               where "post"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
 							response: 1,
@@ -455,7 +455,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "title", $3 :: text as "locale", $4 :: uuid as "post_id") 
 							insert into "public"."post_locale" ("id", "title", "locale", "post_id") 
 							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Hello', 'cs', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -502,7 +502,7 @@ describe('update', () => {
                  "root_"."post_id"
                from "public"."post_locale" as "root_"
                where "root_"."locale" = $2 and "root_"."post_id" = $3) update "public"."post_locale"
-              set "title" = "newData_"."title" from "public"."newData_"
+              set "title" = "newData_"."title" from "newData_"
               where "post_locale"."locale" = $4 and "post_locale"."post_id" = $5`,
 							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)],
 							response: 1,
@@ -550,7 +550,7 @@ describe('update', () => {
                from "public"."post_locale" as "root_"
                where "root_"."locale" = $2 and "root_"."post_id" = $3) 
 							update "public"."post_locale"
-              set "title" = "newData_"."title" from "public"."newData_"
+              set "title" = "newData_"."title" from "newData_"
               where "post_locale"."locale" = $4 and "post_locale"."post_id" = $5`,
 							parameters: ['Hello', 'cs', testUuid(2), 'cs', testUuid(2)],
 							response: 1,
@@ -593,7 +593,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "title", $3 :: text as "locale", $4 :: uuid as "post_id") 
 							insert into "public"."post_locale" ("id", "title", "locale", "post_id") 
 							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'World', 'cs', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -667,7 +667,7 @@ describe('update', () => {
                  "root_"."locale"
                from "public"."post_locale" as "root_"
                where "root_"."id" = $2) update "public"."post_locale"
-              set "post_id" = "newData_"."post_id" from "public"."newData_"
+              set "post_id" = "newData_"."post_id" from "newData_"
               where "post_locale"."id" = $3`,
 							parameters: [testUuid(2), testUuid(1), testUuid(1)],
 							response: 1,
@@ -707,7 +707,7 @@ describe('update', () => {
                  "root_"."locale"
                from "public"."post_locale" as "root_"
                where "root_"."id" = $2 and "root_"."post_id" = $3) update "public"."post_locale"
-              set "post_id" = "newData_"."post_id" from "public"."newData_"
+              set "post_id" = "newData_"."post_id" from "newData_"
               where "post_locale"."id" = $4 and "post_locale"."post_id" = $5`,
 							parameters: [null, testUuid(1), testUuid(2), testUuid(1), testUuid(2)],
 							response: 1,
@@ -763,7 +763,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "url") 
 							insert into "public"."site_setting" ("id", "url") 
 							select "root_"."id", "root_"."url"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'http://mangoweb.cz'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -776,7 +776,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 							response: 1,
@@ -821,7 +821,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."site_setting" as "root_"
                where "root_"."id" = $2) update "public"."site_setting"
-              set "url" = "newData_"."url" from "public"."newData_"
+              set "url" = "newData_"."url" from "newData_"
               where "site_setting"."id" = $3`,
 							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)],
 							response: 1,
@@ -900,7 +900,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 							response: 1,
@@ -946,7 +946,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(3), testUuid(3)],
 							response: 1,
@@ -959,7 +959,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 							response: 1,
@@ -1004,7 +1004,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."site_setting" as "root_"
                where "root_"."id" = $2) update "public"."site_setting"
-              set "url" = "newData_"."url" from "public"."newData_"
+              set "url" = "newData_"."url" from "newData_"
               where "site_setting"."id" = $3`,
 							parameters: ['http://mangoweb.cz', testUuid(1), testUuid(1)],
 							response: 1,
@@ -1047,7 +1047,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "url") 
 							insert into "public"."site_setting" ("id", "url") 
 							select "root_"."id", "root_"."url"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'http://mgw.cz'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -1060,7 +1060,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(1), testUuid(2), testUuid(2)],
 							response: 1,
@@ -1099,7 +1099,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
 							response: 1,
@@ -1145,7 +1145,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
 							response: 1,
@@ -1209,7 +1209,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."setting_id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
 							response: 1,
@@ -1219,7 +1219,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 							insert into "public"."site" ("id", "name", "setting_id") 
 							select "root_"."id", "root_"."name", "root_"."setting_id"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -1262,7 +1262,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 							insert into "public"."site" ("id", "name", "setting_id") 
 							select "root_"."id", "root_"."name", "root_"."setting_id"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -1308,7 +1308,7 @@ describe('update', () => {
                  "root_"."setting_id"
                from "public"."site" as "root_"
                where "root_"."setting_id" = $2) update "public"."site"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: ['Mangoweb', testUuid(2), testUuid(2)],
 							response: 1,
@@ -1354,7 +1354,7 @@ describe('update', () => {
                  "root_"."setting_id"
                from "public"."site" as "root_"
                where "root_"."setting_id" = $2) update "public"."site"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: ['Mangoweb', testUuid(2), testUuid(2)],
 							response: 1,
@@ -1397,7 +1397,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 							insert into "public"."site" ("id", "name", "setting_id") 
 							select "root_"."id", "root_"."name", "root_"."setting_id"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Mgw', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -1443,7 +1443,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."setting_id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."setting_id" = $3`,
 							parameters: [null, testUuid(2), testUuid(2)],
 							response: 1,
@@ -1556,7 +1556,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(2), testUuid(1), testUuid(1)],
 							response: 1,
@@ -1602,7 +1602,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [null, testUuid(3), testUuid(3)],
 							response: 1,
@@ -1615,7 +1615,7 @@ describe('update', () => {
                  "root_"."name"
                from "public"."site" as "root_"
                where "root_"."id" = $2) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "public"."newData_"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
               where "site"."id" = $3`,
 							parameters: [testUuid(2), testUuid(1), testUuid(1)],
 							response: 1,
@@ -1695,7 +1695,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "public"."category" ("id", "name") 
 							select "root_"."id", "root_"."name"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -1812,7 +1812,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."category" as "root_"
                where "root_"."id" = $2) update "public"."category"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "category"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
 							response: 1,
@@ -1859,7 +1859,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."category" as "root_"
                where "root_"."id" = $2) update "public"."category"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "category"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
 							response: 1,
@@ -1906,7 +1906,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."category" as "root_"
                where "root_"."id" = $2) update "public"."category"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "category"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
 							response: 0,
@@ -1916,7 +1916,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "name") 
 							insert into "public"."category" ("id", "name") 
 							select "root_"."id", "root_"."name"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -2002,7 +2002,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "title") 
 							insert into "public"."post" ("id", "title") 
 							select "root_"."id", "root_"."title"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Lorem'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -2119,7 +2119,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "title" = "newData_"."title" from "public"."newData_"
+              set "title" = "newData_"."title" from "newData_"
               where "post"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
 							response: 1,
@@ -2166,7 +2166,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "title" = "newData_"."title" from "public"."newData_"
+              set "title" = "newData_"."title" from "newData_"
               where "post"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
 							response: 1,
@@ -2213,7 +2213,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."post" as "root_"
                where "root_"."id" = $2) update "public"."post"
-              set "title" = "newData_"."title" from "public"."newData_"
+              set "title" = "newData_"."title" from "newData_"
               where "post"."id" = $3`,
 							parameters: ['Lorem', testUuid(1), testUuid(1)],
 							response: 0,
@@ -2223,7 +2223,7 @@ describe('update', () => {
 							(select $1 :: uuid as "id", $2 :: text as "title") 
 							insert into "public"."post" ("id", "title") 
 							select "root_"."id", "root_"."title"
-              from "public"."root_"
+              from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'Ipsum'],
 							response: { rows: [{ id: testUuid(1) }] },
@@ -2291,7 +2291,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."author" as "root_"
                where "root_"."id" = $2) update "public"."author"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3 and "author"."name" in ($4, $5) and "newData_"."name" in ($6, $7)`,
 							parameters: ['John', testUuid(1), testUuid(1), 'John', 'Jack', 'John', 'Jack'],
 							response: 1,
@@ -2356,7 +2356,7 @@ describe('update', () => {
                  "root_"."id"
                from "public"."author" as "root_"
                where "root_"."id" = $2) update "public"."author"
-              set "name" = "newData_"."name" from "public"."newData_"
+              set "name" = "newData_"."name" from "newData_"
               where "author"."id" = $3 and false and false`,
 							parameters: ['John', testUuid(1), testUuid(1)],
 							response: 0,

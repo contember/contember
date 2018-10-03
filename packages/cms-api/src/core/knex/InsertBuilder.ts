@@ -112,7 +112,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 				this.wrapper.raw('??.?? (' + columnNames.map(() => '??').join(', ') + ')', this.schema, into, ...columnNames)
 			)
 			qb.insert((qb: Knex.QueryBuilder) => {
-				const queryBuilder = new QueryBuilder(this.wrapper, qb, this.schema)
+				const queryBuilder = new QueryBuilder(this.wrapper, qb, this.schema, Object.keys(this.options.cte))
 				const values = Object.values(this.getColumnValues(columns))
 				values.forEach(raw => queryBuilder.qb.select(raw))
 				insertFrom(queryBuilder)

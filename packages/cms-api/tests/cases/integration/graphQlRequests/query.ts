@@ -1302,7 +1302,7 @@ describe('Queries', () => {
            order by "root_"."title" asc)
           select
             "data".*
-          from "public"."data"
+          from "data"
           where
             "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
 					parameters: [testUuid(1), testUuid(2), 'cs', 1, 3],
@@ -1417,7 +1417,7 @@ describe('Queries', () => {
            where "root_"."locale" = $1 and "root_"."author_id" in ($2, $3)
            order by "root_"."title" asc)
           select "data".*
-          from "public"."data"
+          from "data"
           where "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
 					parameters: ['cs', testUuid(1), testUuid(2), 1, 3],
 					response: [

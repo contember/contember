@@ -14,12 +14,11 @@ interface Raw {
 }
 
 class QueryBuilder<R = { [columnName: string]: any }[]> {
-
 	constructor(
 		public readonly wrapper: KnexWrapper,
 		public readonly qb: Knex.QueryBuilder,
 		private readonly schema: string,
-		private cteAliases: string[] = [],
+		private cteAliases: string[] = []
 	) {}
 
 	public with(alias: string, select: QueryBuilder.Callback | Knex.Raw | QueryBuilder<any>): void {

@@ -203,4 +203,4 @@ export const isOwnerRelation = (relation: Model.Relation): relation is Model.Own
 	return !isInversedRelation(relation)
 }
 
-export const emptySchema: Model.Schema = {entities: {}, enums: {}}
+export const emptySchema: Model.Schema = { entities: {}, enums: {} }

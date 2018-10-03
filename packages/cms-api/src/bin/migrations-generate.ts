@@ -24,33 +24,30 @@ const command = new class extends Command<Args> {
 		if (typeof projectName === 'undefined') {
 			throw new Command.InvalidArgumentError(`Usage: node ${argv[1]} projectName`)
 		}
-		return { projectName };
+		return { projectName }
 	}
 
 	protected async execute({ projectName }: Args): Promise<void> {
-
 		const migrationsDir = `${process.cwd()}/src/projects/${projectName}/migrations`
 		await mkdir(migrationsDir)
 		const modelDir = `${process.cwd()}/dist/src/projects/${projectName}/src/model.js`
 
-		const files: string[] = (await readDir(migrationsDir))
-		const filteredFiles: string[] = await Promise.all(files
-			.filter(file => file.endsWith('.json'))
-			.filter(async file => {
-			return (await lstatFile(`${migrationsDir}/${file}`)).isFile()
-		}))
+		const files: string[] = await readDir(migrationsDir)
+		const filteredFiles: string[] = await Promise.all(
+			files.filter(file => file.endsWith('.json')).filter(async file => {
+				return (await lstatFile(`${migrationsDir}/${file}`)).isFile()
+			})
+		)
 
 		const diffs = await Promise.all(
 			filteredFiles
 				.sort()
-				.map(async file =>
-					JSON.parse(await readFile(`${migrationsDir}/${file}`, { encoding: 'utf8' })))
+				.map(async file => JSON.parse(await readFile(`${migrationsDir}/${file}`, { encoding: 'utf8' })))
 		)
 
 		const currentSchema = diffs.reduce((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
 
 		const newSchema = await import(modelDir)
-
 
 		const diff = diffSchemas(currentSchema, newSchema.default.model)
 		if (diff === null) {
@@ -69,12 +66,11 @@ const command = new class extends Command<Args> {
 		await Promise.all([
 			writeFile(name + '.json', JSON.stringify(diff, undefined, "\t"), { encoding: 'utf8' }),
 			writeFile(name + '.sql', SqlMigrator.applyDiff(currentSchema, diff), { encoding: 'utf8' }),
-
 		])
 
 		console.log(name + '.json created')
 		console.log(name + '.sql created')
 	}
-}
+}()
 
 command.run()

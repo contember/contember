@@ -1,12 +1,13 @@
+import { assertNever } from 'cms-common'
 import * as React from 'react'
 import MarkerProvider from '../coreComponents/MarkerProvider'
 import DataBindingError from '../dao/DataBindingError'
-import EntityMarker, { EntityFields } from '../dao/EntityMarker'
+import EntityFields from '../dao/EntityFields'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import ReferenceMarker from '../dao/ReferenceMarker'
 
-type NodeResult = EntityMarker | FieldMarker | MarkerTreeRoot | ReferenceMarker
+type NodeResult = FieldMarker | MarkerTreeRoot | ReferenceMarker
 type RawNodeResult = NodeResult | NodeResult[] | undefined
 
 export default class MarkerTreeGenerator {
@@ -88,29 +89,11 @@ export default class MarkerTreeGenerator {
 				return dataMarker.generateFieldMarker(node.props)
 			}
 
-			if ('generateEntityMarker' in dataMarker && dataMarker.generateEntityMarker) {
-				if (children) {
-					return dataMarker.generateEntityMarker(
-						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children)),
-					)
-				}
-				throw new DataBindingError(
-					`Each ${
-						node.type.displayName
-					} component must have children that refer to its fields as otherwise, it would be redundant.`,
-				)
-			}
-
 			if ('generateMarkerTreeRoot' in dataMarker && dataMarker.generateMarkerTreeRoot) {
 				if (children) {
-					const processed = this.processNode(children)
-
-					if (processed instanceof EntityMarker) {
-						return dataMarker.generateMarkerTreeRoot(node.props, processed)
-					}
-					throw new DataBindingError(
-						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`,
+					return dataMarker.generateMarkerTreeRoot(
+						node.props,
+						this.mapNodeResultToEntityFields(this.processNode(children)),
 					)
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
@@ -118,13 +101,9 @@ export default class MarkerTreeGenerator {
 
 			if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
 				if (children) {
-					const processed = this.processNode(children)
-
-					if (processed instanceof EntityMarker) {
-						return dataMarker.generateReferenceMarker(node.props, processed)
-					}
-					throw new DataBindingError(
-						`Each ${node.type.displayName} component must have an <Entity /> component (or equivalent) as its child.`,
+					return dataMarker.generateReferenceMarker(
+						node.props,
+						this.mapNodeResultToEntityFields(this.processNode(children)),
 					)
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
@@ -162,23 +141,15 @@ export default class MarkerTreeGenerator {
 			} else if (marker instanceof MarkerTreeRoot) {
 				fields[marker.placeholderName] = marker
 			} else {
-				throw new DataBindingError(
-					'Detected a sub-entity directly within another one. Use a <Repeater /> or a similar component for relations.',
-				)
+				assertNever(marker)
 			}
 		}
 
 		return fields
 	}
 
-	private reportInvalidTreeError(marker: EntityMarker | FieldMarker | ReferenceMarker | undefined): never {
+	private reportInvalidTreeError(marker: FieldMarker | ReferenceMarker | undefined): never {
 		if (marker) {
-			if (marker instanceof EntityMarker) {
-				throw new DataBindingError(
-					`Top-level <Entity /> discovered. Any entity (or equivalent) components need to be used from within a DataProvider.`,
-				)
-			}
-
 			const kind = marker instanceof FieldMarker ? 'field' : 'relation'
 
 			throw new DataBindingError(

@@ -18,10 +18,8 @@ export default class EditPage extends React.Component<EditPageProps> {
 			<Layout>
 				<ParametersContext.Consumer>
 					{({ id }: { id: string }) => (
-						<SingleEntityDataProvider where={{ id }}>
-							<Entity name={this.props.entity}>
-								{this.props.children}
-							</Entity>
+						<SingleEntityDataProvider where={{ id }} name={this.props.entity}>
+							{this.props.children}
 						</SingleEntityDataProvider>
 					)}
 				</ParametersContext.Consumer>

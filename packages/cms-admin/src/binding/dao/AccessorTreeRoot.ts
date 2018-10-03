@@ -1,3 +1,4 @@
+import { EntityName } from '../bindingTypes'
 import EntityAccessor from './EntityAccessor'
 import EntityCollectionAccessor from './EntityCollectionAccessor'
 import EntityForRemovalAccessor from './EntityForRemovalAccessor'
@@ -9,11 +10,19 @@ export type RootAccessor = (EntityAccessor | EntityForRemovalAccessor) | EntityC
 export default class AccessorTreeRoot {
 	public readonly id: TreeId
 
-	private constructor(markerTreeRoot: MarkerTreeRoot, public readonly root: RootAccessor) {
+	private constructor(
+		markerTreeRoot: MarkerTreeRoot,
+		public readonly root: RootAccessor,
+		public readonly entityName: EntityName,
+	) {
 		this.id = markerTreeRoot.id
 	}
 
-	public static createInstance(markerTreeRoot: MarkerTreeRoot, accessorRoot: RootAccessor): AccessorTreeRoot {
-		return new AccessorTreeRoot(markerTreeRoot, accessorRoot)
+	public static createInstance(
+		markerTreeRoot: MarkerTreeRoot,
+		accessorRoot: RootAccessor,
+		entityName: EntityName,
+	): AccessorTreeRoot {
+		return new AccessorTreeRoot(markerTreeRoot, accessorRoot, entityName)
 	}
 }

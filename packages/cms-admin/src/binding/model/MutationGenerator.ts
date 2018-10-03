@@ -1,6 +1,6 @@
 import { CrudQueryBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
-import { ReceivedData, ReceivedEntityData } from '../bindingTypes'
+import { EntityName, ReceivedData, ReceivedEntityData } from '../bindingTypes'
 import AccessorTreeRoot, { RootAccessor } from '../dao/AccessorTreeRoot'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
@@ -17,26 +17,35 @@ export default class MutationGenerator {
 
 	public getPersistMutation(): string | undefined {
 		try {
-			const builder = this.addSubMutation(this.persistedData[this.currentData.id], this.currentData.root)
+			const builder = this.addSubMutation(
+				this.persistedData[this.currentData.id],
+				this.currentData.entityName,
+				this.currentData.root,
+			)
 			return builder.getGql()
 		} catch (e) {
 			return undefined
 		}
 	}
 
-	private addSubMutation(data: ReceivedData, entity: RootAccessor, queryBuilder?: QueryBuilder): QueryBuilder {
+	private addSubMutation(
+		data: ReceivedData,
+		entityName: EntityName,
+		entity: RootAccessor,
+		queryBuilder?: QueryBuilder,
+	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
 		if (entity instanceof EntityAccessor) {
 			if (entity.primaryKey === undefined) {
-				queryBuilder = this.addCreateMutation(entity, queryBuilder)
+				queryBuilder = this.addCreateMutation(entity, entityName, queryBuilder)
 			} else if (!Array.isArray(data)) {
-				queryBuilder = this.addUpdateMutation(entity, data, queryBuilder)
+				queryBuilder = this.addUpdateMutation(entity, entityName, data, queryBuilder)
 			}
 		} else if (entity instanceof EntityForRemovalAccessor) {
-			queryBuilder = this.addDeleteMutation(entity, queryBuilder)
+			queryBuilder = this.addDeleteMutation(entity, entityName, queryBuilder)
 		} else if (entity instanceof EntityCollectionAccessor) {
 			if (Array.isArray(data)) {
 				const entityCount = entity.entities.length
@@ -45,7 +54,7 @@ export default class MutationGenerator {
 					const currentEntity = entity.entities[entityI]
 
 					if (currentEntity instanceof EntityAccessor || currentEntity instanceof EntityForRemovalAccessor) {
-						queryBuilder = this.addSubMutation(data[dataI++], currentEntity, queryBuilder)
+						queryBuilder = this.addSubMutation(data[dataI++], entityName, currentEntity, queryBuilder)
 					} else if (currentEntity === undefined) {
 						// Do nothing. This was a non-persisted entity that was subsequently deleted.
 						// No need to create it only to delete it again…
@@ -61,23 +70,28 @@ export default class MutationGenerator {
 		return queryBuilder
 	}
 
-	private addDeleteMutation(entity: EntityForRemovalAccessor, queryBuilder?: QueryBuilder): QueryBuilder {
+	private addDeleteMutation(
+		entity: EntityForRemovalAccessor,
+		entityName: EntityName,
+		queryBuilder?: QueryBuilder,
+	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
 		return queryBuilder.delete(
-			`delete${entity.entityName}`,
+			`delete${entityName}`,
 			builder => {
 				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
 				return builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
-			`delete${entity.entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`,
+			`delete${entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`,
 		)
 	}
 
 	private addUpdateMutation(
 		entity: EntityAccessor,
+		entityName: EntityName,
 		data: ReceivedEntityData,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
@@ -92,27 +106,27 @@ export default class MutationGenerator {
 		}
 
 		return queryBuilder.update(
-			`update${entity.entityName}`,
+			`update${entityName}`,
 			builder => {
 				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
 				builder = builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: primaryKey })
 
 				return builder.data(builder => this.registerUpdateMutationPart(entity, data, builder))
 			},
-			`update${entity.entityName}_${this.primaryKeyToAlias(primaryKey)}`,
+			`update${entityName}_${this.primaryKeyToAlias(primaryKey)}`,
 		)
 	}
 
-	private addCreateMutation(entity: EntityAccessor, queryBuilder?: QueryBuilder): QueryBuilder {
+	private addCreateMutation(entity: EntityAccessor, entityName: EntityName, queryBuilder?: QueryBuilder): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		return queryBuilder.create(`create${entity.entityName}`, builder => {
+		return queryBuilder.create(`create${entityName}`, builder => {
 			builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
 			console.log('top-level create')
 			return builder // TODO
-		})
+		}) // TODO: add alias
 	}
 
 	private registerCreateMutationPart(

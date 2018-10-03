@@ -1,9 +1,11 @@
+import { GraphQlBuilder } from 'cms-client'
+import { Input } from 'cms-common'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
+import EntityFields from '../dao/EntityFields'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
@@ -11,6 +13,7 @@ import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface ToManyProps {
 	field: FieldName
+	where?: Input.Where<GraphQlBuilder.Literal>
 }
 
 export default class ToMany extends React.Component<ToManyProps> {
@@ -39,8 +42,8 @@ export default class ToMany extends React.Component<ToManyProps> {
 		)
 	}
 
-	public static generateReferenceMarker(props: ToManyProps, referredEntity: EntityMarker): ReferenceMarker {
-		return new ReferenceMarker(props.field, ExpectedCount.Many, referredEntity)
+	public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
+		return new ReferenceMarker(props.field, ExpectedCount.Many, fields, props.where)
 	}
 }
 

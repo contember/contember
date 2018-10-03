@@ -19,3 +19,4 @@ export {
 }
 
 export * from './facade'
+export * from './utils'

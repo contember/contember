@@ -14,13 +14,16 @@ interface Raw {
 }
 
 class QueryBuilder<R = { [columnName: string]: any }[]> {
+
 	constructor(
 		public readonly wrapper: KnexWrapper,
 		public readonly qb: Knex.QueryBuilder,
-		private readonly schema: string
+		private readonly schema: string,
+		private cteAliases: string[] = [],
 	) {}
 
 	public with(alias: string, select: QueryBuilder.Callback | Knex.Raw | QueryBuilder<any>): void {
+		this.cteAliases.push(alias)
 		if (select instanceof QueryBuilder) {
 			this.qb.with(alias, select.getSql())
 		} else if (typeof select === 'function') {
@@ -33,7 +36,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 	public from(tableName: string | Knex.Raw, alias?: string): void {
 		let raw: Knex.Raw
 		if (typeof tableName === 'string') {
-			raw = this.raw('??.??', this.schema, tableName)
+			raw = this.cteAliases.includes(tableName) ? this.raw('??', tableName) : this.raw('??.??', this.schema, tableName)
 		} else {
 			raw = tableName
 		}
@@ -119,7 +122,7 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
 		this.qb.table(this.raw('??.??', this.schema, tableName)).update(updateData)
 		const updateSql = this.qb.toSQL()
-		const fromQb = this.wrapper.queryBuilder()
+		const fromQb = new QueryBuilder(this.wrapper, this.wrapper.knex.queryBuilder(), this.schema, this.cteAliases)
 		callback(fromQb)
 		const selectSql = fromQb.qb.toSQL()
 		if (!selectSql.sql.startsWith('select *')) {

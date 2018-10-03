@@ -24,7 +24,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."author" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'John'],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -85,7 +85,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."author" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						where "root_"."name" in ($3, $4)
 						returning "id"`,
 						parameters: [testUuid(1), 'John', 'John', 'Jack'],
@@ -133,7 +133,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "url") 
 						insert into "public"."site_setting" ("id", "url") 
 						select "root_"."id", "root_"."url"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'https://mangoweb.cz'],
 						response: { rows: [{ id: testUuid(2) }] },
@@ -143,7 +143,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 						insert into "public"."site" ("id", "name", "setting_id") 
 						select "root_"."id", "root_"."name", "root_"."setting_id"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -190,7 +190,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "url") 
 						insert into "public"."site_setting" ("id", "url") 
 						select "root_"."id", "root_"."url"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'https://mangoweb.cz'],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -200,7 +200,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
 						insert into "public"."site" ("id", "name", "setting_id") 
 						select "root_"."id", "root_"."name", "root_"."setting_id"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'Mangoweb', testUuid(1)],
 						response: { rows: [{ id: testUuid(2) }] },
@@ -249,7 +249,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."author" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'John'],
 						response: { rows: [{ id: testUuid(2) }] },
@@ -259,7 +259,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: timestamp as "published_at", $3 :: uuid as "author_id") 
 						insert into "public"."post" ("id", "published_at", "author_id") 
 						select "root_"."id", "root_"."published_at", "root_"."author_id"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), '2018-06-11', testUuid(2)],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -318,7 +318,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: timestamp as "published_at") 
 						insert into "public"."post" ("id", "published_at") 
 						select "root_"."id", "root_"."published_at"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), '2018-06-11'],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -328,7 +328,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: locale as "locale", $4 :: text as "title") 
 						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), testUuid(2), 'cs', 'Ahoj svete'],
 						response: { rows: [{ id: testUuid(2) }] },
@@ -338,7 +338,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: locale as "locale", $4 :: text as "title") 
 						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), testUuid(3), 'en', 'Hello world'],
 						response: { rows: [{ id: testUuid(3) }] },
@@ -384,7 +384,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."post" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'Hello world'],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -394,7 +394,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."category" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'Category 1'],
 						response: { rows: [{ id: testUuid(2) }] },
@@ -404,7 +404,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."category" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(3), 'Category 2'],
 						response: { rows: [{ id: testUuid(3) }] },
@@ -466,7 +466,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."category" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(1), 'Hello world'],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -476,7 +476,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."post" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(2), 'Post 1'],
 						response: { rows: [{ id: testUuid(2) }] },
@@ -486,7 +486,7 @@ describe('Insert mutation', () => {
 						(select $1 :: uuid as "id", $2 :: text as "name") 
 						insert into "public"."post" ("id", "name") 
 						select "root_"."id", "root_"."name"
-            from "public"."root_"
+            from "root_"
 						returning "id"`,
 						parameters: [testUuid(3), 'Post 2'],
 						response: { rows: [{ id: testUuid(3) }] },

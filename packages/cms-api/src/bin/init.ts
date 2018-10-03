@@ -104,10 +104,11 @@ class Initialize {
 		}
 
 		await this.projectDb.transaction(async trx => {
-			await trx.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
+			const knexConnection = new KnexConnection(trx, 'system');
+			await knexConnection.wrapper().raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
 
 			const handler = new QueryHandler(
-				new KnexQueryable(new KnexConnection(trx, 'system'), {
+				new KnexQueryable(knexConnection, {
 					get(): QueryHandler<KnexQueryable> {
 						return handler
 					},
@@ -205,6 +206,8 @@ const command = new class extends Command<Args> {
 					}),
 					'system'
 				)
+
+				await projectDb.wrapper().raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
 
 				const init = new Initialize(tenantDb, projectDb, project, migrationsDir)
 				await init.createOrUpdateProject()

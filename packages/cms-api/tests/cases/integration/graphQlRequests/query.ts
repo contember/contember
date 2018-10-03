@@ -280,7 +280,6 @@ describe('Queries', () => {
 		})
 	})
 
-
 	it('Post with author query with no result', async () => {
 		await execute({
 			schema: new SchemaBuilder()
@@ -317,7 +316,6 @@ describe('Queries', () => {
 			},
 		})
 	})
-
 
 	it('Sites with settings (one-has-one owner)', async () => {
 		await execute({

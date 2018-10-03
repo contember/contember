@@ -22,12 +22,6 @@ interface Args {
 }
 
 const command = new class extends Command<Args> {
-	protected async execute(args: Args): Promise<void> {
-		const filename = `${__dirname}/../../../src/migrations/${args.type}/${prefix}-${args.name}.sql`
-		await fsWrite(filename, '', { encoding: 'utf8' })
-		console.log(await fsRealpath(filename))
-	}
-
 	protected parseArguments(argv: string[]): Args {
 		const type = argv[2]
 		const name = argv[3]
@@ -36,6 +30,12 @@ const command = new class extends Command<Args> {
 			throw new Command.InvalidArgumentError(`Usage: node ${argv[1]} project|tenant name`)
 		}
 		return { type, name }
+	}
+
+	protected async execute(args: Args): Promise<void> {
+		const filename = `${__dirname}/../../../src/migrations/${args.type}/${prefix}-${args.name}.sql`
+		await fsWrite(filename, '', { encoding: 'utf8' })
+		console.log(await fsRealpath(filename))
 	}
 }()
 

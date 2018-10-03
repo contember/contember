@@ -1,4 +1,4 @@
-CREATE EXTENSION IF NOT EXISTS pgcrypto SCHEMA "system";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA "system";
 
 
 CREATE FUNCTION "system"."make_diff"(old jsonb, new jsonb) RETURNS jsonb AS $$
@@ -21,7 +21,7 @@ $$ LANGUAGE  plpgsql;
 
 CREATE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
 
-  DECLARE new_event_id uuid := system.gen_random_uuid();
+  DECLARE new_event_id uuid := system.uuid_generate_v4();
   DECLARE new_event_type text;
   DECLARE new_event_data jsonb;
   DECLARE current_stage record;

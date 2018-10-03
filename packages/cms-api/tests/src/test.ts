@@ -32,6 +32,10 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 			sql: 'BEGIN;',
 			response: 1,
 		},
+		{
+			sql: 'SELECT set_config($1, $2, false)',
+			response: 1,
+		},
 		...executes,
 		{
 			sql: 'COMMIT;',
@@ -88,6 +92,7 @@ export const execute = async (test: Test) => {
 		const response = await graphql(graphQLSchema, test.query, null, {
 			db: new KnexConnection(connection, 'public'),
 			identityVariables: test.variables || {},
+			identityId: '11111111-1111-1111-1111-111111111111',
 		})
 		// console.log(response)
 		expect(response).deep.equal(test.return)

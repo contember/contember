@@ -9,7 +9,7 @@ import StageByIdForUpdateQuery from './model/queries/StageByIdForUpdateQuery'
 import KnexQueryable from '../core/knex/KnexQueryable'
 import QueryHandler from '../core/query/QueryHandler'
 import LatestMigrationByCurrentEventQuery from './model/queries/LatestMigrationByCurrentEventQuery'
-import Command from "../core/cli/Command";
+import Command from '../core/cli/Command'
 
 const fs = require('fs')
 const exists = promisify(fs.exists)
@@ -130,9 +130,11 @@ class Initialize {
 
 			const files: string[] = await readDir(this.migrationsDir)
 
-			const migrations = await Promise.all(files
-				.filter(file => file.endsWith('.sql') && file > currentMigrationFile && file <= `${stage.migration}.sql`)
-				.filter(async file => (await lstat(this.migrationsDir + '/' + file)).isFile()))
+			const migrations = await Promise.all(
+				files
+					.filter(file => file.endsWith('.sql') && file > currentMigrationFile && file <= `${stage.migration}.sql`)
+					.filter(async file => (await lstat(this.migrationsDir + '/' + file)).isFile())
+			)
 
 			if (migrations.length === 0) {
 				console.log(`No migrations to execute for project ${this.project.slug} (stage ${stage.slug})`)
@@ -163,14 +165,12 @@ class Initialize {
 	}
 }
 
-interface Args
-{
+interface Args {
 	configFileName: string
 	projectsDir: string
 }
 
 const command = new class extends Command<Args> {
-
 	protected parseArguments(argv: string[]): Args {
 		const configFileName = argv[2]
 		const projectsDir = argv[3]
@@ -213,5 +213,5 @@ const command = new class extends Command<Args> {
 			})
 		)
 	}
-}
+}()
 command.run()

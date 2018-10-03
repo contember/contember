@@ -64,7 +64,7 @@ class ContentMiddlewareFactoryMiddlewareFactory {
 						throw new AuthenticationError(`Auth failure: ${res.locals.authResult.error}`)
 					}
 
-					const knexConnection = new KnexConnection(db, 'stage_' + stage.slug);
+					const knexConnection = new KnexConnection(db, 'stage_' + stage.slug)
 					return {
 						db: knexConnection,
 						identityId: res.locals.authResult.identityId,

@@ -6,9 +6,8 @@ class MapperRunner {
 	constructor(
 		private readonly db: KnexWrapper,
 		private readonly mapperFactory: MapperFactory,
-		private readonly identityId: string,
-	) {
-	}
+		private readonly identityId: string
+	) {}
 
 	public run(cb: (mapper: Mapper) => void) {
 		return this.db.transaction(async trx => {

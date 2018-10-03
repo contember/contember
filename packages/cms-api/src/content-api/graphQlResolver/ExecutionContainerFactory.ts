@@ -103,7 +103,10 @@ class ExecutionContainerFactory {
 						junctionTableManager
 					)
 			)
-			.addService('mapperRunner', ({ mapperFactory }) => new MapperRunner(context.db.wrapper(), mapperFactory, context.identityId))
+			.addService(
+				'mapperRunner',
+				({ mapperFactory }) => new MapperRunner(context.db.wrapper(), mapperFactory, context.identityId)
+			)
 
 			.addService(
 				'readResolver',

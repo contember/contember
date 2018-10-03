@@ -6,8 +6,8 @@ import { ReferenceMarkerProvider } from '../coreComponents/MarkerProvider'
 import ToMany, { ToManyProps } from '../coreComponents/ToMany'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
+import EntityFields from '../dao/EntityFields'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import EntityMarker from '../dao/EntityMarker'
 import ReferenceMarker from '../dao/ReferenceMarker'
 import UnlinkButton from './UnlinkButton'
 
@@ -47,8 +47,8 @@ export default class Repeater extends React.Component<RepeaterProps> {
 		)
 	}
 
-	public static generateReferenceMarker(props: RepeaterProps, referredEntity: EntityMarker): ReferenceMarker {
-		return ToMany.generateReferenceMarker(props, referredEntity)
+	public static generateReferenceMarker(props: RepeaterProps, fields: EntityFields): ReferenceMarker {
+		return ToMany.generateReferenceMarker(props, fields)
 	}
 }
 

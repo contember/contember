@@ -8,7 +8,6 @@ export type EntityData = { [name in FieldName]: FieldData }
 
 export default class EntityAccessor {
 	constructor(
-		public readonly entityName: EntityName,
 		public readonly primaryKey: string | undefined,
 		public readonly data: EntityData,
 		public readonly replaceWith: (replacement: EntityAccessor) => void,

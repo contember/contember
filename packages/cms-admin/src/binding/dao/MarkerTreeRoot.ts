@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
-import { FieldName } from '../bindingTypes'
-import EntityMarker from './EntityMarker'
+import { EntityName, FieldName } from '../bindingTypes'
+import EntityFields from './EntityFields'
 import { TreeId } from './TreeId'
 
 export interface SingleEntityTreeConstraints {
@@ -25,7 +25,8 @@ export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTree
 
 	private constructor(
 		public readonly id: TreeId,
-		public readonly root: EntityMarker,
+		public readonly entityName: EntityName,
+		public readonly fields: EntityFields,
 		public readonly constraints: C,
 		public readonly associatedField?: FieldName,
 	) {}
@@ -39,10 +40,11 @@ export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTree
 	}
 
 	public static createInstance(
-		rootMarker: MarkerTreeRoot['root'],
+		entityName: EntityName,
+		fields: MarkerTreeRoot['fields'],
 		constraints: MarkerTreeRoot['constraints'],
 		associatedField?: FieldName,
 	): MarkerTreeRoot {
-		return new MarkerTreeRoot(MarkerTreeRoot.getNewTreeId(), rootMarker, constraints, associatedField)
+		return new MarkerTreeRoot(MarkerTreeRoot.getNewTreeId(), entityName, fields, constraints, associatedField)
 	}
 }

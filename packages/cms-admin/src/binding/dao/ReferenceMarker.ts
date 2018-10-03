@@ -1,5 +1,7 @@
+import { GraphQlBuilder } from 'cms-client'
+import { Input } from 'cms-common'
 import { FieldName } from '../bindingTypes'
-import EntityMarker from './EntityMarker'
+import EntityFields from './EntityFields'
 
 export enum ExpectedCount {
 	One, Many
@@ -9,6 +11,7 @@ export default class ReferenceMarker {
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly expectedCount: ExpectedCount,
-		public readonly reference: EntityMarker,
+		public readonly fields: EntityFields,
+		public readonly where?: Input.Where<GraphQlBuilder.Literal>,
 	) {}
 }

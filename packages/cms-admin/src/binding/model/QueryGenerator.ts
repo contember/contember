@@ -1,7 +1,6 @@
-import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
-import { assertNever, Input } from 'cms-common'
-import DataBindingError from '../dao/DataBindingError'
-import EntityMarker from '../dao/EntityMarker'
+import { CrudQueryBuilder } from 'cms-client'
+import { assertNever } from 'cms-common'
+import EntityFields from '../dao/EntityFields'
 import FieldMarker from '../dao/FieldMarker'
 import Marker from '../dao/Marker'
 import MarkerTreeRoot, { EntityListTreeConstraints, SingleEntityTreeConstraints } from '../dao/MarkerTreeRoot'
@@ -34,69 +33,54 @@ export default class QueryGenerator {
 		baseQueryBuilder: QueryBuilder,
 		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>,
 	): QueryBuilder {
-		if (subTree.root.where) {
-			throw new DataBindingError(
-				'When selecting a single item, it does not make sense for a top-level Entity to have a where clause.',
-			)
-		}
-
 		const boundedQueryBuilder = new CrudQueryBuilder.UnboundedGetQueryBuilder().where(subTree.constraints.where)
 		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder(boundedQueryBuilder.objectBuilder)
 		;[baseQueryBuilder, listQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerListQueryPart(subTree.root, listQueryBuilder),
+			this.registerListQueryPart(subTree.fields, listQueryBuilder),
 		)
 
-		return baseQueryBuilder.get(subTree.root.entityName, listQueryBuilder, subTree.id)
+		return baseQueryBuilder.get(subTree.entityName, listQueryBuilder, subTree.id)
 	}
 
 	private addListQuery(
 		baseQueryBuilder: QueryBuilder,
 		subTree: MarkerTreeRoot<EntityListTreeConstraints>,
 	): QueryBuilder {
-		const entityWhere = subTree.root.where
 		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder()
 
 		if (subTree.constraints.where) {
-			if (entityWhere) {
-				listQueryBuilder = listQueryBuilder.where({
-					and: [entityWhere, subTree.root.where],
-				} as Input.Where<GraphQlBuilder.Literal>) // TODO: This cast is necessary for the time being because TS…
-			} else {
-				listQueryBuilder = listQueryBuilder.where(subTree.constraints.where)
-			}
-		} else if (entityWhere) {
-			listQueryBuilder = listQueryBuilder.where(entityWhere)
+			listQueryBuilder = listQueryBuilder.where(subTree.constraints.where)
 		}
 
 		;[baseQueryBuilder, listQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerListQueryPart(subTree.root, listQueryBuilder),
+			this.registerListQueryPart(subTree.fields, listQueryBuilder),
 		)
 
 		// This naming convention is unfortunate & temporary
-		return baseQueryBuilder.list(`${subTree.root.entityName}s`, listQueryBuilder, subTree.id)
+		return baseQueryBuilder.list(`${subTree.entityName}s`, listQueryBuilder, subTree.id)
 	}
 
 	private *registerListQueryPart(
-		context: EntityMarker,
+		fields: EntityFields,
 		builder: CrudQueryBuilder.ListQueryBuilder,
 	): IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder> {
 		builder = builder.column('id')
 
-		for (const field in context.fields) {
-			const fieldValue: Marker = context.fields[field]
+		for (const field in fields) {
+			const fieldValue: Marker = fields[field]
 
 			if (fieldValue instanceof FieldMarker) {
 				builder = builder.column(fieldValue.name)
 			} else if (fieldValue instanceof ReferenceMarker) {
 				let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
 
-				if (fieldValue.reference.where) {
-					subBuilder = subBuilder.where(fieldValue.reference.where)
+				if (fieldValue.where) {
+					subBuilder = subBuilder.where(fieldValue.where)
 				}
 
-				for (const item of this.registerListQueryPart(fieldValue.reference, subBuilder)) {
+				for (const item of this.registerListQueryPart(fieldValue.fields, subBuilder)) {
 					if (item instanceof CrudQueryBuilder.ListQueryBuilder) {
 						// This branch will only get executed at most once per recursive call
 						subBuilder = new CrudQueryBuilder.ListQueryBuilder(item.objectBuilder)

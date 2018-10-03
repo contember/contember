@@ -87,15 +87,11 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 	public static generateSyntheticChildren(props: SelectFieldProps): React.ReactNode {
 		return (
 			<>
-				<EntityListDataProvider where={props.where} associatedField={props.name}>
-					<Entity name={props.entityName}>
-						<Field name={props.optionFieldName} />
-					</Entity>
+				<EntityListDataProvider name={props.entityName} where={props.where} associatedField={props.name}>
+					<Field name={props.optionFieldName} />
 				</EntityListDataProvider>
 				<ToOne field={props.name}>
-					<Entity name={props.entityName}>
-						<Field name={props.optionFieldName} />
-					</Entity>
+					<Field name={props.optionFieldName} />
 				</ToOne>
 			</>
 		)

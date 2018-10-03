@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
-import { FieldName } from '../bindingTypes'
+import { EntityName, FieldName } from '../bindingTypes'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
 import DataProvider from './DataProvider'
@@ -9,6 +9,7 @@ import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
 interface SingleEntityDataProviderProps {
+	name: EntityName
 	associatedField?: FieldName
 	where: Input.UniqueWhere<GraphQlBuilder.Literal>
 }
@@ -28,10 +29,11 @@ export default class SingleEntityDataProvider extends React.Component<SingleEnti
 
 	public static generateMarkerTreeRoot(
 		props: SingleEntityDataProviderProps,
-		treeRoot: MarkerTreeRoot['root'],
+		fields: MarkerTreeRoot['fields'],
 	): MarkerTreeRoot {
 		return MarkerTreeRoot.createInstance(
-			treeRoot,
+			props.name,
+			fields,
 			{
 				where: props.where,
 				whereType: 'unique',

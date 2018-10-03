@@ -104,7 +104,7 @@ class Initialize {
 		}
 
 		await this.projectDb.transaction(async trx => {
-			const knexConnection = new KnexConnection(trx, 'system');
+			const knexConnection = new KnexConnection(trx, 'system')
 			await knexConnection.wrapper().raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
 
 			const handler = new QueryHandler(

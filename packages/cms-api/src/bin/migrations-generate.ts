@@ -64,7 +64,7 @@ const command = new class extends Command<Args> {
 		const name = `${migrationsDir}/${year}-${month}-${day}-${hours}${minutes}${seconds}`
 
 		await Promise.all([
-			writeFile(name + '.json', JSON.stringify(diff, undefined, "\t"), { encoding: 'utf8' }),
+			writeFile(name + '.json', JSON.stringify(diff, undefined, '\t'), { encoding: 'utf8' }),
 			writeFile(name + '.sql', SqlMigrator.applyDiff(currentSchema, diff), { encoding: 'utf8' }),
 		])
 

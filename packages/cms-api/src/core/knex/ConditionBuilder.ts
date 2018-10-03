@@ -97,9 +97,11 @@ namespace ConditionBuilder {
 				const qb = this.wrapper.queryBuilder()
 				values(qb)
 				this.expressions.push(this.wrapper.raw('?? in (?)', QueryBuilder.toFqn(columnName), qb.getSql()))
-			} else {
+			} else if (values.length > 0) {
 				const parameters = values.map(() => '?').join(', ')
 				this.expressions.push(this.wrapper.raw(`?? in (${parameters})`, QueryBuilder.toFqn(columnName), ...values))
+			} else {
+				this.raw('false')
 			}
 		}
 

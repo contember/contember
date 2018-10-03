@@ -325,7 +325,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: locale as "locale", $4 :: text as "title") 
+						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: text as "locale", $4 :: text as "title") 
 						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"
@@ -335,7 +335,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: locale as "locale", $4 :: text as "title") 
+						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: text as "locale", $4 :: text as "title") 
 						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"

@@ -10,15 +10,14 @@ import { Context } from '../types'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import VariableInjector from '../../acl/VariableInjector'
 import PredicateFactory from '../../acl/PredicateFactory'
-import MapperFactory from '../sql/MapperFactory'
 import UniqueWhereExpander from './UniqueWhereExpander'
-import MapperRunner from '../sql/MapperRunner'
 import ReadResolver from './ReadResolver'
 import MutationResolver from './MutationResolver'
 import JunctionTableManager from '../sql/JunctionTableManager'
 import OrderByBuilder from '../sql/select/OrderByBuilder'
 import JunctionFetcher from '../sql/select/JunctionFetcher'
 import RelationFetchVisitorFactory from '../sql/select/RelationFetchVisitorFactory'
+import Mapper from "../sql/Mapper";
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Model.Schema, private readonly permissions: Acl.Permissions) {}
@@ -80,7 +79,7 @@ class ExecutionContainerFactory {
 			)
 
 			.addService(
-				'mapperFactory',
+				'mapper',
 				({
 					predicateFactory,
 					predicatesInjector,
@@ -91,8 +90,9 @@ class ExecutionContainerFactory {
 					whereBuilder,
 					junctionTableManager,
 				}) =>
-					new MapperFactory(
+					new Mapper(
 						this.schema,
+						context.db.wrapper(),
 						predicateFactory,
 						predicatesInjector,
 						selectBuilderFactory,
@@ -103,16 +103,15 @@ class ExecutionContainerFactory {
 						junctionTableManager
 					)
 			)
-			.addService('mapperRunner', ({ mapperFactory }) => new MapperRunner(context.db.wrapper(), mapperFactory))
 
 			.addService(
 				'readResolver',
-				({ mapperRunner, uniqueWhereExpander }) => new ReadResolver(mapperRunner, uniqueWhereExpander)
+				({ mapper, uniqueWhereExpander }) => new ReadResolver(mapper, uniqueWhereExpander)
 			)
 			.addService(
 				'mutationResolver',
-				({ mapperRunner, predicatesInjector, uniqueWhereExpander }) =>
-					new MutationResolver(mapperRunner, uniqueWhereExpander)
+				({ mapper, predicatesInjector, uniqueWhereExpander }) =>
+					new MutationResolver(mapper, uniqueWhereExpander)
 			)
 
 			.build()

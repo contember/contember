@@ -1,17 +1,18 @@
-import * as Koa from "koa";
-import { get } from "../core/koa/router";
-import { RenderPageOptions as PlaygroundRenderPageOptions, renderPlaygroundPage, } from '@apollographql/graphql-playground-html'
+import * as Koa from 'koa'
+import { get } from '../core/koa/router'
+import {
+	RenderPageOptions as PlaygroundRenderPageOptions,
+	renderPlaygroundPage,
+} from '@apollographql/graphql-playground-html'
 import { createPlaygroundOptions } from 'apollo-server-core'
-import * as accepts from "accepts";
+import * as accepts from 'accepts'
 
 class PlaygroundMiddlewareFactory {
 	public create(): Koa.Middleware {
 		return get('/', (ctx: Koa.Context, next) => {
 			const accept = accepts(ctx.req)
 			const types = accept.types() as string[]
-			const prefersHTML = types.find(
-					(x: string) => x === 'text/html' || x === 'application/json',
-				) === 'text/html'
+			const prefersHTML = types.find((x: string) => x === 'text/html' || x === 'application/json') === 'text/html'
 			if (!prefersHTML) {
 				return next()
 			}
@@ -24,9 +25,7 @@ class PlaygroundMiddlewareFactory {
 			}
 
 			ctx.set('Content-Type', 'text/html')
-			ctx.body = renderPlaygroundPage(
-				playgroundRenderPageOptions,
-			)
+			ctx.body = renderPlaygroundPage(playgroundRenderPageOptions)
 		})
 	}
 }

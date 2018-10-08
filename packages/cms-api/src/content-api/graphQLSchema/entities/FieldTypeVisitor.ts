@@ -24,7 +24,6 @@ export default class FieldTypeVisitor
 	}
 
 	public visitHasOne(entity: Model.Entity, relation: Model.Relation & Model.NullableRelation): GraphQLOutputType {
-		const entityType = this.entityTypeProvider.getEntity(relation.target)
-		return relation.nullable ? entityType : new GraphQLNonNull(entityType)
+		return this.entityTypeProvider.getEntity(relation.target)
 	}
 }

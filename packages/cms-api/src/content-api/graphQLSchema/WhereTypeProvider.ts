@@ -62,7 +62,7 @@ export default class WhereTypeProvider {
 		})
 	}
 
-	private getUniqueWhereFields(entity: Model.Entity, uniqueKeys: string[][]) {
+	public getUniqueWhereFields(entity: Model.Entity, uniqueKeys: string[][]) {
 		const fields: GraphQLInputFieldConfigMap = {}
 		for (const uniqueKey of uniqueKeys) {
 			for (const field of uniqueKey) {

@@ -51,7 +51,7 @@ describe('predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
 		)
-		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {})
+		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id', {})], {}, {})
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({
@@ -71,7 +71,8 @@ describe('predicates injector', () => {
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
 			'PostLocale',
-			[new FieldNode('id', 'id'), new FieldNode('title', 'title')],
+			[new FieldNode('id', 'id', {}), new FieldNode('title', 'title', {})],
+			{},
 			{}
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
@@ -90,9 +91,15 @@ describe('predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
 		)
-		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {
-			where: { id: { in: [1, 2] } },
-		})
+		const obj: ObjectNode = new ObjectNode(
+			'PostLocale',
+			'PostLocale',
+			[new FieldNode('id', 'id', {})],
+			{
+				where: { id: { in: [1, 2] } },
+			},
+			{}
+		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({
@@ -121,9 +128,15 @@ describe('predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
 		)
-		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id')], {
-			where: { title: { eq: 'abc' } },
-		})
+		const obj: ObjectNode = new ObjectNode(
+			'PostLocale',
+			'PostLocale',
+			[new FieldNode('id', 'id', {})],
+			{
+				where: { title: { eq: 'abc' } },
+			},
+			{}
+		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.where).deep.eq({

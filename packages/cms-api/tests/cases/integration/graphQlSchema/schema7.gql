@@ -1,0 +1,232 @@
+scalar DateTime
+
+input DateTimeCondition {
+  and: [DateTimeCondition!]
+  or: [DateTimeCondition!]
+  not: DateTimeCondition
+  eq: DateTime
+  null: Boolean
+  notEq: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+type Mutation {
+  createPost(data: PostCreateInput!): Post!
+  deletePost(where: PostUniqueWhere!): Post
+  updatePost(where: PostUniqueWhere!, data: PostUpdateInput!): Post
+  createPostLocale(data: PostLocaleCreateInput!): PostLocale!
+  deletePostLocale(where: PostLocaleUniqueWhere!): PostLocale
+  updatePostLocale(where: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
+}
+
+enum OrderDirection {
+  asc
+  desc
+}
+
+type Post {
+  _meta: PostMeta
+  id: UUID!
+  publishedAt: DateTime
+  locales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  localesByLocale(by: PostLocalesByLocaleUniqueWhere, where: PostLocaleWhere): PostLocale
+}
+
+input PostCreateInput {
+  publishedAt: DateTime
+  locales: [PostCreateLocalesEntityRelationInput!]
+}
+
+input PostCreateLocalesEntityRelationInput {
+  connect: PostLocaleUniqueWhere
+  create: PostLocaleWithoutPostCreateInput
+}
+
+type PostLocale {
+  _meta: PostLocaleMeta
+  id: UUID!
+  locale: String
+  title: String
+  post(where: PostWhere): Post
+}
+
+input PostLocaleCreateInput {
+  locale: String
+  title: String
+  post: PostLocaleCreatePostEntityRelationInput
+}
+
+input PostLocaleCreatePostEntityRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutLocalesCreateInput
+}
+
+type PostLocaleMeta {
+  id: FieldMeta
+  locale: FieldMeta
+  title: FieldMeta
+  post: FieldMeta
+}
+
+input PostLocaleOrderBy {
+  id: OrderDirection
+  locale: OrderDirection
+  title: OrderDirection
+  post: PostOrderBy
+}
+
+input PostLocalesByLocaleUniqueWhere {
+  locale: String
+}
+
+input PostLocaleUniqueWhere {
+  id: UUID
+  locale: String
+  post: UUID
+}
+
+input PostLocaleUpdateInput {
+  locale: String
+  title: String
+  post: PostLocaleUpdatePostEntityRelationInput
+}
+
+input PostLocaleUpdatePostEntityRelationInput {
+  create: PostWithoutLocalesCreateInput
+  update: PostWithoutLocalesUpdateInput
+  upsert: PostLocaleUpsertPostRelationInput
+  connect: PostUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input PostLocaleUpsertPostRelationInput {
+  update: PostWithoutLocalesUpdateInput
+  create: PostWithoutLocalesCreateInput
+}
+
+input PostLocaleWhere {
+  id: UUIDCondition
+  locale: StringCondition
+  title: StringCondition
+  post: PostWhere
+  and: [PostLocaleWhere!]
+  or: [PostLocaleWhere!]
+  not: PostLocaleWhere
+}
+
+input PostLocaleWithoutPostCreateInput {
+  locale: String
+  title: String
+}
+
+input PostLocaleWithoutPostUpdateInput {
+  locale: String
+  title: String
+}
+
+type PostMeta {
+  id: FieldMeta
+  publishedAt: FieldMeta
+  locales: FieldMeta
+}
+
+input PostOrderBy {
+  id: OrderDirection
+  publishedAt: OrderDirection
+}
+
+input PostUniqueWhere {
+  id: UUID
+}
+
+input PostUpdateInput {
+  publishedAt: DateTime
+  locales: [PostUpdateLocalesEntityRelationInput!]
+}
+
+input PostUpdateLocalesEntityRelationInput {
+  create: PostLocaleWithoutPostCreateInput
+  update: PostUpdateLocalesRelationInput
+  upsert: PostUpsertLocalesRelationInput
+  connect: PostLocaleUniqueWhere
+  disconnect: PostLocaleUniqueWhere
+  delete: PostLocaleUniqueWhere
+}
+
+input PostUpdateLocalesRelationInput {
+  where: PostLocaleUniqueWhere
+  data: PostLocaleWithoutPostUpdateInput
+}
+
+input PostUpsertLocalesRelationInput {
+  where: PostLocaleUniqueWhere
+  update: PostLocaleWithoutPostUpdateInput
+  create: PostLocaleWithoutPostCreateInput
+}
+
+input PostWhere {
+  id: UUIDCondition
+  publishedAt: DateTimeCondition
+  locales: PostLocaleWhere
+  and: [PostWhere!]
+  or: [PostWhere!]
+  not: PostWhere
+}
+
+input PostWithoutLocalesCreateInput {
+  publishedAt: DateTime
+}
+
+input PostWithoutLocalesUpdateInput {
+  publishedAt: DateTime
+}
+
+type Query {
+  getPost(where: PostUniqueWhere!): Post
+  listPost(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  getPostLocale(where: PostLocaleUniqueWhere!): PostLocale
+  listPostLocale(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  eq: String
+  null: Boolean
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+}
+
+scalar UUID
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  eq: UUID
+  null: Boolean
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}

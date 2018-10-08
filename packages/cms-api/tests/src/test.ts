@@ -10,6 +10,7 @@ import { Acl, Model } from 'cms-common'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
 import KnexConnection from '../../src/core/knex/KnexConnection'
+import S3 from '../../src/utils/S3'
 
 export interface SqlQuery {
 	sql: string
@@ -32,7 +33,16 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
-	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, permissions)
+	const builder = new GraphQlSchemaBuilderFactory(
+		new S3({
+			bucket: '',
+			prefix: '',
+			credentials: {
+				key: '',
+				secret: '',
+			},
+		})
+	).create(test.schema, permissions)
 	const graphQLSchema = builder.build()
 
 	// console.log(printSchema(graphQLSchema))

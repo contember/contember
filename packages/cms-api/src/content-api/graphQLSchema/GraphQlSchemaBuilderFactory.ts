@@ -23,10 +23,13 @@ import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 import UpdateEntityRelationAllowedOperationsVisitor from './mutations/UpdateEntityRelationAllowedOperationsVisitor'
 import CreateEntityRelationAllowedOperationsVisitor from './mutations/CreateEntityRelationAllowedOperationsVisitor'
 import OrderByTypeProvider from './OrderByTypeProvider'
+import S3 from '../../utils/S3'
 import HasManyToHasOneReducer from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer'
 import HasManyToHasOneRelationReducerFieldVisitor from '../extensions/hasManyToHasOneReducer/HasManyToHasOneRelationReducerVisitor'
 
 export default class GraphQlSchemaBuilderFactory {
+	constructor(private s3: S3) {}
+
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
 		const authorizator = new StaticAuthorizator(permissions)
 		const columnTypeResolver = new ColumnTypeResolver(schema, new EnumsProvider(schema))
@@ -132,6 +135,6 @@ export default class GraphQlSchemaBuilderFactory {
 			mutationResolverFactory
 		)
 
-		return new GraphQlSchemaBuilder(schema, queryProvider, mutationProvider)
+		return new GraphQlSchemaBuilder(schema, queryProvider, mutationProvider, this.s3)
 	}
 }

@@ -19,6 +19,14 @@ import TenantMiddlewareFactory from './http/TenantMiddlewareFactory'
 import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from './content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { DatabaseCredentials } from './tenant-api/config'
+import S3 from './utils/S3'
+
+export type ProjectContainer = Container<{
+	project: Project
+	knexConnection: knex
+	graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
+	s3: S3
+}>
 
 class CompositionRoot {
 	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<Project>): Koa {
@@ -52,7 +60,7 @@ class CompositionRoot {
 		return masterContainer.get('koa')
 	}
 
-	createProjectContainers(projects: Array<Project>) {
+	createProjectContainers(projects: Array<Project>): ProjectContainer[] {
 		return projects.map((project: Project) => {
 			return new Container.Builder({})
 				.addService('project', () => project)
@@ -69,7 +77,10 @@ class CompositionRoot {
 						},
 					})
 				})
-				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
+				.addService('s3', ({ project }) => {
+					return new S3(project.s3)
+				})
+				.addService('graphQlSchemaBuilderFactory', ({ s3 }) => new GraphQlSchemaBuilderFactory(s3))
 				.build()
 		})
 	}

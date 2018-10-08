@@ -27,6 +27,7 @@ type Mutation {
   createPostLocale(data: PostLocaleCreateInput!): PostLocale!
   deletePostLocale(where: PostLocaleUniqueWhere!): PostLocale
   updatePostLocale(where: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
+  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 enum OrderDirection {
@@ -197,6 +198,10 @@ type Query {
   listPost(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
   getPostLocale(where: PostLocaleUniqueWhere!): PostLocale
   listPostLocale(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+}
+
+type SignedUpload {
+  url: String!
 }
 
 input StringCondition {

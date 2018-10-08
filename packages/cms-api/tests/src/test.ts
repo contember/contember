@@ -27,21 +27,7 @@ export interface Test {
 }
 
 export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
-	return [
-		{
-			sql: 'BEGIN;',
-			response: 1,
-		},
-		{
-			sql: 'SELECT set_config($1, $2, false)',
-			response: 1,
-		},
-		...executes,
-		{
-			sql: 'COMMIT;',
-			response: 1,
-		},
-	]
+	return executes
 }
 
 export const execute = async (test: Test) => {

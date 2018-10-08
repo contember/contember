@@ -22,6 +22,10 @@
 		"init": "dist/src/bin/init.js"
 	},
 	"dependencies": {
+		"@koa/cors": "^2.2.2",
+		"@types/koa-bodyparser": "^5.0.1",
+		"@types/koa2-cors": "^2.0.1",
+		"apollo-server-core": "^2.1.0",
 		"apollo-server-koa": "^2.1.0",
 		"bcrypt": "^2.0.0",
 		"cms-common": "0.0.0",
@@ -33,6 +37,7 @@
 		"js-yaml": "^3.12.0",
 		"knex": "^0.14.6",
 		"koa": "^2.5.3",
+		"koa-bodyparser": "^4.2.1",
 		"node-pg-migrate": "^3.5.1",
 		"pg": "^7.4.3",
 		"uuid": "^3.3.2"

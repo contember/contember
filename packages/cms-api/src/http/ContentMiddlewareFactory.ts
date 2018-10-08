@@ -8,18 +8,21 @@ import { Context } from '../content-api/types'
 import AllowAllPermissionFactory from '../acl/AllowAllPermissionFactory'
 import * as Knex from 'knex'
 import * as Koa from 'koa'
-import { ContextWithRequest, route } from '../core/koa/router'
+import * as koaCompose from 'koa-compose'
+import { ContextWithRequest, get, route } from '../core/koa/router'
+import * as corsMiddleware from '@koa/cors';
+import * as bodyParser from 'koa-bodyparser';
+import PlaygroundMiddlewareFactory from "./PlaygroundMiddlewareFactory";
 
 class ContentMiddlewareFactory {
 	constructor(
-		private projectContainers: Array<
-			Container<{
-				project: Project
-				knexConnection: Knex
-				graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
-			}>
-		>
-	) {}
+		private projectContainers: Array<Container<{
+			project: Project
+			knexConnection: Knex
+			graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
+		}>>
+	) {
+	}
 
 	create(): Koa.Middleware {
 		return route(
@@ -49,6 +52,9 @@ class ContentMiddlewareFactory {
 				const dataSchema = dataSchemaBuilder.build()
 
 				const contentKoa = new Koa()
+				contentKoa.use(corsMiddleware())
+				contentKoa.use(bodyParser())
+				contentKoa.use(get('/', new PlaygroundMiddlewareFactory().create()))
 
 				contentKoa.use(async (ctx, next) => {
 					await db.transaction(async trx => {
@@ -59,6 +65,7 @@ class ContentMiddlewareFactory {
 
 				const contentApollo = new ApolloServer({
 					schema: dataSchema,
+					uploads: false,
 					context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {
 						if (ctx.state.authResult === undefined) {
 							throw new AuthenticationError(
@@ -78,14 +85,17 @@ class ContentMiddlewareFactory {
 							identityVariables: {}, ///todo by identity
 						}
 					},
+					playground: false,
 				})
-
 				contentApollo.applyMiddleware({
 					app: contentKoa,
 					path: '/',
+					disableHealthCheck: true,
+					cors: false,
+					bodyParserConfig: false,
 				})
 
-				await route('/', contentKoa)(ctx, next)
+				await koaCompose(contentKoa.middleware)(ctx, next)
 			}
 		)
 	}

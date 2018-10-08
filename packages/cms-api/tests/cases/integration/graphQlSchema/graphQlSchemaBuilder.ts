@@ -9,6 +9,7 @@ import { promisify } from 'util'
 import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
 import GraphQlSchemaBuilderFactory from '../../../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../../../src/acl/AllowAllPermissionFactory'
+import S3 from '../../../../src/utils/S3'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -22,7 +23,16 @@ interface Test {
 const testSchema = async (test: Test) => {
 	const builder = test.schema(new SchemaBuilder())
 
-	const schemaFactory = new GraphQlSchemaBuilderFactory()
+	const schemaFactory = new GraphQlSchemaBuilderFactory(
+		new S3({
+			bucket: '',
+			prefix: '',
+			credentials: {
+				key: '',
+				secret: '',
+			},
+		})
+	)
 	const schema = builder.buildSchema()
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)

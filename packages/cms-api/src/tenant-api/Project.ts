@@ -6,6 +6,7 @@ interface Project {
 	readonly name: string
 	readonly stages: Array<Project.Stage>
 	readonly dbCredentials: Project.DatabaseCredentials
+	readonly s3: Project.S3Config
 }
 
 namespace Project {
@@ -23,6 +24,15 @@ namespace Project {
 		readonly user: string
 		readonly password: string
 		readonly database: string
+	}
+
+	export interface S3Config {
+		readonly bucket: string
+		readonly prefix: string
+		readonly credentials: {
+			readonly key: string
+			readonly secret: string
+		}
 	}
 }
 

@@ -9,6 +9,7 @@ type Mutation {
   updateRoot(where: RootUniqueWhere!, data: RootUpdateInput!): Root
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntity!
   updateOneHasManyEntity(where: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntity
+  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 type OneHasManyEntity {
@@ -142,6 +143,10 @@ input RootWhere {
   and: [RootWhere!]
   or: [RootWhere!]
   not: RootWhere
+}
+
+type SignedUpload {
+  url: String!
 }
 
 input StringCondition {

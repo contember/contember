@@ -37,6 +37,24 @@ function checkDatabaseCredentials(json: any, path: string): void {
 	}
 }
 
+function checkS3Config(json: any, path: string): void {
+	if (typeof json.bucket === 'undefined') {
+		error(`Undefined property ${path}.bucket in config file`)
+	}
+	if (typeof json.prefix === 'undefined') {
+		error(`Undefined property ${path}.prefix in config file`)
+	}
+	if (typeof json.credentials === 'undefined') {
+		error(`Undefined property ${path}.credentials in config file`)
+	}
+	if (typeof json.credentials.key === 'undefined') {
+		error(`Undefined property ${path}.credentials.key in config file`)
+	}
+	if (typeof json.credentials.secret === 'undefined') {
+		error(`Undefined property ${path}.credentials.secret in config file`)
+	}
+}
+
 function checkConfigStructure(json: any): void {
 	if (typeof json.tenant === 'undefined') {
 		error('Undefined property tenant in config file')
@@ -85,7 +103,14 @@ function checkConfigStructure(json: any): void {
 			error(`Property projects[${i}].dbCredentials should be an array in config file`)
 		}
 		checkDatabaseCredentials(project.dbCredentials, `projects[${i}].dbCredentials`)
+		checkS3Config(project.s3, `projects[${i}].s3`)
 		i++
+	}
+	if (typeof json.server === 'undefined') {
+		error(`Undefined property server in config file`)
+	}
+	if (typeof json.server.port === 'undefined') {
+		error(`Undefined property server.port in config file`)
 	}
 }
 

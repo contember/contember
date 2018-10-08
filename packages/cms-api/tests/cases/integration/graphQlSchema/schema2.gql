@@ -6,6 +6,7 @@ type FieldMeta {
 type Mutation {
   createTest(data: TestCreateInput!): Test!
   updateTest(where: TestUniqueWhere!, data: TestUpdateInput!): Test
+  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 enum OrderDirection {
@@ -16,6 +17,10 @@ enum OrderDirection {
 type Query {
   getTest(where: TestUniqueWhere!): Test
   listTest(where: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
+}
+
+type SignedUpload {
+  url: String!
 }
 
 input StringCondition {

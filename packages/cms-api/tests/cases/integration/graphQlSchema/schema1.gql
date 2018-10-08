@@ -181,6 +181,7 @@ type Mutation {
   createAuthor(data: AuthorCreateInput!): Author!
   deleteAuthor(where: AuthorUniqueWhere!): Author
   updateAuthor(where: AuthorUniqueWhere!, data: AuthorUpdateInput!): Author
+  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 enum OrderDirection {
@@ -423,6 +424,10 @@ type Query {
   listCategory(where: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
   getAuthor(where: AuthorUniqueWhere!): Author
   listAuthor(where: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
+}
+
+type SignedUpload {
+  url: String!
 }
 
 input StringCondition {

@@ -25,6 +25,7 @@
 		"@koa/cors": "^2.2.2",
 		"apollo-server-core": "^2.1.0",
 		"apollo-server-koa": "^2.1.0",
+		"aws-sdk": "^2.331.0",
 		"bcrypt": "^2.0.0",
 		"cms-common": "0.0.0",
 		"fast-deep-equal": "^2.0.1",
@@ -36,6 +37,7 @@
 		"knex": "^0.14.6",
 		"koa": "^2.5.3",
 		"koa-bodyparser": "^4.2.1",
+		"mime-types": "^2.1.20",
 		"node-pg-migrate": "^3.5.1",
 		"pg": "^7.4.3",
 		"uuid": "^3.3.2"
@@ -50,6 +52,7 @@
 		"@types/koa": "^2.0.46",
 		"@types/koa-bodyparser": "^5.0.1",
 		"@types/koa2-cors": "^2.0.1",
+		"@types/mime-types": "^2.1.0",
 		"@types/mocha": "^5.2.4",
 		"@types/mock-knex": "^0.3.2",
 		"@types/pg": "^7.4.10",

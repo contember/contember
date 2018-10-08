@@ -10,6 +10,7 @@ type Mutation {
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntity!
   deleteOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
   updateOneHasManyEntity(where: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntity
+  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 type OneHasManyEntity {
@@ -165,6 +166,10 @@ input RootWithoutRCreateInput {
 
 input RootWithoutRUpdateInput {
   foo: String
+}
+
+type SignedUpload {
+  url: String!
 }
 
 input StringCondition {

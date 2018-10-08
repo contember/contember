@@ -4,7 +4,6 @@ import { acceptFieldVisitor, acceptRelationTypeVisitor, getColumnName } from '..
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
-import Mapper from '../Mapper'
 import WhereBuilder from './WhereBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
@@ -27,7 +26,6 @@ export default class SelectBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderByBuilder: OrderByBuilder,
 		private readonly predicateFactory: PredicateFactory,
-		private readonly mapper: Mapper,
 		private readonly qb: QueryBuilder,
 		private readonly hydrator: SelectHydrator,
 		private readonly relationFetchVisitorFactory: RelationFetchVisitorFactory
@@ -179,14 +177,9 @@ export default class SelectBuilder {
 			return this.getColumnValues(path.for(fieldName), columnName)
 		}
 
-		const fetchVisitor = this.relationFetchVisitorFactory.create(
-			this.mapper,
-			idsGetter,
-			object,
-			(parentKey, data, defaultValue) => {
-				this.hydrator.addPromise(path.for(object.alias), path.for(parentKey), data, defaultValue)
-			}
-		)
+		const fetchVisitor = this.relationFetchVisitorFactory.create(idsGetter, object, (parentKey, data, defaultValue) => {
+			this.hydrator.addPromise(path.for(object.alias), path.for(parentKey), data, defaultValue)
+		})
 		acceptRelationTypeVisitor(this.schema, entity, object.name, fetchVisitor)
 	}
 

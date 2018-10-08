@@ -1,11 +1,10 @@
 import { Input, Model } from 'cms-common'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import ObjectNode from './ObjectNode'
-import Mapper from "../sql/Mapper";
+import Mapper from '../sql/Mapper'
 
 export default class ReadResolver {
-	constructor(private readonly mapper: Mapper, private readonly uniqueWhereExpander: UniqueWhereExpander) {
-	}
+	constructor(private readonly mapper: Mapper, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
 	public async resolveListQuery(entity: Model.Entity, queryAst: ObjectNode<Input.ListQueryInput>) {
 		return await this.mapper.select(entity, queryAst)

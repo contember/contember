@@ -7,8 +7,7 @@ import Mapper from '../sql/Mapper'
 import { UserError } from 'graphql-errors'
 
 export default class MutationResolver {
-	constructor(private readonly mapper: Mapper, private readonly uniqueWhereExpander: UniqueWhereExpander) {
-	}
+	constructor(private readonly mapper: Mapper, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
 	public async resolveUpdate(entity: Model.Entity, queryAst: ObjectNode<Input.UpdateInput>) {
 		if (!isUniqueWhere(entity, queryAst.args.where)) {

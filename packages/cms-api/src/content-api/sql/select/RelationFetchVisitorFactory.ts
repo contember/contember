@@ -3,12 +3,16 @@ import ObjectNode from '../../graphQlResolver/ObjectNode'
 import JunctionFetcher from './JunctionFetcher'
 import { Input, Model } from 'cms-common'
 import Mapper from '../Mapper'
+import { Accessor } from '../../../utils/accessor'
 
 class RelationFetchVisitorFactory {
-	constructor(private readonly schema: Model.Schema, private readonly junctionFetcher: JunctionFetcher) {}
+	constructor(
+		private readonly schema: Model.Schema,
+		private readonly junctionFetcher: JunctionFetcher,
+		private readonly mapperAccessor: Accessor<Mapper>
+	) {}
 
 	create(
-		mapper: Mapper,
 		parentIdsGetter: (fieldName: string) => PromiseLike<Input.PrimaryValue[]>,
 		object: ObjectNode<Input.ListQueryInput>,
 		dataCallback: RelationFetchVisitor.DataCallback
@@ -16,8 +20,7 @@ class RelationFetchVisitorFactory {
 		return new RelationFetchVisitor(
 			this.schema,
 			this.junctionFetcher,
-			mapper,
-			mapper.db,
+			this.mapperAccessor.get(),
 			parentIdsGetter,
 			object,
 			dataCallback

@@ -22,14 +22,12 @@ class JunctionTableManager {
 	) {}
 
 	public async connectJunction(
-		db: KnexWrapper,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	): Promise<void> {
 		await this.executeJunctionModification(
-			db,
 			owningEntity,
 			relation,
 			ownerUnique,
@@ -39,14 +37,12 @@ class JunctionTableManager {
 	}
 
 	public async disconnectJunction(
-		db: KnexWrapper,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	): Promise<void> {
 		await this.executeJunctionModification(
-			db,
 			owningEntity,
 			relation,
 			ownerUnique,
@@ -56,7 +52,6 @@ class JunctionTableManager {
 	}
 
 	private async executeJunctionModification(
-		db: KnexWrapper,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
@@ -81,7 +76,7 @@ class JunctionTableManager {
 		if (hasNoPredicates && hasPrimaryValues) {
 			const ownerPrimary = ownerUnique[owningEntity.primary]
 			const inversedPrimary = inversedUnique[inversedEntity.primary]
-			await handler.executeSimple(db, joiningTable, ownerPrimary, inversedPrimary)
+			await handler.executeSimple(joiningTable, ownerPrimary, inversedPrimary)
 		} else {
 			const ownerWhere: Input.Where = {
 				and: [owningPredicate, this.uniqueWhereExpander.expand(owningEntity, ownerUnique)],
@@ -108,7 +103,7 @@ class JunctionTableManager {
 				this.whereBuilder.build(qb, inversedEntity, new Path([], 'inversed'), inversedWhere)
 			}
 
-			await handler.executeComplex(db, joiningTable, dataCallback)
+			await handler.executeComplex(joiningTable, dataCallback)
 		}
 	}
 
@@ -122,27 +117,23 @@ class JunctionTableManager {
 namespace JunctionTableManager {
 	export interface JunctionHandler {
 		executeSimple(
-			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue
 		): Promise<void>
 
-		executeComplex(
-			db: KnexWrapper,
-			joiningTable: Model.JoiningTable,
-			dataCallback: QueryBuilder.Callback
-		): Promise<void>
+		executeComplex(joiningTable: Model.JoiningTable, dataCallback: QueryBuilder.Callback): Promise<void>
 	}
 
 	export class JunctionConnectHandler implements JunctionHandler {
+		constructor(private readonly db: KnexWrapper) {}
+
 		async executeSimple(
-			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue
 		): Promise<void> {
-			await db
+			await this.db
 				.insertBuilder()
 				.into(joiningTable.tableName)
 				.values({
@@ -153,15 +144,11 @@ namespace JunctionTableManager {
 				.execute()
 		}
 
-		async executeComplex(
-			db: KnexWrapper,
-			joiningTable: Model.JoiningTable,
-			dataCallback: QueryBuilder.Callback
-		): Promise<void> {
-			const qb = db.queryBuilder()
+		async executeComplex(joiningTable: Model.JoiningTable, dataCallback: QueryBuilder.Callback): Promise<void> {
+			const qb = this.db.queryBuilder()
 			qb.with('data', dataCallback)
 
-			const insert = db
+			const insert = this.db
 				.insertBuilder()
 				.into(joiningTable.tableName)
 				.values({
@@ -169,7 +156,7 @@ namespace JunctionTableManager {
 					[joiningTable.inverseJoiningColumn.columnName]: expr =>
 						expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),
 				})
-				.returning(db.raw('true as inserted'))
+				.returning(this.db.raw('true as inserted'))
 				.from(qb => qb.from('data'))
 				.onConflict(InsertBuilder.ConflictActionType.doNothing)
 
@@ -188,13 +175,14 @@ namespace JunctionTableManager {
 	}
 
 	export class JunctionDisconnectHandler implements JunctionHandler {
+		constructor(private readonly db: KnexWrapper) {}
+
 		public async executeSimple(
-			db: KnexWrapper,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue
 		): Promise<void> {
-			const qb = db.queryBuilder()
+			const qb = this.db.queryBuilder()
 			qb.table(joiningTable.tableName)
 			qb.where(cond => cond.compare(joiningTable.joiningColumn.columnName, ConditionBuilder.Operator.eq, ownerPrimary))
 			qb.where(cond =>
@@ -204,14 +192,10 @@ namespace JunctionTableManager {
 			await qb.delete()
 		}
 
-		public async executeComplex(
-			db: KnexWrapper,
-			joiningTable: Model.JoiningTable,
-			dataCallback: QueryBuilder.Callback
-		): Promise<void> {
-			const qb = db.queryBuilder()
+		public async executeComplex(joiningTable: Model.JoiningTable, dataCallback: QueryBuilder.Callback): Promise<void> {
+			const qb = this.db.queryBuilder()
 
-			const deleteQb = db
+			const deleteQb = this.db
 				.deleteBuilder()
 				.from(joiningTable.tableName)
 				.using('data')
@@ -227,7 +211,7 @@ namespace JunctionTableManager {
 						['data', joiningTable.inverseJoiningColumn.columnName]
 					)
 				})
-				.returning(db.raw('true as deleted'))
+				.returning(this.db.raw('true as deleted'))
 
 			qb.with('data', dataCallback)
 			qb.with('delete', deleteQb.createQuery())

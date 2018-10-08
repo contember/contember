@@ -20,7 +20,7 @@ import JunctionTableManager from './JunctionTableManager'
 class Mapper {
 	constructor(
 		private readonly schema: Model.Schema,
-		public readonly db: KnexWrapper,
+		private readonly db: KnexWrapper,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
@@ -95,7 +95,7 @@ class Mapper {
 		const path = new Path([])
 		qb.from(entity.tableName, path.getAlias())
 
-		const selector = this.selectBuilderFactory.create(this, qb, hydrator)
+		const selector = this.selectBuilderFactory.create(qb, hydrator)
 		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input), path, groupBy)
 		const rows = await selector.execute()
 		await selectPromise
@@ -105,7 +105,7 @@ class Mapper {
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
 		const where = this.predicateFactory.create(entity, Acl.Operation.create, Object.keys(data))
-		const insertBuilder = this.insertBuilderFactory.create(entity, this.db)
+		const insertBuilder = this.insertBuilderFactory.create(entity)
 		insertBuilder.addWhere(where)
 		const promises = acceptEveryFieldVisitor(
 			this.schema,
@@ -129,7 +129,7 @@ class Mapper {
 		this.checkUniqueWhere(entity, where)
 
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-		const updateBuilder = this.updateBuilderFactory.create(entity, this.db, uniqueWhere)
+		const updateBuilder = this.updateBuilderFactory.create(entity, uniqueWhere)
 
 		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, Object.keys(data))
 		updateBuilder.addOldWhere(predicateWhere)
@@ -176,7 +176,7 @@ class Mapper {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	): Promise<void> {
-		await this.junctionTableManager.connectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
+		await this.junctionTableManager.connectJunction(owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
 	public async disconnectJunction(
@@ -185,7 +185,7 @@ class Mapper {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere
 	): Promise<void> {
-		await this.junctionTableManager.disconnectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
+		await this.junctionTableManager.disconnectJunction(owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
 	public async getPrimaryValue(entity: Model.Entity, where: Input.UniqueWhere) {

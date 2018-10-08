@@ -2,7 +2,6 @@ import JoinBuilder from './JoinBuilder'
 import WhereBuilder from './WhereBuilder'
 import { Model } from 'cms-common'
 import SelectBuilder from './SelectBuilder'
-import Mapper from '../Mapper'
 import SelectHydrator from './SelectHydrator'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 import PredicateFactory from '../../../acl/PredicateFactory'
@@ -19,14 +18,13 @@ export default class SelectBuilderFactory {
 		private readonly relationFetchVisitorFactory: RelationFetchVisitorFactory
 	) {}
 
-	create(mapper: Mapper, qb: QueryBuilder, hydrator: SelectHydrator): SelectBuilder {
+	create(qb: QueryBuilder, hydrator: SelectHydrator): SelectBuilder {
 		return new SelectBuilder(
 			this.schema,
 			this.joinBuilder,
 			this.whereBuilder,
 			this.orderByBuilder,
 			this.predicateFactory,
-			mapper,
 			qb,
 			hydrator,
 			this.relationFetchVisitorFactory

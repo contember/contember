@@ -23,8 +23,8 @@ import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 import UpdateEntityRelationAllowedOperationsVisitor from './mutations/UpdateEntityRelationAllowedOperationsVisitor'
 import CreateEntityRelationAllowedOperationsVisitor from './mutations/CreateEntityRelationAllowedOperationsVisitor'
 import OrderByTypeProvider from './OrderByTypeProvider'
-import HasManyToHasOneReducer from "../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer";
-import HasManyToHasOneRelationReducerFieldVisitor from "../extensions/hasManyToHasOneReducer/HasManyToHasOneRelationReducerVisitor";
+import HasManyToHasOneReducer from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer'
+import HasManyToHasOneRelationReducerFieldVisitor from '../extensions/hasManyToHasOneReducer/HasManyToHasOneRelationReducerVisitor'
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -34,7 +34,12 @@ export default class GraphQlSchemaBuilderFactory {
 		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
 		const orderByTypeProvider = new OrderByTypeProvider(schema, authorizator)
 		const entityTypeProviderAccessor = new Accessor<EntityTypeProvider>()
-		const hasManyToOneReducerVisitor = new HasManyToHasOneRelationReducerFieldVisitor(schema, authorizator, entityTypeProviderAccessor, whereTypeProvider)
+		const hasManyToOneReducerVisitor = new HasManyToHasOneRelationReducerFieldVisitor(
+			schema,
+			authorizator,
+			entityTypeProviderAccessor,
+			whereTypeProvider
+		)
 		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
 
 		const entityTypeProvider = new EntityTypeProvider(
@@ -44,7 +49,7 @@ export default class GraphQlSchemaBuilderFactory {
 			whereTypeProvider,
 			orderByTypeProvider,
 			{
-				[HasManyToHasOneReducer.extensionName]: hasManyToOneReducer
+				[HasManyToHasOneReducer.extensionName]: hasManyToOneReducer,
 			}
 		)
 		entityTypeProviderAccessor.set(entityTypeProvider)

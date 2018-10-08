@@ -8,9 +8,9 @@ import QueryBuilder from '../../../core/knex/QueryBuilder'
 import OrderByBuilder from './OrderByBuilder'
 import FieldsVisitorFactory from './handlers/FieldsVisitorFactory'
 import LimitByGroupWrapper from '../../../core/knex/LimitByGroupWrapper'
-import SelectExecutionHandler from "./SelectExecutionHandler";
-import FieldNode from "../../graphQlResolver/FieldNode";
-import MetaHandler from "./handlers/MetaHandler";
+import SelectExecutionHandler from './SelectExecutionHandler'
+import FieldNode from '../../graphQlResolver/FieldNode'
+import MetaHandler from './handlers/MetaHandler'
 
 export default class SelectBuilder {
 	public readonly rows: PromiseLike<SelectHydrator.Rows>
@@ -29,7 +29,7 @@ export default class SelectBuilder {
 		private readonly qb: QueryBuilder,
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
-		private readonly selectHandlers: {[key: string]: SelectExecutionHandler<any>}
+		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> }
 	) {
 		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
 		this.rows = this.createRowsPromise(blocker)
@@ -85,7 +85,7 @@ export default class SelectBuilder {
 					const columnName = getColumnName(this.schema, entity, fieldName)
 					const ids = await this.getColumnValues(path.for(fieldName), columnName)
 
-					const data = (async () => ids.length > 0 ? cb(ids) : {})()
+					const data = (async () => (ids.length > 0 ? cb(ids) : {}))()
 					this.hydrator.addPromise(fieldPath, path.for(fieldName), data, defaultValue)
 				},
 				addColumn: (qbCallback, path) => {
@@ -113,7 +113,6 @@ export default class SelectBuilder {
 			acceptFieldVisitor(this.schema, entity, field.name, fieldVisitor)
 		}
 	}
-
 
 	private async createRowsPromise(blocker: PromiseLike<void>): Promise<SelectHydrator.Rows> {
 		await blocker

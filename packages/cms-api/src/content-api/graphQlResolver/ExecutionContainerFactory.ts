@@ -18,13 +18,13 @@ import OrderByBuilder from '../sql/select/OrderByBuilder'
 import JunctionFetcher from '../sql/select/JunctionFetcher'
 import Mapper from '../sql/Mapper'
 import { Accessor } from '../../utils/accessor'
-import FieldsVisitorFactory from "../sql/select/handlers/FieldsVisitorFactory";
-import QueryBuilder from "../../core/knex/QueryBuilder";
-import SelectHydrator from "../sql/select/SelectHydrator";
-import SelectBuilder from "../sql/select/SelectBuilder";
-import MetaHandler from "../sql/select/handlers/MetaHandler";
-import HasManyToHasOneReducerExecutionHandler from "../extensions/hasManyToHasOneReducer/HasManyToHasOneReducerExecutionHandler";
-import HasManyToHasOneReducer from "../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer";
+import FieldsVisitorFactory from '../sql/select/handlers/FieldsVisitorFactory'
+import QueryBuilder from '../../core/knex/QueryBuilder'
+import SelectHydrator from '../sql/select/SelectHydrator'
+import SelectBuilder from '../sql/select/SelectBuilder'
+import MetaHandler from '../sql/select/handlers/MetaHandler'
+import HasManyToHasOneReducerExecutionHandler from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducerExecutionHandler'
+import HasManyToHasOneReducer from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer'
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Model.Schema, private readonly permissions: Acl.Permissions) {}
@@ -58,27 +58,43 @@ class ExecutionContainerFactory {
 				({ junctionFetcher, mapperAccessor, predicateFactory, whereBuilder }) =>
 					new FieldsVisitorFactory(this.schema, junctionFetcher, mapperAccessor, predicateFactory, whereBuilder)
 			)
-			.addService('metaHandler', ({ whereBuilder, predicateFactory }) => new MetaHandler(whereBuilder, predicateFactory))
+			.addService(
+				'metaHandler',
+				({ whereBuilder, predicateFactory }) => new MetaHandler(whereBuilder, predicateFactory)
+			)
 			.addService('uniqueWhereExpander', () => new UniqueWhereExpander(this.schema))
 			.addService(
 				'hasManyToHasOneReducer',
-				({ mapperAccessor }) =>
-					new HasManyToHasOneReducerExecutionHandler(this.schema, mapperAccessor)
+				({ mapperAccessor }) => new HasManyToHasOneReducerExecutionHandler(this.schema, mapperAccessor)
 			)
-			.addService(
-				'selectHandlers',
-				({ hasManyToHasOneReducer}) => ({
-					[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer
-				})
-			)
+			.addService('selectHandlers', ({ hasManyToHasOneReducer }) => ({
+				[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,
+			}))
 			.addService(
 				'selectBuilderFactory',
-				({ joinBuilder, whereBuilder, orderByBuilder, predicateFactory, fieldsVisitorFactory, metaHandler, selectHandlers }) =>
+				({
+					joinBuilder,
+					whereBuilder,
+					orderByBuilder,
+					predicateFactory,
+					fieldsVisitorFactory,
+					metaHandler,
+					selectHandlers,
+				}) =>
 					new class implements SelectBuilderFactory {
 						create(qb: QueryBuilder, hydrator: SelectHydrator): SelectBuilder {
-							return new SelectBuilder(that.schema, whereBuilder, orderByBuilder, metaHandler, qb, hydrator, fieldsVisitorFactory, selectHandlers)
+							return new SelectBuilder(
+								that.schema,
+								whereBuilder,
+								orderByBuilder,
+								metaHandler,
+								qb,
+								hydrator,
+								fieldsVisitorFactory,
+								selectHandlers
+							)
 						}
-					}
+					}()
 			)
 			.addService(
 				'insertBuilderFactory',

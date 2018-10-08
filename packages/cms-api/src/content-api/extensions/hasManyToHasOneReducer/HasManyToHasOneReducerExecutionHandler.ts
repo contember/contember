@@ -1,17 +1,13 @@
 import { Input, Model } from 'cms-common'
-import SelectExecutionHandler from "../../sql/select/SelectExecutionHandler";
-import { Accessor } from "../../../utils/accessor";
-import Mapper from "../../sql/Mapper";
-import ObjectNode from "../../graphQlResolver/ObjectNode";
-import { acceptFieldVisitor } from "../../../content-schema/modelUtils";
-import { isIt } from "../../../utils/type";
+import SelectExecutionHandler from '../../sql/select/SelectExecutionHandler'
+import { Accessor } from '../../../utils/accessor'
+import Mapper from '../../sql/Mapper'
+import ObjectNode from '../../graphQlResolver/ObjectNode'
+import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
+import { isIt } from '../../../utils/type'
 
 class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
-	constructor(
-		private readonly schema: Model.Schema,
-		private readonly mapperAccessor: Accessor<Mapper>,
-	) {
-	}
+	constructor(private readonly schema: Model.Schema, private readonly mapperAccessor: Accessor<Mapper>) {}
 
 	process(context: SelectExecutionHandler.Context): void {
 		const { addData, entity, field } = context
@@ -40,31 +36,31 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ where: whereWithParentId })
 
 				return this.mapperAccessor.get().select(targetEntity, newObjectNode, targetRelation.name)
-			}, null)
+			},
+			null
+		)
 	}
 
-	private getRelationTarget(entity: Model.Entity, relationName: string): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] {
-		return acceptFieldVisitor(
-			this.schema,
-			entity,
-			relationName,
-			{
-				visitColumn: (): never => {
+	private getRelationTarget(
+		entity: Model.Entity,
+		relationName: string
+	): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] {
+		return acceptFieldVisitor(this.schema, entity, relationName, {
+			visitColumn: (): never => {
+				throw new Error()
+			},
+			visitRelation: (
+				entity,
+				relation,
+				targetEntity,
+				targetRelation
+			): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] => {
+				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
 					throw new Error()
-				},
-				visitRelation: (
-					entity,
-					relation,
-					targetEntity,
-					targetRelation
-				): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] => {
-					if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
-						throw new Error()
-					}
-					return [targetEntity, targetRelation]
-				},
-			}
-		)
+				}
+				return [targetEntity, targetRelation]
+			},
+		})
 	}
 }
 

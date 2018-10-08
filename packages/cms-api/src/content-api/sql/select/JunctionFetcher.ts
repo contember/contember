@@ -7,18 +7,17 @@ import ConditionBuilder from '../../../core/knex/ConditionBuilder'
 import OrderByBuilder from './OrderByBuilder'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import PredicatesInjector from '../../../acl/PredicatesInjector'
-import WindowFunction from '../../../core/knex/WindowFunction'
 import LimitByGroupWrapper from '../../../core/knex/LimitByGroupWrapper'
 
 class JunctionFetcher {
 	constructor(
+		private readonly db: KnexWrapper,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderBuilder: OrderByBuilder,
 		private readonly predicateInjector: PredicatesInjector
 	) {}
 
 	public async fetchJunction(
-		db: KnexWrapper,
 		relation: Model.ManyHasManyOwnerRelation,
 		values: Input.PrimaryValue[],
 		column: Mapper.JoiningColumns,
@@ -28,7 +27,7 @@ class JunctionFetcher {
 		const joiningTable = relation.joiningTable
 
 		const whereColumn = column.sourceColumn.columnName
-		const qb = db.queryBuilder()
+		const qb = this.db.queryBuilder()
 		qb.from(joiningTable.tableName, 'junction_')
 		qb.select(['junction_', joiningTable.inverseJoiningColumn.columnName])
 		qb.select(['junction_', joiningTable.joiningColumn.columnName])

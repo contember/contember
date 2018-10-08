@@ -4,14 +4,12 @@ import SelectHydrator from './SelectHydrator'
 import Mapper from '../Mapper'
 import FieldNode from '../../graphQlResolver/FieldNode'
 import JunctionFetcher from './JunctionFetcher'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly junctionFetcher: JunctionFetcher,
 		private readonly mapper: Mapper,
-		private readonly db: KnexWrapper,
 		private readonly parentIdsGetter: (fieldName: string) => PromiseLike<Input.PrimaryValue[]>,
 		private readonly object: ObjectNode<Input.ListQueryInput>,
 		private readonly dataCallback: RelationFetchVisitor.DataCallback
@@ -91,7 +89,6 @@ class RelationFetchVisitor implements Model.RelationByTypeVisitor<void> {
 			return {}
 		}
 		const junctionValues = await this.junctionFetcher.fetchJunction(
-			this.db,
 			relation,
 			ids,
 			joiningColumns,

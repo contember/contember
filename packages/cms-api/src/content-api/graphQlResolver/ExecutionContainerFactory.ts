@@ -17,13 +17,15 @@ import JunctionTableManager from '../sql/JunctionTableManager'
 import OrderByBuilder from '../sql/select/OrderByBuilder'
 import JunctionFetcher from '../sql/select/JunctionFetcher'
 import RelationFetchVisitorFactory from '../sql/select/RelationFetchVisitorFactory'
-import Mapper from "../sql/Mapper";
+import Mapper from '../sql/Mapper'
+import { Accessor } from '../../utils/accessor'
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Model.Schema, private readonly permissions: Acl.Permissions) {}
 
 	public create(context: Context): Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }> {
 		const innerDic = new Container.Builder({})
+			.addService('db', () => context.db.wrapper())
 
 			.addService('variableInjector', () => new VariableInjector(this.schema, context.identityVariables))
 			.addService(
@@ -40,12 +42,14 @@ class ExecutionContainerFactory {
 			.addService('orderByBuilder', ({ joinBuilder }) => new OrderByBuilder(this.schema, joinBuilder))
 			.addService(
 				'junctionFetcher',
-				({ whereBuilder, orderByBuilder, predicatesInjector }) =>
-					new JunctionFetcher(whereBuilder, orderByBuilder, predicatesInjector)
+				({ whereBuilder, orderByBuilder, predicatesInjector, db }) =>
+					new JunctionFetcher(db, whereBuilder, orderByBuilder, predicatesInjector)
 			)
+			.addService('mapperAccessor', () => new Accessor<Mapper>())
 			.addService(
 				'relationFetchVisitorFactory',
-				({ junctionFetcher }) => new RelationFetchVisitorFactory(this.schema, junctionFetcher)
+				({ junctionFetcher, mapperAccessor }) =>
+					new RelationFetchVisitorFactory(this.schema, junctionFetcher, mapperAccessor)
 			)
 			.addService(
 				'selectBuilderFactory',
@@ -59,12 +63,18 @@ class ExecutionContainerFactory {
 						relationFetchVisitorFactory
 					)
 			)
-			.addService('insertBuilderFactory', ({ whereBuilder }) => new InsertBuilderFactory(this.schema, whereBuilder))
-			.addService('updateBuilderFactory', ({ whereBuilder }) => new UpdateBuilderFactory(this.schema, whereBuilder))
+			.addService(
+				'insertBuilderFactory',
+				({ whereBuilder, db }) => new InsertBuilderFactory(this.schema, whereBuilder, db)
+			)
+			.addService(
+				'updateBuilderFactory',
+				({ whereBuilder, db }) => new UpdateBuilderFactory(this.schema, whereBuilder, db)
+			)
 			.addService('uniqueWhereExpander', () => new UniqueWhereExpander(this.schema))
 
-			.addService('connectJunctionHandler', ({}) => new JunctionTableManager.JunctionConnectHandler())
-			.addService('disconnectJunctionHandler', ({}) => new JunctionTableManager.JunctionDisconnectHandler())
+			.addService('connectJunctionHandler', ({ db }) => new JunctionTableManager.JunctionConnectHandler(db))
+			.addService('disconnectJunctionHandler', ({ db }) => new JunctionTableManager.JunctionDisconnectHandler(db))
 			.addService(
 				'junctionTableManager',
 				({ uniqueWhereExpander, predicateFactory, whereBuilder, connectJunctionHandler, disconnectJunctionHandler }) =>
@@ -89,8 +99,9 @@ class ExecutionContainerFactory {
 					uniqueWhereExpander,
 					whereBuilder,
 					junctionTableManager,
-				}) =>
-					new Mapper(
+					mapperAccessor,
+				}) => {
+					const mapper = new Mapper(
 						this.schema,
 						context.db.wrapper(),
 						predicateFactory,
@@ -102,16 +113,16 @@ class ExecutionContainerFactory {
 						whereBuilder,
 						junctionTableManager
 					)
+					mapperAccessor.set(mapper)
+
+					return mapper
+				}
 			)
 
-			.addService(
-				'readResolver',
-				({ mapper, uniqueWhereExpander }) => new ReadResolver(mapper, uniqueWhereExpander)
-			)
+			.addService('readResolver', ({ mapper, uniqueWhereExpander }) => new ReadResolver(mapper, uniqueWhereExpander))
 			.addService(
 				'mutationResolver',
-				({ mapper, predicatesInjector, uniqueWhereExpander }) =>
-					new MutationResolver(mapper, uniqueWhereExpander)
+				({ mapper, predicatesInjector, uniqueWhereExpander }) => new MutationResolver(mapper, uniqueWhereExpander)
 			)
 
 			.build()

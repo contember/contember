@@ -4,10 +4,14 @@ import InsertBuilder from './InsertBuilder'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 class InsertBuilderFactory {
-	constructor(private readonly schema: Model.Schema, private readonly whereBuilder: WhereBuilder) {}
+	constructor(
+		private readonly schema: Model.Schema,
+		private readonly whereBuilder: WhereBuilder,
+		private readonly db: KnexWrapper
+	) {}
 
-	public create(entity: Model.Entity, db: KnexWrapper): InsertBuilder {
-		return new InsertBuilder(this.schema, entity, db, this.whereBuilder)
+	public create(entity: Model.Entity): InsertBuilder {
+		return new InsertBuilder(this.schema, entity, this.db, this.whereBuilder)
 	}
 }
 

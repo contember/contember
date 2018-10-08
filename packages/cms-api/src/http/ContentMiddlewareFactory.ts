@@ -10,19 +10,20 @@ import * as Knex from 'knex'
 import * as Koa from 'koa'
 import * as koaCompose from 'koa-compose'
 import { ContextWithRequest, get, route } from '../core/koa/router'
-import * as corsMiddleware from '@koa/cors';
-import * as bodyParser from 'koa-bodyparser';
-import PlaygroundMiddlewareFactory from "./PlaygroundMiddlewareFactory";
+import * as corsMiddleware from '@koa/cors'
+import * as bodyParser from 'koa-bodyparser'
+import PlaygroundMiddlewareFactory from './PlaygroundMiddlewareFactory'
 
 class ContentMiddlewareFactory {
 	constructor(
-		private projectContainers: Array<Container<{
-			project: Project
-			knexConnection: Knex
-			graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
-		}>>
-	) {
-	}
+		private projectContainers: Array<
+			Container<{
+				project: Project
+				knexConnection: Knex
+				graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
+			}>
+		>
+	) {}
 
 	create(): Koa.Middleware {
 		return route(

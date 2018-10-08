@@ -16,11 +16,9 @@ import Container from './core/di/Container'
 import Project from './tenant-api/Project'
 import AuthMiddlewareFactory from './http/AuthMiddlewareFactory'
 import TenantMiddlewareFactory from './http/TenantMiddlewareFactory'
-import ContentMiddlewareFactoryMiddlewareFactory from './http/ContentMiddlewareFactoryMiddlewareFactory'
 import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from './content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { DatabaseCredentials } from './tenant-api/config'
-import { route } from './core/koa/router'
 
 class CompositionRoot {
 	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<Project>): Koa {
@@ -37,23 +35,18 @@ class CompositionRoot {
 			.addService('tenantMiddleware', ({ tenantContainer }) =>
 				new TenantMiddlewareFactory(tenantContainer.get('apolloServer')).create()
 			)
-			.addService('contentMiddlewareFactoryMiddleware', ({ projectContainers }) =>
-				new ContentMiddlewareFactoryMiddlewareFactory(projectContainers).create()
+			.addService('contentMiddleware', ({ projectContainers }) =>
+				new ContentMiddlewareFactory(projectContainers).create()
 			)
-			.addService('contentMiddleware', ({}) => new ContentMiddlewareFactory().create())
 
-			.addService(
-				'koa',
-				({ authMiddleware, tenantMiddleware, contentMiddlewareFactoryMiddleware, contentMiddleware }) => {
-					const app = new Koa()
-					app.use(authMiddleware)
-					app.use(tenantMiddleware)
-					app.use(route('/content/:projectSlug/:stageSlug$', contentMiddlewareFactoryMiddleware))
-					app.use(contentMiddleware)
+			.addService('koa', ({ authMiddleware, tenantMiddleware, contentMiddleware }) => {
+				const app = new Koa()
+				app.use(authMiddleware)
+				app.use(tenantMiddleware)
+				app.use(contentMiddleware)
 
-					return app
-				}
-			)
+				return app
+			})
 			.build()
 
 		return masterContainer.get('koa')

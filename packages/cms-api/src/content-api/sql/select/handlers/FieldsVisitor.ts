@@ -4,9 +4,9 @@ import SelectHydrator from '../SelectHydrator'
 import Mapper from '../../Mapper'
 import FieldNode from '../../../graphQlResolver/FieldNode'
 import JunctionFetcher from '../JunctionFetcher'
-import SelectExecutionHandler from "../SelectExecutionHandler";
-import PredicateFactory from "../../../../acl/PredicateFactory";
-import WhereBuilder from "../WhereBuilder";
+import SelectExecutionHandler from '../SelectExecutionHandler'
+import PredicateFactory from '../../../../acl/PredicateFactory'
+import WhereBuilder from '../WhereBuilder'
 
 class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
@@ -15,14 +15,10 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
-		private readonly executionContext: SelectExecutionHandler.Context,
-	) {
-	}
+		private readonly executionContext: SelectExecutionHandler.Context
+	) {}
 
-	visitColumn(
-		entity: Model.Entity,
-		column: Model.AnyColumn
-	): void {
+	visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
 		const columnPath = this.executionContext.path
 		this.executionContext.addColumn(qb => {
 			const tableAlias = columnPath.back().getAlias()
@@ -73,7 +69,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 	public visitManyHasManyOwner(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		targetEntity: Model.Entity,
+		targetEntity: Model.Entity
 	): void {
 		const joiningTable = relation.joiningTable
 		const columns: Mapper.JoiningColumns = {
@@ -90,16 +86,20 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasOneRelation
 	): void {
-		this.executionContext.addData(entity.primary, async (ids) => {
-			const objectNode = this.executionContext.field as ObjectNode
-			const whereWithParentId = {
-				...objectNode.args.where,
-				[targetRelation.name]: { [entity.primary]: { in: ids } },
-			}
-			const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('where', whereWithParentId)
+		this.executionContext.addData(
+			entity.primary,
+			async ids => {
+				const objectNode = this.executionContext.field as ObjectNode
+				const whereWithParentId = {
+					...objectNode.args.where,
+					[targetRelation.name]: { [entity.primary]: { in: ids } },
+				}
+				const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('where', whereWithParentId)
 
-			return this.mapper.selectGrouped(targetEntity, objectNodeWithWhere, targetRelation)
-		}, [])
+				return this.mapper.selectGrouped(targetEntity, objectNodeWithWhere, targetRelation)
+			},
+			[]
+		)
 	}
 
 	private createManyHasManyGroups(
@@ -107,34 +107,37 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		relation: Model.ManyHasManyOwnerRelation,
 		joiningColumns: Mapper.JoiningColumns
 	): void {
-		this.executionContext.addData(this.executionContext.entity.primary, async (ids) => {
-			const objectNode = this.executionContext.field as ObjectNode
-			const junctionValues = await this.junctionFetcher.fetchJunction(
-				relation,
-				ids,
-				joiningColumns,
-				targetEntity,
-				objectNode
-			)
+		this.executionContext.addData(
+			this.executionContext.entity.primary,
+			async ids => {
+				const objectNode = this.executionContext.field as ObjectNode
+				const junctionValues = await this.junctionFetcher.fetchJunction(
+					relation,
+					ids,
+					joiningColumns,
+					targetEntity,
+					objectNode
+				)
 
-			const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary, {})
-			const inversedJoiningColumn = joiningColumns.targetColumn.columnName
-			const inversedIds = junctionValues
-				.map((it: any) => it[inversedJoiningColumn])
-				.filter((it, index, arr) => arr.indexOf(it) === index)
+				const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary, {})
+				const inversedJoiningColumn = joiningColumns.targetColumn.columnName
+				const inversedIds = junctionValues
+					.map((it: any) => it[inversedJoiningColumn])
+					.filter((it, index, arr) => arr.indexOf(it) === index)
 
+				const queryWithWhere = objectNode
+					.withArgs({
+						where: {
+							[targetEntity.primary]: { in: inversedIds },
+						},
+					})
+					.withField(primaryField)
+				const result = await this.mapper.select(targetEntity, queryWithWhere)
 
-			const queryWithWhere = objectNode
-				.withArgs({
-					where: {
-						[targetEntity.primary]: { in: inversedIds },
-					},
-				})
-				.withField(primaryField)
-			const result = await this.mapper.select(targetEntity, queryWithWhere)
-
-			return this.buildManyHasManyGroups(targetEntity, joiningColumns, result, junctionValues)
-		}, [])
+				return this.buildManyHasManyGroups(targetEntity, joiningColumns, result, junctionValues)
+			},
+			[]
+		)
 	}
 
 	private buildManyHasManyGroups(
@@ -168,36 +171,14 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneOwnerRelation
 	): void {
-		this.executionContext.addData(entity.primary, async ids => {
-			const idsWhere: Input.Where = {
-				[targetRelation.name]: {
-					[entity.primary]: {
-						in: ids,
-					},
-				},
-			}
-			const objectNode = this.executionContext.field as ObjectNode
-			const where: Input.Where = {
-				and: [idsWhere, objectNode.args.where].filter((it): it is Input.Where => it !== undefined),
-			}
-			const objectWithWhere = objectNode.withArg('where', where)
-
-			return this.mapper.select(targetEntity, objectWithWhere, targetRelation.name)
-		}, null)
-	}
-
-	public visitOneHasOneOwner(
-		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null
-	): void {
 		this.executionContext.addData(
-			relation.name,
-			async (ids) => {
+			entity.primary,
+			async ids => {
 				const idsWhere: Input.Where = {
-					[targetEntity.primary]: {
-						in: ids,
+					[targetRelation.name]: {
+						[entity.primary]: {
+							in: ids,
+						},
 					},
 				}
 				const objectNode = this.executionContext.field as ObjectNode
@@ -206,16 +187,17 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 				}
 				const objectWithWhere = objectNode.withArg('where', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
+				return this.mapper.select(targetEntity, objectWithWhere, targetRelation.name)
 			},
 			null
 		)
 	}
 
-	public visitManyHasOne(
+	public visitOneHasOneOwner(
 		entity: Model.Entity,
-		relation: Model.ManyHasOneRelation,
+		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
+		targetRelation: Model.OneHasOneInversedRelation | null
 	): void {
 		this.executionContext.addData(
 			relation.name,
@@ -236,7 +218,27 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 			null
 		)
 	}
-}
 
+	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity): void {
+		this.executionContext.addData(
+			relation.name,
+			async ids => {
+				const idsWhere: Input.Where = {
+					[targetEntity.primary]: {
+						in: ids,
+					},
+				}
+				const objectNode = this.executionContext.field as ObjectNode
+				const where: Input.Where = {
+					and: [idsWhere, objectNode.args.where].filter((it): it is Input.Where => it !== undefined),
+				}
+				const objectWithWhere = objectNode.withArg('where', where)
+
+				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
+			},
+			null
+		)
+	}
+}
 
 export default FieldsVisitor

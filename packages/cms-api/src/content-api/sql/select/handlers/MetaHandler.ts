@@ -1,17 +1,12 @@
-import SelectExecutionHandler from "../SelectExecutionHandler";
-import Path from "../Path";
-import ObjectNode from "../../../graphQlResolver/ObjectNode";
+import SelectExecutionHandler from '../SelectExecutionHandler'
+import Path from '../Path'
+import ObjectNode from '../../../graphQlResolver/ObjectNode'
 import { Acl, Input } from 'cms-common'
-import PredicateFactory from "../../../../acl/PredicateFactory";
-import WhereBuilder from "../WhereBuilder";
+import PredicateFactory from '../../../../acl/PredicateFactory'
+import WhereBuilder from '../WhereBuilder'
 
 class MetaHandler implements SelectExecutionHandler<{}> {
-
-	constructor(
-		private readonly whereBuilder: WhereBuilder,
-		private readonly predicateFactory: PredicateFactory,
-	) {
-	}
+	constructor(private readonly whereBuilder: WhereBuilder, private readonly predicateFactory: PredicateFactory) {}
 
 	process(context: SelectExecutionHandler.Context): void {
 		const { field, path } = context
@@ -27,7 +22,6 @@ class MetaHandler implements SelectExecutionHandler<{}> {
 			}
 		}
 	}
-
 
 	private addMetaFlag(
 		context: SelectExecutionHandler.Context,

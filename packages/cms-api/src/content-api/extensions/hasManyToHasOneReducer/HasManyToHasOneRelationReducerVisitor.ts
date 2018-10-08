@@ -7,20 +7,19 @@ import { FieldAccessVisitor } from '../../graphQLSchema/FieldAccessVisitor'
 import Authorizator from '../../../acl/Authorizator'
 import { GqlTypeName } from '../../graphQLSchema/utils'
 import { Accessor } from '../../../utils/accessor'
-import HasManyToHasOneReducer from "./HasManyToHasOneReducer";
-import EntityFieldsProvider from "../EntityFieldsProvider";
-
+import HasManyToHasOneReducer from './HasManyToHasOneReducer'
+import EntityFieldsProvider from '../EntityFieldsProvider'
 
 class HasManyToHasOneRelationReducerFieldVisitor
-	implements Model.ColumnVisitor<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta>>,
+	implements
+		Model.ColumnVisitor<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta>>,
 		Model.RelationByTypeVisitor<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta>> {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly entityTypeProviderAccessor: Accessor<EntityTypeProvider>,
 		private readonly whereTypeProvider: WhereTypeProvider
-	) {
-	}
+	) {}
 
 	public visitColumn() {
 		return {}

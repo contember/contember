@@ -1,9 +1,8 @@
-import { GraphQLFieldConfig } from "graphql";
+import { GraphQLFieldConfig } from 'graphql'
 import { Model } from 'cms-common'
 
-
 interface EntityFieldsProvider<MetaArgs extends object = {}> {
-	getFields(entity: Model.Entity, accessibleFields: string[]): EntityFieldsProvider.FieldMap<MetaArgs>;
+	getFields(entity: Model.Entity, accessibleFields: string[]): EntityFieldsProvider.FieldMap<MetaArgs>
 }
 
 namespace EntityFieldsProvider {

@@ -3,9 +3,9 @@ import JunctionFetcher from '../JunctionFetcher'
 import { Model } from 'cms-common'
 import Mapper from '../../Mapper'
 import { Accessor } from '../../../../utils/accessor'
-import SelectExecutionHandler from "../SelectExecutionHandler";
-import PredicateFactory from "../../../../acl/PredicateFactory";
-import WhereBuilder from "../WhereBuilder";
+import SelectExecutionHandler from '../SelectExecutionHandler'
+import PredicateFactory from '../../../../acl/PredicateFactory'
+import WhereBuilder from '../WhereBuilder'
 
 class FieldsVisitorFactory {
 	constructor(
@@ -13,9 +13,8 @@ class FieldsVisitorFactory {
 		private readonly junctionFetcher: JunctionFetcher,
 		private readonly mapperAccessor: Accessor<Mapper>,
 		private readonly predicateFactory: PredicateFactory,
-		private readonly whereBuilder: WhereBuilder,
-	) {
-	}
+		private readonly whereBuilder: WhereBuilder
+	) {}
 
 	create(context: SelectExecutionHandler.Context): FieldsVisitor {
 		return new FieldsVisitor(

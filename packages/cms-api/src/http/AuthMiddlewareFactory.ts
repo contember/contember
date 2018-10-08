@@ -1,33 +1,34 @@
-import { RequestHandler, Request, Response, NextFunction } from 'express'
 import ApiKeyManager from '../tenant-api/model/service/ApiKeyManager'
+import * as Koa from 'koa'
+import * as koaCompose from 'koa-compose'
 
 class AuthMiddlewareFactory {
 	constructor(private apiKeyManager: ApiKeyManager) {}
 
-	create(): RequestHandler {
-		return async (req: Request, res: Response, next: NextFunction) => {
-			const authHeader = req.header('Authorization')
-			const authHeaderPattern = /^Bearer\s+(\w+)$/i
-
+	create(): koaCompose.Middleware<AuthMiddlewareFactory.ContextWithAuth> {
+		return async (ctx, next) => {
+			const authHeader = ctx.request.get('Authorization')
 			if (typeof authHeader !== 'string') {
-				return next()
+				return await next()
 			}
+
+			const authHeaderPattern = /^Bearer\s+(\w+)$/i
 
 			const match = authHeader.match(authHeaderPattern)
 			if (match === null) {
-				return next()
+				return await next()
 			}
 
 			const [, token] = match
-			res.locals.authResult = await this.apiKeyManager.verify(token)
-			next()
+			ctx.state.authResult = await this.apiKeyManager.verify(token)
+			await next()
 		}
 	}
 }
 
 namespace AuthMiddlewareFactory {
-	export type ResponseWithAuthResult = Response & {
-		locals: {
+	export type ContextWithAuth = Koa.Context & {
+		state: {
 			authResult?: ApiKeyManager.VerifyResult
 		}
 	}

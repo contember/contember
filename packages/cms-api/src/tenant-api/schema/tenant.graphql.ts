@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express'
+import { gql } from 'apollo-server-koa'
 import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`

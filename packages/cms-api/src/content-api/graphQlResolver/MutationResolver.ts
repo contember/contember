@@ -40,12 +40,7 @@ export default class MutationResolver {
 		}
 
 		const whereArgs = { where: { [entity.primary]: { eq: primary } } }
-		const objectWithArgs = new ObjectNode<Input.ListQueryInput>(
-			queryAst.name,
-			queryAst.alias,
-			queryAst.fields,
-			whereArgs
-		)
+		const objectWithArgs = queryAst.withArgs(whereArgs)
 
 		return (await this.mapper.select(entity, objectWithArgs))[0] || null
 	}

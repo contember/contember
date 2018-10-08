@@ -12,10 +12,7 @@ export default class ReadResolver {
 
 	public async resolveGetQuery(entity: Model.Entity, queryAst: ObjectNode<Input.UniqueQueryInput>) {
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, queryAst.args.where)
-		const queryExpanded = new ObjectNode(queryAst.name, queryAst.alias, queryAst.fields, {
-			...queryAst.args,
-			where: whereExpanded,
-		})
+		const queryExpanded = queryAst.withArg<Input.ListQueryInput>('where', whereExpanded)
 
 		return (await this.mapper.select(entity, queryExpanded))[0] || null
 	}

@@ -23,6 +23,8 @@ import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 import UpdateEntityRelationAllowedOperationsVisitor from './mutations/UpdateEntityRelationAllowedOperationsVisitor'
 import CreateEntityRelationAllowedOperationsVisitor from './mutations/CreateEntityRelationAllowedOperationsVisitor'
 import OrderByTypeProvider from './OrderByTypeProvider'
+import HasManyToHasOneReducer from "../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer";
+import HasManyToHasOneRelationReducerFieldVisitor from "../extensions/hasManyToHasOneReducer/HasManyToHasOneRelationReducerVisitor";
 
 export default class GraphQlSchemaBuilderFactory {
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
@@ -31,13 +33,21 @@ export default class GraphQlSchemaBuilderFactory {
 		const conditionTypeProvider = new ConditionTypeProvider(columnTypeResolver)
 		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
 		const orderByTypeProvider = new OrderByTypeProvider(schema, authorizator)
+		const entityTypeProviderAccessor = new Accessor<EntityTypeProvider>()
+		const hasManyToOneReducerVisitor = new HasManyToHasOneRelationReducerFieldVisitor(schema, authorizator, entityTypeProviderAccessor, whereTypeProvider)
+		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
+
 		const entityTypeProvider = new EntityTypeProvider(
 			schema,
 			authorizator,
 			columnTypeResolver,
 			whereTypeProvider,
-			orderByTypeProvider
+			orderByTypeProvider,
+			{
+				[HasManyToHasOneReducer.extensionName]: hasManyToOneReducer
+			}
 		)
+		entityTypeProviderAccessor.set(entityTypeProvider)
 
 		const executionContainerFactory = new ExecutionContainerFactory(schema, permissions)
 		const readResolverFactory = new ReadResolverFactory(executionContainerFactory)

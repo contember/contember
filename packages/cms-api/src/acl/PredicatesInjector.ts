@@ -10,7 +10,7 @@ class PredicatesInjector {
 		const restrictedWhere = this.injectToWhere(objectNode.args.where || {}, entity)
 		const where = this.createWhere(entity, [entity.primary], restrictedWhere)
 
-		return new ObjectNode(objectNode.name, objectNode.alias, objectNode.fields, { ...objectNode.args, where })
+		return objectNode.withArg('where', where)
 	}
 
 	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {

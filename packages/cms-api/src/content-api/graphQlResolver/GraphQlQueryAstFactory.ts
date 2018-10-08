@@ -59,7 +59,7 @@ export default class GraphQlQueryAstFactory {
 		const name = node.name.value
 		const alias = node.alias ? node.alias.value : name
 		if (!node.selectionSet) {
-			return new FieldNode(name, alias)
+			return new FieldNode(name, alias, {})
 		}
 		const field = parentType.getFields()[name]
 		const type = field.type
@@ -67,7 +67,13 @@ export default class GraphQlQueryAstFactory {
 
 		const fields: (FieldNode | ObjectNode)[] = this.processSelectionSet(info, resolvedType, node.selectionSet)
 
-		return new ObjectNode(name, alias, fields, getArgumentValues(field, node, info.variableValues))
+		return new ObjectNode(
+			name,
+			alias,
+			fields,
+			getArgumentValues(field, node, info.variableValues),
+			(field as any).meta || {}
+		)
 	}
 
 	private processSelectionSet(

@@ -95,8 +95,8 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select
-                       "root_"."id" as "root_id",
-                       "root_"."title" as "root_heading"
+                       "root_"."title" as "root_heading",
+                       "root_"."id" as "root_id"
                      from "public"."post" as "root_"
                      where "root_"."id" = $1`,
 						response: [{ root_heading: 'Hello' }],
@@ -323,7 +323,7 @@ describe('Queries', () => {
 				.entity('Site', entity =>
 					entity
 						.column('name', column => column.type(Model.ColumnType.String))
-						.manyHasOne('setting', relation => relation.target('SiteSetting'))
+						.oneHasOne('setting', relation => relation.target('SiteSetting'))
 				)
 				.entity('SiteSetting', entity => entity.column('url', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -772,8 +772,8 @@ describe('Queries', () => {
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."id" as "root_id",
-                       "root_"."name" as "root_name"
+                       "root_"."name" as "root_name",
+                       "root_"."id" as "root_id"
                      from "public"."author" as "root_"
                      where "root_"."id" in ($1, $2)
 						`,
@@ -1580,13 +1580,13 @@ describe('Queries', () => {
 			executes: sqlTransaction([
 				{
 					sql: SQL`select
-                     "root_"."id" as "root_id",
                      "root_"."id" as "root_idx",
                      "root_"."name" as "root_name1",
                      "root_"."name" as "root_name2",
                      true as "root_meta_name1_readable1",
                      true as "root_meta_name1_readable2",
-                     "root_"."name" = $1 as "root_meta_name1_updatable1"
+                     "root_"."name" = $1 as "root_meta_name1_updatable1",
+                     "root_"."id" as "root_id"
                    from "public"."author" as "root_"`,
 					parameters: ['John'],
 					response: [

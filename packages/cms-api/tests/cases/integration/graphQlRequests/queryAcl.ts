@@ -407,9 +407,9 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         "root_"."id" as "root_id",
                          "root_country"."id" as "root_country_id",
-                         case when "root_country"."name" in ($1) then "root_"."name" else null end as "root_name"
+                         case when "root_country"."name" in ($1) then "root_"."name" else null end as "root_name",
+                         "root_"."id" as "root_id"
                        from "public"."author" as "root_" left join "public"."country" as "root_country" on "root_"."country_id" = "root_country"."id"
                        where "root_"."id" in ($2, $3)`,
 							parameters: ['Czechia', testUuid(3), testUuid(4)],

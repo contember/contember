@@ -40,8 +40,8 @@ describe('Delete mutation', () => {
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."id" as "root_id",
-                       "root_"."name" as "root_name"
+                       "root_"."name" as "root_name",
+                       "root_"."id" as "root_id"
                      from "public"."author" as "root_"
                      where "root_"."id" in ($1)`,
 						parameters: [testUuid(2)],

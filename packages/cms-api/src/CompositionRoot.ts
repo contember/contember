@@ -1,5 +1,6 @@
 import * as knex from 'knex'
-import { ApolloServer } from 'apollo-server-express'
+import * as Koa from 'koa'
+import { ApolloServer } from 'apollo-server-koa'
 import typeDefs from './tenant-api/schema/tenant.graphql'
 import SignInMutationResolver from './tenant-api/resolvers/mutation/SignInMutationResolver'
 import KnexConnection from './core/knex/KnexConnection'
@@ -13,17 +14,16 @@ import ProjectMemberManager from './tenant-api/model/service/ProjectMemberManage
 import ApiKeyManager from './tenant-api/model/service/ApiKeyManager'
 import Container from './core/di/Container'
 import Project from './tenant-api/Project'
-import * as express from 'express'
-import { Express } from 'express'
 import AuthMiddlewareFactory from './http/AuthMiddlewareFactory'
 import TenantMiddlewareFactory from './http/TenantMiddlewareFactory'
 import ContentMiddlewareFactoryMiddlewareFactory from './http/ContentMiddlewareFactoryMiddlewareFactory'
 import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from './content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { DatabaseCredentials } from './tenant-api/config'
+import { route } from './core/koa/router'
 
 class CompositionRoot {
-	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<Project>): Express {
+	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<Project>): Koa {
 		const tenantContainer = this.createTenantContainer(tenantDbCredentials)
 		const projectContainers = this.createProjectContainers(projects)
 
@@ -43,12 +43,12 @@ class CompositionRoot {
 			.addService('contentMiddleware', ({}) => new ContentMiddlewareFactory().create())
 
 			.addService(
-				'express',
+				'koa',
 				({ authMiddleware, tenantMiddleware, contentMiddlewareFactoryMiddleware, contentMiddleware }) => {
-					const app = express()
+					const app = new Koa()
 					app.use(authMiddleware)
 					app.use(tenantMiddleware)
-					app.use('/content/:projectSlug/:stageSlug', contentMiddlewareFactoryMiddleware)
+					app.use(route('/content/:projectSlug/:stageSlug$', contentMiddlewareFactoryMiddleware))
 					app.use(contentMiddleware)
 
 					return app
@@ -56,7 +56,7 @@ class CompositionRoot {
 			)
 			.build()
 
-		return masterContainer.get('express')
+		return masterContainer.get('koa')
 	}
 
 	createProjectContainers(projects: Array<Project>) {

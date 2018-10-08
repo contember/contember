@@ -1,15 +1,14 @@
 import { Input, Model } from 'cms-common'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import ObjectNode from './ObjectNode'
-import MapperRunner from '../sql/MapperRunner'
+import Mapper from "../sql/Mapper";
 
 export default class ReadResolver {
-	constructor(private readonly mapperRunner: MapperRunner, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
+	constructor(private readonly mapper: Mapper, private readonly uniqueWhereExpander: UniqueWhereExpander) {
+	}
 
 	public async resolveListQuery(entity: Model.Entity, queryAst: ObjectNode<Input.ListQueryInput>) {
-		return await this.mapperRunner.run(async mapper => {
-			return await mapper.select(entity, queryAst)
-		})
+		return await this.mapper.select(entity, queryAst)
 	}
 
 	public async resolveGetQuery(entity: Model.Entity, queryAst: ObjectNode<Input.UniqueQueryInput>) {
@@ -19,8 +18,6 @@ export default class ReadResolver {
 			where: whereExpanded,
 		})
 
-		return await this.mapperRunner.run(async mapper => {
-			return (await mapper.select(entity, queryExpanded))[0] || null
-		})
+		return (await this.mapper.select(entity, queryExpanded))[0] || null
 	}
 }

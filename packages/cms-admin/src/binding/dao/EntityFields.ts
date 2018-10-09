@@ -1,6 +1,5 @@
-import { FieldName } from '../bindingTypes'
 import Marker from './Marker'
 
-type EntityFields = { [name in FieldName]: Marker }
+type EntityFields = { [name: string]: Marker }
 
 export default EntityFields

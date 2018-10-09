@@ -1,9 +1,11 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
+import { FieldName } from '../bindingTypes'
 import MarkerProvider from '../coreComponents/MarkerProvider'
 import DataBindingError from '../dao/DataBindingError'
 import EntityFields from '../dao/EntityFields'
 import FieldMarker from '../dao/FieldMarker'
+import Marker from '../dao/Marker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import ReferenceMarker from '../dao/ReferenceMarker'
 
@@ -134,18 +136,46 @@ export default class MarkerTreeGenerator {
 		}
 
 		for (const marker of result) {
-			if (marker instanceof FieldMarker) {
-				fields[marker.fieldName] = marker
-			} else if (marker instanceof ReferenceMarker) {
-				fields[marker.fieldName] = marker
-			} else if (marker instanceof MarkerTreeRoot) {
-				fields[marker.placeholderName] = marker
-			} else {
-				assertNever(marker)
-			}
+			const fieldName = marker.placeholderName
+
+			fields[fieldName] = fieldName in fields ? this.mergeMarkers(fields[fieldName], marker) : marker
 		}
 
 		return fields
+	}
+
+	// This method assumes their names are the same
+	private mergeMarkers(original: Marker, fresh: Marker): Marker {
+		return fresh
+		/*if (original instanceof FieldMarker) {
+			if (fresh instanceof FieldMarker) {
+				return original
+			} else if (fresh instanceof ReferenceMarker) {
+				this.rejectRelationScalarCombo(original.fieldName)
+			} else if (fresh instanceof MarkerTreeRoot) {
+				throw new DataBindingError() // TODO msg
+			} else {
+				assertNever(fresh)
+			}
+		} else if (original instanceof ReferenceMarker) {
+			if (fresh instanceof FieldMarker) {
+				this.rejectRelationScalarCombo(original.fieldName)
+			} else if (fresh instanceof ReferenceMarker) {
+				if (original.expectedCount === fresh.expectedCount) {
+
+				} else {
+					throw new DataBindingError(`Cannot combine hasOne and hasMany relations for field '${original.fieldName}'.`)
+				}
+			} else if (fresh instanceof MarkerTreeRoot) {
+				throw new DataBindingError() // TODO msg
+			} else {
+				assertNever(fresh)
+			}
+		} else if (original instanceof MarkerTreeRoot) {
+			throw new DataBindingError() // TODO msg
+		} else {
+			assertNever(original)
+		}*/
 	}
 
 	private reportInvalidTreeError(marker: FieldMarker | ReferenceMarker | undefined): never {
@@ -157,5 +187,9 @@ export default class MarkerTreeGenerator {
 			)
 		}
 		throw new DataBindingError('Empty data tree discovered. Try adding some fields…')
+	}
+
+	private rejectRelationScalarCombo(fieldName: FieldName): never {
+		throw new DataBindingError(`Cannot combine a relation with a scalar field '${fieldName}'.`)
 	}
 }

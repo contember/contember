@@ -135,7 +135,7 @@ export default class MarkerTreeGenerator {
 
 		for (const marker of result) {
 			if (marker instanceof FieldMarker) {
-				fields[marker.name] = marker
+				fields[marker.fieldName] = marker
 			} else if (marker instanceof ReferenceMarker) {
 				fields[marker.fieldName] = marker
 			} else if (marker instanceof MarkerTreeRoot) {

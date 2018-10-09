@@ -128,12 +128,12 @@ export default class AccessorTreeGenerator {
 			} else if (field instanceof FieldMarker) {
 				if (Array.isArray(fieldData)) {
 					throw new DataBindingError(
-						`Received a collection of referenced entities where a single '${field.name}' field was expected. ` +
+						`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
 							`Perhaps you wanted to use a <Repeater />?`,
 					)
 				} else if (typeof fieldData === 'object' && fieldData !== null) {
 					throw new DataBindingError(
-						`Received a referenced entity where a single '${field.name}' field was expected. ` +
+						`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
 							`Perhaps you wanted to use a <SingleReference />?`,
 					)
 				} else {

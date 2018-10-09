@@ -6,16 +6,17 @@ import Field from '../../../../src/binding/coreComponents/Field'
 import SingleEntityDataProvider from '../../../../src/binding/coreComponents/SingleEntityDataProvider'
 import ToMany from '../../../../src/binding/coreComponents/ToMany'
 import ToOne from '../../../../src/binding/coreComponents/ToOne'
+import FieldMarker from '../../../../src/binding/dao/FieldMarker'
 import MarkerTreeGenerator from '../../../../src/binding/model/MarkerTreeGenerator'
 
 describe('Marker tree generator', () => {
-	it('reject empty trees', () => {
+	it('should reject empty trees', () => {
 		const generator = new MarkerTreeGenerator(<></>)
 
 		expect(() => generator.generate()).throws(/empty/i)
 	})
 
-	it('reject top-level fields and relations', () => {
+	it('should reject top-level fields and relations', () => {
 		const topOne = <ToOne field="foo"><></></ToOne>
 		const topMany = <ToMany field="foo"><></></ToMany>
 		const topField = <Field name="foo" />
@@ -25,7 +26,7 @@ describe('Marker tree generator', () => {
 		}
 	})
 
-	it('enforce mandatory children', () => {
+	it('should enforce mandatory children', () => {
 		const single = <SingleEntityDataProvider where={{ foo: '' }} name="Foo" />
 		const list = <EntityListDataProvider where={{ foo: {} }} name="Foo" />
 		const toOne = (
@@ -44,4 +45,12 @@ describe('Marker tree generator', () => {
 		}
 	})
 
+	it('should disallow duplicate fields', () => {
+		const tree = <SingleEntityDataProvider where={{ foo: '' }} name="Foo">
+			<Field name="foo" />
+			<Field name="foo" />
+		</SingleEntityDataProvider>
+
+		expect(() => new MarkerTreeGenerator(tree).generate()).throws(/duplicate/i)
+	})
 })

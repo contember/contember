@@ -1,9 +1,10 @@
 import { FieldName } from '../bindingTypes'
+import PlaceholderGenerator from '../model/PlaceholderGenerator'
 
 export default class FieldMarker {
 	constructor(public readonly fieldName: FieldName) {}
 
 	public get placeholderName(): string {
-		return this.fieldName
+		return PlaceholderGenerator.generateFieldMarkerPlaceholder(this)
 	}
 }

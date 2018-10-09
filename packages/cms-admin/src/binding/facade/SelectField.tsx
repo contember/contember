@@ -16,6 +16,7 @@ import EntityAccessor from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
+import PlaceholderGenerator from '../model/PlaceholderGenerator'
 
 export interface SelectFieldProps {
 	name: FieldName
@@ -33,7 +34,7 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
-						const fieldAccessor = data.data[MarkerTreeRoot.getPlaceholderName(this.props.name)]
+						const fieldAccessor = data.data[PlaceholderGenerator.getMarkerTreePlaceholder(this.props.name)]
 						const currentValueEntity = data.data[this.props.name]
 
 						// TODO this fails when `currentValueEntity` is `null` which may legitimately happen.

@@ -153,9 +153,9 @@ export default class MarkerTreeGenerator {
 			const kind = marker instanceof FieldMarker ? 'field' : 'relation'
 
 			throw new DataBindingError(
-				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within an <Entity />.`,
+				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
 			)
 		}
-		throw new DataBindingError('Empty form discovered. Try adding some fields…')
+		throw new DataBindingError('Empty data tree discovered. Try adding some fields…')
 	}
 }

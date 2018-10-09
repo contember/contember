@@ -9,7 +9,7 @@ import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
+import ReferenceMarker from '../dao/ReferenceMarker'
 
 type OnUpdate = (updatedField: FieldName, updatedData: FieldData) => void
 type OnReplace = (replacement: EntityAccessor) => void
@@ -90,7 +90,7 @@ export default class AccessorTreeGenerator {
 			if (field instanceof MarkerTreeRoot) {
 				entityData[fieldName] = this.generateSubTree(field, () => undefined)
 			} else if (field instanceof ReferenceMarker) {
-				if (field.expectedCount === ExpectedCount.One) {
+				if (field.expectedCount === ReferenceMarker.ExpectedCount.One) {
 					if (Array.isArray(fieldData)) {
 						throw new DataBindingError(
 							`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
@@ -106,7 +106,7 @@ export default class AccessorTreeGenerator {
 							`Perhaps you meant to use a variant of <Field />?`,
 						)
 					}
-				} else if (field.expectedCount === ExpectedCount.Many) {
+				} else if (field.expectedCount === ReferenceMarker.ExpectedCount.Many) {
 					if (Array.isArray(fieldData) || fieldData === undefined) {
 						entityData[fieldName] = this.generateManyReference(fieldData, field, onUpdate)
 					} else if (typeof fieldData === 'object') {

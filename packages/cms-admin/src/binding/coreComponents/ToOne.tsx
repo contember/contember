@@ -11,7 +11,6 @@ import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface ToOneProps {
 	field: FieldName
-	children: React.ReactNode | ((unlink?: () => void) => React.ReactNode)
 	where?: Input.Where<GraphQlBuilder.Literal>
 }
 

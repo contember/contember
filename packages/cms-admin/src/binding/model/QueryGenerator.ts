@@ -72,7 +72,7 @@ export default class QueryGenerator {
 			const fieldValue: Marker = fields[field]
 
 			if (fieldValue instanceof FieldMarker) {
-				builder = builder.column(fieldValue.name)
+				builder = builder.column(fieldValue.fieldName)
 			} else if (fieldValue instanceof ReferenceMarker) {
 				let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
 

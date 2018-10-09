@@ -1,6 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import { EntityName, FieldName } from '../bindingTypes'
+import PlaceholderGenerator from '../model/PlaceholderGenerator'
 import EntityFields from './EntityFields'
 import { TreeId } from './TreeId'
 
@@ -32,11 +33,7 @@ export default class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTree
 	) {}
 
 	public get placeholderName(): string {
-		return this.associatedField ? MarkerTreeRoot.getPlaceholderName(this.associatedField) : `__root_${this.id}`
-	}
-
-	public static getPlaceholderName(associatedField: FieldName): string {
-		return `${associatedField}__data`
+		return PlaceholderGenerator.generateMarkerTreeRootPlaceholder(this)
 	}
 
 	public static createInstance(

@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import { FieldName } from '../bindingTypes'
-import { Hashing } from '../utils'
+import PlaceholderGenerator from '../model/PlaceholderGenerator'
 import EntityFields from './EntityFields'
 
 class ReferenceMarker {
@@ -17,13 +17,9 @@ class ReferenceMarker {
 
 	public get placeholderName(): string {
 		if (!this._placeholderName) {
-			this._placeholderName = this.hash()
+			this._placeholderName = PlaceholderGenerator.generateReferenceMarkerPlaceholder(this)
 		}
 		return this._placeholderName
-	}
-
-	private hash(): string {
-		return this.where ? `${this.fieldName}_${Hashing.hashWhere(this.where)}` : this.fieldName
 	}
 }
 

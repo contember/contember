@@ -6,7 +6,7 @@ import EntityAccessor from '../dao/EntityAccessor'
 import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityFields from '../dao/EntityFields'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
+import ReferenceMarker from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
@@ -43,7 +43,7 @@ export default class ToMany extends React.Component<ToManyProps> {
 	}
 
 	public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
-		return new ReferenceMarker(props.field, ExpectedCount.Many, fields, props.where)
+		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.Many, fields, props.where)
 	}
 }
 

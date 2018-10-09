@@ -4,7 +4,7 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityFields from '../dao/EntityFields'
-import ReferenceMarker, { ExpectedCount } from '../dao/ReferenceMarker'
+import ReferenceMarker from '../dao/ReferenceMarker'
 import DataContext, { DataContextValue } from './DataContext'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
@@ -34,7 +34,7 @@ export default class ToOne extends React.Component<ToOneProps> {
 	}
 
 	public static generateReferenceMarker(props: ToOneProps, fields: EntityFields): ReferenceMarker {
-		return new ReferenceMarker(props.field, ExpectedCount.One, fields, props.where)
+		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.One, fields, props.where)
 	}
 }
 

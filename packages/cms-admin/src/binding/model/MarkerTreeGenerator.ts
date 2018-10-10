@@ -136,46 +136,52 @@ export default class MarkerTreeGenerator {
 		}
 
 		for (const marker of result) {
-			const fieldName = marker.placeholderName
+			const placeholderName = marker.placeholderName
 
-			fields[fieldName] = fieldName in fields ? this.mergeMarkers(fields[fieldName], marker) : marker
+			fields[placeholderName] = placeholderName in fields ? this.mergeMarkers(fields[placeholderName], marker) : marker
 		}
 
 		return fields
 	}
 
-	// This method assumes their names are the same
+	// This method assumes their placeholder names are the same
 	private mergeMarkers(original: Marker, fresh: Marker): Marker {
-		return fresh
-		/*if (original instanceof FieldMarker) {
+		if (original instanceof FieldMarker) {
 			if (fresh instanceof FieldMarker) {
 				return original
 			} else if (fresh instanceof ReferenceMarker) {
-				this.rejectRelationScalarCombo(original.fieldName)
+				return this.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof MarkerTreeRoot) {
 				throw new DataBindingError() // TODO msg
 			} else {
-				assertNever(fresh)
+				return assertNever(fresh)
 			}
 		} else if (original instanceof ReferenceMarker) {
 			if (fresh instanceof FieldMarker) {
-				this.rejectRelationScalarCombo(original.fieldName)
+				return this.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof ReferenceMarker) {
 				if (original.expectedCount === fresh.expectedCount) {
+					for (const placeholderName in fresh.fields) {
+						original.fields[placeholderName] =
+							placeholderName in original.fields
+								? this.mergeMarkers(original.fields[placeholderName], fresh.fields[placeholderName])
+								: fresh.fields[placeholderName]
+					}
 
+					return original
 				} else {
 					throw new DataBindingError(`Cannot combine hasOne and hasMany relations for field '${original.fieldName}'.`)
 				}
 			} else if (fresh instanceof MarkerTreeRoot) {
 				throw new DataBindingError() // TODO msg
 			} else {
-				assertNever(fresh)
+				return assertNever(fresh)
 			}
 		} else if (original instanceof MarkerTreeRoot) {
 			throw new DataBindingError() // TODO msg
 		} else {
-			assertNever(original)
-		}*/
+			return assertNever(original)
+		}
 	}
 
 	private reportInvalidTreeError(marker: FieldMarker | ReferenceMarker | undefined): never {

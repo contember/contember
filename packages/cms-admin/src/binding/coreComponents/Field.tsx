@@ -4,6 +4,7 @@ import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor from '../dao/EntityAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
+import PlaceholderGenerator from '../model/PlaceholderGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import { FieldMarkerProvider } from './MarkerProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
@@ -21,7 +22,7 @@ export default class Field extends React.Component<FieldProps> {
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
-						const fieldData = data.data[this.props.name]
+						const fieldData = data.data[PlaceholderGenerator.getFieldPlaceholder(this.props.name)]
 
 						if (this.props.children && fieldData instanceof FieldAccessor) {
 							return this.props.children(fieldData)

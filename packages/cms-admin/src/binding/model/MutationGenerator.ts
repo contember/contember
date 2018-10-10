@@ -133,19 +133,19 @@ export default class MutationGenerator {
 		currentData: EntityAccessor,
 		builder: CrudQueryBuilder.CreateDataBuilder,
 	): CrudQueryBuilder.CreateDataBuilder {
-		for (const fieldName in currentData.data) {
-			const accessor = currentData.data[fieldName]
+		for (const placeholderName in currentData.data) {
+			const accessor = currentData.data[placeholderName]
 
 			if (accessor instanceof FieldAccessor) {
-				builder = builder.set(fieldName, accessor.currentValue)
+				builder = builder.set(placeholderName, accessor.currentValue)
 			} else if (accessor instanceof EntityAccessor) {
-				builder = builder.one(fieldName, builder => {
+				builder = builder.one(placeholderName, builder => {
 					return builder.create(builder => {
 						return this.registerCreateMutationPart(accessor, builder)
 					})
 				})
 			} else if (accessor instanceof EntityCollectionAccessor) {
-				builder = builder.many(fieldName, builder => {
+				builder = builder.many(placeholderName, builder => {
 					for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {
 						const innerAccessor = accessor.entities[i]
 
@@ -182,17 +182,17 @@ export default class MutationGenerator {
 		persistedData: ReceivedEntityData,
 		builder: CrudQueryBuilder.UpdateDataBuilder,
 	): CrudQueryBuilder.UpdateDataBuilder {
-		for (const fieldName in persistedData) {
-			const persistedField = persistedData[fieldName]
-			const accessor = currentData.data[fieldName]
+		for (const placeholderName in persistedData) {
+			const persistedField = persistedData[placeholderName]
+			const accessor = currentData.data[placeholderName]
 
 			if (accessor instanceof FieldAccessor) {
 				if (persistedField !== accessor.currentValue) {
-					builder = builder.set(fieldName, accessor.currentValue)
+					builder = builder.set(placeholderName, accessor.currentValue)
 				}
 			} else if (accessor instanceof EntityAccessor) {
 				if (persistedField && typeof persistedField === 'object' && !Array.isArray(persistedField)) {
-					builder = builder.one(fieldName, builder => {
+					builder = builder.one(placeholderName, builder => {
 						if (accessor.primaryKey === undefined) {
 							return builder.create(builder => {
 								return this.registerCreateMutationPart(accessor, builder)
@@ -205,7 +205,7 @@ export default class MutationGenerator {
 				}
 			} else if (accessor instanceof EntityCollectionAccessor) {
 				if (Array.isArray(persistedField)) {
-					builder = builder.many(fieldName, builder => {
+					builder = builder.many(placeholderName, builder => {
 						for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {
 							const innerAccessor = accessor.entities[i]
 
@@ -238,7 +238,7 @@ export default class MutationGenerator {
 					})
 				}
 			} else if (accessor instanceof EntityForRemovalAccessor) {
-				builder = builder.one(fieldName, builder => {
+				builder = builder.one(placeholderName, builder => {
 					return builder.disconnect()
 				})
 			} else if (accessor instanceof AccessorTreeRoot) {

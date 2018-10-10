@@ -9,6 +9,7 @@ import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityFields from '../dao/EntityFields'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import ReferenceMarker from '../dao/ReferenceMarker'
+import PlaceholderGenerator from '../model/PlaceholderGenerator'
 import UnlinkButton from './UnlinkButton'
 
 export interface RepeaterProps extends ToManyProps {}
@@ -21,7 +22,7 @@ export default class Repeater extends React.Component<RepeaterProps> {
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
-						const field = data.data[this.props.field]
+						const field = data.data[PlaceholderGenerator.getReferencePlaceholder(this.props.field, this.props.where)]
 
 						if (field instanceof EntityCollectionAccessor) {
 							return (

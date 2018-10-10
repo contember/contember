@@ -79,16 +79,16 @@ export default class AccessorTreeGenerator {
 		const entityData: EntityData = {}
 		const id = data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : undefined
 
-		for (const fieldName in fields) {
-			if (fieldName === AccessorTreeGenerator.PRIMARY_KEY_NAME) {
+		for (const placeholderName in fields) {
+			if (placeholderName === AccessorTreeGenerator.PRIMARY_KEY_NAME) {
 				continue
 			}
 
-			const fieldData = data ? data[fieldName] : undefined
-			const field = fields[fieldName]
+			const fieldData = data ? data[placeholderName] : undefined
+			const field = fields[placeholderName]
 
 			if (field instanceof MarkerTreeRoot) {
-				entityData[fieldName] = this.generateSubTree(field, () => undefined)
+				entityData[placeholderName] = this.generateSubTree(field, () => undefined)
 			} else if (field instanceof ReferenceMarker) {
 				if (field.expectedCount === ReferenceMarker.ExpectedCount.One) {
 					if (Array.isArray(fieldData)) {
@@ -97,9 +97,9 @@ export default class AccessorTreeGenerator {
 							`Perhaps you wanted to use a <Repeater />?`,
 						)
 					} else if (fieldData === null) {
-						entityData[fieldName] = undefined
+						entityData[placeholderName] = undefined
 					} else if (typeof fieldData === 'object' || fieldData === undefined) {
-						entityData[fieldName] = this.generateOneReference(fieldData, field, onUpdate, entityData)
+						entityData[placeholderName] = this.generateOneReference(fieldData, field, onUpdate, entityData)
 					} else {
 						throw new DataBindingError(
 							`Received a scalar value for field '${field.fieldName}' where a single entity was expected.` +
@@ -108,7 +108,7 @@ export default class AccessorTreeGenerator {
 					}
 				} else if (field.expectedCount === ReferenceMarker.ExpectedCount.Many) {
 					if (Array.isArray(fieldData) || fieldData === undefined) {
-						entityData[fieldName] = this.generateManyReference(fieldData, field, onUpdate)
+						entityData[placeholderName] = this.generateManyReference(fieldData, field, onUpdate)
 					} else if (typeof fieldData === 'object') {
 						// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
 						// relation is unlinked, e.g. a Person does not have a linked Nationality.
@@ -138,10 +138,10 @@ export default class AccessorTreeGenerator {
 					)
 				} else {
 					const onChange = (newValue: Scalar) => {
-						onUpdate(fieldName, new FieldAccessor(fieldName, newValue, onChange))
+						onUpdate(placeholderName, new FieldAccessor(placeholderName, newValue, onChange))
 					}
 					// `fieldData` will be `undefined` when a repeater creates a clone based on no data.
-					entityData[fieldName] = new FieldAccessor(fieldName, fieldData === undefined ? null : fieldData, onChange)
+					entityData[placeholderName] = new FieldAccessor(placeholderName, fieldData === undefined ? null : fieldData, onChange)
 				}
 			} else {
 				assertNever(field)
@@ -235,10 +235,10 @@ export default class AccessorTreeGenerator {
 		return collectionAccessor
 	}
 
-	private withUpdatedField(original: EntityAccessor, field: FieldName, newData: FieldData): EntityAccessor {
+	private withUpdatedField(original: EntityAccessor, fieldPlaceholder: string, newData: FieldData): EntityAccessor {
 		return new EntityAccessor(
 			original.primaryKey,
-			{ ...original.data, [field]: newData },
+			{ ...original.data, [fieldPlaceholder]: newData },
 			original.replaceWith,
 			original.unlink,
 		)

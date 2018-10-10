@@ -5,6 +5,7 @@ import { FieldName } from '../bindingTypes'
 import EntityAccessor from '../dao/EntityAccessor'
 import EntityFields from '../dao/EntityFields'
 import ReferenceMarker from '../dao/ReferenceMarker'
+import PlaceholderGenerator from '../model/PlaceholderGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
@@ -22,7 +23,7 @@ export default class ToOne extends React.Component<ToOneProps> {
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
-						const field = data.data[this.props.field]
+						const field = data.data[PlaceholderGenerator.getReferencePlaceholder(this.props.field, this.props.where)]
 
 						if (field instanceof EntityAccessor) {
 							return <DataContext.Provider value={field}>{this.props.children}</DataContext.Provider>

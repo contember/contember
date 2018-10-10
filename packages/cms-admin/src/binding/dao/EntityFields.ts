@@ -1,5 +1,5 @@
 import Marker from './Marker'
 
-type EntityFields = { [name: string]: Marker }
+type EntityFields = { [placeholderName: string]: Marker }
 
 export default EntityFields

@@ -23,8 +23,6 @@
 	},
 	"dependencies": {
 		"@koa/cors": "^2.2.2",
-		"@types/koa-bodyparser": "^5.0.1",
-		"@types/koa2-cors": "^2.0.1",
 		"apollo-server-core": "^2.1.0",
 		"apollo-server-koa": "^2.1.0",
 		"bcrypt": "^2.0.0",
@@ -50,6 +48,8 @@
 		"@types/js-yaml": "^3.11.2",
 		"@types/knex": "^0.14.16",
 		"@types/koa": "^2.0.46",
+		"@types/koa-bodyparser": "^5.0.1",
+		"@types/koa2-cors": "^2.0.1",
 		"@types/mocha": "^5.2.4",
 		"@types/mock-knex": "^0.3.2",
 		"@types/pg": "^7.4.10",

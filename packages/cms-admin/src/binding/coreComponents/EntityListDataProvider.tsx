@@ -31,7 +31,7 @@ export default class EntityListDataProvider extends React.Component<EntityListDa
 		props: EntityListDataProviderProps,
 		fields: MarkerTreeRoot['fields'],
 	): MarkerTreeRoot {
-		return MarkerTreeRoot.createInstance(
+		return new MarkerTreeRoot(
 			props.name,
 			fields,
 			{

@@ -27,11 +27,7 @@ export default class EntityCreator extends React.Component<EntityCreatorProps> {
 		props: EntityCreatorProps,
 		fields: MarkerTreeRoot['fields'],
 	): MarkerTreeRoot {
-		return MarkerTreeRoot.createInstance(
-			props.name,
-			fields,
-			undefined
-		)
+		return new MarkerTreeRoot(props.name, fields, undefined)
 	}
 }
 

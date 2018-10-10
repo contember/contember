@@ -31,7 +31,7 @@ export default class SingleEntityDataProvider extends React.Component<SingleEnti
 		props: SingleEntityDataProviderProps,
 		fields: MarkerTreeRoot['fields'],
 	): MarkerTreeRoot {
-		return MarkerTreeRoot.createInstance(
+		return new MarkerTreeRoot(
 			props.name,
 			fields,
 			{

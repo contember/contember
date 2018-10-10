@@ -39,16 +39,14 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 	}
 
 	protected triggerPersist = () => {
-		if (!this.state.id) {
-			return
-		}
-		const data = this.props.requests[this.state.id].data
-		if (data && this.state.data) {
+		const data = this.state.id ? this.props.requests[this.state.id].data : undefined
+
+		if (this.state.data) {
 			const generator = new MutationGenerator(data, this.state.data)
 			const mutation = generator.getPersistMutation()
 
+			console.log('mutation', mutation)
 			if (mutation !== undefined) {
-				console.log(mutation)
 				this.props.putData(mutation)
 			}
 		}
@@ -98,7 +96,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 		const query = new QueryGenerator(this.props.markerTree).getReadQuery()
 
-		console.log('q', query)
+		console.log('query', query)
 		if (query) {
 			const id = await this.props.getData(query)
 			if (!this.unmounted) {

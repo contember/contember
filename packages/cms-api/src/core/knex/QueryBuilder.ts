@@ -4,6 +4,7 @@ import { Value } from './types'
 import KnexWrapper from './KnexWrapper'
 import WindowFunction from './WindowFunction'
 import CaseStatement from './CaseStatement'
+import { QueryResult } from 'pg'
 
 type AffectedRows = number
 type Returning = number | string
@@ -132,7 +133,8 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 			...updateSql.bindings,
 			...selectSql.bindings
 		)
-		return await query
+
+		return ((await query) as QueryResult).rowCount
 	}
 
 	public toString(): string {

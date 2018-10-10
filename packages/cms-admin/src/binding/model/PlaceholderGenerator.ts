@@ -4,7 +4,6 @@ import { FieldName } from '../bindingTypes'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import ReferenceMarker from '../dao/ReferenceMarker'
-import { TreeId } from '../dao/TreeId'
 import { Hashing } from '../utils'
 
 export default class PlaceholderGenerator {
@@ -32,7 +31,7 @@ export default class PlaceholderGenerator {
 		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.id, marker.associatedField)
 	}
 
-	public static getMarkerTreePlaceholder(id: TreeId, associatedField?: FieldName): string {
+	public static getMarkerTreePlaceholder(id: MarkerTreeRoot.TreeId, associatedField?: FieldName): string {
 		return associatedField ? `${associatedField}__data` : `__root_${id}`
 	}
 }

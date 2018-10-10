@@ -19,6 +19,6 @@ export default class Hashing {
 			hash = (hash << 5) - hash + str.charCodeAt(i)
 			hash = hash & hash // Convert to 32bit integer
 		}
-		return hash
+		return Math.abs(hash)
 	}
 }

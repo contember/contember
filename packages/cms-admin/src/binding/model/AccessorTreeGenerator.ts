@@ -70,7 +70,7 @@ export default class AccessorTreeGenerator {
 	}
 
 	private updateFields(
-		data: ReceivedEntityData<undefined> | undefined,
+		data: ReceivedEntityData<undefined>,
 		fields: EntityFields,
 		onUpdate: OnUpdate,
 		onReplace: OnReplace,
@@ -152,7 +152,7 @@ export default class AccessorTreeGenerator {
 	}
 
 	private generateOneReference(
-		fieldData: ReceivedEntityData<undefined> | undefined,
+		fieldData: ReceivedEntityData<undefined>,
 		field: ReferenceMarker,
 		onUpdate: OnUpdate,
 		entityData: EntityData,
@@ -177,7 +177,7 @@ export default class AccessorTreeGenerator {
 	}
 
 	private generateManyReference(
-		fieldData: Array<ReceivedEntityData<undefined> | undefined> | undefined,
+		fieldData: Array<ReceivedEntityData<undefined>> | undefined,
 		field: ReferenceMarker,
 		onUpdate: OnUpdate,
 	): EntityCollectionAccessor {

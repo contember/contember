@@ -34,13 +34,12 @@ export default class QueryGenerator {
 		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>,
 	): QueryBuilder {
 		const boundedQueryBuilder = new CrudQueryBuilder.UnboundedGetQueryBuilder().where(subTree.constraints.where)
-		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder(boundedQueryBuilder.objectBuilder)
-		;[baseQueryBuilder, listQueryBuilder] = this.addMarkerTreeRootQueries(
+		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerListQueryPart(subTree.fields, listQueryBuilder),
+			this.registerListQueryPart(subTree.fields, new CrudQueryBuilder.ListQueryBuilder(boundedQueryBuilder.objectBuilder)),
 		)
 
-		return baseQueryBuilder.get(`get${subTree.entityName}`, listQueryBuilder, subTree.id)
+		return populatedBaseQueryBuilder.get(`get${subTree.entityName}`, populatedListQueryBuilder, subTree.id)
 	}
 
 	private addListQuery(

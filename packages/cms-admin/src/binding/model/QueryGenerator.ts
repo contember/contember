@@ -40,7 +40,7 @@ export default class QueryGenerator {
 			this.registerListQueryPart(subTree.fields, listQueryBuilder),
 		)
 
-		return baseQueryBuilder.get(subTree.entityName, listQueryBuilder, subTree.id)
+		return baseQueryBuilder.get(`get${subTree.entityName}`, listQueryBuilder, subTree.id)
 	}
 
 	private addListQuery(
@@ -59,7 +59,7 @@ export default class QueryGenerator {
 		)
 
 		// This naming convention is unfortunate & temporary
-		return baseQueryBuilder.list(`${subTree.entityName}s`, listQueryBuilder, subTree.id)
+		return baseQueryBuilder.list(`list${subTree.entityName}`, listQueryBuilder, subTree.id)
 	}
 
 	private *registerListQueryPart(

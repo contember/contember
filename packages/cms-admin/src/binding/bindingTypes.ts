@@ -5,7 +5,7 @@ export type EntityName = string
 
 export type Scalar = string | number | boolean | null
 export type ReceivedFieldData<A = never> = Scalar | ReceivedEntityData<A> | Array<ReceivedEntityData<A> | A>
-export interface ReceivedEntityData<A = never> {
+export type ReceivedEntityData<A = never> = A | {
 	id: string
 	[fieldName: string]: ReceivedFieldData<A>
 }

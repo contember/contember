@@ -13,12 +13,14 @@ type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQu
 export default class MutationGenerator {
 	private static readonly PRIMARY_KEY_NAME = 'id'
 
+	private createCounter: number = 0
+
 	public constructor(private persistedData: any, private currentData: AccessorTreeRoot) {}
 
 	public getPersistMutation(): string | undefined {
 		try {
 			const builder = this.addSubMutation(
-				this.persistedData[this.currentData.id],
+				this.persistedData ? this.persistedData[this.currentData.id] : undefined,
 				this.currentData.entityName,
 				this.currentData.root,
 			)
@@ -29,7 +31,7 @@ export default class MutationGenerator {
 	}
 
 	private addSubMutation(
-		data: ReceivedData,
+		data: ReceivedData<undefined>,
 		entityName: EntityName,
 		entity: RootAccessor,
 		queryBuilder?: QueryBuilder,
@@ -41,20 +43,20 @@ export default class MutationGenerator {
 		if (entity instanceof EntityAccessor) {
 			if (entity.primaryKey === undefined) {
 				queryBuilder = this.addCreateMutation(entity, entityName, queryBuilder)
-			} else if (!Array.isArray(data)) {
+			} else if (data && !Array.isArray(data)) {
 				queryBuilder = this.addUpdateMutation(entity, entityName, data, queryBuilder)
 			}
 		} else if (entity instanceof EntityForRemovalAccessor) {
 			queryBuilder = this.addDeleteMutation(entity, entityName, queryBuilder)
 		} else if (entity instanceof EntityCollectionAccessor) {
-			if (Array.isArray(data)) {
+			if (Array.isArray(data) || data === undefined) {
 				const entityCount = entity.entities.length
 
 				for (let entityI = 0, dataI = 0; entityI < entityCount; entityI++) {
 					const currentEntity = entity.entities[entityI]
 
 					if (currentEntity instanceof EntityAccessor || currentEntity instanceof EntityForRemovalAccessor) {
-						queryBuilder = this.addSubMutation(data[dataI++], entityName, currentEntity, queryBuilder)
+						queryBuilder = this.addSubMutation(data ? data[dataI++] : undefined, entityName, currentEntity, queryBuilder)
 					} else if (currentEntity === undefined) {
 						// Do nothing. This was a non-persisted entity that was subsequently deleted.
 						// No need to create it only to delete it again…
@@ -92,7 +94,7 @@ export default class MutationGenerator {
 	private addUpdateMutation(
 		entity: EntityAccessor,
 		entityName: EntityName,
-		data: ReceivedEntityData,
+		data: ReceivedEntityData<undefined>,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -101,7 +103,7 @@ export default class MutationGenerator {
 
 		const primaryKey = entity.primaryKey
 
-		if (!primaryKey) {
+		if (!primaryKey || !data) {
 			return queryBuilder
 		}
 
@@ -124,9 +126,9 @@ export default class MutationGenerator {
 
 		return queryBuilder.create(`create${entityName}`, builder => {
 			builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
-			console.log('top-level create')
-			return builder // TODO
-		}) // TODO: add alias
+
+			return builder.data(builder => this.registerCreateMutationPart(entity, builder))
+		}, `create${entityName}_${(this.createCounter++).toFixed(0)}`)
 	}
 
 	private registerCreateMutationPart(
@@ -179,15 +181,15 @@ export default class MutationGenerator {
 
 	private registerUpdateMutationPart(
 		currentData: EntityAccessor,
-		persistedData: ReceivedEntityData,
+		persistedData: ReceivedEntityData<undefined>,
 		builder: CrudQueryBuilder.UpdateDataBuilder,
 	): CrudQueryBuilder.UpdateDataBuilder {
-		for (const placeholderName in persistedData) {
-			const persistedField = persistedData[placeholderName]
+		for (const placeholderName in currentData.data) {
+			const persistedField = persistedData ? persistedData[placeholderName] : undefined
 			const accessor = currentData.data[placeholderName]
 
 			if (accessor instanceof FieldAccessor) {
-				if (persistedField !== accessor.currentValue) {
+				if (persistedField !== accessor.currentValue && persistedField !== undefined) {
 					builder = builder.set(placeholderName, accessor.currentValue)
 				}
 			} else if (accessor instanceof EntityAccessor) {

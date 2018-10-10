@@ -9,4 +9,4 @@ export type ReceivedEntityData<A = never> = A | {
 	id: string
 	[fieldName: string]: ReceivedFieldData<A>
 }
-export type ReceivedData<A = never> = ReceivedEntityData<A> | ReceivedEntityData<A>[]
+export type ReceivedData<A = never> = A | ReceivedEntityData<A> | ReceivedEntityData<A>[]

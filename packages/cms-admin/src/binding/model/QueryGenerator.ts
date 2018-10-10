@@ -68,8 +68,8 @@ export default class QueryGenerator {
 	): IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder> {
 		builder = builder.column('id')
 
-		for (const field in fields) {
-			const fieldValue: Marker = fields[field]
+		for (const placeholderName in fields) {
+			const fieldValue: Marker = fields[placeholderName]
 
 			if (fieldValue instanceof FieldMarker) {
 				builder = builder.column(fieldValue.fieldName)
@@ -89,7 +89,7 @@ export default class QueryGenerator {
 					}
 				}
 
-				builder = builder.relation(field, subBuilder)
+				builder = builder.relation(fieldValue.fieldName, subBuilder, placeholderName)
 			} else {
 				yield fieldValue
 			}

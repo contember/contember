@@ -10,11 +10,16 @@ export default class BoundedGetQueryBuilder {
 
 	relation(
 		name: string,
-		builder: ListQueryBuilder | ((builder: ListQueryBuilder) => ListQueryBuilder)
+		builder: ListQueryBuilder | ((builder: ListQueryBuilder) => ListQueryBuilder),
+		alias?: string
 	): BoundedGetQueryBuilder {
 		if (!(builder instanceof ListQueryBuilder)) {
 			builder = builder(new ListQueryBuilder())
 		}
-		return new BoundedGetQueryBuilder(this.objectBuilder.object(name, builder.objectBuilder))
+
+		const [objectName, objectBuilder] =
+			typeof alias === 'string' ? [alias, builder.objectBuilder.name(name)] : [name, builder.objectBuilder]
+
+		return new BoundedGetQueryBuilder(this.objectBuilder.object(objectName, objectBuilder))
 	}
 }

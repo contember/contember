@@ -23,25 +23,19 @@ class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
 		return () => `treeRoot${(id++).toFixed(0)}`
 	})()
 
-	private constructor(
-		public readonly id: MarkerTreeRoot.TreeId,
+	public readonly id: MarkerTreeRoot.TreeId
+
+	public constructor(
 		public readonly entityName: EntityName,
 		public readonly fields: EntityFields,
 		public readonly constraints: C,
-		public readonly associatedField?: FieldName,
-	) {}
+		public readonly associatedField?: FieldName
+	) {
+		this.id = MarkerTreeRoot.getNewTreeId()
+	}
 
 	public get placeholderName(): string {
 		return PlaceholderGenerator.generateMarkerTreeRootPlaceholder(this)
-	}
-
-	public static createInstance(
-		entityName: EntityName,
-		fields: MarkerTreeRoot['fields'],
-		constraints: MarkerTreeRoot['constraints'],
-		associatedField?: FieldName,
-	): MarkerTreeRoot {
-		return new MarkerTreeRoot(MarkerTreeRoot.getNewTreeId(), entityName, fields, constraints, associatedField)
 	}
 }
 

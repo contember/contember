@@ -14,7 +14,7 @@ export interface EntityListTreeConstraints {
 	whereType: 'nonUnique'
 }
 
-export type MarkerTreeConstraints = SingleEntityTreeConstraints | EntityListTreeConstraints
+export type MarkerTreeConstraints = SingleEntityTreeConstraints | EntityListTreeConstraints | undefined
 
 class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
 	private static getNewTreeId: () => MarkerTreeRoot.TreeId = (() => {

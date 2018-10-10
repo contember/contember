@@ -12,8 +12,12 @@ type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQu
 export default class QueryGenerator {
 	constructor(private tree: MarkerTreeRoot) {}
 
-	public getReadQuery(): string {
-		return this.addSubQuery(this.tree).getGql()
+	public getReadQuery(): string | undefined {
+		try {
+			return this.addSubQuery(this.tree).getGql()
+		} catch (e) {
+			return undefined
+		}
 	}
 
 	private addSubQuery(subTree: MarkerTreeRoot, baseQueryBuilder?: QueryBuilder): QueryBuilder {
@@ -21,7 +25,13 @@ export default class QueryGenerator {
 			baseQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		if (subTree.constraints.whereType === 'unique') {
+		if (subTree.constraints === undefined) {
+			const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
+				baseQueryBuilder,
+				this.registerListQueryPart(subTree.fields, new CrudQueryBuilder.ListQueryBuilder()),
+			)
+			return populatedBaseQueryBuilder
+		} else if (subTree.constraints.whereType === 'unique') {
 			return this.addGetQuery(baseQueryBuilder, subTree as MarkerTreeRoot<SingleEntityTreeConstraints>)
 		} else if (subTree.constraints.whereType === 'nonUnique') {
 			return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<EntityListTreeConstraints>)
@@ -48,7 +58,7 @@ export default class QueryGenerator {
 	): QueryBuilder {
 		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder()
 
-		if (subTree.constraints.where) {
+		if (subTree.constraints && subTree.constraints.where) {
 			listQueryBuilder = listQueryBuilder.where(subTree.constraints.where)
 		}
 

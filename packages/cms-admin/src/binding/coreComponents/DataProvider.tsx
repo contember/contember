@@ -104,6 +104,9 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 			if (!this.unmounted) {
 				this.setState({ id })
 			}
+		} else {
+			const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree, undefined)
+			accessTreeGenerator.generateLiveTree(newData => this.setState({ data: newData }))
 		}
 	}
 

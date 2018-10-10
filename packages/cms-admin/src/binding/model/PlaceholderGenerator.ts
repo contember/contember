@@ -28,10 +28,10 @@ export default class PlaceholderGenerator {
 	//
 
 	public static generateMarkerTreeRootPlaceholder(marker: MarkerTreeRoot): string {
-		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.id, marker.associatedField)
+		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.associatedField, marker.id)
 	}
 
-	public static getMarkerTreePlaceholder(id: MarkerTreeRoot.TreeId, associatedField?: FieldName): string {
+	public static getMarkerTreePlaceholder(associatedField: FieldName | undefined, id?: MarkerTreeRoot.TreeId): string {
 		return associatedField ? `${associatedField}__data` : `__root_${id}`
 	}
 }

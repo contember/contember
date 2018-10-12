@@ -115,7 +115,7 @@ describe('knex query builder', () => {
 				await builder.execute()
 			},
 			sql: SQL`insert into "public"."author" ("content", "id", "title") values ($1, $2, $3)`,
-			parameters: ['bar', 1, 'foo',],
+			parameters: ['bar', 1, 'foo'],
 		})
 	})
 

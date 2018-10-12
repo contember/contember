@@ -1,8 +1,8 @@
 import { AddProjectMemberErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
-import * as uuid from 'uuid'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
+import { uuid } from '../../../utils/uuid'
 
 class ProjectMemberManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
@@ -13,7 +13,7 @@ class ProjectMemberManager {
 				.insertBuilder()
 				.into('project_member')
 				.values({
-					id: uuid.v4(),
+					id: uuid(),
 					project_id: projectId,
 					person_id: personId,
 				})

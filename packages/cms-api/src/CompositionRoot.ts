@@ -87,7 +87,7 @@ class CompositionRoot {
 		})
 	}
 
-	private createTenantContainer(tenantDbCredentials: DatabaseCredentials) {
+	createTenantContainer(tenantDbCredentials: DatabaseCredentials) {
 		return new Container.Builder({})
 
 			.addService('knexConnection', () => {
@@ -143,7 +143,12 @@ class CompositionRoot {
 			.addService(
 				'resolvers',
 				({ meQueryResolver, signUpMutationResolver, signInMutationResolver, addProjectMemberMutationResolver }) => {
-					return new ResolverFactory(meQueryResolver, signUpMutationResolver, signInMutationResolver, addProjectMemberMutationResolver).create()
+					return new ResolverFactory(
+						meQueryResolver,
+						signUpMutationResolver,
+						signInMutationResolver,
+						addProjectMemberMutationResolver
+					).create()
 				}
 			)
 

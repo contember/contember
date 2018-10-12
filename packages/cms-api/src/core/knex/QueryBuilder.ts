@@ -175,6 +175,10 @@ namespace QueryBuilder {
 	export type Callback = (qb: QueryBuilder) => void
 	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 
+	export interface Options {
+		cte: { [alias: string]: QueryBuilder.Callback }
+	}
+
 	type ColumnFqn = string
 	type TableAliasAndColumn = [string, string]
 	export type ColumnIdentifier = ColumnFqn | TableAliasAndColumn

@@ -2,12 +2,12 @@ import QueryHandler from '../../../core/query/QueryHandler'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import { SignUpErrorCode } from '../../schema/types'
-import KnexConnection from '../../../core/knex/KnexConnection'
 import * as uuid from 'uuid'
 import * as bcrypt from 'bcrypt'
+import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 class SignUpManager {
-	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexConnection) {}
+	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
 
 	async signUp(email: string, password: string): Promise<SignUpManager.SignUpResult> {
 		if (await this.isEmailAlreadyUsed(email)) {
@@ -19,23 +19,25 @@ class SignUpManager {
 
 		await this.db.transaction(async () => {
 			await this.db
-				.queryBuilder()
+				.insertBuilder()
 				.into('tenant.identity')
-				.insert({
+				.values({
 					id: identityId,
 					parent_id: null,
 					roles: JSON.stringify([]), // TODO: try without JSON.stringify
 				})
+				.execute()
 
 			await this.db
-				.queryBuilder()
+				.insertBuilder()
 				.into('tenant.person')
-				.insert({
+				.values({
 					id: personId,
 					email: email,
 					password_hash: await bcrypt.hash(password, 10),
 					identity_id: identityId,
 				})
+				.execute()
 		})
 
 		return new SignUpManager.SignUpResultOk(personId)

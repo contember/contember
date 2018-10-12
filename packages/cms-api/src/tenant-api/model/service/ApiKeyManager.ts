@@ -1,13 +1,13 @@
 import * as crypto from 'crypto'
-import KnexConnection from '../../../core/knex/KnexConnection'
 import * as uuid from 'uuid'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import QueryHandler from '../../../core/query/QueryHandler'
 import ApiKey from '../type/ApiKey'
 import ApiKeyByTokenQuery from '../queries/ApiKeyByTokenQuery'
+import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 class ApiKeyManager {
-	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexConnection) {}
+	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
 
 	async verify(token: string): Promise<ApiKeyManager.VerifyResult> {
 		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))
@@ -37,9 +37,9 @@ class ApiKeyManager {
 		const tokenHash = ApiKey.computeTokenHash(token)
 
 		await this.db
-			.queryBuilder()
-			.into('tenant.api_key')
-			.insert({
+			.insertBuilder()
+			.into('api_key')
+			.values({
 				id: apiKeyId,
 				token_hash: tokenHash,
 				type: type,
@@ -48,6 +48,7 @@ class ApiKeyManager {
 				expires_at: this.getExpiration(type),
 				created_at: new Date(),
 			})
+			.execute()
 
 		return token
 	}

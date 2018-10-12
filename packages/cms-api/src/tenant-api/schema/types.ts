@@ -5,7 +5,7 @@ export type Resolver<Result, Args = any> = (
 	parent: any,
 	args: Args,
 	context: any,
-	info: GraphQLResolveInfo,
+	info: GraphQLResolveInfo
 ) => Promise<Result> | Result
 
 export interface Query {

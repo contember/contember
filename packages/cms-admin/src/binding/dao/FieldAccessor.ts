@@ -4,6 +4,6 @@ export default class FieldAccessor<Persisted extends Scalar = Scalar, Produced e
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted,
-		public readonly onChange?: (newValue: Produced) => void,
+		public readonly onChange?: (newValue: Produced) => void
 	) {}
 }

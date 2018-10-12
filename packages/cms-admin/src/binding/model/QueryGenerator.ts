@@ -28,7 +28,7 @@ export default class QueryGenerator {
 		if (subTree.constraints === undefined) {
 			const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
 				baseQueryBuilder,
-				this.registerListQueryPart(subTree.fields, new CrudQueryBuilder.ListQueryBuilder()),
+				this.registerListQueryPart(subTree.fields, new CrudQueryBuilder.ListQueryBuilder())
 			)
 			return populatedBaseQueryBuilder
 		} else if (subTree.constraints.whereType === 'unique') {
@@ -41,12 +41,15 @@ export default class QueryGenerator {
 
 	private addGetQuery(
 		baseQueryBuilder: QueryBuilder,
-		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>,
+		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>
 	): QueryBuilder {
 		const boundedQueryBuilder = new CrudQueryBuilder.UnboundedGetQueryBuilder().where(subTree.constraints.where)
 		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerListQueryPart(subTree.fields, new CrudQueryBuilder.ListQueryBuilder(boundedQueryBuilder.objectBuilder)),
+			this.registerListQueryPart(
+				subTree.fields,
+				new CrudQueryBuilder.ListQueryBuilder(boundedQueryBuilder.objectBuilder)
+			)
 		)
 
 		return populatedBaseQueryBuilder.get(`get${subTree.entityName}`, populatedListQueryBuilder, subTree.id)
@@ -54,7 +57,7 @@ export default class QueryGenerator {
 
 	private addListQuery(
 		baseQueryBuilder: QueryBuilder,
-		subTree: MarkerTreeRoot<EntityListTreeConstraints>,
+		subTree: MarkerTreeRoot<EntityListTreeConstraints>
 	): QueryBuilder {
 		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder()
 
@@ -64,7 +67,7 @@ export default class QueryGenerator {
 
 		;[baseQueryBuilder, listQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerListQueryPart(subTree.fields, listQueryBuilder),
+			this.registerListQueryPart(subTree.fields, listQueryBuilder)
 		)
 
 		// This naming convention is unfortunate & temporary
@@ -73,7 +76,7 @@ export default class QueryGenerator {
 
 	private *registerListQueryPart(
 		fields: EntityFields,
-		builder: CrudQueryBuilder.ListQueryBuilder,
+		builder: CrudQueryBuilder.ListQueryBuilder
 	): IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder> {
 		builder = builder.column('id')
 
@@ -112,7 +115,7 @@ export default class QueryGenerator {
 
 	private addMarkerTreeRootQueries(
 		baseQueryBuilder: QueryBuilder,
-		subTrees: IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder>,
+		subTrees: IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder>
 	): [QueryBuilder, CrudQueryBuilder.ListQueryBuilder] {
 		let listQueryBuilder: CrudQueryBuilder.ListQueryBuilder | undefined = undefined
 

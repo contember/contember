@@ -4,6 +4,6 @@ export default class EntityForRemovalAccessor {
 	constructor(
 		public readonly primaryKey: string,
 		public readonly data: EntityData,
-		public readonly replaceWith: (replacement: EntityAccessor) => void,
+		public readonly replaceWith: (replacement: EntityAccessor) => void
 	) {}
 }

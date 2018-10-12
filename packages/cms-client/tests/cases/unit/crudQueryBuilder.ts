@@ -52,12 +52,15 @@ describe('crud query builder', () => {
 	})
 
 	it('query', () => {
-		const builder = new CrudQueryBuilder.CrudQueryBuilder().list('Posts', q =>
-			q
-				.where({ foo: { eq: 'bar' } })
-				.column('title')
-				.relation('author', o => o.column('name'))
-		, 'myPostsAlias')
+		const builder = new CrudQueryBuilder.CrudQueryBuilder().list(
+			'Posts',
+			q =>
+				q
+					.where({ foo: { eq: 'bar' } })
+					.column('title')
+					.relation('author', o => o.column('name')),
+			'myPostsAlias'
+		)
 		expect(builder.getGql()).equals(`query {
 	myPostsAlias: Posts(where: {foo: {eq: "bar"}}) {
 		title

@@ -43,7 +43,7 @@ export default class MarkerTreeGenerator {
 		if (typeof node === 'function') {
 			throw new DataBindingError(
 				'Render props (functions as React Component children) are not supported within the schema. ' +
-					'Please refer to the documentation.',
+					'Please refer to the documentation.'
 			)
 		}
 
@@ -95,7 +95,7 @@ export default class MarkerTreeGenerator {
 				if (children) {
 					return dataMarker.generateMarkerTreeRoot(
 						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children)),
+						this.mapNodeResultToEntityFields(this.processNode(children))
 					)
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
@@ -105,7 +105,7 @@ export default class MarkerTreeGenerator {
 				if (children) {
 					return dataMarker.generateReferenceMarker(
 						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children)),
+						this.mapNodeResultToEntityFields(this.processNode(children))
 					)
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
@@ -189,7 +189,7 @@ export default class MarkerTreeGenerator {
 			const kind = marker instanceof FieldMarker ? 'field' : 'relation'
 
 			throw new DataBindingError(
-				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
+				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`
 			)
 		}
 		throw new DataBindingError('Empty data tree discovered. Try adding some fields…')

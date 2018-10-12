@@ -9,9 +9,7 @@ export default class UnlinkButton extends React.Component {
 			<DataContext.Consumer>
 				{(value: DataContextValue) => {
 					if (value instanceof EntityAccessor) {
-						return (
-							<Button icon="cross" onClick={value.unlink} intent={Intent.DANGER} small={true} />
-						)
+						return <Button icon="cross" onClick={value.unlink} intent={Intent.DANGER} small={true} />
 					}
 				}}
 			</DataContext.Consumer>

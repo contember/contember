@@ -34,7 +34,7 @@ export default class Repeater extends React.Component<RepeaterProps> {
 													{this.props.children}
 													<UnlinkButton />
 												</DataContext.Provider>
-											),
+											)
 									)}
 									<Button icon="plus" onClick={field.appendNew}>
 										Add new

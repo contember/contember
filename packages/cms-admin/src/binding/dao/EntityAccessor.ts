@@ -11,6 +11,6 @@ export default class EntityAccessor {
 		public readonly primaryKey: string | undefined,
 		public readonly data: EntityData,
 		public readonly replaceWith: (replacement: EntityAccessor) => void,
-		public readonly unlink?: () => void,
+		public readonly unlink?: () => void
 	) {}
 }

@@ -12,7 +12,7 @@ export default class AccessorTreeRoot {
 	public constructor(
 		markerTreeRoot: MarkerTreeRoot,
 		public readonly root: RootAccessor,
-		public readonly entityName: EntityName,
+		public readonly entityName: EntityName
 	) {
 		this.id = markerTreeRoot.id
 	}

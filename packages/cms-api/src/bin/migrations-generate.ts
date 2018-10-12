@@ -29,7 +29,13 @@ const command = new class extends Command<Args> {
 
 	protected async execute({ projectName }: Args): Promise<void> {
 		const migrationsDir = `${process.cwd()}/src/projects/${projectName}/migrations`
-		await mkdir(migrationsDir)
+		try {
+			await mkdir(migrationsDir)
+		} catch (error) {
+			if (error.code !== 'EEXIST') {
+				throw error
+			}
+		}
 		const modelDir = `${process.cwd()}/dist/src/projects/${projectName}/src/model.js`
 
 		const files: string[] = await readDir(migrationsDir)

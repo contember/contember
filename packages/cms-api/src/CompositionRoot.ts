@@ -20,6 +20,8 @@ import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from './content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { DatabaseCredentials } from './tenant-api/config'
 import S3 from './utils/S3'
+import AddProjectMemberMutationResolver from './tenant-api/resolvers/mutation/AddProjectMemberMutationResolver'
+import ResolverFactory from './tenant-api/resolvers/ResolverFactory'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -135,24 +137,13 @@ class CompositionRoot {
 			)
 			.addService(
 				'addProjectMemberMutationResolver',
-				({ queryHandler, knexConnection }) => new ProjectMemberManager(queryHandler, knexConnection.wrapper())
+				({ projectMemberManager }) => new AddProjectMemberMutationResolver(projectMemberManager)
 			)
 
 			.addService(
 				'resolvers',
 				({ meQueryResolver, signUpMutationResolver, signInMutationResolver, addProjectMemberMutationResolver }) => {
-					return {
-						Query: {
-							me: meQueryResolver.me.bind(meQueryResolver),
-						},
-						Mutation: {
-							signUp: signUpMutationResolver.signUp.bind(signUpMutationResolver),
-							signIn: signInMutationResolver.signIn.bind(signInMutationResolver),
-							addProjectMember: addProjectMemberMutationResolver.addProjectMember.bind(
-								addProjectMemberMutationResolver
-							),
-						},
-					}
+					return new ResolverFactory(meQueryResolver, signUpMutationResolver, signInMutationResolver, addProjectMemberMutationResolver).create()
 				}
 			)
 

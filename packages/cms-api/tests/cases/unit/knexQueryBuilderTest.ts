@@ -101,6 +101,24 @@ describe('knex query builder', () => {
 		})
 	})
 
+	it('constructs simple insert', async () => {
+		await execute({
+			query: async wrapper => {
+				const builder = wrapper
+					.insertBuilder()
+					.into('author')
+					.values({
+						id: 1,
+						title: 'foo',
+						content: expr => expr.selectValue('bar'),
+					})
+				await builder.execute()
+			},
+			sql: SQL`insert into "public"."author" ("content", "id", "title") values ($1, $2, $3)`,
+			parameters: ['bar', 1, 'foo',],
+		})
+	})
+
 	it('constructs insert with cte', async () => {
 		await execute({
 			query: async wrapper => {

@@ -2,6 +2,7 @@ import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
 import * as Knex from 'knex'
 import { QueryResult } from 'pg'
+import { Value } from "./types";
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>> {
 	private constructor(
@@ -168,7 +169,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	private getColumnValues(values: InsertBuilder.Values): { [column: string]: Knex.Raw } {
 		return Object.entries(values)
 			.map(
-				([key, value]): [string, Knex.Raw | undefined] => {
+				([key, value]): [string, Knex.Raw | Value | undefined] => {
 					if (typeof value === 'function') {
 						return [key, value(new QueryBuilder.ColumnExpressionFactory(this.wrapper))]
 					}
@@ -212,7 +213,7 @@ namespace InsertBuilder {
 		update = 'update',
 	}
 
-	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression }
+	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value }
 
 	export type ConflictAction =
 		| { type: ConflictActionType.doNothing }

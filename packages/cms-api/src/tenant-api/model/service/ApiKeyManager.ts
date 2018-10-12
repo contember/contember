@@ -1,10 +1,11 @@
 import * as crypto from 'crypto'
-import * as uuid from 'uuid'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import QueryHandler from '../../../core/query/QueryHandler'
 import ApiKey from '../type/ApiKey'
 import ApiKeyByTokenQuery from '../queries/ApiKeyByTokenQuery'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
+import { uuid } from '../../../utils/uuid'
+import { now } from '../../../utils/date'
 
 class ApiKeyManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
@@ -32,7 +33,7 @@ class ApiKeyManager {
 	}
 
 	private async create(type: ApiKey.Type, identityId: string): Promise<string> {
-		const apiKeyId = uuid.v4()
+		const apiKeyId = uuid()
 		const token = await this.generateToken()
 		const tokenHash = ApiKey.computeTokenHash(token)
 
@@ -46,7 +47,7 @@ class ApiKeyManager {
 				identity_id: identityId,
 				enabled: true,
 				expires_at: this.getExpiration(type),
-				created_at: new Date(),
+				created_at: now(),
 			})
 			.execute()
 
@@ -71,7 +72,7 @@ class ApiKeyManager {
 				return null
 
 			case ApiKey.Type.SESSION:
-				return new Date(Date.now() + 30 * 60 * 1000)
+				return new Date(now().getTime() + 30 * 60 * 1000)
 		}
 	}
 }

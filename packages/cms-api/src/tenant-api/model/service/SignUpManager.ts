@@ -2,9 +2,9 @@ import QueryHandler from '../../../core/query/QueryHandler'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import { SignUpErrorCode } from '../../schema/types'
-import * as uuid from 'uuid'
 import * as bcrypt from 'bcrypt'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
+import { uuid } from '../../../utils/uuid'
 
 class SignUpManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
@@ -14,8 +14,8 @@ class SignUpManager {
 			return new SignUpManager.SignUpResultError([SignUpErrorCode.EMAIL_ALREADY_EXISTS])
 		}
 
-		const identityId = uuid.v4()
-		const personId = uuid.v4()
+		const identityId = uuid()
+		const personId = uuid()
 
 		await this.db.transaction(async () => {
 			await this.db

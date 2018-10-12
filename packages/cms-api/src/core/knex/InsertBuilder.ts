@@ -2,7 +2,7 @@ import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
 import * as Knex from 'knex'
 import { QueryResult } from 'pg'
-import { Value } from "./types";
+import { Value } from './types'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>> {
 	private constructor(

@@ -33,6 +33,7 @@
 		"graphql-code-generator": "0.10.5",
 		"graphql-codegen-typescript-template": "0.10.5",
 		"graphql-errors": "^2.1.0",
+		"graphql-tools": "^4.0.0",
 		"js-yaml": "^3.12.0",
 		"knex": "^0.14.6",
 		"koa": "^2.5.3",

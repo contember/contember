@@ -1,22 +1,23 @@
-import KnexConnection from '../../../core/knex/KnexConnection'
 import { AddProjectMemberErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import * as uuid from 'uuid'
+import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 class ProjectMemberManager {
-	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexConnection) {}
+	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
 
 	async addProjectMember(projectId: string, personId: string): Promise<ProjectMemberManager.AddProjectMemberResponse> {
 		try {
 			await this.db
-				.queryBuilder()
-				.into('tenant.project_member')
-				.insert({
+				.insertBuilder()
+				.into('project_member')
+				.values({
 					id: uuid.v4(),
 					project_id: projectId,
 					person_id: personId,
 				})
+				.execute()
 
 			return new ProjectMemberManager.AddProjectMemberResponseOk()
 		} catch (e) {

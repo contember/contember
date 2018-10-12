@@ -112,16 +112,16 @@ class CompositionRoot {
 
 			.addService(
 				'apiKeyManager',
-				({ queryHandler, knexConnection }) => new ApiKeyManager(queryHandler, knexConnection)
+				({ queryHandler, knexConnection }) => new ApiKeyManager(queryHandler, knexConnection.wrapper())
 			)
 			.addService(
 				'signUpManager',
-				({ queryHandler, knexConnection }) => new SignUpManager(queryHandler, knexConnection)
+				({ queryHandler, knexConnection }) => new SignUpManager(queryHandler, knexConnection.wrapper())
 			)
 			.addService('signInManager', ({ queryHandler, apiKeyManager }) => new SignInManager(queryHandler, apiKeyManager))
 			.addService(
 				'projectMemberManager',
-				({ queryHandler, knexConnection }) => new ProjectMemberManager(queryHandler, knexConnection)
+				({ queryHandler, knexConnection }) => new ProjectMemberManager(queryHandler, knexConnection.wrapper())
 			)
 
 			.addService('meQueryResolver', ({ queryHandler }) => new MeQueryResolver(queryHandler))
@@ -135,7 +135,7 @@ class CompositionRoot {
 			)
 			.addService(
 				'addProjectMemberMutationResolver',
-				({ queryHandler, knexConnection }) => new ProjectMemberManager(queryHandler, knexConnection)
+				({ queryHandler, knexConnection }) => new ProjectMemberManager(queryHandler, knexConnection.wrapper())
 			)
 
 			.addService(

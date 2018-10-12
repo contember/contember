@@ -79,7 +79,7 @@ class Initialize {
 				.first()
 			await trx.raw(
 				`
-				INSERT INTO system.stage (id, name, slug, event_id) 
+				INSERT INTO system.stage (id, name, slug, event_id)
 				VALUES (:uuid, :name, :slug, :eventId)
 				ON CONFLICT (id) DO UPDATE
 				SET name = :name, slug = :slug

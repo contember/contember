@@ -5,6 +5,7 @@ import ManyHasManyBuilder from './ManyHasManyBuilder'
 import OneHasManyBuilder from './OneHasManyBuilder'
 import ManyHasOneBuilder from './ManyHasOneBuilder'
 import { AddEntityCallback } from './SchemaBuilder'
+import { Model } from 'cms-common'
 
 class EntityBuilder {
 	private options: EntityBuilder.EntityOptions
@@ -37,9 +38,12 @@ class EntityBuilder {
 
 	column(
 		name: string,
-		configurator: EntityBuilder.FieldConfigurator<ColumnBuilder, ColumnBuilder.Options>
+		configurator?: EntityBuilder.FieldConfigurator<ColumnBuilder, ColumnBuilder.Options>
 	): EntityBuilder {
-		const options = configurator(new ColumnBuilder({})).getOption()
+		const options: ColumnBuilder.Options = configurator
+			? configurator(new ColumnBuilder({})).getOption()
+			: { type: Model.ColumnType.String }
+
 		const fields: FieldBuilder.Map = { ...this.fields, [name]: { type: FieldBuilder.Type.Column, options: options } }
 
 		return new EntityBuilder(this.options, fields, this.addEntity)

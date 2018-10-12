@@ -22,7 +22,7 @@ export default class MutationGenerator {
 			const builder = this.addSubMutation(
 				this.persistedData ? this.persistedData[this.currentData.id] : undefined,
 				this.currentData.entityName,
-				this.currentData.root,
+				this.currentData.root
 			)
 			return builder.getGql()
 		} catch (e) {
@@ -34,7 +34,7 @@ export default class MutationGenerator {
 		data: ReceivedData<undefined>,
 		entityName: EntityName,
 		entity: RootAccessor,
-		queryBuilder?: QueryBuilder,
+		queryBuilder?: QueryBuilder
 	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
@@ -56,7 +56,12 @@ export default class MutationGenerator {
 					const currentEntity = entity.entities[entityI]
 
 					if (currentEntity instanceof EntityAccessor || currentEntity instanceof EntityForRemovalAccessor) {
-						queryBuilder = this.addSubMutation(data ? data[dataI++] : undefined, entityName, currentEntity, queryBuilder)
+						queryBuilder = this.addSubMutation(
+							data ? data[dataI++] : undefined,
+							entityName,
+							currentEntity,
+							queryBuilder
+						)
 					} else if (currentEntity === undefined) {
 						// Do nothing. This was a non-persisted entity that was subsequently deleted.
 						// No need to create it only to delete it again…
@@ -75,7 +80,7 @@ export default class MutationGenerator {
 	private addDeleteMutation(
 		entity: EntityForRemovalAccessor,
 		entityName: EntityName,
-		queryBuilder?: QueryBuilder,
+		queryBuilder?: QueryBuilder
 	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
@@ -87,7 +92,7 @@ export default class MutationGenerator {
 				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
 				return builder.where({ [MutationGenerator.PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
-			`delete${entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`,
+			`delete${entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`
 		)
 	}
 
@@ -95,7 +100,7 @@ export default class MutationGenerator {
 		entity: EntityAccessor,
 		entityName: EntityName,
 		data: ReceivedEntityData<undefined>,
-		queryBuilder?: QueryBuilder,
+		queryBuilder?: QueryBuilder
 	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
@@ -115,7 +120,7 @@ export default class MutationGenerator {
 
 				return builder.data(builder => this.registerUpdateMutationPart(entity, data, builder))
 			},
-			`update${entityName}_${this.primaryKeyToAlias(primaryKey)}`,
+			`update${entityName}_${this.primaryKeyToAlias(primaryKey)}`
 		)
 	}
 
@@ -124,16 +129,20 @@ export default class MutationGenerator {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		return queryBuilder.create(`create${entityName}`, builder => {
-			builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+		return queryBuilder.create(
+			`create${entityName}`,
+			builder => {
+				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
 
-			return builder.data(builder => this.registerCreateMutationPart(entity, builder))
-		}, `create${entityName}_${(this.createCounter++).toFixed(0)}`)
+				return builder.data(builder => this.registerCreateMutationPart(entity, builder))
+			},
+			`create${entityName}_${(this.createCounter++).toFixed(0)}`
+		)
 	}
 
 	private registerCreateMutationPart(
 		currentData: EntityAccessor,
-		builder: CrudQueryBuilder.CreateDataBuilder,
+		builder: CrudQueryBuilder.CreateDataBuilder
 	): CrudQueryBuilder.CreateDataBuilder {
 		for (const placeholderName in currentData.data) {
 			const accessor = currentData.data[placeholderName]
@@ -182,7 +191,7 @@ export default class MutationGenerator {
 	private registerUpdateMutationPart(
 		currentData: EntityAccessor,
 		persistedData: ReceivedEntityData<undefined>,
-		builder: CrudQueryBuilder.UpdateDataBuilder,
+		builder: CrudQueryBuilder.UpdateDataBuilder
 	): CrudQueryBuilder.UpdateDataBuilder {
 		for (const placeholderName in currentData.data) {
 			const persistedField = persistedData ? persistedData[placeholderName] : undefined
@@ -219,16 +228,16 @@ export default class MutationGenerator {
 								} else {
 									builder = builder.update(
 										{
-											[MutationGenerator.PRIMARY_KEY_NAME]: innerAccessor.primaryKey,
+											[MutationGenerator.PRIMARY_KEY_NAME]: innerAccessor.primaryKey
 										},
 										builder => {
 											return this.registerUpdateMutationPart(innerAccessor, persistedField[i], builder)
-										},
+										}
 									)
 								}
 							} else if (innerAccessor instanceof EntityForRemovalAccessor) {
 								builder = builder.disconnect({
-									[MutationGenerator.PRIMARY_KEY_NAME]: innerAccessor.primaryKey,
+									[MutationGenerator.PRIMARY_KEY_NAME]: innerAccessor.primaryKey
 								})
 							} else if (innerAccessor === undefined) {
 								// Do nothing

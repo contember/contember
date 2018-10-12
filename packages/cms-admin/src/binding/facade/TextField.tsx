@@ -24,7 +24,11 @@ export default class TextField extends React.Component<TextFieldProps> {
 				{(data: FieldAccessor<string | null, string>): React.ReactNode => {
 					return (
 						<FormGroup label={this.props.label} inline={this.props.inlineLabel}>
-							<InputGroup value={data.currentValue || ''} onChange={this.generateOnChange(data)} large={this.props.large} />
+							<InputGroup
+								value={data.currentValue || ''}
+								onChange={this.generateOnChange(data)}
+								large={this.props.large}
+							/>
 						</FormGroup>
 					)
 				}}

@@ -34,7 +34,7 @@ export default class ToMany extends React.Component<ToManyProps> {
 										<DataContext.Provider value={datum} key={i}>
 											{this.props.children}
 										</DataContext.Provider>
-									),
+									)
 							)
 						}
 					}

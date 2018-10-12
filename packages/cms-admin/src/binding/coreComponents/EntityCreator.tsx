@@ -15,18 +15,13 @@ export default class EntityCreator extends React.Component<EntityCreatorProps> {
 
 	public render() {
 		const markerTreeGenerator = new MarkerTreeGenerator(
-			<EntityCreator {...this.props}>{this.props.children}</EntityCreator>,
+			<EntityCreator {...this.props}>{this.props.children}</EntityCreator>
 		)
 
-		return <DataProvider markerTree={markerTreeGenerator.generate()}>
-			{this.props.children}
-		</DataProvider>
+		return <DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
 	}
 
-	public static generateMarkerTreeRoot(
-		props: EntityCreatorProps,
-		fields: MarkerTreeRoot['fields'],
-	): MarkerTreeRoot {
+	public static generateMarkerTreeRoot(props: EntityCreatorProps, fields: MarkerTreeRoot['fields']): MarkerTreeRoot {
 		return new MarkerTreeRoot(props.name, fields, undefined)
 	}
 }

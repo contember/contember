@@ -24,10 +24,7 @@ export interface SyntheticChildrenProvider extends DataBindingComponent {
 }
 
 type MarkerProvider = Partial<
-	| FieldMarkerProvider
-	| MarkerTreeRootProvider
-	| ReferenceMarkerProvider
-	| SyntheticChildrenProvider
+	FieldMarkerProvider | MarkerTreeRootProvider | ReferenceMarkerProvider | SyntheticChildrenProvider
 > &
 	DataBindingComponent
 

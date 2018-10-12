@@ -46,7 +46,7 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 
 						if (subTreeData instanceof EntityCollectionAccessor) {
 							const normalizedData = subTreeData.entities.filter(
-								(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor,
+								(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor
 							)
 							return (
 								<FormGroup label={this.props.label}>
@@ -66,7 +66,7 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 											}
 											return {
 												value: datum.primaryKey!,
-												label: (optionField.currentValue || '').toString(),
+												label: (optionField.currentValue || '').toString()
 											}
 										})}
 									/>

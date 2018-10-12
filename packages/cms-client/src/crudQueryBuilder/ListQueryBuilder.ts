@@ -17,7 +17,7 @@ export default class ListQueryBuilder {
 	relation(
 		name: string,
 		builder: ListQueryBuilder | ((builder: ListQueryBuilder) => ListQueryBuilder),
-		alias?: string,
+		alias?: string
 	) {
 		if (!(builder instanceof ListQueryBuilder)) {
 			builder = builder(new ListQueryBuilder())

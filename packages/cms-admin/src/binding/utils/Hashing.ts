@@ -3,7 +3,7 @@ import { Input } from 'cms-common'
 
 export default class Hashing {
 	public static hashWhere(
-		where: Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal> | Input.Where,
+		where: Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal> | Input.Where
 	): number {
 		const json = JSON.stringify(where)
 		return Hashing.hash(json)

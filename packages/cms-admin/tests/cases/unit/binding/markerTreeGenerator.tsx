@@ -17,8 +17,16 @@ describe('Marker tree generator', () => {
 	})
 
 	it('should reject top-level fields and relations', () => {
-		const topOne = <ToOne field="foo"><></></ToOne>
-		const topMany = <ToMany field="foo"><></></ToMany>
+		const topOne = (
+			<ToOne field="foo">
+				<></>
+			</ToOne>
+		)
+		const topMany = (
+			<ToMany field="foo">
+				<></>
+			</ToMany>
+		)
 		const topField = <Field name="foo" />
 
 		for (const faultyTop of [topOne, topMany, topField]) {
@@ -46,10 +54,12 @@ describe('Marker tree generator', () => {
 	})
 
 	it('should disallow duplicate fields', () => {
-		const tree = <SingleEntityDataProvider where={{ foo: '' }} name="Foo">
-			<Field name="foo" />
-			<Field name="foo" />
-		</SingleEntityDataProvider>
+		const tree = (
+			<SingleEntityDataProvider where={{ foo: '' }} name="Foo">
+				<Field name="foo" />
+				<Field name="foo" />
+			</SingleEntityDataProvider>
+		)
 
 		expect(() => new MarkerTreeGenerator(tree).generate()).throws(/duplicate/i)
 	})

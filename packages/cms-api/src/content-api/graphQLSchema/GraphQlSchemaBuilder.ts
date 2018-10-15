@@ -33,7 +33,7 @@ export default class GraphQlSchemaBuilder {
 				args: {
 					contentType: { type: new GraphQLNonNull(GraphQLString) },
 				},
-				resolve: async ({}, args: { contentType: string }) => {
+				resolve: async (parent, args: { contentType: string }) => {
 					return {
 						url: await this.s3.getSignedUrl(args.contentType),
 					}

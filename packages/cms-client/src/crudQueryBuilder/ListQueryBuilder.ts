@@ -10,6 +10,10 @@ export default class ListQueryBuilder {
 		return new ListQueryBuilder(this.objectBuilder.argument('where', where))
 	}
 
+	by(where: Input.UniqueWhere<Literal>) {
+		return new ListQueryBuilder(this.objectBuilder.argument('by', where))
+	}
+
 	column(name: string) {
 		return new ListQueryBuilder(this.objectBuilder.field(name))
 	}

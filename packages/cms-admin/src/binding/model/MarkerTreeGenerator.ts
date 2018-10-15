@@ -103,10 +103,21 @@ export default class MarkerTreeGenerator {
 
 			if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
 				if (children) {
-					return dataMarker.generateReferenceMarker(
+					const reference =  dataMarker.generateReferenceMarker(
 						node.props,
 						this.mapNodeResultToEntityFields(this.processNode(children))
 					)
+
+					if (reference.reducedBy) {
+						const fields = Object.keys(reference.reducedBy)
+
+						if (fields.length !== 1) {
+							// TODO this will change in future
+							throw new DataBindingError(`Relation can only be reduced by exactly one field.`)
+						}
+					}
+
+					return reference
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
 			}

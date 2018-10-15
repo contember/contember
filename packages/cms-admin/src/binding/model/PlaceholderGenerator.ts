@@ -18,11 +18,15 @@ export default class PlaceholderGenerator {
 	//
 
 	public static generateReferenceMarkerPlaceholder(marker: ReferenceMarker): string {
-		return PlaceholderGenerator.getReferencePlaceholder(marker.fieldName, marker.where)
+		return PlaceholderGenerator.getReferencePlaceholder(marker.fieldName, marker.where, marker.reducedBy)
 	}
 
-	public static getReferencePlaceholder(fieldName: FieldName, where?: Input.Where<GraphQlBuilder.Literal>): string {
-		return where ? `${fieldName}_${Hashing.hashWhere(where)}` : fieldName
+	public static getReferencePlaceholder(
+		fieldName: FieldName,
+		where?: Input.Where<GraphQlBuilder.Literal>,
+		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
+	): string {
+		return (where || reducedBy) ? `${fieldName}_${Hashing.hashWhere(where, reducedBy)}` : fieldName
 	}
 
 	//

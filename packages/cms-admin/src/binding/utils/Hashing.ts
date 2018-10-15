@@ -3,9 +3,13 @@ import { Input } from 'cms-common'
 
 export default class Hashing {
 	public static hashWhere(
-		where: Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal> | Input.Where
+		...where: Array<Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal> | Input.Where | undefined>
 	): number {
-		const json = JSON.stringify(where)
+		if (where.length === 0) {
+			return 0
+		}
+
+		const json = where.map(item => JSON.stringify(item)).join('')
 		return Hashing.hash(json)
 	}
 

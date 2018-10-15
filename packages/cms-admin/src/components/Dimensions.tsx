@@ -12,7 +12,6 @@ interface DimensionsOwnProps<D extends SelectedDimension> {
 }
 
 class Dimensions<D extends SelectedDimension> extends React.Component<DimensionsStateProps<D> & DimensionsOwnProps<D>> {
-
 	public render() {
 		return this.props.children(this.props.dimensions)
 	}

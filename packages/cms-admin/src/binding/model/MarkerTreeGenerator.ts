@@ -103,7 +103,7 @@ export default class MarkerTreeGenerator {
 
 			if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
 				if (children) {
-					const reference =  dataMarker.generateReferenceMarker(
+					const reference = dataMarker.generateReferenceMarker(
 						node.props,
 						this.mapNodeResultToEntityFields(this.processNode(children))
 					)

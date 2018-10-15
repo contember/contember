@@ -12,7 +12,7 @@ class ReferenceMarker {
 		public readonly expectedCount: ReferenceMarker.ExpectedCount,
 		public readonly fields: EntityFields,
 		public readonly where?: Input.Where<GraphQlBuilder.Literal>,
-		public readonly reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>,
+		public readonly reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	) {}
 
 	public get placeholderName(): string {

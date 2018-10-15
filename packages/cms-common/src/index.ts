@@ -9,4 +9,3 @@ type Schema = {
 
 export { Input, Model, Acl, Schema }
 export * from './utils'
-

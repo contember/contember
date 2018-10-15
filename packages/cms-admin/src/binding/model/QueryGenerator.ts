@@ -113,7 +113,11 @@ export default class QueryGenerator {
 					}
 				}
 
-				builder = builder.relation(relationField, subBuilder, placeholderName)
+				builder = builder.relation(
+					relationField,
+					subBuilder,
+					placeholderName === relationField ? undefined : placeholderName
+				)
 			} else {
 				yield fieldValue
 			}

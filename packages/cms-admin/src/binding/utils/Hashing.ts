@@ -3,7 +3,9 @@ import { Input } from 'cms-common'
 
 export default class Hashing {
 	public static hashWhere(
-		...where: Array<Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal> | Input.Where | undefined>
+		...where: Array<
+			Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal> | Input.Where | undefined
+		>
 	): number {
 		if (where.length === 0) {
 			return 0

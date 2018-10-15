@@ -26,7 +26,7 @@ export default class PlaceholderGenerator {
 		where?: Input.Where<GraphQlBuilder.Literal>,
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	): string {
-		return (where || reducedBy) ? `${fieldName}_${Hashing.hashWhere(where, reducedBy)}` : fieldName
+		return where || reducedBy ? `${fieldName}_${Hashing.hashWhere(where, reducedBy)}` : fieldName
 	}
 
 	//

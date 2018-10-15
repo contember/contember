@@ -12,6 +12,7 @@ import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface ToOneProps {
 	field: FieldName
+	reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	where?: Input.Where<GraphQlBuilder.Literal>
 }
 
@@ -35,7 +36,7 @@ export default class ToOne extends React.Component<ToOneProps> {
 	}
 
 	public static generateReferenceMarker(props: ToOneProps, fields: EntityFields): ReferenceMarker {
-		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.One, fields, props.where)
+		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.One, fields, props.where, props.reducedBy)
 	}
 }
 

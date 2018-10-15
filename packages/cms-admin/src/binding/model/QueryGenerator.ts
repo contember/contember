@@ -1,5 +1,6 @@
 import { CrudQueryBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
+import { ucfirst } from 'cms-common'
 import EntityFields from '../dao/EntityFields'
 import FieldMarker from '../dao/FieldMarker'
 import Marker from '../dao/Marker'
@@ -87,9 +88,20 @@ export default class QueryGenerator {
 				builder = builder.column(fieldValue.fieldName)
 			} else if (fieldValue instanceof ReferenceMarker) {
 				let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
+				let relationField
 
 				if (fieldValue.where) {
 					subBuilder = subBuilder.where(fieldValue.where)
+				}
+
+				if (fieldValue.reducedBy) {
+					// Assuming there's exactly one as enforced by MarkerTreeGenerator
+					const reducerFields = Object.keys(fieldValue.reducedBy)
+
+					subBuilder = subBuilder.by(fieldValue.reducedBy)
+					relationField = `${fieldValue.fieldName}By${ucfirst(reducerFields[0])}`
+				} else {
+					relationField = fieldValue.fieldName
 				}
 
 				for (const item of this.registerListQueryPart(fieldValue.fields, subBuilder)) {
@@ -101,7 +113,7 @@ export default class QueryGenerator {
 					}
 				}
 
-				builder = builder.relation(fieldValue.fieldName, subBuilder, placeholderName)
+				builder = builder.relation(relationField, subBuilder, placeholderName)
 			} else {
 				yield fieldValue
 			}

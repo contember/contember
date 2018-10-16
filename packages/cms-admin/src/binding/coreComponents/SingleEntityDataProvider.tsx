@@ -1,11 +1,15 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
+import Dimensions from '../../components/Dimensions'
+import { SelectedDimension } from '../../state/request'
 import { EntityName, FieldName } from '../bindingTypes'
+import Environment from '../dao/Environment'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
 import DataProvider from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
+import EnvironmentContext from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
 interface SingleEntityDataProviderProps {
@@ -18,11 +22,23 @@ export default class SingleEntityDataProvider extends React.Component<SingleEnti
 	public static displayName = 'SingleEntityDataProvider'
 
 	public render() {
-		const markerTreeGenerator = new MarkerTreeGenerator(
-			<SingleEntityDataProvider {...this.props}>{this.props.children}</SingleEntityDataProvider>
-		)
+		return (
+			<Dimensions>
+				{(dimensions: SelectedDimension) => {
+					const environment = new Environment({ dimensions })
+					const markerTreeGenerator = new MarkerTreeGenerator(
+						<SingleEntityDataProvider {...this.props}>{this.props.children}</SingleEntityDataProvider>,
+						environment
+					)
 
-		return <DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
+					return (
+						<EnvironmentContext.Provider value={environment}>
+							<DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
+						</EnvironmentContext.Provider>
+					)
+				}}
+			</Dimensions>
+		)
 	}
 
 	public static generateMarkerTreeRoot(

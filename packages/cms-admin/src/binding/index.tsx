@@ -6,8 +6,6 @@ import SingleEntityDataProvider from './coreComponents/SingleEntityDataProvider'
 import ToMany from './coreComponents/ToMany'
 import ToOne from './coreComponents/ToOne'
 import FieldAccessor from './dao/FieldAccessor'
-import SelectField from './facade/SelectField'
-import UnlinkButton from './facade/UnlinkButton'
 
 export {
 	Entity,
@@ -17,9 +15,7 @@ export {
 	FieldAccessor,
 	ToOne,
 	ToMany,
-	SelectField,
-	SingleEntityDataProvider,
-	UnlinkButton
+	SingleEntityDataProvider
 }
 
 export * from './facade'

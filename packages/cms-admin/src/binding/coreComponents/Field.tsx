@@ -5,7 +5,9 @@ import EntityAccessor from '../dao/EntityAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
 import PlaceholderGenerator from '../model/PlaceholderGenerator'
+import Parser from '../queryLanguage/Parser'
 import DataContext, { DataContextValue } from './DataContext'
+import EnvironmentContext from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
@@ -19,18 +21,28 @@ export default class Field extends React.Component<FieldProps> {
 
 	public render() {
 		return (
-			<DataContext.Consumer>
-				{(data: DataContextValue) => {
-					if (data instanceof EntityAccessor) {
-						const fieldData = data.data[PlaceholderGenerator.getFieldPlaceholder(this.props.name)]
+			<EnvironmentContext.Consumer>
+				{environment =>
+					Parser.generateWrappedField(
+						this.props.name,
+						fieldName => (
+							<DataContext.Consumer>
+								{(data: DataContextValue) => {
+									if (data instanceof EntityAccessor) {
+										const fieldData = data.data[PlaceholderGenerator.getFieldPlaceholder(fieldName)]
 
-						if (this.props.children && fieldData instanceof FieldAccessor) {
-							return this.props.children(fieldData)
-						}
-					}
-					throw new DataBindingError('Corrupted data')
-				}}
-			</DataContext.Consumer>
+										if (this.props.children && fieldData instanceof FieldAccessor) {
+											return this.props.children(fieldData)
+										}
+									}
+									throw new DataBindingError('Corrupted data')
+								}}
+							</DataContext.Consumer>
+						),
+						environment
+					)
+				}
+			</EnvironmentContext.Consumer>
 		)
 	}
 

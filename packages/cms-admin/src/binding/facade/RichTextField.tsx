@@ -19,19 +19,17 @@ export default class RichTextField extends React.Component<RichTextFieldProps> {
 	static displayName = 'RichTextField'
 
 	public render() {
-		return Parser.generateWrappedField(this.props.name, fieldName => (
-			<Field name={fieldName}>
-				{(data: FieldAccessor<string>): React.ReactNode => {
-					return (
-						<RichEditor
-							onChange={this.generateOnChange(data)}
-							value={data.currentValue}
-							allowLineBreaks={this.props.allowLineBreaks}
-						/>
-					)
-				}}
-			</Field>
-		))
+		return <Field name={this.props.name}>
+			{(data: FieldAccessor<string>): React.ReactNode => {
+				return (
+					<RichEditor
+						onChange={this.generateOnChange(data)}
+						value={data.currentValue}
+						allowLineBreaks={this.props.allowLineBreaks}
+					/>
+				)
+			}}
+		</Field>
 	}
 
 	private generateOnChange = (data: FieldAccessor<string>) => (val: string) => {

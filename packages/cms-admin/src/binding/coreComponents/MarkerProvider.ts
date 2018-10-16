@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Environment from '../dao/Environment'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import ReferenceMarker from '../dao/ReferenceMarker'
@@ -7,24 +8,32 @@ export interface DataBindingComponent {
 	displayName: string
 }
 
+export interface EnvironmentDeltaProvider extends DataBindingComponent {
+	generateEnvironmentDelta: (props: any, oldEnvironment: Environment) => Partial<Environment.NameStore>
+}
+
 export interface FieldMarkerProvider extends DataBindingComponent {
-	generateFieldMarker: (props: any) => FieldMarker
+	generateFieldMarker: (props: any, environment: Environment) => FieldMarker
 }
 
 export interface MarkerTreeRootProvider extends DataBindingComponent {
-	generateMarkerTreeRoot: (props: any, fields: MarkerTreeRoot['fields']) => MarkerTreeRoot
+	generateMarkerTreeRoot: (props: any, fields: MarkerTreeRoot['fields'], environment: Environment) => MarkerTreeRoot
 }
 
 export interface ReferenceMarkerProvider extends DataBindingComponent {
-	generateReferenceMarker: (props: any, fields: ReferenceMarker['fields']) => ReferenceMarker
+	generateReferenceMarker: (props: any, fields: ReferenceMarker['fields'], environment: Environment) => ReferenceMarker
 }
 
 export interface SyntheticChildrenProvider extends DataBindingComponent {
-	generateSyntheticChildren: (props: any) => React.ReactNode
+	generateSyntheticChildren: (props: any, environment: Environment) => React.ReactNode
 }
 
 type MarkerProvider = Partial<
-	FieldMarkerProvider | MarkerTreeRootProvider | ReferenceMarkerProvider | SyntheticChildrenProvider
+	| EnvironmentDeltaProvider
+	| FieldMarkerProvider
+	| MarkerTreeRootProvider
+	| ReferenceMarkerProvider
+	| SyntheticChildrenProvider
 > &
 	DataBindingComponent
 

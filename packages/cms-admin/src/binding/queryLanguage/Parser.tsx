@@ -4,6 +4,7 @@ import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import { FieldName } from '../bindingTypes'
 import ToOne, { ToOneProps } from '../coreComponents/ToOne'
+import Environment from '../dao/Environment'
 import QueryLanguageError from './QueryLanguageError'
 import tokenList, { tokens } from './tokenList'
 
@@ -147,10 +148,25 @@ export default class Parser extends ChevrotainParser {
 		return expression
 	}
 
+	// TODO this is too naive but will do for the time being
+	private static replaceVariables(input: string, environment: Environment): string {
+		const names = environment.getAllNames()
+		for (const variable in names) {
+			const value = names[variable]
+
+			if (value) {
+				input = input.replace(`\$${variable}`, value.toString())
+			}
+		}
+		return input
+	}
+
 	public static generateWrappedField(
 		input: string,
-		generateField: (fieldName: FieldName) => React.ReactNode
+		generateField: (fieldName: FieldName) => React.ReactNode,
+		environment?: Environment
 	): React.ReactNode {
+		input = environment === undefined ? input : Parser.replaceVariables(input, environment)
 		const expression = Parser.parseQueryLanguageExpression(input)
 		let currentNode = generateField(expression.fieldName)
 

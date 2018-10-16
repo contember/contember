@@ -1,5 +1,6 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
+import { SelectedDimension } from '../../state/request'
 import { FieldName } from '../bindingTypes'
 import MarkerProvider from '../coreComponents/MarkerProvider'
 import DataBindingError from '../dao/DataBindingError'
@@ -14,10 +15,15 @@ type NodeResult = FieldMarker | MarkerTreeRoot | ReferenceMarker
 type RawNodeResult = NodeResult | NodeResult[] | undefined
 
 export default class MarkerTreeGenerator {
-	public constructor(private sourceTree: React.ReactNode) {}
+	public constructor(
+		private sourceTree: React.ReactNode,
+		private environment: Environment = new Environment({
+			dimensions: {}
+		})
+	) {}
 
 	public generate(): MarkerTreeRoot {
-		const processed = this.processNode(this.sourceTree, new Environment())
+		const processed = this.processNode(this.sourceTree, this.environment)
 
 		let result: NodeResult | undefined = undefined
 

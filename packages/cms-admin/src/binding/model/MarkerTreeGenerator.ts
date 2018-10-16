@@ -4,6 +4,7 @@ import { FieldName } from '../bindingTypes'
 import MarkerProvider from '../coreComponents/MarkerProvider'
 import DataBindingError from '../dao/DataBindingError'
 import EntityFields from '../dao/EntityFields'
+import Environment from '../dao/Environment'
 import FieldMarker from '../dao/FieldMarker'
 import Marker from '../dao/Marker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
@@ -16,7 +17,7 @@ export default class MarkerTreeGenerator {
 	public constructor(private sourceTree: React.ReactNode) {}
 
 	public generate(): MarkerTreeRoot {
-		const processed = this.processNode(this.sourceTree)
+		const processed = this.processNode(this.sourceTree, new Environment())
 
 		let result: NodeResult | undefined = undefined
 
@@ -35,7 +36,7 @@ export default class MarkerTreeGenerator {
 		return this.reportInvalidTreeError(result)
 	}
 
-	private processNode(node: React.ReactNode | Function): RawNodeResult {
+	private processNode(node: React.ReactNode | Function, environment: Environment): RawNodeResult {
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
 			return undefined
 		}
@@ -51,7 +52,7 @@ export default class MarkerTreeGenerator {
 			let mapped: NodeResult[] = []
 
 			for (const subNode of node) {
-				const processed = this.processNode(subNode)
+				const processed = this.processNode(subNode, environment)
 
 				if (processed) {
 					if (Array.isArray(processed)) {
@@ -76,26 +77,32 @@ export default class MarkerTreeGenerator {
 
 			if (typeof node.type === 'symbol' || typeof node.type === 'string') {
 				// React.Fragment or other non-component
-				return this.processNode(children)
+				return this.processNode(children, environment)
 			}
 
 			// React.Component
 
 			const dataMarker = node.type as MarkerProvider & (React.ComponentClass<any> | React.SFC<any>)
 
+			if ('generateEnvironmentDelta' in dataMarker && dataMarker.generateEnvironmentDelta) {
+				const delta = dataMarker.generateEnvironmentDelta(node.props, environment)
+				environment = environment.putDelta(delta)
+			}
+
 			if ('generateSyntheticChildren' in dataMarker && dataMarker.generateSyntheticChildren) {
-				children = dataMarker.generateSyntheticChildren(node.props)
+				children = dataMarker.generateSyntheticChildren(node.props, environment)
 			}
 
 			if ('generateFieldMarker' in dataMarker && dataMarker.generateFieldMarker) {
-				return dataMarker.generateFieldMarker(node.props)
+				return dataMarker.generateFieldMarker(node.props, environment)
 			}
 
 			if ('generateMarkerTreeRoot' in dataMarker && dataMarker.generateMarkerTreeRoot) {
 				if (children) {
 					return dataMarker.generateMarkerTreeRoot(
 						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children))
+						this.mapNodeResultToEntityFields(this.processNode(children, environment)),
+						environment
 					)
 				}
 				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
@@ -105,7 +112,8 @@ export default class MarkerTreeGenerator {
 				if (children) {
 					const reference = dataMarker.generateReferenceMarker(
 						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children))
+						this.mapNodeResultToEntityFields(this.processNode(children, environment)),
+						environment
 					)
 
 					if (reference.reducedBy) {
@@ -123,7 +131,7 @@ export default class MarkerTreeGenerator {
 			}
 
 			if (children) {
-				return this.processNode(children)
+				return this.processNode(children, environment)
 			}
 
 			return undefined
@@ -132,7 +140,7 @@ export default class MarkerTreeGenerator {
 			children = node.children
 		}
 
-		return this.processNode(children)
+		return this.processNode(children, environment)
 	}
 
 	private mapNodeResultToEntityFields(result: RawNodeResult): EntityFields {

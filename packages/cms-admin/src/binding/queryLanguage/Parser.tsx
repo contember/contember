@@ -156,11 +156,7 @@ export default class Parser extends ChevrotainParser {
 
 		for (let i = expression.toOneProps.length - 1; i >= 0; i--) {
 			const currentProps = expression.toOneProps[i]
-			currentNode = (
-				<ToOne {...currentProps}>
-					{currentNode}
-				</ToOne>
-			)
+			currentNode = <ToOne {...currentProps}>{currentNode}</ToOne>
 		}
 
 		return currentNode

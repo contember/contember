@@ -49,18 +49,18 @@ describe('query language parser', () => {
 	})
 
 	it('should correctly generate JSX', () => {
-		const result = Parser.generateWrappedField('this(better=work).as.expected(and = 1).correctly', name => <TextField name={name} />)
-		const expected = <ToOne field="this" reducedBy={{better: new GraphQlBuilder.Literal('work')}}>
-			<ToOne field="as">
-				<ToOne field="expected" reducedBy={{and: 1}}>
-					<TextField name="correctly" />
+		const result = Parser.generateWrappedField('this(better=work).as.expected(and = 1).correctly', name => (
+			<TextField name={name} />
+		))
+		const expected = (
+			<ToOne field="this" reducedBy={{ better: new GraphQlBuilder.Literal('work') }}>
+				<ToOne field="as">
+					<ToOne field="expected" reducedBy={{ and: 1 }}>
+						<TextField name="correctly" />
+					</ToOne>
 				</ToOne>
 			</ToOne>
-		</ToOne>
-		expect(
-			result
-		).eql(
-			expected
 		)
+		expect(result).eql(expected)
 	})
 })

@@ -1,6 +1,7 @@
 export { default as Admin, AdminProps } from './Admin'
 export { default as Dimensions } from './Dimensions'
 export { default as Link } from './Link'
+export { default as LinkWithAlert } from './LinkWithAlert'
 export { default as LogoutLink } from './LogoutLink'
 export * from './pageRouting'
 export * from './ui'

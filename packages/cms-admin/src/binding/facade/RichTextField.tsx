@@ -4,9 +4,10 @@ import RichEditor from '../../components/RichEditor'
 import { FieldName } from '../bindingTypes'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
 import Field from '../coreComponents/Field'
-import { FieldMarkerProvider } from '../coreComponents/MarkerProvider'
+import { SyntheticChildrenProvider } from '../coreComponents/MarkerProvider'
 import FieldAccessor from '../dao/FieldAccessor'
-import FieldMarker from '../dao/FieldMarker'
+import Parser from '../queryLanguage/Parser'
+import { TextFieldProps } from './TextField'
 
 export interface RichTextFieldProps {
 	name: FieldName
@@ -18,8 +19,8 @@ export default class RichTextField extends React.Component<RichTextFieldProps> {
 	static displayName = 'RichTextField'
 
 	public render() {
-		return (
-			<Field name={this.props.name}>
+		return Parser.generateWrappedField(this.props.name, fieldName => (
+			<Field name={fieldName}>
 				{(data: FieldAccessor<string>): React.ReactNode => {
 					return (
 						<RichEditor
@@ -30,16 +31,16 @@ export default class RichTextField extends React.Component<RichTextFieldProps> {
 					)
 				}}
 			</Field>
-		)
+		))
 	}
 
 	private generateOnChange = (data: FieldAccessor<string>) => (val: string) => {
 		data.onChange && data.onChange(val)
 	}
 
-	public static generateFieldMarker(props: RichTextFieldProps): FieldMarker {
-		return new FieldMarker(props.name)
+	public static generateSyntheticChildren(props: TextFieldProps): React.ReactNode {
+		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName} />)
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof RichTextField, FieldMarkerProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof RichTextField, SyntheticChildrenProvider>

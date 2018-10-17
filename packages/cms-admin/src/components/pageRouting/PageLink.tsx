@@ -10,7 +10,7 @@ type ParamNames<P extends AnyParams> = keyof P
 
 type PageConfig<P extends AnyParams, N extends ParamNames<P>> = {
 	name: N & string
-	params: any // ParamByName<P, N>
+	params?: any // ParamByName<P, N>
 }
 
 type PageChange<P extends AnyParams> = () => PageConfig<P, keyof P>
@@ -21,7 +21,7 @@ class PageLink<P> extends React.Component<any | Props<P>> {
 		return (
 			<Link
 				Component={this.props.Component}
-				requestChange={pageRequest(this.props.project, this.props.stage, changed.name, changed.params)}
+				requestChange={pageRequest(this.props.project, this.props.stage, changed.name, changed.params || {})}
 			>
 				{this.props.children}
 			</Link>

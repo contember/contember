@@ -2,10 +2,11 @@ import * as React from 'react'
 import { SingleEntityDataProvider } from '../../binding'
 import { EntityName } from '../../binding/bindingTypes'
 import { ParametersContext } from './Pages'
+import PageWithLayout from './PageWithLayout'
 
 interface EditPageProps {
 	entity: EntityName
-	layout: React.ComponentType<{ children: React.ReactNode }>
+	layout?: React.ComponentType<{ children?: React.ReactNode }>
 }
 
 export default class EditPage extends React.Component<EditPageProps> {
@@ -14,9 +15,8 @@ export default class EditPage extends React.Component<EditPageProps> {
 	}
 
 	render(): React.ReactNode {
-		const Layout = this.props.layout
 		return (
-			<Layout>
+			<PageWithLayout layout={this.props.layout}>
 				<ParametersContext.Consumer>
 					{({ id }: { id: string }) => (
 						<SingleEntityDataProvider where={{ id }} name={this.props.entity}>
@@ -24,7 +24,7 @@ export default class EditPage extends React.Component<EditPageProps> {
 						</SingleEntityDataProvider>
 					)}
 				</ParametersContext.Consumer>
-			</Layout>
+			</PageWithLayout>
 		)
 	}
 }

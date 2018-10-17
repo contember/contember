@@ -167,18 +167,18 @@ export default class AccessorTreeGenerator {
 			fieldData,
 			field.fields,
 			(updatedField: FieldName, updatedData: FieldData) => {
-				const entityAccessor = entityData[field.fieldName]
+				const entityAccessor = entityData[field.placeholderName]
 				if (entityAccessor instanceof EntityAccessor) {
-					onUpdate(field.fieldName, this.withUpdatedField(entityAccessor, updatedField, updatedData))
+					onUpdate(field.placeholderName, this.withUpdatedField(entityAccessor, updatedField, updatedData))
 				}
 			},
 			replacement => {
-				const entityAccessor = entityData[field.fieldName]
+				const entityAccessor = entityData[field.placeholderName]
 				if (entityAccessor instanceof EntityAccessor) {
-					onUpdate(field.fieldName, this.asDifferentEntity(entityAccessor, replacement))
+					onUpdate(field.placeholderName, this.asDifferentEntity(entityAccessor, replacement))
 				}
 			},
-			() => onUpdate(field.fieldName, undefined)
+			() => onUpdate(field.placeholderName, undefined)
 		)
 	}
 
@@ -196,7 +196,7 @@ export default class AccessorTreeGenerator {
 					if (entityAccessor) {
 						collectionAccessor.entities[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
 
-						onUpdate(field.fieldName, collectionAccessor)
+						onUpdate(field.placeholderName, collectionAccessor)
 					}
 				},
 				replacement => {
@@ -204,7 +204,7 @@ export default class AccessorTreeGenerator {
 					if (entityAccessor) {
 						collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement)
 
-						onUpdate(field.fieldName, collectionAccessor)
+						onUpdate(field.placeholderName, collectionAccessor)
 					}
 				},
 				() => {
@@ -221,14 +221,14 @@ export default class AccessorTreeGenerator {
 								currentEntity.replaceWith
 							)
 						}
-						onUpdate(field.fieldName, collectionAccessor)
+						onUpdate(field.placeholderName, collectionAccessor)
 					}
 				}
 			)
 		}
 		const collectionAccessor = new EntityCollectionAccessor([], () => {
 			collectionAccessor.entities.push(generateNewAccessor(collectionAccessor.entities.length))
-			onUpdate(field.fieldName, collectionAccessor)
+			onUpdate(field.placeholderName, collectionAccessor)
 		})
 
 		if (!Array.isArray(fieldData)) {

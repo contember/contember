@@ -15,9 +15,11 @@ class SideDimensions extends React.Component<SideDimensionsProps> {
 
 	public render() {
 		return (
-			<EnvironmentContext.Consumer>
-				{oldEnvironment => SideDimensions.generateSyntheticChildren(this.props, oldEnvironment)}
-			</EnvironmentContext.Consumer>
+			<div className="sideDimensions">
+				<EnvironmentContext.Consumer>
+					{oldEnvironment => SideDimensions.generateSyntheticChildren(this.props, oldEnvironment)}
+				</EnvironmentContext.Consumer>
+			</div>
 		)
 	}
 
@@ -28,18 +30,22 @@ class SideDimensions extends React.Component<SideDimensionsProps> {
 			throw new DataBindingError(`The '${props.dimension}' dimension in undefined`)
 		}
 
-		return dimensions[props.dimension].map(item => {
-			return (
-				<SideDimensions.SingleDimension
-					dimensionValue={item}
-					variableName={props.variableName}
-					variables={props.variables}
-					key={item}
-				>
-					{props.children}
-				</SideDimensions.SingleDimension>
-			)
-		})
+		return (
+			<div className="sideDimensions-dimensions">
+				{dimensions[props.dimension].map(item => {
+					return (
+						<SideDimensions.SingleDimension
+							dimensionValue={item}
+							variableName={props.variableName}
+							variables={props.variables}
+							key={item}
+						>
+							{props.children}
+						</SideDimensions.SingleDimension>
+					)
+				})}
+			</div>
+		)
 	}
 }
 
@@ -63,7 +69,9 @@ namespace SideDimensions {
 						<EnvironmentContext.Provider
 							value={oldEnvironment.putDelta(SingleDimension.generateEnvironmentDelta(this.props, oldEnvironment))}
 						>
-							{this.props.children}
+							<div className="sideDimensions-dimensions-dimension">
+								{this.props.children}
+							</div>
 						</EnvironmentContext.Provider>
 					)}
 				</EnvironmentContext.Consumer>

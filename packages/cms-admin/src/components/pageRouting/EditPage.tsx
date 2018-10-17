@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { SingleEntityDataProvider, Entity } from '../../binding'
+import { SingleEntityDataProvider } from '../../binding'
+import { EntityName } from '../../binding/bindingTypes'
 import { ParametersContext } from './Pages'
 
 interface EditPageProps {
-	entity: string
+	entity: EntityName
 	layout: React.ComponentType<{ children: React.ReactNode }>
 }
 

@@ -12,6 +12,7 @@ export interface PagesProps {
 	project: string
 	stage: string
 	children: PageChild[] | PageChild
+	layout?: React.ComponentType<{ children?: React.ReactNode }>
 }
 
 export interface PagesStateProps {
@@ -33,6 +34,8 @@ function isPageElement(el: any): el is PageElement {
 
 export const ParametersContext = React.createContext<any>({})
 
+export const LayoutContext = React.createContext<React.ComponentType<{ children?: React.ReactNode }>>(React.Fragment)
+
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
@@ -52,11 +55,15 @@ class Pages extends React.Component<PagesProps & PagesStateProps> {
 			throw new Error(`No such page as ${this.props.name}.`)
 		}
 
-		if (isPageProvider(machedPage)) {
-			return <ParametersContext.Provider value={this.props.parameters}>{machedPage}</ParametersContext.Provider>
-		} else {
-			return machedPage.props.children(this.props.parameters)
-		}
+		const isProvider = isPageProvider(machedPage)
+		return (
+			<LayoutContext.Provider value={this.props.layout || React.Fragment}>
+				{isProvider && (
+					<ParametersContext.Provider value={this.props.parameters}>{machedPage}</ParametersContext.Provider>
+				)}
+				{isProvider || machedPage.props.children(this.props.parameters)}
+			</LayoutContext.Provider>
+		)
 	}
 }
 

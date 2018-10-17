@@ -24,7 +24,7 @@ export default class ToOne extends React.Component<ToOneProps> {
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
-						const field = data.data[PlaceholderGenerator.getReferencePlaceholder(this.props.field, this.props.where)]
+						const field = data.data[PlaceholderGenerator.getReferencePlaceholder(this.props.field, this.props.where, this.props.reducedBy)]
 
 						if (field instanceof EntityAccessor) {
 							return <DataContext.Provider value={field}>{this.props.children}</DataContext.Provider>

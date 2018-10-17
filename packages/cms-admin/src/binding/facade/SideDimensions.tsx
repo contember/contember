@@ -69,9 +69,7 @@ namespace SideDimensions {
 						<EnvironmentContext.Provider
 							value={oldEnvironment.putDelta(SingleDimension.generateEnvironmentDelta(this.props, oldEnvironment))}
 						>
-							<div className="sideDimensions-dimensions-dimension">
-								{this.props.children}
-							</div>
+							<div className="sideDimensions-dimensions-dimension">{this.props.children}</div>
 						</EnvironmentContext.Provider>
 					)}
 				</EnvironmentContext.Consumer>

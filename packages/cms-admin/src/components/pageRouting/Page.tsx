@@ -15,6 +15,8 @@ export default class Page<P extends Params, N extends keyof P = keyof P, K = P[N
 	children: (params: K) => React.ReactNode
 }> {
 	render(): React.ReactNode {
-		throw new Error(`Page component doesn't work if it is not places as a direct child of Pages component`)
+		throw new Error(
+			`The <Page /> component doesn't work if it is not placed as a direct child of the <Pages /> component`
+		)
 	}
 }

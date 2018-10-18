@@ -7,16 +7,20 @@ import { loginRequest } from '../state/request'
 
 let idCounter = 1
 
-export const getData = (project: string, stage: string, query: string): ActionCreator => async (
+export const getData = (query: string): ActionCreator => async (
 	dispatch,
 	getState,
 	services
 ) => {
+	const state = getState()
+	if (!('stage' in state.request) || !('project' in state.request)) {
+		return
+	}
 	const id = (idCounter++).toString(16)
 	dispatch(createAction(CONTENT_SET_LOADING, () => ({ id }))())
-	const apiToken = getState().auth.token
+	const apiToken = state.auth.token
 	try {
-		const data = await services.contentClientFactory.create(project, stage).request(query, {}, apiToken || undefined)
+		const data = await services.contentClientFactory.create(state.request.project, state.request.stage).request(query, {}, apiToken || undefined)
 		dispatch(createAction(CONTENT_SET_DATA, () => ({ id, data }))())
 	} catch (error) {
 		dispatch(createAction(CONTENT_SET_NONE, () => ({ id }))())
@@ -42,14 +46,18 @@ export const getData = (project: string, stage: string, query: string): ActionCr
 	return id
 }
 
-export const putData = (project: string, stage: string, query: string): ActionCreator => async (
+export const putData = (query: string): ActionCreator => async (
 	dispatch,
 	getState,
 	services
 ) => {
-	const apiToken = getState().auth.token
+	const state = getState()
+	if (!('stage' in state.request) || !('project' in state.request)) {
+		return
+	}
+	const apiToken = state.auth.token
 	try {
-		await services.contentClientFactory.create(project, stage).request(query, {}, apiToken || undefined)
+		await services.contentClientFactory.create(state.request.project, state.request.stage).request(query, {}, apiToken || undefined)
 		return
 	} catch (error) {
 		if (error instanceof GraphqlClient.GraphqlServerError) {

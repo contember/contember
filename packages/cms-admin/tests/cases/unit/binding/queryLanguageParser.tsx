@@ -7,10 +7,19 @@ import TextField from '../../../../src/binding/facade/TextField'
 import Parser from '../../../../src/binding/queryLanguage/Parser'
 
 describe('query language parser', () => {
-	it('should parse single field naems', () => {
+	it('should parse single field names', () => {
 		expect(Parser.parseQueryLanguageExpression('fooName')).eql({
 			fieldName: 'fooName',
 			toOneProps: []
+		})
+	})
+
+	it('should parse single relation with a name', () => {
+		expect(Parser.parseQueryLanguageExpression('fooRelation.fooName')).eql({
+			fieldName: 'fooName',
+			toOneProps: [{
+				field: 'fooRelation'
+			}]
 		})
 	})
 

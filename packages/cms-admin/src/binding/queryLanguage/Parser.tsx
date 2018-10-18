@@ -135,14 +135,18 @@ export default class Parser extends ChevrotainParser {
 		const lexingResult = Parser.lexer.tokenize(input)
 
 		if (lexingResult.errors.length !== 0) {
-			throw new QueryLanguageError(lexingResult.errors[0].message)
+			throw new QueryLanguageError(
+				`Failed to tokenize '${input}'.\n\n${lexingResult.errors.map(i => i.message).join('\n')}`
+			)
 		}
 
 		Parser.parser.input = lexingResult.tokens
 		const expression = Parser.parser.relationExpression()
 
 		if (Parser.parser.errors.length !== 0) {
-			throw new QueryLanguageError(Parser.parser.errors[0].message)
+			throw new QueryLanguageError(
+				`Failed to parse '${input}'.\n\n${Parser.parser.errors.map(i => i.message).join('\n')}`
+			)
 		}
 
 		return expression

@@ -148,7 +148,9 @@ export default class MutationGenerator {
 			const accessor = currentData.data[placeholderName]
 
 			if (accessor instanceof FieldAccessor) {
-				builder = builder.set(placeholderName, accessor.currentValue)
+				if (accessor.currentValue !== null) {
+					builder = builder.set(placeholderName, accessor.currentValue)
+				}
 			} else if (accessor instanceof EntityAccessor) {
 				builder = builder.one(placeholderName, builder => {
 					return builder.create(builder => {

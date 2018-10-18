@@ -118,7 +118,7 @@ export default connect<DataProviderStateProps, DataProviderDispatchProps, DataPr
 		requests: content.requests
 	}),
 	(dispatch: Dispatch) => ({
-		getData: (query: string) => dispatch(getData('blog', 'prod', query)),
-		putData: (query: string) => dispatch(putData('blog', 'prod', query))
+		getData: (query: string) => dispatch(getData(query)),
+		putData: (query: string) => dispatch(putData(query))
 	})
 )(DataProvider)

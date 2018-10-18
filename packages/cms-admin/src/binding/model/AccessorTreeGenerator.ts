@@ -82,6 +82,9 @@ export default class AccessorTreeGenerator {
 
 		for (const placeholderName in fields) {
 			if (placeholderName === AccessorTreeGenerator.PRIMARY_KEY_NAME) {
+				const fieldData = data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : null
+
+				entityData[placeholderName] = new FieldAccessor<Scalar, Scalar>(placeholderName, fieldData, () => undefined)
 				continue
 			}
 

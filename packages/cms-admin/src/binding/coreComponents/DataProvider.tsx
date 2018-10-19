@@ -77,7 +77,9 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>
-				<Renderer data={this.state.data} />
+				<Renderer data={this.state.data}>
+					{this.props.children}
+				</Renderer>
 			</MetaOperationsContext.Provider>
 		)
 	}

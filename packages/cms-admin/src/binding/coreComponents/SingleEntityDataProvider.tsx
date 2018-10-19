@@ -7,7 +7,7 @@ import { EntityName, FieldName } from '../bindingTypes'
 import Environment from '../dao/Environment'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
-import DataProvider from './DataProvider'
+import DataProvider, { DataRendererProps } from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import EnvironmentContext from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
@@ -16,6 +16,7 @@ interface SingleEntityDataProviderProps {
 	name: EntityName
 	associatedField?: FieldName
 	where: Input.UniqueWhere<GraphQlBuilder.Literal>
+	renderer?: React.ComponentClass<DataRendererProps>
 }
 
 export default class SingleEntityDataProvider extends React.Component<SingleEntityDataProviderProps> {
@@ -33,7 +34,9 @@ export default class SingleEntityDataProvider extends React.Component<SingleEnti
 
 					return (
 						<EnvironmentContext.Provider value={environment}>
-							<DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
+							<DataProvider markerTree={markerTreeGenerator.generate()} renderer={this.props.renderer}>
+								{this.props.children}
+							</DataProvider>
 						</EnvironmentContext.Provider>
 					)
 				}}

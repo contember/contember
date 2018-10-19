@@ -8,7 +8,7 @@ import EnvironmentContext from '../coreComponents/EnvironmentContext'
 import Environment from '../dao/Environment'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
-import DataProvider from './DataProvider'
+import DataProvider, { DataRendererProps } from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
@@ -16,6 +16,7 @@ interface EntityListDataProviderProps {
 	name: EntityName
 	associatedField?: FieldName
 	where?: Input.Where<GraphQlBuilder.Literal>
+	renderer?: React.ComponentClass<DataRendererProps>
 }
 
 export default class EntityListDataProvider extends React.Component<EntityListDataProviderProps> {
@@ -33,7 +34,9 @@ export default class EntityListDataProvider extends React.Component<EntityListDa
 
 					return (
 						<EnvironmentContext.Provider value={environment}>
-							<DataProvider markerTree={markerTreeGenerator.generate()}>{this.props.children}</DataProvider>
+							<DataProvider markerTree={markerTreeGenerator.generate()} renderer={this.props.renderer}>
+								{this.props.children}
+							</DataProvider>
 						</EnvironmentContext.Provider>
 					)
 				}}

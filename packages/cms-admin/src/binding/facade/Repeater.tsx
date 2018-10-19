@@ -10,7 +10,7 @@ import EntityFields from '../dao/EntityFields'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import ReferenceMarker from '../dao/ReferenceMarker'
 import PlaceholderGenerator from '../model/PlaceholderGenerator'
-import UnlinkButton from './UnlinkButton'
+import UnlinkButton from './buttons/UnlinkButton'
 
 export interface RepeaterProps extends ToManyProps {}
 

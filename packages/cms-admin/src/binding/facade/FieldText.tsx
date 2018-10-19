@@ -5,7 +5,7 @@ import { SyntheticChildrenProvider } from '../coreComponents/MarkerProvider'
 import Environment from '../dao/Environment'
 import FieldAccessor from '../dao/FieldAccessor'
 import Parser from '../queryLanguage/Parser'
-import { TextFieldProps } from './TextField'
+import { TextFieldProps } from './fields/TextField'
 
 interface FieldTextProps {
 	name: string

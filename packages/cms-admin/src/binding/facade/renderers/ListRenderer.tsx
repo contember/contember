@@ -5,7 +5,6 @@ import { DataRendererProps } from '../../coreComponents/DataProvider'
 import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
 
 export default class ListRenderer extends React.Component<DataRendererProps> {
-
 	public render() {
 		const data = this.props.data
 
@@ -19,9 +18,7 @@ export default class ListRenderer extends React.Component<DataRendererProps> {
 			<UL>
 				{normalizedData.map((value, i) => (
 					<li key={i}>
-						<DataContext.Provider value={value}>
-							{this.props.children}
-						</DataContext.Provider>
+						<DataContext.Provider value={value}>{this.props.children}</DataContext.Provider>
 					</li>
 				))}
 			</UL>

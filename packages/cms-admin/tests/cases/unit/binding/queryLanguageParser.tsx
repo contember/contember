@@ -17,9 +17,11 @@ describe('query language parser', () => {
 	it('should parse single relation with a name', () => {
 		expect(Parser.parseQueryLanguageExpression('fooRelation.fooName')).eql({
 			fieldName: 'fooName',
-			toOneProps: [{
-				field: 'fooRelation'
-			}]
+			toOneProps: [
+				{
+					field: 'fooRelation'
+				}
+			]
 		})
 	})
 

@@ -1,3 +1,4 @@
+export { default as FieldText } from './FieldText'
 export { default as PageLinkById } from './PageLinkById'
 export { default as PersistButton } from './PersistButton'
 export { default as Repeater } from './Repeater'

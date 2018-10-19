@@ -1,6 +1,6 @@
 import { FormGroup, HTMLSelect, IFormGroupProps } from '@blueprintjs/core'
-import { GraphQlBuilder } from '../../../../../cms-client/dist/src/index'
-import { Input } from '../../../../../cms-common/dist/src/index'
+import { GraphQlBuilder } from 'cms-client'
+import { Input } from 'cms-common'
 import * as React from 'react'
 import { EntityName, FieldName } from '../../bindingTypes'
 import DataContext, { DataContextValue } from '../../coreComponents/DataContext'

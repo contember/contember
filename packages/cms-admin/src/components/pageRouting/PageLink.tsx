@@ -5,10 +5,10 @@ import { connect } from 'react-redux'
 import State from '../../state'
 
 type ParamByName<P extends AnyParams, N extends string> = P extends { [A in N]: infer R } ? R : never
-type AnyParams = { [key: string]: any }
+export type AnyParams = { [key: string]: any }
 type ParamNames<P extends AnyParams> = keyof P
 
-type PageConfig<P extends AnyParams, N extends ParamNames<P>> = {
+export type PageConfig<P extends AnyParams, N extends ParamNames<P>> = {
 	name: N & string
 	params?: any // ParamByName<P, N>
 }

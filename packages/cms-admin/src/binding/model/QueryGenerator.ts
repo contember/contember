@@ -1,6 +1,5 @@
 import { CrudQueryBuilder } from 'cms-client'
-import { assertNever } from 'cms-common'
-import { ucfirst } from 'cms-common'
+import { assertNever, ucfirst } from 'cms-common'
 import EntityFields from '../dao/EntityFields'
 import FieldMarker from '../dao/FieldMarker'
 import Marker from '../dao/Marker'

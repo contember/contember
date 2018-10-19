@@ -5,18 +5,21 @@ import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentRequestsState, ContentStatus } from '../../state/content'
 import AccessorTreeRoot from '../dao/AccessorTreeRoot'
-import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
-import { PersistButton } from '../facade'
+import { DefaultRenderer } from '../facade/renderers'
 import AccessorTreeGenerator from '../model/AccessorTreeGenerator'
 import MutationGenerator from '../model/MutationGenerator'
 import QueryGenerator from '../model/QueryGenerator'
-import DataContext from './DataContext'
 import MetaOperationsContext, { MetaOperationsContextValue } from './MetaOperationsContext'
+
+export interface DataRendererProps {
+	data: AccessorTreeRoot | undefined
+}
 
 export interface DataProviderOwnProps {
 	markerTree: MarkerTreeRoot
+	renderer?: React.ComponentClass<DataRendererProps>
 }
 
 export interface DataProviderDispatchProps {
@@ -70,21 +73,11 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 	}
 
 	public render() {
-		if (!this.state.data) {
-			return null
-		}
-
-		const data =
-			this.state.data.root instanceof EntityCollectionAccessor ? this.state.data.root.entities : [this.state.data.root]
+		const Renderer = this.props.renderer || DefaultRenderer
 
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>
-				{data.map((value, i) => (
-					<DataContext.Provider value={value} key={i}>
-						{this.props.children}
-					</DataContext.Provider>
-				))}
-				<PersistButton />
+				<Renderer data={this.state.data} />
 			</MetaOperationsContext.Provider>
 		)
 	}

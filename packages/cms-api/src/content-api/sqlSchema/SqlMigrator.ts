@@ -235,19 +235,23 @@ export default class SqlMigrator {
 					return relation.joiningColumn.columnName
 				},
 				visitOneHasMany: () => {
-					throw new Error('Cannot create unique key on 1:m relation')
+					throw new Error(`Cannot create unique key on 1:m relation in ${entity.name}.${fieldName}`)
 				},
 				visitOneHasOneOwner: () => {
-					throw new Error('Cannot create unique key on 1:1 relation, this relation has unique key by default')
+					throw new Error(
+						`Cannot create unique key on 1:1 relation, this relation has unique key by default in ${
+							entity.name
+						}.${fieldName}`
+					)
 				},
 				visitOneHasOneInversed: () => {
-					throw new Error('Cannot create unique key on 1:1 inversed relation')
+					throw new Error(`Cannot create unique key on 1:1 inversed relation in ${entity.name}.${fieldName}`)
 				},
 				visitManyHasManyOwner: () => {
-					throw new Error('Cannot create unique key on m:m relation')
+					throw new Error(`Cannot create unique key on m:m relation in ${entity.name}.${fieldName}`)
 				},
 				visitManyHasManyInversed: () => {
-					throw new Error('Cannot create unique key on m:m inversed relation')
+					throw new Error(`Cannot create unique key on m:m inversed relation in ${entity.name}.${fieldName}`)
 				},
 			})
 		})

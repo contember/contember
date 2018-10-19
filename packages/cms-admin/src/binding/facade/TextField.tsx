@@ -8,7 +8,6 @@ import { SyntheticChildrenProvider } from '../coreComponents/MarkerProvider'
 import Environment from '../dao/Environment'
 import FieldAccessor from '../dao/FieldAccessor'
 import Parser from '../queryLanguage/Parser'
-import EnvironmentContext from '../coreComponents/EnvironmentContext'
 
 export interface TextFieldProps {
 	name: FieldName

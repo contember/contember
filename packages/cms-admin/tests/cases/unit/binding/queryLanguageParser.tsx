@@ -3,7 +3,7 @@ import { GraphQlBuilder } from 'cms-client'
 import 'mocha'
 import * as React from 'react'
 import ToOne from '../../../../src/binding/coreComponents/ToOne'
-import TextField from '../../../../src/binding/facade/TextField'
+import TextField from '../../../../src/binding/facade/fields/TextField'
 import Parser from '../../../../src/binding/queryLanguage/Parser'
 
 describe('query language parser', () => {

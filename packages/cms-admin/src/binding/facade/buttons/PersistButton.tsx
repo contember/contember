@@ -1,6 +1,6 @@
 import { Button, Intent } from '@blueprintjs/core'
 import * as React from 'react'
-import MetaOperationsContext, { MetaOperationsContextValue } from '../coreComponents/MetaOperationsContext'
+import MetaOperationsContext, { MetaOperationsContextValue } from '../../coreComponents/MetaOperationsContext'
 
 export default class PersistButton extends React.Component {
 	public render() {

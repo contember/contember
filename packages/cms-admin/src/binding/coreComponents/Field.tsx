@@ -7,9 +7,9 @@ import FieldMarker from '../dao/FieldMarker'
 import PlaceholderGenerator from '../model/PlaceholderGenerator'
 import Parser from '../queryLanguage/Parser'
 import DataContext, { DataContextValue } from './DataContext'
+import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import EnvironmentContext from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
-import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 
 export interface FieldProps {
 	name: FieldName

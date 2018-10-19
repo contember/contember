@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { Lexer, Parser as ChevrotainParser } from 'chevrotain'
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
+import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import ToOne, { ToOneProps } from '../coreComponents/ToOne'
 import Environment from '../dao/Environment'

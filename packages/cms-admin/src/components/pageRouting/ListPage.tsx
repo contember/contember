@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { EntityName } from '../../binding/bindingTypes'
+import { EntityName } from '../../binding'
 import EntityListDataProvider from '../../binding/coreComponents/EntityListDataProvider'
 import PageWithLayout from './PageWithLayout'
 

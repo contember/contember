@@ -1,4 +1,4 @@
-import { EntityName, FieldName } from '../bindingTypes'
+import { FieldName } from '../bindingTypes'
 import { DataContextValue } from '../coreComponents/DataContext'
 import EntityCollectionAccessor from './EntityCollectionAccessor'
 

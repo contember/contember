@@ -1,6 +1,5 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
-import { SelectedDimension } from '../../state/request'
 import { FieldName } from '../bindingTypes'
 import MarkerProvider from '../coreComponents/MarkerProvider'
 import DataBindingError from '../dao/DataBindingError'

@@ -51,6 +51,9 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 				if (entity.primary === column.name) {
 					return this.resolvePrimaryGenerator(column)()
 				}
+				if (column.nullable) {
+					return null
+				}
 
 				throw new Error('NoData')
 			})()

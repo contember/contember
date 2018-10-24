@@ -97,10 +97,8 @@ export default class AccessorTreeGenerator {
 							`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
 								`Perhaps you wanted to use a <Repeater />?`
 						)
-					} else if (fieldData === null) {
-						entityData[placeholderName] = undefined
-					} else if (typeof fieldData === 'object' || fieldData === undefined) {
-						entityData[placeholderName] = this.generateOneReference(fieldData, field, onUpdate, entityData)
+					} else if (fieldData === null || typeof fieldData === 'object' || fieldData === undefined) {
+						entityData[placeholderName] = this.generateOneReference(fieldData || undefined, field, onUpdate, entityData)
 					} else {
 						throw new DataBindingError(
 							`Received a scalar value for field '${field.fieldName}' where a single entity was expected.` +

@@ -1,3 +1,4 @@
+import { lcfirst } from 'cms-common'
 import * as React from 'react'
 import { SingleEntityDataProvider } from '../../binding'
 import { EntityName } from '../../binding'
@@ -13,7 +14,7 @@ interface EditPageProps {
 
 export default class EditPage extends React.Component<EditPageProps> {
 	static getPageName(props: EditPageProps) {
-		return `edit_${props.entity.toLowerCase()}`
+		return `edit_${lcfirst(props.entity)}`
 	}
 
 	render(): React.ReactNode {

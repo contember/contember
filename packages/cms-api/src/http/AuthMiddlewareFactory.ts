@@ -27,7 +27,7 @@ class AuthMiddlewareFactory {
 }
 
 namespace AuthMiddlewareFactory {
-	export type ContextWithAuth = Koa.Context & {
+	export type ContextWithAuth = Pick<Koa.Context, Exclude<keyof Koa.Context, 'state'>> & {
 		state: {
 			authResult?: ApiKeyManager.VerifyResult
 		}

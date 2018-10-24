@@ -3,7 +3,7 @@ import * as compose from 'koa-compose'
 import * as Koa from 'koa'
 
 type Params = { [param: string]: string }
-type ContextWithRequest = Koa.Context & {
+type ContextWithRequest = Pick<Koa.Context, Exclude<keyof Koa.Context, 'state'>> & {
 	state: {
 		route: string
 		params: Params

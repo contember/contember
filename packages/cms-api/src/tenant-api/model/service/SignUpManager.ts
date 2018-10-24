@@ -17,8 +17,8 @@ class SignUpManager {
 		const identityId = uuid()
 		const personId = uuid()
 
-		await this.db.transaction(async () => {
-			await this.db
+		await this.db.transaction(async wrapper => {
+			await wrapper
 				.insertBuilder()
 				.into('tenant.identity')
 				.values({
@@ -28,7 +28,7 @@ class SignUpManager {
 				})
 				.execute()
 
-			await this.db
+			await wrapper
 				.insertBuilder()
 				.into('tenant.person')
 				.values({

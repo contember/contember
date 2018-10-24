@@ -14,7 +14,7 @@ const schema: DocumentNode = gql`
 	type Mutation {
 		signUp(email: String!, password: String!): SignUpResponse
 		signIn(email: String!, password: String!): SignInResponse
-		addProjectMember(projectId: String!, personId: String!): AddProjectMemberResponse
+		addProjectMember(projectId: String!, identityId: String!): AddProjectMemberResponse
 	}
 
 	# === signUp ===
@@ -75,7 +75,7 @@ const schema: DocumentNode = gql`
 
 	enum AddProjectMemberErrorCode {
 		PROJECT_NOT_FOUND
-		PERSON_NOT_FOUND
+		IDENTITY_NOT_FOUND
 		ALREADY_MEMBER
 	}
 

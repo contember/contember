@@ -45,8 +45,8 @@ class CompositionRoot {
 			.addService('tenantMiddleware', ({ tenantContainer }) =>
 				new TenantMiddlewareFactory(tenantContainer.get('apolloServer')).create()
 			)
-			.addService('contentMiddleware', ({ projectContainers }) =>
-				new ContentMiddlewareFactory(projectContainers).create()
+			.addService('contentMiddleware', ({ projectContainers, tenantContainer }) =>
+				new ContentMiddlewareFactory(projectContainers, tenantContainer.get('projectMemberManager')).create()
 			)
 
 			.addService('koa', ({ authMiddleware, tenantMiddleware, contentMiddleware }) => {

@@ -82,7 +82,7 @@ export interface SignInMutationArgs {
 }
 export interface AddProjectMemberMutationArgs {
 	projectId: string
-	personId: string
+	identityId: string
 }
 
 export enum SignUpErrorCode {
@@ -96,7 +96,7 @@ export enum SignInErrorCode {
 
 export enum AddProjectMemberErrorCode {
 	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
-	PERSON_NOT_FOUND = 'PERSON_NOT_FOUND',
+	IDENTITY_NOT_FOUND = 'IDENTITY_NOT_FOUND',
 	ALREADY_MEMBER = 'ALREADY_MEMBER',
 }
 
@@ -152,7 +152,7 @@ export namespace MutationResolvers {
 	export type AddProjectMemberResolver<R = AddProjectMemberResponse | null> = Resolver<R, AddProjectMemberArgs>
 	export interface AddProjectMemberArgs {
 		projectId: string
-		personId: string
+		identityId: string
 	}
 }
 

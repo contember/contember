@@ -12,7 +12,7 @@ export default class AddProjectMemberMutationResolver implements MutationResolve
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<AddProjectMemberResponse> {
-		const result = await this.projectMemberManager.addProjectMember(args.projectId, args.personId)
+		const result = await this.projectMemberManager.addProjectMember(args.projectId, args.identityId)
 
 		if (!result.ok) {
 			return {

@@ -4,8 +4,8 @@ import KnexWrapper from './KnexWrapper'
 export default class KnexConnection {
 	constructor(public readonly knex: Knex, private readonly schema: string) {}
 
-	async transaction<T>(transactionScope: (trx: Knex.Transaction) => Promise<T> | void): Promise<T> {
-		return await this.knex.transaction(transactionScope)
+	async transaction<T>(transactionScope: (trx: KnexConnection) => Promise<T> | void): Promise<T> {
+		return await this.knex.transaction(trx => transactionScope(new KnexConnection(trx, this.schema)))
 	}
 
 	queryBuilder(): Knex.QueryBuilder {

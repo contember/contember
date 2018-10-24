@@ -25,7 +25,7 @@ class ApiKeyManager {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.EXPIRED)
 		}
 
-		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id)
+		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.roles)
 	}
 
 	async createSessionApiKey(identityId: string): Promise<string> {
@@ -82,7 +82,7 @@ namespace ApiKeyManager {
 
 	export class VerifyResultOk {
 		readonly valid = true
-		constructor(public readonly identityId: string) {}
+		constructor(public readonly identityId: string, public readonly roles: string[]) {}
 	}
 
 	export class VerifyResultError {

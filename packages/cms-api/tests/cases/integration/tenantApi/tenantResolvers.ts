@@ -97,7 +97,8 @@ describe('tenant api', () => {
                        "tenant"."project"."name"
                      from "tenant"."project"
                        inner join "tenant"."project_member" on "tenant"."project_member"."project_id" = "tenant"."project"."id"
-                     where "tenant"."project_member"."person_id" = $1`,
+                       inner join "tenant"."person" on "tenant"."project_member"."identity_id" = "tenant"."person"."identity_id"
+                     where "tenant"."person"."id" = $1`,
 						parameters: [testUuid(2)],
 						response: [{ id: testUuid(3), name: 'foo' }],
 					},
@@ -223,7 +224,8 @@ describe('tenant api', () => {
                        "tenant"."project"."name"
                      from "tenant"."project"
                        inner join "tenant"."project_member" on "tenant"."project_member"."project_id" = "tenant"."project"."id"
-                     where "tenant"."project_member"."person_id" = $1`,
+                       inner join "tenant"."person" on "tenant"."project_member"."identity_id" = "tenant"."person"."identity_id"
+                     where "tenant"."person"."id" = $1`,
 						parameters: [testUuid(1)],
 						response: [{ id: testUuid(2), name: 'foo' }],
 					},

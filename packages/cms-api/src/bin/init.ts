@@ -73,11 +73,12 @@ class Initialize {
 	}
 
 	private async createStage(stage: Project.Stage) {
-		await this.projectDb.transaction(async trx => {
-			const initEvent = await trx('system.event')
+		await this.projectDb.transaction(async connection => {
+			const initEvent = await connection
+				.knex('system.event')
 				.where('type', 'init')
 				.first()
-			await trx.raw(
+			await connection.knex.raw(
 				`
 				INSERT INTO system.stage (id, name, slug, event_id)
 				VALUES (:uuid, :name, :slug, :eventId)
@@ -89,7 +90,7 @@ class Initialize {
 					eventId: initEvent.id,
 				}
 			)
-			await trx.raw('CREATE SCHEMA IF NOT EXISTS ??', ['stage_' + stage.slug])
+			await connection.wrapper().raw('CREATE SCHEMA IF NOT EXISTS ??', 'stage_' + stage.slug)
 			console.log(`Updated stage ${stage.slug} of project ${this.project.slug}`)
 		})
 	}
@@ -103,9 +104,9 @@ class Initialize {
 			)
 		}
 
-		await this.projectDb.transaction(async trx => {
-			const knexConnection = new KnexConnection(trx, 'system')
-			await knexConnection.wrapper().raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
+		await this.projectDb.transaction(async knexConnection => {
+			const knexWrapper = knexConnection.wrapper()
+			await knexWrapper.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
 
 			const handler = new QueryHandler(
 				new KnexQueryable(knexConnection, {
@@ -127,7 +128,7 @@ class Initialize {
 				)
 			}
 
-			await trx.raw('SET search_path TO ??', 'stage_' + stage.slug)
+			await knexWrapper.raw('SET search_path TO ??', 'stage_' + stage.slug)
 
 			const files: string[] = await readDir(this.migrationsDir)
 
@@ -146,9 +147,9 @@ class Initialize {
 			for (const file of migrations.sort()) {
 				const migrationPath = this.migrationsDir + '/' + file
 				console.log(`Executing migration ${migrationPath} for project ${this.project.slug} (stage ${stage.slug})`)
-				await trx.raw((await readFile(migrationPath)).toString())
+				await knexWrapper.raw((await readFile(migrationPath)).toString())
 				const newId = uuid()
-				await trx('system.event').insert({
+				await knexConnection.knex('system.event').insert({
 					id: newId,
 					type: 'run_migration',
 					data: {
@@ -159,7 +160,8 @@ class Initialize {
 				previousId = newId
 			}
 
-			await trx('system.stage')
+			await knexConnection
+				.knex('system.stage')
 				.where('id', stage.uuid)
 				.update({ event_id: previousId })
 		})

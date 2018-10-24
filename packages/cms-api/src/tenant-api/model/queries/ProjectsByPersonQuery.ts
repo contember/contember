@@ -12,7 +12,8 @@ class ProjectsByPersonQuery extends KnexQuery<ProjectsByPersonQuery.Result> {
 			.select('tenant.project.id', 'tenant.project.name')
 			.from('tenant.project')
 			.innerJoin('tenant.project_member', 'tenant.project_member.project_id', 'tenant.project.id')
-			.where('tenant.project_member.person_id', this.personId)
+			.innerJoin('tenant.person', 'tenant.project_member.identity_id', 'tenant.person.identity_id')
+			.where('tenant.person.id', this.personId)
 	}
 }
 

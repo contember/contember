@@ -94,7 +94,7 @@ describe('Diff schemas', () => {
 					modification: 'createUniqueConstraint',
 					entityName: 'Author',
 					unique: {
-						name: 'unique_email',
+						name: 'unique_Author_email_a3e587',
 						fields: ['email'],
 					},
 				},
@@ -105,7 +105,7 @@ describe('Diff schemas', () => {
 			  ALTER TABLE "author" ADD "name" text;
 			  ALTER TABLE "author" ADD "email" text;
 			  ALTER TABLE "author" ADD "registered_at" date;
-			  ALTER TABLE "author" ADD CONSTRAINT "unique_email" UNIQUE ("email");`
+			  ALTER TABLE "author" ADD CONSTRAINT "unique_Author_email_a3e587" UNIQUE ("email");`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})
@@ -279,7 +279,7 @@ describe('Diff schemas', () => {
 					modification: 'createUniqueConstraint',
 					entityName: 'PostLocale',
 					unique: {
-						name: 'unique_post_locale',
+						name: 'unique_PostLocale_post_locale_5759e8',
 						fields: ['post', 'locale'],
 					},
 				},
@@ -291,7 +291,7 @@ describe('Diff schemas', () => {
 			CREATE INDEX "post_locale_post_id_index" ON "post_locale" ("post_id");
 			ALTER TABLE "post_locale" ADD "title" text;
 			ALTER TABLE "post_locale" ADD "locale" text;
-			ALTER TABLE "post_locale" ADD CONSTRAINT "unique_post_locale" UNIQUE ("post_id", "locale");`
+			ALTER TABLE "post_locale" ADD CONSTRAINT "unique_PostLocale_post_locale_5759e8" UNIQUE ("post_id", "locale");`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})
@@ -566,6 +566,14 @@ describe('Diff schemas', () => {
 						target: 'Site',
 						ownedBy: 'setting',
 						nullable: true,
+					},
+				},
+				{
+					entityName: 'Site',
+					modification: 'createUniqueConstraint',
+					unique: {
+						fields: ['setting'],
+						name: 'unique_Site_setting_8653a0',
 					},
 				},
 				{

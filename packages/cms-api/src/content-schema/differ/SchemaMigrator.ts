@@ -122,11 +122,6 @@ export default class SchemaMigrator {
 			const inverseEntity = this.schema.entities[modification.owningSide.target]
 			inverseEntity.fields[modification.inverseSide.name] = deepCopy(modification.inverseSide)
 		}
-		if (modification.owningSide.type === Model.RelationType.OneHasOne) {
-			const fieldName = modification.owningSide.name
-			const uniqueName = 'unique_' + fieldName
-			owningEntity.unique[uniqueName] = { name: uniqueName, fields: [fieldName] }
-		}
 	}
 
 	private createRelationInverseSide(modification: CreateRelationInverseSideModification) {

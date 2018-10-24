@@ -169,16 +169,22 @@ export default class AccessorTreeGenerator {
 			(updatedField: FieldName, updatedData: FieldData) => {
 				const entityAccessor = entityData[field.placeholderName]
 				if (entityAccessor instanceof EntityAccessor) {
-					onUpdate(field.placeholderName, this.withUpdatedField(entityAccessor, updatedField, updatedData))
+					onUpdate(
+						field.placeholderName,
+						(entityData[field.placeholderName] = this.withUpdatedField(entityAccessor, updatedField, updatedData))
+					)
 				}
 			},
 			replacement => {
 				const entityAccessor = entityData[field.placeholderName]
 				if (entityAccessor instanceof EntityAccessor) {
-					onUpdate(field.placeholderName, this.asDifferentEntity(entityAccessor, replacement))
+					onUpdate(
+						field.placeholderName,
+						(entityData[field.placeholderName] = this.asDifferentEntity(entityAccessor, replacement))
+					)
 				}
 			},
-			() => onUpdate(field.placeholderName, undefined)
+			() => onUpdate(field.placeholderName, (entityData[field.placeholderName] = undefined))
 		)
 	}
 

@@ -11,10 +11,9 @@ import singletonFactory from '../../utils/singletonFactory'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import FieldTypeVisitor from './entities/FieldTypeVisitor'
 import FieldArgsVisitor from './entities/FieldArgsVisitor'
-import { GqlTypeName } from './utils'
+import { aliasAwareResolver, GqlTypeName } from './utils'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
-import { GraphQLFieldResolver } from 'graphql/type/definition'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
 import OrderByTypeProvider from './OrderByTypeProvider'
 import EntityFieldsProvider from '../extensions/EntityFieldsProvider'
@@ -22,18 +21,11 @@ import EntityFieldsProvider from '../extensions/EntityFieldsProvider'
 class EntityTypeProvider {
 	private entities = singletonFactory(name => this.createEntity(name))
 
-	private aliasAwareResolver: GraphQLFieldResolver<any, any> = (source, args, context, info) => {
-		if (!info.path) {
-			return undefined
-		}
-		return source[info.path.key]
-	}
-
 	private fieldMeta = new GraphQLObjectType({
 		name: 'FieldMeta',
 		fields: {
-			[Input.FieldMeta.readable]: { type: GraphQLBoolean, resolve: this.aliasAwareResolver },
-			[Input.FieldMeta.updatable]: { type: GraphQLBoolean, resolve: this.aliasAwareResolver },
+			[Input.FieldMeta.readable]: { type: GraphQLBoolean, resolve: aliasAwareResolver },
+			[Input.FieldMeta.updatable]: { type: GraphQLBoolean, resolve: aliasAwareResolver },
 		},
 	})
 
@@ -68,7 +60,7 @@ class EntityTypeProvider {
 				...result,
 				[fieldName]: {
 					type: this.fieldMeta,
-					resolve: this.aliasAwareResolver,
+					resolve: aliasAwareResolver,
 				},
 			}),
 			{}
@@ -79,7 +71,7 @@ class EntityTypeProvider {
 				name: GqlTypeName`${entityName}Meta`,
 				fields: metaFields,
 			}),
-			resolve: this.aliasAwareResolver,
+			resolve: aliasAwareResolver,
 		}
 
 		const fields: { [field: string]: GraphQLFieldConfig<any, any> } = accessibleFields.reduce(
@@ -93,7 +85,7 @@ class EntityTypeProvider {
 					[fieldName]: {
 						type,
 						args: acceptFieldVisitor(this.schema, entity, fieldName, fieldArgsVisitor),
-						resolve: this.aliasAwareResolver,
+						resolve: aliasAwareResolver,
 					},
 				}
 			},

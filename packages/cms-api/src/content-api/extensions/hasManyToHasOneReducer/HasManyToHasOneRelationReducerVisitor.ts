@@ -5,7 +5,7 @@ import WhereTypeProvider from '../../graphQLSchema/WhereTypeProvider'
 import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
 import { FieldAccessVisitor } from '../../graphQLSchema/FieldAccessVisitor'
 import Authorizator from '../../../acl/Authorizator'
-import { GqlTypeName } from '../../graphQLSchema/utils'
+import { aliasAwareResolver, GqlTypeName } from '../../graphQLSchema/utils'
 import { Accessor } from '../../../utils/accessor'
 import HasManyToHasOneReducer from './HasManyToHasOneReducer'
 import EntityFieldsProvider from '../EntityFieldsProvider'
@@ -91,6 +91,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 							by: { type: uniqueWhere },
 							where: { type: this.whereTypeProvider.getEntityWhereType(targetEntity.name) },
 						},
+						resolve: aliasAwareResolver,
 					},
 				}
 			}, {})

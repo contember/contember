@@ -83,8 +83,6 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 						},
 						visitRelation: ({}, originalRelation: Model.AnyRelation, {}, _) => {
 							if (!deepEqual(updatedRelation, originalRelation)) {
-								console.log(originalRelation)
-								console.log(updatedRelation)
 								builder.removeField(entityName, fieldName)
 								builder.createField(updatedEntity, fieldName)
 							}

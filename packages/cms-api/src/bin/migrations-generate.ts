@@ -69,9 +69,11 @@ const command = new class extends Command<Args> {
 		const seconds = zeroPad(now.getSeconds(), 2)
 		const name = `${migrationsDir}/${year}-${month}-${day}-${hours}${minutes}${seconds}`
 
+		const sqlDiff = SqlMigrator.applyDiff(currentSchema, diff)
+
 		await Promise.all([
 			writeFile(name + '.json', JSON.stringify(diff, undefined, '\t'), { encoding: 'utf8' }),
-			writeFile(name + '.sql', SqlMigrator.applyDiff(currentSchema, diff), { encoding: 'utf8' }),
+			writeFile(name + '.sql', sqlDiff, { encoding: 'utf8' }),
 		])
 
 		console.log(name + '.json created')

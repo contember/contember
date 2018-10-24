@@ -1,9 +1,9 @@
 import * as React from 'react'
-import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
-import EnvironmentContext from '../coreComponents/EnvironmentContext'
-import { EnvironmentDeltaProvider, SyntheticChildrenProvider } from '../coreComponents/MarkerProvider'
-import DataBindingError from '../dao/DataBindingError'
-import Environment from '../dao/Environment'
+import EnforceSubtypeRelation from '../../coreComponents/EnforceSubtypeRelation'
+import EnvironmentContext from '../../coreComponents/EnvironmentContext'
+import { EnvironmentDeltaProvider, SyntheticChildrenProvider } from '../../coreComponents/MarkerProvider'
+import DataBindingError from '../../dao/DataBindingError'
+import Environment from '../../dao/Environment'
 
 interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	dimension: string

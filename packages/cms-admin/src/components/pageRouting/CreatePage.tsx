@@ -1,3 +1,4 @@
+import { lcfirst } from 'cms-common'
 import * as React from 'react'
 import { EntityName } from '../../binding'
 import { DataRendererProps } from '../../binding/coreComponents/DataProvider'
@@ -12,7 +13,7 @@ interface CreatePageProps {
 
 export default class CreatePage extends React.Component<CreatePageProps> {
 	static getPageName(props: CreatePageProps) {
-		return `create_${props.entity.toLowerCase()}`
+		return `create_${lcfirst(props.entity)}`
 	}
 
 	render(): React.ReactNode {

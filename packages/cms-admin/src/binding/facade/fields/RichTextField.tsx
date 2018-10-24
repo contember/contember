@@ -5,6 +5,7 @@ import { FieldName } from '../../bindingTypes'
 import EnforceSubtypeRelation from '../../coreComponents/EnforceSubtypeRelation'
 import Field from '../../coreComponents/Field'
 import { SyntheticChildrenProvider } from '../../coreComponents/MarkerProvider'
+import Environment from '../../dao/Environment'
 import FieldAccessor from '../../dao/FieldAccessor'
 import Parser from '../../queryLanguage/Parser'
 import { TextFieldProps } from './TextField'
@@ -21,11 +22,11 @@ export default class RichTextField extends React.Component<RichTextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>): React.ReactNode => {
+				{(data: FieldAccessor<string | null, string>): React.ReactNode => {
 					return (
 						<RichEditor
 							onChange={this.generateOnChange(data)}
-							value={data.currentValue}
+							value={data.currentValue || ''}
 							allowLineBreaks={this.props.allowLineBreaks}
 						/>
 					)
@@ -34,12 +35,12 @@ export default class RichTextField extends React.Component<RichTextFieldProps> {
 		)
 	}
 
-	private generateOnChange = (data: FieldAccessor<string>) => (val: string) => {
+	private generateOnChange = (data: FieldAccessor<string | null, string>) => (val: string) => {
 		data.onChange && data.onChange(val)
 	}
 
-	public static generateSyntheticChildren(props: TextFieldProps): React.ReactNode {
-		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName} />)
+	public static generateSyntheticChildren(props: TextFieldProps, environment: Environment): React.ReactNode {
+		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 

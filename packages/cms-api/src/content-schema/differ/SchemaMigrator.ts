@@ -144,7 +144,7 @@ export default class SchemaMigrator {
 			},
 			visitManyHasOne: (entity, relation, {}, targetRelation) => {
 				delete entity.fields[relation.name]
-				if (targetRelation !== null) {
+				if (targetRelation) {
 					delete this.schema.entities[targetRelation.target].fields[targetRelation.name]
 				}
 			},
@@ -154,7 +154,7 @@ export default class SchemaMigrator {
 			visitOneHasOneOwner: (entity, relation, {}, targetRelation) => {
 				delete entity.fields[relation.name]
 				delete entity.unique[relation.name]
-				if (targetRelation !== null) {
+				if (targetRelation) {
 					delete this.schema.entities[targetRelation.target].fields[targetRelation.name]
 				}
 			},
@@ -163,7 +163,7 @@ export default class SchemaMigrator {
 			},
 			visitManyHasManyOwner: (entity, column, {}, targetRelation) => {
 				delete entity.fields[column.name]
-				if (targetRelation !== null) {
+				if (targetRelation) {
 					delete this.schema.entities[targetRelation.target].fields[targetRelation.name]
 				}
 			},

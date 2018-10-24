@@ -1,19 +1,19 @@
-import { Model, assertNever } from 'cms-common'
+import { assertNever, Model } from 'cms-common'
 import {
-	SchemaDiff,
-	CreateEntityModification,
 	CreateColumnModification,
+	CreateEntityModification,
+	CreateEnumModification,
+	CreateRelationModification,
+	CreateUniqueConstraintModification,
 	Modification,
 	RemoveEntityModification,
-	RemoveFieldModification,
-	UpdateEntityTableNameModification,
-	UpdateColumnNameModification,
-	UpdateColumnDefinitionModification,
-	CreateUniqueConstraintModification,
-	RemoveUniqueConstraintModification,
-	CreateRelationModification,
-	CreateEnumModification,
 	RemoveEnumModification,
+	RemoveFieldModification,
+	RemoveUniqueConstraintModification,
+	SchemaDiff,
+	UpdateColumnDefinitionModification,
+	UpdateColumnNameModification,
+	UpdateEntityTableNameModification,
 	UpdateEnumModification,
 } from '../../content-schema/differ/modifications'
 import { MigrationBuilder } from 'node-pg-migrate'
@@ -226,7 +226,12 @@ export default class SqlMigrator {
 
 	private createUniqueConstraint(modification: CreateUniqueConstraintModification) {
 		const entity = this.getNewEntity(modification.entityName)
-		const columns = modification.unique.fields.map(fieldName => {
+		const fields = modification.unique.fields
+		if (fields.length === 1 && entity.fields[Object.values(fields)[0]].type === Model.RelationType.OneHasOne) {
+			return
+		}
+
+		const columns = fields.map(fieldName => {
 			return acceptFieldVisitor(this.newSchema, entity, fieldName, {
 				visitColumn: ({}, column) => {
 					return column.columnName

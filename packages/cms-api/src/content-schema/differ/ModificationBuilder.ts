@@ -87,12 +87,6 @@ export default class ModificationBuilder {
 
 	public createUnique(updatedEntity: Model.Entity, uniqueName: string) {
 		const unique = updatedEntity.unique[uniqueName]
-		if (
-			unique.fields.length === 1 &&
-			updatedEntity.fields[Object.values(unique.fields)[0]].type === Model.RelationType.OneHasOne
-		) {
-			return
-		}
 		this.modifications.push({
 			modification: 'createUniqueConstraint',
 			entityName: updatedEntity.name,

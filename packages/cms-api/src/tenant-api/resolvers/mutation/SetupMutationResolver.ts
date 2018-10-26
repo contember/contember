@@ -1,4 +1,4 @@
-import { MutationResolvers, SignUpResponse } from '../../schema/types'
+import { MutationResolvers, SetupResponse } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import SignUpManager from '../../model/service/SignUpManager'
@@ -6,45 +6,42 @@ import QueryHandler from '../../../core/query/QueryHandler'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
-import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import Actions from '../../model/authorization/Actions'
 import { ForbiddenError } from 'apollo-server-koa'
 import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import ApiKeyManager from '../../model/service/ApiKeyManager'
+import Identity from '../../model/type/Identity'
 
-export default class SignUpMutationResolver implements MutationResolvers.Resolvers {
+export default class SetupMutationResolver implements MutationResolvers.Resolvers {
 	constructor(
 		private readonly signUpManager: SignUpManager,
 		private readonly queryHandler: QueryHandler<KnexQueryable>,
 		private readonly apiKeyManager: ApiKeyManager
 	) {}
 
-	async signUp(
+	async setup(
 		parent: any,
-		args: MutationResolvers.SignUpArgs,
+		args: MutationResolvers.SetupArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
-	): Promise<SignUpResponse> {
-		if (!(await context.isAllowed(new AuthorizationScope.Global(), Actions.PERSON_SIGN_UP))) {
-			throw new ForbiddenError('You are not allowed to sign up')
+	): Promise<SetupResponse> {
+		if (!(await context.isAllowed(new AuthorizationScope.Global(), Actions.SYSTEM_SETUP))) {
+			throw new ForbiddenError('You are not allowed to setup system')
 		}
-		const result = await this.signUpManager.signUp(args.email, args.password)
+		const { email, password } = args.superadmin
+		const result = await this.signUpManager.signUp(email, password, [Identity.SystemRole.SUPER_ADMIN])
 
 		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
+			throw new ImplementationException()
 		}
 
-		const [personRow, projectRows] = await Promise.all([
-			this.queryHandler.fetch(new PersonByIdQuery(result.personId)),
-			this.queryHandler.fetch(new ProjectsByIdentityQuery(result.identityId)),
-		])
+		const personRow = await this.queryHandler.fetch(new PersonByIdQuery(result.personId))
 
 		if (personRow === null) {
 			throw new ImplementationException()
 		}
+
+		const loginToken = await this.apiKeyManager.createLoginApiKey()
 
 		await this.apiKeyManager.disableOneOffApiKey(context.apiKeyId)
 
@@ -52,12 +49,20 @@ export default class SignUpMutationResolver implements MutationResolvers.Resolve
 			ok: true,
 			errors: [],
 			result: {
-				person: {
+				loginKey: {
+					id: loginToken.apiKey.id,
+					token: loginToken.apiKey.token,
+					identity: {
+						id: loginToken.identityId,
+						projects: [],
+					},
+				},
+				superadmin: {
 					id: personRow.id,
 					email: personRow.email,
 					identity: {
 						id: result.identityId,
-						projects: projectRows,
+						projects: [],
 					},
 				},
 			},

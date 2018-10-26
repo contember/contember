@@ -9,10 +9,10 @@ class ProjectRolesByIdentityQuery extends KnexQuery<ProjectRolesByIdentityQuery.
 	async fetch(queryable: KnexQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
 		const result = await queryable
 			.createQueryBuilder()
-			.select('tenant.project_member.roles')
+			.select('roles')
 			.from('tenant.project_member')
-			.where('tenant.project_member.identity_id', this.identityId)
-			.where('tenant.project_member.project_id', this.projectId)
+			.where('identity_id', this.identityId)
+			.where('project_id', this.projectId)
 
 		const row = this.fetchOneOrNull<ProjectRolesByIdentityQuery.Result>(result)
 

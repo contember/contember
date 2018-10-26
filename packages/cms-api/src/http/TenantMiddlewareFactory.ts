@@ -9,7 +9,10 @@ export default class TenantMiddlewareFactory {
 	create(): Koa.Middleware {
 		return route('/tenant$', async (ctx, next) => {
 			const tenantKoa = new Koa()
-			this.apolloServer.applyMiddleware({ app: tenantKoa, path: '/' })
+			this.apolloServer.applyMiddleware({
+				app: tenantKoa,
+				path: '/',
+			})
 			await koaCompose(tenantKoa.middleware)(ctx, next)
 		})
 	}

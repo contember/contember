@@ -10,7 +10,8 @@ class ProjectMemberManager {
 
 	async addProjectMember(
 		projectId: string,
-		identityId: string
+		identityId: string,
+		roles: string[]
 	): Promise<ProjectMemberManager.AddProjectMemberResponse> {
 		try {
 			await this.db
@@ -20,7 +21,7 @@ class ProjectMemberManager {
 					id: uuid(),
 					project_id: projectId,
 					identity_id: identityId,
-					roles: [],
+					roles: JSON.stringify(roles),
 				})
 				.execute()
 

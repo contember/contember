@@ -23,7 +23,7 @@ class SignInManager {
 		}
 
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id)
-		return new SignInManager.SignInResultOk(personRow.id, sessionToken)
+		return new SignInManager.SignInResultOk(personRow.id, personRow.identity_id, sessionToken)
 	}
 }
 
@@ -32,7 +32,7 @@ namespace SignInManager {
 
 	export class SignInResultOk {
 		readonly ok = true
-		constructor(public readonly personId: string, public readonly token: string) {}
+		constructor(public readonly personId: string, public readonly identityId: string, public readonly token: string) {}
 	}
 
 	export class SignInResultError {

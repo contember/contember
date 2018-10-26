@@ -12,43 +12,50 @@ import { ProjectContainer } from '../CompositionRoot'
 import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
 import { GraphQLSchema } from 'graphql'
 import PermissionFactory from '../acl/PermissionFactory'
+import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 
+type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
+	ContextWithRequest &
+	TimerMiddlewareFactory.ContextWithTimer & { state: { db: KnexConnection } }
 class ContentMiddlewareFactory {
 	constructor(private projectContainers: ProjectContainer[], private projectMemberManager: ProjectMemberManager) {}
 
 	create(): Koa.Middleware {
-		return route(
-			'/content/:projectSlug/:stageSlug$',
-			async (
-				ctx: AuthMiddlewareFactory.ContextWithAuth & ContextWithRequest & { state: { db: KnexConnection } },
-				next
-			) => {
-				const projectContainer = this.projectContainers.find(projectContainer => {
-					return projectContainer.get('project').slug === ctx.state.params.projectSlug
-				})
+		return route('/content/:projectSlug/:stageSlug$', async (ctx: KoaContext, next) => {
+			ctx.state.timer('content route')
+			const projectContainer = this.projectContainers.find(projectContainer => {
+				return projectContainer.get('project').slug === ctx.state.params.projectSlug
+			})
 
-				if (projectContainer === undefined) {
-					return ctx.throw(404, `Project ${ctx.state.params.projectSlug} NOT found`)
-				}
+			if (projectContainer === undefined) {
+				return ctx.throw(404, `Project ${ctx.state.params.projectSlug} NOT found`)
+			}
 
-				const project = projectContainer.get('project')
+			const project = projectContainer.get('project')
 
-				const stage = project.stages.find(stage => stage.slug === ctx.state.params.stageSlug)
+			const stage = project.stages.find(stage => stage.slug === ctx.state.params.stageSlug)
 
-				if (stage === undefined) {
-					return ctx.throw(404, `Stage ${ctx.state.params.stageSlug} NOT found`)
-				}
+			if (stage === undefined) {
+				return ctx.throw(404, `Stage ${ctx.state.params.stageSlug} NOT found`)
+			}
 
-				const db = projectContainer.get('knexConnection')
-				ctx.state.db = new KnexConnection(db, 'stage_' + stage.slug)
+			const db = projectContainer.get('knexConnection')
+			ctx.state.db = new KnexConnection(db, 'stage_' + stage.slug)
 
-				const contentKoa = new Koa()
-				contentKoa.use(corsMiddleware())
-				contentKoa.use(bodyParser())
-				contentKoa.use(get('/', new PlaygroundMiddlewareFactory().create()))
+			const contentKoa = new Koa()
 
-				contentKoa.use(async (ctx: AuthMiddlewareFactory.ContextWithAuth & { state: { db: KnexConnection } }, next) => {
+			contentKoa.use(new PlaygroundMiddlewareFactory().create())
+
+			contentKoa.use(
+				async (
+					ctx: AuthMiddlewareFactory.ContextWithAuth & {
+						state: { db: KnexConnection }
+					} & TimerMiddlewareFactory.ContextWithTimer,
+					next
+				) => {
+					ctx.state.timer('starting trx')
 					await ctx.state.db.transaction(async knexConnection => {
+						ctx.state.timer('done')
 						ctx.state.db = knexConnection
 						if (ctx.state.authResult === undefined) {
 							throw new AuthenticationError(
@@ -63,18 +70,24 @@ class ContentMiddlewareFactory {
 							.wrapper()
 							.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', ctx.state.authResult.identityId)
 
+						ctx.state.timer('fetching project roles')
 						const projectRoles = await this.projectMemberManager.getProjectRoles(
 							project.uuid,
 							ctx.state.authResult.identityId
 						)
+						ctx.state.timer('done')
 
 						const permissions = new PermissionFactory(stage.schema.model).create(stage.schema.acl, projectRoles.roles)
 						const dataSchemaBuilder = projectContainer
 							.get('graphQlSchemaBuilderFactory')
 							.create(stage.schema.model, permissions)
+						ctx.state.timer('building schema')
 						const dataSchema = dataSchemaBuilder.build()
+						ctx.state.timer('done')
 
 						const apolloKoa = new Koa()
+						apolloKoa.use(corsMiddleware())
+						apolloKoa.use(bodyParser())
 						const server = this.createApolloServer(dataSchema)
 						server.applyMiddleware({
 							app: apolloKoa,
@@ -84,13 +97,15 @@ class ContentMiddlewareFactory {
 							bodyParserConfig: false,
 						})
 
+						ctx.state.timer('running graphql')
 						await koaCompose(apolloKoa.middleware)(ctx, next)
+						ctx.state.timer('done')
 					})
-				})
+				}
+			)
 
-				await koaCompose(contentKoa.middleware)(ctx, next)
-			}
-		)
+			await koaCompose(contentKoa.middleware)(ctx, next)
+		})
 	}
 
 	private createApolloServer(dataSchema: GraphQLSchema) {

@@ -100,13 +100,14 @@ export default class SelectBuilder {
 				this.metaHandler.process(executionContext)
 				continue
 			}
+
 			if (field.meta.extensionKey) {
 				const handler = this.selectHandlers[field.meta.extensionKey]
 				if (!handler) {
 					throw new Error(`Handler for ${field.meta.extensionKey} not found`)
 				}
 				handler.process(executionContext)
-				return
+				continue
 			}
 
 			const fieldVisitor = this.fieldsVisitorFactory.create(executionContext)

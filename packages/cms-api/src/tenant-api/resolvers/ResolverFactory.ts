@@ -3,13 +3,15 @@ import SignUpMutationResolver from './mutation/SignUpMutationResolver'
 import SignInMutationResolver from './mutation/SignInMutationResolver'
 import AddProjectMemberMutationResolver from './mutation/AddProjectMemberMutationResolver'
 import { Config } from 'apollo-server-core'
+import SetupMutationResolver from './mutation/SetupMutationResolver'
 
 class ResolverFactory {
 	public constructor(
 		private meQueryResolver: MeQueryResolver,
 		private signUpMutationResolver: SignUpMutationResolver,
 		private signInMutationResolver: SignInMutationResolver,
-		private addProjectMemberMutationResolver: AddProjectMemberMutationResolver
+		private addProjectMemberMutationResolver: AddProjectMemberMutationResolver,
+		private setupMutationResolver: SetupMutationResolver
 	) {}
 
 	create(): Config['resolvers'] {
@@ -23,6 +25,7 @@ class ResolverFactory {
 				addProjectMember: this.addProjectMemberMutationResolver.addProjectMember.bind(
 					this.addProjectMemberMutationResolver
 				),
+				setup: this.setupMutationResolver.setup.bind(this.setupMutationResolver),
 			},
 		}
 	}

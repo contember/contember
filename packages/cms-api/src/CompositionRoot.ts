@@ -1,7 +1,5 @@
 import * as knex from 'knex'
 import * as Koa from 'koa'
-import { ApolloServer } from 'apollo-server-koa'
-import typeDefs from './tenant-api/schema/tenant.graphql'
 import SignInMutationResolver from './tenant-api/resolvers/mutation/SignInMutationResolver'
 import KnexConnection from './core/knex/KnexConnection'
 import QueryHandler from './core/query/QueryHandler'
@@ -22,6 +20,12 @@ import { DatabaseCredentials } from './tenant-api/config'
 import S3 from './utils/S3'
 import AddProjectMemberMutationResolver from './tenant-api/resolvers/mutation/AddProjectMemberMutationResolver'
 import ResolverFactory from './tenant-api/resolvers/ResolverFactory'
+import TimerMiddlewareFactory from './http/TimerMiddlewareFactory'
+import TenantApolloServerFactory from './http/TenantApolloServerFactory'
+import SetupMutationResolver from './tenant-api/resolvers/mutation/SetupMutationResolver'
+import Authorizator from './core/authorization/Authorizator'
+import AccessEvaluator from './core/authorization/AccessEvalutator'
+import PermissionsFactory from './tenant-api/model/authorization/PermissionsFactory'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -48,9 +52,11 @@ class CompositionRoot {
 			.addService('contentMiddleware', ({ projectContainers, tenantContainer }) =>
 				new ContentMiddlewareFactory(projectContainers, tenantContainer.get('projectMemberManager')).create()
 			)
+			.addService('timerMiddleware', () => new TimerMiddlewareFactory().create())
 
-			.addService('koa', ({ authMiddleware, tenantMiddleware, contentMiddleware }) => {
+			.addService('koa', ({ authMiddleware, tenantMiddleware, contentMiddleware, timerMiddleware }) => {
 				const app = new Koa()
+				app.use(timerMiddleware)
 				app.use(authMiddleware)
 				app.use(tenantMiddleware)
 				app.use(contentMiddleware)
@@ -93,7 +99,7 @@ class CompositionRoot {
 			.addService('knexConnection', () => {
 				return new KnexConnection(
 					knex({
-						debug: false,
+						debug: true,
 						client: 'pg',
 						connection: tenantDbCredentials,
 					}),
@@ -129,7 +135,8 @@ class CompositionRoot {
 			.addService('meQueryResolver', ({ queryHandler }) => new MeQueryResolver(queryHandler))
 			.addService(
 				'signUpMutationResolver',
-				({ signUpManager, queryHandler }) => new SignUpMutationResolver(signUpManager, queryHandler)
+				({ signUpManager, queryHandler, apiKeyManager }) =>
+					new SignUpMutationResolver(signUpManager, queryHandler, apiKeyManager)
 			)
 			.addService(
 				'signInMutationResolver',
@@ -139,20 +146,36 @@ class CompositionRoot {
 				'addProjectMemberMutationResolver',
 				({ projectMemberManager }) => new AddProjectMemberMutationResolver(projectMemberManager)
 			)
+			.addService(
+				'setupMutationResolver',
+				({ signUpManager, apiKeyManager, queryHandler }) =>
+					new SetupMutationResolver(signUpManager, queryHandler, apiKeyManager)
+			)
 
 			.addService(
 				'resolvers',
-				({ meQueryResolver, signUpMutationResolver, signInMutationResolver, addProjectMemberMutationResolver }) => {
+				({
+					meQueryResolver,
+					signUpMutationResolver,
+					signInMutationResolver,
+					addProjectMemberMutationResolver,
+					setupMutationResolver,
+				}) => {
 					return new ResolverFactory(
 						meQueryResolver,
 						signUpMutationResolver,
 						signInMutationResolver,
-						addProjectMemberMutationResolver
+						addProjectMemberMutationResolver,
+						setupMutationResolver
 					).create()
 				}
 			)
+			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
+			.addService('authorizator', ({ accessEvaluator }) => new Authorizator(accessEvaluator))
 
-			.addService('apolloServer', ({ resolvers }) => new ApolloServer({ typeDefs, resolvers }))
+			.addService('apolloServer', ({ resolvers, projectMemberManager, authorizator }) =>
+				new TenantApolloServerFactory(resolvers, projectMemberManager, authorizator).create()
+			)
 			.build()
 	}
 }

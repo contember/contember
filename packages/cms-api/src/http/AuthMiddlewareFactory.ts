@@ -1,12 +1,12 @@
 import ApiKeyManager from '../tenant-api/model/service/ApiKeyManager'
 import * as Koa from 'koa'
-import * as koaCompose from 'koa-compose'
+import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 
 class AuthMiddlewareFactory {
 	constructor(private apiKeyManager: ApiKeyManager) {}
 
-	create(): koaCompose.Middleware<AuthMiddlewareFactory.ContextWithAuth> {
-		return async (ctx, next) => {
+	create(): Koa.Middleware {
+		return async (ctx: TimerMiddlewareFactory.ContextWithTimer & AuthMiddlewareFactory.ContextWithAuth, next) => {
 			const authHeader = ctx.request.get('Authorization')
 			if (typeof authHeader !== 'string') {
 				return await next()
@@ -20,7 +20,9 @@ class AuthMiddlewareFactory {
 			}
 
 			const [, token] = match
+			ctx.state.timer('fetching auth token info')
 			ctx.state.authResult = await this.apiKeyManager.verify(token)
+			ctx.state.timer('done')
 			await next()
 		}
 	}

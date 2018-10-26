@@ -6,7 +6,10 @@ import ImplementationException from '../../../core/exceptions/ImplementationExce
 import QueryHandler from '../../../core/query/QueryHandler'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
-import ProjectsByPersonQuery from '../../model/queries/ProjectsByPersonQuery'
+import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
+import Actions from '../../model/authorization/Actions'
+import { ForbiddenError } from 'apollo-server-koa'
+import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 
 export default class SignInMutationResolver implements MutationResolvers.Resolvers {
 	constructor(
@@ -20,6 +23,10 @@ export default class SignInMutationResolver implements MutationResolvers.Resolve
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<SignInResponse> {
+		if (!(await context.isAllowed(new AuthorizationScope.Global(), Actions.PERSON_SIGN_IN))) {
+			throw new ForbiddenError('You are not allowed to sign in')
+		}
+
 		const result = await this.signInManager.signIn(args.email, args.password)
 
 		if (!result.ok) {
@@ -31,7 +38,7 @@ export default class SignInMutationResolver implements MutationResolvers.Resolve
 
 		const [personRow, projectRows] = await Promise.all([
 			this.queryHandler.fetch(new PersonByIdQuery(result.personId)),
-			this.queryHandler.fetch(new ProjectsByPersonQuery(result.personId)),
+			this.queryHandler.fetch(new ProjectsByIdentityQuery(result.identityId)),
 		])
 
 		if (personRow === null) {
@@ -46,7 +53,10 @@ export default class SignInMutationResolver implements MutationResolvers.Resolve
 				person: {
 					id: personRow.id,
 					email: personRow.email,
-					projects: projectRows,
+					identity: {
+						id: result.identityId,
+						projects: projectRows,
+					},
 				},
 			},
 		}

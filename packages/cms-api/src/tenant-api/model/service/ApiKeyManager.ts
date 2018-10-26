@@ -1,11 +1,12 @@
-import * as crypto from 'crypto'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import QueryHandler from '../../../core/query/QueryHandler'
 import ApiKey from '../type/ApiKey'
 import ApiKeyByTokenQuery from '../queries/ApiKeyByTokenQuery'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
-import { uuid } from '../../../utils/uuid'
-import { now } from '../../../utils/date'
+import CreateIdentityCommand from '../commands/CreateIdentityCommand'
+import Identity from '../type/Identity'
+import CreateApiKey from '../commands/CreateApiKey'
+import DisableOneOffApiKeyCommand from '../commands/DisableOneOffApiKeyCommand'
 
 class ApiKeyManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
@@ -25,55 +26,23 @@ class ApiKeyManager {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.EXPIRED)
 		}
 
-		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.roles)
+		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles)
 	}
 
 	async createSessionApiKey(identityId: string): Promise<string> {
-		return await this.create(ApiKey.Type.SESSION, identityId)
+		return (await new CreateApiKey(ApiKey.Type.SESSION, identityId).execute(this.db)).token
 	}
 
-	private async create(type: ApiKey.Type, identityId: string): Promise<string> {
-		const apiKeyId = uuid()
-		const token = await this.generateToken()
-		const tokenHash = ApiKey.computeTokenHash(token)
-
-		await this.db
-			.insertBuilder()
-			.into('api_key')
-			.values({
-				id: apiKeyId,
-				token_hash: tokenHash,
-				type: type,
-				identity_id: identityId,
-				enabled: true,
-				expires_at: this.getExpiration(type),
-				created_at: now(),
-			})
-			.execute()
-
-		return token
-	}
-
-	private generateToken(): Promise<string> {
-		return new Promise<string>((resolve, reject) => {
-			crypto.randomBytes(20, (error, buffer) => {
-				if (error) {
-					reject(error)
-				} else {
-					resolve(buffer.toString('hex'))
-				}
-			})
+	async createLoginApiKey(): Promise<ApiKeyManager.CreateLoginApiKeyResult> {
+		return await this.db.transaction(async db => {
+			const identityId = await new CreateIdentityCommand([Identity.SystemRole.LOGIN]).execute(db)
+			const apiKeyResult = await new CreateApiKey(ApiKey.Type.PERMANENT, identityId).execute(db)
+			return new ApiKeyManager.CreateLoginApiKeyResult(identityId, apiKeyResult)
 		})
 	}
 
-	private getExpiration(type: ApiKey.Type): Date | null {
-		switch (type) {
-			case ApiKey.Type.PERMANENT:
-				return null
-
-			case ApiKey.Type.SESSION:
-				return new Date(now().getTime() + 30 * 60 * 1000)
-		}
+	async disableOneOffApiKey(apiKeyId: string): Promise<void> {
+		await new DisableOneOffApiKeyCommand(apiKeyId).execute(this.db)
 	}
 }
 
@@ -82,7 +51,11 @@ namespace ApiKeyManager {
 
 	export class VerifyResultOk {
 		readonly valid = true
-		constructor(public readonly identityId: string, public readonly roles: string[]) {}
+		constructor(
+			public readonly identityId: string,
+			public readonly apiKeyId: string,
+			public readonly roles: string[]
+		) {}
 	}
 
 	export class VerifyResultError {
@@ -94,6 +67,10 @@ namespace ApiKeyManager {
 		NOT_FOUND = 'not_found',
 		DISABLED = 'disabled',
 		EXPIRED = 'expired',
+	}
+
+	export class CreateLoginApiKeyResult {
+		constructor(public readonly identityId: string, public readonly apiKey: CreateApiKey.Result) {}
 	}
 }
 

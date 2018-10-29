@@ -4,10 +4,6 @@ import { Value } from './types'
 import KnexWrapper from './KnexWrapper'
 import WindowFunction from './WindowFunction'
 import CaseStatement from './CaseStatement'
-import { QueryResult } from 'pg'
-
-type AffectedRows = number
-type Returning = number | string
 
 interface Raw {
 	sql: string
@@ -57,9 +53,9 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		this.qb.select(this.aliasRaw(raw, alias))
 	}
 
-	public where(where: { [columName: string]: Value }): void
+	public where(where: { [columName: string]: Value } | Knex.Raw): void
 	public where(whereCondition: QueryBuilder.ConditionCallback): void
-	public where(where: (QueryBuilder.ConditionCallback) | { [columName: string]: Value }): void {
+	public where(where: QueryBuilder.ConditionCallback | { [columName: string]: Value } | Knex.Raw): void {
 		if (typeof where === 'function') {
 			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
 			where(builder)
@@ -98,43 +94,6 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 
 	public async delete(returning?: string | Knex.Raw): Promise<number> {
 		return await this.qb.delete(returning as string)
-	}
-
-	public async update(data: { [column: string]: Value }): Promise<AffectedRows> {
-		return await this.qb.update(data)
-	}
-
-	public async updateFrom(
-		tableName: string,
-		columns: QueryBuilder.ColumnExpressionMap,
-		callback: QueryBuilder.Callback
-	): Promise<AffectedRows> {
-		const updateData = Object.entries(columns)
-			.map(
-				([key, value]): [string, Knex.Raw | undefined] => {
-					if (typeof value === 'function') {
-						return [key, value(new QueryBuilder.ColumnExpressionFactory(this.wrapper))]
-					}
-					return [key, value]
-				}
-			)
-			.filter(it => it[1] !== undefined)
-			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
-		this.qb.table(this.raw('??.??', this.schema, tableName)).update(updateData)
-		const updateSql = this.qb.toSQL()
-		const fromQb = new QueryBuilder(this.wrapper, this.wrapper.knex.queryBuilder(), this.schema, this.cteAliases)
-		callback(fromQb)
-		const selectSql = fromQb.qb.toSQL()
-		if (!selectSql.sql.startsWith('select *')) {
-			throw new Error()
-		}
-		const query = this.wrapper.raw(
-			updateSql.sql + ' ' + selectSql.sql.substring('select *'.length),
-			...updateSql.bindings,
-			...selectSql.bindings
-		)
-
-		return ((await query) as QueryResult).rowCount
 	}
 
 	public toString(): string {

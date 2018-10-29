@@ -3,6 +3,7 @@ import QueryBuilder from './QueryBuilder'
 import { Formatter, Value } from './types'
 import InsertBuilder from './InsertBuilder'
 import DeleteBuilder from './DeleteBuilder'
+import UpdateBuilder from './UpdateBuilder'
 
 export default class KnexWrapper {
 	constructor(public readonly knex: Knex, private readonly schema: string) {}
@@ -17,6 +18,10 @@ export default class KnexWrapper {
 
 	insertBuilder(): InsertBuilder.NewInsertBuilder {
 		return InsertBuilder.create(this, this.schema)
+	}
+
+	updateBuilder(): UpdateBuilder.NewUpdateBuilder {
+		return UpdateBuilder.create(this, this.schema)
 	}
 
 	deleteBuilder(): DeleteBuilder.NewDeleteBuilder {

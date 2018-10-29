@@ -152,7 +152,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			bindings.push(this.options.returningColumn)
 		}
 
-		return this.wrapper.raw(sql, ...qbSql.bindings)
+		return this.wrapper.raw(sql, ...bindings)
 	}
 
 	public async execute(): Promise<Result> {

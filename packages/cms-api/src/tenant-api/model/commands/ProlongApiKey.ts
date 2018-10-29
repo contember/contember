@@ -11,12 +11,14 @@ class ProlongApiKey implements Command<void> {
 		if (newExpiration === null) {
 			return
 		}
-		const qb = db.queryBuilder()
-		qb.table('api_key')
-		qb.where({ id: this.id })
-		await qb.update({
-			expires_at: newExpiration,
-		})
+		const qb = db
+			.updateBuilder()
+			.table('api_key')
+			.where({ id: this.id })
+			.values({
+				expires_at: newExpiration,
+			})
+		await qb.execute()
 	}
 }
 

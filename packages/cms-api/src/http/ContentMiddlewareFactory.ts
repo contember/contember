@@ -1,10 +1,10 @@
-import { ApolloServer, AuthenticationError } from 'apollo-server-koa'
+import { ApolloServer } from 'apollo-server-koa'
 import KnexConnection from '../core/knex/KnexConnection'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import { Context } from '../content-api/types'
 import * as Koa from 'koa'
 import * as koaCompose from 'koa-compose'
-import { ContextWithRequest, get, route } from '../core/koa/router'
+import { ContextWithRequest, route } from '../core/koa/router'
 import * as corsMiddleware from '@koa/cors'
 import * as bodyParser from 'koa-bodyparser'
 import PlaygroundMiddlewareFactory from './PlaygroundMiddlewareFactory'
@@ -13,6 +13,7 @@ import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManag
 import { GraphQLSchema } from 'graphql'
 import PermissionFactory from '../acl/PermissionFactory'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
+import { Acl } from 'cms-common'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
@@ -53,28 +54,33 @@ class ContentMiddlewareFactory {
 					} & TimerMiddlewareFactory.ContextWithTimer,
 					next
 				) => {
+					const createGraphqlResponse = (message: string): void => {
+						ctx.set('Content-type', 'application/json')
+						ctx.status = 500
+						ctx.body = JSON.stringify({ errors: [{message}] })
+					}
 					ctx.state.timer('starting trx')
 					await ctx.state.db.transaction(async knexConnection => {
 						ctx.state.timer('done')
 						ctx.state.db = knexConnection
 						if (ctx.state.authResult === undefined) {
-							throw new AuthenticationError(
-								'/content endpoint requires authorization, see /tenant endpoint and signIn() mutation'
-							)
+							return createGraphqlResponse('/content endpoint requires authorization, see /tenant endpoint and signIn() mutation')
 						}
 
 						if (!ctx.state.authResult.valid) {
-							throw new AuthenticationError(`Auth failure: ${ctx.state.authResult.error}`)
+							return createGraphqlResponse(`Auth failure: ${ctx.state.authResult.error}`)
 						}
 						await knexConnection
 							.wrapper()
 							.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', ctx.state.authResult.identityId)
 
-						ctx.state.timer('fetching project roles')
-						const projectRoles = await this.projectMemberManager.getProjectRoles(
-							project.uuid,
-							ctx.state.authResult.identityId
-						)
+						ctx.state.timer('fetching project roles and variables')
+
+						const [projectRoles, projectVariables] = await Promise.all([
+							this.projectMemberManager.getProjectRoles(project.uuid, ctx.state.authResult.identityId),
+							this.projectMemberManager.getProjectVariables(project.uuid, ctx.state.authResult.identityId)
+						])
+
 						ctx.state.timer('done')
 
 						const permissions = new PermissionFactory(stage.schema.model).create(stage.schema.acl, projectRoles.roles)
@@ -88,7 +94,7 @@ class ContentMiddlewareFactory {
 						const apolloKoa = new Koa()
 						apolloKoa.use(corsMiddleware())
 						apolloKoa.use(bodyParser())
-						const server = this.createApolloServer(dataSchema)
+						const server = this.createApolloServer(dataSchema, projectVariables)
 						server.applyMiddleware({
 							app: apolloKoa,
 							path: '/',
@@ -108,14 +114,14 @@ class ContentMiddlewareFactory {
 		})
 	}
 
-	private createApolloServer(dataSchema: GraphQLSchema) {
+	private createApolloServer(dataSchema: GraphQLSchema, variables: Acl.VariablesMap) {
 		return new ApolloServer({
 			schema: dataSchema,
 			uploads: false,
 			context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {
 				return {
 					db: ctx.state.db,
-					identityVariables: {}, ///todo by identity
+					identityVariables: variables,
 				}
 			},
 			playground: false,

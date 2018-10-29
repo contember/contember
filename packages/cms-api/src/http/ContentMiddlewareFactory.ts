@@ -57,14 +57,16 @@ class ContentMiddlewareFactory {
 					const createGraphqlResponse = (message: string): void => {
 						ctx.set('Content-type', 'application/json')
 						ctx.status = 500
-						ctx.body = JSON.stringify({ errors: [{message}] })
+						ctx.body = JSON.stringify({ errors: [{ message }] })
 					}
 					ctx.state.timer('starting trx')
 					await ctx.state.db.transaction(async knexConnection => {
 						ctx.state.timer('done')
 						ctx.state.db = knexConnection
 						if (ctx.state.authResult === undefined) {
-							return createGraphqlResponse('/content endpoint requires authorization, see /tenant endpoint and signIn() mutation')
+							return createGraphqlResponse(
+								'/content endpoint requires authorization, see /tenant endpoint and signIn() mutation'
+							)
 						}
 
 						if (!ctx.state.authResult.valid) {
@@ -78,7 +80,7 @@ class ContentMiddlewareFactory {
 
 						const [projectRoles, projectVariables] = await Promise.all([
 							this.projectMemberManager.getProjectRoles(project.uuid, ctx.state.authResult.identityId),
-							this.projectMemberManager.getProjectVariables(project.uuid, ctx.state.authResult.identityId)
+							this.projectMemberManager.getProjectVariables(project.uuid, ctx.state.authResult.identityId),
 						])
 
 						ctx.state.timer('done')

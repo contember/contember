@@ -1,4 +1,4 @@
-import { AddProjectMemberResponse, MutationResolvers, UpdateProjectMemberVariablesResponse } from '../../schema/types'
+import { MutationResolvers, UpdateProjectMemberVariablesResponse } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import ProjectMemberManager from '../../model/service/ProjectMemberManager'

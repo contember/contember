@@ -4,8 +4,7 @@ import KnexWrapper from '../../../core/knex/KnexWrapper'
 import ApiKeyHelper from './ApiKeyHelper'
 
 class ProlongApiKey implements Command<void> {
-	constructor(private readonly id: string, private readonly type: ApiKey.Type) {
-	}
+	constructor(private readonly id: string, private readonly type: ApiKey.Type) {}
 
 	async execute(db: KnexWrapper): Promise<void> {
 		const newExpiration = ApiKeyHelper.getExpiration(this.type)

@@ -25,8 +25,8 @@ class ReferenceMarker {
 
 namespace ReferenceMarker {
 	export enum ExpectedCount {
-		One,
-		Many
+		UpToOne,
+		PossiblyMany
 	}
 }
 

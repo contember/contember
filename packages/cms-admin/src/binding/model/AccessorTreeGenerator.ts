@@ -91,7 +91,7 @@ export default class AccessorTreeGenerator {
 			if (field instanceof MarkerTreeRoot) {
 				entityData[placeholderName] = this.generateSubTree(field, () => undefined)
 			} else if (field instanceof ReferenceMarker) {
-				if (field.expectedCount === ReferenceMarker.ExpectedCount.One) {
+				if (field.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
 					if (Array.isArray(fieldData)) {
 						throw new DataBindingError(
 							`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
@@ -105,7 +105,7 @@ export default class AccessorTreeGenerator {
 								`Perhaps you meant to use a variant of <Field />?`
 						)
 					}
-				} else if (field.expectedCount === ReferenceMarker.ExpectedCount.Many) {
+				} else if (field.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
 					if (Array.isArray(fieldData) || fieldData === undefined) {
 						entityData[placeholderName] = this.generateManyReference(fieldData, field, onUpdate)
 					} else if (typeof fieldData === 'object') {

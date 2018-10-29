@@ -44,7 +44,7 @@ export default class ToMany extends React.Component<ToManyProps> {
 	}
 
 	public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
-		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.Many, fields, props.where)
+		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.where)
 	}
 }
 

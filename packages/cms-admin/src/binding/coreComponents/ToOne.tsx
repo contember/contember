@@ -39,7 +39,7 @@ export default class ToOne extends React.Component<ToOneProps> {
 	}
 
 	public static generateReferenceMarker(props: ToOneProps, fields: EntityFields): ReferenceMarker {
-		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.One, fields, props.where, props.reducedBy)
+		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.UpToOne, fields, props.where, props.reducedBy)
 	}
 }
 

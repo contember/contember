@@ -16,6 +16,11 @@ const schema: DocumentNode = gql`
 		signUp(email: String!, password: String!): SignUpResponse
 		signIn(email: String!, password: String!): SignInResponse
 		addProjectMember(projectId: String!, identityId: String!, roles: [String!]!): AddProjectMemberResponse
+		updateProjectMemberVariables(
+			projectId: String!
+			identityId: String!
+			variables: [VariableUpdate!]!
+		): UpdateProjectMemberVariablesResponse
 	}
 
 	# === setUp ===
@@ -106,6 +111,30 @@ const schema: DocumentNode = gql`
 		PROJECT_NOT_FOUND
 		IDENTITY_NOT_FOUND
 		ALREADY_MEMBER
+	}
+
+	# === updateProjectMemberVariables ===
+
+	input VariableUpdate {
+		name: String!
+		values: [String!]!
+	}
+
+	type UpdateProjectMemberVariablesResponse {
+		ok: Boolean!
+		errors: [UpdateProjectMemberVariablesError!]!
+	}
+
+	type UpdateProjectMemberVariablesError {
+		code: UpdateProjectMemberVariablesErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum UpdateProjectMemberVariablesErrorCode {
+		PROJECT_NOT_FOUND
+		IDENTITY_NOT_FOUND
+		VARIABLE_NOT_FOUND
 	}
 
 	# === common ===

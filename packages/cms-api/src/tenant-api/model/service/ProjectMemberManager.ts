@@ -1,9 +1,10 @@
-import { AddProjectMemberErrorCode } from '../../schema/types'
+import { AddProjectMemberErrorCode, UpdateProjectMemberVariablesErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 import { uuid } from '../../../utils/uuid'
 import ProjectRolesByIdentityQuery from '../queries/ProjectRolesByIdentityQuery'
+import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
 
 class ProjectMemberManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
@@ -47,6 +48,32 @@ class ProjectMemberManager {
 		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery(projectId, identityId))
 		return new ProjectMemberManager.GetProjectRolesResponse(row.roles)
 	}
+
+	async updateProjectMemberVariables(
+		projectId: string,
+		identityId: string,
+		variables: ReadonlyArray<UpdateProjectMemberVariablesCommand.VariableUpdate>
+	): Promise<ProjectMemberManager.UpdateProjectMemberVariablesResponse> {
+		try {
+			await new UpdateProjectMemberVariablesCommand(projectId, identityId, variables).execute(this.db)
+			return new ProjectMemberManager.UpdateProjectMemberVariablesResponseOk()
+		} catch (e) {
+			switch (e.constraint) {
+				case 'project_member_project_id_fkey':
+					return new ProjectMemberManager.UpdateProjectMemberVariablesResponseError([
+						UpdateProjectMemberVariablesErrorCode.PROJECT_NOT_FOUND,
+					])
+
+				case 'project_member_identity':
+					return new ProjectMemberManager.UpdateProjectMemberVariablesResponseError([
+						UpdateProjectMemberVariablesErrorCode.IDENTITY_NOT_FOUND,
+					])
+
+				default:
+					throw e
+			}
+		}
+	}
 }
 
 namespace ProjectMemberManager {
@@ -54,16 +81,34 @@ namespace ProjectMemberManager {
 
 	export class AddProjectMemberResponseOk {
 		readonly ok = true
+
 		constructor() {}
 	}
 
 	export class AddProjectMemberResponseError {
 		readonly ok = false
+
 		constructor(public readonly errors: Array<AddProjectMemberErrorCode>) {}
 	}
 
 	export class GetProjectRolesResponse {
 		constructor(public readonly roles: string[]) {}
+	}
+
+	export type UpdateProjectMemberVariablesResponse =
+		| UpdateProjectMemberVariablesResponseOk
+		| UpdateProjectMemberVariablesResponseError
+
+	export class UpdateProjectMemberVariablesResponseOk {
+		readonly ok = true
+
+		constructor() {}
+	}
+
+	export class UpdateProjectMemberVariablesResponseError {
+		readonly ok = false
+
+		constructor(public readonly errors: Array<UpdateProjectMemberVariablesErrorCode>) {}
 	}
 }
 

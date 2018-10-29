@@ -33,6 +33,7 @@ export interface Mutation {
 	readonly signUp?: SignUpResponse | null
 	readonly signIn?: SignInResponse | null
 	readonly addProjectMember?: AddProjectMemberResponse | null
+	readonly updateProjectMemberVariables?: UpdateProjectMemberVariablesResponse | null
 }
 
 export interface SetupResponse {
@@ -107,6 +108,17 @@ export interface AddProjectMemberError {
 	readonly developerMessage?: string | null
 }
 
+export interface UpdateProjectMemberVariablesResponse {
+	readonly ok: boolean
+	readonly errors: ReadonlyArray<UpdateProjectMemberVariablesError>
+}
+
+export interface UpdateProjectMemberVariablesError {
+	readonly code: UpdateProjectMemberVariablesErrorCode
+	readonly endUserMessage?: string | null
+	readonly developerMessage?: string | null
+}
+
 export interface SetupError {
 	readonly code: SetupErrorCode
 	readonly endPersonMessage?: string | null
@@ -116,6 +128,11 @@ export interface SetupError {
 export interface AdminCredentials {
 	readonly email: string
 	readonly password: string
+}
+
+export interface VariableUpdate {
+	readonly name: string
+	readonly values: ReadonlyArray<string>
 }
 export interface SetupMutationArgs {
 	superadmin: AdminCredentials
@@ -132,6 +149,11 @@ export interface AddProjectMemberMutationArgs {
 	projectId: string
 	identityId: string
 	roles: ReadonlyArray<string>
+}
+export interface UpdateProjectMemberVariablesMutationArgs {
+	projectId: string
+	identityId: string
+	variables: ReadonlyArray<VariableUpdate>
 }
 
 export enum SetupErrorCode {
@@ -151,6 +173,12 @@ export enum AddProjectMemberErrorCode {
 	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
 	IDENTITY_NOT_FOUND = 'IDENTITY_NOT_FOUND',
 	ALREADY_MEMBER = 'ALREADY_MEMBER',
+}
+
+export enum UpdateProjectMemberVariablesErrorCode {
+	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
+	IDENTITY_NOT_FOUND = 'IDENTITY_NOT_FOUND',
+	VARIABLE_NOT_FOUND = 'VARIABLE_NOT_FOUND',
 }
 
 export namespace QueryResolvers {
@@ -199,6 +227,7 @@ export namespace MutationResolvers {
 		signUp?: SignUpResolver
 		signIn?: SignInResolver
 		addProjectMember?: AddProjectMemberResolver
+		updateProjectMemberVariables?: UpdateProjectMemberVariablesResolver
 	}
 
 	export type SetupResolver<R = SetupResponse | null> = Resolver<R, SetupArgs>
@@ -223,6 +252,16 @@ export namespace MutationResolvers {
 		projectId: string
 		identityId: string
 		roles: ReadonlyArray<string>
+	}
+
+	export type UpdateProjectMemberVariablesResolver<R = UpdateProjectMemberVariablesResponse | null> = Resolver<
+		R,
+		UpdateProjectMemberVariablesArgs
+	>
+	export interface UpdateProjectMemberVariablesArgs {
+		projectId: string
+		identityId: string
+		variables: ReadonlyArray<VariableUpdate>
 	}
 }
 
@@ -366,6 +405,28 @@ export namespace AddProjectMemberErrorResolvers {
 	}
 
 	export type CodeResolver<R = AddProjectMemberErrorCode> = Resolver<R>
+	export type EndUserMessageResolver<R = string | null> = Resolver<R>
+	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
+}
+
+export namespace UpdateProjectMemberVariablesResponseResolvers {
+	export interface Resolvers {
+		ok?: OkResolver
+		errors?: ErrorsResolver
+	}
+
+	export type OkResolver<R = boolean> = Resolver<R>
+	export type ErrorsResolver<R = ReadonlyArray<UpdateProjectMemberVariablesError>> = Resolver<R>
+}
+
+export namespace UpdateProjectMemberVariablesErrorResolvers {
+	export interface Resolvers {
+		code?: CodeResolver
+		endUserMessage?: EndUserMessageResolver
+		developerMessage?: DeveloperMessageResolver
+	}
+
+	export type CodeResolver<R = UpdateProjectMemberVariablesErrorCode> = Resolver<R>
 	export type EndUserMessageResolver<R = string | null> = Resolver<R>
 	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
 }

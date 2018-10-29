@@ -26,6 +26,7 @@ import SetupMutationResolver from './tenant-api/resolvers/mutation/SetupMutation
 import Authorizator from './core/authorization/Authorizator'
 import AccessEvaluator from './core/authorization/AccessEvalutator'
 import PermissionsFactory from './tenant-api/model/authorization/PermissionsFactory'
+import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -151,6 +152,10 @@ class CompositionRoot {
 				({ signUpManager, apiKeyManager, queryHandler }) =>
 					new SetupMutationResolver(signUpManager, queryHandler, apiKeyManager)
 			)
+			.addService(
+				'updateProjectMemberVariablesMutationResolver',
+				({ projectMemberManager }) => new UpdateProjectMemberVariablesMutationResolver(projectMemberManager)
+			)
 
 			.addService(
 				'resolvers',
@@ -160,13 +165,15 @@ class CompositionRoot {
 					signInMutationResolver,
 					addProjectMemberMutationResolver,
 					setupMutationResolver,
+					updateProjectMemberVariablesMutationResolver,
 				}) => {
 					return new ResolverFactory(
 						meQueryResolver,
 						signUpMutationResolver,
 						signInMutationResolver,
 						addProjectMemberMutationResolver,
-						setupMutationResolver
+						setupMutationResolver,
+						updateProjectMemberVariablesMutationResolver
 					).create()
 				}
 			)

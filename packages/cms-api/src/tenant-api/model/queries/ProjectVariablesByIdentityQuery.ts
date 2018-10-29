@@ -15,7 +15,10 @@ class ProjectVariablesByIdentityQuery extends KnexQuery<ProjectVariablesByIdenti
 			.where('identity_id', this.identityId)
 			.where('project_id', this.projectId)
 
-		return result.reduce<ProjectVariablesByIdentityQuery.Result>((result, row) => ({ ...result, [row.variable]: row.values }), {})
+		return result.reduce<ProjectVariablesByIdentityQuery.Result>(
+			(result, row) => ({ ...result, [row.variable]: row.values }),
+			{}
+		)
 	}
 }
 

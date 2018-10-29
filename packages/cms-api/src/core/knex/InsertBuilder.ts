@@ -3,6 +3,7 @@ import KnexWrapper from './KnexWrapper'
 import * as Knex from 'knex'
 import { QueryResult } from 'pg'
 import { Value } from './types'
+import Returning from './internal/Returning'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>> {
 	private constructor(
@@ -19,7 +20,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 				cte: {},
 				columns: undefined,
 				conflictAction: undefined,
-				returningColumn: undefined,
+				returningColumn: new Returning(),
 				insertFrom: undefined,
 			},
 			schema
@@ -77,12 +78,12 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		) as InsertBuilder.InsertBuilderState<Result, Filled>
 	}
 
-	public returning(column: string | Knex.Raw): InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled> {
-		return new InsertBuilder<InsertBuilder.Returning[], Filled>(
+	public returning(column: string | Knex.Raw): InsertBuilder.InsertBuilderState<Returning.Result[], Filled> {
+		return new InsertBuilder<Returning.Result[], Filled>(
 			this.wrapper,
-			{ ...this.options, returningColumn: column },
+			{ ...this.options, returningColumn: new Returning(column) },
 			this.schema
-		) as InsertBuilder.InsertBuilderState<InsertBuilder.Returning[], Filled>
+		) as InsertBuilder.InsertBuilderState<Returning.Result[], Filled>
 	}
 
 	public from(from: QueryBuilder.Callback): InsertBuilder.InsertBuilderState<Result, Filled> {
@@ -147,23 +148,14 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 					throw Error()
 			}
 		}
-		if (this.options.returningColumn) {
-			sql += ' returning ??'
-			bindings.push(this.options.returningColumn)
-		}
+		const [sqlWithReturning, bindingsWithReturning] = this.options.returningColumn.modifyQuery(sql, bindings)
 
-		return this.wrapper.raw(sql, ...bindings)
+		return this.wrapper.raw(sqlWithReturning, ...bindingsWithReturning)
 	}
 
 	public async execute(): Promise<Result> {
 		const result: QueryResult = await this.createQuery()
-
-		const returningColumn = this.options.returningColumn
-		if (returningColumn) {
-			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]) : result) as Result
-		} else {
-			return result.rowCount as Result
-		}
+		return this.options.returningColumn.parseResponse<Result>(result)
 	}
 
 	private getColumnValues(values: InsertBuilder.Values): { [column: string]: Knex.Raw } {
@@ -183,15 +175,14 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 
 namespace InsertBuilder {
 	export type AffectedRows = number
-	export type Returning = number | string
-	export type InsertResult = AffectedRows | Returning[]
+	export type InsertResult = AffectedRows | Returning.Result[]
 
 	export interface Options {
 		intoTable: string | undefined
 		cte: { [alias: string]: QueryBuilder.Callback }
 		columns: InsertBuilder.Values | undefined
 		conflictAction: InsertBuilder.ConflictAction | undefined
-		returningColumn: string | Knex.Raw | undefined
+		returningColumn: Returning,
 		insertFrom: QueryBuilder.Callback | undefined
 	}
 

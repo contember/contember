@@ -3,6 +3,10 @@ type FieldMeta {
   updatable: Boolean
 }
 
+type Info {
+  description: String
+}
+
 type Mutation {
   createTest(data: TestCreateInput!): Test!
   updateTest(where: TestUniqueWhere!, data: TestUpdateInput!): Test
@@ -17,6 +21,7 @@ enum OrderDirection {
 type Query {
   getTest(where: TestUniqueWhere!): Test
   listTest(where: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
+  _info: Info
 }
 
 type SignedUpload {

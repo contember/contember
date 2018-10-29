@@ -41,16 +41,30 @@ export default class GraphQlSchemaBuilder {
 			} as GraphQLFieldConfig<any, any, any>,
 		}
 
+		const queries = Object.keys(this.schema.entities)
+			.reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
+				return {
+					...this.queryProvider.getQueries(entityName),
+					...queries,
+				}
+			}, {})
+
+		queries['_info'] = {
+			type: new GraphQLObjectType({
+				name: 'Info',
+				fields: () => ({
+					description: { type: GraphQLString }
+				})
+			}),
+			resolve: () => ({
+				description: 'TODO'
+			})
+		}
+
 		return new GraphQLSchema({
 			query: new GraphQLObjectType({
 				name: 'Query',
-				fields: () =>
-					Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
-						return {
-							...this.queryProvider.getQueries(entityName),
-							...queries,
-						}
-					}, {}),
+				fields: () => queries,
 			}),
 			...(Object.keys(mutations).length > 0
 				? {

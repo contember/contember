@@ -20,6 +20,10 @@ type FieldMeta {
   updatable: Boolean
 }
 
+type Info {
+  description: String
+}
+
 type Mutation {
   createPost(data: PostCreateInput!): Post!
   deletePost(where: PostUniqueWhere!): Post
@@ -198,6 +202,7 @@ type Query {
   listPost(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
   getPostLocale(where: PostLocaleUniqueWhere!): PostLocale
   listPostLocale(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  _info: Info
 }
 
 type SignedUpload {

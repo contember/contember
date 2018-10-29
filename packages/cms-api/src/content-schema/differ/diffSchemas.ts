@@ -11,6 +11,7 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 
 	const originalEnums = new Set(Object.keys(originalSchema.enums))
 	const originalEntities = new Set(Object.keys(originalSchema.entities))
+	const toCreateUnique: { [entityName: string]: string[] } = {}
 
 	for (const enumName in updatedSchema.enums) {
 		if (!originalEnums.has(enumName)) {
@@ -26,6 +27,8 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 	for (const entityName in updatedSchema.entities) {
 		const updatedEntity: Model.Entity = updatedSchema.entities[entityName]
 
+		toCreateUnique[entityName] = []
+
 		if (!originalEntities.has(entityName)) {
 			builder.createEntity(updatedEntity)
 			for (const fieldName in updatedEntity.fields) {
@@ -35,7 +38,7 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 				builder.createField(updatedEntity, fieldName)
 			}
 			for (const uniqueName in updatedEntity.unique) {
-				builder.createUnique(updatedEntity, uniqueName)
+				toCreateUnique[entityName].push(uniqueName)
 			}
 			continue
 		}
@@ -44,6 +47,24 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 		const originalEntity: Model.Entity = originalSchema.entities[entityName]
 		const originalFields = new Set(Object.keys(originalEntity.fields))
 		const originalUnique = new Set(Object.keys(originalEntity.unique))
+
+		for (const uniqueName in updatedEntity.unique) {
+			if (
+				originalUnique.has(uniqueName) &&
+				!deepEqual(updatedEntity.unique[uniqueName], originalEntity.unique[uniqueName])
+			) {
+				builder.removeUnique(entityName, uniqueName)
+				originalUnique.delete(uniqueName)
+			}
+			if (!originalUnique.has(uniqueName)) {
+				toCreateUnique[entityName].push(uniqueName)
+			}
+			originalUnique.delete(uniqueName)
+		}
+
+		for (const uniqueName of originalUnique) {
+			builder.removeUnique(entityName, uniqueName)
+		}
 
 		if (updatedEntity.tableName !== originalEntity.tableName) {
 			builder.updateEntityTableName(entityName, updatedEntity.tableName)
@@ -95,23 +116,11 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 		for (const fieldName of originalFields) {
 			builder.removeField(entityName, fieldName)
 		}
+	}
 
-		for (const uniqueName in updatedEntity.unique) {
-			if (
-				originalUnique.has(uniqueName) &&
-				!deepEqual(updatedEntity.unique[uniqueName], originalEntity.unique[uniqueName])
-			) {
-				builder.removeUnique(entityName, uniqueName)
-				originalUnique.delete(uniqueName)
-			}
-			if (!originalUnique.has(uniqueName)) {
-				builder.createUnique(updatedEntity, uniqueName)
-			}
-			originalUnique.delete(uniqueName)
-		}
-
-		for (const uniqueName of originalUnique) {
-			builder.removeUnique(entityName, uniqueName)
+	for (const entityName in toCreateUnique) {
+		for (const uniqueName of toCreateUnique[entityName]) {
+			builder.createUnique(updatedSchema.entities[entityName], uniqueName)
 		}
 	}
 

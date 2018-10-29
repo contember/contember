@@ -178,7 +178,7 @@ class CompositionRoot {
 				}
 			)
 			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
-			.addService('authorizator', ({ accessEvaluator }) => new Authorizator(accessEvaluator))
+			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 
 			.addService('apolloServer', ({ resolvers, projectMemberManager, authorizator }) =>
 				new TenantApolloServerFactory(resolvers, projectMemberManager, authorizator).create()

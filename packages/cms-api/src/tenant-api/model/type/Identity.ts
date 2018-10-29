@@ -13,7 +13,7 @@ namespace Identity {
 		SETUP = 'setup',
 	}
 
-	class StaticIdentity implements Identity {
+	export class StaticIdentity implements Identity {
 		constructor(
 			public readonly id: string,
 			public readonly roles: string[],

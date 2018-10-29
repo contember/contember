@@ -10,6 +10,8 @@ import * as crypto from 'crypto'
 import * as sinon from 'sinon'
 import { Buffer } from 'buffer'
 import ApiKey from '../../../../src/tenant-api/model/type/ApiKey'
+import ResolverContext from '../../../../src/tenant-api/resolvers/ResolverContext'
+import Identity from '../../../../src/tenant-api/model/type/Identity'
 
 export interface Test {
 	query: string
@@ -27,9 +29,17 @@ export const execute = async (test: Test) => {
 		user: 'foo',
 	})
 
+	const context: ResolverContext = new ResolverContext(
+		testUuid(998),
+		new Identity.StaticIdentity(testUuid(999), [], {}),
+		{
+			isAllowed: () => Promise.resolve(true),
+		}
+	)
+
 	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.get('resolvers') })
 	await executeGraphQlTest(tenantContainer.get('knexConnection').knex, {
-		context: null,
+		context: context,
 		executes: test.executes,
 		query: test.query,
 		return: test.return,
@@ -60,21 +70,19 @@ describe('tenant api', () => {
                      from "tenant"."person"
                      where "email" = $1`,
 						parameters: ['john@doe.com'],
-						response: [
-							// {id: testUuid(1), password_hash: null, identity_id: null}
-						],
+						response: [],
 					},
 					{
 						sql: SQL`BEGIN;`,
 						response: 1,
 					},
 					{
-						sql: SQL`insert into "tenant"."tenant"."identity" ("id", "parent_id", "roles") values ($1, $2, $3)`,
+						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles") values ($1, $2, $3)`,
 						parameters: [testUuid(1), null, '[]'],
 						response: 1,
 					},
 					{
-						sql: SQL`insert into "tenant"."tenant"."person" ("email", "id", "identity_id", "password_hash") values ($1, $2, $3, $4)`,
+						sql: SQL`insert into "tenant"."person" ("email", "id", "identity_id", "password_hash") values ($1, $2, $3, $4)`,
 						parameters: ['john@doe.com', testUuid(2), testUuid(1), (val: string) => bcrypt.compareSync('123', val)],
 						response: 1,
 					},
@@ -93,14 +101,20 @@ describe('tenant api', () => {
 					},
 					{
 						sql: SQL`select
-                       "tenant"."project"."id",
-                       "tenant"."project"."name"
+                       "project"."id",
+                       "project"."name"
                      from "tenant"."project"
-                       inner join "tenant"."project_member" on "tenant"."project_member"."project_id" = "tenant"."project"."id"
-                       inner join "tenant"."person" on "tenant"."project_member"."identity_id" = "tenant"."person"."identity_id"
-                     where "tenant"."person"."id" = $1`,
-						parameters: [testUuid(2)],
+                       inner join "tenant"."project_member" on "project_member"."project_id" = "project"."id"
+                     where "tenant"."project_member"."identity_id" = $1`,
+						parameters: [testUuid(1)],
 						response: [{ id: testUuid(3), name: 'foo' }],
+					},
+					{
+						sql: SQL`update "tenant"."api_key"
+            set "enabled" = $1
+            where "id" = $2 and "type" = $3`,
+						parameters: [false, testUuid(998), 'one_off'],
+						response: true,
 					},
 				],
 				return: {
@@ -220,14 +234,13 @@ describe('tenant api', () => {
 					},
 					{
 						sql: SQL`select
-                       "tenant"."project"."id",
-                       "tenant"."project"."name"
+                       "project"."id",
+                       "project"."name"
                      from "tenant"."project"
-                       inner join "tenant"."project_member" on "tenant"."project_member"."project_id" = "tenant"."project"."id"
-                       inner join "tenant"."person" on "tenant"."project_member"."identity_id" = "tenant"."person"."identity_id"
-                     where "tenant"."person"."id" = $1`,
-						parameters: [testUuid(1)],
-						response: [{ id: testUuid(2), name: 'foo' }],
+                       inner join "tenant"."project_member" on "project_member"."project_id" = "project"."id"
+                     where "tenant"."project_member"."identity_id" = $1`,
+						parameters: [testUuid(2)],
+						response: [{ id: testUuid(3), name: 'foo' }],
 					},
 				],
 				return: {

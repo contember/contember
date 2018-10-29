@@ -3,6 +3,10 @@ type FieldMeta {
   updatable: Boolean
 }
 
+type Info {
+  description: String
+}
+
 type Mutation {
   createRoot(data: RootCreateInput!): Root!
   deleteRoot(where: RootUniqueWhere!): Root
@@ -92,6 +96,7 @@ type Query {
   listRoot(where: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
   getOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
   listOneHasManyEntity(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
+  _info: Info
 }
 
 type Root {

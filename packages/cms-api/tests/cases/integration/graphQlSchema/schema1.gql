@@ -168,6 +168,10 @@ type FieldMeta {
   updatable: Boolean
 }
 
+type Info {
+  description: String
+}
+
 type Mutation {
   createPost(data: PostCreateInput!): Post!
   deletePost(where: PostUniqueWhere!): Post
@@ -424,6 +428,7 @@ type Query {
   listCategory(where: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
   getAuthor(where: AuthorUniqueWhere!): Author
   listAuthor(where: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
+  _info: Info
 }
 
 type SignedUpload {

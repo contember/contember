@@ -4,8 +4,9 @@ import * as Knex from 'knex'
 import { QueryResult } from 'pg'
 import { Value } from './types'
 import ConditionBuilder from './ConditionBuilder'
+import Returning from './internal/Returning'
 
-class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>> {
+class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>> implements Returning.Aware {
 	private constructor(
 		private readonly wrapper: KnexWrapper,
 		private readonly options: DeleteBuilder.Options,
@@ -18,7 +19,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 			{
 				fromTable: undefined,
 				cte: {},
-				returningColumn: undefined,
+				returningColumn: new Returning(),
 				usingTables: {},
 				wheres: [],
 			},
@@ -73,12 +74,12 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		) as DeleteBuilder.DeleteBuilderState<Result, Filled>
 	}
 
-	public returning(column: string | Knex.Raw): DeleteBuilder.DeleteBuilderState<DeleteBuilder.Returning[], Filled> {
-		return new DeleteBuilder<DeleteBuilder.Returning[], Filled>(
+	public returning(column: string | Knex.Raw): DeleteBuilder.DeleteBuilderState<Returning.Result[], Filled> {
+		return new DeleteBuilder<Returning.Result[], Filled>(
 			this.wrapper,
-			{ ...this.options, returningColumn: column },
+			{ ...this.options, returningColumn: new Returning(column) },
 			this.schema
-		) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.Returning[], Filled>
+		) as DeleteBuilder.DeleteBuilderState<Returning.Result[], Filled>
 	}
 
 	public createQuery(): Knex.Raw {
@@ -106,39 +107,29 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		qb.delete()
 
 		const qbSql = qb.toSQL()
-		let sql: string = qbSql.sql
-		let bindings = qbSql.bindings
+		const sql: string = qbSql.sql
+		const bindings = qbSql.bindings
 
-		if (this.options.returningColumn) {
-			sql += ' returning ??'
-			bindings.push(this.options.returningColumn)
-		}
+		const [sqlWithReturning, bindingsWithReturning] = this.options.returningColumn.modifyQuery(sql, bindings)
 
-		return this.wrapper.raw(sql, ...qbSql.bindings)
+		return this.wrapper.raw(sqlWithReturning, ...bindingsWithReturning)
 	}
 
 	public async execute(): Promise<Result> {
 		const result: QueryResult = await this.createQuery()
-
-		const returningColumn = this.options.returningColumn
-		if (returningColumn) {
-			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]) : result) as Result
-		} else {
-			return result.rowCount as Result
-		}
+		return this.options.returningColumn.parseResponse<Result>(result)
 	}
 }
 
 namespace DeleteBuilder {
 	export type AffectedRows = number
-	export type Returning = number | string
-	export type DeleteResult = AffectedRows | Returning[]
+	export type DeleteResult = AffectedRows | Returning.Result[]
 	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 
 	export interface Options {
 		fromTable: string | undefined
 		cte: { [alias: string]: QueryBuilder.Callback }
-		returningColumn: string | Knex.Raw | undefined
+		returningColumn: Returning,
 		usingTables: { [alias: string]: string }
 		wheres: (Knex.Raw | { [columName: string]: Value })[]
 	}

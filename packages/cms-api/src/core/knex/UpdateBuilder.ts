@@ -4,6 +4,7 @@ import * as Knex from 'knex'
 import { QueryResult } from 'pg'
 import { Value } from './types'
 import ConditionBuilder from './ConditionBuilder'
+import Returning from './internal/Returning'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>> {
 	private constructor(
@@ -19,7 +20,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 				tableName: undefined,
 				cte: {},
 				columns: undefined,
-				returningColumn: undefined,
+				returningColumn: new Returning(),
 				updateFrom: undefined,
 				wheres: [],
 			},
@@ -51,12 +52,12 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		) as UpdateBuilder.UpdateBuilderState<Result, Filled | 'values'>
 	}
 
-	public returning(column: string | Knex.Raw): UpdateBuilder.UpdateBuilderState<UpdateBuilder.Returning[], Filled> {
-		return new UpdateBuilder<UpdateBuilder.Returning[], Filled>(
+	public returning(column: string | Knex.Raw): UpdateBuilder.UpdateBuilderState<Returning.Result[], Filled> {
+		return new UpdateBuilder<Returning.Result[], Filled>(
 			this.wrapper,
-			{ ...this.options, returningColumn: column },
+			{ ...this.options, returningColumn: new Returning(column) },
 			this.schema
-		) as UpdateBuilder.UpdateBuilderState<UpdateBuilder.Returning[], Filled>
+		) as UpdateBuilder.UpdateBuilderState<Returning.Result[], Filled>
 	}
 
 	public from(from: QueryBuilder.Callback): UpdateBuilder.UpdateBuilderState<Result, Filled> {
@@ -135,23 +136,14 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 			bindings = qb.toSQL().bindings
 		}
 
-		if (this.options.returningColumn) {
-			sql += ' returning ??'
-			bindings.push(this.options.returningColumn)
-		}
+		const [sqlWithReturning, bindingsWithReturning] = this.options.returningColumn.modifyQuery(sql, bindings)
 
-		return this.wrapper.raw(sql, ...bindings)
+		return this.wrapper.raw(sqlWithReturning, ...bindingsWithReturning)
 	}
 
 	public async execute(): Promise<Result> {
 		const result: QueryResult = await this.createQuery()
-
-		const returningColumn = this.options.returningColumn
-		if (returningColumn) {
-			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]) : result) as Result
-		} else {
-			return result.rowCount as Result
-		}
+		return this.options.returningColumn.parseResponse<Result>(result)
 	}
 
 	private getColumnValues(values: UpdateBuilder.Values): { [column: string]: Knex.Raw } {
@@ -171,15 +163,14 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 
 namespace UpdateBuilder {
 	export type AffectedRows = number
-	export type Returning = number | string
-	export type UpdateResult = AffectedRows | Returning[]
+	export type UpdateResult = AffectedRows | Returning.Result[]
 	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 
 	export interface Options {
 		tableName: string | undefined
 		cte: { [alias: string]: QueryBuilder.Callback }
 		columns: UpdateBuilder.Values | undefined
-		returningColumn: string | Knex.Raw | undefined
+		returningColumn:Returning
 		updateFrom: QueryBuilder.Callback | undefined
 		wheres: (Knex.Raw | { [columName: string]: Value })[]
 	}

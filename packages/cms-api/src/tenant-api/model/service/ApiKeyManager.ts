@@ -7,11 +7,12 @@ import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import Identity from '../type/Identity'
 import CreateApiKey from '../commands/CreateApiKey'
 import DisableOneOffApiKeyCommand from '../commands/DisableOneOffApiKeyCommand'
+import ProlongApiKey from '../commands/ProlongApiKey'
 
 class ApiKeyManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
 
-	async verify(token: string): Promise<ApiKeyManager.VerifyResult> {
+	async verifyAndProlong(token: string): Promise<ApiKeyManager.VerifyResult> {
 		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.NOT_FOUND)
@@ -25,6 +26,7 @@ class ApiKeyManager {
 		if (apiKeyRow.expires_at !== null && apiKeyRow.expires_at <= now) {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.EXPIRED)
 		}
+		await new ProlongApiKey(apiKeyRow.id, apiKeyRow.type).execute(this.db)
 
 		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles)
 	}

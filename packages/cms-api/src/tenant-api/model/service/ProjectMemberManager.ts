@@ -5,6 +5,7 @@ import KnexWrapper from '../../../core/knex/KnexWrapper'
 import { uuid } from '../../../utils/uuid'
 import ProjectRolesByIdentityQuery from '../queries/ProjectRolesByIdentityQuery'
 import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
+import ProjectVariablesByIdentityQuery from '../queries/ProjectVariablesByIdentityQuery'
 
 class ProjectMemberManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
@@ -73,6 +74,10 @@ class ProjectMemberManager {
 					throw e
 			}
 		}
+	}
+
+	async getProjectVariables(projectId: string, identityId: string): Promise<ProjectVariablesByIdentityQuery.Result> {
+		return this.queryHandler.fetch(new ProjectVariablesByIdentityQuery(projectId, identityId))
 	}
 }
 

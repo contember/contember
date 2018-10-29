@@ -6,7 +6,8 @@ import { Value } from './types'
 import ConditionBuilder from './ConditionBuilder'
 import Returning from './internal/Returning'
 
-class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>> implements Returning.Aware {
+class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>>
+	implements Returning.Aware {
 	private constructor(
 		private readonly wrapper: KnexWrapper,
 		private readonly options: DeleteBuilder.Options,
@@ -129,7 +130,7 @@ namespace DeleteBuilder {
 	export interface Options {
 		fromTable: string | undefined
 		cte: { [alias: string]: QueryBuilder.Callback }
-		returningColumn: Returning,
+		returningColumn: Returning
 		usingTables: { [alias: string]: string }
 		wheres: (Knex.Raw | { [columName: string]: Value })[]
 	}

@@ -92,10 +92,6 @@ class QueryBuilder<R = { [columnName: string]: any }[]> {
 		return await this.qb
 	}
 
-	public async delete(returning?: string | Knex.Raw): Promise<number> {
-		return await this.qb.delete(returning as string)
-	}
-
 	public toString(): string {
 		return this.qb.toString()
 	}

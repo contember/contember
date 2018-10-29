@@ -172,14 +172,15 @@ namespace JunctionTableManager {
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue
 		): Promise<void> {
-			const qb = this.db.queryBuilder()
-			qb.table(joiningTable.tableName)
-			qb.where(cond => cond.compare(joiningTable.joiningColumn.columnName, ConditionBuilder.Operator.eq, ownerPrimary))
-			qb.where(cond =>
-				cond.compare(joiningTable.inverseJoiningColumn.columnName, ConditionBuilder.Operator.eq, inversedPrimary)
-			)
+			const qb = this.db
+				.deleteBuilder()
+				.from(joiningTable.tableName)
+				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, ConditionBuilder.Operator.eq, ownerPrimary))
+				.where(cond =>
+					cond.compare(joiningTable.inverseJoiningColumn.columnName, ConditionBuilder.Operator.eq, inversedPrimary)
+				)
 
-			await qb.delete()
+			await qb.execute()
 		}
 
 		public async executeComplex(joiningTable: Model.JoiningTable, dataCallback: QueryBuilder.Callback): Promise<void> {

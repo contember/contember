@@ -182,7 +182,7 @@ namespace InsertBuilder {
 		cte: { [alias: string]: QueryBuilder.Callback }
 		columns: InsertBuilder.Values | undefined
 		conflictAction: InsertBuilder.ConflictAction | undefined
-		returningColumn: Returning,
+		returningColumn: Returning
 		insertFrom: QueryBuilder.Callback | undefined
 	}
 

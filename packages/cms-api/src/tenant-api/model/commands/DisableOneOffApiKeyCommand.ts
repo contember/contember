@@ -6,14 +6,16 @@ class DisableOneOffApiKeyCommand implements Command<void> {
 	constructor(private readonly apiKeyId: string) {}
 
 	async execute(db: KnexWrapper): Promise<void> {
-		const qb = db.queryBuilder()
-		qb.table('api_key')
-		qb.where({
-			id: this.apiKeyId,
-			type: ApiKey.Type.ONE_OFF,
-		})
+		const qb = db
+			.updateBuilder()
+			.table('api_key')
+			.where({
+				id: this.apiKeyId,
+				type: ApiKey.Type.ONE_OFF,
+			})
+			.values({ enabled: false })
 
-		await qb.update({ enabled: false })
+		await qb.execute()
 	}
 }
 

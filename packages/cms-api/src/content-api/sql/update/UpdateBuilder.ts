@@ -56,7 +56,6 @@ export default class UpdateBuilder {
 
 	private async createUpdatePromise(blocker: PromiseLike<void>) {
 		await blocker
-		const qb = this.db.queryBuilder()
 
 		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
 		const resolvedData = this.rowData
@@ -66,42 +65,49 @@ export default class UpdateBuilder {
 			return null
 		}
 
-		qb.with('newData_', qb => {
-			resolvedData.forEach(value =>
-				qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName)
-			)
-			const columns = new Set(resolvedData.map(it => it.columnName))
-			const allColumns: string[] = Object.values(
-				acceptEveryFieldVisitor(this.schema, this.entity, {
-					visitColumn: (entity, column) => column.columnName,
-					visitManyHasOne: (entity, relation) => relation.joiningColumn.columnName,
-					visitOneHasOneOwner: (entity, relation) => relation.joiningColumn.columnName,
-					visitManyHasManyInversed: () => null,
-					visitManyHasManyOwner: () => null,
-					visitOneHasOneInversed: () => null,
-					visitOneHasMany: () => null,
-				})
-			).filter((it): it is string => it !== null)
+		const qb = this.db
+			.updateBuilder()
+			.with('newData_', qb => {
+				resolvedData.forEach(value =>
+					qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName)
+				)
+				const columns = new Set(resolvedData.map(it => it.columnName))
+				const allColumns: string[] = Object.values(
+					acceptEveryFieldVisitor(this.schema, this.entity, {
+						visitColumn: (entity, column) => column.columnName,
+						visitManyHasOne: (entity, relation) => relation.joiningColumn.columnName,
+						visitOneHasOneOwner: (entity, relation) => relation.joiningColumn.columnName,
+						visitManyHasManyInversed: () => null,
+						visitManyHasManyOwner: () => null,
+						visitOneHasOneInversed: () => null,
+						visitOneHasMany: () => null,
+					})
+				).filter((it): it is string => it !== null)
 
-			const remainingColumns = allColumns.filter(it => !columns.has(it))
-			qb.from(this.entity.tableName, 'root_')
+				const remainingColumns = allColumns.filter(it => !columns.has(it))
+				qb.from(this.entity.tableName, 'root_')
 
-			remainingColumns.forEach(columnName => qb.select(['root_', columnName]))
+				remainingColumns.forEach(columnName => qb.select(['root_', columnName]))
 
-			this.whereBuilder.build(qb, this.entity, new Path([]), this.uniqueWhere)
-		})
-
-		const columns: QueryBuilder.ColumnExpressionMap = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
-			(result: object, item) => ({ ...result, [item.columnName]: expr => expr.select(['newData_', item.columnName]) }),
-			{}
-		)
-
-		return await qb.updateFrom(this.entity.tableName, columns, qb => {
-			qb.from('newData_')
-			this.whereBuilder.build(qb, this.entity, new Path([], this.entity.tableName), {
-				and: [this.uniqueWhere, this.oldWhere],
+				this.whereBuilder.build(qb, this.entity, new Path([]), this.uniqueWhere)
 			})
-			this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
-		})
+			.table(this.entity.tableName)
+			.values(
+				resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
+					(result: object, item) => ({
+						...result,
+						[item.columnName]: expr => expr.select(['newData_', item.columnName]),
+					}),
+					{}
+				)
+			)
+			.from(qb => {
+				qb.from('newData_')
+				this.whereBuilder.build(qb, this.entity, new Path([], this.entity.tableName), {
+					and: [this.uniqueWhere, this.oldWhere],
+				})
+				this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
+			})
+		return await qb.execute()
 	}
 }

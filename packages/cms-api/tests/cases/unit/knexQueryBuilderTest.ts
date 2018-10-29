@@ -179,33 +179,54 @@ describe('knex query builder', () => {
 			parameters: ['123', '123'],
 		})
 	})
+	it('constructs simple update', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper
+					.updateBuilder()
+					.table('author')
+					.values({
+						title: 'Hello',
+					})
+					.where({ id: 12 })
+				await qb.execute()
+			},
+			sql: SQL`update "public"."author"
+      set "title" = $1
+      where "id" = $2`,
+			parameters: ['Hello', 12],
+		})
+	})
 
 	it('constructs update with cte', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.queryBuilder()
-				qb.with('root_', qb => {
-					qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
-					qb.select(expr => expr.selectValue(1, 'int'), 'id')
-					qb.select(expr => expr.selectValue(null, 'text'), 'content')
-				})
-				await qb.updateFrom(
-					'author',
-					{
+				const qb = wrapper
+					.updateBuilder()
+					.with('root_', qb => {
+						qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
+						qb.select(expr => expr.selectValue(1, 'int'), 'id')
+						qb.select(expr => expr.selectValue(null, 'text'), 'content')
+					})
+					.table('author')
+					.values({
 						id: expr => expr.select(['root_', 'id']),
 						title: expr => expr.select(['root_', 'title']),
-					},
-					qb => {
+					})
+					.from(qb => {
 						qb.table('root_')
-					}
-				)
+						qb.where({ foo: 'bar' })
+					})
+					.where({ id: 12 })
+				await qb.execute()
 			},
 			sql: SQL`with "root_" as (select
                                   $1 :: text as "title",
                                   $2 :: int as "id",
                                   $3 :: text as "content") update "public"."author"
-      set "id" = "root_"."id", "title" = "root_"."title" from "root_"`,
-			parameters: ['Hello', 1, null],
+      set "id" = "root_"."id", "title" = "root_"."title" from "root_"
+      where "foo" = $4 and "id" = $5`,
+			parameters: ['Hello', 1, null, 'bar', 12],
 		})
 	})
 

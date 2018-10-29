@@ -137,32 +137,7 @@ export default class SchemaMigrator {
 			visitColumn: (entity, column) => {
 				delete entity.fields[column.name]
 			},
-			visitManyHasOne: (entity, relation, {}, targetRelation) => {
-				delete entity.fields[relation.name]
-				if (targetRelation) {
-					delete this.schema.entities[targetRelation.target].fields[targetRelation.name]
-				}
-			},
-			visitOneHasMany: (entity, relation, {}, {}) => {
-				delete entity.fields[relation.name]
-			},
-			visitOneHasOneOwner: (entity, relation, {}, targetRelation) => {
-				delete entity.fields[relation.name]
-				delete entity.unique[relation.name]
-				if (targetRelation) {
-					delete this.schema.entities[targetRelation.target].fields[targetRelation.name]
-				}
-			},
-			visitOneHasOneInversed: (entity, relation, {}, {}) => {
-				delete entity.fields[relation.name]
-			},
-			visitManyHasManyOwner: (entity, column, {}, targetRelation) => {
-				delete entity.fields[column.name]
-				if (targetRelation) {
-					delete this.schema.entities[targetRelation.target].fields[targetRelation.name]
-				}
-			},
-			visitManyHasManyInversed: (entity, relation, {}, {}) => {
+			visitRelation: (entity, relation, targetEntity, targetRelation) => {
 				delete entity.fields[relation.name]
 			},
 		})

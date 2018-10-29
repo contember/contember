@@ -15,7 +15,9 @@ class Returning {
 	public parseResponse<ProcessedResult extends number | Returning.Result[]>(result: QueryResult): ProcessedResult {
 		const returningColumn = this.column
 		if (returningColumn) {
-			return (typeof returningColumn === 'string' ? result.rows.map(it => it[returningColumn]) : result) as ProcessedResult
+			return (typeof returningColumn === 'string'
+				? result.rows.map(it => it[returningColumn])
+				: result) as ProcessedResult
 		} else {
 			return result.rowCount as ProcessedResult
 		}

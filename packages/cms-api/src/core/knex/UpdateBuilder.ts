@@ -170,7 +170,7 @@ namespace UpdateBuilder {
 		tableName: string | undefined
 		cte: { [alias: string]: QueryBuilder.Callback }
 		columns: UpdateBuilder.Values | undefined
-		returningColumn:Returning
+		returningColumn: Returning
 		updateFrom: QueryBuilder.Callback | undefined
 		wheres: (Knex.Raw | { [columName: string]: Value })[]
 	}

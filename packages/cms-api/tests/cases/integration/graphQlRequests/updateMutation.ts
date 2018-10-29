@@ -391,7 +391,7 @@ describe('update', () => {
                              from "public"."author" as "root_"
                              where "root_"."id" = $1)`,
 							parameters: [testUuid(1)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
 					]),
@@ -630,7 +630,7 @@ describe('update', () => {
                              from "public"."post_locale" as "root_"
                              where "root_"."locale" = $1 and "root_"."post_id" = $2)`,
 							parameters: ['cs', testUuid(2)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
 					]),
@@ -1156,7 +1156,7 @@ describe('update', () => {
                              from "public"."site_setting" as "root_"
                              where "root_"."id" = $1)`,
 							parameters: [testUuid(1)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdateSiteSql,
 					]),
@@ -1480,7 +1480,7 @@ describe('update', () => {
                              from "public"."site" as "root_"
                              where "root_"."setting_id" = $1)`,
 							parameters: [testUuid(2)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1737,7 +1737,7 @@ describe('update', () => {
 							sql: SQL`delete from "public"."post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(2), testUuid(1)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						{
 							sql: SQL`delete from "public"."category"
@@ -1745,7 +1745,7 @@ describe('update', () => {
                              from "public"."category" as "root_"
                              where "root_"."id" = $1)`,
 							parameters: [testUuid(1)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
 					]),
@@ -1869,7 +1869,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
 					]),
@@ -1926,7 +1926,7 @@ describe('update', () => {
               values ($1, $2)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(2)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
 					]),
@@ -2044,7 +2044,7 @@ describe('update', () => {
 							sql: SQL`delete from "public"."post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(1), testUuid(2)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						{
 							sql: SQL`delete from "public"."post"
@@ -2052,7 +2052,7 @@ describe('update', () => {
                              from "public"."post" as "root_"
                              where "root_"."id" = $1)`,
 							parameters: [testUuid(1)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdateCategorySql,
 					]),
@@ -2084,7 +2084,7 @@ describe('update', () => {
 							sql: SQL`delete from "public"."post_categories"
               where "post_id" = $1 and "category_id" = $2`,
 							parameters: [testUuid(1), testUuid(2)],
-							response: 1,
+							response: { rowCount: 1 },
 						},
 						selectUpdateCategorySql,
 					]),

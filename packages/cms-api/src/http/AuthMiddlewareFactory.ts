@@ -21,7 +21,7 @@ class AuthMiddlewareFactory {
 
 			const [, token] = match
 			ctx.state.timer('fetching auth token info')
-			ctx.state.authResult = await this.apiKeyManager.verify(token)
+			ctx.state.authResult = await this.apiKeyManager.verifyAndProlong(token)
 			ctx.state.timer('done')
 			await next()
 		}

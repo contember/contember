@@ -4,6 +4,7 @@ import ApiKey from '../type/ApiKey'
 import { uuid } from '../../../utils/uuid'
 import { now } from '../../../utils/date'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
+import ApiKeyHelper from './ApiKeyHelper'
 
 class CreateApiKey implements Command<CreateApiKey.Result> {
 	constructor(private readonly type: ApiKey.Type, private readonly identityId: string) {}
@@ -22,7 +23,7 @@ class CreateApiKey implements Command<CreateApiKey.Result> {
 				type: this.type,
 				identity_id: this.identityId,
 				enabled: true,
-				expires_at: this.getExpiration(),
+				expires_at: ApiKeyHelper.getExpiration(this.type),
 				created_at: now(),
 			})
 			.execute()
@@ -40,18 +41,6 @@ class CreateApiKey implements Command<CreateApiKey.Result> {
 				}
 			})
 		})
-	}
-
-	private getExpiration(): Date | null {
-		switch (this.type) {
-			case ApiKey.Type.PERMANENT:
-				return null
-
-			case ApiKey.Type.SESSION:
-				return new Date(now().getTime() + 30 * 60 * 1000)
-			case ApiKey.Type.ONE_OFF:
-				return null
-		}
 	}
 }
 

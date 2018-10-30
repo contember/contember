@@ -68,7 +68,10 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 			((prevReq.state !== req.state && req.data !== prevReq.data) || this.state.id !== prevState.id)
 		) {
 			const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree, req.data)
-			accessTreeGenerator.generateLiveTree(newData => this.setState({ data: newData }))
+			accessTreeGenerator.generateLiveTree(newData => {
+				console.log('data', newData)
+				this.setState({ data: newData })
+			})
 		}
 	}
 

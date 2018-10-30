@@ -15,7 +15,7 @@ export interface FieldProps {
 	children?: (data: FieldAccessor<any>) => React.ReactNode
 }
 
-export default class Field extends React.Component<FieldProps> {
+class Field extends React.Component<FieldProps> {
 	public static displayName = 'Field'
 
 	public render() {
@@ -31,7 +31,7 @@ export default class Field extends React.Component<FieldProps> {
 										const fieldData = data.data.getField(fieldName)
 
 										if (this.props.children && fieldData instanceof FieldAccessor) {
-											return this.props.children(fieldData)
+											return <Field.FieldInner accessor={fieldData}>{this.props.children}</Field.FieldInner>
 										}
 									}
 									throw new DataBindingError('Corrupted data')
@@ -49,5 +49,20 @@ export default class Field extends React.Component<FieldProps> {
 		return new FieldMarker(props.name)
 	}
 }
+
+namespace Field {
+	export interface FieldInnerProps {
+		accessor: FieldAccessor
+		children: (data: FieldAccessor<any>) => React.ReactNode
+	}
+
+	export class FieldInner extends React.PureComponent<FieldInnerProps> {
+		public render() {
+			return this.props.children(this.props.accessor)
+		}
+	}
+}
+
+export default Field
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof Field, FieldMarkerProvider>

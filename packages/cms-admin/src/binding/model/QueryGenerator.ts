@@ -86,7 +86,6 @@ export default class QueryGenerator {
 			if (fieldValue instanceof FieldMarker) {
 				builder = builder.column(fieldValue.fieldName)
 			} else if (fieldValue instanceof ReferenceMarker) {
-				console.log('ss', fieldValue)
 				for (const referenceName in fieldValue.references) {
 					const reference = fieldValue.references[referenceName]
 

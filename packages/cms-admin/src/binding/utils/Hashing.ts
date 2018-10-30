@@ -1,15 +1,16 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
+import ReferenceMarker from '../dao/ReferenceMarker'
 
 export default class Hashing {
-	public static hashWhere(
-		...where: Array<
-			Input.Where<GraphQlBuilder.Literal> | Input.UniqueWhere<GraphQlBuilder.Literal> | Input.Where | undefined
-		>
-	): number {
-		if (where.length === 0) {
-			return 0
-		}
+	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
+		const where: Array<
+			| Input.Where<GraphQlBuilder.Literal>
+			| Input.UniqueWhere<GraphQlBuilder.Literal>
+			| Input.Where
+			| undefined
+			| ReferenceMarker.ExpectedCount
+		> = [constraints.where, constraints.reducedBy, constraints.expectedCount]
 
 		const json = where.map(item => JSON.stringify(item)).join('')
 		return Hashing.hash(json)

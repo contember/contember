@@ -1,13 +1,7 @@
-import { FieldName } from '../bindingTypes'
-import { DataContextValue } from '../coreComponents/DataContext'
-import EntityCollectionAccessor from './EntityCollectionAccessor'
-
-export type FieldData = DataContextValue | EntityCollectionAccessor
-
-export type EntityData = { [name in FieldName]: FieldData }
+import EntityData from './EntityData'
 
 export default class EntityAccessor {
-	constructor(
+	public constructor(
 		public readonly primaryKey: string | undefined,
 		public readonly data: EntityData,
 		public readonly replaceWith: (replacement: EntityAccessor) => void,

@@ -7,7 +7,6 @@ import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityFields from '../dao/EntityFields'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import ReferenceMarker from '../dao/ReferenceMarker'
-import PlaceholderGenerator from '../model/PlaceholderGenerator'
 import DataContext, { DataContextValue } from './DataContext'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
@@ -25,7 +24,11 @@ export default class ToMany extends React.Component<ToManyProps> {
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
-						const field = data.data[PlaceholderGenerator.getReferencePlaceholder(this.props.field, this.props.where)]
+						const field = data.data.getField(
+							this.props.field,
+							ReferenceMarker.ExpectedCount.PossiblyMany,
+							this.props.where
+						)
 
 						if (field instanceof EntityCollectionAccessor) {
 							return field.entities.map(

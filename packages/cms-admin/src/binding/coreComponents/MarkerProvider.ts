@@ -21,7 +21,7 @@ export interface MarkerTreeRootProvider extends DataBindingComponent {
 }
 
 export interface ReferenceMarkerProvider extends DataBindingComponent {
-	generateReferenceMarker: (props: any, fields: ReferenceMarker['fields'], environment: Environment) => ReferenceMarker
+	generateReferenceMarker: (props: any, fields: ReferenceMarker.Reference['fields'], environment: Environment) => ReferenceMarker
 }
 
 export interface SyntheticChildrenProvider extends DataBindingComponent {

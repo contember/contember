@@ -14,7 +14,6 @@ import DataBindingError from '../../dao/DataBindingError'
 import EntityAccessor from '../../dao/EntityAccessor'
 import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
 import FieldAccessor from '../../dao/FieldAccessor'
-import PlaceholderGenerator from '../../model/PlaceholderGenerator'
 
 export interface SelectFieldProps {
 	name: FieldName
@@ -32,8 +31,8 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 			<DataContext.Consumer>
 				{(data: DataContextValue) => {
 					if (data instanceof EntityAccessor) {
-						const fieldAccessor = data.data[PlaceholderGenerator.getMarkerTreePlaceholder(this.props.name)]
-						const currentValueEntity = data.data[PlaceholderGenerator.getFieldPlaceholder(this.props.name)]
+						const fieldAccessor = data.data.getTreeRoot(this.props.name)
+						const currentValueEntity = data.data.getField(this.props.name)
 
 						// TODO this fails when `currentValueEntity` is `null` which may legitimately happen.
 						if (!(fieldAccessor instanceof AccessorTreeRoot) || !(currentValueEntity instanceof EntityAccessor)) {
@@ -57,7 +56,7 @@ export default class SelectField extends React.Component<SelectFieldProps> {
 											newAccessor && currentValueEntity.replaceWith(newAccessor)
 										}}
 										options={normalizedData.map(datum => {
-											const optionField = datum.data[this.props.optionFieldName]
+											const optionField = datum.data.getField(this.props.optionFieldName)
 
 											if (!(optionField instanceof FieldAccessor)) {
 												throw new DataBindingError('Corrupted data')

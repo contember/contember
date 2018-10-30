@@ -1,5 +1,3 @@
-import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
 import { FieldName } from '../bindingTypes'
 import FieldMarker from '../dao/FieldMarker'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
@@ -18,24 +16,22 @@ export default class PlaceholderGenerator {
 	//
 
 	public static generateReferenceMarkerPlaceholder(marker: ReferenceMarker): string {
-		return PlaceholderGenerator.getReferencePlaceholder(marker.fieldName, marker.where, marker.reducedBy)
+		return marker.fieldName
 	}
 
-	public static getReferencePlaceholder(
-		fieldName: FieldName,
-		where?: Input.Where<GraphQlBuilder.Literal>,
-		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
-	): string {
-		return where || reducedBy ? `${fieldName}_${Hashing.hashWhere(where, reducedBy)}` : fieldName
+	public static getReferencePlaceholder(fieldName: FieldName, reference: ReferenceMarker.ReferenceConstraints): string {
+		return `${fieldName}_${Hashing.hashReferenceConstraints(reference)}`
 	}
 
 	//
 
 	public static generateMarkerTreeRootPlaceholder(marker: MarkerTreeRoot): string {
-		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.associatedField, marker.id)
+		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.associatedField || marker.id)
 	}
 
-	public static getMarkerTreePlaceholder(associatedField: FieldName | undefined, id?: MarkerTreeRoot.TreeId): string {
-		return associatedField ? `${associatedField}__data` : `__root_${id}`
+	public static getMarkerTreePlaceholder(associatedField: FieldName): string
+	public static getMarkerTreePlaceholder(id: MarkerTreeRoot.TreeId): string
+	public static getMarkerTreePlaceholder(identifier: FieldName | MarkerTreeRoot.TreeId): string {
+		return `root_${identifier}`
 	}
 }

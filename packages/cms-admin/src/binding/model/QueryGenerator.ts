@@ -86,37 +86,42 @@ export default class QueryGenerator {
 			if (fieldValue instanceof FieldMarker) {
 				builder = builder.column(fieldValue.fieldName)
 			} else if (fieldValue instanceof ReferenceMarker) {
-				let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
-				let relationField
+				console.log('ss', fieldValue)
+				for (const referenceName in fieldValue.references) {
+					const reference = fieldValue.references[referenceName]
 
-				if (fieldValue.where) {
-					subBuilder = subBuilder.where(fieldValue.where)
-				}
+					let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
+					let relationField
 
-				if (fieldValue.reducedBy) {
-					// Assuming there's exactly one as enforced by MarkerTreeGenerator
-					const reducerFields = Object.keys(fieldValue.reducedBy)
-
-					subBuilder = subBuilder.by(fieldValue.reducedBy)
-					relationField = `${fieldValue.fieldName}By${ucfirst(reducerFields[0])}`
-				} else {
-					relationField = fieldValue.fieldName
-				}
-
-				for (const item of this.registerListQueryPart(fieldValue.fields, subBuilder)) {
-					if (item instanceof CrudQueryBuilder.ListQueryBuilder) {
-						// This branch will only get executed at most once per recursive call
-						subBuilder = new CrudQueryBuilder.ListQueryBuilder(item.objectBuilder)
-					} else {
-						yield item
+					if (reference.where) {
+						subBuilder = subBuilder.where(reference.where)
 					}
-				}
 
-				builder = builder.relation(
-					relationField,
-					subBuilder,
-					placeholderName === relationField ? undefined : placeholderName
-				)
+					if (reference.reducedBy) {
+						// Assuming there's exactly one as enforced by MarkerTreeGenerator
+						const reducerFields = Object.keys(reference.reducedBy)
+
+						subBuilder = subBuilder.by(reference.reducedBy)
+						relationField = `${fieldValue.fieldName}By${ucfirst(reducerFields[0])}`
+					} else {
+						relationField = fieldValue.fieldName
+					}
+
+					for (const item of this.registerListQueryPart(reference.fields, subBuilder)) {
+						if (item instanceof CrudQueryBuilder.ListQueryBuilder) {
+							// This branch will only get executed at most once per recursive call
+							subBuilder = new CrudQueryBuilder.ListQueryBuilder(item.objectBuilder)
+						} else {
+							yield item
+						}
+					}
+
+					builder = builder.relation(
+						relationField,
+						subBuilder,
+						placeholderName === relationField ? undefined : referenceName
+					)
+				}
 			} else {
 				yield fieldValue
 			}

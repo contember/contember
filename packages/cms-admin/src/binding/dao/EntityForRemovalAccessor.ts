@@ -1,4 +1,5 @@
-import EntityAccessor, { EntityData } from './EntityAccessor'
+import EntityAccessor from './EntityAccessor'
+import EntityData from './EntityData'
 
 export default class EntityForRemovalAccessor {
 	constructor(

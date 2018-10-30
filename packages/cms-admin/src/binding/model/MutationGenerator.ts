@@ -144,8 +144,9 @@ export default class MutationGenerator {
 		currentData: EntityAccessor,
 		builder: CrudQueryBuilder.CreateDataBuilder
 	): CrudQueryBuilder.CreateDataBuilder {
-		for (const placeholderName in currentData.data) {
-			const accessor = currentData.data[placeholderName]
+		const allData = currentData.data.allFieldData
+		for (const placeholderName in allData) {
+			const accessor = allData[placeholderName]
 
 			if (accessor instanceof FieldAccessor) {
 				if (accessor.currentValue !== null) {
@@ -195,9 +196,10 @@ export default class MutationGenerator {
 		persistedData: ReceivedEntityData<undefined>,
 		builder: CrudQueryBuilder.UpdateDataBuilder
 	): CrudQueryBuilder.UpdateDataBuilder {
-		for (const placeholderName in currentData.data) {
+		const allData = currentData.data.allFieldData
+		for (const placeholderName in allData) {
 			const persistedField = persistedData ? persistedData[placeholderName] : undefined
-			const accessor = currentData.data[placeholderName]
+			const accessor = allData[placeholderName]
 
 			if (accessor instanceof FieldAccessor) {
 				if (persistedField !== accessor.currentValue && persistedField !== undefined) {

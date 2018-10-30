@@ -16,7 +16,7 @@ export interface ToManyProps {
 	where?: Input.Where<GraphQlBuilder.Literal>
 }
 
-export default class ToMany extends React.Component<ToManyProps> {
+class ToMany extends React.Component<ToManyProps> {
 	static displayName = 'ToMany'
 
 	public render() {
@@ -31,14 +31,7 @@ export default class ToMany extends React.Component<ToManyProps> {
 						)
 
 						if (field instanceof EntityCollectionAccessor) {
-							return field.entities.map(
-								(datum: EntityAccessor | EntityForRemovalAccessor | undefined, i: number) =>
-									datum instanceof EntityAccessor && (
-										<DataContext.Provider value={datum} key={i}>
-											{this.props.children}
-										</DataContext.Provider>
-									)
-							)
+							return <ToMany.ToManyInner accessor={field}>{this.props.children}</ToMany.ToManyInner>
 						}
 					}
 				}}
@@ -50,5 +43,26 @@ export default class ToMany extends React.Component<ToManyProps> {
 		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.where)
 	}
 }
+
+namespace ToMany {
+	export interface ToManyInnerProps {
+		accessor: EntityCollectionAccessor
+	}
+
+	export class ToManyInner extends React.PureComponent<ToManyInnerProps> {
+		public render() {
+			return this.props.accessor.entities.map(
+				(datum: EntityAccessor | EntityForRemovalAccessor | undefined, i: number) =>
+					datum instanceof EntityAccessor && (
+						<DataContext.Provider value={datum} key={i}>
+							{this.props.children}
+						</DataContext.Provider>
+					)
+			)
+		}
+	}
+}
+
+export default ToMany
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof ToMany, ReferenceMarkerProvider>

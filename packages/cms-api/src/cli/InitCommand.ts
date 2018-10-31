@@ -10,6 +10,7 @@ import QueryHandler from '../core/query/QueryHandler'
 import LatestMigrationByCurrentEventQuery from './model/queries/LatestMigrationByCurrentEventQuery'
 import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
+import FileNameHelper from '../migrations/FileNameHelper'
 
 const fs = require('fs')
 const exists = promisify(fs.exists)
@@ -114,7 +115,7 @@ class Initialize {
 			const currentMigration = await handler.fetch(new LatestMigrationByCurrentEventQuery(currentStageRow.event_id))
 			const currentMigrationFile = currentMigration === null ? '' : currentMigration.data.file
 
-			if (currentMigrationFile > `${stage.migration}.sql`) {
+			if (currentMigrationFile.substring(0, FileNameHelper.prefixLength) > `${stage.migration}`) {
 				throw new Error(
 					`Cannot revert to migration ${stage.migration} in project ${this.project.slug} (stage ${
 						stage.slug

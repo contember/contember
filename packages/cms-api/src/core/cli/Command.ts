@@ -21,13 +21,13 @@ abstract class Command<Args extends Command.Arguments, Options extends Command.O
 		return this.getConfiguration().getName()
 	}
 
-	protected abstract async execute(input: Command.Input): Promise<void>
+	protected abstract async execute(input: Command.Input): Promise<void | true>
 
-	public async run(args: string[]) {
+	public async run(args: string[]): Promise<boolean> {
 		const parser = this.getConfiguration().createParser()
 		const input = parser.parse(args, false)
-		await this.execute(input)
-
+		const result = await this.execute(input)
+		return result || false
 	}
 }
 

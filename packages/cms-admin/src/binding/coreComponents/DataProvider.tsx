@@ -45,7 +45,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 		const data = this.state.id ? this.props.requests[this.state.id].data : undefined
 
 		if (this.state.data) {
-			const generator = new MutationGenerator(data, this.state.data)
+			const generator = new MutationGenerator(data, this.state.data, this.props.markerTree)
 			const mutation = generator.getPersistMutation()
 
 			console.log('mutation', mutation)

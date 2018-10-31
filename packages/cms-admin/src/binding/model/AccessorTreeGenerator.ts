@@ -47,13 +47,24 @@ export default class AccessorTreeGenerator {
 						entityAccessors[i] = newEntityAccessor
 
 						updateData(createAccessorTreeRoot())
+					},
+					() => {
+						const primaryKey = entityAccessors[i].primaryKey
+						if (primaryKey) {
+							entityAccessors[i] = new EntityForRemovalAccessor(
+								primaryKey,
+								entityAccessors[i].data,
+								entityAccessors[i].replaceWith
+							)
+							updateData(createAccessorTreeRoot())
+						}
 					}
 				)
 			)
 			return createAccessorTreeRoot()
 		} else {
 			const createAccessorTreeRoot = (): AccessorTreeRoot => new AccessorTreeRoot(tree, entityAccessor, tree.entityName)
-			let entityAccessor: EntityAccessor = this.updateFields(
+			let entityAccessor: EntityAccessor | EntityForRemovalAccessor = this.updateFields(
 				data,
 				tree.fields,
 				(fieldName, newData) => {
@@ -65,6 +76,16 @@ export default class AccessorTreeGenerator {
 					entityAccessor = newEntityAccessor
 
 					updateData(createAccessorTreeRoot())
+				},
+				() => {
+					if (entityAccessor.primaryKey) {
+						entityAccessor = new EntityForRemovalAccessor(
+							entityAccessor.primaryKey,
+							entityAccessor.data,
+							entityAccessor.replaceWith
+						)
+						updateData(createAccessorTreeRoot())
+					}
 				}
 			)
 			return createAccessorTreeRoot()

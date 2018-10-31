@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { parseConfig } from '../tenant-api/config'
 import { promisify } from 'util'
 import * as Knex from 'knex'
 import { uuid } from '../utils/uuid'
@@ -9,7 +8,8 @@ import StageByIdForUpdateQuery from './model/queries/StageByIdForUpdateQuery'
 import KnexQueryable from '../core/knex/KnexQueryable'
 import QueryHandler from '../core/query/QueryHandler'
 import LatestMigrationByCurrentEventQuery from './model/queries/LatestMigrationByCurrentEventQuery'
-import Command from '../core/cli/Command'
+import BaseCommand from './BaseCommand'
+import CommandConfiguration from '../core/cli/CommandConfiguration'
 
 const fs = require('fs')
 const exists = promisify(fs.exists)
@@ -18,13 +18,6 @@ const readDir = promisify(fs.readdir)
 const readFile = promisify(fs.readFile)
 
 const identityId = '11111111-1111-1111-1111-111111111111'
-const configFileName = process.argv[2]
-const projectsDir = process.argv[3]
-
-if (typeof configFileName === 'undefined' || typeof projectsDir === 'undefined') {
-	console.log(`Usage: node ${process.argv[1]} path/to/config.yaml path/to/projectsDir`)
-	process.exit(1)
-}
 
 class Initialize {
 	constructor(
@@ -32,7 +25,8 @@ class Initialize {
 		private readonly projectDb: KnexConnection,
 		private readonly project: Project,
 		private readonly migrationsDir: string
-	) {}
+	) {
+	}
 
 	public async createOrUpdateProject() {
 		await this.tenantDb.wrapper().raw(
@@ -124,7 +118,7 @@ class Initialize {
 				throw new Error(
 					`Cannot revert to migration ${stage.migration} in project ${this.project.slug} (stage ${
 						stage.slug
-					}). Current migration is ${currentMigrationFile}`
+						}). Current migration is ${currentMigrationFile}`
 				)
 			}
 
@@ -168,25 +162,18 @@ class Initialize {
 	}
 }
 
-interface Args {
+type Args = {
 	configFileName: string
 	projectsDir: string
 }
 
-const command = new class extends Command<Args> {
-	protected parseArguments(argv: string[]): Args {
-		const configFileName = argv[2]
-		const projectsDir = argv[3]
-		if (typeof configFileName === 'undefined' || typeof projectsDir === 'undefined') {
-			throw new Command.InvalidArgumentError(`Usage: node ${argv[1]} path/to/config.yaml path/to/projectsDir`)
-		}
-		return { configFileName, projectsDir }
+class InitCommand extends BaseCommand<Args, {}> {
+	protected configure(configuration: CommandConfiguration): void {
+		configuration.name('init')
 	}
 
-	protected async execute({ configFileName, projectsDir }: Args): Promise<void> {
-		const file = await readFile(configFileName, { encoding: 'utf8' })
-
-		const config = parseConfig(file)
+	protected async execute(): Promise<void> {
+		const config = await this.readConfig()
 
 		const tenantDb = new KnexConnection(
 			Knex({
@@ -199,7 +186,7 @@ const command = new class extends Command<Args> {
 
 		await Promise.all(
 			config.projects.map(async project => {
-				const migrationsDir = `${projectsDir}/${project.slug}/migrations`
+				const migrationsDir = `${this.getGlobalOptions().projectsDirectory}/${project.slug}/migrations`
 				const projectDb = new KnexConnection(
 					Knex({
 						debug: false,
@@ -218,5 +205,6 @@ const command = new class extends Command<Args> {
 			})
 		)
 	}
-}()
-command.run()
+}
+
+export default InitCommand

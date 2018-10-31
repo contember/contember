@@ -1,28 +1,53 @@
-abstract class Command<Args> {
-	protected abstract parseArguments(argv: string[]): Args
+import CommandConfiguration from './CommandConfiguration'
+import InputParser from './InputParser'
 
-	protected abstract async execute(args: Args): Promise<void>
+abstract class Command<Args extends Command.Arguments, Options extends Command.Options> {
 
-	public async run() {
-		let args: Args
-		try {
-			args = this.parseArguments(process.argv)
-			await this.execute(args)
-		} catch (e) {
-			if (e instanceof Command.InvalidArgumentError) {
-				console.error(e.message)
-				process.exit(1)
-			} else {
-				console.error(e)
-				process.exit(2)
-			}
+	private configuration: CommandConfiguration | undefined
+
+	protected abstract configure(configuration: CommandConfiguration): void
+
+	public getConfiguration(): CommandConfiguration {
+		if (this.configuration === undefined) {
+			const configuration = new CommandConfiguration()
+			this.configure(configuration)
+			configuration.validate()
+			this.configuration = configuration
 		}
-		process.exit(0)
+		return this.configuration
+	}
+
+	public getName(): string {
+		return this.getConfiguration().getName()
+	}
+
+	protected abstract async execute(input: Command.Input): Promise<void>
+
+	public async run(args: string[]) {
+		const parser = this.getConfiguration().createParser()
+		const input = parser.parse(args, false)
+		await this.execute(input)
+
 	}
 }
 
 namespace Command {
-	export class InvalidArgumentError extends Error {}
+
+	export type Arguments = { [name: string]: string | string[] | undefined }
+	export type Options = { [name: string]: string | boolean | string[] | undefined }
+
+	export class Input<Args extends Arguments = Arguments, Opts extends Options = Options> {
+		constructor(private readonly args: Args, private readonly options: Opts, public readonly rest: string[]) {
+		}
+
+		getOption<Name extends keyof Opts>(name: Name): Opts[Name] {
+			return this.options[name]
+		}
+
+		getArgument<Name extends keyof Args>(name: Name): Args[Name] {
+			return this.args[name]
+		}
+	}
 }
 
 export default Command

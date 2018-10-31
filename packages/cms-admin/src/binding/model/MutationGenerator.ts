@@ -285,19 +285,23 @@ export default class MutationGenerator {
 					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
 						if (
 							(accessor instanceof EntityAccessor || accessor instanceof EntityForRemovalAccessor) &&
-							(persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField) || persistedField === undefined)
+							((persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField)) ||
+								(persistedField === undefined || persistedField === null))
 						) {
-							accessorReference.push({ accessor, reference, persistedField })
+							accessorReference.push({ accessor, reference, persistedField: persistedField || undefined })
 
 							if (reference.reducedBy === undefined) {
 								unreducedHasOnePresent = true
 							}
 						}
 					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
-						if (accessor instanceof EntityCollectionAccessor && Array.isArray(persistedField)) {
+						if (
+							accessor instanceof EntityCollectionAccessor &&
+							(Array.isArray(persistedField) || persistedField === undefined || persistedField === null)
+						) {
 							for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {
 								const innerAccessor = accessor.entities[i]
-								const innerField = persistedField[i]
+								const innerField = persistedField ? persistedField[i] : undefined
 								if (innerAccessor) {
 									accessorReference.push({ accessor: innerAccessor, reference, persistedField: innerField })
 								}

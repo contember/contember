@@ -4,6 +4,7 @@ import PageLink, { AnyParams, PageConfig } from '../../../components/pageRouting
 import DataContext, { DataContextValue } from '../../coreComponents/DataContext'
 import DataBindingError from '../../dao/DataBindingError'
 import EntityAccessor from '../../dao/EntityAccessor'
+import EntityForRemovalAccessor from '../../dao/EntityForRemovalAccessor'
 
 interface PageLinkByIdProps<P extends AnyParams> {
 	change: (id: string) => PageConfig<P, keyof P>
@@ -25,8 +26,11 @@ export default class PageLinkById<P extends AnyParams> extends React.Component<P
 								</PageLink>
 							)
 						}
+					} else if (data instanceof EntityForRemovalAccessor) {
+						// Do nothing
+					} else {
+						throw new DataBindingError('Corrupted data')
 					}
-					throw new DataBindingError('Corrupted data')
 				}}
 			</DataContext.Consumer>
 		)

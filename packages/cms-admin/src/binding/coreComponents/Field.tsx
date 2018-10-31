@@ -2,6 +2,7 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import DataBindingError from '../dao/DataBindingError'
 import EntityAccessor from '../dao/EntityAccessor'
+import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import FieldAccessor from '../dao/FieldAccessor'
 import FieldMarker from '../dao/FieldMarker'
 import Parser from '../queryLanguage/Parser'
@@ -33,8 +34,11 @@ class Field extends React.Component<FieldProps> {
 										if (this.props.children && fieldData instanceof FieldAccessor) {
 											return <Field.FieldInner accessor={fieldData}>{this.props.children}</Field.FieldInner>
 										}
+									} else if (data instanceof EntityForRemovalAccessor) {
+										// Do nothing
+									} else {
+										throw new DataBindingError('Corrupted data')
 									}
-									throw new DataBindingError('Corrupted data')
 								}}
 							</DataContext.Consumer>
 						),

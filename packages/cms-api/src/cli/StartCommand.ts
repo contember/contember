@@ -15,31 +15,36 @@ class StartCommand extends BaseCommand<{}, {}> {
 	}
 
 	protected async execute(): Promise<true> {
-
 		const config = await this.readConfig()
 
 		const projectsDirectory = this.getGlobalOptions().projectsDirectory
-		const projects: Array<Project> = await Promise.all(config.projects.map(async (project): Promise<Project> => {
+		const projects: Array<Project> = await Promise.all(
+			config.projects.map(
+				async (project): Promise<Project> => {
+					const migrationsFileManager = MigrationFilesManager.createForProject(projectsDirectory, project.slug)
+					const diffs = (await migrationsFileManager.readFiles('json')).map(it => ({
+						name: it.filename,
+						diff: JSON.parse(it.content),
+					}))
 
-			const migrationsFileManager = MigrationFilesManager.createForProject(projectsDirectory, project.slug)
-			const diffs = (await migrationsFileManager.readFiles('json'))
-				.map(it => ({ name: it.filename, diff: JSON.parse(it.content) }))
-
-			const modelFile = `${this.getGlobalOptions().workingDirectory}/dist/src/projects/${project.slug}/src/model.js`
-			const acl = (await import(modelFile)).default.acl
-			return {
-				...project,
-				stages: project.stages.map((stage) => {
-					const model = diffs.filter(({ name }) => name.substring(0, FileNameHelper.prefixLength) <= stage.migration)
-						.map(({ diff }) => diff)
-						.reduce<Model.Schema>((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
+					const modelFile = `${this.getGlobalOptions().workingDirectory}/dist/src/projects/${project.slug}/src/model.js`
+					const acl = (await import(modelFile)).default.acl
 					return {
-						...stage,
-						schema: { model, acl }
+						...project,
+						stages: project.stages.map(stage => {
+							const model = diffs
+								.filter(({ name }) => name.substring(0, FileNameHelper.prefixLength) <= stage.migration)
+								.map(({ diff }) => diff)
+								.reduce<Model.Schema>((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
+							return {
+								...stage,
+								schema: { model, acl },
+							}
+						}),
 					}
-				})
-			}
-		}))
+				}
+			)
+		)
 		const compositionRoot = new CompositionRoot()
 		const httpServer = compositionRoot.composeServer(config.tenant.db, projects)
 		httpServer.listen(Number.parseInt(String(config.server.port)), () => {

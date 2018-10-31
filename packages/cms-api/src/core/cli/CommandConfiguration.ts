@@ -3,7 +3,6 @@ import Option from './Option'
 import InputParser from './InputParser'
 import UsageFormatter from './UsageFormatter'
 
-
 class CommandConfiguration {
 	private nameValue: string | undefined
 
@@ -40,7 +39,9 @@ class CommandConfiguration {
 		let hasOptional = false
 		for (let argument of this.arguments) {
 			if (hasOptional && !argument.optional) {
-				throw new CommandConfiguration.InvalidConfigurationError(`Required argument ${argument.name} cannot follow an optional `)
+				throw new CommandConfiguration.InvalidConfigurationError(
+					`Required argument ${argument.name} cannot follow an optional `
+				)
 			}
 			if (hasVariadic) {
 				throw new CommandConfiguration.InvalidConfigurationError(`A variadic argument must be the last`)
@@ -69,10 +70,7 @@ class CommandConfiguration {
 }
 
 namespace CommandConfiguration {
-	export class InvalidConfigurationError extends Error {
-	}
-
-
+	export class InvalidConfigurationError extends Error {}
 }
 
 export default CommandConfiguration

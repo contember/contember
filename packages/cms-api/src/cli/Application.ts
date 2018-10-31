@@ -5,8 +5,7 @@ import Command from '../core/cli/Command'
 import UsageFormatter from '../core/cli/UsageFormatter'
 
 class Application {
-	constructor(private readonly commands: BaseCommand<any, any>[]) {
-	}
+	constructor(private readonly commands: BaseCommand<any, any>[]) {}
 
 	async run(args: string[]): Promise<void> {
 		const [{}, consoleCommand, ...commandArgs] = args
@@ -33,8 +32,8 @@ class Application {
 		const inputParser = new InputParser([], globalOptions)
 
 		type GlobalOptions = {
-			['working-directory']: string | undefined,
-			['config-file']: string | undefined,
+			['working-directory']: string | undefined
+			['config-file']: string | undefined
 			['projects-directory']: string | undefined
 		}
 		let globalInput: Command.Input<{}, GlobalOptions>
@@ -66,7 +65,6 @@ class Application {
 		const configFile = globalInput.getOption('config-file') || `${workingDirectory}/src/config/config.yaml`
 		const projectsDirectory = globalInput.getOption('projects-directory') || `${workingDirectory}/src/projects/`
 
-
 		const command = this.commands.find(it => it.getName() === name)
 		if (!command) {
 			const err = new Error(`Undefined command ${name}`)
@@ -77,7 +75,7 @@ class Application {
 		command.setGlobalOptions({ workingDirectory, configFile, projectsDirectory })
 
 		try {
-			const result  = await command.run(rest)
+			const result = await command.run(rest)
 			if (!result) {
 				return process.exit(0)
 			}

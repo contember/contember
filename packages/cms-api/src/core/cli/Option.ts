@@ -6,7 +6,6 @@ type Option = {
 	mode: Option.Mode
 }
 
-
 namespace Option {
 	export enum Mode {
 		VALUE_NONE = 'value_none',
@@ -15,10 +14,8 @@ namespace Option {
 		VALUE_ARRAY = 'value_array',
 	}
 
-
 	export class Configuration {
-		constructor(private readonly option: Option) {
-		}
+		constructor(private readonly option: Option) {}
 
 		public shortcut(shortcut: string) {
 			this.option.shortcut = shortcut

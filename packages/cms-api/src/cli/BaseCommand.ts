@@ -1,6 +1,6 @@
 import Command from '../core/cli/Command'
-import { readFile } from "fs"
-import { promisify } from "util"
+import { readFile } from 'fs'
+import { promisify } from 'util'
 import { Config, parseConfig } from '../tenant-api/config'
 
 const fsRead = promisify(readFile)
@@ -11,8 +11,10 @@ interface GlobalOptions {
 	configFile: string
 }
 
-abstract class BaseCommand<Args extends Command.Arguments, Options extends Command.Options> extends Command<Args, Options> {
-
+abstract class BaseCommand<Args extends Command.Arguments, Options extends Command.Options> extends Command<
+	Args,
+	Options
+> {
 	private config: Config | undefined
 
 	private globalOptions: GlobalOptions | undefined

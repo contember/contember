@@ -28,14 +28,14 @@ class ProjectMigrationsDiffCommand extends BaseCommand<Args, {}> {
 		const migrationsFileManager = MigrationFilesManager.createForProject(this.getGlobalOptions().projectsDirectory, projectName)
 		await migrationsFileManager.createDirIfNotExist()
 
-		const modelDir = `${this.getGlobalOptions().workingDirectory}/dist/src/projects/${projectName}/src/model.js`
+		const modelFile = `${this.getGlobalOptions().workingDirectory}/dist/src/projects/${projectName}/src/model.js`
 
 		const diffs = (await migrationsFileManager.readFiles('json'))
 			.map(it => JSON.parse(it.content))
 
 		const currentSchema = diffs.reduce((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
 
-		const newSchema = await import(modelDir)
+		const newSchema = await import(modelFile)
 
 		const diff = diffSchemas(currentSchema, newSchema.default.model)
 		if (diff === null) {

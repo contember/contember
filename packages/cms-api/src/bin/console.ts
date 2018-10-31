@@ -6,6 +6,7 @@ import EngineMigrationsContinueCommand from '../cli/EngineMigrationsContinueComm
 import EngineMigrationsCreateCommand from '../cli/EngineMigrationsCreateCommand'
 import InitCommand from '../cli/InitCommand'
 import DropCommand from '../cli/DropCommand'
+import StartCommand from '../cli/StartCommand'
 
 const application = new Application([
 	new EngineMigrationsCreateCommand(),
@@ -13,5 +14,11 @@ const application = new Application([
 	new EngineMigrationsContinueCommand(),
 	new InitCommand(),
 	new DropCommand(),
+	new StartCommand(),
 ])
-application.run(process.argv)
+
+application.run(process.argv).catch(e => {
+	console.log(e)
+	process.exit(1)
+})
+

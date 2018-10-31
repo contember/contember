@@ -1,6 +1,8 @@
 import { zeroPad } from '../utils/zeroPad'
 
 class FileNameHelper {
+	public static prefixLength = 'YYYY-MM-DD-HHIISS'.length
+
 	public static createFileName(name: string, extension: string): string {
 		return `${FileNameHelper.createTimePrefix()}-${name}.${extension}`
 	}

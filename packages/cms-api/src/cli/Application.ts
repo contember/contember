@@ -8,7 +8,7 @@ class Application {
 	constructor(private readonly commands: BaseCommand<any, any>[]) {
 	}
 
-	async run(args: string[]): Promise<never> {
+	async run(args: string[]): Promise<void> {
 		const [{}, consoleCommand, ...commandArgs] = args
 		const globalOptions: Option[] = [
 			{
@@ -77,7 +77,10 @@ class Application {
 		command.setGlobalOptions({ workingDirectory, configFile, projectsDirectory })
 
 		try {
-			await command.run(rest)
+			const result  = await command.run(rest)
+			if (!result) {
+				return process.exit(0)
+			}
 		} catch (e) {
 			if (e instanceof InputParser.InvalidInputError) {
 				console.error(e.message)
@@ -87,7 +90,6 @@ class Application {
 				return process.exit(2)
 			}
 		}
-		return process.exit(0)
 	}
 }
 

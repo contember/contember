@@ -7,10 +7,8 @@ type Argument = {
 }
 
 namespace Argument {
-
 	export class Configuration {
-		constructor(private readonly options: Argument) {
-		}
+		constructor(private readonly options: Argument) {}
 
 		public optional(optional: boolean = true) {
 			this.options.optional = optional

@@ -4,7 +4,6 @@ import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 
 class DropCommand extends BaseCommand<{}, {}> {
-
 	protected configure(configuration: CommandConfiguration): void {
 		configuration.name('drop')
 		configuration.description('Deletes all db schemas (including tenant and both data and system schemas of projects)')

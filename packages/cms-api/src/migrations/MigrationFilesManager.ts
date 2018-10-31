@@ -1,6 +1,6 @@
 import FileNameHelper from './FileNameHelper'
-import * as fs from "fs"
-import { promisify } from "util"
+import * as fs from 'fs'
+import { promisify } from 'util'
 
 type EngineMigrationType = 'tenant' | 'project'
 
@@ -12,8 +12,7 @@ const lstatFile = promisify(fs.lstat)
 const readDir = promisify(fs.readdir)
 
 class MigrationFilesManager {
-	constructor(public readonly directory: string) {
-	}
+	constructor(public readonly directory: string) {}
 
 	public async createEmptyFile(name: string, extension: string): Promise<string> {
 		return await this.createFile('', name, extension)
@@ -47,11 +46,11 @@ class MigrationFilesManager {
 		return filteredFiles.sort()
 	}
 
-	public async readFiles(extension: string): Promise<{ filename: string, content: string }[]> {
+	public async readFiles(extension: string): Promise<{ filename: string; content: string }[]> {
 		const files = await this.listFiles(extension)
 		const filesWithContent = files.map(async filename => ({
 			filename: filename,
-			content: await readFile(`${this.directory}/${filename}`, { encoding: 'utf8' })
+			content: await readFile(`${this.directory}/${filename}`, { encoding: 'utf8' }),
 		}))
 
 		return await Promise.all(filesWithContent)

@@ -26,8 +26,7 @@ class Initialize {
 		private readonly projectDb: KnexConnection,
 		private readonly project: Project,
 		private readonly migrationsDir: string
-	) {
-	}
+	) {}
 
 	public async createOrUpdateProject() {
 		await this.tenantDb.wrapper().raw(
@@ -119,7 +118,7 @@ class Initialize {
 				throw new Error(
 					`Cannot revert to migration ${stage.migration} in project ${this.project.slug} (stage ${
 						stage.slug
-						}). Current migration is ${currentMigrationFile}`
+					}). Current migration is ${currentMigrationFile}`
 				)
 			}
 

@@ -12,12 +12,12 @@ class EngineMigrationsCreateCommand extends BaseCommand<Args, {}> {
 	protected configure(configuration: CommandConfiguration): void {
 		configuration.name('engine:migrations:create')
 		configuration.description('For engine developers only')
-		configuration.argument('type')
+		configuration
+			.argument('type')
 			.description('project|tenant')
 			.validator(val => ['project', 'tenant'].includes(val))
 		configuration.argument('name')
 	}
-
 
 	protected async execute(input: Command.Input<Args, {}>): Promise<void> {
 		const [type, name] = [input.getArgument('type'), input.getArgument('name')]

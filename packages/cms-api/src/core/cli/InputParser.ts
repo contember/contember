@@ -3,19 +3,16 @@ import Argument from './Argument'
 import Option from './Option'
 
 class InputParser {
+	constructor(private _arguments: Argument[], private options: Option[]) {}
 
-	constructor(
-		private _arguments: Argument[],
-		private options: Option[]
-	) {
-	}
-
-	parse<Args extends Command.Arguments = Command.Arguments, Opts extends Command.Options = Command.Options>
-	(args: string[], allowRest: boolean): Command.Input<Args, Opts> {
+	parse<Args extends Command.Arguments = Command.Arguments, Opts extends Command.Options = Command.Options>(
+		args: string[],
+		allowRest: boolean
+	): Command.Input<Args, Opts> {
 		let options: Opts = {} as any
 		let argumentValues: Args = {} as any
 
-		let i = 0;
+		let i = 0
 		let argumentNumber = 0
 		let rest: string[] = []
 
@@ -112,7 +109,6 @@ class InputParser {
 		return new Command.Input(argumentValues, options, rest)
 	}
 
-
 	private tryParseValue(arg: string | undefined): string | undefined {
 		if (arg === undefined) {
 			return undefined
@@ -128,8 +124,7 @@ class InputParser {
 }
 
 namespace InputParser {
-	export class InvalidInputError extends Error {
-	}
+	export class InvalidInputError extends Error {}
 }
 
 export default InputParser

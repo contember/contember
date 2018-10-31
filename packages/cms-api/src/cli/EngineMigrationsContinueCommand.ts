@@ -4,9 +4,7 @@ import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 
-
 class EngineMigrationsContinueCommand extends BaseCommand<{}, {}> {
-
 	protected configure(configuration: CommandConfiguration): void {
 		configuration.name('engine:migrations:continue')
 		configuration.description('Runs migrations of tenant api and system schema in projects')

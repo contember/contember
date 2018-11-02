@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { SelectedDimension } from '../../state/request'
 
 class Environment {
@@ -64,7 +65,7 @@ class Environment {
 namespace Environment {
 	export type Name = string
 
-	export type Value = string | number | object | undefined | null
+	export type Value = React.ReactNode
 
 	export interface NameStore {
 		dimensions: SelectedDimension

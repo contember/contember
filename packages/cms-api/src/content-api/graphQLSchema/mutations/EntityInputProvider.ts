@@ -63,7 +63,7 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 			}
 		}
 
-		fields['_' + this.operation] = {type: GraphQLBoolean}
+		fields['_' + this.operation] = { type: GraphQLBoolean }
 
 		return fields
 	}

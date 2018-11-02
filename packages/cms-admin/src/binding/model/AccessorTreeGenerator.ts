@@ -32,16 +32,21 @@ export default class AccessorTreeGenerator {
 		if (Array.isArray(data) || data === undefined) {
 			const createAccessorTreeRoot = (): AccessorTreeRoot => {
 				// TODO, proper addNew callback
-				return new AccessorTreeRoot(tree, new EntityCollectionAccessor(entityAccessors, () => {}), tree.entityName)
+				return new AccessorTreeRoot(tree, new EntityCollectionAccessor(entityAccessors, () => {
+					entityAccessors.push(createEntityAccessor(entityAccessors.length, undefined))
+					updateData(createAccessorTreeRoot())
+				}), tree.entityName)
 			}
-			const entityAccessors: Array<EntityAccessor> = (data || [undefined]).map((datum, i) =>
+			const createEntityAccessor = (i: number, datum: ReceivedEntityData<undefined>): EntityAccessor =>
 				this.updateFields(
 					datum,
 					tree.fields,
 					(fieldName, newData) => {
-						entityAccessors[i] = this.withUpdatedField(entityAccessors[i], fieldName, newData)
-
-						updateData(createAccessorTreeRoot())
+						const entityAccessor = entityAccessors[i]
+						if (entityAccessor) {
+							entityAccessors[i] = this.withUpdatedField(entityAccessor, fieldName, newData)
+							updateData(createAccessorTreeRoot())
+						}
 					},
 					newEntityAccessor => {
 						entityAccessors[i] = newEntityAccessor
@@ -49,17 +54,26 @@ export default class AccessorTreeGenerator {
 						updateData(createAccessorTreeRoot())
 					},
 					() => {
-						const primaryKey = entityAccessors[i].primaryKey
-						if (primaryKey) {
-							entityAccessors[i] = new EntityForRemovalAccessor(
-								primaryKey,
-								entityAccessors[i].data,
-								entityAccessors[i].replaceWith
-							)
+						const entityAccessor = entityAccessors[i]
+
+						if (entityAccessor) {
+							const primaryKey = entityAccessor.primaryKey
+							if (primaryKey) {
+								entityAccessors[i] = new EntityForRemovalAccessor(
+									primaryKey,
+									entityAccessor.data,
+									entityAccessor.replaceWith
+								)
+							} else {
+								entityAccessors[i] = undefined
+							}
+
 							updateData(createAccessorTreeRoot())
 						}
 					}
 				)
+			const entityAccessors: Array<EntityAccessor | undefined> = (data && data.length ? data : [undefined]).map((datum, i) =>
+				createEntityAccessor(i, datum)
 			)
 			return createAccessorTreeRoot()
 		} else {
@@ -119,15 +133,21 @@ export default class AccessorTreeGenerator {
 					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
 						if (Array.isArray(fieldData)) {
 							throw new DataBindingError(
-								`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
-								`Perhaps you wanted to use a <Repeater />?`
+								`Received a collection of entities for field '${
+									field.fieldName
+								}' where a single entity was expected. ` + `Perhaps you wanted to use a <Repeater />?`
 							)
 						} else if (fieldData === null || typeof fieldData === 'object' || fieldData === undefined) {
-							entityData[referencePlaceholder] = this.generateOneReference(fieldData || undefined, reference, onUpdate, entityData)
+							entityData[referencePlaceholder] = this.generateOneReference(
+								fieldData || undefined,
+								reference,
+								onUpdate,
+								entityData
+							)
 						} else {
 							throw new DataBindingError(
 								`Received a scalar value for field '${field.fieldName}' where a single entity was expected.` +
-								`Perhaps you meant to use a variant of <Field />?`
+									`Perhaps you meant to use a variant of <Field />?`
 							)
 						}
 					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
@@ -139,12 +159,12 @@ export default class AccessorTreeGenerator {
 							throw new DataBindingError(
 								`Received a referenced entity for field '${
 									field.fieldName
-									}' where a collection of entities was expected.` + `Perhaps you wanted to use a <SingleReference />?`
+								}' where a collection of entities was expected.` + `Perhaps you wanted to use a <SingleReference />?`
 							)
 						} else {
 							throw new DataBindingError(
 								`Received a scalar value for field '${field.fieldName}' where a collection of entities was expected.` +
-								`Perhaps you meant to use a variant of <Field />?`
+									`Perhaps you meant to use a variant of <Field />?`
 							)
 						}
 					} else {
@@ -272,7 +292,11 @@ export default class AccessorTreeGenerator {
 		return collectionAccessor
 	}
 
-	private withUpdatedField(original: EntityAccessor, fieldPlaceholder: string, newData: EntityData.FieldData): EntityAccessor {
+	private withUpdatedField(
+		original: EntityAccessor,
+		fieldPlaceholder: string,
+		newData: EntityData.FieldData
+	): EntityAccessor {
 		return new EntityAccessor(
 			original.primaryKey,
 			new EntityData({ ...original.data.allFieldData, [fieldPlaceholder]: newData }),

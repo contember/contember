@@ -62,7 +62,7 @@ export default class MutationProvider {
 		return {
 			type: this.entityTypeProvider.getEntity(entityName),
 			args: {
-				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
+				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 			},
 			resolve: (parent, args, context, info) =>
 				this.mutationResolverFactory.create(context).resolveDelete(entity, this.queryAstAFactory.create(info)),
@@ -78,7 +78,7 @@ export default class MutationProvider {
 		return {
 			type: this.entityTypeProvider.getEntity(entityName),
 			args: {
-				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
+				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 				data: { type: new GraphQLNonNull(dataType) },
 			},
 			resolve: (parent, args, context, info) =>

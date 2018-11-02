@@ -7,8 +7,8 @@ type FrontPage {
   _meta: FrontPageMeta
   id: UUID!
   unique: One!
-  introVideo(where: VideoWhere): Video
-  inHouseVideos(where: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]
+  introVideo(filter: VideoWhere): Video
+  inHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]
 }
 
 input FrontPageCreateInHouseVideosEntityRelationInput {
@@ -56,7 +56,7 @@ input FrontPageUpdateInHouseVideosEntityRelationInput {
 }
 
 input FrontPageUpdateInHouseVideosRelationInput {
-  where: VideoUniqueWhere
+  by: VideoUniqueWhere
   data: VideoWithoutFrontPageUpdateInput
 }
 
@@ -72,7 +72,7 @@ input FrontPageUpdateIntroVideoEntityRelationInput {
 }
 
 input FrontPageUpsertInHouseVideosRelationInput {
-  where: VideoUniqueWhere
+  by: VideoUniqueWhere
   update: VideoWithoutFrontPageUpdateInput
   create: VideoWithoutFrontPageCreateInput
 }
@@ -117,11 +117,11 @@ type Info {
 
 type Mutation {
   createFrontPage(data: FrontPageCreateInput!): FrontPage!
-  deleteFrontPage(where: FrontPageUniqueWhere!): FrontPage
-  updateFrontPage(where: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): FrontPage
+  deleteFrontPage(by: FrontPageUniqueWhere!): FrontPage
+  updateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): FrontPage
   createVideo(data: VideoCreateInput!): Video!
-  deleteVideo(where: VideoUniqueWhere!): Video
-  updateVideo(where: VideoUniqueWhere!, data: VideoUpdateInput!): Video
+  deleteVideo(by: VideoUniqueWhere!): Video
+  updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): Video
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -150,10 +150,10 @@ enum OrderDirection {
 }
 
 type Query {
-  getFrontPage(where: FrontPageUniqueWhere!): FrontPage
-  listFrontPage(where: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage]
-  getVideo(where: VideoUniqueWhere!): Video
-  listVideo(where: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video]
+  getFrontPage(by: FrontPageUniqueWhere!): FrontPage
+  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage]
+  getVideo(by: VideoUniqueWhere!): Video
+  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video]
   _info: Info
 }
 
@@ -197,8 +197,8 @@ type Video {
   _meta: VideoMeta
   id: UUID!
   vimeoId: String
-  frontPageForIntro(where: FrontPageWhere): FrontPage
-  frontPage(where: FrontPageWhere): FrontPage
+  frontPageForIntro(filter: FrontPageWhere): FrontPage
+  frontPage(filter: FrontPageWhere): FrontPage
 }
 
 input VideoCreateFrontPageEntityRelationInput {

@@ -45,11 +45,11 @@ namespace Input {
 	}
 
 	export interface UpdateSpecifiedRelationInput<E = never> {
-		update: { where: UniqueWhere<E>; data: UpdateDataInput<E> }
+		update: { by: UniqueWhere<E>; data: UpdateDataInput<E> }
 	}
 
 	export interface UpsertSpecifiedRelationInput<E = never> {
-		upsert: { where: UniqueWhere<E>; update: UpdateDataInput<E>; create: CreateDataInput<E> }
+		upsert: { by: UniqueWhere<E>; update: UpdateDataInput<E>; create: CreateDataInput<E> }
 	}
 
 	export interface DisconnectRelationInput {
@@ -81,7 +81,7 @@ namespace Input {
 	}
 
 	export interface UpdateInput<E = never> {
-		where: UniqueWhere<E>
+		by: UniqueWhere<E>
 		data: UpdateDataInput<E>
 	}
 
@@ -90,15 +90,15 @@ namespace Input {
 	}
 
 	export interface DeleteInput<E = never> {
-		where: UniqueWhere<E>
+		by: UniqueWhere<E>
 	}
 
 	export interface UniqueQueryInput<E = never> {
-		where: UniqueWhere<E>
+		by: UniqueWhere<E>
 	}
 
 	export interface ListQueryInput<E = never> {
-		where?: Where<Condition<ColumnValue<E>>>
+		filter?: Where<Condition<ColumnValue<E>>>
 		orderBy?: OrderBy[]
 		offset?: number
 		limit?: number

@@ -26,11 +26,11 @@ type Info {
 
 type Mutation {
   createPost(data: PostCreateInput!): Post!
-  deletePost(where: PostUniqueWhere!): Post
-  updatePost(where: PostUniqueWhere!, data: PostUpdateInput!): Post
+  deletePost(by: PostUniqueWhere!): Post
+  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): Post
   createPostLocale(data: PostLocaleCreateInput!): PostLocale!
-  deletePostLocale(where: PostLocaleUniqueWhere!): PostLocale
-  updatePostLocale(where: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
+  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -43,8 +43,8 @@ type Post {
   _meta: PostMeta
   id: UUID!
   publishedAt: DateTime
-  locales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
-  localesByLocale(by: PostLocalesByLocaleUniqueWhere, where: PostLocaleWhere): PostLocale
+  locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  localesByLocale(by: PostLocalesByLocaleUniqueWhere, filter: PostLocaleWhere): PostLocale
 }
 
 input PostCreateInput {
@@ -63,7 +63,7 @@ type PostLocale {
   id: UUID!
   locale: String
   title: String
-  post(where: PostWhere): Post
+  post(filter: PostWhere): Post
 }
 
 input PostLocaleCreateInput {
@@ -176,12 +176,12 @@ input PostUpdateLocalesEntityRelationInput {
 }
 
 input PostUpdateLocalesRelationInput {
-  where: PostLocaleUniqueWhere
+  by: PostLocaleUniqueWhere
   data: PostLocaleWithoutPostUpdateInput
 }
 
 input PostUpsertLocalesRelationInput {
-  where: PostLocaleUniqueWhere
+  by: PostLocaleUniqueWhere
   update: PostLocaleWithoutPostUpdateInput
   create: PostLocaleWithoutPostCreateInput
 }
@@ -206,10 +206,10 @@ input PostWithoutLocalesUpdateInput {
 }
 
 type Query {
-  getPost(where: PostUniqueWhere!): Post
-  listPost(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
-  getPostLocale(where: PostLocaleUniqueWhere!): PostLocale
-  listPostLocale(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  getPost(by: PostUniqueWhere!): Post
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
   _info: Info
 }
 

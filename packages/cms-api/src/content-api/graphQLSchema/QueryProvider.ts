@@ -36,7 +36,7 @@ export default class QueryProvider {
 		return {
 			type: this.entityTypeProvider.getEntity(entityName),
 			args: {
-				where: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
+				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 			},
 			resolve: (parent, args, context, info) =>
 				this.readResolverFactory.create(context).resolveGetQuery(entity, this.queryAstAFactory.create(info)),
@@ -49,7 +49,7 @@ export default class QueryProvider {
 		return {
 			type: new GraphQLList(this.entityTypeProvider.getEntity(entityName)),
 			args: {
-				where: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
+				filter: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
 				orderBy: {
 					type: new GraphQLList(new GraphQLNonNull(this.orderByTypeProvider.getEntityOrderByType(entityName))),
 				},

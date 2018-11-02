@@ -54,7 +54,7 @@ describe('predicates injector', () => {
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id', {})], {}, {})
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
-		expect(result.args.where).deep.eq({
+		expect(result.args.filter).deep.eq({
 			and: [
 				{
 					locale: { in: ['cs'] },
@@ -77,7 +77,7 @@ describe('predicates injector', () => {
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
-		expect(result.args.where).deep.eq({
+		expect(result.args.filter).deep.eq({
 			and: [
 				{
 					locale: { in: ['cs'] },
@@ -96,13 +96,13 @@ describe('predicates injector', () => {
 			'PostLocale',
 			[new FieldNode('id', 'id', {})],
 			{
-				where: { id: { in: [1, 2] } },
+				filter: { id: { in: [1, 2] } },
 			},
 			{}
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
-		expect(result.args.where).deep.eq({
+		expect(result.args.filter).deep.eq({
 			and: [
 				{
 					and: [
@@ -133,13 +133,13 @@ describe('predicates injector', () => {
 			'PostLocale',
 			[new FieldNode('id', 'id', {})],
 			{
-				where: { title: { eq: 'abc' } },
+				filter: { title: { eq: 'abc' } },
 			},
 			{}
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
-		expect(result.args.where).deep.eq({
+		expect(result.args.filter).deep.eq({
 			and: [
 				{
 					and: [

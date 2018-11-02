@@ -13,7 +13,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          getPost(where: {id: "${testUuid(1)}"}) {
+          getPost(by: {id: "${testUuid(1)}"}) {
             id
           }
         }`,
@@ -55,7 +55,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          getPostLocale(where: {post: "${testUuid(1)}", locale: "cs"}) {
+          getPostLocale(by: {post: "${testUuid(1)}", locale: "cs"}) {
             id
           }
         }`,
@@ -87,7 +87,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          getPost(where: {id: "${testUuid(1)}"}) {
+          getPost(by: {id: "${testUuid(1)}"}) {
             heading: title
           }
         }`,
@@ -518,7 +518,7 @@ describe('Queries', () => {
             categories {
               id
               visible
-              locales(where: {locale: {eq: cs}}) {
+              locales(filter: {locale: {eq: cs}}) {
                 id
                 name
               }
@@ -842,7 +842,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          listPost(where: {author: {name: {eq: "John"}}}) {
+          listPost(filter: {author: {name: {eq: "John"}}}) {
             id
           }
         }`,
@@ -893,7 +893,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          listAuthor(where: {posts: {title: {eq: "Hello"}}}) {
+          listAuthor(filter: {posts: {title: {eq: "Hello"}}}) {
             id
           }
         }`,
@@ -943,7 +943,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          listPost(where: {categories: {name: {eq: "Stuff"}}}) {
+          listPost(filter: {categories: {name: {eq: "Stuff"}}}) {
             id
           }
         }`,
@@ -993,7 +993,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          listPost(where: {categories: {id: {in: ["${testUuid(10)}", "${testUuid(11)}"]}}}) {
+          listPost(filter: {categories: {id: {in: ["${testUuid(10)}", "${testUuid(11)}"]}}}) {
             id
           }
         }`,
@@ -1048,7 +1048,7 @@ describe('Queries', () => {
         query {
           listPost {
             id
-            locales(where: {locale: {eq: "cs"}}) {
+            locales(filter: {locale: {eq: "cs"}}) {
               id
               locale
               title
@@ -1120,7 +1120,7 @@ describe('Queries', () => {
         query {
           listPost {
             id
-            author (where: {name: {eq: "John"}}) {
+            author (filter: {name: {eq: "John"}}) {
               id
             }
           }
@@ -1310,7 +1310,7 @@ describe('Queries', () => {
           listCategory {
             id
             title
-            posts(where: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
+            posts(filter: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
               id
               title
             }
@@ -1424,7 +1424,7 @@ describe('Queries', () => {
           listAuthor {
             id
             name
-            posts(where: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
+            posts(filter: {locale: {eq: "cs"}}, orderBy: [{title: asc}], offset: 1, limit: 2) {
               id
               title
             }

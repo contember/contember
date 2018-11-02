@@ -42,7 +42,7 @@ export default class SelectBuilder {
 
 	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, path: Path, groupBy?: string) {
 		const promise = this.selectInternal(entity, path, input)
-		const where = input.args.where
+		const where = input.args.filter
 		if (where) {
 			this.whereBuilder.build(this.qb, entity, path, where)
 		}

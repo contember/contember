@@ -9,10 +9,10 @@ type Info {
 
 type Mutation {
   createRoot(data: RootCreateInput!): Root!
-  deleteRoot(where: RootUniqueWhere!): Root
-  updateRoot(where: RootUniqueWhere!, data: RootUpdateInput!): Root
+  deleteRoot(by: RootUniqueWhere!): Root
+  updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): Root
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntity!
-  deleteOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -20,7 +20,7 @@ type OneHasManyEntity {
   _meta: OneHasManyEntityMeta
   id: UUID!
   a: String
-  r2(where: RootWhere): Root
+  r2(filter: RootWhere): Root
 }
 
 input OneHasManyEntityCreateInput {
@@ -70,17 +70,17 @@ enum OrderDirection {
 }
 
 type Query {
-  getRoot(where: RootUniqueWhere!): Root
-  listRoot(where: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
-  getOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
-  listOneHasManyEntity(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
+  getRoot(by: RootUniqueWhere!): Root
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
+  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
   _info: Info
 }
 
 type Root {
   _meta: RootMeta
   id: UUID!
-  r(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
+  r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
 }
 
 input RootCreateInput {

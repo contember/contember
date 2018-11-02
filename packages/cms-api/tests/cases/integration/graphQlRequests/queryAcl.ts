@@ -127,7 +127,7 @@ describe('Queries with acl', () => {
 				},
 				query: GQL`
         query {
-          listPostLocale(where: {title: {eq: "foo"}}) {
+          listPostLocale(filter: {title: {eq: "foo"}}) {
             id
             title
           }

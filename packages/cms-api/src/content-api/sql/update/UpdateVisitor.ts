@@ -523,11 +523,11 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 			}
 			if (isIt<Input.UpdateSpecifiedRelationInput>(element, 'update')) {
 				operation.push('update')
-				result = processor.update(element.update.where, element.update.data)
+				result = processor.update(element.update.by, element.update.data)
 			}
 			if (isIt<Input.UpsertSpecifiedRelationInput>(element, 'upsert')) {
 				operation.push('upsert')
-				result = processor.upsert(element.upsert.where, element.upsert.update, element.upsert.create)
+				result = processor.upsert(element.upsert.by, element.upsert.update, element.upsert.create)
 			}
 			if (operation.length !== 1) {
 				const found = operation.length === 0 ? 'none' : operation.join(', ')

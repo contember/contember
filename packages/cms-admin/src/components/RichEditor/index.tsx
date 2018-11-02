@@ -6,7 +6,7 @@ import { Value, Change } from 'slate'
 import { ActionButton, Toolbar } from './utils'
 import { PARAGRAPH_RULE } from './rules'
 import { RichEditorPluginConfig, BOLD, ITALIC, UNDERLINED, LINK } from './configs'
-import { FormGroup, Classes } from '@blueprintjs/core'
+import { FormGroup, Classes, IFormGroupProps } from '@blueprintjs/core'
 import cn from 'classnames'
 
 const DEFAULT_NODE = 'paragraph'
@@ -20,6 +20,7 @@ export interface RichEditorProps {
 	value: string
 	allowLineBreaks?: boolean
 	onChange: (value: string) => void
+	label?: IFormGroupProps['label']
 }
 
 export interface RichTextFieldState {
@@ -44,7 +45,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 	public render() {
 		return (
 			<div className="editor">
-				<FormGroup label="Content">
+				<FormGroup label={this.props.label}>
 					<Toolbar>
 						<ActionButton config={BOLD} icon="bold" value={this.state.value} onChange={this.onChange} />
 						<ActionButton config={ITALIC} icon="italic" value={this.state.value} onChange={this.onChange} />

@@ -28,6 +28,7 @@ export default class RichTextField extends React.Component<RichTextFieldProps> {
 							onChange={this.generateOnChange(data)}
 							value={data.currentValue || ''}
 							allowLineBreaks={this.props.allowLineBreaks}
+							label={this.props.label}
 						/>
 					)
 				}}

@@ -17,9 +17,9 @@ export default class DefaultRenderer extends React.Component<RendererProps> {
 
 		return (
 			<>
-				{DefaultRenderer.renderTitle(this.props.title)}
 				{normalizedData.map((value, i) => (
 					<DataContext.Provider value={value} key={i}>
+						{DefaultRenderer.renderTitle(this.props.title)}
 						{this.props.children}
 					</DataContext.Provider>
 				))}

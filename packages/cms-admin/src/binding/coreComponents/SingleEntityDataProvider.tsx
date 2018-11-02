@@ -6,8 +6,9 @@ import { SelectedDimension } from '../../state/request'
 import { EntityName, FieldName } from '../bindingTypes'
 import Environment from '../dao/Environment'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
+import { DefaultRenderer } from '../facade/renderers'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
-import { getDataProvider, DataRendererProps } from './DataProvider'
+import { DataRendererProps, getDataProvider } from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import EnvironmentContext from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
@@ -36,7 +37,11 @@ export default class SingleEntityDataProvider<DRP> extends React.Component<Singl
 
 					return (
 						<EnvironmentContext.Provider value={environment}>
-							<DataProvider markerTree={markerTreeGenerator.generate()} renderer={this.props.renderer}>
+							<DataProvider
+								markerTree={markerTreeGenerator.generate()}
+								renderer={this.props.renderer}
+								rendererProps={this.props.rendererProps}
+							>
 								{this.props.children}
 							</DataProvider>
 						</EnvironmentContext.Provider>

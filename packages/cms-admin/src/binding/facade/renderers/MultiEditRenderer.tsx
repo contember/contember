@@ -27,13 +27,14 @@ export default class MultiEditRenderer extends React.Component<MultiEditRenderer
 					{DefaultRenderer.renderTitle(this.props.title)}
 					{data.root.entities.map((value, i) => (
 						<React.Fragment key={i}>
-							{value && !(value instanceof EntityForRemovalAccessor) && (
-								<DataContext.Provider value={value}>
-									{!!i && this.props.entrySeparator || <hr />}
-									{this.props.children}
-									{!!i && <UnlinkButton /> /* Can't delete the first one */}
-								</DataContext.Provider>
-							)}
+							{value &&
+								!(value instanceof EntityForRemovalAccessor) && (
+									<DataContext.Provider value={value}>
+										{(!!i && this.props.entrySeparator) || <hr />}
+										{this.props.children}
+										{!!i && <UnlinkButton /> /* Can't delete the first one */}
+									</DataContext.Provider>
+								)}
 						</React.Fragment>
 					))}
 					{this.props.displayAddNewButton !== false && <AddNewButton addNew={data.root.addNew} />}

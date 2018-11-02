@@ -9,7 +9,9 @@ import SpecificPageProps from './SpecificPageProps'
 
 interface MultiEditPageProps<DRP extends MultiEditRendererProps> extends SpecificPageProps<DRP> {}
 
-export default class MultiEditPage<DRP extends MultiEditRendererProps = MultiEditRendererProps> extends React.Component<MultiEditPageProps<DRP>> {
+export default class MultiEditPage<DRP extends MultiEditRendererProps = MultiEditRendererProps> extends React.Component<
+	MultiEditPageProps<DRP>
+> {
 	static getPageName(props: MultiEditPageProps<MultiEditRendererProps>) {
 		return `multiEdit_${lcfirst(props.entity)}`
 	}

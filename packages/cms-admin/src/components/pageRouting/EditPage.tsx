@@ -9,7 +9,9 @@ import SpecificPageProps from './SpecificPageProps'
 
 interface EditPageProps<DRP> extends SpecificPageProps<DRP> {}
 
-export default class EditPage<DRP extends CommonRendererProps = CommonRendererProps> extends React.Component<EditPageProps<DRP>> {
+export default class EditPage<DRP extends CommonRendererProps = CommonRendererProps> extends React.Component<
+	EditPageProps<DRP>
+> {
 	static getPageName(props: EditPageProps<DataRendererProps>) {
 		return `edit_${lcfirst(props.entity)}`
 	}
@@ -18,9 +20,9 @@ export default class EditPage<DRP extends CommonRendererProps = CommonRendererPr
 		return (
 			<PageWithLayout layout={this.props.layout}>
 				<ParametersContext.Consumer>
-					{({ id }: { id: string }) => (
+					{(parameters: any) => (
 						<SingleEntityDataProvider
-							where={{ id }}
+							where={parameters}
 							name={this.props.entity}
 							renderer={this.props.renderer}
 							rendererProps={this.props.rendererProps}

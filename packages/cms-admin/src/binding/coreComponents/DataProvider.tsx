@@ -30,20 +30,14 @@ export interface DataProviderDispatchProps {
 export interface DataProviderStateProps {
 	requests: ContentRequestsState
 }
-type DataProviderInnerProps<DRP> = DataProviderOwnProps<DRP> &
-	DataProviderDispatchProps &
-	DataProviderStateProps
+type DataProviderInnerProps<DRP> = DataProviderOwnProps<DRP> & DataProviderDispatchProps & DataProviderStateProps
 
 export interface DataProviderState {
 	data?: AccessorTreeRoot
 	id?: string
 }
 
-class DataProvider<DRP> extends React.Component<
-	DataProviderInnerProps<DRP>,
-	DataProviderState,
-	boolean
-> {
+class DataProvider<DRP> extends React.Component<DataProviderInnerProps<DRP>, DataProviderState, boolean> {
 	public state: DataProviderState = {
 		data: undefined
 	}
@@ -87,7 +81,9 @@ class DataProvider<DRP> extends React.Component<
 
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>
-				<Renderer {...this.props.rendererProps} data={this.state.data}>{this.props.children}</Renderer>
+				<Renderer {...this.props.rendererProps} data={this.state.data}>
+					{this.props.children}
+				</Renderer>
 			</MetaOperationsContext.Provider>
 		)
 	}

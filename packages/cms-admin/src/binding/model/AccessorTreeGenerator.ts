@@ -32,10 +32,14 @@ export default class AccessorTreeGenerator {
 		if (Array.isArray(data) || data === undefined) {
 			const createAccessorTreeRoot = (): AccessorTreeRoot => {
 				// TODO, proper addNew callback
-				return new AccessorTreeRoot(tree, new EntityCollectionAccessor(entityAccessors, () => {
-					entityAccessors.push(createEntityAccessor(entityAccessors.length, undefined))
-					updateData(createAccessorTreeRoot())
-				}), tree.entityName)
+				return new AccessorTreeRoot(
+					tree,
+					new EntityCollectionAccessor(entityAccessors, () => {
+						entityAccessors.push(createEntityAccessor(entityAccessors.length, undefined))
+						updateData(createAccessorTreeRoot())
+					}),
+					tree.entityName
+				)
 			}
 			const createEntityAccessor = (i: number, datum: ReceivedEntityData<undefined>): EntityAccessor =>
 				this.updateFields(
@@ -72,8 +76,8 @@ export default class AccessorTreeGenerator {
 						}
 					}
 				)
-			const entityAccessors: Array<EntityAccessor | undefined> = (data && data.length ? data : [undefined]).map((datum, i) =>
-				createEntityAccessor(i, datum)
+			const entityAccessors: Array<EntityAccessor | undefined> = (data && data.length ? data : [undefined]).map(
+				(datum, i) => createEntityAccessor(i, datum)
 			)
 			return createAccessorTreeRoot()
 		} else {

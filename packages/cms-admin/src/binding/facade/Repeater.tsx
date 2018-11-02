@@ -1,4 +1,3 @@
-import { Button } from '@blueprintjs/core'
 import * as React from 'react'
 import DataContext, { DataContextValue } from '../coreComponents/DataContext'
 import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
@@ -9,6 +8,7 @@ import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
 import EntityFields from '../dao/EntityFields'
 import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
 import ReferenceMarker from '../dao/ReferenceMarker'
+import { AddNewButton } from './buttons'
 import UnlinkButton from './buttons/UnlinkButton'
 
 export interface RepeaterProps extends ToManyProps {}
@@ -39,9 +39,7 @@ export default class Repeater extends React.Component<RepeaterProps> {
 												</DataContext.Provider>
 											)
 									)}
-									<Button icon="plus" onClick={field.appendNew}>
-										Add new
-									</Button>
+									<AddNewButton addNew={field.addNew} />
 								</>
 							)
 						}

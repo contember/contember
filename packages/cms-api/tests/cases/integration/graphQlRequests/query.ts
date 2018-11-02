@@ -55,7 +55,7 @@ describe('Queries', () => {
 				.buildSchema(),
 			query: GQL`
         query {
-          getPostLocale(by: {post: "${testUuid(1)}", locale: "cs"}) {
+          getPostLocale(by: {post: {id: "${testUuid(1)}"}, locale: "cs"}) {
             id
           }
         }`,

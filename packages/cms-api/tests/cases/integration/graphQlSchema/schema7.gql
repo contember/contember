@@ -99,7 +99,7 @@ input PostLocalesByLocaleUniqueWhere {
 input PostLocaleUniqueWhere {
   id: UUID
   locale: String
-  post: UUID
+  post: PostUniqueWhere
 }
 
 input PostLocaleUpdateInput {

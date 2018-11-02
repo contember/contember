@@ -151,7 +151,7 @@ namespace Input {
 	}
 
 	export interface UniqueWhere<E = never> {
-		[field: string]: PrimaryValue<E>
+		[field: string]: PrimaryValue<E> | UniqueWhere<E>
 	}
 
 	export type ComposedWhere<C> = {

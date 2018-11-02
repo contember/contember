@@ -6,7 +6,7 @@ export default class UniqueWhereExpander {
 	constructor(private readonly schema: Model.Schema) {}
 
 	expand(entity: Model.Entity, where: Input.UniqueWhere): Input.Where {
-		if (!isUniqueWhere(entity, where)) {
+		if (!isUniqueWhere(this.schema, entity, where)) {
 			throw new Error('Unique where is not unique')
 		}
 
@@ -16,7 +16,7 @@ export default class UniqueWhereExpander {
 			if (!target) {
 				whereExpanded[field] = { eq: where[field] }
 			} else {
-				whereExpanded[field] = { [target.primary]: { eq: where[field] } }
+				whereExpanded[field] = this.expand(target, where[field] as Input.UniqueWhere)
 			}
 		}
 

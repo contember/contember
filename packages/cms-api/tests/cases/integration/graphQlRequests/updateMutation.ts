@@ -22,7 +22,7 @@ describe('update', () => {
 					.buildSchema(),
 				query: GQL`mutation {
         updateAuthor(
-            where: {id: "${testUuid(1)}"},
+            by: {id: "${testUuid(1)}"},
             data: {name: "John"}
           ) {
           id
@@ -86,7 +86,7 @@ describe('update', () => {
 				schema: postWithAuthor,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {author: {create: {name: "John"}}}
           ) {
           id
@@ -136,7 +136,7 @@ describe('update', () => {
 				schema: postWithAuthor,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {author: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -175,7 +175,7 @@ describe('update', () => {
 				schema: postWithAuthor,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {author: {update: {name: "John"}}}
           ) {
           id
@@ -220,7 +220,7 @@ describe('update', () => {
 				schema: postWithAuthor,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {author: {upsert: {create: {name: "John"}, update: {name: "Jack"}}}}
           ) {
           id
@@ -264,7 +264,7 @@ describe('update', () => {
 				schema: postWithAuthor,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {author: {upsert: {create: {name: "John"}, update: {name: "Jack"}}}}
           ) {
           id
@@ -320,7 +320,7 @@ describe('update', () => {
 				schema: postWithNullableAuthor,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {author: {disconnect: true}}
           ) {
           id
@@ -358,7 +358,7 @@ describe('update', () => {
 				schema: postWithNullableAuthor,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {author: {delete: true}}
           ) {
           id
@@ -442,7 +442,7 @@ describe('update', () => {
 				schema: postWithLocale,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {locales: [{create: {title: "Hello", locale: "cs"}}]}
           ) {
           id
@@ -478,8 +478,8 @@ describe('update', () => {
 				schema: postWithLocale,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
-            data: {locales: [{update: {where: {locale: "cs"}, data: {title: "Hello"}}}]}
+            by: {id: "${testUuid(2)}"},
+            data: {locales: [{update: {by: {locale: "cs"}, data: {title: "Hello"}}}]}
           ) {
           id
         }
@@ -525,8 +525,8 @@ describe('update', () => {
 				schema: postWithLocale,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
-            data: {locales: [{upsert: {where: {locale: "cs"}, update: {title: "Hello"}, create: {title: "World"}}}]}
+            by: {id: "${testUuid(2)}"},
+            data: {locales: [{upsert: {by: {locale: "cs"}, update: {title: "Hello"}, create: {title: "World"}}}]}
           ) {
           id
         }
@@ -573,8 +573,8 @@ describe('update', () => {
 				schema: postWithLocale,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
-            data: {locales: [{upsert: {where: {locale: "cs"}, update: {title: "Hello"}, create: {title: "World", locale: "cs"}}}]}
+            by: {id: "${testUuid(2)}"},
+            data: {locales: [{upsert: {by: {locale: "cs"}, update: {title: "Hello"}, create: {title: "World", locale: "cs"}}}]}
           ) {
           id
         }
@@ -616,7 +616,7 @@ describe('update', () => {
 				schema: postWithLocale,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {locales: [{delete: {locale: "cs"}}]}
           ) {
           id
@@ -650,7 +650,7 @@ describe('update', () => {
 				schema: postWithLocale,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {locales: [{connect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -690,7 +690,7 @@ describe('update', () => {
 				schema: postWithNullableLocale,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {locales: [{disconnect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -750,7 +750,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {create: {url: "http://mangoweb.cz"}}}
           ) {
           id
@@ -799,7 +799,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {update: {url: "http://mangoweb.cz"}}}
           ) {
           id
@@ -844,7 +844,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -877,7 +877,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -923,7 +923,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -982,7 +982,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {upsert: {update: {url: "http://mangoweb.cz"}, create: {url: "http://mgw.cz"}}}}
           ) {
           id
@@ -1027,7 +1027,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {upsert: {update: {url: "http://mangoweb.cz"}, create: {url: "http://mgw.cz"}}}}
           ) {
           id
@@ -1083,7 +1083,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {disconnect: true}}
           ) {
           id
@@ -1122,7 +1122,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSite(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {setting: {delete: true}}
           ) {
           id
@@ -1186,7 +1186,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {create: {name: "Mangoweb"}}}
           ) {
           id
@@ -1242,7 +1242,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {create: {name: "Mangoweb"}}}
           ) {
           id
@@ -1285,7 +1285,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {update: {name: "Mangoweb"}}}
           ) {
           id
@@ -1331,7 +1331,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {upsert: {update: {name: "Mangoweb"}, create: {name: "Mgw"}}}}
           ) {
           id
@@ -1377,7 +1377,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
            data: {site: {upsert: {update: {name: "Mangoweb"}, create: {name: "Mgw"}}}}
           ) {
           id
@@ -1420,7 +1420,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {disconnect: true}}
           ) {
           id
@@ -1466,7 +1466,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {delete: true}}
           ) {
           id
@@ -1500,7 +1500,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -1533,7 +1533,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -1579,7 +1579,7 @@ describe('update', () => {
 				schema: siteSettingSchema,
 				query: GQL`mutation {
         updateSiteSetting(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {site: {connect: {id: "${testUuid(1)}"}}}
           ) {
           id
@@ -1649,7 +1649,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {categories: [{connect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1682,7 +1682,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {categories: [{create: {name: "Lorem"}}]}
           ) {
           id
@@ -1725,7 +1725,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {categories: [{delete: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1765,7 +1765,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {categories: [{disconnect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1797,8 +1797,8 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
-            data: {categories: [{update: {where: {id: "${testUuid(1)}"}, data: {name: "Lorem"}}}]}
+            by: {id: "${testUuid(2)}"},
+            data: {categories: [{update: {by: {id: "${testUuid(1)}"}, data: {name: "Lorem"}}}]}
           ) {
           id
         }
@@ -1842,8 +1842,8 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
-            data: {categories: [{upsert: {where: {id: "${testUuid(
+            by: {id: "${testUuid(2)}"},
+            data: {categories: [{upsert: {by: {id: "${testUuid(
 							1
 						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
@@ -1889,8 +1889,8 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updatePost(
-            where: {id: "${testUuid(2)}"},
-            data: {categories: [{upsert: {where: {id: "${testUuid(
+            by: {id: "${testUuid(2)}"},
+            data: {categories: [{upsert: {by: {id: "${testUuid(
 							1
 						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
@@ -1956,7 +1956,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {posts: [{connect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -1989,7 +1989,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {posts: [{create: {title: "Lorem"}}]}
           ) {
           id
@@ -2032,7 +2032,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {posts: [{delete: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -2072,7 +2072,7 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"},
+            by: {id: "${testUuid(2)}"},
             data: {posts: [{disconnect: {id: "${testUuid(1)}"}}]}
           ) {
           id
@@ -2104,8 +2104,8 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"},
-            data: {posts: [{update: {where: {id: "${testUuid(1)}"}, data: {title: "Lorem"}}}]}
+            by: {id: "${testUuid(2)}"},
+            data: {posts: [{update: {by: {id: "${testUuid(1)}"}, data: {title: "Lorem"}}}]}
           ) {
           id
         }
@@ -2149,8 +2149,8 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"},
-            data: {posts: [{upsert: {where: {id: "${testUuid(
+            by: {id: "${testUuid(2)}"},
+            data: {posts: [{upsert: {by: {id: "${testUuid(
 							1
 						)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
           ) {
@@ -2196,8 +2196,8 @@ describe('update', () => {
 				schema: postWithCategories,
 				query: GQL`mutation {
         updateCategory(
-            where: {id: "${testUuid(2)}"},
-            data: {posts: [{upsert: {where: {id: "${testUuid(
+            by: {id: "${testUuid(2)}"},
+            data: {posts: [{upsert: {by: {id: "${testUuid(
 							1
 						)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
           ) {
@@ -2257,7 +2257,7 @@ describe('update', () => {
 					.buildSchema(),
 				query: GQL`mutation {
         updateAuthor(
-            where: {id: "${testUuid(1)}"},
+            by: {id: "${testUuid(1)}"},
             data: {name: "John"}
           ) {
           id
@@ -2322,7 +2322,7 @@ describe('update', () => {
 					.buildSchema(),
 				query: GQL`mutation {
         updateAuthor(
-            where: {id: "${testUuid(1)}"},
+            by: {id: "${testUuid(1)}"},
             data: {name: "John"}
           ) {
           id
@@ -2439,7 +2439,7 @@ describe('update', () => {
 					category_name_variable: ['foo', 'bar'],
 				},
 				query: GQL`mutation  {
-          updatePost(where: {id: "${testUuid(1)}"}, data: {categories: [
+          updatePost(by: {id: "${testUuid(1)}"}, data: {categories: [
 						{connect: {id: "${testUuid(2)}"}},          
 						{disconnect: {id: "${testUuid(3)}"}},          
           ]}) {

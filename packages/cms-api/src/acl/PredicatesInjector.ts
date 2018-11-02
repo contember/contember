@@ -7,10 +7,10 @@ class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
 	public inject(entity: Model.Entity, objectNode: ObjectNode<Input.ListQueryInput>) {
-		const restrictedWhere = this.injectToWhere(objectNode.args.where || {}, entity)
+		const restrictedWhere = this.injectToWhere(objectNode.args.filter || {}, entity)
 		const where = this.createWhere(entity, [entity.primary], restrictedWhere)
 
-		return objectNode.withArg('where', where)
+		return objectNode.withArg('filter', where)
 	}
 
 	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {

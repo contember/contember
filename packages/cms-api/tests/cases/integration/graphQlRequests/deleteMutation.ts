@@ -14,7 +14,7 @@ describe('Delete mutation', () => {
 				.buildSchema(),
 			query: GQL`
         mutation {
-          deletePost(where: {id: "${testUuid(1)}"}) {
+          deletePost(by: {id: "${testUuid(1)}"}) {
             id
             author {
               name
@@ -82,7 +82,7 @@ describe('Delete mutation', () => {
 				.buildSchema(),
 			query: GQL`
         mutation {
-          deletePost(where: {id: "${testUuid(1)}"}) {
+          deletePost(by: {id: "${testUuid(1)}"}) {
             id
           }
         }`,

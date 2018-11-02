@@ -2,7 +2,7 @@ type Author {
   _meta: AuthorMeta
   id: UUID!
   name: String
-  posts(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
+  posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
 }
 
 input AuthorCreateInput {
@@ -47,12 +47,12 @@ input AuthorUpdatePostsEntityRelationInput {
 }
 
 input AuthorUpdatePostsRelationInput {
-  where: PostUniqueWhere
+  by: PostUniqueWhere
   data: PostWithoutAuthorUpdateInput
 }
 
 input AuthorUpsertPostsRelationInput {
-  where: PostUniqueWhere
+  by: PostUniqueWhere
   update: PostWithoutAuthorUpdateInput
   create: PostWithoutAuthorCreateInput
 }
@@ -80,7 +80,7 @@ type Category {
   _meta: CategoryMeta
   id: UUID!
   name: String
-  posts(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
+  posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
 }
 
 input CategoryCreateInput {
@@ -125,12 +125,12 @@ input CategoryUpdatePostsEntityRelationInput {
 }
 
 input CategoryUpdatePostsRelationInput {
-  where: PostUniqueWhere
+  by: PostUniqueWhere
   data: PostWithoutCategoriesUpdateInput
 }
 
 input CategoryUpsertPostsRelationInput {
-  where: PostUniqueWhere
+  by: PostUniqueWhere
   update: PostWithoutCategoriesUpdateInput
   create: PostWithoutCategoriesCreateInput
 }
@@ -182,17 +182,17 @@ type Info {
 
 type Mutation {
   createPost(data: PostCreateInput!): Post!
-  deletePost(where: PostUniqueWhere!): Post
-  updatePost(where: PostUniqueWhere!, data: PostUpdateInput!): Post
+  deletePost(by: PostUniqueWhere!): Post
+  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): Post
   createPostLocale(data: PostLocaleCreateInput!): PostLocale!
-  deletePostLocale(where: PostLocaleUniqueWhere!): PostLocale
-  updatePostLocale(where: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
+  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
   createCategory(data: CategoryCreateInput!): Category!
-  deleteCategory(where: CategoryUniqueWhere!): Category
-  updateCategory(where: CategoryUniqueWhere!, data: CategoryUpdateInput!): Category
+  deleteCategory(by: CategoryUniqueWhere!): Category
+  updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): Category
   createAuthor(data: AuthorCreateInput!): Author!
-  deleteAuthor(where: AuthorUniqueWhere!): Author
-  updateAuthor(where: AuthorUniqueWhere!, data: AuthorUpdateInput!): Author
+  deleteAuthor(by: AuthorUniqueWhere!): Author
+  updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): Author
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -203,11 +203,11 @@ enum OrderDirection {
 
 type Post {
   _meta: PostMeta
-  author(where: AuthorWhere): Author
+  author(filter: AuthorWhere): Author
   id: UUID!
   publishedAt: DateTime
-  locales(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
-  categories(where: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]
+  locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  categories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]
 }
 
 input PostCreateAuthorEntityRelationInput {
@@ -237,7 +237,7 @@ type PostLocale {
   _meta: PostLocaleMeta
   id: UUID!
   title: String
-  Post(where: PostWhere): Post
+  Post(filter: PostWhere): Post
 }
 
 input PostLocaleCreateInput {
@@ -343,7 +343,7 @@ input PostUpdateCategoriesEntityRelationInput {
 }
 
 input PostUpdateCategoriesRelationInput {
-  where: CategoryUniqueWhere
+  by: CategoryUniqueWhere
   data: CategoryWithoutPostsUpdateInput
 }
 
@@ -365,7 +365,7 @@ input PostUpdateLocalesEntityRelationInput {
 }
 
 input PostUpdateLocalesRelationInput {
-  where: PostLocaleUniqueWhere
+  by: PostLocaleUniqueWhere
   data: PostLocaleWithoutPostUpdateInput
 }
 
@@ -375,13 +375,13 @@ input PostUpsertAuthorRelationInput {
 }
 
 input PostUpsertCategoriesRelationInput {
-  where: CategoryUniqueWhere
+  by: CategoryUniqueWhere
   update: CategoryWithoutPostsUpdateInput
   create: CategoryWithoutPostsCreateInput
 }
 
 input PostUpsertLocalesRelationInput {
-  where: PostLocaleUniqueWhere
+  by: PostLocaleUniqueWhere
   update: PostLocaleWithoutPostUpdateInput
   create: PostLocaleWithoutPostCreateInput
 }
@@ -440,14 +440,14 @@ input PostWithoutLocalesUpdateInput {
 }
 
 type Query {
-  getPost(where: PostUniqueWhere!): Post
-  listPost(where: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
-  getPostLocale(where: PostLocaleUniqueWhere!): PostLocale
-  listPostLocale(where: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
-  getCategory(where: CategoryUniqueWhere!): Category
-  listCategory(where: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
-  getAuthor(where: AuthorUniqueWhere!): Author
-  listAuthor(where: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
+  getPost(by: PostUniqueWhere!): Post
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  getCategory(by: CategoryUniqueWhere!): Category
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
+  getAuthor(by: AuthorUniqueWhere!): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
   _info: Info
 }
 

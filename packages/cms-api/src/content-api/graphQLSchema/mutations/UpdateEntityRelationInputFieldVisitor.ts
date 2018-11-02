@@ -111,7 +111,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 					type: new GraphQLInputObjectType({
 						name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
 						fields: () => ({
-							where: whereInput,
+							by: whereInput,
 							data: updateInput,
 						}),
 					}),
@@ -124,7 +124,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 							fields: () => ({
-								where: whereInput,
+								by: whereInput,
 								update: updateInput,
 								create: createInput,
 							}),

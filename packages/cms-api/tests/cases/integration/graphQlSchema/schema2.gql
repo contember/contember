@@ -9,7 +9,7 @@ type Info {
 
 type Mutation {
   createTest(data: TestCreateInput!): Test!
-  updateTest(where: TestUniqueWhere!, data: TestUpdateInput!): Test
+  updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): Test
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -19,8 +19,8 @@ enum OrderDirection {
 }
 
 type Query {
-  getTest(where: TestUniqueWhere!): Test
-  listTest(where: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
+  getTest(by: TestUniqueWhere!): Test
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
   _info: Info
 }
 

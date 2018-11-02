@@ -89,7 +89,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 						},
 						args: {
 							by: { type: uniqueWhere },
-							where: { type: this.whereTypeProvider.getEntityWhereType(targetEntity.name) },
+							filter: { type: this.whereTypeProvider.getEntityWhereType(targetEntity.name) },
 						},
 						resolve: aliasAwareResolver,
 					},

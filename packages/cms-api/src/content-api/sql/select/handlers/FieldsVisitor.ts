@@ -91,10 +91,10 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 			async ids => {
 				const objectNode = this.executionContext.field as ObjectNode
 				const whereWithParentId = {
-					...objectNode.args.where,
+					...objectNode.args.filter,
 					[targetRelation.name]: { [entity.primary]: { in: ids } },
 				}
-				const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('where', whereWithParentId)
+				const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('filter', whereWithParentId)
 
 				return this.mapper.selectGrouped(targetEntity, objectNodeWithWhere, targetRelation)
 			},
@@ -127,7 +127,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 				const queryWithWhere = objectNode
 					.withArgs({
-						where: {
+						filter: {
 							[targetEntity.primary]: { in: inversedIds },
 						},
 					})
@@ -183,9 +183,9 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 				}
 				const objectNode = this.executionContext.field as ObjectNode
 				const where: Input.Where = {
-					and: [idsWhere, objectNode.args.where].filter((it): it is Input.Where => it !== undefined),
+					and: [idsWhere, objectNode.args.filter].filter((it): it is Input.Where => it !== undefined),
 				}
-				const objectWithWhere = objectNode.withArg('where', where)
+				const objectWithWhere = objectNode.withArg('filter', where)
 
 				return this.mapper.select(targetEntity, objectWithWhere, targetRelation.name)
 			},
@@ -209,9 +209,9 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 				}
 				const objectNode = this.executionContext.field as ObjectNode
 				const where: Input.Where = {
-					and: [idsWhere, objectNode.args.where].filter((it): it is Input.Where => it !== undefined),
+					and: [idsWhere, objectNode.args.filter].filter((it): it is Input.Where => it !== undefined),
 				}
-				const objectWithWhere = objectNode.withArg('where', where)
+				const objectWithWhere = objectNode.withArg('filter', where)
 
 				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
 			},
@@ -230,9 +230,9 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 				}
 				const objectNode = this.executionContext.field as ObjectNode
 				const where: Input.Where = {
-					and: [idsWhere, objectNode.args.where].filter((it): it is Input.Where => it !== undefined),
+					and: [idsWhere, objectNode.args.filter].filter((it): it is Input.Where => it !== undefined),
 				}
-				const objectWithWhere = objectNode.withArg('where', where)
+				const objectWithWhere = objectNode.withArg('filter', where)
 
 				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
 			},

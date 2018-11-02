@@ -8,10 +8,10 @@ type Info {
 }
 
 type Mutation {
-  deleteRoot(where: RootUniqueWhere!): Root
-  updateRoot(where: RootUniqueWhere!, data: RootUpdateInput!): Root
-  deleteOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
-  updateOneHasManyEntity(where: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntity
+  deleteRoot(by: RootUniqueWhere!): Root
+  updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): Root
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntity
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -19,7 +19,7 @@ type OneHasManyEntity {
   _meta: OneHasManyEntityMeta
   id: UUID!
   a: String
-  r2(where: RootWhere): Root
+  r2(filter: RootWhere): Root
 }
 
 type OneHasManyEntityMeta {
@@ -71,17 +71,17 @@ enum OrderDirection {
 }
 
 type Query {
-  getRoot(where: RootUniqueWhere!): Root
-  listRoot(where: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
-  getOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
-  listOneHasManyEntity(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
+  getRoot(by: RootUniqueWhere!): Root
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
+  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
   _info: Info
 }
 
 type Root {
   _meta: RootMeta
   id: UUID!
-  r(where: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
+  r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
 }
 
 type RootMeta {
@@ -110,7 +110,7 @@ input RootUpdateREntityRelationInput {
 }
 
 input RootUpdateRRelationInput {
-  where: OneHasManyEntityUniqueWhere
+  by: OneHasManyEntityUniqueWhere
   data: OneHasManyEntityWithoutR2UpdateInput
 }
 

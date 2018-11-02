@@ -24,7 +24,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 				}
 				const whereWithParentId = {
 					and: [
-						objectNode.args.where || {},
+						objectNode.args.filter || {},
 						{
 							[uniqueWhere[0][0]]: { eq: uniqueWhere[0][1] },
 						},
@@ -33,7 +33,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 						},
 					],
 				}
-				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ where: whereWithParentId })
+				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ filter: whereWithParentId })
 
 				return this.mapperAccessor.get().select(targetEntity, newObjectNode, targetRelation.name)
 			},

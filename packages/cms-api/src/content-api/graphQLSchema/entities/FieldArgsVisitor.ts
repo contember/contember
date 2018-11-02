@@ -20,10 +20,10 @@ export default class FieldArgsVisitor
 	}
 
 	public visitHasMany(entity: Model.Entity, relation: Model.Relation) {
-		const where = this.getWhereArg(relation)
+		const filter = this.getWhereArg(relation)
 		const orderBy = this.getOrderByArgs(relation)
 		return {
-			where,
+			filter,
 			orderBy,
 			offset: { type: GraphQLInt },
 			limit: { type: GraphQLInt },
@@ -31,8 +31,8 @@ export default class FieldArgsVisitor
 	}
 
 	public visitHasOne(entity: Model.Entity, relation: Model.Relation) {
-		const where = this.getWhereArg(relation)
-		return { where }
+		const filter = this.getWhereArg(relation)
+		return { filter }
 	}
 
 	private getWhereArg(relation: Model.Relation) {

@@ -1,12 +1,19 @@
 import * as React from 'react'
 import DataContext from '../../coreComponents/DataContext'
+import { DataRendererProps } from '../../coreComponents/DataProvider'
 import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
 import EntityForRemovalAccessor from '../../dao/EntityForRemovalAccessor'
 import { AddNewButton, PersistButton, UnlinkButton } from '../buttons'
-import { RendererProps } from './CommonRendererProps'
+import CommonRendererProps from './CommonRendererProps'
 import DefaultRenderer from './DefaultRenderer'
 
-export default class MultiEditRenderer extends React.Component<RendererProps> {
+export interface MultiEditRendererProps extends CommonRendererProps {
+	displayAddNewButton?: boolean
+	displayPersistButton?: boolean
+	entrySeparator?: React.ReactNode
+}
+
+export default class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRendererProps> {
 	public render() {
 		const data = this.props.data
 
@@ -22,14 +29,15 @@ export default class MultiEditRenderer extends React.Component<RendererProps> {
 						<React.Fragment key={i}>
 							{value && !(value instanceof EntityForRemovalAccessor) && (
 								<DataContext.Provider value={value}>
+									{!!i && this.props.entrySeparator || <hr />}
 									{this.props.children}
 									{!!i && <UnlinkButton /> /* Can't delete the first one */}
 								</DataContext.Provider>
 							)}
 						</React.Fragment>
 					))}
-					<AddNewButton addNew={data.root.addNew} />
-					<PersistButton />
+					{this.props.displayAddNewButton !== false && <AddNewButton addNew={data.root.addNew} />}
+					{this.props.displayPersistButton !== false && <PersistButton />}
 				</>
 			)
 		}

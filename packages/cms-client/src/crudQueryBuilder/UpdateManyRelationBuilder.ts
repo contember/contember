@@ -29,7 +29,7 @@ export default class UpdateManyRelationBuilder {
 		data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>
 	) {
 		const input = DataBuilder.resolveData(data, UpdateDataBuilder)
-		return new UpdateManyRelationBuilder([...this.data, { update: { where, data: input } }])
+		return new UpdateManyRelationBuilder([...this.data, { update: { by: where, data: input } }])
 	}
 
 	public upsert(
@@ -43,7 +43,7 @@ export default class UpdateManyRelationBuilder {
 			...this.data,
 			{
 				upsert: {
-					where,
+					by: where,
 					update: updateInput,
 					create: createInput
 				}

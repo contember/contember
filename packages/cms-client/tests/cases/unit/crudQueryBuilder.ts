@@ -18,7 +18,7 @@ describe('crud query builder', () => {
 									.create({ name: 'foo' })
 									.disconnect({ id: 2 })
 							)
-							.many('locales', [{ update: { where: { id: '123' }, data: { foo: 'bar' } } }])
+							.many('locales', [{ update: { by: { id: '123' }, data: { foo: 'bar' } } }])
 							.one('author', { create: { name: 'John' } })
 					)
 					.column('id')
@@ -36,13 +36,13 @@ describe('crud query builder', () => {
 			)
 
 		expect(builder.getGql()).equals(`mutation {
-	updatePost(where: {id: "123"}, data: {name: "John", locales: [{update: {where: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}}, {create: {name: "foo"}}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}) {
+	updatePost(by: {id: "123"}, data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}}, {create: {name: "foo"}}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}) {
 		id
 		author {
 			name
 		}
 	}
-	deleteCategory(where: {id: "123"}) {
+	deleteCategory(by: {id: "123"}) {
 		id
 	}
 	createAuthor(data: {name: "John", posts: [{connect: {id: "456"}}, {create: {title: "Abcd"}}]}) {
@@ -62,7 +62,7 @@ describe('crud query builder', () => {
 			'myPostsAlias'
 		)
 		expect(builder.getGql()).equals(`query {
-	myPostsAlias: Posts(where: {foo: {eq: "bar"}}) {
+	myPostsAlias: Posts(filter: {foo: {eq: "bar"}}) {
 		title
 		author {
 			name

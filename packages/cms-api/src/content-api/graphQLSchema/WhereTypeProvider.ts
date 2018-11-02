@@ -39,7 +39,7 @@ export default class WhereTypeProvider {
 		return where
 	}
 
-	private createEntityUniqueWhereType(entityName: string) {
+	private createEntityUniqueWhereType(entityName: string, withoutRelation?: string) {
 		const entity = getEntity(this.schema, entityName)
 
 		const combinations: string[] = []
@@ -69,15 +69,10 @@ export default class WhereTypeProvider {
 				if (fields[field] !== undefined) {
 					continue
 				}
-				fields[field] = acceptFieldVisitor(this.schema, entity, field, {
+				fields[field] = acceptFieldVisitor<GraphQLInputFieldConfig>(this.schema, entity, field, {
 					visitRelation: (entity, relation, targetEntity) => {
 						if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
-							return acceptFieldVisitor(this.schema, targetEntity, targetEntity.primary, {
-								visitColumn: (entity, column) => ({ type: this.columnTypeResolver.getType(column) }),
-								visitRelation: () => {
-									throw new Error()
-								},
-							})
+							return { type: this.getEntityUniqueWhereType(targetEntity.name) }
 						}
 						throw new Error('Only column or owning relation can be a part of unique key')
 					},

@@ -7,7 +7,7 @@ export default class ListQueryBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
 	where(where: Input.Where<Input.Condition<Input.ColumnValue<Literal>>>) {
-		return new ListQueryBuilder(this.objectBuilder.argument('where', where))
+		return new ListQueryBuilder(this.objectBuilder.argument('filter', where))
 	}
 
 	by(where: Input.UniqueWhere<Literal>) {

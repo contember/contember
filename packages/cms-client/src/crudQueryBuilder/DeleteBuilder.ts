@@ -6,8 +6,8 @@ import { Input } from 'cms-common'
 export default class DeleteBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	where(where: Input.UniqueWhere<Literal>) {
-		return new DeleteBuilder(this.objectBuilder.argument('where', where))
+	where(by: Input.UniqueWhere<Literal>) {
+		return new DeleteBuilder(this.objectBuilder.argument('by', by))
 	}
 
 	column(name: string) {

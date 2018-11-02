@@ -184,9 +184,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "author_id"
-                       from "public"."post"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."author_id"
+                       from "public"."post" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ author_id: testUuid(1) }],
 						},
@@ -229,9 +229,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "author_id"
-                       from "public"."post"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."author_id"
+                       from "public"."post" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ author_id: testUuid(1) }],
 						},
@@ -273,9 +273,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "author_id"
-                       from "public"."post"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."author_id"
+                       from "public"."post" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [],
 						},
@@ -367,9 +367,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "author_id"
-                       from "public"."post"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."author_id"
+                       from "public"."post" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ author_id: testUuid(1) }],
 						},
@@ -473,7 +473,7 @@ describe('update', () => {
 			})
 		})
 
-		it('update "public".(composed unique)', async () => {
+		it('update (composed unique)', async () => {
 			await execute({
 				schema: postWithLocale,
 				query: GQL`mutation {
@@ -487,9 +487,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."post_locale"
-                       where "locale" = $1 and "post_id" = $2`,
+							sql: SQL`select "root_"."id"
+                       from "public"."post_locale" as "root_"
+                       where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
 							response: [{ id: testUuid(1) }],
 						},
@@ -534,9 +534,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."post_locale"
-                       where "locale" = $1 and "post_id" = $2`,
+							sql: SQL`select "root_"."id"
+                       from "public"."post_locale" as "root_"
+                       where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
 							response: [{ id: testUuid(1) }],
 						},
@@ -582,9 +582,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."post_locale"
-                       where "locale" = $1 and "post_id" = $2`,
+							sql: SQL`select "root_"."id"
+                       from "public"."post_locale" as "root_"
+                       where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
 							response: [],
 						},
@@ -808,9 +808,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "setting_id"
-                       from "public"."site"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."setting_id"
+                       from "public"."site" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ setting_id: testUuid(1) }],
 						},
@@ -853,9 +853,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(1)],
 							response: [{ id: testUuid(2) }],
 						},
@@ -886,9 +886,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(1)],
 							response: [],
 						},
@@ -932,9 +932,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(1)],
 							response: [{ id: testUuid(3) }],
 						},
@@ -991,9 +991,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "setting_id"
-                       from "public"."site"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."setting_id"
+                       from "public"."site" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ setting_id: testUuid(1) }],
 						},
@@ -1036,9 +1036,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "setting_id"
-                       from "public"."site"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."setting_id"
+                       from "public"."site" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [],
 						},
@@ -1131,9 +1131,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "setting_id"
-                       from "public"."site"
-                       where "id" = $1`,
+							sql: SQL`select "root_"."setting_id"
+                       from "public"."site" as "root_"
+                       where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ setting_id: testUuid(1) }],
 						},
@@ -1195,9 +1195,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ id: testUuid(3) }],
 						},
@@ -1251,9 +1251,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [],
 						},
@@ -1294,9 +1294,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ id: testUuid(1) }],
 						},
@@ -1340,9 +1340,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ id: testUuid(1) }],
 						},
@@ -1386,9 +1386,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [],
 						},
@@ -1429,9 +1429,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ id: testUuid(1) }],
 						},
@@ -1509,9 +1509,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ id: testUuid(1) }],
 						},
@@ -1542,9 +1542,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [],
 						},
@@ -1588,9 +1588,9 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`select "id"
-                       from "public"."site"
-                       where "setting_id" = $1`,
+							sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
 							response: [{ id: testUuid(3) }],
 						},
@@ -2150,9 +2150,7 @@ describe('update', () => {
 				query: GQL`mutation {
         updateCategory(
             by: {id: "${testUuid(2)}"},
-            data: {posts: [{upsert: {by: {id: "${testUuid(
-							1
-						)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
+            data: {posts: [{upsert: {by: {id: "${testUuid(1)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
           ) {
           id
         }
@@ -2197,9 +2195,7 @@ describe('update', () => {
 				query: GQL`mutation {
         updateCategory(
             by: {id: "${testUuid(2)}"},
-            data: {posts: [{upsert: {by: {id: "${testUuid(
-							1
-						)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
+            data: {posts: [{upsert: {by: {id: "${testUuid(1)}"}, update: {title: "Lorem"}, create: {title: "Ipsum"}}}]}
           ) {
           id
         }

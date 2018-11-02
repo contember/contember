@@ -248,8 +248,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 		if (relationData === undefined) {
 			return Promise.resolve(undefined)
 		}
-		const primaryValue = this.primaryValue
-		const thisPrimary = { [entity.primary]: primaryValue }
+		const thisPrimary = { [entity.primary]: this.primaryValue }
 
 		const mapper = this.mapper
 
@@ -270,13 +269,13 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				public async delete(where: Input.UniqueWhere) {
-					await mapper.delete(targetEntity, { ...where, [targetRelation.name]: primaryValue })
+					await mapper.delete(targetEntity, { ...where, [targetRelation.name]: thisPrimary })
 				}
 
 				public async disconnect(where: Input.UniqueWhere) {
 					await mapper.update(
 						targetEntity,
-						{ ...where, [targetRelation.name]: primaryValue },
+						{ ...where, [targetRelation.name]: thisPrimary },
 						{ [targetRelation.name]: { disconnect: true } }
 					)
 				}
@@ -284,7 +283,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				public async update(where: Input.UniqueWhere, input: Input.UpdateDataInput) {
 					await mapper.update(
 						targetEntity,
-						{ ...where, [targetRelation.name]: primaryValue },
+						{ ...where, [targetRelation.name]: thisPrimary },
 						{
 							...input,
 							// [targetRelation.name]: {connect: thisPrimary}
@@ -295,7 +294,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				public async upsert(where: Input.UniqueWhere, update: Input.UpdateDataInput, create: Input.CreateDataInput) {
 					const result = await mapper.update(
 						targetEntity,
-						{ ...where, [targetRelation.name]: primaryValue },
+						{ ...where, [targetRelation.name]: thisPrimary },
 						{
 							...update,
 							// [targetRelation.name]: {connect: thisPrimary}
@@ -323,8 +322,6 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		const mapper = this.mapper
 
-		const primaryValue = this.primaryValue
-
 		return this.processHasOneRelationInput(
 			relationData,
 			new class implements HasOneRelationInputProcessor {
@@ -335,7 +332,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				public async create(input: Input.CreateDataInput) {
 					await mapper.update(
 						targetEntity,
-						{ [targetRelation.name]: primaryValue },
+						{ [targetRelation.name]: thisPrimary },
 						{ [targetRelation.name]: { disconnect: true } }
 					)
 					await mapper.insert(targetEntity, {
@@ -345,23 +342,23 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				public async delete() {
-					await mapper.delete(targetEntity, { [targetRelation.name]: primaryValue })
+					await mapper.delete(targetEntity, { [targetRelation.name]: thisPrimary })
 				}
 
 				public async disconnect() {
 					await mapper.update(
 						targetEntity,
-						{ [targetRelation.name]: primaryValue },
+						{ [targetRelation.name]: thisPrimary },
 						{ [targetRelation.name]: { disconnect: true } }
 					)
 				}
 
 				public async update(input: Input.UpdateDataInput) {
-					await mapper.update(targetEntity, { [targetRelation.name]: primaryValue }, input)
+					await mapper.update(targetEntity, { [targetRelation.name]: thisPrimary }, input)
 				}
 
 				public async upsert(update: Input.UpdateDataInput, create: Input.CreateDataInput) {
-					const result = await mapper.update(targetEntity, { [targetRelation.name]: primaryValue }, update)
+					const result = await mapper.update(targetEntity, { [targetRelation.name]: thisPrimary }, update)
 					if (result === 0) {
 						await mapper.insert(targetEntity, {
 							...create,
@@ -390,8 +387,13 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 			new class implements HasOneRelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					updateBuilder.addFieldValue(relation.name, async () => {
-						const relationPrimary = await mapper.getPrimaryValue(targetEntity, input)
-						const currentOwner = await mapper.selectField(entity, { [relation.name]: relationPrimary }, entity.primary)
+						const relationPrimary = (await mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
+
+						const currentOwner = await mapper.selectField(
+							entity,
+							{ [relation.name]: { [targetEntity.primary]: relationPrimary } },
+							entity.primary
+						)
 						if (currentOwner === primaryValue) {
 							return undefined
 						}

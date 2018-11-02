@@ -43,7 +43,7 @@ input FrontPageOrderBy {
 input FrontPageUniqueWhere {
   id: UUID
   unique: One
-  introVideo: UUID
+  introVideo: VideoUniqueWhere
 }
 
 input FrontPageUpdateInHouseVideosEntityRelationInput {

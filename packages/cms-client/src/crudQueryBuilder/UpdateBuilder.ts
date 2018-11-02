@@ -9,7 +9,7 @@ export default class UpdateBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
 	where(where: Input.UniqueWhere<Literal>) {
-		return new UpdateBuilder(this.objectBuilder.argument('where', where))
+		return new UpdateBuilder(this.objectBuilder.argument('by', where))
 	}
 
 	data(data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>) {

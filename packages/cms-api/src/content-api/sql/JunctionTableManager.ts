@@ -6,7 +6,6 @@ import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../../acl/PredicateFactory'
 import KnexWrapper from '../../core/knex/KnexWrapper'
 import { Acl, Input, Model } from 'cms-common'
-import { isUniqueWhere } from '../../content-schema/inputUtils'
 import InsertBuilder from '../../core/knex/InsertBuilder'
 import QueryBuilder from '../../core/knex/QueryBuilder'
 import ConditionBuilder from '../../core/knex/ConditionBuilder'
@@ -61,9 +60,6 @@ class JunctionTableManager {
 		const joiningTable = relation.joiningTable
 		const inversedEntity = getEntity(this.schema, relation.target)
 
-		this.checkUniqueWhere(owningEntity, ownerUnique)
-		this.checkUniqueWhere(inversedEntity, inversedUnique)
-
 		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
 		let inversePredicate: Input.Where = {}
 		if (relation.inversedBy) {
@@ -74,8 +70,8 @@ class JunctionTableManager {
 		const hasPrimaryValues = ownerUnique[owningEntity.primary] && inversedUnique[inversedEntity.primary]
 
 		if (hasNoPredicates && hasPrimaryValues) {
-			const ownerPrimary = ownerUnique[owningEntity.primary]
-			const inversedPrimary = inversedUnique[inversedEntity.primary]
+			const ownerPrimary = ownerUnique[owningEntity.primary] as Input.PrimaryValue
+			const inversedPrimary = inversedUnique[inversedEntity.primary] as Input.PrimaryValue
 			await handler.executeSimple(joiningTable, ownerPrimary, inversedPrimary)
 		} else {
 			const ownerWhere: Input.Where = {
@@ -104,12 +100,6 @@ class JunctionTableManager {
 			}
 
 			await handler.executeComplex(joiningTable, dataCallback)
-		}
-	}
-
-	private checkUniqueWhere(entity: Model.Entity, where: Input.UniqueWhere): void {
-		if (!isUniqueWhere(entity, where)) {
-			throw new Error('Unique where is not unique')
 		}
 	}
 }

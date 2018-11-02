@@ -13,6 +13,6 @@ export default class UnboundedGetQueryBuilder extends BoundedGetQueryBuilder {
 	}
 
 	where(where: Input.UniqueWhere<Literal>) {
-		return new BoundedGetQueryBuilder(this.objectBuilder.argument('where', where))
+		return new BoundedGetQueryBuilder(this.objectBuilder.argument('by', where))
 	}
 }

@@ -1,5 +1,4 @@
 import { Acl, Input, Model } from 'cms-common'
-import { isUniqueWhere } from '../../content-schema/inputUtils'
 import { acceptEveryFieldVisitor, getColumnName } from '../../content-schema/modelUtils'
 import InsertVisitor from './insert/InsertVisitor'
 import UpdateVisitor from './update/UpdateVisitor'
@@ -35,9 +34,10 @@ class Mapper {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
 		const qb = this.db.queryBuilder()
-		qb.from(entity.tableName)
-		qb.select(columnName)
-		qb.where(this.getUniqueWhereArgs(entity, where))
+		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
+		qb.from(entity.tableName, 'root_')
+		qb.select(['root_', columnName])
+		this.whereBuilder.build(qb, entity, new Path([]), expandedWhere)
 		const result = await qb.getResult()
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
@@ -126,8 +126,6 @@ class Mapper {
 			return Promise.resolve(0)
 		}
 
-		this.checkUniqueWhere(entity, where)
-
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 		const updateBuilder = this.updateBuilderFactory.create(entity, uniqueWhere)
 
@@ -188,41 +186,15 @@ class Mapper {
 		await this.junctionTableManager.disconnectJunction(owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
-	public async getPrimaryValue(entity: Model.Entity, where: Input.UniqueWhere) {
-		if (where[entity.primary] !== undefined) {
-			return where[entity.primary]
-		}
-
-		const whereArgs = this.getUniqueWhereArgs(entity, where)
-		const qb = this.db.queryBuilder()
-		qb.from(entity.tableName)
-		qb.select(entity.primaryColumn)
-		qb.where(whereArgs)
-
-		const result = await qb.getResult()
-
-		return result[0] !== undefined ? result[0][entity.primaryColumn] : undefined
-	}
-
-	private getUniqueWhereArgs(
+	public async getPrimaryValue(
 		entity: Model.Entity,
 		where: Input.UniqueWhere
-	): { [columnName: string]: string | number } {
-		if (!isUniqueWhere(entity, where)) {
-			throw new Error('Unique where is not unique')
-		}
-		const whereArgs: { [columnName: string]: string | number } = {}
-		for (const field in where) {
-			whereArgs[getColumnName(this.schema, entity, field)] = where[field]
+	): Promise<Input.PrimaryValue | undefined> {
+		if (where[entity.primary] !== undefined) {
+			return where[entity.primary] as Input.PrimaryValue
 		}
 
-		return whereArgs
-	}
-
-	private checkUniqueWhere(entity: Model.Entity, where: Input.UniqueWhere): void {
-		if (!isUniqueWhere(entity, where)) {
-			throw new Error('Unique where is not unique')
-		}
+		return this.selectField(entity, where, entity.primary)
 	}
 }
 

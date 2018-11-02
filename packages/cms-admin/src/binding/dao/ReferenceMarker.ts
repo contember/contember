@@ -36,7 +36,7 @@ class ReferenceMarker {
 			const placeholderName = PlaceholderGenerator.getReferencePlaceholder(fieldName, constraints)
 			const reference: ReferenceMarker.Reference = Object.assign(constraints, {
 				placeholderName,
-				fields: fields || {},
+				fields: fields || {}
 			})
 
 			references = {

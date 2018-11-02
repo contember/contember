@@ -16,9 +16,7 @@ interface EntityCreatorProps<DRP> {
 	rendererProps?: DRP
 }
 
-export default class EntityCreator<DRP> extends React.Component<
-	EntityCreatorProps<DRP>
-> {
+export default class EntityCreator<DRP> extends React.Component<EntityCreatorProps<DRP>> {
 	public static displayName = 'EntityCreator'
 
 	public render() {
@@ -34,7 +32,11 @@ export default class EntityCreator<DRP> extends React.Component<
 
 					return (
 						<EnvironmentContext.Provider value={environment}>
-							<DataProvider markerTree={markerTreeGenerator.generate()} renderer={this.props.renderer}>
+							<DataProvider
+								markerTree={markerTreeGenerator.generate()}
+								renderer={this.props.renderer}
+								rendererProps={this.props.rendererProps}
+							>
 								{this.props.children}
 							</DataProvider>
 						</EnvironmentContext.Provider>
@@ -44,7 +46,10 @@ export default class EntityCreator<DRP> extends React.Component<
 		)
 	}
 
-	public static generateMarkerTreeRoot(props: EntityCreatorProps<unknown>, fields: MarkerTreeRoot['fields']): MarkerTreeRoot {
+	public static generateMarkerTreeRoot(
+		props: EntityCreatorProps<unknown>,
+		fields: MarkerTreeRoot['fields']
+	): MarkerTreeRoot {
 		return new MarkerTreeRoot(props.name, fields, undefined)
 	}
 }

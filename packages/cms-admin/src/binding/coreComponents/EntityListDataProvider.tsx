@@ -36,7 +36,11 @@ export default class EntityListDataProvider<DRP> extends React.Component<EntityL
 
 					return (
 						<EnvironmentContext.Provider value={environment}>
-							<DataProvider markerTree={markerTreeGenerator.generate()} renderer={this.props.renderer}>
+							<DataProvider
+								markerTree={markerTreeGenerator.generate()}
+								renderer={this.props.renderer}
+								rendererProps={this.props.rendererProps}
+							>
 								{this.props.children}
 							</DataProvider>
 						</EnvironmentContext.Provider>

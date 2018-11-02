@@ -17,9 +17,10 @@ export interface DataRendererProps {
 	data: AccessorTreeRoot | undefined
 }
 
-export interface DataProviderOwnProps {
+export interface DataProviderOwnProps<DRP> {
 	markerTree: MarkerTreeRoot
-	renderer?: React.ComponentClass<DataRendererProps>
+	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	rendererProps?: DRP
 }
 
 export interface DataProviderDispatchProps {
@@ -29,14 +30,20 @@ export interface DataProviderDispatchProps {
 export interface DataProviderStateProps {
 	requests: ContentRequestsState
 }
-type DataProviderInnerProps = DataProviderOwnProps & DataProviderDispatchProps & DataProviderStateProps
+type DataProviderInnerProps<DRP> = DataProviderOwnProps<DRP> &
+	DataProviderDispatchProps &
+	DataProviderStateProps
 
 export interface DataProviderState {
 	data?: AccessorTreeRoot
 	id?: string
 }
 
-class DataProvider extends React.Component<DataProviderInnerProps, DataProviderState, boolean> {
+class DataProvider<DRP> extends React.Component<
+	DataProviderInnerProps<DRP>,
+	DataProviderState,
+	boolean
+> {
 	public state: DataProviderState = {
 		data: undefined
 	}
@@ -57,7 +64,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(this.triggerPersist)
 
-	componentDidUpdate(prevProps: DataProviderInnerProps, prevState: DataProviderState) {
+	componentDidUpdate(prevProps: DataProviderInnerProps<DRP>, prevState: DataProviderState) {
 		if (!this.state.id) {
 			return
 		}
@@ -80,7 +87,7 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>
-				<Renderer data={this.state.data}>{this.props.children}</Renderer>
+				<Renderer {...this.props.rendererProps} data={this.state.data}>{this.props.children}</Renderer>
 			</MetaOperationsContext.Provider>
 		)
 	}
@@ -109,12 +116,15 @@ class DataProvider extends React.Component<DataProviderInnerProps, DataProviderS
 	}
 }
 
-export default connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps, State>(
-	({ content }) => ({
-		requests: content.requests
-	}),
-	(dispatch: Dispatch) => ({
-		getData: (query: string) => dispatch(getData(query)),
-		putData: (query: string) => dispatch(putData(query))
-	})
-)(DataProvider)
+const getDataProvider = <DRP extends {}>() =>
+	connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps<DRP>, State>(
+		({ content }) => ({
+			requests: content.requests
+		}),
+		(dispatch: Dispatch) => ({
+			getData: (query: string) => dispatch(getData(query)),
+			putData: (query: string) => dispatch(putData(query))
+		})
+	)(DataProvider as new (props: DataProviderInnerProps<DRP>) => DataProvider<DRP>)
+
+export { getDataProvider }

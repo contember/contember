@@ -1,19 +1,16 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
 import { SingleEntityDataProvider } from '../../binding'
-import { EntityName } from '../../binding'
 import { DataRendererProps } from '../../binding/coreComponents/DataProvider'
+import CommonRendererProps from '../../binding/facade/renderers/CommonRendererProps'
 import { ParametersContext } from './Pages'
 import PageWithLayout from './PageWithLayout'
+import SpecificPageProps from './SpecificPageProps'
 
-interface EditPageProps {
-	entity: EntityName
-	layout?: React.ComponentType<{ children?: React.ReactNode }>
-	renderer?: React.ComponentClass<DataRendererProps>
-}
+interface EditPageProps<DRP> extends SpecificPageProps<DRP> {}
 
-export default class EditPage extends React.Component<EditPageProps> {
-	static getPageName(props: EditPageProps) {
+export default class EditPage<DRP extends CommonRendererProps = CommonRendererProps> extends React.Component<EditPageProps<DRP>> {
+	static getPageName(props: EditPageProps<DataRendererProps>) {
 		return `edit_${lcfirst(props.entity)}`
 	}
 
@@ -22,7 +19,12 @@ export default class EditPage extends React.Component<EditPageProps> {
 			<PageWithLayout layout={this.props.layout}>
 				<ParametersContext.Consumer>
 					{({ id }: { id: string }) => (
-						<SingleEntityDataProvider where={{ id }} name={this.props.entity} renderer={this.props.renderer}>
+						<SingleEntityDataProvider
+							where={{ id }}
+							name={this.props.entity}
+							renderer={this.props.renderer}
+							rendererProps={this.props.rendererProps}
+						>
 							{this.props.children}
 						</SingleEntityDataProvider>
 					)}

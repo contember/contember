@@ -8,18 +8,19 @@ import EnvironmentContext from '../coreComponents/EnvironmentContext'
 import Environment from '../dao/Environment'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
-import DataProvider, { DataRendererProps } from './DataProvider'
+import { getDataProvider, DataRendererProps } from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
-interface EntityListDataProviderProps {
+interface EntityListDataProviderProps<DRP> {
 	name: EntityName
 	associatedField?: FieldName
 	where?: Input.Where<GraphQlBuilder.Literal>
-	renderer?: React.ComponentClass<DataRendererProps>
+	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	rendererProps?: DRP
 }
 
-export default class EntityListDataProvider extends React.Component<EntityListDataProviderProps> {
+export default class EntityListDataProvider<DRP> extends React.Component<EntityListDataProviderProps<DRP>> {
 	public static displayName = 'EntityListDataProvider'
 
 	public render() {
@@ -31,6 +32,7 @@ export default class EntityListDataProvider extends React.Component<EntityListDa
 						<EntityListDataProvider {...this.props}>{this.props.children}</EntityListDataProvider>,
 						environment
 					)
+					const DataProvider = getDataProvider<DRP>()
 
 					return (
 						<EnvironmentContext.Provider value={environment}>
@@ -45,7 +47,7 @@ export default class EntityListDataProvider extends React.Component<EntityListDa
 	}
 
 	public static generateMarkerTreeRoot(
-		props: EntityListDataProviderProps,
+		props: EntityListDataProviderProps<unknown>,
 		fields: MarkerTreeRoot['fields']
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(

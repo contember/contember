@@ -1,10 +1,11 @@
+import { H1 } from '@blueprintjs/core'
 import * as React from 'react'
 import DataContext from '../../coreComponents/DataContext'
-import { DataRendererProps } from '../../coreComponents/DataProvider'
 import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
 import { PersistButton } from '../buttons'
+import { RendererProps } from './CommonRendererProps'
 
-export default class DefaultRenderer extends React.Component<DataRendererProps> {
+export default class DefaultRenderer extends React.Component<RendererProps> {
 	public render() {
 		const data = this.props.data
 
@@ -16,6 +17,7 @@ export default class DefaultRenderer extends React.Component<DataRendererProps> 
 
 		return (
 			<>
+				{DefaultRenderer.renderTitle(this.props.title)}
 				{normalizedData.map((value, i) => (
 					<DataContext.Provider value={value} key={i}>
 						{this.props.children}
@@ -24,5 +26,9 @@ export default class DefaultRenderer extends React.Component<DataRendererProps> 
 				<PersistButton />
 			</>
 		)
+	}
+
+	public static renderTitle(title: RendererProps['title']): React.ReactNode {
+		return title && <H1>{title}</H1>
 	}
 }

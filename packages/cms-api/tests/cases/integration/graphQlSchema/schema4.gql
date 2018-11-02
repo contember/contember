@@ -26,11 +26,12 @@ type OneHasManyEntity {
 input OneHasManyEntityCreateInput {
   a: String
   r2: OneHasManyEntityCreateR2EntityRelationInput
+  _create: Boolean
 }
 
 input OneHasManyEntityCreateR2EntityRelationInput {
   connect: RootUniqueWhere
-  create: Boolean
+  create: RootWithoutRCreateInput
 }
 
 type OneHasManyEntityMeta {
@@ -52,13 +53,21 @@ input OneHasManyEntityUniqueWhere {
 input OneHasManyEntityUpdateInput {
   a: String
   r2: OneHasManyEntityUpdateR2EntityRelationInput
+  _update: Boolean
 }
 
 input OneHasManyEntityUpdateR2EntityRelationInput {
-  create: Boolean
+  create: RootWithoutRCreateInput
+  update: RootWithoutRUpdateInput
+  upsert: OneHasManyEntityUpsertR2RelationInput
   connect: RootUniqueWhere
   disconnect: Boolean
   delete: Boolean
+}
+
+input OneHasManyEntityUpsertR2RelationInput {
+  update: RootWithoutRUpdateInput
+  create: RootWithoutRCreateInput
 }
 
 input OneHasManyEntityWhere {
@@ -72,10 +81,12 @@ input OneHasManyEntityWhere {
 
 input OneHasManyEntityWithoutR2CreateInput {
   a: String
+  _create: Boolean
 }
 
 input OneHasManyEntityWithoutR2UpdateInput {
   a: String
+  _update: Boolean
 }
 
 enum OrderDirection {
@@ -99,6 +110,7 @@ type Root {
 
 input RootCreateInput {
   r: [RootCreateREntityRelationInput!]
+  _create: Boolean
 }
 
 input RootCreateREntityRelationInput {
@@ -121,6 +133,7 @@ input RootUniqueWhere {
 
 input RootUpdateInput {
   r: [RootUpdateREntityRelationInput!]
+  _update: Boolean
 }
 
 input RootUpdateREntityRelationInput {
@@ -148,6 +161,14 @@ input RootWhere {
   and: [RootWhere!]
   or: [RootWhere!]
   not: RootWhere
+}
+
+input RootWithoutRCreateInput {
+  _create: Boolean
+}
+
+input RootWithoutRUpdateInput {
+  _update: Boolean
 }
 
 type SignedUpload {

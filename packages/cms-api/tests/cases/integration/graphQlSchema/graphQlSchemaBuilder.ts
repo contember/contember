@@ -1,5 +1,5 @@
 import 'mocha'
-import { printSchema } from 'graphql'
+import { graphql, printSchema } from 'graphql'
 import { expect } from 'chai'
 import { Acl, Model } from 'cms-common'
 import * as fs from 'fs'
@@ -38,6 +38,10 @@ const testSchema = async (test: Test) => {
 	const permissions = test.permissions(schemaWithAcl)
 	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, permissions)
 	const graphQlSchema = graphQlSchemaBuilder.build()
+
+	const result = await graphql(graphQlSchema, `{ _info { description }}`)
+	const errors = (result.errors || []).map(it => it.message)
+	expect(errors).deep.equals([])
 
 	const textSchema = printSchema(graphQlSchema)
 
@@ -221,6 +225,27 @@ describe('build gql schema from model schema', () => {
 				),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema7.gql',
+		})
+	})
+
+	it('bug with multiple relations 66', async () => {
+		await testSchema({
+			schema: builder => builder
+				.enum('one', ['one'])
+				.entity('Video', entity => entity.column('vimeoId'))
+				.entity('FrontPage', entity =>
+					entity
+						.column('unique', column =>
+							column
+								.type(Model.ColumnType.Enum, { enumName: 'one' })
+								.unique()
+								.notNull()
+						)
+						.oneHasOne('introVideo', relation => relation.target('Video').notNull().inversedBy('frontPageForIntro'))
+						.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage'))
+				),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema8.gql',
 		})
 	})
 })

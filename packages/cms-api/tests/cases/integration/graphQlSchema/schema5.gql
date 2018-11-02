@@ -10,6 +10,7 @@ type Info {
 type Mutation {
   createRoot(data: RootCreateInput!): Root!
   deleteRoot(where: RootUniqueWhere!): Root
+  updateRoot(where: RootUniqueWhere!, data: RootUpdateInput!): Root
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntity!
   deleteOneHasManyEntity(where: OneHasManyEntityUniqueWhere!): OneHasManyEntity
   generateUploadUrl(contentType: String!): SignedUpload!
@@ -25,11 +26,12 @@ type OneHasManyEntity {
 input OneHasManyEntityCreateInput {
   a: String
   r2: OneHasManyEntityCreateR2EntityRelationInput
+  _create: Boolean
 }
 
 input OneHasManyEntityCreateR2EntityRelationInput {
   connect: RootUniqueWhere
-  create: Boolean
+  create: RootWithoutRCreateInput
 }
 
 type OneHasManyEntityMeta {
@@ -59,6 +61,7 @@ input OneHasManyEntityWhere {
 
 input OneHasManyEntityWithoutR2CreateInput {
   a: String
+  _create: Boolean
 }
 
 enum OrderDirection {
@@ -82,6 +85,7 @@ type Root {
 
 input RootCreateInput {
   r: [RootCreateREntityRelationInput!]
+  _create: Boolean
 }
 
 input RootCreateREntityRelationInput {
@@ -102,12 +106,20 @@ input RootUniqueWhere {
   id: UUID
 }
 
+input RootUpdateInput {
+  _update: Boolean
+}
+
 input RootWhere {
   id: UUIDCondition
   r: OneHasManyEntityWhere
   and: [RootWhere!]
   or: [RootWhere!]
   not: RootWhere
+}
+
+input RootWithoutRCreateInput {
+  _create: Boolean
 }
 
 type SignedUpload {

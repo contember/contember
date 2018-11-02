@@ -41,9 +41,11 @@ input OneHasManyEntityUniqueWhere {
 input OneHasManyEntityUpdateInput {
   a: String
   r2: OneHasManyEntityUpdateR2EntityRelationInput
+  _update: Boolean
 }
 
 input OneHasManyEntityUpdateR2EntityRelationInput {
+  update: RootWithoutRUpdateInput
   connect: RootUniqueWhere
   disconnect: Boolean
   delete: Boolean
@@ -60,6 +62,7 @@ input OneHasManyEntityWhere {
 
 input OneHasManyEntityWithoutR2UpdateInput {
   a: String
+  _update: Boolean
 }
 
 enum OrderDirection {
@@ -96,6 +99,7 @@ input RootUniqueWhere {
 
 input RootUpdateInput {
   r: [RootUpdateREntityRelationInput!]
+  _update: Boolean
 }
 
 input RootUpdateREntityRelationInput {
@@ -116,6 +120,10 @@ input RootWhere {
   and: [RootWhere!]
   or: [RootWhere!]
   not: RootWhere
+}
+
+input RootWithoutRUpdateInput {
+  _update: Boolean
 }
 
 type SignedUpload {

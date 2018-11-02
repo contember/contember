@@ -1,10 +1,11 @@
 import { UL } from '@blueprintjs/core'
 import * as React from 'react'
 import DataContext from '../../coreComponents/DataContext'
-import { DataRendererProps } from '../../coreComponents/DataProvider'
 import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
+import { RendererProps } from './CommonRendererProps'
+import DefaultRenderer from './DefaultRenderer'
 
-export default class ListRenderer extends React.Component<DataRendererProps> {
+export default class ListRenderer extends React.Component<RendererProps> {
 	public render() {
 		const data = this.props.data
 
@@ -16,6 +17,7 @@ export default class ListRenderer extends React.Component<DataRendererProps> {
 
 		return (
 			<UL>
+				{DefaultRenderer.renderTitle(this.props.title)}
 				{normalizedData.map((value, i) => (
 					<li key={i}>
 						<DataContext.Provider value={value}>{this.props.children}</DataContext.Provider>

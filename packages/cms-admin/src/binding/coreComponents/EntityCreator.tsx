@@ -5,17 +5,20 @@ import { EntityName } from '../bindingTypes'
 import Environment from '../dao/Environment'
 import MarkerTreeRoot from '../dao/MarkerTreeRoot'
 import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
-import DataProvider, { DataRendererProps } from './DataProvider'
+import { getDataProvider, DataRendererProps } from './DataProvider'
 import EnforceSubtypeRelation from './EnforceSubtypeRelation'
 import EnvironmentContext from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
-interface EntityCreatorProps {
+interface EntityCreatorProps<DRP> {
 	name: EntityName
-	renderer?: React.ComponentClass<DataRendererProps>
+	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	rendererProps?: DRP
 }
 
-export default class EntityCreator extends React.Component<EntityCreatorProps> {
+export default class EntityCreator<DRP> extends React.Component<
+	EntityCreatorProps<DRP>
+> {
 	public static displayName = 'EntityCreator'
 
 	public render() {
@@ -27,6 +30,7 @@ export default class EntityCreator extends React.Component<EntityCreatorProps> {
 						<EntityCreator {...this.props}>{this.props.children}</EntityCreator>,
 						environment
 					)
+					const DataProvider = getDataProvider<DRP>()
 
 					return (
 						<EnvironmentContext.Provider value={environment}>
@@ -40,7 +44,7 @@ export default class EntityCreator extends React.Component<EntityCreatorProps> {
 		)
 	}
 
-	public static generateMarkerTreeRoot(props: EntityCreatorProps, fields: MarkerTreeRoot['fields']): MarkerTreeRoot {
+	public static generateMarkerTreeRoot(props: EntityCreatorProps<unknown>, fields: MarkerTreeRoot['fields']): MarkerTreeRoot {
 		return new MarkerTreeRoot(props.name, fields, undefined)
 	}
 }

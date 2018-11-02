@@ -3,14 +3,14 @@ import * as React from 'react'
 import { DataRendererProps } from '../../binding/coreComponents/DataProvider'
 import EntityListDataProvider from '../../binding/coreComponents/EntityListDataProvider'
 import { MultiEditRenderer } from '../../binding/facade/renderers'
-import CommonRendererProps from '../../binding/facade/renderers/CommonRendererProps'
+import { MultiEditRendererProps } from '../../binding/facade/renderers/MultiEditRenderer'
 import PageWithLayout from './PageWithLayout'
 import SpecificPageProps from './SpecificPageProps'
 
-interface MultiEditPageProps<DRP extends CommonRendererProps> extends SpecificPageProps<DRP> {}
+interface MultiEditPageProps<DRP extends MultiEditRendererProps> extends SpecificPageProps<DRP> {}
 
-export default class MultiEditPage<DRP extends CommonRendererProps = CommonRendererProps> extends React.Component<MultiEditPageProps<DRP>> {
-	static getPageName(props: MultiEditPageProps<CommonRendererProps>) {
+export default class MultiEditPage<DRP extends MultiEditRendererProps = MultiEditRendererProps> extends React.Component<MultiEditPageProps<DRP>> {
+	static getPageName(props: MultiEditPageProps<MultiEditRendererProps>) {
 		return `multiEdit_${lcfirst(props.entity)}`
 	}
 

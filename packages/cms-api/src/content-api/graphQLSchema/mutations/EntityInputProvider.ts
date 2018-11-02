@@ -48,28 +48,22 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 			.filter(it => it !== entity.primary)
 			.filter(it => it !== withoutRelation)
 
-		const fields = this.createEntityFields(entityName, fieldNames, withoutRelation)
-		if (Object.keys(fields).length === 0) {
-			return this.operation === EntityInputProvider.Type.create ? GraphQLBoolean : undefined
-		}
-
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}${withoutSuffix}${this.operation}Input`,
-			fields: () => fields,
+			fields: () => this.createEntityFields(entityName, fieldNames),
 		})
 	}
 
-	private createEntityFields(entityName: string, fieldsNames: string[], withoutRelation?: string) {
+	private createEntityFields(entityName: string, fieldsNames: string[]) {
 		const fields: GraphQLInputFieldConfigMap = {}
 		for (const fieldName of fieldsNames) {
-			if (withoutRelation && fieldName === withoutRelation) {
-				continue
-			}
 			const result = acceptFieldVisitor(this.schema, entityName, fieldName, this.visitor)
 			if (result !== undefined) {
 				fields[fieldName] = result
 			}
 		}
+
+		fields['_' + this.operation] = {type: GraphQLBoolean}
 
 		return fields
 	}

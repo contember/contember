@@ -27,6 +27,7 @@ type OneHasManyEntity {
 input OneHasManyEntityCreateInput {
   a: String
   r2: OneHasManyEntityCreateR2EntityRelationInput
+  _create: Boolean
 }
 
 input OneHasManyEntityCreateR2EntityRelationInput {
@@ -53,6 +54,7 @@ input OneHasManyEntityUniqueWhere {
 input OneHasManyEntityUpdateInput {
   a: String
   r2: OneHasManyEntityUpdateR2EntityRelationInput
+  _update: Boolean
 }
 
 input OneHasManyEntityUpdateR2EntityRelationInput {
@@ -80,10 +82,12 @@ input OneHasManyEntityWhere {
 
 input OneHasManyEntityWithoutR2CreateInput {
   a: String
+  _create: Boolean
 }
 
 input OneHasManyEntityWithoutR2UpdateInput {
   a: String
+  _update: Boolean
 }
 
 enum OrderDirection {
@@ -109,6 +113,7 @@ type Root {
 input RootCreateInput {
   foo: String
   r: [RootCreateREntityRelationInput!]
+  _create: Boolean
 }
 
 input RootCreateREntityRelationInput {
@@ -134,6 +139,7 @@ input RootUniqueWhere {
 input RootUpdateInput {
   foo: String
   r: [RootUpdateREntityRelationInput!]
+  _update: Boolean
 }
 
 input RootUpdateREntityRelationInput {
@@ -167,10 +173,12 @@ input RootWhere {
 
 input RootWithoutRCreateInput {
   foo: String
+  _create: Boolean
 }
 
 input RootWithoutRUpdateInput {
   foo: String
+  _update: Boolean
 }
 
 type SignedUpload {

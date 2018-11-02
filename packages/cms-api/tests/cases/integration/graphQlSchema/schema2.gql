@@ -51,6 +51,7 @@ type Test {
 
 input TestCreateInput {
   a: String
+  _create: Boolean
 }
 
 type TestMeta {
@@ -69,6 +70,7 @@ input TestUniqueWhere {
 
 input TestUpdateInput {
   b: String
+  _update: Boolean
 }
 
 input TestWhere {

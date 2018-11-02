@@ -50,6 +50,7 @@ type Post {
 input PostCreateInput {
   publishedAt: DateTime
   locales: [PostCreateLocalesEntityRelationInput!]
+  _create: Boolean
 }
 
 input PostCreateLocalesEntityRelationInput {
@@ -69,6 +70,7 @@ input PostLocaleCreateInput {
   locale: String
   title: String
   post: PostLocaleCreatePostEntityRelationInput
+  _create: Boolean
 }
 
 input PostLocaleCreatePostEntityRelationInput {
@@ -104,6 +106,7 @@ input PostLocaleUpdateInput {
   locale: String
   title: String
   post: PostLocaleUpdatePostEntityRelationInput
+  _update: Boolean
 }
 
 input PostLocaleUpdatePostEntityRelationInput {
@@ -133,11 +136,13 @@ input PostLocaleWhere {
 input PostLocaleWithoutPostCreateInput {
   locale: String
   title: String
+  _create: Boolean
 }
 
 input PostLocaleWithoutPostUpdateInput {
   locale: String
   title: String
+  _update: Boolean
 }
 
 type PostMeta {
@@ -158,6 +163,7 @@ input PostUniqueWhere {
 input PostUpdateInput {
   publishedAt: DateTime
   locales: [PostUpdateLocalesEntityRelationInput!]
+  _update: Boolean
 }
 
 input PostUpdateLocalesEntityRelationInput {
@@ -191,10 +197,12 @@ input PostWhere {
 
 input PostWithoutLocalesCreateInput {
   publishedAt: DateTime
+  _create: Boolean
 }
 
 input PostWithoutLocalesUpdateInput {
   publishedAt: DateTime
+  _update: Boolean
 }
 
 type Query {

@@ -14,6 +14,8 @@ import { GraphQLSchema } from 'graphql'
 import PermissionFactory from '../acl/PermissionFactory'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import { Acl } from 'cms-common'
+import Identity from '../tenant-api/model/type/Identity'
+import AllowAllPermissionFactory from '../acl/AllowAllPermissionFactory'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
@@ -87,7 +89,14 @@ class ContentMiddlewareFactory {
 
 						ctx.state.timer('done')
 
-						const permissions = new PermissionFactory(stage.schema.model).create(stage.schema.acl, projectRoles.roles)
+						let permissions: Acl.Permissions
+
+						if (ctx.state.authResult.roles.includes(Identity.SystemRole.SUPER_ADMIN)) {
+							permissions = new AllowAllPermissionFactory().create(stage.schema.model)
+						} else {
+							permissions = new PermissionFactory(stage.schema.model).create(stage.schema.acl, projectRoles.roles)
+						}
+
 						const dataSchemaBuilder = projectContainer
 							.get('graphQlSchemaBuilderFactory')
 							.create(stage.schema.model, permissions)

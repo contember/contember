@@ -1,5 +1,4 @@
 import { ApolloServer } from 'apollo-server-koa'
-import KnexConnection from '../core/knex/KnexConnection'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import { Context } from '../content-api/types'
 import * as Koa from 'koa'
@@ -13,11 +12,11 @@ import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManag
 import { GraphQLSchema } from 'graphql'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import { Acl } from 'cms-common'
+import KnexWrapper from '../core/knex/KnexWrapper'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
-	TimerMiddlewareFactory.ContextWithTimer & { state: { db: KnexConnection } }
-
+	TimerMiddlewareFactory.ContextWithTimer & { state: { db: KnexWrapper } }
 class ContentMiddlewareFactory {
 	constructor(private projectContainers: ProjectContainer[], private projectMemberManager: ProjectMemberManager) {}
 
@@ -41,7 +40,7 @@ class ContentMiddlewareFactory {
 			}
 
 			const db = projectContainer.get('knexConnection')
-			ctx.state.db = new KnexConnection(db, 'stage_' + stage.slug)
+			ctx.state.db = new KnexWrapper(db, 'stage_' + stage.slug)
 
 			const contentKoa = new Koa()
 
@@ -52,7 +51,7 @@ class ContentMiddlewareFactory {
 			contentKoa.use(
 				async (
 					ctx: AuthMiddlewareFactory.ContextWithAuth & {
-						state: { db: KnexConnection }
+						state: { db: KnexWrapper }
 					} & TimerMiddlewareFactory.ContextWithTimer,
 					next
 				) => {
@@ -74,9 +73,7 @@ class ContentMiddlewareFactory {
 						if (!ctx.state.authResult.valid) {
 							return createGraphqlInvalidAuthResponse(`Auth failure: ${ctx.state.authResult.error}`)
 						}
-						await knexConnection
-							.wrapper()
-							.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', ctx.state.authResult.identityId)
+						await knexConnection.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', ctx.state.authResult.identityId)
 
 						ctx.state.timer('fetching project roles and variables')
 

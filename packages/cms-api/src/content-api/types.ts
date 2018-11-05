@@ -1,7 +1,7 @@
-import KnexConnection from '../core/knex/KnexConnection'
 import { Acl } from 'cms-common'
+import KnexWrapper from '../core/knex/KnexWrapper'
 
 export interface Context {
-	db: KnexConnection
+	db: KnexWrapper
 	identityVariables: Acl.VariablesMap
 }

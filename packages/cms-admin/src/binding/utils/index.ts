@@ -1,1 +1,1 @@
-export { default as Hashing } from './Hashing'
+export * from './Hashing'

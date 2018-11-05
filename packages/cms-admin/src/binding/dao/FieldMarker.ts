@@ -1,7 +1,7 @@
 import { FieldName } from '../bindingTypes'
-import PlaceholderGenerator from '../model/PlaceholderGenerator'
+import { PlaceholderGenerator } from '../model'
 
-export default class FieldMarker {
+export class FieldMarker {
 	constructor(public readonly fieldName: FieldName) {}
 
 	public get placeholderName(): string {

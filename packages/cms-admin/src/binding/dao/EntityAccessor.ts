@@ -1,6 +1,6 @@
-import EntityData from './EntityData'
+import { EntityData } from './EntityData'
 
-export default class EntityAccessor {
+export class EntityAccessor {
 	public constructor(
 		public readonly primaryKey: string | undefined,
 		public readonly data: EntityData,

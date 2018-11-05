@@ -1,7 +1,7 @@
 import * as pathToRegexp from 'path-to-regexp'
-import { RouteMap, matchesPath } from './utils/url'
 import { ProjectConfig } from './state/projectsConfigs'
-import { toString as dimensionsStringify, toObject as parseDimensionsString } from './utils/stringifyDimensions'
+import { toObject as parseDimensionsString, toString as dimensionsStringify } from './utils/stringifyDimensions'
+import { matchesPath, RouteMap } from './utils/url'
 
 export default (map: ProjectConfig[]): RouteMap => {
 	const configResolver = (project: string, stage: string) => map.find(c => c.project === project && c.stage === stage)

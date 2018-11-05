@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import { EntityName, FieldName } from '../bindingTypes'
-import PlaceholderGenerator from '../model/PlaceholderGenerator'
-import EntityFields from './EntityFields'
+import { PlaceholderGenerator } from '../model'
+import { EntityFields } from './EntityFields'
 
 export interface SingleEntityTreeConstraints {
 	where: Input.UniqueWhere<GraphQlBuilder.Literal>
@@ -43,4 +43,4 @@ namespace MarkerTreeRoot {
 	export type TreeId = string
 }
 
-export default MarkerTreeRoot
+export { MarkerTreeRoot }

@@ -1,6 +1,6 @@
-import { Action, handleActions } from 'redux-actions'
-import AuthState, { emptyAuthState, AuthStatus } from '../state/auth'
 import { Reducer } from 'redux'
+import { Action, handleActions } from 'redux-actions'
+import AuthState, { AuthStatus, emptyAuthState } from '../state/auth'
 
 export const SET_TOKEN = 'set_token'
 export const SET_ERROR = 'set_error'

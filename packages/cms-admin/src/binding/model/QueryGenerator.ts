@@ -1,15 +1,19 @@
 import { CrudQueryBuilder } from 'cms-client'
 import { assertNever, ucfirst } from 'cms-common'
-import EntityFields from '../dao/EntityFields'
-import FieldMarker from '../dao/FieldMarker'
-import Marker from '../dao/Marker'
-import MarkerTreeRoot, { EntityListTreeConstraints, SingleEntityTreeConstraints } from '../dao/MarkerTreeRoot'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import {
+	EntityFields,
+	EntityListTreeConstraints,
+	FieldMarker,
+	Marker,
+	MarkerTreeRoot,
+	ReferenceMarker,
+	SingleEntityTreeConstraints
+} from '../dao'
 
 type Mutations = 'create' | 'update' | 'delete'
 type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQueryBuilder.CrudQueryBuilder, Mutations>>
 
-export default class QueryGenerator {
+export class QueryGenerator {
 	constructor(private tree: MarkerTreeRoot) {}
 
 	public getReadQuery(): string | undefined {

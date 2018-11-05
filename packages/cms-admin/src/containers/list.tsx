@@ -1,8 +1,8 @@
+import { Icon } from '@blueprintjs/core'
+import * as moment from 'moment'
 import * as React from 'react'
 import ReactTable, { Column } from 'react-table'
 import 'react-table/react-table.css'
-import { Icon } from '@blueprintjs/core'
-import * as moment from 'moment'
 
 export default class List extends React.Component {
 	render() {

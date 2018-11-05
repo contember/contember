@@ -1,8 +1,8 @@
-import * as React from 'react'
-import PageLink, { PageLinkProps } from '../pageRouting/PageLink'
 import { Icon } from '@blueprintjs/core'
 import { IconName } from '@blueprintjs/icons'
 import classNames from 'classnames'
+import * as React from 'react'
+import PageLink, { PageLinkProps } from '../pageRouting/PageLink'
 
 export default class MenuPageLink extends React.Component<MenuPageLinkProps> {
 	render() {

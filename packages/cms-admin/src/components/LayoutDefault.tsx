@@ -1,7 +1,7 @@
-import * as React from 'react'
-import Link from './Link'
 import { Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
+import * as React from 'react'
+import Link from './Link'
 import LogoutLink from './LogoutLink'
 
 export interface LayoutDefaultProps {

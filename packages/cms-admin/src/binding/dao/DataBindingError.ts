@@ -1,1 +1,1 @@
-export default class DataBindingError extends Error {}
+export class DataBindingError extends Error {}

@@ -1,19 +1,25 @@
 import * as React from 'react'
-import DataContext, { DataContextValue } from '../coreComponents/DataContext'
-import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
-import { ReferenceMarkerProvider } from '../coreComponents/MarkerProvider'
-import ToMany, { ToManyProps } from '../coreComponents/ToMany'
-import EntityAccessor from '../dao/EntityAccessor'
-import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
-import EntityFields from '../dao/EntityFields'
-import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import {
+	DataContext,
+	DataContextValue,
+	EnforceSubtypeRelation,
+	ReferenceMarkerProvider,
+	ToMany,
+	ToManyProps
+} from '../coreComponents'
+import {
+	EntityAccessor,
+	EntityCollectionAccessor,
+	EntityFields,
+	EntityForRemovalAccessor,
+	ReferenceMarker
+} from '../dao'
 import { AddNewButton } from './buttons'
-import UnlinkButton from './buttons/UnlinkButton'
+import { UnlinkButton } from './buttons/UnlinkButton'
 
 export interface RepeaterProps extends ToManyProps {}
 
-export default class Repeater extends React.Component<RepeaterProps> {
+export class Repeater extends React.Component<RepeaterProps> {
 	static displayName = 'Repeater'
 
 	public render() {

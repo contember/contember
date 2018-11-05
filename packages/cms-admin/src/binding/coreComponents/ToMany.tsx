@@ -2,13 +2,15 @@ import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import EntityAccessor from '../dao/EntityAccessor'
-import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
-import EntityFields from '../dao/EntityFields'
-import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import ReferenceMarker from '../dao/ReferenceMarker'
-import DataContext, { DataContextValue } from './DataContext'
-import EnforceSubtypeRelation from './EnforceSubtypeRelation'
+import {
+	EntityAccessor,
+	EntityCollectionAccessor,
+	EntityFields,
+	EntityForRemovalAccessor,
+	ReferenceMarker
+} from '../dao'
+import { DataContext, DataContextValue } from './DataContext'
+import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface ToManyProps {
@@ -63,6 +65,6 @@ namespace ToMany {
 	}
 }
 
-export default ToMany
+export { ToMany }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof ToMany, ReferenceMarkerProvider>

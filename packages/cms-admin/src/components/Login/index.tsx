@@ -1,9 +1,9 @@
+import { Button, Callout, Card, Checkbox, Elevation, FormGroup, InputGroup } from '@blueprintjs/core'
 import * as React from 'react'
-import { InputGroup, FormGroup, Card, Elevation, H1, Button, Checkbox, Callout } from '@blueprintjs/core'
 import { connect } from 'react-redux'
 import { login } from '../../actions/auth'
-import State from '../../state'
 import { Dispatch } from '../../actions/types'
+import State from '../../state'
 import { AuthStatus } from '../../state/auth'
 
 class Login extends React.PureComponent<Login.Props, Login.State> {

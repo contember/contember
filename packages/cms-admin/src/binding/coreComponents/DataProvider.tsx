@@ -4,14 +4,10 @@ import { getData, putData } from '../../actions/content'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentRequestsState, ContentStatus } from '../../state/content'
-import AccessorTreeRoot from '../dao/AccessorTreeRoot'
-import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
+import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
-import AccessorTreeGenerator from '../model/AccessorTreeGenerator'
-import MutationGenerator from '../model/MutationGenerator'
-import QueryGenerator from '../model/QueryGenerator'
-import MetaOperationsContext, { MetaOperationsContextValue } from './MetaOperationsContext'
+import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
+import { MetaOperationsContext, MetaOperationsContextValue } from './MetaOperationsContext'
 
 export interface DataRendererProps {
 	data: AccessorTreeRoot | undefined

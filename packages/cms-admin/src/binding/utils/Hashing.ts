@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import { ReferenceMarker } from '../dao'
 
-export default class Hashing {
+export class Hashing {
 	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
 		const where: Array<
 			| Input.Where<GraphQlBuilder.Literal>

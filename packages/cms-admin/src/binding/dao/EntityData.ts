@@ -1,9 +1,9 @@
 import { FieldName } from '../bindingTypes'
-import { DataContextValue } from '../coreComponents/DataContext'
-import PlaceholderGenerator from '../model/PlaceholderGenerator'
-import EntityCollectionAccessor from './EntityCollectionAccessor'
-import MarkerTreeRoot from './MarkerTreeRoot'
-import ReferenceMarker from './ReferenceMarker'
+import { DataContextValue } from '../coreComponents'
+import { PlaceholderGenerator } from '../model'
+import { EntityCollectionAccessor } from './EntityCollectionAccessor'
+import { MarkerTreeRoot } from './MarkerTreeRoot'
+import { ReferenceMarker } from './ReferenceMarker'
 
 class EntityData {
 	public constructor(private data: EntityData.EntityData) {}
@@ -58,4 +58,4 @@ namespace EntityData {
 	export type EntityData = { [placeholder in FieldName]: FieldData }
 }
 
-export default EntityData
+export { EntityData }

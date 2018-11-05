@@ -1,6 +1,6 @@
-import { Action, handleActions } from 'redux-actions'
-import ContentState, { emptyContentState, ContentStatus } from '../state/content'
 import { Reducer } from 'redux'
+import { handleActions } from 'redux-actions'
+import ContentState, { ContentStatus, emptyContentState } from '../state/content'
 
 export const CONTENT_SET_DATA = 'content_set_data'
 export const CONTENT_SET_LOADING = 'content_set_loading'

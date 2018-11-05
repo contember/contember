@@ -1,14 +1,10 @@
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import DataBindingError from '../dao/DataBindingError'
-import EntityAccessor from '../dao/EntityAccessor'
-import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import FieldAccessor from '../dao/FieldAccessor'
-import FieldMarker from '../dao/FieldMarker'
-import Parser from '../queryLanguage/Parser'
-import DataContext, { DataContextValue } from './DataContext'
-import EnforceSubtypeRelation from './EnforceSubtypeRelation'
-import EnvironmentContext from './EnvironmentContext'
+import { DataBindingError, EntityAccessor, EntityForRemovalAccessor, FieldAccessor, FieldMarker } from '../dao'
+import { Parser } from '../queryLanguage'
+import { DataContext, DataContextValue } from './DataContext'
+import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
+import { EnvironmentContext } from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
 
 export interface FieldProps {
@@ -67,6 +63,6 @@ namespace Field {
 	}
 }
 
-export default Field
+export { Field }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof Field, FieldMarkerProvider>

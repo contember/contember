@@ -5,7 +5,7 @@ export interface EntityProps {
 	name: EntityName
 }
 
-export default class Entity extends React.Component<EntityProps> {
+export class Entity extends React.Component<EntityProps> {
 	static displayName = 'Entity'
 
 	public render() {

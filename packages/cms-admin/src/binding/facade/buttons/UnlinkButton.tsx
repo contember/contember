@@ -1,9 +1,9 @@
 import { Button, Intent } from '@blueprintjs/core'
 import * as React from 'react'
-import DataContext, { DataContextValue } from '../../coreComponents/DataContext'
-import EntityAccessor from '../../dao/EntityAccessor'
+import { DataContext, DataContextValue } from '../../coreComponents'
+import { EntityAccessor } from '../../dao'
 
-export default class UnlinkButton extends React.Component {
+export class UnlinkButton extends React.Component {
 	public render() {
 		return (
 			<DataContext.Consumer>

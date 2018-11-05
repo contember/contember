@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Environment from '../dao/Environment'
+import { Environment } from '../dao'
 
-const environmentContext = React.createContext<Environment>(new Environment())
+const EnvironmentContext = React.createContext<Environment>(new Environment())
 
-export default environmentContext
+export { EnvironmentContext }

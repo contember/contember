@@ -1,7 +1,7 @@
-import { Plugin } from 'slate-react'
-import { Rule } from 'slate-html-serializer'
 import * as React from 'react'
-import { Change, Value, Mark } from 'slate'
+import { Change, Value } from 'slate'
+import { Rule } from 'slate-html-serializer'
+import { Plugin } from 'slate-react'
 
 export interface RichEditorPluginConfig {
 	node: 'mark' | 'block'

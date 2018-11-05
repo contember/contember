@@ -1,8 +1,8 @@
 import * as React from 'react'
-import Link, { InnerProps } from '../Link'
-import { pageRequest } from '../../state/request'
 import { connect } from 'react-redux'
 import State from '../../state'
+import { pageRequest } from '../../state/request'
+import Link, { InnerProps } from '../Link'
 
 type ParamByName<P extends AnyParams, N extends string> = P extends { [A in N]: infer R } ? R : never
 export type AnyParams = { [key: string]: any }

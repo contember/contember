@@ -1,11 +1,11 @@
 import { UL } from '@blueprintjs/core'
 import * as React from 'react'
-import DataContext from '../../coreComponents/DataContext'
-import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
+import { DataContext } from '../../coreComponents'
+import { EntityCollectionAccessor } from '../../dao'
 import { RendererProps } from './CommonRendererProps'
-import DefaultRenderer from './DefaultRenderer'
+import { DefaultRenderer } from './DefaultRenderer'
 
-export default class ListRenderer extends React.Component<RendererProps> {
+export class ListRenderer extends React.Component<RendererProps> {
 	public render() {
 		const data = this.props.data
 

@@ -1,6 +1,6 @@
+import { Card, H1 } from '@blueprintjs/core'
 import * as React from 'react'
 import { ProjectConfig } from '../state/projectsConfigs'
-import { H1, Card } from '@blueprintjs/core'
 import Link from './Link'
 
 interface ProjectsListProps {

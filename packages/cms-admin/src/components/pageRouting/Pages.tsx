@@ -1,8 +1,8 @@
 import * as React from 'react'
-import Page, { PageProps } from './Page'
-import PageProvider from './PageProvider'
 import { connect } from 'react-redux'
 import State from '../../state'
+import Page, { PageProps } from './Page'
+import PageProvider from './PageProvider'
 
 type PageProviderElement = React.ReactElement<any> & { type: PageProvider }
 type PageElement = React.ReactElement<PageProps>

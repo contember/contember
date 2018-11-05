@@ -1,7 +1,7 @@
-import RequestState from '../state/request'
-import { ActionCreator } from './types'
 import { createAction } from 'redux-actions'
 import { VIEW_REPLACE } from '../reducer/view'
+import RequestState from '../state/request'
+import { ActionCreator } from './types'
 
 const handleRequest = (request: RequestState, previous: RequestState): ActionCreator => (dispatch, getState) => {
 	//show old view and loading overlay until it is loaded

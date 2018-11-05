@@ -1,4 +1,4 @@
-export { default as AddNewButton } from './AddNewButton'
-export { default as PageLinkById } from './PageLinkById'
-export { default as PersistButton } from './PersistButton'
-export { default as UnlinkButton } from './UnlinkButton'
+export * from './AddNewButton'
+export * from './PageLinkById'
+export * from './PersistButton'
+export * from './UnlinkButton'

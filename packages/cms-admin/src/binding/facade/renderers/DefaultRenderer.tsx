@@ -1,11 +1,11 @@
 import { H1 } from '@blueprintjs/core'
 import * as React from 'react'
-import DataContext from '../../coreComponents/DataContext'
-import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
+import { DataContext } from '../../coreComponents'
+import { EntityCollectionAccessor } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
 
-export default class DefaultRenderer extends React.Component<RendererProps> {
+export class DefaultRenderer extends React.Component<RendererProps> {
 	public render() {
 		const data = this.props.data
 

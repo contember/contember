@@ -33,7 +33,7 @@ class ExecutionContainerFactory {
 	public create(context: Context): Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }> {
 		const that = this
 		const innerDic = new Container.Builder({})
-			.addService('db', () => context.db.wrapper())
+			.addService('db', () => context.db)
 
 			.addService('variableInjector', () => new VariableInjector(this.schema, context.identityVariables))
 			.addService(

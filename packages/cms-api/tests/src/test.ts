@@ -2,9 +2,9 @@ import * as knex from 'knex'
 import { Acl, Model } from 'cms-common'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
-import KnexConnection from '../../src/core/knex/KnexConnection'
 import S3 from '../../src/utils/S3'
 import { executeGraphQlTest } from './testGraphql'
+import KnexWrapper from '../../src/core/knex/KnexWrapper'
 
 export interface SqlQuery {
 	sql: string
@@ -47,7 +47,7 @@ export const execute = async (test: Test) => {
 
 	await executeGraphQlTest(connection, {
 		context: {
-			db: new KnexConnection(connection, 'public'),
+			db: new KnexWrapper(connection, 'public'),
 			identityVariables: test.variables || {},
 			identityId: '11111111-1111-1111-1111-111111111111',
 		},

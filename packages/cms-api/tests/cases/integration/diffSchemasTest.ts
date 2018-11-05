@@ -180,7 +180,8 @@ describe('Diff schemas', () => {
 		const sql = SQL`CREATE TABLE "post" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			ALTER TABLE "post" ADD "title" text;
-			ALTER TABLE "post" ADD "author_id" uuid REFERENCES "author"("id") ON DELETE cascade;
+			ALTER TABLE "post" ADD "author_id" uuid;
+			ALTER TABLE "post" ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
 			CREATE INDEX "post_author_id_index" ON "post" ("author_id");`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
@@ -287,7 +288,8 @@ describe('Diff schemas', () => {
 		}
 		const sql = SQL`CREATE TABLE "post_locale" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_locale" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
-			ALTER TABLE "post_locale" ADD "post_id" uuid NOT NULL REFERENCES "post"("id") ON DELETE restrict;
+			ALTER TABLE "post_locale" ADD "post_id" uuid NOT NULL;
+    	ALTER TABLE "post_locale" ADD CONSTRAINT "fk_post_locale_post_id_f3d2e5" FOREIGN KEY ("post_id") REFERENCES "post"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
 			CREATE INDEX "post_locale_post_id_index" ON "post_locale" ("post_id");
 			ALTER TABLE "post_locale" ADD "title" text;
 			ALTER TABLE "post_locale" ADD "locale" text;
@@ -468,8 +470,8 @@ describe('Diff schemas', () => {
 			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "category" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			  CREATE TABLE "post_categories" (
 				"id"          uuid PRIMARY KEY NOT NULL,
-				"post_id"     uuid NOT NULL REFERENCES "post"("id") ON DELETE cascade,
-				"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE cascade,
+				"post_id"     uuid NOT NULL REFERENCES "post"("id") ON DELETE CASCADE,
+				"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE CASCADE,
 				CONSTRAINT "post_categories_uniq_post_id_category_id" UNIQUE ("post_id", "category_id")
 			  );
 			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_categories" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
@@ -594,7 +596,8 @@ describe('Diff schemas', () => {
 			CREATE TABLE "site_setting" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site_setting" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			ALTER TABLE "site" ADD "name" text;
-			ALTER TABLE "site" ADD "setting_id" uuid UNIQUE REFERENCES "site_setting"("id") ON DELETE restrict;
+			ALTER TABLE "site" ADD "setting_id" uuid UNIQUE;
+			ALTER TABLE "site" ADD CONSTRAINT "fk_site_setting_id_6a4aa6" FOREIGN KEY ("setting_id") REFERENCES "site_setting"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
 			ALTER TABLE "site_setting" ADD "url" text;`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)

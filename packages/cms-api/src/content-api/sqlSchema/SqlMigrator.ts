@@ -21,6 +21,7 @@ import SchemaMigrator from '../../content-schema/differ/SchemaMigrator'
 import { acceptFieldVisitor, acceptRelationTypeVisitor } from '../../content-schema/modelUtils'
 import escapeSqlString from '../../utils/escapeSqlString'
 import { createMigrationBuilder } from './sqlSchemaBuilderHelper'
+import SqlNameHelper from './SqlNameHelper'
 
 export default class SqlMigrator {
 	constructor(
@@ -132,9 +133,22 @@ export default class SqlMigrator {
 					[relation.joiningColumn.columnName]: {
 						type: this.getPrimaryType(targetEntity),
 						notNull: !relation.nullable,
-						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-						onDelete: relation.joiningColumn.onDelete,
 					},
+				})
+				const fkName = SqlNameHelper.createForeignKeyName(
+					entity.tableName,
+					relation.joiningColumn.columnName,
+					targetEntity.tableName,
+					targetEntity.primaryColumn
+				)
+				this.builder.addConstraint(entity.tableName, fkName, {
+					foreignKeys: {
+						columns: relation.joiningColumn.columnName,
+						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
+						onDelete: 'NO ACTION',
+					},
+					deferrable: true,
+					deferred: false,
 				})
 				this.builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 			},
@@ -145,9 +159,22 @@ export default class SqlMigrator {
 						type: this.getPrimaryType(targetEntity),
 						notNull: !relation.nullable,
 						unique: true,
-						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-						onDelete: relation.joiningColumn.onDelete,
 					},
+				})
+				const fkName = SqlNameHelper.createForeignKeyName(
+					entity.tableName,
+					relation.joiningColumn.columnName,
+					targetEntity.tableName,
+					targetEntity.primaryColumn
+				)
+				this.builder.addConstraint(entity.tableName, fkName, {
+					foreignKeys: {
+						columns: relation.joiningColumn.columnName,
+						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
+						onDelete: 'NO ACTION',
+					},
+					deferrable: true,
+					deferred: false,
 				})
 			},
 			visitOneHasOneInversed: () => {},
@@ -164,13 +191,13 @@ export default class SqlMigrator {
 							type: this.getPrimaryType(entity),
 							notNull: true,
 							references: `"${entity.tableName}"("${entity.primaryColumn}")`,
-							onDelete: relation.joiningTable.joiningColumn.onDelete,
+							onDelete: 'CASCADE',
 						},
 						[relation.joiningTable.inverseJoiningColumn.columnName]: {
 							type: this.getPrimaryType(targetEntity),
 							notNull: true,
 							references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-							onDelete: relation.joiningTable.inverseJoiningColumn.onDelete,
+							onDelete: 'CASCADE',
 						},
 					},
 					{

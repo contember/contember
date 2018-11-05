@@ -15,6 +15,7 @@ import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
+import DeleteExecutor from './delete/DeleteExecutor'
 
 class Mapper {
 	constructor(
@@ -27,7 +28,8 @@ class Mapper {
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly whereBuilder: WhereBuilder,
-		private readonly junctionTableManager: JunctionTableManager
+		private readonly junctionTableManager: JunctionTableManager,
+		private readonly deleteExecutor: DeleteExecutor
 	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
@@ -149,24 +151,7 @@ class Mapper {
 	}
 
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
-		const qb = this.db
-			.deleteBuilder()
-			.from(entity.tableName)
-			.where(condition =>
-				condition.in(entity.primaryColumn, qb => {
-					qb.from(entity.tableName, 'root_')
-					qb.select(['root_', entity.primaryColumn])
-					const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-					const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-					this.whereBuilder.build(qb, entity, new Path([]), { and: [uniqueWhere, predicate] })
-				})
-			)
-
-		const affectedRows = await qb.execute()
-
-		if (affectedRows !== 1) {
-			throw new Mapper.NoResultError()
-		}
+		await this.deleteExecutor.execute(entity, where)
 	}
 
 	public async connectJunction(

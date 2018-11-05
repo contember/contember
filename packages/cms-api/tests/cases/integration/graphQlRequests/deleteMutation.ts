@@ -53,12 +53,23 @@ describe('Delete mutation', () => {
 						],
 					},
 					{
+						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+						parameters: [],
+						response: 1,
+					},
+					{
 						sql: SQL`delete from "public"."post"
             where "id" in (select "root_"."id"
                            from "public"."post" as "root_"
-                           where "root_"."id" = $1)`,
+                           where "root_"."id" = $1)
+						returning "id"`,
 						parameters: [testUuid(1)],
-						response: { rowCount: 1 },
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+					{
+						sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+						parameters: [],
+						response: 1,
 					},
 				]),
 			],
@@ -68,6 +79,154 @@ describe('Delete mutation', () => {
 						author: {
 							name: 'John',
 						},
+						id: testUuid(1),
+					},
+				},
+			},
+		})
+	})
+
+	it('delete author with posts and locales cascade delete', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.cascade))
+				)
+				.entity('PostLocales', entity =>
+					entity.manyHasOne('post', relation => relation.target('Post').onDelete(Model.OnDelete.cascade))
+				)
+				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        mutation {
+          deleteAuthor(by: {id: "${testUuid(1)}"}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "public"."author" as "root_"
+                     where "root_"."id" = $1`,
+						parameters: [testUuid(1)],
+						response: [
+							{
+								root_id: testUuid(1),
+							},
+						],
+					},
+					{
+						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+						parameters: [],
+						response: 1,
+					},
+					{
+						sql: SQL`delete from "public"."author"
+            where "id" in (select "root_"."id"
+                           from "public"."author" as "root_"
+                           where "root_"."id" = $1)
+            returning "id"`,
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+					{
+						sql: SQL`delete from "public"."post"
+            where "id" in (select "root_"."id"
+                           from "public"."post" as "root_"
+                           where "root_"."author_id" in ($1))
+            returning "id"`,
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(2) }, { id: testUuid(3) }] },
+					},
+					{
+						sql: SQL`delete from "public"."post_locales"
+            where "id" in (select "root_"."id"
+                           from "public"."post_locales" as "root_"
+                           where "root_"."post_id" in ($1, $2))
+            returning "id"`,
+						parameters: [testUuid(2), testUuid(3)],
+						response: { rows: [{ id: testUuid(4) }, { id: testUuid(5) }] },
+					},
+					{
+						sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+						parameters: [],
+						response: 1,
+					},
+				]),
+			],
+			return: {
+				data: {
+					deleteAuthor: {
+						id: testUuid(1),
+					},
+				},
+			},
+		})
+	})
+
+	it('delete author and set null on posts', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull))
+				)
+				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        mutation {
+          deleteAuthor(by: {id: "${testUuid(1)}"}) {
+            id
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "public"."author" as "root_"
+                     where "root_"."id" = $1`,
+						parameters: [testUuid(1)],
+						response: [
+							{
+								root_id: testUuid(1),
+							},
+						],
+					},
+					{
+						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+						parameters: [],
+						response: 1,
+					},
+					{
+						sql: SQL`delete from "public"."author"
+            where "id" in (select "root_"."id"
+                           from "public"."author" as "root_"
+                           where "root_"."id" = $1)
+            returning "id"`,
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+					{
+						sql: SQL`with "newData_" as (select
+                                           $1 :: uuid as "author_id",
+                                           "root_"."id"
+                                         from "public"."post" as "root_"
+                                         where "root_"."author_id" in ($2)) update "public"."post"
+            set "author_id" = "newData_"."author_id" from "newData_"
+            where "post"."author_id" in ($3)`,
+						parameters: [null, testUuid(1), testUuid(1)],
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+						parameters: [],
+						response: 1,
+					},
+				]),
+			],
+			return: {
+				data: {
+					deleteAuthor: {
 						id: testUuid(1),
 					},
 				},
@@ -117,12 +276,23 @@ describe('Delete mutation', () => {
 						],
 					},
 					{
+						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+						parameters: [],
+						response: 1,
+					},
+					{
 						sql: SQL`delete from "public"."post"
             where "id" in (select "root_"."id"
                            from "public"."post" as "root_"
-                           where "root_"."id" = $1 and "root_"."locale" in ($2))`,
+                           where "root_"."id" = $1 and "root_"."locale" in ($2))
+            returning "id"`,
 						parameters: [testUuid(1), 'cs'],
-						response: { rowCount: 1 },
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+					{
+						sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+						parameters: [],
+						response: 1,
 					},
 				]),
 			],

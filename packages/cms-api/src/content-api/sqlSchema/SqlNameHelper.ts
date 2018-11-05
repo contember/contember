@@ -1,4 +1,4 @@
-import * as crypto from "crypto"
+import * as crypto from 'crypto'
 
 class SqlNameHelper {
 	public static createForeignKeyName(fromTable: string, fromColumn: string, toTable: string, toColumn: string): string {
@@ -12,4 +12,3 @@ class SqlNameHelper {
 }
 
 export default SqlNameHelper
-

@@ -46,10 +46,20 @@ class MigrationFilesManager {
 		return filteredFiles.sort()
 	}
 
-	public async readFiles(extension: string): Promise<{ filename: string; content: string }[]> {
-		const files = await this.listFiles(extension)
+	public async readFiles(extension: string, predicate?: (version: string) => boolean): Promise<{
+		filename: string;
+		path: string;
+		version: string,
+		content: string,
+	}[]> {
+		let files = await this.listFiles(extension)
+		if (predicate) {
+			files = files.filter(filename => predicate(FileNameHelper.extractVersion(filename)))
+		}
 		const filesWithContent = files.map(async filename => ({
 			filename: filename,
+			path: `${this.directory}/${filename}`,
+			version: FileNameHelper.extractVersion(filename),
 			content: await readFile(`${this.directory}/${filename}`, { encoding: 'utf8' }),
 		}))
 

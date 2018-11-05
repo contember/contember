@@ -84,7 +84,6 @@ class Initialize {
 	}
 
 	private async runMigrationsForStage(stage: Project.Stage) {
-
 		await this.projectDb.transaction(async knexConnection => {
 			const knexWrapper = knexConnection.wrapper()
 			await knexWrapper.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
@@ -109,8 +108,11 @@ class Initialize {
 				)
 			}
 
-			const migrations = await this.migrationFilesManager.readFiles('sql', version => version > currentVersion && version <= stage.migration)
-			if (!migrations.find(({version}) => version === stage.migration)) {
+			const migrations = await this.migrationFilesManager.readFiles(
+				'sql',
+				version => version > currentVersion && version <= stage.migration
+			)
+			if (!migrations.find(({ version }) => version === stage.migration)) {
 				throw new Error(
 					`Migration ${stage.migration} does not exist in project ${this.project.slug} (stage ${stage.slug})`
 				)
@@ -171,7 +173,10 @@ class InitCommand extends BaseCommand<Args, {}> {
 
 		await Promise.all(
 			config.projects.map(async project => {
-				const migrationFilesManager = MigrationFilesManager.createForProject(this.getGlobalOptions().projectsDirectory, project.slug)
+				const migrationFilesManager = MigrationFilesManager.createForProject(
+					this.getGlobalOptions().projectsDirectory,
+					project.slug
+				)
 				const projectDb = new KnexConnection(
 					Knex({
 						debug: false,

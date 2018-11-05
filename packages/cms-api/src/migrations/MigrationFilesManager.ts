@@ -46,12 +46,17 @@ class MigrationFilesManager {
 		return filteredFiles.sort()
 	}
 
-	public async readFiles(extension: string, predicate?: (version: string) => boolean): Promise<{
-		filename: string;
-		path: string;
-		version: string,
-		content: string,
-	}[]> {
+	public async readFiles(
+		extension: string,
+		predicate?: (version: string) => boolean
+	): Promise<
+		{
+			filename: string
+			path: string
+			version: string
+			content: string
+		}[]
+	> {
 		let files = await this.listFiles(extension)
 		if (predicate) {
 			files = files.filter(filename => predicate(FileNameHelper.extractVersion(filename)))

@@ -25,6 +25,7 @@ import SelectBuilder from '../sql/select/SelectBuilder'
 import MetaHandler from '../sql/select/handlers/MetaHandler'
 import HasManyToHasOneReducerExecutionHandler from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducerExecutionHandler'
 import HasManyToHasOneReducer from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer'
+import DeleteExecutor from '../sql/delete/DeleteExecutor'
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Model.Schema, private readonly permissions: Acl.Permissions) {}
@@ -119,10 +120,16 @@ class ExecutionContainerFactory {
 						disconnectJunctionHandler
 					)
 			)
+			.addService(
+				'deleteExecutor',
+				({ db, uniqueWhereExpander, predicateFactory, updateBuilderFactory, whereBuilder }) =>
+					new DeleteExecutor(this.schema, db, uniqueWhereExpander, predicateFactory, whereBuilder, updateBuilderFactory)
+			)
 
 			.addService(
 				'mapper',
 				({
+					db,
 					predicateFactory,
 					predicatesInjector,
 					selectBuilderFactory,
@@ -132,10 +139,11 @@ class ExecutionContainerFactory {
 					whereBuilder,
 					junctionTableManager,
 					mapperAccessor,
+					deleteExecutor,
 				}) => {
 					const mapper = new Mapper(
 						this.schema,
-						context.db.wrapper(),
+						db,
 						predicateFactory,
 						predicatesInjector,
 						selectBuilderFactory,
@@ -143,7 +151,8 @@ class ExecutionContainerFactory {
 						updateBuilderFactory,
 						uniqueWhereExpander,
 						whereBuilder,
-						junctionTableManager
+						junctionTableManager,
+						deleteExecutor
 					)
 					mapperAccessor.set(mapper)
 

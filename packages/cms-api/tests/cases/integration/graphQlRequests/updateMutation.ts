@@ -386,12 +386,23 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
+							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+							parameters: [],
+							response: 1,
+						},
+						{
 							sql: SQL`delete from "public"."author"
               where "id" in (select "root_"."id"
                              from "public"."author" as "root_"
-                             where "root_"."id" = $1)`,
+                             where "root_"."id" = $1)
+              returning "id"`,
 							parameters: [testUuid(1)],
-							response: { rowCount: 1 },
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+							parameters: [],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -625,12 +636,23 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
+							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+							parameters: [],
+							response: 1,
+						},
+						{
 							sql: SQL`delete from "public"."post_locale"
               where "id" in (select "root_"."id"
                              from "public"."post_locale" as "root_"
-                             where "root_"."locale" = $1 and "root_"."post_id" = $2)`,
+                             where "root_"."locale" = $1 and "root_"."post_id" = $2)
+              returning "id"`,
 							parameters: ['cs', testUuid(2)],
-							response: { rowCount: 1 },
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+							parameters: [],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -1151,12 +1173,23 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
+							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+							parameters: [],
+							response: 1,
+						},
+						{
 							sql: SQL`delete from "public"."site_setting"
               where "id" in (select "root_"."id"
                              from "public"."site_setting" as "root_"
-                             where "root_"."id" = $1)`,
+                             where "root_"."id" = $1)
+              returning "id"`,
 							parameters: [testUuid(1)],
-							response: { rowCount: 1 },
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+							parameters: [],
+							response: 1,
 						},
 						selectUpdateSiteSql,
 					]),
@@ -1475,12 +1508,23 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
+							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+							parameters: [],
+							response: 1,
+						},
+						{
 							sql: SQL`delete from "public"."site"
               where "id" in (select "root_"."id"
                              from "public"."site" as "root_"
-                             where "root_"."setting_id" = $1)`,
+                             where "root_"."setting_id" = $1)
+              returning "id"`,
 							parameters: [testUuid(2)],
-							response: { rowCount: 1 },
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+							parameters: [],
+							response: 1,
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1734,18 +1778,23 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`delete from "public"."post_categories"
-              where "post_id" = $1 and "category_id" = $2`,
-							parameters: [testUuid(2), testUuid(1)],
-							response: { rowCount: 1 },
+							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+							parameters: [],
+							response: 1,
 						},
 						{
 							sql: SQL`delete from "public"."category"
               where "id" in (select "root_"."id"
                              from "public"."category" as "root_"
-                             where "root_"."id" = $1)`,
+                             where "root_"."id" = $1)
+              returning "id"`,
 							parameters: [testUuid(1)],
-							response: { rowCount: 1 },
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+							parameters: [],
+							response: 1,
 						},
 						selectUpdatePostSql,
 					]),
@@ -2041,18 +2090,23 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`delete from "public"."post_categories"
-              where "post_id" = $1 and "category_id" = $2`,
-							parameters: [testUuid(1), testUuid(2)],
-							response: { rowCount: 1 },
+							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+							parameters: [],
+							response: 1,
 						},
 						{
 							sql: SQL`delete from "public"."post"
               where "id" in (select "root_"."id"
                              from "public"."post" as "root_"
-                             where "root_"."id" = $1)`,
+                             where "root_"."id" = $1)
+              returning "id"`,
 							parameters: [testUuid(1)],
-							response: { rowCount: 1 },
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+							parameters: [],
+							response: 1,
 						},
 						selectUpdateCategorySql,
 					]),

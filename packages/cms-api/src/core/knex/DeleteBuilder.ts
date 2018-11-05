@@ -75,7 +75,9 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		) as DeleteBuilder.DeleteBuilderState<Result, Filled>
 	}
 
-	public returning(column: string | Knex.Raw): DeleteBuilder.DeleteBuilderState<Returning.Result[], Filled> {
+	public returning(
+		column: QueryBuilder.ColumnIdentifier | Knex.Raw
+	): DeleteBuilder.DeleteBuilderState<Returning.Result[], Filled> {
 		return new DeleteBuilder<Returning.Result[], Filled>(
 			this.wrapper,
 			{ ...this.options, returningColumn: new Returning(column) },

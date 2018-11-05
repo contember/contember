@@ -1,13 +1,15 @@
 import * as Knex from 'knex'
 import { Value } from '../types'
 import { QueryResult } from 'pg'
+import QueryBuilder from '../QueryBuilder'
 
 class Returning {
-	constructor(private readonly column: string | Knex.Raw | null = null) {}
+	constructor(private readonly column: QueryBuilder.ColumnIdentifier | Knex.Raw | null = null) {}
 
 	public modifyQuery(sql: string, bindings: Value[]): [string, Value[]] {
 		if (this.column) {
-			return [sql + ' returning ??', [...bindings, this.column]]
+			const column = Array.isArray(this.column) ? QueryBuilder.toFqn(this.column) : this.column
+			return [sql + ' returning ??', [...bindings, column]]
 		}
 		return [sql, bindings]
 	}

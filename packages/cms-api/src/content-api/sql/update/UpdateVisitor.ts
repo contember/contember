@@ -87,7 +87,6 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				public async delete(where: Input.UniqueWhere) {
-					await disconnect(where)
 					await mapper.delete(targetEntity, where)
 				}
 
@@ -149,7 +148,6 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 				}
 
 				public async delete(where: Input.UniqueWhere) {
-					await disconnect(where)
 					await mapper.delete(targetEntity, where)
 				}
 

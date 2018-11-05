@@ -38,7 +38,7 @@ export class NumberField extends React.Component<NumberFieldProps> {
 	}
 
 	public static generateSyntheticChildren(props: NumberFieldProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName}/>, environment)
+		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 

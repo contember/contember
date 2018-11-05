@@ -1,19 +1,21 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import MarkerProvider from '../coreComponents/MarkerProvider'
-import DataBindingError from '../dao/DataBindingError'
-import EntityFields from '../dao/EntityFields'
-import Environment from '../dao/Environment'
-import FieldMarker from '../dao/FieldMarker'
-import Marker from '../dao/Marker'
-import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import { MarkerProvider } from '../coreComponents'
+import {
+	DataBindingError,
+	EntityFields,
+	Environment,
+	FieldMarker,
+	Marker,
+	MarkerTreeRoot,
+	ReferenceMarker
+} from '../dao'
 
 type NodeResult = FieldMarker | MarkerTreeRoot | ReferenceMarker
 type RawNodeResult = NodeResult | NodeResult[] | undefined
 
-export default class MarkerTreeGenerator {
+export class MarkerTreeGenerator {
 	public constructor(
 		private sourceTree: React.ReactNode,
 		private environment: Environment = new Environment({

@@ -1,10 +1,8 @@
 import { FieldName } from '../bindingTypes'
-import FieldMarker from '../dao/FieldMarker'
-import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import { FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
 import { Hashing } from '../utils'
 
-export default class PlaceholderGenerator {
+export class PlaceholderGenerator {
 	public static generateFieldMarkerPlaceholder(marker: FieldMarker): string {
 		return PlaceholderGenerator.getFieldPlaceholder(marker.fieldName)
 	}

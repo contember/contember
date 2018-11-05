@@ -4,12 +4,11 @@ import * as React from 'react'
 import Dimensions from '../../components/Dimensions'
 import { SelectedDimension } from '../../state/request'
 import { EntityName, FieldName } from '../bindingTypes'
-import Environment from '../dao/Environment'
-import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import MarkerTreeGenerator from '../model/MarkerTreeGenerator'
+import { Environment, MarkerTreeRoot } from '../dao'
+import { MarkerTreeGenerator } from '../model'
 import { DataRendererProps, getDataProvider } from './DataProvider'
-import EnforceSubtypeRelation from './EnforceSubtypeRelation'
-import EnvironmentContext from './EnvironmentContext'
+import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
+import { EnvironmentContext } from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
 interface SingleEntityDataProviderProps<DRP> {
@@ -20,7 +19,7 @@ interface SingleEntityDataProviderProps<DRP> {
 	rendererProps?: DRP
 }
 
-export default class SingleEntityDataProvider<DRP> extends React.Component<SingleEntityDataProviderProps<DRP>> {
+export class SingleEntityDataProvider<DRP> extends React.Component<SingleEntityDataProviderProps<DRP>> {
 	public static displayName = 'SingleEntityDataProvider'
 
 	public render() {

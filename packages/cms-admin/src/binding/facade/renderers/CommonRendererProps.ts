@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { DataRendererProps } from '../../coreComponents/DataProvider'
+import { DataRendererProps } from '../../coreComponents'
 
-export default interface CommonRendererProps {
+export interface CommonRendererProps {
 	title?: React.ReactNode
 }
 

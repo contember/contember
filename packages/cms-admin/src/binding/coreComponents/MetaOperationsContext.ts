@@ -1,8 +1,8 @@
 import * as React from 'react'
-import MetaOperationsAccessor from '../dao/MetaOperationsAccessor'
+import { MetaOperationsAccessor } from '../dao'
 
 export type MetaOperationsContextValue = MetaOperationsAccessor | undefined
 
-const metaOperationsContext = React.createContext<MetaOperationsContextValue>(undefined)
+const MetaOperationsContext = React.createContext<MetaOperationsContextValue>(undefined)
 
-export default metaOperationsContext
+export { MetaOperationsContext }

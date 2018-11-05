@@ -1,1 +1,1 @@
-export default class QueryLanguageError extends Error {}
+export class QueryLanguageError extends Error {}

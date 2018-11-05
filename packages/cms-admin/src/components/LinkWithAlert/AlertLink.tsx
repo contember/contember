@@ -1,7 +1,7 @@
 import { Alert, IAlertProps } from '@blueprintjs/core'
 import * as React from 'react'
-import LinkComponent from '../Link/LinkComponent'
 import { InnerProps } from '../Link'
+import LinkComponent from '../Link/LinkComponent'
 
 export interface AlertLinkProps
 	extends Pick<LinkComponent.OwnProps, Exclude<keyof LinkComponent.OwnProps, 'requestChange'>> {

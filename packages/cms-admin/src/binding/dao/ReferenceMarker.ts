@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import { FieldName } from '../bindingTypes'
-import PlaceholderGenerator from '../model/PlaceholderGenerator'
-import EntityFields from './EntityFields'
+import { PlaceholderGenerator } from '../model'
+import { EntityFields } from './EntityFields'
 
 class ReferenceMarker {
 	public readonly fieldName: FieldName
@@ -75,4 +75,4 @@ namespace ReferenceMarker {
 	}
 }
 
-export default ReferenceMarker
+export { ReferenceMarker }

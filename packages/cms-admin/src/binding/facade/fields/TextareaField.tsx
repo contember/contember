@@ -2,11 +2,9 @@ import { FormGroup, IFormGroupProps, TextArea } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
-import EnforceSubtypeRelation from '../../coreComponents/EnforceSubtypeRelation'
-import Field from '../../coreComponents/Field'
-import { SyntheticChildrenProvider } from '../../coreComponents/MarkerProvider'
-import FieldAccessor from '../../dao/FieldAccessor'
-import Parser from '../../queryLanguage/Parser'
+import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
+import { FieldAccessor } from '../../dao'
+import { Parser } from '../../queryLanguage'
 import { TextFieldProps } from './TextField'
 
 export interface TextAreaFieldProps {
@@ -16,7 +14,7 @@ export interface TextAreaFieldProps {
 	singleLine?: boolean
 }
 
-export default class TextAreaField extends React.Component<TextAreaFieldProps> {
+export class TextAreaField extends React.Component<TextAreaFieldProps> {
 	static displayName = 'TextAreaField'
 
 	public render() {

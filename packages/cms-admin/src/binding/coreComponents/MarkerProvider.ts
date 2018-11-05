@@ -1,8 +1,5 @@
 import * as React from 'react'
-import Environment from '../dao/Environment'
-import FieldMarker from '../dao/FieldMarker'
-import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import { Environment, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
 
 export interface DataBindingComponent {
 	displayName: string
@@ -32,7 +29,7 @@ export interface SyntheticChildrenProvider extends DataBindingComponent {
 	generateSyntheticChildren: (props: any, environment: Environment) => React.ReactNode
 }
 
-type MarkerProvider = Partial<
+export type MarkerProvider = Partial<
 	| EnvironmentDeltaProvider
 	| FieldMarkerProvider
 	| MarkerTreeRootProvider
@@ -40,5 +37,3 @@ type MarkerProvider = Partial<
 	| SyntheticChildrenProvider
 > &
 	DataBindingComponent
-
-export default MarkerProvider

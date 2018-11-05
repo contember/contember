@@ -1,7 +1,7 @@
-import { ActionCreator } from './types'
 import { createAction } from 'redux-actions'
-import { SET_TOKEN, SET_ERROR, SET_LOADING, SET_LOGOUT } from '../reducer/auth'
+import { SET_ERROR, SET_LOADING, SET_LOGOUT, SET_TOKEN } from '../reducer/auth'
 import { pushRequest } from './request'
+import { ActionCreator } from './types'
 
 export const login = (email: string, password: string): ActionCreator => async (dispatch, getState, services) => {
 	dispatch(createAction(SET_LOADING)())

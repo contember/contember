@@ -1,21 +1,24 @@
 import { CrudQueryBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
 import { EntityName, ReceivedData, ReceivedEntityData } from '../bindingTypes'
-import AccessorTreeRoot, { RootAccessor } from '../dao/AccessorTreeRoot'
-import DataBindingError from '../dao/DataBindingError'
-import EntityAccessor from '../dao/EntityAccessor'
-import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
-import EntityFields from '../dao/EntityFields'
-import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import FieldAccessor from '../dao/FieldAccessor'
-import FieldMarker from '../dao/FieldMarker'
-import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import {
+	AccessorTreeRoot,
+	DataBindingError,
+	EntityAccessor,
+	EntityCollectionAccessor,
+	EntityFields,
+	EntityForRemovalAccessor,
+	FieldAccessor,
+	FieldMarker,
+	MarkerTreeRoot,
+	ReferenceMarker,
+	RootAccessor
+} from '../dao'
 
 type Queries = 'get' | 'list'
 type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQueryBuilder.CrudQueryBuilder, Queries>>
 
-export default class MutationGenerator {
+export class MutationGenerator {
 	private static readonly PRIMARY_KEY_NAME = 'id'
 
 	private createCounter: number = 0

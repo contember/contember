@@ -84,4 +84,4 @@ const tokenList = [
 	tokens.Equals
 ]
 
-export default tokenList
+export { tokenList }

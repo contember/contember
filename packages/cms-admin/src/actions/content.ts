@@ -1,9 +1,9 @@
-import { ActionCreator } from './types'
 import { createAction } from 'redux-actions'
-import { CONTENT_SET_LOADING, CONTENT_SET_DATA, CONTENT_SET_NONE } from '../reducer/content'
 import GraphqlClient from '../model/GraphqlClient'
-import { pushRequest } from './request'
+import { CONTENT_SET_DATA, CONTENT_SET_LOADING, CONTENT_SET_NONE } from '../reducer/content'
 import { loginRequest } from '../state/request'
+import { pushRequest } from './request'
+import { ActionCreator } from './types'
 
 let idCounter = 1
 

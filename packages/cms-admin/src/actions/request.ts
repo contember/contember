@@ -1,10 +1,10 @@
 import { createAction } from 'redux-actions'
 import { REQUEST_REPLACE } from '../reducer/request'
-import { ActionCreator } from './types'
-import { pathToRequestState, requestStateToPath } from '../utils/url'
-import { default as RequestState, RequestChange } from '../state/request'
-import handleRequest from './requestHandler'
 import routes, { PageNotFound } from '../routes'
+import { default as RequestState, RequestChange } from '../state/request'
+import { pathToRequestState, requestStateToPath } from '../utils/url'
+import handleRequest from './requestHandler'
+import { ActionCreator } from './types'
 
 export const pushRequest = (requestChange: RequestChange): ActionCreator => (dispatch, getState) => {
 	const previousRequest = getState().request

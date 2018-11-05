@@ -2,12 +2,9 @@ import { IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import RichEditor from '../../../components/RichEditor/index'
 import { FieldName } from '../../bindingTypes'
-import EnforceSubtypeRelation from '../../coreComponents/EnforceSubtypeRelation'
-import Field from '../../coreComponents/Field'
-import { SyntheticChildrenProvider } from '../../coreComponents/MarkerProvider'
-import Environment from '../../dao/Environment'
-import FieldAccessor from '../../dao/FieldAccessor'
-import Parser from '../../queryLanguage/Parser'
+import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
+import { Environment, FieldAccessor } from '../../dao'
+import { Parser } from '../../queryLanguage'
 import { TextFieldProps } from './TextField'
 
 export interface RichTextFieldProps {
@@ -16,7 +13,7 @@ export interface RichTextFieldProps {
 	allowLineBreaks?: boolean
 }
 
-export default class RichTextField extends React.Component<RichTextFieldProps> {
+export class RichTextField extends React.Component<RichTextFieldProps> {
 	static displayName = 'RichTextField'
 
 	public render() {

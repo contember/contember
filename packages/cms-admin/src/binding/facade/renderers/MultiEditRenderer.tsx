@@ -1,11 +1,9 @@
 import * as React from 'react'
-import DataContext from '../../coreComponents/DataContext'
-import { DataRendererProps } from '../../coreComponents/DataProvider'
-import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
-import EntityForRemovalAccessor from '../../dao/EntityForRemovalAccessor'
+import { DataContext, DataRendererProps } from '../../coreComponents'
+import { EntityCollectionAccessor, EntityForRemovalAccessor } from '../../dao'
 import { AddNewButton, PersistButton, UnlinkButton } from '../buttons'
-import CommonRendererProps from './CommonRendererProps'
-import DefaultRenderer from './DefaultRenderer'
+import { CommonRendererProps } from './CommonRendererProps'
+import { DefaultRenderer } from './DefaultRenderer'
 
 export interface MultiEditRendererProps extends CommonRendererProps {
 	displayAddNewButton?: boolean
@@ -13,7 +11,7 @@ export interface MultiEditRendererProps extends CommonRendererProps {
 	entrySeparator?: React.ReactNode
 }
 
-export default class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRendererProps> {
+export class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRendererProps> {
 	public render() {
 		const data = this.props.data
 

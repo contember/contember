@@ -1,22 +1,24 @@
 import { assertNever } from 'cms-common'
 import { FieldName, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
-import AccessorTreeRoot from '../dao/AccessorTreeRoot'
-import DataBindingError from '../dao/DataBindingError'
-import EntityAccessor from '../dao/EntityAccessor'
-import EntityCollectionAccessor from '../dao/EntityCollectionAccessor'
-import EntityData from '../dao/EntityData'
-import EntityFields from '../dao/EntityFields'
-import EntityForRemovalAccessor from '../dao/EntityForRemovalAccessor'
-import FieldAccessor from '../dao/FieldAccessor'
-import FieldMarker from '../dao/FieldMarker'
-import MarkerTreeRoot from '../dao/MarkerTreeRoot'
-import ReferenceMarker from '../dao/ReferenceMarker'
+import {
+	AccessorTreeRoot,
+	DataBindingError,
+	EntityAccessor,
+	EntityCollectionAccessor,
+	EntityData,
+	EntityFields,
+	EntityForRemovalAccessor,
+	FieldAccessor,
+	FieldMarker,
+	MarkerTreeRoot,
+	ReferenceMarker
+} from '../dao'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
 type OnReplace = (replacement: EntityAccessor) => void
 type OnUnlink = () => void
 
-export default class AccessorTreeGenerator {
+export class AccessorTreeGenerator {
 	private static readonly PRIMARY_KEY_NAME = 'id'
 
 	public constructor(private tree: MarkerTreeRoot, private allInitialData: any) {}

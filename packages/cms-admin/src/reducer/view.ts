@@ -1,6 +1,6 @@
+import { Reducer } from 'redux'
 import { Action, handleActions } from 'redux-actions'
 import ViewState, { emptyViewState } from '../state/view'
-import { Reducer } from 'redux'
 
 export const VIEW_REPLACE = 'view_replace'
 

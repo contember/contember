@@ -1,17 +1,14 @@
 import * as React from 'react'
-import EnforceSubtypeRelation from '../coreComponents/EnforceSubtypeRelation'
-import Field from '../coreComponents/Field'
-import { SyntheticChildrenProvider } from '../coreComponents/MarkerProvider'
-import Environment from '../dao/Environment'
-import FieldAccessor from '../dao/FieldAccessor'
-import Parser from '../queryLanguage/Parser'
-import { TextFieldProps } from './fields/TextField'
+import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../coreComponents'
+import { Environment, FieldAccessor } from '../dao'
+import { Parser } from '../queryLanguage'
+import { TextFieldProps } from './fields'
 
 interface FieldTextProps {
 	name: string
 }
 
-export default class FieldText extends React.Component<FieldTextProps> {
+export class FieldText extends React.Component<FieldTextProps> {
 	public static displayName = 'FieldText'
 
 	public render() {

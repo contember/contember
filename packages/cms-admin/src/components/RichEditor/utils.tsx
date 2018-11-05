@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { Value, Change, Block, Mark } from 'slate'
-import { RichEditorPluginConfig } from './configs'
+import { Button, ButtonGroup, IconName } from '@blueprintjs/core'
 import { List } from 'immutable'
-import { IconName, Button, ButtonGroup } from '@blueprintjs/core'
+import * as React from 'react'
+import { Block, Change, Mark, Value } from 'slate'
+import { RichEditorPluginConfig } from './configs'
 
 export const has = (value: Value, config: RichEditorPluginConfig): boolean => {
 	const nodes: List<Block | Mark> = config.node === 'mark' ? value.activeMarks.toList() : value.blocks

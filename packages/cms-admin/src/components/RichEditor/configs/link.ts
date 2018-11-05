@@ -1,5 +1,5 @@
-import { RichEditorPluginConfig, simpleMarkPlugin, simpleMarkRule } from './utils'
 import { Change, Value } from 'slate'
+import { RichEditorPluginConfig, simpleMarkPlugin, simpleMarkRule } from './utils'
 
 /**
  * A change helper to standardize wrapping links.

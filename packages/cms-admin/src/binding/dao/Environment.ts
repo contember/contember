@@ -77,4 +77,4 @@ namespace Environment {
 	}
 }
 
-export default Environment
+export { Environment }

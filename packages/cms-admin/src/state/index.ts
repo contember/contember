@@ -1,8 +1,8 @@
-import RequestState, { emptyRequestState } from './request'
-import ViewState, { emptyViewState } from './view'
 import AuthState, { emptyAuthState } from './auth'
 import ContentState, { emptyContentState } from './content'
 import ProjectsConfigsState, { emptyProjectsConfigsState } from './projectsConfigs'
+import RequestState, { emptyRequestState } from './request'
+import ViewState, { emptyViewState } from './view'
 
 export default interface State {
 	request: RequestState

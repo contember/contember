@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
+import { createAction } from 'redux-actions'
+import { populateRequest } from '../actions/request'
 import Router from '../containers/router'
+import { PROJECT_CONFIGS_REPLACE } from '../reducer/projectsConfigs'
+import { emptyState } from '../state'
+import { ProjectConfig } from '../state/projectsConfigs'
+
+import { configureStore, Store } from '../store'
 import Login from './Login'
 import ProjectsList from './ProjectsList'
 import RenderPromise from './RenderPromise'
-
-import { configureStore, Store } from '../store'
-import { populateRequest } from '../actions/request'
-import { emptyState } from '../state'
-import { createAction } from 'redux-actions'
-import { PROJECT_CONFIGS_REPLACE } from '../reducer/projectsConfigs'
-import { ProjectConfig } from '../state/projectsConfigs'
 
 export interface AdminProps {
 	configs: ProjectConfig[]

@@ -1,6 +1,6 @@
+import { Reducer } from 'redux'
 import { Action, handleActions } from 'redux-actions'
 import ProjectConfigsState, { emptyProjectsConfigsState } from '../state/projectsConfigs'
-import { Reducer } from 'redux'
 
 export const PROJECT_CONFIGS_REPLACE = 'project_configs_replace'
 

@@ -2,11 +2,9 @@ import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import EntityAccessor from '../dao/EntityAccessor'
-import EntityFields from '../dao/EntityFields'
-import ReferenceMarker from '../dao/ReferenceMarker'
-import DataContext, { DataContextValue } from './DataContext'
-import EnforceSubtypeRelation from './EnforceSubtypeRelation'
+import { EntityAccessor, EntityFields, ReferenceMarker } from '../dao'
+import { DataContext, DataContextValue } from './DataContext'
+import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface ToOneProps {
@@ -56,6 +54,6 @@ namespace ToOne {
 	}
 }
 
-export default ToOne
+export { ToOne }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof ToOne, ReferenceMarkerProvider>

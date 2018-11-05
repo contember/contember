@@ -1,7 +1,7 @@
-import EntityAccessor from './EntityAccessor'
-import EntityData from './EntityData'
+import { EntityAccessor } from './EntityAccessor'
+import { EntityData } from './EntityData'
 
-export default class EntityForRemovalAccessor {
+export class EntityForRemovalAccessor {
 	constructor(
 		public readonly primaryKey: string,
 		public readonly data: EntityData,

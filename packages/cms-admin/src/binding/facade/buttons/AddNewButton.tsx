@@ -1,12 +1,12 @@
 import { Button, Intent } from '@blueprintjs/core'
 import * as React from 'react'
-import EntityCollectionAccessor from '../../dao/EntityCollectionAccessor'
+import { EntityCollectionAccessor } from '../../dao'
 
 interface AddNewButtonProps {
 	addNew: EntityCollectionAccessor['addNew']
 }
 
-export default class AddNewButton extends React.Component<AddNewButtonProps> {
+export class AddNewButton extends React.Component<AddNewButtonProps> {
 	public render() {
 		return (
 			this.props.addNew && (

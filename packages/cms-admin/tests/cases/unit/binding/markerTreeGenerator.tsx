@@ -1,12 +1,14 @@
 import { expect } from 'chai'
 import 'mocha'
 import * as React from 'react'
-import EntityListDataProvider from '../../../../src/binding/coreComponents/EntityListDataProvider'
-import Field from '../../../../src/binding/coreComponents/Field'
-import SingleEntityDataProvider from '../../../../src/binding/coreComponents/SingleEntityDataProvider'
-import ToMany from '../../../../src/binding/coreComponents/ToMany'
-import ToOne from '../../../../src/binding/coreComponents/ToOne'
-import MarkerTreeGenerator from '../../../../src/binding/model/MarkerTreeGenerator'
+import {
+	EntityListDataProvider,
+	Field,
+	SingleEntityDataProvider,
+	ToMany,
+	ToOne
+} from '../../../../src/binding/coreComponents'
+import { MarkerTreeGenerator } from '../../../../src/binding/model'
 
 describe('Marker tree generator', () => {
 	it('should reject empty trees', () => {

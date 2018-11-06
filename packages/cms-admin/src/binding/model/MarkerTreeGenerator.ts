@@ -196,7 +196,7 @@ export class MarkerTreeGenerator {
 						original.references[placeholderName] = {
 							placeholderName,
 							fields: {},
-							where: fresh.references[placeholderName].where,
+							filter: fresh.references[placeholderName].filter,
 							reducedBy: fresh.references[placeholderName].reducedBy,
 							expectedCount: fresh.references[placeholderName].expectedCount
 						}

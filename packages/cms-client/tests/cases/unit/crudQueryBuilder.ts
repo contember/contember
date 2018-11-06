@@ -56,7 +56,7 @@ describe('crud query builder', () => {
 			'Posts',
 			q =>
 				q
-					.where({ foo: { eq: 'bar' } })
+					.filter({ foo: { eq: 'bar' } })
 					.column('title')
 					.relation('author', o => o.column('name')),
 			'myPostsAlias'

@@ -15,7 +15,7 @@ import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface ToManyProps {
 	field: FieldName
-	where?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Input.Where<GraphQlBuilder.Literal>
 }
 
 class ToMany extends React.Component<ToManyProps> {
@@ -29,7 +29,7 @@ class ToMany extends React.Component<ToManyProps> {
 						const field = data.data.getField(
 							this.props.field,
 							ReferenceMarker.ExpectedCount.PossiblyMany,
-							this.props.where
+							this.props.filter
 						)
 
 						if (field instanceof EntityCollectionAccessor) {
@@ -42,7 +42,7 @@ class ToMany extends React.Component<ToManyProps> {
 	}
 
 	public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
-		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.where)
+		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.filter)
 	}
 }
 

@@ -19,7 +19,7 @@ export interface SelectFieldProps {
 	label: IFormGroupProps['label']
 	entityName: EntityName
 	optionFieldName: FieldName
-	where?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Input.Where<GraphQlBuilder.Literal>
 }
 
 export class SelectField extends React.Component<SelectFieldProps> {
@@ -79,7 +79,7 @@ export class SelectField extends React.Component<SelectFieldProps> {
 	public static generateSyntheticChildren(props: SelectFieldProps): React.ReactNode {
 		return (
 			<>
-				<EntityListDataProvider name={props.entityName} where={props.where} associatedField={props.name}>
+				<EntityListDataProvider name={props.entityName} filter={props.filter} associatedField={props.name}>
 					<Field name={props.optionFieldName} />
 				</EntityListDataProvider>
 				<ToOne field={props.name}>

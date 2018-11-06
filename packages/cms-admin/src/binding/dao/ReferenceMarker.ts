@@ -12,7 +12,7 @@ class ReferenceMarker {
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ExpectedCount,
 		fields: EntityFields,
-		where?: Input.Where<GraphQlBuilder.Literal>,
+		filter?: Input.Where<GraphQlBuilder.Literal>,
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	)
 	public constructor(fieldName: FieldName, references: ReferenceMarker.References)
@@ -20,7 +20,7 @@ class ReferenceMarker {
 		fieldName: FieldName,
 		decider: ReferenceMarker.ExpectedCount | ReferenceMarker.References,
 		fields?: EntityFields,
-		where?: Input.Where<GraphQlBuilder.Literal>,
+		filter?: Input.Where<GraphQlBuilder.Literal>,
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	) {
 		let references: ReferenceMarker.References
@@ -30,7 +30,7 @@ class ReferenceMarker {
 		} else {
 			const constraints: ReferenceMarker.ReferenceConstraints = {
 				expectedCount: decider,
-				where,
+				filter,
 				reducedBy
 			}
 			const placeholderName = PlaceholderGenerator.getReferencePlaceholder(fieldName, constraints)
@@ -61,7 +61,7 @@ namespace ReferenceMarker {
 
 	export interface ReferenceConstraints {
 		expectedCount: ReferenceMarker.ExpectedCount
-		where?: Input.Where<GraphQlBuilder.Literal>
+		filter?: Input.Where<GraphQlBuilder.Literal>
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	}
 

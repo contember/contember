@@ -1,3 +1,4 @@
+export * from './Component'
 export * from './FieldText'
 export * from './Repeater'
 

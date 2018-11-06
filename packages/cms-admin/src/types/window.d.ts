@@ -3,7 +3,11 @@ declare interface Window {
 }
 
 declare interface Process {
-	env: any
+	env: {
+		NODE_ENV: 'development'
+		SERVER_URL: string
+		LOGIN_TOKEN: string
+	}
 }
 
-declare var process: Process
+declare const process: Process

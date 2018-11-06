@@ -96,8 +96,6 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('done')
 
 						const apolloKoa = new Koa()
-						apolloKoa.use(corsMiddleware())
-						apolloKoa.use(bodyParser())
 						const server = this.createApolloServer(dataSchema, projectVariables)
 						server.applyMiddleware({
 							app: apolloKoa,

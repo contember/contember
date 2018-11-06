@@ -46,6 +46,8 @@ class ContentMiddlewareFactory {
 			const contentKoa = new Koa()
 
 			contentKoa.use(new PlaygroundMiddlewareFactory().create())
+			contentKoa.use(corsMiddleware())
+			contentKoa.use(bodyParser())
 
 			contentKoa.use(
 				async (

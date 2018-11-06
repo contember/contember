@@ -30,7 +30,7 @@ export class Repeater extends React.Component<RepeaterProps> {
 						const field = data.data.getField(
 							this.props.field,
 							ReferenceMarker.ExpectedCount.PossiblyMany,
-							this.props.where
+							this.props.filter
 						)
 
 						if (field instanceof EntityCollectionAccessor) {

@@ -10,7 +10,7 @@ export class Hashing {
 			| Input.Where
 			| undefined
 			| ReferenceMarker.ExpectedCount
-		> = [constraints.where, constraints.reducedBy, constraints.expectedCount]
+		> = [constraints.filter, constraints.reducedBy, constraints.expectedCount]
 
 		const json = where.map(item => JSON.stringify(item)).join('')
 		return Hashing.hash(json)

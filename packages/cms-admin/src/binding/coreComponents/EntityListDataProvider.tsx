@@ -14,7 +14,7 @@ import { MarkerTreeRootProvider } from './MarkerProvider'
 interface EntityListDataProviderProps<DRP> {
 	name: EntityName
 	associatedField?: FieldName
-	where?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Input.Where<GraphQlBuilder.Literal>
 	renderer?: React.ComponentClass<DRP & DataRendererProps>
 	rendererProps?: DRP
 }
@@ -57,7 +57,7 @@ export class EntityListDataProvider<DRP> extends React.Component<EntityListDataP
 			props.name,
 			fields,
 			{
-				where: props.where,
+				filter: props.filter,
 				whereType: 'nonUnique'
 			},
 			props.associatedField

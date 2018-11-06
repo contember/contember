@@ -10,7 +10,7 @@ export interface SingleEntityTreeConstraints {
 }
 
 export interface EntityListTreeConstraints {
-	where?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Input.Where<GraphQlBuilder.Literal>
 	whereType: 'nonUnique'
 }
 

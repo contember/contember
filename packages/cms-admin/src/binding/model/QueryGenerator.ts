@@ -65,8 +65,8 @@ export class QueryGenerator {
 	): QueryBuilder {
 		let listQueryBuilder = new CrudQueryBuilder.ListQueryBuilder()
 
-		if (subTree.constraints && subTree.constraints.where) {
-			listQueryBuilder = listQueryBuilder.where(subTree.constraints.where)
+		if (subTree.constraints && subTree.constraints.filter) {
+			listQueryBuilder = listQueryBuilder.filter(subTree.constraints.filter)
 		}
 
 		;[baseQueryBuilder, listQueryBuilder] = this.addMarkerTreeRootQueries(
@@ -96,8 +96,8 @@ export class QueryGenerator {
 					let subBuilder = new CrudQueryBuilder.ListQueryBuilder()
 					let relationField
 
-					if (reference.where) {
-						subBuilder = subBuilder.where(reference.where)
+					if (reference.filter) {
+						subBuilder = subBuilder.filter(reference.filter)
 					}
 
 					if (reference.reducedBy) {

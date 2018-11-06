@@ -55,7 +55,10 @@ class Environment {
 		for (const name in delta) {
 			const value = delta[name]
 
-			newDelta[name] = typeof value === 'function' ? value(currentEnvironment) : delta[name]
+			newDelta[name] =
+				value && typeof value === 'function'
+					? (value as (environment: Environment) => Environment.Value)(currentEnvironment)
+					: delta[name]
 		}
 
 		return newDelta

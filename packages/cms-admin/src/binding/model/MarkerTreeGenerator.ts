@@ -83,7 +83,7 @@ export class MarkerTreeGenerator {
 			children = node.props.children
 
 			if (typeof node.type === 'symbol' || typeof node.type === 'string') {
-				// React.Fragment or other non-component
+				// React.Fragment, React.Portal or other non-component
 				return this.processNode(children, environment)
 			}
 
@@ -145,9 +145,6 @@ export class MarkerTreeGenerator {
 			}
 
 			return undefined
-		} else if ('children' in node) {
-			// React Portal
-			children = node.children
 		}
 
 		return this.processNode(children, environment)

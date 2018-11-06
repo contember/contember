@@ -117,7 +117,7 @@ class Mapper {
 
 		const result = await insertBuilder.execute()
 
-		await Promise.all(Object.values(promises).filter(it => !!it))
+		await Promise.all(Object.values(promises).filter((it: any) => !!it))
 
 		return result
 	}
@@ -139,7 +139,7 @@ class Mapper {
 		const promises = acceptEveryFieldVisitor(this.schema, entity, updateVisitor)
 		const executeResult = updateBuilder.execute()
 
-		await Promise.all(Object.values(promises).filter(it => !!it))
+		await Promise.all(Object.values(promises).filter((it: any) => !!it))
 
 		const affectedRows = await executeResult
 

@@ -19,8 +19,11 @@ export class TextField extends React.Component<TextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string | null, string>): React.ReactNode => (
-					<FormGroup label={this.props.label} inline={this.props.inlineLabel}>
+				{(data: FieldAccessor<string | null, string>, env): React.ReactNode => (
+					<FormGroup
+						label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
+						inline={this.props.inlineLabel}
+					>
 						<InputGroup
 							value={data.currentValue || ''}
 							onChange={this.generateOnChange(data)}

@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import { DataBindingError, EntityAccessor, EntityForRemovalAccessor, FieldAccessor, FieldMarker } from '../dao'
+import {
+	DataBindingError,
+	EntityAccessor,
+	EntityForRemovalAccessor,
+	Environment,
+	FieldAccessor,
+	FieldMarker
+} from '../dao'
 import { Parser } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
@@ -9,7 +16,7 @@ import { FieldMarkerProvider } from './MarkerProvider'
 
 export interface FieldProps {
 	name: FieldName
-	children?: (data: FieldAccessor<any>) => React.ReactNode
+	children?: (data: FieldAccessor<any>, environment: Environment) => React.ReactNode
 }
 
 class Field extends React.Component<FieldProps> {
@@ -28,7 +35,11 @@ class Field extends React.Component<FieldProps> {
 										const fieldData = data.data.getField(fieldName)
 
 										if (this.props.children && fieldData instanceof FieldAccessor) {
-											return <Field.FieldInner accessor={fieldData}>{this.props.children}</Field.FieldInner>
+											return (
+												<Field.FieldInner accessor={fieldData} environment={environment}>
+													{this.props.children}
+												</Field.FieldInner>
+											)
 										}
 									} else if (data instanceof EntityForRemovalAccessor) {
 										// Do nothing
@@ -53,12 +64,13 @@ class Field extends React.Component<FieldProps> {
 namespace Field {
 	export interface FieldInnerProps {
 		accessor: FieldAccessor
-		children: (data: FieldAccessor<any>) => React.ReactNode
+		environment: Environment
+		children: Exclude<FieldProps['children'], undefined>
 	}
 
 	export class FieldInner extends React.PureComponent<FieldInnerProps> {
 		public render() {
-			return this.props.children(this.props.accessor)
+			return this.props.children(this.props.accessor, this.props.environment)
 		}
 	}
 }

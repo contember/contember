@@ -46,4 +46,7 @@ export class TextAreaField extends React.Component<TextAreaFieldProps> {
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof TextAreaField, SyntheticChildrenProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof TextAreaField,
+	SyntheticChildrenProvider<TextAreaFieldProps>
+>

@@ -42,4 +42,7 @@ export class NumberField extends React.Component<NumberFieldProps> {
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof NumberField, SyntheticChildrenProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof NumberField,
+	SyntheticChildrenProvider<NumberFieldProps>
+>

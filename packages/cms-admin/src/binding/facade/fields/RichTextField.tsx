@@ -42,4 +42,7 @@ export class RichTextField extends React.Component<RichTextFieldProps> {
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof RichTextField, SyntheticChildrenProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof RichTextField,
+	SyntheticChildrenProvider<RichTextFieldProps>
+>

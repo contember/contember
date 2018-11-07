@@ -14,8 +14,7 @@ import {
 	EntityForRemovalAccessor,
 	ReferenceMarker
 } from '../dao'
-import { AddNewButton } from './buttons'
-import { UnlinkButton } from './buttons/UnlinkButton'
+import { AddNewButton, UnlinkButton } from './buttons'
 
 export interface RepeaterProps extends ToManyProps {}
 

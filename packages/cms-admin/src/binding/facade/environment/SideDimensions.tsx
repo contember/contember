@@ -92,9 +92,15 @@ namespace SideDimensions {
 		}
 	}
 
-	type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof SingleDimension, EnvironmentDeltaProvider>
+	type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+		typeof SingleDimension,
+		EnvironmentDeltaProvider<SingleDimensionProps>
+	>
 }
 
 export { SideDimensions }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof SideDimensions, SyntheticChildrenProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof SideDimensions,
+	SyntheticChildrenProvider<SideDimensionsProps>
+>

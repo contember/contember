@@ -65,4 +65,7 @@ export class SingleEntityDataProvider<DRP> extends React.Component<SingleEntityD
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof SingleEntityDataProvider, MarkerTreeRootProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof SingleEntityDataProvider,
+	MarkerTreeRootProvider<SingleEntityDataProviderProps<any>>
+>

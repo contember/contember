@@ -23,31 +23,49 @@ class GraphqlClient {
 			if (response.ok && !result.errors && result.data) {
 				return result.data
 			} else {
-				throw new GraphqlClient.GraphqlClientError({ query, variables }, { status: response.status, body: result })
+				const body = await response.text()
+				throw new GraphqlClient.GraphqlClientError({ query, variables }, { status: response.status, body, data: result })
 			}
 		} else {
-			throw new GraphqlClient.GraphqlServerError(
-				{ query, variables },
-				{ status: response.status, body: await response.text() }
-			)
+			const body = await response.text()
+			let data : any = undefined
+			try {
+				data = JSON.parse(body)
+			} catch {
+				//invalid JSON
+			}
+			const request = { query, variables }
+			const errorResponse = { status: response.status, body, data }
+			if (
+				data &&
+				data.errors &&
+				data.errors[0] &&
+				data.errors[0].code === 401
+			) {
+				throw new GraphqlClient.GraphqlAuthenticationError(request, errorResponse)
+			}
+
+			throw new GraphqlClient.GraphqlServerError(request, errorResponse)
 		}
 	}
 }
 
 namespace GraphqlClient {
+	type Request = { query: string, variables: Variables }
+	type Response = { status: number, body: string, data?: any }
+
 	export class GraphqlError extends Error {
-		request: any
-		response: any
-		constructor(request: any, response: any) {
+		request: Request
+		response: Response
+		constructor(request: Request, response: Response) {
 			let message = 'An GraphQL error occured'
 			if (
-				typeof response === 'object' &&
-				typeof response.body === 'object' &&
-				Array.isArray(response.body.errors) &&
-				response.body.errors[0] &&
-				response.body.errors[0].message
+				response.data &&
+				Array.isArray(response.data.errors) &&
+				response.data.errors[0] &&
+				response.data.errors[0].message
 			) {
-				message = response.body.errors[0].message
+				message = response.data.errors[0].message
 			} else if (response.status) {
 				message = `API responded with ${response.status} status code`
 			}
@@ -56,8 +74,10 @@ namespace GraphqlClient {
 			this.response = response
 		}
 	}
+
 	export class GraphqlServerError extends GraphqlError {}
 	export class GraphqlClientError extends GraphqlError {}
+	export class GraphqlAuthenticationError extends GraphqlError {}
 }
 
 export default GraphqlClient

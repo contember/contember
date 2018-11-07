@@ -53,4 +53,7 @@ export class EntityCreator<DRP> extends React.Component<EntityCreatorProps<DRP>>
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof EntityCreator, MarkerTreeRootProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof EntityCreator,
+	MarkerTreeRootProvider<EntityCreatorProps<any>>
+>

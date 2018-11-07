@@ -65,4 +65,7 @@ export class EntityListDataProvider<DRP> extends React.Component<EntityListDataP
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof EntityListDataProvider, MarkerTreeRootProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof EntityListDataProvider,
+	MarkerTreeRootProvider<EntityListDataProviderProps<any>>
+>

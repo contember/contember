@@ -20,4 +20,4 @@ export class FieldText extends React.Component<FieldTextProps> {
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof FieldText, SyntheticChildrenProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof FieldText, SyntheticChildrenProvider<FieldTextProps>>

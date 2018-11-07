@@ -2,13 +2,7 @@ import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import {
-	EntityAccessor,
-	EntityCollectionAccessor,
-	EntityFields,
-	EntityForRemovalAccessor,
-	ReferenceMarker
-} from '../dao'
+import { EntityAccessor, EntityCollectionAccessor, EntityFields, ReferenceMarker } from '../dao'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { ReferenceMarkerProvider } from './MarkerProvider'
@@ -23,38 +17,61 @@ class ToMany extends React.Component<ToManyProps> {
 
 	public render() {
 		return (
-			<DataContext.Consumer>
-				{(data: DataContextValue) => {
-					if (data instanceof EntityAccessor) {
-						const field = data.data.getField(
-							this.props.field,
-							ReferenceMarker.ExpectedCount.PossiblyMany,
-							this.props.filter
-						)
-
-						if (field instanceof EntityCollectionAccessor) {
-							return <ToMany.ToManyInner accessor={field}>{this.props.children}</ToMany.ToManyInner>
-						}
-					}
+			<ToMany.CollectionRetriever {...this.props}>
+				{(field: EntityCollectionAccessor) => {
+					return <ToMany.AccessorRenderer accessor={field}>{this.props.children}</ToMany.AccessorRenderer>
 				}}
-			</DataContext.Consumer>
+			</ToMany.CollectionRetriever>
 		)
 	}
 
 	public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
-		return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.filter)
+		return ToMany.CollectionRetriever.generateReferenceMarker(props, fields)
 	}
 }
 
 namespace ToMany {
-	export interface ToManyInnerProps {
+	export interface CollectionRetrieverProps extends ToManyProps {
+		children: (field: EntityCollectionAccessor) => React.ReactNode
+	}
+
+	export interface AccessorRendererProps {
 		accessor: EntityCollectionAccessor
 	}
 
-	export class ToManyInner extends React.PureComponent<ToManyInnerProps> {
+	export class CollectionRetriever extends React.PureComponent<CollectionRetrieverProps> {
+		public static displayName = 'ToMany'
+
+		public render() {
+			return (
+				<DataContext.Consumer>
+					{(data: DataContextValue) => {
+						if (data instanceof EntityAccessor) {
+							const field = data.data.getField(
+								this.props.field,
+								ReferenceMarker.ExpectedCount.PossiblyMany,
+								this.props.filter
+							)
+
+							if (field instanceof EntityCollectionAccessor) {
+								return this.props.children(field)
+							}
+						}
+					}}
+				</DataContext.Consumer>
+			)
+		}
+
+		public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
+			return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.filter)
+		}
+	}
+	type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof CollectionRetriever, ReferenceMarkerProvider>
+
+	export class AccessorRenderer extends React.PureComponent<AccessorRendererProps> {
 		public render() {
 			return this.props.accessor.entities.map(
-				(datum: EntityAccessor | EntityForRemovalAccessor | undefined, i: number) =>
+				(datum, i) =>
 					datum instanceof EntityAccessor && (
 						<DataContext.Provider value={datum} key={i}>
 							{this.props.children}

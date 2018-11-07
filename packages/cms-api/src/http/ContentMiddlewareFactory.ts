@@ -58,23 +58,23 @@ class ContentMiddlewareFactory {
 					} & TimerMiddlewareFactory.ContextWithTimer,
 					next
 				) => {
-					const createGraphqlResponse = (message: string): void => {
+					const createGraphqlInvalidAuthResponse = (message: string): void => {
 						ctx.set('Content-type', 'application/json')
 						ctx.status = 500
-						ctx.body = JSON.stringify({ errors: [{ message }] })
+						ctx.body = JSON.stringify({ errors: [{ message, code: 401 }] })
 					}
 					ctx.state.timer('starting trx')
 					await ctx.state.db.transaction(async knexConnection => {
 						ctx.state.timer('done')
 						ctx.state.db = knexConnection
 						if (ctx.state.authResult === undefined) {
-							return createGraphqlResponse(
+							return createGraphqlInvalidAuthResponse(
 								'/content endpoint requires authorization, see /tenant endpoint and signIn() mutation'
 							)
 						}
 
 						if (!ctx.state.authResult.valid) {
-							return createGraphqlResponse(`Auth failure: ${ctx.state.authResult.error}`)
+							return createGraphqlInvalidAuthResponse(`Auth failure: ${ctx.state.authResult.error}`)
 						}
 						await knexConnection
 							.wrapper()

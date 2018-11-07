@@ -22,22 +22,9 @@ export const getData = (query: string): ActionCreator => async (dispatch, getSta
 		dispatch(createAction(CONTENT_SET_DATA, () => ({ id, data }))())
 	} catch (error) {
 		dispatch(createAction(CONTENT_SET_NONE, () => ({ id }))())
-		if (error instanceof GraphqlClient.GraphqlServerError) {
-			try {
-				const json = JSON.parse(error.response.body)
-				if (
-					json.errors &&
-					json.errors[0] &&
-					json.errors[0].extensions &&
-					json.errors[0].extensions.code === 'UNAUTHENTICATED'
-				) {
-					// Token expired
-					dispatch(pushRequest(loginRequest()))
-					return
-				}
-			} catch {
-				// Not valid json - API is probably down
-			}
+		if (error instanceof GraphqlClient.GraphqlAuthenticationError) {
+			dispatch(pushRequest(loginRequest()))
+			return
 		}
 		throw error
 	}
@@ -56,22 +43,9 @@ export const putData = (query: string): ActionCreator => async (dispatch, getSta
 			.request(query, {}, apiToken || undefined)
 		return
 	} catch (error) {
-		if (error instanceof GraphqlClient.GraphqlServerError) {
-			try {
-				const json = JSON.parse(error.response.body)
-				if (
-					json.errors &&
-					json.errors[0] &&
-					json.errors[0].extensions &&
-					json.errors[0].extensions.code === 'UNAUTHENTICATED'
-				) {
-					// Token expired
-					dispatch(pushRequest(loginRequest()))
-					return
-				}
-			} catch {
-				// Not valid json - API is probably down
-			}
+		if (error instanceof GraphqlClient.GraphqlAuthenticationError) {
+			dispatch(pushRequest(loginRequest()))
+			return
 		}
 		throw error
 	}

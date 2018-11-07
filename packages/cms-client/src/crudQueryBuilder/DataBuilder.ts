@@ -11,7 +11,7 @@ namespace DataBuilder {
 	): D => {
 		if (data instanceof builderConstructor) {
 			data = data.data
-		} else if (typeof data === 'function') {
+		} else if (data instanceof Function) {
 			data = data(new builderConstructor()).data
 		}
 		return data as D

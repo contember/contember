@@ -24,11 +24,14 @@ class GraphqlClient {
 				return result.data
 			} else {
 				const body = await response.text()
-				throw new GraphqlClient.GraphqlClientError({ query, variables }, { status: response.status, body, data: result })
+				throw new GraphqlClient.GraphqlClientError(
+					{ query, variables },
+					{ status: response.status, body, data: result }
+				)
 			}
 		} else {
 			const body = await response.text()
-			let data : any = undefined
+			let data: any = undefined
 			try {
 				data = JSON.parse(body)
 			} catch {
@@ -36,12 +39,7 @@ class GraphqlClient {
 			}
 			const request = { query, variables }
 			const errorResponse = { status: response.status, body, data }
-			if (
-				data &&
-				data.errors &&
-				data.errors[0] &&
-				data.errors[0].code === 401
-			) {
+			if (data && data.errors && data.errors[0] && data.errors[0].code === 401) {
 				throw new GraphqlClient.GraphqlAuthenticationError(request, errorResponse)
 			}
 
@@ -51,8 +49,8 @@ class GraphqlClient {
 }
 
 namespace GraphqlClient {
-	type Request = { query: string, variables: Variables }
-	type Response = { status: number, body: string, data?: any }
+	type Request = { query: string; variables: Variables }
+	type Response = { status: number; body: string; data?: any }
 
 	export class GraphqlError extends Error {
 		request: Request

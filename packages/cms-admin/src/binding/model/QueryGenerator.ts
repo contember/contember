@@ -122,7 +122,7 @@ export class QueryGenerator {
 					builder = builder.relation(
 						relationField,
 						subBuilder,
-						placeholderName === relationField ? undefined : referenceName
+						referenceName === relationField ? undefined : referenceName
 					)
 				}
 			} else {

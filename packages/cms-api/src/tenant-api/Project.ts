@@ -28,6 +28,7 @@ namespace Project {
 
 	export interface S3Config {
 		readonly bucket: string
+		readonly region: string
 		readonly prefix: string
 		readonly credentials: {
 			readonly key: string

@@ -27,6 +27,7 @@ const testSchema = async (test: Test) => {
 		new S3({
 			bucket: '',
 			prefix: '',
+			region: '',
 			credentials: {
 				key: '',
 				secret: '',

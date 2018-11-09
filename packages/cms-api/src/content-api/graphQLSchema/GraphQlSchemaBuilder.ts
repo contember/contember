@@ -27,6 +27,10 @@ export default class GraphQlSchemaBuilder {
 						name: 'SignedUpload',
 						fields: {
 							url: { type: new GraphQLNonNull(GraphQLString) },
+							objectKey: { type: new GraphQLNonNull(GraphQLString) },
+							bucket: { type: new GraphQLNonNull(GraphQLString) },
+							region: { type: new GraphQLNonNull(GraphQLString) },
+							publicUrl: { type: new GraphQLNonNull(GraphQLString) },
 						},
 					})
 				),
@@ -34,9 +38,7 @@ export default class GraphQlSchemaBuilder {
 					contentType: { type: new GraphQLNonNull(GraphQLString) },
 				},
 				resolve: async (parent, args: { contentType: string }) => {
-					return {
-						url: await this.s3.getSignedUrl(args.contentType),
-					}
+					return this.s3.getSignedUrl(args.contentType)
 				},
 			} as GraphQLFieldConfig<any, any, any>,
 		}

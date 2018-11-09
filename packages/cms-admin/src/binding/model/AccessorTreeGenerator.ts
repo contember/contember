@@ -49,7 +49,7 @@ export class AccessorTreeGenerator {
 					tree.fields,
 					(fieldName, newData) => {
 						const entityAccessor = entityAccessors[i]
-						if (entityAccessor) {
+						if (entityAccessor instanceof EntityAccessor) {
 							entityAccessors[i] = this.withUpdatedField(entityAccessor, fieldName, newData)
 							updateData(createAccessorTreeRoot())
 						}
@@ -78,7 +78,7 @@ export class AccessorTreeGenerator {
 						}
 					}
 				)
-			const entityAccessors: Array<EntityAccessor | undefined> = (data && data.length ? data : [undefined]).map(
+			const entityAccessors: Array<EntityAccessor | EntityForRemovalAccessor | undefined> = (data && data.length ? data : [undefined]).map(
 				(datum, i) => createEntityAccessor(i, datum)
 			)
 			return createAccessorTreeRoot()
@@ -88,9 +88,11 @@ export class AccessorTreeGenerator {
 				data,
 				tree.fields,
 				(fieldName, newData) => {
-					entityAccessor = this.withUpdatedField(entityAccessor, fieldName, newData)
+					if (entityAccessor instanceof EntityAccessor) {
+						entityAccessor = this.withUpdatedField(entityAccessor, fieldName, newData)
 
-					updateData(createAccessorTreeRoot())
+						updateData(createAccessorTreeRoot())
+					}
 				},
 				newEntityAccessor => {
 					entityAccessor = newEntityAccessor
@@ -250,7 +252,7 @@ export class AccessorTreeGenerator {
 				reference.fields,
 				(updatedField: FieldName, updatedData: EntityData.FieldData) => {
 					const entityAccessor = collectionAccessor.entities[i]
-					if (entityAccessor) {
+					if (entityAccessor instanceof EntityAccessor) {
 						collectionAccessor.entities[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
 
 						onUpdate(reference.placeholderName, collectionAccessor)
@@ -258,7 +260,7 @@ export class AccessorTreeGenerator {
 				},
 				replacement => {
 					const entityAccessor = collectionAccessor.entities[i]
-					if (entityAccessor) {
+					if (entityAccessor instanceof EntityAccessor) {
 						collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement)
 
 						onUpdate(reference.placeholderName, collectionAccessor)

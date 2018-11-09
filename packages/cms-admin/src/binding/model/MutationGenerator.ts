@@ -55,7 +55,7 @@ export class MutationGenerator {
 		}
 
 		if (entity instanceof EntityAccessor) {
-			if (entity.primaryKey === undefined) {
+			if (entity.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 				queryBuilder = this.addCreateMutation(entity, entityName, entityFields, queryBuilder)
 			} else if (data && !Array.isArray(data)) {
 				queryBuilder = this.addUpdateMutation(entity, entityName, entityFields, data, queryBuilder)
@@ -214,7 +214,7 @@ export class MutationGenerator {
 						builder = builder.one(placeholderName, builder => {
 							const { accessor, reference } = accessorReference[0]
 
-							if (accessor.primaryKey === undefined) {
+							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 								const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
 								return builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 							} else {
@@ -229,7 +229,7 @@ export class MutationGenerator {
 						for (const referencePair of accessorReference) {
 							const { accessor, reference } = referencePair
 
-							if (accessor.primaryKey === undefined) {
+							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 								const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
 								builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 							} else {
@@ -321,7 +321,7 @@ export class MutationGenerator {
 							const { accessor, reference, persistedField } = accessorReference[0]
 
 							if (accessor instanceof EntityAccessor) {
-								if (accessor.primaryKey === undefined) {
+								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 									const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
 									return builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 								} else {
@@ -354,7 +354,7 @@ export class MutationGenerator {
 							const { accessor, reference, persistedField } = referencePair
 
 							if (accessor instanceof EntityAccessor) {
-								if (accessor.primaryKey === undefined) {
+								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 									const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
 									builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 								} else {

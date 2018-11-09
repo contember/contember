@@ -3,6 +3,7 @@ import ContentState, { emptyContentState } from './content'
 import ProjectsConfigsState, { emptyProjectsConfigsState } from './projectsConfigs'
 import RequestState, { emptyRequestState } from './request'
 import ViewState, { emptyViewState } from './view'
+import UploadState, { emptyUploadState } from './upload'
 
 export default interface State {
 	request: RequestState
@@ -10,6 +11,7 @@ export default interface State {
 	auth: AuthState
 	content: ContentState
 	projectsConfigs: ProjectsConfigsState
+	upload: UploadState
 }
 
 export const emptyState: State = {
@@ -17,5 +19,6 @@ export const emptyState: State = {
 	view: emptyViewState,
 	auth: emptyAuthState,
 	content: emptyContentState,
-	projectsConfigs: emptyProjectsConfigsState
+	projectsConfigs: emptyProjectsConfigsState,
+	upload: emptyUploadState
 }

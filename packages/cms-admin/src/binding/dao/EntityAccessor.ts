@@ -21,13 +21,13 @@ namespace EntityAccessor {
 	export class UnpersistedEntityID {
 		public readonly value: string
 
-		private generateId = (() => {
+		private static generateId = (() => {
 			let id = 0
 			return () => id++
 		})()
 
 		public constructor() {
-			this.value = `unpersistedEntity-${this.generateId()}`
+			this.value = `unpersistedEntity-${UnpersistedEntityID.generateId()}`
 		}
 	}
 }

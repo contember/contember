@@ -47,7 +47,7 @@ export class SelectField extends React.Component<SelectFieldProps> {
 							return (
 								<FormGroup label={this.props.label}>
 									<HTMLSelect
-										value={currentValueEntity.primaryKey}
+										value={currentValueEntity.primaryKey as string}
 										onChange={e => {
 											const newPrimaryKey = e.currentTarget.value
 											const newAccessor = normalizedData.find(accessor => accessor.primaryKey === newPrimaryKey)
@@ -61,7 +61,7 @@ export class SelectField extends React.Component<SelectFieldProps> {
 												throw new DataBindingError('Corrupted data')
 											}
 											return {
-												value: datum.primaryKey!,
+												value: datum.primaryKey as string,
 												label: (optionField.currentValue || '').toString()
 											}
 										})}

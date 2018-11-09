@@ -124,7 +124,7 @@ export class MutationGenerator {
 
 		const primaryKey = entity.primaryKey
 
-		if (!primaryKey || !data) {
+		if (primaryKey instanceof EntityAccessor.UnpersistedEntityID || !data) {
 			return queryBuilder
 		}
 

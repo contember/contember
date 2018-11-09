@@ -64,7 +64,7 @@ export class AccessorTreeGenerator {
 
 						if (entityAccessor) {
 							const primaryKey = entityAccessor.primaryKey
-							if (primaryKey) {
+							if (typeof primaryKey === 'string') {
 								entityAccessors[i] = new EntityForRemovalAccessor(
 									primaryKey,
 									entityAccessor.data,
@@ -98,7 +98,7 @@ export class AccessorTreeGenerator {
 					updateData(createAccessorTreeRoot())
 				},
 				() => {
-					if (entityAccessor.primaryKey) {
+					if (typeof entityAccessor.primaryKey === 'string') {
 						entityAccessor = new EntityForRemovalAccessor(
 							entityAccessor.primaryKey,
 							entityAccessor.data,
@@ -269,14 +269,14 @@ export class AccessorTreeGenerator {
 					if (currentEntity instanceof EntityAccessor) {
 						const id = currentEntity.primaryKey
 
-						if (id === undefined) {
-							collectionAccessor.entities[i] = undefined
-						} else {
+						if (typeof id === 'string') {
 							collectionAccessor.entities[i] = new EntityForRemovalAccessor(
 								id,
 								currentEntity.data,
 								currentEntity.replaceWith
 							)
+						} else {
+							collectionAccessor.entities[i] = undefined
 						}
 						onUpdate(reference.placeholderName, collectionAccessor)
 					}

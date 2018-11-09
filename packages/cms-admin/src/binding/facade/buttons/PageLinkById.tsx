@@ -17,7 +17,7 @@ export class PageLinkById<P extends AnyParams> extends React.Component<PageLinkB
 					if (data instanceof EntityAccessor) {
 						const id = data.primaryKey
 
-						if (id) {
+						if (typeof id === 'string') {
 							return (
 								<PageLink change={() => this.props.change(id)} Component={this.props.Component}>
 									{this.props.children}

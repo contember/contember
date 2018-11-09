@@ -10,19 +10,28 @@ class S3 {
 		this.s3 = new AwsS3({
 			accessKeyId: config.credentials.key,
 			secretAccessKey: config.credentials.secret,
+			region: config.region,
 		})
 	}
 
-	public getSignedUrl(contentType: string): string {
+	public getSignedUrl(contentType: string): { objectKey: string; url: string; bucket: string; publicUrl: string } {
 		const ext = extension(contentType) || 'bin'
-		return this.s3.getSignedUrl('putObject', {
-			Bucket: this.config.bucket,
-			Key: `${this.config.prefix}/${uuid()}.${ext}`,
+		const objectKey = `${this.config.prefix}/${uuid()}.${ext}`
+		const bucket = this.config.bucket
+		const url = this.s3.getSignedUrl('putObject', {
+			Bucket: bucket,
+			Key: objectKey,
 			ContentType: contentType,
 			CacheControl: 'immutable',
 			Expires: 3600,
 			ACL: 'public-read',
 		})
+		const publicUrl = this.formatPublicUrl(objectKey)
+		return { bucket, objectKey, url, publicUrl }
+	}
+
+	public formatPublicUrl(key: string): string {
+		return `https://s3.${this.config.region}.amazonaws.com/${this.config.bucket}/${key}`
 	}
 }
 

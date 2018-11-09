@@ -44,6 +44,9 @@ function checkS3Config(json: any, path: string): void {
 	if (typeof json.prefix === 'undefined') {
 		error(`Undefined property ${path}.prefix in config file`)
 	}
+	if (typeof json.region === 'undefined') {
+		error(`Undefined property ${path}.region in config file`)
+	}
 	if (typeof json.credentials === 'undefined') {
 		error(`Undefined property ${path}.credentials in config file`)
 	}

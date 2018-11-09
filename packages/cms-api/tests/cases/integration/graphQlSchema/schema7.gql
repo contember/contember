@@ -215,6 +215,10 @@ type Query {
 
 type SignedUpload {
   url: String!
+  objectKey: String!
+  bucket: String!
+  region: String!
+  publicUrl: String!
 }
 
 input StringCondition {

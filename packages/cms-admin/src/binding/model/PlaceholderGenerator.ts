@@ -18,7 +18,9 @@ export class PlaceholderGenerator {
 	}
 
 	public static getReferencePlaceholder(fieldName: FieldName, reference: ReferenceMarker.ReferenceConstraints): string {
-		return `${fieldName}_${Hashing.hashReferenceConstraints(reference)}`
+		return reference.filter || reference.reducedBy
+			? `${fieldName}_${Hashing.hashReferenceConstraints(reference)}`
+			: fieldName
 	}
 
 	//

@@ -40,7 +40,7 @@ class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRen
 							{this.props.children}
 						</Sortable>
 					)}
-					{this.props.displayAddNewButton !== false && <AddNewButton addNew={data.root.addNew} />}
+					{this.props.displayAddNewButton && <AddNewButton addNew={data.root.addNew} />}
 					{this.props.displayPersistButton !== false && <PersistButton />}
 				</>
 			)

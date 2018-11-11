@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { DataContext, DataRendererProps } from '../../coreComponents'
+import {
+	DataContext,
+	DataRendererProps,
+	EnforceSubtypeRelation,
+	Field,
+	Props,
+	SyntheticChildrenProvider
+} from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
 import { AddNewButton, PersistButton, UnlinkButton } from '../buttons'
 import { Sortable, SortablePublicProps } from '../collections/Sortable'
@@ -14,6 +21,8 @@ export interface MultiEditRendererProps extends CommonRendererProps {
 }
 
 class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRendererProps> {
+	public static displayName = 'MultiEditRenderer'
+
 	public render() {
 		const data = this.props.data
 
@@ -46,6 +55,16 @@ class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRen
 			)
 		}
 	}
+
+	public static generateSyntheticChildren(props: Props<MultiEditRendererProps>) {
+		return (
+			<>
+				{DefaultRenderer.renderTitle(props.title)}
+				{props.sortable !== undefined && <Sortable {...props.sortable} />}
+				{props.children}
+			</>
+		)
+	}
 }
 
 namespace MultiEditRenderer {
@@ -65,5 +84,10 @@ namespace MultiEditRenderer {
 		}
 	}
 }
+
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof MultiEditRenderer,
+	SyntheticChildrenProvider<MultiEditRendererProps>
+>
 
 export { MultiEditRenderer }

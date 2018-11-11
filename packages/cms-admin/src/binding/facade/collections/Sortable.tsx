@@ -1,9 +1,12 @@
+import { Icon } from '@blueprintjs/core'
+import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import {
 	SortableContainer,
 	SortableContainerProps,
 	SortableElement,
 	SortableElementProps,
+	SortableHandle,
 	SortEndHandler
 } from 'react-sortable-hoc'
 import { FieldName } from '../../bindingTypes'
@@ -64,21 +67,30 @@ class Sortable extends React.Component<SortableProps> {
 }
 
 namespace Sortable {
-	interface SortableItemProps {
+	export interface DragHandleProps {}
+
+	export const DragHandle = SortableHandle((props: Props<DragHandleProps>) => (
+		<Icon icon={IconNames.DRAG_HANDLE_HORIZONTAL} className="sortable-item-handle" />
+	))
+
+	export interface SortableItemProps {
 		entity: EntityAccessor
 	}
 
-	const SortableItem = SortableElement((props: Props<SortableItemProps> & SortableElementProps) => (
-		<li>{props.children}</li>
+	export const SortableItem = SortableElement((props: Props<SortableItemProps & SortableElementProps>) => (
+		<li className="sortable-item">
+			<DragHandle />
+			<div className="sortable-item-content">{props.children}</div>
+		</li>
 	))
 
 	export interface SortableListProps {
 		entities: EntityAccessor[]
 	}
 
-	export const SortableList = SortableContainer((props: Props<SortableListProps> & SortableContainerProps) => {
+	export const SortableList = SortableContainer((props: Props<SortableListProps & SortableContainerProps>) => {
 		return (
-			<ul>
+			<ul className="sortable">
 				{props.entities.map((item, index) => {
 					return (
 						<SortableItem entity={item} key={item.getKey()} index={index}>
@@ -161,7 +173,7 @@ namespace Sortable {
 			})
 
 			return (
-				<SortableList entities={this.entities} onSortEnd={this.onSortEnd}>
+				<SortableList entities={this.entities} onSortEnd={this.onSortEnd} useDragHandle={true} lockAxis="y">
 					{this.props.children}
 				</SortableList>
 			)

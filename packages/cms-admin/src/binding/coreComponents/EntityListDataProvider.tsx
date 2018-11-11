@@ -30,11 +30,13 @@ export class EntityListDataProvider<DRP> extends React.Component<EntityListDataP
 					const environment = new Environment({ dimensions })
 					const Renderer = this.props.renderer || DefaultRenderer
 					const markerTreeGenerator = new MarkerTreeGenerator(
-						<EntityListDataProvider {...this.props}>
-							<Renderer {...this.props.rendererProps} data={undefined}>
-								{this.props.children}
-							</Renderer>
-						</EntityListDataProvider>,
+						(
+							<EntityListDataProvider {...this.props}>
+								<Renderer {...this.props.rendererProps} data={undefined}>
+									{this.props.children}
+								</Renderer>
+							</EntityListDataProvider>
+						),
 						environment
 					)
 					const DataProvider = getDataProvider<DRP>()

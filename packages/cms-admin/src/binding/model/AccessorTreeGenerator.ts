@@ -78,9 +78,10 @@ export class AccessorTreeGenerator {
 						}
 					}
 				)
-			const entityAccessors: Array<EntityAccessor | EntityForRemovalAccessor | undefined> = (data && data.length ? data : [undefined]).map(
-				(datum, i) => createEntityAccessor(i, datum)
-			)
+			const entityAccessors: Array<EntityAccessor | EntityForRemovalAccessor | undefined> = (data && data.length
+				? data
+				: [undefined]
+			).map((datum, i) => createEntityAccessor(i, datum))
 			return createAccessorTreeRoot()
 		} else {
 			const createAccessorTreeRoot = (): AccessorTreeRoot => new AccessorTreeRoot(tree, entityAccessor, tree.entityName)

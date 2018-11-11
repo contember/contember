@@ -33,11 +33,11 @@ class SortableRepeater extends React.Component<SortableRepeaterProps> {
 	}
 
 	public static generateSyntheticChildren(props: Props<SortableRepeaterProps>): React.ReactNode {
-		return <ToMany field={props.field} filter={props.filter}>
-			<Sortable sortBy={props.sortBy}>
-				{props.children}
-			</Sortable>
-		</ToMany>
+		return (
+			<ToMany field={props.field} filter={props.filter}>
+				<Sortable sortBy={props.sortBy}>{props.children}</Sortable>
+			</ToMany>
+		)
 	}
 }
 

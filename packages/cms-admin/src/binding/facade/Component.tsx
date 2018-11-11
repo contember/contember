@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { EnvironmentContext, SyntheticChildrenProvider } from '../coreComponents'
+import { EnvironmentContext, Props, SyntheticChildrenProvider } from '../coreComponents'
 import { Environment } from '../dao'
 
 type Component<P> = {
-	render(props: Readonly<{ children?: React.ReactNode }> & Readonly<P>, environment: Environment): React.ReactNode
+	render(props: Props<P>, environment: Environment): React.ReactNode
 	displayName?: string
 }
 
+// TODO: allow just a function as an argument after we upgrade to TS 3.2
 const Component = <P extends {}, S>(
 	Parent: React.ComponentClass<P, S> & Component<P>
 ): React.ComponentClass<P, S> & SyntheticChildrenProvider<P> => {

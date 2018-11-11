@@ -90,4 +90,7 @@ export class SelectField extends React.Component<SelectFieldProps> {
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof SelectField, SyntheticChildrenProvider<SelectFieldProps>>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof SelectField,
+	SyntheticChildrenProvider<SelectFieldProps>
+>

@@ -22,7 +22,7 @@ export default class MultiEditPage<DRP extends MultiEditRendererProps = MultiEdi
 					renderer={
 						this.props.renderer ||
 						// The as any cast is necessary because MultiEditRenderer is also a namespace… 🙄
-						(MultiEditRenderer as any as React.ComponentClass<DRP & DataRendererProps>)
+						((MultiEditRenderer as any) as React.ComponentClass<DRP & DataRendererProps>)
 					}
 					rendererProps={this.props.rendererProps}
 				>

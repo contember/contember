@@ -6,6 +6,7 @@ import { SelectedDimension } from '../../state/request'
 import { EntityName, FieldName } from '../bindingTypes'
 import { EnvironmentContext } from '../coreComponents'
 import { Environment, MarkerTreeRoot } from '../dao'
+import { DefaultRenderer } from '../facade/renderers'
 import { MarkerTreeGenerator } from '../model'
 import { DataRendererProps, getDataProvider } from './DataProvider'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
@@ -27,8 +28,13 @@ export class EntityListDataProvider<DRP> extends React.Component<EntityListDataP
 			<Dimensions>
 				{(dimensions: SelectedDimension) => {
 					const environment = new Environment({ dimensions })
+					const Renderer = this.props.renderer || DefaultRenderer
 					const markerTreeGenerator = new MarkerTreeGenerator(
-						<EntityListDataProvider {...this.props}>{this.props.children}</EntityListDataProvider>,
+						<EntityListDataProvider {...this.props}>
+							<Renderer {...this.props.rendererProps} data={undefined}>
+								{this.props.children}
+							</Renderer>
+						</EntityListDataProvider>,
 						environment
 					)
 					const DataProvider = getDataProvider<DRP>()

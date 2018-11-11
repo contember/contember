@@ -1,17 +1,19 @@
 import * as React from 'react'
 import { DataContext, DataRendererProps } from '../../coreComponents'
-import { EntityCollectionAccessor, EntityForRemovalAccessor } from '../../dao'
+import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
 import { AddNewButton, PersistButton, UnlinkButton } from '../buttons'
+import { Sortable, SortablePublicProps } from '../collections/Sortable'
 import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
 
 export interface MultiEditRendererProps extends CommonRendererProps {
 	displayAddNewButton?: boolean
 	displayPersistButton?: boolean
-	entrySeparator?: React.ReactNode
+	displayUnlinkButton?: boolean
+	sortable?: SortablePublicProps
 }
 
-export class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRendererProps> {
+class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRendererProps> {
 	public render() {
 		const data = this.props.data
 
@@ -20,21 +22,24 @@ export class MultiEditRenderer extends React.Component<MultiEditRendererProps & 
 		}
 
 		if (data.root instanceof EntityCollectionAccessor) {
+			const entities = data.root.entities.filter((item): item is EntityAccessor => item instanceof EntityAccessor)
+
 			return (
 				<>
 					{DefaultRenderer.renderTitle(this.props.title)}
-					{data.root.entities.map((value, i) => (
-						<React.Fragment key={i}>
-							{value &&
-								!(value instanceof EntityForRemovalAccessor) && (
-									<DataContext.Provider value={value}>
-										{(!!i && this.props.entrySeparator) || <hr />}
-										{this.props.children}
-										{!!i && <UnlinkButton /> /* Can't delete the first one */}
-									</DataContext.Provider>
-								)}
-						</React.Fragment>
-					))}
+					{this.props.sortable === undefined &&
+						entities.map(entity => (
+							<DataContext.Provider value={entity} key={entity.getKey()}>
+								<MultiEditRenderer.MultiEditItem displayUnlinkButton={entities.length > 1} entity={entity}>
+									{this.props.children}
+								</MultiEditRenderer.MultiEditItem>
+							</DataContext.Provider>
+						))}
+					{this.props.sortable !== undefined && (
+						<Sortable {...this.props.sortable} entities={data.root}>
+							{this.props.children}
+						</Sortable>
+					)}
 					{this.props.displayAddNewButton !== false && <AddNewButton addNew={data.root.addNew} />}
 					{this.props.displayPersistButton !== false && <PersistButton />}
 				</>
@@ -42,3 +47,23 @@ export class MultiEditRenderer extends React.Component<MultiEditRendererProps & 
 		}
 	}
 }
+
+namespace MultiEditRenderer {
+	export interface MultiEditItemProps {
+		entity: EntityAccessor
+		displayUnlinkButton: boolean
+	}
+
+	export class MultiEditItem extends React.Component<MultiEditItemProps> {
+		public render() {
+			return (
+				<>
+					{this.props.children}
+					{this.props.displayUnlinkButton && <UnlinkButton />}
+				</>
+			)
+		}
+	}
+}
+
+export { MultiEditRenderer }

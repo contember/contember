@@ -20,31 +20,41 @@ class ToOne extends React.Component<ToOneProps> {
 
 	public render() {
 		return (
-			<DataContext.Consumer>
-				{(data: DataContextValue) => {
-					if (data instanceof EntityAccessor) {
-						const field = data.data.getField(
-							this.props.field,
-							ReferenceMarker.ExpectedCount.UpToOne,
-							this.props.filter,
-							this.props.reducedBy
-						)
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) => (
+					<DataContext.Consumer>
+						{(data: DataContextValue) => {
+							if (data instanceof EntityAccessor) {
+								const transformer = new VariableInputTransformer(this.props.filter, environment)
+								const field = data.data.getField(
+									this.props.field,
+									ReferenceMarker.ExpectedCount.UpToOne,
+									transformer.transform(),
+									this.props.reducedBy
+								)
 
-						if (field instanceof EntityAccessor) {
-							return <ToOne.ToOneInner accessor={field}>{this.props.children}</ToOne.ToOneInner>
-						}
-					}
-				}}
-			</DataContext.Consumer>
+								if (field instanceof EntityAccessor) {
+									return <ToOne.ToOneInner accessor={field}>{this.props.children}</ToOne.ToOneInner>
+								}
+							}
+						}}
+					</DataContext.Consumer>
+				)}
+			</EnvironmentContext.Consumer>
 		)
 	}
 
-	public static generateReferenceMarker(props: ToOneProps, fields: EntityFields): ReferenceMarker {
+	public static generateReferenceMarker(
+		props: ToOneProps,
+		fields: EntityFields,
+		environment: Environment
+	): ReferenceMarker {
+		const transformer = new VariableInputTransformer(props.filter, environment)
 		return new ReferenceMarker(
 			props.field,
 			ReferenceMarker.ExpectedCount.UpToOne,
 			fields,
-			props.filter,
+			transformer.transform(),
 			props.reducedBy
 		)
 	}

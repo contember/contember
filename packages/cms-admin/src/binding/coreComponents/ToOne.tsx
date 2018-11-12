@@ -15,7 +15,7 @@ export interface ToOneProps {
 	filter?: Filter
 }
 
-class ToOne extends React.Component<ToOneProps> {
+class ToOne extends React.PureComponent<ToOneProps> {
 	static displayName = 'ToOne'
 
 	public render() {

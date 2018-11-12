@@ -18,7 +18,7 @@ interface EntityListDataProviderProps<DRP> {
 	rendererProps?: DRP
 }
 
-export class EntityListDataProvider<DRP> extends React.Component<EntityListDataProviderProps<DRP>> {
+export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListDataProviderProps<DRP>> {
 	public static displayName = 'EntityListDataProvider'
 
 	public render() {

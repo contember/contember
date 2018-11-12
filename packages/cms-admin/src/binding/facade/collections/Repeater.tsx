@@ -12,7 +12,7 @@ import { AddNewButton, UnlinkButton } from '../buttons'
 
 export interface RepeaterProps extends ToManyProps {}
 
-class Repeater extends React.Component<RepeaterProps> {
+class Repeater extends React.PureComponent<RepeaterProps> {
 	static displayName = 'Repeater'
 
 	public render() {
@@ -71,7 +71,7 @@ namespace Repeater {
 		addNew?: EntityCollectionAccessor['addNew']
 	}
 
-	export class Cloneable extends React.Component<CloneableProps> {
+	export class Cloneable extends React.PureComponent<CloneableProps> {
 		public render() {
 			return (
 				<>

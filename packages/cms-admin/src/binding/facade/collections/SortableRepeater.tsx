@@ -15,7 +15,7 @@ interface SortableRepeaterProps extends ToManyProps {
 	sortBy: FieldName
 }
 
-class SortableRepeater extends React.Component<SortableRepeaterProps> {
+class SortableRepeater extends React.PureComponent<SortableRepeaterProps> {
 	public static displayName = 'SortableRepeater'
 
 	public render() {

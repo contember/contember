@@ -13,7 +13,7 @@ export interface RichTextFieldProps {
 	allowLineBreaks?: boolean
 }
 
-export class RichTextField extends React.Component<RichTextFieldProps> {
+export class RichTextField extends React.PureComponent<RichTextFieldProps> {
 	static displayName = 'RichTextField'
 
 	public render() {

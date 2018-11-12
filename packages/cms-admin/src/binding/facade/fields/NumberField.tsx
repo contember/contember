@@ -13,7 +13,7 @@ export interface NumberFieldProps {
 	inlineLabel?: boolean
 }
 
-export class NumberField extends React.Component<NumberFieldProps> {
+export class NumberField extends React.PureComponent<NumberFieldProps> {
 	static displayName = 'TextField'
 
 	public render() {

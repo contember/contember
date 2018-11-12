@@ -12,7 +12,7 @@ interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	children: React.ReactNode
 }
 
-class SideDimensions extends React.Component<SideDimensionsProps> {
+class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 	static displayName = 'SideDimensions'
 
 	public render() {
@@ -61,7 +61,7 @@ namespace SideDimensions {
 		dimensionValue: Environment.Value
 	}
 
-	export class SingleDimension extends React.Component<SingleDimensionProps> {
+	export class SingleDimension extends React.PureComponent<SingleDimensionProps> {
 		static displayName = 'SideDimension'
 
 		public render() {

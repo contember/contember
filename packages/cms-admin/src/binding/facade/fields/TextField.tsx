@@ -13,7 +13,7 @@ export interface TextFieldProps {
 	inlineLabel?: boolean
 }
 
-export class TextField extends React.Component<TextFieldProps> {
+export class TextField extends React.PureComponent<TextFieldProps> {
 	static displayName = 'TextField'
 
 	public render() {

@@ -33,7 +33,7 @@ export interface DataProviderState {
 	id?: string
 }
 
-class DataProvider<DRP> extends React.Component<DataProviderInnerProps<DRP>, DataProviderState, boolean> {
+class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>, DataProviderState, boolean> {
 	public state: DataProviderState = {
 		data: undefined
 	}

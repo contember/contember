@@ -1,15 +1,16 @@
-import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
 import * as React from 'react'
-import { FieldName } from '../bindingTypes'
-import { EntityAccessor, EntityCollectionAccessor, EntityFields, ReferenceMarker } from '../dao'
+import { FieldName, Filter } from '../bindingTypes'
+import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
+import { VariableInputTransformer } from '../model/VariableInputTransformer'
+import { Parser } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
-import { ReferenceMarkerProvider } from './MarkerProvider'
+import { EnvironmentContext } from './EnvironmentContext'
+import { Props, ReferenceMarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
 
 export interface ToManyProps {
 	field: FieldName
-	filter?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Filter
 }
 
 class ToMany extends React.Component<ToManyProps> {

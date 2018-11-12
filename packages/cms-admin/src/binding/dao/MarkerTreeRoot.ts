@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
-import { EntityName, FieldName } from '../bindingTypes'
+import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'
 import { EntityFields } from './EntityFields'
 
@@ -10,7 +10,7 @@ export interface SingleEntityTreeConstraints {
 }
 
 export interface EntityListTreeConstraints {
-	filter?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Filter
 	whereType: 'nonUnique'
 }
 

@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
-import { FieldName } from '../bindingTypes'
+import { FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'
 import { EntityFields } from './EntityFields'
 
@@ -12,7 +12,7 @@ class ReferenceMarker {
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ExpectedCount,
 		fields: EntityFields,
-		filter?: Input.Where<GraphQlBuilder.Literal>,
+		filter?: Filter<GraphQlBuilder.Literal>,
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	)
 	public constructor(fieldName: FieldName, references: ReferenceMarker.References)
@@ -20,7 +20,7 @@ class ReferenceMarker {
 		fieldName: FieldName,
 		decider: ReferenceMarker.ExpectedCount | ReferenceMarker.References,
 		fields?: EntityFields,
-		filter?: Input.Where<GraphQlBuilder.Literal>,
+		filter?: Filter<GraphQlBuilder.Literal>,
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	) {
 		let references: ReferenceMarker.References

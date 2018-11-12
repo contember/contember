@@ -1,8 +1,6 @@
 import { FormGroup, HTMLSelect, IFormGroupProps } from '@blueprintjs/core'
-import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
 import * as React from 'react'
-import { EntityName, FieldName } from '../../bindingTypes'
+import { EntityName, FieldName, Filter } from '../../bindingTypes'
 import {
 	DataContext,
 	DataContextValue,
@@ -19,7 +17,7 @@ export interface SelectFieldProps {
 	label: IFormGroupProps['label']
 	entityName: EntityName
 	optionFieldName: FieldName
-	filter?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Filter
 }
 
 export class SelectField extends React.Component<SelectFieldProps> {

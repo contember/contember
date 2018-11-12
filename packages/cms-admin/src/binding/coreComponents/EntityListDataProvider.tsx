@@ -1,9 +1,7 @@
-import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
 import * as React from 'react'
 import Dimensions from '../../components/Dimensions'
 import { SelectedDimension } from '../../state/request'
-import { EntityName, FieldName } from '../bindingTypes'
+import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { EnvironmentContext } from '../coreComponents'
 import { Environment, MarkerTreeRoot } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
@@ -15,7 +13,7 @@ import { MarkerTreeRootProvider } from './MarkerProvider'
 interface EntityListDataProviderProps<DRP> {
 	name: EntityName
 	associatedField?: FieldName
-	filter?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Filter
 	renderer?: React.ComponentClass<DRP & DataRendererProps>
 	rendererProps?: DRP
 }

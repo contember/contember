@@ -1,16 +1,18 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
-import { FieldName } from '../bindingTypes'
-import { EntityAccessor, EntityFields, ReferenceMarker } from '../dao'
+import { FieldName, Filter } from '../bindingTypes'
+import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
+import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
+import { EnvironmentContext } from './EnvironmentContext'
 import { ReferenceMarkerProvider } from './MarkerProvider'
 
 export interface ToOneProps {
 	field: FieldName
 	reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
-	filter?: Input.Where<GraphQlBuilder.Literal>
+	filter?: Filter
 }
 
 class ToOne extends React.Component<ToOneProps> {

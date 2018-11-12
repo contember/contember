@@ -165,7 +165,7 @@ export class Parser extends ChevrotainParser {
 		return input
 	}
 
-	public static generateWrappedField(
+	public static generateWrappedNode(
 		input: string,
 		generateField: (fieldName: FieldName) => React.ReactNode,
 		environment?: Environment

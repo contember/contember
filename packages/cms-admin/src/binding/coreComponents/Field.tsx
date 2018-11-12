@@ -26,7 +26,7 @@ class Field extends React.Component<FieldProps> {
 		return (
 			<EnvironmentContext.Consumer>
 				{environment =>
-					Parser.generateWrappedField(
+					Parser.generateWrappedNode(
 						this.props.name,
 						fieldName => (
 							<DataContext.Consumer>

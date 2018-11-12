@@ -16,7 +16,7 @@ export class FieldText extends React.Component<FieldTextProps> {
 	}
 
 	public static generateSyntheticChildren(props: TextFieldProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName} />, environment)
+		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 

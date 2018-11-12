@@ -40,8 +40,10 @@ namespace Repeater {
 		public render() {
 			return (
 				<DataContext.Provider value={this.props.entity}>
-					{this.props.children}
-					{this.props.displayUnlinkButton && <UnlinkButton />}
+					<div className="repeaterItem">
+						<div className="repeaterItem-content">{this.props.children}</div>
+						{this.props.displayUnlinkButton && <UnlinkButton className="repeaterItem-button" />}
+					</div>
 				</DataContext.Provider>
 			)
 		}
@@ -74,10 +76,13 @@ namespace Repeater {
 	export class Cloneable extends React.PureComponent<CloneableProps> {
 		public render() {
 			return (
-				<>
-					{this.props.children}
-					<AddNewButton addNew={this.props.entities ? this.props.entities.addNew : this.props.addNew} />
-				</>
+				<div className="cloneable">
+					<div className="cloneable-content">{this.props.children}</div>
+					<AddNewButton
+						addNew={this.props.entities ? this.props.entities.addNew : this.props.addNew}
+						className="cloneable-button"
+					/>
+				</div>
 			)
 		}
 	}

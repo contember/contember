@@ -19,6 +19,8 @@ import {
 	SyntheticChildrenProvider
 } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../dao'
+import { AddNewButton } from '../buttons'
+import { Repeater } from './Repeater'
 
 export interface SortablePublicProps {
 	sortBy: FieldName
@@ -73,32 +75,41 @@ namespace Sortable {
 		<Icon icon={IconNames.DRAG_HANDLE_HORIZONTAL} className="sortable-item-handle" />
 	))
 
-	export interface SortableItemProps {
-		entity: EntityAccessor
-	}
+	export interface SortableItemProps extends Repeater.ItemProps {}
 
 	export const SortableItem = SortableElement((props: Props<SortableItemProps & SortableElementProps>) => (
 		<li className="sortable-item">
 			<DragHandle />
-			<div className="sortable-item-content">{props.children}</div>
+			<div className="sortable-item-content">
+				<Repeater.Item {...props}>{props.children}</Repeater.Item>
+			</div>
 		</li>
 	))
 
 	export interface SortableListProps {
 		entities: EntityAccessor[]
+		addNew: EntityCollectionAccessor['addNew']
 	}
 
 	export const SortableList = SortableContainer((props: Props<SortableListProps & SortableContainerProps>) => {
 		return (
-			<ul className="sortable">
-				{props.entities.map((item, index) => {
-					return (
-						<SortableItem entity={item} key={item.getKey()} index={index}>
-							<DataContext.Provider value={item}>{props.children}</DataContext.Provider>
-						</SortableItem>
-					)
-				})}
-			</ul>
+			<>
+				<ul className="sortable">
+					{props.entities.map((item, index) => {
+						return (
+							<SortableItem
+								entity={item}
+								key={item.getKey()}
+								index={index}
+								displayUnlinkButton={props.entities.length > 0}
+							>
+								<DataContext.Provider value={item}>{props.children}</DataContext.Provider>
+							</SortableItem>
+						)
+					})}
+				</ul>
+				<AddNewButton addNew={props.addNew} />
+			</>
 		)
 	})
 
@@ -107,7 +118,7 @@ namespace Sortable {
 		sortBy: FieldName
 	}
 
-	export class SortableInner extends React.PureComponent<SortableInnerProps> {
+	export class SortableInner extends React.Component<SortableInnerProps> {
 		private entities: EntityAccessor[] = []
 
 		private onSortEnd: SortEndHandler = ({ oldIndex, newIndex }, e) => {
@@ -173,7 +184,13 @@ namespace Sortable {
 			})
 
 			return (
-				<SortableList entities={this.entities} onSortEnd={this.onSortEnd} useDragHandle={true} lockAxis="y">
+				<SortableList
+					entities={this.entities}
+					onSortEnd={this.onSortEnd}
+					useDragHandle={true}
+					lockAxis="y"
+					addNew={this.props.entities.addNew}
+				>
 					{this.props.children}
 				</SortableList>
 			)

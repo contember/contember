@@ -247,6 +247,12 @@ export class AccessorTreeGenerator {
 		reference: ReferenceMarker.Reference,
 		onUpdate: OnUpdate
 	): EntityCollectionAccessor {
+		const update = () => {
+			onUpdate(
+				reference.placeholderName,
+				(collectionAccessor = new EntityCollectionAccessor(collectionAccessor.entities, collectionAccessor.addNew))
+			)
+		}
 		const generateNewAccessor = (i: number): EntityAccessor => {
 			return this.updateFields(
 				Array.isArray(fieldData) ? fieldData[i] : undefined,
@@ -255,16 +261,14 @@ export class AccessorTreeGenerator {
 					const entityAccessor = collectionAccessor.entities[i]
 					if (entityAccessor instanceof EntityAccessor) {
 						collectionAccessor.entities[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
-
-						onUpdate(reference.placeholderName, collectionAccessor)
+						update()
 					}
 				},
 				replacement => {
 					const entityAccessor = collectionAccessor.entities[i]
 					if (entityAccessor instanceof EntityAccessor) {
 						collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement)
-
-						onUpdate(reference.placeholderName, collectionAccessor)
+						update()
 					}
 				},
 				() => {
@@ -281,14 +285,14 @@ export class AccessorTreeGenerator {
 						} else {
 							collectionAccessor.entities[i] = undefined
 						}
-						onUpdate(reference.placeholderName, collectionAccessor)
+						update()
 					}
 				}
 			)
 		}
-		const collectionAccessor = new EntityCollectionAccessor([], () => {
+		let collectionAccessor = new EntityCollectionAccessor([], () => {
 			collectionAccessor.entities.push(generateNewAccessor(collectionAccessor.entities.length))
-			onUpdate(reference.placeholderName, collectionAccessor)
+			update()
 		})
 
 		if (!Array.isArray(fieldData)) {

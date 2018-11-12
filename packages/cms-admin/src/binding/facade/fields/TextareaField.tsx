@@ -14,7 +14,7 @@ export interface TextAreaFieldProps {
 	singleLine?: boolean
 }
 
-export class TextAreaField extends React.Component<TextAreaFieldProps> {
+export class TextAreaField extends React.PureComponent<TextAreaFieldProps> {
 	static displayName = 'TextAreaField'
 
 	public render() {

@@ -21,7 +21,7 @@ export interface MultiEditRendererProps extends CommonRendererProps {
 	sortable?: SortablePublicProps
 }
 
-class MultiEditRenderer extends React.Component<MultiEditRendererProps & DataRendererProps> {
+class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & DataRendererProps> {
 	public static displayName = 'MultiEditRenderer'
 
 	public render() {
@@ -68,7 +68,7 @@ namespace MultiEditRenderer {
 		displayUnlinkButton: boolean
 	}
 
-	export class MultiEditItem extends React.Component<MultiEditItemProps> {
+	export class MultiEditItem extends React.PureComponent<MultiEditItemProps> {
 		public render() {
 			return (
 				<>

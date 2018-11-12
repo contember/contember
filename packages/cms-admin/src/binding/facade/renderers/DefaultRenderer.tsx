@@ -5,7 +5,7 @@ import { EntityCollectionAccessor } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
 
-export class DefaultRenderer extends React.Component<RendererProps> {
+export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	public render() {
 		const data = this.props.data
 

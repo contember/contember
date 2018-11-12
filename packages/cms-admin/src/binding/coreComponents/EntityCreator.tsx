@@ -15,7 +15,7 @@ interface EntityCreatorProps<DRP> {
 	rendererProps?: DRP
 }
 
-export class EntityCreator<DRP> extends React.Component<EntityCreatorProps<DRP>> {
+export class EntityCreator<DRP> extends React.PureComponent<EntityCreatorProps<DRP>> {
 	public static displayName = 'EntityCreator'
 
 	public render() {

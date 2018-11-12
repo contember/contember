@@ -19,7 +19,7 @@ interface SingleEntityDataProviderProps<DRP> {
 	rendererProps?: DRP
 }
 
-export class SingleEntityDataProvider<DRP> extends React.Component<SingleEntityDataProviderProps<DRP>> {
+export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEntityDataProviderProps<DRP>> {
 	public static displayName = 'SingleEntityDataProvider'
 
 	public render() {

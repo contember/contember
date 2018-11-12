@@ -9,7 +9,7 @@ interface PageLinkByIdProps<P extends AnyParams> {
 	Component?: React.ComponentType<InnerProps>
 }
 
-export class PageLinkById<P extends AnyParams> extends React.Component<PageLinkByIdProps<P>> {
+export class PageLinkById<P extends AnyParams> extends React.PureComponent<PageLinkByIdProps<P>> {
 	public render() {
 		return (
 			<DataContext.Consumer>

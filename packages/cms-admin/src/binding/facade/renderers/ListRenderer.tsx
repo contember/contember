@@ -5,7 +5,7 @@ import { EntityCollectionAccessor } from '../../dao'
 import { RendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
 
-export class ListRenderer extends React.Component<RendererProps> {
+export class ListRenderer extends React.PureComponent<RendererProps> {
 	public render() {
 		const data = this.props.data
 

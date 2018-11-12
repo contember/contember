@@ -8,7 +8,7 @@ interface FieldTextProps {
 	name: string
 }
 
-export class FieldText extends React.Component<FieldTextProps> {
+export class FieldText extends React.PureComponent<FieldTextProps> {
 	public static displayName = 'FieldText'
 
 	public render() {

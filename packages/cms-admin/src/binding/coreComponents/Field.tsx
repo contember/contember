@@ -19,7 +19,7 @@ export interface FieldProps {
 	children?: (data: FieldAccessor<any>, environment: Environment) => React.ReactNode
 }
 
-class Field extends React.Component<FieldProps> {
+class Field extends React.PureComponent<FieldProps> {
 	public static displayName = 'Field'
 
 	public render() {

@@ -20,7 +20,7 @@ export interface SelectFieldProps {
 	filter?: Filter
 }
 
-export class SelectField extends React.Component<SelectFieldProps> {
+export class SelectField extends React.PureComponent<SelectFieldProps> {
 	public static displayName = 'SelectField'
 
 	public render() {

@@ -13,7 +13,7 @@ export interface ToManyProps {
 	filter?: Filter
 }
 
-class ToMany extends React.Component<ToManyProps> {
+class ToMany extends React.PureComponent<ToManyProps> {
 	static displayName = 'ToMany'
 
 	public render() {

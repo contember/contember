@@ -19,7 +19,6 @@ import {
 	SyntheticChildrenProvider
 } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../dao'
-import { AddNewButton } from '../buttons'
 import { Repeater } from './Repeater'
 
 export interface SortablePublicProps {
@@ -32,7 +31,7 @@ export interface SortableInternalProps {
 
 export interface SortableProps extends SortablePublicProps, SortableInternalProps {}
 
-class Sortable extends React.Component<SortableProps> {
+class Sortable extends React.PureComponent<SortableProps> {
 	public static displayName = 'Sortable'
 
 	public render() {
@@ -117,7 +116,7 @@ namespace Sortable {
 		sortBy: FieldName
 	}
 
-	export class SortableInner extends React.Component<SortableInnerProps> {
+	export class SortableInner extends React.PureComponent<SortableInnerProps> {
 		private entities: EntityAccessor[] = []
 
 		private onSortEnd: SortEndHandler = ({ oldIndex, newIndex }, e) => {

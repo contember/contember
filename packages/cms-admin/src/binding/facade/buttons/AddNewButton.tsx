@@ -6,7 +6,7 @@ interface AddNewButtonProps {
 	addNew: EntityCollectionAccessor['addNew']
 }
 
-export class AddNewButton extends React.Component<AddNewButtonProps> {
+export class AddNewButton extends React.PureComponent<AddNewButtonProps> {
 	public render() {
 		return (
 			this.props.addNew && (

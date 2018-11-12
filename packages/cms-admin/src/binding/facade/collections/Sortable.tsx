@@ -100,7 +100,7 @@ namespace Sortable {
 								entity={item}
 								key={item.getKey()}
 								index={index}
-								displayUnlinkButton={props.entities.length > 0}
+								displayUnlinkButton={props.entities.length > 1}
 							>
 								<DataContext.Provider value={item}>{props.children}</DataContext.Provider>
 							</SortableItem>

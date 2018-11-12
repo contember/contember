@@ -85,10 +85,10 @@ namespace SideDimensions {
 			if (!props.variables) {
 				return {}
 			}
-			return Environment.generateDelta(
-				oldEnvironment.putName(props.variableName, props.dimensionValue),
-				{ ...props.variables, [props.variableName]: props.dimensionValue }
-			)
+			return Environment.generateDelta(oldEnvironment.putName(props.variableName, props.dimensionValue), {
+				...props.variables,
+				[props.variableName]: props.dimensionValue
+			})
 		}
 	}
 

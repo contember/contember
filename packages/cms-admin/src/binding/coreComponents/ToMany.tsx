@@ -1,3 +1,4 @@
+import { IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import { FieldName, Filter } from '../bindingTypes'
 import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
@@ -10,6 +11,7 @@ import { Props, ReferenceMarkerProvider, SyntheticChildrenProvider } from './Mar
 
 export interface ToManyProps {
 	field: FieldName
+	label?: IFormGroupProps['label']
 	filter?: Filter
 }
 

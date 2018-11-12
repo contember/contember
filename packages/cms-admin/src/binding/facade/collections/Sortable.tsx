@@ -93,7 +93,7 @@ namespace Sortable {
 
 	export const SortableList = SortableContainer((props: Props<SortableListProps & SortableContainerProps>) => {
 		return (
-			<>
+			<Repeater.Cloneable addNew={props.addNew}>
 				<ul className="sortable">
 					{props.entities.map((item, index) => {
 						return (
@@ -108,8 +108,7 @@ namespace Sortable {
 						)
 					})}
 				</ul>
-				<AddNewButton addNew={props.addNew} />
-			</>
+			</Repeater.Cloneable>
 		)
 	})
 

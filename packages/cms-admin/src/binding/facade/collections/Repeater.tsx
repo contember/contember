@@ -55,13 +55,28 @@ namespace Repeater {
 		public render() {
 			const entities = filterEntities(this.props.entities)
 			return (
-				<>
+				<Cloneable entities={this.props.entities}>
 					{entities.map(entity => (
 						<Item displayUnlinkButton={entities.length > 1} entity={entity} key={entity.getKey()}>
 							{this.props.children}
 						</Item>
 					))}
-					<AddNewButton addNew={this.props.entities.addNew} />
+				</Cloneable>
+			)
+		}
+	}
+
+	export interface CloneableProps {
+		entities?: EntityCollectionAccessor
+		addNew?: EntityCollectionAccessor['addNew']
+	}
+
+	export class Cloneable extends React.Component<CloneableProps> {
+		public render() {
+			return (
+				<>
+					{this.props.children}
+					<AddNewButton addNew={this.props.entities ? this.props.entities.addNew : this.props.addNew} />
 				</>
 			)
 		}

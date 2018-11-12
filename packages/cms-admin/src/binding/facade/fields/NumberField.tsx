@@ -19,8 +19,11 @@ export class NumberField extends React.PureComponent<NumberFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<number | null, number>): React.ReactNode => (
-					<FormGroup label={this.props.label} inline={this.props.inlineLabel}>
+				{(data: FieldAccessor<number | null, number>, env): React.ReactNode => (
+					<FormGroup
+						label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
+						inline={this.props.inlineLabel}
+					>
 						<InputGroup
 							value={data.currentValue ? data.currentValue.toFixed(0) : '0'}
 							onChange={this.generateOnChange(data)}

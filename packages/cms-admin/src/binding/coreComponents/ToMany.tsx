@@ -26,12 +26,22 @@ class ToMany extends React.Component<ToManyProps> {
 		)
 	}
 
-	public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
-		return ToMany.CollectionRetriever.generateReferenceMarker(props, fields)
+	public static generateSyntheticChildren(props: Props<ToManyProps>, environment: Environment): React.ReactNode {
+		return Parser.generateWrappedNode(
+			props.field,
+			fieldName => (
+				<ToMany.ReferenceMarkerGenerator {...props} field={fieldName}>
+					{props.children}
+				</ToMany.ReferenceMarkerGenerator>
+			),
+			environment
+		)
 	}
 }
 
 namespace ToMany {
+	export interface ReferenceMarkerGeneratorProps extends ToManyProps {}
+
 	export interface CollectionRetrieverProps extends ToManyProps {
 		children: (field: EntityCollectionAccessor) => React.ReactNode
 	}
@@ -40,34 +50,73 @@ namespace ToMany {
 		accessor: EntityCollectionAccessor
 	}
 
+	export class ReferenceMarkerGenerator extends React.PureComponent<ReferenceMarkerGeneratorProps> {
+		public static displayName = 'ReferenceMarkerGenerator'
+		public static generateReferenceMarker(
+			props: ToManyProps,
+			fields: EntityFields,
+			environment: Environment
+		): ReferenceMarker {
+			const transformer = new VariableInputTransformer(props.filter, environment)
+			return new ReferenceMarker(
+				props.field,
+				ReferenceMarker.ExpectedCount.PossiblyMany,
+				fields,
+				transformer.transform()
+			)
+		}
+	}
+	type EnforceDataBindingCompatibility1 = EnforceSubtypeRelation<
+		typeof ReferenceMarkerGenerator,
+		ReferenceMarkerProvider<CollectionRetrieverProps>
+	>
+
 	export class CollectionRetriever extends React.PureComponent<CollectionRetrieverProps> {
 		public static displayName = 'ToMany'
 
 		public render() {
 			return (
-				<DataContext.Consumer>
-					{(data: DataContextValue) => {
-						if (data instanceof EntityAccessor) {
-							const field = data.data.getField(
-								this.props.field,
-								ReferenceMarker.ExpectedCount.PossiblyMany,
-								this.props.filter
-							)
+				<EnvironmentContext.Consumer>
+					{(environment: Environment) =>
+						Parser.generateWrappedNode(
+							this.props.field,
+							fieldName => (
+								<DataContext.Consumer>
+									{(data: DataContextValue) => {
+										if (data instanceof EntityAccessor) {
+											const transformer = new VariableInputTransformer(this.props.filter, environment)
+											const field = data.data.getField(
+												fieldName,
+												ReferenceMarker.ExpectedCount.PossiblyMany,
+												transformer.transform()
+											)
 
-							if (field instanceof EntityCollectionAccessor) {
-								return this.props.children(field)
-							}
-						}
-					}}
-				</DataContext.Consumer>
+											if (field instanceof EntityCollectionAccessor) {
+												return this.props.children(field)
+											}
+										}
+									}}
+								</DataContext.Consumer>
+							),
+							environment
+						)
+					}
+				</EnvironmentContext.Consumer>
 			)
 		}
 
-		public static generateReferenceMarker(props: ToManyProps, fields: EntityFields): ReferenceMarker {
-			return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.filter)
+		public static generateSyntheticChildren(props: Props<CollectionRetrieverProps>): React.ReactNode {
+			return (
+				<ReferenceMarkerGenerator field={props.field} filter={props.filter}>
+					{props.children}
+				</ReferenceMarkerGenerator>
+			)
 		}
 	}
-	type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof CollectionRetriever, ReferenceMarkerProvider>
+	type EnforceDataBindingCompatibility2 = EnforceSubtypeRelation<
+		typeof CollectionRetriever,
+		SyntheticChildrenProvider<CollectionRetrieverProps>
+	>
 
 	export class AccessorRenderer extends React.PureComponent<AccessorRendererProps> {
 		public render() {
@@ -85,4 +134,4 @@ namespace ToMany {
 
 export { ToMany }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof ToMany, ReferenceMarkerProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof ToMany, SyntheticChildrenProvider<ToManyProps>>

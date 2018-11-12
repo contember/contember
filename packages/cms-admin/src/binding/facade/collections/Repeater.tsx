@@ -1,6 +1,13 @@
 import * as React from 'react'
-import { DataContext, EnforceSubtypeRelation, ReferenceMarkerProvider, ToMany, ToManyProps } from '../../coreComponents'
-import { EntityAccessor, EntityCollectionAccessor, EntityFields, ReferenceMarker } from '../../dao'
+import {
+	DataContext,
+	EnforceSubtypeRelation,
+	Props,
+	SyntheticChildrenProvider,
+	ToMany,
+	ToManyProps
+} from '../../coreComponents'
+import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
 import { AddNewButton, UnlinkButton } from '../buttons'
 
 export interface RepeaterProps extends ToManyProps {}
@@ -31,9 +38,9 @@ export class Repeater extends React.Component<RepeaterProps> {
 		)
 	}
 
-	public static generateReferenceMarker(props: RepeaterProps, fields: EntityFields): ReferenceMarker {
-		return ToMany.generateReferenceMarker(props, fields)
+	public static generateSyntheticChildren(props: Props<RepeaterProps>): React.ReactNode {
+		return <ToMany {...props}>{props.children}</ToMany>
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof Repeater, ReferenceMarkerProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof Repeater, SyntheticChildrenProvider<RepeaterProps>>

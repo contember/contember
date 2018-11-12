@@ -41,7 +41,9 @@ export class VariableInputTransformer {
 					value !== null &&
 					value !== undefined
 				) {
-					throw new DataBindingError(`The value of the '${field.variable}' must be a scalar or null, not '${typeof value}'.`)
+					throw new DataBindingError(
+						`The value of the '${field.variable}' must be a scalar or null, not '${typeof value}'.`
+					)
 				}
 				mapped[key] = value
 			} else if (field instanceof VariableLiteral) {

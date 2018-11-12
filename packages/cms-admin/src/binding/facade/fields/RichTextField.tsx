@@ -19,13 +19,13 @@ export class RichTextField extends React.PureComponent<RichTextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string | null, string>): React.ReactNode => {
+				{(data: FieldAccessor<string | null, string>, env): React.ReactNode => {
 					return (
 						<RichEditor
 							onChange={this.generateOnChange(data)}
 							value={data.currentValue || ''}
 							allowLineBreaks={this.props.allowLineBreaks}
-							label={this.props.label}
+							label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
 						/>
 					)
 				}}

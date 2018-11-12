@@ -42,7 +42,7 @@ export class TextAreaField extends React.Component<TextAreaFieldProps> {
 	}
 
 	public static generateSyntheticChildren(props: TextFieldProps): React.ReactNode {
-		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName} />)
+		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />)
 	}
 }
 

@@ -60,7 +60,7 @@ describe('query language parser', () => {
 	})
 
 	it('should correctly generate JSX', () => {
-		const result = Parser.generateWrappedField('this(better=work).as.expected(and = 1).correctly', name => (
+		const result = Parser.generateWrappedNode('this(better=work).as.expected(and = 1).correctly', name => (
 			<TextField name={name} />
 		))
 		const expected = (

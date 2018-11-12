@@ -1,3 +1,4 @@
+import { FormGroup } from '@blueprintjs/core'
 import * as React from 'react'
 import {
 	DataContext,
@@ -19,7 +20,11 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 		return (
 			<ToMany.CollectionRetriever {...this.props}>
 				{(field: EntityCollectionAccessor) => {
-					return <Repeater.EntityCollection entities={field}>{this.props.children}</Repeater.EntityCollection>
+					return (
+						<Repeater.EntityCollection entities={field} label={this.props.label}>
+							{this.props.children}
+						</Repeater.EntityCollection>
+					)
 				}}
 			</ToMany.CollectionRetriever>
 		)
@@ -51,19 +56,23 @@ namespace Repeater {
 
 	export interface EntityCollectionProps {
 		entities: EntityCollectionAccessor
+		label?: ToManyProps['label']
 	}
 
 	export class EntityCollection extends React.PureComponent<EntityCollectionProps> {
 		public render() {
 			const entities = filterEntities(this.props.entities)
 			return (
-				<Cloneable entities={this.props.entities}>
-					{entities.map(entity => (
-						<Item displayUnlinkButton={entities.length > 1} entity={entity} key={entity.getKey()}>
-							{this.props.children}
-						</Item>
-					))}
-				</Cloneable>
+				// Intentionally not applying label system middleware
+				<FormGroup label={this.props.label}>
+					<Cloneable entities={this.props.entities}>
+						{entities.map(entity => (
+							<Item displayUnlinkButton={entities.length > 1} entity={entity} key={entity.getKey()}>
+								{this.props.children}
+							</Item>
+						))}
+					</Cloneable>
+				</FormGroup>
 			)
 		}
 	}

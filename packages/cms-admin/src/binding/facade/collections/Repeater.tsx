@@ -1,4 +1,5 @@
-import { FormGroup } from '@blueprintjs/core'
+import { Card, FormGroup } from '@blueprintjs/core'
+import { Elevation } from '@blueprintjs/core/src/common/elevation'
 import * as React from 'react'
 import {
 	DataContext,
@@ -46,8 +47,10 @@ namespace Repeater {
 			return (
 				<DataContext.Provider value={this.props.entity}>
 					<div className="repeaterItem">
-						<div className="repeaterItem-content">{this.props.children}</div>
-						{this.props.displayUnlinkButton && <UnlinkButton className="repeaterItem-button" />}
+						<Card elevation={Elevation.ONE} className="repeaterItem-in">
+							<div className="repeaterItem-content">{this.props.children}</div>
+							{this.props.displayUnlinkButton && <UnlinkButton className="repeaterItem-button" />}
+						</Card>
 					</div>
 				</DataContext.Provider>
 			)

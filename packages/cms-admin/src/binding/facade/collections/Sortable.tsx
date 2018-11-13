@@ -187,6 +187,7 @@ namespace Sortable {
 					onSortEnd={this.onSortEnd}
 					useDragHandle={true}
 					lockAxis="y"
+					lockToContainerEdges={true}
 					addNew={this.props.entities.addNew}
 				>
 					{this.props.children}

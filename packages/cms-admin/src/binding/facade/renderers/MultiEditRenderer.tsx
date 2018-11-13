@@ -35,6 +35,7 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 			return (
 				<>
 					{DefaultRenderer.renderTitle(this.props.title)}
+					{this.props.beforeContent}
 					{this.props.sortable === undefined && (
 						<Repeater.EntityCollection entities={data.root}>{this.props.children}</Repeater.EntityCollection>
 					)}

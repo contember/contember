@@ -1,5 +1,4 @@
-import { Card, FormGroup } from '@blueprintjs/core'
-import { Elevation } from '@blueprintjs/core/src/common/elevation'
+import { Card, Elevation, FormGroup } from '@blueprintjs/core'
 import * as React from 'react'
 import {
 	DataContext,

@@ -161,8 +161,14 @@ export class AccessorTreeGenerator {
 							)
 						}
 					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
-						if (Array.isArray(fieldData) || fieldData === undefined) {
-							entityData[referencePlaceholder] = this.generateManyReference(fieldData, reference, onUpdate)
+						if (fieldData === undefined) {
+							entityData[referencePlaceholder] = this.generateManyReference(undefined, reference, onUpdate)
+						} else if (Array.isArray(fieldData)) {
+							entityData[referencePlaceholder] = this.generateManyReference(
+								fieldData.length === 0 ? undefined : fieldData,
+								reference,
+								onUpdate
+							)
 						} else if (typeof fieldData === 'object') {
 							// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
 							// relation is unlinked, e.g. a Person does not have a linked Nationality.
@@ -200,7 +206,7 @@ export class AccessorTreeGenerator {
 					// `fieldData` will be `undefined` when a repeater creates a clone based on no data.
 					entityData[placeholderName] = new FieldAccessor(
 						placeholderName,
-						fieldData === undefined ? (field.defaultValue || null) : fieldData,
+						fieldData === undefined ? field.defaultValue || null : fieldData,
 						onChange
 					)
 				}

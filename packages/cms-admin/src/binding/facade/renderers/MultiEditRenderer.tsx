@@ -15,9 +15,9 @@ import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
 
 export interface MultiEditRendererProps extends CommonRendererProps {
-	displayAddNewButton?: boolean
-	displayPersistButton?: boolean
-	displayUnlinkButton?: boolean
+	enableAddingNew?: boolean
+	enablePersist?: boolean
+	enableUnlink?: boolean
 	sortable?: SortablePublicProps
 }
 
@@ -44,8 +44,8 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 							{this.props.children}
 						</Sortable>
 					)}
-					{this.props.displayAddNewButton && <AddNewButton addNew={data.root.addNew} />}
-					{this.props.displayPersistButton !== false && <PersistButton />}
+					{this.props.enableAddingNew && <AddNewButton addNew={data.root.addNew} />}
+					{this.props.enablePersist !== false && <PersistButton />}
 				</>
 			)
 		}

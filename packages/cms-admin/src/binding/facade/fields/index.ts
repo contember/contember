@@ -1,3 +1,4 @@
+export * from './HiddenField'
 export * from './NumberField'
 export * from './RichTextField'
 export * from './SelectField'

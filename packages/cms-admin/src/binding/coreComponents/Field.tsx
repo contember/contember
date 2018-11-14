@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FieldName } from '../bindingTypes'
+import { FieldName, Scalar, VariableInput } from '../bindingTypes'
 import {
 	DataBindingError,
 	EntityAccessor,
@@ -8,14 +8,19 @@ import {
 	FieldAccessor,
 	FieldMarker
 } from '../dao'
+import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { Parser } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
 
-export interface FieldProps {
+export interface FieldPublicProps {
 	name: FieldName
+	defaultValue?: VariableInput | Scalar
+}
+
+export interface FieldProps extends FieldPublicProps {
 	children?: (data: FieldAccessor<any>, environment: Environment) => React.ReactNode
 }
 
@@ -56,8 +61,11 @@ class Field extends React.PureComponent<FieldProps> {
 		)
 	}
 
-	public static generateFieldMarker(props: FieldProps): FieldMarker {
-		return new FieldMarker(props.name)
+	public static generateFieldMarker(props: FieldProps, environment: Environment): FieldMarker {
+		return new FieldMarker(
+			props.name,
+			props.defaultValue && VariableInputTransformer.transformValue(props.defaultValue, environment)
+		)
 	}
 }
 

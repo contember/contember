@@ -1,3 +1,4 @@
+import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
 import { FieldName, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
@@ -193,13 +194,13 @@ export class AccessorTreeGenerator {
 							`Perhaps you wanted to use a <SingleReference />?`
 					)
 				} else {
-					const onChange = (newValue: Scalar) => {
+					const onChange = (newValue: Scalar | GraphQlBuilder.Literal) => {
 						onUpdate(placeholderName, new FieldAccessor(placeholderName, newValue, onChange))
 					}
 					// `fieldData` will be `undefined` when a repeater creates a clone based on no data.
 					entityData[placeholderName] = new FieldAccessor(
 						placeholderName,
-						fieldData === undefined ? null : fieldData,
+						fieldData === undefined ? (field.defaultValue || null) : fieldData,
 						onChange
 					)
 				}

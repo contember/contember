@@ -57,9 +57,15 @@ namespace Repeater {
 		}
 	}
 
-	export interface EntityCollectionProps {
-		entities: EntityCollectionAccessor
+	export interface EntityCollectionPublicProps {
 		label?: ToManyProps['label']
+		enableUnlink?: boolean
+		enableUnlinkAll?: boolean
+		enableAddingNew?: boolean
+	}
+
+	export interface EntityCollectionProps extends EntityCollectionPublicProps {
+		entities: EntityCollectionAccessor
 	}
 
 	export class EntityCollection extends React.PureComponent<EntityCollectionProps> {
@@ -68,9 +74,15 @@ namespace Repeater {
 			return (
 				// Intentionally not applying label system middleware
 				<FormGroup label={this.props.label}>
-					<Cloneable entities={this.props.entities}>
+					<Cloneable entities={this.props.entities} enableAddingNew={this.props.enableAddingNew}>
 						{entities.map(entity => (
-							<Item displayUnlinkButton={entities.length > 1} entity={entity} key={entity.getKey()}>
+							<Item
+								displayUnlinkButton={
+									this.props.enableUnlink !== false && (entities.length > 1 || this.props.enableUnlinkAll === true)
+								}
+								entity={entity}
+								key={entity.getKey()}
+							>
 								{this.props.children}
 							</Item>
 						))}
@@ -83,11 +95,14 @@ namespace Repeater {
 	export interface CloneableProps {
 		entities?: EntityCollectionAccessor
 		addNew?: EntityCollectionAccessor['addNew']
+		enableAddingNew?: boolean
 	}
 
 	export class Cloneable extends React.PureComponent<CloneableProps> {
 		public render() {
-			return (
+			return this.props.enableAddingNew === false ? (
+				this.props.children
+			) : (
 				<div className="cloneable">
 					<div className="cloneable-content">{this.props.children}</div>
 					<AddNewButton

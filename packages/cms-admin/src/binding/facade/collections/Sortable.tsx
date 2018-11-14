@@ -20,8 +20,9 @@ import {
 } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../dao'
 import { Repeater } from './Repeater'
+import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
-export interface SortablePublicProps {
+export interface SortablePublicProps extends EntityCollectionPublicProps {
 	sortBy: FieldName
 }
 
@@ -37,7 +38,14 @@ class Sortable extends React.PureComponent<SortableProps> {
 	public render() {
 		if (this.props.entities) {
 			return (
-				<Sortable.SortableInner sortBy={this.props.sortBy} entities={this.props.entities}>
+				<Sortable.SortableInner
+					enableUnlinkAll={this.props.enableUnlinkAll}
+					enableAddingNew={this.props.enableAddingNew}
+					enableUnlink={this.props.enableUnlink}
+					label={this.props.label}
+					sortBy={this.props.sortBy}
+					entities={this.props.entities}
+				>
 					{this.props.children}
 				</Sortable.SortableInner>
 			)
@@ -85,14 +93,14 @@ namespace Sortable {
 		</li>
 	))
 
-	export interface SortableListProps {
+	export interface SortableListProps extends EntityCollectionPublicProps {
 		entities: EntityAccessor[]
 		addNew: EntityCollectionAccessor['addNew']
 	}
 
 	export const SortableList = SortableContainer((props: Props<SortableListProps & SortableContainerProps>) => {
 		return (
-			<Repeater.Cloneable addNew={props.addNew}>
+			<Repeater.Cloneable addNew={props.addNew} enableAddingNew={props.enableAddingNew}>
 				<ul className="sortable">
 					{props.entities.map((item, index) => {
 						return (
@@ -100,7 +108,9 @@ namespace Sortable {
 								entity={item}
 								key={item.getKey()}
 								index={index}
-								displayUnlinkButton={props.entities.length > 1}
+								displayUnlinkButton={
+									props.enableUnlink !== false && (props.entities.length > 1 || props.enableUnlinkAll === true)
+								}
 							>
 								<DataContext.Provider value={item}>{props.children}</DataContext.Provider>
 							</SortableItem>
@@ -111,9 +121,8 @@ namespace Sortable {
 		)
 	})
 
-	export interface SortableInnerProps {
+	export interface SortableInnerProps extends SortablePublicProps {
 		entities: EntityCollectionAccessor
-		sortBy: FieldName
 	}
 
 	export class SortableInner extends React.PureComponent<SortableInnerProps> {
@@ -189,6 +198,10 @@ namespace Sortable {
 					lockAxis="y"
 					lockToContainerEdges={true}
 					addNew={this.props.entities.addNew}
+					enableUnlinkAll={this.props.enableUnlinkAll}
+					enableAddingNew={this.props.enableAddingNew}
+					enableUnlink={this.props.enableUnlink}
+					label={this.props.label}
 				>
 					{this.props.children}
 				</SortableList>

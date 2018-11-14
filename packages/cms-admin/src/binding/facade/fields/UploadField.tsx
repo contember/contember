@@ -103,11 +103,14 @@ class UploadFieldComponent extends React.Component<
 	}
 
 	public static generateSyntheticChildren(props: UploadFieldOwnProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedField(props.name, fieldName => <Field name={fieldName} />, environment)
+		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof UploadFieldComponent, SyntheticChildrenProvider>
+type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
+	typeof UploadFieldComponent,
+	SyntheticChildrenProvider<UploadFieldOwnProps>
+>
 
 const UploadField = connect<UploadFieldStateProps, UploadFieldDispatchProps, UploadFieldOwnProps, State>(
 	state => ({

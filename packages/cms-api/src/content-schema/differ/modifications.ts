@@ -41,6 +41,13 @@ export interface CreateRelationInverseSideModification {
 	relation: Model.AnyRelation & Model.InversedRelation
 }
 
+export interface UpdateRelationOnDeleteModification {
+	modification: 'updateRelationOnDelete'
+	entityName: string
+	fieldName: string
+	onDelete: Model.OnDelete
+}
+
 export interface RemoveFieldModification {
 	modification: 'removeField'
 	entityName: string
@@ -114,6 +121,7 @@ export type Modification =
 	| CreateEnumModification
 	| RemoveEnumModification
 	| UpdateEnumModification
+	| UpdateRelationOnDeleteModification
 
 export interface SchemaDiff {
 	modifications: Modification[]

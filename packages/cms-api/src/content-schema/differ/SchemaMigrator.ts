@@ -18,8 +18,10 @@ import {
 	UpdateEntityNameModification,
 	UpdateFieldNameModification,
 	CreateRelationInverseSideModification,
+	UpdateRelationOnDeleteModification,
 } from './modifications'
 import { acceptFieldVisitor } from '../modelUtils'
+import { isIt } from '../../utils/type'
 
 export default class SchemaMigrator {
 	constructor(private readonly schema: Model.Schema) {}
@@ -82,6 +84,9 @@ export default class SchemaMigrator {
 				break
 			case 'updateEnum':
 				this.updateEnum(modification)
+				break
+			case 'updateRelationOnDelete':
+				this.updateRelationOnDelete(modification)
 				break
 			default:
 				assertNever(modification)
@@ -200,5 +205,13 @@ export default class SchemaMigrator {
 
 	private updateEnum(modification: UpdateEnumModification) {
 		this.schema.enums[modification.enumName] = deepCopy(modification.values)
+	}
+
+	private updateRelationOnDelete(modification: UpdateRelationOnDeleteModification) {
+		const field = this.schema.entities[modification.entityName].fields[modification.fieldName]
+		if (!isIt<Model.JoiningColumnRelation>(field, 'joiningColumn')) {
+			throw new Error()
+		}
+		field.joiningColumn.onDelete = modification.onDelete
 	}
 }

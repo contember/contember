@@ -16,4 +16,14 @@ const arrayEquals = (a: any, b: any): boolean => {
 	return true
 }
 
-export { arrayEquals }
+const arraySplit = <T>(source: T[], condition: (value: T) => boolean): [T[], T[]] => {
+	return source.reduce<[T[], T[]]>(
+		([res1, res2], value) => {
+			const valid = condition(value)
+			return [[...res1, ...(valid ? [value] : [])], [...res2, ...(!valid ? [value] : [])]]
+		},
+		[[], []]
+	)
+}
+
+export { arrayEquals, arraySplit }

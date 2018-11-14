@@ -84,6 +84,7 @@ export default class SqlMigrator {
 			case 'updateEntityName':
 			case 'updateFieldName':
 			case 'createRelationInverseSide':
+			case 'updateRelationOnDelete':
 				break
 			default:
 				assertNever(modification)

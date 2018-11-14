@@ -1,23 +1,24 @@
-import { Model, deepCopy } from 'cms-common'
-import { SchemaDiff, Modification, CreateEntityModification } from './modifications'
+import { deepCopy, Model } from 'cms-common'
+import { Modification, SchemaDiff } from './modifications'
 import { acceptFieldVisitor } from '../modelUtils'
 import CreateModificationFieldVisitor from './CreateModificationFieldVisitor'
+import { arraySplit } from '../../utils/arrays'
 
-export default class ModificationBuilder {
-	private readonly entities: CreateEntityModification[] = []
-	private readonly modifications: Modification[] = []
+class ModificationBuilder {
+	private modifications: Modification[] = []
 
 	constructor(private readonly originalSchema: Model.Schema, private readonly updatedSchema: Model.Schema) {}
 
 	public getDiff(): SchemaDiff | null {
+		const [createEntity, other] = arraySplit(this.modifications, it => it.modification === 'createEntity')
 		const diff = {
-			modifications: [...this.entities, ...this.modifications],
+			modifications: [...createEntity, ...other],
 		}
 		return diff.modifications.length > 0 ? diff : null
 	}
 
 	public createEntity(updatedEntity: Model.Entity) {
-		this.entities.push({
+		this.modifications.push({
 			modification: 'createEntity',
 			entity: {
 				name: updatedEntity.name,
@@ -124,4 +125,33 @@ export default class ModificationBuilder {
 			values: deepCopy(this.updatedSchema.enums[enumName]),
 		})
 	}
+
+	public updateRelationOnDelete(entityName: string, fieldName: string, onDelete: Model.OnDelete) {
+		this.modifications.push({
+			modification: 'updateRelationOnDelete',
+			entityName,
+			fieldName,
+			onDelete,
+		})
+	}
+
+	public createMarker(): ModificationBuilder.Marker {
+		return new ModificationBuilder.Marker(this, [...this.modifications])
+	}
+
+	public rewind(modifications: Modification[]) {
+		this.modifications = modifications
+	}
 }
+
+namespace ModificationBuilder {
+	export class Marker {
+		constructor(private readonly builder: ModificationBuilder, public readonly modifications: Modification[]) {}
+
+		public rewind() {
+			this.builder.rewind(this.modifications)
+		}
+	}
+}
+
+export default ModificationBuilder

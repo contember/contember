@@ -13,11 +13,10 @@ import { Repeater } from '../collections'
 import { Sortable, SortablePublicProps } from '../collections/Sortable'
 import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
+import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
-export interface MultiEditRendererProps extends CommonRendererProps {
-	enableAddingNew?: boolean
+export interface MultiEditRendererProps extends CommonRendererProps, EntityCollectionPublicProps {
 	enablePersist?: boolean
-	enableUnlink?: boolean
 	sortable?: SortablePublicProps
 }
 
@@ -37,14 +36,28 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 					{DefaultRenderer.renderTitle(this.props.title)}
 					{this.props.beforeContent}
 					{this.props.sortable === undefined && (
-						<Repeater.EntityCollection entities={data.root}>{this.props.children}</Repeater.EntityCollection>
+						<Repeater.EntityCollection
+							entities={data.root}
+							enableUnlinkAll={this.props.enableUnlinkAll}
+							enableAddingNew={this.props.enableAddingNew}
+							enableUnlink={this.props.enableUnlink}
+							label={this.props.label}
+						>
+							{this.props.children}
+						</Repeater.EntityCollection>
 					)}
 					{this.props.sortable !== undefined && (
-						<Sortable {...this.props.sortable} entities={data.root}>
+						<Sortable
+							enableUnlinkAll={this.props.enableUnlinkAll}
+							enableAddingNew={this.props.enableAddingNew}
+							enableUnlink={this.props.enableUnlink}
+							label={this.props.label}
+							{...this.props.sortable}
+							entities={data.root}
+						>
 							{this.props.children}
 						</Sortable>
 					)}
-					{this.props.enableAddingNew && <AddNewButton addNew={data.root.addNew} />}
 					{this.props.enablePersist !== false && <PersistButton />}
 				</>
 			)

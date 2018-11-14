@@ -4,17 +4,19 @@ import { Filter, VariableInput } from '../bindingTypes'
 import { DataBindingError, Environment, Literal, VariableLiteral, VariableScalar } from '../dao'
 
 export class VariableInputTransformer {
-	public constructor(private input: Filter | undefined, private readonly environment: Environment) {}
-
-	public transform(): Filter<GraphQlBuilder.Literal> | undefined {
-		if (this.input === undefined) {
+	public static transformFilter(
+		input: Filter | undefined,
+		environment: Environment
+	): Filter<GraphQlBuilder.Literal> | undefined {
+		if (input === undefined) {
 			return undefined
 		}
-		return this.transformWhere(this.input) as Filter<GraphQlBuilder.Literal>
+		return VariableInputTransformer.transformWhere(input, environment) as Filter<GraphQlBuilder.Literal>
 	}
 
-	private transformWhere = (
-		where: VariableInputTransformer.Where<VariableInput>
+	private static transformWhere = (
+		where: VariableInputTransformer.Where<VariableInput>,
+		environment: Environment
 	): VariableInputTransformer.Where<GraphQlBuilder.Literal> => {
 		const mapped: VariableInputTransformer.Where<GraphQlBuilder.Literal> = {}
 
@@ -30,9 +32,9 @@ export class VariableInputTransformer {
 			) {
 				mapped[key] = field
 			} else if (Array.isArray(field)) {
-				mapped[key] = field.map(this.transformWhere)
+				mapped[key] = field.map(item => VariableInputTransformer.transformWhere(item, environment))
 			} else if (field instanceof VariableScalar) {
-				const value = this.environment.getValue(field.variable)
+				const value = environment.getValue(field.variable)
 
 				if (
 					typeof value !== 'string' &&
@@ -47,7 +49,7 @@ export class VariableInputTransformer {
 				}
 				mapped[key] = value
 			} else if (field instanceof VariableLiteral) {
-				const value = this.environment.getValue(field.variable)
+				const value = environment.getValue(field.variable)
 
 				if (typeof value !== 'string') {
 					throw new DataBindingError(`The value of the '${field.variable}' must be a string, not '${typeof value}'.`)
@@ -56,7 +58,7 @@ export class VariableInputTransformer {
 			} else if (field instanceof Literal) {
 				mapped[key] = field
 			} else if (typeof field === 'object') {
-				mapped[key] = this.transformWhere(field)
+				mapped[key] = VariableInputTransformer.transformWhere(field, environment)
 			} else {
 				assertNever(field)
 			}

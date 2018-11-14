@@ -25,11 +25,10 @@ class ToOne extends React.PureComponent<ToOneProps> {
 					<DataContext.Consumer>
 						{(data: DataContextValue) => {
 							if (data instanceof EntityAccessor) {
-								const transformer = new VariableInputTransformer(this.props.filter, environment)
 								const field = data.data.getField(
 									this.props.field,
 									ReferenceMarker.ExpectedCount.UpToOne,
-									transformer.transform(),
+									VariableInputTransformer.transformFilter(this.props.filter, environment),
 									this.props.reducedBy
 								)
 
@@ -49,12 +48,11 @@ class ToOne extends React.PureComponent<ToOneProps> {
 		fields: EntityFields,
 		environment: Environment
 	): ReferenceMarker {
-		const transformer = new VariableInputTransformer(props.filter, environment)
 		return new ReferenceMarker(
 			props.field,
 			ReferenceMarker.ExpectedCount.UpToOne,
 			fields,
-			transformer.transform(),
+			VariableInputTransformer.transformFilter(props.filter, environment),
 			props.reducedBy
 		)
 	}

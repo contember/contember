@@ -59,12 +59,11 @@ namespace ToMany {
 			fields: EntityFields,
 			environment: Environment
 		): ReferenceMarker {
-			const transformer = new VariableInputTransformer(props.filter, environment)
 			return new ReferenceMarker(
 				props.field,
 				ReferenceMarker.ExpectedCount.PossiblyMany,
 				fields,
-				transformer.transform()
+				VariableInputTransformer.transformFilter(props.filter, environment)
 			)
 		}
 	}
@@ -86,11 +85,10 @@ namespace ToMany {
 								<DataContext.Consumer>
 									{(data: DataContextValue) => {
 										if (data instanceof EntityAccessor) {
-											const transformer = new VariableInputTransformer(this.props.filter, environment)
 											const field = data.data.getField(
 												fieldName,
 												ReferenceMarker.ExpectedCount.PossiblyMany,
-												transformer.transform()
+												VariableInputTransformer.transformFilter(this.props.filter, environment)
 											)
 
 											if (field instanceof EntityCollectionAccessor) {

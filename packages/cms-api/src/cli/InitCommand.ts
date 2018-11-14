@@ -110,7 +110,7 @@ class Initialize {
 
 			const migrations = await this.migrationFilesManager.readFiles(
 				'sql',
-				version => version > currentVersion && version <= stage.migration
+				version => version >= currentVersion && version <= stage.migration
 			)
 			if (!migrations.find(({ version }) => version === stage.migration)) {
 				throw new Error(
@@ -118,15 +118,17 @@ class Initialize {
 				)
 			}
 
+			const migrationsToExecute = migrations.filter(({ version }) => version > currentVersion)
+
 			await knexWrapper.raw('SET search_path TO ??', 'stage_' + stage.slug)
 
-			if (migrations.length === 0) {
+			if (migrationsToExecute.length === 0) {
 				console.log(`No migrations to execute for project ${this.project.slug} (stage ${stage.slug})`)
 				return
 			}
 
 			let previousId = currentStageRow.event_id
-			for (const { filename, content } of migrations) {
+			for (const { filename, content } of migrationsToExecute) {
 				console.log(`Executing migration ${filename} for project ${this.project.slug} (stage ${stage.slug})`)
 				await knexWrapper.raw(content)
 				const newId = uuid()

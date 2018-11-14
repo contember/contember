@@ -1,10 +1,11 @@
-import { Model } from 'cms-common'
+import { deepCopy, Model } from 'cms-common'
 import { acceptFieldVisitor } from '../modelUtils'
 import ImplementationException from '../../core/exceptions/ImplementationException'
-import deepEqual = require('fast-deep-equal')
 import SchemaMigrator from './SchemaMigrator'
 import { SchemaDiff } from './modifications'
 import ModificationBuilder from './ModificationBuilder'
+import deepEqual = require('fast-deep-equal')
+import { isIt } from '../../utils/type'
 
 export default function diffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema): SchemaDiff | null {
 	const builder = new ModificationBuilder(originalSchema, updatedSchema)
@@ -70,6 +71,30 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 			builder.updateEntityTableName(entityName, updatedEntity.tableName)
 		}
 
+		const tryPartialUpdate = (updatedRelation: Model.AnyRelation, originalRelation: Model.AnyRelation): boolean => {
+			if (updatedRelation.type !== originalRelation.type) {
+				return false
+			}
+			const marker = builder.createMarker()
+			const tmpRelation = deepCopy(originalRelation)
+			if (
+				isIt<Model.JoiningColumnRelation>(updatedRelation, 'joiningColumn') &&
+				isIt<Model.JoiningColumnRelation>(originalRelation, 'joiningColumn') &&
+				updatedRelation.joiningColumn.onDelete !== originalRelation.joiningColumn.onDelete
+			) {
+				;(tmpRelation as Model.AnyRelation & Model.JoiningColumnRelation).joiningColumn.onDelete =
+					updatedRelation.joiningColumn.onDelete
+				builder.updateRelationOnDelete(entityName, updatedRelation.name, updatedRelation.joiningColumn.onDelete)
+			}
+
+			if (!deepEqual(tmpRelation, updatedRelation)) {
+				marker.rewind()
+				return false
+			}
+
+			return true
+		}
+
 		for (const fieldName in updatedEntity.fields) {
 			if (!originalFields.has(fieldName)) {
 				builder.createField(updatedEntity, fieldName)
@@ -103,7 +128,12 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 							builder.createField(updatedEntity, fieldName)
 						},
 						visitRelation: ({}, originalRelation: Model.AnyRelation, {}, _) => {
-							if (!deepEqual(updatedRelation, originalRelation)) {
+							if (deepEqual(updatedRelation, originalRelation)) {
+								return
+							}
+							const partialUpdateResult = tryPartialUpdate(updatedRelation, originalRelation)
+
+							if (!partialUpdateResult) {
 								builder.removeField(entityName, fieldName)
 								builder.createField(updatedEntity, fieldName)
 							}

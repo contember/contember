@@ -19,7 +19,7 @@ export class RichTextField extends React.PureComponent<RichTextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string | null, string>, env): React.ReactNode => {
+				{(data: FieldAccessor<string>, env): React.ReactNode => {
 					return (
 						<RichEditor
 							onChange={this.generateOnChange(data)}
@@ -33,7 +33,7 @@ export class RichTextField extends React.PureComponent<RichTextFieldProps> {
 		)
 	}
 
-	private generateOnChange = (data: FieldAccessor<string | null, string>) => (val: string) => {
+	private generateOnChange = (data: FieldAccessor<string>) => (val: string) => {
 		data.onChange && data.onChange(val)
 	}
 

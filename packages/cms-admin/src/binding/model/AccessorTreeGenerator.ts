@@ -201,10 +201,13 @@ export class AccessorTreeGenerator {
 					)
 				} else {
 					const onChange = (newValue: Scalar | GraphQlBuilder.Literal) => {
-						onUpdate(placeholderName, new FieldAccessor(placeholderName, newValue, onChange))
+						onUpdate(
+							placeholderName,
+							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(placeholderName, newValue, onChange)
+						)
 					}
 					// `fieldData` will be `undefined` when a repeater creates a clone based on no data.
-					entityData[placeholderName] = new FieldAccessor(
+					entityData[placeholderName] = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 						placeholderName,
 						fieldData === undefined ? field.defaultValue || null : fieldData,
 						onChange

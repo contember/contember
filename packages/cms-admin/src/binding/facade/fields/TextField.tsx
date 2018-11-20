@@ -19,7 +19,7 @@ export class TextField extends React.PureComponent<TextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string | null, string>, env): React.ReactNode => (
+				{(data: FieldAccessor<string>, env): React.ReactNode => (
 					<FormGroup
 						label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
 						inline={this.props.inlineLabel}
@@ -35,7 +35,7 @@ export class TextField extends React.PureComponent<TextFieldProps> {
 		)
 	}
 
-	private generateOnChange = (data: FieldAccessor<string | null, string>) => (e: ChangeEvent<HTMLInputElement>) => {
+	private generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLInputElement>) => {
 		data.onChange && data.onChange(e.target.value)
 	}
 

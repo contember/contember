@@ -7,7 +7,7 @@ export class FieldAccessor<
 > {
 	constructor(
 		public readonly fieldName: FieldName,
-		public readonly currentValue: Persisted,
-		public readonly onChange?: (newValue: Produced) => void
+		public readonly currentValue: Persisted | null,
+		public readonly onChange?: (newValue: Produced | null) => void
 	) {}
 }

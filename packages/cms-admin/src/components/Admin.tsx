@@ -11,9 +11,11 @@ import { configureStore, Store } from '../store'
 import Login from './Login'
 import ProjectsList from './ProjectsList'
 import RenderPromise from './RenderPromise'
+import Config, { validateConfig } from '../config'
 
 export interface AdminProps {
 	configs: ProjectConfig[]
+	config: Config
 }
 
 export default class Admin extends React.Component<AdminProps> {
@@ -22,7 +24,9 @@ export default class Admin extends React.Component<AdminProps> {
 	constructor(props: AdminProps) {
 		super(props)
 
-		this.store = configureStore(emptyState)
+		validateConfig(props.config)
+
+		this.store = configureStore(emptyState, props.config)
 		this.store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => this.props.configs)())
 		this.store.dispatch(populateRequest(document.location!))
 		window.onpopstate = e => {

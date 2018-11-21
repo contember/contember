@@ -5,8 +5,6 @@ declare interface Window {
 declare interface Process {
 	env: {
 		NODE_ENV: 'development'
-		SERVER_URL: string
-		LOGIN_TOKEN: string
 	}
 }
 

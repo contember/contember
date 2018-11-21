@@ -9,21 +9,24 @@ import LocalStorageManager from '../model/LocalStorageManager'
 import rootReducer from '../reducer'
 import { SET_TOKEN } from '../reducer/auth'
 import State from '../state'
+import Config from '../config'
 
 export interface Services {
 	localStorageManager: LocalStorageManager
 	tenantClient: GraphqlClient
 	contentClientFactory: ContentClientFactory
+	config: Config
 }
 
-export function createServices(): Services {
+export function createServices(config: Config): Services {
 	const localStorageManager = new LocalStorageManager()
-	const tenantClient = new GraphqlClient(process.env.SERVER_URL + '/tenant')
-	const contentClientFactory = new ContentClientFactory(process.env.SERVER_URL)
+	const tenantClient = new GraphqlClient(config.apiServer + '/tenant')
+	const contentClientFactory = new ContentClientFactory(config.apiServer)
 	return {
 		localStorageManager,
 		tenantClient,
-		contentClientFactory
+		contentClientFactory,
+		config,
 	}
 }
 
@@ -54,9 +57,9 @@ export function persistState(services: Services) {
 	}
 }
 
-export function configureStore(initialState: State): Store {
+export function configureStore(initialState: State, config: Config): Store {
 	const composeEnhancers: typeof compose = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-	const services = createServices()
+	const services = createServices(config)
 	const middlewares: Middleware[] = [thunk.withExtraArgument(services)]
 
 	const middlewareEnhancer = applyMiddleware(...middlewares)

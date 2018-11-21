@@ -10,10 +10,9 @@ class Loader {
 	constructor(
 		private readonly adapters: { [extensions: string]: Loader.Adapter } = {
 			yaml: new YamlAdapter(),
-			json: new JsonAdapter(),
+			json: new JsonAdapter()
 		}
-	) {
-	}
+	) {}
 
 	public async load(filename: string, parameters: any = {}): Promise<any> {
 		const ext = extname(filename)
@@ -100,14 +99,11 @@ namespace Loader {
 		parse(input: string): any
 	}
 
-	export class UnresolvedAdapterError extends Error {
-	}
+	export class UnresolvedAdapterError extends Error {}
 
-	export class UndefinedParameterError extends Error {
-	}
+	export class UndefinedParameterError extends Error {}
 
-	export class InvalidConfigError extends Error {
-	}
+	export class InvalidConfigError extends Error {}
 }
 
 export default Loader

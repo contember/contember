@@ -1,4 +1,10 @@
-export default function render({ config, assets }: { config: any, assets: { js: string | undefined, css: string | undefined } }): string {
+export default function render({
+	config,
+	assets
+}: {
+	config: any
+	assets: { js: string | undefined; css: string | undefined }
+}): string {
 	return `<!DOCTYPE html>
 <html>
 <head>

@@ -12,6 +12,4 @@ export function validateConfig(config: any) {
 	}
 }
 
-export class ConfigurationError extends Error {
-
-}
+export class ConfigurationError extends Error {}

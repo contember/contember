@@ -24,6 +24,7 @@
 		"aws-sdk": "^2.331.0",
 		"bcrypt": "^2.0.0",
 		"cms-common": "0.0.0",
+		"cms-server-common": "0.0.0",
 		"commander": "^2.19.0",
 		"fast-deep-equal": "^2.0.1",
 		"graphql": "^0.13.2",

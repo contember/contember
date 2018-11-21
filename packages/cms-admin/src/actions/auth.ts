@@ -5,7 +5,7 @@ import { ActionCreator } from './types'
 
 export const login = (email: string, password: string): ActionCreator => async (dispatch, getState, services) => {
 	dispatch(createAction(SET_LOADING)())
-	const { signIn } = await services.tenantClient.request(loginMutation, { email, password }, process.env.LOGIN_TOKEN)
+	const { signIn } = await services.tenantClient.request(loginMutation, { email, password }, services.config.loginToken)
 	if (signIn.ok) {
 		dispatch(createAction(SET_TOKEN, () => signIn.result.token)())
 		dispatch(pushRequest(() => ({ name: 'projects_list' })))

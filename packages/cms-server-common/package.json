@@ -1,0 +1,16 @@
+{
+	"name": "cms-server-common",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {
+		"build": "tsc --build --verbose"
+	},
+	"devDependencies": {
+		"typescript": "^3.1.6"
+	},
+	"dependencies": {
+		"js-yaml": "^3.12.0"
+	}
+}

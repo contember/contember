@@ -1,0 +1,23 @@
+{
+	"name": "cms-admin-server",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {
+		"build": "tsc --build --verbose"
+	},
+	"bin": {
+		"run-admin": "dist/src/run-admin.js"
+	},
+	"dependencies": {
+		"cms-server-common": "0.0.0",
+		"koa": "^2.6.2",
+		"koa-static": "^5.0.0"
+	},
+	"devDependencies": {
+		"@types/koa": "^2.0.47",
+		"@types/koa-static": "^4.0.0",
+		"typescript": "^3.0.1"
+	}
+}

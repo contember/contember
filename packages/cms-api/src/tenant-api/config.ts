@@ -1,5 +1,5 @@
 import Project from './Project'
-import { Loader } from 'cms-common'
+import { ConfigLoader } from 'cms-server-common'
 
 export type DatabaseCredentials = Project.DatabaseCredentials
 
@@ -118,7 +118,7 @@ function checkConfigStructure(json: any): void {
 }
 
 export async function readConfig(filename: string): Promise<Config> {
-	const loader = new Loader()
+	const loader = new ConfigLoader()
 	const config = await loader.load(filename, {
 		env: process.env,
 	})

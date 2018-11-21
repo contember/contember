@@ -1,16 +1,19 @@
-import { extname } from 'path'
+import { dirname, extname, join } from 'path'
 import { promisify } from 'util'
 import { readFile } from 'fs'
 import { YamlAdapter } from './adapters/YamlAdapter'
+import { JsonAdapter } from './adapters/JsonAdapter'
 
 const fsRead = promisify(readFile)
 
 class Loader {
 	constructor(
 		private readonly adapters: { [extensions: string]: Loader.Adapter } = {
-			yaml: new YamlAdapter()
+			yaml: new YamlAdapter(),
+			json: new JsonAdapter(),
 		}
-	) {}
+	) {
+	}
 
 	public async load(filename: string, parameters: any = {}): Promise<any> {
 		const ext = extname(filename)
@@ -24,10 +27,44 @@ class Loader {
 		const file = await fsRead(filename, { encoding: 'utf8' })
 		const config = this.adapters[extWithoutDot].parse(file)
 
+		const configWithIncludes = await this.includeConfigs(config, dirname(filename), parameters)
+
 		if (Object.keys(parameters).length === 0) {
-			return config
+			return configWithIncludes
 		}
-		return this.replaceParameters(config, parameters)
+		return this.replaceParameters(configWithIncludes, parameters)
+	}
+
+	private async includeConfigs(data: any, baseDir: string, parameters: any): Promise<any> {
+		if (Array.isArray(data)) {
+			return await Promise.all(data.map(async it => await this.includeConfigs(it, baseDir, parameters)))
+		}
+		if (data === null) {
+			return data
+		}
+		if (typeof data === 'object') {
+			const result: any = {}
+			for (let [key, value] of Object.entries(data)) {
+				if (key !== '_include') {
+					result[key] = await this.includeConfigs(value, baseDir, parameters)
+					continue
+				}
+				if (!Array.isArray(value)) {
+					throw new Loader.InvalidConfigError(`Only arrays are expected under _include key`)
+				}
+				for (let file of value) {
+					const nestedConfig = await this.load(join(baseDir, file), parameters)
+					if (typeof nestedConfig !== 'object' || nestedConfig === null) {
+						throw new Loader.InvalidConfigError(`Only object configs can be included`)
+					}
+					for (let [xKey, xValue] of Object.entries(nestedConfig)) {
+						result[xKey] = xValue
+					}
+				}
+			}
+			return result
+		}
+		return data
 	}
 
 	private replaceParameters(data: any, parameters: any): any {
@@ -63,9 +100,14 @@ namespace Loader {
 		parse(input: string): any
 	}
 
-	export class UnresolvedAdapterError extends Error {}
+	export class UnresolvedAdapterError extends Error {
+	}
 
-	export class UndefinedParameterError extends Error {}
+	export class UndefinedParameterError extends Error {
+	}
+
+	export class InvalidConfigError extends Error {
+	}
 }
 
 export default Loader

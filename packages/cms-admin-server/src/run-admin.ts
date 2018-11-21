@@ -3,12 +3,12 @@
 import { ConfigLoader } from 'cms-server-common'
 import Server from './Server'
 
-(async () => {
+;(async () => {
 	try {
 		const configFile = process.cwd() + '/src/config/config.yaml'
 		const loader = new ConfigLoader()
 		const config = await loader.load(configFile, {
-			env: process.env,
+			env: process.env
 		})
 		const server = new Server()
 		server.run(config)

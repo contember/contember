@@ -26,7 +26,7 @@ export function createServices(config: Config): Services {
 		localStorageManager,
 		tenantClient,
 		contentClientFactory,
-		config,
+		config
 	}
 }
 

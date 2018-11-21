@@ -1,9 +1,5 @@
 import Command from '../core/cli/Command'
-import { readFile } from 'fs'
-import { promisify } from 'util'
-import { Config, parseConfig } from '../tenant-api/config'
-
-const fsRead = promisify(readFile)
+import { Config, readConfig } from '../tenant-api/config'
 
 interface GlobalOptions {
 	workingDirectory: string
@@ -33,8 +29,7 @@ abstract class BaseCommand<Args extends Command.Arguments, Options extends Comma
 	async readConfig(): Promise<Config> {
 		const options = this.getGlobalOptions()
 		if (this.config === undefined) {
-			const file = await fsRead(options.configFile, { encoding: 'utf8' })
-			this.config = parseConfig(file)
+			this.config = await readConfig(options.configFile)
 		}
 		return this.config
 	}

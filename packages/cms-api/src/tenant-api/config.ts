@@ -1,5 +1,5 @@
 import Project from './Project'
-import * as yaml from 'js-yaml'
+import { Loader } from 'cms-common'
 
 export type DatabaseCredentials = Project.DatabaseCredentials
 
@@ -117,29 +117,11 @@ function checkConfigStructure(json: any): void {
 	}
 }
 
-function replaceEnv(data: any): any {
-	if (Array.isArray(data)) {
-		return data.map(it => replaceEnv(it))
-	}
-	if (typeof data === 'string') {
-		return data.replace(/^%env\.(\w+)%$/, (match, name) => {
-			return String(process.env[name])
-		})
-	}
-	if (data === null) {
-		return data
-	}
-	if (typeof data === 'object') {
-		return Object.entries(data)
-			.map(([key, value]: [string, any]) => [key, replaceEnv(value)])
-			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
-	}
-	return data
-}
-
-export function parseConfig(input: string): Config {
-	const parsed = yaml.safeLoad(input)
-	checkConfigStructure(parsed)
-	const configWithEnv = replaceEnv(parsed)
-	return configWithEnv
+export async function readConfig(filename: string): Promise<Config> {
+	const loader = new Loader()
+	const config = await loader.load(filename, {
+		env: process.env,
+	})
+	checkConfigStructure(config)
+	return config
 }

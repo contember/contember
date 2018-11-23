@@ -2,7 +2,6 @@
 
 import { ConfigLoader } from 'cms-server-common'
 import Server from './Server'
-
 ;(async () => {
 	try {
 		const configFile = process.cwd() + '/src/config/config.yaml'

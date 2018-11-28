@@ -14,7 +14,7 @@ const schema: DocumentNode = gql`
 	type Mutation {
 		setup(superadmin: AdminCredentials!): SetupResponse
 		signUp(email: String!, password: String!): SignUpResponse
-		signIn(email: String!, password: String!): SignInResponse
+		signIn(email: String!, password: String!, expiration: Int): SignInResponse
 		addProjectMember(projectId: String!, identityId: String!, roles: [String!]!): AddProjectMemberResponse
 		updateProjectMemberVariables(
 			projectId: String!

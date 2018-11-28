@@ -7,7 +7,17 @@ import KnexWrapper from '../../../core/knex/KnexWrapper'
 import ApiKeyHelper from './ApiKeyHelper'
 
 class CreateApiKey implements Command<CreateApiKey.Result> {
-	constructor(private readonly type: ApiKey.Type, private readonly identityId: string) {}
+	private readonly type: ApiKey.Type
+	private readonly identityId: string
+	private readonly expiration: number | undefined
+
+	constructor(type: ApiKey.Type.SESSION, identityId: string, expiration?: number)
+	constructor(type: ApiKey.Type, identityId: string)
+	constructor(type: ApiKey.Type, identityId: string, expiration?: number) {
+		this.type = type
+		this.identityId = identityId
+		this.expiration = expiration
+	}
 
 	async execute(db: KnexWrapper): Promise<CreateApiKey.Result> {
 		const apiKeyId = uuid()
@@ -23,7 +33,7 @@ class CreateApiKey implements Command<CreateApiKey.Result> {
 				type: this.type,
 				identity_id: this.identityId,
 				enabled: true,
-				expires_at: ApiKeyHelper.getExpiration(this.type),
+				expires_at: ApiKeyHelper.getExpiration(this.type, this.expiration),
 				created_at: now(),
 			})
 			.execute()

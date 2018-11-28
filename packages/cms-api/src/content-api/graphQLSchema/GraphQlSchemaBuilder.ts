@@ -13,7 +13,7 @@ export default class GraphQlSchemaBuilder {
 		private s3: S3
 	) {}
 
-	public build() {
+	public build(): GraphQLSchema {
 		const mutations = {
 			...Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((mutations, entityName) => {
 				return {

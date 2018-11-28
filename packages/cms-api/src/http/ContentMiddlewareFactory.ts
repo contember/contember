@@ -11,15 +11,13 @@ import PlaygroundMiddlewareFactory from './PlaygroundMiddlewareFactory'
 import { ProjectContainer } from '../CompositionRoot'
 import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
 import { GraphQLSchema } from 'graphql'
-import PermissionFactory from '../acl/PermissionFactory'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import { Acl } from 'cms-common'
-import Identity from '../tenant-api/model/type/Identity'
-import AllowAllPermissionFactory from '../acl/AllowAllPermissionFactory'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
 	TimerMiddlewareFactory.ContextWithTimer & { state: { db: KnexConnection } }
+
 class ContentMiddlewareFactory {
 	constructor(private projectContainers: ProjectContainer[], private projectMemberManager: ProjectMemberManager) {}
 
@@ -89,19 +87,14 @@ class ContentMiddlewareFactory {
 
 						ctx.state.timer('done')
 
-						let permissions: Acl.Permissions
-
-						if (ctx.state.authResult.roles.includes(Identity.SystemRole.SUPER_ADMIN)) {
-							permissions = new AllowAllPermissionFactory().create(stage.schema.model)
-						} else {
-							permissions = new PermissionFactory(stage.schema.model).create(stage.schema.acl, projectRoles.roles)
-						}
-
-						const dataSchemaBuilder = projectContainer
-							.get('graphQlSchemaBuilderFactory')
-							.create(stage.schema.model, permissions)
 						ctx.state.timer('building schema')
-						const dataSchema = dataSchemaBuilder.build()
+
+						const globalRoles = ctx.state.authResult.roles
+						const dataSchema = projectContainer.get('graphQlSchemaFactory').create(stage.schema, {
+							projectRoles: projectRoles.roles,
+							globalRoles: globalRoles,
+						})
+
 						ctx.state.timer('done')
 
 						const apolloKoa = new Koa()

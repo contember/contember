@@ -27,11 +27,13 @@ import Authorizator from './core/authorization/Authorizator'
 import AccessEvaluator from './core/authorization/AccessEvalutator'
 import PermissionsFactory from './tenant-api/model/authorization/PermissionsFactory'
 import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
+import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
 
 export type ProjectContainer = Container<{
 	project: Project
 	knexConnection: knex
 	graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
+	graphQlSchemaFactory: GraphQlSchemaFactory
 	s3: S3
 }>
 
@@ -90,6 +92,14 @@ class CompositionRoot {
 					return new S3(project.s3)
 				})
 				.addService('graphQlSchemaBuilderFactory', ({ s3 }) => new GraphQlSchemaBuilderFactory(s3))
+				.addService(
+					'graphQlSchemaFactory',
+					({ graphQlSchemaBuilderFactory }) =>
+						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, [
+							new GraphQlSchemaFactory.SuperAdminPermissionFactory(),
+							new GraphQlSchemaFactory.RoleBasedPermissionFactory(),
+						])
+				)
 				.build()
 		})
 	}

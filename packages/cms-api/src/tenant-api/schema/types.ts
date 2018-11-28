@@ -144,6 +144,7 @@ export interface SignUpMutationArgs {
 export interface SignInMutationArgs {
 	email: string
 	password: string
+	expiration?: number | null
 }
 export interface AddProjectMemberMutationArgs {
 	projectId: string
@@ -245,6 +246,7 @@ export namespace MutationResolvers {
 	export interface SignInArgs {
 		email: string
 		password: string
+		expiration?: number | null
 	}
 
 	export type AddProjectMemberResolver<R = AddProjectMemberResponse | null> = Resolver<R, AddProjectMemberArgs>

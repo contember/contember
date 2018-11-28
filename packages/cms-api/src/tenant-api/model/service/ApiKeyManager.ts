@@ -31,8 +31,8 @@ class ApiKeyManager {
 		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles)
 	}
 
-	async createSessionApiKey(identityId: string): Promise<string> {
-		return (await new CreateApiKey(ApiKey.Type.SESSION, identityId).execute(this.db)).token
+	async createSessionApiKey(identityId: string, expiration?: number): Promise<string> {
+		return (await new CreateApiKey(ApiKey.Type.SESSION, identityId, expiration).execute(this.db)).token
 	}
 
 	async createLoginApiKey(): Promise<ApiKeyManager.CreateLoginApiKeyResult> {

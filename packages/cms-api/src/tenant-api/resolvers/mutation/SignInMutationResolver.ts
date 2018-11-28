@@ -27,7 +27,7 @@ export default class SignInMutationResolver implements MutationResolvers.Resolve
 			throw new ForbiddenError('You are not allowed to sign in')
 		}
 
-		const result = await this.signInManager.signIn(args.email, args.password)
+		const result = await this.signInManager.signIn(args.email, args.password, args.expiration || undefined)
 
 		if (!result.ok) {
 			return {

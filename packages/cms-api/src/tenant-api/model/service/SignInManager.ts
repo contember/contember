@@ -11,7 +11,7 @@ class SignInManager {
 		private readonly apiKeyManager: ApiKeyManager
 	) {}
 
-	async signIn(email: string, password: string): Promise<SignInManager.SignInResult> {
+	async signIn(email: string, password: string, expiration?: number): Promise<SignInManager.SignInResult> {
 		const personRow = await this.queryHandler.fetch(new PersonByEmailQuery(email))
 		if (personRow === null) {
 			return new SignInManager.SignInResultError([SignInErrorCode.UNKNOWN_EMAIL])
@@ -22,7 +22,7 @@ class SignInManager {
 			return new SignInManager.SignInResultError([SignInErrorCode.INVALID_PASSWORD])
 		}
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id, expiration)
 		return new SignInManager.SignInResultOk(personRow.id, personRow.identity_id, sessionToken)
 	}
 }

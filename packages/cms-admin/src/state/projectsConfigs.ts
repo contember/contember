@@ -1,9 +1,10 @@
 import { RouteMap } from '../components/pageRouting/utils'
+import { ComponentType } from 'react'
 
 export interface ProjectConfig {
 	project: string
 	stage: string
-	component: () => Promise<React.ReactNode>
+	component: () => Promise<{ default: ComponentType }>
 	routes: RouteMap
 }
 

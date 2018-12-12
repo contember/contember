@@ -47,7 +47,10 @@ export default class Admin extends React.Component<AdminProps> {
 								({ project, stage }) => project === route.project && stage === route.stage
 							)
 							if (config) {
-								return <RenderPromise>{config.component()}</RenderPromise>
+								const Component = React.lazy(config.component)
+								return <React.Suspense fallback={'Loading...'}>
+									<Component/>
+								</React.Suspense>
 							} else {
 								return `No such project or stage as ${route.project}/${route.stage}`
 							}

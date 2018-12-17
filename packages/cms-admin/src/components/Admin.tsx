@@ -10,7 +10,6 @@ import { ProjectConfig } from '../state/projectsConfigs'
 import { configureStore, Store } from '../store'
 import Login from './Login'
 import ProjectsList from './ProjectsList'
-import RenderPromise from './RenderPromise'
 import Config, { validateConfig } from '../config'
 
 export interface AdminProps {

@@ -29,6 +29,12 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	}
 
 	public static renderTitle(title: RendererProps['title']): React.ReactNode {
-		return title && <H1>{title}</H1>
+		if (title) {
+			if (typeof title === 'string') {
+				return <H1>{title}</H1>
+			}
+			return title
+		}
+		return null
 	}
 }

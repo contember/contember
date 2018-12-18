@@ -48,20 +48,20 @@ class Pages extends React.Component<PagesProps & PagesStateProps> {
 			throw new Error('Pages has a child which is not a Page')
 		}
 
-		const machedPage = (children as PageChild[]).find(
+		const matchedPage = (children as PageChild[]).find(
 			child => (isPageProvider(child) ? child.type.getPageName(child.props) : child.props.name) === this.props.name
 		)
-		if (machedPage === undefined) {
+		if (matchedPage === undefined) {
 			throw new Error(`No such page as ${this.props.name}.`)
 		}
 
-		const isProvider = isPageProvider(machedPage)
+		const isProvider = isPageProvider(matchedPage)
 		return (
 			<LayoutContext.Provider value={this.props.layout || React.Fragment}>
 				{isProvider && (
-					<ParametersContext.Provider value={this.props.parameters}>{machedPage}</ParametersContext.Provider>
+					<ParametersContext.Provider value={this.props.parameters}>{matchedPage}</ParametersContext.Provider>
 				)}
-				{isProvider || machedPage.props.children(this.props.parameters)}
+				{isProvider || matchedPage.props.children(this.props.parameters)}
 			</LayoutContext.Provider>
 		)
 	}

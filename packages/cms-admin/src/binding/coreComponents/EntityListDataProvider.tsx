@@ -23,9 +23,8 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 
 	public render() {
 		return (
-			<Dimensions>
-				{(dimensions: SelectedDimension) => {
-					const environment = new Environment({ dimensions })
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) => {
 					const FallbackRenderer: React.ComponentClass<DataRendererProps> = DefaultRenderer
 					const Renderer = this.props.renderer || FallbackRenderer
 					const markerTreeGenerator = new MarkerTreeGenerator(
@@ -41,18 +40,16 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 					const DataProvider = getDataProvider<DRP>()
 
 					return (
-						<EnvironmentContext.Provider value={environment}>
-							<DataProvider
-								markerTree={markerTreeGenerator.generate()}
-								renderer={this.props.renderer}
-								rendererProps={this.props.rendererProps}
-							>
-								{this.props.children}
-							</DataProvider>
-						</EnvironmentContext.Provider>
+						<DataProvider
+							markerTree={markerTreeGenerator.generate()}
+							renderer={this.props.renderer}
+							rendererProps={this.props.rendererProps}
+						>
+							{this.props.children}
+						</DataProvider>
 					)
 				}}
-			</Dimensions>
+			</EnvironmentContext.Consumer>
 		)
 	}
 

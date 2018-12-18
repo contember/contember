@@ -24,9 +24,8 @@ export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEnt
 
 	public render() {
 		return (
-			<Dimensions>
-				{(dimensions: SelectedDimension) => {
-					const environment = new Environment({ dimensions })
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) => {
 					const markerTreeGenerator = new MarkerTreeGenerator(
 						<SingleEntityDataProvider {...this.props}>{this.props.children}</SingleEntityDataProvider>,
 						environment
@@ -34,18 +33,16 @@ export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEnt
 					const DataProvider = getDataProvider<DRP>()
 
 					return (
-						<EnvironmentContext.Provider value={environment}>
-							<DataProvider
-								markerTree={markerTreeGenerator.generate()}
-								renderer={this.props.renderer}
-								rendererProps={this.props.rendererProps}
-							>
-								{this.props.children}
-							</DataProvider>
-						</EnvironmentContext.Provider>
+						<DataProvider
+							markerTree={markerTreeGenerator.generate()}
+							renderer={this.props.renderer}
+							rendererProps={this.props.rendererProps}
+						>
+							{this.props.children}
+						</DataProvider>
 					)
 				}}
-			</Dimensions>
+			</EnvironmentContext.Consumer>
 		)
 	}
 

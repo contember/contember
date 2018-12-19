@@ -3,7 +3,7 @@ import UpdateManyRelationBuilder from './UpdateManyRelationBuilder'
 import UpdateOneRelationBuilder from './UpdateOneRelationBuilder'
 import Literal from '../graphQlBuilder/Literal'
 
-import { Input } from 'cms-common'
+import { Input, isEmptyObject } from 'cms-common'
 
 export default class UpdateDataBuilder {
 	constructor(public readonly data: Input.UpdateDataInput<Literal> = {}) {}
@@ -16,10 +16,13 @@ export default class UpdateDataBuilder {
 		fieldName: string,
 		data: DataBuilder.DataLike<Input.UpdateManyRelationInput<Literal>, UpdateManyRelationBuilder>
 	) {
-		return new UpdateDataBuilder({
-			...this.data,
-			[fieldName]: DataBuilder.resolveData(data, UpdateManyRelationBuilder)
-		})
+		const resolvedData = DataBuilder.resolveData(data, UpdateManyRelationBuilder)
+		return resolvedData
+			? new UpdateDataBuilder({
+					...this.data,
+					[fieldName]: resolvedData
+			  })
+			: this
 	}
 
 	public one(
@@ -35,6 +38,6 @@ export default class UpdateDataBuilder {
 			UpdateOneRelationBuilder,
 			UpdateOneRelationBuilder<undefined>
 		>(data, UpdateOneRelationBuilder)
-		return new UpdateDataBuilder({ ...this.data, [fieldName]: input })
+		return isEmptyObject(input) ? this : new UpdateDataBuilder({ ...this.data, [fieldName]: input })
 	}
 }

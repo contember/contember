@@ -3,13 +3,14 @@ import CreateDataBuilder from './CreateDataBuilder'
 import UpdateDataBuilder from './UpdateDataBuilder'
 import Literal from '../graphQlBuilder/Literal'
 
-import { Input } from 'cms-common'
+import { Input, isEmptyObject } from 'cms-common'
 
 export default class UpdateManyRelationBuilder {
 	constructor(public readonly data: Input.UpdateManyRelationInput<Literal> = []) {}
 
 	public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {
-		return new UpdateManyRelationBuilder([...this.data, { create: DataBuilder.resolveData(data, CreateDataBuilder) }])
+		const resolvedData = DataBuilder.resolveData(data, CreateDataBuilder)
+		return resolvedData ? new UpdateManyRelationBuilder([...this.data, { create: resolvedData }]) : this
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>) {
@@ -29,7 +30,7 @@ export default class UpdateManyRelationBuilder {
 		data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>
 	) {
 		const input = DataBuilder.resolveData(data, UpdateDataBuilder)
-		return new UpdateManyRelationBuilder([...this.data, { update: { by: where, data: input } }])
+		return input ? new UpdateManyRelationBuilder([...this.data, { update: { by: where, data: input } }]) : this
 	}
 
 	public upsert(
@@ -39,15 +40,17 @@ export default class UpdateManyRelationBuilder {
 	) {
 		const updateInput = DataBuilder.resolveData(update, UpdateDataBuilder)
 		const createInput = DataBuilder.resolveData(create, CreateDataBuilder)
-		return new UpdateManyRelationBuilder([
-			...this.data,
-			{
-				upsert: {
-					by: where,
-					update: updateInput,
-					create: createInput
-				}
-			}
-		])
+		return isEmptyObject(updateInput) && isEmptyObject(createInput)
+			? this
+			: new UpdateManyRelationBuilder([
+					...this.data,
+					{
+						upsert: {
+							by: where,
+							update: updateInput,
+							create: createInput
+						}
+					}
+			  ])
 	}
 }

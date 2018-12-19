@@ -3,15 +3,18 @@ import CreateDataBuilder from './CreateDataBuilder'
 import UpdateDataBuilder from './UpdateDataBuilder'
 import Literal from '../graphQlBuilder/Literal'
 
-import { Input } from 'cms-common'
+import { Input, isEmptyObject } from 'cms-common'
 
 export default class UpdateOneRelationBuilder<
 	D extends Input.UpdateOneRelationInput<Literal> | undefined = Input.UpdateOneRelationInput<Literal>
 > {
 	constructor(public readonly data: D = undefined as D) {}
 
-	public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {
-		return new UpdateOneRelationBuilder({ create: DataBuilder.resolveData(data, CreateDataBuilder) })
+	public create(
+		data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>
+	): UpdateOneRelationBuilder<Input.UpdateOneRelationInput<Literal>> | this {
+		const resolvedData = DataBuilder.resolveData(data, CreateDataBuilder)
+		return resolvedData ? new UpdateOneRelationBuilder({ create: resolvedData }) : this
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>) {
@@ -26,19 +29,27 @@ export default class UpdateOneRelationBuilder<
 		return new UpdateOneRelationBuilder({ disconnect: true })
 	}
 
-	public update(data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>) {
-		return new UpdateOneRelationBuilder({ update: DataBuilder.resolveData(data, UpdateDataBuilder) })
+	public update(
+		data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>
+	): UpdateOneRelationBuilder<Input.UpdateOneRelationInput<Literal>> | this {
+		const resolvedData = DataBuilder.resolveData(data, UpdateDataBuilder)
+		return resolvedData ? new UpdateOneRelationBuilder({ update: resolvedData }) : this
 	}
 
 	public upsert(
 		update: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>,
 		create: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>
 	) {
-		return new UpdateOneRelationBuilder({
-			upsert: {
-				update: DataBuilder.resolveData(update, UpdateDataBuilder),
-				create: DataBuilder.resolveData(create, CreateDataBuilder)
-			}
-		})
+		const resolvedUpdate = DataBuilder.resolveData(update, UpdateDataBuilder)
+		const resolvedCreate = DataBuilder.resolveData(create, CreateDataBuilder)
+
+		return isEmptyObject(resolvedUpdate) && isEmptyObject(resolvedCreate)
+			? this
+			: new UpdateOneRelationBuilder({
+					upsert: {
+						update: resolvedUpdate,
+						create: resolvedCreate
+					}
+			  })
 	}
 }

@@ -1,18 +1,12 @@
 import { FormGroup } from '@blueprintjs/core'
 import * as React from 'react'
 import { FieldName } from '../../bindingTypes'
-import {
-	EnforceSubtypeRelation,
-	EnvironmentContext,
-	Props,
-	SyntheticChildrenProvider,
-	ToMany,
-	ToManyProps
-} from '../../coreComponents'
-import { EntityCollectionAccessor, Environment } from '../../dao'
+import { EnforceSubtypeRelation, Props, SyntheticChildrenProvider, ToMany, ToManyProps } from '../../coreComponents'
+import { EntityCollectionAccessor } from '../../dao'
+import { Repeater } from './Repeater'
 import { Sortable } from './Sortable'
 
-interface SortableRepeaterProps extends ToManyProps {
+interface SortableRepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {
 	sortBy: FieldName
 }
 
@@ -21,12 +15,20 @@ class SortableRepeater extends React.PureComponent<SortableRepeaterProps> {
 
 	public render() {
 		return (
-			<ToMany.CollectionRetriever {...this.props}>
+			<ToMany.CollectionRetriever field={this.props.field} label={this.props.label} filter={this.props.filter}>
 				{(field: EntityCollectionAccessor) => {
 					return (
 						// Intentionally not applying label system middleware
 						<FormGroup label={this.props.label}>
-							<Sortable entities={field} sortBy={this.props.sortBy}>
+							<Sortable
+								entities={field}
+								sortBy={this.props.sortBy}
+								label={this.props.label}
+								enableAddingNew={this.props.enableAddingNew}
+								enableUnlink={this.props.enableUnlink}
+								enableUnlinkAll={this.props.enableUnlinkAll}
+								removeType={this.props.removeType}
+							>
 								{this.props.children}
 							</Sortable>
 						</FormGroup>

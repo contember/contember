@@ -45,6 +45,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 					label={this.props.label}
 					sortBy={this.props.sortBy}
 					entities={this.props.entities}
+					removeType={this.props.removeType}
 				>
 					{this.props.children}
 				</Sortable.SortableInner>
@@ -111,6 +112,7 @@ namespace Sortable {
 								displayUnlinkButton={
 									props.enableUnlink !== false && (props.entities.length > 1 || props.enableUnlinkAll === true)
 								}
+								removeType={props.removeType}
 							>
 								<DataContext.Provider value={item}>{props.children}</DataContext.Provider>
 							</SortableItem>
@@ -202,6 +204,7 @@ namespace Sortable {
 					enableAddingNew={this.props.enableAddingNew}
 					enableUnlink={this.props.enableUnlink}
 					label={this.props.label}
+					removeType={this.props.removeType}
 				>
 					{this.props.children}
 				</SortableList>

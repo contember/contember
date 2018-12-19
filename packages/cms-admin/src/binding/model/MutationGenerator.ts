@@ -13,8 +13,7 @@ import {
 	MarkerTreeConstraints,
 	MarkerTreeRoot,
 	ReferenceMarker,
-	RootAccessor,
-	SingleEntityTreeConstraints
+	RootAccessor
 } from '../dao'
 
 type Queries = 'get' | 'list'
@@ -368,7 +367,15 @@ export class MutationGenerator {
 									return updated
 								}
 							} else if (accessor instanceof EntityForRemovalAccessor) {
-								return builder.disconnect()
+								const removalType = accessor.removalType
+
+								if (removalType === EntityAccessor.RemovalType.Delete) {
+									return builder.delete()
+								} else if (removalType === EntityAccessor.RemovalType.Disconnect) {
+									return builder.disconnect()
+								} else {
+									return assertNever(removalType)
+								}
 							} else {
 								return assertNever(accessor)
 							}
@@ -400,9 +407,19 @@ export class MutationGenerator {
 									}
 								}
 							} else if (accessor instanceof EntityForRemovalAccessor) {
-								builder = builder.disconnect({
-									[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
-								})
+								const removalType = accessor.removalType
+
+								if (removalType === EntityAccessor.RemovalType.Delete) {
+									builder = builder.delete({
+										[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+									})
+								} else if (removalType === EntityAccessor.RemovalType.Disconnect) {
+									builder = builder.disconnect({
+										[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+									})
+								} else {
+									assertNever(removalType)
+								}
 							} else {
 								assertNever(accessor)
 							}

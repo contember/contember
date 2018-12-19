@@ -8,7 +8,7 @@ import {
 	SyntheticChildrenProvider
 } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
-import { AddNewButton, PersistButton, UnlinkButton } from '../buttons'
+import { AddNewButton, PersistButton, RemoveButton } from '../buttons'
 import { Repeater } from '../collections'
 import { Sortable, SortablePublicProps } from '../collections/Sortable'
 import { CommonRendererProps } from './CommonRendererProps'
@@ -86,7 +86,7 @@ namespace MultiEditRenderer {
 			return (
 				<>
 					{this.props.children}
-					{this.props.displayUnlinkButton && <UnlinkButton />}
+					{this.props.displayUnlinkButton && <RemoveButton />}
 				</>
 			)
 		}

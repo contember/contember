@@ -9,19 +9,26 @@ import {
 	ToManyProps
 } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
-import { AddNewButton, UnlinkButton } from '../buttons'
+import { AddNewButton, RemoveButton, RemoveButtonProps } from '../buttons'
 
-export interface RepeaterProps extends ToManyProps {}
+export interface RepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {}
 
 class Repeater extends React.PureComponent<RepeaterProps> {
 	static displayName = 'Repeater'
 
 	public render() {
 		return (
-			<ToMany.CollectionRetriever {...this.props}>
+			<ToMany.CollectionRetriever field={this.props.field} label={this.props.label} filter={this.props.filter}>
 				{(field: EntityCollectionAccessor) => {
 					return (
-						<Repeater.EntityCollection entities={field} label={this.props.label}>
+						<Repeater.EntityCollection
+							entities={field}
+							label={this.props.label}
+							enableAddingNew={this.props.enableAddingNew}
+							enableUnlink={this.props.enableUnlink}
+							enableUnlinkAll={this.props.enableUnlinkAll}
+							removeType={this.props.removeType}
+						>
 							{this.props.children}
 						</Repeater.EntityCollection>
 					)
@@ -36,7 +43,11 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 }
 
 namespace Repeater {
-	export interface ItemProps {
+	export interface ItemPublicProps {
+		removeType?: RemoveButtonProps['removeType']
+	}
+
+	export interface ItemProps extends ItemPublicProps {
 		entity: EntityAccessor
 		displayUnlinkButton: boolean
 	}
@@ -48,7 +59,9 @@ namespace Repeater {
 					<div className="repeaterItem">
 						<Card elevation={Elevation.ONE} className="repeaterItem-in">
 							<div className="repeaterItem-content">{this.props.children}</div>
-							{this.props.displayUnlinkButton && <UnlinkButton className="repeaterItem-button" />}
+							{this.props.displayUnlinkButton && (
+								<RemoveButton className="repeaterItem-button" removeType={this.props.removeType} />
+							)}
 						</Card>
 					</div>
 				</DataContext.Provider>
@@ -56,7 +69,7 @@ namespace Repeater {
 		}
 	}
 
-	export interface EntityCollectionPublicProps {
+	export interface EntityCollectionPublicProps extends ItemPublicProps {
 		label?: ToManyProps['label']
 		enableUnlink?: boolean
 		enableUnlinkAll?: boolean
@@ -81,6 +94,7 @@ namespace Repeater {
 								}
 								entity={entity}
 								key={entity.getKey()}
+								removeType={this.props.removeType}
 							>
 								{this.props.children}
 							</Item>

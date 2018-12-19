@@ -16,8 +16,8 @@ import {
 } from '../dao'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
-type OnReplace = (replacement: EntityAccessor) => void
-type OnUnlink = () => void
+type OnReplace = EntityAccessor['replaceWith']
+type OnUnlink = EntityAccessor['remove']
 
 export class AccessorTreeGenerator {
 	private static readonly PRIMARY_KEY_NAME = 'id'
@@ -60,7 +60,7 @@ export class AccessorTreeGenerator {
 
 						updateData(createAccessorTreeRoot())
 					},
-					() => {
+					(removalType: EntityAccessor.RemovalType) => {
 						const entityAccessor = entityAccessors[i]
 
 						if (entityAccessor) {
@@ -69,7 +69,8 @@ export class AccessorTreeGenerator {
 								entityAccessors[i] = new EntityForRemovalAccessor(
 									primaryKey,
 									entityAccessor.data,
-									entityAccessor.replaceWith
+									entityAccessor.replaceWith,
+									removalType
 								)
 							} else {
 								entityAccessors[i] = undefined
@@ -101,12 +102,13 @@ export class AccessorTreeGenerator {
 
 					updateData(createAccessorTreeRoot())
 				},
-				() => {
+				(removalType: EntityAccessor.RemovalType) => {
 					if (typeof entityAccessor.primaryKey === 'string') {
 						entityAccessor = new EntityForRemovalAccessor(
 							entityAccessor.primaryKey,
 							entityAccessor.data,
-							entityAccessor.replaceWith
+							entityAccessor.replaceWith,
+							removalType
 						)
 						updateData(createAccessorTreeRoot())
 					}
@@ -282,7 +284,7 @@ export class AccessorTreeGenerator {
 						update()
 					}
 				},
-				() => {
+				(removalType: EntityAccessor.RemovalType) => {
 					const currentEntity = collectionAccessor.entities[i]
 					if (currentEntity instanceof EntityAccessor) {
 						const id = currentEntity.primaryKey
@@ -291,7 +293,8 @@ export class AccessorTreeGenerator {
 							collectionAccessor.entities[i] = new EntityForRemovalAccessor(
 								id,
 								currentEntity.data,
-								currentEntity.replaceWith
+								currentEntity.replaceWith,
+								removalType
 							)
 						} else {
 							collectionAccessor.entities[i] = undefined
@@ -325,12 +328,12 @@ export class AccessorTreeGenerator {
 			original.primaryKey,
 			new EntityData({ ...original.data.allFieldData, [fieldPlaceholder]: newData }),
 			original.replaceWith,
-			original.unlink
+			original.remove
 		)
 	}
 
 	private asDifferentEntity(original: EntityAccessor, replacement: EntityAccessor): EntityAccessor {
 		// TODO: we also need to update the callbacks inside replacement.data
-		return new EntityAccessor(replacement.primaryKey, replacement.data, original.replaceWith, original.unlink)
+		return new EntityAccessor(replacement.primaryKey, replacement.data, original.replaceWith, original.remove)
 	}
 }

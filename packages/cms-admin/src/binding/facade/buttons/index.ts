@@ -1,4 +1,4 @@
 export * from './AddNewButton'
 export * from './PageLinkById'
 export * from './PersistButton'
-export * from './UnlinkButton'
+export * from './RemoveButton'

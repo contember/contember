@@ -1,4 +1,4 @@
-import { FormGroup, IFormGroupProps } from '@blueprintjs/core'
+import { FileInput, FormGroup, IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'

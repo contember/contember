@@ -7,7 +7,7 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkCompone
 		this.props.goTo()
 	}
 
-	defaultComponent: React.StatelessComponent<InnerProps> = () => (
+	defaultComponent: React.FunctionComponent<InnerProps> = () => (
 		<a href={this.props.url} onClick={this.onClick}>
 			{this.props.children}
 		</a>

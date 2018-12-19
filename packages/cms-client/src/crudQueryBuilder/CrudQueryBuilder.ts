@@ -1,3 +1,4 @@
+import { isEmptyObject } from 'cms-common'
 import UnboundedGetQueryBuilder from './UnboundedGetQueryBuilder'
 import UpdateBuilder from './UpdateBuilder'
 import QueryBuilder from '../graphQlBuilder/QueryBuilder'
@@ -67,6 +68,10 @@ export default class CrudQueryBuilder {
 		}
 		if (typeof query === 'function') {
 			query = query(new UpdateBuilder())
+		}
+
+		if (isEmptyObject(query.objectBuilder.args.data)) {
+			return this
 		}
 
 		const [objectName, objectBuilder] =

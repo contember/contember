@@ -4,13 +4,14 @@ import { DataContext } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
+import { LoadingSpinner } from './userFeedback'
 
 export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	public render() {
 		const data = this.props.data
 
 		if (!data) {
-			return null // TODO display a message
+			return <LoadingSpinner />
 		}
 
 		const normalizedData = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]

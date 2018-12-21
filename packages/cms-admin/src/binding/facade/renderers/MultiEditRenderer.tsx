@@ -1,18 +1,12 @@
 import * as React from 'react'
-import {
-	DataContext,
-	DataRendererProps,
-	EnforceSubtypeRelation,
-	Field,
-	Props,
-	SyntheticChildrenProvider
-} from '../../coreComponents'
+import { DataRendererProps, EnforceSubtypeRelation, Props, SyntheticChildrenProvider } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
-import { AddNewButton, PersistButton, RemoveButton } from '../buttons'
+import { PersistButton, RemoveButton } from '../buttons'
 import { Repeater } from '../collections'
 import { Sortable, SortablePublicProps } from '../collections/Sortable'
 import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
+import { LoadingSpinner } from './userFeedback'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
 export interface MultiEditRendererProps extends CommonRendererProps, EntityCollectionPublicProps {
@@ -27,7 +21,7 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 		const data = this.props.data
 
 		if (!data) {
-			return null // TODO display a message
+			return <LoadingSpinner />
 		}
 
 		if (data.root instanceof EntityCollectionAccessor) {

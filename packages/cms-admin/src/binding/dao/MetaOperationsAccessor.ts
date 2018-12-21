@@ -1,3 +1,3 @@
 export class MetaOperationsAccessor {
-	public constructor(public readonly triggerPersist: () => void) {}
+	public constructor(public readonly triggerPersist: () => Promise<void>) {}
 }

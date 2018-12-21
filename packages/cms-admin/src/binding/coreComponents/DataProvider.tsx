@@ -38,7 +38,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		data: undefined
 	}
 
-	protected triggerPersist = () => {
+	protected triggerPersist = (): Promise<void> => {
 		const data = this.state.id ? this.props.requests[this.state.id].data : undefined
 
 		if (this.state.data) {
@@ -47,9 +47,10 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 			console.log('mutation', mutation)
 			if (mutation !== undefined) {
-				this.props.putData(mutation)
+				return this.props.putData(mutation)
 			}
 		}
+		return Promise.reject()
 	}
 
 	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(this.triggerPersist)

@@ -10,6 +10,7 @@ import { DataBindingError, Environment } from '../../dao'
 interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	dimension: string
 	children: React.ReactNode
+	alignChildren?: boolean
 }
 
 class SideDimensions extends React.PureComponent<SideDimensionsProps> {
@@ -32,20 +33,28 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 			throw new DataBindingError(`The '${props.dimension}' dimension in undefined`)
 		}
 
+		const alignChildren: boolean = props.alignChildren !== false
+		const children: React.ReactNodeArray =
+			Array.isArray(props.children) && alignChildren ? props.children : [props.children]
+
 		return (
 			<div className="sideDimensions-dimensions">
-				{dimensions[props.dimension].map(item => {
-					return (
-						<SideDimensions.SingleDimension
-							dimensionValue={item}
-							variableName={props.variableName}
-							variables={props.variables}
-							key={item}
-						>
-							{props.children}
-						</SideDimensions.SingleDimension>
-					)
-				})}
+				{children.map(child => (
+					<div className="sideDimensions-dimensions-in">
+						{dimensions[props.dimension].map(item => {
+							return (
+								<SideDimensions.SingleDimension
+									dimensionValue={item}
+									variableName={props.variableName}
+									variables={props.variables}
+									key={item}
+								>
+									{child}
+								</SideDimensions.SingleDimension>
+							)
+						})}
+					</div>
+				))}
 			</div>
 		)
 	}

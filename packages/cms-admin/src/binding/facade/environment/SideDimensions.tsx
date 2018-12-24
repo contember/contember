@@ -39,8 +39,8 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 		return (
 			<div className="sideDimensions-dimensions">
-				{children.map(child => (
-					<div className="sideDimensions-dimensions-in">
+				{children.map((child, i) => (
+					<div className="sideDimensions-dimensions-in" key={i}>
 						{dimensions[props.dimension].map(item => {
 							return (
 								<SideDimensions.SingleDimension

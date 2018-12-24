@@ -23,10 +23,9 @@ class GraphqlClient {
 			if (response.ok && !result.errors && result.data) {
 				return result.data
 			} else {
-				const body = await response.text()
 				throw new GraphqlClient.GraphqlClientError(
 					{ query, variables },
-					{ status: response.status, body, data: result }
+					{ status: response.status, body: JSON.stringify(result), data: result }
 				)
 			}
 		} else {

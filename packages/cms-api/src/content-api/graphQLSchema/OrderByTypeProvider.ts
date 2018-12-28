@@ -1,4 +1,4 @@
-import { GraphQLEnumType, GraphQLInputObjectType, GraphQLList, GraphQLNonNull } from 'graphql'
+import { GraphQLEnumType, GraphQLInputObjectType } from 'graphql'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputType } from 'graphql/type/definition'
 import { Acl, Model } from 'cms-common'
 import { acceptFieldVisitor } from '../../content-schema/modelUtils'

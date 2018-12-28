@@ -2,11 +2,7 @@ import FieldBuilder from './FieldBuilder'
 import { Model } from 'cms-common'
 
 class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O> {
-	private options: O
-
-	constructor(options: O) {
-		this.options = options
-	}
+	constructor(private readonly options: O) {}
 
 	public columnName(columnName: string): ColumnBuilder<O> {
 		return new ColumnBuilder<O>({ ...(this.options as object), columnName } as O)

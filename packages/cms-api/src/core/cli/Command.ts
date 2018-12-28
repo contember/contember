@@ -1,5 +1,4 @@
 import CommandConfiguration from './CommandConfiguration'
-import InputParser from './InputParser'
 
 abstract class Command<Args extends Command.Arguments, Options extends Command.Options> {
 	private configuration: CommandConfiguration | undefined

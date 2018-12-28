@@ -9,11 +9,8 @@ export type AddEntityCallback = (name: string, configurator: EntityConfigurator)
 export default class SchemaBuilder {
 	private entities: { [name: string]: EntityConfigurator } = {}
 	private enums: { [name: string]: string[] } = {}
-	private conventions: NamingConventions
 
-	constructor(conventions: NamingConventions = new NamingConventions.Default()) {
-		this.conventions = conventions
-	}
+	constructor(private readonly conventions: NamingConventions = new NamingConventions.Default()) {}
 
 	public enum(name: string, values: string[]): SchemaBuilder {
 		this.enums[name] = values

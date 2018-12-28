@@ -21,7 +21,6 @@ export default class QueryProvider {
 	) {}
 
 	public getQueries(entityName: string): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {
-		const entity = getEntity(this.schema, entityName)
 		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
 			return {}
 		}

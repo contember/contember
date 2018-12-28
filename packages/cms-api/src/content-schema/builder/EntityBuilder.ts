@@ -8,21 +8,11 @@ import { AddEntityCallback } from './SchemaBuilder'
 import { Model } from 'cms-common'
 
 class EntityBuilder {
-	private options: EntityBuilder.EntityOptions
-
-	private fields: FieldBuilder.Map
-
-	private addEntity: AddEntityCallback
-
 	constructor(
-		options: Partial<EntityBuilder.EntityOptions>,
-		fields: FieldBuilder.Map = {},
-		addEntity: AddEntityCallback
-	) {
-		this.options = options
-		this.fields = fields
-		this.addEntity = addEntity
-	}
+		private readonly options: Partial<EntityBuilder.EntityOptions>,
+		private readonly fields: FieldBuilder.Map = {},
+		private readonly addEntity: AddEntityCallback
+	) {}
 
 	tableName(tableName: string): EntityBuilder {
 		return new EntityBuilder({ ...this.options, tableName }, this.fields, this.addEntity)

@@ -140,7 +140,6 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 	) {
 		const insertBuilder = this.insertBuilder
 		const mapper = this.mapper
-		const that = this
 
 		return this.processRelationInput(
 			this.data[relation.name] as Input.CreateOneRelationInput,
@@ -232,7 +231,6 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 	) {
 		const insertBuilder = this.insertBuilder
 		const mapper = this.mapper
-		const that = this
 
 		return this.processRelationInput(
 			this.data[relation.name] as Input.CreateOneRelationInput,

@@ -32,22 +32,12 @@ interface HasManyRelationInputProcessor {
 }
 
 export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.RelationByTypeVisitor<PromiseLike<any>> {
-	private primaryValue: Input.PrimaryValue
-	private data: Input.UpdateDataInput
-	private updateBuilder: UpdateBuilder
-	private mapper: Mapper
-
 	constructor(
-		primaryValue: Input.PrimaryValue,
-		data: Input.UpdateDataInput,
-		updateBuilder: UpdateBuilder,
-		mapper: Mapper
-	) {
-		this.primaryValue = primaryValue
-		this.data = data
-		this.updateBuilder = updateBuilder
-		this.mapper = mapper
-	}
+		private readonly primaryValue: Input.PrimaryValue,
+		private readonly data: Input.UpdateDataInput,
+		private readonly updateBuilder: UpdateBuilder,
+		private readonly mapper: Mapper
+	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
 		if (this.data[column.name] !== undefined) {

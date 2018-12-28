@@ -6,13 +6,7 @@ type PartialOptions<K extends keyof OneHasManyBuilder.Options> = Partial<OneHasM
 	Pick<OneHasManyBuilder.Options, K>
 
 class OneHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
-	private options: O
-	private addEntity: AddEntityCallback
-
-	constructor(options: O, addEntity: AddEntityCallback) {
-		this.options = options
-		this.addEntity = addEntity
-	}
+	constructor(private readonly options: O, private readonly addEntity: AddEntityCallback) {}
 
 	target(target: string, configurator?: EntityConfigurator): OneHasManyBuilder<O & PartialOptions<'target'>> {
 		if (configurator) {

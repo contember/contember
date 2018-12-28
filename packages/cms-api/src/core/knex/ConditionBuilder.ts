@@ -1,5 +1,5 @@
 import * as Knex from 'knex'
-import { Formatter, Value } from './types'
+import { Value } from './types'
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
 

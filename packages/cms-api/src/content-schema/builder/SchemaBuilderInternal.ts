@@ -19,11 +19,7 @@ export default class SchemaBuilderInternal {
 
 	private enums: { [name: string]: string[] } = {}
 
-	private conventions: NamingConventions
-
-	constructor(conventions: NamingConventions) {
-		this.conventions = conventions
-	}
+	constructor(private readonly conventions: NamingConventions) {}
 
 	public addEntity(name: string, options: EntityBuilder.EntityOptions, fieldOptions: FieldBuilder.Map): void {
 		this.fieldOptions[name] = fieldOptions

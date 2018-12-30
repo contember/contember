@@ -1,5 +1,6 @@
 export * from './HiddenField'
 export * from './NumberField'
+export * from './RadioField'
 export * from './RichTextField'
 export * from './SelectField'
 export * from './TextField'

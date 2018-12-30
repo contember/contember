@@ -10,4 +10,13 @@ export class FieldAccessor<
 		public readonly currentValue: Persisted | null,
 		public readonly onChange?: (newValue: Produced | null) => void
 	) {}
+
+	public hasValue(candidate: this['currentValue']): boolean {
+		const currentValue = this.currentValue
+
+		if (currentValue instanceof GraphQlBuilder.Literal) {
+			return candidate instanceof GraphQlBuilder.Literal && currentValue.value === candidate.value
+		}
+		return currentValue === candidate
+	}
 }

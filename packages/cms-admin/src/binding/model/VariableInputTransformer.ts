@@ -62,7 +62,7 @@ export class VariableInputTransformer {
 		}
 	}
 
-	private static transformVariableScalar(variableScalar: VariableScalar, environment: Environment): Scalar {
+	public static transformVariableScalar(variableScalar: VariableScalar, environment: Environment): Scalar {
 		const value = environment.getValue(variableScalar.variable)
 
 		if (typeof value !== 'string' && typeof value !== 'boolean' && typeof value !== 'number' && value !== null) {
@@ -73,7 +73,7 @@ export class VariableInputTransformer {
 		return value
 	}
 
-	private static transformVariableLiteral(
+	public static transformVariableLiteral(
 		variableLiteral: VariableLiteral,
 		environment: Environment
 	): GraphQlBuilder.Literal {

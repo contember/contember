@@ -62,8 +62,8 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 namespace SideDimensions {
 	export interface CommonDimensionProps {
-		variableName: Environment.Name
-		variables?: Environment.DeltaFactory
+		variableName?: Environment.Name
+		variables?: Environment.DeltaFactory | ((dimensionValue: Environment.Value) => Environment.DeltaFactory)
 	}
 
 	export interface SingleDimensionProps extends CommonDimensionProps {
@@ -94,10 +94,23 @@ namespace SideDimensions {
 			if (!props.variables) {
 				return {}
 			}
-			return Environment.generateDelta(oldEnvironment.putName(props.variableName, props.dimensionValue), {
-				...props.variables,
-				[props.variableName]: props.dimensionValue
-			})
+
+			let deltaFactory: Environment.DeltaFactory
+
+			if (typeof props.variables === 'function') {
+				deltaFactory = props.variables(props.dimensionValue)
+			} else if (props.variables) {
+				deltaFactory = props.variables
+			} else {
+				deltaFactory = {}
+			}
+
+			if (props.variableName) {
+				oldEnvironment = oldEnvironment.putName(props.variableName, props.dimensionValue)
+				deltaFactory[props.variableName] = props.dimensionValue
+			}
+
+			return Environment.generateDelta(oldEnvironment, deltaFactory)
 		}
 	}
 

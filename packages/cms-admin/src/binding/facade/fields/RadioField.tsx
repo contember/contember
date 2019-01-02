@@ -8,6 +8,7 @@ import { ChoiceField, ChoiceFieldProps, ChoiceFieldStaticProps } from './ChoiceF
 export interface RadioFieldPublicProps {
 	name: FieldName
 	label: IRadioGroupProps['label']
+	inline?: boolean
 }
 
 export interface RadioFieldStaticProps {
@@ -45,6 +46,7 @@ export class RadioField extends React.Component<RadioFieldProps> {
 							label={this.props.label}
 							selectedValue={currentValue === null ? undefined : currentValue}
 							onChange={event => onChange(event.currentTarget.value)}
+							inline={this.props.inline}
 						>
 							{data.map(choice => {
 								const [value, label] = choice

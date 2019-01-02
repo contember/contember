@@ -15,7 +15,7 @@ class Container<M extends Container.ServiceTypeMap> {
 			this.services[name] = this.factories[name](this.accessors)
 		}
 
-		return this.services[name]
+		return this.services[name]!
 	}
 }
 

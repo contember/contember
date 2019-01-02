@@ -26,7 +26,8 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 			<Dimensions>
 				{(dimensions: SelectedDimension) => {
 					const environment = new Environment({ dimensions })
-					const Renderer = this.props.renderer || DefaultRenderer
+					const FallbackRenderer: React.ComponentClass<DataRendererProps> = DefaultRenderer
+					const Renderer = this.props.renderer || FallbackRenderer
 					const markerTreeGenerator = new MarkerTreeGenerator(
 						(
 							<EntityListDataProvider {...this.props}>

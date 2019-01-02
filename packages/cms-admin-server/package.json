@@ -18,6 +18,6 @@
 	"devDependencies": {
 		"@types/koa": "^2.0.47",
 		"@types/koa-static": "^4.0.0",
-		"typescript": "^3.0.1"
+		"typescript": "^3.2.2"
 	}
 }

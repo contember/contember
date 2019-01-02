@@ -73,7 +73,8 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	}
 
 	public render() {
-		const Renderer = this.props.renderer || DefaultRenderer
+		const FallbackRenderer: React.ComponentClass<DataRendererProps> = DefaultRenderer
+		const Renderer = this.props.renderer || FallbackRenderer
 
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>

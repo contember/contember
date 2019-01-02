@@ -57,6 +57,6 @@
 		"@types/slate-react": "^0.18.0",
 		"chai": "^4.2.0",
 		"mocha": "^5.2.0",
-		"typescript": "^3.0.1"
+		"typescript": "^3.2.2"
 	}
 }

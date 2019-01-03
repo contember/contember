@@ -21,15 +21,16 @@ export class PersistButton extends React.Component<PersistButtonProps, PersistBu
 		if (this.state.isLoading) {
 			return
 		}
+		const toaster = FeedbackToaster.toaster
 		triggerPersist()
 			.then(() =>
-				FeedbackToaster.show({
+				toaster.show({
 					intent: Intent.SUCCESS,
 					message: this.props.successMessage || 'Success!'
 				})
 			)
 			.catch(() =>
-				FeedbackToaster.show({
+				toaster.show({
 					intent: Intent.DANGER,
 					message: this.props.failureMessage || 'Failure!'
 				})

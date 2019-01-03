@@ -11,11 +11,13 @@ class Container<M extends Container.ServiceTypeMap> {
 	}
 
 	get<N extends keyof M>(name: N): M[N] {
-		if (this.services[name] === undefined) {
-			this.services[name] = this.factories[name](this.accessors)
+		const service: M[N] | undefined = this.services[name]
+
+		if (service === undefined) {
+			return (this.services[name] = this.factories[name](this.accessors))
 		}
 
-		return this.services[name]!
+		return service
 	}
 }
 

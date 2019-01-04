@@ -14,16 +14,24 @@ import {
 	DataContext,
 	DataContextValue,
 	EnforceSubtypeRelation,
+	EnvironmentContext,
 	Field,
 	Props,
 	SyntheticChildrenProvider
 } from '../../coreComponents'
-import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../dao'
+import {
+	DataBindingError,
+	EntityAccessor,
+	EntityCollectionAccessor,
+	Environment,
+	FieldAccessor,
+	VariableScalar
+} from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
-	sortBy: FieldName
+	sortBy: FieldName | VariableScalar
 }
 
 export interface SortableInternalProps {
@@ -66,10 +74,10 @@ class Sortable extends React.PureComponent<SortableProps> {
 		)
 	}
 
-	public static generateSyntheticChildren(props: Props<SortableProps>): React.ReactNode {
+	public static generateSyntheticChildren(props: Props<SortableProps>, environment: Environment): React.ReactNode {
 		return (
 			<>
-				<Field name={props.sortBy} />
+				<Field name={Sortable.resolveSortByFieldName(props.sortBy, environment)} />
 				{props.children}
 			</>
 		)
@@ -77,6 +85,23 @@ class Sortable extends React.PureComponent<SortableProps> {
 }
 
 namespace Sortable {
+	export const resolveSortByFieldName = (sortBy: FieldName | VariableScalar, environment: Environment): FieldName => {
+		if (sortBy instanceof VariableScalar) {
+			const fieldName = environment.getValue(sortBy.variable)
+
+			if (fieldName === undefined) {
+				throw new DataBindingError(`Attempting to sort by a variable field '${sortBy.variable}' which is not defined.`)
+			}
+			if (typeof fieldName !== 'string') {
+				throw new DataBindingError(
+					`Attempting to sort by a variable field '${sortBy.variable}' which exists but resolves to a non-string value.`
+				)
+			}
+			return fieldName
+		}
+		return sortBy
+	}
+
 	export interface DragHandleProps {}
 
 	export const DragHandle = SortableHandle((props: Props<DragHandleProps>) => (
@@ -130,13 +155,14 @@ namespace Sortable {
 	export class SortableInner extends React.PureComponent<SortableInnerProps> {
 		private entities: EntityAccessor[] = []
 
-		private onSortEnd: SortEndHandler = ({ oldIndex, newIndex }, e) => {
+		private getOnSortEnd = (environment: Environment): SortEndHandler => ({ oldIndex, newIndex }, e) => {
 			const persistedOrder: { [primaryKey: string]: number } = {}
 			const unpersistedOrder: { [primaryKey: string]: number } = {}
 
 			for (let i = 0, len = this.entities.length; i < len; i++) {
 				const entity = this.entities[i]
-				const orderField = entity.data.getField(this.props.sortBy)
+				const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, environment)
+				const orderField = entity.data.getField(fieldName)
 
 				if (orderField instanceof FieldAccessor && orderField.onChange) {
 					let targetValue
@@ -161,7 +187,8 @@ namespace Sortable {
 				}
 			}
 			for (const entity of this.entities) {
-				const orderField = entity.data.getField(this.props.sortBy)
+				const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, environment)
+				const orderField = entity.data.getField(fieldName)
 				const target =
 					typeof entity.primaryKey === 'string'
 						? persistedOrder[entity.primaryKey]
@@ -174,40 +201,47 @@ namespace Sortable {
 		}
 
 		public render() {
-			const entities = this.props.entities.entities.filter(
-				(item): item is EntityAccessor => item instanceof EntityAccessor
-			)
-
-			this.entities = entities.sort((a, b) => {
-				const [aField, bField] = [a.data.getField(this.props.sortBy), b.data.getField(this.props.sortBy)]
-
-				if (
-					aField instanceof FieldAccessor &&
-					bField instanceof FieldAccessor &&
-					typeof aField.currentValue === 'number' &&
-					typeof bField.currentValue === 'number'
-				) {
-					return aField.currentValue - bField.currentValue
-				}
-				return 0
-			})
-
 			return (
-				<SortableList
-					entities={this.entities}
-					onSortEnd={this.onSortEnd}
-					useDragHandle={true}
-					lockAxis="y"
-					lockToContainerEdges={true}
-					addNew={this.props.entities.addNew}
-					enableUnlinkAll={this.props.enableUnlinkAll}
-					enableAddingNew={this.props.enableAddingNew}
-					enableUnlink={this.props.enableUnlink}
-					label={this.props.label}
-					removeType={this.props.removeType}
-				>
-					{this.props.children}
-				</SortableList>
+				<EnvironmentContext.Consumer>
+					{environment => {
+						const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, environment)
+						const entities = this.props.entities.entities.filter(
+							(item): item is EntityAccessor => item instanceof EntityAccessor
+						)
+
+						this.entities = entities.sort((a, b) => {
+							const [aField, bField] = [a.data.getField(fieldName), b.data.getField(fieldName)]
+
+							if (
+								aField instanceof FieldAccessor &&
+								bField instanceof FieldAccessor &&
+								typeof aField.currentValue === 'number' &&
+								typeof bField.currentValue === 'number'
+							) {
+								return aField.currentValue - bField.currentValue
+							}
+							return 0
+						})
+
+						return (
+							<SortableList
+								entities={this.entities}
+								onSortEnd={this.getOnSortEnd(environment)}
+								useDragHandle={true}
+								lockAxis="y"
+								lockToContainerEdges={true}
+								addNew={this.props.entities.addNew}
+								enableUnlinkAll={this.props.enableUnlinkAll}
+								enableAddingNew={this.props.enableAddingNew}
+								enableUnlink={this.props.enableUnlink}
+								label={this.props.label}
+								removeType={this.props.removeType}
+							>
+								{this.props.children}
+							</SortableList>
+						)
+					}}
+				</EnvironmentContext.Consumer>
 			)
 		}
 	}

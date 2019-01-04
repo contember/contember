@@ -1,13 +1,12 @@
 import { FormGroup } from '@blueprintjs/core'
 import * as React from 'react'
-import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Props, SyntheticChildrenProvider, ToMany, ToManyProps } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { Repeater } from './Repeater'
-import { Sortable } from './Sortable'
+import { Sortable, SortablePublicProps } from './Sortable'
 
 interface SortableRepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {
-	sortBy: FieldName
+	sortBy: SortablePublicProps['sortBy']
 }
 
 class SortableRepeater extends React.PureComponent<SortableRepeaterProps> {

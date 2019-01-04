@@ -8,7 +8,8 @@ import {
 import { DataBindingError, Environment } from '../../dao'
 
 interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
-	dimension: string
+	dimension?: string
+	staticOptions?: Array<Environment.Value>
 	children: React.ReactNode
 	alignChildren?: boolean
 }
@@ -27,10 +28,24 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 	}
 
 	public static generateSyntheticChildren(props: SideDimensionsProps, environment: Environment): React.ReactNode {
-		const dimensions = environment.getDimensions()
+		if ((props.dimension === undefined) === (props.staticOptions === undefined)) {
+			throw new DataBindingError(
+				`The SideDimensions component needs to be passed exactly one of its 'dimension' or 'staticOptions' props.`
+			)
+		}
 
-		if (!(props.dimension in dimensions)) {
-			throw new DataBindingError(`The '${props.dimension}' dimension in undefined`)
+		let dimensions: Array<Environment.Value>
+
+		if (props.dimension !== undefined) {
+			const selectedDimensions = environment.getDimensions()
+
+			if (!(props.dimension in selectedDimensions)) {
+				throw new DataBindingError(`The '${props.dimension}' dimension in undefined`)
+			}
+
+			dimensions = selectedDimensions[props.dimension]
+		} else if (props.staticOptions !== undefined) {
+			dimensions = props.staticOptions
 		}
 
 		const alignChildren: boolean = props.alignChildren !== false
@@ -41,13 +56,13 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 			<div className="sideDimensions-dimensions">
 				{children.map((child, i) => (
 					<div className="sideDimensions-dimensions-in" key={i}>
-						{dimensions[props.dimension].map(item => {
+						{dimensions.map((item, j) => {
 							return (
 								<SideDimensions.SingleDimension
 									dimensionValue={item}
 									variableName={props.variableName}
 									variables={props.variables}
-									key={item}
+									key={j}
 								>
 									{child}
 								</SideDimensions.SingleDimension>

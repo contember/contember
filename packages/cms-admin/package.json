@@ -35,10 +35,10 @@
 		"redux": "^4.0.0",
 		"redux-actions": "^2.4.0",
 		"redux-thunk": "^2.3.0",
-		"slate": "0.40.2",
-		"slate-html-serializer": "0.7.2",
-		"slate-plain-serializer": "0.6.7",
-		"slate-react": "0.18.5"
+		"slate": "0.44.9",
+		"slate-html-serializer": "0.7.33",
+		"slate-plain-serializer": "0.6.33",
+		"slate-react": "0.21.15"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.1.6",
@@ -52,9 +52,9 @@
 		"@types/react-table": "^6.7.12",
 		"@types/reactstrap": "^6.0.0",
 		"@types/redux-actions": "^2.3.0",
-		"@types/slate": "^0.40.0",
-		"@types/slate-html-serializer": "^0.6.2",
-		"@types/slate-react": "^0.18.0",
+		"@types/slate": "^0.43.8",
+		"@types/slate-html-serializer": "^0.6.3",
+		"@types/slate-react": "^0.20.3",
 		"chai": "^4.2.0",
 		"mocha": "^5.2.0",
 		"typescript": "^3.2.2"

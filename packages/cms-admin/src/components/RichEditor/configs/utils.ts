@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Change, Value } from 'slate'
+import { Editor, Mark } from 'slate'
 import { Rule } from 'slate-html-serializer'
 import { Plugin } from 'slate-react'
 
@@ -8,12 +8,12 @@ export interface RichEditorPluginConfig {
 	type: string
 	plugin: Plugin
 	htmlSerializer: Rule
-	onToggle: (value: Value) => Change
+	onToggle: (editor: Editor) => void
 }
 
 export function simpleMarkPlugin(markType: string, htmlTag: string, attrs: string[] = []): Plugin {
 	return {
-		renderMark: ({ mark, children, attributes }) => {
+		renderMark: ({ mark, children, attributes }, editor, next) => {
 			if (mark.type === markType) {
 				return React.createElement(
 					htmlTag,
@@ -21,6 +21,7 @@ export function simpleMarkPlugin(markType: string, htmlTag: string, attrs: strin
 					children
 				)
 			}
+			return next()
 		}
 	}
 }
@@ -50,8 +51,14 @@ export function simpleMarkRule(markType: string, htmlTag: string | string[], att
 	}
 }
 
-export const simpleMarkToggle = (markType: string): RichEditorPluginConfig['onToggle'] => (value: Value): Change =>
-	value.change().toggleMark(markType)
+export const simpleMarkToggle = (markType: string): RichEditorPluginConfig['onToggle'] => editor => {
+	const mark = Mark.create(markType)
+	if (editor.value.activeMarks.has(mark)) {
+		editor.removeMark(mark)
+	} else {
+		editor.addMark(mark)
+	}
+}
 
 export function simpleMarkConfig(markType: string, htmlTags: string | [string, ...string[]]): RichEditorPluginConfig {
 	const tags = Array.isArray(htmlTags) ? htmlTags : [htmlTags]

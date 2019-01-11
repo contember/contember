@@ -1,13 +1,7 @@
 import { Button, ButtonGroup, IconName } from '@blueprintjs/core'
-import { List } from 'immutable'
 import * as React from 'react'
-import { Block, Change, Mark, Value } from 'slate'
-import { RichEditorPluginConfig } from './configs'
-
-export const has = (value: Value, config: RichEditorPluginConfig): boolean => {
-	const nodes: List<Block | Mark> = config.node === 'mark' ? value.activeMarks.toList() : value.blocks
-	return nodes.some(node => node !== undefined && node.type === config.type)
-}
+import { Editor } from 'slate'
+import { Editor as ReactEditor } from 'slate-react'
 
 interface ToolbarProps {
 	children: React.ReactNode
@@ -15,17 +9,19 @@ interface ToolbarProps {
 
 export const Toolbar: React.SFC<ToolbarProps> = ({ children }) => <ButtonGroup minimal={true}>{children}</ButtonGroup>
 
-type OnChange = (change: Change) => void
-
 interface ActionButtonProps {
-	value: Value
 	icon: IconName
-	config: RichEditorPluginConfig
-	onChange: OnChange
+	onClick: () => unknown | void
+	isActive: boolean
 }
 
-export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, value, config, onChange }) => {
-	const isActive = has(value, config)
+export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive }) => (
+	<Button active={isActive} icon={icon} onClick={() => onClick()} />
+)
 
-	return <Button active={isActive} icon={icon} onClick={() => onChange(config.onToggle(value))} />
+// This is dumm thing, but slate or slate's typings are bad
+export function getSlateController(editor: Editor | ReactEditor, rec: number = 0): Editor {
+	if (typeof (editor as any).controller !== 'undefined' && rec < 5)
+		return getSlateController((editor as ReactEditor).controller, rec + 1)
+	else return editor as Editor
 }

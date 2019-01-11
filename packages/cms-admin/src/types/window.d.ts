@@ -4,7 +4,7 @@ declare interface Window {
 
 declare interface Process {
 	env: {
-		NODE_ENV: 'development'
+		NODE_ENV: 'development' | 'production'
 	}
 }
 

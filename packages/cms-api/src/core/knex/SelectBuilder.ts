@@ -86,7 +86,7 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 
 	public async getResult(): Promise<Result> {
 		const result: QueryResult = await this.createQuery()
-		return result.rows as any as Result;
+		return (result.rows as any) as Result
 	}
 
 	public createQuery(): Raw {

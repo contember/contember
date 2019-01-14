@@ -7,8 +7,8 @@ import PredicateFactory from '../../acl/PredicateFactory'
 import KnexWrapper from '../../core/knex/KnexWrapper'
 import { Acl, Input, Model } from 'cms-common'
 import InsertBuilder from '../../core/knex/InsertBuilder'
-import QueryBuilder from '../../core/knex/QueryBuilder'
 import ConditionBuilder from '../../core/knex/ConditionBuilder'
+import SelectBuilder from '../../core/knex/SelectBuilder'
 
 class JunctionTableManager {
 	constructor(
@@ -82,21 +82,21 @@ class JunctionTableManager {
 				and: [inversePredicate, this.uniqueWhereExpander.expand(inversedEntity, inversedUnique)],
 			}
 
-			const dataCallback: QueryBuilder.Callback = qb => {
-				qb.select(expr => expr.select(['owning', owningEntity.primaryColumn]), joiningTable.joiningColumn.columnName)
-				qb.select(
-					expr => expr.select(['inversed', inversedEntity.primaryColumn]),
-					joiningTable.inverseJoiningColumn.columnName
-				)
-				qb.select(expr => expr.raw('true'), 'selected')
+			const dataCallback: SelectBuilder.Callback = qb => {
+				qb = qb
+					.select(expr => expr.select(['owning', owningEntity.primaryColumn]), joiningTable.joiningColumn.columnName)
+					.select(
+						expr => expr.select(['inversed', inversedEntity.primaryColumn]),
+						joiningTable.inverseJoiningColumn.columnName
+					)
+					.select(expr => expr.raw('true'), 'selected')
+					.from(qb.raw('(values (null))'), 't')
 
-				qb.from(qb.raw('(values (null))'), 't')
-
-				qb.join(owningEntity.tableName, 'owning', condition => condition.raw('true'))
-				this.whereBuilder.build(qb, owningEntity, new Path([], 'owning'), ownerWhere)
-
-				qb.join(inversedEntity.tableName, 'inversed', condition => condition.raw('true'))
-				this.whereBuilder.build(qb, inversedEntity, new Path([], 'inversed'), inversedWhere)
+					.join(owningEntity.tableName, 'owning', condition => condition.raw('true'))
+					.join(inversedEntity.tableName, 'inversed', condition => condition.raw('true'))
+				qb = this.whereBuilder.build(qb, owningEntity, new Path([], 'owning'), ownerWhere)
+				qb = this.whereBuilder.build(qb, inversedEntity, new Path([], 'inversed'), inversedWhere)
+				return qb
 			}
 
 			await handler.executeComplex(joiningTable, dataCallback)
@@ -112,7 +112,7 @@ namespace JunctionTableManager {
 			inversedPrimary: Input.PrimaryValue
 		): Promise<void>
 
-		executeComplex(joiningTable: Model.JoiningTable, dataCallback: QueryBuilder.Callback): Promise<void>
+		executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void>
 	}
 
 	export class JunctionConnectHandler implements JunctionHandler {
@@ -134,10 +134,7 @@ namespace JunctionTableManager {
 				.execute()
 		}
 
-		async executeComplex(joiningTable: Model.JoiningTable, dataCallback: QueryBuilder.Callback): Promise<void> {
-			const qb = this.db.queryBuilder()
-			qb.with('data', dataCallback)
-
+		async executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void> {
 			const insert = this.db
 				.insertBuilder()
 				.into(joiningTable.tableName)
@@ -148,14 +145,18 @@ namespace JunctionTableManager {
 				})
 				.returning(this.db.raw('true as inserted'))
 				.from(qb => qb.from('data'))
+				.withCteAliases(['data'])
 				.onConflict(InsertBuilder.ConflictActionType.doNothing)
 
-			qb.with('insert', insert.createQuery())
-			qb.from(qb.raw('(values (null))'), 't')
-			qb.leftJoin('data', 'data', condition => condition.raw('true'))
-			qb.leftJoin('insert', 'insert', condition => condition.raw('true'))
-			qb.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
-			qb.select(expr => expr.raw('coalesce(insert.inserted, false)'), 'inserted')
+			const qb = this.db
+				.selectBuilder()
+				.with('data', dataCallback)
+				.with('insert', insert.createQuery())
+				.from(this.db.raw('(values (null))'), 't')
+				.leftJoin('data', 'data', condition => condition.raw('true'))
+				.leftJoin('insert', 'insert', condition => condition.raw('true'))
+				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
+				.select(expr => expr.raw('coalesce(insert.inserted, false)'), 'inserted')
 
 			const result = await qb.getResult()
 			if (result[0]['selected'] === false) {
@@ -183,9 +184,7 @@ namespace JunctionTableManager {
 			await qb.execute()
 		}
 
-		public async executeComplex(joiningTable: Model.JoiningTable, dataCallback: QueryBuilder.Callback): Promise<void> {
-			const qb = this.db.queryBuilder()
-
+		public async executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void> {
 			const deleteQb = this.db
 				.deleteBuilder()
 				.from(joiningTable.tableName)
@@ -204,13 +203,15 @@ namespace JunctionTableManager {
 				})
 				.returning(this.db.raw('true as deleted'))
 
-			qb.with('data', dataCallback)
-			qb.with('delete', deleteQb.createQuery())
-			qb.from(qb.raw('(values (null))'), 't')
-			qb.leftJoin('data', 'data', condition => condition.raw('true'))
-			qb.leftJoin('delete', 'delete', condition => condition.raw('true'))
-			qb.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
-			qb.select(expr => expr.raw('coalesce(delete.deleted, false)'), 'deleted')
+			const qb = this.db
+				.selectBuilder()
+				.with('data', dataCallback)
+				.with('delete', deleteQb.createQuery())
+				.from(this.db.raw('(values (null))'), 't')
+				.leftJoin('data', 'data', condition => condition.raw('true'))
+				.leftJoin('delete', 'delete', condition => condition.raw('true'))
+				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
+				.select(expr => expr.raw('coalesce(delete.deleted, false)'), 'deleted')
 
 			const result = await qb.getResult()
 			if (result[0]['selected'] === false) {

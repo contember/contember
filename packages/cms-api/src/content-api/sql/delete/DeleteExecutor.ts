@@ -62,10 +62,9 @@ class DeleteExecutor {
 			.from(entity.tableName)
 			.where(condition =>
 				condition.in(entity.primaryColumn, qb => {
-					qb.from(entity.tableName, 'root_')
-					qb.select(['root_', entity.primaryColumn])
+					qb = qb.from(entity.tableName, 'root_').select(['root_', entity.primaryColumn])
 					const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-					this.whereBuilder.build(qb, entity, new Path([]), { and: [where, predicate] })
+					return this.whereBuilder.build(qb, entity, new Path([]), { and: [where, predicate] })
 				})
 			)
 			.returning(entity.primaryColumn)

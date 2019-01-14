@@ -12,6 +12,7 @@ export type Value =
 	| Array<boolean>
 	| Buffer
 	| Knex.Raw
+	| Knex.QueryBuilder
 
 export interface Formatter {
 	bindings: Array<any>
@@ -29,4 +30,9 @@ export interface Formatter {
 	parameter(values: any): string
 
 	operator(values: string): string
+}
+
+export interface Raw extends Knex.Raw {
+	sql: string
+	bindings: (Value | Knex.QueryBuilder)[]
 }

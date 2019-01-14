@@ -2,7 +2,7 @@ import QueryBuilder from './QueryBuilder'
 import * as Knex from 'knex'
 import KnexWrapper from './KnexWrapper'
 
-class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable {
+class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable<WindowFunction<HasFunction>> {
 	private constructor(
 		private readonly wrapper: KnexWrapper,
 		private readonly windowFunction: Knex.Raw | undefined,
@@ -51,20 +51,6 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 		}
 
 		return this.wrapper.raw(`?? over(${windowDefinition})`, ...bindings)
-	}
-}
-
-namespace WindowFunction {
-	export class MutableWindowFunctionOrderableWrapper implements QueryBuilder.Orderable {
-		constructor(private windowFunction: WindowFunction<any>) {}
-
-		getWindowFunction(): WindowFunction<any> {
-			return this.windowFunction
-		}
-
-		orderBy(columnName: QueryBuilder.ColumnIdentifier, direction: 'asc' | 'desc' = 'asc'): void {
-			this.windowFunction = this.windowFunction.orderBy(columnName, direction)
-		}
 	}
 }
 

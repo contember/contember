@@ -2512,14 +2512,14 @@ describe('update', () => {
                 select
                   "data"."post_id",
                   "data"."category_id"
-                from "public"."data"
+                from "data"
               on conflict do nothing
               returning true as inserted)
             select
               coalesce(data.selected, false) as "selected",
               coalesce(insert.inserted, false) as "inserted"
-            from (values (null)) as "t" left join "public"."data" as "data" on true
-              left join "public"."insert" as "insert" on true`,
+            from (values (null)) as "t" left join "data" as "data" on true
+              left join "insert" as "insert" on true`,
 						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(2)],
 						response: [{ selected: true, inserted: true }],
 					},
@@ -2541,8 +2541,8 @@ describe('update', () => {
             select
               coalesce(data.selected, false) as "selected",
               coalesce(delete.deleted, false) as "deleted"
-            from (values (null)) as "t" left join "public"."data" as "data" on true
-              left join "public"."delete" as "delete" on true`,
+            from (values (null)) as "t" left join "data" as "data" on true
+              left join "delete" as "delete" on true`,
 						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(3)],
 						response: [{ selected: true, deleted: true }],
 					},

@@ -5,11 +5,11 @@ import QueryBuilder from './QueryBuilder'
 class CaseStatement {
 	constructor(private readonly wrapper: KnexWrapper, private readonly options: CaseStatement.Options) {}
 
-	public static createEmpty(wrapper: KnexWrapper) {
+	public static createEmpty(wrapper: KnexWrapper): CaseStatement {
 		return new CaseStatement(wrapper, { whenClauses: [], elseClause: undefined })
 	}
 
-	public when(when: QueryBuilder.ColumnExpression, then: QueryBuilder.ColumnExpression) {
+	public when(when: QueryBuilder.ColumnExpression, then: QueryBuilder.ColumnExpression): CaseStatement {
 		return new CaseStatement(this.wrapper, {
 			...this.options,
 			whenClauses: [
@@ -22,7 +22,7 @@ class CaseStatement {
 		})
 	}
 
-	public else(elseClause: QueryBuilder.ColumnExpression) {
+	public else(elseClause: QueryBuilder.ColumnExpression): CaseStatement {
 		return new CaseStatement(this.wrapper, {
 			...this.options,
 			elseClause: QueryBuilder.columnExpressionToRaw(this.wrapper, elseClause) || this.wrapper.raw('null'),

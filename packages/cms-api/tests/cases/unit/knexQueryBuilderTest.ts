@@ -7,6 +7,7 @@ import { SQL } from '../../src/tags'
 import InsertBuilder from '../../../src/core/knex/InsertBuilder'
 import ConditionBuilder from '../../../src/core/knex/ConditionBuilder'
 import LimitByGroupWrapper from '../../../src/core/knex/LimitByGroupWrapper'
+import SelectBuilder from '../../../src/core/knex/SelectBuilder'
 
 interface Test {
 	query: (wrapper: KnexWrapper) => void
@@ -41,25 +42,26 @@ describe('knex query builder', () => {
 	it('constructs condition', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.queryBuilder()
-				qb.table('foo')
-				qb.where(cond => {
-					cond.compare('a', ConditionBuilder.Operator.eq, 1)
-					cond.compare('b', ConditionBuilder.Operator.notEq, 2)
-					cond.compare('c', ConditionBuilder.Operator.lt, 3)
-					cond.compare('d', ConditionBuilder.Operator.lte, 4)
-					cond.compare('e', ConditionBuilder.Operator.gt, 5)
-					cond.compare('f', ConditionBuilder.Operator.gte, 6)
+				const qb = wrapper
+					.selectBuilder()
+					.from('foo')
+					.where(cond => {
+						cond.compare('a', ConditionBuilder.Operator.eq, 1)
+						cond.compare('b', ConditionBuilder.Operator.notEq, 2)
+						cond.compare('c', ConditionBuilder.Operator.lt, 3)
+						cond.compare('d', ConditionBuilder.Operator.lte, 4)
+						cond.compare('e', ConditionBuilder.Operator.gt, 5)
+						cond.compare('f', ConditionBuilder.Operator.gte, 6)
 
-					cond.compareColumns('z', ConditionBuilder.Operator.eq, ['foo', 'x'])
+						cond.compareColumns('z', ConditionBuilder.Operator.eq, ['foo', 'x'])
 
-					cond.in('o', [1, 2, 3])
-					cond.in('m', qb => qb.select(expr => expr.selectValue(1)))
+						cond.in('o', [1, 2, 3])
+						cond.in('m', (qb: SelectBuilder) => qb.select(expr => expr.selectValue(1)))
 
-					cond.null('n')
+						cond.null('n')
 
-					cond.raw('false')
-				})
+						cond.raw('false')
+					})
 
 				await qb.getResult()
 			},
@@ -74,22 +76,23 @@ describe('knex query builder', () => {
 	it('constructs "on"', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.queryBuilder()
-				qb.select(['foo', 'id'])
-				qb.table('foo')
-				qb.join('bar', 'bar', clause => {
-					clause.or(clause => {
-						clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 1)
-						clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 2)
-						clause.not(clause => clause.compare(['bar', 'b'], ConditionBuilder.Operator.eq, 1))
+				const qb = wrapper
+					.selectBuilder()
+					.select(['foo', 'id'])
+					.from('foo')
+					.join('bar', 'bar', clause => {
+						clause.or(clause => {
+							clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 1)
+							clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 2)
+							clause.not(clause => clause.compare(['bar', 'b'], ConditionBuilder.Operator.eq, 1))
+						})
+						clause.and(clause => {
+							clause.in(['bar', 'c'], [1, 2, 3])
+							clause.null(['bar', 'd'])
+							clause.not(clause => clause.null(['bar', 'd']))
+							clause.compareColumns(['bar', 'e'], ConditionBuilder.Operator.lte, ['bar', 'f'])
+						})
 					})
-					clause.and(clause => {
-						clause.in(['bar', 'c'], [1, 2, 3])
-						clause.null(['bar', 'd'])
-						clause.not(clause => clause.null(['bar', 'd']))
-						clause.compareColumns(['bar', 'e'], ConditionBuilder.Operator.lte, ['bar', 'f'])
-					})
-				})
 				await qb.getResult()
 			},
 			sql: SQL`select "foo"."id"
@@ -125,9 +128,10 @@ describe('knex query builder', () => {
 				const builder = wrapper
 					.insertBuilder()
 					.with('root_', qb => {
-						qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
-						qb.select(expr => expr.selectValue(1, 'int'), 'id')
-						qb.select(expr => expr.selectValue(null, 'text'), 'content')
+						return qb
+							.select(expr => expr.selectValue('Hello', 'text'), 'title')
+							.select(expr => expr.selectValue(1, 'int'), 'id')
+							.select(expr => expr.selectValue(null, 'text'), 'content')
 					})
 					.into('author')
 					.values({
@@ -135,7 +139,7 @@ describe('knex query builder', () => {
 						title: expr => expr.select('title'),
 					})
 					.from(qb => {
-						qb.table('root_')
+						return qb.from('root_')
 					})
 					.returning('id')
 					.onConflict(InsertBuilder.ConflictActionType.doNothing)
@@ -161,7 +165,7 @@ describe('knex query builder', () => {
 						title: expr => expr.select('title'),
 					})
 					.from(qb => {
-						qb.table('foo')
+						return qb.from('foo')
 					})
 					.returning('id')
 					.onConflict(InsertBuilder.ConflictActionType.update, ['id'], {
@@ -204,9 +208,10 @@ describe('knex query builder', () => {
 				const qb = wrapper
 					.updateBuilder()
 					.with('root_', qb => {
-						qb.select(expr => expr.selectValue('Hello', 'text'), 'title')
-						qb.select(expr => expr.selectValue(1, 'int'), 'id')
-						qb.select(expr => expr.selectValue(null, 'text'), 'content')
+						return qb
+							.select(expr => expr.selectValue('Hello', 'text'), 'title')
+							.select(expr => expr.selectValue(1, 'int'), 'id')
+							.select(expr => expr.selectValue(null, 'text'), 'content')
 					})
 					.table('author')
 					.values({
@@ -214,8 +219,7 @@ describe('knex query builder', () => {
 						title: expr => expr.select(['root_', 'title']),
 					})
 					.from(qb => {
-						qb.table('root_')
-						qb.where({ foo: 'bar' })
+						return qb.from('root_').where({ foo: 'bar' })
 					})
 					.where({ id: 12 })
 				await qb.execute()
@@ -233,8 +237,7 @@ describe('knex query builder', () => {
 	it('constructs select with condition', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.queryBuilder()
-				qb.select(
+				const qb = wrapper.selectBuilder().select(
 					expr =>
 						expr.selectCondition(condition =>
 							condition.or(condition => {
@@ -275,8 +278,7 @@ describe('knex query builder', () => {
 	it('constructs window function', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.queryBuilder()
-				qb.select(expr =>
+				const qb = wrapper.selectBuilder().select(expr =>
 					expr.window(window =>
 						window
 							.orderBy(['foo', 'bar'], 'desc')
@@ -298,13 +300,14 @@ describe('knex query builder', () => {
 	it('applies limit by group', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.queryBuilder()
-				qb.select(['foo', 'bar'])
-				qb.from('foo')
+				const qb = wrapper
+					.selectBuilder()
+					.select(['foo', 'bar'])
+					.from('foo')
 
 				await new LimitByGroupWrapper(
 					['foo', 'lorem'],
-					orderable => orderable.orderBy(['foo', 'ipsum']),
+					(orderable, qb) => [orderable.orderBy(['foo', 'ipsum']), qb],
 					1,
 					3
 				).getResult(qb)

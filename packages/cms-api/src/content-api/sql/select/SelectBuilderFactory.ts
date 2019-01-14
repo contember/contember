@@ -1,7 +1,7 @@
 import SelectBuilder from './SelectBuilder'
 import SelectHydrator from './SelectHydrator'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
+import DbSelectBuilder from '../../../core/knex/SelectBuilder'
 
 export default interface SelectBuilderFactory {
-	create(qb: QueryBuilder, hydrator: SelectHydrator): SelectBuilder
+	create(qb: DbSelectBuilder, hydrator: SelectHydrator): SelectBuilder
 }

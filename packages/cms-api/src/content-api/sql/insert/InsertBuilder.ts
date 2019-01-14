@@ -5,8 +5,9 @@ import { Value } from '../../../core/knex/types'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import { getColumnName, getColumnType } from '../../../content-schema/modelUtils'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
 import Mapper from '../Mapper'
+import SelectBuilder from '../../../core/knex/SelectBuilder'
+import QueryBuilder from '../../../core/knex/QueryBuilder'
 
 type ColumnValue = {
 	value: PromiseLike<Input.ColumnValue>
@@ -60,15 +61,16 @@ export default class InsertBuilder {
 		const qb = this.db
 			.insertBuilder()
 			.with('root_', qb => {
-				resolvedData.forEach(value =>
-					qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName)
+				return resolvedData.reduce(
+					(qb, value) => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName),
+					qb
 				)
 			})
 			.into(this.entity.tableName)
 			.values(insertData)
 			.from(qb => {
-				qb.from('root_')
-				this.whereBuilder.build(qb, this.entity, new Path([]), this.where)
+				qb = qb.from('root_')
+				return this.whereBuilder.build(qb, this.entity, new Path([]), this.where)
 			})
 			.returning(this.entity.primaryColumn)
 

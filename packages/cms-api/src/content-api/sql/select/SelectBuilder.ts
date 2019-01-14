@@ -4,7 +4,7 @@ import { acceptFieldVisitor, getColumnName } from '../../../content-schema/model
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import WhereBuilder from './WhereBuilder'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
+import DbSelectBuilder from '../../../core/knex/SelectBuilder'
 import OrderByBuilder from './OrderByBuilder'
 import FieldsVisitorFactory from './handlers/FieldsVisitorFactory'
 import LimitByGroupWrapper from '../../../core/knex/LimitByGroupWrapper'
@@ -26,7 +26,7 @@ export default class SelectBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderByBuilder: OrderByBuilder,
 		private readonly metaHandler: MetaHandler,
-		private readonly qb: QueryBuilder,
+		private qb: DbSelectBuilder,
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> }
@@ -44,7 +44,7 @@ export default class SelectBuilder {
 		const promise = this.selectInternal(entity, path, input)
 		const where = input.args.filter
 		if (where) {
-			this.whereBuilder.build(this.qb, entity, path, where)
+			this.qb = this.whereBuilder.build(this.qb, entity, path, where)
 		}
 		const orderBy = input.args.orderBy
 
@@ -54,18 +54,19 @@ export default class SelectBuilder {
 				[path.getAlias(), groupByColumn],
 				(orderable, qb) => {
 					if (orderBy) {
-						this.orderByBuilder.build(this.qb, orderable, entity, new Path([]), orderBy)
+						;[qb, orderable] = this.orderByBuilder.build(this.qb, orderable, entity, new Path([]), orderBy)
 					}
+					return [orderable, qb]
 				},
 				input.args.offset,
 				input.args.limit
 			)
 		} else {
 			if (orderBy) {
-				this.orderByBuilder.build(this.qb, this.qb, entity, path, orderBy)
+				;[this.qb] = this.orderByBuilder.build(this.qb, this.qb, entity, path, orderBy)
 			}
 			if (input.args.limit) {
-				this.qb.limit(input.args.limit, input.args.offset)
+				this.qb = this.qb.limit(input.args.limit, input.args.offset)
 			}
 		}
 
@@ -89,7 +90,7 @@ export default class SelectBuilder {
 					this.hydrator.addPromise(fieldPath, path.for(fieldName), data, defaultValue)
 				},
 				addColumn: (qbCallback, path) => {
-					qbCallback(this.qb)
+					this.qb = qbCallback(this.qb)
 					this.hydrator.addColumn(path || fieldPath)
 				},
 				path: fieldPath,
@@ -124,7 +125,7 @@ export default class SelectBuilder {
 	}
 
 	private async getColumnValues(columnPath: Path, columnName: string): Promise<Input.PrimaryValue[]> {
-		this.qb.select([columnPath.back().getAlias(), columnName], columnPath.getAlias())
+		this.qb = this.qb.select([columnPath.back().getAlias(), columnName], columnPath.getAlias())
 		const rows = await this.rows
 		const columnAlias = columnPath.getAlias()
 		return rows.map(it => it[columnAlias]).filter((val, index, all) => all.indexOf(val) === index)

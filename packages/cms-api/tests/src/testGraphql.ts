@@ -40,13 +40,15 @@ export const executeGraphQlTest = async (connection: knex, test: Test) => {
 			query.response([])
 			return
 		}
-		console.log(query.sql)
+		const actualSql = query.sql.replace(/\s+/g, ' ')
+		console.log(actualSql)
+		console.log(queryDefinition.sql)
 		console.log(query.bindings)
 		if (!queryDefinition) {
 			throw new Error(`Unexpected query #${step} '${query.sql}'`)
 		}
 		try {
-			expect(query.sql.replace(/\s+/g, ' ')).equals(queryDefinition.sql)
+			expect(actualSql).equals(queryDefinition.sql)
 			if (queryDefinition.parameters) {
 				expect(query.bindings.length).equals(queryDefinition.parameters.length)
 				for (let index in queryDefinition.parameters) {

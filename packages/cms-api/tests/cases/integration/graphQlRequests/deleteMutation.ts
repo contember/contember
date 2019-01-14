@@ -30,12 +30,14 @@ describe('Delete mutation', () => {
                      from "public"."post" as "root_" 
                    where "root_"."id" = $1`,
 						parameters: [testUuid(1)],
-						response: [
-							{
-								root_id: testUuid(1),
-								root_author: testUuid(2),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+									root_author: testUuid(2),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -45,12 +47,14 @@ describe('Delete mutation', () => {
                      from "public"."author" as "root_"
                      where "root_"."id" in ($1)`,
 						parameters: [testUuid(2)],
-						response: [
-							{
-								root_id: testUuid(2),
-								root_name: 'John',
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(2),
+									root_name: 'John',
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
@@ -110,11 +114,13 @@ describe('Delete mutation', () => {
                      from "public"."author" as "root_"
                      where "root_"."id" = $1`,
 						parameters: [testUuid(1)],
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
@@ -186,11 +192,13 @@ describe('Delete mutation', () => {
                      from "public"."author" as "root_"
                      where "root_"."id" = $1`,
 						parameters: [testUuid(1)],
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
@@ -269,11 +277,13 @@ describe('Delete mutation', () => {
                      from "public"."post" as "root_" 
                    where "root_"."id" = $1`,
 						parameters: [testUuid(1)],
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`SET CONSTRAINTS ALL DEFERRED`,

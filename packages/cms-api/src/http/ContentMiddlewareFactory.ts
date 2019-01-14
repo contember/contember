@@ -13,6 +13,7 @@ import { GraphQLSchema } from 'graphql'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import { Acl } from 'cms-common'
 import KnexWrapper from '../core/knex/KnexWrapper'
+import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
@@ -73,11 +74,7 @@ class ContentMiddlewareFactory {
 						if (!ctx.state.authResult.valid) {
 							return createGraphqlInvalidAuthResponse(`Auth failure: ${ctx.state.authResult.error}`)
 						}
-						await knexConnection.raw(
-							'SELECT set_config(?, ?, false)',
-							'tenant.identity_id',
-							ctx.state.authResult.identityId
-						)
+						await setupSystemVariables(knexConnection, ctx.state.authResult.identityId)
 
 						ctx.state.timer('fetching project roles and variables')
 

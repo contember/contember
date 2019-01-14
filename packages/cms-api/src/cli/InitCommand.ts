@@ -11,6 +11,7 @@ import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import FileNameHelper from '../migrations/FileNameHelper'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
+import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
 
 const identityId = '11111111-1111-1111-1111-111111111111'
 
@@ -86,7 +87,7 @@ class Initialize {
 	private async runMigrationsForStage(stage: Project.Stage) {
 		await this.projectDb.transaction(async knexConnection => {
 			const knexWrapper = knexConnection.wrapper()
-			await knexWrapper.raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
+			await setupSystemVariables(knexWrapper, identityId)
 
 			const handler = new QueryHandler(
 				new KnexQueryable(knexConnection, {
@@ -188,7 +189,7 @@ class InitCommand extends BaseCommand<Args, {}> {
 					'system'
 				)
 
-				await projectDb.wrapper().raw('SELECT set_config(?, ?, false)', 'tenant.identity_id', identityId)
+				await setupSystemVariables(projectDb.wrapper(), identityId)
 
 				const init = new Initialize(tenantDb, projectDb, project, migrationFilesManager)
 				await init.createOrUpdateProject()

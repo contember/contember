@@ -19,7 +19,7 @@ export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isAc
 	<Button active={isActive} icon={icon} onClick={() => onClick()} />
 )
 
-// This is dumm thing, but slate or slate's typings are bad
+// This is a bad thing, but slate or slate's typings are bad
 export function getSlateController(editor: Editor | ReactEditor, rec: number = 0): Editor {
 	if (typeof (editor as any).controller !== 'undefined' && rec < 5)
 		return getSlateController((editor as ReactEditor).controller, rec + 1)

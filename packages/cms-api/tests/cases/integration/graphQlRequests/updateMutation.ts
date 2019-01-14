@@ -10,7 +10,9 @@ describe('update', () => {
 		sql: SQL`select "root_"."id" as "root_id"
                from "public"."post" as "root_"
                where "root_"."id" = $1`,
-		response: [{ root_id: testUuid(2) }],
+		response: {
+			rows: [{ root_id: testUuid(2) }],
+		},
 		parameters: [testUuid(2)],
 	}
 
@@ -45,7 +47,9 @@ describe('update', () => {
 							sql: SQL`select "root_"."id" as "root_id"
                      from "public"."author" as "root_"
                      where "root_"."id" = $1`,
-							response: [{ root_id: testUuid(1) }],
+							response: {
+								rows: [{ root_id: testUuid(1) }],
+							},
 							parameters: [testUuid(1)],
 						},
 					]),
@@ -188,7 +192,9 @@ describe('update', () => {
                        from "public"."post" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ author_id: testUuid(1) }],
+							response: {
+								rows: [{ author_id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -233,7 +239,9 @@ describe('update', () => {
                        from "public"."post" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ author_id: testUuid(1) }],
+							response: {
+								rows: [{ author_id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as (select
@@ -277,7 +285,9 @@ describe('update', () => {
                        from "public"."post" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -371,7 +381,9 @@ describe('update', () => {
                        from "public"."post" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ author_id: testUuid(1) }],
+							response: {
+								rows: [{ author_id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -502,7 +514,9 @@ describe('update', () => {
                        from "public"."post_locale" as "root_"
                        where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
-							response: [{ id: testUuid(1) }],
+							response: {
+								rows: [{ id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -549,7 +563,9 @@ describe('update', () => {
                        from "public"."post_locale" as "root_"
                        where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
-							response: [{ id: testUuid(1) }],
+							response: {
+								rows: [{ id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -597,7 +613,9 @@ describe('update', () => {
                        from "public"."post_locale" as "root_"
                        where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 							parameters: ['cs', testUuid(2)],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -763,7 +781,9 @@ describe('update', () => {
 			sql: SQL`select "root_"."id" as "root_id"
                from "public"."site" as "root_"
                where "root_"."id" = $1`,
-			response: [{ root_id: testUuid(2) }],
+			response: {
+				rows: [{ root_id: testUuid(2) }],
+			},
 			parameters: [testUuid(2)],
 		}
 
@@ -834,7 +854,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ setting_id: testUuid(1) }],
+							response: {
+								rows: [{ setting_id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -879,7 +901,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(1)],
-							response: [{ id: testUuid(2) }],
+							response: {
+								rows: [{ id: testUuid(2) }],
+							},
 						},
 						selectUpdateSiteSql,
 					]),
@@ -912,7 +936,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(1)],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -958,7 +984,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(1)],
-							response: [{ id: testUuid(3) }],
+							response: {
+								rows: [{ id: testUuid(3) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1017,7 +1045,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ setting_id: testUuid(1) }],
+							response: {
+								rows: [{ setting_id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1062,7 +1092,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1157,7 +1189,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ setting_id: testUuid(1) }],
+							response: {
+								rows: [{ setting_id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1210,7 +1244,9 @@ describe('update', () => {
 			sql: SQL`select "root_"."id" as "root_id"
                from "public"."site_setting" as "root_"
                where "root_"."id" = $1`,
-			response: [{ root_id: testUuid(2) }],
+			response: {
+				rows: [{ root_id: testUuid(2) }],
+			},
 			parameters: [testUuid(2)],
 		}
 
@@ -1232,7 +1268,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(3) }],
+							response: {
+								rows: [{ id: testUuid(3) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1288,7 +1326,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1331,7 +1371,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }],
+							response: {
+								rows: [{ id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1377,7 +1419,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }],
+							response: {
+								rows: [{ id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1423,7 +1467,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 						{
 							sql: SQL`with "root_" as 
@@ -1466,7 +1512,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }],
+							response: {
+								rows: [{ id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1557,7 +1605,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(1) }],
+							response: {
+								rows: [{ id: testUuid(1) }],
+							},
 						},
 						selectUpdateSiteSettingSql,
 					]),
@@ -1590,7 +1640,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1636,7 +1688,9 @@ describe('update', () => {
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = $1`,
 							parameters: [testUuid(2)],
-							response: [{ id: testUuid(3) }],
+							response: {
+								rows: [{ id: testUuid(3) }],
+							},
 						},
 						{
 							sql: SQL`with "newData_" as
@@ -1996,7 +2050,9 @@ describe('update', () => {
 			sql: SQL`select "root_"."id" as "root_id"
                from "public"."category" as "root_"
                where "root_"."id" = $1`,
-			response: [{ root_id: testUuid(2) }],
+			response: {
+				rows: [{ root_id: testUuid(2) }],
+			},
 			parameters: [testUuid(2)],
 		}
 
@@ -2350,7 +2406,9 @@ describe('update', () => {
 							sql: SQL`select "root_"."id" as "root_id"
                      from "public"."author" as "root_"
                      where "root_"."id" = $1`,
-							response: [{ root_id: testUuid(1) }],
+							response: {
+								rows: [{ root_id: testUuid(1) }],
+							},
 							parameters: [testUuid(1)],
 						},
 					]),
@@ -2415,7 +2473,9 @@ describe('update', () => {
 							sql: SQL`select "root_"."id" as "root_id"
                      from "public"."author" as "root_"
                      where "root_"."id" = $1`,
-							response: [{ root_id: testUuid(1) }],
+							response: {
+								rows: [{ root_id: testUuid(1) }],
+							},
 							parameters: [testUuid(1)],
 						},
 					]),
@@ -2521,7 +2581,9 @@ describe('update', () => {
             from (values (null)) as "t" left join "data" as "data" on true
               left join "insert" as "insert" on true`,
 						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(2)],
-						response: [{ selected: true, inserted: true }],
+						response: {
+							rows: [{ selected: true, inserted: true }],
+						},
 					},
 					{
 						sql: SQL`with "data" as
@@ -2544,13 +2606,17 @@ describe('update', () => {
             from (values (null)) as "t" left join "data" as "data" on true
               left join "delete" as "delete" on true`,
 						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(3)],
-						response: [{ selected: true, deleted: true }],
+						response: {
+							rows: [{ selected: true, deleted: true }],
+						},
 					},
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
                      where "root_"."id" = $1`,
-						response: [{ root_id: testUuid(1) }],
+						response: {
+							rows: [{ root_id: testUuid(1) }],
+						},
 						parameters: [testUuid(1)],
 					},
 				]),

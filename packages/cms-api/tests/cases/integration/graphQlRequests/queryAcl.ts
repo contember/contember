@@ -72,20 +72,22 @@ describe('Queries with acl', () => {
                          false as "root__meta_title_updatable"
                        from "public"."post_locale" as "root_"`,
 							parameters: ['cs', 'cs'],
-							response: [
-								{
-									root_id: testUuid(1),
-									root_title: null,
-									root__meta_title_readable: false,
-									root__meta_title_updatable: false,
-								},
-								{
-									root_id: testUuid(2),
-									root_title: 'bar',
-									root__meta_title_readable: true,
-									root__meta_title_updatable: false,
-								},
-							],
+							response: {
+								rows: [
+									{
+										root_id: testUuid(1),
+										root_title: null,
+										root__meta_title_readable: false,
+										root__meta_title_updatable: false,
+									},
+									{
+										root_id: testUuid(2),
+										root_title: 'bar',
+										root__meta_title_readable: true,
+										root__meta_title_updatable: false,
+									},
+								],
+							},
 						},
 					]),
 				],
@@ -141,13 +143,15 @@ describe('Queries with acl', () => {
                        from "public"."post_locale" as "root_"
                        where "root_"."title" = $2 and "root_"."locale" in ($3)`,
 							parameters: ['cs', 'foo', 'cs'],
-							response: [
-								{
-									root_id: testUuid(1),
-									root_title: 'foo',
-									root_title__readable: true,
-								},
-							],
+							response: {
+								rows: [
+									{
+										root_id: testUuid(1),
+										root_title: 'foo',
+										root_title__readable: true,
+									},
+								],
+							},
 						},
 					]),
 				],
@@ -184,11 +188,13 @@ describe('Queries with acl', () => {
                        "root_"."id" as "root_id"
                      from "public"."post_locale" as "root_"`,
 							parameters: [],
-							response: [
-								{
-									root_id: testUuid(1),
-								},
-							],
+							response: {
+								rows: [
+									{
+										root_id: testUuid(1),
+									},
+								],
+							},
 						},
 					]),
 				],
@@ -224,7 +230,9 @@ describe('Queries with acl', () => {
                          case when false then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"`,
 							parameters: [],
-							response: [],
+							response: {
+								rows: [],
+							},
 						},
 					]),
 				],
@@ -260,14 +268,16 @@ describe('Queries with acl', () => {
                          "root_"."id" as "root_id"
                        from "public"."post" as "root_"`,
 							parameters: [],
-							response: [
-								{
-									root_id: testUuid(1),
-								},
-								{
-									root_id: testUuid(2),
-								},
-							],
+							response: {
+								rows: [
+									{
+										root_id: testUuid(1),
+									},
+									{
+										root_id: testUuid(2),
+									},
+								],
+							},
 						},
 						{
 							sql: SQL`select
@@ -277,18 +287,20 @@ describe('Queries with acl', () => {
                        from "public"."post_locale" as "root_"
                        where "root_"."post_id" in ($2, $3) and false`,
 							parameters: ['cs', testUuid(1), testUuid(2)],
-							response: [
-								{
-									__grouping_key: testUuid(1),
-									root_id: testUuid(3),
-									root_title: null,
-								},
-								{
-									__grouping_key: testUuid(2),
-									root_id: testUuid(4),
-									root_title: 'bar',
-								},
-							],
+							response: {
+								rows: [
+									{
+										__grouping_key: testUuid(1),
+										root_id: testUuid(3),
+										root_title: null,
+									},
+									{
+										__grouping_key: testUuid(2),
+										root_id: testUuid(4),
+										root_title: 'bar',
+									},
+								],
+							},
 						},
 					]),
 				],
@@ -393,16 +405,18 @@ describe('Queries with acl', () => {
                          "root_"."author_id" as "root_author"
                        from "public"."post" as "root_"`,
 							parameters: [],
-							response: [
-								{
-									root_id: testUuid(1),
-									root_author: testUuid(3),
-								},
-								{
-									root_id: testUuid(2),
-									root_author: testUuid(4),
-								},
-							],
+							response: {
+								rows: [
+									{
+										root_id: testUuid(1),
+										root_author: testUuid(3),
+									},
+									{
+										root_id: testUuid(2),
+										root_author: testUuid(4),
+									},
+								],
+							},
 						},
 						{
 							sql: SQL`select
@@ -413,12 +427,14 @@ describe('Queries with acl', () => {
                        from "public"."author" as "root_" left join "public"."country" as "root_country" on "root_"."country_id" = "root_country"."id"
                        where "root_"."id" in ($2, $3)`,
 							parameters: ['Czechia', testUuid(3), testUuid(4)],
-							response: [
-								{
-									root_id: testUuid(3),
-									root_name: 'John',
-								},
-							],
+							response: {
+								rows: [
+									{
+										root_id: testUuid(3),
+										root_name: 'John',
+									},
+								],
+							},
 						},
 					]),
 				],

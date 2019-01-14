@@ -23,7 +23,7 @@ describe('Queries', () => {
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
                      where "root_"."id" = $1`,
-						response: [{ root_id: testUuid(1) }],
+						response: { rows: [{ root_id: testUuid(1) }] },
 						parameters: [testUuid(1)],
 					},
 				]),
@@ -66,7 +66,7 @@ describe('Queries', () => {
                      from "public"."post_locale" as "root_"
                      where "root_"."locale" = $1 and "root_"."post_id" = $2`,
 						parameters: ['cs', testUuid(1)],
-						response: [{ root_id: testUuid(2) }],
+						response: { rows: [{ root_id: testUuid(2) }] },
 					},
 				]),
 			],
@@ -99,7 +99,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"
                      where "root_"."id" = $1`,
-						response: [{ root_heading: 'Hello' }],
+						response: { rows: [{ root_heading: 'Hello' }] },
 						parameters: [testUuid(1)],
 					},
 				]),
@@ -145,7 +145,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"`,
-						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+						response: { rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }] },
 					},
 					{
 						sql: SQL`select
@@ -156,11 +156,13 @@ describe('Queries', () => {
                      from "public"."post_locale" as "root_"
                      where "root_"."post_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
-						response: [
-							{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
-							{ root_id: testUuid(4), root_locale: 'en', root_title: 'hello world', __grouping_key: testUuid(1) },
-							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) },
-						],
+						response: {
+							rows: [
+								{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
+								{ root_id: testUuid(4), root_locale: 'en', root_title: 'hello world', __grouping_key: testUuid(1) },
+								{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) },
+							],
+						},
 					},
 				]),
 			],
@@ -223,16 +225,18 @@ describe('Queries', () => {
                 "root_"."author_id" as "root_author"
               from "public"."post" as "root_"
 						`,
-						response: [
-							{
-								root_id: testUuid(1),
-								root_author: testUuid(2),
-							},
-							{
-								root_id: testUuid(3),
-								root_author: testUuid(4),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+									root_author: testUuid(2),
+								},
+								{
+									root_id: testUuid(3),
+									root_author: testUuid(4),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`
@@ -244,16 +248,18 @@ describe('Queries', () => {
               where "root_"."id" in ($1, $2)
 						`,
 						parameters: [testUuid(2), testUuid(4)],
-						response: [
-							{
-								root_id: testUuid(2),
-								root_name: 'John',
-							},
-							{
-								root_id: testUuid(4),
-								root_name: 'Jack',
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(2),
+									root_name: 'John',
+								},
+								{
+									root_id: testUuid(4),
+									root_name: 'Jack',
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -305,7 +311,9 @@ describe('Queries', () => {
                 "root_"."author_id" as "root_author"
               from "public"."post" as "root_"
 						`,
-						response: [],
+						response: {
+							rows: [],
+						},
 					},
 				]),
 			],
@@ -347,18 +355,20 @@ describe('Queries', () => {
                 "root_"."setting_id" as "root_setting"
               from "public"."site" as "root_"`,
 
-						response: [
-							{
-								root_id: testUuid(1),
-								root_name: 'Site 1',
-								root_setting: testUuid(2),
-							},
-							{
-								root_id: testUuid(3),
-								root_name: 'Site 2',
-								root_setting: testUuid(4),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+									root_name: 'Site 1',
+									root_setting: testUuid(2),
+								},
+								{
+									root_id: testUuid(3),
+									root_name: 'Site 2',
+									root_setting: testUuid(4),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`
@@ -370,16 +380,18 @@ describe('Queries', () => {
               where "root_"."id" in ($1, $2)
 						`,
 						parameters: [testUuid(2), testUuid(4)],
-						response: [
-							{
-								root_id: testUuid(2),
-								root_url: 'http://site1.cz',
-							},
-							{
-								root_id: testUuid(4),
-								root_url: 'http://site2.cz',
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(2),
+									root_url: 'http://site1.cz',
+								},
+								{
+									root_id: testUuid(4),
+									root_url: 'http://site2.cz',
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -436,16 +448,18 @@ describe('Queries', () => {
                        "root_"."url" as "root_url",
                        "root_"."id" as "root_id"
                      from "public"."site_setting" as "root_"`,
-						response: [
-							{
-								root_id: testUuid(1),
-								root_url: 'http://site1.cz',
-							},
-							{
-								root_id: testUuid(3),
-								root_url: 'http://site2.cz',
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+									root_url: 'http://site1.cz',
+								},
+								{
+									root_id: testUuid(3),
+									root_url: 'http://site2.cz',
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -455,18 +469,20 @@ describe('Queries', () => {
                      from "public"."site" as "root_"
                      where "root_"."setting_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(3)],
-						response: [
-							{
-								root_id: testUuid(2),
-								root_setting: testUuid(1),
-								root_name: 'Site 1',
-							},
-							{
-								root_id: testUuid(4),
-								root_setting: testUuid(3),
-								root_name: 'Site 2',
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(2),
+									root_setting: testUuid(1),
+									root_name: 'Site 1',
+								},
+								{
+									root_id: testUuid(4),
+									root_setting: testUuid(3),
+									root_name: 'Site 2',
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -532,14 +548,16 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"`,
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-							{
-								root_id: testUuid(2),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+								{
+									root_id: testUuid(2),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -548,24 +566,26 @@ describe('Queries', () => {
                      from "public"."post_categories" as "junction_"
                      where "junction_"."post_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
-						response: [
-							{
-								category_id: testUuid(3),
-								post_id: testUuid(1),
-							},
-							{
-								category_id: testUuid(4),
-								post_id: testUuid(1),
-							},
-							{
-								category_id: testUuid(5),
-								post_id: testUuid(2),
-							},
-							{
-								category_id: testUuid(3),
-								post_id: testUuid(2),
-							},
-						],
+						response: {
+							rows: [
+								{
+									category_id: testUuid(3),
+									post_id: testUuid(1),
+								},
+								{
+									category_id: testUuid(4),
+									post_id: testUuid(1),
+								},
+								{
+									category_id: testUuid(5),
+									post_id: testUuid(2),
+								},
+								{
+									category_id: testUuid(3),
+									post_id: testUuid(2),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -576,20 +596,22 @@ describe('Queries', () => {
                      from "public"."category" as "root_"
                      where "root_"."id" in ($1, $2, $3)`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
-						response: [
-							{
-								root_id: testUuid(3),
-								root_visible: true,
-							},
-							{
-								root_id: testUuid(4),
-								root_visible: true,
-							},
-							{
-								root_id: testUuid(5),
-								root_visible: true,
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(3),
+									root_visible: true,
+								},
+								{
+									root_id: testUuid(4),
+									root_visible: true,
+								},
+								{
+									root_id: testUuid(5),
+									root_visible: true,
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`
@@ -601,23 +623,25 @@ describe('Queries', () => {
               where "root_"."locale" = $1 and "root_"."category_id" in ($2, $3, $4)
 						`,
 						parameters: ['cs', testUuid(3), testUuid(4), testUuid(5)],
-						response: [
-							{
-								root_id: testUuid(6),
-								root_name: 'Kategorie 1',
-								__grouping_key: testUuid(3),
-							},
-							{
-								root_id: testUuid(7),
-								root_name: 'Kategorie 2',
-								__grouping_key: testUuid(4),
-							},
-							{
-								root_id: testUuid(8),
-								root_name: 'Kategorie 3',
-								__grouping_key: testUuid(5),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(6),
+									root_name: 'Kategorie 1',
+									__grouping_key: testUuid(3),
+								},
+								{
+									root_id: testUuid(7),
+									root_name: 'Kategorie 2',
+									__grouping_key: testUuid(4),
+								},
+								{
+									root_id: testUuid(8),
+									root_name: 'Kategorie 3',
+									__grouping_key: testUuid(5),
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -710,14 +734,16 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "public"."category" as "root_"`,
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-							{
-								root_id: testUuid(2),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+								{
+									root_id: testUuid(2),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -726,24 +752,26 @@ describe('Queries', () => {
                      from "public"."post_categories" as "junction_"
                      where "junction_"."category_id" in ($1, $2)`,
 						parameters: [testUuid(1), testUuid(2)],
-						response: [
-							{
-								category_id: testUuid(1),
-								post_id: testUuid(3),
-							},
-							{
-								category_id: testUuid(1),
-								post_id: testUuid(4),
-							},
-							{
-								category_id: testUuid(2),
-								post_id: testUuid(4),
-							},
-							{
-								category_id: testUuid(2),
-								post_id: testUuid(5),
-							},
-						],
+						response: {
+							rows: [
+								{
+									category_id: testUuid(1),
+									post_id: testUuid(3),
+								},
+								{
+									category_id: testUuid(1),
+									post_id: testUuid(4),
+								},
+								{
+									category_id: testUuid(2),
+									post_id: testUuid(4),
+								},
+								{
+									category_id: testUuid(2),
+									post_id: testUuid(5),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -754,20 +782,22 @@ describe('Queries', () => {
                      where "root_"."id" in ($1, $2, $3)
 						`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
-						response: [
-							{
-								root_id: testUuid(3),
-								root_author: testUuid(6),
-							},
-							{
-								root_id: testUuid(4),
-								root_author: testUuid(7),
-							},
-							{
-								root_id: testUuid(5),
-								root_author: testUuid(7),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(3),
+									root_author: testUuid(6),
+								},
+								{
+									root_id: testUuid(4),
+									root_author: testUuid(7),
+								},
+								{
+									root_id: testUuid(5),
+									root_author: testUuid(7),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -778,16 +808,18 @@ describe('Queries', () => {
                      where "root_"."id" in ($1, $2)
 						`,
 						parameters: [testUuid(6), testUuid(7)],
-						response: [
-							{
-								root_id: testUuid(6),
-								root_name: 'John',
-							},
-							{
-								root_id: testUuid(7),
-								root_name: 'Jack',
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(6),
+									root_name: 'John',
+								},
+								{
+									root_id: testUuid(7),
+									root_name: 'Jack',
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -855,14 +887,16 @@ describe('Queries', () => {
                      from "public"."post" as "root_" left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
                      where "root_author"."name" = $1`,
 						parameters: ['John'],
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-							{
-								root_id: testUuid(3),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+								{
+									root_id: testUuid(3),
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -906,14 +940,16 @@ describe('Queries', () => {
                                             from "public"."post" as "root_"
                                             where "root_"."title" = $1)`,
 						parameters: ['Hello'],
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-							{
-								root_id: testUuid(3),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+								{
+									root_id: testUuid(3),
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -956,14 +992,16 @@ describe('Queries', () => {
                                             from "public"."post_categories" as "junction_" inner join "public"."category" as "root_" on "junction_"."category_id" = "root_"."id"
                                             where "root_"."name" = $1)`,
 						parameters: ['Stuff'],
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-							{
-								root_id: testUuid(3),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+								{
+									root_id: testUuid(3),
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -1006,14 +1044,16 @@ describe('Queries', () => {
                                             from "public"."post_categories" as "junction_"
                                             where "junction_"."category_id" in ($1, $2))`,
 						parameters: [testUuid(10), testUuid(11)],
-						response: [
-							{
-								root_id: testUuid(1),
-							},
-							{
-								root_id: testUuid(3),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+								},
+								{
+									root_id: testUuid(3),
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -1063,7 +1103,9 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"`,
-						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+						response: {
+							rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+						},
 					},
 					{
 						sql: SQL`select
@@ -1074,10 +1116,12 @@ describe('Queries', () => {
                      from "public"."post_locale" as "root_"
                      where "root_"."locale" = $1 and "root_"."post_id" in ($2, $3)`,
 						parameters: ['cs', testUuid(1), testUuid(2)],
-						response: [
-							{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
-							{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) },
-						],
+						response: {
+							rows: [
+								{ root_id: testUuid(3), root_locale: 'cs', root_title: 'ahoj svete', __grouping_key: testUuid(1) },
+								{ root_id: testUuid(5), root_locale: 'cs', root_title: 'dalsi clanek', __grouping_key: testUuid(2) },
+							],
+						},
 					},
 				]),
 			],
@@ -1132,16 +1176,18 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."author_id" as "root_author"
                      from "public"."post" as "root_"`,
-						response: [
-							{
-								root_id: testUuid(1),
-								root_author: testUuid(2),
-							},
-							{
-								root_id: testUuid(3),
-								root_author: testUuid(4),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(1),
+									root_author: testUuid(2),
+								},
+								{
+									root_id: testUuid(3),
+									root_author: testUuid(4),
+								},
+							],
+						},
 					},
 					{
 						sql: SQL`select
@@ -1150,11 +1196,13 @@ describe('Queries', () => {
                      from "public"."author" as "root_"
                      where "root_"."id" in ($1, $2) and "root_"."name" = $3`,
 						parameters: [testUuid(2), testUuid(4), 'John'],
-						response: [
-							{
-								root_id: testUuid(2),
-							},
-						],
+						response: {
+							rows: [
+								{
+									root_id: testUuid(2),
+								},
+							],
+						},
 					},
 				]),
 			],
@@ -1206,7 +1254,9 @@ describe('Queries', () => {
                      from "public"."post_locale" as "root_" left join "public"."post" as "root_post" on "root_"."post_id" = "root_post"."id"
                        left join "public"."author" as "root_post_author" on "root_post"."author_id" = "root_post_author"."id"
                      order by "root_post_author"."name" asc, "root_"."id" desc`,
-						response: [{ root_id: testUuid(2) }],
+						response: {
+							rows: [{ root_id: testUuid(2) }],
+						},
 					},
 				]),
 			],
@@ -1243,7 +1293,9 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"`,
-						response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+						response: {
+							rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+						},
 					},
 					{
 						sql: SQL`select
@@ -1253,12 +1305,14 @@ describe('Queries', () => {
                      where "root_"."post_id" in ($1, $2)
                      order by "root_"."id" desc`,
 						parameters: [testUuid(1), testUuid(2)],
-						response: [
-							{ __grouping_key: testUuid(1), root_id: testUuid(3) },
-							{ __grouping_key: testUuid(1), root_id: testUuid(4) },
-							{ __grouping_key: testUuid(2), root_id: testUuid(4) },
-							{ __grouping_key: testUuid(2), root_id: testUuid(5) },
-						],
+						response: {
+							rows: [
+								{ __grouping_key: testUuid(1), root_id: testUuid(3) },
+								{ __grouping_key: testUuid(1), root_id: testUuid(4) },
+								{ __grouping_key: testUuid(2), root_id: testUuid(4) },
+								{ __grouping_key: testUuid(2), root_id: testUuid(5) },
+							],
+						},
 					},
 				]),
 			],
@@ -1324,7 +1378,9 @@ describe('Queries', () => {
                      "root_"."id" as "root_id"
                    from "public"."category" as "root_"`,
 					parameters: [],
-					response: [{ root_id: testUuid(1), root_title: 'Hello' }, { root_id: testUuid(2), root_title: 'World' }],
+					response: {
+						rows: [{ root_id: testUuid(1), root_title: 'Hello' }, { root_id: testUuid(2), root_title: 'World' }],
+					},
 				},
 				{
 					sql: SQL`with "data" as
@@ -1343,12 +1399,14 @@ describe('Queries', () => {
           where
             "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
 					parameters: [testUuid(1), testUuid(2), 'cs', 1, 3],
-					response: [
-						{ category_id: testUuid(1), post_id: testUuid(10) },
-						{ category_id: testUuid(1), post_id: testUuid(11) },
-						{ category_id: testUuid(2), post_id: testUuid(10) },
-						{ category_id: testUuid(2), post_id: testUuid(12) },
-					],
+					response: {
+						rows: [
+							{ category_id: testUuid(1), post_id: testUuid(10) },
+							{ category_id: testUuid(1), post_id: testUuid(11) },
+							{ category_id: testUuid(2), post_id: testUuid(10) },
+							{ category_id: testUuid(2), post_id: testUuid(12) },
+						],
+					},
 				},
 				{
 					sql: SQL`select
@@ -1358,11 +1416,13 @@ describe('Queries', () => {
                    from "public"."post" as "root_"
                    where "root_"."id" in ($1, $2, $3)`,
 					parameters: [testUuid(10), testUuid(11), testUuid(12)],
-					response: [
-						{ root_id: testUuid(12), root_title: 'A' },
-						{ root_id: testUuid(11), root_title: 'B' },
-						{ root_id: testUuid(10), root_title: 'C' },
-					],
+					response: {
+						rows: [
+							{ root_id: testUuid(12), root_title: 'A' },
+							{ root_id: testUuid(11), root_title: 'B' },
+							{ root_id: testUuid(10), root_title: 'C' },
+						],
+					},
 				},
 			]),
 			return: {
@@ -1438,7 +1498,9 @@ describe('Queries', () => {
                      "root_"."id" as "root_id"
                    from "public"."author" as "root_"`,
 					parameters: [],
-					response: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+					response: {
+						rows: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+					},
 				},
 				{
 					sql: SQL`with "data" as
@@ -1457,11 +1519,13 @@ describe('Queries', () => {
           from "data"
           where "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
 					parameters: ['cs', testUuid(1), testUuid(2), 1, 3],
-					response: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(10), root_title: 'A' },
-						{ __grouping_key: testUuid(1), root_id: testUuid(11), root_title: 'B' },
-						{ __grouping_key: testUuid(2), root_id: testUuid(12), root_title: 'C' },
-					],
+					response: {
+						rows: [
+							{ __grouping_key: testUuid(1), root_id: testUuid(10), root_title: 'A' },
+							{ __grouping_key: testUuid(1), root_id: testUuid(11), root_title: 'B' },
+							{ __grouping_key: testUuid(2), root_id: testUuid(12), root_title: 'C' },
+						],
+					},
 				},
 			]),
 			return: {
@@ -1519,7 +1583,9 @@ describe('Queries', () => {
                    limit $1
                    offset $2`,
 					parameters: [3, 2],
-					response: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+					response: {
+						rows: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+					},
 				},
 			]),
 			return: {
@@ -1589,17 +1655,19 @@ describe('Queries', () => {
                      "root_"."id" as "root_id"
                    from "public"."author" as "root_"`,
 					parameters: ['John'],
-					response: [
-						{
-							root_id: testUuid(1),
-							root_idx: testUuid(1),
-							root_name1: 'John',
-							root_name2: 'John',
-							root_meta_name1_readable1: true,
-							root_meta_name1_readable2: true,
-							root_meta_name1_updatable1: false,
-						},
-					],
+					response: {
+						rows: [
+							{
+								root_id: testUuid(1),
+								root_idx: testUuid(1),
+								root_name1: 'John',
+								root_name2: 'John',
+								root_meta_name1_readable1: true,
+								root_meta_name1_readable2: true,
+								root_meta_name1_updatable1: false,
+							},
+						],
+					},
 				},
 			]),
 			return: {
@@ -1663,7 +1731,9 @@ describe('Queries', () => {
                      "root_"."id" as "root_id"
                    from "public"."author" as "root_"`,
 					parameters: [],
-					response: [{ root_id: testUuid(1), root_name: 'John' }],
+					response: {
+						rows: [{ root_id: testUuid(1), root_name: 'John' }],
+					},
 				},
 				{
 					sql: SQL`select
@@ -1673,7 +1743,9 @@ describe('Queries', () => {
                    from "public"."post" as "root_"
                    where "root_"."author_id" in ($1)`,
 					parameters: [testUuid(1)],
-					response: [],
+					response: {
+						rows: [],
+					},
 				},
 			]),
 			return: {
@@ -1720,7 +1792,9 @@ describe('Queries', () => {
                      "root_"."id" as "root_id"
                    from "public"."post" as "root_"`,
 					parameters: [],
-					response: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					response: {
+						rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					},
 				},
 				{
 					sql: SQL`select
@@ -1729,10 +1803,12 @@ describe('Queries', () => {
                    from "public"."post_locale" as "root_"
                    where "root_"."locale" = $1 and "root_"."post_id" in ($2, $3)`,
 					parameters: ['cs', testUuid(1), testUuid(2)],
-					response: [
-						{ root_post: testUuid(1), root_id: testUuid(11) },
-						{ root_post: testUuid(2), root_id: testUuid(12) },
-					],
+					response: {
+						rows: [
+							{ root_post: testUuid(1), root_id: testUuid(11) },
+							{ root_post: testUuid(2), root_id: testUuid(12) },
+						],
+					},
 				},
 			]),
 			return: {

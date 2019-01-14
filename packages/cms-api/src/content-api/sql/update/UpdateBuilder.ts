@@ -68,8 +68,9 @@ export default class UpdateBuilder {
 		const qb = this.db
 			.updateBuilder()
 			.with('newData_', qb => {
-				resolvedData.forEach(value =>
-					qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName)
+				qb = resolvedData.reduce(
+					(qb, value) => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName),
+					qb
 				)
 				const columns = new Set(resolvedData.map(it => it.columnName))
 				const allColumns: string[] = Object.values(
@@ -85,11 +86,13 @@ export default class UpdateBuilder {
 				).filter((it): it is string => it !== null)
 
 				const remainingColumns = allColumns.filter(it => !columns.has(it))
-				qb.from(this.entity.tableName, 'root_')
+				qb = qb.from(this.entity.tableName, 'root_')
 
-				remainingColumns.forEach(columnName => qb.select(['root_', columnName]))
+				qb = remainingColumns.reduce((qb, columnName) => qb.select(['root_', columnName]), qb)
 
-				this.whereBuilder.build(qb, this.entity, new Path([]), this.uniqueWhere)
+				qb = this.whereBuilder.build(qb, this.entity, new Path([]), this.uniqueWhere)
+
+				return qb
 			})
 			.table(this.entity.tableName)
 			.values(
@@ -102,11 +105,12 @@ export default class UpdateBuilder {
 				)
 			)
 			.from(qb => {
-				qb.from('newData_')
-				this.whereBuilder.build(qb, this.entity, new Path([], this.entity.tableName), {
+				qb = qb.from('newData_')
+				qb = this.whereBuilder.build(qb, this.entity, new Path([], this.entity.tableName), {
 					and: [this.uniqueWhere, this.oldWhere],
 				})
-				this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
+				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
+				return qb
 			})
 		return await qb.execute()
 	}

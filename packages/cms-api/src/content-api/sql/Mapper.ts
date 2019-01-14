@@ -5,7 +5,6 @@ import UpdateVisitor from './update/UpdateVisitor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
-import QueryBuilder from '../../core/knex/QueryBuilder'
 import KnexWrapper from '../../core/knex/KnexWrapper'
 import PredicateFactory from '../../acl/PredicateFactory'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
@@ -16,6 +15,7 @@ import PredicatesInjector from '../../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
 import DeleteExecutor from './delete/DeleteExecutor'
+import SelectBuilder from '../../core/knex/SelectBuilder'
 
 class Mapper {
 	constructor(
@@ -35,11 +35,12 @@ class Mapper {
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
-		const qb = this.db.queryBuilder()
+		let qb = this.db
+			.selectBuilder()
+			.from(entity.tableName, 'root_')
+			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		qb.from(entity.tableName, 'root_')
-		qb.select(['root_', columnName])
-		this.whereBuilder.build(qb, entity, new Path([]), expandedWhere)
+		qb = this.whereBuilder.build(qb, entity, new Path([]), expandedWhere)
 		const result = await qb.getResult()
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
@@ -60,12 +61,12 @@ class Mapper {
 		indexBy?: string
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		const hydrator = new SelectHydrator()
-		const qb = this.db.queryBuilder()
+		let qb = this.db.selectBuilder()
 		let indexByAlias: string | null = null
 		if (indexBy) {
 			const path = new Path([])
 			indexByAlias = path.for(indexBy).getAlias()
-			qb.select([path.getAlias(), getColumnName(this.schema, entity, indexBy)], indexByAlias)
+			qb = qb.select([path.getAlias(), getColumnName(this.schema, entity, indexBy)], indexByAlias)
 		}
 		const rows = await this.selectRows(hydrator, qb, entity, input)
 
@@ -78,10 +79,10 @@ class Mapper {
 		relation: Model.JoiningColumnRelation & Model.Relation
 	) {
 		const hydrator = new SelectHydrator()
-		const qb = this.db.queryBuilder()
+		let qb = this.db.selectBuilder()
 		const path = new Path([])
 		const groupingKey = '__grouping_key'
-		qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
+		qb = qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
 
 		const rows = await this.selectRows(hydrator, qb, entity, input, relation.name)
 		return await hydrator.hydrateGroups(rows, groupingKey)
@@ -89,13 +90,13 @@ class Mapper {
 
 	private async selectRows(
 		hydrator: SelectHydrator,
-		qb: QueryBuilder,
+		qb: SelectBuilder,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		groupBy?: string
 	) {
 		const path = new Path([])
-		qb.from(entity.tableName, path.getAlias())
+		qb = qb.from(entity.tableName, path.getAlias())
 
 		const selector = this.selectBuilderFactory.create(qb, hydrator)
 		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input), path, groupBy)

@@ -4,43 +4,63 @@ import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import ConditionBuilder from './ConditionBuilder'
 import { isIt } from '../../../utils/type'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
+import SelectBuilder from '../../../core/knex/SelectBuilder'
 import SqlConditionBuilder from '../../../core/knex/ConditionBuilder'
 
-export default class WhereBuilder {
+class WhereBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly conditionBuilder: ConditionBuilder
 	) {}
 
-	public build(qb: QueryBuilder, entity: Model.Entity, path: Path, where: Input.Where): void {
-		qb.where(clause => this.buildInternal(qb, clause, entity, path, where, false))
+	public build(qb: SelectBuilder, entity: Model.Entity, path: Path, where: Input.Where): SelectBuilder {
+		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)))
+	}
+
+	public buildAdvanced(
+		entity: Model.Entity,
+		path: Path,
+		where: Input.Where,
+		callback: (clauseCb: (clause: SqlConditionBuilder) => void) => SelectBuilder,
+		allowManyJoin: boolean = false
+	): SelectBuilder {
+		const joinList: WhereBuilder.JoinDefinition[] = []
+
+		const qbWithWhere = callback(clause => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
+		return joinList.reduce(
+			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
+			qbWithWhere
+		)
 	}
 
 	public buildInternal(
-		qb: QueryBuilder,
 		whereClause: SqlConditionBuilder,
 		entity: Model.Entity,
 		path: Path,
 		where: Input.Where,
-		allowManyJoin: boolean = false
+		allowManyJoin: boolean,
+		joinList: WhereBuilder.JoinDefinition[]
 	): void {
 		const tableName = path.getAlias()
 
 		if (where.and !== undefined && where.and.length > 0) {
 			const expr = where.and
-			whereClause.and(clause => expr.map((where: Input.Where) => this.buildInternal(qb, clause, entity, path, where)))
+			whereClause.and(clause =>
+				expr.map((where: Input.Where) => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
+			)
 		}
 		if (where.or !== undefined && where.or.length > 0) {
 			const expr = where.or
 			whereClause.and(clause =>
-				expr.map((where: Input.Where) => clause.or(clause => this.buildInternal(qb, clause, entity, path, where)))
+				expr.map((where: Input.Where) =>
+					clause.or(clause => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
+				)
 			)
 		}
 		if (where.not !== undefined) {
 			const expr = where.not
-			whereClause.not(clause => this.buildInternal(qb, clause, entity, path, expr))
+			whereClause.not(clause => this.buildInternal(clause, entity, path, expr, allowManyJoin, joinList))
 		}
 
 		for (const fieldName in where) {
@@ -62,9 +82,9 @@ export default class WhereBuilder {
 					}
 				}
 
-				this.joinBuilder.join(qb, targetPath, entity, relation.name)
+				joinList.push({ path: targetPath, entity, relationName: relation.name })
 
-				this.buildInternal(qb, whereClause, targetEntity, targetPath, relationWhere)
+				this.buildInternal(whereClause, targetEntity, targetPath, relationWhere, allowManyJoin, joinList)
 			}
 
 			acceptFieldVisitor(this.schema, entity, fieldName, {
@@ -106,39 +126,38 @@ export default class WhereBuilder {
 
 					const relationWhere = where[fieldName] as Input.Where
 
-					whereClause.in([tableName, entity.primaryColumn], qb => {
-						qb.select(['root_', targetRelation.joiningColumn.columnName])
-						qb.from(targetEntity.tableName, 'root_')
-						qb.where(clause => this.buildInternal(qb, clause, targetEntity, new Path([]), relationWhere, true))
-					})
+					whereClause.in([tableName, entity.primaryColumn], qb =>
+						qb
+							.select(['root_', targetRelation.joiningColumn.columnName])
+							.from(targetEntity.tableName, 'root_')
+							.where(clause => this.buildInternal(clause, targetEntity, new Path([]), relationWhere, true, joinList))
+					)
 				},
 			})
 		}
 	}
 
 	private createManyHasManySubquery(
-		qb: QueryBuilder,
+		qb: SelectBuilder,
 		relationWhere: Input.Where,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
 		fromSide: 'owner' | 'inversed'
-	) {
+	): SelectBuilder {
 		const fromColumn =
 			fromSide === 'owner' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
 		const toColumn =
 			fromSide === 'owner' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
-		qb.from(joiningTable.tableName, 'junction_')
-		qb.select(['junction_', fromColumn])
+		qb = qb.from(joiningTable.tableName, 'junction_').select(['junction_', fromColumn])
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {
-			qb.where(whereClause => this.conditionBuilder.build(whereClause, 'junction_', toColumn, primaryCondition))
-			return
+			return qb.where(whereClause => this.conditionBuilder.build(whereClause, 'junction_', toColumn, primaryCondition))
 		}
 
-		qb.join(targetEntity.tableName, 'root_', clause =>
+		qb = qb.join(targetEntity.tableName, 'root_', clause =>
 			clause.compareColumns(['junction_', toColumn], SqlConditionBuilder.Operator.eq, ['root_', targetEntity.primary])
 		)
-		qb.where(clause => this.buildInternal(qb, clause, targetEntity, new Path([]), relationWhere, true))
+		return this.buildAdvanced(targetEntity, new Path([]), relationWhere, cb => qb.where(clause => cb(clause)), true)
 	}
 
 	private transformWhereToPrimaryCondition(where: Input.Where, primaryField: string): Input.Condition<never> | null {
@@ -177,3 +196,9 @@ export default class WhereBuilder {
 		return condition
 	}
 }
+
+namespace WhereBuilder {
+	export type JoinDefinition = { path: Path; entity: Model.Entity; relationName: string }
+}
+
+export default WhereBuilder

@@ -30,24 +30,27 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 					: this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
 
 			if (!fieldPredicate || Object.keys(fieldPredicate).length === 0) {
-				qb.select([tableAlias, column.columnName], columnAlias)
+				qb = qb.select([tableAlias, column.columnName], columnAlias)
 			} else {
-				qb.select(
-					expr =>
-						expr.case(caseExpr =>
-							caseExpr
-								.when(
-									whenExpr =>
-										whenExpr.selectCondition(condition =>
-											this.whereBuilder.buildInternal(qb, condition, entity, columnPath.back(), fieldPredicate)
-										),
-									thenExpr => thenExpr.select([tableAlias, column.columnName])
-								)
-								.else(elseExpr => elseExpr.raw('null'))
-						),
-					columnAlias
+				qb = this.whereBuilder.buildAdvanced(entity, columnPath.back(), fieldPredicate, cb =>
+					qb.select(
+						expr =>
+							expr.case(caseExpr =>
+								caseExpr
+									.when(
+										whenExpr =>
+											whenExpr.selectCondition(condition => {
+												cb(condition)
+											}),
+										thenExpr => thenExpr.select([tableAlias, column.columnName])
+									)
+									.else(elseExpr => elseExpr.raw('null'))
+							),
+						columnAlias
+					)
 				)
 			}
+			return qb
 		})
 	}
 

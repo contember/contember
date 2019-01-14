@@ -2,6 +2,7 @@ import * as Knex from 'knex'
 import { Value } from './types'
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
+import SelectBuilder from './SelectBuilder'
 
 type ConditionBuilderCallback = (builder: ConditionBuilder) => void
 
@@ -21,7 +22,7 @@ interface ConditionBuilder {
 
 	in(columnName: QueryBuilder.ColumnIdentifier, values: Value[]): void
 
-	in(columnName: QueryBuilder.ColumnIdentifier, callback: QueryBuilder.Callback): void
+	in(columnName: QueryBuilder.ColumnIdentifier, callback: SelectBuilder.Callback): void
 
 	null(columnName: QueryBuilder.ColumnIdentifier): void
 
@@ -92,11 +93,10 @@ namespace ConditionBuilder {
 			)
 		}
 
-		in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | QueryBuilder.Callback): void {
+		in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | SelectBuilder.Callback): void {
 			if (typeof values === 'function') {
-				const qb = this.wrapper.queryBuilder()
-				values(qb)
-				this.expressions.push(this.wrapper.raw('?? in (?)', QueryBuilder.toFqn(columnName), qb.getSql()))
+				const qb = values(this.wrapper.selectBuilder())
+				this.expressions.push(this.wrapper.raw('?? in (?)', QueryBuilder.toFqn(columnName), qb.createQuery()))
 			} else if (values.length > 0) {
 				const parameters = values.map(() => '?').join(', ')
 				this.expressions.push(this.wrapper.raw(`?? in (${parameters})`, QueryBuilder.toFqn(columnName), ...values))

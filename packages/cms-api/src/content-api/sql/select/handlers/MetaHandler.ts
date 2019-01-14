@@ -35,15 +35,17 @@ class MetaHandler implements SelectExecutionHandler<{}> {
 		}
 		const fieldPredicate = this.predicateFactory.create(entity, operation, [fieldName])
 		context.addColumn(qb => {
-			qb.select(
-				expr =>
-					expr.selectCondition(condition => {
-						this.whereBuilder.buildInternal(qb, condition, entity, path.back(), fieldPredicate)
-						if (condition.isEmpty()) {
-							condition.raw('true')
-						}
-					}),
-				metaPath.getAlias()
+			return this.whereBuilder.buildAdvanced(entity, path.back(), fieldPredicate, cb =>
+				qb.select(
+					expr =>
+						expr.selectCondition(condition => {
+							cb(condition)
+							if (condition.isEmpty()) {
+								condition.raw('true')
+							}
+						}),
+					metaPath.getAlias()
+				)
 			)
 		}, metaPath)
 	}

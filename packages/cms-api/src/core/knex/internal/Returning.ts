@@ -28,7 +28,7 @@ class Returning {
 
 namespace Returning {
 	export interface Aware {
-		returning(column: string | Knex.Raw): any
+		returning(column: QueryBuilder.ColumnIdentifier | Knex.Raw): any
 	}
 
 	export type Result = number | string

@@ -6,6 +6,7 @@ import With from './internal/With'
 import Where from './internal/Where'
 import { assertNever } from 'cms-common'
 import QueryBuilder from './QueryBuilder'
+import { QueryResult } from 'pg'
 
 class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends keyof SelectBuilder<Result, never> = never>
 	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled>> {
@@ -84,7 +85,8 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 	}
 
 	public async getResult(): Promise<Result> {
-		return await this.createQuery()
+		const result: QueryResult = await this.createQuery()
+		return result.rows as any as Result;
 	}
 
 	public createQuery(): Raw {

@@ -1,3 +1,3 @@
 import { simpleMarkConfig } from './utils'
 
-export default simpleMarkConfig('italic', ['em', 'i'])
+export const ITALIC = simpleMarkConfig('italic', ['em', 'i'])

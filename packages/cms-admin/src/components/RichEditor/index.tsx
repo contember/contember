@@ -4,13 +4,12 @@ import { isKeyHotkey } from 'is-hotkey'
 import * as React from 'react'
 import { Editor as CoreEditor, Value } from 'slate'
 import HtmlSerializer from 'slate-html-serializer'
-import { Editor, EditorProps, Plugin, EventHook } from 'slate-react'
-import { BOLD, ITALIC, LINK, RichEditorPluginConfig, UNDERLINED, PARAGRAPH } from './configs'
+import { Editor, Plugin, EventHook } from 'slate-react'
+import { BOLD, ITALIC, LINK, UNDERLINED, PARAGRAPH, HEADING, RichEditorPluginConfig } from './configs'
 import { ActionButton, Toolbar, getSlateController } from './utils'
 import { assertNever } from 'cms-common'
 import JsonSerializer from './JsonSerializer'
-import { List } from 'immutable'
-import { HEADING } from './configs/heading'
+import { IconNames } from '@blueprintjs/icons'
 
 const isBoldHotkey = isKeyHotkey('mod+b')
 const isItalicHotkey = isKeyHotkey('mod+i')
@@ -26,7 +25,7 @@ export enum RichEditorSerializer {
 	JSON
 }
 
-export enum LineBreakBehaviour {
+export enum LineBreakBehavior {
 	NEWLINE = 'newline',
 	NEWBLOCK = 'newblock',
 	DISABLE = 'disable'
@@ -38,7 +37,7 @@ export interface RichEditorProps {
 	onChange: (value: string) => void
 	label?: IFormGroupProps['label']
 	serializer: RichEditorSerializer
-	lineBreakBehaviour: LineBreakBehaviour
+	lineBreakBehavior: LineBreakBehavior
 	defaultBlock: Block
 	blocks: { block: Block; marks?: Mark[] }[]
 }
@@ -84,7 +83,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 	static defaultProps: Partial<RichEditorProps> = {
 		serializer: RichEditorSerializer.JSON,
-		lineBreakBehaviour: LineBreakBehaviour.NEWBLOCK,
+		lineBreakBehavior: LineBreakBehavior.NEWBLOCK,
 		blocks: [{ block: Block.HEADING }, { block: Block.PARAGRAPH, marks: [Mark.BOLD] }]
 	}
 
@@ -106,17 +105,17 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 	private getIcon(node: Mark | Block): IconName {
 		switch (node) {
 			case Mark.BOLD:
-				return 'bold'
+				return IconNames.BOLD
 			case Mark.ITALIC:
-				return 'italic'
+				return IconNames.ITALIC
 			case Mark.UNDERLINED:
-				return 'underline'
+				return IconNames.UNDERLINE
 			case Mark.LINK:
-				return 'link'
+				return IconNames.LINK
 			case Block.HEADING:
-				return 'header'
+				return IconNames.HEADER
 			case Block.PARAGRAPH:
-				return 'paragraph'
+				return IconNames.PARAGRAPH
 			default:
 				return assertNever(node)
 		}
@@ -219,13 +218,13 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			mark = 'underlined'
 		} else if (event.key === 'Enter') {
 			event.preventDefault()
-			switch (this.props.lineBreakBehaviour) {
-				case LineBreakBehaviour.DISABLE:
+			switch (this.props.lineBreakBehavior) {
+				case LineBreakBehavior.DISABLE:
 					break
-				case LineBreakBehaviour.NEWLINE:
+				case LineBreakBehavior.NEWLINE:
 					editor.insertText('\n')
 					break
-				case LineBreakBehaviour.NEWBLOCK:
+				case LineBreakBehavior.NEWBLOCK:
 					if (editor.value.selection.isExpanded) {
 						editor.delete()
 					}
@@ -243,7 +242,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 					}
 					break
 				default:
-					console.error(`Unknown lineBreakBehaviour ${this.props.lineBreakBehaviour} for RichEditor`)
+					assertNever(this.props.lineBreakBehavior)
 					break
 			}
 			return

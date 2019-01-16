@@ -1,3 +1,3 @@
 import { simpleMarkConfig } from './utils'
 
-export default simpleMarkConfig('bold', ['strong', 'b'])
+export const BOLD = simpleMarkConfig('bold', ['strong', 'b'])

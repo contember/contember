@@ -123,7 +123,13 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 	public render() {
 		const { blocks } = this.props
-		const marksToShow = blocks.filter(block => this.isBlockActive(block.block)).flatMap(block => block.marks || [])
+		const [firstBlockMarks, ...otherBlocksMarks] = blocks
+			.filter(block => this.isBlockActive(block.block))
+			.map(block => [...(block.marks || [])].sort())
+		const marksToShow = firstBlockMarks
+			? firstBlockMarks.filter(mark => otherBlocksMarks.every(otherMarks => otherMarks.includes(mark)))
+			: []
+
 		return (
 			<div className="editor">
 				<FormGroup label={this.props.label}>
@@ -208,14 +214,14 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 	private onKeyDown: EventHook = (event_: Event, editor: CoreEditor, next): unknown => {
 		const event = event_ as KeyboardEvent
 
-		let mark
+		let mark: Mark
 
 		if (isBoldHotkey(event)) {
-			mark = 'bold'
+			mark = Mark.BOLD
 		} else if (isItalicHotkey(event)) {
-			mark = 'italic'
+			mark = Mark.ITALIC
 		} else if (isUnderlinedHotkey(event)) {
-			mark = 'underlined'
+			mark = Mark.UNDERLINED
 		} else if (event.key === 'Enter') {
 			event.preventDefault()
 			switch (this.props.lineBreakBehavior) {
@@ -250,8 +256,21 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			return next()
 		}
 
-		event.preventDefault()
-		editor.toggleMark(mark)
+		const currentBlockTypes = editor.value.blocks.toArray().map(block => block.type)
+		const blockDefinitions = currentBlockTypes.map(currentBlock =>
+			this.props.blocks.find(block => block.block === currentBlock)
+		)
+		if (blockDefinitions.every(b => typeof b !== 'undefined' && (b.marks || []).includes(mark))) {
+			event.preventDefault()
+			editor.toggleMark(mark)
+		} else {
+			console.warn(
+				`Mark "${mark}" is not available in at least some of following blocks: ${blockDefinitions
+					.map(block => block && block.block)
+					.join(', ')}.`
+			)
+		}
+
 		return
 	}
 }

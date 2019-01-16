@@ -1,5 +1,5 @@
 import { S3 as AwsS3 } from 'aws-sdk'
-import Project from '../tenant-api/Project'
+import Project from '../config/Project'
 import { uuid } from './uuid'
 import { extension } from 'mime-types'
 

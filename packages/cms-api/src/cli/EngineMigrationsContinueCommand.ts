@@ -1,5 +1,5 @@
 import pgMigrate from 'node-pg-migrate'
-import { DatabaseCredentials } from '../tenant-api/config'
+import { DatabaseCredentials } from '../config/config'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'

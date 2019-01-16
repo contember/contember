@@ -1,55 +1,34 @@
-#!/usr/bin/env node
 import Knex from 'knex'
-import { uuid } from '../utils/uuid'
 import Project from '../config/Project'
 import KnexConnection from '../core/knex/KnexConnection'
-import StageByIdForUpdateQuery from './model/queries/StageByIdForUpdateQuery'
-import KnexQueryable from '../core/knex/KnexQueryable'
-import QueryHandler from '../core/query/QueryHandler'
-import LatestMigrationByCurrentEventQuery from './model/queries/LatestMigrationByCurrentEventQuery'
 import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
-import FileNameHelper from '../migrations/FileNameHelper'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
+import CreateStageCommand from '../system-api/model/commands/CreateStageCommand'
+import CreateInitEventCommand from '../system-api/model/commands/CreateInitEventCommand'
+import CreateProjectCommand from '../tenant-api/model/commands/CreateProjectCommand'
+import StageMigrator from '../system-api/StageMigrator'
+import KnexWrapper from '../core/knex/KnexWrapper'
 
 const identityId = '11111111-1111-1111-1111-111111111111'
 
 class Initialize {
 	constructor(
-		private readonly tenantDb: KnexConnection,
-		private readonly projectDb: KnexConnection,
+		private readonly tenantDb: KnexWrapper,
+		private readonly projectDb: KnexWrapper,
 		private readonly project: Project,
 		private readonly migrationFilesManager: MigrationFilesManager
 	) {}
 
 	public async createOrUpdateProject() {
-		await this.tenantDb.wrapper().raw(
-			`
-			INSERT INTO tenant.project (id, name, slug)
-			VALUES (?, ?, ?)
-			ON CONFLICT (id) DO UPDATE
-			SET name = ?, slug = ?
-		`,
-			this.project.uuid,
-			this.project.name,
-			this.project.slug,
-			this.project.name,
-			this.project.slug
-		)
+		new CreateProjectCommand(this.project).execute(this.tenantDb)
 		console.log(`Project ${this.project.slug} updated`)
 	}
 
 	public async createInitEvent() {
-		const res = await this.projectDb.wrapper().raw(
-			`
-			INSERT INTO system.event (id, type, data, previous_id)
-			VALUES (?, 'init', '{}'::jsonb, NULL)
-			ON CONFLICT ON CONSTRAINT unique_init DO NOTHING
-		`,
-			uuid()
-		)
-		if (res.rowCount) {
+		const rowCount = new CreateInitEventCommand().execute(this.projectDb)
+		if (rowCount) {
 			console.log(`Created init event for project ${this.project.slug}`)
 		}
 	}
@@ -64,93 +43,28 @@ class Initialize {
 	}
 
 	private async createStage(stage: Project.Stage) {
-		await this.projectDb.transaction(async connection => {
-			const initEvent = await connection
-				.knex('system.event')
-				.where('type', 'init')
-				.first()
-			await connection.knex.raw(
-				`
-				INSERT INTO system.stage (id, name, slug, event_id)
-				VALUES (:uuid, :name, :slug, :eventId)
-				ON CONFLICT (id) DO UPDATE
-				SET name = :name, slug = :slug
-			`,
-				{
-					...(stage as any),
-					eventId: initEvent.id,
-				}
-			)
-			await connection.wrapper().raw('CREATE SCHEMA IF NOT EXISTS ??', 'stage_' + stage.slug)
+		await this.projectDb.transaction(async wrapper => {
+			await new CreateStageCommand(stage).execute(wrapper)
 			console.log(`Updated stage ${stage.slug} of project ${this.project.slug}`)
 		})
 	}
 
 	private async runMigrationsForStage(stage: Project.Stage) {
-		await this.projectDb.transaction(async knexConnection => {
-			const knexWrapper = knexConnection.wrapper()
-			await setupSystemVariables(knexWrapper, identityId)
-
-			const handler = new QueryHandler(
-				new KnexQueryable(knexConnection, {
-					get(): QueryHandler<KnexQueryable> {
-						return handler
-					},
-				})
-			)
-
-			const currentStageRow = (await handler.fetch(new StageByIdForUpdateQuery(stage.uuid)))!
-			const currentMigration = await handler.fetch(new LatestMigrationByCurrentEventQuery(currentStageRow.event_id))
-			const currentMigrationFile = currentMigration === null ? '' : currentMigration.data.file
-			const currentVersion = currentMigrationFile.substring(0, FileNameHelper.prefixLength)
-			if (currentVersion > `${stage.migration}`) {
-				throw new Error(
-					`Cannot revert to migration ${stage.migration} in project ${this.project.slug} (stage ${
-						stage.slug
-					}). Current migration is ${currentMigrationFile}`
-				)
-			}
-
-			const migrations = await this.migrationFilesManager.readFiles(
-				'sql',
-				version => version >= currentVersion && version <= stage.migration
-			)
-			if (!migrations.find(({ version }) => version === stage.migration)) {
-				throw new Error(
-					`Migration ${stage.migration} does not exist in project ${this.project.slug} (stage ${stage.slug})`
-				)
-			}
-
-			const migrationsToExecute = migrations.filter(({ version }) => version > currentVersion)
-
-			await knexWrapper.raw('SET search_path TO ??', 'stage_' + stage.slug)
-
-			if (migrationsToExecute.length === 0) {
-				console.log(`No migrations to execute for project ${this.project.slug} (stage ${stage.slug})`)
-				return
-			}
-
-			let previousId = currentStageRow.event_id
-			for (const { filename, content } of migrationsToExecute) {
+		await setupSystemVariables(this.projectDb, identityId)
+		try {
+			const result = await new StageMigrator(this.migrationFilesManager).migrate(stage, this.projectDb, filename =>
 				console.log(`Executing migration ${filename} for project ${this.project.slug} (stage ${stage.slug})`)
-				await knexWrapper.raw(content)
-				const newId = uuid()
-				await knexConnection.knex('system.event').insert({
-					id: newId,
-					type: 'run_migration',
-					data: {
-						file: filename,
-					},
-					previous_id: previousId,
-				})
-				previousId = newId
-			}
+			)
 
-			await knexConnection
-				.knex('system.stage')
-				.where('id', stage.uuid)
-				.update({ event_id: previousId })
-		})
+			if (result.count === 0) {
+				console.log(`No migrations to execute for project ${this.project.slug} (stage ${stage.slug})`)
+			}
+		} catch (e) {
+			if (e instanceof StageMigrator.MigrationError) {
+				e.message = `${this.project.name} - ${stage.name}: ${e.message}`
+			}
+			throw e
+		}
 	}
 }
 
@@ -174,7 +88,7 @@ class InitCommand extends BaseCommand<Args, {}> {
 				connection: config.tenant.db,
 			}),
 			'tenant'
-		)
+		).wrapper()
 
 		await Promise.all(
 			config.projects.map(async project => {
@@ -189,9 +103,9 @@ class InitCommand extends BaseCommand<Args, {}> {
 						connection: project.dbCredentials,
 					}),
 					'system'
-				)
+				).wrapper()
 
-				await setupSystemVariables(projectDb.wrapper(), identityId)
+				await setupSystemVariables(projectDb, identityId)
 
 				const init = new Initialize(tenantDb, projectDb, project, migrationFilesManager)
 				await init.createOrUpdateProject()

@@ -50,7 +50,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
 		type: InsertBuilder.ConflictActionType.doNothing,
-		target?: InsertBuilder.ConflictTarget,
+		target?: InsertBuilder.ConflictTarget
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
 		type: InsertBuilder.ConflictActionType,
@@ -219,8 +219,8 @@ namespace InsertBuilder {
 	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value }
 
 	export type ConflictAction =
-		| { type: ConflictActionType.doNothing, target?: ConflictTarget }
-		| { type: ConflictActionType.update, values: Values, target: ConflictTarget }
+		| { type: ConflictActionType.doNothing; target?: ConflictTarget }
+		| { type: ConflictActionType.update; values: Values; target: ConflictTarget }
 
 	export type IndexColumns = string[]
 	export type ConflictTarget = IndexColumns | { constraint: string }

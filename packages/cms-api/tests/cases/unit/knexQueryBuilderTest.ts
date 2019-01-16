@@ -193,7 +193,7 @@ describe('knex query builder', () => {
 					.values({
 						id: expr => expr.selectValue('123'),
 					})
-					.onConflict(InsertBuilder.ConflictActionType.doNothing, {constraint: 'bar'})
+					.onConflict(InsertBuilder.ConflictActionType.doNothing, { constraint: 'bar' })
 				await builder.execute()
 			},
 			sql: SQL`insert into "public"."author" ("id")

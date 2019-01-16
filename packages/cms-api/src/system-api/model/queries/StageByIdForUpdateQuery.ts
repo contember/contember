@@ -8,10 +8,15 @@ class StageByIdForUpdateQuery extends KnexQuery<StageByIdForUpdateQuery.Result> 
 
 	async fetch(queryable: KnexQueryable): Promise<StageByIdForUpdateQuery.Result> {
 		const rows = await queryable
-			.createQueryBuilder()
-			.select('id', 'name', 'slug', 'event_id')
-			.from('system.stage')
-			.where('id', this.stageId)
+			.createWrapper()
+			.selectBuilder<StageByIdForUpdateQuery.Result[]>()
+			.select('id')
+			.select('name')
+			.select('slug')
+			.select('event_id')
+			.from('stage')
+			.where({ id: this.stageId })
+			.getResult()
 
 		return this.fetchOneOrNull(rows)
 	}

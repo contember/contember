@@ -6,6 +6,7 @@ import Returning from './internal/Returning'
 import With from './internal/With'
 import SelectBuilder from './SelectBuilder'
 import QueryBuilder from './QueryBuilder'
+import { assertNever } from 'cms-common'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
 	implements With.Aware {
@@ -48,7 +49,8 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		values: InsertBuilder.Values
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
-		type: InsertBuilder.ConflictActionType.doNothing
+		type: InsertBuilder.ConflictActionType.doNothing,
+		target?: InsertBuilder.ConflictTarget,
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
 		type: InsertBuilder.ConflictActionType,
@@ -59,7 +61,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		if (type === InsertBuilder.ConflictActionType.update && values && target) {
 			conflictAction = { type, values, target }
 		} else if (type === InsertBuilder.ConflictActionType.doNothing) {
-			conflictAction = { type }
+			conflictAction = { type, target }
 		} else {
 			throw Error()
 		}
@@ -120,23 +122,28 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		let bindings = qbSql.bindings
 
 		if (this.options.onConflict) {
+			sql += ' on conflict'
+			if (!this.options.onConflict.target) {
+			} else if (Array.isArray(this.options.onConflict.target)) {
+				sql += ' (' + this.options.onConflict.target.map(() => '??').join(', ') + ')'
+				bindings.push(...this.options.onConflict.target);
+			} else if (this.options.onConflict.target.constraint) {
+				sql += ' on constraint ??'
+				bindings.push(this.options.onConflict.target.constraint)
+			}
+
 			switch (this.options.onConflict.type) {
 				case InsertBuilder.ConflictActionType.doNothing:
-					sql += ' on conflict do nothing'
+					sql += ' do nothing'
 					break
 				case InsertBuilder.ConflictActionType.update:
 					const values = this.getColumnValues(this.options.onConflict.values)
 					const updateExpr = Object.keys(values).join(' = ?, ') + ' = ?'
-					sql += ' on conflict (?) do update set ' + updateExpr
-					const indexExpr = this.wrapper.raw(
-						this.options.onConflict.target.map(() => '??').join(', '),
-						...this.options.onConflict.target
-					)
-					bindings.push(indexExpr)
+					sql += '  do update set ' + updateExpr
 					bindings.push(...Object.values(values))
 					break
 				default:
-					throw Error()
+					assertNever(this.options.onConflict)
 			}
 		}
 		const [sqlWithReturning, bindingsWithReturning] = this.options.returning.modifyQuery(sql, bindings)
@@ -212,11 +219,11 @@ namespace InsertBuilder {
 	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value }
 
 	export type ConflictAction =
-		| { type: ConflictActionType.doNothing }
-		| { type: ConflictActionType.update; values: Values; target: ConflictTarget }
+		| { type: ConflictActionType.doNothing, target?: ConflictTarget }
+		| { type: ConflictActionType.update, values: Values, target: ConflictTarget }
 
 	export type IndexColumns = string[]
-	export type ConflictTarget = IndexColumns
+	export type ConflictTarget = IndexColumns | { constraint: string }
 }
 
 export default InsertBuilder

@@ -4,6 +4,9 @@ import InsertBuilder from './InsertBuilder'
 import DeleteBuilder from './DeleteBuilder'
 import UpdateBuilder from './UpdateBuilder'
 import SelectBuilder from './SelectBuilder'
+import QueryHandler from '../query/QueryHandler'
+import KnexQueryable from './KnexQueryable'
+import KnexConnection from './KnexConnection'
 
 export default class KnexWrapper {
 	constructor(public readonly knex: Knex, public readonly schema: string) {}
@@ -30,5 +33,16 @@ export default class KnexWrapper {
 
 	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Raw {
 		return this.knex.raw(sql, bindings as any) as Raw
+	}
+
+	createQueryHandler(): QueryHandler<KnexQueryable> {
+		const handler = new QueryHandler(
+			new KnexQueryable(new KnexConnection(this.knex, this.schema), {
+				get(): QueryHandler<KnexQueryable> {
+					return handler
+				},
+			})
+		)
+		return handler
 	}
 }

@@ -28,13 +28,14 @@ import AccessEvaluator from './core/authorization/AccessEvalutator'
 import PermissionsFactory from './tenant-api/model/authorization/PermissionsFactory'
 import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
+import ProjectSchemaInfo from './config/ProjectSchemaInfo'
 import KnexDebugger from './core/knex/KnexDebugger'
 import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
 import ContentApolloServerFactory from './http/ContentApolloServerFactory'
 import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
 
 export type ProjectContainer = Container<{
-	project: Project
+	project: ProjectSchemaInfo & Project
 	knexConnection: knex
 	graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
 	graphQlSchemaFactory: GraphQlSchemaFactory
@@ -44,7 +45,7 @@ export type ProjectContainer = Container<{
 }>
 
 class CompositionRoot {
-	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<Project>): Koa {
+	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<ProjectSchemaInfo & Project>): Koa {
 		const tenantContainer = this.createTenantContainer(tenantDbCredentials)
 		const projectContainers = this.createProjectContainers(projects)
 
@@ -83,8 +84,8 @@ class CompositionRoot {
 		return masterContainer.get('koa')
 	}
 
-	createProjectContainers(projects: Array<Project>): ProjectContainer[] {
-		return projects.map((project: Project) => {
+	createProjectContainers(projects: Array<ProjectSchemaInfo & Project>): ProjectContainer[] {
+		return projects.map((project: ProjectSchemaInfo & Project) => {
 			return new Container.Builder({})
 				.addService('project', () => project)
 				.addService('knexDebugger', () => new KnexDebugger())

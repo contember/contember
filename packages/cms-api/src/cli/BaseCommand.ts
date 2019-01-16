@@ -1,5 +1,5 @@
 import Command from '../core/cli/Command'
-import { Config, readConfig } from '../tenant-api/config'
+import { Config, readConfig } from '../config/config'
 
 interface GlobalOptions {
 	workingDirectory: string

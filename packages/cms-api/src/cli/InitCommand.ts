@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import Knex from 'knex'
 import { uuid } from '../utils/uuid'
-import Project from '../tenant-api/Project'
+import Project from '../config/Project'
 import KnexConnection from '../core/knex/KnexConnection'
 import StageByIdForUpdateQuery from './model/queries/StageByIdForUpdateQuery'
 import KnexQueryable from '../core/knex/KnexQueryable'

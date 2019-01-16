@@ -183,6 +183,26 @@ describe('knex query builder', () => {
 			parameters: ['123', '123'],
 		})
 	})
+
+	it('constructs insert with on conflict do nothing', async () => {
+		await execute({
+			query: async wrapper => {
+				const builder = wrapper
+					.insertBuilder()
+					.into('author')
+					.values({
+						id: expr => expr.selectValue('123'),
+					})
+					.onConflict(InsertBuilder.ConflictActionType.doNothing, {constraint: 'bar'})
+				await builder.execute()
+			},
+			sql: SQL`insert into "public"."author" ("id")
+			         values ($1)
+			         on conflict on constraint "bar" do nothing`,
+			parameters: ['123'],
+		})
+	})
+
 	it('constructs simple update', async () => {
 		await execute({
 			query: async wrapper => {

@@ -1,5 +1,3 @@
-import { Schema } from 'cms-common'
-
 interface Project {
 	readonly uuid: string
 	readonly slug: string
@@ -14,8 +12,7 @@ namespace Project {
 		readonly uuid: string
 		readonly slug: string
 		readonly name: string
-		readonly schema: Schema
-		readonly migration: string
+		readonly migration?: string
 	}
 
 	export interface DatabaseCredentials {

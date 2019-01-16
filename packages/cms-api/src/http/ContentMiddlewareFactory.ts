@@ -14,6 +14,10 @@ import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import { Acl, Model } from 'cms-common'
 import KnexWrapper from '../core/knex/KnexWrapper'
 import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
+import LatestMigrationByStageQuery from '../system-api/model/queries/LatestMigrationByStageQuery'
+import FileNameHelper from '../migrations/FileNameHelper'
+import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
+import { emptySchema } from '../content-schema/modelUtils'
 import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
 import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
 import KnexDebugger from '../core/knex/KnexDebugger'
@@ -78,6 +82,14 @@ class ContentMiddlewareFactory {
 							return createGraphqlInvalidAuthResponse(`Auth failure: ${ctx.state.authResult.error}`)
 						}
 						await setupSystemVariables(knexConnection, ctx.state.authResult.identityId)
+						const queryHandler = knexConnection.createQueryHandler()
+						const currentMigration = (await queryHandler.fetch(new LatestMigrationByStageQuery(stage.uuid))) // todo cache
+
+						const model = currentMigration ? project.migrations
+								.filter(({ version }) => version <= FileNameHelper.extractVersion(currentMigration.data.file))
+								.map(({ diff }) => diff)
+								.reduce<Model.Schema>((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
+							: emptySchema
 
 						ctx.state.timer('fetching project roles and variables')
 
@@ -91,7 +103,10 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('building schema')
 
 						const globalRoles = ctx.state.authResult.roles
-						const [dataSchema, permissions] = projectContainer.get('graphQlSchemaFactory').create(stage.schema, {
+						const [dataSchema, permissions] = projectContainer.get('graphQlSchemaFactory').create({
+							acl: project.acl,
+							model,
+						}, {
 							projectRoles: projectRoles.roles,
 							globalRoles: globalRoles,
 						})
@@ -100,11 +115,13 @@ class ContentMiddlewareFactory {
 
 						const apolloKoa = new Koa()
 						ctx.state.timer('creating graphql server')
-						;(ctx.state as any).projectVariables = projectVariables
-						;(ctx.state as any).schema = stage.schema.model
-						;(ctx.state as any).permissions = permissions
-
-						const server = projectContainer.get('apolloServerFactory').create(dataSchema)
+						const server = this.createApolloServer(
+							dataSchema,
+							projectVariables,
+							model,
+							permissions,
+							projectContainer.get('knexDebugger')
+						)
 						ctx.state.timer('applying middleware')
 						server.applyMiddleware({
 							app: apolloKoa,
@@ -122,6 +139,40 @@ class ContentMiddlewareFactory {
 			)
 
 			await koaCompose<any>(contentKoa.middleware)(ctx, next)
+		})
+	}
+
+	private createApolloServer(
+		dataSchema: GraphQLSchema,
+		variables: Acl.VariablesMap,
+		schema: Model.Schema,
+		permissions: Acl.Permissions,
+		knexDebugger: KnexDebugger
+	) {
+		return new ApolloServer({
+			tracing: true,
+			introspection: true,
+			schema: dataSchema,
+			uploads: false,
+			extensions: [
+				() => {
+					const queriesExt = new DbQueriesExtension()
+					knexDebugger.subscribe(query => queriesExt.addQuery(query))
+					return queriesExt
+				},
+			],
+			context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {
+				const executionContainer = new ExecutionContainerFactory(schema, permissions).create({
+					db: ctx.state.db,
+					identityVariables: variables,
+				})
+				return {
+					db: ctx.state.db,
+					identityVariables: variables,
+					executionContainer,
+				}
+			},
+			playground: false,
 		})
 	}
 }

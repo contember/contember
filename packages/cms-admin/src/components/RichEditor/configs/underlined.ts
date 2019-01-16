@@ -1,3 +1,3 @@
 import { simpleMarkConfig } from './utils'
 
-export default simpleMarkConfig('underlined', ['u'])
+export const UNDERLINED = simpleMarkConfig('underlined', ['u'])

@@ -1,7 +1,7 @@
 import { Editor, Value } from 'slate'
 import { RichEditorPluginConfig, simpleMarkPlugin, simpleHtmlSerializerRule } from './utils'
 
-const LINK: RichEditorPluginConfig = {
+export const LINK: RichEditorPluginConfig = {
 	node: 'mark',
 	type: 'link',
 	plugin: simpleMarkPlugin('link', 'a', ['href']),
@@ -37,5 +37,3 @@ const LINK: RichEditorPluginConfig = {
 		return editor
 	}
 }
-
-export default LINK

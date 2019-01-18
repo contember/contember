@@ -15,7 +15,7 @@ export default class KnexWrapper {
 		return await this.knex.transaction(knex => transactionScope(new KnexWrapper(knex, this.schema)))
 	}
 
-	selectBuilder<Result = { [columnName: string]: any }[]>(): SelectBuilder<Result, never> {
+	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result, never> {
 		return SelectBuilder.create<Result>(this)
 	}
 

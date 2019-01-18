@@ -15,7 +15,7 @@ class LimitByGroupWrapper {
 		private readonly limit: number | undefined
 	) {}
 
-	public async getResult<R>(qb: SelectBuilder<R>): Promise<R> {
+	public async getResult<R>(qb: SelectBuilder<R>): Promise<R[]> {
 		if (this.limit !== undefined || this.skip !== undefined) {
 			qb = qb.select(
 				expr =>

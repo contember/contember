@@ -340,4 +340,19 @@ describe('knex query builder', () => {
 			parameters: [1, 4],
 		})
 	})
+
+	it('select with no key update', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper.selectBuilder()
+					.select('id')
+					.from('foo')
+					.lock(SelectBuilder.LockType.forNoKeyUpdate)
+
+				await qb.getResult()
+			},
+			sql: SQL`select "id" from "public"."foo" for no key update`,
+			parameters: [],
+		})
+	})
 })

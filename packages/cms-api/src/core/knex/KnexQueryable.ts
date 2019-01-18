@@ -4,6 +4,7 @@ import KnexConnection from './KnexConnection'
 import QueryHandlerAccessor from '../query/QueryHandlerAccessor'
 import Knex from 'knex'
 import KnexWrapper from './KnexWrapper'
+import SelectBuilder from './SelectBuilder'
 
 export default class KnexQueryable implements Queryable<KnexQueryable> {
 	constructor(
@@ -17,6 +18,10 @@ export default class KnexQueryable implements Queryable<KnexQueryable> {
 
 	createQueryBuilder(): Knex.QueryBuilder {
 		return this.db.queryBuilder()
+	}
+
+	createSelectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result> {
+		return this.createWrapper().selectBuilder<Result>();
 	}
 
 	createWrapper(): KnexWrapper {

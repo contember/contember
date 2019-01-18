@@ -8,7 +8,7 @@ import { assertNever } from 'cms-common'
 import QueryBuilder from './QueryBuilder'
 import { QueryResult } from 'pg'
 
-class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends keyof SelectBuilder<Result, never> = never>
+class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder<Result, never> = never>
 	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled>> {
 	constructor(
 		public readonly wrapper: KnexWrapper,
@@ -16,7 +16,7 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 		private readonly cteAliases: string[] = []
 	) {}
 
-	public static create<Result = { [columnName: string]: any }[]>(wrapper: KnexWrapper): SelectBuilder<Result, never> {
+	public static create<Result = SelectBuilder.Result>(wrapper: KnexWrapper): SelectBuilder<Result, never> {
 		return new SelectBuilder(wrapper, {
 			from: undefined,
 			orderBy: [],
@@ -25,6 +25,7 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 			select: [],
 			with: new With.Statement(wrapper, {}),
 			where: new Where.Statement(wrapper, []),
+			lock: undefined,
 			meta: {},
 		})
 	}
@@ -81,6 +82,10 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 		return this.withOption('limit', [limit, offset || 0])
 	}
 
+	public lock(type: SelectBuilder.LockType): SelectBuilder<Result, Filled | 'lock'> {
+		return this.withOption('lock', type)
+	}
+
 	public meta(key: string, value: any): SelectBuilder<Result, Filled | 'meta'> {
 		return this.withOption('meta', { ...this.options.meta, [key]: value })
 	}
@@ -89,9 +94,9 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 		return this.wrapper.raw(sql, ...bindings)
 	}
 
-	public async getResult(): Promise<Result> {
+	public async getResult(): Promise<Result[]> {
 		const result: QueryResult = await this.createQuery()
-		return (result.rows as any) as Result
+		return (result.rows as any) as Result[]
 	}
 
 	public createQuery(): Raw {
@@ -128,8 +133,27 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 
 		this.options.orderBy.forEach(([column, direction]) => qb.orderBy(column, direction))
 
-		const sql = qb.toSQL()
-		return this.wrapper.raw(sql.sql, ...sql.bindings).options({ meta: this.options.meta })
+		let { sql, bindings } = qb.toSQL()
+		if (this.options.lock !== undefined) {
+			switch (this.options.lock) {
+				case SelectBuilder.LockType.forUpdate:
+					sql += ' for update'
+					break
+				case SelectBuilder.LockType.forNoKeyUpdate:
+					sql += ' for no key update'
+					break
+				case SelectBuilder.LockType.forShare:
+					sql += ' for share'
+					break
+				case SelectBuilder.LockType.forKeyShare:
+					sql += ' for key share'
+					break
+				default:
+					assertNever(this.options.lock)
+			}
+		}
+
+		return this.wrapper.raw(sql, ...bindings).options({ meta: this.options.meta })
 	}
 
 	private buildJoinArguments(
@@ -185,7 +209,7 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 namespace SelectBuilder {
 	export type Callback = (qb: SelectBuilder<any, any>) => SelectBuilder<any, any>
 
-	export type Result = { [columnName: string]: any }[]
+	export type Result = { [columnName: string]: any }
 
 	export type Options = With.Options &
 		Where.Options & {
@@ -199,8 +223,16 @@ namespace SelectBuilder {
 				alias: string | undefined
 				condition: JoinCondition | undefined
 			})[]
+			lock?: LockType
 			meta: Record<string, any>
 		}
+
+	export enum LockType {
+		forUpdate = 'forUpdate',
+		forNoKeyUpdate = 'forNoKeyUpdate',
+		forShare = 'forShare',
+		forKeyShare = 'forKeyShare',
+	}
 
 	export type JoinCondition = (joinClause: ConditionBuilder) => void
 }

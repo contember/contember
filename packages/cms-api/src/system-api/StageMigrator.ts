@@ -1,7 +1,7 @@
 import FileNameHelper from '../migrations/FileNameHelper'
 import Project from '../config/Project'
 import KnexWrapper from '../core/knex/KnexWrapper'
-import StageByIdForUpdateQuery from './model/queries/StageByIdForUpdateQuery'
+import StageByIdQuery from './model/queries/StageByIdQuery'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import UpdateStageEventCommand from './model/commands/UpdateStageEventCommand'
 import CreateEventCommand from './model/commands/CreateEventCommand'
@@ -24,7 +24,7 @@ class StageMigrator {
 				return { count: 0 }
 			}
 
-			const currentStageRow = (await handler.fetch(new StageByIdForUpdateQuery(stage.uuid)))!
+			const currentStageRow = (await handler.fetch(new StageByIdQuery(stage.uuid, true)))!
 			const currentMigration = await handler.fetch(new LatestMigrationByStageQuery(stage.uuid))
 			const currentMigrationFile = currentMigration === null ? '' : currentMigration.data.file
 			const currentVersion = FileNameHelper.extractVersion(currentMigrationFile)

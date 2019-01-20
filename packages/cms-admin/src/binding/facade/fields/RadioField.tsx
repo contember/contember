@@ -3,6 +3,7 @@ import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Props, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
+import { Component } from '../Component'
 import { ChoiceField, ChoiceFieldStaticProps } from './ChoiceField'
 
 export interface RadioFieldPublicProps {
@@ -23,44 +24,36 @@ export interface RadioFieldDynamicProps {
 
 export type RadioFieldProps = RadioFieldPublicProps & (RadioFieldStaticProps | RadioFieldDynamicProps)
 
-class RadioField extends React.Component<RadioFieldProps> {
-	public static displayName = 'RadioField'
+class RadioField extends Component<RadioFieldProps>(props => {
+	const restProps =
+		'options' in props
+			? {
+					options: props.options
+			  }
+			: {
+					entityName: props.entityName,
+					optionFieldName: props.optionFieldName,
+					filter: props.filter
+			  }
 
-	public render() {
-		const restProps =
-			'options' in this.props
-				? {
-						options: this.props.options
-				  }
-				: {
-						entityName: this.props.entityName,
-						optionFieldName: this.props.optionFieldName,
-						filter: this.props.filter
-				  }
-
-		return (
-			<ChoiceField name={this.props.name} {...restProps}>
-				{(data, currentValue, onChange, environment) => {
-					return (
-						<RadioField.RadioFieldInner
-							name={this.props.name}
-							label={this.props.label}
-							inline={this.props.inline}
-							data={data}
-							currentValue={currentValue}
-							onChange={onChange}
-							environment={environment}
-						/>
-					)
-				}}
-			</ChoiceField>
-		)
-	}
-
-	public static generateSyntheticChildren(props: Props<RadioFieldProps>, environment: Environment): React.ReactNode {
-		return ChoiceField.generateSyntheticChildren(props, environment)
-	}
-}
+	return (
+		<ChoiceField name={props.name} {...restProps}>
+			{(data, currentValue, onChange, environment) => {
+				return (
+					<RadioField.RadioFieldInner
+						name={props.name}
+						label={props.label}
+						inline={props.inline}
+						data={data}
+						currentValue={currentValue}
+						onChange={onChange}
+						environment={environment}
+					/>
+				)
+			}}
+		</ChoiceField>
+	)
+}, 'RadioField') {}
 
 namespace RadioField {
 	export interface RadioFieldInnerProps<Label extends React.ReactNode = React.ReactNode> {

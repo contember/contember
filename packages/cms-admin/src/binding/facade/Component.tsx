@@ -2,15 +2,15 @@ import * as React from 'react'
 import { EnvironmentContext, Props, SyntheticChildrenProvider } from '../coreComponents'
 import { Environment } from '../dao'
 
-interface Component<P extends {}> extends React.ComponentClass<P, undefined> {
+interface Component<P extends {}> extends React.ComponentClass<P, {}> {
 	render(props: Props<P>, environment: Environment): React.ReactNode
 }
 
 const Component = <P extends {}>(
 	Parent: Component<P> | React.FunctionComponent<P>,
 	displayName?: string
-): React.ComponentClass<P, undefined> & SyntheticChildrenProvider<P> => {
-	const NormalizedParent: React.ComponentClass<P, undefined> = 'render' in Parent ? Parent : React.Component
+): React.ComponentClass<P, {}> & SyntheticChildrenProvider<P> => {
+	const NormalizedParent: React.ComponentClass<P, {}> = 'render' in Parent ? Parent : React.Component
 	const render: (props: Props<P>, environment: Environment) => React.ReactNode =
 		'render' in Parent ? Parent.render : Parent
 

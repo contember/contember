@@ -1,6 +1,5 @@
 import { Button, IButtonProps, Intent, IProps } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { assertNever } from 'cms-common'
 import * as React from 'react'
 import { DataContext, DataContextValue } from '../../coreComponents'
 import { EntityAccessor } from '../../dao'

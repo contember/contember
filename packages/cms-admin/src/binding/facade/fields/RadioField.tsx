@@ -3,11 +3,11 @@ import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Props, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
-import { ChoiceField, ChoiceFieldProps, ChoiceFieldStaticProps } from './ChoiceField'
+import { ChoiceField, ChoiceFieldStaticProps } from './ChoiceField'
 
 export interface RadioFieldPublicProps {
 	name: FieldName
-	label: IRadioGroupProps['label']
+	label?: IRadioGroupProps['label']
 	inline?: boolean
 }
 
@@ -23,7 +23,7 @@ export interface RadioFieldDynamicProps {
 
 export type RadioFieldProps = RadioFieldPublicProps & (RadioFieldStaticProps | RadioFieldDynamicProps)
 
-export class RadioField extends React.Component<RadioFieldProps> {
+class RadioField extends React.Component<RadioFieldProps> {
 	public static displayName = 'RadioField'
 
 	public render() {
@@ -42,17 +42,15 @@ export class RadioField extends React.Component<RadioFieldProps> {
 			<ChoiceField name={this.props.name} {...restProps}>
 				{(data, currentValue, onChange, environment) => {
 					return (
-						<RadioGroup
+						<RadioField.RadioFieldInner
+							name={this.props.name}
 							label={this.props.label}
-							selectedValue={currentValue === null ? undefined : currentValue}
-							onChange={event => onChange(event.currentTarget.value)}
 							inline={this.props.inline}
-						>
-							{data.map(choice => {
-								const [value, label] = choice
-								return <Radio value={value} labelElement={label} key={value} />
-							})}
-						</RadioGroup>
+							data={data}
+							currentValue={currentValue}
+							onChange={onChange}
+							environment={environment}
+						/>
 					)
 				}}
 			</ChoiceField>
@@ -63,6 +61,41 @@ export class RadioField extends React.Component<RadioFieldProps> {
 		return ChoiceField.generateSyntheticChildren(props, environment)
 	}
 }
+
+namespace RadioField {
+	export interface RadioFieldInnerProps<Label extends React.ReactNode = React.ReactNode> {
+		name: FieldName
+		label?: IRadioGroupProps['label']
+		inline?: boolean
+
+		data: ChoiceField.Data<Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>
+		currentValue: ChoiceField.ValueRepresentation | null
+		onChange: (newValue: ChoiceField.ValueRepresentation) => void
+		environment: Environment
+	}
+
+	export class RadioFieldInner<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
+		RadioFieldInnerProps<Label>
+	> {
+		public render() {
+			return (
+				<RadioGroup
+					label={this.props.label}
+					selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}
+					onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
+					inline={this.props.inline}
+				>
+					{this.props.data.map(choice => {
+						const [value, label] = choice
+						return <Radio value={value} labelElement={label} key={value} />
+					})}
+				</RadioGroup>
+			)
+		}
+	}
+}
+
+export { RadioField }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
 	typeof RadioField,

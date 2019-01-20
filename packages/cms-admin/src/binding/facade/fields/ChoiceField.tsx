@@ -19,7 +19,7 @@ export interface ChoiceFieldPublicProps {
 
 export interface ChoiceFieldBaseProps<Label extends React.ReactNode = React.ReactNode> {
 	children: (
-		data: ChoiceField.Data<Label>,
+		data: ChoiceField.Data<Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>,
 		currentValue: ChoiceField.ValueRepresentation | null,
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void,
 		environment: Environment
@@ -40,7 +40,7 @@ export type ChoiceFieldProps<Label extends React.ReactNode = React.ReactNode> = 
 	ChoiceFieldBaseProps<Label> &
 	(ChoiceFieldDynamicProps | ChoiceFieldStaticProps<Label>)
 
-class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React.Component<ChoiceFieldProps<Label>> {
+class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<ChoiceFieldProps<Label>> {
 	public static displayName = 'ChoiceField'
 
 	public render() {
@@ -49,6 +49,7 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 				{(fieldName, data, environment) => {
 					if ('options' in this.props) {
 						const rawOptions = this.props.options
+						const children = this.props.children
 
 						if (rawOptions.length === 0) {
 							return null
@@ -61,24 +62,26 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 						return (
 							<Field name={fieldName}>
 								{(data: FieldAccessor): React.ReactNode => {
-									return this.props.children(
-										options.map((item, i): [ChoiceField.ValueRepresentation, Label] => [i.toFixed(0), item[1]]),
-										options.reduce((acc: ChoiceField.ValueRepresentation | null, [value], index) => {
-											if (acc !== null) {
-												return acc
-											}
-											if (
-												data.hasValue(value) ||
-												(value instanceof GraphQlBuilder.Literal &&
-													typeof data.currentValue === 'string' &&
-													value.value === data.currentValue)
-											) {
-												return index.toFixed(0)
-											}
-											return null
-										}, null),
+									const currentValue: ChoiceField.ValueRepresentation = options.findIndex(([value]) => {
+										return (
+											data.hasValue(value) ||
+											(value instanceof GraphQlBuilder.Literal &&
+												typeof data.currentValue === 'string' &&
+												value.value === data.currentValue)
+										)
+									}, null)
+
+									return children(
+										options.map(
+											(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.StaticValue] => [
+												i,
+												item[1],
+												item[0]
+											]
+										),
+										currentValue === -1 ? null : currentValue,
 										(newValue: ChoiceField.ValueRepresentation) => {
-											data.onChange && data.onChange(options[parseInt(newValue, 10)][0])
+											data.onChange && data.onChange(options[newValue][0])
 										},
 										environment
 									)
@@ -152,9 +155,17 @@ namespace ChoiceField {
 
 	export type LiteralValue = VariableLiteral | Literal
 
-	export type ValueRepresentation = string
+	export type StaticValue = GraphQlBuilder.Literal | Scalar
 
-	export type Data<Label extends React.ReactNode = React.ReactNode> = Array<[ValueRepresentation, Label]>
+	export type DynamicValue = string // UID type. May be changed to EntityAccessor later.
+
+	// This is just the JS array index as specified in options or as returned from the server.
+	export type ValueRepresentation = number
+
+	export type Data<
+		Label extends React.ReactNode = React.ReactNode,
+		ActualValue extends Environment.Value = string
+	> = Array<[ValueRepresentation, Label, ActualValue]>
 }
 
 export { ChoiceField }

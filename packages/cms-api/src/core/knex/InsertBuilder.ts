@@ -126,7 +126,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			if (!this.options.onConflict.target) {
 			} else if (Array.isArray(this.options.onConflict.target)) {
 				sql += ' (' + this.options.onConflict.target.map(() => '??').join(', ') + ')'
-				bindings.push(...this.options.onConflict.target);
+				bindings.push(...this.options.onConflict.target)
 			} else if (this.options.onConflict.target.constraint) {
 				sql += ' on constraint ??'
 				bindings.push(this.options.onConflict.target.constraint)

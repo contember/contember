@@ -14,10 +14,6 @@ import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import { Acl, Model } from 'cms-common'
 import KnexWrapper from '../core/knex/KnexWrapper'
 import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
-import LatestMigrationByStageQuery from '../system-api/model/queries/LatestMigrationByStageQuery'
-import FileNameHelper from '../migrations/FileNameHelper'
-import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
-import { emptySchema } from '../content-schema/modelUtils'
 import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
 import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
 import KnexDebugger from '../core/knex/KnexDebugger'
@@ -82,14 +78,8 @@ class ContentMiddlewareFactory {
 							return createGraphqlInvalidAuthResponse(`Auth failure: ${ctx.state.authResult.error}`)
 						}
 						await setupSystemVariables(knexConnection, ctx.state.authResult.identityId)
-						const queryHandler = knexConnection.createQueryHandler()
-						const currentMigration = (await queryHandler.fetch(new LatestMigrationByStageQuery(stage.uuid))) // todo cache
 
-						const model = currentMigration ? project.migrations
-								.filter(({ version }) => version <= FileNameHelper.extractVersion(currentMigration.data.file))
-								.map(({ diff }) => diff)
-								.reduce<Model.Schema>((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
-							: emptySchema
+						const model = await projectContainer.get('schemaVersionBuilder').buildSchemaForStage(stage.uuid)
 
 						ctx.state.timer('fetching project roles and variables')
 
@@ -103,13 +93,16 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('building schema')
 
 						const globalRoles = ctx.state.authResult.roles
-						const [dataSchema, permissions] = projectContainer.get('graphQlSchemaFactory').create({
-							acl: project.acl,
-							model,
-						}, {
-							projectRoles: projectRoles.roles,
-							globalRoles: globalRoles,
-						})
+						const [dataSchema, permissions] = projectContainer.get('graphQlSchemaFactory').create(
+							{
+								acl: project.acl,
+								model,
+							},
+							{
+								projectRoles: projectRoles.roles,
+								globalRoles: globalRoles,
+							}
+						)
 
 						ctx.state.timer('done')
 

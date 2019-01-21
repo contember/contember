@@ -1,11 +1,10 @@
 import KnexQuery from '../../../core/knex/KnexQuery'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import SelectBuilder from '../../../core/knex/SelectBuilder'
+import { Stage } from '../dtos/Stage'
 
 class StageByIdQuery extends KnexQuery<StageByIdQuery.Result> {
-	constructor(
-		private readonly stageId: string,
-		private readonly forUpdate: boolean) {
+	constructor(private readonly stageId: string, private readonly forUpdate: boolean = false) {
 		super()
 	}
 
@@ -30,12 +29,7 @@ class StageByIdQuery extends KnexQuery<StageByIdQuery.Result> {
 }
 
 namespace StageByIdQuery {
-	export type Result = null | {
-		readonly id: string
-		readonly name: string
-		readonly slug: string
-		readonly event_id: string
-	}
+	export type Result = null | Stage
 }
 
 export default StageByIdQuery

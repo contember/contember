@@ -21,7 +21,7 @@ export default class KnexQueryable implements Queryable<KnexQueryable> {
 	}
 
 	createSelectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result> {
-		return this.createWrapper().selectBuilder<Result>();
+		return this.createWrapper().selectBuilder<Result>()
 	}
 
 	createWrapper(): KnexWrapper {

@@ -8,7 +8,9 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"prebuild": "env CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/tenant-api/schema/tenant.graphql.ts --template typescript --skip-documents --out ./src/tenant-api/schema/types.ts && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
+		"prebuild-tenant-api": "env CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/tenant-api/schema/tenant.graphql.ts --template typescript --skip-documents --out ./src/tenant-api/schema/types.ts",
+		"prebuild-system-api": "env CODEGEN_IMMUTABLE_TYPES=1 npx gql-gen --require ts-node/register --schema ./src/system-api/schema/system.graphql.ts --template typescript --skip-documents --out ./src/system-api/schema/types.ts",
+		"prebuild": "npm run prebuild-tenant-api && prebuild-system-api && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
 		"build": "tsc --build --verbose",
 		"test": "mocha --ui bdd './dist/tests/cases/**/*.js'",
 		"test:debug": "mocha --inspect --ui bdd",

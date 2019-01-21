@@ -30,7 +30,7 @@ class StartCommand extends BaseCommand<{}, {}> {
 					return {
 						...project,
 						acl,
-						migrations: diffs.map(({ name, diff }) => ({ version: FileNameHelper.extractVersion(name), diff }))
+						migrations: diffs.map(({ name, diff }) => ({ version: FileNameHelper.extractVersion(name), diff })),
 					}
 				}
 			)
@@ -40,6 +40,8 @@ class StartCommand extends BaseCommand<{}, {}> {
 		httpServer.listen(Number.parseInt(String(config.server.port)), () => {
 			console.log(`Tenant API running on http://localhost:${config.server.port}/tenant`)
 			config.projects.forEach(project => {
+				const url = `http://localhost:${config.server.port}/system/${project.slug}`
+				console.log(`System API for project ${project.slug} running on ${url}`)
 				project.stages.forEach(stage => {
 					const url = `http://localhost:${config.server.port}/content/${project.slug}/${stage.slug}`
 					console.log(`Content API for project ${project.slug} and stage ${stage.slug} running on ${url}`)

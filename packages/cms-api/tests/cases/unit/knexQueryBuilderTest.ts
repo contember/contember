@@ -344,7 +344,8 @@ describe('knex query builder', () => {
 	it('select with no key update', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.selectBuilder()
+				const qb = wrapper
+					.selectBuilder()
 					.select('id')
 					.from('foo')
 					.lock(SelectBuilder.LockType.forNoKeyUpdate)

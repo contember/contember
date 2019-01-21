@@ -125,7 +125,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 		const { blocks } = this.props
 		const [firstBlockMarks, ...otherBlocksMarks] = blocks
 			.filter(block => this.isBlockActive(block.block))
-			.map(block => [...(block.marks || [])].sort())
+			.map(block => (block.marks || []).sort())
 		const marksToShow = firstBlockMarks
 			? firstBlockMarks.filter(mark => otherBlocksMarks.every(otherMarks => otherMarks.includes(mark)))
 			: []

@@ -13,7 +13,8 @@ namespace DependencyBuilder {
 		async build(events: Event[]): Promise<Dependencies> {
 			return (await Promise.all(this.builders.map(builder => builder.build(events)))).reduce((result, val) => {
 				for (let event in val) {
-					result[event] = [...(result[event] || []), ...val[event]]
+					const current = (result[event] || [])
+					result[event] = [...current, ...val[event].filter(it => !current.includes(it))]
 				}
 				return result
 			}, {})

@@ -8,8 +8,8 @@ export interface AlternativeFieldsProps extends RadioFieldPublicProps {
 	alternatives: AlternativeFields.ControllerFieldMetadata
 }
 
-class AlternativeFields extends Component<AlternativeFieldsProps>(props => {
-	return (
+class AlternativeFields extends Component<AlternativeFieldsProps>(
+	props => (
 		<div className="alternativeFields">
 			<ChoiceField name={props.name} options={Object.values(props.alternatives)}>
 				{(data, currentValue, onChange, environment) => {
@@ -38,8 +38,9 @@ class AlternativeFields extends Component<AlternativeFieldsProps>(props => {
 				}}
 			</ChoiceField>
 		</div>
-	)
-}, 'AlternativeFields') {}
+	),
+	'AlternativeFields'
+) {}
 
 namespace AlternativeFields {
 	// This isn't React.ReactNode so as to exclude arrays and other likely irrelevant values

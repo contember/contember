@@ -1,7 +1,6 @@
 import { IRadioGroupProps, Radio, RadioGroup } from '@blueprintjs/core'
 import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../../bindingTypes'
-import { EnforceSubtypeRelation, Props, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { Component } from '../Component'
 import { ChoiceField, ChoiceFieldStaticProps } from './ChoiceField'
@@ -89,8 +88,3 @@ namespace RadioField {
 }
 
 export { RadioField }
-
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
-	typeof RadioField,
-	SyntheticChildrenProvider<RadioFieldProps>
->

@@ -40,7 +40,9 @@ export type ChoiceFieldProps<Label extends React.ReactNode = React.ReactNode> = 
 	ChoiceFieldBaseProps<Label> &
 	(ChoiceFieldDynamicProps | ChoiceFieldStaticProps<Label>)
 
-class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<ChoiceFieldProps<Label>> {
+class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
+	ChoiceFieldProps<Label>
+> {
 	public static displayName = 'ChoiceField'
 
 	public render() {

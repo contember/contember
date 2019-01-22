@@ -12,7 +12,7 @@ export default class EditPage<DRP extends CommonRendererProps = CommonRendererPr
 	EditPageProps<DRP>
 > {
 	static getPageName(props: EditPageProps<DataRendererProps>) {
-		return `edit_${lcfirst(props.entity)}`
+		return props.pageName || `edit_${lcfirst(props.entity)}`
 	}
 
 	render(): React.ReactNode {

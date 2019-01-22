@@ -11,7 +11,7 @@ export default class MultiEditPage<DRP extends MultiEditRendererProps = MultiEdi
 	MultiEditPageProps<DRP>
 > {
 	static getPageName(props: MultiEditPageProps<MultiEditRendererProps>) {
-		return `multiEdit_${lcfirst(props.entity)}`
+		return props.pageName || `multiEdit_${lcfirst(props.entity)}`
 	}
 
 	render(): React.ReactNode {

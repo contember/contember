@@ -11,7 +11,7 @@ export default class CreatePage<DRP extends CommonRendererProps = CommonRenderer
 	CreatePageProps<DRP>
 > {
 	static getPageName(props: CreatePageProps<DataRendererProps>) {
-		return `create_${lcfirst(props.entity)}`
+		return props.pageName || `create_${lcfirst(props.entity)}`
 	}
 
 	render(): React.ReactNode {

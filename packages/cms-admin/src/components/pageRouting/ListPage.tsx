@@ -9,7 +9,7 @@ interface ListPageProps<DRP> extends SpecificPageProps<DRP> {}
 
 export default class ListPage<DRP extends CommonRendererProps> extends React.Component<ListPageProps<DRP>> {
 	static getPageName(props: ListPageProps<DataRendererProps>) {
-		return `list_${lcfirst(props.entity)}`
+		return props.pageName || `list_${lcfirst(props.entity)}`
 	}
 
 	render(): React.ReactNode {

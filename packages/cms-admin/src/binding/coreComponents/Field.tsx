@@ -40,6 +40,8 @@ class Field extends React.PureComponent<FieldProps> {
 									{this.props.children}
 								</Field.FieldInner>
 							)
+						} else {
+							throw new DataBindingError(`Undefined field '${fieldName}'`)
 						}
 					} else if (data instanceof EntityForRemovalAccessor) {
 						// Do nothing

@@ -145,7 +145,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 			this.data[relation.name] as Input.CreateOneRelationInput,
 			new class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
-					insertBuilder.addFieldValue(relation.name, input[targetEntity.primary])
+					insertBuilder.addFieldValue(relation.name, mapper.getPrimaryValue(targetEntity, input))
 				}
 
 				public async create(input: Input.CreateDataInput) {
@@ -236,7 +236,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 			this.data[relation.name] as Input.CreateOneRelationInput,
 			new class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
-					insertBuilder.addFieldValue(relation.name, input[targetEntity.primary])
+					insertBuilder.addFieldValue(relation.name, mapper.getPrimaryValue(targetEntity, input))
 				}
 
 				public async create(input: Input.CreateDataInput) {

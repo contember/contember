@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RequestChange } from '../../state/request'
+import RequestState, { RequestChange } from '../../state/request'
 
 class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkComponent.State> {
 	onClick = (e: React.SyntheticEvent<Element>) => {

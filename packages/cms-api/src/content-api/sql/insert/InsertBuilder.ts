@@ -9,8 +9,8 @@ import Mapper from '../Mapper'
 import SelectBuilder from '../../../core/knex/SelectBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 
-type ColumnValue = {
-	value: PromiseLike<Input.ColumnValue>
+type ColumnValue<E = never> = {
+	value: PromiseLike<Input.ColumnValue<E>>
 	columnName: string
 	columnType: string
 }

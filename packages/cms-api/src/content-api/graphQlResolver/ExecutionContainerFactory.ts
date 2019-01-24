@@ -66,7 +66,8 @@ class ExecutionContainerFactory {
 			.addService('uniqueWhereExpander', () => new UniqueWhereExpander(this.schema))
 			.addService(
 				'hasManyToHasOneReducer',
-				({ mapperAccessor }) => new HasManyToHasOneReducerExecutionHandler(this.schema, mapperAccessor)
+				({ mapperAccessor, uniqueWhereExpander }) =>
+					new HasManyToHasOneReducerExecutionHandler(this.schema, mapperAccessor, uniqueWhereExpander)
 			)
 			.addService('selectHandlers', ({ hasManyToHasOneReducer }) => ({
 				[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,

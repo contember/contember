@@ -14,7 +14,7 @@ export default class UniqueWhereExpander {
 		for (const field in where) {
 			const target = getTargetEntity(this.schema, entity, field)
 			if (!target) {
-				whereExpanded[field] = Array.isArray(where[field]) ? { in: (where[field] as any) } : {eq: where[field]}
+				whereExpanded[field] = Array.isArray(where[field]) ? { in: where[field] as any } : { eq: where[field] }
 			} else {
 				whereExpanded[field] = this.expand(target, where[field] as Input.UniqueWhere)
 			}

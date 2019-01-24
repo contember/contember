@@ -1,21 +1,18 @@
-import {Input, Model} from 'cms-common'
+import { Input, Model } from 'cms-common'
 import SelectExecutionHandler from '../../sql/select/SelectExecutionHandler'
-import {Accessor} from '../../../utils/accessor'
+import { Accessor } from '../../../utils/accessor'
 import Mapper from '../../sql/Mapper'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
-import {acceptFieldVisitor} from '../../../content-schema/modelUtils'
-import {isIt} from '../../../utils/type'
-import UniqueWhereExpander from "../../graphQlResolver/UniqueWhereExpander";
+import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
+import { isIt } from '../../../utils/type'
+import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 
-class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}>
-{
+class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly mapperAccessor: Accessor<Mapper>,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
-	)
-	{
-	}
+		private readonly uniqueWhereExpander: UniqueWhereExpander
+	) {}
 
 	process(context: SelectExecutionHandler.Context): void {
 		const { addData, entity, field } = context
@@ -26,19 +23,15 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 			async (ids: Input.PrimaryValue[]) => {
 				const [targetEntity, targetRelation] = this.getRelationTarget(entity, objectNode.meta.relationName)
 
-				const uniqueWhere = this.uniqueWhereExpander.expand(targetEntity,
-					{
-						...objectNode.args.by,
-						[targetRelation.name]: {[entity.primary]: ids},
-					})
+				const uniqueWhere = this.uniqueWhereExpander.expand(targetEntity, {
+					...objectNode.args.by,
+					[targetRelation.name]: { [entity.primary]: ids },
+				})
 				if (Object.keys(uniqueWhere).length !== 2) {
 					throw new Error()
 				}
 				const whereWithParentId = {
-					and: [
-						objectNode.args.filter || {},
-						uniqueWhere,
-					],
+					and: [objectNode.args.filter || {}, uniqueWhere],
 				}
 				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ filter: whereWithParentId })
 

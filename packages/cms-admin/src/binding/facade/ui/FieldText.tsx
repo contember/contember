@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../coreComponents'
-import { Environment, FieldAccessor } from '../dao'
-import { Parser } from '../queryLanguage'
-import { TextFieldProps } from './fields'
+import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
+import { Environment, FieldAccessor } from '../../dao'
+import { Parser } from '../../queryLanguage'
+import { TextFieldProps } from '../fields'
 
 interface FieldTextProps {
 	name: string

@@ -1,5 +1,4 @@
 export * from './Component'
-export * from './FieldText'
 
 export * from './buttons'
 export * from './environment'

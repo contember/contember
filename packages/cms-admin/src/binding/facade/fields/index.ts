@@ -1,3 +1,4 @@
+export * from './CheckboxField'
 export * from './HiddenField'
 export * from './NumberField'
 export * from './RadioField'

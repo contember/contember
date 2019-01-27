@@ -1,8 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
-import Dimensions from '../../components/Dimensions'
-import { SelectedDimension } from '../../state/request'
 import { EntityName, FieldName } from '../bindingTypes'
 import { Environment, MarkerTreeRoot } from '../dao'
 import { MarkerTreeGenerator } from '../model'

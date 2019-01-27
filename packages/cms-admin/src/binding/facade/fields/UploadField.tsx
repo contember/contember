@@ -67,10 +67,17 @@ class UploadFieldComponent extends React.Component<
 								}}
 								accept="image/*"
 								multiple={false}
+								style={{}}
 							>
 								{data.currentValue && this.isImage(data.currentValue) ? <img src={data.currentValue} /> : null}
 								{upload && upload.thumbnailUrl ? <img src={upload.thumbnailUrl} /> : null}
-								{this.renderUploadStatusMessage(upload)}
+								<FileInput
+									fill={true}
+									text={this.renderUploadStatusMessage(upload)}
+									onInputChange={async e => {
+										e.currentTarget.files && this.handleStartUpload(Array.from(e.currentTarget.files))
+									}}
+								/>
 							</Dropzone>
 						</FormGroup>
 					)

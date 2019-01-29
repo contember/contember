@@ -32,7 +32,12 @@ export class DimensionSwitcherRenderer extends React.PureComponent<
 				{normalizedData.map((dataValue, i) => {
 					const value = dataValue && dataValue.data.getField(this.props.valueName)
 					const label = dataValue && dataValue.data.getField(this.props.labelName)
-					if (dataValue && typeof dataValue.primaryKey === "string" && value instanceof FieldAccessor && label instanceof FieldAccessor) {
+					if (
+						dataValue &&
+						typeof dataValue.primaryKey === 'string' &&
+						value instanceof FieldAccessor &&
+						label instanceof FieldAccessor
+					) {
 						const currentValue = value.currentValue
 						if (typeof currentValue !== 'string') {
 							return null

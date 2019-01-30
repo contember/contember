@@ -59,6 +59,25 @@ describe('query language parser', () => {
 		})
 	})
 
+	it('should parse composite unique where', () => {
+		expect(Parser.parseQueryLanguageExpression("foo(a='b', bar = 123).name")).eql({
+			fieldName: 'name',
+			toOneProps: [
+				{
+					field: 'foo',
+					reducedBy: {
+						a: 'b',
+						bar: 123,
+					}
+				}
+			]
+		})
+	})
+
+	it('should reject duplicate fields in unique where', () => {
+		expect(() => Parser.parseQueryLanguageExpression("foo(a='b', a = 123).name")).throws(/duplicate/i)
+	})
+
 	it('should correctly generate JSX', () => {
 		const result = Parser.generateWrappedNode('this(better=work).as.expected(and = 1).correctly', name => (
 			<TextField name={name} />

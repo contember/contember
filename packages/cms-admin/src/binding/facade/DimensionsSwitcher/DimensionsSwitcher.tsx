@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Popover } from '@blueprintjs/core'
-import { EntityListDataProvider } from '../../binding'
+import { EntityListDataProvider } from '../..'
 import { DimensionSwitcherRenderer, DimensionSwitcherRendererProps } from './MenuItemsRenderer'
 import { DimensionSwitcherItem } from './DimensionSwitcherItem'
 
@@ -17,7 +17,7 @@ export interface DimensionsSwitcherProps {
 	opener: JSX.Element
 }
 
-export default class DimensionsSwitcher extends React.Component<DimensionsSwitcherProps, DimensionsSwitcherState> {
+export class DimensionsSwitcher extends React.Component<DimensionsSwitcherProps, DimensionsSwitcherState> {
 	state: DimensionsSwitcherState = {
 		isOpen: false
 	}

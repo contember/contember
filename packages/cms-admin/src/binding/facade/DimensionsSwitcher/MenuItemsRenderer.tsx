@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Button, Menu, MenuItem, Divider, Spinner } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { Dimensions, Link } from '..'
-import { RendererProps, EntityCollectionAccessor, FieldAccessor } from '../../binding'
-import { LoadingSpinner } from '../../binding/facade/renderers/userFeedback'
+import { Dimensions, Link } from '../../../components'
+import { RendererProps, EntityCollectionAccessor, FieldAccessor } from '../..'
+import { LoadingSpinner } from '../../facade/renderers/userFeedback'
 
 export interface DimensionSwitcherRendererProps {
 	dimension: string
@@ -28,7 +28,7 @@ export class DimensionSwitcherRenderer extends React.PureComponent<
 		if (typeof data === 'undefined') return null
 		const normalizedData = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
 		return (
-			<Menu style={{ minWidth: '3em' }}>
+			<Menu className="dimensionsSwitcher-menu">
 				{normalizedData.map((dataValue, i) => {
 					const value = dataValue && dataValue.data.getField(this.props.valueName)
 					const label = dataValue && dataValue.data.getField(this.props.labelName)
@@ -83,7 +83,7 @@ export class DimensionSwitcherRenderer extends React.PureComponent<
 			return <LoadingSpinner size={Spinner.SIZE_SMALL} />
 		}
 		return (
-			<div style={{ display: 'flex' }}>
+			<div className="dimensionsSwitcher-wrapper">
 				<Dimensions>
 					{dimensions => {
 						const currentValue = dimensions[this.props.dimension] || []

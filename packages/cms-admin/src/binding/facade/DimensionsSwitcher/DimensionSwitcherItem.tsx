@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Field, Environment } from '../../binding'
-import { Parser } from '../../binding/queryLanguage'
+import { Field, Environment } from '../..'
+import { Parser } from '../../queryLanguage'
 
 interface DimensionSwitcherItemProps {
 	labelName: string

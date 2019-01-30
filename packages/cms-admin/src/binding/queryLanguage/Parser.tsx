@@ -53,15 +53,47 @@ export class Parser extends ChevrotainParser {
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.Comma,
 			DEF: () => {
-				const fieldName = this.SUBRULE(this.identifier)
+				const nestedFields: string[] = []
+				this.AT_LEAST_ONE_SEP1({
+					SEP: tokens.Dot,
+					DEF: () => {
+						nestedFields.push(this.SUBRULE(this.identifier))
+					}
+				})
 				this.CONSUME(tokens.Equals)
-				const primaryValue = this.SUBRULE(this.primaryValue)
+				const primaryValue = this.SUBRULE<Input.PrimaryValue<GraphQlBuilder.Literal>>(this.primaryValue)
 
-				if (fieldName in where) {
-					throw new QueryLanguageError(`Duplicate '${fieldName}' field`)
+				let nestedWhere = where
+				for (let i = 0, len = nestedFields.length; i < len; i++) {
+					const nestedField = nestedFields[i]
+
+					const isLast = len - 1 === i
+
+					if (isLast) {
+						if (nestedField in nestedWhere) {
+							throw new QueryLanguageError(`Duplicate '${nestedFields.slice(0, i + 1).join('.')}' field`)
+						}
+
+						nestedWhere[nestedField] = primaryValue
+					} else {
+						if (nestedField in nestedWhere) {
+							const existingWhere = nestedWhere[nestedField]
+
+							if (typeof existingWhere === 'object' && !(existingWhere instanceof GraphQlBuilder.Literal)) {
+								nestedWhere = existingWhere
+							} else {
+								throw new QueryLanguageError(
+									`Malformed expression: cannot simultaneously treat the '${nestedFields.slice(0, i + 1).join('.')}' ` +
+										`field as a scalar as well as a relation.`
+								)
+							}
+						} else {
+							const newWhere = {}
+							nestedWhere[nestedField] = newWhere
+							nestedWhere = newWhere
+						}
+					}
 				}
-
-				where[fieldName] = primaryValue
 			}
 		})
 		this.CONSUME(tokens.RightParenthesis)

@@ -36,7 +36,12 @@ export default class DimensionsSwitcher extends React.Component<DimensionsSwitch
 					<EntityListDataProvider<DimensionSwitcherRendererProps>
 						name={this.props.entityName}
 						renderer={DimensionSwitcherRenderer}
-						rendererProps={this.props}
+						rendererProps={{
+							dimension: this.props.dimension,
+							labelName: this.props.labelName,
+							valueName: this.props.valueName,
+							maxItems: this.props.maxItems
+						}}
 					>
 						<DimensionSwitcherItem labelName={this.props.labelName} valueName={this.props.valueName} />
 					</EntityListDataProvider>

@@ -19,9 +19,9 @@ export default class EditPage<DRP extends CommonRendererProps = CommonRendererPr
 		return (
 			<PageWithLayout layout={this.props.layout}>
 				<ParametersContext.Consumer>
-					{(parameters: any) => (
+					{parameters => (
 						<SingleEntityDataProvider
-							where={parameters}
+							where={this.props.where ? this.props.where(parameters) : parameters}
 							name={this.props.entity}
 							renderer={this.props.renderer}
 							rendererProps={this.props.rendererProps}

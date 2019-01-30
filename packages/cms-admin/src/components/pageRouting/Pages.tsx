@@ -32,7 +32,8 @@ function isPageElement(el: any): el is PageElement {
 	}
 }
 
-export const ParametersContext = React.createContext<any>({})
+export type Parameters = any
+export const ParametersContext = React.createContext<Parameters>({})
 
 export const LayoutContext = React.createContext<React.ComponentType<{ children?: React.ReactNode }>>(React.Fragment)
 

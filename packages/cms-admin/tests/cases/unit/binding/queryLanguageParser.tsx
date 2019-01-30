@@ -67,7 +67,7 @@ describe('query language parser', () => {
 					field: 'foo',
 					reducedBy: {
 						a: 'b',
-						bar: 123,
+						bar: 123
 					}
 				}
 			]
@@ -76,6 +76,46 @@ describe('query language parser', () => {
 
 	it('should reject duplicate fields in unique where', () => {
 		expect(() => Parser.parseQueryLanguageExpression("foo(a='b', a = 123).name")).throws(/duplicate/i)
+	})
+
+	it('should parse nested unique where', () => {
+		expect(
+			Parser.parseQueryLanguageExpression(
+				'foo(nested.structure.is.deep = 123, nested.structure.be.indeed.not.shallow = baz).name'
+			)
+		).eql({
+			fieldName: 'name',
+			toOneProps: [
+				{
+					field: 'foo',
+					reducedBy: {
+						nested: {
+							structure: {
+								is: {
+									deep: 123
+								},
+								be: {
+									indeed: {
+										not: {
+											shallow: new GraphQlBuilder.Literal('baz')
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			]
+		})
+	})
+
+	it('should reject malformed nested unique where', () => {
+		expect(() =>
+			Parser.parseQueryLanguageExpression('foo(nested.field = 123, nested.field.treated.as.relation = baz).name')
+		).throws(/'nested\.field'/i)
+		expect(() => Parser.parseQueryLanguageExpression('foo(nested.field = 123, nested.field = baz).name')).throws(
+			/'nested\.field'/i
+		)
 	})
 
 	it('should correctly generate JSX', () => {

@@ -1,1 +1,0 @@
-export { DimensionsSwitcher } from './DimensionsSwitcher'

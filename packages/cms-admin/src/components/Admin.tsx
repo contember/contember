@@ -84,11 +84,7 @@ export default class Admin extends React.Component<AdminProps> {
 										</EnvironmentContext.Provider>
 									)
 								} else {
-									return (
-										<>
-											{`No such project or stage as ${route.project}/${route.stage}`}
-										</>
-									)
+									return <>{`No such project or stage as ${route.project}/${route.stage}`}</>
 								}
 							}
 						})()

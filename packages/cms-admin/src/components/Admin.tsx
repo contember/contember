@@ -67,6 +67,7 @@ export default class Admin extends React.Component<AdminProps> {
 									lazyComponent: React.lazy(config.component)
 								}
 							}
+							let rootEnvironment = new Environment()
 
 							return ({ route }: { route: PageRequest<any> }) => {
 								const config = this.props.configs.find(
@@ -74,9 +75,9 @@ export default class Admin extends React.Component<AdminProps> {
 								)
 								const Component = normalizedConfigs[route.project][route.stage].lazyComponent
 								if (config) {
-									const environment = new Environment({ dimensions: route.dimensions })
+									rootEnvironment = rootEnvironment.updateDimensionsIfNecessary(route.dimensions)
 									return (
-										<EnvironmentContext.Provider value={environment}>
+										<EnvironmentContext.Provider value={rootEnvironment}>
 											<React.Suspense fallback={'Loading...'}>
 												<Component />
 											</React.Suspense>

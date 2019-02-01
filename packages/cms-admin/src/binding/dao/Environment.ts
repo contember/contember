@@ -59,6 +59,16 @@ class Environment {
 		return new Environment(currentNames)
 	}
 
+	public updateDimensionsIfNecessary(newDimensions: Environment.NameStore['dimensions']): Environment {
+		const dimensionsEqual = JSON.stringify(this.names.dimensions) === JSON.stringify(newDimensions)
+		return dimensionsEqual
+			? this
+			: new Environment({
+					...this.names,
+					dimensions: { ...newDimensions }
+			  })
+	}
+
 	public static generateDelta(
 		currentEnvironment: Environment,
 		delta: Environment.DeltaFactory

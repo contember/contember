@@ -1,4 +1,4 @@
-import Identity from '../type/Identity'
+import Identity from '../../../common/auth/Identity'
 import ProjectMemberManager from '../service/ProjectMemberManager'
 
 class ProjectAwareIdentity implements Identity {

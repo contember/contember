@@ -1,7 +1,7 @@
 import { Acl, Schema } from 'cms-common'
 import { GraphQLSchema } from 'graphql'
 import GraphQlSchemaBuilderFactory from '../content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
-import TenantIdentity from '../tenant-api/model/type/Identity'
+import TenantIdentity from '../common/auth/Identity'
 import AllowAllPermissionFactory from '../acl/AllowAllPermissionFactory'
 import PermissionFactory from '../acl/PermissionFactory'
 import { arrayEquals } from '../utils/arrays'

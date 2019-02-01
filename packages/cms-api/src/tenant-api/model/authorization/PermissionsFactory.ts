@@ -1,5 +1,5 @@
 import Permissions from '../../../core/authorization/Permissions'
-import Identity from '../type/Identity'
+import Identity from '../../../common/auth/Identity'
 import Actions from './Actions'
 
 class PermissionsFactory {

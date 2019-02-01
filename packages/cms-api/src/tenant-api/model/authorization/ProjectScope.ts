@@ -1,5 +1,5 @@
 import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
-import Identity from '../type/Identity'
+import Identity from '../../../common/auth/Identity'
 import AccessNode from '../../../core/authorization/AccessNode'
 
 class ProjectScope implements AuthorizationScope<Identity> {

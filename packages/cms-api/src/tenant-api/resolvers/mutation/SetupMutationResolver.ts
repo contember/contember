@@ -10,7 +10,7 @@ import Actions from '../../model/authorization/Actions'
 import { ForbiddenError } from 'apollo-server-koa'
 import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import ApiKeyManager from '../../model/service/ApiKeyManager'
-import Identity from '../../model/type/Identity'
+import Identity from '../../../common/auth/Identity'
 
 export default class SetupMutationResolver implements MutationResolvers.Resolvers {
 	constructor(

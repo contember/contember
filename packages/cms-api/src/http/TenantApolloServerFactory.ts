@@ -6,7 +6,7 @@ import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
 import ProjectAwareIdentity from '../tenant-api/model/authorization/ProjectAwareIdentity'
 import Authorizator from '../core/authorization/Authorizator'
-import Identity from '../tenant-api/model/type/Identity'
+import Identity from '../common/auth/Identity'
 
 class TenantApolloServerFactory {
 	constructor(

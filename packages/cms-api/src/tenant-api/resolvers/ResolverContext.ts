@@ -1,6 +1,6 @@
 import AuthorizationScope from '../../core/authorization/AuthorizationScope'
 import Authorizator from '../../core/authorization/Authorizator'
-import Identity from '../model/type/Identity'
+import Identity from '../../common/auth/Identity'
 
 export default class ResolverContext {
 	constructor(

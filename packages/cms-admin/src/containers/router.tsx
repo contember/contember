@@ -5,21 +5,34 @@ import RequestState from '../state/request'
 
 type RouteName = RequestState['name']
 type RequestByName<K extends RouteName, T = RequestState> = T extends { name: K } ? T : never
-type RouteHandler<K extends RouteName> = (route: RequestByName<K>) => React.ReactNode
+type RouteHandler<K extends RouteName> = React.FunctionComponent<{ route: RequestByName<K> }>
 type RouteMap<N extends RouteName = RouteName> = { [K in N]: RouteHandler<K> }
 
-function getHandler<N extends RouteName>(routeMap: RouteMap, name: N): RouteHandler<N> {
-	return routeMap[name] as RouteHandler<N>
+interface RoutesRendererStateProps {
+	loading: boolean
+	route: RequestState | null
 }
 
-function renderRoute(routeMap: RouteMap, route: RequestState): React.ReactNode {
-	const handler = getHandler(routeMap, route.name)
-	return handler ? handler(route) : '404'
+interface RoutesRendererOwnProps {
+	routes: RouteMap
 }
 
-export default connect<{ loading: boolean; route: RequestState | null }, {}, { routes: RouteMap }, State>(
+type RoutesRendererProps = RoutesRendererStateProps & RoutesRendererOwnProps
+
+class RoutesRenderer extends React.PureComponent<RoutesRendererProps> {
+	public render() {
+		const route = this.props.route
+		if (!route) {
+			return null
+		}
+		const Handler = this.props.routes[route.name] as RouteHandler<RouteName>
+		return Handler ? <Handler route={route} /> : '404'
+	}
+}
+
+export const Router = connect<RoutesRendererStateProps, {}, RoutesRendererOwnProps, State>(
 	({ view: { loading, route } }) => ({
 		loading,
 		route
 	})
-)(({ loading, route, routes }) => <>{route && renderRoute(routes, route)}</>)
+)(RoutesRenderer)

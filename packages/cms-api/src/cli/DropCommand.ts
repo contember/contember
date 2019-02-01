@@ -2,6 +2,7 @@ import { DatabaseCredentials } from '../config/config'
 import Knex from 'knex'
 import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
+import { formatSchemaName } from '../system-api/model/helpers/stageHelpers'
 
 class DropCommand extends BaseCommand<{}, {}> {
 	protected configure(configuration: CommandConfiguration): void {
@@ -17,7 +18,7 @@ class DropCommand extends BaseCommand<{}, {}> {
 		queries.push(this.clear(config.tenant.db, ['tenant']))
 
 		for (const project of config.projects) {
-			const schemas = [...project.stages.map(stage => 'stage_' + stage.slug), 'system']
+			const schemas = [...project.stages.map(stage => formatSchemaName(stage)), 'system']
 			queries.push(this.clear(project.dbCredentials, schemas))
 		}
 

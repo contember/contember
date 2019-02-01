@@ -17,6 +17,7 @@ import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
 import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
 import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
 import KnexDebugger from '../core/knex/KnexDebugger'
+import { formatSchemaName } from '../system-api/model/helpers/stageHelpers'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
@@ -44,7 +45,7 @@ class ContentMiddlewareFactory {
 			}
 
 			const db = projectContainer.get('knexConnection')
-			ctx.state.db = new KnexWrapper(db, 'stage_' + stage.slug)
+			ctx.state.db = new KnexWrapper(db, formatSchemaName(stage))
 
 			const contentKoa = new Koa()
 

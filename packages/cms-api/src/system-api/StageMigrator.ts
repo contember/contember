@@ -3,10 +3,8 @@ import Project from '../config/Project'
 import KnexWrapper from '../core/knex/KnexWrapper'
 import StageByIdQuery from './model/queries/StageByIdQuery'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
-import UpdateStageEventCommand from './model/commands/UpdateStageEventCommand'
-import CreateEventCommand from './model/commands/CreateEventCommand'
-import { EventType } from './model/EventType'
 import LatestMigrationByStageQuery from './model/queries/LatestMigrationByStageQuery'
+import MigrationExecutor from './model/migrations/MigrationExecutor'
 
 class StageMigrator {
 	constructor(private readonly migrationFilesManager: MigrationFilesManager) {}
@@ -46,27 +44,13 @@ class StageMigrator {
 
 			const migrationsToExecute = migrations.filter(({ version }) => version > currentVersion)
 
-			await knexWrapper.raw('SET search_path TO ??', 'stage_' + stage.slug)
-
 			if (migrationsToExecute.length === 0) {
 				return { count: 0 }
 			}
 
-			let previousId = currentStageRow.event_id
-			for (const { filename, content } of migrationsToExecute) {
-				progressCb(filename, content)
+			const executor = new MigrationExecutor(knexWrapper)
 
-				await knexWrapper.raw(content)
-				previousId = await new CreateEventCommand(
-					EventType.runMigration,
-					{
-						file: filename,
-					},
-					previousId
-				).execute(knexWrapper)
-			}
-
-			await new UpdateStageEventCommand(stage.uuid, previousId).execute(knexWrapper)
+			await executor.execute(currentStageRow, migrationsToExecute, progressCb)
 
 			return { count: migrationsToExecute.length }
 		})

@@ -1,6 +1,7 @@
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 import Project from '../../../config/Project'
 import InsertBuilder from '../../../core/knex/InsertBuilder'
+import { formatSchemaName } from '../helpers/stageHelpers'
 
 class CreateStageCommand {
 	constructor(private readonly stage: Project.Stage) {}
@@ -28,7 +29,7 @@ class CreateStageCommand {
 			})
 			.execute()
 
-		await connection.raw('CREATE SCHEMA IF NOT EXISTS ??', 'stage_' + this.stage.slug)
+		await connection.raw('CREATE SCHEMA IF NOT EXISTS ??', formatSchemaName(this.stage))
 	}
 }
 

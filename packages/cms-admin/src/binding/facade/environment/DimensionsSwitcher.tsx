@@ -13,54 +13,35 @@ import {
 import { Parser } from '../../queryLanguage'
 import { LoadingSpinner } from '../renderers/userFeedback'
 
-interface DimensionsSwitcherState {
-	isOpen: boolean
-}
-
-export interface DimensionsSwitcherProps {
+export interface DimensionsSwitcherProps extends DimensionsSwitcher.DimensionsRendererProps {
 	entityName: string
-	dimension: string
-	labelName: string
-	valueName: string
-	maxItems: number
-	opener: JSX.Element
 }
 
-class DimensionsSwitcher extends React.Component<DimensionsSwitcherProps, DimensionsSwitcherState> {
-	state: DimensionsSwitcherState = {
-		isOpen: false
-	}
-
+class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 	static defaultProps: Partial<DimensionsSwitcherProps> = {
 		maxItems: 2
 	}
 
 	render() {
 		return (
-			<Popover
-				isOpen={this.state.isOpen}
-				target={this.props.opener}
-				onInteraction={target => this.setState({ isOpen: target })}
-				content={
-					<EntityListDataProvider<DimensionSwitcher.DimensionsRendererProps>
-						name={this.props.entityName}
-						renderer={DimensionSwitcher.DimensionsRenderer}
-						rendererProps={{
-							dimension: this.props.dimension,
-							labelName: this.props.labelName,
-							valueName: this.props.valueName,
-							maxItems: this.props.maxItems
-						}}
-					>
-						<DimensionSwitcher.Item labelName={this.props.labelName} valueName={this.props.valueName} />
-					</EntityListDataProvider>
-				}
-			/>
+			<EntityListDataProvider<DimensionsSwitcher.DimensionsRendererProps>
+				name={this.props.entityName}
+				renderer={DimensionsSwitcher.DimensionsRenderer}
+				rendererProps={{
+					dimension: this.props.dimension,
+					labelName: this.props.labelName,
+					maxItems: this.props.maxItems,
+					opener: this.props.opener,
+					valueName: this.props.valueName
+				}}
+			>
+				<DimensionsSwitcher.Item labelName={this.props.labelName} valueName={this.props.valueName} />
+			</EntityListDataProvider>
 		)
 	}
 }
 
-namespace DimensionSwitcher {
+namespace DimensionsSwitcher {
 	export interface ItemProps {
 		labelName: string
 		valueName: string
@@ -94,6 +75,7 @@ namespace DimensionSwitcher {
 	}
 
 	export interface DimensionsRendererProps {
+		opener: JSX.Element
 		dimension: string
 		labelName: string
 		valueName: string
@@ -102,18 +84,33 @@ namespace DimensionSwitcher {
 
 	interface DimensionsRendererState {
 		isAdding: boolean
+		isOpen: boolean
 	}
 
-	export class DimensionsRenderer extends React.PureComponent<
+	export class DimensionsRenderer extends React.Component<
 		RendererProps & DimensionsRendererProps,
 		DimensionsRendererState
 	> {
+		static defaultProps: Partial<DimensionsSwitcherProps> = {
+			maxItems: 2
+		}
+
+		shouldComponentUpdate(
+			nextProps: Readonly<RendererProps & DimensionsSwitcher.DimensionsRendererProps>,
+			nextState: Readonly<DimensionsRendererState>
+		): boolean {
+			return nextState.isAdding !== this.state.isAdding || nextState.isOpen !== this.state.isOpen
+		}
+
 		state: DimensionsRendererState = {
-			isAdding: false
+			isAdding: false,
+			isOpen: false
 		}
 		private renderColumn(selectedValue: string | null, index: number): React.ReactNode {
 			const { data } = this.props
-			if (typeof data === 'undefined') return null
+			if (data === undefined) {
+				return null
+			}
 			const normalizedData = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
 			return (
 				<Menu className="dimensionsSwitcher-menu">
@@ -166,7 +163,17 @@ namespace DimensionSwitcher {
 				</Menu>
 			)
 		}
+
 		public render() {
+			return (
+				<Popover isOpen={this.state.isOpen} onInteraction={target => this.setState({ isOpen: target })}>
+					{this.props.opener}
+					{this.renderContent()}
+				</Popover>
+			)
+		}
+
+		private renderContent() {
 			if (!this.props.data) {
 				return <LoadingSpinner size={Spinner.SIZE_SMALL} />
 			}

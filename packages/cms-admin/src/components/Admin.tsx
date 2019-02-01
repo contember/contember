@@ -4,7 +4,7 @@ import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
 import { EnvironmentContext } from '../binding/coreComponents'
 import { Environment } from '../binding/dao'
-import Router from '../containers/router'
+import { Router } from '../containers/router'
 import { PROJECT_CONFIGS_REPLACE } from '../reducer/projectsConfigs'
 import { emptyState } from '../state'
 import { ProjectConfig } from '../state/projectsConfigs'
@@ -42,26 +42,55 @@ export default class Admin extends React.Component<AdminProps> {
 			<Provider store={this.store}>
 				<Router
 					routes={{
-						login: route => <Login />,
-						projects_list: route => <ProjectsList configs={this.props.configs} />,
-						project_page: (route: PageRequest<any>) => {
-							const config = this.props.configs.find(
-								({ project, stage }) => project === route.project && stage === route.stage
-							)
-							if (config) {
-								const Component = React.lazy(config.component)
-								const environment = new Environment({ dimensions: route.dimensions })
-								return (
-									<EnvironmentContext.Provider value={environment}>
-										<React.Suspense fallback={'Loading...'}>
-											<Component />
-										</React.Suspense>
-									</EnvironmentContext.Provider>
-								)
-							} else {
-								return `No such project or stage as ${route.project}/${route.stage}`
+						login: () => <Login />,
+						projects_list: () => <ProjectsList configs={this.props.configs} />,
+						project_page: (() => {
+							const normalizedConfigs: {
+								[project: string]: {
+									[stage: string]: ProjectConfig & {
+										lazyComponent: React.LazyExoticComponent<React.ComponentType<any>>
+									}
+								}
+							} = {}
+
+							for (const config of this.props.configs) {
+								if (!(config.project in normalizedConfigs)) {
+									normalizedConfigs[config.project] = {}
+								}
+								if (config.stage in normalizedConfigs[config.project]) {
+									throw new Error(
+										`Duplicate project-stage pair supplied for project '${config.project}' and stage '${config.stage}'`
+									)
+								}
+								normalizedConfigs[config.project][config.stage] = {
+									...config,
+									lazyComponent: React.lazy(config.component)
+								}
 							}
-						}
+
+							return ({ route }: { route: PageRequest<any> }) => {
+								const config = this.props.configs.find(
+									({ project, stage }) => project === route.project && stage === route.stage
+								)
+								const Component = normalizedConfigs[route.project][route.stage].lazyComponent
+								if (config) {
+									const environment = new Environment({ dimensions: route.dimensions })
+									return (
+										<EnvironmentContext.Provider value={environment}>
+											<React.Suspense fallback={'Loading...'}>
+												<Component />
+											</React.Suspense>
+										</EnvironmentContext.Provider>
+									)
+								} else {
+									return (
+										<>
+											{`No such project or stage as ${route.project}/${route.stage}`}
+										</>
+									)
+								}
+							}
+						})()
 					}}
 				/>
 			</Provider>

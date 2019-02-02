@@ -242,7 +242,7 @@ export class MutationGenerator {
 							const { accessor, reference } = accessorReference[0]
 
 							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-								const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
+								const innerBuilder = this.createCreateDataBuilderByReference(reference)
 								return builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 							} else {
 								return builder.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey })
@@ -257,7 +257,7 @@ export class MutationGenerator {
 							const { accessor, reference } = referencePair
 
 							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-								const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
+								const innerBuilder = this.createCreateDataBuilderByReference(reference)
 								builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 							} else {
 								builder = builder.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey })
@@ -349,7 +349,7 @@ export class MutationGenerator {
 
 							if (accessor instanceof EntityAccessor) {
 								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-									const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
+									const innerBuilder = this.createCreateDataBuilderByReference(reference)
 									return builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 								} else {
 									const updated = builder.update(builder =>
@@ -396,7 +396,7 @@ export class MutationGenerator {
 
 							if (accessor instanceof EntityAccessor) {
 								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-									const innerBuilder = new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy)
+									const innerBuilder = this.createCreateDataBuilderByReference(reference)
 									builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 								} else {
 									builder = builder.update({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey }, builder => {
@@ -441,6 +441,35 @@ export class MutationGenerator {
 		}
 
 		return builder
+	}
+
+	private createCreateDataBuilderByReference(reference: ReferenceMarker.Reference): CrudQueryBuilder.CreateDataBuilder {
+		const registerReductionFields = (
+			where: Input.UniqueWhere<GraphQlBuilder.Literal>
+		): Input.CreateDataInput<GraphQlBuilder.Literal> => {
+			const data: Input.CreateDataInput<GraphQlBuilder.Literal> = {}
+
+			for (const key in where) {
+				const field = where[key]
+
+				if (
+					typeof field === 'string' ||
+					typeof field === 'number' ||
+					field === null ||
+					field instanceof GraphQlBuilder.Literal
+				) {
+					data[key] = field
+				} else {
+					data[key] = {
+						connect: field
+					}
+				}
+			}
+
+			return data
+		}
+
+		return new CrudQueryBuilder.CreateDataBuilder(reference.reducedBy && registerReductionFields(reference.reducedBy))
 	}
 
 	private primaryKeyToAlias(primaryKey: string): string {

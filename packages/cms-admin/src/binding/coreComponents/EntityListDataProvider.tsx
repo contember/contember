@@ -1,6 +1,4 @@
 import * as React from 'react'
-import Dimensions from '../../components/Dimensions'
-import { SelectedDimension } from '../../state/request'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { EnvironmentContext } from '../coreComponents'
 import { Environment, MarkerTreeRoot } from '../dao'
@@ -8,6 +6,7 @@ import { DefaultRenderer } from '../facade/renderers'
 import { MarkerTreeGenerator } from '../model'
 import { DataRendererProps, getDataProvider } from './DataProvider'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
+import { ImmutableDataProvider } from './ImmutableDataProvider'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
 interface EntityListDataProviderProps<DRP> {
@@ -16,6 +15,7 @@ interface EntityListDataProviderProps<DRP> {
 	filter?: Filter
 	renderer?: React.ComponentClass<DRP & DataRendererProps>
 	rendererProps?: DRP
+	immutable?: boolean
 }
 
 export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListDataProviderProps<DRP>> {
@@ -23,33 +23,47 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 
 	public render() {
 		return (
-			<EnvironmentContext.Consumer>
-				{(environment: Environment) => {
-					const FallbackRenderer: React.ComponentClass<DataRendererProps> = DefaultRenderer
-					const Renderer = this.props.renderer || FallbackRenderer
-					const markerTreeGenerator = new MarkerTreeGenerator(
-						(
-							<EntityListDataProvider {...this.props}>
-								<Renderer {...this.props.rendererProps} data={undefined}>
-									{this.props.children}
-								</Renderer>
-							</EntityListDataProvider>
-						),
-						environment
-					)
-					const DataProvider = getDataProvider<DRP>()
+			<ImmutableDataProvider immutable={!!this.props.immutable}>
+				{(data, onDataAvailable) => {
+					if (data) {
+						return this.renderRenderer(data)
+					}
 
 					return (
-						<DataProvider
-							markerTree={markerTreeGenerator.generate()}
-							renderer={this.props.renderer}
-							rendererProps={this.props.rendererProps}
-						>
-							{this.props.children}
-						</DataProvider>
+						<EnvironmentContext.Consumer>
+							{(environment: Environment) => {
+								const markerTreeGenerator = new MarkerTreeGenerator(
+									<EntityListDataProvider {...this.props}>{this.renderRenderer(undefined)}</EntityListDataProvider>,
+									environment
+								)
+								const DataProvider = getDataProvider<DRP>()
+
+								return (
+									<DataProvider
+										markerTree={markerTreeGenerator.generate()}
+										renderer={this.props.renderer}
+										rendererProps={this.props.rendererProps}
+										onDataAvailable={onDataAvailable}
+									>
+										{this.props.children}
+									</DataProvider>
+								)
+							}}
+						</EnvironmentContext.Consumer>
 					)
 				}}
-			</EnvironmentContext.Consumer>
+			</ImmutableDataProvider>
+		)
+	}
+
+	private renderRenderer(data: DataRendererProps['data']): React.ReactNode {
+		const FallbackRenderer: React.ComponentClass<DataRendererProps> = DefaultRenderer
+		const Renderer = this.props.renderer || FallbackRenderer
+
+		return (
+			<Renderer {...this.props.rendererProps} data={data}>
+				{this.props.children}
+			</Renderer>
 		)
 	}
 

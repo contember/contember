@@ -2,7 +2,6 @@ import { Button, Divider, IButtonProps, Menu, MenuItem, Popover, Spinner } from 
 import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import { Dimensions, Link } from '../../../components'
-import { SelectedDimension } from '../../../state/request'
 import {
 	AccessorTreeRoot,
 	EntityAccessor,
@@ -29,6 +28,7 @@ class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 		return (
 			<EntityListDataProvider<DimensionsSwitcher.DimensionsRendererProps>
 				name={this.props.entityName}
+				immutable={true}
 				renderer={DimensionsSwitcher.DimensionsRenderer}
 				rendererProps={{
 					buttonProps: this.props.buttonProps,

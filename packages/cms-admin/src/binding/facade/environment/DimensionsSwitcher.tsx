@@ -1,8 +1,11 @@
-import { Button, Divider, Menu, MenuItem, Popover, Spinner } from '@blueprintjs/core'
+import { Button, Divider, IButtonProps, Menu, MenuItem, Popover, Spinner } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import { Dimensions, Link } from '../../../components'
+import { SelectedDimension } from '../../../state/request'
 import {
+	AccessorTreeRoot,
+	EntityAccessor,
 	EntityCollectionAccessor,
 	EntityListDataProvider,
 	Environment,
@@ -28,10 +31,12 @@ class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 				name={this.props.entityName}
 				renderer={DimensionsSwitcher.DimensionsRenderer}
 				rendererProps={{
+					buttonProps: this.props.buttonProps,
 					dimension: this.props.dimension,
+					emptyText: this.props.emptyText,
 					labelName: this.props.labelName,
 					maxItems: this.props.maxItems,
-					opener: this.props.opener,
+					renderSelectedText: this.props.renderSelectedText,
 					valueName: this.props.valueName
 				}}
 			>
@@ -75,16 +80,24 @@ namespace DimensionsSwitcher {
 	}
 
 	export interface DimensionsRendererProps {
-		opener: JSX.Element
 		dimension: string
 		labelName: string
 		valueName: string
 		maxItems: number
+		emptyText: React.ReactNode
+		renderSelectedText?: (dimensionData: NormalizedDimensionData[]) => React.ReactNode
+		buttonProps?: Pick<IButtonProps, Exclude<keyof IButtonProps, 'text'>>
 	}
 
 	interface DimensionsRendererState {
 		isAdding: boolean
 		isOpen: boolean
+	}
+
+	interface NormalizedDimensionData {
+		slug: string
+		label: string
+		isSelected: boolean
 	}
 
 	export class DimensionsRenderer extends React.Component<
@@ -95,116 +108,156 @@ namespace DimensionsSwitcher {
 			maxItems: 2
 		}
 
-		shouldComponentUpdate(
-			nextProps: Readonly<RendererProps & DimensionsSwitcher.DimensionsRendererProps>,
-			nextState: Readonly<DimensionsRendererState>
-		): boolean {
-			return nextState.isAdding !== this.state.isAdding || nextState.isOpen !== this.state.isOpen
-		}
-
 		state: DimensionsRendererState = {
 			isAdding: false,
 			isOpen: false
 		}
-		private renderColumn(selectedValue: string | null, index: number): React.ReactNode {
-			const { data } = this.props
-			if (data === undefined) {
-				return null
-			}
-			const normalizedData = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
-			return (
-				<Menu className="dimensionsSwitcher-menu">
-					{normalizedData.map((dataValue, i) => {
-						const value = dataValue && dataValue.data.getField(this.props.valueName)
-						const label = dataValue && dataValue.data.getField(this.props.labelName)
-						if (
-							dataValue &&
-							typeof dataValue.primaryKey === 'string' &&
-							value instanceof FieldAccessor &&
-							label instanceof FieldAccessor
-						) {
-							const currentValue = value.currentValue
-							if (typeof currentValue !== 'string') {
-								return null
-							}
-							return (
-								<Link
-									key={dataValue.primaryKey}
-									Component={({ href, onClick }) => (
-										<MenuItem
-											href={href}
-											onClick={onClick}
-											text={label.currentValue}
-											active={selectedValue == value.currentValue}
-											shouldDismissPopover={false}
-										/>
-									)}
-									requestChange={reqState => {
-										if (reqState.name !== 'project_page') {
-											return reqState
-										}
-										const dimensionName = this.props.dimension
-										const dimension = [...(reqState.dimensions[dimensionName] || [])]
-										if (dimension[index] === currentValue) {
-											dimension.splice(index, 1)
-										} else {
-											dimension[index] = currentValue
-										}
-										return {
-											...reqState,
-											dimensions: { ...(reqState.dimensions || {}), [dimensionName]: dimension }
-										}
-									}}
-								/>
-							)
-						}
-						return null
-					})}
-				</Menu>
-			)
-		}
 
 		public render() {
 			return (
-				<Popover isOpen={this.state.isOpen} onInteraction={target => this.setState({ isOpen: target })}>
-					{this.props.opener}
-					{this.renderContent()}
-				</Popover>
+				<Dimensions>
+					{dimensions => {
+						const uniqueDimensions = this.getUniqueDimensions(dimensions[this.props.dimension] || [])
+						const normalizedData = this.getNormalizedData(uniqueDimensions, this.props.data)
+
+						return (
+							<Popover isOpen={this.state.isOpen} onInteraction={target => this.setState({ isOpen: target })}>
+								{this.renderTarget(normalizedData)}
+								{this.renderContent(normalizedData, uniqueDimensions)}
+							</Popover>
+						)
+					}}
+				</Dimensions>
 			)
 		}
 
-		private renderContent() {
-			if (!this.props.data) {
+		private renderTarget(dimensionData: undefined | NormalizedDimensionData[]): React.ReactNode {
+			const defaultProps: IButtonProps = {
+				rightIcon: IconNames.CHEVRON_DOWN
+			}
+			let text: React.ReactNode
+
+			if (dimensionData) {
+				const normalizedSelected = dimensionData.filter(item => item.isSelected)
+
+				if (normalizedSelected.length) {
+					if (this.props.renderSelectedText) {
+						text = this.props.renderSelectedText(normalizedSelected)
+					} else {
+						text = normalizedSelected.map(datum => datum.label).join(', ')
+					}
+				} else {
+					text = this.props.emptyText
+				}
+			} else {
+				text = this.props.emptyText
+			}
+			return <Button {...defaultProps} {...this.props.buttonProps} text={text} />
+		}
+
+		private renderContent(dimensionData: undefined | NormalizedDimensionData[], selectedDimensions: string[]) {
+			if (!dimensionData) {
 				return <LoadingSpinner size={Spinner.SIZE_SMALL} />
 			}
+			const selectedDimensionsCount = selectedDimensions.length
+			const canSelectAnother = selectedDimensionsCount < this.props.maxItems
+			const columnCount = selectedDimensionsCount + (this.state.isAdding && canSelectAnother ? 1 : 0)
+
 			return (
 				<div className="dimensionsSwitcher-wrapper">
-					<Dimensions>
-						{dimensions => {
-							const currentValue = dimensions[this.props.dimension] || []
-							return (
-								<>
-									{currentValue.map((current, i) => {
+					{[...Array(columnCount)].map((_, i) => {
+						return (
+							<React.Fragment key={i}>
+								{!!i && <Divider />}
+								<Menu className="dimensionsSwitcher-menu">
+									{dimensionData.map((dimension, j) => {
+										const isActive = selectedDimensions[i] === dimension.slug
 										return (
-											<React.Fragment key={i}>
-												{!!i && <Divider />}
-												{this.renderColumn(current, i)}
-											</React.Fragment>
+											<Link
+												key={j}
+												Component={({ href, onClick }) => (
+													<MenuItem
+														href={href}
+														onClick={onClick}
+														text={dimension.label}
+														active={isActive}
+														disabled={!isActive && dimension.isSelected}
+														shouldDismissPopover={false}
+													/>
+												)}
+												requestChange={reqState => {
+													if (reqState.name !== 'project_page') {
+														return reqState
+													}
+													const dimensionName = this.props.dimension
+													const selectedDimensions = [...(reqState.dimensions[dimensionName] || [])]
+													if (selectedDimensions[i] === dimension.slug) {
+														selectedDimensions.splice(i, 1)
+													} else {
+														selectedDimensions[i] = dimension.slug
+													}
+													return {
+														...reqState,
+														dimensions: {
+															...(reqState.dimensions || {}),
+															[dimensionName]: this.getUniqueDimensions(selectedDimensions)
+														}
+													}
+												}}
+											/>
 										)
 									})}
-									{(this.state.isAdding || currentValue.length < this.props.maxItems) &&
-										currentValue.length > 0 && <Divider />}
-									{this.state.isAdding && this.renderColumn(null, currentValue.length)}
-									{!this.state.isAdding &&
-										currentValue.length < this.props.maxItems && (
-											<Button icon={IconNames.ADD} minimal={true} onClick={() => this.setState({ isAdding: true })} />
-										)}
-								</>
-							)
-						}}
-					</Dimensions>
+								</Menu>
+							</React.Fragment>
+						)
+					})}
+					{!this.state.isAdding &&
+						canSelectAnother && (
+							<>
+								<Divider />
+								<Button icon={IconNames.ADD} minimal={true} onClick={() => this.setState({ isAdding: true })} />
+							</>
+						)}
 				</div>
 			)
+		}
+
+		private getNormalizedData(
+			currentDimensions: string[],
+			data?: AccessorTreeRoot
+		): undefined | NormalizedDimensionData[] {
+			if (!data) {
+				return undefined
+			}
+			const entities = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
+			const normalized: NormalizedDimensionData[] = []
+
+			for (const entity of entities) {
+				if (!(entity instanceof EntityAccessor)) {
+					continue
+				}
+				const slug = entity.data.getField(this.props.valueName)
+				const label = entity.data.getField(this.props.labelName)
+
+				if (slug instanceof FieldAccessor && label instanceof FieldAccessor) {
+					const slugValue = slug.currentValue
+					const labelValue = label.currentValue
+
+					if (typeof slugValue === 'string' && typeof labelValue === 'string') {
+						normalized.push({
+							slug: slugValue,
+							label: labelValue,
+							isSelected: currentDimensions.indexOf(slugValue) !== -1
+						})
+					}
+				}
+			}
+
+			return normalized
+		}
+
+		private getUniqueDimensions(selectedDimensions: string[]): string[] {
+			return selectedDimensions.filter((item, i, array) => array.indexOf(item) === i)
 		}
 	}
 }

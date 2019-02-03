@@ -59,13 +59,21 @@ class Environment {
 		return new Environment(currentNames)
 	}
 
-	public updateDimensionsIfNecessary(newDimensions: Environment.NameStore['dimensions']): Environment {
-		const dimensionsEqual = JSON.stringify(this.names.dimensions) === JSON.stringify(newDimensions)
+	public updateDimensionsIfNecessary(
+		dimensions: Environment.NameStore['dimensions'],
+		defaultDimensions: Environment.NameStore['dimensions']
+	): Environment {
+		const normalizedDimensions: Environment.NameStore['dimensions'] = {
+			...defaultDimensions,
+			...dimensions
+		}
+
+		const dimensionsEqual = JSON.stringify(this.names.dimensions) === JSON.stringify(normalizedDimensions)
 		return dimensionsEqual
 			? this
 			: new Environment({
 					...this.names,
-					dimensions: { ...newDimensions }
+					dimensions: { ...normalizedDimensions }
 			  })
 	}
 

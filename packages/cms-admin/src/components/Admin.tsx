@@ -49,6 +49,7 @@ export default class Admin extends React.Component<AdminProps> {
 								[project: string]: {
 									[stage: string]: ProjectConfig & {
 										lazyComponent: React.LazyExoticComponent<React.ComponentType<any>>
+										rootEnvironment: Environment
 									}
 								}
 							} = {}
@@ -64,20 +65,27 @@ export default class Admin extends React.Component<AdminProps> {
 								}
 								normalizedConfigs[config.project][config.stage] = {
 									...config,
-									lazyComponent: React.lazy(config.component)
+									lazyComponent: React.lazy(config.component),
+									rootEnvironment: new Environment({
+										dimensions: config.defaultDimensions || {}
+									})
 								}
 							}
-							let rootEnvironment = new Environment()
 
 							return ({ route }: { route: PageRequest<any> }) => {
 								const config = this.props.configs.find(
 									({ project, stage }) => project === route.project && stage === route.stage
 								)
-								const Component = normalizedConfigs[route.project][route.stage].lazyComponent
+								const relevantConfig = normalizedConfigs[route.project][route.stage]
+								const Component = relevantConfig.lazyComponent
+
 								if (config) {
-									rootEnvironment = rootEnvironment.updateDimensionsIfNecessary(route.dimensions)
+									relevantConfig.rootEnvironment = relevantConfig.rootEnvironment.updateDimensionsIfNecessary(
+										route.dimensions,
+										config.defaultDimensions || {}
+									)
 									return (
-										<EnvironmentContext.Provider value={rootEnvironment}>
+										<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
 											<React.Suspense fallback={'Loading...'}>
 												<Component />
 											</React.Suspense>

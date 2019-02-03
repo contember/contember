@@ -25,7 +25,7 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 		return (
 			<ImmutableDataProvider immutable={!!this.props.immutable}>
 				{(data, onDataAvailable) => {
-					if (data) {
+					if (data && this.props.immutable) {
 						return this.renderRenderer(data)
 					}
 
@@ -43,7 +43,7 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 										markerTree={markerTreeGenerator.generate()}
 										renderer={this.props.renderer}
 										rendererProps={this.props.rendererProps}
-										onDataAvailable={onDataAvailable}
+										onDataAvailable={this.props.immutable ? onDataAvailable : undefined}
 									>
 										{this.props.children}
 									</DataProvider>

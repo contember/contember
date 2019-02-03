@@ -1,13 +1,14 @@
 import { Button, Divider, IButtonProps, Menu, MenuItem, Popover, Spinner } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
-import { Dimensions, Link } from '../../../components'
+import { Link } from '../../../components'
 import {
 	AccessorTreeRoot,
 	EntityAccessor,
 	EntityCollectionAccessor,
 	EntityListDataProvider,
 	Environment,
+	EnvironmentContext,
 	Field,
 	FieldAccessor,
 	RendererProps
@@ -115,9 +116,9 @@ namespace DimensionsSwitcher {
 
 		public render() {
 			return (
-				<Dimensions>
-					{dimensions => {
-						const uniqueDimensions = this.getUniqueDimensions(dimensions[this.props.dimension] || [])
+				<EnvironmentContext.Consumer>
+					{environment => {
+						const uniqueDimensions = this.getUniqueDimensions(environment.getDimensions()[this.props.dimension] || [])
 						const normalizedData = this.getNormalizedData(uniqueDimensions, this.props.data)
 
 						return (
@@ -127,7 +128,7 @@ namespace DimensionsSwitcher {
 							</Popover>
 						)
 					}}
-				</Dimensions>
+				</EnvironmentContext.Consumer>
 			)
 		}
 
@@ -190,17 +191,17 @@ namespace DimensionsSwitcher {
 														return reqState
 													}
 													const dimensionName = this.props.dimension
-													const selectedDimensions = [...(reqState.dimensions[dimensionName] || [])]
-													if (selectedDimensions[i] === dimension.slug) {
-														selectedDimensions.splice(i, 1)
+													const dimensions = [...selectedDimensions]
+													if (dimensions[i] === dimension.slug) {
+														dimensions.splice(i, 1)
 													} else {
-														selectedDimensions[i] = dimension.slug
+														dimensions[i] = dimension.slug
 													}
 													return {
 														...reqState,
 														dimensions: {
 															...(reqState.dimensions || {}),
-															[dimensionName]: this.getUniqueDimensions(selectedDimensions)
+															[dimensionName]: this.getUniqueDimensions(dimensions)
 														}
 													}
 												}}

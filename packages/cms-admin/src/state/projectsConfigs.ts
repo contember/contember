@@ -1,11 +1,13 @@
 import { RouteMap } from '../components/pageRouting/utils'
 import { ComponentType } from 'react'
+import { SelectedDimension } from './request'
 
 export interface ProjectConfig {
 	project: string
 	stage: string
 	component: () => Promise<{ default: ComponentType }>
 	routes: RouteMap
+	defaultDimensions?: SelectedDimension
 }
 
 export default interface ProjectsConfigsState {

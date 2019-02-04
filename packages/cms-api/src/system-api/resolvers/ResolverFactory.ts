@@ -1,16 +1,20 @@
-import { Config } from 'apollo-server-core'
 import StagesQueryResolver from './query/StagesQueryResolver'
 import DiffQueryResolver from './query/DiffQueryResolver'
 import { Event, EventType } from '../schema/types'
 import { assertNever } from 'cms-common'
+import ResolverContext from './ResolverContext'
+import { GraphQLResolveInfo } from 'graphql'
+import { IResolvers } from 'graphql-tools'
+import ReleaseMutationResolver from './mutation/ReleaseMutationResolver'
 
 class ResolverFactory {
 	public constructor(
 		private readonly stagesQueryResolver: StagesQueryResolver,
-		private readonly diffQueryResolver: DiffQueryResolver
+		private readonly diffQueryResolver: DiffQueryResolver,
+		private readonly releaseMutationResolver: ReleaseMutationResolver
 	) {}
 
-	create(): Config['resolvers'] {
+	create(): IResolvers {
 		return {
 			Event: {
 				__resolveType: (obj: Event) => {
@@ -32,10 +36,15 @@ class ResolverFactory {
 				},
 			},
 			Query: {
-				stages: this.stagesQueryResolver.stages.bind(this.stagesQueryResolver),
-				diff: this.diffQueryResolver.diff.bind(this.diffQueryResolver),
+				stages: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.stagesQueryResolver.stages(parent, args, context, info),
+				diff: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.diffQueryResolver.diff(parent, args, context, info),
 			},
-			Mutation: {},
+			Mutation: {
+				release: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.releaseMutationResolver.release(parent, args, context, info),
+			},
 		}
 	}
 }

@@ -6,7 +6,7 @@ class UpdateStageEventCommand {
 	public async execute(db: KnexWrapper) {
 		await db
 			.updateBuilder()
-			.table('event')
+			.table('stage')
 			.where({ id: this.stageId })
 			.values({
 				event_id: this.eventId,

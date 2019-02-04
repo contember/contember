@@ -2,7 +2,7 @@ import AuthorizationScope from './AuthorizationScope'
 import AccessEvaluator from './AccessEvalutator'
 import AccessNode from './AccessNode'
 
-interface Authorizator<Identity extends Authorizator.Identity> {
+interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Identity> {
 	isAllowed(identity: Identity, scope: AuthorizationScope<Identity>, action: Authorizator.Action): Promise<boolean>
 }
 

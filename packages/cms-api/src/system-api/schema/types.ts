@@ -40,7 +40,12 @@ export interface DiffResult {
 }
 
 export interface Mutation {
-	readonly foo: string
+	readonly release: ReleaseResponse
+}
+
+export interface ReleaseResponse {
+	readonly ok: boolean
+	readonly errors: ReadonlyArray<ReleaseErrorCode>
 }
 
 export interface UpdateEvent extends Event {
@@ -92,6 +97,11 @@ export interface DiffQueryArgs {
 	headStage: string
 	filter?: ReadonlyArray<DiffFilter> | null
 }
+export interface ReleaseMutationArgs {
+	baseStage: string
+	headStage: string
+	events: ReadonlyArray<string>
+}
 
 export enum DiffErrorCode {
 	BASE_NOT_FOUND = 'BASE_NOT_FOUND',
@@ -104,6 +114,11 @@ export enum EventType {
 	DELETE = 'DELETE',
 	CREATE = 'CREATE',
 	RUN_MIGRATION = 'RUN_MIGRATION',
+}
+
+export enum ReleaseErrorCode {
+	MISSING_DEPENDENCY = 'MISSING_DEPENDENCY',
+	FORBIDDEN = 'FORBIDDEN',
 }
 
 export namespace QueryResolvers {
@@ -159,10 +174,25 @@ export namespace DiffResultResolvers {
 
 export namespace MutationResolvers {
 	export interface Resolvers {
-		foo?: FooResolver
+		release?: ReleaseResolver
 	}
 
-	export type FooResolver<R = string> = Resolver<R>
+	export type ReleaseResolver<R = ReleaseResponse> = Resolver<R, ReleaseArgs>
+	export interface ReleaseArgs {
+		baseStage: string
+		headStage: string
+		events: ReadonlyArray<string>
+	}
+}
+
+export namespace ReleaseResponseResolvers {
+	export interface Resolvers {
+		ok?: OkResolver
+		errors?: ErrorsResolver
+	}
+
+	export type OkResolver<R = boolean> = Resolver<R>
+	export type ErrorsResolver<R = ReadonlyArray<ReleaseErrorCode>> = Resolver<R>
 }
 
 export namespace UpdateEventResolvers {

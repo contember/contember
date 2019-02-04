@@ -43,7 +43,7 @@ SELECT * FROM events ORDER BY index DESC
 		}
 
 		const result: Event[] = []
-		for (let event of rows.slice(1, -1)) {
+		for (let event of rows.slice(1)) {
 			const data = event.data
 			switch (event.type) {
 				case EventType.create:

@@ -13,12 +13,20 @@ const schema: DocumentNode = gql`
 	}
 
 	type Mutation {
-		foo: String!
+		release(baseStage: String!, headStage: String!, events: [String!]!): ReleaseResponse!
 	}
+
+	# === diff ===
 
 	input DiffFilter {
 		entity: String!
 		id: String!
+	}
+
+	enum DiffErrorCode {
+		BASE_NOT_FOUND
+		HEAD_NOT_FOUND
+		NOT_REBASED
 	}
 
 	type DiffResponse {
@@ -32,6 +40,19 @@ const schema: DocumentNode = gql`
 		head: Stage!
 		events: [Event!]!
 	}
+
+	# === release ===
+	enum ReleaseErrorCode {
+		MISSING_DEPENDENCY
+		FORBIDDEN
+	}
+
+	type ReleaseResponse {
+		ok: Boolean!
+		errors: [ReleaseErrorCode!]!
+	}
+
+	# === events ===
 
 	interface Event {
 		id: String!
@@ -88,11 +109,7 @@ const schema: DocumentNode = gql`
 		version: String!
 	}
 
-	enum DiffErrorCode {
-		BASE_NOT_FOUND
-		HEAD_NOT_FOUND
-		NOT_REBASED
-	}
+	# === stage ===
 
 	type Stage {
 		id: String!

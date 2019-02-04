@@ -1,8 +1,7 @@
-import pgMigrate from 'node-pg-migrate'
-import { DatabaseCredentials } from '../config/config'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
+import MigrationsRunner from '../migrations/MigrationsRunner'
 
 class EngineMigrationsContinueCommand extends BaseCommand<{}, {}> {
 	protected configure(configuration: CommandConfiguration): void {
@@ -14,34 +13,18 @@ class EngineMigrationsContinueCommand extends BaseCommand<{}, {}> {
 		const config = await this.readConfig()
 
 		console.log('Executing tenant schema migrations')
+
+		const migrationsRunner = new MigrationsRunner()
 		const tenantMigrationsManager = MigrationFilesManager.createForEngine('tenant')
-		await this.migrate(config.tenant.db, 'tenant', tenantMigrationsManager.directory)
+		await migrationsRunner.migrate(config.tenant.db, 'tenant', tenantMigrationsManager.directory)
 
 		console.log('\n')
 		const projectMigrationsManager = MigrationFilesManager.createForEngine('project')
 		for (const project of config.projects) {
 			console.log(`Executing event schema migrations for project ${project.slug}`)
-			await this.migrate(project.dbCredentials, 'system', projectMigrationsManager.directory)
+			await migrationsRunner.migrate(project.dbCredentials, 'system', projectMigrationsManager.directory)
 			console.log('\n')
 		}
-	}
-
-	private async migrate(db: DatabaseCredentials, schema: string, dir: string) {
-		await pgMigrate({
-			databaseUrl: db,
-			dir: dir,
-			schema: schema,
-			migrationsTable: 'migrations',
-			checkOrder: true,
-			direction: 'up',
-			count: Infinity,
-			ignorePattern: '^\\..*$',
-			createSchema: true,
-			singleTransaction: true,
-			log: (msg: string) => {
-				console.log('    ' + msg.replace(/\n/g, '\n    '))
-			},
-		})
 	}
 }
 

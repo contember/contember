@@ -8,10 +8,15 @@ import QueryHandler from '../query/QueryHandler'
 import KnexQueryable from './KnexQueryable'
 import KnexConnection from './KnexConnection'
 
-export default class KnexWrapper {
-	constructor(public readonly knex: Knex, public readonly schema: string) {}
+class KnexWrapper<KnexType extends Knex = Knex> {
+	constructor(public readonly knex: KnexType, public readonly schema: string) {
+	}
 
-	async transaction<T>(transactionScope: (wrapper: KnexWrapper) => Promise<T> | void): Promise<T> {
+	public forSchema(schema: string): KnexWrapper {
+		return new KnexWrapper(this.knex, schema)
+	}
+
+	async transaction<T>(transactionScope: (wrapper: KnexWrapper & KnexWrapper.Transaction) => Promise<T> | void): Promise<T> {
 		return await this.knex.transaction(knex => transactionScope(new KnexWrapper(knex, this.schema)))
 	}
 
@@ -46,3 +51,11 @@ export default class KnexWrapper {
 		return handler
 	}
 }
+
+namespace KnexWrapper {
+	export interface Transaction {
+		knex: Knex.Transaction
+	}
+}
+
+export default KnexWrapper

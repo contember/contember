@@ -18,6 +18,7 @@ import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionC
 import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
 import KnexDebugger from '../core/knex/KnexDebugger'
 import { formatSchemaName } from '../system-api/model/helpers/stageHelpers'
+import { createGraphqlInvalidAuthResponse } from './responseUtils'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
@@ -60,38 +61,27 @@ class ContentMiddlewareFactory {
 					} & TimerMiddlewareFactory.ContextWithTimer,
 					next
 				) => {
-					const createGraphqlInvalidAuthResponse = (message: string): void => {
-						ctx.set('Content-type', 'application/json')
-						ctx.status = 500
-						ctx.body = JSON.stringify({ errors: [{ message, code: 401 }] })
-					}
 					ctx.state.timer('starting trx')
 					await ctx.state.db.transaction(async knexConnection => {
 						ctx.state.timer('done')
 						ctx.state.db = knexConnection
 						if (ctx.state.authResult === undefined) {
-							return createGraphqlInvalidAuthResponse(
+							return createGraphqlInvalidAuthResponse(ctx,
 								'/content endpoint requires authorization, see /tenant endpoint and signIn() mutation'
 							)
 						}
 
 						if (!ctx.state.authResult.valid) {
-							return createGraphqlInvalidAuthResponse(`Auth failure: ${ctx.state.authResult.error}`)
+							return createGraphqlInvalidAuthResponse(ctx, `Auth failure: ${ctx.state.authResult.error}`)
 						}
 						await setupSystemVariables(knexConnection, ctx.state.authResult.identityId)
 
 						const model = await projectContainer.get('schemaVersionBuilder').buildSchemaForStage(stage.uuid)
 
-						ctx.state.timer('fetching project roles and variables')
-
 						const [projectRoles, projectVariables] = await Promise.all([
 							this.projectMemberManager.getProjectRoles(project.uuid, ctx.state.authResult.identityId),
 							this.projectMemberManager.getProjectVariables(project.uuid, ctx.state.authResult.identityId),
 						])
-
-						ctx.state.timer('done')
-
-						ctx.state.timer('building schema')
 
 						const globalRoles = ctx.state.authResult.roles
 						const [dataSchema, permissions] = projectContainer.get('graphQlSchemaFactory').create(

@@ -41,9 +41,9 @@ export const executeGraphQlTest = async (connection: knex, test: Test) => {
 			return
 		}
 		const actualSql = query.sql.replace(/\s+/g, ' ')
-		console.log(actualSql)
-		console.log(queryDefinition.sql)
-		console.log(query.bindings)
+		// console.log(actualSql)
+		// console.log(queryDefinition.sql)
+		// console.log(query.bindings)
 		if (!queryDefinition) {
 			throw new Error(`Unexpected query #${step} '${query.sql}'`)
 		}
@@ -75,6 +75,7 @@ export const executeGraphQlTest = async (connection: knex, test: Test) => {
 		expect(response).deep.equal(test.return)
 	} finally {
 		tracker.uninstall()
+		mockKnex.unmock(connection)
 		uuidStub.restore()
 		nowStub.restore()
 	}

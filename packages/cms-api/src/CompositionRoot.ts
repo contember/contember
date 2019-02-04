@@ -20,7 +20,6 @@ import { DatabaseCredentials } from './config/config'
 import S3 from './utils/S3'
 import AddProjectMemberMutationResolver from './tenant-api/resolvers/mutation/AddProjectMemberMutationResolver'
 import ResolverFactory from './tenant-api/resolvers/ResolverFactory'
-import SystemResolverFactory from './system-api/resolvers/ResolverFactory'
 import TimerMiddlewareFactory from './http/TimerMiddlewareFactory'
 import TenantApolloServerFactory from './http/TenantApolloServerFactory'
 import SetupMutationResolver from './tenant-api/resolvers/mutation/SetupMutationResolver'
@@ -30,22 +29,15 @@ import PermissionsFactory from './tenant-api/model/authorization/PermissionsFact
 import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
 import ProjectSchemaInfo from './config/ProjectSchemaInfo'
-import { ApolloServer } from 'apollo-server-koa'
-import SystemApolloServerFactory from './http/SystemApolloServerFactory'
-import StagesQueryResolver from './system-api/resolvers/query/StagesQueryResolver'
 import KnexWrapper from './core/knex/KnexWrapper'
 import SystemMiddlewareFactory from './http/SystemMiddlewareFactory'
-import DiffQueryResolver from './system-api/resolvers/query/DiffQueryResolver'
-import DiffBuilder from './system-api/model/events/DiffBuilder'
-import DependencyBuilder from './system-api/model/events/DependencyBuilder'
-import MigrationsDependencyBuilder from './system-api/model/events/dependency/MigrationsDependencyBuilder'
-import SameRowDependencyBuilder from './system-api/model/events/dependency/SameRowDependencyBuilder'
-import TransactionDependencyBuilder from './system-api/model/events/dependency/TransactionDependencyBuilder'
-import DeletedRowReferenceDependencyBuilder from './system-api/model/events/dependency/DeletedRowReferenceDependencyBuilder'
-import CreatedRowReferenceDependencyBuilder from './system-api/model/events/dependency/CreatedRowReferenceDependencyBuilder'
 import SchemaVersionBuilder from './content-schema/SchemaVersionBuilder'
-import TableReferencingResolver from './system-api/model/events/TableReferencingResolver'
-import DiffResponseBuilder from './system-api/model/events/DiffResponseBuilder'
+import { IResolvers } from 'graphql-tools'
+import SystemContainerFactory from './system-api/SystemContainerFactory'
+import SystemApolloServerFactory from './http/SystemApolloServerFactory'
+import MigrationFilesManager from './migrations/MigrationFilesManager'
+import SchemaMigrationDiffsResolver from './content-schema/SchemaMigrationDiffsResolver'
+import PermissionsByIdentityFactory from './acl/PermissionsByIdentityFactory'
 import KnexDebugger from './core/knex/KnexDebugger'
 import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
 import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
@@ -55,14 +47,19 @@ export type ProjectContainer = Container<{
 	knexConnection: knex
 	graphQlSchemaFactory: GraphQlSchemaFactory
 	knexDebugger: KnexDebugger
-	systemApollo: ApolloServer
+	systemApolloServerFactory: SystemApolloServerFactory
+	systemResolvers: IResolvers
 	schemaVersionBuilder: SchemaVersionBuilder
 }>
 
 class CompositionRoot {
-	composeServer(tenantDbCredentials: DatabaseCredentials, projects: Array<ProjectSchemaInfo & Project>): Koa {
+	composeServer(
+		tenantDbCredentials: DatabaseCredentials,
+		projects: Array<ProjectSchemaInfo & Project>,
+		projectsDirectory: string
+	): Koa {
 		const tenantContainer = this.createTenantContainer(tenantDbCredentials)
-		const projectContainers = this.createProjectContainers(projects)
+		const projectContainers = this.createProjectContainers(projects, projectsDirectory)
 
 		const masterContainer = new Container.Builder({})
 			.addService('tenantContainer', () => tenantContainer)
@@ -80,7 +77,7 @@ class CompositionRoot {
 				new ContentMiddlewareFactory(projectContainers, tenantContainer.get('projectMemberManager')).create()
 			)
 			.addService('systemMiddleware', ({ projectContainers }) =>
-				new SystemMiddlewareFactory(projectContainers).create()
+				new SystemMiddlewareFactory(projectContainers, tenantContainer.get('projectMemberManager')).create()
 			)
 			.addService('timerMiddleware', () => new TimerMiddlewareFactory().create())
 
@@ -103,10 +100,11 @@ class CompositionRoot {
 		return masterContainer.get('koa')
 	}
 
-	createProjectContainers(projects: Array<ProjectSchemaInfo & Project>): ProjectContainer[] {
+	createProjectContainers(projects: Array<ProjectSchemaInfo & Project>, projectsDir: string): ProjectContainer[] {
 		return projects.map((project: ProjectSchemaInfo & Project) => {
-			const container = new Container.Builder({})
+			const projectContainer = new Container.Builder({})
 				.addService('project', () => project)
+				.addService('aclSchema', ({ project }) => project.acl)
 				.addService('knexDebugger', () => new KnexDebugger())
 				.addService('knexConnection', ({ project, knexDebugger }) => {
 					const knexInst = knex({
@@ -124,71 +122,51 @@ class CompositionRoot {
 
 					return knexInst
 				})
+				.addService('migrationFilesManager', ({ project }) =>
+					MigrationFilesManager.createForProject(projectsDir, project.slug)
+				)
+				.addService(
+					'schemaMigrationDiffsResolver',
+					({ migrationFilesManager }) => new SchemaMigrationDiffsResolver(migrationFilesManager)
+				)
 				.addService('systemKnexWrapper', ({ knexConnection }) => new KnexWrapper(knexConnection, 'system'))
 				.addService('systemQueryHandler', ({ systemKnexWrapper }) => systemKnexWrapper.createQueryHandler())
 				.addService(
 					'schemaVersionBuilder',
-					({ systemQueryHandler, project }) => new SchemaVersionBuilder(systemQueryHandler, project.migrations)
+					({ systemQueryHandler, schemaMigrationDiffsResolver }) =>
+						new SchemaVersionBuilder(systemQueryHandler, schemaMigrationDiffsResolver.resolve())
 				)
 				.addService('s3', ({ project }) => {
 					return new S3(project.s3)
 				})
 				.addService('graphQlSchemaBuilderFactory', ({ s3 }) => new GraphQlSchemaBuilderFactory(s3))
 				.addService(
+					'permissionsByIdentityFactory',
+					({}) =>
+						new PermissionsByIdentityFactory([
+							new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
+							new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
+						])
+				)
+				.addService(
 					'graphQlSchemaFactory',
-					({ graphQlSchemaBuilderFactory }) =>
-						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, [
-							new GraphQlSchemaFactory.SuperAdminPermissionFactory(),
-							new GraphQlSchemaFactory.RoleBasedPermissionFactory(),
-						])
+					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory }) =>
+						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory)
 				)
-				.addService(
-					'systemStagesQueryResolver',
-					({ systemQueryHandler }) => new StagesQueryResolver(systemQueryHandler)
-				)
-				.addService('tableReferencingResolver', () => new TableReferencingResolver())
-				.addService(
-					'systemDiffDependencyBuilder',
-					({ schemaVersionBuilder, tableReferencingResolver }) =>
-						new DependencyBuilder.DependencyBuilderList([
-							new MigrationsDependencyBuilder(),
-							new SameRowDependencyBuilder(),
-							new TransactionDependencyBuilder(),
-							new DeletedRowReferenceDependencyBuilder(schemaVersionBuilder, tableReferencingResolver),
-							new CreatedRowReferenceDependencyBuilder(schemaVersionBuilder, tableReferencingResolver),
-						])
-				)
-				.addService(
-					'systemDiffBuilder',
-					({ systemDiffDependencyBuilder, systemQueryHandler }) =>
-						new DiffBuilder(systemDiffDependencyBuilder, systemQueryHandler)
-				)
-				.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder())
-				.addService(
-					'systemDiffQueryResolver',
-					({ systemQueryHandler, systemDiffBuilder, systemDiffResponseBuilder }) =>
-						new DiffQueryResolver(systemQueryHandler, systemDiffBuilder, systemDiffResponseBuilder)
-				)
-				.addService(
-					'systemResolvers',
-					({ systemStagesQueryResolver, systemDiffQueryResolver }) =>
-						new SystemResolverFactory(systemStagesQueryResolver, systemDiffQueryResolver)
-				)
-				.addService(
-					'systemApolloServerFactory',
-					({ systemResolvers }) => new SystemApolloServerFactory(systemResolvers.create())
-				)
-				.addService('systemApollo', ({ systemApolloServerFactory }) => systemApolloServerFactory.create())
 				.build()
 
-			return new Container.Builder({})
-				.addService('project', () => container.get('project'))
-				.addService('knexConnection', () => container.get('knexConnection'))
-				.addService('knexDebugger', () => container.get('knexDebugger'))
-				.addService('graphQlSchemaFactory', () => container.get('graphQlSchemaFactory'))
-				.addService('systemApollo', () => container.get('systemApollo'))
-				.addService('schemaVersionBuilder', () => container.get('schemaVersionBuilder'))
-				.build()
+			const systemContainer = new SystemContainerFactory().create(
+				projectContainer.pick(
+					'schemaMigrationDiffsResolver',
+					'migrationFilesManager',
+					'permissionsByIdentityFactory',
+					'aclSchema'
+				)
+			)
+
+			return projectContainer
+				.pick('project', 'knexDebugger', 'knexConnection', 'graphQlSchemaFactory', 'schemaVersionBuilder')
+				.merge(systemContainer.pick('systemApolloServerFactory', 'systemResolvers'))
 		})
 	}
 

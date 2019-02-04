@@ -6,14 +6,20 @@ import QueryHandler from '../../../core/query/QueryHandler'
 import DiffCountQuery from '../queries/DiffCountQuery'
 import DiffQuery from '../queries/DiffQuery'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
+import PermissionsVerifier from './PermissionsVerifier'
 
 class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
-		private readonly queryHandler: QueryHandler<KnexQueryable>
+		private readonly queryHandler: QueryHandler<KnexQueryable>,
+		private readonly permissionsVerifier: PermissionsVerifier
 	) {}
 
-	public async build(baseStage: Stage, headStage: Stage): Promise<DiffBuilder.Response> {
+	public async build(
+		permissionContext: PermissionsVerifier.Context,
+		baseStage: Stage,
+		headStage: Stage
+	): Promise<DiffBuilder.Response> {
 		const count = await this.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
 
 		if (count.ok === false) {
@@ -29,10 +35,15 @@ class DiffBuilder {
 
 		const events = await this.queryHandler.fetch(new DiffQuery(baseStage.event_id, headStage.event_id))
 		const dependencies = await this.dependencyBuilder.build(events)
+		const permissions = await this.permissionsVerifier.verify(permissionContext, headStage, baseStage, events)
 
 		return {
 			ok: true,
-			events: events.map(event => ({ ...event, dependencies: dependencies[event.id] || [] })),
+			events: events.map(event => ({
+				...event,
+				allowed: permissions[event.id],
+				dependencies: dependencies[event.id] || [],
+			})),
 		}
 	}
 }
@@ -49,7 +60,7 @@ namespace DiffBuilder {
 	export class OkResponse {
 		public readonly ok: true = true
 
-		constructor(public readonly events: (Event & { dependencies: string[] })[]) {}
+		constructor(public readonly events: (Event & { dependencies: string[]; allowed: boolean })[]) {}
 	}
 }
 

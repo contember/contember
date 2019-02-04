@@ -2,6 +2,7 @@ import KnexQuery from '../../../core/knex/KnexQuery'
 import KnexQueryable from '../../../core/knex/KnexQueryable'
 import SelectBuilder from '../../../core/knex/SelectBuilder'
 import { Stage } from '../dtos/Stage'
+import { prepareStageQueryBuilder } from './StageQueryHelper'
 
 class StageByIdQuery extends KnexQuery<StageByIdQuery.Result> {
 	constructor(private readonly stageId: string, private readonly forUpdate: boolean = false) {
@@ -9,13 +10,7 @@ class StageByIdQuery extends KnexQuery<StageByIdQuery.Result> {
 	}
 
 	async fetch(queryable: KnexQueryable): Promise<StageByIdQuery.Result> {
-		let selectBuilder = queryable
-			.createSelectBuilder<StageByIdQuery.Result>()
-			.select('id')
-			.select('name')
-			.select('slug')
-			.select('event_id')
-			.from('stage')
+		let selectBuilder = prepareStageQueryBuilder(queryable)
 			.where({ id: this.stageId })
 
 		if (this.forUpdate) {

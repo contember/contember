@@ -11,7 +11,7 @@ import sinon from 'sinon'
 import { Buffer } from 'buffer'
 import ApiKey from '../../../../src/tenant-api/model/type/ApiKey'
 import ResolverContext from '../../../../src/tenant-api/resolvers/ResolverContext'
-import Identity from '../../../../src/tenant-api/model/type/Identity'
+import Identity from '../../../../src/common/auth/Identity'
 
 export interface Test {
 	query: string

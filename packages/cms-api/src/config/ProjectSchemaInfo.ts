@@ -4,7 +4,6 @@ import { SchemaDiff } from '../content-schema/differ/modifications'
 interface ProjectSchemaInfo {
 	uuid: string
 	acl: Acl.Schema
-	migrations: ProjectSchemaInfo.Migration[]
 }
 
 namespace ProjectSchemaInfo {

@@ -4,7 +4,7 @@ import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
 
 class DiffResponseBuilder {
-	public buildResponse(events: (Event & { dependencies: string[] })[]): ApiEvent[] {
+	public buildResponse(events: (Event & { dependencies: string[]; allowed: boolean })[]): ApiEvent[] {
 		const apiEventTypeMapping = {
 			[EventType.create]: ApiEventType.CREATE,
 			[EventType.update]: ApiEventType.UPDATE,
@@ -13,7 +13,7 @@ class DiffResponseBuilder {
 		}
 
 		return events.map(it => ({
-			allowed: true,
+			allowed: it.allowed,
 			dependencies: it.dependencies,
 			id: it.id,
 			type: apiEventTypeMapping[it.type],

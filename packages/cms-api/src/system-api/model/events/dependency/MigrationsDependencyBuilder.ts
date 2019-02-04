@@ -25,7 +25,7 @@ class MigrationsDependencyBuilder implements DependencyBuilder {
 				dependencies[event.id] = [...processedEvents]
 				processedEvents = []
 			} else {
-				dependencies[event.id] = [processedMigrations[processedMigrations.length - 1]]
+				dependencies[event.id] = processedMigrations.length > 0 ? [processedMigrations[processedMigrations.length - 1]] : []
 			}
 			processedEvents.push(event.id)
 		}

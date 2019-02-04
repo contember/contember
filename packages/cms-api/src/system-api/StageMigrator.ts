@@ -17,10 +17,11 @@ class StageMigrator {
 		return db.transaction(async knexWrapper => {
 			const handler = knexWrapper.createQueryHandler()
 
-			const targetVersion = stage.migration
-			if (!targetVersion) {
+			if (!stage.migration) {
 				return { count: 0 }
 			}
+
+			const targetVersion = FileNameHelper.extractVersion(stage.migration)
 
 			const currentStageRow = (await handler.fetch(new StageByIdQuery(stage.uuid, true)))!
 			const currentMigration = await handler.fetch(new LatestMigrationByStageQuery(stage.uuid))

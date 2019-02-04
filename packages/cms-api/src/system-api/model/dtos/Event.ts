@@ -1,6 +1,7 @@
 import { EventType } from '../EventType'
 
-export type Event = RunMigrationEvent | UpdateEvent | CreateEvent | DeleteEvent
+export type ContentEvent = UpdateEvent | CreateEvent | DeleteEvent
+export type Event = RunMigrationEvent | ContentEvent
 
 export class RunMigrationEvent {
 	public readonly type = EventType.runMigration

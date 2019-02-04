@@ -1,19 +1,17 @@
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
-import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
 import { QueryResolver } from '../Resolver'
 import { DiffErrorCode, DiffQueryArgs, DiffResponse } from '../../schema/types'
-import StageByIdQuery from '../../model/queries/StageByIdQuery'
-import DiffBuilder from '../../model/events/DiffBuilder'
 import DiffResponseBuilder from '../../model/events/DiffResponseBuilder'
+import { Acl } from 'cms-common'
+import { createStageQuery } from '../../model/queries/StageQueryHelper'
 
 export default class DiffQueryResolver implements QueryResolver<'diff'> {
 	constructor(
-		private readonly queryHandler: QueryHandler<KnexQueryable>,
-		private readonly diffBuilder: DiffBuilder,
-		private readonly diffResponseBuilder: DiffResponseBuilder
-	) {}
+		private readonly diffResponseBuilder: DiffResponseBuilder,
+		private readonly acl: Acl.Schema
+	) {
+	}
 
 	async diff(
 		parent: any,
@@ -22,8 +20,8 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 		info: GraphQLResolveInfo
 	): Promise<DiffResponse> {
 		const [baseStage, headStage] = await Promise.all([
-			this.queryHandler.fetch(new StageByIdQuery(args.baseStage)),
-			this.queryHandler.fetch(new StageByIdQuery(args.headStage)),
+			context.container.queryHandler.fetch(createStageQuery(args.baseStage)),
+			context.container.queryHandler.fetch(createStageQuery(args.headStage)),
 		])
 		if (!baseStage || !headStage) {
 			return {
@@ -35,7 +33,15 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 			}
 		}
 
-		const diff = await this.diffBuilder.build(baseStage, headStage)
+		const diff = await context.container.diffBuilder.build(
+			{
+				variables: context.variables,
+				identity: context.identity,
+				acl: this.acl,
+			},
+			baseStage,
+			headStage
+		)
 		if (!diff.ok) {
 			return diff
 		}

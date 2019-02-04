@@ -30,6 +30,9 @@ class TransactionDependencyBuilder implements DependencyBuilder {
 
 			eventsInTrx.push(event)
 		}
+		if (eventsInTrx.length > 0) {
+			dependencies = { ...dependencies, ...this.buildTransactionReferences(eventsInTrx) }
+		}
 
 		return dependencies
 	}

@@ -68,8 +68,8 @@ class MigrationFilesManager {
 		return new MigrationFilesManager(`${__dirname}/../../../migrations/${type}`)
 	}
 
-	public static createForProject(projectsDirectory: string, projectName: string): MigrationFilesManager {
-		return new MigrationFilesManager(`${projectsDirectory}/${projectName}/migrations`)
+	public static createForProject(projectsDirectory: string, projectSlug: string): MigrationFilesManager {
+		return new MigrationFilesManager(`${projectsDirectory}/${projectSlug}/migrations`)
 	}
 }
 

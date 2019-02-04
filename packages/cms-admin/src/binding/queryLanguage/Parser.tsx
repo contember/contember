@@ -194,6 +194,7 @@ export class Parser extends ChevrotainParser {
 				input = input.replace(`\$${variable}`, value.toString())
 			}
 		}
+		input = input.replace(/^\$this\./, '')
 		return input
 	}
 

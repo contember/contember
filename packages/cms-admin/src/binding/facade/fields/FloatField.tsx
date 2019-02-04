@@ -6,15 +6,15 @@ import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../
 import { Environment, FieldAccessor } from '../../dao'
 import { Parser } from '../../queryLanguage'
 
-export interface NumberFieldProps {
+export interface FloatFieldProps {
 	name: FieldName
 	label?: IFormGroupProps['label']
 	large?: IInputGroupProps['large']
 	inlineLabel?: boolean
 }
 
-export class NumberField extends React.PureComponent<NumberFieldProps> {
-	static displayName = 'NumberField'
+export class FloatField extends React.PureComponent<FloatFieldProps> {
+	static displayName = 'FloatField'
 
 	public render() {
 		return (
@@ -25,7 +25,7 @@ export class NumberField extends React.PureComponent<NumberFieldProps> {
 						inline={this.props.inlineLabel}
 					>
 						<InputGroup
-							value={typeof data.currentValue === 'number' ? data.currentValue.toFixed(0) : '0'}
+							value={typeof data.currentValue === 'number' ? data.currentValue.toString(10) : '0'}
 							onChange={this.generateOnChange(data)}
 							large={this.props.large}
 							type="number"
@@ -37,15 +37,15 @@ export class NumberField extends React.PureComponent<NumberFieldProps> {
 	}
 
 	private generateOnChange = (data: FieldAccessor<number>) => (e: ChangeEvent<HTMLInputElement>) => {
-		data.onChange && data.onChange(parseInt(e.target.value, 10))
+		data.onChange && data.onChange(parseFloat(e.target.value))
 	}
 
-	public static generateSyntheticChildren(props: NumberFieldProps, environment: Environment): React.ReactNode {
+	public static generateSyntheticChildren(props: FloatFieldProps, environment: Environment): React.ReactNode {
 		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
-	typeof NumberField,
-	SyntheticChildrenProvider<NumberFieldProps>
+	typeof FloatField,
+	SyntheticChildrenProvider<FloatFieldProps>
 >

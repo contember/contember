@@ -1,10 +1,20 @@
-/*! Default styles from your beloved manGoweb (http://mangoweb.cz) */
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500&subset=latin-ext')
+
+html
+	margin: 0
+
+*
+	box-sizing: border-box
+
+body
+	font-family: $font-family-base
 
 h1, h2, h3, h4, h5, h6
 	font-family: $font-family-head
 	line-height: 1
 	margin: $spacing*2 0 1em
 	text-rendering: optimizeLegibility
+	font-weight: $fw-medium
 
 a
 	color: $link-default

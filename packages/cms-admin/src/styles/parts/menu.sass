@@ -4,34 +4,10 @@
 	&-title
 		color: $menu-title-color
 		font-size: $menu-title-font-size
-		margin: em(20px, $menu-title-font-size) 0 em(5px, $menu-title-font-size)
+		margin: ($spacing-4 / 2 + $spacing-1) 0 ($spacing-4 / 2)
 		padding: 0 $menu-link-padding
 		font-weight: $fw-medium
+		text-transform: uppercase
 
 	&-list
 		list-style-type: none
-
-		&-item
-			display: block
-
-			&-link
-				display: block
-				color: $menu-link-color
-				padding: em(7.5px) $menu-link-padding
-				transition-property: color, background-color
-				transition-duration: 50ms
-				text-decoration: none
-
-				&.view-primary
-					text-transform: uppercase
-
-				&:hover
-					background-color: $menu-link-hover-color
-					color: $link-default
-					text-decoration: none //#blueprint
-
-					.icon
-						color: $link-default
-
-			&-link .icon
-				color: $menu-icon-color

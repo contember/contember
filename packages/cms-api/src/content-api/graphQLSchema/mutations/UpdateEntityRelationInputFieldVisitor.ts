@@ -162,7 +162,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 			relation.name,
 			this.updateEntityRelationAllowedOperationsVisitor
 		)
-		return filterObject<GraphQLInputFieldConfig, GraphQLInputFieldConfig | undefined>(
+		return filterObject(
 			graphQlFields,
 			(key, value): value is GraphQLInputFieldConfig =>
 				allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined

@@ -31,10 +31,7 @@ export default class MutationProvider {
 		mutations[`delete${entityName}`] = this.getDeleteMutation(entityName)
 		mutations[`update${entityName}`] = this.getUpdateMutation(entityName)
 
-		return filterObject<FieldConfig<any>, FieldConfig<any> | undefined>(
-			mutations,
-			(key, value): value is FieldConfig<any> => value !== undefined
-		)
+		return filterObject(mutations, (key, value): value is FieldConfig<any> => value !== undefined)
 	}
 
 	private getCreateMutation(entityName: string): FieldConfig<Input.CreateInput> | undefined {

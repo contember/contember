@@ -84,16 +84,27 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	}
 
 	public render() {
-		const FallbackRenderer: React.ComponentClass<DataRendererProps> = DefaultRenderer
-		const Renderer = this.props.renderer || FallbackRenderer
-
-		return (
-			<MetaOperationsContext.Provider value={this.metaOperations}>
-				<Renderer {...this.props.rendererProps} data={this.state.data}>
-					{this.props.children}
-				</Renderer>
-			</MetaOperationsContext.Provider>
-		)
+		if (this.props.renderer) {
+			const Renderer = this.props.renderer
+			if (this.props.rendererProps === undefined) {
+				throw new Error(`No rendererProps passed to custom renderer.`)
+			}
+			return (
+				<MetaOperationsContext.Provider value={this.metaOperations}>
+					<Renderer {...this.props.rendererProps} data={this.state.data}>
+						{this.props.children}
+					</Renderer>
+				</MetaOperationsContext.Provider>
+			)
+		} else {
+			return (
+				<MetaOperationsContext.Provider value={this.metaOperations}>
+					<DefaultRenderer {...this.props.rendererProps} data={this.state.data}>
+						{this.props.children}
+					</DefaultRenderer>
+				</MetaOperationsContext.Provider>
+			)
+		}
 	}
 
 	protected unmounted: boolean = false

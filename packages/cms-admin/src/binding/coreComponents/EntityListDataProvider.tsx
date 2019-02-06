@@ -57,14 +57,23 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 	}
 
 	private renderRenderer(data: DataRendererProps['data']): React.ReactNode {
-		const FallbackRenderer: React.ComponentClass<DataRendererProps> = DefaultRenderer
-		const Renderer = this.props.renderer || FallbackRenderer
-
-		return (
-			<Renderer {...this.props.rendererProps} data={data}>
-				{this.props.children}
-			</Renderer>
-		)
+		if (this.props.renderer) {
+			const Renderer = this.props.renderer
+			if (typeof this.props.rendererProps === 'undefined') {
+				throw new Error(`No rendererProps passed to custom renderer.`)
+			}
+			return (
+				<Renderer {...this.props.rendererProps} data={data}>
+					{this.props.children}
+				</Renderer>
+			)
+		} else {
+			return (
+				<DefaultRenderer {...this.props.rendererProps} data={data}>
+					{this.props.children}
+				</DefaultRenderer>
+			)
+		}
 	}
 
 	public static generateMarkerTreeRoot(

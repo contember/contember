@@ -5,22 +5,59 @@
 		display: flex
 		justify-content: space-between
 		align-items: center
-		min-height: $layout-navbar-height
-		padding: 0 rem(10px)
+		height: $layout-navbar-height
+		padding: 16px $spacing-4
 		z-index: 19
 		background-color: $layout-background-color
 		color: $layout-text-color
+		border-bottom: 1px solid #EAEDF3
 
 	&-container
 		display: flex
 
 	&-side
 		+sticky($layout-navbar-height null null)
-		width: rem(160px)
+		width: 270px
+		max-width: 80vw
+		border-right: 1px solid #EAEDF3
 		height: calc(100vh - #{$layout-navbar-height})
 		z-index: 19
 		background-color: $layout-background-color
 		color: $layout-text-color
+		overflow-y: auto
+
+	&-menuBtn
+		display: none
+
+	&-menuShadow
+		display: none
+
+	@media (max-width: 768px)
+		&-side
+			position: absolute
+			transform: translateX(-100%)
+			transition: transform 500ms
+
+		&-menuOpen &-side
+			transform: translateX(0)
+		&-menuShadow
+			display: block
+			+fixed(0)
+			background: #000000
+			opacity: 0
+			transition: opacity 500ms
+			pointer-events: none
+		&-menuOpen &-menuShadow
+			opacity: .15
+			pointer-events: all
+
+		&-menuBtn
+			display: inline-block
+			background: none
+			border: none
+			padding: $spacing-1
+			margin-left: -$spacing-1
+			vertical-align: middle
 
 	&-content
 		padding: rem(25px)

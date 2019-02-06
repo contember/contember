@@ -1,0 +1,18 @@
+.menuSecondaryItem
+	display: block
+
+	&-link
+		display: block
+		color: $menu-link-color
+		font-size: $font-size-1
+		padding: 11px $spacing-4
+		text-decoration: none
+		font-weight: $fw-medium
+
+		$hover-color: #1665D8
+		&:hover, &-active
+			background: rgba($hover-color, .15)
+			color: $hover-color
+
+		&-active
+			box-shadow: inset 3px 0 0 $hover-color

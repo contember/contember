@@ -1,0 +1,22 @@
+$avatar-sizes: 28px, 38px, 60px, 80px, 100px
+$avatar-fonts: $font-size-0, $font-size-2, $font-size-3, $font-size-6, $font-size-8
+
+.avatar
+	display: flex
+	background: #1665D8
+	justify-content: center
+	align-items: center
+
+	&-placeholder
+		color: #FFFFFF
+
+	@for $i from 1 through length($avatar-sizes)
+		&-size#{$i}
+			+size(nth($avatar-sizes, $i))
+			font-size: nth($avatar-fonts, $i)
+
+	&-shape
+		&Circle
+			border-radius: 50%
+		&Square
+			border-radius: 4px

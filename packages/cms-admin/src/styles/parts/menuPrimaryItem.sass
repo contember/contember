@@ -1,0 +1,30 @@
+.menuPrimaryItem
+	padding: 14px $spacing-4
+
+	&-link
+		display: flex
+		text-decoration: none
+		color: $c-text
+
+	&-texts
+		padding-left: 17px
+		display: flex
+		flex-direction: column
+		align-items: flex-start
+		justify-content: space-around
+
+	&-name
+		font-size: $font-size-1
+		font-weight: $fw-medium
+
+	&-note
+		color: $c-text-light
+		font-size: $font-size-0
+
+	$hover-color: #1665D8
+	&:hover, &-active
+		background: rgba($hover-color, .15)
+		color: $hover-color
+
+	&-active
+		box-shadow: inset 3px 0 0 $hover-color

@@ -1,6 +1,3 @@
-import { Icon } from '@blueprintjs/core'
-import { IconName } from '@blueprintjs/icons'
-import classNames from 'classnames'
 import * as React from 'react'
 import PageLink, { PageLinkProps } from '../pageRouting/PageLink'
 
@@ -9,14 +6,8 @@ export default class MenuPageLink extends React.Component<MenuPageLinkProps> {
 		return (
 			<PageLink
 				Component={props => (
-					<li className="menu-list-item">
-						<a {...props} className={classNames('menu-list-item-link', this.props.appearance)}>
-							{this.props.frontIcon && (
-								<div className="icon icon-left">
-									<Icon icon={this.props.frontIcon} iconSize={18} />
-								</div>
-							)}
-
+					<li className="menuSecondaryItem">
+						<a {...props} className="menuSecondaryItem-link">
 							{this.props.children}
 						</a>
 					</li>
@@ -27,12 +18,6 @@ export default class MenuPageLink extends React.Component<MenuPageLinkProps> {
 	}
 }
 
-export enum LinkAppearance {
-	Primary = 'view-primary'
-}
-
 export interface MenuPageLinkProps {
-	appearance?: LinkAppearance
-	frontIcon?: IconName
 	change: PageLinkProps<any>['change']
 }

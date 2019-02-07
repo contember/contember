@@ -1,31 +1,30 @@
-import { Button, IButtonProps, Intent, IProps } from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
+import { Icon } from '@blueprintjs/core'
+import { IconNames, IconName } from '@blueprintjs/icons'
 import { DataContext, DataContextValue } from '../../coreComponents'
 import { EntityAccessor } from '../../dao'
+import { Button, ButtonProps } from '../../../components'
 
-export interface RemoveButtonProps
-	extends Pick<IButtonProps, 'icon' | 'intent' | 'large' | 'small' | 'minimal'>,
-		IProps {
+export interface RemoveButtonProps extends ButtonProps {
 	removeType?: RemoveButton.RemovalType
+	icon?: IconName
 }
 
 class RemoveButton extends React.Component<RemoveButtonProps> {
 	public render() {
+		const { removeType, icon, ...rest } = this.props
 		return (
 			<DataContext.Consumer>
 				{(value: DataContextValue) => {
 					if (value instanceof EntityAccessor) {
 						return (
 							<Button
-								icon={this.props.icon || IconNames.DELETE}
+								{...rest}
 								onClick={() => value.remove && value.remove(this.mapToRemovalType(this.props.removeType))}
-								intent={this.props.intent || Intent.DANGER}
-								small={this.props.small !== undefined ? this.props.small : true}
-								large={this.props.large !== undefined ? this.props.large : false}
-								minimal={this.props.minimal !== undefined ? this.props.minimal : true}
-								className={this.props.className}
-							/>
+								small
+							>
+								<Icon icon={icon || IconNames.DELETE} />
+							</Button>
 						)
 					}
 				}}

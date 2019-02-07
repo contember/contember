@@ -1,25 +1,21 @@
-import { Button, IButtonProps, Intent, IProps } from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
+import { Icon } from '@blueprintjs/core'
+import { IconNames, IconName } from '@blueprintjs/icons'
 import { EntityCollectionAccessor } from '../../dao'
+import { Button, ButtonProps } from '../../../components'
 
-interface AddNewButtonProps extends Pick<IButtonProps, 'icon' | 'intent' | 'large' | 'small'>, IProps {
+export interface AddNewButtonProps extends ButtonProps {
 	addNew: EntityCollectionAccessor['addNew']
+	icon?: IconName
 }
 
 export class AddNewButton extends React.PureComponent<AddNewButtonProps> {
 	public render() {
+		const { addNew, icon, ...rest } = this.props
 		return (
-			this.props.addNew && (
-				<Button
-					icon={this.props.icon || IconNames.ADD}
-					onClick={this.props.addNew}
-					intent={this.props.intent || Intent.NONE}
-					large={this.props.large !== undefined ? this.props.large : false}
-					small={this.props.small !== undefined ? this.props.small : false}
-					className={this.props.className}
-				>
-					{this.props.children}
+			addNew && (
+				<Button onClick={addNew} {...rest} small>
+					<Icon icon={icon || IconNames.ADD} />
 				</Button>
 			)
 		)

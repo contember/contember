@@ -1,7 +1,8 @@
-import { Button, Intent } from '@blueprintjs/core'
+import { Intent } from '@blueprintjs/core'
 import * as React from 'react'
 import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
 import { FeedbackToaster } from '../renderers/userFeedback'
+import { Button, ButtonColor } from '../../../components'
 
 export interface PersistButtonProps {
 	successMessage?: string
@@ -48,11 +49,12 @@ export class PersistButton extends React.Component<PersistButtonProps, PersistBu
 					if (value) {
 						return (
 							<Button
-								icon="floppy-disk"
+								color={ButtonColor.Green}
+								// icon="floppy-disk"
 								onClick={this.getOnPersist(value.triggerPersist)}
-								intent={Intent.PRIMARY}
-								loading={this.state.isLoading}
-								large={true}
+								// intent={Intent.PRIMARY}
+								// loading={this.state.isLoading}
+								// large={true}
 							>
 								{this.props.children || 'Save!'}
 							</Button>

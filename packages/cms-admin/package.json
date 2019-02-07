@@ -6,7 +6,8 @@
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"build": "tsc --build --verbose",
-		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js"
+		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js",
+		"storybook": "start-storybook -p 9001 -c dist/storybook/config"
 	},
 	"dependencies": {
 		"@blueprintjs/core": "^3.0.1",
@@ -39,6 +40,8 @@
 		"slate-react": "0.21.15"
 	},
 	"devDependencies": {
+		"@storybook/addon-info": "^4.1.11",
+		"@storybook/react": "^4.1.11",
 		"@types/chai": "^4.1.6",
 		"@types/classnames": "^2.2.6",
 		"@types/is-hotkey": "^0.1.0",
@@ -52,8 +55,17 @@
 		"@types/slate": "^0.43.8",
 		"@types/slate-html-serializer": "^0.6.3",
 		"@types/slate-react": "^0.20.3",
+		"@types/storybook__react": "^4.0.0",
+		"awesome-typescript-loader": "^5.2.1",
 		"chai": "^4.2.0",
+		"css-loader": "^2.1.0",
 		"mocha": "^5.2.0",
+		"node-sass": "^4.11.0",
+		"react-docgen-typescript-webpack-plugin": "^1.1.0",
+		"resolve-url-loader": "^3.0.0",
+		"sass-loader": "^7.1.0",
+		"source-map-loader": "^0.2.4",
+		"style-loader": "^0.23.1",
 		"typescript": "^3.2.2"
 	}
 }

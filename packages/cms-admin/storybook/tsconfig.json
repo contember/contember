@@ -1,0 +1,9 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/storybook",
+		"esModuleInterop": true,
+		// "module": "esnext"
+	},
+	"references": [{ "path": "../src" }]
+}

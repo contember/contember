@@ -8,4 +8,4 @@ declare interface Process {
 	}
 }
 
-declare const process: Process
+// declare const process: Process

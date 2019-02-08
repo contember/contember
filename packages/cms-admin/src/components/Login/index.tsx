@@ -1,4 +1,5 @@
-import { Button, Callout, Card, Checkbox, Elevation, FormGroup, InputGroup } from '@blueprintjs/core'
+import { Callout, Card, Checkbox, Elevation } from '@blueprintjs/core'
+import { FormGroup, InputGroup, Button } from '..'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { login } from '../../actions/auth'
@@ -52,7 +53,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 								onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })}
 							/>
 						</FormGroup>
-						<Checkbox
+						{/* <Checkbox
 							disabled={loading}
 							checked={this.state.rememberMe}
 							onChange={(e: React.FormEvent<HTMLInputElement>) =>
@@ -60,10 +61,13 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 							}
 						>
 							Remember me
-						</Checkbox>
-						<Button type="submit" loading={loading} intent="primary">
-							Login
-						</Button>
+						</Checkbox> */}
+						<Button
+							Component={({ children, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
+								<input type="submit" value="Submit" {...props} />
+							)}
+							disabled={loading}
+						/>
 					</form>
 				</Card>
 			</div>

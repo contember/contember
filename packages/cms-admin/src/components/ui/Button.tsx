@@ -16,7 +16,7 @@ interface ButtonInnerProps<T> {
 	disabled?: boolean
 	noBorder?: boolean
 	small?: boolean
-	Component?: React.ReactType<ComponentProps & T>
+	Component?: React.ReactType<ComponentProps & T> | any // Hotfix
 }
 
 export type ButtonProps<T = React.BaseHTMLAttributes<HTMLButtonElement>> = T & ButtonInnerProps<T>

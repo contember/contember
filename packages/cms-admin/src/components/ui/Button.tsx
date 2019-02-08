@@ -11,34 +11,32 @@ export interface ComponentProps {
 	className: string
 }
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonInnerProps<T> {
 	color?: ButtonColor
 	disabled?: boolean
 	noBorder?: boolean
 	small?: boolean
-	Component?: React.ReactType<ComponentProps>
+	Component?: React.ReactType<ComponentProps & T>
 }
 
-const Button: React.FunctionComponent<ButtonProps> = props => {
-	const { Component = 'button', color, disabled, noBorder, small, children, ...rest } = props
+export type ButtonProps<T = React.BaseHTMLAttributes<HTMLButtonElement>> = T & ButtonInnerProps<T>
 
-	return React.createElement(
-		Component,
-		{
-			...rest,
+class Button<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React.PureComponent<ButtonProps<T>> {
+	render() {
+		const { Component = 'button', color, disabled, noBorder, small, children, ...rest } = this.props
+
+		const attrs: ComponentProps = {
 			className: cn(
-				rest.className,
+				(rest as { className?: string }).className,
 				'button',
 				color && `button-color${color}`,
 				disabled && 'button-disabled',
 				noBorder && 'button-noBorder',
 				small && 'button-small'
 			)
-		},
-		children
-	)
+		}
+		return React.createElement(Component, { ...attrs, ...(rest as T) }, children)
+	}
 }
-
-Button.displayName = 'Button'
 
 export { Button }

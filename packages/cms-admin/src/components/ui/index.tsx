@@ -1,5 +1,7 @@
 export * from './Avatar'
 export * from './Button'
+export * from './InputGroup'
+export * from './FormGroup'
 export { default as MenuPageLink } from './MenuPageLink'
 export { default as MenuPageLinkPrimary } from './MenuPageLinkPrimary'
 export { default as MenuList } from './MenuList'

@@ -1,15 +1,15 @@
-import { FormGroup, IFormGroupProps, TextArea } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
+import { FormGroup, FormGroupProps, TextArea } from '../../../components'
 import { Environment, FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { TextFieldProps } from './TextField'
 
 export interface TextAreaFieldProps {
 	name: FieldName
-	label?: IFormGroupProps['label']
+	label?: FormGroupProps['label']
 	large?: boolean
 }
 
@@ -25,7 +25,7 @@ export class TextAreaField extends React.PureComponent<TextAreaFieldProps> {
 							value={data.currentValue || ''}
 							onChange={this.generateOnChange(data)}
 							large={this.props.large}
-							fill={true}
+							// fill={true}
 						/>
 					</FormGroup>
 				)}

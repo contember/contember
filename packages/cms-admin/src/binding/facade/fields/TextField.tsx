@@ -1,4 +1,5 @@
-import { FormGroup, IFormGroupProps, IInputGroupProps, InputGroup } from '@blueprintjs/core'
+// import {  } from '@blueprintjs/core'
+import { FormGroup, InputGroup, FormGroupProps, InputGroupProps } from '../../../components'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
@@ -8,8 +9,8 @@ import { QueryLanguage } from '../../queryLanguage'
 
 export interface TextFieldProps {
 	name: FieldName
-	label?: IFormGroupProps['label']
-	large?: IInputGroupProps['large']
+	label?: FormGroupProps['label']
+	large?: InputGroupProps['large']
 	inlineLabel?: boolean
 }
 
@@ -22,7 +23,6 @@ export class TextField extends React.PureComponent<TextFieldProps> {
 				{(data: FieldAccessor<string>, env): React.ReactNode => (
 					<FormGroup
 						label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
-						inline={this.props.inlineLabel}
 					>
 						<InputGroup
 							value={data.currentValue || ''}

@@ -35,7 +35,7 @@ class Button<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React.Pure
 				small && 'button-small'
 			)
 		}
-		return React.createElement(Component, { ...attrs, ...(rest as T) }, children)
+		return React.createElement(Component, { ...(rest as T), ...attrs }, children)
 	}
 }
 

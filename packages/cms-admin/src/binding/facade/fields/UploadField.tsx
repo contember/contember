@@ -1,6 +1,7 @@
-import { FileInput, FormGroup, IFormGroupProps } from '@blueprintjs/core'
 import { assertNever } from 'cms-common'
 import { contentType } from 'mime-types'
+import { FileInput } from '@blueprintjs/core'
+import { FormGroup, FormGroupProps } from '../../../components'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
 import { connect } from 'react-redux'
@@ -15,8 +16,7 @@ import { QueryLanguage } from '../../queryLanguage'
 
 export interface UploadFieldOwnProps {
 	name: FieldName
-	label?: IFormGroupProps['label']
-	inlineLabel?: boolean
+	label?: FormGroupProps['label']
 }
 
 export interface UploadFieldDispatchProps {
@@ -59,7 +59,6 @@ class UploadFieldComponent extends React.Component<
 					return (
 						<FormGroup
 							label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
-							inline={this.props.inlineLabel}
 						>
 							<Dropzone
 								onDrop={async (accepted: File[]) => {

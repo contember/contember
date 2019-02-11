@@ -298,7 +298,10 @@ export default class SqlMigrator {
 
 	private createEnum(modification: CreateEnumModification) {
 		const joinedValues = modification.values.map(it => `'${escapeSqlString(it)}'`).join(',')
-		this.builder.createDomain(modification.enumName, 'text', { check: `VALUE IN(${joinedValues})` })
+		this.builder.createDomain(modification.enumName, 'text', {
+			check: `VALUE IN(${joinedValues})`,
+			constraintName: `${modification.enumName}_check`,
+		})
 	}
 
 	private removeEnum(modification: RemoveEnumModification) {
@@ -307,7 +310,12 @@ export default class SqlMigrator {
 
 	private updateEnum(modification: UpdateEnumModification) {
 		const joinedValues = modification.values.map(it => `'${escapeSqlString(it)}'`).join(',')
-		this.builder.alterDomain(modification.enumName, { check: `VALUE IN(${joinedValues})` })
+		this.builder.sql(`ALTER DOMAIN "${modification.enumName}" DROP CONSTRAINT "${modification.enumName}_check"`)
+		this.builder.sql(
+			`ALTER DOMAIN "${modification.enumName}" ADD CONSTRAINT "${
+				modification.enumName
+			}_check" CHECK (VALUE IN(${joinedValues}))`
+		)
 	}
 
 	private getOldEntity(name: string): Model.Entity {

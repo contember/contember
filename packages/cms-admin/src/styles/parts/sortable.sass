@@ -2,11 +2,15 @@
 
 .sortable
 	list-style-type: none
+	background: white
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04)
 
 	&-item
+		background: white
 		display: flex
 		align-items: flex-start
-		background: #FFFFFF
+		border-bottom: 1px solid #eaedf3
+		padding: $spacing-2 $spacing-1
 
 		&-handle
 			display: flex
@@ -15,8 +19,6 @@
 			flex: 0 0 2em
 			height: (1em * 1.28581)
 			cursor: ns-resize
+			color: #D5DCE6
 		&-content
 			flex: 1
-
-		& + &
-			margin-top: 20px

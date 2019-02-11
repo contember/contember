@@ -8,7 +8,7 @@ import { Environment } from '../dao'
 import { QueryLanguageError } from './QueryLanguageError'
 import { tokenList, tokens } from './tokenList'
 
-export class Parser extends ChevrotainParser {
+class Parser extends ChevrotainParser {
 	private static lexer = new Lexer(tokenList)
 	private static parser = new Parser()
 
@@ -186,15 +186,24 @@ export class Parser extends ChevrotainParser {
 
 	// TODO this is too naive but will do for the time being
 	private static replaceVariables(input: string, environment: Environment): string {
-		const names = environment.getAllNames()
-		for (const variable in names) {
-			const value = names[variable]
+		const nameStore = environment.getAllNames()
+		const names = Object.keys(nameStore).sort().reverse()
+		let keepFindingVariables = false
 
-			if (value) {
-				input = input.replace(`\$${variable}`, value.toString())
+		do {
+			keepFindingVariables = false
+
+			for (const name of names) {
+				const value = nameStore[name]
+
+				if (value) {
+					input = input.replace(`\$${name}`, () => {
+						keepFindingVariables = true
+						return value.toString()
+					})
+				}
 			}
-		}
-		input = input.replace(/^\$this\./, '')
+		} while (keepFindingVariables)
 		return input
 	}
 
@@ -222,3 +231,5 @@ namespace Parser {
 		fieldName: FieldName
 	}
 }
+
+export { Parser }

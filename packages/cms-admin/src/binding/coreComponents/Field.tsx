@@ -9,7 +9,7 @@ import {
 	FieldMarker
 } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
-import { Parser } from '../queryLanguage'
+import { QueryLanguage } from '../queryLanguage/QueryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
@@ -84,7 +84,7 @@ namespace Field {
 			return (
 				<EnvironmentContext.Consumer>
 					{environment =>
-						Parser.generateWrappedNode(
+						QueryLanguage.wrapRelativeSingleField(
 							this.props.name,
 							fieldName => (
 								<DataContext.Consumer>

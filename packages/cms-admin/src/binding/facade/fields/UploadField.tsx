@@ -1,17 +1,17 @@
 import { FileInput, FormGroup, IFormGroupProps } from '@blueprintjs/core'
+import { assertNever } from 'cms-common'
+import { contentType } from 'mime-types'
 import * as React from 'react'
+import Dropzone from 'react-dropzone'
+import { connect } from 'react-redux'
+import { Dispatch } from '../../../actions/types'
+import { uploadFile } from '../../../actions/upload'
+import State from '../../../state'
+import { AnyUpload, UploadStatus } from '../../../state/upload'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
-import { Parser } from '../../queryLanguage'
-import Dropzone from 'react-dropzone'
-import { connect } from 'react-redux'
-import { uploadFile } from '../../../actions/upload'
-import { Dispatch } from '../../../actions/types'
-import { AnyUpload, UploadStatus } from '../../../state/upload'
-import State from '../../../state'
-import { assertNever } from 'cms-common'
-import { contentType } from 'mime-types'
+import { QueryLanguage } from '../../queryLanguage'
 
 export interface UploadFieldOwnProps {
 	name: FieldName
@@ -110,7 +110,7 @@ class UploadFieldComponent extends React.Component<
 	}
 
 	public static generateSyntheticChildren(props: UploadFieldOwnProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 

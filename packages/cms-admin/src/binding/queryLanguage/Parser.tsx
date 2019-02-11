@@ -2,31 +2,69 @@ import { Lexer, Parser as ChevrotainParser } from 'chevrotain'
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
-import { FieldName } from '../bindingTypes'
-import { ToOne, ToOneProps } from '../coreComponents'
+import { EntityName, FieldName, Filter } from '../bindingTypes'
+import { ToOneProps } from '../coreComponents'
 import { Environment } from '../dao'
+import { MacroResolver } from './MacroResolver'
 import { QueryLanguageError } from './QueryLanguageError'
 import { tokenList, tokens } from './tokenList'
 
 class Parser extends ChevrotainParser {
+	private static macroResolver = new MacroResolver()
 	private static lexer = new Lexer(tokenList)
 	private static parser = new Parser()
 
-	private relationExpression = this.RULE<Parser.QueryLanguageExpression>('relationExpression', () => {
-		const toOneProps: ToOneProps[] = []
-
-		this.MANY(() => {
-			toOneProps.push(this.SUBRULE(this.toOneProps))
-			this.CONSUME(tokens.Dot)
-		})
-
-		const fieldName = this.SUBRULE(this.fieldName)
-
-		return {
-			toOneProps: toOneProps,
-			fieldName: fieldName
+	private qualifiedFieldList: () => Parser.AST.QualifiedFieldList = this.RULE<Parser.AST.QualifiedFieldList>(
+		'qualifiedFieldList',
+		() => {
+			throw new QueryLanguageError(`Not implemented`)
 		}
-	})
+	)
+
+	private relativeSingleField: () => Parser.AST.RelativeSingleField = this.RULE<Parser.AST.RelativeSingleField>(
+		'relativeSingleField',
+		() => {
+			const toOneProps: ToOneProps[] = []
+
+			this.MANY(() => {
+				toOneProps.push(this.SUBRULE(this.toOneProps))
+				this.CONSUME(tokens.Dot)
+			})
+
+			const fieldName = this.SUBRULE(this.fieldName)
+
+			return {
+				toOneProps: toOneProps,
+				fieldName: fieldName
+			}
+
+		}
+	)
+
+	private relativeSingleEntity: () => Parser.AST.RelativeSingleEntity = this.RULE<Parser.AST.RelativeSingleEntity>(
+		'relativeSingleEntity',
+		() => {
+			const toOneProps: ToOneProps[] = []
+
+			this.MANY_SEP({
+				SEP: tokens.Dot,
+				DEF: () => {
+					toOneProps.push(this.SUBRULE(this.toOneProps))
+				}
+			})
+
+			return {
+				toOneProps
+			}
+		}
+	)
+
+	private relativeEntityList: () => Parser.AST.RelativeEntityList = this.RULE<Parser.AST.RelativeEntityList>(
+		'relativeEntityList',
+		() => {
+			throw new QueryLanguageError(`Not implemented`)
+		}
+	)
 
 	private toOneProps = this.RULE('toOneProps', () => {
 		const fieldName = this.SUBRULE(this.fieldName)
@@ -57,7 +95,7 @@ class Parser extends ChevrotainParser {
 				this.AT_LEAST_ONE_SEP1({
 					SEP: tokens.Dot,
 					DEF: () => {
-						nestedFields.push(this.SUBRULE(this.identifier))
+						nestedFields.push(this.SUBRULE(this.fieldIdentifier))
 					}
 				})
 				this.CONSUME(tokens.Equals)
@@ -103,7 +141,7 @@ class Parser extends ChevrotainParser {
 	})
 
 	private fieldName = this.RULE<FieldName>('fieldName', () => {
-		return this.SUBRULE(this.identifier)
+		return this.SUBRULE(this.fieldIdentifier)
 	})
 
 	private primaryValue = this.RULE('primaryValue', () => {
@@ -116,16 +154,24 @@ class Parser extends ChevrotainParser {
 			},
 			{
 				ALT: () => {
-					const identifier = this.SUBRULE(this.identifier)
+					const identifier = this.SUBRULE(this.fieldIdentifier)
 					return new GraphQlBuilder.Literal(identifier)
 				}
 			}
 		])
 	})
 
-	private identifier = this.RULE('identifier', () => {
+	private fieldIdentifier = this.RULE('fieldIdentifier', () => {
 		this.SUBRULE(this.optionalWhitespace)
-		const identifier = this.CONSUME(tokens.Identifier).image
+		const identifier = this.CONSUME(tokens.FieldIdentifier).image
+		this.SUBRULE1(this.optionalWhitespace)
+
+		return identifier
+	})
+
+	private entityIdentifier: () => EntityName = this.RULE('entityIdentifier', () => {
+		this.SUBRULE(this.optionalWhitespace)
+		const identifier = this.CONSUME(tokens.EntityIdentifier).image
 		this.SUBRULE1(this.optionalWhitespace)
 
 		return identifier
@@ -163,17 +209,34 @@ class Parser extends ChevrotainParser {
 		this.performSelfAnalysis()
 	}
 
-	public static parseQueryLanguageExpression(input: string) {
-		const lexingResult = Parser.lexer.tokenize(input)
+	public static parseQueryLanguageExpression<E extends Parser.EntryPoint>(
+		input: string,
+		entry: E,
+		environment?: Environment
+	): Parser.ParserResult[E] {
+		const inputWithResolvedMacros = Parser.macroResolver.resolve(input, environment)
+		const lexingResult = Parser.lexer.tokenize(inputWithResolvedMacros)
 
 		if (lexingResult.errors.length !== 0) {
 			throw new QueryLanguageError(
-				`Failed to tokenize '${input}'.\n\n${lexingResult.errors.map(i => i.message).join('\n')}`
+				`Failed to tokenize '${inputWithResolvedMacros}'.\n\n${lexingResult.errors.map(i => i.message).join('\n')}`
 			)
 		}
 
 		Parser.parser.input = lexingResult.tokens
-		const expression = Parser.parser.relationExpression()
+
+		let expression: Parser.ParserResult[E]
+
+		switch (entry) {
+			case Parser.EntryPoint.RelativeSingleField:
+				expression = Parser.parser.relativeSingleField()
+				break
+			case Parser.EntryPoint.RelativeSingleEntity:
+				expression = Parser.parser.relativeSingleEntity()
+				break
+			default:
+				throw new QueryLanguageError(`Not implemented`)
+		}
 
 		if (Parser.parser.errors.length !== 0) {
 			throw new QueryLanguageError(
@@ -183,52 +246,43 @@ class Parser extends ChevrotainParser {
 
 		return expression
 	}
-
-	// TODO this is too naive but will do for the time being
-	private static replaceVariables(input: string, environment: Environment): string {
-		const nameStore = environment.getAllNames()
-		const names = Object.keys(nameStore).sort().reverse()
-		let keepFindingVariables = false
-
-		do {
-			keepFindingVariables = false
-
-			for (const name of names) {
-				const value = nameStore[name]
-
-				if (value) {
-					input = input.replace(`\$${name}`, () => {
-						keepFindingVariables = true
-						return value.toString()
-					})
-				}
-			}
-		} while (keepFindingVariables)
-		return input
-	}
-
-	public static generateWrappedNode(
-		input: string,
-		generateField: (fieldName: FieldName) => React.ReactNode,
-		environment?: Environment
-	): React.ReactNode {
-		input = environment === undefined ? input : Parser.replaceVariables(input, environment)
-		const expression = Parser.parseQueryLanguageExpression(input)
-		let currentNode = generateField(expression.fieldName)
-
-		for (let i = expression.toOneProps.length - 1; i >= 0; i--) {
-			const currentProps = expression.toOneProps[i]
-			currentNode = <ToOne {...currentProps}>{currentNode}</ToOne>
-		}
-
-		return currentNode
-	}
 }
 
 namespace Parser {
-	export interface QueryLanguageExpression {
-		toOneProps: ToOneProps[]
-		fieldName: FieldName
+	export namespace AST {
+		export interface QualifiedFieldList {
+			entityName: EntityName
+			filter: Filter[]
+			toOneProps: ToOneProps[]
+			fieldName: FieldName
+		}
+
+		export interface RelativeSingleField {
+			toOneProps: ToOneProps[]
+			fieldName: FieldName
+		}
+
+		export interface RelativeSingleEntity {
+			toOneProps: ToOneProps[]
+		}
+
+		export interface RelativeEntityList {
+			filter: Filter[]
+		}
+	}
+
+	export enum EntryPoint {
+		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].name
+		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
+		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
+		RelativeEntityList = 'relativeEntityList' // E.g. authors[age < 123].name
+	}
+
+	export interface ParserResult {
+		qualifiedFieldList: AST.QualifiedFieldList
+		relativeSingleField: AST.RelativeSingleField
+		relativeSingleEntity: AST.RelativeSingleEntity
+		relativeEntityList: AST.RelativeEntityList
 	}
 }
 

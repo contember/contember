@@ -3,7 +3,7 @@ import * as React from 'react'
 import { FieldName, Filter } from '../bindingTypes'
 import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
-import { Parser } from '../queryLanguage'
+import { QueryLanguage } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
@@ -29,7 +29,7 @@ class ToMany extends React.PureComponent<ToManyProps> {
 	}
 
 	public static generateSyntheticChildren(props: Props<ToManyProps>, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedNode(
+		return QueryLanguage.wrapRelativeSingleField(
 			props.field,
 			fieldName => (
 				<ToMany.ReferenceMarkerGenerator {...props} field={fieldName}>
@@ -79,7 +79,7 @@ namespace ToMany {
 			return (
 				<EnvironmentContext.Consumer>
 					{(environment: Environment) =>
-						Parser.generateWrappedNode(
+						QueryLanguage.wrapRelativeSingleField(
 							this.props.field,
 							fieldName => (
 								<DataContext.Consumer>

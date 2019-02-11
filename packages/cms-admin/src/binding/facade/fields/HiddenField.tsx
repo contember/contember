@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { EnforceSubtypeRelation, Field, FieldPublicProps, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
-import { Parser } from '../../queryLanguage'
+import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
 
 export interface HiddenFieldProps extends FieldPublicProps {
 	defaultValue: FieldPublicProps['defaultValue']
@@ -15,7 +15,7 @@ export class HiddenField extends React.PureComponent<HiddenFieldProps> {
 	}
 
 	public static generateSyntheticChildren(props: HiddenFieldProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedNode(props.name, fieldName => <Field {...props} name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field {...props} name={fieldName} />, environment)
 	}
 }
 

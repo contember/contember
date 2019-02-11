@@ -13,7 +13,7 @@ import {
 	FieldAccessor,
 	RendererProps
 } from '../../index'
-import { Parser } from '../../queryLanguage'
+import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
 import { LoadingSpinner } from '../renderers/userFeedback'
 
 export interface DimensionsSwitcherProps extends DimensionsSwitcher.DimensionsRendererProps {
@@ -61,14 +61,14 @@ namespace DimensionsSwitcher {
 		public static generateSyntheticChildren(props: ItemProps, environment: Environment): React.ReactNode {
 			return (
 				<>
-					{Parser.generateWrappedNode(
+					{QueryLanguage.wrapRelativeSingleField(
 						props.labelName,
 						fieldName => (
 							<Field name={fieldName} />
 						),
 						environment
 					)}
-					{Parser.generateWrappedNode(
+					{QueryLanguage.wrapRelativeSingleField(
 						props.valueName,
 						fieldName => (
 							<Field name={fieldName} />

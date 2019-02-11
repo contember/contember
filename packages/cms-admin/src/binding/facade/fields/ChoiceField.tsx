@@ -11,7 +11,7 @@ import {
 } from '../../coreComponents'
 import { Environment, FieldAccessor, Literal, VariableLiteral, VariableScalar } from '../../dao'
 import { VariableInputTransformer } from '../../model/VariableInputTransformer'
-import { Parser } from '../../queryLanguage'
+import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
 
 export interface ChoiceFieldPublicProps {
 	name: FieldName
@@ -137,7 +137,7 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 		environment: Environment
 	): React.ReactNode {
 		if ('options' in props) {
-			return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
+			return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 		}
 		return (
 			<>

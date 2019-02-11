@@ -7,8 +7,13 @@ export const tokens = {
 		group: Lexer.SKIPPED
 	}),
 
-	Identifier: createToken({
-		name: 'Identifier',
+	EntityIdentifier: createToken({
+		name: 'EntityIdentifier',
+		pattern: /[A-Z]\w*/
+	}),
+
+	FieldIdentifier: createToken({
+		name: 'FieldIdentifier',
 		pattern: /[a-zA-Z]\w*/
 	}),
 
@@ -70,7 +75,8 @@ export const tokens = {
 
 const tokenList = [
 	tokens.WhiteSpace,
-	tokens.Identifier,
+	tokens.EntityIdentifier,
+	tokens.FieldIdentifier,
 	tokens.Variable,
 	tokens.Dot,
 	tokens.Comma,

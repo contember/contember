@@ -4,7 +4,7 @@ import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
-import { Parser } from '../../queryLanguage'
+import { QueryLanguage } from '../../queryLanguage'
 
 export interface TextFieldProps {
 	name: FieldName
@@ -40,7 +40,7 @@ export class TextField extends React.PureComponent<TextFieldProps> {
 	}
 
 	public static generateSyntheticChildren(props: TextFieldProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 

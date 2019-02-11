@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
-import { Parser } from '../../queryLanguage'
+import { QueryLanguage } from '../../queryLanguage'
 import { TextFieldProps } from '../fields'
 
 interface FieldTextProps {
@@ -16,7 +16,7 @@ export class FieldText extends React.PureComponent<FieldTextProps> {
 	}
 
 	public static generateSyntheticChildren(props: TextFieldProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 

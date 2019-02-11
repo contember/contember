@@ -29,6 +29,7 @@ import {
 } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
+import { DragHandle as DragHandleIcon } from '../../../components/ui'
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
 	sortBy: FieldName | VariableScalar
@@ -105,7 +106,9 @@ namespace Sortable {
 	export interface DragHandleProps {}
 
 	export const DragHandle = SortableHandle((props: Props<DragHandleProps>) => (
-		<Icon icon={IconNames.DRAG_HANDLE_HORIZONTAL} className="sortable-item-handle" />
+		<div className="sortable-item-handle">
+			<DragHandleIcon />
+		</div>
 	))
 
 	export interface SortableItemProps extends Repeater.ItemProps {}

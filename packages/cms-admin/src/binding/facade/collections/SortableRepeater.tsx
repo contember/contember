@@ -1,4 +1,4 @@
-import { FormGroup } from '@blueprintjs/core'
+import { FormGroup } from '../../../components'
 import * as React from 'react'
 import {
 	EnforceSubtypeRelation,

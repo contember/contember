@@ -1,7 +1,8 @@
-import { Button, Divider, IButtonProps, Menu, MenuItem, Popover, Spinner } from '@blueprintjs/core'
+import { Manager, Reference, Popper } from 'react-popper'
+import { Spinner } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
-import { Link } from '../../../components'
+import { Link, Button, Dropdown } from '../../../components'
 import {
 	AccessorTreeRoot,
 	EntityAccessor,
@@ -15,6 +16,7 @@ import {
 } from '../../index'
 import { QueryLanguage } from '../../queryLanguage'
 import { LoadingSpinner } from '../renderers/userFeedback'
+import { Portal } from '../../../components/ui/Portal'
 
 export interface DimensionsSwitcherProps extends DimensionsSwitcher.DimensionsRendererProps {
 	entityName: string
@@ -87,7 +89,7 @@ namespace DimensionsSwitcher {
 		maxItems: number
 		emptyText: React.ReactNode
 		renderSelectedText?: (dimensionData: NormalizedDimensionData[]) => React.ReactNode
-		buttonProps?: Pick<IButtonProps, Exclude<keyof IButtonProps, 'text'>>
+		buttonProps?: any // Pick<IButtonProps, Exclude<keyof IButtonProps, 'text'>>
 	}
 
 	interface DimensionsRendererState {
@@ -122,10 +124,30 @@ namespace DimensionsSwitcher {
 						const normalizedData = this.getNormalizedData(uniqueDimensions, this.props.data)
 
 						return (
-							<Popover isOpen={this.state.isOpen} onInteraction={target => this.setState({ isOpen: target })}>
-								{this.renderTarget(normalizedData)}
-								{this.renderContent(normalizedData, uniqueDimensions)}
-							</Popover>
+							<Manager>
+								<Reference>
+									{({ ref }) => (
+										<Button
+											ref={ref}
+											onClick={() => this.setState(p => ({ ...p, isOpen: !p.isOpen, isAdding: false }))}
+										>
+											{this.renderTarget(normalizedData)}
+										</Button>
+									)}
+								</Reference>
+								{this.state.isOpen && (
+									<Portal>
+										<Popper placement="auto">
+											{({ ref, style, placement, arrowProps }) => (
+												<div ref={ref} style={{ ...style, zIndex: 20 }} data-placement={placement}>
+													{this.renderContent(normalizedData, uniqueDimensions)}
+													<div ref={arrowProps.ref} style={arrowProps.style} />
+												</div>
+											)}
+										</Popper>
+									</Portal>
+								)}
+							</Manager>
 						)
 					}}
 				</EnvironmentContext.Consumer>
@@ -133,9 +155,6 @@ namespace DimensionsSwitcher {
 		}
 
 		private renderTarget(dimensionData: undefined | NormalizedDimensionData[]): React.ReactNode {
-			const defaultProps: IButtonProps = {
-				rightIcon: IconNames.CHEVRON_DOWN
-			}
 			let text: React.ReactNode
 
 			if (dimensionData) {
@@ -153,7 +172,7 @@ namespace DimensionsSwitcher {
 			} else {
 				text = this.props.emptyText
 			}
-			return <Button {...defaultProps} {...this.props.buttonProps} text={text} />
+			return text
 		}
 
 		private renderContent(dimensionData: undefined | NormalizedDimensionData[], selectedDimensions: string[]) {
@@ -165,61 +184,50 @@ namespace DimensionsSwitcher {
 			const columnCount = selectedDimensionsCount + (this.state.isAdding && canSelectAnother ? 1 : 0)
 
 			return (
-				<div className="dimensionsSwitcher-wrapper">
+				<Dropdown columns>
 					{[...Array(columnCount)].map((_, i) => {
 						return (
-							<React.Fragment key={i}>
-								{!!i && <Divider />}
-								<Menu className="dimensionsSwitcher-menu">
-									{dimensionData.map((dimension, j) => {
-										const isActive = selectedDimensions[i] === dimension.slug
-										return (
-											<Link
-												key={j}
-												Component={({ href, onClick }) => (
-													<MenuItem
-														href={href}
-														onClick={onClick}
-														text={dimension.label}
-														active={isActive}
-														disabled={!isActive && dimension.isSelected}
-														shouldDismissPopover={false}
-													/>
-												)}
-												requestChange={reqState => {
-													if (reqState.name !== 'project_page') {
-														return reqState
+							<Dropdown.Column key={i}>
+								{dimensionData.map((dimension, j) => {
+									const active = selectedDimensions[i] === dimension.slug
+									return (
+										<Link
+											key={j}
+											Component={({ href, onClick }) => (
+												<Dropdown.Item {...{ href, onClick, active }}>{dimension.label}</Dropdown.Item>
+											)}
+											requestChange={reqState => {
+												if (reqState.name !== 'project_page') {
+													return reqState
+												}
+												const dimensionName = this.props.dimension
+												const dimensions = [...selectedDimensions]
+												if (dimensions[i] === dimension.slug) {
+													dimensions.splice(i, 1)
+												} else {
+													dimensions[i] = dimension.slug
+												}
+												return {
+													...reqState,
+													dimensions: {
+														...(reqState.dimensions || {}),
+														[dimensionName]: this.getUniqueDimensions(dimensions)
 													}
-													const dimensionName = this.props.dimension
-													const dimensions = [...selectedDimensions]
-													if (dimensions[i] === dimension.slug) {
-														dimensions.splice(i, 1)
-													} else {
-														dimensions[i] = dimension.slug
-													}
-													return {
-														...reqState,
-														dimensions: {
-															...(reqState.dimensions || {}),
-															[dimensionName]: this.getUniqueDimensions(dimensions)
-														}
-													}
-												}}
-											/>
-										)
-									})}
-								</Menu>
-							</React.Fragment>
+												}
+											}}
+										/>
+									)
+								})}
+							</Dropdown.Column>
 						)
 					})}
 					{!this.state.isAdding &&
 						canSelectAnother && (
-							<>
-								<Divider />
-								<Button icon={IconNames.ADD} minimal={true} onClick={() => this.setState({ isAdding: true })} />
-							</>
+							<Button onClick={() => this.setState({ isAdding: true })} small>
+								Add
+							</Button>
 						)}
-				</div>
+				</Dropdown>
 			)
 		}
 

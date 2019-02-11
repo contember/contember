@@ -4,6 +4,7 @@ import { FieldName } from '../../bindingTypes'
 import { Environment } from '../../dao'
 import { Component } from '../Component'
 import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
+import { FormGroup } from '../../../components'
 
 export interface RadioFieldPublicProps {
 	name: FieldName
@@ -48,17 +49,17 @@ namespace RadioField {
 	export class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
 		public render() {
 			return (
-				<RadioGroup
-					label={this.props.label}
-					selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}
-					onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
-					inline={this.props.inline}
-				>
-					{this.props.data.map(choice => {
-						const [value, label] = choice
-						return <Radio value={value} labelElement={label} key={value} />
-					})}
-				</RadioGroup>
+				<FormGroup label={this.props.label}>
+					<RadioGroup
+						selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}
+						onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
+					>
+						{this.props.data.map(choice => {
+							const [value, label] = choice
+							return <Radio value={value} labelElement={label} key={value} />
+						})}
+					</RadioGroup>
+				</FormGroup>
 			)
 		}
 	}

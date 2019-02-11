@@ -9,6 +9,7 @@ export enum ButtonColor {
 
 export interface ComponentProps {
 	className: string
+	ref?: React.Ref<any>
 }
 
 interface ButtonInnerProps<T> {
@@ -19,11 +20,15 @@ interface ButtonInnerProps<T> {
 	Component?: React.ReactType<ComponentProps & T> | any // Hotfix
 }
 
+interface InnerButtonInnerProps<T> extends ButtonInnerProps<T> {
+	forwardRef?: React.Ref<HTMLButtonElement>
+}
+
 export type ButtonProps<T = React.BaseHTMLAttributes<HTMLButtonElement>> = T & ButtonInnerProps<T>
 
-class Button<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React.PureComponent<ButtonProps<T>> {
+class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React.PureComponent<InnerButtonInnerProps<T>> {
 	render() {
-		const { Component = 'button', color, disabled, noBorder, small, children, ...rest } = this.props
+		const { Component = 'button', color, disabled, noBorder, small, children, forwardRef, ...rest } = this.props
 
 		const attrs: ComponentProps = {
 			className: cn(
@@ -33,10 +38,13 @@ class Button<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React.Pure
 				disabled && 'button-disabled',
 				noBorder && 'button-noBorder',
 				small && 'button-small'
-			)
+			),
+			ref: forwardRef
 		}
 		return React.createElement(Component, { ...(rest as T), ...attrs }, children)
 	}
 }
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => <InnerButton {...props} forwardRef={ref} />)
 
 export { Button }

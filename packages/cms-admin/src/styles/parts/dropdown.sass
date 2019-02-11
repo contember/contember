@@ -1,0 +1,32 @@
+.dropdown
+	list-style: none
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08)
+	border-radius: 4px
+	border: 1px solid #d8dce6
+	background-color: white
+	font-size: $font-size-1
+	min-width: 150px
+	display: inline-block
+	width: fit-content
+	margin: 4px 0
+
+	&-item
+		//
+
+	&-link
+		border-bottom: 1px solid #eaedf3
+		padding: $spacing-1 15px
+		color: inherit
+		text-decoration: none
+		display: block
+
+		&.is-active
+			background: #fbfbfd
+
+	&.view-columns
+		display: flex
+		min-width: auto
+	&.view-columns &
+		&-column
+			list-style: none
+			border-right: 1px solid #eaedf3

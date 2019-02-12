@@ -1,9 +1,9 @@
-import { Lexer, Parser as ChevrotainParser } from 'chevrotain'
+import { Lexer, Parser as ChevrotainParser, TokenType } from 'chevrotain'
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
-import { EntityName, FieldName, Filter } from '../bindingTypes'
-import { ToOneProps } from '../coreComponents'
+import { EntityName, FieldName } from '../bindingTypes'
+import { ToManyProps, ToOneProps } from '../coreComponents'
 import { Environment } from '../dao'
 import { MacroResolver } from './MacroResolver'
 import { QueryLanguageError } from './QueryLanguageError'
@@ -41,7 +41,6 @@ class Parser extends ChevrotainParser {
 				toOneProps: toOneProps,
 				fieldName: fieldName
 			}
-
 		}
 	)
 
@@ -66,26 +65,227 @@ class Parser extends ChevrotainParser {
 	private relativeEntityList: () => Parser.AST.RelativeEntityList = this.RULE<Parser.AST.RelativeEntityList>(
 		'relativeEntityList',
 		() => {
-			throw new QueryLanguageError(`Not implemented`)
+			const toManyProps: ToManyProps[] = []
+
+			this.MANY_SEP({
+				SEP: tokens.Dot,
+				DEF: () => {
+					toManyProps.push(this.SUBRULE(this.toManyProps))
+				}
+			})
+
+			return {
+				toManyProps
+			}
 		}
 	)
 
 	private toOneProps = this.RULE('toOneProps', () => {
 		const fieldName = this.SUBRULE(this.fieldName)
 		const reducedBy = this.OPTION(() => this.SUBRULE(this.uniqueWhere))
-		// TODO add nonUnique where
 		const props: ToOneProps = {
 			field: fieldName
 		}
 
 		if (reducedBy !== undefined) {
-			props['reducedBy'] = reducedBy
+			props.reducedBy = reducedBy
 		}
 
 		return props
 	})
 
-	private nonUniqueWhere = this.RULE('reductionWhere', () => {}) // TODO
+	private toManyProps: () => ToManyProps = this.RULE('toManyProps', () => {
+		const fieldName = this.SUBRULE(this.fieldName)
+		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+		const props: ToManyProps = {
+			field: fieldName
+		}
+
+		if (filter !== undefined) {
+			props.filter = filter
+		}
+
+		return props
+	})
+
+	private nonUniqueWhere: () => Parser.AST.Filter = this.RULE('nonUniqueWhere', () => {
+		const cnfWhere: Parser.AST.Filter[] = []
+
+		this.AT_LEAST_ONE(() => {
+			this.SUBRULE(this.optionalWhitespace)
+			this.CONSUME(tokens.LeftBracket)
+
+			cnfWhere.push(this.SUBRULE(this.disjunction))
+
+			this.CONSUME(tokens.RightBracket)
+			this.SUBRULE2(this.optionalWhitespace)
+		})
+		if (cnfWhere.length === 1) {
+			return cnfWhere[0]
+		}
+		return {
+			and: cnfWhere
+		}
+	})
+
+	private disjunction: () => Parser.AST.Filter = this.RULE('disjunction', () => {
+		const conjunctions: Parser.AST.Filter[] = []
+
+		this.AT_LEAST_ONE_SEP({
+			SEP: tokens.Or,
+			DEF: () => {
+				conjunctions.push(this.SUBRULE(this.conjunction))
+			}
+		})
+		if (conjunctions.length === 1) {
+			return conjunctions[0]
+		}
+		return {
+			or: conjunctions
+		}
+	})
+
+	private conjunction: () => Parser.AST.Filter = this.RULE('conjunction', () => {
+		const negations: Parser.AST.Filter[] = []
+
+		this.AT_LEAST_ONE_SEP({
+			SEP: tokens.And,
+			DEF: () => {
+				negations.push(this.SUBRULE(this.negation))
+			}
+		})
+		if (negations.length === 1) {
+			return negations[0]
+		}
+		return {
+			and: negations
+		}
+	})
+
+	private negation: () => Parser.AST.Filter = this.RULE('negation', () => {
+		return this.OR<Parser.AST.Filter>([
+			{
+				ALT: () => {
+					this.CONSUME(tokens.Not)
+					return {
+						not: this.SUBRULE(this.fieldWhere)
+					}
+				}
+			},
+			{
+				ALT: () => {
+					return this.SUBRULE1(this.fieldWhere)
+				}
+			}
+		])
+	})
+
+	private fieldWhere: () => Parser.AST.FieldWhere = this.RULE('fieldWhere', () => {
+		const field = this.SUBRULE(this.fieldIdentifier)
+		const condition = this.SUBRULE(this.condition)
+
+		return {
+			[field]: condition
+		}
+	})
+
+	private condition: () => Parser.AST.Condition = this.RULE('condition', () => {
+		const operator = this.SUBRULE(this.conditionOperator)
+		const columnValue = this.SUBRULE(this.columnValue)
+		const condition: Parser.AST.Condition = {}
+
+		if (columnValue === null) {
+			if (operator === 'eq') {
+				condition.null = true
+			} else if (operator === 'notEq') {
+				condition.null = false
+			} else {
+				throw new QueryLanguageError(`The null keyword as a right hand operand can only be tested for (in)equality.`)
+			}
+			return condition
+		}
+		condition[operator] = columnValue
+
+		return condition
+	})
+
+	private conditionOperator: () => Parser.AST.ConditionOperator = this.RULE('conditionOperator', () => {
+		this.SUBRULE(this.optionalWhitespace)
+		const operator = this.OR<Parser.AST.ConditionOperator>(
+			[
+				{
+					ALT: () => {
+						this.CONSUME(tokens.Equals)
+						return 'eq'
+					}
+				},
+				{
+					ALT: () => {
+						this.CONSUME(tokens.NotEquals)
+						return 'notEq'
+					}
+				},
+				{
+					ALT: () => {
+						this.CONSUME(tokens.LowerThan)
+						return 'lt'
+					}
+				},
+				{
+					ALT: () => {
+						this.CONSUME(tokens.LowerEqual)
+						return 'lte'
+					}
+				},
+				{
+					ALT: () => {
+						this.CONSUME(tokens.GreaterThan)
+						return 'gt'
+					}
+				},
+				{
+					ALT: () => {
+						this.CONSUME(tokens.GreaterEqual)
+						return 'gte'
+					}
+				},
+			]
+		)
+		this.SUBRULE1(this.optionalWhitespace)
+		return operator
+	})
+
+	// TODO add support for object & list
+	private columnValue: () => Parser.AST.ColumnValue = this.RULE('columnValue', () => {
+		this.SUBRULE(this.optionalWhitespace)
+		const value = this.OR<Parser.AST.ColumnValue>(
+			[
+				{
+					ALT: () => {
+						this.CONSUME(tokens.Null)
+						return null
+					}
+				},
+				{
+					ALT: () => {
+						this.CONSUME(tokens.True)
+						return true
+					}
+				},
+				{
+					ALT: () => {
+						this.CONSUME(tokens.False)
+						return false
+					}
+				},
+				{
+					ALT: () => this.SUBRULE(this.primaryValue)
+				}
+			]
+		)
+		this.SUBRULE1(this.optionalWhitespace)
+		return value
+	})
 
 	private uniqueWhere = this.RULE('uniqueWhere', () => {
 		const where: Input.UniqueWhere<GraphQlBuilder.Literal> = {}
@@ -165,7 +365,7 @@ class Parser extends ChevrotainParser {
 		])
 	})
 
-	private fieldIdentifier = this.RULE('fieldIdentifier', () => {
+	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {
 		this.SUBRULE(this.optionalWhitespace)
 		const identifier = this.CONSUME(tokens.FieldIdentifier).image
 		this.SUBRULE1(this.optionalWhitespace)
@@ -238,6 +438,9 @@ class Parser extends ChevrotainParser {
 			case Parser.EntryPoint.RelativeSingleEntity:
 				expression = Parser.parser.relativeSingleEntity()
 				break
+			case Parser.EntryPoint.RelativeEntityList:
+				expression = Parser.parser.relativeEntityList()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented`)
 		}
@@ -256,8 +459,8 @@ namespace Parser {
 	export namespace AST {
 		export interface QualifiedFieldList {
 			entityName: EntityName
-			filter: Filter[]
-			toOneProps: ToOneProps[]
+			filter: Filter
+			toManyProps: ToManyProps[]
 			fieldName: FieldName
 		}
 
@@ -271,15 +474,25 @@ namespace Parser {
 		}
 
 		export interface RelativeEntityList {
-			filter: Filter[]
+			toManyProps: ToManyProps[]
 		}
+
+		export type FieldWhere = Input.FieldWhere<Condition>
+
+		export type Filter = Input.Where<Condition>
+
+		export type ColumnValue = Input.ColumnValue<GraphQlBuilder.Literal>
+
+		export type Condition = Input.Condition<ColumnValue>
+
+		export type ConditionOperator = keyof Pick<Condition, 'eq' | 'notEq' | 'lt' | 'lte' | 'gt' | 'gte'>
 	}
 
 	export enum EntryPoint {
 		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].name
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
-		RelativeEntityList = 'relativeEntityList' // E.g. authors[age < 123].name
+		RelativeEntityList = 'relativeEntityList' // E.g. authors[age < 123]
 	}
 
 	export interface ParserResult {

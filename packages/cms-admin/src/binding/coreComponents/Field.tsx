@@ -9,7 +9,7 @@ import {
 	FieldMarker
 } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
-import { QueryLanguage } from '../queryLanguage/QueryLanguage'
+import { QueryLanguage } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'

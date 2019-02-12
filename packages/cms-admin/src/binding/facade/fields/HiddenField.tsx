@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { EnforceSubtypeRelation, Field, FieldPublicProps, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
-import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
+import { QueryLanguage } from '../../queryLanguage'
 
 export interface HiddenFieldProps extends FieldPublicProps {
 	defaultValue: FieldPublicProps['defaultValue']

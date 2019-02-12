@@ -13,7 +13,7 @@ import {
 	FieldAccessor,
 	RendererProps
 } from '../../index'
-import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
+import { QueryLanguage } from '../../queryLanguage'
 import { LoadingSpinner } from '../renderers/userFeedback'
 
 export interface DimensionsSwitcherProps extends DimensionsSwitcher.DimensionsRendererProps {

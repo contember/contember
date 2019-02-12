@@ -4,7 +4,7 @@ import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
-import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
+import { QueryLanguage } from '../../queryLanguage'
 
 export interface CheckboxFieldProps {
 	name: FieldName

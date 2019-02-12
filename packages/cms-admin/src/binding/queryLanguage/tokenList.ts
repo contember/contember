@@ -64,7 +64,7 @@ export const tokens = {
 
 	NotEquals: createToken({
 		name: 'NotEquals',
-		pattern: '/!=/'
+		pattern: /!=/
 	}),
 
 	True: createToken({

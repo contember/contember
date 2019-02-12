@@ -26,6 +26,10 @@ class Parser extends ChevrotainParser {
 		() => {
 			const toOneProps: ToOneProps[] = []
 
+			// Deliberately using a combination of consuming the Dot inside MANY as opposed to using MANY_SEP so as to
+			// disambiguate the grammar. Otherwise inputs such as "field(fooParam = 1).foo.bar" where a MANY_SEP alternative
+			// would match it all the way to "bar", leaving nothing to be matched subsequently. It would be possible to get
+			// around this, although it would be somewhat cumbersome.
 			this.MANY(() => {
 				toOneProps.push(this.SUBRULE(this.toOneProps))
 				this.CONSUME(tokens.Dot)

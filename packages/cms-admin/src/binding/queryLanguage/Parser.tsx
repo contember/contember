@@ -9,6 +9,14 @@ import { MacroResolver } from './MacroResolver'
 import { QueryLanguageError } from './QueryLanguageError'
 import { tokenList, tokens } from './tokenList'
 
+/**
+ * TODO:
+ * 	- double quoted strings
+ * 	- parentheses within non-unique where
+ * 	- predicate negation
+ * 	- collections (objects & lists)
+ * 	- collection operators (e.g. 'in', 'notIn', etc.)
+ */
 class Parser extends ChevrotainParser {
 	private static macroResolver = new MacroResolver()
 	private static lexer = new Lexer(tokenList)
@@ -179,6 +187,7 @@ class Parser extends ChevrotainParser {
 		}
 	})
 
+	// TODO this is to naïve and needs rewriting
 	private negation: () => Parser.AST.Filter = this.RULE('negation', () => {
 		return this.OR<Parser.AST.Filter>([
 			{
@@ -198,12 +207,29 @@ class Parser extends ChevrotainParser {
 	})
 
 	private fieldWhere: () => Parser.AST.FieldWhere = this.RULE('fieldWhere', () => {
-		const field = this.SUBRULE(this.fieldIdentifier)
+		const fields: FieldName[] = []
+
+		this.AT_LEAST_ONE_SEP({
+			SEP: tokens.Dot,
+			DEF: () => {
+				fields.push(this.SUBRULE(this.fieldIdentifier))
+			}
+		})
+
 		const condition = this.SUBRULE(this.condition)
 
-		return {
-			[field]: condition
+		let i = fields.length - 1
+		let where: Parser.AST.FieldWhere = {
+			[fields[i--]]: condition
 		}
+
+		while (i >= 0) {
+			where = {
+				[fields[i--]]: where
+			}
+		}
+
+		return where
 	})
 
 	private condition: () => Parser.AST.Condition = this.RULE('condition', () => {
@@ -270,7 +296,6 @@ class Parser extends ChevrotainParser {
 		return operator
 	})
 
-	// TODO add support for object & list
 	private columnValue: () => Parser.AST.ColumnValue = this.RULE('columnValue', () => {
 		this.SUBRULE(this.optionalWhitespace)
 		const value = this.OR<Parser.AST.ColumnValue>([

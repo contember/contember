@@ -64,4 +64,15 @@ describe('relative entity list QueryLanguage parser', () => {
 			}
 		])
 	})
+
+	it('should parse conditions with nested fields', () => {
+		expect(parse('foo[a.b.c < 123 && a.d = 456]')).eql([
+			{
+				field: 'foo',
+				filter: {
+					and: [{ a: { b: { c: { lt: 123 } } } }, { a: { d: { eq: 456 } } }]
+				}
+			}
+		])
+	})
 })

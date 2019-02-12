@@ -1,10 +1,7 @@
 import { expect } from 'chai'
-import { GraphQlBuilder } from 'cms-client'
 import 'mocha'
 import * as React from 'react'
-import { ToOne } from '../../../../src/binding/coreComponents'
-import { TextField } from '../../../../src/binding/facade'
-import { Parser, QueryLanguage } from '../../../../src/binding/queryLanguage'
+import { Parser } from '../../../../src/binding/queryLanguage'
 
 const parse = (input: string): Parser.AST.RelativeEntityList['toManyProps'] => {
 	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeEntityList).toManyProps

@@ -17,7 +17,24 @@ class Parser extends ChevrotainParser {
 	private qualifiedFieldList: () => Parser.AST.QualifiedFieldList = this.RULE<Parser.AST.QualifiedFieldList>(
 		'qualifiedFieldList',
 		() => {
-			throw new QueryLanguageError(`Not implemented`)
+			const toManyProps: ToManyProps[] = []
+			const entityName = this.SUBRULE(this.entityIdentifier)
+			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+
+			this.CONSUME(tokens.Dot)
+
+			this.MANY(() => {
+				toManyProps.push(this.SUBRULE(this.toManyProps))
+				this.CONSUME1(tokens.Dot)
+			})
+			const fieldName = this.SUBRULE(this.fieldIdentifier)
+
+			return {
+				entityName,
+				filter,
+				toManyProps,
+				fieldName
+			}
 		}
 	)
 
@@ -211,46 +228,44 @@ class Parser extends ChevrotainParser {
 
 	private conditionOperator: () => Parser.AST.ConditionOperator = this.RULE('conditionOperator', () => {
 		this.SUBRULE(this.optionalWhitespace)
-		const operator = this.OR<Parser.AST.ConditionOperator>(
-			[
-				{
-					ALT: () => {
-						this.CONSUME(tokens.Equals)
-						return 'eq'
-					}
-				},
-				{
-					ALT: () => {
-						this.CONSUME(tokens.NotEquals)
-						return 'notEq'
-					}
-				},
-				{
-					ALT: () => {
-						this.CONSUME(tokens.LowerThan)
-						return 'lt'
-					}
-				},
-				{
-					ALT: () => {
-						this.CONSUME(tokens.LowerEqual)
-						return 'lte'
-					}
-				},
-				{
-					ALT: () => {
-						this.CONSUME(tokens.GreaterThan)
-						return 'gt'
-					}
-				},
-				{
-					ALT: () => {
-						this.CONSUME(tokens.GreaterEqual)
-						return 'gte'
-					}
-				},
-			]
-		)
+		const operator = this.OR<Parser.AST.ConditionOperator>([
+			{
+				ALT: () => {
+					this.CONSUME(tokens.Equals)
+					return 'eq'
+				}
+			},
+			{
+				ALT: () => {
+					this.CONSUME(tokens.NotEquals)
+					return 'notEq'
+				}
+			},
+			{
+				ALT: () => {
+					this.CONSUME(tokens.LowerThan)
+					return 'lt'
+				}
+			},
+			{
+				ALT: () => {
+					this.CONSUME(tokens.LowerEqual)
+					return 'lte'
+				}
+			},
+			{
+				ALT: () => {
+					this.CONSUME(tokens.GreaterThan)
+					return 'gt'
+				}
+			},
+			{
+				ALT: () => {
+					this.CONSUME(tokens.GreaterEqual)
+					return 'gte'
+				}
+			}
+		])
 		this.SUBRULE1(this.optionalWhitespace)
 		return operator
 	})
@@ -258,31 +273,29 @@ class Parser extends ChevrotainParser {
 	// TODO add support for object & list
 	private columnValue: () => Parser.AST.ColumnValue = this.RULE('columnValue', () => {
 		this.SUBRULE(this.optionalWhitespace)
-		const value = this.OR<Parser.AST.ColumnValue>(
-			[
-				{
-					ALT: () => {
-						this.CONSUME(tokens.Null)
-						return null
-					}
-				},
-				{
-					ALT: () => {
-						this.CONSUME(tokens.True)
-						return true
-					}
-				},
-				{
-					ALT: () => {
-						this.CONSUME(tokens.False)
-						return false
-					}
-				},
-				{
-					ALT: () => this.SUBRULE(this.primaryValue)
+		const value = this.OR<Parser.AST.ColumnValue>([
+			{
+				ALT: () => {
+					this.CONSUME(tokens.Null)
+					return null
 				}
-			]
-		)
+			},
+			{
+				ALT: () => {
+					this.CONSUME(tokens.True)
+					return true
+				}
+			},
+			{
+				ALT: () => {
+					this.CONSUME(tokens.False)
+					return false
+				}
+			},
+			{
+				ALT: () => this.SUBRULE(this.primaryValue)
+			}
+		])
 		this.SUBRULE1(this.optionalWhitespace)
 		return value
 	})
@@ -441,6 +454,9 @@ class Parser extends ChevrotainParser {
 			case Parser.EntryPoint.RelativeEntityList:
 				expression = Parser.parser.relativeEntityList()
 				break
+			case Parser.EntryPoint.QualifiedFieldList:
+				expression = Parser.parser.qualifiedFieldList()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented`)
 		}
@@ -459,7 +475,7 @@ namespace Parser {
 	export namespace AST {
 		export interface QualifiedFieldList {
 			entityName: EntityName
-			filter: Filter
+			filter?: Filter
 			toManyProps: ToManyProps[]
 			fieldName: FieldName
 		}

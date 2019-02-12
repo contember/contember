@@ -4,7 +4,7 @@ import RichEditor, { LineBreakBehavior, RichEditorProps } from '../../../compone
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
-import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
+import { QueryLanguage } from '../../queryLanguage'
 import { TextFieldProps } from './TextField'
 
 export { LineBreakBehavior, Block, Mark } from '../../../components/RichEditor'

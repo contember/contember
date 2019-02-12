@@ -11,7 +11,7 @@ import {
 } from '../../coreComponents'
 import { Environment, FieldAccessor, Literal, VariableLiteral, VariableScalar } from '../../dao'
 import { VariableInputTransformer } from '../../model/VariableInputTransformer'
-import { QueryLanguage } from '../../queryLanguage/QueryLanguage'
+import { QueryLanguage } from '../../queryLanguage'
 
 export interface ChoiceFieldPublicProps {
 	name: FieldName

@@ -11,8 +11,10 @@ import {
 	ToOne
 } from '../../coreComponents'
 import {
+	AccessorTreeRoot,
 	DataBindingError,
 	EntityAccessor,
+	EntityCollectionAccessor,
 	Environment,
 	FieldAccessor,
 	Literal,
@@ -26,53 +28,38 @@ export interface ChoiceFieldPublicProps {
 	name: FieldName
 }
 
-export interface ChoiceFieldBaseProps<Label extends React.ReactNode = React.ReactNode> extends ChoiceFieldPublicProps {
+export interface ChoiceFieldBaseProps extends ChoiceFieldPublicProps {
 	children: (
-		data: ChoiceField.Data<Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>,
+		data: ChoiceField.Data<ChoiceField.Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>,
 		currentValue: ChoiceField.ValueRepresentation | null,
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void,
 		environment: Environment
 	) => React.ReactNode
 }
 
-export interface ChoiceFieldProps<Label extends React.ReactNode = React.ReactNode> extends ChoiceFieldBaseProps<Label> {
-	options: ChoiceField.StaticProps<Label>['options'] | FieldName
+export interface ChoiceFieldProps extends ChoiceFieldBaseProps {
+	options: ChoiceField.StaticProps['options'] | ChoiceField.DynamicProps['options']
 }
 
-class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
-	ChoiceFieldProps<Label>
-> {
+class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 	public static displayName = 'ChoiceField'
 
 	public render() {
 		return (
 			<Field.DataRetriever name={this.props.name}>
 				{(fieldName, data, environment) => {
-					if (Array.isArray(this.props.options)) {
-						return (
-							<ChoiceField.Static
-								fieldName={fieldName}
-								data={data}
-								environment={environment}
-								children={this.props.children}
-								options={this.props.options}
-								name={this.props.name}
-							/>
-						)
-					} else if (data instanceof EntityAccessor) {
-						const metadata = QueryLanguage.wrapQualifiedFieldList(
-							this.props.options,
-							fieldName => <Field name={fieldName} />,
-							environment
-						)
-						const fieldAccessor = data.data.getTreeRoot(metadata.fieldName)
-						const currentValueEntity = data.data.getField(fieldName)
-
-						console.log(fieldAccessor, currentValueEntity)
-						return null
-					} else {
-						throw new DataBindingError('Corrupted data')
+					const commonProps = {
+						fieldName,
+						data,
+						environment,
+						children: this.props.children,
+						name: this.props.name
 					}
+
+					if (Array.isArray(this.props.options)) {
+						return <ChoiceField.Static {...commonProps} options={this.props.options} />
+					}
+					return <ChoiceField.Dynamic {...commonProps} options={this.props.options} />
 				}}
 			</Field.DataRetriever>
 		)
@@ -118,13 +105,15 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 }
 
 namespace ChoiceField {
+	export type Label = React.ReactNode
+
 	export type ScalarValue = Scalar | VariableScalar
 
 	export type LiteralValue = VariableLiteral | Literal
 
 	export type StaticValue = GraphQlBuilder.Literal | Scalar
 
-	export type DynamicValue = string // UID type. May be changed to EntityAccessor later.
+	export type DynamicValue = EntityAccessor['primaryKey']
 
 	// This is just the JS array index as specified in options or as returned from the server.
 	export type ValueRepresentation = number
@@ -134,17 +123,17 @@ namespace ChoiceField {
 		ActualValue extends Environment.Value = string
 	> = Array<[ValueRepresentation, Label, ActualValue]>
 
-	export interface InnerBaseProps<Label extends React.ReactNode = React.ReactNode> extends ChoiceFieldBaseProps<Label> {
+	export interface InnerBaseProps extends ChoiceFieldBaseProps {
 		fieldName: FieldName
 		data: DataContextValue
 		environment: Environment
 	}
 
-	export interface StaticProps<Label extends React.ReactNode = React.ReactNode> extends InnerBaseProps<Label> {
+	export interface StaticProps extends InnerBaseProps {
 		options: Array<[ChoiceField.LiteralValue, Label]> | Array<[ChoiceField.ScalarValue, Label]>
 	}
 
-	export class Static<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<StaticProps<Label>> {
+	export class Static extends React.PureComponent<StaticProps> {
 		public render() {
 			const rawOptions = this.props.options
 			const children = this.props.children
@@ -209,7 +198,7 @@ namespace ChoiceField {
 		}
 
 		private isLiteralStaticMode(
-			options: ChoiceFieldProps<Label>['options']
+			options: ChoiceFieldProps['options']
 		): options is Array<[ChoiceField.LiteralValue, Label]> {
 			if (options.length === 0) {
 				return false
@@ -217,6 +206,63 @@ namespace ChoiceField {
 
 			const optionIndicator = options[0][0]
 			return optionIndicator instanceof VariableLiteral || optionIndicator instanceof Literal
+		}
+	}
+
+	export interface DynamicProps extends InnerBaseProps {
+		options: FieldName
+	}
+
+	export class Dynamic extends React.PureComponent<DynamicProps> {
+		public render() {
+			const data = this.props.data
+
+			if (!(data instanceof EntityAccessor)) {
+				throw new DataBindingError('Corrupted data')
+			}
+
+			const metadata = QueryLanguage.wrapQualifiedFieldList(
+				this.props.options,
+				fieldName => <Field name={fieldName} />,
+				this.props.environment
+			)
+			const fieldAccessor = data.data.getTreeRoot(metadata.fieldName)
+			const currentValueEntity = data.data.getField(this.props.fieldName)
+
+			if (!(fieldAccessor instanceof AccessorTreeRoot) || !(currentValueEntity instanceof EntityAccessor)) {
+				throw new DataBindingError('Corrupted data')
+			}
+
+			const subTreeData = fieldAccessor.root
+
+			if (!(subTreeData instanceof EntityCollectionAccessor)) {
+				throw new DataBindingError('Corrupted data')
+			}
+			const filteredData = subTreeData.entities.filter(
+				(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor
+			)
+
+			const currentKey = currentValueEntity.getKey()
+			const currentValue: ChoiceField.ValueRepresentation = filteredData.findIndex(entity => {
+				return entity.getKey() === currentKey
+			})
+			const normalizedData = filteredData.map(
+				(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.DynamicValue] => {
+					const field = item.data.getField(metadata.fieldName)
+					const label: Label = field instanceof FieldAccessor ? field.currentValue : undefined
+
+					return [i, label, item.primaryKey]
+				}
+			)
+
+			return this.props.children(
+				normalizedData,
+				currentValue === -1 ? null : currentValue,
+				(newValue: ChoiceField.ValueRepresentation) => {
+					currentValueEntity.replaceWith(filteredData[newValue])
+				},
+				this.props.environment
+			)
 		}
 	}
 }

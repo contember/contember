@@ -38,11 +38,7 @@ class RadioField extends Component<RadioFieldProps>(props => {
 }, 'RadioField') {}
 
 namespace RadioField {
-	export interface RadioFieldInnerProps {
-		name: FieldName
-		label?: IRadioGroupProps['label']
-		inline?: boolean
-
+	export interface RadioFieldInnerProps extends RadioFieldPublicProps {
 		data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
 		currentValue: ChoiceField.ValueRepresentation | null
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void

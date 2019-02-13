@@ -38,19 +38,19 @@ class RadioField extends Component<RadioFieldProps>(props => {
 }, 'RadioField') {}
 
 namespace RadioField {
-	export interface RadioFieldInnerProps<Label extends React.ReactNode = React.ReactNode> {
+	export interface RadioFieldInnerProps {
 		name: FieldName
 		label?: IRadioGroupProps['label']
 		inline?: boolean
 
-		data: ChoiceField.Data<Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>
+		data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
 		currentValue: ChoiceField.ValueRepresentation | null
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void
 		environment: Environment
 	}
 
-	export class RadioFieldInner<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
-		RadioFieldInnerProps<Label>
+	export class RadioFieldInner extends React.PureComponent<
+		RadioFieldInnerProps
 	> {
 		public render() {
 			return (

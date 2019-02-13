@@ -2,7 +2,7 @@ import * as React from 'react'
 import { EnvironmentContext, Props, SyntheticChildrenProvider } from '../coreComponents'
 import { Environment } from '../dao'
 
-interface Component<P extends {}> extends React.ComponentClass<P, {}> {
+interface Component<P extends {} = {}> extends React.ComponentClass<P, {}> {
 	render(props: Props<P>, environment: Environment): React.ReactNode
 }
 

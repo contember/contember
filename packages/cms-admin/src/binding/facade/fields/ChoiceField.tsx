@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { EntityName, FieldName, Filter, Scalar } from '../../bindingTypes'
+import { FieldName, Scalar } from '../../bindingTypes'
 import {
 	EnforceSubtypeRelation,
 	EntityListDataProvider,
@@ -9,7 +9,15 @@ import {
 	SyntheticChildrenProvider,
 	ToOne
 } from '../../coreComponents'
-import { Environment, FieldAccessor, Literal, VariableLiteral, VariableScalar } from '../../dao'
+import {
+	DataBindingError,
+	EntityAccessor,
+	Environment,
+	FieldAccessor,
+	Literal,
+	VariableLiteral,
+	VariableScalar
+} from '../../dao'
 import { VariableInputTransformer } from '../../model/VariableInputTransformer'
 import { QueryLanguage } from '../../queryLanguage'
 
@@ -24,21 +32,11 @@ export interface ChoiceFieldBaseProps<Label extends React.ReactNode = React.Reac
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void,
 		environment: Environment
 	) => React.ReactNode
-}
-
-export interface ChoiceFieldStaticProps<Label extends React.ReactNode = React.ReactNode> {
-	options: Array<[ChoiceField.LiteralValue, Label]> | Array<[ChoiceField.ScalarValue, Label]>
-}
-
-export interface ChoiceFieldDynamicProps {
-	entityName: EntityName
-	optionFieldName: FieldName
-	filter?: Filter
+	options: Array<[ChoiceField.LiteralValue, Label]> | Array<[ChoiceField.ScalarValue, Label]> | FieldName
 }
 
 export type ChoiceFieldProps<Label extends React.ReactNode = React.ReactNode> = ChoiceFieldPublicProps &
-	ChoiceFieldBaseProps<Label> &
-	(ChoiceFieldDynamicProps | ChoiceFieldStaticProps<Label>)
+	ChoiceFieldBaseProps<Label>
 
 class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
 	ChoiceFieldProps<Label>
@@ -49,7 +47,7 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 		return (
 			<Field.DataRetriever name={this.props.name}>
 				{(fieldName, data, environment) => {
-					if ('options' in this.props) {
+					if (Array.isArray(this.props.options)) {
 						const rawOptions = this.props.options
 						const children = this.props.children
 
@@ -90,8 +88,20 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 								}}
 							</Field>
 						)
+					} else if (data instanceof EntityAccessor) {
+						const metadata = QueryLanguage.wrapQualifiedFieldList(
+							this.props.options,
+							fieldName => <Field name={fieldName} />,
+							environment
+						)
+						const fieldAccessor = data.data.getTreeRoot(metadata.fieldName)
+						const currentValueEntity = data.data.getField(fieldName)
+
+						console.log(fieldAccessor, currentValueEntity)
+						return null
+					} else {
+						throw new DataBindingError('Corrupted data')
 					}
-					return null // TODO handle the dynamic case
 				}}
 			</Field.DataRetriever>
 		)
@@ -122,7 +132,7 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 	}
 
 	private isLiteralStaticMode(
-		options: ChoiceFieldStaticProps<Label>['options']
+		options: ChoiceFieldProps<Label>['options']
 	): options is Array<[ChoiceField.LiteralValue, Label]> {
 		if (options.length === 0) {
 			return false
@@ -133,20 +143,39 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 	}
 
 	public static generateSyntheticChildren(
-		props: Props<ChoiceFieldPublicProps & (ChoiceFieldStaticProps | ChoiceFieldDynamicProps)>,
+		props: Props<Pick<ChoiceFieldProps, Exclude<keyof ChoiceFieldProps, 'children'>>>,
 		environment: Environment
 	): React.ReactNode {
-		if ('options' in props) {
+		if (Array.isArray(props.options)) {
 			return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 		}
+
+		const metadata = QueryLanguage.wrapQualifiedFieldList(
+			props.options,
+			fieldName => <Field name={fieldName} />,
+			environment
+		)
+
 		return (
 			<>
-				<EntityListDataProvider name={props.entityName} filter={props.filter} associatedField={props.name}>
-					<Field name={props.optionFieldName} />
-				</EntityListDataProvider>
-				<ToOne field={props.name}>
-					<Field name={props.optionFieldName} />
-				</ToOne>
+				{QueryLanguage.wrapRelativeSingleField(
+					props.name,
+					fieldName => (
+						<>
+							<EntityListDataProvider
+								name={metadata.entityName}
+								filter={metadata.filter}
+								associatedField={metadata.fieldName}
+							>
+								{metadata.children}
+							</EntityListDataProvider>
+							<ToOne field={fieldName}>
+								<Field name={metadata.fieldName} />
+							</ToOne>
+						</>
+					),
+					environment
+				)}
 			</>
 		)
 	}

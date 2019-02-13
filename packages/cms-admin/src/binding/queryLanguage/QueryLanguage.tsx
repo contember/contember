@@ -66,6 +66,7 @@ export namespace QueryLanguage {
 		entityName: EntityName
 		filter?: Filter
 		children: React.ReactNode
+		fieldName: FieldName
 	} => {
 		const { entityName, filter, fieldName, toManyProps } = Parser.parseQueryLanguageExpression(
 			input,
@@ -74,6 +75,7 @@ export namespace QueryLanguage {
 		)
 
 		return {
+			fieldName,
 			entityName,
 			filter,
 			children: wrap(generateField(fieldName), ToMany, toManyProps)

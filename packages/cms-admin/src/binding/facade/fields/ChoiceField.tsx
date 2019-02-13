@@ -2,6 +2,7 @@ import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { FieldName, Scalar } from '../../bindingTypes'
 import {
+	DataContextValue,
 	EnforceSubtypeRelation,
 	EntityListDataProvider,
 	Field,
@@ -25,18 +26,18 @@ export interface ChoiceFieldPublicProps {
 	name: FieldName
 }
 
-export interface ChoiceFieldBaseProps<Label extends React.ReactNode = React.ReactNode> {
+export interface ChoiceFieldBaseProps<Label extends React.ReactNode = React.ReactNode> extends ChoiceFieldPublicProps {
 	children: (
 		data: ChoiceField.Data<Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>,
 		currentValue: ChoiceField.ValueRepresentation | null,
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void,
 		environment: Environment
 	) => React.ReactNode
-	options: Array<[ChoiceField.LiteralValue, Label]> | Array<[ChoiceField.ScalarValue, Label]> | FieldName
 }
 
-export type ChoiceFieldProps<Label extends React.ReactNode = React.ReactNode> = ChoiceFieldPublicProps &
-	ChoiceFieldBaseProps<Label>
+export interface ChoiceFieldProps<Label extends React.ReactNode = React.ReactNode> extends ChoiceFieldBaseProps<Label> {
+	options: ChoiceField.StaticProps<Label>['options'] | FieldName
+}
 
 class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
 	ChoiceFieldProps<Label>
@@ -48,45 +49,15 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 			<Field.DataRetriever name={this.props.name}>
 				{(fieldName, data, environment) => {
 					if (Array.isArray(this.props.options)) {
-						const rawOptions = this.props.options
-						const children = this.props.children
-
-						if (rawOptions.length === 0) {
-							return null
-						}
-
-						const options: Array<[GraphQlBuilder.Literal | Scalar, Label]> = this.isLiteralStaticMode(rawOptions)
-							? this.normalizeLiteralStaticOptions(rawOptions, environment)
-							: this.normalizeScalarStaticOptions(rawOptions, environment)
-
 						return (
-							<Field name={fieldName}>
-								{(data: FieldAccessor): React.ReactNode => {
-									const currentValue: ChoiceField.ValueRepresentation = options.findIndex(([value]) => {
-										return (
-											data.hasValue(value) ||
-											(value instanceof GraphQlBuilder.Literal &&
-												typeof data.currentValue === 'string' &&
-												value.value === data.currentValue)
-										)
-									}, null)
-
-									return children(
-										options.map(
-											(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.StaticValue] => [
-												i,
-												item[1],
-												item[0]
-											]
-										),
-										currentValue === -1 ? null : currentValue,
-										(newValue: ChoiceField.ValueRepresentation) => {
-											data.onChange && data.onChange(options[newValue][0])
-										},
-										environment
-									)
-								}}
-							</Field>
+							<ChoiceField.Static
+								fieldName={fieldName}
+								data={data}
+								environment={environment}
+								children={this.props.children}
+								options={this.props.options}
+								name={this.props.name}
+							/>
 						)
 					} else if (data instanceof EntityAccessor) {
 						const metadata = QueryLanguage.wrapQualifiedFieldList(
@@ -105,41 +76,6 @@ class ChoiceField<Label extends React.ReactNode = React.ReactNode> extends React
 				}}
 			</Field.DataRetriever>
 		)
-	}
-
-	private normalizeLiteralStaticOptions(
-		options: Array<[ChoiceField.LiteralValue, Label]>,
-		environment: Environment
-	): Array<[GraphQlBuilder.Literal, Label]> {
-		return options.map(
-			([key, value]): [GraphQlBuilder.Literal, Label] => [
-				key instanceof VariableLiteral ? VariableInputTransformer.transformVariableLiteral(key, environment) : key,
-				value
-			]
-		)
-	}
-
-	private normalizeScalarStaticOptions(
-		options: Array<[ChoiceField.ScalarValue, Label]>,
-		environment: Environment
-	): Array<[Scalar, Label]> {
-		return options.map(
-			([key, value]): [Scalar, Label] => [
-				key instanceof VariableScalar ? VariableInputTransformer.transformVariableScalar(key, environment) : key,
-				value
-			]
-		)
-	}
-
-	private isLiteralStaticMode(
-		options: ChoiceFieldProps<Label>['options']
-	): options is Array<[ChoiceField.LiteralValue, Label]> {
-		if (options.length === 0) {
-			return false
-		}
-
-		const optionIndicator = options[0][0]
-		return optionIndicator instanceof VariableLiteral || optionIndicator instanceof Literal
 	}
 
 	public static generateSyntheticChildren(
@@ -197,6 +133,92 @@ namespace ChoiceField {
 		Label extends React.ReactNode = React.ReactNode,
 		ActualValue extends Environment.Value = string
 	> = Array<[ValueRepresentation, Label, ActualValue]>
+
+	export interface InnerBaseProps<Label extends React.ReactNode = React.ReactNode> extends ChoiceFieldBaseProps<Label> {
+		fieldName: FieldName
+		data: DataContextValue
+		environment: Environment
+	}
+
+	export interface StaticProps<Label extends React.ReactNode = React.ReactNode> extends InnerBaseProps<Label> {
+		options: Array<[ChoiceField.LiteralValue, Label]> | Array<[ChoiceField.ScalarValue, Label]>
+	}
+
+	export class Static<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<StaticProps<Label>> {
+		public render() {
+			const rawOptions = this.props.options
+			const children = this.props.children
+
+			if (rawOptions.length === 0) {
+				return null
+			}
+
+			const options: Array<[GraphQlBuilder.Literal | Scalar, Label]> = this.isLiteralStaticMode(rawOptions)
+				? this.normalizeLiteralStaticOptions(rawOptions, this.props.environment)
+				: this.normalizeScalarStaticOptions(rawOptions, this.props.environment)
+
+			return (
+				<Field name={this.props.fieldName}>
+					{(data: FieldAccessor): React.ReactNode => {
+						const currentValue: ChoiceField.ValueRepresentation = options.findIndex(([value]) => {
+							return (
+								data.hasValue(value) ||
+								(value instanceof GraphQlBuilder.Literal &&
+									typeof data.currentValue === 'string' &&
+									value.value === data.currentValue)
+							)
+						}, null)
+
+						return children(
+							options.map(
+								(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.StaticValue] => [i, item[1], item[0]]
+							),
+							currentValue === -1 ? null : currentValue,
+							(newValue: ChoiceField.ValueRepresentation) => {
+								data.onChange && data.onChange(options[newValue][0])
+							},
+							this.props.environment
+						)
+					}}
+				</Field>
+			)
+		}
+
+		private normalizeLiteralStaticOptions(
+			options: Array<[ChoiceField.LiteralValue, Label]>,
+			environment: Environment
+		): Array<[GraphQlBuilder.Literal, Label]> {
+			return options.map(
+				([key, value]): [GraphQlBuilder.Literal, Label] => [
+					key instanceof VariableLiteral ? VariableInputTransformer.transformVariableLiteral(key, environment) : key,
+					value
+				]
+			)
+		}
+
+		private normalizeScalarStaticOptions(
+			options: Array<[ChoiceField.ScalarValue, Label]>,
+			environment: Environment
+		): Array<[Scalar, Label]> {
+			return options.map(
+				([key, value]): [Scalar, Label] => [
+					key instanceof VariableScalar ? VariableInputTransformer.transformVariableScalar(key, environment) : key,
+					value
+				]
+			)
+		}
+
+		private isLiteralStaticMode(
+			options: ChoiceFieldProps<Label>['options']
+		): options is Array<[ChoiceField.LiteralValue, Label]> {
+			if (options.length === 0) {
+				return false
+			}
+
+			const optionIndicator = options[0][0]
+			return optionIndicator instanceof VariableLiteral || optionIndicator instanceof Literal
+		}
+	}
 }
 
 export { ChoiceField }

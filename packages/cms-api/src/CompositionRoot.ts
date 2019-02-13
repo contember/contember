@@ -28,6 +28,7 @@ import AccessEvaluator from './core/authorization/AccessEvalutator'
 import PermissionsFactory from './tenant-api/model/authorization/PermissionsFactory'
 import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
+import KnexDebugger from './core/knex/KnexDebugger'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -76,8 +77,8 @@ class CompositionRoot {
 			return new Container.Builder({})
 				.addService('project', () => project)
 				.addService('knexConnection', ({ project }) => {
-					return knex({
-						debug: true,
+					const knexInst = knex({
+						debug: false,
 						client: 'pg',
 						connection: {
 							host: project.dbCredentials.host,
@@ -87,6 +88,10 @@ class CompositionRoot {
 							database: project.dbCredentials.database,
 						},
 					})
+					const knexDebugger = new KnexDebugger()
+					knexDebugger.register(knexInst)
+
+					return knexInst
 				})
 				.addService('s3', ({ project }) => {
 					return new S3(project.s3)
@@ -106,16 +111,17 @@ class CompositionRoot {
 
 	createTenantContainer(tenantDbCredentials: DatabaseCredentials) {
 		return new Container.Builder({})
-
-			.addService('knexConnection', () => {
-				return new KnexConnection(
-					knex({
-						debug: true,
-						client: 'pg',
-						connection: tenantDbCredentials,
-					}),
-					'tenant'
-				)
+			.addService('knexDebugger', () => {
+				return new KnexDebugger()
+			})
+			.addService('knexConnection', ({ knexDebugger }) => {
+				const knexInst = knex({
+					debug: false,
+					client: 'pg',
+					connection: tenantDbCredentials,
+				})
+				knexDebugger.register(knexInst)
+				return new KnexConnection(knexInst, 'tenant')
 			})
 			.addService('queryHandler', ({ knexConnection }) => {
 				const handler = new QueryHandler(

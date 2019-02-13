@@ -4,7 +4,7 @@ import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
-import { Parser } from '../../queryLanguage'
+import { Parser, QueryLanguage } from '../../queryLanguage'
 
 export interface FloatFieldProps {
 	name: FieldName
@@ -41,7 +41,7 @@ export class FloatField extends React.PureComponent<FloatFieldProps> {
 	}
 
 	public static generateSyntheticChildren(props: FloatFieldProps, environment: Environment): React.ReactNode {
-		return Parser.generateWrappedNode(props.name, fieldName => <Field name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }
 

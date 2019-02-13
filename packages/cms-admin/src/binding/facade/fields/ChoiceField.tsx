@@ -239,12 +239,13 @@ namespace ChoiceField {
 				throw new DataBindingError('Corrupted data')
 			}
 			const filteredData = subTreeData.entities.filter(
-				(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor
+				(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor && !!accessor.getPersistedKey()
 			)
 
 			const currentKey = currentValueEntity.getKey()
-			const currentValue: ChoiceField.ValueRepresentation = filteredData.findIndex(entity => {
-				return entity.getKey() === currentKey
+			const currentValue: ChoiceField.ValueRepresentation = filteredData.findIndex((entity) => {
+				const key = entity.getPersistedKey()
+				return !!key && key === currentKey
 			})
 			const normalizedData = filteredData.map(
 				(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.DynamicValue] => {

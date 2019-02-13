@@ -15,6 +15,10 @@ class EntityAccessor {
 	public getKey() {
 		return this.primaryKey instanceof EntityAccessor.UnpersistedEntityID ? this.primaryKey.value : this.primaryKey
 	}
+
+	public getPersistedKey() {
+		return this.primaryKey instanceof EntityAccessor.UnpersistedEntityID ? undefined : this.primaryKey
+	}
 }
 
 namespace EntityAccessor {

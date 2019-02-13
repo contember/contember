@@ -1,122 +1,77 @@
-import { FormGroup, HTMLSelect, IFormGroupProps } from '@blueprintjs/core'
+import { FormGroup, HTMLSelect, IRadioGroupProps, Radio, RadioGroup } from '@blueprintjs/core'
 import * as React from 'react'
-import { EntityName, FieldName, Filter } from '../../bindingTypes'
-import {
-	DataContext,
-	DataContextValue,
-	EnforceSubtypeRelation,
-	EntityListDataProvider,
-	Field,
-	SyntheticChildrenProvider,
-	ToOne,
-	EnvironmentContext
-} from '../../coreComponents'
-import {
-	AccessorTreeRoot,
-	DataBindingError,
-	EntityAccessor,
-	EntityCollectionAccessor,
-	FieldAccessor,
-	Environment
-} from '../../dao'
-import { Parser } from '../../queryLanguage'
+import { FieldName } from '../../bindingTypes'
+import { Environment } from '../../dao'
+import { Component } from '../Component'
+import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
 
-export interface SelectFieldProps {
+export interface SelectFieldPublicProps {
 	name: FieldName
-	label: IFormGroupProps['label']
-	entityName: EntityName
-	optionFieldName: FieldName
-	filter?: Filter
+	label?: IRadioGroupProps['label']
+	inline?: boolean
 }
 
-export class SelectField extends React.PureComponent<SelectFieldProps> {
-	public static displayName = 'SelectField'
+export interface SelectFieldInternalProps {
+	options: ChoiceFieldProps['options']
+}
 
-	public render() {
-		return (
-			<EnvironmentContext.Consumer>
-				{(environment: Environment) =>
-					Parser.generateWrappedNode(
-						this.props.name,
-						fieldName => (
-							<DataContext.Consumer>
-								{(data: DataContextValue) => {
-									if (data instanceof EntityAccessor) {
-										const fieldAccessor = data.data.getTreeRoot(fieldName)
-										const currentValueEntity = data.data.getField(fieldName)
+export type SelectFieldProps = SelectFieldPublicProps & SelectFieldInternalProps
 
-										// TODO this fails when `currentValueEntity` is `null` which may legitimately happen.
-										if (
-											!(fieldAccessor instanceof AccessorTreeRoot) ||
-											!(currentValueEntity instanceof EntityAccessor)
-										) {
-											throw new DataBindingError('Corrupted data')
-										}
+class SelectField extends Component<SelectFieldProps>(props => {
+	return (
+		<ChoiceField name={props.name} options={props.options}>
+			{(data, currentValue, onChange, environment) => {
+				return (
+					<SelectField.SelectFieldInner
+						name={props.name}
+						label={props.label}
+						inline={props.inline}
+						data={data}
+						currentValue={currentValue}
+						onChange={onChange}
+						environment={environment}
+					/>
+				)
+			}}
+		</ChoiceField>
+	)
+}, 'SelectField') {}
 
-										const subTreeData = fieldAccessor.root
+namespace SelectField {
+	export interface SelectFieldInnerProps<Label extends React.ReactNode = React.ReactNode> {
+		name: FieldName
+		label?: IRadioGroupProps['label']
+		inline?: boolean
 
-										if (subTreeData instanceof EntityCollectionAccessor) {
-											const normalizedData = subTreeData.entities.filter(
-												(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor
-											)
-											return (
-												<FormGroup label={this.props.label}>
-													<HTMLSelect
-														value={currentValueEntity.primaryKey as string}
-														onChange={e => {
-															const newPrimaryKey = e.currentTarget.value
-															const newAccessor = normalizedData.find(accessor => accessor.primaryKey === newPrimaryKey)
-
-															newAccessor && currentValueEntity.replaceWith(newAccessor)
-														}}
-														options={normalizedData.map(datum => {
-															const optionField = datum.data.getField(this.props.optionFieldName)
-
-															if (!(optionField instanceof FieldAccessor)) {
-																throw new DataBindingError('Corrupted data')
-															}
-															return {
-																value: datum.primaryKey as string,
-																label: (optionField.currentValue || '').toString()
-															}
-														})}
-													/>
-												</FormGroup>
-											)
-										}
-									}
-									throw new DataBindingError('Corrupted data')
-								}}
-							</DataContext.Consumer>
-						),
-						environment
-					)
-				}
-			</EnvironmentContext.Consumer>
-		)
+		data: ChoiceField.Data<Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>
+		currentValue: ChoiceField.ValueRepresentation | null
+		onChange: (newValue: ChoiceField.ValueRepresentation) => void
+		environment: Environment
 	}
 
-	public static generateSyntheticChildren(props: SelectFieldProps, environment: Environment): React.ReactNode {
-		return (
-			<>
-				{Parser.generateWrappedNode(
-					`${props.name}.${props.optionFieldName}`,
-					fieldName => (
-						<>
-							<Field name={fieldName} />
-							<EntityListDataProvider name={props.entityName} filter={props.filter} associatedField={fieldName}>
-								<Field name={fieldName} />
-							</EntityListDataProvider>
-						</>
-					),
-					environment
-				)}
-			</>
-		)
+	export class SelectFieldInner<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
+		SelectFieldInnerProps<Label>
+	> {
+		public render() {
+			console.log(this.props.data)
+			return (
+				<FormGroup
+					label={this.props.label}
+					inline={this.props.inline}
+				>
+					<HTMLSelect
+						value={this.props.currentValue === null ? undefined : this.props.currentValue}
+						onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
+						options={this.props.data.map(([value, label]) => {
+							return {
+								value, label: label as string
+							}
+						})}
+					/>
+				</FormGroup>
+			)
+		}
 	}
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
-	typeof SelectField,
-	SyntheticChildrenProvider<SelectFieldProps>
->
+export { SelectField }

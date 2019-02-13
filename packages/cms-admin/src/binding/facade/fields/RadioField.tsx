@@ -1,9 +1,9 @@
 import { IRadioGroupProps, Radio, RadioGroup } from '@blueprintjs/core'
 import * as React from 'react'
-import { EntityName, FieldName, Filter } from '../../bindingTypes'
+import { FieldName } from '../../bindingTypes'
 import { Environment } from '../../dao'
 import { Component } from '../Component'
-import { ChoiceField, ChoiceFieldStaticProps } from './ChoiceField'
+import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
 
 export interface RadioFieldPublicProps {
 	name: FieldName
@@ -11,32 +11,15 @@ export interface RadioFieldPublicProps {
 	inline?: boolean
 }
 
-export interface RadioFieldStaticProps {
-	options: ChoiceFieldStaticProps['options']
+export interface RadioFieldInternalProps {
+	options: ChoiceFieldProps['options']
 }
 
-export interface RadioFieldDynamicProps {
-	entityName: EntityName
-	optionFieldName: FieldName
-	filter?: Filter
-}
-
-export type RadioFieldProps = RadioFieldPublicProps & (RadioFieldStaticProps | RadioFieldDynamicProps)
+export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 
 class RadioField extends Component<RadioFieldProps>(props => {
-	const restProps =
-		'options' in props
-			? {
-					options: props.options
-			  }
-			: {
-					entityName: props.entityName,
-					optionFieldName: props.optionFieldName,
-					filter: props.filter
-			  }
-
 	return (
-		<ChoiceField name={props.name} {...restProps}>
+		<ChoiceField name={props.name} options={props.options}>
 			{(data, currentValue, onChange, environment) => {
 				return (
 					<RadioField.RadioFieldInner

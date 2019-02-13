@@ -43,28 +43,23 @@ namespace SelectField {
 		label?: IRadioGroupProps['label']
 		inline?: boolean
 
-		data: ChoiceField.Data<Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>
+		data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
 		currentValue: ChoiceField.ValueRepresentation | null
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void
 		environment: Environment
 	}
 
-	export class SelectFieldInner<Label extends React.ReactNode = React.ReactNode> extends React.PureComponent<
-		SelectFieldInnerProps<Label>
-	> {
+	export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps> {
 		public render() {
-			console.log(this.props.data)
 			return (
-				<FormGroup
-					label={this.props.label}
-					inline={this.props.inline}
-				>
+				<FormGroup label={this.props.label} inline={this.props.inline}>
 					<HTMLSelect
 						value={this.props.currentValue === null ? undefined : this.props.currentValue}
 						onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
 						options={this.props.data.map(([value, label]) => {
 							return {
-								value, label: label as string
+								value,
+								label: label as string
 							}
 						})}
 					/>

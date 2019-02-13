@@ -30,7 +30,7 @@ export interface ChoiceFieldPublicProps {
 
 export interface ChoiceFieldBaseProps extends ChoiceFieldPublicProps {
 	children: (
-		data: ChoiceField.Data<ChoiceField.Label, ChoiceField.DynamicValue | ChoiceField.StaticValue>,
+		data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>,
 		currentValue: ChoiceField.ValueRepresentation | null,
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void,
 		environment: Environment
@@ -119,7 +119,6 @@ namespace ChoiceField {
 	export type ValueRepresentation = number
 
 	export type Data<
-		Label extends React.ReactNode = React.ReactNode,
 		ActualValue extends Environment.Value = string
 	> = Array<[ValueRepresentation, Label, ActualValue]>
 

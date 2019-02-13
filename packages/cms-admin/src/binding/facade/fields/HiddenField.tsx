@@ -15,7 +15,11 @@ export class HiddenField extends React.PureComponent<HiddenFieldProps> {
 	}
 
 	public static generateSyntheticChildren(props: HiddenFieldProps, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field {...props} name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(
+			props.name,
+			fieldName => <Field {...props} name={fieldName} />,
+			environment
+		)
 	}
 }
 

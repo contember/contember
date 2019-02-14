@@ -15,7 +15,11 @@ export namespace QueryLanguage {
 
 		for (let i = layers.length - 1; i >= 0; i--) {
 			const currentProps = layers[i]
-			currentNode = <Component {...currentProps} environment={environment}>{currentNode}</Component>
+			currentNode = (
+				<Component {...currentProps} environment={environment}>
+					{currentNode}
+				</Component>
+			)
 		}
 
 		return currentNode
@@ -47,7 +51,7 @@ export namespace QueryLanguage {
 
 	export const wrapRelativeEntityList = (
 		input: string,
-		subordinateFields: React.ReactNode,
+		generateAtomicToMany: (atomicPrimitiveProps: ToMany.AtomicPrimitiveProps) => React.ReactNode,
 		environment: Environment
 	): React.ReactNode => {
 		const { toOneProps, toManyProps } = Parser.parseQueryLanguageExpression(
@@ -56,8 +60,15 @@ export namespace QueryLanguage {
 			environment
 		)
 
-		return null
-		//return wrap(subordinateFields, ToMany, toManyProps, environment)
+		return wrap(
+			generateAtomicToMany({
+				...toManyProps,
+				environment
+			}),
+			ToOne.AtomicPrimitive,
+			toOneProps,
+			environment
+		)
 	}
 
 	export const wrapQualifiedFieldList = (

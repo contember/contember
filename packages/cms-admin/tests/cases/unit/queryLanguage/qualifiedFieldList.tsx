@@ -14,14 +14,13 @@ describe('qualified field list QueryLanguage parser', () => {
 			filter: {
 				age: { gt: 20 }
 			},
-			toManyProps: [
-				{
-					field: 'children',
-					filter: {
-						name: { notEq: 'james' }
-					}
+			toOneProps: [],
+			toManyProps: {
+				field: 'children',
+				filter: {
+					name: { notEq: 'james' }
 				}
-			],
+			},
 			fieldName: 'name'
 		})
 	})

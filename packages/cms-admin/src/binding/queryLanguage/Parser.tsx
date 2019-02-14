@@ -25,23 +25,22 @@ class Parser extends ChevrotainParser {
 	private qualifiedFieldList: () => Parser.AST.QualifiedFieldList = this.RULE<Parser.AST.QualifiedFieldList>(
 		'qualifiedFieldList',
 		() => {
-			const toManyProps: ToManyProps[] = []
 			const entityName = this.SUBRULE(this.entityIdentifier)
 			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
 
 			this.CONSUME(tokens.Dot)
 
-			this.MANY(() => {
-				toManyProps.push(this.SUBRULE(this.toManyProps))
-				this.CONSUME1(tokens.Dot)
-			})
+			const { toManyProps, toOneProps } = this.SUBRULE(this.relativeEntityList)
+
+			this.CONSUME1(tokens.Dot)
 			const fieldName = this.SUBRULE(this.fieldIdentifier)
 
 			return {
 				entityName,
+				fieldName,
 				filter,
 				toManyProps,
-				fieldName
+				toOneProps
 			}
 		}
 	)
@@ -63,8 +62,8 @@ class Parser extends ChevrotainParser {
 			const fieldName = this.SUBRULE(this.fieldName)
 
 			return {
-				toOneProps: toOneProps,
-				fieldName: fieldName
+				toOneProps,
+				fieldName
 			}
 		}
 	)
@@ -90,16 +89,18 @@ class Parser extends ChevrotainParser {
 	private relativeEntityList: () => Parser.AST.RelativeEntityList = this.RULE<Parser.AST.RelativeEntityList>(
 		'relativeEntityList',
 		() => {
-			const toManyProps: ToManyProps[] = []
+			const { toOneProps, fieldName } = this.SUBRULE(this.relativeSingleField)
+			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+			const toManyProps: ToManyProps = {
+				field: fieldName
+			}
 
-			this.MANY_SEP({
-				SEP: tokens.Dot,
-				DEF: () => {
-					toManyProps.push(this.SUBRULE(this.toManyProps))
-				}
-			})
+			if (filter !== undefined) {
+				toManyProps.filter = filter
+			}
 
 			return {
+				toOneProps,
 				toManyProps
 			}
 		}
@@ -114,20 +115,6 @@ class Parser extends ChevrotainParser {
 
 		if (reducedBy !== undefined) {
 			props.reducedBy = reducedBy
-		}
-
-		return props
-	})
-
-	private toManyProps: () => ToManyProps = this.RULE('toManyProps', () => {
-		const fieldName = this.SUBRULE(this.fieldName)
-		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-		const props: ToManyProps = {
-			field: fieldName
-		}
-
-		if (filter !== undefined) {
-			props.filter = filter
 		}
 
 		return props
@@ -483,7 +470,7 @@ class Parser extends ChevrotainParser {
 				expression = Parser.parser.qualifiedFieldList()
 				break
 			default:
-				throw new QueryLanguageError(`Not implemented`)
+				throw new QueryLanguageError(`Not implemented entry point '${entry}'`)
 		}
 
 		if (Parser.parser.errors.length !== 0) {
@@ -498,24 +485,22 @@ class Parser extends ChevrotainParser {
 
 namespace Parser {
 	export namespace AST {
-		export interface QualifiedFieldList {
-			entityName: EntityName
-			filter?: Filter
-			toManyProps: ToManyProps[]
-			fieldName: FieldName
-		}
-
-		export interface RelativeSingleField {
-			toOneProps: ToOneProps[]
-			fieldName: FieldName
-		}
-
 		export interface RelativeSingleEntity {
 			toOneProps: ToOneProps[]
 		}
 
-		export interface RelativeEntityList {
-			toManyProps: ToManyProps[]
+		export interface RelativeSingleField extends RelativeSingleEntity {
+			fieldName: FieldName
+		}
+
+		export interface RelativeEntityList extends RelativeSingleEntity {
+			toManyProps: ToManyProps
+		}
+
+		export interface QualifiedFieldList extends RelativeEntityList {
+			entityName: EntityName
+			fieldName: FieldName
+			filter?: Filter
 		}
 
 		export type FieldWhere = Input.FieldWhere<Condition>
@@ -530,10 +515,10 @@ namespace Parser {
 	}
 
 	export enum EntryPoint {
-		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].name
+		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].son.siblings[name != 'James'].name
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
-		RelativeEntityList = 'relativeEntityList' // E.g. authors[age < 123]
+		RelativeEntityList = 'relativeEntityList' // E.g. genres(slug = 'sciFi').authors[age < 123]
 	}
 
 	export interface ParserResult {

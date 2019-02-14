@@ -55,7 +55,8 @@ export namespace QueryLanguage {
 			environment
 		)
 
-		return wrap(subordinateFields, ToMany, toManyProps)
+		return null
+		//return wrap(subordinateFields, ToMany, toManyProps)
 	}
 
 	export const wrapQualifiedFieldList = (
@@ -78,7 +79,8 @@ export namespace QueryLanguage {
 			fieldName,
 			entityName,
 			filter,
-			children: wrap(generateField(fieldName), ToMany, toManyProps)
+			//children: wrap(generateField(fieldName), ToMany, toManyProps)
+			children: null
 		}
 	}
 }

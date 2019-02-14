@@ -1,7 +1,15 @@
 import { FormGroup } from '@blueprintjs/core'
 import * as React from 'react'
-import { EnforceSubtypeRelation, Props, SyntheticChildrenProvider, ToMany, ToManyProps } from '../../coreComponents'
-import { EntityCollectionAccessor } from '../../dao'
+import {
+	EnforceSubtypeRelation,
+	EnvironmentContext,
+	Props,
+	SyntheticChildrenProvider,
+	ToMany,
+	ToManyProps
+} from '../../coreComponents'
+import { EntityCollectionAccessor, Environment } from '../../dao'
+import { QueryLanguage } from '../../queryLanguage'
 import { Repeater } from './Repeater'
 import { Sortable, SortablePublicProps } from './Sortable'
 
@@ -14,32 +22,40 @@ class SortableRepeater extends React.PureComponent<SortableRepeaterProps> {
 
 	public render() {
 		return (
-			<ToMany.CollectionRetriever field={this.props.field} label={this.props.label} filter={this.props.filter}>
-				{(field: EntityCollectionAccessor) => {
-					return (
-						// Intentionally not applying label system middleware
-						<FormGroup label={this.props.label}>
-							<Sortable
-								entities={field}
-								sortBy={this.props.sortBy}
-								label={this.props.label}
-								enableAddingNew={this.props.enableAddingNew}
-								enableUnlink={this.props.enableUnlink}
-								enableUnlinkAll={this.props.enableUnlinkAll}
-								removeType={this.props.removeType}
-							>
-								{this.props.children}
-							</Sortable>
-						</FormGroup>
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) =>
+					QueryLanguage.wrapRelativeEntityList(
+						this.props.field,
+						atomicPrimitiveProps => (
+							<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
+								{(field: EntityCollectionAccessor) => (
+									// Intentionally not applying label system middleware
+									<FormGroup label={this.props.label}>
+										<Sortable
+											entities={field}
+											sortBy={this.props.sortBy}
+											label={this.props.label}
+											enableAddingNew={this.props.enableAddingNew}
+											enableUnlink={this.props.enableUnlink}
+											enableUnlinkAll={this.props.enableUnlinkAll}
+											removeType={this.props.removeType}
+										>
+											{this.props.children}
+										</Sortable>
+									</FormGroup>
+								)}
+							</ToMany.AccessorRetriever>
+						),
+						environment
 					)
-				}}
-			</ToMany.CollectionRetriever>
+				}
+			</EnvironmentContext.Consumer>
 		)
 	}
 
 	public static generateSyntheticChildren(props: Props<SortableRepeaterProps>): React.ReactNode {
 		return (
-			<ToMany field={props.field} filter={props.filter}>
+			<ToMany field={props.field}>
 				<Sortable sortBy={props.sortBy}>{props.children}</Sortable>
 			</ToMany>
 		)

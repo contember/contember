@@ -1,6 +1,5 @@
-import { IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
-import { FieldName, Filter } from '../bindingTypes'
+import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
@@ -10,9 +9,7 @@ import { EnvironmentContext } from './EnvironmentContext'
 import { Props, ReferenceMarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
 
 export interface ToManyProps {
-	field: FieldName
-	label?: IFormGroupProps['label']
-	filter?: Filter
+	field: RelativeEntityList
 }
 
 class ToMany extends React.PureComponent<ToManyProps> {
@@ -20,42 +17,48 @@ class ToMany extends React.PureComponent<ToManyProps> {
 
 	public render() {
 		return (
-			<ToMany.CollectionRetriever {...this.props}>
-				{(field: EntityCollectionAccessor) => {
-					return <ToMany.AccessorRenderer accessor={field}>{this.props.children}</ToMany.AccessorRenderer>
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) => {
+					return ToMany.generateSyntheticChildren(this.props, environment)
 				}}
-			</ToMany.CollectionRetriever>
+			</EnvironmentContext.Consumer>
 		)
 	}
 
 	public static generateSyntheticChildren(props: Props<ToManyProps>, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(
-			props.field,
-			fieldName => (
-				<ToMany.ReferenceMarkerGenerator {...props} field={fieldName}>
-					{props.children}
-				</ToMany.ReferenceMarkerGenerator>
-			),
-			environment
-		)
+		return QueryLanguage.wrapRelativeEntityList(props.field, (atomicPrimitiveProps) => (
+			<ToMany.AtomicPrimitive {...atomicPrimitiveProps}>
+				{props.children}
+			</ToMany.AtomicPrimitive>
+		), environment)
 	}
 }
 
 namespace ToMany {
-	export interface ReferenceMarkerGeneratorProps extends ToManyProps {}
-
-	export interface CollectionRetrieverProps extends ToManyProps {
-		children: (field: EntityCollectionAccessor) => React.ReactNode
+	export interface AtomicPrimitivePublicProps {
+		field: FieldName
+		filter?: Filter
 	}
 
-	export interface AccessorRendererProps {
-		accessor: EntityCollectionAccessor
+	export interface AtomicPrimitiveProps extends AtomicPrimitivePublicProps {
+		environment: Environment
 	}
 
-	export class ReferenceMarkerGenerator extends React.PureComponent<ReferenceMarkerGeneratorProps> {
-		public static displayName = 'ReferenceMarkerGenerator'
+	export class AtomicPrimitive extends React.PureComponent<AtomicPrimitiveProps> {
+		public static displayName = 'ToMany.AtomicPrimitive'
+
+		public render() {
+			return (
+				<AccessorRetriever field={this.props.field} filter={this.props.filter} environment={this.props.environment}>
+					{(accessor: EntityCollectionAccessor) => (
+						<AccessorRenderer accessor={accessor}>{this.props.children}</AccessorRenderer>
+					)}
+				</AccessorRetriever>
+			)
+		}
+
 		public static generateReferenceMarker(
-			props: ToManyProps,
+			props: Props<AtomicPrimitiveProps>,
 			fields: EntityFields,
 			environment: Environment
 		): ReferenceMarker {
@@ -67,56 +70,40 @@ namespace ToMany {
 			)
 		}
 	}
-	type EnforceDataBindingCompatibility1 = EnforceSubtypeRelation<
-		typeof ReferenceMarkerGenerator,
-		ReferenceMarkerProvider<CollectionRetrieverProps>
-	>
 
-	export class CollectionRetriever extends React.PureComponent<CollectionRetrieverProps> {
-		public static displayName = 'ToMany'
+	type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof AtomicPrimitive, ReferenceMarkerProvider>
+
+	export interface AccessorRetrieverProps extends AtomicPrimitiveProps {
+		children: (accessor: EntityCollectionAccessor) => React.ReactNode
+	}
+
+	export class AccessorRetriever extends React.PureComponent<AccessorRetrieverProps> {
+		public static displayName = 'ToMany.AccessorRetriever'
 
 		public render() {
 			return (
-				<EnvironmentContext.Consumer>
-					{(environment: Environment) =>
-						QueryLanguage.wrapRelativeSingleField(
-							this.props.field,
-							fieldName => (
-								<DataContext.Consumer>
-									{(data: DataContextValue) => {
-										if (data instanceof EntityAccessor) {
-											const field = data.data.getField(
-												fieldName,
-												ReferenceMarker.ExpectedCount.PossiblyMany,
-												VariableInputTransformer.transformFilter(this.props.filter, environment)
-											)
+				<DataContext.Consumer>
+					{(data: DataContextValue) => {
+						if (data instanceof EntityAccessor) {
+							const field = data.data.getField(
+								this.props.field,
+								ReferenceMarker.ExpectedCount.PossiblyMany,
+								VariableInputTransformer.transformFilter(this.props.filter, this.props.environment)
+							)
 
-											if (field instanceof EntityCollectionAccessor) {
-												return this.props.children(field)
-											}
-										}
-									}}
-								</DataContext.Consumer>
-							),
-							environment
-						)
-					}
-				</EnvironmentContext.Consumer>
-			)
-		}
-
-		public static generateSyntheticChildren(props: Props<CollectionRetrieverProps>): React.ReactNode {
-			return (
-				<ReferenceMarkerGenerator field={props.field} filter={props.filter}>
-					{props.children}
-				</ReferenceMarkerGenerator>
+							if (field instanceof EntityCollectionAccessor) {
+								return this.props.children(field)
+							}
+						}
+					}}
+				</DataContext.Consumer>
 			)
 		}
 	}
-	type EnforceDataBindingCompatibility2 = EnforceSubtypeRelation<
-		typeof CollectionRetriever,
-		SyntheticChildrenProvider<CollectionRetrieverProps>
-	>
+
+	export interface AccessorRendererProps {
+		accessor: EntityCollectionAccessor
+	}
 
 	export class AccessorRenderer extends React.PureComponent<AccessorRendererProps> {
 		public render() {

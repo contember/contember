@@ -3,7 +3,7 @@ import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
 import { EntityName, FieldName } from '../bindingTypes'
-import { ToManyProps, ToOne } from '../coreComponents'
+import { ToMany, ToOne } from '../coreComponents'
 import { Environment } from '../dao'
 import { MacroResolver } from './MacroResolver'
 import { QueryLanguageError } from './QueryLanguageError'
@@ -488,8 +488,7 @@ namespace Parser {
 	export namespace AST {
 		export type AtomicToOneProps = ToOne.AtomicPrimitivePublicProps
 
-		//export type AtomicToManyProps = ToMany.AtomicPrimitivePublicProps
-		export type AtomicToManyProps = ToManyProps
+		export type AtomicToManyProps = ToMany.AtomicPrimitivePublicProps
 
 		export interface RelativeSingleEntity {
 			toOneProps: AtomicToOneProps[]

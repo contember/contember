@@ -1,14 +1,16 @@
-import { Card, Elevation, FormGroup } from '@blueprintjs/core'
+import { Card, Elevation, FormGroup, IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import {
 	DataContext,
+	EnvironmentContext,
 	EnforceSubtypeRelation,
 	Props,
 	SyntheticChildrenProvider,
 	ToMany,
 	ToManyProps
 } from '../../coreComponents'
-import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
+import { EntityAccessor, EntityCollectionAccessor, Environment } from '../../dao'
+import { QueryLanguage } from '../../queryLanguage'
 import { AddNewButton, RemoveButton, RemoveButtonProps } from '../buttons'
 
 export interface RepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {}
@@ -18,27 +20,37 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 
 	public render() {
 		return (
-			<ToMany.CollectionRetriever field={this.props.field} label={this.props.label} filter={this.props.filter}>
-				{(field: EntityCollectionAccessor) => {
-					return (
-						<Repeater.EntityCollection
-							entities={field}
-							label={this.props.label}
-							enableAddingNew={this.props.enableAddingNew}
-							enableUnlink={this.props.enableUnlink}
-							enableUnlinkAll={this.props.enableUnlinkAll}
-							removeType={this.props.removeType}
-						>
-							{this.props.children}
-						</Repeater.EntityCollection>
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) =>
+					QueryLanguage.wrapRelativeEntityList(
+						this.props.field,
+						atomicPrimitiveProps => (
+							<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
+								{(field: EntityCollectionAccessor) => {
+									return (
+										<Repeater.EntityCollection
+											entities={field}
+											label={this.props.label}
+											enableAddingNew={this.props.enableAddingNew}
+											enableUnlink={this.props.enableUnlink}
+											enableUnlinkAll={this.props.enableUnlinkAll}
+											removeType={this.props.removeType}
+										>
+											{this.props.children}
+										</Repeater.EntityCollection>
+									)
+								}}
+							</ToMany.AccessorRetriever>
+						),
+						environment
 					)
-				}}
-			</ToMany.CollectionRetriever>
+				}
+			</EnvironmentContext.Consumer>
 		)
 	}
 
 	public static generateSyntheticChildren(props: Props<RepeaterProps>): React.ReactNode {
-		return <ToMany {...props}>{props.children}</ToMany>
+		return <ToMany field={props.field}>{props.children}</ToMany>
 	}
 }
 
@@ -70,7 +82,7 @@ namespace Repeater {
 	}
 
 	export interface EntityCollectionPublicProps extends ItemPublicProps {
-		label?: ToManyProps['label']
+		label?: IFormGroupProps['label']
 		enableUnlink?: boolean
 		enableUnlinkAll?: boolean
 		enableAddingNew?: boolean

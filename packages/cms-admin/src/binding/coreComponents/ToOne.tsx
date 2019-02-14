@@ -18,11 +18,11 @@ class ToOne extends React.PureComponent<ToOneProps> {
 	static displayName = 'ToOne'
 
 	public render() {
-		return <EnvironmentContext.Consumer>
-			{(environment: Environment) => (
-				ToOne.generateSyntheticChildren(this.props, environment)
-			)}
-		</EnvironmentContext.Consumer>
+		return (
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) => ToOne.generateSyntheticChildren(this.props, environment)}
+			</EnvironmentContext.Consumer>
+		)
 	}
 
 	public static generateSyntheticChildren(props: Props<ToOneProps>, environment: Environment): React.ReactNode {
@@ -45,22 +45,18 @@ namespace ToOne {
 		static displayName = 'ToOne.AtomicPrimitive'
 
 		public render() {
-			return <DataContext.Consumer>
-				{(data: DataContextValue) => {
-				if (data instanceof EntityAccessor) {
-					const field = data.data.getField(
-						this.props.field,
-						ReferenceMarker.ExpectedCount.UpToOne,
-						VariableInputTransformer.transformFilter(this.props.filter, this.props.environment),
-						this.props.reducedBy
-					)
-
-					if (field instanceof EntityAccessor) {
-						return <ToOne.ToOneInner accessor={field}>{this.props.children}</ToOne.ToOneInner>
-					}
-				}
-			}}
-		</DataContext.Consumer>
+			return (
+				<AccessorRetriever
+					field={this.props.field}
+					filter={this.props.filter}
+					reducedBy={this.props.reducedBy}
+					environment={this.props.environment}
+				>
+					{(accessor: EntityAccessor) => (
+						<AccessorRenderer accessor={accessor}>{this.props.children}</AccessorRenderer>
+					)}
+				</AccessorRetriever>
+			)
 		}
 
 		public static generateReferenceMarker(
@@ -80,11 +76,38 @@ namespace ToOne {
 
 	type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof AtomicPrimitive, ReferenceMarkerProvider>
 
-	export interface ToOneInnerProps {
+	export interface AccessorRetrieverProps extends AtomicPrimitiveProps {
+		children: (accessor: EntityAccessor) => React.ReactNode
+	}
+
+	export class AccessorRetriever extends React.PureComponent<AccessorRetrieverProps> {
+		public render() {
+			return (
+				<DataContext.Consumer>
+					{(data: DataContextValue) => {
+						if (data instanceof EntityAccessor) {
+							const field = data.data.getField(
+								this.props.field,
+								ReferenceMarker.ExpectedCount.UpToOne,
+								VariableInputTransformer.transformFilter(this.props.filter, this.props.environment),
+								this.props.reducedBy
+							)
+
+							if (field instanceof EntityAccessor) {
+								return this.props.children(field)
+							}
+						}
+					}}
+				</DataContext.Consumer>
+			)
+		}
+	}
+
+	export interface AccessorRendererProps {
 		accessor: EntityAccessor
 	}
 
-	export class ToOneInner extends React.PureComponent<ToOneInnerProps> {
+	export class AccessorRenderer extends React.PureComponent<AccessorRendererProps> {
 		public render() {
 			return <DataContext.Provider value={this.props.accessor}>{this.props.children}</DataContext.Provider>
 		}

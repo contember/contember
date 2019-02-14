@@ -1,9 +1,9 @@
-import { Lexer, Parser as ChevrotainParser, TokenType } from 'chevrotain'
+import { Lexer, Parser as ChevrotainParser } from 'chevrotain'
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
 import { EntityName, FieldName } from '../bindingTypes'
-import { ToManyProps, ToOneProps } from '../coreComponents'
+import { ToManyProps, ToOne } from '../coreComponents'
 import { Environment } from '../dao'
 import { MacroResolver } from './MacroResolver'
 import { QueryLanguageError } from './QueryLanguageError'
@@ -16,6 +16,7 @@ import { tokenList, tokens } from './tokenList'
  * 	- predicate negation
  * 	- collections (objects & lists)
  * 	- collection operators (e.g. 'in', 'notIn', etc.)
+ * 	- filtering toOne
  */
 class Parser extends ChevrotainParser {
 	private static macroResolver = new MacroResolver()
@@ -48,7 +49,7 @@ class Parser extends ChevrotainParser {
 	private relativeSingleField: () => Parser.AST.RelativeSingleField = this.RULE<Parser.AST.RelativeSingleField>(
 		'relativeSingleField',
 		() => {
-			const toOneProps: ToOneProps[] = []
+			const toOneProps: Parser.AST.AtomicToOneProps[] = []
 
 			// Deliberately using a combination of consuming the Dot inside MANY as opposed to using MANY_SEP so as to
 			// disambiguate the grammar. Otherwise inputs such as "field(fooParam = 1).foo.bar" where a MANY_SEP alternative
@@ -71,7 +72,7 @@ class Parser extends ChevrotainParser {
 	private relativeSingleEntity: () => Parser.AST.RelativeSingleEntity = this.RULE<Parser.AST.RelativeSingleEntity>(
 		'relativeSingleEntity',
 		() => {
-			const toOneProps: ToOneProps[] = []
+			const toOneProps: Parser.AST.AtomicToOneProps[] = []
 
 			this.MANY_SEP({
 				SEP: tokens.Dot,
@@ -91,7 +92,7 @@ class Parser extends ChevrotainParser {
 		() => {
 			const { toOneProps, fieldName } = this.SUBRULE(this.relativeSingleField)
 			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-			const toManyProps: ToManyProps = {
+			const toManyProps: Parser.AST.AtomicToManyProps = {
 				field: fieldName
 			}
 
@@ -109,7 +110,7 @@ class Parser extends ChevrotainParser {
 	private toOneProps = this.RULE('toOneProps', () => {
 		const fieldName = this.SUBRULE(this.fieldName)
 		const reducedBy = this.OPTION(() => this.SUBRULE(this.uniqueWhere))
-		const props: ToOneProps = {
+		const props: Parser.AST.AtomicToOneProps = {
 			field: fieldName
 		}
 
@@ -485,8 +486,13 @@ class Parser extends ChevrotainParser {
 
 namespace Parser {
 	export namespace AST {
+		export type AtomicToOneProps = ToOne.AtomicPrimitivePublicProps
+
+		//export type AtomicToManyProps = ToMany.AtomicPrimitivePublicProps
+		export type AtomicToManyProps = ToManyProps
+
 		export interface RelativeSingleEntity {
-			toOneProps: ToOneProps[]
+			toOneProps: AtomicToOneProps[]
 		}
 
 		export interface RelativeSingleField extends RelativeSingleEntity {
@@ -494,7 +500,7 @@ namespace Parser {
 		}
 
 		export interface RelativeEntityList extends RelativeSingleEntity {
-			toManyProps: ToManyProps
+			toManyProps: AtomicToManyProps
 		}
 
 		export interface QualifiedFieldList extends RelativeEntityList {

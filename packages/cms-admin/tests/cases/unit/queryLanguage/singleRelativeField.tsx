@@ -3,6 +3,7 @@ import { GraphQlBuilder } from 'cms-client'
 import 'mocha'
 import * as React from 'react'
 import { ToOne } from '../../../../src/binding/coreComponents'
+import { Environment } from '../../../../src/binding/dao'
 import { TextField } from '../../../../src/binding/facade'
 import { Parser, QueryLanguage } from '../../../../src/binding/queryLanguage'
 
@@ -117,17 +118,24 @@ describe('single relative fields QueryLanguage parser', () => {
 	})
 
 	it('should correctly generate JSX', () => {
-		const result = QueryLanguage.wrapRelativeSingleField('this(better=work).as.expected(and = 1).correctly', name => (
-			<TextField name={name} />
-		))
+		const environment = new Environment()
+		const result = QueryLanguage.wrapRelativeSingleField(
+			'this(better=work).as.expected(and = 1).correctly',
+			name => <TextField name={name} />,
+			environment
+		)
 		const expected = (
-			<ToOne field="this" reducedBy={{ better: new GraphQlBuilder.Literal('work') }}>
-				<ToOne field="as">
-					<ToOne field="expected" reducedBy={{ and: 1 }}>
+			<ToOne.AtomicPrimitive
+				field="this"
+				reducedBy={{ better: new GraphQlBuilder.Literal('work') }}
+				environment={environment}
+			>
+				<ToOne.AtomicPrimitive field="as" environment={environment}>
+					<ToOne.AtomicPrimitive field="expected" reducedBy={{ and: 1 }} environment={environment}>
 						<TextField name="correctly" />
-					</ToOne>
-				</ToOne>
-			</ToOne>
+					</ToOne.AtomicPrimitive>
+				</ToOne.AtomicPrimitive>
+			</ToOne.AtomicPrimitive>
 		)
 		expect(result).eql(expected)
 	})

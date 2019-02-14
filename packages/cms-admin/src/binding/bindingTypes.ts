@@ -2,7 +2,11 @@ import { Input } from 'cms-common'
 import { Literal, VariableLiteral, VariableScalar } from './dao'
 
 // TODO These shouldn't just be strings
-// TODO this should be an ambient declaration file but Lerna messes that up
+
+export type QualifiedFieldList = string
+export type RelativeSingleField = string
+export type RelativeSingleEntity = string
+export type RelativeEntityList = string
 
 export type FieldName = string
 export type EntityName = string

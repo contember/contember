@@ -7,14 +7,15 @@ import { Parser } from './Parser'
 export namespace QueryLanguage {
 	const wrap = <P extends {}>(
 		innerNode: React.ReactNode,
-		Component: React.ComponentClass<P>,
-		layers: P[]
+		Component: React.ComponentClass<P & { environment: Environment }>,
+		layers: P[],
+		environment: Environment
 	): React.ReactNode => {
 		let currentNode: React.ReactNode = innerNode
 
 		for (let i = layers.length - 1; i >= 0; i--) {
 			const currentProps = layers[i]
-			currentNode = <Component {...currentProps}>{currentNode}</Component>
+			currentNode = <Component {...currentProps} environment={environment}>{currentNode}</Component>
 		}
 
 		return currentNode
@@ -23,17 +24,17 @@ export namespace QueryLanguage {
 	export const wrapRelativeSingleField = (
 		input: string,
 		generateField: (fieldName: FieldName) => React.ReactNode,
-		environment?: Environment
+		environment: Environment
 	): React.ReactNode => {
 		const expression = Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeSingleField, environment)
 
-		return wrap(generateField(expression.fieldName), ToOne, expression.toOneProps)
+		return wrap(generateField(expression.fieldName), ToOne.AtomicPrimitive, expression.toOneProps, environment)
 	}
 
 	export const wrapRelativeSingleEntity = (
 		input: string,
 		subordinateFields: React.ReactNode,
-		environment?: Environment
+		environment: Environment
 	): React.ReactNode => {
 		const { toOneProps } = Parser.parseQueryLanguageExpression(
 			input,
@@ -41,28 +42,28 @@ export namespace QueryLanguage {
 			environment
 		)
 
-		return wrap(subordinateFields, ToOne, toOneProps)
+		return wrap(subordinateFields, ToOne.AtomicPrimitive, toOneProps, environment)
 	}
 
 	export const wrapRelativeEntityList = (
 		input: string,
 		subordinateFields: React.ReactNode,
-		environment?: Environment
+		environment: Environment
 	): React.ReactNode => {
-		const { toManyProps } = Parser.parseQueryLanguageExpression(
+		const { toOneProps, toManyProps } = Parser.parseQueryLanguageExpression(
 			input,
 			Parser.EntryPoint.RelativeEntityList,
 			environment
 		)
 
 		return null
-		//return wrap(subordinateFields, ToMany, toManyProps)
+		//return wrap(subordinateFields, ToMany, toManyProps, environment)
 	}
 
 	export const wrapQualifiedFieldList = (
 		input: string,
 		generateField: (fieldName: FieldName) => React.ReactNode,
-		environment?: Environment
+		environment: Environment
 	): {
 		entityName: EntityName
 		filter?: Filter
@@ -79,7 +80,7 @@ export namespace QueryLanguage {
 			fieldName,
 			entityName,
 			filter,
-			//children: wrap(generateField(fieldName), ToMany, toManyProps)
+			//children: wrap(generateField(fieldName), ToMany, toManyProps, environment)
 			children: null
 		}
 	}

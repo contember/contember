@@ -4,6 +4,7 @@
 	&-right
 		flex-basis: 0
 		flex-grow: 1
+		white-space: nowrap
 
 	&-center
 		text-align: center
@@ -17,6 +18,10 @@
 		font-weight: $fw-medium
 		color: $c-text
 		text-decoration: none
+		margin-right: $spacing-2
+
+		@media (max-width: 768px)
+			display: none
 
 	&-link
 		display: inline-block

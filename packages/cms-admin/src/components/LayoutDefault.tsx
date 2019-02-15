@@ -3,9 +3,11 @@ import cn from 'classnames'
 import LogoutLink from './LogoutLink'
 import { Avatar, AvatarSize } from './ui/Avatar'
 import { Icon } from '@blueprintjs/core'
+import { default as PageLink } from './pageRouting/PageLink'
 
 export interface LayoutDefaultProps {
 	header: {
+		title?: React.ReactNode
 		left: React.ReactNode
 		center?: React.ReactNode
 		right: React.ReactNode
@@ -57,6 +59,16 @@ export default class LayoutDefault extends React.PureComponent<LayoutDefaultProp
 							<button className="layout-menuBtn" onClick={this.toggleMenu}>
 								<Icon icon="menu" />
 							</button>
+						)}
+						{this.props.header.title && (
+							<PageLink
+								change={() => ({ name: 'dashboard' })}
+								Component={props => (
+									<a {...props} className="navbar-title">
+										{this.props.header.title}
+									</a>
+								)}
+							/>
 						)}
 						{this.props.header.left}
 					</div>

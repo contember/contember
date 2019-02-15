@@ -26,15 +26,19 @@ class ToMany extends React.PureComponent<ToManyProps> {
 	}
 
 	public static generateSyntheticChildren(props: Props<ToManyProps>, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeEntityList(props.field, (atomicPrimitiveProps) => (
-			<ToMany.AtomicPrimitive {...atomicPrimitiveProps}>
-				{props.children}
-			</ToMany.AtomicPrimitive>
-		), environment)
+		return QueryLanguage.wrapRelativeEntityList(
+			props.field,
+			ToMany.getAtomicPrimitiveFactory(props.children),
+			environment
+		)
 	}
 }
 
 namespace ToMany {
+	export const getAtomicPrimitiveFactory = (children: React.ReactNode) => (
+		atomicPrimitiveProps: AtomicPrimitiveProps
+	) => <ToMany.AtomicPrimitive {...atomicPrimitiveProps}>{children}</ToMany.AtomicPrimitive>
+
 	export interface AtomicPrimitivePublicProps {
 		field: FieldName
 		filter?: Filter

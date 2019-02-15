@@ -29,6 +29,7 @@ import PermissionsFactory from './tenant-api/model/authorization/PermissionsFact
 import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
 import KnexDebugger from './core/knex/KnexDebugger'
+import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -47,6 +48,8 @@ class CompositionRoot {
 			.addService('tenantContainer', () => tenantContainer)
 			.addService('projectContainers', () => projectContainers)
 
+			.addService('homepageMiddleware', () => new HomepageMiddlewareFactory().create())
+
 			.addService('authMiddleware', ({ tenantContainer }) =>
 				new AuthMiddlewareFactory(tenantContainer.get('apiKeyManager')).create()
 			)
@@ -58,15 +61,19 @@ class CompositionRoot {
 			)
 			.addService('timerMiddleware', () => new TimerMiddlewareFactory().create())
 
-			.addService('koa', ({ authMiddleware, tenantMiddleware, contentMiddleware, timerMiddleware }) => {
-				const app = new Koa()
-				app.use(timerMiddleware)
-				app.use(authMiddleware)
-				app.use(tenantMiddleware)
-				app.use(contentMiddleware)
+			.addService(
+				'koa',
+				({ homepageMiddleware, authMiddleware, tenantMiddleware, contentMiddleware, timerMiddleware }) => {
+					const app = new Koa()
+					app.use(timerMiddleware)
+					app.use(homepageMiddleware)
+					app.use(authMiddleware)
+					app.use(tenantMiddleware)
+					app.use(contentMiddleware)
 
-				return app
-			})
+					return app
+				}
+			)
 			.build()
 
 		return masterContainer.get('koa')

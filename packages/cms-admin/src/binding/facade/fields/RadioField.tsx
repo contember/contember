@@ -45,9 +45,7 @@ namespace RadioField {
 		environment: Environment
 	}
 
-	export class RadioFieldInner extends React.PureComponent<
-		RadioFieldInnerProps
-	> {
+	export class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
 		public render() {
 			return (
 				<RadioGroup

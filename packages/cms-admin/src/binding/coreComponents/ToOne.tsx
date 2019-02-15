@@ -52,9 +52,7 @@ namespace ToOne {
 					reducedBy={this.props.reducedBy}
 					environment={this.props.environment}
 				>
-					{(accessor: EntityAccessor) => (
-						<AccessorRenderer accessor={accessor}>{this.props.children}</AccessorRenderer>
-					)}
+					{(accessor: EntityAccessor) => <AccessorRenderer accessor={accessor}>{this.props.children}</AccessorRenderer>}
 				</AccessorRetriever>
 			)
 		}

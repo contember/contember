@@ -118,9 +118,7 @@ namespace ChoiceField {
 	// This is just the JS array index as specified in options or as returned from the server.
 	export type ValueRepresentation = number
 
-	export type Data<
-		ActualValue extends Environment.Value = string
-	> = Array<[ValueRepresentation, Label, ActualValue]>
+	export type Data<ActualValue extends Environment.Value = string> = Array<[ValueRepresentation, Label, ActualValue]>
 
 	export interface InnerBaseProps extends ChoiceFieldBaseProps {
 		fieldName: FieldName
@@ -242,7 +240,7 @@ namespace ChoiceField {
 			)
 
 			const currentKey = currentValueEntity.getKey()
-			const currentValue: ChoiceField.ValueRepresentation = filteredData.findIndex((entity) => {
+			const currentValue: ChoiceField.ValueRepresentation = filteredData.findIndex(entity => {
 				const key = entity.getPersistedKey()
 				return !!key && key === currentKey
 			})

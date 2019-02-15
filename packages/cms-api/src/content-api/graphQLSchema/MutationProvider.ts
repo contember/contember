@@ -23,7 +23,6 @@ export default class MutationProvider {
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
 		private readonly queryAstAFactory: GraphQlQueryAstFactory,
-		private readonly mutationResolverFactory: MutationResolverFactory
 	) {}
 
 	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {
@@ -49,8 +48,8 @@ export default class MutationProvider {
 			args: {
 				data: { type: new GraphQLNonNull(dataType) },
 			},
-			resolve: (parent, args, context, info) =>
-				this.mutationResolverFactory.create(context).resolveCreate(entity, this.queryAstAFactory.create(info)),
+			resolve: (parent, args, context: Context, info) =>
+				context.executionContainer.get('mutationResolver').resolveCreate(entity, this.queryAstAFactory.create(info)),
 		}
 	}
 
@@ -64,8 +63,8 @@ export default class MutationProvider {
 			args: {
 				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 			},
-			resolve: (parent, args, context, info) =>
-				this.mutationResolverFactory.create(context).resolveDelete(entity, this.queryAstAFactory.create(info)),
+			resolve: (parent, args, context: Context, info) =>
+				context.executionContainer.get('mutationResolver').resolveDelete(entity, this.queryAstAFactory.create(info)),
 		}
 	}
 
@@ -81,8 +80,8 @@ export default class MutationProvider {
 				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 				data: { type: new GraphQLNonNull(dataType) },
 			},
-			resolve: (parent, args, context, info) =>
-				this.mutationResolverFactory.create(context).resolveUpdate(entity, this.queryAstAFactory.create(info)),
+			resolve: (parent, args, context: Context, info) =>
+				context.executionContainer.get('mutationResolver').resolveUpdate(entity, this.queryAstAFactory.create(info)),
 		}
 	}
 }

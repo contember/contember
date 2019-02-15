@@ -11,9 +11,10 @@ import { ProjectContainer } from '../CompositionRoot'
 import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
 import { GraphQLSchema } from 'graphql'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
-import { Acl } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import KnexWrapper from '../core/knex/KnexWrapper'
 import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
+import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
@@ -88,7 +89,7 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('building schema')
 
 						const globalRoles = ctx.state.authResult.roles
-						const dataSchema = projectContainer.get('graphQlSchemaFactory').create(stage.schema, {
+						const [dataSchema, permissions] = projectContainer.get('graphQlSchemaFactory').create(stage.schema, {
 							projectRoles: projectRoles.roles,
 							globalRoles: globalRoles,
 						})
@@ -96,7 +97,7 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('done')
 
 						const apolloKoa = new Koa()
-						const server = this.createApolloServer(dataSchema, projectVariables)
+						const server = this.createApolloServer(dataSchema, projectVariables, stage.schema.model, permissions)
 						server.applyMiddleware({
 							app: apolloKoa,
 							path: '/',
@@ -116,14 +117,20 @@ class ContentMiddlewareFactory {
 		})
 	}
 
-	private createApolloServer(dataSchema: GraphQLSchema, variables: Acl.VariablesMap) {
+	private createApolloServer(dataSchema: GraphQLSchema, variables: Acl.VariablesMap, schema: Model.Schema, permissions: Acl.Permissions) {
 		return new ApolloServer({
+			tracing: true,
 			schema: dataSchema,
 			uploads: false,
 			context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {
+				const executionContainer = new ExecutionContainerFactory(schema, permissions).create({
+					db: ctx.state.db,
+					identityVariables: variables,
+				})
 				return {
 					db: ctx.state.db,
 					identityVariables: variables,
+					executionContainer
 				}
 			},
 			playground: false,

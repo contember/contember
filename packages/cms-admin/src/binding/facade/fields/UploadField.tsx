@@ -1,6 +1,6 @@
 import { assertNever } from 'cms-common'
 import { contentType } from 'mime-types'
-import { FileInput } from '@blueprintjs/core'
+import { FileInput } from '../../../components'
 import { FormGroup, FormGroupProps } from '../../../components'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
@@ -71,12 +71,10 @@ class UploadFieldComponent extends React.Component<
 								{data.currentValue && this.isImage(data.currentValue) ? <img src={data.currentValue} /> : null}
 								{upload && upload.thumbnailUrl ? <img src={upload.thumbnailUrl} /> : null}
 								<FileInput
-									fill={true}
-									text={this.renderUploadStatusMessage(upload)}
-									onInputChange={async e => {
+									onChange={async e => {
 										e.currentTarget.files && this.handleStartUpload(Array.from(e.currentTarget.files))
 									}}
-								/>
+								>{this.renderUploadStatusMessage(upload)}</FileInput>
 							</Dropzone>
 						</FormGroup>
 					)

@@ -1,6 +1,7 @@
 export * from './Avatar'
 export * from './Button'
 export * from './Dropdown'
+export * from './FileInput'
 export * from './FormGroup'
 export * from './InputGroup'
 export * from './TextArea'

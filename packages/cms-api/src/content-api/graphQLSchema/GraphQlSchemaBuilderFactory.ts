@@ -64,7 +64,7 @@ export default class GraphQlSchemaBuilderFactory {
 			whereTypeProvider,
 			orderByTypeProvider,
 			entityTypeProvider,
-			queryAstFactory,
+			queryAstFactory
 		)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputProvider.Type.create>>()
@@ -127,7 +127,7 @@ export default class GraphQlSchemaBuilderFactory {
 			columnTypeResolver,
 			createEntityInputProvider,
 			updateEntityInputProvider,
-			queryAstFactory,
+			queryAstFactory
 		)
 
 		return new GraphQlSchemaBuilder(schema, queryProvider, mutationProvider, this.s3)

@@ -5,6 +5,8 @@ import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
 import S3 from '../../src/utils/S3'
 import { executeGraphQlTest } from './testGraphql'
 import KnexWrapper from '../../src/core/knex/KnexWrapper'
+import Container from '../../src/core/di/Container'
+import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
 
 export interface SqlQuery {
 	sql: string
@@ -45,11 +47,15 @@ export const execute = async (test: Test) => {
 		client: 'pg',
 	})
 
+	const db = new KnexWrapper(connection, 'public')
 	await executeGraphQlTest(connection, {
 		context: {
-			db: new KnexWrapper(connection, 'public'),
+			db: db,
 			identityVariables: test.variables || {},
-			identityId: '11111111-1111-1111-1111-111111111111',
+			executionContainer: new ExecutionContainerFactory(test.schema, permissions).create({
+				db,
+				identityVariables: test.variables || {},
+			}),
 		},
 		executes: test.executes,
 		query: test.query,

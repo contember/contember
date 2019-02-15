@@ -22,7 +22,7 @@ export default class MutationProvider {
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
-		private readonly queryAstAFactory: GraphQlQueryAstFactory,
+		private readonly queryAstAFactory: GraphQlQueryAstFactory
 	) {}
 
 	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {

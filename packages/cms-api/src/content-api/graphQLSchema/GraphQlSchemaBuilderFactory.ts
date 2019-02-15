@@ -57,8 +57,6 @@ export default class GraphQlSchemaBuilderFactory {
 		)
 		entityTypeProviderAccessor.set(entityTypeProvider)
 
-		const executionContainerFactory = new ExecutionContainerFactory(schema, permissions)
-		const readResolverFactory = new ReadResolverFactory(executionContainerFactory)
 		const queryAstFactory = new GraphQlQueryAstFactory()
 		const queryProvider = new QueryProvider(
 			schema,
@@ -67,7 +65,6 @@ export default class GraphQlSchemaBuilderFactory {
 			orderByTypeProvider,
 			entityTypeProvider,
 			queryAstFactory,
-			readResolverFactory
 		)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputProvider.Type.create>>()
@@ -122,7 +119,6 @@ export default class GraphQlSchemaBuilderFactory {
 		)
 		updateEntityInputProviderAccessor.set(updateEntityInputProvider)
 
-		const mutationResolverFactory = new MutationResolverFactory(executionContainerFactory)
 		const mutationProvider = new MutationProvider(
 			schema,
 			authorizator,
@@ -132,7 +128,6 @@ export default class GraphQlSchemaBuilderFactory {
 			createEntityInputProvider,
 			updateEntityInputProvider,
 			queryAstFactory,
-			mutationResolverFactory
 		)
 
 		return new GraphQlSchemaBuilder(schema, queryProvider, mutationProvider, this.s3)

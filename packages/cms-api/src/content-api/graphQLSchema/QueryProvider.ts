@@ -17,7 +17,6 @@ export default class QueryProvider {
 		private readonly orderByTypeProvider: OrderByTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly queryAstAFactory: GraphQlQueryAstFactory,
-		private readonly readResolverFactory: ReadResolverFactory
 	) {}
 
 	public getQueries(entityName: string): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {
@@ -38,7 +37,7 @@ export default class QueryProvider {
 				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 			},
 			resolve: (parent, args, context, info) =>
-				this.readResolverFactory.create(context).resolveGetQuery(entity, this.queryAstAFactory.create(info)),
+				context.executionContainer.get('readResolver').resolveGetQuery(entity, this.queryAstAFactory.create(info)),
 		}
 	}
 
@@ -56,7 +55,7 @@ export default class QueryProvider {
 				limit: { type: GraphQLInt },
 			},
 			resolve: (parent, args, context, info) =>
-				this.readResolverFactory.create(context).resolveListQuery(entity, this.queryAstAFactory.create(info)),
+				context.executionContainer.get('readResolver').resolveListQuery(entity, this.queryAstAFactory.create(info)),
 		}
 	}
 }

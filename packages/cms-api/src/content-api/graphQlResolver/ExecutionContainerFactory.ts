@@ -30,7 +30,9 @@ import DeleteExecutor from '../sql/delete/DeleteExecutor'
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Model.Schema, private readonly permissions: Acl.Permissions) {}
 
-	public create(context: Pick<Context, 'db' | 'identityVariables'>): Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }> {
+	public create(
+		context: Pick<Context, 'db' | 'identityVariables'>
+	): Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }> {
 		const that = this
 		const innerDic = new Container.Builder({})
 			.addService('db', () => context.db)

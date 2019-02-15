@@ -117,7 +117,12 @@ class ContentMiddlewareFactory {
 		})
 	}
 
-	private createApolloServer(dataSchema: GraphQLSchema, variables: Acl.VariablesMap, schema: Model.Schema, permissions: Acl.Permissions) {
+	private createApolloServer(
+		dataSchema: GraphQLSchema,
+		variables: Acl.VariablesMap,
+		schema: Model.Schema,
+		permissions: Acl.Permissions
+	) {
 		return new ApolloServer({
 			tracing: true,
 			schema: dataSchema,
@@ -130,7 +135,7 @@ class ContentMiddlewareFactory {
 				return {
 					db: ctx.state.db,
 					identityVariables: variables,
-					executionContainer
+					executionContainer,
 				}
 			},
 			playground: false,

@@ -16,7 +16,7 @@ export default class QueryProvider {
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
-		private readonly queryAstAFactory: GraphQlQueryAstFactory,
+		private readonly queryAstAFactory: GraphQlQueryAstFactory
 	) {}
 
 	public getQueries(entityName: string): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {

@@ -8,19 +8,24 @@ const parse = (input: string) => {
 }
 
 describe('qualified field list QueryLanguage parser', () => {
+	it('should parse a qualified field list in its simplest form', () => {
+		expect(parse("Author.name")).eql({
+			entityName: 'Author',
+			filter: undefined,
+			toOneProps: [],
+			fieldName: 'name'
+		})
+	})
+
 	it('should parse a complete qualified field list', () => {
-		expect(parse("Author[age > 20].children[name != 'james'].name")).eql({
+		expect(parse("Author[age > 20].son.name")).eql({
 			entityName: 'Author',
 			filter: {
 				age: { gt: 20 }
 			},
-			toOneProps: [],
-			toManyProps: {
-				field: 'children',
-				filter: {
-					name: { notEq: 'james' }
-				}
-			},
+			toOneProps: [
+				{field: 'son'}
+			],
 			fieldName: 'name'
 		})
 	})

@@ -31,16 +31,12 @@ class Parser extends ChevrotainParser {
 
 			this.CONSUME(tokens.Dot)
 
-			const { toManyProps, toOneProps } = this.SUBRULE(this.relativeEntityList)
-
-			this.CONSUME1(tokens.Dot)
-			const fieldName = this.SUBRULE(this.fieldIdentifier)
+			const { toOneProps, fieldName } = this.SUBRULE(this.relativeSingleField)
 
 			return {
 				entityName,
 				fieldName,
 				filter,
-				toManyProps,
 				toOneProps
 			}
 		}
@@ -502,7 +498,7 @@ namespace Parser {
 			toManyProps: AtomicToManyProps
 		}
 
-		export interface QualifiedFieldList extends RelativeEntityList {
+		export interface QualifiedFieldList extends RelativeSingleEntity {
 			entityName: EntityName
 			fieldName: FieldName
 			filter?: Filter

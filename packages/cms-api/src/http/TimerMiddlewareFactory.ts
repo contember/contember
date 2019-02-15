@@ -15,9 +15,9 @@ class TimerMiddlewareFactory {
 			for (let [name, time] of times) {
 				console.log(`Event ${name}: T+${time.getTime() - start.getTime()}ms`)
 			}
-			const used = process.memoryUsage() as any;
+			const used = process.memoryUsage() as any
 			for (let key in used) {
-				console.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+				console.log(`${key} ${Math.round((used[key] / 1024 / 1024) * 100) / 100} MB`)
 			}
 		}
 	}

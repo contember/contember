@@ -91,12 +91,7 @@ export namespace QueryLanguage {
 			fieldName,
 			entityName,
 			filter,
-			children: wrap(
-				generateField(fieldName),
-				ToOne.AtomicPrimitive,
-				toOneProps,
-				environment
-			)
+			children: wrap(generateField(fieldName), ToOne.AtomicPrimitive, toOneProps, environment)
 		}
 	}
 }

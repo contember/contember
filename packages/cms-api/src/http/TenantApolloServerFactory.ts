@@ -18,6 +18,8 @@ class TenantApolloServerFactory {
 	create(): ApolloServer {
 		return new ApolloServer({
 			typeDefs,
+			introspection: true,
+			tracing: true,
 			resolvers: this.resolvers,
 			context: ({ ctx }: { ctx: AuthMiddlewareFactory.ContextWithAuth }): ResolverContext => {
 				if (ctx.state.authResult === undefined) {

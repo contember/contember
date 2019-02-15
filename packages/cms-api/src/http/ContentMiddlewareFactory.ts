@@ -125,6 +125,7 @@ class ContentMiddlewareFactory {
 	) {
 		return new ApolloServer({
 			tracing: true,
+			introspection: true,
 			schema: dataSchema,
 			uploads: false,
 			context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {

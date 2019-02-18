@@ -4,8 +4,10 @@ import LogoutLink from './LogoutLink'
 import { Avatar, AvatarSize } from './ui/Avatar'
 import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
+import { connect } from 'react-redux'
+import State from '../state'
 
-export interface LayoutDefaultProps {
+export interface LayoutOwnProps {
 	header: {
 		title?: React.ReactNode
 		left: React.ReactNode
@@ -16,11 +18,15 @@ export interface LayoutDefaultProps {
 	content: React.ReactNode
 }
 
+export interface LayoutStateProps {
+	identity: string | null
+}
+
 interface LayoutDefaultState {
 	menuOpen: boolean
 }
 
-export default class LayoutDefault extends React.PureComponent<LayoutDefaultProps, LayoutDefaultState> {
+class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProps, LayoutDefaultState> {
 	state: LayoutDefaultState = {
 		menuOpen: false
 	}
@@ -78,7 +84,10 @@ export default class LayoutDefault extends React.PureComponent<LayoutDefaultProp
 						<LogoutLink
 							Component={props => (
 								<a {...props} className="navbar-link">
-									<Avatar size={AvatarSize.Size2}>HS</Avatar>
+									<Avatar size={AvatarSize.Size2}>
+										HS
+										{/*{this.props.identity}*/}
+									</Avatar>
 								</a>
 							)}
 						/>
@@ -101,3 +110,8 @@ export default class LayoutDefault extends React.PureComponent<LayoutDefaultProp
 		)
 	}
 }
+export default connect<LayoutStateProps, {}, LayoutOwnProps, State>(state => {
+	return {
+		identity: state.auth.identity ? state.auth.identity.email : null
+	}
+})(LayoutDefault)

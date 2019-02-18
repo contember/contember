@@ -14,7 +14,7 @@ export const getData = (query: string): ActionCreator => async (dispatch, getSta
 	}
 	const id = (idCounter++).toString(16)
 	dispatch(createAction(CONTENT_SET_LOADING, () => ({ id }))())
-	const apiToken = state.auth.token
+	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	try {
 		const data = await services.contentClientFactory
 			.create(state.request.project, state.request.stage)
@@ -36,7 +36,7 @@ export const putData = (query: string): ActionCreator => async (dispatch, getSta
 	if (!('stage' in state.request) || !('project' in state.request)) {
 		return
 	}
-	const apiToken = state.auth.token
+	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	try {
 		await services.contentClientFactory
 			.create(state.request.project, state.request.stage)

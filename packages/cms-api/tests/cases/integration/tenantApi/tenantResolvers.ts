@@ -102,12 +102,13 @@ describe('tenant api', () => {
 					{
 						sql: SQL`select
                        "project"."id",
-                       "project"."name"
+                       "project"."name",
+                       "project"."slug"
                      from "tenant"."project"
                        inner join "tenant"."project_member" on "project_member"."project_id" = "project"."id"
                      where "tenant"."project_member"."identity_id" = $1`,
 						parameters: [testUuid(1)],
-						response: [{ id: testUuid(3), name: 'foo' }],
+						response: [{ id: testUuid(3), name: 'foo', slug: 'foo' }],
 					},
 					{
 						sql: SQL`update "tenant"."api_key"
@@ -235,7 +236,8 @@ describe('tenant api', () => {
 					{
 						sql: SQL`select
                        "project"."id",
-                       "project"."name"
+                       "project"."name",
+                       "project"."slug"
                      from "tenant"."project"
                        inner join "tenant"."project_member" on "project_member"."project_id" = "project"."id"
                      where "tenant"."project_member"."identity_id" = $1`,

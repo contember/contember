@@ -7,7 +7,7 @@ import ContentClientFactory from '../model/ContentClientFactory'
 import GraphqlClient from '../model/GraphqlClient'
 import LocalStorageManager from '../model/LocalStorageManager'
 import rootReducer from '../reducer'
-import { SET_TOKEN } from '../reducer/auth'
+import { SET_IDENTITY } from '../reducer/auth'
 import State from '../state'
 import Config from '../config'
 
@@ -38,18 +38,18 @@ export function persistState(services: Services) {
 	return (next: Function) => (reducer: Reducer, initialState: State): Store => {
 		const store: Store = next(reducer, initialState)
 
-		const persistedApiToken = services.localStorageManager.get(LocalStorageManager.Keys.API_TOKEN)
-		if (persistedApiToken) {
-			store.dispatch(createAction(SET_TOKEN, () => persistedApiToken)())
+		const persistedApiIdentity = services.localStorageManager.get(LocalStorageManager.Keys.API_IDENTITY)
+		if (persistedApiIdentity) {
+			store.dispatch(createAction(SET_IDENTITY, () => JSON.parse(persistedApiIdentity))())
 		}
 
 		store.subscribe(() => {
 			const state = store.getState()
-			const token = state.auth.token
-			if (token) {
-				services.localStorageManager.set(LocalStorageManager.Keys.API_TOKEN, token)
+			const identity = state.auth.identity
+			if (identity) {
+				services.localStorageManager.set(LocalStorageManager.Keys.API_IDENTITY, JSON.stringify(identity))
 			} else {
-				services.localStorageManager.unset(LocalStorageManager.Keys.API_TOKEN)
+				services.localStorageManager.unset(LocalStorageManager.Keys.API_IDENTITY)
 			}
 		})
 

@@ -1,4 +1,4 @@
-import { Classes, FormGroup, IFormGroupProps, IconName, Divider } from '@blueprintjs/core'
+import { IconName, Divider } from '@blueprintjs/core'
 import cn from 'classnames'
 import { isKeyHotkey } from 'is-hotkey'
 import * as React from 'react'
@@ -10,6 +10,7 @@ import { ActionButton, Toolbar, getSlateController } from './utils'
 import { assertNever } from 'cms-common'
 import JsonSerializer from './JsonSerializer'
 import { IconNames } from '@blueprintjs/icons'
+import { FormGroup, FormGroupProps } from '../ui'
 
 const isBoldHotkey = isKeyHotkey('mod+b')
 const isItalicHotkey = isKeyHotkey('mod+i')
@@ -35,7 +36,7 @@ export interface RichEditorProps {
 	inlineLabel?: boolean
 	value: string
 	onChange: (value: string) => void
-	label?: IFormGroupProps['label']
+	label?: FormGroupProps['label']
 	serializer: RichEditorSerializer
 	lineBreakBehavior: LineBreakBehavior
 	defaultBlock: Block
@@ -151,15 +152,17 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 							/>
 						))}
 					</Toolbar>
-					<Editor
-						ref={this.ref}
-						className={cn(Classes.INPUT, 'input', 'view-autoHeight')}
-						spellCheck
-						plugins={this.plugins}
-						value={this.state.value}
-						onChange={this.onChange}
-						onKeyDown={this.onKeyDown}
-					/>
+					<div className="inputGroup">
+						<Editor
+							ref={this.ref}
+							className={cn('inputGroup-text', 'input', 'view-autoHeight')}
+							spellCheck
+							plugins={this.plugins}
+							value={this.state.value}
+							onChange={this.onChange}
+							onKeyDown={this.onKeyDown}
+						/>
+					</div>
 				</FormGroup>
 			</div>
 		)

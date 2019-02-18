@@ -1,7 +1,9 @@
-import { Button, ButtonGroup, IconName } from '@blueprintjs/core'
+import { ButtonGroup, IconName } from '@blueprintjs/core'
 import * as React from 'react'
 import { Editor } from 'slate'
 import { Editor as ReactEditor } from 'slate-react'
+import { Button, ButtonColor } from '../ui'
+import { Icon } from '@blueprintjs/core'
 
 interface ToolbarProps {
 	children: React.ReactNode
@@ -16,7 +18,10 @@ interface ActionButtonProps {
 }
 
 export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive }) => (
-	<Button active={isActive} icon={icon} onClick={() => onClick()} />
+	<Button color={isActive ? ButtonColor.Green : undefined} small onClick={() => onClick()}>
+		<Icon icon={icon} />
+	</Button>
+	// <Button active={isActive} icon={icon} onClick={() => onClick()} />
 )
 
 // This is a bad thing, but slate or slate's typings are bad

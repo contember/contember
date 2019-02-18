@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
-import { assertNever, Input } from 'cms-common'
+import { assertNever, Input, isEmptyObject } from 'cms-common'
 import { EntityName, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
@@ -194,14 +194,29 @@ export class MutationGenerator {
 		builder: CrudQueryBuilder.CreateDataBuilder
 	): CrudQueryBuilder.CreateDataBuilder {
 		const allData = currentData.data.allFieldData
+		const nonbearingFields: Array<{
+			placeholderName: string
+			value: GraphQlBuilder.Literal | Scalar
+		}> = []
 
 		for (const placeholderName in entityFields) {
 			const marker = entityFields[placeholderName]
 
 			if (marker instanceof FieldMarker) {
 				const accessor = allData[placeholderName]
-				if (accessor instanceof FieldAccessor && accessor.currentValue !== null) {
-					builder = builder.set(placeholderName, accessor.currentValue)
+				if (accessor instanceof FieldAccessor) {
+					const value = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
+
+					if (value !== undefined && value !== null) {
+						if (marker.isNonbearing) {
+							nonbearingFields.push({
+								value,
+								placeholderName
+							})
+						} else {
+							builder = builder.set(placeholderName, value)
+						}
+					}
 				}
 			} else if (marker instanceof ReferenceMarker) {
 				let unreducedHasOnePresent = false
@@ -279,6 +294,12 @@ export class MutationGenerator {
 				// Do nothing: we don't support persisting nested queries (yet?).
 			} else {
 				assertNever(marker)
+			}
+		}
+
+		if (nonbearingFields.length && builder.data !== undefined && !isEmptyObject(builder.data)) {
+			for (const { value, placeholderName } of nonbearingFields) {
+				builder = builder.set(placeholderName, value)
 			}
 		}
 

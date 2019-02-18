@@ -1,5 +1,3 @@
-import { Icon } from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import {
 	SortableContainer,
@@ -9,6 +7,7 @@ import {
 	SortableHandle,
 	SortEndHandler
 } from 'react-sortable-hoc'
+import { DragHandle as DragHandleIcon } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import {
 	DataContext,
@@ -29,7 +28,6 @@ import {
 } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
-import { DragHandle as DragHandleIcon } from '../../../components/ui'
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
 	sortBy: FieldName | VariableScalar
@@ -45,40 +43,47 @@ class Sortable extends React.PureComponent<SortableProps> {
 	public static displayName = 'Sortable'
 
 	public render() {
-		if (this.props.entities) {
-			return (
-				<Sortable.SortableInner
-					enableUnlinkAll={this.props.enableUnlinkAll}
-					enableAddingNew={this.props.enableAddingNew}
-					enableUnlink={this.props.enableUnlink}
-					label={this.props.label}
-					sortBy={this.props.sortBy}
-					entities={this.props.entities}
-					removeType={this.props.removeType}
-				>
-					{this.props.children}
-				</Sortable.SortableInner>
-			)
-		}
 		return (
-			<DataContext.Consumer>
-				{(data: DataContextValue) => {
-					if (data instanceof EntityCollectionAccessor) {
+			<EnvironmentContext.Consumer>
+				{(environment: Environment) => {
+					if (this.props.entities) {
 						return (
-							<Sortable.SortableInner sortBy={this.props.sortBy} entities={data}>
+							<Sortable.SortableInner
+								enableUnlinkAll={this.props.enableUnlinkAll}
+								enableAddingNew={this.props.enableAddingNew}
+								enableUnlink={this.props.enableUnlink}
+								label={this.props.label}
+								sortBy={this.props.sortBy}
+								entities={this.props.entities}
+								removeType={this.props.removeType}
+								environment={environment}
+							>
 								{this.props.children}
 							</Sortable.SortableInner>
 						)
 					}
+					return (
+						<DataContext.Consumer>
+							{(data: DataContextValue) => {
+								if (data instanceof EntityCollectionAccessor) {
+									return (
+										<Sortable.SortableInner environment={environment} sortBy={this.props.sortBy} entities={data}>
+											{this.props.children}
+										</Sortable.SortableInner>
+									)
+								}
+							}}
+						</DataContext.Consumer>
+					)
 				}}
-			</DataContext.Consumer>
+			</EnvironmentContext.Consumer>
 		)
 	}
 
 	public static generateSyntheticChildren(props: Props<SortableProps>, environment: Environment): React.ReactNode {
 		return (
 			<>
-				<Field name={Sortable.resolveSortByFieldName(props.sortBy, environment)} />
+				<Field name={Sortable.resolveSortByFieldName(props.sortBy, environment)} isNonbearing={true} />
 				{props.children}
 			</>
 		)
@@ -153,14 +158,14 @@ namespace Sortable {
 
 	export interface SortableInnerProps extends SortablePublicProps {
 		entities: EntityCollectionAccessor
+		environment: Environment
 	}
 
 	export class SortableInner extends React.PureComponent<SortableInnerProps> {
 		private entities: EntityAccessor[] = []
 
 		private getOnSortEnd = (environment: Environment): SortEndHandler => ({ oldIndex, newIndex }, e) => {
-			const persistedOrder: { [primaryKey: string]: number } = {}
-			const unpersistedOrder: { [primaryKey: string]: number } = {}
+			const order: { [primaryKey: string]: number } = {}
 
 			for (let i = 0, len = this.entities.length; i < len; i++) {
 				const entity = this.entities[i]
@@ -180,22 +185,15 @@ namespace Sortable {
 						targetValue = i
 					}
 
-					if (!(typeof orderField.currentValue === 'number') || orderField.currentValue !== targetValue) {
-						if (typeof entity.primaryKey === 'string') {
-							persistedOrder[entity.primaryKey] = targetValue
-						} else {
-							unpersistedOrder[entity.primaryKey.value] = targetValue
-						}
+					if (typeof orderField.currentValue !== 'number' || orderField.currentValue !== targetValue) {
+						order[entity.getKey()] = targetValue
 					}
 				}
 			}
+			const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, environment)
 			for (const entity of this.entities) {
-				const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, environment)
+				const target = order[entity.getKey()]
 				const orderField = entity.data.getField(fieldName)
-				const target =
-					typeof entity.primaryKey === 'string'
-						? persistedOrder[entity.primaryKey]
-						: unpersistedOrder[entity.primaryKey.value]
 
 				if (target !== undefined && orderField instanceof FieldAccessor && orderField.onChange) {
 					orderField.onChange(target)
@@ -203,49 +201,66 @@ namespace Sortable {
 			}
 		}
 
+		private updateUnpersistedEntities() {
+			const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, this.props.environment)
+			for (let i = 0, length = this.entities.length; i < length; i++) {
+				const entity = this.entities[i]
+
+				if (entity.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
+					const orderField = entity.data.getField(fieldName)
+
+					if (
+						orderField instanceof FieldAccessor &&
+						orderField.currentValue === null &&
+						orderField.onChange
+					) {
+						orderField.onChange(i)
+					}
+				}
+			}
+		}
+
 		public render() {
-			return (
-				<EnvironmentContext.Consumer>
-					{environment => {
-						const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, environment)
-						const entities = this.props.entities.entities.filter(
-							(item): item is EntityAccessor => item instanceof EntityAccessor
-						)
-
-						this.entities = entities.sort((a, b) => {
-							const [aField, bField] = [a.data.getField(fieldName), b.data.getField(fieldName)]
-
-							if (
-								aField instanceof FieldAccessor &&
-								bField instanceof FieldAccessor &&
-								typeof aField.currentValue === 'number' &&
-								typeof bField.currentValue === 'number'
-							) {
-								return aField.currentValue - bField.currentValue
-							}
-							return 0
-						})
-
-						return (
-							<SortableList
-								entities={this.entities}
-								onSortEnd={this.getOnSortEnd(environment)}
-								useDragHandle={true}
-								lockAxis="y"
-								lockToContainerEdges={true}
-								addNew={this.props.entities.addNew}
-								enableUnlinkAll={this.props.enableUnlinkAll}
-								enableAddingNew={this.props.enableAddingNew}
-								enableUnlink={this.props.enableUnlink}
-								label={this.props.label}
-								removeType={this.props.removeType}
-							>
-								{this.props.children}
-							</SortableList>
-						)
-					}}
-				</EnvironmentContext.Consumer>
+			const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, this.props.environment)
+			const entities = this.props.entities.entities.filter(
+				(item): item is EntityAccessor => item instanceof EntityAccessor
 			)
+
+			this.entities = entities.sort((a, b) => {
+				const [aField, bField] = [a.data.getField(fieldName), b.data.getField(fieldName)]
+
+				if (
+					aField instanceof FieldAccessor &&
+					bField instanceof FieldAccessor &&
+					typeof aField.currentValue === 'number' &&
+					typeof bField.currentValue === 'number'
+				) {
+					return aField.currentValue - bField.currentValue
+				}
+				return 0
+			})
+
+			return (
+				<SortableList
+					entities={this.entities}
+					onSortEnd={this.getOnSortEnd(this.props.environment)}
+					useDragHandle={true}
+					lockAxis="y"
+					lockToContainerEdges={true}
+					addNew={this.props.entities.addNew}
+					enableUnlinkAll={this.props.enableUnlinkAll}
+					enableAddingNew={this.props.enableAddingNew}
+					enableUnlink={this.props.enableUnlink}
+					label={this.props.label}
+					removeType={this.props.removeType}
+				>
+					{this.props.children}
+				</SortableList>
+			)
+		}
+
+		componentDidUpdate(): void {
+			this.updateUnpersistedEntities()
 		}
 	}
 }

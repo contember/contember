@@ -112,7 +112,7 @@ namespace ToMany {
 	export class AccessorRenderer extends React.PureComponent<AccessorRendererProps> {
 		public render() {
 			return this.props.accessor.entities.map(
-				(datum) =>
+				datum =>
 					datum instanceof EntityAccessor && (
 						<DataContext.Provider value={datum} key={datum.getKey()}>
 							{this.props.children}

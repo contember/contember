@@ -188,7 +188,7 @@ namespace DimensionsSwitcher {
 					{[...Array(columnCount)].map((_, i) => {
 						return (
 							<Dropdown.Column key={i}>
-								{dimensionData.map((dimension) => {
+								{dimensionData.map(dimension => {
 									const active = selectedDimensions[i] === dimension.slug
 									return (
 										<Link

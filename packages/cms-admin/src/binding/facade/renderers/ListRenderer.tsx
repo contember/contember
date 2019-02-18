@@ -19,8 +19,8 @@ export class ListRenderer extends React.PureComponent<RendererProps> {
 		return (
 			<UL>
 				{DefaultRenderer.renderTitle(this.props.title)}
-				{normalizedData.map((value, i) => (
-					<li key={i}>
+				{normalizedData.map((value) => (
+					value && <li key={value.getKey()}>
 						<DataContext.Provider value={value}>{this.props.children}</DataContext.Provider>
 					</li>
 				))}

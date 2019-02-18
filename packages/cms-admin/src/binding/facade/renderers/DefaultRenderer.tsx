@@ -18,8 +18,8 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 
 		return (
 			<>
-				{normalizedData.map((value, i) => (
-					<DataContext.Provider value={value} key={i}>
+				{normalizedData.map((value) => (
+					value && <DataContext.Provider value={value} key={value.getKey()}>
 						{DefaultRenderer.renderTitle(this.props.title)}
 						{this.props.children}
 					</DataContext.Provider>

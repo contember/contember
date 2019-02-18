@@ -48,19 +48,21 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			const generator = new MutationGenerator(data, this.state.data, this.props.markerTree)
 			const mutation = generator.getPersistMutation()
 
-			console.log(mutation)
-			if (mutation !== undefined) {
-				return this.props.putData(mutation).then(async () => {
-					if (!this.state.query) {
-						return Promise.resolve()
-					}
-					const id = await this.props.getData(this.state.query)
-					if (!this.unmounted) {
-						this.setState({ id })
-					}
-					return Promise.resolve()
-				})
+			console.log('mutation', mutation)
+			if (mutation === undefined) {
+				return Promise.resolve()
 			}
+
+			return this.props.putData(mutation).then(async () => {
+				if (!this.state.query) {
+					return Promise.resolve()
+				}
+				const id = await this.props.getData(this.state.query)
+				if (!this.unmounted) {
+					this.setState({ id })
+				}
+				return Promise.resolve()
+			})
 		}
 		return Promise.reject()
 	}
@@ -101,7 +103,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 		const query = new QueryGenerator(this.props.markerTree).getReadQuery()
 
-		console.log(query)
+		console.log('query', query)
 		if (query) {
 			const id = await this.props.getData(query)
 			if (!this.unmounted) {

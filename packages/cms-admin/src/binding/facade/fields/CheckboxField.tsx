@@ -1,16 +1,15 @@
-import { Checkbox, FormGroup, IFormGroupProps, IInputGroupProps } from '@blueprintjs/core'
+import { Checkbox, IInputGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
+import { FormGroup, FormGroupProps } from '../../../components'
 
 export interface CheckboxFieldProps {
 	name: FieldName
-	label?: IFormGroupProps['label']
-	large?: IInputGroupProps['large']
-	inlineLabel?: boolean
+	label?: FormGroupProps['label']
 }
 
 export class CheckboxField extends React.PureComponent<CheckboxFieldProps> {
@@ -20,11 +19,8 @@ export class CheckboxField extends React.PureComponent<CheckboxFieldProps> {
 		return (
 			<Field name={this.props.name}>
 				{(data: FieldAccessor<boolean>, env): React.ReactNode => (
-					<FormGroup
-						label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
-						inline={this.props.inlineLabel}
-					>
-						<Checkbox checked={!!data.currentValue} onChange={this.generateOnChange(data)} large={this.props.large} />
+					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
+						<input type="checkbox" checked={!!data.currentValue} onChange={this.generateOnChange(data)} />
 					</FormGroup>
 				)}
 			</Field>

@@ -1,9 +1,8 @@
-import DataBuilder from './DataBuilder'
-import CreateDataBuilder from './CreateDataBuilder'
-import UpdateDataBuilder from './UpdateDataBuilder'
+import { Input } from 'cms-common'
 import Literal from '../graphQlBuilder/Literal'
-
-import { Input, isEmptyObject } from 'cms-common'
+import CreateDataBuilder from './CreateDataBuilder'
+import DataBuilder from './DataBuilder'
+import UpdateDataBuilder from './UpdateDataBuilder'
 
 export default class UpdateOneRelationBuilder<
 	D extends Input.UpdateOneRelationInput<Literal> | undefined = Input.UpdateOneRelationInput<Literal>
@@ -14,7 +13,7 @@ export default class UpdateOneRelationBuilder<
 		data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>
 	): UpdateOneRelationBuilder<Input.UpdateOneRelationInput<Literal>> | this {
 		const resolvedData = DataBuilder.resolveData(data, CreateDataBuilder)
-		return resolvedData ? new UpdateOneRelationBuilder({ create: resolvedData }) : this
+		return resolvedData === undefined ? this : new UpdateOneRelationBuilder({ create: resolvedData })
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>) {
@@ -33,7 +32,7 @@ export default class UpdateOneRelationBuilder<
 		data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>
 	): UpdateOneRelationBuilder<Input.UpdateOneRelationInput<Literal>> | this {
 		const resolvedData = DataBuilder.resolveData(data, UpdateDataBuilder)
-		return resolvedData ? new UpdateOneRelationBuilder({ update: resolvedData }) : this
+		return resolvedData === undefined ? this : new UpdateOneRelationBuilder({ update: resolvedData })
 	}
 
 	public upsert(
@@ -43,12 +42,12 @@ export default class UpdateOneRelationBuilder<
 		const resolvedUpdate = DataBuilder.resolveData(update, UpdateDataBuilder)
 		const resolvedCreate = DataBuilder.resolveData(create, CreateDataBuilder)
 
-		return isEmptyObject(resolvedUpdate) && isEmptyObject(resolvedCreate)
+		return resolvedUpdate === undefined && resolvedCreate === undefined
 			? this
 			: new UpdateOneRelationBuilder({
 					upsert: {
-						update: resolvedUpdate,
-						create: resolvedCreate
+						update: resolvedUpdate || {},
+						create: resolvedCreate || {}
 					}
 			  })
 	}

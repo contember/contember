@@ -1,9 +1,8 @@
+import { Input } from 'cms-common'
+import Literal from '../graphQlBuilder/Literal'
 import DataBuilder from './DataBuilder'
 import UpdateManyRelationBuilder from './UpdateManyRelationBuilder'
 import UpdateOneRelationBuilder from './UpdateOneRelationBuilder'
-import Literal from '../graphQlBuilder/Literal'
-
-import { Input, isEmptyObject } from 'cms-common'
 
 export default class UpdateDataBuilder {
 	constructor(public readonly data: Input.UpdateDataInput<Literal> = {}) {}
@@ -17,12 +16,12 @@ export default class UpdateDataBuilder {
 		data: DataBuilder.DataLike<Input.UpdateManyRelationInput<Literal>, UpdateManyRelationBuilder>
 	) {
 		const resolvedData = DataBuilder.resolveData(data, UpdateManyRelationBuilder)
-		return resolvedData
-			? new UpdateDataBuilder({
+		return resolvedData === undefined
+			? this
+			: new UpdateDataBuilder({
 					...this.data,
 					[fieldName]: resolvedData
 			  })
-			: this
 	}
 
 	public one(
@@ -33,11 +32,11 @@ export default class UpdateDataBuilder {
 			UpdateOneRelationBuilder<undefined>
 		>
 	) {
-		const input = DataBuilder.resolveData<
+		const resolvedData = DataBuilder.resolveData<
 			Input.UpdateOneRelationInput<Literal>,
 			UpdateOneRelationBuilder,
 			UpdateOneRelationBuilder<undefined>
 		>(data, UpdateOneRelationBuilder)
-		return isEmptyObject(input) ? this : new UpdateDataBuilder({ ...this.data, [fieldName]: input })
+		return resolvedData === undefined ? this : new UpdateDataBuilder({ ...this.data, [fieldName]: resolvedData })
 	}
 }

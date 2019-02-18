@@ -1,15 +1,15 @@
-import ObjectBuilder from '../graphQlBuilder/ObjectBuilder'
-import DataBuilder from './DataBuilder'
-import CreateDataBuilder from './CreateDataBuilder'
-import Literal from '../graphQlBuilder/Literal'
-
 import { Input } from 'cms-common'
+import Literal from '../graphQlBuilder/Literal'
+import ObjectBuilder from '../graphQlBuilder/ObjectBuilder'
+import CreateDataBuilder from './CreateDataBuilder'
+import DataBuilder from './DataBuilder'
 
 export default class CreateBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
 	data(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {
-		return new CreateBuilder(this.objectBuilder.argument('data', DataBuilder.resolveData(data, CreateDataBuilder)))
+		const resolvedData = DataBuilder.resolveData(data, CreateDataBuilder)
+		return resolvedData === undefined ? this : new CreateBuilder(this.objectBuilder.argument('data', resolvedData))
 	}
 
 	column(name: string) {

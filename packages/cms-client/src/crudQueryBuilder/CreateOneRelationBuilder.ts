@@ -9,8 +9,11 @@ export default class CreateOneRelationBuilder<
 > {
 	constructor(public readonly data: D = undefined as D) {}
 
-	public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {
-		return new CreateOneRelationBuilder({ create: DataBuilder.resolveData(data, CreateDataBuilder) })
+	public create(
+		data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>
+	): CreateOneRelationBuilder<D> | CreateOneRelationBuilder<{ create: Input.CreateDataInput<Literal> }> {
+		const resolvedData = DataBuilder.resolveData(data, CreateDataBuilder)
+		return resolvedData === undefined ? this : new CreateOneRelationBuilder({ create: resolvedData })
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>) {

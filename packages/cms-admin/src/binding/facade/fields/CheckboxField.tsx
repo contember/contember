@@ -1,11 +1,10 @@
-import { Checkbox, IInputGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
+import { FormGroup, FormGroupProps } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
-import { FormGroup, FormGroupProps } from '../../../components'
 
 export interface CheckboxFieldProps {
 	name: FieldName

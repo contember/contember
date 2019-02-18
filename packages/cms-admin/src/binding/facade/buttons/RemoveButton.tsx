@@ -1,9 +1,9 @@
-import * as React from 'react'
 import { Icon } from '@blueprintjs/core'
-import { IconNames, IconName } from '@blueprintjs/icons'
+import { IconName, IconNames } from '@blueprintjs/icons'
+import * as React from 'react'
+import { Button, ButtonProps } from '../../../components'
 import { DataContext, DataContextValue } from '../../coreComponents'
 import { EntityAccessor } from '../../dao'
-import { Button, ButtonProps } from '../../../components'
 
 export interface RemoveButtonProps extends ButtonProps {
 	removeType?: RemoveButton.RemovalType

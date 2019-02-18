@@ -1,7 +1,7 @@
 // import {  } from '@blueprintjs/core'
-import { FormGroup, InputGroup, FormGroupProps, InputGroupProps } from '../../../components'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
+import { FormGroup, FormGroupProps, InputGroup, InputGroupProps } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'

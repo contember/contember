@@ -1,5 +1,5 @@
-import { FormGroup } from '../../../components'
 import * as React from 'react'
+import { FormGroup } from '../../../components'
 import {
 	EnforceSubtypeRelation,
 	EnvironmentContext,

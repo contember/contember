@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FormGroup, Select, FormGroupProps } from '../../../components'
+import { FormGroup, FormGroupProps, Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment } from '../../dao'
 import { Component } from '../Component'

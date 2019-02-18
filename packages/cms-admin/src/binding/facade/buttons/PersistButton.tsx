@@ -1,12 +1,11 @@
-import { Intent } from '@blueprintjs/core'
 import * as React from 'react'
-import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
-import { Button, ButtonColor } from '../../../components'
 import { connect } from 'react-redux'
-import State from '../../../state'
-import { Dispatch } from '../../../actions/types'
-import { Toast, ToastType } from '../../../state/toasts'
 import { addToast } from '../../../actions/toasts'
+import { Dispatch } from '../../../actions/types'
+import { Button, ButtonColor } from '../../../components'
+import State from '../../../state'
+import { Toast, ToastType } from '../../../state/toasts'
+import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
 
 export interface PersistButtonOwnProps {
 	successMessage?: string

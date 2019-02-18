@@ -1,16 +1,15 @@
-import { FormGroup, IFormGroupProps, IInputGroupProps, InputGroup } from '@blueprintjs/core'
 import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
 import { Parser, QueryLanguage } from '../../queryLanguage'
+import { FormGroup, InputGroup, InputGroupProps, FormGroupProps } from '../../../components'
 
 export interface FloatFieldProps {
 	name: FieldName
-	label?: IFormGroupProps['label']
-	large?: IInputGroupProps['large']
-	inlineLabel?: boolean
+	label?: FormGroupProps['label']
+	large?: InputGroupProps['large']
 }
 
 export class FloatField extends React.PureComponent<FloatFieldProps> {
@@ -20,10 +19,7 @@ export class FloatField extends React.PureComponent<FloatFieldProps> {
 		return (
 			<Field name={this.props.name}>
 				{(data: FieldAccessor<number>, env): React.ReactNode => (
-					<FormGroup
-						label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
-						inline={this.props.inlineLabel}
-					>
+					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<InputGroup
 							value={typeof data.currentValue === 'number' ? data.currentValue.toString(10) : '0'}
 							onChange={this.generateOnChange(data)}

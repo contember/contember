@@ -9,6 +9,7 @@ import { QueryLanguage } from '../../queryLanguage'
 export interface CheckboxFieldProps {
 	name: FieldName
 	label?: FormGroupProps['label']
+	defaultValue?: boolean
 }
 
 export class CheckboxField extends React.PureComponent<CheckboxFieldProps> {
@@ -31,7 +32,11 @@ export class CheckboxField extends React.PureComponent<CheckboxFieldProps> {
 	}
 
 	public static generateSyntheticChildren(props: CheckboxFieldProps, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(
+			props.name,
+			fieldName => <Field name={fieldName} defaultValue={props.defaultValue || false} />,
+			environment
+		)
 	}
 }
 

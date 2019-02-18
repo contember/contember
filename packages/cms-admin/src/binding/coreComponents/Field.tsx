@@ -57,7 +57,9 @@ class Field extends React.PureComponent<FieldProps> {
 	public static generateFieldMarker(props: FieldProps, environment: Environment): FieldMarker {
 		return new FieldMarker(
 			props.name,
-			props.defaultValue && VariableInputTransformer.transformValue(props.defaultValue, environment),
+			props.defaultValue !== undefined
+				? VariableInputTransformer.transformValue(props.defaultValue, environment)
+				: undefined,
 			props.isNonbearing === true
 		)
 	}

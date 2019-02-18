@@ -1,6 +1,10 @@
 import * as React from 'react'
 
-export default class MenuList extends React.Component<MenuListProps> {
+export interface MenuListProps {
+	title?: string
+}
+
+export class MenuList extends React.PureComponent<MenuListProps> {
 	render() {
 		return (
 			<ul className="menu-list">
@@ -10,8 +14,4 @@ export default class MenuList extends React.Component<MenuListProps> {
 			</ul>
 		)
 	}
-}
-
-export interface MenuListProps {
-	title?: string
 }

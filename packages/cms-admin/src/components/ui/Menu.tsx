@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export default class MenuList extends React.Component {
+export class Menu extends React.PureComponent {
 	render() {
 		return <div className="menu">{this.props.children}</div>
 	}

@@ -2,7 +2,14 @@ import * as React from 'react'
 import PageLink, { PageLinkProps } from '../pageRouting/PageLink'
 import { Avatar, AvatarShape, AvatarSize } from './Avatar'
 
-export default class MenuPageLinkPrimary extends React.Component<MenuPageLinkPrimaryProps> {
+export interface MenuPageLinkPrimaryProps {
+	avatar: React.ReactNode
+	name: React.ReactNode
+	note?: React.ReactNode
+	change: PageLinkProps<any>['change']
+}
+
+export class MenuPageLinkPrimary extends React.PureComponent<MenuPageLinkPrimaryProps> {
 	render() {
 		const { avatar, name, note } = this.props
 		return (
@@ -24,11 +31,4 @@ export default class MenuPageLinkPrimary extends React.Component<MenuPageLinkPri
 			/>
 		)
 	}
-}
-
-export interface MenuPageLinkPrimaryProps {
-	avatar: React.ReactNode
-	name: React.ReactNode
-	note?: React.ReactNode
-	change: PageLinkProps<any>['change']
 }

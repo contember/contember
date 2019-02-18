@@ -1,0 +1,27 @@
+.select
+	padding: 10px 30px 10px 15px
+	-webkit-appearance: none
+	-moz-appearance: none
+	background: none
+	border: none
+	width: 100%
+
+	&:focus
+		outline: none
+
+	&-wrap
+		+relative
+		background-color: white
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08)
+		border-radius: 4px
+		border: 1px solid #D8DCE6
+		display: inline-block
+
+		&::after
+			content: ''
+			background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10"><path fill="%239ea0a5" d="M 3,0 0,3 l 6,0 z"/><path fill="%239ea0a5" d="M 3,10 6,7 0,7 Z"/></svg>')
+			background-position: center center
+			color: #9ea0a5
+			background-repeat: no-repeat
+			+size(6px, 100%)
+			+absolute(0 15px 0 null)

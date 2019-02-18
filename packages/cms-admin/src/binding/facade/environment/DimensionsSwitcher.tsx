@@ -188,11 +188,11 @@ namespace DimensionsSwitcher {
 					{[...Array(columnCount)].map((_, i) => {
 						return (
 							<Dropdown.Column key={i}>
-								{dimensionData.map((dimension, j) => {
+								{dimensionData.map((dimension) => {
 									const active = selectedDimensions[i] === dimension.slug
 									return (
 										<Link
-											key={j}
+											key={dimension.slug}
 											Component={({ href, onClick }) => (
 												<Dropdown.Item {...{ href, onClick, active }}>{dimension.label}</Dropdown.Item>
 											)}

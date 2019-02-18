@@ -22,8 +22,9 @@ class RemoveButton extends React.Component<RemoveButtonProps> {
 								{...rest}
 								onClick={() => value.remove && value.remove(this.mapToRemovalType(this.props.removeType))}
 								small
+								minimal
 							>
-								<Icon icon={icon || IconNames.DELETE} />
+								<Icon icon={icon || IconNames.CROSS} color="currentColor" />
 							</Button>
 						)
 					}

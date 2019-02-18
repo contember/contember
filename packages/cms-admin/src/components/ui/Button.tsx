@@ -17,6 +17,7 @@ interface ButtonInnerProps<T> {
 	disabled?: boolean
 	noBorder?: boolean
 	small?: boolean
+	minimal?: boolean
 	Component?: React.ReactType<ComponentProps & T> | any // Hotfix
 }
 
@@ -30,7 +31,17 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 	InnerButtonInnerProps<T>
 > {
 	render() {
-		const { Component = 'button', color, disabled, noBorder, small, children, forwardRef, ...rest } = this.props
+		const {
+			Component = 'button',
+			color,
+			disabled,
+			noBorder,
+			small,
+			minimal,
+			children,
+			forwardRef,
+			...rest
+		} = this.props
 
 		const attrs: ComponentProps = {
 			className: cn(
@@ -39,7 +50,8 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 				color && `button-color${color}`,
 				disabled && 'button-disabled',
 				noBorder && 'button-noBorder',
-				small && 'button-small'
+				small && 'button-small',
+				minimal && 'button-minimal'
 			),
 			ref: forwardRef
 		}

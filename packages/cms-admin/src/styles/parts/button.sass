@@ -39,7 +39,6 @@
 				background: linear-gradient(to top, $hover-color 0%, lighten($hover-color, 5) 100%)
 				outline: none
 
-
 	&-disabled,
 	&-disabled:focus,
 	&-disabled:hover
@@ -51,3 +50,13 @@
 
 	&-noBorder
 		border: none
+
+	&-minimal
+		background: none
+		border: none
+		box-shadow: none
+		color: $c-text-light
+		margin: 0
+
+		&:hover
+			background: $color

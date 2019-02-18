@@ -1,6 +1,6 @@
 import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import { assertNever, Input } from 'cms-common'
-import { EntityName, ReceivedData, ReceivedEntityData } from '../bindingTypes'
+import { EntityName, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
 	DataBindingError,
@@ -238,22 +238,24 @@ export class MutationGenerator {
 
 				if (unreducedHasOnePresent) {
 					if (accessorReference.length === 1) {
-						let createOneRelationBuilder = new CrudQueryBuilder.CreateOneRelationBuilder()
+						const createOneRelationBuilder = new CrudQueryBuilder.CreateOneRelationBuilder<undefined>()
 						const { accessor, reference } = accessorReference[0]
 
 						if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 							const innerBuilder = this.createCreateDataBuilderByReference(reference)
-							createOneRelationBuilder = createOneRelationBuilder.create(
+							const createBuilder = createOneRelationBuilder.create(
 								this.registerCreateMutationPart(accessor, reference.fields, innerBuilder)
 							)
+							if (createBuilder.data) {
+								builder = builder.one(placeholderName, createBuilder)
+							}
 						} else {
-							createOneRelationBuilder = createOneRelationBuilder.connect({
-								[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
-							})
-						}
-
-						if ('connect' in createOneRelationBuilder.data || 'create' in createOneRelationBuilder.data) {
-							builder = builder.one(placeholderName, createOneRelationBuilder)
+							builder = builder.one(
+								placeholderName,
+								createOneRelationBuilder.connect({
+									[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+								})
+							)
 						}
 					} else {
 						throw new DataBindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)

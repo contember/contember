@@ -22,6 +22,7 @@ export interface FieldPublicProps {
 
 export interface FieldProps extends FieldPublicProps {
 	children?: (data: FieldAccessor<any>, environment: Environment) => React.ReactNode
+	isNonbearing?: boolean
 }
 
 class Field extends React.PureComponent<FieldProps> {
@@ -56,7 +57,8 @@ class Field extends React.PureComponent<FieldProps> {
 	public static generateFieldMarker(props: FieldProps, environment: Environment): FieldMarker {
 		return new FieldMarker(
 			props.name,
-			props.defaultValue && VariableInputTransformer.transformValue(props.defaultValue, environment)
+			props.defaultValue && VariableInputTransformer.transformValue(props.defaultValue, environment),
+			props.isNonbearing === true
 		)
 	}
 }

@@ -26,7 +26,9 @@ interface InnerButtonInnerProps<T> extends ButtonInnerProps<T> {
 
 export type ButtonProps<T = React.BaseHTMLAttributes<HTMLButtonElement>> = T & ButtonInnerProps<T>
 
-class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React.PureComponent<InnerButtonInnerProps<T>> {
+class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React.PureComponent<
+	InnerButtonInnerProps<T>
+> {
 	render() {
 		const { Component = 'button', color, disabled, noBorder, small, children, forwardRef, ...rest } = this.props
 
@@ -45,6 +47,8 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 	}
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => <InnerButton {...props} forwardRef={ref} />)
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => (
+	<InnerButton {...props} forwardRef={ref} />
+))
 
 export { Button }

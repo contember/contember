@@ -6,16 +6,13 @@ module.exports = (storybookBaseConfig: any, configType: string, config: any) => 
 			...defaultConfig.module,
 			rules: [
 				// Temp fix for issue: https://github.com/storybooks/storybook/issues/3346
-				...defaultConfig.module.rules
-					.filter(
-						(rule: any) =>
-							!(rule.use && rule.use.length && rule.use.find(({ loader }: any) => loader === 'babel-loader'))
-					)
-					// .filter(
-					// 	(rule: any) =>
-					// 		!(rule.use && rule.use.length && rule.use.find(({ loader }: any) => loader === 'css-loader'))
-					// ),
-					,
+				...defaultConfig.module.rules.filter(
+					(rule: any) => !(rule.use && rule.use.length && rule.use.find(({ loader }: any) => loader === 'babel-loader'))
+				),
+				// .filter(
+				// 	(rule: any) =>
+				// 		!(rule.use && rule.use.length && rule.use.find(({ loader }: any) => loader === 'css-loader'))
+				// ),
 				{
 					test: /\.jsx?$/,
 					include: require('path').resolve('./'),

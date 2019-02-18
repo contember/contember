@@ -57,9 +57,7 @@ class UploadFieldComponent extends React.Component<
 						data.onChange && data.onChange(upload.resultUrl)
 					}
 					return (
-						<FormGroup
-							label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
-						>
+						<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
 							<Dropzone
 								onDrop={async (accepted: File[]) => {
 									this.handleStartUpload(accepted)
@@ -74,7 +72,9 @@ class UploadFieldComponent extends React.Component<
 									onChange={async e => {
 										e.currentTarget.files && this.handleStartUpload(Array.from(e.currentTarget.files))
 									}}
-								>{this.renderUploadStatusMessage(upload)}</FileInput>
+								>
+									{this.renderUploadStatusMessage(upload)}
+								</FileInput>
 							</Dropzone>
 						</FormGroup>
 					)

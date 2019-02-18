@@ -34,6 +34,7 @@ class CreateApiKey implements Command<CreateApiKey.Result> {
 				identity_id: this.identityId,
 				enabled: true,
 				expires_at: ApiKeyHelper.getExpiration(this.type, this.expiration),
+				expiration: this.expiration || null,
 				created_at: now(),
 			})
 			.execute()

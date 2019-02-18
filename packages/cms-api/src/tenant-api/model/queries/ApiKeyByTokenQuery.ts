@@ -17,7 +17,8 @@ class ApiKeyByTokenQuery extends KnexQuery<ApiKeyByTokenQuery.Result> {
 				'tenant.api_key.identity_id',
 				'tenant.api_key.enabled',
 				'tenant.api_key.expires_at',
-				'tenant.identity.roles'
+				'tenant.identity.roles',
+				'tenant.api_key.expiration'
 			)
 			.from('tenant.api_key')
 			.innerJoin('tenant.identity', 'tenant.api_key.identity_id', 'tenant.identity.id')
@@ -34,6 +35,7 @@ namespace ApiKeyByTokenQuery {
 		readonly identity_id: string
 		readonly enabled: boolean
 		readonly expires_at: Date
+		readonly expiration: number | null
 		readonly roles: string[]
 	}
 }

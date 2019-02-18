@@ -26,14 +26,16 @@ class Initialize {
 	public async createOrUpdateProject() {
 		await this.tenantDb.wrapper().raw(
 			`
-			INSERT INTO tenant.project (id, name)
-			VALUES (?, ?)
+			INSERT INTO tenant.project (id, name, slug)
+			VALUES (?, ?, ?)
 			ON CONFLICT (id) DO UPDATE
-			SET name = ?
+			SET name = ?, slug = ?
 		`,
 			this.project.uuid,
 			this.project.name,
-			this.project.name
+			this.project.slug,
+			this.project.name,
+			this.project.slug
 		)
 		console.log(`Project ${this.project.slug} updated`)
 	}

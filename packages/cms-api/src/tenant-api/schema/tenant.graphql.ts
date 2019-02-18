@@ -163,6 +163,7 @@ const schema: DocumentNode = gql`
 	type Project {
 		id: String!
 		name: String!
+		slug: String!
 	}
 
 	type ApiKey {

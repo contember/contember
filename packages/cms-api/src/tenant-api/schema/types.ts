@@ -21,6 +21,7 @@ export interface Identity {
 export interface Project {
 	readonly id: string
 	readonly name: string
+	readonly slug: string
 }
 
 export interface PersonWithoutIdentity {
@@ -206,10 +207,12 @@ export namespace ProjectResolvers {
 	export interface Resolvers {
 		id?: IdResolver
 		name?: NameResolver
+		slug?: SlugResolver
 	}
 
 	export type IdResolver<R = string> = Resolver<R>
 	export type NameResolver<R = string> = Resolver<R>
+	export type SlugResolver<R = string> = Resolver<R>
 }
 
 export namespace PersonWithoutIdentityResolvers {

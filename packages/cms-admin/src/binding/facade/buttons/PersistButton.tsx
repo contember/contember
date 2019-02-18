@@ -3,17 +3,29 @@ import * as React from 'react'
 import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
 import { FeedbackToaster } from '../renderers/userFeedback'
 import { Button, ButtonColor } from '../../../components'
+import { connect } from 'react-redux'
+import State from '../../../state'
+import { Dispatch } from '../../../actions/types'
+import { Toast, ToastType } from '../../../state/toasts'
+import { addToast } from '../../../actions/toasts'
 
-export interface PersistButtonProps {
+export interface PersistButtonOwnProps {
 	successMessage?: string
 	failureMessage?: string
+}
+
+export interface PersistButtonDispatchProps {
+	showToast: (toast: Toast) => void
 }
 
 interface PersistButtonState {
 	isLoading: boolean
 }
 
-export class PersistButton extends React.Component<PersistButtonProps, PersistButtonState> {
+class PersistButtonConnected extends React.Component<
+	PersistButtonOwnProps & PersistButtonDispatchProps,
+	PersistButtonState
+> {
 	public readonly state: PersistButtonState = {
 		isLoading: false
 	}
@@ -25,14 +37,14 @@ export class PersistButton extends React.Component<PersistButtonProps, PersistBu
 		const toaster = FeedbackToaster.toaster
 		triggerPersist()
 			.then(() =>
-				toaster.show({
-					intent: Intent.SUCCESS,
+				this.props.showToast({
+					type: ToastType.Success,
 					message: this.props.successMessage || 'Success!'
 				})
 			)
 			.catch(() =>
-				toaster.show({
-					intent: Intent.DANGER,
+				this.props.showToast({
+					type: ToastType.Error,
 					message: this.props.failureMessage || 'Failure!'
 				})
 			)
@@ -65,3 +77,12 @@ export class PersistButton extends React.Component<PersistButtonProps, PersistBu
 		)
 	}
 }
+
+export const PersistButton = connect<{}, PersistButtonDispatchProps, PersistButtonOwnProps, State>(
+	null,
+	(dispatch: Dispatch) => ({
+		showToast: (toast: Toast) => {
+			dispatch(addToast(toast))
+		}
+	})
+)(PersistButtonConnected)

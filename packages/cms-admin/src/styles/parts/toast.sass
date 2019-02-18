@@ -1,0 +1,40 @@
+.toast
+	&-wrap
+		+fixed($spacing-2 $spacing-2 null)
+		pointer-events: none
+		z-index: 20
+
+	&-message
+		flex-grow: 1
+		margin: 0
+
+	&-button
+		background: none
+		border: none
+		padding: $spacing-1 / 2
+		margin: -($spacing-1 / 2)
+		color: inherit
+
+		&:focus,
+		&:hover
+			outline: none
+			border-radius: 4px
+			background: rgba(white, .1)
+
+	display: flex
+	max-width: 720px
+	margin: 0 auto $spacing-1
+	padding: 15px
+	border-radius: 4px
+	box-shadow: 0 1px 1px rgba(22, 29, 37, 0.1)
+	color: white
+	pointer-events: auto
+
+	&.view-success
+		background: #34AA44
+	&.view-warning
+		background: #F6AB2F
+	&.view-error
+		background: #E6492D
+	&.view-info
+		background: #1665D8

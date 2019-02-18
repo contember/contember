@@ -4,12 +4,16 @@ import { emptyState } from '../src/state'
 
 import { configureStore, Store } from '../src/store'
 import { RouteMap } from '../src/components/pageRouting/utils'
+import { Toast } from '../src/state/toasts'
 
-
-export class DummyAdmin extends React.Component<{}> {
+class DummyAdmin extends React.Component<DummyAdmin.Props> {
 	store: Store
 
-	constructor(props: {}) {
+	public static defaultProps: Partial<DummyAdmin.Props> = {
+		toasts: []
+	}
+
+	constructor(props: DummyAdmin.Props) {
 		super(props)
 
 		// validateConfig(props.config)
@@ -49,7 +53,8 @@ export class DummyAdmin extends React.Component<{}> {
 							routes: everyPage
 						}
 					]
-				}
+				},
+				toasts: { toasts: this.props.toasts }
 			},
 			{ apiServer: 'https://example.com', loginToken: 'XXX' }
 		)
@@ -59,3 +64,11 @@ export class DummyAdmin extends React.Component<{}> {
 		return <Provider store={this.store}>{this.props.children}</Provider>
 	}
 }
+
+namespace DummyAdmin {
+	export interface Props {
+		toasts: Toast[]
+	}
+}
+
+export { DummyAdmin }

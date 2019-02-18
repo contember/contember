@@ -6,6 +6,7 @@ import ProjectsConfigs from './projectsConfigs'
 import Request from './request'
 import View from './view'
 import Upload from './upload'
+import Toasts from './toasts'
 
 export default combineReducers<State>({
 	request: Request,
@@ -13,5 +14,6 @@ export default combineReducers<State>({
 	auth: Auth,
 	content: Content,
 	projectsConfigs: ProjectsConfigs,
-	upload: Upload
+	upload: Upload,
+	toasts: Toasts
 })

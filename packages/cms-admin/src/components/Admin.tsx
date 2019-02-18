@@ -14,6 +14,7 @@ import { configureStore, Store } from '../store'
 import Login from './Login'
 import ProjectsList from './ProjectsList'
 import Config, { validateConfig } from '../config'
+import { Toaster } from './ui/Toaster'
 
 export interface AdminProps {
 	configs: ProjectConfig[]
@@ -40,64 +41,69 @@ export default class Admin extends React.Component<AdminProps> {
 	render() {
 		return (
 			<Provider store={this.store}>
-				<Router
-					routes={{
-						login: () => <Login />,
-						projects_list: () => <ProjectsList configs={this.props.configs} />,
-						project_page: (() => {
-							const normalizedConfigs: {
-								[project: string]: {
-									[stage: string]: ProjectConfig & {
-										lazyComponent: React.LazyExoticComponent<React.ComponentType<any>>
-										rootEnvironment: Environment
+				<>
+					<Router
+						routes={{
+							login: () => <Login />,
+							projects_list: () => <ProjectsList configs={this.props.configs} />,
+							project_page: (() => {
+								const normalizedConfigs: {
+									[project: string]: {
+										[stage: string]: ProjectConfig & {
+											lazyComponent: React.LazyExoticComponent<React.ComponentType<any>>
+											rootEnvironment: Environment
+										}
+									}
+								} = {}
+
+								for (const config of this.props.configs) {
+									if (!(config.project in normalizedConfigs)) {
+										normalizedConfigs[config.project] = {}
+									}
+									if (config.stage in normalizedConfigs[config.project]) {
+										throw new Error(
+											`Duplicate project-stage pair supplied for project '${config.project}' and stage '${
+												config.stage
+											}'`
+										)
+									}
+									normalizedConfigs[config.project][config.stage] = {
+										...config,
+										lazyComponent: React.lazy(config.component),
+										rootEnvironment: new Environment({
+											dimensions: config.defaultDimensions || {}
+										})
 									}
 								}
-							} = {}
 
-							for (const config of this.props.configs) {
-								if (!(config.project in normalizedConfigs)) {
-									normalizedConfigs[config.project] = {}
-								}
-								if (config.stage in normalizedConfigs[config.project]) {
-									throw new Error(
-										`Duplicate project-stage pair supplied for project '${config.project}' and stage '${config.stage}'`
+								return ({ route }: { route: PageRequest<any> }) => {
+									const config = this.props.configs.find(
+										({ project, stage }) => project === route.project && stage === route.stage
 									)
-								}
-								normalizedConfigs[config.project][config.stage] = {
-									...config,
-									lazyComponent: React.lazy(config.component),
-									rootEnvironment: new Environment({
-										dimensions: config.defaultDimensions || {}
-									})
-								}
-							}
+									const relevantConfig = normalizedConfigs[route.project][route.stage]
+									const Component = relevantConfig.lazyComponent
 
-							return ({ route }: { route: PageRequest<any> }) => {
-								const config = this.props.configs.find(
-									({ project, stage }) => project === route.project && stage === route.stage
-								)
-								const relevantConfig = normalizedConfigs[route.project][route.stage]
-								const Component = relevantConfig.lazyComponent
-
-								if (config) {
-									relevantConfig.rootEnvironment = relevantConfig.rootEnvironment.updateDimensionsIfNecessary(
-										route.dimensions,
-										config.defaultDimensions || {}
-									)
-									return (
-										<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
-											<React.Suspense fallback={'Loading...'}>
-												<Component />
-											</React.Suspense>
-										</EnvironmentContext.Provider>
-									)
-								} else {
-									return <>{`No such project or stage as ${route.project}/${route.stage}`}</>
+									if (config) {
+										relevantConfig.rootEnvironment = relevantConfig.rootEnvironment.updateDimensionsIfNecessary(
+											route.dimensions,
+											config.defaultDimensions || {}
+										)
+										return (
+											<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
+												<React.Suspense fallback={'Loading...'}>
+													<Component />
+												</React.Suspense>
+											</EnvironmentContext.Provider>
+										)
+									} else {
+										return <>{`No such project or stage as ${route.project}/${route.stage}`}</>
+									}
 								}
-							}
-						})()
-					}}
-				/>
+							})()
+						}}
+					/>
+					<Toaster />
+				</>
 			</Provider>
 		)
 	}

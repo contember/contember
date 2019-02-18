@@ -211,11 +211,12 @@ describe('tenant api', () => {
 						response: [{ id: testUuid(1), password_hash: await bcrypt.hash('123', salt), identity_id: testUuid(2) }],
 					},
 					{
-						sql: SQL`insert into "tenant"."api_key" ("created_at", "enabled", "expires_at", "id", "identity_id", "token_hash", "type")
-            values ($1, $2, $3, $4, $5, $6, $7)`,
+						sql: SQL`insert into "tenant"."api_key" ("created_at", "enabled", "expiration", "expires_at", "id", "identity_id", "token_hash", "type")
+            values ($1, $2, $3, $4, $5, $6, $7, $8)`,
 						parameters: [
 							new Date('2018-10-12T08:00:00.000Z'),
 							true,
+							null,
 							new Date('2018-10-12T08:30:00.000Z'),
 							testUuid(1),
 							testUuid(2),

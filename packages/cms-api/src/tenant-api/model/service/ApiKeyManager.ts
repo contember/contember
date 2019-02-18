@@ -26,7 +26,7 @@ class ApiKeyManager {
 		if (apiKeyRow.expires_at !== null && apiKeyRow.expires_at <= now) {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.EXPIRED)
 		}
-		await new ProlongApiKey(apiKeyRow.id, apiKeyRow.type).execute(this.db)
+		await new ProlongApiKey(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined).execute(this.db)
 
 		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles)
 	}

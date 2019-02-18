@@ -1,7 +1,6 @@
 import { Intent } from '@blueprintjs/core'
 import * as React from 'react'
 import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
-import { FeedbackToaster } from '../renderers/userFeedback'
 import { Button, ButtonColor } from '../../../components'
 import { connect } from 'react-redux'
 import State from '../../../state'
@@ -34,7 +33,7 @@ class PersistButtonConnected extends React.Component<
 		if (this.state.isLoading) {
 			return
 		}
-		const toaster = FeedbackToaster.toaster
+
 		triggerPersist()
 			.then(() =>
 				this.props.showToast({

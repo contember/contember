@@ -7,13 +7,15 @@ export interface FormGroupProps {
 	// shape?: AvatarShape
 }
 
-export const FormGroup: React.FunctionComponent<FormGroupProps> = props => {
-	const { label, children } = props
+export class FormGroup extends React.PureComponent<FormGroupProps> {
+	public render() {
+		const { label, children } = this.props
 
-	return (
-		<div className={cn('formGroup')}>
-			<div className="formGroup-label">{label}</div>
-			<div className="formGroup-field">{children}</div>
-		</div>
-	)
+		return (
+			<div className={cn('formGroup')}>
+				<div className="formGroup-label">{label}</div>
+				<div className="formGroup-field">{children}</div>
+			</div>
+		)
+	}
 }

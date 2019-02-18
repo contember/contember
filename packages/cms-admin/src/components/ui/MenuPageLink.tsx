@@ -1,7 +1,11 @@
 import * as React from 'react'
 import PageLink, { PageLinkProps } from '../pageRouting/PageLink'
 
-export default class MenuPageLink extends React.Component<MenuPageLinkProps> {
+export interface MenuPageLinkProps {
+	change: PageLinkProps<any>['change']
+}
+
+export class MenuPageLink extends React.PureComponent<MenuPageLinkProps> {
 	render() {
 		return (
 			<PageLink
@@ -16,8 +20,4 @@ export default class MenuPageLink extends React.Component<MenuPageLinkProps> {
 			/>
 		)
 	}
-}
-
-export interface MenuPageLinkProps {
-	change: PageLinkProps<any>['change']
 }

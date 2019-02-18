@@ -1,11 +1,12 @@
-import { Callout, Card, Checkbox, Elevation } from '@blueprintjs/core'
-import { FormGroup, InputGroup, Button } from '..'
+import { Callout, Card, Elevation } from '@blueprintjs/core'
+import { Button, FormGroup, InputGroup } from '..'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { login } from '../../actions/auth'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { AuthStatus } from '../../state/auth'
+import cn from 'classnames'
 
 class Login extends React.PureComponent<Login.Props, Login.State> {
 	state: Login.State = {
@@ -27,7 +28,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 					<form
 						onSubmit={async e => {
 							e.preventDefault()
-							await this.props.login(this.state.email, this.state.password)
+							await this.props.login(this.state.email, this.state.password, this.state.rememberMe)
 						}}
 					>
 						{this.props.errorMessage && (
@@ -53,15 +54,21 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 								onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })}
 							/>
 						</FormGroup>
-						{/* <Checkbox
-							disabled={loading}
-							checked={this.state.rememberMe}
-							onChange={(e: React.FormEvent<HTMLInputElement>) =>
-								this.setState({ rememberMe: e.currentTarget.checked })
-							}
-						>
-							Remember me
-						</Checkbox> */}
+
+						<div className={cn('formGroup')}>
+							<label className="formGroup-label">
+								<input
+									type="checkbox"
+									checked={this.state.rememberMe}
+									value={this.state.password}
+									disabled={loading}
+									onChange={(e: React.FormEvent<HTMLInputElement>) =>
+										this.setState({ rememberMe: e.currentTarget.checked })
+									}
+								/>
+								Remember me
+							</label>
+						</div>
 						<Button
 							Component={({ children, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
 								<input type="submit" value="Submit" {...props} />
@@ -77,7 +84,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 
 namespace Login {
 	export interface DispatchProps {
-		login: (email: string, password: string) => void
+		login: (email: string, password: string, rememberMe: boolean) => void
 	}
 
 	export interface StateProps {
@@ -97,6 +104,6 @@ namespace Login {
 export default connect<Login.StateProps, Login.DispatchProps, {}, State>(
 	({ auth }) => ({ errorMessage: auth.errorMessage, status: auth.status }),
 	(dispatch: Dispatch) => ({
-		login: (email: string, password: string) => dispatch(login(email, password))
+		login: (email: string, password: string, rememberMe: boolean) => dispatch(login(email, password, rememberMe))
 	})
 )(Login)

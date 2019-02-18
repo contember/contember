@@ -4,9 +4,21 @@ import { pushRequest } from './request'
 import { ActionCreator } from './types'
 import { AuthIdentity } from '../state/auth'
 
-export const login = (email: string, password: string): ActionCreator => async (dispatch, getState, services) => {
+export const login = (email: string, password: string, rememberMe: boolean): ActionCreator => async (
+	dispatch,
+	getState,
+	services
+) => {
 	dispatch(createAction(SET_LOADING)())
-	const { signIn } = await services.tenantClient.request(loginMutation, { email, password }, services.config.loginToken)
+	const { signIn } = await services.tenantClient.request(
+		loginMutation,
+		{
+			email,
+			password,
+			expiration: rememberMe ? 3600 * 24 * 14 : undefined
+		},
+		services.config.loginToken
+	)
 	if (signIn.ok) {
 		dispatch(
 			createAction<AuthIdentity>(SET_IDENTITY, () => ({
@@ -24,8 +36,8 @@ export const login = (email: string, password: string): ActionCreator => async (
 }
 
 const loginMutation = `
-	mutation($email: String!, $password: String!) {
-		signIn(email: $email, password: $password) {
+	mutation($email: String!, $password: String!, $expiration: Int) {
+		signIn(email: $email, password: $password, expiration: $expiration) {
 			ok
 			errors {
 				endUserMessage

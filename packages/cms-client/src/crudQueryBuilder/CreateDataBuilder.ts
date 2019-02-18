@@ -1,8 +1,8 @@
-import DataBuilder from './DataBuilder'
+import { Input } from 'cms-common'
+import Literal from '../graphQlBuilder/Literal'
 import CreateManyRelationBuilder from './CreateManyRelationBuilder'
 import CreateOneRelationBuilder from './CreateOneRelationBuilder'
-import Literal from '../graphQlBuilder/Literal'
-import { Input } from 'cms-common'
+import DataBuilder from './DataBuilder'
 
 export default class CreateDataBuilder {
 	constructor(public readonly data: Input.CreateDataInput<Literal> = {}) {}
@@ -15,10 +15,13 @@ export default class CreateDataBuilder {
 		fieldName: string,
 		data: DataBuilder.DataLike<Input.CreateManyRelationInput<Literal>, CreateManyRelationBuilder>
 	) {
-		return new CreateDataBuilder({
-			...this.data,
-			[fieldName]: DataBuilder.resolveData(data, CreateManyRelationBuilder)
-		})
+		const resolvedData = DataBuilder.resolveData(data, CreateManyRelationBuilder)
+		return resolvedData === undefined
+			? this
+			: new CreateDataBuilder({
+					...this.data,
+					[fieldName]: resolvedData
+			  })
 	}
 
 	public one(
@@ -29,11 +32,11 @@ export default class CreateDataBuilder {
 			CreateOneRelationBuilder<undefined>
 		>
 	) {
-		const value = DataBuilder.resolveData<
+		const resolvedData = DataBuilder.resolveData<
 			Input.CreateOneRelationInput<Literal>,
 			CreateOneRelationBuilder,
 			CreateOneRelationBuilder<undefined>
 		>(data, CreateOneRelationBuilder)
-		return new CreateDataBuilder({ ...this.data, [fieldName]: value })
+		return resolvedData === undefined ? this : new CreateDataBuilder({ ...this.data, [fieldName]: resolvedData })
 	}
 }

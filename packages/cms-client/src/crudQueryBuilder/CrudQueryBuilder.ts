@@ -92,6 +92,10 @@ export default class CrudQueryBuilder {
 			query = query(new CreateBuilder())
 		}
 
+		if (isEmptyObject(query.objectBuilder.args.data)) {
+			return this
+		}
+
 		const [objectName, objectBuilder] =
 			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]
 

@@ -1,16 +1,15 @@
-import DataBuilder from './DataBuilder'
-import CreateDataBuilder from './CreateDataBuilder'
-import UpdateDataBuilder from './UpdateDataBuilder'
+import { Input } from 'cms-common'
 import Literal from '../graphQlBuilder/Literal'
-
-import { Input, isEmptyObject } from 'cms-common'
+import CreateDataBuilder from './CreateDataBuilder'
+import DataBuilder from './DataBuilder'
+import UpdateDataBuilder from './UpdateDataBuilder'
 
 export default class UpdateManyRelationBuilder {
 	constructor(public readonly data: Input.UpdateManyRelationInput<Literal> = []) {}
 
 	public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {
 		const resolvedData = DataBuilder.resolveData(data, CreateDataBuilder)
-		return resolvedData ? new UpdateManyRelationBuilder([...this.data, { create: resolvedData }]) : this
+		return resolvedData === undefined ? this : new UpdateManyRelationBuilder([...this.data, { create: resolvedData }])
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>) {
@@ -29,8 +28,10 @@ export default class UpdateManyRelationBuilder {
 		where: Input.UniqueWhere<Literal>,
 		data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>
 	) {
-		const input = DataBuilder.resolveData(data, UpdateDataBuilder)
-		return input ? new UpdateManyRelationBuilder([...this.data, { update: { by: where, data: input } }]) : this
+		const resolvedData = DataBuilder.resolveData(data, UpdateDataBuilder)
+		return resolvedData === undefined
+			? this
+			: new UpdateManyRelationBuilder([...this.data, { update: { by: where, data: resolvedData } }])
 	}
 
 	public upsert(
@@ -40,15 +41,15 @@ export default class UpdateManyRelationBuilder {
 	) {
 		const updateInput = DataBuilder.resolveData(update, UpdateDataBuilder)
 		const createInput = DataBuilder.resolveData(create, CreateDataBuilder)
-		return isEmptyObject(updateInput) && isEmptyObject(createInput)
+		return updateInput === undefined && createInput === undefined
 			? this
 			: new UpdateManyRelationBuilder([
 					...this.data,
 					{
 						upsert: {
 							by: where,
-							update: updateInput,
-							create: createInput
+							update: updateInput || {},
+							create: createInput || {}
 						}
 					}
 			  ])

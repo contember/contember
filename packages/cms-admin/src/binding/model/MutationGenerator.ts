@@ -238,16 +238,23 @@ export class MutationGenerator {
 
 				if (unreducedHasOnePresent) {
 					if (accessorReference.length === 1) {
-						builder = builder.one(placeholderName, builder => {
-							const { accessor, reference } = accessorReference[0]
+						let createOneRelationBuilder = new CrudQueryBuilder.CreateOneRelationBuilder()
+						const { accessor, reference } = accessorReference[0]
 
-							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-								const innerBuilder = this.createCreateDataBuilderByReference(reference)
-								return builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
-							} else {
-								return builder.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey })
-							}
-						})
+						if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
+							const innerBuilder = this.createCreateDataBuilderByReference(reference)
+							createOneRelationBuilder = createOneRelationBuilder.create(
+								this.registerCreateMutationPart(accessor, reference.fields, innerBuilder)
+							)
+						} else {
+							createOneRelationBuilder = createOneRelationBuilder.connect({
+								[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+							})
+						}
+
+						if ('connect' in createOneRelationBuilder.data || 'create' in createOneRelationBuilder.data) {
+							builder = builder.one(placeholderName, createOneRelationBuilder)
+						}
 					} else {
 						throw new DataBindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
 					}

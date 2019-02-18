@@ -8,7 +8,8 @@ export default class CreateManyRelationBuilder {
 	constructor(public readonly data: Input.CreateManyRelationInput<Literal> = []) {}
 
 	public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {
-		return new CreateManyRelationBuilder([...this.data, { create: DataBuilder.resolveData(data, CreateDataBuilder) }])
+		const resolvedData = DataBuilder.resolveData(data, CreateDataBuilder)
+		return resolvedData === undefined ? this : new CreateManyRelationBuilder([...this.data, { create: resolvedData }])
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>) {

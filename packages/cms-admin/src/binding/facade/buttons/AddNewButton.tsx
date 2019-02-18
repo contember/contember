@@ -15,7 +15,8 @@ export class AddNewButton extends React.PureComponent<AddNewButtonProps> {
 		return (
 			addNew && (
 				<Button onClick={addNew} small {...rest}>
-					<Icon icon={icon || IconNames.ADD} />&nbsp;Add
+					<Icon icon={icon || IconNames.ADD} />
+					&nbsp;Add
 				</Button>
 			)
 		)

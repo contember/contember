@@ -59,7 +59,7 @@ export const uploadFile = (id: string, file: File): ActionCreator => async (disp
 
 	dispatch(startUpload(id, file, thumbnailUrl))
 
-	const apiToken = state.auth.token
+	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	const graphqlClient = services.contentClientFactory.create(state.request.project, state.request.stage)
 
 	let uploadUrl: string

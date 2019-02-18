@@ -1,8 +1,8 @@
-import * as React from 'react'
 import { Icon } from '@blueprintjs/core'
-import { IconNames, IconName } from '@blueprintjs/icons'
-import { EntityCollectionAccessor } from '../../dao'
+import { IconName, IconNames } from '@blueprintjs/icons'
+import * as React from 'react'
 import { Button, ButtonProps } from '../../../components'
+import { EntityCollectionAccessor } from '../../dao'
 
 export interface AddNewButtonProps extends ButtonProps {
 	addNew: EntityCollectionAccessor['addNew']

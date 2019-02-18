@@ -2,8 +2,8 @@ import { Card, Elevation, FormGroup, IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import {
 	DataContext,
-	EnvironmentContext,
 	EnforceSubtypeRelation,
+	EnvironmentContext,
 	Props,
 	SyntheticChildrenProvider,
 	ToMany,

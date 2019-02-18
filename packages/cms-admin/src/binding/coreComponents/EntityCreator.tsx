@@ -1,6 +1,4 @@
 import * as React from 'react'
-import Dimensions from '../../components/Dimensions'
-import { SelectedDimension } from '../../state/request'
 import { EntityName } from '../bindingTypes'
 import { Environment, MarkerTreeRoot } from '../dao'
 import { MarkerTreeGenerator } from '../model'

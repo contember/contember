@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ChangeEvent } from 'react'
+import { FormGroup, FormGroupProps, InputGroup, InputGroupProps } from '../../../components'
 import { FieldName } from '../../bindingTypes'
-import { FormGroup, FormGroupProps, InputGroupProps, InputGroup } from '../../../components'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'

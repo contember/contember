@@ -1,10 +1,10 @@
 import { IRadioGroupProps, Radio, RadioGroup } from '@blueprintjs/core'
 import * as React from 'react'
+import { FormGroup } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment } from '../../dao'
 import { Component } from '../Component'
 import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
-import { FormGroup } from '../../../components'
 
 export interface RadioFieldPublicProps {
 	name: FieldName

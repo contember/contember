@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { ChangeEvent } from 'react'
+import { FormGroup, FormGroupProps, InputGroup, InputGroupProps } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment, FieldAccessor } from '../../dao'
-import { Parser, QueryLanguage } from '../../queryLanguage'
-import { FormGroup, InputGroup, InputGroupProps, FormGroupProps } from '../../../components'
+import { QueryLanguage } from '../../queryLanguage'
 
 export interface FloatFieldProps {
 	name: FieldName

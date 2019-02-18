@@ -209,11 +209,7 @@ namespace Sortable {
 				if (entity.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 					const orderField = entity.data.getField(fieldName)
 
-					if (
-						orderField instanceof FieldAccessor &&
-						orderField.currentValue === null &&
-						orderField.onChange
-					) {
+					if (orderField instanceof FieldAccessor && orderField.currentValue === null && orderField.onChange) {
 						orderField.onChange(i)
 					}
 				}

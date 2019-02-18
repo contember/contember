@@ -1,6 +1,5 @@
 import { assertNever } from 'cms-common'
 import { contentType } from 'mime-types'
-import { FileInput } from '../../../components'
 import { FormGroup, FormGroupProps } from '../../../components'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
@@ -66,15 +65,22 @@ class UploadFieldComponent extends React.Component<
 								multiple={false}
 								style={{}}
 							>
-								{data.currentValue && this.isImage(data.currentValue) ? <img src={data.currentValue} /> : null}
-								{upload && upload.thumbnailUrl ? <img src={upload.thumbnailUrl} /> : null}
-								<FileInput
-									onChange={async e => {
-										e.currentTarget.files && this.handleStartUpload(Array.from(e.currentTarget.files))
-									}}
-								>
-									{this.renderUploadStatusMessage(upload)}
-								</FileInput>
+								<label className="fileInput">
+									{data.currentValue && this.isImage(data.currentValue) ? (
+										<img src={data.currentValue} style={{ width: '15%' }} />
+									) : null}
+									{upload && upload.status !== UploadStatus.FINISHED && upload.thumbnailUrl ? (
+										<img
+											src={upload.thumbnailUrl}
+											style={{
+												width: '15%'
+											}}
+										/>
+									) : null}
+									<span className="fileInput-label" style={{ marginLeft: '10px' }}>
+										{this.renderUploadStatusMessage(upload)}
+									</span>
+								</label>
 							</Dropzone>
 						</FormGroup>
 					)

@@ -4,8 +4,8 @@
 	display: inline-block
 	text-decoration: none
 	$shadow-color: rgba(22, 29, 37, 0.05)
-	box-shadow: 0 1px 1px $shadow-color, inset 0 2px 0 rgba(255, 255, 255, 0.05)
-	border-radius: 4px
+	box-shadow: 0 rem(1px) rem(1px) $shadow-color, inset 0 rem(2px) 0 rgba(255, 255, 255, 0.05)
+	border-radius: rem(4px)
 	padding: $spacing-small $spacing-normal
 	margin: $spacing-small 0
 
@@ -14,7 +14,7 @@
 
 	$color: #F6F7F9
 	color: $c-text
-	border: 1px solid darken($color, 10)
+	border: rem(1px) solid darken($color, 10)
 	background: linear-gradient(to top, $color 0%, lighten($color, 5) 100%)
 
 	&:hover
@@ -29,7 +29,7 @@
 	@each $name, $color in $color-pairs
 		&.view-#{$name}
 			color: #FFFFFF
-			border: 1px solid darken($color, 10)
+			border: rem(1px) solid darken($color, 10)
 			background: linear-gradient(to top, $color 0%, lighten($color, 5) 100%)
 
 			&:hover
@@ -45,9 +45,9 @@
 		&,
 		&:hover
 			color: $c-text-light
-			box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.06)
-			border-radius: 4px
-			border: 1px solid #696a6e
+			box-shadow: inset 0 rem(2px) 0 rgba(255, 255, 255, 0.06)
+			border-radius: rem(4px)
+			border: rem(1px) solid #696a6e
 			background: #747578
 
 	&-noBorder

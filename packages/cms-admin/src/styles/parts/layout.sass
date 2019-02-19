@@ -8,11 +8,11 @@
 		justify-content: space-between
 		align-items: center
 		height: $layout-navbar-height
-		padding: 16px $spacing-extraLarge
+		padding: 1rem $spacing-extraLarge
 		z-index: 19
 		background-color: $layout-background-color
 		color: $layout-text-color
-		border-bottom: 1px solid #EAEDF3
+		border-bottom: rem(1px) solid #EAEDF3
 
 	&-container
 		display: flex
@@ -20,9 +20,9 @@
 
 	&-side
 		+sticky($layout-navbar-height null null)
-		width: 270px
+		width: rem(270px)
 		max-width: 80vw
-		border-right: 1px solid #EAEDF3
+		border-right: rem(1px) solid #EAEDF3
 		height: calc(100vh - #{$layout-navbar-height})
 		z-index: 19
 		background-color: $layout-background-color

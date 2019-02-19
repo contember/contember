@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { FormGroup } from '../../src/components/ui/FormGroup'
-import { InputGroup } from '../../src/components/ui/InputGroup'
+import * as React from 'react'
+import { FormGroup, InputGroup } from '../../src/components/ui'
 
 storiesOf('Form group', module).add('text field', () => (
 	<>

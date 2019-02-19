@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { addToast } from '../../../actions/toasts'
 import { Dispatch } from '../../../actions/types'
-import { Button, ButtonColor } from '../../../components'
+import { Button, Intent } from '../../../components'
 import State from '../../../state'
 import { Toast, ToastType } from '../../../state/toasts'
 import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
@@ -59,14 +59,14 @@ class PersistButtonConnected extends React.Component<
 					if (value) {
 						return (
 							<Button
-								color={ButtonColor.Green}
+								intent={Intent.Success}
 								// icon="floppy-disk"
 								onClick={this.getOnPersist(value.triggerPersist)}
 								// intent={Intent.PRIMARY}
 								// loading={this.state.isLoading}
 								// large={true}
 							>
-								{this.props.children || 'Save!'}
+								{this.props.children || 'Save'}
 							</Button>
 						)
 					}

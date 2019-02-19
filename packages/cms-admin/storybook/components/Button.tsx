@@ -1,24 +1,24 @@
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { Button, ButtonColor, ButtonProps } from '../../src/components/ui'
+import { Button, Intent, ButtonProps } from '../../src/components/ui'
 
-const variedColors = (props: Exclude<ButtonProps, 'color'>) => (
+const variedIntents = (props: Exclude<ButtonProps, 'intent'>) => (
 	<>
 		<Button {...props}>Save</Button>
-		<Button {...props} color={ButtonColor.Blue}>
+		<Button {...props} intent={Intent.Info}>
 			Save
 		</Button>
-		<Button {...props} color={ButtonColor.Green}>
+		<Button {...props} intent={Intent.Success}>
 			Save
 		</Button>
-		<Button {...props} color={ButtonColor.Red}>
+		<Button {...props} intent={Intent.Danger}>
 			Save
 		</Button>
 	</>
 )
 
 storiesOf('Button', module)
-	.add('colored', () => variedColors({}))
-	.add('small', () => variedColors({ small: true }))
-	.add('disabled', () => variedColors({ disabled: true }))
-	.add('link', () => variedColors({ Component: 'a', href: 'https://example.com' }))
+	.add('intent', () => variedIntents({}))
+	.add('small', () => variedIntents({ small: true }))
+	.add('disabled', () => variedIntents({ disabled: true }))
+	.add('link', () => variedIntents({ Component: 'a', href: 'https://example.com' }))

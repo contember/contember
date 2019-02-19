@@ -1,34 +1,16 @@
+@import 'common'
 
-// ## Mixins library
-@import '../../node_modules/bourbon/core/bourbon'
-
-// ## Functions
-@import 'functions/em'
-@import 'functions/rem'
-
-// ## Settings, variables and animations
-@import 'variables'
-@import 'animations'
-$icon-font-path: "../node_modules/@blueprintjs/icons/resources/icons"
-
-// ## Mixins
-// @import 'mixins/*'
-@import 'mixins/media'
-@import 'mixins/position'
+@import './../../node_modules/@mangoweb/sass-base/index'
 
 // ## Frameworks
+// $icon-font-path: "../node_modules/@blueprintjs/icons/resources/icons"
 // @import '../../node_modules/@blueprintjs/core/src/blueprint'
 // @import '../../node_modules/@blueprintjs/datetime/src/blueprint-datetime'
 // @import '../../node_modules/@blueprintjs/icons/src/blueprint-icons'
 // @import '../../node_modules/@blueprintjs/select/src/blueprint-select'
 // @import '../../node_modules/@blueprintjs/table/src/table'
 
-// ## Web styles
-@import 'global'
-
-// ## Abstract
-// @import 'abstract/*'
-@import 'abstract/accessible'
+@import 'globalOverrides'
 
 // ## Components
 // @import 'parts/*'

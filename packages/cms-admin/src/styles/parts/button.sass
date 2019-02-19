@@ -25,8 +25,8 @@
 		outline: none
 
 	@each $name, $color in $color-pairs
-		&-color#{$name}
-			color: white
+		&.view-#{$name}
+			color: #FFFFFF
 			border: 1px solid darken($color, 10)
 			background: linear-gradient(to top, $color 0%, lighten($color, 5) 100%)
 

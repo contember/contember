@@ -1,19 +1,15 @@
 import * as React from 'react'
 import cn from 'classnames'
-
-export enum ButtonColor {
-	Blue = 'blue',
-	Red = 'red',
-	Green = 'green'
-}
+import { Intent } from './Intent'
 
 export interface ComponentProps {
 	className: string
+	disabled?: boolean
 	ref?: React.Ref<any>
 }
 
 interface ButtonInnerProps<T> {
-	color?: ButtonColor
+	intent?: Intent
 	disabled?: boolean
 	noBorder?: boolean
 	small?: boolean
@@ -33,7 +29,7 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 	render() {
 		const {
 			Component = 'button',
-			color,
+			intent,
 			disabled,
 			noBorder,
 			small,
@@ -47,14 +43,15 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 			className: cn(
 				(rest as { className?: string }).className,
 				'button',
-				color && `button-color${color}`,
-				disabled && 'button-disabled',
+				intent && `view-${intent}`,
 				noBorder && 'button-noBorder',
 				small && 'button-small',
 				minimal && 'button-minimal'
 			),
-			ref: forwardRef
+			ref: forwardRef,
+			disabled: disabled === true
 		}
+
 		return React.createElement(Component, { ...(rest as T), ...attrs }, children)
 	}
 }

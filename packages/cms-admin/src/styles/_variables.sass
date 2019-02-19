@@ -1,10 +1,9 @@
-// Favorite constants
-$gratio: 1.618
-$pi: 3.14159
+@import './../../node_modules/@mangoweb/sass-base/crucialVariables'
+@import './../../node_modules/@mangoweb/sass-base/functions/index'
 
 // Dimensions
 
-$spacings: 10px, 20px, 24px, 30px
+$spacings: rem(10px), rem(20px), rem(24px), rem(30px)
 $spacing-1: nth($spacings, 1)
 $spacing-2: nth($spacings, 2)
 $spacing-3: nth($spacings, 3)
@@ -14,30 +13,29 @@ $spacing: nth($spacings, 2)
 $padding: nth($spacings, 1)
 
 // Font properties
-$font-family-sans-serif: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"
-
+$font-family-sans-serif: Roboto, $font-family-sans-serif-fallback
 $font-family-base: $font-family-sans-serif
 $font-family-head: $font-family-sans-serif
 
-$base-font-size: 16px
-$fw-light: 300
-$fw-reguar: 400
-$fw-medium: 500
-$em-base: $base-font-size
-
-$font-sizes: 14px, 16px, 18px, 20px, 22px, 26px, 30px, 36px
-$font-size-0: 12px
-$font-size-1: nth($font-sizes, 1)
-$font-size-2: nth($font-sizes, 2)
-$font-size-3: nth($font-sizes, 3)
-$font-size-4: nth($font-sizes, 4)
-$font-size-5: nth($font-sizes, 5)
-$font-size-6: nth($font-sizes, 6)
-$font-size-7: nth($font-sizes, 7)
-$font-size-8: nth($font-sizes, 8)
+$font-size-0: rem(12px)
+$font-size-1: rem(14px)
+$font-size-2: rem(16px)
+$font-size-3: rem(18px)
+$font-size-4: rem(20px)
+$font-size-5: rem(22px)
+$font-size-6: rem(26px)
+$font-size-7: rem(30px)
+$font-size-8: rem(36px)
 
 // Colors
-$color-pairs: (green, #38B249), (blue, #1665D8), (orange, #F6AB2F), (violet, #6977FF), (yellow, #FACF55), (red, #E6492D)
+$c-success: #38B249
+$c-info: #1665D8
+$c-warn: #F6AB2F
+$c-danger: #E6492D
+$c-alt: #6977FF
+$c-accent: #FACF55
+
+$color-pairs: (success, $c-success), (info, $c-info), (warn, $c-warn), (danger, $c-danger), (alt, $c-alt), (accent, $c-accent)
 
 // Links
 $c-link: #1665D8
@@ -45,11 +43,13 @@ $link-default: $c-link
 
 // Other
 $c-text: #3E3F42
-$c-text-light: #9ea0a5
+$c-text-alt: #6B6C6F
+$c-icon: #9EA0A5
+$c-text-tertiary: #BCBCBC
 $c-text-back: #FFF
 
 // Menu
-$menu-title-color: $c-text-light
+$menu-title-color: $c-icon
 $menu-title-font-size: $font-size-0
 $menu-icon-color: $c-text
 $menu-link-color: $c-text
@@ -63,19 +63,3 @@ $layout-navbar-link-color: white
 
 
 $c-login-background: #F9F9F9
-
-// Breakpoints
-$break320: '(min-width: 320px)'
-$break480: '(min-width: 480px)'
-$break768: '(min-width: 768px)'
-$break992: '(min-width: 992px)'
-$break1200: '(min-width: 1200px)'
-
-$break320M: '(max-width: 319px)'
-$break480M: '(max-width: 479px)'
-$break768M: '(max-width: 767px)'
-$break992M: '(max-width: 991px)'
-$break1200M: '(max-width: 1199px)'
-
-$landscape: '(orientation: landscape)'
-$portrait: '(orientation: portrait)'

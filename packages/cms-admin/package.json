@@ -15,6 +15,7 @@
 		"@blueprintjs/icons": "^3.0.0",
 		"@blueprintjs/select": "^3.0.0",
 		"@blueprintjs/table": "^3.0.0",
+		"@mangoweb/sass-base": "0.0.2",
 		"bourbon": "^5.1.0",
 		"chevrotain": "^4.1.0",
 		"classnames": "^2.2.6",

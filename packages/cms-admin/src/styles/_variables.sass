@@ -3,14 +3,13 @@
 
 // Dimensions
 
-$spacings: rem(10px), rem(20px), rem(24px), rem(30px)
-$spacing-1: nth($spacings, 1)
-$spacing-2: nth($spacings, 2)
-$spacing-3: nth($spacings, 3)
-$spacing-4: nth($spacings, 4)
+$spacing-small: rem(10px)
+$spacing-normal: rem(20px)
+$spacing-large: rem(24px)
+$spacing-extraLarge: rem(30px)
 
-$spacing: nth($spacings, 2)
-$padding: nth($spacings, 1)
+$spacing: $spacing-normal
+$padding: $spacing-small
 
 // Font properties
 $font-family-sans-serif: Roboto, $font-family-sans-serif-fallback
@@ -59,7 +58,7 @@ $menu-title-color: $c-icon
 $menu-title-font-size: $fs-tiny
 $menu-icon-color: $c-text
 $menu-link-color: $c-text
-$menu-link-padding: $spacing-4
+$menu-link-padding: $spacing-extraLarge
 
 // Layout
 $layout-background-color: #FFFFFF

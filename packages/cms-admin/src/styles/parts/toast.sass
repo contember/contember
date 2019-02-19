@@ -2,7 +2,7 @@
 
 .toast
 	&-wrap
-		+fixed($spacing-2 $spacing-2 null)
+		+fixed($spacing-normal $spacing-normal null)
 		pointer-events: none
 		z-index: 20
 
@@ -13,8 +13,8 @@
 	&-button
 		background: none
 		border: none
-		padding: $spacing-1 / 2
-		margin: -($spacing-1 / 2)
+		padding: $spacing-small / 2
+		margin: -($spacing-small / 2)
 		color: inherit
 
 		&:focus,
@@ -25,7 +25,7 @@
 
 	display: flex
 	max-width: 720px
-	margin: 0 auto $spacing-1
+	margin: 0 auto $spacing-small
 	padding: 15px
 	border-radius: 4px
 	box-shadow: 0 1px 1px rgba(22, 29, 37, 0.1)

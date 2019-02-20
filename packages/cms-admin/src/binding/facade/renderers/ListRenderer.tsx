@@ -17,17 +17,20 @@ export class ListRenderer extends React.PureComponent<RendererProps> {
 		const normalizedData = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
 
 		return (
-			<UL>
+			<>
 				{DefaultRenderer.renderTitle(this.props.title)}
-				{normalizedData.map(
-					value =>
-						value && (
-							<li key={value.getKey()}>
-								<DataContext.Provider value={value}>{this.props.children}</DataContext.Provider>
-							</li>
-						)
-				)}
-			</UL>
+				{this.props.beforeContent}
+				<UL>
+					{normalizedData.map(
+						value =>
+							value && (
+								<li key={value.getKey()}>
+									<DataContext.Provider value={value}>{this.props.children}</DataContext.Provider>
+								</li>
+							)
+					)}
+				</UL>
+			</>
 		)
 	}
 }

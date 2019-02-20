@@ -99,7 +99,13 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('done')
 
 						const apolloKoa = new Koa()
-						const server = this.createApolloServer(dataSchema, projectVariables, stage.schema.model, permissions, projectContainer.get('knexDebugger'))
+						const server = this.createApolloServer(
+							dataSchema,
+							projectVariables,
+							stage.schema.model,
+							permissions,
+							projectContainer.get('knexDebugger')
+						)
 						server.applyMiddleware({
 							app: apolloKoa,
 							path: '/',
@@ -124,19 +130,20 @@ class ContentMiddlewareFactory {
 		variables: Acl.VariablesMap,
 		schema: Model.Schema,
 		permissions: Acl.Permissions,
-		knexDebugger: KnexDebugger,
+		knexDebugger: KnexDebugger
 	) {
-
 		return new ApolloServer({
 			tracing: true,
 			introspection: true,
 			schema: dataSchema,
 			uploads: false,
-			extensions: [() => {
-				const queriesExt = new DbQueriesExtension()
-				knexDebugger.subscribe(query => queriesExt.addQuery(query))
-				return queriesExt
-			}],
+			extensions: [
+				() => {
+					const queriesExt = new DbQueriesExtension()
+					knexDebugger.subscribe(query => queriesExt.addQuery(query))
+					return queriesExt
+				},
+			],
 			context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {
 				const executionContainer = new ExecutionContainerFactory(schema, permissions).create({
 					db: ctx.state.db,

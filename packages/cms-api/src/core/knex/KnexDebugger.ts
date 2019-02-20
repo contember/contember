@@ -6,7 +6,7 @@ type Query = {
 	bindings: any
 }
 
-type Meta = { startTime: Date, elapsed?: number, error?: string }
+type Meta = { startTime: Date; elapsed?: number; error?: string }
 type Subscriber = (query: Query & Meta & { elapsed: number }) => void
 
 class KnexDebugger {

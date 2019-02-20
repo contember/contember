@@ -5,14 +5,11 @@
 	border-radius: rem(4px)
 	border: rem(1px) solid #EAEDF3
 	background: #FFFFFF
+	padding: 0 rem(30px)
 
 	&-row
-		box-shadow: 0 rem(1px) 0 #EAEDF3
+		& + &
+			box-shadow: 0 rem(1px) 0 #EAEDF3
 
 	&-cell
 		padding: rem(15px) rem(7px)
-
-		&:first-child
-			padding-left: rem(30px)
-		&:last-child
-			padding-right: rem(30px)

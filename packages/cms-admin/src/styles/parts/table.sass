@@ -1,16 +1,18 @@
+@import '../common'
+
 .table
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04)
-	border-radius: 4px
-	border: 1px solid #EAEDF3
-	background: white
+	box-shadow: 0 rem(1px) rem(3px) rgba(0, 0, 0, .04)
+	border-radius: rem(4px)
+	border: rem(1px) solid #EAEDF3
+	background: #FFFFFF
 
 	&-row
-		box-shadow: 0 1px 0 #EAEDF3
+		box-shadow: 0 rem(1px) 0 #EAEDF3
 
 	&-cell
-		padding: 15px 7px
+		padding: rem(15px) rem(7px)
 
 		&:first-child
-			padding-left: 30px
+			padding-left: rem(30px)
 		&:last-child
-			padding-right: 30px
+			padding-right: rem(30px)

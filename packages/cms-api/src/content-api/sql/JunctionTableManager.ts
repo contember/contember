@@ -9,6 +9,7 @@ import { Acl, Input, Model } from 'cms-common'
 import InsertBuilder from '../../core/knex/InsertBuilder'
 import ConditionBuilder from '../../core/knex/ConditionBuilder'
 import SelectBuilder from '../../core/knex/SelectBuilder'
+import { uuid } from '../../utils/uuid'
 
 class JunctionTableManager {
 	constructor(
@@ -127,6 +128,7 @@ namespace JunctionTableManager {
 				.insertBuilder()
 				.into(joiningTable.tableName)
 				.values({
+					id: uuid(),
 					[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(ownerPrimary),
 					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimary),
 				})
@@ -139,6 +141,7 @@ namespace JunctionTableManager {
 				.insertBuilder()
 				.into(joiningTable.tableName)
 				.values({
+					id: expr => expr.selectValue(uuid()),
 					[joiningTable.joiningColumn.columnName]: expr => expr.select(['data', joiningTable.joiningColumn.columnName]),
 					[joiningTable.inverseJoiningColumn.columnName]: expr =>
 						expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),

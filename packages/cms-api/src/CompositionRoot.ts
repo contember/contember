@@ -36,6 +36,7 @@ export type ProjectContainer = Container<{
 	knexConnection: knex
 	graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
 	graphQlSchemaFactory: GraphQlSchemaFactory
+	knexDebugger: KnexDebugger
 	s3: S3
 }>
 
@@ -83,7 +84,8 @@ class CompositionRoot {
 		return projects.map((project: Project) => {
 			return new Container.Builder({})
 				.addService('project', () => project)
-				.addService('knexConnection', ({ project }) => {
+				.addService('knexDebugger', () => new KnexDebugger())
+				.addService('knexConnection', ({ project, knexDebugger }) => {
 					const knexInst = knex({
 						debug: false,
 						client: 'pg',
@@ -95,7 +97,6 @@ class CompositionRoot {
 							database: project.dbCredentials.database,
 						},
 					})
-					const knexDebugger = new KnexDebugger()
 					knexDebugger.register(knexInst)
 
 					return knexInst

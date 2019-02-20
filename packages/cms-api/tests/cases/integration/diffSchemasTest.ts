@@ -720,8 +720,8 @@ describe('Diff schemas', () => {
 				},
 			],
 		}
-		const sql = SQL`ALTER DOMAIN "postStatus" DROP CONSTRAINT "postStatus_check";
-		ALTER DOMAIN "postStatus" ADD CONSTRAINT "postStatus_check" CHECK (VALUE IN('publish','draft','auto-draft','SQL\\', \\'injection'));`
+		const sql = SQL`ALTER DOMAIN "postStatus" DROP CONSTRAINT postStatus_check;
+		ALTER DOMAIN "postStatus" ADD CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft','auto-draft','SQL\\', \\'injection'));`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})

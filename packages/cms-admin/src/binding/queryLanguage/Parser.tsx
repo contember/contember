@@ -516,7 +516,7 @@ namespace Parser {
 	}
 
 	export enum EntryPoint {
-		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].son.siblings[name != 'James'].name
+		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].son.siblings.name
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
 		RelativeEntityList = 'relativeEntityList' // E.g. genres(slug = 'sciFi').authors[age < 123]

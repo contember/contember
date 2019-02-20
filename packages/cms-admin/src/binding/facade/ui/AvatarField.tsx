@@ -17,15 +17,14 @@ export class AvatarField extends React.PureComponent<AvatarFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor) => (
+				{(data: FieldAccessor<string>) => (
 					<Avatar size={this.props.size} shape={this.props.shape}>
 						{data.currentValue &&
 							data.currentValue
-								.toString()
-								.split(' ')
+								.split(/\s+/)
+								.slice(0, 2)
 								.map(s => s.charAt(0).toLocaleUpperCase())
-								.join('')
-								.substring(0, 2)}
+								.join('')}
 					</Avatar>
 				)}
 			</Field>

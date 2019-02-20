@@ -15,6 +15,8 @@ import { Acl, Model } from 'cms-common'
 import KnexWrapper from '../core/knex/KnexWrapper'
 import { setupSystemVariables } from '../system-api/SystemVariablesSetupHelper'
 import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
+import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
+import KnexDebugger from '../core/knex/KnexDebugger'
 
 type KoaContext = AuthMiddlewareFactory.ContextWithAuth &
 	ContextWithRequest &
@@ -97,7 +99,7 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('done')
 
 						const apolloKoa = new Koa()
-						const server = this.createApolloServer(dataSchema, projectVariables, stage.schema.model, permissions)
+						const server = this.createApolloServer(dataSchema, projectVariables, stage.schema.model, permissions, projectContainer.get('knexDebugger'))
 						server.applyMiddleware({
 							app: apolloKoa,
 							path: '/',
@@ -121,13 +123,20 @@ class ContentMiddlewareFactory {
 		dataSchema: GraphQLSchema,
 		variables: Acl.VariablesMap,
 		schema: Model.Schema,
-		permissions: Acl.Permissions
+		permissions: Acl.Permissions,
+		knexDebugger: KnexDebugger,
 	) {
+
 		return new ApolloServer({
 			tracing: true,
 			introspection: true,
 			schema: dataSchema,
 			uploads: false,
+			extensions: [() => {
+				const queriesExt = new DbQueriesExtension()
+				knexDebugger.subscribe(query => queriesExt.addQuery(query))
+				return queriesExt
+			}],
 			context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {
 				const executionContainer = new ExecutionContainerFactory(schema, permissions).create({
 					db: ctx.state.db,

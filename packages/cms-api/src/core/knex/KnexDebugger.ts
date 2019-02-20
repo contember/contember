@@ -6,36 +6,57 @@ type Query = {
 	bindings: any
 }
 
+type Meta = { startTime: Date, elapsed?: number, error?: string }
+type Subscriber = (query: Query & Meta & { elapsed: number }) => void
+
 class KnexDebugger {
-	private queries: { [uuid: string]: Query & { startTime: Date } } = {}
+	private _queries: { [uuid: string]: Query & Meta } = {}
+
+	private subscribers: (Subscriber)[] = []
+
+	get queries() {
+		return this._queries
+	}
+
+	public subscribe(subscriber: Subscriber): void {
+		this.subscribers.push(subscriber)
+	}
 
 	public register(knex: Knex) {
 		knex
 			.on('query', (query: Query) => {
 				const uid = query.__knexQueryUid
-				this.queries[uid] = {
+				this._queries[uid] = {
 					...query,
 					startTime: new Date(),
 				}
 			})
 			.on('query-response', (response: any, query: Query) => {
 				const uid = query.__knexQueryUid
-				const q = this.queries[uid]
+				const q = this._queries[uid]
 				if (!q) {
 					return
 				}
-				console.log(query.sql)
-				console.log(JSON.stringify(query.bindings))
-				console.log('Elapsed time: ' + (new Date().getTime() - q.startTime.getTime()) + ' ms')
-				delete this.queries[uid]
+				delete this._queries[uid]
+				const q2 = {
+					...q,
+					elapsed: new Date().getTime() - q.startTime.getTime(),
+				}
+				this.subscribers.forEach(s => s(q2))
 			})
 			.on('query-error', (error: any, query: Query) => {
 				const uid = query.__knexQueryUid
-				delete this.queries[uid]
-				console.log('Query failed:')
-				console.log(error)
-				console.log(query.sql)
-				console.log(JSON.stringify(query.bindings))
+				const q = this._queries[uid]
+				if (!q) {
+					return
+				}
+				delete this._queries[uid]
+				const q2 = {
+					...q,
+					error,
+					elapsed: new Date().getTime() - q.startTime.getTime(),
+				}
+				this.subscribers.forEach(s => s(q2))
 			})
 	}
 }

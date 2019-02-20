@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { DataRendererProps, EnforceSubtypeRelation, Props, SyntheticChildrenProvider } from '../../coreComponents'
-import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
+import { EntityAccessor } from '../../dao'
 import { PersistButton, RemoveButton } from '../buttons'
 import { Repeater } from '../collections'
 import { Sortable, SortablePublicProps } from '../collections/Sortable'
+import { CollectionRenderer } from './CollectionRenderer'
 import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
-import { LoadingSpinner } from './userFeedback'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
 export interface MultiEditRendererProps extends CommonRendererProps, EntityCollectionPublicProps {
@@ -18,44 +18,40 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 	public static displayName = 'MultiEditRenderer'
 
 	public render() {
-		const data = this.props.data
-
-		if (!data) {
-			return <LoadingSpinner />
-		}
-
-		if (data.root instanceof EntityCollectionAccessor) {
-			return (
-				<>
-					{DefaultRenderer.renderTitle(this.props.title)}
-					{this.props.beforeContent}
-					{this.props.sortable === undefined && (
-						<Repeater.EntityCollection
-							entities={data.root}
-							enableUnlinkAll={this.props.enableUnlinkAll}
-							enableAddingNew={this.props.enableAddingNew}
-							enableUnlink={this.props.enableUnlink}
-							label={this.props.label}
-						>
-							{this.props.children}
-						</Repeater.EntityCollection>
-					)}
-					{this.props.sortable !== undefined && (
-						<Sortable
-							enableUnlinkAll={this.props.enableUnlinkAll}
-							enableAddingNew={this.props.enableAddingNew}
-							enableUnlink={this.props.enableUnlink}
-							label={this.props.label}
-							{...this.props.sortable}
-							entities={data.root}
-						>
-							{this.props.children}
-						</Sortable>
-					)}
-					{this.props.enablePersist !== false && <PersistButton />}
-				</>
-			)
-		}
+		return (
+			<CollectionRenderer data={this.props.data}>
+				{(rawData) => (
+					<>
+						{DefaultRenderer.renderTitle(this.props.title)}
+						{this.props.beforeContent}
+						{this.props.sortable === undefined && (
+							<Repeater.EntityCollection
+								entities={rawData}
+								enableUnlinkAll={this.props.enableUnlinkAll}
+								enableAddingNew={this.props.enableAddingNew}
+								enableUnlink={this.props.enableUnlink}
+								label={this.props.label}
+							>
+								{this.props.children}
+							</Repeater.EntityCollection>
+						)}
+						{this.props.sortable !== undefined && (
+							<Sortable
+								enableUnlinkAll={this.props.enableUnlinkAll}
+								enableAddingNew={this.props.enableAddingNew}
+								enableUnlink={this.props.enableUnlink}
+								label={this.props.label}
+								{...this.props.sortable}
+								entities={rawData}
+							>
+								{this.props.children}
+							</Sortable>
+						)}
+						{this.props.enablePersist !== false && <PersistButton />}
+					</>
+				)}
+			</CollectionRenderer>
+		)
 	}
 
 	public static generateSyntheticChildren(props: Props<MultiEditRendererProps>) {

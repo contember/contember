@@ -310,11 +310,11 @@ export default class SqlMigrator {
 
 	private updateEnum(modification: UpdateEnumModification) {
 		const joinedValues = modification.values.map(it => `'${escapeSqlString(it)}'`).join(',')
-		this.builder.sql(`ALTER DOMAIN "${modification.enumName}" DROP CONSTRAINT "${modification.enumName}_check"`)
+		this.builder.sql(`ALTER DOMAIN "${modification.enumName}" DROP CONSTRAINT ${modification.enumName}_check`)
 		this.builder.sql(
-			`ALTER DOMAIN "${modification.enumName}" ADD CONSTRAINT "${
+			`ALTER DOMAIN "${modification.enumName}" ADD CONSTRAINT ${
 				modification.enumName
-			}_check" CHECK (VALUE IN(${joinedValues}))`
+			}_check CHECK (VALUE IN(${joinedValues}))`
 		)
 	}
 

@@ -139,8 +139,13 @@ namespace Repeater {
 		}
 	}
 
-	export const filterEntities = (entities: EntityCollectionAccessor): EntityAccessor[] => {
-		return entities.entities.filter((item): item is EntityAccessor => item instanceof EntityAccessor)
+	export const filterEntities = (
+		entities: EntityCollectionAccessor,
+		excludeUnpersisted: boolean = false
+	): EntityAccessor[] => {
+		return entities.entities.filter(
+			(item): item is EntityAccessor => item instanceof EntityAccessor && (!excludeUnpersisted || item.isPersisted())
+		)
 	}
 }
 

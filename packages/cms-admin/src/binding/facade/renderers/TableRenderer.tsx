@@ -13,14 +13,17 @@ export class TableRenderer extends React.PureComponent<RendererProps> {
 					<>
 						{DefaultRenderer.renderTitle(this.props.title)}
 						{this.props.beforeContent}
-						<Table>
+						{!!entities.length && <Table>
 							{entities.map(value => (
 								<DataContext.Provider value={value} key={value.getKey()}>
 									{console.log(value)}
 									<Table.Row>{this.props.children}</Table.Row>
 								</DataContext.Provider>
 							))}
-						</Table>
+						</Table>}
+						{!!entities.length || <div>
+							There are no items to display.
+						</div>}
 					</>
 				)}
 			</CollectionRenderer>

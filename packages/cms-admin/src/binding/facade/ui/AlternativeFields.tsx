@@ -2,7 +2,7 @@ import cn from 'classnames'
 import * as React from 'react'
 import { Props } from '../../coreComponents'
 import { Environment } from '../../dao'
-import { RadioField, RadioFieldPublicProps } from '../fields'
+import { RadioFieldPublicProps, SelectField } from '../fields'
 import { ChoiceField } from '../fields/ChoiceField'
 
 export interface AlternativeFieldsProps extends RadioFieldPublicProps {
@@ -27,10 +27,9 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 						}
 						return (
 							<>
-								<RadioField.RadioFieldInner
+								<SelectField.SelectFieldInner
 									name={this.props.name}
 									label={this.props.label}
-									inline={this.props.inline !== false}
 									data={data}
 									currentValue={currentValue}
 									onChange={onChange}

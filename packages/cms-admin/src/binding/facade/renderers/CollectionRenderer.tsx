@@ -6,6 +6,7 @@ import { LoadingRenderer, LoadingRendererPublicProps } from './LoadingRenderer'
 export interface CollectionRendererPublicProps extends LoadingRendererPublicProps {}
 
 export interface CollectionRendererInternalProps {
+	includeUnpersisted?: boolean
 	children: (rawData: EntityCollectionAccessor, filteredData: EntityAccessor[]) => React.ReactNode
 }
 
@@ -20,7 +21,10 @@ export class CollectionRenderer extends React.PureComponent<CollectionRendererPr
 						return null
 					}
 
-					return this.props.children(data.root, Repeater.filterEntities(data.root))
+					return this.props.children(
+						data.root,
+						Repeater.filterEntities(data.root, this.props.includeUnpersisted !== true)
+					)
 				}}
 			</LoadingRenderer>
 		)

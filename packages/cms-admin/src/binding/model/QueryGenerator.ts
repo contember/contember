@@ -89,7 +89,9 @@ export class QueryGenerator {
 			const fieldValue: Marker = fields[placeholderName]
 
 			if (fieldValue instanceof FieldMarker) {
-				builder = builder.column(fieldValue.fieldName)
+				if (fieldValue.fieldName !== PRIMARY_KEY_NAME) {
+					builder = builder.column(fieldValue.fieldName)
+				}
 			} else if (fieldValue instanceof ReferenceMarker) {
 				for (const referenceName in fieldValue.references) {
 					const reference = fieldValue.references[referenceName]

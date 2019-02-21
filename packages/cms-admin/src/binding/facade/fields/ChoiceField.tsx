@@ -1,7 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { FieldName, Scalar } from '../../bindingTypes'
+import { FieldName, PRIMARY_KEY_NAME, Scalar } from '../../bindingTypes'
 import {
+	DataContext,
 	DataContextValue,
 	EnforceSubtypeRelation,
 	EntityListDataProvider,
@@ -17,12 +18,12 @@ import {
 	EntityCollectionAccessor,
 	Environment,
 	FieldAccessor,
-	Literal,
+	Literal, ReferenceMarker,
 	VariableLiteral,
 	VariableScalar
 } from '../../dao'
 import { VariableInputTransformer } from '../../model/VariableInputTransformer'
-import { QueryLanguage } from '../../queryLanguage'
+import { Parser, QueryLanguage } from '../../queryLanguage'
 
 export interface ChoiceFieldPublicProps {
 	name: FieldName
@@ -93,7 +94,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 								{metadata.children}
 							</EntityListDataProvider>
 							<ToOne field={fieldName}>
-								<Field name={metadata.fieldName} />
+								<Field name={PRIMARY_KEY_NAME} />
 							</ToOne>
 						</>
 					),
@@ -218,12 +219,13 @@ namespace ChoiceField {
 				throw new DataBindingError('Corrupted data')
 			}
 
-			const metadata = QueryLanguage.wrapQualifiedFieldList(
+			const { fieldName, toOneProps } = Parser.parseQueryLanguageExpression(
 				this.props.options,
-				fieldName => <Field name={fieldName} />,
+				Parser.EntryPoint.QualifiedFieldList,
 				this.props.environment
 			)
-			const fieldAccessor = data.data.getTreeRoot(metadata.fieldName)
+
+			const fieldAccessor = data.data.getTreeRoot(fieldName)
 			const currentValueEntity = data.data.getField(this.props.fieldName)
 
 			if (!(fieldAccessor instanceof AccessorTreeRoot) || !(currentValueEntity instanceof EntityAccessor)) {
@@ -239,14 +241,36 @@ namespace ChoiceField {
 				(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor && !!accessor.getPersistedKey()
 			)
 
+			const optionEntities: EntityAccessor[] = []
+
+			for (let entity of filteredData) {
+				for (let i = toOneProps.length - 1; i >= 0; i--) {
+					const props = toOneProps[i]
+
+					const field = entity.data.getField(
+						props.field,
+						ReferenceMarker.ExpectedCount.UpToOne,
+						VariableInputTransformer.transformFilter(props.filter, this.props.environment),
+						props.reducedBy
+					)
+
+					if (field instanceof EntityAccessor) {
+						entity = field
+					} else {
+						throw new DataBindingError('Corrupted data')
+					}
+				}
+				optionEntities.push(entity)
+			}
+
 			const currentKey = currentValueEntity.getKey()
 			const currentValue: ChoiceField.ValueRepresentation = filteredData.findIndex(entity => {
 				const key = entity.getPersistedKey()
 				return !!key && key === currentKey
 			})
-			const normalizedData = filteredData.map(
+			const normalizedData = optionEntities.map(
 				(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.DynamicValue] => {
-					const field = item.data.getField(metadata.fieldName)
+					const field = item.data.getField(fieldName)
 					const label: Label = field instanceof FieldAccessor ? field.currentValue : undefined
 
 					return [i, label, item.primaryKey]

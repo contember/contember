@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { Select } from '../../src/components/ui/Select'
+import * as React from 'react'
+import { Select } from '../../src/components/ui'
 
 storiesOf('Select', module).add('simple', () => (
 	<Select

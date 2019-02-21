@@ -4,9 +4,9 @@ class Select extends React.PureComponent<Select.Props> {
 	render() {
 		return (
 			<div className="select-wrap">
-				<select onChange={this.props.onChange} className="select">
+				<select onChange={this.props.onChange} value={this.props.value} className="select">
 					{this.props.options.map(option => (
-						<option value={option.value} disabled={option.disabled} selected={this.props.value === option.value}>
+						<option value={option.value} disabled={option.disabled} key={option.value}>
 							{option.label}
 						</option>
 					))}

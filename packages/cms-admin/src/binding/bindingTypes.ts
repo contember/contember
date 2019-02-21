@@ -11,6 +11,8 @@ export type RelativeEntityList = string
 export type FieldName = string
 export type EntityName = string
 
+export const PRIMARY_KEY_NAME = 'id'
+
 export type Scalar = string | number | boolean | null
 export type ReceivedFieldData<A = never> = Scalar | ReceivedEntityData<A> | Array<ReceivedEntityData<A> | A>
 export type ReceivedEntityData<A = never> =

@@ -1,6 +1,6 @@
 import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import { assertNever, Input, isEmptyObject } from 'cms-common'
-import { EntityName, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
+import { EntityName, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
 	DataBindingError,
@@ -20,8 +20,6 @@ type Queries = 'get' | 'list'
 type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQueryBuilder.CrudQueryBuilder, Queries>>
 
 export class MutationGenerator {
-	private static readonly PRIMARY_KEY_NAME = 'id'
-
 	private createCounter: number = 0
 
 	public constructor(
@@ -109,14 +107,14 @@ export class MutationGenerator {
 		return queryBuilder.delete(
 			`delete${entityName}`,
 			builder => {
-				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+				builder = builder.column(PRIMARY_KEY_NAME)
 
 				let where = {}
 				if (constraints && constraints.whereType === 'unique') {
 					where = constraints.where
 				}
 
-				return builder.where({ ...where, [MutationGenerator.PRIMARY_KEY_NAME]: entity.primaryKey })
+				return builder.where({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
 			`delete${entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`
 		)
@@ -143,14 +141,14 @@ export class MutationGenerator {
 		return queryBuilder.update(
 			`update${entityName}`,
 			builder => {
-				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+				builder = builder.column(PRIMARY_KEY_NAME)
 
 				let where = {}
 				if (constraints && constraints.whereType === 'unique') {
 					where = constraints.where
 				}
 
-				builder = builder.where({ ...where, [MutationGenerator.PRIMARY_KEY_NAME]: primaryKey })
+				builder = builder.where({ ...where, [PRIMARY_KEY_NAME]: primaryKey })
 
 				return builder.data(builder => this.registerUpdateMutationPart(entity, entityFields, data, builder))
 			},
@@ -172,7 +170,7 @@ export class MutationGenerator {
 		return queryBuilder.create(
 			`create${entityName}`,
 			builder => {
-				builder = builder.column(MutationGenerator.PRIMARY_KEY_NAME)
+				builder = builder.column(PRIMARY_KEY_NAME)
 
 				return builder.data(
 					this.registerCreateMutationPart(
@@ -268,7 +266,7 @@ export class MutationGenerator {
 							builder = builder.one(
 								placeholderName,
 								createOneRelationBuilder.connect({
-									[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+									[PRIMARY_KEY_NAME]: accessor.primaryKey
 								})
 							)
 						}
@@ -284,7 +282,7 @@ export class MutationGenerator {
 								const innerBuilder = this.createCreateDataBuilderByReference(reference)
 								builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 							} else {
-								builder = builder.connect({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey })
+								builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey })
 							}
 						}
 						return builder
@@ -386,12 +384,9 @@ export class MutationGenerator {
 										this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder)
 									)
 
-									if (
-										!persistedField ||
-										(persistedField && accessor.primaryKey !== persistedField[MutationGenerator.PRIMARY_KEY_NAME])
-									) {
+									if (!persistedField || (persistedField && accessor.primaryKey !== persistedField[PRIMARY_KEY_NAME])) {
 										return updated.connect({
-											[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+											[PRIMARY_KEY_NAME]: accessor.primaryKey
 										})
 									}
 									return updated
@@ -429,16 +424,13 @@ export class MutationGenerator {
 									const innerBuilder = this.createCreateDataBuilderByReference(reference)
 									builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 								} else {
-									builder = builder.update({ [MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey }, builder => {
+									builder = builder.update({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, builder => {
 										return this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder)
 									})
 
-									if (
-										!persistedField ||
-										(persistedField && accessor.primaryKey !== persistedField[MutationGenerator.PRIMARY_KEY_NAME])
-									) {
+									if (!persistedField || (persistedField && accessor.primaryKey !== persistedField[PRIMARY_KEY_NAME])) {
 										builder = builder.connect({
-											[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+											[PRIMARY_KEY_NAME]: accessor.primaryKey
 										})
 									}
 								}
@@ -447,11 +439,11 @@ export class MutationGenerator {
 
 								if (removalType === EntityAccessor.RemovalType.Delete) {
 									builder = builder.delete({
-										[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+										[PRIMARY_KEY_NAME]: accessor.primaryKey
 									})
 								} else if (removalType === EntityAccessor.RemovalType.Disconnect) {
 									builder = builder.disconnect({
-										[MutationGenerator.PRIMARY_KEY_NAME]: accessor.primaryKey
+										[PRIMARY_KEY_NAME]: accessor.primaryKey
 									})
 								} else {
 									assertNever(removalType)

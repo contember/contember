@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
-import { FieldName, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
+import { FieldName, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
 	DataBindingError,
@@ -20,8 +20,6 @@ type OnReplace = EntityAccessor['replaceWith']
 type OnUnlink = EntityAccessor['remove']
 
 export class AccessorTreeGenerator {
-	private static readonly PRIMARY_KEY_NAME = 'id'
-
 	public constructor(private tree: MarkerTreeRoot, private allInitialData: any) {}
 
 	public generateLiveTree(updateData: (newData?: AccessorTreeRoot) => void): void {
@@ -126,10 +124,10 @@ export class AccessorTreeGenerator {
 		onUnlink?: OnUnlink
 	): EntityAccessor {
 		const entityData: EntityData.EntityData = {}
-		const id = data ? data[AccessorTreeGenerator.PRIMARY_KEY_NAME] : undefined
+		const id = data ? data[PRIMARY_KEY_NAME] : undefined
 
 		for (const placeholderName in fields) {
-			if (placeholderName === AccessorTreeGenerator.PRIMARY_KEY_NAME) {
+			if (placeholderName === PRIMARY_KEY_NAME) {
 				continue
 			}
 

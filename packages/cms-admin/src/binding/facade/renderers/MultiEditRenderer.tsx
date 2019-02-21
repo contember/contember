@@ -20,7 +20,7 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 	public render() {
 		return (
 			<CollectionRenderer data={this.props.data}>
-				{(rawData) => (
+				{rawData => (
 					<>
 						{DefaultRenderer.renderTitle(this.props.title)}
 						{this.props.beforeContent}

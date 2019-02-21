@@ -1,5 +1,6 @@
 import { CrudQueryBuilder } from 'cms-client'
 import { assertNever, ucfirst } from 'cms-common'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFields,
 	EntityListTreeConstraints,
@@ -82,7 +83,7 @@ export class QueryGenerator {
 		fields: EntityFields,
 		builder: CrudQueryBuilder.ListQueryBuilder
 	): IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder> {
-		builder = builder.column('id')
+		builder = builder.column(PRIMARY_KEY_NAME)
 
 		for (const placeholderName in fields) {
 			const fieldValue: Marker = fields[placeholderName]

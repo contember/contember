@@ -9,6 +9,10 @@ export class EntityForRemovalAccessor implements EntityAccessor {
 		public readonly removalType: EntityAccessor.RemovalType
 	) {}
 
+	public isPersisted(): boolean {
+		return true
+	}
+
 	public getKey() {
 		return this.primaryKey
 	}

@@ -12,6 +12,10 @@ class EntityAccessor {
 		this.primaryKey = primaryKey || new EntityAccessor.UnpersistedEntityID()
 	}
 
+	public isPersisted(): boolean {
+		return typeof this.primaryKey === 'string'
+	}
+
 	public getKey() {
 		return this.primaryKey instanceof EntityAccessor.UnpersistedEntityID ? this.primaryKey.value : this.primaryKey
 	}

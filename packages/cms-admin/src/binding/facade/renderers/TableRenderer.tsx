@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Table } from '../../../components'
-import { DataContext } from '../../coreComponents'
+import { DataContext, DataRendererProps } from '../../coreComponents'
 import { CollectionRenderer } from './CollectionRenderer'
-import { RendererProps } from './CommonRendererProps'
+import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
 
-export interface TableRendererProps {
+export interface TableRendererProps extends CommonRendererProps {
 	tableHeader?: React.ReactNode
 }
 
-export class TableRenderer extends React.PureComponent<RendererProps & TableRendererProps> {
+export class TableRenderer extends React.PureComponent<DataRendererProps & TableRendererProps> {
 	public render() {
 		return (
 			<CollectionRenderer data={this.props.data}>

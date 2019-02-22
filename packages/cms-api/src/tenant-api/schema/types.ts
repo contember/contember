@@ -35,6 +35,7 @@ export interface Mutation {
 	readonly signIn?: SignInResponse | null
 	readonly addProjectMember?: AddProjectMemberResponse | null
 	readonly updateProjectMemberVariables?: UpdateProjectMemberVariablesResponse | null
+	readonly createApiKey?: CreateApiKeyResponse | null
 }
 
 export interface SetupResponse {
@@ -120,6 +121,24 @@ export interface UpdateProjectMemberVariablesError {
 	readonly developerMessage?: string | null
 }
 
+export interface CreateApiKeyResponse {
+	readonly ok: boolean
+	readonly errors: ReadonlyArray<CreateApiKeyError>
+	readonly result?: CreateApiKeyResult | null
+}
+
+export interface CreateApiKeyError {
+	readonly code: CreateApiKeyErrorCode
+	readonly endUserMessage?: string | null
+	readonly developerMessage?: string | null
+}
+
+export interface CreateApiKeyResult {
+	readonly id: string
+	readonly token: string
+	readonly identity: IdentityWithoutPerson
+}
+
 export interface SetupError {
 	readonly code: SetupErrorCode
 	readonly endPersonMessage?: string | null
@@ -134,6 +153,12 @@ export interface AdminCredentials {
 export interface VariableUpdate {
 	readonly name: string
 	readonly values: ReadonlyArray<string>
+}
+
+export interface ApiKeyProjectInput {
+	readonly projectId: string
+	readonly roles?: ReadonlyArray<string> | null
+	readonly variables?: ReadonlyArray<VariableUpdate> | null
 }
 export interface SetupMutationArgs {
 	superadmin: AdminCredentials
@@ -156,6 +181,10 @@ export interface UpdateProjectMemberVariablesMutationArgs {
 	projectId: string
 	identityId: string
 	variables: ReadonlyArray<VariableUpdate>
+}
+export interface CreateApiKeyMutationArgs {
+	roles?: ReadonlyArray<string> | null
+	projects?: ReadonlyArray<ApiKeyProjectInput> | null
 }
 
 export enum SetupErrorCode {
@@ -180,6 +209,11 @@ export enum AddProjectMemberErrorCode {
 export enum UpdateProjectMemberVariablesErrorCode {
 	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
 	IDENTITY_NOT_FOUND = 'IDENTITY_NOT_FOUND',
+	VARIABLE_NOT_FOUND = 'VARIABLE_NOT_FOUND',
+}
+
+export enum CreateApiKeyErrorCode {
+	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
 	VARIABLE_NOT_FOUND = 'VARIABLE_NOT_FOUND',
 }
 
@@ -232,6 +266,7 @@ export namespace MutationResolvers {
 		signIn?: SignInResolver
 		addProjectMember?: AddProjectMemberResolver
 		updateProjectMemberVariables?: UpdateProjectMemberVariablesResolver
+		createApiKey?: CreateApiKeyResolver
 	}
 
 	export type SetupResolver<R = SetupResponse | null> = Resolver<R, SetupArgs>
@@ -267,6 +302,12 @@ export namespace MutationResolvers {
 		projectId: string
 		identityId: string
 		variables: ReadonlyArray<VariableUpdate>
+	}
+
+	export type CreateApiKeyResolver<R = CreateApiKeyResponse | null> = Resolver<R, CreateApiKeyArgs>
+	export interface CreateApiKeyArgs {
+		roles?: ReadonlyArray<string> | null
+		projects?: ReadonlyArray<ApiKeyProjectInput> | null
 	}
 }
 
@@ -434,6 +475,42 @@ export namespace UpdateProjectMemberVariablesErrorResolvers {
 	export type CodeResolver<R = UpdateProjectMemberVariablesErrorCode> = Resolver<R>
 	export type EndUserMessageResolver<R = string | null> = Resolver<R>
 	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
+}
+
+export namespace CreateApiKeyResponseResolvers {
+	export interface Resolvers {
+		ok?: OkResolver
+		errors?: ErrorsResolver
+		result?: ResultResolver
+	}
+
+	export type OkResolver<R = boolean> = Resolver<R>
+	export type ErrorsResolver<R = ReadonlyArray<CreateApiKeyError>> = Resolver<R>
+	export type ResultResolver<R = CreateApiKeyResult | null> = Resolver<R>
+}
+
+export namespace CreateApiKeyErrorResolvers {
+	export interface Resolvers {
+		code?: CodeResolver
+		endUserMessage?: EndUserMessageResolver
+		developerMessage?: DeveloperMessageResolver
+	}
+
+	export type CodeResolver<R = CreateApiKeyErrorCode> = Resolver<R>
+	export type EndUserMessageResolver<R = string | null> = Resolver<R>
+	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
+}
+
+export namespace CreateApiKeyResultResolvers {
+	export interface Resolvers {
+		id?: IdResolver
+		token?: TokenResolver
+		identity?: IdentityResolver
+	}
+
+	export type IdResolver<R = string> = Resolver<R>
+	export type TokenResolver<R = string> = Resolver<R>
+	export type IdentityResolver<R = IdentityWithoutPerson> = Resolver<R>
 }
 
 export namespace SetupErrorResolvers {

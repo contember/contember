@@ -5,6 +5,7 @@ namespace Actions {
 		system = 'system',
 		person = 'person',
 		project = 'project',
+		apiKey = 'apiKey',
 	}
 
 	export const SYSTEM_SETUP: Authorizator.Action = [Resources.system, 'setup']
@@ -14,6 +15,8 @@ namespace Actions {
 
 	export const PROJECT_ADD_MEMBER: Authorizator.Action = [Resources.project, 'addMember']
 	export const PROJECT_UPDATE_MEMBER_VARIABLES: Authorizator.Action = [Resources.project, 'updateMemberVariables']
+
+	export const API_KEY_CREATE: Authorizator.Action = [Resources.apiKey, 'create']
 }
 
 export default Actions

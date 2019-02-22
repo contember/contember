@@ -21,6 +21,7 @@ const schema: DocumentNode = gql`
 			identityId: String!
 			variables: [VariableUpdate!]!
 		): UpdateProjectMemberVariablesResponse
+		createApiKey(roles: [String!], projects: [ApiKeyProjectInput!]): CreateApiKeyResponse
 	}
 
 	# === setUp ===
@@ -115,11 +116,6 @@ const schema: DocumentNode = gql`
 
 	# === updateProjectMemberVariables ===
 
-	input VariableUpdate {
-		name: String!
-		values: [String!]!
-	}
-
 	type UpdateProjectMemberVariablesResponse {
 		ok: Boolean!
 		errors: [UpdateProjectMemberVariablesError!]!
@@ -137,7 +133,43 @@ const schema: DocumentNode = gql`
 		VARIABLE_NOT_FOUND
 	}
 
+	# === createApiKey ===
+
+	input ApiKeyProjectInput {
+		projectId: String!
+		roles: [String!]
+		variables: [VariableUpdate!]
+	}
+
+	type CreateApiKeyResponse {
+		ok: Boolean!
+		errors: [CreateApiKeyError!]!
+		result: CreateApiKeyResult
+	}
+
+	type CreateApiKeyError {
+		code: CreateApiKeyErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum CreateApiKeyErrorCode {
+		PROJECT_NOT_FOUND
+		VARIABLE_NOT_FOUND
+	}
+
+	type CreateApiKeyResult {
+		id: String!
+		token: String!
+		identity: IdentityWithoutPerson!
+	}
+
 	# === common ===
+	input VariableUpdate {
+		name: String!
+		values: [String!]!
+	}
+
 	type Person {
 		id: String!
 		email: String!

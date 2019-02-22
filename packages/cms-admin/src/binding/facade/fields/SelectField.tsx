@@ -9,6 +9,7 @@ export interface SelectFieldPublicProps {
 	name: FieldName
 	label?: FormGroupProps['label']
 	firstOptionCaption?: string
+	allowNull?: boolean
 }
 
 export interface SelectFieldInternalProps {
@@ -25,6 +26,7 @@ class SelectField extends Component<SelectFieldProps>(props => {
 					<SelectField.SelectFieldInner
 						name={props.name}
 						label={props.label}
+						allowNull={props.allowNull}
 						firstOptionCaption={props.firstOptionCaption}
 						data={data}
 						currentValue={currentValue}
@@ -49,7 +51,7 @@ namespace SelectField {
 		public render() {
 			const options: Select.Option[] = [
 				{
-					disabled: true,
+					disabled: this.props.allowNull !== true,
 					value: -1,
 					label: this.props.firstOptionCaption || (typeof this.props.label === 'string' ? this.props.label : '')
 				}

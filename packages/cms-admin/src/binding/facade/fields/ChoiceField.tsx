@@ -228,6 +228,7 @@ namespace ChoiceField {
 			const fieldAccessor = data.data.getTreeRoot(fieldName)
 			const currentValueEntity = data.data.getField(this.props.fieldName)
 
+			// TODO handle when currentValueEntity is disconnected
 			if (!(fieldAccessor instanceof AccessorTreeRoot) || !(currentValueEntity instanceof EntityAccessor)) {
 				throw new DataBindingError('Corrupted data')
 			}
@@ -281,7 +282,11 @@ namespace ChoiceField {
 				normalizedData,
 				currentValue === -1 ? null : currentValue,
 				(newValue: ChoiceField.ValueRepresentation) => {
-					currentValueEntity.replaceWith(filteredData[newValue])
+					if (newValue === -1 && currentValueEntity.remove) {
+						currentValueEntity.remove(EntityAccessor.RemovalType.Disconnect)
+					} else {
+						currentValueEntity.replaceWith(filteredData[newValue])
+					}
 				},
 				this.props.environment
 			)

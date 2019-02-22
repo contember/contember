@@ -10,7 +10,7 @@ import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../mod
 import { MetaOperationsContext, MetaOperationsContextValue } from './MetaOperationsContext'
 
 export interface DataRendererProps {
-	data: AccessorTreeRoot | undefined
+	data?: AccessorTreeRoot | undefined
 }
 
 export interface DataProviderOwnProps<DRP> {

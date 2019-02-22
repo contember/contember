@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
+import { assertNever } from 'cms-common'
 import * as React from 'react'
 import { FieldName, PRIMARY_KEY_NAME, Scalar } from '../../bindingTypes'
 import {
-	DataContext,
 	DataContextValue,
 	EnforceSubtypeRelation,
 	EntityListDataProvider,
@@ -16,6 +16,7 @@ import {
 	DataBindingError,
 	EntityAccessor,
 	EntityCollectionAccessor,
+	EntityForRemovalAccessor,
 	Environment,
 	FieldAccessor,
 	Literal,
@@ -230,7 +231,10 @@ namespace ChoiceField {
 			const currentValueEntity = data.data.getField(this.props.fieldName)
 
 			// TODO handle when currentValueEntity is disconnected
-			if (!(fieldAccessor instanceof AccessorTreeRoot) || !(currentValueEntity instanceof EntityAccessor)) {
+			if (
+				!(fieldAccessor instanceof AccessorTreeRoot) ||
+				!(currentValueEntity instanceof EntityAccessor || currentValueEntity instanceof EntityForRemovalAccessor)
+			) {
 				throw new DataBindingError('Corrupted data')
 			}
 
@@ -265,11 +269,19 @@ namespace ChoiceField {
 				optionEntities.push(entity)
 			}
 
-			const currentKey = currentValueEntity.getKey()
-			const currentValue: ChoiceField.ValueRepresentation = filteredData.findIndex(entity => {
-				const key = entity.getPersistedKey()
-				return !!key && key === currentKey
-			})
+			let currentValue: ChoiceField.ValueRepresentation
+
+			if (currentValueEntity instanceof EntityAccessor) {
+				const currentKey = currentValueEntity.getKey()
+				currentValue = filteredData.findIndex(entity => {
+					const key = entity.getPersistedKey()
+					return !!key && key === currentKey
+				})
+			} else if (currentValueEntity instanceof EntityForRemovalAccessor) {
+				currentValue = -1
+			} else {
+				return assertNever(currentValueEntity)
+			}
 			const normalizedData = optionEntities.map(
 				(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.DynamicValue] => {
 					const field = item.data.getField(fieldName)
@@ -283,8 +295,10 @@ namespace ChoiceField {
 				normalizedData,
 				currentValue === -1 ? null : currentValue,
 				(newValue: ChoiceField.ValueRepresentation) => {
-					if (newValue === -1 && currentValueEntity.remove) {
-						currentValueEntity.remove(EntityAccessor.RemovalType.Disconnect)
+					if (newValue === -1) {
+						if (currentValueEntity instanceof EntityAccessor && currentValueEntity.remove) {
+							currentValueEntity.remove(EntityAccessor.RemovalType.Disconnect)
+						}
 					} else {
 						currentValueEntity.replaceWith(filteredData[newValue])
 					}

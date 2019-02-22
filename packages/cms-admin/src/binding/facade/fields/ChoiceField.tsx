@@ -18,7 +18,8 @@ import {
 	EntityCollectionAccessor,
 	Environment,
 	FieldAccessor,
-	Literal, ReferenceMarker,
+	Literal,
+	ReferenceMarker,
 	VariableLiteral,
 	VariableScalar
 } from '../../dao'

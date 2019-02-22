@@ -5,7 +5,11 @@ import { CollectionRenderer } from './CollectionRenderer'
 import { RendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
 
-export class TableRenderer extends React.PureComponent<RendererProps> {
+export interface TableRendererProps {
+	tableHeader?: React.ReactNode
+}
+
+export class TableRenderer extends React.PureComponent<RendererProps & TableRendererProps> {
 	public render() {
 		return (
 			<CollectionRenderer data={this.props.data}>
@@ -13,11 +17,11 @@ export class TableRenderer extends React.PureComponent<RendererProps> {
 					<>
 						{DefaultRenderer.renderTitle(this.props.title)}
 						{this.props.beforeContent}
-						{!!entities.length && (
+						{(entities.length > 0 || this.props.tableHeader) && (
 							<Table>
+								{this.props.tableHeader}
 								{entities.map(value => (
 									<DataContext.Provider value={value} key={value.getKey()}>
-										{console.log(value)}
 										<Table.Row>{this.props.children}</Table.Row>
 									</DataContext.Provider>
 								))}

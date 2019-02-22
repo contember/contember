@@ -8,6 +8,15 @@ import Identity from '../type/Identity'
 import CreateApiKey from '../commands/CreateApiKey'
 import DisableOneOffApiKeyCommand from '../commands/DisableOneOffApiKeyCommand'
 import ProlongApiKey from '../commands/ProlongApiKey'
+import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
+import AddProjectMemberCommand from '../commands/AddProjectMemberCommand'
+import {
+	AddProjectMemberErrorCode,
+	CreateApiKeyErrorCode,
+	UpdateProjectMemberVariablesErrorCode,
+} from '../../schema/types'
+import ImplementationException from '../../../core/exceptions/ImplementationException'
+import { mapValues } from '../../utils/mapValue'
 
 class ApiKeyManager {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
@@ -35,16 +44,68 @@ class ApiKeyManager {
 		return (await new CreateApiKey(ApiKey.Type.SESSION, identityId, expiration).execute(this.db)).token
 	}
 
-	async createLoginApiKey(): Promise<ApiKeyManager.CreateLoginApiKeyResult> {
-		return await this.db.transaction(async db => {
-			const identityId = await new CreateIdentityCommand([Identity.SystemRole.LOGIN]).execute(db)
-			const apiKeyResult = await new CreateApiKey(ApiKey.Type.PERMANENT, identityId).execute(db)
-			return new ApiKeyManager.CreateLoginApiKeyResult(identityId, apiKeyResult)
-		})
+	async createLoginApiKey(): Promise<ApiKeyManager.CreateApiKeyResult> {
+		const response = await this.createPermanentApiKey([Identity.SystemRole.LOGIN], [])
+		if (!response.ok) {
+			throw new ImplementationException(response.errors.join(', '))
+		}
+		return response.result
 	}
 
 	async disableOneOffApiKey(apiKeyId: string): Promise<void> {
 		await new DisableOneOffApiKeyCommand(apiKeyId).execute(this.db)
+	}
+
+	async createPermanentApiKey(
+		roles: string[],
+		projects: { id: string; roles: string[]; variables: UpdateProjectMemberVariablesCommand.VariableUpdate[] }[]
+	): Promise<ApiKeyManager.CreateApiKeyResponse> {
+		return await this.db.transaction(async db => {
+			const identityId = await new CreateIdentityCommand(roles).execute(db)
+			const apiKeyResult = await new CreateApiKey(ApiKey.Type.PERMANENT, identityId).execute(db)
+
+			const addMemberResponses = (await Promise.all(
+				projects.map(async project => {
+					return new AddProjectMemberCommand(project.id, identityId, project.roles).execute(db)
+				})
+			))
+				.filter((it): it is AddProjectMemberCommand.AddProjectMemberResponseError => !it.ok)
+				.map(it => it.errors)
+				.map(
+					mapValues<AddProjectMemberErrorCode, CreateApiKeyErrorCode>({
+						[AddProjectMemberErrorCode.PROJECT_NOT_FOUND]: CreateApiKeyErrorCode.PROJECT_NOT_FOUND,
+						[AddProjectMemberErrorCode.IDENTITY_NOT_FOUND]: ImplementationException.Throw,
+						[AddProjectMemberErrorCode.ALREADY_MEMBER]: ImplementationException.Throw,
+					})
+				)
+				.reduce((acc, val) => [...acc, ...val], [])
+
+			if (addMemberResponses.length > 0) {
+				return new ApiKeyManager.CreateApiKeyResponseError(addMemberResponses)
+			}
+
+			const updateVariablesResponses = (await Promise.all(
+				projects.filter(project => project.variables.length > 0).map(project => {
+					return new UpdateProjectMemberVariablesCommand(project.id, identityId, project.variables).execute(db)
+				})
+			))
+				.filter((it): it is UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponseError => !it.ok)
+				.map(it => it.errors)
+				.map(
+					mapValues<UpdateProjectMemberVariablesErrorCode, CreateApiKeyErrorCode>({
+						[UpdateProjectMemberVariablesErrorCode.VARIABLE_NOT_FOUND]: CreateApiKeyErrorCode.VARIABLE_NOT_FOUND,
+						[UpdateProjectMemberVariablesErrorCode.PROJECT_NOT_FOUND]: ImplementationException.Throw,
+						[UpdateProjectMemberVariablesErrorCode.IDENTITY_NOT_FOUND]: ImplementationException.Throw,
+					})
+				)
+				.reduce((acc, val) => [...acc, ...val], [])
+
+			if (updateVariablesResponses.length > 0) {
+				return new ApiKeyManager.CreateApiKeyResponseError(updateVariablesResponses)
+			}
+
+			return new ApiKeyManager.CreateApiKeyResponseOk(new ApiKeyManager.CreateApiKeyResult(identityId, apiKeyResult))
+		})
 	}
 }
 
@@ -53,6 +114,7 @@ namespace ApiKeyManager {
 
 	export class VerifyResultOk {
 		readonly valid = true
+
 		constructor(
 			public readonly identityId: string,
 			public readonly apiKeyId: string,
@@ -62,6 +124,7 @@ namespace ApiKeyManager {
 
 	export class VerifyResultError {
 		readonly valid = false
+
 		constructor(public readonly error: VerifyErrorCode) {}
 	}
 
@@ -71,7 +134,21 @@ namespace ApiKeyManager {
 		EXPIRED = 'expired',
 	}
 
-	export class CreateLoginApiKeyResult {
+	export type CreateApiKeyResponse = CreateApiKeyResponseOk | CreateApiKeyResponseError
+
+	export class CreateApiKeyResponseOk {
+		public readonly ok = true
+
+		constructor(public readonly result: CreateApiKeyResult) {}
+	}
+
+	export class CreateApiKeyResponseError {
+		public readonly ok = false
+
+		constructor(public readonly errors: CreateApiKeyErrorCode[]) {}
+	}
+
+	export class CreateApiKeyResult {
 		constructor(public readonly identityId: string, public readonly apiKey: CreateApiKey.Result) {}
 	}
 }

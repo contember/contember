@@ -31,6 +31,7 @@ import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
 import KnexDebugger from './core/knex/KnexDebugger'
 import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
 import ContentApolloServerFactory from './http/ContentApolloServerFactory'
+import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -183,6 +184,10 @@ class CompositionRoot {
 				'updateProjectMemberVariablesMutationResolver',
 				({ projectMemberManager }) => new UpdateProjectMemberVariablesMutationResolver(projectMemberManager)
 			)
+			.addService(
+				'createApiKeyMutationResolver',
+				({ apiKeyManager }) => new CreateApiKeyMutationResolver(apiKeyManager)
+			)
 
 			.addService(
 				'resolvers',
@@ -193,6 +198,7 @@ class CompositionRoot {
 					addProjectMemberMutationResolver,
 					setupMutationResolver,
 					updateProjectMemberVariablesMutationResolver,
+					createApiKeyMutationResolver,
 				}) => {
 					return new ResolverFactory(
 						meQueryResolver,
@@ -200,7 +206,8 @@ class CompositionRoot {
 						signInMutationResolver,
 						addProjectMemberMutationResolver,
 						setupMutationResolver,
-						updateProjectMemberVariablesMutationResolver
+						updateProjectMemberVariablesMutationResolver,
+						createApiKeyMutationResolver
 					).create()
 				}
 			)

@@ -8,6 +8,7 @@ import { Config } from 'apollo-server-core'
 import SetupMutationResolver from './mutation/SetupMutationResolver'
 import UpdateProjectMemberVariablesMutationResolver from './mutation/UpdateProjectMemberVariablesMutationResolver'
 import ResolverContext from './ResolverContext'
+import CreateApiKeyMutationResolver from './mutation/CreateApiKeyMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -16,7 +17,8 @@ class ResolverFactory {
 		private signInMutationResolver: SignInMutationResolver,
 		private addProjectMemberMutationResolver: AddProjectMemberMutationResolver,
 		private setupMutationResolver: SetupMutationResolver,
-		private updateProjectMemberVariablesMutationResolver: UpdateProjectMemberVariablesMutationResolver
+		private updateProjectMemberVariablesMutationResolver: UpdateProjectMemberVariablesMutationResolver,
+		private createApiKeyMutationResolver: CreateApiKeyMutationResolver
 	) {}
 
 	create(): Config['resolvers'] {
@@ -87,6 +89,19 @@ class ResolverFactory {
 						this.updateProjectMemberVariablesMutationResolver,
 						parent,
 						args as MutationResolvers.UpdateProjectMemberVariablesArgs,
+						context,
+						info
+					),
+				createApiKey: (
+					parent: any,
+					args: ResolverFactory.FieldResolverArgs,
+					context: ResolverContext,
+					info: GraphQLResolveInfo
+				) =>
+					this.createApiKeyMutationResolver.createApiKey.call(
+						this.createApiKeyMutationResolver,
+						parent,
+						args as MutationResolvers.CreateApiKeyArgs,
 						context,
 						info
 					),

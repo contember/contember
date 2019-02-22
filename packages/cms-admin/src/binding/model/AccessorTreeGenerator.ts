@@ -228,6 +228,13 @@ export class AccessorTreeGenerator {
 		onUpdate: OnUpdate,
 		entityData: EntityData.EntityData
 	): EntityAccessor {
+		const onRemove = (removalType: EntityAccessor.RemovalType) => {
+			onUpdate(
+				reference.placeholderName,
+				(entityData[reference.placeholderName] = this.removeEntity(entityData[reference.placeholderName], removalType))
+			)
+		}
+
 		return this.updateFields(
 			fieldData,
 			reference.fields,
@@ -242,14 +249,14 @@ export class AccessorTreeGenerator {
 			},
 			replacement => {
 				const entityAccessor = entityData[reference.placeholderName]
-				if (entityAccessor instanceof EntityAccessor) {
+				if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
 					onUpdate(
 						reference.placeholderName,
-						(entityData[reference.placeholderName] = this.asDifferentEntity(entityAccessor, replacement))
+						(entityData[reference.placeholderName] = this.asDifferentEntity(entityAccessor, replacement, onRemove))
 					)
 				}
 			},
-			() => onUpdate(reference.placeholderName, (entityData[reference.placeholderName] = undefined))
+			onRemove
 		)
 	}
 
@@ -264,7 +271,12 @@ export class AccessorTreeGenerator {
 				(collectionAccessor = new EntityCollectionAccessor(collectionAccessor.entities, collectionAccessor.addNew))
 			)
 		}
+		const getOnRemove = (i: number) => (removalType: EntityAccessor.RemovalType) => {
+			collectionAccessor.entities[i] = this.removeEntity(collectionAccessor.entities[i], removalType)
+			update()
+		}
 		const generateNewAccessor = (i: number): EntityAccessor => {
+			const onRemove = getOnRemove(i)
 			return this.updateFields(
 				Array.isArray(fieldData) ? fieldData[i] : undefined,
 				reference.fields,
@@ -277,29 +289,12 @@ export class AccessorTreeGenerator {
 				},
 				replacement => {
 					const entityAccessor = collectionAccessor.entities[i]
-					if (entityAccessor instanceof EntityAccessor) {
-						collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement)
+					if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
+						collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement, onRemove)
 						update()
 					}
 				},
-				(removalType: EntityAccessor.RemovalType) => {
-					const currentEntity = collectionAccessor.entities[i]
-					if (currentEntity instanceof EntityAccessor) {
-						const id = currentEntity.primaryKey
-
-						if (typeof id === 'string') {
-							collectionAccessor.entities[i] = new EntityForRemovalAccessor(
-								id,
-								currentEntity.data,
-								currentEntity.replaceWith,
-								removalType
-							)
-						} else {
-							collectionAccessor.entities[i] = undefined
-						}
-						update()
-					}
-				}
+				onRemove
 			)
 		}
 		let collectionAccessor = new EntityCollectionAccessor([], () => {
@@ -330,8 +325,31 @@ export class AccessorTreeGenerator {
 		)
 	}
 
-	private asDifferentEntity(original: EntityAccessor, replacement: EntityAccessor): EntityAccessor {
+	private asDifferentEntity(
+		original: EntityAccessor,
+		replacement: EntityAccessor,
+		onRemove?: EntityAccessor['remove']
+	): EntityAccessor {
 		// TODO: we also need to update the callbacks inside replacement.data
-		return new EntityAccessor(replacement.primaryKey, replacement.data, original.replaceWith, original.remove)
+		return new EntityAccessor(
+			replacement.primaryKey,
+			replacement.data,
+			original.replaceWith,
+			onRemove || original.remove
+		)
+	}
+
+	private removeEntity(
+		currentEntity: EntityData.FieldData,
+		removalType: EntityAccessor.RemovalType
+	): EntityForRemovalAccessor | undefined {
+		if (currentEntity instanceof EntityAccessor) {
+			const id = currentEntity.primaryKey
+
+			if (typeof id === 'string') {
+				return new EntityForRemovalAccessor(id, currentEntity.data, currentEntity.replaceWith, removalType)
+			}
+		}
+		return undefined
 	}
 }

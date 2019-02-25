@@ -8,14 +8,14 @@ export const TOASTS_DISMISS = 'toasts_dismiss'
 export default handleActions<ToastsState, any>(
 	{
 		[TOASTS_ADD]: (state, action: Action<Toast>): ToastsState => {
-			if (action.payload == undefined) {
-				throw new Error('Action payload can not be undefind')
+			if (action.payload === undefined) {
+				throw new Error('Action payload can not be undefined')
 			}
 			return { ...state, toasts: [...state.toasts, action.payload] }
 		},
 		[TOASTS_DISMISS]: (state, action: Action<Toast>): ToastsState => {
-			if (action.payload == undefined) {
-				throw new Error('Action payload can not be undefind')
+			if (action.payload === undefined) {
+				throw new Error('Action payload can not be undefined')
 			}
 			return { ...state, toasts: [...state.toasts.filter(t => t !== action.payload)] }
 		}

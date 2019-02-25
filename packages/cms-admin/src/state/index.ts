@@ -1,5 +1,6 @@
 import AuthState, { emptyAuthState } from './auth'
 import ContentState, { emptyContentState } from './content'
+import { emptyFormState, FormState } from './form'
 import ProjectsConfigsState, { emptyProjectsConfigsState } from './projectsConfigs'
 import RequestState, { emptyRequestState } from './request'
 import ViewState, { emptyViewState } from './view'
@@ -14,6 +15,7 @@ export default interface State {
 	projectsConfigs: ProjectsConfigsState
 	upload: UploadState
 	toasts: ToastsState
+	form: FormState
 }
 
 export const emptyState: State = {
@@ -23,5 +25,6 @@ export const emptyState: State = {
 	content: emptyContentState,
 	projectsConfigs: emptyProjectsConfigsState,
 	upload: emptyUploadState,
-	toasts: emptyToastsState
+	toasts: emptyToastsState,
+	form: emptyFormState
 }

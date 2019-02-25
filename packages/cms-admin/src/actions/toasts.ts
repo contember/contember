@@ -6,12 +6,10 @@ export const addToast = (() => {
 	let toastId = 0
 
 	return (toast: ToastDefinition) =>
-		createAction<Toast>(TOASTS_ADD, () => {
-			return {
-				...toast,
-				id: `${toastId++}`
-			}
-		})()
+		createAction<Toast>(TOASTS_ADD, () => ({
+			...toast,
+			id: `${toastId++}`
+		}))()
 })()
 
 export const dismissToast = (toastId: ToastId) => createAction(TOASTS_DISMISS, () => toastId)()

@@ -8,9 +8,11 @@ export interface DataTreeDirtinessDelta {
 }
 
 export interface DataTreeState {
-	[id: string]: {
-		dirty: DataTreeDirtinessState
-	}
+	dirty: DataTreeDirtinessState
 }
 
-export const emptyDataTreeState: DataTreeState = {}
+export interface DataTreesState {
+	[id: string]: DataTreeState
+}
+
+export const emptyDataTreesState: DataTreesState = {}

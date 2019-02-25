@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { getData, putData } from '../../actions/content'
-import { setFormDirtiness } from '../../actions/form'
+import { setDataTreeDirtiness } from '../../actions/dataTree'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentRequestsState, ContentStatus } from '../../state/content'
-import { FormDirtinessState, FormId } from '../../state/form'
+import { DataTreeDirtinessState, DataTreeId } from '../../state/dataTree'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -23,7 +23,7 @@ export interface DataProviderOwnProps<DRP> {
 }
 
 export interface DataProviderDispatchProps {
-	setFormDirtiness: (formId: FormId, isDirty: FormDirtinessState) => void
+	setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) => void
 	getData: (query: string) => Promise<string>
 	putData: (query: string) => Promise<void>
 }
@@ -48,7 +48,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	protected triggerPersist = (): Promise<void> => {
 		const data = this.state.id ? this.props.requests[this.state.id].data : undefined
 		const successfullyFinalizeMutation: () => Promise<void> = () => {
-			this.props.setFormDirtiness(this.props.markerTree.id, false)
+			this.props.setDataTreeDirtiness(this.props.markerTree.id, false)
 			return Promise.resolve()
 		}
 
@@ -100,7 +100,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			this.state.id !== prevState.id &&
 			this.props.isDirty !== true
 		) {
-			this.props.setFormDirtiness(this.props.markerTree.id, true)
+			this.props.setDataTreeDirtiness(this.props.markerTree.id, true)
 		}
 	}
 
@@ -162,12 +162,13 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 const getDataProvider = <DRP extends {}>() =>
 	connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps<DRP>, State>(
-		({ content, form }, ownProps: DataProviderOwnProps<DRP>) => ({
+		({ content, dataTree }, ownProps: DataProviderOwnProps<DRP>) => ({
 			requests: content.requests,
-			isDirty: form.dirty[ownProps.markerTree.id] || false
+			isDirty: (dataTree[ownProps.markerTree.id] || {}).dirty || false
 		}),
 		(dispatch: Dispatch) => ({
-			setFormDirtiness: (formId: FormId, isDirty: FormDirtinessState) => dispatch(setFormDirtiness(formId, isDirty)),
+			setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) =>
+				dispatch(setDataTreeDirtiness(dataTreeId, isDirty)),
 			getData: (query: string) => dispatch(getData(query)),
 			putData: (query: string) => dispatch(putData(query))
 		})

@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { getData, putData } from '../../actions/content'
-import { setDataTreeDirtiness } from '../../actions/dataTree'
+import { setDataTreeDirtiness } from '../../actions/dataTrees'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentRequestsState, ContentStatus } from '../../state/content'
-import { DataTreeDirtinessState, DataTreeId } from '../../state/dataTree'
+import { DataTreeDirtinessState, DataTreeId } from '../../state/dataTrees'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -162,9 +162,9 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 const getDataProvider = <DRP extends {}>() =>
 	connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps<DRP>, State>(
-		({ content, dataTree }, ownProps: DataProviderOwnProps<DRP>) => ({
+		({ content, dataTrees }, ownProps: DataProviderOwnProps<DRP>) => ({
 			requests: content.requests,
-			isDirty: (dataTree[ownProps.markerTree.id] || {}).dirty || false
+			isDirty: (dataTrees[ownProps.markerTree.id] || {}).dirty || false
 		}),
 		(dispatch: Dispatch) => ({
 			setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) =>

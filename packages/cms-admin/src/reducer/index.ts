@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import State from '../state'
 import Auth from './auth'
 import Content from './content'
-import DataTree from './dataTree'
+import DataTrees from './dataTrees'
 import ProjectsConfigs from './projectsConfigs'
 import Request from './request'
 import Toasts from './toasts'
@@ -17,5 +17,5 @@ export default combineReducers<State>({
 	projectsConfigs: ProjectsConfigs,
 	upload: Upload,
 	toasts: Toasts,
-	dataTree: DataTree
+	dataTrees: DataTrees
 })

@@ -4,7 +4,7 @@ import { addToast } from '../../../actions/toasts'
 import { Dispatch } from '../../../actions/types'
 import { Button, Intent } from '../../../components'
 import State from '../../../state'
-import { Toast, ToastType } from '../../../state/toasts'
+import { ToastDefinition, ToastType } from '../../../state/toasts'
 import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
 
 export interface PersistButtonOwnProps {
@@ -13,7 +13,7 @@ export interface PersistButtonOwnProps {
 }
 
 export interface PersistButtonDispatchProps {
-	showToast: (toast: Toast) => void
+	showToast: (toast: ToastDefinition) => void
 }
 
 interface PersistButtonState {
@@ -79,7 +79,7 @@ class PersistButtonConnected extends React.Component<
 export const PersistButton = connect<{}, PersistButtonDispatchProps, PersistButtonOwnProps, State>(
 	null,
 	(dispatch: Dispatch) => ({
-		showToast: (toast: Toast) => {
+		showToast: (toast: ToastDefinition) => {
 			dispatch(addToast(toast))
 		}
 	})

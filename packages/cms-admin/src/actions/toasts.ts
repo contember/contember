@@ -1,6 +1,17 @@
 import { createAction } from 'redux-actions'
 import { TOASTS_ADD, TOASTS_DISMISS } from '../reducer/toasts'
-import { Toast } from '../state/toasts'
+import { Toast, ToastDefinition, ToastId } from '../state/toasts'
 
-export const addToast = (toast: Toast) => createAction(TOASTS_ADD, () => toast)()
-export const dismissToast = (toast: Toast) => createAction(TOASTS_DISMISS, () => toast)()
+export const addToast = (() => {
+	let toastId = 0
+
+	return (toast: ToastDefinition) =>
+		createAction<Toast>(TOASTS_ADD, () => {
+			return {
+				...toast,
+				id: `${toastId++}`
+			}
+		})()
+})()
+
+export const dismissToast = (toastId: ToastId) => createAction(TOASTS_DISMISS, () => toastId)()

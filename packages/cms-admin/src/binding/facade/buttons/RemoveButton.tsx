@@ -7,6 +7,7 @@ import { EntityAccessor } from '../../dao'
 
 export interface RemoveButtonProps extends ButtonProps {
 	removeType?: RemoveButton.RemovalType
+	immediatePersist?: true
 	icon?: IconName
 }
 

@@ -5,9 +5,15 @@ export enum ToastType {
 	Info = 'info'
 }
 
-export interface Toast {
+export type ToastId = string
+
+export interface ToastDefinition {
 	type: ToastType
 	message: string
+}
+
+export interface Toast extends ToastDefinition {
+	id: ToastId
 }
 
 export default interface ToastsState {

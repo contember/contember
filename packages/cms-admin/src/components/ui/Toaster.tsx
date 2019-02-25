@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cn from 'classnames'
-import { Toast, ToastType } from '../../state/toasts'
+import ToastsState, { Toast, ToastId, ToastType } from '../../state/toasts'
 import State from '../../state'
 import { Icon } from '@blueprintjs/core'
 import { Dispatch } from '../../actions/types'
@@ -19,13 +19,13 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 		return (
 			<div className="toast-wrap">
 				{this.props.toasts.map(toast => (
-					<div key={toast.type + toast.message} className={cn('toast', typeClassName[toast.type])}>
+					<div key={toast.id} className={cn('toast', typeClassName[toast.type])}>
 						<p className="toast-message">{toast.message}</p>
 						<button
 							className="toast-button"
 							onClick={e => {
 								e.preventDefault()
-								this.props.dismissToast(toast)
+								this.props.dismissToast(toast.id)
 							}}
 						>
 							<Icon icon="cross" color="currentColor" />
@@ -39,15 +39,13 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 
 const Toaster = connect<Toaster.ToasterStateProps, Toaster.ToasterDispatcherProps, {}, State>(
 	state => ({ toasts: state.toasts.toasts }),
-	(dispatch: Dispatch) => ({ dismissToast: (toast: Toast) => dispatch(dismissToast(toast)) })
+	(dispatch: Dispatch) => ({ dismissToast: (toastId: ToastId) => dispatch(dismissToast(toastId)) })
 )(ToasterConnected)
 
 namespace Toaster {
-	export interface ToasterStateProps {
-		toasts: Toast[]
-	}
+	export interface ToasterStateProps extends ToastsState {}
 	export interface ToasterDispatcherProps {
-		dismissToast: (toast: Toast) => void
+		dismissToast: (toastId: ToastId) => void
 	}
 }
 

@@ -2,7 +2,7 @@ import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import { Button, ButtonProps } from '../../../components'
-import { DataContext, DataContextValue } from '../../coreComponents'
+import { DataContext, DataContextValue, MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
 import { EntityAccessor } from '../../dao'
 
 export interface RemoveButtonProps extends ButtonProps {
@@ -12,21 +12,35 @@ export interface RemoveButtonProps extends ButtonProps {
 }
 
 class RemoveButton extends React.Component<RemoveButtonProps> {
+	private getOnClick = (entityAccessor: EntityAccessor, metaOperations: MetaOperationsContextValue) => () => {
+		if (!entityAccessor.remove) {
+			return
+		}
+		if (this.props.immediatePersist && !confirm('Really?')) {
+			return
+		}
+
+		entityAccessor.remove(this.mapToRemovalType(this.props.removeType))
+
+		if (this.props.immediatePersist && metaOperations) {
+			metaOperations.triggerPersist()
+		}
+	}
+
 	public render() {
-		const { removeType, icon, ...rest } = this.props
+		const { removeType, icon, immediatePersist, ...rest } = this.props
 		return (
 			<DataContext.Consumer>
 				{(value: DataContextValue) => {
 					if (value instanceof EntityAccessor) {
 						return (
-							<Button
-								{...rest}
-								onClick={() => value.remove && value.remove(this.mapToRemovalType(this.props.removeType))}
-								small
-								minimal
-							>
-								<Icon icon={icon || IconNames.CROSS} color="currentColor" />
-							</Button>
+							<MetaOperationsContext.Consumer>
+								{(metaOperations: MetaOperationsContextValue) => (
+									<Button {...rest} onClick={this.getOnClick(value, metaOperations)} small minimal>
+										<Icon icon={icon || IconNames.CROSS} color="currentColor" />
+									</Button>
+								)}
+							</MetaOperationsContext.Consumer>
 						)
 					}
 				}}

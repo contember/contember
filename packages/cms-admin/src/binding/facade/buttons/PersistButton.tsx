@@ -1,29 +1,14 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { addToast } from '../../../actions/toasts'
-import { Dispatch } from '../../../actions/types'
 import { Button, Intent } from '../../../components'
-import State from '../../../state'
-import { ToastDefinition, ToastType } from '../../../state/toasts'
 import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
 
-export interface PersistButtonOwnProps {
-	successMessage?: string
-	failureMessage?: string
-}
-
-export interface PersistButtonDispatchProps {
-	showToast: (toast: ToastDefinition) => void
-}
+export interface PersistButtonProps {}
 
 interface PersistButtonState {
 	isLoading: boolean
 }
 
-class PersistButtonConnected extends React.Component<
-	PersistButtonOwnProps & PersistButtonDispatchProps,
-	PersistButtonState
-> {
+export class PersistButton extends React.PureComponent<PersistButtonProps, PersistButtonState> {
 	public readonly state: PersistButtonState = {
 		isLoading: false
 	}
@@ -33,20 +18,7 @@ class PersistButtonConnected extends React.Component<
 			return
 		}
 
-		triggerPersist()
-			.then(() =>
-				this.props.showToast({
-					type: ToastType.Success,
-					message: this.props.successMessage || 'Success!'
-				})
-			)
-			.catch(() =>
-				this.props.showToast({
-					type: ToastType.Error,
-					message: this.props.failureMessage || 'Failure!'
-				})
-			)
-			.finally(() => this.setState({ isLoading: false }))
+		triggerPersist().finally(() => this.setState({ isLoading: false }))
 		this.setState({
 			isLoading: true
 		})
@@ -75,12 +47,3 @@ class PersistButtonConnected extends React.Component<
 		)
 	}
 }
-
-export const PersistButton = connect<{}, PersistButtonDispatchProps, PersistButtonOwnProps, State>(
-	null,
-	(dispatch: Dispatch) => ({
-		showToast: (toast: ToastDefinition) => {
-			dispatch(addToast(toast))
-		}
-	})
-)(PersistButtonConnected)

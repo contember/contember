@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { EntityAccessor, EntityCollectionAccessor } from '../../dao'
 import { Repeater } from '../collections'
-import { LoadingRenderer, LoadingRendererPublicProps } from './LoadingRenderer'
+import { FeedbackRenderer, FeedbackRendererPublicProps } from './FeedbackRenderer'
 
-export interface CollectionRendererPublicProps extends LoadingRendererPublicProps {}
+export interface CollectionRendererPublicProps extends FeedbackRendererPublicProps {}
 
 export interface CollectionRendererInternalProps {
 	includeUnpersisted?: boolean
@@ -15,7 +15,7 @@ export interface CollectionRendererProps extends CollectionRendererPublicProps, 
 export class CollectionRenderer extends React.PureComponent<CollectionRendererProps> {
 	public render(): React.ReactNode {
 		return (
-			<LoadingRenderer data={this.props.data} fallback={this.props.fallback}>
+			<FeedbackRenderer data={this.props.data} loadingFallback={this.props.loadingFallback}>
 				{data => {
 					if (!(data.root instanceof EntityCollectionAccessor)) {
 						return null
@@ -26,7 +26,7 @@ export class CollectionRenderer extends React.PureComponent<CollectionRendererPr
 						Repeater.filterEntities(data.root, this.props.includeUnpersisted !== true)
 					)
 				}}
-			</LoadingRenderer>
+			</FeedbackRenderer>
 		)
 	}
 }

@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { getData, putData } from '../../actions/content'
-import { setDataTreeDirtiness } from '../../actions/dataTrees'
+import { setDataTreeDirtiness, setDataTreeMutationState } from '../../actions/dataTrees'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { ContentRequestsState, ContentStatus } from '../../state/content'
-import { DataTreeDirtinessState, DataTreeId } from '../../state/dataTrees'
+import { DataTreeDirtinessState, DataTreeId, DataTreeMutationState } from '../../state/dataTrees'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -24,6 +24,7 @@ export interface DataProviderOwnProps<DRP> {
 
 export interface DataProviderDispatchProps {
 	setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) => void
+	setDataTreeMutationState: (dataTreeId: DataTreeId, isMutating: DataTreeMutationState) => void
 	getData: (query: string) => Promise<string>
 	putData: (query: string) => Promise<void>
 }
@@ -61,16 +62,22 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 				return successfullyFinalizeMutation()
 			}
 
-			return this.props.putData(mutation).then(async () => {
-				if (!this.state.query) {
+			this.props.setDataTreeMutationState(this.props.markerTree.id, true)
+			return this.props
+				.putData(mutation)
+				.then(async () => {
+					if (!this.state.query) {
+						return successfullyFinalizeMutation()
+					}
+					const id = await this.props.getData(this.state.query)
+					if (!this.unmounted) {
+						this.setState({ id })
+					}
 					return successfullyFinalizeMutation()
-				}
-				const id = await this.props.getData(this.state.query)
-				if (!this.unmounted) {
-					this.setState({ id })
-				}
-				return successfullyFinalizeMutation()
-			})
+				})
+				.finally(() => {
+					this.props.setDataTreeMutationState(this.props.markerTree.id, false)
+				})
 		}
 		return Promise.reject()
 	}
@@ -96,9 +103,10 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		if (
 			req.state === ContentStatus.LOADED &&
 			this.state.data &&
+			prevState.data &&
 			this.state.data !== prevState.data &&
-			this.state.id !== prevState.id &&
-			this.props.isDirty !== true
+			this.state.id === prevState.id &&
+			!this.props.isDirty
 		) {
 			this.props.setDataTreeDirtiness(this.props.markerTree.id, true)
 		}
@@ -164,11 +172,13 @@ const getDataProvider = <DRP extends {}>() =>
 	connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps<DRP>, State>(
 		({ content, dataTrees }, ownProps: DataProviderOwnProps<DRP>) => ({
 			requests: content.requests,
-			isDirty: (dataTrees[ownProps.markerTree.id] || {}).dirty || false
+			isDirty: (dataTrees[ownProps.markerTree.id] || {}).isDirty || false
 		}),
 		(dispatch: Dispatch) => ({
 			setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) =>
 				dispatch(setDataTreeDirtiness(dataTreeId, isDirty)),
+			setDataTreeMutationState: (dataTreeId: DataTreeId, isMutating: DataTreeMutationState) =>
+				dispatch(setDataTreeMutationState(dataTreeId, isMutating)),
 			getData: (query: string) => dispatch(getData(query)),
 			putData: (query: string) => dispatch(putData(query))
 		})

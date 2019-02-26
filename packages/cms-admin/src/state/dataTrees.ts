@@ -2,13 +2,21 @@ export type DataTreeId = string
 
 export type DataTreeDirtinessState = boolean
 
+export type DataTreeMutationState = boolean
+
 export interface DataTreeDirtinessDelta {
 	dataTreeId: DataTreeId
 	isDirty: DataTreeDirtinessState
 }
 
+export interface DataTreeMutationStateDelta {
+	dataTreeId: DataTreeId
+	isMutating: DataTreeMutationState
+}
+
 export interface DataTreeState {
-	dirty: DataTreeDirtinessState
+	isDirty: DataTreeDirtinessState
+	isMutating: DataTreeMutationState
 }
 
 export interface DataTreesState {

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { FormGroup, FormGroupProps, Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment } from '../../dao'
-import { Component } from '../Component'
+import { Component } from '../aux'
 import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
 
 export interface SelectFieldPublicProps {

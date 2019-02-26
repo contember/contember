@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { DataRendererProps, MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
+import { DataRendererProps } from '../../coreComponents'
+import { TreeIdRetriever } from '../aux'
 import { LoadingSpinner, PersistInfo, PersistInfoPublicProps } from './userFeedback'
 
 export interface FeedbackRendererPublicProps extends DataRendererProps {
@@ -25,16 +26,14 @@ export class FeedbackRenderer extends React.PureComponent<FeedbackRendererProps>
 		}
 
 		return (
-			<MetaOperationsContext.Consumer>
-				{(metaOperations: MetaOperationsContextValue) => {
-					return (
-						<>
-							{metaOperations && <PersistInfo {...this.props.userFeedback || {}} treeId={metaOperations.treeId} />}
-							{this.props.children(data)}
-						</>
-					)
-				}}
-			</MetaOperationsContext.Consumer>
+			<TreeIdRetriever>
+				{treeId => (
+					<>
+						{<PersistInfo {...this.props.userFeedback || {}} treeId={treeId} />}
+						{this.props.children(data)}
+					</>
+				)}
+			</TreeIdRetriever>
 		)
 	}
 }

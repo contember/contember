@@ -4,12 +4,12 @@ import { DataContext } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
-import { LoadingRenderer } from './LoadingRenderer'
+import { FeedbackRenderer } from './FeedbackRenderer'
 
 export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	public render() {
 		return (
-			<LoadingRenderer data={this.props.data}>
+			<FeedbackRenderer data={this.props.data}>
 				{data => {
 					const normalizedData = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
 
@@ -28,7 +28,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 						</>
 					)
 				}}
-			</LoadingRenderer>
+			</FeedbackRenderer>
 		)
 	}
 

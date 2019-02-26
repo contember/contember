@@ -1,5 +1,4 @@
-export * from './Component'
-
+export * from './aux'
 export * from './buttons'
 export * from './environment'
 export * from './fields'

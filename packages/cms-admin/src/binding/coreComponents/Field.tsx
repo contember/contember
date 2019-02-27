@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { DataTreeMutationState } from '../../state/dataTrees'
 import { FieldName, Scalar, VariableInput } from '../bindingTypes'
 import {
 	DataBindingError,
@@ -8,6 +9,7 @@ import {
 	FieldAccessor,
 	FieldMarker
 } from '../dao'
+import { MutationStateRetriever } from '../facade/aux'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
@@ -21,7 +23,7 @@ export interface FieldPublicProps {
 }
 
 export interface FieldProps extends FieldPublicProps {
-	children?: (data: FieldAccessor<any>, environment: Environment) => React.ReactNode
+	children?: (data: FieldAccessor<any>, isMutating: DataTreeMutationState, environment: Environment) => React.ReactNode
 	isNonbearing?: boolean
 }
 
@@ -31,13 +33,13 @@ class Field extends React.PureComponent<FieldProps> {
 	public render() {
 		return (
 			<Field.DataRetriever name={this.props.name}>
-				{(fieldName, data, environment) => {
+				{(fieldName, data, isMutating, environment) => {
 					if (data instanceof EntityAccessor) {
 						const fieldData = data.data.getField(fieldName)
 
 						if (this.props.children && fieldData instanceof FieldAccessor) {
 							return (
-								<Field.FieldInner accessor={fieldData} environment={environment}>
+								<Field.FieldInner accessor={fieldData} isMutating={isMutating} environment={environment}>
 									{this.props.children}
 								</Field.FieldInner>
 							)
@@ -69,18 +71,24 @@ namespace Field {
 	export interface FieldInnerProps {
 		accessor: FieldAccessor
 		environment: Environment
+		isMutating: DataTreeMutationState
 		children: Exclude<FieldProps['children'], undefined>
 	}
 
 	export class FieldInner extends React.PureComponent<FieldInnerProps> {
 		public render() {
-			return this.props.children(this.props.accessor, this.props.environment)
+			return this.props.children(this.props.accessor, this.props.isMutating, this.props.environment)
 		}
 	}
 
 	export interface DataRetrieverProps {
 		name: FieldName
-		children: (fieldName: FieldName, data: DataContextValue, environment: Environment) => React.ReactNode
+		children: (
+			fieldName: FieldName,
+			data: DataContextValue,
+			isMutating: DataTreeMutationState,
+			environment: Environment
+		) => React.ReactNode
 	}
 
 	export class DataRetriever extends React.Component<DataRetrieverProps> {
@@ -91,9 +99,13 @@ namespace Field {
 						QueryLanguage.wrapRelativeSingleField(
 							this.props.name,
 							fieldName => (
-								<DataContext.Consumer>
-									{(data: DataContextValue) => this.props.children(fieldName, data, environment)}
-								</DataContext.Consumer>
+								<MutationStateRetriever>
+									{isMutating => (
+										<DataContext.Consumer>
+											{(data: DataContextValue) => this.props.children(fieldName, data, isMutating, environment)}
+										</DataContext.Consumer>
+									)}
+								</MutationStateRetriever>
 							),
 							environment
 						)

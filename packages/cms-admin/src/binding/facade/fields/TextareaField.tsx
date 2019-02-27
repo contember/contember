@@ -19,7 +19,7 @@ export class TextAreaField extends React.PureComponent<TextAreaFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, env): React.ReactNode => (
+				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => (
 					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<TextArea
 							value={data.currentValue || ''}

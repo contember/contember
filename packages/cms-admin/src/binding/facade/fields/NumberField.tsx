@@ -18,7 +18,7 @@ export class NumberField extends React.PureComponent<NumberFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<number>, env): React.ReactNode => (
+				{(data: FieldAccessor<number>, isMutating, env): React.ReactNode => (
 					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<InputGroup
 							value={typeof data.currentValue === 'number' ? data.currentValue.toFixed(0) : '0'}

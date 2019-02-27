@@ -1,6 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
 import * as React from 'react'
+import { DataTreeMutationState } from '../../../state/dataTrees'
 import { FieldName, PRIMARY_KEY_NAME, Scalar } from '../../bindingTypes'
 import {
 	DataContextValue,
@@ -36,6 +37,7 @@ export interface ChoiceFieldBaseProps extends ChoiceFieldPublicProps {
 		data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>,
 		currentValue: ChoiceField.ValueRepresentation | null,
 		onChange: (newValue: ChoiceField.ValueRepresentation) => void,
+		isMutating: DataTreeMutationState,
 		environment: Environment
 	) => React.ReactNode
 }
@@ -50,7 +52,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 	public render() {
 		return (
 			<Field.DataRetriever name={this.props.name}>
-				{(fieldName, data, environment) => {
+				{(fieldName, data, isMutating, environment) => {
 					const commonProps = {
 						fieldName,
 						data,
@@ -148,7 +150,7 @@ namespace ChoiceField {
 
 			return (
 				<Field name={this.props.fieldName}>
-					{(data: FieldAccessor): React.ReactNode => {
+					{(data: FieldAccessor, isMutating): React.ReactNode => {
 						const currentValue: ChoiceField.ValueRepresentation = options.findIndex(([value]) => {
 							return (
 								data.hasValue(value) ||
@@ -166,6 +168,7 @@ namespace ChoiceField {
 							(newValue: ChoiceField.ValueRepresentation) => {
 								data.onChange && data.onChange(options[newValue][0])
 							},
+							isMutating,
 							this.props.environment
 						)
 					}}
@@ -303,6 +306,7 @@ namespace ChoiceField {
 						currentValueEntity.replaceWith(filteredData[newValue])
 					}
 				},
+				false, // TODO
 				this.props.environment
 			)
 		}

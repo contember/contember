@@ -21,7 +21,7 @@ export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 class RadioField extends Component<RadioFieldProps>(props => {
 	return (
 		<ChoiceField name={props.name} options={props.options}>
-			{(data, currentValue, onChange, environment) => {
+			{(data, currentValue, onChange, isMutating, environment) => {
 				return (
 					<RadioField.RadioFieldInner
 						name={props.name}

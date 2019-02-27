@@ -21,7 +21,7 @@ export type SelectFieldProps = SelectFieldPublicProps & SelectFieldInternalProps
 class SelectField extends Component<SelectFieldProps>(props => {
 	return (
 		<ChoiceField name={props.name} options={props.options}>
-			{(data, currentValue, onChange, environment) => {
+			{(data, currentValue, onChange, isMutating, environment) => {
 				return (
 					<SelectField.SelectFieldInner
 						name={props.name}

@@ -51,7 +51,7 @@ class UploadFieldComponent extends React.Component<
 
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, env): React.ReactNode => {
+				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => {
 					if (upload && upload.status === UploadStatus.FINISHED && upload.resultUrl !== data.currentValue) {
 						data.onChange && data.onChange(upload.resultUrl)
 					}

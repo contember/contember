@@ -18,7 +18,7 @@ export class CheckboxField extends React.PureComponent<CheckboxFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<boolean>, env): React.ReactNode => (
+				{(data: FieldAccessor<boolean>, isMutating, env): React.ReactNode => (
 					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<input type="checkbox" checked={!!data.currentValue} onChange={this.generateOnChange(data)} />
 					</FormGroup>

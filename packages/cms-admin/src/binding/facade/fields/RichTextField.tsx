@@ -22,7 +22,7 @@ export class RichTextField extends React.PureComponent<RichTextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, env): React.ReactNode => {
+				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => {
 					return (
 						<RichEditor
 							onChange={this.generateOnChange(data)}

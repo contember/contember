@@ -20,12 +20,13 @@ export class TextField extends React.PureComponent<TextFieldProps> {
 	public render() {
 		return (
 			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, env): React.ReactNode => (
+				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => (
 					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<InputGroup
 							value={data.currentValue || ''}
 							onChange={this.generateOnChange(data)}
 							large={this.props.large}
+							readOnly={isMutating}
 						/>
 					</FormGroup>
 				)}

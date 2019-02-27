@@ -53,10 +53,11 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 		return (
 			<Field.DataRetriever name={this.props.name}>
 				{(fieldName, data, isMutating, environment) => {
-					const commonProps = {
+					const commonProps: ChoiceField.InnerBaseProps = {
 						fieldName,
 						data,
 						environment,
+						isMutating,
 						children: this.props.children,
 						name: this.props.name
 					}
@@ -128,6 +129,7 @@ namespace ChoiceField {
 	export interface InnerBaseProps extends ChoiceFieldBaseProps {
 		fieldName: FieldName
 		data: DataContextValue
+		isMutating: DataTreeMutationState
 		environment: Environment
 	}
 
@@ -306,7 +308,7 @@ namespace ChoiceField {
 						currentValueEntity.replaceWith(filteredData[newValue])
 					}
 				},
-				false, // TODO
+				this.props.isMutating,
 				this.props.environment
 			)
 		}

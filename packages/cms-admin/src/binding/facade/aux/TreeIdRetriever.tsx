@@ -10,9 +10,7 @@ export class TreeIdRetriever extends React.PureComponent<TreeIdRetrieverProps> {
 	public render(): React.ReactNode {
 		return (
 			<MetaOperationsContext.Consumer>
-				{(metaOperations: MetaOperationsContextValue) =>
-					metaOperations && this.props.children(metaOperations.treeId)
-				}
+				{(metaOperations: MetaOperationsContextValue) => metaOperations && this.props.children(metaOperations.treeId)}
 			</MetaOperationsContext.Consumer>
 		)
 	}

@@ -34,6 +34,7 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 									currentValue={currentValue}
 									onChange={onChange}
 									environment={environment}
+									firstOptionCaption="Choose…"
 								/>
 								<div className="alternativeFields-items">{alternatives}</div>
 							</>

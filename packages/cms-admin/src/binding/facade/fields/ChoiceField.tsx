@@ -235,7 +235,6 @@ namespace ChoiceField {
 			const fieldAccessor = data.data.getTreeRoot(fieldName)
 			const currentValueEntity = data.data.getField(this.props.fieldName)
 
-			// TODO handle when currentValueEntity is disconnected
 			if (
 				!(fieldAccessor instanceof AccessorTreeRoot) ||
 				!(currentValueEntity instanceof EntityAccessor || currentValueEntity instanceof EntityForRemovalAccessor)

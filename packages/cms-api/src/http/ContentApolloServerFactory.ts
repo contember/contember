@@ -3,26 +3,29 @@ import { ApolloError } from 'apollo-server-errors'
 import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
 import { Context } from '../content-api/types'
 import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
+import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
 import KnexDebugger from '../core/knex/KnexDebugger'
 import { GraphQLSchema } from 'graphql'
-import LRUCache from 'lru-cache'
+import { Acl, Model } from 'cms-common'
+import { KoaContext } from '../core/koa/types'
+import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
+import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 
 class ContentApolloServerFactory {
-	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
-		max: 100,
-	})
+	constructor(private readonly knexDebugger: KnexDebugger) {
 
-	constructor(private readonly knexDebugger: KnexDebugger) {}
+	}
 
-	public create(dataSchema: GraphQLSchema): ApolloServer {
-		const server = this.cache.get(dataSchema)
-		if (server) {
-			return server
-		}
-		const newServer = new ApolloServer({
+
+	public create(
+		dataSchema: GraphQLSchema,
+		schema: Model.Schema,
+		permissions: Acl.Permissions,): ApolloServer {
+		return new ApolloServer({
 			tracing: true,
 			introspection: true,
 			extensions: [
+				() => new ErrorHandlerExtension(),
 				() => {
 					const queriesExt = new DbQueriesExtension()
 					this.knexDebugger.subscribe(query => queriesExt.addQuery(query))
@@ -41,23 +44,20 @@ class ContentApolloServerFactory {
 			},
 			schema: dataSchema,
 			uploads: false,
-			context: async ({ ctx }: { ctx: any }): Promise<Context> => {
+			context: async ({ ctx }: { ctx: KoaContext<ProjectMemberMiddlewareFactory.KoaState & DatabaseTransactionMiddlewareFactory.KoaState> }): Promise<Context> => {
 				const partialContext = {
 					db: ctx.state.db,
 					identityVariables: ctx.state.projectVariables,
 				}
-				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions).create(
-					partialContext
-				)
+				const executionContainer = new ExecutionContainerFactory(schema, permissions).create(partialContext)
 				return {
 					...partialContext,
 					executionContainer,
+					errorHandler: ctx.state.planRollback,
 				}
 			},
 			playground: false,
 		})
-		this.cache.set(dataSchema, newServer)
-		return newServer
 	}
 }
 

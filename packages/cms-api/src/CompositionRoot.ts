@@ -40,16 +40,21 @@ import SchemaMigrationDiffsResolver from './content-schema/SchemaMigrationDiffsR
 import PermissionsByIdentityFactory from './acl/PermissionsByIdentityFactory'
 import KnexDebugger from './core/knex/KnexDebugger'
 import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
+import MiddlewareStackFactory from './http/MiddlewareStackFactory'
+import ContentApolloMiddlewareFactory from './http/ContentApolloMiddlewareFactory'
+import ProjectResolveMiddlewareFactory from './http/ProjectResolveMiddlewareFactory'
+import ProjectMemberMiddlewareFactory from './http/ProjectMemberMiddlewareFactory'
+import StageResolveMiddlewareFactory from './http/StageResolveMiddlewareFactory'
+import DatabaseTransactionMiddlewareFactory from './http/DatabaseTransactionMiddlewareFactory'
+import SetupSystemVariablesMiddlewareFactory from './http/SetupSystemVariablesMiddlewareFactory'
+import ContentApolloServerFactory from './http/ContentApolloServerFactory'
 import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
 
 export type ProjectContainer = Container<{
 	project: ProjectSchemaInfo & Project
 	knexConnection: knex
-	graphQlSchemaFactory: GraphQlSchemaFactory
-	knexDebugger: KnexDebugger
 	systemApolloServerFactory: SystemApolloServerFactory
-	systemResolvers: IResolvers
-	schemaVersionBuilder: SchemaVersionBuilder
+	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
 }>
 
 class CompositionRoot {
@@ -65,32 +70,72 @@ class CompositionRoot {
 			.addService('tenantContainer', () => tenantContainer)
 			.addService('projectContainers', () => projectContainers)
 
-			.addService('homepageMiddleware', () => new HomepageMiddlewareFactory().create())
+			.addService('homepageMiddlewareFactory', () => new HomepageMiddlewareFactory())
 
-			.addService('authMiddleware', ({ tenantContainer }) =>
-				new AuthMiddlewareFactory(tenantContainer.get('apiKeyManager')).create()
+			.addService('authMiddlewareFactory', ({ tenantContainer }) =>
+				new AuthMiddlewareFactory(tenantContainer.get('apiKeyManager'))
 			)
-			.addService('tenantMiddleware', ({ tenantContainer }) =>
-				new TenantMiddlewareFactory(tenantContainer.get('apolloServer')).create()
+			.addService('projectMemberMiddlewareFactory', ({ tenantContainer }) =>
+				new ProjectMemberMiddlewareFactory(tenantContainer.projectMemberManager)
 			)
-			.addService('contentMiddleware', ({ projectContainers, tenantContainer }) =>
-				new ContentMiddlewareFactory(projectContainers, tenantContainer.get('projectMemberManager')).create()
+			.addService('projectResolveMiddlewareFactory', ({ projectContainers }) =>
+				new ProjectResolveMiddlewareFactory(projectContainers)
 			)
-			.addService('systemMiddleware', ({ projectContainers }) =>
-				new SystemMiddlewareFactory(projectContainers, tenantContainer.get('projectMemberManager')).create()
+			.addService('stageResolveMiddlewareFactory', () =>
+				new StageResolveMiddlewareFactory()
 			)
-			.addService('timerMiddleware', () => new TimerMiddlewareFactory().create())
+			.addService('databaseTransactionMiddlewareFactory', () => {
+				return new DatabaseTransactionMiddlewareFactory()
+			})
+			.addService('tenantMiddlewareFactory', ({ tenantContainer, authMiddlewareFactory }) =>
+				new TenantMiddlewareFactory(tenantContainer.get('apolloServer'), authMiddlewareFactory)
+			)
+			.addService('setupSystemVariablesMiddlewareFactory', () => new SetupSystemVariablesMiddlewareFactory())
+			.addService('contentMiddlewareFactory', (
+				{
+					authMiddlewareFactory,
+					projectMemberMiddlewareFactory,
+					projectResolveMiddlewareFactory,
+					stageResolveMiddlewareFactory,
+					databaseTransactionMiddlewareFactory,
+					setupSystemVariablesMiddlewareFactory,
+				}) =>
+				new ContentMiddlewareFactory(
+					projectResolveMiddlewareFactory,
+					stageResolveMiddlewareFactory,
+					authMiddlewareFactory,
+					projectMemberMiddlewareFactory,
+					databaseTransactionMiddlewareFactory,
+					setupSystemVariablesMiddlewareFactory
+				)
+			)
+			.addService('systemMiddlewareFactory', ({ projectResolveMiddlewareFactory, authMiddlewareFactory, projectMemberMiddlewareFactory, databaseTransactionMiddlewareFactory, setupSystemVariablesMiddlewareFactory }) =>
+				new SystemMiddlewareFactory(projectResolveMiddlewareFactory, authMiddlewareFactory, projectMemberMiddlewareFactory, databaseTransactionMiddlewareFactory, setupSystemVariablesMiddlewareFactory)
+			)
+			.addService('timerMiddlewareFactory', () => new TimerMiddlewareFactory())
+
+			.addService('middlewareStackFactory', (
+				{
+					timerMiddlewareFactory,
+					homepageMiddlewareFactory,
+					contentMiddlewareFactory,
+					tenantMiddlewareFactory,
+					systemMiddlewareFactory
+				}
+				) => new MiddlewareStackFactory(
+				timerMiddlewareFactory,
+				homepageMiddlewareFactory,
+				contentMiddlewareFactory,
+				tenantMiddlewareFactory,
+				systemMiddlewareFactory
+				)
+			)
 
 			.addService(
 				'koa',
-				({ homepageMiddleware, authMiddleware, tenantMiddleware, contentMiddleware, timerMiddleware, systemMiddleware }) => {
+				({ middlewareStackFactory }) => {
 					const app = new Koa()
-					app.use(timerMiddleware)
-					app.use(homepageMiddleware)
-					app.use(authMiddleware)
-					app.use(contentMiddleware)
-					app.use(tenantMiddleware)
-					app.use(systemMiddleware)
+					app.use(middlewareStackFactory.create())
 
 					return app
 				}
@@ -153,6 +198,9 @@ class CompositionRoot {
 					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory }) =>
 						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory)
 				)
+				.addService('apolloServerFactory', ({ knexDebugger }) => new ContentApolloServerFactory(knexDebugger))
+				.addService('contentApolloMiddlewareFactory', ({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory }) =>
+					new ContentApolloMiddlewareFactory(project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory))
 				.build()
 
 			const systemContainer = new SystemContainerFactory().create(
@@ -165,8 +213,8 @@ class CompositionRoot {
 			)
 
 			return projectContainer
-				.pick('project', 'knexDebugger', 'knexConnection', 'graphQlSchemaFactory', 'schemaVersionBuilder')
-				.merge(systemContainer.pick('systemApolloServerFactory', 'systemResolvers'))
+				.pick('project', 'knexConnection', 'contentApolloMiddlewareFactory')
+				.merge(systemContainer.pick('systemApolloServerFactory'))
 		})
 	}
 

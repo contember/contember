@@ -4,12 +4,13 @@ import typeDefs from '../system-api/schema/system.graphql'
 import ResolverContext from '../system-api/resolvers/ResolverContext'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import Authorizator from '../core/authorization/Authorizator'
-import { Acl } from 'cms-common'
 import Identity from '../common/auth/Identity'
 import { ApolloError } from 'apollo-server-errors'
 import SystemExecutionContainer from '../system-api/SystemExecutionContainer'
-import KnexWrapper from '../core/knex/KnexWrapper'
 import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
+import { KoaContext } from '../core/koa/types'
+import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
+import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 
 class SystemApolloServerFactory {
 	constructor(private readonly resolvers: Config['resolvers'],
@@ -17,7 +18,7 @@ class SystemApolloServerFactory {
 	            private readonly executionContainerFactory: SystemExecutionContainer.Factory) {
 	}
 
-	create(projectRoles: string[], variables: Acl.VariablesMap): ApolloServer {
+	create(): ApolloServer {
 		return new ApolloServer({
 			typeDefs,
 			resolvers: this.resolvers,
@@ -26,36 +27,23 @@ class SystemApolloServerFactory {
 			],
 			formatError: (error: any) => {
 				if (error instanceof AuthenticationError) {
-					return error.message
+					return {message: error.message, locations: undefined, path: undefined}
 				}
 				if (error instanceof ApolloError) {
 					return error
 				}
 				console.error(error.originalError || error)
-				return 'Internal server error'
+				return {message: 'Internal server error', locations: undefined, path: undefined}
 			},
 			context: ({ ctx }: {
-				ctx: AuthMiddlewareFactory.ContextWithAuth & {
-					state: {
-						db: KnexWrapper,
-						errorHandler: ErrorHandlerExtension.Context['errorHandler']
-					}
-				}
+				ctx: KoaContext<DatabaseTransactionMiddlewareFactory.KoaState & AuthMiddlewareFactory.KoaState & ProjectMemberMiddlewareFactory.KoaState>
 			}): ResolverContext => {
-				const authResult = ctx.state.authResult
-				if (authResult === undefined) {
-					throw new AuthenticationError('/system endpoint requires authorization')
-				}
-				if (!authResult.valid) {
-					throw new AuthenticationError(`Auth failure: ${authResult.error}`)
-				}
-
 				return new ResolverContext(
-					new Identity.StaticIdentity(authResult.identityId, authResult.roles, {}),
-					variables,
+					new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {}),
+					ctx.state.projectVariables,
 					this.authorizator,
 					this.executionContainerFactory.create(ctx.state.db),
-					ctx.state.errorHandler
+					ctx.state.planRollback
 				)
 			},
 		})

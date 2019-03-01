@@ -85,6 +85,7 @@ export class ApiTester {
 			db,
 			identityVariables: {},
 			executionContainer,
+			errorHandler: () => null
 		}
 		return await graphql(schema, gql, null, context, variables)
 	}

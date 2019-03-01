@@ -10,11 +10,13 @@ import rootReducer from '../reducer'
 import { SET_IDENTITY } from '../reducer/auth'
 import State from '../state'
 import Config from '../config'
+import SystemClientFactory from '../model/SystemClientFactory'
 
 export interface Services {
 	localStorageManager: LocalStorageManager
 	tenantClient: GraphqlClient
 	contentClientFactory: ContentClientFactory
+	systemClientFactory: SystemClientFactory
 	config: Config
 }
 
@@ -22,10 +24,12 @@ export function createServices(config: Config): Services {
 	const localStorageManager = new LocalStorageManager()
 	const tenantClient = new GraphqlClient(config.apiServer + '/tenant')
 	const contentClientFactory = new ContentClientFactory(config.apiServer)
+	const systemClientFactory = new SystemClientFactory(config.apiServer)
 	return {
 		localStorageManager,
 		tenantClient,
 		contentClientFactory,
+		systemClientFactory,
 		config
 	}
 }

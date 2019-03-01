@@ -6,6 +6,7 @@ import RequestState, { emptyRequestState } from './request'
 import ToastsState, { emptyToastsState } from './toasts'
 import UploadState, { emptyUploadState } from './upload'
 import ViewState, { emptyViewState } from './view'
+import SystemState, { emptySystemState } from './system'
 
 export default interface State {
 	request: RequestState
@@ -16,6 +17,7 @@ export default interface State {
 	upload: UploadState
 	toasts: ToastsState
 	dataTrees: DataTreesState
+	system: SystemState
 }
 
 export const emptyState: State = {
@@ -26,5 +28,6 @@ export const emptyState: State = {
 	projectsConfigs: emptyProjectsConfigsState,
 	upload: emptyUploadState,
 	toasts: emptyToastsState,
-	dataTrees: emptyDataTreesState
+	dataTrees: emptyDataTreesState,
+	system: emptySystemState
 }

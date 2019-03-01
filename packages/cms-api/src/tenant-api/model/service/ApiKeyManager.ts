@@ -35,7 +35,10 @@ class ApiKeyManager {
 		if (apiKeyRow.expires_at !== null && apiKeyRow.expires_at <= now) {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.EXPIRED)
 		}
-		await new ProlongApiKey(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined).execute(this.db)
+
+		setImmediate(async () => {
+			await new ProlongApiKey(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined).execute(this.db)
+		})
 
 		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles)
 	}
@@ -132,6 +135,8 @@ namespace ApiKeyManager {
 		NOT_FOUND = 'not_found',
 		DISABLED = 'disabled',
 		EXPIRED = 'expired',
+		NO_AUTH_HEADER = 'no_auth_header',
+		INVALID_AUTH_HEADER = 'invalid_auth_header',
 	}
 
 	export type CreateApiKeyResponse = CreateApiKeyResponseOk | CreateApiKeyResponseError

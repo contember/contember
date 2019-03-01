@@ -1,12 +1,16 @@
 import Koa from 'koa'
+import { KoaContext } from '../core/koa/types'
 
 class TimerMiddlewareFactory {
 	public create(): Koa.Middleware {
 		return async (ctx: TimerMiddlewareFactory.ContextWithTimer, next) => {
 			const times: [string, Date][] = []
 			const start = new Date()
-			ctx.state.timer = (name: string) => {
-				times.push([name, new Date()])
+			ctx.state.timer = async (name: string, cb) => {
+				times.push([name + " start", new Date()])
+				const res = cb && await cb()
+				times.push([name + " end", new Date()])
+				return res as any
 			}
 			ctx.state.timer('starting')
 			await next()
@@ -24,10 +28,10 @@ class TimerMiddlewareFactory {
 }
 
 namespace TimerMiddlewareFactory {
-	export type ContextWithTimer = Pick<Koa.Context, Exclude<keyof Koa.Context, 'state'>> & {
-		state: {
-			timer: (event: string) => void
-		}
+	export type ContextWithTimer = KoaContext<KoaState>
+
+	export type KoaState = {
+		timer: <T>(event: string, cb?: () => T) => Promise<T>
 	}
 }
 

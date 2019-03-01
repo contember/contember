@@ -16,7 +16,7 @@ namespace Container {
 		constructor(private factories: ServiceFactoryMap<M>) {}
 
 		addService<N extends ServiceName, T extends ServiceType>(
-			name: N,
+			name: N extends keyof M ? 'Service with this name already exists' : N,
 			factory: ServiceFactory<M, T>
 		): Builder<M & { [K in N]: T }> {
 			type TypeMapA = M

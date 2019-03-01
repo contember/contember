@@ -1,38 +1,40 @@
 import ApiKeyManager from '../tenant-api/model/service/ApiKeyManager'
-import Koa from 'koa'
-import TimerMiddlewareFactory from './TimerMiddlewareFactory'
+import { KoaContext, KoaMiddleware } from '../core/koa/types'
+import { createGraphqlInvalidAuthResponse } from './responseUtils'
 
 class AuthMiddlewareFactory {
-	constructor(private apiKeyManager: ApiKeyManager) {}
+	constructor(private apiKeyManager: ApiKeyManager) {
+	}
 
-	create(): Koa.Middleware {
-		return async (ctx: TimerMiddlewareFactory.ContextWithTimer & AuthMiddlewareFactory.ContextWithAuth, next) => {
+	create(): KoaMiddleware<AuthMiddlewareFactory.KoaState> {
+		const auth: KoaMiddleware<AuthMiddlewareFactory.KoaState> = async (ctx, next) => {
 			const authHeader = ctx.request.get('Authorization')
 			if (typeof authHeader !== 'string') {
-				return await next()
+				return createGraphqlInvalidAuthResponse(ctx, `Auth failure: Authorization header is missing`)
 			}
 
 			const authHeaderPattern = /^Bearer\s+(\w+)$/i
 
 			const match = authHeader.match(authHeaderPattern)
 			if (match === null) {
-				return await next()
+				return createGraphqlInvalidAuthResponse(ctx, `Auth failure: invalid Authorization header format`)
 			}
-
 			const [, token] = match
-			ctx.state.timer('fetching auth token info')
-			ctx.state.authResult = await this.apiKeyManager.verifyAndProlong(token)
-			ctx.state.timer('done')
+			const authResult = await this.apiKeyManager.verifyAndProlong(token)
+			if (!authResult.valid) {
+				return createGraphqlInvalidAuthResponse(ctx, `Auth failure: ${authResult.error}`)
+			}
+			ctx.state.authResult = authResult
 			await next()
 		}
+		return auth
 	}
 }
 
 namespace AuthMiddlewareFactory {
-	export type ContextWithAuth = Pick<Koa.Context, Exclude<keyof Koa.Context, 'state'>> & {
-		state: {
-			authResult?: ApiKeyManager.VerifyResult
-		}
+	export type ContextWithAuth = KoaContext<KoaState>
+	export type KoaState = {
+		authResult: ApiKeyManager.VerifyResultOk
 	}
 }
 

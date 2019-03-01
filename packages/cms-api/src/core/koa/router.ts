@@ -1,14 +1,14 @@
 import pathToRegexp from 'path-to-regexp'
 import compose from 'koa-compose'
 import Koa from 'koa'
+import { KoaContext } from './types'
 
 type Params = { [param: string]: string }
-type ContextWithRequest = Pick<Koa.Context, Exclude<keyof Koa.Context, 'state'>> & {
-	state: {
-		route: string
-		params: Params
-	}
+type KoaRequestState = {
+	route: string
+	params: Params
 }
+type ContextWithRequest = KoaContext<KoaRequestState>
 
 function createRoutingMiddleware(
 	method: string | undefined,
@@ -65,4 +65,4 @@ function post(mask: string, appOrMiddleWare: Koa | Koa.Middleware): compose.Midd
 	return createRoutingMiddleware('POST', mask, appOrMiddleWare)
 }
 
-export { route, get, post, ContextWithRequest }
+export { route, get, post, ContextWithRequest, KoaRequestState }

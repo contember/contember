@@ -1,11 +1,7 @@
 import { Reducer } from 'redux'
 import { Action, handleActions } from 'redux-actions'
-import {
-	emptyDataTreesState,
-	DataTreeDirtinessDelta,
-	DataTreesState,
-	DataTreeMutationStateDelta
-} from '../state/dataTrees'
+import { DataTreeDirtinessDelta, DataTreeMutationStateDelta } from '../actions/dataTrees'
+import { DataTreesState, emptyDataTreesState } from '../state/dataTrees'
 
 export const DATA_TREE_SET_DIRTINESS = 'data_tree_set_dirtiness'
 export const DATA_TREE_SET_MUTATION_STATE = 'data_tree_set_mutation_state'

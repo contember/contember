@@ -1,9 +1,9 @@
 import * as React from 'react'
+import { Avatar, AvatarProps } from '../../../components'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment, FieldAccessor } from '../../dao'
+import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { TextFieldProps } from '../fields'
-import { Avatar, AvatarProps } from '../../../components'
 
 interface AvatarFieldProps {
 	name: string
@@ -16,8 +16,8 @@ export class AvatarField extends React.PureComponent<AvatarFieldProps> {
 
 	public render() {
 		return (
-			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>) => (
+			<Field<string> name={this.props.name}>
+				{({ data }) => (
 					<Avatar size={this.props.size} shape={this.props.shape}>
 						{data.currentValue &&
 							data.currentValue

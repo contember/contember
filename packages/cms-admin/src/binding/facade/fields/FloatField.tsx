@@ -17,9 +17,9 @@ export class FloatField extends React.PureComponent<FloatFieldProps> {
 
 	public render() {
 		return (
-			<Field name={this.props.name}>
-				{(data: FieldAccessor<number>, isMutating, env): React.ReactNode => (
-					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
+			<Field<number> name={this.props.name}>
+				{({ data, environment }): React.ReactNode => (
+					<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<InputGroup
 							value={typeof data.currentValue === 'number' ? data.currentValue.toString(10) : '0'}
 							onChange={this.generateOnChange(data)}

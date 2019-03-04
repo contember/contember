@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment, FieldAccessor } from '../../dao'
+import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { TextFieldProps } from '../fields'
 
@@ -14,8 +14,8 @@ export class FieldText extends React.PureComponent<FieldTextProps> {
 
 	public render() {
 		return (
-			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>) =>
+			<Field<string> name={this.props.name}>
+				{({ data }) =>
 					this.props.formatter ? this.props.formatter(data.currentValue) : data.currentValue
 				}
 			</Field>

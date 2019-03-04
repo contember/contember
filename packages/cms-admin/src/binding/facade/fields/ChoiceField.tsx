@@ -4,7 +4,6 @@ import * as React from 'react'
 import { DataTreeMutationState } from '../../../state/dataTrees'
 import { FieldName, PRIMARY_KEY_NAME, Scalar } from '../../bindingTypes'
 import {
-	DataContextValue,
 	EnforceSubtypeRelation,
 	EntityListDataProvider,
 	Field,
@@ -52,12 +51,9 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 	public render() {
 		return (
 			<Field.DataRetriever name={this.props.name}>
-				{(fieldName, data, isMutating, environment) => {
+				{rawMetadata => {
 					const commonProps: ChoiceField.InnerBaseProps = {
-						fieldName,
-						data,
-						environment,
-						isMutating,
+						rawMetadata,
 						children: this.props.children,
 						name: this.props.name
 					}
@@ -127,10 +123,7 @@ namespace ChoiceField {
 	export type Data<ActualValue extends Environment.Value = string> = Array<[ValueRepresentation, Label, ActualValue]>
 
 	export interface InnerBaseProps extends ChoiceFieldBaseProps {
-		fieldName: FieldName
-		data: DataContextValue
-		isMutating: DataTreeMutationState
-		environment: Environment
+		rawMetadata: Field.RawMetadata
 	}
 
 	export interface StaticProps extends InnerBaseProps {
@@ -146,13 +139,14 @@ namespace ChoiceField {
 				return null
 			}
 
+			const environment = this.props.rawMetadata.environment
 			const options: Array<[GraphQlBuilder.Literal | Scalar, Label]> = this.isLiteralStaticMode(rawOptions)
-				? this.normalizeLiteralStaticOptions(rawOptions, this.props.environment)
-				: this.normalizeScalarStaticOptions(rawOptions, this.props.environment)
+				? this.normalizeLiteralStaticOptions(rawOptions, environment)
+				: this.normalizeScalarStaticOptions(rawOptions, environment)
 
 			return (
-				<Field name={this.props.fieldName}>
-					{(data: FieldAccessor, isMutating): React.ReactNode => {
+				<Field name={this.props.rawMetadata.fieldName}>
+					{({ data, isMutating }): React.ReactNode => {
 						const currentValue: ChoiceField.ValueRepresentation = options.findIndex(([value]) => {
 							return (
 								data.hasValue(value) ||
@@ -171,7 +165,7 @@ namespace ChoiceField {
 								data.onChange && data.onChange(options[newValue][0])
 							},
 							isMutating,
-							this.props.environment
+							environment
 						)
 					}}
 				</Field>
@@ -220,7 +214,7 @@ namespace ChoiceField {
 
 	export class Dynamic extends React.PureComponent<DynamicProps> {
 		public render() {
-			const data = this.props.data
+			const data = this.props.rawMetadata.data
 
 			if (!(data instanceof EntityAccessor)) {
 				throw new DataBindingError('Corrupted data')
@@ -229,11 +223,11 @@ namespace ChoiceField {
 			const { fieldName, toOneProps } = Parser.parseQueryLanguageExpression(
 				this.props.options,
 				Parser.EntryPoint.QualifiedFieldList,
-				this.props.environment
+				this.props.rawMetadata.environment
 			)
 
 			const fieldAccessor = data.data.getTreeRoot(fieldName)
-			const currentValueEntity = data.data.getField(this.props.fieldName)
+			const currentValueEntity = data.data.getField(this.props.rawMetadata.fieldName)
 
 			if (
 				!(fieldAccessor instanceof AccessorTreeRoot) ||
@@ -260,7 +254,7 @@ namespace ChoiceField {
 					const field = entity.data.getField(
 						props.field,
 						ReferenceMarker.ExpectedCount.UpToOne,
-						VariableInputTransformer.transformFilter(props.filter, this.props.environment),
+						VariableInputTransformer.transformFilter(props.filter, this.props.rawMetadata.environment),
 						props.reducedBy
 					)
 
@@ -307,8 +301,8 @@ namespace ChoiceField {
 						currentValueEntity.replaceWith(filteredData[newValue])
 					}
 				},
-				this.props.isMutating,
-				this.props.environment
+				this.props.rawMetadata.isMutating,
+				this.props.rawMetadata.environment
 			)
 		}
 	}

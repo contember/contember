@@ -18,9 +18,9 @@ export class TextAreaField extends React.PureComponent<TextAreaFieldProps> {
 
 	public render() {
 		return (
-			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => (
-					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
+			<Field<string> name={this.props.name}>
+				{({ data, environment }): React.ReactNode => (
+					<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<TextArea
 							value={data.currentValue || ''}
 							onChange={this.generateOnChange(data)}

@@ -1,3 +1,4 @@
+import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { DataTreeMutationState } from '../../state/dataTrees'
 import { FieldName, Scalar, VariableInput } from '../bindingTypes'
@@ -22,24 +23,45 @@ export interface FieldPublicProps {
 	defaultValue?: VariableInput | Scalar
 }
 
-export interface FieldProps extends FieldPublicProps {
-	children?: (data: FieldAccessor<any>, isMutating: DataTreeMutationState, environment: Environment) => React.ReactNode
+export interface FieldMetadata<
+	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+	Produced extends Persisted = Persisted
+> {
+	fieldName: FieldName
+	data: FieldAccessor<Persisted, Produced>
+	isMutating: DataTreeMutationState
+	environment: Environment
+}
+
+export interface FieldProps<
+	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+	Produced extends Persisted = Persisted
+> extends FieldPublicProps {
+	children?: (metadata: FieldMetadata<Persisted, Produced>) => React.ReactNode
 	isNonbearing?: boolean
 }
 
-class Field extends React.PureComponent<FieldProps> {
+class Field<
+	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+	Produced extends Persisted = Persisted
+> extends React.PureComponent<FieldProps<Persisted, Produced>> {
 	public static displayName = 'Field'
 
 	public render() {
 		return (
 			<Field.DataRetriever name={this.props.name}>
-				{(fieldName, data, isMutating, environment) => {
+				{({ fieldName, data, isMutating, environment }) => {
 					if (data instanceof EntityAccessor) {
 						const fieldData = data.data.getField(fieldName)
 
 						if (this.props.children && fieldData instanceof FieldAccessor) {
 							return (
-								<Field.FieldInner accessor={fieldData} isMutating={isMutating} environment={environment}>
+								<Field.FieldInner<Persisted, Produced>
+									fieldName={fieldName}
+									data={(fieldData as unknown) as FieldAccessor<Persisted, Produced>}
+									isMutating={isMutating}
+									environment={environment}
+								>
 									{this.props.children}
 								</Field.FieldInner>
 							)
@@ -68,27 +90,34 @@ class Field extends React.PureComponent<FieldProps> {
 }
 
 namespace Field {
-	export interface FieldInnerProps {
-		accessor: FieldAccessor
-		environment: Environment
-		isMutating: DataTreeMutationState
-		children: Exclude<FieldProps['children'], undefined>
+	export interface RawMetadata extends Pick<FieldMetadata, Exclude<keyof FieldMetadata, 'data'>> {
+		data: DataContextValue
 	}
 
-	export class FieldInner extends React.PureComponent<FieldInnerProps> {
+	export interface FieldInnerProps<
+		Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+		Produced extends Persisted = Persisted
+	> extends FieldMetadata<Persisted, Produced> {
+		children: Exclude<FieldProps<Persisted, Produced>['children'], undefined>
+	}
+
+	export class FieldInner<
+		Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+		Produced extends Persisted = Persisted
+	> extends React.PureComponent<FieldInnerProps<Persisted, Produced>> {
 		public render() {
-			return this.props.children(this.props.accessor, this.props.isMutating, this.props.environment)
+			return this.props.children({
+				fieldName: this.props.fieldName,
+				data: this.props.data,
+				isMutating: this.props.isMutating,
+				environment: this.props.environment
+			})
 		}
 	}
 
 	export interface DataRetrieverProps {
 		name: FieldName
-		children: (
-			fieldName: FieldName,
-			data: DataContextValue,
-			isMutating: DataTreeMutationState,
-			environment: Environment
-		) => React.ReactNode
+		children: (rawMetadata: RawMetadata) => React.ReactNode
 	}
 
 	export class DataRetriever extends React.Component<DataRetrieverProps> {
@@ -102,7 +131,14 @@ namespace Field {
 								<MutationStateRetriever>
 									{isMutating => (
 										<DataContext.Consumer>
-											{(data: DataContextValue) => this.props.children(fieldName, data, isMutating, environment)}
+											{(data: DataContextValue) =>
+												this.props.children({
+													fieldName,
+													data,
+													isMutating,
+													environment
+												})
+											}
 										</DataContext.Consumer>
 									)}
 								</MutationStateRetriever>

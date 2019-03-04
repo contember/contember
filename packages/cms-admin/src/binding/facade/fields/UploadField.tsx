@@ -10,7 +10,7 @@ import State from '../../../state'
 import { AnyUpload, UploadStatus } from '../../../state/upload'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment, FieldAccessor } from '../../dao'
+import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 
 export interface UploadFieldOwnProps {
@@ -50,13 +50,13 @@ class UploadFieldComponent extends React.Component<
 		const upload: AnyUpload | undefined = this.state.uploadId ? this.props.uploads[this.state.uploadId] : undefined
 
 		return (
-			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => {
+			<Field<string> name={this.props.name}>
+				{({ data, environment }): React.ReactNode => {
 					if (upload && upload.status === UploadStatus.FINISHED && upload.resultUrl !== data.currentValue) {
 						data.onChange && data.onChange(upload.resultUrl)
 					}
 					return (
-						<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
+						<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
 							<Dropzone
 								onDrop={async (accepted: File[]) => {
 									this.handleStartUpload(accepted)

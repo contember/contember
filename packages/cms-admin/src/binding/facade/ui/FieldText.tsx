@@ -15,9 +15,7 @@ export class FieldText extends React.PureComponent<FieldTextProps> {
 	public render() {
 		return (
 			<Field<string> name={this.props.name}>
-				{({ data }) =>
-					this.props.formatter ? this.props.formatter(data.currentValue) : data.currentValue
-				}
+				{({ data }) => (this.props.formatter ? this.props.formatter(data.currentValue) : data.currentValue)}
 			</Field>
 		)
 	}

@@ -1,4 +1,4 @@
-import * as Koa from 'koa'
+import Koa from 'koa'
 
 class TimerMiddlewareFactory {
 	public create(): Koa.Middleware {

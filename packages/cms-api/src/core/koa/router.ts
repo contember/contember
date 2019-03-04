@@ -1,6 +1,6 @@
-import * as pathToRegexp from 'path-to-regexp'
-import * as compose from 'koa-compose'
-import * as Koa from 'koa'
+import pathToRegexp from 'path-to-regexp'
+import compose from 'koa-compose'
+import Koa from 'koa'
 
 type Params = { [param: string]: string }
 type ContextWithRequest = Pick<Koa.Context, Exclude<keyof Koa.Context, 'state'>> & {
@@ -17,7 +17,7 @@ function createRoutingMiddleware(
 ): compose.Middleware<ContextWithRequest> {
 	const downstream = app instanceof Koa ? compose(app.middleware) : app
 
-	return async (ctx: Koa.Context, upstream) => {
+	return async (ctx: ContextWithRequest, upstream) => {
 		const prev = ctx.path
 		if (method && ctx.req.method !== method) {
 			return await upstream()
@@ -33,7 +33,7 @@ function createRoutingMiddleware(
 		ctx.state.params = params
 		ctx.path = params.__path || '/'
 
-		await downstream(ctx, async () => {
+		await downstream(ctx as Koa.Context, async () => {
 			ctx.path = prev
 			await upstream()
 			ctx.path = params.__path || '/'

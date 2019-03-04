@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import Knex from 'knex'
 import { Value } from '../types'
 import { QueryResult } from 'pg'
 import QueryBuilder from '../QueryBuilder'

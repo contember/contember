@@ -2,7 +2,7 @@ import QueryHandler from '../query/QueryHandler'
 import Queryable from '../query/Queryable'
 import KnexConnection from './KnexConnection'
 import QueryHandlerAccessor from '../query/QueryHandlerAccessor'
-import * as Knex from 'knex'
+import Knex from 'knex'
 import KnexWrapper from './KnexWrapper'
 
 export default class KnexQueryable implements Queryable<KnexQueryable> {

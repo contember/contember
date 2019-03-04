@@ -1,4 +1,4 @@
-import * as crypto from 'crypto'
+import crypto from 'crypto'
 
 namespace ApiKey {
 	export function computeTokenHash(token: string): string {

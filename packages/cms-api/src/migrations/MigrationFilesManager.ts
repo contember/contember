@@ -1,5 +1,5 @@
 import FileNameHelper from './FileNameHelper'
-import * as fs from 'fs'
+import fs from 'fs'
 import { promisify } from 'util'
 
 type EngineMigrationType = 'tenant' | 'project'

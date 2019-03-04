@@ -1,5 +1,5 @@
 import Command from './Command'
-import * as crypto from 'crypto'
+import crypto from 'crypto'
 import ApiKey from '../type/ApiKey'
 import { uuid } from '../../../utils/uuid'
 import { now } from '../../../utils/date'

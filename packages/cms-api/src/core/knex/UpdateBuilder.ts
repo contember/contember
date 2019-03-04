@@ -1,6 +1,6 @@
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
-import * as Knex from 'knex'
+import Knex from 'knex'
 import { QueryResult } from 'pg'
 import { Value } from './types'
 import Returning from './internal/Returning'

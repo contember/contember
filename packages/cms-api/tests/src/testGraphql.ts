@@ -1,12 +1,12 @@
 import { expect } from 'chai'
 import { graphql, GraphQLSchema } from 'graphql'
 import { maskErrors } from 'graphql-errors'
-import * as knex from 'knex'
-import * as mockKnex from 'mock-knex'
+import knex from 'knex'
+import mockKnex from 'mock-knex'
 import { testUuid } from './testUuid'
 import * as uuid from '../../src/utils/uuid'
 import * as date from '../../src/utils/date'
-import * as sinon from 'sinon'
+import sinon from 'sinon'
 
 export interface SqlQuery {
 	sql: string

@@ -1,6 +1,6 @@
 import Command from './Command'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
-import * as bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 import { uuid } from '../../../utils/uuid'
 
 class CreatePersonCommand implements Command<string> {

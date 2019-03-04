@@ -1,11 +1,11 @@
 import { ApolloServer } from 'apollo-server-koa'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import { Context } from '../content-api/types'
-import * as Koa from 'koa'
-import * as koaCompose from 'koa-compose'
+import Koa from 'koa'
+import koaCompose from 'koa-compose'
 import { ContextWithRequest, route } from '../core/koa/router'
-import * as corsMiddleware from '@koa/cors'
-import * as bodyParser from 'koa-bodyparser'
+import corsMiddleware from '@koa/cors'
+import bodyParser from 'koa-bodyparser'
 import PlaygroundMiddlewareFactory from './PlaygroundMiddlewareFactory'
 import { ProjectContainer } from '../CompositionRoot'
 import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
@@ -99,6 +99,7 @@ class ContentMiddlewareFactory {
 						ctx.state.timer('done')
 
 						const apolloKoa = new Koa()
+						ctx.state.timer('creating graphql server')
 						const server = this.createApolloServer(
 							dataSchema,
 							projectVariables,
@@ -106,6 +107,7 @@ class ContentMiddlewareFactory {
 							permissions,
 							projectContainer.get('knexDebugger')
 						)
+						ctx.state.timer('applying middleware')
 						server.applyMiddleware({
 							app: apolloKoa,
 							path: '/',
@@ -115,13 +117,13 @@ class ContentMiddlewareFactory {
 						})
 
 						ctx.state.timer('running graphql')
-						await koaCompose(apolloKoa.middleware)(ctx, next)
+						await koaCompose<any>(apolloKoa.middleware)(ctx, next)
 						ctx.state.timer('done')
 					})
 				}
 			)
 
-			await koaCompose(contentKoa.middleware)(ctx, next)
+			await koaCompose<any>(contentKoa.middleware)(ctx, next)
 		})
 	}
 

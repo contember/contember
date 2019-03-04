@@ -36,7 +36,9 @@ export default class QueryProvider {
 				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 			},
 			resolve: (parent, args, context, info) =>
-				context.executionContainer.get('readResolver').resolveGetQuery(entity, this.queryAstAFactory.create(info)),
+				context.timer('query ' + info.fieldName, () =>
+					context.executionContainer.get('readResolver').resolveGetQuery(entity, this.queryAstAFactory.create(info))
+				),
 		}
 	}
 
@@ -54,7 +56,9 @@ export default class QueryProvider {
 				limit: { type: GraphQLInt },
 			},
 			resolve: (parent, args, context, info) =>
-				context.executionContainer.get('readResolver').resolveListQuery(entity, this.queryAstAFactory.create(info)),
+				context.timer('query ' + info.fieldName, () =>
+					context.executionContainer.get('readResolver').resolveListQuery(entity, this.queryAstAFactory.create(info))
+				),
 		}
 	}
 }

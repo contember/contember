@@ -302,7 +302,7 @@ namespace ChoiceField {
 						currentValueEntity.replaceWith(filteredData[newValue])
 					}
 				},
-				fieldName: fieldName,
+				fieldName: fieldName
 			})
 		}
 	}

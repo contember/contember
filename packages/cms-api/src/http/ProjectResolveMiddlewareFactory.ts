@@ -5,8 +5,7 @@ import { KoaRequestState } from '../core/koa/router'
 type InputState = ProjectResolveMiddlewareFactory.KoaState & KoaRequestState
 
 class ProjectResolveMiddlewareFactory {
-	constructor(private projectContainers: ProjectContainer[]) {
-	}
+	constructor(private projectContainers: ProjectContainer[]) {}
 
 	public create(): KoaMiddleware<InputState> {
 		const projectResolve: KoaMiddleware<InputState> = async (ctx, next) => {

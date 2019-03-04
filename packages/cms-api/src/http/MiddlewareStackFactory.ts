@@ -7,15 +7,13 @@ import SystemMiddlewareFactory from './SystemMiddlewareFactory'
 import { compose } from '../core/koa/compose'
 
 class MiddlewareStackFactory {
-
 	constructor(
 		private readonly timerMiddlewareFactory: TimerMiddlewareFactory,
 		private readonly homepageMiddlewareFactory: HomepageMiddlewareFactory,
 		private readonly contentMiddlewareFactory: ContentMiddlewareFactory,
 		private readonly tenantMiddlewareFactory: TenantMiddlewareFactory,
-		private readonly systemMiddlewareFactory: SystemMiddlewareFactory,
-	) {
-	}
+		private readonly systemMiddlewareFactory: SystemMiddlewareFactory
+	) {}
 
 	create(): Koa.Middleware {
 		return compose([

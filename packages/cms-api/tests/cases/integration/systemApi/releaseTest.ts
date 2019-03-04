@@ -87,10 +87,8 @@ describe('system api', () => {
 
 		expect(authors).deep.eq({
 			data: {
-				listAuthor: [
-					{ name: 'Jack Black' }
-				]
-			}
+				listAuthor: [{ name: 'Jack Black' }],
+			},
 		})
 
 		const diff2 = await tester.querySystem(GQL`query {

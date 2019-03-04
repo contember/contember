@@ -18,7 +18,6 @@ import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import Actions from '../authorization/Actions'
 import SelectBuilder from '../../../core/knex/SelectBuilder'
 
-
 type AffectedColumnsByRow = { [rowId: string]: string[] }
 type PermissionsByRow = { [rowId: string]: boolean }
 type PermissionsByTable = { [tableName: string]: PermissionsByRow }
@@ -30,8 +29,7 @@ class PermissionsVerifier {
 		private readonly db: KnexWrapper,
 		private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
 		private readonly authorizator: Authorizator
-	) {
-	}
+	) {}
 
 	public async verify(
 		permissionContext: PermissionsVerifier.Context,
@@ -61,15 +59,26 @@ class PermissionsVerifier {
 		const contentEvents = events.filter(this.isContentEvent)
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
-		const readPermissions = await this.verifyPermissionsCb(context, sourceStage, eventsByTable, this.verifyReadPermissionsForTable)
-		const writePermissions = await this.verifyPermissionsCb(context, targetStage, eventsByTable, this.verifyWritePermissionsForTable)
+		const readPermissions = await this.verifyPermissionsCb(
+			context,
+			sourceStage,
+			eventsByTable,
+			this.verifyReadPermissionsForTable
+		)
+		const writePermissions = await this.verifyPermissionsCb(
+			context,
+			targetStage,
+			eventsByTable,
+			this.verifyWritePermissionsForTable
+		)
 
 		const permissionsResult: PermissionsVerifier.Result = {}
 
 		for (let event of events) {
 			if (this.isContentEvent(event)) {
-				permissionsResult[event.id] = (readPermissions[event.tableName][event.rowId] || false)
-					&& (writePermissions[event.tableName][event.rowId] || false)
+				permissionsResult[event.id] =
+					(readPermissions[event.tableName][event.rowId] || false) &&
+					(writePermissions[event.tableName][event.rowId] || false)
 			} else {
 				permissionsResult[event.id] = false
 			}
@@ -82,7 +91,7 @@ class PermissionsVerifier {
 		context: PermissionsVerifier.Context,
 		stage: Stage,
 		eventsByTable: ContentEventsByTable,
-		cb: PermissionsVerifier['verifyReadPermissionsForTable'] | PermissionsVerifier['verifyWritePermissionsForTable'],
+		cb: PermissionsVerifier['verifyReadPermissionsForTable'] | PermissionsVerifier['verifyWritePermissionsForTable']
 	): Promise<PermissionsByTable> {
 		const db = this.db.forSchema(formatSchemaName(stage))
 		const schema = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
@@ -135,7 +144,6 @@ class PermissionsVerifier {
 		return permissions
 	}
 
-
 	private async verifyWritePermissionsForTable(
 		schema: Model.Schema,
 		entity: Model.Entity,
@@ -156,16 +164,24 @@ class PermissionsVerifier {
 		for (const eventType of ContentEvents) {
 			const typeEvents = events.filter(it => it.type === eventType)
 			affectedColumnsByType[eventType] = this.getAffectedColumnsByRow(typeEvents)
-			qb = this.buildPredicates(qb, eventToOperationMapping[eventType], affectedColumnsByType[eventType], entity, predicateFactory, schema)
+			qb = this.buildPredicates(
+				qb,
+				eventToOperationMapping[eventType],
+				affectedColumnsByType[eventType],
+				entity,
+				predicateFactory,
+				schema
+			)
 		}
 
 		const result = await qb.getResult()
 		const permissions: PermissionsByRow = {}
 		for (let row of result) {
-
-			let result = true;
+			let result = true
 			for (const eventType of ContentEvents) {
-				result = result && this.extractRowPermissions(row, affectedColumnsByType[eventType], eventToOperationMapping[eventType])
+				result =
+					result &&
+					this.extractRowPermissions(row, affectedColumnsByType[eventType], eventToOperationMapping[eventType])
 			}
 
 			permissions[row.__primary] = result
@@ -180,9 +196,8 @@ class PermissionsVerifier {
 		rowAffectedColumns: AffectedColumnsByRow,
 		entity: Model.Entity,
 		predicateFactory: PredicateFactory,
-		schema: Model.Schema,
+		schema: Model.Schema
 	): SelectBuilder {
-
 		const columnToField = Object.values(entity.fields).reduce<{ [column: string]: string }>(
 			(result, field) => ({
 				...result,
@@ -199,9 +214,10 @@ class PermissionsVerifier {
 		)
 
 		for (const column of columns) {
-			const fieldPredicate = operation === Acl.Operation.delete
-				? predicateFactory.create(entity, operation)
-				: predicateFactory.create(entity, operation, [columnToField[column]])
+			const fieldPredicate =
+				operation === Acl.Operation.delete
+					? predicateFactory.create(entity, operation)
+					: predicateFactory.create(entity, operation, [columnToField[column]])
 
 			qb = whereBuilder.buildAdvanced(entity, new Path([]), fieldPredicate, cb =>
 				qb.select(
@@ -238,9 +254,15 @@ class PermissionsVerifier {
 		}, {})
 	}
 
-	private extractRowPermissions(row: { [column: string]: any }, affectedColumnsByRow: AffectedColumnsByRow, operation: Acl.Operation) {
-		return affectedColumnsByRow[row.__primary]
-			.reduce((acc, column) => acc && row[this.formatPermissionColumn(column, operation)], true)
+	private extractRowPermissions(
+		row: { [column: string]: any },
+		affectedColumnsByRow: AffectedColumnsByRow,
+		operation: Acl.Operation
+	) {
+		return affectedColumnsByRow[row.__primary].reduce(
+			(acc, column) => acc && row[this.formatPermissionColumn(column, operation)],
+			true
+		)
 	}
 
 	private formatPermissionColumn(columnName: string, operation: Acl.Operation) {

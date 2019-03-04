@@ -3,10 +3,11 @@ import { KoaMiddleware } from '../core/koa/types'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
 
-type InputState = ProjectMemberMiddlewareFactory.KoaState & AuthMiddlewareFactory.KoaState & ProjectResolveMiddlewareFactory.KoaState
+type InputState = ProjectMemberMiddlewareFactory.KoaState &
+	AuthMiddlewareFactory.KoaState &
+	ProjectResolveMiddlewareFactory.KoaState
 class ProjectMemberMiddlewareFactory {
-	constructor(private readonly projectMemberManager: ProjectMemberManager) {
-	}
+	constructor(private readonly projectMemberManager: ProjectMemberManager) {}
 
 	public create(): KoaMiddleware<InputState> {
 		const projectMember: KoaMiddleware<InputState> = async (ctx, next) => {

@@ -13,8 +13,7 @@ class TenantApolloServerFactory {
 		private readonly resolvers: Config['resolvers'],
 		private readonly projectMemberManager: ProjectMemberManager,
 		private readonly authorizator: Authorizator<Identity>
-	) {
-	}
+	) {}
 
 	create(): ApolloServer {
 		return new ApolloServer({

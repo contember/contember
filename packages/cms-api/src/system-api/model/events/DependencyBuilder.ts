@@ -11,7 +11,7 @@ namespace DependencyBuilder {
 		constructor(private readonly builders: DependencyBuilder[]) {}
 
 		async build(events: Event[]): Promise<Dependencies> {
-			const emptyDeps = events.map(it => it.id).reduce((acc, val) => ({...acc, [val]: []}), {})
+			const emptyDeps = events.map(it => it.id).reduce((acc, val) => ({ ...acc, [val]: [] }), {})
 
 			return (await Promise.all(this.builders.map(builder => builder.build(events)))).reduce((result, val) => {
 				for (let event in val) {

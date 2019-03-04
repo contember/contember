@@ -10,8 +10,7 @@ class StageByIdQuery extends KnexQuery<StageByIdQuery.Result> {
 	}
 
 	async fetch(queryable: KnexQueryable): Promise<StageByIdQuery.Result> {
-		let selectBuilder = prepareStageQueryBuilder(queryable)
-			.where({ id: this.stageId })
+		let selectBuilder = prepareStageQueryBuilder(queryable).where({ id: this.stageId })
 
 		if (this.forUpdate) {
 			selectBuilder = selectBuilder.lock(SelectBuilder.LockType.forNoKeyUpdate)

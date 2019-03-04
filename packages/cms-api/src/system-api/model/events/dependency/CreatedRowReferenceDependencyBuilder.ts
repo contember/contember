@@ -65,7 +65,7 @@ class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 					continue
 				}
 				if (createdRows[event.values[column]]) {
-					dependencies[event.id] = [...dependencies[event.id] || [], createdRows[event.values[column]]]
+					dependencies[event.id] = [...(dependencies[event.id] || []), createdRows[event.values[column]]]
 				}
 			}
 		}

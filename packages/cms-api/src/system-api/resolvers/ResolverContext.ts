@@ -11,9 +11,8 @@ export default class ResolverContext implements ErrorHandlerExtension.Context {
 		public readonly variables: Acl.VariablesMap,
 		private readonly authorizator: Authorizator<Identity>,
 		public readonly container: SystemExecutionContainer,
-		public readonly errorHandler: ErrorHandlerExtension.Context['errorHandler'],
-	) {
-	}
+		public readonly errorHandler: ErrorHandlerExtension.Context['errorHandler']
+	) {}
 
 	public async isAllowed(scope: AuthorizationScope<Identity>, action: Authorizator.Action): Promise<boolean> {
 		return await this.authorizator.isAllowed(this.identity, scope, action)

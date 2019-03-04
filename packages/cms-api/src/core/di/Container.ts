@@ -1,6 +1,4 @@
-type Container<M extends Container.ServiceTypeMap> = Container.Impl<M> & {
-	[K in keyof M]: M[K]
-}
+type Container<M extends Container.ServiceTypeMap> = Container.Impl<M> & { [K in keyof M]: M[K] }
 
 namespace Container {
 	export type ServiceName = string
@@ -40,8 +38,6 @@ namespace Container {
 	}
 
 	export class Impl<M extends Container.ServiceTypeMap> {
-
-
 		private readonly services: Partial<M> = {}
 		private readonly accessors: Readonly<M> = {} as any
 
@@ -82,7 +78,6 @@ namespace Container {
 			} as Container.ServiceFactoryMap<M & M2>) as Container<M & M2>
 		}
 	}
-
 }
 
 export default Container

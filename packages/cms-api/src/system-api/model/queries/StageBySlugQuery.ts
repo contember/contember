@@ -9,8 +9,7 @@ class StageBySlugQuery extends KnexQuery<StageBySlugQuery.Result> {
 	}
 
 	async fetch(queryable: KnexQueryable): Promise<StageBySlugQuery.Result> {
-		let selectBuilder = prepareStageQueryBuilder(queryable)
-			.where({ slug: this.slug })
+		let selectBuilder = prepareStageQueryBuilder(queryable).where({ slug: this.slug })
 
 		const rows = await selectBuilder.getResult()
 

@@ -72,27 +72,31 @@ class CompositionRoot {
 
 			.addService('homepageMiddlewareFactory', () => new HomepageMiddlewareFactory())
 
-			.addService('authMiddlewareFactory', ({ tenantContainer }) =>
-				new AuthMiddlewareFactory(tenantContainer.get('apiKeyManager'))
+			.addService(
+				'authMiddlewareFactory',
+				({ tenantContainer }) => new AuthMiddlewareFactory(tenantContainer.get('apiKeyManager'))
 			)
-			.addService('projectMemberMiddlewareFactory', ({ tenantContainer }) =>
-				new ProjectMemberMiddlewareFactory(tenantContainer.projectMemberManager)
+			.addService(
+				'projectMemberMiddlewareFactory',
+				({ tenantContainer }) => new ProjectMemberMiddlewareFactory(tenantContainer.projectMemberManager)
 			)
-			.addService('projectResolveMiddlewareFactory', ({ projectContainers }) =>
-				new ProjectResolveMiddlewareFactory(projectContainers)
+			.addService(
+				'projectResolveMiddlewareFactory',
+				({ projectContainers }) => new ProjectResolveMiddlewareFactory(projectContainers)
 			)
-			.addService('stageResolveMiddlewareFactory', () =>
-				new StageResolveMiddlewareFactory()
-			)
+			.addService('stageResolveMiddlewareFactory', () => new StageResolveMiddlewareFactory())
 			.addService('databaseTransactionMiddlewareFactory', () => {
 				return new DatabaseTransactionMiddlewareFactory()
 			})
-			.addService('tenantMiddlewareFactory', ({ tenantContainer, authMiddlewareFactory }) =>
-				new TenantMiddlewareFactory(tenantContainer.get('apolloServer'), authMiddlewareFactory)
+			.addService(
+				'tenantMiddlewareFactory',
+				({ tenantContainer, authMiddlewareFactory }) =>
+					new TenantMiddlewareFactory(tenantContainer.get('apolloServer'), authMiddlewareFactory)
 			)
 			.addService('setupSystemVariablesMiddlewareFactory', () => new SetupSystemVariablesMiddlewareFactory())
-			.addService('contentMiddlewareFactory', (
-				{
+			.addService(
+				'contentMiddlewareFactory',
+				({
 					authMiddlewareFactory,
 					projectMemberMiddlewareFactory,
 					projectResolveMiddlewareFactory,
@@ -100,46 +104,58 @@ class CompositionRoot {
 					databaseTransactionMiddlewareFactory,
 					setupSystemVariablesMiddlewareFactory,
 				}) =>
-				new ContentMiddlewareFactory(
+					new ContentMiddlewareFactory(
+						projectResolveMiddlewareFactory,
+						stageResolveMiddlewareFactory,
+						authMiddlewareFactory,
+						projectMemberMiddlewareFactory,
+						databaseTransactionMiddlewareFactory,
+						setupSystemVariablesMiddlewareFactory
+					)
+			)
+			.addService(
+				'systemMiddlewareFactory',
+				({
 					projectResolveMiddlewareFactory,
-					stageResolveMiddlewareFactory,
 					authMiddlewareFactory,
 					projectMemberMiddlewareFactory,
 					databaseTransactionMiddlewareFactory,
-					setupSystemVariablesMiddlewareFactory
-				)
-			)
-			.addService('systemMiddlewareFactory', ({ projectResolveMiddlewareFactory, authMiddlewareFactory, projectMemberMiddlewareFactory, databaseTransactionMiddlewareFactory, setupSystemVariablesMiddlewareFactory }) =>
-				new SystemMiddlewareFactory(projectResolveMiddlewareFactory, authMiddlewareFactory, projectMemberMiddlewareFactory, databaseTransactionMiddlewareFactory, setupSystemVariablesMiddlewareFactory)
+					setupSystemVariablesMiddlewareFactory,
+				}) =>
+					new SystemMiddlewareFactory(
+						projectResolveMiddlewareFactory,
+						authMiddlewareFactory,
+						projectMemberMiddlewareFactory,
+						databaseTransactionMiddlewareFactory,
+						setupSystemVariablesMiddlewareFactory
+					)
 			)
 			.addService('timerMiddlewareFactory', () => new TimerMiddlewareFactory())
 
-			.addService('middlewareStackFactory', (
-				{
+			.addService(
+				'middlewareStackFactory',
+				({
 					timerMiddlewareFactory,
 					homepageMiddlewareFactory,
 					contentMiddlewareFactory,
 					tenantMiddlewareFactory,
-					systemMiddlewareFactory
-				}
-				) => new MiddlewareStackFactory(
-				timerMiddlewareFactory,
-				homepageMiddlewareFactory,
-				contentMiddlewareFactory,
-				tenantMiddlewareFactory,
-				systemMiddlewareFactory
-				)
+					systemMiddlewareFactory,
+				}) =>
+					new MiddlewareStackFactory(
+						timerMiddlewareFactory,
+						homepageMiddlewareFactory,
+						contentMiddlewareFactory,
+						tenantMiddlewareFactory,
+						systemMiddlewareFactory
+					)
 			)
 
-			.addService(
-				'koa',
-				({ middlewareStackFactory }) => {
-					const app = new Koa()
-					app.use(middlewareStackFactory.create())
+			.addService('koa', ({ middlewareStackFactory }) => {
+				const app = new Koa()
+				app.use(middlewareStackFactory.create())
 
-					return app
-				}
-			)
+				return app
+			})
 			.build()
 
 		return masterContainer.get('koa')
@@ -199,8 +215,11 @@ class CompositionRoot {
 						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory)
 				)
 				.addService('apolloServerFactory', ({ knexDebugger }) => new ContentApolloServerFactory(knexDebugger))
-				.addService('contentApolloMiddlewareFactory', ({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory }) =>
-					new ContentApolloMiddlewareFactory(project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory))
+				.addService(
+					'contentApolloMiddlewareFactory',
+					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory }) =>
+						new ContentApolloMiddlewareFactory(project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory)
+				)
 				.build()
 
 			const systemContainer = new SystemContainerFactory().create(

@@ -10,7 +10,7 @@ class DatabaseTransactionMiddlewareFactory {
 
 					ctx.state.db = db
 					let rollback = false
-					ctx.state.planRollback = () => rollback = true
+					ctx.state.planRollback = () => (rollback = true)
 					await next()
 					if (rollback) {
 						throw new DatabaseTransactionMiddlewareFactory.RollbackMarker()
@@ -32,8 +32,7 @@ namespace DatabaseTransactionMiddlewareFactory {
 		planRollback: () => void
 	}
 
-	export class RollbackMarker {
-	}
+	export class RollbackMarker {}
 }
 
 export default DatabaseTransactionMiddlewareFactory

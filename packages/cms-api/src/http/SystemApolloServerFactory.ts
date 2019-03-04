@@ -13,30 +13,35 @@ import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewar
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 
 class SystemApolloServerFactory {
-	constructor(private readonly resolvers: Config['resolvers'],
-	            private readonly authorizator: Authorizator<Identity>,
-	            private readonly executionContainerFactory: SystemExecutionContainer.Factory) {
-	}
+	constructor(
+		private readonly resolvers: Config['resolvers'],
+		private readonly authorizator: Authorizator<Identity>,
+		private readonly executionContainerFactory: SystemExecutionContainer.Factory
+	) {}
 
 	create(): ApolloServer {
 		return new ApolloServer({
 			typeDefs,
 			resolvers: this.resolvers,
-			extensions: [
-				() => new ErrorHandlerExtension(),
-			],
+			extensions: [() => new ErrorHandlerExtension()],
 			formatError: (error: any) => {
 				if (error instanceof AuthenticationError) {
-					return {message: error.message, locations: undefined, path: undefined}
+					return { message: error.message, locations: undefined, path: undefined }
 				}
 				if (error instanceof ApolloError) {
 					return error
 				}
 				console.error(error.originalError || error)
-				return {message: 'Internal server error', locations: undefined, path: undefined}
+				return { message: 'Internal server error', locations: undefined, path: undefined }
 			},
-			context: ({ ctx }: {
-				ctx: KoaContext<DatabaseTransactionMiddlewareFactory.KoaState & AuthMiddlewareFactory.KoaState & ProjectMemberMiddlewareFactory.KoaState>
+			context: ({
+				ctx,
+			}: {
+				ctx: KoaContext<
+					DatabaseTransactionMiddlewareFactory.KoaState &
+						AuthMiddlewareFactory.KoaState &
+						ProjectMemberMiddlewareFactory.KoaState
+				>
 			}): ResolverContext => {
 				return new ResolverContext(
 					new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {}),

@@ -6,7 +6,6 @@ import { setupSystemVariables as setupSystemVariablesFn } from '../system-api/Sy
 type InputState = DatabaseTransactionMiddlewareFactory.KoaState & AuthMiddlewareFactory.KoaState
 
 class SetupSystemVariablesMiddlewareFactory {
-
 	public create(): KoaMiddleware<InputState> {
 		const setupSystemVariables: KoaMiddleware<InputState> = async (ctx, next) => {
 			await setupSystemVariablesFn(ctx.state.db, ctx.state.authResult.identityId)

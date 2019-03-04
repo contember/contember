@@ -12,15 +12,9 @@ import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 
 class ContentApolloServerFactory {
-	constructor(private readonly knexDebugger: KnexDebugger) {
+	constructor(private readonly knexDebugger: KnexDebugger) {}
 
-	}
-
-
-	public create(
-		dataSchema: GraphQLSchema,
-		schema: Model.Schema,
-		permissions: Acl.Permissions,): ApolloServer {
+	public create(dataSchema: GraphQLSchema, schema: Model.Schema, permissions: Acl.Permissions): ApolloServer {
 		return new ApolloServer({
 			tracing: true,
 			introspection: true,
@@ -44,7 +38,11 @@ class ContentApolloServerFactory {
 			},
 			schema: dataSchema,
 			uploads: false,
-			context: async ({ ctx }: { ctx: KoaContext<ProjectMemberMiddlewareFactory.KoaState & DatabaseTransactionMiddlewareFactory.KoaState> }): Promise<Context> => {
+			context: async ({
+				ctx,
+			}: {
+				ctx: KoaContext<ProjectMemberMiddlewareFactory.KoaState & DatabaseTransactionMiddlewareFactory.KoaState>
+			}): Promise<Context> => {
 				const partialContext = {
 					db: ctx.state.db,
 					identityVariables: ctx.state.projectVariables,

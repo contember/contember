@@ -28,22 +28,22 @@ interface SystemExecutionContainer {
 }
 
 namespace SystemExecutionContainer {
-
-
 	export class Factory {
 		constructor(
 			private readonly migrations: Promise<ProjectSchemaInfo.Migration[]>,
 			private readonly migrationFilesManager: MigrationFilesManager,
 			private readonly authorizator: Authorizator,
-			private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
-		) {
-		}
+			private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory
+		) {}
 
 		public create(db: KnexWrapper): SystemExecutionContainer {
 			return new Container.Builder({})
 				.addService('db', () => db)
 				.addService('queryHandler', ({ db }) => db.createQueryHandler())
-				.addService('schemaVersionBuilder', ({ queryHandler }) => new SchemaVersionBuilder(queryHandler, this.migrations))
+				.addService(
+					'schemaVersionBuilder',
+					({ queryHandler }) => new SchemaVersionBuilder(queryHandler, this.migrations)
+				)
 				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
 
 				.addService('tableReferencingResolver', () => new TableReferencingResolver())

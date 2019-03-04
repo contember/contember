@@ -6,10 +6,8 @@ import Project from '../config/Project'
 type InputState = StageResolveMiddlewareFactory.KoaState & ProjectResolveMiddlewareFactory.KoaState & KoaRequestState
 
 class StageResolveMiddlewareFactory {
-
 	public create(): KoaMiddleware<InputState> {
 		const stageResolve: KoaMiddleware<InputState> = async (ctx, next) => {
-
 			const project = ctx.state.projectContainer.project
 
 			const stage = project.stages.find(stage => stage.slug === ctx.state.params.stageSlug)

@@ -21,36 +21,47 @@ class ContentMiddlewareFactory {
 		private readonly authMiddlewareFactory: AuthMiddlewareFactory,
 		private readonly projectMemberMiddlewareFactory: ProjectMemberMiddlewareFactory,
 		private readonly databaseTransactionMiddlewareFactory: DatabaseTransactionMiddlewareFactory,
-		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory,
-	) {
-	}
+		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory
+	) {}
 
 	create(): Koa.Middleware {
-		const assignDb: KoaMiddleware<ProjectResolveMiddlewareFactory.KoaState & StageResolveMiddlewareFactory.KoaState & { db: KnexWrapper }> = (ctx, next) => {
+		const assignDb: KoaMiddleware<
+			ProjectResolveMiddlewareFactory.KoaState & StageResolveMiddlewareFactory.KoaState & { db: KnexWrapper }
+		> = (ctx, next) => {
 			const projectContainer = ctx.state.projectContainer
 			const stage = ctx.state.stage
 			const knex = projectContainer.knexConnection
 			ctx.state.db = new KnexWrapper(knex, formatSchemaName(stage))
 			return next()
 		}
-		const contentApollo: KoaMiddleware<ProjectResolveMiddlewareFactory.KoaState
-			& StageResolveMiddlewareFactory.KoaState> = async (ctx, next) => {
-			await ctx.state.projectContainer.contentApolloMiddlewareFactory.create(ctx.state.stage)(ctx as KoaContext<any>, next)
+		const contentApollo: KoaMiddleware<
+			ProjectResolveMiddlewareFactory.KoaState & StageResolveMiddlewareFactory.KoaState
+		> = async (ctx, next) => {
+			await ctx.state.projectContainer.contentApolloMiddlewareFactory.create(ctx.state.stage)(
+				ctx as KoaContext<any>,
+				next
+			)
 		}
 
-		return route('/content/:projectSlug/:stageSlug$', compose([
-			new PlaygroundMiddlewareFactory().create(),
-			corsMiddleware(),
-			bodyParser(),
-			this.authMiddlewareFactory.create(),
-			this.projectFindMiddlewareFactory.create(),
-			this.stageFindMiddlewareFactory.create(),
-			this.projectMemberMiddlewareFactory.create(),
-			assignDb,
-			this.databaseTransactionMiddlewareFactory.create(),
-			this.setupSystemVariablesMiddlewareFactory.create(),
-			contentApollo,
-		], true))
+		return route(
+			'/content/:projectSlug/:stageSlug$',
+			compose(
+				[
+					new PlaygroundMiddlewareFactory().create(),
+					corsMiddleware(),
+					bodyParser(),
+					this.authMiddlewareFactory.create(),
+					this.projectFindMiddlewareFactory.create(),
+					this.stageFindMiddlewareFactory.create(),
+					this.projectMemberMiddlewareFactory.create(),
+					assignDb,
+					this.databaseTransactionMiddlewareFactory.create(),
+					this.setupSystemVariablesMiddlewareFactory.create(),
+					contentApollo,
+				],
+				true
+			)
+		)
 	}
 }
 

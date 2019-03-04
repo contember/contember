@@ -16,10 +16,10 @@ class EventsRebaser {
 
 		const newHead = result.rows[0].id || newBase.event_id
 
-		console.log("Old head: " + headStage.event_id)
-		console.log("Old base: " + oldBase.event_id)
-		console.log("New head: " + newHead)
-		console.log("New base: " + newBase.event_id)
+		console.log('Old head: ' + headStage.event_id)
+		console.log('Old base: ' + oldBase.event_id)
+		console.log('New head: ' + newHead)
+		console.log('New base: ' + newBase.event_id)
 
 		await new UpdateStageEventCommand(headStage.id, newHead).execute(this.db)
 	}

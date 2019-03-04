@@ -17,14 +17,12 @@ import SystemExecutionContainer from './SystemExecutionContainer'
 import SchemaMigrationDiffsResolver from '../content-schema/SchemaMigrationDiffsResolver'
 
 export default class SystemContainerFactory {
-	public create(
-		container: {
-			migrationFilesManager: MigrationFilesManager
-			permissionsByIdentityFactory: PermissionsByIdentityFactory
-			aclSchema: Acl.Schema
-			schemaMigrationDiffsResolver: SchemaMigrationDiffsResolver
-		}
-	): Container<{
+	public create(container: {
+		migrationFilesManager: MigrationFilesManager
+		permissionsByIdentityFactory: PermissionsByIdentityFactory
+		aclSchema: Acl.Schema
+		schemaMigrationDiffsResolver: SchemaMigrationDiffsResolver
+	}): Container<{
 		systemApolloServerFactory: SystemApolloServerFactory
 		systemResolvers: IResolvers
 		authorizator: Authorizator
@@ -40,36 +38,30 @@ export default class SystemContainerFactory {
 			.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder())
 			.addService(
 				'systemDiffQueryResolver',
-				({ systemDiffResponseBuilder, aclSchema }) =>
-					new DiffQueryResolver(systemDiffResponseBuilder, aclSchema)
+				({ systemDiffResponseBuilder, aclSchema }) => new DiffQueryResolver(systemDiffResponseBuilder, aclSchema)
 			)
-			.addService(
-				'releaseMutationResolver',
-				({ aclSchema }) =>
-					new ReleaseMutationResolver(aclSchema)
-			)
+			.addService('releaseMutationResolver', ({ aclSchema }) => new ReleaseMutationResolver(aclSchema))
 			.addService(
 				'systemResolvers',
 				({ systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver }) =>
 					new ResolverFactory(systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver).create()
 			)
-			.addService('executionContainerFactory', ({ authorizator }) => new SystemExecutionContainer.Factory(
-				container.schemaMigrationDiffsResolver.resolve(),
-				container.migrationFilesManager,
-				authorizator,
-				container.permissionsByIdentityFactory
-			))
+			.addService(
+				'executionContainerFactory',
+				({ authorizator }) =>
+					new SystemExecutionContainer.Factory(
+						container.schemaMigrationDiffsResolver.resolve(),
+						container.migrationFilesManager,
+						authorizator,
+						container.permissionsByIdentityFactory
+					)
+			)
 			.addService(
 				'systemApolloServerFactory',
 				({ systemResolvers, authorizator, executionContainerFactory }) =>
 					new SystemApolloServerFactory(systemResolvers, authorizator, executionContainerFactory)
 			)
 			.build()
-			.pick(
-				'systemApolloServerFactory',
-				'systemResolvers',
-				'authorizator',
-				'executionContainerFactory',
-			)
+			.pick('systemApolloServerFactory', 'systemResolvers', 'authorizator', 'executionContainerFactory')
 	}
 }

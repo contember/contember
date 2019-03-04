@@ -7,9 +7,9 @@ class TimerMiddlewareFactory {
 			const times: [string, Date][] = []
 			const start = new Date()
 			ctx.state.timer = async (name: string, cb) => {
-				times.push([name + " start", new Date()])
-				const res = cb && await cb()
-				times.push([name + " end", new Date()])
+				times.push([name + ' start', new Date()])
+				const res = cb && (await cb())
+				times.push([name + ' end', new Date()])
 				return res as any
 			}
 			ctx.state.timer('starting')

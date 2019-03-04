@@ -3,8 +3,7 @@ import { KoaContext, KoaMiddleware } from '../core/koa/types'
 import { createGraphqlInvalidAuthResponse } from './responseUtils'
 
 class AuthMiddlewareFactory {
-	constructor(private apiKeyManager: ApiKeyManager) {
-	}
+	constructor(private apiKeyManager: ApiKeyManager) {}
 
 	create(): KoaMiddleware<AuthMiddlewareFactory.KoaState> {
 		const auth: KoaMiddleware<AuthMiddlewareFactory.KoaState> = async (ctx, next) => {

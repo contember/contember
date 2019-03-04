@@ -84,7 +84,7 @@ export class ApiTester {
 			db,
 			identityVariables: {},
 			executionContainer,
-			errorHandler: () => null
+			errorHandler: () => null,
 		}
 		return await graphql(schema, gql, null, context, variables)
 	}
@@ -96,14 +96,13 @@ export class ApiTester {
 			{},
 			this.authorizator,
 			this.systemExecutionContainer,
-			() => null,
+			() => null
 		)
 
 		return await graphql(this.systemSchema, gql, null, context, variables)
 	}
 
-	public async refreshStagesVersion()
-	{
+	public async refreshStagesVersion() {
 		const queryHandler = this.projectDb.createQueryHandler()
 		for (let stage in this.knownStages) {
 			const stageObj = this.knownStages[stage]
@@ -141,7 +140,9 @@ export class ApiTester {
 		await connection.raw('CREATE DATABASE ?? ', [dbName])
 
 		const migrationsRunner = new MigrationsRunner()
-		const systemMigrationsManager = new MigrationFilesManager(process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/migrations/project')
+		const systemMigrationsManager = new MigrationFilesManager(
+			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/migrations/project'
+		)
 		await migrationsRunner.migrate(dbCredentials(dbName), 'system', systemMigrationsManager.directory, false)
 		await connection.destroy()
 
@@ -168,17 +169,17 @@ export class ApiTester {
 
 		const systemContainerFactory = new SystemContainerFactory()
 		const systemContainer = systemContainerFactory.create({
-				schemaMigrationDiffsResolver: schemaMigrationDiffsResolver,
-				migrationFilesManager: projectMigrationFilesManager,
-				permissionsByIdentityFactory: new PermissionsByIdentityFactory([
-						new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
-						new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
-					]),
-				aclSchema: ({
-					variables: {},
-					roles: {},
-				}),
-			})
+			schemaMigrationDiffsResolver: schemaMigrationDiffsResolver,
+			migrationFilesManager: projectMigrationFilesManager,
+			permissionsByIdentityFactory: new PermissionsByIdentityFactory([
+				new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
+				new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
+			]),
+			aclSchema: {
+				variables: {},
+				roles: {},
+			},
+		})
 
 		const systemExecutionContainer = systemContainer.executionContainerFactory.create(projectDb)
 
@@ -203,6 +204,8 @@ export class ApiTester {
 	}
 
 	private static createProjectMigrationFilesManager(): MigrationFilesManager {
-		return new MigrationFilesManager(process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/tests/example-project/migrations')
+		return new MigrationFilesManager(
+			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/tests/example-project/migrations'
+		)
 	}
 }

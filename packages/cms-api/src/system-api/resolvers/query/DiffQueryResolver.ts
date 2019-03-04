@@ -7,11 +7,7 @@ import { Acl } from 'cms-common'
 import { createStageQuery } from '../../model/queries/StageQueryHelper'
 
 export default class DiffQueryResolver implements QueryResolver<'diff'> {
-	constructor(
-		private readonly diffResponseBuilder: DiffResponseBuilder,
-		private readonly acl: Acl.Schema
-	) {
-	}
+	constructor(private readonly diffResponseBuilder: DiffResponseBuilder, private readonly acl: Acl.Schema) {}
 
 	async diff(
 		parent: any,

@@ -9,5 +9,5 @@ export interface Context {
 	db: KnexWrapper
 	identityVariables: Acl.VariablesMap
 	executionContainer: Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }>
-	errorHandler: ErrorHandlerExtension.Context['errorHandler'],
+	errorHandler: ErrorHandlerExtension.Context['errorHandler']
 }

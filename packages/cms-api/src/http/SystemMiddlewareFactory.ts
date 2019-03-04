@@ -18,33 +18,41 @@ export default class SystemMiddlewareFactory {
 		private readonly authMiddlewareFactory: AuthMiddlewareFactory,
 		private readonly projectMemberMiddlewareFactory: ProjectMemberMiddlewareFactory,
 		private readonly databaseTransactionMiddlewareFactory: DatabaseTransactionMiddlewareFactory,
-		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory,
-	) {
-	}
+		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory
+	) {}
 
 	create(): Koa.Middleware {
-		return route('/system/:projectSlug$', koaCompose<KoaContext<any>>([
-			corsMiddleware(),
-			bodyParser(),
-			this.authMiddlewareFactory.create(),
-			this.projectResolveMiddlewareFactory.create(),
-			this.projectMemberMiddlewareFactory.create(),
-			(ctx: KoaContext<ProjectResolveMiddlewareFactory.KoaState & { db: KnexWrapper }>, next) => {
-				const projectContainer = ctx.state.projectContainer
-				const knex = projectContainer.knexConnection
-				ctx.state.db = new KnexWrapper(knex, 'system')
-				return next()
-			},
-			this.databaseTransactionMiddlewareFactory.create(),
-			this.setupSystemVariablesMiddlewareFactory.create(),
+		return route(
+			'/system/:projectSlug$',
+			koaCompose<KoaContext<any>>([
+				corsMiddleware(),
+				bodyParser(),
+				this.authMiddlewareFactory.create(),
+				this.projectResolveMiddlewareFactory.create(),
+				this.projectMemberMiddlewareFactory.create(),
+				(ctx: KoaContext<ProjectResolveMiddlewareFactory.KoaState & { db: KnexWrapper }>, next) => {
+					const projectContainer = ctx.state.projectContainer
+					const knex = projectContainer.knexConnection
+					ctx.state.db = new KnexWrapper(knex, 'system')
+					return next()
+				},
+				this.databaseTransactionMiddlewareFactory.create(),
+				this.setupSystemVariablesMiddlewareFactory.create(),
 
-			async (ctx: KoaContext<AuthMiddlewareFactory.KoaState & ProjectResolveMiddlewareFactory.KoaState & ProjectMemberMiddlewareFactory.KoaState>, next) => {
-				const projectContainer = ctx.state.projectContainer
-				const serverFactory = projectContainer.systemApolloServerFactory
-				const server = serverFactory.create()
-				await graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next)
-			},
-
-		]))
+				async (
+					ctx: KoaContext<
+						AuthMiddlewareFactory.KoaState &
+							ProjectResolveMiddlewareFactory.KoaState &
+							ProjectMemberMiddlewareFactory.KoaState
+					>,
+					next
+				) => {
+					const projectContainer = ctx.state.projectContainer
+					const serverFactory = projectContainer.systemApolloServerFactory
+					const server = serverFactory.create()
+					await graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next)
+				},
+			])
+		)
 	}
 }

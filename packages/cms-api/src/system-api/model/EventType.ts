@@ -6,4 +6,8 @@ export enum EventType {
 	runMigration = 'run_migration',
 }
 
-export const ContentEvents: [EventType.delete, EventType.update, EventType.create] = [EventType.delete, EventType.update, EventType.create]
+export const ContentEvents: [EventType.delete, EventType.update, EventType.create] = [
+	EventType.delete,
+	EventType.update,
+	EventType.create,
+]

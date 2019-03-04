@@ -19,9 +19,9 @@ export class TextField extends React.PureComponent<TextFieldProps> {
 
 	public render() {
 		return (
-			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => (
-					<FormGroup label={env.applySystemMiddleware('labelMiddleware', this.props.label)}>
+			<Field<string> name={this.props.name}>
+				{({ data, isMutating, environment }): React.ReactNode => (
+					<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
 						<InputGroup
 							value={data.currentValue || ''}
 							onChange={this.generateOnChange(data)}

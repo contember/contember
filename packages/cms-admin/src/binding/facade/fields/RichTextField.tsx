@@ -21,14 +21,14 @@ export class RichTextField extends React.PureComponent<RichTextFieldProps> {
 
 	public render() {
 		return (
-			<Field name={this.props.name}>
-				{(data: FieldAccessor<string>, isMutating, env): React.ReactNode => {
+			<Field<string> name={this.props.name}>
+				{({ data, environment }): React.ReactNode => {
 					return (
 						<RichEditor
 							onChange={this.generateOnChange(data)}
 							value={data.currentValue || ''}
 							lineBreakBehavior={this.props.lineBreakBehavior}
-							label={env.applySystemMiddleware('labelMiddleware', this.props.label)}
+							label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}
 							blocks={this.props.blocks}
 						/>
 					)

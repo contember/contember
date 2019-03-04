@@ -1,11 +1,11 @@
-import * as Koa from 'koa'
+import Koa from 'koa'
 import { get } from '../core/koa/router'
 import {
 	RenderPageOptions as PlaygroundRenderPageOptions,
 	renderPlaygroundPage,
 } from '@apollographql/graphql-playground-html'
 import { createPlaygroundOptions } from 'apollo-server-core'
-import * as accepts from 'accepts'
+import accepts from 'accepts'
 
 class PlaygroundMiddlewareFactory {
 	public create(): Koa.Middleware {

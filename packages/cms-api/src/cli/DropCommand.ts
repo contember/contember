@@ -1,5 +1,5 @@
 import { DatabaseCredentials } from '../tenant-api/config'
-import * as Knex from 'knex'
+import Knex from 'knex'
 import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 

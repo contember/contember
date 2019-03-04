@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import Knex from 'knex'
 import ConditionBuilder from './ConditionBuilder'
 import { Raw, Value } from './types'
 import KnexWrapper from './KnexWrapper'

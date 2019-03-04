@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import * as Knex from 'knex'
+import Knex from 'knex'
 import { uuid } from '../utils/uuid'
 import Project from '../tenant-api/Project'
 import KnexConnection from '../core/knex/KnexConnection'

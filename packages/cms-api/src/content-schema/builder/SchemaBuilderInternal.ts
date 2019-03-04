@@ -10,7 +10,7 @@ import OneHasManyProcessor from './internal/OneHasManyProcessor'
 import ManyHasOneProcessor from './internal/ManyHasOneProcessor'
 import NamingConventions from './NamingConventions'
 import FieldBuilder from './FieldBuilder'
-import * as crypto from 'crypto'
+import crypto from 'crypto'
 
 export default class SchemaBuilderInternal {
 	private entities: { [name: string]: Model.Entity } = {}

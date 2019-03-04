@@ -24,7 +24,7 @@ export default class GraphQlQueryAstFactory {
 		return this.createFromNode(info, parentType as GraphQLObjectType, node) as ObjectNode
 	}
 
-	private mergeAllFieldNodes(fieldNodes: GraphQlFieldNode[]): GraphQlFieldNode {
+	private mergeAllFieldNodes(fieldNodes: ReadonlyArray<GraphQlFieldNode>): GraphQlFieldNode {
 		const newGraphQlFieldNodes = [...fieldNodes]
 		while (newGraphQlFieldNodes.length > 1) {
 			newGraphQlFieldNodes.push(

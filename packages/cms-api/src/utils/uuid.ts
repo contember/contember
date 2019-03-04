@@ -1,3 +1,3 @@
-import * as uuidLib from 'uuid'
+import uuidLib from 'uuid'
 
 export const uuid = () => uuidLib.v4()

@@ -1,7 +1,7 @@
 import { Value } from '../types'
 import ConditionBuilder from '../ConditionBuilder'
 import KnexWrapper from '../KnexWrapper'
-import * as knex from 'knex'
+import knex from 'knex'
 
 namespace Where {
 	export interface Options {

@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server-koa'
-import * as Koa from 'koa'
-import * as koaCompose from 'koa-compose'
+import Koa from 'koa'
+import koaCompose from 'koa-compose'
 import { route } from '../core/koa/router'
 
 export default class TenantMiddlewareFactory {

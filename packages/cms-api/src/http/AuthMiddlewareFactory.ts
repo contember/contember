@@ -1,5 +1,5 @@
 import ApiKeyManager from '../tenant-api/model/service/ApiKeyManager'
-import * as Koa from 'koa'
+import Koa from 'koa'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 
 class AuthMiddlewareFactory {

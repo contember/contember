@@ -1,5 +1,5 @@
-import * as knex from 'knex'
-import * as Koa from 'koa'
+import knex from 'knex'
+import Koa from 'koa'
 import SignInMutationResolver from './tenant-api/resolvers/mutation/SignInMutationResolver'
 import KnexConnection from './core/knex/KnexConnection'
 import QueryHandler from './core/query/QueryHandler'

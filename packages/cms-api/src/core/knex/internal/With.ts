@@ -1,5 +1,5 @@
 import SelectBuilder from '../SelectBuilder'
-import * as Knex from 'knex'
+import Knex from 'knex'
 import KnexWrapper from '../KnexWrapper'
 import { Raw } from '../types'
 

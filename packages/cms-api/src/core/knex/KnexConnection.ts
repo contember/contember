@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import Knex from 'knex'
 import KnexWrapper from './KnexWrapper'
 
 export default class KnexConnection {

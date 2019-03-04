@@ -4,10 +4,10 @@ import typeDefs from '../../../../src/tenant-api/schema/tenant.graphql'
 import { executeGraphQlTest, SqlQuery } from '../../../src/testGraphql'
 import { GQL, SQL } from '../../../src/tags'
 import 'mocha'
-import * as bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 import { testUuid } from '../../../src/testUuid'
-import * as crypto from 'crypto'
-import * as sinon from 'sinon'
+import crypto from 'crypto'
+import sinon from 'sinon'
 import { Buffer } from 'buffer'
 import ApiKey from '../../../../src/tenant-api/model/type/ApiKey'
 import ResolverContext from '../../../../src/tenant-api/resolvers/ResolverContext'
@@ -181,7 +181,7 @@ describe('tenant api', () => {
 			const randomBytesStub = sinon.stub(crypto, 'randomBytes').callsFake(function(length, cb) {
 				const val = buffer(length)
 				if (cb) {
-					return cb(undefined, val)
+					return cb(null, val)
 				} else {
 					return val
 				}

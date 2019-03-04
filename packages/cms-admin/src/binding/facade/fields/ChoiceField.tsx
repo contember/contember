@@ -7,6 +7,7 @@ import {
 	EnforceSubtypeRelation,
 	EntityListDataProvider,
 	Field,
+	FieldMetadata,
 	Props,
 	SyntheticChildrenProvider,
 	ToOne
@@ -31,14 +32,14 @@ export interface ChoiceFieldPublicProps {
 	name: FieldName
 }
 
+export interface ChoiceFieldMetadata extends Pick<FieldMetadata, Exclude<keyof FieldMetadata, 'data'>> {
+	data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
+	currentValue: ChoiceField.ValueRepresentation | null
+	onChange: (newValue: ChoiceField.ValueRepresentation) => void
+}
+
 export interface ChoiceFieldBaseProps extends ChoiceFieldPublicProps {
-	children: (
-		data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>,
-		currentValue: ChoiceField.ValueRepresentation | null,
-		onChange: (newValue: ChoiceField.ValueRepresentation) => void,
-		isMutating: DataTreeMutationState,
-		environment: Environment
-	) => React.ReactNode
+	children: (metadata: ChoiceFieldMetadata) => React.ReactNode
 }
 
 export interface ChoiceFieldProps extends ChoiceFieldBaseProps {
@@ -146,7 +147,7 @@ namespace ChoiceField {
 
 			return (
 				<Field name={this.props.rawMetadata.fieldName}>
-					{({ data, isMutating }): React.ReactNode => {
+					{({ data, ...otherMetadata }): React.ReactNode => {
 						const currentValue: ChoiceField.ValueRepresentation = options.findIndex(([value]) => {
 							return (
 								data.hasValue(value) ||
@@ -156,17 +157,16 @@ namespace ChoiceField {
 							)
 						}, null)
 
-						return children(
-							options.map(
+						return children({
+							data: options.map(
 								(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.StaticValue] => [i, item[1], item[0]]
 							),
-							currentValue === -1 ? null : currentValue,
-							(newValue: ChoiceField.ValueRepresentation) => {
+							currentValue: currentValue === -1 ? null : currentValue,
+							onChange: (newValue: ChoiceField.ValueRepresentation) => {
 								data.onChange && data.onChange(options[newValue][0])
 							},
-							isMutating,
-							environment
-						)
+							...otherMetadata
+						})
 					}}
 				</Field>
 			)
@@ -289,10 +289,11 @@ namespace ChoiceField {
 				}
 			)
 
-			return this.props.children(
-				normalizedData,
-				currentValue === -1 ? null : currentValue,
-				(newValue: ChoiceField.ValueRepresentation) => {
+			return this.props.children({
+				...this.props.rawMetadata,
+				data: normalizedData,
+				currentValue: currentValue === -1 ? null : currentValue,
+				onChange: (newValue: ChoiceField.ValueRepresentation) => {
 					if (newValue === -1) {
 						if (currentValueEntity instanceof EntityAccessor && currentValueEntity.remove) {
 							currentValueEntity.remove(EntityAccessor.RemovalType.Disconnect)
@@ -301,9 +302,8 @@ namespace ChoiceField {
 						currentValueEntity.replaceWith(filteredData[newValue])
 					}
 				},
-				this.props.rawMetadata.isMutating,
-				this.props.rawMetadata.environment
-			)
+				fieldName: fieldName,
+			})
 		}
 	}
 }

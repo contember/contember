@@ -11,6 +11,7 @@ import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
+import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
@@ -51,7 +52,11 @@ class ContentApolloServerFactory {
 			context: async ({
 				                ctx,
 			                }: {
-				ctx: KoaContext<ProjectMemberMiddlewareFactory.KoaState & DatabaseTransactionMiddlewareFactory.KoaState & ContentApolloMiddlewareFactory.KoaState>
+				ctx: KoaContext<
+					ProjectMemberMiddlewareFactory.KoaState &
+					DatabaseTransactionMiddlewareFactory.KoaState &
+					ContentApolloMiddlewareFactory.KoaState &
+					TimerMiddlewareFactory.KoaState>
 			}): Promise<Context> => {
 				const partialContext = {
 					db: ctx.state.db,
@@ -62,6 +67,7 @@ class ContentApolloServerFactory {
 					...partialContext,
 					executionContainer,
 					errorHandler: ctx.state.planRollback,
+					timer: ctx.state.timer,
 				}
 			},
 			playground: false,

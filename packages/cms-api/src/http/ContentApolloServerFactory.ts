@@ -6,16 +6,26 @@ import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionC
 import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
 import KnexDebugger from '../core/knex/KnexDebugger'
 import { GraphQLSchema } from 'graphql'
-import { Acl, Model } from 'cms-common'
 import { KoaContext } from '../core/koa/types'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
+import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
+import LRUCache from 'lru-cache'
 
 class ContentApolloServerFactory {
-	constructor(private readonly knexDebugger: KnexDebugger) {}
+	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
+		max: 100,
+	})
 
-	public create(dataSchema: GraphQLSchema, schema: Model.Schema, permissions: Acl.Permissions): ApolloServer {
-		return new ApolloServer({
+	constructor(private readonly knexDebugger: KnexDebugger) {
+	}
+
+	public create(dataSchema: GraphQLSchema): ApolloServer {
+		const server = this.cache.get(dataSchema)
+		if (server) {
+			return server
+		}
+		const newServer = new ApolloServer({
 			tracing: true,
 			introspection: true,
 			extensions: [
@@ -39,15 +49,15 @@ class ContentApolloServerFactory {
 			schema: dataSchema,
 			uploads: false,
 			context: async ({
-				ctx,
-			}: {
-				ctx: KoaContext<ProjectMemberMiddlewareFactory.KoaState & DatabaseTransactionMiddlewareFactory.KoaState>
+				                ctx,
+			                }: {
+				ctx: KoaContext<ProjectMemberMiddlewareFactory.KoaState & DatabaseTransactionMiddlewareFactory.KoaState & ContentApolloMiddlewareFactory.KoaState>
 			}): Promise<Context> => {
 				const partialContext = {
 					db: ctx.state.db,
 					identityVariables: ctx.state.projectVariables,
 				}
-				const executionContainer = new ExecutionContainerFactory(schema, permissions).create(partialContext)
+				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions).create(partialContext)
 				return {
 					...partialContext,
 					executionContainer,
@@ -56,6 +66,8 @@ class ContentApolloServerFactory {
 			},
 			playground: false,
 		})
+		this.cache.set(dataSchema, newServer)
+		return newServer
 	}
 }
 

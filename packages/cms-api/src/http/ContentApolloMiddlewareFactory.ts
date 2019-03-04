@@ -7,7 +7,7 @@ import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import ContentApolloServerFactory from './ContentApolloServerFactory'
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
-import { Model } from 'cms-common'
+import { Acl, Model } from 'cms-common'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 
 class ContentApolloMiddlewareFactory {
@@ -23,7 +23,7 @@ class ContentApolloMiddlewareFactory {
 	create(
 		stage: Project.Stage
 	): KoaMiddleware<
-		AuthMiddlewareFactory.KoaState & ProjectMemberMiddlewareFactory.KoaState & TimerMiddlewareFactory.KoaState
+		AuthMiddlewareFactory.KoaState & ProjectMemberMiddlewareFactory.KoaState & TimerMiddlewareFactory.KoaState & ContentApolloMiddlewareFactory.KoaState
 	> {
 		return async (ctx, next) => {
 			if (!this.modelCache[stage.uuid]) {
@@ -41,11 +41,20 @@ class ContentApolloMiddlewareFactory {
 					globalRoles: ctx.state.authResult.roles,
 				}
 			)
+			ctx.state.schema = model
+			ctx.state.permissions = permissions
 
-			const server = this.apolloServerFactory.create(dataSchema, model, permissions)
+			const server = this.apolloServerFactory.create(dataSchema)
 
 			await ctx.state.timer('exec graphql', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
 		}
+	}
+}
+
+namespace ContentApolloMiddlewareFactory {
+	export interface KoaState {
+		schema: Model.Schema
+		permissions: Acl.Permissions
 	}
 }
 

@@ -1,4 +1,3 @@
-import { Spinner } from '@blueprintjs/core'
 import * as React from 'react'
 import { Manager, Popper, Reference } from 'react-popper'
 import { Button, Dropdown, Link } from '../../../components'
@@ -176,7 +175,7 @@ namespace DimensionsSwitcher {
 
 		private renderContent(dimensionData: undefined | NormalizedDimensionData[], selectedDimensions: string[]) {
 			if (!dimensionData) {
-				return <LoadingSpinner size={Spinner.SIZE_SMALL} />
+				return <LoadingSpinner />
 			}
 			const selectedDimensionsCount = selectedDimensions.length
 			const canSelectAnother = selectedDimensionsCount < this.props.maxItems

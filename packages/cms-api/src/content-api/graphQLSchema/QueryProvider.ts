@@ -5,7 +5,6 @@ import { Context } from '../types'
 import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
-import ReadResolverFactory from '../graphQlResolver/ReadResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import OrderByTypeProvider from './OrderByTypeProvider'
 

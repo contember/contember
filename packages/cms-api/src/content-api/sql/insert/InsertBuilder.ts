@@ -6,7 +6,6 @@ import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import { getColumnName, getColumnType } from '../../../content-schema/modelUtils'
 import Mapper from '../Mapper'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
 import QueryBuilder from '../../../core/knex/QueryBuilder'
 
 type ColumnValue<E = never> = {

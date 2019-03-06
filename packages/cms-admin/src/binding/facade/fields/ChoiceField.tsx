@@ -1,7 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
 import * as React from 'react'
-import { DataTreeMutationState } from '../../../state/dataTrees'
 import { FieldName, PRIMARY_KEY_NAME, Scalar } from '../../bindingTypes'
 import {
 	EnforceSubtypeRelation,

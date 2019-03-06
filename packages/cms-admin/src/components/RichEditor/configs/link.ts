@@ -1,4 +1,4 @@
-import { Editor, Value } from 'slate'
+import { Editor } from 'slate'
 import { RichEditorPluginConfig, simpleMarkPlugin, simpleHtmlSerializerRule } from './utils'
 
 export const LINK: RichEditorPluginConfig = {

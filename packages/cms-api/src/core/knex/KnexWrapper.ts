@@ -1,5 +1,4 @@
 import * as Knex from 'knex'
-import QueryBuilder from './QueryBuilder'
 import { Raw, Value } from './types'
 import InsertBuilder from './InsertBuilder'
 import DeleteBuilder from './DeleteBuilder'

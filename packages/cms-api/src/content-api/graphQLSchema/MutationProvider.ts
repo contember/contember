@@ -7,7 +7,6 @@ import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../../acl/Authorizator'
 import EntityInputProvider from './mutations/EntityInputProvider'
-import MutationResolverFactory from '../graphQlResolver/MutationResolverFactory'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import { filterObject } from '../../utils/object'
 

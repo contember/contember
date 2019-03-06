@@ -53,11 +53,10 @@ export default class WhereTypeProvider {
 		for (const uniqueKey of uniqueKeys) {
 			combinations.push(uniqueKey.join(', '))
 		}
-		const description = `Valid combinations are: (${combinations.join('), (')})`
 
 		return new GraphQLInputObjectType({
 			name: capitalizeFirstLetter(entityName) + 'UniqueWhere',
-			// description: description, generates invalid schema file
+			// description: `Valid combinations are: (${combinations.join('), (')})`, generates invalid schema file
 			fields: () => this.getUniqueWhereFields(entity, uniqueKeys),
 		})
 	}

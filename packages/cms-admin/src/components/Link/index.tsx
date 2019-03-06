@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
 import { Dispatch } from '../../actions/types'

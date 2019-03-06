@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import 'mocha'
-import * as React from 'react'
 import { Parser } from '../../../../src/binding/queryLanguage'
 
 const parse = (input: string): Parser.AST.RelativeEntityList => {

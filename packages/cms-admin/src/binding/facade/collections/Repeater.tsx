@@ -9,7 +9,7 @@ import {
 	ToMany,
 	ToManyProps
 } from '../../coreComponents'
-import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, Environment } from '../../dao'
+import { EntityAccessor, EntityCollectionAccessor, Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { AddNewButton, RemoveButton, RemoveButtonProps } from '../buttons'
 

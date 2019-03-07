@@ -9,13 +9,18 @@ import { FormGroup, FormGroupProps } from '../../../components'
 import State from '../../../state'
 import { AnyUpload, UploadStatus } from '../../../state/upload'
 import { FieldName } from '../../bindingTypes'
-import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment } from '../../dao'
+import { EnforceSubtypeRelation, Field, FieldMetadata, SyntheticChildrenProvider } from '../../coreComponents'
+import { Environment, FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
+
+export interface UploadFieldMetadata extends FieldMetadata<string> {
+	upload?: AnyUpload
+}
 
 export interface UploadFieldOwnProps {
 	name: FieldName
 	label?: FormGroupProps['label']
+	children?: (metadata: UploadFieldMetadata) => React.ReactNode
 }
 
 export interface UploadFieldDispatchProps {
@@ -30,15 +35,14 @@ interface UploadFieldState {
 	uploadId?: string
 }
 
-class UploadFieldComponent extends React.Component<
-	UploadFieldOwnProps & UploadFieldDispatchProps & UploadFieldStateProps,
-	UploadFieldState
-> {
+interface UploadFieldProps extends UploadFieldOwnProps, UploadFieldDispatchProps, UploadFieldStateProps {}
+
+class UploadFieldComponent extends React.Component<UploadFieldProps, UploadFieldState> {
 	static displayName = 'UploadField'
 
 	state: UploadFieldState = {}
 
-	handleStartUpload(files: File[]) {
+	private handleStartUpload = async (files: File[]) => {
 		const uploadId = Math.random()
 			.toString(36)
 			.substring(2, 15)
@@ -47,73 +51,95 @@ class UploadFieldComponent extends React.Component<
 	}
 
 	public render() {
-		const upload: AnyUpload | undefined = this.state.uploadId ? this.props.uploads[this.state.uploadId] : undefined
+		const upload = this.state.uploadId ? this.props.uploads[this.state.uploadId] : undefined
 
 		return (
 			<Field<string> name={this.props.name}>
-				{({ data, environment }): React.ReactNode => {
-					if (upload && upload.status === UploadStatus.FINISHED && upload.resultUrl !== data.currentValue) {
-						data.onChange && data.onChange(upload.resultUrl)
-					}
-					return (
-						<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
-							<Dropzone
-								onDrop={async (accepted: File[]) => {
-									this.handleStartUpload(accepted)
-								}}
-								accept="image/*"
-								multiple={false}
-								style={{}}
-							>
-								<label className="fileInput">
-									{data.currentValue && this.isImage(data.currentValue) ? (
-										<img src={data.currentValue} style={{ width: '15%' }} />
-									) : null}
-									{upload && upload.status !== UploadStatus.FINISHED && upload.thumbnailUrl ? (
-										<img
-											src={upload.thumbnailUrl}
-											style={{
-												width: '15%'
-											}}
-										/>
-									) : null}
-									<span className="fileInput-label" style={{ marginLeft: '10px' }}>
-										{this.renderUploadStatusMessage(upload)}
-									</span>
-								</label>
-							</Dropzone>
-						</FormGroup>
-					)
-				}}
+				{(metadata): React.ReactNode => (
+					<Dropzone onDrop={this.handleStartUpload} accept="image/*" multiple={false} style={{}}>
+						<UploadFieldComponent.Inner
+							metadata={{
+								...metadata,
+								upload
+							}}
+							label={this.props.label}
+						>
+							{this.props.children}
+						</UploadFieldComponent.Inner>
+					</Dropzone>
+				)}
 			</Field>
 		)
 	}
 
-	private isImage(filename: string): boolean {
-		const contentTypeValue = contentType(filename.substring(filename.lastIndexOf('/') + 1))
-		return contentTypeValue !== false && contentTypeValue.startsWith('image/')
-	}
-
-	private renderUploadStatusMessage(upload?: AnyUpload) {
-		if (!upload) {
-			return 'Select a file to upload'
-		}
-		switch (upload.status) {
-			case UploadStatus.PREPARING:
-				return `Starting upload of ${upload.name}`
-			case UploadStatus.UPLOADING:
-				return `Upload of ${upload.name}: ${upload.progress && upload.progress.toFixed()}%`
-			case UploadStatus.FAILED:
-				return `Upload failed: ${upload.reason}`
-			case UploadStatus.FINISHED:
-				return `Upload has finished successfully`
-			default:
-				assertNever(upload)
-		}
-	}
-
 	public static generateSyntheticChildren(props: UploadFieldOwnProps, environment: Environment): React.ReactNode {
 		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
+	}
+}
+
+namespace UploadFieldComponent {
+	export interface InnerProps {
+		metadata: UploadFieldMetadata
+		label?: FormGroupProps['label']
+		children?: (metadata: UploadFieldMetadata) => React.ReactNode
+	}
+
+	export class Inner extends React.PureComponent<InnerProps> {
+		public render() {
+			const { environment, data, upload } = this.props.metadata
+
+			return (
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
+					<label className="fileInput">
+						{data.currentValue && this.isImage(data.currentValue) ? (
+							<img src={data.currentValue} style={{ width: '15%' }} />
+						) : null}
+						{upload && upload.status !== UploadStatus.FINISHED && upload.thumbnailUrl ? (
+							<img
+								src={upload.thumbnailUrl}
+								style={{
+									width: '15%'
+								}}
+							/>
+						) : null}
+						<span className="fileInput-label" style={{ marginLeft: '10px' }}>
+							{this.renderUploadStatusMessage(upload)}
+						</span>
+					</label>
+				</FormGroup>
+			)
+		}
+
+		public componentDidUpdate() {
+			const { upload, data } = this.props.metadata
+
+			if (upload && upload.status === UploadStatus.FINISHED && upload.resultUrl !== data.currentValue) {
+				data.onChange && data.onChange(upload.resultUrl)
+			}
+		}
+
+		private isImage(filename: string): boolean {
+			const contentTypeValue = contentType(filename.substring(filename.lastIndexOf('/') + 1))
+			return contentTypeValue !== false && contentTypeValue.startsWith('image/')
+		}
+
+		private renderUploadStatusMessage(upload?: AnyUpload) {
+			if (!upload) {
+				return 'Select a file to upload'
+			}
+			switch (upload.status) {
+				case UploadStatus.PREPARING:
+					return `Starting upload of ${upload.name}`
+				case UploadStatus.UPLOADING:
+					return `Upload of ${upload.name}: ${upload.progress && upload.progress.toFixed()}%`
+				case UploadStatus.FAILED:
+					return `Upload failed: ${upload.reason}`
+				case UploadStatus.FINISHED:
+					return `Upload has finished successfully`
+				default:
+					assertNever(upload)
+			}
+		}
 	}
 }
 
@@ -122,7 +148,7 @@ type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
 	SyntheticChildrenProvider<UploadFieldOwnProps>
 >
 
-const UploadField = connect<UploadFieldStateProps, UploadFieldDispatchProps, UploadFieldOwnProps, State>(
+export const UploadField = connect<UploadFieldStateProps, UploadFieldDispatchProps, UploadFieldOwnProps, State>(
 	state => ({
 		uploads: state.upload.uploads
 	}),
@@ -130,5 +156,3 @@ const UploadField = connect<UploadFieldStateProps, UploadFieldDispatchProps, Upl
 		onUpload: (id, file) => dispatch(uploadFile(id, file))
 	})
 )(UploadFieldComponent)
-
-export { UploadField }

@@ -94,9 +94,9 @@ namespace UploadFieldComponent {
 						{data.currentValue && this.isImage(data.currentValue) ? (
 							<img src={data.currentValue} style={{ width: '15%' }} />
 						) : null}
-						{upload && upload.status !== UploadStatus.FINISHED && upload.thumbnailUrl ? (
+						{upload && upload.status !== UploadStatus.FINISHED && upload.objectURL ? (
 							<img
-								src={upload.thumbnailUrl}
+								src={upload.objectURL}
 								style={{
 									width: '15%'
 								}}

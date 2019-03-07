@@ -10,7 +10,7 @@ export interface Upload {
 	name: string
 	size: number
 	mime: string
-	thumbnailUrl?: string
+	objectURL?: string
 }
 
 export interface UploadPreparing extends Upload {

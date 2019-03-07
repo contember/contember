@@ -15,7 +15,7 @@ import {
 	UploadUpdateProgressPayload
 } from '../reducer/upload'
 import { UploadStatus } from '../state/upload'
-import { readAsArrayBuffer, readAsDataUrl } from '../utils/fileReader'
+import { readAsArrayBuffer } from '../utils/fileReader'
 
 const mutation = `mutation ($contentType: String!) {
 	generateUploadUrl(contentType: $contentType) {
@@ -26,14 +26,14 @@ const mutation = `mutation ($contentType: String!) {
 
 const startUpload = createAction<UploadStartPayload, string, File, string | undefined>(
 	UPLOAD_START,
-	(id, file, thumbnailUrl) => ({
+	(id, file, objectURL) => ({
 		id,
 		data: {
 			status: UploadStatus.PREPARING,
 			name: file.name,
 			mime: file.type,
 			size: file.size,
-			thumbnailUrl
+			objectURL
 		}
 	})
 )
@@ -55,9 +55,9 @@ export const uploadFile = (id: string, file: File): ActionCreator => async (disp
 	if (!('stage' in state.request) || !('project' in state.request)) {
 		return
 	}
-	const thumbnailUrl = file.type.startsWith('image/') ? await readAsDataUrl(file) : undefined
+	const objectURL = URL.createObjectURL(file)
 
-	dispatch(startUpload(id, file, thumbnailUrl))
+	dispatch(startUpload(id, file, objectURL))
 
 	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	const graphqlClient = services.contentClientFactory.create(state.request.project, state.request.stage)
@@ -105,4 +105,5 @@ export const uploadFile = (id: string, file: File): ActionCreator => async (disp
 		throw error
 	}
 	dispatch(finishUpload(id, publicUrl))
+	URL.revokeObjectURL(objectURL)
 }

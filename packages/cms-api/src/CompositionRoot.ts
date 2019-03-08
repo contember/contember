@@ -224,6 +224,7 @@ class CompositionRoot {
 
 			const systemContainer = new SystemContainerFactory().create(
 				projectContainer.pick(
+					'project',
 					'schemaMigrationDiffsResolver',
 					'migrationFilesManager',
 					'permissionsByIdentityFactory',

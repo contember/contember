@@ -41,7 +41,7 @@ class DiffBuilder {
 			ok: true,
 			events: events.map(event => ({
 				...event,
-				allowed: permissions[event.id],
+				permission: permissions[event.id],
 				dependencies: dependencies[event.id] || [],
 			})),
 		}
@@ -60,7 +60,7 @@ namespace DiffBuilder {
 	export class OkResponse {
 		public readonly ok: true = true
 
-		constructor(public readonly events: (Event & { dependencies: string[]; allowed: boolean })[]) {}
+		constructor(public readonly events: (Event & { dependencies: string[]; permission: PermissionsVerifier.EventPermission })[]) {}
 	}
 }
 

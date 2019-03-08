@@ -15,9 +15,11 @@ import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
 import { Acl } from 'cms-common'
 import SystemExecutionContainer from './SystemExecutionContainer'
 import SchemaMigrationDiffsResolver from '../content-schema/SchemaMigrationDiffsResolver'
+import Project from '../config/Project'
 
 export default class SystemContainerFactory {
 	public create(container: {
+		project: Project,
 		migrationFilesManager: MigrationFilesManager
 		permissionsByIdentityFactory: PermissionsByIdentityFactory
 		aclSchema: Acl.Schema
@@ -50,6 +52,7 @@ export default class SystemContainerFactory {
 				'executionContainerFactory',
 				({ authorizator }) =>
 					new SystemExecutionContainer.Factory(
+						container.project,
 						container.schemaMigrationDiffsResolver.resolve(),
 						container.migrationFilesManager,
 						authorizator,

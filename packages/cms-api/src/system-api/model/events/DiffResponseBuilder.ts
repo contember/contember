@@ -2,9 +2,20 @@ import { Event } from '../dtos/Event'
 import { Event as ApiEvent, EventType as ApiEventType } from '../../schema/types'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
+import PermissionsVerifier from './PermissionsVerifier'
+
+type EventWithMeta = Event & { dependencies: string[]; permission: PermissionsVerifier.EventPermission }
+type EventFilter = { entity: string, id: string }
 
 class DiffResponseBuilder {
-	public buildResponse(events: (Event & { dependencies: string[]; allowed: boolean })[]): ApiEvent[] {
+	public buildResponse(
+		events: (EventWithMeta)[],
+		filter: ReadonlyArray<EventFilter>
+	): ApiEvent[] {
+		if (filter.length > 0) {
+			events = this.filterEvents(events, filter)
+		}
+
 		const apiEventTypeMapping = {
 			[EventType.create]: ApiEventType.CREATE,
 			[EventType.update]: ApiEventType.UPDATE,
@@ -13,7 +24,7 @@ class DiffResponseBuilder {
 		}
 
 		return events.map(it => ({
-			allowed: it.allowed,
+			allowed: it.permission === PermissionsVerifier.EventPermission.canApply,
 			dependencies: it.dependencies,
 			id: it.id,
 			type: apiEventTypeMapping[it.type],
@@ -21,7 +32,11 @@ class DiffResponseBuilder {
 		}))
 	}
 
-	private formatDescription(event: Event): string {
+	private formatDescription(event: EventWithMeta): string {
+		if (event.permission ===PermissionsVerifier.EventPermission.forbidden) {
+			return 'Forbidden'
+		}
+
 		switch (event.type) {
 			case EventType.create:
 				return `Creating ${event.tableName}#${event.rowId}`
@@ -34,6 +49,27 @@ class DiffResponseBuilder {
 			default:
 				return assertNever(event)
 		}
+	}
+
+	private filterEvents(events: EventWithMeta[], filter: ReadonlyArray<EventFilter>): EventWithMeta[]
+	{
+		const entityIds = filter.map(it => it.id)
+		const rootEvents: EventWithMeta[] = events.filter(it => it.type !== EventType.runMigration && entityIds.includes(it.rowId))
+		const eventIds = new Set<string>([])
+		const dependenciesMap: {[id: string]: string[]} = events.reduce((acc, event) => ({...acc, [event.id]: event.dependencies}), {})
+		const collectDependencies = (ids: string[]) => {
+			ids.forEach(id => {
+				if (eventIds.has(id)) {
+					return
+				}
+				eventIds.add(id)
+				collectDependencies(dependenciesMap[id] || [])
+			})
+		}
+		const rootEventIds = rootEvents.map(it => it.id)
+		collectDependencies(rootEventIds)
+
+		return events.filter(it => eventIds.has(it.id))
 	}
 }
 

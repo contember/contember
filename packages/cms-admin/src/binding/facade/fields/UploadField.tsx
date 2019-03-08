@@ -1,5 +1,4 @@
 import { assertNever } from 'cms-common'
-import { contentType } from 'mime-types'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
 import { connect } from 'react-redux'
@@ -10,17 +9,19 @@ import State from '../../../state'
 import { AnyUpload, UploadStatus } from '../../../state/upload'
 import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, FieldMetadata, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment, FieldAccessor } from '../../dao'
+import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 
 export interface UploadFieldMetadata extends FieldMetadata<string> {
 	upload?: AnyUpload
+	label?: FormGroupProps['label']
 }
 
 export interface UploadFieldOwnProps {
 	name: FieldName
 	label?: FormGroupProps['label']
-	children?: (metadata: UploadFieldMetadata) => React.ReactNode
+	accept: string
+	children: (url: string) => React.ReactNode
 }
 
 export interface UploadFieldDispatchProps {
@@ -56,13 +57,13 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 		return (
 			<Field<string> name={this.props.name}>
 				{(metadata): React.ReactNode => (
-					<Dropzone onDrop={this.handleStartUpload} accept="image/*" multiple={false} style={{}}>
+					<Dropzone onDrop={this.handleStartUpload} accept={this.props.accept} multiple={false} style={{}}>
 						<UploadFieldComponent.Inner
 							metadata={{
 								...metadata,
-								upload
+								upload,
+								label: this.props.label
 							}}
-							label={this.props.label}
 						>
 							{this.props.children}
 						</UploadFieldComponent.Inner>
@@ -80,31 +81,23 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 namespace UploadFieldComponent {
 	export interface InnerProps {
 		metadata: UploadFieldMetadata
-		label?: FormGroupProps['label']
-		children?: (metadata: UploadFieldMetadata) => React.ReactNode
+		children: (url: string) => React.ReactNode
 	}
 
 	export class Inner extends React.PureComponent<InnerProps> {
 		public render() {
-			const { environment, data, upload } = this.props.metadata
-
+			const { data, environment, upload, label } = this.props.metadata
 			return (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', label)}>
 					<label className="fileInput">
-						{data.currentValue && this.isImage(data.currentValue) ? (
-							<img src={data.currentValue} style={{ width: '15%' }} />
-						) : null}
-						{upload && upload.status !== UploadStatus.FINISHED && upload.objectURL ? (
-							<img
-								src={upload.objectURL}
-								style={{
-									width: '15%'
-								}}
-							/>
-						) : null}
-						<span className="fileInput-label" style={{ marginLeft: '10px' }}>
-							{this.renderUploadStatusMessage(upload)}
+						<span className="fileInput-preview">
+							{data.currentValue && this.props.children(data.currentValue)}
+							{upload &&
+								upload.status !== UploadStatus.FINISHED &&
+								upload.objectURL &&
+								this.props.children(upload.objectURL)}
 						</span>
+						<span className="fileInput-message">{this.renderUploadStatusMessage(upload)}</span>
 					</label>
 				</FormGroup>
 			)
@@ -116,11 +109,6 @@ namespace UploadFieldComponent {
 			if (upload && upload.status === UploadStatus.FINISHED && upload.resultUrl !== data.currentValue) {
 				data.onChange && data.onChange(upload.resultUrl)
 			}
-		}
-
-		private isImage(filename: string): boolean {
-			const contentTypeValue = contentType(filename.substring(filename.lastIndexOf('/') + 1))
-			return contentTypeValue !== false && contentTypeValue.startsWith('image/')
 		}
 
 		private renderUploadStatusMessage(upload?: AnyUpload) {

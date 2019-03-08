@@ -16,7 +16,7 @@ export class ImageUploadField extends React.PureComponent<ImageUploadFieldProps>
 
 	public render() {
 		return (
-			<UploadField name={this.props.name} accept="image/*">
+			<UploadField name={this.props.name} label={this.props.label} accept="image/*">
 				{url => <img src={url} />}
 			</UploadField>
 		)

@@ -20,6 +20,7 @@ import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
 import DiffBuilder from './model/events/DiffBuilder'
 import QueryHandler from '../core/query/QueryHandler'
 import KnexQueryable from '../core/knex/KnexQueryable'
+import Project from '../config/Project'
 
 interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
@@ -30,6 +31,7 @@ interface SystemExecutionContainer {
 namespace SystemExecutionContainer {
 	export class Factory {
 		constructor(
+			private readonly project: Project,
 			private readonly migrations: Promise<ProjectSchemaInfo.Migration[]>,
 			private readonly migrationFilesManager: MigrationFilesManager,
 			private readonly authorizator: Authorizator,
@@ -62,7 +64,7 @@ namespace SystemExecutionContainer {
 				.addService(
 					'permissionVerifier',
 					({ schemaVersionBuilder, db, authorizator }) =>
-						new PermissionsVerifier(schemaVersionBuilder, db, this.permissionsByIdentityFactory, authorizator)
+						new PermissionsVerifier(this.project, schemaVersionBuilder, db, this.permissionsByIdentityFactory, authorizator)
 				)
 				.addService(
 					'diffBuilder',

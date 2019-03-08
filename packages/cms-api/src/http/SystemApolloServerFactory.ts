@@ -11,6 +11,7 @@ import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
 import { KoaContext } from '../core/koa/types'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
+import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
 
 class SystemApolloServerFactory {
 	constructor(
@@ -37,14 +38,16 @@ class SystemApolloServerFactory {
 			context: ({
 				ctx,
 			}: {
-				ctx: KoaContext<
-					DatabaseTransactionMiddlewareFactory.KoaState &
-						AuthMiddlewareFactory.KoaState &
-						ProjectMemberMiddlewareFactory.KoaState
+				ctx: KoaContext<DatabaseTransactionMiddlewareFactory.KoaState
+					& AuthMiddlewareFactory.KoaState
+					& ProjectMemberMiddlewareFactory.KoaState
+					& ProjectResolveMiddlewareFactory.KoaState
 				>
 			}): ResolverContext => {
 				return new ResolverContext(
-					new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {}),
+					new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {
+						[ctx.state.projectContainer.project.uuid]: ctx.state.projectRoles
+					}),
 					ctx.state.projectVariables,
 					this.authorizator,
 					this.executionContainerFactory.create(ctx.state.db),

@@ -30,8 +30,18 @@ import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/Exe
 import LatestMigrationByStageQuery from '../../src/system-api/model/queries/LatestMigrationByStageQuery'
 import FileNameHelper from '../../src/migrations/FileNameHelper'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
+import { Acl, Model } from 'cms-common'
 
 export class ApiTester {
+	public static project: Project = {
+		uuid: testUuid(1000),
+		name: 'test',
+		stages: [],
+		slug: 'test',
+		dbCredentials: {} as any,
+		s3: {} as any,
+	}
+
 	private knownStages: { [stageSlug: string]: Project.Stage } = {}
 
 	constructor(
@@ -64,13 +74,18 @@ export class ApiTester {
 		return stage
 	}
 
-	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
-		await setupSystemVariables(this.projectDb, '11111111-1111-1111-1111-111111111111')
+	public async getStageSchema(stageSlug: string): Promise<Model.Schema> {
 		const stage = this.getStage(stageSlug)
 		if (!stage.migration) {
 			throw new Error(`Unknown migration version for stage ${stageSlug}`)
 		}
-		const model = await this.schemaVersionBuilder.buildSchema(stage.migration)
+		return await this.schemaVersionBuilder.buildSchema(stage.migration)
+	}
+
+	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
+		await setupSystemVariables(this.projectDb, '11111111-1111-1111-1111-111111111111')
+		const stage = this.getStage(stageSlug)
+		const model = await this.getStageSchema(stageSlug)
 		const permissions = new AllowAllPermissionFactory().create(model)
 		const gqlSchemaBuilder = this.graphQlSchemaBuilderFactory.create(model, permissions)
 		const schema = gqlSchemaBuilder.build()
@@ -90,10 +105,16 @@ export class ApiTester {
 		return await graphql(schema, gql, null, context, variables)
 	}
 
-	public async querySystem(gql: string, variables?: { [key: string]: any }): Promise<any> {
+	public async querySystem(gql: string, variables?: { [key: string]: any }, options: {
+		identity?: Identity
+		roles?: string[]
+		projectRoles?: string[]
+	} = {}): Promise<any> {
 		await setupSystemVariables(this.projectDb, '11111111-1111-1111-1111-111111111111')
 		const context: ResolverContext = new ResolverContext(
-			new Identity.StaticIdentity(testUuid(888), [Identity.SystemRole.SUPER_ADMIN], {}),
+			options.identity || new Identity.StaticIdentity(testUuid(888), options.roles || [Identity.SystemRole.SUPER_ADMIN], {
+				[ApiTester.project.uuid]: options.projectRoles || [],
+			}),
 			{},
 			this.authorizator,
 			this.systemExecutionContainer,
@@ -115,7 +136,9 @@ export class ApiTester {
 		}
 	}
 
-	public static async create(): Promise<ApiTester> {
+	public static async create(options: {
+		aclSchema?: Acl.Schema,
+	} = {}): Promise<ApiTester> {
 		const dbCredentials = (dbName: string) => {
 			return {
 				host: String(process.env.TEST_DB_HOST),
@@ -170,13 +193,14 @@ export class ApiTester {
 
 		const systemContainerFactory = new SystemContainerFactory()
 		const systemContainer = systemContainerFactory.create({
+			project: ApiTester.project,
 			schemaMigrationDiffsResolver: schemaMigrationDiffsResolver,
 			migrationFilesManager: projectMigrationFilesManager,
 			permissionsByIdentityFactory: new PermissionsByIdentityFactory([
 				new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
 				new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
 			]),
-			aclSchema: {
+			aclSchema: options.aclSchema || {
 				variables: {},
 				roles: {},
 			},

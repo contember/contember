@@ -17,6 +17,8 @@ import Authorizator from '../../../core/authorization/Authorizator'
 import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import Actions from '../authorization/Actions'
 import SelectBuilder from '../../../core/knex/SelectBuilder'
+import Project from '../../../config/Project'
+import Identity from '../../../common/auth/Identity'
 
 type AffectedColumnsByRow = { [rowId: string]: string[] }
 type PermissionsByRow = { [rowId: string]: boolean }
@@ -25,6 +27,7 @@ type ContentEventsByTable = { [tableName: string]: ContentEvent[] }
 
 class PermissionsVerifier {
 	constructor(
+		private readonly project: Project,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly db: KnexWrapper,
 		private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
@@ -63,24 +66,27 @@ class PermissionsVerifier {
 			context,
 			sourceStage,
 			eventsByTable,
-			this.verifyReadPermissionsForTable
+			this.verifyReadPermissionsForTable.bind(this)
 		)
 		const writePermissions = await this.verifyPermissionsCb(
 			context,
 			targetStage,
 			eventsByTable,
-			this.verifyWritePermissionsForTable
+			this.verifyWritePermissionsForTable.bind(this)
 		)
 
 		const permissionsResult: PermissionsVerifier.Result = {}
 
 		for (let event of events) {
 			if (this.isContentEvent(event)) {
-				permissionsResult[event.id] =
-					(readPermissions[event.tableName][event.rowId] || false) &&
-					(writePermissions[event.tableName][event.rowId] || false)
+				const canRead = readPermissions[event.tableName][event.rowId]
+				const canWrite = writePermissions[event.tableName][event.rowId]
+
+				permissionsResult[event.id] = canRead && canWrite ? PermissionsVerifier.EventPermission.canApply
+					: (canRead ? PermissionsVerifier.EventPermission.canView : PermissionsVerifier.EventPermission.forbidden)
+
 			} else {
-				permissionsResult[event.id] = false
+				permissionsResult[event.id] = PermissionsVerifier.EventPermission.forbidden
 			}
 		}
 
@@ -99,7 +105,7 @@ class PermissionsVerifier {
 			{ model: schema, acl: context.acl },
 			{
 				globalRoles: context.identity.roles,
-				projectRoles: context.identity.roles,
+				projectRoles: await context.identity.getProjectRoles(this.project.uuid) || [],
 			}
 		)
 
@@ -275,12 +281,18 @@ class PermissionsVerifier {
 }
 
 namespace PermissionsVerifier {
-	export type Result = { [eventId: string]: boolean }
+	export type Result = { [eventId: string]: EventPermission }
 
 	export type Context = {
 		variables: Acl.VariablesMap
-		identity: Authorizator.Identity
+		identity: Identity
 		acl: Acl.Schema
+	}
+
+	export enum EventPermission {
+		forbidden = 'forbidden',
+		canView = 'canView',
+		canApply = 'canApply',
 	}
 }
 

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import cn from 'classnames'
 
 class Table extends React.PureComponent {
 	render() {
@@ -11,11 +12,17 @@ class Table extends React.PureComponent {
 }
 
 namespace Table {
-	export class Row extends React.PureComponent {
+	export class Row extends React.PureComponent<React.HTMLAttributes<HTMLTableRowElement>> {
 		render() {
-			return <tr className="table-row">{this.props.children}</tr>
+			const props = this.props
+			return (
+				<tr {...props} className={cn(props.className, 'table-row')}>
+					{this.props.children}
+				</tr>
+			)
 		}
 	}
+
 	export class Cell extends React.PureComponent {
 		render() {
 			return <td className="table-cell">{this.props.children}</td>

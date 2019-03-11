@@ -30,7 +30,8 @@ import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/Exe
 import LatestMigrationByStageQuery from '../../src/system-api/model/queries/LatestMigrationByStageQuery'
 import FileNameHelper from '../../src/migrations/FileNameHelper'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model, Schema } from 'cms-common'
+import { GQL } from './tags'
 
 export class ApiTester {
 	public static project: Project = {
@@ -74,7 +75,7 @@ export class ApiTester {
 		return stage
 	}
 
-	public async getStageSchema(stageSlug: string): Promise<Model.Schema> {
+	public async getStageSchema(stageSlug: string): Promise<Schema> {
 		const stage = this.getStage(stageSlug)
 		if (!stage.migration) {
 			throw new Error(`Unknown migration version for stage ${stageSlug}`)
@@ -85,7 +86,7 @@ export class ApiTester {
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
 		await setupSystemVariables(this.projectDb, '11111111-1111-1111-1111-111111111111')
 		const stage = this.getStage(stageSlug)
-		const model = await this.getStageSchema(stageSlug)
+		const model = (await this.getStageSchema(stageSlug)).model
 		const permissions = new AllowAllPermissionFactory().create(model)
 		const gqlSchemaBuilder = this.graphQlSchemaBuilderFactory.create(model, permissions)
 		const schema = gqlSchemaBuilder.build()
@@ -136,8 +137,36 @@ export class ApiTester {
 		}
 	}
 
+	public async releaseForward(baseStage: string, headStage: string, eventsCount?: number): Promise<void>
+	{
+		const diff = await this.querySystem(GQL`query($headStage: String!, $baseStage: String!) {
+			diff(baseStage: $baseStage, headStage: $headStage) {
+				result {
+					events {
+						id
+					}
+				}
+			}
+		}`, {
+			headStage,
+			baseStage,
+		})
+
+		await this.querySystem(
+			GQL`mutation ($baseStage: String!, $headStage: String!, $events: [String!]!) {
+				release(baseStage: $baseStage, headStage: $headStage, events: $events) {
+					ok
+				}
+			}`,
+			{
+				baseStage,
+				headStage,
+				events: (diff.data.diff.result.events as any[]).slice(0, eventsCount || diff.data.diff.result.events.length).map(it => it.id),
+			}
+		)
+	}
+
 	public static async create(options: {
-		aclSchema?: Acl.Schema,
 	} = {}): Promise<ApiTester> {
 		const dbCredentials = (dbName: string) => {
 			return {
@@ -200,10 +229,6 @@ export class ApiTester {
 				new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
 				new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
 			]),
-			aclSchema: options.aclSchema || {
-				variables: {},
-				roles: {},
-			},
 		})
 
 		const systemExecutionContainer = systemContainer.executionContainerFactory.create(projectDb)
@@ -214,7 +239,7 @@ export class ApiTester {
 		})
 		maskErrors(systemSchema)
 
-		after(async () => {
+		afterEach(async () => {
 			await projectDb.knex.destroy()
 		})
 

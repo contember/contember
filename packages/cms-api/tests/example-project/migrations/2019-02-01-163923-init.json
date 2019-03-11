@@ -84,6 +84,27 @@
 				"type": "String",
 				"columnType": "text"
 			}
+		},
+		{
+			"modification": "updateAclSchema",
+			"schema": {
+				"variables": {},
+				"roles": {
+					"viewer": {
+						"entities": {
+							"Author": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	]
 }

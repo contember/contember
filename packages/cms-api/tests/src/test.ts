@@ -55,6 +55,7 @@ export const execute = async (test: Test) => {
 				db,
 				identityVariables: test.variables || {},
 			}),
+			timer: (label: any, cb: any) => cb(),
 		},
 		executes: test.executes,
 		query: test.query,

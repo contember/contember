@@ -50,7 +50,7 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 		]
 	}
 
-	execRelease() {
+	execRelease = () => {
 		const events = [
 			...this.state.selected,
 			...this.state.selected.map(it => this.getDependencies(it)).reduce((acc, val) => [...acc, ...val], [])

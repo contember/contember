@@ -2,12 +2,33 @@ import { ActionCreator } from './types'
 import { SYSTEM_ADD_DIFF } from '../reducer/system'
 import { StageDiffState } from '../state/system'
 
+export const setFetching = (baseStage: string): ActionCreator => async (dispatch, getState, services) => {
+	const state = getState()
+	const request = state.request
+	if (request.name !== 'project_page' || !request.stage) {
+		throw new Error()
+	}
+	const project = request.project
+	const headStage = request.stage
+
+	dispatch({
+		type: SYSTEM_ADD_DIFF,
+		payload: {
+			project,
+			headStage,
+			baseStage,
+			state: StageDiffState.DIFF_FETCHING
+		}
+	})
+}
+
 export const fetchDiff = (baseStage: string): ActionCreator => async (dispatch, getState, services) => {
 	const state = getState()
 	const request = state.request
 	if (request.name !== 'project_page' || !request.stage) {
 		throw new Error()
 	}
+	await dispatch(setFetching(baseStage))
 	const project = request.project
 	const headStage = request.stage
 	const systemClient = services.systemClientFactory.create(project)
@@ -47,6 +68,7 @@ export const executeRelease = (baseStage: string, events: string[]): ActionCreat
 	}
 	const project = request.project
 	const headStage = request.stage
+	await dispatch(setFetching(baseStage))
 	const systemClient = services.systemClientFactory.create(project)
 	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	await systemClient.request(

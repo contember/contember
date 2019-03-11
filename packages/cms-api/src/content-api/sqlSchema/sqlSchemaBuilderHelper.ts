@@ -13,11 +13,3 @@ export function createMigrationBuilder() {
 		}
 	)
 }
-
-const getSql = (schema: Model.Schema): string => {
-	const emptySchema = new SchemaBuilder().buildSchema()
-	const diff = diffSchemas(emptySchema, schema)
-	return diff ? SqlMigrator.applyDiff(emptySchema, diff) : ''
-}
-
-export default getSql

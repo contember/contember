@@ -1,32 +1,40 @@
-import { deepCopy, Model } from 'cms-common'
+import { deepCopy, Model, Schema } from 'cms-common'
 import { acceptFieldVisitor } from '../modelUtils'
 import ImplementationException from '../../core/exceptions/ImplementationException'
 import SchemaMigrator from './SchemaMigrator'
 import { SchemaDiff } from './modifications'
 import ModificationBuilder from './ModificationBuilder'
-import deepEqual = require('fast-deep-equal')
 import { isIt } from '../../utils/type'
+import deepEqual = require('fast-deep-equal')
 
-export default function diffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema): SchemaDiff | null {
+export default function diffSchemas(originalSchema: Schema, updatedSchema: Schema): SchemaDiff | null {
+
 	const builder = new ModificationBuilder(originalSchema, updatedSchema)
 
-	const originalEnums = new Set(Object.keys(originalSchema.enums))
-	const originalEntities = new Set(Object.keys(originalSchema.entities))
+	if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
+		builder.updateAclSchema(updatedSchema.acl)
+	}
+
+	const originalModel = originalSchema.model
+	const updatedModel = updatedSchema.model
+
+	const originalEnums = new Set(Object.keys(originalModel.enums))
+	const originalEntities = new Set(Object.keys(originalModel.entities))
 	const toCreateUnique: { [entityName: string]: string[] } = {}
 
-	for (const enumName in updatedSchema.enums) {
+	for (const enumName in updatedModel.enums) {
 		if (!originalEnums.has(enumName)) {
 			builder.createEnum(enumName)
 			continue
 		}
-		if (!deepEqual(updatedSchema.enums[enumName], originalSchema.enums[enumName])) {
+		if (!deepEqual(updatedModel.enums[enumName], originalModel.enums[enumName])) {
 			builder.updateEnum(enumName)
 		}
 		originalEnums.delete(enumName)
 	}
 
-	for (const entityName in updatedSchema.entities) {
-		const updatedEntity: Model.Entity = updatedSchema.entities[entityName]
+	for (const entityName in updatedModel.entities) {
+		const updatedEntity: Model.Entity = updatedModel.entities[entityName]
 
 		toCreateUnique[entityName] = []
 
@@ -45,7 +53,7 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 		}
 		originalEntities.delete(entityName)
 
-		const originalEntity: Model.Entity = originalSchema.entities[entityName]
+		const originalEntity: Model.Entity = originalModel.entities[entityName]
 		const originalFields = new Set(Object.keys(originalEntity.fields))
 		const originalUnique = new Set(Object.keys(originalEntity.unique))
 
@@ -102,9 +110,9 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 			}
 			originalFields.delete(fieldName)
 
-			acceptFieldVisitor(updatedSchema, updatedEntity, fieldName, {
+			acceptFieldVisitor(updatedModel, updatedEntity, fieldName, {
 				visitColumn: ({}, updatedColumn: Model.AnyColumn) => {
-					acceptFieldVisitor(originalSchema, originalEntity, fieldName, {
+					acceptFieldVisitor(originalModel, originalEntity, fieldName, {
 						visitColumn: ({}, originalColumn: Model.AnyColumn) => {
 							if (updatedColumn.columnName != originalColumn.columnName) {
 								builder.updateColumnName(entityName, fieldName, updatedColumn.columnName)
@@ -122,7 +130,7 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 					})
 				},
 				visitRelation: ({}, updatedRelation: Model.AnyRelation, {}, _) => {
-					acceptFieldVisitor(originalSchema, originalEntity, fieldName, {
+					acceptFieldVisitor(originalModel, originalEntity, fieldName, {
 						visitColumn: () => {
 							builder.removeField(entityName, fieldName)
 							builder.createField(updatedEntity, fieldName)
@@ -150,7 +158,7 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 
 	for (const entityName in toCreateUnique) {
 		for (const uniqueName of toCreateUnique[entityName]) {
-			builder.createUnique(updatedSchema.entities[entityName], uniqueName)
+			builder.createUnique(updatedModel.entities[entityName], uniqueName)
 		}
 	}
 
@@ -165,6 +173,7 @@ export default function diffSchemas(originalSchema: Model.Schema, updatedSchema:
 	const diff = builder.getDiff()
 
 	const appliedDiff = diff === null ? updatedSchema : SchemaMigrator.applyDiff(originalSchema, diff)
+
 	if (!deepEqual(updatedSchema, appliedDiff)) {
 		throw new ImplementationException('Updated schema cannot be recreated by the generated diff!')
 	}

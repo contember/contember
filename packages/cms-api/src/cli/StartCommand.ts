@@ -16,18 +16,7 @@ class StartCommand extends BaseCommand<{}, {}> {
 		const config = await this.readConfig()
 
 		const projectsDirectory = this.getGlobalOptions().projectsDirectory
-		const projects: (ProjectSchemaInfo & Project)[] = await Promise.all(
-			config.projects.map(
-				async (project): Promise<ProjectSchemaInfo & Project> => {
-					const modelFile = `${this.getGlobalOptions().workingDirectory}/dist/src/projects/${project.slug}/src/model.js`
-					const acl = (await import(modelFile)).default.acl
-					return {
-						...project,
-						acl,
-					}
-				}
-			)
-		)
+		const projects: Project[] = config.projects
 		const compositionRoot = new CompositionRoot()
 		const httpServer = compositionRoot.composeServer(config.tenant.db, projects, projectsDirectory)
 		httpServer.listen(Number.parseInt(String(config.server.port)), () => {

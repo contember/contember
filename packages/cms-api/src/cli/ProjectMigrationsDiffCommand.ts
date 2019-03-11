@@ -2,10 +2,11 @@ import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
 import diffSchemas from '../content-schema/differ/diffSchemas'
 import SqlMigrator from '../content-api/sqlSchema/SqlMigrator'
 import Command from '../core/cli/Command'
-import { emptySchema } from '../content-schema/modelUtils'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import BaseCommand from './BaseCommand'
+import { Schema } from 'cms-common'
+import { emptySchema } from '../content-schema/schemaUtils'
 
 type Args = {
 	projectName: string
@@ -33,11 +34,11 @@ class ProjectMigrationsDiffCommand extends BaseCommand<Args, {}> {
 
 		const diffs = (await migrationsFileManager.readFiles('json')).map(it => JSON.parse(it.content))
 
-		const currentSchema = diffs.reduce((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
+		const currentSchema = diffs.reduce<Schema>((schema, diff) => SchemaMigrator.applyDiff(schema, diff), emptySchema)
 
 		const newSchema = await import(modelFile)
 
-		const diff = diffSchemas(currentSchema, newSchema.default.model)
+		const diff = diffSchemas(currentSchema, newSchema.default)
 		if (diff === null) {
 			console.log('Nothing to do')
 			return

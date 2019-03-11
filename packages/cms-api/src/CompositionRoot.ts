@@ -28,11 +28,9 @@ import AccessEvaluator from './core/authorization/AccessEvalutator'
 import PermissionsFactory from './tenant-api/model/authorization/PermissionsFactory'
 import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
-import ProjectSchemaInfo from './config/ProjectSchemaInfo'
 import KnexWrapper from './core/knex/KnexWrapper'
 import SystemMiddlewareFactory from './http/SystemMiddlewareFactory'
 import SchemaVersionBuilder from './content-schema/SchemaVersionBuilder'
-import { IResolvers } from 'graphql-tools'
 import SystemContainerFactory from './system-api/SystemContainerFactory'
 import SystemApolloServerFactory from './http/SystemApolloServerFactory'
 import MigrationFilesManager from './migrations/MigrationFilesManager'
@@ -51,7 +49,7 @@ import ContentApolloServerFactory from './http/ContentApolloServerFactory'
 import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
 
 export type ProjectContainer = Container<{
-	project: ProjectSchemaInfo & Project
+	project: Project
 	knexConnection: knex
 	systemApolloServerFactory: SystemApolloServerFactory
 	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
@@ -60,7 +58,7 @@ export type ProjectContainer = Container<{
 class CompositionRoot {
 	composeServer(
 		tenantDbCredentials: DatabaseCredentials,
-		projects: Array<ProjectSchemaInfo & Project>,
+		projects: Array<Project>,
 		projectsDirectory: string
 	): Koa {
 		const tenantContainer = this.createTenantContainer(tenantDbCredentials)
@@ -161,11 +159,10 @@ class CompositionRoot {
 		return masterContainer.get('koa')
 	}
 
-	createProjectContainers(projects: Array<ProjectSchemaInfo & Project>, projectsDir: string): ProjectContainer[] {
-		return projects.map((project: ProjectSchemaInfo & Project) => {
+	createProjectContainers(projects: Array<Project>, projectsDir: string): ProjectContainer[] {
+		return projects.map((project: Project) => {
 			const projectContainer = new Container.Builder({})
 				.addService('project', () => project)
-				.addService('aclSchema', ({ project }) => project.acl)
 				.addService('knexDebugger', () => new KnexDebugger())
 				.addService('knexConnection', ({ project, knexDebugger }) => {
 					const knexInst = knex({
@@ -228,7 +225,6 @@ class CompositionRoot {
 					'schemaMigrationDiffsResolver',
 					'migrationFilesManager',
 					'permissionsByIdentityFactory',
-					'aclSchema'
 				)
 			)
 

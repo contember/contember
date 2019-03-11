@@ -79,8 +79,8 @@ class PermissionsVerifier {
 
 		for (let event of events) {
 			if (this.isContentEvent(event)) {
-				const canRead = readPermissions[event.tableName][event.rowId]
-				const canWrite = writePermissions[event.tableName][event.rowId]
+				const canRead = (readPermissions[event.tableName] || {})[event.rowId] || false
+				const canWrite = (writePermissions[event.tableName] || {})[event.rowId] || false
 
 				permissionsResult[event.id] = canRead && canWrite ? PermissionsVerifier.EventPermission.canApply
 					: (canRead ? PermissionsVerifier.EventPermission.canView : PermissionsVerifier.EventPermission.forbidden)
@@ -101,22 +101,21 @@ class PermissionsVerifier {
 	): Promise<PermissionsByTable> {
 		const db = this.db.forSchema(formatSchemaName(stage))
 		const schema = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
-		const { permissions } = this.permissionsByIdentityFactory.createPermissions(
-			{ model: schema, acl: context.acl },
+		const { permissions } = this.permissionsByIdentityFactory.createPermissions(schema,
 			{
 				globalRoles: context.identity.roles,
 				projectRoles: await context.identity.getProjectRoles(this.project.uuid) || [],
 			}
 		)
 
-		const predicateFactory = new PredicateFactory(permissions, new VariableInjector(schema, context.variables))
-		const entitiesByTable = Object.values(schema.entities).reduce<{ [tableName: string]: Model.Entity }>(
+		const predicateFactory = new PredicateFactory(permissions, new VariableInjector(schema.model, context.variables))
+		const entitiesByTable = Object.values(schema.model.entities).reduce<{ [tableName: string]: Model.Entity }>(
 			(tables, entity) => ({ ...tables, [entity.tableName]: entity }),
 			{}
 		)
 		const result: PermissionsByTable = {}
 		for (let table in eventsByTable) {
-			result[table] = await cb(schema, entitiesByTable[table], db, eventsByTable[table], predicateFactory)
+			result[table] = await cb(schema.model, entitiesByTable[table], db, eventsByTable[table], predicateFactory)
 		}
 		return result
 	}
@@ -286,7 +285,6 @@ namespace PermissionsVerifier {
 	export type Context = {
 		variables: Acl.VariablesMap
 		identity: Identity
-		acl: Acl.Schema
 	}
 
 	export enum EventPermission {

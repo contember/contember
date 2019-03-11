@@ -3,11 +3,10 @@ import ResolverContext from '../ResolverContext'
 import { QueryResolver } from '../Resolver'
 import { DiffErrorCode, DiffQueryArgs, DiffResponse } from '../../schema/types'
 import DiffResponseBuilder from '../../model/events/DiffResponseBuilder'
-import { Acl } from 'cms-common'
 import { createStageQuery } from '../../model/queries/StageQueryHelper'
 
 export default class DiffQueryResolver implements QueryResolver<'diff'> {
-	constructor(private readonly diffResponseBuilder: DiffResponseBuilder, private readonly acl: Acl.Schema) {}
+	constructor(private readonly diffResponseBuilder: DiffResponseBuilder) {}
 
 	async diff(
 		parent: any,
@@ -33,7 +32,6 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 			{
 				variables: context.variables,
 				identity: context.identity,
-				acl: this.acl,
 			},
 			baseStage,
 			headStage

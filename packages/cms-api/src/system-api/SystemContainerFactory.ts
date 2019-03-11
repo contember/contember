@@ -22,7 +22,6 @@ export default class SystemContainerFactory {
 		project: Project,
 		migrationFilesManager: MigrationFilesManager
 		permissionsByIdentityFactory: PermissionsByIdentityFactory
-		aclSchema: Acl.Schema
 		schemaMigrationDiffsResolver: SchemaMigrationDiffsResolver
 	}): Container<{
 		systemApolloServerFactory: SystemApolloServerFactory
@@ -31,7 +30,6 @@ export default class SystemContainerFactory {
 		executionContainerFactory: SystemExecutionContainer.Factory
 	}> {
 		return new Container.Builder({})
-			.addService('aclSchema', () => container.aclSchema)
 			.addService('systemStagesQueryResolver', () => new StagesQueryResolver())
 			.addService('tableReferencingResolver', () => new TableReferencingResolver())
 			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
@@ -40,9 +38,9 @@ export default class SystemContainerFactory {
 			.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder())
 			.addService(
 				'systemDiffQueryResolver',
-				({ systemDiffResponseBuilder, aclSchema }) => new DiffQueryResolver(systemDiffResponseBuilder, aclSchema)
+				({ systemDiffResponseBuilder }) => new DiffQueryResolver(systemDiffResponseBuilder)
 			)
-			.addService('releaseMutationResolver', ({ aclSchema }) => new ReleaseMutationResolver(aclSchema))
+			.addService('releaseMutationResolver', () => new ReleaseMutationResolver())
 			.addService(
 				'systemResolvers',
 				({ systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver }) =>

@@ -1,4 +1,4 @@
-import { assertNever, Model } from 'cms-common'
+import { assertNever, Model, Schema } from 'cms-common'
 import {
 	CreateColumnModification,
 	CreateEntityModification,
@@ -30,10 +30,10 @@ export default class SqlMigrator {
 		private readonly newSchema: Model.Schema
 	) {}
 
-	public static applyDiff(oldSchema: Model.Schema, diff: SchemaDiff): string {
+	public static applyDiff(oldSchema: Schema, diff: SchemaDiff): string {
 		const builder = createMigrationBuilder()
 		const newSchema = SchemaMigrator.applyDiff(oldSchema, diff)
-		const migrator = new SqlMigrator(builder, oldSchema, newSchema)
+		const migrator = new SqlMigrator(builder, oldSchema.model, newSchema.model)
 		for (const modification of diff.modifications) {
 			migrator.apply(modification)
 		}
@@ -85,6 +85,7 @@ export default class SqlMigrator {
 			case 'updateFieldName':
 			case 'createRelationInverseSide':
 			case 'updateRelationOnDelete':
+			case 'updateAclSchema':
 				break
 			default:
 				assertNever(modification)

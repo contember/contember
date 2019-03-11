@@ -6,7 +6,6 @@ import { Acl } from 'cms-common'
 import { createStageQuery } from '../../model/queries/StageQueryHelper'
 
 export default class ReleaseMutationResolver implements MutationResolver<'release'> {
-	constructor(private readonly acl: Acl.Schema) {}
 
 	async release(
 		parent: any,
@@ -29,7 +28,6 @@ export default class ReleaseMutationResolver implements MutationResolver<'releas
 			{
 				variables: context.variables,
 				identity: context.identity,
-				acl: this.acl,
 			},
 			baseStage,
 			headStage,

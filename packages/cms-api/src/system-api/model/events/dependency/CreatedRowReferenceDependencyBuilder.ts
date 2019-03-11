@@ -58,7 +58,7 @@ class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 
 			for (let column in event.values) {
 				if (tableReferencing === null) {
-					tableReferencing = this.tableReferencingResolver.getTableReferencing(schema)
+					tableReferencing = this.tableReferencingResolver.getTableReferencing(schema.model)
 				}
 				const referencedTable = tableReferencing[event.tableName][column]
 				if (!referencedTable) {

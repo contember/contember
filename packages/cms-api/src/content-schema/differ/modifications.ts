@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model, Acl } from 'cms-common'
 
 export interface CreateEntityModification {
 	modification: 'createEntity'
@@ -104,6 +104,11 @@ export interface UpdateEnumModification {
 	values: string[]
 }
 
+export interface UpdateAclSchemaModification {
+	modification: 'updateAclSchema'
+	schema: Acl.Schema,
+}
+
 export type Modification =
 	| CreateEntityModification
 	| RemoveEntityModification
@@ -122,6 +127,7 @@ export type Modification =
 	| RemoveEnumModification
 	| UpdateEnumModification
 	| UpdateRelationOnDeleteModification
+	| UpdateAclSchemaModification
 
 export interface SchemaDiff {
 	modifications: Modification[]

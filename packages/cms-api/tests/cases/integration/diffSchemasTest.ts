@@ -1,5 +1,5 @@
 import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
-import { Model } from 'cms-common'
+import { Model, Acl } from 'cms-common'
 import { SchemaDiff } from '../../../src/content-schema/differ/modifications'
 import diffSchemas from '../../../src/content-schema/differ/diffSchemas'
 import SchemaMigrator from '../../../src/content-schema/differ/SchemaMigrator'
@@ -8,18 +8,20 @@ import { expect } from 'chai'
 import { SQL } from '../../src/tags'
 import 'mocha'
 
+const emptyAcl = {roles: {}, variables: {}}
+
 function testDiffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema, expectedDiff: SchemaDiff) {
-	const actual = diffSchemas(originalSchema, updatedSchema)
+	const actual = diffSchemas({ model: originalSchema, acl: emptyAcl }, { model: updatedSchema, acl: emptyAcl })
 	expect(actual).deep.equals(expectedDiff)
 }
 
 function testApplyDiff(originalSchema: Model.Schema, diff: SchemaDiff, expectedSchema: Model.Schema) {
-	const actual = SchemaMigrator.applyDiff(originalSchema, diff)
-	expect(actual).deep.equals(expectedSchema)
+	const actual = SchemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, diff)
+	expect(actual.model).deep.equals(expectedSchema)
 }
 
 function testGenerateSql(originalSchema: Model.Schema, diff: SchemaDiff, expectedSql: string) {
-	const actual = SqlMigrator.applyDiff(originalSchema, diff)
+	const actual = SqlMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, diff)
 		.replace(/\s+/g, ' ')
 		.trim()
 	expect(actual).equals(expectedSql)
@@ -1028,6 +1030,53 @@ describe('Diff schemas', () => {
 		})
 		it('generate sql', () => {
 			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
+
+	describe('update ACL', () => {
+		const model = new SchemaBuilder()
+			.entity('Site', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+			)
+			.buildSchema()
+		const acl: Acl.Schema = {
+			variables: {},
+			roles: {
+				admin: {
+					entities: {
+						Site: {
+							predicates: {},
+							operations: {
+								read: {
+									id: true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		const diff: SchemaDiff = {
+			modifications: [
+				{
+					modification: 'updateAclSchema',
+					schema: acl,
+				}
+			],
+		}
+		it('diff schemas', () => {
+			const actual = diffSchemas({ model, acl: emptyAcl}, { model, acl})
+			expect(actual).deep.equals(diff)
+		})
+		it('apply diff', () => {
+			const actual = SchemaMigrator.applyDiff({ model, acl: emptyAcl }, diff)
+			expect(actual).deep.equals({ model, acl })
+		})
+		it('generate sql', () => {
+			const actual = SqlMigrator.applyDiff({ model, acl: emptyAcl }, diff)
+			expect(actual.trim()).eq('')
 		})
 	})
 })

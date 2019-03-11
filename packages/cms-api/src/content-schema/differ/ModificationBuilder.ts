@@ -1,4 +1,4 @@
-import { deepCopy, Model } from 'cms-common'
+import { deepCopy, Model, Schema, Acl } from 'cms-common'
 import { Modification, SchemaDiff } from './modifications'
 import { acceptFieldVisitor } from '../modelUtils'
 import CreateModificationFieldVisitor from './CreateModificationFieldVisitor'
@@ -7,7 +7,7 @@ import { arraySplit } from '../../utils/arrays'
 class ModificationBuilder {
 	private modifications: Modification[] = []
 
-	constructor(private readonly originalSchema: Model.Schema, private readonly updatedSchema: Model.Schema) {}
+	constructor(private readonly originalSchema: Schema, private readonly updatedSchema: Schema) {}
 
 	public getDiff(): SchemaDiff | null {
 		const [createEntity, other] = arraySplit(this.modifications, it => it.modification === 'createEntity')
@@ -50,7 +50,7 @@ class ModificationBuilder {
 
 	public createField(updatedEntity: Model.Entity, fieldName: string) {
 		const modification = acceptFieldVisitor(
-			this.updatedSchema,
+			this.updatedSchema.model,
 			updatedEntity,
 			fieldName,
 			new CreateModificationFieldVisitor(updatedEntity)
@@ -107,7 +107,7 @@ class ModificationBuilder {
 		this.modifications.push({
 			modification: 'createEnum',
 			enumName: enumName,
-			values: deepCopy(this.updatedSchema.enums[enumName]),
+			values: deepCopy(this.updatedSchema.model.enums[enumName]),
 		})
 	}
 
@@ -122,7 +122,7 @@ class ModificationBuilder {
 		this.modifications.push({
 			modification: 'updateEnum',
 			enumName: enumName,
-			values: deepCopy(this.updatedSchema.enums[enumName]),
+			values: deepCopy(this.updatedSchema.model.enums[enumName]),
 		})
 	}
 
@@ -132,6 +132,13 @@ class ModificationBuilder {
 			entityName,
 			fieldName,
 			onDelete,
+		})
+	}
+
+	public updateAclSchema(schema: Acl.Schema) {
+		this.modifications.push({
+			modification: 'updateAclSchema',
+			schema,
 		})
 	}
 

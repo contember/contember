@@ -1,7 +1,7 @@
 export enum StageDiffState {
-	DIFF_FETCHING,
-	DIFF_FAILED,
-	DIFF_DONE
+	DIFF_FETCHING = 'fetching',
+	DIFF_FAILED = 'failed',
+	DIFF_DONE = 'done'
 }
 
 export interface StageDiff {
@@ -27,11 +27,19 @@ export interface StageDiffDone extends StageDiff {
 
 export type AnyStageDiff = StageDiffFetching | StageDiffDone | StageDiffFailed
 
+export enum EventType {
+	UPDATE = 'UPDATE',
+	DELETE = 'DELETE',
+	CREATE = 'CREATE',
+	RUN_MIGRATION = 'RUN_MIGRATION'
+}
+
 export interface Event {
 	id: string
 	dependencies: string[]
 	allowed: boolean
 	description: string
+	type: EventType
 }
 
 export default interface SystemState {

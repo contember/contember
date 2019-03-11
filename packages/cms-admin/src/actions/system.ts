@@ -27,8 +27,10 @@ export const fetchDiff = (baseStage: string): ActionCreator => async (dispatch, 
 			project,
 			headStage,
 			baseStage,
-			state: StageDiffState.DIFF_DONE,
-			events: response.diff.result.events
+			state:
+				response.diff.errors && response.diff.errors.length > 0 ? StageDiffState.DIFF_FAILED : StageDiffState.DIFF_DONE,
+			events: response.diff.result && response.diff.result.events,
+			errors: response.diff.errors
 		}
 	})
 }

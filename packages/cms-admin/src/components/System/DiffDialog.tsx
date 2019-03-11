@@ -5,8 +5,12 @@ import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { pushRequest } from '../../actions/request'
 import { pageRequest } from '../../state/request'
+import { Button, FormGroup, InputGroup } from '../ui'
 
-class DiffDialog extends React.PureComponent<DiffDialog.StateProps & DiffDialog.DispatchProps, DiffDialog.State> {
+class ConnectedDiffDialog extends React.PureComponent<
+	DiffDialog.Props & DiffDialog.StateProps & DiffDialog.DispatchProps,
+	DiffDialog.State
+> {
 	state: DiffDialog.State = {
 		targetStage: ''
 	}
@@ -15,21 +19,33 @@ class DiffDialog extends React.PureComponent<DiffDialog.StateProps & DiffDialog.
 		this.setState({ targetStage: value })
 	}
 
-	showDiff() {
-		this.props.onShowDiff(this.props.project, this.props.stage, this.props.pageName, this.state.targetStage)
+	onSubmit = (e: React.FormEvent<unknown>) => {
+		e.preventDefault()
+		this.props.onShowDiff(this.props.project, this.props.stage, this.props.viewPageName, this.state.targetStage)
 	}
 
 	render() {
 		return (
-			<form>
-				<input type={'text'} onChange={e => this.updateTargetState(e.target.value)} />
-				<a onClick={() => this.showDiff()}>Show diff</a>
+			<form onSubmit={this.onSubmit}>
+				<FormGroup label="Stage slug">
+					<InputGroup onChange={e => this.updateTargetState(e.target.value)} />
+				</FormGroup>
+
+				<Button
+					Component={({ children, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
+						<input type="submit" value="Show diff" {...props} />
+					)}
+				/>
 			</form>
 		)
 	}
 }
 
 namespace DiffDialog {
+	export interface Props {
+		viewPageName: string
+	}
+
 	export interface State {
 		targetStage: string
 	}
@@ -45,7 +61,7 @@ namespace DiffDialog {
 	}
 }
 
-export default connect<DiffDialog.StateProps, DiffDialog.DispatchProps, {}, State>(
+export const DiffDialog = connect<DiffDialog.StateProps, DiffDialog.DispatchProps, DiffDialog.Props, State>(
 	state => {
 		if (state.request.name !== 'project_page') {
 			throw new Error()
@@ -59,7 +75,6 @@ export default connect<DiffDialog.StateProps, DiffDialog.DispatchProps, {}, Stat
 	(dispatch: Dispatch) => ({
 		onShowDiff: (project, headStage, pageName, baseStage) => {
 			dispatch(pushRequest(pageRequest(project, headStage, pageName, { targetStage: baseStage })))
-			dispatch(fetchDiff(baseStage))
 		}
 	})
-)(DiffDialog)
+)(ConnectedDiffDialog)

@@ -59,7 +59,17 @@ class PermissionsVerifier {
 		targetStage: Stage,
 		events: Event[]
 	): Promise<PermissionsVerifier.Result> {
-		const contentEvents = events.filter(this.isContentEvent)
+		const contentEvents: ContentEvent[] = []
+
+		for (const event of events) {
+			if (this.isContentEvent(event)) {
+				contentEvents.push(event)
+			} else {
+				// if there is migration, we cannot verify any further content event permissions
+				break
+			}
+		}
+
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
 		const readPermissions = await this.verifyPermissionsCb(

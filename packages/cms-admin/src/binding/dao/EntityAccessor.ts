@@ -5,10 +5,10 @@ class EntityAccessor {
 
 	public constructor(
 		primaryKey: string | EntityAccessor.UnpersistedEntityID | undefined,
+		public readonly typename: string | undefined,
 		public readonly data: EntityData,
-		public readonly replaceWith: (replacement: EntityAccessor) => void,
-		public readonly remove?: (removalType: EntityAccessor.RemovalType) => void
-	) {
+		public readonly replaceWith: (replacement: EntityAccessor) => void
+		, public readonly remove?: (removalType: EntityAccessor.RemovalType) => void) {
 		this.primaryKey = primaryKey || new EntityAccessor.UnpersistedEntityID()
 	}
 

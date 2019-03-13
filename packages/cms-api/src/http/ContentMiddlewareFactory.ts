@@ -100,13 +100,11 @@ class ContentMiddlewareFactory {
 
 						const apolloKoa = new Koa()
 						ctx.state.timer('creating graphql server')
-						const server = this.createApolloServer(
-							dataSchema,
-							projectVariables,
-							stage.schema.model,
-							permissions,
-							projectContainer.get('knexDebugger')
-						)
+						;(ctx.state as any).projectVariables = projectVariables
+						;(ctx.state as any).schema = stage.schema.model
+						;(ctx.state as any).permissions = permissions
+
+						const server = projectContainer.get('apolloServerFactory').create(dataSchema)
 						ctx.state.timer('applying middleware')
 						server.applyMiddleware({
 							app: apolloKoa,
@@ -124,40 +122,6 @@ class ContentMiddlewareFactory {
 			)
 
 			await koaCompose<any>(contentKoa.middleware)(ctx, next)
-		})
-	}
-
-	private createApolloServer(
-		dataSchema: GraphQLSchema,
-		variables: Acl.VariablesMap,
-		schema: Model.Schema,
-		permissions: Acl.Permissions,
-		knexDebugger: KnexDebugger
-	) {
-		return new ApolloServer({
-			tracing: true,
-			introspection: true,
-			schema: dataSchema,
-			uploads: false,
-			extensions: [
-				() => {
-					const queriesExt = new DbQueriesExtension()
-					knexDebugger.subscribe(query => queriesExt.addQuery(query))
-					return queriesExt
-				},
-			],
-			context: async ({ ctx }: { ctx: Koa.Context }): Promise<Context> => {
-				const executionContainer = new ExecutionContainerFactory(schema, permissions).create({
-					db: ctx.state.db,
-					identityVariables: variables,
-				})
-				return {
-					db: ctx.state.db,
-					identityVariables: variables,
-					executionContainer,
-				}
-			},
-			playground: false,
 		})
 	}
 }

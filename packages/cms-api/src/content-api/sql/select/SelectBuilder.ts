@@ -102,6 +102,11 @@ export default class SelectBuilder {
 				continue
 			}
 
+			// Disregarding __typename field since it's automatically handeled by apollo server
+			if (field.name === '__typename') {
+				continue
+			}
+
 			if (field.meta.extensionKey) {
 				const handler = this.selectHandlers[field.meta.extensionKey]
 				if (!handler) {

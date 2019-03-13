@@ -30,6 +30,7 @@ import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
 import KnexDebugger from './core/knex/KnexDebugger'
 import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
+import ContentApolloServerFactory from './http/ContentApolloServerFactory'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -37,6 +38,7 @@ export type ProjectContainer = Container<{
 	graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory
 	graphQlSchemaFactory: GraphQlSchemaFactory
 	knexDebugger: KnexDebugger
+	apolloServerFactory: ContentApolloServerFactory
 	s3: S3
 }>
 
@@ -113,6 +115,7 @@ class CompositionRoot {
 							new GraphQlSchemaFactory.RoleBasedPermissionFactory(),
 						])
 				)
+				.addService('apolloServerFactory', ({ knexDebugger }) => new ContentApolloServerFactory(knexDebugger))
 				.build()
 		})
 	}

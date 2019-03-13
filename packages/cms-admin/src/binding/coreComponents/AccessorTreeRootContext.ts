@@ -1,4 +1,4 @@
 import * as React from 'react'
-import { AccessorTreeRoot } from "../dao"
+import { AccessorTreeRoot } from '../dao'
 
-export const AccessorTreeRootContext = React.createContext<AccessorTreeRoot|undefined>(undefined)
+export const AccessorTreeRootContext = React.createContext<AccessorTreeRoot | undefined>(undefined)

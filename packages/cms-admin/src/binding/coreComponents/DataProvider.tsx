@@ -1,16 +1,16 @@
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {getData, putData} from '../../actions/content'
-import {setDataTreeDirtiness, setDataTreeMutationState} from '../../actions/dataTrees'
-import {Dispatch} from '../../actions/types'
+import { connect } from 'react-redux'
+import { getData, putData } from '../../actions/content'
+import { setDataTreeDirtiness, setDataTreeMutationState } from '../../actions/dataTrees'
+import { Dispatch } from '../../actions/types'
 import State from '../../state'
-import {ContentRequestsState, ContentStatus} from '../../state/content'
-import {DataTreeDirtinessState, DataTreeId, DataTreeMutationState} from '../../state/dataTrees'
-import {AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor} from '../dao'
-import {DefaultRenderer} from '../facade/renderers'
-import {AccessorTreeGenerator, MutationGenerator, QueryGenerator} from '../model'
-import {MetaOperationsContext, MetaOperationsContextValue} from './MetaOperationsContext'
-import {AccessorTreeRootContext} from "./AccessorTreeRootContext";
+import { ContentRequestsState, ContentStatus } from '../../state/content'
+import { DataTreeDirtinessState, DataTreeId, DataTreeMutationState } from '../../state/dataTrees'
+import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
+import { DefaultRenderer } from '../facade/renderers'
+import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
+import { MetaOperationsContext, MetaOperationsContextValue } from './MetaOperationsContext'
+import { AccessorTreeRootContext } from './AccessorTreeRootContext'
 
 export interface DataRendererProps {
 	data?: AccessorTreeRoot | undefined
@@ -74,7 +74,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 					}
 					const id = await this.props.getData(this.state.query)
 					if (!this.unmounted) {
-						this.setState({id})
+						this.setState({ id })
 					}
 					return successfullyFinalizeMutation()
 				})
@@ -133,7 +133,6 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 				</DefaultRenderer>
 			)
 		}
-
 	}
 
 	public render() {
@@ -157,7 +156,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		if (query) {
 			const id = await this.props.getData(query)
 			if (!this.unmounted) {
-				this.setState({id, query})
+				this.setState({ id, query })
 			}
 		} else {
 			this.initializeAccessorTree(undefined)
@@ -173,14 +172,14 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		accessTreeGenerator.generateLiveTree(newData => {
 			console.log('data', newData)
 			this.props.onDataAvailable && this.props.onDataAvailable(newData)
-			this.setState({data: newData})
+			this.setState({ data: newData })
 		})
 	}
 }
 
 const getDataProvider = <DRP extends {}>() =>
 	connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps<DRP>, State>(
-		({content, dataTrees}, ownProps: DataProviderOwnProps<DRP>) => ({
+		({ content, dataTrees }, ownProps: DataProviderOwnProps<DRP>) => ({
 			requests: content.requests,
 			isDirty: (dataTrees[ownProps.markerTree.id] || {}).isDirty || false
 		}),
@@ -194,4 +193,4 @@ const getDataProvider = <DRP extends {}>() =>
 		})
 	)(DataProvider as new (props: DataProviderInnerProps<DRP>) => DataProvider<DRP>)
 
-export {getDataProvider}
+export { getDataProvider }

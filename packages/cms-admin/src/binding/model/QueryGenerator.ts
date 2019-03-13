@@ -84,6 +84,7 @@ export class QueryGenerator {
 		builder: CrudQueryBuilder.ListQueryBuilder
 	): IterableIterator<MarkerTreeRoot | CrudQueryBuilder.ListQueryBuilder> {
 		builder = builder.column(PRIMARY_KEY_NAME)
+		builder = builder.column('__typename')
 
 		for (const placeholderName in fields) {
 			const fieldValue: Marker = fields[placeholderName]

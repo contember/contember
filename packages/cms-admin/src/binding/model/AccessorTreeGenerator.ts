@@ -66,6 +66,7 @@ export class AccessorTreeGenerator {
 							if (typeof primaryKey === 'string') {
 								entityAccessors[i] = new EntityForRemovalAccessor(
 									primaryKey,
+									entityAccessor.typename,
 									entityAccessor.data,
 									entityAccessor.replaceWith,
 									removalType
@@ -104,6 +105,7 @@ export class AccessorTreeGenerator {
 					if (typeof entityAccessor.primaryKey === 'string') {
 						entityAccessor = new EntityForRemovalAccessor(
 							entityAccessor.primaryKey,
+							entityAccessor.typename,
 							entityAccessor.data,
 							entityAccessor.replaceWith,
 							removalType
@@ -125,6 +127,7 @@ export class AccessorTreeGenerator {
 	): EntityAccessor {
 		const entityData: EntityData.EntityData = {}
 		const id = data ? data[PRIMARY_KEY_NAME] : undefined
+		const typename = data ? data['__typename'] : undefined
 
 		for (const placeholderName in fields) {
 			if (placeholderName === PRIMARY_KEY_NAME) {
@@ -219,7 +222,7 @@ export class AccessorTreeGenerator {
 			}
 		}
 
-		return new EntityAccessor(id, new EntityData(entityData), onReplace, onUnlink)
+		return new EntityAccessor(id, typename, new EntityData(entityData), onReplace, onUnlink)
 	}
 
 	private generateOneReference(
@@ -317,12 +320,10 @@ export class AccessorTreeGenerator {
 		fieldPlaceholder: string,
 		newData: EntityData.FieldData
 	): EntityAccessor {
-		return new EntityAccessor(
-			original.primaryKey,
-			new EntityData({ ...original.data.allFieldData, [fieldPlaceholder]: newData }),
-			original.replaceWith,
-			original.remove
-		)
+		return new EntityAccessor(original.primaryKey, original.typename, new EntityData({
+			...original.data.allFieldData,
+			[fieldPlaceholder]: newData
+		}), original.replaceWith, original.remove)
 	}
 
 	private asDifferentEntity(
@@ -331,12 +332,7 @@ export class AccessorTreeGenerator {
 		onRemove?: EntityAccessor['remove']
 	): EntityAccessor {
 		// TODO: we also need to update the callbacks inside replacement.data
-		return new EntityAccessor(
-			replacement.primaryKey,
-			replacement.data,
-			original.replaceWith,
-			onRemove || original.remove
-		)
+		return new EntityAccessor(replacement.primaryKey, original.typename, replacement.data, original.replaceWith, onRemove || original.remove)
 	}
 
 	private removeEntity(
@@ -347,7 +343,7 @@ export class AccessorTreeGenerator {
 			const id = currentEntity.primaryKey
 
 			if (typeof id === 'string') {
-				return new EntityForRemovalAccessor(id, currentEntity.data, currentEntity.replaceWith, removalType)
+				return new EntityForRemovalAccessor(id, currentEntity.typename, currentEntity.data, currentEntity.replaceWith, removalType)
 			}
 		}
 		return undefined

@@ -1,23 +1,25 @@
-import { DatabaseCredentials } from '../config/config'
+import { Config, DatabaseCredentials } from '../config/config'
 import Knex from 'knex'
-import BaseCommand from './BaseCommand'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import { formatSchemaName } from '../system-api/model/helpers/stageHelpers'
+import Command from '../core/cli/Command'
 
-class DropCommand extends BaseCommand<{}, {}> {
+class DropCommand extends Command<{}, {}> {
+	constructor(private readonly config: Config) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration): void {
-		configuration.name('drop')
 		configuration.description('Deletes all db schemas (including tenant and both data and system schemas of projects)')
 	}
 
 	protected async execute(): Promise<void> {
-		const config = await this.readConfig()
 
 		const queries = []
 
-		queries.push(this.clear(config.tenant.db, ['tenant']))
+		queries.push(this.clear(this.config.tenant.db, ['tenant']))
 
-		for (const project of config.projects) {
+		for (const project of this.config.projects) {
 			const schemas = [...project.stages.map(stage => formatSchemaName(stage)), 'system']
 			queries.push(this.clear(project.dbCredentials, schemas))
 		}

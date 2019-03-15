@@ -1,27 +1,39 @@
-import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
-import { Model, Acl } from 'cms-common'
-import { SchemaDiff } from '../../../src/content-schema/differ/modifications'
-import diffSchemas from '../../../src/content-schema/differ/diffSchemas'
-import SchemaMigrator from '../../../src/content-schema/differ/SchemaMigrator'
-import SqlMigrator from '../../../src/content-api/sqlSchema/SqlMigrator'
+import { Acl, Model } from 'cms-common'
 import { expect } from 'chai'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../../src/tags'
 import 'mocha'
+import Migration from '../../../../src/system-api/model/migrations/Migration'
+import SchemaDiffer from '../../../../src/system-api/model/migrations/SchemaDiffer'
+import SchemaMigrator from '../../../../src/content-schema/differ/SchemaMigrator'
+import { createMigrationBuilder } from '../../../../src/content-api/sqlSchema/sqlSchemaBuilderHelper'
+import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
+import ModificationHandlerFactory from '../../../../src/system-api/model/migrations/modifications/ModificationHandlerFactory'
 
 const emptyAcl = {roles: {}, variables: {}}
 
-function testDiffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema, expectedDiff: SchemaDiff) {
-	const actual = diffSchemas({ model: originalSchema, acl: emptyAcl }, { model: updatedSchema, acl: emptyAcl })
+const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
+const schemaMigrator = new SchemaMigrator(modificationFactory)
+const schemaDiffer = new SchemaDiffer(schemaMigrator)
+
+function testDiffSchemas(originalSchema: Model.Schema, updatedSchema: Model.Schema, expectedDiff: Migration.Modification[]) {
+	const actual = schemaDiffer.diffSchemas({ model: originalSchema, acl: emptyAcl }, { model: updatedSchema, acl: emptyAcl })
 	expect(actual).deep.equals(expectedDiff)
 }
 
-function testApplyDiff(originalSchema: Model.Schema, diff: SchemaDiff, expectedSchema: Model.Schema) {
-	const actual = SchemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, diff)
+function testApplyDiff(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSchema: Model.Schema) {
+	const actual = schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, diff)
 	expect(actual.model).deep.equals(expectedSchema)
 }
 
-function testGenerateSql(originalSchema: Model.Schema, diff: SchemaDiff, expectedSql: string) {
-	const actual = SqlMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, diff)
+function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSql: string) {
+	let schema = { model: originalSchema, acl: emptyAcl }
+	const builder = createMigrationBuilder()
+	for (let {modification, ...data} of diff) {
+		const modificationHandler = modificationFactory.create(modification, data, schema)
+		modificationHandler.createSql(builder)
+		schema = modificationHandler.getSchemaUpdater()(schema)
+	}
+	const actual = builder.getSql()
 		.replace(/\s+/g, ' ')
 		.trim()
 	expect(actual).equals(expectedSql)
@@ -38,8 +50,7 @@ describe('Diff schemas', () => {
 					.column('registeredAt', c => c.type(Model.ColumnType.Date))
 			)
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'createEntity',
 					entity: {
@@ -100,8 +111,7 @@ describe('Diff schemas', () => {
 						fields: ['email'],
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL`CREATE TABLE "author" ( "id" uuid PRIMARY KEY NOT NULL );
 			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "author" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			  ALTER TABLE "author" ADD "name" text;
@@ -131,8 +141,7 @@ describe('Diff schemas', () => {
 					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade))
 			)
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'createEntity',
 					entity: {
@@ -177,8 +186,7 @@ describe('Diff schemas', () => {
 						nullable: true,
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL`CREATE TABLE "post" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			ALTER TABLE "post" ADD "title" text;
@@ -214,8 +222,7 @@ describe('Diff schemas', () => {
 					.column('locale', c => c.type(Model.ColumnType.String))
 			)
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'createEntity',
 					entity: {
@@ -286,8 +293,7 @@ describe('Diff schemas', () => {
 						fields: ['post', 'locale'],
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL`CREATE TABLE "post_locale" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_locale" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			ALTER TABLE "post_locale" ADD "post_id" uuid NOT NULL;
@@ -381,8 +387,7 @@ describe('Diff schemas', () => {
 			enums: {},
 		}
 
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'createRelationInverseSide',
 					entityName: 'Post',
@@ -393,8 +398,7 @@ describe('Diff schemas', () => {
 						ownedBy: 'post',
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL``
 		it('apply diff', () => {
 			testApplyDiff(originalSchema, diff, updatedSchema)
@@ -414,8 +418,7 @@ describe('Diff schemas', () => {
 			)
 			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'createEntity',
 					entity: {
@@ -466,8 +469,7 @@ describe('Diff schemas', () => {
 						columnType: 'text',
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL`CREATE TABLE "category" ( "id" uuid PRIMARY KEY NOT NULL );
 			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "category" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			  CREATE TABLE "post_categories" (
@@ -499,8 +501,7 @@ describe('Diff schemas', () => {
 			)
 			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'createEntity',
 					entity: {
@@ -591,8 +592,7 @@ describe('Diff schemas', () => {
 						name: 'unique_Site_setting_8653a0',
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL`CREATE TABLE "site" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			CREATE TABLE "site_setting" ( "id" uuid PRIMARY KEY NOT NULL );
@@ -624,8 +624,7 @@ describe('Diff schemas', () => {
 		const updatedSchema = new SchemaBuilder()
 			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'removeField',
 					entityName: 'Post',
@@ -635,8 +634,7 @@ describe('Diff schemas', () => {
 					modification: 'removeEntity',
 					entityName: 'Author',
 				},
-			],
-		}
+			]
 		const sql = SQL`ALTER TABLE "post" DROP "author_id";
 			DROP TABLE "author";`
 		it('diff schemas', () => {
@@ -662,8 +660,7 @@ describe('Diff schemas', () => {
 			)
 			.enum('postStatus', ['publish', 'draft', 'auto-draft'])
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'createEnum',
 					enumName: 'postStatus',
@@ -681,8 +678,7 @@ describe('Diff schemas', () => {
 						enumName: 'postStatus',
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft','auto-draft'));
 				ALTER TABLE "post" ADD "status" "postStatus";`
 		it('diff schemas', () => {
@@ -713,15 +709,13 @@ describe('Diff schemas', () => {
 			)
 			.enum('postStatus', ['publish', 'draft', 'auto-draft', "SQL', 'injection"])
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'updateEnum',
 					enumName: 'postStatus',
 					values: ['publish', 'draft', 'auto-draft', "SQL', 'injection"],
 				},
-			],
-		}
+			]
 		const sql = SQL`ALTER DOMAIN "postStatus" DROP CONSTRAINT postStatus_check;
 		ALTER DOMAIN "postStatus" ADD CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft','auto-draft','SQL\\', \\'injection'));`
 		it('diff schemas', () => {
@@ -747,8 +741,7 @@ describe('Diff schemas', () => {
 		const updatedSchema = new SchemaBuilder()
 			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'removeField',
 					entityName: 'Post',
@@ -758,8 +751,7 @@ describe('Diff schemas', () => {
 					modification: 'removeEnum',
 					enumName: 'postStatus',
 				},
-			],
-		}
+			]
 		const sql = SQL`ALTER TABLE "post" DROP "status";
 				DROP DOMAIN "postStatus";`
 		it('diff schemas', () => {
@@ -788,8 +780,7 @@ describe('Diff schemas', () => {
 					.column('registeredAt', c => c.type(Model.ColumnType.DateTime))
 			)
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'updateColumnDefinition',
 					entityName: 'Author',
@@ -800,8 +791,7 @@ describe('Diff schemas', () => {
 						nullable: true,
 					},
 				},
-			],
-		}
+			]
 		const sql = SQL`ALTER TABLE "author"
 						ALTER "registered_at" SET DATA TYPE timestamp,
 						ALTER "registered_at" DROP NOT NULL;`
@@ -823,15 +813,13 @@ describe('Diff schemas', () => {
 		const updatedSchema = new SchemaBuilder()
 			.entity('User', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'updateEntityName',
 					entityName: 'Author',
 					newEntityName: 'User',
 				},
-			],
-		}
+			]
 		const sql = SQL``
 		it('apply diff', () => {
 			testApplyDiff(originalSchema, diff, updatedSchema)
@@ -848,16 +836,14 @@ describe('Diff schemas', () => {
 		const updatedSchema = new SchemaBuilder()
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'updateFieldName',
 					entityName: 'Author',
 					fieldName: 'firstName',
 					newFieldName: 'name',
 				},
-			],
-		}
+			]
 		const sql = SQL``
 		it('apply diff', () => {
 			testApplyDiff(originalSchema, diff, updatedSchema)
@@ -880,15 +866,13 @@ describe('Diff schemas', () => {
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'removeField',
 					entityName: 'Post',
 					fieldName: 'author',
 				},
-			],
-		}
+			]
 		const sql = SQL`ALTER TABLE "post" DROP "author_id";`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
@@ -924,8 +908,7 @@ describe('Diff schemas', () => {
 				e.column('title', c => c.type(Model.ColumnType.String)).column('locale', c => c.type(Model.ColumnType.String))
 			)
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'removeField',
 					entityName: 'Post',
@@ -941,8 +924,7 @@ describe('Diff schemas', () => {
 					entityName: 'PostLocale',
 					fieldName: 'post',
 				},
-			],
-		}
+			]
 		const sql = SQL`ALTER TABLE "post_locale" DROP CONSTRAINT "unique_PostLocale_post_locale_5759e8";
 						ALTER TABLE "post_locale" DROP "post_id";`
 		it('diff schemas', () => {
@@ -967,15 +949,13 @@ describe('Diff schemas', () => {
 			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'removeField',
 					entityName: 'Post',
 					fieldName: 'categories',
 				},
-			],
-		}
+			]
 		const sql = SQL`DROP TABLE "post_categories";`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
@@ -1001,8 +981,12 @@ describe('Diff schemas', () => {
 			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
 			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
-		const diff: SchemaDiff = {
-			modifications: [
+		const diff: Migration.Modification[] = [
+				{
+					modification: 'removeField',
+					entityName: 'SiteSetting',
+					fieldName: 'site',
+				},
 				{
 					modification: 'removeUniqueConstraint',
 					entityName: 'Site',
@@ -1013,15 +997,45 @@ describe('Diff schemas', () => {
 					entityName: 'Site',
 					fieldName: 'setting',
 				},
+			]
+		const sql = SQL`ALTER TABLE "site" DROP CONSTRAINT "unique_Site_setting_8653a0";
+						ALTER TABLE "site" DROP "setting_id";`
+		it('diff schemas', () => {
+			testDiffSchemas(originalSchema, updatedSchema, diff)
+		})
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
+	describe('drop relation inversed side (one has one)', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Site', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+			)
+			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Site', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.oneHasOne('setting', r => r.target('SiteSetting'))
+			)
+			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
 				{
 					modification: 'removeField',
 					entityName: 'SiteSetting',
 					fieldName: 'site',
 				},
-			],
-		}
-		const sql = SQL`ALTER TABLE "site" DROP CONSTRAINT "unique_Site_setting_8653a0";
-						ALTER TABLE "site" DROP "setting_id";`
+			]
+		const sql = SQL``
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})
@@ -1058,25 +1072,19 @@ describe('Diff schemas', () => {
 				}
 			}
 		}
-		const diff: SchemaDiff = {
-			modifications: [
-				{
-					modification: 'updateAclSchema',
-					schema: acl,
-				}
-			],
-		}
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateAclSchema',
+				schema: acl,
+			}
+		]
 		it('diff schemas', () => {
-			const actual = diffSchemas({ model, acl: emptyAcl}, { model, acl})
+			const actual = schemaDiffer.diffSchemas({ model, acl: emptyAcl}, { model, acl})
 			expect(actual).deep.equals(diff)
 		})
 		it('apply diff', () => {
-			const actual = SchemaMigrator.applyDiff({ model, acl: emptyAcl }, diff)
+			const actual = schemaMigrator.applyDiff({ model, acl: emptyAcl }, diff)
 			expect(actual).deep.equals({ model, acl })
-		})
-		it('generate sql', () => {
-			const actual = SqlMigrator.applyDiff({ model, acl: emptyAcl }, diff)
-			expect(actual.trim()).eq('')
 		})
 	})
 })

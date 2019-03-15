@@ -4,7 +4,7 @@ import CreateStageCommand from '../../src/system-api/model/commands/CreateStageC
 import MigrationFilesManager from '../../src/migrations/MigrationFilesManager'
 import StageMigrator from '../../src/system-api/StageMigrator'
 import knex from 'knex'
-import MigrationsRunner from '../../src/migrations/MigrationsRunner'
+import MigrationsRunner from '../../src/core/migrations/MigrationsRunner'
 import { setupSystemVariables } from '../../src/system-api/SystemVariablesSetupHelper'
 import CreateInitEventCommand from '../../src/system-api/model/commands/CreateInitEventCommand'
 import { graphql, GraphQLSchema } from 'graphql'
@@ -13,7 +13,7 @@ import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/Gra
 import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
 import { Context as ContentContext } from '../../src/content-api/types'
 import { formatSchemaName } from '../../src/system-api/model/helpers/stageHelpers'
-import SchemaMigrationDiffsResolver from '../../src/content-schema/SchemaMigrationDiffsResolver'
+import MigrationsResolver from '../../src/content-schema/MigrationsResolver'
 import { createMock } from '../../src/utils/testing'
 import S3 from '../../src/utils/S3'
 import systemTypeDefs from '../../src/system-api/schema/system.graphql'
@@ -32,6 +32,8 @@ import FileNameHelper from '../../src/migrations/FileNameHelper'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
 import { Acl, Model, Schema } from 'cms-common'
 import { GQL } from './tags'
+import SchemaMigrator from '../../src/content-schema/differ/SchemaMigrator'
+import ModificationHandlerFactory from '../../src/system-api/model/migrations/modifications/ModificationHandlerFactory'
 
 export class ApiTester {
 	public static project: Project = {
@@ -60,11 +62,11 @@ export class ApiTester {
 	}
 
 	public async migrateStage(slug: string, version: string): Promise<void> {
-		const migrationFilesManager = ApiTester.createProjectMigrationFilesManager()
-		const stageMigrator = new StageMigrator(migrationFilesManager)
-		const stage = this.getStage(slug)
-		await stageMigrator.migrate({ ...stage, migration: version }, this.projectDb, () => null)
-		this.knownStages[slug] = { ...stage, migration: version }
+		// const migrationFilesManager = ApiTester.createProjectMigrationFilesManager()
+		// const stageMigrator = new StageMigrator(migrationFilesManager)
+		// const stage = this.getStage(slug)
+		// await stageMigrator.migrate({ ...stage, migration: version }, this.projectDb, () => null)
+		// this.knownStages[slug] = { ...stage, migration: version }
 	}
 
 	private getStage(slug: string): Project.Stage {
@@ -132,7 +134,7 @@ export class ApiTester {
 			const latestMigration = await queryHandler.fetch(new LatestMigrationByStageQuery(stageObj.uuid))
 			this.knownStages[stage] = {
 				...stageObj,
-				migration: latestMigration ? FileNameHelper.extractVersion(latestMigration.data.file) : undefined,
+				migration: latestMigration ? latestMigration.data.version : undefined,
 			}
 		}
 	}
@@ -206,9 +208,10 @@ export class ApiTester {
 		await new CreateInitEventCommand().execute(projectDb)
 
 		const projectMigrationFilesManager = ApiTester.createProjectMigrationFilesManager()
-		const schemaMigrationDiffsResolver = new SchemaMigrationDiffsResolver(projectMigrationFilesManager)
+		const schemaMigrationDiffsResolver = new MigrationsResolver(projectMigrationFilesManager)
 		const diffs = schemaMigrationDiffsResolver.resolve()
-		const schemaVersionBuilder = new SchemaVersionBuilder(projectDb.createQueryHandler(), diffs)
+		const schemaMigrator = new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+		const schemaVersionBuilder = new SchemaVersionBuilder(projectDb.createQueryHandler(), diffs, schemaMigrator)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(
 			createMock<S3>({
 				formatPublicUrl() {
@@ -229,7 +232,8 @@ export class ApiTester {
 				new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
 				new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
 			]),
-		})
+			schemaMigrator: schemaMigrator
+		} as any)
 
 		const systemExecutionContainer = systemContainer.executionContainerFactory.create(projectDb)
 

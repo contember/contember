@@ -15,9 +15,6 @@ abstract class Command<Args extends Command.Arguments, Options extends Command.O
 		return this.configuration
 	}
 
-	public getName(): string {
-		return this.getConfiguration().getName()
-	}
 
 	protected abstract async execute(input: Command.Input): Promise<void | true>
 

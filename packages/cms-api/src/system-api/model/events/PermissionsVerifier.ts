@@ -1,5 +1,5 @@
 import { Stage } from '../dtos/Stage'
-import { ContentEvent, Event } from '../dtos/Event'
+import { ContentEvent, AnyEvent } from '../dtos/Event'
 import PredicateFactory from '../../../acl/PredicateFactory'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 import { formatSchemaName } from '../helpers/stageHelpers'
@@ -38,7 +38,7 @@ class PermissionsVerifier {
 		permissionContext: PermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
-		events: Event[]
+		events: AnyEvent[]
 	): Promise<PermissionsVerifier.Result> {
 		if (
 			await this.authorizator.isAllowed(
@@ -57,7 +57,7 @@ class PermissionsVerifier {
 		context: PermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
-		events: Event[]
+		events: AnyEvent[]
 	): Promise<PermissionsVerifier.Result> {
 		const contentEvents: ContentEvent[] = []
 
@@ -284,7 +284,7 @@ class PermissionsVerifier {
 		return `${columnName}_${operation}`
 	}
 
-	private isContentEvent(it: Event): it is ContentEvent {
+	private isContentEvent(it: AnyEvent): it is ContentEvent {
 		return ContentEvents.includes(it.type as ContentEvent['type'])
 	}
 }

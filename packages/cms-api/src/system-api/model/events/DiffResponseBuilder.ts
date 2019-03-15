@@ -1,10 +1,10 @@
-import { Event } from '../dtos/Event'
+import { AnyEvent } from '../dtos/Event'
 import { Event as ApiEvent, EventType as ApiEventType } from '../../schema/types'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
 import PermissionsVerifier from './PermissionsVerifier'
 
-type EventWithMeta = Event & { dependencies: string[]; permission: PermissionsVerifier.EventPermission }
+type EventWithMeta = AnyEvent & { dependencies: string[]; permission: PermissionsVerifier.EventPermission }
 type EventFilter = { entity: string, id: string }
 
 class DiffResponseBuilder {
@@ -48,7 +48,7 @@ class DiffResponseBuilder {
 			case EventType.delete:
 				return `Deleting ${event.tableName}#${event.rowId}`
 			case EventType.runMigration:
-				return `Running migration ${event.file}`
+				return `Running migration ${event.version}`
 			default:
 				return assertNever(event)
 		}

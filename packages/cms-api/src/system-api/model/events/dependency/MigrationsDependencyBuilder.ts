@@ -1,4 +1,4 @@
-import { Event } from '../../dtos/Event'
+import { AnyEvent } from '../../dtos/Event'
 import { EventType } from '../../EventType'
 import DependencyBuilder from '../DependencyBuilder'
 
@@ -15,7 +15,7 @@ import DependencyBuilder from '../DependencyBuilder'
  *
  */
 class MigrationsDependencyBuilder implements DependencyBuilder {
-	async build(events: Event[]): Promise<DependencyBuilder.Dependencies> {
+	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
 		let processedEvents: string[] = []
 		const processedMigrations: string[] = []
 		const dependencies: DependencyBuilder.Dependencies = {}

@@ -1,9 +1,8 @@
-import { Event } from '../../dtos/Event'
+import { AnyEvent } from '../../dtos/Event'
 import { EventType } from '../../EventType'
 import DependencyBuilder from '../DependencyBuilder'
 import TableReferencingResolver from '../TableReferencingResolver'
 import SchemaVersionBuilder from '../../../../content-schema/SchemaVersionBuilder'
-import FileNameHelper from '../../../../migrations/FileNameHelper'
 
 /**
  * Events that references a row depends on creation of such event (or its following update)
@@ -23,7 +22,7 @@ class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 		private readonly tableReferencingResolver: TableReferencingResolver
 	) {}
 
-	async build(events: Event[]): Promise<DependencyBuilder.Dependencies> {
+	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
 		if (events.length === 0) {
 			return {}
 		}
@@ -36,7 +35,7 @@ class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 
 		for (const event of events) {
 			if (event.type === EventType.runMigration) {
-				const newVersion = FileNameHelper.extractVersion(event.file)
+				const newVersion = event.version
 
 				schema = await this.schemaVersionBuilder.continue(schema, schemaVersion, newVersion)
 				schemaVersion = newVersion

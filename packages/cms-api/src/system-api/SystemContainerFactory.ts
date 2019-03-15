@@ -12,24 +12,41 @@ import AccessEvaluator from '../core/authorization/AccessEvalutator'
 import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolver'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
-import { Acl } from 'cms-common'
 import SystemExecutionContainer from './SystemExecutionContainer'
-import SchemaMigrationDiffsResolver from '../content-schema/SchemaMigrationDiffsResolver'
+import MigrationsResolver from '../content-schema/MigrationsResolver'
 import Project from '../config/Project'
+import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
+import MigrationDiffCreator from './model/migrations/MigrationDiffCreator'
+import MigrationExecutor from './model/migrations/MigrationExecutor'
+import ProjectInitializer from './ProjectInitializer'
+import SchemaVersionBuilder from '../content-schema/SchemaVersionBuilder'
+import SchemaDiffer from './model/migrations/SchemaDiffer'
+import StageMigrator from './StageMigrator'
+import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
+import KnexWrapper from '../core/knex/KnexWrapper'
+
+export interface SystemContainer {
+	systemApolloServerFactory: SystemApolloServerFactory
+	systemResolvers: IResolvers
+	authorizator: Authorizator
+	executionContainerFactory: SystemExecutionContainer.Factory,
+	projectIntializer: ProjectInitializer,
+	migrationDiffCreator: MigrationDiffCreator,
+}
 
 export default class SystemContainerFactory {
 	public create(container: {
 		project: Project,
 		migrationFilesManager: MigrationFilesManager
 		permissionsByIdentityFactory: PermissionsByIdentityFactory
-		schemaMigrationDiffsResolver: SchemaMigrationDiffsResolver
-	}): Container<{
-		systemApolloServerFactory: SystemApolloServerFactory
-		systemResolvers: IResolvers
-		authorizator: Authorizator
-		executionContainerFactory: SystemExecutionContainer.Factory
-	}> {
+		schemaMigrationDiffsResolver: MigrationsResolver,
+		schemaMigrator: SchemaMigrator,
+		schemaVersionBuilder: SchemaVersionBuilder,
+		modificationHandlerFactory: ModificationHandlerFactory,
+		systemKnexWrapper: KnexWrapper,
+	}): Container<SystemContainer> {
 		return new Container.Builder({})
+			.addService('schemaDiffer', () => new SchemaDiffer(container.schemaMigrator))
 			.addService('systemStagesQueryResolver', () => new StagesQueryResolver())
 			.addService('tableReferencingResolver', () => new TableReferencingResolver())
 			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
@@ -46,15 +63,18 @@ export default class SystemContainerFactory {
 				({ systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver }) =>
 					new ResolverFactory(systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver).create()
 			)
+			.addService('migrationExecutor', () => new MigrationExecutor(container.modificationHandlerFactory))
 			.addService(
 				'executionContainerFactory',
-				({ authorizator }) =>
+				({ authorizator, migrationExecutor }) =>
 					new SystemExecutionContainer.Factory(
 						container.project,
 						container.schemaMigrationDiffsResolver.resolve(),
 						container.migrationFilesManager,
 						authorizator,
-						container.permissionsByIdentityFactory
+						container.permissionsByIdentityFactory,
+						container.schemaMigrator,
+						migrationExecutor
 					)
 			)
 			.addService(
@@ -62,7 +82,14 @@ export default class SystemContainerFactory {
 				({ systemResolvers, authorizator, executionContainerFactory }) =>
 					new SystemApolloServerFactory(systemResolvers, authorizator, executionContainerFactory)
 			)
+			.addService('migrationDiffCreator', ({ schemaDiffer }) =>
+				new MigrationDiffCreator(container.migrationFilesManager, container.schemaVersionBuilder, schemaDiffer))
+
+			.addService('stageMigrator', ({ migrationExecutor }) =>
+				new StageMigrator(container.systemKnexWrapper, container.schemaMigrationDiffsResolver.resolve(), migrationExecutor, container.schemaVersionBuilder))
+			.addService('projectIntializer', ({ stageMigrator }) =>
+				new ProjectInitializer(container.systemKnexWrapper, container.project, stageMigrator))
 			.build()
-			.pick('systemApolloServerFactory', 'systemResolvers', 'authorizator', 'executionContainerFactory')
+			.pick('systemApolloServerFactory', 'systemResolvers', 'authorizator', 'executionContainerFactory', 'projectIntializer', 'migrationDiffCreator')
 	}
 }

@@ -1,4 +1,4 @@
-import { CreateEvent, DeleteEvent, Event, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
+import { CreateEvent, DeleteEvent, AnyEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
 import { Stage } from '../dtos/Stage'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
@@ -6,7 +6,6 @@ import KnexWrapper from '../../../core/knex/KnexWrapper'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
 import MigrationFilesManager from '../../../migrations/MigrationFilesManager'
-import FileNameHelper from '../../../migrations/FileNameHelper'
 
 class EventApplier {
 	constructor(
@@ -15,7 +14,7 @@ class EventApplier {
 		private readonly migrationsFileManager: MigrationFilesManager
 	) {}
 
-	public async applyEvents(stage: Stage, events: Event[]): Promise<void> {
+	public async applyEvents(stage: Stage, events: AnyEvent[]): Promise<void> {
 		let trxId: string | null = null
 		for (let event of events) {
 			if (event.transactionId !== trxId) {
@@ -28,7 +27,7 @@ class EventApplier {
 		await this.db.raw('SET CONSTRAINTS ALL IMMEDIATE')
 	}
 
-	private async applyEvent(stage: Stage, event: Event): Promise<void> {
+	private async applyEvent(stage: Stage, event: AnyEvent): Promise<void> {
 		switch (event.type) {
 			case EventType.create:
 				return this.applyCreate(stage, event)
@@ -74,9 +73,9 @@ class EventApplier {
 	private async applyRunMigration(stage: Stage, event: RunMigrationEvent): Promise<void> {
 		const files = await this.migrationsFileManager.readFiles(
 			'sql',
-			version => version === FileNameHelper.extractVersion(event.file)
+			version => version === event.version
 		)
-		await this.migrationExecutor.execute(stage, files, () => null)
+		// await this.migrationExecutor.execute(this.db, stage, files, () => null)
 	}
 }
 

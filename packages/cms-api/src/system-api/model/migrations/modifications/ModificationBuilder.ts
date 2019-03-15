@@ -1,20 +1,18 @@
-import { deepCopy, Model, Schema, Acl } from 'cms-common'
-import { Modification, SchemaDiff } from './modifications'
-import { acceptFieldVisitor } from '../modelUtils'
-import CreateModificationFieldVisitor from './CreateModificationFieldVisitor'
-import { arraySplit } from '../../utils/arrays'
+import { Acl, deepCopy, Model, Schema } from 'cms-common'
+import { arraySplit } from '../../../../utils/arrays'
+import { acceptFieldVisitor } from '../../../../content-schema/modelUtils'
+import CreateModificationFieldVisitor from '../CreateModificationFieldVisitor'
+import Migration from '../Migration'
 
 class ModificationBuilder {
-	private modifications: Modification[] = []
+	private modifications: Migration.Modification[] = []
 
-	constructor(private readonly originalSchema: Schema, private readonly updatedSchema: Schema) {}
+	constructor(private readonly updatedSchema: Schema) {
+	}
 
-	public getDiff(): SchemaDiff | null {
+	public getDiff(): Migration.Modification[] {
 		const [createEntity, other] = arraySplit(this.modifications, it => it.modification === 'createEntity')
-		const diff = {
-			modifications: [...createEntity, ...other],
-		}
-		return diff.modifications.length > 0 ? diff : null
+		return [...createEntity, ...other]
 	}
 
 	public createEntity(updatedEntity: Model.Entity) {
@@ -60,12 +58,17 @@ class ModificationBuilder {
 		}
 	}
 
-	public removeField(entityName: string, fieldName: string) {
-		this.modifications.push({
+	public removeField(entityName: string, fieldName: string, prepend: boolean = false) {
+		const modification = {
 			modification: 'removeField',
 			entityName: entityName,
 			fieldName: fieldName,
-		})
+		}
+		if (prepend) {
+			this.modifications.unshift(modification)
+		} else {
+			this.modifications.push(modification)
+		}
 	}
 
 	public updateColumnName(entityName: string, fieldName: string, columnName: string) {
@@ -146,14 +149,15 @@ class ModificationBuilder {
 		return new ModificationBuilder.Marker(this, [...this.modifications])
 	}
 
-	public rewind(modifications: Modification[]) {
+	public rewind(modifications: Migration.Modification[]) {
 		this.modifications = modifications
 	}
 }
 
 namespace ModificationBuilder {
 	export class Marker {
-		constructor(private readonly builder: ModificationBuilder, public readonly modifications: Modification[]) {}
+		constructor(private readonly builder: ModificationBuilder, public readonly modifications: Migration.Modification[]) {
+		}
 
 		public rewind() {
 			this.builder.rewind(this.modifications)

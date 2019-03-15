@@ -1,4 +1,4 @@
-import { DatabaseCredentials } from '../config/config'
+import { DatabaseCredentials } from '../../config/config'
 import pgMigrate from 'node-pg-migrate'
 
 export default class MigrationsRunner {

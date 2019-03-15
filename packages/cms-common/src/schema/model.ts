@@ -168,13 +168,20 @@ namespace Model {
 		ManyHasMany = 'ManyHasMany'
 	}
 
-	export type AnyRelation =
+	export type AnyInversedRelation =
 		| OneHasManyRelation
-		| ManyHasOneRelation
 		| OneHasOneInversedRelation
-		| OneHasOneOwnerRelation
 		| ManyHasManyInversedRelation
+
+	export type AnyOwningRelation =
+		| ManyHasOneRelation
+		| OneHasOneOwnerRelation
 		| ManyHasManyOwnerRelation
+
+
+	export type AnyRelation =
+		| AnyInversedRelation
+		| AnyOwningRelation
 
 	export interface Relation<T extends RelationType = RelationType> extends Field<T> {
 		name: string

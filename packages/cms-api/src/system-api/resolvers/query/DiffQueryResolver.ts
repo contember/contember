@@ -46,7 +46,7 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 			result: {
 				base: baseStage,
 				head: headStage,
-				events: this.diffResponseBuilder.buildResponse(diff.events, args.filter || []),
+				events: this.diffResponseBuilder.buildResponse(diff.events, args.filter || null),
 			},
 		}
 	}

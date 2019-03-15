@@ -10,9 +10,12 @@ type EventFilter = { entity: string, id: string }
 class DiffResponseBuilder {
 	public buildResponse(
 		events: (EventWithMeta)[],
-		filter: ReadonlyArray<EventFilter>
+		filter: ReadonlyArray<EventFilter> | null
 	): ApiEvent[] {
-		if (filter.length > 0) {
+		if (filter !== null) {
+			if (filter.length === 0) {
+				return []
+			}
 			events = this.filterEvents(events, filter)
 		}
 

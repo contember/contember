@@ -12,6 +12,7 @@ export type FieldName = string
 export type EntityName = string
 
 export const PRIMARY_KEY_NAME = 'id'
+export const TYPENAME_KEY_NAME = '__typename'
 
 export type Scalar = string | number | boolean | null
 export type ReceivedFieldData<A = never> = Scalar | ReceivedEntityData<A> | Array<ReceivedEntityData<A> | A>

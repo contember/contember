@@ -1,6 +1,13 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
-import { FieldName, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
+import {
+	FieldName,
+	PRIMARY_KEY_NAME,
+	ReceivedData,
+	ReceivedEntityData,
+	Scalar,
+	TYPENAME_KEY_NAME
+} from '../bindingTypes'
 import {
 	AccessorTreeRoot,
 	DataBindingError,
@@ -127,7 +134,7 @@ export class AccessorTreeGenerator {
 	): EntityAccessor {
 		const entityData: EntityData.EntityData = {}
 		const id = data ? data[PRIMARY_KEY_NAME] : undefined
-		const typename = data ? data['__typename'] : undefined
+		const typename = data ? data[TYPENAME_KEY_NAME] : undefined
 
 		for (const placeholderName in fields) {
 			if (placeholderName === PRIMARY_KEY_NAME) {

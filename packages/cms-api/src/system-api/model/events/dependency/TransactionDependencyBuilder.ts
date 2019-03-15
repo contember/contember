@@ -1,4 +1,4 @@
-import { Event } from '../../dtos/Event'
+import { AnyEvent } from '../../dtos/Event'
 import { EventType } from '../../EventType'
 import DependencyBuilder from '../DependencyBuilder'
 
@@ -11,9 +11,9 @@ import DependencyBuilder from '../DependencyBuilder'
  *
  */
 class TransactionDependencyBuilder implements DependencyBuilder {
-	async build(events: Event[]): Promise<DependencyBuilder.Dependencies> {
+	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
 		let trxId = null
-		let eventsInTrx: Event[] = []
+		let eventsInTrx: AnyEvent[] = []
 		let dependencies: DependencyBuilder.Dependencies = {}
 
 		for (const event of events) {
@@ -37,7 +37,7 @@ class TransactionDependencyBuilder implements DependencyBuilder {
 		return dependencies
 	}
 
-	private buildTransactionReferences(events: Event[]): DependencyBuilder.Dependencies {
+	private buildTransactionReferences(events: AnyEvent[]): DependencyBuilder.Dependencies {
 		const ids = events.map(it => it.id)
 		return ids.reduce((result, id) => ({ ...result, [id]: ids }), {})
 	}

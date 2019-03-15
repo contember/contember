@@ -4,16 +4,12 @@ import InputParser from './InputParser'
 import UsageFormatter from './UsageFormatter'
 
 class CommandConfiguration {
-	private nameValue: string | undefined
 
 	private descriptionValue: string = ''
 
 	private arguments: Argument[] = []
 	private options: Option[] = []
 
-	public name(name: string) {
-		this.nameValue = name
-	}
 
 	public description(description: string) {
 		this.descriptionValue = description
@@ -32,9 +28,6 @@ class CommandConfiguration {
 	}
 
 	public validate() {
-		if (!this.nameValue) {
-			throw new CommandConfiguration.InvalidConfigurationError(`Name for a command is not set`)
-		}
 		let hasVariadic = false
 		let hasOptional = false
 		for (let argument of this.arguments) {
@@ -47,13 +40,6 @@ class CommandConfiguration {
 				throw new CommandConfiguration.InvalidConfigurationError(`A variadic argument must be the last`)
 			}
 		}
-	}
-
-	public getName(): string {
-		if (this.nameValue === undefined) {
-			throw new Error('impl error')
-		}
-		return this.nameValue
 	}
 
 	public getDescription(): string {

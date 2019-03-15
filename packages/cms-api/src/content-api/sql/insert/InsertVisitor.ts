@@ -3,6 +3,7 @@ import { isIt } from '../../../utils/type'
 import Mapper from '../Mapper'
 import { uuid } from '../../../utils/uuid'
 import InsertBuilder from './InsertBuilder'
+import { resolveDefaultValue } from '../../../content-schema/dataUtils'
 
 interface RelationInputProcessor {
 	connect(input: Input.UniqueWhere): PromiseLike<void>
@@ -25,37 +26,11 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 				if (this.data[column.name] !== undefined) {
 					return this.data[column.name] as Input.ColumnValue
 				}
-
-				switch (column.type) {
-					case Model.ColumnType.String:
-					case Model.ColumnType.Int:
-					case Model.ColumnType.Enum:
-					case Model.ColumnType.Double:
-					case Model.ColumnType.Bool:
-						if (typeof column.default !== 'undefined') {
-							return column.default
-						}
-						break
-					case Model.ColumnType.DateTime:
-					case Model.ColumnType.Date:
-						if (column.default === 'now') {
-							return new Date().toISOString()
-						}
-						break
-					case Model.ColumnType.Uuid:
-						break
-					default:
-						;((x: never) => {})(column)
-				}
-
 				if (entity.primary === column.name) {
 					return this.resolvePrimaryGenerator(column)()
 				}
-				if (column.nullable) {
-					return null
-				}
 
-				throw new Error('NoData')
+				return resolveDefaultValue(column, new Date())
 			})()
 		)
 	}

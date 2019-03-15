@@ -16,9 +16,6 @@
 		"test:debug": "mocha --inspect --ui bdd",
 		"test:clean": "rm -rf ./dist && npm run build && npm run test"
 	},
-	"bin": {
-		"console": "dist/src/bin/console.js"
-	},
 	"dependencies": {
 		"@apollographql/graphql-playground-html": "^1.6.6",
 		"@koa/cors": "^2.2.3",

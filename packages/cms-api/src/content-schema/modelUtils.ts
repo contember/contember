@@ -136,6 +136,8 @@ export const acceptRelationTypeVisitor = <T>(
 	const targetEntity = getEntity(schema, relationObj.target)
 
 	if (isInversedRelation(relationObj)) {
+		console.log(targetEntity)
+		console.log(relationObj.ownedBy)
 		const targetRelation = targetEntity.fields[relationObj.ownedBy]
 		if (!isIt<Model.Relation>(targetRelation, 'target')) {
 			throw new Error()

@@ -1,7 +1,7 @@
 import DependencyBuilder from './DependencyBuilder'
 import { DiffErrorCode } from '../../schema/types'
 import { Stage } from '../dtos/Stage'
-import { Event } from '../dtos/Event'
+import { AnyEvent } from '../dtos/Event'
 import QueryHandler from '../../../core/query/QueryHandler'
 import DiffCountQuery from '../queries/DiffCountQuery'
 import DiffQuery from '../queries/DiffQuery'
@@ -60,7 +60,7 @@ namespace DiffBuilder {
 	export class OkResponse {
 		public readonly ok: true = true
 
-		constructor(public readonly events: (Event & { dependencies: string[]; permission: PermissionsVerifier.EventPermission })[]) {}
+		constructor(public readonly events: (AnyEvent & { dependencies: string[]; permission: PermissionsVerifier.EventPermission })[]) {}
 	}
 }
 

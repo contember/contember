@@ -1,9 +1,8 @@
-import { Event } from '../../dtos/Event'
+import { AnyEvent } from '../../dtos/Event'
 import { EventType } from '../../EventType'
 import DependencyBuilder from '../DependencyBuilder'
 import TableReferencingResolver from '../TableReferencingResolver'
 import SchemaVersionBuilder from '../../../../content-schema/SchemaVersionBuilder'
-import FileNameHelper from '../../../../migrations/FileNameHelper'
 
 /**
  * Delete event depends on all previous events which references this row
@@ -21,7 +20,7 @@ class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 		private readonly tableReferencingResolver: TableReferencingResolver
 	) {}
 
-	async build(events: Event[]): Promise<DependencyBuilder.Dependencies> {
+	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
 		if (events.length === 0) {
 			return {}
 		}
@@ -41,7 +40,7 @@ class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 
 		for (const event of events) {
 			if (event.type === EventType.runMigration) {
-				const newVersion = FileNameHelper.extractVersion(event.file)
+				const newVersion = event.version
 
 				schema = await this.schemaVersionBuilder.continue(schema, schemaVersion, newVersion)
 				schemaVersion = newVersion

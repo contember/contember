@@ -34,7 +34,7 @@ namespace LatestMigrationByEventQuery {
 	export type Result = null | {
 		readonly type: string
 		readonly previous_id: string
-		readonly data: { file: string }
+		readonly data: { version: string }
 	}
 }
 

@@ -1,7 +1,7 @@
-import { Event } from '../dtos/Event'
+import { AnyEvent } from '../dtos/Event'
 
 interface DependencyBuilder {
-	build(events: Event[]): Promise<DependencyBuilder.Dependencies>
+	build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies>
 }
 
 namespace DependencyBuilder {
@@ -10,7 +10,7 @@ namespace DependencyBuilder {
 	export class DependencyBuilderList implements DependencyBuilder {
 		constructor(private readonly builders: DependencyBuilder[]) {}
 
-		async build(events: Event[]): Promise<Dependencies> {
+		async build(events: AnyEvent[]): Promise<Dependencies> {
 			const emptyDeps = events.map(it => it.id).reduce((acc, val) => ({ ...acc, [val]: [] }), {})
 
 			return (await Promise.all(this.builders.map(builder => builder.build(events)))).reduce((result, val) => {

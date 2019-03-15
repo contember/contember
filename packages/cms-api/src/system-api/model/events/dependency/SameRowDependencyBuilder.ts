@@ -1,4 +1,4 @@
-import { Event } from '../../dtos/Event'
+import { AnyEvent } from '../../dtos/Event'
 import { EventType } from '../../EventType'
 import DependencyBuilder from '../DependencyBuilder'
 
@@ -12,7 +12,7 @@ import DependencyBuilder from '../DependencyBuilder'
  *    ^-----^
  */
 class SameRowDependencyBuilder implements DependencyBuilder {
-	async build(events: Event[]): Promise<DependencyBuilder.Dependencies> {
+	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
 		const rows: { [id: string]: string[] } = {}
 		const dependencies: DependencyBuilder.Dependencies = {}
 		for (const event of events) {

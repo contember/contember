@@ -102,7 +102,7 @@ export default class SelectBuilder {
 				continue
 			}
 
-			// Disregarding __typename field since it's automatically handeled by apollo server
+			// Disregarding __typename field since it's automatically handled by apollo server
 			if (field.name === '__typename') {
 				continue
 			}

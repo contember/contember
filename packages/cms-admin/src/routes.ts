@@ -26,7 +26,7 @@ export default (map: ProjectConfig[]): RouteMap => {
 					throw new PageNotFound('No such project')
 				}
 
-				const parsedDimensions = parseDimensionsString(dimensions)
+				const parsedDimensions = parseDimensionsString(dimensions, configMap.defaultDimensions || {})
 
 				for (const [name, config] of Object.entries(configMap.routes)) {
 					const params = matchesPath(config.path, '/' + path)

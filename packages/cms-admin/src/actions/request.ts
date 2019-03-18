@@ -16,10 +16,17 @@ export const pushRequest = (requestChange: RequestChange): ActionCreator => (dis
 }
 
 export const populateRequest = (location: Location): ActionCreator => (dispatch, getState) => {
-	const request = pathToRequestState(routes(getState().projectsConfigs.configs), location.pathname)
+	const routeMap = routes(getState().projectsConfigs.configs)
+	const request = pathToRequestState(routeMap, location.pathname)
 
 	if (!request) {
 		throw new PageNotFound('No matching route found')
+	}
+
+	// Replace with canonical version of the url
+	const canonicalPath = requestStateToPath(routeMap, request)
+	if (canonicalPath !== location.pathname) {
+		window.history.replaceState({}, document.title, canonicalPath)
 	}
 
 	const previousRequest = getState().request

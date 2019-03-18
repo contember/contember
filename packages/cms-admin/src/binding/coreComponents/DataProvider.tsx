@@ -10,7 +10,6 @@ import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
 import { MetaOperationsContext, MetaOperationsContextValue } from './MetaOperationsContext'
-import { AccessorTreeRootContext } from './AccessorTreeRootContext'
 
 export interface DataRendererProps {
 	data?: AccessorTreeRoot | undefined
@@ -138,9 +137,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	public render() {
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>
-				<AccessorTreeRootContext.Provider value={this.state.data}>
-					{this.renderRenderer()}
-				</AccessorTreeRootContext.Provider>
+				{this.renderRenderer()}
 			</MetaOperationsContext.Provider>
 		)
 	}

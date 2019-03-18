@@ -8,11 +8,11 @@ export function toString(dimensions: SelectedDimension): string {
 	)
 }
 
-export function toObject(dimensions: string): SelectedDimension {
+export function toObject(dimensions: string, defaultDimensions: SelectedDimension): SelectedDimension {
 	return dimensions !== 'null'
 		? dimensions
 				.split('+')
 				.map((pair: string) => pair.split('='))
 				.reduce((acc, [key, value]) => ({ ...acc, [key]: value.split(',') }), {})
-		: {}
+		: defaultDimensions
 }

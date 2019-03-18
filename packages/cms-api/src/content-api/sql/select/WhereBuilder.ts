@@ -14,8 +14,14 @@ class WhereBuilder {
 		private readonly conditionBuilder: ConditionBuilder
 	) {}
 
-	public build(qb: SelectBuilder, entity: Model.Entity, path: Path, where: Input.Where): SelectBuilder {
-		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)))
+	public build(
+		qb: SelectBuilder,
+		entity: Model.Entity,
+		path: Path,
+		where: Input.Where,
+		allowManyJoin: boolean = false
+	): SelectBuilder {
+		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)), allowManyJoin)
 	}
 
 	public buildAdvanced(
@@ -127,10 +133,13 @@ class WhereBuilder {
 					const relationWhere = where[fieldName] as Input.Where
 
 					whereClause.in([tableName, entity.primaryColumn], qb =>
-						qb
-							.select(['root_', targetRelation.joiningColumn.columnName])
-							.from(targetEntity.tableName, 'root_')
-							.where(clause => this.buildInternal(clause, targetEntity, new Path([]), relationWhere, true, joinList))
+						this.build(
+							qb.select(['root_', targetRelation.joiningColumn.columnName]).from(targetEntity.tableName, 'root_'),
+							targetEntity,
+							new Path([]),
+							relationWhere,
+							true
+						)
 					)
 				},
 			})

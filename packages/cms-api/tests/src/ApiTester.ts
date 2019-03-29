@@ -2,7 +2,6 @@ import Project from '../../src/config/Project'
 import KnexWrapper from '../../src/core/knex/KnexWrapper'
 import CreateStageCommand from '../../src/system-api/model/commands/CreateStageCommand'
 import MigrationFilesManager from '../../src/migrations/MigrationFilesManager'
-import StageMigrator from '../../src/system-api/StageMigrator'
 import knex from 'knex'
 import MigrationsRunner from '../../src/core/migrations/MigrationsRunner'
 import { setupSystemVariables } from '../../src/system-api/SystemVariablesSetupHelper'
@@ -18,22 +17,23 @@ import { createMock } from '../../src/utils/testing'
 import S3 from '../../src/utils/S3'
 import systemTypeDefs from '../../src/system-api/schema/system.graphql'
 import { makeExecutableSchema } from 'graphql-tools'
-import SystemContainerFactory from '../../src/system-api/SystemContainerFactory'
+import SystemContainerFactory, { SystemContainer } from '../../src/system-api/SystemContainerFactory'
 import ResolverContext from '../../src/system-api/resolvers/ResolverContext'
 import 'mocha'
 import PermissionsByIdentityFactory from '../../src/acl/PermissionsByIdentityFactory'
-import Authorizator from '../../src/core/authorization/Authorizator'
 import { testUuid } from './testUuid'
 import Identity from '../../src/common/auth/Identity'
 import { maskErrors } from 'graphql-errors'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
 import LatestMigrationByStageQuery from '../../src/system-api/model/queries/LatestMigrationByStageQuery'
-import FileNameHelper from '../../src/migrations/FileNameHelper'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
-import { Acl, Model, Schema } from 'cms-common'
+import { Schema } from 'cms-common'
 import { GQL } from './tags'
 import SchemaMigrator from '../../src/content-schema/differ/SchemaMigrator'
 import ModificationHandlerFactory from '../../src/system-api/model/migrations/modifications/ModificationHandlerFactory'
+import FileNameHelper from '../../src/migrations/FileNameHelper'
+import EventSequence from './EventSequence'
+import { DiffResult } from '../../src/system-api/schema/types'
 
 export class ApiTester {
 	public static project: Project = {
@@ -45,16 +45,17 @@ export class ApiTester {
 		s3: {} as any,
 	}
 
-	private knownStages: { [stageSlug: string]: Project.Stage } = {}
+	private knownStages: { [stageSlug: string]: Project.Stage & { migration?: string } } = {}
 
 	constructor(
 		private readonly projectDb: KnexWrapper,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly systemSchema: GraphQLSchema,
-		private readonly authorizator: Authorizator,
+		private readonly systemContainer: SystemContainer,
 		private readonly systemExecutionContainer: SystemExecutionContainer
-	) {}
+	) {
+	}
 
 	public async createStage(stage: Project.Stage): Promise<void> {
 		await new CreateStageCommand(stage).execute(this.projectDb)
@@ -62,14 +63,14 @@ export class ApiTester {
 	}
 
 	public async migrateStage(slug: string, version: string): Promise<void> {
-		// const migrationFilesManager = ApiTester.createProjectMigrationFilesManager()
-		// const stageMigrator = new StageMigrator(migrationFilesManager)
-		// const stage = this.getStage(slug)
-		// await stageMigrator.migrate({ ...stage, migration: version }, this.projectDb, () => null)
-		// this.knownStages[slug] = { ...stage, migration: version }
+		version = FileNameHelper.extractVersion(version)
+		const stageMigrator = this.systemContainer.stageMigrator
+		const stage = this.getStage(slug)
+		await stageMigrator.migrate({ ...stage }, () => null, version)
+		this.knownStages[slug] = { ...stage, migration: version }
 	}
 
-	private getStage(slug: string): Project.Stage {
+	private getStage(slug: string): Project.Stage & { migration?: string } {
 		const stage = this.knownStages[slug]
 		if (!stage) {
 			throw new Error(`Unknown stage ${stage}`)
@@ -105,7 +106,15 @@ export class ApiTester {
 			errorHandler: () => null,
 			timer: async (label, cb) => cb ? await cb() : undefined as any,
 		}
-		return await graphql(schema, gql, null, context, variables)
+		maskErrors(schema, err => {
+			console.error(err)
+			process.exit(1)
+		})
+		const result = await graphql(schema, gql, null, context, variables)
+		if (result.errors) {
+			result.errors.map(it => console.error(it))
+		}
+		return result
 	}
 
 	public async querySystem(gql: string, variables?: { [key: string]: any }, options: {
@@ -119,12 +128,36 @@ export class ApiTester {
 				[ApiTester.project.uuid]: options.projectRoles || [],
 			}),
 			{},
-			this.authorizator,
+			this.systemContainer.authorizator,
 			this.systemExecutionContainer,
 			() => null
 		)
 
 		return await graphql(this.systemSchema, gql, null, context, variables)
+	}
+
+	public async diff(baseStage: string, headStage: string): Promise<DiffResult> {
+		const result = (await this.querySystem(GQL`query($baseStage: String!, $headStage: String!) {
+      diff(baseStage: $baseStage, headStage: $headStage) {
+	      ok
+        errors
+        result {
+          events {
+            id
+            dependencies
+            description
+            allowed
+            type
+          }
+        }
+      }
+    }`, { baseStage, headStage }))
+
+		if (!result.data.diff.ok) {
+			throw result.data.diff.errors
+		}
+
+		return result.data.diff.result
 	}
 
 	public async refreshStagesVersion() {
@@ -139,27 +172,31 @@ export class ApiTester {
 		}
 	}
 
-	public async releaseForward(baseStage: string, headStage: string, eventsCount?: number): Promise<void>
-	{
+	public async releaseForward(baseStage: string, headStage: string, eventsCount?: number): Promise<void> {
 		const diff = await this.querySystem(GQL`query($headStage: String!, $baseStage: String!) {
-			diff(baseStage: $baseStage, headStage: $headStage) {
-				result {
-					events {
-						id
-					}
-				}
-			}
-		}`, {
+      diff(baseStage: $baseStage, headStage: $headStage) {
+	      ok
+	      errors
+        result {
+          events {
+            id
+          }
+        }
+      }
+    }`, {
 			headStage,
 			baseStage,
 		})
+		if (!diff.data.diff.ok) {
+			throw diff.data.diff.errors
+		}
 
 		await this.querySystem(
 			GQL`mutation ($baseStage: String!, $headStage: String!, $events: [String!]!) {
-				release(baseStage: $baseStage, headStage: $headStage, events: $events) {
-					ok
-				}
-			}`,
+        release(baseStage: $baseStage, headStage: $headStage, events: $events) {
+          ok
+        }
+      }`,
 			{
 				baseStage,
 				headStage,
@@ -168,7 +205,38 @@ export class ApiTester {
 		)
 	}
 
+	public async runSequence(sequences: EventSequence.StringSequenceSet): Promise<void> {
+		const sequenceSet = EventSequence.parseSet(sequences)
+
+		const executed = new Set<string>()
+		for (const sequence of sequenceSet) {
+			if (sequence.baseStage && !executed.has(sequence.baseStage)) {
+				throw new Error('Sequences has to be sorted')
+			}
+			await this.executeSingleSequence(sequence)
+			executed.add(sequence.stage)
+		}
+	}
+
+	private async executeSingleSequence(sequence: EventSequence): Promise<void> {
+		for (const event of sequence.sequence) {
+			switch (event.type) {
+				case 'event':
+					await this.queryContent(sequence.stage, GQL`mutation ($number: Int!) {
+            createEntry(data: {number: $number}) {
+              id
+            }
+          }`, { number: event.number })
+					break
+				case 'follow':
+					await this.releaseForward(sequence.stage, sequence.baseStage!, 1)
+					break
+			}
+		}
+	}
+
 	public static async create(options: {
+		project?: Partial<Project>
 	} = {}): Promise<ApiTester> {
 		const dbCredentials = (dbName: string) => {
 			return {
@@ -208,10 +276,10 @@ export class ApiTester {
 		await new CreateInitEventCommand().execute(projectDb)
 
 		const projectMigrationFilesManager = ApiTester.createProjectMigrationFilesManager()
-		const schemaMigrationDiffsResolver = new MigrationsResolver(projectMigrationFilesManager)
-		const diffs = schemaMigrationDiffsResolver.resolve()
-		const schemaMigrator = new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-		const schemaVersionBuilder = new SchemaVersionBuilder(projectDb.createQueryHandler(), diffs, schemaMigrator)
+		const migrationsResolver = new MigrationsResolver(projectMigrationFilesManager)
+		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
+		const schemaMigrator = new SchemaMigrator(modificationHandlerFactory)
+		const schemaVersionBuilder = new SchemaVersionBuilder(projectDb.createQueryHandler(), migrationsResolver, schemaMigrator)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(
 			createMock<S3>({
 				formatPublicUrl() {
@@ -225,23 +293,29 @@ export class ApiTester {
 
 		const systemContainerFactory = new SystemContainerFactory()
 		const systemContainer = systemContainerFactory.create({
-			project: ApiTester.project,
-			schemaMigrationDiffsResolver: schemaMigrationDiffsResolver,
+			project: { ...ApiTester.project, ...options.project || {} },
+			migrationsResolver: migrationsResolver,
 			migrationFilesManager: projectMigrationFilesManager,
 			permissionsByIdentityFactory: new PermissionsByIdentityFactory([
 				new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
 				new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
 			]),
-			schemaMigrator: schemaMigrator
-		} as any)
+			schemaMigrator,
+			schemaVersionBuilder,
+			modificationHandlerFactory,
+			systemKnexWrapper: projectDb,
+		})
 
 		const systemExecutionContainer = systemContainer.executionContainerFactory.create(projectDb)
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
-			resolvers: systemContainer.get('systemResolvers'),
+			resolvers: systemContainer.get('systemResolvers') as any,
 		})
-		maskErrors(systemSchema)
+		maskErrors(systemSchema, err => {
+			console.error(err)
+			process.exit(1)
+		})
 
 		afterEach(async () => {
 			await projectDb.knex.destroy()
@@ -252,7 +326,7 @@ export class ApiTester {
 			schemaVersionBuilder,
 			gqlSchemaBuilderFactory,
 			systemSchema,
-			systemContainer.get('authorizator'),
+			systemContainer,
 			systemExecutionContainer
 		)
 	}

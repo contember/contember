@@ -6,6 +6,7 @@ namespace Actions {
 	}
 
 	export const PROJECT_RELEASE_ANY: Authorizator.Action = [Resources.project, 'releaseAny']
+	export const PROJECT_REBASE_ALL: Authorizator.Action = [Resources.project, 'rebaseAll']
 }
 
 export default Actions

@@ -91,22 +91,9 @@ describe('system api - release', () => {
 			},
 		})
 
-		const diff2 = await tester.querySystem(GQL`query {
-			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}") {
-				errors
-				result {
-					events {
-						id
-						dependencies
-						description
-						allowed
-						type
-					}
-				}
-			}
-		}`)
+		const diff2 = await tester.diff(testUuid(2), testUuid(1))
 
-		expect(diff2.data.diff.result.events).length(1)
-		expect(diff2.data.diff.result.events[0].type).eq('CREATE')
+		expect(diff2.events).length(1)
+		expect(diff2.events[0].type).eq('CREATE')
 	})
 })

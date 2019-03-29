@@ -21,10 +21,13 @@ import QueryHandler from '../core/query/QueryHandler'
 import KnexQueryable from '../core/knex/KnexQueryable'
 import Project from '../config/Project'
 import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
-import Migration from './model/migrations/Migration'
+import MigrationsResolver from '../content-schema/MigrationsResolver'
+import RebaseExecutor from './model/events/RebaseExecutor'
+import StageTree from './model/stages/StageTree'
 
 interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
+	rebaseExecutor: RebaseExecutor
 	diffBuilder: DiffBuilder
 	queryHandler: QueryHandler<KnexQueryable>
 }
@@ -33,13 +36,14 @@ namespace SystemExecutionContainer {
 	export class Factory {
 		constructor(
 			private readonly project: Project,
-			private readonly migrations: Promise<Migration[]>,
+			private readonly migrationsResolver: MigrationsResolver,
 			private readonly migrationFilesManager: MigrationFilesManager,
 			private readonly authorizator: Authorizator,
 			private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
 			private readonly schemaMigrator: SchemaMigrator,
 			private readonly migrationExecutor: MigrationExecutor,
-		) {}
+		) {
+		}
 
 		public create(db: KnexWrapper): SystemExecutionContainer {
 			return new Container.Builder({})
@@ -47,7 +51,7 @@ namespace SystemExecutionContainer {
 				.addService('queryHandler', ({ db }) => db.createQueryHandler())
 				.addService(
 					'schemaVersionBuilder',
-					({ queryHandler }) => new SchemaVersionBuilder(queryHandler, this.migrations, this.schemaMigrator)
+					({ queryHandler }) => new SchemaVersionBuilder(queryHandler, this.migrationsResolver, this.schemaMigrator)
 				)
 				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
 
@@ -76,17 +80,24 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'eventApplier',
-					({ db, migrationFilesManager }) =>
-						new EventApplier(db, this.migrationExecutor, migrationFilesManager)
+					({ db }) =>
+						new EventApplier(db, this.migrationExecutor, this.migrationsResolver)
 				)
 				.addService('eventsRebaser', ({ db }) => new EventsRebaser(db))
 				.addService(
 					'releaseExecutor',
-					({ queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser }) =>
-						new ReleaseExecutor(queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser)
+					({ queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, db}) =>
+						new ReleaseExecutor(queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, db)
+				)
+				.addService('stageTree', () =>
+					new StageTree.Factory().create(this.project)
+				)
+				.addService('rebaseExecutor',
+					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree}) =>
+						new RebaseExecutor(queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree)
 				)
 				.build()
-				.pick('queryHandler', 'releaseExecutor', 'diffBuilder')
+				.pick('queryHandler', 'releaseExecutor', 'diffBuilder', 'rebaseExecutor')
 		}
 	}
 }

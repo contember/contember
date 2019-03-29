@@ -1,18 +1,19 @@
-import { CreateEvent, DeleteEvent, AnyEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
+import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
 import { Stage } from '../dtos/Stage'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
-import MigrationFilesManager from '../../../migrations/MigrationFilesManager'
+import MigrationsResolver from '../../../content-schema/MigrationsResolver'
 
 class EventApplier {
 	constructor(
 		private readonly db: KnexWrapper,
 		private readonly migrationExecutor: MigrationExecutor,
-		private readonly migrationsFileManager: MigrationFilesManager
-	) {}
+		private readonly migrationResolver: MigrationsResolver,
+	) {
+	}
 
 	public async applyEvents(stage: Stage, events: AnyEvent[]): Promise<void> {
 		let trxId: string | null = null
@@ -71,11 +72,8 @@ class EventApplier {
 	}
 
 	private async applyRunMigration(stage: Stage, event: RunMigrationEvent): Promise<void> {
-		const files = await this.migrationsFileManager.readFiles(
-			'sql',
-			version => version === event.version
-		)
-		// await this.migrationExecutor.execute(this.db, stage, files, () => null)
+		const files = (await this.migrationResolver.getMigrations()).filter(({ version }) => version === event.version)
+		await this.migrationExecutor.execute(this.db, stage, files, () => null)
 	}
 }
 

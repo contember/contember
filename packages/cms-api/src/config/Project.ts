@@ -12,7 +12,7 @@ namespace Project {
 		readonly uuid: string
 		readonly slug: string
 		readonly name: string
-		readonly migration?: string
+		readonly rebaseOn?: string
 	}
 
 	export interface DatabaseCredentials {

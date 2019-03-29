@@ -68,6 +68,7 @@ export enum EventType {
 
 export type Mutation = {
 	readonly release: ReleaseResponse
+	readonly rebaseAll: RebaseAllResponse
 }
 
 export type MutationReleaseArgs = {
@@ -85,6 +86,10 @@ export type QueryDiffArgs = {
 	baseStage: Scalars['String']
 	headStage: Scalars['String']
 	filter?: Maybe<ReadonlyArray<DiffFilter>>
+}
+
+export type RebaseAllResponse = {
+	readonly ok: Scalars['Boolean']
 }
 
 export enum ReleaseErrorCode {
@@ -223,11 +228,16 @@ export type EventResolvers<Context = any, ParentType = Event> = {
 
 export type MutationResolvers<Context = any, ParentType = Mutation> = {
 	release?: Resolver<ReleaseResponse, ParentType, Context, MutationReleaseArgs>
+	rebaseAll?: Resolver<RebaseAllResponse, ParentType, Context>
 }
 
 export type QueryResolvers<Context = any, ParentType = Query> = {
 	stages?: Resolver<ReadonlyArray<Stage>, ParentType, Context>
 	diff?: Resolver<DiffResponse, ParentType, Context, QueryDiffArgs>
+}
+
+export type RebaseAllResponseResolvers<Context = any, ParentType = RebaseAllResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
 }
 
 export type ReleaseResponseResolvers<Context = any, ParentType = ReleaseResponse> = {
@@ -269,6 +279,7 @@ export type Resolvers<Context = any> = {
 	Event?: EventResolvers
 	Mutation?: MutationResolvers<Context>
 	Query?: QueryResolvers<Context>
+	RebaseAllResponse?: RebaseAllResponseResolvers<Context>
 	ReleaseResponse?: ReleaseResponseResolvers<Context>
 	RunMigrationEvent?: RunMigrationEventResolvers<Context>
 	Stage?: StageResolvers<Context>

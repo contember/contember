@@ -50,7 +50,6 @@ import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/Create
 import SchemaMigrator from './content-schema/differ/SchemaMigrator'
 import ModificationHandlerFactory from './system-api/model/migrations/modifications/ModificationHandlerFactory'
 import MigrationDiffCreator from './system-api/model/migrations/MigrationDiffCreator'
-import SchemaDiffer from './system-api/model/migrations/SchemaDiffer'
 import Application from './core/cli/Application'
 import EngineMigrationsCreateCommand from './cli/EngineMigrationsCreateCommand'
 import ProjectMigrationsDiffCommand from './cli/ProjectMigrationsDiffCommand'
@@ -61,8 +60,6 @@ import StartCommand from './cli/StartCommand'
 import { CommandManager } from './core/cli/CommandManager'
 import { Schema } from 'cms-common'
 import ProjectInitializer from './system-api/ProjectInitializer'
-import StageMigrator from './system-api/StageMigrator'
-import MigrationExecutor from './system-api/model/migrations/MigrationExecutor'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -222,7 +219,7 @@ class CompositionRoot {
 					MigrationFilesManager.createForProject(projectsDir, project.slug)
 				)
 				.addService(
-					'schemaMigrationDiffsResolver',
+					'migrationsResolver',
 					({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager)
 				)
 				.addService('systemKnexWrapper', ({ knexConnection }) => new KnexWrapper(knexConnection, 'system'))
@@ -231,8 +228,8 @@ class CompositionRoot {
 				.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
 				.addService(
 					'schemaVersionBuilder',
-					({ systemQueryHandler, schemaMigrationDiffsResolver, schemaMigrator }) =>
-						new SchemaVersionBuilder(systemQueryHandler, schemaMigrationDiffsResolver.resolve(), schemaMigrator)
+					({ systemQueryHandler, migrationsResolver, schemaMigrator }) =>
+						new SchemaVersionBuilder(systemQueryHandler, migrationsResolver, schemaMigrator)
 				)
 				.addService('s3', ({ project }) => {
 					return new S3(project.s3)
@@ -262,7 +259,7 @@ class CompositionRoot {
 			const systemContainer = new SystemContainerFactory().create(
 				projectContainer.pick(
 					'project',
-					'schemaMigrationDiffsResolver',
+					'migrationsResolver',
 					'migrationFilesManager',
 					'permissionsByIdentityFactory',
 					'schemaMigrator',

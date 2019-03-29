@@ -39,6 +39,25 @@
 			}
 		},
 		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Entry",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "entry",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
 			"modification": "createColumn",
 			"entityName": "Author",
 			"field": {
@@ -83,6 +102,17 @@
 				"nullable": true,
 				"type": "String",
 				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Entry",
+			"field": {
+				"name": "number",
+				"columnName": "number",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
 			}
 		},
 		{

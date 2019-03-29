@@ -12,10 +12,11 @@ import { KoaContext } from '../core/koa/types'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
+import { Resolvers } from '../system-api/schema/types'
 
 class SystemApolloServerFactory {
 	constructor(
-		private readonly resolvers: Config['resolvers'],
+		private readonly resolvers: Resolvers,
 		private readonly authorizator: Authorizator<Identity>,
 		private readonly executionContainerFactory: SystemExecutionContainer.Factory
 	) {}
@@ -23,7 +24,7 @@ class SystemApolloServerFactory {
 	create(): ApolloServer {
 		return new ApolloServer({
 			typeDefs,
-			resolvers: this.resolvers,
+			resolvers: this.resolvers as Config['resolvers'],
 			extensions: [() => new ErrorHandlerExtension()],
 			formatError: (error: any) => {
 				if (error instanceof AuthenticationError) {

@@ -7,20 +7,25 @@ import { formatSchemaName } from '../helpers/stageHelpers'
 import Migration from './Migration'
 import { createMigrationBuilder } from '../../../content-api/sqlSchema/sqlSchemaBuilderHelper'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
-import { Schema } from 'cms-common'
+import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
 
 class MigrationExecutor {
 	constructor(
-		private readonly modificationHandlerFactory: ModificationHandlerFactory) {
+		private readonly modificationHandlerFactory: ModificationHandlerFactory,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+	) {
 	}
 
 	public async execute(
 		db: KnexWrapper,
 		stage: Stage,
 		migrations: Migration[],
-		schema: Schema,
 		progressCb: (version: string) => void
 	): Promise<void> {
+		if (migrations.length === 0) {
+			return
+		}
+		let schema = await this.schemaVersionBuilder.buildSchemaUntil(migrations[0].version)
 		await db.raw('SET search_path TO ??', formatSchemaName(stage))
 
 		let previousId = stage.event_id

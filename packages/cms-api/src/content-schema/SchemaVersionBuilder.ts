@@ -1,18 +1,17 @@
 import { Schema } from 'cms-common'
 import SchemaMigrator from './differ/SchemaMigrator'
-import FileNameHelper from '../migrations/FileNameHelper'
 import QueryHandler from '../core/query/QueryHandler'
 import KnexQueryable from '../core/knex/KnexQueryable'
 import LatestMigrationByStageQuery from '../system-api/model/queries/LatestMigrationByStageQuery'
 import LatestMigrationByEventQuery from '../system-api/model/queries/LatestMigrationByEventQuery'
 import { tuple } from '../utils/tuple'
 import { emptySchema } from './schemaUtils'
-import Migration from '../system-api/model/migrations/Migration'
+import MigrationsResolver from './MigrationsResolver'
 
 class SchemaVersionBuilder {
 	constructor(
 		private readonly queryHandler: QueryHandler<KnexQueryable>,
-		private readonly migrations: Promise<Migration[]>,
+		private readonly migrationsResolver: MigrationsResolver,
 		private readonly schemaMigrator: SchemaMigrator,
 	) {
 	}
@@ -38,17 +37,22 @@ class SchemaVersionBuilder {
 	}
 
 	async buildSchema(targetVersion?: string): Promise<Schema> {
-		return (await this.migrations)
-			.filter(({ version }) => !targetVersion || version <= targetVersion)
-			.map(({ modifications }) => modifications)
-			.reduce<Schema>((schema, modifications) => this.schemaMigrator.applyDiff(schema, modifications), emptySchema)
+		return this.doBuild(emptySchema, version => !targetVersion || version <= targetVersion)
+	}
+
+	async buildSchemaUntil(targetVersion: string): Promise<Schema> {
+		return this.doBuild(emptySchema, version => version < targetVersion)
 	}
 
 	async continue(schema: Schema, previousVersion: string | null, targetVersion: string): Promise<Schema> {
-		return (await this.migrations)
-			.filter(({ version }) => version <= targetVersion && version > (previousVersion || ''))
+		return this.doBuild(schema, version => version <= targetVersion && version > (previousVersion || ''))
+	}
+
+	private async doBuild(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
+		return (await this.migrationsResolver.getMigrations())
+			.filter(({ version }) => condition(version))
 			.map(({ modifications }) => modifications)
-			.reduce<Schema>((schema, modifications) => this.schemaMigrator.applyDiff(schema, modifications), schema)
+			.reduce<Schema>((schema, modifications) => this.schemaMigrator.applyDiff(schema, modifications), initialSchema)
 	}
 }
 

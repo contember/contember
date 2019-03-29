@@ -14,6 +14,7 @@ const schema: DocumentNode = gql`
 
 	type Mutation {
 		release(baseStage: String!, headStage: String!, events: [String!]!): ReleaseResponse!
+		rebaseAll: RebaseAllResponse!
 	}
 
 	# === diff ===
@@ -51,7 +52,12 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		errors: [ReleaseErrorCode!]!
 	}
-
+  # === release ===
+	
+  type RebaseAllResponse {
+    ok: Boolean!
+  }
+	
 	# === events ===
 
 	interface Event {

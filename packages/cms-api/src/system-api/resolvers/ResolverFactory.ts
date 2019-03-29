@@ -1,20 +1,22 @@
 import StagesQueryResolver from './query/StagesQueryResolver'
 import DiffQueryResolver from './query/DiffQueryResolver'
-import { Event, EventType } from '../schema/types'
+import { Event, EventType, Resolvers } from '../schema/types'
 import { assertNever } from 'cms-common'
 import ResolverContext from './ResolverContext'
 import { GraphQLResolveInfo } from 'graphql'
-import { IResolvers } from 'graphql-tools'
 import ReleaseMutationResolver from './mutation/ReleaseMutationResolver'
+import RebeaseAllMutationResolver from './mutation/RebeaseAllMutationResolver'
 
 class ResolverFactory {
 	public constructor(
 		private readonly stagesQueryResolver: StagesQueryResolver,
 		private readonly diffQueryResolver: DiffQueryResolver,
-		private readonly releaseMutationResolver: ReleaseMutationResolver
-	) {}
+		private readonly releaseMutationResolver: ReleaseMutationResolver,
+		private readonly rebaseMutationResolver: RebeaseAllMutationResolver,
+	) {
+	}
 
-	create(): IResolvers {
+	create(): Resolvers {
 		return {
 			Event: {
 				__resolveType: (obj: Event) => {
@@ -31,7 +33,7 @@ class ResolverFactory {
 						case undefined:
 							return null
 						default:
-							assertNever(obj.type)
+							return assertNever(obj.type)
 					}
 				},
 			},
@@ -44,6 +46,8 @@ class ResolverFactory {
 			Mutation: {
 				release: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.releaseMutationResolver.release(parent, args, context, info),
+				rebaseAll: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.rebaseMutationResolver.rebaseAll(parent, args, context, info),
 			},
 		}
 	}

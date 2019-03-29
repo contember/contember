@@ -1,10 +1,15 @@
-CREATE OR REPLACE FUNCTION rebase_events_unsafe(head UUID, oldBase UUID, newBase UUID, appliedEvents UUID[]) RETURNS UUID AS
+DROP FUNCTION IF EXISTS rebase_events_unsafe(head UUID, oldBase UUID, newBase UUID, appliedEvents UUID[]);
+
+CREATE OR REPLACE FUNCTION rebase_events_unsafe(head UUID, oldBase UUID, newBase UUID, appliedEvents UUID[]) RETURNS TABLE (
+	new_id UUID,
+	old_id UUID
+) AS
 $$
 
 WITH RECURSIVE events(id, type, data, previous_id, created_at, identity_id, transaction_id, index) AS (
 	SELECT event.id, event.type, event.data, event.previous_id, event.created_at, event.identity_id, event.transaction_id, 0
 	FROM system.event
-	WHERE event.id = head AND event.previous_id <> oldBase
+	WHERE event.id = head AND event.id <> oldBase
 	UNION
 	SELECT event.id, event.type, event.data, event.previous_id, event.created_at, event.identity_id, event.transaction_id, index + 1
 	FROM system.event, events
@@ -36,10 +41,9 @@ WITH RECURSIVE events(id, type, data, previous_id, created_at, identity_id, tran
 				FROM with_ids_by_window
 				WHERE with_ids_by_window.number > 0 RETURNING *
 	)
-SELECT insert.id
+SELECT insert.id as new_id, with_ids_by_window.id as old_id
 FROM with_ids_by_window
 		 JOIN insert ON insert.id = with_ids_by_window.new_id
 ORDER BY number DESC
-LIMIT 1
 $$
 	LANGUAGE SQL;

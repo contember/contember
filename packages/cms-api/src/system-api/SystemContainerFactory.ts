@@ -5,7 +5,6 @@ import SystemApolloServerFactory from '../http/SystemApolloServerFactory'
 import Container from '../core/di/Container'
 import TableReferencingResolver from './model/events/TableReferencingResolver'
 import ResolverFactory from './resolvers/ResolverFactory'
-import { IResolvers } from 'graphql-tools'
 import PermissionsFactory from '../tenant-api/model/authorization/PermissionsFactory'
 import Authorizator from '../core/authorization/Authorizator'
 import AccessEvaluator from '../core/authorization/AccessEvalutator'
@@ -24,14 +23,17 @@ import SchemaDiffer from './model/migrations/SchemaDiffer'
 import StageMigrator from './StageMigrator'
 import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
 import KnexWrapper from '../core/knex/KnexWrapper'
+import RebeaseAllMutationResolver from './resolvers/mutation/RebeaseAllMutationResolver'
+import { Resolvers } from './schema/types'
 
 export interface SystemContainer {
 	systemApolloServerFactory: SystemApolloServerFactory
-	systemResolvers: IResolvers
+	systemResolvers: Resolvers
 	authorizator: Authorizator
 	executionContainerFactory: SystemExecutionContainer.Factory,
 	projectIntializer: ProjectInitializer,
 	migrationDiffCreator: MigrationDiffCreator,
+	stageMigrator: StageMigrator,
 }
 
 export default class SystemContainerFactory {
@@ -39,7 +41,7 @@ export default class SystemContainerFactory {
 		project: Project,
 		migrationFilesManager: MigrationFilesManager
 		permissionsByIdentityFactory: PermissionsByIdentityFactory
-		schemaMigrationDiffsResolver: MigrationsResolver,
+		migrationsResolver: MigrationsResolver,
 		schemaMigrator: SchemaMigrator,
 		schemaVersionBuilder: SchemaVersionBuilder,
 		modificationHandlerFactory: ModificationHandlerFactory,
@@ -58,18 +60,19 @@ export default class SystemContainerFactory {
 				({ systemDiffResponseBuilder }) => new DiffQueryResolver(systemDiffResponseBuilder)
 			)
 			.addService('releaseMutationResolver', () => new ReleaseMutationResolver())
+			.addService('rebaseMutationResolver', () => new RebeaseAllMutationResolver())
 			.addService(
 				'systemResolvers',
-				({ systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver }) =>
-					new ResolverFactory(systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver).create()
+				({ systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver, rebaseMutationResolver }) =>
+					new ResolverFactory(systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver, rebaseMutationResolver).create()
 			)
-			.addService('migrationExecutor', () => new MigrationExecutor(container.modificationHandlerFactory))
+			.addService('migrationExecutor', () => new MigrationExecutor(container.modificationHandlerFactory, container.schemaVersionBuilder))
 			.addService(
 				'executionContainerFactory',
 				({ authorizator, migrationExecutor }) =>
 					new SystemExecutionContainer.Factory(
 						container.project,
-						container.schemaMigrationDiffsResolver.resolve(),
+						container.migrationsResolver,
 						container.migrationFilesManager,
 						authorizator,
 						container.permissionsByIdentityFactory,
@@ -86,10 +89,11 @@ export default class SystemContainerFactory {
 				new MigrationDiffCreator(container.migrationFilesManager, container.schemaVersionBuilder, schemaDiffer))
 
 			.addService('stageMigrator', ({ migrationExecutor }) =>
-				new StageMigrator(container.systemKnexWrapper, container.schemaMigrationDiffsResolver.resolve(), migrationExecutor, container.schemaVersionBuilder))
+				new StageMigrator(container.systemKnexWrapper, container.migrationsResolver, migrationExecutor))
 			.addService('projectIntializer', ({ stageMigrator }) =>
 				new ProjectInitializer(container.systemKnexWrapper, container.project, stageMigrator))
 			.build()
-			.pick('systemApolloServerFactory', 'systemResolvers', 'authorizator', 'executionContainerFactory', 'projectIntializer', 'migrationDiffCreator')
+			.pick('systemApolloServerFactory',
+				'systemResolvers', 'authorizator', 'executionContainerFactory', 'projectIntializer', 'migrationDiffCreator', 'stageMigrator')
 	}
 }

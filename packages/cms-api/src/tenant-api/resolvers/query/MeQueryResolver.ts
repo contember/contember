@@ -6,7 +6,7 @@ import KnexQueryable from '../../../core/knex/KnexQueryable'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import PersonByIdentityQuery from '../../model/queries/PersonByIdentityQuery'
 
-export default class MeQueryResolver implements QueryResolvers.Resolvers {
+export default class MeQueryResolver implements QueryResolvers {
 	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>) {}
 
 	async me(parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo): Promise<Identity> {

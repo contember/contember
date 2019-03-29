@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import { QueryResolver } from '../Resolver'
-import { DiffErrorCode, DiffQueryArgs, DiffResponse } from '../../schema/types'
+import { DiffErrorCode, DiffResponse, QueryDiffArgs } from '../../schema/types'
 import DiffResponseBuilder from '../../model/events/DiffResponseBuilder'
 import { createStageQuery } from '../../model/queries/StageQueryHelper'
 
@@ -10,7 +10,7 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 
 	async diff(
 		parent: any,
-		args: DiffQueryArgs,
+		args: QueryDiffArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<DiffResponse> {
@@ -22,8 +22,8 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 			return {
 				ok: false,
 				errors: [
-					!baseStage ? DiffErrorCode.BASE_NOT_FOUND : null,
-					!headStage ? DiffErrorCode.HEAD_NOT_FOUND : null,
+					!baseStage ? DiffErrorCode.BaseNotFound : null,
+					!headStage ? DiffErrorCode.HeadNotFound : null,
 				].filter((it): it is DiffErrorCode => !!it),
 			}
 		}

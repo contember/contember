@@ -19,13 +19,13 @@ class ResolverFactory {
 			Event: {
 				__resolveType: (obj: Event) => {
 					switch (obj.type) {
-						case EventType.CREATE:
+						case EventType.Create:
 							return 'CreateEvent'
-						case EventType.UPDATE:
+						case EventType.Update:
 							return 'UpdateEvent'
-						case EventType.DELETE:
+						case EventType.Delete:
 							return 'DeleteEvent'
-						case EventType.RUN_MIGRATION:
+						case EventType.RunMigration:
 							return 'RunMigrationEvent'
 						case null:
 						case undefined:

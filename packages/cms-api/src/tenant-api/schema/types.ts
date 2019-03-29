@@ -1,526 +1,462 @@
-/* tslint:disable */
-import { GraphQLResolveInfo } from 'graphql'
+type Maybe<T> = T | null
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+	ID: string
+	String: string
+	Boolean: boolean
+	Int: number
+	Float: number
+}
 
-export type Resolver<Result, Args = any> = (
-	parent: any,
-	args: Args,
-	context: any,
-	info: GraphQLResolveInfo
-) => Promise<Result> | Result
+export type AddProjectMemberError = {
+	readonly code: AddProjectMemberErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
 
-export interface Query {
+export enum AddProjectMemberErrorCode {
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	IdentityNotFound = 'IDENTITY_NOT_FOUND',
+	AlreadyMember = 'ALREADY_MEMBER',
+}
+
+export type AddProjectMemberResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<AddProjectMemberError>
+}
+
+export type AdminCredentials = {
+	readonly email: Scalars['String']
+	readonly password: Scalars['String']
+}
+
+export type ApiKey = {
+	readonly id: Scalars['String']
+	readonly token: Scalars['String']
+	readonly identity: Identity
+}
+
+export type ApiKeyProjectInput = {
+	readonly projectId: Scalars['String']
+	readonly roles?: Maybe<ReadonlyArray<Scalars['String']>>
+	readonly variables?: Maybe<ReadonlyArray<VariableUpdate>>
+}
+
+export type CreateApiKeyError = {
+	readonly code: CreateApiKeyErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum CreateApiKeyErrorCode {
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	VariableNotFound = 'VARIABLE_NOT_FOUND',
+}
+
+export type CreateApiKeyResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<CreateApiKeyError>
+	readonly result?: Maybe<CreateApiKeyResult>
+}
+
+export type CreateApiKeyResult = {
+	readonly id: Scalars['String']
+	readonly token: Scalars['String']
+	readonly identity: IdentityWithoutPerson
+}
+
+export type Identity = {
+	readonly id: Scalars['String']
+	readonly projects: ReadonlyArray<Project>
+	readonly person?: Maybe<PersonWithoutIdentity>
+}
+
+export type IdentityWithoutPerson = {
+	readonly id: Scalars['String']
+	readonly projects: ReadonlyArray<Project>
+}
+
+export type Mutation = {
+	readonly setup?: Maybe<SetupResponse>
+	readonly signUp?: Maybe<SignUpResponse>
+	readonly signIn?: Maybe<SignInResponse>
+	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
+	readonly updateProjectMemberVariables?: Maybe<UpdateProjectMemberVariablesResponse>
+	readonly createApiKey?: Maybe<CreateApiKeyResponse>
+}
+
+export type MutationSetupArgs = {
+	superadmin: AdminCredentials
+}
+
+export type MutationSignUpArgs = {
+	email: Scalars['String']
+	password: Scalars['String']
+}
+
+export type MutationSignInArgs = {
+	email: Scalars['String']
+	password: Scalars['String']
+	expiration?: Maybe<Scalars['Int']>
+}
+
+export type MutationAddProjectMemberArgs = {
+	projectId: Scalars['String']
+	identityId: Scalars['String']
+	roles: ReadonlyArray<Scalars['String']>
+}
+
+export type MutationUpdateProjectMemberVariablesArgs = {
+	projectId: Scalars['String']
+	identityId: Scalars['String']
+	variables: ReadonlyArray<VariableUpdate>
+}
+
+export type MutationCreateApiKeyArgs = {
+	roles?: Maybe<ReadonlyArray<Scalars['String']>>
+	projects?: Maybe<ReadonlyArray<ApiKeyProjectInput>>
+}
+
+export type Person = {
+	readonly id: Scalars['String']
+	readonly email: Scalars['String']
+	readonly identity: IdentityWithoutPerson
+}
+
+export type PersonWithoutIdentity = {
+	readonly id: Scalars['String']
+	readonly email: Scalars['String']
+}
+
+export type Project = {
+	readonly id: Scalars['String']
+	readonly name: Scalars['String']
+	readonly slug: Scalars['String']
+}
+
+export type Query = {
 	readonly me: Identity
 }
 
-export interface Identity {
-	readonly id: string
-	readonly projects: ReadonlyArray<Project>
-	readonly person?: PersonWithoutIdentity | null
+export type SetupError = {
+	readonly code: SetupErrorCode
+	readonly endPersonMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
-export interface Project {
-	readonly id: string
-	readonly name: string
-	readonly slug: string
+export enum SetupErrorCode {
+	SetupAlreadyDone = 'SETUP_ALREADY_DONE',
 }
 
-export interface PersonWithoutIdentity {
-	readonly id: string
-	readonly email: string
-}
-
-export interface Mutation {
-	readonly setup?: SetupResponse | null
-	readonly signUp?: SignUpResponse | null
-	readonly signIn?: SignInResponse | null
-	readonly addProjectMember?: AddProjectMemberResponse | null
-	readonly updateProjectMemberVariables?: UpdateProjectMemberVariablesResponse | null
-	readonly createApiKey?: CreateApiKeyResponse | null
-}
-
-export interface SetupResponse {
-	readonly ok: boolean
+export type SetupResponse = {
+	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<SetupErrorCode>
-	readonly result?: SetupResult | null
+	readonly result?: Maybe<SetupResult>
 }
 
-export interface SetupResult {
+export type SetupResult = {
 	readonly superadmin: Person
 	readonly loginKey: ApiKey
 }
 
-export interface Person {
-	readonly id: string
-	readonly email: string
-	readonly identity: IdentityWithoutPerson
-}
-
-export interface IdentityWithoutPerson {
-	readonly id: string
-	readonly projects: ReadonlyArray<Project>
-}
-
-export interface ApiKey {
-	readonly id: string
-	readonly token: string
-	readonly identity: Identity
-}
-
-export interface SignUpResponse {
-	readonly ok: boolean
-	readonly errors: ReadonlyArray<SignUpError>
-	readonly result?: SignUpResult | null
-}
-
-export interface SignUpError {
-	readonly code: SignUpErrorCode
-	readonly endPersonMessage?: string | null
-	readonly developerMessage?: string | null
-}
-
-export interface SignUpResult {
-	readonly person: Person
-}
-
-export interface SignInResponse {
-	readonly ok: boolean
-	readonly errors: ReadonlyArray<SignInError>
-	readonly result?: SignInResult | null
-}
-
-export interface SignInError {
+export type SignInError = {
 	readonly code: SignInErrorCode
-	readonly endUserMessage?: string | null
-	readonly developerMessage?: string | null
-}
-
-export interface SignInResult {
-	readonly token: string
-	readonly person: Person
-}
-
-export interface AddProjectMemberResponse {
-	readonly ok: boolean
-	readonly errors: ReadonlyArray<AddProjectMemberError>
-}
-
-export interface AddProjectMemberError {
-	readonly code: AddProjectMemberErrorCode
-	readonly endUserMessage?: string | null
-	readonly developerMessage?: string | null
-}
-
-export interface UpdateProjectMemberVariablesResponse {
-	readonly ok: boolean
-	readonly errors: ReadonlyArray<UpdateProjectMemberVariablesError>
-}
-
-export interface UpdateProjectMemberVariablesError {
-	readonly code: UpdateProjectMemberVariablesErrorCode
-	readonly endUserMessage?: string | null
-	readonly developerMessage?: string | null
-}
-
-export interface CreateApiKeyResponse {
-	readonly ok: boolean
-	readonly errors: ReadonlyArray<CreateApiKeyError>
-	readonly result?: CreateApiKeyResult | null
-}
-
-export interface CreateApiKeyError {
-	readonly code: CreateApiKeyErrorCode
-	readonly endUserMessage?: string | null
-	readonly developerMessage?: string | null
-}
-
-export interface CreateApiKeyResult {
-	readonly id: string
-	readonly token: string
-	readonly identity: IdentityWithoutPerson
-}
-
-export interface SetupError {
-	readonly code: SetupErrorCode
-	readonly endPersonMessage?: string | null
-	readonly developerMessage?: string | null
-}
-
-export interface AdminCredentials {
-	readonly email: string
-	readonly password: string
-}
-
-export interface VariableUpdate {
-	readonly name: string
-	readonly values: ReadonlyArray<string>
-}
-
-export interface ApiKeyProjectInput {
-	readonly projectId: string
-	readonly roles?: ReadonlyArray<string> | null
-	readonly variables?: ReadonlyArray<VariableUpdate> | null
-}
-export interface SetupMutationArgs {
-	superadmin: AdminCredentials
-}
-export interface SignUpMutationArgs {
-	email: string
-	password: string
-}
-export interface SignInMutationArgs {
-	email: string
-	password: string
-	expiration?: number | null
-}
-export interface AddProjectMemberMutationArgs {
-	projectId: string
-	identityId: string
-	roles: ReadonlyArray<string>
-}
-export interface UpdateProjectMemberVariablesMutationArgs {
-	projectId: string
-	identityId: string
-	variables: ReadonlyArray<VariableUpdate>
-}
-export interface CreateApiKeyMutationArgs {
-	roles?: ReadonlyArray<string> | null
-	projects?: ReadonlyArray<ApiKeyProjectInput> | null
-}
-
-export enum SetupErrorCode {
-	SETUP_ALREADY_DONE = 'SETUP_ALREADY_DONE',
-}
-
-export enum SignUpErrorCode {
-	EMAIL_ALREADY_EXISTS = 'EMAIL_ALREADY_EXISTS',
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
 export enum SignInErrorCode {
-	UNKNOWN_EMAIL = 'UNKNOWN_EMAIL',
-	INVALID_PASSWORD = 'INVALID_PASSWORD',
+	UnknownEmail = 'UNKNOWN_EMAIL',
+	InvalidPassword = 'INVALID_PASSWORD',
 }
 
-export enum AddProjectMemberErrorCode {
-	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
-	IDENTITY_NOT_FOUND = 'IDENTITY_NOT_FOUND',
-	ALREADY_MEMBER = 'ALREADY_MEMBER',
+export type SignInResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<SignInError>
+	readonly result?: Maybe<SignInResult>
+}
+
+export type SignInResult = {
+	readonly token: Scalars['String']
+	readonly person: Person
+}
+
+export type SignUpError = {
+	readonly code: SignUpErrorCode
+	readonly endPersonMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum SignUpErrorCode {
+	EmailAlreadyExists = 'EMAIL_ALREADY_EXISTS',
+}
+
+export type SignUpResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<SignUpError>
+	readonly result?: Maybe<SignUpResult>
+}
+
+export type SignUpResult = {
+	readonly person: Person
+}
+
+export type UpdateProjectMemberVariablesError = {
+	readonly code: UpdateProjectMemberVariablesErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
 export enum UpdateProjectMemberVariablesErrorCode {
-	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
-	IDENTITY_NOT_FOUND = 'IDENTITY_NOT_FOUND',
-	VARIABLE_NOT_FOUND = 'VARIABLE_NOT_FOUND',
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	IdentityNotFound = 'IDENTITY_NOT_FOUND',
+	VariableNotFound = 'VARIABLE_NOT_FOUND',
 }
 
-export enum CreateApiKeyErrorCode {
-	PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
-	VARIABLE_NOT_FOUND = 'VARIABLE_NOT_FOUND',
+export type UpdateProjectMemberVariablesResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<UpdateProjectMemberVariablesError>
 }
 
-export namespace QueryResolvers {
-	export interface Resolvers {
-		me?: MeResolver
-	}
-
-	export type MeResolver<R = Identity> = Resolver<R>
+export type VariableUpdate = {
+	readonly name: Scalars['String']
+	readonly values: ReadonlyArray<Scalars['String']>
 }
 
-export namespace IdentityResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		projects?: ProjectsResolver
-		person?: PersonResolver
-	}
+import { GraphQLResolveInfo } from 'graphql'
 
-	export type IdResolver<R = string> = Resolver<R>
-	export type ProjectsResolver<R = ReadonlyArray<Project>> = Resolver<R>
-	export type PersonResolver<R = PersonWithoutIdentity | null> = Resolver<R>
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => Promise<TResult> | TResult
+
+export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
+	fragment: string
+	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
 }
 
-export namespace ProjectResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		name?: NameResolver
-		slug?: SlugResolver
-	}
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+	| ResolverFn<TResult, TParent, TContext, TArgs>
+	| StitchingResolver<TResult, TParent, TContext, TArgs>
 
-	export type IdResolver<R = string> = Resolver<R>
-	export type NameResolver<R = string> = Resolver<R>
-	export type SlugResolver<R = string> = Resolver<R>
+export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => AsyncIterator<TResult> | Promise<AsyncIterator<TResult>>
+
+export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => TResult | Promise<TResult>
+
+export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
+	subscribe: SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs>
+	resolve?: SubscriptionResolveFn<TResult, TParent, TContext, TArgs>
 }
 
-export namespace PersonWithoutIdentityResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		email?: EmailResolver
-	}
+export type SubscriptionResolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+	| ((...args: any[]) => SubscriptionResolverObject<TResult, TParent, TContext, TArgs>)
+	| SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
 
-	export type IdResolver<R = string> = Resolver<R>
-	export type EmailResolver<R = string> = Resolver<R>
+export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
+	parent: TParent,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => Maybe<TTypes>
+
+export type NextResolverFn<T> = () => Promise<T>
+
+export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+	next: NextResolverFn<TResult>,
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => TResult | Promise<TResult>
+
+export type AddProjectMemberErrorResolvers<Context = any, ParentType = AddProjectMemberError> = {
+	code?: Resolver<AddProjectMemberErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export namespace MutationResolvers {
-	export interface Resolvers {
-		setup?: SetupResolver
-		signUp?: SignUpResolver
-		signIn?: SignInResolver
-		addProjectMember?: AddProjectMemberResolver
-		updateProjectMemberVariables?: UpdateProjectMemberVariablesResolver
-		createApiKey?: CreateApiKeyResolver
-	}
+export type AddProjectMemberResponseResolvers<Context = any, ParentType = AddProjectMemberResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<AddProjectMemberError>, ParentType, Context>
+}
 
-	export type SetupResolver<R = SetupResponse | null> = Resolver<R, SetupArgs>
-	export interface SetupArgs {
-		superadmin: AdminCredentials
-	}
+export type ApiKeyResolvers<Context = any, ParentType = ApiKey> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	token?: Resolver<Scalars['String'], ParentType, Context>
+	identity?: Resolver<Identity, ParentType, Context>
+}
 
-	export type SignUpResolver<R = SignUpResponse | null> = Resolver<R, SignUpArgs>
-	export interface SignUpArgs {
-		email: string
-		password: string
-	}
+export type CreateApiKeyErrorResolvers<Context = any, ParentType = CreateApiKeyError> = {
+	code?: Resolver<CreateApiKeyErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+}
 
-	export type SignInResolver<R = SignInResponse | null> = Resolver<R, SignInArgs>
-	export interface SignInArgs {
-		email: string
-		password: string
-		expiration?: number | null
-	}
+export type CreateApiKeyResponseResolvers<Context = any, ParentType = CreateApiKeyResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<CreateApiKeyError>, ParentType, Context>
+	result?: Resolver<Maybe<CreateApiKeyResult>, ParentType, Context>
+}
 
-	export type AddProjectMemberResolver<R = AddProjectMemberResponse | null> = Resolver<R, AddProjectMemberArgs>
-	export interface AddProjectMemberArgs {
-		projectId: string
-		identityId: string
-		roles: ReadonlyArray<string>
-	}
+export type CreateApiKeyResultResolvers<Context = any, ParentType = CreateApiKeyResult> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	token?: Resolver<Scalars['String'], ParentType, Context>
+	identity?: Resolver<IdentityWithoutPerson, ParentType, Context>
+}
 
-	export type UpdateProjectMemberVariablesResolver<R = UpdateProjectMemberVariablesResponse | null> = Resolver<
-		R,
-		UpdateProjectMemberVariablesArgs
+export type IdentityResolvers<Context = any, ParentType = Identity> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	projects?: Resolver<ReadonlyArray<Project>, ParentType, Context>
+	person?: Resolver<Maybe<PersonWithoutIdentity>, ParentType, Context>
+}
+
+export type IdentityWithoutPersonResolvers<Context = any, ParentType = IdentityWithoutPerson> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	projects?: Resolver<ReadonlyArray<Project>, ParentType, Context>
+}
+
+export type MutationResolvers<Context = any, ParentType = Mutation> = {
+	setup?: Resolver<Maybe<SetupResponse>, ParentType, Context, MutationSetupArgs>
+	signUp?: Resolver<Maybe<SignUpResponse>, ParentType, Context, MutationSignUpArgs>
+	signIn?: Resolver<Maybe<SignInResponse>, ParentType, Context, MutationSignInArgs>
+	addProjectMember?: Resolver<Maybe<AddProjectMemberResponse>, ParentType, Context, MutationAddProjectMemberArgs>
+	updateProjectMemberVariables?: Resolver<
+		Maybe<UpdateProjectMemberVariablesResponse>,
+		ParentType,
+		Context,
+		MutationUpdateProjectMemberVariablesArgs
 	>
-	export interface UpdateProjectMemberVariablesArgs {
-		projectId: string
-		identityId: string
-		variables: ReadonlyArray<VariableUpdate>
-	}
-
-	export type CreateApiKeyResolver<R = CreateApiKeyResponse | null> = Resolver<R, CreateApiKeyArgs>
-	export interface CreateApiKeyArgs {
-		roles?: ReadonlyArray<string> | null
-		projects?: ReadonlyArray<ApiKeyProjectInput> | null
-	}
+	createApiKey?: Resolver<Maybe<CreateApiKeyResponse>, ParentType, Context, MutationCreateApiKeyArgs>
 }
 
-export namespace SetupResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-		result?: ResultResolver
-	}
-
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<SetupErrorCode>> = Resolver<R>
-	export type ResultResolver<R = SetupResult | null> = Resolver<R>
+export type PersonResolvers<Context = any, ParentType = Person> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	email?: Resolver<Scalars['String'], ParentType, Context>
+	identity?: Resolver<IdentityWithoutPerson, ParentType, Context>
 }
 
-export namespace SetupResultResolvers {
-	export interface Resolvers {
-		superadmin?: SuperadminResolver
-		loginKey?: LoginKeyResolver
-	}
-
-	export type SuperadminResolver<R = Person> = Resolver<R>
-	export type LoginKeyResolver<R = ApiKey> = Resolver<R>
+export type PersonWithoutIdentityResolvers<Context = any, ParentType = PersonWithoutIdentity> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	email?: Resolver<Scalars['String'], ParentType, Context>
 }
 
-export namespace PersonResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		email?: EmailResolver
-		identity?: IdentityResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type EmailResolver<R = string> = Resolver<R>
-	export type IdentityResolver<R = IdentityWithoutPerson> = Resolver<R>
+export type ProjectResolvers<Context = any, ParentType = Project> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	name?: Resolver<Scalars['String'], ParentType, Context>
+	slug?: Resolver<Scalars['String'], ParentType, Context>
 }
 
-export namespace IdentityWithoutPersonResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		projects?: ProjectsResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type ProjectsResolver<R = ReadonlyArray<Project>> = Resolver<R>
+export type QueryResolvers<Context = any, ParentType = Query> = {
+	me?: Resolver<Identity, ParentType, Context>
 }
 
-export namespace ApiKeyResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		token?: TokenResolver
-		identity?: IdentityResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type TokenResolver<R = string> = Resolver<R>
-	export type IdentityResolver<R = Identity> = Resolver<R>
+export type SetupErrorResolvers<Context = any, ParentType = SetupError> = {
+	code?: Resolver<SetupErrorCode, ParentType, Context>
+	endPersonMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export namespace SignUpResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-		result?: ResultResolver
-	}
-
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<SignUpError>> = Resolver<R>
-	export type ResultResolver<R = SignUpResult | null> = Resolver<R>
+export type SetupResponseResolvers<Context = any, ParentType = SetupResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SetupErrorCode>, ParentType, Context>
+	result?: Resolver<Maybe<SetupResult>, ParentType, Context>
 }
 
-export namespace SignUpErrorResolvers {
-	export interface Resolvers {
-		code?: CodeResolver
-		endPersonMessage?: EndPersonMessageResolver
-		developerMessage?: DeveloperMessageResolver
-	}
-
-	export type CodeResolver<R = SignUpErrorCode> = Resolver<R>
-	export type EndPersonMessageResolver<R = string | null> = Resolver<R>
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
+export type SetupResultResolvers<Context = any, ParentType = SetupResult> = {
+	superadmin?: Resolver<Person, ParentType, Context>
+	loginKey?: Resolver<ApiKey, ParentType, Context>
 }
 
-export namespace SignUpResultResolvers {
-	export interface Resolvers {
-		person?: PersonResolver
-	}
-
-	export type PersonResolver<R = Person> = Resolver<R>
+export type SignInErrorResolvers<Context = any, ParentType = SignInError> = {
+	code?: Resolver<SignInErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export namespace SignInResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-		result?: ResultResolver
-	}
-
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<SignInError>> = Resolver<R>
-	export type ResultResolver<R = SignInResult | null> = Resolver<R>
+export type SignInResponseResolvers<Context = any, ParentType = SignInResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SignInError>, ParentType, Context>
+	result?: Resolver<Maybe<SignInResult>, ParentType, Context>
 }
 
-export namespace SignInErrorResolvers {
-	export interface Resolvers {
-		code?: CodeResolver
-		endUserMessage?: EndUserMessageResolver
-		developerMessage?: DeveloperMessageResolver
-	}
-
-	export type CodeResolver<R = SignInErrorCode> = Resolver<R>
-	export type EndUserMessageResolver<R = string | null> = Resolver<R>
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
+export type SignInResultResolvers<Context = any, ParentType = SignInResult> = {
+	token?: Resolver<Scalars['String'], ParentType, Context>
+	person?: Resolver<Person, ParentType, Context>
 }
 
-export namespace SignInResultResolvers {
-	export interface Resolvers {
-		token?: TokenResolver
-		person?: PersonResolver
-	}
-
-	export type TokenResolver<R = string> = Resolver<R>
-	export type PersonResolver<R = Person> = Resolver<R>
+export type SignUpErrorResolvers<Context = any, ParentType = SignUpError> = {
+	code?: Resolver<SignUpErrorCode, ParentType, Context>
+	endPersonMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export namespace AddProjectMemberResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-	}
-
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<AddProjectMemberError>> = Resolver<R>
+export type SignUpResponseResolvers<Context = any, ParentType = SignUpResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SignUpError>, ParentType, Context>
+	result?: Resolver<Maybe<SignUpResult>, ParentType, Context>
 }
 
-export namespace AddProjectMemberErrorResolvers {
-	export interface Resolvers {
-		code?: CodeResolver
-		endUserMessage?: EndUserMessageResolver
-		developerMessage?: DeveloperMessageResolver
-	}
-
-	export type CodeResolver<R = AddProjectMemberErrorCode> = Resolver<R>
-	export type EndUserMessageResolver<R = string | null> = Resolver<R>
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
+export type SignUpResultResolvers<Context = any, ParentType = SignUpResult> = {
+	person?: Resolver<Person, ParentType, Context>
 }
 
-export namespace UpdateProjectMemberVariablesResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-	}
-
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<UpdateProjectMemberVariablesError>> = Resolver<R>
+export type UpdateProjectMemberVariablesErrorResolvers<
+	Context = any,
+	ParentType = UpdateProjectMemberVariablesError
+> = {
+	code?: Resolver<UpdateProjectMemberVariablesErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export namespace UpdateProjectMemberVariablesErrorResolvers {
-	export interface Resolvers {
-		code?: CodeResolver
-		endUserMessage?: EndUserMessageResolver
-		developerMessage?: DeveloperMessageResolver
-	}
-
-	export type CodeResolver<R = UpdateProjectMemberVariablesErrorCode> = Resolver<R>
-	export type EndUserMessageResolver<R = string | null> = Resolver<R>
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
+export type UpdateProjectMemberVariablesResponseResolvers<
+	Context = any,
+	ParentType = UpdateProjectMemberVariablesResponse
+> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<UpdateProjectMemberVariablesError>, ParentType, Context>
 }
 
-export namespace CreateApiKeyResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-		result?: ResultResolver
-	}
-
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<CreateApiKeyError>> = Resolver<R>
-	export type ResultResolver<R = CreateApiKeyResult | null> = Resolver<R>
+export type Resolvers<Context = any> = {
+	AddProjectMemberError?: AddProjectMemberErrorResolvers<Context>
+	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<Context>
+	ApiKey?: ApiKeyResolvers<Context>
+	CreateApiKeyError?: CreateApiKeyErrorResolvers<Context>
+	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<Context>
+	CreateApiKeyResult?: CreateApiKeyResultResolvers<Context>
+	Identity?: IdentityResolvers<Context>
+	IdentityWithoutPerson?: IdentityWithoutPersonResolvers<Context>
+	Mutation?: MutationResolvers<Context>
+	Person?: PersonResolvers<Context>
+	PersonWithoutIdentity?: PersonWithoutIdentityResolvers<Context>
+	Project?: ProjectResolvers<Context>
+	Query?: QueryResolvers<Context>
+	SetupError?: SetupErrorResolvers<Context>
+	SetupResponse?: SetupResponseResolvers<Context>
+	SetupResult?: SetupResultResolvers<Context>
+	SignInError?: SignInErrorResolvers<Context>
+	SignInResponse?: SignInResponseResolvers<Context>
+	SignInResult?: SignInResultResolvers<Context>
+	SignUpError?: SignUpErrorResolvers<Context>
+	SignUpResponse?: SignUpResponseResolvers<Context>
+	SignUpResult?: SignUpResultResolvers<Context>
+	UpdateProjectMemberVariablesError?: UpdateProjectMemberVariablesErrorResolvers<Context>
+	UpdateProjectMemberVariablesResponse?: UpdateProjectMemberVariablesResponseResolvers<Context>
 }
 
-export namespace CreateApiKeyErrorResolvers {
-	export interface Resolvers {
-		code?: CodeResolver
-		endUserMessage?: EndUserMessageResolver
-		developerMessage?: DeveloperMessageResolver
-	}
-
-	export type CodeResolver<R = CreateApiKeyErrorCode> = Resolver<R>
-	export type EndUserMessageResolver<R = string | null> = Resolver<R>
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
-}
-
-export namespace CreateApiKeyResultResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		token?: TokenResolver
-		identity?: IdentityResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type TokenResolver<R = string> = Resolver<R>
-	export type IdentityResolver<R = IdentityWithoutPerson> = Resolver<R>
-}
-
-export namespace SetupErrorResolvers {
-	export interface Resolvers {
-		code?: CodeResolver
-		endPersonMessage?: EndPersonMessageResolver
-		developerMessage?: DeveloperMessageResolver
-	}
-
-	export type CodeResolver<R = SetupErrorCode> = Resolver<R>
-	export type EndPersonMessageResolver<R = string | null> = Resolver<R>
-	export type DeveloperMessageResolver<R = string | null> = Resolver<R>
-}
+/**
+ * @deprecated
+ * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
+ */
+export type IResolvers<Context = any> = Resolvers<Context>

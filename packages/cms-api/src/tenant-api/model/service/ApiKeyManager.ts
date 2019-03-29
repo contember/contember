@@ -76,9 +76,9 @@ class ApiKeyManager {
 				.map(it => it.errors)
 				.map(
 					mapValues<AddProjectMemberErrorCode, CreateApiKeyErrorCode>({
-						[AddProjectMemberErrorCode.PROJECT_NOT_FOUND]: CreateApiKeyErrorCode.PROJECT_NOT_FOUND,
-						[AddProjectMemberErrorCode.IDENTITY_NOT_FOUND]: ImplementationException.Throw,
-						[AddProjectMemberErrorCode.ALREADY_MEMBER]: ImplementationException.Throw,
+						[AddProjectMemberErrorCode.ProjectNotFound]: CreateApiKeyErrorCode.ProjectNotFound,
+						[AddProjectMemberErrorCode.IdentityNotFound]: ImplementationException.Throw,
+						[AddProjectMemberErrorCode.AlreadyMember]: ImplementationException.Throw,
 					})
 				)
 				.reduce((acc, val) => [...acc, ...val], [])
@@ -96,9 +96,9 @@ class ApiKeyManager {
 				.map(it => it.errors)
 				.map(
 					mapValues<UpdateProjectMemberVariablesErrorCode, CreateApiKeyErrorCode>({
-						[UpdateProjectMemberVariablesErrorCode.VARIABLE_NOT_FOUND]: CreateApiKeyErrorCode.VARIABLE_NOT_FOUND,
-						[UpdateProjectMemberVariablesErrorCode.PROJECT_NOT_FOUND]: ImplementationException.Throw,
-						[UpdateProjectMemberVariablesErrorCode.IDENTITY_NOT_FOUND]: ImplementationException.Throw,
+						[UpdateProjectMemberVariablesErrorCode.VariableNotFound]: CreateApiKeyErrorCode.VariableNotFound,
+						[UpdateProjectMemberVariablesErrorCode.ProjectNotFound]: ImplementationException.Throw,
+						[UpdateProjectMemberVariablesErrorCode.IdentityNotFound]: ImplementationException.Throw,
 					})
 				)
 				.reduce((acc, val) => [...acc, ...val], [])

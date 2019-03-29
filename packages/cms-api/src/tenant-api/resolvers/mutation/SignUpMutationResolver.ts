@@ -1,4 +1,4 @@
-import { MutationResolvers, SignUpResponse } from '../../schema/types'
+import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import SignUpManager from '../../model/service/SignUpManager'
@@ -12,7 +12,7 @@ import { ForbiddenError } from 'apollo-server-koa'
 import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import ApiKeyManager from '../../model/service/ApiKeyManager'
 
-export default class SignUpMutationResolver implements MutationResolvers.Resolvers {
+export default class SignUpMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly signUpManager: SignUpManager,
 		private readonly queryHandler: QueryHandler<KnexQueryable>,
@@ -21,7 +21,7 @@ export default class SignUpMutationResolver implements MutationResolvers.Resolve
 
 	async signUp(
 		parent: any,
-		args: MutationResolvers.SignUpArgs,
+		args: MutationSignUpArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<SignUpResponse> {

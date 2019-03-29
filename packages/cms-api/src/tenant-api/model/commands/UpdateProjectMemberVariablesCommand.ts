@@ -36,12 +36,12 @@ class UpdateProjectMemberVariablesCommand
 			switch (e.constraint) {
 				case 'project_member_project_id_fkey':
 					return new UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponseError([
-						UpdateProjectMemberVariablesErrorCode.PROJECT_NOT_FOUND,
+						UpdateProjectMemberVariablesErrorCode.ProjectNotFound,
 					])
 
 				case 'project_member_identity':
 					return new UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponseError([
-						UpdateProjectMemberVariablesErrorCode.IDENTITY_NOT_FOUND,
+						UpdateProjectMemberVariablesErrorCode.IdentityNotFound,
 					])
 
 				default:

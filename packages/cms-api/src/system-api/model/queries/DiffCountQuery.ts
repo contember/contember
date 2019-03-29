@@ -26,7 +26,7 @@ SELECT index from events where events.id = ?
 		)
 
 		return diff.rows.length === 0
-			? new DiffCountQuery.ErrorResponse([DiffErrorCode.NOT_REBASED])
+			? new DiffCountQuery.ErrorResponse([DiffErrorCode.NotRebased])
 			: new DiffCountQuery.OkResponse(diff.rows[0].index)
 	}
 }

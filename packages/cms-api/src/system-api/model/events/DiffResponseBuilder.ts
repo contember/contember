@@ -20,10 +20,10 @@ class DiffResponseBuilder {
 		}
 
 		const apiEventTypeMapping = {
-			[EventType.create]: ApiEventType.CREATE,
-			[EventType.update]: ApiEventType.UPDATE,
-			[EventType.delete]: ApiEventType.DELETE,
-			[EventType.runMigration]: ApiEventType.RUN_MIGRATION,
+			[EventType.create]: ApiEventType.Create,
+			[EventType.update]: ApiEventType.Update,
+			[EventType.delete]: ApiEventType.Delete,
+			[EventType.runMigration]: ApiEventType.RunMigration,
 		}
 
 		return events.map(it => ({

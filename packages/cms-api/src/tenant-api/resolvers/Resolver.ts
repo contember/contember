@@ -6,6 +6,6 @@ export interface IgnoreIndex {
 }
 
 export default interface Resolver extends IResolvers {
-	Query: Schema.QueryResolvers.Resolvers & IgnoreIndex
-	Mutation: Schema.MutationResolvers.Resolvers & IgnoreIndex
+	Query: Schema.QueryResolvers & IgnoreIndex
+	Mutation: Schema.MutationResolvers & IgnoreIndex
 }

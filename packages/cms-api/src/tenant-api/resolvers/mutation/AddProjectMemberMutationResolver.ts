@@ -1,4 +1,4 @@
-import { AddProjectMemberResponse, MutationResolvers } from '../../schema/types'
+import { AddProjectMemberResponse, MutationAddProjectMemberArgs, MutationResolvers } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import ProjectMemberManager from '../../model/service/ProjectMemberManager'
@@ -6,12 +6,12 @@ import ProjectScope from '../../model/authorization/ProjectScope'
 import Actions from '../../model/authorization/Actions'
 import { ForbiddenError } from 'apollo-server-koa'
 
-export default class AddProjectMemberMutationResolver implements MutationResolvers.Resolvers {
+export default class AddProjectMemberMutationResolver implements MutationResolvers {
 	constructor(private readonly projectMemberManager: ProjectMemberManager) {}
 
 	async addProjectMember(
 		parent: any,
-		{ projectId, identityId, roles }: MutationResolvers.AddProjectMemberArgs,
+		{ projectId, identityId, roles }: MutationAddProjectMemberArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<AddProjectMemberResponse> {

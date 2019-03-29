@@ -1,4 +1,4 @@
-import { MutationResolvers, SetupResponse } from '../../schema/types'
+import { MutationResolvers, MutationSetupArgs, SetupResponse } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import SignUpManager from '../../model/service/SignUpManager'
@@ -12,7 +12,7 @@ import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import ApiKeyManager from '../../model/service/ApiKeyManager'
 import Identity from '../../../common/auth/Identity'
 
-export default class SetupMutationResolver implements MutationResolvers.Resolvers {
+export default class SetupMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly signUpManager: SignUpManager,
 		private readonly queryHandler: QueryHandler<KnexQueryable>,
@@ -21,7 +21,7 @@ export default class SetupMutationResolver implements MutationResolvers.Resolver
 
 	async setup(
 		parent: any,
-		args: MutationResolvers.SetupArgs,
+		args: MutationSetupArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<SetupResponse> {

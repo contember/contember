@@ -14,12 +14,12 @@ class SignInManager {
 	async signIn(email: string, password: string, expiration?: number): Promise<SignInManager.SignInResult> {
 		const personRow = await this.queryHandler.fetch(new PersonByEmailQuery(email))
 		if (personRow === null) {
-			return new SignInManager.SignInResultError([SignInErrorCode.UNKNOWN_EMAIL])
+			return new SignInManager.SignInResultError([SignInErrorCode.UnknownEmail])
 		}
 
 		const passwordValid = await bcrypt.compare(password, personRow.password_hash)
 		if (!passwordValid) {
-			return new SignInManager.SignInResultError([SignInErrorCode.INVALID_PASSWORD])
+			return new SignInManager.SignInResultError([SignInErrorCode.InvalidPassword])
 		}
 
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id, expiration)

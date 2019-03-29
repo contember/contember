@@ -1,15 +1,14 @@
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
-import { ReleaseMutationArgs, ReleaseResponse } from '../../schema/types'
-import { Acl } from 'cms-common'
+import { MutationReleaseArgs, ReleaseResponse } from '../../schema/types'
 import { createStageQuery } from '../../model/queries/StageQueryHelper'
 
 export default class ReleaseMutationResolver implements MutationResolver<'release'> {
 
 	async release(
 		parent: any,
-		args: ReleaseMutationArgs,
+		args: MutationReleaseArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<ReleaseResponse> {

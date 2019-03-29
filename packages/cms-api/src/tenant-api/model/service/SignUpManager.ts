@@ -11,7 +11,7 @@ class SignUpManager {
 
 	async signUp(email: string, password: string, roles: string[] = []): Promise<SignUpManager.SignUpResult> {
 		if (await this.isEmailAlreadyUsed(email)) {
-			return new SignUpManager.SignUpResultError([SignUpErrorCode.EMAIL_ALREADY_EXISTS])
+			return new SignUpManager.SignUpResultError([SignUpErrorCode.EmailAlreadyExists])
 		}
 		const [identityId, personId] = await this.db.transaction(async wrapper => {
 			const identityId = await new CreateIdentityCommand(roles).execute(wrapper)

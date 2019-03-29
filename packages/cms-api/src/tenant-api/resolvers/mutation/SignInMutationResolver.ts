@@ -1,4 +1,4 @@
-import { MutationResolvers, SignInResponse } from '../../schema/types'
+import { MutationResolvers, MutationSignInArgs, SignInResponse } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import SignInManager from '../../model/service/SignInManager'
@@ -11,7 +11,7 @@ import Actions from '../../model/authorization/Actions'
 import { ForbiddenError } from 'apollo-server-koa'
 import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 
-export default class SignInMutationResolver implements MutationResolvers.Resolvers {
+export default class SignInMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly signInManager: SignInManager,
 		private readonly queryHandler: QueryHandler<KnexQueryable>
@@ -19,7 +19,7 @@ export default class SignInMutationResolver implements MutationResolvers.Resolve
 
 	async signIn(
 		parent: any,
-		args: MutationResolvers.SignInArgs,
+		args: MutationSignInArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<SignInResponse> {

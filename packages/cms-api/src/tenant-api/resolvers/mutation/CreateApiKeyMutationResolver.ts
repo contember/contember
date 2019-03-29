@@ -1,4 +1,4 @@
-import { CreateApiKeyResponse, MutationResolvers } from '../../schema/types'
+import { CreateApiKeyResponse, MutationCreateApiKeyArgs, MutationResolvers } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import Actions from '../../model/authorization/Actions'
@@ -6,12 +6,12 @@ import { ForbiddenError } from 'apollo-server-koa'
 import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import ApiKeyManager from '../../model/service/ApiKeyManager'
 
-export default class CreateApiKeyMutationResolver implements MutationResolvers.Resolvers {
+export default class CreateApiKeyMutationResolver implements MutationResolvers {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
 	async createApiKey(
 		parent: any,
-		{ projects, roles }: MutationResolvers.CreateApiKeyArgs,
+		{ projects, roles }: MutationCreateApiKeyArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<CreateApiKeyResponse> {

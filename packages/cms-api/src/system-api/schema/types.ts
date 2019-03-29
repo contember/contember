@@ -1,276 +1,282 @@
-/* tslint:disable */
-import { GraphQLResolveInfo } from 'graphql'
-
-export type Resolver<Result, Args = any> = (
-	parent: any,
-	args: Args,
-	context: any,
-	info: GraphQLResolveInfo
-) => Promise<Result> | Result
-
-export interface Event {
-	readonly id: string
-	readonly dependencies: ReadonlyArray<string>
-	readonly description: string
-	readonly allowed: boolean
-	readonly type?: EventType | null
+type Maybe<T> = T | null
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+	ID: string
+	String: string
+	Boolean: boolean
+	Int: number
+	Float: number
 }
 
-export interface Query {
-	readonly stages: ReadonlyArray<Stage>
-	readonly diff: DiffResponse
+export type CreateEvent = Event & {
+	readonly id: Scalars['String']
+	readonly dependencies: ReadonlyArray<Scalars['String']>
+	readonly type?: Maybe<EventType>
+	readonly description: Scalars['String']
+	readonly allowed: Scalars['Boolean']
+	readonly entity: Scalars['String']
+	readonly rowId: Scalars['String']
 }
 
-export interface Stage {
-	readonly id: string
-	readonly name: string
-	readonly slug: string
+export type DeleteEvent = Event & {
+	readonly id: Scalars['String']
+	readonly dependencies: ReadonlyArray<Scalars['String']>
+	readonly type?: Maybe<EventType>
+	readonly description: Scalars['String']
+	readonly allowed: Scalars['Boolean']
+	readonly entity: Scalars['String']
+	readonly rowId: Scalars['String']
 }
 
-export interface DiffResponse {
-	readonly ok: boolean
+export enum DiffErrorCode {
+	BaseNotFound = 'BASE_NOT_FOUND',
+	HeadNotFound = 'HEAD_NOT_FOUND',
+	NotRebased = 'NOT_REBASED',
+}
+
+export type DiffFilter = {
+	readonly entity: Scalars['String']
+	readonly id: Scalars['String']
+}
+
+export type DiffResponse = {
+	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<DiffErrorCode>
-	readonly result?: DiffResult | null
+	readonly result?: Maybe<DiffResult>
 }
 
-export interface DiffResult {
+export type DiffResult = {
 	readonly base: Stage
 	readonly head: Stage
 	readonly events: ReadonlyArray<Event>
 }
 
-export interface Mutation {
-	readonly release: ReleaseResponse
-}
-
-export interface ReleaseResponse {
-	readonly ok: boolean
-	readonly errors: ReadonlyArray<ReleaseErrorCode>
-}
-
-export interface UpdateEvent extends Event {
-	readonly id: string
-	readonly dependencies: ReadonlyArray<string>
-	readonly type?: EventType | null
-	readonly description: string
-	readonly allowed: boolean
-	readonly entity: string
-	readonly rowId: string
-	readonly fields: ReadonlyArray<string>
-}
-
-export interface DeleteEvent extends Event {
-	readonly id: string
-	readonly dependencies: ReadonlyArray<string>
-	readonly type?: EventType | null
-	readonly description: string
-	readonly allowed: boolean
-	readonly entity: string
-	readonly rowId: string
-}
-
-export interface CreateEvent extends Event {
-	readonly id: string
-	readonly dependencies: ReadonlyArray<string>
-	readonly type?: EventType | null
-	readonly description: string
-	readonly allowed: boolean
-	readonly entity: string
-	readonly rowId: string
-}
-
-export interface RunMigrationEvent extends Event {
-	readonly id: string
-	readonly dependencies: ReadonlyArray<string>
-	readonly type?: EventType | null
-	readonly description: string
-	readonly allowed: boolean
-	readonly version: string
-}
-
-export interface DiffFilter {
-	readonly entity: string
-	readonly id: string
-}
-export interface DiffQueryArgs {
-	baseStage: string
-	headStage: string
-	filter?: ReadonlyArray<DiffFilter> | null
-}
-export interface ReleaseMutationArgs {
-	baseStage: string
-	headStage: string
-	events: ReadonlyArray<string>
-}
-
-export enum DiffErrorCode {
-	BASE_NOT_FOUND = 'BASE_NOT_FOUND',
-	HEAD_NOT_FOUND = 'HEAD_NOT_FOUND',
-	NOT_REBASED = 'NOT_REBASED',
+export type Event = {
+	readonly id: Scalars['String']
+	readonly dependencies: ReadonlyArray<Scalars['String']>
+	readonly description: Scalars['String']
+	readonly allowed: Scalars['Boolean']
+	readonly type?: Maybe<EventType>
 }
 
 export enum EventType {
-	UPDATE = 'UPDATE',
-	DELETE = 'DELETE',
-	CREATE = 'CREATE',
-	RUN_MIGRATION = 'RUN_MIGRATION',
+	Update = 'UPDATE',
+	Delete = 'DELETE',
+	Create = 'CREATE',
+	RunMigration = 'RUN_MIGRATION',
+}
+
+export type Mutation = {
+	readonly release: ReleaseResponse
+}
+
+export type MutationReleaseArgs = {
+	baseStage: Scalars['String']
+	headStage: Scalars['String']
+	events: ReadonlyArray<Scalars['String']>
+}
+
+export type Query = {
+	readonly stages: ReadonlyArray<Stage>
+	readonly diff: DiffResponse
+}
+
+export type QueryDiffArgs = {
+	baseStage: Scalars['String']
+	headStage: Scalars['String']
+	filter?: Maybe<ReadonlyArray<DiffFilter>>
 }
 
 export enum ReleaseErrorCode {
-	MISSING_DEPENDENCY = 'MISSING_DEPENDENCY',
-	FORBIDDEN = 'FORBIDDEN',
+	MissingDependency = 'MISSING_DEPENDENCY',
+	Forbidden = 'FORBIDDEN',
 }
 
-export namespace QueryResolvers {
-	export interface Resolvers {
-		stages?: StagesResolver
-		diff?: DiffResolver
-	}
-
-	export type StagesResolver<R = ReadonlyArray<Stage>> = Resolver<R>
-	export type DiffResolver<R = DiffResponse> = Resolver<R, DiffArgs>
-	export interface DiffArgs {
-		baseStage: string
-		headStage: string
-		filter?: ReadonlyArray<DiffFilter> | null
-	}
+export type ReleaseResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<ReleaseErrorCode>
 }
 
-export namespace StageResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		name?: NameResolver
-		slug?: SlugResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type NameResolver<R = string> = Resolver<R>
-	export type SlugResolver<R = string> = Resolver<R>
+export type RunMigrationEvent = Event & {
+	readonly id: Scalars['String']
+	readonly dependencies: ReadonlyArray<Scalars['String']>
+	readonly type?: Maybe<EventType>
+	readonly description: Scalars['String']
+	readonly allowed: Scalars['Boolean']
+	readonly version: Scalars['String']
 }
 
-export namespace DiffResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-		result?: ResultResolver
-	}
-
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<DiffErrorCode>> = Resolver<R>
-	export type ResultResolver<R = DiffResult | null> = Resolver<R>
+export type Stage = {
+	readonly id: Scalars['String']
+	readonly name: Scalars['String']
+	readonly slug: Scalars['String']
 }
 
-export namespace DiffResultResolvers {
-	export interface Resolvers {
-		base?: BaseResolver
-		head?: HeadResolver
-		events?: EventsResolver
-	}
-
-	export type BaseResolver<R = Stage> = Resolver<R>
-	export type HeadResolver<R = Stage> = Resolver<R>
-	export type EventsResolver<R = ReadonlyArray<Event>> = Resolver<R>
+export type UpdateEvent = Event & {
+	readonly id: Scalars['String']
+	readonly dependencies: ReadonlyArray<Scalars['String']>
+	readonly type?: Maybe<EventType>
+	readonly description: Scalars['String']
+	readonly allowed: Scalars['Boolean']
+	readonly entity: Scalars['String']
+	readonly rowId: Scalars['String']
+	readonly fields: ReadonlyArray<Scalars['String']>
 }
 
-export namespace MutationResolvers {
-	export interface Resolvers {
-		release?: ReleaseResolver
-	}
+import { GraphQLResolveInfo } from 'graphql'
 
-	export type ReleaseResolver<R = ReleaseResponse> = Resolver<R, ReleaseArgs>
-	export interface ReleaseArgs {
-		baseStage: string
-		headStage: string
-		events: ReadonlyArray<string>
-	}
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => Promise<TResult> | TResult
+
+export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
+	fragment: string
+	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
 }
 
-export namespace ReleaseResponseResolvers {
-	export interface Resolvers {
-		ok?: OkResolver
-		errors?: ErrorsResolver
-	}
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+	| ResolverFn<TResult, TParent, TContext, TArgs>
+	| StitchingResolver<TResult, TParent, TContext, TArgs>
 
-	export type OkResolver<R = boolean> = Resolver<R>
-	export type ErrorsResolver<R = ReadonlyArray<ReleaseErrorCode>> = Resolver<R>
+export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => AsyncIterator<TResult> | Promise<AsyncIterator<TResult>>
+
+export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => TResult | Promise<TResult>
+
+export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
+	subscribe: SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs>
+	resolve?: SubscriptionResolveFn<TResult, TParent, TContext, TArgs>
 }
 
-export namespace UpdateEventResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		dependencies?: DependenciesResolver
-		type?: TypeResolver
-		description?: DescriptionResolver
-		allowed?: AllowedResolver
-		entity?: EntityResolver
-		rowId?: RowIdResolver
-		fields?: FieldsResolver
-	}
+export type SubscriptionResolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+	| ((...args: any[]) => SubscriptionResolverObject<TResult, TParent, TContext, TArgs>)
+	| SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
 
-	export type IdResolver<R = string> = Resolver<R>
-	export type DependenciesResolver<R = ReadonlyArray<string>> = Resolver<R>
-	export type TypeResolver<R = EventType | null> = Resolver<R>
-	export type DescriptionResolver<R = string> = Resolver<R>
-	export type AllowedResolver<R = boolean> = Resolver<R>
-	export type EntityResolver<R = string> = Resolver<R>
-	export type RowIdResolver<R = string> = Resolver<R>
-	export type FieldsResolver<R = ReadonlyArray<string>> = Resolver<R>
+export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
+	parent: TParent,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => Maybe<TTypes>
+
+export type NextResolverFn<T> = () => Promise<T>
+
+export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+	next: NextResolverFn<TResult>,
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo
+) => TResult | Promise<TResult>
+
+export type CreateEventResolvers<Context = any, ParentType = CreateEvent> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
+	type?: Resolver<Maybe<EventType>, ParentType, Context>
+	description?: Resolver<Scalars['String'], ParentType, Context>
+	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
+	entity?: Resolver<Scalars['String'], ParentType, Context>
+	rowId?: Resolver<Scalars['String'], ParentType, Context>
 }
 
-export namespace DeleteEventResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		dependencies?: DependenciesResolver
-		type?: TypeResolver
-		description?: DescriptionResolver
-		allowed?: AllowedResolver
-		entity?: EntityResolver
-		rowId?: RowIdResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type DependenciesResolver<R = ReadonlyArray<string>> = Resolver<R>
-	export type TypeResolver<R = EventType | null> = Resolver<R>
-	export type DescriptionResolver<R = string> = Resolver<R>
-	export type AllowedResolver<R = boolean> = Resolver<R>
-	export type EntityResolver<R = string> = Resolver<R>
-	export type RowIdResolver<R = string> = Resolver<R>
+export type DeleteEventResolvers<Context = any, ParentType = DeleteEvent> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
+	type?: Resolver<Maybe<EventType>, ParentType, Context>
+	description?: Resolver<Scalars['String'], ParentType, Context>
+	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
+	entity?: Resolver<Scalars['String'], ParentType, Context>
+	rowId?: Resolver<Scalars['String'], ParentType, Context>
 }
 
-export namespace CreateEventResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		dependencies?: DependenciesResolver
-		type?: TypeResolver
-		description?: DescriptionResolver
-		allowed?: AllowedResolver
-		entity?: EntityResolver
-		rowId?: RowIdResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type DependenciesResolver<R = ReadonlyArray<string>> = Resolver<R>
-	export type TypeResolver<R = EventType | null> = Resolver<R>
-	export type DescriptionResolver<R = string> = Resolver<R>
-	export type AllowedResolver<R = boolean> = Resolver<R>
-	export type EntityResolver<R = string> = Resolver<R>
-	export type RowIdResolver<R = string> = Resolver<R>
+export type DiffResponseResolvers<Context = any, ParentType = DiffResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<DiffErrorCode>, ParentType, Context>
+	result?: Resolver<Maybe<DiffResult>, ParentType, Context>
 }
 
-export namespace RunMigrationEventResolvers {
-	export interface Resolvers {
-		id?: IdResolver
-		dependencies?: DependenciesResolver
-		type?: TypeResolver
-		description?: DescriptionResolver
-		allowed?: AllowedResolver
-		version?: VersionResolver
-	}
-
-	export type IdResolver<R = string> = Resolver<R>
-	export type DependenciesResolver<R = ReadonlyArray<string>> = Resolver<R>
-	export type TypeResolver<R = EventType | null> = Resolver<R>
-	export type DescriptionResolver<R = string> = Resolver<R>
-	export type AllowedResolver<R = boolean> = Resolver<R>
-	export type VersionResolver<R = string> = Resolver<R>
+export type DiffResultResolvers<Context = any, ParentType = DiffResult> = {
+	base?: Resolver<Stage, ParentType, Context>
+	head?: Resolver<Stage, ParentType, Context>
+	events?: Resolver<ReadonlyArray<Event>, ParentType, Context>
 }
+
+export type EventResolvers<Context = any, ParentType = Event> = {
+	__resolveType: TypeResolveFn<'UpdateEvent' | 'DeleteEvent' | 'CreateEvent' | 'RunMigrationEvent', ParentType, Context>
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
+	description?: Resolver<Scalars['String'], ParentType, Context>
+	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
+	type?: Resolver<Maybe<EventType>, ParentType, Context>
+}
+
+export type MutationResolvers<Context = any, ParentType = Mutation> = {
+	release?: Resolver<ReleaseResponse, ParentType, Context, MutationReleaseArgs>
+}
+
+export type QueryResolvers<Context = any, ParentType = Query> = {
+	stages?: Resolver<ReadonlyArray<Stage>, ParentType, Context>
+	diff?: Resolver<DiffResponse, ParentType, Context, QueryDiffArgs>
+}
+
+export type ReleaseResponseResolvers<Context = any, ParentType = ReleaseResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<ReleaseErrorCode>, ParentType, Context>
+}
+
+export type RunMigrationEventResolvers<Context = any, ParentType = RunMigrationEvent> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
+	type?: Resolver<Maybe<EventType>, ParentType, Context>
+	description?: Resolver<Scalars['String'], ParentType, Context>
+	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
+	version?: Resolver<Scalars['String'], ParentType, Context>
+}
+
+export type StageResolvers<Context = any, ParentType = Stage> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	name?: Resolver<Scalars['String'], ParentType, Context>
+	slug?: Resolver<Scalars['String'], ParentType, Context>
+}
+
+export type UpdateEventResolvers<Context = any, ParentType = UpdateEvent> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
+	type?: Resolver<Maybe<EventType>, ParentType, Context>
+	description?: Resolver<Scalars['String'], ParentType, Context>
+	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
+	entity?: Resolver<Scalars['String'], ParentType, Context>
+	rowId?: Resolver<Scalars['String'], ParentType, Context>
+	fields?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
+}
+
+export type Resolvers<Context = any> = {
+	CreateEvent?: CreateEventResolvers<Context>
+	DeleteEvent?: DeleteEventResolvers<Context>
+	DiffResponse?: DiffResponseResolvers<Context>
+	DiffResult?: DiffResultResolvers<Context>
+	Event?: EventResolvers
+	Mutation?: MutationResolvers<Context>
+	Query?: QueryResolvers<Context>
+	ReleaseResponse?: ReleaseResponseResolvers<Context>
+	RunMigrationEvent?: RunMigrationEventResolvers<Context>
+	Stage?: StageResolvers<Context>
+	UpdateEvent?: UpdateEventResolvers<Context>
+}
+
+/**
+ * @deprecated
+ * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
+ */
+export type IResolvers<Context = any> = Resolvers<Context>

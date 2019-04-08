@@ -16,7 +16,7 @@ class CreateEventCommand {
 			.into('event')
 			.values({
 				id,
-				type: 'run_migration',
+				type: this.type,
 				data: this.data,
 				previous_id: this.previousId,
 			})

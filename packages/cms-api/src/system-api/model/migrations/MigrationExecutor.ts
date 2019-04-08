@@ -21,9 +21,9 @@ class MigrationExecutor {
 		stage: Stage,
 		migrations: Migration[],
 		progressCb: (version: string) => void
-	): Promise<void> {
+	): Promise<Stage> {
 		if (migrations.length === 0) {
-			return
+			return stage
 		}
 		let schema = await this.schemaVersionBuilder.buildSchemaUntil(migrations[0].version)
 		await db.raw('SET search_path TO ??', formatSchemaName(stage))
@@ -36,7 +36,7 @@ class MigrationExecutor {
 
 			for (let { modification, ...data } of modifications) {
 				const modificationHandler = this.modificationHandlerFactory.create(modification, data, schema)
-				modificationHandler.createSql(builder)
+				await modificationHandler.createSql(builder)
 				schema = modificationHandler.getSchemaUpdater()(schema)
 			}
 
@@ -53,6 +53,7 @@ class MigrationExecutor {
 		}
 
 		await new UpdateStageEventCommand(stage.id, previousId).execute(db)
+		return {...stage, event_id: previousId}
 	}
 }
 

@@ -44,8 +44,8 @@ class KnexDebugger {
 					elapsed: new Date().getTime() - q.startTime.getTime(),
 				}
 				this.subscribers.forEach(s => s(q2))
-				console.log(query.sql)
-				console.log(query.bindings)
+				// console.log(query.sql)
+				// console.log(query.bindings)
 			})
 			.on('query-error', (error: any, query: Query) => {
 				const uid = query.__knexQueryUid

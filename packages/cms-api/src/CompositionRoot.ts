@@ -49,7 +49,6 @@ import ContentApolloServerFactory from './http/ContentApolloServerFactory'
 import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
 import SchemaMigrator from './content-schema/differ/SchemaMigrator'
 import ModificationHandlerFactory from './system-api/model/migrations/modifications/ModificationHandlerFactory'
-import MigrationDiffCreator from './system-api/model/migrations/MigrationDiffCreator'
 import Application from './core/cli/Application'
 import EngineMigrationsCreateCommand from './cli/EngineMigrationsCreateCommand'
 import ProjectMigrationsDiffCommand from './cli/ProjectMigrationsDiffCommand'
@@ -59,15 +58,15 @@ import DropCommand from './cli/DropCommand'
 import StartCommand from './cli/StartCommand'
 import { CommandManager } from './core/cli/CommandManager'
 import { Schema } from 'cms-common'
-import ProjectInitializer from './system-api/ProjectInitializer'
+import SystemExecutionContainer from './system-api/SystemExecutionContainer'
 
 export type ProjectContainer = Container<{
 	project: Project
 	knexConnection: knex
+	systemKnexWrapper: KnexWrapper
 	systemApolloServerFactory: SystemApolloServerFactory
 	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
-	migrationDiffCreator: MigrationDiffCreator
-	projectIntializer: ProjectInitializer
+	systemExecutionContainerFactory: SystemExecutionContainer.Factory
 }>
 
 export interface MasterContainer
@@ -270,8 +269,8 @@ class CompositionRoot {
 			)
 
 			return projectContainer
-				.pick('project', 'knexConnection', 'contentApolloMiddlewareFactory')
-				.merge(systemContainer.pick('systemApolloServerFactory', 'projectIntializer', 'migrationDiffCreator'))
+				.pick('project', 'knexConnection', 'contentApolloMiddlewareFactory', 'systemKnexWrapper')
+				.merge(systemContainer.pick('systemApolloServerFactory', 'systemExecutionContainerFactory'))
 		})
 	}
 

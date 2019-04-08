@@ -22,7 +22,7 @@ class MigrationDiffCreator {
 			return null
 		}
 
-		const jsonDiff = JSON.stringify(diff, undefined, '\t')
+		const jsonDiff = JSON.stringify({ modifications: diff }, undefined, '\t')
 
 		return await this.migrationFilesManager.createFile(jsonDiff, migrationName, 'json')
 	}

@@ -3,7 +3,7 @@ import { ContentEvent, AnyEvent } from '../dtos/Event'
 import PredicateFactory from '../../../acl/PredicateFactory'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 import { formatSchemaName } from '../helpers/stageHelpers'
-import { ContentEvents, EventType } from '../EventType'
+import { ContentEvents, EventType, isContentEvent } from '../EventType'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
 import { Acl, Model } from 'cms-common'
 import WhereBuilder from '../../../content-api/sql/select/WhereBuilder'
@@ -62,7 +62,7 @@ class PermissionsVerifier {
 		const contentEvents: ContentEvent[] = []
 
 		for (const event of events) {
-			if (this.isContentEvent(event)) {
+			if (isContentEvent(event)) {
 				contentEvents.push(event)
 			} else {
 				// if there is migration, we cannot verify any further content event permissions
@@ -88,7 +88,7 @@ class PermissionsVerifier {
 		const permissionsResult: PermissionsVerifier.Result = {}
 
 		for (let event of events) {
-			if (this.isContentEvent(event)) {
+			if (isContentEvent(event)) {
 				const canRead = (readPermissions[event.tableName] || {})[event.rowId] || false
 				const canWrite = (writePermissions[event.tableName] || {})[event.rowId] || false
 
@@ -282,10 +282,6 @@ class PermissionsVerifier {
 
 	private formatPermissionColumn(columnName: string, operation: Acl.Operation) {
 		return `${columnName}_${operation}`
-	}
-
-	private isContentEvent(it: AnyEvent): it is ContentEvent {
-		return ContentEvents.includes(it.type as ContentEvent['type'])
 	}
 }
 

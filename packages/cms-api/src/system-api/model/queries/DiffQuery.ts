@@ -47,16 +47,16 @@ SELECT * FROM events ORDER BY index DESC
 			const data = event.data
 			switch (event.type) {
 				case EventType.create:
-					result.push(new CreateEvent(event.id, event.created_at, event.transaction_id, data.rowId, data.tableName, data.values))
+					result.push(new CreateEvent(event.id, event.created_at, event.identity_id, event.transaction_id, data.rowId, data.tableName, data.values))
 					break
 				case EventType.update:
-					result.push(new UpdateEvent(event.id, event.created_at, event.transaction_id, data.rowId, data.tableName, data.values))
+					result.push(new UpdateEvent(event.id, event.created_at, event.identity_id, event.transaction_id, data.rowId, data.tableName, data.values))
 					break
 				case EventType.delete:
-					result.push(new DeleteEvent(event.id, event.created_at, event.transaction_id, data.rowId, data.tableName))
+					result.push(new DeleteEvent(event.id, event.created_at, event.identity_id, event.transaction_id, data.rowId, data.tableName))
 					break
 				case EventType.runMigration:
-					result.push(new RunMigrationEvent(event.id, event.created_at, event.transaction_id, data.version))
+					result.push(new RunMigrationEvent(event.id, event.created_at, event.identity_id, event.transaction_id, data.version))
 					break
 
 				case EventType.init:

@@ -1,6 +1,6 @@
 import Project from '../../src/config/Project'
 import KnexWrapper from '../../src/core/knex/KnexWrapper'
-import CreateStageCommand from '../../src/system-api/model/commands/CreateStageCommand'
+import CreateOrUpdateStageCommand from '../../src/system-api/model/commands/CreateOrUpdateStageCommand'
 import MigrationFilesManager from '../../src/migrations/MigrationFilesManager'
 import knex from 'knex'
 import MigrationsRunner from '../../src/core/migrations/MigrationsRunner'
@@ -58,13 +58,16 @@ export class ApiTester {
 	}
 
 	public async createStage(stage: Project.Stage): Promise<void> {
-		await new CreateStageCommand(stage).execute(this.projectDb)
+		await new CreateOrUpdateStageCommand({
+			id: stage.uuid,
+			...stage,
+		}).execute(this.projectDb)
 		this.knownStages[stage.slug] = stage
 	}
 
 	public async migrateStage(slug: string, version: string): Promise<void> {
 		version = FileNameHelper.extractVersion(version)
-		const stageMigrator = this.systemContainer.stageMigrator
+		const stageMigrator = this.systemExecutionContainer.stageMigrator
 		const stage = this.getStage(slug)
 		await stageMigrator.migrate({ ...stage }, () => null, version)
 		this.knownStages[slug] = { ...stage, migration: version }
@@ -301,12 +304,11 @@ export class ApiTester {
 				new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
 			]),
 			schemaMigrator,
-			schemaVersionBuilder,
 			modificationHandlerFactory,
 			systemKnexWrapper: projectDb,
 		})
 
-		const systemExecutionContainer = systemContainer.executionContainerFactory.create(projectDb)
+		const systemExecutionContainer = systemContainer.systemExecutionContainerFactory.create(projectDb)
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,

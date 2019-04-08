@@ -43,7 +43,6 @@ class ReleaseExecutor {
 		const eventsSet = new Set(eventsToApply)
 		const events = allEvents.filter(it => eventsSet.has(it.id))
 
-
 		const permissions = this.permissionsVerifier.verify(permissionContext, sourceStage, targetStage, events)
 		if (Object.values(permissions).filter(it => !it).length) {
 			throw new Error() // todo

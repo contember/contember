@@ -1,20 +1,27 @@
 import CreateInitEventCommand from './model/commands/CreateInitEventCommand'
-import CreateStageCommand from './model/commands/CreateStageCommand'
 import { setupSystemVariables, unnamedIdentity } from './SystemVariablesSetupHelper'
 import Project from '../config/Project'
-import StageMigrator from './StageMigrator'
 import KnexWrapper from '../core/knex/KnexWrapper'
+import ProjectMigrator from './model/migrations/ProjectMigrator'
+import RebaseExecutor from './model/events/RebaseExecutor'
+import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
+import StageCreator from './model/stages/StageCreator'
+import StageTree from './model/stages/StageTree'
+import { StageWithoutEvent } from './model/dtos/Stage'
 
 class ProjectInitializer {
 	constructor(
 		private readonly projectDb: KnexWrapper,
 		private readonly project: Project,
-		private readonly stageMigrator: StageMigrator,
+		private readonly stageTree: StageTree,
+		private readonly projectMigrator: ProjectMigrator,
+		private readonly rebaseExecutor: RebaseExecutor,
+		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver,
+		private readonly stageCreator: StageCreator
 	) {
 	}
 
-	public async initialize()
-	{
+	public async initialize() {
 		await setupSystemVariables(this.projectDb, unnamedIdentity)
 		await this.createInitEvent()
 		await this.initStages()
@@ -28,37 +35,38 @@ class ProjectInitializer {
 	}
 
 	private async initStages() {
-		await Promise.all(
-			this.project.stages.map(async stage => {
-				await this.createStage(stage)
-				await this.runMigrationsForStage(stage)
-			})
-		)
-	}
-
-	private async createStage(stage: Project.Stage) {
-		await this.projectDb.transaction(async wrapper => {
-			await new CreateStageCommand(stage).execute(wrapper)
-			console.log(`Updated stage ${stage.slug} of project ${this.project.slug}`)
-		})
-	}
-
-	private async runMigrationsForStage(stage: Project.Stage) {
-		await setupSystemVariables(this.projectDb, unnamedIdentity)
-		try {
-			const result = await this.stageMigrator.migrate(stage, filename =>
-				console.log(`Executing migration ${filename} for project ${this.project.slug} (stage ${stage.slug})`)
-			)
-
-			if (result.count === 0) {
-				console.log(`No migrations to execute for project ${this.project.slug} (stage ${stage.slug})`)
+		const root = this.stageTree.getRoot()
+		const createStage = async (parent: StageWithoutEvent | null, stage: StageWithoutEvent) => {
+			const created = await this.stageCreator.createStage(parent, stage)
+			if (created) {
+				console.log(`Created stage ${stage.slug} of project ${this.project.slug}`)
+			} else {
+				console.log(`Updated stage ${stage.slug} of project ${this.project.slug}`)
 			}
-		} catch (e) {
-			if (e instanceof StageMigrator.MigrationError) {
-				e.message = `${this.project.name} - ${stage.name}: ${e.message}`
-			}
-			throw e
 		}
+		const createRecursive = async (parent: StageWithoutEvent | null, stage: StageWithoutEvent) => {
+			await createStage(parent, stage)
+			for (const childStage of this.stageTree.getChildren(stage)) {
+				await createRecursive(stage, childStage)
+			}
+		}
+		await createRecursive(null, root)
+
+		await this.runMigrations()
+	}
+
+	private async runMigrations() {
+		const { currentVersion, migrationsToExecute } = await this.projectMigrationInfoResolver.getMigrationsInfo()
+
+		if (migrationsToExecute.length === 0) {
+			console.log(`No migrations to execute for project ${this.project.slug}`)
+			return
+		}
+		await this.rebaseExecutor.rebaseAll()
+
+		await this.projectMigrator.migrate(currentVersion, migrationsToExecute, version =>
+			console.log(`Executing migration ${version} for project ${this.project.slug} `)
+		)
 	}
 }
 

@@ -24,12 +24,23 @@ import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
 import MigrationsResolver from '../content-schema/MigrationsResolver'
 import RebaseExecutor from './model/events/RebaseExecutor'
 import StageTree from './model/stages/StageTree'
+import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
+import MigrationDiffCreator from './model/migrations/MigrationDiffCreator'
+import ProjectInitializer from './ProjectInitializer'
+import StageMigrator from './StageMigrator'
+import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
+import ProjectMigrator from './model/migrations/ProjectMigrator'
+import SchemaDiffer from './model/migrations/SchemaDiffer'
+import StageCreator from './model/stages/StageCreator'
 
 interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
 	rebaseExecutor: RebaseExecutor
 	diffBuilder: DiffBuilder
+	migrationDiffCreator: MigrationDiffCreator
 	queryHandler: QueryHandler<KnexQueryable>
+	projectIntializer: ProjectInitializer
+	stageMigrator: StageMigrator
 }
 
 namespace SystemExecutionContainer {
@@ -40,23 +51,31 @@ namespace SystemExecutionContainer {
 			private readonly migrationFilesManager: MigrationFilesManager,
 			private readonly authorizator: Authorizator,
 			private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
-			private readonly schemaMigrator: SchemaMigrator,
-			private readonly migrationExecutor: MigrationExecutor,
+			private readonly modificationHandlerFactory: ModificationHandlerFactory,
 		) {
 		}
 
 		public create(db: KnexWrapper): SystemExecutionContainer {
 			return new Container.Builder({})
+				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
+				.addService('migrationsResolver', () => this.migrationsResolver)
+				.addService('modificationHandlerFactory', () => this.modificationHandlerFactory)
+				.addService('authorizator', () => this.authorizator)
+				.addService('permissionsByIdentityFactory', () => this.permissionsByIdentityFactory)
+
 				.addService('db', () => db)
 				.addService('queryHandler', ({ db }) => db.createQueryHandler())
+				.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
+				.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
 				.addService(
 					'schemaVersionBuilder',
-					({ queryHandler }) => new SchemaVersionBuilder(queryHandler, this.migrationsResolver, this.schemaMigrator)
+					({ queryHandler, schemaMigrator, migrationsResolver }) => new SchemaVersionBuilder(queryHandler, migrationsResolver, schemaMigrator)
 				)
-				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
+				.addService('migrationExecutor', ({ schemaVersionBuilder, modificationHandlerFactory }) =>
+					new MigrationExecutor(modificationHandlerFactory, schemaVersionBuilder)
+				)
 
 				.addService('tableReferencingResolver', () => new TableReferencingResolver())
-				.addService('authorizator', () => this.authorizator)
 				.addService(
 					'dependencyBuilder',
 					({ schemaVersionBuilder, tableReferencingResolver }) =>
@@ -70,8 +89,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'permissionVerifier',
-					({ schemaVersionBuilder, db, authorizator }) =>
-						new PermissionsVerifier(this.project, schemaVersionBuilder, db, this.permissionsByIdentityFactory, authorizator)
+					({ schemaVersionBuilder, db, authorizator, permissionsByIdentityFactory }) =>
+						new PermissionsVerifier(this.project, schemaVersionBuilder, db, permissionsByIdentityFactory, authorizator)
 				)
 				.addService(
 					'diffBuilder',
@@ -80,24 +99,38 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'eventApplier',
-					({ db }) =>
-						new EventApplier(db, this.migrationExecutor, this.migrationsResolver)
+					({ db, migrationExecutor, migrationsResolver }) =>
+						new EventApplier(db, migrationExecutor, migrationsResolver)
 				)
 				.addService('eventsRebaser', ({ db }) => new EventsRebaser(db))
 				.addService(
 					'releaseExecutor',
-					({ queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, db}) =>
+					({ queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, db }) =>
 						new ReleaseExecutor(queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, db)
 				)
 				.addService('stageTree', () =>
 					new StageTree.Factory().create(this.project)
 				)
 				.addService('rebaseExecutor',
-					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree}) =>
+					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree }) =>
 						new RebaseExecutor(queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree)
 				)
+				.addService('migrationDiffCreator', ({ schemaDiffer, migrationFilesManager, schemaVersionBuilder }) =>
+					new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer))
+
+				.addService('stageMigrator', ({ db, migrationExecutor, migrationsResolver }) =>
+					new StageMigrator(db, migrationsResolver, migrationExecutor))
+				.addService('projectMigrationInfoResolver', ({ queryHandler, migrationsResolver }) =>
+					new ProjectMigrationInfoResolver(this.project, migrationsResolver, queryHandler)
+				)
+				.addService('projectMigrator', ({ db, stageTree, migrationsResolver, schemaVersionBuilder, modificationHandlerFactory }) =>
+					new ProjectMigrator(db, stageTree, migrationsResolver, modificationHandlerFactory, schemaVersionBuilder)
+				)
+				.addService('stageCreator', ({ db, eventApplier }) => new StageCreator(db, eventApplier))
+				.addService('projectIntializer', ({ db, stageTree, projectMigrator, rebaseExecutor, projectMigrationInfoResolver, stageCreator }) =>
+					new ProjectInitializer(db, this.project, stageTree, projectMigrator, rebaseExecutor, projectMigrationInfoResolver, stageCreator))
 				.build()
-				.pick('queryHandler', 'releaseExecutor', 'diffBuilder', 'rebaseExecutor')
+				.pick('queryHandler', 'releaseExecutor', 'diffBuilder', 'rebaseExecutor', 'migrationDiffCreator', 'projectIntializer', 'stageMigrator')
 		}
 	}
 }

@@ -216,7 +216,7 @@ namespace InsertBuilder {
 		update = 'update',
 	}
 
-	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value }
+	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value | undefined }
 
 	export type ConflictAction =
 		| { type: ConflictActionType.doNothing; target?: ConflictTarget }

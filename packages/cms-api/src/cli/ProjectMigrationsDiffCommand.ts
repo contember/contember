@@ -28,7 +28,9 @@ class ProjectMigrationsDiffCommand extends Command<Args, {}> {
 		if (!projectContainer) {
 			throw new Error(`Undefined project ${projectName}`)
 		}
-		const migrationDiffCreator = projectContainer.migrationDiffCreator
+
+		const executionContainer = projectContainer.systemExecutionContainerFactory.create(projectContainer.systemKnexWrapper)
+		const migrationDiffCreator = executionContainer.migrationDiffCreator
 		const result = await migrationDiffCreator.createDiff(this.schemas[projectName], migrationName)
 
 		if (result === null) {

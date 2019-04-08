@@ -24,9 +24,13 @@ class InitCommand extends Command<{}, {}> {
 				const project = container.project
 				await new CreateProjectCommand(project).execute(this.tenantDb)
 				console.log(`Project ${project.slug} updated`)
+				await container.systemKnexWrapper.transaction(async trx => {
+					const executionContainer = container.systemExecutionContainerFactory.create(trx)
 
-				const init = container.projectIntializer
-				await init.initialize()
+					const init = executionContainer.projectIntializer
+					await init.initialize()
+				})
+
 			})
 		)
 	}

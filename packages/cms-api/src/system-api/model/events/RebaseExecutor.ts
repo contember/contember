@@ -23,6 +23,7 @@ class RebaseExecutor {
 	public async rebaseAll() {
 		const root = this.stageTree.getRoot()
 		const commonEvents = await this.queryHandler.fetch(new StageCommonEventsMatrixQuery())
+		console.log(commonEvents)
 		for (const stage of this.stageTree.getChildren(root)) {
 			await this.rebase(commonEvents, stage, root)
 		}

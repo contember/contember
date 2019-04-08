@@ -14,6 +14,7 @@ describe('system api - release', () => {
 			d: 'b - - - - - 8',
 			e: 'd - - - - - - 9',
 			f: 'a - - - - 10 11',
+			g: 'd - - - - -',
 		}
 		const tester = await ApiTester.create({
 			project: {

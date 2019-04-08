@@ -18,6 +18,7 @@ export class RunMigrationEvent implements Event {
 	constructor(
 		public readonly id: string,
 		public readonly createdAt: Date,
+		public readonly identityId: string,
 		public readonly transactionId: string,
 		public readonly version: string
 	) {}
@@ -29,6 +30,7 @@ export class UpdateEvent implements Event {
 	constructor(
 		public readonly id: string,
 		public readonly createdAt: Date,
+		public readonly identityId: string,
 		public readonly transactionId: string,
 		public readonly rowId: string,
 		public readonly tableName: string,
@@ -42,6 +44,7 @@ export class CreateEvent implements Event {
 	constructor(
 		public readonly id: string,
 		public readonly createdAt: Date,
+		public readonly identityId: string,
 		public readonly transactionId: string,
 		public readonly rowId: string,
 		public readonly tableName: string,
@@ -55,6 +58,7 @@ export class DeleteEvent implements Event {
 	constructor(
 		public readonly id: string,
 		public readonly createdAt: Date,
+		public readonly identityId: string,
 		public readonly transactionId: string,
 		public readonly rowId: string,
 		public readonly tableName: string

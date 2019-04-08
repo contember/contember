@@ -6,6 +6,8 @@ class EventsRebaser {
 	}
 
 	public async rebaseStageEvents(stageId: string, headEvent: string, oldBase: string, newBase: string, droppedEvents: string[]): Promise<string> {
+		console.log(oldBase)
+		console.log(headEvent)
 		const result: { rows: { old_id: string, new_id: string }[] } = await this.db.raw(
 			'SELECT * FROM system.rebase_events_unsafe(?::UUID, ?::UUID, ?::UUID, ?::UUID[]) AS t',
 			headEvent,

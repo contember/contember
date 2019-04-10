@@ -46,28 +46,15 @@ describe('system api - release', () => {
     }`)
 		expect(result.data.rebaseAll.ok).eq(true)
 
-		// const expected = {
-		// 	a: '  1 2 3 4 5',
-		// 	b: 'a - - - - - 6 7',
-		// 	c: 'b - - - - - - - ',
-		// 	d: 'b - - - - - - - 9',
-		// 	e: 'd - - - - - - - - 12',
-		// 	f: 'a - - - - - 10 11',
-		// }
+		await tester.verifySequence({
+			a: '  1 2 3 4 5',
+			b: 'a - - - - - 6 7',
+			c: 'b - - - - - - -',
+			d: 'b - - - - - - - 8',
+			e: 'd - - - - - - - - 9',
+			f: 'a - - - - - 10 11',
+			g: 'd - - - - - - - -',
+		}, 1)
 
-		const abDiff = await tester.diff('a', 'b')
-		expect(abDiff.events).length(2)
-
-		const bcDiff = await tester.diff('b', 'c')
-		expect(bcDiff.events).length(0)
-
-		const bdDiff = await tester.diff('b', 'd')
-		expect(bdDiff.events).length(1)
-
-		const deDiff = await tester.diff('d', 'e')
-		expect(deDiff.events).length(1)
-
-		const afDiff = await tester.diff('a', 'f')
-		expect(afDiff.events).length(2)
 	})
 })

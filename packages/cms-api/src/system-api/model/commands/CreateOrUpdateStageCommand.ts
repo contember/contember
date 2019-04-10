@@ -2,18 +2,14 @@ import KnexWrapper from '../../../core/knex/KnexWrapper'
 import InsertBuilder from '../../../core/knex/InsertBuilder'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import { StageWithoutEvent } from '../dtos/Stage'
+import InitEventQuery from '../queries/InitEventQuery'
 
 class CreateOrUpdateStageCommand {
 	constructor(private readonly stage: StageWithoutEvent) {
 	}
 
 	public async execute(connection: KnexWrapper): Promise<boolean> {
-		const initEvent = (await connection
-			.selectBuilder()
-			.from('event')
-			.select('id')
-			.where({ type: 'init' })
-			.getResult())[0]
+		const initEvent = await connection.createQueryHandler().fetch(new InitEventQuery())
 
 		const result = await connection
 			.insertBuilder()

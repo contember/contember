@@ -34,6 +34,12 @@ import ModificationHandlerFactory from '../../src/system-api/model/migrations/mo
 import FileNameHelper from '../../src/migrations/FileNameHelper'
 import EventSequence from './EventSequence'
 import { DiffResult } from '../../src/system-api/schema/types'
+import { AnyEvent, CreateEvent } from '../../src/system-api/model/dtos/Event'
+import InitEventQuery from '../../src/system-api/model/queries/InitEventQuery'
+import StageBySlugQuery from '../../src/system-api/model/queries/StageBySlugQuery'
+import DiffQuery from '../../src/system-api/model/queries/DiffQuery'
+import { expect } from 'chai'
+import { EventType } from '../../src/system-api/model/EventType'
 
 export class ApiTester {
 	public static project: Project = {
@@ -234,6 +240,45 @@ export class ApiTester {
 				case 'follow':
 					await this.releaseForward(sequence.stage, sequence.baseStage!, 1)
 					break
+			}
+		}
+	}
+
+	public async fetchEvents(stage: string): Promise<AnyEvent[]> {
+		const queryHandler = this.systemExecutionContainer.queryHandler
+		const initEvent = await queryHandler.fetch(new InitEventQuery())
+		const stageHead = (await queryHandler.fetch(new StageBySlugQuery(stage)))!.event_id
+
+		return await queryHandler.fetch(new DiffQuery(initEvent.id, stageHead))
+	}
+
+	public async verifySequence(sequences: EventSequence.StringSequenceSet, skip: number = 0): Promise<void> {
+		const sequenceSet = EventSequence.parseSet(sequences)
+
+		const events: Record<string, AnyEvent[]> = {}
+		for (const sequence of sequenceSet) {
+			events[sequence.stage] = (await this.fetchEvents(sequence.stage)).slice(skip)
+		}
+
+		for (const sequence of sequenceSet) {
+			for (const i in sequence.sequence) {
+				const sequenceItem = sequence.sequence[i]
+
+				const event = events[sequence.stage][i]
+				expect(event).not.undefined
+
+				switch (sequenceItem.type) {
+					case 'event':
+						expect(event.type).eq(EventType.create)
+						expect((event as CreateEvent).values).deep.eq({ number: sequenceItem.number })
+						break
+					case 'follow':
+						const baseEvent = events[sequence.baseStage!][i]
+						expect(baseEvent).not.undefined
+
+						expect(event.id).eq(baseEvent.id)
+						break
+				}
 			}
 		}
 	}

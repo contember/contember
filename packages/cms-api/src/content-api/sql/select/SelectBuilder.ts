@@ -84,7 +84,7 @@ export default class SelectBuilder {
 				field: field,
 				addData: async (fieldName, cb, defaultValue = null) => {
 					const columnName = getColumnName(this.schema, entity, fieldName)
-					const ids = await this.getColumnValues(path.for(fieldName), columnName)
+					const ids = (await this.getColumnValues(path.for(fieldName), columnName)).filter(it => it !== null)
 
 					const data = (async () => (ids.length > 0 ? cb(ids) : {}))()
 					this.hydrator.addPromise(fieldPath, path.for(fieldName), data, defaultValue)

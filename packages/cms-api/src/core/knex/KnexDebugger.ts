@@ -4,6 +4,7 @@ type Query = {
 	__knexQueryUid: string
 	sql: string
 	bindings: any
+	options: Record<string, any>
 }
 
 type Meta = { startTime: Date; elapsed?: number; error?: string }

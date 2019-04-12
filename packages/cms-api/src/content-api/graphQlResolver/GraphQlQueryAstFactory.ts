@@ -21,7 +21,7 @@ export default class GraphQlQueryAstFactory {
 			throw new Error(this.getValueType(parentType))
 		}
 
-		return this.createFromNode(info, parentType as GraphQLObjectType, node) as ObjectNode
+		return this.createFromNode(info, parentType as GraphQLObjectType, node, []) as ObjectNode
 	}
 
 	private mergeAllFieldNodes(fieldNodes: ReadonlyArray<GraphQlFieldNode>): GraphQlFieldNode {
@@ -53,7 +53,8 @@ export default class GraphQlQueryAstFactory {
 	private createFromNode(
 		info: GraphQLResolveInfo,
 		parentType: GraphQLObjectType,
-		node: GraphQlFieldNode
+		node: GraphQlFieldNode,
+		path: string[]
 	): ObjectNode | FieldNode {
 		const name = node.name.value
 		const alias = node.alias ? node.alias.value : name
@@ -64,26 +65,31 @@ export default class GraphQlQueryAstFactory {
 		const type = field.type
 		const resolvedType = this.resolveObjectType(type)
 
-		const fields: (FieldNode | ObjectNode)[] = this.processSelectionSet(info, resolvedType, node.selectionSet)
+		const fields: (FieldNode | ObjectNode)[] = this.processSelectionSet(info, resolvedType, node.selectionSet, [
+			...path,
+			alias,
+		])
 
 		return new ObjectNode(
 			name,
 			alias,
 			fields,
 			getArgumentValues(field, node, info.variableValues),
-			(field as any).meta || {}
+			(field as any).meta || {},
+			path
 		)
 	}
 
 	private processSelectionSet(
 		info: GraphQLResolveInfo,
 		parentType: GraphQLObjectType,
-		selectionSet: SelectionSetNode
+		selectionSet: SelectionSetNode,
+		path: string[]
 	): (FieldNode | ObjectNode)[] {
 		const fields: (FieldNode | ObjectNode)[] = []
 		for (let subNode of selectionSet.selections) {
 			if (isIt<GraphQlFieldNode>(subNode, 'kind', 'Field')) {
-				fields.push(this.createFromNode(info, parentType, subNode))
+				fields.push(this.createFromNode(info, parentType, subNode, path))
 			} else if (isIt<FragmentSpreadNode>(subNode, 'kind', 'FragmentSpread')) {
 				const fragmentDefinition = info.fragments[subNode.name.value]
 				if (!fragmentDefinition) {
@@ -94,7 +100,9 @@ export default class GraphQlQueryAstFactory {
 				if (!(subField instanceof GraphQLObjectType)) {
 					throw new Error()
 				}
-				fields.push(...this.processSelectionSet(info, subField as GraphQLObjectType, fragmentDefinition.selectionSet))
+				fields.push(
+					...this.processSelectionSet(info, subField as GraphQLObjectType, fragmentDefinition.selectionSet, path)
+				)
 			} else {
 				throw new Error('FragmentSpread and InlineFragment are not supported yet')
 			}

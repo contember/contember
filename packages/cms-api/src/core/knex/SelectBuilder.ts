@@ -25,6 +25,7 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 			select: [],
 			with: new With.Statement(wrapper, {}),
 			where: new Where.Statement(wrapper, []),
+			meta: {},
 		})
 	}
 
@@ -80,6 +81,10 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 		return this.withOption('limit', [limit, offset || 0])
 	}
 
+	public meta(key: string, value: any): SelectBuilder<Result, Filled | 'meta'> {
+		return this.withOption('meta', { ...this.options.meta, [key]: value })
+	}
+
 	public raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Knex.Raw {
 		return this.wrapper.raw(sql, ...bindings)
 	}
@@ -124,7 +129,7 @@ class SelectBuilder<Result = { [columnName: string]: any }[], Filled extends key
 		this.options.orderBy.forEach(([column, direction]) => qb.orderBy(column, direction))
 
 		const sql = qb.toSQL()
-		return this.wrapper.raw(sql.sql, ...sql.bindings)
+		return this.wrapper.raw(sql.sql, ...sql.bindings).options({ meta: this.options.meta })
 	}
 
 	private buildJoinArguments(
@@ -194,6 +199,7 @@ namespace SelectBuilder {
 				alias: string | undefined
 				condition: JoinCondition | undefined
 			})[]
+			meta: Record<string, any>
 		}
 
 	export type JoinCondition = (joinClause: ConditionBuilder) => void

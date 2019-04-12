@@ -51,7 +51,7 @@ describe('predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
 		)
-		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id', {})], {}, {})
+		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id', {})], {}, {}, [])
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
 		expect(result.args.filter).deep.eq({
@@ -73,7 +73,8 @@ describe('predicates injector', () => {
 			'PostLocale',
 			[new FieldNode('id', 'id', {}), new FieldNode('title', 'title', {})],
 			{},
-			{}
+			{},
+			[]
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
@@ -98,7 +99,8 @@ describe('predicates injector', () => {
 			{
 				filter: { id: { in: [1, 2] } },
 			},
-			{}
+			{},
+			[]
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
@@ -135,7 +137,8 @@ describe('predicates injector', () => {
 			{
 				filter: { title: { eq: 'abc' } },
 			},
-			{}
+			{},
+			[]
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 

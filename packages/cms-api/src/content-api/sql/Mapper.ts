@@ -96,7 +96,7 @@ class Mapper {
 		groupBy?: string
 	) {
 		const path = new Path([])
-		qb = qb.from(entity.tableName, path.getAlias())
+		qb = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(qb, hydrator)
 		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input), path, groupBy)

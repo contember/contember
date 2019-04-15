@@ -1,27 +1,27 @@
 import 'mocha'
 import { testUuid } from '../../../src/testUuid'
-import { ApiTester } from '../../../src/ApiTester'
+import ApiTester from '../../../src/ApiTester'
 import { GQL } from '../../../src/tags'
 import { expect } from 'chai'
 
 describe('system api - diff', () => {
 	it('returns filtered diff', async () => {
 		const tester = await ApiTester.create()
-		await tester.createStage({
+		await tester.stages.createStage({
 			uuid: testUuid(1),
 			name: 'Preview',
 			slug: 'preview',
 		})
 
-		await tester.createStage({
+		await tester.stages.createStage({
 			uuid: testUuid(2),
 			name: 'Prod',
 			slug: 'prod',
 		})
 
-		await tester.migrateStage('preview', '2019-02-01-163923-init')
+		await tester.stages.migrateStage('preview', '2019-02-01-163923-init')
 
-		const response = await tester.queryContent(
+		const response = await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
 				createAuthor(data: {name: "John Doe"}) {
@@ -30,7 +30,7 @@ describe('system api - diff', () => {
 			}`
 		)
 
-		await tester.queryContent(
+		await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
 				createAuthor(data: {name: "Jack Black"}) {
@@ -39,7 +39,7 @@ describe('system api - diff', () => {
 			}`
 		)
 
-		const diff = await tester.querySystem(GQL`query {
+		const diff = await tester.system.querySystem(GQL`query {
 			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}", filter: [{entity: "Author", id: "${
 			response.data.createAuthor.id
 		}"}]) {
@@ -62,22 +62,22 @@ describe('system api - diff', () => {
 
 	it('diff permissions - cannot write', async () => {
 		const tester = await ApiTester.create()
-		await tester.createStage({
+		await tester.stages.createStage({
 			uuid: testUuid(1),
 			name: 'Preview',
 			slug: 'preview',
 		})
 
-		await tester.createStage({
+		await tester.stages.createStage({
 			uuid: testUuid(2),
 			name: 'Prod',
 			slug: 'prod',
 		})
 
-		await tester.migrateStage('preview', '2019-02-01-163923-init')
-		await tester.releaseForward('prod', 'preview')
+		await tester.stages.migrateStage('preview', '2019-02-01-163923-init')
+		await tester.system.releaseForward('prod', 'preview')
 
-		await tester.queryContent(
+		await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
 				createAuthor(data: {name: "John Doe"}) {
@@ -86,7 +86,7 @@ describe('system api - diff', () => {
 			}`
 		)
 
-		const diff = await tester.querySystem(
+		const diff = await tester.system.querySystem(
 			GQL`query {
 			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}") {
 				result {

@@ -1,6 +1,6 @@
 import 'mocha'
 import { testUuid } from '../../../src/testUuid'
-import { ApiTester } from '../../../src/ApiTester'
+import ApiTester from '../../../src/ApiTester'
 import { GQL } from '../../../src/tags'
 import { expect } from 'chai'
 
@@ -8,21 +8,21 @@ describe('system api - release', () => {
 	it('executes release', async () => {
 		const tester = await ApiTester.create()
 
-		await tester.createStage({
+		await tester.stages.createStage({
 			uuid: testUuid(1),
 			name: 'Preview',
 			slug: 'preview',
 		})
 
-		await tester.createStage({
+		await tester.stages.createStage({
 			uuid: testUuid(2),
 			name: 'Prod',
 			slug: 'prod',
 		})
 
-		await tester.migrateStage('preview', '2019-02-01-163923-init')
+		await tester.stages.migrateStage('preview', '2019-02-01-163923-init')
 
-		await tester.queryContent(
+		await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
 				createAuthor(data: {name: "John Doe"}) {
@@ -31,7 +31,7 @@ describe('system api - release', () => {
 			}`
 		)
 
-		await tester.queryContent(
+		await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
 				createAuthor(data: {name: "Jack Black"}) {
@@ -40,7 +40,7 @@ describe('system api - release', () => {
 			}`
 		)
 
-		const diff = await tester.querySystem(GQL`query {
+		const diff = await tester.system.querySystem(GQL`query {
 			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}") {
 				result {
 					events {
@@ -59,7 +59,7 @@ describe('system api - release', () => {
 		expect(diff.data.diff.result.events[1].type).eq('CREATE')
 		expect(diff.data.diff.result.events[2].type).eq('CREATE')
 
-		const result = await tester.querySystem(
+		const result = await tester.system.querySystem(
 			GQL`mutation ($baseStage: String!, $headStage: String!, $events: [String!]!) {
 				release(baseStage: $baseStage, headStage: $headStage, events: $events) {
 					ok
@@ -74,9 +74,9 @@ describe('system api - release', () => {
 
 		expect(result.data.release.ok).eq(true)
 
-		await tester.refreshStagesVersion()
+		await tester.stages.refreshStagesVersion()
 
-		const authors = await tester.queryContent(
+		const authors = await tester.content.queryContent(
 			'prod',
 			GQL`query {
 				listAuthor {
@@ -91,7 +91,7 @@ describe('system api - release', () => {
 			},
 		})
 
-		const diff2 = await tester.diff(testUuid(2), testUuid(1))
+		const diff2 = await tester.system.diff(testUuid(2), testUuid(1))
 
 		expect(diff2.events).length(1)
 		expect(diff2.events[0].type).eq('CREATE')

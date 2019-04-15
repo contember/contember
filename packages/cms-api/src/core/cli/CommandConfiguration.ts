@@ -4,12 +4,10 @@ import InputParser from './InputParser'
 import UsageFormatter from './UsageFormatter'
 
 class CommandConfiguration {
-
 	private descriptionValue: string = ''
 
 	private arguments: Argument[] = []
 	private options: Option[] = []
-
 
 	public description(description: string) {
 		this.descriptionValue = description

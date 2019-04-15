@@ -17,24 +17,26 @@ class ContentApolloMiddlewareFactory {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly graphqlSchemaFactory: GraphQlSchemaFactory,
 		private readonly apolloServerFactory: ContentApolloServerFactory
-	) {
-	}
+	) {}
 
 	create(
 		stage: Project.Stage
-	): KoaMiddleware<AuthMiddlewareFactory.KoaState & ProjectMemberMiddlewareFactory.KoaState & TimerMiddlewareFactory.KoaState & ContentApolloMiddlewareFactory.KoaState> {
+	): KoaMiddleware<
+		AuthMiddlewareFactory.KoaState &
+			ProjectMemberMiddlewareFactory.KoaState &
+			TimerMiddlewareFactory.KoaState &
+			ContentApolloMiddlewareFactory.KoaState
+	> {
 		return async (ctx, next) => {
 			if (!this.schemaCache[stage.uuid]) {
 				this.schemaCache[stage.uuid] = await this.schemaVersionBuilder.buildSchemaForStage(stage.uuid)
 			}
 			const schema = this.schemaCache[stage.uuid]
 
-			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema,
-				{
-					projectRoles: ctx.state.projectRoles,
-					globalRoles: ctx.state.authResult.roles,
-				}
-			)
+			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
+				projectRoles: ctx.state.projectRoles,
+				globalRoles: ctx.state.authResult.roles,
+			})
 			ctx.state.schema = schema.model
 			ctx.state.permissions = permissions
 

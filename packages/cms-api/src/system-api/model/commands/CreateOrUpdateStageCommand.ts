@@ -5,8 +5,7 @@ import { StageWithoutEvent } from '../dtos/Stage'
 import InitEventQuery from '../queries/InitEventQuery'
 
 class CreateOrUpdateStageCommand {
-	constructor(private readonly stage: StageWithoutEvent) {
-	}
+	constructor(private readonly stage: StageWithoutEvent) {}
 
 	public async execute(connection: KnexWrapper): Promise<boolean> {
 		const initEvent = await connection.createQueryHandler().fetch(new InitEventQuery())

@@ -3,9 +3,9 @@ import { ContentEvent } from '../../dtos/Event'
 import { SchemaUpdater } from './schemaUpdateUtils'
 
 export interface Modification<Data> {
-	createSql(builder: MigrationBuilder): void | Promise<void>;
+	createSql(builder: MigrationBuilder): void | Promise<void>
 
-	getSchemaUpdater(): SchemaUpdater;
+	getSchemaUpdater(): SchemaUpdater
 
 	transformEvents(events: ContentEvent[]): ContentEvent[] | Promise<ContentEvent[]>
 }

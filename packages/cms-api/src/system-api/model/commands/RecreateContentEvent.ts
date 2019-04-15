@@ -5,13 +5,11 @@ import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
 
 class RecreateContentEvent {
-
 	constructor(
 		private readonly event: ContentEvent,
 		private readonly previousId: string,
-		private readonly transactionContext: RecreateContentEvent.TransactionContext,
-	) {
-	}
+		private readonly transactionContext: RecreateContentEvent.TransactionContext
+	) {}
 
 	public async execute(db: KnexWrapper) {
 		const id = uuid()

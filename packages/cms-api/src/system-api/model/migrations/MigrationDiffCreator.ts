@@ -7,10 +7,8 @@ class MigrationDiffCreator {
 	constructor(
 		private readonly migrationFilesManager: MigrationFilesManager,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly schemaDiffer: SchemaDiffer,
-	) {
-
-	}
+		private readonly schemaDiffer: SchemaDiffer
+	) {}
 
 	async createDiff(newSchema: Schema, migrationName: string): Promise<string | null> {
 		await this.migrationFilesManager.createDirIfNotExist()
@@ -27,6 +25,5 @@ class MigrationDiffCreator {
 		return await this.migrationFilesManager.createFile(jsonDiff, migrationName, 'json')
 	}
 }
-
 
 export default MigrationDiffCreator

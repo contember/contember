@@ -13,12 +13,10 @@ class MigrationsResolver {
 	}
 
 	private async createMigrations(): Promise<Migration[]> {
-		return (await this.migrationFilesManager.readFiles('json'))
-			.map(({ version, content }) => ({
-				version,
-				...JSON.parse(content),
-			}))
-
+		return (await this.migrationFilesManager.readFiles('json')).map(({ version, content }) => ({
+			version,
+			...JSON.parse(content),
+		}))
 	}
 }
 

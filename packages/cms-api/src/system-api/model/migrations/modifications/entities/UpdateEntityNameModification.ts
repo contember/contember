@@ -5,31 +5,24 @@ import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 
 class UpdateEntityNameModification implements Modification<UpdateEntityNameModification.Data> {
-	constructor(
-		private readonly data: UpdateEntityNameModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: UpdateEntityNameModification.Data, private readonly schema: Schema) {}
 
-	public createSql(builder: MigrationBuilder): void {
-	}
+	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(
-			model => {
-				const { [this.data.entityName]: renamed, ...entities } = model.entities
-				return ({
-					...model,
-					entities: {
-						...entities,
-						[this.data.newEntityName]: {
-							...renamed,
-							name: this.data.newEntityName
-						}
-					}
-				})
-			},
-		)
+		return updateModel(model => {
+			const { [this.data.entityName]: renamed, ...entities } = model.entities
+			return {
+				...model,
+				entities: {
+					...entities,
+					[this.data.newEntityName]: {
+						...renamed,
+						name: this.data.newEntityName,
+					},
+				},
+			}
+		})
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
@@ -38,7 +31,6 @@ class UpdateEntityNameModification implements Modification<UpdateEntityNameModif
 }
 
 namespace UpdateEntityNameModification {
-
 	export const id = 'updateEntityName'
 
 	export interface Data {

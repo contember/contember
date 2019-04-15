@@ -12,9 +12,8 @@ class ResolverFactory {
 		private readonly stagesQueryResolver: StagesQueryResolver,
 		private readonly diffQueryResolver: DiffQueryResolver,
 		private readonly releaseMutationResolver: ReleaseMutationResolver,
-		private readonly rebaseMutationResolver: RebeaseAllMutationResolver,
-	) {
-	}
+		private readonly rebaseMutationResolver: RebeaseAllMutationResolver
+	) {}
 
 	create(): Resolvers {
 		return {

@@ -5,26 +5,20 @@ import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 
 class RemoveEntityModification implements Modification<RemoveEntityModification.Data> {
-	constructor(
-		private readonly data: RemoveEntityModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: RemoveEntityModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		builder.dropTable(this.schema.model.entities[this.data.entityName].tableName)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(
-			model => {
-				const { [this.data.entityName]: removed, ...entities } = model.entities
-				return ({
-					...model,
-					entities: { ...entities }
-				})
-			},
-		)
+		return updateModel(model => {
+			const { [this.data.entityName]: removed, ...entities } = model.entities
+			return {
+				...model,
+				entities: { ...entities },
+			}
+		})
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
@@ -36,7 +30,6 @@ class RemoveEntityModification implements Modification<RemoveEntityModification.
 }
 
 namespace RemoveEntityModification {
-
 	export const id = 'removeEntity'
 
 	export interface Data {

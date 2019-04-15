@@ -2,9 +2,13 @@ import { Acl, Model } from 'cms-common'
 
 export default class AllowAllPermissionFactory {
 	constructor(
-		private readonly operations: Acl.Operation[] = [Acl.Operation.read, Acl.Operation.update, Acl.Operation.delete, Acl.Operation.create]
-	) {
-	}
+		private readonly operations: Acl.Operation[] = [
+			Acl.Operation.read,
+			Acl.Operation.update,
+			Acl.Operation.delete,
+			Acl.Operation.create,
+		]
+	) {}
 
 	create(schema: Pick<Model.Schema, 'entities'>): Acl.Permissions {
 		const permissions: Acl.Permissions = {}

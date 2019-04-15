@@ -21,10 +21,9 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 		if (!baseStage || !headStage) {
 			return {
 				ok: false,
-				errors: [
-					!baseStage ? DiffErrorCode.BaseNotFound : null,
-					!headStage ? DiffErrorCode.HeadNotFound : null,
-				].filter((it): it is DiffErrorCode => !!it),
+				errors: [!baseStage ? DiffErrorCode.BaseNotFound : null, !headStage ? DiffErrorCode.HeadNotFound : null].filter(
+					(it): it is DiffErrorCode => !!it
+				),
 			}
 		}
 

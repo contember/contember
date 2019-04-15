@@ -7,11 +7,7 @@ import { EventType } from '../../../EventType'
 import { NoDataError, resolveDefaultValue } from '../../../../../content-schema/dataUtils'
 
 class CreateColumnModification implements Modification<CreateColumnModification.Data> {
-	constructor(
-		private readonly data: CreateColumnModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: CreateColumnModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -25,9 +21,7 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(
-			updateEntity(this.data.entityName, addField(this.data.field))
-		)
+		return updateModel(updateEntity(this.data.entityName, addField(this.data.field)))
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
@@ -55,7 +49,6 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 }
 
 namespace CreateColumnModification {
-
 	export const id = 'createColumn'
 
 	export interface Data {

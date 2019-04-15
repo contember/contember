@@ -6,11 +6,7 @@ import { EventType } from '../../../EventType'
 import { Modification } from '../Modification'
 
 class UpdateColumnNameModification implements Modification<UpdateColumnNameModification.Data> {
-	constructor(
-		private readonly data: UpdateColumnNameModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: UpdateColumnNameModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -20,10 +16,9 @@ class UpdateColumnNameModification implements Modification<UpdateColumnNameModif
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
-			updateEntity(this.data.entityName,
-				updateField(this.data.fieldName,
-					field => ({ ...field, columnName: this.data.columnName })
-				)
+			updateEntity(
+				this.data.entityName,
+				updateField(this.data.fieldName, field => ({ ...field, columnName: this.data.columnName }))
 			)
 		)
 	}
@@ -34,9 +29,11 @@ class UpdateColumnNameModification implements Modification<UpdateColumnNameModif
 		const oldColumnName = (entity.fields[this.data.fieldName] as Model.AnyColumn).columnName
 		const newColumnName = this.data.columnName
 		return events.map(it => {
-			if (it.tableName !== tableName
-				|| (it.type !== EventType.create && it.type !== EventType.update)
-				|| !it.values.hasOwnProperty(oldColumnName)) {
+			if (
+				it.tableName !== tableName ||
+				(it.type !== EventType.create && it.type !== EventType.update) ||
+				!it.values.hasOwnProperty(oldColumnName)
+			) {
 				return it
 			}
 
@@ -47,7 +44,6 @@ class UpdateColumnNameModification implements Modification<UpdateColumnNameModif
 }
 
 namespace UpdateColumnNameModification {
-
 	export const id = 'updateColumnName'
 
 	export interface Data {

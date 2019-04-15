@@ -5,14 +5,12 @@ import LatestMigrationByStageQuery from './model/queries/LatestMigrationByStageQ
 import MigrationExecutor from './model/migrations/MigrationExecutor'
 import MigrationsResolver from '../content-schema/MigrationsResolver'
 
-
 class StageMigrator {
 	constructor(
 		private readonly db: KnexWrapper,
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly migrationExecutor: MigrationExecutor,
-	) {
-	}
+		private readonly migrationExecutor: MigrationExecutor
+	) {}
 
 	public async migrate(
 		stage: Project.Stage,
@@ -32,14 +30,18 @@ class StageMigrator {
 				)
 			}
 
-			const migrations = (await this.migrationsResolver.getMigrations())
-				.filter(({ version }) => (currentVersion === null || version >= currentVersion) && (!targetVersion || version <= targetVersion))
+			const migrations = (await this.migrationsResolver.getMigrations()).filter(
+				({ version }) =>
+					(currentVersion === null || version >= currentVersion) && (!targetVersion || version <= targetVersion)
+			)
 
 			if (targetVersion && !migrations.find(({ version }) => version === targetVersion)) {
 				throw new StageMigrator.MigrationError(`Target migration ${targetVersion} does not exist`)
 			}
 
-			const migrationsToExecute = migrations.filter(({ version }) => currentVersion === null || version > currentVersion)
+			const migrationsToExecute = migrations.filter(
+				({ version }) => currentVersion === null || version > currentVersion
+			)
 
 			await this.migrationExecutor.execute(trx, currentStageRow, migrationsToExecute, progressCb)
 
@@ -51,8 +53,7 @@ class StageMigrator {
 namespace StageMigrator {
 	export type Result = { count: number }
 
-	export class MigrationError extends Error {
-	}
+	export class MigrationError extends Error {}
 }
 
 export default StageMigrator

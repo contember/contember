@@ -6,11 +6,7 @@ import { Modification } from '../Modification'
 import { createEventTrigger } from '../sqlUpdateUtils'
 
 class CreateEntityModification implements Modification<CreateEntityModification.Data> {
-	constructor(
-		private readonly data: CreateEntityModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: CreateEntityModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
@@ -26,15 +22,13 @@ class CreateEntityModification implements Modification<CreateEntityModification.
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(
-			model => ({
-				...model,
-				entities: {
-					...model.entities,
-					[this.data.entity.name]: this.data.entity,
-				}
-			})
-		)
+		return updateModel(model => ({
+			...model,
+			entities: {
+				...model.entities,
+				[this.data.entity.name]: this.data.entity,
+			},
+		}))
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
@@ -43,7 +37,6 @@ class CreateEntityModification implements Modification<CreateEntityModification.
 }
 
 namespace CreateEntityModification {
-
 	export const id = 'createEntity'
 
 	export interface Data {

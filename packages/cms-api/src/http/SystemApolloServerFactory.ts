@@ -39,15 +39,16 @@ class SystemApolloServerFactory {
 			context: ({
 				ctx,
 			}: {
-				ctx: KoaContext<DatabaseTransactionMiddlewareFactory.KoaState
-					& AuthMiddlewareFactory.KoaState
-					& ProjectMemberMiddlewareFactory.KoaState
-					& ProjectResolveMiddlewareFactory.KoaState
+				ctx: KoaContext<
+					DatabaseTransactionMiddlewareFactory.KoaState &
+						AuthMiddlewareFactory.KoaState &
+						ProjectMemberMiddlewareFactory.KoaState &
+						ProjectResolveMiddlewareFactory.KoaState
 				>
 			}): ResolverContext => {
 				return new ResolverContext(
 					new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {
-						[ctx.state.projectContainer.project.uuid]: ctx.state.projectRoles
+						[ctx.state.projectContainer.project.uuid]: ctx.state.projectRoles,
 					}),
 					ctx.state.projectVariables,
 					this.authorizator,

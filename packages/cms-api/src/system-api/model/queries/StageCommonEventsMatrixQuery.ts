@@ -8,12 +8,12 @@ class StageCommonEventsMatrixQuery extends KnexQuery<StageCommonEventsMatrixQuer
 
 	async fetch(queryable: KnexQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
 		const rows: {
-			stage_a_id: string,
-			stage_b_id: string,
-			stage_a_event_id: string,
-			stage_b_event_id: string,
-			common_event_id: string,
-			distance: number,
+			stage_a_id: string
+			stage_b_id: string
+			stage_a_event_id: string
+			stage_b_event_id: string
+			common_event_id: string
+			distance: number
 		}[] = (await queryable.createWrapper().raw(
 			`WITH RECURSIVE events(id, previous_id, index, stage) AS (
   SELECT event.id, previous_id, 0, stage.id
@@ -39,7 +39,8 @@ class StageCommonEventsMatrixQuery extends KnexQuery<StageCommonEventsMatrixQuer
 SELECT stage_a_id, stage_a_event_id, stage_b_id, stage_b_event_id, distance, common_event_id
 FROM matrix
 WHERE num = 1
-`)).rows
+`
+		)).rows
 		const result: StageCommonEventsMatrixQuery.Result = {}
 		for (const row of rows) {
 			result[row.stage_a_id] = result[row.stage_a_id] || {}

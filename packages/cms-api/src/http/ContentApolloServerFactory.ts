@@ -18,8 +18,7 @@ class ContentApolloServerFactory {
 		max: 100,
 	})
 
-	constructor(private readonly knexDebugger: KnexDebugger) {
-	}
+	constructor(private readonly knexDebugger: KnexDebugger) {}
 
 	public create(dataSchema: GraphQLSchema): ApolloServer {
 		const server = this.cache.get(dataSchema)
@@ -50,19 +49,22 @@ class ContentApolloServerFactory {
 			schema: dataSchema,
 			uploads: false,
 			context: async ({
-				                ctx,
-			                }: {
+				ctx,
+			}: {
 				ctx: KoaContext<
 					ProjectMemberMiddlewareFactory.KoaState &
-					DatabaseTransactionMiddlewareFactory.KoaState &
-					ContentApolloMiddlewareFactory.KoaState &
-					TimerMiddlewareFactory.KoaState>
+						DatabaseTransactionMiddlewareFactory.KoaState &
+						ContentApolloMiddlewareFactory.KoaState &
+						TimerMiddlewareFactory.KoaState
+				>
 			}): Promise<Context> => {
 				const partialContext = {
 					db: ctx.state.db,
 					identityVariables: ctx.state.projectVariables,
 				}
-				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions).create(partialContext)
+				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions).create(
+					partialContext
+				)
 				return {
 					...partialContext,
 					executionContainer,

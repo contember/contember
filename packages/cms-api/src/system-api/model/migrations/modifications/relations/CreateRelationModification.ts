@@ -13,11 +13,7 @@ const getPrimaryType = (entity: Model.Entity): string => {
 }
 
 class CreateRelationModification implements Modification<CreateRelationModification.Data> {
-	constructor(
-		private readonly data: CreateRelationModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: CreateRelationModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -47,8 +43,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				})
 				builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 			},
-			visitOneHasMany: () => {
-			},
+			visitOneHasMany: () => {},
 			visitOneHasOneOwner: ({}, relation, {}, _) => {
 				builder.addColumn(entity.tableName, {
 					[relation.joiningColumn.columnName]: {
@@ -73,8 +68,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					deferred: false,
 				})
 			},
-			visitOneHasOneInversed: () => {
-			},
+			visitOneHasOneInversed: () => {},
 			visitManyHasManyOwner: ({}, relation, {}, _) => {
 				builder.createTable(
 					relation.joiningTable.tableName,
@@ -108,17 +102,16 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				)
 				createEventTrigger(builder, relation.joiningTable.tableName)
 			},
-			visitManyHasManyInversed: () => {
-			},
+			visitManyHasManyInversed: () => {},
 		})
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
 			updateEntity(this.data.entityName, addField(this.data.owningSide)),
-			this.data.inverseSide !== undefined ?
-				updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
-				: undefined,
+			this.data.inverseSide !== undefined
+				? updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
+				: undefined
 		)
 	}
 
@@ -128,7 +121,6 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 }
 
 namespace CreateRelationModification {
-
 	export const id = 'createRelation'
 
 	export interface Data {

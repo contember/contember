@@ -17,9 +17,8 @@ class ReleaseExecutor {
 		private readonly permissionsVerifier: PermissionsVerifier,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
-		private readonly db: KnexWrapper,
-	) {
-	}
+		private readonly db: KnexWrapper
+	) {}
 
 	public async execute(
 		permissionContext: PermissionsVerifier.Context,
@@ -56,7 +55,13 @@ class ReleaseExecutor {
 		if (this.isFastForward(eventsToApply, allEvents.map(it => it.id))) {
 			await new UpdateStageEventCommand(targetStage.id, eventsToApply[eventsToApply.length - 1]).execute(this.db)
 		} else {
-			await this.eventsRebaser.rebaseStageEvents(sourceStage.id, sourceStage.event_id, targetStage.event_id, newBase.event_id, eventsToApply)
+			await this.eventsRebaser.rebaseStageEvents(
+				sourceStage.id,
+				sourceStage.event_id,
+				targetStage.event_id,
+				newBase.event_id,
+				eventsToApply
+			)
 		}
 	}
 

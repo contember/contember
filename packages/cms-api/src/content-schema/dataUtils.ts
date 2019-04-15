@@ -1,4 +1,4 @@
-import {Model} from 'cms-common'
+import { Model } from 'cms-common'
 export const resolveDefaultValue = (column: Model.AnyColumn, now: Date) => {
 	switch (column.type) {
 		case Model.ColumnType.String:
@@ -19,10 +19,8 @@ export const resolveDefaultValue = (column: Model.AnyColumn, now: Date) => {
 		case Model.ColumnType.Uuid:
 			break
 		default:
-			;((x: never) => {
-		})(column)
+			;((x: never) => {})(column)
 	}
-
 
 	if (column.nullable) {
 		return null
@@ -31,6 +29,4 @@ export const resolveDefaultValue = (column: Model.AnyColumn, now: Date) => {
 	throw new NoDataError(`No data for column ${column.name}`)
 }
 
-export class NoDataError extends Error {
-
-}
+export class NoDataError extends Error {}

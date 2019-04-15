@@ -5,11 +5,7 @@ import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 
 class RemoveUniqueConstraintModification implements Modification<RemoveUniqueConstraintModification.Data> {
-	constructor(
-		private readonly data: RemoveUniqueConstraintModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: RemoveUniqueConstraintModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -22,7 +18,7 @@ class RemoveUniqueConstraintModification implements Modification<RemoveUniqueCon
 				const { [this.data.constraintName]: removed, ...unique } = entity.unique
 				return {
 					...entity,
-					unique
+					unique,
 				}
 			})
 		)
@@ -34,7 +30,6 @@ class RemoveUniqueConstraintModification implements Modification<RemoveUniqueCon
 }
 
 namespace RemoveUniqueConstraintModification {
-
 	export const id = 'removeUniqueConstraint'
 
 	export interface Data {

@@ -18,8 +18,7 @@ class ProjectInitializer {
 		private readonly rebaseExecutor: RebaseExecutor,
 		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver,
 		private readonly stageCreator: StageCreator
-	) {
-	}
+	) {}
 
 	public async initialize() {
 		await setupSystemVariables(this.projectDb, unnamedIdentity)

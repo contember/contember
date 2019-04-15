@@ -3,8 +3,7 @@ import ModificationHandlerFactory from '../../system-api/model/migrations/modifi
 import Migration from '../../system-api/model/migrations/Migration'
 
 export default class SchemaMigrator {
-	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {
-	}
+	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {}
 
 	public applyDiff(schema: Schema, diff: Migration.Modification[]): Schema {
 		for (const modification of diff) {

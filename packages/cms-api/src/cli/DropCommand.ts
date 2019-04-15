@@ -14,7 +14,6 @@ class DropCommand extends Command<{}, {}> {
 	}
 
 	protected async execute(): Promise<void> {
-
 		const queries = []
 
 		queries.push(this.clear(this.config.tenant.db, ['tenant']))

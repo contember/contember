@@ -8,13 +8,9 @@ import deepEqual = require('fast-deep-equal')
 import { isIt } from '../../../utils/type'
 
 class SchemaDiffer {
-
-	constructor(private readonly schemaMigrator: SchemaMigrator) {
-
-	}
+	constructor(private readonly schemaMigrator: SchemaMigrator) {}
 
 	diffSchemas(originalSchema: Schema, updatedSchema: Schema): Migration.Modification[] {
-
 		const builder = new ModificationBuilder(updatedSchema)
 
 		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
@@ -142,7 +138,12 @@ class SchemaDiffer {
 								builder.createField(updatedEntity, fieldName)
 							},
 							visitRelation: ({}, originalRelation: Model.AnyRelation, {}, _) => {
-								if (deepEqual({...updatedRelation, inversedBy: undefined}, {...originalRelation, inversedBy: undefined})) {
+								if (
+									deepEqual(
+										{ ...updatedRelation, inversedBy: undefined },
+										{ ...originalRelation, inversedBy: undefined }
+									)
+								) {
 									return
 								}
 								const partialUpdateResult = tryPartialUpdate(updatedRelation, originalRelation)
@@ -208,7 +209,6 @@ class SchemaDiffer {
 
 		return diff
 	}
-
 }
 
 export default SchemaDiffer

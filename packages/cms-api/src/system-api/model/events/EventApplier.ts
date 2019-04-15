@@ -12,9 +12,8 @@ class EventApplier {
 	constructor(
 		private readonly db: KnexWrapper,
 		private readonly migrationExecutor: MigrationExecutor,
-		private readonly migrationResolver: MigrationsResolver,
-	) {
-	}
+		private readonly migrationResolver: MigrationsResolver
+	) {}
 
 	public async applyEvents(stage: Stage, events: AnyEvent[]): Promise<void> {
 		let trxId: string | null = null

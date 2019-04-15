@@ -6,7 +6,6 @@ import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import Actions from '../../model/authorization/Actions'
 
 export default class RebeaseAllMutationResolver implements MutationResolver<'rebaseAll'> {
-
 	async rebaseAll(
 		parent: any,
 		args: any,

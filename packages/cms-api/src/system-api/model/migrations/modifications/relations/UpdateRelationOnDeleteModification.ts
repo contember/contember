@@ -5,22 +5,20 @@ import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schema
 import { Modification } from '../Modification'
 
 class UpdateRelationOnDeleteModification implements Modification<UpdateRelationOnDeleteModification.Data> {
-	constructor(
-		private readonly data: UpdateRelationOnDeleteModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: UpdateRelationOnDeleteModification.Data, private readonly schema: Schema) {}
 
-	public createSql(builder: MigrationBuilder): void {
-	}
+	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		const { entityName, fieldName, onDelete } = this.data
 		return updateModel(
-			updateEntity(entityName, updateField<Model.AnyRelation & Model.JoiningColumnRelation>(fieldName, field => ({
-				...field,
-				joiningColumn: { ...field.joiningColumn, onDelete }
-			}))),
+			updateEntity(
+				entityName,
+				updateField<Model.AnyRelation & Model.JoiningColumnRelation>(fieldName, field => ({
+					...field,
+					joiningColumn: { ...field.joiningColumn, onDelete },
+				}))
+			)
 		)
 	}
 
@@ -30,7 +28,6 @@ class UpdateRelationOnDeleteModification implements Modification<UpdateRelationO
 }
 
 namespace UpdateRelationOnDeleteModification {
-
 	export const id = 'updateRelationOnDelete'
 
 	export interface Data {

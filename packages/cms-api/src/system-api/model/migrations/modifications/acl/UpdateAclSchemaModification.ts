@@ -5,13 +5,9 @@ import { SchemaUpdater } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 
 class UpdateAclSchemaModification implements Modification<UpdateAclSchemaModification.Data> {
-	constructor(
-		private readonly data: UpdateAclSchemaModification.Data,
-	) {
-	}
+	constructor(private readonly data: UpdateAclSchemaModification.Data) {}
 
-	public createSql(builder: MigrationBuilder): void {
-	}
+	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return schema => ({
@@ -26,7 +22,6 @@ class UpdateAclSchemaModification implements Modification<UpdateAclSchemaModific
 }
 
 namespace UpdateAclSchemaModification {
-
 	export const id = 'updateAclSchema'
 
 	export interface Data {

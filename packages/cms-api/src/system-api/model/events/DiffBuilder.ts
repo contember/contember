@@ -60,7 +60,9 @@ namespace DiffBuilder {
 	export class OkResponse {
 		public readonly ok: true = true
 
-		constructor(public readonly events: (AnyEvent & { dependencies: string[]; permission: PermissionsVerifier.EventPermission })[]) {}
+		constructor(
+			public readonly events: (AnyEvent & { dependencies: string[]; permission: PermissionsVerifier.EventPermission })[]
+		) {}
 	}
 }
 

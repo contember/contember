@@ -2,11 +2,7 @@ import InputParser from './InputParser'
 import { CommandManager } from './CommandManager'
 
 class Application {
-	constructor(
-		private readonly commandManager: CommandManager
-	) {
-
-	}
+	constructor(private readonly commandManager: CommandManager) {}
 
 	async run(args: string[]): Promise<void> {
 		const [{}, {}, ...commandArgs] = args

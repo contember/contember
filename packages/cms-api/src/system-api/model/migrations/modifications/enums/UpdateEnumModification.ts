@@ -6,11 +6,7 @@ import { Modification } from '../Modification'
 import escapeSqlString from '../../../../../utils/escapeSqlString'
 
 class UpdateEnumModification implements Modification<UpdateEnumModification.Data> {
-	constructor(
-		private readonly data: UpdateEnumModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: UpdateEnumModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const joinedValues = this.data.values.map(it => `'${escapeSqlString(it)}'`).join(',')
@@ -18,20 +14,18 @@ class UpdateEnumModification implements Modification<UpdateEnumModification.Data
 		builder.sql(
 			`ALTER DOMAIN "${this.data.enumName}" ADD CONSTRAINT ${
 				this.data.enumName
-				}_check CHECK (VALUE IN(${joinedValues}))`
+			}_check CHECK (VALUE IN(${joinedValues}))`
 		)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(
-			model => ({
-				...model,
-				enums: {
-					...model.enums,
-					[this.data.enumName]: this.data.values
-				}
-			})
-		)
+		return updateModel(model => ({
+			...model,
+			enums: {
+				...model.enums,
+				[this.data.enumName]: this.data.values,
+			},
+		}))
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
@@ -40,7 +34,6 @@ class UpdateEnumModification implements Modification<UpdateEnumModification.Data
 }
 
 namespace UpdateEnumModification {
-
 	export const id = 'updateEnum'
 
 	export interface Data {
@@ -50,4 +43,3 @@ namespace UpdateEnumModification {
 }
 
 export default UpdateEnumModification
-

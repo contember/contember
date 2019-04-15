@@ -3,8 +3,7 @@ import { EventType } from '../EventType'
 export type ContentEvent = UpdateEvent | CreateEvent | DeleteEvent
 export type AnyEvent = RunMigrationEvent | ContentEvent
 
-export interface Event
-{
+export interface Event {
 	readonly type: EventType
 	readonly id: string
 	readonly createdAt: Date

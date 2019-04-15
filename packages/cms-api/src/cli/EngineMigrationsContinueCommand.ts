@@ -5,7 +5,6 @@ import { Config } from '../config/config'
 import Command from '../core/cli/Command'
 
 class EngineMigrationsContinueCommand extends Command<{}, {}> {
-
 	constructor(private readonly config: Config) {
 		super()
 	}

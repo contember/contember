@@ -4,23 +4,16 @@ import { ProjectContainer } from '../CompositionRoot'
 import Command from '../core/cli/Command'
 import KnexWrapper from '../core/knex/KnexWrapper'
 
-
 class InitCommand extends Command<{}, {}> {
-
-	constructor(
-		private readonly tenantDb: KnexWrapper,
-		private readonly projectContainers: ProjectContainer[]
-	) {
+	constructor(private readonly tenantDb: KnexWrapper, private readonly projectContainers: ProjectContainer[]) {
 		super()
 	}
 
-	protected configure(configuration: CommandConfiguration): void {
-	}
+	protected configure(configuration: CommandConfiguration): void {}
 
 	protected async execute(): Promise<void> {
 		await Promise.all(
 			this.projectContainers.map(async container => {
-
 				const project = container.project
 				await new CreateProjectCommand(project).execute(this.tenantDb)
 				console.log(`Project ${project.slug} updated`)
@@ -30,7 +23,6 @@ class InitCommand extends Command<{}, {}> {
 					const init = executionContainer.projectIntializer
 					await init.initialize()
 				})
-
 			})
 		)
 	}

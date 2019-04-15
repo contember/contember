@@ -92,9 +92,12 @@ class PermissionsVerifier {
 				const canRead = (readPermissions[event.tableName] || {})[event.rowId] || false
 				const canWrite = (writePermissions[event.tableName] || {})[event.rowId] || false
 
-				permissionsResult[event.id] = canRead && canWrite ? PermissionsVerifier.EventPermission.canApply
-					: (canRead ? PermissionsVerifier.EventPermission.canView : PermissionsVerifier.EventPermission.forbidden)
-
+				permissionsResult[event.id] =
+					canRead && canWrite
+						? PermissionsVerifier.EventPermission.canApply
+						: canRead
+							? PermissionsVerifier.EventPermission.canView
+							: PermissionsVerifier.EventPermission.forbidden
 			} else {
 				permissionsResult[event.id] = PermissionsVerifier.EventPermission.forbidden
 			}
@@ -111,12 +114,10 @@ class PermissionsVerifier {
 	): Promise<PermissionsByTable> {
 		const db = this.db.forSchema(formatSchemaName(stage))
 		const schema = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
-		const { permissions } = this.permissionsByIdentityFactory.createPermissions(schema,
-			{
-				globalRoles: context.identity.roles,
-				projectRoles: await context.identity.getProjectRoles(this.project.uuid) || [],
-			}
-		)
+		const { permissions } = this.permissionsByIdentityFactory.createPermissions(schema, {
+			globalRoles: context.identity.roles,
+			projectRoles: (await context.identity.getProjectRoles(this.project.uuid)) || [],
+		})
 
 		const predicateFactory = new PredicateFactory(permissions, new VariableInjector(schema.model, context.variables))
 		const entitiesByTable = Object.values(schema.model.entities).reduce<{ [tableName: string]: Model.Entity }>(

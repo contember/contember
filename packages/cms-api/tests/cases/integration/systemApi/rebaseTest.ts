@@ -18,10 +18,9 @@ describe('system api - release', () => {
 		}
 		const tester = await ApiTester.create({
 			project: {
-				stages: EventSequence.createStagesConfiguration(eventsSequence)
-			}
+				stages: EventSequence.createStagesConfiguration(eventsSequence),
+			},
 		})
-
 
 		let i = 0
 		for (const stage in eventsSequence) {
@@ -46,15 +45,17 @@ describe('system api - release', () => {
     }`)
 		expect(result.data.rebaseAll.ok).eq(true)
 
-		await tester.verifySequence({
-			a: '  1 2 3 4 5',
-			b: 'a - - - - - 6 7',
-			c: 'b - - - - - - -',
-			d: 'b - - - - - - - 8',
-			e: 'd - - - - - - - - 9',
-			f: 'a - - - - - 10 11',
-			g: 'd - - - - - - - -',
-		}, 1)
-
+		await tester.verifySequence(
+			{
+				a: '  1 2 3 4 5',
+				b: 'a - - - - - 6 7',
+				c: 'b - - - - - - -',
+				d: 'b - - - - - - - 8',
+				e: 'd - - - - - - - - 9',
+				f: 'a - - - - - 10 11',
+				g: 'd - - - - - - - -',
+			},
+			1
+		)
 	})
 })

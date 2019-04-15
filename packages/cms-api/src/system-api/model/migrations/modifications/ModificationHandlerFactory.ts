@@ -20,9 +20,7 @@ import RemoveUniqueConstraintModification from './constraints/RemoveUniqueConstr
 import UpdateEntityNameModification from './entities/UpdateEntityNameModification'
 
 class ModificationHandlerFactory {
-
-	constructor(private readonly map: ModificationHandlerFactory.FactoryMap<any>) {
-	}
+	constructor(private readonly map: ModificationHandlerFactory.FactoryMap<any>) {}
 
 	public create<D>(name: string, data: D, schema: Schema): Modification<D> {
 		if (!this.map[name]) {
@@ -33,7 +31,7 @@ class ModificationHandlerFactory {
 }
 
 namespace ModificationHandlerFactory {
-	export type FactoryDefinition<D> = (input: { schema: Schema, data: D }) => Modification<D>
+	export type FactoryDefinition<D> = (input: { schema: Schema; data: D }) => Modification<D>
 	export type FactoryMap<D> = { [modificationName: string]: FactoryDefinition<D> }
 
 	export const defaultFactoryMap: FactoryMap<any> = {
@@ -58,11 +56,11 @@ namespace ModificationHandlerFactory {
 		[RemoveFieldModification.id]: ({ data, schema }) => new RemoveFieldModification(data, schema),
 		[UpdateFieldNameModification.id]: ({ data, schema }) => new UpdateFieldNameModification(data, schema),
 
-		[CreateRelationInverseSideModification.id]: ({ data, schema }) => new CreateRelationInverseSideModification(data, schema),
+		[CreateRelationInverseSideModification.id]: ({ data, schema }) =>
+			new CreateRelationInverseSideModification(data, schema),
 		[CreateRelationModification.id]: ({ data, schema }) => new CreateRelationModification(data, schema),
 		[UpdateRelationOnDeleteModification.id]: ({ data, schema }) => new UpdateRelationOnDeleteModification(data, schema),
 	}
 }
 
 export default ModificationHandlerFactory
-

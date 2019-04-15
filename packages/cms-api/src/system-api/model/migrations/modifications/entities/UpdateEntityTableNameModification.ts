@@ -5,11 +5,7 @@ import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 
 class UpdateEntityTableNameModification implements Modification<UpdateEntityTableNameModification.Data> {
-	constructor(
-		private readonly data: UpdateEntityTableNameModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: UpdateEntityTableNameModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -19,10 +15,9 @@ class UpdateEntityTableNameModification implements Modification<UpdateEntityTabl
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
 			updateEntity(this.data.entityName, entity => ({
-					...entity,
-					tableName: this.data.tableName
-				})
-			)
+				...entity,
+				tableName: this.data.tableName,
+			}))
 		)
 	}
 
@@ -38,7 +33,6 @@ class UpdateEntityTableNameModification implements Modification<UpdateEntityTabl
 }
 
 namespace UpdateEntityTableNameModification {
-
 	export const id = 'updateEntityTableName'
 
 	export interface Data {

@@ -9,11 +9,12 @@ type Args = {
 }
 
 class ProjectMigrationsDiffCommand extends Command<Args, {}> {
-
-	constructor(private readonly projectContainerResolver: ProjectContainerResolver, private readonly schemas: { [name: string]: Schema }) {
+	constructor(
+		private readonly projectContainerResolver: ProjectContainerResolver,
+		private readonly schemas: { [name: string]: Schema }
+	) {
 		super()
 	}
-
 
 	protected configure(configuration: CommandConfiguration): void {
 		configuration.description('Creates .json and .sql schema migration for given project')
@@ -29,7 +30,9 @@ class ProjectMigrationsDiffCommand extends Command<Args, {}> {
 			throw new Error(`Undefined project ${projectName}`)
 		}
 
-		const executionContainer = projectContainer.systemExecutionContainerFactory.create(projectContainer.systemKnexWrapper)
+		const executionContainer = projectContainer.systemExecutionContainerFactory.create(
+			projectContainer.systemKnexWrapper
+		)
 		const migrationDiffCreator = executionContainer.migrationDiffCreator
 		const result = await migrationDiffCreator.createDiff(this.schemas[projectName], migrationName)
 

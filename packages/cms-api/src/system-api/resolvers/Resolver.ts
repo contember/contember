@@ -10,9 +10,5 @@ export default interface Resolver extends IResolvers {
 	Mutation: Schema.MutationResolvers & IgnoreIndex
 }
 
-export type QueryResolver<T extends keyof Schema.QueryResolvers> = {
-	[K in T]: Schema.QueryResolvers[K]
-}
-export type MutationResolver<T extends keyof Schema.MutationResolvers> = {
-	[K in T]: Schema.MutationResolvers[K]
-}
+export type QueryResolver<T extends keyof Schema.QueryResolvers> = { [K in T]: Schema.QueryResolvers[K] }
+export type MutationResolver<T extends keyof Schema.MutationResolvers> = { [K in T]: Schema.MutationResolvers[K] }

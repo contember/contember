@@ -6,11 +6,7 @@ import { Modification } from '../Modification'
 import escapeSqlString from '../../../../../utils/escapeSqlString'
 
 class CreateEnumModification implements Modification<CreateEnumModification.Data> {
-	constructor(
-		private readonly data: CreateEnumModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: CreateEnumModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const joinedValues = this.data.values.map(it => `'${escapeSqlString(it)}'`).join(',')
@@ -21,15 +17,13 @@ class CreateEnumModification implements Modification<CreateEnumModification.Data
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(
-			model => ({
-				...model,
-				enums: {
-					...model.enums,
-					[this.data.enumName]: this.data.values
-				}
-			})
-		)
+		return updateModel(model => ({
+			...model,
+			enums: {
+				...model.enums,
+				[this.data.enumName]: this.data.values,
+			},
+		}))
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
@@ -38,7 +32,6 @@ class CreateEnumModification implements Modification<CreateEnumModification.Data
 }
 
 namespace CreateEnumModification {
-
 	export const id = 'createEnum'
 
 	export interface Data {

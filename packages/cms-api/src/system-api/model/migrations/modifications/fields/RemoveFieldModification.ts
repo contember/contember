@@ -8,11 +8,7 @@ import { EventType } from '../../../EventType'
 import { isIt } from '../../../../../utils/type'
 
 class RemoveFieldModification implements Modification<RemoveFieldModification.Data> {
-	constructor(
-		private readonly data: RemoveFieldModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: RemoveFieldModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		acceptFieldVisitor(this.schema.model, this.data.entityName, this.data.fieldName, {
@@ -22,18 +18,15 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 			visitManyHasOne: (entity, relation, {}, _) => {
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
-			visitOneHasMany: () => {
-			},
+			visitOneHasMany: () => {},
 			visitOneHasOneOwner: (entity, relation, {}, _) => {
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
-			visitOneHasOneInversed: () => {
-			},
+			visitOneHasOneInversed: () => {},
 			visitManyHasManyOwner: ({}, relation, {}, _) => {
 				builder.dropTable(relation.joiningTable.tableName)
 			},
-			visitManyHasManyInversed: () => {
-			},
+			visitManyHasManyInversed: () => {},
 		})
 	}
 
@@ -46,8 +39,12 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 				const { [this.data.fieldName]: removed, ...fields } = entity.fields
 				return { ...entity, fields }
 			}),
-			isIt<Model.InversedRelation>(field, 'ownedBy') ?
-				updateEntity(field.target, updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field)) : undefined
+			isIt<Model.InversedRelation>(field, 'ownedBy')
+				? updateEntity(
+						field.target,
+						updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field)
+				  )
+				: undefined
 		)
 	}
 
@@ -56,9 +53,11 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 		const tableName = entity.tableName
 		const columnName = (entity.fields[this.data.fieldName] as Model.AnyColumn).columnName
 		return events.map(it => {
-			if (it.tableName !== tableName
-				|| (it.type !== EventType.create && it.type !== EventType.update)
-				|| !it.values.hasOwnProperty(columnName)) {
+			if (
+				it.tableName !== tableName ||
+				(it.type !== EventType.create && it.type !== EventType.update) ||
+				!it.values.hasOwnProperty(columnName)
+			) {
 				return it
 			}
 
@@ -69,7 +68,6 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 }
 
 namespace RemoveFieldModification {
-
 	export const id = 'removeField'
 
 	export interface Data {

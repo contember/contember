@@ -5,11 +5,9 @@ import Migration from './Migration'
 
 type Modification = Migration.Modification<CreateColumnModification.Data | CreateRelationModification.Data>
 
-
 export default class CreateFieldVisitor
 	implements Model.ColumnVisitor<Modification>, Model.RelationByTypeVisitor<Modification | null> {
-	constructor(private readonly entity: Model.Entity) {
-	}
+	constructor(private readonly entity: Model.Entity) {}
 
 	public visitColumn({}, updatedColumn: Model.AnyColumn): Modification {
 		return {

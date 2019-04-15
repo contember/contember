@@ -25,18 +25,18 @@ export interface SystemContainer {
 	systemApolloServerFactory: SystemApolloServerFactory
 	systemResolvers: Resolvers
 	authorizator: Authorizator
-	systemExecutionContainerFactory: SystemExecutionContainer.Factory,
+	systemExecutionContainerFactory: SystemExecutionContainer.Factory
 }
 
 export default class SystemContainerFactory {
 	public create(container: {
-		project: Project,
+		project: Project
 		migrationFilesManager: MigrationFilesManager
 		permissionsByIdentityFactory: PermissionsByIdentityFactory
-		migrationsResolver: MigrationsResolver,
-		schemaMigrator: SchemaMigrator,
-		modificationHandlerFactory: ModificationHandlerFactory,
-		systemKnexWrapper: KnexWrapper,
+		migrationsResolver: MigrationsResolver
+		schemaMigrator: SchemaMigrator
+		modificationHandlerFactory: ModificationHandlerFactory
+		systemKnexWrapper: KnexWrapper
 	}): Container<SystemContainer> {
 		return new Container.Builder({})
 
@@ -55,7 +55,12 @@ export default class SystemContainerFactory {
 			.addService(
 				'systemResolvers',
 				({ systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver, rebaseMutationResolver }) =>
-					new ResolverFactory(systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver, rebaseMutationResolver).create()
+					new ResolverFactory(
+						systemStagesQueryResolver,
+						systemDiffQueryResolver,
+						releaseMutationResolver,
+						rebaseMutationResolver
+					).create()
 			)
 			.addService(
 				'systemExecutionContainerFactory',
@@ -76,7 +81,6 @@ export default class SystemContainerFactory {
 			)
 
 			.build()
-			.pick('systemApolloServerFactory',
-				'systemResolvers', 'authorizator', 'systemExecutionContainerFactory')
+			.pick('systemApolloServerFactory', 'systemResolvers', 'authorizator', 'systemExecutionContainerFactory')
 	}
 }

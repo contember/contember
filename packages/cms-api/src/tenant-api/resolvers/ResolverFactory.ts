@@ -5,7 +5,7 @@ import {
 	MutationSetupArgs,
 	MutationSignInArgs,
 	MutationSignUpArgs,
-	MutationUpdateProjectMemberVariablesArgs
+	MutationUpdateProjectMemberVariablesArgs,
 } from '../schema/types'
 import MeQueryResolver from './query/MeQueryResolver'
 import SignUpMutationResolver from './mutation/SignUpMutationResolver'

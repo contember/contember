@@ -60,8 +60,7 @@ export class ApiTester {
 		private readonly systemSchema: GraphQLSchema,
 		private readonly systemContainer: SystemContainer,
 		private readonly systemExecutionContainer: SystemExecutionContainer
-	) {
-	}
+	) {}
 
 	public async createStage(stage: Project.Stage): Promise<void> {
 		await new CreateOrUpdateStageCommand({
@@ -113,7 +112,7 @@ export class ApiTester {
 			identityVariables: {},
 			executionContainer,
 			errorHandler: () => null,
-			timer: async (label, cb) => cb ? await cb() : undefined as any,
+			timer: async (label, cb) => (cb ? await cb() : (undefined as any)),
 		}
 		maskErrors(schema, err => {
 			console.error(err)
@@ -126,16 +125,21 @@ export class ApiTester {
 		return result
 	}
 
-	public async querySystem(gql: string, variables?: { [key: string]: any }, options: {
-		identity?: Identity
-		roles?: string[]
-		projectRoles?: string[]
-	} = {}): Promise<any> {
+	public async querySystem(
+		gql: string,
+		variables?: { [key: string]: any },
+		options: {
+			identity?: Identity
+			roles?: string[]
+			projectRoles?: string[]
+		} = {}
+	): Promise<any> {
 		await setupSystemVariables(this.projectDb, '11111111-1111-1111-1111-111111111111')
 		const context: ResolverContext = new ResolverContext(
-			options.identity || new Identity.StaticIdentity(testUuid(888), options.roles || [Identity.SystemRole.SUPER_ADMIN], {
-				[ApiTester.project.uuid]: options.projectRoles || [],
-			}),
+			options.identity ||
+				new Identity.StaticIdentity(testUuid(888), options.roles || [Identity.SystemRole.SUPER_ADMIN], {
+					[ApiTester.project.uuid]: options.projectRoles || [],
+				}),
 			{},
 			this.systemContainer.authorizator,
 			this.systemExecutionContainer,
@@ -146,7 +150,8 @@ export class ApiTester {
 	}
 
 	public async diff(baseStage: string, headStage: string): Promise<DiffResult> {
-		const result = (await this.querySystem(GQL`query($baseStage: String!, $headStage: String!) {
+		const result = await this.querySystem(
+			GQL`query($baseStage: String!, $headStage: String!) {
       diff(baseStage: $baseStage, headStage: $headStage) {
 	      ok
         errors
@@ -160,7 +165,9 @@ export class ApiTester {
           }
         }
       }
-    }`, { baseStage, headStage }))
+    }`,
+			{ baseStage, headStage }
+		)
 
 		if (!result.data.diff.ok) {
 			throw result.data.diff.errors
@@ -182,7 +189,8 @@ export class ApiTester {
 	}
 
 	public async releaseForward(baseStage: string, headStage: string, eventsCount?: number): Promise<void> {
-		const diff = await this.querySystem(GQL`query($headStage: String!, $baseStage: String!) {
+		const diff = await this.querySystem(
+			GQL`query($headStage: String!, $baseStage: String!) {
       diff(baseStage: $baseStage, headStage: $headStage) {
 	      ok
 	      errors
@@ -192,10 +200,12 @@ export class ApiTester {
           }
         }
       }
-    }`, {
-			headStage,
-			baseStage,
-		})
+    }`,
+			{
+				headStage,
+				baseStage,
+			}
+		)
 		if (!diff.data.diff.ok) {
 			throw diff.data.diff.errors
 		}
@@ -209,7 +219,9 @@ export class ApiTester {
 			{
 				baseStage,
 				headStage,
-				events: (diff.data.diff.result.events as any[]).slice(0, eventsCount || diff.data.diff.result.events.length).map(it => it.id),
+				events: (diff.data.diff.result.events as any[])
+					.slice(0, eventsCount || diff.data.diff.result.events.length)
+					.map(it => it.id),
 			}
 		)
 	}
@@ -231,11 +243,15 @@ export class ApiTester {
 		for (const event of sequence.sequence) {
 			switch (event.type) {
 				case 'event':
-					await this.queryContent(sequence.stage, GQL`mutation ($number: Int!) {
+					await this.queryContent(
+						sequence.stage,
+						GQL`mutation ($number: Int!) {
             createEntry(data: {number: $number}) {
               id
             }
-          }`, { number: event.number })
+          }`,
+						{ number: event.number }
+					)
 					break
 				case 'follow':
 					await this.releaseForward(sequence.stage, sequence.baseStage!, 1)
@@ -283,9 +299,11 @@ export class ApiTester {
 		}
 	}
 
-	public static async create(options: {
-		project?: Partial<Project>
-	} = {}): Promise<ApiTester> {
+	public static async create(
+		options: {
+			project?: Partial<Project>
+		} = {}
+	): Promise<ApiTester> {
 		const dbCredentials = (dbName: string) => {
 			return {
 				host: String(process.env.TEST_DB_HOST),
@@ -327,7 +345,11 @@ export class ApiTester {
 		const migrationsResolver = new MigrationsResolver(projectMigrationFilesManager)
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const schemaMigrator = new SchemaMigrator(modificationHandlerFactory)
-		const schemaVersionBuilder = new SchemaVersionBuilder(projectDb.createQueryHandler(), migrationsResolver, schemaMigrator)
+		const schemaVersionBuilder = new SchemaVersionBuilder(
+			projectDb.createQueryHandler(),
+			migrationsResolver,
+			schemaMigrator
+		)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(
 			createMock<S3>({
 				formatPublicUrl() {
@@ -341,7 +363,7 @@ export class ApiTester {
 
 		const systemContainerFactory = new SystemContainerFactory()
 		const systemContainer = systemContainerFactory.create({
-			project: { ...ApiTester.project, ...options.project || {} },
+			project: { ...ApiTester.project, ...(options.project || {}) },
 			migrationsResolver: migrationsResolver,
 			migrationFilesManager: projectMigrationFilesManager,
 			permissionsByIdentityFactory: new PermissionsByIdentityFactory([

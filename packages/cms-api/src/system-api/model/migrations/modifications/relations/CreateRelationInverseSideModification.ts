@@ -5,24 +5,19 @@ import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from 
 import { Modification } from '../Modification'
 
 class CreateRelationInverseSideModification implements Modification<CreateRelationInverseSideModification.Data> {
-	constructor(
-		private readonly data: CreateRelationInverseSideModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: CreateRelationInverseSideModification.Data, private readonly schema: Schema) {}
 
-	public createSql(builder: MigrationBuilder): void {
-	}
+	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
 			updateEntity(this.data.entityName, addField(this.data.relation)),
-			updateEntity(this.data.relation.target,
+			updateEntity(
+				this.data.relation.target,
 				updateField<Model.AnyRelation & Model.OwnerRelation>(this.data.relation.ownedBy, field => ({
-						...field,
-						inversedBy: this.data.relation.name,
-					})
-				)
+					...field,
+					inversedBy: this.data.relation.name,
+				}))
 			)
 		)
 	}
@@ -33,7 +28,6 @@ class CreateRelationInverseSideModification implements Modification<CreateRelati
 }
 
 namespace CreateRelationInverseSideModification {
-
 	export const id = 'createRelationInverseSide'
 
 	export interface Data {

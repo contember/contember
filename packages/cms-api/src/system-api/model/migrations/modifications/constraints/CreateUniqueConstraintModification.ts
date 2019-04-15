@@ -6,11 +6,7 @@ import { Modification } from '../Modification'
 import { acceptFieldVisitor } from '../../../../../content-schema/modelUtils'
 
 class CreateUniqueConstraintModification implements Modification<CreateUniqueConstraintModification.Data> {
-	constructor(
-		private readonly data: CreateUniqueConstraintModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: CreateUniqueConstraintModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -34,7 +30,7 @@ class CreateUniqueConstraintModification implements Modification<CreateUniqueCon
 					throw new Error(
 						`Cannot create unique key on 1:1 relation, this relation has unique key by default in ${
 							entity.name
-							}.${fieldName}`
+						}.${fieldName}`
 					)
 				},
 				visitOneHasOneInversed: () => {
@@ -57,8 +53,8 @@ class CreateUniqueConstraintModification implements Modification<CreateUniqueCon
 				...entity,
 				unique: {
 					...entity.unique,
-					[this.data.unique.name]: this.data.unique
-				}
+					[this.data.unique.name]: this.data.unique,
+				},
 			}))
 		)
 	}
@@ -69,7 +65,6 @@ class CreateUniqueConstraintModification implements Modification<CreateUniqueCon
 }
 
 namespace CreateUniqueConstraintModification {
-
 	export const id = 'createUniqueConstraint'
 
 	export interface Data {

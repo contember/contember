@@ -5,7 +5,6 @@ import { MutationReleaseArgs, ReleaseResponse } from '../../schema/types'
 import { createStageQuery } from '../../model/queries/StageQueryHelper'
 
 export default class ReleaseMutationResolver implements MutationResolver<'release'> {
-
 	async release(
 		parent: any,
 		args: MutationReleaseArgs,

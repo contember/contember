@@ -52,12 +52,12 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		errors: [ReleaseErrorCode!]!
 	}
-  # === release ===
-	
-  type RebaseAllResponse {
-    ok: Boolean!
-  }
-	
+	# === release ===
+
+	type RebaseAllResponse {
+		ok: Boolean!
+	}
+
 	# === events ===
 
 	interface Event {

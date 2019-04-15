@@ -5,13 +5,10 @@ import { assertNever } from 'cms-common'
 import PermissionsVerifier from './PermissionsVerifier'
 
 type EventWithMeta = AnyEvent & { dependencies: string[]; permission: PermissionsVerifier.EventPermission }
-type EventFilter = { entity: string, id: string }
+type EventFilter = { entity: string; id: string }
 
 class DiffResponseBuilder {
-	public buildResponse(
-		events: (EventWithMeta)[],
-		filter: ReadonlyArray<EventFilter> | null
-	): ApiEvent[] {
+	public buildResponse(events: (EventWithMeta)[], filter: ReadonlyArray<EventFilter> | null): ApiEvent[] {
 		if (filter !== null) {
 			if (filter.length === 0) {
 				return []
@@ -36,7 +33,7 @@ class DiffResponseBuilder {
 	}
 
 	private formatDescription(event: EventWithMeta): string {
-		if (event.permission ===PermissionsVerifier.EventPermission.forbidden) {
+		if (event.permission === PermissionsVerifier.EventPermission.forbidden) {
 			return 'Forbidden'
 		}
 
@@ -54,12 +51,16 @@ class DiffResponseBuilder {
 		}
 	}
 
-	private filterEvents(events: EventWithMeta[], filter: ReadonlyArray<EventFilter>): EventWithMeta[]
-	{
+	private filterEvents(events: EventWithMeta[], filter: ReadonlyArray<EventFilter>): EventWithMeta[] {
 		const entityIds = filter.map(it => it.id)
-		const rootEvents: EventWithMeta[] = events.filter(it => it.type !== EventType.runMigration && entityIds.includes(it.rowId))
+		const rootEvents: EventWithMeta[] = events.filter(
+			it => it.type !== EventType.runMigration && entityIds.includes(it.rowId)
+		)
 		const eventIds = new Set<string>([])
-		const dependenciesMap: {[id: string]: string[]} = events.reduce((acc, event) => ({...acc, [event.id]: event.dependencies}), {})
+		const dependenciesMap: { [id: string]: string[] } = events.reduce(
+			(acc, event) => ({ ...acc, [event.id]: event.dependencies }),
+			{}
+		)
 		const collectDependencies = (ids: string[]) => {
 			ids.forEach(id => {
 				if (eventIds.has(id)) {

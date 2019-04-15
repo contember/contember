@@ -7,7 +7,7 @@ export default class PermissionFactory {
 	public create(acl: Acl.Schema, roles: string[]): Acl.Permissions {
 		let result: Acl.Permissions = {}
 		for (let role of roles) {
-			const roleDefinition = acl.roles[role] || {entities: {}}
+			const roleDefinition = acl.roles[role] || { entities: {} }
 			let rolePermissions: Acl.Permissions = roleDefinition.entities
 			if (roleDefinition.inherits) {
 				rolePermissions = this.mergePermissions(this.create(acl, roleDefinition.inherits), rolePermissions)

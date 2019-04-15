@@ -23,20 +23,18 @@ import RecreateContentEvent from '../commands/RecreateContentEvent'
 type StageEventsMap = Record<string, ContentEvent[]>
 
 export default class ProjectMigrator {
-
 	constructor(
 		private readonly db: KnexWrapper,
 		private readonly stageTree: StageTree,
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-	) {
-	}
+		private readonly schemaVersionBuilder: SchemaVersionBuilder
+	) {}
 
 	public async migrate(
 		currentVersion: string | null,
 		migrationsToExecute: Migration[],
-		progressCb: (version: string) => void,
+		progressCb: (version: string) => void
 	) {
 		const queryHandler = this.db.createQueryHandler()
 		const rootStage = this.stageTree.getRoot()
@@ -49,7 +47,7 @@ export default class ProjectMigrator {
 			progressCb(migration.version)
 
 			for (const modification of migration.modifications) {
-				[schema, stageEvents] = await this.applyModification(schema, stageEvents, modification)
+				;[schema, stageEvents] = await this.applyModification(schema, stageEvents, modification)
 			}
 
 			previousId = await new CreateEventCommand(
@@ -85,14 +83,12 @@ export default class ProjectMigrator {
 		return [schema, newEvents]
 	}
 
-
 	private async applyOnChildren(
 		stage: StageWithoutEvent,
 		modificationHandler: Modification<any>,
 		events: StageEventsMap,
 		sql: string
 	): Promise<StageEventsMap> {
-
 		for (const childStage of this.stageTree.getChildren(stage)) {
 			const stageEvents = events[childStage.id]
 
@@ -101,7 +97,7 @@ export default class ProjectMigrator {
 				events = { ...events, [childStage.id]: transformedEvents }
 			}
 			await this.executeOnStage(childStage, sql)
-			events = await this.applyOnChildren( childStage, modificationHandler, events, sql)
+			events = await this.applyOnChildren(childStage, modificationHandler, events, sql)
 		}
 		return events
 	}
@@ -122,9 +118,10 @@ export default class ProjectMigrator {
 			if (info.distance !== 0) {
 				throw new Error('Not rebased')
 			}
-			const events = eventsMatrix[child.id][stage.id].distance > 0 ?
-				await queryHandler.fetch(new DiffQuery(info.commonEventId, info.stageBEventId))
-				: []
+			const events =
+				eventsMatrix[child.id][stage.id].distance > 0
+					? await queryHandler.fetch(new DiffQuery(info.commonEventId, info.stageBEventId))
+					: []
 			for (const event of events) {
 				if (!isContentEvent(event)) {
 					throw new Error()
@@ -133,7 +130,7 @@ export default class ProjectMigrator {
 			result = {
 				...result,
 				[child.id]: events as ContentEvent[],
-				...(await this.fetchStageEvents(queryHandler, eventsMatrix, child))
+				...(await this.fetchStageEvents(queryHandler, eventsMatrix, child)),
 			}
 		}
 		return result
@@ -144,7 +141,7 @@ export default class ProjectMigrator {
 			let previousId = stage.event_id
 			const transactionContext = new RecreateContentEvent.TransactionContext()
 			for (const event of events[childStage.id]) {
-				previousId = await (new RecreateContentEvent(event, previousId, transactionContext)).execute(db)
+				previousId = await new RecreateContentEvent(event, previousId, transactionContext).execute(db)
 			}
 			await new UpdateStageEventCommand(childStage.id, previousId).execute(db)
 			await this.reCreateEvents(db, { ...childStage, event_id: previousId }, events)

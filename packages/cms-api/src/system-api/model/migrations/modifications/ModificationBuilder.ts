@@ -7,8 +7,7 @@ import Migration from '../Migration'
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
 
-	constructor(private readonly updatedSchema: Schema) {
-	}
+	constructor(private readonly updatedSchema: Schema) {}
 
 	public getDiff(): Migration.Modification[] {
 		const [createEntity, other] = arraySplit(this.modifications, it => it.modification === 'createEntity')
@@ -156,8 +155,10 @@ class ModificationBuilder {
 
 namespace ModificationBuilder {
 	export class Marker {
-		constructor(private readonly builder: ModificationBuilder, public readonly modifications: Migration.Modification[]) {
-		}
+		constructor(
+			private readonly builder: ModificationBuilder,
+			public readonly modifications: Migration.Modification[]
+		) {}
 
 		public rewind() {
 			this.builder.rewind(this.modifications)

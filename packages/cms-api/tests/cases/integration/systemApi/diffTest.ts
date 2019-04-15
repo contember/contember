@@ -5,7 +5,6 @@ import { GQL } from '../../../src/tags'
 import { expect } from 'chai'
 
 describe('system api - diff', () => {
-
 	it('returns filtered diff', async () => {
 		const tester = await ApiTester.create()
 		await tester.createStage({
@@ -41,7 +40,9 @@ describe('system api - diff', () => {
 		)
 
 		const diff = await tester.querySystem(GQL`query {
-			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}", filter: [{entity: "Author", id: "${response.data.createAuthor.id}"}]) {
+			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}", filter: [{entity: "Author", id: "${
+			response.data.createAuthor.id
+		}"}]) {
 				result {
 					events {
 						id
@@ -58,7 +59,6 @@ describe('system api - diff', () => {
 		expect(diff.data.diff.result.events[0].type).eq('RUN_MIGRATION')
 		expect(diff.data.diff.result.events[1].type).eq('CREATE')
 	})
-
 
 	it('diff permissions - cannot write', async () => {
 		const tester = await ApiTester.create()
@@ -86,8 +86,8 @@ describe('system api - diff', () => {
 			}`
 		)
 
-
-		const diff = await tester.querySystem(GQL`query {
+		const diff = await tester.querySystem(
+			GQL`query {
 			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}") {
 				result {
 					events {
@@ -99,15 +99,16 @@ describe('system api - diff', () => {
 					}
 				}
 			}
-		}`, {}, {
-			roles: [],
-			projectRoles: ['viewer'],
-		})
-
+		}`,
+			{},
+			{
+				roles: [],
+				projectRoles: ['viewer'],
+			}
+		)
 
 		expect(diff.data.diff.result.events).length(1)
 		expect(diff.data.diff.result.events[0].type).eq('CREATE')
 		expect(diff.data.diff.result.events[0].allowed).eq(false)
 	})
-
 })

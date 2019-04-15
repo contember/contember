@@ -12,9 +12,8 @@ class SchemaVersionBuilder {
 	constructor(
 		private readonly queryHandler: QueryHandler<KnexQueryable>,
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly schemaMigrator: SchemaMigrator,
-	) {
-	}
+		private readonly schemaMigrator: SchemaMigrator
+	) {}
 
 	async buildSchemaForStage(stageId: string): Promise<Schema> {
 		const currentMigration = await this.queryHandler.fetch(new LatestMigrationByStageQuery(stageId))

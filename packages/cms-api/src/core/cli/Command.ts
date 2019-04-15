@@ -15,7 +15,6 @@ abstract class Command<Args extends Command.Arguments, Options extends Command.O
 		return this.configuration
 	}
 
-
 	protected abstract async execute(input: Command.Input): Promise<void | true>
 
 	public async run(args: string[]): Promise<boolean> {

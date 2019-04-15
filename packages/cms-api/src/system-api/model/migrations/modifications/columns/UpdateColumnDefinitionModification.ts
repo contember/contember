@@ -5,11 +5,7 @@ import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schema
 import { Modification } from '../Modification'
 
 class UpdateColumnDefinitionModification implements Modification<UpdateColumnDefinitionModification.Data> {
-	constructor(
-		private readonly data: UpdateColumnDefinitionModification.Data,
-		private readonly schema: Schema,
-	) {
-	}
+	constructor(private readonly data: UpdateColumnDefinitionModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -23,16 +19,15 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
-			updateEntity(this.data.entityName,
-				updateField<Model.AnyColumn>(this.data.fieldName,
-					field => {
-						return {
-							...this.data.definition,
-							name: field.name,
-							columnName: field.columnName,
-						}
+			updateEntity(
+				this.data.entityName,
+				updateField<Model.AnyColumn>(this.data.fieldName, field => {
+					return {
+						...this.data.definition,
+						name: field.name,
+						columnName: field.columnName,
 					}
-				)
+				})
 			)
 		)
 	}
@@ -43,7 +38,6 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 }
 
 namespace UpdateColumnDefinitionModification {
-
 	export const id = 'updateColumnDefinition'
 
 	export interface Data {

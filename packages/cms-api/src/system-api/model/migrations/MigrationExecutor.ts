@@ -12,9 +12,8 @@ import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
 class MigrationExecutor {
 	constructor(
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-	) {
-	}
+		private readonly schemaVersionBuilder: SchemaVersionBuilder
+	) {}
 
 	public async execute(
 		db: KnexWrapper,
@@ -53,7 +52,7 @@ class MigrationExecutor {
 		}
 
 		await new UpdateStageEventCommand(stage.id, previousId).execute(db)
-		return {...stage, event_id: previousId}
+		return { ...stage, event_id: previousId }
 	}
 }
 

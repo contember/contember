@@ -69,8 +69,7 @@ export type ProjectContainer = Container<{
 	systemExecutionContainerFactory: SystemExecutionContainer.Factory
 }>
 
-export interface MasterContainer
-{
+export interface MasterContainer {
 	cli: Application
 }
 
@@ -88,8 +87,10 @@ class CompositionRoot {
 		const masterContainer = new Container.Builder({})
 			.addService('tenantContainer', () => tenantContainer)
 			.addService('projectContainers', () => projectContainers)
-			.addService('projectContainerResolver', ({ projectContainers }): ProjectContainerResolver =>
-				(slug) => projectContainers.find(it => it.project.slug === slug)
+			.addService(
+				'projectContainerResolver',
+				({ projectContainers }): ProjectContainerResolver => slug =>
+					projectContainers.find(it => it.project.slug === slug)
 			)
 
 			.addService('homepageMiddlewareFactory', () => new HomepageMiddlewareFactory())
@@ -178,14 +179,18 @@ class CompositionRoot {
 
 				return app
 			})
-			.addService('commandManager', ({ projectContainerResolver, koa }) => new CommandManager({
-				['engine:migrations:create']: () => new EngineMigrationsCreateCommand(),
-				['engine:migrations:continue']: () => new EngineMigrationsContinueCommand(config),
-				['project:create-diff']: () => new ProjectMigrationsDiffCommand(projectContainerResolver, projectSchemas),
-				['init']: () => new InitCommand(tenantContainer.knexConnection.wrapper(), projectContainers),
-				['drop']: () => new DropCommand(config),
-				['start']: () => new StartCommand(koa, config),
-			}))
+			.addService(
+				'commandManager',
+				({ projectContainerResolver, koa }) =>
+					new CommandManager({
+						['engine:migrations:create']: () => new EngineMigrationsCreateCommand(),
+						['engine:migrations:continue']: () => new EngineMigrationsContinueCommand(config),
+						['project:create-diff']: () => new ProjectMigrationsDiffCommand(projectContainerResolver, projectSchemas),
+						['init']: () => new InitCommand(tenantContainer.knexConnection.wrapper(), projectContainers),
+						['drop']: () => new DropCommand(config),
+						['start']: () => new StartCommand(koa, config),
+					})
+			)
 			.addService('cli', ({ commandManager }) => new Application(commandManager))
 
 			.build()
@@ -217,14 +222,17 @@ class CompositionRoot {
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.slug)
 				)
-				.addService(
-					'migrationsResolver',
-					({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager)
-				)
+				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
 				.addService('systemKnexWrapper', ({ knexConnection }) => new KnexWrapper(knexConnection, 'system'))
 				.addService('systemQueryHandler', ({ systemKnexWrapper }) => systemKnexWrapper.createQueryHandler())
-				.addService('modificationHandlerFactory', () => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-				.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
+				.addService(
+					'modificationHandlerFactory',
+					() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
+				)
+				.addService(
+					'schemaMigrator',
+					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory)
+				)
 				.addService(
 					'schemaVersionBuilder',
 					({ systemQueryHandler, migrationsResolver, schemaMigrator }) =>

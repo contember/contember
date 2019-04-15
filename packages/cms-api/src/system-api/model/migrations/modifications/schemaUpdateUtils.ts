@@ -17,20 +17,23 @@ export const updateEntity = (name: string, entityUpdate: EntityUpdater): ModelUp
 	entities: {
 		...model.entities,
 		[name]: entityUpdate(model.entities[name]),
-	}
+	},
 })
 
-export const updateField = <T extends Model.AnyField = Model.AnyField>(name: string, fieldUpdater: FieldUpdater<T>): EntityUpdater => entity => ({
+export const updateField = <T extends Model.AnyField = Model.AnyField>(
+	name: string,
+	fieldUpdater: FieldUpdater<T>
+): EntityUpdater => entity => ({
 	...entity,
 	fields: {
 		...entity.fields,
 		[name]: fieldUpdater(entity.fields[name] as T),
-	}
+	},
 })
 export const addField = (field: Model.AnyField): EntityUpdater => entity => ({
 	...entity,
 	fields: {
 		...entity.fields,
 		[field.name]: field,
-	}
+	},
 })

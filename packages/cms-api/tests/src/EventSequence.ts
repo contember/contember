@@ -6,12 +6,10 @@ class EventSequence {
 		public readonly stage: string,
 		public readonly baseStage: string | undefined,
 		public readonly sequence: EventSequence.SequencePart[]
-	) {
-	}
+	) {}
 }
 
 namespace EventSequence {
-
 	export type SequencePart = Follow | Event
 
 	export class Follow {
@@ -19,7 +17,7 @@ namespace EventSequence {
 	}
 
 	export enum EventModifier {
-		changed = '*'
+		changed = '*',
 	}
 
 	export type Sequences = EventSequence[]
@@ -28,12 +26,11 @@ namespace EventSequence {
 	export class Event {
 		public readonly type = 'event'
 
-		constructor(public readonly number: number, public readonly modifier?: EventModifier) {
-		}
+		constructor(public readonly number: number, public readonly modifier?: EventModifier) {}
 	}
 
 	export function parse(stage: string, data: string): EventSequence {
-		const matchResult = (data.trim() + " ").match(/^((?<baseStage>[a-z]+)\s+)?(?<sequence>(-\s+)*([0-9]+\*?\s+)*)$/)
+		const matchResult = (data.trim() + ' ').match(/^((?<baseStage>[a-z]+)\s+)?(?<sequence>(-\s+)*([0-9]+\*?\s+)*)$/)
 		if (!matchResult) {
 			throw new Error('Invalid sequence format')
 		}
@@ -81,9 +78,13 @@ namespace EventSequence {
 
 	export function createStagesConfiguration(sequences: StringSequenceSet): Project.Stage[] {
 		const sequenceSet = parseSet(sequences)
-		return sequenceSet.map((it, index) => ({ uuid: testUuid(index + 1), name: it.stage, slug: it.stage, rebaseOn: it.baseStage }))
+		return sequenceSet.map((it, index) => ({
+			uuid: testUuid(index + 1),
+			name: it.stage,
+			slug: it.stage,
+			rebaseOn: it.baseStage,
+		}))
 	}
-
 }
 
 export default EventSequence

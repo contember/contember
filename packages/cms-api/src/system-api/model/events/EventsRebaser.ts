@@ -2,13 +2,18 @@ import KnexWrapper from '../../../core/knex/KnexWrapper'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 
 class EventsRebaser {
-	constructor(private readonly db: KnexWrapper) {
-	}
+	constructor(private readonly db: KnexWrapper) {}
 
-	public async rebaseStageEvents(stageId: string, headEvent: string, oldBase: string, newBase: string, droppedEvents: string[]): Promise<string> {
+	public async rebaseStageEvents(
+		stageId: string,
+		headEvent: string,
+		oldBase: string,
+		newBase: string,
+		droppedEvents: string[]
+	): Promise<string> {
 		console.log(oldBase)
 		console.log(headEvent)
-		const result: { rows: { old_id: string, new_id: string }[] } = await this.db.raw(
+		const result: { rows: { old_id: string; new_id: string }[] } = await this.db.raw(
 			'SELECT * FROM system.rebase_events_unsafe(?::UUID, ?::UUID, ?::UUID, ?::UUID[]) AS t',
 			headEvent,
 			oldBase,
@@ -29,6 +34,5 @@ class EventsRebaser {
 		// return result.rows.reduce((result, row) => ({ ...result, [row.old_id]: row.new_id }), {})
 	}
 }
-
 
 export default EventsRebaser

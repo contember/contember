@@ -147,9 +147,6 @@ class SchemaDiffer {
 								}
 								const partialUpdateResult = tryPartialUpdate(updatedRelation, originalRelation)
 
-								console.log(updatedRelation)
-								console.log(originalRelation)
-
 								if (!partialUpdateResult) {
 									builder.removeField(entityName, fieldName)
 									builder.createField(updatedEntity, fieldName)

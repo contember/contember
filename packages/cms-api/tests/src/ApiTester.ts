@@ -61,6 +61,10 @@ export default class ApiTester {
 				debug: false,
 				client: 'pg',
 				connection: dbCredentials(dbName),
+				pool: {
+					max: 1,
+					min: 1,
+				},
 			})
 		}
 
@@ -117,7 +121,7 @@ export default class ApiTester {
 			systemKnexWrapper: projectDb,
 		})
 
-		const systemExecutionContainer = systemContainer.systemExecutionContainerFactory.create(projectDb)
+		const systemExecutionContainer = systemContainer.systemExecutionContainerFactory.createBuilder(projectDb).build()
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
@@ -132,7 +136,14 @@ export default class ApiTester {
 			await projectDb.knex.destroy()
 		})
 
-		const stageManager = new TesterStageManager(projectDb, systemExecutionContainer.stageMigrator)
+		const stageManager = new TesterStageManager(
+			options.project ? options.project.stages || [] : [],
+			projectDb,
+			systemExecutionContainer.stageCreator,
+			systemExecutionContainer.projectMigrator,
+			migrationsResolver
+		)
+
 		const contentApiTester = new ContentApiTester(
 			projectDb,
 			gqlSchemaBuilderFactory,

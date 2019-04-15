@@ -1,48 +1,69 @@
 import Project from '../../src/config/Project'
-import CreateOrUpdateStageCommand from '../../src/system-api/model/commands/CreateOrUpdateStageCommand'
 import FileNameHelper from '../../src/migrations/FileNameHelper'
 import KnexWrapper from '../../src/core/knex/KnexWrapper'
-import LatestMigrationByStageQuery from '../../src/system-api/model/queries/LatestMigrationByStageQuery'
-import StageMigrator from '../../src/system-api/StageMigrator'
+import StageCreator from '../../src/system-api/model/stages/StageCreator'
+import ProjectMigrator from '../../src/system-api/model/migrations/ProjectMigrator'
+import Migration from '../../src/system-api/model/migrations/Migration'
+import MigrationsResolver from '../../src/content-schema/MigrationsResolver'
 
 export default class TesterStageManager {
-	private knownStages: { [stageSlug: string]: Project.Stage & { migration?: string } } = {}
+	private createdStages = new Set<string>()
 
-	constructor(private readonly db: KnexWrapper, private readonly stageMigrator: StageMigrator) {}
+	private migrationVersion: string | null = null
 
-	public getStage(slug: string): Project.Stage & { migration?: string } {
-		const stage = this.knownStages[slug]
-		if (!stage) {
-			throw new Error(`Unknown stage ${stage}`)
+	constructor(
+		private readonly stages: Project.Stage[],
+		private readonly db: KnexWrapper,
+		private readonly stageCreator: StageCreator,
+		private readonly projectMigrator: ProjectMigrator,
+		private readonly migrationResolver: MigrationsResolver
+	) {}
+
+	public getStage(slug: string): Project.Stage & { migration?: string; id: string } {
+		const stage = this.getStageInternal(slug)
+		if (!this.createdStages.has(slug)) {
+			throw new Error(`Stage ${slug} is not created yet`)
 		}
 		return stage
 	}
 
-	public async createStage(stage: Project.Stage): Promise<void> {
-		await new CreateOrUpdateStageCommand({
-			id: stage.uuid,
-			...stage,
-		}).execute(this.db)
-		this.knownStages[stage.slug] = stage
+	public getMigrationVersion() {
+		return this.migrationVersion
 	}
 
-	public async migrateStage(slug: string, version: string): Promise<void> {
-		version = FileNameHelper.extractVersion(version)
-		const stageMigrator = this.stageMigrator
-		const stage = this.getStage(slug)
-		await stageMigrator.migrate({ ...stage }, () => null, version)
-		this.knownStages[slug] = { ...stage, migration: version }
-	}
-
-	public async refreshStagesVersion() {
-		const queryHandler = this.db.createQueryHandler()
-		for (let stage in this.knownStages) {
-			const stageObj = this.knownStages[stage]
-			const latestMigration = await queryHandler.fetch(new LatestMigrationByStageQuery(stageObj.uuid))
-			this.knownStages[stage] = {
-				...stageObj,
-				migration: latestMigration ? latestMigration.data.version : undefined,
-			}
+	public async createAll(): Promise<void> {
+		for (const stage of this.stages) {
+			await this.createStage(stage.slug)
 		}
+	}
+
+	public async createStage(slug: string): Promise<void> {
+		const stage = this.getStageInternal(slug)
+		await this.stageCreator.createStage(stage.rebaseOn ? this.getStage(stage.rebaseOn) : null, {
+			...stage,
+			id: stage.uuid,
+		})
+		this.createdStages.add(slug)
+	}
+
+	public async migrate(migration: string | Migration): Promise<void> {
+		if (typeof migration === 'string') {
+			const version = FileNameHelper.extractVersion(migration)
+			const resolvedMigration = (await this.migrationResolver.getMigrations()).find(it => it.version === version)
+			if (!resolvedMigration) {
+				throw new Error(`Migration ${migration} not found`)
+			}
+			migration = resolvedMigration
+		}
+		await this.projectMigrator.migrate(this.migrationVersion, [migration], () => null)
+		this.migrationVersion = FileNameHelper.extractVersion(migration.version)
+	}
+
+	private getStageInternal(slug: string): Project.Stage & { migration?: string; id: string } {
+		const stage = this.stages.find(it => it.slug === slug)
+		if (!stage) {
+			throw new Error(`Unknown stage ${stage}`)
+		}
+		return { ...stage, id: stage.uuid }
 	}
 }

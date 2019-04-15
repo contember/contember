@@ -6,21 +6,26 @@ import { expect } from 'chai'
 
 describe('system api - release', () => {
 	it('executes release', async () => {
-		const tester = await ApiTester.create()
-
-		await tester.stages.createStage({
-			uuid: testUuid(1),
-			name: 'Preview',
-			slug: 'preview',
+		const tester = await ApiTester.create({
+			project: {
+				stages: [
+					{
+						uuid: testUuid(2),
+						name: 'Prod',
+						slug: 'prod',
+					},
+					{
+						uuid: testUuid(1),
+						name: 'Preview',
+						slug: 'preview',
+						rebaseOn: 'prod',
+					},
+				],
+			},
 		})
+		await tester.stages.createAll()
 
-		await tester.stages.createStage({
-			uuid: testUuid(2),
-			name: 'Prod',
-			slug: 'prod',
-		})
-
-		await tester.stages.migrateStage('preview', '2019-02-01-163923-init')
+		await tester.stages.migrate('2019-02-01-163923-init')
 
 		await tester.content.queryContent(
 			'preview',
@@ -54,10 +59,9 @@ describe('system api - release', () => {
 			}
 		}`)
 
-		expect(diff.data.diff.result.events).length(3)
-		expect(diff.data.diff.result.events[0].type).eq('RUN_MIGRATION')
+		expect(diff.data.diff.result.events).length(2)
+		expect(diff.data.diff.result.events[0].type).eq('CREATE')
 		expect(diff.data.diff.result.events[1].type).eq('CREATE')
-		expect(diff.data.diff.result.events[2].type).eq('CREATE')
 
 		const result = await tester.system.querySystem(
 			GQL`mutation ($baseStage: String!, $headStage: String!, $events: [String!]!) {
@@ -68,13 +72,11 @@ describe('system api - release', () => {
 			{
 				baseStage: testUuid(2),
 				headStage: testUuid(1),
-				events: [diff.data.diff.result.events[0].id, diff.data.diff.result.events[2].id],
+				events: [diff.data.diff.result.events[1].id],
 			}
 		)
 
 		expect(result.data.release.ok).eq(true)
-
-		await tester.stages.refreshStagesVersion()
 
 		const authors = await tester.content.queryContent(
 			'prod',

@@ -27,11 +27,11 @@ import StageTree from './model/stages/StageTree'
 import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
 import MigrationDiffCreator from './model/migrations/MigrationDiffCreator'
 import ProjectInitializer from './ProjectInitializer'
-import StageMigrator from './StageMigrator'
 import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
 import ProjectMigrator from './model/migrations/ProjectMigrator'
 import SchemaDiffer from './model/migrations/SchemaDiffer'
 import StageCreator from './model/stages/StageCreator'
+import Knex from 'knex'
 
 interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
@@ -40,7 +40,6 @@ interface SystemExecutionContainer {
 	migrationDiffCreator: MigrationDiffCreator
 	queryHandler: QueryHandler<KnexQueryable>
 	projectIntializer: ProjectInitializer
-	stageMigrator: StageMigrator
 }
 
 namespace SystemExecutionContainer {
@@ -55,6 +54,19 @@ namespace SystemExecutionContainer {
 		) {}
 
 		public create(db: KnexWrapper): SystemExecutionContainer {
+			return this.createBuilder(db)
+				.build()
+				.pick(
+					'queryHandler',
+					'releaseExecutor',
+					'diffBuilder',
+					'rebaseExecutor',
+					'migrationDiffCreator',
+					'projectIntializer'
+				)
+		}
+
+		public createBuilder(db: KnexWrapper<Knex>) {
 			return new Container.Builder({})
 				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
 				.addService('migrationsResolver', () => this.migrationsResolver)
@@ -123,12 +135,6 @@ namespace SystemExecutionContainer {
 					({ schemaDiffer, migrationFilesManager, schemaVersionBuilder }) =>
 						new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer)
 				)
-
-				.addService(
-					'stageMigrator',
-					({ db, migrationExecutor, migrationsResolver }) =>
-						new StageMigrator(db, migrationsResolver, migrationExecutor)
-				)
 				.addService(
 					'projectMigrationInfoResolver',
 					({ queryHandler, migrationsResolver }) =>
@@ -152,16 +158,6 @@ namespace SystemExecutionContainer {
 							projectMigrationInfoResolver,
 							stageCreator
 						)
-				)
-				.build()
-				.pick(
-					'queryHandler',
-					'releaseExecutor',
-					'diffBuilder',
-					'rebaseExecutor',
-					'migrationDiffCreator',
-					'projectIntializer',
-					'stageMigrator'
 				)
 		}
 	}

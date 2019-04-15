@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import Knex from 'knex'
 import { Raw, Value } from './types'
 import InsertBuilder from './InsertBuilder'
 import DeleteBuilder from './DeleteBuilder'

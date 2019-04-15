@@ -38,7 +38,6 @@ export default class ProjectMigrator {
 		migrationsToExecute: Migration[],
 		progressCb: (version: string) => void,
 	) {
-		console.log(migrationsToExecute)
 		const queryHandler = this.db.createQueryHandler()
 		const rootStage = this.stageTree.getRoot()
 		const commonEventsMatrix = await queryHandler.fetch(new StageCommonEventsMatrixQuery())

@@ -1,6 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import {
-	MutationAddProjectMemberArgs, MutationCreateApiKeyArgs,
+	MutationAddProjectMemberArgs,
+	MutationCreateApiKeyArgs,
 	MutationResolvers,
 	MutationSetupArgs,
 	MutationSignInArgs,

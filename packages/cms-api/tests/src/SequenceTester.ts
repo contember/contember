@@ -2,7 +2,6 @@ import { GQL } from './tags'
 import { AnyEvent, CreateEvent } from '../../src/system-api/model/dtos/Event'
 import DiffQuery from '../../src/system-api/model/queries/DiffQuery'
 import { expect } from 'chai'
-import { EventType } from '../../src/system-api/model/EventType'
 import EventSequence from './EventSequence'
 import InitEventQuery from '../../src/system-api/model/queries/InitEventQuery'
 import StageBySlugQuery from '../../src/system-api/model/queries/StageBySlugQuery'
@@ -10,6 +9,7 @@ import QueryHandler from '../../src/core/query/QueryHandler'
 import KnexQueryable from '../../src/core/knex/KnexQueryable'
 import ContentApiTester from './ContentApiTester'
 import SystemApiTester from './SystemApiTester'
+import { createCreateEvent } from './DummyEventFactory'
 
 export default class SequenceTester {
 	constructor(
@@ -59,12 +59,15 @@ export default class SequenceTester {
 		return await this.queryHandler.fetch(new DiffQuery(initEvent.id, stageHead))
 	}
 
-	public async verifySequence(sequences: EventSequence.StringSequenceSet, skip: number = 0): Promise<void> {
+	public async verifySequence(
+		sequences: EventSequence.StringSequenceSet,
+		eventsMap: Record<number, AnyEvent>
+	): Promise<void> {
 		const sequenceSet = EventSequence.parseSet(sequences)
 
 		const events: Record<string, AnyEvent[]> = {}
 		for (const sequence of sequenceSet) {
-			events[sequence.stage] = (await this.fetchEvents(sequence.stage)).slice(skip)
+			events[sequence.stage] = await this.fetchEvents(sequence.stage)
 		}
 
 		for (const sequence of sequenceSet) {
@@ -76,8 +79,11 @@ export default class SequenceTester {
 
 				switch (sequenceItem.type) {
 					case 'event':
-						expect(event.type).eq(EventType.create)
-						expect((event as CreateEvent).values).deep.eq({ number: sequenceItem.number })
+						const expectedEvent =
+							eventsMap[sequenceItem.number] ||
+							createCreateEvent((event as CreateEvent).rowId, 'entry', { number: sequenceItem.number })
+
+						this.assertEventEquals(expectedEvent, event)
 						break
 					case 'follow':
 						const baseEvent = events[sequence.baseStage!][i]
@@ -88,5 +94,21 @@ export default class SequenceTester {
 				}
 			}
 		}
+	}
+
+	private assertEventEquals(expected: AnyEvent, actual: AnyEvent) {
+		let {
+			id: {},
+			transactionId: {},
+			createdAt: {},
+			...restExpected
+		} = expected
+		let {
+			id: {},
+			transactionId: {},
+			createdAt: {},
+			...restActual
+		} = actual
+		expect(restActual).deep.eq(restExpected)
 	}
 }

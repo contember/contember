@@ -4,6 +4,7 @@ import ApiTester from '../../../src/ApiTester'
 import { GQL } from '../../../src/tags'
 import EventSequence from '../../../src/EventSequence'
 import { expect } from 'chai'
+import { createRunMigrationEvent } from '../../../src/DummyEventFactory'
 
 describe('system api - release', () => {
 	it('executes release', async () => {
@@ -47,15 +48,17 @@ describe('system api - release', () => {
 
 		await tester.sequences.verifySequence(
 			{
-				a: '  1 2 3 4 5',
-				b: 'a - - - - - 6 7',
-				c: 'b - - - - - - -',
-				d: 'b - - - - - - - 8',
-				e: 'd - - - - - - - - 9',
-				f: 'a - - - - - 10 11',
-				g: 'd - - - - - - - -',
+				a: '  99 1 2 3 4 5',
+				b: 'a -  - - - - - 6 7',
+				c: 'b -  - - - - - - -',
+				d: 'b -  - - - - - - - 8',
+				e: 'd -  - - - - - - - - 9',
+				f: 'a -  - - - - - 10 11',
+				g: 'd -  - - - - - - - -',
 			},
-			1
+			{
+				99: createRunMigrationEvent('2019-02-01-163923'),
+			}
 		)
 	})
 })

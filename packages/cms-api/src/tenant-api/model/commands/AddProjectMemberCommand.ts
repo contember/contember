@@ -27,14 +27,10 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 		} catch (e) {
 			switch (e.constraint) {
 				case 'project_member_project_id_fkey':
-					return new AddProjectMemberCommand.AddProjectMemberResponseError([
-						AddProjectMemberErrorCode.ProjectNotFound,
-					])
+					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.ProjectNotFound])
 
 				case 'project_member_identity':
-					return new AddProjectMemberCommand.AddProjectMemberResponseError([
-						AddProjectMemberErrorCode.IdentityNotFound,
-					])
+					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.IdentityNotFound])
 
 				case 'project_member_project_identity':
 					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.AlreadyMember])

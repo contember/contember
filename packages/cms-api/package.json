@@ -24,6 +24,7 @@
 		"apollo-server-koa": "^2.4.8",
 		"aws-sdk": "^2.413.0",
 		"bcrypt": "^3.0.4",
+		"chalk": "^2.4.2",
 		"cms-common": "0.0.0",
 		"cms-server-common": "0.0.0",
 		"fast-deep-equal": "^2.0.1",

@@ -1,5 +1,6 @@
 import Project from './Project'
 import { ConfigLoader } from 'cms-server-common'
+import { deprecated } from '../core/console/messages'
 
 export type DatabaseCredentials = Project.DatabaseCredentials
 
@@ -20,99 +21,114 @@ function error(err: string): never {
 }
 
 function checkDatabaseCredentials(json: any, path: string): void {
-	if (typeof json.host === 'undefined') {
+	if (json.host === undefined) {
 		error(`Undefined property ${path}.host in config file`)
 	}
-	if (typeof json.port === 'undefined') {
+	if (json.port === undefined) {
 		error(`Undefined property ${path}.port in config file`)
 	}
-	if (typeof json.user === 'undefined') {
+	if (json.user === undefined) {
 		error(`Undefined property ${path}.user in config file`)
 	}
-	if (typeof json.password === 'undefined') {
+	if (json.password === undefined) {
 		error(`Undefined property ${path}.password in config file`)
 	}
-	if (typeof json.database === 'undefined') {
+	if (json.database === undefined) {
 		error(`Undefined property ${path}.database in config file`)
 	}
 }
 
 function checkS3Config(json: any, path: string): void {
-	if (typeof json.bucket === 'undefined') {
+	if (json.bucket === undefined) {
 		error(`Undefined property ${path}.bucket in config file`)
 	}
-	if (typeof json.prefix === 'undefined') {
+	if (json.prefix === undefined) {
 		error(`Undefined property ${path}.prefix in config file`)
 	}
-	if (typeof json.region === 'undefined') {
+	if (json.region === undefined) {
 		error(`Undefined property ${path}.region in config file`)
 	}
-	if (typeof json.credentials === 'undefined') {
+	if (json.credentials === undefined) {
 		error(`Undefined property ${path}.credentials in config file`)
 	}
-	if (typeof json.credentials.key === 'undefined') {
+	if (json.credentials.key === undefined) {
 		error(`Undefined property ${path}.credentials.key in config file`)
 	}
-	if (typeof json.credentials.secret === 'undefined') {
+	if (json.credentials.secret === undefined) {
 		error(`Undefined property ${path}.credentials.secret in config file`)
 	}
 }
 
 function checkConfigStructure(json: any): void {
-	if (typeof json.tenant === 'undefined') {
+	if (json.tenant === undefined) {
 		error('Undefined property tenant in config file')
 	}
-	if (typeof json.tenant.db === 'undefined') {
+	if (json.tenant.db === undefined) {
 		error('Undefined property tenant.db in config file')
 	}
 	checkDatabaseCredentials(json.tenant.db, 'tenant.db')
-	if (typeof json.projects === 'undefined') {
+	if (json.projects === undefined) {
 		error('Undefined property projects in config file')
 	}
-	if (typeof json.projects[Symbol.iterator] !== 'function') {
+	if (!Array.isArray(json.projects)) {
 		error('Property projects should be an array in config file')
 	}
 	let i = 0
 	for (const project of json.projects) {
-		if (typeof project.uuid === 'undefined') {
-			error(`Undefined property projects[${i}].uuid in config file`)
+		if (project.id === undefined) {
+			if (project.uuid !== undefined) {
+				project.id = project.uuid
+				console.warn(
+					deprecated(`Property projects[${i}].uuid in config file is deprecated, use projects[${i}].id instead`)
+				)
+			} else {
+				error(`Undefined property projects[${i}].uuid in config file`)
+			}
 		}
-		if (typeof project.slug === 'undefined') {
+		if (project.slug === undefined) {
 			error(`Undefined property projects[${i}].slug in config file`)
 		}
-		if (typeof project.name === 'undefined') {
+		if (project.name === undefined) {
 			error(`Undefined property projects[${i}].name in config file`)
 		}
-		if (typeof project.stages === 'undefined') {
+		if (project.stages === undefined) {
 			error(`Undefined property projects[${i}].stages in config file`)
 		}
-		if (typeof project.stages[Symbol.iterator] !== 'function') {
+		if (!Array.isArray(project.stages)) {
 			error(`Property projects[${i}].stages should be an array in config file`)
 		}
 		let j = 0
 		for (const stage of project.stages) {
-			if (typeof stage.uuid === 'undefined') {
-				error(`Undefined property projects[${i}}.stages[${j}].uuid in config file`)
+			if (stage.id === undefined) {
+				if (stage.uuid !== undefined) {
+					console.warn(
+						deprecated(
+							`Property projects[${i}].stages[${j}].uuid in config file is deprecated, use projects[${i}].stages[${j}].id instead`
+						)
+					)
+				} else {
+					error(`Undefined property projects[${i}].stages[${j}].uuid in config file`)
+				}
 			}
-			if (typeof stage.slug === 'undefined') {
+			if (stage.slug === undefined) {
 				error(`Undefined property projects[${i}}.stages[${j}].slug in config file`)
 			}
-			if (typeof stage.name === 'undefined') {
+			if (stage.name === undefined) {
 				error(`Undefined property projects[${i}}.stages[${j}].name in config file`)
 			}
 			j++
 		}
-		if (typeof project.dbCredentials === 'undefined') {
+		if (project.dbCredentials === undefined) {
 			error(`Property projects[${i}].dbCredentials should be an array in config file`)
 		}
 		checkDatabaseCredentials(project.dbCredentials, `projects[${i}].dbCredentials`)
 		checkS3Config(project.s3, `projects[${i}].s3`)
 		i++
 	}
-	if (typeof json.server === 'undefined') {
+	if (json.server === undefined) {
 		error(`Undefined property server in config file`)
 	}
-	if (typeof json.server.port === 'undefined') {
+	if (json.server.port === undefined) {
 		error(`Undefined property server.port in config file`)
 	}
 }

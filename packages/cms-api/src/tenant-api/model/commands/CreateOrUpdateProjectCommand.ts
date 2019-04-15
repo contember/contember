@@ -11,7 +11,7 @@ class CreateOrUpdateProjectCommand implements Command<void> {
 			.insertBuilder()
 			.into('project')
 			.values({
-				id: this.project.uuid,
+				id: this.project.id,
 				name: this.project.name,
 				slug: this.project.slug,
 			})

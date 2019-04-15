@@ -79,7 +79,7 @@ namespace EventSequence {
 	export function createStagesConfiguration(sequences: StringSequenceSet): Project.Stage[] {
 		const sequenceSet = parseSet(sequences)
 		return sequenceSet.map((it, index) => ({
-			uuid: testUuid(index + 1),
+			id: testUuid(index + 1),
 			name: it.stage,
 			slug: it.stage,
 			rebaseOn: it.baseStage,

@@ -1,15 +1,5 @@
 import knex from 'knex'
 import Koa from 'koa'
-import SignInMutationResolver from './tenant-api/resolvers/mutation/SignInMutationResolver'
-import KnexConnection from './core/knex/KnexConnection'
-import QueryHandler from './core/query/QueryHandler'
-import KnexQueryable from './core/knex/KnexQueryable'
-import SignInManager from './tenant-api/model/service/SignInManager'
-import SignUpManager from './tenant-api/model/service/SignUpManager'
-import SignUpMutationResolver from './tenant-api/resolvers/mutation/SignUpMutationResolver'
-import MeQueryResolver from './tenant-api/resolvers/query/MeQueryResolver'
-import ProjectMemberManager from './tenant-api/model/service/ProjectMemberManager'
-import ApiKeyManager from './tenant-api/model/service/ApiKeyManager'
 import Container from './core/di/Container'
 import Project from './config/Project'
 import AuthMiddlewareFactory from './http/AuthMiddlewareFactory'
@@ -18,15 +8,7 @@ import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
 import GraphQlSchemaBuilderFactory from './content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { Config, DatabaseCredentials } from './config/config'
 import S3 from './utils/S3'
-import AddProjectMemberMutationResolver from './tenant-api/resolvers/mutation/AddProjectMemberMutationResolver'
-import ResolverFactory from './tenant-api/resolvers/ResolverFactory'
 import TimerMiddlewareFactory from './http/TimerMiddlewareFactory'
-import TenantApolloServerFactory from './http/TenantApolloServerFactory'
-import SetupMutationResolver from './tenant-api/resolvers/mutation/SetupMutationResolver'
-import Authorizator from './core/authorization/Authorizator'
-import AccessEvaluator from './core/authorization/AccessEvalutator'
-import PermissionsFactory from './tenant-api/model/authorization/PermissionsFactory'
-import UpdateProjectMemberVariablesMutationResolver from './tenant-api/resolvers/mutation/UpdateProjectMemberVariablesMutationResolver'
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
 import KnexWrapper from './core/knex/KnexWrapper'
 import SystemMiddlewareFactory from './http/SystemMiddlewareFactory'
@@ -59,6 +41,7 @@ import StartCommand from './cli/StartCommand'
 import { CommandManager } from './core/cli/CommandManager'
 import { Schema } from 'cms-common'
 import SystemExecutionContainer from './system-api/SystemExecutionContainer'
+import TenantContainer from './tenant-api/TenantContainer'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -97,7 +80,7 @@ class CompositionRoot {
 
 			.addService(
 				'authMiddlewareFactory',
-				({ tenantContainer }) => new AuthMiddlewareFactory(tenantContainer.get('apiKeyManager'))
+				({ tenantContainer }) => new AuthMiddlewareFactory(tenantContainer.apiKeyManager)
 			)
 			.addService(
 				'projectMemberMiddlewareFactory',
@@ -114,7 +97,7 @@ class CompositionRoot {
 			.addService(
 				'tenantMiddlewareFactory',
 				({ tenantContainer, authMiddlewareFactory }) =>
-					new TenantMiddlewareFactory(tenantContainer.get('apolloServer'), authMiddlewareFactory)
+					new TenantMiddlewareFactory(tenantContainer.apolloServer, authMiddlewareFactory)
 			)
 			.addService('setupSystemVariablesMiddlewareFactory', () => new SetupSystemVariablesMiddlewareFactory())
 			.addService(
@@ -186,7 +169,7 @@ class CompositionRoot {
 						['engine:migrations:create']: () => new EngineMigrationsCreateCommand(),
 						['engine:migrations:continue']: () => new EngineMigrationsContinueCommand(config),
 						['project:create-diff']: () => new ProjectMigrationsDiffCommand(projectContainerResolver, projectSchemas),
-						['init']: () => new InitCommand(tenantContainer.knexConnection.wrapper(), projectContainers),
+						['init']: () => new InitCommand(tenantContainer.projectManager, projectContainers),
 						['drop']: () => new DropCommand(config),
 						['start']: () => new StartCommand(koa, config),
 					})
@@ -283,102 +266,7 @@ class CompositionRoot {
 	}
 
 	createTenantContainer(tenantDbCredentials: DatabaseCredentials) {
-		return new Container.Builder({})
-			.addService('knexDebugger', () => {
-				return new KnexDebugger()
-			})
-			.addService('knexConnection', ({ knexDebugger }) => {
-				const knexInst = knex({
-					debug: false,
-					client: 'pg',
-					connection: tenantDbCredentials,
-				})
-				knexDebugger.register(knexInst)
-				return new KnexConnection(knexInst, 'tenant')
-			})
-			.addService('queryHandler', ({ knexConnection }) => {
-				const handler = new QueryHandler(
-					new KnexQueryable(knexConnection, {
-						get(): QueryHandler<KnexQueryable> {
-							return handler
-						},
-					})
-				)
-
-				return handler
-			})
-
-			.addService(
-				'apiKeyManager',
-				({ queryHandler, knexConnection }) => new ApiKeyManager(queryHandler, knexConnection.wrapper())
-			)
-			.addService(
-				'signUpManager',
-				({ queryHandler, knexConnection }) => new SignUpManager(queryHandler, knexConnection.wrapper())
-			)
-			.addService('signInManager', ({ queryHandler, apiKeyManager }) => new SignInManager(queryHandler, apiKeyManager))
-			.addService(
-				'projectMemberManager',
-				({ queryHandler, knexConnection }) => new ProjectMemberManager(queryHandler, knexConnection.wrapper())
-			)
-
-			.addService('meQueryResolver', ({ queryHandler }) => new MeQueryResolver(queryHandler))
-			.addService(
-				'signUpMutationResolver',
-				({ signUpManager, queryHandler, apiKeyManager }) =>
-					new SignUpMutationResolver(signUpManager, queryHandler, apiKeyManager)
-			)
-			.addService(
-				'signInMutationResolver',
-				({ signInManager, queryHandler }) => new SignInMutationResolver(signInManager, queryHandler)
-			)
-			.addService(
-				'addProjectMemberMutationResolver',
-				({ projectMemberManager }) => new AddProjectMemberMutationResolver(projectMemberManager)
-			)
-			.addService(
-				'setupMutationResolver',
-				({ signUpManager, apiKeyManager, queryHandler }) =>
-					new SetupMutationResolver(signUpManager, queryHandler, apiKeyManager)
-			)
-			.addService(
-				'updateProjectMemberVariablesMutationResolver',
-				({ projectMemberManager }) => new UpdateProjectMemberVariablesMutationResolver(projectMemberManager)
-			)
-			.addService(
-				'createApiKeyMutationResolver',
-				({ apiKeyManager }) => new CreateApiKeyMutationResolver(apiKeyManager)
-			)
-
-			.addService(
-				'resolvers',
-				({
-					meQueryResolver,
-					signUpMutationResolver,
-					signInMutationResolver,
-					addProjectMemberMutationResolver,
-					setupMutationResolver,
-					updateProjectMemberVariablesMutationResolver,
-					createApiKeyMutationResolver,
-				}) => {
-					return new ResolverFactory(
-						meQueryResolver,
-						signUpMutationResolver,
-						signInMutationResolver,
-						addProjectMemberMutationResolver,
-						setupMutationResolver,
-						updateProjectMemberVariablesMutationResolver,
-						createApiKeyMutationResolver
-					).create()
-				}
-			)
-			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
-			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
-
-			.addService('apolloServer', ({ resolvers, projectMemberManager, authorizator }) =>
-				new TenantApolloServerFactory(resolvers, projectMemberManager, authorizator).create()
-			)
-			.build()
+		return new TenantContainer.Factory().create(tenantDbCredentials)
 	}
 }
 

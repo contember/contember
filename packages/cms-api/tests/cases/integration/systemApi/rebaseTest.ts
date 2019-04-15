@@ -1,6 +1,6 @@
 import 'mocha'
 import { testUuid } from '../../../src/testUuid'
-import { ApiTester } from '../../../src/ApiTester'
+import ApiTester from '../../../src/ApiTester'
 import { GQL } from '../../../src/tags'
 import EventSequence from '../../../src/EventSequence'
 import { expect } from 'chai'
@@ -24,28 +24,28 @@ describe('system api - release', () => {
 
 		let i = 0
 		for (const stage in eventsSequence) {
-			await tester.createStage({
+			await tester.stages.createStage({
 				uuid: testUuid(++i),
 				name: stage,
 				slug: stage,
 			})
 			if (i === 1) {
-				await tester.migrateStage(stage, '2019-02-01-163923-init')
+				await tester.stages.migrateStage(stage, '2019-02-01-163923-init')
 			} else {
-				await tester.releaseForward(stage, 'a', 1)
+				await tester.system.releaseForward(stage, 'a', 1)
 			}
 		}
-		await tester.refreshStagesVersion()
-		await tester.runSequence(eventsSequence)
+		await tester.stages.refreshStagesVersion()
+		await tester.sequences.runSequence(eventsSequence)
 
-		const result = await tester.querySystem(GQL`mutation {
+		const result = await tester.system.querySystem(GQL`mutation {
       rebaseAll {
         ok
       }
     }`)
 		expect(result.data.rebaseAll.ok).eq(true)
 
-		await tester.verifySequence(
+		await tester.sequences.verifySequence(
 			{
 				a: '  1 2 3 4 5',
 				b: 'a - - - - - 6 7',

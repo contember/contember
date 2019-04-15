@@ -1,5 +1,6 @@
 import InputParser from './InputParser'
 import { CommandManager } from './CommandManager'
+import chalk from 'chalk'
 
 class Application {
 	constructor(private readonly commandManager: CommandManager) {}
@@ -13,9 +14,9 @@ class Application {
 			for (let commandName of this.commandManager.getNames().sort((a, b) => a.localeCompare(b))) {
 				const command = this.commandManager.createCommand(commandName)!
 				const configuration = command.getConfiguration()
-				const commandUsage = configuration.getUsage()
+				const commandUsage = configuration.getUsage() ? ' ' + configuration.getUsage() : ''
 				const description = configuration.getDescription() ? ` - ${configuration.getDescription()}` : ''
-				console.log(`\t${commandName} ${commandUsage}${description}`)
+				console.log(`\t${chalk.greenBright(commandName)}${chalk.green(commandUsage)}${description}`)
 			}
 			return process.exit(0)
 		}

@@ -1,11 +1,10 @@
 import CommandConfiguration from '../core/cli/CommandConfiguration'
-import CreateProjectCommand from '../tenant-api/model/commands/CreateProjectCommand'
 import { ProjectContainer } from '../CompositionRoot'
 import Command from '../core/cli/Command'
-import KnexWrapper from '../core/knex/KnexWrapper'
+import ProjectManager from '../tenant-api/model/service/ProjectManager'
 
 class InitCommand extends Command<{}, {}> {
-	constructor(private readonly tenantDb: KnexWrapper, private readonly projectContainers: ProjectContainer[]) {
+	constructor(private readonly projectManager: ProjectManager, private readonly projectContainers: ProjectContainer[]) {
 		super()
 	}
 
@@ -15,7 +14,7 @@ class InitCommand extends Command<{}, {}> {
 		await Promise.all(
 			this.projectContainers.map(async container => {
 				const project = container.project
-				await new CreateProjectCommand(project).execute(this.tenantDb)
+				await this.projectManager.createOrUpdateProject(project)
 				console.log(`Project ${project.slug} updated`)
 				await container.systemKnexWrapper.transaction(async trx => {
 					const executionContainer = container.systemExecutionContainerFactory.create(trx)

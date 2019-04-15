@@ -1,9 +1,9 @@
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 import Command from './Command'
-import Project from '../../../config/Project'
 import InsertBuilder from '../../../core/knex/InsertBuilder'
+import Project from '../type/Project'
 
-class CreateProjectCommand implements Command<void> {
+class CreateOrUpdateProjectCommand implements Command<void> {
 	constructor(private readonly project: Project) {}
 
 	public async execute(db: KnexWrapper): Promise<void> {
@@ -22,4 +22,4 @@ class CreateProjectCommand implements Command<void> {
 	}
 }
 
-export default CreateProjectCommand
+export default CreateOrUpdateProjectCommand

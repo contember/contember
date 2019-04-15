@@ -1,4 +1,3 @@
-import CompositionRoot from '../../../../src/CompositionRoot'
 import { makeExecutableSchema } from 'graphql-tools'
 import typeDefs from '../../../../src/tenant-api/schema/tenant.graphql'
 import { executeGraphQlTest, SqlQuery } from '../../../src/testGraphql'
@@ -12,6 +11,7 @@ import { Buffer } from 'buffer'
 import ApiKey from '../../../../src/tenant-api/model/type/ApiKey'
 import ResolverContext from '../../../../src/tenant-api/resolvers/ResolverContext'
 import Identity from '../../../../src/common/auth/Identity'
+import TenantContainer from '../../../../src/tenant-api/TenantContainer'
 
 export interface Test {
 	query: string
@@ -20,8 +20,7 @@ export interface Test {
 }
 
 export const execute = async (test: Test) => {
-	const compositionRoot = new CompositionRoot()
-	const tenantContainer = compositionRoot.createTenantContainer({
+	const tenantContainer = new TenantContainer.Factory().create({
 		database: 'foo',
 		host: 'localhost',
 		port: 5432,
@@ -37,8 +36,8 @@ export const execute = async (test: Test) => {
 		}
 	)
 
-	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.get('resolvers') })
-	await executeGraphQlTest(tenantContainer.get('knexConnection').knex, {
+	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.testContainer.resolvers })
+	await executeGraphQlTest(tenantContainer.testContainer.knexConnection.knex, {
 		context: context,
 		executes: test.executes,
 		query: test.query,

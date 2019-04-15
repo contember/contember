@@ -1,5 +1,5 @@
 interface Project {
-	readonly uuid: string
+	readonly id: string
 	readonly slug: string
 	readonly name: string
 	readonly stages: Array<Project.Stage>
@@ -9,7 +9,7 @@ interface Project {
 
 namespace Project {
 	export interface Stage {
-		readonly uuid: string
+		readonly id: string
 		readonly slug: string
 		readonly name: string
 		readonly rebaseOn?: string

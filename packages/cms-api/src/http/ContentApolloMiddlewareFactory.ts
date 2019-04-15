@@ -28,10 +28,10 @@ class ContentApolloMiddlewareFactory {
 			ContentApolloMiddlewareFactory.KoaState
 	> {
 		return async (ctx, next) => {
-			if (!this.schemaCache[stage.uuid]) {
-				this.schemaCache[stage.uuid] = await this.schemaVersionBuilder.buildSchemaForStage(stage.uuid)
+			if (!this.schemaCache[stage.id]) {
+				this.schemaCache[stage.id] = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
 			}
-			const schema = this.schemaCache[stage.uuid]
+			const schema = this.schemaCache[stage.id]
 
 			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
 				projectRoles: ctx.state.projectRoles,

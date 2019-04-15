@@ -48,7 +48,7 @@ class SystemApolloServerFactory {
 			}): ResolverContext => {
 				return new ResolverContext(
 					new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {
-						[ctx.state.projectContainer.project.uuid]: ctx.state.projectRoles,
+						[ctx.state.projectContainer.project.id]: ctx.state.projectRoles,
 					}),
 					ctx.state.projectVariables,
 					this.authorizator,

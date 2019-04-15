@@ -26,7 +26,7 @@ import SequenceTester from './SequenceTester'
 
 export default class ApiTester {
 	public static project: Project = {
-		uuid: testUuid(1000),
+		id: testUuid(1000),
 		name: 'test',
 		stages: [],
 		slug: 'test',

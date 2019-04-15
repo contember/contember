@@ -26,11 +26,11 @@ namespace StageTree {
 			const stages = project.stages.filter(it => it.rebaseOn).reduce<Map>(
 				(acc, stage) => ({
 					...acc,
-					[stage.rebaseOn!]: [...(acc[stage.rebaseOn!] || []), { ...stage, id: stage.uuid }],
+					[stage.rebaseOn!]: [...(acc[stage.rebaseOn!] || []), stage],
 				}),
 				{}
 			)
-			return new StageTree({ ...rootStage, id: rootStage.uuid }, stages)
+			return new StageTree(rootStage, stages)
 		}
 	}
 }

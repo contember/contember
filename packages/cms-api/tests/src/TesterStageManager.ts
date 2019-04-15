@@ -19,7 +19,7 @@ export default class TesterStageManager {
 		private readonly migrationResolver: MigrationsResolver
 	) {}
 
-	public getStage(slug: string): Project.Stage & { migration?: string; id: string } {
+	public getStage(slug: string): Project.Stage {
 		const stage = this.getStageInternal(slug)
 		if (!this.createdStages.has(slug)) {
 			throw new Error(`Stage ${slug} is not created yet`)
@@ -39,10 +39,7 @@ export default class TesterStageManager {
 
 	public async createStage(slug: string): Promise<void> {
 		const stage = this.getStageInternal(slug)
-		await this.stageCreator.createStage(stage.rebaseOn ? this.getStage(stage.rebaseOn) : null, {
-			...stage,
-			id: stage.uuid,
-		})
+		await this.stageCreator.createStage(stage.rebaseOn ? this.getStage(stage.rebaseOn) : null, stage)
 		this.createdStages.add(slug)
 	}
 
@@ -59,11 +56,11 @@ export default class TesterStageManager {
 		this.migrationVersion = FileNameHelper.extractVersion(migration.version)
 	}
 
-	private getStageInternal(slug: string): Project.Stage & { migration?: string; id: string } {
+	private getStageInternal(slug: string): Project.Stage {
 		const stage = this.stages.find(it => it.slug === slug)
 		if (!stage) {
 			throw new Error(`Unknown stage ${stage}`)
 		}
-		return { ...stage, id: stage.uuid }
+		return stage
 	}
 }

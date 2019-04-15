@@ -1,5 +1,4 @@
 import 'mocha'
-import { testUuid } from '../../../src/testUuid'
 import ApiTester from '../../../src/ApiTester'
 import { GQL } from '../../../src/tags'
 import EventSequence from '../../../src/EventSequence'
@@ -17,26 +16,17 @@ describe('system api - release', () => {
 			f: 'a - - - - 10 11',
 			g: 'd - - - - -',
 		}
+
+		const stages = EventSequence.createStagesConfiguration(eventsSequence)
 		const tester = await ApiTester.create({
 			project: {
-				stages: EventSequence.createStagesConfiguration(eventsSequence),
+				stages: stages,
 			},
 		})
+		await tester.stages.createAll()
 
-		let i = 0
-		for (const stage in eventsSequence) {
-			await tester.stages.createStage({
-				uuid: testUuid(++i),
-				name: stage,
-				slug: stage,
-			})
-			if (i === 1) {
-				await tester.stages.migrateStage(stage, '2019-02-01-163923-init')
-			} else {
-				await tester.system.releaseForward(stage, 'a', 1)
-			}
-		}
-		await tester.stages.refreshStagesVersion()
+		await tester.stages.migrate('2019-02-01-163923-init')
+
 		await tester.sequences.runSequence(eventsSequence)
 
 		const result = await tester.system.querySystem(GQL`mutation {

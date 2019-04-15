@@ -18,10 +18,11 @@ namespace StageTree {
 
 	export class Factory {
 		public create(project: Project): StageTree {
-			const rootStage = project.stages.find(it => !it.rebaseOn)
-			if (!rootStage) {
-				throw new Error('Root stage is not defined')
+			const rootStages = project.stages.filter(it => !it.rebaseOn)
+			if (rootStages.length !== 1) {
+				throw new Error(`Exactly 1 root stage expected, ${rootStages.length} found`)
 			}
+			const rootStage = rootStages[0]
 			const stages = project.stages.filter(it => it.rebaseOn).reduce<Map>(
 				(acc, stage) => ({
 					...acc,

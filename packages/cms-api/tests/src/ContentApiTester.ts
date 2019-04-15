@@ -10,6 +10,7 @@ import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/Gra
 import TesterStageManager from './TesterStageManager'
 import { Schema } from 'cms-common'
 import SchemaVersionBuilder from '../../src/content-schema/SchemaVersionBuilder'
+import { emptySchema } from '../../src/content-schema/schemaUtils'
 
 export default class ContentApiTester {
 	constructor(
@@ -22,7 +23,7 @@ export default class ContentApiTester {
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
 		await setupSystemVariables(this.db, '11111111-1111-1111-1111-111111111111')
 		const stage = this.stageManager.getStage(stageSlug)
-		const model = (await this.getStageSchema(stageSlug)).model
+		const model = (await this.getSchema()).model
 		const permissions = new AllowAllPermissionFactory().create(model)
 		const gqlSchemaBuilder = this.graphqlSchemaBuilderFactory.create(model, permissions)
 		const schema = gqlSchemaBuilder.build()
@@ -50,11 +51,8 @@ export default class ContentApiTester {
 		return result
 	}
 
-	public async getStageSchema(stageSlug: string): Promise<Schema> {
-		const stage = this.stageManager.getStage(stageSlug)
-		if (!stage.migration) {
-			throw new Error(`Unknown migration version for stage ${stageSlug}`)
-		}
-		return await this.schemaVersionBuilder.buildSchema(stage.migration)
+	private async getSchema(): Promise<Schema> {
+		const version = this.stageManager.getMigrationVersion()
+		return version ? await this.schemaVersionBuilder.buildSchema(version) : emptySchema
 	}
 }

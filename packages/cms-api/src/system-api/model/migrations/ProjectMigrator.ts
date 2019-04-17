@@ -39,7 +39,7 @@ export default class ProjectMigrator {
 		const queryHandler = this.db.createQueryHandler()
 		const rootStage = this.stageTree.getRoot()
 		const commonEventsMatrix = await queryHandler.fetch(new StageCommonEventsMatrixQuery())
-		let schema = currentVersion ? await this.schemaVersionBuilder.buildSchemaUntil(currentVersion) : emptySchema
+		let schema = currentVersion ? await this.schemaVersionBuilder.buildSchema(currentVersion) : emptySchema
 		let stageEvents = await this.fetchStageEvents(queryHandler, commonEventsMatrix, rootStage)
 
 		let previousId = commonEventsMatrix[rootStage.id][rootStage.id].stageAEventId

@@ -5,6 +5,7 @@ import StageCreator from '../../src/system-api/model/stages/StageCreator'
 import ProjectMigrator from '../../src/system-api/model/migrations/ProjectMigrator'
 import Migration from '../../src/system-api/model/migrations/Migration'
 import MigrationsResolver from '../../src/content-schema/MigrationsResolver'
+import LatestMigrationByStageQuery from '../../src/system-api/model/queries/LatestMigrationByStageQuery'
 
 export default class TesterStageManager {
 	private createdStages = new Set<string>()
@@ -25,6 +26,23 @@ export default class TesterStageManager {
 			throw new Error(`Stage ${slug} is not created yet`)
 		}
 		return stage
+	}
+
+	public async refreshCreatedStages(): Promise<Set<string>> {
+		const stages = await this.db
+			.selectBuilder<{ slug: string; id: string }>()
+			.select('slug')
+			.select('id')
+			.from('stage')
+			.getResult()
+
+		this.createdStages = new Set(stages.map(it => it.slug))
+		if (stages.length > 0) {
+			const latestVersion = await this.db.createQueryHandler().fetch(new LatestMigrationByStageQuery(stages[0].id))
+			this.migrationVersion = latestVersion ? latestVersion.data.version : null
+		}
+
+		return this.createdStages
 	}
 
 	public getMigrationVersion() {
@@ -59,7 +77,7 @@ export default class TesterStageManager {
 	private getStageInternal(slug: string): Project.Stage {
 		const stage = this.stages.find(it => it.slug === slug)
 		if (!stage) {
-			throw new Error(`Unknown stage ${stage}`)
+			throw new Error(`Unknown stage ${slug}`)
 		}
 		return stage
 	}

@@ -23,6 +23,8 @@ import ContentApiTester from './ContentApiTester'
 import SystemApiTester from './SystemApiTester'
 import TesterStageManager from './TesterStageManager'
 import SequenceTester from './SequenceTester'
+import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
+import Container from '../../src/core/di/Container'
 
 export default class ApiTester {
 	public static project: Project = {
@@ -38,12 +40,19 @@ export default class ApiTester {
 		public readonly content: ContentApiTester,
 		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
-		public readonly sequences: SequenceTester
+		public readonly sequences: SequenceTester,
+		public readonly systemExecutionContainer: ReturnType<
+			ReturnType<SystemExecutionContainer.Factory['createBuilder']>['build']
+		>
 	) {}
 
 	public static async create(
 		options: {
 			project?: Partial<Project>
+			migrationsResolver?: MigrationsResolver
+			systemExecutionContainerHook?: (
+				container: ReturnType<SystemExecutionContainer.Factory['createBuilder']>
+			) => ReturnType<SystemExecutionContainer.Factory['createBuilder']>
 		} = {}
 	): Promise<ApiTester> {
 		const dbCredentials = (dbName: string) => {
@@ -88,7 +97,7 @@ export default class ApiTester {
 		await new CreateInitEventCommand().execute(projectDb)
 
 		const projectMigrationFilesManager = ApiTester.createProjectMigrationFilesManager()
-		const migrationsResolver = new MigrationsResolver(projectMigrationFilesManager)
+		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(projectMigrationFilesManager)
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const schemaMigrator = new SchemaMigrator(modificationHandlerFactory)
 		const schemaVersionBuilder = new SchemaVersionBuilder(
@@ -121,7 +130,11 @@ export default class ApiTester {
 			systemKnexWrapper: projectDb,
 		})
 
-		const systemExecutionContainer = systemContainer.systemExecutionContainerFactory.createBuilder(projectDb).build()
+		let systemExecutionContainerBuilder = systemContainer.systemExecutionContainerFactory.createBuilder(projectDb)
+		if (options.systemExecutionContainerHook) {
+			systemExecutionContainerBuilder = options.systemExecutionContainerHook(systemExecutionContainerBuilder)
+		}
+		const systemExecutionContainer = systemExecutionContainerBuilder.build()
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
@@ -153,7 +166,7 @@ export default class ApiTester {
 		const systemApiTester = new SystemApiTester(projectDb, systemSchema, systemContainer, systemExecutionContainer)
 		const sequenceTester = new SequenceTester(projectDb.createQueryHandler(), contentApiTester, systemApiTester)
 
-		return new ApiTester(contentApiTester, systemApiTester, stageManager, sequenceTester)
+		return new ApiTester(contentApiTester, systemApiTester, stageManager, sequenceTester, systemExecutionContainer)
 	}
 
 	private static createProjectMigrationFilesManager(): MigrationFilesManager {

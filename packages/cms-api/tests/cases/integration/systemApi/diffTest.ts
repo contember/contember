@@ -45,7 +45,7 @@ describe('system api - diff', () => {
 		)
 
 		const diff = await tester.system.querySystem(GQL`query {
-			diff(baseStage: "prod", headStage: "preview", filter: [{entity: "Author", id: "${response.data.createAuthor.id}"}]) {
+			diff(baseStage: "prod", headStage: "preview", filter: [{entity: "Author", id: "${response.createAuthor.id}"}]) {
 				result {
 					events {
 						id

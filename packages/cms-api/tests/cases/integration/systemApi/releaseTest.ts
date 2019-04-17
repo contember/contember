@@ -88,9 +88,7 @@ describe('system api - release', () => {
 		)
 
 		expect(authors).deep.eq({
-			data: {
-				listAuthor: [{ name: 'Jack Black' }],
-			},
+			listAuthor: [{ name: 'Jack Black' }],
 		})
 
 		const diff2 = await tester.system.diff(testUuid(2), testUuid(1))

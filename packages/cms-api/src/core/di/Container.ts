@@ -26,10 +26,17 @@ namespace Container {
 			type FactoryMapC = ServiceFactoryMap<TypeMapC>
 
 			const factoryMapA: FactoryMapA = this.factories
-			const factoryMapB: FactoryMapB = ({ [name]: factory } as any) as FactoryMapB
-			const factoryMapC = (Object.assign(factoryMapB, factoryMapA) as any) as FactoryMapC
+			const factoryMapB: FactoryMapB = { [name]: factory } as FactoryMapB
+			const factoryMapC: FactoryMapC = { ...factoryMapA, ...factoryMapB }
 
 			return new Builder(factoryMapC)
+		}
+
+		replaceService<N extends ServiceName, T extends ServiceType>(
+			name: N extends keyof M ? N : 'Service with this name does not exist',
+			factory: ServiceFactory<M, T>
+		): Builder<M> {
+			return new Builder({ ...this.factories, [name]: factory } as ServiceFactoryMap<M>)
 		}
 
 		build(): Container<M> {

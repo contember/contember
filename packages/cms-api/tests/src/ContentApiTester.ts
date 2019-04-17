@@ -48,7 +48,7 @@ export default class ContentApiTester {
 		if (result.errors) {
 			result.errors.map(it => console.error(it))
 		}
-		return result
+		return result.data
 	}
 
 	private async getSchema(): Promise<Schema> {

@@ -9,6 +9,7 @@ import { Acl, Input, Model } from 'cms-common'
 import InsertBuilder from '../../core/knex/InsertBuilder'
 import ConditionBuilder from '../../core/knex/ConditionBuilder'
 import SelectBuilder from '../../core/knex/SelectBuilder'
+import Literal from '../../core/knex/Literal'
 import { uuid } from '../../utils/uuid'
 
 class JunctionTableManager {
@@ -91,7 +92,7 @@ class JunctionTableManager {
 						joiningTable.inverseJoiningColumn.columnName
 					)
 					.select(expr => expr.raw('true'), 'selected')
-					.from(qb.raw('(values (null))'), 't')
+					.from(new Literal('(values (null))'), 't')
 
 					.join(owningEntity.tableName, 'owning', condition => condition.raw('true'))
 					.join(inversedEntity.tableName, 'inversed', condition => condition.raw('true'))
@@ -146,7 +147,7 @@ namespace JunctionTableManager {
 					[joiningTable.inverseJoiningColumn.columnName]: expr =>
 						expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),
 				})
-				.returning(this.db.raw('true as inserted'))
+				.returning(new Literal('true as inserted'))
 				.from(qb => qb.from('data'))
 				.withCteAliases(['data'])
 				.onConflict(InsertBuilder.ConflictActionType.doNothing)
@@ -155,7 +156,7 @@ namespace JunctionTableManager {
 				.selectBuilder()
 				.with('data', dataCallback)
 				.with('insert', insert.createQuery())
-				.from(this.db.raw('(values (null))'), 't')
+				.from(new Literal('(values (null))'), 't')
 				.leftJoin('data', 'data', condition => condition.raw('true'))
 				.leftJoin('insert', 'insert', condition => condition.raw('true'))
 				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
@@ -204,13 +205,14 @@ namespace JunctionTableManager {
 						['data', joiningTable.inverseJoiningColumn.columnName]
 					)
 				})
-				.returning(this.db.raw('true as deleted'))
+				.withCteAliases(['data'])
+				.returning(new Literal('true as deleted'))
 
 			const qb = this.db
 				.selectBuilder()
 				.with('data', dataCallback)
 				.with('delete', deleteQb.createQuery())
-				.from(this.db.raw('(values (null))'), 't')
+				.from(new Literal('(values (null))'), 't')
 				.leftJoin('data', 'data', condition => condition.raw('true'))
 				.leftJoin('delete', 'delete', condition => condition.raw('true'))
 				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')

@@ -1,6 +1,6 @@
-import * as Knex from 'knex'
 import KnexWrapper from './KnexWrapper'
 import QueryBuilder from './QueryBuilder'
+import Literal from './Literal'
 
 class CaseStatement {
 	constructor(private readonly wrapper: KnexWrapper, private readonly options: CaseStatement.Options) {}
@@ -15,8 +15,8 @@ class CaseStatement {
 			whenClauses: [
 				...this.options.whenClauses,
 				{
-					when: QueryBuilder.columnExpressionToRaw(this.wrapper, when) || this.wrapper.raw('null'),
-					then: QueryBuilder.columnExpressionToRaw(this.wrapper, then) || this.wrapper.raw('null'),
+					when: QueryBuilder.columnExpressionToLiteral(this.wrapper, when) || new Literal('null'),
+					then: QueryBuilder.columnExpressionToLiteral(this.wrapper, then) || new Literal('null'),
 				},
 			],
 		})
@@ -25,30 +25,30 @@ class CaseStatement {
 	public else(elseClause: QueryBuilder.ColumnExpression): CaseStatement {
 		return new CaseStatement(this.wrapper, {
 			...this.options,
-			elseClause: QueryBuilder.columnExpressionToRaw(this.wrapper, elseClause) || this.wrapper.raw('null'),
+			elseClause: QueryBuilder.columnExpressionToLiteral(this.wrapper, elseClause) || new Literal('null'),
 		})
 	}
 
-	createExpression(): Knex.Raw {
-		const sql =
-			'case ' +
-			this.options.whenClauses.map(() => 'when ?? then ?? ') +
-			(this.options.elseClause ? 'else ?? ' : '') +
-			'end'
-		const bindings: Knex.Raw[] = []
-		this.options.whenClauses.forEach(({ when, then }) => bindings.push(when, then))
-		if (this.options.elseClause) {
-			bindings.push(this.options.elseClause)
+	compile(): Literal {
+		let sql = 'case '
+		const bindings: any[] = []
+		for (const { when, then } of this.options.whenClauses) {
+			sql += 'when ' + when.sql + ' then ' + then.sql + ' '
+			bindings.push(...when.parameters, ...then.parameters)
 		}
-
-		return this.wrapper.raw(sql, ...bindings)
+		if (this.options.elseClause) {
+			sql += 'else ' + this.options.elseClause.sql + ' '
+			bindings.push(...this.options.elseClause.parameters)
+		}
+		sql += 'end'
+		return new Literal(sql, bindings)
 	}
 }
 
 namespace CaseStatement {
 	export interface Options {
-		whenClauses: { when: Knex.Raw; then: Knex.Raw }[]
-		elseClause: Knex.Raw | undefined
+		whenClauses: { when: Literal; then: Literal }[]
+		elseClause: Literal | undefined
 	}
 }
 

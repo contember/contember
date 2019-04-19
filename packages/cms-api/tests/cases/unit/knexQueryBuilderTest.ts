@@ -117,8 +117,8 @@ describe('knex query builder', () => {
 					})
 				await builder.execute()
 			},
-			sql: SQL`insert into "public"."author" ("content", "id", "title") values ($1, $2, $3)`,
-			parameters: ['bar', 1, 'foo'],
+			sql: SQL`insert into "public"."author" ("id", "title", "content") values ($1, $2, $3)`,
+			parameters: [1, 'foo', 'bar'],
 		})
 	})
 
@@ -179,7 +179,7 @@ describe('knex query builder', () => {
           $1,
           "title"
         from "public"."foo"
-      on conflict ("id") do update set id = $2, title = "title" returning "id"`,
+      on conflict ("id") do update set "id" = $2, "title" = "title" returning "id"`,
 			parameters: ['123', '123'],
 		})
 	})
@@ -310,8 +310,7 @@ describe('knex query builder', () => {
 				await qb.getResult()
 			},
 			sql: SQL`select row_number()
-      over(
-        partition by "lorem"."ipsum"
+      over(partition by "lorem"."ipsum"
         order by "foo"."bar" desc)`,
 			parameters: [],
 		})
@@ -334,7 +333,7 @@ describe('knex query builder', () => {
 			},
 			sql: SQL`with "data" as 
 			(select "foo"."bar", 
-				 row_number() over( partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_" 
+				 row_number() over(partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_" 
 			 from "public"."foo" order by "foo"."ipsum" asc) 
 			select "data".* from "data" where "data"."rowNumber_" > $1 and "data"."rowNumber_" <= $2`,
 			parameters: [1, 4],

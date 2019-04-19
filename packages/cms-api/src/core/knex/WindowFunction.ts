@@ -1,13 +1,13 @@
 import QueryBuilder from './QueryBuilder'
-import * as Knex from 'knex'
 import KnexWrapper from './KnexWrapper'
+import Literal from './Literal'
 
 class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable<WindowFunction<HasFunction>> {
 	private constructor(
 		private readonly wrapper: KnexWrapper,
-		private readonly windowFunction: Knex.Raw | undefined,
-		private readonly partitionByExpr: Knex.Raw | undefined,
-		private readonly orderByColumns: Knex.Raw[]
+		private readonly windowFunction: Literal | undefined,
+		private readonly partitionByExpr: Literal | undefined,
+		private readonly orderByColumns: Literal[]
 	) {}
 
 	public static createEmpty(wrapper: KnexWrapper): WindowFunction<false> {
@@ -15,13 +15,13 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 	}
 
 	public rowNumber(): WindowFunction<true> {
-		return new WindowFunction(this.wrapper, this.wrapper.raw('row_number()'), this.partitionByExpr, this.orderByColumns)
+		return new WindowFunction(this.wrapper, new Literal('row_number()'), this.partitionByExpr, this.orderByColumns)
 	}
 
 	public partitionBy(columnName: QueryBuilder.ColumnIdentifier): WindowFunction<HasFunction>
 	public partitionBy(callback: QueryBuilder.ColumnExpression): WindowFunction<HasFunction>
 	public partitionBy(expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression): WindowFunction<HasFunction> {
-		const raw = QueryBuilder.columnExpressionToRaw(this.wrapper, expr)
+		const raw = QueryBuilder.columnExpressionToLiteral(this.wrapper, expr)
 		if (raw === undefined) {
 			return this
 		}
@@ -29,28 +29,25 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 	}
 
 	orderBy(columnName: QueryBuilder.ColumnIdentifier, direction: 'asc' | 'desc' = 'asc'): WindowFunction<HasFunction> {
-		const raw = this.wrapper.raw('?? ' + (direction === 'asc' ? 'asc' : 'desc'), QueryBuilder.toFqn(columnName))
+		const raw = new Literal(QueryBuilder.toFqnWrap(columnName) + (direction === 'asc' ? ' asc' : ' desc'))
 		return new WindowFunction(this.wrapper, this.windowFunction, this.partitionByExpr, [...this.orderByColumns, raw])
 	}
 
-	buildRaw(): Knex.Raw {
+	compile(): Literal {
 		if (this.windowFunction === undefined) {
 			throw new Error()
 		}
-		const bindings: Knex.Raw[] = []
-		bindings.push(this.windowFunction)
-
-		let windowDefinition = ''
+		let windowDefinition = new Literal('')
 		if (this.partitionByExpr !== undefined) {
-			windowDefinition += ' partition by ?? '
-			bindings.push(this.partitionByExpr)
+			windowDefinition = windowDefinition.appendString('partition by ').append(this.partitionByExpr)
 		}
 		if (this.orderByColumns.length > 0) {
-			windowDefinition += ' order by ' + this.orderByColumns.map(() => '??').join(', ')
-			bindings.push(...this.orderByColumns)
+			windowDefinition = windowDefinition.appendString(' order by ').appendAll(this.orderByColumns, ', ')
 		}
-
-		return this.wrapper.raw(`?? over(${windowDefinition})`, ...bindings)
+		return new Literal(this.windowFunction.sql + ' over(' + windowDefinition.sql + ')', [
+			...this.windowFunction.parameters,
+			...windowDefinition.parameters,
+		])
 	}
 }
 

@@ -1,24 +1,32 @@
 import KnexWrapper from './KnexWrapper'
-import * as Knex from 'knex'
-import { QueryResult } from 'pg'
 import Returning from './internal/Returning'
 import With from './internal/With'
 import QueryBuilder from './QueryBuilder'
 import Where from './internal/Where'
-import { Raw } from './types'
+import Literal from './Literal'
+import Compiler from './Compiler'
+import { QueryResult } from 'pg'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>>
-	implements Returning.Aware, With.Aware, Where.Aware {
-	private constructor(private readonly wrapper: KnexWrapper, private readonly options: DeleteBuilder.Options) {}
+	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
+	private constructor(
+		private readonly wrapper: KnexWrapper,
+		private readonly options: DeleteBuilder.Options,
+		private readonly cteAliases: string[]
+	) {}
 
 	public static create(wrapper: KnexWrapper): DeleteBuilder.NewDeleteBuilder {
-		return new DeleteBuilder(wrapper, {
-			from: undefined,
-			with: new With.Statement(wrapper, {}),
-			returning: new Returning(),
-			using: {},
-			where: new Where.Statement(wrapper, []),
-		}) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
+		return new DeleteBuilder(
+			wrapper,
+			{
+				from: undefined,
+				with: new With.Statement(wrapper, {}),
+				returning: new Returning(),
+				using: {},
+				where: new Where.Statement(wrapper, []),
+			},
+			[]
+		) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
 	}
 
 	with(alias: string, expression: With.Expression): DeleteBuilder.DeleteBuilderState<Result, Filled | 'with'> {
@@ -38,7 +46,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 	}
 
 	public returning(
-		column: QueryBuilder.ColumnIdentifier | Knex.Raw
+		column: QueryBuilder.ColumnIdentifier | Literal
 	): DeleteBuilder.DeleteBuilderState<Returning.Result[], Filled | 'returning'> {
 		return this.withOption('returning', new Returning(column)) as DeleteBuilder.DeleteBuilderState<
 			Returning.Result[],
@@ -46,41 +54,15 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		>
 	}
 
-	public createQuery(): Raw {
-		const fromTable = this.options.from
-
-		if (fromTable === undefined) {
-			throw Error()
-		}
-
-		const qb = this.wrapper.knex.queryBuilder()
-		this.options.with.apply(qb)
-
-		const usingBindings: any = []
-		Object.entries(this.options.using).forEach(([alias, table]) => usingBindings.push(alias, table))
-		const using = Object.keys(this.options.using)
-			.map(() => '?? as ??')
-			.join(', ')
-
-		qb.from(
-			this.wrapper.raw('??.??' + (using ? ' using ' + using : ''), this.wrapper.schema, fromTable, ...usingBindings)
-		)
-
-		this.options.where.apply(qb)
-
-		qb.delete()
-
-		const qbSql = qb.toSQL()
-		const sql: string = qbSql.sql
-		const bindings = qbSql.bindings
-
-		const [sqlWithReturning, bindingsWithReturning] = this.options.returning.modifyQuery(sql, bindings)
-
-		return this.wrapper.raw(sqlWithReturning, ...bindingsWithReturning)
+	public createQuery(): Literal {
+		const compiler = new Compiler()
+		const cteAliases = new Set([...this.options.with.getAliases(), ...this.cteAliases])
+		return compiler.compileDelete(this.options, new Compiler.NamespaceContext(this.wrapper.schema, cteAliases))
 	}
 
 	public async execute(): Promise<Result> {
-		const result: QueryResult = await this.createQuery()
+		const query = this.createQuery()
+		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
 	}
 
@@ -88,10 +70,18 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		key: K,
 		value: V
 	): DeleteBuilder.DeleteBuilderState<Result, Filled | K> {
-		return new DeleteBuilder<Result, Filled | K>(this.wrapper, {
-			...this.options,
-			[key]: value,
-		}) as DeleteBuilder.DeleteBuilderState<Result, Filled | K>
+		return new DeleteBuilder<Result, Filled | K>(
+			this.wrapper,
+			{
+				...this.options,
+				[key]: value,
+			},
+			this.cteAliases
+		) as DeleteBuilder.DeleteBuilderState<Result, Filled | K>
+	}
+
+	public withCteAliases(aliases: string[]): DeleteBuilder.DeleteBuilderState<Result, Filled> {
+		return new DeleteBuilder(this.wrapper, this.options, aliases) as DeleteBuilder.DeleteBuilderState<Result, Filled>
 	}
 }
 

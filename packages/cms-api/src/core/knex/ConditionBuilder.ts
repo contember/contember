@@ -1,14 +1,14 @@
-import * as Knex from 'knex'
 import { Value } from './types'
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
 import SelectBuilder from './SelectBuilder'
+import Literal from './Literal'
 
 type ConditionBuilderCallback = (builder: ConditionBuilder) => void
 
 interface Raw {
 	sql: string
-	bindings: (Value | Knex.QueryBuilder)[]
+	bindings: Value[]
 }
 
 interface ConditionBuilder {
@@ -34,7 +34,7 @@ interface ConditionBuilder {
 		columnName2: QueryBuilder.ColumnIdentifier
 	): void
 
-	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): void
+	raw(sql: string, ...bindings: Value[]): void
 }
 
 namespace ConditionBuilder {
@@ -48,7 +48,7 @@ namespace ConditionBuilder {
 	}
 
 	export class ConditionStringBuilder implements ConditionBuilder {
-		public readonly expressions: Knex.Raw[] = []
+		public readonly expressions: Literal[] = []
 
 		constructor(private readonly wrapper: KnexWrapper) {}
 
@@ -77,7 +77,7 @@ namespace ConditionBuilder {
 			if (!Object.values(Operator).includes(operator)) {
 				throw new Error(`Operator ${operator} is not supported`)
 			}
-			this.expressions.push(this.wrapper.raw(`?? ${operator} ?`, QueryBuilder.toFqn(columnName), value))
+			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} ${operator} ?`, [value]))
 		}
 
 		compareColumns(
@@ -89,40 +89,44 @@ namespace ConditionBuilder {
 				throw new Error(`Operator ${operator} is not supported`)
 			}
 			this.expressions.push(
-				this.wrapper.raw(`?? ${operator} ??`, QueryBuilder.toFqn(columnName1), QueryBuilder.toFqn(columnName2))
+				new Literal(`${QueryBuilder.toFqnWrap(columnName1)} ${operator} ${QueryBuilder.toFqnWrap(columnName2)}`)
 			)
 		}
 
 		in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | SelectBuilder.Callback): void {
 			if (typeof values === 'function') {
 				const qb = values(this.wrapper.selectBuilder())
-				this.expressions.push(this.wrapper.raw('?? in (?)', QueryBuilder.toFqn(columnName), qb.createQuery()))
-			} else if (values.length > 0) {
+				const query = qb.createQuery()
+				this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
+				return
+			}
+			values = values.filter(it => it !== undefined)
+			if (values.length > 0) {
 				const parameters = values.map(() => '?').join(', ')
-				this.expressions.push(this.wrapper.raw(`?? in (${parameters})`, QueryBuilder.toFqn(columnName), ...values))
+				this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${parameters})`, values))
 			} else {
 				this.raw('false')
 			}
 		}
 
 		null(columnName: QueryBuilder.ColumnIdentifier): void {
-			this.expressions.push(this.wrapper.raw('?? is null', QueryBuilder.toFqn(columnName)))
+			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} is null`))
 		}
 
-		raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): void {
-			this.expressions.push(this.wrapper.raw(sql, ...bindings))
+		raw(sql: string, ...bindings: (Value)[]): void {
+			this.expressions.push(new Literal(sql, bindings))
 		}
 
-		public getSql(operator: 'or' | 'and' = 'and', not: boolean = false): Knex.Raw | null {
+		public getSql(operator: 'or' | 'and' = 'and', not: boolean = false): Literal | null {
 			if (this.expressions.length === 0) {
 				return null
 			}
 			const sql = this.expressions.map(it => ((it as any) as Raw).sql).join(` ${operator} `)
 
-			const bindings: (Value | Knex.QueryBuilder)[] = []
-			this.expressions.map(it => ((it as any) as Raw).bindings).forEach(it => bindings.push(...it))
+			const bindings: Value[] = []
+			this.expressions.map(it => ((it as any) as Literal).parameters).forEach(it => bindings.push(...it))
 
-			return this.wrapper.raw(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, ...bindings)
+			return new Literal(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, bindings)
 		}
 
 		isEmpty(): boolean {

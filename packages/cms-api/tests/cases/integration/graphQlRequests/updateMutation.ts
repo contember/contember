@@ -1756,10 +1756,10 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(3), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2), testUuid(3)],
 							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
@@ -1799,10 +1799,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							parameters: [testUuid(2), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
@@ -1921,10 +1921,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
@@ -1968,10 +1968,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
@@ -2025,10 +2025,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2), testUuid(2)],
+							parameters: [testUuid(2), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 						selectUpdatePostSql,
@@ -2070,10 +2070,10 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id") 
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id") 
 							values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1), testUuid(1)],
+							parameters: [testUuid(1), testUuid(1), testUuid(2)],
 							response: 1,
 						},
 						selectUpdateCategorySql,
@@ -2113,10 +2113,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1), testUuid(2)],
 							response: 1,
 						},
 						selectUpdateCategorySql,
@@ -2235,10 +2235,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1), testUuid(1)],
+							parameters: [testUuid(1), testUuid(1), testUuid(2)],
 							response: 1,
 						},
 						selectUpdateCategorySql,
@@ -2280,10 +2280,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1), testUuid(1)],
+							parameters: [testUuid(1), testUuid(1), testUuid(2)],
 							response: 1,
 						},
 						selectUpdateCategorySql,
@@ -2335,10 +2335,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("category_id", "id", "post_id")
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
               values ($1, $2, $3)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1), testUuid(2)],
 							response: 1,
 						},
 						selectUpdateCategorySql,

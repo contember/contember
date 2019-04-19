@@ -1385,7 +1385,7 @@ describe('Queries', () => {
              "junction_"."category_id",
              "junction_"."post_id",
              row_number()
-             over( partition by "junction_"."category_id"
+             over(partition by "junction_"."category_id"
                order by "root_"."title" asc) as "rowNumber_"
            from "public"."post_categories" as "junction_" inner join "public"."post" as "root_" on "junction_"."post_id" = "root_"."id"
            where "junction_"."category_id" in ($1, $2) and "root_"."locale" = $3
@@ -1506,8 +1506,7 @@ describe('Queries', () => {
              "root_"."id" as "root_id",
              "root_"."title" as "root_title",
              row_number()
-             over(
-               partition by "root_"."author_id"
+             over(partition by "root_"."author_id"
                order by "root_"."title" asc) as "rowNumber_"
            from "public"."post" as "root_"
            where "root_"."locale" = $1 and "root_"."author_id" in ($2, $3)
@@ -1577,9 +1576,9 @@ describe('Queries', () => {
                      "root_"."name" as "root_name"
                    from "public"."author" as "root_"
                    order by "root_"."name" asc
-                   limit $1
-                   offset $2`,
-					parameters: [3, 2],
+                   limit 3
+                   offset 2`,
+					parameters: [],
 					response: {
 						rows: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
 					},

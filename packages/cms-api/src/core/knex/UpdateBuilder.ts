@@ -1,15 +1,15 @@
 import QueryBuilder from './QueryBuilder'
 import KnexWrapper from './KnexWrapper'
-import Knex from 'knex'
-import { QueryResult } from 'pg'
-import { Value } from './types'
 import Returning from './internal/Returning'
 import With from './internal/With'
 import Where from './internal/Where'
 import SelectBuilder from './SelectBuilder'
+import Literal from './Literal'
+import Compiler from './Compiler'
+import { QueryResult } from 'pg'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>>
-	implements With.Aware, Where.Aware {
+	implements With.Aware, Where.Aware, QueryBuilder {
 	private constructor(private readonly wrapper: KnexWrapper, private readonly options: UpdateBuilder.Options) {}
 
 	public static create(wrapper: KnexWrapper): UpdateBuilder.NewUpdateBuilder {
@@ -31,12 +31,12 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		return this.withOption('table', name)
 	}
 
-	public values(columns: UpdateBuilder.Values): UpdateBuilder.UpdateBuilderState<Result, Filled | 'values'> {
-		return this.withOption('values', columns)
+	public values(columns: QueryBuilder.Values): UpdateBuilder.UpdateBuilderState<Result, Filled | 'values'> {
+		return this.withOption('values', QueryBuilder.resolveValues(columns, this.wrapper))
 	}
 
 	public returning(
-		column: string | Knex.Raw
+		column: string | Literal
 	): UpdateBuilder.UpdateBuilderState<Returning.Result[], Filled | 'returning'> {
 		return this.withOption('returning', new Returning(column)) as UpdateBuilder.UpdateBuilderState<
 			Returning.Result[],
@@ -52,68 +52,39 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		return this.withOption('where', this.options.where.withWhere(where))
 	}
 
-	public createQuery(): Knex.Raw {
-		const columns = this.options.values
+	public createQuery(): Literal {
+		const values = this.options.values
 		const table = this.options.table
 
-		if (table === undefined || columns === undefined) {
+		if (table === undefined || values === undefined) {
 			throw Error()
 		}
 
-		const qb = this.wrapper.knex.queryBuilder()
-		this.options.with.apply(qb)
+		let from: Literal | undefined
+		let where = this.options.where
 
-		let sql: string
-		let bindings: Value[]
-
-		const updateFrom = this.options.from
-		if (updateFrom !== undefined) {
-			qb.table(this.wrapper.raw('??.??', this.wrapper.schema, table))
-
-			let fromQb: SelectBuilder = SelectBuilder.create(this.wrapper).withCteAliases(this.options.with.getAliases())
-			fromQb = updateFrom(fromQb)
-			fromQb = this.options.where.apply(fromQb)
-
-			this.options.where.values.forEach(it => fromQb.where(it))
+		const cteAliases = this.options.with.getAliases()
+		if (this.options.from !== undefined) {
+			let fromQb: SelectBuilder = SelectBuilder.create(this.wrapper).withCteAliases(cteAliases)
+			fromQb = this.options.from(fromQb)
+			fromQb = this.options.where.values.reduce((builder, value) => builder.where(value), fromQb)
 			const selectSql = fromQb.createQuery()
 			if (!selectSql.sql.startsWith('select *')) {
-				throw new Error()
+				throw new Error(`Query does not start with "select *": ${selectSql.sql}`)
 			}
-			const values = this.getColumnValues(columns)
-			qb.update(values)
-			const updateSql = qb.toSQL()
-			sql = updateSql.sql + ' ' + selectSql.sql.substring('select *'.length)
-			bindings = [...updateSql.bindings, ...selectSql.bindings]
-		} else {
-			qb.table(this.wrapper.raw('??.??', this.wrapper.schema, table))
-			qb.update(this.getColumnValues(columns))
-			this.options.where.apply(qb)
-			sql = qb.toSQL().sql
-			bindings = qb.toSQL().bindings
+			from = new Literal(selectSql.sql.substring('select *'.length), selectSql.parameters)
+			where = new Where.Statement(this.wrapper, [])
 		}
 
-		const [sqlWithReturning, bindingsWithReturning] = this.options.returning.modifyQuery(sql, bindings)
-
-		return this.wrapper.raw(sqlWithReturning, ...bindingsWithReturning)
+		const compiler = new Compiler()
+		const namespaceContext = new Compiler.NamespaceContext(this.wrapper.schema, new Set(cteAliases))
+		return compiler.compileUpdate({ ...this.options, values, table, from, where }, namespaceContext)
 	}
 
 	public async execute(): Promise<Result> {
-		const result: QueryResult = await this.createQuery()
+		const query = this.createQuery()
+		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
-	}
-
-	private getColumnValues(values: UpdateBuilder.Values): { [column: string]: Knex.Raw } {
-		return Object.entries(values)
-			.map(
-				([key, value]): [string, Knex.Raw | Value | undefined] => {
-					if (typeof value === 'function') {
-						return [key, value(new QueryBuilder.ColumnExpressionFactory(this.wrapper))]
-					}
-					return [key, value]
-				}
-			)
-			.filter((it): it is [string, Knex.Raw] => it[1] !== undefined)
-			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
 	}
 
 	protected withOption<K extends keyof UpdateBuilder.Options, V extends UpdateBuilder.Options[K]>(
@@ -133,11 +104,17 @@ namespace UpdateBuilder {
 
 	export type Options = {
 		table: string | undefined
-		values: UpdateBuilder.Values | undefined
+		values: QueryBuilder.ResolvedValues | undefined
 		returning: Returning
 		from: SelectBuilder.Callback | undefined
 	} & With.Options &
 		Where.Options
+
+	export type ResolvedOptions = Pick<Options, Exclude<keyof Options, 'from'>> & {
+		from: Literal | undefined
+		table: Exclude<Options['table'], undefined>
+		values: Exclude<Options['values'], undefined>
+	}
 
 	export type UpdateBuilderWithoutExecute<
 		Result extends UpdateResult,
@@ -151,8 +128,6 @@ namespace UpdateBuilder {
 		: UpdateBuilderWithoutExecute<Result, Filled>
 
 	export type NewUpdateBuilder = UpdateBuilder.UpdateBuilderState<UpdateBuilder.AffectedRows, never>
-
-	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value }
 }
 
 export default UpdateBuilder

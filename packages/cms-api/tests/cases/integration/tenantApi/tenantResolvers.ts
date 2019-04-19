@@ -81,8 +81,8 @@ describe('tenant api', () => {
 						response: 1,
 					},
 					{
-						sql: SQL`insert into "tenant"."person" ("email", "id", "identity_id", "password_hash") values ($1, $2, $3, $4)`,
-						parameters: ['john@doe.com', testUuid(2), testUuid(1), (val: string) => bcrypt.compareSync('123', val)],
+						sql: SQL`insert into "tenant"."person" ("id", "email", "password_hash", "identity_id") values ($1, $2, $3, $4)`,
+						parameters: [testUuid(2), 'john@doe.com', (val: string) => bcrypt.compareSync('123', val), testUuid(1)],
 						response: 1,
 					},
 					{
@@ -210,17 +210,17 @@ describe('tenant api', () => {
 						response: [{ id: testUuid(1), password_hash: await bcrypt.hash('123', salt), identity_id: testUuid(2) }],
 					},
 					{
-						sql: SQL`insert into "tenant"."api_key" ("created_at", "enabled", "expiration", "expires_at", "id", "identity_id", "token_hash", "type")
+						sql: SQL`insert into "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "enabled", "expires_at", "expiration", "created_at")
             values ($1, $2, $3, $4, $5, $6, $7, $8)`,
 						parameters: [
-							new Date('2018-10-12T08:00:00.000Z'),
-							true,
-							null,
-							new Date('2018-10-12T08:30:00.000Z'),
 							testUuid(1),
-							testUuid(2),
 							ApiKey.computeTokenHash(buffer(20).toString('hex')),
 							'session',
+							testUuid(2),
+							true,
+							new Date('2018-10-12T08:30:00.000Z'),
+							null,
+							new Date('2018-10-12T08:00:00.000Z'),
 						],
 						response: 1,
 					},

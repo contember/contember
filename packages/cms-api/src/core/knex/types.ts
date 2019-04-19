@@ -1,5 +1,3 @@
-import * as Knex from 'knex'
-
 export type Value =
 	| null
 	| string
@@ -11,8 +9,6 @@ export type Value =
 	| Array<Date>
 	| Array<boolean>
 	| Buffer
-	| Knex.Raw
-	| Knex.QueryBuilder
 
 export interface Formatter {
 	bindings: Array<any>
@@ -32,7 +28,7 @@ export interface Formatter {
 	operator(values: string): string
 }
 
-export interface Raw extends Knex.Raw {
+export interface Raw {
 	sql: string
-	bindings: (Value | Knex.QueryBuilder)[]
+	bindings: Value[]
 }

@@ -1,19 +1,19 @@
 import KnexWrapper from './KnexWrapper'
-import * as Knex from 'knex'
 import { QueryResult } from 'pg'
-import { Raw, Value } from './types'
 import Returning from './internal/Returning'
 import With from './internal/With'
 import SelectBuilder from './SelectBuilder'
 import QueryBuilder from './QueryBuilder'
+import Literal from './Literal'
+import Compiler from './Compiler'
 import { assertNever } from 'cms-common'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
-	implements With.Aware {
+	implements With.Aware, QueryBuilder {
 	private constructor(
 		private readonly wrapper: KnexWrapper,
 		private readonly options: InsertBuilder.Options,
-		private cteAliases: string[]
+		private readonly cteAliases: string[]
 	) {}
 
 	public static create(wrapper: KnexWrapper): InsertBuilder.NewInsertBuilder {
@@ -39,14 +39,14 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		return this.withOption('into', intoTable)
 	}
 
-	public values(columns: InsertBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
-		return this.withOption('values', columns)
+	public values(columns: QueryBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
+		return this.withOption('values', QueryBuilder.resolveValues(columns, this.wrapper))
 	}
 
 	public onConflict(
 		type: InsertBuilder.ConflictActionType.update,
 		target: InsertBuilder.ConflictTarget,
-		values: InsertBuilder.Values
+		values: QueryBuilder.Values
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
 		type: InsertBuilder.ConflictActionType.doNothing,
@@ -55,11 +55,11 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	public onConflict(
 		type: InsertBuilder.ConflictActionType,
 		target?: InsertBuilder.ConflictTarget,
-		values?: InsertBuilder.Values
+		values?: QueryBuilder.Values
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'> {
 		let conflictAction: InsertBuilder.ConflictAction
 		if (type === InsertBuilder.ConflictActionType.update && values && target) {
-			conflictAction = { type, values, target }
+			conflictAction = { type, values: QueryBuilder.resolveValues(values, this.wrapper), target }
 		} else if (type === InsertBuilder.ConflictActionType.doNothing) {
 			conflictAction = { type, target }
 		} else {
@@ -69,7 +69,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	}
 
 	public returning(
-		column: string | Knex.Raw
+		column: string | Literal
 	): InsertBuilder.InsertBuilderState<Returning.Result[], Filled | 'returning'> {
 		return this.withOption('returning', new Returning(column)) as InsertBuilder.InsertBuilderState<
 			Returning.Result[],
@@ -81,93 +81,33 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		return this.withOption('from', from)
 	}
 
-	public createQuery(): Raw {
-		const columns = this.options.values
+	public createQuery(): Literal {
+		const values = this.options.values
 		const into = this.options.into
 
-		if (into === undefined || columns === undefined) {
+		if (into === undefined || values === undefined) {
 			throw Error()
 		}
 
-		const qb = this.wrapper.knex.queryBuilder()
-		this.options.with.apply(qb)
+		let from: Literal | undefined
 
-		const insertFrom = this.options.from
-		if (insertFrom !== undefined) {
-			const columnNames = Object.keys(columns)
-			qb.into(
-				this.wrapper.raw(
-					'??.?? (' + columnNames.map(() => '??').join(', ') + ')',
-					this.wrapper.schema,
-					into,
-					...columnNames
-				)
-			)
-
-			let queryBuilder = SelectBuilder.create(this.wrapper).withCteAliases([
-				...this.options.with.getAliases(),
-				...this.cteAliases,
-			])
-			const values = Object.values(this.getColumnValues(columns))
-			queryBuilder = values.reduce((qb, raw) => qb.select(raw), queryBuilder)
-			queryBuilder = insertFrom(queryBuilder)
-			qb.insert(queryBuilder.createQuery())
-		} else {
-			qb.into(this.wrapper.raw('??.??', this.wrapper.schema, into))
-			qb.insert(this.getColumnValues(columns))
+		const cteAliases = [...this.options.with.getAliases(), ...this.cteAliases]
+		if (this.options.from !== undefined) {
+			let queryBuilder = SelectBuilder.create(this.wrapper).withCteAliases(cteAliases)
+			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
+			queryBuilder = this.options.from(queryBuilder)
+			from = queryBuilder.createQuery()
 		}
 
-		const qbSql = qb.toSQL()
-		let sql: string = qbSql.sql
-		let bindings = qbSql.bindings
-
-		if (this.options.onConflict) {
-			sql += ' on conflict'
-			if (!this.options.onConflict.target) {
-			} else if (Array.isArray(this.options.onConflict.target)) {
-				sql += ' (' + this.options.onConflict.target.map(() => '??').join(', ') + ')'
-				bindings.push(...this.options.onConflict.target)
-			} else if (this.options.onConflict.target.constraint) {
-				sql += ' on constraint ??'
-				bindings.push(this.options.onConflict.target.constraint)
-			}
-
-			switch (this.options.onConflict.type) {
-				case InsertBuilder.ConflictActionType.doNothing:
-					sql += ' do nothing'
-					break
-				case InsertBuilder.ConflictActionType.update:
-					const values = this.getColumnValues(this.options.onConflict.values)
-					const updateExpr = Object.keys(values).join(' = ?, ') + ' = ?'
-					sql += '  do update set ' + updateExpr
-					bindings.push(...Object.values(values))
-					break
-				default:
-					assertNever(this.options.onConflict)
-			}
-		}
-		const [sqlWithReturning, bindingsWithReturning] = this.options.returning.modifyQuery(sql, bindings)
-
-		return this.wrapper.raw(sqlWithReturning, ...bindingsWithReturning)
+		const compiler = new Compiler()
+		const namespaceContext = new Compiler.NamespaceContext(this.wrapper.schema, new Set(cteAliases))
+		return compiler.compileInsert({ ...this.options, values, into, from }, namespaceContext)
 	}
 
 	public async execute(): Promise<Result> {
-		const result: QueryResult = await this.createQuery()
+		const query = this.createQuery()
+		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
-	}
-
-	private getColumnValues(values: InsertBuilder.Values): { [column: string]: Knex.Raw } {
-		return Object.entries(values)
-			.map(
-				([key, value]): [string, Knex.Raw | Value | undefined] => {
-					if (typeof value === 'function') {
-						return [key, value(new QueryBuilder.ColumnExpressionFactory(this.wrapper))]
-					}
-					return [key, value]
-				}
-			)
-			.filter((it): it is [string, Knex.Raw] => it[1] !== undefined)
-			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
 	}
 
 	private withOption<K extends keyof InsertBuilder.Options, V extends InsertBuilder.Options[K]>(
@@ -192,11 +132,17 @@ namespace InsertBuilder {
 
 	export type Options = {
 		into: string | undefined
-		values: InsertBuilder.Values | undefined
-		onConflict: InsertBuilder.ConflictAction | undefined
+		values: QueryBuilder.ResolvedValues | undefined
+		onConflict: ConflictAction | undefined
 		returning: Returning
 		from: SelectBuilder.Callback | undefined
 	} & With.Options
+
+	export type ResolvedOptions = Pick<Options, Exclude<keyof Options, 'from'>> & {
+		from: Literal | undefined
+		into: Exclude<Options['into'], undefined>
+		values: Exclude<Options['values'], undefined>
+	}
 
 	export type InsertBuilderWithoutExecute<
 		Result extends InsertResult,
@@ -216,11 +162,9 @@ namespace InsertBuilder {
 		update = 'update',
 	}
 
-	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value | undefined }
-
 	export type ConflictAction =
 		| { type: ConflictActionType.doNothing; target?: ConflictTarget }
-		| { type: ConflictActionType.update; values: Values; target: ConflictTarget }
+		| { type: ConflictActionType.update; values: QueryBuilder.ResolvedValues; target: ConflictTarget }
 
 	export type IndexColumns = string[]
 	export type ConflictTarget = IndexColumns | { constraint: string }

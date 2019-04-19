@@ -1,17 +1,18 @@
-import Knex from 'knex'
-import { Value } from '../types'
 import { QueryResult } from 'pg'
 import QueryBuilder from '../QueryBuilder'
+import Literal from '../Literal'
 
 class Returning {
-	constructor(private readonly column: QueryBuilder.ColumnIdentifier | Knex.Raw | null = null) {}
+	constructor(private readonly column: QueryBuilder.ColumnIdentifier | Literal | null = null) {}
 
-	public modifyQuery(sql: string, bindings: Value[]): [string, Value[]] {
-		if (this.column) {
-			const column = Array.isArray(this.column) ? QueryBuilder.toFqn(this.column) : this.column
-			return [sql + ' returning ??', [...bindings, column]]
+	public compile(): Literal {
+		if (this.column === null) {
+			return new Literal('')
 		}
-		return [sql, bindings]
+		if (this.column instanceof Literal) {
+			return new Literal(' returning ').append(this.column)
+		}
+		return new Literal(' returning ' + QueryBuilder.toFqnWrap(this.column))
 	}
 
 	public parseResponse<ProcessedResult extends number | Returning.Result[]>(result: QueryResult): ProcessedResult {
@@ -19,7 +20,7 @@ class Returning {
 		if (returningColumn) {
 			return (typeof returningColumn === 'string'
 				? result.rows.map(it => it[returningColumn])
-				: result) as ProcessedResult
+				: result.rows) as ProcessedResult
 		} else {
 			return result.rowCount as ProcessedResult
 		}
@@ -28,7 +29,7 @@ class Returning {
 
 namespace Returning {
 	export interface Aware {
-		returning(column: QueryBuilder.ColumnIdentifier | Knex.Raw): any
+		returning(column: QueryBuilder.ColumnIdentifier | Literal): any
 	}
 
 	export type Result = number | string

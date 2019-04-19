@@ -37,8 +37,8 @@ class KnexWrapper<KnexType extends Knex = Knex> {
 		return DeleteBuilder.create(this)
 	}
 
-	raw(sql: string, ...bindings: (Value | Knex.QueryBuilder)[]): Raw {
-		return this.knex.raw(sql, bindings as any) as Raw
+	raw(sql: string, ...bindings: Value[]): Raw & Knex.Raw {
+		return this.knex.raw(sql, bindings as any) as Raw & Knex.Raw
 	}
 
 	createQueryHandler(): QueryHandler<KnexQueryable> {

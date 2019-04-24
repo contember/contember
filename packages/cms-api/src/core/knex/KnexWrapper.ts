@@ -1,24 +1,23 @@
-import Knex from 'knex'
-import { Raw, Value } from './types'
+import { Value } from './types'
 import InsertBuilder from './InsertBuilder'
 import DeleteBuilder from './DeleteBuilder'
 import UpdateBuilder from './UpdateBuilder'
 import SelectBuilder from './SelectBuilder'
+import Connection from './Connection'
 import QueryHandler from '../query/QueryHandler'
 import KnexQueryable from './KnexQueryable'
-import KnexConnection from './KnexConnection'
 
-class KnexWrapper<KnexType extends Knex = Knex> {
-	constructor(public readonly knex: KnexType, public readonly schema: string) {}
-
-	public forSchema(schema: string): KnexWrapper {
-		return new KnexWrapper(this.knex, schema)
+class KnexWrapper<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
+implements Connection.Queryable{
+	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {
 	}
 
-	async transaction<T>(
-		transactionScope: (wrapper: KnexWrapper & KnexWrapper.Transaction) => Promise<T> | void
-	): Promise<T> {
-		return await this.knex.transaction(knex => transactionScope(new KnexWrapper(knex, this.schema)))
+	public forSchema(schema: string): KnexWrapper {
+		return new KnexWrapper(this.connection, schema)
+	}
+
+	async transaction<T>(transactionScope: (wrapper: KnexWrapper) => Promise<T> | T): Promise<T> {
+		return await this.connection.transaction(connection => transactionScope(new KnexWrapper(connection, this.schema)))
 	}
 
 	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result, never> {
@@ -37,8 +36,12 @@ class KnexWrapper<KnexType extends Knex = Knex> {
 		return DeleteBuilder.create(this)
 	}
 
-	raw(sql: string, ...bindings: Value[]): Raw & Knex.Raw {
-		return this.knex.raw(sql, bindings as any) as Raw & Knex.Raw
+	async raw(sql: string, ...bindings: Value[]): Promise<Connection.Result> {
+		return this.connection.query(sql, bindings as any)
+	}
+
+	async query(sql: string, parameters: any[], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result> {
+		return this.connection.query(sql, parameters, meta, config)
 	}
 
 	createQueryHandler(): QueryHandler<KnexQueryable> {
@@ -50,12 +53,6 @@ class KnexWrapper<KnexType extends Knex = Knex> {
 			})
 		)
 		return handler
-	}
-}
-
-namespace KnexWrapper {
-	export interface Transaction {
-		knex: Knex.Transaction
 	}
 }
 

@@ -46,6 +46,7 @@ export const execute = async (test: Test) => {
 		client: 'pg',
 	})
 
+	// @ts-ignore
 	const db = new KnexWrapper(connection, 'public')
 	await executeGraphQlTest(connection, {
 		context: {

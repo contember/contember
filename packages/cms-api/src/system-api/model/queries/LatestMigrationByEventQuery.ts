@@ -26,7 +26,7 @@ class LatestMigrationByEventQuery extends KnexQuery<LatestMigrationByEventQuery.
 			this.eventId
 		)).rows
 
-		return this.fetchOneOrNull(rows)
+		return this.fetchOneOrNull(rows) as any
 	}
 }
 

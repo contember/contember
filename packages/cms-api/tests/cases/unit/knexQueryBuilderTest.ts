@@ -22,6 +22,7 @@ const execute = async (test: Test) => {
 	})
 
 	mockKnex.mock(connection)
+	//  @ts-ignore
 	const wrapper = new KnexWrapper(connection, 'public')
 
 	const tracker = mockKnex.getTracker()

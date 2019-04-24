@@ -6,7 +6,7 @@ import Where from './internal/Where'
 import SelectBuilder from './SelectBuilder'
 import Literal from './Literal'
 import Compiler from './Compiler'
-import { QueryResult } from 'pg'
+import Connection from './Connection'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>>
 	implements With.Aware, Where.Aware, QueryBuilder {
@@ -83,7 +83,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 
 	public async execute(): Promise<Result> {
 		const query = this.createQuery()
-		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
+		const result: Connection.Result = await this.wrapper.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
 	}
 

@@ -1,6 +1,6 @@
-import { QueryResult } from 'pg'
 import QueryBuilder from '../QueryBuilder'
 import Literal from '../Literal'
+import Connection from '../Connection'
 
 class Returning {
 	constructor(private readonly column: QueryBuilder.ColumnIdentifier | Literal | null = null) {}
@@ -15,7 +15,7 @@ class Returning {
 		return new Literal(' returning ' + QueryBuilder.toFqnWrap(this.column))
 	}
 
-	public parseResponse<ProcessedResult extends number | Returning.Result[]>(result: QueryResult): ProcessedResult {
+	public parseResponse<ProcessedResult extends number | Returning.Result[]>(result: Connection.Result): ProcessedResult {
 		const returningColumn = this.column
 		if (returningColumn) {
 			return (typeof returningColumn === 'string'

@@ -17,6 +17,7 @@ export default class KnexConnection {
 	}
 
 	wrapper(): KnexWrapper {
-		return new KnexWrapper(this.knex, this.schema)
+		return null as any
+		// return new KnexWrapper(this.knex, this.schema)
 	}
 }

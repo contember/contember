@@ -1,7 +1,11 @@
 export default class Literal {
 	static empty = new Literal('')
 
-	constructor(public readonly sql: string, public readonly parameters: any[] = []) {}
+	constructor(
+		public readonly sql: string,
+		public readonly parameters: any[] = [],
+		public readonly meta: Record<string, any> = {}) {
+	}
 
 	public append(literal: Literal) {
 		return new Literal(this.sql.trimLeft() + ' ' + literal.sql, [...this.parameters, ...literal.parameters])

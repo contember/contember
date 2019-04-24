@@ -115,17 +115,17 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	public async getResult(): Promise<Result[]> {
 		const query = this.createQuery()
 		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
+			.options({ meta: query.meta })
 		return (result.rows as any) as Result[]
 	}
 
 	public createQuery(): Literal {
-		// const sql = qb.toSQL()
-		// return this.wrapper.raw(sql.sql, ...sql.bindings).options({ meta: this.options.meta })
-
 		const compiler = new Compiler()
 
 		const namespaceContext = new Compiler.NamespaceContext(this.wrapper.schema, this.cteAliases)
-		return compiler.compileSelect(this.options, namespaceContext)
+		const compiled = compiler.compileSelect(this.options, namespaceContext)
+
+		return new Literal(compiled.sql, compiled.parameters, this.options.meta)
 	}
 
 	protected withOption<K extends keyof SelectBuilder.Options, V extends SelectBuilder.Options[K]>(

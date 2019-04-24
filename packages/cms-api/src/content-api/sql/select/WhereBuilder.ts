@@ -6,13 +6,16 @@ import ConditionBuilder from './ConditionBuilder'
 import { isIt } from '../../../utils/type'
 import SelectBuilder from '../../../core/knex/SelectBuilder'
 import SqlConditionBuilder from '../../../core/knex/ConditionBuilder'
+import KnexWrapper from '../../../core/knex/KnexWrapper'
 
 class WhereBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
-		private readonly conditionBuilder: ConditionBuilder
-	) {}
+		private readonly conditionBuilder: ConditionBuilder,
+		private readonly db: KnexWrapper,
+	) {
+	}
 
 	public build(
 		qb: SelectBuilder,
@@ -108,8 +111,8 @@ class WhereBuilder {
 					}
 					const relationWhere = where[fieldName] as Input.Where
 
-					whereClause.in([tableName, entity.primaryColumn], qb =>
-						this.createManyHasManySubquery(qb, relationWhere, targetEntity, targetRelation.joiningTable, 'inversed')
+					whereClause.in([tableName, entity.primaryColumn],
+						this.createManyHasManySubquery(this.db.selectBuilder(), relationWhere, targetEntity, targetRelation.joiningTable, 'inversed')
 					)
 				},
 				visitManyHasManyOwner: (entity, relation, targetEntity) => {
@@ -120,8 +123,8 @@ class WhereBuilder {
 
 					const relationWhere = where[fieldName] as Input.Where
 
-					whereClause.in([tableName, entity.primaryColumn], qb =>
-						this.createManyHasManySubquery(qb, relationWhere, targetEntity, relation.joiningTable, 'owner')
+					whereClause.in([tableName, entity.primaryColumn],
+						this.createManyHasManySubquery(this.db.selectBuilder(), relationWhere, targetEntity, relation.joiningTable, 'owner')
 					)
 				},
 				visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
@@ -132,13 +135,12 @@ class WhereBuilder {
 
 					const relationWhere = where[fieldName] as Input.Where
 
-					whereClause.in([tableName, entity.primaryColumn], qb =>
-						this.build(
-							qb.select(['root_', targetRelation.joiningColumn.columnName]).from(targetEntity.tableName, 'root_'),
-							targetEntity,
-							new Path([]),
-							relationWhere,
-							true
+					whereClause.in([tableName, entity.primaryColumn], this.build(
+						this.db.selectBuilder().select(['root_', targetRelation.joiningColumn.columnName]).from(targetEntity.tableName, 'root_'),
+						targetEntity,
+						new Path([]),
+						relationWhere,
+						true
 						)
 					)
 				},

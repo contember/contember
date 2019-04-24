@@ -20,17 +20,17 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 			wrapper,
 			{
 				from: undefined,
-				with: new With.Statement(wrapper, {}),
+				with: new With.Statement({}),
 				returning: new Returning(),
 				using: {},
-				where: new Where.Statement(wrapper, []),
+				where: new Where.Statement([]),
 			},
 			[]
 		) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
 	}
 
 	with(alias: string, expression: With.Expression): DeleteBuilder.DeleteBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, expression))
+		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression)))
 	}
 
 	public from(tableName: string): DeleteBuilder.DeleteBuilderState<Result, Filled | 'from'> {

@@ -15,16 +15,16 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 	public static create(wrapper: KnexWrapper): UpdateBuilder.NewUpdateBuilder {
 		return new UpdateBuilder(wrapper, {
 			table: undefined,
-			with: new With.Statement(wrapper, {}),
+			with: new With.Statement({}),
 			values: undefined,
 			returning: new Returning(),
 			from: undefined,
-			where: new Where.Statement(wrapper, []),
+			where: new Where.Statement([]),
 		}) as UpdateBuilder.UpdateBuilderState<UpdateBuilder.AffectedRows, never>
 	}
 
 	public with(alias: string, expression: With.Expression): UpdateBuilder.UpdateBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, expression))
+		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression)))
 	}
 
 	public table(name: string): UpdateBuilder.UpdateBuilderState<Result, Filled | 'table'> {
@@ -32,7 +32,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 	}
 
 	public values(columns: QueryBuilder.Values): UpdateBuilder.UpdateBuilderState<Result, Filled | 'values'> {
-		return this.withOption('values', QueryBuilder.resolveValues(columns, this.wrapper))
+		return this.withOption('values', QueryBuilder.resolveValues(columns))
 	}
 
 	public returning(
@@ -73,7 +73,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 				throw new Error(`Query does not start with "select *": ${selectSql.sql}`)
 			}
 			from = new Literal(selectSql.sql.substring('select *'.length), selectSql.parameters)
-			where = new Where.Statement(this.wrapper, [])
+			where = new Where.Statement([])
 		}
 
 		const compiler = new Compiler()

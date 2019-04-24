@@ -56,7 +56,7 @@ describe('knex query builder', () => {
 						cond.compareColumns('z', ConditionBuilder.Operator.eq, ['foo', 'x'])
 
 						cond.in('o', [1, 2, 3])
-						cond.in('m', (qb: SelectBuilder) => qb.select(expr => expr.selectValue(1)))
+						cond.in('m', wrapper.selectBuilder().select(expr => expr.selectValue(1)))
 
 						cond.null('n')
 

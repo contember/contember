@@ -6,7 +6,7 @@ import QueryBuilder from '../QueryBuilder'
 
 namespace With {
 	export class Statement {
-		constructor(private readonly wrapper: KnexWrapper, public readonly ctes: { [alias: string]: Expression }) {}
+		constructor(public readonly ctes: { [alias: string]: Literal }) {}
 
 		public compile(): Literal {
 			const ctes = Object.entries(this.ctes)
@@ -15,15 +15,14 @@ namespace With {
 			}
 			return new Literal('with ').appendAll(
 				ctes.map(([alias, expr]) => {
-					const raw = this.createLiteral(expr)
-					return new Literal(wrapIdentifier(alias) + ' as (' + raw.sql + ')', raw.parameters)
+					return new Literal(wrapIdentifier(alias) + ' as (' + expr.sql + ')', expr.parameters)
 				}),
 				', '
 			)
 		}
 
-		public withCte(alias: string, expression: Expression): Statement {
-			return new Statement(this.wrapper, { ...this.ctes, [alias]: expression })
+		public withCte(alias: string, expression: Literal): Statement {
+			return new Statement({ ...this.ctes, [alias]: expression })
 		}
 
 		public includes(alias: string): boolean {
@@ -33,26 +32,26 @@ namespace With {
 		public getAliases(): string[] {
 			return Object.keys(this.ctes)
 		}
-
-		private createLiteral(expr: Expression): Literal {
-			if (typeof expr === 'function') {
-				return expr(SelectBuilder.create(this.wrapper)).createQuery()
-			} else if (((expr: any): expr is QueryBuilder => 'createQuery' in expr)(expr)) {
-				return expr.createQuery()
-			} else {
-				return expr
-			}
-		}
 	}
 
 	export interface Options {
 		with: Statement
 	}
 
-	export type Expression = SelectBuilder.Callback | Literal | SelectBuilder<any>
+	export type Expression = SelectBuilder.Callback | Literal | QueryBuilder
 
 	export interface Aware {
 		with(alias: string, expression: Expression): any
+	}
+
+	export function createLiteral(wrapper: KnexWrapper, expr: Expression): Literal {
+		if (typeof expr === 'function') {
+			return expr(SelectBuilder.create(wrapper)).createQuery()
+		} else if (((expr: any): expr is QueryBuilder => 'createQuery' in expr)(expr)) {
+			return expr.createQuery()
+		} else {
+			return expr
+		}
 	}
 }
 

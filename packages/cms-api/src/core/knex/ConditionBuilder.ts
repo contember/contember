@@ -1,6 +1,5 @@
 import { Value } from './types'
 import QueryBuilder from './QueryBuilder'
-import KnexWrapper from './KnexWrapper'
 import SelectBuilder from './SelectBuilder'
 import Literal from './Literal'
 
@@ -13,9 +12,6 @@ interface Raw {
 
 class ConditionBuilder {
 	public readonly expressions: Literal[] = []
-
-	constructor(private readonly wrapper: KnexWrapper) {
-	}
 
 	and(callback: ConditionBuilderCallback): void {
 		this.invokeCallback(callback, ['and', false])
@@ -30,7 +26,7 @@ class ConditionBuilder {
 	}
 
 	private invokeCallback(callback: ConditionBuilderCallback, parameters: ['and' | 'or', boolean]) {
-		const builder = new ConditionBuilder(this.wrapper)
+		const builder = new ConditionBuilder()
 		callback(builder)
 		const sql = builder.getSql(...parameters)
 		if (sql) {
@@ -58,10 +54,9 @@ class ConditionBuilder {
 		)
 	}
 
-	in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | SelectBuilder.Callback): void {
-		if (typeof values === 'function') {
-			const qb = values(this.wrapper.selectBuilder())
-			const query = qb.createQuery()
+	in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | SelectBuilder): void {
+		if (!Array.isArray(values)) {
+			const query = values.createQuery()
 			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
 			return
 		}

@@ -21,7 +21,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			wrapper,
 			{
 				into: undefined,
-				with: new With.Statement(wrapper, {}),
+				with: new With.Statement({}),
 				values: undefined,
 				onConflict: undefined,
 				returning: new Returning(),
@@ -32,7 +32,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	}
 
 	public with(alias: string, expression: With.Expression): InsertBuilder.InsertBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, expression))
+		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression)))
 	}
 
 	public into(intoTable: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {
@@ -40,7 +40,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	}
 
 	public values(columns: QueryBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
-		return this.withOption('values', QueryBuilder.resolveValues(columns, this.wrapper))
+		return this.withOption('values', QueryBuilder.resolveValues(columns))
 	}
 
 	public onConflict(
@@ -59,7 +59,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'> {
 		let conflictAction: InsertBuilder.ConflictAction
 		if (type === InsertBuilder.ConflictActionType.update && values && target) {
-			conflictAction = { type, values: QueryBuilder.resolveValues(values, this.wrapper), target }
+			conflictAction = { type, values: QueryBuilder.resolveValues(values), target }
 		} else if (type === InsertBuilder.ConflictActionType.doNothing) {
 			conflictAction = { type, target }
 		} else {

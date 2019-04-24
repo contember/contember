@@ -23,15 +23,15 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 			join: [],
 			limit: undefined,
 			select: [],
-			with: new With.Statement(wrapper, {}),
-			where: new Where.Statement(wrapper, []),
+			with: new With.Statement({}),
+			where: new Where.Statement([]),
 			lock: undefined,
 			meta: {},
 		})
 	}
 
 	public with(alias: string, expression: With.Expression): SelectBuilder<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, expression)).withCteAliases([
+		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression))).withCteAliases([
 			...this.cteAliases,
 			alias,
 		])
@@ -47,7 +47,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression,
 		alias?: string
 	): SelectBuilder<Result, Filled | 'select'> {
-		let raw = QueryBuilder.columnExpressionToLiteral(this.wrapper, expr)
+		let raw = QueryBuilder.columnExpressionToLiteral(expr)
 		if (raw === undefined) {
 			return this
 		}
@@ -94,7 +94,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		if (joinCondition === undefined) {
 			return undefined
 		}
-		const builder = new ConditionBuilder(this.wrapper)
+		const builder = new ConditionBuilder()
 		joinCondition(builder)
 
 		return builder.getSql() || undefined

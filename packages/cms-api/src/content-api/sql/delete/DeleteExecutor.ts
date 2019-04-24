@@ -57,15 +57,15 @@ class DeleteExecutor {
 	}
 
 	private async delete(entity: Model.Entity, where: Input.Where): Promise<Returning.Result[]> {
+		const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
+		const inQb = this.db.selectBuilder().from(entity.tableName, 'root_').select(['root_', entity.primaryColumn])
+		const inQbWithWhere = this.whereBuilder.build(inQb, entity, new Path([]), { and: [where, predicate] })
+
 		const qb = this.db
 			.deleteBuilder()
 			.from(entity.tableName)
 			.where(condition =>
-				condition.in(entity.primaryColumn, qb => {
-					qb = qb.from(entity.tableName, 'root_').select(['root_', entity.primaryColumn])
-					const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-					return this.whereBuilder.build(qb, entity, new Path([]), { and: [where, predicate] })
-				})
+				condition.in(entity.primaryColumn, inQbWithWhere)
 			)
 			.returning(entity.primaryColumn)
 

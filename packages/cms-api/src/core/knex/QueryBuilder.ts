@@ -24,12 +24,12 @@ namespace QueryBuilder {
 		| ((expressionFactory: QueryBuilder.ColumnExpressionFactory) => Literal | undefined)
 	export type ColumnExpressionMap = { [columnName: string]: QueryBuilder.ColumnExpression }
 
-	export function resolveValues(values: Values, wrapper: KnexWrapper): ResolvedValues {
+	export function resolveValues(values: Values): ResolvedValues {
 		return Object.entries(values)
 			.map(
 				([key, value]): [string, Literal | Value | undefined] => {
 					if (typeof value === 'function') {
-						return [key, value(new QueryBuilder.ColumnExpressionFactory(wrapper))]
+						return [key, value(new QueryBuilder.ColumnExpressionFactory())]
 					} else if (value instanceof Literal) {
 						return [key, value]
 					}
@@ -56,11 +56,10 @@ namespace QueryBuilder {
 	}
 
 	export function columnExpressionToLiteral(
-		wrapper: KnexWrapper,
 		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression
 	): Literal | undefined {
 		if (typeof expr === 'function') {
-			return expr(new QueryBuilder.ColumnExpressionFactory(wrapper))
+			return expr(new QueryBuilder.ColumnExpressionFactory())
 		} else if (typeof expr === 'string' || Array.isArray(expr)) {
 			return new Literal(QueryBuilder.toFqnWrap(expr))
 		}
@@ -72,7 +71,7 @@ namespace QueryBuilder {
 	}
 
 	export class ColumnExpressionFactory {
-		constructor(private readonly wrapper: KnexWrapper) {}
+		constructor() {}
 
 		public select(columnName: QueryBuilder.ColumnIdentifier): Literal {
 			return new Literal(QueryBuilder.toFqnWrap(columnName))
@@ -84,7 +83,7 @@ namespace QueryBuilder {
 		}
 
 		public selectCondition(condition: ConditionCallback): Literal | undefined {
-			const builder = new ConditionBuilder(this.wrapper)
+			const builder = new ConditionBuilder()
 			condition(builder)
 			return builder.getSql() || undefined
 		}
@@ -94,11 +93,11 @@ namespace QueryBuilder {
 		}
 
 		public window(callback: (windowFunction: WindowFunction<false>) => WindowFunction<true>): Literal {
-			return callback(WindowFunction.createEmpty(this.wrapper)).compile()
+			return callback(WindowFunction.createEmpty()).compile()
 		}
 
 		public case(callback: (caseStatement: CaseStatement) => CaseStatement): Literal {
-			return callback(CaseStatement.createEmpty(this.wrapper)).compile()
+			return callback(CaseStatement.createEmpty()).compile()
 		}
 	}
 }

@@ -1,6 +1,5 @@
 import { Value } from '../types'
 import ConditionBuilder from '../ConditionBuilder'
-import KnexWrapper from '../KnexWrapper'
 import Literal from '../Literal'
 import { wrapIdentifier } from '../utils'
 
@@ -10,19 +9,19 @@ namespace Where {
 	}
 
 	export class Statement {
-		constructor(private readonly wrapper: KnexWrapper, public readonly values: (Literal | ValueWhere)[]) {}
+		constructor(public readonly values: (Literal | ValueWhere)[]) {}
 
 		public withWhere(expression: Expression): Statement {
 			if (typeof expression !== 'function') {
-				return new Statement(this.wrapper, [...this.values, expression])
+				return new Statement([...this.values, expression])
 			}
-			const builder = new ConditionBuilder(this.wrapper)
+			const builder = new ConditionBuilder()
 			expression(builder)
 			const sql = builder.getSql()
 			if (!sql) {
 				return this
 			}
-			return new Statement(this.wrapper, [...this.values, sql])
+			return new Statement([...this.values, sql])
 		}
 
 		public compile(): Literal {

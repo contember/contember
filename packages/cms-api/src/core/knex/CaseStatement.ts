@@ -1,31 +1,30 @@
-import KnexWrapper from './KnexWrapper'
 import QueryBuilder from './QueryBuilder'
 import Literal from './Literal'
 
 class CaseStatement {
-	constructor(private readonly wrapper: KnexWrapper, private readonly options: CaseStatement.Options) {}
+	constructor(private readonly options: CaseStatement.Options) {}
 
-	public static createEmpty(wrapper: KnexWrapper): CaseStatement {
-		return new CaseStatement(wrapper, { whenClauses: [], elseClause: undefined })
+	public static createEmpty(): CaseStatement {
+		return new CaseStatement({ whenClauses: [], elseClause: undefined })
 	}
 
 	public when(when: QueryBuilder.ColumnExpression, then: QueryBuilder.ColumnExpression): CaseStatement {
-		return new CaseStatement(this.wrapper, {
+		return new CaseStatement({
 			...this.options,
 			whenClauses: [
 				...this.options.whenClauses,
 				{
-					when: QueryBuilder.columnExpressionToLiteral(this.wrapper, when) || new Literal('null'),
-					then: QueryBuilder.columnExpressionToLiteral(this.wrapper, then) || new Literal('null'),
+					when: QueryBuilder.columnExpressionToLiteral(when) || new Literal('null'),
+					then: QueryBuilder.columnExpressionToLiteral(then) || new Literal('null'),
 				},
 			],
 		})
 	}
 
 	public else(elseClause: QueryBuilder.ColumnExpression): CaseStatement {
-		return new CaseStatement(this.wrapper, {
+		return new CaseStatement({
 			...this.options,
-			elseClause: QueryBuilder.columnExpressionToLiteral(this.wrapper, elseClause) || new Literal('null'),
+			elseClause: QueryBuilder.columnExpressionToLiteral(elseClause) || new Literal('null'),
 		})
 	}
 

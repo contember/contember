@@ -84,7 +84,7 @@ namespace QueryBuilder {
 		}
 
 		public selectCondition(condition: ConditionCallback): Literal | undefined {
-			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
+			const builder = new ConditionBuilder(this.wrapper)
 			condition(builder)
 			return builder.getSql() || undefined
 		}

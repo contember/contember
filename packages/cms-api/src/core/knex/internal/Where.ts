@@ -16,7 +16,7 @@ namespace Where {
 			if (typeof expression !== 'function') {
 				return new Statement(this.wrapper, [...this.values, expression])
 			}
-			const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
+			const builder = new ConditionBuilder(this.wrapper)
 			expression(builder)
 			const sql = builder.getSql()
 			if (!sql) {

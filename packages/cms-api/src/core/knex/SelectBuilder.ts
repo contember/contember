@@ -94,7 +94,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		if (joinCondition === undefined) {
 			return undefined
 		}
-		const builder = new ConditionBuilder.ConditionStringBuilder(this.wrapper)
+		const builder = new ConditionBuilder(this.wrapper)
 		joinCondition(builder)
 
 		return builder.getSql() || undefined

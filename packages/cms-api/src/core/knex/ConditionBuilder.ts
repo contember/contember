@@ -11,30 +11,92 @@ interface Raw {
 	bindings: Value[]
 }
 
-interface ConditionBuilder {
-	isEmpty(): boolean
+class ConditionBuilder {
+	public readonly expressions: Literal[] = []
 
-	and(callback: ConditionBuilderCallback): void
+	constructor(private readonly wrapper: KnexWrapper) {
+	}
 
-	or(callback: ConditionBuilderCallback): void
+	and(callback: ConditionBuilderCallback): void {
+		this.invokeCallback(callback, ['and', false])
+	}
 
-	not(callback: ConditionBuilderCallback): void
+	or(callback: ConditionBuilderCallback): void {
+		this.invokeCallback(callback, ['or', false])
+	}
 
-	in(columnName: QueryBuilder.ColumnIdentifier, values: Value[]): void
+	not(callback: ConditionBuilderCallback): void {
+		this.invokeCallback(callback, ['and', true])
+	}
 
-	in(columnName: QueryBuilder.ColumnIdentifier, callback: SelectBuilder.Callback): void
+	private invokeCallback(callback: ConditionBuilderCallback, parameters: ['and' | 'or', boolean]) {
+		const builder = new ConditionBuilder(this.wrapper)
+		callback(builder)
+		const sql = builder.getSql(...parameters)
+		if (sql) {
+			this.expressions.push(sql)
+		}
+	}
 
-	null(columnName: QueryBuilder.ColumnIdentifier): void
-
-	compare(columnName: QueryBuilder.ColumnIdentifier, operator: ConditionBuilder.Operator, value: Value): void
+	compare(columnName: QueryBuilder.ColumnIdentifier, operator: ConditionBuilder.Operator, value: Value): void {
+		if (!Object.values(ConditionBuilder.Operator).includes(operator)) {
+			throw new Error(`Operator ${operator} is not supported`)
+		}
+		this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} ${operator} ?`, [value]))
+	}
 
 	compareColumns(
 		columnName1: QueryBuilder.ColumnIdentifier,
 		operator: ConditionBuilder.Operator,
 		columnName2: QueryBuilder.ColumnIdentifier
-	): void
+	) {
+		if (!Object.values(ConditionBuilder.Operator).includes(operator)) {
+			throw new Error(`Operator ${operator} is not supported`)
+		}
+		this.expressions.push(
+			new Literal(`${QueryBuilder.toFqnWrap(columnName1)} ${operator} ${QueryBuilder.toFqnWrap(columnName2)}`)
+		)
+	}
 
-	raw(sql: string, ...bindings: Value[]): void
+	in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | SelectBuilder.Callback): void {
+		if (typeof values === 'function') {
+			const qb = values(this.wrapper.selectBuilder())
+			const query = qb.createQuery()
+			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
+			return
+		}
+		values = values.filter(it => it !== undefined)
+		if (values.length > 0) {
+			const parameters = values.map(() => '?').join(', ')
+			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${parameters})`, values))
+		} else {
+			this.raw('false')
+		}
+	}
+
+	null(columnName: QueryBuilder.ColumnIdentifier): void {
+		this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} is null`))
+	}
+
+	raw(sql: string, ...bindings: (Value)[]): void {
+		this.expressions.push(new Literal(sql, bindings))
+	}
+
+	public getSql(operator: 'or' | 'and' = 'and', not: boolean = false): Literal | null {
+		if (this.expressions.length === 0) {
+			return null
+		}
+		const sql = this.expressions.map(it => ((it as any) as Raw).sql).join(` ${operator} `)
+
+		const bindings: Value[] = []
+		this.expressions.map(it => ((it as any) as Literal).parameters).forEach(it => bindings.push(...it))
+
+		return new Literal(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, bindings)
+	}
+
+	isEmpty(): boolean {
+		return this.expressions.length === 0
+	}
 }
 
 namespace ConditionBuilder {
@@ -47,92 +109,6 @@ namespace ConditionBuilder {
 		'lte' = '<=',
 	}
 
-	export class ConditionStringBuilder implements ConditionBuilder {
-		public readonly expressions: Literal[] = []
-
-		constructor(private readonly wrapper: KnexWrapper) {}
-
-		and(callback: ConditionBuilderCallback): void {
-			this.invokeCallback(callback, ['and', false])
-		}
-
-		or(callback: ConditionBuilderCallback): void {
-			this.invokeCallback(callback, ['or', false])
-		}
-
-		not(callback: ConditionBuilderCallback): void {
-			this.invokeCallback(callback, ['and', true])
-		}
-
-		private invokeCallback(callback: ConditionBuilderCallback, parameters: ['and' | 'or', boolean]) {
-			const builder = new ConditionStringBuilder(this.wrapper)
-			callback(builder)
-			const sql = builder.getSql(...parameters)
-			if (sql) {
-				this.expressions.push(sql)
-			}
-		}
-
-		compare(columnName: QueryBuilder.ColumnIdentifier, operator: Operator, value: Value): void {
-			if (!Object.values(Operator).includes(operator)) {
-				throw new Error(`Operator ${operator} is not supported`)
-			}
-			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} ${operator} ?`, [value]))
-		}
-
-		compareColumns(
-			columnName1: QueryBuilder.ColumnIdentifier,
-			operator: Operator,
-			columnName2: QueryBuilder.ColumnIdentifier
-		) {
-			if (!Object.values(Operator).includes(operator)) {
-				throw new Error(`Operator ${operator} is not supported`)
-			}
-			this.expressions.push(
-				new Literal(`${QueryBuilder.toFqnWrap(columnName1)} ${operator} ${QueryBuilder.toFqnWrap(columnName2)}`)
-			)
-		}
-
-		in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | SelectBuilder.Callback): void {
-			if (typeof values === 'function') {
-				const qb = values(this.wrapper.selectBuilder())
-				const query = qb.createQuery()
-				this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
-				return
-			}
-			values = values.filter(it => it !== undefined)
-			if (values.length > 0) {
-				const parameters = values.map(() => '?').join(', ')
-				this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${parameters})`, values))
-			} else {
-				this.raw('false')
-			}
-		}
-
-		null(columnName: QueryBuilder.ColumnIdentifier): void {
-			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} is null`))
-		}
-
-		raw(sql: string, ...bindings: (Value)[]): void {
-			this.expressions.push(new Literal(sql, bindings))
-		}
-
-		public getSql(operator: 'or' | 'and' = 'and', not: boolean = false): Literal | null {
-			if (this.expressions.length === 0) {
-				return null
-			}
-			const sql = this.expressions.map(it => ((it as any) as Raw).sql).join(` ${operator} `)
-
-			const bindings: Value[] = []
-			this.expressions.map(it => ((it as any) as Literal).parameters).forEach(it => bindings.push(...it))
-
-			return new Literal(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, bindings)
-		}
-
-		isEmpty(): boolean {
-			return this.expressions.length === 0
-		}
-	}
 }
 
 export default ConditionBuilder

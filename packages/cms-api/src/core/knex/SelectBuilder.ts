@@ -3,10 +3,10 @@ import KnexWrapper from './KnexWrapper'
 import With from './internal/With'
 import Where from './internal/Where'
 import QueryBuilder from './QueryBuilder'
-import { QueryResult } from 'pg'
 import { aliasLiteral } from './utils'
 import Literal from './Literal'
 import Compiler from './Compiler'
+import Connection from './Connection'
 
 class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder<Result, never> = never>
 	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled>>, QueryBuilder {
@@ -114,7 +114,8 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 
 	public async getResult(): Promise<Result[]> {
 		const query = this.createQuery()
-		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters).options({ meta: query.meta })
+		const result: Connection.Result = await this.wrapper.query(query.sql, query.parameters, query.meta)
+
 		return (result.rows as any) as Result[]
 	}
 

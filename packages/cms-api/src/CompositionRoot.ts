@@ -10,7 +10,6 @@ import { Config, DatabaseCredentials } from './config/config'
 import S3 from './utils/S3'
 import TimerMiddlewareFactory from './http/TimerMiddlewareFactory'
 import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
-import KnexWrapper from './core/knex/KnexWrapper'
 import SystemMiddlewareFactory from './http/SystemMiddlewareFactory'
 import SchemaVersionBuilder from './content-schema/SchemaVersionBuilder'
 import SystemContainerFactory from './system-api/SystemContainerFactory'
@@ -41,6 +40,9 @@ import { CommandManager } from './core/cli/CommandManager'
 import { Schema } from 'cms-common'
 import SystemExecutionContainer from './system-api/SystemExecutionContainer'
 import TenantContainer from './tenant-api/TenantContainer'
+import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
+import Connection from './core/knex/Connection'
+import KnexWrapper from './core/knex/KnexWrapper'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -49,6 +51,7 @@ export type ProjectContainer = Container<{
 	systemApolloServerFactory: SystemApolloServerFactory
 	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
 	systemExecutionContainerFactory: SystemExecutionContainer.Factory
+	connection: Connection
 }>
 
 export interface MasterContainer {
@@ -196,16 +199,28 @@ class CompositionRoot {
 							password: project.dbCredentials.password,
 							database: project.dbCredentials.database,
 						},
+						pool: {
+							max: 20,
+						},
 					})
-					knexDebugger.register(knexInst)
+					// knexDebugger.register(knexInst)
 
 					return knexInst
+				})
+				.addService('connection', ({ project, }) => {
+					return new Connection({
+						host: project.dbCredentials.host,
+						port: project.dbCredentials.port,
+						user: project.dbCredentials.user,
+						password: project.dbCredentials.password,
+						database: project.dbCredentials.database,
+					}, {timing: true})
 				})
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.slug)
 				)
 				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-				.addService('systemKnexWrapper', ({ knexConnection }) => new KnexWrapper(knexConnection, 'system'))
+				.addService('systemKnexWrapper', ({ connection }) => new KnexWrapper(connection, 'system'))
 				.addService('systemQueryHandler', ({ systemKnexWrapper }) => systemKnexWrapper.createQueryHandler())
 				.addService(
 					'modificationHandlerFactory',
@@ -259,7 +274,7 @@ class CompositionRoot {
 			)
 
 			return projectContainer
-				.pick('project', 'knexConnection', 'contentApolloMiddlewareFactory', 'systemKnexWrapper')
+				.pick('project', 'knexConnection', 'contentApolloMiddlewareFactory', 'systemKnexWrapper', 'connection')
 				.merge(systemContainer.pick('systemApolloServerFactory', 'systemExecutionContainerFactory'))
 		})
 	}

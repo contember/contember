@@ -6,6 +6,7 @@ import Where from './internal/Where'
 import Literal from './Literal'
 import Compiler from './Compiler'
 import { QueryResult } from 'pg'
+import Connection from './Connection'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>>
 	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
@@ -62,7 +63,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 
 	public async execute(): Promise<Result> {
 		const query = this.createQuery()
-		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
+		const result: Connection.Result = await this.wrapper.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
 	}
 

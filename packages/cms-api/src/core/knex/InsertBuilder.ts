@@ -6,6 +6,7 @@ import SelectBuilder from './SelectBuilder'
 import QueryBuilder from './QueryBuilder'
 import Literal from './Literal'
 import Compiler from './Compiler'
+import Connection from './Connection'
 import { assertNever } from 'cms-common'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
@@ -106,7 +107,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 
 	public async execute(): Promise<Result> {
 		const query = this.createQuery()
-		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
+		const result: Connection.Result = await this.wrapper.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
 	}
 

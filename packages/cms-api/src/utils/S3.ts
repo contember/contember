@@ -6,12 +6,17 @@ import { extension } from 'mime-types'
 class S3 {
 	private readonly s3: AwsS3
 
+	private readonly endpoint: string
+
 	constructor(private config: Project.S3Config) {
 		this.s3 = new AwsS3({
 			accessKeyId: config.credentials.key,
 			secretAccessKey: config.credentials.secret,
 			region: config.region,
+			signatureVersion: 'v4',
+			endpoint: config.endpoint || 's3.{region}.amazonaws.com',
 		})
+		this.endpoint = this.s3.config.endpoint!
 	}
 
 	public getSignedUrl(contentType: string): { objectKey: string; url: string; bucket: string; publicUrl: string } {
@@ -31,7 +36,7 @@ class S3 {
 	}
 
 	public formatPublicUrl(key: string): string {
-		return `https://s3.${this.config.region}.amazonaws.com/${this.config.bucket}/${key}`
+		return `https://${this.endpoint}/${this.config.bucket}/${key}`
 	}
 }
 

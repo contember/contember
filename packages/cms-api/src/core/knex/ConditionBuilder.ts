@@ -103,7 +103,6 @@ namespace ConditionBuilder {
 		'lt' = '<',
 		'lte' = '<=',
 	}
-
 }
 
 export default ConditionBuilder

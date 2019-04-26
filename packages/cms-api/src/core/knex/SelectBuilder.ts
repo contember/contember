@@ -31,10 +31,10 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	}
 
 	public with(alias: string, expression: With.Expression): SelectBuilder<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression))).withCteAliases([
-			...this.cteAliases,
-			alias,
-		])
+		return this.withOption(
+			'with',
+			this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression))
+		).withCteAliases([...this.cteAliases, alias])
 	}
 
 	public from(tableName: string | Literal, alias?: string): SelectBuilder<Result, Filled | 'from'> {
@@ -114,8 +114,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 
 	public async getResult(): Promise<Result[]> {
 		const query = this.createQuery()
-		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters)
-			.options({ meta: query.meta })
+		const result: QueryResult = await this.wrapper.raw(query.sql, ...query.parameters).options({ meta: query.meta })
 		return (result.rows as any) as Result[]
 	}
 

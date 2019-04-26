@@ -1,0 +1,248 @@
+mutation {
+  csLocale: createLocale(data: { slug: "cs", title: "Cestina" }) {
+    id
+  }
+
+  enLocale: createLocale(data: { slug: "en", title: "Anglictina" }) {
+    id
+  }
+
+  createFooter(
+    data: {
+      unique: One
+      locales: [
+        { create: { address: "Abcd", locale: { connect: { slug: "cs" } } } }
+        { create: { address: "Xyz", locale: { connect: { slug: "en" } } } }
+      ]
+    }
+  ) {
+    id
+  }
+
+  createContact(
+    data: {
+      unique: One
+      locales: [
+        {
+          create: {
+            header: "Abcd"
+            link: {
+              create: {url: "/cs/kontakt"}
+            }
+            seo: { create: { title: "Kontakt" } }
+            locale: { connect: { slug: "cs" } }
+          }
+        }
+        {
+          create: {
+            header: "Xyz"
+            link: {
+              create: {url: "/en/contact"}
+            }
+            seo: { create: { title: "Contact" } }
+            locale: { connect: { slug: "en" } }
+          }
+        }
+      ]
+    }
+  ) {
+    id
+  }
+
+  createPage(
+    data: {
+      image: { create: { url: "http://example.org" } }
+      category: {
+        create: {
+          locales: [
+            {
+              create: {
+                name: "Prvni kategorie"
+                locale: { connect: { slug: "cs" } }
+              }
+            }
+            {
+              create: {
+                name: "First category"
+                locale: { connect: { slug: "en" } }
+              }
+            }
+          ]
+        }
+      }
+      locales: [
+        {
+          create: {
+            locale: { connect: { slug: "cs" } }
+            state: Published
+            header: "Ahoj svete"
+            perex: "..."
+            contactUs: "Napiste nám"
+            seo: {
+              create: {
+                title: "Ahoj"
+                ogImage: { create: { url: "http://example.org" } }
+                description: "..."
+              }
+            }
+            link: { create: { url: "/cs" } }
+            content: [
+              { create: { type: Heading, text: "Ahoj svete", order: 1 } }
+              { create: { type: Text, text: "bla bla", order: 2 } }
+              {
+                create: {
+                  type: Image
+                  order: 3
+                  image: { create: { url: "http://example.org/1" } }
+                }
+              }
+              {
+                create: {
+                  type: ImageGrid
+                  order: 4
+                  imageGrid: {
+                    create: {
+                      imagePosition1: {
+                        create: { url: "http://example.org/2" }
+                      }
+                      imagePosition2: {
+                        create: { url: "http://example.org/3" }
+                      }
+                      imagePosition3: {
+                        create: { url: "http://example.org/4" }
+                      }
+                    }
+                  }
+                }
+              }
+              {
+                create: {
+                  type: People
+                  order: 5
+                  people: [
+                    {
+                      create: {
+                        order: 1
+                        person: {
+                          create: {
+                            order: 1
+                            image: { create: { url: "xxx" } }
+                            email: "foo@bar.com"
+                            locales: [
+                              {
+                                create: {
+                                  locale: { connect: { slug: "cs" } }
+                                  name: "John doe"
+                                  position: "Programmer"
+                                  quote: "hi"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                    {
+                      create: {
+                        order: 2
+                        person: {
+                          create: {
+                            order: 2
+                            image: { create: { url: "yy" } }
+                            email: "foo@lorem.com"
+                            locales: [
+                              {
+                                create: {
+                                  locale: { connect: { slug: "cs" } }
+                                  name: "Jack black"
+                                  position: "Developer"
+                                  quote: "hello"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+              {
+                create: {
+                  type: Category
+                  order: 6
+                  category: {
+                    create: {
+                      locales: [
+                        {
+                          create: {
+                            name: "Dalsi kategorie"
+                            locale: { connect: { slug: "cs" } }
+                          }
+                        }
+                      ]
+                      pages: [
+                        {
+                          create: {
+                            image: {create: {url: "aaa"}}
+                            locales: {
+                              create: {
+                                seo: {
+                                  create: {
+                                    title: "Bla"
+                                  }
+                                }
+                                link: {
+                                  create: {url: "/xx"}
+                                }
+                                locale: {connect: {slug: "cs"}}
+                                state: ToBePublished
+                                header: "Bla bla"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ) {
+    id
+  }
+
+  item1: createMenuItem(data: {
+    order: 1,
+    locales: [
+      {
+        create: {
+          label: "Uvodni stranka",
+          locale: {connect: {slug: "cs"}},
+          target: {connect: {url: "/cs"}}
+        }
+      }
+    ]
+  }) {
+    id
+  }
+
+  item2: createMenuItem(data: {
+    order: 2,
+    locales: [
+      {
+        create: {
+          label: "Kontakt",
+          locale: {connect: {slug: "cs"}},
+          target: {connect: {url: "/cs/kontakt"}}
+        }
+      }
+    ]
+  }) {
+    id
+  }
+}

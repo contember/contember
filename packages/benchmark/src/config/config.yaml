@@ -1,0 +1,32 @@
+tenant:
+    db:
+        host: '%env.TENANT_DB_HOST%'
+        port: '%env.TENANT_DB_PORT%'
+        user: '%env.TENANT_DB_USER%'
+        password: '%env.TENANT_DB_PASSWORD%'
+        database: '%env.TENANT_DB_NAME%'
+
+projects:
+    - uuid: a2f943bb-cd4f-419c-af5a-60c850c97f59
+      slug: app
+      name: App
+      stages:
+          - uuid: 01c8f908-6f48-4ef3-9751-9989931b42eb
+            slug: prod
+            name: Production
+            migration: '2019-04-24-135532'
+      dbCredentials:
+        host: '%env.APP_DB_HOST%'
+        port: '%env.APP_DB_PORT%'
+        user: '%env.APP_DB_USER%'
+        password: '%env.APP_DB_PASSWORD%'
+        database: '%env.APP_DB_NAME%'
+      s3:
+        bucket: ''
+        prefix: 'dev'
+        region: 'eu-central-1'
+        credentials:
+          key: ''
+          secret: ''
+server:
+    port: '%env.SERVER_PORT%'

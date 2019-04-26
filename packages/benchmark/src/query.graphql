@@ -1,0 +1,107 @@
+query {
+  locales: listLocale {
+    id
+    slug
+    title
+  }
+  menuItems: listMenuItem(
+    orderBy: [{ order: asc }]
+  ) {
+    id
+    localesByLocale(by: { locale: { slug: "cs" } }) {
+      label
+      target {
+        url
+      }
+    }
+  }
+
+  footer: getFooter(by: { unique: One }) {
+    id
+    localesByLocale(by: { locale: { slug: "cs" } }) {
+      id
+      address
+    }
+  }
+
+  contact: getContact(by: { unique: One }) {
+    id
+    localesByLocale(by: { locale: { slug: "cs" } }) {
+      header
+    }
+  }
+
+  pages: listPage {
+    id
+    image {
+      url
+    }
+    category {
+      localesByLocale(by: { locale: { slug: "cs" } }) {
+        name
+      }
+    }
+    localesByLocale(by: { locale: { slug: "cs" } }) {
+      id
+      header
+      perex
+      state
+      seo {
+        title
+        description
+        ogImage {
+          url
+        }
+      }
+      link {
+        url
+      }
+      content(orderBy: { order: asc }) {
+        order
+        type
+        text
+        people(orderBy: { order: asc }) {
+          id
+
+          person {
+            image {
+              url
+            }
+            email
+            localesByLocale(by: { locale: { slug: "cs" } }) {
+              quote
+              name
+              position
+            }
+          }
+        }
+        image {
+          url
+        }
+        imageGrid {
+          imagePosition1 {
+            url
+          }
+          imagePosition2 {
+            url
+          }
+          imagePosition3 {
+            url
+          }
+        }
+        category {
+          localesByLocale(by: {locale: {slug: "cs"}}) {
+            name
+          }
+          pages {
+            localesByLocale(by: {locale: {slug: "cs"}}) {
+              id
+              header
+            }
+          }
+        }
+
+      }
+    }
+  }
+}

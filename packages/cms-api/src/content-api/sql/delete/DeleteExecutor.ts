@@ -22,7 +22,7 @@ class DeleteExecutor {
 	) {}
 
 	public async execute(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
-		await this.db.raw('SET CONSTRAINTS ALL DEFERRED')
+		await this.db.query('SET CONSTRAINTS ALL DEFERRED')
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 		const result = await this.delete(entity, uniqueWhere)
 		if (result.length === 0) {
@@ -30,7 +30,7 @@ class DeleteExecutor {
 		}
 		await this.executeCascade(entity, result)
 
-		await this.db.raw('SET CONSTRAINTS ALL IMMEDIATE')
+		await this.db.query('SET CONSTRAINTS ALL IMMEDIATE')
 	}
 
 	private async executeCascade(entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {

@@ -8,6 +8,7 @@ import Migration from './Migration'
 import { createMigrationBuilder } from '../../../content-api/sqlSchema/sqlSchemaBuilderHelper'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
+import { wrapIdentifier } from '../../../core/knex/utils'
 
 class MigrationExecutor {
 	constructor(
@@ -25,7 +26,7 @@ class MigrationExecutor {
 			return stage
 		}
 		let schema = await this.schemaVersionBuilder.buildSchemaUntil(migrations[0].version)
-		await db.raw('SET search_path TO ??', formatSchemaName(stage))
+		await db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
 
 		let previousId = stage.event_id
 		for (const { version, modifications } of migrations) {
@@ -41,7 +42,7 @@ class MigrationExecutor {
 
 			const sql = builder.getSql()
 
-			await db.raw(sql)
+			await db.query(sql)
 			previousId = await new CreateEventCommand(
 				EventType.runMigration,
 				{

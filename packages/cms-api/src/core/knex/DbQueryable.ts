@@ -6,7 +6,7 @@ import SelectBuilder from './SelectBuilder'
 
 export default class DbQueryable implements Queryable<DbQueryable> {
 	constructor(
-		private readonly knexWrapper: KnexWrapper,
+		public readonly wrapper: KnexWrapper,
 		private readonly handlerAccessor: QueryHandlerAccessor<DbQueryable>
 	) {
 	}
@@ -16,10 +16,10 @@ export default class DbQueryable implements Queryable<DbQueryable> {
 	}
 
 	createSelectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result> {
-		return this.knexWrapper.selectBuilder<Result>()
+		return this.wrapper.selectBuilder<Result>()
 	}
 
 	createWrapper(): KnexWrapper {
-		return this.knexWrapper
+		return this.wrapper
 	}
 }

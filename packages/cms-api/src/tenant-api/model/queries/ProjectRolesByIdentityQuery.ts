@@ -10,7 +10,7 @@ class ProjectRolesByIdentityQuery extends DbQuery<ProjectRolesByIdentityQuery.Re
 		const result = await queryable
 			.createSelectBuilder<ProjectRolesByIdentityQuery.Result>()
 			.select('roles')
-			.from('tenant.project_member')
+			.from('project_member')
 			.where({
 				identity_id: this.identityId,
 				project_id: this.projectId,

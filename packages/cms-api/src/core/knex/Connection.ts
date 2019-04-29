@@ -1,8 +1,9 @@
 import { Pool, PoolClient, PoolConfig } from 'pg'
 import EventManager from './EventManager'
 import { Transaction } from './Transaction'
+import KnexWrapper from './KnexWrapper'
 
-class Connection implements Connection.Transactional, Connection.Queryable {
+class Connection implements Connection.ConnectionLike, Connection.ClientFactory {
 
 	private readonly pool: Pool
 
@@ -12,6 +13,10 @@ class Connection implements Connection.Transactional, Connection.Queryable {
 		public readonly eventManager: EventManager = new EventManager()
 	) {
 		this.pool = new Pool(config)
+	}
+
+	public createClient(schema: string): KnexWrapper {
+		return new KnexWrapper(this, schema)
 	}
 
 	async transaction<Result>(callback: (connection: Connection.TransactionLike) => Promise<Result> | Result): Promise<Result> {
@@ -34,6 +39,10 @@ class Connection implements Connection.Transactional, Connection.Queryable {
 			client.release(e)
 			throw e
 		}
+	}
+
+	async end(): Promise<void> {
+		await this.pool.end()
 	}
 
 	async query<Row extends Record<string, any>>(sql: string, parameters: any[], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
@@ -67,6 +76,10 @@ namespace Connection {
 
 	export interface ConnectionLike extends Transactional, Queryable {
 
+	}
+
+	export interface ClientFactory {
+		createClient(schema: string): KnexWrapper
 	}
 
 	export interface TransactionLike extends ConnectionLike {
@@ -116,8 +129,18 @@ namespace Connection {
 			return result
 		} catch (error) {
 			eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
-			throw error
+			throw new ConnectionError(`Execution of SQL query has failed: 
+SQL: ${sql}
+parameters: ${parameters}
+original message:
+${'message' in error ? error.message : error}
+`)
 		}
+	}
+
+	class ConnectionError extends Error
+	{
+
 	}
 
 	function prepareSql(sql: string) {

@@ -198,7 +198,7 @@ class CompositionRoot {
 					MigrationFilesManager.createForProject(projectsDir, project.slug)
 				)
 				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-				.addService('systemKnexWrapper', ({ connection }) => new KnexWrapper(connection, 'system'))
+				.addService('systemKnexWrapper', ({ connection }) => connection.createClient('system'))
 				.addService('systemQueryHandler', ({ systemKnexWrapper }) => systemKnexWrapper.createQueryHandler())
 				.addService(
 					'modificationHandlerFactory',

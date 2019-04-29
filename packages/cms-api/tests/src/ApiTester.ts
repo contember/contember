@@ -1,7 +1,5 @@
 import Project from '../../src/config/Project'
-import KnexWrapper from '../../src/core/knex/KnexWrapper'
 import MigrationFilesManager from '../../src/migrations/MigrationFilesManager'
-import knex from 'knex'
 import MigrationsRunner from '../../src/core/migrations/MigrationsRunner'
 import { setupSystemVariables, unnamedIdentity } from '../../src/system-api/SystemVariablesSetupHelper'
 import CreateInitEventCommand from '../../src/system-api/model/commands/CreateInitEventCommand'
@@ -24,7 +22,8 @@ import SystemApiTester from './SystemApiTester'
 import TesterStageManager from './TesterStageManager'
 import SequenceTester from './SequenceTester'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
-import Container from '../../src/core/di/Container'
+import Connection from '../../src/core/knex/Connection'
+import { wrapIdentifier } from '../../src/core/knex/utils'
 
 export default class ApiTester {
 	public static project: Project = {
@@ -41,10 +40,9 @@ export default class ApiTester {
 		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
 		public readonly sequences: SequenceTester,
-		public readonly systemExecutionContainer: ReturnType<
-			ReturnType<SystemExecutionContainer.Factory['createBuilder']>['build']
-		>
-	) {}
+		public readonly systemExecutionContainer: ReturnType<ReturnType<SystemExecutionContainer.Factory['createBuilder']>['build']>
+	) {
+	}
 
 	public static async create(
 		options: {
@@ -65,32 +63,29 @@ export default class ApiTester {
 			}
 		}
 
-		const createConnection = (dbName: string): knex => {
-			return knex({
-				debug: false,
-				client: 'pg',
-				connection: dbCredentials(dbName),
-				pool: {
-					max: 1,
-					min: 1,
-				},
-			})
+		const createConnection = (dbName: string): Connection => {
+			return new Connection({
+				...dbCredentials(dbName),
+				max: 1,
+				min: 1,
+			}, {})
 		}
 
 		const connection = createConnection(process.env.TEST_DB_MAINTENANCE_NAME || 'postgres')
 
 		const dbName = String(process.env.TEST_DB_NAME)
-		await connection.raw('DROP DATABASE IF EXISTS ?? ', [dbName])
-		await connection.raw('CREATE DATABASE ?? ', [dbName])
+		await connection.query('DROP DATABASE IF EXISTS ' + wrapIdentifier(dbName), [])
+		await connection.query('CREATE DATABASE ' + wrapIdentifier(dbName), [])
 
 		const migrationsRunner = new MigrationsRunner()
 		const systemMigrationsManager = new MigrationFilesManager(
 			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/migrations/project'
 		)
 		await migrationsRunner.migrate(dbCredentials(dbName), 'system', systemMigrationsManager.directory, false)
-		await connection.destroy()
+		await connection.end()
 
-		const projectDb = new KnexWrapper(createConnection(dbName), 'system')
+		const projectConnection = createConnection(dbName)
+		const projectDb = projectConnection.createClient('system')
 
 		await setupSystemVariables(projectDb, unnamedIdentity)
 
@@ -145,8 +140,12 @@ export default class ApiTester {
 			process.exit(1)
 		})
 
+		let closed = false
 		afterEach(async () => {
-			await projectDb.knex.destroy()
+			if (!closed) {
+				await projectConnection.end()
+				closed = true
+			}
 		})
 
 		const stageManager = new TesterStageManager(

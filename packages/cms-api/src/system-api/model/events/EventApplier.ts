@@ -19,13 +19,13 @@ class EventApplier {
 		let trxId: string | null = null
 		for (let event of events) {
 			if (event.transactionId !== trxId) {
-				await this.db.raw('SET CONSTRAINTS ALL IMMEDIATE')
-				await this.db.raw('SET CONSTRAINTS ALL DEFERRED')
+				await this.db.query('SET CONSTRAINTS ALL IMMEDIATE')
+				await this.db.query('SET CONSTRAINTS ALL DEFERRED')
 				trxId = event.transactionId
 			}
 			await this.applyEvent(stage, event)
 		}
-		await this.db.raw('SET CONSTRAINTS ALL IMMEDIATE')
+		await this.db.query('SET CONSTRAINTS ALL IMMEDIATE')
 	}
 
 	private async applyEvent(stage: Stage, event: AnyEvent): Promise<void> {

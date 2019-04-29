@@ -19,6 +19,7 @@ import DiffQuery from '../queries/DiffQuery'
 import { Modification } from './modifications/Modification'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import RecreateContentEvent from '../commands/RecreateContentEvent'
+import { wrapIdentifier } from '../../../core/knex/utils'
 
 type StageEventsMap = Record<string, ContentEvent[]>
 
@@ -103,8 +104,8 @@ export default class ProjectMigrator {
 	}
 
 	private async executeOnStage(stage: StageWithoutEvent, sql: string) {
-		await this.db.raw('SET search_path TO ??', formatSchemaName(stage))
-		await this.db.raw(sql)
+		await this.db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
+		await this.db.query(sql)
 	}
 
 	private async fetchStageEvents(

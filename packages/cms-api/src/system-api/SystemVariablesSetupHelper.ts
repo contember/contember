@@ -5,11 +5,13 @@ export const unnamedIdentity = '11111111-1111-1111-1111-111111111111'
 
 export async function setupSystemVariables(knex: KnexWrapper, identityId: string) {
 	await Promise.all([
-		await knex.raw(
+		await knex.query(
 			'SELECT set_config(?, ?, false)',
-			'tenant.identity_id', // todo rename to system.identity_id
-			identityId
+			[
+				'tenant.identity_id', // todo rename to system.identity_id
+				identityId
+			]
 		),
-		await knex.raw('SELECT set_config(?, ?, false)', 'system.transaction_id', uuid()),
+		await knex.query('SELECT set_config(?, ?, false)', ['system.transaction_id', uuid()]),
 	])
 }

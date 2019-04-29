@@ -32,8 +32,7 @@ export default class SystemMiddlewareFactory {
 				this.projectMemberMiddlewareFactory.create(),
 				(ctx: KoaContext<ProjectResolveMiddlewareFactory.KoaState & { db: KnexWrapper }>, next) => {
 					const projectContainer = ctx.state.projectContainer
-					const knex = projectContainer.connection
-					ctx.state.db = new KnexWrapper(knex, 'system')
+					ctx.state.db = projectContainer.connection.createClient('system')
 					return next()
 				},
 				this.databaseTransactionMiddlewareFactory.create(),

@@ -67,8 +67,8 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title",
-                         "root_"."locale" in ($2) as "root__meta_title_readable",
+                         case when "root_"."locale" in (?) then "root_"."title" else null end as "root_title",
+                         "root_"."locale" in (?) as "root__meta_title_readable",
                          false as "root__meta_title_updatable"
                        from "public"."post_locale" as "root_"`,
 							parameters: ['cs', 'cs'],
@@ -139,9 +139,9 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title"
+                         case when "root_"."locale" in (?) then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"
-                       where "root_"."title" = $2 and "root_"."locale" in ($3)`,
+                       where "root_"."title" = ? and "root_"."locale" in (?)`,
 							parameters: ['cs', 'foo', 'cs'],
 							response: {
 								rows: [
@@ -283,9 +283,9 @@ describe('Queries with acl', () => {
 							sql: SQL`select
                          "root_"."post_id" as "__grouping_key",
                          "root_"."id" as "root_id",
-                         case when "root_"."locale" in ($1) then "root_"."title" else null end as "root_title"
+                         case when "root_"."locale" in (?) then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"
-                       where "root_"."post_id" in ($2, $3) and false`,
+                       where "root_"."post_id" in (?, ?) and false`,
 							parameters: ['cs', testUuid(1), testUuid(2)],
 							response: {
 								rows: [
@@ -421,10 +421,10 @@ describe('Queries with acl', () => {
 						{
 							sql: SQL`select
                          "root_"."id" as "root_id",
-                         case when "root_country"."name" in ($1) then "root_"."name" else null end as "root_name",
+                         case when "root_country"."name" in (?) then "root_"."name" else null end as "root_name",
                          "root_"."id" as "root_id"
                        from "public"."author" as "root_" left join "public"."country" as "root_country" on "root_"."country_id" = "root_country"."id"
-                       where "root_"."id" in ($2, $3)`,
+                       where "root_"."id" in (?, ?)`,
 							parameters: ['Czechia', testUuid(3), testUuid(4)],
 							response: {
 								rows: [

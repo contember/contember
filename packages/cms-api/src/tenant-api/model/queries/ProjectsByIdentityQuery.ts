@@ -10,10 +10,10 @@ class ProjectsByIdentityQuery extends DbQuery<ProjectsByIdentityQuery.Result> {
 	async fetch(queryable: DbQueryable): Promise<ProjectsByIdentityQuery.Result> {
 		return await queryable
 			.createSelectBuilder<ProjectsByIdentityQuery.Row>()
-			.select('project.id')
-			.select('project.name')
-			.select('project.slug')
-			.from('tenant.project')
+			.select(['project', 'id'])
+			.select(['project', 'name'])
+			.select(['project', 'slug'])
+			.from('project')
 			.join('project_member', 'project_member', clause =>
 				clause.compareColumns(['project_member', 'project_id'], ConditionBuilder.Operator.eq, ['project', 'id'])
 			)

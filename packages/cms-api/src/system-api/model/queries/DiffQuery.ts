@@ -10,7 +10,7 @@ class DiffQuery extends DbQuery<AnyEvent[]> {
 	}
 
 	async fetch(queryable: DbQueryable): Promise<AnyEvent[]> {
-		const diff = await queryable.createWrapper().raw<{
+		const diff = await queryable.createWrapper().query<{
 			id: string
 			type: EventType
 			data: any
@@ -31,8 +31,7 @@ class DiffQuery extends DbQuery<AnyEvent[]> {
   )
 SELECT * FROM events ORDER BY index DESC
 `,
-			this.headEvent,
-			this.baseEvent
+			[this.headEvent, this.baseEvent]
 		)
 
 		const rows = diff.rows

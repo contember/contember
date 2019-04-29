@@ -7,7 +7,7 @@ class StageCommonEventsMatrixQuery extends DbQuery<StageCommonEventsMatrixQuery.
 	}
 
 	async fetch(queryable: DbQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
-		const rows = (await queryable.createWrapper().raw<{
+		const rows = (await queryable.createWrapper().query<{
 			stage_a_id: string
 			stage_b_id: string
 			stage_a_event_id: string

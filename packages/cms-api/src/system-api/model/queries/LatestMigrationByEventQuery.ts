@@ -7,7 +7,7 @@ class LatestMigrationByEventQuery extends DbQuery<LatestMigrationByEventQuery.Re
 	}
 
 	async fetch(queryable: DbQueryable): Promise<LatestMigrationByEventQuery.Result> {
-		const rows = (await queryable.createWrapper().raw(
+		const rows = (await queryable.createWrapper().query<LatestMigrationByEventQuery.Row>(
 			`
 			WITH RECURSIVE recent_events(type, previous_id, data) AS (
 					SELECT type, previous_id, data
@@ -22,20 +22,19 @@ class LatestMigrationByEventQuery extends DbQuery<LatestMigrationByEventQuery.Re
 			FROM recent_events
 			WHERE type = 'run_migration'
 			LIMIT 1
-		`,
-			this.eventId
-		)).rows
+		`, [this.eventId])).rows
 
-		return this.fetchOneOrNull(rows) as any
+		return this.fetchOneOrNull(rows)
 	}
 }
 
 namespace LatestMigrationByEventQuery {
-	export type Result = null | {
+	export type Row = {
 		readonly type: string
 		readonly previous_id: string
 		readonly data: { version: string }
 	}
+	export type Result = null | Row
 }
 
 export default LatestMigrationByEventQuery

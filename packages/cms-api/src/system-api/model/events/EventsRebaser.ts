@@ -12,12 +12,14 @@ class EventsRebaser {
 		newBase: string,
 		droppedEvents: string[]
 	): Promise<string> {
-		const result: { rows: { old_id: string; new_id: string }[] } = await this.db.raw(
+		const result: { rows: { old_id: string; new_id: string }[] } = await this.db.query(
 			'SELECT * FROM system.rebase_events_unsafe(?::UUID, ?::UUID, ?::UUID, ?::UUID[]) AS t',
-			headEvent,
-			oldBase,
-			newBase,
-			droppedEvents
+			[
+				headEvent,
+				oldBase,
+				newBase,
+				droppedEvents,
+			]
 		)
 
 		const newHead = result.rows[0] ? result.rows[0].new_id : newBase

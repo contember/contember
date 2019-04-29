@@ -1,4 +1,4 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { EventType } from '../EventType'
 import { uuid } from '../../../utils/uuid'
 
@@ -9,7 +9,7 @@ class CreateEventCommand {
 		private readonly previousId: string | null
 	) {}
 
-	public async execute(db: KnexWrapper): Promise<string> {
+	public async execute(db: Client): Promise<string> {
 		const id = uuid()
 		await db
 			.insertBuilder()

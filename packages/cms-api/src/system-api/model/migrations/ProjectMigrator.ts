@@ -1,6 +1,6 @@
 import StageTree from '../stages/StageTree'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
@@ -14,18 +14,18 @@ import { EventType, isContentEvent } from '../EventType'
 import { Stage, StageWithoutEvent } from '../dtos/Stage'
 import { ContentEvent } from '../dtos/Event'
 import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import DiffQuery from '../queries/DiffQuery'
 import { Modification } from './modifications/Modification'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import RecreateContentEvent from '../commands/RecreateContentEvent'
-import { wrapIdentifier } from '../../../core/knex/utils'
+import { wrapIdentifier } from '../../../core/database/utils'
 
 type StageEventsMap = Record<string, ContentEvent[]>
 
 export default class ProjectMigrator {
 	constructor(
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly stageTree: StageTree,
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
@@ -137,7 +137,7 @@ export default class ProjectMigrator {
 		return result
 	}
 
-	private async reCreateEvents(db: KnexWrapper, stage: Stage, events: StageEventsMap): Promise<void> {
+	private async reCreateEvents(db: Client, stage: Stage, events: StageEventsMap): Promise<void> {
 		for (const childStage of this.stageTree.getChildren(stage)) {
 			let previousId = stage.event_id
 			const transactionContext = new RecreateContentEvent.TransactionContext()

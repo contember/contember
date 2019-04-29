@@ -1,18 +1,18 @@
 import Path from '../select/Path'
 import Mapper from '../Mapper'
 import WhereBuilder from '../select/WhereBuilder'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { Input, Model } from 'cms-common'
-import ConditionBuilder from '../../../core/knex/ConditionBuilder'
+import ConditionBuilder from '../../../core/database/ConditionBuilder'
 import OrderByBuilder from './OrderByBuilder'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import PredicatesInjector from '../../../acl/PredicatesInjector'
-import LimitByGroupWrapper from '../../../core/knex/LimitByGroupWrapper'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
+import LimitByGroupWrapper from '../../../core/database/LimitByGroupWrapper'
+import SelectBuilder from '../../../core/database/SelectBuilder'
 
 class JunctionFetcher {
 	constructor(
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderBuilder: OrderByBuilder,
 		private readonly predicateInjector: PredicatesInjector

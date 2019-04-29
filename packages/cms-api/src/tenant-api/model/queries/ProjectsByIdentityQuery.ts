@@ -1,6 +1,6 @@
-import DbQuery from '../../../core/knex/DbQuery'
-import DbQueryable from '../../../core/knex/DbQueryable'
-import ConditionBuilder from '../../../core/knex/ConditionBuilder'
+import DbQuery from '../../../core/database/DbQuery'
+import DbQueryable from '../../../core/database/DbQueryable'
+import ConditionBuilder from '../../../core/database/ConditionBuilder'
 
 class ProjectsByIdentityQuery extends DbQuery<ProjectsByIdentityQuery.Result> {
 	constructor(private readonly identityId: string) {

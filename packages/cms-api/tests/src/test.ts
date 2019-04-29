@@ -1,10 +1,9 @@
-import knex from 'knex'
 import { Acl, Model } from 'cms-common'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
 import S3 from '../../src/utils/S3'
 import { executeGraphQlTest } from './testGraphql'
-import KnexWrapper from '../../src/core/knex/KnexWrapper'
+import Client from '../../src/core/database/Client'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
 import { createConnectionMock } from './ConnectionMock'
 
@@ -45,7 +44,7 @@ export const execute = async (test: Test) => {
 	const connection = createConnectionMock(test.executes)
 
 	// @ts-ignore
-	const db = new KnexWrapper(connection, 'public')
+	const db = new Client(connection, 'public')
 	await executeGraphQlTest({
 		context: {
 			db: db,

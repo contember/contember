@@ -1,4 +1,3 @@
-import knex from 'knex'
 import Koa from 'koa'
 import Container from './core/di/Container'
 import Project from './config/Project'
@@ -40,12 +39,12 @@ import { Schema } from 'cms-common'
 import SystemExecutionContainer from './system-api/SystemExecutionContainer'
 import TenantContainer from './tenant-api/TenantContainer'
 import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
-import Connection from './core/knex/Connection'
-import KnexWrapper from './core/knex/KnexWrapper'
+import Connection from './core/database/Connection'
+import Client from './core/database/Client'
 
 export type ProjectContainer = Container<{
 	project: Project
-	systemKnexWrapper: KnexWrapper
+	systemDbClient: Client
 	systemApolloServerFactory: SystemApolloServerFactory
 	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
 	systemExecutionContainerFactory: SystemExecutionContainer.Factory
@@ -198,8 +197,8 @@ class CompositionRoot {
 					MigrationFilesManager.createForProject(projectsDir, project.slug)
 				)
 				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-				.addService('systemKnexWrapper', ({ connection }) => connection.createClient('system'))
-				.addService('systemQueryHandler', ({ systemKnexWrapper }) => systemKnexWrapper.createQueryHandler())
+				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
+				.addService('systemQueryHandler', ({ systemDbClient }) => systemDbClient.createQueryHandler())
 				.addService(
 					'modificationHandlerFactory',
 					() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
@@ -245,14 +244,13 @@ class CompositionRoot {
 					'migrationFilesManager',
 					'permissionsByIdentityFactory',
 					'schemaMigrator',
-					'systemKnexWrapper',
 					'modificationHandlerFactory',
 					'schemaVersionBuilder'
 				)
 			)
 
 			return projectContainer
-				.pick('project', 'contentApolloMiddlewareFactory', 'systemKnexWrapper', 'connection')
+				.pick('project', 'contentApolloMiddlewareFactory', 'systemDbClient', 'connection')
 				.merge(systemContainer.pick('systemApolloServerFactory', 'systemExecutionContainerFactory'))
 		})
 	}

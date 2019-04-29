@@ -1,7 +1,7 @@
 import { Schema } from 'cms-common'
 import SchemaMigrator from './differ/SchemaMigrator'
 import QueryHandler from '../core/query/QueryHandler'
-import DbQueryable from '../core/knex/DbQueryable'
+import DbQueryable from '../core/database/DbQueryable'
 import LatestMigrationByStageQuery from '../system-api/model/queries/LatestMigrationByStageQuery'
 import LatestMigrationByEventQuery from '../system-api/model/queries/LatestMigrationByEventQuery'
 import { tuple } from '../utils/tuple'

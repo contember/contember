@@ -1,9 +1,9 @@
 import { resolveValue } from '../utils'
 import { Input, Model } from 'cms-common'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '../../../content-schema/modelUtils'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
-import { Value } from '../../../core/knex/types'
+import QueryBuilder from '../../../core/database/QueryBuilder'
+import { Value } from '../../../core/database/types'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 
@@ -27,7 +27,7 @@ export default class UpdateBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly uniqueWhere: Input.Where
 	) {

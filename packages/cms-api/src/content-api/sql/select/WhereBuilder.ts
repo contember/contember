@@ -4,16 +4,16 @@ import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import ConditionBuilder from './ConditionBuilder'
 import { isIt } from '../../../utils/type'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
-import SqlConditionBuilder from '../../../core/knex/ConditionBuilder'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import SelectBuilder from '../../../core/database/SelectBuilder'
+import SqlConditionBuilder from '../../../core/database/ConditionBuilder'
+import Client from '../../../core/database/Client'
 
 class WhereBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly conditionBuilder: ConditionBuilder,
-		private readonly db: KnexWrapper
+		private readonly db: Client
 	) {}
 
 	public build(

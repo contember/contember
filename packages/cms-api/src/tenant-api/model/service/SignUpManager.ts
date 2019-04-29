@@ -1,13 +1,13 @@
 import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import { SignUpErrorCode } from '../../schema/types'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import CreatePersonCommand from '../commands/CreatePersonCommand'
 
 class SignUpManager {
-	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: KnexWrapper) {}
+	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
 
 	async signUp(email: string, password: string, roles: string[] = []): Promise<SignUpManager.SignUpResult> {
 		if (await this.isEmailAlreadyUsed(email)) {

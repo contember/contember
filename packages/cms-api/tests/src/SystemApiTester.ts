@@ -6,13 +6,13 @@ import { DiffResult } from '../../src/system-api/schema/types'
 import { GQL } from './tags'
 import Identity from '../../src/common/auth/Identity'
 import ApiTester from './ApiTester'
-import KnexWrapper from '../../src/core/knex/KnexWrapper'
+import Client from '../../src/core/database/Client'
 import { SystemContainer } from '../../src/system-api/SystemContainerFactory'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
 
 export default class SystemApiTester {
 	constructor(
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly systemSchema: GraphQLSchema,
 		private readonly systemContainer: SystemContainer,
 		private readonly systemExecutionContainer: SystemExecutionContainer

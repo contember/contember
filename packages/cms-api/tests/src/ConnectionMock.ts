@@ -1,6 +1,6 @@
-import Connection from '../../src/core/knex/Connection'
+import Connection from '../../src/core/database/Connection'
 import { expect } from 'chai'
-import KnexWrapper from '../../src/core/knex/KnexWrapper'
+import Client from '../../src/core/database/Client'
 
 export interface SqlQuery {
 	sql: string
@@ -68,8 +68,8 @@ EXPECTED: ${expectedSql}
 			await this.query('ROLLBACK;');
 		}
 
-		public createClient(schema: string): KnexWrapper {
-			return new KnexWrapper(this, schema)
+		public createClient(schema: string): Client {
+			return new Client(this, schema)
 		}
 	}
 }

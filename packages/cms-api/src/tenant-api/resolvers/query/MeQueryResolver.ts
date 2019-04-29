@@ -2,7 +2,7 @@ import { Identity, QueryResolvers } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import PersonByIdentityQuery from '../../model/queries/PersonByIdentityQuery'
 

@@ -1,6 +1,6 @@
 import Project from '../../src/config/Project'
 import FileNameHelper from '../../src/migrations/FileNameHelper'
-import KnexWrapper from '../../src/core/knex/KnexWrapper'
+import Client from '../../src/core/database/Client'
 import StageCreator from '../../src/system-api/model/stages/StageCreator'
 import ProjectMigrator from '../../src/system-api/model/migrations/ProjectMigrator'
 import Migration from '../../src/system-api/model/migrations/Migration'
@@ -14,7 +14,7 @@ export default class TesterStageManager {
 
 	constructor(
 		private readonly stages: Project.Stage[],
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly stageCreator: StageCreator,
 		private readonly projectMigrator: ProjectMigrator,
 		private readonly migrationResolver: MigrationsResolver

@@ -2,10 +2,10 @@ import { Acl, Input, Model, assertNever } from 'cms-common'
 import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 import { acceptEveryFieldVisitor } from '../../../content-schema/modelUtils'
 import WhereBuilder from '../select/WhereBuilder'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import Path from '../select/Path'
 import PredicateFactory from '../../../acl/PredicateFactory'
-import Returning from '../../../core/knex/internal/Returning'
+import Returning from '../../../core/database/internal/Returning'
 import Mapper from '../Mapper'
 import UpdateBuilderFactory from '../update/UpdateBuilderFactory'
 
@@ -14,7 +14,7 @@ type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHa
 class DeleteExecutor {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,

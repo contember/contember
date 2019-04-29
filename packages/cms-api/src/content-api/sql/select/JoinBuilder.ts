@@ -2,8 +2,8 @@ import Path from './Path'
 import { acceptRelationTypeVisitor, getTargetEntity } from '../../../content-schema/modelUtils'
 import { Model } from 'cms-common'
 import JoinVisitor from './JoinVisitor'
-import ConditionBuilder from '../../../core/knex/ConditionBuilder'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
+import ConditionBuilder from '../../../core/database/ConditionBuilder'
+import SelectBuilder from '../../../core/database/SelectBuilder'
 
 export default class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}

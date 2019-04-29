@@ -1,7 +1,7 @@
 import Command from './Command'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { uuid } from '../../../utils/uuid'
-import InsertBuilder from '../../../core/knex/InsertBuilder'
+import InsertBuilder from '../../../core/database/InsertBuilder'
 import { UpdateProjectMemberVariablesErrorCode } from '../../schema/types'
 
 class UpdateProjectMemberVariablesCommand
@@ -12,7 +12,7 @@ class UpdateProjectMemberVariablesCommand
 		private readonly variables: ReadonlyArray<UpdateProjectMemberVariablesCommand.VariableUpdate>
 	) {}
 
-	async execute(db: KnexWrapper): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponse> {
+	async execute(db: Client): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponse> {
 		try {
 			const queries = this.variables.map(update => {
 				return db

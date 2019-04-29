@@ -1,6 +1,6 @@
-import DbQuery from '../../../core/knex/DbQuery'
-import DbQueryable from '../../../core/knex/DbQueryable'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
+import DbQuery from '../../../core/database/DbQuery'
+import DbQueryable from '../../../core/database/DbQueryable'
+import SelectBuilder from '../../../core/database/SelectBuilder'
 import { Stage } from '../dtos/Stage'
 import { prepareStageQueryBuilder } from './StageQueryHelper'
 

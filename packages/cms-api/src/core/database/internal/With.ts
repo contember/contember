@@ -1,5 +1,5 @@
 import SelectBuilder from '../SelectBuilder'
-import KnexWrapper from '../KnexWrapper'
+import Client from '../Client'
 import Literal from '../Literal'
 import { wrapIdentifier } from '../utils'
 import QueryBuilder from '../QueryBuilder'
@@ -44,7 +44,7 @@ namespace With {
 		with(alias: string, expression: Expression): any
 	}
 
-	export function createLiteral(wrapper: KnexWrapper, expr: Expression): Literal {
+	export function createLiteral(wrapper: Client, expr: Expression): Literal {
 		if (typeof expr === 'function') {
 			return expr(SelectBuilder.create(wrapper)).createQuery()
 		} else if (((expr: any): expr is QueryBuilder => 'createQuery' in expr)(expr)) {

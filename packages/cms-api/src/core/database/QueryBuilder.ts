@@ -1,4 +1,4 @@
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 import { Value } from './types'
 import WindowFunction from './WindowFunction'
 import ConditionBuilder from './ConditionBuilder'

@@ -1,12 +1,12 @@
 import { resolveValue } from '../utils'
 import { Input, Model } from 'cms-common'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
-import { Value } from '../../../core/knex/types'
+import Client from '../../../core/database/Client'
+import { Value } from '../../../core/database/types'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import { getColumnName, getColumnType } from '../../../content-schema/modelUtils'
 import Mapper from '../Mapper'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
+import QueryBuilder from '../../../core/database/QueryBuilder'
 
 type ColumnValue<E = never> = {
 	value: PromiseLike<Input.ColumnValue<E>>
@@ -26,7 +26,7 @@ export default class InsertBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder
 	) {
 		const blocker: Promise<void> = new Promise(resolver => (this.firer = resolver))

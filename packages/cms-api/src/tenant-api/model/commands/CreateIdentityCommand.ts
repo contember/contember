@@ -1,11 +1,11 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { uuid } from '../../../utils/uuid'
 import Command from './Command'
 
 class CreateIdentityCommand implements Command<string> {
 	constructor(private readonly roles: string[]) {}
 
-	public async execute(db: KnexWrapper): Promise<string> {
+	public async execute(db: Client): Promise<string> {
 		const identityId = uuid()
 		await db
 			.insertBuilder()

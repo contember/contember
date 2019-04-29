@@ -1,12 +1,12 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import Command from './Command'
-import InsertBuilder from '../../../core/knex/InsertBuilder'
+import InsertBuilder from '../../../core/database/InsertBuilder'
 import Project from '../type/Project'
 
 class CreateOrUpdateProjectCommand implements Command<void> {
 	constructor(private readonly project: Project) {}
 
-	public async execute(db: KnexWrapper): Promise<void> {
+	public async execute(db: Client): Promise<void> {
 		await db
 			.insertBuilder()
 			.into('project')

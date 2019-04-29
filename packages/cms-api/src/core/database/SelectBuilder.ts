@@ -1,5 +1,5 @@
 import ConditionBuilder from './ConditionBuilder'
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 import With from './internal/With'
 import Where from './internal/Where'
 import QueryBuilder from './QueryBuilder'
@@ -11,12 +11,12 @@ import Connection from './Connection'
 class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder<Result, never> = never>
 	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled>>, QueryBuilder {
 	constructor(
-		public readonly wrapper: KnexWrapper,
+		public readonly wrapper: Client,
 		private readonly options: SelectBuilder.Options,
 		private readonly cteAliases: Set<string> = new Set()
 	) {}
 
-	public static create<Result = SelectBuilder.Result>(wrapper: KnexWrapper): SelectBuilder<Result, never> {
+	public static create<Result = SelectBuilder.Result>(wrapper: Client): SelectBuilder<Result, never> {
 		return new SelectBuilder(wrapper, {
 			from: undefined,
 			orderBy: [],

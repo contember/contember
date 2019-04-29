@@ -1,9 +1,9 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 
 class UpdateStageEventCommand {
 	constructor(private readonly stageId: string, private readonly eventId: string) {}
 
-	public async execute(db: KnexWrapper) {
+	public async execute(db: Client) {
 		await db
 			.updateBuilder()
 			.table('stage')

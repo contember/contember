@@ -5,7 +5,7 @@ import { AnyEvent } from '../dtos/Event'
 import QueryHandler from '../../../core/query/QueryHandler'
 import DiffCountQuery from '../queries/DiffCountQuery'
 import DiffQuery from '../queries/DiffQuery'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import PermissionsVerifier from './PermissionsVerifier'
 
 class DiffBuilder {

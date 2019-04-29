@@ -31,7 +31,7 @@ class ProjectMigrationsDiffCommand extends Command<Args, {}> {
 		}
 
 		const executionContainer = projectContainer.systemExecutionContainerFactory.create(
-			projectContainer.systemKnexWrapper
+			projectContainer.systemDbClient
 		)
 		const migrationDiffCreator = executionContainer.migrationDiffCreator
 		const result = await migrationDiffCreator.createDiff(this.schemas[projectName], migrationName)

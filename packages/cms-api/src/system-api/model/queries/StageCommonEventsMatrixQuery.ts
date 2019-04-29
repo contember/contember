@@ -1,5 +1,5 @@
-import DbQuery from '../../../core/knex/DbQuery'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQuery from '../../../core/database/DbQuery'
+import DbQueryable from '../../../core/database/DbQueryable'
 
 class StageCommonEventsMatrixQuery extends DbQuery<StageCommonEventsMatrixQuery.Result> {
 	constructor() {

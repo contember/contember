@@ -1,6 +1,6 @@
 import { Input } from 'cms-common'
-import SqlConditionBuilder from '../../../core/knex/ConditionBuilder'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
+import SqlConditionBuilder from '../../../core/database/ConditionBuilder'
+import QueryBuilder from '../../../core/database/QueryBuilder'
 
 export default class ConditionBuilder {
 	public build(

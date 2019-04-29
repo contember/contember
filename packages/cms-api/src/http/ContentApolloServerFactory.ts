@@ -11,8 +11,8 @@ import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewar
 import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
-import Connection from '../core/knex/Connection'
-import EventManager from '../core/knex/EventManager'
+import Connection from '../core/database/Connection'
+import EventManager from '../core/database/EventManager'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({

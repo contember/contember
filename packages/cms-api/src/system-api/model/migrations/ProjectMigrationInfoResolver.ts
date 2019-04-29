@@ -3,7 +3,7 @@ import Project from '../../../config/Project'
 import LatestMigrationByStageQuery from '../queries/LatestMigrationByStageQuery'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
 import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 
 class ProjectMigrationInfoResolver {
 	constructor(

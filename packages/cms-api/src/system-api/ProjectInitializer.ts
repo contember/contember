@@ -1,7 +1,7 @@
 import CreateInitEventCommand from './model/commands/CreateInitEventCommand'
 import { setupSystemVariables, unnamedIdentity } from './SystemVariablesSetupHelper'
 import Project from '../config/Project'
-import KnexWrapper from '../core/knex/KnexWrapper'
+import Client from '../core/database/Client'
 import ProjectMigrator from './model/migrations/ProjectMigrator'
 import RebaseExecutor from './model/events/RebaseExecutor'
 import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
@@ -11,7 +11,7 @@ import { StageWithoutEvent } from './model/dtos/Stage'
 
 class ProjectInitializer {
 	constructor(
-		private readonly projectDb: KnexWrapper,
+		private readonly projectDb: Client,
 		private readonly project: Project,
 		private readonly stageTree: StageTree,
 		private readonly projectMigrator: ProjectMigrator,

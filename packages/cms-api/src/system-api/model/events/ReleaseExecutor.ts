@@ -1,14 +1,14 @@
 import { Stage } from '../dtos/Stage'
 import DiffQuery from '../queries/DiffQuery'
 import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import DependencyBuilder from './DependencyBuilder'
 import PermissionsVerifier from './PermissionsVerifier'
 import EventApplier from './EventApplier'
 import EventsRebaser from './EventsRebaser'
 import StageByIdQuery from '../queries/StageByIdQuery'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 
 class ReleaseExecutor {
 	constructor(
@@ -17,7 +17,7 @@ class ReleaseExecutor {
 		private readonly permissionsVerifier: PermissionsVerifier,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
-		private readonly db: KnexWrapper
+		private readonly db: Client
 	) {}
 
 	public async execute(

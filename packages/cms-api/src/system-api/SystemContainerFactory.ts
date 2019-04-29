@@ -16,7 +16,7 @@ import MigrationsResolver from '../content-schema/MigrationsResolver'
 import Project from '../config/Project'
 import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
 import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
-import KnexWrapper from '../core/knex/KnexWrapper'
+import Client from '../core/database/Client'
 import RebeaseAllMutationResolver from './resolvers/mutation/RebeaseAllMutationResolver'
 import { Resolvers } from './schema/types'
 
@@ -35,7 +35,6 @@ export default class SystemContainerFactory {
 		migrationsResolver: MigrationsResolver
 		schemaMigrator: SchemaMigrator
 		modificationHandlerFactory: ModificationHandlerFactory
-		systemKnexWrapper: KnexWrapper
 	}): Container<SystemContainer> {
 		return new Container.Builder({})
 

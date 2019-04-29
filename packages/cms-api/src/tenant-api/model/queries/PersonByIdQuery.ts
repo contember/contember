@@ -1,27 +1,32 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 
-class PersonByIdQuery extends KnexQuery<PersonByIdQuery.Result> {
+class PersonByIdQuery extends DbQuery<PersonByIdQuery.Result> {
 	constructor(private readonly personId: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<PersonByIdQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<PersonByIdQuery.Result> {
 		const rows = await queryable
-			.createQueryBuilder()
-			.select('id', 'email')
-			.from('tenant.person')
-			.where('id', this.personId)
+			.createSelectBuilder<PersonByIdQuery.Row>()
+			.select('id')
+			.select('email')
+			.from('person')
+			.where({
+				id: this.personId
+			})
+			.getResult()
 
 		return this.fetchOneOrNull(rows)
 	}
 }
 
 namespace PersonByIdQuery {
-	export type Result = null | {
+	export type Row = {
 		readonly id: string
 		readonly email: string
 	}
+	export type Result = null | Row
 }
 
 export default PersonByIdQuery

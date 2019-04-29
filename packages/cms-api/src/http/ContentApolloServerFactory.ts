@@ -4,7 +4,6 @@ import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
 import { Context } from '../content-api/types'
 import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
 import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
-import KnexDebugger from '../core/knex/KnexDebugger'
 import { GraphQLSchema } from 'graphql'
 import { KoaContext } from '../core/koa/types'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
@@ -12,13 +11,15 @@ import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewar
 import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
+import Connection from '../core/knex/Connection'
+import EventManager from '../core/knex/EventManager'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
 		max: 100,
 	})
 
-	constructor(private readonly knexDebugger: KnexDebugger) {}
+	constructor(private readonly connection: Connection) {}
 
 	public create(dataSchema: GraphQLSchema): ApolloServer {
 		const server = this.cache.get(dataSchema)
@@ -32,7 +33,8 @@ class ContentApolloServerFactory {
 				() => new ErrorHandlerExtension(),
 				() => {
 					const queriesExt = new DbQueriesExtension()
-					this.knexDebugger.subscribe(query => queriesExt.addQuery(query))
+					this.connection.eventManager.on(EventManager.Event.queryEnd, ({sql, parameters, meta}, {timing}) =>
+						queriesExt.addQuery({sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta}))
 					return queriesExt
 				},
 			],

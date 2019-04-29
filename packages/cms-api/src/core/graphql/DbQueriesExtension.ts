@@ -1,6 +1,6 @@
 import { GraphQLExtension } from 'graphql-extensions'
 
-type Query = { sql: string; bindings: any; elapsed: number; error?: string; options?: any }
+type Query = { sql: string; bindings: any; elapsed: number; error?: string; meta?: any }
 
 export default class DbQueriesExtension extends GraphQLExtension {
 	private readonly queries: Query[] = []
@@ -14,7 +14,7 @@ export default class DbQueriesExtension extends GraphQLExtension {
 			'dbQueries',
 			this.queries.map(it => ({
 				...it,
-				path: (it.options && it.options.meta && it.options.meta.path) || [],
+				path: (it.meta && it.meta.path) || [],
 			})),
 		]
 	}

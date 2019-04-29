@@ -1,27 +1,32 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 
-class ProjectByIdQuery extends KnexQuery<ProjectByIdQuery.Result> {
+class ProjectByIdQuery extends DbQuery<ProjectByIdQuery.Result> {
 	constructor(private readonly projectId: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<ProjectByIdQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<ProjectByIdQuery.Result> {
 		const rows = await queryable
-			.createQueryBuilder()
-			.select('id', 'name')
-			.from('tenant.project')
-			.where('id', this.projectId)
+			.createSelectBuilder<ProjectByIdQuery.Row>()
+			.select('id')
+			.select('name')
+			.from('project')
+			.where({
+				id: this.projectId
+			})
+			.getResult()
 
 		return this.fetchOneOrNull(rows)
 	}
 }
 
 namespace ProjectByIdQuery {
-	export type Result = null | {
+	export type Row = {
 		readonly id: string
 		readonly name: string
 	}
+	export type Result = null | Row
 }
 
 export default ProjectByIdQuery

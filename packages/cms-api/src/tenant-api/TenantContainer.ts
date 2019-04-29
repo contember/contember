@@ -1,8 +1,6 @@
 import { DatabaseCredentials } from '../config/config'
-import KnexDebugger from '../core/knex/KnexDebugger'
-import KnexConnection from '../core/knex/KnexConnection'
 import QueryHandler from '../core/query/QueryHandler'
-import KnexQueryable from '../core/knex/KnexQueryable'
+import DbQueryable from '../core/knex/DbQueryable'
 import MeQueryResolver from './resolvers/query/MeQueryResolver'
 import SignUpMutationResolver from './resolvers/mutation/SignUpMutationResolver'
 import SignInMutationResolver from './resolvers/mutation/SignInMutationResolver'
@@ -12,7 +10,6 @@ import UpdateProjectMemberVariablesMutationResolver from './resolvers/mutation/U
 import PermissionsFactory from './model/authorization/PermissionsFactory'
 import TenantApolloServerFactory from '../http/TenantApolloServerFactory'
 import Container from '../core/di/Container'
-import Knex from 'knex'
 import ApiKeyManager from './model/service/ApiKeyManager'
 import SignUpManager from './model/service/SignUpManager'
 import SignInManager from './model/service/SignInManager'
@@ -23,6 +20,8 @@ import Authorizator from '../core/authorization/Authorizator'
 import { ApolloServer, Config } from 'apollo-server-koa'
 import ProjectManager from './model/service/ProjectManager'
 import CreateApiKeyMutationResolver from './resolvers/mutation/CreateApiKeyMutationResolver'
+import Connection from '../core/knex/Connection'
+import KnexWrapper from '../core/knex/KnexWrapper'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -30,7 +29,7 @@ interface TenantContainer {
 	projectManager: ProjectManager
 	apolloServer: ApolloServer
 	testContainer: {
-		knexConnection: KnexConnection
+		connection: Connection
 		resolvers: Config['resolvers']
 	}
 }
@@ -39,23 +38,14 @@ namespace TenantContainer {
 	export class Factory {
 		create(tenantDbCredentials: DatabaseCredentials): TenantContainer {
 			return new Container.Builder({})
-				.addService('knexDebugger', () => {
-					return new KnexDebugger()
+				.addService('connection', () => {
+					return new Connection(tenantDbCredentials, {})
 				})
-				.addService('knexConnection', ({ knexDebugger }) => {
-					const knexInst = Knex({
-						debug: false,
-						client: 'pg',
-						connection: tenantDbCredentials,
-					})
-					knexDebugger.register(knexInst)
-					return new KnexConnection(knexInst, 'tenant')
-				})
-				.addService('db', ({ knexConnection }) => knexConnection.wrapper())
-				.addService('queryHandler', ({ knexConnection }) => {
+				.addService('db', ({ connection }) => new KnexWrapper(connection, 'tenant'))
+				.addService('queryHandler', ({ db }) => {
 					const handler = new QueryHandler(
-						new KnexQueryable(knexConnection, {
-							get(): QueryHandler<KnexQueryable> {
+						new DbQueryable(db, {
+							get(): QueryHandler<DbQueryable> {
 								return handler
 							},
 						})
@@ -131,7 +121,7 @@ namespace TenantContainer {
 				.addService('apolloServer', ({ resolvers, projectMemberManager, authorizator }) =>
 					new TenantApolloServerFactory(resolvers, projectMemberManager, authorizator).create()
 				)
-				.addService('testContainer', ({ knexConnection, resolvers }) => ({ knexConnection, resolvers }))
+				.addService('testContainer', ({ connection, resolvers }) => ({ connection, resolvers }))
 				.build()
 				.pick('apolloServer', 'apiKeyManager', 'projectMemberManager', 'projectManager', 'testContainer')
 		}

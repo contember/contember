@@ -3,13 +3,13 @@ import Project from '../../../config/Project'
 import LatestMigrationByStageQuery from '../queries/LatestMigrationByStageQuery'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 
 class ProjectMigrationInfoResolver {
 	constructor(
 		private readonly project: Project,
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly queryHandler: QueryHandler<KnexQueryable>
+		private readonly queryHandler: QueryHandler<DbQueryable>
 	) {}
 
 	public async getMigrationsInfo(): Promise<ProjectMigrationInfoResolver.Result> {

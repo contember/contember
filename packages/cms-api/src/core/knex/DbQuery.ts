@@ -1,9 +1,9 @@
 import Query from '../query/Query'
-import KnexQueryable from './KnexQueryable'
+import DbQueryable from './DbQueryable'
 import ImplementationException from '../exceptions/ImplementationException'
 
-export default abstract class KnexQuery<T> implements Query<KnexQueryable, T> {
-	abstract async fetch(queryable: KnexQueryable): Promise<T>
+export default abstract class DbQuery<T> implements Query<DbQueryable, T> {
+	abstract async fetch(queryable: DbQueryable): Promise<T>
 
 	protected fetchOneOrNull<R>(rows: Array<R>): R | null {
 		if (rows.length === 0) {

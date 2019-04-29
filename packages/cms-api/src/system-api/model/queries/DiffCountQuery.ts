@@ -1,15 +1,14 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import { DiffErrorCode } from '../../schema/types'
-import { QueryResult } from 'pg'
 
-class DiffCountQuery extends KnexQuery<DiffCountQuery.Response> {
+class DiffCountQuery extends DbQuery<DiffCountQuery.Response> {
 	constructor(private readonly baseEvent: string, private readonly headEvent: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<DiffCountQuery.Response> {
-		const diff: QueryResult = await queryable.createWrapper().raw(
+	async fetch(queryable: DbQueryable): Promise<DiffCountQuery.Response> {
+		const diff = await queryable.createWrapper().raw<{ index: number }>(
 			`WITH RECURSIVE events(id, previous_id, index) AS (
     SELECT id, previous_id, 0
     FROM system.event

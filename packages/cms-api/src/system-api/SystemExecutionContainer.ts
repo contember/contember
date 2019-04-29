@@ -18,7 +18,7 @@ import Authorizator from '../core/authorization/Authorizator'
 import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
 import DiffBuilder from './model/events/DiffBuilder'
 import QueryHandler from '../core/query/QueryHandler'
-import KnexQueryable from '../core/knex/KnexQueryable'
+import DbQueryable from '../core/knex/DbQueryable'
 import Project from '../config/Project'
 import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
 import MigrationsResolver from '../content-schema/MigrationsResolver'
@@ -31,14 +31,13 @@ import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInf
 import ProjectMigrator from './model/migrations/ProjectMigrator'
 import SchemaDiffer from './model/migrations/SchemaDiffer'
 import StageCreator from './model/stages/StageCreator'
-import Knex from 'knex'
 
 interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
 	rebaseExecutor: RebaseExecutor
 	diffBuilder: DiffBuilder
 	migrationDiffCreator: MigrationDiffCreator
-	queryHandler: QueryHandler<KnexQueryable>
+	queryHandler: QueryHandler<DbQueryable>
 	projectIntializer: ProjectInitializer
 }
 
@@ -66,7 +65,7 @@ namespace SystemExecutionContainer {
 				)
 		}
 
-		public createBuilder(db: KnexWrapper<Knex>) {
+		public createBuilder(db: KnexWrapper) {
 			return new Container.Builder({})
 				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
 				.addService('migrationsResolver', () => this.migrationsResolver)

@@ -42,11 +42,11 @@ export class Transaction implements Connection.Queryable, Connection.Transaction
 	}
 
 
-	async query(sql: string, parameters: any[] = [], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result> {
+	async query<Row extends Record<string, any>>(sql: string, parameters: any[] = [], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error('Transaction is already closed')
 		}
-		return await Connection.executeQuery(this.pgClient, this.eventManager, { sql, parameters, meta, ...this.config, ...config }, this.queryContext)
+		return await Connection.executeQuery<Row>(this.pgClient, this.eventManager, { sql, parameters, meta, ...this.config, ...config }, this.queryContext)
 	}
 
 	async rollback(): Promise<void> {
@@ -83,11 +83,11 @@ class SavePoint implements Connection.Queryable, Connection.TransactionLike {
 	}
 
 
-	async query(sql: string, parameters: any[], meta: Record<string, any> = {}): Promise<Connection.Result> {
+	async query<Row extends Record<string, any>>(sql: string, parameters: any[], meta: Record<string, any> = {}): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error(`Savepoint ${this.savepointName} is already closed.`)
 		}
-		return await this.transactionInst.query(sql, parameters, meta)
+		return await this.transactionInst.query<Row>(sql, parameters, meta)
 	}
 
 	async rollback(): Promise<void> {

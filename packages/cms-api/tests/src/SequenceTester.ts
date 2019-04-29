@@ -6,14 +6,14 @@ import EventSequence from './EventSequence'
 import InitEventQuery from '../../src/system-api/model/queries/InitEventQuery'
 import StageBySlugQuery from '../../src/system-api/model/queries/StageBySlugQuery'
 import QueryHandler from '../../src/core/query/QueryHandler'
-import KnexQueryable from '../../src/core/knex/KnexQueryable'
+import DbQueryable from '../../src/core/knex/DbQueryable'
 import ContentApiTester from './ContentApiTester'
 import SystemApiTester from './SystemApiTester'
 import { createCreateEvent } from './DummyEventFactory'
 
 export default class SequenceTester {
 	constructor(
-		private readonly queryHandler: QueryHandler<KnexQueryable>,
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly contentApiTester: ContentApiTester,
 		private readonly systemApiTester: SystemApiTester
 	) {}

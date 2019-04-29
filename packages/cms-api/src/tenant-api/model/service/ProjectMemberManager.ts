@@ -1,6 +1,6 @@
 import { AddProjectMemberErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import KnexWrapper from '../../../core/knex/KnexWrapper'
 import ProjectRolesByIdentityQuery from '../queries/ProjectRolesByIdentityQuery'
 import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
@@ -8,7 +8,7 @@ import ProjectVariablesByIdentityQuery from '../queries/ProjectVariablesByIdenti
 import AddProjectMemberCommand from '../commands/AddProjectMemberCommand'
 
 class ProjectMemberManager {
-	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
+	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: KnexWrapper) {}
 
 	async getProjectRoles(projectId: string, identityId: string): Promise<ProjectMemberManager.GetProjectRolesResponse> {
 		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery(projectId, identityId))

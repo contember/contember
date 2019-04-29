@@ -2,12 +2,12 @@ import { Identity, QueryResolvers } from '../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import PersonByIdentityQuery from '../../model/queries/PersonByIdentityQuery'
 
 export default class MeQueryResolver implements QueryResolvers {
-	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>) {}
+	constructor(private readonly queryHandler: QueryHandler<DbQueryable>) {}
 
 	async me(parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo): Promise<Identity> {
 		const identityId = context.identity.id

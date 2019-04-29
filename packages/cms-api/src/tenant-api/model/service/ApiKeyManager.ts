@@ -1,4 +1,4 @@
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import QueryHandler from '../../../core/query/QueryHandler'
 import ApiKey from '../type/ApiKey'
 import ApiKeyByTokenQuery from '../queries/ApiKeyByTokenQuery'
@@ -19,7 +19,7 @@ import ImplementationException from '../../../core/exceptions/ImplementationExce
 import { mapValues } from '../../utils/mapValue'
 
 class ApiKeyManager {
-	constructor(private readonly queryHandler: QueryHandler<KnexQueryable>, private readonly db: KnexWrapper) {}
+	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: KnexWrapper) {}
 
 	async verifyAndProlong(token: string): Promise<ApiKeyManager.VerifyResult> {
 		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))

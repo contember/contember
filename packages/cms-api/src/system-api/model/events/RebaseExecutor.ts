@@ -1,6 +1,6 @@
 import { StageWithoutEvent } from '../dtos/Stage'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import DiffQuery from '../queries/DiffQuery'
 import { AnyEvent } from '../dtos/Event'
@@ -12,7 +12,7 @@ import ImplementationException from '../../../core/exceptions/ImplementationExce
 
 class RebaseExecutor {
 	constructor(
-		private readonly queryHandler: QueryHandler<KnexQueryable>,
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,

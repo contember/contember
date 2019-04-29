@@ -1,19 +1,22 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 
-class ProjectVariablesByIdentityQuery extends KnexQuery<ProjectVariablesByIdentityQuery.Result> {
+class ProjectVariablesByIdentityQuery extends DbQuery<ProjectVariablesByIdentityQuery.Result> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<ProjectVariablesByIdentityQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<ProjectVariablesByIdentityQuery.Result> {
 		const result: Array<any> = await queryable
-			.createQueryBuilder()
+			.createSelectBuilder()
 			.select('variable')
 			.select('values')
-			.from('tenant.project_member_variable')
-			.where('identity_id', this.identityId)
-			.where('project_id', this.projectId)
+			.from('project_member_variable')
+			.where({
+				identity_id: this.identityId,
+				project_id: this.projectId,
+			})
+			.getResult()
 
 		return result.reduce<ProjectVariablesByIdentityQuery.Result>(
 			(result, row) => ({ ...result, [row.variable]: row.values }),

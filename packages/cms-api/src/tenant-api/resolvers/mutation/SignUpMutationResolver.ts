@@ -3,7 +3,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import SignUpManager from '../../model/service/SignUpManager'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
@@ -15,7 +15,7 @@ import ApiKeyManager from '../../model/service/ApiKeyManager'
 export default class SignUpMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly signUpManager: SignUpManager,
-		private readonly queryHandler: QueryHandler<KnexQueryable>,
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly apiKeyManager: ApiKeyManager
 	) {}
 

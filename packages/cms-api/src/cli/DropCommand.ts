@@ -29,7 +29,7 @@ class DropCommand extends Command<{}, {}> {
 
 	private async clear(db: DatabaseCredentials, schemas: string[]) {
 		const connection = new Connection(db, {})
-		connection.transaction(async trx => {
+		await connection.transaction(async trx => {
 			await Promise.all(
 				schemas.map(async schema => {
 					await trx.query(`DROP SCHEMA IF EXISTS ${wrapIdentifier(schema)} CASCADE`)

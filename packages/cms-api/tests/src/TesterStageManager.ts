@@ -57,7 +57,7 @@ export default class TesterStageManager {
 
 	public async createStage(slug: string): Promise<void> {
 		const stage = this.getStageInternal(slug)
-		await this.stageCreator.createStage(stage.rebaseOn ? this.getStage(stage.rebaseOn) : null, stage)
+		await this.stageCreator.createStage(stage.base ? this.getStage(stage.base) : null, stage)
 		this.createdStages.add(slug)
 	}
 

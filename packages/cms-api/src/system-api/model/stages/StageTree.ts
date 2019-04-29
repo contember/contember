@@ -18,15 +18,15 @@ namespace StageTree {
 
 	export class Factory {
 		public create(project: Project): StageTree {
-			const rootStages = project.stages.filter(it => !it.rebaseOn)
+			const rootStages = project.stages.filter(it => !it.base)
 			if (rootStages.length !== 1) {
 				throw new Error(`Exactly 1 root stage expected, ${rootStages.length} found`)
 			}
 			const rootStage = rootStages[0]
-			const stages = project.stages.filter(it => it.rebaseOn).reduce<Map>(
+			const stages = project.stages.filter(it => it.base).reduce<Map>(
 				(acc, stage) => ({
 					...acc,
-					[stage.rebaseOn!]: [...(acc[stage.rebaseOn!] || []), stage],
+					[stage.base!]: [...(acc[stage.base!] || []), stage],
 				}),
 				{}
 			)

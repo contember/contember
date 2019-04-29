@@ -82,7 +82,7 @@ namespace EventSequence {
 			id: testUuid(index + 1),
 			name: it.stage,
 			slug: it.stage,
-			rebaseOn: it.baseStage,
+			base: it.baseStage,
 		}))
 	}
 }

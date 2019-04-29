@@ -30,11 +30,11 @@ class RebaseExecutor {
 	private async rebase(
 		eventsInfoMatrix: StageCommonEventsMatrixQuery.Result,
 		stage: StageWithoutEvent,
-		rebaseOn: StageWithoutEvent,
+		base: StageWithoutEvent,
 		prevEventsToApply: AnyEvent[] = [],
 		newBase?: string
 	) {
-		const eventsInfo = eventsInfoMatrix[rebaseOn.id][stage.id]
+		const eventsInfo = eventsInfoMatrix[base.id][stage.id]
 		let newHead: string = eventsInfo.stageBEventId
 		let eventsToApply: AnyEvent[] = []
 		if (prevEventsToApply.length > 0 || eventsInfo.distance > 0) {
@@ -44,7 +44,7 @@ class RebaseExecutor {
 					: []
 
 			const stageEvents =
-				eventsInfoMatrix[stage.id][rebaseOn.id].distance > 0
+				eventsInfoMatrix[stage.id][base.id].distance > 0
 					? await this.queryHandler.fetch(new DiffQuery(eventsInfo.commonEventId, eventsInfo.stageBEventId))
 					: []
 

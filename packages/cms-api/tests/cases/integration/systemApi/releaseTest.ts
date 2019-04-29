@@ -18,7 +18,7 @@ describe('system api - release', () => {
 						id: testUuid(1),
 						name: 'Preview',
 						slug: 'preview',
-						rebaseOn: 'prod',
+						base: 'prod',
 					},
 				],
 			},

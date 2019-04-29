@@ -22,7 +22,9 @@ class LatestMigrationByEventQuery extends DbQuery<LatestMigrationByEventQuery.Re
 			FROM recent_events
 			WHERE type = 'run_migration'
 			LIMIT 1
-		`, [this.eventId])).rows
+		`,
+			[this.eventId]
+		)).rows
 
 		return this.fetchOneOrNull(rows)
 	}

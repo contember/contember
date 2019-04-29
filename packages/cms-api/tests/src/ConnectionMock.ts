@@ -8,13 +8,16 @@ export interface SqlQuery {
 	response: Partial<Connection.Result>
 }
 
-class ConnectionMockError extends Error {
-
-}
+class ConnectionMockError extends Error {}
 
 export const createConnectionMock = (queries: SqlQuery[]): Connection.TransactionLike & Connection.ClientFactory => {
 	return new class implements Connection.TransactionLike {
-		query<Row extends Record<string, any>>(sql: string, parameters?: any[], meta?: any, config?: Connection.QueryConfig): Promise<Connection.Result<Row>> {
+		query<Row extends Record<string, any>>(
+			sql: string,
+			parameters?: any[],
+			meta?: any,
+			config?: Connection.QueryConfig
+		): Promise<Connection.Result<Row>> {
 			if (sql === 'ROLLBACK;') {
 				return null as any
 			}
@@ -28,11 +31,14 @@ ${JSON.stringify(parameters)}
 			}
 			const actualSql = sql.replace(/\s+/g, ' ')
 			const expectedSql = expected.sql.replace(/\s+/g, ' ')
-			expect(sql.replace(/\s+/g, ' ')).eq(expected.sql.replace(/\s+/g, ' '), `SQL mismatch:
+			expect(sql.replace(/\s+/g, ' ')).eq(
+				expected.sql.replace(/\s+/g, ' '),
+				`SQL mismatch:
 ACTUAL:   ${actualSql}
 EXPECTED: ${expectedSql}
 --- original message ---
-`)
+`
+			)
 			if (expected.parameters) {
 				expect(parameters || []).length(expected.parameters.length)
 				for (let index in expected.parameters) {
@@ -51,8 +57,10 @@ EXPECTED: ${expectedSql}
 			return expected.response as any
 		}
 
-		async transaction<Result>(trx: (connection: Connection.TransactionLike) => (Promise<Result> | Result)): Promise<Result> {
-			await this.query('BEGIN;');
+		async transaction<Result>(
+			trx: (connection: Connection.TransactionLike) => Promise<Result> | Result
+		): Promise<Result> {
+			await this.query('BEGIN;')
 			const result = await trx(createConnectionMock(queries))
 			await this.commit()
 			return result
@@ -61,15 +69,15 @@ EXPECTED: ${expectedSql}
 		isClosed: boolean = false
 
 		async commit(): Promise<void> {
-			await this.query('COMMIT;');
+			await this.query('COMMIT;')
 		}
 
 		async rollback(): Promise<void> {
-			await this.query('ROLLBACK;');
+			await this.query('ROLLBACK;')
 		}
 
 		public createClient(schema: string): Client {
 			return new Client(this, schema)
 		}
-	}
+	}()
 }

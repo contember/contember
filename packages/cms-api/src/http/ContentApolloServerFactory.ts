@@ -33,8 +33,9 @@ class ContentApolloServerFactory {
 				() => new ErrorHandlerExtension(),
 				() => {
 					const queriesExt = new DbQueriesExtension()
-					this.connection.eventManager.on(EventManager.Event.queryEnd, ({sql, parameters, meta}, {timing}) =>
-						queriesExt.addQuery({sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta}))
+					this.connection.eventManager.on(EventManager.Event.queryEnd, ({ sql, parameters, meta }, { timing }) =>
+						queriesExt.addQuery({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta })
+					)
 					return queriesExt
 				},
 			],

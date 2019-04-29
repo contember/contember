@@ -184,14 +184,17 @@ class CompositionRoot {
 		return projects.map((project: Project) => {
 			const projectContainer = new Container.Builder({})
 				.addService('project', () => project)
-				.addService('connection', ({ project, }) => {
-					return new Connection({
-						host: project.dbCredentials.host,
-						port: project.dbCredentials.port,
-						user: project.dbCredentials.user,
-						password: project.dbCredentials.password,
-						database: project.dbCredentials.database,
-					}, {timing: true})
+				.addService('connection', ({ project }) => {
+					return new Connection(
+						{
+							host: project.dbCredentials.host,
+							port: project.dbCredentials.port,
+							user: project.dbCredentials.user,
+							password: project.dbCredentials.password,
+							database: project.dbCredentials.database,
+						},
+						{ timing: true }
+					)
 				})
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.slug)

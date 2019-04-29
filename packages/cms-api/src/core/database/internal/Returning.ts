@@ -15,7 +15,9 @@ class Returning {
 		return new Literal(' returning ' + QueryBuilder.toFqnWrap(this.column))
 	}
 
-	public parseResponse<ProcessedResult extends number | Returning.Result[]>(result: Connection.Result): ProcessedResult {
+	public parseResponse<ProcessedResult extends number | Returning.Result[]>(
+		result: Connection.Result
+	): ProcessedResult {
 		const returningColumn = this.column
 		if (returningColumn) {
 			return (typeof returningColumn === 'string'

@@ -8,8 +8,7 @@ import DbQueryable from './DbQueryable'
 
 class Client<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
 	implements Connection.Queryable {
-	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {
-	}
+	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {}
 
 	public forSchema(schema: string): Client {
 		return new Client(this.connection, schema)
@@ -35,7 +34,12 @@ class Client<ConnectionType extends Connection.Queryable & Connection.Transactio
 		return DeleteBuilder.create(this)
 	}
 
-	async query<Row extends Record<string, any>>(sql: string, parameters: any[] = [], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
+	async query<Row extends Record<string, any>>(
+		sql: string,
+		parameters: any[] = [],
+		meta: Record<string, any> = {},
+		config: Connection.QueryConfig = {}
+	): Promise<Connection.Result<Row>> {
 		return this.connection.query<Row>(sql, parameters, meta, config)
 	}
 

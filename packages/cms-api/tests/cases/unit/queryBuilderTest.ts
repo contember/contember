@@ -18,8 +18,8 @@ const execute = async (test: Test) => {
 		{
 			sql: test.sql,
 			parameters: test.parameters,
-			response: {rows: []},
-		}
+			response: { rows: [] },
+		},
 	])
 	const wrapper = new Client(connection, 'public')
 

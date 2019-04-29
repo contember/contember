@@ -13,7 +13,7 @@ class ProjectByIdQuery extends DbQuery<ProjectByIdQuery.Result> {
 			.select('name')
 			.from('project')
 			.where({
-				id: this.projectId
+				id: this.projectId,
 			})
 			.getResult()
 

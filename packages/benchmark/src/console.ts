@@ -3,7 +3,6 @@
 import { CompositionRoot, readConfig } from 'cms-api'
 import * as path from 'path'
 import App from './projects/app/src/model'
-
 ;(async () => {
 	const configFile = path.join(__dirname, '../../src/config/config.yaml')
 	const config = await readConfig(configFile)

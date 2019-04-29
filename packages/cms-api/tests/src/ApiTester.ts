@@ -40,9 +40,10 @@ export default class ApiTester {
 		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
 		public readonly sequences: SequenceTester,
-		public readonly systemExecutionContainer: ReturnType<ReturnType<SystemExecutionContainer.Factory['createBuilder']>['build']>
-	) {
-	}
+		public readonly systemExecutionContainer: ReturnType<
+			ReturnType<SystemExecutionContainer.Factory['createBuilder']>['build']
+		>
+	) {}
 
 	public static async create(
 		options: {
@@ -64,11 +65,14 @@ export default class ApiTester {
 		}
 
 		const createConnection = (dbName: string): Connection => {
-			return new Connection({
-				...dbCredentials(dbName),
-				max: 1,
-				min: 1,
-			}, {})
+			return new Connection(
+				{
+					...dbCredentials(dbName),
+					max: 1,
+					min: 1,
+				},
+				{}
+			)
 		}
 
 		const connection = createConnection(process.env.TEST_DB_MAINTENANCE_NAME || 'postgres')

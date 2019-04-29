@@ -14,7 +14,7 @@ import { EventType, isContentEvent } from '../EventType'
 import { Stage, StageWithoutEvent } from '../dtos/Stage'
 import { ContentEvent } from '../dtos/Event'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import DiffQuery from '../queries/DiffQuery'
 import { Modification } from './modifications/Modification'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
@@ -108,7 +108,7 @@ export default class ProjectMigrator {
 	}
 
 	private async fetchStageEvents(
-		queryHandler: QueryHandler<KnexQueryable>,
+		queryHandler: QueryHandler<DbQueryable>,
 		eventsMatrix: StageCommonEventsMatrixQuery.Result,
 		stage: StageWithoutEvent
 	): Promise<StageEventsMap> {

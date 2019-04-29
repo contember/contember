@@ -1,14 +1,14 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import { Stage } from '../dtos/Stage'
 import { prepareStageQueryBuilder } from './StageQueryHelper'
 
-class StageBySlugQuery extends KnexQuery<StageBySlugQuery.Result> {
+class StageBySlugQuery extends DbQuery<StageBySlugQuery.Result> {
 	constructor(private readonly slug: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<StageBySlugQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<StageBySlugQuery.Result> {
 		let selectBuilder = prepareStageQueryBuilder(queryable).where({ slug: this.slug })
 
 		const rows = await selectBuilder.getResult()

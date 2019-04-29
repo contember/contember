@@ -1,35 +1,40 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import ApiKey from '../type/ApiKey'
+import ConditionBuilder from '../../../core/knex/ConditionBuilder'
 
-class ApiKeyByTokenQuery extends KnexQuery<ApiKeyByTokenQuery.Result> {
+class ApiKeyByTokenQuery extends DbQuery<ApiKeyByTokenQuery.Result> {
 	constructor(private readonly token: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<ApiKeyByTokenQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<ApiKeyByTokenQuery.Result> {
 		const tokenHash = ApiKey.computeTokenHash(this.token)
 		const rows = await queryable
-			.createQueryBuilder()
-			.select(
-				'tenant.api_key.id',
-				'tenant.api_key.type',
-				'tenant.api_key.identity_id',
-				'tenant.api_key.enabled',
-				'tenant.api_key.expires_at',
-				'tenant.identity.roles',
-				'tenant.api_key.expiration'
+			.createSelectBuilder<ApiKeyByTokenQuery.Row>()
+			.select('api_key.id')
+			.select('api_key.type')
+			.select('api_key.identity_id')
+			.select('api_key.enabled')
+			.select('api_key.expires_at')
+			.select('identity.roles')
+			.select('api_key.expiration')
+			.from('api_key')
+			.join('identity', 'identity', joinClause =>
+				joinClause.compareColumns(['api_key', 'identity_id'], ConditionBuilder.Operator.eq, ['identity', 'id'])
 			)
-			.from('tenant.api_key')
-			.innerJoin('tenant.identity', 'tenant.api_key.identity_id', 'tenant.identity.id')
-			.where('token_hash', tokenHash)
+			.where({
+				token_hash: tokenHash
+			})
+			.getResult()
 
 		return this.fetchOneOrNull(rows)
 	}
 }
 
 namespace ApiKeyByTokenQuery {
-	export type Result = null | {
+	export type Result = null | Row
+	export type Row = {
 		readonly id: string
 		readonly type: ApiKey.Type
 		readonly identity_id: string

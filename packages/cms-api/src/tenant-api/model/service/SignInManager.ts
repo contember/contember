@@ -1,13 +1,13 @@
 import bcrypt from 'bcrypt'
 import { SignInErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import ApiKeyManager from './ApiKeyManager'
 
 class SignInManager {
 	constructor(
-		private readonly queryHandler: QueryHandler<KnexQueryable>,
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly apiKeyManager: ApiKeyManager
 	) {}
 

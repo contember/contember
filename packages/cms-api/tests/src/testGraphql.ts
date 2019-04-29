@@ -7,6 +7,7 @@ import { testUuid } from './testUuid'
 import * as uuid from '../../src/utils/uuid'
 import * as date from '../../src/utils/date'
 import sinon from 'sinon'
+import Connection from '../../src/core/knex/Connection'
 
 export interface SqlQuery {
 	sql: string
@@ -22,7 +23,7 @@ export interface Test {
 	return: object
 }
 
-export const executeGraphQlTest = async (connection: knex, test: Test) => {
+export const executeGraphQlTest = async (connection: Connection, test: Test) => {
 	maskErrors(test.schema)
 
 	mockKnex.mock(connection)

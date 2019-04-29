@@ -5,7 +5,7 @@ import UpdateBuilder from './UpdateBuilder'
 import SelectBuilder from './SelectBuilder'
 import Connection from './Connection'
 import QueryHandler from '../query/QueryHandler'
-import KnexQueryable from './KnexQueryable'
+import DbQueryable from './DbQueryable'
 
 class KnexWrapper<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
 implements Connection.Queryable{
@@ -36,18 +36,18 @@ implements Connection.Queryable{
 		return DeleteBuilder.create(this)
 	}
 
-	async raw(sql: string, ...bindings: Value[]): Promise<Connection.Result> {
-		return this.connection.query(sql, bindings as any)
+	async raw<Row extends Record<string, any>>(sql: string, ...bindings: Value[]): Promise<Connection.Result<Row>> {
+		return this.connection.query<Row>(sql, bindings as any)
 	}
 
-	async query(sql: string, parameters: any[], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result> {
-		return this.connection.query(sql, parameters, meta, config)
+	async query<Row extends Record<string, any>>(sql: string, parameters: any[], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
+		return this.connection.query<Row>(sql, parameters, meta, config)
 	}
 
-	createQueryHandler(): QueryHandler<KnexQueryable> {
+	createQueryHandler(): QueryHandler<DbQueryable> {
 		const handler = new QueryHandler(
-			new KnexQueryable(new KnexConnection(this.knex, this.schema), {
-				get(): QueryHandler<KnexQueryable> {
+			new DbQueryable(this, {
+				get(): QueryHandler<DbQueryable> {
 					return handler
 				},
 			})

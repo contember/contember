@@ -1,20 +1,20 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 
-class StageCommonEventsMatrixQuery extends KnexQuery<StageCommonEventsMatrixQuery.Result> {
+class StageCommonEventsMatrixQuery extends DbQuery<StageCommonEventsMatrixQuery.Result> {
 	constructor() {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
-		const rows: {
+	async fetch(queryable: DbQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
+		const rows = (await queryable.createWrapper().raw<{
 			stage_a_id: string
 			stage_b_id: string
 			stage_a_event_id: string
 			stage_b_event_id: string
 			common_event_id: string
 			distance: number
-		}[] = (await queryable.createWrapper().raw(
+		}>(
 			`WITH RECURSIVE events(id, previous_id, index, stage) AS (
   SELECT event.id, previous_id, 0, stage.id
   FROM system.event

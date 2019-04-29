@@ -1,15 +1,15 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import SelectBuilder from '../../../core/knex/SelectBuilder'
 import { Stage } from '../dtos/Stage'
 import { prepareStageQueryBuilder } from './StageQueryHelper'
 
-class StageByIdQuery extends KnexQuery<StageByIdQuery.Result> {
+class StageByIdQuery extends DbQuery<StageByIdQuery.Result> {
 	constructor(private readonly stageId: string, private readonly forUpdate: boolean = false) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<StageByIdQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<StageByIdQuery.Result> {
 		let selectBuilder = prepareStageQueryBuilder(queryable).where({ id: this.stageId })
 
 		if (this.forUpdate) {

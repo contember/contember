@@ -5,13 +5,13 @@ import { AnyEvent } from '../dtos/Event'
 import QueryHandler from '../../../core/query/QueryHandler'
 import DiffCountQuery from '../queries/DiffCountQuery'
 import DiffQuery from '../queries/DiffQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import PermissionsVerifier from './PermissionsVerifier'
 
 class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
-		private readonly queryHandler: QueryHandler<KnexQueryable>,
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly permissionsVerifier: PermissionsVerifier
 	) {}
 

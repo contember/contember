@@ -4,7 +4,7 @@ import ResolverContext from '../ResolverContext'
 import SignInManager from '../../model/service/SignInManager'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import QueryHandler from '../../../core/query/QueryHandler'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import Actions from '../../model/authorization/Actions'
@@ -14,7 +14,7 @@ import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 export default class SignInMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly signInManager: SignInManager,
-		private readonly queryHandler: QueryHandler<KnexQueryable>
+		private readonly queryHandler: QueryHandler<DbQueryable>
 	) {}
 
 	async signIn(

@@ -17,7 +17,6 @@ import SystemApolloServerFactory from './http/SystemApolloServerFactory'
 import MigrationFilesManager from './migrations/MigrationFilesManager'
 import MigrationsResolver from './content-schema/MigrationsResolver'
 import PermissionsByIdentityFactory from './acl/PermissionsByIdentityFactory'
-import KnexDebugger from './core/knex/KnexDebugger'
 import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
 import MiddlewareStackFactory from './http/MiddlewareStackFactory'
 import ContentApolloMiddlewareFactory from './http/ContentApolloMiddlewareFactory'
@@ -46,7 +45,6 @@ import KnexWrapper from './core/knex/KnexWrapper'
 
 export type ProjectContainer = Container<{
 	project: Project
-	knexConnection: knex
 	systemKnexWrapper: KnexWrapper
 	systemApolloServerFactory: SystemApolloServerFactory
 	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
@@ -187,26 +185,6 @@ class CompositionRoot {
 		return projects.map((project: Project) => {
 			const projectContainer = new Container.Builder({})
 				.addService('project', () => project)
-				.addService('knexDebugger', () => new KnexDebugger())
-				.addService('knexConnection', ({ project, knexDebugger }) => {
-					const knexInst = knex({
-						debug: false,
-						client: 'pg',
-						connection: {
-							host: project.dbCredentials.host,
-							port: project.dbCredentials.port,
-							user: project.dbCredentials.user,
-							password: project.dbCredentials.password,
-							database: project.dbCredentials.database,
-						},
-						pool: {
-							max: 20,
-						},
-					})
-					// knexDebugger.register(knexInst)
-
-					return knexInst
-				})
 				.addService('connection', ({ project, }) => {
 					return new Connection({
 						host: project.dbCredentials.host,
@@ -252,7 +230,7 @@ class CompositionRoot {
 					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory }) =>
 						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory)
 				)
-				.addService('apolloServerFactory', ({ knexDebugger }) => new ContentApolloServerFactory(knexDebugger))
+				.addService('apolloServerFactory', ({ connection }) => new ContentApolloServerFactory(connection))
 				.addService(
 					'contentApolloMiddlewareFactory',
 					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory }) =>
@@ -274,7 +252,7 @@ class CompositionRoot {
 			)
 
 			return projectContainer
-				.pick('project', 'knexConnection', 'contentApolloMiddlewareFactory', 'systemKnexWrapper', 'connection')
+				.pick('project', 'contentApolloMiddlewareFactory', 'systemKnexWrapper', 'connection')
 				.merge(systemContainer.pick('systemApolloServerFactory', 'systemExecutionContainerFactory'))
 		})
 	}

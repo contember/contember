@@ -37,7 +37,7 @@ export const execute = async (test: Test) => {
 	)
 
 	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.testContainer.resolvers })
-	await executeGraphQlTest(tenantContainer.testContainer.knexConnection.knex, {
+	await executeGraphQlTest(tenantContainer.testContainer.connection, {
 		context: context,
 		executes: test.executes,
 		query: test.query,

@@ -1,12 +1,12 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 
-class LatestMigrationByEventQuery extends KnexQuery<LatestMigrationByEventQuery.Result> {
+class LatestMigrationByEventQuery extends DbQuery<LatestMigrationByEventQuery.Result> {
 	constructor(private readonly eventId: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<LatestMigrationByEventQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<LatestMigrationByEventQuery.Result> {
 		const rows = (await queryable.createWrapper().raw(
 			`
 			WITH RECURSIVE recent_events(type, previous_id, data) AS (

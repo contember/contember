@@ -150,7 +150,7 @@ class PermissionsVerifier {
 		const ids = events.map(it => it.rowId)
 		let qb = this.createBaseSelectBuilder(db, entity, ids)
 
-		qb = this.buildPredicates(qb, Acl.Operation.read, rowAffectedColumns, entity, predicateFactory, schema)
+		qb = this.buildPredicates(db, qb, Acl.Operation.read, rowAffectedColumns, entity, predicateFactory, schema)
 
 		const result = await qb.getResult()
 		const permissions: PermissionsByRow = {}
@@ -181,6 +181,7 @@ class PermissionsVerifier {
 			const typeEvents = events.filter(it => it.type === eventType)
 			affectedColumnsByType[eventType] = this.getAffectedColumnsByRow(typeEvents)
 			qb = this.buildPredicates(
+				db,
 				qb,
 				eventToOperationMapping[eventType],
 				affectedColumnsByType[eventType],
@@ -207,6 +208,7 @@ class PermissionsVerifier {
 	}
 
 	private buildPredicates(
+		db: KnexWrapper,
 		qb: SelectBuilder,
 		operation: Acl.Operation,
 		rowAffectedColumns: AffectedColumnsByRow,
@@ -222,7 +224,7 @@ class PermissionsVerifier {
 			{}
 		)
 
-		const whereBuilder = new WhereBuilder(schema, new JoinBuilder(schema), new ConditionBuilder())
+		const whereBuilder = new WhereBuilder(schema, new JoinBuilder(schema), new ConditionBuilder(), db)
 
 		const columns = Object.values(rowAffectedColumns).reduce(
 			(result, fields) => [...result, ...fields.filter(it => result.indexOf(it) < 0)],

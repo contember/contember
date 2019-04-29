@@ -1,27 +1,34 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
+import ConditionBuilder from '../../../core/knex/ConditionBuilder'
 
-class ProjectsByIdentityQuery extends KnexQuery<ProjectsByIdentityQuery.Result> {
+class ProjectsByIdentityQuery extends DbQuery<ProjectsByIdentityQuery.Result> {
 	constructor(private readonly identityId: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<ProjectsByIdentityQuery.Result> {
+	async fetch(queryable: DbQueryable): Promise<ProjectsByIdentityQuery.Result> {
 		return await queryable
-			.createQueryBuilder()
-			.select('project.id', 'project.name', 'project.slug')
+			.createSelectBuilder<ProjectsByIdentityQuery.Row>()
+			.select('project.id')
+			.select('project.name')
+			.select('project.slug')
 			.from('tenant.project')
-			.innerJoin('tenant.project_member', 'project_member.project_id', 'project.id')
-			.where('tenant.project_member.identity_id', this.identityId)
+			.join('project_member', 'project_member', clause =>
+				clause.compareColumns(['project_member', 'project_id'], ConditionBuilder.Operator.eq, ['project', 'id'])
+			)
+			.where(where => where.compare(['project_member', 'identity_id'], ConditionBuilder.Operator.eq, this.identityId))
+			.getResult()
 	}
 }
 
 namespace ProjectsByIdentityQuery {
-	export type Result = Array<{
+	export type Row = {
 		readonly id: string
 		readonly name: string
 		readonly slug: string
-	}>
+	}
+	export type Result = Array<Row>
 }
 
 export default ProjectsByIdentityQuery

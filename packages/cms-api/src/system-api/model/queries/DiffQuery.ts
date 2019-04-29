@@ -1,17 +1,25 @@
-import KnexQuery from '../../../core/knex/KnexQuery'
-import KnexQueryable from '../../../core/knex/KnexQueryable'
-import { QueryResult } from 'pg'
+import DbQuery from '../../../core/knex/DbQuery'
+import DbQueryable from '../../../core/knex/DbQueryable'
 import { EventType } from '../EventType'
-import { CreateEvent, DeleteEvent, AnyEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
+import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
 import { assertNever } from 'cms-common'
 
-class DiffQuery extends KnexQuery<AnyEvent[]> {
+class DiffQuery extends DbQuery<AnyEvent[]> {
 	constructor(private readonly baseEvent: string, private readonly headEvent: string) {
 		super()
 	}
 
-	async fetch(queryable: KnexQueryable): Promise<AnyEvent[]> {
-		const diff: QueryResult = await queryable.createWrapper().raw(
+	async fetch(queryable: DbQueryable): Promise<AnyEvent[]> {
+		const diff = await queryable.createWrapper().raw<{
+			id: string
+			type: EventType
+			data: any
+			previous_id: string
+			created_at: Date
+			identity_id: string
+			transaction_id: string
+			index: number
+		}>(
 			`WITH RECURSIVE events(id, type, data, previous_id, created_at, identity_id, transaction_id, index) AS (
     SELECT event.id, event.type, event.data, event.previous_id, event.created_at, event.identity_id, event.transaction_id, 0
     FROM system.event
@@ -27,16 +35,7 @@ SELECT * FROM events ORDER BY index DESC
 			this.baseEvent
 		)
 
-		const rows: {
-			id: string
-			type: EventType
-			data: any
-			previous_id: string
-			created_at: Date
-			identity_id: string
-			transaction_id: string
-			index: number
-		}[] = diff.rows
+		const rows = diff.rows
 
 		if (rows.length < 2 || rows[0].id !== this.baseEvent || rows[rows.length - 1].id !== this.headEvent) {
 			throw new Error('Cannot calculate diff.')

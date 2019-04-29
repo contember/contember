@@ -1,7 +1,7 @@
 import { Schema } from 'cms-common'
 import SchemaMigrator from './differ/SchemaMigrator'
 import QueryHandler from '../core/query/QueryHandler'
-import KnexQueryable from '../core/knex/KnexQueryable'
+import DbQueryable from '../core/knex/DbQueryable'
 import LatestMigrationByStageQuery from '../system-api/model/queries/LatestMigrationByStageQuery'
 import LatestMigrationByEventQuery from '../system-api/model/queries/LatestMigrationByEventQuery'
 import { tuple } from '../utils/tuple'
@@ -10,7 +10,7 @@ import MigrationsResolver from './MigrationsResolver'
 
 class SchemaVersionBuilder {
 	constructor(
-		private readonly queryHandler: QueryHandler<KnexQueryable>,
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly schemaMigrator: SchemaMigrator
 	) {}

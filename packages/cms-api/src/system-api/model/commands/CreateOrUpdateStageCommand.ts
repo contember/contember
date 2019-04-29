@@ -1,14 +1,14 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
-import InsertBuilder from '../../../core/knex/InsertBuilder'
+import Client from '../../../core/database/Client'
+import InsertBuilder from '../../../core/database/InsertBuilder'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import { StageWithoutEvent } from '../dtos/Stage'
 import InitEventQuery from '../queries/InitEventQuery'
-import { wrapIdentifier } from '../../../core/knex/utils'
+import { wrapIdentifier } from '../../../core/database/utils'
 
 class CreateOrUpdateStageCommand {
 	constructor(private readonly stage: StageWithoutEvent) {}
 
-	public async execute(connection: KnexWrapper): Promise<boolean> {
+	public async execute(connection: Client): Promise<boolean> {
 		const initEvent = await connection.createQueryHandler().fetch(new InitEventQuery())
 
 		const result = await connection

@@ -1,6 +1,6 @@
 import { StageWithoutEvent } from '../dtos/Stage'
 import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import DiffQuery from '../queries/DiffQuery'
 import { AnyEvent } from '../dtos/Event'

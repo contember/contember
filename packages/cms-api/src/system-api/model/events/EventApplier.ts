@@ -2,7 +2,7 @@ import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } fr
 import { Stage } from '../dtos/Stage'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
@@ -10,7 +10,7 @@ import StageByIdQuery from '../queries/StageByIdQuery'
 
 class EventApplier {
 	constructor(
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly migrationExecutor: MigrationExecutor,
 		private readonly migrationResolver: MigrationsResolver
 	) {}

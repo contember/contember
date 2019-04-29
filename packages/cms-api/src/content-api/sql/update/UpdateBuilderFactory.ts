@@ -1,4 +1,4 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import WhereBuilder from '../select/WhereBuilder'
 import { Model, Input } from 'cms-common'
 import UpdateBuilder from './UpdateBuilder'
@@ -7,7 +7,7 @@ class UpdateBuilderFactory {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly whereBuilder: WhereBuilder,
-		private readonly db: KnexWrapper
+		private readonly db: Client
 	) {}
 
 	public create(entity: Model.Entity, uniqueWhere: Input.Where): UpdateBuilder {

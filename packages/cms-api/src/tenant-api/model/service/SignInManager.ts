@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import { SignInErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import ApiKeyManager from './ApiKeyManager'
 

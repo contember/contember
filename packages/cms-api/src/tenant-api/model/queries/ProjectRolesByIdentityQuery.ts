@@ -1,5 +1,5 @@
-import DbQuery from '../../../core/knex/DbQuery'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQuery from '../../../core/database/DbQuery'
+import DbQueryable from '../../../core/database/DbQueryable'
 
 class ProjectRolesByIdentityQuery extends DbQuery<ProjectRolesByIdentityQuery.Result> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {

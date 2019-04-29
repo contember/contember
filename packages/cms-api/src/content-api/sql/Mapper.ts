@@ -5,7 +5,7 @@ import UpdateVisitor from './update/UpdateVisitor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
-import KnexWrapper from '../../core/knex/KnexWrapper'
+import Client from '../../core/database/Client'
 import PredicateFactory from '../../acl/PredicateFactory'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
 import InsertBuilderFactory from './insert/InsertBuilderFactory'
@@ -15,12 +15,12 @@ import PredicatesInjector from '../../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
 import DeleteExecutor from './delete/DeleteExecutor'
-import SelectBuilder from '../../core/knex/SelectBuilder'
+import SelectBuilder from '../../core/database/SelectBuilder'
 
 class Mapper {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,

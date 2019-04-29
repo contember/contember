@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import ApiKey from '../type/ApiKey'
 import { uuid } from '../../../utils/uuid'
 import { now } from '../../../utils/date'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import ApiKeyHelper from './ApiKeyHelper'
 
 class CreateApiKey implements Command<CreateApiKey.Result> {
@@ -19,7 +19,7 @@ class CreateApiKey implements Command<CreateApiKey.Result> {
 		this.expiration = expiration
 	}
 
-	async execute(db: KnexWrapper): Promise<CreateApiKey.Result> {
+	async execute(db: Client): Promise<CreateApiKey.Result> {
 		const apiKeyId = uuid()
 		const token = await this.generateToken()
 		const tokenHash = ApiKey.computeTokenHash(token)

@@ -1,6 +1,6 @@
 import { DatabaseCredentials } from '../config/config'
 import QueryHandler from '../core/query/QueryHandler'
-import DbQueryable from '../core/knex/DbQueryable'
+import DbQueryable from '../core/database/DbQueryable'
 import MeQueryResolver from './resolvers/query/MeQueryResolver'
 import SignUpMutationResolver from './resolvers/mutation/SignUpMutationResolver'
 import SignInMutationResolver from './resolvers/mutation/SignInMutationResolver'
@@ -20,7 +20,7 @@ import Authorizator from '../core/authorization/Authorizator'
 import { ApolloServer, Config } from 'apollo-server-koa'
 import ProjectManager from './model/service/ProjectManager'
 import CreateApiKeyMutationResolver from './resolvers/mutation/CreateApiKeyMutationResolver'
-import Connection from '../core/knex/Connection'
+import Connection from '../core/database/Connection'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager

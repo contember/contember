@@ -6,17 +6,17 @@ import Connection from './Connection'
 import QueryHandler from '../query/QueryHandler'
 import DbQueryable from './DbQueryable'
 
-class KnexWrapper<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
+class Client<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
 	implements Connection.Queryable {
 	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {
 	}
 
-	public forSchema(schema: string): KnexWrapper {
-		return new KnexWrapper(this.connection, schema)
+	public forSchema(schema: string): Client {
+		return new Client(this.connection, schema)
 	}
 
-	async transaction<T>(transactionScope: (wrapper: KnexWrapper) => Promise<T> | T): Promise<T> {
-		return await this.connection.transaction(connection => transactionScope(new KnexWrapper(connection, this.schema)))
+	async transaction<T>(transactionScope: (wrapper: Client) => Promise<T> | T): Promise<T> {
+		return await this.connection.transaction(connection => transactionScope(new Client(connection, this.schema)))
 	}
 
 	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result, never> {
@@ -51,4 +51,4 @@ class KnexWrapper<ConnectionType extends Connection.Queryable & Connection.Trans
 	}
 }
 
-export default KnexWrapper
+export default Client

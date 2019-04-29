@@ -1,6 +1,6 @@
 import Command from './Command'
 import { AddProjectMemberErrorCode } from '../../schema/types'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { uuid } from '../../../utils/uuid'
 
 class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProjectMemberResponse> {
@@ -10,7 +10,7 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 		private readonly roles: string[]
 	) {}
 
-	async execute(db: KnexWrapper): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
+	async execute(db: Client): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
 		try {
 			await db
 				.insertBuilder()

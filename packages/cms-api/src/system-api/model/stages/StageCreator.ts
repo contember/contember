@@ -1,4 +1,4 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import CreateOrUpdateStageCommand from '../commands/CreateOrUpdateStageCommand'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import EventApplier from '../events/EventApplier'
@@ -7,7 +7,7 @@ import StageByIdQuery from '../queries/StageByIdQuery'
 import { StageWithoutEvent } from '../dtos/Stage'
 
 class StageCreator {
-	constructor(private readonly db: KnexWrapper, private readonly eventApplier: EventApplier) {}
+	constructor(private readonly db: Client, private readonly eventApplier: EventApplier) {}
 
 	public async createStage(parent: StageWithoutEvent | null, stage: StageWithoutEvent): Promise<boolean> {
 		const created = await new CreateOrUpdateStageCommand(stage).execute(this.db)

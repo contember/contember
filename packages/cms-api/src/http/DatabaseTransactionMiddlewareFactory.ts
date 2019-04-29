@@ -1,5 +1,5 @@
 import { KoaMiddleware } from '../core/koa/types'
-import KnexWrapper from '../core/knex/KnexWrapper'
+import Client from '../core/database/Client'
 
 class DatabaseTransactionMiddlewareFactory {
 	public create(): KoaMiddleware<DatabaseTransactionMiddlewareFactory.KoaState> {
@@ -28,7 +28,7 @@ class DatabaseTransactionMiddlewareFactory {
 
 namespace DatabaseTransactionMiddlewareFactory {
 	export interface KoaState {
-		db: KnexWrapper
+		db: Client
 		planRollback: () => void
 	}
 

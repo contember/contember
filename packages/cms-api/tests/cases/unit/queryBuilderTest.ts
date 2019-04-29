@@ -1,14 +1,14 @@
 import 'mocha'
-import KnexWrapper from '../../../src/core/knex/KnexWrapper'
+import Client from '../../../src/core/database/Client'
 import { SQL } from '../../src/tags'
-import InsertBuilder from '../../../src/core/knex/InsertBuilder'
-import ConditionBuilder from '../../../src/core/knex/ConditionBuilder'
-import LimitByGroupWrapper from '../../../src/core/knex/LimitByGroupWrapper'
-import SelectBuilder from '../../../src/core/knex/SelectBuilder'
+import InsertBuilder from '../../../src/core/database/InsertBuilder'
+import ConditionBuilder from '../../../src/core/database/ConditionBuilder'
+import LimitByGroupWrapper from '../../../src/core/database/LimitByGroupWrapper'
+import SelectBuilder from '../../../src/core/database/SelectBuilder'
 import { createConnectionMock } from '../../src/ConnectionMock'
 
 interface Test {
-	query: (wrapper: KnexWrapper) => void
+	query: (wrapper: Client) => void
 	sql: string
 	parameters: any[]
 }
@@ -21,12 +21,12 @@ const execute = async (test: Test) => {
 			response: {rows: []},
 		}
 	])
-	const wrapper = new KnexWrapper(connection, 'public')
+	const wrapper = new Client(connection, 'public')
 
 	await test.query(wrapper)
 }
 
-describe('knex query builder', () => {
+describe('query builder', () => {
 	it('constructs condition', async () => {
 		await execute({
 			query: async wrapper => {

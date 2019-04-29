@@ -1,12 +1,12 @@
 import Command from './Command'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import bcrypt from 'bcrypt'
 import { uuid } from '../../../utils/uuid'
 
 class CreatePersonCommand implements Command<string> {
 	constructor(private readonly identityId: string, private readonly email: string, private readonly password: string) {}
 
-	async execute(db: KnexWrapper): Promise<string> {
+	async execute(db: Client): Promise<string> {
 		const personId = uuid()
 
 		await db

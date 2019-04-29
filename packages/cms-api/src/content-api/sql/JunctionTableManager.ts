@@ -4,12 +4,12 @@ import Mapper from './Mapper'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../../acl/PredicateFactory'
-import KnexWrapper from '../../core/knex/KnexWrapper'
+import Client from '../../core/database/Client'
 import { Acl, Input, Model } from 'cms-common'
-import InsertBuilder from '../../core/knex/InsertBuilder'
-import ConditionBuilder from '../../core/knex/ConditionBuilder'
-import SelectBuilder from '../../core/knex/SelectBuilder'
-import Literal from '../../core/knex/Literal'
+import InsertBuilder from '../../core/database/InsertBuilder'
+import ConditionBuilder from '../../core/database/ConditionBuilder'
+import SelectBuilder from '../../core/database/SelectBuilder'
+import Literal from '../../core/database/Literal'
 import { uuid } from '../../utils/uuid'
 
 class JunctionTableManager {
@@ -118,7 +118,7 @@ namespace JunctionTableManager {
 	}
 
 	export class JunctionConnectHandler implements JunctionHandler {
-		constructor(private readonly db: KnexWrapper) {}
+		constructor(private readonly db: Client) {}
 
 		async executeSimple(
 			joiningTable: Model.JoiningTable,
@@ -170,7 +170,7 @@ namespace JunctionTableManager {
 	}
 
 	export class JunctionDisconnectHandler implements JunctionHandler {
-		constructor(private readonly db: KnexWrapper) {}
+		constructor(private readonly db: Client) {}
 
 		public async executeSimple(
 			joiningTable: Model.JoiningTable,

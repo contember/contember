@@ -1,8 +1,9 @@
 import { Config, DatabaseCredentials } from '../config/config'
-import Knex from 'knex'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import { formatSchemaName } from '../system-api/model/helpers/stageHelpers'
 import Command from '../core/cli/Command'
+import Connection from '../core/database/Connection'
+import { wrapIdentifier } from '../core/database/utils'
 
 class DropCommand extends Command<{}, {}> {
 	constructor(private readonly config: Config) {
@@ -27,14 +28,11 @@ class DropCommand extends Command<{}, {}> {
 	}
 
 	private async clear(db: DatabaseCredentials, schemas: string[]) {
-		await Knex({
-			debug: false,
-			client: 'pg',
-			connection: db,
-		}).transaction(async trx => {
+		const connection = new Connection(db, {})
+		connection.transaction(async trx => {
 			await Promise.all(
 				schemas.map(async schema => {
-					await trx.raw('DROP SCHEMA IF EXISTS ?? CASCADE', [schema])
+					await trx.query(`DROP SCHEMA IF EXISTS ${wrapIdentifier(schema)} CASCADE`)
 					console.log(`Dropped schema ${schema} in DB ${db.database}`)
 				})
 			)

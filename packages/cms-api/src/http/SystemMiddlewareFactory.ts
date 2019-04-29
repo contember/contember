@@ -3,7 +3,7 @@ import koaCompose from 'koa-compose'
 import { route } from '../core/koa/router'
 import corsMiddleware from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
-import KnexWrapper from '../core/knex/KnexWrapper'
+import Client from '../core/database/Client'
 import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import { KoaContext } from '../core/koa/types'
@@ -30,7 +30,7 @@ export default class SystemMiddlewareFactory {
 				this.authMiddlewareFactory.create(),
 				this.projectResolveMiddlewareFactory.create(),
 				this.projectMemberMiddlewareFactory.create(),
-				(ctx: KoaContext<ProjectResolveMiddlewareFactory.KoaState & { db: KnexWrapper }>, next) => {
+				(ctx: KoaContext<ProjectResolveMiddlewareFactory.KoaState & { db: Client }>, next) => {
 					const projectContainer = ctx.state.projectContainer
 					ctx.state.db = projectContainer.connection.createClient('system')
 					return next()

@@ -1,4 +1,4 @@
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 import Returning from './internal/Returning'
 import With from './internal/With'
 import QueryBuilder from './QueryBuilder'
@@ -11,12 +11,12 @@ import Connection from './Connection'
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>>
 	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
 	private constructor(
-		private readonly wrapper: KnexWrapper,
+		private readonly wrapper: Client,
 		private readonly options: DeleteBuilder.Options,
 		private readonly cteAliases: string[]
 	) {}
 
-	public static create(wrapper: KnexWrapper): DeleteBuilder.NewDeleteBuilder {
+	public static create(wrapper: Client): DeleteBuilder.NewDeleteBuilder {
 		return new DeleteBuilder(
 			wrapper,
 			{

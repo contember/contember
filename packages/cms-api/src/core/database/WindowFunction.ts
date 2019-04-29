@@ -1,5 +1,5 @@
 import QueryBuilder from './QueryBuilder'
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 import Literal from './Literal'
 
 class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable<WindowFunction<HasFunction>> {

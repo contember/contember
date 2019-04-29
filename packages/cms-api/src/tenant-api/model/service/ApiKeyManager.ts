@@ -1,8 +1,8 @@
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import QueryHandler from '../../../core/query/QueryHandler'
 import ApiKey from '../type/ApiKey'
 import ApiKeyByTokenQuery from '../queries/ApiKeyByTokenQuery'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import Identity from '../../../common/auth/Identity'
 import CreateApiKey from '../commands/CreateApiKey'
@@ -19,7 +19,7 @@ import ImplementationException from '../../../core/exceptions/ImplementationExce
 import { mapValues } from '../../utils/mapValue'
 
 class ApiKeyManager {
-	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: KnexWrapper) {}
+	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
 
 	async verifyAndProlong(token: string): Promise<ApiKeyManager.VerifyResult> {
 		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))

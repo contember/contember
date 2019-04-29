@@ -1,7 +1,7 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 
 interface Command<Result> {
-	execute(db: KnexWrapper): Promise<Result>
+	execute(db: Client): Promise<Result>
 }
 
 export default Command

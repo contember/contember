@@ -1,7 +1,7 @@
-import DbQuery from '../../../core/knex/DbQuery'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQuery from '../../../core/database/DbQuery'
+import DbQueryable from '../../../core/database/DbQueryable'
 import ApiKey from '../type/ApiKey'
-import ConditionBuilder from '../../../core/knex/ConditionBuilder'
+import ConditionBuilder from '../../../core/database/ConditionBuilder'
 
 class ApiKeyByTokenQuery extends DbQuery<ApiKeyByTokenQuery.Result> {
 	constructor(private readonly token: string) {

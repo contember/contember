@@ -1,9 +1,9 @@
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import { debug } from '../../../core/console/messages'
 
 class EventsRebaser {
-	constructor(private readonly db: KnexWrapper) {}
+	constructor(private readonly db: Client) {}
 
 	public async rebaseStageEvents(
 		stageId: string,

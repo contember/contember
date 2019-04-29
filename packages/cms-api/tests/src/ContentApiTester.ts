@@ -5,7 +5,7 @@ import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/Exe
 import { Context as ContentContext } from '../../src/content-api/types'
 import { maskErrors } from 'graphql-errors'
 import { graphql } from 'graphql'
-import KnexWrapper from '../../src/core/knex/KnexWrapper'
+import Client from '../../src/core/database/Client'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import TesterStageManager from './TesterStageManager'
 import { Schema } from 'cms-common'
@@ -14,7 +14,7 @@ import { emptySchema } from '../../src/content-schema/schemaUtils'
 
 export default class ContentApiTester {
 	constructor(
-		private readonly db: KnexWrapper,
+		private readonly db: Client,
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly stageManager: TesterStageManager,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder

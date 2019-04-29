@@ -3,7 +3,7 @@ import Path from './Path'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { Input, Model } from 'cms-common'
 import SelectHydrator from './SelectHydrator'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
+import SelectBuilder from '../../../core/database/SelectBuilder'
 
 interface SelectExecutionHandler<MetaArgs> {
 	process(context: SelectExecutionHandler.Context): void

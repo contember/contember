@@ -1,5 +1,5 @@
 import QueryBuilder from './QueryBuilder'
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 import Returning from './internal/Returning'
 import With from './internal/With'
 import Where from './internal/Where'
@@ -10,9 +10,9 @@ import Connection from './Connection'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>>
 	implements With.Aware, Where.Aware, QueryBuilder {
-	private constructor(private readonly wrapper: KnexWrapper, private readonly options: UpdateBuilder.Options) {}
+	private constructor(private readonly wrapper: Client, private readonly options: UpdateBuilder.Options) {}
 
-	public static create(wrapper: KnexWrapper): UpdateBuilder.NewUpdateBuilder {
+	public static create(wrapper: Client): UpdateBuilder.NewUpdateBuilder {
 		return new UpdateBuilder(wrapper, {
 			table: undefined,
 			with: new With.Statement({}),

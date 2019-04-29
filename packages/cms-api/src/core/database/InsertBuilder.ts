@@ -1,4 +1,4 @@
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 import { QueryResult } from 'pg'
 import Returning from './internal/Returning'
 import With from './internal/With'
@@ -12,12 +12,12 @@ import { assertNever } from 'cms-common'
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
 	implements With.Aware, QueryBuilder {
 	private constructor(
-		private readonly wrapper: KnexWrapper,
+		private readonly wrapper: Client,
 		private readonly options: InsertBuilder.Options,
 		private readonly cteAliases: string[]
 	) {}
 
-	public static create(wrapper: KnexWrapper): InsertBuilder.NewInsertBuilder {
+	public static create(wrapper: Client): InsertBuilder.NewInsertBuilder {
 		return new InsertBuilder(
 			wrapper,
 			{

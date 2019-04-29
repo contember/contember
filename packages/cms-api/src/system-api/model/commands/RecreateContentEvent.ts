@@ -1,5 +1,5 @@
 import { uuid } from '../../../utils/uuid'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { ContentEvent } from '../dtos/Event'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
@@ -11,7 +11,7 @@ class RecreateContentEvent {
 		private readonly transactionContext: RecreateContentEvent.TransactionContext
 	) {}
 
-	public async execute(db: KnexWrapper) {
+	public async execute(db: Client) {
 		const id = uuid()
 		await db
 			.insertBuilder()

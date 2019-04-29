@@ -1,9 +1,9 @@
 import { Input, Model } from 'cms-common'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
-import QueryBuilder from '../../../core/knex/QueryBuilder'
+import QueryBuilder from '../../../core/database/QueryBuilder'
 import { getColumnName, getTargetEntity } from '../../../content-schema/modelUtils'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
+import SelectBuilder from '../../../core/database/SelectBuilder'
 
 class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}

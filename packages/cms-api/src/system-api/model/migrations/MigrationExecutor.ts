@@ -2,13 +2,13 @@ import { Stage } from '../dtos/Stage'
 import CreateEventCommand from '../commands/CreateEventCommand'
 import { EventType } from '../EventType'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import KnexWrapper from '../../../core/knex/KnexWrapper'
+import Client from '../../../core/database/Client'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import Migration from './Migration'
 import { createMigrationBuilder } from '../../../content-api/sqlSchema/sqlSchemaBuilderHelper'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
-import { wrapIdentifier } from '../../../core/knex/utils'
+import { wrapIdentifier } from '../../../core/database/utils'
 
 class MigrationExecutor {
 	constructor(
@@ -17,7 +17,7 @@ class MigrationExecutor {
 	) {}
 
 	public async execute(
-		db: KnexWrapper,
+		db: Client,
 		stage: Stage,
 		migrations: Migration[],
 		progressCb: (version: string) => void

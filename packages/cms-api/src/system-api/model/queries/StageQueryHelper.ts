@@ -1,6 +1,6 @@
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 import { Stage } from '../dtos/Stage'
-import SelectBuilder from '../../../core/knex/SelectBuilder'
+import SelectBuilder from '../../../core/database/SelectBuilder'
 import { isUuid } from '../../../utils/uuid'
 import StageByIdQuery from './StageByIdQuery'
 import StageBySlugQuery from './StageBySlugQuery'

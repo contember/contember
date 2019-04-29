@@ -1,6 +1,6 @@
-import DbQuery from '../../../core/knex/DbQuery'
+import DbQuery from '../../../core/database/DbQuery'
 import { Stage } from '../../schema/types'
-import DbQueryable from '../../../core/knex/DbQueryable'
+import DbQueryable from '../../../core/database/DbQueryable'
 
 class StagesQuery extends DbQuery<Stage[]> {
 	async fetch(queryable: DbQueryable): Promise<Stage[]> {

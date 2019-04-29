@@ -1,12 +1,12 @@
 import QueryHandler from '../query/QueryHandler'
 import Queryable from '../query/Queryable'
 import QueryHandlerAccessor from '../query/QueryHandlerAccessor'
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 import SelectBuilder from './SelectBuilder'
 
 export default class DbQueryable implements Queryable<DbQueryable> {
 	constructor(
-		public readonly wrapper: KnexWrapper,
+		public readonly wrapper: Client,
 		private readonly handlerAccessor: QueryHandlerAccessor<DbQueryable>
 	) {
 	}
@@ -19,7 +19,7 @@ export default class DbQueryable implements Queryable<DbQueryable> {
 		return this.wrapper.selectBuilder<Result>()
 	}
 
-	createWrapper(): KnexWrapper {
+	createWrapper(): Client {
 		return this.wrapper
 	}
 }

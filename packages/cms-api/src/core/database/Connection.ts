@@ -1,7 +1,7 @@
 import { Pool, PoolClient, PoolConfig } from 'pg'
 import EventManager from './EventManager'
 import { Transaction } from './Transaction'
-import KnexWrapper from './KnexWrapper'
+import Client from './Client'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory {
 
@@ -15,8 +15,8 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		this.pool = new Pool(config)
 	}
 
-	public createClient(schema: string): KnexWrapper {
-		return new KnexWrapper(this, schema)
+	public createClient(schema: string): Client {
+		return new Client(this, schema)
 	}
 
 	async transaction<Result>(callback: (connection: Connection.TransactionLike) => Promise<Result> | Result): Promise<Result> {
@@ -79,7 +79,7 @@ namespace Connection {
 	}
 
 	export interface ClientFactory {
-		createClient(schema: string): KnexWrapper
+		createClient(schema: string): Client
 	}
 
 	export interface TransactionLike extends ConnectionLike {

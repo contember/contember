@@ -7,14 +7,13 @@ tenant:
         database: '%env.TENANT_DB_NAME%'
 
 projects:
-    - uuid: a2f943bb-cd4f-419c-af5a-60c850c97f59
+    - id: a2f943bb-cd4f-419c-af5a-60c850c97f59
       slug: app
       name: App
       stages:
-          - uuid: 01c8f908-6f48-4ef3-9751-9989931b42eb
+          - id: 01c8f908-6f48-4ef3-9751-9989931b42eb
             slug: prod
             name: Production
-            migration: '2019-04-24-135532'
       dbCredentials:
         host: '%env.APP_DB_HOST%'
         port: '%env.APP_DB_PORT%'

@@ -3,6 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
+		"console": "dotenv -- node dist/src/console.js",
 		"compare": "node dist/src/compare.js",
 		"benchmark": "dotenv -- node dist/src/benchmark.js",
 		"start": "dotenv -- ./run.sh"

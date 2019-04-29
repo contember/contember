@@ -882,8 +882,7 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select
-                       "root_"."id" as "root_id",
-                       "root_author"."id" as "root_author_id"
+                       "root_"."id" as "root_id"
                      from "public"."post" as "root_" left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
                      where "root_author"."name" = $1`,
 						parameters: ['John'],
@@ -1248,9 +1247,7 @@ describe('Queries', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`select
-                       "root_"."id" as "root_id",
-                       "root_post"."id" as "root_post_id",
-                       "root_post_author"."id" as "root_post_author_id"
+                       "root_"."id" as "root_id"
                      from "public"."post_locale" as "root_" left join "public"."post" as "root_post" on "root_"."post_id" = "root_post"."id"
                        left join "public"."author" as "root_post_author" on "root_post"."author_id" = "root_post_author"."id"
                      order by "root_post_author"."name" asc, "root_"."id" desc`,

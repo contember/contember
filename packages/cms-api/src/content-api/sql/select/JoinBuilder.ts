@@ -28,8 +28,6 @@ export default class JoinBuilder {
 			throw new Error()
 		}
 
-		const primaryPath = path.for(targetEntity.primary)
-
-		return qb.select([path.getAlias(), targetEntity.primaryColumn], primaryPath.getAlias())
+		return qb
 	}
 }

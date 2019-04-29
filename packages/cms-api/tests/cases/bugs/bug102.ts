@@ -53,7 +53,7 @@ it('Filter by has many with additional join', async () => {
 					sql: SQL`
 select "root_"."id" as "root_id", "root_"."short_name" as "root_shortName", "root_"."id" as "root_id" 
 from "public"."person" as "root_" 
-where "root_"."id" in (select "root_"."person_id", "root_locale"."id" as "root_locale_id" 
+where "root_"."id" in (select "root_"."person_id" 
   from "public"."person_locale" as "root_" 
     left join "public"."language" as "root_locale" on "root_"."locale_id" = "root_locale"."id" 
   where "root_locale"."slug" = $1 and not("root_"."url_slug" is null))`,
@@ -61,15 +61,13 @@ where "root_"."id" in (select "root_"."person_id", "root_locale"."id" as "root_l
 					parameters: ['cs'],
 				},
 				{
-					sql: SQL`select "root_"."person_id" as "root_person", "root_"."url_slug" as "root_urlSlug", "root_"."id" as "root_id", "root_locale"."id" as "root_locale_id" 
+					sql: SQL`select "root_"."person_id" as "root_person", "root_"."url_slug" as "root_urlSlug", "root_"."id" as "root_id"
 from "public"."person_locale" as "root_" 
 left join "public"."language" as "root_locale" on "root_"."locale_id" = "root_locale"."id" 
 where "root_locale"."slug" = $1 and "root_"."person_id" in ($2)`,
 					parameters: ['cs', testUuid(1)],
 					response: {
-						rows: [
-							{ root_person: testUuid(1), root_urlSlug: 'john', root_id: testUuid(2), root_locale_id: testUuid(3) },
-						],
+						rows: [{ root_person: testUuid(1), root_urlSlug: 'john', root_id: testUuid(2) }],
 					},
 				},
 			]),

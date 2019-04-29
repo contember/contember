@@ -2,12 +2,12 @@
 set -e
 
 echo "Cleaning"
-node ./node_modules/cms-api/dist/src/bin/console drop > /dev/null
+npm run console drop
 echo "Initializing database"
-node ./node_modules/cms-api/dist/src/bin/console engine:migrations:continue > /dev/null
-node ./node_modules/cms-api/dist/src/bin/console init > /dev/null
+npm run console engine:migrations:continue > /dev/null
+npm run console init > /dev/null
 echo "Starting server"
-node --max-old-space-size=8192 ./node_modules/cms-api/dist/src/bin/console start > /dev/null &
+npm run console start > /dev/null &
 PID=$!
 sleep 5
 

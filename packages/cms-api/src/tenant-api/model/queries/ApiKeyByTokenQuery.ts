@@ -24,7 +24,7 @@ class ApiKeyByTokenQuery extends DbQuery<ApiKeyByTokenQuery.Result> {
 				joinClause.compareColumns(['api_key', 'identity_id'], ConditionBuilder.Operator.eq, ['identity', 'id'])
 			)
 			.where({
-				token_hash: tokenHash
+				token_hash: tokenHash,
 			})
 			.getResult()
 

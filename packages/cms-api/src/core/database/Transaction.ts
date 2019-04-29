@@ -3,14 +3,12 @@ import EventManager from './EventManager'
 import Connection from './Connection'
 import { wrapIdentifier } from './utils'
 
-
 export class Transaction implements Connection.Queryable, Connection.TransactionLike {
-
 	private _isClosed = false
 
 	private queryContext: Connection.QueryContext = {}
 
-	private savepointCounter = 1;
+	private savepointCounter = 1
 
 	public get isClosed(): boolean {
 		return this._isClosed
@@ -20,10 +18,11 @@ export class Transaction implements Connection.Queryable, Connection.Transaction
 		private readonly pgClient: PoolClient,
 		private readonly eventManager: EventManager,
 		private readonly config: Connection.QueryConfig
-	) {
-	}
+	) {}
 
-	async transaction<Result>(callback: (connection: Connection.TransactionLike) => (Promise<Result> | Result)): Promise<Result> {
+	async transaction<Result>(
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result
+	): Promise<Result> {
 		const savepointName = `savepoint_${this.savepointCounter++}`
 		await this.pgClient.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
 		const savepoint = new SavePoint(savepointName, this, this.pgClient)
@@ -41,12 +40,21 @@ export class Transaction implements Connection.Queryable, Connection.Transaction
 		}
 	}
 
-
-	async query<Row extends Record<string, any>>(sql: string, parameters: any[] = [], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
+	async query<Row extends Record<string, any>>(
+		sql: string,
+		parameters: any[] = [],
+		meta: Record<string, any> = {},
+		config: Connection.QueryConfig = {}
+	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error('Transaction is already closed')
 		}
-		return await Connection.executeQuery<Row>(this.pgClient, this.eventManager, { sql, parameters, meta, ...this.config, ...config }, this.queryContext)
+		return await Connection.executeQuery<Row>(
+			this.pgClient,
+			this.eventManager,
+			{ sql, parameters, meta, ...this.config, ...config },
+			this.queryContext
+		)
 	}
 
 	async rollback(): Promise<void> {
@@ -63,7 +71,6 @@ export class Transaction implements Connection.Queryable, Connection.Transaction
 	}
 }
 
-
 class SavePoint implements Connection.Queryable, Connection.TransactionLike {
 	private _isClosed = false
 
@@ -75,15 +82,19 @@ class SavePoint implements Connection.Queryable, Connection.TransactionLike {
 		public readonly savepointName: string,
 		private readonly transactionInst: Transaction,
 		private readonly pgClient: PoolClient
-	) {
-	}
+	) {}
 
-	async transaction<Result>(callback: (connection: Connection.TransactionLike) => (Promise<Result> | Result)): Promise<Result> {
+	async transaction<Result>(
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result
+	): Promise<Result> {
 		return await this.transactionInst.transaction(callback)
 	}
 
-
-	async query<Row extends Record<string, any>>(sql: string, parameters: any[], meta: Record<string, any> = {}): Promise<Connection.Result<Row>> {
+	async query<Row extends Record<string, any>>(
+		sql: string,
+		parameters: any[],
+		meta: Record<string, any> = {}
+	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error(`Savepoint ${this.savepointName} is already closed.`)
 		}

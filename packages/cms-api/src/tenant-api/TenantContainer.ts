@@ -39,9 +39,12 @@ namespace TenantContainer {
 
 		createBuilder(tenantDbCredentials: DatabaseCredentials) {
 			return new Container.Builder({})
-				.addService('connection', (): Connection.ConnectionLike & Connection.ClientFactory => {
-					return new Connection(tenantDbCredentials, {})
-				})
+				.addService(
+					'connection',
+					(): Connection.ConnectionLike & Connection.ClientFactory => {
+						return new Connection(tenantDbCredentials, {})
+					}
+				)
 				.addService('db', ({ connection }) => connection.createClient('tenant'))
 				.addService('queryHandler', ({ db }) => {
 					const handler = new QueryHandler(

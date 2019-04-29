@@ -14,7 +14,7 @@ class PersonByEmailQuery extends DbQuery<PersonByEmailQuery.Result> {
 			.select('identity_id')
 			.from('person')
 			.where({
-				email: this.email
+				email: this.email,
 			})
 			.getResult()
 

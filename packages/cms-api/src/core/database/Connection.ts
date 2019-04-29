@@ -4,7 +4,6 @@ import { Transaction } from './Transaction'
 import Client from './Client'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory {
-
 	private readonly pool: Pool
 
 	constructor(
@@ -19,7 +18,9 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		return new Client(this, schema)
 	}
 
-	async transaction<Result>(callback: (connection: Connection.TransactionLike) => Promise<Result> | Result): Promise<Result> {
+	async transaction<Result>(
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result
+	): Promise<Result> {
 		const client = await this.pool.connect()
 		await client.query('BEGIN')
 		const transaction = new Transaction(client, this.eventManager, this.queryConfig)
@@ -45,7 +46,12 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		await this.pool.end()
 	}
 
-	async query<Row extends Record<string, any>>(sql: string, parameters: any[], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
+	async query<Row extends Record<string, any>>(
+		sql: string,
+		parameters: any[],
+		meta: Record<string, any> = {},
+		config: Connection.QueryConfig = {}
+	): Promise<Connection.Result<Row>> {
 		const client = await this.pool.connect()
 		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
 		try {
@@ -59,24 +65,25 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 	}
 }
 
-
 namespace Connection {
-
 	export interface QueryConfig {
 		timing?: boolean
 	}
 
 	export interface Queryable {
-		query<Row extends Record<string, any>>(sql: string, parameters?: any[], meta?: Record<string, any>, config?: Connection.QueryConfig): Promise<Connection.Result<Row>>
+		query<Row extends Record<string, any>>(
+			sql: string,
+			parameters?: any[],
+			meta?: Record<string, any>,
+			config?: Connection.QueryConfig
+		): Promise<Connection.Result<Row>>
 	}
 
 	export interface Transactional {
 		transaction<Result>(trx: (connection: TransactionLike) => Promise<Result> | Result): Promise<Result>
 	}
 
-	export interface ConnectionLike extends Transactional, Queryable {
-
-	}
+	export interface ConnectionLike extends Transactional, Queryable {}
 
 	export interface ClientFactory {
 		createClient(schema: string): Client
@@ -89,7 +96,6 @@ namespace Connection {
 
 		commit(): Promise<void>
 	}
-
 
 	export async function executeQuery<Row extends Record<string, any>>(
 		pgClient: PoolClient,
@@ -111,13 +117,14 @@ namespace Connection {
 
 				const endHrTime = process.hrtime()
 				const endTimeUs = endHrTime[0] * 1e6 + Math.floor(endHrTime[1] / 1000)
-				const realStart = context.previousQueryEnd && context.previousQueryEnd > startTimeUs ? context.previousQueryEnd : startTimeUs
+				const realStart =
+					context.previousQueryEnd && context.previousQueryEnd > startTimeUs ? context.previousQueryEnd : startTimeUs
 				result = {
 					...result,
 					timing: {
 						selfDuration: endTimeUs - realStart,
 						totalDuration: endTimeUs - startTimeUs,
-					}
+					},
 				}
 				context.previousQueryEnd = endTimeUs
 			} else {
@@ -138,16 +145,11 @@ ${'message' in error ? error.message : error}
 		}
 	}
 
-	class ConnectionError extends Error
-	{
-
-	}
+	class ConnectionError extends Error {}
 
 	function prepareSql(sql: string) {
-		let parameterIndex = 0;
-		return sql.replace(/(\\*)\?/g, ({}, numOfEscapes) =>
-			numOfEscapes.length % 2 ? '?' : `$${++parameterIndex}`
-		);
+		let parameterIndex = 0
+		return sql.replace(/(\\*)\?/g, ({}, numOfEscapes) => (numOfEscapes.length % 2 ? '?' : `$${++parameterIndex}`))
 	}
 
 	export interface QueryContext {
@@ -162,9 +164,8 @@ ${'message' in error ? error.message : error}
 
 	export type Credentials = Pick<PoolConfig, 'host' | 'port' | 'user' | 'password' | 'database'>
 
-
 	export interface Result<Row extends Record<string, any> = Record<string, any>> {
-		readonly rowCount: number;
+		readonly rowCount: number
 		readonly rows: Row[]
 		readonly timing?: {
 			totalDuration: number

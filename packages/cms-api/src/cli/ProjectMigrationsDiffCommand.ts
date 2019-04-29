@@ -30,9 +30,7 @@ class ProjectMigrationsDiffCommand extends Command<Args, {}> {
 			throw new Error(`Undefined project ${projectName}`)
 		}
 
-		const executionContainer = projectContainer.systemExecutionContainerFactory.create(
-			projectContainer.systemDbClient
-		)
+		const executionContainer = projectContainer.systemExecutionContainerFactory.create(projectContainer.systemDbClient)
 		const migrationDiffCreator = executionContainer.migrationDiffCreator
 		const result = await migrationDiffCreator.createDiff(this.schemas[projectName], migrationName)
 

@@ -34,9 +34,9 @@ namespace EventManager {
 	export type QueryErrorCallback = (query: Connection.Query, error: Error) => void
 
 	export interface ListenerTypes {
-		[EventManager.Event.queryStart]: QueryStartCallback,
-		[EventManager.Event.queryEnd]: QueryEndCallback,
-		[EventManager.Event.queryError]: QueryErrorCallback,
+		[EventManager.Event.queryStart]: QueryStartCallback
+		[EventManager.Event.queryEnd]: QueryEndCallback
+		[EventManager.Event.queryError]: QueryErrorCallback
 	}
 
 	export type ListenersList = { [T in keyof ListenerTypes]: ListenerTypes[T][] }

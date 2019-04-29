@@ -13,7 +13,7 @@ class PersonByIdentityQuery extends DbQuery<PersonByIdentityQuery.Result> {
 			.select('email')
 			.from('person')
 			.where({
-				identity_id: this.identityId
+				identity_id: this.identityId,
 			})
 			.getResult()
 

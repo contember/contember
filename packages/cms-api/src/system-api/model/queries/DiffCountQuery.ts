@@ -8,7 +8,7 @@ class DiffCountQuery extends DbQuery<DiffCountQuery.Response> {
 	}
 
 	async fetch(queryable: DbQueryable): Promise<DiffCountQuery.Response> {
-		const diff = await queryable.createWrapper().raw<{ index: number }>(
+		const diff = await queryable.createWrapper().query<{ index: number }>(
 			`WITH RECURSIVE events(id, previous_id, index) AS (
     SELECT id, previous_id, 0
     FROM system.event
@@ -20,8 +20,7 @@ class DiffCountQuery extends DbQuery<DiffCountQuery.Response> {
   )
 SELECT index from events where events.id = ?
 `,
-			this.headEvent,
-			this.baseEvent
+			[this.headEvent, this.baseEvent]
 		)
 
 		return diff.rows.length === 0

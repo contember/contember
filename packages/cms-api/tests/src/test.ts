@@ -6,6 +6,7 @@ import S3 from '../../src/utils/S3'
 import { executeGraphQlTest } from './testGraphql'
 import KnexWrapper from '../../src/core/knex/KnexWrapper'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
+import { createConnectionMock } from './ConnectionMock'
 
 export interface SqlQuery {
 	sql: string
@@ -41,14 +42,11 @@ export const execute = async (test: Test) => {
 	).create(test.schema, permissions)
 	const graphQLSchema = builder.build()
 
-	const connection = knex({
-		// debug: true,
-		client: 'pg',
-	})
+	const connection = createConnectionMock(test.executes)
 
 	// @ts-ignore
 	const db = new KnexWrapper(connection, 'public')
-	await executeGraphQlTest(connection, {
+	await executeGraphQlTest({
 		context: {
 			db: db,
 			identityVariables: test.variables || {},
@@ -58,7 +56,6 @@ export const execute = async (test: Test) => {
 			}),
 			timer: (label: any, cb: any) => cb(),
 		},
-		executes: test.executes,
 		query: test.query,
 		return: test.return,
 		schema: graphQLSchema,

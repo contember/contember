@@ -7,7 +7,7 @@ class LatestMigrationByStageQuery extends DbQuery<LatestMigrationByStageQuery.Re
 	}
 
 	async fetch(queryable: DbQueryable): Promise<LatestMigrationByStageQuery.Result> {
-		const rows = (await queryable.createWrapper().raw< LatestMigrationByStageQuery.Row>(
+		const rows = (await queryable.wrapper.query< LatestMigrationByStageQuery.Row>(
 			`
 			WITH RECURSIVE recent_events(type, previous_id, data) AS (
 					SELECT type, previous_id, data
@@ -23,9 +23,7 @@ class LatestMigrationByStageQuery extends DbQuery<LatestMigrationByStageQuery.Re
 			FROM recent_events
 			WHERE type = 'run_migration'
 			LIMIT 1
-		`,
-			this.stageId
-		)).rows
+		`, [this.stageId])).rows
 
 		return this.fetchOneOrNull(rows)
 	}

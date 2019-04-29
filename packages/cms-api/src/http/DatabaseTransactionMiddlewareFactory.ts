@@ -6,7 +6,7 @@ class DatabaseTransactionMiddlewareFactory {
 		const databaseTransaction: KoaMiddleware<DatabaseTransactionMiddlewareFactory.KoaState> = async (ctx, next) => {
 			try {
 				await ctx.state.db.transaction(async db => {
-					await db.raw('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
+					await db.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
 
 					ctx.state.db = db
 					let rollback = false

@@ -187,7 +187,7 @@ class Compiler {
 		if (Array.isArray(target)) {
 			return Literal.empty.appendAll(target.map(it => new Literal(wrapIdentifier(it))), ', ', ['(', ')'])
 		}
-		return new Literal(wrapIdentifier(target.constraint))
+		return new Literal('on constraint ' + wrapIdentifier(target.constraint))
 	}
 
 	private createSet(values: QueryBuilder.ResolvedValues): Literal {

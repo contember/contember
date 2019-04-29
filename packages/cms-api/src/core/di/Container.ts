@@ -32,7 +32,7 @@ namespace Container {
 			return new Builder(factoryMapC)
 		}
 
-		replaceService<N extends ServiceName, T extends ServiceType>(
+		replaceService<N extends ServiceName, T extends { [P in keyof M[N]]: M[N][P] }>(
 			name: N extends keyof M ? N : 'Service with this name does not exist',
 			factory: ServiceFactory<M, T>
 		): Builder<M> {

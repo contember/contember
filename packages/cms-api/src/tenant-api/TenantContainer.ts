@@ -21,27 +21,28 @@ import { ApolloServer, Config } from 'apollo-server-koa'
 import ProjectManager from './model/service/ProjectManager'
 import CreateApiKeyMutationResolver from './resolvers/mutation/CreateApiKeyMutationResolver'
 import Connection from '../core/knex/Connection'
-import KnexWrapper from '../core/knex/KnexWrapper'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
 	apiKeyManager: ApiKeyManager
 	projectManager: ProjectManager
 	apolloServer: ApolloServer
-	testContainer: {
-		connection: Connection
-		resolvers: Config['resolvers']
-	}
 }
 
 namespace TenantContainer {
 	export class Factory {
 		create(tenantDbCredentials: DatabaseCredentials): TenantContainer {
+			return this.createBuilder(tenantDbCredentials)
+				.build()
+				.pick('apolloServer', 'apiKeyManager', 'projectMemberManager', 'projectManager')
+		}
+
+		createBuilder(tenantDbCredentials: DatabaseCredentials) {
 			return new Container.Builder({})
-				.addService('connection', () => {
+				.addService('connection', (): Connection.ConnectionLike & Connection.ClientFactory => {
 					return new Connection(tenantDbCredentials, {})
 				})
-				.addService('db', ({ connection }) => new KnexWrapper(connection, 'tenant'))
+				.addService('db', ({ connection }) => connection.createClient('tenant'))
 				.addService('queryHandler', ({ db }) => {
 					const handler = new QueryHandler(
 						new DbQueryable(db, {
@@ -121,9 +122,6 @@ namespace TenantContainer {
 				.addService('apolloServer', ({ resolvers, projectMemberManager, authorizator }) =>
 					new TenantApolloServerFactory(resolvers, projectMemberManager, authorizator).create()
 				)
-				.addService('testContainer', ({ connection, resolvers }) => ({ connection, resolvers }))
-				.build()
-				.pick('apolloServer', 'apiKeyManager', 'projectMemberManager', 'projectManager', 'testContainer')
 		}
 	}
 }

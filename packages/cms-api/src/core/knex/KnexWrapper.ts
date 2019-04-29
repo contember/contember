@@ -1,4 +1,3 @@
-import { Value } from './types'
 import InsertBuilder from './InsertBuilder'
 import DeleteBuilder from './DeleteBuilder'
 import UpdateBuilder from './UpdateBuilder'
@@ -8,7 +7,7 @@ import QueryHandler from '../query/QueryHandler'
 import DbQueryable from './DbQueryable'
 
 class KnexWrapper<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
-implements Connection.Queryable{
+	implements Connection.Queryable {
 	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {
 	}
 
@@ -36,11 +35,7 @@ implements Connection.Queryable{
 		return DeleteBuilder.create(this)
 	}
 
-	async raw<Row extends Record<string, any>>(sql: string, ...bindings: Value[]): Promise<Connection.Result<Row>> {
-		return this.connection.query<Row>(sql, bindings as any)
-	}
-
-	async query<Row extends Record<string, any>>(sql: string, parameters: any[], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
+	async query<Row extends Record<string, any>>(sql: string, parameters: any[] = [], meta: Record<string, any> = {}, config: Connection.QueryConfig = {}): Promise<Connection.Result<Row>> {
 		return this.connection.query<Row>(sql, parameters, meta, config)
 	}
 

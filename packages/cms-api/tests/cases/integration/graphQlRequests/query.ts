@@ -22,7 +22,7 @@ describe('Queries', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: { rows: [{ root_id: testUuid(1) }] },
 						parameters: [testUuid(1)],
 					},
@@ -64,7 +64,7 @@ describe('Queries', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post_locale" as "root_"
-                     where "root_"."locale" = $1 and "root_"."post_id" = $2`,
+                     where "root_"."locale" = ? and "root_"."post_id" = ?`,
 						parameters: ['cs', testUuid(1)],
 						response: { rows: [{ root_id: testUuid(2) }] },
 					},
@@ -98,7 +98,7 @@ describe('Queries', () => {
                        "root_"."title" as "root_heading",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: { rows: [{ root_heading: 'Hello' }] },
 						parameters: [testUuid(1)],
 					},
@@ -154,7 +154,7 @@ describe('Queries', () => {
                        "root_"."locale" as "root_locale",
                        "root_"."title" as "root_title"
                      from "public"."post_locale" as "root_"
-                     where "root_"."post_id" in ($1, $2)`,
+                     where "root_"."post_id" in (?, ?)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: {
 							rows: [
@@ -245,7 +245,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name"
               from "public"."author" as "root_"
-              where "root_"."id" in ($1, $2)
+              where "root_"."id" in (?, ?)
 						`,
 						parameters: [testUuid(2), testUuid(4)],
 						response: {
@@ -377,7 +377,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."url" as "root_url"
               from "public"."site_setting" as "root_"
-              where "root_"."id" in ($1, $2)
+              where "root_"."id" in (?, ?)
 						`,
 						parameters: [testUuid(2), testUuid(4)],
 						response: {
@@ -467,7 +467,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."name" as "root_name"
                      from "public"."site" as "root_"
-                     where "root_"."setting_id" in ($1, $2)`,
+                     where "root_"."setting_id" in (?, ?)`,
 						parameters: [testUuid(1), testUuid(3)],
 						response: {
 							rows: [
@@ -564,7 +564,7 @@ describe('Queries', () => {
                        "junction_"."category_id",
                        "junction_"."post_id"
                      from "public"."post_categories" as "junction_"
-                     where "junction_"."post_id" in ($1, $2)`,
+                     where "junction_"."post_id" in (?, ?)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: {
 							rows: [
@@ -594,7 +594,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "public"."category" as "root_"
-                     where "root_"."id" in ($1, $2, $3)`,
+                     where "root_"."id" in (?, ?, ?)`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
 						response: {
 							rows: [
@@ -620,7 +620,7 @@ describe('Queries', () => {
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name"
               from "public"."category_locale" as "root_"
-              where "root_"."locale" = $1 and "root_"."category_id" in ($2, $3, $4)
+              where "root_"."locale" = ? and "root_"."category_id" in (?, ?, ?)
 						`,
 						parameters: ['cs', testUuid(3), testUuid(4), testUuid(5)],
 						response: {
@@ -750,7 +750,7 @@ describe('Queries', () => {
                        "junction_"."category_id",
                        "junction_"."post_id"
                      from "public"."post_categories" as "junction_"
-                     where "junction_"."category_id" in ($1, $2)`,
+                     where "junction_"."category_id" in (?, ?)`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: {
 							rows: [
@@ -779,7 +779,7 @@ describe('Queries', () => {
                        "root_"."author_id" as "root_author",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" in ($1, $2, $3)
+                     where "root_"."id" in (?, ?, ?)
 						`,
 						parameters: [testUuid(3), testUuid(4), testUuid(5)],
 						response: {
@@ -805,7 +805,7 @@ describe('Queries', () => {
                        "root_"."name" as "root_name",
                        "root_"."id" as "root_id"
                      from "public"."author" as "root_"
-                     where "root_"."id" in ($1, $2)
+                     where "root_"."id" in (?, ?)
 						`,
 						parameters: [testUuid(6), testUuid(7)],
 						response: {
@@ -884,7 +884,7 @@ describe('Queries', () => {
 						sql: SQL`select
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_" left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
-                     where "root_author"."name" = $1`,
+                     where "root_author"."name" = ?`,
 						parameters: ['John'],
 						response: {
 							rows: [
@@ -937,7 +937,7 @@ describe('Queries', () => {
                      from "public"."author" as "root_"
                      where "root_"."id" in (select "root_"."author_id"
                                             from "public"."post" as "root_"
-                                            where "root_"."title" = $1)`,
+                                            where "root_"."title" = ?)`,
 						parameters: ['Hello'],
 						response: {
 							rows: [
@@ -989,7 +989,7 @@ describe('Queries', () => {
                      from "public"."post" as "root_"
                      where "root_"."id" in (select "junction_"."post_id"
                                             from "public"."post_categories" as "junction_" inner join "public"."category" as "root_" on "junction_"."category_id" = "root_"."id"
-                                            where "root_"."name" = $1)`,
+                                            where "root_"."name" = ?)`,
 						parameters: ['Stuff'],
 						response: {
 							rows: [
@@ -1041,7 +1041,7 @@ describe('Queries', () => {
                      from "public"."post" as "root_"
                      where "root_"."id" in (select "junction_"."post_id"
                                             from "public"."post_categories" as "junction_"
-                                            where "junction_"."category_id" in ($1, $2))`,
+                                            where "junction_"."category_id" in (?, ?))`,
 						parameters: [testUuid(10), testUuid(11)],
 						response: {
 							rows: [
@@ -1113,7 +1113,7 @@ describe('Queries', () => {
                        "root_"."locale" as "root_locale",
                        "root_"."title" as "root_title"
                      from "public"."post_locale" as "root_"
-                     where "root_"."locale" = $1 and "root_"."post_id" in ($2, $3)`,
+                     where "root_"."locale" = ? and "root_"."post_id" in (?, ?)`,
 						parameters: ['cs', testUuid(1), testUuid(2)],
 						response: {
 							rows: [
@@ -1193,7 +1193,7 @@ describe('Queries', () => {
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
                      from "public"."author" as "root_"
-                     where "root_"."id" in ($1, $2) and "root_"."name" = $3`,
+                     where "root_"."id" in (?, ?) and "root_"."name" = ?`,
 						parameters: [testUuid(2), testUuid(4), 'John'],
 						response: {
 							rows: [
@@ -1299,7 +1299,7 @@ describe('Queries', () => {
                        "root_"."post_id" as "__grouping_key",
                        "root_"."id" as "root_id"
                      from "public"."post_locale" as "root_"
-                     where "root_"."post_id" in ($1, $2)
+                     where "root_"."post_id" in (?, ?)
                      order by "root_"."id" desc`,
 						parameters: [testUuid(1), testUuid(2)],
 						response: {
@@ -1388,13 +1388,13 @@ describe('Queries', () => {
              over(partition by "junction_"."category_id"
                order by "root_"."title" asc) as "rowNumber_"
            from "public"."post_categories" as "junction_" inner join "public"."post" as "root_" on "junction_"."post_id" = "root_"."id"
-           where "junction_"."category_id" in ($1, $2) and "root_"."locale" = $3
+           where "junction_"."category_id" in (?, ?) and "root_"."locale" = ?
            order by "root_"."title" asc)
           select
             "data".*
           from "data"
           where
-            "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
+            "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?`,
 					parameters: [testUuid(1), testUuid(2), 'cs', 1, 3],
 					response: {
 						rows: [
@@ -1411,7 +1411,7 @@ describe('Queries', () => {
                      "root_"."title" as "root_title",
                      "root_"."id" as "root_id"
                    from "public"."post" as "root_"
-                   where "root_"."id" in ($1, $2, $3)`,
+                   where "root_"."id" in (?, ?, ?)`,
 					parameters: [testUuid(10), testUuid(11), testUuid(12)],
 					response: {
 						rows: [
@@ -1509,11 +1509,11 @@ describe('Queries', () => {
              over(partition by "root_"."author_id"
                order by "root_"."title" asc) as "rowNumber_"
            from "public"."post" as "root_"
-           where "root_"."locale" = $1 and "root_"."author_id" in ($2, $3)
+           where "root_"."locale" = ? and "root_"."author_id" in (?, ?)
            order by "root_"."title" asc)
           select "data".*
           from "data"
-          where "data"."rowNumber_" > $4 and "data"."rowNumber_" <= $5`,
+          where "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?`,
 					parameters: ['cs', testUuid(1), testUuid(2), 1, 3],
 					response: {
 						rows: [
@@ -1647,7 +1647,7 @@ describe('Queries', () => {
                      "root_"."name" as "root_name2",
                      true as "root_meta_name1_readable1",
                      true as "root_meta_name1_readable2",
-                     "root_"."name" = $1 as "root_meta_name1_updatable1",
+                     "root_"."name" = ? as "root_meta_name1_updatable1",
                      "root_"."id" as "root_id"
                    from "public"."author" as "root_"`,
 					parameters: ['John'],
@@ -1737,7 +1737,7 @@ describe('Queries', () => {
                      "root_"."id" as "root_id",
                      "root_"."title" as "root_title"
                    from "public"."post" as "root_"
-                   where "root_"."author_id" in ($1)`,
+                   where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: {
 						rows: [],
@@ -1797,7 +1797,7 @@ describe('Queries', () => {
                      "root_"."post_id" as "root_post",
                      "root_"."id" as "root_id"
                    from "public"."post_locale" as "root_"
-                   where "root_"."locale" = $1 and "root_"."post_id" in ($2, $3)`,
+                   where "root_"."locale" = ? and "root_"."post_id" in (?, ?)`,
 					parameters: ['cs', testUuid(1), testUuid(2)],
 					response: {
 						rows: [

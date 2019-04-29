@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from 'graphql-tools'
 import typeDefs from '../../../../src/tenant-api/schema/tenant.graphql'
-import { executeGraphQlTest, SqlQuery } from '../../../src/testGraphql'
+import { executeGraphQlTest } from '../../../src/testGraphql'
 import { GQL, SQL } from '../../../src/tags'
 import 'mocha'
 import bcrypt from 'bcrypt'
@@ -12,6 +12,7 @@ import ApiKey from '../../../../src/tenant-api/model/type/ApiKey'
 import ResolverContext from '../../../../src/tenant-api/resolvers/ResolverContext'
 import Identity from '../../../../src/common/auth/Identity'
 import TenantContainer from '../../../../src/tenant-api/TenantContainer'
+import { createConnectionMock, SqlQuery } from '../../../src/ConnectionMock'
 
 export interface Test {
 	query: string
@@ -20,13 +21,15 @@ export interface Test {
 }
 
 export const execute = async (test: Test) => {
-	const tenantContainer = new TenantContainer.Factory().create({
+	const tenantContainer = new TenantContainer.Factory().createBuilder({
 		database: 'foo',
 		host: 'localhost',
 		port: 5432,
 		password: '123',
 		user: 'foo',
 	})
+		.replaceService('connection', () => createConnectionMock(test.executes))
+		.build()
 
 	const context: ResolverContext = new ResolverContext(
 		testUuid(998),
@@ -36,10 +39,9 @@ export const execute = async (test: Test) => {
 		}
 	)
 
-	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.testContainer.resolvers })
-	await executeGraphQlTest(tenantContainer.testContainer.connection, {
+	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.resolvers })
+	await executeGraphQlTest({
 		context: context,
-		executes: test.executes,
 		query: test.query,
 		return: test.return,
 		schema: schema,
@@ -67,36 +69,36 @@ describe('tenant api', () => {
                        "password_hash",
                        "identity_id"
                      from "tenant"."person"
-                     where "email" = $1`,
+                     where "email" = ?`,
 						parameters: ['john@doe.com'],
-						response: [],
+						response: {rows: []},
 					},
 					{
 						sql: SQL`BEGIN;`,
-						response: 1,
+						response: { rowCount: 1 },
 					},
 					{
-						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles") values ($1, $2, $3)`,
+						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles") values (?, ?, ?)`,
 						parameters: [testUuid(1), null, '[]'],
-						response: 1,
+						response: { rowCount: 1 },
 					},
 					{
-						sql: SQL`insert into "tenant"."person" ("id", "email", "password_hash", "identity_id") values ($1, $2, $3, $4)`,
+						sql: SQL`insert into "tenant"."person" ("id", "email", "password_hash", "identity_id") values (?, ?, ?, ?)`,
 						parameters: [testUuid(2), 'john@doe.com', (val: string) => bcrypt.compareSync('123', val), testUuid(1)],
-						response: 1,
+						response: { rowCount: 1 },
 					},
 					{
 						sql: SQL`COMMIT;`,
-						response: 1,
+						response: { rowCount: 1},
 					},
 					{
 						sql: SQL`select
                        "id",
                        "email"
                      from "tenant"."person"
-                     where "id" = $1`,
+                     where "id" = ?`,
 						parameters: [testUuid(2)],
-						response: [{ id: testUuid(2), email: 'john@doe.com' }],
+						response: {rows: [{ id: testUuid(2), email: 'john@doe.com' }]},
 					},
 					{
 						sql: SQL`select
@@ -104,17 +106,17 @@ describe('tenant api', () => {
                        "project"."name",
                        "project"."slug"
                      from "tenant"."project"
-                       inner join "tenant"."project_member" on "project_member"."project_id" = "project"."id"
-                     where "tenant"."project_member"."identity_id" = $1`,
+                       inner join "tenant"."project_member" as "project_member" on "project_member"."project_id" = "project"."id"
+                     where "project_member"."identity_id" = ?`,
 						parameters: [testUuid(1)],
-						response: [{ id: testUuid(3), name: 'foo', slug: 'foo' }],
+						response: {rows: [{ id: testUuid(3), name: 'foo', slug: 'foo' }]},
 					},
 					{
 						sql: SQL`update "tenant"."api_key"
-            set "enabled" = $1
-            where "id" = $2 and "type" = $3`,
+            set "enabled" = ?
+            where "id" = ? and "type" = ?`,
 						parameters: [false, testUuid(998), 'one_off'],
-						response: true,
+						response: { rowCount: 1 },
 					},
 				],
 				return: {
@@ -154,9 +156,9 @@ describe('tenant api', () => {
                        "password_hash",
                        "identity_id"
                      from "tenant"."person"
-                     where "email" = $1`,
+                     where "email" = ?`,
 						parameters: ['john@doe.com'],
-						response: [{ id: testUuid(1), password_hash: null, identity_id: null }],
+						response: {rows: [{ id: testUuid(1), password_hash: null, identity_id: null }]},
 					},
 				],
 				return: {
@@ -205,13 +207,13 @@ describe('tenant api', () => {
                        "password_hash",
                        "identity_id"
                      from "tenant"."person"
-                     where "email" = $1`,
+                     where "email" = ?`,
 						parameters: ['john@doe.com'],
-						response: [{ id: testUuid(1), password_hash: await bcrypt.hash('123', salt), identity_id: testUuid(2) }],
+						response: {rows: [{ id: testUuid(1), password_hash: await bcrypt.hash('123', salt), identity_id: testUuid(2) }]},
 					},
 					{
 						sql: SQL`insert into "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "enabled", "expires_at", "expiration", "created_at")
-            values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            values (?, ?, ?, ?, ?, ?, ?, ?)`,
 						parameters: [
 							testUuid(1),
 							ApiKey.computeTokenHash(buffer(20).toString('hex')),
@@ -222,16 +224,16 @@ describe('tenant api', () => {
 							null,
 							new Date('2018-10-12T08:00:00.000Z'),
 						],
-						response: 1,
+						response: { rowCount: 1 },
 					},
 					{
 						sql: SQL`select
                        "id",
                        "email"
                      from "tenant"."person"
-                     where "id" = $1`,
+                     where "id" = ?`,
 						parameters: [testUuid(1)],
-						response: [{ id: testUuid(1), email: 'john@doe.com' }],
+						response: {rows: [{ id: testUuid(1), email: 'john@doe.com' }]},
 					},
 					{
 						sql: SQL`select
@@ -239,10 +241,10 @@ describe('tenant api', () => {
                        "project"."name",
                        "project"."slug"
                      from "tenant"."project"
-                       inner join "tenant"."project_member" on "project_member"."project_id" = "project"."id"
-                     where "tenant"."project_member"."identity_id" = $1`,
+                       inner join "tenant"."project_member" as "project_member" on "project_member"."project_id" = "project"."id"
+                     where "project_member"."identity_id" = ?`,
 						parameters: [testUuid(2)],
-						response: [{ id: testUuid(3), name: 'foo' }],
+						response: {rows: [{ id: testUuid(3), name: 'foo' }]},
 					},
 				],
 				return: {

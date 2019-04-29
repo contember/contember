@@ -21,7 +21,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."author" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -32,7 +32,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."author" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},
@@ -84,11 +84,11 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."author" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
-						where "root_"."name" in ($3, $4)
+						where "root_"."name" in (?, ?)
 						returning "id"`,
 						parameters: [testUuid(1), 'John', 'John', 'Jack'],
 						response: { rows: [{ id: testUuid(1) }] },
@@ -96,7 +96,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."author" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},
@@ -134,7 +134,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "url") 
+						(select ? :: uuid as "id", ? :: text as "url") 
 						insert into "public"."site_setting" ("id", "url") 
 						select "root_"."id", "root_"."url"
             from "root_"
@@ -144,7 +144,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
+						(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id") 
 						insert into "public"."site" ("id", "name", "setting_id") 
 						select "root_"."id", "root_"."name", "root_"."setting_id"
             from "root_"
@@ -155,7 +155,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."site" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},
@@ -193,7 +193,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "url") 
+						(select ? :: uuid as "id", ? :: text as "url") 
 						insert into "public"."site_setting" ("id", "url") 
 						select "root_"."id", "root_"."url"
             from "root_"
@@ -203,7 +203,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name", $3 :: uuid as "setting_id") 
+						(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id") 
 						insert into "public"."site" ("id", "name", "setting_id") 
 						select "root_"."id", "root_"."name", "root_"."setting_id"
             from "root_"
@@ -214,7 +214,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."site_setting" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},
@@ -254,7 +254,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."author" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -264,7 +264,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: timestamp as "published_at", $3 :: uuid as "author_id") 
+						(select ? :: uuid as "id", ? :: timestamp as "published_at", ? :: uuid as "author_id") 
 						insert into "public"."post" ("id", "published_at", "author_id") 
 						select "root_"."id", "root_"."published_at", "root_"."author_id"
             from "root_"
@@ -275,7 +275,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},
@@ -325,7 +325,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: timestamp as "published_at") 
+						(select ? :: uuid as "id", ? :: timestamp as "published_at") 
 						insert into "public"."post" ("id", "published_at") 
 						select "root_"."id", "root_"."published_at"
             from "root_"
@@ -335,7 +335,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: text as "locale", $4 :: text as "title") 
+						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title") 
 						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"
@@ -345,7 +345,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "post_id", $2 :: uuid as "id", $3 :: text as "locale", $4 :: text as "title") 
+						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title") 
 						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"
@@ -356,7 +356,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},
@@ -393,7 +393,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."post" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -403,7 +403,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."category" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -413,7 +413,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."category" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -423,14 +423,14 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-          values ($1, $2, $3)
+          values (?, ?, ?)
           on conflict do nothing`,
 						parameters: [testUuid(4), testUuid(1), testUuid(2)],
 						response: 1,
 					},
 					{
 						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-          values ($1, $2, $3)
+          values (?, ?, ?)
           on conflict do nothing`,
 						parameters: [testUuid(5), testUuid(1), testUuid(3)],
 						response: 1,
@@ -438,7 +438,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},
@@ -477,7 +477,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."category" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -487,7 +487,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."post" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -497,7 +497,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as 
-						(select $1 :: uuid as "id", $2 :: text as "name") 
+						(select ? :: uuid as "id", ? :: text as "name") 
 						insert into "public"."post" ("id", "name") 
 						select "root_"."id", "root_"."name"
             from "root_"
@@ -507,14 +507,14 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-          values ($1, $2, $3)
+          values (?, ?, ?)
           on conflict do nothing`,
 						parameters: [testUuid(4), testUuid(2), testUuid(1)],
 						response: 1,
 					},
 					{
 						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-          values ($1, $2, $3)
+          values (?, ?, ?)
           on conflict do nothing`,
 						parameters: [testUuid(5), testUuid(3), testUuid(1)],
 						response: 1,
@@ -522,7 +522,7 @@ describe('Insert mutation', () => {
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."category" as "root_"
-                     where "root_"."id" = $1`,
+                     where "root_"."id" = ?`,
 						response: {
 							rows: [{ root_id: testUuid(1) }],
 						},

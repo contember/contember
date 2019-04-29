@@ -30,8 +30,7 @@ class ContentMiddlewareFactory {
 		> = (ctx, next) => {
 			const projectContainer = ctx.state.projectContainer
 			const stage = ctx.state.stage
-			const knex = projectContainer.connection
-			ctx.state.db = new KnexWrapper(knex, formatSchemaName(stage))
+			ctx.state.db = projectContainer.connection.createClient(formatSchemaName(stage))
 			return next()
 		}
 		const contentApollo: KoaMiddleware<

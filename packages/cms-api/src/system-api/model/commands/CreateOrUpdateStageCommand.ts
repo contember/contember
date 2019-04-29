@@ -3,6 +3,7 @@ import InsertBuilder from '../../../core/knex/InsertBuilder'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import { StageWithoutEvent } from '../dtos/Stage'
 import InitEventQuery from '../queries/InitEventQuery'
+import { wrapIdentifier } from '../../../core/knex/utils'
 
 class CreateOrUpdateStageCommand {
 	constructor(private readonly stage: StageWithoutEvent) {}
@@ -26,7 +27,7 @@ class CreateOrUpdateStageCommand {
 			.returning('event_id')
 			.execute()
 
-		await connection.raw('CREATE SCHEMA IF NOT EXISTS ??', formatSchemaName(this.stage))
+		await connection.query('CREATE SCHEMA IF NOT EXISTS ' + wrapIdentifier(formatSchemaName(this.stage)))
 
 		return result.length === 1 && result[0] === initEvent.id
 	}

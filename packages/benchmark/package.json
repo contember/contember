@@ -4,7 +4,8 @@
 	"private": true,
 	"scripts": {
 		"compare": "node dist/src/compare.js",
-		"benchmark": "node dist/src/benchmark.js"
+		"benchmark": "dotenv -- node dist/src/benchmark.js",
+		"start": "dotenv -- ./run.sh"
 	},
 	"dependencies": {
 		"autocannon": "^3.2.1",

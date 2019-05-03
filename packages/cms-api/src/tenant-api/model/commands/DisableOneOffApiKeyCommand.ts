@@ -13,7 +13,7 @@ class DisableOneOffApiKeyCommand implements Command<void> {
 				id: this.apiKeyId,
 				type: ApiKey.Type.ONE_OFF,
 			})
-			.values({ enabled: false })
+			.values({ disabled_at: new Date() })
 
 		await qb.execute()
 	}

@@ -27,7 +27,7 @@ class ApiKeyManager {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.NOT_FOUND)
 		}
 
-		if (apiKeyRow.enabled !== true) {
+		if (apiKeyRow.disabled_at !== null) {
 			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.DISABLED)
 		}
 

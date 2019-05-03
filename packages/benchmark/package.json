@@ -19,6 +19,6 @@
 	"devDependencies": {
 		"@types/request": "^2.48.1",
 		"dotenv-cli": "^1.4.0",
-		"typescript": "^3.3.3333"
+		"typescript": "^3.4.5"
 	}
 }

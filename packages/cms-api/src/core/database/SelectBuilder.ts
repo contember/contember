@@ -8,8 +8,8 @@ import Literal from './Literal'
 import Compiler from './Compiler'
 import Connection from './Connection'
 
-class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder<Result, never> = never>
-	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled>>, QueryBuilder {
+class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder.Options = never>
+	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled | 'orderBy'>>, QueryBuilder {
 	constructor(
 		public readonly wrapper: Client,
 		private readonly options: SelectBuilder.Options,

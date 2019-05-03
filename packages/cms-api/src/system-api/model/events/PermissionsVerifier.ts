@@ -114,7 +114,7 @@ class PermissionsVerifier {
 	): Promise<PermissionsByTable> {
 		const db = this.db.forSchema(formatSchemaName(stage))
 		const schema = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
-		const { permissions } = this.permissionsByIdentityFactory.createPermissions(schema, {
+		const { permissions } = this.permissionsByIdentityFactory.createPermissions(stage.slug, schema, {
 			globalRoles: context.identity.roles,
 			projectRoles: (await context.identity.getProjectRoles(this.project.id)) || [],
 		})

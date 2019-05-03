@@ -3,11 +3,14 @@ import PermissionFactory from './PermissionFactory'
 import { arrayEquals } from '../utils/arrays'
 import { Acl, Schema } from 'cms-common'
 import AuthIdentity from '../common/auth/Identity'
+import { filterObject } from '../utils/object'
 
 class PermissionsByIdentityFactory {
-	constructor(private readonly permissionFactories: PermissionsByIdentityFactory.PermissionFactory[]) {}
+	constructor(private readonly permissionFactories: PermissionsByIdentityFactory.PermissionFactory[]) {
+	}
 
 	public createPermissions(
+		stageSlug: string,
 		schema: Schema,
 		identity: PermissionsByIdentityFactory.Identity
 	): PermissionsByIdentityFactory.PermissionResult {
@@ -15,7 +18,23 @@ class PermissionsByIdentityFactory {
 		if (!permissionFactory) {
 			throw new Error('No suitable permission factory found')
 		}
-		return permissionFactory.createPermissions(schema, identity)
+		return permissionFactory.createPermissions({
+			...schema,
+			acl: this.extractAclForStage(schema.acl, stageSlug),
+		}, identity)
+	}
+
+	private extractAclForStage(acl: Acl.Schema, stageSlug: string): Acl.Schema {
+		return {
+			...acl,
+			roles: filterObject(acl.roles, (key, value) =>
+				value.stages === '*' || !!value.stages.find(pattern => this.matches(stageSlug, pattern))
+			),
+		}
+	}
+
+	private matches(stageSlug: string, pattern: string): boolean {
+		return !!(new RegExp(pattern).exec(stageSlug))
 	}
 }
 

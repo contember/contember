@@ -9,6 +9,7 @@ class PermissionsFactory {
 		permissions.allow(Identity.SystemRole.LOGIN, ...Actions.PERSON_SIGN_IN)
 		permissions.allow(Identity.SystemRole.SETUP, ...Actions.SYSTEM_SETUP)
 		permissions.allow(Identity.SystemRole.SELF, ...Actions.PERSON_CHANGE_PASSWORD)
+		permissions.allow(Identity.SystemRole.PERSON, ...Actions.PERSON_SIGN_OUT)
 
 		return permissions
 	}

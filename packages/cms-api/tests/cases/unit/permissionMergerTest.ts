@@ -27,6 +27,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {},
@@ -40,6 +41,7 @@ describe('permission merger', () => {
 					},
 					role2: {
 						inherits: ['role1'],
+						stages: '*',
 						entities: {
 							Entity2: {
 								predicates: {},
@@ -81,6 +83,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {},
@@ -93,6 +96,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {},
@@ -127,6 +131,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {},
@@ -139,6 +144,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -177,6 +183,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {},
@@ -190,6 +197,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -226,6 +234,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -241,6 +250,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -281,6 +291,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -293,6 +304,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -328,6 +340,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -343,6 +356,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {
@@ -383,6 +397,7 @@ describe('permission merger', () => {
 				variables: {},
 				roles: {
 					role1: {
+						stages: '*',
 						entities: {
 							Entity1: {
 								predicates: {

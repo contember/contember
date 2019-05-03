@@ -1061,6 +1061,7 @@ describe('Diff schemas', () => {
 			variables: {},
 			roles: {
 				admin: {
+					stages: '*',
 					entities: {
 						Site: {
 							predicates: {},

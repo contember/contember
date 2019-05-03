@@ -237,7 +237,10 @@ const model = builder.buildSchema()
 const acl: Acl.Schema = {
 	variables: {},
 	roles: {
-		admin: { entities: new AllowAllPermissionFactory().create(model) }
+		admin: {
+			stages: '*',
+			entities: new AllowAllPermissionFactory().create(model),
+		}
 	}
 }
 

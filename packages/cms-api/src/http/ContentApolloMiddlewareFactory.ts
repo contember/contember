@@ -33,7 +33,7 @@ class ContentApolloMiddlewareFactory {
 			}
 			const schema = this.schemaCache[stage.id]
 
-			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
+			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(stage.slug, schema, {
 				projectRoles: ctx.state.projectRoles,
 				globalRoles: ctx.state.authResult.roles,
 			})

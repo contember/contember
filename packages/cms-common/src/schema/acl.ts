@@ -58,8 +58,12 @@ namespace Acl {
 	export type PredicateReference = string
 	export type Predicate = PredicateReference | true
 
+	export type AnyStage = '*'
+	export type StagesDefinition = AnyStage | (string[])
+
 	export interface RolePermissions {
 		inherits?: string[]
+		stages: StagesDefinition
 		entities: Permissions
 	}
 

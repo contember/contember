@@ -18,7 +18,7 @@ class GraphQlSchemaFactory {
 		private readonly permissionFactory: PermissionsByIdentityFactory
 	) {}
 
-	public create(schema: Schema, identity: PermissionsByIdentityFactory.Identity): [GraphQLSchema, Acl.Permissions] {
+	public create(stageSlug: string, schema: Schema, identity: PermissionsByIdentityFactory.Identity): [GraphQLSchema, Acl.Permissions] {
 		let schemaCacheEntry = this.cache.find(it => it.schema.model === schema.model && it.schema.acl === schema.acl)
 		if (!schemaCacheEntry) {
 			schemaCacheEntry = {
@@ -33,7 +33,7 @@ class GraphQlSchemaFactory {
 			}
 		}
 
-		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
+		const { permissions, verifier } = this.permissionFactory.createPermissions(stageSlug, schema, identity)
 
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, permissions)
 		const graphQlSchema = dataSchemaBuilder.build()

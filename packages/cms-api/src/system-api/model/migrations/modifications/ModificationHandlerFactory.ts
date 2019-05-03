@@ -18,6 +18,7 @@ import RemoveEntityModification from './entities/RemoveEntityModification'
 import CreateEntityModification from './entities/CreateEntityModification'
 import RemoveUniqueConstraintModification from './constraints/RemoveUniqueConstraintModification'
 import UpdateEntityNameModification from './entities/UpdateEntityNameModification'
+import PatchAclSchemaModification from './acl/PatchAclSchemaModification'
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: ModificationHandlerFactory.FactoryMap<any>) {}
@@ -36,6 +37,7 @@ namespace ModificationHandlerFactory {
 
 	export const defaultFactoryMap: FactoryMap<any> = {
 		[UpdateAclSchemaModification.id]: ({ data }) => new UpdateAclSchemaModification(data),
+		[PatchAclSchemaModification.id]: ({ data }) => new PatchAclSchemaModification(data),
 
 		[CreateColumnModification.id]: ({ data, schema }) => new CreateColumnModification(data, schema),
 		[UpdateColumnDefinitionModification.id]: ({ data, schema }) => new UpdateColumnDefinitionModification(data, schema),

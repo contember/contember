@@ -15,7 +15,7 @@ class ApiKeyByTokenQuery extends DbQuery<ApiKeyByTokenQuery.Result> {
 			.select(['api_key', 'id'])
 			.select(['api_key', 'type'])
 			.select(['api_key', 'identity_id'])
-			.select(['api_key', 'enabled'])
+			.select(['api_key', 'disabled_at'])
 			.select(['api_key', 'expires_at'])
 			.select(['identity', 'roles'])
 			.select(['api_key', 'expiration'])
@@ -38,8 +38,8 @@ namespace ApiKeyByTokenQuery {
 		readonly id: string
 		readonly type: ApiKey.Type
 		readonly identity_id: string
-		readonly enabled: boolean
-		readonly expires_at: Date
+		readonly disabled_at: Date | null
+		readonly expires_at: Date | null
 		readonly expiration: number | null
 		readonly roles: string[]
 	}

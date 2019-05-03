@@ -32,7 +32,7 @@ class CreateApiKey implements Command<CreateApiKey.Result> {
 				token_hash: tokenHash,
 				type: this.type,
 				identity_id: this.identityId,
-				enabled: true,
+				disabled_at: null,
 				expires_at: ApiKeyHelper.getExpiration(this.type, this.expiration),
 				expiration: this.expiration || null,
 				created_at: now(),

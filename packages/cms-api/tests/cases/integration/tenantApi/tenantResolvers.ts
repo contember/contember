@@ -115,9 +115,9 @@ describe('tenant api', () => {
 					},
 					{
 						sql: SQL`update "tenant"."api_key"
-            set "enabled" = ?
+            set "disabled_at" = ?
             where "id" = ? and "type" = ?`,
-						parameters: [false, testUuid(998), 'one_off'],
+						parameters: [(val: any) => val instanceof Date, testUuid(998), 'one_off'],
 						response: { rowCount: 1 },
 					},
 				],
@@ -216,14 +216,14 @@ describe('tenant api', () => {
 						},
 					},
 					{
-						sql: SQL`insert into "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "enabled", "expires_at", "expiration", "created_at")
+						sql: SQL`insert into "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at")
             values (?, ?, ?, ?, ?, ?, ?, ?)`,
 						parameters: [
 							testUuid(1),
 							ApiKey.computeTokenHash(buffer(20).toString('hex')),
 							'session',
 							testUuid(2),
-							true,
+							null,
 							new Date('2018-10-12T08:30:00.000Z'),
 							null,
 							new Date('2018-10-12T08:00:00.000Z'),

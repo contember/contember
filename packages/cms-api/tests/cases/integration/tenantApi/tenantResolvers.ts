@@ -380,7 +380,6 @@ describe('tenant api', () => {
 			})
 		})
 
-
 		it('sign out - not a person', async () => {
 			await execute({
 				query: GQL`mutation {
@@ -406,9 +405,9 @@ describe('tenant api', () => {
 							ok: false,
 							errors: [
 								{
-									code: 'NOT_A_PERSON'
-								}
-							]
+									code: 'NOT_A_PERSON',
+								},
+							],
 						},
 					},
 				},

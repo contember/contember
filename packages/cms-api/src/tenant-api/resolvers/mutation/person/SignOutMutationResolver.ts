@@ -11,8 +11,7 @@ export default class SignOutMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly queryHandler: QueryHandler<DbQueryable>
-	) {
-	}
+	) {}
 
 	async signOut(
 		parent: any,
@@ -30,10 +29,8 @@ export default class SignOutMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign out',
 		})
 
-
 		if (args.all) {
 			await this.apiKeyManager.disableIdentityApiKeys(context.identity.id)
-
 		} else {
 			await this.apiKeyManager.disableApiKey(context.apiKeyId)
 		}

@@ -115,28 +115,7 @@ namespace TenantContainer {
 
 				.addService(
 					'resolvers',
-					({
-						meQueryResolver,
-						signUpMutationResolver,
-						signInMutationResolver,
-						signOutMutationResolver,
-						changePasswordMutationResolver,
-						addProjectMemberMutationResolver,
-						setupMutationResolver,
-						updateProjectMemberVariablesMutationResolver,
-						createApiKeyMutationResolver,
-					}) =>
-						new ResolverFactory(
-							meQueryResolver,
-							signUpMutationResolver,
-							signInMutationResolver,
-							signOutMutationResolver,
-							changePasswordMutationResolver,
-							addProjectMemberMutationResolver,
-							setupMutationResolver,
-							updateProjectMemberVariablesMutationResolver,
-							createApiKeyMutationResolver
-						).create()
+					(container) => new ResolverFactory(container).create()
 				)
 
 				.addService('apolloServer', ({ resolvers, projectMemberManager, authorizator }) =>

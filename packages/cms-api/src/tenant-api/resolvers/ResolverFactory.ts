@@ -1,16 +1,4 @@
 import { Config } from 'apollo-server-core'
-import { GraphQLResolveInfo } from 'graphql'
-
-import {
-	MutationAddProjectMemberArgs,
-	MutationChangePasswordArgs,
-	MutationCreateApiKeyArgs,
-	MutationSetupArgs,
-	MutationSignInArgs, MutationSignOutArgs,
-	MutationSignUpArgs,
-	MutationUpdateProjectMemberVariablesArgs,
-} from '../schema/types'
-import ResolverContext from './ResolverContext'
 
 import MeQueryResolver from './query/MeQueryResolver'
 
@@ -24,128 +12,39 @@ import ChangePasswordMutationResolver from './mutation/person/ChangePasswordMuta
 import SignOutMutationResolver from './mutation/person/SignOutMutationResolver'
 
 class ResolverFactory {
-	public constructor(
-		private meQueryResolver: MeQueryResolver,
-		private signUpMutationResolver: SignUpMutationResolver,
-		private signInMutationResolver: SignInMutationResolver,
-		private signOutMutationResolver: SignOutMutationResolver,
-		private changePasswordMutationResolver: ChangePasswordMutationResolver,
-		private addProjectMemberMutationResolver: AddProjectMemberMutationResolver,
-		private setupMutationResolver: SetupMutationResolver,
-		private updateProjectMemberVariablesMutationResolver: UpdateProjectMemberVariablesMutationResolver,
-		private createApiKeyMutationResolver: CreateApiKeyMutationResolver
-	) {}
+	public constructor(private readonly resolvers: {
+		                   meQueryResolver: MeQueryResolver,
+		                   signUpMutationResolver: SignUpMutationResolver,
+		                   signInMutationResolver: SignInMutationResolver,
+		                   signOutMutationResolver: SignOutMutationResolver,
+		                   changePasswordMutationResolver: ChangePasswordMutationResolver,
+		                   addProjectMemberMutationResolver: AddProjectMemberMutationResolver,
+		                   setupMutationResolver: SetupMutationResolver,
+		                   updateProjectMemberVariablesMutationResolver: UpdateProjectMemberVariablesMutationResolver,
+		                   createApiKeyMutationResolver: CreateApiKeyMutationResolver
+	                   }
+	) {
+	}
 
 	create(): Config['resolvers'] {
 		return {
 			Query: {
-				me: this.meQueryResolver.me.bind(this.meQueryResolver),
+				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),
 			},
 			Mutation: {
-				signUp: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.signUpMutationResolver.signUp.call(
-						this.signUpMutationResolver,
-						parent,
-						args as MutationSignUpArgs,
-						context,
-						info
-					),
-				signIn: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.signInMutationResolver.signIn.call(
-						this.signInMutationResolver,
-						parent,
-						args as MutationSignInArgs,
-						context,
-						info
-					),
-				signOut: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.signOutMutationResolver.signOut.call(
-						this.signOutMutationResolver,
-						parent,
-						args as MutationSignOutArgs,
-						context,
-						info
-					),
-				changePassword: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.changePasswordMutationResolver.changePassword.call(
-						this.changePasswordMutationResolver,
-						parent,
-						args as MutationChangePasswordArgs,
-						context,
-						info
-					),
-				addProjectMember: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.addProjectMemberMutationResolver.addProjectMember.call(
-						this.addProjectMemberMutationResolver,
-						parent,
-						args as MutationAddProjectMemberArgs,
-						context,
-						info
-					),
-				setup: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.setupMutationResolver.setup.call(
-						this.setupMutationResolver,
-						parent,
-						args as MutationSetupArgs,
-						context,
-						info
-					),
-				updateProjectMemberVariables: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.updateProjectMemberVariablesMutationResolver.updateProjectMemberVariables.call(
-						this.updateProjectMemberVariablesMutationResolver,
-						parent,
-						args as MutationUpdateProjectMemberVariablesArgs,
-						context,
-						info
-					),
-				createApiKey: (
-					parent: any,
-					args: ResolverFactory.FieldResolverArgs,
-					context: ResolverContext,
-					info: GraphQLResolveInfo
-				) =>
-					this.createApiKeyMutationResolver.createApiKey.call(
-						this.createApiKeyMutationResolver,
-						parent,
-						args as MutationCreateApiKeyArgs,
-						context,
-						info
-					),
+				signUp: this.resolvers.signUpMutationResolver.signUp.bind(this.resolvers.signUpMutationResolver),
+				signIn: this.resolvers.signInMutationResolver.signIn.bind(this.resolvers.signInMutationResolver),
+				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),
+				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(this.resolvers.changePasswordMutationResolver),
+				addProjectMember: this.resolvers.addProjectMemberMutationResolver.addProjectMember.bind(
+					this.resolvers.addProjectMemberMutationResolver
+				),
+				setup: this.resolvers.setupMutationResolver.setup.bind(this.resolvers.setupMutationResolver),
+				updateProjectMemberVariables: this.resolvers.updateProjectMemberVariablesMutationResolver.updateProjectMemberVariables.bind(
+					this.resolvers.updateProjectMemberVariablesMutationResolver
+				),
+				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(
+					this.resolvers.createApiKeyMutationResolver),
 			},
 		}
 	}

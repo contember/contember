@@ -12,6 +12,7 @@ namespace Actions {
 
 	export const PERSON_SIGN_IN: Authorizator.Action = [Resources.person, 'signIn']
 	export const PERSON_SIGN_UP: Authorizator.Action = [Resources.person, 'signUp']
+	export const PERSON_CHANGE_PASSWORD: Authorizator.Action = [Resources.person, 'changePassword']
 
 	export const PROJECT_ADD_MEMBER: Authorizator.Action = [Resources.project, 'addMember']
 	export const PROJECT_UPDATE_MEMBER_VARIABLES: Authorizator.Action = [Resources.project, 'updateMemberVariables']

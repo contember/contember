@@ -18,9 +18,11 @@ import ProjectMemberManager from './model/service/ProjectMemberManager'
 import ResolverFactory from './resolvers/ResolverFactory'
 import AccessEvaluator from '../core/authorization/AccessEvalutator'
 import Authorizator from '../core/authorization/Authorizator'
-import { ApolloServer, Config } from 'apollo-server-koa'
+import { ApolloServer } from 'apollo-server-koa'
 import ProjectManager from './model/service/ProjectManager'
 import Connection from '../core/database/Connection'
+import ChangePasswordMutationResolver from './resolvers/mutation/person/ChangePasswordMutationResolver'
+import PasswordChangeManager from './model/service/PasswordChangeManager'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -65,6 +67,7 @@ namespace TenantContainer {
 
 				.addService('apiKeyManager', ({ queryHandler, db }) => new ApiKeyManager(queryHandler, db))
 				.addService('signUpManager', ({ queryHandler, db }) => new SignUpManager(queryHandler, db))
+				.addService('passwordChangeManager', ({ db }) => new PasswordChangeManager(db))
 				.addService(
 					'signInManager',
 					({ queryHandler, apiKeyManager }) => new SignInManager(queryHandler, apiKeyManager)
@@ -81,6 +84,11 @@ namespace TenantContainer {
 				.addService(
 					'signInMutationResolver',
 					({ signInManager, queryHandler }) => new SignInMutationResolver(signInManager, queryHandler)
+				)
+				.addService(
+					'changePasswordMutationResolver',
+					({ passwordChangeManager, queryHandler }) =>
+						new ChangePasswordMutationResolver(passwordChangeManager, queryHandler)
 				)
 				.addService(
 					'addProjectMemberMutationResolver',
@@ -106,6 +114,7 @@ namespace TenantContainer {
 						meQueryResolver,
 						signUpMutationResolver,
 						signInMutationResolver,
+						changePasswordMutationResolver,
 						addProjectMemberMutationResolver,
 						setupMutationResolver,
 						updateProjectMemberVariablesMutationResolver,
@@ -115,6 +124,7 @@ namespace TenantContainer {
 							meQueryResolver,
 							signUpMutationResolver,
 							signInMutationResolver,
+							changePasswordMutationResolver,
 							addProjectMemberMutationResolver,
 							setupMutationResolver,
 							updateProjectMemberVariablesMutationResolver,

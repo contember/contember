@@ -54,7 +54,7 @@ describe('tenant api', () => {
 		it('signs up', async () => {
 			await execute({
 				query: GQL`mutation {
-          signUp(email: "john@doe.com", password: "123") {
+          signUp(email: "john@doe.com", password: "123456") {
             ok
             result {
               person {
@@ -85,7 +85,7 @@ describe('tenant api', () => {
 					},
 					{
 						sql: SQL`insert into "tenant"."person" ("id", "email", "password_hash", "identity_id") values (?, ?, ?, ?)`,
-						parameters: [testUuid(2), 'john@doe.com', (val: string) => bcrypt.compareSync('123', val), testUuid(1)],
+						parameters: [testUuid(2), 'john@doe.com', (val: string) => bcrypt.compareSync('123456', val), testUuid(1)],
 						response: { rowCount: 1 },
 					},
 					{
@@ -95,7 +95,8 @@ describe('tenant api', () => {
 					{
 						sql: SQL`select
                        "id",
-                       "email"
+                       "email",
+                       "identity_id"
                      from "tenant"."person"
                      where "id" = ?`,
 						parameters: [testUuid(2)],
@@ -232,7 +233,8 @@ describe('tenant api', () => {
 					{
 						sql: SQL`select
                        "id",
-                       "email"
+                       "email",
+                       "identity_id"
                      from "tenant"."person"
                      where "id" = ?`,
 						parameters: [testUuid(1)],
@@ -265,6 +267,45 @@ describe('tenant api', () => {
 				},
 			})
 			randomBytesStub.restore()
+		})
+
+		it('change password', async () => {
+			await execute({
+				query: GQL`mutation {
+          changePassword(personId: "${testUuid(1)}", password: "123456") {
+            ok
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`select "id", "email", "identity_id" from "tenant"."person" where "id" = ?`,
+						parameters: [testUuid(1)],
+						response: {
+							rows: [
+								{
+									id: testUuid(1),
+									email: 'john@doe.com',
+									identity_id: testUuid(2),
+								},
+							],
+						},
+					},
+					{
+						sql: SQL`update "tenant"."person"
+                     set "password_hash" = ?
+                     where "id" = ?`,
+						parameters: [(val: string) => bcrypt.compareSync('123456', val), testUuid(1)],
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						changePassword: {
+							ok: true,
+						},
+					},
+				},
+			})
 		})
 	})
 })

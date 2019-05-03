@@ -6,8 +6,7 @@ import ProjectScope from '../../../model/authorization/ProjectScope'
 import Actions from '../../../model/authorization/Actions'
 
 export default class AddProjectMemberMutationResolver implements MutationResolvers {
-	constructor(private readonly projectMemberManager: ProjectMemberManager) {
-	}
+	constructor(private readonly projectMemberManager: ProjectMemberManager) {}
 
 	async addProjectMember(
 		parent: any,
@@ -18,7 +17,7 @@ export default class AddProjectMemberMutationResolver implements MutationResolve
 		await context.requireAccess({
 			scope: new ProjectScope(projectId),
 			action: Actions.PROJECT_ADD_MEMBER,
-			message: 'You are not allowed to add a project member'
+			message: 'You are not allowed to add a project member',
 		})
 
 		const result = await this.projectMemberManager.addProjectMember(projectId, identityId, [...roles])

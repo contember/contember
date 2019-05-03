@@ -1,6 +1,7 @@
 import Connection from '../../src/core/database/Connection'
 import { expect } from 'chai'
 import Client from '../../src/core/database/Client'
+import EventManager from '../../src/core/database/EventManager'
 
 export interface SqlQuery {
 	sql: string
@@ -12,6 +13,8 @@ class ConnectionMockError extends Error {}
 
 export const createConnectionMock = (queries: SqlQuery[]): Connection.TransactionLike & Connection.ClientFactory => {
 	return new class implements Connection.TransactionLike {
+		public readonly eventManager = new EventManager()
+
 		query<Row extends Record<string, any>>(
 			sql: string,
 			parameters?: any[],

@@ -12,7 +12,6 @@ import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import Connection from '../core/database/Connection'
-import EventManager from '../core/database/EventManager'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
@@ -29,16 +28,7 @@ class ContentApolloServerFactory {
 		const newServer = new ApolloServer({
 			tracing: true,
 			introspection: true,
-			extensions: [
-				() => new ErrorHandlerExtension(),
-				() => {
-					const queriesExt = new DbQueriesExtension()
-					this.connection.eventManager.on(EventManager.Event.queryEnd, ({ sql, parameters, meta }, { timing }) =>
-						queriesExt.addQuery({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta })
-					)
-					return queriesExt
-				},
-			],
+			extensions: [() => new ErrorHandlerExtension(), () => new DbQueriesExtension()],
 			formatError: (error: any) => {
 				if (error instanceof AuthenticationError) {
 					return { message: error.message, locations: undefined, path: undefined }

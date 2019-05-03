@@ -3,7 +3,7 @@ import EventManager from './EventManager'
 import Connection from './Connection'
 import { wrapIdentifier } from './utils'
 
-export class Transaction implements Connection.Queryable, Connection.TransactionLike {
+export class Transaction implements Connection.TransactionLike {
 	private _isClosed = false
 
 	private queryContext: Connection.QueryContext = {}
@@ -16,7 +16,7 @@ export class Transaction implements Connection.Queryable, Connection.Transaction
 
 	constructor(
 		private readonly pgClient: PoolClient,
-		private readonly eventManager: EventManager,
+		public readonly eventManager: EventManager,
 		private readonly config: Connection.QueryConfig
 	) {}
 
@@ -71,11 +71,15 @@ export class Transaction implements Connection.Queryable, Connection.Transaction
 	}
 }
 
-class SavePoint implements Connection.Queryable, Connection.TransactionLike {
+class SavePoint implements Connection.TransactionLike {
 	private _isClosed = false
 
 	public get isClosed(): boolean {
 		return this._isClosed
+	}
+
+	public get eventManager(): EventManager {
+		return this.transactionInst.eventManager
 	}
 
 	constructor(

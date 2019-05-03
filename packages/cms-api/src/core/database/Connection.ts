@@ -23,7 +23,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 	): Promise<Result> {
 		const client = await this.pool.connect()
 		await client.query('BEGIN')
-		const transaction = new Transaction(client, this.eventManager, this.queryConfig)
+		const transaction = new Transaction(client, new EventManager(this.eventManager), this.queryConfig)
 		try {
 			const result = await callback(transaction)
 
@@ -71,6 +71,8 @@ namespace Connection {
 	}
 
 	export interface Queryable {
+		readonly eventManager: EventManager
+
 		query<Row extends Record<string, any>>(
 			sql: string,
 			parameters?: any[],

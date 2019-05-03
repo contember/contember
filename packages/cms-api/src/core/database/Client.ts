@@ -5,10 +5,15 @@ import SelectBuilder from './SelectBuilder'
 import Connection from './Connection'
 import QueryHandler from '../query/QueryHandler'
 import DbQueryable from './DbQueryable'
+import EventManager from './EventManager'
 
 class Client<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
 	implements Connection.Queryable {
 	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {}
+
+	get eventManager(): EventManager {
+		return this.connection.eventManager
+	}
 
 	public forSchema(schema: string): Client {
 		return new Client(this.connection, schema)

@@ -7,6 +7,8 @@ class EventManager {
 		[EventManager.Event.queryError]: [],
 	}
 
+	constructor(private readonly parent: EventManager | null = null) {}
+
 	on(event: EventManager.Event.queryStart, cb: EventManager.QueryStartCallback): void
 	on(event: EventManager.Event.queryEnd, cb: EventManager.QueryEndCallback): void
 	on(event: EventManager.Event.queryError, cb: EventManager.QueryErrorCallback): void
@@ -19,6 +21,9 @@ class EventManager {
 	fire(event: EventManager.Event.queryError, ...params: Parameters<EventManager.QueryErrorCallback>): void
 	fire<Event extends EventManager.Event>(event: Event, ...params: Parameters<EventManager.ListenerTypes[Event]>): void {
 		this.listeners[event].forEach((cb: any) => cb(...(params as any)))
+		if (this.parent) {
+			this.parent.fire(event as any, ...(params as [any, any]))
+		}
 	}
 }
 

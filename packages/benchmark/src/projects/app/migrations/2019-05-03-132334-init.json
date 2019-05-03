@@ -98,25 +98,6 @@
 		{
 			"modification": "createEntity",
 			"entity": {
-				"name": "Medium",
-				"primary": "id",
-				"primaryColumn": "id",
-				"tableName": "medium",
-				"fields": {
-					"id": {
-						"name": "id",
-						"columnName": "id",
-						"nullable": false,
-						"type": "Uuid",
-						"columnType": "uuid"
-					}
-				},
-				"unique": {}
-			}
-		},
-		{
-			"modification": "createEntity",
-			"entity": {
 				"name": "Seo",
 				"primary": "id",
 				"primaryColumn": "id",
@@ -419,24 +400,583 @@
 			}
 		},
 		{
-			"modification": "createEnum",
-			"enumName": "One",
-			"values": ["One"]
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin",
+					"value": {
+						"stages": "*",
+						"entities": {
+							"Locale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"slug": true,
+										"title": true
+									},
+									"update": {
+										"id": true,
+										"slug": true,
+										"title": true
+									},
+									"create": {
+										"id": true,
+										"slug": true,
+										"title": true
+									},
+									"delete": true
+								}
+							},
+							"Linkable": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"redirect": true,
+										"page": true,
+										"contact": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"redirect": true,
+										"page": true,
+										"contact": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"redirect": true,
+										"page": true,
+										"contact": true
+									},
+									"delete": true
+								}
+							},
+							"Redirect": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"link": true,
+										"target": true
+									},
+									"update": {
+										"id": true,
+										"link": true,
+										"target": true
+									},
+									"create": {
+										"id": true,
+										"link": true,
+										"target": true
+									},
+									"delete": true
+								}
+							},
+							"Image": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true
+									},
+									"update": {
+										"id": true,
+										"url": true
+									},
+									"create": {
+										"id": true,
+										"url": true
+									},
+									"delete": true
+								}
+							},
+							"Video": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"poster": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"poster": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"poster": true
+									},
+									"delete": true
+								}
+							},
+							"Seo": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"title": true,
+										"ogImage": true,
+										"description": true,
+										"ogTitle": true,
+										"ogDescription": true
+									},
+									"update": {
+										"id": true,
+										"title": true,
+										"ogImage": true,
+										"description": true,
+										"ogTitle": true,
+										"ogDescription": true
+									},
+									"create": {
+										"id": true,
+										"title": true,
+										"ogImage": true,
+										"description": true,
+										"ogTitle": true,
+										"ogDescription": true
+									},
+									"delete": true
+								}
+							},
+							"ImageGrid": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"imagePosition1": true,
+										"imagePosition2": true,
+										"imagePosition3": true
+									},
+									"update": {
+										"id": true,
+										"imagePosition1": true,
+										"imagePosition2": true,
+										"imagePosition3": true
+									},
+									"create": {
+										"id": true,
+										"imagePosition1": true,
+										"imagePosition2": true,
+										"imagePosition3": true
+									},
+									"delete": true
+								}
+							},
+							"BlockPerson": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"person": true,
+										"Block": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"person": true,
+										"Block": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"person": true,
+										"Block": true
+									},
+									"delete": true
+								}
+							},
+							"Block": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"type": true,
+										"text": true,
+										"imageGrid": true,
+										"image": true,
+										"category": true,
+										"people": true,
+										"PageLocale": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"type": true,
+										"text": true,
+										"imageGrid": true,
+										"image": true,
+										"category": true,
+										"people": true,
+										"PageLocale": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"type": true,
+										"text": true,
+										"imageGrid": true,
+										"image": true,
+										"category": true,
+										"people": true,
+										"PageLocale": true
+									},
+									"delete": true
+								}
+							},
+							"MenuItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"MenuItemLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"menuItem": true,
+										"id": true,
+										"label": true,
+										"target": true,
+										"locale": true
+									},
+									"update": {
+										"menuItem": true,
+										"id": true,
+										"label": true,
+										"target": true,
+										"locale": true
+									},
+									"create": {
+										"menuItem": true,
+										"id": true,
+										"label": true,
+										"target": true,
+										"locale": true
+									},
+									"delete": true
+								}
+							},
+							"Footer": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"FooterLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"footer": true,
+										"id": true,
+										"locale": true,
+										"address": true
+									},
+									"update": {
+										"footer": true,
+										"id": true,
+										"locale": true,
+										"address": true
+									},
+									"create": {
+										"footer": true,
+										"id": true,
+										"locale": true,
+										"address": true
+									},
+									"delete": true
+								}
+							},
+							"Person": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"image": true,
+										"email": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"image": true,
+										"email": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"image": true,
+										"email": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"PersonLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"person": true,
+										"id": true,
+										"locale": true,
+										"quote": true,
+										"name": true,
+										"position": true
+									},
+									"update": {
+										"person": true,
+										"id": true,
+										"locale": true,
+										"quote": true,
+										"name": true,
+										"position": true
+									},
+									"create": {
+										"person": true,
+										"id": true,
+										"locale": true,
+										"quote": true,
+										"name": true,
+										"position": true
+									},
+									"delete": true
+								}
+							},
+							"Page": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"locales": true,
+										"image": true,
+										"category": true
+									},
+									"update": {
+										"id": true,
+										"locales": true,
+										"image": true,
+										"category": true
+									},
+									"create": {
+										"id": true,
+										"locales": true,
+										"image": true,
+										"category": true
+									},
+									"delete": true
+								}
+							},
+							"PageLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"page": true,
+										"id": true,
+										"state": true,
+										"header": true,
+										"perex": true,
+										"content": true,
+										"contactUs": true,
+										"seo": true,
+										"locale": true,
+										"link": true
+									},
+									"update": {
+										"page": true,
+										"id": true,
+										"state": true,
+										"header": true,
+										"perex": true,
+										"content": true,
+										"contactUs": true,
+										"seo": true,
+										"locale": true,
+										"link": true
+									},
+									"create": {
+										"page": true,
+										"id": true,
+										"state": true,
+										"header": true,
+										"perex": true,
+										"content": true,
+										"contactUs": true,
+										"seo": true,
+										"locale": true,
+										"link": true
+									},
+									"delete": true
+								}
+							},
+							"CategoryLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"locale": true,
+										"category": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"locale": true,
+										"category": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"locale": true,
+										"category": true
+									},
+									"delete": true
+								}
+							},
+							"Category": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"pages": true,
+										"id": true,
+										"locales": true
+									},
+									"update": {
+										"pages": true,
+										"id": true,
+										"locales": true
+									},
+									"create": {
+										"pages": true,
+										"id": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"Contact": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"ContactLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"contact": true,
+										"id": true,
+										"locale": true,
+										"header": true,
+										"seo": true,
+										"link": true
+									},
+									"update": {
+										"contact": true,
+										"id": true,
+										"locale": true,
+										"header": true,
+										"seo": true,
+										"link": true
+									},
+									"create": {
+										"contact": true,
+										"id": true,
+										"locale": true,
+										"header": true,
+										"seo": true,
+										"link": true
+									},
+									"delete": true
+								}
+							}
+						}
+					}
+				}
+			]
 		},
 		{
 			"modification": "createEnum",
-			"enumName": "MediumType",
-			"values": ["image", "video"]
+			"enumName": "One",
+			"values": [
+				"One"
+			]
 		},
 		{
 			"modification": "createEnum",
 			"enumName": "State",
-			"values": ["Draft", "ToBePublished", "Published"]
+			"values": [
+				"Draft",
+				"ToBePublished",
+				"Published"
+			]
 		},
 		{
 			"modification": "createEnum",
 			"enumName": "BlockType",
-			"values": ["Heading", "Text", "Image", "ImageGrid", "People", "Category"]
+			"values": [
+				"Heading",
+				"Text",
+				"Image",
+				"ImageGrid",
+				"People",
+				"Category"
+			]
 		},
 		{
 			"modification": "createColumn",
@@ -545,46 +1085,6 @@
 		},
 		{
 			"modification": "createColumn",
-			"entityName": "Medium",
-			"field": {
-				"name": "type",
-				"columnName": "type",
-				"nullable": true,
-				"type": "Enum",
-				"columnType": "MediumType",
-				"enumName": "MediumType"
-			}
-		},
-		{
-			"modification": "createRelation",
-			"entityName": "Medium",
-			"owningSide": {
-				"name": "image",
-				"nullable": true,
-				"type": "ManyHasOne",
-				"target": "Image",
-				"joiningColumn": {
-					"columnName": "image_id",
-					"onDelete": "cascade"
-				}
-			}
-		},
-		{
-			"modification": "createRelation",
-			"entityName": "Medium",
-			"owningSide": {
-				"name": "video",
-				"nullable": true,
-				"type": "ManyHasOne",
-				"target": "Video",
-				"joiningColumn": {
-					"columnName": "video_id",
-					"onDelete": "cascade"
-				}
-			}
-		},
-		{
-			"modification": "createColumn",
 			"entityName": "Seo",
 			"field": {
 				"name": "title",
@@ -679,48 +1179,6 @@
 				"target": "Image",
 				"joiningColumn": {
 					"columnName": "image_position3_id",
-					"onDelete": "cascade"
-				}
-			}
-		},
-		{
-			"modification": "createRelation",
-			"entityName": "ImageGrid",
-			"owningSide": {
-				"name": "imagePosition4",
-				"nullable": true,
-				"type": "ManyHasOne",
-				"target": "Image",
-				"joiningColumn": {
-					"columnName": "image_position4_id",
-					"onDelete": "cascade"
-				}
-			}
-		},
-		{
-			"modification": "createRelation",
-			"entityName": "ImageGrid",
-			"owningSide": {
-				"name": "imagePosition5",
-				"nullable": true,
-				"type": "ManyHasOne",
-				"target": "Image",
-				"joiningColumn": {
-					"columnName": "image_position5_id",
-					"onDelete": "cascade"
-				}
-			}
-		},
-		{
-			"modification": "createRelation",
-			"entityName": "ImageGrid",
-			"owningSide": {
-				"name": "imagePosition6",
-				"nullable": true,
-				"type": "ManyHasOne",
-				"target": "Image",
-				"joiningColumn": {
-					"columnName": "image_position6_id",
 					"onDelete": "cascade"
 				}
 			}
@@ -1396,7 +1854,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "Locale",
 			"unique": {
-				"fields": ["slug"],
+				"fields": [
+					"slug"
+				],
 				"name": "unique_Locale_slug_67d6fc"
 			}
 		},
@@ -1404,7 +1864,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "Linkable",
 			"unique": {
-				"fields": ["url"],
+				"fields": [
+					"url"
+				],
 				"name": "unique_Linkable_url_f92092"
 			}
 		},
@@ -1412,7 +1874,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "Redirect",
 			"unique": {
-				"fields": ["link"],
+				"fields": [
+					"link"
+				],
 				"name": "unique_Redirect_link_90ad6a"
 			}
 		},
@@ -1420,7 +1884,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "Seo",
 			"unique": {
-				"fields": ["ogImage"],
+				"fields": [
+					"ogImage"
+				],
 				"name": "unique_Seo_ogImage_1d3ab5"
 			}
 		},
@@ -1428,7 +1894,10 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "MenuItemLocale",
 			"unique": {
-				"fields": ["menuItem", "locale"],
+				"fields": [
+					"menuItem",
+					"locale"
+				],
 				"name": "unique_MenuItemLocale_menuItem_locale_9e2d51"
 			}
 		},
@@ -1436,7 +1905,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "Footer",
 			"unique": {
-				"fields": ["unique"],
+				"fields": [
+					"unique"
+				],
 				"name": "unique_Footer_unique_c0f335"
 			}
 		},
@@ -1444,7 +1915,10 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "FooterLocale",
 			"unique": {
-				"fields": ["footer", "locale"],
+				"fields": [
+					"footer",
+					"locale"
+				],
 				"name": "unique_FooterLocale_footer_locale_95872c"
 			}
 		},
@@ -1452,7 +1926,10 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "PersonLocale",
 			"unique": {
-				"fields": ["person", "locale"],
+				"fields": [
+					"person",
+					"locale"
+				],
 				"name": "unique_PersonLocale_person_locale_8cb199"
 			}
 		},
@@ -1460,7 +1937,10 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "PageLocale",
 			"unique": {
-				"fields": ["page", "locale"],
+				"fields": [
+					"page",
+					"locale"
+				],
 				"name": "unique_PageLocale_page_locale_42ead3"
 			}
 		},
@@ -1468,7 +1948,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "PageLocale",
 			"unique": {
-				"fields": ["seo"],
+				"fields": [
+					"seo"
+				],
 				"name": "unique_PageLocale_seo_22ce77"
 			}
 		},
@@ -1476,7 +1958,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "PageLocale",
 			"unique": {
-				"fields": ["link"],
+				"fields": [
+					"link"
+				],
 				"name": "unique_PageLocale_link_944c82"
 			}
 		},
@@ -1484,7 +1968,10 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "CategoryLocale",
 			"unique": {
-				"fields": ["category", "locale"],
+				"fields": [
+					"category",
+					"locale"
+				],
 				"name": "unique_CategoryLocale_category_locale_7a1d47"
 			}
 		},
@@ -1492,7 +1979,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "Contact",
 			"unique": {
-				"fields": ["unique"],
+				"fields": [
+					"unique"
+				],
 				"name": "unique_Contact_unique_3eeed3"
 			}
 		},
@@ -1500,7 +1989,10 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "ContactLocale",
 			"unique": {
-				"fields": ["contact", "locale"],
+				"fields": [
+					"contact",
+					"locale"
+				],
 				"name": "unique_ContactLocale_contact_locale_bd2875"
 			}
 		},
@@ -1508,7 +2000,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "ContactLocale",
 			"unique": {
-				"fields": ["seo"],
+				"fields": [
+					"seo"
+				],
 				"name": "unique_ContactLocale_seo_6663c8"
 			}
 		},
@@ -1516,7 +2010,9 @@
 			"modification": "createUniqueConstraint",
 			"entityName": "ContactLocale",
 			"unique": {
-				"fields": ["link"],
+				"fields": [
+					"link"
+				],
 				"name": "unique_ContactLocale_link_e6310a"
 			}
 		}

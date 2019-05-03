@@ -1,9 +1,9 @@
-import { AddProjectMemberResponse, MutationAddProjectMemberArgs, MutationResolvers } from '../../schema/types'
+import { AddProjectMemberResponse, MutationAddProjectMemberArgs, MutationResolvers } from '../../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
-import ResolverContext from '../ResolverContext'
-import ProjectMemberManager from '../../model/service/ProjectMemberManager'
-import ProjectScope from '../../model/authorization/ProjectScope'
-import Actions from '../../model/authorization/Actions'
+import ResolverContext from '../../ResolverContext'
+import ProjectMemberManager from '../../../model/service/ProjectMemberManager'
+import ProjectScope from '../../../model/authorization/ProjectScope'
+import Actions from '../../../model/authorization/Actions'
 
 export default class AddProjectMemberMutationResolver implements MutationResolvers {
 	constructor(private readonly projectMemberManager: ProjectMemberManager) {

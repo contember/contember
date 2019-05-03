@@ -1,8 +1,8 @@
-import { CreateApiKeyResponse, MutationCreateApiKeyArgs, MutationResolvers } from '../../schema/types'
+import { CreateApiKeyResponse, MutationCreateApiKeyArgs, MutationResolvers } from '../../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
-import ResolverContext from '../ResolverContext'
-import Actions from '../../model/authorization/Actions'
-import ApiKeyManager from '../../model/service/ApiKeyManager'
+import ResolverContext from '../../ResolverContext'
+import Actions from '../../../model/authorization/Actions'
+import ApiKeyManager from '../../../model/service/ApiKeyManager'
 
 export default class CreateApiKeyMutationResolver implements MutationResolvers {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}

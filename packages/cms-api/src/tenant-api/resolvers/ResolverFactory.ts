@@ -1,22 +1,24 @@
+import { Config } from 'apollo-server-core'
 import { GraphQLResolveInfo } from 'graphql'
+
 import {
 	MutationAddProjectMemberArgs,
 	MutationCreateApiKeyArgs,
-	MutationResolvers,
 	MutationSetupArgs,
 	MutationSignInArgs,
 	MutationSignUpArgs,
 	MutationUpdateProjectMemberVariablesArgs,
 } from '../schema/types'
-import MeQueryResolver from './query/MeQueryResolver'
-import SignUpMutationResolver from './mutation/SignUpMutationResolver'
-import SignInMutationResolver from './mutation/SignInMutationResolver'
-import AddProjectMemberMutationResolver from './mutation/AddProjectMemberMutationResolver'
-import { Config } from 'apollo-server-core'
-import SetupMutationResolver from './mutation/SetupMutationResolver'
-import UpdateProjectMemberVariablesMutationResolver from './mutation/UpdateProjectMemberVariablesMutationResolver'
 import ResolverContext from './ResolverContext'
-import CreateApiKeyMutationResolver from './mutation/CreateApiKeyMutationResolver'
+
+import MeQueryResolver from './query/MeQueryResolver'
+
+import SignUpMutationResolver from './mutation/person/SignUpMutationResolver'
+import SignInMutationResolver from './mutation/person/SignInMutationResolver'
+import AddProjectMemberMutationResolver from './mutation/projectMember/AddProjectMemberMutationResolver'
+import UpdateProjectMemberVariablesMutationResolver from './mutation/projectMember/UpdateProjectMemberVariablesMutationResolver'
+import SetupMutationResolver from './mutation/setup/SetupMutationResolver'
+import CreateApiKeyMutationResolver from './mutation/apiKey/CreateApiKeyMutationResolver'
 
 class ResolverFactory {
 	public constructor(

@@ -4,7 +4,6 @@ import Identity from '../../common/auth/Identity'
 import { Acl } from 'cms-common'
 import SystemExecutionContainer from '../SystemExecutionContainer'
 import ErrorHandlerExtension from '../../core/graphql/ErrorHandlerExtension'
-import Actions from '../../tenant-api/model/authorization/Actions'
 import { ForbiddenError } from 'apollo-server-koa'
 
 export default class ResolverContext implements ErrorHandlerExtension.Context {
@@ -25,7 +24,7 @@ export default class ResolverContext implements ErrorHandlerExtension.Context {
 		action: Authorizator.Action,
 		message?: string
 	): Promise<void> {
-		if (!(await this.isAllowed(new AuthorizationScope.Global(), Actions.SYSTEM_SETUP))) {
+		if (!(await this.isAllowed(scope, action))) {
 			throw new ForbiddenError(message || 'Forbidden')
 		}
 	}

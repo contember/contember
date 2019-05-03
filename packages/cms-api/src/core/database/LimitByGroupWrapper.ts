@@ -15,7 +15,7 @@ class LimitByGroupWrapper {
 		private readonly limit: number | undefined
 	) {}
 
-	public async getResult<R>(qb: SelectBuilder<R>): Promise<R[]> {
+	public async getResult<R>(qb: SelectBuilder<R, any>): Promise<R[]> {
 		if (this.limit !== undefined || this.skip !== undefined) {
 			qb = qb.select(
 				expr =>
@@ -41,7 +41,7 @@ class LimitByGroupWrapper {
 				;[qb] = this.orderByCallback(qb, qb)
 			}
 
-			let wrapperQb = qb.wrapper
+			let wrapperQb: SelectBuilder<R, any> = qb.wrapper
 				.selectBuilder<R>()
 				.with('data', qb)
 				.from('data')

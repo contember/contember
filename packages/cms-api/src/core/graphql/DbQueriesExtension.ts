@@ -1,12 +1,16 @@
 import { GraphQLExtension } from 'graphql-extensions'
+import Client from '../database/Client'
+import EventManager from '../database/EventManager'
 
 type Query = { sql: string; bindings: any; elapsed: number; error?: string; meta?: any }
 
-export default class DbQueriesExtension extends GraphQLExtension {
+export default class DbQueriesExtension extends GraphQLExtension<{ db: Client }> {
 	private readonly queries: Query[] = []
 
-	addQuery(query: Query): void {
-		this.queries.push(query)
+	requestDidStart({ context: { db } }: { context: { db: Client } }): void {
+		db.eventManager.on(EventManager.Event.queryEnd, ({ sql, parameters, meta }, { timing }) =>
+			this.queries.push({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta })
+		)
 	}
 
 	format(): [string, any] | undefined {

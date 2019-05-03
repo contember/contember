@@ -1,7 +1,6 @@
 import AuthorizationScope from '../../core/authorization/AuthorizationScope'
 import Authorizator from '../../core/authorization/Authorizator'
 import Identity from '../../common/auth/Identity'
-import Actions from '../model/authorization/Actions'
 import { ForbiddenError } from 'apollo-server-koa'
 
 export default class ResolverContext {
@@ -16,11 +15,13 @@ export default class ResolverContext {
 	}
 
 	public async requireAccess(
-		scope: AuthorizationScope<Identity>,
-		action: Authorizator.Action,
-		message: string
+		{ scope, action, message }: {
+			scope?: AuthorizationScope<Identity>,
+			action: Authorizator.Action,
+			message?: string
+		}
 	): Promise<void> {
-		if (!(await this.isAllowed(new AuthorizationScope.Global(), Actions.SYSTEM_SETUP))) {
+		if (!(await this.isAllowed(scope || new AuthorizationScope.Global(), action))) {
 			throw new ForbiddenError(message || 'Forbidden')
 		}
 	}

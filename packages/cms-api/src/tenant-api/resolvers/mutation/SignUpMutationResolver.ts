@@ -8,8 +8,6 @@ import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import Actions from '../../model/authorization/Actions'
-import { ForbiddenError } from 'apollo-server-koa'
-import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import ApiKeyManager from '../../model/service/ApiKeyManager'
 
 export default class SignUpMutationResolver implements MutationResolvers {
@@ -25,9 +23,11 @@ export default class SignUpMutationResolver implements MutationResolvers {
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<SignUpResponse> {
-		if (!(await context.isAllowed(new AuthorizationScope.Global(), Actions.PERSON_SIGN_UP))) {
-			throw new ForbiddenError('You are not allowed to sign up')
-		}
+		await context.requireAccess({
+			action: Actions.PERSON_SIGN_UP,
+			message: 'You are not allowed to sign up'
+		})
+
 		const result = await this.signUpManager.signUp(args.email, args.password)
 
 		if (!result.ok) {

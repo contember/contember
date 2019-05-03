@@ -38,7 +38,6 @@ import { CommandManager } from './core/cli/CommandManager'
 import { Schema } from 'cms-common'
 import SystemExecutionContainer from './system-api/SystemExecutionContainer'
 import TenantContainer from './tenant-api/TenantContainer'
-import CreateApiKeyMutationResolver from './tenant-api/resolvers/mutation/CreateApiKeyMutationResolver'
 import Connection from './core/database/Connection'
 import Client from './core/database/Client'
 

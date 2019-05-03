@@ -1,13 +1,13 @@
-import { MutationResolvers, MutationSignInArgs, SignInResponse } from '../../schema/types'
+import { MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
-import ResolverContext from '../ResolverContext'
-import SignInManager from '../../model/service/SignInManager'
-import ImplementationException from '../../../core/exceptions/ImplementationException'
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
-import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
-import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
-import Actions from '../../model/authorization/Actions'
+import ResolverContext from '../../ResolverContext'
+import SignInManager from '../../../model/service/SignInManager'
+import ImplementationException from '../../../../core/exceptions/ImplementationException'
+import QueryHandler from '../../../../core/query/QueryHandler'
+import DbQueryable from '../../../../core/database/DbQueryable'
+import PersonByIdQuery from '../../../model/queries/PersonByIdQuery'
+import ProjectsByIdentityQuery from '../../../model/queries/ProjectsByIdentityQuery'
+import Actions from '../../../model/authorization/Actions'
 
 export default class SignInMutationResolver implements MutationResolvers {
 	constructor(

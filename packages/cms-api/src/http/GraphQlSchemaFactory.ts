@@ -18,7 +18,11 @@ class GraphQlSchemaFactory {
 		private readonly permissionFactory: PermissionsByIdentityFactory
 	) {}
 
-	public create(stageSlug: string, schema: Schema, identity: PermissionsByIdentityFactory.Identity): [GraphQLSchema, Acl.Permissions] {
+	public create(
+		stageSlug: string,
+		schema: Schema,
+		identity: PermissionsByIdentityFactory.Identity
+	): [GraphQLSchema, Acl.Permissions] {
 		let schemaCacheEntry = this.cache.find(it => it.schema.model === schema.model && it.schema.acl === schema.acl)
 		if (!schemaCacheEntry) {
 			schemaCacheEntry = {

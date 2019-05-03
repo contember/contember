@@ -80,7 +80,7 @@ describe('tenant api', () => {
 					},
 					{
 						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles") values (?, ?, ?)`,
-						parameters: [testUuid(1), null, '[]'],
+						parameters: [testUuid(1), null, '["person"]'],
 						response: { rowCount: 1 },
 					},
 					{

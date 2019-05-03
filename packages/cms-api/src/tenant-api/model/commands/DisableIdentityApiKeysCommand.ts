@@ -2,8 +2,7 @@ import Command from './Command'
 import Client from '../../../core/database/Client'
 
 class DisableIdentityApiKeysCommand implements Command<void> {
-	constructor(private readonly identityId: string) {
-	}
+	constructor(private readonly identityId: string) {}
 
 	async execute(db: Client): Promise<void> {
 		const qb = db

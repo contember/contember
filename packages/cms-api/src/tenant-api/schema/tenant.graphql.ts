@@ -69,7 +69,7 @@ const schema: DocumentNode = gql`
 
 	enum SignUpErrorCode {
 		EMAIL_ALREADY_EXISTS
-    TOO_WEAK
+		TOO_WEAK
 	}
 
 	type SignUpResult {
@@ -99,22 +99,22 @@ const schema: DocumentNode = gql`
 		person: Person!
 	}
 
-  # === signOut ===
-	
-  type SignOutResponse {
-    ok: Boolean!
-    errors: [SignOutError!]!
-  }
+	# === signOut ===
 
-  type SignOutError {
-    code: SignOutErrorCode!
-    endUserMessage: String
-    developerMessage: String
-  }
+	type SignOutResponse {
+		ok: Boolean!
+		errors: [SignOutError!]!
+	}
 
-  enum SignOutErrorCode {
-    NOT_A_PERSON
-  }
+	type SignOutError {
+		code: SignOutErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum SignOutErrorCode {
+		NOT_A_PERSON
+	}
 
 	# === changePassword ===
 

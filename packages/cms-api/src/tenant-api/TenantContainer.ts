@@ -113,10 +113,7 @@ namespace TenantContainer {
 					({ apiKeyManager }) => new CreateApiKeyMutationResolver(apiKeyManager)
 				)
 
-				.addService(
-					'resolvers',
-					(container) => new ResolverFactory(container).create()
-				)
+				.addService('resolvers', container => new ResolverFactory(container).create())
 
 				.addService('apolloServer', ({ resolvers, projectMemberManager, authorizator }) =>
 					new TenantApolloServerFactory(resolvers, projectMemberManager, authorizator).create()

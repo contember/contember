@@ -12,19 +12,19 @@ import ChangePasswordMutationResolver from './mutation/person/ChangePasswordMuta
 import SignOutMutationResolver from './mutation/person/SignOutMutationResolver'
 
 class ResolverFactory {
-	public constructor(private readonly resolvers: {
-		                   meQueryResolver: MeQueryResolver,
-		                   signUpMutationResolver: SignUpMutationResolver,
-		                   signInMutationResolver: SignInMutationResolver,
-		                   signOutMutationResolver: SignOutMutationResolver,
-		                   changePasswordMutationResolver: ChangePasswordMutationResolver,
-		                   addProjectMemberMutationResolver: AddProjectMemberMutationResolver,
-		                   setupMutationResolver: SetupMutationResolver,
-		                   updateProjectMemberVariablesMutationResolver: UpdateProjectMemberVariablesMutationResolver,
-		                   createApiKeyMutationResolver: CreateApiKeyMutationResolver
-	                   }
-	) {
-	}
+	public constructor(
+		private readonly resolvers: {
+			meQueryResolver: MeQueryResolver
+			signUpMutationResolver: SignUpMutationResolver
+			signInMutationResolver: SignInMutationResolver
+			signOutMutationResolver: SignOutMutationResolver
+			changePasswordMutationResolver: ChangePasswordMutationResolver
+			addProjectMemberMutationResolver: AddProjectMemberMutationResolver
+			setupMutationResolver: SetupMutationResolver
+			updateProjectMemberVariablesMutationResolver: UpdateProjectMemberVariablesMutationResolver
+			createApiKeyMutationResolver: CreateApiKeyMutationResolver
+		}
+	) {}
 
 	create(): Config['resolvers'] {
 		return {
@@ -35,7 +35,9 @@ class ResolverFactory {
 				signUp: this.resolvers.signUpMutationResolver.signUp.bind(this.resolvers.signUpMutationResolver),
 				signIn: this.resolvers.signInMutationResolver.signIn.bind(this.resolvers.signInMutationResolver),
 				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),
-				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(this.resolvers.changePasswordMutationResolver),
+				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(
+					this.resolvers.changePasswordMutationResolver
+				),
 				addProjectMember: this.resolvers.addProjectMemberMutationResolver.addProjectMember.bind(
 					this.resolvers.addProjectMemberMutationResolver
 				),
@@ -44,7 +46,8 @@ class ResolverFactory {
 					this.resolvers.updateProjectMemberVariablesMutationResolver
 				),
 				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(
-					this.resolvers.createApiKeyMutationResolver),
+					this.resolvers.createApiKeyMutationResolver
+				),
 			},
 		}
 	}

@@ -3,6 +3,8 @@ import { arraySplit } from '../../../../utils/arrays'
 import { acceptFieldVisitor } from '../../../../content-schema/modelUtils'
 import CreateModificationFieldVisitor from '../CreateModificationFieldVisitor'
 import Migration from '../Migration'
+import PatchAclSchemaModification from './acl/PatchAclSchemaModification'
+import { Operation } from 'rfc6902'
 
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
@@ -141,6 +143,13 @@ class ModificationBuilder {
 		this.modifications.push({
 			modification: 'updateAclSchema',
 			schema,
+		})
+	}
+
+	public patchAclSchema(patch: Operation[]) {
+		this.modifications.push({
+			modification: PatchAclSchemaModification.id,
+			patch,
 		})
 	}
 

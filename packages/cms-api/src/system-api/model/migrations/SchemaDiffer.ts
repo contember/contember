@@ -6,6 +6,7 @@ import ModificationBuilder from './modifications/ModificationBuilder'
 import Migration from './Migration'
 import deepEqual = require('fast-deep-equal')
 import { isIt } from '../../../utils/type'
+import { createPatch } from 'rfc6902'
 
 class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -14,7 +15,12 @@ class SchemaDiffer {
 		const builder = new ModificationBuilder(updatedSchema)
 
 		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
-			builder.updateAclSchema(updatedSchema.acl)
+			const patch = createPatch(originalSchema.acl, updatedSchema.acl)
+			if (patch.length <= 20) {
+				builder.patchAclSchema(patch)
+			} else {
+				builder.updateAclSchema(updatedSchema.acl)
+			}
 		}
 
 		const originalModel = originalSchema.model

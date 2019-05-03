@@ -307,5 +307,112 @@ describe('tenant api', () => {
 				},
 			})
 		})
+
+		it('sign out', async () => {
+			await execute({
+				query: GQL`mutation {
+          signOut {
+            ok
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`select "id", "email" from "tenant"."person" where "identity_id" = ?`,
+						parameters: [testUuid(999)],
+						response: {
+							rows: [
+								{
+									id: testUuid(1),
+									email: 'john@doe.com',
+								},
+							],
+						},
+					},
+					{
+						sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "id" = ?`,
+						parameters: [(val: any) => val instanceof Date, testUuid(998)],
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						signOut: {
+							ok: true,
+						},
+					},
+				},
+			})
+		})
+
+		it('sign out all', async () => {
+			await execute({
+				query: GQL`mutation {
+          signOut(all: true) {
+            ok
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`select "id", "email" from "tenant"."person" where "identity_id" = ?`,
+						parameters: [testUuid(999)],
+						response: {
+							rows: [
+								{
+									id: testUuid(1),
+									email: 'john@doe.com',
+								},
+							],
+						},
+					},
+					{
+						sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,
+						parameters: [(val: any) => val instanceof Date, testUuid(999)],
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						signOut: {
+							ok: true,
+						},
+					},
+				},
+			})
+		})
+
+
+		it('sign out - not a person', async () => {
+			await execute({
+				query: GQL`mutation {
+          signOut(all: true) {
+            ok
+	          errors {
+		          code
+	          }
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`select "id", "email" from "tenant"."person" where "identity_id" = ?`,
+						parameters: [testUuid(999)],
+						response: {
+							rows: [],
+						},
+					},
+				],
+				return: {
+					data: {
+						signOut: {
+							ok: false,
+							errors: [
+								{
+									code: 'NOT_A_PERSON'
+								}
+							]
+						},
+					},
+				},
+			})
+		})
 	})
 })

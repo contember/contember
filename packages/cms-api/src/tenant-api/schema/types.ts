@@ -96,6 +96,7 @@ export type Mutation = {
 	readonly setup?: Maybe<SetupResponse>
 	readonly signUp?: Maybe<SignUpResponse>
 	readonly signIn?: Maybe<SignInResponse>
+	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
 	readonly updateProjectMemberVariables?: Maybe<UpdateProjectMemberVariablesResponse>
@@ -115,6 +116,10 @@ export type MutationSignInArgs = {
 	email: Scalars['String']
 	password: Scalars['String']
 	expiration?: Maybe<Scalars['Int']>
+}
+
+export type MutationSignOutArgs = {
+	all?: Maybe<Scalars['Boolean']>
 }
 
 export type MutationChangePasswordArgs = {
@@ -201,6 +206,21 @@ export type SignInResponse = {
 export type SignInResult = {
 	readonly token: Scalars['String']
 	readonly person: Person
+}
+
+export type SignOutError = {
+	readonly code: SignOutErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum SignOutErrorCode {
+	NotAPerson = 'NOT_A_PERSON',
+}
+
+export type SignOutResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<SignOutError>
 }
 
 export type SignUpError = {
@@ -364,6 +384,7 @@ export type MutationResolvers<Context = any, ParentType = Mutation> = {
 	setup?: Resolver<Maybe<SetupResponse>, ParentType, Context, MutationSetupArgs>
 	signUp?: Resolver<Maybe<SignUpResponse>, ParentType, Context, MutationSignUpArgs>
 	signIn?: Resolver<Maybe<SignInResponse>, ParentType, Context, MutationSignInArgs>
+	signOut?: Resolver<Maybe<SignOutResponse>, ParentType, Context, MutationSignOutArgs>
 	changePassword?: Resolver<Maybe<ChangePasswordResponse>, ParentType, Context, MutationChangePasswordArgs>
 	addProjectMember?: Resolver<Maybe<AddProjectMemberResponse>, ParentType, Context, MutationAddProjectMemberArgs>
 	updateProjectMemberVariables?: Resolver<
@@ -430,6 +451,17 @@ export type SignInResultResolvers<Context = any, ParentType = SignInResult> = {
 	person?: Resolver<Person, ParentType, Context>
 }
 
+export type SignOutErrorResolvers<Context = any, ParentType = SignOutError> = {
+	code?: Resolver<SignOutErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+}
+
+export type SignOutResponseResolvers<Context = any, ParentType = SignOutResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SignOutError>, ParentType, Context>
+}
+
 export type SignUpErrorResolvers<Context = any, ParentType = SignUpError> = {
 	code?: Resolver<SignUpErrorCode, ParentType, Context>
 	endPersonMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
@@ -485,6 +517,8 @@ export type Resolvers<Context = any> = {
 	SignInError?: SignInErrorResolvers<Context>
 	SignInResponse?: SignInResponseResolvers<Context>
 	SignInResult?: SignInResultResolvers<Context>
+	SignOutError?: SignOutErrorResolvers<Context>
+	SignOutResponse?: SignOutResponseResolvers<Context>
 	SignUpError?: SignUpErrorResolvers<Context>
 	SignUpResponse?: SignUpResponseResolvers<Context>
 	SignUpResult?: SignUpResultResolvers<Context>

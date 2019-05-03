@@ -12,6 +12,7 @@ namespace Identity {
 		LOGIN = 'login',
 		SETUP = 'setup',
 		SELF = 'self',
+		PERSON = 'person',
 	}
 
 	export class StaticIdentity implements Identity {

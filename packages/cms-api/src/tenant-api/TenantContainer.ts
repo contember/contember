@@ -23,6 +23,7 @@ import ProjectManager from './model/service/ProjectManager'
 import Connection from '../core/database/Connection'
 import ChangePasswordMutationResolver from './resolvers/mutation/person/ChangePasswordMutationResolver'
 import PasswordChangeManager from './model/service/PasswordChangeManager'
+import SignOutMutationResolver from './resolvers/mutation/person/SignOutMutationResolver'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -86,6 +87,10 @@ namespace TenantContainer {
 					({ signInManager, queryHandler }) => new SignInMutationResolver(signInManager, queryHandler)
 				)
 				.addService(
+					'signOutMutationResolver',
+					({ apiKeyManager, queryHandler }) => new SignOutMutationResolver(apiKeyManager, queryHandler)
+				)
+				.addService(
 					'changePasswordMutationResolver',
 					({ passwordChangeManager, queryHandler }) =>
 						new ChangePasswordMutationResolver(passwordChangeManager, queryHandler)
@@ -114,6 +119,7 @@ namespace TenantContainer {
 						meQueryResolver,
 						signUpMutationResolver,
 						signInMutationResolver,
+						signOutMutationResolver,
 						changePasswordMutationResolver,
 						addProjectMemberMutationResolver,
 						setupMutationResolver,
@@ -124,6 +130,7 @@ namespace TenantContainer {
 							meQueryResolver,
 							signUpMutationResolver,
 							signInMutationResolver,
+							signOutMutationResolver,
 							changePasswordMutationResolver,
 							addProjectMemberMutationResolver,
 							setupMutationResolver,

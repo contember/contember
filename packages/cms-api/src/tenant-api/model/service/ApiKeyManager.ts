@@ -17,6 +17,8 @@ import {
 } from '../../schema/types'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import { mapValues } from '../../utils/mapValue'
+import DisableApiKeyCommand from '../commands/DisableApiKeyCommand'
+import DisableIdentityApiKeysCommand from '../commands/DisableIdentityApiKeysCommand'
 
 class ApiKeyManager {
 	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
@@ -57,6 +59,14 @@ class ApiKeyManager {
 
 	async disableOneOffApiKey(apiKeyId: string): Promise<void> {
 		await new DisableOneOffApiKeyCommand(apiKeyId).execute(this.db)
+	}
+
+	async disableApiKey(apiKeyId: string): Promise<void> {
+		await new DisableApiKeyCommand(apiKeyId).execute(this.db)
+	}
+
+	async disableIdentityApiKeys(identityId: string): Promise<void> {
+		await new DisableIdentityApiKeysCommand(identityId).execute(this.db)
 	}
 
 	async createPermanentApiKey(

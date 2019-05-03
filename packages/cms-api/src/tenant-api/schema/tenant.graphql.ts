@@ -15,6 +15,7 @@ const schema: DocumentNode = gql`
 		setup(superadmin: AdminCredentials!): SetupResponse
 		signUp(email: String!, password: String!): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int): SignInResponse
+		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		addProjectMember(projectId: String!, identityId: String!, roles: [String!]!): AddProjectMemberResponse
 		updateProjectMemberVariables(
@@ -97,6 +98,23 @@ const schema: DocumentNode = gql`
 		token: String!
 		person: Person!
 	}
+
+  # === signOut ===
+	
+  type SignOutResponse {
+    ok: Boolean!
+    errors: [SignOutError!]!
+  }
+
+  type SignOutError {
+    code: SignOutErrorCode!
+    endUserMessage: String
+    developerMessage: String
+  }
+
+  enum SignOutErrorCode {
+    NOT_A_PERSON
+  }
 
 	# === changePassword ===
 

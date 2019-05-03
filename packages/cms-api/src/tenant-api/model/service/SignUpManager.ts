@@ -5,6 +5,7 @@ import { SignUpErrorCode } from '../../schema/types'
 import Client from '../../../core/database/Client'
 import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import CreatePersonCommand from '../commands/CreatePersonCommand'
+import Identity from '../../../common/auth/Identity'
 
 class SignUpManager {
 	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
@@ -17,7 +18,7 @@ class SignUpManager {
 			return new SignUpManager.SignUpResultError([SignUpErrorCode.TooWeak])
 		}
 		const [identityId, personId] = await this.db.transaction(async wrapper => {
-			const identityId = await new CreateIdentityCommand(roles).execute(wrapper)
+			const identityId = await new CreateIdentityCommand([...roles, Identity.SystemRole.PERSON]).execute(wrapper)
 			const personId = await new CreatePersonCommand(identityId, email, password).execute(wrapper)
 			return [identityId, personId]
 		})

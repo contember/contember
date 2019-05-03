@@ -6,11 +6,9 @@ import { Modification } from '../Modification'
 import { applyPatch, Operation } from 'rfc6902'
 
 class PatchAclSchemaModification implements Modification<PatchAclSchemaModification.Data> {
-	constructor(private readonly data: PatchAclSchemaModification.Data) {
-	}
+	constructor(private readonly data: PatchAclSchemaModification.Data) {}
 
-	public createSql(builder: MigrationBuilder): void {
-	}
+	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return schema => {
@@ -20,10 +18,10 @@ class PatchAclSchemaModification implements Modification<PatchAclSchemaModificat
 				throw result[0]
 			}
 
-			return ({
+			return {
 				...schema,
 				acl,
-			})
+			}
 		}
 	}
 

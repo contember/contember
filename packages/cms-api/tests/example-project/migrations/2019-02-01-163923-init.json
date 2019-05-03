@@ -121,6 +121,7 @@
 				"variables": {},
 				"roles": {
 					"viewer": {
+						"stages": "*",
 						"entities": {
 							"Author": {
 								"predicates": {},

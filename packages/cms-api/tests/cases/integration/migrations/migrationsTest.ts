@@ -1077,8 +1077,26 @@ describe('Diff schemas', () => {
 		}
 		const diff: Migration.Modification[] = [
 			{
-				modification: 'updateAclSchema',
-				schema: acl,
+				modification: 'patchAclSchema',
+				patch: [
+					{
+						op: 'add',
+						path: '/roles/admin',
+						value: {
+							entities: {
+								Site: {
+									operations: {
+										read: {
+											id: true,
+										},
+									},
+									predicates: {},
+								},
+							},
+							stages: '*',
+						},
+					},
+				],
 			},
 		]
 		it('diff schemas', () => {

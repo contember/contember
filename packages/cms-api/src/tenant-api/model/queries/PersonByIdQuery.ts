@@ -11,6 +11,7 @@ class PersonByIdQuery extends DbQuery<PersonByIdQuery.Result> {
 			.createSelectBuilder<PersonByIdQuery.Row>()
 			.select('id')
 			.select('email')
+			.select('identity_id')
 			.from('person')
 			.where({
 				id: this.personId,
@@ -25,6 +26,7 @@ namespace PersonByIdQuery {
 	export type Row = {
 		readonly id: string
 		readonly email: string
+		readonly identity_id: string
 	}
 	export type Result = null | Row
 }

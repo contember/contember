@@ -15,6 +15,7 @@ const schema: DocumentNode = gql`
 		setup(superadmin: AdminCredentials!): SetupResponse
 		signUp(email: String!, password: String!): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int): SignInResponse
+		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		addProjectMember(projectId: String!, identityId: String!, roles: [String!]!): AddProjectMemberResponse
 		updateProjectMemberVariables(
 			projectId: String!
@@ -67,6 +68,7 @@ const schema: DocumentNode = gql`
 
 	enum SignUpErrorCode {
 		EMAIL_ALREADY_EXISTS
+    TOO_WEAK
 	}
 
 	type SignUpResult {
@@ -96,7 +98,26 @@ const schema: DocumentNode = gql`
 		person: Person!
 	}
 
+	# === changePassword ===
+
+	type ChangePasswordResponse {
+		ok: Boolean!
+		errors: [ChangePasswordError!]!
+	}
+
+	type ChangePasswordError {
+		code: ChangePasswordErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum ChangePasswordErrorCode {
+		PERSON_NOT_FOUND
+		TOO_WEAK
+	}
+
 	# === addProjectMember ===
+
 	type AddProjectMemberResponse {
 		ok: Boolean!
 		errors: [AddProjectMemberError!]!

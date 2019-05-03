@@ -14,13 +14,15 @@ export default class ResolverContext {
 		return await this.authorizator.isAllowed(this.identity, scope, action)
 	}
 
-	public async requireAccess(
-		{ scope, action, message }: {
-			scope?: AuthorizationScope<Identity>,
-			action: Authorizator.Action,
-			message?: string
-		}
-	): Promise<void> {
+	public async requireAccess({
+		scope,
+		action,
+		message,
+	}: {
+		scope?: AuthorizationScope<Identity>
+		action: Authorizator.Action
+		message?: string
+	}): Promise<void> {
 		if (!(await this.isAllowed(scope || new AuthorizationScope.Global(), action))) {
 			throw new ForbiddenError(message || 'Forbidden')
 		}

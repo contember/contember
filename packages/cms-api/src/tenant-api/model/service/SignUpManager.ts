@@ -13,6 +13,9 @@ class SignUpManager {
 		if (await this.isEmailAlreadyUsed(email)) {
 			return new SignUpManager.SignUpResultError([SignUpErrorCode.EmailAlreadyExists])
 		}
+		if (password.length < 6) {
+			return new SignUpManager.SignUpResultError([SignUpErrorCode.TooWeak])
+		}
 		const [identityId, personId] = await this.db.transaction(async wrapper => {
 			const identityId = await new CreateIdentityCommand(roles).execute(wrapper)
 			const personId = await new CreatePersonCommand(identityId, email, password).execute(wrapper)

@@ -25,7 +25,7 @@ export default class SignUpMutationResolver implements MutationResolvers {
 	): Promise<SignUpResponse> {
 		await context.requireAccess({
 			action: Actions.PERSON_SIGN_UP,
-			message: 'You are not allowed to sign up'
+			message: 'You are not allowed to sign up',
 		})
 
 		const result = await this.signUpManager.signUp(args.email, args.password)

@@ -1,4 +1,8 @@
-import { MutationResolvers, MutationUpdateProjectMemberVariablesArgs, UpdateProjectMemberVariablesResponse, } from '../../../schema/types'
+import {
+	MutationResolvers,
+	MutationUpdateProjectMemberVariablesArgs,
+	UpdateProjectMemberVariablesResponse,
+} from '../../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../../ResolverContext'
 import ProjectMemberManager from '../../../model/service/ProjectMemberManager'
@@ -17,7 +21,7 @@ export default class UpdateProjectMemberVariablesMutationResolver implements Mut
 		await context.requireAccess({
 			scope: new ProjectScope(projectId),
 			action: Actions.PROJECT_UPDATE_MEMBER_VARIABLES,
-			message: 'You are not allowed to update project member variables'
+			message: 'You are not allowed to update project member variables',
 		})
 
 		const result = await this.projectMemberManager.updateProjectMemberVariables(projectId, identityId, variables)

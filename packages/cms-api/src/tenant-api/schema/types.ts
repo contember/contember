@@ -42,6 +42,22 @@ export type ApiKeyProjectInput = {
 	readonly variables?: Maybe<ReadonlyArray<VariableUpdate>>
 }
 
+export type ChangePasswordError = {
+	readonly code: ChangePasswordErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum ChangePasswordErrorCode {
+	PersonNotFound = 'PERSON_NOT_FOUND',
+	TooWeak = 'TOO_WEAK',
+}
+
+export type ChangePasswordResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<ChangePasswordError>
+}
+
 export type CreateApiKeyError = {
 	readonly code: CreateApiKeyErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
@@ -80,6 +96,7 @@ export type Mutation = {
 	readonly setup?: Maybe<SetupResponse>
 	readonly signUp?: Maybe<SignUpResponse>
 	readonly signIn?: Maybe<SignInResponse>
+	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
 	readonly updateProjectMemberVariables?: Maybe<UpdateProjectMemberVariablesResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
@@ -98,6 +115,11 @@ export type MutationSignInArgs = {
 	email: Scalars['String']
 	password: Scalars['String']
 	expiration?: Maybe<Scalars['Int']>
+}
+
+export type MutationChangePasswordArgs = {
+	personId: Scalars['String']
+	password: Scalars['String']
 }
 
 export type MutationAddProjectMemberArgs = {
@@ -189,6 +211,7 @@ export type SignUpError = {
 
 export enum SignUpErrorCode {
 	EmailAlreadyExists = 'EMAIL_ALREADY_EXISTS',
+	TooWeak = 'TOO_WEAK',
 }
 
 export type SignUpResponse = {
@@ -297,6 +320,17 @@ export type ApiKeyResolvers<Context = any, ParentType = ApiKey> = {
 	identity?: Resolver<Identity, ParentType, Context>
 }
 
+export type ChangePasswordErrorResolvers<Context = any, ParentType = ChangePasswordError> = {
+	code?: Resolver<ChangePasswordErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+}
+
+export type ChangePasswordResponseResolvers<Context = any, ParentType = ChangePasswordResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<ChangePasswordError>, ParentType, Context>
+}
+
 export type CreateApiKeyErrorResolvers<Context = any, ParentType = CreateApiKeyError> = {
 	code?: Resolver<CreateApiKeyErrorCode, ParentType, Context>
 	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
@@ -330,6 +364,7 @@ export type MutationResolvers<Context = any, ParentType = Mutation> = {
 	setup?: Resolver<Maybe<SetupResponse>, ParentType, Context, MutationSetupArgs>
 	signUp?: Resolver<Maybe<SignUpResponse>, ParentType, Context, MutationSignUpArgs>
 	signIn?: Resolver<Maybe<SignInResponse>, ParentType, Context, MutationSignInArgs>
+	changePassword?: Resolver<Maybe<ChangePasswordResponse>, ParentType, Context, MutationChangePasswordArgs>
 	addProjectMember?: Resolver<Maybe<AddProjectMemberResponse>, ParentType, Context, MutationAddProjectMemberArgs>
 	updateProjectMemberVariables?: Resolver<
 		Maybe<UpdateProjectMemberVariablesResponse>,
@@ -432,6 +467,8 @@ export type Resolvers<Context = any> = {
 	AddProjectMemberError?: AddProjectMemberErrorResolvers<Context>
 	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<Context>
 	ApiKey?: ApiKeyResolvers<Context>
+	ChangePasswordError?: ChangePasswordErrorResolvers<Context>
+	ChangePasswordResponse?: ChangePasswordResponseResolvers<Context>
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<Context>
 	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<Context>
 	CreateApiKeyResult?: CreateApiKeyResultResolvers<Context>

@@ -3,6 +3,7 @@ import { GraphQLResolveInfo } from 'graphql'
 
 import {
 	MutationAddProjectMemberArgs,
+	MutationChangePasswordArgs,
 	MutationCreateApiKeyArgs,
 	MutationSetupArgs,
 	MutationSignInArgs,
@@ -19,12 +20,14 @@ import AddProjectMemberMutationResolver from './mutation/projectMember/AddProjec
 import UpdateProjectMemberVariablesMutationResolver from './mutation/projectMember/UpdateProjectMemberVariablesMutationResolver'
 import SetupMutationResolver from './mutation/setup/SetupMutationResolver'
 import CreateApiKeyMutationResolver from './mutation/apiKey/CreateApiKeyMutationResolver'
+import ChangePasswordMutationResolver from './mutation/person/ChangePasswordMutationResolver'
 
 class ResolverFactory {
 	public constructor(
 		private meQueryResolver: MeQueryResolver,
 		private signUpMutationResolver: SignUpMutationResolver,
 		private signInMutationResolver: SignInMutationResolver,
+		private changePasswordMutationResolver: ChangePasswordMutationResolver,
 		private addProjectMemberMutationResolver: AddProjectMemberMutationResolver,
 		private setupMutationResolver: SetupMutationResolver,
 		private updateProjectMemberVariablesMutationResolver: UpdateProjectMemberVariablesMutationResolver,
@@ -60,6 +63,19 @@ class ResolverFactory {
 						this.signInMutationResolver,
 						parent,
 						args as MutationSignInArgs,
+						context,
+						info
+					),
+				changePassword: (
+					parent: any,
+					args: ResolverFactory.FieldResolverArgs,
+					context: ResolverContext,
+					info: GraphQLResolveInfo
+				) =>
+					this.changePasswordMutationResolver.changePassword.call(
+						this.changePasswordMutationResolver,
+						parent,
+						args as MutationChangePasswordArgs,
 						context,
 						info
 					),

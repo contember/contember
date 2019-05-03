@@ -23,7 +23,7 @@ export default class SignInMutationResolver implements MutationResolvers {
 	): Promise<SignInResponse> {
 		await context.requireAccess({
 			action: Actions.PERSON_SIGN_IN,
-			message: 'You are not allowed to sign in'
+			message: 'You are not allowed to sign in',
 		})
 
 		const result = await this.signInManager.signIn(args.email, args.password, args.expiration || undefined)

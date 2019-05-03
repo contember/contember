@@ -7,8 +7,6 @@ import DbQueryable from '../../../core/database/DbQueryable'
 import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import Actions from '../../model/authorization/Actions'
-import { ForbiddenError } from 'apollo-server-koa'
-import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import ApiKeyManager from '../../model/service/ApiKeyManager'
 import Identity from '../../../common/auth/Identity'
 
@@ -25,9 +23,11 @@ export default class SetupMutationResolver implements MutationResolvers {
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<SetupResponse> {
-		if (!(await context.isAllowed(new AuthorizationScope.Global(), Actions.SYSTEM_SETUP))) {
-			throw new ForbiddenError('You are not allowed to setup system')
-		}
+		await context.requireAccess({
+			action: Actions.SYSTEM_SETUP,
+			message: 'You are not allowed to setup system',
+		})
+
 		const { email, password } = args.superadmin
 		const result = await this.signUpManager.signUp(email, password, [Identity.SystemRole.SUPER_ADMIN])
 

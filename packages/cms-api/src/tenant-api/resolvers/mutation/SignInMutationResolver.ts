@@ -8,8 +8,6 @@ import DbQueryable from '../../../core/database/DbQueryable'
 import PersonByIdQuery from '../../model/queries/PersonByIdQuery'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import Actions from '../../model/authorization/Actions'
-import { ForbiddenError } from 'apollo-server-koa'
-import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 
 export default class SignInMutationResolver implements MutationResolvers {
 	constructor(
@@ -23,9 +21,10 @@ export default class SignInMutationResolver implements MutationResolvers {
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<SignInResponse> {
-		if (!(await context.isAllowed(new AuthorizationScope.Global(), Actions.PERSON_SIGN_IN))) {
-			throw new ForbiddenError('You are not allowed to sign in')
-		}
+		await context.requireAccess({
+			action: Actions.PERSON_SIGN_IN,
+			message: 'You are not allowed to sign in'
+		})
 
 		const result = await this.signInManager.signIn(args.email, args.password, args.expiration || undefined)
 

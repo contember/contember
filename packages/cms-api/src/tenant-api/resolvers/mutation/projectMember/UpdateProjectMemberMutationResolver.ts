@@ -1,5 +1,4 @@
 import { MutationResolvers, MutationUpdateProjectMemberArgs, UpdateProjectMemberResponse } from '../../../schema/types'
-import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../../ResolverContext'
 import ProjectMemberManager from '../../../model/service/ProjectMemberManager'
 import ProjectScope from '../../../model/authorization/ProjectScope'
@@ -11,8 +10,7 @@ export default class UpdateProjectMemberMutationResolver implements MutationReso
 	async updateProjectMember(
 		parent: any,
 		{ projectId, identityId, variables, roles }: MutationUpdateProjectMemberArgs,
-		context: ResolverContext,
-		info: GraphQLResolveInfo
+		context: ResolverContext
 	): Promise<UpdateProjectMemberResponse> {
 		await context.requireAccess({
 			scope: new ProjectScope(projectId),

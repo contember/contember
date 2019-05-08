@@ -7,10 +7,11 @@ import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManag
 import ProjectAwareIdentity from '../tenant-api/model/authorization/ProjectAwareIdentity'
 import Authorizator from '../core/authorization/Authorizator'
 import Identity from '../common/auth/Identity'
+import { Resolvers } from '../tenant-api/schema/types'
 
 class TenantApolloServerFactory {
 	constructor(
-		private readonly resolvers: Config['resolvers'],
+		private readonly resolvers: Resolvers,
 		private readonly projectMemberManager: ProjectMemberManager,
 		private readonly authorizator: Authorizator<Identity>
 	) {}
@@ -20,7 +21,7 @@ class TenantApolloServerFactory {
 			typeDefs,
 			introspection: true,
 			tracing: true,
-			resolvers: this.resolvers,
+			resolvers: this.resolvers as Config['resolvers'],
 			context: ({ ctx }: { ctx: AuthMiddlewareFactory.ContextWithAuth }): ResolverContext => {
 				const { identityId, apiKeyId, roles } = ctx.state.authResult
 				return new ResolverContext(

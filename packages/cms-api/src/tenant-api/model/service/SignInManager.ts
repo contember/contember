@@ -2,8 +2,9 @@ import bcrypt from 'bcrypt'
 import { SignInErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
 import DbQueryable from '../../../core/database/DbQueryable'
-import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import ApiKeyManager from './ApiKeyManager'
+import PersonQuery from '../queries/person/PersonQuery'
+import { PersonRow } from '../queries/person/types'
 
 class SignInManager {
 	constructor(
@@ -12,7 +13,7 @@ class SignInManager {
 	) {}
 
 	async signIn(email: string, password: string, expiration?: number): Promise<SignInManager.SignInResult> {
-		const personRow = await this.queryHandler.fetch(new PersonByEmailQuery(email))
+		const personRow = await this.queryHandler.fetch(PersonQuery.byEmail(email))
 		if (personRow === null) {
 			return new SignInManager.SignInResultError([SignInErrorCode.UnknownEmail])
 		}
@@ -23,7 +24,7 @@ class SignInManager {
 		}
 
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id, expiration)
-		return new SignInManager.SignInResultOk(personRow.id, personRow.identity_id, sessionToken)
+		return new SignInManager.SignInResultOk(personRow, sessionToken)
 	}
 }
 
@@ -32,7 +33,7 @@ namespace SignInManager {
 
 	export class SignInResultOk {
 		readonly ok = true
-		constructor(public readonly personId: string, public readonly identityId: string, public readonly token: string) {}
+		constructor(public readonly person: PersonRow, public readonly token: string) {}
 	}
 
 	export class SignInResultError {

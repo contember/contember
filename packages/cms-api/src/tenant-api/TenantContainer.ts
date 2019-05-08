@@ -26,6 +26,7 @@ import PasswordChangeManager from './model/service/PasswordChangeManager'
 import SignOutMutationResolver from './resolvers/mutation/person/SignOutMutationResolver'
 import RemoveProjectMemberMutationResolver from './resolvers/mutation/projectMember/RemoveProjectMemberMutationResolver'
 import DisableApiKeyMutationResolver from './resolvers/mutation/apiKey/DisableApiKeyMutationResolver'
+import { IdentityTypeResolver } from './resolvers/types/IdentityTypeResolver'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -78,16 +79,12 @@ namespace TenantContainer {
 				.addService('projectMemberManager', ({ queryHandler, db }) => new ProjectMemberManager(queryHandler, db))
 				.addService('projectManager', ({ db }) => new ProjectManager(db))
 
-				.addService('meQueryResolver', ({ queryHandler }) => new MeQueryResolver(queryHandler))
+				.addService('meQueryResolver', () => new MeQueryResolver())
 				.addService(
 					'signUpMutationResolver',
-					({ signUpManager, queryHandler, apiKeyManager }) =>
-						new SignUpMutationResolver(signUpManager, queryHandler, apiKeyManager)
+					({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager)
 				)
-				.addService(
-					'signInMutationResolver',
-					({ signInManager, queryHandler }) => new SignInMutationResolver(signInManager, queryHandler)
-				)
+				.addService('signInMutationResolver', ({ signInManager }) => new SignInMutationResolver(signInManager))
 				.addService(
 					'signOutMutationResolver',
 					({ apiKeyManager, queryHandler }) => new SignOutMutationResolver(apiKeyManager, queryHandler)
@@ -103,8 +100,7 @@ namespace TenantContainer {
 				)
 				.addService(
 					'setupMutationResolver',
-					({ signUpManager, apiKeyManager, queryHandler }) =>
-						new SetupMutationResolver(signUpManager, queryHandler, apiKeyManager)
+					({ signUpManager, apiKeyManager }) => new SetupMutationResolver(signUpManager, apiKeyManager)
 				)
 				.addService(
 					'updateProjectMemberMutationResolver',
@@ -122,6 +118,7 @@ namespace TenantContainer {
 					'disableApiKeyMutationResolver',
 					({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager)
 				)
+				.addService('identityTypeResolver', ({ queryHandler }) => new IdentityTypeResolver(queryHandler))
 
 				.addService('resolvers', container => new ResolverFactory(container).create())
 

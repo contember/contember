@@ -1,11 +1,12 @@
 import QueryHandler from '../../../core/query/QueryHandler'
 import DbQueryable from '../../../core/database/DbQueryable'
-import PersonByEmailQuery from '../queries/PersonByEmailQuery'
 import { SignUpErrorCode } from '../../schema/types'
 import Client from '../../../core/database/Client'
 import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import CreatePersonCommand from '../commands/CreatePersonCommand'
 import Identity from '../../../common/auth/Identity'
+import PersonQuery from '../queries/person/PersonQuery'
+import { PersonRow } from '../queries/person/types'
 
 class SignUpManager {
 	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
@@ -17,17 +18,16 @@ class SignUpManager {
 		if (password.length < 6) {
 			return new SignUpManager.SignUpResultError([SignUpErrorCode.TooWeak])
 		}
-		const [identityId, personId] = await this.db.transaction(async wrapper => {
+		const person = await this.db.transaction(async wrapper => {
 			const identityId = await new CreateIdentityCommand([...roles, Identity.SystemRole.PERSON]).execute(wrapper)
-			const personId = await new CreatePersonCommand(identityId, email, password).execute(wrapper)
-			return [identityId, personId]
+			return await new CreatePersonCommand(identityId, email, password).execute(wrapper)
 		})
 
-		return new SignUpManager.SignUpResultOk(personId, identityId)
+		return new SignUpManager.SignUpResultOk(person)
 	}
 
 	private async isEmailAlreadyUsed(email: string): Promise<boolean> {
-		const personOrNull = await this.queryHandler.fetch(new PersonByEmailQuery(email))
+		const personOrNull = await this.queryHandler.fetch(PersonQuery.byEmail(email))
 		return personOrNull !== null
 	}
 }
@@ -38,7 +38,7 @@ namespace SignUpManager {
 	export class SignUpResultOk {
 		readonly ok = true
 
-		constructor(public readonly personId: string, public readonly identityId: string) {}
+		constructor(public readonly person: PersonRow) {}
 	}
 
 	export class SignUpResultError {

@@ -52,7 +52,7 @@ EXPECTED: ${expectedSql}
 					} else if (expectedParameter instanceof Date && actualParameter instanceof Date) {
 						expect(expectedParameter.getTime()).equal(actualParameter.getTime())
 					} else {
-						expect(actualParameter).equals(expectedParameter)
+						expect(actualParameter).deep.equals(expectedParameter)
 					}
 				}
 			}

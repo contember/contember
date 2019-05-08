@@ -138,16 +138,25 @@ namespace Connection {
 			return result
 		} catch (error) {
 			eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
-			throw new ConnectionError(`Execution of SQL query has failed: 
-SQL: ${sql}
-parameters: ${parameters}
-original message:
-${'message' in error ? error.message : error}
-`)
+			throw new ConnectionError(sql, parameters, error)
 		}
 	}
 
-	class ConnectionError extends Error {}
+	class ConnectionError extends Error {
+		public readonly code?: string
+		public readonly constraint?: string
+
+		constructor(public readonly sql: string, public readonly parameters: any, public readonly previous: Error | any) {
+			super(`Execution of SQL query has failed: 
+SQL: ${sql}
+parameters: ${parameters}
+original message:
+${'message' in previous ? previous.message : JSON.stringify(previous)}
+`)
+			this.code = previous.code
+			this.constraint = previous.constraint
+		}
+	}
 
 	function prepareSql(sql: string) {
 		let parameterIndex = 0

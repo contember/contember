@@ -2,52 +2,42 @@ import Command from './Command'
 import Client from '../../../core/database/Client'
 import { uuid } from '../../../utils/uuid'
 import InsertBuilder from '../../../core/database/InsertBuilder'
-import { UpdateProjectMemberVariablesErrorCode } from '../../schema/types'
+import { UpdateProjectMemberErrorCode } from '../../schema/types'
+import RemoveProjectMemberVariablesCommand from './RemoveProjectMemberVariablesCommand'
 
 class UpdateProjectMemberVariablesCommand
-	implements Command<UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponse> {
+	implements Command<UpdateProjectMemberVariablesCommand.UpdateProjectMemberResponse> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
-		private readonly variables: ReadonlyArray<UpdateProjectMemberVariablesCommand.VariableUpdate>
+		private readonly variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
+		private readonly deleteOld: boolean
 	) {}
 
-	async execute(db: Client): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponse> {
-		try {
-			const queries = this.variables.map(update => {
-				return db
-					.insertBuilder()
-					.into('project_member_variable')
-					.values({
-						id: uuid(),
-						project_id: this.projectId,
-						identity_id: this.identityId,
-						variable: update.name,
-						values: [...update.values],
-					})
-					.onConflict(InsertBuilder.ConflictActionType.update, ['project_id', 'identity_id', 'variable'], {
-						values: [...update.values],
-					})
-					.execute()
-			})
-			await Promise.all(queries)
-			return new UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponseOk()
-		} catch (e) {
-			switch (e.constraint) {
-				case 'project_member_project_id_fkey':
-					return new UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponseError([
-						UpdateProjectMemberVariablesErrorCode.ProjectNotFound,
-					])
+	async execute(db: Client): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberResponse> {
+		const queries = this.variables.map(update => {
+			return db
+				.insertBuilder()
+				.into('project_member_variable')
+				.values({
+					id: uuid(),
+					project_id: this.projectId,
+					identity_id: this.identityId,
+					variable: update.name,
+					values: [...update.values],
+				})
+				.onConflict(InsertBuilder.ConflictActionType.update, ['project_id', 'identity_id', 'variable'], {
+					values: [...update.values],
+				})
+				.execute()
+		})
+		await Promise.all(queries)
 
-				case 'project_member_identity':
-					return new UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponseError([
-						UpdateProjectMemberVariablesErrorCode.IdentityNotFound,
-					])
-
-				default:
-					throw e
-			}
+		if (this.deleteOld) {
+			await new RemoveProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables).execute(db)
 		}
+
+		return new UpdateProjectMemberVariablesCommand.UpdateProjectMemberResponseOk()
 	}
 }
 
@@ -57,20 +47,18 @@ namespace UpdateProjectMemberVariablesCommand {
 		values: ReadonlyArray<string>
 	}
 
-	export type UpdateProjectMemberVariablesResponse =
-		| UpdateProjectMemberVariablesResponseOk
-		| UpdateProjectMemberVariablesResponseError
+	export type UpdateProjectMemberResponse = UpdateProjectMemberResponseOk | UpdateProjectMemberResponseError
 
-	export class UpdateProjectMemberVariablesResponseOk {
+	export class UpdateProjectMemberResponseOk {
 		readonly ok = true
 
 		constructor() {}
 	}
 
-	export class UpdateProjectMemberVariablesResponseError {
+	export class UpdateProjectMemberResponseError {
 		readonly ok = false
 
-		constructor(public readonly errors: Array<UpdateProjectMemberVariablesErrorCode>) {}
+		constructor(public readonly errors: Array<UpdateProjectMemberErrorCode>) {}
 	}
 }
 

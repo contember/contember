@@ -1,11 +1,12 @@
-import { AddProjectMemberErrorCode } from '../../schema/types'
 import QueryHandler from '../../../core/query/QueryHandler'
 import DbQueryable from '../../../core/database/DbQueryable'
 import Client from '../../../core/database/Client'
 import ProjectRolesByIdentityQuery from '../queries/ProjectRolesByIdentityQuery'
-import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
+import UpdateProjectMemberCommand from '../commands/UpdateProjectMemberCommand'
 import ProjectVariablesByIdentityQuery from '../queries/ProjectVariablesByIdentityQuery'
 import AddProjectMemberCommand from '../commands/AddProjectMemberCommand'
+import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
+import RemoveProjectMemberCommand from '../commands/RemoveProjectMemberCommand'
 
 class ProjectMemberManager {
 	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
@@ -18,17 +19,32 @@ class ProjectMemberManager {
 	async addProjectMember(
 		projectId: string,
 		identityId: string,
-		roles: string[]
-	): Promise<ProjectMemberManager.AddProjectMemberResponse> {
-		return await new AddProjectMemberCommand(projectId, identityId, roles).execute(this.db)
+		roles: readonly string[],
+		variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[]
+	): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
+		return await this.db.transaction(
+			async trx => await new AddProjectMemberCommand(projectId, identityId, roles, variables).execute(trx)
+		)
 	}
 
-	async updateProjectMemberVariables(
+	async updateProjectMember(
 		projectId: string,
 		identityId: string,
-		variables: ReadonlyArray<UpdateProjectMemberVariablesCommand.VariableUpdate>
-	): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponse> {
-		return await new UpdateProjectMemberVariablesCommand(projectId, identityId, variables).execute(this.db)
+		roles?: readonly string[],
+		variables?: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[]
+	): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
+		return await this.db.transaction(
+			async trx => await new UpdateProjectMemberCommand(projectId, identityId, roles, variables).execute(trx)
+		)
+	}
+
+	async removeProjectMember(
+		projectId: string,
+		identityId: string
+	): Promise<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
+		return await this.db.transaction(
+			async trx => await new RemoveProjectMemberCommand(projectId, identityId).execute(trx)
+		)
 	}
 
 	async getProjectVariables(projectId: string, identityId: string): Promise<ProjectVariablesByIdentityQuery.Result> {
@@ -37,20 +53,6 @@ class ProjectMemberManager {
 }
 
 namespace ProjectMemberManager {
-	export type AddProjectMemberResponse = AddProjectMemberResponseOk | AddProjectMemberResponseError
-
-	export class AddProjectMemberResponseOk {
-		readonly ok = true
-
-		constructor() {}
-	}
-
-	export class AddProjectMemberResponseError {
-		readonly ok = false
-
-		constructor(public readonly errors: Array<AddProjectMemberErrorCode>) {}
-	}
-
 	export class GetProjectRolesResponse {
 		constructor(public readonly roles: string[]) {}
 	}

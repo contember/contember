@@ -8,17 +8,13 @@ import Identity from '../../../common/auth/Identity'
 import CreateApiKey from '../commands/CreateApiKey'
 import DisableOneOffApiKeyCommand from '../commands/DisableOneOffApiKeyCommand'
 import ProlongApiKey from '../commands/ProlongApiKey'
-import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
 import AddProjectMemberCommand from '../commands/AddProjectMemberCommand'
-import {
-	AddProjectMemberErrorCode,
-	CreateApiKeyErrorCode,
-	UpdateProjectMemberVariablesErrorCode,
-} from '../../schema/types'
+import { AddProjectMemberErrorCode, CreateApiKeyErrorCode } from '../../schema/types'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import { mapValues } from '../../utils/mapValue'
 import DisableApiKeyCommand from '../commands/DisableApiKeyCommand'
 import DisableIdentityApiKeysCommand from '../commands/DisableIdentityApiKeysCommand'
+import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
 
 class ApiKeyManager {
 	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
@@ -79,7 +75,7 @@ class ApiKeyManager {
 
 			const addMemberResponses = (await Promise.all(
 				projects.map(async project => {
-					return new AddProjectMemberCommand(project.id, identityId, project.roles).execute(db)
+					return new AddProjectMemberCommand(project.id, identityId, project.roles, project.variables).execute(db)
 				})
 			))
 				.filter((it): it is AddProjectMemberCommand.AddProjectMemberResponseError => !it.ok)
@@ -87,6 +83,7 @@ class ApiKeyManager {
 				.map(
 					mapValues<AddProjectMemberErrorCode, CreateApiKeyErrorCode>({
 						[AddProjectMemberErrorCode.ProjectNotFound]: CreateApiKeyErrorCode.ProjectNotFound,
+						[AddProjectMemberErrorCode.VariableNotFound]: CreateApiKeyErrorCode.VariableNotFound,
 						[AddProjectMemberErrorCode.IdentityNotFound]: ImplementationException.Throw,
 						[AddProjectMemberErrorCode.AlreadyMember]: ImplementationException.Throw,
 					})
@@ -95,26 +92,6 @@ class ApiKeyManager {
 
 			if (addMemberResponses.length > 0) {
 				return new ApiKeyManager.CreateApiKeyResponseError(addMemberResponses)
-			}
-
-			const updateVariablesResponses = (await Promise.all(
-				projects.filter(project => project.variables.length > 0).map(project => {
-					return new UpdateProjectMemberVariablesCommand(project.id, identityId, project.variables).execute(db)
-				})
-			))
-				.filter((it): it is UpdateProjectMemberVariablesCommand.UpdateProjectMemberVariablesResponseError => !it.ok)
-				.map(it => it.errors)
-				.map(
-					mapValues<UpdateProjectMemberVariablesErrorCode, CreateApiKeyErrorCode>({
-						[UpdateProjectMemberVariablesErrorCode.VariableNotFound]: CreateApiKeyErrorCode.VariableNotFound,
-						[UpdateProjectMemberVariablesErrorCode.ProjectNotFound]: ImplementationException.Throw,
-						[UpdateProjectMemberVariablesErrorCode.IdentityNotFound]: ImplementationException.Throw,
-					})
-				)
-				.reduce((acc, val) => [...acc, ...val], [])
-
-			if (updateVariablesResponses.length > 0) {
-				return new ApiKeyManager.CreateApiKeyResponseError(updateVariablesResponses)
 			}
 
 			return new ApiKeyManager.CreateApiKeyResponseOk(new ApiKeyManager.CreateApiKeyResult(identityId, apiKeyResult))

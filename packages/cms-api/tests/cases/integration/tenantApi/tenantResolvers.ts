@@ -413,5 +413,165 @@ describe('tenant api', () => {
 				},
 			})
 		})
+
+		it('add project member', async () => {
+			await execute({
+				query: GQL`mutation {
+          addProjectMember(projectId: "${testUuid(5)}", identityId: "${testUuid(
+					6
+				)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]) {
+            ok
+	          errors {
+		          code
+	          }
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`BEGIN;`,
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`insert into "tenant"."project_member" ("id", "project_id", "identity_id", "roles") values (?, ?, ?, ?)`,
+						parameters: [testUuid(1), testUuid(5), testUuid(6), JSON.stringify(['editor'])],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`insert into  "tenant"."project_member_variable" ("id", "project_id", "identity_id", "variable", "values") 
+				values  (?, ?, ?, ?, ?) on conflict  ("project_id", "identity_id", "variable") do update set  "values" =  ?`,
+						parameters: [testUuid(2), testUuid(5), testUuid(6), 'language', ['cs'], ['cs']],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`COMMIT;`,
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						addProjectMember: {
+							ok: true,
+							errors: [],
+						},
+					},
+				},
+			})
+		})
+
+		it('update project member', async () => {
+			await execute({
+				query: GQL`mutation {
+          updateProjectMember(projectId: "${testUuid(5)}", identityId: "${testUuid(
+					6
+				)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]) {
+            ok
+	          errors {
+		          code
+	          }
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`BEGIN;`,
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select "id" from "tenant"."project_member" where "project_id" = ? and "identity_id" = ?`,
+						response: {
+							rows: [{ id: testUuid(10) }],
+						},
+					},
+					{
+						sql: SQL`update "tenant"."project_member" set "roles" = ? where "project_id" = ? and "identity_id" = ?`,
+						parameters: [JSON.stringify(['editor']), testUuid(5), testUuid(6)],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`insert into  "tenant"."project_member_variable" ("id", "project_id", "identity_id", "variable", "values") 
+				values  (?, ?, ?, ?, ?) on conflict  ("project_id", "identity_id", "variable") do update set  "values" =  ?`,
+						parameters: [testUuid(1), testUuid(5), testUuid(6), 'language', ['cs'], ['cs']],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`delete from "tenant"."project_member_variable" where "project_id" = ? and "identity_id" = ? and not("variable" in (?))`,
+						parameters: [testUuid(5), testUuid(6), 'language'],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`COMMIT;`,
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						updateProjectMember: {
+							ok: true,
+							errors: [],
+						},
+					},
+				},
+			})
+		})
+
+		it('remove project member', async () => {
+			await execute({
+				query: GQL`mutation {
+          removeProjectMember(projectId: "${testUuid(5)}", identityId: "${testUuid(6)}") {
+            ok
+	          errors {
+		          code
+	          }
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`BEGIN;`,
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select "id" from "tenant"."project_member" where "project_id" = ? and "identity_id" = ?`,
+						response: {
+							rows: [{ id: testUuid(10) }],
+						},
+					},
+					{
+						sql: SQL`delete from "tenant"."project_member" where "project_id" = ? and "identity_id" = ?`,
+						parameters: [testUuid(5), testUuid(6)],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`delete from "tenant"."project_member_variable" where "project_id" = ? and "identity_id" = ? and not(false)`,
+						parameters: [testUuid(5), testUuid(6)],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`COMMIT;`,
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						removeProjectMember: {
+							ok: true,
+							errors: [],
+						},
+					},
+				},
+			})
+		})
 	})
 })

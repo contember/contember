@@ -2,12 +2,14 @@ import Command from './Command'
 import { AddProjectMemberErrorCode } from '../../schema/types'
 import Client from '../../../core/database/Client'
 import { uuid } from '../../../utils/uuid'
+import UpdateProjectMemberVariablesCommand from './UpdateProjectMemberVariablesCommand'
 
 class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProjectMemberResponse> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
-		private readonly roles: string[]
+		private readonly roles: readonly string[],
+		private readonly variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[]
 	) {}
 
 	async execute(db: Client): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
@@ -22,6 +24,7 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 					roles: JSON.stringify(this.roles),
 				})
 				.execute()
+			await new UpdateProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables, false).execute(db)
 
 			return new AddProjectMemberCommand.AddProjectMemberResponseOk()
 		} catch (e) {

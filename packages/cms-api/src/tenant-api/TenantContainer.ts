@@ -6,7 +6,7 @@ import CreateApiKeyMutationResolver from './resolvers/mutation/apiKey/CreateApiK
 import SignUpMutationResolver from './resolvers/mutation/person/SignUpMutationResolver'
 import SignInMutationResolver from './resolvers/mutation/person/SignInMutationResolver'
 import AddProjectMemberMutationResolver from './resolvers/mutation/projectMember/AddProjectMemberMutationResolver'
-import UpdateProjectMemberVariablesMutationResolver from './resolvers/mutation/projectMember/UpdateProjectMemberVariablesMutationResolver'
+import UpdateProjectMemberMutationResolver from './resolvers/mutation/projectMember/UpdateProjectMemberMutationResolver'
 import SetupMutationResolver from './resolvers/mutation/setup/SetupMutationResolver'
 import PermissionsFactory from './model/authorization/PermissionsFactory'
 import TenantApolloServerFactory from '../http/TenantApolloServerFactory'
@@ -24,6 +24,7 @@ import Connection from '../core/database/Connection'
 import ChangePasswordMutationResolver from './resolvers/mutation/person/ChangePasswordMutationResolver'
 import PasswordChangeManager from './model/service/PasswordChangeManager'
 import SignOutMutationResolver from './resolvers/mutation/person/SignOutMutationResolver'
+import RemoveProjectMemberMutationResolver from './resolvers/mutation/projectMember/RemoveProjectMemberMutationResolver'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -105,8 +106,12 @@ namespace TenantContainer {
 						new SetupMutationResolver(signUpManager, queryHandler, apiKeyManager)
 				)
 				.addService(
-					'updateProjectMemberVariablesMutationResolver',
-					({ projectMemberManager }) => new UpdateProjectMemberVariablesMutationResolver(projectMemberManager)
+					'updateProjectMemberMutationResolver',
+					({ projectMemberManager }) => new UpdateProjectMemberMutationResolver(projectMemberManager)
+				)
+				.addService(
+					'removeProjectMemberMutationResolver',
+					({ projectMemberManager }) => new RemoveProjectMemberMutationResolver(projectMemberManager)
 				)
 				.addService(
 					'createApiKeyMutationResolver',

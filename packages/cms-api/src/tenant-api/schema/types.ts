@@ -17,6 +17,7 @@ export type AddProjectMemberError = {
 export enum AddProjectMemberErrorCode {
 	ProjectNotFound = 'PROJECT_NOT_FOUND',
 	IdentityNotFound = 'IDENTITY_NOT_FOUND',
+	VariableNotFound = 'VARIABLE_NOT_FOUND',
 	AlreadyMember = 'ALREADY_MEMBER',
 }
 
@@ -99,7 +100,8 @@ export type Mutation = {
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
-	readonly updateProjectMemberVariables?: Maybe<UpdateProjectMemberVariablesResponse>
+	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
+	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 }
 
@@ -131,12 +133,19 @@ export type MutationAddProjectMemberArgs = {
 	projectId: Scalars['String']
 	identityId: Scalars['String']
 	roles: ReadonlyArray<Scalars['String']>
+	variables?: Maybe<ReadonlyArray<VariableUpdate>>
 }
 
-export type MutationUpdateProjectMemberVariablesArgs = {
+export type MutationUpdateProjectMemberArgs = {
 	projectId: Scalars['String']
 	identityId: Scalars['String']
-	variables: ReadonlyArray<VariableUpdate>
+	roles?: Maybe<ReadonlyArray<Scalars['String']>>
+	variables?: Maybe<ReadonlyArray<VariableUpdate>>
+}
+
+export type MutationRemoveProjectMemberArgs = {
+	projectId: Scalars['String']
+	identityId: Scalars['String']
 }
 
 export type MutationCreateApiKeyArgs = {
@@ -163,6 +172,21 @@ export type Project = {
 
 export type Query = {
 	readonly me: Identity
+}
+
+export type RemoveProjectMemberError = {
+	readonly code: RemoveProjectMemberErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum RemoveProjectMemberErrorCode {
+	NotMember = 'NOT_MEMBER',
+}
+
+export type RemoveProjectMemberResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<RemoveProjectMemberError>
 }
 
 export type SetupError = {
@@ -244,21 +268,20 @@ export type SignUpResult = {
 	readonly person: Person
 }
 
-export type UpdateProjectMemberVariablesError = {
-	readonly code: UpdateProjectMemberVariablesErrorCode
+export type UpdateProjectMemberError = {
+	readonly code: UpdateProjectMemberErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
-export enum UpdateProjectMemberVariablesErrorCode {
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	IdentityNotFound = 'IDENTITY_NOT_FOUND',
+export enum UpdateProjectMemberErrorCode {
 	VariableNotFound = 'VARIABLE_NOT_FOUND',
+	NotMember = 'NOT_MEMBER',
 }
 
-export type UpdateProjectMemberVariablesResponse = {
+export type UpdateProjectMemberResponse = {
 	readonly ok: Scalars['Boolean']
-	readonly errors: ReadonlyArray<UpdateProjectMemberVariablesError>
+	readonly errors: ReadonlyArray<UpdateProjectMemberError>
 }
 
 export type VariableUpdate = {
@@ -387,11 +410,17 @@ export type MutationResolvers<Context = any, ParentType = Mutation> = {
 	signOut?: Resolver<Maybe<SignOutResponse>, ParentType, Context, MutationSignOutArgs>
 	changePassword?: Resolver<Maybe<ChangePasswordResponse>, ParentType, Context, MutationChangePasswordArgs>
 	addProjectMember?: Resolver<Maybe<AddProjectMemberResponse>, ParentType, Context, MutationAddProjectMemberArgs>
-	updateProjectMemberVariables?: Resolver<
-		Maybe<UpdateProjectMemberVariablesResponse>,
+	updateProjectMember?: Resolver<
+		Maybe<UpdateProjectMemberResponse>,
 		ParentType,
 		Context,
-		MutationUpdateProjectMemberVariablesArgs
+		MutationUpdateProjectMemberArgs
+	>
+	removeProjectMember?: Resolver<
+		Maybe<RemoveProjectMemberResponse>,
+		ParentType,
+		Context,
+		MutationRemoveProjectMemberArgs
 	>
 	createApiKey?: Resolver<Maybe<CreateApiKeyResponse>, ParentType, Context, MutationCreateApiKeyArgs>
 }
@@ -415,6 +444,17 @@ export type ProjectResolvers<Context = any, ParentType = Project> = {
 
 export type QueryResolvers<Context = any, ParentType = Query> = {
 	me?: Resolver<Identity, ParentType, Context>
+}
+
+export type RemoveProjectMemberErrorResolvers<Context = any, ParentType = RemoveProjectMemberError> = {
+	code?: Resolver<RemoveProjectMemberErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+}
+
+export type RemoveProjectMemberResponseResolvers<Context = any, ParentType = RemoveProjectMemberResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<RemoveProjectMemberError>, ParentType, Context>
 }
 
 export type SetupErrorResolvers<Context = any, ParentType = SetupError> = {
@@ -478,21 +518,15 @@ export type SignUpResultResolvers<Context = any, ParentType = SignUpResult> = {
 	person?: Resolver<Person, ParentType, Context>
 }
 
-export type UpdateProjectMemberVariablesErrorResolvers<
-	Context = any,
-	ParentType = UpdateProjectMemberVariablesError
-> = {
-	code?: Resolver<UpdateProjectMemberVariablesErrorCode, ParentType, Context>
+export type UpdateProjectMemberErrorResolvers<Context = any, ParentType = UpdateProjectMemberError> = {
+	code?: Resolver<UpdateProjectMemberErrorCode, ParentType, Context>
 	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type UpdateProjectMemberVariablesResponseResolvers<
-	Context = any,
-	ParentType = UpdateProjectMemberVariablesResponse
-> = {
+export type UpdateProjectMemberResponseResolvers<Context = any, ParentType = UpdateProjectMemberResponse> = {
 	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
-	errors?: Resolver<ReadonlyArray<UpdateProjectMemberVariablesError>, ParentType, Context>
+	errors?: Resolver<ReadonlyArray<UpdateProjectMemberError>, ParentType, Context>
 }
 
 export type Resolvers<Context = any> = {
@@ -511,6 +545,8 @@ export type Resolvers<Context = any> = {
 	PersonWithoutIdentity?: PersonWithoutIdentityResolvers<Context>
 	Project?: ProjectResolvers<Context>
 	Query?: QueryResolvers<Context>
+	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<Context>
+	RemoveProjectMemberResponse?: RemoveProjectMemberResponseResolvers<Context>
 	SetupError?: SetupErrorResolvers<Context>
 	SetupResponse?: SetupResponseResolvers<Context>
 	SetupResult?: SetupResultResolvers<Context>
@@ -522,8 +558,8 @@ export type Resolvers<Context = any> = {
 	SignUpError?: SignUpErrorResolvers<Context>
 	SignUpResponse?: SignUpResponseResolvers<Context>
 	SignUpResult?: SignUpResultResolvers<Context>
-	UpdateProjectMemberVariablesError?: UpdateProjectMemberVariablesErrorResolvers<Context>
-	UpdateProjectMemberVariablesResponse?: UpdateProjectMemberVariablesResponseResolvers<Context>
+	UpdateProjectMemberError?: UpdateProjectMemberErrorResolvers<Context>
+	UpdateProjectMemberResponse?: UpdateProjectMemberResponseResolvers<Context>
 }
 
 /**

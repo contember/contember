@@ -25,6 +25,7 @@ import ChangePasswordMutationResolver from './resolvers/mutation/person/ChangePa
 import PasswordChangeManager from './model/service/PasswordChangeManager'
 import SignOutMutationResolver from './resolvers/mutation/person/SignOutMutationResolver'
 import RemoveProjectMemberMutationResolver from './resolvers/mutation/projectMember/RemoveProjectMemberMutationResolver'
+import DisableApiKeyMutationResolver from './resolvers/mutation/apiKey/DisableApiKeyMutationResolver'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -116,6 +117,10 @@ namespace TenantContainer {
 				.addService(
 					'createApiKeyMutationResolver',
 					({ apiKeyManager }) => new CreateApiKeyMutationResolver(apiKeyManager)
+				)
+				.addService(
+					'disableApiKeyMutationResolver',
+					({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager)
 				)
 
 				.addService('resolvers', container => new ResolverFactory(container).create())

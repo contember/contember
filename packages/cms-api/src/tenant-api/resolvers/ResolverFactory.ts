@@ -11,6 +11,7 @@ import ChangePasswordMutationResolver from './mutation/person/ChangePasswordMuta
 import SignOutMutationResolver from './mutation/person/SignOutMutationResolver'
 import UpdateProjectMemberMutationResolver from './mutation/projectMember/UpdateProjectMemberMutationResolver'
 import RemoveProjectMemberMutationResolver from './mutation/projectMember/RemoveProjectMemberMutationResolver'
+import DisableApiKeyMutationResolver from './mutation/apiKey/DisableApiKeyMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -29,6 +30,7 @@ class ResolverFactory {
 			removeProjectMemberMutationResolver: RemoveProjectMemberMutationResolver
 
 			createApiKeyMutationResolver: CreateApiKeyMutationResolver
+			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
 		}
 	) {}
 
@@ -59,6 +61,9 @@ class ResolverFactory {
 
 				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(
 					this.resolvers.createApiKeyMutationResolver
+				),
+				disableApiKey: this.resolvers.disableApiKeyMutationResolver.disableApiKey.bind(
+					this.resolvers.disableApiKeyMutationResolver
 				),
 			},
 		}

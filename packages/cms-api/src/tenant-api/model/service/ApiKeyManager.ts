@@ -57,8 +57,8 @@ class ApiKeyManager {
 		await new DisableOneOffApiKeyCommand(apiKeyId).execute(this.db)
 	}
 
-	async disableApiKey(apiKeyId: string): Promise<void> {
-		await new DisableApiKeyCommand(apiKeyId).execute(this.db)
+	async disableApiKey(apiKeyId: string): Promise<boolean> {
+		return await new DisableApiKeyCommand(apiKeyId).execute(this.db)
 	}
 
 	async disableIdentityApiKeys(identityId: string): Promise<void> {

@@ -85,7 +85,7 @@ class ExecutionContainerFactory {
 					metaHandler,
 					selectHandlers,
 				}) =>
-					new class implements SelectBuilderFactory {
+					new (class implements SelectBuilderFactory {
 						create(qb: DbSelectBuilder, hydrator: SelectHydrator): SelectBuilder {
 							return new SelectBuilder(
 								that.schema,
@@ -98,7 +98,7 @@ class ExecutionContainerFactory {
 								selectHandlers
 							)
 						}
-					}()
+					})()
 			)
 			.addService(
 				'insertBuilderFactory',

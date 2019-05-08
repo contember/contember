@@ -15,7 +15,7 @@ type ColumnValue = {
 
 export default class UpdateBuilder {
 	public readonly update: Promise<number | null>
-	private firer: (() => void) = () => {
+	private firer: () => void = () => {
 		throw new Error()
 	}
 

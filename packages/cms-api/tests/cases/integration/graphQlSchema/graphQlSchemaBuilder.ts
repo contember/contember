@@ -224,14 +224,16 @@ describe('build gql schema from model schema', () => {
 		await testSchema({
 			schema: builder =>
 				builder.entity('Post', e =>
-					e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).oneHasMany('locales', r =>
-						r.ownedBy('post').target('PostLocale', e =>
-							e
-								.unique(['locale', 'post'])
-								.column('locale', c => c.type(Model.ColumnType.String))
-								.column('title', c => c.type(Model.ColumnType.String))
+					e
+						.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
+						.oneHasMany('locales', r =>
+							r.ownedBy('post').target('PostLocale', e =>
+								e
+									.unique(['locale', 'post'])
+									.column('locale', c => c.type(Model.ColumnType.String))
+									.column('title', c => c.type(Model.ColumnType.String))
+							)
 						)
-					)
 				),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema7.gql',

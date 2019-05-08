@@ -46,7 +46,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processManyRelationInput(
 			this.data[relation.name] as Input.CreateManyRelationInput,
-			new class implements RelationInputProcessor {
+			new (class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					const primaryInversed = await insertBuilder.insert
 					await mapper.connectJunction(
@@ -67,7 +67,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 						{ [entity.primary]: primaryInversed }
 					)
 				}
-			}()
+			})()
 		)
 	}
 
@@ -82,7 +82,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processManyRelationInput(
 			this.data[relation.name] as Input.CreateManyRelationInput,
-			new class implements RelationInputProcessor {
+			new (class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					const primary = await insertBuilder.insert
 					await mapper.connectJunction(
@@ -103,7 +103,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 						{ [targetEntity.primary]: primaryInversed }
 					)
 				}
-			}()
+			})()
 		)
 	}
 
@@ -118,7 +118,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processRelationInput(
 			this.data[relation.name] as Input.CreateOneRelationInput,
-			new class implements RelationInputProcessor {
+			new (class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					insertBuilder.addFieldValue(relation.name, mapper.getPrimaryValue(targetEntity, input))
 				}
@@ -126,7 +126,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 				public async create(input: Input.CreateDataInput) {
 					insertBuilder.addFieldValue(relation.name, mapper.insert(targetEntity, input))
 				}
-			}()
+			})()
 		)
 	}
 
@@ -141,7 +141,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processManyRelationInput(
 			this.data[relation.name] as Input.CreateManyRelationInput,
-			new class implements RelationInputProcessor {
+			new (class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					const value = await insertBuilder.insert
 					await mapper.update(targetEntity, input, {
@@ -160,7 +160,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 						},
 					})
 				}
-			}()
+			})()
 		)
 	}
 
@@ -175,7 +175,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processRelationInput(
 			this.data[relation.name] as Input.CreateOneRelationInput,
-			new class implements RelationInputProcessor {
+			new (class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					const value = await insertBuilder.insert
 					await mapper.update(targetEntity, input, {
@@ -194,7 +194,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 						},
 					})
 				}
-			}()
+			})()
 		)
 	}
 
@@ -209,7 +209,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processRelationInput(
 			this.data[relation.name] as Input.CreateOneRelationInput,
-			new class implements RelationInputProcessor {
+			new (class implements RelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					insertBuilder.addFieldValue(relation.name, mapper.getPrimaryValue(targetEntity, input))
 				}
@@ -217,7 +217,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 				public async create(input: Input.CreateDataInput) {
 					insertBuilder.addFieldValue(relation.name, mapper.insert(targetEntity, input))
 				}
-			}()
+			})()
 		)
 	}
 

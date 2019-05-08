@@ -66,7 +66,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processHasManyRelationInput(
 			relationData,
-			new class implements HasManyRelationInputProcessor {
+			new (class implements HasManyRelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					await connect(input)
 				}
@@ -102,7 +102,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						}
 					}
 				}
-			}()
+			})()
 		)
 	}
 
@@ -127,7 +127,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processHasManyRelationInput(
 			relationData,
-			new class implements HasManyRelationInputProcessor {
+			new (class implements HasManyRelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					await connect(input)
 				}
@@ -163,7 +163,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						}
 					}
 				}
-			}()
+			})()
 		)
 	}
 
@@ -180,7 +180,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processHasOneRelationInput(
 			relationData,
-			new class implements HasOneRelationInputProcessor {
+			new (class implements HasOneRelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					updateBuilder.addFieldValue(relation.name, mapper.getPrimaryValue(targetEntity, input))
 				}
@@ -222,7 +222,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						await mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
 					}
 				}
-			}()
+			})()
 		)
 	}
 
@@ -242,7 +242,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processHasManyRelationInput(
 			relationData,
-			new class implements HasManyRelationInputProcessor {
+			new (class implements HasManyRelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					await mapper.update(targetEntity, input, {
 						[targetRelation.name]: { connect: thisPrimary },
@@ -295,7 +295,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						})
 					}
 				}
-			}()
+			})()
 		)
 	}
 
@@ -312,7 +312,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processHasOneRelationInput(
 			relationData,
-			new class implements HasOneRelationInputProcessor {
+			new (class implements HasOneRelationInputProcessor {
 				public async connect(where: Input.UniqueWhere) {
 					await mapper.update(targetEntity, where, { [targetRelation.name]: { connect: thisPrimary } })
 				}
@@ -354,7 +354,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						})
 					}
 				}
-			}()
+			})()
 		)
 	}
 
@@ -372,7 +372,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 
 		return this.processHasOneRelationInput(
 			relationData,
-			new class implements HasOneRelationInputProcessor {
+			new (class implements HasOneRelationInputProcessor {
 				public async connect(input: Input.UniqueWhere) {
 					updateBuilder.addFieldValue(relation.name, async () => {
 						const relationPrimary = (await mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
@@ -434,7 +434,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 						await mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
 					}
 				}
-			}()
+			})()
 		)
 	}
 

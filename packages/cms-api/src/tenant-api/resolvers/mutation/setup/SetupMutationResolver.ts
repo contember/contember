@@ -2,20 +2,13 @@ import { MutationResolvers, MutationSetupArgs, SetupResponse } from '../../../sc
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../../ResolverContext'
 import SignUpManager from '../../../model/service/SignUpManager'
-import QueryHandler from '../../../../core/query/QueryHandler'
-import DbQueryable from '../../../../core/database/DbQueryable'
-import PersonByIdQuery from '../../../model/queries/PersonByIdQuery'
 import ImplementationException from '../../../../core/exceptions/ImplementationException'
 import Actions from '../../../model/authorization/Actions'
 import ApiKeyManager from '../../../model/service/ApiKeyManager'
 import Identity from '../../../../common/auth/Identity'
 
 export default class SetupMutationResolver implements MutationResolvers {
-	constructor(
-		private readonly signUpManager: SignUpManager,
-		private readonly queryHandler: QueryHandler<DbQueryable>,
-		private readonly apiKeyManager: ApiKeyManager
-	) {}
+	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}
 
 	async setup(
 		parent: any,
@@ -32,12 +25,6 @@ export default class SetupMutationResolver implements MutationResolvers {
 		const result = await this.signUpManager.signUp(email, password, [Identity.SystemRole.SUPER_ADMIN])
 
 		if (!result.ok) {
-			throw new ImplementationException()
-		}
-
-		const personRow = await this.queryHandler.fetch(new PersonByIdQuery(result.personId))
-
-		if (personRow === null) {
 			throw new ImplementationException()
 		}
 
@@ -58,10 +45,10 @@ export default class SetupMutationResolver implements MutationResolvers {
 					},
 				},
 				superadmin: {
-					id: personRow.id,
-					email: personRow.email,
+					id: result.person.id,
+					email: result.person.email,
 					identity: {
-						id: result.identityId,
+						id: result.person.identity_id,
 						projects: [],
 					},
 				},

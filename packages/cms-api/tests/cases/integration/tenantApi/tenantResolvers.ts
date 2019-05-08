@@ -40,7 +40,7 @@ export const execute = async (test: Test) => {
 		}
 	)
 
-	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.resolvers })
+	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.resolvers as any })
 	await executeGraphQlTest({
 		context: context,
 		query: test.query,
@@ -65,12 +65,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select
-                       "id",
-                       "password_hash",
-                       "identity_id"
-                     from "tenant"."person"
-                     where "email" = ?`,
+						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "email" = ?`,
 						parameters: ['john@doe.com'],
 						response: { rows: [] },
 					},
@@ -93,14 +88,11 @@ describe('tenant api', () => {
 						response: { rowCount: 1 },
 					},
 					{
-						sql: SQL`select
-                       "id",
-                       "email",
-                       "identity_id"
-                     from "tenant"."person"
-                     where "id" = ?`,
-						parameters: [testUuid(2)],
-						response: { rows: [{ id: testUuid(2), email: 'john@doe.com' }] },
+						sql: SQL`update "tenant"."api_key"
+            set "disabled_at" = ?
+            where "id" = ? and "type" = ?`,
+						parameters: [(val: any) => val instanceof Date, testUuid(998), 'one_off'],
+						response: { rowCount: 1 },
 					},
 					{
 						sql: SQL`select
@@ -112,13 +104,6 @@ describe('tenant api', () => {
                      where "project_member"."identity_id" = ?`,
 						parameters: [testUuid(1)],
 						response: { rows: [{ id: testUuid(3), name: 'foo', slug: 'foo' }] },
-					},
-					{
-						sql: SQL`update "tenant"."api_key"
-            set "disabled_at" = ?
-            where "id" = ? and "type" = ?`,
-						parameters: [(val: any) => val instanceof Date, testUuid(998), 'one_off'],
-						response: { rowCount: 1 },
 					},
 				],
 				return: {
@@ -153,12 +138,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select
-                       "id",
-                       "password_hash",
-                       "identity_id"
-                     from "tenant"."person"
-                     where "email" = ?`,
+						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "email" = ?`,
 						parameters: ['john@doe.com'],
 						response: { rows: [{ id: testUuid(1), password_hash: null, identity_id: null }] },
 					},
@@ -204,12 +184,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select
-                       "id",
-                       "password_hash",
-                       "identity_id"
-                     from "tenant"."person"
-                     where "email" = ?`,
+						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "email" = ?`,
 						parameters: ['john@doe.com'],
 						response: {
 							rows: [{ id: testUuid(1), password_hash: await bcrypt.hash('123', salt), identity_id: testUuid(2) }],
@@ -278,7 +253,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "email", "identity_id" from "tenant"."person" where "id" = ?`,
+						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "id" = ?`,
 						parameters: [testUuid(1)],
 						response: {
 							rows: [
@@ -317,7 +292,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "email" from "tenant"."person" where "identity_id" = ?`,
+						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [
@@ -353,7 +328,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "email" from "tenant"."person" where "identity_id" = ?`,
+						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [
@@ -392,7 +367,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "email" from "tenant"."person" where "identity_id" = ?`,
+						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [],
@@ -587,6 +562,13 @@ describe('tenant api', () => {
 	          errors {
 		          code
 	          }
+	          result  {
+		          identity {
+			            projects {
+			              id
+			            }
+		          }
+	          }
           }
         }`,
 				executes: [
@@ -636,12 +618,28 @@ describe('tenant api', () => {
 						sql: SQL`COMMIT;`,
 						response: { rowCount: 1 },
 					},
+					{
+						sql: SQL`select "project"."id", "project"."name", "project"."slug" 
+								from  "tenant"."project" 
+								    inner join  "tenant"."project_member" as "project_member" on  "project_member"."project_id" = "project"."id"  
+								where "project_member"."identity_id" = ?
+`,
+						parameters: [testUuid(1)],
+						response: {
+							rows: [{ id: testUuid(11), name: 'test', slug: 'test' }],
+						},
+					},
 				],
 				return: {
 					data: {
 						createApiKey: {
 							ok: true,
 							errors: [],
+							result: {
+								identity: {
+									projects: [{ id: testUuid(11) }],
+								},
+							},
 						},
 					},
 				},

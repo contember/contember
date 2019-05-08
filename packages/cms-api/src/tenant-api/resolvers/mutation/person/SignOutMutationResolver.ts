@@ -1,11 +1,10 @@
 import { MutationResolvers, MutationSignOutArgs, SignOutErrorCode, SignOutResponse } from '../../../schema/types'
-import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../../ResolverContext'
 import QueryHandler from '../../../../core/query/QueryHandler'
 import DbQueryable from '../../../../core/database/DbQueryable'
 import Actions from '../../../model/authorization/Actions'
 import ApiKeyManager from '../../../model/service/ApiKeyManager'
-import PersonByIdentityQuery from '../../../model/queries/PersonByIdentityQuery'
+import PersonQuery from '../../../model/queries/person/PersonQuery'
 
 export default class SignOutMutationResolver implements MutationResolvers {
 	constructor(
@@ -13,13 +12,8 @@ export default class SignOutMutationResolver implements MutationResolvers {
 		private readonly queryHandler: QueryHandler<DbQueryable>
 	) {}
 
-	async signOut(
-		parent: any,
-		args: MutationSignOutArgs,
-		context: ResolverContext,
-		info: GraphQLResolveInfo
-	): Promise<SignOutResponse> {
-		const person = await this.queryHandler.fetch(new PersonByIdentityQuery(context.identity.id))
+	async signOut(parent: any, args: MutationSignOutArgs, context: ResolverContext): Promise<SignOutResponse> {
+		const person = await this.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
 			return { ok: false, errors: [{ code: SignOutErrorCode.NotAPerson }] }
 		}

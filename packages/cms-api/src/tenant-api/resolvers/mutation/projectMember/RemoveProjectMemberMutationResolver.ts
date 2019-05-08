@@ -1,5 +1,4 @@
 import { MutationRemoveProjectMemberArgs, MutationResolvers, RemoveProjectMemberResponse } from '../../../schema/types'
-import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../../ResolverContext'
 import ProjectMemberManager from '../../../model/service/ProjectMemberManager'
 import ProjectScope from '../../../model/authorization/ProjectScope'
@@ -11,8 +10,7 @@ export default class RemoveProjectMemberMutationResolver implements MutationReso
 	async removeProjectMember(
 		parent: any,
 		{ projectId, identityId }: MutationRemoveProjectMemberArgs,
-		context: ResolverContext,
-		info: GraphQLResolveInfo
+		context: ResolverContext
 	): Promise<RemoveProjectMemberResponse> {
 		await context.requireAccess({
 			scope: new ProjectScope(projectId),

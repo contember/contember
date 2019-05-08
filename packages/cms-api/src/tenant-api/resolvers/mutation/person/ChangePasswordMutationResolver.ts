@@ -8,10 +8,10 @@ import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../../ResolverContext'
 import QueryHandler from '../../../../core/query/QueryHandler'
 import DbQueryable from '../../../../core/database/DbQueryable'
-import PersonByIdQuery from '../../../model/queries/PersonByIdQuery'
 import Actions from '../../../model/authorization/Actions'
 import IdentityScope from '../../../model/authorization/IdentityScope'
 import PasswordChangeManager from '../../../model/service/PasswordChangeManager'
+import PersonQuery from '../../../model/queries/person/PersonQuery'
 
 export default class ChangePasswordMutationResolver implements MutationResolvers {
 	constructor(
@@ -25,7 +25,7 @@ export default class ChangePasswordMutationResolver implements MutationResolvers
 		context: ResolverContext,
 		info: GraphQLResolveInfo
 	): Promise<ChangePasswordResponse> {
-		const person = await this.queryHandler.fetch(new PersonByIdQuery(args.personId))
+		const person = await this.queryHandler.fetch(PersonQuery.byId(args.personId))
 		if (!person) {
 			return {
 				ok: false,

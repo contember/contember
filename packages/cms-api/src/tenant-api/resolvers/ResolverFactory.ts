@@ -1,5 +1,3 @@
-import { Config } from 'apollo-server-core'
-
 import MeQueryResolver from './query/MeQueryResolver'
 
 import SignUpMutationResolver from './mutation/person/SignUpMutationResolver'
@@ -12,6 +10,8 @@ import SignOutMutationResolver from './mutation/person/SignOutMutationResolver'
 import UpdateProjectMemberMutationResolver from './mutation/projectMember/UpdateProjectMemberMutationResolver'
 import RemoveProjectMemberMutationResolver from './mutation/projectMember/RemoveProjectMemberMutationResolver'
 import DisableApiKeyMutationResolver from './mutation/apiKey/DisableApiKeyMutationResolver'
+import { IdentityTypeResolver } from './types/IdentityTypeResolver'
+import { Resolvers } from '../schema/types'
 
 class ResolverFactory {
 	public constructor(
@@ -31,11 +31,20 @@ class ResolverFactory {
 
 			createApiKeyMutationResolver: CreateApiKeyMutationResolver
 			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
+
+			identityTypeResolver: IdentityTypeResolver
 		}
 	) {}
 
-	create(): Config['resolvers'] {
+	create(): Resolvers {
 		return {
+			IdentityWithoutPerson: {
+				projects: this.resolvers.identityTypeResolver.projects.bind(this.resolvers.identityTypeResolver),
+			},
+			Identity: {
+				projects: this.resolvers.identityTypeResolver.projects.bind(this.resolvers.identityTypeResolver),
+				person: this.resolvers.identityTypeResolver.person.bind(this.resolvers.identityTypeResolver),
+			},
 			Query: {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),
 			},

@@ -16,7 +16,7 @@ type ColumnValue<E = never> = {
 
 export default class InsertBuilder {
 	public readonly insert: Promise<Input.PrimaryValue>
-	private firer: (() => void) = () => {
+	private firer: () => void = () => {
 		throw new Error()
 	}
 

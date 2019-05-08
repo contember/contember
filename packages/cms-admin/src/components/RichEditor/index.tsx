@@ -97,8 +97,8 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			props.serializer == RichEditorSerializer.HTML
 				? htmlSerializer
 				: props.serializer == RichEditorSerializer.JSON
-					? new JsonSerializer(htmlSerializer)
-					: assertNever(props.serializer)
+				? new JsonSerializer(htmlSerializer)
+				: assertNever(props.serializer)
 		this.plugins = CONFIGS.map(c => c.plugin)
 		this.state = { value: this.serializer.deserialize(props.value) }
 	}
@@ -185,7 +185,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 	}
 
 	private onMarkClickCache = new Map<RichEditorPluginConfig, () => unknown>()
-	private changeMarkingTo(config: RichEditorPluginConfig): (() => unknown) {
+	private changeMarkingTo(config: RichEditorPluginConfig): () => unknown {
 		if (this.onMarkClickCache.has(config)) return this.onMarkClickCache.get(config)!
 		else
 			return this.onMarkClickCache

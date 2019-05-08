@@ -96,8 +96,8 @@ class PermissionsVerifier {
 					canRead && canWrite
 						? PermissionsVerifier.EventPermission.canApply
 						: canRead
-							? PermissionsVerifier.EventPermission.canView
-							: PermissionsVerifier.EventPermission.forbidden
+						? PermissionsVerifier.EventPermission.canView
+						: PermissionsVerifier.EventPermission.forbidden
 			} else {
 				permissionsResult[event.id] = PermissionsVerifier.EventPermission.forbidden
 			}

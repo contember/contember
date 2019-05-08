@@ -75,13 +75,15 @@ builder.entity('Block', entity =>
 
 // Menu
 builder.entity('MenuItem', entity =>
-	entity.column('order', col => col.type(Model.ColumnType.Int)).oneHasMany('locales', ref =>
-		ref
-			.target('MenuItemLocale')
-			.ownedBy('menuItem')
-			.onDelete(Model.OnDelete.cascade)
-			.ownerNotNull()
-	)
+	entity
+		.column('order', col => col.type(Model.ColumnType.Int))
+		.oneHasMany('locales', ref =>
+			ref
+				.target('MenuItemLocale')
+				.ownedBy('menuItem')
+				.onDelete(Model.OnDelete.cascade)
+				.ownerNotNull()
+		)
 )
 
 builder.entity('MenuItemLocale', entity =>

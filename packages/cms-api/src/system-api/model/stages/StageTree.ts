@@ -23,13 +23,15 @@ namespace StageTree {
 				throw new Error(`Exactly 1 root stage expected, ${rootStages.length} found`)
 			}
 			const rootStage = rootStages[0]
-			const stages = project.stages.filter(it => it.base).reduce<Map>(
-				(acc, stage) => ({
-					...acc,
-					[stage.base!]: [...(acc[stage.base!] || []), stage],
-				}),
-				{}
-			)
+			const stages = project.stages
+				.filter(it => it.base)
+				.reduce<Map>(
+					(acc, stage) => ({
+						...acc,
+						[stage.base!]: [...(acc[stage.base!] || []), stage],
+					}),
+					{}
+				)
 			return new StageTree(rootStage, stages)
 		}
 	}

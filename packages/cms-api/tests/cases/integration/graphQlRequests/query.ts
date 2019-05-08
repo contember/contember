@@ -1762,14 +1762,16 @@ describe('Queries', () => {
 		await execute({
 			schema: new SchemaBuilder()
 				.entity('Post', e =>
-					e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).oneHasMany('locales', r =>
-						r.ownedBy('post').target('PostLocale', e =>
-							e
-								.unique(['locale', 'post'])
-								.column('locale', c => c.type(Model.ColumnType.String))
-								.column('title', c => c.type(Model.ColumnType.String))
+					e
+						.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
+						.oneHasMany('locales', r =>
+							r.ownedBy('post').target('PostLocale', e =>
+								e
+									.unique(['locale', 'post'])
+									.column('locale', c => c.type(Model.ColumnType.String))
+									.column('title', c => c.type(Model.ColumnType.String))
+							)
 						)
-					)
 				)
 				.buildSchema(),
 			query: GQL`				

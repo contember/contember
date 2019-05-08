@@ -9,7 +9,7 @@ class TableReferencingResolver {
 			const referencing = acceptEveryFieldVisitor(
 				schema,
 				entity,
-				new class implements Model.RelationByTypeVisitor<{ [column: string]: string }> {
+				new (class implements Model.RelationByTypeVisitor<{ [column: string]: string }> {
 					visitManyHasOne({}, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity) {
 						return { [relation.joiningColumn.columnName]: targetEntity.tableName }
 					}
@@ -44,7 +44,7 @@ class TableReferencingResolver {
 					visitOneHasOneInversed() {
 						return {}
 					}
-				}()
+				})()
 			)
 			result[entity.tableName] = Object.values(referencing).reduce((acc, val) => ({ ...acc, ...val }), {})
 		}

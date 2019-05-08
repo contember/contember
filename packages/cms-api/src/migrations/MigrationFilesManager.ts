@@ -39,9 +39,11 @@ class MigrationFilesManager {
 		const files: string[] = await readDir(this.directory)
 
 		const filteredFiles: string[] = await Promise.all(
-			files.filter(file => file.endsWith(`.${extension}`)).filter(async file => {
-				return (await lstatFile(`${this.directory}/${file}`)).isFile()
-			})
+			files
+				.filter(file => file.endsWith(`.${extension}`))
+				.filter(async file => {
+					return (await lstatFile(`${this.directory}/${file}`)).isFile()
+				})
 		)
 		return filteredFiles.sort()
 	}

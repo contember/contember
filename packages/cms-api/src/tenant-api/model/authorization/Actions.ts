@@ -19,6 +19,7 @@ namespace Actions {
 	export const PROJECT_UPDATE_MEMBER_VARIABLES: Authorizator.Action = [Resources.project, 'updateMemberVariables']
 
 	export const API_KEY_CREATE: Authorizator.Action = [Resources.apiKey, 'create']
+	export const API_KEY_DISABLE: Authorizator.Action = [Resources.apiKey, 'disable']
 }
 
 export default Actions

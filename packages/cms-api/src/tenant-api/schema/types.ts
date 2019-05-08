@@ -82,6 +82,21 @@ export type CreateApiKeyResult = {
 	readonly identity: IdentityWithoutPerson
 }
 
+export type DisableApiKeyError = {
+	readonly code: DisableApiKeyErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum DisableApiKeyErrorCode {
+	KeyNotFound = 'KEY_NOT_FOUND',
+}
+
+export type DisableApiKeyResponse = {
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<DisableApiKeyError>
+}
+
 export type Identity = {
 	readonly id: Scalars['String']
 	readonly projects: ReadonlyArray<Project>
@@ -103,6 +118,7 @@ export type Mutation = {
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
 	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
+	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 }
 
 export type MutationSetupArgs = {
@@ -151,6 +167,10 @@ export type MutationRemoveProjectMemberArgs = {
 export type MutationCreateApiKeyArgs = {
 	roles?: Maybe<ReadonlyArray<Scalars['String']>>
 	projects?: Maybe<ReadonlyArray<ApiKeyProjectInput>>
+}
+
+export type MutationDisableApiKeyArgs = {
+	id: Scalars['String']
 }
 
 export type Person = {
@@ -392,6 +412,17 @@ export type CreateApiKeyResultResolvers<Context = any, ParentType = CreateApiKey
 	identity?: Resolver<IdentityWithoutPerson, ParentType, Context>
 }
 
+export type DisableApiKeyErrorResolvers<Context = any, ParentType = DisableApiKeyError> = {
+	code?: Resolver<DisableApiKeyErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+}
+
+export type DisableApiKeyResponseResolvers<Context = any, ParentType = DisableApiKeyResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<DisableApiKeyError>, ParentType, Context>
+}
+
 export type IdentityResolvers<Context = any, ParentType = Identity> = {
 	id?: Resolver<Scalars['String'], ParentType, Context>
 	projects?: Resolver<ReadonlyArray<Project>, ParentType, Context>
@@ -423,6 +454,7 @@ export type MutationResolvers<Context = any, ParentType = Mutation> = {
 		MutationRemoveProjectMemberArgs
 	>
 	createApiKey?: Resolver<Maybe<CreateApiKeyResponse>, ParentType, Context, MutationCreateApiKeyArgs>
+	disableApiKey?: Resolver<Maybe<DisableApiKeyResponse>, ParentType, Context, MutationDisableApiKeyArgs>
 }
 
 export type PersonResolvers<Context = any, ParentType = Person> = {
@@ -538,6 +570,8 @@ export type Resolvers<Context = any> = {
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<Context>
 	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<Context>
 	CreateApiKeyResult?: CreateApiKeyResultResolvers<Context>
+	DisableApiKeyError?: DisableApiKeyErrorResolvers<Context>
+	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<Context>
 	Identity?: IdentityResolvers<Context>
 	IdentityWithoutPerson?: IdentityWithoutPersonResolvers<Context>
 	Mutation?: MutationResolvers<Context>

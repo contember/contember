@@ -34,6 +34,7 @@ const schema: DocumentNode = gql`
 		removeProjectMember(projectId: String!, identityId: String!): RemoveProjectMemberResponse
 
 		createApiKey(roles: [String!], projects: [ApiKeyProjectInput!]): CreateApiKeyResponse
+		disableApiKey(id: String!): DisableApiKeyResponse
 	}
 
 	# === setUp ===
@@ -228,6 +229,23 @@ const schema: DocumentNode = gql`
 		id: String!
 		token: String!
 		identity: IdentityWithoutPerson!
+	}
+
+	# === disableApiKey ===
+
+	type DisableApiKeyResponse {
+		ok: Boolean!
+		errors: [DisableApiKeyError!]!
+	}
+
+	type DisableApiKeyError {
+		code: DisableApiKeyErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum DisableApiKeyErrorCode {
+		KEY_NOT_FOUND
 	}
 
 	# === common ===

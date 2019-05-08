@@ -417,9 +417,12 @@ describe('tenant api', () => {
 		it('add project member', async () => {
 			await execute({
 				query: GQL`mutation {
-          addProjectMember(projectId: "${testUuid(5)}", identityId: "${testUuid(
-					6
-				)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]) {
+          addProjectMember(
+          projectId: "${testUuid(5)}", 
+          identityId: "${testUuid(6)}", 
+          roles: ["editor"], 
+          variables: [{name: "language", values: ["cs"]}]
+          ) {
             ok
 	          errors {
 		          code
@@ -568,6 +571,101 @@ describe('tenant api', () => {
 						removeProjectMember: {
 							ok: true,
 							errors: [],
+						},
+					},
+				},
+			})
+		})
+
+		it('create api key', async () => {
+			await execute({
+				query: GQL`mutation {
+          createApiKey(roles: ["test"], projects: [
+          	{projectId: "${testUuid(6)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]}
+          ]) {
+            ok
+	          errors {
+		          code
+	          }
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`BEGIN;`,
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles") values (?, ?, ?)`,
+						parameters: [testUuid(1), null, JSON.stringify(['test'])],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`insert into "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at") values (?, ?, ?, ?, ?, ?, ?, ?)`,
+						parameters: [
+							testUuid(2),
+							() => true,
+							'permanent',
+							testUuid(1),
+							null,
+							null,
+							null,
+							(val: any) => val instanceof Date,
+						],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`insert into "tenant"."project_member" ("id", "project_id", "identity_id", "roles") values (?, ?, ?, ?)`,
+						parameters: [testUuid(3), testUuid(6), testUuid(1), JSON.stringify(['editor'])],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`insert into  "tenant"."project_member_variable" ("id", "project_id", "identity_id", "variable", "values") 
+				values  (?, ?, ?, ?, ?) on conflict  ("project_id", "identity_id", "variable") do update set  "values" =  ?`,
+						parameters: [testUuid(4), testUuid(6), testUuid(1), 'language', ['cs'], ['cs']],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`COMMIT;`,
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						createApiKey: {
+							ok: true,
+							errors: [],
+						},
+					},
+				},
+			})
+		})
+
+		it('disable api key', async () => {
+			await execute({
+				query: GQL`mutation {
+          disableApiKey(id: "${testUuid(1)}"){
+            ok
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "id" = ?`,
+						parameters: [(val: any) => val instanceof Date, testUuid(1)],
+						response: { rowCount: 1 },
+					},
+				],
+				return: {
+					data: {
+						disableApiKey: {
+							ok: true,
 						},
 					},
 				},

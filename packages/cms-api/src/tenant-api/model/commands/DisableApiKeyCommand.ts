@@ -1,10 +1,10 @@
 import Command from './Command'
 import Client from '../../../core/database/Client'
 
-class DisableApiKeyCommand implements Command<void> {
+class DisableApiKeyCommand implements Command<boolean> {
 	constructor(private readonly apiKeyId: string) {}
 
-	async execute(db: Client): Promise<void> {
+	async execute(db: Client): Promise<boolean> {
 		const qb = db
 			.updateBuilder()
 			.table('api_key')
@@ -13,7 +13,7 @@ class DisableApiKeyCommand implements Command<void> {
 			})
 			.values({ disabled_at: new Date() })
 
-		await qb.execute()
+		return (await qb.execute()) > 0
 	}
 }
 

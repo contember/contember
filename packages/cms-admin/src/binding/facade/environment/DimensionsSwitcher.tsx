@@ -219,12 +219,11 @@ namespace DimensionsSwitcher {
 							</Dropdown.Column>
 						)
 					})}
-					{!this.state.isAdding &&
-						canSelectAnother && (
-							<Button onClick={() => this.setState({ isAdding: true })} small>
-								Add
-							</Button>
-						)}
+					{!this.state.isAdding && canSelectAnother && (
+						<Button onClick={() => this.setState({ isAdding: true })} small>
+							Add
+						</Button>
+					)}
 				</Dropdown>
 			)
 		}

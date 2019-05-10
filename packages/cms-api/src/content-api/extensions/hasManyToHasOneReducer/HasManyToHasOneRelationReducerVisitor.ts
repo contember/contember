@@ -54,7 +54,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		if (!targetRelation) {
 			return {}
 		}
-		return getUniqueConstraints(this.schema, entity)
+		return getUniqueConstraints(this.schema, targetEntity)
 			.map(unique => unique.fields)
 			.filter(fields => fields.length === 2) //todo support all uniques
 			.filter(fields => fields.includes(targetRelation.name))

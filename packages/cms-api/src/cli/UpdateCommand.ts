@@ -32,7 +32,6 @@ class UpdateCommand extends Command<{}, {}> {
 				console.log(`Done`)
 
 				await container.systemDbClient.transaction(async trx => {
-
 					const executionContainer = container.systemExecutionContainerFactory.create(trx)
 
 					const init = executionContainer.projectIntializer

@@ -13,7 +13,8 @@ class ProjectsByIdentityQuery extends DbQuery<ProjectsByIdentityQuery.Result> {
 	}
 
 	async fetch(queryable: DbQueryable): Promise<ProjectsByIdentityQuery.Result> {
-		const identityResult =  await queryable.createSelectBuilder<{ roles: string[] }>()
+		const identityResult = await queryable
+			.createSelectBuilder<{ roles: string[] }>()
 			.from('identity')
 			.where({
 				id: this.identityId,

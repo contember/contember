@@ -166,7 +166,8 @@ class CompositionRoot {
 				({ projectContainerResolver, koa }) =>
 					new CommandManager({
 						['diff']: () => new DiffCommand(projectContainerResolver, projectSchemas),
-						['update']: () => new UpdateCommand(tenantContainer.dbMigrationsRunner, tenantContainer.projectManager, projectContainers),
+						['update']: () =>
+							new UpdateCommand(tenantContainer.dbMigrationsRunner, tenantContainer.projectManager, projectContainers),
 						['drop']: () => new DropCommand(config),
 						['start']: () => new StartCommand(koa, config),
 						['setup']: () => new SetupCommand(tenantContainer.signUpManager, tenantContainer.apiKeyManager),
@@ -195,11 +196,15 @@ class CompositionRoot {
 						{ timing: true }
 					)
 				})
-				.addService('systemDbMigrationsRunner', () => new MigrationsRunner(
-					project.dbCredentials,
-					'system',
-					MigrationFilesManager.createForEngine('project').directory
-				))
+				.addService(
+					'systemDbMigrationsRunner',
+					() =>
+						new MigrationsRunner(
+							project.dbCredentials,
+							'system',
+							MigrationFilesManager.createForEngine('project').directory
+						)
+				)
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.slug)
 				)

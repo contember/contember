@@ -2,7 +2,6 @@ import DbQuery from '../../../core/database/DbQuery'
 import DbQueryable from '../../../core/database/DbQueryable'
 
 class ProjectsQuery extends DbQuery<ProjectsQuery.Result> {
-
 	async fetch(queryable: DbQueryable): Promise<ProjectsQuery.Result> {
 		return await queryable
 			.createSelectBuilder<ProjectsQuery.Row>()

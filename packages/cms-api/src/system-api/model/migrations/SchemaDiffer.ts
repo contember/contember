@@ -189,8 +189,11 @@ class SchemaDiffer {
 		return diff
 	}
 
-	private trackUniqueConstraintDiff(builder: ModificationBuilder, originalEntity: Model.Entity, updatedEntity: Model.Entity) {
-
+	private trackUniqueConstraintDiff(
+		builder: ModificationBuilder,
+		originalEntity: Model.Entity,
+		updatedEntity: Model.Entity
+	) {
 		const originalUnique = originalEntity.unique
 		const originalUniqueNames = new Set(Object.keys(originalUnique))
 

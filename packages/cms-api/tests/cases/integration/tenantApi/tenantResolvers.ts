@@ -621,7 +621,7 @@ describe('tenant api', () => {
 					{
 						sql: SQL`select "roles" from "tenant"."identity" where "id" = ?`,
 						parameters: [testUuid(1)],
-						response: {rows: [{roles: []}]},
+						response: { rows: [{ roles: [] }] },
 					},
 					{
 						sql: SQL`select "id", "name", "slug" from "tenant"."project"`,

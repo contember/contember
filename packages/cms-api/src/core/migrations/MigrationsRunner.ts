@@ -2,11 +2,15 @@ import { DatabaseCredentials } from '../../config/config'
 import pgMigrate from 'node-pg-migrate'
 
 export default class MigrationsRunner {
-	public async migrate(db: DatabaseCredentials, schema: string, dir: string, log: boolean = true) {
+	constructor(private readonly db: DatabaseCredentials, private readonly schema: string, private readonly dir: string) {
+
+	}
+
+	public async migrate(log: boolean = true) {
 		await pgMigrate({
-			databaseUrl: db,
-			dir: dir,
-			schema: schema,
+			databaseUrl: this.db,
+			dir: this.dir,
+			schema: this.schema,
 			migrationsTable: 'migrations',
 			checkOrder: true,
 			direction: 'up',

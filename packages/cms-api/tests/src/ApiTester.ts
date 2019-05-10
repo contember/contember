@@ -81,11 +81,11 @@ export default class ApiTester {
 		await connection.query('DROP DATABASE IF EXISTS ' + wrapIdentifier(dbName), [])
 		await connection.query('CREATE DATABASE ' + wrapIdentifier(dbName), [])
 
-		const migrationsRunner = new MigrationsRunner()
 		const systemMigrationsManager = new MigrationFilesManager(
 			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/migrations/project'
 		)
-		await migrationsRunner.migrate(dbCredentials(dbName), 'system', systemMigrationsManager.directory, false)
+		const migrationsRunner = new MigrationsRunner(dbCredentials(dbName), 'system', systemMigrationsManager.directory)
+		await migrationsRunner.migrate(false)
 		await connection.end()
 
 		const projectConnection = createConnection(dbName)

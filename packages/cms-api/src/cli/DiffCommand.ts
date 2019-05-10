@@ -8,7 +8,7 @@ type Args = {
 	migrationName: string
 }
 
-class ProjectMigrationsDiffCommand extends Command<Args, {}> {
+class DiffCommand extends Command<Args, {}> {
 	constructor(
 		private readonly projectContainerResolver: ProjectContainerResolver,
 		private readonly schemas: { [name: string]: Schema }
@@ -17,7 +17,7 @@ class ProjectMigrationsDiffCommand extends Command<Args, {}> {
 	}
 
 	protected configure(configuration: CommandConfiguration): void {
-		configuration.description('Creates .json and .sql schema migration for given project')
+		configuration.description('Creates .json schema migration for given project')
 		configuration.argument('projectName')
 		configuration.argument('migrationName')
 	}
@@ -43,4 +43,4 @@ class ProjectMigrationsDiffCommand extends Command<Args, {}> {
 	}
 }
 
-export default ProjectMigrationsDiffCommand
+export default DiffCommand

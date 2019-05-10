@@ -3,6 +3,7 @@ import Command from '../core/cli/Command'
 import ApiKeyManager from '../tenant-api/model/service/ApiKeyManager'
 import SignUpManager from '../tenant-api/model/service/SignUpManager'
 import prompts from 'prompts'
+import Identity from '../common/auth/Identity'
 
 class SetupCommand extends Command<{}, {}> {
 	constructor(
@@ -29,7 +30,10 @@ class SetupCommand extends Command<{}, {}> {
 				message: 'Superadmin password',
 			}
 		])
-		await this.signUpManager.signUp(email, password)
+		const result = await this.signUpManager.signUp(email, password, [Identity.SystemRole.SUPER_ADMIN])
+		if (!result.ok) {
+			throw new Error(result.errors.join(", "))
+		}
 		console.log("Superadmin created.")
 
 		const loginKey = await this.apiKeyManager.createLoginApiKey()

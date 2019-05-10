@@ -164,7 +164,7 @@ export default class SchemaBuilderInternal {
 		for (let fieldName in fieldOptions) {
 			const options = fieldOptions[fieldName]
 
-			if ((options.type === FieldBuilder.Type.Column && options.options.unique)) {
+			if (options.type === FieldBuilder.Type.Column && options.options.unique) {
 				const uniqueName = SqlNameHelper.createUniqueConstraintName(entityName, [fieldName])
 				unique[uniqueName] = { fields: [fieldName], name: uniqueName }
 			}

@@ -18,7 +18,6 @@ class SqlNameHelper {
 
 		return 'unique_' + entityName + '_' + fields.join('_') + '_' + uniqueSuffix.slice(0, 6)
 	}
-
 }
 
 export default SqlNameHelper

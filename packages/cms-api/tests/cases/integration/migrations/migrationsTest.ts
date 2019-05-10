@@ -22,9 +22,14 @@ function testDiffSchemas(
 ) {
 	const actual = schemaDiffer.diffSchemas(
 		{ model: originalSchema, acl: emptyAcl },
-		{ model: updatedSchema, acl: emptyAcl }, false)
+		{ model: updatedSchema, acl: emptyAcl },
+		false
+	)
 	expect(actual).deep.equals(expectedDiff)
-	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, actual)).deep.equals({ model: updatedSchema, acl: emptyAcl })
+	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, actual)).deep.equals({
+		model: updatedSchema,
+		acl: emptyAcl,
+	})
 }
 
 function testApplyDiff(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSchema: Model.Schema) {

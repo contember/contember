@@ -44,7 +44,14 @@ namespace TenantContainer {
 		create(tenantDbCredentials: DatabaseCredentials): TenantContainer {
 			return this.createBuilder(tenantDbCredentials)
 				.build()
-				.pick('apolloServer', 'apiKeyManager', 'projectMemberManager', 'projectManager', 'dbMigrationsRunner', 'signUpManager')
+				.pick(
+					'apolloServer',
+					'apiKeyManager',
+					'projectMemberManager',
+					'projectManager',
+					'dbMigrationsRunner',
+					'signUpManager'
+				)
 		}
 
 		createBuilder(tenantDbCredentials: DatabaseCredentials) {
@@ -56,11 +63,15 @@ namespace TenantContainer {
 					}
 				)
 				.addService('db', ({ connection }) => connection.createClient('tenant'))
-				.addService('dbMigrationsRunner', () => new MigrationsRunner(
-					tenantDbCredentials,
-					'tenant',
-					MigrationFilesManager.createForEngine('tenant').directory
-				))
+				.addService(
+					'dbMigrationsRunner',
+					() =>
+						new MigrationsRunner(
+							tenantDbCredentials,
+							'tenant',
+							MigrationFilesManager.createForEngine('tenant').directory
+						)
+				)
 				.addService('queryHandler', ({ db }) => {
 					const handler = new QueryHandler(
 						new DbQueryable(db, {

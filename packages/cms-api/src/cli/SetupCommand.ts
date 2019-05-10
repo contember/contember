@@ -6,10 +6,7 @@ import prompts from 'prompts'
 import Identity from '../common/auth/Identity'
 
 class SetupCommand extends Command<{}, {}> {
-	constructor(
-		private readonly signUpManager: SignUpManager,
-		private readonly apiKeyManager: ApiKeyManager
-	) {
+	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {
 		super()
 	}
 
@@ -28,16 +25,16 @@ class SetupCommand extends Command<{}, {}> {
 				type: 'password',
 				name: 'password',
 				message: 'Superadmin password',
-			}
+			},
 		])
 		const result = await this.signUpManager.signUp(email, password, [Identity.SystemRole.SUPER_ADMIN])
 		if (!result.ok) {
-			throw new Error(result.errors.join(", "))
+			throw new Error(result.errors.join(', '))
 		}
-		console.log("Superadmin created.")
+		console.log('Superadmin created.')
 
 		const loginKey = await this.apiKeyManager.createLoginApiKey()
-		console.log("Login token:")
+		console.log('Login token:')
 		console.log(loginKey.apiKey.token)
 	}
 }

@@ -3,8 +3,7 @@
 import { CommandManager } from './core/cli/CommandManager'
 import EngineMigrationsCreateCommand from './cli/EngineMigrationsCreateCommand'
 import Application from './core/cli/Application'
-
-(async () => {
+;(async () => {
 	const commandManager = new CommandManager({
 		['migrations:create']: () => new EngineMigrationsCreateCommand(),
 	})
@@ -15,4 +14,3 @@ import Application from './core/cli/Application'
 	console.error(e)
 	process.exit(1)
 })
-

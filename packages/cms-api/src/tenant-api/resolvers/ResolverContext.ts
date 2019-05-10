@@ -29,7 +29,7 @@ export default class ResolverContext {
 		action: Authorizator.Action
 		message?: string
 	}): Promise<void> {
-		if (!(await this.isAllowed({scope, action}))) {
+		if (!(await this.isAllowed({ scope, action }))) {
 			throw new ForbiddenError(message || 'Forbidden')
 		}
 	}

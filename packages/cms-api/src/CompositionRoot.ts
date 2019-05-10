@@ -39,6 +39,7 @@ import TenantContainer from './tenant-api/TenantContainer'
 import Connection from './core/database/Connection'
 import Client from './core/database/Client'
 import MigrationsRunner from './core/migrations/MigrationsRunner'
+import SetupCommand from './cli/SetupCommand'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -168,6 +169,7 @@ class CompositionRoot {
 						['update']: () => new UpdateCommand(tenantContainer.dbMigrationsRunner, tenantContainer.projectManager, projectContainers),
 						['drop']: () => new DropCommand(config),
 						['start']: () => new StartCommand(koa, config),
+						['setup']: () => new SetupCommand(tenantContainer.signUpManager, tenantContainer.apiKeyManager),
 					})
 			)
 			.addService('cli', ({ commandManager }) => new Application(commandManager))

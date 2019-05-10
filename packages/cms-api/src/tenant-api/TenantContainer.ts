@@ -33,6 +33,7 @@ import MigrationFilesManager from '../migrations/MigrationFilesManager'
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
 	apiKeyManager: ApiKeyManager
+	signUpManager: SignUpManager
 	projectManager: ProjectManager
 	apolloServer: ApolloServer
 	dbMigrationsRunner: MigrationsRunner
@@ -43,7 +44,7 @@ namespace TenantContainer {
 		create(tenantDbCredentials: DatabaseCredentials): TenantContainer {
 			return this.createBuilder(tenantDbCredentials)
 				.build()
-				.pick('apolloServer', 'apiKeyManager', 'projectMemberManager', 'projectManager', 'dbMigrationsRunner')
+				.pick('apolloServer', 'apiKeyManager', 'projectMemberManager', 'projectManager', 'dbMigrationsRunner', 'signUpManager')
 		}
 
 		createBuilder(tenantDbCredentials: DatabaseCredentials) {

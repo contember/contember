@@ -13,7 +13,9 @@ class ModificationBuilder {
 
 	public getDiff(): Migration.Modification[] {
 		const [createEntity, other] = arraySplit(this.modifications, it => it.modification === 'createEntity')
-		return [...createEntity, ...other]
+		const [createUniqueConstraint, other2] = arraySplit(other, it => it.modification === 'createUniqueConstraint')
+
+		return [...createEntity, ...other2, ...createUniqueConstraint]
 	}
 
 	public createEntity(updatedEntity: Model.Entity) {

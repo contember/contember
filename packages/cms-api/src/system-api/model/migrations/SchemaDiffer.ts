@@ -4,14 +4,14 @@ import ImplementationException from '../../../core/exceptions/ImplementationExce
 import SchemaMigrator from '../../../content-schema/differ/SchemaMigrator'
 import ModificationBuilder from './modifications/ModificationBuilder'
 import Migration from './Migration'
-import deepEqual = require('fast-deep-equal')
 import { isIt } from '../../../utils/type'
 import { createPatch } from 'rfc6902'
+import deepEqual = require('fast-deep-equal')
 
 class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
 
-	diffSchemas(originalSchema: Schema, updatedSchema: Schema): Migration.Modification[] {
+	diffSchemas(originalSchema: Schema, updatedSchema: Schema, checkRecreate: boolean = true): Migration.Modification[] {
 		const builder = new ModificationBuilder(updatedSchema)
 
 		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
@@ -27,8 +27,6 @@ class SchemaDiffer {
 		const updatedModel = updatedSchema.model
 
 		const originalEnums = new Set(Object.keys(originalModel.enums))
-		const originalEntities = new Set(Object.keys(originalModel.entities))
-		const toCreateUnique: { [entityName: string]: string[] } = {}
 
 		for (const enumName in updatedModel.enums) {
 			if (!originalEnums.has(enumName)) {
@@ -43,10 +41,9 @@ class SchemaDiffer {
 
 		for (const entityName in updatedModel.entities) {
 			const updatedEntity: Model.Entity = updatedModel.entities[entityName]
+			const originalEntity: Model.Entity | undefined = originalModel.entities[entityName]
 
-			toCreateUnique[entityName] = []
-
-			if (!originalEntities.has(entityName)) {
+			if (!originalEntity) {
 				builder.createEntity(updatedEntity)
 				for (const fieldName in updatedEntity.fields) {
 					if (fieldName === updatedEntity.primary) {
@@ -55,33 +52,12 @@ class SchemaDiffer {
 					builder.createField(updatedEntity, fieldName)
 				}
 				for (const uniqueName in updatedEntity.unique) {
-					toCreateUnique[entityName].push(uniqueName)
+					builder.createUnique(updatedEntity, uniqueName)
 				}
 				continue
 			}
-			originalEntities.delete(entityName)
 
-			const originalEntity: Model.Entity = originalModel.entities[entityName]
-			const originalFields = new Set(Object.keys(originalEntity.fields))
-			const originalUnique = new Set(Object.keys(originalEntity.unique))
-
-			for (const uniqueName in updatedEntity.unique) {
-				if (
-					originalUnique.has(uniqueName) &&
-					!deepEqual(updatedEntity.unique[uniqueName], originalEntity.unique[uniqueName])
-				) {
-					builder.removeUnique(entityName, uniqueName)
-					originalUnique.delete(uniqueName)
-				}
-				if (!originalUnique.has(uniqueName)) {
-					toCreateUnique[entityName].push(uniqueName)
-				}
-				originalUnique.delete(uniqueName)
-			}
-
-			for (const uniqueName of originalUnique) {
-				builder.removeUnique(entityName, uniqueName)
-			}
+			this.trackUniqueConstraintDiff(builder, originalEntity, updatedEntity)
 
 			if (updatedEntity.tableName !== originalEntity.tableName) {
 				builder.updateEntityTableName(entityName, updatedEntity.tableName)
@@ -111,6 +87,7 @@ class SchemaDiffer {
 				return true
 			}
 
+			const originalFields = new Set(Object.keys(originalEntity.fields))
 			for (const fieldName in updatedEntity.fields) {
 				if (!originalFields.has(fieldName)) {
 					builder.createField(updatedEntity, fieldName)
@@ -191,17 +168,13 @@ class SchemaDiffer {
 			}
 		}
 
-		for (const entityName in toCreateUnique) {
-			for (const uniqueName of toCreateUnique[entityName]) {
-				builder.createUnique(updatedModel.entities[entityName], uniqueName)
-			}
-		}
-
-		for (const entityName of originalEntities) {
+		const entitiesToDelete = Object.keys(originalModel.entities).filter(name => !updatedModel.entities[name])
+		for (const entityName of entitiesToDelete) {
 			builder.removeEntity(entityName)
 		}
 
-		for (const enumName of originalEnums) {
+		const enumsToDelete = Object.keys(originalModel.enums).filter(name => !updatedModel.enums[name])
+		for (const enumName of enumsToDelete) {
 			builder.removeEnum(enumName)
 		}
 
@@ -209,11 +182,35 @@ class SchemaDiffer {
 
 		const appliedDiff = this.schemaMigrator.applyDiff(originalSchema, diff)
 
-		if (!deepEqual(updatedSchema, appliedDiff)) {
+		if (checkRecreate && !deepEqual(updatedSchema, appliedDiff)) {
 			throw new ImplementationException('Updated schema cannot be recreated by the generated diff!')
 		}
 
 		return diff
+	}
+
+	private trackUniqueConstraintDiff(builder: ModificationBuilder, originalEntity: Model.Entity, updatedEntity: Model.Entity) {
+
+		const originalUnique = originalEntity.unique
+		const originalUniqueNames = new Set(Object.keys(originalUnique))
+
+		for (const uniqueName in updatedEntity.unique) {
+			if (
+				originalUniqueNames.has(uniqueName) &&
+				!deepEqual(updatedEntity.unique[uniqueName], originalUnique[uniqueName])
+			) {
+				builder.removeUnique(updatedEntity.name, uniqueName)
+				originalUniqueNames.delete(uniqueName)
+			}
+			if (!originalUniqueNames.has(uniqueName)) {
+				builder.createUnique(updatedEntity, uniqueName)
+			}
+			originalUniqueNames.delete(uniqueName)
+		}
+
+		for (const uniqueName of originalUniqueNames) {
+			builder.removeUnique(updatedEntity.name, uniqueName)
+		}
 	}
 }
 

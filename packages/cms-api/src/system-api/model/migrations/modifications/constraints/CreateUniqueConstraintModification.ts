@@ -11,9 +11,6 @@ class CreateUniqueConstraintModification implements Modification<CreateUniqueCon
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		const fields = this.data.unique.fields
-		if (fields.length === 1 && entity.fields[Object.values(fields)[0]].type === Model.RelationType.OneHasOne) {
-			return
-		}
 
 		const columns = fields.map(fieldName => {
 			return acceptFieldVisitor(this.schema.model, entity, fieldName, {

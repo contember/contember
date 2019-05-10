@@ -164,7 +164,6 @@ class CompositionRoot {
 				'commandManager',
 				({ projectContainerResolver, koa }) =>
 					new CommandManager({
-						['engine:migrations:create']: () => new EngineMigrationsCreateCommand(),
 						['engine:migrations:continue']: () => new EngineMigrationsContinueCommand(config),
 						['project:create-diff']: () => new ProjectMigrationsDiffCommand(projectContainerResolver, projectSchemas),
 						['init']: () => new InitCommand(tenantContainer.projectManager, projectContainers),

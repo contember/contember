@@ -25,6 +25,7 @@ class SetupCommand extends Command<{}, {}> {
 				type: 'password',
 				name: 'password',
 				message: 'Superadmin password',
+				validate: password => (password.length < 6 ? 'Password must contain at least 6 characters' : true),
 			},
 		])
 		const result = await this.signUpManager.signUp(email, password, [Identity.SystemRole.SUPER_ADMIN])

@@ -619,12 +619,13 @@ describe('tenant api', () => {
 						response: { rowCount: 1 },
 					},
 					{
-						sql: SQL`select "project"."id", "project"."name", "project"."slug" 
-								from  "tenant"."project" 
-								    inner join  "tenant"."project_member" as "project_member" on  "project_member"."project_id" = "project"."id"  
-								where "project_member"."identity_id" = ?
-`,
+						sql: SQL`select "roles" from "tenant"."identity" where "id" = ?`,
 						parameters: [testUuid(1)],
+						response: {rows: [{roles: []}]},
+					},
+					{
+						sql: SQL`select "id", "name", "slug" from "tenant"."project"`,
+						parameters: [],
 						response: {
 							rows: [{ id: testUuid(11), name: 'test', slug: 'test' }],
 						},

@@ -1,5 +1,6 @@
 import { isIt } from '../utils/type'
 import { Model } from 'cms-common'
+import SqlNameHelper from '../content-api/sqlSchema/SqlNameHelper'
 
 export const getEntity = (schema: Model.Schema, entityName: string): Model.Entity => {
 	const entity = schema.entities[entityName]
@@ -43,6 +44,23 @@ export const getTargetEntity = (
 		visitColumn: () => null,
 		visitRelation: (entity, relation, targetEntity) => targetEntity,
 	})
+}
+
+export const getUniqueConstraints = (schema: Model.Schema, entity: Model.Entity): Model.UniqueConstraint[] => {
+	const additionalConstraints = Object.values(acceptEveryFieldVisitor<Model.UniqueConstraint | undefined>(schema, entity, {
+		visitColumn: () => undefined,
+		visitManyHasManyInversed: () => undefined,
+		visitManyHasManyOwner: () => undefined,
+		visitOneHasMany: () => undefined,
+		visitManyHasOne: () => undefined,
+		visitOneHasOneInversed: () => undefined,
+		visitOneHasOneOwner: (entity, relation) => ({
+			fields: [relation.name],
+			name: SqlNameHelper.createUniqueConstraintName(entity.name, [relation.name]),
+		}),
+	})).filter((it): it is Model.UniqueConstraint => !!it)
+
+	return [...Object.values(entity.unique), ...additionalConstraints]
 }
 
 export const acceptEveryFieldVisitor = <T>(

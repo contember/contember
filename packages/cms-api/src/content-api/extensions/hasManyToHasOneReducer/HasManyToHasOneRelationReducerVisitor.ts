@@ -2,7 +2,7 @@ import { GraphQLInputObjectType } from 'graphql'
 import { Acl, Model } from 'cms-common'
 import EntityTypeProvider from '../../graphQLSchema/EntityTypeProvider'
 import WhereTypeProvider from '../../graphQLSchema/WhereTypeProvider'
-import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor, getUniqueConstraints } from '../../../content-schema/modelUtils'
 import { FieldAccessVisitor } from '../../graphQLSchema/FieldAccessVisitor'
 import Authorizator from '../../../acl/Authorizator'
 import { aliasAwareResolver, GqlTypeName } from '../../graphQLSchema/utils'
@@ -54,7 +54,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		if (!targetRelation) {
 			return {}
 		}
-		return Object.values(targetEntity.unique)
+		return getUniqueConstraints(this.schema, entity)
 			.map(unique => unique.fields)
 			.filter(fields => fields.length === 2) //todo support all uniques
 			.filter(fields => fields.includes(targetRelation.name))

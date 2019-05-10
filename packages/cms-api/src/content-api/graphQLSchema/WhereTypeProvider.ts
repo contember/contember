@@ -1,7 +1,7 @@
 import { GraphQLInputObjectType, GraphQLList } from 'graphql'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull } from 'graphql/type/definition'
 import { Acl, Model } from 'cms-common'
-import { acceptFieldVisitor, getEntity } from '../../content-schema/modelUtils'
+import { acceptFieldVisitor, getEntity, getUniqueConstraints } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
 import { capitalizeFirstLetter } from '../../utils/strings'
 import { isIt } from '../../utils/type'
@@ -44,7 +44,7 @@ export default class WhereTypeProvider {
 
 		const combinations: string[] = []
 
-		const definedUniqueKeys = Object.values(entity.unique).map(it => it.fields)
+		const definedUniqueKeys = getUniqueConstraints(this.schema, entity).map(it => it.fields)
 		const uniqueKeys: string[][] = [[entity.primary], ...definedUniqueKeys].filter(uniqueKey =>
 			uniqueKey.every(it =>
 				acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator))

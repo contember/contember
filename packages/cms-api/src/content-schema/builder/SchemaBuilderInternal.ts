@@ -10,7 +10,7 @@ import OneHasManyProcessor from './internal/OneHasManyProcessor'
 import ManyHasOneProcessor from './internal/ManyHasOneProcessor'
 import NamingConventions from './NamingConventions'
 import FieldBuilder from './FieldBuilder'
-import crypto from 'crypto'
+import SqlNameHelper from '../../content-api/sqlSchema/SqlNameHelper'
 
 export default class SchemaBuilderInternal {
 	private entities: { [name: string]: Model.Entity } = {}
@@ -158,29 +158,17 @@ export default class SchemaBuilderInternal {
 	): Model.UniqueConstraints {
 		const unique: Model.UniqueConstraints = {}
 		for (const singleUnique of options.unique || []) {
-			const name = singleUnique.name || this.createUniqueName(entityName, singleUnique.fields)
+			const name = singleUnique.name || SqlNameHelper.createUniqueConstraintName(entityName, singleUnique.fields)
 			unique[name] = { fields: singleUnique.fields, name: name }
 		}
 		for (let fieldName in fieldOptions) {
 			const options = fieldOptions[fieldName]
 
-			if (
-				(options.type === FieldBuilder.Type.Column && options.options.unique) ||
-				options.type === FieldBuilder.Type.OneHasOne
-			) {
-				const uniqueName = this.createUniqueName(entityName, [fieldName])
+			if ((options.type === FieldBuilder.Type.Column && options.options.unique)) {
+				const uniqueName = SqlNameHelper.createUniqueConstraintName(entityName, [fieldName])
 				unique[uniqueName] = { fields: [fieldName], name: uniqueName }
 			}
 		}
 		return unique
-	}
-
-	private createUniqueName(entityName: string, fields: string[]): string {
-		const uniqueSuffix = crypto
-			.createHash('sha256')
-			.update(JSON.stringify([entityName, ...fields]), 'ascii')
-			.digest('hex')
-
-		return 'unique_' + entityName + '_' + fields.join('_') + '_' + uniqueSuffix.slice(0, 6)
 	}
 }

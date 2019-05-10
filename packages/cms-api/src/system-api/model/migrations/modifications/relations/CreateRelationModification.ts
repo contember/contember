@@ -49,9 +49,12 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					[relation.joiningColumn.columnName]: {
 						type: getPrimaryType(targetEntity),
 						notNull: !relation.nullable,
-						unique: true,
 					},
 				})
+				const uniqueConstraintName = SqlNameHelper.createUniqueConstraintName(entity.name, [relation.name])
+
+				builder.addConstraint(entity.tableName, uniqueConstraintName, { unique: [relation.joiningColumn.columnName] })
+
 				const fkName = SqlNameHelper.createForeignKeyName(
 					entity.tableName,
 					relation.joiningColumn.columnName,

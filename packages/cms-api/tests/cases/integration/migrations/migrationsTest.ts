@@ -22,9 +22,9 @@ function testDiffSchemas(
 ) {
 	const actual = schemaDiffer.diffSchemas(
 		{ model: originalSchema, acl: emptyAcl },
-		{ model: updatedSchema, acl: emptyAcl }
-	)
+		{ model: updatedSchema, acl: emptyAcl }, false)
 	expect(actual).deep.equals(expectedDiff)
+	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, actual)).deep.equals({ model: updatedSchema, acl: emptyAcl })
 }
 
 function testApplyDiff(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSchema: Model.Schema) {
@@ -592,21 +592,14 @@ describe('Diff schemas', () => {
 					columnType: 'text',
 				},
 			},
-			{
-				entityName: 'Site',
-				modification: 'createUniqueConstraint',
-				unique: {
-					fields: ['setting'],
-					name: 'unique_Site_setting_8653a0',
-				},
-			},
 		]
 		const sql = SQL`CREATE TABLE "site" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			CREATE TABLE "site_setting" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site_setting" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			ALTER TABLE "site" ADD "name" text;
-			ALTER TABLE "site" ADD "setting_id" uuid UNIQUE;
+			ALTER TABLE "site" ADD "setting_id" uuid;
+			ALTER TABLE "site" ADD CONSTRAINT "unique_Site_setting_8653a0" UNIQUE ("setting_id");
 			ALTER TABLE "site" ADD CONSTRAINT "fk_site_setting_id_6a4aa6" FOREIGN KEY ("setting_id") REFERENCES "site_setting"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
 			ALTER TABLE "site_setting" ADD "url" text;`
 		it('diff schemas', () => {
@@ -994,11 +987,6 @@ describe('Diff schemas', () => {
 				modification: 'removeField',
 				entityName: 'SiteSetting',
 				fieldName: 'site',
-			},
-			{
-				modification: 'removeUniqueConstraint',
-				entityName: 'Site',
-				constraintName: 'unique_Site_setting_8653a0',
 			},
 			{
 				modification: 'removeField',

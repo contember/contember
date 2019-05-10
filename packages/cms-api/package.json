@@ -44,6 +44,7 @@
 		"node-pg-migrate": "^3.16.1",
 		"path-to-regexp": "^3.0.0",
 		"pg": "^7.8.1",
+		"prompts": "^2.0.4",
 		"rfc6902": "^3.0.2",
 		"uuid": "^3.3.2"
 	},
@@ -64,6 +65,7 @@
 		"@types/mime-types": "^2.1.0",
 		"@types/mocha": "^5.2.6",
 		"@types/pg": "^7.4.13",
+		"@types/prompts": "^2.4.0",
 		"@types/sinon": "^7.0.8",
 		"@types/uuid": "^3.4.3",
 		"@types/ws": "^6.0.1",

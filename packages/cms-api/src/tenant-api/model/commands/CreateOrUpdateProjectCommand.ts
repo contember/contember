@@ -19,6 +19,7 @@ class CreateOrUpdateProjectCommand implements Command<void> {
 				name: this.project.name,
 				slug: this.project.slug,
 			})
+			.execute()
 	}
 }
 

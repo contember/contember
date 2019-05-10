@@ -28,10 +28,8 @@ import ContentApolloServerFactory from './http/ContentApolloServerFactory'
 import SchemaMigrator from './content-schema/differ/SchemaMigrator'
 import ModificationHandlerFactory from './system-api/model/migrations/modifications/ModificationHandlerFactory'
 import Application from './core/cli/Application'
-import EngineMigrationsCreateCommand from './cli/EngineMigrationsCreateCommand'
-import ProjectMigrationsDiffCommand from './cli/ProjectMigrationsDiffCommand'
-import EngineMigrationsContinueCommand from './cli/EngineMigrationsContinueCommand'
-import InitCommand from './cli/InitCommand'
+import DiffCommand from './cli/DiffCommand'
+import UpdateCommand from './cli/UpdateCommand'
 import DropCommand from './cli/DropCommand'
 import StartCommand from './cli/StartCommand'
 import { CommandManager } from './core/cli/CommandManager'
@@ -40,6 +38,7 @@ import SystemExecutionContainer from './system-api/SystemExecutionContainer'
 import TenantContainer from './tenant-api/TenantContainer'
 import Connection from './core/database/Connection'
 import Client from './core/database/Client'
+import MigrationsRunner from './core/migrations/MigrationsRunner'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -48,6 +47,7 @@ export type ProjectContainer = Container<{
 	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
 	systemExecutionContainerFactory: SystemExecutionContainer.Factory
 	connection: Connection
+	systemDbMigrationsRunner: MigrationsRunner
 }>
 
 export interface MasterContainer {
@@ -164,9 +164,8 @@ class CompositionRoot {
 				'commandManager',
 				({ projectContainerResolver, koa }) =>
 					new CommandManager({
-						['engine:migrations:continue']: () => new EngineMigrationsContinueCommand(config),
-						['project:create-diff']: () => new ProjectMigrationsDiffCommand(projectContainerResolver, projectSchemas),
-						['init']: () => new InitCommand(tenantContainer.projectManager, projectContainers),
+						['diff']: () => new DiffCommand(projectContainerResolver, projectSchemas),
+						['update']: () => new UpdateCommand(tenantContainer.dbMigrationsRunner, tenantContainer.projectManager, projectContainers),
 						['drop']: () => new DropCommand(config),
 						['start']: () => new StartCommand(koa, config),
 					})
@@ -194,6 +193,11 @@ class CompositionRoot {
 						{ timing: true }
 					)
 				})
+				.addService('systemDbMigrationsRunner', () => new MigrationsRunner(
+					project.dbCredentials,
+					'system',
+					MigrationFilesManager.createForEngine('project').directory
+				))
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.slug)
 				)
@@ -251,7 +255,7 @@ class CompositionRoot {
 			)
 
 			return projectContainer
-				.pick('project', 'contentApolloMiddlewareFactory', 'systemDbClient', 'connection')
+				.pick('project', 'contentApolloMiddlewareFactory', 'systemDbClient', 'connection', 'systemDbMigrationsRunner')
 				.merge(systemContainer.pick('systemApolloServerFactory', 'systemExecutionContainerFactory'))
 		})
 	}

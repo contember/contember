@@ -6,7 +6,7 @@ import Application from './core/cli/Application'
 
 (async () => {
 	const commandManager = new CommandManager({
-		['engine:migrations:create']: () => new EngineMigrationsCreateCommand(),
+		['migrations:create']: () => new EngineMigrationsCreateCommand(),
 	})
 	const application = new Application(commandManager)
 

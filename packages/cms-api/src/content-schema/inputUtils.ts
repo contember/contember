@@ -1,12 +1,12 @@
 import { Input, Model } from 'cms-common'
-import { getTargetEntity } from './modelUtils'
+import { getTargetEntity, getUniqueConstraints } from './modelUtils'
 
 export const isUniqueWhere = (schema: Model.Schema, entity: Model.Entity, where: Input.UniqueWhere): boolean => {
 	if (where[entity.primary] !== undefined) {
 		return true
 	}
-	uniqueKeys: for (const uniqueName in entity.unique) {
-		for (const field of entity.unique[uniqueName].fields) {
+	uniqueKeys: for (const unique of getUniqueConstraints(schema, entity)) {
+		for (const field of unique.fields) {
 			if (where[field] === undefined) {
 				continue uniqueKeys
 			} else {

@@ -1,5 +1,5 @@
 import Project from './Project'
-import { ConfigLoader } from 'cms-server-common'
+import { ConfigLoader, Merger } from 'cms-server-common'
 import { deprecated } from '../core/console/messages'
 
 export type DatabaseCredentials = Project.DatabaseCredentials
@@ -20,124 +20,201 @@ function error(err: string): never {
 	throw new InvalidConfigError(err)
 }
 
-function checkDatabaseCredentials(json: any, path: string): void {
-	if (json.host === undefined) {
-		error(`Undefined property ${path}.host in config file`)
+function typeError(property: string, value: any, expectedType: string): never {
+	return error(`Invalid property ${property} in config file. ${expectedType} expected, ${typeof value} found`)
+}
+
+type UnknownObject = Record<string, unknown>
+
+function isObject(input: unknown): input is UnknownObject {
+	return typeof input === 'object' && input !== null
+}
+
+function hasStringProperty<Input extends UnknownObject, Property extends string>(
+	input: Input,
+	property: Property
+): input is Input & { [key in Property]: string } {
+	return typeof input[property] === 'string'
+}
+
+function hasNumberProperty<Input extends UnknownObject, Property extends string>(
+	input: Input,
+	property: Property
+): input is Input & { [key in Property]: number } {
+	return typeof input[property] === 'number'
+}
+
+function hasArrayProperty<Input extends UnknownObject, Property extends string>(
+	input: Input,
+	property: Property
+): input is Input & { [key in Property]: unknown[] } {
+	return Array.isArray(input[property])
+}
+
+function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredentials {
+	if (!isObject(json)) {
+		return error(`Property ${path} must be an object`)
 	}
-	if (json.port === undefined) {
-		error(`Undefined property ${path}.port in config file`)
+	if (!hasStringProperty(json, 'host')) {
+		return typeError(path + '.host', json.host, 'string')
 	}
-	if (json.user === undefined) {
-		error(`Undefined property ${path}.user in config file`)
+	if (!hasNumberProperty(json, 'port')) {
+		if (hasStringProperty({ ...json }, 'port')) {
+			console.warn(
+				deprecated(`Property ${path}.port must be a number, but string was found. Use ::number typecast in config.`)
+			)
+			json.port = Number(json.port)
+		} else {
+			return typeError(path + '.port', json.port, 'number')
+		}
 	}
-	if (json.password === undefined) {
-		error(`Undefined property ${path}.password in config file`)
+	if (!hasNumberProperty(json, 'port')) {
+		throw new Error('impl error')
 	}
-	if (json.database === undefined) {
-		error(`Undefined property ${path}.database in config file`)
+	if (!hasStringProperty(json, 'user')) {
+		return typeError(path + '.user', json.user, 'string')
+	}
+	if (!hasStringProperty(json, 'password')) {
+		return typeError(path + '.password', json.password, 'string')
+	}
+	if (!hasStringProperty(json, 'database')) {
+		return typeError(path + '.database', json.database, 'string')
+	}
+	return json
+}
+
+function checkS3Config(json: unknown, path: string): Project.S3Config {
+	if (!isObject(json)) {
+		return error(`Property ${path} must be an object`)
+	}
+	if (!hasStringProperty(json, 'bucket')) {
+		return typeError(path + '.bucket', json.bucket, 'string')
+	}
+	if (!hasStringProperty(json, 'prefix')) {
+		return typeError(path + '.prefix', json.prefix, 'string')
+	}
+	if (!hasStringProperty(json, 'region')) {
+		return typeError(path + '.region', json.region, 'string')
+	}
+
+	return { ...json, credentials: checkS3Credentials(json.credentials, `${path}.credentials`) }
+}
+
+function checkS3Credentials(json: unknown, path: string): Project.S3Config['credentials'] {
+	if (!isObject(json)) {
+		return typeError(path, json, 'object')
+	}
+	if (!hasStringProperty(json, 'key')) {
+		return typeError(path + '.key', json.key, 'string')
+	}
+	if (!hasStringProperty(json, 'secret')) {
+		return typeError(path + '.secret', json.secret, 'string')
+	}
+	return json
+}
+
+function checkTenantStructure(json: unknown): Config['tenant'] {
+	if (!isObject(json)) {
+		return typeError('tenant', json, 'object')
+	}
+	return { db: checkDatabaseCredentials(json.db, 'tenant.db') }
+}
+
+function checkIdProperty<Input extends UnknownObject>(json: Input, path: string): string {
+	if (!hasStringProperty(json, 'id') && hasStringProperty(json, 'uuid')) {
+		console.warn(deprecated(`Property ${path}.id in config file is deprecated, use ${path}.id instead`))
+		return json.uuid
+	}
+	if (!hasStringProperty(json, 'id')) {
+		return typeError(path + '.uuid', json.uuid, 'string')
+	}
+	return json.id
+}
+
+function checkStageStructure(json: unknown, path: string): Project.Stage {
+	if (!isObject(json)) {
+		return typeError(path, json, 'object')
+	}
+
+	if (!hasStringProperty(json, 'slug')) {
+		return typeError(path + '.slug', json.slug, 'string')
+	}
+	if (!hasStringProperty(json, 'name')) {
+		return typeError(path + '.name', json.name, 'string')
+	}
+	return { ...json, id: checkIdProperty(json, path) }
+}
+
+function checkProjectStructure(json: unknown, path: string): Project {
+	if (!isObject(json)) {
+		return typeError(path, json, 'object')
+	}
+
+	if (!hasStringProperty(json, 'slug')) {
+		return typeError(path + '.slug', json.slug, 'string')
+	}
+	if (!hasStringProperty(json, 'name')) {
+		return typeError(path + '.name', json.name, 'string')
+	}
+	if (!hasArrayProperty(json, 'stages')) {
+		return error(`Property ${path}.stages should be an array in config file`)
+	}
+	return {
+		...json,
+		id: checkIdProperty(json, path),
+		stages: json.stages.map((stage, i) => checkStageStructure(stage, `${path}.stages${i}`)),
+		dbCredentials: checkDatabaseCredentials(json.dbCredentials, `${path}.dbCredentials`),
+		s3: checkS3Config(json.s3, `${path}.s3`),
 	}
 }
 
-function checkS3Config(json: any, path: string): void {
-	if (json.bucket === undefined) {
-		error(`Undefined property ${path}.bucket in config file`)
+function checkServerStructure(json: unknown): Config['server'] {
+	if (!isObject(json)) {
+		return typeError('server', json, 'object')
 	}
-	if (json.prefix === undefined) {
-		error(`Undefined property ${path}.prefix in config file`)
+	if (!hasNumberProperty(json, 'port')) {
+		if (hasStringProperty({ ...json }, 'port')) {
+			console.warn(
+				deprecated(`Property server.port must be a number, but string was found. Use ::number typecast in config.`)
+			)
+			json.port = Number(json.port)
+		} else {
+			return typeError('server.port', json.port, 'number')
+		}
 	}
-	if (json.region === undefined) {
-		error(`Undefined property ${path}.region in config file`)
+	if (!hasNumberProperty(json, 'port')) {
+		throw new Error('impl error')
 	}
-	if (json.credentials === undefined) {
-		error(`Undefined property ${path}.credentials in config file`)
+	return json
+}
+
+function checkConfigStructure(json: unknown): Config {
+	if (!isObject(json)) {
+		return error('Invalid input type')
 	}
-	if (json.credentials.key === undefined) {
-		error(`Undefined property ${path}.credentials.key in config file`)
+	if (!hasArrayProperty(json, 'projects')) {
+		return error('Property projects should be an array in config file')
 	}
-	if (json.credentials.secret === undefined) {
-		error(`Undefined property ${path}.credentials.secret in config file`)
+
+	return {
+		...json,
+		projects: json.projects.map((it, i) => checkProjectStructure(it, `projects[${i}]`)),
+		tenant: checkTenantStructure(json.tenant),
+		server: checkServerStructure(json.server),
 	}
 }
 
-function checkConfigStructure(json: any): void {
-	if (json.tenant === undefined) {
-		error('Undefined property tenant in config file')
-	}
-	if (json.tenant.db === undefined) {
-		error('Undefined property tenant.db in config file')
-	}
-	checkDatabaseCredentials(json.tenant.db, 'tenant.db')
-	if (json.projects === undefined) {
-		error('Undefined property projects in config file')
-	}
-	if (!Array.isArray(json.projects)) {
-		error('Property projects should be an array in config file')
-	}
-	let i = 0
-	for (const project of json.projects) {
-		if (project.id === undefined) {
-			if (project.uuid !== undefined) {
-				project.id = project.uuid
-				console.warn(
-					deprecated(`Property projects[${i}].uuid in config file is deprecated, use projects[${i}].id instead`)
-				)
-			} else {
-				error(`Undefined property projects[${i}].uuid in config file`)
-			}
-		}
-		if (project.slug === undefined) {
-			error(`Undefined property projects[${i}].slug in config file`)
-		}
-		if (project.name === undefined) {
-			error(`Undefined property projects[${i}].name in config file`)
-		}
-		if (project.stages === undefined) {
-			error(`Undefined property projects[${i}].stages in config file`)
-		}
-		if (!Array.isArray(project.stages)) {
-			error(`Property projects[${i}].stages should be an array in config file`)
-		}
-		let j = 0
-		for (const stage of project.stages) {
-			if (stage.id === undefined) {
-				if (stage.uuid !== undefined) {
-					console.warn(
-						deprecated(
-							`Property projects[${i}].stages[${j}].uuid in config file is deprecated, use projects[${i}].stages[${j}].id instead`
-						)
-					)
-				} else {
-					error(`Undefined property projects[${i}].stages[${j}].uuid in config file`)
-				}
-			}
-			if (stage.slug === undefined) {
-				error(`Undefined property projects[${i}}.stages[${j}].slug in config file`)
-			}
-			if (stage.name === undefined) {
-				error(`Undefined property projects[${i}}.stages[${j}].name in config file`)
-			}
-			j++
-		}
-		if (project.dbCredentials === undefined) {
-			error(`Property projects[${i}].dbCredentials should be an array in config file`)
-		}
-		checkDatabaseCredentials(project.dbCredentials, `projects[${i}].dbCredentials`)
-		checkS3Config(project.s3, `projects[${i}].s3`)
-		i++
-	}
-	if (json.server === undefined) {
-		error(`Undefined property server in config file`)
-	}
-	if (json.server.port === undefined) {
-		error(`Undefined property server.port in config file`)
-	}
-}
-
-export async function readConfig(filename: string): Promise<Config> {
+export async function readConfig(...filenames: string[]): Promise<Config> {
 	const loader = new ConfigLoader()
-	const config = await loader.load(filename, {
-		env: process.env,
-	})
-	checkConfigStructure(config)
-	return config
+
+	const configs = await Promise.all(
+		filenames.map(it =>
+			loader.load(it, {
+				env: process.env,
+			})
+		)
+	)
+	const config = Merger.merge(...configs)
+
+	return checkConfigStructure(config)
 }

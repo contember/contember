@@ -71,7 +71,9 @@ class Loader {
 			return data.map(it => this.replaceParameters(it, parameters))
 		}
 		if (typeof data === 'string') {
-			return data.replace(/^%(\w+(\.\w+)*)%$/, (match, parameter: string) => {
+			const match = /^%(\w+(?:\.\w+)*)(?:::(\w+))?%$/.exec(data)
+			if (match) {
+				const [, parameter, cast] = match
 				const parts = parameter.split('.')
 				const value = parts.reduce((current, part) => {
 					if (current === null || typeof current !== 'object' || typeof current[part] === 'undefined') {
@@ -79,8 +81,20 @@ class Loader {
 					}
 					return current[part]
 				}, parameters)
-				return String(value)
-			})
+				if (cast) {
+					switch (cast) {
+						case 'number':
+							return Number(value)
+						case 'string':
+							return String(value)
+						default:
+							throw new Error(`Unsupported cast to ${cast}`)
+					}
+				}
+				return value
+			} else {
+				return data
+			}
 		}
 		if (data === null) {
 			return data

@@ -31,6 +31,7 @@ import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInf
 import ProjectMigrator from './model/migrations/ProjectMigrator'
 import SchemaDiffer from './model/migrations/SchemaDiffer'
 import StageCreator from './model/stages/StageCreator'
+import MigrationSqlDryRunner from './model/migrations/MigrationSqlDryRunner'
 
 interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
@@ -39,6 +40,7 @@ interface SystemExecutionContainer {
 	migrationDiffCreator: MigrationDiffCreator
 	queryHandler: QueryHandler<DbQueryable>
 	projectIntializer: ProjectInitializer
+	migrationSqlDryRunner: MigrationSqlDryRunner
 }
 
 namespace SystemExecutionContainer {
@@ -61,7 +63,8 @@ namespace SystemExecutionContainer {
 					'diffBuilder',
 					'rebaseExecutor',
 					'migrationDiffCreator',
-					'projectIntializer'
+					'projectIntializer',
+					'migrationSqlDryRunner'
 				)
 		}
 
@@ -156,6 +159,16 @@ namespace SystemExecutionContainer {
 							rebaseExecutor,
 							projectMigrationInfoResolver,
 							stageCreator
+						)
+				)
+				.addService(
+					'migrationSqlDryRunner',
+					({ schemaVersionBuilder, modificationHandlerFactory, migrationsResolver }) =>
+						new MigrationSqlDryRunner(
+							this.project,
+							migrationsResolver,
+							modificationHandlerFactory,
+							schemaVersionBuilder
 						)
 				)
 		}

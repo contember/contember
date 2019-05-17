@@ -40,6 +40,7 @@ import Connection from './core/database/Connection'
 import Client from './core/database/Client'
 import MigrationsRunner from './core/migrations/MigrationsRunner'
 import SetupCommand from './cli/SetupCommand'
+import DryRunCommand from './cli/DryRunCommand'
 
 export type ProjectContainer = Container<{
 	project: Project
@@ -171,6 +172,7 @@ class CompositionRoot {
 						['drop']: () => new DropCommand(config),
 						['start']: () => new StartCommand(koa, config),
 						['setup']: () => new SetupCommand(tenantContainer.signUpManager, tenantContainer.apiKeyManager),
+						['dry-run-sql']: () => new DryRunCommand(projectContainers),
 					})
 			)
 			.addService('cli', ({ commandManager }) => new Application(commandManager))

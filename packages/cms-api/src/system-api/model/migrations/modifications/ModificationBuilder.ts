@@ -1,21 +1,100 @@
 import { Acl, deepCopy, Model, Schema } from 'cms-common'
-import { arraySplit } from '../../../../utils/arrays'
 import { acceptFieldVisitor } from '../../../../content-schema/modelUtils'
 import CreateModificationFieldVisitor from '../CreateModificationFieldVisitor'
 import Migration from '../Migration'
 import PatchAclSchemaModification from './acl/PatchAclSchemaModification'
 import { Operation } from 'rfc6902'
+import UpdateAclSchemaModification from './acl/UpdateAclSchemaModification'
+import CreateColumnModification from './columns/CreateColumnModification'
+import UpdateColumnDefinitionModification from './columns/UpdateColumnDefinitionModification'
+import UpdateColumnNameModification from './columns/UpdateColumnNameModification'
+import CreateUniqueConstraintModification from './constraints/CreateUniqueConstraintModification'
+import RemoveUniqueConstraintModification from './constraints/RemoveUniqueConstraintModification'
+import CreateEntityModification from './entities/CreateEntityModification'
+import RemoveEntityModification from './entities/RemoveEntityModification'
+import UpdateEntityNameModification from './entities/UpdateEntityNameModification'
+import UpdateEntityTableNameModification from './entities/UpdateEntityTableNameModification'
+import CreateEnumModification from './enums/CreateEnumModification'
+import RemoveEnumModification from './enums/RemoveEnumModification'
+import UpdateEnumModification from './enums/UpdateEnumModification'
+import RemoveFieldModification from './fields/RemoveFieldModification'
+import UpdateFieldNameModification from './fields/UpdateFieldNameModification'
+import CreateRelationInverseSideModification from './relations/CreateRelationInverseSideModification'
+import CreateRelationModification from './relations/CreateRelationModification'
+import UpdateRelationOnDeleteModification from './relations/UpdateRelationOnDeleteModification'
 
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
 
-	constructor(private readonly updatedSchema: Schema) {}
+	constructor(private readonly originalSchema: Schema, private readonly updatedSchema: Schema) {}
 
 	public getDiff(): Migration.Modification[] {
-		const [createEntity, other] = arraySplit(this.modifications, it => it.modification === 'createEntity')
-		const [createUniqueConstraint, other2] = arraySplit(other, it => it.modification === 'createUniqueConstraint')
+		const order = [
+			null,
+			RemoveUniqueConstraintModification.id,
+			RemoveFieldModification.id,
+			RemoveEntityModification.id,
 
-		return [...createEntity, ...other2, ...createUniqueConstraint]
+			UpdateEntityNameModification.id,
+			UpdateEntityTableNameModification.id,
+			UpdateFieldNameModification.id,
+			UpdateColumnDefinitionModification.id,
+			UpdateColumnNameModification.id,
+			UpdateRelationOnDeleteModification.id,
+			UpdateEnumModification.id,
+
+			CreateEnumModification.id,
+			CreateEntityModification.id,
+			CreateColumnModification.id,
+			CreateRelationInverseSideModification.id,
+			CreateRelationModification.id,
+
+			CreateUniqueConstraintModification.id,
+
+			RemoveEnumModification.id,
+
+			UpdateAclSchemaModification.id,
+			PatchAclSchemaModification.id,
+		]
+		const modificationSorters: Record<string, (a: any, b: any) => number> = {
+			[RemoveFieldModification.id]: (a: RemoveFieldModification.Data, b: RemoveFieldModification.Data) => {
+				const visitor: Model.FieldVisitor<number> = {
+					visitColumn: () => 0,
+					visitManyHasOne: () => 10,
+					visitOneHasMany: () => 0,
+					visitOneHasOneOwner: () => 10,
+					visitOneHasOneInversed: () => 0,
+					visitManyHasManyOwner: () => 10,
+					visitManyHasManyInversed: () => 0,
+				}
+				return (
+					acceptFieldVisitor(this.originalSchema.model, a.entityName, a.fieldName, visitor) -
+					acceptFieldVisitor(this.originalSchema.model, b.entityName, b.fieldName, visitor)
+				)
+			},
+		}
+		const modifications = this.modifications.filter(it => {
+			if (it.modification === CreateRelationInverseSideModification.id) {
+				// remove creation of inversed side if owning side is created
+				const relation = (it as Migration.Modification<CreateRelationInverseSideModification.Data>).relation
+				return !this.modifications.find(
+					it =>
+						it.modification === CreateRelationModification.id &&
+						(it as Migration.Modification<CreateRelationModification.Data>).inverseSide === relation
+				)
+			}
+			return true
+		})
+
+		return modifications.sort((a, b) => {
+			const cmp =
+				(order.indexOf(a.modification) || Number.MAX_SAFE_INTEGER) -
+				(order.indexOf(b.modification) || Number.MAX_SAFE_INTEGER)
+			if (cmp === 0 && modificationSorters[a.modification]) {
+				return modificationSorters[a.modification](a, b)
+			}
+			return cmp
+		})
 	}
 
 	public createEntity(updatedEntity: Model.Entity) {
@@ -50,12 +129,8 @@ class ModificationBuilder {
 	}
 
 	public createField(updatedEntity: Model.Entity, fieldName: string) {
-		const modification = acceptFieldVisitor(
-			this.updatedSchema.model,
-			updatedEntity,
-			fieldName,
-			new CreateModificationFieldVisitor(updatedEntity)
-		)
+		const visitor: Model.FieldVisitor<Migration.Modification> = new CreateModificationFieldVisitor()
+		const modification = acceptFieldVisitor(this.updatedSchema.model, updatedEntity, fieldName, visitor)
 		if (modification != null) {
 			this.modifications.push(modification)
 		}

@@ -256,27 +256,6 @@ describe('Diff schemas', () => {
 				},
 			},
 			{
-				modification: 'createRelation',
-				entityName: 'PostLocale',
-				owningSide: {
-					name: 'post',
-					type: Model.RelationType.ManyHasOne,
-					target: 'Post',
-					inversedBy: 'locales',
-					joiningColumn: {
-						columnName: 'post_id',
-						onDelete: Model.OnDelete.restrict,
-					},
-					nullable: false,
-				},
-				inverseSide: {
-					name: 'locales',
-					type: Model.RelationType.OneHasMany,
-					target: 'PostLocale',
-					ownedBy: 'post',
-				},
-			},
-			{
 				modification: 'createColumn',
 				entityName: 'PostLocale',
 				field: {
@@ -299,6 +278,27 @@ describe('Diff schemas', () => {
 				},
 			},
 			{
+				modification: 'createRelation',
+				entityName: 'PostLocale',
+				owningSide: {
+					name: 'post',
+					type: Model.RelationType.ManyHasOne,
+					target: 'Post',
+					inversedBy: 'locales',
+					joiningColumn: {
+						columnName: 'post_id',
+						onDelete: Model.OnDelete.restrict,
+					},
+					nullable: false,
+				},
+				inverseSide: {
+					name: 'locales',
+					type: Model.RelationType.OneHasMany,
+					target: 'PostLocale',
+					ownedBy: 'post',
+				},
+			},
+			{
 				modification: 'createUniqueConstraint',
 				entityName: 'PostLocale',
 				unique: {
@@ -309,11 +309,11 @@ describe('Diff schemas', () => {
 		]
 		const sql = SQL`CREATE TABLE "post_locale" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_locale" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			ALTER TABLE "post_locale" ADD "title" text;
+			ALTER TABLE "post_locale" ADD "locale" text;
 			ALTER TABLE "post_locale" ADD "post_id" uuid NOT NULL;
     	ALTER TABLE "post_locale" ADD CONSTRAINT "fk_post_locale_post_id_f3d2e5" FOREIGN KEY ("post_id") REFERENCES "post"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
 			CREATE INDEX "post_locale_post_id_index" ON "post_locale" ("post_id");
-			ALTER TABLE "post_locale" ADD "title" text;
-			ALTER TABLE "post_locale" ADD "locale" text;
 			ALTER TABLE "post_locale" ADD CONSTRAINT "unique_PostLocale_post_locale_5759e8" UNIQUE ("post_id", "locale");`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
@@ -413,6 +413,9 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL``
+		it('diff schemas', () => {
+			testDiffSchemas(originalSchema, updatedSchema, diff)
+		})
 		it('apply diff', () => {
 			testApplyDiff(originalSchema, diff, updatedSchema)
 		})
@@ -452,6 +455,17 @@ describe('Diff schemas', () => {
 				},
 			},
 			{
+				modification: 'createColumn',
+				entityName: 'Category',
+				field: {
+					columnName: 'title',
+					name: 'title',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
+				},
+			},
+			{
 				modification: 'createRelation',
 				entityName: 'Post',
 				owningSide: {
@@ -471,28 +485,17 @@ describe('Diff schemas', () => {
 					},
 				},
 			},
-			{
-				modification: 'createColumn',
-				entityName: 'Category',
-				field: {
-					columnName: 'title',
-					name: 'title',
-					nullable: true,
-					type: Model.ColumnType.String,
-					columnType: 'text',
-				},
-			},
 		]
 		const sql = SQL`CREATE TABLE "category" ( "id" uuid PRIMARY KEY NOT NULL );
 			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "category" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			  ALTER TABLE "category" ADD "title" text;
 			  CREATE TABLE "post_categories" (
 				"id"          uuid PRIMARY KEY NOT NULL,
 				"post_id"     uuid NOT NULL REFERENCES "post"("id") ON DELETE CASCADE,
 				"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE CASCADE,
 				CONSTRAINT "post_categories_uniq_post_id_category_id" UNIQUE ("post_id", "category_id")
 			  );
-			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_categories" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
-			  ALTER TABLE "category" ADD "title" text;`
+			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_categories" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})
@@ -565,6 +568,17 @@ describe('Diff schemas', () => {
 				},
 			},
 			{
+				modification: 'createColumn',
+				entityName: 'SiteSetting',
+				field: {
+					columnName: 'url',
+					name: 'url',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
+				},
+			},
+			{
 				modification: 'createRelation',
 				entityName: 'Site',
 				owningSide: {
@@ -586,27 +600,16 @@ describe('Diff schemas', () => {
 					nullable: true,
 				},
 			},
-			{
-				modification: 'createColumn',
-				entityName: 'SiteSetting',
-				field: {
-					columnName: 'url',
-					name: 'url',
-					nullable: true,
-					type: Model.ColumnType.String,
-					columnType: 'text',
-				},
-			},
 		]
 		const sql = SQL`CREATE TABLE "site" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			CREATE TABLE "site_setting" ( "id" uuid PRIMARY KEY NOT NULL );
 			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site_setting" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
 			ALTER TABLE "site" ADD "name" text;
+			ALTER TABLE "site_setting" ADD "url" text;
 			ALTER TABLE "site" ADD "setting_id" uuid;
 			ALTER TABLE "site" ADD CONSTRAINT "unique_Site_setting_8653a0" UNIQUE ("setting_id");
-			ALTER TABLE "site" ADD CONSTRAINT "fk_site_setting_id_6a4aa6" FOREIGN KEY ("setting_id") REFERENCES "site_setting"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
-			ALTER TABLE "site_setting" ADD "url" text;`
+			ALTER TABLE "site" ADD CONSTRAINT "fk_site_setting_id_6a4aa6" FOREIGN KEY ("setting_id") REFERENCES "site_setting"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})
@@ -916,14 +919,14 @@ describe('Diff schemas', () => {
 			.buildSchema()
 		const diff: Migration.Modification[] = [
 			{
-				modification: 'removeField',
-				entityName: 'Post',
-				fieldName: 'locales',
-			},
-			{
 				constraintName: 'unique_PostLocale_post_locale_5759e8',
 				entityName: 'PostLocale',
 				modification: 'removeUniqueConstraint',
+			},
+			{
+				modification: 'removeField',
+				entityName: 'Post',
+				fieldName: 'locales',
 			},
 			{
 				modification: 'removeField',

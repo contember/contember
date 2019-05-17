@@ -45,6 +45,7 @@
 		"path-to-regexp": "^3.0.0",
 		"pg": "^7.8.1",
 		"prompts": "^2.0.4",
+		"reflect-metadata": "^0.1.13",
 		"rfc6902": "^3.0.2",
 		"uuid": "^3.3.2"
 	},

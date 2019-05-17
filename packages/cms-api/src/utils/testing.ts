@@ -1,3 +1,5 @@
-export function createMock<T>(members: { [P in keyof T]: T[P] }): T {
+import { Interface } from './interfaceType'
+
+export function createMock<T>(members: Interface<T>): T {
 	return members
 }

@@ -10,18 +10,20 @@ import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
 import GraphQlSchemaBuilderFactory from '../../../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../../../src/acl/AllowAllPermissionFactory'
 import S3 from '../../../../src/utils/S3'
+import * as model from './model'
+import { createModel } from '../../../../src/content-schema/definition'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
 interface Test {
-	schema: (builder: SchemaBuilder) => SchemaBuilder
+	schema: (builder: SchemaBuilder) => SchemaBuilder | Model.Schema
 	permissions: (schema: Model.Schema) => Acl.Permissions
 	graphQlSchemaFile: string
 }
 
 const testSchema = async (test: Test) => {
-	const builder = test.schema(new SchemaBuilder())
+	const schemaResult = test.schema(new SchemaBuilder())
 
 	const schemaFactory = new GraphQlSchemaBuilderFactory(
 		new S3({
@@ -34,7 +36,7 @@ const testSchema = async (test: Test) => {
 			},
 		})
 	)
-	const schema = builder.buildSchema()
+	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)
 	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, permissions)
@@ -264,6 +266,14 @@ describe('build gql schema from model schema', () => {
 					),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema8.gql',
+		})
+	})
+
+	it('builds basic schema with new builder', async () => {
+		await testSchema({
+			schema: () => createModel(model),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema9.gql',
 		})
 	})
 })

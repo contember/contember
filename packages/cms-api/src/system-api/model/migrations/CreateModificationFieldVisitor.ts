@@ -1,73 +1,96 @@
 import { deepCopy, Model } from 'cms-common'
 import CreateColumnModification from './modifications/columns/CreateColumnModification'
 import CreateRelationModification from './modifications/relations/CreateRelationModification'
+import CreateRelationInverseSideModification from './modifications/relations/CreateRelationInverseSideModification'
 import Migration from './Migration'
 
-type Modification = Migration.Modification<CreateColumnModification.Data | CreateRelationModification.Data>
-
 export default class CreateFieldVisitor
-	implements Model.ColumnVisitor<Modification>, Model.RelationByTypeVisitor<Modification | null> {
-	constructor(private readonly entity: Model.Entity) {}
-
-	public visitColumn({}, updatedColumn: Model.AnyColumn): Modification {
+	implements
+		Model.ColumnVisitor<Migration.Modification<any>>,
+		Model.RelationByTypeVisitor<Migration.Modification<any>> {
+	public visitColumn(
+		entity: Model.Entity,
+		updatedColumn: Model.AnyColumn
+	): Migration.Modification<CreateColumnModification.Data> {
 		return {
-			modification: 'createColumn',
-			entityName: this.entity.name,
+			modification: CreateColumnModification.id,
+			entityName: entity.name,
 			field: deepCopy(updatedColumn),
 		}
 	}
 
 	public visitManyHasOne(
-		{},
+		entity: Model.Entity,
 		relation: Model.ManyHasOneRelation,
 		{},
 		targetRelation: Model.OneHasManyRelation | null
-	): Modification {
+	): Migration.Modification<CreateRelationModification.Data> {
 		return {
-			modification: 'createRelation',
-			entityName: this.entity.name,
+			modification: CreateRelationModification.id,
+			entityName: entity.name,
 			owningSide: relation,
 			...(targetRelation ? { inverseSide: targetRelation } : {}),
 		}
 	}
 
-	public visitOneHasMany() {
-		return null
+	public visitOneHasMany(
+		entity: Model.Entity,
+		relation: Model.OneHasManyRelation
+	): Migration.Modification<CreateRelationInverseSideModification.Data> {
+		return {
+			modification: CreateRelationInverseSideModification.id,
+			entityName: entity.name,
+			relation: relation,
+		}
 	}
 
 	public visitOneHasOneOwner(
-		{},
+		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		{},
 		targetRelation: Model.OneHasOneInversedRelation | null
-	): Modification {
+	): Migration.Modification<CreateRelationModification.Data> {
 		return {
-			modification: 'createRelation',
-			entityName: this.entity.name,
+			modification: CreateRelationModification.id,
+			entityName: entity.name,
 			owningSide: relation,
 			...(targetRelation ? { inverseSide: targetRelation } : {}),
 		}
 	}
 
-	public visitOneHasOneInversed() {
-		return null
+	public visitOneHasOneInversed(
+		entity: Model.Entity,
+		relation: Model.OneHasOneInversedRelation
+	): Migration.Modification<CreateRelationInverseSideModification.Data> {
+		return {
+			modification: CreateRelationInverseSideModification.id,
+			entityName: entity.name,
+			relation: relation,
+		}
 	}
 
 	public visitManyHasManyOwner(
-		{},
+		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		{},
 		targetRelation: Model.ManyHasManyInversedRelation | null
-	): Modification {
+	): Migration.Modification<CreateRelationModification.Data> {
 		return {
-			modification: 'createRelation',
-			entityName: this.entity.name,
+			modification: CreateRelationModification.id,
+			entityName: entity.name,
 			owningSide: relation,
 			...(targetRelation ? { inverseSide: targetRelation } : {}),
 		}
 	}
 
-	public visitManyHasManyInversed() {
-		return null
+	public visitManyHasManyInversed(
+		entity: Model.Entity,
+		relation: Model.ManyHasManyInversedRelation
+	): Migration.Modification<CreateRelationInverseSideModification.Data> {
+		return {
+			modification: CreateRelationInverseSideModification.id,
+			entityName: entity.name,
+			relation: relation,
+		}
 	}
 }

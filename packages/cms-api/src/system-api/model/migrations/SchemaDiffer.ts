@@ -12,11 +12,11 @@ class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
 
 	diffSchemas(originalSchema: Schema, updatedSchema: Schema, checkRecreate: boolean = true): Migration.Modification[] {
-		const builder = new ModificationBuilder(updatedSchema)
+		const builder = new ModificationBuilder(originalSchema, updatedSchema)
 
 		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
 			const patch = createPatch(originalSchema.acl, updatedSchema.acl)
-			if (patch.length <= 20) {
+			if (patch.length <= 40) {
 				builder.patchAclSchema(patch)
 			} else {
 				builder.updateAclSchema(updatedSchema.acl)

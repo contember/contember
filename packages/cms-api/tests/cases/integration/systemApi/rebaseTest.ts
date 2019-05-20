@@ -5,8 +5,8 @@ import EventSequence from '../../../src/EventSequence'
 import { expect } from 'chai'
 import { createRunMigrationEvent } from '../../../src/DummyEventFactory'
 
-describe('system api - release', () => {
-	it('executes release', async () => {
+describe('system api - rebase', () => {
+	it('executes rebase', async () => {
 		const eventsSequence = {
 			a: '  1 2 3 4 5',
 			b: 'a - - - - 6 7',

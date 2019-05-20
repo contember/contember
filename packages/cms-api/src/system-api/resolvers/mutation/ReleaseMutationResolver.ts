@@ -22,6 +22,8 @@ export default class ReleaseMutationResolver implements MutationResolver<'releas
 			}
 		}
 
+		await context.container.rebaseExecutor.rebaseAll()
+
 		await context.container.releaseExecutor.execute(
 			{
 				variables: context.variables,

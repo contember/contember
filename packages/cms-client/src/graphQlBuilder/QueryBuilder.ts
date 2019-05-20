@@ -28,7 +28,7 @@ namespace QueryBuilder {
 	export interface List extends Array<Value> {}
 
 	export type AtomicValue = string | null | number | boolean | Literal
-	export type Value = AtomicValue | Object | List
+	export type Value = AtomicValue | QueryBuilder.Object | List
 }
 
 export default QueryBuilder

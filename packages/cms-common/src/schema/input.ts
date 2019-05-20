@@ -8,7 +8,7 @@ namespace Input {
 	export type PrimaryValue<E = never> = string | number | E
 
 	export type AtomicValue<E = never> = PrimaryValue<E> | null | boolean
-	export type ColumnValue<E = never> = AtomicValue<E> | Object<E> | List<E>
+	export type ColumnValue<E = never> = AtomicValue<E> | Input.Object<E> | List<E>
 
 	export type GenericValueLike<T> = T | PromiseLike<T> | (() => T | PromiseLike<T>)
 

@@ -12,6 +12,10 @@ class EventsRebaser {
 		newBase: string,
 		droppedEvents: string[]
 	): Promise<string> {
+		console.log(debug('Old head: ' + headEvent))
+		console.log(debug('Old base: ' + oldBase))
+		console.log(debug('New base: ' + newBase))
+
 		const result: { rows: { old_id: string; new_id: string }[] } = await this.db.query(
 			'SELECT * FROM system.rebase_events_unsafe(?::UUID, ?::UUID, ?::UUID, ?::UUID[]) AS t',
 			[headEvent, oldBase, newBase, droppedEvents]
@@ -19,10 +23,7 @@ class EventsRebaser {
 
 		const newHead = result.rows[0] ? result.rows[0].new_id : newBase
 
-		console.log(debug('Old head: ' + headEvent))
-		console.log(debug('Old base: ' + oldBase))
 		console.log(debug('New head: ' + newHead))
-		console.log(debug('New base: ' + newBase))
 
 		await new UpdateStageEventCommand(stageId, newHead).execute(this.db)
 

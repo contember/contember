@@ -27,7 +27,7 @@ class RebaseExecutor {
 		}
 	}
 
-	private async rebase(
+	public async rebase(
 		eventsInfoMatrix: StageCommonEventsMatrixQuery.Result,
 		stage: StageWithoutEvent,
 		base: StageWithoutEvent,

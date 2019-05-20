@@ -9,6 +9,7 @@ import EventsRebaser from './EventsRebaser'
 import StageByIdQuery from '../queries/StageByIdQuery'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import Client from '../../../core/database/Client'
+import StageTree from '../stages/StageTree'
 
 class ReleaseExecutor {
 	constructor(
@@ -17,6 +18,7 @@ class ReleaseExecutor {
 		private readonly permissionsVerifier: PermissionsVerifier,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
+		private readonly stageTree: StageTree,
 		private readonly db: Client
 	) {}
 
@@ -55,13 +57,21 @@ class ReleaseExecutor {
 		if (this.isFastForward(eventsToApply, allEvents.map(it => it.id))) {
 			await new UpdateStageEventCommand(targetStage.id, eventsToApply[eventsToApply.length - 1]).execute(this.db)
 		} else {
-			await this.eventsRebaser.rebaseStageEvents(
-				sourceStage.id,
-				sourceStage.event_id,
-				targetStage.event_id,
-				newBase.event_id,
-				eventsToApply
-			)
+			await this.rebaseRecursive(sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
+		}
+	}
+
+	private async rebaseRecursive(rebasedStage: Stage, oldBase: string, newBase: string, droppedEvents: string[]) {
+		const newHead = await this.eventsRebaser.rebaseStageEvents(
+			rebasedStage.id,
+			rebasedStage.event_id,
+			oldBase,
+			newBase,
+			droppedEvents
+		)
+		for (const child of this.stageTree.getChildren(rebasedStage)) {
+			const childWithEvent = await this.queryHandler.fetch(new StageByIdQuery(child.id))
+			await this.rebaseRecursive(childWithEvent!, rebasedStage.event_id, newHead, [])
 		}
 	}
 

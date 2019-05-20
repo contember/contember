@@ -9,6 +9,7 @@ import ApiTester from './ApiTester'
 import Client from '../../src/core/database/Client'
 import { SystemContainer } from '../../src/system-api/SystemContainerFactory'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
+import StageBySlugQuery from '../../src/system-api/model/queries/StageBySlugQuery'
 
 export default class SystemApiTester {
 	constructor(
@@ -91,19 +92,21 @@ export default class SystemApiTester {
 			throw diff.data.diff.errors
 		}
 
-		await this.querySystem(
-			GQL`mutation ($baseStage: String!, $headStage: String!, $events: [String!]!) {
-        release(baseStage: $baseStage, headStage: $headStage, events: $events) {
-          ok
-        }
-      }`,
+		const [baseStageObj, headStageObj] = await Promise.all([
+			this.systemExecutionContainer.queryHandler.fetch(new StageBySlugQuery(baseStage)),
+			this.systemExecutionContainer.queryHandler.fetch(new StageBySlugQuery(headStage)),
+		])
+
+		await this.systemExecutionContainer.releaseExecutor.execute(
 			{
-				baseStage,
-				headStage,
-				events: (diff.data.diff.result.events as any[])
-					.slice(0, eventsCount || diff.data.diff.result.events.length)
-					.map(it => it.id),
-			}
+				identity: new Identity.StaticIdentity(testUuid(666), [Identity.SystemRole.SUPER_ADMIN], {}),
+				variables: {},
+			},
+			baseStageObj!,
+			headStageObj!,
+			(diff.data.diff.result.events as any[])
+				.slice(0, eventsCount || diff.data.diff.result.events.length)
+				.map(it => it.id)
 		)
 	}
 }

@@ -121,16 +121,24 @@ namespace SystemExecutionContainer {
 					({ db, migrationExecutor, migrationsResolver }) => new EventApplier(db, migrationExecutor, migrationsResolver)
 				)
 				.addService('eventsRebaser', ({ db }) => new EventsRebaser(db))
-				.addService(
-					'releaseExecutor',
-					({ queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, db }) =>
-						new ReleaseExecutor(queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, db)
-				)
 				.addService('stageTree', () => new StageTree.Factory().create(this.project))
 				.addService(
 					'rebaseExecutor',
 					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree }) =>
 						new RebaseExecutor(queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree)
+				)
+				.addService(
+					'releaseExecutor',
+					({ queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, stageTree, db }) =>
+						new ReleaseExecutor(
+							queryHandler,
+							dependencyBuilder,
+							permissionVerifier,
+							eventApplier,
+							eventsRebaser,
+							stageTree,
+							db
+						)
 				)
 				.addService(
 					'migrationDiffCreator',

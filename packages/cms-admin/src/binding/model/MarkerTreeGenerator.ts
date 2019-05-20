@@ -112,7 +112,7 @@ export class MarkerTreeGenerator {
 						environment
 					)
 				}
-				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
+				throw new DataBindingError(`Each ${dataMarker.displayName} component must have children.`)
 			}
 
 			if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
@@ -137,7 +137,7 @@ export class MarkerTreeGenerator {
 
 					return referenceMarker
 				}
-				throw new DataBindingError(`Each ${node.type.displayName} component must have children.`)
+				throw new DataBindingError(`Each ${dataMarker.displayName} component must have children.`)
 			}
 
 			if (children) {

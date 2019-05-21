@@ -5,7 +5,7 @@ import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
-import { DataContext, DataContextValue } from './DataContext'
+import { DataContext } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { Props, ReferenceMarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
@@ -51,8 +51,9 @@ namespace ToOne {
 					filter={this.props.filter}
 					reducedBy={this.props.reducedBy}
 					environment={this.props.environment}
+					renderer={AccessorRenderer}
 				>
-					{(accessor: EntityAccessor) => <AccessorRenderer accessor={accessor}>{this.props.children}</AccessorRenderer>}
+					{this.props.children}
 				</AccessorRetriever>
 			)
 		}
@@ -75,31 +76,31 @@ namespace ToOne {
 	type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof AtomicPrimitive, ReferenceMarkerProvider>
 
 	export interface AccessorRetrieverProps extends AtomicPrimitiveProps {
-		children: (accessor: EntityAccessor) => React.ReactNode
+		renderer: React.ComponentType<{
+			accessor: EntityAccessor
+		}>
 	}
 
-	export class AccessorRetriever extends React.PureComponent<AccessorRetrieverProps> {
-		public render() {
-			return (
-				<DataContext.Consumer>
-					{(data: DataContextValue) => {
-						if (data instanceof EntityAccessor) {
-							const field = data.data.getField(
-								this.props.field,
-								ReferenceMarker.ExpectedCount.UpToOne,
-								VariableInputTransformer.transformFilter(this.props.filter, this.props.environment),
-								this.props.reducedBy
-							)
+	export const AccessorRetriever = React.memo((props: React.PropsWithChildren<AccessorRetrieverProps>) => {
+		const data = React.useContext(DataContext)
 
-							if (field instanceof EntityAccessor) {
-								return this.props.children(field)
-							}
-						}
-					}}
-				</DataContext.Consumer>
-			)
-		}
-	}
+		return React.useMemo(() => {
+			if (data instanceof EntityAccessor) {
+				const fieldEntityAccessor = data.data.getField(
+					props.field,
+					ReferenceMarker.ExpectedCount.UpToOne,
+					VariableInputTransformer.transformFilter(props.filter, props.environment),
+					props.reducedBy
+				)
+
+				if (fieldEntityAccessor instanceof EntityAccessor) {
+					const Renderer = props.renderer
+					return <Renderer accessor={fieldEntityAccessor}>{props.children}</Renderer>
+				}
+			}
+			return null
+		}, [data, props])
+	})
 
 	export interface AccessorRendererProps {
 		accessor: EntityAccessor

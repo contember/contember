@@ -1,49 +1,35 @@
 import * as React from 'react'
 import { Button, Intent } from '../../../components'
-import { MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
+import { MetaOperationsContext } from '../../coreComponents'
 
-export interface PersistButtonProps {}
+export type PersistButtonProps = React.PropsWithChildren<{}>
 
-interface PersistButtonState {
-	isLoading: boolean
-}
+export const PersistButton = React.memo((props: PersistButtonProps) => {
+	const [isLoading, setIsLoading] = React.useState(false)
+	const value = React.useContext(MetaOperationsContext)
 
-export class PersistButton extends React.PureComponent<PersistButtonProps, PersistButtonState> {
-	public readonly state: PersistButtonState = {
-		isLoading: false
-	}
-
-	private getOnPersist = (triggerPersist: () => Promise<void>) => () => {
-		if (this.state.isLoading) {
+	const getOnPersist = (triggerPersist: () => Promise<void>) => () => {
+		if (isLoading) {
 			return
 		}
 
-		triggerPersist().finally(() => this.setState({ isLoading: false }))
-		this.setState({
-			isLoading: true
-		})
+		triggerPersist().finally(() => setIsLoading(false))
+		setIsLoading(true)
 	}
 
-	public render() {
+	if (value) {
 		return (
-			<MetaOperationsContext.Consumer>
-				{(value: MetaOperationsContextValue) => {
-					if (value) {
-						return (
-							<Button
-								intent={Intent.Success}
-								// icon="floppy-disk"
-								onClick={this.getOnPersist(value.triggerPersist)}
-								// intent={Intent.PRIMARY}
-								// loading={this.state.isLoading}
-								// large={true}
-							>
-								{this.props.children || 'Save'}
-							</Button>
-						)
-					}
-				}}
-			</MetaOperationsContext.Consumer>
+			<Button
+				intent={Intent.Success}
+				// icon="floppy-disk"
+				onClick={getOnPersist(value.triggerPersist)}
+				// intent={Intent.PRIMARY}
+				// loading={this.state.isLoading}
+				// large={true}
+			>
+				{props.children || 'Save'}
+			</Button>
 		)
 	}
-}
+	return null
+})

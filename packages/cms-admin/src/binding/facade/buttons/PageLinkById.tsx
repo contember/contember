@@ -1,36 +1,32 @@
 import * as React from 'react'
+import { ReactNode } from 'react'
 import { InnerProps } from '../../../components/Link'
 import PageLink, { AnyParams, PageConfig } from '../../../components/pageRouting/PageLink'
-import { DataContext, DataContextValue } from '../../coreComponents'
+import { DataContext } from '../../coreComponents'
 import { DataBindingError, EntityAccessor, EntityForRemovalAccessor } from '../../dao'
 
 interface PageLinkByIdProps<P extends AnyParams> {
 	change: (id: string) => PageConfig<P, keyof P>
 	Component?: React.ComponentType<InnerProps>
+	children?: ReactNode
 }
 
-export class PageLinkById<P extends AnyParams> extends React.PureComponent<PageLinkByIdProps<P>> {
-	public render() {
-		return (
-			<DataContext.Consumer>
-				{(data: DataContextValue) => {
-					if (data instanceof EntityAccessor) {
-						const id = data.primaryKey
+export const PageLinkById = React.memo(function<P extends AnyParams>(props: PageLinkByIdProps<P>) {
+	const data = React.useContext(DataContext)
 
-						if (typeof id === 'string') {
-							return (
-								<PageLink change={() => this.props.change(id)} Component={this.props.Component}>
-									{this.props.children}
-								</PageLink>
-							)
-						}
-					} else if (data instanceof EntityForRemovalAccessor) {
-						// Do nothing
-					} else {
-						throw new DataBindingError('Corrupted data')
-					}
-				}}
-			</DataContext.Consumer>
-		)
+	if (data instanceof EntityAccessor) {
+		const id = data.primaryKey
+
+		if (typeof id === 'string') {
+			return (
+				<PageLink change={() => props.change(id)} Component={props.Component}>
+					{props.children}
+				</PageLink>
+			)
+		}
+		return null
+	} else if (data instanceof EntityForRemovalAccessor) {
+		return null // Do nothing
 	}
-}
+	throw new DataBindingError('Corrupted data')
+})

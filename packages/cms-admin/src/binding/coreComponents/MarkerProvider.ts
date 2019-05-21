@@ -5,7 +5,7 @@ export interface DataBindingComponent {
 	displayName: string
 }
 
-export type Props<P> = React.Component<P>['props']
+export type Props<P> = React.PropsWithChildren<P>
 
 export interface EnvironmentDeltaProvider<P = any> extends DataBindingComponent {
 	generateEnvironmentDelta: (props: Props<P>, oldEnvironment: Environment) => Partial<Environment.NameStore>

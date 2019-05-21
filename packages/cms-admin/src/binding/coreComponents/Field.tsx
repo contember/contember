@@ -120,36 +120,32 @@ namespace Field {
 		children: (rawMetadata: RawMetadata) => React.ReactNode
 	}
 
-	export class DataRetriever extends React.Component<DataRetrieverProps> {
-		public render() {
-			return (
-				<EnvironmentContext.Consumer>
-					{environment =>
-						QueryLanguage.wrapRelativeSingleField(
-							this.props.name,
-							fieldName => (
-								<MutationStateContext.Consumer>
-									{isMutating => (
-										<DataContext.Consumer>
-											{(data: DataContextValue) =>
-												this.props.children({
-													fieldName,
-													data,
-													isMutating,
-													environment
-												})
-											}
-										</DataContext.Consumer>
-									)}
-								</MutationStateContext.Consumer>
-							),
-							environment
-						)
-					}
-				</EnvironmentContext.Consumer>
+	export const DataRetriever = React.memo((props: DataRetrieverProps) => {
+		const environment = React.useContext(EnvironmentContext)
+		const isMutating = React.useContext(MutationStateContext)
+
+		const propsName = props.name
+		const propsChildren = props.children
+
+		return React.useMemo(() => {
+			return QueryLanguage.wrapRelativeSingleField(
+				propsName,
+				fieldName => (
+					<DataContext.Consumer>
+						{(data: DataContextValue) =>
+							propsChildren({
+								fieldName,
+								data,
+								isMutating,
+								environment
+							})
+						}
+					</DataContext.Consumer>
+				),
+				environment
 			)
-		}
-	}
+		}, [environment, isMutating, propsName, propsChildren])
+	})
 }
 
 export { Field }

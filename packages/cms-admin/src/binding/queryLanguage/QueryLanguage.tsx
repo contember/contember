@@ -1,3 +1,4 @@
+import { isEmptyObject } from 'cms-common'
 import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { Props, ToMany, ToOne } from '../coreComponents'
@@ -10,7 +11,7 @@ export namespace QueryLanguage {
 		Component: React.ComponentClass<P & { environment: Environment }>,
 		layers: P[],
 		environment: Environment
-	): React.ReactNode => {
+	): React.ReactElement | null => {
 		let currentNode: React.ReactNode = innerNode
 
 		for (let i = layers.length - 1; i >= 0; i--) {
@@ -22,6 +23,9 @@ export namespace QueryLanguage {
 			)
 		}
 
+		if (!currentNode || isEmptyObject(currentNode)) {
+			return null
+		}
 		return currentNode
 	}
 
@@ -29,7 +33,7 @@ export namespace QueryLanguage {
 		input: string,
 		generateField: (fieldName: FieldName) => React.ReactNode,
 		environment: Environment
-	): React.ReactNode => {
+	): React.ReactElement | null => {
 		const expression = Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeSingleField, environment)
 
 		return wrap(generateField(expression.fieldName), ToOne.AtomicPrimitive, expression.toOneProps, environment)
@@ -39,7 +43,7 @@ export namespace QueryLanguage {
 		input: string,
 		subordinateFields: React.ReactNode,
 		environment: Environment
-	): React.ReactNode => {
+	): React.ReactElement | null => {
 		const { toOneProps } = Parser.parseQueryLanguageExpression(
 			input,
 			Parser.EntryPoint.RelativeSingleEntity,
@@ -53,7 +57,7 @@ export namespace QueryLanguage {
 		input: string,
 		generateAtomicToMany: (atomicPrimitiveProps: Props<ToMany.AtomicPrimitiveProps>) => React.ReactNode,
 		environment: Environment
-	): React.ReactNode => {
+	): React.ReactElement | null => {
 		const { toOneProps, toManyProps } = Parser.parseQueryLanguageExpression(
 			input,
 			Parser.EntryPoint.RelativeEntityList,
@@ -78,7 +82,7 @@ export namespace QueryLanguage {
 	): {
 		entityName: EntityName
 		filter?: Filter
-		children: React.ReactNode
+		children: React.ReactElement | null
 		fieldName: FieldName
 	} => {
 		const { entityName, filter, fieldName, toOneProps } = Parser.parseQueryLanguageExpression(

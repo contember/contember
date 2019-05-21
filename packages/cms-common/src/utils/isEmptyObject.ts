@@ -1,7 +1,7 @@
-export default (object: any): boolean => {
-	// This is faster than Object.keys(object).length === 0 && object.constructor === Object
-	for (const key in object) {
-		if (object.hasOwnProperty(key)) {
+export default (arg: any): arg is {} => {
+	// This is faster than Object.keys(arg).length === 0 && arg.constructor === Object
+	for (const key in arg) {
+		if (arg.hasOwnProperty(key)) {
 			return false
 		}
 	}

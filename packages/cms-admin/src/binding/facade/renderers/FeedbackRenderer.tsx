@@ -1,6 +1,7 @@
+import { isEmptyObject } from 'cms-common'
 import * as React from 'react'
 import { DataRendererProps } from '../../coreComponents'
-import { TreeIdRetriever } from '../aux'
+import { DirtinessContext, MutationStateContext } from '../../coreComponents/PersistState'
 import { LoadingSpinner, PersistInfo, PersistInfoPublicProps } from './userFeedback'
 
 export interface FeedbackRendererPublicProps extends DataRendererProps {
@@ -14,26 +15,24 @@ export interface FeedbackRendererInternalProps {
 
 export interface FeedbackRendererProps extends FeedbackRendererPublicProps, FeedbackRendererInternalProps {}
 
-export class FeedbackRenderer extends React.PureComponent<FeedbackRendererProps> {
-	public render(): React.ReactNode {
-		const data = this.props.data
+export const FeedbackRenderer = React.memo(
+	(props: FeedbackRendererProps): React.ReactElement | null => {
+		const isMutating = React.useContext(MutationStateContext)
+		const isDirty = React.useContext(DirtinessContext)
+		const data = props.data
 
 		if (!data) {
-			if (this.props.loadingFallback) {
-				return this.props.loadingFallback
+			if (props.loadingFallback && !isEmptyObject(props.loadingFallback)) {
+				return props.loadingFallback
 			}
 			return <LoadingSpinner />
 		}
 
 		return (
-			<TreeIdRetriever>
-				{treeId => (
-					<>
-						{<PersistInfo {...this.props.userFeedback || {}} treeId={treeId} />}
-						{this.props.children(data)}
-					</>
-				)}
-			</TreeIdRetriever>
+			<>
+				{<PersistInfo {...props.userFeedback || {}} isMutating={isMutating} isDirty={isDirty} />}
+				{props.children(data)}
+			</>
 		)
 	}
-}
+)

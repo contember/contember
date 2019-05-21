@@ -59,6 +59,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 						{dimensions.map((item, j) => {
 							return (
 								<SideDimensions.SingleDimension
+									environment={environment}
 									dimensionValue={item}
 									variableName={props.variableName}
 									variables={props.variables}
@@ -82,6 +83,7 @@ namespace SideDimensions {
 	}
 
 	export interface SingleDimensionProps extends CommonDimensionProps {
+		environment: Environment
 		dimensionValue: Environment.Value
 	}
 
@@ -90,15 +92,13 @@ namespace SideDimensions {
 
 		public render() {
 			return (
-				<EnvironmentContext.Consumer>
-					{oldEnvironment => (
-						<EnvironmentContext.Provider
-							value={oldEnvironment.putDelta(SingleDimension.generateEnvironmentDelta(this.props, oldEnvironment))}
-						>
-							<div className="sideDimensions-dimensions-dimension">{this.props.children}</div>
-						</EnvironmentContext.Provider>
+				<EnvironmentContext.Provider
+					value={this.props.environment.putDelta(
+						SingleDimension.generateEnvironmentDelta(this.props, this.props.environment)
 					)}
-				</EnvironmentContext.Consumer>
+				>
+					<div className="sideDimensions-dimensions-dimension">{this.props.children}</div>
+				</EnvironmentContext.Provider>
 			)
 		}
 

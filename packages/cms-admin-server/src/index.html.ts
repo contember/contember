@@ -27,7 +27,6 @@ export default function render({
 
 	<script id="admin-config" type="application/json">${JSON.stringify(config)}</script>
 	${assets.js ? `<script type="text/javascript" src="${assets.js}"></script>` : ''}
-	</body>
 </body>
 </html>
 `

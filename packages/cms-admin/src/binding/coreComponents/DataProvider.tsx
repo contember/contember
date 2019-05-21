@@ -10,6 +10,7 @@ import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
 import { MetaOperationsContext, MetaOperationsContextValue } from './MetaOperationsContext'
+import { DirtinessContext, MutationStateContext } from './PersistState'
 
 export interface DataRendererProps {
 	data?: AccessorTreeRoot | undefined
@@ -31,6 +32,7 @@ export interface DataProviderDispatchProps {
 
 export interface DataProviderStateProps {
 	requests: ContentRequestsState
+	isMutating: boolean
 	isDirty: boolean
 }
 
@@ -137,7 +139,11 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	public render() {
 		return (
 			<MetaOperationsContext.Provider value={this.metaOperations}>
-				{this.renderRenderer()}
+				<DirtinessContext.Provider value={this.props.isDirty}>
+					<MutationStateContext.Provider value={this.props.isMutating}>
+						{this.renderRenderer()}
+					</MutationStateContext.Provider>
+				</DirtinessContext.Provider>
 			</MetaOperationsContext.Provider>
 		)
 	}
@@ -176,10 +182,14 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 const getDataProvider = <DRP extends {}>() =>
 	connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps<DRP>, State>(
-		({ content, dataTrees }, ownProps: DataProviderOwnProps<DRP>) => ({
-			requests: content.requests,
-			isDirty: (dataTrees[ownProps.markerTree.id] || {}).isDirty || false
-		}),
+		({ content, dataTrees }, ownProps: DataProviderOwnProps<DRP>) => {
+			const dataTree = dataTrees[ownProps.markerTree.id] || {}
+			return {
+				requests: content.requests,
+				isDirty: dataTree.isDirty || false,
+				isMutating: dataTree.isMutating || false
+			}
+		},
 		(dispatch: Dispatch) => ({
 			setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) =>
 				dispatch(setDataTreeDirtiness(dataTreeId, isDirty)),

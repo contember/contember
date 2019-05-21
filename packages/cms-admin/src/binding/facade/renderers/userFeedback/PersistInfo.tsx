@@ -3,30 +3,24 @@ import { connect } from 'react-redux'
 import { addToast } from '../../../../actions/toasts'
 import { Dispatch } from '../../../../actions/types'
 import State from '../../../../state'
-import { DataTreeDirtinessState, DataTreeId, DataTreeMutationState } from '../../../../state/dataTrees'
 import { ToastDefinition, ToastType } from '../../../../state/toasts'
+import { DirtinessContextValue, MutationStateContextValue } from '../../../coreComponents/PersistState'
 
 export interface PersistInfoPublicProps {
 	successMessage?: string
 	errorMessage?: string
 }
 
-export interface PersistInfoInternalProps {
-	treeId: DataTreeId
-}
-
-export interface PersistInfoOwnProps extends PersistInfoInternalProps, PersistInfoPublicProps {}
-
-interface PersistInfoStateProps {
-	isDirty: DataTreeDirtinessState
-	isMutating: DataTreeMutationState
+export interface PersistInfoOwnProps extends PersistInfoPublicProps {
+	isDirty: DirtinessContextValue
+	isMutating: MutationStateContextValue
 }
 
 interface PersistInfoDispatchProps {
 	showToast: (toast: ToastDefinition) => void
 }
 
-export interface PersistInfoProps extends PersistInfoOwnProps, PersistInfoStateProps, PersistInfoDispatchProps {}
+export interface PersistInfoProps extends PersistInfoOwnProps, PersistInfoDispatchProps {}
 
 export class PersistInfoConnected extends React.PureComponent<PersistInfoProps> {
 	public render(): React.ReactNode {
@@ -58,14 +52,8 @@ export class PersistInfoConnected extends React.PureComponent<PersistInfoProps> 
 	}
 }
 
-export const PersistInfo = connect<PersistInfoStateProps, PersistInfoDispatchProps, PersistInfoOwnProps, State>(
-	({ dataTrees }, ownProps: PersistInfoOwnProps) => {
-		const dataTree = dataTrees[ownProps.treeId] || {}
-		return {
-			isDirty: dataTree.isDirty || false,
-			isMutating: dataTree.isMutating || false
-		}
-	},
+export const PersistInfo = connect<{}, PersistInfoDispatchProps, {}, State>(
+	undefined,
 	(dispatch: Dispatch) => ({
 		showToast: (toast: ToastDefinition) => {
 			dispatch(addToast(toast))

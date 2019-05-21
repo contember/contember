@@ -10,13 +10,13 @@ import {
 	FieldAccessor,
 	FieldMarker
 } from '../dao'
-import { MutationStateRetriever } from '../facade/aux'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
+import { MutationStateContext } from './PersistState'
 
 export interface FieldPublicProps {
 	name: FieldName
@@ -128,7 +128,7 @@ namespace Field {
 						QueryLanguage.wrapRelativeSingleField(
 							this.props.name,
 							fieldName => (
-								<MutationStateRetriever>
+								<MutationStateContext.Consumer>
 									{isMutating => (
 										<DataContext.Consumer>
 											{(data: DataContextValue) =>
@@ -141,7 +141,7 @@ namespace Field {
 											}
 										</DataContext.Consumer>
 									)}
-								</MutationStateRetriever>
+								</MutationStateContext.Consumer>
 							),
 							environment
 						)

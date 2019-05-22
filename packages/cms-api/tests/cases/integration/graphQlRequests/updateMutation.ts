@@ -17,7 +17,7 @@ describe('update', () => {
 	}
 
 	describe('columns (author)', () => {
-		it('update "public".name', async () => {
+		it('update name', async () => {
 			await execute({
 				schema: new SchemaBuilder()
 					.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -2356,7 +2356,7 @@ describe('update', () => {
 	})
 
 	describe('acl', () => {
-		it('update "public".name', async () => {
+		it('update name', async () => {
 			await execute({
 				schema: new SchemaBuilder()
 					.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -2423,7 +2423,7 @@ describe('update', () => {
 			})
 		})
 
-		it('update "public".name - denied', async () => {
+		it('update name - denied', async () => {
 			await execute({
 				schema: new SchemaBuilder()
 					.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -2500,7 +2500,7 @@ describe('update', () => {
 			})
 		})
 
-		it('update "public".m:n', async () => {
+		it('update m:n', async () => {
 			await execute({
 				schema: new SchemaBuilder()
 					.entity('Post', e =>

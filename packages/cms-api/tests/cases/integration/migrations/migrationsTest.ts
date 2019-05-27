@@ -21,24 +21,24 @@ function testDiffSchemas(
 	expectedDiff: Migration.Modification[]
 ) {
 	const actual = schemaDiffer.diffSchemas(
-		{ model: originalSchema, acl: emptyAcl },
-		{ model: updatedSchema, acl: emptyAcl },
+		{ model: originalSchema, acl: emptyAcl, validation: {} },
+		{ model: updatedSchema, acl: emptyAcl, validation: {} },
 		false
 	)
 	expect(actual).deep.equals(expectedDiff)
-	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, actual)).deep.equals({
+	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl, validation: {} }, actual)).deep.equals({
 		model: updatedSchema,
 		acl: emptyAcl,
 	})
 }
 
 function testApplyDiff(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSchema: Model.Schema) {
-	const actual = schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl }, diff)
+	const actual = schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl, validation: {} }, diff)
 	expect(actual.model).deep.equals(expectedSchema)
 }
 
 function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSql: string) {
-	let schema = { model: originalSchema, acl: emptyAcl }
+	let schema = { model: originalSchema, acl: emptyAcl, validation: {} }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
 		const modificationHandler = modificationFactory.create(modification, data, schema)
@@ -1096,11 +1096,11 @@ describe('Diff schemas', () => {
 			},
 		]
 		it('diff schemas', () => {
-			const actual = schemaDiffer.diffSchemas({ model, acl: emptyAcl }, { model, acl })
+			const actual = schemaDiffer.diffSchemas({ model, acl: emptyAcl, validation: {} }, { model, acl, validation: {} })
 			expect(actual).deep.equals(diff)
 		})
 		it('apply diff', () => {
-			const actual = schemaMigrator.applyDiff({ model, acl: emptyAcl }, diff)
+			const actual = schemaMigrator.applyDiff({ model, acl: emptyAcl, validation: {} }, diff)
 			expect(actual).deep.equals({ model, acl })
 		})
 	})

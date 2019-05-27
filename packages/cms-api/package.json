@@ -13,7 +13,8 @@
 	"scripts": {
 		"prebuild-tenant-api": "npx gql-gen --config graphql-tenant.codegen.yml",
 		"prebuild-system-api": "npx gql-gen --config graphql-system.codegen.yml",
-		"prebuild": "npm run prebuild-tenant-api && npm run prebuild-system-api && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
+		"prebuild-content-schema-api": "npx gql-gen --config graphql-content-schema.codegen.yml",
+		"prebuild": "npm run prebuild-tenant-api && npm run prebuild-system-api && npm run prebuild-content-schema-api && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
 		"build": "tsc --build --verbose",
 		"test": "mocha --ui bdd './dist/tests/cases/**/*.js'",
 		"test:debug": "mocha --inspect --ui bdd",

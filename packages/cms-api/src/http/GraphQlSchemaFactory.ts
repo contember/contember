@@ -2,6 +2,8 @@ import { Acl, Schema } from 'cms-common'
 import { GraphQLSchema } from 'graphql'
 import GraphQlSchemaBuilderFactory from '../content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
+import { ContentSchemaFactory } from '../content-api/graphQLSchema/ContentSchemaFactory'
+import { mergeSchemas } from 'graphql-tools'
 
 class GraphQlSchemaFactory {
 	private cache: {
@@ -40,7 +42,8 @@ class GraphQlSchemaFactory {
 		const { permissions, verifier } = this.permissionFactory.createPermissions(stageSlug, schema, identity)
 
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, permissions)
-		const graphQlSchema = dataSchemaBuilder.build()
+		const contentSchemaFactory = new ContentSchemaFactory(schema)
+		const graphQlSchema = mergeSchemas({ schemas: [dataSchemaBuilder.build(), contentSchemaFactory.create()] })
 		schemaCacheEntry.entries.push({ graphQlSchema, verifier, permissions })
 
 		return [graphQlSchema, permissions]

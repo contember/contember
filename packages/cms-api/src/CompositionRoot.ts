@@ -65,7 +65,7 @@ class CompositionRoot {
 		projectSchemas: { [name: string]: Schema }
 	): MasterContainer {
 		const tenantContainer = this.createTenantContainer(config.tenant.db)
-		const projectContainers = this.createProjectContainers(config.projects, projectsDirectory)
+		const projectContainers = this.createProjectContainers(config.projects, projectsDirectory, projectSchemas)
 
 		const masterContainer = new Container.Builder({})
 			.addService('tenantContainer', () => tenantContainer)
@@ -182,10 +182,15 @@ class CompositionRoot {
 		return masterContainer.pick('cli')
 	}
 
-	createProjectContainers(projects: Array<Project>, projectsDir: string): ProjectContainer[] {
+	createProjectContainers(
+		projects: Array<Project>,
+		projectsDir: string,
+		schemas: Record<string, Schema>
+	): ProjectContainer[] {
 		return projects.map((project: Project) => {
 			const projectContainer = new Container.Builder({})
 				.addService('project', () => project)
+				.addService('schema', ({ project }) => schemas[project.slug])
 				.addService('connection', ({ project }) => {
 					return new Connection(
 						{
@@ -246,8 +251,14 @@ class CompositionRoot {
 				.addService('apolloServerFactory', ({ connection }) => new ContentApolloServerFactory(connection))
 				.addService(
 					'contentApolloMiddlewareFactory',
-					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory }) =>
-						new ContentApolloMiddlewareFactory(project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory)
+					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory, schema }) =>
+						new ContentApolloMiddlewareFactory(
+							project,
+							schemaVersionBuilder,
+							graphQlSchemaFactory,
+							apolloServerFactory,
+							schema
+						)
 				)
 				.build()
 

@@ -16,7 +16,8 @@ class ContentApolloMiddlewareFactory {
 		private readonly project: Project,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly graphqlSchemaFactory: GraphQlSchemaFactory,
-		private readonly apolloServerFactory: ContentApolloServerFactory
+		private readonly apolloServerFactory: ContentApolloServerFactory,
+		private readonly currentSchema: Schema
 	) {}
 
 	create(
@@ -29,7 +30,9 @@ class ContentApolloMiddlewareFactory {
 	> {
 		return async (ctx, next) => {
 			if (!this.schemaCache[stage.id]) {
-				this.schemaCache[stage.id] = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
+				this.schemaCache[stage.id] = this.project.ignoreMigrations
+					? this.currentSchema
+					: await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
 			}
 			const schema = this.schemaCache[stage.id]
 

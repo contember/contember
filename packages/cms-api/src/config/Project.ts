@@ -6,6 +6,7 @@ interface Project {
 	readonly stages: Array<Project.Stage>
 	readonly dbCredentials: Project.DatabaseCredentials
 	readonly s3: Project.S3Config
+	readonly ignoreMigrations?: boolean
 }
 
 namespace Project {

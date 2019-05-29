@@ -36,13 +36,13 @@ export class ContentSchemaFactory {
 			validators.push(apiValidator)
 			for (const arg of validator.args) {
 				switch (arg.type) {
-					case 'path':
+					case Validation.ArgumentType.path:
 						args.push({ __typename: '_PathArgument', path: arg.path })
 						break
-					case 'literal':
+					case Validation.ArgumentType.literal:
 						args.push({ __typename: '_LiteralArgument', value: createValue(arg.value) })
 						break
-					case 'validator':
+					case Validation.ArgumentType.validator:
 						args.push({ __typename: '_ValidatorArgument', validator: processValidator(arg.validator) })
 						break
 					default:

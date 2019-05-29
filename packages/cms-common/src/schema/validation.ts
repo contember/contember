@@ -1,8 +1,15 @@
 namespace Validation {
 	export type ContextPath = string[]
-	export type ValidatorArgument = { type: 'validator'; validator: Validator }
-	export type PathArgument = { type: 'path'; path: ContextPath }
-	export type LiteralArgument<V = any> = { type: 'literal'; value: V }
+
+	export enum ArgumentType {
+		validator = 'validator',
+		path = 'path',
+		literal = 'literal'
+	}
+
+	export type ValidatorArgument = { type: ArgumentType.validator; validator: Validator }
+	export type PathArgument = { type: ArgumentType.path; path: ContextPath }
+	export type LiteralArgument<V = any> = { type: ArgumentType.literal; value: V }
 
 	export type AnyArgument = LiteralArgument | PathArgument | ValidatorArgument
 

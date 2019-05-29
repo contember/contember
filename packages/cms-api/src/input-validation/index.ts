@@ -16,9 +16,9 @@ const parsePath = (path: ContextPath): string[] => {
 	return path
 }
 const ArgumentFactory = {
-	validator: (validator: Validation.Validator): Validation.ValidatorArgument => ({ type: 'validator', validator }),
-	path: (path?: ContextPath): Validation.PathArgument => ({ type: 'path', path: parsePath(path) }),
-	literal: (value: any): Validation.LiteralArgument => ({ type: 'literal', value }),
+	validator: (validator: Validation.Validator): Validation.ValidatorArgument => ({ type: Validation.ArgumentType.validator, validator }),
+	path: (path?: ContextPath): Validation.PathArgument => ({ type: Validation.ArgumentType.path, path: parsePath(path) }),
+	literal: (value: any): Validation.LiteralArgument => ({ type: Validation.ArgumentType.literal, value }),
 }
 
 type AnyContext = NodeContext | ValueContext | NodeListContext | UndefinedNodeContext
@@ -50,7 +50,7 @@ const getValueOrLiteral = (
 	context: AnyContext,
 	argument: Validation.PathArgument | Validation.LiteralArgument
 ): any => {
-	if (argument.type === 'literal') {
+	if (argument.type === Validation.ArgumentType.literal) {
 		return argument.value
 	}
 	return getValueFromContext(argument.path ? changeContext(context, argument.path) : context)
@@ -295,8 +295,10 @@ const notOperation = (validator: Validation.Validator): Validation.Validator => 
 })
 
 const emptyOperation = (): Validation.Validator => ({ operation: 'empty', args: [] })
+
+export const InContextOperation = 'inContext' as const
 const onOperation = (path: ContextPath, validator: Validation.Validator): Validation.Validator => ({
-	operation: 'inContext',
+	operation: InContextOperation,
 	args: [ArgumentFactory.path(path), ArgumentFactory.validator(validator)],
 })
 

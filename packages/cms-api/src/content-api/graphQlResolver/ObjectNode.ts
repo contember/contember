@@ -30,6 +30,17 @@ export default class ObjectNode<Args = any> {
 	}
 
 	public withField(field: ObjectNode | FieldNode): ObjectNode<Args> {
-		return new ObjectNode(this.name, this.alias, [...this.fields, field], this.args, this.meta, this.path)
+		return new ObjectNode(
+			this.name,
+			this.alias,
+			[...this.fields.filter(it => it.alias !== field.alias), field],
+			this.args,
+			this.meta,
+			this.path
+		)
+	}
+
+	public findField(alias: string): ObjectNode | FieldNode | undefined {
+		return this.fields.find(it => it.alias === alias)
 	}
 }

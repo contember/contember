@@ -15,7 +15,7 @@ describe('input validation', () => {
 			r.on('books', r.filter(r.on('deleted', r.equals(false)), r.on('published', r.any(r.equals(true))))),
 			r.on('published', r.equals(true))
 		)
-		console.log(JSON.stringify(rule, null, ' '))
+
 		const author = {
 			books: [
 				{ published: true, deleted: true },
@@ -23,6 +23,18 @@ describe('input validation', () => {
 				{ published: true, deleted: false },
 			],
 			published: true,
+		}
+
+		const context = validation.createRootContext(author)
+
+		expect(validation.evaluate(context, rule)).eq(true)
+	})
+
+	it('evaluates collection length rule', () => {
+		const rule = validation.rules.on('tags', validation.rules.minLength(2))
+
+		const author = {
+			tags: [{ value: 'abc' }, { value: 'xyz' }],
 		}
 
 		const context = validation.createRootContext(author)

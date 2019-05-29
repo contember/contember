@@ -166,9 +166,16 @@ const validatorEvaluators: Record<string, (context: AnyContext, ...args: any[]) 
 	equals: (context: AnyContext, other: Validation.LiteralArgument | Validation.PathArgument) => {
 		return getValueFromContext(context) === getValueOrLiteral(context, other)
 	},
-	range: (context: AnyContext, min?: Validation.LiteralArgument<number>, max?: Validation.LiteralArgument<number>) => {
-		const value = getValueFromContext(context)
-		return (min === undefined || min.value <= value) && (max === undefined || max.value >= value)
+	lengthRange: (context: AnyContext, min: Validation.LiteralArgument<number>, max: Validation.LiteralArgument<number>) => {
+		let value: number
+		if (isValueContext(context)) {
+			value = String(getValueFromContext(context)).length
+		} else if (isNodeListContext(context)) {
+			value = context.nodes.length
+		} else {
+			throw new Error('Value or List context is required for range operation')
+		}
+		return (min.value === undefined || min.value <= value) && (max.value === undefined || max.value >= value)
 	},
 	and: (context: AnyContext, ...values: Validation.ValidatorArgument[]) => {
 		return values.reduce<boolean>((acc, val) => acc && evaluate(context, val.validator), true)
@@ -280,8 +287,8 @@ const patternOperation = (pattern: string): Validation.Validator => ({
 	args: [ArgumentFactory.literal(pattern)],
 })
 
-const rangeOperation = (min?: number, max?: number): Validation.Validator => ({
-	operation: 'range',
+const lengthRangeOperation = (min?: number, max?: number): Validation.Validator => ({
+	operation: 'lengthRange',
 	args: [ArgumentFactory.literal(min), ArgumentFactory.literal(max)],
 })
 
@@ -322,9 +329,9 @@ export const rules = {
 	or: orOperation,
 	conditional: conditionalOperation,
 	pattern: patternOperation,
-	range: rangeOperation,
-	minLength: (min: number) => rangeOperation(min),
-	maxLength: (max: number) => rangeOperation(undefined, max),
+	lengthRange: lengthRangeOperation,
+	minLength: (min: number) => lengthRangeOperation(min),
+	maxLength: (max: number) => lengthRangeOperation(undefined, max),
 	equals: equalsOperation,
 	not: notOperation,
 	['empty']: emptyOperation,

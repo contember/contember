@@ -44,7 +44,7 @@ export default class ObjectNode<Args = any> {
 		return this.fields.find(it => it.alias === alias)
 	}
 
-	public findFieldByName(name: string): ObjectNode | FieldNode | undefined {
-		return this.fields.find(it => it.name === name)
+	public findFieldByName(name: string): (ObjectNode | FieldNode)[] {
+		return this.fields.filter(it => it.name === name)
 	}
 }

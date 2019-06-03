@@ -49,6 +49,7 @@ namespace CreateInputProcessor {
 		targetEntity: Model.Entity
 		targetRelation: Model.ManyHasManyOwnerRelation
 		input: I
+		index: number
 	}
 
 	export interface ManyHasManyOwnerContext<I> {
@@ -57,6 +58,7 @@ namespace CreateInputProcessor {
 		targetEntity: Model.Entity
 		targetRelation: Model.ManyHasManyInversedRelation | null
 		input: I
+		index: number
 	}
 
 	export interface ManyHasOneContext<I> {
@@ -73,6 +75,7 @@ namespace CreateInputProcessor {
 		targetEntity: Model.Entity
 		targetRelation: Model.ManyHasOneRelation
 		input: I
+		index: number
 	}
 
 	export interface OneHasOneInversedContext<I> {

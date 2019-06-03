@@ -13,15 +13,16 @@ import { isIt } from '../../utils/type'
 import ObjectNode from './ObjectNode'
 import { getArgumentValues } from 'graphql/execution/values'
 
+type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 export default class GraphQlQueryAstFactory {
-	public create<Args = any>(info: GraphQLResolveInfo): ObjectNode<Args> {
+	public create<Args = any>(info: GraphQLResolveInfo, filter?: NodeFilter): ObjectNode<Args> {
 		const node = this.mergeAllFieldNodes(info.fieldNodes)
 		const parentType = info.parentType
 		if (!(parentType instanceof GraphQLObjectType)) {
 			throw new Error(this.getValueType(parentType))
 		}
 
-		return this.createFromNode(info, parentType as GraphQLObjectType, node, []) as ObjectNode
+		return this.createFromNode(info, parentType as GraphQLObjectType, node, [], filter || (() => true)) as ObjectNode
 	}
 
 	private mergeAllFieldNodes(fieldNodes: ReadonlyArray<GraphQlFieldNode>): GraphQlFieldNode {
@@ -54,8 +55,12 @@ export default class GraphQlQueryAstFactory {
 		info: GraphQLResolveInfo,
 		parentType: GraphQLObjectType,
 		node: GraphQlFieldNode,
-		path: string[]
-	): ObjectNode | FieldNode {
+		path: string[],
+		filter: NodeFilter
+	): ObjectNode | FieldNode | null {
+		if (!filter(node, path)) {
+			return null
+		}
 		const name = node.name.value
 		const alias = node.alias ? node.alias.value : name
 		if (!node.selectionSet) {
@@ -65,10 +70,13 @@ export default class GraphQlQueryAstFactory {
 		const type = field.type
 		const resolvedType = this.resolveObjectType(type)
 
-		const fields: (FieldNode | ObjectNode)[] = this.processSelectionSet(info, resolvedType, node.selectionSet, [
-			...path,
-			alias,
-		])
+		const fields: (FieldNode | ObjectNode)[] = this.processSelectionSet(
+			info,
+			resolvedType,
+			node.selectionSet,
+			[...path, alias],
+			filter
+		)
 
 		return new ObjectNode(
 			name,
@@ -84,12 +92,16 @@ export default class GraphQlQueryAstFactory {
 		info: GraphQLResolveInfo,
 		parentType: GraphQLObjectType,
 		selectionSet: SelectionSetNode,
-		path: string[]
+		path: string[],
+		filter: NodeFilter
 	): (FieldNode | ObjectNode)[] {
 		const fields: (FieldNode | ObjectNode)[] = []
 		for (let subNode of selectionSet.selections) {
 			if (isIt<GraphQlFieldNode>(subNode, 'kind', 'Field')) {
-				fields.push(this.createFromNode(info, parentType, subNode, path))
+				const result = this.createFromNode(info, parentType, subNode, path, filter)
+				if (result !== null) {
+					fields.push(result)
+				}
 			} else if (isIt<FragmentSpreadNode>(subNode, 'kind', 'FragmentSpread')) {
 				const fragmentDefinition = info.fragments[subNode.name.value]
 				if (!fragmentDefinition) {
@@ -101,7 +113,13 @@ export default class GraphQlQueryAstFactory {
 					throw new Error()
 				}
 				fields.push(
-					...this.processSelectionSet(info, subField as GraphQLObjectType, fragmentDefinition.selectionSet, path)
+					...this.processSelectionSet(
+						info,
+						subField as GraphQLObjectType,
+						fragmentDefinition.selectionSet,
+						path,
+						filter
+					)
 				)
 			} else {
 				throw new Error('FragmentSpread and InlineFragment are not supported yet')

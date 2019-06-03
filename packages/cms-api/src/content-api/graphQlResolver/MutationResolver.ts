@@ -1,11 +1,17 @@
-import { Input, Model } from 'cms-common'
+import { assertNever, Input, Model } from 'cms-common'
 import ObjectNode from './ObjectNode'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import Mapper from '../sql/Mapper'
 import { UserError } from 'graphql-errors'
+import InputValidator from '../input-validation/InputValidator'
+import InsertVisitor from '../inputProcessing/CreateInputVisitor'
 
 export default class MutationResolver {
-	constructor(private readonly mapper: Mapper, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
+	constructor(
+		private readonly mapper: Mapper,
+		private readonly uniqueWhereExpander: UniqueWhereExpander,
+		private readonly inputValidator: InputValidator
+	) {}
 
 	public async resolveUpdate(entity: Model.Entity, queryAst: ObjectNode<Input.UpdateInput>) {
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, queryAst.args.by)
@@ -23,10 +29,33 @@ export default class MutationResolver {
 		return (await this.mapper.select(entity, queryExpanded))[0] || null
 	}
 
-	public async resolveCreate(entity: Model.Entity, queryAst: ObjectNode<Input.CreateInput>) {
+	public async resolveCreate(entity: Model.Entity, input: Input.CreateInput, queryAst: ObjectNode) {
+		const validationResult = await this.inputValidator.validateCreate(entity, input.data)
+		if (validationResult.length > 0) {
+			return {
+				ok: false,
+				validation: {
+					valid: false,
+					errors: validationResult.map(it => ({
+						message: it.message,
+						path: it.path.map(part => {
+							switch (typeof part) {
+								case 'number':
+									return { __typename: '_IndexPathFragment', index: part }
+								case 'string':
+									return { __typename: '_FieldPathFragment', field: part }
+								default:
+									assertNever(part)
+							}
+						}),
+					})),
+				},
+				node: null,
+			}
+		}
 		let primary: Input.PrimaryValue
 		try {
-			primary = await this.mapper.insert(entity, queryAst.args.data)
+			primary = await this.mapper.insert(entity, input.data)
 		} catch (e) {
 			if (!(e instanceof Mapper.NoResultError)) {
 				throw e
@@ -36,11 +65,14 @@ export default class MutationResolver {
 
 		const nodeQuery = queryAst.findFieldByName('node')
 
-		let node: any = undefined
-		if (nodeQuery instanceof ObjectNode) {
-			const whereArgs = { filter: { [entity.primary]: { eq: primary } } }
-			const objectWithArgs = nodeQuery.withArgs(whereArgs)
-			node = (await this.mapper.select(entity, objectWithArgs))[0] || null
+		let nodes: Record<string, any> = {}
+		const whereArgs = { filter: { [entity.primary]: { eq: primary } } }
+		for (const singleNodeQuery of nodeQuery) {
+			if (!(singleNodeQuery instanceof ObjectNode)) {
+				throw new Error()
+			}
+			const objectWithArgs = singleNodeQuery.withArgs(whereArgs)
+			nodes[singleNodeQuery.alias] = (await this.mapper.select(entity, objectWithArgs))[0] || null
 		}
 
 		return {
@@ -49,7 +81,7 @@ export default class MutationResolver {
 				valid: true,
 				errors: [],
 			},
-			node,
+			...nodes,
 		}
 	}
 

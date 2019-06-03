@@ -63,6 +63,9 @@ const getValueOrLiteral = (
 }
 
 const getValueFromContext = (context: AnyContext): any => {
+	if (isUndefinedNodeContext(context)) {
+		return undefined
+	}
 	if (!isValueContext(context)) {
 		throw new Error('ValueContext is required')
 	}
@@ -147,6 +150,9 @@ export const evaluate = (context: AnyContext, validator: Validation.Validator): 
 
 const validatorEvaluators: Record<string, (context: AnyContext, ...args: any[]) => boolean> = {
 	empty: (context: AnyContext) => {
+		if (isNodeListContext(context)) {
+			return context.nodes.length === 0
+		}
 		const value = getValueFromContext(context)
 		return !value
 	},
@@ -182,6 +188,8 @@ const validatorEvaluators: Record<string, (context: AnyContext, ...args: any[]) 
 			value = String(getValueFromContext(context)).length
 		} else if (isNodeListContext(context)) {
 			value = context.nodes.length
+		} else if (isUndefinedNodeContext(context)) {
+			return false
 		} else {
 			throw new Error('Value or List context is required for range operation')
 		}
@@ -246,35 +254,39 @@ function addRuleToMetadata(target: any, propertyKey: string | symbol, ...rule: V
 
 const RequiredMetaKey = Symbol('Required')
 
-function fluent() {
+export function fluent() {
 	return new RuleBranch([], [])
 }
 
 class RuleBranch {
-	constructor(private conditions: Validation.Validator[], private rules: Validation.ValidationRule[]) {}
+	constructor(private conditions: Validation.Validator[], private branchRules: Validation.ValidationRule[]) {}
 
-	public getRules(): Validation.ValidationRule[] {
-		return this.rules.map(rule => ({
+	public buildRules = (): Validation.ValidationRule[] => {
+		if (this.conditions.length === 0) {
+			return this.branchRules
+		}
+		return this.branchRules.map(rule => ({
 			validator: rules.conditional(rule.validator, rules.and(...this.conditions)),
 			message: rule.message,
 		}))
 	}
 
-	public assert(validator: Validation.Validator, message: MessageOrString) {
+	public assert = (validator: Validation.Validator, message: MessageOrString): RuleBranch & PropertyDecorator => {
 		const messageParsed: Validation.Message = typeof message === 'string' ? { text: message } : message
-		const newRules = [...this.rules, { validator, message: messageParsed }]
+		const newRules = [...this.branchRules, { validator, message: messageParsed }]
 		const branch = new RuleBranch(this.conditions, newRules)
 		const propertyDecorator: PropertyDecorator = (target: any, propertykey: string | symbol) => {
-			addRuleToMetadata(target, propertykey, ...branch.getRules())
+			addRuleToMetadata(target, propertykey, ...branch.buildRules())
 		}
-		return Object.assign(propertyDecorator, branch)
+		const result = Object.assign(propertyDecorator, branch)
+		return result
 	}
 
-	assertPattern(pattern: string, message: MessageOrString) {
+	assertPattern = (pattern: string, message: MessageOrString) => {
 		return this.assert(rules.pattern(pattern), message)
 	}
 
-	assertMinLength(minLength: number, message: MessageOrString) {
+	assertMinLength = (minLength: number, message: MessageOrString) => {
 		return this.assert(rules.minLength(minLength), message)
 	}
 }

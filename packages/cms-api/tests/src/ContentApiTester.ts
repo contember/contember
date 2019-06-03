@@ -23,13 +23,14 @@ export default class ContentApiTester {
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
 		await setupSystemVariables(this.db, '11111111-1111-1111-1111-111111111111')
 		const stage = this.stageManager.getStage(stageSlug)
-		const model = (await this.getSchema()).model
+		const schema = await this.getSchema()
+		const model = schema.model
 		const permissions = new AllowAllPermissionFactory().create(model)
 		const gqlSchemaBuilder = this.graphqlSchemaBuilderFactory.create(model, permissions)
-		const schema = gqlSchemaBuilder.build()
+		const gqlSchema = gqlSchemaBuilder.build()
 		const db = this.db.forSchema(formatSchemaName(stage))
 
-		const executionContainer = new ExecutionContainerFactory(model, permissions).create({
+		const executionContainer = new ExecutionContainerFactory(schema, permissions).create({
 			db,
 			identityVariables: {},
 		})
@@ -40,11 +41,11 @@ export default class ContentApiTester {
 			errorHandler: () => null,
 			timer: async (label, cb) => (cb ? await cb() : (undefined as any)),
 		}
-		maskErrors(schema, err => {
+		maskErrors(gqlSchema, err => {
 			console.error(err)
 			process.exit(1)
 		})
-		const result = await graphql(schema, gql, null, context, variables)
+		const result = await graphql(gqlSchema, gql, null, context, variables)
 		if (result.errors) {
 			result.errors.map(it => console.error(it))
 		}

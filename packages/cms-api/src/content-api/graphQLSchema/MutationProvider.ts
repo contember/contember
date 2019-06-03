@@ -18,7 +18,7 @@ import Authorizator from '../../acl/Authorizator'
 import EntityInputProvider from './mutations/EntityInputProvider'
 import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import { filterObject } from '../../utils/object'
-import { GqlTypeName } from './utils'
+import { aliasAwareResolver, GqlTypeName } from './utils'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
 
@@ -98,7 +98,7 @@ export default class MutationProvider {
 			fields: {
 				ok: { type: new GraphQLNonNull(GraphQLBoolean) },
 				validation: { type: new GraphQLNonNull(MutationProvider.validationResultType) },
-				node: { type: nodeType },
+				node: { type: nodeType, resolve: aliasAwareResolver },
 			},
 		})
 		return {
@@ -107,7 +107,13 @@ export default class MutationProvider {
 				data: { type: new GraphQLNonNull(dataType) },
 			},
 			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveCreate(entity, this.queryAstAFactory.create(info)),
+				context.executionContainer.get('mutationResolver').resolveCreate(
+					entity,
+					args,
+					this.queryAstAFactory.create(info, (node, path) => {
+						return path.length !== 1 || node.name.value === 'node'
+					})
+				),
 		}
 	}
 

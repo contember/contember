@@ -2,12 +2,6 @@ import { Input, Model } from 'cms-common'
 import CreateInputProcessor from './CreateInputProcessor'
 import { isIt } from '../../utils/type'
 
-interface RelationInputProcessor<V> {
-	connect(input: Input.UniqueWhere): Promise<V>
-
-	create(input: Input.CreateDataInput): Promise<V>
-}
-
 export default class InsertVisitor<V>
 	implements
 		Model.ColumnVisitor<Promise<V | V[] | undefined>>,
@@ -33,22 +27,24 @@ export default class InsertVisitor<V>
 		targetRelation: Model.ManyHasManyOwnerRelation
 	) {
 		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
+			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
 				return this.createInputProcessor.processManyHasManyInversedConnect({
 					entity,
 					relation,
 					targetEntity,
 					targetRelation,
 					input,
+					index,
 				})
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
+			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
 				return this.createInputProcessor.processManyHasManyInversedCreate({
 					entity,
 					relation,
 					targetEntity,
 					targetRelation,
 					input,
+					index,
 				})
 			},
 		})
@@ -61,22 +57,24 @@ export default class InsertVisitor<V>
 		targetRelation: Model.ManyHasManyInversedRelation | null
 	) {
 		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
+			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
 				return this.createInputProcessor.processManyHasManyOwnerConnect({
 					entity,
 					relation,
 					targetEntity,
 					targetRelation,
 					input,
+					index,
 				})
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
+			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
 				return this.createInputProcessor.processManyHasManyOwnerCreate({
 					entity,
 					relation,
 					targetEntity,
 					targetRelation,
 					input,
+					index,
 				})
 			},
 		})
@@ -117,22 +115,24 @@ export default class InsertVisitor<V>
 		targetRelation: Model.ManyHasOneRelation
 	) {
 		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
+			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
 				return this.createInputProcessor.processOneHasManyConnect({
 					entity,
 					relation,
 					targetEntity,
 					targetRelation,
 					input,
+					index,
 				})
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
+			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
 				return this.createInputProcessor.processOneHasManyCreate({
 					entity,
 					relation,
 					targetEntity,
 					targetRelation,
 					input,
+					index,
 				})
 			},
 		})
@@ -194,9 +194,17 @@ export default class InsertVisitor<V>
 		})
 	}
 
-	private processRelationInput(
+	private processRelationInput<AdditionalData = {}>(
 		input: Input.CreateOneRelationInput | undefined,
-		processor: RelationInputProcessor<V>
+		processor: RelationInputProcessor<V, AdditionalData>
+	): Promise<undefined | V> {
+		return this.doProcessRelationInput(input, processor, {})
+	}
+
+	private doProcessRelationInput<AdditionalData = {}>(
+		input: Input.CreateOneRelationInput | undefined,
+		processor: RelationInputProcessor<V, AdditionalData>,
+		additional: AdditionalData
 	): Promise<undefined | V> {
 		if (input === undefined) {
 			return Promise.resolve(undefined)
@@ -205,11 +213,11 @@ export default class InsertVisitor<V>
 		let result: Promise<V> | null = null
 		if (isIt<Input.ConnectRelationInput>(input, 'connect')) {
 			relations.push('connect')
-			result = processor.connect(input.connect)
+			result = processor.connect(input.connect, additional)
 		}
 		if (isIt<Input.CreateRelationInput>(input, 'create')) {
 			relations.push('create')
-			result = processor.create(input.create)
+			result = processor.create(input.create, additional)
 		}
 
 		if (relations.length !== 1) {
@@ -224,16 +232,23 @@ export default class InsertVisitor<V>
 
 	private processManyRelationInput(
 		input: Input.CreateManyRelationInput | undefined,
-		processor: RelationInputProcessor<V>
+		processor: RelationInputProcessor<V, { index: number }>
 	): Promise<undefined | V[]> {
 		if (input === undefined) {
 			return Promise.resolve(undefined)
 		}
 		const promises = []
+		let i = 0
 		for (const element of input) {
-			const result = this.processRelationInput(element, processor) as Promise<V>
+			const result = this.doProcessRelationInput(element, processor, { index: i++ }) as Promise<V>
 			promises.push(result)
 		}
 		return Promise.all(promises)
 	}
+}
+
+interface RelationInputProcessor<V, AdditionalData> {
+	connect(input: Input.UniqueWhere, data: AdditionalData): Promise<V>
+
+	create(input: Input.CreateDataInput, data: AdditionalData): Promise<V>
 }

@@ -248,7 +248,8 @@ const acl: Acl.Schema = {
 
 const schema: Schema = {
 	model: model,
-	acl: acl
+	acl: acl,
+	validation: {}
 }
 
 export default schema

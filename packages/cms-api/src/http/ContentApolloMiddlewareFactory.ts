@@ -40,7 +40,7 @@ class ContentApolloMiddlewareFactory {
 				projectRoles: ctx.state.projectRoles,
 				globalRoles: ctx.state.authResult.roles,
 			})
-			ctx.state.schema = schema.model
+			ctx.state.schema = schema
 			ctx.state.permissions = permissions
 
 			const server = this.apolloServerFactory.create(dataSchema)
@@ -52,7 +52,7 @@ class ContentApolloMiddlewareFactory {
 
 namespace ContentApolloMiddlewareFactory {
 	export interface KoaState {
-		schema: Model.Schema
+		schema: Schema
 		permissions: Acl.Permissions
 	}
 }

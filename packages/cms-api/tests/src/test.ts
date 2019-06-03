@@ -1,4 +1,4 @@
-import { Acl, Model } from 'cms-common'
+import { Acl, Model, Schema } from 'cms-common'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
 import S3 from '../../src/utils/S3'
@@ -6,6 +6,8 @@ import { executeGraphQlTest } from './testGraphql'
 import Client from '../../src/core/database/Client'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
 import { createConnectionMock } from './ConnectionMock'
+import Validation from 'cms-common/dist/src/schema/validation'
+import { emptySchema } from '../../src/content-schema/schemaUtils'
 
 export interface SqlQuery {
 	sql: string
@@ -15,6 +17,7 @@ export interface SqlQuery {
 
 export interface Test {
 	schema: Model.Schema
+	validation?: Validation.Schema
 	permissions?: Acl.Permissions
 	variables?: Acl.VariablesMap
 	query: string
@@ -46,11 +49,12 @@ export const execute = async (test: Test) => {
 
 	// @ts-ignore
 	const db = new Client(connection, 'public')
+	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {} }
 	await executeGraphQlTest({
 		context: {
 			db: db,
 			identityVariables: test.variables || {},
-			executionContainer: new ExecutionContainerFactory(test.schema, permissions).create({
+			executionContainer: new ExecutionContainerFactory(schema, permissions).create({
 				db,
 				identityVariables: test.variables || {},
 			}),

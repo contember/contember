@@ -1,3 +1,27 @@
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
 type FieldMeta {
   readable: Boolean
   updatable: Boolean
@@ -8,7 +32,7 @@ type Info {
 }
 
 type Mutation {
-  createTest(data: TestCreateInput!): Test!
+  createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): Test
   generateUploadUrl(contentType: String!): SignedUpload!
 }
@@ -56,6 +80,12 @@ type Test {
 input TestCreateInput {
   a: String
   _create: Boolean
+}
+
+type TestCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Test
 }
 
 type TestMeta {

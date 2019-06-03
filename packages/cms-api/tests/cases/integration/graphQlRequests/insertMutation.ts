@@ -12,11 +12,13 @@ describe('Insert mutation', () => {
 				.entity('Author', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
 			query: GQL`
-        mutation {
-          createAuthor(data: {name: "John"}) {
-            id
-          }
-        }`,
+          mutation {
+              createAuthor(data: {name: "John"}) {
+                  node {
+                      id
+                  }
+              }
+          }`,
 			executes: [
 				...sqlTransaction([
 					{
@@ -43,7 +45,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createAuthor: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -77,7 +81,9 @@ describe('Insert mutation', () => {
 			query: GQL`
         mutation {
           createAuthor(data: {name: "John"}) {
-            id
+		          node {
+				          id
+		          }
           }
         }`,
 			executes: [
@@ -107,7 +113,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createAuthor: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -127,7 +135,9 @@ describe('Insert mutation', () => {
 			query: GQL`
         mutation {
           createSite(data: {name: "Mangoweb", setting: {create: {url: "https://mangoweb.cz"}}}) {
-            id
+		          node {
+				          id
+		          }
           }
         }`,
 			executes: [
@@ -166,7 +176,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createSite: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -186,7 +198,9 @@ describe('Insert mutation', () => {
 			query: GQL`
         mutation {
           createSiteSetting(data: {url: "https://mangoweb.cz", site: {create: {name: "Mangoweb"}}}) {
-            id
+		          node {
+				          id
+		          }
           }
         }`,
 			executes: [
@@ -225,7 +239,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createSiteSetting: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -246,7 +262,9 @@ describe('Insert mutation', () => {
             publishedAt: "2018-06-11",
             author: {create: {name: "John"}}
           }) {
-            id
+		          node {
+				          id
+		          }
           }
         }
       `,
@@ -286,7 +304,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createPost: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -317,7 +337,9 @@ describe('Insert mutation', () => {
               {create: {locale: en, title: "Hello world"}}
             ]
           }) {
-            id
+		          node {
+				          id
+		          }
           }
         }
       `,
@@ -367,7 +389,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createPost: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -383,12 +407,14 @@ describe('Insert mutation', () => {
 				.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
 			query: GQL`
-        mutation {
-          createPost(data: {name: "Hello world", categories: [{create: {name: "Category 1"}}, {create: {name: "Category 2"}}]}) {
-            id
+          mutation {
+              createPost(data: {name: "Hello world", categories: [{create: {name: "Category 1"}}, {create: {name: "Category 2"}}]}) {
+                  node {
+                      id
+                  }
+              }
           }
-        }
-      `,
+			`,
 			executes: [
 				...sqlTransaction([
 					{
@@ -449,7 +475,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createPost: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -469,7 +497,9 @@ describe('Insert mutation', () => {
 			query: GQL`
         mutation {
           createCategory(data: {name: "Hello world", posts: [{create: {name: "Post 1"}}, {create: {name: "Post 2"}}]}) {
-            id
+		          node {
+                    id
+		          }
           }
         }
       `,
@@ -533,7 +563,9 @@ describe('Insert mutation', () => {
 			return: {
 				data: {
 					createCategory: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},

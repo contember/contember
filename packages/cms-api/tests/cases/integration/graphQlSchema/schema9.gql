@@ -1,3 +1,27 @@
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
 type Author {
   _meta: AuthorMeta
   id: UUID!
@@ -14,6 +38,12 @@ input AuthorCreateInput {
 input AuthorCreatePostsEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutAuthorCreateInput
+}
+
+type AuthorCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Author
 }
 
 type AuthorMeta {
@@ -92,6 +122,12 @@ input CategoryCreateInput {
 input CategoryCreatePostsEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutCategoriesCreateInput
+}
+
+type CategoryCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Category
 }
 
 type CategoryMeta {
@@ -202,16 +238,16 @@ input LocaleEnumCondition {
 }
 
 type Mutation {
-  createCategory(data: CategoryCreateInput!): Category!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   deleteCategory(by: CategoryUniqueWhere!): Category
   updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): Category
-  createPostLocale(data: PostLocaleCreateInput!): PostLocale!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
   updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
-  createPost(data: PostCreateInput!): Post!
+  createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!): Post
   updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): Post
-  createAuthor(data: AuthorCreateInput!): Author!
+  createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!): Author
   updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): Author
   generateUploadUrl(contentType: String!): SignedUpload!
@@ -257,6 +293,12 @@ input PostCreateLocalesEntityRelationInput {
   create: PostLocaleWithoutPostCreateInput
 }
 
+type PostCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Post
+}
+
 type PostLocale {
   _meta: PostLocaleMeta
   id: UUID!
@@ -275,6 +317,12 @@ input PostLocaleCreateInput {
 input PostLocaleCreatePostEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutLocalesCreateInput
+}
+
+type PostLocaleCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: PostLocale
 }
 
 type PostLocaleMeta {

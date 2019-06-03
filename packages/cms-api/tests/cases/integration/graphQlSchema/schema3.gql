@@ -1,3 +1,27 @@
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
 type FieldMeta {
   readable: Boolean
   updatable: Boolean
@@ -8,10 +32,10 @@ type Info {
 }
 
 type Mutation {
-  createRoot(data: RootCreateInput!): Root!
+  createRoot(data: RootCreateInput!): RootCreateResult!
   deleteRoot(by: RootUniqueWhere!): Root
   updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): Root
-  createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntity!
+  createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
   deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntity
   generateUploadUrl(contentType: String!): SignedUpload!
@@ -33,6 +57,12 @@ input OneHasManyEntityCreateInput {
 input OneHasManyEntityCreateR2EntityRelationInput {
   connect: RootUniqueWhere
   create: RootWithoutRCreateInput
+}
+
+type OneHasManyEntityCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: OneHasManyEntity
 }
 
 type OneHasManyEntityMeta {
@@ -119,6 +149,12 @@ input RootCreateInput {
 input RootCreateREntityRelationInput {
   connect: OneHasManyEntityUniqueWhere
   create: OneHasManyEntityWithoutR2CreateInput
+}
+
+type RootCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Root
 }
 
 type RootMeta {

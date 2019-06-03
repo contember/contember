@@ -39,7 +39,7 @@ export default class SequenceTester {
 						sequence.stage,
 						GQL`mutation ($number: Int!) {
               createEntry(data: {number: $number}) {
-                id
+                ok
               }
             }`,
 						{ number: event.number }

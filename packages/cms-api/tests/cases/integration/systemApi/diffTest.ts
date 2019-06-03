@@ -29,23 +29,25 @@ describe('system api - diff', () => {
 		const response = await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
-        createAuthor(data: {name: "John Doe"}) {
-          id
-        }
+          createAuthor(data: {name: "John Doe"}) {
+              node {
+                  id
+              }
+          }
       }`
 		)
 
 		await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
-        createAuthor(data: {name: "Jack Black"}) {
-          id
-        }
+          createAuthor(data: {name: "Jack Black"}) {
+              ok
+          }
       }`
 		)
 
 		const diff = await tester.system.querySystem(GQL`query {
-			diff(baseStage: "prod", headStage: "preview", filter: [{entity: "Author", id: "${response.createAuthor.id}"}]) {
+			diff(baseStage: "prod", headStage: "preview", filter: [{entity: "Author", id: "${response.createAuthor.node.id}"}]) {
 				result {
 					events {
 						id
@@ -87,9 +89,9 @@ describe('system api - diff', () => {
 		await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
-        createAuthor(data: {name: "John Doe"}) {
-          id
-        }
+          createAuthor(data: {name: "John Doe"}) {
+              ok
+          }
       }`
 		)
 

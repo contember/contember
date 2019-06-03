@@ -33,7 +33,7 @@ describe('system api - release', () => {
 			'preview',
 			GQL`mutation {
 				createAuthor(data: {name: "John Doe"}) {
-					id
+					ok
 				}
 			}`
 		)
@@ -42,7 +42,7 @@ describe('system api - release', () => {
 			'preview',
 			GQL`mutation {
 				createAuthor(data: {name: "Jack Black"}) {
-					id
+					ok
 				}
 			}`
 		)

@@ -45,9 +45,11 @@ describe('project initializer', () => {
 		const response = await tester.content.queryContent(
 			'prod',
 			GQL`mutation {
-        createAuthor(data: {name: "John Doe"}) {
-          id
-        }
+          createAuthor(data: {name: "John Doe"}) {
+              node {
+                  id
+              }
+          }
       }`
 		)
 
@@ -73,7 +75,7 @@ describe('project initializer', () => {
 			},
 			{
 				1: createRunMigrationEvent('2019-02-01-163923'),
-				2: createCreateEvent(response.createAuthor.id, 'author', { name: 'John Doe' }),
+				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
 			}
 		)
 	})
@@ -127,18 +129,22 @@ describe('project initializer', () => {
 		const response = await tester.content.queryContent(
 			'prod',
 			GQL`mutation {
-        createAuthor(data: {name: "John Doe"}) {
-          id
-        }
+          createAuthor(data: {name: "John Doe"}) {
+              node {
+                  id
+              }
+          }
       }`
 		)
 
 		const response2 = await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
-        createAuthor(data: {name: "Jack Black"}) {
-          id
-        }
+          createAuthor(data: {name: "Jack Black"}) {
+              node {
+                  id
+              }
+          }
       }`
 		)
 
@@ -149,8 +155,8 @@ describe('project initializer', () => {
 			},
 			{
 				1: createRunMigrationEvent('2019-02-01-163923'),
-				2: createCreateEvent(response.createAuthor.id, 'author', { name: 'John Doe' }),
-				3: createCreateEvent(response2.createAuthor.id, 'author', { name: 'Jack Black' }),
+				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
+				3: createCreateEvent(response2.createAuthor.node.id, 'author', { name: 'Jack Black' }),
 			}
 		)
 
@@ -173,8 +179,8 @@ describe('project initializer', () => {
 			},
 			{
 				1: createRunMigrationEvent('2019-02-01-163923'),
-				2: createCreateEvent(response.createAuthor.id, 'author', { name: 'John Doe' }),
-				3: createCreateEvent(response2.createAuthor.id, 'author', { name: 'Jack Black' }),
+				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
+				3: createCreateEvent(response2.createAuthor.node.id, 'author', { name: 'Jack Black' }),
 			}
 		)
 	})
@@ -264,18 +270,22 @@ describe('project initializer', () => {
 		const response = await tester.content.queryContent(
 			'prod',
 			GQL`mutation {
-        createAuthor(data: {name: "John Doe"}) {
-          id
-        }
+          createAuthor(data: {name: "John Doe"}) {
+              node {
+                  id
+              }
+          }
       }`
 		)
 
 		const response2 = await tester.content.queryContent(
 			'preview',
 			GQL`mutation {
-        createAuthor(data: {name: "Jack Black"}) {
-          id
-        }
+          createAuthor(data: {name: "Jack Black"}) {
+              node {
+                  id
+              }
+          }
       }`
 		)
 
@@ -301,9 +311,9 @@ describe('project initializer', () => {
 			},
 			{
 				1: createRunMigrationEvent('2019-04-17-123500'),
-				2: createCreateEvent(response.createAuthor.id, 'author', { name: 'John Doe' }),
+				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
 				3: createRunMigrationEvent('2019-04-17-123600'),
-				4: createCreateEvent(response2.createAuthor.id, 'author', { fullName: 'Jack Black' }),
+				4: createCreateEvent(response2.createAuthor.node.id, 'author', { fullName: 'Jack Black' }),
 			}
 		)
 	})

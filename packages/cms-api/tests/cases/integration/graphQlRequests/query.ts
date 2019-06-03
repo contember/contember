@@ -589,7 +589,6 @@ describe('Queries', () => {
 					},
 					{
 						sql: SQL`select
-                       "root_"."id" as "root_id",
                        "root_"."visible" as "root_visible",
                        "root_"."id" as "root_id",
                        "root_"."id" as "root_id"
@@ -775,7 +774,6 @@ describe('Queries', () => {
 					},
 					{
 						sql: SQL`select
-                       "root_"."id" as "root_id",
                        "root_"."author_id" as "root_author",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"
@@ -1407,7 +1405,6 @@ describe('Queries', () => {
 				},
 				{
 					sql: SQL`select
-                     "root_"."id" as "root_id",
                      "root_"."title" as "root_title",
                      "root_"."id" as "root_id"
                    from "public"."post" as "root_"

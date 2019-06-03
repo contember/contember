@@ -1,6 +1,6 @@
 import { Acl, Input, Model } from 'cms-common'
 import { acceptEveryFieldVisitor, getColumnName } from '../../content-schema/modelUtils'
-import InsertVisitor from './insert/InsertVisitor'
+import SqlCreateInputProcessor from './insert/SqlCreateInputProcessor'
 import UpdateVisitor from './update/UpdateVisitor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
@@ -16,6 +16,7 @@ import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
 import DeleteExecutor from './delete/DeleteExecutor'
 import SelectBuilder from '../../core/database/SelectBuilder'
+import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
 
 class Mapper {
 	constructor(
@@ -110,15 +111,15 @@ class Mapper {
 		const where = this.predicateFactory.create(entity, Acl.Operation.create, Object.keys(data))
 		const insertBuilder = this.insertBuilderFactory.create(entity)
 		insertBuilder.addWhere(where)
-		const promises = acceptEveryFieldVisitor(
-			this.schema,
-			entity,
-			new InsertVisitor(this.schema, data, insertBuilder, this)
-		)
+
+		const visitor = new CreateInputVisitor(new SqlCreateInputProcessor(insertBuilder, this), this.schema, data)
+		const promises = acceptEveryFieldVisitor<any>(this.schema, entity, visitor)
+
+		const promise = Promise.all(Object.values(promises).filter((it: any) => !!it))
 
 		const result = await insertBuilder.execute()
 
-		await Promise.all(Object.values(promises).filter((it: any) => !!it))
+		await promise
 
 		return result
 	}

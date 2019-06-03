@@ -40,7 +40,11 @@ export default class ObjectNode<Args = any> {
 		)
 	}
 
-	public findField(alias: string): ObjectNode | FieldNode | undefined {
+	public findFieldByAlias(alias: string): ObjectNode | FieldNode | undefined {
 		return this.fields.find(it => it.alias === alias)
+	}
+
+	public findFieldByName(name: string): ObjectNode | FieldNode | undefined {
+		return this.fields.find(it => it.name === name)
 	}
 }

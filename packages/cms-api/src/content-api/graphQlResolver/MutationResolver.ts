@@ -34,10 +34,23 @@ export default class MutationResolver {
 			throw new UserError('Mutation failed, operation denied by ACL rules')
 		}
 
-		const whereArgs = { filter: { [entity.primary]: { eq: primary } } }
-		const objectWithArgs = queryAst.withArgs(whereArgs)
+		const nodeQuery = queryAst.findFieldByName('node')
 
-		return (await this.mapper.select(entity, objectWithArgs))[0] || null
+		let node: any = undefined
+		if (nodeQuery instanceof ObjectNode) {
+			const whereArgs = { filter: { [entity.primary]: { eq: primary } } }
+			const objectWithArgs = nodeQuery.withArgs(whereArgs)
+			node = (await this.mapper.select(entity, objectWithArgs))[0] || null
+		}
+
+		return {
+			ok: true,
+			validation: {
+				valid: true,
+				errors: [],
+			},
+			node,
+		}
 	}
 
 	public async resolveDelete(entity: Model.Entity, queryAst: ObjectNode<Input.DeleteInput>) {

@@ -1,3 +1,27 @@
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
 scalar DateTime
 
 input DateTimeCondition {
@@ -25,10 +49,10 @@ type Info {
 }
 
 type Mutation {
-  createPost(data: PostCreateInput!): Post!
+  createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!): Post
   updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): Post
-  createPostLocale(data: PostLocaleCreateInput!): PostLocale!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
   updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
   generateUploadUrl(contentType: String!): SignedUpload!
@@ -58,6 +82,12 @@ input PostCreateLocalesEntityRelationInput {
   create: PostLocaleWithoutPostCreateInput
 }
 
+type PostCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Post
+}
+
 type PostLocale {
   _meta: PostLocaleMeta
   id: UUID!
@@ -76,6 +106,12 @@ input PostLocaleCreateInput {
 input PostLocaleCreatePostEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutLocalesCreateInput
+}
+
+type PostLocaleCreateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: PostLocale
 }
 
 type PostLocaleMeta {

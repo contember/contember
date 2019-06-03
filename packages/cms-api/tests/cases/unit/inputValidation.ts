@@ -1,12 +1,13 @@
-import * as validation from '../../../src/input-validation'
+import * as validation from '../../../src/content-api/input-validation'
 import 'mocha'
 import { expect } from 'chai'
 import { Model } from 'cms-common'
 import ObjectNode from '../../../src/content-api/graphQlResolver/ObjectNode'
 import FieldNode from '../../../src/content-api/graphQlResolver/FieldNode'
 import { SchemaBuilder } from '../../../src'
-import DependencyCollector from '../../../src/input-validation/DependencyCollector'
-import QueryAstFactory from '../../../src/input-validation/QueryAstFactory'
+import DependencyCollector from '../../../src/content-api/input-validation/DependencyCollector'
+import QueryAstFactory from '../../../src/content-api/input-validation/QueryAstFactory'
+import DependencyMerger from '../../../src/content-api/input-validation/DependencyMerger'
 
 describe('input validation', () => {
 	it('evaluates rule', () => {
@@ -51,12 +52,48 @@ describe('input validation', () => {
 
 		const collector = new DependencyCollector()
 
-		expect(collector.collect(validator)).deep.eq([
-			['books'],
-			['books', 'deleted'],
-			['books', 'published'],
-			['published'],
-		])
+		expect(collector.collect(validator)).deep.eq({
+			books: {
+				deleted: {},
+				published: {},
+			},
+			published: {},
+		})
+	})
+
+	it('merges dependencies', () => {
+		const aDeps = {
+			a1: {
+				b1: {
+					c1: {},
+					c2: {},
+				},
+			},
+			a2: {},
+		}
+		const bDeps = {
+			a1: {
+				b1: {
+					c1: { d1: {} },
+					c3: {},
+				},
+			},
+			a3: {},
+		}
+		const result = DependencyMerger.merge(aDeps, bDeps)
+		expect(result).deep.eq({
+			a1: {
+				b1: {
+					c1: {
+						d1: {},
+					},
+					c2: {},
+					c3: {},
+				},
+			},
+			a2: {},
+			a3: {},
+		})
 	})
 
 	it('constructs query AST', () => {
@@ -74,13 +111,16 @@ describe('input validation', () => {
 					.column('published', c => c.type(Model.ColumnType.Bool))
 			)
 			.buildSchema()
-		const dependencies = [
-			['books'],
-			['books', 'deleted'],
-			['books', 'published'],
-			['books', 'category', 'name'],
-			['published'],
-		]
+		const dependencies: DependencyCollector.Dependencies = {
+			books: {
+				deleted: {},
+				published: {},
+				category: {
+					name: {},
+				},
+			},
+			published: {},
+		}
 
 		const astFactory = new QueryAstFactory(schema)
 		const result = astFactory.create('Author', dependencies)
@@ -94,9 +134,17 @@ describe('input validation', () => {
 						'books',
 						'books',
 						[
+							new FieldNode('id', 'id', {}),
 							new FieldNode('deleted', 'deleted', {}),
 							new FieldNode('published', 'published', {}),
-							new ObjectNode('category', 'category', [new FieldNode('name', 'name', {})], {}, {}, []),
+							new ObjectNode(
+								'category',
+								'category',
+								[new FieldNode('id', 'id', {}), new FieldNode('name', 'name', {})],
+								{},
+								{},
+								[]
+							),
 						],
 						{},
 						{},

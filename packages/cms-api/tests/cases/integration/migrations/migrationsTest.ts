@@ -29,6 +29,7 @@ function testDiffSchemas(
 	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl, validation: {} }, actual)).deep.equals({
 		model: updatedSchema,
 		acl: emptyAcl,
+		validation: {},
 	})
 }
 
@@ -1101,7 +1102,7 @@ describe('Diff schemas', () => {
 		})
 		it('apply diff', () => {
 			const actual = schemaMigrator.applyDiff({ model, acl: emptyAcl, validation: {} }, diff)
-			expect(actual).deep.equals({ model, acl })
+			expect(actual).deep.equals({ model, acl, validation: {} })
 		})
 	})
 })

@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { Validation } from 'cms-common'
-import EnumDefinition from '../content-schema/definition/EnumDefinition'
-import { tuple } from '../utils/tuple'
+import EnumDefinition from '../../content-schema/definition/EnumDefinition'
+import { tuple } from '../../utils/tuple'
 
 type ContextPath = Validation.ContextPath | string | undefined
 type MessageOrString = Validation.Message | string
@@ -16,8 +16,14 @@ const parsePath = (path: ContextPath): string[] => {
 	return path
 }
 const ArgumentFactory = {
-	validator: (validator: Validation.Validator): Validation.ValidatorArgument => ({ type: Validation.ArgumentType.validator, validator }),
-	path: (path?: ContextPath): Validation.PathArgument => ({ type: Validation.ArgumentType.path, path: parsePath(path) }),
+	validator: (validator: Validation.Validator): Validation.ValidatorArgument => ({
+		type: Validation.ArgumentType.validator,
+		validator,
+	}),
+	path: (path?: ContextPath): Validation.PathArgument => ({
+		type: Validation.ArgumentType.path,
+		path: parsePath(path),
+	}),
 	literal: (value: any): Validation.LiteralArgument => ({ type: Validation.ArgumentType.literal, value }),
 }
 
@@ -30,7 +36,7 @@ interface ValidationContext {
 type NodeType = Record<string, any>
 type ValueType = any
 
-interface NodeContext extends ValidationContext {
+export interface NodeContext extends ValidationContext {
 	node: NodeType
 }
 
@@ -166,7 +172,11 @@ const validatorEvaluators: Record<string, (context: AnyContext, ...args: any[]) 
 	equals: (context: AnyContext, other: Validation.LiteralArgument | Validation.PathArgument) => {
 		return getValueFromContext(context) === getValueOrLiteral(context, other)
 	},
-	lengthRange: (context: AnyContext, min: Validation.LiteralArgument<number>, max: Validation.LiteralArgument<number>) => {
+	lengthRange: (
+		context: AnyContext,
+		min: Validation.LiteralArgument<number>,
+		max: Validation.LiteralArgument<number>
+	) => {
 		let value: number
 		if (isValueContext(context)) {
 			value = String(getValueFromContext(context)).length

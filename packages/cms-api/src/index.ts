@@ -11,7 +11,7 @@ import { readConfig } from './config/config'
 import AllowAllPermissionFactory from './acl/AllowAllPermissionFactory'
 import Application from './core/cli/Application'
 import * as SchemaDefinition from './content-schema/definition'
-import * as InputValidation from './input-validation'
+import * as InputValidation from './content-api/input-validation'
 
 export {
 	CompositionRoot,

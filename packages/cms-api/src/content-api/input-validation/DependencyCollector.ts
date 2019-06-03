@@ -3,10 +3,26 @@ import * as validation from './index'
 
 class DependencyCollector {
 	public collect(validator: Validation.Validator): DependencyCollector.Dependencies {
-		return this.doCollect(validator, [])
+		const dependenciesList = this.doCollect(validator, [])
+		return dependenciesList.reduce((acc, deps) => this.withDependency(acc, deps), {})
 	}
 
-	private doCollect(validator: Validation.Validator, prefix: string[]): DependencyCollector.Dependencies {
+	private withDependency(
+		object: DependencyCollector.Dependencies,
+		dependency: string[]
+	): DependencyCollector.Dependencies {
+		const part = dependency.shift()
+		if (!part) {
+			return object
+		}
+
+		return {
+			...object,
+			[part]: this.withDependency(object[part] || {}, [...dependency]),
+		}
+	}
+
+	private doCollect(validator: Validation.Validator, prefix: string[]): DependencyCollector.DependenciesList {
 		if (validator.operation === validation.InContextOperation) {
 			const validatorArg = validator.args[1] as Validation.ValidatorArgument
 			const pathArg = validator.args[0] as Validation.PathArgument
@@ -17,7 +33,7 @@ class DependencyCollector {
 			return [newPrefix, ...dependencies]
 		}
 
-		const result: DependencyCollector.Dependencies = []
+		const result: DependencyCollector.DependenciesList = []
 		for (const arg of validator.args) {
 			switch (arg.type) {
 				case Validation.ArgumentType.path:
@@ -37,8 +53,11 @@ class DependencyCollector {
 }
 
 namespace DependencyCollector {
-	export type Dependency = string[]
-	export type Dependencies = Dependency[]
+	export type DependenciesList = string[][]
+
+	export interface Dependencies {
+		[field: string]: Dependencies
+	}
 }
 
 export default DependencyCollector

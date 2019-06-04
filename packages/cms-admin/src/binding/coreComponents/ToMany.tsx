@@ -18,9 +18,7 @@ class ToMany extends React.PureComponent<ToManyProps> {
 	public render() {
 		return (
 			<EnvironmentContext.Consumer>
-				{(environment: Environment) => {
-					return ToMany.generateSyntheticChildren(this.props, environment)
-				}}
+				{(environment: Environment) => ToMany.generateSyntheticChildren(this.props, environment)}
 			</EnvironmentContext.Consumer>
 		)
 	}

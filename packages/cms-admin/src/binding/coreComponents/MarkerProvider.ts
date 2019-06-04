@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { Environment, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
 
+export interface RenderFunction<P = any> {
+	(props: Props<P>): React.ReactElement | null
+}
+
 export interface DataBindingComponent {
 	displayName: string
 }

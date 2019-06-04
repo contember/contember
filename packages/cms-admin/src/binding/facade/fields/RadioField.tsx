@@ -18,12 +18,12 @@ export interface RadioFieldInternalProps {
 
 export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 
-class RadioField extends Component<RadioFieldProps>(props => {
+export const RadioField = Component<RadioFieldProps>(props => {
 	return (
 		<ChoiceField name={props.name} options={props.options}>
 			{({ data, currentValue, onChange, environment }) => {
 				return (
-					<RadioField.RadioFieldInner
+					<RadioFieldInner
 						name={props.name}
 						label={props.label}
 						inline={props.inline}
@@ -36,33 +36,29 @@ class RadioField extends Component<RadioFieldProps>(props => {
 			}}
 		</ChoiceField>
 	)
-}, 'RadioField') {}
+}, 'RadioField')
 
-namespace RadioField {
-	export interface RadioFieldInnerProps extends RadioFieldPublicProps {
-		data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
-		currentValue: ChoiceField.ValueRepresentation | null
-		onChange: (newValue: ChoiceField.ValueRepresentation) => void
-		environment: Environment
-	}
-
-	export class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
-		public render() {
-			return (
-				<FormGroup label={this.props.label}>
-					<RadioGroup
-						selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}
-						onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
-					>
-						{this.props.data.map(choice => {
-							const [value, label] = choice
-							return <Radio value={value} labelElement={label} key={value} />
-						})}
-					</RadioGroup>
-				</FormGroup>
-			)
-		}
-	}
+interface RadioFieldInnerProps extends RadioFieldPublicProps {
+	data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
+	currentValue: ChoiceField.ValueRepresentation | null
+	onChange: (newValue: ChoiceField.ValueRepresentation) => void
+	environment: Environment
 }
 
-export { RadioField }
+class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
+	public render() {
+		return (
+			<FormGroup label={this.props.label}>
+				<RadioGroup
+					selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}
+					onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
+				>
+					{this.props.data.map(choice => {
+						const [value, label] = choice
+						return <Radio value={value} labelElement={label} key={value} />
+					})}
+				</RadioGroup>
+			</FormGroup>
+		)
+	}
+}

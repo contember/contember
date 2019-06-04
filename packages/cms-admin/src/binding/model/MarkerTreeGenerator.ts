@@ -89,7 +89,8 @@ export class MarkerTreeGenerator {
 
 			// React.Component
 
-			const dataMarker = node.type as MarkerProvider & (React.ComponentClass<any> | React.FunctionComponent<any>)
+			const dataMarker = node.type as MarkerProvider &
+				(React.ComponentClass<unknown> | React.FunctionComponent<unknown> | React.NamedExoticComponent<unknown>)
 
 			if ('generateEnvironmentDelta' in dataMarker && dataMarker.generateEnvironmentDelta) {
 				const delta = dataMarker.generateEnvironmentDelta(node.props, environment)

@@ -141,21 +141,19 @@ namespace Sortable {
 			return (
 				<Repeater.Cloneable addNew={props.addNew} enableAddingNew={props.enableAddingNew}>
 					<ul className="sortable">
-						{props.entities.map((item, index) => {
-							return (
-								<SortableItem
-									entity={item}
-									key={item.getKey()}
-									index={index}
-									displayUnlinkButton={
-										props.enableUnlink !== false && (props.entities.length > 1 || props.enableUnlinkAll === true)
-									}
-									removeType={props.removeType}
-								>
-									<DataContext.Provider value={item}>{props.children}</DataContext.Provider>
-								</SortableItem>
-							)
-						})}
+						{props.entities.map((item, index) => (
+							<SortableItem
+								entity={item}
+								index={index}
+								key={item.getKey()}
+								displayUnlinkButton={
+									props.enableUnlink !== false && (props.entities.length > 1 || props.enableUnlinkAll === true)
+								}
+								removeType={props.removeType}
+							>
+								{props.children}
+							</SortableItem>
+						))}
 					</ul>
 				</Repeater.Cloneable>
 			)

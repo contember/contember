@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Props, RenderFunction, SyntheticChildrenProvider } from '../../coreComponents'
+import { RenderFunction, SyntheticChildrenProvider } from '../../coreComponents'
 
 export const Component = <P extends {}>(
-	render: (props: Props<P>) => React.ReactElement | null,
+	render: React.FunctionComponent<P>,
 	displayName?: string,
 	generateSyntheticChildren: SyntheticChildrenProvider<P>['generateSyntheticChildren'] = render
 ) => {

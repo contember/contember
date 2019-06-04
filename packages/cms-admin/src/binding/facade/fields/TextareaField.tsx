@@ -2,10 +2,9 @@ import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FormGroup, FormGroupProps, TextArea } from '../../../components'
 import { FieldName } from '../../bindingTypes'
-import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment, FieldAccessor } from '../../dao'
-import { QueryLanguage } from '../../queryLanguage'
-import { TextFieldProps } from './TextField'
+import { Field } from '../../coreComponents'
+import { FieldAccessor } from '../../dao'
+import { SimpleRelativeSingleField } from '../aux'
 
 export interface TextAreaFieldProps {
 	name: FieldName
@@ -13,36 +12,22 @@ export interface TextAreaFieldProps {
 	large?: boolean
 }
 
-export class TextAreaField extends React.PureComponent<TextAreaFieldProps> {
-	static displayName = 'TextAreaField'
-
-	public render() {
-		return (
-			<Field<string> name={this.props.name}>
-				{({ data, environment }): React.ReactNode => (
-					<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
-						<TextArea
-							value={data.currentValue || ''}
-							onChange={this.generateOnChange(data)}
-							large={this.props.large}
-							// fill={true}
-						/>
-					</FormGroup>
-				)}
-			</Field>
-		)
-	}
-
-	private generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLTextAreaElement>) => {
+export const TextAreaField = SimpleRelativeSingleField<TextAreaFieldProps>(props => {
+	const generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLTextAreaElement>) => {
 		data.onChange && data.onChange(e.target.value)
 	}
-
-	public static generateSyntheticChildren(props: TextFieldProps, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
-	}
-}
-
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
-	typeof TextAreaField,
-	SyntheticChildrenProvider<TextAreaFieldProps>
->
+	return (
+		<Field<string> name={props.name}>
+			{({ data, environment }): React.ReactNode => (
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)}>
+					<TextArea
+						value={data.currentValue || ''}
+						onChange={generateOnChange(data)}
+						large={props.large}
+						// fill={true}
+					/>
+				</FormGroup>
+			)}
+		</Field>
+	)
+}, 'TextAreaField')

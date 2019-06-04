@@ -2,9 +2,9 @@ import * as React from 'react'
 import { ChangeEvent } from 'react'
 import { FormGroup, FormGroupProps } from '../../../components'
 import { FieldName } from '../../bindingTypes'
-import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment, FieldAccessor } from '../../dao'
-import { QueryLanguage } from '../../queryLanguage'
+import { Field } from '../../coreComponents'
+import { FieldAccessor } from '../../dao'
+import { SimpleRelativeSingleField } from '../aux'
 
 export interface CheckboxFieldProps {
 	name: FieldName
@@ -12,35 +12,23 @@ export interface CheckboxFieldProps {
 	defaultValue?: boolean
 }
 
-export class CheckboxField extends React.PureComponent<CheckboxFieldProps> {
-	static displayName = 'CheckboxField'
-
-	public render() {
-		return (
-			<Field<boolean> name={this.props.name}>
-				{({ data, environment }): React.ReactNode => (
-					<FormGroup label={environment.applySystemMiddleware('labelMiddleware', this.props.label)}>
-						<input type="checkbox" checked={!!data.currentValue} onChange={this.generateOnChange(data)} />
-					</FormGroup>
-				)}
-			</Field>
-		)
-	}
-
-	private generateOnChange = (data: FieldAccessor<boolean>) => (e: ChangeEvent<HTMLInputElement>) => {
+const renderCheckboxField: React.FunctionComponent<CheckboxFieldProps> = (props: CheckboxFieldProps) => {
+	const generateOnChange = (data: FieldAccessor<boolean>) => (e: ChangeEvent<HTMLInputElement>) => {
 		data.onChange && data.onChange(e.target.checked)
 	}
-
-	public static generateSyntheticChildren(props: CheckboxFieldProps, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(
-			props.name,
-			fieldName => <Field name={fieldName} defaultValue={props.defaultValue || false} />,
-			environment
-		)
-	}
+	return (
+		<Field<boolean> name={props.name}>
+			{({ data, environment }): React.ReactNode => (
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)}>
+					<input type="checkbox" checked={!!data.currentValue} onChange={generateOnChange(data)} />
+				</FormGroup>
+			)}
+		</Field>
+	)
 }
 
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
-	typeof CheckboxField,
-	SyntheticChildrenProvider<CheckboxFieldProps>
->
+renderCheckboxField.defaultProps = {
+	defaultValue: false
+}
+
+export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps>(renderCheckboxField, 'CheckboxField')

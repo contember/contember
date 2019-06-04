@@ -11,7 +11,7 @@ export interface RemoveButtonProps extends ButtonProps {
 	icon?: IconName
 }
 
-class RemoveButton extends React.Component<RemoveButtonProps> {
+class RemoveButton extends React.PureComponent<RemoveButtonProps> {
 	private getOnClick = (entityAccessor: EntityAccessor, metaOperations: MetaOperationsContextValue) => () => {
 		if (!entityAccessor.remove) {
 			return

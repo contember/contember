@@ -1,4 +1,4 @@
-import { Card, Elevation, FormGroup, IFormGroupProps } from '@blueprintjs/core'
+import { FormGroup, IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import {
 	DataContext,
@@ -69,12 +69,12 @@ namespace Repeater {
 			return (
 				<DataContext.Provider value={this.props.entity}>
 					<div className="repeaterItem">
-						<Card elevation={Elevation.ONE} className="repeaterItem-in">
+						<div className="repeaterItem-in">
 							<div className="repeaterItem-content">{this.props.children}</div>
 							{this.props.displayUnlinkButton && (
 								<RemoveButton className="repeaterItem-button" removeType={this.props.removeType} />
 							)}
-						</Card>
+						</div>
 					</div>
 				</DataContext.Provider>
 			)

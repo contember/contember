@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { RenderFunction, SyntheticChildrenProvider } from '../../coreComponents'
+import { Props, RenderFunction, SyntheticChildrenProvider } from '../../coreComponents'
 
 export const Component = <P extends {}>(
-	render: (props: P) => React.ReactElement | null,
+	render: (props: Props<P>) => React.ReactElement | null,
 	displayName?: string,
 	generateSyntheticChildren: SyntheticChildrenProvider<P>['generateSyntheticChildren'] = render
 ) => {
-	const augmentedRender: RenderFunction<P> & Partial<SyntheticChildrenProvider<P>> = render
+	const augmentedRender: React.NamedExoticComponent<P> & Partial<SyntheticChildrenProvider<P>> = React.memo<P>(render)
 
 	augmentedRender.generateSyntheticChildren = generateSyntheticChildren
 	augmentedRender.displayName = displayName || 'UserComponent'

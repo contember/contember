@@ -9,6 +9,7 @@ import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
 import { createRootContext, evaluate, NodeContext, rules } from './index'
 import { tuple } from '../../utils/tuple'
+import { ColumnContext } from '../inputProcessing/InputContext'
 
 type Path = (string | number)[]
 
@@ -62,21 +63,18 @@ class InputValidator {
 			const newPath = [...path, ...(context.index ? [context.index] : []), context.relation.name]
 			return this.validateCreate(context.targetEntity, context.input, newPath)
 		}
-
+		const relationProcessors = {
+			create: processCreate,
+			connect: noneResult,
+		}
 		const processor: CreateInputProcessor<InputValidator.Result> = {
-			processManyHasManyInversedCreate: processCreate,
-			processManyHasManyOwnerCreate: processCreate,
-			processManyHasOneCreate: processCreate,
-			processOneHasManyCreate: processCreate,
-			processOneHasOneOwnerCreate: processCreate,
-			processOneHasOneInversedCreate: processCreate,
-			processColumn: noneResult,
-			processManyHasManyInversedConnect: noneResult,
-			processManyHasManyOwnerConnect: noneResult,
-			processManyHasOneConnect: noneResult,
-			processOneHasManyConnect: noneResult,
-			processOneHasOneInversedConnect: noneResult,
-			processOneHasOneOwnerConnect: noneResult,
+			column: noneResult,
+			manyHasManyInversed: relationProcessors,
+			manyHasManyOwner: relationProcessors,
+			oneHasOneInversed: relationProcessors,
+			oneHasOneOwner: relationProcessors,
+			oneHasMany: relationProcessors,
+			manyHasOne: relationProcessors,
 		}
 
 		const visitor = new CreateInputVisitor(processor, this.model, data)
@@ -112,22 +110,20 @@ class InputValidator {
 			return this.createValidationContext(context.targetEntity, context.input, dependencies[context.relation.name])
 		}
 
+		const relationProcessors = {
+			create: processCreate,
+			connect: processConnect,
+		}
 		const processor: CreateInputProcessor<any> = {
-			processColumn: async (context: CreateInputProcessor.ColumnContext) => {
+			column: async (context: ColumnContext) => {
 				return context.input
 			},
-			processManyHasManyInversedConnect: processConnect,
-			processManyHasManyInversedCreate: processCreate,
-			processManyHasManyOwnerConnect: processConnect,
-			processManyHasManyOwnerCreate: processCreate,
-			processManyHasOneConnect: processConnect,
-			processManyHasOneCreate: processCreate,
-			processOneHasManyConnect: processConnect,
-			processOneHasManyCreate: processCreate,
-			processOneHasOneInversedConnect: processConnect,
-			processOneHasOneInversedCreate: processCreate,
-			processOneHasOneOwnerConnect: processConnect,
-			processOneHasOneOwnerCreate: processCreate,
+			manyHasManyInversed: relationProcessors,
+			manyHasManyOwner: relationProcessors,
+			oneHasOneInversed: relationProcessors,
+			oneHasOneOwner: relationProcessors,
+			oneHasMany: relationProcessors,
+			manyHasOne: relationProcessors,
 		}
 
 		const visitor = new CreateInputVisitor(processor, this.model, data)

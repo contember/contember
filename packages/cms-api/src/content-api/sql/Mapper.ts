@@ -1,7 +1,6 @@
 import { Acl, Input, Model } from 'cms-common'
 import { acceptEveryFieldVisitor, getColumnName } from '../../content-schema/modelUtils'
 import SqlCreateInputProcessor from './insert/SqlCreateInputProcessor'
-import UpdateVisitor from './update/UpdateVisitor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
@@ -17,6 +16,8 @@ import JunctionTableManager from './JunctionTableManager'
 import DeleteExecutor from './delete/DeleteExecutor'
 import SelectBuilder from '../../core/database/SelectBuilder'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
+import SqlUpdateInputProcessor from './update/SqlUpdateInputProcessor'
+import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
 
 class Mapper {
 	constructor(
@@ -137,8 +138,9 @@ class Mapper {
 		updateBuilder.addOldWhere(predicateWhere)
 		updateBuilder.addNewWhere(predicateWhere)
 
-		const updateVisitor = new UpdateVisitor(primaryValue, data, updateBuilder, this)
-		const promises = acceptEveryFieldVisitor(this.schema, entity, updateVisitor)
+		const updateVisitor = new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, this)
+		const visitor = new UpdateInputVisitor(updateVisitor, this.schema, data)
+		const promises = acceptEveryFieldVisitor<any>(this.schema, entity, visitor)
 		const executeResult = updateBuilder.execute()
 
 		await Promise.all(Object.values(promises).filter((it: any) => !!it))

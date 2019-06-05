@@ -2,7 +2,7 @@ import { Input, Model } from 'cms-common'
 import CreateInputProcessor from './CreateInputProcessor'
 import { isIt } from '../../utils/type'
 
-export default class InsertVisitor<V>
+export default class CreateInputVisitor<V>
 	implements
 		Model.ColumnVisitor<Promise<V | V[] | undefined>>,
 		Model.RelationByTypeVisitor<Promise<V | V[] | undefined>> {
@@ -13,7 +13,7 @@ export default class InsertVisitor<V>
 	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<V> {
-		return this.createInputProcessor.processColumn({
+		return this.createInputProcessor.column({
 			entity,
 			column,
 			input: this.data[column.name] as Input.ColumnValue,
@@ -28,7 +28,7 @@ export default class InsertVisitor<V>
 	) {
 		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
 			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.processManyHasManyInversedConnect({
+				return this.createInputProcessor.manyHasManyInversed.connect({
 					entity,
 					relation,
 					targetEntity,
@@ -38,7 +38,7 @@ export default class InsertVisitor<V>
 				})
 			},
 			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.processManyHasManyInversedCreate({
+				return this.createInputProcessor.manyHasManyInversed.create({
 					entity,
 					relation,
 					targetEntity,
@@ -58,7 +58,7 @@ export default class InsertVisitor<V>
 	) {
 		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
 			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.processManyHasManyOwnerConnect({
+				return this.createInputProcessor.manyHasManyOwner.connect({
 					entity,
 					relation,
 					targetEntity,
@@ -68,7 +68,7 @@ export default class InsertVisitor<V>
 				})
 			},
 			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.processManyHasManyOwnerCreate({
+				return this.createInputProcessor.manyHasManyOwner.create({
 					entity,
 					relation,
 					targetEntity,
@@ -88,7 +88,7 @@ export default class InsertVisitor<V>
 	) {
 		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
 			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.createInputProcessor.processManyHasOneConnect({
+				return this.createInputProcessor.manyHasOne.connect({
 					entity,
 					relation,
 					targetEntity,
@@ -97,7 +97,7 @@ export default class InsertVisitor<V>
 				})
 			},
 			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.createInputProcessor.processManyHasOneCreate({
+				return this.createInputProcessor.manyHasOne.create({
 					entity,
 					relation,
 					targetEntity,
@@ -116,7 +116,7 @@ export default class InsertVisitor<V>
 	) {
 		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
 			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.processOneHasManyConnect({
+				return this.createInputProcessor.oneHasMany.connect({
 					entity,
 					relation,
 					targetEntity,
@@ -126,7 +126,7 @@ export default class InsertVisitor<V>
 				})
 			},
 			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.processOneHasManyCreate({
+				return this.createInputProcessor.oneHasMany.create({
 					entity,
 					relation,
 					targetEntity,
@@ -146,7 +146,7 @@ export default class InsertVisitor<V>
 	) {
 		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
 			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.createInputProcessor.processOneHasOneInversedConnect({
+				return this.createInputProcessor.oneHasOneInversed.connect({
 					entity,
 					relation,
 					targetEntity,
@@ -155,7 +155,7 @@ export default class InsertVisitor<V>
 				})
 			},
 			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.createInputProcessor.processOneHasOneInversedCreate({
+				return this.createInputProcessor.oneHasOneInversed.create({
 					entity,
 					relation,
 					targetEntity,
@@ -174,7 +174,7 @@ export default class InsertVisitor<V>
 	) {
 		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
 			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.createInputProcessor.processOneHasOneOwnerConnect({
+				return this.createInputProcessor.oneHasOneOwner.connect({
 					entity,
 					relation,
 					targetEntity,
@@ -183,7 +183,7 @@ export default class InsertVisitor<V>
 				})
 			},
 			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.createInputProcessor.processOneHasOneOwnerCreate({
+				return this.createInputProcessor.oneHasOneOwner.create({
 					entity,
 					relation,
 					targetEntity,

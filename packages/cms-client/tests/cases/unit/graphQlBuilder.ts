@@ -32,7 +32,7 @@ describe('GraphQlQueryBuilder', () => {
 	}
 	Authors {
 		id
-	}     
+	}
 }`)
 	})
 })

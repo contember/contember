@@ -11,7 +11,7 @@ export default class QueryCompiler {
 
 	public create(): string {
 		return `${this.operation} {
-${this.formatObject(this.builder).join('\n')}     
+${this.formatObject(this.builder).join('\n')}
 }`
 	}
 

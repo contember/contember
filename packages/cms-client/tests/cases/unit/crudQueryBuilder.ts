@@ -47,7 +47,7 @@ describe('crud query builder', () => {
 	}
 	createAuthor(data: {name: "John", posts: [{connect: {id: "456"}}, {create: {title: "Abcd"}}]}) {
 		name
-	}     
+	}
 }`)
 	})
 
@@ -67,7 +67,7 @@ describe('crud query builder', () => {
 		author {
 			name
 		}
-	}     
+	}
 }`)
 	})
 })

@@ -11,6 +11,11 @@ describe('GraphQlQueryBuilder', () => {
 						.argument('where', { id: '123' })
 						.field('id')
 						.field('publishedAt')
+						.fragment('Article', new GraphQlBuilder.ObjectBuilder().field('leadParagraph'))
+						.fragment(
+							'BlogPost',
+							new GraphQlBuilder.ObjectBuilder().object('comments', new GraphQlBuilder.ObjectBuilder().field('id'))
+						)
 						.object(
 							'locales',
 							new GraphQlBuilder.ObjectBuilder()
@@ -25,6 +30,14 @@ describe('GraphQlQueryBuilder', () => {
 	Post(where: {id: "123"}) {
 		id
 		publishedAt
+		... on Article {
+			leadParagraph
+		}
+		... on BlogPost {
+			comments {
+				id
+			}
+		}
 		locales(where: {locale: {eq: cs}}) {
 			id
 			title

@@ -1,18 +1,8 @@
+import Value from './value'
+
 namespace Input {
-	export interface Object<E = never> {
-		[key: string]: ColumnValue<E>
-	}
-
-	export interface List<E = never> extends Array<ColumnValue<E>> {}
-
-	export type PrimaryValue<E = never> = string | number | E
-
-	export type AtomicValue<E = never> = PrimaryValue<E> | null | boolean
-	export type ColumnValue<E = never> = AtomicValue<E> | Input.Object<E> | List<E>
-
-	export type GenericValueLike<T> = T | PromiseLike<T> | (() => T | PromiseLike<T>)
-
-	export type ColumnValueLike<E = never> = GenericValueLike<ColumnValue<E>>
+	export type PrimaryValue<E = never> = Value.PrimaryValue<E>
+	export type ColumnValue<E = never> = Value.FieldValue<E>
 
 	export enum UpdateRelationOperation {
 		connect = 'connect',
@@ -69,7 +59,7 @@ namespace Input {
 	}
 
 	export interface CreateDataInput<E = never> {
-		[column: string]: ColumnValue<E> | CreateOneRelationInput<E> | CreateManyRelationInput<E>
+		[column: string]: Value.FieldValue<E> | CreateOneRelationInput<E> | CreateManyRelationInput<E>
 	}
 
 	export type CreateOneRelationInput<E = never> = ConnectRelationInput<E> | CreateRelationInput<E>
@@ -77,7 +67,7 @@ namespace Input {
 	export type CreateManyRelationInput<E = never> = CreateOneRelationInput<E>[]
 
 	export interface UpdateDataInput<E = never> {
-		[column: string]: ColumnValue<E> | UpdateOneRelationInput<E> | UpdateManyRelationInput<E>
+		[column: string]: Value.FieldValue<E> | UpdateOneRelationInput<E> | UpdateManyRelationInput<E>
 	}
 
 	export interface UpdateInput<E = never> {
@@ -98,7 +88,7 @@ namespace Input {
 	}
 
 	export interface ListQueryInput<E = never> {
-		filter?: Where<Condition<ColumnValue<E>>>
+		filter?: Where<Condition<Value.FieldValue<E>>>
 		orderBy?: OrderBy[]
 		offset?: number
 		limit?: number
@@ -132,7 +122,7 @@ namespace Input {
 		[fieldName: string]: FieldOrderBy
 	}
 
-	export interface Condition<T = ColumnValue> {
+	export interface Condition<T = Value.FieldValue> {
 		and?: Array<Condition<T>>
 		or?: Array<Condition<T>>
 		not?: Condition<T>
@@ -151,7 +141,7 @@ namespace Input {
 	}
 
 	export interface UniqueWhere<E = never> {
-		[field: string]: PrimaryValue<E> | UniqueWhere<E>
+		[field: string]: Value.PrimaryValue<E> | UniqueWhere<E>
 	}
 
 	export type ComposedWhere<C> = {

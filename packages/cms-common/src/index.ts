@@ -2,6 +2,8 @@ import Input from './schema/input'
 import Model from './schema/model'
 import Acl from './schema/acl'
 import Validation from './schema/validation'
+import Value from './schema/value'
+import Result from './schema/result'
 
 type Schema = {
 	model: Model.Schema
@@ -9,5 +11,5 @@ type Schema = {
 	validation: Validation.Schema
 }
 
-export { Input, Model, Acl, Schema, Validation }
+export { Input, Model, Acl, Schema, Validation, Value, Result }
 export * from './utils'

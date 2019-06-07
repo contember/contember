@@ -1,4 +1,4 @@
-import { Input } from 'cms-common'
+import { Input, Value } from 'cms-common'
 import Mapper from '../Mapper'
 import UpdateBuilder from './UpdateBuilder'
 import UpdateInputProcessor from '../../inputProcessing/UpdateInputProcessor'
@@ -14,7 +14,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 
 	public column({ entity, column }: Context.ColumnContext) {
 		if (this.data[column.name] !== undefined) {
-			this.updateBuilder.addFieldValue(column.name, this.data[column.name] as Input.ColumnValue)
+			this.updateBuilder.addFieldValue(column.name, this.data[column.name] as Value.AtomicValue)
 		}
 		return Promise.resolve()
 	}

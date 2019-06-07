@@ -33,7 +33,7 @@ interface ValidationContext {
 	root: NodeContext
 }
 
-type NodeType = Record<string, any>
+export type NodeType = Record<string, any>
 type ValueType = any
 
 export interface NodeContext extends ValidationContext {

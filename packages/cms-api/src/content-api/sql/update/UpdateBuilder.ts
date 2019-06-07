@@ -1,14 +1,14 @@
 import { resolveValue } from '../utils'
-import { Input, Model } from 'cms-common'
+import { Input, Model, Value } from 'cms-common'
 import Client from '../../../core/database/Client'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '../../../content-schema/modelUtils'
 import QueryBuilder from '../../../core/database/QueryBuilder'
-import { Value } from '../../../core/database/types'
+import { Value as DbValue } from '../../../core/database/types'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 
 type ColumnValue = {
-	value: PromiseLike<Input.ColumnValue<undefined>>
+	value: PromiseLike<Value.AtomicValue | undefined>
 	columnName: string
 	columnType: string
 }
@@ -40,7 +40,7 @@ export default class UpdateBuilder {
 		return this.update
 	}
 
-	public addFieldValue(fieldName: string, value: Input.ColumnValueLike<undefined>) {
+	public addFieldValue(fieldName: string, value: Value.GenericValueLike<Value.AtomicValue | undefined>) {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		this.rowData.push({ columnName, value: resolveValue(value), columnType })
@@ -69,7 +69,7 @@ export default class UpdateBuilder {
 			.updateBuilder()
 			.with('newData_', qb => {
 				qb = resolvedData.reduce(
-					(qb, value) => qb.select(expr => expr.selectValue(value.value as Value, value.columnType), value.columnName),
+					(qb, value) => qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
 					qb
 				)
 				const columns = new Set(resolvedData.map(it => it.columnName))

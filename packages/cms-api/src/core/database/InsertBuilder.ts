@@ -1,5 +1,4 @@
 import Client from './Client'
-import { QueryResult } from 'pg'
 import Returning from './internal/Returning'
 import With from './internal/With'
 import SelectBuilder from './SelectBuilder'
@@ -7,7 +6,6 @@ import QueryBuilder from './QueryBuilder'
 import Literal from './Literal'
 import Compiler from './Compiler'
 import Connection from './Connection'
-import { assertNever } from 'cms-common'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
 	implements With.Aware, QueryBuilder {

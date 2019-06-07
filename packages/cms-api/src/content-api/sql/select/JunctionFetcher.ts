@@ -2,7 +2,7 @@ import Path from '../select/Path'
 import Mapper from '../Mapper'
 import WhereBuilder from '../select/WhereBuilder'
 import Client from '../../../core/database/Client'
-import { Input, Model } from 'cms-common'
+import { Input, Model, Value } from 'cms-common'
 import ConditionBuilder from '../../../core/database/ConditionBuilder'
 import OrderByBuilder from './OrderByBuilder'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
@@ -24,7 +24,7 @@ class JunctionFetcher {
 		column: Mapper.JoiningColumns,
 		targetEntity: Model.Entity,
 		object: ObjectNode<Input.ListQueryInput>
-	): Promise<object[]> {
+	): Promise<Record<string, Value.AtomicValue>[]> {
 		const joiningTable = relation.joiningTable
 
 		const whereColumn = column.sourceColumn.columnName

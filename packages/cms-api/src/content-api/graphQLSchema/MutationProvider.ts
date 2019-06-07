@@ -1,13 +1,4 @@
-import {
-	GraphQLBoolean,
-	GraphQLFieldConfig,
-	GraphQLInt,
-	GraphQLList,
-	GraphQLNonNull,
-	GraphQLObjectType,
-	GraphQLString,
-	GraphQLUnionType,
-} from 'graphql'
+import { GraphQLBoolean, GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString, GraphQLUnionType, } from 'graphql'
 import { Acl, Input, Model } from 'cms-common'
 import { getEntity } from '../../content-schema/modelUtils'
 import { Context } from '../types'
@@ -92,15 +83,7 @@ export default class MutationProvider {
 		if (dataType === undefined) {
 			return undefined
 		}
-		const nodeType = this.entityTypeProvider.getEntity(entityName)
-		const resultType = new GraphQLObjectType({
-			name: GqlTypeName`${entityName}CreateResult`,
-			fields: {
-				ok: { type: new GraphQLNonNull(GraphQLBoolean) },
-				validation: { type: new GraphQLNonNull(MutationProvider.validationResultType) },
-				node: { type: nodeType, resolve: aliasAwareResolver },
-			},
-		})
+		const resultType = this.createResultType(entityName, 'create')
 		return {
 			type: new GraphQLNonNull(resultType),
 			args: {
@@ -138,14 +121,33 @@ export default class MutationProvider {
 		if (dataType === undefined) {
 			return undefined
 		}
+		const resultType = this.createResultType(entityName, 'update')
 		return {
-			type: this.entityTypeProvider.getEntity(entityName),
+			type: new GraphQLNonNull(resultType),
 			args: {
 				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 				data: { type: new GraphQLNonNull(dataType) },
 			},
 			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveUpdate(entity, this.queryAstAFactory.create(info)),
+				context.executionContainer.get('mutationResolver').resolveUpdate(
+					entity,
+					args,
+					this.queryAstAFactory.create(info, (node, path) => {
+						return path.length !== 1 || node.name.value === 'node'
+					})
+				),
 		}
+	}
+
+	private createResultType(entityName: string, operation: string): GraphQLObjectType {
+		const nodeType = this.entityTypeProvider.getEntity(entityName)
+		return new GraphQLObjectType({
+			name: GqlTypeName`${entityName}${operation}Result`,
+			fields: {
+				ok: { type: new GraphQLNonNull(GraphQLBoolean) },
+				validation: { type: new GraphQLNonNull(MutationProvider.validationResultType) },
+				node: { type: nodeType, resolve: aliasAwareResolver },
+			},
+		})
 	}
 }

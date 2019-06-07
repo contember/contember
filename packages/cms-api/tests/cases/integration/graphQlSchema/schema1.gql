@@ -81,6 +81,12 @@ input AuthorUpdatePostsRelationInput {
   data: PostWithoutAuthorUpdateInput
 }
 
+type AuthorUpdateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Author
+}
+
 input AuthorUpsertPostsRelationInput {
   by: PostUniqueWhere
   update: PostWithoutAuthorUpdateInput
@@ -165,6 +171,12 @@ input CategoryUpdatePostsRelationInput {
   data: PostWithoutCategoriesUpdateInput
 }
 
+type CategoryUpdateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Category
+}
+
 input CategoryUpsertPostsRelationInput {
   by: PostUniqueWhere
   update: PostWithoutCategoriesUpdateInput
@@ -219,16 +231,16 @@ type Info {
 type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!): Post
-  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): Post
+  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
-  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
+  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   deleteCategory(by: CategoryUniqueWhere!): Category
-  updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): Category
+  updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): CategoryUpdateResult!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!): Author
-  updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): Author
+  updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): AuthorUpdateResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -330,6 +342,12 @@ input PostLocaleUpdatePostEntityRelationInput {
   delete: Boolean
 }
 
+type PostLocaleUpdateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: PostLocale
+}
+
 input PostLocaleUpsertPostRelationInput {
   update: PostWithoutLocalesUpdateInput
   create: PostWithoutLocalesCreateInput
@@ -415,6 +433,12 @@ input PostUpdateLocalesEntityRelationInput {
 input PostUpdateLocalesRelationInput {
   by: PostLocaleUniqueWhere
   data: PostLocaleWithoutPostUpdateInput
+}
+
+type PostUpdateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Post
 }
 
 input PostUpsertAuthorRelationInput {

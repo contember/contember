@@ -51,10 +51,10 @@ type Info {
 type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!): Post
-  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): Post
+  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
-  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocale
+  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -154,6 +154,12 @@ input PostLocaleUpdatePostEntityRelationInput {
   delete: Boolean
 }
 
+type PostLocaleUpdateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: PostLocale
+}
+
 input PostLocaleUpsertPostRelationInput {
   update: PostWithoutLocalesUpdateInput
   create: PostWithoutLocalesCreateInput
@@ -214,6 +220,12 @@ input PostUpdateLocalesEntityRelationInput {
 input PostUpdateLocalesRelationInput {
   by: PostLocaleUniqueWhere
   data: PostLocaleWithoutPostUpdateInput
+}
+
+type PostUpdateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Post
 }
 
 input PostUpsertLocalesRelationInput {

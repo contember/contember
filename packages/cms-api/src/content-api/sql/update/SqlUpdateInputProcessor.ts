@@ -4,7 +4,7 @@ import UpdateBuilder from './UpdateBuilder'
 import UpdateInputProcessor from '../../inputProcessing/UpdateInputProcessor'
 import * as Context from '../../inputProcessing/InputContext'
 
-export default class SqlUpdateInputProcessor implements UpdateInputProcessor<any> {
+export default class SqlUpdateInputProcessor implements UpdateInputProcessor<void> {
 	constructor(
 		private readonly primaryValue: Input.PrimaryValue,
 		private readonly data: Input.UpdateDataInput,

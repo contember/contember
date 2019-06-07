@@ -33,7 +33,7 @@ type Info {
 
 type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
-  updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): Test
+  updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -105,6 +105,12 @@ input TestUniqueWhere {
 input TestUpdateInput {
   b: String
   _update: Boolean
+}
+
+type TestUpdateResult {
+  ok: Boolean!
+  validation: _ValidationResult!
+  node: Test
 }
 
 input TestWhere {

@@ -4,7 +4,6 @@ import UniqueWhereExpander from './UniqueWhereExpander'
 import Mapper from '../sql/Mapper'
 import { UserError } from 'graphql-errors'
 import InputValidator from '../input-validation/InputValidator'
-import InsertVisitor from '../inputProcessing/CreateInputVisitor'
 
 export default class MutationResolver {
 	constructor(
@@ -13,12 +12,9 @@ export default class MutationResolver {
 		private readonly inputValidator: InputValidator
 	) {}
 
-	public async resolveUpdate(entity: Model.Entity, queryAst: ObjectNode<Input.UpdateInput>) {
-		const whereExpanded = this.uniqueWhereExpander.expand(entity, queryAst.args.by)
-		const queryExpanded = queryAst.withArg<Input.ListQueryInput>('filter', whereExpanded)
-
+	public async resolveUpdate(entity: Model.Entity, input: Input.UpdateInput, queryAst: ObjectNode<Input.UpdateInput>) {
 		try {
-			await this.mapper.update(entity, queryAst.args.by, queryAst.args.data)
+			await this.mapper.update(entity, input.by, input.data)
 		} catch (e) {
 			if (!(e instanceof Mapper.NoResultError)) {
 				throw e
@@ -26,7 +22,16 @@ export default class MutationResolver {
 			throw new UserError('Mutation failed, operation denied by ACL rules')
 		}
 
-		return (await this.mapper.select(entity, queryExpanded))[0] || null
+		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
+		const nodes = await this.resolveResultNodes(entity, whereExpanded, queryAst)
+		return {
+			ok: true,
+			validation: {
+				valid: true,
+				errors: [],
+			},
+			...nodes,
+		}
 	}
 
 	public async resolveCreate(entity: Model.Entity, input: Input.CreateInput, queryAst: ObjectNode) {
@@ -63,18 +68,7 @@ export default class MutationResolver {
 			throw new UserError('Mutation failed, operation denied by ACL rules')
 		}
 
-		const nodeQuery = queryAst.findFieldByName('node')
-
-		let nodes: Record<string, any> = {}
-		const whereArgs = { filter: { [entity.primary]: { eq: primary } } }
-		for (const singleNodeQuery of nodeQuery) {
-			if (!(singleNodeQuery instanceof ObjectNode)) {
-				throw new Error()
-			}
-			const objectWithArgs = singleNodeQuery.withArgs(whereArgs)
-			nodes[singleNodeQuery.alias] = (await this.mapper.select(entity, objectWithArgs))[0] || null
-		}
-
+		const nodes = await this.resolveResultNodes(entity, { [entity.primary]: { eq: primary } }, queryAst)
 		return {
 			ok: true,
 			validation: {
@@ -83,6 +77,19 @@ export default class MutationResolver {
 			},
 			...nodes,
 		}
+	}
+
+	private async resolveResultNodes(entity: Model.Entity, where: Input.Where, queryAst: ObjectNode): Promise<Record<string, any>> {
+		const nodeQuery = queryAst.findFieldByName('node')
+		let nodes: Record<string, any> = {}
+		for (const singleNodeQuery of nodeQuery) {
+			if (!(singleNodeQuery instanceof ObjectNode)) {
+				throw new Error()
+			}
+			const objectWithArgs = singleNodeQuery.withArgs({ filter: where })
+			nodes[singleNodeQuery.alias] = (await this.mapper.select(entity, objectWithArgs))[0] || null
+		}
+		return nodes
 	}
 
 	public async resolveDelete(entity: Model.Entity, queryAst: ObjectNode<Input.DeleteInput>) {

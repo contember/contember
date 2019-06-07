@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from 'cms-common'
+import { Acl, Input, Model, Value } from 'cms-common'
 import ObjectNode from '../../../graphQlResolver/ObjectNode'
 import SelectHydrator from '../SelectHydrator'
 import Mapper from '../../Mapper'
@@ -123,7 +123,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 				const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary, {})
 				const inversedJoiningColumn = joiningColumns.targetColumn.columnName
 				const inversedIds = junctionValues
-					.map((it: any) => it[inversedJoiningColumn])
+					.map(it => it[inversedJoiningColumn])
 					.filter((it, index, arr) => arr.indexOf(it) === index)
 
 				const queryWithWhere = objectNode
@@ -149,18 +149,18 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 	): SelectHydrator.GroupedObjects {
 		const dataById: { [id: string]: SelectHydrator.ResultObject } = {}
 		for (let object of resultObjects) {
-			dataById[object[entity.primary]] = object
+			dataById[object[entity.primary] as Value.PrimaryValue] = object
 		}
 		const sourceColumn = joiningColumns.sourceColumn.columnName
 		const targetColumn = joiningColumns.targetColumn.columnName
 		const groupedResult: { [id: string]: SelectHydrator.ResultObjects } = {}
 		for (let pair of junctionValues) {
-			if (!groupedResult[pair[sourceColumn]]) {
-				groupedResult[pair[sourceColumn]] = []
+			if (!groupedResult[pair[sourceColumn] as Value.PrimaryValue]) {
+				groupedResult[pair[sourceColumn] as Value.PrimaryValue] = []
 			}
-			const resultObject = dataById[pair[targetColumn]]
+			const resultObject = dataById[pair[targetColumn] as Value.PrimaryValue]
 			if (resultObject) {
-				groupedResult[pair[sourceColumn]].push(resultObject)
+				groupedResult[pair[sourceColumn] as Value.PrimaryValue].push(resultObject)
 			}
 		}
 		return groupedResult

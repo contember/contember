@@ -1,4 +1,5 @@
 import Path from './Path'
+import { Value } from 'cms-common'
 
 class SelectHydrator {
 	private columns: Path[] = []
@@ -26,7 +27,7 @@ class SelectHydrator {
 		await Promise.all(this.promises.map(it => it.data))
 		const result: SelectHydrator.GroupedObjects = {}
 		for (let row of rows) {
-			const key = row[groupBy]
+			const key = row[groupBy] as Value.PrimaryValue
 			if (!result[key]) {
 				result[key] = []
 			}
@@ -46,7 +47,7 @@ class SelectHydrator {
 		if (indexBy) {
 			const result: SelectHydrator.IndexedResultObjects = {}
 			for (let row of rows) {
-				result[row[indexBy]] = await this.hydrateRow(row)
+				result[row[indexBy] as Value.PrimaryValue] = await this.hydrateRow(row)
 			}
 			return result
 		}
@@ -60,7 +61,7 @@ class SelectHydrator {
 		for (let columnPath of this.columns) {
 			const path = [...columnPath.path]
 			const last: string = path.pop() as string
-			const currentObject = path.reduce((obj, part) => (obj[part] = obj[part] || {}), result)
+			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || {}), result)
 
 			currentObject[last] = row[columnPath.getAlias()]
 		}
@@ -69,8 +70,8 @@ class SelectHydrator {
 			const awaitedData = await data
 			const pathTmp = [...path.path]
 			const last = pathTmp.pop() as string
-			const currentObject = pathTmp.reduce((obj, part) => (obj && obj[part]) || undefined, result)
-			const parentValue = row[parentKeyPath.getAlias()]
+			const currentObject = pathTmp.reduce<any>((obj, part) => (obj && obj[part]) || undefined, result)
+			const parentValue = row[parentKeyPath.getAlias()] as Value.PrimaryValue
 			if (currentObject && parentValue) {
 				currentObject[last] = awaitedData[parentValue] || defaultValue
 			}
@@ -81,10 +82,10 @@ class SelectHydrator {
 }
 
 namespace SelectHydrator {
-	export type Row = { [key: string]: any }
+	export type Row = { [key: string]: Value.AtomicValue }
 	export type Rows = Row[]
 
-	export type ResultObject = { [key: string]: any }
+	export type ResultObject = Value.Object
 	export type ResultObjects = ResultObject[]
 	export type IndexedResultObjects = { [key: string]: ResultObject }
 	export type GroupedObjects = { [groupingKey: string]: ResultObjects }

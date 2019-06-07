@@ -1,9 +1,11 @@
-import { assertNever, Input, Model } from 'cms-common'
+import { assertNever, Input, Model, Result, Value } from 'cms-common'
 import ObjectNode from './ObjectNode'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import Mapper from '../sql/Mapper'
 import { UserError } from 'graphql-errors'
 import InputValidator from '../input-validation/InputValidator'
+
+type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
 export default class MutationResolver {
 	constructor(
@@ -12,7 +14,7 @@ export default class MutationResolver {
 		private readonly inputValidator: InputValidator
 	) {}
 
-	public async resolveUpdate(entity: Model.Entity, input: Input.UpdateInput, queryAst: ObjectNode<Input.UpdateInput>) {
+	public async resolveUpdate(entity: Model.Entity, input: Input.UpdateInput, queryAst: ObjectNode<Input.UpdateInput>): Promise<WithoutNode<Result.UpdateResult>> {
 		try {
 			await this.mapper.update(entity, input.by, input.data)
 		} catch (e) {
@@ -34,7 +36,7 @@ export default class MutationResolver {
 		}
 	}
 
-	public async resolveCreate(entity: Model.Entity, input: Input.CreateInput, queryAst: ObjectNode) {
+	public async resolveCreate(entity: Model.Entity, input: Input.CreateInput, queryAst: ObjectNode): Promise<WithoutNode<Result.CreateResult>> {
 		const validationResult = await this.inputValidator.validateCreate(entity, input.data)
 		if (validationResult.length > 0) {
 			return {
@@ -50,12 +52,11 @@ export default class MutationResolver {
 								case 'string':
 									return { __typename: '_FieldPathFragment', field: part }
 								default:
-									assertNever(part)
+									return assertNever(part)
 							}
 						}),
 					})),
 				},
-				node: null,
 			}
 		}
 		let primary: Input.PrimaryValue
@@ -79,7 +80,7 @@ export default class MutationResolver {
 		}
 	}
 
-	private async resolveResultNodes(entity: Model.Entity, where: Input.Where, queryAst: ObjectNode): Promise<Record<string, any>> {
+	private async resolveResultNodes(entity: Model.Entity, where: Input.Where, queryAst: ObjectNode): Promise<Record<string, Value.Object>> {
 		const nodeQuery = queryAst.findFieldByName('node')
 		let nodes: Record<string, any> = {}
 		for (const singleNodeQuery of nodeQuery) {

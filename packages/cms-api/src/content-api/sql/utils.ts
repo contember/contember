@@ -1,6 +1,6 @@
-import { Input } from 'cms-common'
+import { Value } from 'cms-common'
 
-export const resolveValue = <T>(value: Input.GenericValueLike<T>): PromiseLike<T> => {
+export const resolveValue = <T>(value: Value.GenericValueLike<T>): PromiseLike<T> => {
 	if (value instanceof Function) {
 		value = value()
 	}

@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Input, Model, Value } from 'cms-common'
 import Mapper from '../Mapper'
 import { uuid } from '../../../utils/uuid'
 import InsertBuilder from './InsertBuilder'
@@ -12,9 +12,9 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 	public async column({ entity, column, input }: Context.ColumnContext): Promise<void> {
 		this.insertBuilder.addFieldValue(
 			column.name,
-			(() => {
+			((): Value.GenericValueLike<Value.AtomicValue> => {
 				if (input !== undefined) {
-					return input
+					return input as Value.AtomicValue
 				}
 				if (entity.primary === column.name) {
 					return this.resolvePrimaryGenerator(column)()

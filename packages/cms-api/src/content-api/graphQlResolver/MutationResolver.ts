@@ -1,9 +1,10 @@
-import { assertNever, Input, Model, Result, Value } from 'cms-common'
+import { Input, Model, Result, Value } from 'cms-common'
 import ObjectNode from './ObjectNode'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import Mapper from '../sql/Mapper'
 import { UserError } from 'graphql-errors'
 import InputValidator from '../input-validation/InputValidator'
+import ValidationResolver from './ValidationResolver'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -21,7 +22,7 @@ export default class MutationResolver {
 	): Promise<WithoutNode<Result.UpdateResult>> {
 		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data)
 		if (validationResult.length > 0) {
-			return this.createValidationResponse(validationResult)
+			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
 		}
 		try {
 			await this.mapper.update(entity, input.by, input.data)
@@ -51,7 +52,7 @@ export default class MutationResolver {
 	): Promise<WithoutNode<Result.CreateResult>> {
 		const validationResult = await this.inputValidator.validateCreate(entity, input.data)
 		if (validationResult.length > 0) {
-			return this.createValidationResponse(validationResult)
+			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
 		}
 		let primary: Input.PrimaryValue
 		try {
@@ -71,30 +72,6 @@ export default class MutationResolver {
 				errors: [],
 			},
 			...nodes,
-		}
-	}
-
-	private createValidationResponse(
-		validationResult: InputValidator.Result
-	): { ok: boolean; validation: Result.ValidationResult } {
-		return {
-			ok: false,
-			validation: {
-				valid: false,
-				errors: validationResult.map(it => ({
-					message: it.message,
-					path: it.path.map(part => {
-						switch (typeof part) {
-							case 'number':
-								return { __typename: '_IndexPathFragment', index: part }
-							case 'string':
-								return { __typename: '_FieldPathFragment', field: part }
-							default:
-								return assertNever(part)
-						}
-					}),
-				})),
-			},
 		}
 	}
 

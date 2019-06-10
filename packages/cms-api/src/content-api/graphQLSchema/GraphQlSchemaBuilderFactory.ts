@@ -23,6 +23,7 @@ import OrderByTypeProvider from './OrderByTypeProvider'
 import S3 from '../../utils/S3'
 import HasManyToHasOneReducer from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer'
 import HasManyToHasOneRelationReducerFieldVisitor from '../extensions/hasManyToHasOneReducer/HasManyToHasOneRelationReducerVisitor'
+import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 
 export default class GraphQlSchemaBuilderFactory {
 	constructor(private s3: S3) {}
@@ -121,12 +122,17 @@ export default class GraphQlSchemaBuilderFactory {
 			authorizator,
 			whereTypeProvider,
 			entityTypeProvider,
-			columnTypeResolver,
 			createEntityInputProvider,
 			updateEntityInputProvider,
 			queryAstFactory
 		)
+		const validationQueriesProvider = new ValidationQueriesProvider(
+			schema,
+			whereTypeProvider,
+			createEntityInputProvider,
+			updateEntityInputProvider
+		)
 
-		return new GraphQlSchemaBuilder(schema, queryProvider, mutationProvider, this.s3)
+		return new GraphQlSchemaBuilder(schema, queryProvider, validationQueriesProvider, mutationProvider, this.s3)
 	}
 }

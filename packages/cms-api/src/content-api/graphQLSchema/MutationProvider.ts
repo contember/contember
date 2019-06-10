@@ -58,7 +58,7 @@ export default class MutationProvider {
 			},
 		},
 	})
-	private static validationResultType = new GraphQLObjectType({
+	public static validationResultType = new GraphQLObjectType({
 		name: '_ValidationResult',
 		fields: {
 			valid: { type: new GraphQLNonNull(GraphQLBoolean) },
@@ -71,7 +71,6 @@ export default class MutationProvider {
 		private readonly authorizator: Authorizator,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
-		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
 		private readonly queryAstAFactory: GraphQlQueryAstFactory

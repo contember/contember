@@ -4,11 +4,13 @@ import MutationProvider from './MutationProvider'
 import QueryProvider from './QueryProvider'
 import S3 from '../../utils/S3'
 import { GraphQLFieldConfig } from 'graphql/type/definition'
+import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 
 export default class GraphQlSchemaBuilder {
 	constructor(
 		private schema: Model.Schema,
 		private queryProvider: QueryProvider,
+		private validationQueriesProvider: ValidationQueriesProvider,
 		private mutationProvider: MutationProvider,
 		private s3: S3
 	) {}
@@ -46,6 +48,7 @@ export default class GraphQlSchemaBuilder {
 		const queries = Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
 			return {
 				...this.queryProvider.getQueries(entityName),
+				...this.validationQueriesProvider.getQueries(entityName),
 				...queries,
 			}
 		}, {})

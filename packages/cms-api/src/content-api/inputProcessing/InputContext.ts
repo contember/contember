@@ -11,7 +11,6 @@ export interface ManyHasManyInversedContext {
 	relation: Model.ManyHasManyInversedRelation
 	targetEntity: Model.Entity
 	targetRelation: Model.ManyHasManyOwnerRelation
-	index: number
 }
 
 export interface ManyHasManyOwnerContext {
@@ -19,7 +18,6 @@ export interface ManyHasManyOwnerContext {
 	relation: Model.ManyHasManyOwnerRelation
 	targetEntity: Model.Entity
 	targetRelation: Model.ManyHasManyInversedRelation | null
-	index: number
 }
 
 export interface ManyHasOneContext {
@@ -34,7 +32,6 @@ export interface OneHasManyContext {
 	relation: Model.OneHasManyRelation
 	targetEntity: Model.Entity
 	targetRelation: Model.ManyHasOneRelation
-	index: number
 }
 
 export interface OneHasOneInversedContext {

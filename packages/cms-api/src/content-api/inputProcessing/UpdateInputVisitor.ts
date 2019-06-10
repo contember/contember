@@ -1,18 +1,19 @@
 import { Input, Model } from 'cms-common'
 import { isIt } from '../../utils/type'
 import UpdateInputProcessor from './UpdateInputProcessor'
+import * as Context from './InputContext'
 
-export default class UpdateInputVisitor<V>
+export default class UpdateInputVisitor<Result>
 	implements
-		Model.ColumnVisitor<Promise<V | V[] | undefined>>,
-		Model.RelationByTypeVisitor<Promise<V | V[] | undefined>> {
+		Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
+		Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>> {
 	constructor(
-		private readonly updateInputProcessor: UpdateInputProcessor<V>,
+		private readonly updateInputProcessor: UpdateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
 		private readonly data: Input.UpdateDataInput
 	) {}
 
-	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<V> {
+	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<Result> {
 		return this.updateInputProcessor.column({
 			entity,
 			column,
@@ -26,73 +27,11 @@ export default class UpdateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwnerRelation
 	) {
-		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyInversed.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyInversed.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			delete: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyInversed.delete({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			disconnect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyInversed.disconnect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			update: (where: Input.UniqueWhere<never>, data: Input.UpdateDataInput<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyInversed.update({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { where, data },
-					index,
-				})
-			},
-			upsert: (
-				where: Input.UniqueWhere<never>,
-				update: Input.UpdateDataInput<never>,
-				create: Input.CreateDataInput<never>,
-				{ index }
-			): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyInversed.upsert({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { where, update, create },
-					index,
-				})
-			},
-		})
+		return this.processManyRelationInput<Context.ManyHasManyInversedContext>(
+			this.updateInputProcessor.manyHasManyInversed,
+			{ entity, relation, targetEntity, targetRelation },
+			this.data[relation.name] as Input.CreateManyRelationInput
+		)
 	}
 
 	public visitManyHasManyOwner(
@@ -101,73 +40,11 @@ export default class UpdateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyInversedRelation | null
 	) {
-		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyOwner.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyOwner.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			delete: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyOwner.delete({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			disconnect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyOwner.disconnect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			update: (where: Input.UniqueWhere<never>, data: Input.UpdateDataInput<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyOwner.update({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { where, data },
-					index,
-				})
-			},
-			upsert: (
-				where: Input.UniqueWhere<never>,
-				update: Input.UpdateDataInput<never>,
-				create: Input.CreateDataInput<never>,
-				{ index }
-			): Promise<V> => {
-				return this.updateInputProcessor.manyHasManyOwner.upsert({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { where, update, create },
-					index,
-				})
-			},
-		})
+		return this.processManyRelationInput<Context.ManyHasManyOwnerContext>(
+			this.updateInputProcessor.manyHasManyOwner,
+			{ entity, relation, targetEntity, targetRelation },
+			this.data[relation.name] as Input.CreateManyRelationInput
+		)
 	}
 
 	public visitManyHasOne(
@@ -176,62 +53,16 @@ export default class UpdateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasManyRelation | null
 	) {
-		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.updateInputProcessor.manyHasOne.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
+		return this.processRelationInput<Context.ManyHasOneContext>(
+			this.updateInputProcessor.manyHasOne,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.manyHasOne.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-			delete: (): Promise<V> => {
-				return this.updateInputProcessor.manyHasOne.delete({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: undefined,
-				})
-			},
-			disconnect: (): Promise<V> => {
-				return this.updateInputProcessor.manyHasOne.disconnect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: undefined,
-				})
-			},
-			update: (input: Input.UpdateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.manyHasOne.update({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-			upsert: (update: Input.UpdateDataInput<never>, create: Input.CreateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.manyHasOne.upsert({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { update, create },
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateOneRelationInput
+		)
 	}
 
 	public visitOneHasMany(
@@ -240,73 +71,11 @@ export default class UpdateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasOneRelation
 	) {
-		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.oneHasMany.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.oneHasMany.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			delete: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.oneHasMany.delete({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			disconnect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.oneHasMany.disconnect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-			update: (where: Input.UniqueWhere<never>, data: Input.UpdateDataInput<never>, { index }): Promise<V> => {
-				return this.updateInputProcessor.oneHasMany.update({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { where, data },
-					index,
-				})
-			},
-			upsert: (
-				where: Input.UniqueWhere<never>,
-				update: Input.UpdateDataInput<never>,
-				create: Input.CreateDataInput<never>,
-				{ index }
-			): Promise<V> => {
-				return this.updateInputProcessor.oneHasMany.upsert({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { where, update, create },
-					index,
-				})
-			},
-		})
+		return this.processManyRelationInput<Context.OneHasManyContext>(
+			this.updateInputProcessor.oneHasMany,
+			{ entity, relation, targetEntity, targetRelation },
+			this.data[relation.name] as Input.CreateManyRelationInput
+		)
 	}
 
 	public visitOneHasOneInversed(
@@ -315,62 +84,16 @@ export default class UpdateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneOwnerRelation
 	) {
-		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneInversed.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
+		return this.processRelationInput<Context.OneHasOneInversedContext>(
+			this.updateInputProcessor.oneHasOneInversed,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneInversed.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-			delete: (): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneInversed.delete({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: undefined,
-				})
-			},
-			disconnect: (): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneInversed.disconnect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: undefined,
-				})
-			},
-			update: (input: Input.UpdateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneInversed.update({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-			upsert: (update: Input.UpdateDataInput<never>, create: Input.CreateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneInversed.upsert({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { update, create },
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateOneRelationInput
+		)
 	}
 
 	public visitOneHasOneOwner(
@@ -379,196 +102,102 @@ export default class UpdateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneInversedRelation | null
 	) {
-		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneOwner.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
+		return this.processRelationInput<Context.OneHasOneOwnerContext>(
+			this.updateInputProcessor.oneHasOneOwner,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneOwner.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-			delete: (): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneOwner.delete({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: undefined,
-				})
-			},
-			disconnect: (): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneOwner.disconnect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: undefined,
-				})
-			},
-			update: (input: Input.UpdateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneOwner.update({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-			upsert: (update: Input.UpdateDataInput<never>, create: Input.CreateDataInput<never>): Promise<V> => {
-				return this.updateInputProcessor.oneHasOneOwner.upsert({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input: { update, create },
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateOneRelationInput
+		)
 	}
 
-	private processRelationInput<AdditionalData = {}>(
-		input: Input.CreateOneRelationInput | undefined,
-		processor: HasOneRelationInputProcessor<V, AdditionalData>
-	): Promise<undefined | V> {
-		return this.doProcessRelationInput(input, processor, {})
-	}
-
-	private doProcessRelationInput<AdditionalData = {}>(
-		input: Input.CreateOneRelationInput | undefined,
-		processor: HasOneRelationInputProcessor<V, AdditionalData>,
-		additional: AdditionalData
-	): Promise<undefined | V> {
+	private processRelationInput<Context>(
+		processor: UpdateInputProcessor.HasOneRelationInputProcessor<Context, Result>,
+		context: Context,
+		input: Input.UpdateOneRelationInput | undefined
+	): Promise<undefined | Result> {
 		if (input === undefined) {
 			return Promise.resolve(undefined)
 		}
-		const operation = []
-		let result: Promise<V> | null = null
+		this.verifyOperations(input)
 		if (isIt<Input.ConnectRelationInput>(input, 'connect')) {
-			operation.push('connect')
-			result = processor.connect(input.connect, additional)
+			return processor.connect({ ...context, input: input.connect })
 		}
 		if (isIt<Input.CreateRelationInput>(input, 'create')) {
-			operation.push('create')
-			result = processor.create(input.create, additional)
+			return processor.create({ ...context, input: input.create })
 		}
 		if (isIt<Input.DeleteRelationInput>(input, 'delete')) {
-			operation.push('delete')
-			result = processor.delete(additional)
+			return processor.delete({ ...context, input: undefined })
 		}
 		if (isIt<Input.DisconnectRelationInput>(input, 'disconnect')) {
-			operation.push('disconnect')
-			result = processor.disconnect(additional)
+			return processor.disconnect({ ...context, input: undefined })
 		}
 		if (isIt<Input.UpdateRelationInput>(input, 'update')) {
-			operation.push('update')
-			result = processor.update(input.update, additional)
+			return processor.update({ ...context, input: input.update })
 		}
 		if (isIt<Input.UpsertRelationInput>(input, 'upsert')) {
-			operation.push('upsert')
-			result = processor.upsert(input.upsert.update, input.upsert.create, additional)
+			return processor.upsert({ ...context, input: input.upsert })
 		}
-
-		if (operation.length !== 1) {
-			const found = operation.length === 0 ? 'none' : 'both'
-			throw new Error(`Expected either "create" or "connect", ${found} found.`)
-		}
-		if (result === null) {
-			throw new Error()
-		}
-		return result
+		throw new Error()
 	}
 
-	private processManyRelationInput(
-		input: Input.CreateManyRelationInput | undefined,
-		processor: HasManyRelationInputProcessor<V, { index: number }>
-	): Promise<undefined | V[]> {
+	private processManyRelationInput<Context>(
+		processor: UpdateInputProcessor.HasManyRelationInputProcessor<Context, Result>,
+		context: Context,
+		input: Input.UpdateManyRelationInput | undefined
+	): Promise<undefined | Result[]> {
 		if (input === undefined) {
 			return Promise.resolve(undefined)
 		}
-		const promises: Array<Promise<V>> = []
+		const promises: Array<Promise<Result>> = []
 		let i = 0
 		for (const element of input) {
-			const operation = []
+			this.verifyOperations(element)
 			let result
-			const additional = { index: i }
 			if (isIt<Input.ConnectRelationInput>(element, 'connect')) {
-				operation.push('connect')
-				result = processor.connect(element.connect, additional)
+				result = processor.connect({ ...context, input: element.connect, index: i })
 			}
 			if (isIt<Input.CreateRelationInput>(element, 'create')) {
-				operation.push('create')
-				result = processor.create(element.create, additional)
+				result = processor.create({ ...context, input: element.create, index: i })
 			}
 			if (isIt<Input.DeleteSpecifiedRelationInput>(element, 'delete')) {
-				operation.push('delete')
-				result = processor.delete(element.delete, additional)
+				result = processor.delete({ ...context, input: element.delete, index: i })
 			}
 			if (isIt<Input.DisconnectSpecifiedRelationInput>(element, 'disconnect')) {
-				operation.push('disconnect')
-				result = processor.disconnect(element.disconnect, additional)
+				result = processor.disconnect({ ...context, input: element.disconnect, index: i })
 			}
 			if (isIt<Input.UpdateSpecifiedRelationInput>(element, 'update')) {
-				operation.push('update')
-				result = processor.update(element.update.by, element.update.data, additional)
+				result = processor.update({
+					...context,
+					input: { where: element.update.by, data: element.update.data },
+					index: i,
+				})
 			}
 			if (isIt<Input.UpsertSpecifiedRelationInput>(element, 'upsert')) {
-				operation.push('upsert')
-				result = processor.upsert(element.upsert.by, element.upsert.update, element.upsert.create, additional)
+				result = processor.upsert({
+					...context,
+					input: { where: element.upsert.by, update: element.upsert.update, create: element.upsert.create },
+					index: i,
+				})
 			}
-			if (operation.length !== 1) {
-				const found = operation.length === 0 ? 'none' : operation.join(', ')
-				throw new Error(
-					`Expected exactly one of: "create", "connect", "delete", "disconnect", "update" or "upsert". ${found} found.`
-				)
-			}
+
 			if (result !== undefined) {
 				promises.push(result)
 			}
 		}
 		return Promise.all(promises)
 	}
-}
 
-interface HasOneRelationInputProcessor<V, AdditionalData> {
-	connect(input: Input.UniqueWhere, data: AdditionalData): Promise<V>
-
-	create(input: Input.CreateDataInput, data: AdditionalData): Promise<V>
-
-	update(input: Input.UpdateDataInput, data: AdditionalData): Promise<V>
-
-	upsert(update: Input.UpdateDataInput, create: Input.CreateDataInput, data: AdditionalData): Promise<V>
-
-	disconnect(data: AdditionalData): Promise<V>
-
-	delete(data: AdditionalData): Promise<V>
-}
-
-interface HasManyRelationInputProcessor<V, AdditionalData> {
-	connect(input: Input.UniqueWhere, data: AdditionalData): Promise<V>
-
-	create(input: Input.CreateDataInput, data: AdditionalData): Promise<V>
-
-	update(where: Input.UniqueWhere, input: Input.UpdateDataInput, data: AdditionalData): Promise<V>
-
-	upsert(
-		where: Input.UniqueWhere,
-		update: Input.UpdateDataInput,
-		create: Input.CreateDataInput,
-		data: AdditionalData
-	): Promise<V>
-
-	disconnect(where: Input.UniqueWhere, data: AdditionalData): Promise<V>
-
-	delete(where: Input.UniqueWhere, data: AdditionalData): Promise<V>
+	private verifyOperations(input: any) {
+		const keys = Object.keys(input)
+		if (keys.length !== 1) {
+			const found = keys.length === 0 ? 'none' : keys.join(', ')
+			throw new Error(
+				`Expected exactly one of: "create", "connect", "delete", "disconnect", "update" or "upsert". ${found} found.`
+			)
+		}
+	}
 }

@@ -1,18 +1,19 @@
 import { Input, Model } from 'cms-common'
 import CreateInputProcessor from './CreateInputProcessor'
 import { isIt } from '../../utils/type'
+import * as Context from './InputContext'
 
-export default class CreateInputVisitor<V>
+export default class CreateInputVisitor<Result>
 	implements
-		Model.ColumnVisitor<Promise<V | V[] | undefined>>,
-		Model.RelationByTypeVisitor<Promise<V | V[] | undefined>> {
+		Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
+		Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>> {
 	constructor(
-		private readonly createInputProcessor: CreateInputProcessor<V>,
+		private readonly createInputProcessor: CreateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
 		private readonly data: Input.CreateDataInput
 	) {}
 
-	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<V> {
+	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<Result> {
 		return this.createInputProcessor.column({
 			entity,
 			column,
@@ -26,28 +27,16 @@ export default class CreateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwnerRelation
 	) {
-		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.manyHasManyInversed.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
+		return this.processManyRelationInput<Context.ManyHasManyInversedContext>(
+			this.createInputProcessor.manyHasManyInversed,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.manyHasManyInversed.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateManyRelationInput
+		)
 	}
 
 	public visitManyHasManyOwner(
@@ -56,28 +45,16 @@ export default class CreateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyInversedRelation | null
 	) {
-		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.manyHasManyOwner.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
+		return this.processManyRelationInput<Context.ManyHasManyOwnerContext>(
+			this.createInputProcessor.manyHasManyOwner,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.manyHasManyOwner.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateManyRelationInput
+		)
 	}
 
 	public visitManyHasOne(
@@ -86,26 +63,16 @@ export default class CreateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasManyRelation | null
 	) {
-		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.createInputProcessor.manyHasOne.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
+		return this.processRelationInput<Context.ManyHasOneContext>(
+			this.createInputProcessor.manyHasOne,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.createInputProcessor.manyHasOne.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateOneRelationInput
+		)
 	}
 
 	public visitOneHasMany(
@@ -114,28 +81,16 @@ export default class CreateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasOneRelation
 	) {
-		return this.processManyRelationInput(this.data[relation.name] as Input.CreateManyRelationInput, {
-			connect: (input: Input.UniqueWhere<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.oneHasMany.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
+		return this.processManyRelationInput<Context.OneHasManyContext>(
+			this.createInputProcessor.oneHasMany,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>, { index }): Promise<V> => {
-				return this.createInputProcessor.oneHasMany.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-					index,
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateManyRelationInput
+		)
 	}
 
 	public visitOneHasOneInversed(
@@ -144,26 +99,16 @@ export default class CreateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneOwnerRelation
 	) {
-		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.createInputProcessor.oneHasOneInversed.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
+		return this.processRelationInput<Context.OneHasOneInversedContext>(
+			this.createInputProcessor.oneHasOneInversed,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.createInputProcessor.oneHasOneInversed.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateOneRelationInput
+		)
 	}
 
 	public visitOneHasOneOwner(
@@ -172,83 +117,67 @@ export default class CreateInputVisitor<V>
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneInversedRelation | null
 	) {
-		return this.processRelationInput(this.data[relation.name] as Input.CreateOneRelationInput, {
-			connect: (input: Input.UniqueWhere<never>): Promise<V> => {
-				return this.createInputProcessor.oneHasOneOwner.connect({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
+		return this.processRelationInput<Context.OneHasOneOwnerContext>(
+			this.createInputProcessor.oneHasOneOwner,
+			{
+				entity,
+				relation,
+				targetEntity,
+				targetRelation,
 			},
-			create: (input: Input.CreateDataInput<never>): Promise<V> => {
-				return this.createInputProcessor.oneHasOneOwner.create({
-					entity,
-					relation,
-					targetEntity,
-					targetRelation,
-					input,
-				})
-			},
-		})
+			this.data[relation.name] as Input.CreateOneRelationInput
+		)
 	}
 
-	private processRelationInput<AdditionalData = {}>(
-		input: Input.CreateOneRelationInput | undefined,
-		processor: RelationInputProcessor<V, AdditionalData>
-	): Promise<undefined | V> {
-		return this.doProcessRelationInput(input, processor, {})
-	}
-
-	private doProcessRelationInput<AdditionalData = {}>(
-		input: Input.CreateOneRelationInput | undefined,
-		processor: RelationInputProcessor<V, AdditionalData>,
-		additional: AdditionalData
-	): Promise<undefined | V> {
+	private processRelationInput<Context>(
+		processor: CreateInputProcessor.HasOneRelationProcessor<Context, Result>,
+		context: Context,
+		input: Input.CreateOneRelationInput | undefined
+	): Promise<undefined | Result> {
 		if (input === undefined) {
 			return Promise.resolve(undefined)
 		}
-		const relations = []
-		let result: Promise<V> | null = null
+		this.verifyOperations(input)
 		if (isIt<Input.ConnectRelationInput>(input, 'connect')) {
-			relations.push('connect')
-			result = processor.connect(input.connect, additional)
+			return processor.connect({ ...context, input: input.connect })
 		}
 		if (isIt<Input.CreateRelationInput>(input, 'create')) {
-			relations.push('create')
-			result = processor.create(input.create, additional)
+			return processor.create({ ...context, input: input.create })
 		}
-
-		if (relations.length !== 1) {
-			const found = relations.length === 0 ? 'none' : 'both'
-			throw new Error(`Expected either "create" or "connect", ${found} found.`)
-		}
-		if (result === null) {
-			throw new Error()
-		}
-		return result
+		throw new Error()
 	}
 
-	private processManyRelationInput(
-		input: Input.CreateManyRelationInput | undefined,
-		processor: RelationInputProcessor<V, { index: number }>
-	): Promise<undefined | V[]> {
+	private processManyRelationInput<Context>(
+		processor: CreateInputProcessor.HasManyRelationProcessor<Context, Result>,
+		context: Context,
+		input: Input.CreateManyRelationInput | undefined
+	): Promise<undefined | Result[]> {
 		if (input === undefined) {
 			return Promise.resolve(undefined)
 		}
-		const promises = []
+		const promises: Array<Promise<Result>> = []
 		let i = 0
 		for (const element of input) {
-			const result = this.doProcessRelationInput(element, processor, { index: i++ }) as Promise<V>
-			promises.push(result)
+			this.verifyOperations(element)
+			let result
+			if (isIt<Input.ConnectRelationInput>(element, 'connect')) {
+				result = processor.connect({ ...context, input: element.connect, index: i++ })
+			}
+			if (isIt<Input.CreateRelationInput>(element, 'create')) {
+				result = processor.create({ ...context, input: element.create, index: i++ })
+			}
+			if (result !== undefined) {
+				promises.push(result)
+			}
 		}
 		return Promise.all(promises)
 	}
-}
 
-interface RelationInputProcessor<V, AdditionalData> {
-	connect(input: Input.UniqueWhere, data: AdditionalData): Promise<V>
-
-	create(input: Input.CreateDataInput, data: AdditionalData): Promise<V>
+	private verifyOperations(input: any) {
+		const keys = Object.keys(input)
+		if (keys.length !== 1) {
+			const found = keys.length === 0 ? 'none' : keys.join(', ')
+			throw new Error(`Expected either "create" or "connect". ${found} found.`)
+		}
+	}
 }

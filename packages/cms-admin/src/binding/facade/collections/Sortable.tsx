@@ -1,3 +1,4 @@
+import cn from 'classnames'
 import * as React from 'react'
 import {
 	SortableContainer,
@@ -18,6 +19,7 @@ import {
 	Props,
 	SyntheticChildrenProvider
 } from '../../coreComponents'
+import { MutationStateContext } from '../../coreComponents/PersistState'
 import {
 	DataBindingError,
 	EntityAccessor,
@@ -108,22 +110,30 @@ namespace Sortable {
 		return sortBy
 	}
 
-	export interface DragHandleProps {}
+	export interface DragHandleProps {
+		isMutating: boolean
+	}
 
 	export const DragHandle = React.memo(
 		SortableHandle((props: Props<DragHandleProps>) => (
-			<div className="sortable-item-handle">
+			<div
+				className={cn(
+					'sortable-item-handle',
+					(console.log(props) as any) || false,
+					props.isMutating && 'sortable-item-handle-disabled'
+				)}
+			>
 				<DragHandleIcon />
 			</div>
 		))
 	)
 
-	export interface SortableItemProps extends Repeater.ItemProps {}
+	export interface SortableItemProps extends Repeater.ItemProps, DragHandleProps {}
 
 	export const SortableItem = React.memo(
 		SortableElement((props: Props<SortableItemProps & SortableElementProps>) => (
 			<li className="sortable-item">
-				<DragHandle />
+				<DragHandle isMutating={props.isMutating} />
 				<div className="sortable-item-content">
 					<Repeater.Item {...props}>{props.children}</Repeater.Item>
 				</div>
@@ -138,6 +148,7 @@ namespace Sortable {
 
 	export const SortableList = React.memo(
 		SortableContainer((props: Props<SortableListProps & SortableContainerProps>) => {
+			const isMutating = React.useContext(MutationStateContext)
 			return (
 				<Repeater.Cloneable addNew={props.addNew} enableAddingNew={props.enableAddingNew}>
 					<ul className="sortable">
@@ -146,6 +157,8 @@ namespace Sortable {
 								entity={item}
 								index={index}
 								key={item.getKey()}
+								disabled={isMutating}
+								isMutating={isMutating}
 								displayUnlinkButton={
 									props.enableUnlink !== false && (props.entities.length > 1 || props.enableUnlinkAll === true)
 								}

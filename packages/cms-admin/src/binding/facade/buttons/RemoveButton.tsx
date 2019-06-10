@@ -3,67 +3,61 @@ import { IconName, IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import { Button, ButtonProps } from '../../../components'
 import { DataContext, DataContextValue, MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
+import { MutationStateContext } from '../../coreComponents/PersistState'
 import { EntityAccessor } from '../../dao'
 
+// This type is technically useless but it allows users to avoid importing EntityAccessor.RemovalType
+export type RemovalType = 'disconnect' | 'delete'
+
 export interface RemoveButtonProps extends ButtonProps {
-	removeType?: RemoveButton.RemovalType
+	removeType?: RemovalType
 	immediatePersist?: true
 	icon?: IconName
 }
 
-class RemoveButton extends React.PureComponent<RemoveButtonProps> {
-	private getOnClick = (entityAccessor: EntityAccessor, metaOperations: MetaOperationsContextValue) => () => {
-		if (!entityAccessor.remove) {
-			return
-		}
-		if (this.props.immediatePersist && !confirm('Really?')) {
-			return
-		}
+export const RemoveButton = React.memo((props: RemoveButtonProps) => {
+	const { removeType, icon, immediatePersist, ...rest } = props
+	const value = React.useContext(DataContext)
+	const metaOperations = React.useContext(MetaOperationsContext)
+	const isMutating = React.useContext(MutationStateContext)
 
-		entityAccessor.remove(this.mapToRemovalType(this.props.removeType))
-
-		if (this.props.immediatePersist && metaOperations) {
-			metaOperations.triggerPersist()
-		}
-	}
-
-	public render() {
-		const { removeType, icon, immediatePersist, ...rest } = this.props
+	if (value instanceof EntityAccessor) {
 		return (
-			<DataContext.Consumer>
-				{(value: DataContextValue) => {
-					if (value instanceof EntityAccessor) {
-						return (
-							<MetaOperationsContext.Consumer>
-								{(metaOperations: MetaOperationsContextValue) => (
-									<Button {...rest} onClick={this.getOnClick(value, metaOperations)} small minimal>
-										<Icon icon={icon || IconNames.CROSS} color="currentColor" />
-									</Button>
-								)}
-							</MetaOperationsContext.Consumer>
-						)
-					}
-				}}
-			</DataContext.Consumer>
+			<Button {...rest} onClick={getOnClick(props, value, metaOperations)} disabled={isMutating} small minimal>
+				<Icon icon={icon || IconNames.CROSS} color="currentColor" />
+			</Button>
 		)
 	}
+	return null
+})
 
-	private mapToRemovalType(removalType?: RemoveButton.RemovalType): EntityAccessor.RemovalType {
-		switch (removalType) {
-			case 'disconnect':
-				return EntityAccessor.RemovalType.Disconnect
-			case 'delete':
-				return EntityAccessor.RemovalType.Delete
-			default:
-				// By default, we just unlink unless explicitly told to actually delete
-				return EntityAccessor.RemovalType.Disconnect
-		}
+const getOnClick = (
+	props: RemoveButtonProps,
+	entityAccessor: EntityAccessor,
+	metaOperations: MetaOperationsContextValue
+) => () => {
+	if (!entityAccessor.remove) {
+		return
+	}
+	if (props.immediatePersist && !confirm('Really?')) {
+		return
+	}
+
+	entityAccessor.remove(mapToRemovalType(props.removeType))
+
+	if (props.immediatePersist && metaOperations) {
+		metaOperations.triggerPersist()
 	}
 }
 
-namespace RemoveButton {
-	// This enum is technically useless but it allows users to avoid importing EntityAccessor.RemovalType
-	export type RemovalType = 'disconnect' | 'delete'
+const mapToRemovalType = (removalType?: RemovalType): EntityAccessor.RemovalType => {
+	switch (removalType) {
+		case 'disconnect':
+			return EntityAccessor.RemovalType.Disconnect
+		case 'delete':
+			return EntityAccessor.RemovalType.Delete
+		default:
+			// By default, we just unlink unless explicitly told to actually delete
+			return EntityAccessor.RemovalType.Disconnect
+	}
 }
-
-export { RemoveButton }

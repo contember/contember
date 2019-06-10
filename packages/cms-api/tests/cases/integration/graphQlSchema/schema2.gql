@@ -45,6 +45,8 @@ enum OrderDirection {
 type Query {
   getTest(by: TestUniqueWhere!): Test
   listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
+  validateCreateTest(data: TestCreateInput!): _ValidationResult!
+  validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
   _info: Info
 }
 

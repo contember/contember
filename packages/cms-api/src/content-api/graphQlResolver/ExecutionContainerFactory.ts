@@ -1,5 +1,5 @@
 import Container from '../../core/di/Container'
-import { Acl, Model, Schema } from 'cms-common'
+import { Acl, Schema } from 'cms-common'
 import JoinBuilder from '../sql/select/JoinBuilder'
 import ConditionBuilder from '../sql/select/ConditionBuilder'
 import WhereBuilder from '../sql/select/WhereBuilder'
@@ -31,13 +31,18 @@ import DependencyCollector from '../input-validation/DependencyCollector'
 import QueryAstFactory from '../input-validation/QueryAstFactory'
 import ValidationContextFactory from '../input-validation/ValidationContextFactory'
 import ValidationDataSelector from '../input-validation/ValidationDataSelector'
+import ValidationResolver from './ValidationResolver'
+
+export interface ExecutionContainer {
+	readResolver: ReadResolver
+	mutationResolver: MutationResolver
+	validationResolver: ValidationResolver
+}
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Schema, private readonly permissions: Acl.Permissions) {}
 
-	public create(
-		context: Pick<Context, 'db' | 'identityVariables'>
-	): Container<{ readResolver: ReadResolver; mutationResolver: MutationResolver }> {
+	public create(context: Pick<Context, 'db' | 'identityVariables'>): Container<ExecutionContainer> {
 		const that = this
 		const innerDic = new Container.Builder({})
 			.addService('db', () => context.db)
@@ -207,13 +212,11 @@ class ExecutionContainerFactory {
 				({ mapper, uniqueWhereExpander, inputValidator }) =>
 					new MutationResolver(mapper, uniqueWhereExpander, inputValidator)
 			)
+			.addService('validationResolver', ({ inputValidator }) => new ValidationResolver(inputValidator))
 
 			.build()
 
-		return new Container.Builder({})
-			.addService('readResolver', () => innerDic.get('readResolver'))
-			.addService('mutationResolver', () => innerDic.get('mutationResolver'))
-			.build()
+		return innerDic.pick('readResolver', 'mutationResolver', 'validationResolver')
 	}
 }
 

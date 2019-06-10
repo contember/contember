@@ -42,17 +42,17 @@ namespace UpdateInputProcessor {
 	}
 
 	export interface HasManyRelationInputProcessor<Context, Result> {
-		connect(context: ContextWithInput<Context, Input.UniqueWhere>): Promise<Result>
+		connect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number }): Promise<Result>
 
-		create(context: ContextWithInput<Context, Input.CreateDataInput>): Promise<Result>
+		create(context: ContextWithInput<Context, Input.CreateDataInput> & { index: number }): Promise<Result>
 
-		update(context: ContextWithInput<Context, UpdateManyInput>): Promise<Result>
+		update(context: ContextWithInput<Context, UpdateManyInput> & { index: number }): Promise<Result>
 
-		upsert(context: ContextWithInput<Context, UpsertManyInput>): Promise<Result>
+		upsert(context: ContextWithInput<Context, UpsertManyInput> & { index: number }): Promise<Result>
 
-		disconnect(context: ContextWithInput<Context, Input.UniqueWhere>): Promise<Result>
+		disconnect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number }): Promise<Result>
 
-		delete(context: ContextWithInput<Context, Input.UniqueWhere>): Promise<Result>
+		delete(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number }): Promise<Result>
 	}
 }
 

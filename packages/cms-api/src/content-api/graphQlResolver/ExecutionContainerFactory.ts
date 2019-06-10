@@ -29,6 +29,8 @@ import DeleteExecutor from '../sql/delete/DeleteExecutor'
 import InputValidator from '../input-validation/InputValidator'
 import DependencyCollector from '../input-validation/DependencyCollector'
 import QueryAstFactory from '../input-validation/QueryAstFactory'
+import ValidationContextFactory from '../input-validation/ValidationContextFactory'
+import ValidationDataSelector from '../input-validation/ValidationDataSelector'
 
 class ExecutionContainerFactory {
 	constructor(private readonly schema: Schema, private readonly permissions: Acl.Permissions) {}
@@ -181,15 +183,23 @@ class ExecutionContainerFactory {
 			.addService('validationDependencyCollector', () => new DependencyCollector())
 			.addService('validationQueryAstFactory', () => new QueryAstFactory(this.schema.model))
 			.addService(
+				'dataSelector',
+				({ validationQueryAstFactory, mapper }) =>
+					new ValidationDataSelector(this.schema.model, validationQueryAstFactory, mapper)
+			)
+			.addService(
+				'validationContextFactory',
+				({ dataSelector }) => new ValidationContextFactory(this.schema.model, dataSelector)
+			)
+			.addService(
 				'inputValidator',
-				({ validationDependencyCollector, validationQueryAstFactory, mapper, uniqueWhereExpander }) =>
+				({ validationDependencyCollector, validationContextFactory, dataSelector }) =>
 					new InputValidator(
 						this.schema.validation,
 						this.schema.model,
 						validationDependencyCollector,
-						validationQueryAstFactory,
-						mapper,
-						uniqueWhereExpander
+						validationContextFactory,
+						dataSelector
 					)
 			)
 			.addService(

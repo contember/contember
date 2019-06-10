@@ -75,6 +75,16 @@ class Mapper {
 		return await (indexByAlias !== null ? hydrator.hydrateAll(rows, indexByAlias) : hydrator.hydrateAll(rows))
 	}
 
+	public async selectUnique(
+		entity: Model.Entity,
+		query: ObjectNode<Input.UniqueQueryInput>
+	): Promise<SelectHydrator.ResultObject | null> {
+		const where = this.uniqueWhereExpander.expand(entity, query.args.by)
+		const queryExpanded = query.withArg<Input.ListQueryInput>('filter', where)
+
+		return (await this.select(entity, queryExpanded))[0] || null
+	}
+
 	public async selectGrouped(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,

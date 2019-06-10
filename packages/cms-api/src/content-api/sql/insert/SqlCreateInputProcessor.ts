@@ -2,25 +2,18 @@ import { Input, Model, Value } from 'cms-common'
 import Mapper from '../Mapper'
 import { uuid } from '../../../utils/uuid'
 import InsertBuilder from './InsertBuilder'
-import { resolveDefaultValue } from '../../../content-schema/dataUtils'
+import { resolveColumnValue, resolveDefaultValue, resolvePrimaryGenerator } from '../../../content-schema/dataUtils'
 import CreateInputProcessor from '../../inputProcessing/CreateInputProcessor'
 import * as Context from '../../inputProcessing/InputContext'
 
 export default class SqlCreateInputProcessor implements CreateInputProcessor {
 	constructor(private readonly insertBuilder: InsertBuilder, private readonly mapper: Mapper) {}
 
-	public async column({ entity, column, input }: Context.ColumnContext): Promise<void> {
+	public async column(context: Context.ColumnContext): Promise<void> {
 		this.insertBuilder.addFieldValue(
-			column.name,
+			context.column.name,
 			((): Value.GenericValueLike<Value.AtomicValue> => {
-				if (input !== undefined) {
-					return input as Value.AtomicValue
-				}
-				if (entity.primary === column.name) {
-					return this.resolvePrimaryGenerator(column)()
-				}
-
-				return resolveDefaultValue(column, new Date())
+				return resolveColumnValue(context)
 			})()
 		)
 		return Promise.resolve()
@@ -132,12 +125,5 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 				},
 			})
 		},
-	}
-
-	private resolvePrimaryGenerator(column: Model.AnyColumn): () => Input.PrimaryValue {
-		if (column.type === Model.ColumnType.Uuid) {
-			return uuid
-		}
-		throw new Error('not implemented')
 	}
 }

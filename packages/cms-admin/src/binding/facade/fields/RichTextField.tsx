@@ -21,7 +21,7 @@ export const RichTextField = SimpleRelativeSingleField<RichTextFieldProps>(props
 	}
 	return (
 		<Field<string> name={props.name}>
-			{({ data, environment }): React.ReactNode => {
+			{({ data, isMutating, environment }): React.ReactNode => {
 				return (
 					<RichEditor
 						onChange={generateOnChange(data)}
@@ -29,6 +29,7 @@ export const RichTextField = SimpleRelativeSingleField<RichTextFieldProps>(props
 						lineBreakBehavior={props.lineBreakBehavior}
 						label={environment.applySystemMiddleware('labelMiddleware', props.label)}
 						blocks={props.blocks}
+						readOnly={isMutating}
 					/>
 				)
 			}}

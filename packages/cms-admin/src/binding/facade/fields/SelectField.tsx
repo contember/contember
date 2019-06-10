@@ -21,7 +21,7 @@ export type SelectFieldProps = SelectFieldPublicProps & SelectFieldInternalProps
 export const SelectField = Component<SelectFieldProps>(props => {
 	return (
 		<ChoiceField name={props.name} options={props.options}>
-			{({ data, currentValue, onChange, environment }) => {
+			{({ data, currentValue, onChange, environment, isMutating }) => {
 				return (
 					<SelectFieldInner
 						name={props.name}
@@ -32,6 +32,7 @@ export const SelectField = Component<SelectFieldProps>(props => {
 						currentValue={currentValue}
 						onChange={onChange}
 						environment={environment}
+						isMutating={isMutating}
 					/>
 				)
 			}}
@@ -44,6 +45,7 @@ export interface SelectFieldInnerProps extends SelectFieldPublicProps {
 	currentValue: ChoiceField.ValueRepresentation | null
 	onChange: (newValue: ChoiceField.ValueRepresentation) => void
 	environment: Environment
+	isMutating: boolean
 }
 
 export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps> {
@@ -70,6 +72,7 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 					value={this.props.currentValue === null ? -1 : this.props.currentValue}
 					onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
 					options={options}
+					disabled={this.props.isMutating}
 				/>
 			</FormGroup>
 		)

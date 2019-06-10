@@ -4,7 +4,12 @@ class Select extends React.PureComponent<Select.Props> {
 	render() {
 		return (
 			<div className="select-wrap">
-				<select onChange={this.props.onChange} value={this.props.value} className="select">
+				<select
+					disabled={this.props.disabled === true}
+					onChange={this.props.onChange}
+					value={this.props.value}
+					className="select"
+				>
 					{this.props.options.map(option => (
 						<option value={option.value} disabled={option.disabled} key={option.value}>
 							{option.label}
@@ -27,6 +32,7 @@ namespace Select {
 		value: string | number
 		onChange?: React.ChangeEventHandler<HTMLSelectElement>
 		options: Option[]
+		disabled?: boolean
 	}
 }
 

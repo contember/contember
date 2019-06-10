@@ -14,7 +14,15 @@ export default class MutationResolver {
 		private readonly inputValidator: InputValidator
 	) {}
 
-	public async resolveUpdate(entity: Model.Entity, input: Input.UpdateInput, queryAst: ObjectNode<Input.UpdateInput>): Promise<WithoutNode<Result.UpdateResult>> {
+	public async resolveUpdate(
+		entity: Model.Entity,
+		input: Input.UpdateInput,
+		queryAst: ObjectNode<Input.UpdateInput>
+	): Promise<WithoutNode<Result.UpdateResult>> {
+		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data)
+		if (validationResult.length > 0) {
+			return this.createValidationResponse(validationResult)
+		}
 		try {
 			await this.mapper.update(entity, input.by, input.data)
 		} catch (e) {
@@ -36,28 +44,14 @@ export default class MutationResolver {
 		}
 	}
 
-	public async resolveCreate(entity: Model.Entity, input: Input.CreateInput, queryAst: ObjectNode): Promise<WithoutNode<Result.CreateResult>> {
+	public async resolveCreate(
+		entity: Model.Entity,
+		input: Input.CreateInput,
+		queryAst: ObjectNode
+	): Promise<WithoutNode<Result.CreateResult>> {
 		const validationResult = await this.inputValidator.validateCreate(entity, input.data)
 		if (validationResult.length > 0) {
-			return {
-				ok: false,
-				validation: {
-					valid: false,
-					errors: validationResult.map(it => ({
-						message: it.message,
-						path: it.path.map(part => {
-							switch (typeof part) {
-								case 'number':
-									return { __typename: '_IndexPathFragment', index: part }
-								case 'string':
-									return { __typename: '_FieldPathFragment', field: part }
-								default:
-									return assertNever(part)
-							}
-						}),
-					})),
-				},
-			}
+			return this.createValidationResponse(validationResult)
 		}
 		let primary: Input.PrimaryValue
 		try {
@@ -80,7 +74,35 @@ export default class MutationResolver {
 		}
 	}
 
-	private async resolveResultNodes(entity: Model.Entity, where: Input.Where, queryAst: ObjectNode): Promise<Record<string, Value.Object>> {
+	private createValidationResponse(
+		validationResult: InputValidator.Result
+	): { ok: boolean; validation: Result.ValidationResult } {
+		return {
+			ok: false,
+			validation: {
+				valid: false,
+				errors: validationResult.map(it => ({
+					message: it.message,
+					path: it.path.map(part => {
+						switch (typeof part) {
+							case 'number':
+								return { __typename: '_IndexPathFragment', index: part }
+							case 'string':
+								return { __typename: '_FieldPathFragment', field: part }
+							default:
+								return assertNever(part)
+						}
+					}),
+				})),
+			},
+		}
+	}
+
+	private async resolveResultNodes(
+		entity: Model.Entity,
+		where: Input.Where,
+		queryAst: ObjectNode
+	): Promise<Record<string, Value.Object>> {
 		const nodeQuery = queryAst.findFieldByName('node')
 		let nodes: Record<string, any> = {}
 		for (const singleNodeQuery of nodeQuery) {

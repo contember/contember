@@ -69,7 +69,8 @@ export default class UpdateBuilder {
 			.updateBuilder()
 			.with('newData_', qb => {
 				qb = resolvedData.reduce(
-					(qb, value) => qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
+					(qb, value) =>
+						qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
 					qb
 				)
 				const columns = new Set(resolvedData.map(it => it.columnName))

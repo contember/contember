@@ -61,7 +61,8 @@ export default class InsertBuilder {
 			.insertBuilder()
 			.with('root_', qb => {
 				return resolvedData.reduce(
-					(qb, value) => qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
+					(qb, value) =>
+						qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
 					qb
 				)
 			})

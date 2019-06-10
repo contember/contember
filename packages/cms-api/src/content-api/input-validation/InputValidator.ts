@@ -1,15 +1,17 @@
 import { Input, Model, Validation } from 'cms-common'
 import DependencyCollector from './DependencyCollector'
-import QueryAstFactory from './QueryAstFactory'
-import Mapper from '../sql/Mapper'
 import DependencyMerger from './DependencyMerger'
-import { acceptEveryFieldVisitor, acceptFieldVisitor } from '../../content-schema/modelUtils'
-import CreateInputProcessor from '../inputProcessing/CreateInputProcessor'
-import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
+import { acceptEveryFieldVisitor } from '../../content-schema/modelUtils'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
 import { createRootContext, evaluate, NodeContext, rules } from './index'
 import { tuple } from '../../utils/tuple'
-import { ColumnContext } from '../inputProcessing/InputContext'
+import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
+import UpdateInputValidationProcessor from './UpdateInputValidationProcessor'
+import ValidationContextFactory from './ValidationContextFactory'
+import ValidationDataSelector from './ValidationDataSelector'
+import CreateInputValidationProcessor from './CreateInputValidationProcessor'
+import UpdateInputProcessor from '../inputProcessing/UpdateInputProcessor'
+import CreateInputProcessor from '../inputProcessing/CreateInputProcessor'
 
 type Path = (string | number)[]
 
@@ -18,129 +20,201 @@ class InputValidator {
 		private readonly validationSchema: Validation.Schema,
 		private readonly model: Model.Schema,
 		private readonly dependencyCollector: DependencyCollector,
-		private readonly queryAstFactory: QueryAstFactory,
-		private readonly mapper: Mapper,
-		private readonly uniqueWhereExpander: UniqueWhereExpander
+		private readonly validationContextFactory: ValidationContextFactory,
+		private readonly validationDataSelector: ValidationDataSelector
 	) {}
+
+	async hasValidationRulesOnUpdate(entity: Model.Entity, data: Input.UpdateDataInput): Promise<boolean> {
+		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data))
+		if (fieldsWithRules.length > 0) {
+			return true
+		}
+		const hasManyProcessor: UpdateInputProcessor.HasManyRelationInputProcessor<
+			{
+				targetEntity: Model.Entity
+				relation: Model.AnyRelation
+			},
+			boolean
+		> = {
+			connect: () => Promise.resolve(false),
+			disconnect: () => Promise.resolve(false),
+			delete: () => Promise.resolve(false),
+			create: context => this.hasValidationRulesOnCreate(context.targetEntity, context.input),
+			update: context => this.hasValidationRulesOnUpdate(context.targetEntity, context.input.data),
+			upsert: context =>
+				this.hasValidationRulesOnUpdate(context.targetEntity, context.input.update) ||
+				this.hasValidationRulesOnCreate(context.targetEntity, context.input.create),
+		}
+		const hasOneProcessor: UpdateInputProcessor.HasOneRelationInputProcessor<
+			{
+				targetEntity: Model.Entity
+				relation: Model.AnyRelation
+			},
+			boolean
+		> = {
+			connect: () => Promise.resolve(false),
+			disconnect: () => Promise.resolve(false),
+			delete: () => Promise.resolve(false),
+			create: context => this.hasValidationRulesOnCreate(context.targetEntity, context.input),
+			update: context => this.hasValidationRulesOnUpdate(context.targetEntity, context.input),
+			upsert: context =>
+				this.hasValidationRulesOnUpdate(context.targetEntity, context.input.update) ||
+				this.hasValidationRulesOnCreate(context.targetEntity, context.input.create),
+		}
+		const processor: UpdateInputProcessor<boolean> = {
+			column: () => Promise.resolve(false),
+			manyHasManyInversed: hasManyProcessor,
+			manyHasManyOwner: hasManyProcessor,
+			oneHasMany: hasManyProcessor,
+			manyHasOne: hasOneProcessor,
+			oneHasOneInversed: hasOneProcessor,
+			oneHasOneOwner: hasOneProcessor,
+		}
+		const visitor = new UpdateInputVisitor(processor, this.model, data)
+		return await this.checkRelationHasValidation(entity, visitor)
+	}
+
+	async hasValidationRulesOnCreate(entity: Model.Entity, data: Input.CreateDataInput): Promise<boolean> {
+		const fieldsWithRules = this.getFieldsWithRules(entity)
+		if (fieldsWithRules.length > 0) {
+			return true
+		}
+		const hasManyProcessor: CreateInputProcessor.HasManyRelationProcessor<
+			{
+				targetEntity: Model.Entity
+				relation: Model.AnyRelation
+			},
+			boolean
+		> = {
+			connect: () => Promise.resolve(false),
+			create: context => this.hasValidationRulesOnCreate(context.targetEntity, context.input),
+		}
+		const hasOneProcessor: CreateInputProcessor.HasOneRelationProcessor<
+			{
+				targetEntity: Model.Entity
+				relation: Model.AnyRelation
+			},
+			boolean
+		> = {
+			connect: () => Promise.resolve(false),
+			create: context => this.hasValidationRulesOnCreate(context.targetEntity, context.input),
+		}
+		const processor: CreateInputProcessor<boolean> = {
+			column: () => Promise.resolve(false),
+			manyHasManyInversed: hasManyProcessor,
+			manyHasManyOwner: hasManyProcessor,
+			oneHasMany: hasManyProcessor,
+			manyHasOne: hasOneProcessor,
+			oneHasOneInversed: hasOneProcessor,
+			oneHasOneOwner: hasOneProcessor,
+		}
+		const visitor = new CreateInputVisitor(processor, this.model, data)
+
+		return await this.checkRelationHasValidation(entity, visitor)
+	}
+
+	private async checkRelationHasValidation(
+		entity: Model.Entity,
+		visitor: Model.FieldVisitor<Promise<boolean | boolean[] | undefined>>
+	): Promise<boolean> {
+		const validateRelationsResult = acceptEveryFieldVisitor<Promise<boolean | boolean[] | undefined>>(
+			this.model,
+			entity,
+			visitor
+		)
+
+		const results = await Promise.all(Object.values(validateRelationsResult))
+
+		return results.find(it => it === true || (Array.isArray(it) && it.includes(true))) !== undefined
+	}
 
 	async validateCreate(
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
 		path: Path = []
 	): Promise<InputValidator.Result> {
-		const entityRules = this.validationSchema[entity.name] || {}
-		const fieldsWithRules = Object.entries(entityRules)
-			.filter(([, rules]) => rules.length > 0)
-			.map(([field]) => field)
-		if (fieldsWithRules.length === 0) {
+		if (!(await this.hasValidationRulesOnCreate(entity, data))) {
 			return []
 		}
+		const entityRules = this.validationSchema[entity.name] || {}
+		const fieldsWithRules = this.getFieldsWithRules(entity)
 
-		const dependencies: DependencyCollector.Dependencies = fieldsWithRules
-			.map(it => entityRules[it])
-			.reduce((acc, val) => [...acc, ...val], [])
-			.map(it => this.dependencyCollector.collect(it.validator))
-			.concat(fieldsWithRules.reduce((acc, field) => ({ ...acc, [field]: {} }), {}))
-			.reduce((acc, dependency) => DependencyMerger.merge(acc, dependency), {})
+		const dependencies = this.buildDependencies(fieldsWithRules, entityRules)
 
-		const context = await this.createValidationContext(entity, data, dependencies)
+		const context = createRootContext(await this.validationContextFactory.createForCreate(entity, data, dependencies))
 
-		const fieldsResult = fieldsWithRules
+		const fieldsResult = this.validateFields(fieldsWithRules, entityRules, context, path)
+
+		const processor = new CreateInputValidationProcessor(this, path)
+		const visitor = new CreateInputVisitor(processor, this.model, data)
+		const relationResult = await this.validateRelations(entity, visitor)
+
+		return [...fieldsResult, ...relationResult]
+	}
+
+	async validateUpdate(
+		entity: Model.Entity,
+		where: Input.UniqueWhere,
+		data: Input.UpdateDataInput,
+		path: Path = []
+	): Promise<InputValidator.Result> {
+		if (!(await this.hasValidationRulesOnUpdate(entity, data))) {
+			return []
+		}
+		const entityRules = this.validationSchema[entity.name] || {}
+
+		const dependencies = this.buildDependencies(Object.keys(data), entityRules)
+
+		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data))
+
+		let fieldsResult: InputValidator.Result = []
+		const node = (await this.validationContextFactory.createForUpdate(entity, { where }, data, dependencies)) || {}
+		if (fieldsWithRules.length > 0) {
+			const context = createRootContext(node)
+			fieldsResult = this.validateFields(fieldsWithRules, entityRules, context, path)
+		}
+
+		const processor = new UpdateInputValidationProcessor(this, path, node, this.validationDataSelector)
+		const visitor = new UpdateInputVisitor(processor, this.model, data)
+		const relationResult = await this.validateRelations(entity, visitor)
+
+		return [...fieldsResult, ...relationResult]
+	}
+
+	private getFieldsWithRules(entity: Model.Entity, fields?: string[]) {
+		const entityRules = this.validationSchema[entity.name] || {}
+		return (fields || Object.keys(entityRules)).filter(field => entityRules[field] && entityRules[field].length > 0)
+	}
+
+	private validateFields(fields: string[], entityRules: Validation.EntityRules, context: NodeContext, path: Path) {
+		return fields
 			.map(field => tuple(field, entityRules[field]))
 			.map(([field, fieldRules]) =>
 				tuple(field, fieldRules.find(it => !evaluate(context, rules.on(field, it.validator))))
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])
 			.map(([field, { message }]) => ({ path: [...path, field], message }))
+	}
 
-		const noneResult = async () => []
-		const processCreate = async (context: {
-			targetEntity: Model.Entity
-			relation: Model.AnyRelation
-			input: Input.CreateDataInput
-			index?: number
-		}) => {
-			const newPath = [...path, ...(context.index ? [context.index] : []), context.relation.name]
-			return this.validateCreate(context.targetEntity, context.input, newPath)
-		}
-		const relationProcessors = {
-			create: processCreate,
-			connect: noneResult,
-		}
-		const processor: CreateInputProcessor<InputValidator.Result> = {
-			column: noneResult,
-			manyHasManyInversed: relationProcessors,
-			manyHasManyOwner: relationProcessors,
-			oneHasOneInversed: relationProcessors,
-			oneHasOneOwner: relationProcessors,
-			oneHasMany: relationProcessors,
-			manyHasOne: relationProcessors,
-		}
+	private async validateRelations(
+		entity: Model.Entity,
+		visitor: Model.FieldVisitor<Promise<InputValidator.Result | InputValidator.Result[] | undefined>>
+	): Promise<InputValidator.FieldResult[]> {
+		const validateRelationsResult = acceptEveryFieldVisitor(this.model, entity, visitor)
 
-		const visitor = new CreateInputVisitor(processor, this.model, data)
-
-		type VisitorType = Promise<InputValidator.Result | InputValidator.Result[] | undefined>
-		const nestedCreateResult = acceptEveryFieldVisitor<VisitorType>(this.model, entity, visitor)
-
-		const nestedResult = (await Promise.all(Object.values(nestedCreateResult)))
+		return (await Promise.all(Object.values(validateRelationsResult)))
 			.filter((value): value is InputValidator.FieldResult[] | InputValidator.FieldResult[][] => value !== undefined)
 			.reduce<(InputValidator.FieldResult[] | InputValidator.FieldResult)[]>((res, it) => [...res, ...it], [])
 			.reduce<InputValidator.FieldResult[]>((res, it) => [...res, ...(Array.isArray(it) ? it : [it])], [])
-
-		return [...fieldsResult, ...nestedResult]
 	}
 
-	private async createValidationContext(
-		entity: Model.Entity,
-		data: Input.CreateDataInput,
-		dependencies: DependencyCollector.Dependencies
-	): Promise<NodeContext> {
-		const processConnect = async (context: {
-			targetEntity: Model.Entity
-			relation: Model.AnyRelation
-			input: Input.UniqueWhere
-		}) => {
-			return this.select(context.targetEntity, context.input, dependencies[context.relation.name])
-		}
-		const processCreate = async (context: {
-			targetEntity: Model.Entity
-			relation: Model.AnyRelation
-			input: Input.CreateDataInput
-		}) => {
-			return this.createValidationContext(context.targetEntity, context.input, dependencies[context.relation.name])
-		}
-
-		const relationProcessors = {
-			create: processCreate,
-			connect: processConnect,
-		}
-		const processor: CreateInputProcessor<any> = {
-			column: async (context: ColumnContext) => {
-				return context.input
-			},
-			manyHasManyInversed: relationProcessors,
-			manyHasManyOwner: relationProcessors,
-			oneHasOneInversed: relationProcessors,
-			oneHasOneOwner: relationProcessors,
-			oneHasMany: relationProcessors,
-			manyHasOne: relationProcessors,
-		}
-
-		const visitor = new CreateInputVisitor(processor, this.model, data)
-		const contextData = (await Promise.all(
-			Object.keys(dependencies).map(async field => {
-				return [field, await acceptFieldVisitor(this.model, entity, field, visitor)]
-			})
-		)).reduce((acc, [field, value]) => ({ ...acc, [field]: value }), {})
-
-		return createRootContext(contextData)
-	}
-
-	private async select(entity: Model.Entity, where: Input.UniqueWhere, dependencies: DependencyCollector.Dependencies) {
-		const queryAst = this.queryAstFactory.create(entity.name, dependencies)
-		const whereExpanded = this.uniqueWhereExpander.expand(entity, where)
-		const queryExpanded = queryAst.withArg<Input.ListQueryInput>('filter', whereExpanded)
-		return (await this.mapper.select(entity, queryExpanded))[0] || undefined
+	private buildDependencies(fields: string[], entityRules: Validation.EntityRules) {
+		return fields
+			.map(it => entityRules[it] || [])
+			.reduce((acc, val) => [...acc, ...val], [])
+			.map(it => this.dependencyCollector.collect(it.validator))
+			.concat(fields.reduce((acc, field) => ({ ...acc, [field]: {} }), {}))
+			.reduce((acc, dependency) => DependencyMerger.merge(acc, dependency), {})
 	}
 }
 

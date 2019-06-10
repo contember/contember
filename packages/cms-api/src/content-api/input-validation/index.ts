@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Validation } from 'cms-common'
+import { Validation, Value } from 'cms-common'
 import EnumDefinition from '../../content-schema/definition/EnumDefinition'
 import { tuple } from '../../utils/tuple'
 
@@ -33,8 +33,8 @@ interface ValidationContext {
 	root: NodeContext
 }
 
-export type NodeType = Record<string, any>
-type ValueType = any
+export type NodeType = Value.Object
+type ValueType = Value.FieldValue
 
 export interface NodeContext extends ValidationContext {
 	node: NodeType
@@ -106,7 +106,7 @@ const createSingleNodeContext = (
 		throw new Error('Nested arrays are not allowed')
 	}
 	if (typeof value === 'object' && value !== null) {
-		return createNodeContext(parent.root, value)
+		return createNodeContext(parent.root, value as NodeType)
 	}
 	return createValueContext(parent.root, parent.node, value)
 }

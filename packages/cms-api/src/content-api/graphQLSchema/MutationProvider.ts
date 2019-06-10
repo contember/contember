@@ -1,4 +1,13 @@
-import { GraphQLBoolean, GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString, GraphQLUnionType, } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLString,
+	GraphQLUnionType,
+} from 'graphql'
 import { Acl, Input, Model } from 'cms-common'
 import { getEntity } from '../../content-schema/modelUtils'
 import { Context } from '../types'

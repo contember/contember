@@ -11,11 +11,19 @@
 		background: white
 
 		&::placeholder
-				color: $c-text-light
+			color: $c-text-light
 
 		&:focus
 			outline: none
 			border: rem(1px) solid #1665d8
+
+		&[readonly]
+			border-color: lighten(#E2E5ED, 5)
+			color: lighten($c-text-light, 5)
+			background: #fcfcfc
+
+			&:focus
+				border-color: lighten(#E2E5ED, 2.5)
 
 
 	&.view-large

@@ -41,6 +41,7 @@ export interface RichEditorProps {
 	lineBreakBehavior: LineBreakBehavior
 	defaultBlock: Block
 	blocks: { block: Block; marks?: Mark[] }[]
+	readOnly?: boolean
 }
 
 export interface RichTextFieldState {
@@ -161,6 +162,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 							value={this.state.value}
 							onChange={this.onChange}
 							onKeyDown={this.onKeyDown}
+							readOnly={this.props.readOnly}
 						/>
 					</div>
 				</FormGroup>

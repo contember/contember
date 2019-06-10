@@ -21,7 +21,7 @@ export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 export const RadioField = Component<RadioFieldProps>(props => {
 	return (
 		<ChoiceField name={props.name} options={props.options}>
-			{({ data, currentValue, onChange, environment }) => {
+			{({ data, currentValue, onChange, isMutating, environment }) => {
 				return (
 					<RadioFieldInner
 						name={props.name}
@@ -30,6 +30,7 @@ export const RadioField = Component<RadioFieldProps>(props => {
 						data={data}
 						currentValue={currentValue}
 						onChange={onChange}
+						isMutating={isMutating}
 						environment={environment}
 					/>
 				)
@@ -43,6 +44,7 @@ interface RadioFieldInnerProps extends RadioFieldPublicProps {
 	currentValue: ChoiceField.ValueRepresentation | null
 	onChange: (newValue: ChoiceField.ValueRepresentation) => void
 	environment: Environment
+	isMutating: boolean
 }
 
 class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
@@ -50,6 +52,7 @@ class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
 		return (
 			<FormGroup label={this.props.label}>
 				<RadioGroup
+					disabled={this.props.isMutating}
 					selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}
 					onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
 				>

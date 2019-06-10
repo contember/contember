@@ -57,7 +57,13 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 		return (
 			<Field<string> name={this.props.name}>
 				{(metadata): React.ReactNode => (
-					<Dropzone onDrop={this.handleStartUpload} accept={this.props.accept} multiple={false} style={{}}>
+					<Dropzone
+						disabled={metadata.isMutating}
+						onDrop={this.handleStartUpload}
+						accept={this.props.accept}
+						multiple={false}
+						style={{}}
+					>
 						<UploadFieldComponent.Inner
 							metadata={{
 								...metadata,

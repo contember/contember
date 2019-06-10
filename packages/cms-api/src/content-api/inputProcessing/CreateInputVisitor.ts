@@ -134,7 +134,7 @@ export default class CreateInputVisitor<Result>
 		context: Context,
 		input: Input.CreateOneRelationInput | undefined
 	): Promise<undefined | Result> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		this.verifyOperations(input)
@@ -152,7 +152,7 @@ export default class CreateInputVisitor<Result>
 		context: Context,
 		input: Input.CreateManyRelationInput | undefined
 	): Promise<undefined | Result[]> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		const promises: Array<Promise<Result>> = []

@@ -119,7 +119,7 @@ export default class UpdateInputVisitor<Result>
 		context: Context,
 		input: Input.UpdateOneRelationInput | undefined
 	): Promise<undefined | Result> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		this.verifyOperations(input)
@@ -149,7 +149,7 @@ export default class UpdateInputVisitor<Result>
 		context: Context,
 		input: Input.UpdateManyRelationInput | undefined
 	): Promise<undefined | Result[]> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		const promises: Array<Promise<Result>> = []

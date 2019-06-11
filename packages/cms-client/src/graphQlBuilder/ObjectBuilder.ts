@@ -1,4 +1,4 @@
-export default class ObjectBuilder {
+export class ObjectBuilder {
 	constructor(
 		public readonly fields: string[] = [],
 		public readonly objects: { [name: string]: ObjectBuilder } = {},

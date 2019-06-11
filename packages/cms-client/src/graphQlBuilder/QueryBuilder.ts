@@ -1,6 +1,6 @@
-import RootObjectBuilder from './RootObjectBuilder'
-import QueryCompiler from './QueryCompiler'
-import Literal from './Literal'
+import { RootObjectBuilder } from './RootObjectBuilder'
+import { QueryCompiler } from './QueryCompiler'
+import { Literal } from './Literal'
 
 class QueryBuilder {
 	query(builder: ((builder: RootObjectBuilder) => RootObjectBuilder) | RootObjectBuilder): string {
@@ -31,4 +31,4 @@ namespace QueryBuilder {
 	export type Value = AtomicValue | QueryBuilder.Object | List
 }
 
-export default QueryBuilder
+export { QueryBuilder }

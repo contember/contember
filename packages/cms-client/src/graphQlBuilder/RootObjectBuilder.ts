@@ -1,6 +1,6 @@
-import ObjectBuilder from './ObjectBuilder'
+import { ObjectBuilder } from './ObjectBuilder'
 
-export default class RootObjectBuilder {
+export class RootObjectBuilder {
 	constructor(public readonly objects: { [name: string]: ObjectBuilder } = {}) {}
 
 	public object(name: string, builder: ((builder: ObjectBuilder) => ObjectBuilder) | ObjectBuilder): RootObjectBuilder {

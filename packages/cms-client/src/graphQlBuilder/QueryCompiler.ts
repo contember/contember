@@ -1,8 +1,8 @@
-import ObjectBuilder from './ObjectBuilder'
-import Literal from './Literal'
-import RootObjectBuilder from './RootObjectBuilder'
+import { ObjectBuilder } from './ObjectBuilder'
+import { Literal } from './Literal'
+import { RootObjectBuilder } from './RootObjectBuilder'
 
-export default class QueryCompiler {
+export class QueryCompiler {
 	constructor(private operation: 'query' | 'mutation', private builder: RootObjectBuilder) {}
 
 	public create(): string {

@@ -1,3 +1,3 @@
-export default class Literal {
+export class Literal {
 	constructor(public readonly value: string) {}
 }

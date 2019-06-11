@@ -1,12 +1,11 @@
-import ObjectBuilder from '../graphQlBuilder/ObjectBuilder'
-import Literal from '../graphQlBuilder/Literal'
-
 import { Input } from 'cms-common'
+import { Literal, ObjectBuilder } from '../graphQlBuilder'
+import { UnboundedGetQueryBuilder } from './UnboundedGetQueryBuilder'
 
-export default class DeleteBuilder {
+export class DeleteBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	where(by: Input.UniqueWhere<Literal>) {
+	by(by: Input.UniqueWhere<Literal>) {
 		return new DeleteBuilder(this.objectBuilder.argument('by', by))
 	}
 
@@ -14,10 +13,23 @@ export default class DeleteBuilder {
 		return new DeleteBuilder(this.objectBuilder.field(name))
 	}
 
-	relation(name: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder)) {
-		if (!(builder instanceof ObjectBuilder)) {
-			builder = builder(new ObjectBuilder())
+	inlineFragment(
+		typeName: string,
+		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder)
+	) {
+		if (!(builder instanceof UnboundedGetQueryBuilder)) {
+			builder = builder(new UnboundedGetQueryBuilder())
 		}
-		return new DeleteBuilder(this.objectBuilder.object(name, builder))
+		return new DeleteBuilder(this.objectBuilder.fragment(typeName, builder.objectBuilder))
+	}
+
+	relation(
+		name: string,
+		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder)
+	) {
+		if (!(builder instanceof UnboundedGetQueryBuilder)) {
+			builder = builder(new UnboundedGetQueryBuilder())
+		}
+		return new DeleteBuilder(this.objectBuilder.object(name, builder.objectBuilder))
 	}
 }

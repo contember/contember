@@ -1,30 +1,35 @@
-import ObjectBuilder from '../graphQlBuilder/ObjectBuilder'
-import Literal from '../graphQlBuilder/Literal'
-
 import { Input } from 'cms-common'
+import { Literal, ObjectBuilder } from '../graphQlBuilder'
+import { UnboundedGetQueryBuilder } from './UnboundedGetQueryBuilder'
 
-export default class ListQueryBuilder {
+export class ListQueryBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
 	filter(where: Input.Where<Input.Condition<Input.ColumnValue<Literal>>>) {
 		return new ListQueryBuilder(this.objectBuilder.argument('filter', where))
 	}
 
-	by(where: Input.UniqueWhere<Literal>) {
-		return new ListQueryBuilder(this.objectBuilder.argument('by', where))
-	}
-
 	column(name: string) {
 		return new ListQueryBuilder(this.objectBuilder.field(name))
 	}
 
+	inlineFragment(
+		typeName: string,
+		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder)
+	) {
+		if (!(builder instanceof UnboundedGetQueryBuilder)) {
+			builder = builder(new UnboundedGetQueryBuilder())
+		}
+		return new ListQueryBuilder(this.objectBuilder.fragment(typeName, builder.objectBuilder))
+	}
+
 	relation(
 		name: string,
-		builder: ListQueryBuilder | ((builder: ListQueryBuilder) => ListQueryBuilder),
+		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder),
 		alias?: string
 	) {
-		if (!(builder instanceof ListQueryBuilder)) {
-			builder = builder(new ListQueryBuilder())
+		if (!(builder instanceof UnboundedGetQueryBuilder)) {
+			builder = builder(new UnboundedGetQueryBuilder())
 		}
 
 		const [objectName, objectBuilder] =

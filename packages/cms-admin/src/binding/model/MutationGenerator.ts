@@ -16,8 +16,7 @@ import {
 	RootAccessor
 } from '../dao'
 
-type Queries = 'get' | 'list'
-type QueryBuilder = Pick<CrudQueryBuilder.CrudQueryBuilder, Exclude<keyof CrudQueryBuilder.CrudQueryBuilder, Queries>>
+type QueryBuilder = CrudQueryBuilder.OmitMethods<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
 export class MutationGenerator {
 	private createCounter: number = 0
@@ -114,7 +113,7 @@ export class MutationGenerator {
 					where = constraints.where
 				}
 
-				return builder.where({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
+				return builder.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
 			`delete${entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`
 		)
@@ -148,7 +147,7 @@ export class MutationGenerator {
 					where = constraints.where
 				}
 
-				builder = builder.where({ ...where, [PRIMARY_KEY_NAME]: primaryKey })
+				builder = builder.by({ ...where, [PRIMARY_KEY_NAME]: primaryKey })
 
 				return builder.data(builder => this.registerUpdateMutationPart(entity, entityFields, data, builder))
 			},

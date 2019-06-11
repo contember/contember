@@ -1,10 +1,10 @@
-import DataBuilder from './DataBuilder'
-import CreateDataBuilder from './CreateDataBuilder'
-import Literal from '../graphQlBuilder/Literal'
+import { DataBuilder } from './DataBuilder'
+import { CreateDataBuilder } from './CreateDataBuilder'
+import { Literal } from '../graphQlBuilder'
 
 import { Input } from 'cms-common'
 
-export default class CreateOneRelationBuilder<
+export class CreateOneRelationBuilder<
 	D extends Input.CreateOneRelationInput<Literal> | undefined = Input.CreateOneRelationInput<Literal>
 > {
 	constructor(public readonly data: D = undefined as D) {}

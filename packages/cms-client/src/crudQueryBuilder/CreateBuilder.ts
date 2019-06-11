@@ -1,10 +1,10 @@
 import { Input } from 'cms-common'
-import Literal from '../graphQlBuilder/Literal'
-import ObjectBuilder from '../graphQlBuilder/ObjectBuilder'
-import CreateDataBuilder from './CreateDataBuilder'
-import DataBuilder from './DataBuilder'
+import { Literal, ObjectBuilder } from '../graphQlBuilder'
+import { CreateDataBuilder } from './CreateDataBuilder'
+import { DataBuilder } from './DataBuilder'
+import { UnboundedGetQueryBuilder } from './UnboundedGetQueryBuilder'
 
-export default class CreateBuilder {
+export class CreateBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
 	data(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {
@@ -16,10 +16,25 @@ export default class CreateBuilder {
 		return new CreateBuilder(this.objectBuilder.field(name))
 	}
 
-	relation(name: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder)) {
+	inlineFragment(typeName: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder)) {
 		if (!(builder instanceof ObjectBuilder)) {
 			builder = builder(new ObjectBuilder())
 		}
-		return new CreateBuilder(this.objectBuilder.object(name, builder))
+		return new CreateBuilder(this.objectBuilder.fragment(typeName, builder))
+	}
+
+	relation(
+		name: string,
+		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder),
+		alias?: string
+	) {
+		if (!(builder instanceof UnboundedGetQueryBuilder)) {
+			builder = builder(new UnboundedGetQueryBuilder())
+		}
+
+		const [objectName, objectBuilder] =
+			typeof alias === 'string' ? [alias, builder.objectBuilder.name(name)] : [name, builder.objectBuilder]
+
+		return new CreateBuilder(this.objectBuilder.object(objectName, objectBuilder))
 	}
 }

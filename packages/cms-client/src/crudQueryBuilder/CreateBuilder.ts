@@ -2,7 +2,6 @@ import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
 import { CreateDataBuilder } from './CreateDataBuilder'
 import { DataBuilder } from './DataBuilder'
-import { UnboundedGetQueryBuilder } from './UnboundedGetQueryBuilder'
 
 export class CreateBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}

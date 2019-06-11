@@ -1,7 +1,6 @@
 import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
 import { DataBuilder } from './DataBuilder'
-import { UnboundedGetQueryBuilder } from './UnboundedGetQueryBuilder'
 import { UpdateDataBuilder } from './UpdateDataBuilder'
 
 export class UpdateBuilder {

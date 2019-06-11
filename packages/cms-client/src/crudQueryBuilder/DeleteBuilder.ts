@@ -1,6 +1,5 @@
 import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
-import { UnboundedGetQueryBuilder } from './UnboundedGetQueryBuilder'
 
 export class DeleteBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}

@@ -28,4 +28,4 @@ namespace DataBuilder {
 	}
 }
 
-export default DataBuilder
+export { DataBuilder }

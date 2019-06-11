@@ -7,7 +7,7 @@ describe('crud query builder', () => {
 		const builder = new CrudQueryBuilder.CrudQueryBuilder()
 			.update('updatePost', builder =>
 				builder
-					.where({ id: '123' })
+					.by({ id: '123' })
 					.data(data =>
 						data
 							.set('name', 'John')
@@ -22,9 +22,10 @@ describe('crud query builder', () => {
 							.one('author', { create: { name: 'John' } })
 					)
 					.column('id')
-					.relation('author', o => o.field('name'))
+					.inlineFragment('Foo', builder => builder.column('bar'))
+					.relation('author', o => o.column('name'))
 			)
-			.delete('deleteCategory', new CrudQueryBuilder.DeleteBuilder().where({ id: '123' }).column('id'))
+			.delete('deleteCategory', new CrudQueryBuilder.DeleteBuilder().by({ id: '123' }).column('id'))
 			.create('createAuthor', builder =>
 				builder
 					.column('name')
@@ -38,6 +39,9 @@ describe('crud query builder', () => {
 		expect(builder.getGql()).equals(`mutation {
 	updatePost(by: {id: "123"}, data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}}, {create: {name: "foo"}}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}) {
 		id
+		... on Foo {
+			bar
+		}
 		author {
 			name
 		}
@@ -58,7 +62,7 @@ describe('crud query builder', () => {
 				q
 					.filter({ foo: { eq: 'bar' } })
 					.column('title')
-					.relation('author', o => o.column('name')),
+					.hasOneRelation('author', o => o.column('name')),
 			'myPostsAlias'
 		)
 		expect(builder.getGql()).equals(`query {

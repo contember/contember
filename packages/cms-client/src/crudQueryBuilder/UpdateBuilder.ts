@@ -1,14 +1,14 @@
 import { Input } from 'cms-common'
-import Literal from '../graphQlBuilder/Literal'
-import ObjectBuilder from '../graphQlBuilder/ObjectBuilder'
-import DataBuilder from './DataBuilder'
-import UpdateDataBuilder from './UpdateDataBuilder'
+import { Literal, ObjectBuilder } from '../graphQlBuilder'
+import { DataBuilder } from './DataBuilder'
+import { UnboundedGetQueryBuilder } from './UnboundedGetQueryBuilder'
+import { UpdateDataBuilder } from './UpdateDataBuilder'
 
-export default class UpdateBuilder {
+export class UpdateBuilder {
 	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	where(where: Input.UniqueWhere<Literal>) {
-		return new UpdateBuilder(this.objectBuilder.argument('by', where))
+	by(by: Input.UniqueWhere<Literal>) {
+		return new UpdateBuilder(this.objectBuilder.argument('by', by))
 	}
 
 	data(data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>) {
@@ -20,10 +20,23 @@ export default class UpdateBuilder {
 		return new UpdateBuilder(this.objectBuilder.field(name))
 	}
 
-	relation(name: string, builder: ObjectBuilder | ((builder: ObjectBuilder) => ObjectBuilder)) {
-		if (!(builder instanceof ObjectBuilder)) {
-			builder = builder(new ObjectBuilder())
+	inlineFragment(
+		typeName: string,
+		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder)
+	) {
+		if (!(builder instanceof UnboundedGetQueryBuilder)) {
+			builder = builder(new UnboundedGetQueryBuilder())
 		}
-		return new UpdateBuilder(this.objectBuilder.object(name, builder))
+		return new UpdateBuilder(this.objectBuilder.fragment(typeName, builder.objectBuilder))
+	}
+
+	relation(
+		name: string,
+		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder)
+	) {
+		if (!(builder instanceof UnboundedGetQueryBuilder)) {
+			builder = builder(new UnboundedGetQueryBuilder())
+		}
+		return new UpdateBuilder(this.objectBuilder.object(name, builder.objectBuilder))
 	}
 }

@@ -1,10 +1,10 @@
 import { Input } from 'cms-common'
-import Literal from '../graphQlBuilder/Literal'
-import CreateDataBuilder from './CreateDataBuilder'
-import DataBuilder from './DataBuilder'
-import UpdateDataBuilder from './UpdateDataBuilder'
+import { Literal } from '../graphQlBuilder'
+import { CreateDataBuilder } from './CreateDataBuilder'
+import { DataBuilder } from './DataBuilder'
+import { UpdateDataBuilder } from './UpdateDataBuilder'
 
-export default class UpdateManyRelationBuilder {
+export class UpdateManyRelationBuilder {
 	constructor(public readonly data: Input.UpdateManyRelationInput<Literal> = []) {}
 
 	public create(data: DataBuilder.DataLike<Input.CreateDataInput<Literal>, CreateDataBuilder>) {

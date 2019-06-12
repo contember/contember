@@ -1,5 +1,5 @@
 import { assertNever, Validation } from 'cms-common'
-import * as validation from './index'
+import { InContextOperation } from './ValidationDefinition'
 
 class DependencyCollector {
 	public collect(validator: Validation.Validator): DependencyCollector.Dependencies {
@@ -23,7 +23,7 @@ class DependencyCollector {
 	}
 
 	private doCollect(validator: Validation.Validator, prefix: string[]): DependencyCollector.DependenciesList {
-		if (validator.operation === validation.InContextOperation) {
+		if (validator.operation === InContextOperation) {
 			const validatorArg = validator.args[1] as Validation.ValidatorArgument
 			const pathArg = validator.args[0] as Validation.PathArgument
 

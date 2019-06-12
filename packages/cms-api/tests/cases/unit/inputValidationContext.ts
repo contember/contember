@@ -6,6 +6,9 @@ import schema from '../../example-project/src'
 import ValidationDataSelector from '../../../src/content-api/input-validation/ValidationDataSelector'
 import { createMock } from '../../../src/utils/testing'
 import DependencyCollector from '../../../src/content-api/input-validation/DependencyCollector'
+import sinon from 'sinon'
+import * as uuid from '../../../src/utils/uuid'
+import { testUuid, withMockedUuid } from '../../src/testUuid'
 
 type PrimaryValueExpectation = { entity: string; where: Input.UniqueWhere; result: Value.PrimaryValue }
 type SelectExpectation = {
@@ -64,18 +67,20 @@ const test = async (test: Test) => {
 		schema.model,
 		createDataSelectorMock(test.primaryValues || [], test.selects || [])
 	)
-	if ('createInput' in test) {
-		const result = await contextFactory.createForCreate(test.entity, test.createInput, test.dependencies)
-		expect(result).deep.eq(test.result)
-	} else {
-		const result = await contextFactory.createForUpdate(
-			test.entity,
-			test.nodeInput,
-			test.updateInput,
-			test.dependencies
-		)
-		expect(result).deep.eq(test.result)
-	}
+	await withMockedUuid(async () => {
+		if ('createInput' in test) {
+			const result = await contextFactory.createForCreate(test.entity, test.createInput, test.dependencies)
+			expect(result).deep.eq(test.result)
+		} else {
+			const result = await contextFactory.createForUpdate(
+				test.entity,
+				test.nodeInput,
+				test.updateInput,
+				test.dependencies
+			)
+			expect(result).deep.eq(test.result)
+		}
+	})
 }
 
 describe('input validation context', () => {
@@ -263,7 +268,7 @@ describe('input validation context', () => {
 						title: 'Update post',
 					},
 					{
-						id: undefined,
+						id: testUuid(1),
 						tags: [
 							{
 								label: 'DB label 201',

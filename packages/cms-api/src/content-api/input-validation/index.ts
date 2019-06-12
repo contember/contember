@@ -153,6 +153,9 @@ const validatorEvaluators: Record<string, (context: AnyContext, ...args: any[]) 
 		if (isNodeListContext(context)) {
 			return context.nodes.length === 0
 		}
+		if (isNodeContext(context) && !isValueContext(context)) {
+			return false
+		}
 		const value = getValueFromContext(context)
 		return !value
 	},

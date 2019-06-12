@@ -8,6 +8,8 @@ import { SchemaBuilder } from '../../../src'
 import DependencyCollector from '../../../src/content-api/input-validation/DependencyCollector'
 import QueryAstFactory from '../../../src/content-api/input-validation/QueryAstFactory'
 import DependencyMerger from '../../../src/content-api/input-validation/DependencyMerger'
+import { evaluateValidation } from '../../../src/content-api/input-validation/ValidationEvaluation'
+import ValidationContext from '../../../src/content-api/input-validation/ValidationContext'
 
 describe('input validation', () => {
 	it('evaluates rule', () => {
@@ -26,9 +28,9 @@ describe('input validation', () => {
 			published: true,
 		}
 
-		const context = validation.createRootContext(author)
+		const context = ValidationContext.createRootContext(author)
 
-		expect(validation.evaluate(context, rule)).eq(true)
+		expect(evaluateValidation(context, rule)).eq(true)
 	})
 
 	it('evaluates collection length rule', () => {
@@ -38,9 +40,9 @@ describe('input validation', () => {
 			tags: [{ value: 'abc' }, { value: 'xyz' }],
 		}
 
-		const context = validation.createRootContext(author)
+		const context = ValidationContext.createRootContext(author)
 
-		expect(validation.evaluate(context, rule)).eq(true)
+		expect(evaluateValidation(context, rule)).eq(true)
 	})
 
 	it('collects dependencies', () => {

@@ -3,7 +3,6 @@ import DependencyCollector from './DependencyCollector'
 import DependencyMerger from './DependencyMerger'
 import { acceptEveryFieldVisitor } from '../../content-schema/modelUtils'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
-import { createRootContext, evaluate, NodeContext, rules } from './index'
 import { tuple } from '../../utils/tuple'
 import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
 import UpdateInputValidationProcessor from './UpdateInputValidationProcessor'
@@ -12,6 +11,9 @@ import ValidationDataSelector from './ValidationDataSelector'
 import CreateInputValidationProcessor from './CreateInputValidationProcessor'
 import UpdateInputProcessor from '../inputProcessing/UpdateInputProcessor'
 import CreateInputProcessor from '../inputProcessing/CreateInputProcessor'
+import ValidationContext from './ValidationContext'
+import { evaluateValidation } from './ValidationEvaluation'
+import { rules } from './ValidationDefinition'
 
 type Path = (string | number)[]
 
@@ -141,7 +143,9 @@ class InputValidator {
 
 		const dependencies = this.buildDependencies(fieldsWithRules, entityRules)
 
-		const context = createRootContext(await this.validationContextFactory.createForCreate(entity, data, dependencies))
+		const context = ValidationContext.createRootContext(
+			await this.validationContextFactory.createForCreate(entity, data, dependencies)
+		)
 
 		const fieldsResult = this.validateFields(fieldsWithRules, entityRules, context, path)
 
@@ -170,7 +174,7 @@ class InputValidator {
 		let fieldsResult: InputValidator.Result = []
 		const node = (await this.validationContextFactory.createForUpdate(entity, { where }, data, dependencies)) || {}
 		if (fieldsWithRules.length > 0) {
-			const context = createRootContext(node)
+			const context = ValidationContext.createRootContext(node)
 			fieldsResult = this.validateFields(fieldsWithRules, entityRules, context, path)
 		}
 
@@ -186,11 +190,16 @@ class InputValidator {
 		return (fields || Object.keys(entityRules)).filter(field => entityRules[field] && entityRules[field].length > 0)
 	}
 
-	private validateFields(fields: string[], entityRules: Validation.EntityRules, context: NodeContext, path: Path) {
+	private validateFields(
+		fields: string[],
+		entityRules: Validation.EntityRules,
+		context: ValidationContext.NodeContext,
+		path: Path
+	) {
 		return fields
 			.map(field => tuple(field, entityRules[field]))
 			.map(([field, fieldRules]) =>
-				tuple(field, fieldRules.find(it => !evaluate(context, rules.on(field, it.validator))))
+				tuple(field, fieldRules.find(it => !evaluateValidation(context, rules.on(field, it.validator))))
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])
 			.map(([field, { message }]) => ({ path: [...path, field], message }))

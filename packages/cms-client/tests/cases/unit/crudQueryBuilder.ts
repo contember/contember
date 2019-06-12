@@ -1,13 +1,13 @@
 import 'mocha'
 import { CrudQueryBuilder } from '../../../src'
 import { expect } from 'chai'
+import { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
 
 describe('crud query builder', () => {
 	it('complex mutation', () => {
 		const builder = new CrudQueryBuilder.CrudQueryBuilder()
 			.update('updatePost', builder =>
 				builder
-					.by({ id: '123' })
 					.data(data =>
 						data
 							.set('name', 'John')
@@ -21,23 +21,29 @@ describe('crud query builder', () => {
 							.many('locales', [{ update: { by: { id: '123' }, data: { foo: 'bar' } } }])
 							.one('author', { create: { name: 'John' } })
 					)
+					.by({ id: '123' })
 					.column('id')
 					.inlineFragment('Foo', builder => builder.column('bar'))
-					.relation('author', o => o.column('name'))
+					.hasOneRelation('author', o => o.column('name'))
 			)
-			.delete('deleteCategory', new CrudQueryBuilder.DeleteBuilder().by({ id: '123' }).column('id'))
+			.delete(
+				'deleteCategory',
+				CrudQueryBuilder.ReadBuilder.create<DeleteMutationArguments>()
+					.by({ id: '123' })
+					.column('id')
+			)
 			.create('createAuthor', builder =>
 				builder
-					.column('name')
 					.data(builder =>
 						builder
 							.set('name', 'John')
 							.many('posts', builder => builder.connect({ id: '456' }).create(builder => builder.set('title', 'Abcd')))
 					)
+					.column('name')
 			)
 
 		expect(builder.getGql()).equals(`mutation {
-	updatePost(by: {id: "123"}, data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}}, {create: {name: "foo"}}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}) {
+	updatePost(data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}}, {create: {name: "foo"}}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}, by: {id: "123"}) {
 		id
 		... on Foo {
 			bar

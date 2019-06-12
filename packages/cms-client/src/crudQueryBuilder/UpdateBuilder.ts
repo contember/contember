@@ -1,41 +1,49 @@
-import { Input } from 'cms-common'
+import { Input, OmitMethods } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
 import { DataBuilder } from './DataBuilder'
+import { ReadBuilder } from './ReadBuilder'
+import { SupportedArguments } from './types'
 import { UpdateDataBuilder } from './UpdateDataBuilder'
 
-export class UpdateBuilder {
-	constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
-
-	by(by: Input.UniqueWhere<Literal>) {
-		return new UpdateBuilder(this.objectBuilder.argument('by', by))
+class UpdateBuilder<AllowedArgs extends SupportedArguments> extends ReadBuilder<AllowedArgs> {
+	public static create<AllowedArgs extends SupportedArguments = SupportedArguments>(
+		objectBuilder: ObjectBuilder = new ObjectBuilder()
+	): UpdateBuilder.Builder<AllowedArgs> {
+		return new UpdateBuilder<AllowedArgs>(objectBuilder)
 	}
 
-	data(data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>) {
+	public static createFromFactory<AllowedArgs extends SupportedArguments>(
+		builder: UpdateBuilder.BuilderFactory<AllowedArgs>
+	): UpdateBuilder.Builder<never> {
+		if (typeof builder === 'function') {
+			return builder(UpdateBuilder.create())
+		}
+		return builder
+	}
+
+	protected create<AA extends SupportedArguments = SupportedArguments>(
+		objectBuilder: ObjectBuilder = new ObjectBuilder()
+	): UpdateBuilder.Builder<AA> {
+		return UpdateBuilder.create<AA>(objectBuilder)
+	}
+
+	public data(data: DataBuilder.DataLike<Input.UpdateDataInput<Literal>, UpdateDataBuilder>) {
 		const resolvedData = DataBuilder.resolveData(data, UpdateDataBuilder)
-		return resolvedData === undefined ? this : new UpdateBuilder(this.objectBuilder.argument('data', resolvedData))
-	}
 
-	column(name: string) {
-		return new UpdateBuilder(this.objectBuilder.field(name))
-	}
-
-	inlineFragment(
-		typeName: string,
-		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder)
-	) {
-		if (!(builder instanceof UnboundedGetQueryBuilder)) {
-			builder = builder(new UnboundedGetQueryBuilder())
-		}
-		return new UpdateBuilder(this.objectBuilder.fragment(typeName, builder.objectBuilder))
-	}
-
-	relation(
-		name: string,
-		builder: UnboundedGetQueryBuilder | ((builder: UnboundedGetQueryBuilder) => UnboundedGetQueryBuilder)
-	) {
-		if (!(builder instanceof UnboundedGetQueryBuilder)) {
-			builder = builder(new UnboundedGetQueryBuilder())
-		}
-		return new UpdateBuilder(this.objectBuilder.object(name, builder.objectBuilder))
+		return this.create<Exclude<AllowedArgs, 'data'>>(
+			resolvedData === undefined ? this.objectBuilder : this.objectBuilder.argument('data', resolvedData)
+		)
 	}
 }
+
+namespace UpdateBuilder {
+	export type Builder<AllowedArgs extends SupportedArguments> = OmitMethods<
+		UpdateBuilder<AllowedArgs>,
+		Exclude<SupportedArguments, AllowedArgs>
+	>
+	export type BuilderFactory<AllowedArgs extends SupportedArguments> =
+		| Builder<never>
+		| ((builder: Builder<AllowedArgs>) => Builder<never>)
+}
+
+export { UpdateBuilder }

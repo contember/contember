@@ -33,6 +33,7 @@ export class CrudQueryBuilder {
 		if (this.type === 'mutation') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
+		name = `list${name}`
 		query = ReadBuilder.createFromFactory(query)
 
 		const [objectName, objectBuilder] =
@@ -49,6 +50,7 @@ export class CrudQueryBuilder {
 		if (this.type === 'mutation') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
+		name = `get${name}`
 		query = ReadBuilder.createFromFactory(query)
 
 		const [objectName, objectBuilder] =
@@ -65,6 +67,7 @@ export class CrudQueryBuilder {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
+		name = `update${name}`
 		query = UpdateBuilder.createFromFactory(query)
 
 		if (isEmptyObject(query.objectBuilder.args.data)) {
@@ -85,6 +88,7 @@ export class CrudQueryBuilder {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
+		name = `create${name}`
 		query = CreateBuilder.createFromFactory(query)
 
 		if (isEmptyObject(query.objectBuilder.args.data)) {
@@ -105,6 +109,7 @@ export class CrudQueryBuilder {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
+		name = `delete${name}`
 		query = ReadBuilder.createFromFactory(query)
 
 		const [objectName, objectBuilder] =

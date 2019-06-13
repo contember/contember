@@ -59,7 +59,7 @@ export class QueryGenerator {
 		)
 
 		return populatedBaseQueryBuilder.get(
-			`get${subTree.entityName}`,
+			subTree.entityName,
 			CrudQueryBuilder.ReadBuilder.create(
 				populatedListQueryBuilder ? populatedListQueryBuilder.objectBuilder : undefined
 			),
@@ -71,19 +71,18 @@ export class QueryGenerator {
 		baseQueryBuilder: BaseQueryBuilder,
 		subTree: MarkerTreeRoot<EntityListTreeConstraints>
 	): BaseQueryBuilder {
-		const ReadBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.SupportedArguments, 'filter'>> =
+		const builder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.SupportedArguments, 'filter'>> =
 			subTree.constraints && subTree.constraints.filter
 				? CrudQueryBuilder.ReadBuilder.create().filter(subTree.constraints.filter)
 				: CrudQueryBuilder.ReadBuilder.create()
 
 		const [newBaseQueryBuilder, newReadBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerQueryPart(subTree.fields, ReadBuilder)
+			this.registerQueryPart(subTree.fields, builder)
 		)
 
-		// This naming convention is unfortunate & temporary
 		return newBaseQueryBuilder.list(
-			`list${subTree.entityName}`,
+			subTree.entityName,
 			newReadBuilder || CrudQueryBuilder.ReadBuilder.create(),
 			subTree.id
 		)

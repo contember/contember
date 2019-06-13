@@ -1,5 +1,6 @@
 import { CrudQueryBuilder } from 'cms-client'
-import { assertNever, ucfirst } from 'cms-common'
+import { GetQueryArguments } from 'cms-client/dist/src/crudQueryBuilder'
+import { assertNever, OmitMethods, ucfirst } from 'cms-common'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFields,
@@ -11,7 +12,7 @@ import {
 	SingleEntityTreeConstraints
 } from '../dao'
 
-type BaseQueryBuilder = CrudQueryBuilder.OmitMethods<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
+type BaseQueryBuilder = OmitMethods<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
 
 type ReadBuilder = CrudQueryBuilder.ReadBuilder.Builder<never>
 
@@ -49,12 +50,11 @@ export class QueryGenerator {
 		baseQueryBuilder: BaseQueryBuilder,
 		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>
 	): BaseQueryBuilder {
-		const boundedQueryBuilder = new CrudQueryBuilder.UnboundedGetQueryBuilder().by(subTree.constraints.where)
 		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
 			this.registerQueryPart(
 				subTree.fields,
-				CrudQueryBuilder.ReadBuilder.create(boundedQueryBuilder.objectBuilder)
+				CrudQueryBuilder.ReadBuilder.create<GetQueryArguments>().by(subTree.constraints.where)
 			)
 		)
 
@@ -71,9 +71,7 @@ export class QueryGenerator {
 		baseQueryBuilder: BaseQueryBuilder,
 		subTree: MarkerTreeRoot<EntityListTreeConstraints>
 	): BaseQueryBuilder {
-		const ReadBuilder: CrudQueryBuilder.ReadBuilder.Builder<
-			Exclude<CrudQueryBuilder.SupportedArguments, 'filter'>
-		> =
+		const ReadBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.SupportedArguments, 'filter'>> =
 			subTree.constraints && subTree.constraints.filter
 				? CrudQueryBuilder.ReadBuilder.create().filter(subTree.constraints.filter)
 				: CrudQueryBuilder.ReadBuilder.create()

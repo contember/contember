@@ -10,15 +10,19 @@ export class QueryCompiler {
 	}
 
 	private formatRootObject(builder: RootObjectBuilder): string {
-		return Object.keys(builder.objects)
-			.flatMap(alias => this.formatObject(alias, builder.objects[alias]).map(val => '\t' + val))
-			.join('\n')
+		const lines: string[] = []
+
+		for (const alias in builder.objects) {
+			lines.push(...this.formatObject(alias, builder.objects[alias]).map(val => `\t${val}`))
+		}
+
+		return lines.join('\n')
 	}
 
 	private formatObject(alias: string, builder: ObjectBuilder): string[] {
 		const result = []
 
-		result.push(alias + (builder.objectName ? `: ${builder.objectName}` : '') + this.formatArgs(builder.args, 0) + ' {')
+		result.push(`${alias}${builder.objectName ? `: ${builder.objectName}` : ''}${this.formatArgs(builder.args, 0)} {`)
 
 		result.push(...this.formatObjectBody(builder))
 
@@ -39,7 +43,7 @@ export class QueryCompiler {
 		for (const alias in builder.objects) {
 			result.push(...this.formatObject(alias, builder.objects[alias]))
 		}
-		return result.map(val => '\t' + val)
+		return result.map(val => `\t${val}`)
 	}
 
 	private formatArgs(args: any, level: number): string {
@@ -60,7 +64,7 @@ export class QueryCompiler {
 
 		if (Array.isArray(args)) {
 			const vals = args.map(val => this.formatArgs(val, level + 1))
-			return '[' + vals.join(', ') + ']'
+			return `[${vals.join(', ')}]`
 		}
 		if (args instanceof Literal) {
 			return args.value

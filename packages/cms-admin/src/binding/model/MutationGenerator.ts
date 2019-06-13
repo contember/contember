@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
-import { assertNever, Input, isEmptyObject } from 'cms-common'
+import { assertNever, Input, isEmptyObject, OmitMethods } from 'cms-common'
 import { EntityName, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
@@ -16,7 +16,7 @@ import {
 	RootAccessor
 } from '../dao'
 
-type QueryBuilder = CrudQueryBuilder.OmitMethods<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
+type QueryBuilder = OmitMethods<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
 export class MutationGenerator {
 	private createCounter: number = 0
@@ -140,16 +140,15 @@ export class MutationGenerator {
 		return queryBuilder.update(
 			`update${entityName}`,
 			builder => {
-				builder = builder.column(PRIMARY_KEY_NAME)
-
 				let where = {}
 				if (constraints && constraints.whereType === 'unique') {
 					where = constraints.where
 				}
 
-				builder = builder.by({ ...where, [PRIMARY_KEY_NAME]: primaryKey })
-
-				return builder.data(builder => this.registerUpdateMutationPart(entity, entityFields, data, builder))
+				return builder
+					.data(builder => this.registerUpdateMutationPart(entity, entityFields, data, builder))
+					.column(PRIMARY_KEY_NAME)
+					.by({ ...where, [PRIMARY_KEY_NAME]: primaryKey })
 			},
 			`update${entityName}_${this.primaryKeyToAlias(primaryKey)}`
 		)
@@ -169,17 +168,17 @@ export class MutationGenerator {
 		return queryBuilder.create(
 			`create${entityName}`,
 			builder => {
-				builder = builder.column(PRIMARY_KEY_NAME)
-
-				return builder.data(
-					this.registerCreateMutationPart(
-						entity,
-						entityFields,
-						new CrudQueryBuilder.CreateDataBuilder(
-							constraints && constraints.whereType === 'unique' ? constraints.where : undefined
+				return builder
+					.data(
+						this.registerCreateMutationPart(
+							entity,
+							entityFields,
+							new CrudQueryBuilder.CreateDataBuilder(
+								constraints && constraints.whereType === 'unique' ? constraints.where : undefined
+							)
 						)
 					)
-				)
+					.column(PRIMARY_KEY_NAME)
 			},
 			`create${entityName}_${(this.createCounter++).toFixed(0)}`
 		)

@@ -104,7 +104,7 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.delete(
-			`delete${entityName}`,
+			entityName,
 			builder => {
 				builder = builder.column(PRIMARY_KEY_NAME)
 
@@ -138,7 +138,7 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.update(
-			`update${entityName}`,
+			entityName,
 			builder => {
 				let where = {}
 				if (constraints && constraints.whereType === 'unique') {
@@ -166,7 +166,7 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.create(
-			`create${entityName}`,
+			entityName,
 			builder => {
 				return builder
 					.data(

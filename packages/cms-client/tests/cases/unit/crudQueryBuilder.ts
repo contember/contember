@@ -6,7 +6,7 @@ import { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
 describe('crud query builder', () => {
 	it('complex mutation', () => {
 		const builder = new CrudQueryBuilder.CrudQueryBuilder()
-			.update('updatePost', builder =>
+			.update('Post', builder =>
 				builder
 					.data(data =>
 						data
@@ -27,12 +27,12 @@ describe('crud query builder', () => {
 					.hasOneRelation('author', o => o.column('name'))
 			)
 			.delete(
-				'deleteCategory',
+				'Category',
 				CrudQueryBuilder.ReadBuilder.create<DeleteMutationArguments>()
 					.by({ id: '123' })
 					.column('id')
 			)
-			.create('createAuthor', builder =>
+			.create('Author', builder =>
 				builder
 					.data(builder =>
 						builder
@@ -72,7 +72,7 @@ describe('crud query builder', () => {
 			'myPostsAlias'
 		)
 		expect(builder.getGql()).equals(`query {
-	myPostsAlias: Posts(filter: {foo: {eq: "bar"}}) {
+	myPostsAlias: listPosts(filter: {foo: {eq: "bar"}}) {
 		title
 		author {
 			name

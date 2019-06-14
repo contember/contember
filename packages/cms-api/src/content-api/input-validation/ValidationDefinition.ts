@@ -15,7 +15,7 @@ const ArgumentFactory = {
 		type: Validation.ArgumentType.path,
 		path: ValidationContext.parsePath(path),
 	}),
-	literal: (value: any): Validation.LiteralArgument => ({ type: Validation.ArgumentType.literal, value }),
+	literal: <V = any>(value: V): Validation.LiteralArgument<V> => ({ type: Validation.ArgumentType.literal, value }),
 }
 
 const RuleMetaKey = Symbol('Rule')
@@ -67,7 +67,7 @@ class RuleBranch {
 		return result
 	}
 
-	assertPattern = (pattern: string, message: MessageOrString) => {
+	assertPattern = (pattern: RegExp, message: MessageOrString) => {
 		return this.assert(rules.pattern(pattern), message)
 	}
 
@@ -89,7 +89,7 @@ const conditionalOperation = (condition: Validation.Validator, rule: Validation.
 	args: [ArgumentFactory.validator(condition), ArgumentFactory.validator(rule)],
 })
 
-const patternOperation = (pattern: string): Validation.Validator => ({
+const patternOperation = (pattern: RegExp): Validation.Validator => ({
 	operation: 'pattern',
 	args: [ArgumentFactory.literal(pattern)],
 })
@@ -170,7 +170,7 @@ export function required(message: MessageOrString): PropertyDecorator {
 	return combine(requiredOrOptional(true), assert(rules.notEmpty(), message))
 }
 
-export const assertPattern = (pattern: string, message: MessageOrString) => fluent().assertPattern(pattern, message)
+export const assertPattern = (pattern: RegExp, message: MessageOrString) => fluent().assertPattern(pattern, message)
 export const assertMinLength = (min: number, message: MessageOrString) => fluent().assertMinLength(min, message)
 
 export const combine = (...decorators: PropertyDecorator[]): PropertyDecorator => (target, propertyKey) =>

@@ -22,10 +22,15 @@ const getValueFromContext = (context: ValidationContext.AnyContext): any => {
 }
 
 export const evaluateValidation = (context: ValidationContext.AnyContext, validator: Validation.Validator): boolean => {
-	return validatorEvaluators[validator.operation](context, ...validator.args)
+	return validatorEvaluators[validator.operation](context, ...(validator.args as any[]))
 }
 
-const validatorEvaluators: Record<string, (context: ValidationContext.AnyContext, ...args: any[]) => boolean> = {
+const validatorEvaluators: {
+	[K in keyof Validation.ValidatorArguments]: (
+		context: ValidationContext.AnyContext,
+		...args: Validation.ValidatorArguments[K]
+	) => boolean
+} = {
 	empty: (context: ValidationContext.AnyContext) => {
 		if (ValidationContext.isNodeListContext(context)) {
 			return context.nodes.length === 0
@@ -60,8 +65,8 @@ const validatorEvaluators: Record<string, (context: ValidationContext.AnyContext
 	},
 	lengthRange: (
 		context: ValidationContext.AnyContext,
-		min: Validation.LiteralArgument<number>,
-		max: Validation.LiteralArgument<number>
+		min: Validation.LiteralArgument<number | undefined>,
+		max: Validation.LiteralArgument<number | undefined>
 	) => {
 		let value: number
 		if (ValidationContext.isValueContext(context)) {

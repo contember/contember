@@ -69,6 +69,6 @@
 		"sass-loader": "^7.1.0",
 		"source-map-loader": "^0.2.4",
 		"style-loader": "^0.23.1",
-		"typescript": "^3.4.5"
+		"typescript": "^3.5.2"
 	}
 }

@@ -10,7 +10,7 @@
 	"devDependencies": {
 		"@types/js-yaml": "^3.11.2",
 		"@types/node": "^10.12.10",
-		"typescript": "^3.4.5"
+		"typescript": "^3.5.2"
 	},
 	"dependencies": {
 		"js-yaml": "^3.12.0"

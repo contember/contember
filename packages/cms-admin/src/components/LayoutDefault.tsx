@@ -1,7 +1,8 @@
 import * as React from 'react'
 import cn from 'classnames'
+import { TokenExposer } from './Dev'
 import LogoutLink from './LogoutLink'
-import { Avatar, AvatarSize } from './ui/Avatar'
+import { Avatar, AvatarSize } from './ui'
 import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { connect } from 'react-redux'
@@ -77,6 +78,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 							/>
 						)}
 						{this.props.header.left}
+						{<TokenExposer />}
 					</div>
 					<div className="navbar-center">{this.props.header.center}</div>
 					<div className="navbar-right">

@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
-import { assertNever, Input, isEmptyObject, OmitMethods } from 'cms-common'
+import { assertNever, Input, isEmptyObject } from 'cms-common'
 import { EntityName, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
@@ -16,7 +16,7 @@ import {
 	RootAccessor
 } from '../dao'
 
-type QueryBuilder = OmitMethods<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
+type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
 export class MutationGenerator {
 	private createCounter: number = 0

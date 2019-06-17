@@ -12,5 +12,4 @@ type Schema = {
 }
 
 export { Input, Model, Acl, Schema, Validation, Value, Result }
-export * from './types'
 export * from './utils'

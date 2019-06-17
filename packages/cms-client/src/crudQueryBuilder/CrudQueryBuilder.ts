@@ -1,4 +1,4 @@
-import { isEmptyObject, OmitMethods } from 'cms-common'
+import { isEmptyObject } from 'cms-common'
 import { QueryBuilder, RootObjectBuilder } from '../graphQlBuilder'
 import { CreateBuilder } from './CreateBuilder'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
@@ -29,7 +29,7 @@ export class CrudQueryBuilder {
 		name: string,
 		query: ReadBuilder.BuilderFactory<ListQueryArguments>,
 		alias?: string
-	): OmitMethods<CrudQueryBuilder, Mutations> {
+	): Omit<CrudQueryBuilder, Mutations> {
 		if (this.type === 'mutation') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
@@ -46,7 +46,7 @@ export class CrudQueryBuilder {
 		name: string,
 		query: ReadBuilder.BuilderFactory<GetQueryArguments>,
 		alias?: string
-	): OmitMethods<CrudQueryBuilder, Mutations> {
+	): Omit<CrudQueryBuilder, Mutations> {
 		if (this.type === 'mutation') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
@@ -63,7 +63,7 @@ export class CrudQueryBuilder {
 		name: string,
 		query: UpdateBuilder.BuilderFactory<UpdateMutationArguments>,
 		alias?: string
-	): OmitMethods<CrudQueryBuilder, Queries> {
+	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
@@ -84,7 +84,7 @@ export class CrudQueryBuilder {
 		name: string,
 		query: CreateBuilder.BuilderFactory<CreateMutationArguments>,
 		alias?: string
-	): OmitMethods<CrudQueryBuilder, Queries> {
+	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
@@ -105,7 +105,7 @@ export class CrudQueryBuilder {
 		name: string,
 		query: ReadBuilder.BuilderFactory<DeleteMutationArguments>,
 		alias?: string
-	): OmitMethods<CrudQueryBuilder, Queries> {
+	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}

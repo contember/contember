@@ -94,7 +94,9 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 
 		const cteAliases = [...this.options.with.getAliases(), ...this.cteAliases]
 		if (this.options.from !== undefined) {
-			let queryBuilder: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create(this.wrapper).withCteAliases(cteAliases)
+			let queryBuilder: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create(this.wrapper).withCteAliases(
+				cteAliases
+			)
 			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
 			queryBuilder = this.options.from(queryBuilder)
 			from = queryBuilder.createQuery()

@@ -28,7 +28,7 @@ class JunctionFetcher {
 		const joiningTable = relation.joiningTable
 
 		const whereColumn = column.sourceColumn.columnName
-		let qb: SelectBuilder = this.db
+		let qb: SelectBuilder<SelectBuilder.Result, any> = this.db
 			.selectBuilder()
 			.from(joiningTable.tableName, 'junction_')
 			.select(['junction_', joiningTable.inverseJoiningColumn.columnName])

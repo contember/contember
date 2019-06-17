@@ -16,27 +16,27 @@ class WhereBuilder {
 		private readonly db: Client
 	) {}
 
-	public build(
-		qb: SelectBuilder,
+	public build<Filled extends keyof SelectBuilder.Options>(
+		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		entity: Model.Entity,
 		path: Path,
 		where: Input.Where,
 		allowManyJoin: boolean = false
-	): SelectBuilder {
+	) {
 		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)), allowManyJoin)
 	}
 
-	public buildAdvanced(
+	public buildAdvanced<Filled extends keyof SelectBuilder.Options>(
 		entity: Model.Entity,
 		path: Path,
 		where: Input.Where,
-		callback: (clauseCb: (clause: SqlConditionBuilder) => void) => SelectBuilder,
+		callback: (clauseCb: (clause: SqlConditionBuilder) => void) => SelectBuilder<SelectBuilder.Result, Filled>,
 		allowManyJoin: boolean = false
-	): SelectBuilder {
+	) {
 		const joinList: WhereBuilder.JoinDefinition[] = []
 
 		const qbWithWhere = callback(clause => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
-		return joinList.reduce(
+		return joinList.reduce<SelectBuilder<SelectBuilder.Result, Filled | 'join'>>(
 			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
 			qbWithWhere
 		)
@@ -166,27 +166,36 @@ class WhereBuilder {
 		}
 	}
 
-	private createManyHasManySubquery(
-		qb: SelectBuilder,
+	private createManyHasManySubquery<Filled extends keyof SelectBuilder.Options>(
+		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		relationWhere: Input.Where,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
 		fromSide: 'owner' | 'inversed'
-	): SelectBuilder {
+	) {
+		let augmentedBuilder: SelectBuilder<SelectBuilder.Result, Filled | 'select' | 'from' | 'join'> = qb
 		const fromColumn =
 			fromSide === 'owner' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
 		const toColumn =
 			fromSide === 'owner' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
-		qb = qb.from(joiningTable.tableName, 'junction_').select(['junction_', fromColumn])
+		augmentedBuilder = augmentedBuilder.from(joiningTable.tableName, 'junction_').select(['junction_', fromColumn])
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {
-			return qb.where(whereClause => this.conditionBuilder.build(whereClause, 'junction_', toColumn, primaryCondition))
+			return augmentedBuilder.where(whereClause =>
+				this.conditionBuilder.build(whereClause, 'junction_', toColumn, primaryCondition)
+			)
 		}
 
-		qb = qb.join(targetEntity.tableName, 'root_', clause =>
+		augmentedBuilder = augmentedBuilder.join(targetEntity.tableName, 'root_', clause =>
 			clause.compareColumns(['junction_', toColumn], SqlConditionBuilder.Operator.eq, ['root_', targetEntity.primary])
 		)
-		return this.buildAdvanced(targetEntity, new Path([]), relationWhere, cb => qb.where(clause => cb(clause)), true)
+		return this.buildAdvanced(
+			targetEntity,
+			new Path([]),
+			relationWhere,
+			cb => augmentedBuilder.where(clause => cb(clause)),
+			true
+		)
 	}
 
 	private transformWhereToPrimaryCondition(where: Input.Where, primaryField: string): Input.Condition<never> | null {

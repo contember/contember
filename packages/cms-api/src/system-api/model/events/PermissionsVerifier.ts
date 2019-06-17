@@ -148,7 +148,7 @@ class PermissionsVerifier {
 		const rowAffectedColumns = this.getAffectedColumnsByRow(events)
 
 		const ids = events.map(it => it.rowId)
-		let qb = this.createBaseSelectBuilder(db, entity, ids)
+		let qb: SelectBuilder<SelectBuilder.Result, any> = this.createBaseSelectBuilder(db, entity, ids)
 
 		qb = this.buildPredicates(db, qb, Acl.Operation.read, rowAffectedColumns, entity, predicateFactory, schema)
 
@@ -170,7 +170,11 @@ class PermissionsVerifier {
 		const ids = events.map(it => it.rowId)
 
 		const affectedColumnsByType: { [type: string]: AffectedColumnsByRow } = {}
-		let qb = this.createBaseSelectBuilder(db, entity, ids)
+		let qb: SelectBuilder<SelectBuilder.Result, 'select' | 'from' | 'where' | 'join'> = this.createBaseSelectBuilder(
+			db,
+			entity,
+			ids
+		)
 
 		const eventToOperationMapping = {
 			[EventType.create]: Acl.Operation.create,
@@ -207,15 +211,15 @@ class PermissionsVerifier {
 		return permissions
 	}
 
-	private buildPredicates(
+	private buildPredicates<Filled extends keyof SelectBuilder.Options>(
 		db: Client,
-		qb: SelectBuilder,
+		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		operation: Acl.Operation,
 		rowAffectedColumns: AffectedColumnsByRow,
 		entity: Model.Entity,
 		predicateFactory: PredicateFactory,
 		schema: Model.Schema
-	): SelectBuilder {
+	) {
 		const columnToField = Object.values(entity.fields).reduce<{ [column: string]: string }>(
 			(result, field) => ({
 				...result,
@@ -231,14 +235,15 @@ class PermissionsVerifier {
 			[]
 		)
 
+		let withPredicates: SelectBuilder<SelectBuilder.Result, Filled | 'select' | 'join'> = qb
 		for (const column of columns) {
 			const fieldPredicate =
 				operation === Acl.Operation.delete
 					? predicateFactory.create(entity, operation)
 					: predicateFactory.create(entity, operation, [columnToField[column]])
 
-			qb = whereBuilder.buildAdvanced(entity, new Path([]), fieldPredicate, cb =>
-				qb.select(
+			withPredicates = whereBuilder.buildAdvanced(entity, new Path([]), fieldPredicate, cb =>
+				withPredicates.select(
 					expr =>
 						expr.selectCondition(condition => {
 							cb(condition)
@@ -251,10 +256,10 @@ class PermissionsVerifier {
 			)
 		}
 
-		return qb
+		return withPredicates
 	}
 
-	private createBaseSelectBuilder(db: Client, entity: Model.Entity, ids: string[]): SelectBuilder {
+	private createBaseSelectBuilder(db: Client, entity: Model.Entity, ids: string[]) {
 		return db
 			.selectBuilder()
 			.select(entity.primaryColumn, '__primary')

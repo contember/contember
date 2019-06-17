@@ -21,7 +21,7 @@ class PredicateFactory {
 		let predicates: Acl.PredicateReference[]
 		if (operation === Acl.Operation.delete) {
 			const deletePredicate = entityPermissions.operations.delete
-			if (deletePredicate === undefined || deletePredicate === false) {
+			if (deletePredicate === undefined) {
 				return neverCondition
 			}
 			if (deletePredicate === true) {

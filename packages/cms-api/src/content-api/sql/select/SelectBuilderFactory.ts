@@ -3,5 +3,5 @@ import SelectHydrator from './SelectHydrator'
 import DbSelectBuilder from '../../../core/database/SelectBuilder'
 
 export default interface SelectBuilderFactory {
-	create(qb: DbSelectBuilder, hydrator: SelectHydrator): SelectBuilder
+	create(qb: DbSelectBuilder<DbSelectBuilder.Result, any>, hydrator: SelectHydrator): SelectBuilder
 }

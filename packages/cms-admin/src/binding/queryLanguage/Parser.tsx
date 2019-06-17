@@ -450,7 +450,7 @@ class Parser extends ChevrotainParser {
 
 		Parser.parser.input = lexingResult.tokens
 
-		let expression: Parser.ParserResult[E]
+		let expression: Parser.ParserResult[keyof Parser.ParserResult]
 
 		switch (entry) {
 			case Parser.EntryPoint.RelativeSingleField:
@@ -475,7 +475,7 @@ class Parser extends ChevrotainParser {
 			)
 		}
 
-		return expression
+		return expression as Parser.ParserResult[E]
 	}
 }
 

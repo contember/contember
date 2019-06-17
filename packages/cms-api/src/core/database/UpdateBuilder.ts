@@ -65,7 +65,9 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 
 		const cteAliases = this.options.with.getAliases()
 		if (this.options.from !== undefined) {
-			let fromQb: SelectBuilder = SelectBuilder.create(this.wrapper).withCteAliases(cteAliases)
+			let fromQb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create(this.wrapper).withCteAliases(
+				cteAliases
+			)
 			fromQb = this.options.from(fromQb)
 			fromQb = this.options.where.values.reduce((builder, value) => builder.where(value), fromQb)
 			const selectSql = fromQb.createQuery()

@@ -17,7 +17,10 @@ namespace SelectExecutionHandler {
 		field: ObjectNode | FieldNode
 		entity: Model.Entity
 
-		addColumn: (queryCallback: (qb: SelectBuilder) => SelectBuilder, path?: Path) => void
+		addColumn: (
+			queryCallback: (qb: SelectBuilder<SelectBuilder.Result, any>) => SelectBuilder<SelectBuilder.Result, any>,
+			path?: Path
+		) => void
 		addData: (parentField: string, cb: DataCallback, defaultValue?: SelectHydrator.NestedDefaultValue) => void
 	}
 }

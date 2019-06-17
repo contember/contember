@@ -16,8 +16,8 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		private readonly cteAliases: Set<string> = new Set()
 	) {}
 
-	public static create<Result = SelectBuilder.Result>(wrapper: Client): SelectBuilder<Result, never> {
-		return new SelectBuilder(wrapper, {
+	public static create<Result = SelectBuilder.Result>(wrapper: Client) {
+		return new SelectBuilder<Result>(wrapper, {
 			from: undefined,
 			orderBy: [],
 			join: [],

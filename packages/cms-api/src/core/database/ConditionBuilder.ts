@@ -54,7 +54,10 @@ class ConditionBuilder {
 		)
 	}
 
-	in(columnName: QueryBuilder.ColumnIdentifier, values: Value[] | SelectBuilder): void {
+	in<Filled extends keyof SelectBuilder.Options>(
+		columnName: QueryBuilder.ColumnIdentifier,
+		values: Value[] | SelectBuilder<SelectBuilder.Result, Filled>
+	): void {
 		if (!Array.isArray(values)) {
 			const query = values.createQuery()
 			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${query.sql})`, query.parameters))

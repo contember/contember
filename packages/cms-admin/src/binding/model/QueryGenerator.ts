@@ -1,6 +1,6 @@
 import { CrudQueryBuilder } from 'cms-client'
 import { GetQueryArguments } from 'cms-client/dist/src/crudQueryBuilder'
-import { assertNever, OmitMethods, ucfirst } from 'cms-common'
+import { assertNever, ucfirst } from 'cms-common'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFields,
@@ -12,7 +12,7 @@ import {
 	SingleEntityTreeConstraints
 } from '../dao'
 
-type BaseQueryBuilder = OmitMethods<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
+type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
 
 type ReadBuilder = CrudQueryBuilder.ReadBuilder.Builder<never>
 

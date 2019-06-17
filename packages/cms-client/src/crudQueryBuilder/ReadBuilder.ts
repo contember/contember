@@ -1,4 +1,4 @@
-import { Input, OmitMethods } from 'cms-common'
+import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
 import { HasManyArguments, HasOneArguments, ReductionArguments, SupportedArguments } from './types'
 
@@ -86,7 +86,7 @@ class ReadBuilder<AllowedArgs extends SupportedArguments = SupportedArguments> {
 }
 
 namespace ReadBuilder {
-	export type Builder<AllowedArgs extends SupportedArguments> = OmitMethods<
+	export type Builder<AllowedArgs extends SupportedArguments> = Omit<
 		ReadBuilder<AllowedArgs>,
 		Exclude<SupportedArguments, AllowedArgs>
 	>

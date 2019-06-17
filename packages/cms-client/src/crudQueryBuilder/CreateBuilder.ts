@@ -1,4 +1,4 @@
-import { Input, OmitMethods } from 'cms-common'
+import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
 import { CreateDataBuilder } from './CreateDataBuilder'
 import { DataBuilder } from './DataBuilder'
@@ -37,7 +37,7 @@ class CreateBuilder<AllowedArgs extends SupportedArguments> extends ReadBuilder<
 }
 
 namespace CreateBuilder {
-	export type Builder<AllowedArgs extends SupportedArguments> = OmitMethods<
+	export type Builder<AllowedArgs extends SupportedArguments> = Omit<
 		CreateBuilder<AllowedArgs>,
 		Exclude<SupportedArguments, AllowedArgs>
 	>

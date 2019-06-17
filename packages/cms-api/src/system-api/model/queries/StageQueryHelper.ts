@@ -5,7 +5,7 @@ import { isUuid } from '../../../utils/uuid'
 import StageByIdQuery from './StageByIdQuery'
 import StageBySlugQuery from './StageBySlugQuery'
 
-export const prepareStageQueryBuilder = (queryable: DbQueryable): SelectBuilder<Stage> => {
+export const prepareStageQueryBuilder = (queryable: DbQueryable) => {
 	return queryable
 		.createSelectBuilder<Stage>()
 		.select('id')

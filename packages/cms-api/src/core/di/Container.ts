@@ -10,7 +10,7 @@ namespace Container {
 
 	export type ServiceFactoryMap<M extends ServiceTypeMap> = { [N in keyof M]: ServiceFactory<M, M[N]> }
 
-	export class Builder<M extends ServiceTypeMap> {
+	export class Builder<M extends ServiceTypeMap = {}> {
 		constructor(private factories: ServiceFactoryMap<M>) {}
 
 		addService<N extends ServiceName, T extends ServiceType>(

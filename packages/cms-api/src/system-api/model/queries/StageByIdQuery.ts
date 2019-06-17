@@ -10,7 +10,9 @@ class StageByIdQuery extends DbQuery<StageByIdQuery.Result> {
 	}
 
 	async fetch(queryable: DbQueryable): Promise<StageByIdQuery.Result> {
-		let selectBuilder = prepareStageQueryBuilder(queryable).where({ id: this.stageId })
+		let selectBuilder: SelectBuilder<StageByIdQuery.Result, any> = prepareStageQueryBuilder(queryable).where({
+			id: this.stageId,
+		})
 
 		if (this.forUpdate) {
 			selectBuilder = selectBuilder.lock(SelectBuilder.LockType.forNoKeyUpdate)

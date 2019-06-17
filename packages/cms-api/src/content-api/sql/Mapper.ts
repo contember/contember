@@ -35,13 +35,13 @@ class Mapper {
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
-		let qb = this.db
+		const qb = this.db
 			.selectBuilder()
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		qb = this.whereBuilder.build(qb, entity, new Path([]), expandedWhere)
-		const result = await qb.getResult()
+		const builtQb = this.whereBuilder.build(qb, entity, new Path([]), expandedWhere)
+		const result = await builtQb.getResult()
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
@@ -61,7 +61,7 @@ class Mapper {
 		indexBy?: string
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		const hydrator = new SelectHydrator()
-		let qb = this.db.selectBuilder()
+		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = this.db.selectBuilder()
 		let indexByAlias: string | null = null
 		if (indexBy) {
 			const path = new Path([])
@@ -79,7 +79,7 @@ class Mapper {
 		relation: Model.JoiningColumnRelation & Model.Relation
 	) {
 		const hydrator = new SelectHydrator()
-		let qb = this.db.selectBuilder()
+		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = this.db.selectBuilder()
 		const path = new Path([])
 		const groupingKey = '__grouping_key'
 		qb = qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
@@ -88,17 +88,17 @@ class Mapper {
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
-	private async selectRows(
+	private async selectRows<Filled extends keyof SelectBuilder.Options>(
 		hydrator: SelectHydrator,
-		qb: SelectBuilder,
+		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		groupBy?: string
 	) {
 		const path = new Path([])
-		qb = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
+		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
 
-		const selector = this.selectBuilderFactory.create(qb, hydrator)
+		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
 		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input), path, groupBy)
 		const rows = await selector.execute()
 		await selectPromise

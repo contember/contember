@@ -8,8 +8,8 @@ class LimitByGroupWrapper {
 		private readonly orderByCallback:
 			| (<Orderable extends QueryBuilder.Orderable<any>>(
 					orderable: Orderable,
-					qb: SelectBuilder<any>
-			  ) => [Orderable, SelectBuilder<any>])
+					qb: SelectBuilder<any, any>
+			  ) => [Orderable, SelectBuilder<any, any>])
 			| undefined,
 		private readonly skip: number | undefined,
 		private readonly limit: number | undefined

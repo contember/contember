@@ -8,26 +8,26 @@ import SelectBuilder from '../../../core/database/SelectBuilder'
 class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}
 
-	public build<Orderable extends QueryBuilder.Orderable<any>>(
-		qb: SelectBuilder,
+	public build<Orderable extends QueryBuilder.Orderable<any>, Filled extends keyof SelectBuilder.Options>(
+		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		orderable: Orderable,
 		entity: Model.Entity,
 		path: Path,
 		orderBy: Input.OrderBy[]
-	): [SelectBuilder, Orderable] {
-		return orderBy.reduce<[SelectBuilder, Orderable]>(
+	): [SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable] {
+		return orderBy.reduce<[SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable]>(
 			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy),
 			[qb, orderable]
 		)
 	}
 
-	private buildOne<Orderable extends QueryBuilder.Orderable<any>>(
-		qb: SelectBuilder,
+	private buildOne<Orderable extends QueryBuilder.Orderable<any>, Filled extends keyof SelectBuilder.Options>(
+		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		orderable: Orderable,
 		entity: Model.Entity,
 		path: Path,
 		orderBy: Input.FieldOrderBy
-	): [SelectBuilder, Orderable] {
+	): [SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
 			throw new Error()
@@ -49,11 +49,11 @@ class OrderByBuilder {
 			}
 			const newPath = path.for(fieldName)
 			const prevQb: any = qb
-			qb = this.joinBuilder.join(qb, newPath, entity, fieldName)
+			const joined = this.joinBuilder.join(qb, newPath, entity, fieldName)
 			if (prevQb === orderable) {
-				orderable = (qb as any) as Orderable
+				orderable = (joined as any) as Orderable
 			}
-			return this.buildOne(qb, orderable, targetEntity, newPath, value)
+			return this.buildOne(joined, orderable, targetEntity, newPath, value)
 		}
 	}
 }

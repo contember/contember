@@ -8,10 +8,20 @@ import SelectBuilder from '../../../core/database/SelectBuilder'
 export default class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}
 
-	join(qb: SelectBuilder, path: Path, entity: Model.Entity, relationName: string): SelectBuilder {
+	join<Filled extends keyof SelectBuilder.Options>(
+		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+		path: Path,
+		entity: Model.Entity,
+		relationName: string
+	) {
+		const targetEntity = getTargetEntity(this.schema, entity, relationName)
+		if (!targetEntity) {
+			throw new Error()
+		}
+
 		const joins = acceptRelationTypeVisitor(this.schema, entity, relationName, new JoinVisitor(path))
 
-		qb = joins.reduce((qb, join) => {
+		return joins.reduce<SelectBuilder<SelectBuilder.Result, Filled | 'join'>>((qb, join) => {
 			const sourceAlias = join.sourceAlias || path.back().getAlias()
 			const targetAlias = join.targetAlias || path.getAlias()
 
@@ -22,12 +32,5 @@ export default class JoinBuilder {
 				])
 			)
 		}, qb)
-
-		const targetEntity = getTargetEntity(this.schema, entity, relationName)
-		if (!targetEntity) {
-			throw new Error()
-		}
-
-		return qb
 	}
 }

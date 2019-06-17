@@ -5,12 +5,9 @@ import Option from './Option'
 class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}
 
-	parse<Args extends Command.Arguments = Command.Arguments, Opts extends Command.Options = Command.Options>(
-		args: string[],
-		allowRest: boolean
-	): Command.Input<Args, Opts> {
-		let options: Opts = {} as any
-		let argumentValues: Args = {} as any
+	parse(args: string[], allowRest: boolean): Command.Input<Command.Arguments, Command.Options> {
+		let options: Command.Options = {}
+		let argumentValues: Command.Arguments = {}
 
 		let i = 0
 		let argumentNumber = 0

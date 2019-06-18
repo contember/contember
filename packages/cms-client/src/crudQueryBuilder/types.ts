@@ -18,6 +18,8 @@ export type HasOneArguments = 'filter'
 
 export type HasManyArguments = 'filter' | 'orderBy' | 'offset' | 'limit'
 
+export type UpdateMutationFields = 'ok' | 'validation' | 'node'
+
 export type SupportedArguments =
 	| CreateMutationArguments
 	| UpdateMutationArguments

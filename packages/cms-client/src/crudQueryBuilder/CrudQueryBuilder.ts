@@ -10,7 +10,8 @@ import {
 	ListQueryArguments,
 	Mutations,
 	Queries,
-	UpdateMutationArguments
+	UpdateMutationArguments,
+	UpdateMutationFields
 } from './types'
 import { UpdateBuilder } from './UpdateBuilder'
 
@@ -61,7 +62,7 @@ export class CrudQueryBuilder {
 
 	public update(
 		name: string,
-		query: UpdateBuilder.BuilderFactory<UpdateMutationArguments>,
+		query: UpdateBuilder.BuilderFactory<UpdateMutationArguments, UpdateMutationFields>,
 		alias?: string
 	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {

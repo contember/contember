@@ -5,54 +5,54 @@ import { HasManyArguments, HasOneArguments, ReductionArguments, ReadArguments } 
 class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	public static create<AllowedArgs extends ReadArguments = ReadArguments>(
+	public static instantiate<AllowedArgs extends ReadArguments = ReadArguments>(
 		objectBuilder: ObjectBuilder = new ObjectBuilder()
 	): ReadBuilder.Builder<AllowedArgs> {
 		return new ReadBuilder<AllowedArgs>(objectBuilder)
 	}
 
-	public static createFromFactory<AllowedArgs extends ReadArguments>(
+	public static instantiateFromFactory<AllowedArgs extends ReadArguments>(
 		builder: ReadBuilder.BuilderFactory<AllowedArgs>
 	): ReadBuilder.Builder<never> {
 		if (typeof builder === 'function') {
-			return builder(ReadBuilder.create())
+			return builder(ReadBuilder.instantiate())
 		}
 		return builder
 	}
 
-	protected create<AA extends ReadArguments = ReadArguments>(
+	protected instantiate<AA extends ReadArguments = ReadArguments>(
 		objectBuilder: ObjectBuilder = new ObjectBuilder()
 	): ReadBuilder.Builder<AA> {
-		return ReadBuilder.create<AA>(objectBuilder)
+		return ReadBuilder.instantiate<AA>(objectBuilder)
 	}
 
 	public by(by: Input.UniqueWhere<Literal>) {
-		return this.create<Exclude<AllowedArgs, 'by'>>(this.objectBuilder.argument('by', by))
+		return this.instantiate<Exclude<AllowedArgs, 'by'>>(this.objectBuilder.argument('by', by))
 	}
 
 	public filter(where: Input.Where<Input.Condition<Input.ColumnValue<Literal>>>) {
-		return this.create<Exclude<AllowedArgs, 'filter'>>(this.objectBuilder.argument('filter', where))
+		return this.instantiate<Exclude<AllowedArgs, 'filter'>>(this.objectBuilder.argument('filter', where))
 	}
 
 	public orderBy(orderBy: Input.OrderBy) {
-		return this.create<Exclude<AllowedArgs, 'orderBy'>>(this.objectBuilder.argument('orderBy', orderBy))
+		return this.instantiate<Exclude<AllowedArgs, 'orderBy'>>(this.objectBuilder.argument('orderBy', orderBy))
 	}
 
 	public offset(offset: number) {
-		return this.create<Exclude<AllowedArgs, 'offset'>>(this.objectBuilder.argument('offset', offset))
+		return this.instantiate<Exclude<AllowedArgs, 'offset'>>(this.objectBuilder.argument('offset', offset))
 	}
 
 	public limit(limit: number) {
-		return this.create<Exclude<AllowedArgs, 'limit'>>(this.objectBuilder.argument('limit', limit))
+		return this.instantiate<Exclude<AllowedArgs, 'limit'>>(this.objectBuilder.argument('limit', limit))
 	}
 
 	public column(name: string) {
-		return this.create<AllowedArgs>(this.objectBuilder.field(name))
+		return this.instantiate<AllowedArgs>(this.objectBuilder.field(name))
 	}
 
 	public inlineFragment(typeName: string, builder: ReadBuilder.BuilderFactory<never>) {
-		builder = ReadBuilder.createFromFactory(builder)
-		return this.create<AllowedArgs>(this.objectBuilder.fragment(typeName, builder.objectBuilder))
+		builder = ReadBuilder.instantiateFromFactory(builder)
+		return this.instantiate<AllowedArgs>(this.objectBuilder.fragment(typeName, builder.objectBuilder))
 	}
 
 	public reductionRelation(name: string, builder: ReadBuilder.BuilderFactory<ReductionArguments>, alias?: string) {
@@ -72,12 +72,12 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 	}
 
 	protected relation<A extends ReadArguments>(name: string, builder: ReadBuilder.BuilderFactory<A>, alias?: string) {
-		builder = ReadBuilder.createFromFactory(builder)
+		builder = ReadBuilder.instantiateFromFactory(builder)
 
 		const [objectName, objectBuilder] =
 			typeof alias === 'string' ? [alias, builder.objectBuilder.name(name)] : [name, builder.objectBuilder]
 
-		return this.create<AllowedArgs>(this.objectBuilder.object(objectName, objectBuilder))
+		return this.instantiate<AllowedArgs>(this.objectBuilder.object(objectName, objectBuilder))
 	}
 }
 

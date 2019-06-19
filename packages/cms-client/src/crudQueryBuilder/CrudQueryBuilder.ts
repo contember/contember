@@ -36,7 +36,7 @@ export class CrudQueryBuilder {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `list${name}`
-		query = ReadBuilder.createFromFactory(query)
+		query = ReadBuilder.instantiateFromFactory(query)
 
 		const [objectName, objectBuilder] =
 			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]
@@ -53,7 +53,7 @@ export class CrudQueryBuilder {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `get${name}`
-		query = ReadBuilder.createFromFactory(query)
+		query = ReadBuilder.instantiateFromFactory(query)
 
 		const [objectName, objectBuilder] =
 			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]
@@ -70,7 +70,7 @@ export class CrudQueryBuilder {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `update${name}`
-		query = WriteBuilder.createFromFactory(query)
+		query = WriteBuilder.instantiateFromFactory(query)
 
 		if (isEmptyObject(query.objectBuilder.args.data)) {
 			return this
@@ -91,7 +91,7 @@ export class CrudQueryBuilder {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `create${name}`
-		query = WriteBuilder.createFromFactory(query)
+		query = WriteBuilder.instantiateFromFactory(query)
 
 		if (isEmptyObject(query.objectBuilder.args.data)) {
 			return this
@@ -112,7 +112,7 @@ export class CrudQueryBuilder {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `delete${name}`
-		query = ReadBuilder.createFromFactory(query)
+		query = ReadBuilder.instantiateFromFactory(query)
 
 		const [objectName, objectBuilder] =
 			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]

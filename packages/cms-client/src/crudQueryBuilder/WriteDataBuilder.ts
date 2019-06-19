@@ -5,7 +5,11 @@ import { WriteManyRelationBuilder } from './WriteManyRelationBuilder'
 import { WriteOneRelationBuilder } from './WriteOneRelationBuilder'
 
 class WriteDataBuilder<Op extends WriteOperation> {
-	public constructor(public readonly data: WriteDataBuilder.DataFormat[Op]) {}
+	public readonly data: WriteDataBuilder.DataFormat[Op]
+
+	public constructor(data: WriteDataBuilder.DataFormat[Op] | undefined) {
+		this.data = data || {}
+	}
 
 	public set(fieldName: string, value: Input.ColumnValue<Literal>) {
 		return new WriteDataBuilder<Op>({ ...this.data, [fieldName]: value })

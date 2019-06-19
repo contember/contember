@@ -35,7 +35,7 @@ export class QueryGenerator {
 		if (subTree.constraints === undefined) {
 			const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
 				baseQueryBuilder,
-				this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.create())
+				this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate())
 			)
 			return populatedBaseQueryBuilder
 		} else if (subTree.constraints.whereType === 'unique') {
@@ -54,13 +54,13 @@ export class QueryGenerator {
 			baseQueryBuilder,
 			this.registerQueryPart(
 				subTree.fields,
-				CrudQueryBuilder.ReadBuilder.create<GetQueryArguments>().by(subTree.constraints.where)
+				CrudQueryBuilder.ReadBuilder.instantiate<GetQueryArguments>().by(subTree.constraints.where)
 			)
 		)
 
 		return populatedBaseQueryBuilder.get(
 			subTree.entityName,
-			CrudQueryBuilder.ReadBuilder.create(
+			CrudQueryBuilder.ReadBuilder.instantiate(
 				populatedListQueryBuilder ? populatedListQueryBuilder.objectBuilder : undefined
 			),
 			subTree.id
@@ -73,8 +73,8 @@ export class QueryGenerator {
 	): BaseQueryBuilder {
 		const builder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
 			subTree.constraints && subTree.constraints.filter
-				? CrudQueryBuilder.ReadBuilder.create().filter(subTree.constraints.filter)
-				: CrudQueryBuilder.ReadBuilder.create()
+				? CrudQueryBuilder.ReadBuilder.instantiate().filter(subTree.constraints.filter)
+				: CrudQueryBuilder.ReadBuilder.instantiate()
 
 		const [newBaseQueryBuilder, newReadBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
@@ -83,7 +83,7 @@ export class QueryGenerator {
 
 		return newBaseQueryBuilder.list(
 			subTree.entityName,
-			newReadBuilder || CrudQueryBuilder.ReadBuilder.create(),
+			newReadBuilder || CrudQueryBuilder.ReadBuilder.instantiate(),
 			subTree.id
 		)
 	}
@@ -106,11 +106,11 @@ export class QueryGenerator {
 				for (const referenceName in fieldValue.references) {
 					const reference = fieldValue.references[referenceName]
 
-					let builderWithBody = CrudQueryBuilder.ReadBuilder.create()
+					let builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate()
 					for (const item of this.registerQueryPart(reference.fields, builderWithBody)) {
 						if (item instanceof CrudQueryBuilder.ReadBuilder) {
 							// This branch will only get executed at most once per recursive call
-							builderWithBody = CrudQueryBuilder.ReadBuilder.create(item.objectBuilder)
+							builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(item.objectBuilder)
 						} else {
 							yield item
 						}

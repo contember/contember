@@ -9,45 +9,45 @@ import { WriteDataBuilder } from './WriteDataBuilder'
 class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation> {
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	public static create<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation>(
+	public static instantiate<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation>(
 		objectBuilder: ObjectBuilder = new ObjectBuilder()
 	): WriteBuilder.Builder<AA, AF, Op> {
 		return new WriteBuilder<AA, AF, Op>(objectBuilder)
 	}
 
-	public static createFromFactory<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation>(
+	public static instantiateFromFactory<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation>(
 		builder: WriteBuilder.BuilderFactory<AA, AF, Op>
 	): WriteBuilder.Builder<never, never, Op> {
 		if (typeof builder === 'function') {
-			return builder(WriteBuilder.create())
+			return builder(WriteBuilder.instantiate())
 		}
 		return builder
 	}
 
 	public data(data: DataBuilder.DataLike<WriteDataBuilder.DataFormat[Op], WriteDataBuilder<Op>>) {
 		const resolvedData = DataBuilder.resolveData(data, WriteDataBuilder as { new (): WriteDataBuilder<Op> })
-		return WriteBuilder.create<Exclude<AA, 'data'>, AF, Op>(
+		return WriteBuilder.instantiate<Exclude<AA, 'data'>, AF, Op>(
 			resolvedData === undefined ? this.objectBuilder : this.objectBuilder.argument('data', resolvedData)
 		)
 	}
 
 	public by(by: Input.UniqueWhere<Literal>) {
-		return WriteBuilder.create<Exclude<AA, 'by'>, AF, Op>(this.objectBuilder.argument('by', by))
+		return WriteBuilder.instantiate<Exclude<AA, 'by'>, AF, Op>(this.objectBuilder.argument('by', by))
 	}
 
 	public ok() {
-		return WriteBuilder.create<AA, Exclude<AF, 'ok'>, Op>(this.objectBuilder.field('ok'))
+		return WriteBuilder.instantiate<AA, Exclude<AF, 'ok'>, Op>(this.objectBuilder.field('ok'))
 	}
 
 	public validation() {
-		return WriteBuilder.create<AA, Exclude<AF, 'validation'>, Op>(
+		return WriteBuilder.instantiate<AA, Exclude<AF, 'validation'>, Op>(
 			ValidationRelationBuilder.validationRelation(this.objectBuilder)
 		)
 	}
 
 	public node(builder: ReadBuilder.BuilderFactory<never>) {
-		const readBuilder = ReadBuilder.createFromFactory(builder)
-		return WriteBuilder.create<AA, Exclude<AF, 'node'>, Op>(
+		const readBuilder = ReadBuilder.instantiateFromFactory(builder)
+		return WriteBuilder.instantiate<AA, Exclude<AF, 'node'>, Op>(
 			this.objectBuilder.object('node', readBuilder.objectBuilder)
 		)
 	}

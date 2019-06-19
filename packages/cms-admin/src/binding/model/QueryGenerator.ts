@@ -71,7 +71,7 @@ export class QueryGenerator {
 		baseQueryBuilder: BaseQueryBuilder,
 		subTree: MarkerTreeRoot<EntityListTreeConstraints>
 	): BaseQueryBuilder {
-		const builder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.SupportedArguments, 'filter'>> =
+		const builder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
 			subTree.constraints && subTree.constraints.filter
 				? CrudQueryBuilder.ReadBuilder.create().filter(subTree.constraints.filter)
 				: CrudQueryBuilder.ReadBuilder.create()
@@ -117,7 +117,7 @@ export class QueryGenerator {
 					}
 
 					const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<
-						Exclude<CrudQueryBuilder.SupportedArguments, 'filter'>
+						Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
 					> = reference.filter ? builderWithBody.filter(reference.filter) : builderWithBody
 
 					if (reference.reducedBy) {

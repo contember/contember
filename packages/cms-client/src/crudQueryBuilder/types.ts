@@ -20,11 +20,20 @@ export type HasManyArguments = 'filter' | 'orderBy' | 'offset' | 'limit'
 
 export type UpdateMutationFields = 'ok' | 'validation' | 'node'
 
-export type SupportedArguments =
-	| CreateMutationArguments
-	| UpdateMutationArguments
-	| DeleteMutationArguments
-	| GetQueryArguments
-	| ListQueryArguments
-	| HasOneArguments
-	| HasManyArguments
+export type CreateMutationFields = 'ok' | 'validation' | 'node'
+
+export enum WriteOperation {
+	Create = 'create',
+	Update = 'update'
+}
+
+export type WriteArguments = CreateMutationArguments | UpdateMutationArguments | DeleteMutationArguments
+
+export type WriteFields = UpdateMutationFields | CreateMutationFields
+
+export type ReadArguments = GetQueryArguments | ListQueryArguments | HasOneArguments | HasManyArguments
+
+export interface WriteRelationOps {
+	create: 'create' | 'connect'
+	update: 'create' | 'connect' | 'delete' | 'disconnect' | 'update' | 'upsert'
+}

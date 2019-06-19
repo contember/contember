@@ -1,17 +1,17 @@
 import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
-import { HasManyArguments, HasOneArguments, ReductionArguments, SupportedArguments } from './types'
+import { HasManyArguments, HasOneArguments, ReductionArguments, ReadArguments } from './types'
 
-class ReadBuilder<AllowedArgs extends SupportedArguments = SupportedArguments> {
+class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	public static create<AllowedArgs extends SupportedArguments = SupportedArguments>(
+	public static create<AllowedArgs extends ReadArguments = ReadArguments>(
 		objectBuilder: ObjectBuilder = new ObjectBuilder()
 	): ReadBuilder.Builder<AllowedArgs> {
 		return new ReadBuilder<AllowedArgs>(objectBuilder)
 	}
 
-	public static createFromFactory<AllowedArgs extends SupportedArguments>(
+	public static createFromFactory<AllowedArgs extends ReadArguments>(
 		builder: ReadBuilder.BuilderFactory<AllowedArgs>
 	): ReadBuilder.Builder<never> {
 		if (typeof builder === 'function') {
@@ -20,7 +20,7 @@ class ReadBuilder<AllowedArgs extends SupportedArguments = SupportedArguments> {
 		return builder
 	}
 
-	protected create<AA extends SupportedArguments = SupportedArguments>(
+	protected create<AA extends ReadArguments = ReadArguments>(
 		objectBuilder: ObjectBuilder = new ObjectBuilder()
 	): ReadBuilder.Builder<AA> {
 		return ReadBuilder.create<AA>(objectBuilder)
@@ -71,11 +71,7 @@ class ReadBuilder<AllowedArgs extends SupportedArguments = SupportedArguments> {
 		return this.relation(name, builder, alias)
 	}
 
-	protected relation<A extends SupportedArguments>(
-		name: string,
-		builder: ReadBuilder.BuilderFactory<A>,
-		alias?: string
-	) {
+	protected relation<A extends ReadArguments>(name: string, builder: ReadBuilder.BuilderFactory<A>, alias?: string) {
 		builder = ReadBuilder.createFromFactory(builder)
 
 		const [objectName, objectBuilder] =
@@ -86,11 +82,11 @@ class ReadBuilder<AllowedArgs extends SupportedArguments = SupportedArguments> {
 }
 
 namespace ReadBuilder {
-	export type Builder<AllowedArgs extends SupportedArguments> = Omit<
+	export type Builder<AllowedArgs extends ReadArguments> = Omit<
 		ReadBuilder<AllowedArgs>,
-		Exclude<SupportedArguments, AllowedArgs>
+		Exclude<ReadArguments, AllowedArgs>
 	>
-	export type BuilderFactory<AllowedArgs extends SupportedArguments> =
+	export type BuilderFactory<AllowedArgs extends ReadArguments> =
 		| Builder<never>
 		| ((builder: Builder<AllowedArgs>) => Builder<never>)
 }

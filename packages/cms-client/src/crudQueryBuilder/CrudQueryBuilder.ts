@@ -1,19 +1,20 @@
 import { isEmptyObject } from 'cms-common'
 import { QueryBuilder, RootObjectBuilder } from '../graphQlBuilder'
-import { CreateBuilder } from './CreateBuilder'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
 import { ReadBuilder } from './ReadBuilder'
 import {
 	CreateMutationArguments,
+	CreateMutationFields,
 	DeleteMutationArguments,
 	GetQueryArguments,
 	ListQueryArguments,
 	Mutations,
 	Queries,
 	UpdateMutationArguments,
-	UpdateMutationFields
+	UpdateMutationFields,
+	WriteOperation
 } from './types'
-import { UpdateBuilder } from './UpdateBuilder'
+import { WriteBuilder } from './WriteBuilder'
 
 type Variables = {
 	[key: string]: any
@@ -62,14 +63,14 @@ export class CrudQueryBuilder {
 
 	public update(
 		name: string,
-		query: UpdateBuilder.BuilderFactory<UpdateMutationArguments, UpdateMutationFields>,
+		query: WriteBuilder.BuilderFactory<UpdateMutationArguments, UpdateMutationFields, WriteOperation.Update>,
 		alias?: string
 	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `update${name}`
-		query = UpdateBuilder.createFromFactory(query)
+		query = WriteBuilder.createFromFactory(query)
 
 		if (isEmptyObject(query.objectBuilder.args.data)) {
 			return this
@@ -83,14 +84,14 @@ export class CrudQueryBuilder {
 
 	public create(
 		name: string,
-		query: CreateBuilder.BuilderFactory<CreateMutationArguments>,
+		query: WriteBuilder.BuilderFactory<CreateMutationArguments, CreateMutationFields, WriteOperation.Create>,
 		alias?: string
 	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `create${name}`
-		query = CreateBuilder.createFromFactory(query)
+		query = WriteBuilder.createFromFactory(query)
 
 		if (isEmptyObject(query.objectBuilder.args.data)) {
 			return this

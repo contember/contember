@@ -1,6 +1,7 @@
 interface Project {
 	readonly id: string
 	readonly slug: string
+	readonly directory?: string
 	readonly name: string
 	readonly stages: Array<Project.Stage>
 	readonly dbCredentials: Project.DatabaseCredentials

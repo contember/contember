@@ -208,7 +208,7 @@ class CompositionRoot {
 						)
 				)
 				.addService('migrationFilesManager', ({ project }) =>
-					MigrationFilesManager.createForProject(projectsDir, project.slug)
+					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug)
 				)
 				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
 				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))

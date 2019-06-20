@@ -3,6 +3,7 @@ import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { Props, ToMany, ToOne } from '../coreComponents'
 import { Environment } from '../dao'
+import { reactNodeToElement } from '../utils'
 import { Parser } from './Parser'
 
 export namespace QueryLanguage {
@@ -23,10 +24,7 @@ export namespace QueryLanguage {
 			)
 		}
 
-		if (!currentNode || isEmptyObject(currentNode)) {
-			return null
-		}
-		return currentNode
+		return reactNodeToElement(currentNode)
 	}
 
 	export const wrapRelativeSingleField = (

@@ -1,11 +1,10 @@
-import { isEmptyObject } from 'cms-common'
 import * as React from 'react'
 import { DataRendererProps } from '../../coreComponents'
 import { DirtinessContext, MutationStateContext } from '../../coreComponents/PersistState'
 import { LoadingSpinner, PersistInfo, PersistInfoPublicProps } from './userFeedback'
 
 export interface FeedbackRendererPublicProps extends DataRendererProps {
-	loadingFallback?: React.ReactNode
+	loadingFallback?: React.ReactElement
 	userFeedback?: PersistInfoPublicProps
 }
 
@@ -22,7 +21,7 @@ export const FeedbackRenderer = React.memo(
 		const data = props.data
 
 		if (!data) {
-			if (props.loadingFallback && !isEmptyObject(props.loadingFallback)) {
+			if (props.loadingFallback !== undefined) {
 				return props.loadingFallback
 			}
 			return <LoadingSpinner />

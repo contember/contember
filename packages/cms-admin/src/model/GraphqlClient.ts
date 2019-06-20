@@ -20,8 +20,8 @@ class GraphqlClient {
 		})
 		if (response.ok) {
 			const result = await response.json()
-			if (response.ok && !result.errors && result.data) {
-				return result.data
+			if (response.ok) {
+				return result // It may still have errors (e.g. unfilled fields) but as far as the request goes, it is ok.
 			} else {
 				throw new GraphqlClient.GraphqlClientError(
 					{ query, variables },
@@ -55,7 +55,7 @@ namespace GraphqlClient {
 		request: Request
 		response: Response
 		constructor(request: Request, response: Response) {
-			let message = 'An GraphQL error occured'
+			let message = 'A GraphQL error occured'
 			if (
 				response.data &&
 				Array.isArray(response.data.errors) &&

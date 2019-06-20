@@ -5,14 +5,14 @@ import { loginRequest } from '../state/request'
 import { pushRequest } from './request'
 import { ActionCreator } from './types'
 
-let idCounter = 1
+let requestIdCounter = 0
 
-export const getData = (query: string): ActionCreator => async (dispatch, getState, services) => {
+export const sendContentAPIRequest = (query: string): ActionCreator => async (dispatch, getState, services) => {
 	const state = getState()
 	if (!('stage' in state.request) || !('project' in state.request)) {
 		return
 	}
-	const id = (idCounter++).toString(16)
+	const id = (requestIdCounter++).toString(16)
 	dispatch(createAction(CONTENT_SET_LOADING, () => ({ id }))())
 	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	try {
@@ -29,24 +29,4 @@ export const getData = (query: string): ActionCreator => async (dispatch, getSta
 		throw error
 	}
 	return id
-}
-
-export const putData = (query: string): ActionCreator => async (dispatch, getState, services) => {
-	const state = getState()
-	if (!('stage' in state.request) || !('project' in state.request)) {
-		return
-	}
-	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
-	try {
-		await services.contentClientFactory
-			.create(state.request.project, state.request.stage)
-			.request(query, {}, apiToken || undefined)
-		return
-	} catch (error) {
-		if (error instanceof GraphqlClient.GraphqlAuthenticationError) {
-			dispatch(pushRequest(loginRequest()))
-			return
-		}
-		throw error
-	}
 }

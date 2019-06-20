@@ -31,7 +31,7 @@ describe('crud query builder', () => {
 			)
 			.delete(
 				'Category',
-				CrudQueryBuilder.ReadBuilder.create<DeleteMutationArguments>()
+				CrudQueryBuilder.ReadBuilder.instantiate<DeleteMutationArguments>()
 					.by({ id: '123' })
 					.column('id')
 			)

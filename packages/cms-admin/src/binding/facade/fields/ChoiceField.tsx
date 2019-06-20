@@ -68,7 +68,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 	}
 
 	public static generateSyntheticChildren(
-		props: Props<Pick<ChoiceFieldProps, Exclude<keyof ChoiceFieldProps, 'children'>>>,
+		props: Omit<ChoiceFieldProps, 'children'>,
 		environment: Environment
 	): React.ReactNode {
 		if (Array.isArray(props.options)) {

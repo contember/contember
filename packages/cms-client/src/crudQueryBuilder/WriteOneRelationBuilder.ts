@@ -1,6 +1,5 @@
 import { Input } from 'cms-common'
 import { Literal } from '../graphQlBuilder'
-import { DataBuilder } from './DataBuilder'
 import { WriteRelationOps, WriteOperation } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
@@ -33,12 +32,8 @@ class WriteOneRelationBuilder<
 		return WriteOneRelationBuilder.instantiate(builder)
 	}
 
-	public create(
-		data: DataBuilder.DataLike<WriteDataBuilder.DataFormat['create'], WriteDataBuilder<WriteOperation.Create>>
-	) {
-		const resolvedData = DataBuilder.resolveData(data, WriteDataBuilder as {
-			new (): WriteDataBuilder<WriteOperation.Create>
-		})
+	public create(data: WriteDataBuilder.DataLike<WriteOperation.Create>) {
+		const resolvedData = WriteDataBuilder.resolveData(data)
 		return resolvedData === undefined
 			? this
 			: WriteOneRelationBuilder.instantiate<Op, never>({
@@ -58,25 +53,17 @@ class WriteOneRelationBuilder<
 		return WriteOneRelationBuilder.instantiate<WriteOperation.Update, never>({ disconnect: true })
 	}
 
-	public update(
-		data: DataBuilder.DataLike<WriteDataBuilder.DataFormat['update'], WriteDataBuilder<WriteOperation.Update>>
-	) {
-		const resolvedData = DataBuilder.resolveData(data, WriteDataBuilder as {
-			new (): WriteDataBuilder<WriteOperation.Update>
-		})
+	public update(data: WriteDataBuilder.DataLike<WriteOperation.Update>) {
+		const resolvedData = WriteDataBuilder.resolveData(data)
 		return resolvedData === undefined ? this : new WriteOneRelationBuilder({ update: resolvedData })
 	}
 
 	public upsert(
-		update: DataBuilder.DataLike<WriteDataBuilder.DataFormat['update'], WriteDataBuilder<WriteOperation.Update>>,
-		create: DataBuilder.DataLike<WriteDataBuilder.DataFormat['create'], WriteDataBuilder<WriteOperation.Create>>
+		update: WriteDataBuilder.DataLike<WriteOperation.Update>,
+		create: WriteDataBuilder.DataLike<WriteOperation.Create>
 	) {
-		const resolvedCreate = DataBuilder.resolveData(create, WriteDataBuilder as {
-			new (): WriteDataBuilder<WriteOperation.Create>
-		})
-		const resolvedUpdate = DataBuilder.resolveData(update, WriteDataBuilder as {
-			new (): WriteDataBuilder<WriteOperation.Update>
-		})
+		const resolvedCreate = WriteDataBuilder.resolveData(create)
+		const resolvedUpdate = WriteDataBuilder.resolveData(update)
 
 		return resolvedUpdate === undefined && resolvedCreate === undefined
 			? this

@@ -1,6 +1,5 @@
 import { Input } from 'cms-common'
 import { Literal } from '../graphQlBuilder'
-import { DataBuilder } from './DataBuilder'
 import { WriteOperation, WriteRelationOps } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
@@ -25,15 +24,8 @@ class WriteManyRelationBuilder<Op extends WriteOperation, Allowed extends WriteR
 		return WriteManyRelationBuilder.instantiate(builder)
 	}
 
-	public create(
-		data: DataBuilder.DataLike<WriteDataBuilder.DataFormat['create'], WriteDataBuilder<WriteOperation.Create>>
-	): WriteManyRelationBuilder.Builder<Op> {
-		const resolvedData: WriteDataBuilder.DataFormat['create'] | undefined = DataBuilder.resolveData(
-			data,
-			WriteDataBuilder as {
-				new (): WriteDataBuilder<WriteOperation.Create>
-			}
-		)
+	public create(data: WriteDataBuilder.DataLike<WriteOperation.Create>): WriteManyRelationBuilder.Builder<Op> {
+		const resolvedData = WriteDataBuilder.resolveData(data)
 		return (resolvedData === undefined
 			? this
 			: WriteManyRelationBuilder.instantiate<Op>([
@@ -59,11 +51,9 @@ class WriteManyRelationBuilder<Op extends WriteOperation, Allowed extends WriteR
 
 	public update(
 		where: Input.UniqueWhere<Literal>,
-		data: DataBuilder.DataLike<WriteDataBuilder.DataFormat['update'], WriteDataBuilder<WriteOperation.Update>>
+		data: WriteDataBuilder.DataLike<WriteOperation.Update>
 	): WriteManyRelationBuilder.Builder<WriteOperation.Update> {
-		const resolvedData = DataBuilder.resolveData(data, WriteDataBuilder as {
-			new (): WriteDataBuilder<WriteOperation.Update>
-		})
+		const resolvedData = WriteDataBuilder.resolveData(data)
 		return (resolvedData === undefined
 			? this
 			: WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
@@ -74,15 +64,11 @@ class WriteManyRelationBuilder<Op extends WriteOperation, Allowed extends WriteR
 
 	public upsert(
 		where: Input.UniqueWhere<Literal>,
-		update: DataBuilder.DataLike<WriteDataBuilder.DataFormat['update'], WriteDataBuilder<WriteOperation.Update>>,
-		create: DataBuilder.DataLike<WriteDataBuilder.DataFormat['create'], WriteDataBuilder<WriteOperation.Create>>
+		update: WriteDataBuilder.DataLike<WriteOperation.Update>,
+		create: WriteDataBuilder.DataLike<WriteOperation.Create>
 	): WriteManyRelationBuilder.Builder<WriteOperation.Update> {
-		const resolvedUpdate = DataBuilder.resolveData(update, WriteDataBuilder as {
-			new (): WriteDataBuilder<WriteOperation.Update>
-		})
-		const resolvedCreate = DataBuilder.resolveData(create, WriteDataBuilder as {
-			new (): WriteDataBuilder<WriteOperation.Create>
-		})
+		const resolvedUpdate = WriteDataBuilder.resolveData(update)
+		const resolvedCreate = WriteDataBuilder.resolveData(create)
 		return (resolvedUpdate === undefined && resolvedCreate === undefined
 			? this
 			: WriteManyRelationBuilder.instantiate<WriteOperation.Update>([

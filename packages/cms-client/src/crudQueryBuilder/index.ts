@@ -1,5 +1,4 @@
 export * from './CrudQueryBuilder'
-export * from './DataBuilder'
 export * from './ReadBuilder'
 export * from './types'
 export * from './WriteBuilder'

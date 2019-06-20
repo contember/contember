@@ -149,6 +149,8 @@ export class MutationGenerator {
 					.data(builder => this.registerUpdateMutationPart(entity, entityFields, data, builder))
 					.by({ ...where, [PRIMARY_KEY_NAME]: primaryKey })
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
+					.ok()
+					.validation()
 			},
 			`update${entityName}_${this.primaryKeyToAlias(primaryKey)}`
 		)
@@ -179,6 +181,8 @@ export class MutationGenerator {
 						)
 					)
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
+					.ok()
+					.validation()
 			},
 			`create${entityName}_${(this.createCounter++).toFixed(0)}`
 		)

@@ -1,6 +1,5 @@
 import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
-import { DataBuilder } from './DataBuilder'
 import { ReadBuilder } from './ReadBuilder'
 import { WriteArguments, WriteFields, WriteOperation } from './types'
 import { ValidationRelationBuilder } from './ValidationRelationBuilder'
@@ -24,8 +23,8 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 		return builder
 	}
 
-	public data(data: DataBuilder.DataLike<WriteDataBuilder.DataFormat[Op], WriteDataBuilder<Op>>) {
-		const resolvedData = DataBuilder.resolveData(data, WriteDataBuilder as { new (): WriteDataBuilder<Op> })
+	public data(data: WriteDataBuilder.DataLike<Op>) {
+		const resolvedData = WriteDataBuilder.resolveData(data)
 		return WriteBuilder.instantiate<Exclude<AA, 'data'>, AF, Op>(
 			resolvedData === undefined ? this.objectBuilder : this.objectBuilder.argument('data', resolvedData)
 		)

@@ -19,15 +19,7 @@ class GraphqlClient {
 			body: JSON.stringify({ query, variables })
 		})
 		if (response.ok) {
-			const result = await response.json()
-			if (response.ok) {
-				return result // It may still have errors (e.g. unfilled fields) but as far as the request goes, it is ok.
-			} else {
-				throw new GraphqlClient.GraphqlClientError(
-					{ query, variables },
-					{ status: response.status, body: JSON.stringify(result), data: result }
-				)
-			}
+			return (await response.json()).data // It may still have errors (e.g. unfilled fields) but as far as the request goes, it is ok.
 		} else {
 			const body = await response.text()
 			let data: any = undefined

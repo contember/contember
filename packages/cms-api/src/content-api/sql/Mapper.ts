@@ -129,7 +129,7 @@ class Mapper {
 			return Promise.resolve(0)
 		}
 
-		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
+		const uniqueWhere = this.uniqueWhereExpander.expand(entity, { [entity.primary]: primaryValue })
 		const updateBuilder = this.updateBuilderFactory.create(entity, uniqueWhere)
 
 		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, Object.keys(data))

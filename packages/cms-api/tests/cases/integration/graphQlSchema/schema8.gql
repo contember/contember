@@ -24,6 +24,7 @@ input FrontPageCreateInput {
 }
 
 input FrontPageCreateIntroVideoEntityRelationInput {
+  connect: VideoUniqueWhere
   create: VideoWithoutFrontPageForIntroCreateInput
 }
 

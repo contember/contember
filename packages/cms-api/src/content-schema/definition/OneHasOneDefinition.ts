@@ -22,6 +22,10 @@ class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinition.Options> {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.cascade })
 	}
 
+	setNullOnDelete(): Interface<OneHasOneDefinition> {
+		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.setNull })
+	}
+
 	notNull(): Interface<OneHasOneDefinition> {
 		return this.withOption('nullable', false)
 	}

@@ -75,7 +75,7 @@ it('Filter by "has one" multiple times with OR and with empty parameter', async 
     left join "public"."location" as "root_location" on "root_"."location_id" = "root_location"."id" 
     left join "public"."location" as "root_location_parent" on "root_location"."parent_id" = "root_location_parent"."id"`,
 					response: { rows: [{ root_id: testUuid(2), root_name: 'Foo' }] },
-					parameters: [testUuid(1), testUuid(1), testUuid(1)],
+					parameters: [],
 				},
 			]),
 		],

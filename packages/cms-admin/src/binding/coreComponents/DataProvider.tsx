@@ -92,6 +92,15 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	)
 
 	componentDidUpdate(prevProps: DataProviderInnerProps<DRP>, prevState: DataProviderState) {
+		if (
+			this.state.data &&
+			prevState.data &&
+			this.state.data !== prevState.data &&
+			this.state.id === prevState.id &&
+			!this.props.isDirty
+		) {
+			this.props.setDataTreeDirtiness(this.props.markerTree.id, true)
+		}
 		if (!this.state.id) {
 			return
 		}
@@ -102,17 +111,6 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			((prevReq.state !== req.state && req.data !== prevReq.data) || this.state.id !== prevState.id)
 		) {
 			this.initializeAccessorTree(req.data)
-		}
-
-		if (
-			req.state === ContentStatus.LOADED &&
-			this.state.data &&
-			prevState.data &&
-			this.state.data !== prevState.data &&
-			this.state.id === prevState.id &&
-			!this.props.isDirty
-		) {
-			this.props.setDataTreeDirtiness(this.props.markerTree.id, true)
 		}
 	}
 

@@ -18,6 +18,7 @@ export interface Test {
 	permissions?: Acl.Permissions
 	variables?: Acl.VariablesMap
 	query: string
+	queryVariables?: Record<string, any>
 	executes: SqlQuery[]
 	return: object
 }
@@ -56,6 +57,7 @@ export const execute = async (test: Test) => {
 			timer: (label: any, cb: any) => cb(),
 		},
 		query: test.query,
+		queryVariables: test.queryVariables,
 		return: test.return,
 		schema: graphQLSchema,
 	})

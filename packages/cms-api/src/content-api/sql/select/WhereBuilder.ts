@@ -60,10 +60,8 @@ class WhereBuilder {
 		}
 		if (where.or !== undefined && where.or.length > 0) {
 			const expr = where.or
-			whereClause.and(clause =>
-				expr.map((where: Input.Where) =>
-					clause.or(clause => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
-				)
+			whereClause.or(clause =>
+				expr.map((where: Input.Where) => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
 			)
 		}
 		if (where.not !== undefined) {

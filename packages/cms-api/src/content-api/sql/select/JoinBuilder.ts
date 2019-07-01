@@ -22,8 +22,11 @@ export default class JoinBuilder {
 		const joins = acceptRelationTypeVisitor(this.schema, entity, relationName, new JoinVisitor(path))
 
 		return joins.reduce<SelectBuilder<SelectBuilder.Result, Filled | 'join'>>((qb, join) => {
-			const sourceAlias = join.sourceAlias || path.back().getAlias()
 			const targetAlias = join.targetAlias || path.getAlias()
+			if (qb.options.join.find(it => it.alias === targetAlias)) {
+				return qb
+			}
+			const sourceAlias = join.sourceAlias || path.back().getAlias()
 
 			return qb.leftJoin(join.tableName, targetAlias, clause =>
 				clause.compareColumns([sourceAlias, join.sourceColumn], ConditionBuilder.Operator.eq, [

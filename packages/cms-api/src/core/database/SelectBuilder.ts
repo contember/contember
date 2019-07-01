@@ -12,7 +12,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled | 'orderBy'>>, QueryBuilder {
 	constructor(
 		public readonly wrapper: Client,
-		private readonly options: SelectBuilder.Options,
+		public readonly options: SelectBuilder.Options,
 		private readonly cteAliases: Set<string> = new Set()
 	) {}
 
@@ -149,21 +149,23 @@ namespace SelectBuilder {
 
 	export type Result = { [columnName: string]: any }
 
-	export type Options = With.Options &
-		Where.Options & {
-			select: Literal[]
-			limit: undefined | [number, number]
-			from: undefined | [Literal | string, string | undefined]
-			orderBy: ([Literal, 'asc' | 'desc'])[]
-			join: ({
-				type: 'inner' | 'left'
-				table: string
-				alias: string | undefined
-				condition: Literal | undefined
-			})[]
-			lock?: LockType
-			meta: Record<string, any>
-		}
+	export type Options = Readonly<
+		With.Options &
+			Where.Options & {
+				select: Literal[]
+				limit: undefined | [number, number]
+				from: undefined | [Literal | string, string | undefined]
+				orderBy: ([Literal, 'asc' | 'desc'])[]
+				join: ({
+					type: 'inner' | 'left'
+					table: string
+					alias: string | undefined
+					condition: Literal | undefined
+				})[]
+				lock?: LockType
+				meta: Record<string, any>
+			}
+	>
 
 	export enum LockType {
 		forUpdate = 'forUpdate',

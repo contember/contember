@@ -10,6 +10,7 @@ export interface Test {
 	schema: GraphQLSchema
 	context: any
 	query: string
+	queryVariables?: Record<string, any>
 	return: object
 }
 
@@ -21,7 +22,7 @@ export const executeGraphQlTest = async (test: Test) => {
 	const nowStub = sinon.stub(date, 'now').callsFake(() => new Date('2018-10-12T08:00:00.000Z'))
 
 	try {
-		const response = await graphql(test.schema, test.query, null, test.context)
+		const response = await graphql(test.schema, test.query, null, test.context, test.queryVariables)
 		// console.log(response)
 		expect(response).deep.equal(test.return)
 	} finally {

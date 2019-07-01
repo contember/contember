@@ -1,6 +1,6 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
-import { DataRendererProps, SingleEntityDataProvider } from '../../binding/coreComponents'
+import { DataRendererProps, EnvironmentContext, SingleEntityDataProvider } from '../../binding/coreComponents'
 import { CommonRendererProps } from '../../binding/facade/renderers'
 import { ParametersContext } from './Pages'
 import PageWithLayout from './PageWithLayout'
@@ -20,14 +20,18 @@ export default class EditPage<DRP extends CommonRendererProps = CommonRendererPr
 			<PageWithLayout layout={this.props.layout}>
 				<ParametersContext.Consumer>
 					{parameters => (
-						<SingleEntityDataProvider
-							where={this.props.where ? this.props.where(parameters) : parameters}
-							name={this.props.entity}
-							renderer={this.props.renderer}
-							rendererProps={this.props.rendererProps}
-						>
-							{this.props.children}
-						</SingleEntityDataProvider>
+						<EnvironmentContext.Consumer>
+							{environment => (
+								<SingleEntityDataProvider
+									where={this.props.where ? this.props.where(parameters, environment) : parameters}
+									name={this.props.entity}
+									renderer={this.props.renderer}
+									rendererProps={this.props.rendererProps}
+								>
+									{this.props.children}
+								</SingleEntityDataProvider>
+							)}
+						</EnvironmentContext.Consumer>
 					)}
 				</ParametersContext.Consumer>
 			</PageWithLayout>

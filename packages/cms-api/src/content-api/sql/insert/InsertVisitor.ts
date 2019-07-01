@@ -52,7 +52,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 					await mapper.connectJunction(
 						targetEntity,
 						targetRelation,
-						{ [targetEntity.primary]: input[targetEntity.primary] },
+						{ [targetEntity.primary]: (await mapper.getPrimaryValue(targetEntity, input))! },
 						{ [entity.primary]: primaryInversed }
 					)
 				}
@@ -89,7 +89,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 						entity,
 						relation,
 						{ [entity.primary]: primary },
-						{ [targetEntity.primary]: input[targetEntity.primary] }
+						{ [targetEntity.primary]: (await mapper.getPrimaryValue(targetEntity, input))! }
 					)
 				}
 
@@ -225,7 +225,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 		input: Input.CreateOneRelationInput | undefined,
 		processor: RelationInputProcessor
 	): PromiseLike<any> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		const relations = []
@@ -253,7 +253,7 @@ export default class InsertVisitor implements Model.ColumnVisitor<void>, Model.R
 		input: Input.CreateManyRelationInput | undefined,
 		processor: RelationInputProcessor
 	): PromiseLike<any> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		const promises = []

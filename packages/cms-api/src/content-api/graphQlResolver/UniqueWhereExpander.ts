@@ -7,7 +7,7 @@ export default class UniqueWhereExpander {
 
 	expand(entity: Model.Entity, where: Input.UniqueWhere): Input.Where {
 		if (!isUniqueWhere(this.schema, entity, where)) {
-			throw new Error('Unique where is not unique')
+			throw new Error('Unique where is not unique: ' + JSON.stringify(where))
 		}
 
 		const whereExpanded: Input.Where = {}

@@ -70,10 +70,10 @@ export default class WhereTypeProvider {
 				}
 				fields[field] = acceptFieldVisitor<GraphQLInputFieldConfig>(this.schema, entity, field, {
 					visitRelation: (entity, relation, targetEntity) => {
-						if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
-							return { type: this.getEntityUniqueWhereType(targetEntity.name) }
-						}
-						throw new Error('Only column or owning relation can be a part of unique key')
+						// if (!isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
+						// 	throw new Error('Only column or owning relation can be a part of unique key')
+						// }
+						return { type: this.getEntityUniqueWhereType(targetEntity.name) }
 					},
 					visitColumn: (entity, column) => ({ type: this.columnTypeResolver.getType(column) }),
 				})

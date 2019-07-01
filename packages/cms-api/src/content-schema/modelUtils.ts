@@ -54,7 +54,10 @@ export const getUniqueConstraints = (schema: Model.Schema, entity: Model.Entity)
 			visitManyHasManyOwner: () => undefined,
 			visitOneHasMany: () => undefined,
 			visitManyHasOne: () => undefined,
-			visitOneHasOneInversed: () => undefined,
+			visitOneHasOneInversed: (entity, relation) => ({
+				fields: [relation.name],
+				name: SqlNameHelper.createUniqueConstraintName(entity.name, [relation.name]),
+			}),
 			visitOneHasOneOwner: (entity, relation) => ({
 				fields: [relation.name],
 				name: SqlNameHelper.createUniqueConstraintName(entity.name, [relation.name]),

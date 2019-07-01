@@ -442,7 +442,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 		input: Input.UpdateOneRelationInput | undefined,
 		processor: HasOneRelationInputProcessor
 	): PromiseLike<any> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		const operation = []
@@ -488,7 +488,7 @@ export default class UpdateVisitor implements Model.ColumnVisitor<void>, Model.R
 		input: Input.UpdateManyRelationInput | undefined,
 		processor: HasManyRelationInputProcessor
 	): PromiseLike<any> {
-		if (input === undefined) {
+		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
 		const promises: Array<PromiseLike<void>> = []

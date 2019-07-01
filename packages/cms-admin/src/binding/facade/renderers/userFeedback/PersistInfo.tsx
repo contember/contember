@@ -61,7 +61,16 @@ export class PersistInfoConnected extends React.PureComponent<PersistInfoProps> 
 	}
 }
 
-export const PersistInfo = connect<{}, PersistInfoDispatchProps, {}, State>(
+// typescript is generating invalid .d.ts file
+
+type PersistInfoType = React.ComponentClass<
+	Pick<PersistInfoProps, Exclude<keyof PersistInfoProps, keyof PersistInfoDispatchProps>>,
+	any
+> & {
+	WrappedComponent: React.ComponentType<PersistInfoProps>
+}
+
+export const PersistInfo: PersistInfoType = connect<{}, PersistInfoDispatchProps, {}, State>(
 	undefined,
 	(dispatch: Dispatch) => ({
 		showToast: (toast: ToastDefinition) => {

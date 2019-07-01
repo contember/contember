@@ -1,3 +1,4 @@
+export * from './CollectionRenderer'
 export * from './CommonRendererProps'
 export * from './DefaultRenderer'
 export * from './ListRenderer'

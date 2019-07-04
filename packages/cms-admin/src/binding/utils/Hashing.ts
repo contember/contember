@@ -17,7 +17,7 @@ export class Hashing {
 	}
 
 	// Taken from Java
-	private static hash(str: string): number {
+	public static hash(str: string): number {
 		let hash = 0
 		if (str.length === 0) {
 			return hash

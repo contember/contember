@@ -5,7 +5,8 @@ import {
 	DATA_TREE_REQUEST_CREATE,
 	DATA_TREE_REQUEST_END,
 	DATA_TREE_REQUEST_ERROR,
-	DATA_TREE_REQUEST_INITIALIZE, DATA_TREE_SET_DIRTINESS
+	DATA_TREE_REQUEST_INITIALIZE,
+	DATA_TREE_SET_DIRTINESS
 } from '../reducer/dataTrees'
 import { DataTreeDirtinessState, DataTreeId, DataTreeRequestErrorData, DataTreeRequestType } from '../state/dataTrees'
 import { loginRequest } from '../state/request'

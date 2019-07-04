@@ -1,5 +1,4 @@
 import AuthState, { emptyAuthState } from './auth'
-import ContentState, { emptyContentState } from './content'
 import { DataTreesState, emptyDataTreesState } from './dataTrees'
 import ProjectsConfigsState, { emptyProjectsConfigsState } from './projectsConfigs'
 import RequestState, { emptyRequestState } from './request'
@@ -12,7 +11,6 @@ export default interface State {
 	request: RequestState
 	view: ViewState
 	auth: AuthState
-	content: ContentState
 	projectsConfigs: ProjectsConfigsState
 	upload: UploadState
 	toasts: ToastsState
@@ -24,7 +22,6 @@ export const emptyState: State = {
 	request: emptyRequestState,
 	view: emptyViewState,
 	auth: emptyAuthState,
-	content: emptyContentState,
 	projectsConfigs: emptyProjectsConfigsState,
 	upload: emptyUploadState,
 	toasts: emptyToastsState,

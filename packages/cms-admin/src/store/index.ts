@@ -3,14 +3,14 @@ import { createAction } from 'redux-actions'
 
 import thunk from 'redux-thunk'
 import { Dispatch } from '../actions/types'
+import Config from '../config'
 import ContentClientFactory from '../model/ContentClientFactory'
 import GraphqlClient from '../model/GraphqlClient'
 import LocalStorageManager from '../model/LocalStorageManager'
+import SystemClientFactory from '../model/SystemClientFactory'
 import rootReducer from '../reducer'
 import { SET_IDENTITY } from '../reducer/auth'
 import State from '../state'
-import Config from '../config'
-import SystemClientFactory from '../model/SystemClientFactory'
 
 export interface Services {
 	localStorageManager: LocalStorageManager
@@ -37,6 +37,8 @@ export function createServices(config: Config): Services {
 export interface Store extends ReduxStore<State> {
 	dispatch: Dispatch
 }
+
+export class ReducerError extends Error {}
 
 export function persistState(services: Services) {
 	return (next: Function) => (reducer: Reducer, initialState: State): Store => {

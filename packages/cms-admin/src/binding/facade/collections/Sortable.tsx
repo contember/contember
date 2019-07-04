@@ -116,13 +116,7 @@ namespace Sortable {
 
 	export const DragHandle = React.memo(
 		SortableHandle((props: Props<DragHandleProps>) => (
-			<div
-				className={cn(
-					'sortable-item-handle',
-					(console.log(props) as any) || false,
-					props.isMutating && 'sortable-item-handle-disabled'
-				)}
-			>
+			<div className={cn('sortable-item-handle', props.isMutating && 'sortable-item-handle-disabled')}>
 				<DragHandleIcon />
 			</div>
 		))

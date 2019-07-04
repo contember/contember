@@ -1,11 +1,16 @@
+import { assertNever } from 'cms-common'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { sendContentAPIRequest } from '../../actions/content'
-import { setDataTreeDirtiness, setDataTreeMutationState } from '../../actions/dataTrees'
+import { sendDataTreeRequest, setDataTreeDirtiness } from '../../actions/dataTrees'
 import { Dispatch } from '../../actions/types'
+import { createEmptyDataTreeState } from '../../reducer/dataTrees'
 import State from '../../state'
-import { ContentRequestsState, ContentStatus } from '../../state/content'
-import { DataTreeDirtinessState, DataTreeId, DataTreeMutationState } from '../../state/dataTrees'
+import {
+	DataTreeDirtinessState,
+	DataTreeRequestReadyState,
+	DataTreeRequestType,
+	DataTreeState
+} from '../../state/dataTrees'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -24,43 +29,33 @@ export interface DataProviderOwnProps<DRP> {
 }
 
 export interface DataProviderDispatchProps {
-	setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) => void
-	setDataTreeMutationState: (dataTreeId: DataTreeId, isMutating: DataTreeMutationState) => void
-	sendContentAPIRequest: (query: string) => Promise<string>
+	setDataTreeDirtiness: (isDirty: DataTreeDirtinessState) => void
+	sendDataTreeRequest: (type: DataTreeRequestType, request: string) => void
 }
 
-export interface DataProviderStateProps {
-	requests: ContentRequestsState
-	isMutating: boolean
-	isDirty: boolean
-}
+export interface DataProviderStateProps extends DataTreeState {}
 
 type DataProviderInnerProps<DRP> = DataProviderOwnProps<DRP> & DataProviderDispatchProps & DataProviderStateProps
 
 export interface DataProviderState {
 	accessorTree?: AccessorTreeRoot
 	query?: string
-	queryRequestId?: string
-	mutationRequestId?: string
 }
 
 class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>, DataProviderState, boolean> {
 	public state: DataProviderState = {
 		accessorTree: undefined,
-		query: undefined,
-		queryRequestId: undefined,
-		mutationRequestId: undefined
+		query: undefined
 	}
 
-	protected triggerPersist = (): Promise<void> => {
-		const persistedData = this.state.queryRequestId ? this.props.requests[this.state.queryRequestId].data : undefined
-		const successfullyFinalizeMutation: () => Promise<void> = () => {
-			this.props.setDataTreeDirtiness(this.props.markerTree.id, false)
-			return Promise.resolve()
-		}
+	protected triggerPersist = () => {
+		const persistedData =
+			this.props.requests.query.readyState === DataTreeRequestReadyState.Success
+				? this.props.requests.query.data
+				: undefined
 
-		if (!this.state.accessorTree) {
-			return Promise.reject()
+		if (!this.state.accessorTree || !this.props.isDirty) {
+			return
 		}
 
 		const generator = new MutationGenerator(persistedData, this.state.accessorTree, this.props.markerTree)
@@ -68,25 +63,10 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 		console.log('mutation', mutation)
 		if (mutation === undefined) {
-			return successfullyFinalizeMutation()
+			return // There's nothing to do
 		}
 
-		this.props.setDataTreeMutationState(this.props.markerTree.id, true)
-		return this.props
-			.sendContentAPIRequest(mutation)
-			.then(async () => {
-				if (!this.state.query) {
-					return successfullyFinalizeMutation()
-				}
-				const queryRequestId = await this.props.sendContentAPIRequest(this.state.query)
-				if (!this.unmounted) {
-					this.setState({ queryRequestId })
-				}
-				return successfullyFinalizeMutation()
-			})
-			.finally(() => {
-				this.props.setDataTreeMutationState(this.props.markerTree.id, false)
-			})
+		this.props.sendDataTreeRequest(DataTreeRequestType.Mutation, mutation)
 	}
 
 	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(
@@ -94,29 +74,40 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		this.triggerPersist
 	)
 
-	componentDidUpdate(prevProps: DataProviderInnerProps<DRP>, prevState: DataProviderState) {
-		if (!this.state.queryRequestId) {
+	async componentDidUpdate(prevProps: DataProviderInnerProps<DRP>, prevState: DataProviderState) {
+		const { query, mutation } = this.props.requests
+		if (
+			mutation.readyState === DataTreeRequestReadyState.Pending ||
+			!(query.readyState === DataTreeRequestReadyState.Success || query.readyState === DataTreeRequestReadyState.Error)
+		) {
 			return
 		}
-		const prevReq = prevProps.requests[this.state.queryRequestId]
-		const req = this.props.requests[this.state.queryRequestId]
-		if (
-			req.state === ContentStatus.LOADED &&
-			((prevReq.state !== req.state && req.data !== prevReq.data) ||
-				this.state.queryRequestId !== prevState.queryRequestId)
-		) {
-			this.initializeAccessorTree(req.data)
+
+		if (mutation.readyState === DataTreeRequestReadyState.Success) {
+			if (!this.state.query) {
+				return
+			}
+			console.log('query', this.state.query)
+			return this.props.sendDataTreeRequest(DataTreeRequestType.Query, this.state.query)
+		} else if (mutation.readyState === DataTreeRequestReadyState.Error) {
+			// TODO handle mutation error
 		}
 
-		if (
-			req.state === ContentStatus.LOADED &&
-			this.state.accessorTree &&
-			prevState.accessorTree &&
-			this.state.accessorTree !== prevState.accessorTree &&
-			this.state.queryRequestId === prevState.queryRequestId &&
-			!this.props.isDirty
-		) {
-			this.props.setDataTreeDirtiness(this.props.markerTree.id, true)
+		if (query.readyState === DataTreeRequestReadyState.Success) {
+			if (prevProps.requests.query.readyState === DataTreeRequestReadyState.Pending) {
+				this.initializeAccessorTree(query.data)
+			} else if (
+				this.state.accessorTree &&
+				prevState.accessorTree &&
+				this.state.accessorTree !== prevState.accessorTree &&
+				!this.props.isDirty
+			) {
+				this.props.setDataTreeDirtiness(true)
+			}
+		} else if (query.readyState === DataTreeRequestReadyState.Error) {
+			// TODO handle query error
+		} else {
+			return assertNever(query)
 		}
 	}
 
@@ -161,9 +152,9 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 		console.log('query', query)
 		if (query) {
-			const queryRequestId = await this.props.sendContentAPIRequest(query)
+			this.props.sendDataTreeRequest(DataTreeRequestType.Query, query)
 			if (!this.unmounted) {
-				this.setState({ queryRequestId, query })
+				this.setState({ query })
 			}
 		} else {
 			this.initializeAccessorTree(undefined)
@@ -186,20 +177,13 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 const getDataProvider = <DRP extends {}>() =>
 	connect<DataProviderStateProps, DataProviderDispatchProps, DataProviderOwnProps<DRP>, State>(
-		({ content, dataTrees }, ownProps: DataProviderOwnProps<DRP>) => {
-			const dataTree = dataTrees[ownProps.markerTree.id] || {}
-			return {
-				requests: content.requests,
-				isDirty: dataTree.isDirty || false,
-				isMutating: dataTree.isMutating || false
-			}
-		},
-		(dispatch: Dispatch) => ({
-			setDataTreeDirtiness: (dataTreeId: DataTreeId, isDirty: DataTreeDirtinessState) =>
-				dispatch(setDataTreeDirtiness(dataTreeId, isDirty)),
-			setDataTreeMutationState: (dataTreeId: DataTreeId, isMutating: DataTreeMutationState) =>
-				dispatch(setDataTreeMutationState(dataTreeId, isMutating)),
-			sendContentAPIRequest: (query: string) => dispatch(sendContentAPIRequest(query))
+		({ dataTrees }, ownProps: DataProviderOwnProps<DRP>) =>
+			dataTrees[ownProps.markerTree.id] || createEmptyDataTreeState(),
+		(dispatch: Dispatch, ownProps) => ({
+			setDataTreeDirtiness: (isDirty: DataTreeDirtinessState) =>
+				dispatch(setDataTreeDirtiness(ownProps.markerTree.id, isDirty)),
+			sendDataTreeRequest: (type: DataTreeRequestType, request: string) =>
+				dispatch(sendDataTreeRequest(ownProps.markerTree.id, type, request))
 		})
 	)(DataProvider as new (props: DataProviderInnerProps<DRP>) => DataProvider<DRP>)
 

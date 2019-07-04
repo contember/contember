@@ -35,9 +35,11 @@ export interface IndexPathErrorFragment {
 	index: number
 }
 
-export type MutationErrorPath = Array<FieldPathErrorFragment | IndexPathErrorFragment>
+export type ErrorPathNodeType = FieldPathErrorFragment | IndexPathErrorFragment
 
-export interface MutationErrors {
+export type MutationErrorPath = ErrorPathNodeType[]
+
+export interface MutationError {
 	path: MutationErrorPath
 	message: {
 		text: string
@@ -46,9 +48,9 @@ export interface MutationErrors {
 
 export interface MutationResult {
 	ok: boolean
-	validation?: {
+	validation: {
 		valid: boolean
-		errors: MutationErrors
+		errors: MutationError[]
 	}
 }
 

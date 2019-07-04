@@ -19,7 +19,7 @@ import {
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
 export class MutationGenerator {
-	private createCounter: number = 0
+	public static readonly ALIAS_SEPARATOR = '__'
 
 	public constructor(
 		private persistedData: any,
@@ -34,6 +34,7 @@ export class MutationGenerator {
 				this.markerTree.entityName,
 				this.markerTree.fields,
 				this.currentData.root,
+				this.markerTree.id,
 				this.markerTree.constraints
 			)
 			return builder.getGql()
@@ -47,6 +48,7 @@ export class MutationGenerator {
 		entityName: EntityName,
 		entityFields: EntityFields,
 		entity: RootAccessor,
+		alias: string,
 		constraints?: MarkerTreeConstraints,
 		queryBuilder?: QueryBuilder
 	): QueryBuilder {
@@ -56,12 +58,12 @@ export class MutationGenerator {
 
 		if (entity instanceof EntityAccessor) {
 			if (entity.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-				queryBuilder = this.addCreateMutation(entity, entityName, entityFields, constraints, queryBuilder)
+				queryBuilder = this.addCreateMutation(entity, entityName, entityFields, alias, constraints, queryBuilder)
 			} else if (data && !Array.isArray(data)) {
-				queryBuilder = this.addUpdateMutation(entity, entityName, entityFields, data, constraints, queryBuilder)
+				queryBuilder = this.addUpdateMutation(entity, entityName, entityFields, data, alias, constraints, queryBuilder)
 			}
 		} else if (entity instanceof EntityForRemovalAccessor) {
-			queryBuilder = this.addDeleteMutation(entity, entityName, constraints, queryBuilder)
+			queryBuilder = this.addDeleteMutation(entity, entityName, alias, constraints, queryBuilder)
 		} else if (entity instanceof EntityCollectionAccessor) {
 			if (Array.isArray(data) || data === undefined) {
 				const entityCount = entity.entities.length
@@ -75,6 +77,7 @@ export class MutationGenerator {
 							entityName,
 							entityFields,
 							currentEntity,
+							`${alias}${MutationGenerator.ALIAS_SEPARATOR}${entityI}`,
 							constraints,
 							queryBuilder
 						)
@@ -96,6 +99,7 @@ export class MutationGenerator {
 	private addDeleteMutation(
 		entity: EntityForRemovalAccessor,
 		entityName: EntityName,
+		alias: string,
 		constraints?: MarkerTreeConstraints,
 		queryBuilder?: QueryBuilder
 	): QueryBuilder {
@@ -115,7 +119,7 @@ export class MutationGenerator {
 
 				return builder.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
-			`delete${entityName}_${this.primaryKeyToAlias(entity.primaryKey)}`
+			alias
 		)
 	}
 
@@ -124,6 +128,7 @@ export class MutationGenerator {
 		entityName: EntityName,
 		entityFields: EntityFields,
 		data: ReceivedEntityData<undefined>,
+		alias: string,
 		constraints?: MarkerTreeConstraints,
 		queryBuilder?: QueryBuilder
 	): QueryBuilder {
@@ -152,7 +157,7 @@ export class MutationGenerator {
 					.ok()
 					.validation()
 			},
-			`update${entityName}_${this.primaryKeyToAlias(primaryKey)}`
+			alias
 		)
 	}
 
@@ -160,6 +165,7 @@ export class MutationGenerator {
 		entity: EntityAccessor,
 		entityName: EntityName,
 		entityFields: EntityFields,
+		alias: string,
 		constraints?: MarkerTreeConstraints,
 		queryBuilder?: QueryBuilder
 	): QueryBuilder {
@@ -184,7 +190,7 @@ export class MutationGenerator {
 					.ok()
 					.validation()
 			},
-			`create${entityName}_${(this.createCounter++).toFixed(0)}`
+			alias
 		)
 	}
 

@@ -1,22 +1,59 @@
 import { assertNever } from 'cms-common'
-import { MutationError, MutationResult } from '../bindingTypes'
+import { MutationError, MutationRequestResult, MutationResult } from '../bindingTypes'
 import { ErrorAccessor } from '../dao/ErrorAccessor'
 import { ErrorCollectionAccessor } from '../dao/ErrorCollectionAccessor'
+import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {
-	public constructor(private readonly mutationResult: MutationResult) {}
+	public constructor(private readonly requestResult?: MutationRequestResult) {}
 
-	public preprocess(): ErrorsPreprocessor.ErrorNode {
-		if (
-			(this.mutationResult.ok && this.mutationResult.validation.valid) ||
-			this.mutationResult.validation.errors.length === 0
-		) {
-			return {
-				errors: new ErrorCollectionAccessor(),
-				nodeType: ErrorsPreprocessor.ErrorNodeType.Leaf
+	public preprocess(): ErrorsPreprocessor.ErrorTreeRoot {
+		const treeRoot: ErrorsPreprocessor.ErrorTreeRoot = {}
+
+		if (this.requestResult === undefined) {
+			return treeRoot
+		}
+
+		for (const mutationAlias in this.requestResult) {
+			const mutationResult = this.requestResult[mutationAlias]
+			const processedResult = this.processMutationResult(mutationResult)
+
+			if (processedResult === undefined) {
+				continue
+			}
+
+			const [treeId, itemNumber] = mutationAlias.split(MutationGenerator.ALIAS_SEPARATOR)
+
+			if (itemNumber === undefined) {
+				if (treeId in treeRoot) {
+					return this.rejectCorruptData()
+				}
+				treeRoot[treeId] = processedResult
+			} else {
+				const itemIndex = parseInt(itemNumber, 10)
+				const child = treeRoot[treeId]
+
+				if (!(treeId in treeRoot) || child === undefined) {
+					treeRoot[treeId] = {
+						nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
+						children: {
+							[itemIndex]: processedResult
+						},
+						errors: new ErrorCollectionAccessor()
+					}
+				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
+					child.children[itemIndex] = processedResult
+				}
 			}
 		}
-		return this.getErrorNode(this.mutationResult.validation.errors)
+		return treeRoot
+	}
+
+	private processMutationResult(mutationResult: MutationResult): ErrorsPreprocessor.ErrorNode | undefined {
+		if ((mutationResult.ok && mutationResult.validation.valid) || mutationResult.validation.errors.length === 0) {
+			return undefined
+		}
+		return this.getErrorNode(mutationResult.validation.errors)
 	}
 
 	private getErrorNode(errors: MutationError[]): ErrorsPreprocessor.ErrorNode {
@@ -102,7 +139,7 @@ class ErrorsPreprocessor {
 		return rootNode
 	}
 
-	private rejectCorruptData() {
+	private rejectCorruptData(): never {
 		throw new ErrorsPreprocessor.ErrorsPreprocessorError(
 			'Received corrupted data: a node cannot be simultaneously field-indexed and path-indexed.'
 		)
@@ -138,6 +175,10 @@ namespace ErrorsPreprocessor {
 		Leaf = 'Leaf',
 		NumberIndexed = 'NumberIndexed',
 		FieldIndexed = 'FieldIndexed'
+	}
+
+	export interface ErrorTreeRoot {
+		[rootId: string]: ErrorNode
 	}
 
 	export class ErrorsPreprocessorError extends Error {}

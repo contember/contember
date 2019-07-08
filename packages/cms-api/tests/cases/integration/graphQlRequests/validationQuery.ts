@@ -3,30 +3,33 @@ import { GQL } from '../../../src/tags'
 import 'mocha'
 import schema from '../../../example-project/src'
 import { testUuid } from '../../../src/testUuid'
-import { Input } from 'cms-common'
+import { Input, Result } from 'cms-common'
 
 interface CreateTest {
 	entity: string
 	executes?: SqlQuery[]
 	data: Input.CreateDataInput
-	errors: string[]
+	errors: string[] | Result.ValidationError[]
 }
 
 const testCreate = async (test: CreateTest) => {
+	const simplifiedErrors = test.errors.length === 0 || typeof test.errors[0] === 'string'
 	return await execute({
 		schema: schema.model,
 		validation: schema.validation,
 		executes: test.executes || [],
 		query: GQL`query($data: ${test.entity}CreateInput!) {
 					result: validateCreate${test.entity}(data: $data) {
-							${validationGqlPart}
+							${simplifiedErrors ? simplifiedValidationGqlPart : validationGqlPart}
 					}
 			}`,
 		queryVariables: { data: test.data },
 		return: {
 			data: {
 				result: {
-					errors: test.errors.map(it => ({ message: { text: it } })),
+					errors: (test.errors as any).map((it: string | Result.ValidationError) =>
+						typeof it === 'string' ? { message: { text: it } } : it
+					),
 					valid: test.errors.length === 0,
 				},
 			},
@@ -39,24 +42,28 @@ interface UpdateTest {
 	executes?: SqlQuery[]
 	by: Input.UniqueWhere
 	data: Input.UpdateDataInput
-	errors: string[]
+	errors: string[] | Result.ValidationError[]
 }
 
 const testUpdate = async (test: UpdateTest) => {
+	const simplifiedErrors = test.errors.length === 0 || typeof test.errors[0] === 'string'
+
 	return await execute({
 		schema: schema.model,
 		validation: schema.validation,
 		executes: test.executes || [],
 		query: GQL`query($data: ${test.entity}UpdateInput!, $by: ${test.entity}UniqueWhere!) {
 					result: validateUpdate${test.entity}(data: $data, by: $by) {
-							${validationGqlPart}
+							${simplifiedErrors ? simplifiedValidationGqlPart : validationGqlPart}
 					}
 			}`,
 		queryVariables: { data: test.data, by: test.by },
 		return: {
 			data: {
 				result: {
-					errors: test.errors.map(it => ({ message: { text: it } })),
+					errors: (test.errors as any).map((it: string | Result.ValidationError) =>
+						typeof it === 'string' ? { message: { text: it } } : it
+					),
 					valid: test.errors.length === 0,
 				},
 			},
@@ -64,12 +71,28 @@ const testUpdate = async (test: UpdateTest) => {
 	})
 }
 
+const simplifiedValidationGqlPart = `
+valid
+errors {
+    message {
+        text
+    }
+}`
 const validationGqlPart = `
 valid
 errors {
     message {
         text
     }
+    path {
+        ... on _IndexPathFragment {
+            index
+            alias
+        }
+        ... on _FieldPathFragment {
+            field
+        }
+    }    
 }`
 
 describe('Create validation queries', () => {
@@ -123,7 +146,7 @@ describe('Create validation queries', () => {
 			},
 			executes: [
 				{
-					sql: 'SELECT "root_"."id" AS "root_id" FROM  "public"."author" AS "root_"   WHERE "root_"."id" = ?',
+					sql: 'select "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" = ?',
 					parameters: [testUuid(1)],
 					response: {
 						rows: [{ root_id: testUuid(1) }],
@@ -145,14 +168,14 @@ describe('Create validation queries', () => {
 			},
 			executes: [
 				{
-					sql: 'SELECT "root_"."id" AS "root_id" FROM  "public"."author" AS "root_"   WHERE "root_"."id" = ?',
+					sql: 'select "root_"."id" as "root_id" from  "public"."author" as "root_"   where "root_"."id" = ?',
 					parameters: [testUuid(1)],
 					response: {
 						rows: [{ root_id: testUuid(1) }],
 					},
 				},
 				{
-					sql: 'SELECT "root_"."id" AS "root_id" FROM  "public"."tag" AS "root_"   WHERE "root_"."id" = ?',
+					sql: 'select "root_"."id" as "root_id" from  "public"."tag" as "root_"   where "root_"."id" = ?',
 					parameters: [testUuid(2)],
 					response: {
 						rows: [{ root_id: testUuid(2) }],
@@ -160,6 +183,56 @@ describe('Create validation queries', () => {
 				},
 			],
 			errors: [],
+		})
+	})
+
+	it('Validate with alias', async () => {
+		await testCreate({
+			entity: 'Post',
+			data: {
+				title: 'Abc',
+				content: 'Xyz',
+				author: { connect: { id: testUuid(1) } },
+				tags: [{ alias: 'foo', create: { label: '' } }],
+			},
+			executes: [
+				{
+					sql: 'select "root_"."id" as "root_id" from  "public"."author" as "root_"   where "root_"."id" = ?',
+					parameters: [testUuid(1)],
+					response: {
+						rows: [{ root_id: testUuid(1) }],
+					},
+				},
+			],
+			errors: [
+				{
+					message: {
+						text: 'Please fill at least two tags',
+					},
+					path: [
+						{
+							field: 'tags',
+						},
+					],
+				},
+				{
+					message: {
+						text: 'Tag label is required',
+					},
+					path: [
+						{
+							field: 'tags',
+						},
+						{
+							index: 0,
+							alias: 'foo',
+						},
+						{
+							field: 'label',
+						},
+					],
+				},
+			],
 		})
 	})
 })
@@ -220,6 +293,55 @@ describe('Update validation queries', () => {
 			by: { id: testUuid(1) },
 			data: { tags: [{ disconnect: { id: testUuid(10) } }] },
 			errors: ['Please fill at least two tags'],
+		})
+	})
+
+	it('update post with alias on many update', async () => {
+		await testUpdate({
+			entity: 'Post',
+			executes: [
+				{
+					sql:
+						'select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_" where "root_"."id" = ?',
+					parameters: [testUuid(1)],
+					response: {
+						rows: [{ root_id: testUuid(1) }],
+					},
+				},
+				{
+					sql: `select "junction_"."tag_id", "junction_"."post_id" from  "public"."post_tags" as "junction_"   where "junction_"."post_id" in (?)`,
+					parameters: [testUuid(1)],
+					response: {
+						rows: [{ post_id: testUuid(1), tag_id: testUuid(10) }, { post_id: testUuid(1), tag_id: testUuid(11) }],
+					},
+				},
+				{
+					sql: `select "root_"."id" as "root_id" from  "public"."tag" as "root_"   where "root_"."id" in (?, ?)`,
+					parameters: [testUuid(10), testUuid(11)],
+					response: { rows: [{ root_id: testUuid(10) }, { root_id: testUuid(11) }] },
+				},
+			],
+			by: { id: testUuid(1) },
+			data: { tags: [{ alias: 'foo', create: { label: '' } }] },
+			errors: [
+				{
+					message: {
+						text: 'Tag label is required',
+					},
+					path: [
+						{
+							field: 'tags',
+						},
+						{
+							index: 0,
+							alias: 'foo',
+						},
+						{
+							field: 'label',
+						},
+					],
+				},
+			],
 		})
 	})
 })

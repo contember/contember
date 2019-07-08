@@ -158,13 +158,14 @@ export default class CreateInputVisitor<Result>
 		const promises: Array<Promise<Result>> = []
 		let i = 0
 		for (const element of input) {
+			const alias = element.alias
 			this.verifyOperations(element)
 			let result
 			if (isIt<Input.ConnectRelationInput>(element, 'connect')) {
-				result = processor.connect({ ...context, input: element.connect, index: i++ })
+				result = processor.connect({ ...context, input: element.connect, index: i++, alias })
 			}
 			if (isIt<Input.CreateRelationInput>(element, 'create')) {
-				result = processor.create({ ...context, input: element.create, index: i++ })
+				result = processor.create({ ...context, input: element.create, index: i++, alias })
 			}
 			if (result !== undefined) {
 				promises.push(result)
@@ -174,7 +175,7 @@ export default class CreateInputVisitor<Result>
 	}
 
 	private verifyOperations(input: any) {
-		const keys = Object.keys(input)
+		const keys = Object.keys(input).filter(it => it !== 'alias')
 		if (keys.length !== 1) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new Error(`Expected either "create" or "connect". ${found} found.`)

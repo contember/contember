@@ -4,6 +4,7 @@ type _FieldPathFragment {
 
 type _IndexPathFragment {
   index: Int!
+  alias: String
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -80,6 +81,7 @@ input PostCreateInput {
 input PostCreateLocalesEntityRelationInput {
   connect: PostLocaleUniqueWhere
   create: PostLocaleWithoutPostCreateInput
+  alias: String
 }
 
 type PostCreateResult {
@@ -215,6 +217,7 @@ input PostUpdateLocalesEntityRelationInput {
   connect: PostLocaleUniqueWhere
   disconnect: PostLocaleUniqueWhere
   delete: PostLocaleUniqueWhere
+  alias: String
 }
 
 input PostUpdateLocalesRelationInput {

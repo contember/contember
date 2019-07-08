@@ -3,6 +3,7 @@ import * as Context from '../inputProcessing/InputContext'
 import { Input, Model, Value } from 'cms-common'
 import InputValidator from './InputValidator'
 import ValidationDataSelector from './ValidationDataSelector'
+import { appendRelationToPath, ValidationPath } from './ValidationPath'
 
 type Result = any
 
@@ -11,7 +12,7 @@ const NoResult = () => Promise.resolve([])
 export default class UpdateInputValidationProcessor implements UpdateInputProcessor<Result> {
 	constructor(
 		private readonly inputValidator: InputValidator,
-		private readonly path: (string | number)[],
+		private readonly path: ValidationPath,
 		private readonly node: Value.Object,
 		private readonly dataSelector: ValidationDataSelector
 	) {}
@@ -50,9 +51,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 	oneHasMany: UpdateInputProcessor.HasManyRelationInputProcessor<Context.OneHasManyContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processOneManyUpdate(ctx),
-		upsert: async () => {
-			return []
-		},
+		upsert: ctx => this.processOneManyUpsert(ctx),
 		connect: NoResult,
 		disconnect: NoResult,
 		['delete']: NoResult,
@@ -80,8 +79,10 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		relation: Model.AnyRelation
 		input: Input.CreateDataInput
 		index?: number
+		alias?: string
 	}) {
-		const newPath = [...this.path, ...(context.index ? [context.index] : []), context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name, context)
+
 		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath)
 	}
 
@@ -91,7 +92,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		input: Input.UpdateDataInput
 		targetRelation: Model.AnyRelation | null
 	}) {
-		const newPath = [...this.path, context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name)
 		const relationNode = this.node[context.relation.name]
 		if (!relationNode) {
 			return []
@@ -108,7 +109,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		relation: Model.AnyRelation
 		input: UpdateInputProcessor.UpsertInput
 	}) {
-		const newPath = [...this.path, context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name)
 		const relNode = this.node[context.relation.name] as Value.Object | undefined
 		if (!relNode) {
 			return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath)
@@ -125,8 +126,9 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		relation: Model.AnyRelation
 		input: UpdateInputProcessor.UpdateManyInput
 		index: number
+		alias?: string
 	}) {
-		const newPath = [...this.path, context.index, context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 		return this.inputValidator.validateUpdate(context.targetEntity, context.input.where, context.input.data, newPath)
 	}
 
@@ -135,9 +137,10 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		relation: Model.AnyRelation
 		input: UpdateInputProcessor.UpsertManyInput
 		index: number
+		alias?: string
 	}) {
 		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, context.input.where)
-		const newPath = [...this.path, context.index, context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 		if (id) {
 			return this.inputValidator.validateUpdate(
 				context.targetEntity,
@@ -156,8 +159,9 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		targetRelation: Model.AnyRelation
 		input: UpdateInputProcessor.UpdateManyInput
 		index: number
+		alias?: string
 	}) {
-		const newPath = [...this.path, context.index, context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 		const fullWhere = {
 			...context.input.where,
 			[context.targetRelation.name]: {
@@ -174,6 +178,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		targetRelation: Model.AnyRelation
 		input: UpdateInputProcessor.UpsertManyInput
 		index: number
+		alias?: string
 	}) => {
 		const fullWhere = {
 			...context.input.where,
@@ -182,7 +187,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 			},
 		}
 		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, fullWhere)
-		const newPath = [...this.path, context.index, context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 		if (id) {
 			return this.inputValidator.validateUpdate(
 				context.targetEntity,

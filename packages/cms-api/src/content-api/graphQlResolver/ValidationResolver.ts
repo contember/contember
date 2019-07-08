@@ -32,14 +32,13 @@ export default class ValidationResolver {
 			errors: validationResult.map(it => ({
 				message: it.message,
 				path: it.path.map(part => {
-					switch (typeof part) {
-						case 'number':
-							return { __typename: '_IndexPathFragment', index: part }
-						case 'string':
-							return { __typename: '_FieldPathFragment', field: part }
-						default:
-							return assertNever(part)
+					if ('field' in part) {
+						return { __typename: '_FieldPathFragment', ...part }
 					}
+					if ('index' in part) {
+						return { __typename: '_IndexPathFragment', ...part }
+					}
+					return assertNever(part)
 				}),
 			})),
 		}

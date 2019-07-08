@@ -14,8 +14,7 @@ import CreateInputProcessor from '../inputProcessing/CreateInputProcessor'
 import ValidationContext from './ValidationContext'
 import { evaluateValidation } from './ValidationEvaluation'
 import { rules } from './ValidationDefinition'
-
-type Path = (string | number)[]
+import { ValidationPath } from './ValidationPath'
 
 class InputValidator {
 	constructor(
@@ -133,7 +132,7 @@ class InputValidator {
 	async validateCreate(
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
-		path: Path = []
+		path: ValidationPath = []
 	): Promise<InputValidator.Result> {
 		if (!(await this.hasValidationRulesOnCreate(entity, data))) {
 			return []
@@ -160,7 +159,7 @@ class InputValidator {
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
-		path: Path = []
+		path: ValidationPath = []
 	): Promise<InputValidator.Result> {
 		if (!(await this.hasValidationRulesOnUpdate(entity, data))) {
 			return []
@@ -194,7 +193,7 @@ class InputValidator {
 		fields: string[],
 		entityRules: Validation.EntityRules,
 		context: ValidationContext.NodeContext,
-		path: Path
+		path: ValidationPath
 	) {
 		return fields
 			.map(field => tuple(field, entityRules[field]))
@@ -202,7 +201,7 @@ class InputValidator {
 				tuple(field, fieldRules.find(it => !evaluateValidation(context, rules.on(field, it.validator))))
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])
-			.map(([field, { message }]) => ({ path: [...path, field], message }))
+			.map(([field, { message }]) => ({ path: [...path, { field }], message }))
 	}
 
 	private async validateRelations(
@@ -229,7 +228,7 @@ class InputValidator {
 
 namespace InputValidator {
 	export interface FieldResult {
-		path: Path
+		path: ValidationPath
 		message: Validation.Message
 	}
 

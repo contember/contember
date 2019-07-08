@@ -1,4 +1,4 @@
-import { GraphQLBoolean, GraphQLInputObjectType } from 'graphql'
+import { GraphQLBoolean, GraphQLInputObjectType, GraphQLString } from 'graphql'
 import { Input, Model } from 'cms-common'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
@@ -147,7 +147,10 @@ export default class UpdateEntityRelationInputFieldVisitor
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
-			fields: () => filteredFields,
+			fields: () => ({
+				...filteredFields,
+				alias: { type: GraphQLString },
+			}),
 		})
 	}
 

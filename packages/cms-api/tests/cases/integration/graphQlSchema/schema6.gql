@@ -33,9 +33,9 @@ type Info {
 }
 
 type Mutation {
-  deleteRoot(by: RootUniqueWhere!): Root
+  deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
-  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
@@ -45,6 +45,11 @@ type OneHasManyEntity {
   id: UUID!
   a: String
   r2(filter: RootWhere): Root
+}
+
+type OneHasManyEntityDeleteResult {
+  ok: Boolean!
+  node: OneHasManyEntity
 }
 
 type OneHasManyEntityMeta {
@@ -78,8 +83,8 @@ input OneHasManyEntityUpdateR2EntityRelationInput {
 
 type OneHasManyEntityUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: OneHasManyEntity
+  validation: _ValidationResult!
 }
 
 input OneHasManyEntityWhere {
@@ -117,6 +122,11 @@ type Root {
   r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
 }
 
+type RootDeleteResult {
+  ok: Boolean!
+  node: Root
+}
+
 type RootMeta {
   id: FieldMeta
   r: FieldMeta
@@ -145,8 +155,8 @@ input RootUpdateREntityRelationInput {
 
 type RootUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Root
+  validation: _ValidationResult!
 }
 
 input RootUpdateRRelationInput {

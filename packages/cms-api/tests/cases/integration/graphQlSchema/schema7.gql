@@ -51,10 +51,10 @@ type Info {
 
 type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!): Post
+  deletePost(by: PostUniqueWhere!): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
@@ -86,7 +86,12 @@ input PostCreateLocalesEntityRelationInput {
 
 type PostCreateResult {
   ok: Boolean!
+  node: Post
   validation: _ValidationResult!
+}
+
+type PostDeleteResult {
+  ok: Boolean!
   node: Post
 }
 
@@ -112,7 +117,12 @@ input PostLocaleCreatePostEntityRelationInput {
 
 type PostLocaleCreateResult {
   ok: Boolean!
+  node: PostLocale
   validation: _ValidationResult!
+}
+
+type PostLocaleDeleteResult {
+  ok: Boolean!
   node: PostLocale
 }
 
@@ -158,8 +168,8 @@ input PostLocaleUpdatePostEntityRelationInput {
 
 type PostLocaleUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: PostLocale
+  validation: _ValidationResult!
 }
 
 input PostLocaleUpsertPostRelationInput {
@@ -227,8 +237,8 @@ input PostUpdateLocalesRelationInput {
 
 type PostUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Post
+  validation: _ValidationResult!
 }
 
 input PostUpsertLocalesRelationInput {

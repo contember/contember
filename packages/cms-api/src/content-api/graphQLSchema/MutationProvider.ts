@@ -5,6 +5,7 @@ import {
 	GraphQLList,
 	GraphQLNonNull,
 	GraphQLObjectType,
+	GraphQLObjectTypeConfig,
 	GraphQLString,
 	GraphQLUnionType,
 } from 'graphql'
@@ -115,12 +116,18 @@ export default class MutationProvider {
 		}
 		const entity = getEntity(this.schema, entityName)
 		return {
-			type: this.entityTypeProvider.getEntity(entityName),
+			type: new GraphQLNonNull(this.createResultType(entityName, 'delete')),
 			args: {
 				by: { type: new GraphQLNonNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)) },
 			},
 			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveDelete(entity, this.queryAstAFactory.create(info)),
+				context.executionContainer.get('mutationResolver').resolveDelete(
+					entity,
+					args,
+					this.queryAstAFactory.create(info, (node, path) => {
+						return path.length !== 1 || node.name.value === 'node'
+					})
+				),
 		}
 	}
 
@@ -148,15 +155,18 @@ export default class MutationProvider {
 		}
 	}
 
-	private createResultType(entityName: string, operation: string): GraphQLObjectType {
+	private createResultType(entityName: string, operation: 'create' | 'update' | 'delete'): GraphQLObjectType {
 		const nodeType = this.entityTypeProvider.getEntity(entityName)
+		const fields: GraphQLObjectTypeConfig<any, any>['fields'] = {
+			ok: { type: new GraphQLNonNull(GraphQLBoolean) },
+			node: { type: nodeType, resolve: aliasAwareResolver },
+		}
+		if (operation !== 'delete') {
+			fields.validation = { type: new GraphQLNonNull(MutationProvider.validationResultType) }
+		}
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}${operation}Result`,
-			fields: {
-				ok: { type: new GraphQLNonNull(GraphQLBoolean) },
-				validation: { type: new GraphQLNonNull(MutationProvider.validationResultType) },
-				node: { type: nodeType, resolve: aliasAwareResolver },
-			},
+			fields: fields,
 		})
 	}
 }

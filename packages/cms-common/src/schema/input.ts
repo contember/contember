@@ -62,9 +62,11 @@ namespace Input {
 		[column: string]: Value.FieldValue<E> | CreateOneRelationInput<E> | CreateManyRelationInput<E>
 	}
 
-	export type CreateOneRelationInput<E = never> = ConnectRelationInput<E> | CreateRelationInput<E>
+	export type CreateOneRelationInput<E = never> = { alias?: string } & (
+		| ConnectRelationInput<E>
+		| CreateRelationInput<E>)
 
-	export type CreateManyRelationInput<E = never> = Array<{ alias?: string } & CreateOneRelationInput<E>>
+	export type CreateManyRelationInput<E = never> = Array<CreateOneRelationInput<E>>
 
 	export interface UpdateDataInput<E = never> {
 		[column: string]: Value.FieldValue<E> | UpdateOneRelationInput<E> | UpdateManyRelationInput<E>
@@ -102,15 +104,15 @@ namespace Input {
 		| UpdateRelationInput<E>
 		| UpsertRelationInput<E>
 
-	export type UpdateManyRelationInputItem<E = never> =
+	export type UpdateManyRelationInputItem<E = never> = { alias?: string } & (
 		| CreateRelationInput<E>
 		| ConnectRelationInput<E>
 		| DeleteSpecifiedRelationInput<E>
 		| DisconnectSpecifiedRelationInput<E>
 		| UpdateSpecifiedRelationInput<E>
-		| UpsertSpecifiedRelationInput<E>
+		| UpsertSpecifiedRelationInput<E>)
 
-	export type UpdateManyRelationInput<E = never> = Array<{ alias?: string } & UpdateManyRelationInputItem<E>>
+	export type UpdateManyRelationInput<E = never> = Array<UpdateManyRelationInputItem<E>>
 
 	export enum OrderDirection {
 		asc = 'asc',

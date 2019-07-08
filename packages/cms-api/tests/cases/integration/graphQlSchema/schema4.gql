@@ -34,7 +34,7 @@ type Info {
 
 type Mutation {
   createRoot(data: RootCreateInput!): RootCreateResult!
-  deleteRoot(by: RootUniqueWhere!): Root
+  deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
@@ -61,8 +61,8 @@ input OneHasManyEntityCreateR2EntityRelationInput {
 
 type OneHasManyEntityCreateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: OneHasManyEntity
+  validation: _ValidationResult!
 }
 
 type OneHasManyEntityMeta {
@@ -98,8 +98,8 @@ input OneHasManyEntityUpdateR2EntityRelationInput {
 
 type OneHasManyEntityUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: OneHasManyEntity
+  validation: _ValidationResult!
 }
 
 input OneHasManyEntityUpsertR2RelationInput {
@@ -162,7 +162,12 @@ input RootCreateREntityRelationInput {
 
 type RootCreateResult {
   ok: Boolean!
+  node: Root
   validation: _ValidationResult!
+}
+
+type RootDeleteResult {
+  ok: Boolean!
   node: Root
 }
 
@@ -195,8 +200,8 @@ input RootUpdateREntityRelationInput {
 
 type RootUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Root
+  validation: _ValidationResult!
 }
 
 input RootUpdateRRelationInput {

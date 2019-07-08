@@ -34,10 +34,10 @@ type Info {
 
 type Mutation {
   createRoot(data: RootCreateInput!): RootCreateResult!
-  deleteRoot(by: RootUniqueWhere!): Root
+  deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
-  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
 
@@ -61,7 +61,12 @@ input OneHasManyEntityCreateR2EntityRelationInput {
 
 type OneHasManyEntityCreateResult {
   ok: Boolean!
+  node: OneHasManyEntity
   validation: _ValidationResult!
+}
+
+type OneHasManyEntityDeleteResult {
+  ok: Boolean!
   node: OneHasManyEntity
 }
 
@@ -130,7 +135,12 @@ input RootCreateREntityRelationInput {
 
 type RootCreateResult {
   ok: Boolean!
+  node: Root
   validation: _ValidationResult!
+}
+
+type RootDeleteResult {
+  ok: Boolean!
   node: Root
 }
 
@@ -153,8 +163,8 @@ input RootUpdateInput {
 
 type RootUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Root
+  validation: _ValidationResult!
 }
 
 input RootWhere {

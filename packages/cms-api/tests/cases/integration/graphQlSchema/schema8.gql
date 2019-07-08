@@ -56,7 +56,12 @@ input FrontPageCreateIntroVideoEntityRelationInput {
 
 type FrontPageCreateResult {
   ok: Boolean!
+  node: FrontPage
   validation: _ValidationResult!
+}
+
+type FrontPageDeleteResult {
+  ok: Boolean!
   node: FrontPage
 }
 
@@ -107,8 +112,8 @@ input FrontPageUpdateIntroVideoEntityRelationInput {
 
 type FrontPageUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: FrontPage
+  validation: _ValidationResult!
 }
 
 input FrontPageUpsertInHouseVideosRelationInput {
@@ -157,10 +162,10 @@ type Info {
 
 type Mutation {
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
-  deleteFrontPage(by: FrontPageUniqueWhere!): FrontPage
+  deleteFrontPage(by: FrontPageUniqueWhere!): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   createVideo(data: VideoCreateInput!): VideoCreateResult!
-  deleteVideo(by: VideoUniqueWhere!): Video
+  deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
@@ -267,7 +272,12 @@ input VideoCreateInput {
 
 type VideoCreateResult {
   ok: Boolean!
+  node: Video
   validation: _ValidationResult!
+}
+
+type VideoDeleteResult {
+  ok: Boolean!
   node: Video
 }
 
@@ -312,8 +322,8 @@ input VideoUpdateInput {
 
 type VideoUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Video
+  validation: _ValidationResult!
 }
 
 input VideoUpsertFrontPageRelationInput {

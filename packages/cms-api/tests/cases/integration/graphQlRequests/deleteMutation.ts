@@ -15,9 +15,11 @@ describe('Delete mutation', () => {
 			query: GQL`
         mutation {
           deletePost(by: {id: "${testUuid(1)}"}) {
-            id
-            author {
-              name
+            node {
+              id
+              author {
+                name
+              }
             }
           }
         }`,
@@ -80,10 +82,12 @@ describe('Delete mutation', () => {
 			return: {
 				data: {
 					deletePost: {
-						author: {
-							name: 'John',
+						node: {
+							author: {
+								name: 'John',
+							},
+							id: testUuid(1),
 						},
-						id: testUuid(1),
 					},
 				},
 			},
@@ -104,7 +108,9 @@ describe('Delete mutation', () => {
 			query: GQL`
         mutation {
           deleteAuthor(by: {id: "${testUuid(1)}"}) {
-            id
+            node {
+              id
+            }
           }
         }`,
 			executes: [
@@ -164,7 +170,9 @@ describe('Delete mutation', () => {
 			return: {
 				data: {
 					deleteAuthor: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -182,7 +190,9 @@ describe('Delete mutation', () => {
 			query: GQL`
         mutation {
           deleteAuthor(by: {id: "${testUuid(1)}"}) {
-            id
+            node {
+              id
+            }
           }
         }`,
 			executes: [
@@ -235,7 +245,9 @@ describe('Delete mutation', () => {
 			return: {
 				data: {
 					deleteAuthor: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},
@@ -250,7 +262,9 @@ describe('Delete mutation', () => {
 			query: GQL`
         mutation {
           deletePost(by: {id: "${testUuid(1)}"}) {
-            id
+            node {
+              id
+            }
           }
         }`,
 			permissions: {
@@ -309,7 +323,9 @@ describe('Delete mutation', () => {
 			return: {
 				data: {
 					deletePost: {
-						id: testUuid(1),
+						node: {
+							id: testUuid(1),
+						},
 					},
 				},
 			},

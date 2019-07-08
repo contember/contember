@@ -44,7 +44,12 @@ input AuthorCreatePostsEntityRelationInput {
 
 type AuthorCreateResult {
   ok: Boolean!
+  node: Author
   validation: _ValidationResult!
+}
+
+type AuthorDeleteResult {
+  ok: Boolean!
   node: Author
 }
 
@@ -86,8 +91,8 @@ input AuthorUpdatePostsRelationInput {
 
 type AuthorUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Author
+  validation: _ValidationResult!
 }
 
 input AuthorUpsertPostsRelationInput {
@@ -136,7 +141,12 @@ input CategoryCreatePostsEntityRelationInput {
 
 type CategoryCreateResult {
   ok: Boolean!
+  node: Category
   validation: _ValidationResult!
+}
+
+type CategoryDeleteResult {
+  ok: Boolean!
   node: Category
 }
 
@@ -178,8 +188,8 @@ input CategoryUpdatePostsRelationInput {
 
 type CategoryUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Category
+  validation: _ValidationResult!
 }
 
 input CategoryUpsertPostsRelationInput {
@@ -235,16 +245,16 @@ type Info {
 
 type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!): Post
+  deletePost(by: PostUniqueWhere!): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
-  deleteCategory(by: CategoryUniqueWhere!): Category
+  deleteCategory(by: CategoryUniqueWhere!): CategoryDeleteResult!
   updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): CategoryUpdateResult!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
-  deleteAuthor(by: AuthorUniqueWhere!): Author
+  deleteAuthor(by: AuthorUniqueWhere!): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): AuthorUpdateResult!
   generateUploadUrl(contentType: String!): SignedUpload!
 }
@@ -290,7 +300,12 @@ input PostCreateLocalesEntityRelationInput {
 
 type PostCreateResult {
   ok: Boolean!
+  node: Post
   validation: _ValidationResult!
+}
+
+type PostDeleteResult {
+  ok: Boolean!
   node: Post
 }
 
@@ -314,7 +329,12 @@ input PostLocaleCreatePostEntityRelationInput {
 
 type PostLocaleCreateResult {
   ok: Boolean!
+  node: PostLocale
   validation: _ValidationResult!
+}
+
+type PostLocaleDeleteResult {
+  ok: Boolean!
   node: PostLocale
 }
 
@@ -351,8 +371,8 @@ input PostLocaleUpdatePostEntityRelationInput {
 
 type PostLocaleUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: PostLocale
+  validation: _ValidationResult!
 }
 
 input PostLocaleUpsertPostRelationInput {
@@ -446,8 +466,8 @@ input PostUpdateLocalesRelationInput {
 
 type PostUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Post
+  validation: _ValidationResult!
 }
 
 input PostUpsertAuthorRelationInput {

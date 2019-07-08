@@ -75,6 +75,23 @@ export default class MutationResolver {
 		}
 	}
 
+	public async resolveDelete(entity: Model.Entity, input: Input.DeleteInput, queryAst: ObjectNode) {
+		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
+
+		const nodes = await this.resolveResultNodes(entity, whereExpanded, queryAst)
+
+		try {
+			await this.mapper.delete(entity, queryAst.args.by)
+		} catch (e) {
+			if (!(e instanceof Mapper.NoResultError)) {
+				throw e
+			}
+			throw new UserError('Mutation failed, operation denied by ACL rules')
+		}
+
+		return { ok: true, ...nodes }
+	}
+
 	private async resolveResultNodes(
 		entity: Model.Entity,
 		where: Input.Where,
@@ -90,23 +107,5 @@ export default class MutationResolver {
 			nodes[singleNodeQuery.alias] = (await this.mapper.select(entity, objectWithArgs))[0] || null
 		}
 		return nodes
-	}
-
-	public async resolveDelete(entity: Model.Entity, queryAst: ObjectNode<Input.DeleteInput>) {
-		const whereExpanded = this.uniqueWhereExpander.expand(entity, queryAst.args.by)
-		const queryExpanded = queryAst.withArg<Input.ListQueryInput>('filter', whereExpanded)
-
-		const result = (await this.mapper.select(entity, queryExpanded))[0] || null
-
-		try {
-			await this.mapper.delete(entity, queryAst.args.by)
-		} catch (e) {
-			if (!(e instanceof Mapper.NoResultError)) {
-				throw e
-			}
-			throw new UserError('Mutation failed, operation denied by ACL rules')
-		}
-
-		return result
 	}
 }

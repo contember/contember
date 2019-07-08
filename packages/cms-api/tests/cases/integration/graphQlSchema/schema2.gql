@@ -87,8 +87,8 @@ input TestCreateInput {
 
 type TestCreateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Test
+  validation: _ValidationResult!
 }
 
 type TestMeta {
@@ -112,8 +112,8 @@ input TestUpdateInput {
 
 type TestUpdateResult {
   ok: Boolean!
-  validation: _ValidationResult!
   node: Test
+  validation: _ValidationResult!
 }
 
 input TestWhere {

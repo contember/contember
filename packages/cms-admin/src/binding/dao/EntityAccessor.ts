@@ -1,12 +1,15 @@
 import { EntityData } from './EntityData'
+import { Errorable } from './Errorable'
+import { ErrorCollectionAccessor } from './ErrorCollectionAccessor'
 
-class EntityAccessor {
+class EntityAccessor implements Errorable {
 	public readonly primaryKey: string | EntityAccessor.UnpersistedEntityID
 
 	public constructor(
 		primaryKey: string | EntityAccessor.UnpersistedEntityID | undefined,
 		public readonly typename: string | undefined,
 		public readonly data: EntityData,
+		public readonly errors: ErrorCollectionAccessor,
 		public readonly replaceWith: (replacement: EntityAccessor) => void,
 		public readonly remove?: (removalType: EntityAccessor.RemovalType) => void
 	) {

@@ -11,6 +11,7 @@ import {
 	DataTreeRequestType,
 	DataTreeState
 } from '../../state/dataTrees'
+import { MutationRequestResult } from '../bindingTypes'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -40,12 +41,14 @@ type DataProviderInnerProps<DRP> = DataProviderOwnProps<DRP> & DataProviderDispa
 export interface DataProviderState {
 	accessorTree?: AccessorTreeRoot
 	query?: string
+	showingErrors: boolean
 }
 
 class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>, DataProviderState, boolean> {
 	public state: DataProviderState = {
 		accessorTree: undefined,
-		query: undefined
+		query: undefined,
+		showingErrors: false
 	}
 
 	protected triggerPersist = () => {
@@ -89,8 +92,18 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			}
 			console.log('query', this.state.query)
 			return this.props.sendDataTreeRequest(DataTreeRequestType.Query, this.state.query)
-		} else if (mutation.readyState === DataTreeRequestReadyState.Error) {
-			// TODO handle mutation error
+		}
+
+		if (mutation.readyState === DataTreeRequestReadyState.Error) {
+			if (this.state.showingErrors) {
+				return
+			}
+
+			const queryData = query.data
+			const mutationResult: MutationRequestResult = mutation.data
+
+			console.log('mut error!', mutationResult)
+			return this.initializeAccessorTree(queryData, mutationResult)
 		}
 
 		if (query.readyState === DataTreeRequestReadyState.Success) {
@@ -165,12 +178,12 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		this.unmounted = true
 	}
 
-	private initializeAccessorTree(initialData: any) {
-		const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree, initialData)
+	private initializeAccessorTree(initialData: any, errors?: MutationRequestResult) {
+		const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree, initialData, errors)
 		accessTreeGenerator.generateLiveTree(accessorTree => {
 			console.log('data', accessorTree)
 			this.props.onDataAvailable && this.props.onDataAvailable(accessorTree)
-			this.setState({ accessorTree })
+			this.setState({ accessorTree, showingErrors: errors !== undefined })
 		})
 	}
 }

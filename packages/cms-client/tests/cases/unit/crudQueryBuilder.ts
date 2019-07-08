@@ -108,6 +108,7 @@ describe('crud query builder', () => {
 					}
 					... on _IndexPathFragment {
 						index
+						alias
 					}
 				}
 				message {

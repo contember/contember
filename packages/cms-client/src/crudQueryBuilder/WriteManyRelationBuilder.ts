@@ -3,18 +3,23 @@ import { Literal } from '../graphQlBuilder'
 import { WriteOperation, WriteRelationOps } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
-class WriteManyRelationBuilder<Op extends WriteOperation, Allowed extends WriteRelationOps[Op]> {
-	private constructor(public readonly data: WriteManyRelationBuilder.DataFormat[Op] = []) {}
+class WriteManyRelationBuilder<
+	Op extends WriteOperation.ContentfulOperation,
+	Allowed extends WriteRelationOps[Op['op']]
+> {
+	private constructor(public readonly data: WriteManyRelationBuilder.DataFormat[Op['op']] = []) {}
 
-	public static instantiate<Op extends WriteOperation, Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op]>(
-		data: WriteManyRelationBuilder.DataFormat[Op] = []
-	): WriteManyRelationBuilder.Builder<Op, Allowed> {
+	public static instantiate<
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]
+	>(data: WriteManyRelationBuilder.DataFormat[Op['op']] = []): WriteManyRelationBuilder.Builder<Op, Allowed> {
 		return new WriteManyRelationBuilder<Op, Allowed>(data)
 	}
 
-	public static instantiateFromFactory<Op extends WriteOperation, Allowed extends WriteRelationOps[Op]>(
-		builder: WriteManyRelationBuilder.BuilderFactory<Op, Allowed>
-	): WriteManyRelationBuilder.Builder<Op, never> {
+	public static instantiateFromFactory<
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']]
+	>(builder: WriteManyRelationBuilder.BuilderFactory<Op, Allowed>): WriteManyRelationBuilder.Builder<Op, never> {
 		if (typeof builder === 'function') {
 			return builder(WriteManyRelationBuilder.instantiate())
 		}
@@ -34,14 +39,14 @@ class WriteManyRelationBuilder<Op extends WriteOperation, Allowed extends WriteR
 			: WriteManyRelationBuilder.instantiate<Op>([
 					...this.data,
 					this.withAlias({ create: resolvedData }, alias)
-			  ] as WriteManyRelationBuilder.DataFormat[WriteOperation.Create])) as WriteManyRelationBuilder.Builder<Op>
+			  ] as WriteManyRelationBuilder.DataFormat[WriteOperation.Create['op']])) as WriteManyRelationBuilder.Builder<Op>
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>, alias?: string) {
 		return WriteManyRelationBuilder.instantiate<Op>([
 			...this.data,
 			this.withAlias({ connect: where }, alias)
-		] as WriteManyRelationBuilder.DataFormat[Op])
+		] as WriteManyRelationBuilder.DataFormat[Op['op']])
 	}
 
 	public delete(where: Input.UniqueWhere<Literal>, alias?: string) {
@@ -114,15 +119,18 @@ namespace WriteManyRelationBuilder {
 		update: Input.UpdateManyRelationInput<Literal>
 	}
 
-	export type Builder<Op extends WriteOperation, Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op]> = Omit<
+	export type Builder<
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]
+	> = Omit<
 		WriteManyRelationBuilder<Op, Allowed>,
-		Exclude<WriteRelationOps[WriteOperation], Allowed>
+		Exclude<WriteRelationOps[WriteOperation.ContentfulOperation['op']], Allowed>
 	>
 
-	export type BuilderFactory<Op extends WriteOperation, Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op]> =
-		| DataFormat[Op]
-		| Builder<Op, never>
-		| ((builder: Builder<Op, Allowed>) => Builder<Op, never>)
+	export type BuilderFactory<
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]
+	> = DataFormat[Op['op']] | Builder<Op, never> | ((builder: Builder<Op, Allowed>) => Builder<Op, never>)
 }
 
 export { WriteManyRelationBuilder }

@@ -110,14 +110,15 @@ export class MutationGenerator {
 		return queryBuilder.delete(
 			entityName,
 			builder => {
-				builder = builder.column(PRIMARY_KEY_NAME)
-
 				let where = {}
 				if (constraints && constraints.whereType === 'unique') {
 					where = constraints.where
 				}
 
-				return builder.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
+				return builder
+					.ok()
+					.node(builder => builder.column(PRIMARY_KEY_NAME))
+					.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
 			alias
 		)

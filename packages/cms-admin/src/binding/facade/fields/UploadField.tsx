@@ -15,6 +15,7 @@ import { QueryLanguage } from '../../queryLanguage'
 export interface UploadFieldMetadata extends FieldMetadata<string> {
 	upload?: AnyUpload
 	label?: FormGroupProps['label']
+	emptyText?: React.ReactNode
 }
 
 export interface UploadFieldOwnProps {
@@ -22,6 +23,7 @@ export interface UploadFieldOwnProps {
 	label?: FormGroupProps['label']
 	accept: string
 	children: (url: string) => React.ReactNode
+	emptyText?: React.ReactNode
 }
 
 export interface UploadFieldDispatchProps {
@@ -68,7 +70,8 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 							metadata={{
 								...metadata,
 								upload,
-								label: this.props.label
+								label: this.props.label,
+								emptyText: this.props.emptyText
 							}}
 						>
 							{this.props.children}
@@ -87,26 +90,32 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 namespace UploadFieldComponent {
 	export interface InnerProps {
 		metadata: UploadFieldMetadata
+		emptyText?: React.ReactNode
 		children: (url: string) => React.ReactNode
 	}
 
 	export class Inner extends React.PureComponent<InnerProps> {
 		public render() {
-			const { data, environment, upload, label } = this.props.metadata
+			const { environment, upload, label } = this.props.metadata
 			return (
 				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', label)}>
 					<label className="fileInput">
-						<span className="fileInput-preview">
-							{data.currentValue && this.props.children(data.currentValue)}
-							{upload &&
-								upload.status !== UploadStatus.FINISHED &&
-								upload.objectURL &&
-								this.props.children(upload.objectURL)}
-						</span>
+						<span className="fileInput-preview">{this.renderPreview()}</span>
 						<span className="fileInput-message">{this.renderUploadStatusMessage(upload)}</span>
 					</label>
 				</FormGroup>
 			)
+		}
+
+		private renderPreview() {
+			const { data, upload, emptyText } = this.props.metadata
+			if (upload && upload.status !== UploadStatus.FINISHED && upload.objectURL) {
+				return this.props.children(upload.objectURL)
+			}
+			if (data.currentValue) {
+				return this.props.children(data.currentValue)
+			}
+			return <span className="fileInput-empty">{emptyText}</span>
 		}
 
 		public componentDidUpdate() {
@@ -119,7 +128,12 @@ namespace UploadFieldComponent {
 
 		private renderUploadStatusMessage(upload?: AnyUpload) {
 			if (!upload) {
-				return 'Select a file to upload'
+				return (
+					<>
+						<button className={'button'}>Select a file to upload</button>
+						<span className={'fileInput-drop'}>or drag & drop</span>
+					</>
+				)
 			}
 			switch (upload.status) {
 				case UploadStatus.PREPARING:

@@ -11,6 +11,7 @@ export interface TextFieldProps {
 	label?: FormGroupProps['label']
 	large?: InputGroupProps['large']
 	inlineLabel?: boolean
+	horizontal?: boolean
 }
 
 export const TextField = SimpleRelativeSingleField<TextFieldProps>(props => {
@@ -20,7 +21,10 @@ export const TextField = SimpleRelativeSingleField<TextFieldProps>(props => {
 	return (
 		<Field<string> name={props.name}>
 			{({ data, isMutating, environment }): React.ReactNode => (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)}>
+				<FormGroup
+					label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
+					horizontal={props.horizontal}
+				>
 					<InputGroup
 						value={data.currentValue || ''}
 						onChange={generateOnChange(data)}

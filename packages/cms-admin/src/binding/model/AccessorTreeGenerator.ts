@@ -75,6 +75,7 @@ export class AccessorTreeGenerator {
 									primaryKey,
 									entityAccessor.typename,
 									entityAccessor.data,
+									entityAccessor.errors,
 									entityAccessor.replaceWith,
 									removalType
 								)
@@ -114,6 +115,7 @@ export class AccessorTreeGenerator {
 							entityAccessor.primaryKey,
 							entityAccessor.typename,
 							entityAccessor.data,
+							entityAccessor.errors,
 							entityAccessor.replaceWith,
 							removalType
 						)
@@ -213,7 +215,8 @@ export class AccessorTreeGenerator {
 					const onChange = (newValue: Scalar | GraphQlBuilder.Literal) => {
 						onUpdate(
 							placeholderName,
-							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(placeholderName, newValue, onChange)
+							// TODO this is just to make it compile
+							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(placeholderName, newValue, [], onChange)
 						)
 					}
 					// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
@@ -221,6 +224,7 @@ export class AccessorTreeGenerator {
 					entityData[placeholderName] = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 						placeholderName,
 						fieldData === undefined ? field.defaultValue || null : fieldData,
+						[], // TODO this is just to make it compile
 						onChange
 					)
 				}
@@ -229,7 +233,8 @@ export class AccessorTreeGenerator {
 			}
 		}
 
-		return new EntityAccessor(id, typename, new EntityData(entityData), onReplace, onUnlink)
+		// TODO this is just to make it compile
+		return new EntityAccessor(id, typename, new EntityData(entityData), [], onReplace, onUnlink)
 	}
 
 	private generateOneReference(
@@ -334,6 +339,7 @@ export class AccessorTreeGenerator {
 				...original.data.allFieldData,
 				[fieldPlaceholder]: newData
 			}),
+			original.errors,
 			original.replaceWith,
 			original.remove
 		)
@@ -349,6 +355,7 @@ export class AccessorTreeGenerator {
 			replacement.primaryKey,
 			original.typename,
 			replacement.data,
+			original.errors,
 			original.replaceWith,
 			onRemove || original.remove
 		)
@@ -366,6 +373,7 @@ export class AccessorTreeGenerator {
 					id,
 					currentEntity.typename,
 					currentEntity.data,
+					currentEntity.errors,
 					currentEntity.replaceWith,
 					removalType
 				)

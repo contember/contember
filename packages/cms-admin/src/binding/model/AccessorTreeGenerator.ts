@@ -2,6 +2,7 @@ import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from 'cms-common'
 import {
 	FieldName,
+	MutationRequestResult,
 	PRIMARY_KEY_NAME,
 	ReceivedData,
 	ReceivedEntityData,
@@ -21,13 +22,19 @@ import {
 	MarkerTreeRoot,
 	ReferenceMarker
 } from '../dao'
+import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
 type OnReplace = EntityAccessor['replaceWith']
 type OnUnlink = EntityAccessor['remove']
 
 export class AccessorTreeGenerator {
-	public constructor(private tree: MarkerTreeRoot, private allInitialData: any) {}
+	private readonly errors: ErrorsPreprocessor.ErrorTreeRoot
+
+	public constructor(private tree: MarkerTreeRoot, private allInitialData: any, errors?: MutationRequestResult) {
+		const preprocessor = new ErrorsPreprocessor(errors)
+		this.errors = preprocessor.preprocess()
+	}
 
 	public generateLiveTree(updateData: (newData?: AccessorTreeRoot) => void): void {
 		updateData(this.generateSubTree(this.tree, updateData))

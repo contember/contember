@@ -4,17 +4,17 @@ import { WriteOperation } from './types'
 import { WriteManyRelationBuilder } from './WriteManyRelationBuilder'
 import { WriteOneRelationBuilder } from './WriteOneRelationBuilder'
 
-class WriteDataBuilder<Op extends WriteOperation> {
-	public readonly data: WriteDataBuilder.DataFormat[Op]
+class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
+	public readonly data: WriteDataBuilder.DataFormat[Op['op']]
 
-	public constructor(data?: WriteDataBuilder.DataFormat[Op]) {
+	public constructor(data?: WriteDataBuilder.DataFormat[Op['op']]) {
 		this.data = data || {}
 	}
 
-	public static resolveData<Op extends WriteOperation>(
+	public static resolveData<Op extends WriteOperation.ContentfulOperation>(
 		dataLike: WriteDataBuilder.DataLike<Op>
-	): WriteDataBuilder.DataFormat[Op] | undefined {
-		let resolvedData: WriteDataBuilder.DataFormat[Op]
+	): WriteDataBuilder.DataFormat[Op['op']] | undefined {
+		let resolvedData: WriteDataBuilder.DataFormat[Op['op']]
 
 		if (dataLike instanceof WriteDataBuilder) {
 			resolvedData = dataLike.data
@@ -58,8 +58,8 @@ namespace WriteDataBuilder {
 		update: Input.UpdateDataInput<Literal>
 	}
 
-	export type DataLike<Op extends WriteOperation> =
-		| DataFormat[Op]
+	export type DataLike<Op extends WriteOperation.ContentfulOperation> =
+		| DataFormat[Op['op']]
 		| WriteDataBuilder<Op>
 		| ((builder: WriteDataBuilder<Op>) => WriteDataBuilder<Op>)
 }

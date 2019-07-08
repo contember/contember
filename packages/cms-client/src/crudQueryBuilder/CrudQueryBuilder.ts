@@ -6,6 +6,7 @@ import {
 	CreateMutationArguments,
 	CreateMutationFields,
 	DeleteMutationArguments,
+	DeleteMutationFields,
 	GetQueryArguments,
 	ListQueryArguments,
 	Mutations,
@@ -105,14 +106,14 @@ export class CrudQueryBuilder {
 
 	public delete(
 		name: string,
-		query: ReadBuilder.BuilderFactory<DeleteMutationArguments>,
+		query: WriteBuilder.BuilderFactory<DeleteMutationArguments, DeleteMutationFields, WriteOperation.Delete>,
 		alias?: string
 	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `delete${name}`
-		query = ReadBuilder.instantiateFromFactory(query)
+		query = WriteBuilder.instantiateFromFactory(query)
 
 		const [objectName, objectBuilder] =
 			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]

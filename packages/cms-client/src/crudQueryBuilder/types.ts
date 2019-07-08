@@ -22,10 +22,7 @@ export type UpdateMutationFields = 'ok' | 'validation' | 'node'
 
 export type CreateMutationFields = 'ok' | 'validation' | 'node'
 
-export enum WriteOperation {
-	Create = 'create',
-	Update = 'update'
-}
+export type DeleteMutationFields = 'ok' | 'node'
 
 export type WriteArguments = CreateMutationArguments | UpdateMutationArguments | DeleteMutationArguments
 
@@ -36,4 +33,30 @@ export type ReadArguments = GetQueryArguments | ListQueryArguments | HasOneArgum
 export interface WriteRelationOps {
 	create: 'create' | 'connect'
 	update: 'create' | 'connect' | 'delete' | 'disconnect' | 'update' | 'upsert'
+}
+
+// TODO Silly enums because TS does not support enum extension 🙄
+// https://github.com/Microsoft/TypeScript/issues/17592
+export namespace WriteOperation {
+	export interface Operation {
+		op: 'create' | 'update' | 'delete'
+	}
+	export abstract class Operation implements Operation {}
+
+	export interface ContentfulOperation {
+		op: 'create' | 'update'
+	}
+	export abstract class ContentfulOperation extends Operation implements ContentfulOperation {}
+
+	export class Update extends ContentfulOperation {
+		readonly op = 'update' as const
+	}
+
+	export class Create extends ContentfulOperation {
+		readonly op = 'create' as const
+	}
+
+	export class Delete extends Operation {
+		readonly op = 'delete' as const
+	}
 }

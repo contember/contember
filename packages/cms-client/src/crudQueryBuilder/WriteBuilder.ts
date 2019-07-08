@@ -5,25 +5,27 @@ import { WriteArguments, WriteFields, WriteOperation } from './types'
 import { ValidationRelationBuilder } from './ValidationRelationBuilder'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
-class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation> {
+class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation> {
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
-	public static instantiate<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation>(
+	public static instantiate<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation>(
 		objectBuilder: ObjectBuilder = new ObjectBuilder()
 	): WriteBuilder.Builder<AA, AF, Op> {
 		return new WriteBuilder<AA, AF, Op>(objectBuilder)
 	}
 
-	public static instantiateFromFactory<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation>(
-		builder: WriteBuilder.BuilderFactory<AA, AF, Op>
-	): WriteBuilder.Builder<never, never, Op> {
+	public static instantiateFromFactory<
+		AA extends WriteArguments,
+		AF extends WriteFields,
+		Op extends WriteOperation.Operation
+	>(builder: WriteBuilder.BuilderFactory<AA, AF, Op>): WriteBuilder.Builder<never, never, Op> {
 		if (typeof builder === 'function') {
 			return builder(WriteBuilder.instantiate())
 		}
 		return builder
 	}
 
-	public data(data: WriteDataBuilder.DataLike<Op>) {
+	public data<SubOp extends Op & WriteOperation.ContentfulOperation>(data: WriteDataBuilder.DataLike<SubOp>) {
 		const resolvedData = WriteDataBuilder.resolveData(data)
 		return WriteBuilder.instantiate<Exclude<AA, 'data'>, AF, Op>(
 			resolvedData === undefined ? this.objectBuilder : this.objectBuilder.argument('data', resolvedData)
@@ -53,12 +55,12 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 }
 
 namespace WriteBuilder {
-	export type Builder<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation> = Omit<
+	export type Builder<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation> = Omit<
 		Omit<WriteBuilder<AA, AF, Op>, Exclude<WriteArguments, AA>>,
 		Exclude<WriteFields, AF>
 	>
 
-	export type BuilderFactory<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation> =
+	export type BuilderFactory<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation> =
 		| Builder<never, never, Op>
 		| ((builder: Builder<AA, AF, Op>) => Builder<never, never, Op>)
 }

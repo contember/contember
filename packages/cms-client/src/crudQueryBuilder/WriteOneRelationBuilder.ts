@@ -1,27 +1,27 @@
 import { Input } from 'cms-common'
 import { Literal } from '../graphQlBuilder'
-import { WriteRelationOps, WriteOperation } from './types'
+import { WriteOperation, WriteRelationOps } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
 class WriteOneRelationBuilder<
-	Op extends WriteOperation,
-	Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op],
-	D extends WriteOneRelationBuilder.DataFormat[Op] | undefined = WriteOneRelationBuilder.DataFormat[Op]
+	Op extends WriteOperation.ContentfulOperation,
+	Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
+	D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
 > {
 	protected constructor(public readonly data: D = undefined as D) {}
 
 	public static instantiate<
-		Op extends WriteOperation,
-		Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op],
-		D extends WriteOneRelationBuilder.DataFormat[Op] | undefined = WriteOneRelationBuilder.DataFormat[Op]
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
 	>(data: D = undefined as D): WriteOneRelationBuilder.Builder<Op, Allowed, D> {
 		return new WriteOneRelationBuilder<Op, Allowed, D>(data)
 	}
 
 	public static instantiateFromFactory<
-		Op extends WriteOperation,
-		Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op],
-		D extends WriteOneRelationBuilder.DataFormat[Op] | undefined = WriteOneRelationBuilder.DataFormat[Op]
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
 	>(builder: WriteOneRelationBuilder.BuilderFactory<Op, Allowed, D>): WriteOneRelationBuilder.Builder<Op, never, D> {
 		if (typeof builder === 'function') {
 			return builder(WriteOneRelationBuilder.instantiate())
@@ -83,15 +83,18 @@ namespace WriteOneRelationBuilder {
 	}
 
 	export type Builder<
-		Op extends WriteOperation,
-		Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op],
-		D extends WriteOneRelationBuilder.DataFormat[Op] | undefined = WriteOneRelationBuilder.DataFormat[Op]
-	> = Omit<WriteOneRelationBuilder<Op, Allowed, D>, Exclude<WriteRelationOps[WriteOperation], Allowed>>
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
+	> = Omit<
+		WriteOneRelationBuilder<Op, Allowed, D>,
+		Exclude<WriteRelationOps[WriteOperation.ContentfulOperation['op']], Allowed>
+	>
 
 	export type BuilderFactory<
-		Op extends WriteOperation,
-		Allowed extends WriteRelationOps[Op] = WriteRelationOps[Op],
-		D extends WriteOneRelationBuilder.DataFormat[Op] | undefined = WriteOneRelationBuilder.DataFormat[Op]
+		Op extends WriteOperation.ContentfulOperation,
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
 	> = D | Builder<Op, never, D> | ((builder: Builder<Op, Allowed, D>) => Builder<Op, never, D>)
 }
 

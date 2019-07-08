@@ -14,8 +14,8 @@ describe('crud query builder', () => {
 							.many('locales', builder => builder.connect({ id: '1' }).update({ locale: 'cs' }, { title: 'foo' }))
 							.many('tags', b =>
 								b
-									.connect({ id: '1' })
-									.create({ name: 'foo' })
+									.connect({ id: '1' }, 'connectId1')
+									.create({ name: 'foo' }, 'createNameFoo')
 									.disconnect({ id: 2 })
 							)
 							.many('locales', [{ update: { by: { id: '123' }, data: { foo: 'bar' } } }])
@@ -46,7 +46,7 @@ describe('crud query builder', () => {
 			)
 
 		expect(builder.getGql()).equals(`mutation {
-	updatePost(data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}}, {create: {name: "foo"}}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}, by: {id: "123"}) {
+	updatePost(data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}, alias: "connectId1"}, {create: {name: "foo"}, alias: "createNameFoo"}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}, by: {id: "123"}) {
 		node {
 			id
 			... on Foo {

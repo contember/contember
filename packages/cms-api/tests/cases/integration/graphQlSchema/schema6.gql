@@ -4,6 +4,7 @@ type _FieldPathFragment {
 
 type _IndexPathFragment {
   index: Int!
+  alias: String
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -139,6 +140,7 @@ input RootUpdateREntityRelationInput {
   connect: OneHasManyEntityUniqueWhere
   disconnect: OneHasManyEntityUniqueWhere
   delete: OneHasManyEntityUniqueWhere
+  alias: String
 }
 
 type RootUpdateResult {

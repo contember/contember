@@ -1,4 +1,4 @@
-import { GraphQLInputObjectType } from 'graphql'
+import { GraphQLInputObjectType, GraphQLString } from 'graphql'
 import { Input, Model } from 'cms-common'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
@@ -9,7 +9,7 @@ import CreateEntityRelationAllowedOperationsVisitor from './CreateEntityRelation
 import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
 
 export default class CreateEntityRelationInputFieldVisitor
-	implements Model.ColumnVisitor<never>, Model.RelationVisitor<GraphQLInputObjectType | undefined> {
+	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly whereTypeBuilder: WhereTypeProvider,
@@ -21,11 +21,30 @@ export default class CreateEntityRelationInputFieldVisitor
 		throw new Error()
 	}
 
-	public visitRelation(
+	public visitHasOne(
+		entity: Model.Entity,
+		relation: Model.Relation & Model.NullableRelation,
+		targetEntity: Model.Entity,
+		targetRelation: Model.Relation | null
+	): GraphQLInputObjectType | undefined {
+		return this.createInputObject(entity, relation, targetEntity, targetRelation, false)
+	}
+
+	public visitHasMany(
 		entity: Model.Entity,
 		relation: Model.Relation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.Relation
+		targetRelation: Model.Relation | null
+	): GraphQLInputObjectType | undefined {
+		return this.createInputObject(entity, relation, targetEntity, targetRelation, true)
+	}
+
+	public createInputObject(
+		entity: Model.Entity,
+		relation: Model.Relation,
+		targetEntity: Model.Entity,
+		targetRelation: Model.Relation | null,
+		withAliasField: boolean
 	): GraphQLInputObjectType | undefined {
 		const targetName = targetRelation ? targetRelation.name : undefined
 		const fields: GraphQLInputFieldConfigMap = {}
@@ -53,7 +72,13 @@ export default class CreateEntityRelationInputFieldVisitor
 		}
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
-			fields: () => fields,
+			fields: () =>
+				withAliasField
+					? {
+							...fields,
+							alias: { type: GraphQLString },
+					  }
+					: fields,
 		})
 	}
 }

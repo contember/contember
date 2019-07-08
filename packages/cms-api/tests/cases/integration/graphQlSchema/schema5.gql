@@ -4,6 +4,7 @@ type _FieldPathFragment {
 
 type _IndexPathFragment {
   index: Int!
+  alias: String
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -124,6 +125,7 @@ input RootCreateInput {
 input RootCreateREntityRelationInput {
   connect: OneHasManyEntityUniqueWhere
   create: OneHasManyEntityWithoutR2CreateInput
+  alias: String
 }
 
 type RootCreateResult {

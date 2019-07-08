@@ -36,6 +36,7 @@ export default class MutationProvider {
 				name: '_IndexPathFragment',
 				fields: {
 					index: { type: new GraphQLNonNull(GraphQLInt) },
+					alias: { type: GraphQLString },
 				},
 			}),
 		],

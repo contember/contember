@@ -1,14 +1,14 @@
 import CreateInputProcessor from '../inputProcessing/CreateInputProcessor'
 import * as Context from '../inputProcessing/InputContext'
 import { Input, Model } from 'cms-common'
-import { resolveColumnValue } from '../../content-schema/dataUtils'
 import InputValidator from './InputValidator'
+import { appendRelationToPath, ValidationPath } from './ValidationPath'
 
 type Result = any
 const NoResult = () => Promise.resolve([])
 
 export default class CreateInputValidationProcessor implements CreateInputProcessor<Result> {
-	constructor(private readonly inputValidator: InputValidator, private readonly path: (string | number)[]) {}
+	constructor(private readonly inputValidator: InputValidator, private readonly path: ValidationPath) {}
 
 	manyHasManyInversed: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInversedContext, Result> = {
 		connect: NoResult,
@@ -43,8 +43,9 @@ export default class CreateInputValidationProcessor implements CreateInputProces
 		relation: Model.AnyRelation
 		input: Input.CreateDataInput
 		index?: number
+		alias?: string
 	}) {
-		const newPath = [...this.path, ...(context.index ? [context.index] : []), context.relation.name]
+		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath)
 	}
 

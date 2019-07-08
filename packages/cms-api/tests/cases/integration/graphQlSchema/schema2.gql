@@ -4,6 +4,7 @@ type _FieldPathFragment {
 
 type _IndexPathFragment {
   index: Int!
+  alias: String
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment

@@ -4,6 +4,7 @@ type _FieldPathFragment {
 
 type _IndexPathFragment {
   index: Int!
+  alias: String
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -38,6 +39,7 @@ input AuthorCreateInput {
 input AuthorCreatePostsEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutAuthorCreateInput
+  alias: String
 }
 
 type AuthorCreateResult {
@@ -74,6 +76,7 @@ input AuthorUpdatePostsEntityRelationInput {
   connect: PostUniqueWhere
   disconnect: PostUniqueWhere
   delete: PostUniqueWhere
+  alias: String
 }
 
 input AuthorUpdatePostsRelationInput {
@@ -128,6 +131,7 @@ input CategoryCreateInput {
 input CategoryCreatePostsEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutCategoriesCreateInput
+  alias: String
 }
 
 type CategoryCreateResult {
@@ -164,6 +168,7 @@ input CategoryUpdatePostsEntityRelationInput {
   connect: PostUniqueWhere
   disconnect: PostUniqueWhere
   delete: PostUniqueWhere
+  alias: String
 }
 
 input CategoryUpdatePostsRelationInput {
@@ -266,6 +271,7 @@ input PostCreateAuthorEntityRelationInput {
 input PostCreateCategoriesEntityRelationInput {
   connect: CategoryUniqueWhere
   create: CategoryWithoutPostsCreateInput
+  alias: String
 }
 
 input PostCreateInput {
@@ -279,6 +285,7 @@ input PostCreateInput {
 input PostCreateLocalesEntityRelationInput {
   connect: PostLocaleUniqueWhere
   create: PostLocaleWithoutPostCreateInput
+  alias: String
 }
 
 type PostCreateResult {
@@ -406,6 +413,7 @@ input PostUpdateCategoriesEntityRelationInput {
   connect: CategoryUniqueWhere
   disconnect: CategoryUniqueWhere
   delete: CategoryUniqueWhere
+  alias: String
 }
 
 input PostUpdateCategoriesRelationInput {
@@ -428,6 +436,7 @@ input PostUpdateLocalesEntityRelationInput {
   connect: PostLocaleUniqueWhere
   disconnect: PostLocaleUniqueWhere
   delete: PostLocaleUniqueWhere
+  alias: String
 }
 
 input PostUpdateLocalesRelationInput {

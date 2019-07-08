@@ -4,6 +4,7 @@ type _FieldPathFragment {
 
 type _IndexPathFragment {
   index: Int!
+  alias: String
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -38,6 +39,7 @@ type FrontPage {
 input FrontPageCreateInHouseVideosEntityRelationInput {
   connect: VideoUniqueWhere
   create: VideoWithoutFrontPageCreateInput
+  alias: String
 }
 
 input FrontPageCreateInput {
@@ -84,6 +86,7 @@ input FrontPageUpdateInHouseVideosEntityRelationInput {
   connect: VideoUniqueWhere
   disconnect: VideoUniqueWhere
   delete: VideoUniqueWhere
+  alias: String
 }
 
 input FrontPageUpdateInHouseVideosRelationInput {

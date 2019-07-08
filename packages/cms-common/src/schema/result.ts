@@ -23,7 +23,7 @@ namespace Result {
 		message: ValidationMessage
 	}
 
-	export type PathFragment = { field: string } | { index: number }
+	export type PathFragment = { field: string } | { index: number; alias?: string }
 
 	export interface ValidationMessage {
 		text: string

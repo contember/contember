@@ -155,25 +155,27 @@ export default class UpdateInputVisitor<Result>
 		const promises: Array<Promise<Result>> = []
 		let i = 0
 		for (const element of input) {
+			const alias = element.alias
 			this.verifyOperations(element)
 			let result
 			if (isIt<Input.ConnectRelationInput>(element, 'connect')) {
-				result = processor.connect({ ...context, input: element.connect, index: i })
+				result = processor.connect({ ...context, input: element.connect, index: i, alias })
 			}
 			if (isIt<Input.CreateRelationInput>(element, 'create')) {
-				result = processor.create({ ...context, input: element.create, index: i })
+				result = processor.create({ ...context, input: element.create, index: i, alias })
 			}
 			if (isIt<Input.DeleteSpecifiedRelationInput>(element, 'delete')) {
-				result = processor.delete({ ...context, input: element.delete, index: i })
+				result = processor.delete({ ...context, input: element.delete, index: i, alias })
 			}
 			if (isIt<Input.DisconnectSpecifiedRelationInput>(element, 'disconnect')) {
-				result = processor.disconnect({ ...context, input: element.disconnect, index: i })
+				result = processor.disconnect({ ...context, input: element.disconnect, index: i, alias })
 			}
 			if (isIt<Input.UpdateSpecifiedRelationInput>(element, 'update')) {
 				result = processor.update({
 					...context,
 					input: { where: element.update.by, data: element.update.data },
 					index: i,
+					alias,
 				})
 			}
 			if (isIt<Input.UpsertSpecifiedRelationInput>(element, 'upsert')) {
@@ -181,6 +183,7 @@ export default class UpdateInputVisitor<Result>
 					...context,
 					input: { where: element.upsert.by, update: element.upsert.update, create: element.upsert.create },
 					index: i,
+					alias,
 				})
 			}
 
@@ -192,7 +195,7 @@ export default class UpdateInputVisitor<Result>
 	}
 
 	private verifyOperations(input: any) {
-		const keys = Object.keys(input)
+		const keys = Object.keys(input).filter(it => it !== 'alias')
 		if (keys.length !== 1) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new Error(

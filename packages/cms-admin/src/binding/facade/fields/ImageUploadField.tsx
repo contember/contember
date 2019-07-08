@@ -11,7 +11,7 @@ export interface ImageUploadFieldProps {
 
 export const ImageUploadField = SimpleRelativeSingleField<ImageUploadFieldProps>(
 	props => (
-		<UploadField name={props.name} label={props.label} accept="image/*">
+		<UploadField name={props.name} label={props.label} accept="image/*" emptyText={'No image'}>
 			{url => <img src={url} />}
 		</UploadField>
 	),

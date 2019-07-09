@@ -11,7 +11,7 @@ import {
 	DataTreeRequestType,
 	DataTreeState
 } from '../../state/dataTrees'
-import { MutationRequestResult } from '../bindingTypes'
+import { MutationRequestResult, ReceivedDataTree } from '../bindingTypes'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -99,11 +99,10 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 				return
 			}
 
-			const queryData = query.data
 			const mutationResult: MutationRequestResult = mutation.data
 
 			console.log('mut error!', mutationResult)
-			return this.initializeAccessorTree(queryData, mutationResult)
+			return this.initializeAccessorTree(this.state.accessorTree, mutationResult)
 		}
 
 		if (query.readyState === DataTreeRequestReadyState.Success) {
@@ -178,13 +177,20 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		this.unmounted = true
 	}
 
-	private initializeAccessorTree(initialData: any, errors?: MutationRequestResult) {
-		const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree, initialData, errors)
-		accessTreeGenerator.generateLiveTree(accessorTree => {
-			console.log('data', accessorTree)
-			this.props.onDataAvailable && this.props.onDataAvailable(accessorTree)
-			this.setState({ accessorTree, showingErrors: errors !== undefined })
-		})
+	private initializeAccessorTree(
+		initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
+		errors?: MutationRequestResult
+	) {
+		const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree)
+		accessTreeGenerator.generateLiveTree(
+			initialData,
+			accessorTree => {
+				console.log('data', accessorTree)
+				this.props.onDataAvailable && this.props.onDataAvailable(accessorTree)
+				this.setState({ accessorTree, showingErrors: errors !== undefined })
+			},
+			errors
+		)
 	}
 }
 

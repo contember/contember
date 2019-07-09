@@ -1,3 +1,4 @@
+export * from './Accessor'
 export * from './AccessorTreeRoot'
 export * from './DataBindingError'
 export * from './EntityAccessor'

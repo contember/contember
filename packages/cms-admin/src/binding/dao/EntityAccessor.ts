@@ -1,8 +1,9 @@
+import { Accessor } from './Accessor'
 import { EntityData } from './EntityData'
 import { Errorable } from './Errorable'
 import { ErrorCollectionAccessor } from './ErrorCollectionAccessor'
 
-class EntityAccessor implements Errorable {
+class EntityAccessor extends Accessor implements Errorable {
 	public readonly primaryKey: string | EntityAccessor.UnpersistedEntityID
 
 	public constructor(
@@ -13,6 +14,7 @@ class EntityAccessor implements Errorable {
 		public readonly replaceWith: (replacement: EntityAccessor) => void,
 		public readonly remove?: (removalType: EntityAccessor.RemovalType) => void
 	) {
+		super()
 		this.primaryKey = primaryKey || new EntityAccessor.UnpersistedEntityID()
 	}
 

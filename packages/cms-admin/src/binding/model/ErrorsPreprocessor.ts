@@ -1,7 +1,6 @@
 import { assertNever } from 'cms-common'
 import { MutationError, MutationRequestResult, MutationResult } from '../bindingTypes'
 import { ErrorAccessor } from '../dao/ErrorAccessor'
-import { ErrorCollectionAccessor } from '../dao/ErrorCollectionAccessor'
 import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {
@@ -39,7 +38,7 @@ class ErrorsPreprocessor {
 						children: {
 							[itemIndex]: processedResult
 						},
-						errors: new ErrorCollectionAccessor()
+						errors: []
 					}
 				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
 					child.children[itemIndex] = processedResult
@@ -127,7 +126,7 @@ class ErrorsPreprocessor {
 			const pathNode = error.path[i]
 			if (pathNode.__typename === '_FieldPathFragment') {
 				rootNode = {
-					errors: new ErrorCollectionAccessor(),
+					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.FieldIndexed,
 					children: {
 						[pathNode.field]: rootNode
@@ -135,7 +134,7 @@ class ErrorsPreprocessor {
 				}
 			} else if (pathNode.__typename === '_IndexPathFragment') {
 				rootNode = {
-					errors: new ErrorCollectionAccessor(),
+					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
 					children: {
 						[pathNode.index]: rootNode
@@ -158,12 +157,12 @@ class ErrorsPreprocessor {
 
 namespace ErrorsPreprocessor {
 	export interface LeafErrorNode {
-		errors: ErrorCollectionAccessor
+		errors: ErrorAccessor[]
 		nodeType: ErrorNodeType.Leaf
 	}
 
 	export interface NumberIndexedErrorNode {
-		errors: ErrorCollectionAccessor
+		errors: ErrorAccessor[]
 		nodeType: ErrorNodeType.NumberIndexed
 		children: {
 			[index: number]: ErrorNode
@@ -171,7 +170,7 @@ namespace ErrorsPreprocessor {
 	}
 
 	export interface FieldIndexedErrorNode {
-		errors: ErrorCollectionAccessor
+		errors: ErrorAccessor[]
 		nodeType: ErrorNodeType.FieldIndexed
 		children: {
 			[index: string]: ErrorNode

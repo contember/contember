@@ -1,5 +1,5 @@
-import { ErrorCollectionAccessor } from './ErrorCollectionAccessor'
+import { ErrorAccessor } from './ErrorAccessor'
 
 export interface Errorable {
-	errors: ErrorCollectionAccessor
+	errors: ErrorAccessor[]
 }

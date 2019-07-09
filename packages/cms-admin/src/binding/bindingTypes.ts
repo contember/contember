@@ -25,6 +25,10 @@ export type ReceivedEntityData<A = never> =
 	  }
 export type ReceivedData<A = never> = A | ReceivedEntityData<A> | ReceivedEntityData<A>[]
 
+export interface ReceivedDataTree<A = never> {
+	[treeId: string]: ReceivedData<A>
+}
+
 export interface FieldPathErrorFragment {
 	__typename: '_FieldPathFragment'
 	field: string

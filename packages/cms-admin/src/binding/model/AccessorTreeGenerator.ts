@@ -25,7 +25,6 @@ import {
 	ReferenceMarker,
 	RootAccessor
 } from '../dao'
-import { ErrorCollectionAccessor } from '../dao/ErrorCollectionAccessor'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
@@ -34,6 +33,7 @@ type OnUnlink = EntityAccessor['remove']
 
 class AccessorTreeGenerator {
 	private receivedDataTree?: ReceivedDataTree<undefined>
+	private errorTreeRoot?: ErrorsPreprocessor.ErrorTreeRoot
 
 	public constructor(private tree: MarkerTreeRoot) {}
 
@@ -43,7 +43,9 @@ class AccessorTreeGenerator {
 		errors?: MutationRequestResult
 	): void {
 		const preprocessor = new ErrorsPreprocessor(errors)
-		const preprocessedErrors: ErrorsPreprocessor.ErrorTreeRoot = preprocessor.preprocess()
+
+		this.errorTreeRoot = preprocessor.preprocess()
+		this.receivedDataTree = initialData instanceof AccessorTreeRoot ? undefined : initialData
 
 		updateData(
 			this.generateSubTree(
@@ -54,7 +56,7 @@ class AccessorTreeGenerator {
 					? undefined
 					: initialData[this.tree.id],
 				updateData,
-				preprocessedErrors
+				this.errorTreeRoot
 			)
 		)
 	}
@@ -66,13 +68,14 @@ class AccessorTreeGenerator {
 		errors?: ErrorsPreprocessor.ErrorTreeRoot
 	): AccessorTreeRoot {
 		const data = initialData === undefined ? undefined : initialData
+		const errorNode = errors === undefined ? undefined : errors[tree.id]
 
 		if (Array.isArray(data) || data === undefined || data instanceof EntityCollectionAccessor) {
 			const createAccessorTreeRoot = (): AccessorTreeRoot => {
 				// TODO, proper addNew callback
 				return new AccessorTreeRoot(
 					tree,
-					new EntityCollectionAccessor(entityAccessors, () => {
+					new EntityCollectionAccessor(entityAccessors, errorNode ? errorNode.errors : [], () => {
 						entityAccessors.push(createEntityAccessor(undefined, entityAccessors.length))
 						updateData(createAccessorTreeRoot())
 					}),
@@ -83,6 +86,9 @@ class AccessorTreeGenerator {
 				this.updateFields(
 					datum,
 					tree.fields,
+					errorNode && errorNode.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed && i in errorNode.children
+						? errorNode.children[i]
+						: undefined,
 					(fieldName, newData) => {
 						const entityAccessor = entityAccessors[i]
 						if (entityAccessor instanceof EntityAccessor) {
@@ -131,6 +137,7 @@ class AccessorTreeGenerator {
 			let entityAccessor: EntityAccessor | EntityForRemovalAccessor = this.updateFields(
 				data,
 				tree.fields,
+				errorNode,
 				(fieldName, newData) => {
 					if (entityAccessor instanceof EntityAccessor) {
 						entityAccessor = this.withUpdatedField(entityAccessor, fieldName, newData)
@@ -164,6 +171,7 @@ class AccessorTreeGenerator {
 	private updateFields(
 		data: AccessorTreeGenerator.InitialEntityData,
 		fields: EntityFields,
+		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		onUpdate: OnUpdate,
 		onReplace: OnReplace,
 		onUnlink?: OnUnlink
@@ -211,8 +219,10 @@ class AccessorTreeGenerator {
 							)
 						} else if (fieldData === null || typeof fieldData === 'object' || fieldData === undefined) {
 							entityData[referencePlaceholder] = this.generateOneReference(
+								field.fieldName,
 								fieldData || undefined,
 								reference,
+								errors,
 								onUpdate,
 								entityData
 							)
@@ -224,11 +234,12 @@ class AccessorTreeGenerator {
 						}
 					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
 						if (fieldData === undefined) {
-							entityData[referencePlaceholder] = this.generateManyReference(undefined, reference, onUpdate)
+							entityData[referencePlaceholder] = this.generateManyReference(undefined, reference, errors, onUpdate)
 						} else if (Array.isArray(fieldData)) {
 							entityData[referencePlaceholder] = this.generateManyReference(
 								fieldData.length === 0 ? undefined : fieldData,
 								reference,
+								errors,
 								onUpdate
 							)
 						} else if (typeof fieldData === 'object') {
@@ -275,15 +286,16 @@ class AccessorTreeGenerator {
 							`Perhaps you wanted to use a <SingleReference />?`
 					)
 				} else {
+					const fieldErrors =
+						errors &&
+						errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
+						field.fieldName in errors.children
+							? errors.children[field.fieldName].errors
+							: []
 					const onChange = (newValue: Scalar | GraphQlBuilder.Literal) => {
 						onUpdate(
 							placeholderName,
-							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
-								placeholderName,
-								newValue,
-								new ErrorCollectionAccessor(),
-								onChange
-							)
+							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(placeholderName, newValue, fieldErrors, onChange)
 						)
 					}
 					// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
@@ -295,7 +307,7 @@ class AccessorTreeGenerator {
 							: fieldData instanceof FieldAccessor
 							? fieldData.currentValue
 							: fieldData,
-						new ErrorCollectionAccessor(),
+						fieldErrors,
 						onChange
 					)
 				}
@@ -308,15 +320,17 @@ class AccessorTreeGenerator {
 			id,
 			typename,
 			new EntityData(entityData),
-			new ErrorCollectionAccessor(),
+			errors ? errors.errors : [],
 			onReplace,
 			onUnlink
 		)
 	}
 
 	private generateOneReference(
+		fieldName: FieldName,
 		fieldData: AccessorTreeGenerator.InitialEntityData,
 		reference: ReferenceMarker.Reference,
+		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		onUpdate: OnUpdate,
 		entityData: EntityData.EntityData
 	): EntityAccessor {
@@ -326,10 +340,12 @@ class AccessorTreeGenerator {
 				(entityData[reference.placeholderName] = this.removeEntity(entityData[reference.placeholderName], removalType))
 			)
 		}
-
 		return this.updateFields(
 			fieldData,
 			reference.fields,
+			errors && errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed && fieldName in errors.children
+				? errors.children[fieldName]
+				: undefined,
 			(updatedField: FieldName, updatedData: EntityData.FieldData) => {
 				const entityAccessor = entityData[reference.placeholderName]
 				if (entityAccessor instanceof EntityAccessor) {
@@ -355,12 +371,23 @@ class AccessorTreeGenerator {
 	private generateManyReference(
 		fieldData: Array<AccessorTreeGenerator.InitialEntityData> | undefined,
 		reference: ReferenceMarker.Reference,
+		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		onUpdate: OnUpdate
 	): EntityCollectionAccessor {
+		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
+			throw new DataBindingError(
+				`The error tree structure does not correspond to the marker tree. This should never happen.`
+			)
+		}
+
 		const update = () => {
 			onUpdate(
 				reference.placeholderName,
-				(collectionAccessor = new EntityCollectionAccessor(collectionAccessor.entities, collectionAccessor.addNew))
+				(collectionAccessor = new EntityCollectionAccessor(
+					collectionAccessor.entities,
+					collectionAccessor.errors,
+					collectionAccessor.addNew
+				))
 			)
 		}
 		const getOnRemove = (i: number) => (removalType: EntityAccessor.RemovalType) => {
@@ -372,6 +399,7 @@ class AccessorTreeGenerator {
 			return this.updateFields(
 				Array.isArray(fieldData) ? fieldData[i] : undefined,
 				reference.fields,
+				errors && i in errors.children ? errors.children[i] : undefined,
 				(updatedField: FieldName, updatedData: EntityData.FieldData) => {
 					const entityAccessor = collectionAccessor.entities[i]
 					if (entityAccessor instanceof EntityAccessor) {
@@ -389,13 +417,13 @@ class AccessorTreeGenerator {
 				onRemove
 			)
 		}
-		let collectionAccessor = new EntityCollectionAccessor([], () => {
+		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], () => {
 			collectionAccessor.entities.push(generateNewAccessor(collectionAccessor.entities.length))
 			update()
 		})
 
 		if (!Array.isArray(fieldData)) {
-			fieldData = [fieldData]
+			fieldData = [undefined]
 		}
 		for (let i = 0, len = fieldData.length; i < len; i++) {
 			collectionAccessor.entities.push(generateNewAccessor(i))

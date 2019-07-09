@@ -301,6 +301,7 @@ namespace ChoiceField {
 						currentValueEntity.replaceWith(filteredData[newValue])
 					}
 				},
+				errors: currentValueEntity.errors,
 				fieldName: fieldName
 			})
 		}

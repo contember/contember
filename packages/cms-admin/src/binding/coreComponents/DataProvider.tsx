@@ -83,6 +83,9 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			mutation.readyState === DataTreeRequestReadyState.Pending ||
 			!(query.readyState === DataTreeRequestReadyState.Success || query.readyState === DataTreeRequestReadyState.Error)
 		) {
+			if (this.state.showingErrors) {
+				this.setState({ showingErrors: false })
+			}
 			return
 		}
 

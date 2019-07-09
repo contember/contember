@@ -1,18 +1,21 @@
 import { GraphQlBuilder } from 'cms-client'
 import { FieldName, Scalar } from '../bindingTypes'
+import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
 import { ErrorCollectionAccessor } from './ErrorCollectionAccessor'
 
 export class FieldAccessor<
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
 	Produced extends Persisted = Persisted
-> implements Errorable {
+> extends Accessor implements Errorable {
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted | null,
 		public readonly errors: ErrorCollectionAccessor,
 		public readonly onChange?: (newValue: Produced | null) => void
-	) {}
+	) {
+		super()
+	}
 
 	public hasValue(candidate: this['currentValue']): boolean {
 		const currentValue = this.currentValue

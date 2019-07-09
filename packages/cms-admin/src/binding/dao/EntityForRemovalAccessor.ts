@@ -1,14 +1,14 @@
 import { Accessor } from './Accessor'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityData } from './EntityData'
-import { ErrorCollectionAccessor } from './ErrorCollectionAccessor'
+import { ErrorAccessor } from './ErrorAccessor'
 
 export class EntityForRemovalAccessor extends Accessor implements EntityAccessor {
 	constructor(
 		public readonly primaryKey: string,
 		public readonly typename: string | undefined,
 		public readonly data: EntityData,
-		public readonly errors: ErrorCollectionAccessor,
+		public readonly errors: ErrorAccessor[],
 		public readonly replaceWith: (replacement: EntityAccessor) => void,
 		public readonly removalType: EntityAccessor.RemovalType
 	) {

@@ -2,7 +2,7 @@ import { GraphQlBuilder } from 'cms-client'
 import { FieldName, Scalar } from '../bindingTypes'
 import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
-import { ErrorCollectionAccessor } from './ErrorCollectionAccessor'
+import { ErrorAccessor } from './ErrorAccessor'
 
 export class FieldAccessor<
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
@@ -11,7 +11,7 @@ export class FieldAccessor<
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted | null,
-		public readonly errors: ErrorCollectionAccessor,
+		public readonly errors: ErrorAccessor[],
 		public readonly onChange?: (newValue: Produced | null) => void
 	) {
 		super()

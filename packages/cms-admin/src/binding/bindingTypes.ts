@@ -33,6 +33,7 @@ export interface FieldPathErrorFragment {
 export interface IndexPathErrorFragment {
 	__typename: '_IndexPathFragment'
 	index: number
+	alias: string | null
 }
 
 export type ErrorPathNodeType = FieldPathErrorFragment | IndexPathErrorFragment

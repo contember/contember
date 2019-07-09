@@ -229,6 +229,7 @@ export class MutationGenerator {
 				let unreducedHasOnePresent = false
 				const references = marker.references
 				const accessorReference: Array<{
+					alias?: string
 					accessor: EntityAccessor
 					reference: ReferenceMarker.Reference
 				}> = []
@@ -247,9 +248,10 @@ export class MutationGenerator {
 						}
 					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
 						if (accessor instanceof EntityCollectionAccessor) {
-							for (const innerAccessor of accessor.entities) {
+							for (let i = 0, accessorCount = accessor.entities.length; i < accessorCount; i++) {
+								const innerAccessor = accessor.entities[i]
 								if (innerAccessor instanceof EntityAccessor) {
-									accessorReference.push({ accessor: innerAccessor, reference })
+									accessorReference.push({ accessor: innerAccessor, reference, alias: i.toString() })
 								}
 							}
 						}
@@ -287,13 +289,16 @@ export class MutationGenerator {
 				} else {
 					builder = builder.many(placeholderName, builder => {
 						for (const referencePair of accessorReference) {
-							const { accessor, reference } = referencePair
+							const { alias, accessor, reference } = referencePair
 
 							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 								const innerBuilder = this.createCreateDataBuilderByReference(reference)
-								builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
+								builder = builder.create(
+									this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
+									alias
+								)
 							} else {
-								builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey })
+								builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 							}
 						}
 						return builder
@@ -341,6 +346,7 @@ export class MutationGenerator {
 				let unreducedHasOnePresent = false
 				const references = marker.references
 				const accessorReference: Array<{
+					alias?: string
 					accessor: EntityAccessor | EntityForRemovalAccessor
 					reference: ReferenceMarker.Reference
 					persistedField: ReceivedEntityData<undefined>
@@ -372,7 +378,12 @@ export class MutationGenerator {
 								const innerAccessor = accessor.entities[i]
 								const innerField = persistedField ? persistedField[i] : undefined
 								if (innerAccessor) {
-									accessorReference.push({ accessor: innerAccessor, reference, persistedField: innerField })
+									accessorReference.push({
+										accessor: innerAccessor,
+										reference,
+										persistedField: innerField,
+										alias: i.toString()
+									})
 								}
 							}
 						}
@@ -386,7 +397,7 @@ export class MutationGenerator {
 						const subBuilder = ((
 							builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>
 						) => {
-							const { accessor, reference, persistedField } = accessorReference[0]
+							const { accessor, reference, persistedField, alias } = accessorReference[0]
 
 							if (accessor instanceof EntityAccessor) {
 								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
@@ -428,34 +439,35 @@ export class MutationGenerator {
 				} else {
 					builder = builder.many(placeholderName, builder => {
 						for (const referencePair of accessorReference) {
-							const { accessor, reference, persistedField } = referencePair
+							const { accessor, reference, persistedField, alias } = referencePair
 
 							if (accessor instanceof EntityAccessor) {
 								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 									const innerBuilder = this.createCreateDataBuilderByReference(reference)
-									builder = builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
+									builder = builder.create(
+										this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
+										alias
+									)
 								} else {
-									builder = builder.update({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, builder => {
-										return this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder)
-									})
+									builder = builder.update(
+										{ [PRIMARY_KEY_NAME]: accessor.primaryKey },
+										builder => {
+											return this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder)
+										},
+										alias
+									)
 
 									if (!persistedField || (persistedField && accessor.primaryKey !== persistedField[PRIMARY_KEY_NAME])) {
-										builder = builder.connect({
-											[PRIMARY_KEY_NAME]: accessor.primaryKey
-										})
+										builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 									}
 								}
 							} else if (accessor instanceof EntityForRemovalAccessor) {
 								const removalType = accessor.removalType
 
 								if (removalType === EntityAccessor.RemovalType.Delete) {
-									builder = builder.delete({
-										[PRIMARY_KEY_NAME]: accessor.primaryKey
-									})
+									builder = builder.delete({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 								} else if (removalType === EntityAccessor.RemovalType.Disconnect) {
-									builder = builder.disconnect({
-										[PRIMARY_KEY_NAME]: accessor.primaryKey
-									})
+									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 								} else {
 									assertNever(removalType)
 								}

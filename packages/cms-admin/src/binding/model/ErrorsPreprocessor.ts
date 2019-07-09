@@ -87,13 +87,23 @@ class ErrorsPreprocessor {
 					}
 				} else if (pathNode.__typename === '_IndexPathFragment') {
 					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
-						if (!(pathNode.index in currentNode.children)) {
-							currentNode.children[pathNode.index] = this.getRootNode(mutationError, i + 1)
+						const alias = pathNode.alias
+
+						if (alias === null) {
+							throw new ErrorsPreprocessor.ErrorsPreprocessorError(
+								`Corrupt data: undefined alias for node with index ${pathNode.index}.`
+							)
+						}
+
+						const numericAlias = parseInt(alias, 10)
+
+						if (!(numericAlias in currentNode.children)) {
+							currentNode.children[numericAlias] = this.getRootNode(mutationError, i + 1)
 							if (i + 1 <= mutationError.path.length) {
 								continue errorLoop
 							}
 						}
-						currentNode = currentNode.children[pathNode.index]
+						currentNode = currentNode.children[numericAlias]
 					} else {
 						this.rejectCorruptData()
 					}

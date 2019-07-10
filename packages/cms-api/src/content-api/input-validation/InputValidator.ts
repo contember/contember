@@ -15,8 +15,12 @@ import ValidationContext from './ValidationContext'
 import { evaluateValidation } from './ValidationEvaluation'
 import { rules } from './ValidationDefinition'
 import { ValidationPath } from './ValidationPath'
+import NotNullFieldsVisitor from './NotNullFieldsVisitor'
+import { filterObject } from '../../utils/object'
 
 class InputValidator {
+	private cachedEntityRules: Record<string, Validation.EntityRules> = {}
+
 	constructor(
 		private readonly validationSchema: Validation.Schema,
 		private readonly model: Model.Schema,
@@ -132,13 +136,14 @@ class InputValidator {
 	async validateCreate(
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
-		path: ValidationPath = []
+		path: ValidationPath = [],
+		overRelation: Model.AnyRelation | null
 	): Promise<InputValidator.Result> {
 		if (!(await this.hasValidationRulesOnCreate(entity, data))) {
 			return []
 		}
-		const entityRules = this.validationSchema[entity.name] || {}
-		const fieldsWithRules = this.getFieldsWithRules(entity)
+		const { [overRelation ? overRelation.name : '']: dropRule, ...entityRules } = this.getEntityRules(entity.name)
+		const fieldsWithRules = Object.keys(entityRules).filter(field => entityRules[field].length > 0)
 
 		const dependencies = this.buildDependencies(fieldsWithRules, entityRules)
 
@@ -159,12 +164,12 @@ class InputValidator {
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
-		path: ValidationPath = []
+		path: ValidationPath
 	): Promise<InputValidator.Result> {
 		if (!(await this.hasValidationRulesOnUpdate(entity, data))) {
 			return []
 		}
-		const entityRules = this.validationSchema[entity.name] || {}
+		const entityRules = this.getEntityRules(entity.name)
 
 		const dependencies = this.buildDependencies(Object.keys(data), entityRules)
 
@@ -184,9 +189,11 @@ class InputValidator {
 		return [...fieldsResult, ...relationResult]
 	}
 
-	private getFieldsWithRules(entity: Model.Entity, fields?: string[]) {
-		const entityRules = this.validationSchema[entity.name] || {}
-		return (fields || Object.keys(entityRules)).filter(field => entityRules[field] && entityRules[field].length > 0)
+	private getFieldsWithRules(entity: Model.Entity, fields?: string[]): string[] {
+		const entityRules = this.getEntityRules(entity.name)
+		const fields2 = fields || Object.keys(this.model.entities[entity.name].fields)
+
+		return fields2.filter(field => entityRules[field] && entityRules[field].length > 0)
 	}
 
 	private validateFields(
@@ -223,6 +230,26 @@ class InputValidator {
 			.map(it => this.dependencyCollector.collect(it.validator))
 			.concat(fields.reduce((acc, field) => ({ ...acc, [field]: {} }), {}))
 			.reduce((acc, dependency) => DependencyMerger.merge(acc, dependency), {})
+	}
+
+	private getEntityRules(entityName: string): Validation.EntityRules {
+		if (this.cachedEntityRules[entityName]) {
+			return this.cachedEntityRules[entityName]
+		}
+		const definedRules = this.validationSchema[entityName] || {}
+		const fieldsNotNullFlag = acceptEveryFieldVisitor(this.model, entityName, new NotNullFieldsVisitor())
+		const notNullFields = Object.keys(filterObject(fieldsNotNullFlag, (field, val) => val))
+
+		return (this.cachedEntityRules[entityName] = notNullFields.reduce(
+			(entityRules, field) => ({
+				...entityRules,
+				[field]: [
+					...(entityRules[field] || []),
+					{ validator: rules.defined(), message: { text: 'Field is required' } },
+				],
+			}),
+			definedRules
+		))
 	}
 }
 

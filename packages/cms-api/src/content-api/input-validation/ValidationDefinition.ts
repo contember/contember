@@ -109,6 +109,7 @@ const notOperation = (validator: Validation.Validator): Validation.Validator => 
 })
 
 const emptyOperation = (): Validation.Validator => ({ operation: 'empty', args: [] })
+const definedOperation = (): Validation.Validator => ({ operation: 'defined', args: [] })
 
 export const InContextOperation = 'inContext' as const
 const onOperation = (path: ValidationContext.ContextPath, validator: Validation.Validator): Validation.Validator => ({
@@ -149,6 +150,7 @@ export const rules = {
 	filter: filterOperation,
 	any: anyOperation,
 	every: everyOperation,
+	defined: definedOperation,
 }
 
 export function when(...conditions: Validation.Validator[]) {

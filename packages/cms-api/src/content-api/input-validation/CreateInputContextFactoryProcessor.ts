@@ -4,7 +4,7 @@ import { Input, Model } from 'cms-common'
 import ValidationContextFactory from './ValidationContextFactory'
 import DependencyCollector from './DependencyCollector'
 import ValidationDataSelector from './ValidationDataSelector'
-import { resolveColumnValue } from '../../content-schema/dataUtils'
+import { NoDataError, resolveColumnValue } from '../../content-schema/dataUtils'
 
 type Result = any
 
@@ -58,6 +58,13 @@ export default class CreateInputContextFactoryProcessor implements CreateInputPr
 	}
 
 	async column(context: Context.ColumnContext): Promise<Result> {
-		return resolveColumnValue(context)
+		try {
+			return resolveColumnValue(context)
+		} catch (e) {
+			if (e instanceof NoDataError) {
+				return undefined
+			}
+			throw e
+		}
 	}
 }

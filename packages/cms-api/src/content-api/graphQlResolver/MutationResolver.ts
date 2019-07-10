@@ -20,7 +20,7 @@ export default class MutationResolver {
 		input: Input.UpdateInput,
 		queryAst: ObjectNode<Input.UpdateInput>
 	): Promise<WithoutNode<Result.UpdateResult>> {
-		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data)
+		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data, [])
 		if (validationResult.length > 0) {
 			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
 		}
@@ -50,7 +50,7 @@ export default class MutationResolver {
 		input: Input.CreateInput,
 		queryAst: ObjectNode
 	): Promise<WithoutNode<Result.CreateResult>> {
-		const validationResult = await this.inputValidator.validateCreate(entity, input.data)
+		const validationResult = await this.inputValidator.validateCreate(entity, input.data, [], null)
 		if (validationResult.length > 0) {
 			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
 		}

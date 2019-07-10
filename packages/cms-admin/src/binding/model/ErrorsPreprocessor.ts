@@ -1,6 +1,6 @@
 import { assertNever } from 'cms-common'
 import { MutationError, MutationRequestResult, MutationResult } from '../bindingTypes'
-import { ErrorAccessor } from '../dao/ErrorAccessor'
+import { ErrorAccessor } from '../dao'
 import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {

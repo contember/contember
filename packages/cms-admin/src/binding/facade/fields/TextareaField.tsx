@@ -18,8 +18,8 @@ export const TextAreaField = SimpleRelativeSingleField<TextAreaFieldProps>(props
 	}
 	return (
 		<Field<string> name={props.name}>
-			{({ data, isMutating, environment }): React.ReactNode => (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)}>
+			{({ data, isMutating, environment, errors }): React.ReactNode => (
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
 					<TextArea
 						value={data.currentValue || ''}
 						onChange={generateOnChange(data)}

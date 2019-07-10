@@ -18,8 +18,8 @@ export const NumberField = SimpleRelativeSingleField<NumberFieldProps>(props => 
 	}
 	return (
 		<Field<number> name={props.name}>
-			{({ data, isMutating, environment }): React.ReactNode => (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)}>
+			{({ data, isMutating, environment, errors }): React.ReactNode => (
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
 					<InputGroup
 						value={typeof data.currentValue === 'number' ? data.currentValue.toFixed(0) : '0'}
 						onChange={generateOnChange(data)}

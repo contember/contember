@@ -1,7 +1,8 @@
-import * as React from 'react'
 import cn from 'classnames'
+import * as React from 'react'
+import { FormErrors, FormErrorsProps } from './FormErrors'
 
-export interface FormGroupProps {
+export interface FormGroupProps extends FormErrorsProps {
 	label?: React.ReactNode
 	horizontal?: boolean
 	// size?: AvatarSize
@@ -13,8 +14,9 @@ export class FormGroup extends React.PureComponent<FormGroupProps> {
 		const { label, children, horizontal } = this.props
 
 		return (
-			<div className={cn('formGroup', horizontal ? 'formGroup-horizontal' : undefined)}>
+			<div className={cn('formGroup', horizontal && 'formGroup-horizontal')}>
 				{label && <div className="formGroup-label">{label}</div>}
+				<FormErrors errors={this.props.errors} />
 				<div className="formGroup-field">{children}</div>
 			</div>
 		)

@@ -2,7 +2,7 @@ import { IRadioGroupProps, Radio, RadioGroup } from '@blueprintjs/core'
 import * as React from 'react'
 import { FormGroup } from '../../../components'
 import { FieldName } from '../../bindingTypes'
-import { Environment } from '../../dao'
+import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../aux'
 import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
 
@@ -21,7 +21,7 @@ export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 export const RadioField = Component<RadioFieldProps>(props => {
 	return (
 		<ChoiceField name={props.name} options={props.options}>
-			{({ data, currentValue, onChange, isMutating, environment }) => {
+			{({ data, currentValue, onChange, isMutating, environment, errors }) => {
 				return (
 					<RadioFieldInner
 						name={props.name}
@@ -32,6 +32,7 @@ export const RadioField = Component<RadioFieldProps>(props => {
 						onChange={onChange}
 						isMutating={isMutating}
 						environment={environment}
+						errors={errors}
 					/>
 				)
 			}}
@@ -44,13 +45,14 @@ interface RadioFieldInnerProps extends RadioFieldPublicProps {
 	currentValue: ChoiceField.ValueRepresentation | null
 	onChange: (newValue: ChoiceField.ValueRepresentation) => void
 	environment: Environment
+	errors: ErrorAccessor[]
 	isMutating: boolean
 }
 
 class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
 	public render() {
 		return (
-			<FormGroup label={this.props.label}>
+			<FormGroup label={this.props.label} errors={this.props.errors}>
 				<RadioGroup
 					disabled={this.props.isMutating}
 					selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}

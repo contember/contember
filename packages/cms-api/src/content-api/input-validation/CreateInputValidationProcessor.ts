@@ -42,11 +42,12 @@ export default class CreateInputValidationProcessor implements CreateInputProces
 		targetEntity: Model.Entity
 		relation: Model.AnyRelation
 		input: Input.CreateDataInput
+		targetRelation: Model.AnyRelation | null
 		index?: number
 		alias?: string
 	}) {
 		const newPath = appendRelationToPath(this.path, context.relation.name, context)
-		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath)
+		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath, context.targetRelation)
 	}
 
 	async column(context: Context.ColumnContext): Promise<Result> {

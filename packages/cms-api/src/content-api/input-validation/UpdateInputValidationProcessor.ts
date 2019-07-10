@@ -77,13 +77,14 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 	async processCreate(context: {
 		targetEntity: Model.Entity
 		relation: Model.AnyRelation
+		targetRelation: Model.AnyRelation | null
 		input: Input.CreateDataInput
 		index?: number
 		alias?: string
 	}) {
 		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 
-		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath)
+		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath, context.targetRelation)
 	}
 
 	async processHasOneUpdate(context: {
@@ -106,13 +107,14 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 
 	async processHasOneUpsert(context: {
 		targetEntity: Model.Entity
+		targetRelation: Model.AnyRelation | null
 		relation: Model.AnyRelation
 		input: UpdateInputProcessor.UpsertInput
 	}) {
 		const newPath = appendRelationToPath(this.path, context.relation.name)
 		const relNode = this.node[context.relation.name] as Value.Object | undefined
 		if (!relNode) {
-			return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath)
+			return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath, context.targetRelation)
 		}
 		const primary = relNode[context.targetEntity.primary] as Value.PrimaryValue
 		const where = {
@@ -124,6 +126,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 	async processManyManyUpdate(context: {
 		targetEntity: Model.Entity
 		relation: Model.AnyRelation
+		targetRelation: Model.AnyRelation | null
 		input: UpdateInputProcessor.UpdateManyInput
 		index: number
 		alias?: string
@@ -135,6 +138,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 	async processManyManyUpsert(context: {
 		targetEntity: Model.Entity
 		relation: Model.AnyRelation
+		targetRelation: Model.AnyRelation | null
 		input: UpdateInputProcessor.UpsertManyInput
 		index: number
 		alias?: string
@@ -149,7 +153,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				newPath
 			)
 		}
-		return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath)
+		return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath, context.targetRelation)
 	}
 
 	async processOneManyUpdate(context: {
@@ -196,6 +200,6 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				newPath
 			)
 		}
-		return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath)
+		return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath, context.targetRelation)
 	}
 }

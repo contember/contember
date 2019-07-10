@@ -43,8 +43,8 @@ input FrontPageCreateInHouseVideosEntityRelationInput {
 }
 
 input FrontPageCreateInput {
-  unique: One!
-  introVideo: FrontPageCreateIntroVideoEntityRelationInput!
+  unique: One
+  introVideo: FrontPageCreateIntroVideoEntityRelationInput
   inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
   _create: Boolean
 }
@@ -133,8 +133,8 @@ input FrontPageWhere {
 }
 
 input FrontPageWithoutInHouseVideosCreateInput {
-  unique: One!
-  introVideo: FrontPageCreateIntroVideoEntityRelationInput!
+  unique: One
+  introVideo: FrontPageCreateIntroVideoEntityRelationInput
   _create: Boolean
 }
 
@@ -145,7 +145,7 @@ input FrontPageWithoutInHouseVideosUpdateInput {
 }
 
 input FrontPageWithoutIntroVideoCreateInput {
-  unique: One!
+  unique: One
   inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
   _create: Boolean
 }

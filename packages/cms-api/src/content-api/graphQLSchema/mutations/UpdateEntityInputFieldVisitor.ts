@@ -21,8 +21,9 @@ export default class UpdateEntityInputFieldVisitor
 		if (!this.authorizator.isAllowed(Acl.Operation.update, entity.name, column.name)) {
 			return undefined
 		}
+		const type = this.columnTypeResolver.getType(column)
 		return {
-			type: this.columnTypeResolver.getType(column),
+			type,
 		}
 	}
 
@@ -35,7 +36,7 @@ export default class UpdateEntityInputFieldVisitor
 			return undefined
 		}
 		return {
-			type: type,
+			type,
 		}
 	}
 

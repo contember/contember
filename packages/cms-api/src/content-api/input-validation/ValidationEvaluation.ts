@@ -47,6 +47,19 @@ const validatorEvaluators: {
 		}
 		return context.node !== undefined
 	},
+	defined: (context: ValidationContext.AnyContext) => {
+		if (ValidationContext.isNodeListContext(context)) {
+			throw new Error('Unexpected node list')
+		}
+		if (ValidationContext.isUndefinedNodeContext(context)) {
+			return false
+		}
+		if (ValidationContext.isValueContext(context)) {
+			const value = getValueFromContext(context)
+			return value !== null && value !== undefined
+		}
+		return context.node !== undefined
+	},
 	not: (context: ValidationContext.AnyContext, { validator }: Validation.ValidatorArgument) => {
 		return !evaluateValidation(context, validator)
 	},

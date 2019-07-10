@@ -5,7 +5,7 @@ import 'mocha'
 import Migration from '../../../../src/system-api/model/migrations/Migration'
 import SchemaDiffer from '../../../../src/system-api/model/migrations/SchemaDiffer'
 import SchemaMigrator from '../../../../src/content-schema/differ/SchemaMigrator'
-import { createMigrationBuilder } from '../../../../src/content-api/sqlSchema/sqlSchemaBuilderHelper'
+import { createMigrationBuilder } from '../../../../src/core/pg-migrate/helpers'
 import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
 import ModificationHandlerFactory from '../../../../src/system-api/model/migrations/modifications/ModificationHandlerFactory'
 

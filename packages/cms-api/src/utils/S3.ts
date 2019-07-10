@@ -15,6 +15,7 @@ class S3 {
 			region: config.region,
 			signatureVersion: 'v4',
 			endpoint: config.endpoint || 's3.{region}.amazonaws.com',
+			s3ForcePathStyle: !!config.endpoint,
 		})
 		this.endpoint = this.s3.config.endpoint!
 	}

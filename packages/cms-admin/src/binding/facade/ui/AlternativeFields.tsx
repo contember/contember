@@ -16,7 +16,7 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 		return (
 			<div className="alternativeFields">
 				<ChoiceField name={this.props.name} options={Object.values(this.props.alternatives)}>
-					{({ data, currentValue, onChange, isMutating, environment }) => {
+					{({ data, currentValue, onChange, isMutating, environment, errors }) => {
 						const alternatives: React.ReactNodeArray = []
 						for (let i = 0, length = this.props.alternatives.length; i < length; i++) {
 							alternatives.push(
@@ -34,6 +34,7 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 									currentValue={currentValue}
 									onChange={onChange}
 									environment={environment}
+									errors={errors}
 									firstOptionCaption="Choose…"
 									isMutating={isMutating}
 								/>

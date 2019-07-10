@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { FormGroup, FormGroupProps, Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
-import { Environment } from '../../dao'
+import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../aux'
 import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
 
@@ -21,7 +21,7 @@ export type SelectFieldProps = SelectFieldPublicProps & SelectFieldInternalProps
 export const SelectField = Component<SelectFieldProps>(props => {
 	return (
 		<ChoiceField name={props.name} options={props.options}>
-			{({ data, currentValue, onChange, environment, isMutating }) => {
+			{({ data, currentValue, onChange, environment, isMutating, errors }) => {
 				return (
 					<SelectFieldInner
 						name={props.name}
@@ -32,6 +32,7 @@ export const SelectField = Component<SelectFieldProps>(props => {
 						currentValue={currentValue}
 						onChange={onChange}
 						environment={environment}
+						errors={errors}
 						isMutating={isMutating}
 					/>
 				)
@@ -45,6 +46,7 @@ export interface SelectFieldInnerProps extends SelectFieldPublicProps {
 	currentValue: ChoiceField.ValueRepresentation | null
 	onChange: (newValue: ChoiceField.ValueRepresentation) => void
 	environment: Environment
+	errors: ErrorAccessor[]
 	isMutating: boolean
 }
 
@@ -67,7 +69,7 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 		)
 
 		return (
-			<FormGroup label={this.props.label}>
+			<FormGroup label={this.props.label} errors={this.props.errors}>
 				<Select
 					value={this.props.currentValue === null ? -1 : this.props.currentValue}
 					onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}

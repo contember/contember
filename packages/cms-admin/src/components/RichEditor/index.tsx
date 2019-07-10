@@ -37,6 +37,7 @@ export interface RichEditorProps {
 	value: string
 	onChange: (value: string) => void
 	label?: FormGroupProps['label']
+	errors?: FormGroupProps['errors']
 	serializer: RichEditorSerializer
 	lineBreakBehavior: LineBreakBehavior
 	defaultBlock: Block

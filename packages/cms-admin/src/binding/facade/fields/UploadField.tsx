@@ -96,9 +96,9 @@ namespace UploadFieldComponent {
 
 	export class Inner extends React.PureComponent<InnerProps> {
 		public render() {
-			const { environment, upload, label } = this.props.metadata
+			const { environment, upload, label, errors } = this.props.metadata
 			return (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', label)}>
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', label)} errors={errors}>
 					<label className="fileInput">
 						<span className="fileInput-preview">{this.renderPreview()}</span>
 						<span className="fileInput-message">{this.renderUploadStatusMessage(upload)}</span>

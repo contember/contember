@@ -30,7 +30,7 @@ class SortableRepeater extends React.PureComponent<SortableRepeaterProps> {
 							<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
 								{(field: EntityCollectionAccessor) => (
 									// Intentionally not applying label system middleware
-									<FormGroup label={this.props.label}>
+									<FormGroup label={this.props.label} errors={field.errors}>
 										<Sortable
 											entities={field}
 											sortBy={this.props.sortBy}

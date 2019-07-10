@@ -18,8 +18,8 @@ const renderCheckboxField: React.FunctionComponent<CheckboxFieldProps> = (props:
 	}
 	return (
 		<Field<boolean> name={props.name}>
-			{({ data, isMutating, environment }): React.ReactNode => (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)}>
+			{({ data, isMutating, environment, errors }): React.ReactNode => (
+				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
 					<input
 						type="checkbox"
 						readOnly={isMutating}

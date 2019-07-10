@@ -23,9 +23,9 @@ export const TextField = SimpleRelativeSingleField<TextFieldProps>(props => {
 			{({ data, isMutating, environment, errors }): React.ReactNode => (
 				<FormGroup
 					label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
+					errors={errors}
 					horizontal={props.horizontal}
 				>
-					{errors.map(e => e.message).join(', ')}
 					<InputGroup
 						value={data.currentValue || ''}
 						onChange={generateOnChange(data)}

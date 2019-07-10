@@ -7,10 +7,10 @@ import {
 	EntityAccessor,
 	EntityForRemovalAccessor,
 	Environment,
+	ErrorAccessor,
 	FieldAccessor,
 	FieldMarker
 } from '../dao'
-import { ErrorAccessor } from '../dao/ErrorAccessor'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'

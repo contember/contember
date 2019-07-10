@@ -1,7 +1,7 @@
 import Project from '../../../config/Project'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
 import FileNameHelper from '../../../migrations/FileNameHelper'
-import { createMigrationBuilder } from '../../../content-api/sqlSchema/sqlSchemaBuilderHelper'
+import { createMigrationBuilder } from '../../../core/pg-migrate/helpers'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
 

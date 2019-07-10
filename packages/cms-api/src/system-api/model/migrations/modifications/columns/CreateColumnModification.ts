@@ -4,7 +4,9 @@ import { ContentEvent } from '../../../dtos/Event'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 import { EventType } from '../../../EventType'
-import { NoDataError, resolveDefaultValue } from '../../../../../content-schema/dataUtils'
+import { resolveDefaultValue } from '../../../../../content-schema/dataUtils'
+import { wrapIdentifier } from '../../../../../core/database/utils'
+import { escapeValue } from '../../../../../core/pg-migrate/helpers'
 
 class CreateColumnModification implements Modification<CreateColumnModification.Data> {
 	constructor(private readonly data: CreateColumnModification.Data, private readonly schema: Schema) {}
@@ -15,9 +17,19 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 		builder.addColumn(entity.tableName, {
 			[column.columnName]: {
 				type: column.type === Model.ColumnType.Enum ? `"${column.columnType}"` : column.columnType,
-				notNull: !column.nullable,
+				notNull: !column.nullable && this.data.fillValue === undefined,
 			},
 		})
+		if (this.data.fillValue !== undefined) {
+			builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)} 
+  SET ${wrapIdentifier(column.columnName)} = ${escapeValue(this.data.fillValue)}`)
+
+			if (!column.nullable) {
+				builder.alterColumn(entity.tableName, column.columnName, {
+					notNull: true,
+				})
+			}
+		}
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
@@ -33,7 +45,8 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 			}
 
 			try {
-				const value = resolveDefaultValue(this.data.field, it.createdAt)
+				const fillValue = this.data.fillValue
+				const value = fillValue !== undefined ? fillValue : resolveDefaultValue(this.data.field, it.createdAt)
 				return {
 					...it,
 					[this.data.field.columnName]: value,
@@ -54,6 +67,7 @@ namespace CreateColumnModification {
 	export interface Data {
 		entityName: string
 		field: Model.AnyColumn
+		fillValue?: any
 	}
 }
 

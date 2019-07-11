@@ -7,7 +7,6 @@ import {
 	EntityListDataProvider,
 	Field,
 	FieldMetadata,
-	Props,
 	SyntheticChildrenProvider,
 	ToOne
 } from '../../coreComponents'
@@ -225,17 +224,17 @@ namespace ChoiceField {
 				this.props.rawMetadata.environment
 			)
 
-			const fieldAccessor = data.data.getTreeRoot(fieldName)
+			const subTreeRootAccessor = data.data.getTreeRoot(fieldName)
 			const currentValueEntity = data.data.getField(this.props.rawMetadata.fieldName)
 
-			if (
-				!(fieldAccessor instanceof AccessorTreeRoot) ||
-				!(currentValueEntity instanceof EntityAccessor || currentValueEntity instanceof EntityForRemovalAccessor)
-			) {
+			if (!(subTreeRootAccessor instanceof AccessorTreeRoot)) {
+				throw new DataBindingError('Corrupted data: dynamic choice field options have not been retrieved.')
+			}
+			if (!(currentValueEntity instanceof EntityAccessor || currentValueEntity instanceof EntityForRemovalAccessor)) {
 				throw new DataBindingError('Corrupted data')
 			}
 
-			const subTreeData = fieldAccessor.root
+			const subTreeData = subTreeRootAccessor.root
 
 			if (!(subTreeData instanceof EntityCollectionAccessor)) {
 				throw new DataBindingError('Corrupted data')

@@ -114,7 +114,12 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		const newPath = appendRelationToPath(this.path, context.relation.name)
 		const relNode = this.node[context.relation.name] as Value.Object | undefined
 		if (!relNode) {
-			return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath, context.targetRelation)
+			return this.inputValidator.validateCreate(
+				context.targetEntity,
+				context.input.create,
+				newPath,
+				context.targetRelation
+			)
 		}
 		const primary = relNode[context.targetEntity.primary] as Value.PrimaryValue
 		const where = {
@@ -153,7 +158,12 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				newPath
 			)
 		}
-		return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath, context.targetRelation)
+		return this.inputValidator.validateCreate(
+			context.targetEntity,
+			context.input.create,
+			newPath,
+			context.targetRelation
+		)
 	}
 
 	async processOneManyUpdate(context: {
@@ -200,6 +210,11 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				newPath
 			)
 		}
-		return this.inputValidator.validateCreate(context.targetEntity, context.input.create, newPath, context.targetRelation)
+		return this.inputValidator.validateCreate(
+			context.targetEntity,
+			context.input.create,
+			newPath,
+			context.targetRelation
+		)
 	}
 }

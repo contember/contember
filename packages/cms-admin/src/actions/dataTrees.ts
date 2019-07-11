@@ -56,12 +56,12 @@ export type DataTreeSetRequestEnd =
 	| {
 			dataTreeId: DataTreeId
 			type: DataTreeRequestType.Mutation
-			data: MutationRequestResult
+			data: MutationRequestResult | null
 	  }
 	| {
 			dataTreeId: DataTreeId
 			type: DataTreeRequestType.Query
-			data: QueryRequestResult
+			data: QueryRequestResult | null
 	  }
 
 export const handleDataTreeRequestEnd = (dataTreeId: DataTreeId, type: DataTreeRequestType, data: any) =>

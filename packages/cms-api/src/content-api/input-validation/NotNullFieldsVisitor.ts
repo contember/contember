@@ -1,6 +1,7 @@
 import { Model } from 'cms-common'
 
-export default class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Model.ColumnVisitor<boolean> {
+export default class NotNullFieldsVisitor
+	implements Model.RelationByTypeVisitor<boolean>, Model.ColumnVisitor<boolean> {
 	visitColumn(entity: Model.Entity, column: Model.AnyColumn): boolean {
 		return !column.nullable
 	}

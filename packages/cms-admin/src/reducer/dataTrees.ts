@@ -93,15 +93,16 @@ export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
 							},
 							query: {
 								readyState: DataTreeRequestReadyState.Success,
-								data: action.payload.data
+								data: action.payload.data // TODO handle this being null
 							}
 						}
 					}
 				}
 			} else if (action.payload.type === DataTreeRequestType.Mutation) {
-				const mutationRequestResult: MutationRequestResult = action.payload.data
-				const aliases = Object.keys(mutationRequestResult)
-				const allOk = aliases.every(item => mutationRequestResult[item].ok)
+				const mutationRequestResult = action.payload.data
+				const allOk =
+					mutationRequestResult !== null &&
+					Object.keys(mutationRequestResult).every(item => mutationRequestResult[item].ok)
 
 				return {
 					...state,

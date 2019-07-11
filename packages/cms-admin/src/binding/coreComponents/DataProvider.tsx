@@ -105,12 +105,12 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			const mutationResult: MutationRequestResult = mutation.data
 
 			console.log('mut error!', mutationResult)
-			return this.initializeAccessorTree(this.state.accessorTree, mutationResult)
+			return this.initializeAccessorTree(query.data, this.state.accessorTree, mutationResult)
 		}
 
 		if (query.readyState === DataTreeRequestReadyState.Success) {
 			if (prevProps.requests.query.readyState === DataTreeRequestReadyState.Pending) {
-				this.initializeAccessorTree(query.data)
+				this.initializeAccessorTree(query.data, query.data)
 			} else if (
 				this.state.accessorTree &&
 				prevState.accessorTree &&
@@ -172,7 +172,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 				this.setState({ query })
 			}
 		} else {
-			this.initializeAccessorTree(undefined)
+			this.initializeAccessorTree(undefined, undefined)
 		}
 	}
 
@@ -181,11 +181,13 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	}
 
 	private initializeAccessorTree(
+		persistedData: ReceivedDataTree<undefined> | undefined,
 		initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
 		errors?: MutationRequestResult
 	) {
 		const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree)
 		accessTreeGenerator.generateLiveTree(
+			persistedData,
 			initialData,
 			accessorTree => {
 				console.log('data', accessorTree)

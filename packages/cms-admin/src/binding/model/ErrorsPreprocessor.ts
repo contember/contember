@@ -133,11 +133,18 @@ class ErrorsPreprocessor {
 					}
 				}
 			} else if (pathNode.__typename === '_IndexPathFragment') {
+				const alias = pathNode.alias
+
+				if (alias === null) {
+					throw new ErrorsPreprocessor.ErrorsPreprocessorError(
+						`Corrupt data: undefined alias for node with index ${pathNode.index}.`
+					)
+				}
 				rootNode = {
 					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
 					children: {
-						[pathNode.index]: rootNode
+						[parseInt(alias, 10)]: rootNode
 					}
 				}
 			} else {

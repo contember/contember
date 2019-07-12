@@ -7,9 +7,14 @@ import ValidationDataSelector from './ValidationDataSelector'
 import CreateInputContextFactoryProcessor from './CreateInputContextFactoryProcessor'
 import UpdateInputContextFactoryProcessor from './UpdateInputContextFactoryProcessor'
 import ValidationContext from './ValidationContext'
+import DependencyPruner from './DependencyPruner'
 
 export default class ValidationContextFactory {
-	constructor(private readonly model: Model.Schema, private readonly dataSelector: ValidationDataSelector) {}
+	constructor(
+		private readonly model: Model.Schema,
+		private readonly dataSelector: ValidationDataSelector,
+		private readonly dependencyPruner: DependencyPruner
+	) {}
 
 	public async createForCreate(
 		entity: Model.Entity,
@@ -34,7 +39,8 @@ export default class ValidationContextFactory {
 		data: Input.UpdateDataInput,
 		dependencies: DependencyCollector.Dependencies
 	): Promise<ValidationContext.NodeType | undefined> {
-		const node = 'where' in input ? await this.dataSelector.select(entity, input.where, dependencies) : input.node
+		const prunedDependencies = this.dependencyPruner.pruneDependencies(entity, dependencies, data)
+		const node = 'where' in input ? await this.dataSelector.select(entity, input.where, prunedDependencies) : input.node
 		if (!node) {
 			return undefined
 		}

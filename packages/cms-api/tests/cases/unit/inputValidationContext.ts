@@ -6,9 +6,8 @@ import schema from '../../example-project/src'
 import ValidationDataSelector from '../../../src/content-api/input-validation/ValidationDataSelector'
 import { createMock } from '../../../src/utils/testing'
 import DependencyCollector from '../../../src/content-api/input-validation/DependencyCollector'
-import sinon from 'sinon'
-import * as uuid from '../../../src/utils/uuid'
 import { testUuid, withMockedUuid } from '../../src/testUuid'
+import DependencyPruner from '../../../src/content-api/input-validation/DependencyPruner'
 
 type PrimaryValueExpectation = { entity: string; where: Input.UniqueWhere; result: Value.PrimaryValue }
 type SelectExpectation = {
@@ -41,6 +40,7 @@ const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], select
 			}
 			expect(entity.name).eq(entry.entity)
 			expect(where).deep.eq(entry.where)
+			console.log(JSON.stringify(entry))
 			expect(dependencies).deep.eq(entry.dependencies)
 			return entry.result
 		},
@@ -65,7 +65,8 @@ type Test = {
 const test = async (test: Test) => {
 	const contextFactory = new ValidationContextFactory(
 		schema.model,
-		createDataSelectorMock(test.primaryValues || [], test.selects || [])
+		createDataSelectorMock(test.primaryValues || [], test.selects || []),
+		new DependencyPruner(schema.model)
 	)
 	await withMockedUuid(async () => {
 		if ('createInput' in test) {
@@ -157,7 +158,7 @@ describe('input validation context', () => {
 				{
 					entity: 'Author',
 					where: { id: 1 },
-					dependencies: { name: {}, contact: { email: {} }, posts: { id: {}, title: {}, tags: { label: {} } } },
+					dependencies: { posts: { id: {}, title: {}, tags: { label: {} } } },
 					result: {
 						name: 'Db name',
 						contact: {
@@ -199,7 +200,7 @@ describe('input validation context', () => {
 				{
 					entity: 'Post',
 					where: { id: 103 },
-					dependencies: { id: {}, title: {}, tags: { label: {} } },
+					dependencies: { id: {}, tags: { label: {} } },
 					result: {
 						id: 103,
 						title: 'DB title 103',
@@ -268,7 +269,7 @@ describe('input validation context', () => {
 						title: 'Update post',
 					},
 					{
-						id: testUuid(1),
+						id: '00000000-0000-0000-0000-000000000000',
 						tags: [
 							{
 								label: 'DB label 201',

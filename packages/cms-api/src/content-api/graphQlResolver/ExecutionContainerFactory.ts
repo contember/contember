@@ -32,6 +32,7 @@ import QueryAstFactory from '../input-validation/QueryAstFactory'
 import ValidationContextFactory from '../input-validation/ValidationContextFactory'
 import ValidationDataSelector from '../input-validation/ValidationDataSelector'
 import ValidationResolver from './ValidationResolver'
+import DependencyPruner from '../input-validation/DependencyPruner'
 
 export interface ExecutionContainer {
 	readResolver: ReadResolver
@@ -192,9 +193,11 @@ class ExecutionContainerFactory {
 				({ validationQueryAstFactory, mapper }) =>
 					new ValidationDataSelector(this.schema.model, validationQueryAstFactory, mapper)
 			)
+			.addService('dependencyPruner', () => new DependencyPruner(this.schema.model))
 			.addService(
 				'validationContextFactory',
-				({ dataSelector }) => new ValidationContextFactory(this.schema.model, dataSelector)
+				({ dataSelector, dependencyPruner }) =>
+					new ValidationContextFactory(this.schema.model, dataSelector, dependencyPruner)
 			)
 			.addService(
 				'inputValidator',

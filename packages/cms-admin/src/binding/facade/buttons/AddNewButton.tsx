@@ -13,9 +13,10 @@ export interface AddNewButtonProps extends React.PropsWithChildren<ButtonProps> 
 export const AddNewButton = React.memo((props: AddNewButtonProps) => {
 	const isMutating = React.useContext(MutationStateContext)
 	const { addNew, icon, ...rest } = props
+	const addNewCallback = React.useCallback(() => addNew && addNew(), [addNew])
 	if (addNew) {
 		return (
-			<Button onClick={addNew} disabled={isMutating} small {...rest}>
+			<Button onClick={addNewCallback} disabled={isMutating} small {...rest}>
 				<Icon icon={icon || IconNames.ADD} />
 				{props.children || 'Add'}
 			</Button>

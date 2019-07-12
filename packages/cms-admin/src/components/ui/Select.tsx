@@ -9,6 +9,7 @@ class Select extends React.PureComponent<Select.Props> {
 					onChange={this.props.onChange}
 					value={this.props.value}
 					className="select"
+					multiple={this.props.multiple}
 				>
 					{this.props.options.map(option => (
 						<option value={option.value} disabled={option.disabled} key={option.value}>
@@ -29,10 +30,11 @@ namespace Select {
 	}
 
 	export interface Props {
-		value: string | number
+		value: string | number | string[]
 		onChange?: React.ChangeEventHandler<HTMLSelectElement>
 		options: Option[]
 		disabled?: boolean
+		multiple?: boolean
 	}
 }
 

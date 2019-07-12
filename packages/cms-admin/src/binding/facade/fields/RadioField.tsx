@@ -4,7 +4,7 @@ import { FormGroup } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../aux'
-import { ChoiceField, ChoiceFieldProps } from './ChoiceField'
+import { ChoiceArity, ChoiceField, ChoiceFieldMetadata, ChoiceFieldProps } from './ChoiceField'
 
 export interface RadioFieldPublicProps {
 	name: FieldName
@@ -20,15 +20,15 @@ export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 
 export const RadioField = Component<RadioFieldProps>(props => {
 	return (
-		<ChoiceField name={props.name} options={props.options}>
-			{({ data, currentValue, onChange, isMutating, environment, errors }) => {
+		<ChoiceField name={props.name} options={props.options} arity={ChoiceArity.Single}>
+			{({ data, currentValues, onChange, isMutating, environment, errors }) => {
 				return (
 					<RadioFieldInner
 						name={props.name}
 						label={props.label}
 						inline={props.inline}
 						data={data}
-						currentValue={currentValue}
+						currentValue={currentValues ? currentValues[0] : -1}
 						onChange={onChange}
 						isMutating={isMutating}
 						environment={environment}
@@ -41,9 +41,9 @@ export const RadioField = Component<RadioFieldProps>(props => {
 }, 'RadioField')
 
 interface RadioFieldInnerProps extends RadioFieldPublicProps {
-	data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
-	currentValue: ChoiceField.ValueRepresentation | null
-	onChange: (newValue: ChoiceField.ValueRepresentation) => void
+	data: ChoiceFieldMetadata['data']
+	currentValue: ChoiceField.ValueRepresentation
+	onChange: ChoiceFieldMetadata['onChange']
 	environment: Environment
 	errors: ErrorAccessor[]
 	isMutating: boolean
@@ -56,11 +56,11 @@ class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
 				<RadioGroup
 					disabled={this.props.isMutating}
 					selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}
-					onChange={event => this.props.onChange(parseInt(event.currentTarget.value, 10))}
+					onChange={event => this.props.onChange(0, parseInt(event.currentTarget.value, 10))}
 				>
 					{this.props.data.map(choice => {
-						const [value, label] = choice
-						return <Radio value={value} labelElement={label} key={value} />
+						const { key, label } = choice
+						return <Radio value={key} labelElement={label} key={key} />
 					})}
 				</RadioGroup>
 			</FormGroup>

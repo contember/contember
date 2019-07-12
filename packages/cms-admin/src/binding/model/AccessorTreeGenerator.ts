@@ -80,8 +80,8 @@ class AccessorTreeGenerator {
 				// TODO, proper addNew callback
 				return new AccessorTreeRoot(
 					tree,
-					new EntityCollectionAccessor(entityAccessors, errorNode ? errorNode.errors : [], () => {
-						entityAccessors.push(createEntityAccessor(undefined, entityAccessors.length))
+					new EntityCollectionAccessor(entityAccessors, errorNode ? errorNode.errors : [], newEntity => {
+						entityAccessors.push(createEntityAccessor(newEntity, entityAccessors.length))
 						updateData(createAccessorTreeRoot())
 					}),
 					tree.entityName
@@ -437,8 +437,8 @@ class AccessorTreeGenerator {
 				onRemove
 			)
 		}
-		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], () => {
-			collectionAccessor.entities.push(generateNewAccessor(undefined, collectionAccessor.entities.length))
+		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], newEntity => {
+			collectionAccessor.entities.push(generateNewAccessor(newEntity, collectionAccessor.entities.length))
 			update()
 		})
 

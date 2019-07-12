@@ -8,7 +8,7 @@ export class EntityCollectionAccessor extends Accessor implements Errorable {
 	public constructor(
 		public readonly entities: Array<EntityAccessor | EntityForRemovalAccessor | undefined>, // Undefined is a "hole" after an non-persisted entity
 		public readonly errors: ErrorAccessor[],
-		public readonly addNew?: () => void
+		public readonly addNew?: (newEntity?: EntityAccessor) => void
 	) {
 		super()
 	}

@@ -1,3 +1,4 @@
+export * from './arrayDifference'
 export { default as assertNever } from './assertNever'
 export { default as deepCopy } from './deepCopy'
 export { default as isEmptyObject } from './isEmptyObject'

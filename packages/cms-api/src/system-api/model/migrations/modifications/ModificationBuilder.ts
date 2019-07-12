@@ -1,4 +1,4 @@
-import { Acl, deepCopy, Model, Schema } from 'cms-common'
+import { Acl, deepCopy, Model, Schema, Validation } from 'cms-common'
 import { acceptFieldVisitor } from '../../../../content-schema/modelUtils'
 import CreateModificationFieldVisitor from '../CreateModificationFieldVisitor'
 import Migration from '../Migration'
@@ -22,6 +22,8 @@ import UpdateFieldNameModification from './fields/UpdateFieldNameModification'
 import CreateRelationInverseSideModification from './relations/CreateRelationInverseSideModification'
 import CreateRelationModification from './relations/CreateRelationModification'
 import UpdateRelationOnDeleteModification from './relations/UpdateRelationOnDeleteModification'
+import UpdateValidationSchemaModification from './validation/UpdateValidationSchemaModification'
+import PatchValidationSchemaModification from './validation/PatchValidationSchemaModification'
 
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
@@ -55,6 +57,9 @@ class ModificationBuilder {
 
 			UpdateAclSchemaModification.id,
 			PatchAclSchemaModification.id,
+
+			UpdateValidationSchemaModification.id,
+			PatchValidationSchemaModification.id,
 		]
 		const modificationSorters: Record<string, (a: any, b: any) => number> = {
 			[RemoveFieldModification.id]: (a: RemoveFieldModification.Data, b: RemoveFieldModification.Data) => {
@@ -226,6 +231,20 @@ class ModificationBuilder {
 	public patchAclSchema(patch: Operation[]) {
 		this.modifications.push({
 			modification: PatchAclSchemaModification.id,
+			patch,
+		})
+	}
+
+	public updateValidationSchema(schema: Validation.Schema) {
+		this.modifications.push({
+			modification: 'updateValidationSchema',
+			schema,
+		})
+	}
+
+	public patchValidationSchema(patch: Operation[]) {
+		this.modifications.push({
+			modification: PatchValidationSchemaModification.id,
 			patch,
 		})
 	}

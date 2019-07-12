@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Props } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { RadioFieldPublicProps, SelectFieldInner } from '../fields'
-import { ChoiceField } from '../fields/ChoiceField'
+import { ChoiceArity, ChoiceField } from '../fields/ChoiceField'
 
 export interface AlternativeFieldsProps extends RadioFieldPublicProps {
 	alternatives: AlternativeFields.ControllerFieldMetadata
@@ -15,9 +15,10 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 	public render(): React.ReactNode {
 		return (
 			<div className="alternativeFields">
-				<ChoiceField name={this.props.name} options={Object.values(this.props.alternatives)}>
-					{({ data, currentValue, onChange, isMutating, environment, errors }) => {
+				<ChoiceField name={this.props.name} options={Object.values(this.props.alternatives)} arity={ChoiceArity.Single}>
+					{({ data, currentValues, onChange, isMutating, environment, errors }) => {
 						const alternatives: React.ReactNodeArray = []
+						const currentValue = currentValues ? currentValues[0] : -1
 						for (let i = 0, length = this.props.alternatives.length; i < length; i++) {
 							alternatives.push(
 								<div className={cn('alternativeFields-item', i === currentValue && 'is-active')} key={i}>
@@ -31,12 +32,13 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 									name={this.props.name}
 									label={this.props.label}
 									data={data}
-									currentValue={currentValue}
+									currentValues={currentValues}
 									onChange={onChange}
 									environment={environment}
 									errors={errors}
 									firstOptionCaption="Choose…"
 									isMutating={isMutating}
+									multiple={false}
 								/>
 								<div className="alternativeFields-items">{alternatives}</div>
 							</>
@@ -62,7 +64,8 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 				{ChoiceField.generateSyntheticChildren(
 					{
 						name: props.name,
-						options: Object.values(props.alternatives)
+						options: Object.values(props.alternatives),
+						arity: ChoiceArity.Single
 					},
 					environment
 				)}

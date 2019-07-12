@@ -8,6 +8,7 @@ import {
 	Field,
 	FieldMetadata,
 	SyntheticChildrenProvider,
+	ToMany,
 	ToOne
 } from '../../coreComponents'
 import {
@@ -26,17 +27,24 @@ import {
 import { VariableInputTransformer } from '../../model/VariableInputTransformer'
 import { Parser, QueryLanguage } from '../../queryLanguage'
 
+export enum ChoiceArity {
+	Single = 'single',
+	Multiple = 'multiple'
+}
+
 export interface ChoiceFieldPublicProps {
 	name: FieldName
 }
 
-export interface ChoiceFieldMetadata extends Pick<FieldMetadata, Exclude<keyof FieldMetadata, 'data'>> {
+export interface ChoiceFieldMetadata extends Omit<FieldMetadata, 'data'> {
 	data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
-	currentValue: ChoiceField.ValueRepresentation | null
-	onChange: (newValue: ChoiceField.ValueRepresentation) => void
+	currentValues: Array<ChoiceField.ValueRepresentation> | undefined
+	onChange: ((optionKey: ChoiceField.ValueRepresentation, isChosen: boolean) => void) &
+		((entityIndex: number, newValue: ChoiceField.ValueRepresentation) => void)
 }
 
 export interface ChoiceFieldBaseProps extends ChoiceFieldPublicProps {
+	arity: ChoiceArity
 	children: (metadata: ChoiceFieldMetadata) => React.ReactNode
 }
 
@@ -53,6 +61,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 				{rawMetadata => {
 					const commonProps: ChoiceField.InnerBaseProps = {
 						rawMetadata,
+						arity: this.props.arity,
 						children: this.props.children,
 						name: this.props.name
 					}
@@ -93,9 +102,16 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 							>
 								{metadata.children}
 							</EntityListDataProvider>
-							<ToOne field={fieldName}>
-								<Field name={PRIMARY_KEY_NAME} />
-							</ToOne>
+							{props.arity === ChoiceArity.Single && (
+								<ToOne field={fieldName}>
+									<Field name={PRIMARY_KEY_NAME} />
+								</ToOne>
+							)}
+							{props.arity === ChoiceArity.Multiple && (
+								<ToMany field={fieldName}>
+									<Field name={PRIMARY_KEY_NAME} />
+								</ToMany>
+							)}
 						</>
 					),
 					environment
@@ -119,7 +135,13 @@ namespace ChoiceField {
 	// This is just the JS array index as specified in options or as returned from the server.
 	export type ValueRepresentation = number
 
-	export type Data<ActualValue extends Environment.Value = string> = Array<[ValueRepresentation, Label, ActualValue]>
+	export interface SingleDatum<ActualValue extends Environment.Value = string> {
+		key: ValueRepresentation
+		label: Label
+		actualValue: ActualValue
+	}
+
+	export type Data<ActualValue extends Environment.Value = string> = SingleDatum<ActualValue>[]
 
 	export interface InnerBaseProps extends ChoiceFieldBaseProps {
 		rawMetadata: Field.RawMetadata
@@ -131,6 +153,10 @@ namespace ChoiceField {
 
 	export class Static extends React.PureComponent<StaticProps> {
 		public render() {
+			if (this.props.arity === ChoiceArity.Multiple) {
+				throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
+			}
+
 			const rawOptions = this.props.options
 			const children = this.props.children
 
@@ -156,10 +182,12 @@ namespace ChoiceField {
 						}, null)
 
 						return children({
-							data: options.map(
-								(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.StaticValue] => [i, item[1], item[0]]
-							),
-							currentValue: currentValue === -1 ? null : currentValue,
+							data: options.map((item, i) => ({
+								key: i,
+								label: item[1],
+								actualValue: item[0]
+							})),
+							currentValues: currentValue === -1 ? undefined : [currentValue],
 							onChange: (newValue: ChoiceField.ValueRepresentation) => {
 								data.onChange && data.onChange(options[newValue][0])
 							},
@@ -230,8 +258,28 @@ namespace ChoiceField {
 			if (!(subTreeRootAccessor instanceof AccessorTreeRoot)) {
 				throw new DataBindingError('Corrupted data: dynamic choice field options have not been retrieved.')
 			}
-			if (!(currentValueEntity instanceof EntityAccessor || currentValueEntity instanceof EntityForRemovalAccessor)) {
-				throw new DataBindingError('Corrupted data')
+			if (
+				currentValueEntity === undefined ||
+				currentValueEntity instanceof FieldAccessor ||
+				currentValueEntity instanceof AccessorTreeRoot
+			) {
+				throw new DataBindingError(
+					'Corrupted data: dynamic choice field must be a reference, not a field or a sub-tree.'
+				)
+			}
+
+			if (
+				this.props.arity === ChoiceArity.Single &&
+				!(currentValueEntity instanceof EntityAccessor || currentValueEntity instanceof EntityForRemovalAccessor)
+			) {
+				throw new DataBindingError(
+					'Corrupted data: dynamic single-choice field must be a reference to a single entity.'
+				)
+			}
+			if (this.props.arity === ChoiceArity.Multiple && !(currentValueEntity instanceof EntityCollectionAccessor)) {
+				throw new DataBindingError(
+					'Corrupted data: dynamic multiple-choice field must be a reference to a collection of entities.'
+				)
 			}
 
 			const subTreeData = subTreeRootAccessor.root
@@ -265,39 +313,97 @@ namespace ChoiceField {
 				optionEntities.push(entity)
 			}
 
-			let currentValue: ChoiceField.ValueRepresentation
+			const entities =
+				currentValueEntity instanceof EntityCollectionAccessor ? currentValueEntity.entities : [currentValueEntity]
 
-			if (currentValueEntity instanceof EntityAccessor) {
-				const currentKey = currentValueEntity.getKey()
-				currentValue = filteredData.findIndex(entity => {
-					const key = entity.getPersistedKey()
-					return !!key && key === currentKey
-				})
-			} else if (currentValueEntity instanceof EntityForRemovalAccessor) {
-				currentValue = -1
-			} else {
-				return assertNever(currentValueEntity)
+			const currentValues: ChoiceField.ValueRepresentation[] = []
+
+			for (const entity of entities) {
+				if (entity instanceof EntityAccessor) {
+					const currentKey = entity.getKey()
+					const index = filteredData.findIndex(entity => {
+						const key = entity.getPersistedKey()
+						return !!key && key === currentKey
+					})
+					if (index > -1) {
+						currentValues.push(index)
+					}
+				}
 			}
+
 			const normalizedData = optionEntities.map(
-				(item, i): [ChoiceField.ValueRepresentation, Label, ChoiceField.DynamicValue] => {
+				(item, i): ChoiceField.SingleDatum => {
 					const field = item.data.getField(fieldName)
 					const label: Label = field instanceof FieldAccessor ? field.currentValue : undefined
 
-					return [i, label, item.primaryKey]
+					return {
+						key: i,
+						label,
+
+						// We can get away with the "!" since this collection was created from filteredData above.
+						// If this is actually an unpersisted entity, we've got a huge problem.
+						actualValue: item.getPersistedKey()!
+					}
 				}
 			)
 
 			return this.props.children({
 				...this.props.rawMetadata,
 				data: normalizedData,
-				currentValue: currentValue === -1 ? null : currentValue,
-				onChange: (newValue: ChoiceField.ValueRepresentation) => {
-					if (newValue === -1) {
-						if (currentValueEntity instanceof EntityAccessor && currentValueEntity.remove) {
-							currentValueEntity.remove(EntityAccessor.RemovalType.Disconnect)
+				currentValues: currentValues.length ? currentValues : undefined,
+				onChange: (
+					optionKeyOrEntityIndex: ChoiceField.ValueRepresentation | number,
+					isChosenOrNewValue: boolean | ChoiceField.ValueRepresentation
+				) => {
+					if (typeof isChosenOrNewValue === 'boolean') {
+						const optionKey: ChoiceField.ValueRepresentation = optionKeyOrEntityIndex
+						const isChosen: boolean = isChosenOrNewValue
+
+						if (this.props.arity === ChoiceArity.Single) {
+							if (currentValueEntity instanceof EntityAccessor) {
+								if (isChosen) {
+									currentValueEntity.replaceWith(optionEntities[optionKey])
+								} else {
+									currentValueEntity.remove && currentValueEntity.remove(EntityAccessor.RemovalType.Disconnect)
+								}
+							}
+						} else if (this.props.arity === ChoiceArity.Multiple) {
+							if (currentValueEntity instanceof EntityCollectionAccessor && currentValueEntity.addNew) {
+								if (isChosen) {
+									currentValueEntity.addNew(optionEntities[optionKey])
+								} else {
+									const targetEntityId = optionEntities[optionKey].getPersistedKey()
+
+									for (const searchedEntity of currentValueEntity.entities) {
+										if (!(searchedEntity instanceof EntityAccessor)) {
+											continue
+										}
+										if (searchedEntity.getPersistedKey() === targetEntityId) {
+											searchedEntity.remove && searchedEntity.remove(EntityAccessor.RemovalType.Disconnect)
+											break
+										}
+									}
+								}
+							}
+						} else {
+							assertNever(this.props.arity)
 						}
 					} else {
-						currentValueEntity.replaceWith(filteredData[newValue])
+						const entityIndex: number = optionKeyOrEntityIndex
+						const newValue: number = isChosenOrNewValue
+
+						const entity = entities[entityIndex]
+						if (entity === undefined) {
+							return
+						}
+
+						if (newValue === -1) {
+							if (entity instanceof EntityAccessor && entity.remove) {
+								entity.remove(EntityAccessor.RemovalType.Disconnect)
+							}
+						} else {
+							entity.replaceWith(filteredData[newValue])
+						}
 					}
 				},
 				errors: currentValueEntity.errors,

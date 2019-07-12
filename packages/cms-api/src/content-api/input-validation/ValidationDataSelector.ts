@@ -19,7 +19,15 @@ export default class ValidationDataSelector {
 		where: Input.UniqueWhere,
 		dependencies: DependencyCollector.Dependencies
 	): Promise<Value.Object | null> {
+		if (Object.keys(dependencies).length === 0) {
+			return {}
+		}
 		const queryAst = this.queryAstFactory.create(entity.name, dependencies).withArg('by', where)
-		return this.mapper.selectUnique(entity, queryAst)
+		const node = await this.mapper.selectUnique(entity, queryAst)
+		if (!node) {
+			return null
+		}
+
+		return node
 	}
 }

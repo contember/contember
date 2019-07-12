@@ -2691,10 +2691,10 @@ describe('update', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id" from  "public"."book" as "root_"   where "root_"."id" = ?`,
+						sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."book" as "root_" where "root_"."id" = ?`,
 						parameters: [testUuid(1)],
 						response: {
-							rows: [{ root_name: 'John', root_id: testUuid(1) }],
+							rows: [{ root_id: testUuid(1) }],
 						},
 					},
 					{

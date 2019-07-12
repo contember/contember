@@ -19,8 +19,6 @@ import NotNullFieldsVisitor from './NotNullFieldsVisitor'
 import { filterObject } from '../../utils/object'
 
 class InputValidator {
-	private cachedEntityRules: Record<string, Validation.EntityRules> = {}
-
 	constructor(
 		private readonly validationSchema: Validation.Schema,
 		private readonly model: Model.Schema,
@@ -30,7 +28,7 @@ class InputValidator {
 	) {}
 
 	async hasValidationRulesOnUpdate(entity: Model.Entity, data: Input.UpdateDataInput): Promise<boolean> {
-		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data))
+		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data), data)
 		if (fieldsWithRules.length > 0) {
 			return true
 		}
@@ -80,7 +78,7 @@ class InputValidator {
 	}
 
 	async hasValidationRulesOnCreate(entity: Model.Entity, data: Input.CreateDataInput): Promise<boolean> {
-		const fieldsWithRules = this.getFieldsWithRules(entity)
+		const fieldsWithRules = this.getFieldsWithRules(entity, undefined, data)
 		if (fieldsWithRules.length > 0) {
 			return true
 		}
@@ -142,7 +140,7 @@ class InputValidator {
 		if (!(await this.hasValidationRulesOnCreate(entity, data))) {
 			return []
 		}
-		const { [overRelation ? overRelation.name : '']: dropRule, ...entityRules } = this.getEntityRules(entity.name)
+		const { [overRelation ? overRelation.name : '']: dropRule, ...entityRules } = this.getEntityRules(entity.name, data)
 		const fieldsWithRules = Object.keys(entityRules).filter(field => entityRules[field].length > 0)
 
 		const dependencies = this.buildDependencies(fieldsWithRules, entityRules)
@@ -169,11 +167,11 @@ class InputValidator {
 		if (!(await this.hasValidationRulesOnUpdate(entity, data))) {
 			return []
 		}
-		const entityRules = this.getEntityRules(entity.name)
+		const entityRules = this.getEntityRules(entity.name, data)
 
 		const dependencies = this.buildDependencies(Object.keys(data), entityRules)
 
-		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data))
+		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data), data)
 
 		let fieldsResult: InputValidator.Result = []
 		const node = (await this.validationContextFactory.createForUpdate(entity, { where }, data, dependencies)) || {}
@@ -189,8 +187,12 @@ class InputValidator {
 		return [...fieldsResult, ...relationResult]
 	}
 
-	private getFieldsWithRules(entity: Model.Entity, fields?: string[]): string[] {
-		const entityRules = this.getEntityRules(entity.name)
+	private getFieldsWithRules(
+		entity: Model.Entity,
+		fields: string[] | undefined,
+		data: Input.UpdateDataInput | Input.CreateDataInput
+	): string[] {
+		const entityRules = this.getEntityRules(entity.name, data)
 		const fields2 = fields || Object.keys(this.model.entities[entity.name].fields)
 
 		return fields2.filter(field => entityRules[field] && entityRules[field].length > 0)
@@ -228,19 +230,20 @@ class InputValidator {
 			.map(it => entityRules[it] || [])
 			.reduce((acc, val) => [...acc, ...val], [])
 			.map(it => this.dependencyCollector.collect(it.validator))
-			.concat(fields.reduce((acc, field) => ({ ...acc, [field]: {} }), {}))
+			.concat(fields.reduce((acc, field) => (entityRules[field] ? { ...acc, [field]: {} } : acc), {}))
 			.reduce((acc, dependency) => DependencyMerger.merge(acc, dependency), {})
 	}
 
-	private getEntityRules(entityName: string): Validation.EntityRules {
-		if (this.cachedEntityRules[entityName]) {
-			return this.cachedEntityRules[entityName]
-		}
+	private getEntityRules(
+		entityName: string,
+		data: Input.UpdateDataInput | Input.CreateDataInput
+	): Validation.EntityRules {
 		const definedRules = this.validationSchema[entityName] || {}
 		const fieldsNotNullFlag = acceptEveryFieldVisitor(this.model, entityName, new NotNullFieldsVisitor())
-		const notNullFields = Object.keys(filterObject(fieldsNotNullFlag, (field, val) => val))
-
-		return (this.cachedEntityRules[entityName] = notNullFields.reduce(
+		const notNullFields = Object.keys(filterObject(fieldsNotNullFlag, (field, val) => val)).filter(
+			field => data[field] === undefined || data[field] === null
+		)
+		return notNullFields.reduce(
 			(entityRules, field) => ({
 				...entityRules,
 				[field]: [
@@ -249,7 +252,7 @@ class InputValidator {
 				],
 			}),
 			definedRules
-		))
+		)
 	}
 }
 

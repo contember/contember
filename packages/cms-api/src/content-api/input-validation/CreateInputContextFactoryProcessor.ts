@@ -58,6 +58,9 @@ export default class CreateInputContextFactoryProcessor implements CreateInputPr
 	}
 
 	async column(context: Context.ColumnContext): Promise<Result> {
+		if (context.column.name === context.entity.primary) {
+			return '00000000-0000-0000-0000-000000000000'
+		}
 		try {
 			return resolveColumnValue(context)
 		} catch (e) {

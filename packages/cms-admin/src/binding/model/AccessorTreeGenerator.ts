@@ -213,17 +213,18 @@ class AccessorTreeGenerator {
 							: data[referencePlaceholder]
 						: undefined
 
-					if (
-						fieldData instanceof FieldAccessor ||
-						fieldData instanceof AccessorTreeRoot ||
-						(errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.FieldIndexed)
-					) {
+					if (fieldData instanceof FieldAccessor || fieldData instanceof AccessorTreeRoot) {
 						throw new DataBindingError(
 							`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`
 						)
 					}
 
-					const referenceError = errors ? errors.children[field.fieldName] : undefined
+					const referenceError =
+						errors &&
+						errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
+						field.fieldName in errors.children
+							? errors.children[field.fieldName]
+							: undefined
 
 					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
 						if (Array.isArray(fieldData) || fieldData instanceof EntityCollectionAccessor) {

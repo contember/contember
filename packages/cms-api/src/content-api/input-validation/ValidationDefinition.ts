@@ -201,8 +201,8 @@ export function parseDefinition(definitions: Record<string, EnumDefinition | { n
 							: fieldRules
 						return tuple(field, finalRules)
 					})
-					.reduce<Validation.EntityRules>((ruleSet, [field, rules]) => ({ ...ruleSet, [field]: rules }), {})
+					.reduce<Validation.EntityRules>((ruleSet, [field, rules]) => rules.length > 0 ? ({ ...ruleSet, [field]: rules }) : ruleSet, {})
 			)
 		})
-		.reduce<Validation.Schema>((acc, [name, defs]) => ({ ...acc, [name]: defs }), {})
+		.reduce<Validation.Schema>((acc, [name, defs]) => Object.keys(defs).length > 0 ? ({ ...acc, [name]: defs }) : acc, {})
 }

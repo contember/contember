@@ -1,4 +1,5 @@
 export * from './CheckboxField'
+export * from './CheckboxList'
 export * from './FloatField'
 export * from './HiddenField'
 export * from './ImageUploadField'

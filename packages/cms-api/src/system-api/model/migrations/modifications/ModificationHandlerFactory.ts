@@ -19,6 +19,8 @@ import CreateEntityModification from './entities/CreateEntityModification'
 import RemoveUniqueConstraintModification from './constraints/RemoveUniqueConstraintModification'
 import UpdateEntityNameModification from './entities/UpdateEntityNameModification'
 import PatchAclSchemaModification from './acl/PatchAclSchemaModification'
+import UpdateValidationSchemaModification from './validation/UpdateValidationSchemaModification'
+import PatchValidationSchemaModification from './validation/PatchValidationSchemaModification'
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: ModificationHandlerFactory.FactoryMap<any>) {}
@@ -62,6 +64,9 @@ namespace ModificationHandlerFactory {
 			new CreateRelationInverseSideModification(data, schema),
 		[CreateRelationModification.id]: ({ data, schema }) => new CreateRelationModification(data, schema),
 		[UpdateRelationOnDeleteModification.id]: ({ data, schema }) => new UpdateRelationOnDeleteModification(data, schema),
+
+		[UpdateValidationSchemaModification.id]: ({ data }) => new UpdateValidationSchemaModification(data),
+		[PatchValidationSchemaModification.id]: ({ data }) => new PatchValidationSchemaModification(data),
 	}
 }
 

@@ -16,12 +16,22 @@ class SchemaDiffer {
 
 		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
 			const patch = createPatch(originalSchema.acl, updatedSchema.acl)
-			if (patch.length <= 40) {
+			if (patch.length <= 20) {
 				builder.patchAclSchema(patch)
 			} else {
 				builder.updateAclSchema(updatedSchema.acl)
 			}
 		}
+
+		if (!deepEqual(originalSchema.validation, updatedSchema.validation)) {
+			const patch = createPatch(originalSchema.validation, updatedSchema.validation)
+			if (patch.length <= 20) {
+				builder.patchValidationSchema(patch)
+			} else {
+				builder.updateValidationSchema(updatedSchema.validation)
+			}
+		}
+
 
 		const originalModel = originalSchema.model
 		const updatedModel = updatedSchema.model
@@ -183,6 +193,10 @@ class SchemaDiffer {
 		const appliedDiff = this.schemaMigrator.applyDiff(originalSchema, diff)
 
 		if (checkRecreate && !deepEqual(updatedSchema, appliedDiff)) {
+			const diff = createPatch(updatedSchema, appliedDiff)
+			for (let item of diff) {
+				console.log(item)
+			}
 			throw new ImplementationException('Updated schema cannot be recreated by the generated diff!')
 		}
 

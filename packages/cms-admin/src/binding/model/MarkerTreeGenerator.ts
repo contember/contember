@@ -11,6 +11,7 @@ import {
 	MarkerTreeRoot,
 	ReferenceMarker
 } from '../dao'
+import { Hashing } from '../utils'
 
 type NodeResult = FieldMarker | MarkerTreeRoot | ReferenceMarker
 type RawNodeResult = NodeResult | NodeResult[] | undefined
@@ -87,7 +88,7 @@ export class MarkerTreeGenerator {
 				return this.processNode(children, environment)
 			}
 
-			// React.Component
+			// React.Component, React.PureComponent, React.FunctionComponent
 
 			const dataMarker = node.type as MarkerProvider &
 				(React.ComponentClass<unknown> | React.FunctionComponent<unknown> | React.NamedExoticComponent<unknown>)
@@ -131,7 +132,7 @@ export class MarkerTreeGenerator {
 
 							if (fields.length !== 1) {
 								// TODO this will change in future
-								throw new DataBindingError(`Relation can only be reduced by exactly one field.`)
+								throw new DataBindingError(`A hasMany relation can only be reduced to a hasOne by exactly one field.`)
 							}
 						}
 					}
@@ -179,7 +180,7 @@ export class MarkerTreeGenerator {
 			} else if (fresh instanceof ReferenceMarker) {
 				return this.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof MarkerTreeRoot) {
-				throw new DataBindingError() // TODO msg
+				throw new DataBindingError('Merging fields and tree roots is an undefined operation.')
 			} else {
 				return assertNever(fresh)
 			}
@@ -209,12 +210,22 @@ export class MarkerTreeGenerator {
 				}
 				return original
 			} else if (fresh instanceof MarkerTreeRoot) {
-				throw new DataBindingError() // TODO msg
+				throw new DataBindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
 			} else {
 				return assertNever(fresh)
 			}
 		} else if (original instanceof MarkerTreeRoot) {
-			throw new DataBindingError() // TODO msg
+			if (fresh instanceof MarkerTreeRoot) {
+				if (
+					Hashing.hashMarkerTreeConstraints(original.constraints) ===
+					Hashing.hashMarkerTreeConstraints(fresh.constraints)
+				) {
+					return original
+				}
+				throw new DataBindingError('MarkerTreeGenerator merging: error code cc') // TODO msg
+			} else {
+				throw new DataBindingError('MarkerTreeGenerator merging: error code aa') // TODO msg
+			}
 		} else {
 			return assertNever(original)
 		}

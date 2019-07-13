@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
-import { ReferenceMarker } from '../dao'
+import { assertNever, Input } from 'cms-common'
+import { MarkerTreeConstraints, ReferenceMarker } from '../dao'
 
 export class Hashing {
 	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
@@ -12,7 +12,24 @@ export class Hashing {
 			| ReferenceMarker.ExpectedCount
 		> = [constraints.filter, constraints.reducedBy, constraints.expectedCount]
 
-		const json = where.map(item => JSON.stringify(item)).join('')
+		return Hashing.hashArray(where)
+	}
+
+	public static hashMarkerTreeConstraints(constraints: MarkerTreeConstraints): number {
+		if (constraints === undefined) {
+			return 0
+		}
+		if (constraints.whereType === 'nonUnique') {
+			return Hashing.hashArray([constraints.whereType, constraints.filter])
+		} else if (constraints.whereType === 'unique') {
+			return Hashing.hashArray([constraints.whereType, constraints.where])
+		} else {
+			return assertNever(constraints)
+		}
+	}
+
+	private static hashArray(array: any[]): number {
+		const json = array.map(item => JSON.stringify(item)).join('')
 		return Hashing.hash(json)
 	}
 

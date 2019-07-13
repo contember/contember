@@ -95,11 +95,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 					props.name,
 					fieldName => (
 						<>
-							<EntityListDataProvider
-								name={metadata.entityName}
-								filter={metadata.filter}
-								associatedField={metadata.fieldName}
-							>
+							<EntityListDataProvider name={metadata.entityName} filter={metadata.filter} associatedField={props.name}>
 								{metadata.children}
 							</EntityListDataProvider>
 							{props.arity === ChoiceArity.Single && (
@@ -252,7 +248,7 @@ namespace ChoiceField {
 				this.props.rawMetadata.environment
 			)
 
-			const subTreeRootAccessor = data.data.getTreeRoot(fieldName)
+			const subTreeRootAccessor = data.data.getTreeRoot(this.props.rawMetadata.fieldName)
 			const currentValueEntity = data.data.getField(this.props.rawMetadata.fieldName)
 
 			if (!(subTreeRootAccessor instanceof AccessorTreeRoot)) {

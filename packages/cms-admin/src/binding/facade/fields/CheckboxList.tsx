@@ -2,7 +2,7 @@ import * as React from 'react'
 import { FormGroup, FormGroupProps } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import { Component } from '../aux'
-import { ChoiceArity, ChoiceField, ChoiceFieldProps } from './ChoiceField'
+import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
 
 export interface CheckboxListPublicProps {
 	name: FieldName
@@ -18,7 +18,7 @@ export type CheckboxListProps = CheckboxListPublicProps & CheckboxListInternalPr
 export const CheckboxList = Component<CheckboxListProps>(
 	props => (
 		<ChoiceField name={props.name} options={props.options} arity={ChoiceArity.Multiple}>
-			{({ data, currentValues, onChange, environment, isMutating, errors }) => (
+			{({ data, currentValues, onChange, environment, isMutating, errors }: MultipleChoiceFieldMetadata) => (
 				// TODO this formGroup should be a fieldset
 				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
 					{data.map(({ key, label }) => (

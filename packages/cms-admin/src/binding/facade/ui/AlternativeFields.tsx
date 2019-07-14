@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Props } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { RadioFieldPublicProps, SelectFieldInner } from '../fields'
-import { ChoiceArity, ChoiceField } from '../fields/ChoiceField'
+import { ChoiceArity, ChoiceField, SingleChoiceFieldMetadata } from '../fields/ChoiceField'
 
 export interface AlternativeFieldsProps extends RadioFieldPublicProps {
 	alternatives: AlternativeFields.ControllerFieldMetadata
@@ -16,9 +16,8 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 		return (
 			<div className="alternativeFields">
 				<ChoiceField name={this.props.name} options={Object.values(this.props.alternatives)} arity={ChoiceArity.Single}>
-					{({ data, currentValues, onChange, isMutating, environment, errors }) => {
+					{({ data, currentValue, onChange, isMutating, environment, errors }: SingleChoiceFieldMetadata) => {
 						const alternatives: React.ReactNodeArray = []
-						const currentValue = currentValues ? currentValues[0] : -1
 						for (let i = 0, length = this.props.alternatives.length; i < length; i++) {
 							alternatives.push(
 								<div className={cn('alternativeFields-item', i === currentValue && 'is-active')} key={i}>
@@ -32,13 +31,12 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 									name={this.props.name}
 									label={this.props.label}
 									data={data}
-									currentValues={currentValues}
+									currentValue={currentValue}
 									onChange={onChange}
 									environment={environment}
 									errors={errors}
 									firstOptionCaption="Choose…"
 									isMutating={isMutating}
-									multiple={false}
 								/>
 								<div className="alternativeFields-items">{alternatives}</div>
 							</>

@@ -483,7 +483,8 @@ class Parser extends ChevrotainParser {
 	})
 
 	private variable = this.RULE('variable', () => {
-		const variableName = this.CONSUME(tokens.Variable).image.substring(1) // Substring to remove the $ prefix
+		this.CONSUME(tokens.DollarSign)
+		const variableName = this.CONSUME(tokens.Identifier).image
 
 		if (Parser.environment.hasName(variableName)) {
 			return Parser.environment.getValue(variableName)

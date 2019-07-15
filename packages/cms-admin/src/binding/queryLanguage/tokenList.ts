@@ -22,9 +22,9 @@ export const tokens = {
 		pattern: TokenRegExps.identifier
 	}),
 
-	Variable: createToken({
-		name: 'Variable',
-		pattern: /\$\w+/
+	DollarSign: createToken({
+		name: 'DollarSign',
+		pattern: /\$/
 	}),
 
 	Dot: createToken({
@@ -135,7 +135,7 @@ const tokenList = [
 	tokens.Null,
 	tokens.EntityIdentifier,
 	tokens.Identifier,
-	tokens.Variable,
+	tokens.DollarSign,
 	tokens.Dot,
 	tokens.Comma,
 	tokens.StringLiteral,

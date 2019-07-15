@@ -37,7 +37,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 		let dimensions: Array<Environment.Value>
 
 		if (props.dimension !== undefined) {
-			const selectedDimensions = environment.getDimensions()
+			const selectedDimensions = environment.getAllDimensions()
 
 			if (!(props.dimension in selectedDimensions)) {
 				throw new DataBindingError(`The '${props.dimension}' dimension in undefined`)

@@ -10,18 +10,41 @@ class Environment {
 		}
 	) {}
 
-	public getValue(name: keyof Environment.NameStore): Environment.Value | undefined {
-		if (!(name in this.names)) {
-			return undefined
+	public hasName(name: keyof Environment.NameStore): boolean {
+		return name in this.names
+	}
+
+	public hasDimension(dimensionName: keyof SelectedDimension): boolean {
+		return dimensionName in this.names.dimensions
+	}
+
+	public getValueOrElse<F>(name: keyof Environment.NameStore, fallback: F): Environment.Value | F {
+		if (!this.hasName(name)) {
+			return fallback
 		}
 		return this.names[name]
+	}
+
+	public getDimensionOrElse<F>(dimensionName: keyof SelectedDimension, fallback: F): string[] | F {
+		if (!this.hasDimension(dimensionName)) {
+			return fallback
+		}
+		return this.names.dimensions[dimensionName]
+	}
+
+	public getValue(name: keyof Environment.NameStore): Environment.Value {
+		return this.names[name]
+	}
+
+	public getDimension(dimensionName: keyof SelectedDimension): string[] {
+		return this.names.dimensions[dimensionName]
 	}
 
 	public getAllNames(): Environment.NameStore {
 		return { ...this.names }
 	}
 
-	public getDimensions(): SelectedDimension {
+	public getAllDimensions(): SelectedDimension {
 		return { ...this.names.dimensions }
 	}
 

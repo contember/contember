@@ -6,10 +6,8 @@ interface VariableProps {
 	name: Environment.Name
 }
 
-export class Variable extends React.PureComponent<VariableProps> {
-	public render() {
-		return (
-			<EnvironmentContext.Consumer>{environment => environment.getValue(this.props.name)}</EnvironmentContext.Consumer>
-		)
-	}
+export const Variable = (props: VariableProps): React.ReactElement => {
+	const environment = React.useContext(EnvironmentContext)
+
+	return <>{environment.getValueOrElse(props.name, null)}</>
 }

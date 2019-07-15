@@ -95,7 +95,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 namespace Sortable {
 	export const resolveSortByFieldName = (sortBy: FieldName | VariableScalar, environment: Environment): FieldName => {
 		if (sortBy instanceof VariableScalar) {
-			const fieldName = environment.getValue(sortBy.variable)
+			const fieldName = environment.getValueOrElse(sortBy.variable, undefined)
 
 			if (fieldName === undefined) {
 				throw new DataBindingError(`Attempting to sort by a variable field '${sortBy.variable}' which is not defined.`)

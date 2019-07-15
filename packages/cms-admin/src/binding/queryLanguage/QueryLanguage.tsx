@@ -1,4 +1,3 @@
-import { isEmptyObject } from 'cms-common'
 import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { Props, ToMany, ToOne } from '../coreComponents'

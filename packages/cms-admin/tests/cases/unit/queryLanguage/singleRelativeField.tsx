@@ -8,7 +8,7 @@ import { TextField } from '../../../../src/binding/facade'
 import { Parser, QueryLanguage } from '../../../../src/binding/queryLanguage'
 
 const parse = (input: string) => {
-	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeSingleField)
+	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeSingleField, new Environment())
 }
 
 describe('single relative fields QueryLanguage parser', () => {

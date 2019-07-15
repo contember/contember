@@ -1,9 +1,10 @@
 import { expect } from 'chai'
 import 'mocha'
+import { Environment } from '../../../../src/binding/dao'
 import { Parser } from '../../../../src/binding/queryLanguage'
 
 const parse = (input: string): Parser.AST.RelativeEntityList => {
-	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeEntityList)
+	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeEntityList, new Environment())
 }
 
 describe('relative entity list QueryLanguage parser', () => {

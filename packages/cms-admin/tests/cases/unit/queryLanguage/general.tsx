@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
+import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { ToOne } from '../../../../src/binding/coreComponents'
 import { Environment } from '../../../../src/binding/dao'
@@ -11,35 +12,28 @@ describe('query language parser', () => {
 		const environment = new Environment({
 			ab: 456,
 			a: 123,
-			x: "'x'",
+			x: 'x',
+			fieldVariable: 'fieldVariableName',
+			literal: new GraphQlBuilder.Literal('literal'),
 			dimensions: {}
 		})
 		expect(
 			QueryLanguage.wrapRelativeSingleField(
-				'a(a=$a).ab(ab = $ab).x(x = $x).foo',
+				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = $x).foo',
 				name => <TextField name={name} />,
 				environment
 			)
 		).eql(
 			<ToOne.AtomicPrimitive field="a" reducedBy={{ a: 123 }} environment={environment}>
-				<ToOne.AtomicPrimitive field="ab" reducedBy={{ ab: 456 }} environment={environment}>
+				<ToOne.AtomicPrimitive
+					field="fieldVariableName"
+					reducedBy={{ ab: 456, literalColumn: new GraphQlBuilder.Literal('literal') }}
+					environment={environment}
+				>
 					<ToOne.AtomicPrimitive field="x" reducedBy={{ x: 'x' }} environment={environment}>
 						<TextField name="foo" />
 					</ToOne.AtomicPrimitive>
 				</ToOne.AtomicPrimitive>
-			</ToOne.AtomicPrimitive>
-		)
-	})
-
-	it('should resolve variables with multiple levels of replacement', () => {
-		const environment = new Environment({
-			ab: 456,
-			a: 'ab = $ab',
-			dimensions: {}
-		})
-		expect(QueryLanguage.wrapRelativeSingleField('a($a).foo', name => <TextField name={name} />, environment)).eql(
-			<ToOne.AtomicPrimitive field="a" reducedBy={{ ab: 456 }} environment={environment}>
-				<TextField name="foo" />
 			</ToOne.AtomicPrimitive>
 		)
 	})

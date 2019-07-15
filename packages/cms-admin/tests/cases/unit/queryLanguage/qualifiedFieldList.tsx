@@ -1,9 +1,10 @@
 import { expect } from 'chai'
 import 'mocha'
+import { Environment } from '../../../../src/binding/dao'
 import { Parser } from '../../../../src/binding/queryLanguage'
 
 const parse = (input: string) => {
-	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.QualifiedFieldList)
+	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.QualifiedFieldList, new Environment())
 }
 
 describe('qualified field list QueryLanguage parser', () => {

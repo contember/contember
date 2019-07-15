@@ -32,7 +32,6 @@ class SchemaDiffer {
 			}
 		}
 
-
 		const originalModel = originalSchema.model
 		const updatedModel = updatedSchema.model
 

@@ -4,9 +4,8 @@ import { Input } from 'cms-common'
 import { EntityName, FieldName } from '../bindingTypes'
 import { ToMany, ToOne } from '../coreComponents'
 import { Environment } from '../dao'
-import { MacroResolver } from './MacroResolver'
 import { QueryLanguageError } from './QueryLanguageError'
-import { tokenList, tokens } from './tokenList'
+import { tokenList, TokenRegExps, tokens } from './tokenList'
 
 /**
  * TODO:
@@ -18,9 +17,9 @@ import { tokenList, tokens } from './tokenList'
  * 	- filtering toOne
  */
 class Parser extends ChevrotainParser {
-	private static macroResolver = new MacroResolver()
 	private static lexer = new Lexer(tokenList)
 	private static parser = new Parser()
+	private static environment: Environment = new Environment()
 
 	private qualifiedFieldList: () => Parser.AST.QualifiedFieldList = this.RULE<Parser.AST.QualifiedFieldList>(
 		'qualifiedFieldList',
@@ -366,7 +365,11 @@ class Parser extends ChevrotainParser {
 	})
 
 	private fieldName = this.RULE<FieldName>('fieldName', () => {
-		return this.SUBRULE(this.fieldIdentifier)
+		return this.OR([
+			{
+				ALT: () => this.SUBRULE(this.fieldIdentifier)
+			}
+		])
 	})
 
 	private primaryValue = this.RULE('primaryValue', () => {
@@ -378,9 +381,21 @@ class Parser extends ChevrotainParser {
 				ALT: () => this.SUBRULE(this.number)
 			},
 			{
+				ALT: () => this.SUBRULE(this.graphQlLiteral)
+			},
+			{
 				ALT: () => {
-					const identifier = this.SUBRULE(this.fieldIdentifier)
-					return new GraphQlBuilder.Literal(identifier)
+					const variableValue = this.SUBRULE(this.variable)
+					if (
+						typeof variableValue === 'string' ||
+						typeof variableValue === 'number' ||
+						variableValue instanceof GraphQlBuilder.Literal
+					) {
+						return variableValue
+					}
+					throw new QueryLanguageError(
+						`A variable can resolve to a literal, string or a number, not ${typeof variableValue}`
+					)
 				}
 			}
 		])
@@ -388,15 +403,45 @@ class Parser extends ChevrotainParser {
 
 	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {
 		this.SUBRULE(this.optionalWhitespace)
-		const identifier = this.CONSUME(tokens.FieldIdentifier).image
+		const identifier = this.OR([
+			{
+				ALT: () => this.SUBRULE(this.identifier)
+			},
+			{
+				ALT: () => {
+					const variable = this.SUBRULE(this.variable)
+					if (!TokenRegExps.identifier.test(variable)) {
+						throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
+					}
+					return variable
+				}
+			}
+		])
 		this.SUBRULE1(this.optionalWhitespace)
 
 		return identifier
 	})
 
+	private identifier: () => string = this.RULE('identifier', () => {
+		return this.CONSUME(tokens.Identifier).image
+	})
+
 	private entityIdentifier: () => EntityName = this.RULE('entityIdentifier', () => {
 		this.SUBRULE(this.optionalWhitespace)
-		const identifier = this.CONSUME(tokens.EntityIdentifier).image
+		const identifier = this.OR([
+			{
+				ALT: () => this.CONSUME(tokens.EntityIdentifier).image
+			},
+			{
+				ALT: () => {
+					const variable = this.SUBRULE(this.variable)
+					if (!TokenRegExps.entityIdentifier.test(variable)) {
+						throw new QueryLanguageError(`The value of the variable \$${variable} is not a valid entity identifier.`)
+					}
+					return variable
+				}
+			}
+		])
 		this.SUBRULE1(this.optionalWhitespace)
 
 		return identifier
@@ -425,8 +470,37 @@ class Parser extends ChevrotainParser {
 		return number
 	})
 
+	private graphQlLiteral = this.RULE('graphQlLiteral', () => {
+		this.SUBRULE(this.optionalWhitespace)
+		const image = this.SUBRULE1(this.identifier)
+		this.SUBRULE2(this.optionalWhitespace)
+
+		return new GraphQlBuilder.Literal(image)
+	})
+
 	private optionalWhitespace = this.RULE('optionalWhitespace', () => {
 		this.OPTION(() => this.CONSUME(tokens.WhiteSpace))
+	})
+
+	private variable = this.RULE('variable', () => {
+		const variableName = this.CONSUME(tokens.Variable).image.substring(1) // Substring to remove the $ prefix
+
+		if (Parser.environment.hasName(variableName)) {
+			return Parser.environment.getValue(variableName)
+		}
+		if (Parser.environment.hasDimension(variableName)) {
+			const dimensionValue = Parser.environment.getDimension(variableName)
+
+			if (dimensionValue.length === 1) {
+				return dimensionValue[0]
+			}
+			throw new QueryLanguageError(
+				`The variable \$${variableName} resolved to a dimension which exists but contains ${
+					dimensionValue.length
+				} values. It has to contain exactly one.`
+			)
+		}
+		throw new QueryLanguageError(`Undefined variable \$${variableName}.`)
 	})
 
 	private constructor() {
@@ -437,17 +511,17 @@ class Parser extends ChevrotainParser {
 	public static parseQueryLanguageExpression<E extends Parser.EntryPoint>(
 		input: string,
 		entry: E,
-		environment?: Environment
+		environment: Environment
 	): Parser.ParserResult[E] {
-		const inputWithResolvedMacros = Parser.macroResolver.resolve(input, environment)
-		const lexingResult = Parser.lexer.tokenize(inputWithResolvedMacros)
+		const lexingResult = Parser.lexer.tokenize(input)
 
 		if (lexingResult.errors.length !== 0) {
 			throw new QueryLanguageError(
-				`Failed to tokenize '${inputWithResolvedMacros}'.\n\n${lexingResult.errors.map(i => i.message).join('\n')}`
+				`Failed to tokenize '${input}'.\n\n${lexingResult.errors.map(i => i.message).join('\n')}`
 			)
 		}
 
+		Parser.environment = environment
 		Parser.parser.input = lexingResult.tokens
 
 		let expression: Parser.ParserResult[keyof Parser.ParserResult]

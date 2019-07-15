@@ -1,5 +1,10 @@
 import { createToken, Lexer } from 'chevrotain'
 
+export namespace TokenRegExps {
+	export const entityIdentifier = /[A-Z]\w*/
+	export const identifier = /[a-zA-Z]\w*/
+}
+
 export const tokens = {
 	WhiteSpace: createToken({
 		name: 'WhiteSpace',
@@ -9,12 +14,12 @@ export const tokens = {
 
 	EntityIdentifier: createToken({
 		name: 'EntityIdentifier',
-		pattern: /[A-Z]\w*/
+		pattern: TokenRegExps.entityIdentifier
 	}),
 
-	FieldIdentifier: createToken({
-		name: 'FieldIdentifier',
-		pattern: /[a-zA-Z]\w*/
+	Identifier: createToken({
+		name: 'Identifier',
+		pattern: TokenRegExps.identifier
 	}),
 
 	Variable: createToken({
@@ -129,7 +134,7 @@ const tokenList = [
 	tokens.False,
 	tokens.Null,
 	tokens.EntityIdentifier,
-	tokens.FieldIdentifier,
+	tokens.Identifier,
 	tokens.Variable,
 	tokens.Dot,
 	tokens.Comma,

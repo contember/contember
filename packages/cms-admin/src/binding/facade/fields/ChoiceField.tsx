@@ -72,6 +72,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 		return (
 			<Field.DataRetriever name={this.props.name}>
 				{rawMetadata => {
+					// Unfortunately, the "any" type is necessary because the TS inference otherwise fails here for some reason.
 					const commonProps: any = {
 						rawMetadata,
 						name: this.props.name,
@@ -103,30 +104,26 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 			environment
 		)
 
-		return (
-			<>
-				{QueryLanguage.wrapRelativeSingleField(
-					props.name,
-					fieldName => (
-						<>
-							<EntityListDataProvider name={metadata.entityName} filter={metadata.filter} associatedField={props.name}>
-								{metadata.children}
-							</EntityListDataProvider>
-							{props.arity === ChoiceArity.Single && (
-								<ToOne field={fieldName}>
-									<Field name={PRIMARY_KEY_NAME} />
-								</ToOne>
-							)}
-							{props.arity === ChoiceArity.Multiple && (
-								<ToMany field={fieldName}>
-									<Field name={PRIMARY_KEY_NAME} />
-								</ToMany>
-							)}
-						</>
-					),
-					environment
-				)}
-			</>
+		return QueryLanguage.wrapRelativeSingleField(
+			props.name,
+			fieldName => (
+				<>
+					<EntityListDataProvider name={metadata.entityName} filter={metadata.filter} associatedField={props.name}>
+						{metadata.children}
+					</EntityListDataProvider>
+					{props.arity === ChoiceArity.Single && (
+						<ToOne field={fieldName}>
+							<Field name={PRIMARY_KEY_NAME} />
+						</ToOne>
+					)}
+					{props.arity === ChoiceArity.Multiple && (
+						<ToMany field={fieldName}>
+							<Field name={PRIMARY_KEY_NAME} />
+						</ToMany>
+					)}
+				</>
+			),
+			environment
 		)
 	}
 }

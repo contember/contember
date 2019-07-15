@@ -63,7 +63,7 @@ export class VariableInputTransformer {
 	}
 
 	public static transformVariableScalar(variableScalar: VariableScalar, environment: Environment): Scalar {
-		const value = environment.getValue(variableScalar.variable)
+		const value = environment.getValueOrElse(variableScalar.variable, undefined)
 
 		if (typeof value !== 'string' && typeof value !== 'boolean' && typeof value !== 'number' && value !== null) {
 			throw new DataBindingError(
@@ -77,7 +77,7 @@ export class VariableInputTransformer {
 		variableLiteral: VariableLiteral,
 		environment: Environment
 	): GraphQlBuilder.Literal {
-		const value = environment.getValue(variableLiteral.variable)
+		const value = environment.getValueOrElse(variableLiteral.variable, undefined)
 
 		if (typeof value !== 'string') {
 			throw new DataBindingError(

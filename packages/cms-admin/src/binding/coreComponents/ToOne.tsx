@@ -1,6 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
+import { FormErrors } from '../../components/ui/FormErrors'
 import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
@@ -108,7 +109,12 @@ namespace ToOne {
 
 	export class AccessorRenderer extends React.PureComponent<AccessorRendererProps> {
 		public render() {
-			return <DataContext.Provider value={this.props.accessor}>{this.props.children}</DataContext.Provider>
+			return (
+				<DataContext.Provider value={this.props.accessor}>
+					<FormErrors errors={this.props.accessor.errors} />
+					{this.props.children}
+				</DataContext.Provider>
+			)
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import { CrudQueryBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
@@ -15,7 +16,7 @@ export interface EntityListDataProviderProps<DRP> {
 	entityName: EntityName
 	associatedField?: FieldName
 	filter?: string | Filter
-	orderBy?: Input.OrderBy[]
+	orderBy?: Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
 	offset?: number
 	limit?: number
 	renderer?: React.ComponentClass<DRP & DataRendererProps>

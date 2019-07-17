@@ -3,6 +3,7 @@ import { GetQueryArguments } from 'cms-client/dist/src/crudQueryBuilder'
 import { assertNever, ucfirst } from 'cms-common'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
+	ConnectionMarker,
 	EntityFields,
 	EntityListTreeConstraints,
 	FieldMarker,
@@ -136,6 +137,8 @@ export class QueryGenerator {
 						)
 					}
 				}
+			} else if (fieldValue instanceof ConnectionMarker) {
+				// Do nothing ‒ connections are only relevant to mutations.
 			} else {
 				yield fieldValue
 			}

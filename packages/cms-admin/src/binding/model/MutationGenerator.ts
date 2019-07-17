@@ -3,6 +3,7 @@ import { assertNever, Input, isEmptyObject } from 'cms-common'
 import { EntityName, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
+	ConnectionMarker,
 	DataBindingError,
 	EntityAccessor,
 	EntityCollectionAccessor,
@@ -304,6 +305,8 @@ export class MutationGenerator {
 						return builder
 					})
 				}
+			} else if (marker instanceof ConnectionMarker) {
+				builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
 			} else if (marker instanceof MarkerTreeRoot) {
 				// Do nothing: we don't support persisting nested queries (yet?).
 			} else {
@@ -478,6 +481,9 @@ export class MutationGenerator {
 						return builder
 					})
 				}
+			} else if (marker instanceof ConnectionMarker) {
+				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
+				// supposed to have already been connected.
 			} else if (marker instanceof MarkerTreeRoot) {
 				// Do nothing: we don't support persisting nested queries (yet?).
 			} else {

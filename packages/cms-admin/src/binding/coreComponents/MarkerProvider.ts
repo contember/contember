@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Environment, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
+import { ConnectionMarker, Environment, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
 
 export interface RenderFunction<P = any> {
 	(props: Props<P>): React.ReactElement | null
@@ -35,6 +35,10 @@ export interface ReferenceMarkerProvider<P = any> extends DataBindingComponent {
 	) => ReferenceMarker
 }
 
+export interface ConnectionMarkerProvider<P = any> extends DataBindingComponent {
+	generateConnectionMarker: (props: P, environment: Environment) => ConnectionMarker
+}
+
 export interface SyntheticChildrenProvider<P = any> extends DataBindingComponent {
 	generateSyntheticChildren: (props: Props<P>, environment: Environment) => React.ReactNode
 }
@@ -44,6 +48,7 @@ export type MarkerProvider = Partial<
 	| FieldMarkerProvider
 	| MarkerTreeRootProvider
 	| ReferenceMarkerProvider
+	| ConnectionMarkerProvider
 	| SyntheticChildrenProvider
 > &
 	DataBindingComponent

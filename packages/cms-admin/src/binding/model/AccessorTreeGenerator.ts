@@ -13,6 +13,7 @@ import {
 import {
 	Accessor,
 	AccessorTreeRoot,
+	ConnectionMarker,
 	DataBindingError,
 	EntityAccessor,
 	EntityCollectionAccessor,
@@ -334,6 +335,8 @@ class AccessorTreeGenerator {
 						onChange
 					)
 				}
+			} else if (field instanceof ConnectionMarker) {
+				// Do nothing ‒ connections need no runtime representation
 			} else {
 				assertNever(field)
 			}

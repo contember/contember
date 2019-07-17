@@ -1,5 +1,6 @@
 export * from './Accessor'
 export * from './AccessorTreeRoot'
+export * from './ConnectionMarker'
 export * from './DataBindingError'
 export * from './EntityAccessor'
 export * from './EntityCollectionAccessor'

@@ -3,6 +3,7 @@ import * as React from 'react'
 import { FieldName } from '../bindingTypes'
 import { MarkerProvider } from '../coreComponents'
 import {
+	ConnectionMarker,
 	DataBindingError,
 	EntityFields,
 	Environment,
@@ -13,7 +14,7 @@ import {
 } from '../dao'
 import { Hashing } from '../utils'
 
-type NodeResult = FieldMarker | MarkerTreeRoot | ReferenceMarker
+type NodeResult = FieldMarker | MarkerTreeRoot | ReferenceMarker | ConnectionMarker
 type RawNodeResult = NodeResult | NodeResult[] | undefined
 
 export class MarkerTreeGenerator {
@@ -142,6 +143,10 @@ export class MarkerTreeGenerator {
 				throw new DataBindingError(`Each ${dataMarker.displayName} component must have children.`)
 			}
 
+			if ('generateConnectionMarker' in dataMarker && dataMarker.generateConnectionMarker) {
+				return dataMarker.generateConnectionMarker(node.props, environment)
+			}
+
 			if (children) {
 				return this.processNode(children, environment)
 			}
@@ -181,6 +186,8 @@ export class MarkerTreeGenerator {
 				return this.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof MarkerTreeRoot) {
 				throw new DataBindingError('Merging fields and tree roots is an undefined operation.')
+			} else if (fresh instanceof ConnectionMarker) {
+				return this.rejectConnectionMarkerCombo(fresh)
 			} else {
 				return assertNever(fresh)
 			}
@@ -188,11 +195,12 @@ export class MarkerTreeGenerator {
 			if (fresh instanceof FieldMarker) {
 				return this.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof ReferenceMarker) {
+				const newReferences = { ...original.references }
 				for (const placeholderName in fresh.references) {
-					const namePresentInOriginal = placeholderName in original.references
+					const namePresentInOriginal = placeholderName in newReferences
 
 					if (!namePresentInOriginal) {
-						original.references[placeholderName] = {
+						newReferences[placeholderName] = {
 							placeholderName,
 							fields: {},
 							filter: fresh.references[placeholderName].filter,
@@ -201,19 +209,20 @@ export class MarkerTreeGenerator {
 						}
 					}
 
-					original.references[placeholderName].fields = namePresentInOriginal
-						? this.mergeEntityFields(
-								original.references[placeholderName].fields,
-								fresh.references[placeholderName].fields
-						  )
+					newReferences[placeholderName].fields = namePresentInOriginal
+						? this.mergeEntityFields(newReferences[placeholderName].fields, fresh.references[placeholderName].fields)
 						: fresh.references[placeholderName].fields
 				}
-				return original
+				return new ReferenceMarker(original.fieldName, newReferences)
+			} else if (fresh instanceof ConnectionMarker) {
+				return this.rejectConnectionMarkerCombo(fresh)
 			} else if (fresh instanceof MarkerTreeRoot) {
 				throw new DataBindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
 			} else {
 				return assertNever(fresh)
 			}
+		} else if (original instanceof ConnectionMarker) {
+			return this.rejectConnectionMarkerCombo(original)
 		} else if (original instanceof MarkerTreeRoot) {
 			if (fresh instanceof MarkerTreeRoot) {
 				if (
@@ -241,9 +250,10 @@ export class MarkerTreeGenerator {
 		return original
 	}
 
-	private reportInvalidTreeError(marker: FieldMarker | ReferenceMarker | undefined): never {
+	private reportInvalidTreeError(marker: FieldMarker | ReferenceMarker | ConnectionMarker | undefined): never {
 		if (marker) {
-			const kind = marker instanceof FieldMarker ? 'field' : 'relation'
+			const kind =
+				marker instanceof FieldMarker ? 'field' : marker instanceof ReferenceMarker ? 'relation' : 'connection'
 
 			throw new DataBindingError(
 				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`
@@ -254,5 +264,11 @@ export class MarkerTreeGenerator {
 
 	private rejectRelationScalarCombo(fieldName: FieldName): never {
 		throw new DataBindingError(`Cannot combine a relation with a scalar field '${fieldName}'.`)
+	}
+
+	private rejectConnectionMarkerCombo(connectionMarker: ConnectionMarker): never {
+		throw new DataBindingError(
+			`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`
+		)
 	}
 }

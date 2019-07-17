@@ -119,10 +119,10 @@ namespace Input {
 		desc = 'desc'
 	}
 
-	export type FieldOrderBy = OrderDirection | OrderBy
+	export type FieldOrderBy<T = OrderDirection> = T | OrderBy<T>
 
-	export interface OrderBy {
-		[fieldName: string]: FieldOrderBy
+	export interface OrderBy<T = OrderDirection> {
+		[fieldName: string]: FieldOrderBy<T>
 	}
 
 	export interface Condition<T = Value.FieldValue> {

@@ -18,7 +18,7 @@ export default class MultiEditPage<DRP extends MultiEditRendererProps = MultiEdi
 		return (
 			<PageWithLayout layout={this.props.layout}>
 				<EntityListDataProvider<DRP>
-					name={this.props.entity}
+					entityName={this.props.entity}
 					renderer={
 						this.props.renderer ||
 						// The as any cast is necessary because MultiEditRenderer is also a namespace… 🙄

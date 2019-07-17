@@ -34,7 +34,7 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 		return this.instantiate<Exclude<AllowedArgs, 'filter'>>(this.objectBuilder.argument('filter', where))
 	}
 
-	public orderBy(orderBy: Input.OrderBy) {
+	public orderBy(orderBy: Input.OrderBy[]) {
 		return this.instantiate<Exclude<AllowedArgs, 'orderBy'>>(this.objectBuilder.argument('orderBy', orderBy))
 	}
 

@@ -98,4 +98,7 @@ export namespace QueryLanguage {
 
 	export const parseUniqueWhere = (input: string, environment: Environment) =>
 		Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.UniqueWhere, environment)
+
+	export const parseFilter = (input: string, environment: Environment) =>
+		Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.Filter, environment)
 }

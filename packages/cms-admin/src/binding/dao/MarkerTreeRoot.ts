@@ -11,6 +11,9 @@ export interface SingleEntityTreeConstraints {
 
 export interface EntityListTreeConstraints {
 	filter?: Filter
+	orderBy?: Input.OrderBy[]
+	offset?: number
+	limit?: number
 	whereType: 'nonUnique'
 }
 

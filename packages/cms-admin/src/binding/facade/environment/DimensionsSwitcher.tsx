@@ -28,7 +28,7 @@ class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 	render() {
 		return (
 			<EntityListDataProvider<DimensionsSwitcher.DimensionsRendererProps>
-				name={this.props.entityName}
+				entityName={this.props.entityName}
 				immutable={true}
 				renderer={DimensionsSwitcher.DimensionsRenderer}
 				rendererProps={{

@@ -1,3 +1,3 @@
-export class Literal {
-	constructor(public readonly value: string) {}
+export class Literal<Value extends string = string> {
+	constructor(public readonly value: Value) {}
 }

@@ -1,6 +1,6 @@
 import { Input } from 'cms-common'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
-import { HasManyArguments, HasOneArguments, ReductionArguments, ReadArguments } from './types'
+import { HasManyArguments, HasOneArguments, ReductionArguments, OrderDirection, ReadArguments } from './types'
 
 class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
@@ -34,7 +34,7 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 		return this.instantiate<Exclude<AllowedArgs, 'filter'>>(this.objectBuilder.argument('filter', where))
 	}
 
-	public orderBy(orderBy: Input.OrderBy[]) {
+	public orderBy(orderBy: Input.OrderBy<OrderDirection>[]) {
 		return this.instantiate<Exclude<AllowedArgs, 'orderBy'>>(this.objectBuilder.argument('orderBy', orderBy))
 	}
 

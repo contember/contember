@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from 'cms-client'
+import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'
@@ -11,7 +11,7 @@ export interface SingleEntityTreeConstraints {
 
 export interface EntityListTreeConstraints {
 	filter?: Filter
-	orderBy?: Input.OrderBy[]
+	orderBy?: Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
 	offset?: number
 	limit?: number
 	whereType: 'nonUnique'

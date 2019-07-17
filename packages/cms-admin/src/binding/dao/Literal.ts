@@ -1,3 +1,3 @@
 import { GraphQlBuilder } from 'cms-client'
 
-export class Literal extends GraphQlBuilder.Literal {}
+export class Literal<Value extends string = string> extends GraphQlBuilder.Literal<Value> {}

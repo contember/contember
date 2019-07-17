@@ -540,6 +540,9 @@ class Parser extends ChevrotainParser {
 			case Parser.EntryPoint.QualifiedFieldList:
 				expression = Parser.parser.qualifiedFieldList()
 				break
+			case Parser.EntryPoint.UniqueWhere:
+				expression = Parser.parser.uniqueWhere()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented entry point '${entry}'`)
 		}
@@ -587,13 +590,16 @@ namespace Parser {
 		export type Condition = Input.Condition<ColumnValue>
 
 		export type ConditionOperator = keyof Pick<Condition, 'eq' | 'notEq' | 'lt' | 'lte' | 'gt' | 'gte'>
+
+		export type UniqueWhere = Input.UniqueWhere<GraphQlBuilder.Literal>
 	}
 
 	export enum EntryPoint {
 		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].son.siblings.name
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
-		RelativeEntityList = 'relativeEntityList' // E.g. genres(slug = 'sciFi').authors[age < 123]
+		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
+		UniqueWhere = 'uniqueWhere' // E.g. (author.mother.id = 123)
 	}
 
 	export interface ParserResult {
@@ -601,6 +607,7 @@ namespace Parser {
 		relativeSingleField: AST.RelativeSingleField
 		relativeSingleEntity: AST.RelativeSingleEntity
 		relativeEntityList: AST.RelativeEntityList
+		uniqueWhere: AST.UniqueWhere
 	}
 }
 

@@ -95,4 +95,7 @@ export namespace QueryLanguage {
 			children: wrap(generateField(fieldName), ToOne.AtomicPrimitive, toOneProps, environment)
 		}
 	}
+
+	export const parseUniqueWhere = (input: string, environment: Environment) =>
+		Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.UniqueWhere, environment)
 }

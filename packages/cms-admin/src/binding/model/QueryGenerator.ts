@@ -72,14 +72,31 @@ export class QueryGenerator {
 		baseQueryBuilder: BaseQueryBuilder,
 		subTree: MarkerTreeRoot<EntityListTreeConstraints>
 	): BaseQueryBuilder {
-		const builder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
-			subTree.constraints && subTree.constraints.filter
+		let finalBuilder: ReadBuilder
+
+		if (subTree.constraints) {
+			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<
+				Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
+			> = subTree.constraints.filter
 				? CrudQueryBuilder.ReadBuilder.instantiate().filter(subTree.constraints.filter)
 				: CrudQueryBuilder.ReadBuilder.instantiate()
 
+			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<
+				Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy'>
+			> = subTree.constraints.orderBy ? withFilter.orderBy(subTree.constraints.orderBy) : withFilter
+
+			const withOffset: CrudQueryBuilder.ReadBuilder.Builder<
+				Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy' | 'offset'>
+			> = subTree.constraints.offset === undefined ? withOrderBy : withOrderBy.offset(subTree.constraints.offset)
+
+			finalBuilder = subTree.constraints.limit === undefined ? withOffset : withOffset.limit(subTree.constraints.limit)
+		} else {
+			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
+		}
+
 		const [newBaseQueryBuilder, newReadBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerQueryPart(subTree.fields, builder)
+			this.registerQueryPart(subTree.fields, finalBuilder)
 		)
 
 		return newBaseQueryBuilder.list(

@@ -543,6 +543,9 @@ class Parser extends ChevrotainParser {
 			case Parser.EntryPoint.UniqueWhere:
 				expression = Parser.parser.uniqueWhere()
 				break
+			case Parser.EntryPoint.Filter:
+				expression = Parser.parser.nonUniqueWhere()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented entry point '${entry}'`)
 		}
@@ -599,7 +602,8 @@ namespace Parser {
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
 		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
-		UniqueWhere = 'uniqueWhere' // E.g. (author.mother.id = 123)
+		UniqueWhere = 'uniqueWhere', // E.g. (author.mother.id = 123)
+		Filter = 'filter' // E.g. [author.son.age < 123]
 	}
 
 	export interface ParserResult {
@@ -608,6 +612,7 @@ namespace Parser {
 		relativeSingleEntity: AST.RelativeSingleEntity
 		relativeEntityList: AST.RelativeEntityList
 		uniqueWhere: AST.UniqueWhere
+		filter: AST.Filter
 	}
 }
 

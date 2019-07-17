@@ -1,18 +1,23 @@
+import { Input } from 'cms-common'
 import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { EnvironmentContext } from '../coreComponents'
 import { Environment, MarkerTreeRoot } from '../dao'
 import { DefaultRenderer } from '../facade/renderers'
 import { MarkerTreeGenerator } from '../model'
+import { QueryLanguage } from '../queryLanguage'
 import { DataRendererProps, getDataProvider } from './DataProvider'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { ImmutableDataProvider } from './ImmutableDataProvider'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
-interface EntityListDataProviderProps<DRP> {
-	name: EntityName
+export interface EntityListDataProviderProps<DRP> {
+	entityName: EntityName
 	associatedField?: FieldName
-	filter?: Filter
+	filter?: string | Filter
+	orderBy?: Input.OrderBy[]
+	offset?: number
+	limit?: number
 	renderer?: React.ComponentClass<DRP & DataRendererProps>
 	rendererProps?: DRP
 	immutable?: boolean
@@ -78,13 +83,17 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 
 	public static generateMarkerTreeRoot(
 		props: EntityListDataProviderProps<unknown>,
-		fields: MarkerTreeRoot['fields']
+		fields: MarkerTreeRoot['fields'],
+		environment: Environment
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(
-			props.name,
+			props.entityName,
 			fields,
 			{
-				filter: props.filter,
+				filter: typeof props.filter === 'string' ? QueryLanguage.parseFilter(props.filter, environment) : props.filter,
+				orderBy: props.orderBy,
+				offset: props.offset,
+				limit: props.limit,
 				whereType: 'nonUnique'
 			},
 			props.associatedField

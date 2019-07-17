@@ -20,7 +20,13 @@ export class Hashing {
 			return 0
 		}
 		if (constraints.whereType === 'nonUnique') {
-			return Hashing.hashArray([constraints.whereType, constraints.filter])
+			return Hashing.hashArray([
+				constraints.whereType,
+				constraints.filter,
+				constraints.orderBy,
+				constraints.offset,
+				constraints.limit
+			])
 		} else if (constraints.whereType === 'unique') {
 			return Hashing.hashArray([constraints.whereType, constraints.where])
 		} else {
@@ -29,7 +35,7 @@ export class Hashing {
 	}
 
 	private static hashArray(array: any[]): number {
-		const json = array.map(item => JSON.stringify(item)).join('')
+		const json = array.map(item => JSON.stringify(item)).join('_')
 		return Hashing.hash(json)
 	}
 

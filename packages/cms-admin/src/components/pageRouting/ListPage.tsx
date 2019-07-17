@@ -16,7 +16,7 @@ export default class ListPage<DRP extends CommonRendererProps> extends React.Com
 		return (
 			<PageWithLayout layout={this.props.layout}>
 				<EntityListDataProvider
-					name={this.props.entity}
+					entityName={this.props.entity}
 					renderer={this.props.renderer || (ListRenderer as React.ComponentClass<DRP & DataRendererProps>)}
 					rendererProps={this.props.rendererProps}
 				>

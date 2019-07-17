@@ -108,7 +108,11 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 			props.name,
 			fieldName => (
 				<>
-					<EntityListDataProvider name={metadata.entityName} filter={metadata.filter} associatedField={props.name}>
+					<EntityListDataProvider
+						entityName={metadata.entityName}
+						filter={metadata.filter}
+						associatedField={props.name}
+					>
 						{metadata.children}
 					</EntityListDataProvider>
 					{props.arity === ChoiceArity.Single && (

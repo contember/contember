@@ -1,5 +1,5 @@
 import { FieldName } from '../bindingTypes'
-import { FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
+import { ConnectionMarker, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
 import { Hashing } from '../utils'
 
 export class PlaceholderGenerator {
@@ -8,6 +8,16 @@ export class PlaceholderGenerator {
 	}
 
 	public static getFieldPlaceholder(fieldName: FieldName): string {
+		return fieldName
+	}
+
+	//
+
+	public static generateConnectionMarkerPlaceholder(marker: ConnectionMarker): string {
+		return PlaceholderGenerator.getFieldPlaceholder(marker.fieldName)
+	}
+
+	public static getConnectionPlaceholder(fieldName: FieldName): string {
 		return fieldName
 	}
 

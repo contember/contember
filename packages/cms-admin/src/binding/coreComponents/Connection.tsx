@@ -9,7 +9,7 @@ import { ConnectionMarkerProvider, SyntheticChildrenProvider } from './MarkerPro
 
 export interface ConnectionProps {
 	field: RelativeSingleField
-	to: /*string | */ Input.UniqueWhere<GraphQlBuilder.Literal>
+	to: string | Input.UniqueWhere<GraphQlBuilder.Literal>
 }
 
 class Connection extends React.PureComponent<ConnectionProps> {
@@ -22,7 +22,12 @@ class Connection extends React.PureComponent<ConnectionProps> {
 	public static generateSyntheticChildren(props: ConnectionProps, environment: Environment) {
 		return QueryLanguage.wrapRelativeSingleField(
 			props.field,
-			field => <Connection.ConnectionGenerator field={field} to={props.to} />,
+			field => (
+				<Connection.ConnectionGenerator
+					field={field}
+					to={typeof props.to === 'string' ? QueryLanguage.parseUniqueWhere(props.to, environment) : props.to}
+				/>
+			),
 			environment
 		)
 	}

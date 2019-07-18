@@ -36,20 +36,19 @@ describe('Marker tree generator', () => {
 	})
 
 	it('should enforce mandatory children', () => {
-		const single = <SingleEntityDataProvider where={{ foo: '' }} name="Foo" />
-		const list = <EntityListDataProvider filter={{ foo: {} }} name="Foo" />
+		const list = <EntityListDataProvider filter={{ foo: {} }} entityName="Foo" />
 		const toOne = (
-			<SingleEntityDataProvider where={{ foo: '' }} name="Foo">
+			<SingleEntityDataProvider where={{ foo: '' }} entityName="Foo">
 				<ToOne field="foo" />
 			</SingleEntityDataProvider>
 		)
 		const toMany = (
-			<SingleEntityDataProvider where={{ foo: '' }} name="Foo">
+			<SingleEntityDataProvider where={{ foo: '' }} entityName="Foo">
 				<ToMany field="foo" />
 			</SingleEntityDataProvider>
 		)
 
-		for (const faultyChildren of [single, list, toOne, toMany]) {
+		for (const faultyChildren of [list, toOne, toMany]) {
 			expect(() => new MarkerTreeGenerator(faultyChildren).generate()).throws(/children/i)
 		}
 	})

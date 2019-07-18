@@ -4,17 +4,19 @@ import * as React from 'react'
 import { EntityName, FieldName } from '../bindingTypes'
 import { Environment, MarkerTreeRoot } from '../dao'
 import { MarkerTreeGenerator } from '../model'
+import { QueryLanguage } from '../queryLanguage'
 import { DataRendererProps, getDataProvider } from './DataProvider'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
-interface SingleEntityDataProviderProps<DRP> {
+export interface SingleEntityDataProviderProps<DRP> {
 	entityName: EntityName
 	associatedField?: FieldName
-	where: Input.UniqueWhere<GraphQlBuilder.Literal>
+	where: string | Input.UniqueWhere<GraphQlBuilder.Literal>
 	renderer?: React.ComponentClass<DRP & DataRendererProps>
 	rendererProps?: DRP
+	children: React.ReactNode
 }
 
 export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEntityDataProviderProps<DRP>> {
@@ -46,13 +48,14 @@ export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEnt
 
 	public static generateMarkerTreeRoot(
 		props: SingleEntityDataProviderProps<unknown>,
-		fields: MarkerTreeRoot['fields']
+		fields: MarkerTreeRoot['fields'],
+		environment: Environment
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(
 			props.entityName,
 			fields,
 			{
-				where: props.where,
+				where: typeof props.where === 'string' ? QueryLanguage.parseUniqueWhere(props.where, environment) : props.where,
 				whereType: 'unique'
 			},
 			props.associatedField

@@ -315,7 +315,7 @@ namespace ChoiceField {
 					const field = entity.data.getField(
 						props.field,
 						ReferenceMarker.ExpectedCount.UpToOne,
-						VariableInputTransformer.transformFilter(props.filter, this.props.rawMetadata.environment),
+						props.filter,
 						props.reducedBy
 					)
 

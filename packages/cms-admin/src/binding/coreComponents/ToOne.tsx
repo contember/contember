@@ -68,7 +68,7 @@ namespace ToOne {
 				props.field,
 				ReferenceMarker.ExpectedCount.UpToOne,
 				fields,
-				VariableInputTransformer.transformFilter(props.filter, environment),
+				props.filter,
 				props.reducedBy
 			)
 		}
@@ -90,7 +90,7 @@ namespace ToOne {
 				const fieldEntityAccessor = data.data.getField(
 					props.field,
 					ReferenceMarker.ExpectedCount.UpToOne,
-					VariableInputTransformer.transformFilter(props.filter, props.environment),
+					props.filter,
 					props.reducedBy
 				)
 

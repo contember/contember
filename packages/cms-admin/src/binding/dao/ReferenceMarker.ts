@@ -65,7 +65,7 @@ namespace ReferenceMarker {
 
 	export interface ReferenceConstraints {
 		expectedCount: ReferenceMarker.ExpectedCount
-		filter?: Input.Where<GraphQlBuilder.Literal>
+		filter?: Input.Where<Input.Condition<Input.ColumnValue<GraphQlBuilder.Literal>>>
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 	}
 

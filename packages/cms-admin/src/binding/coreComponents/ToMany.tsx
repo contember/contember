@@ -65,12 +65,7 @@ namespace ToMany {
 			fields: EntityFields,
 			environment: Environment
 		): ReferenceMarker {
-			return new ReferenceMarker(
-				props.field,
-				ReferenceMarker.ExpectedCount.PossiblyMany,
-				fields,
-				VariableInputTransformer.transformFilter(props.filter, environment)
-			)
+			return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.filter)
 		}
 	}
 
@@ -91,7 +86,7 @@ namespace ToMany {
 							const field = data.data.getField(
 								this.props.field,
 								ReferenceMarker.ExpectedCount.PossiblyMany,
-								VariableInputTransformer.transformFilter(this.props.filter, this.props.environment)
+								this.props.filter
 							)
 
 							if (field instanceof EntityCollectionAccessor) {

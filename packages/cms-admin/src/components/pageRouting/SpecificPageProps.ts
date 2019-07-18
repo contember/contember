@@ -1,15 +1,17 @@
-import * as React from 'react'
 import { Input } from 'cms-common'
-import { GraphQlBuilder } from 'cms-client'
-import { EntityName, Environment, VariableInput } from '../../binding'
+import * as React from 'react'
+import { EntityName, Environment, SingleEntityDataProviderProps, VariableInput } from '../../binding'
 import { DataRendererProps } from '../../binding/coreComponents'
 import { Parameters } from './Pages'
 
 export default interface SpecificPageProps<DRP> {
 	entity: EntityName
-	where?: (routingParameters: Parameters, environment: Environment) => Input.UniqueWhere<VariableInput>
+	where?:
+		| SingleEntityDataProviderProps<DRP>['where']
+		| ((routingParameters: Parameters, environment: Environment) => SingleEntityDataProviderProps<DRP>['where'])
 	pageName?: string
 	layout?: React.ComponentType<{ children?: React.ReactNode }>
 	renderer?: React.ComponentClass<DRP & DataRendererProps>
 	rendererProps?: DRP
+	children: React.ReactNode
 }

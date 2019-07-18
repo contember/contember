@@ -10,7 +10,7 @@ import { EnvironmentContext } from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
 
 interface SingleEntityDataProviderProps<DRP> {
-	name: EntityName
+	entityName: EntityName
 	associatedField?: FieldName
 	where: Input.UniqueWhere<GraphQlBuilder.Literal>
 	renderer?: React.ComponentClass<DRP & DataRendererProps>
@@ -49,7 +49,7 @@ export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEnt
 		fields: MarkerTreeRoot['fields']
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(
-			props.name,
+			props.entityName,
 			fields,
 			{
 				where: props.where,

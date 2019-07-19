@@ -6,6 +6,8 @@ import QueryBuilder from '../../../core/database/QueryBuilder'
 import { Value as DbValue } from '../../../core/database/types'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
+import ConditionBuilder from '../../../core/database/ConditionBuilder'
+import { tuple } from '../../../utils/tuple'
 
 type ColumnValue = {
 	value: PromiseLike<Value.AtomicValue | undefined>
@@ -91,7 +93,9 @@ export default class UpdateBuilder {
 
 				qb = remainingColumns.reduce((qb, columnName) => qb.select(['root_', columnName]), qb)
 
-				qb = this.whereBuilder.build(qb, this.entity, new Path([]), this.uniqueWhere)
+				qb = this.whereBuilder.build(qb, this.entity, new Path([]), {
+					and: [this.uniqueWhere, this.oldWhere],
+				})
 
 				return qb
 			})
@@ -107,9 +111,9 @@ export default class UpdateBuilder {
 			)
 			.from(qb => {
 				qb = qb.from('newData_')
-				qb = this.whereBuilder.build(qb, this.entity, new Path([], this.entity.tableName), {
-					and: [this.uniqueWhere, this.oldWhere],
-				})
+				const col1 = tuple(this.entity.tableName, this.entity.primaryColumn)
+				const col2 = tuple('newData_', this.entity.primaryColumn)
+				qb = qb.where(expr => expr.compareColumns(col1, ConditionBuilder.Operator.eq, col2))
 				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
 				return qb
 			})

@@ -231,8 +231,8 @@ describe('Delete mutation', () => {
                                          from "public"."post" as "root_"
                                          where "root_"."author_id" in (?)) update "public"."post"
             set "author_id" = "newData_"."author_id" from "newData_"
-            where "post"."author_id" in (?)`,
-						parameters: [null, testUuid(1), testUuid(1)],
+            where "post"."id" = "newData_"."id"`,
+						parameters: [null, testUuid(1)],
 						response: { rowCount: 1 },
 					},
 					{

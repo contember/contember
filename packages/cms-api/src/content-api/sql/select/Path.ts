@@ -4,7 +4,7 @@ export default class Path {
 	public back() {
 		const newPath = [...this.path]
 		newPath.pop()
-		return new Path(newPath)
+		return new Path(newPath, this.rootAlias)
 	}
 
 	public for(path: string) {

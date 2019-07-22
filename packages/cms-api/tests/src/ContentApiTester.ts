@@ -41,13 +41,9 @@ export default class ContentApiTester {
 			errorHandler: () => null,
 			timer: async (label, cb) => (cb ? await cb() : (undefined as any)),
 		}
-		maskErrors(gqlSchema, err => {
-			console.error(err)
-			process.exit(1)
-		})
 		const result = await graphql(gqlSchema, gql, null, context, variables)
 		if (result.errors) {
-			result.errors.map(it => console.error(it))
+			throw result.errors[0]
 		}
 		return result.data
 	}

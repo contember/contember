@@ -36,7 +36,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 		targetRelation: Model.OneHasOneOwnerRelation
 	) {
 		const operations = this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
-		if (targetRelation.nullable) {
+		if (relation.nullable || targetRelation.nullable) {
 			return operations
 		}
 		return operations.filter(it => it === Input.CreateRelationOperation.create)
@@ -49,7 +49,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 		targetRelation: Model.OneHasOneInversedRelation | null
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
-		if (!targetRelation || targetRelation.nullable) {
+		if (!targetRelation || targetRelation.nullable || relation.nullable) {
 			return operations
 		}
 		return operations.filter(it => it === Input.CreateRelationOperation.create)

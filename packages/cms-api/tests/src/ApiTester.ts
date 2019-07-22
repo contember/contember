@@ -24,6 +24,7 @@ import SequenceTester from './SequenceTester'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
 import Connection from '../../src/core/database/Connection'
 import { wrapIdentifier } from '../../src/core/database/utils'
+import Client from '../../src/core/database/Client'
 
 export default class ApiTester {
 	public static project: Project = {
@@ -36,6 +37,7 @@ export default class ApiTester {
 	}
 
 	constructor(
+		public readonly client: Client,
 		public readonly content: ContentApiTester,
 		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
@@ -168,7 +170,14 @@ export default class ApiTester {
 		const systemApiTester = new SystemApiTester(projectDb, systemSchema, systemContainer, systemExecutionContainer)
 		const sequenceTester = new SequenceTester(projectDb.createQueryHandler(), contentApiTester, systemApiTester)
 
-		return new ApiTester(contentApiTester, systemApiTester, stageManager, sequenceTester, systemExecutionContainer)
+		return new ApiTester(
+			projectDb,
+			contentApiTester,
+			systemApiTester,
+			stageManager,
+			sequenceTester,
+			systemExecutionContainer
+		)
 	}
 
 	private static createProjectMigrationFilesManager(): MigrationFilesManager {

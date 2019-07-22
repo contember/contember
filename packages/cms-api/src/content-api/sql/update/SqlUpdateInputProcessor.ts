@@ -3,6 +3,7 @@ import Mapper from '../Mapper'
 import UpdateBuilder from './UpdateBuilder'
 import UpdateInputProcessor from '../../inputProcessing/UpdateInputProcessor'
 import * as Context from '../../inputProcessing/InputContext'
+import { NotNullConstraintViolation } from '../Constraints'
 
 export default class SqlUpdateInputProcessor implements UpdateInputProcessor<void> {
 	constructor(
@@ -138,6 +139,9 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			}
 		},
 		delete: async ({ targetEntity, entity, relation }) => {
+			if (!relation.nullable) {
+				throw new NotNullConstraintViolation(entity.name, relation.name)
+			}
 			this.updateBuilder.addFieldValue(relation.name, null)
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
@@ -147,7 +151,10 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			await this.updateBuilder.update
 			await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
 		},
-		disconnect: async ({ relation }) => {
+		disconnect: async ({ entity, relation }) => {
+			if (!relation.nullable) {
+				throw new NotNullConstraintViolation(entity.name, relation.name)
+			}
 			this.updateBuilder.addFieldValue(relation.name, null)
 		},
 	}
@@ -304,6 +311,9 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			}
 		},
 		delete: async ({ targetEntity, entity, relation }) => {
+			if (!relation.nullable) {
+				throw new NotNullConstraintViolation(entity.name, relation.name)
+			}
 			this.updateBuilder.addFieldValue(relation.name, null)
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
@@ -312,7 +322,10 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			)
 			await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
 		},
-		disconnect: async ({ relation }) => {
+		disconnect: async ({ entity, relation }) => {
+			if (!relation.nullable) {
+				throw new NotNullConstraintViolation(entity.name, relation.name)
+			}
 			this.updateBuilder.addFieldValue(relation.name, null)
 		},
 	}

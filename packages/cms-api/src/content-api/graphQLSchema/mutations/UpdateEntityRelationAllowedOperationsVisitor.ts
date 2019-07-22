@@ -41,7 +41,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		targetRelation: Model.OneHasOneOwnerRelation
 	) {
 		const operations = this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
-		if (relation.nullable && targetRelation.nullable) {
+		if (relation.nullable || targetRelation.nullable) {
 			return operations
 		}
 		return operations.filter(it => it === Input.UpdateRelationOperation.update)
@@ -54,7 +54,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		targetRelation: Model.OneHasOneInversedRelation | null
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
-		if (relation.nullable && (!targetRelation || targetRelation.nullable)) {
+		if (relation.nullable || (targetRelation && targetRelation.nullable)) {
 			return operations
 		}
 		return operations.filter(it => it === Input.UpdateRelationOperation.update)

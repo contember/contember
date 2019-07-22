@@ -4,7 +4,7 @@ import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
 import { Context } from '../content-api/types'
 import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
 import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
-import { GraphQLSchema } from 'graphql'
+import { GraphQLError, GraphQLSchema } from 'graphql'
 import { KoaContext } from '../core/koa/types'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
@@ -12,6 +12,8 @@ import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import Connection from '../core/database/Connection'
+import { extractOriginalError } from '../core/graphql/errorExtract'
+import UserError from '../core/graphql/UserError'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
@@ -35,6 +37,10 @@ class ContentApolloServerFactory {
 				}
 				if (error instanceof ApolloError) {
 					return error
+				}
+				const originalError = extractOriginalError(error)
+				if (originalError instanceof UserError) {
+					return { message: error.message, locations: undefined, path: undefined }
 				}
 				console.error(error.originalError || error)
 				return { message: 'Internal server error', locations: undefined, path: undefined }

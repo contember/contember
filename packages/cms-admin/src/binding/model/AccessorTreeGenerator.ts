@@ -31,6 +31,8 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
 type OnReplace = EntityAccessor['replaceWith']
 type OnUnlink = EntityAccessor['remove']
+type BatchEntityUpdates = EntityAccessor['batchUpdates']
+type BatchEntityCollectionUpdates = EntityCollectionAccessor['batchUpdates']
 
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined
@@ -73,20 +75,36 @@ class AccessorTreeGenerator {
 		updateData: AccessorTreeGenerator.UpdateData,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot
 	): AccessorTreeRoot {
+		let inBatchUpdateMode = false
+		let createAccessorTreeRoot: () => AccessorTreeRoot
 		const data = initialData === undefined ? undefined : initialData
 		const errorNode = errors === undefined ? undefined : errors[tree.id]
+		const performUpdate = () => {
+			updateData(createAccessorTreeRoot())
+		}
 
 		if (Array.isArray(data) || data === undefined || data instanceof EntityCollectionAccessor) {
-			const createAccessorTreeRoot = (): AccessorTreeRoot => {
-				// TODO, proper addNew callback
+			createAccessorTreeRoot = (): AccessorTreeRoot => {
 				return new AccessorTreeRoot(
 					tree,
-					new EntityCollectionAccessor(entityAccessors, errorNode ? errorNode.errors : [], newEntity => {
-						entityAccessors.push(createEntityAccessor(newEntity, entityAccessors.length))
-						updateData(createAccessorTreeRoot())
-					}),
+					new EntityCollectionAccessor(
+						entityAccessors,
+						errorNode ? errorNode.errors : [],
+						() => {}, // TODO proper batching
+						newEntity => {
+							entityAccessors.push(createEntityAccessor(newEntity, entityAccessors.length))
+							updateData(createAccessorTreeRoot())
+						}
+					),
 					tree.entityName
 				)
+			}
+			const onUpdateProxy = (i: number, newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
+				entityAccessors[i] = newValue
+
+				if (!inBatchUpdateMode) {
+					performUpdate()
+				}
 			}
 			const createEntityAccessor = (datum: AccessorTreeGenerator.InitialEntityData, i: number): EntityAccessor =>
 				this.updateFields(
@@ -98,34 +116,31 @@ class AccessorTreeGenerator {
 					(fieldName, newData) => {
 						const entityAccessor = entityAccessors[i]
 						if (entityAccessor instanceof EntityAccessor) {
-							entityAccessors[i] = this.withUpdatedField(entityAccessor, fieldName, newData)
-							updateData(createAccessorTreeRoot())
+							onUpdateProxy(i, this.withUpdatedField(entityAccessor, fieldName, newData))
 						}
 					},
 					newEntityAccessor => {
-						entityAccessors[i] = newEntityAccessor
-
-						updateData(createAccessorTreeRoot())
+						onUpdateProxy(i, newEntityAccessor)
 					},
+					() => {}, // TODO proper batching
 					(removalType: EntityAccessor.RemovalType) => {
 						const entityAccessor = entityAccessors[i]
 
 						if (entityAccessor) {
 							const primaryKey = entityAccessor.primaryKey
-							if (typeof primaryKey === 'string') {
-								entityAccessors[i] = new EntityForRemovalAccessor(
-									primaryKey,
-									entityAccessor.typename,
-									entityAccessor.data,
-									entityAccessor.errors,
-									entityAccessor.replaceWith,
-									removalType
-								)
-							} else {
-								entityAccessors[i] = undefined
-							}
-
-							updateData(createAccessorTreeRoot())
+							onUpdateProxy(
+								i,
+								typeof primaryKey === 'string'
+									? new EntityForRemovalAccessor(
+											primaryKey,
+											entityAccessor.typename,
+											entityAccessor.data,
+											entityAccessor.errors,
+											entityAccessor.replaceWith,
+											removalType
+									  )
+									: undefined
+							)
 						}
 					}
 				)
@@ -139,34 +154,45 @@ class AccessorTreeGenerator {
 
 			return createAccessorTreeRoot()
 		} else {
-			const createAccessorTreeRoot = (): AccessorTreeRoot => new AccessorTreeRoot(tree, entityAccessor, tree.entityName)
+			createAccessorTreeRoot = (): AccessorTreeRoot => new AccessorTreeRoot(tree, entityAccessor, tree.entityName)
+			const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor) => {
+				entityAccessor = newValue
+
+				if (!inBatchUpdateMode) {
+					performUpdate()
+				}
+			}
+			const batchUpdates = (): BatchEntityUpdates => performUpdates => {
+				inBatchUpdateMode = true
+				performUpdates(() => entityAccessor)
+				inBatchUpdateMode = false
+				performUpdate()
+			}
 			let entityAccessor: EntityAccessor | EntityForRemovalAccessor = this.updateFields(
 				data,
 				tree.fields,
 				errorNode,
 				(fieldName, newData) => {
 					if (entityAccessor instanceof EntityAccessor) {
-						entityAccessor = this.withUpdatedField(entityAccessor, fieldName, newData)
-
-						updateData(createAccessorTreeRoot())
+						onUpdateProxy(this.withUpdatedField(entityAccessor, fieldName, newData))
 					}
 				},
 				newEntityAccessor => {
-					entityAccessor = newEntityAccessor
-
-					updateData(createAccessorTreeRoot())
+					onUpdateProxy(newEntityAccessor)
 				},
+				batchUpdates,
 				(removalType: EntityAccessor.RemovalType) => {
 					if (typeof entityAccessor.primaryKey === 'string') {
-						entityAccessor = new EntityForRemovalAccessor(
-							entityAccessor.primaryKey,
-							entityAccessor.typename,
-							entityAccessor.data,
-							entityAccessor.errors,
-							entityAccessor.replaceWith,
-							removalType
+						onUpdateProxy(
+							new EntityForRemovalAccessor(
+								entityAccessor.primaryKey,
+								entityAccessor.typename,
+								entityAccessor.data,
+								entityAccessor.errors,
+								entityAccessor.replaceWith,
+								removalType
+							)
 						)
-						updateData(createAccessorTreeRoot())
 					}
 				}
 			)
@@ -180,6 +206,7 @@ class AccessorTreeGenerator {
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		onUpdate: OnUpdate,
 		onReplace: OnReplace,
+		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink
 	): EntityAccessor {
 		const entityData: EntityData.EntityData = {}
@@ -348,6 +375,7 @@ class AccessorTreeGenerator {
 			new EntityData(entityData),
 			errors ? errors.errors : [],
 			onReplace,
+			batchUpdates,
 			onUnlink
 		)
 	}
@@ -359,11 +387,25 @@ class AccessorTreeGenerator {
 		onUpdate: OnUpdate,
 		entityData: EntityData.EntityData
 	): EntityAccessor {
+		let inBatchUpdateMode = false
+		const performUpdate = () => {
+			onUpdate(reference.placeholderName, entityData[reference.placeholderName])
+		}
+		const onUpdateProxy = (newValue: EntityData.FieldData) => {
+			entityData[reference.placeholderName] = newValue
+
+			if (!inBatchUpdateMode) {
+				performUpdate()
+			}
+		}
 		const onRemove = (removalType: EntityAccessor.RemovalType) => {
-			onUpdate(
-				reference.placeholderName,
-				(entityData[reference.placeholderName] = this.removeEntity(entityData[reference.placeholderName], removalType))
-			)
+			onUpdateProxy(this.removeEntity(entityData[reference.placeholderName], removalType))
+		}
+		const batchUpdates = (): BatchEntityUpdates => performUpdates => {
+			inBatchUpdateMode = true
+			performUpdates(() => entityData[reference.placeholderName] as EntityAccessor) // TODO add checks
+			inBatchUpdateMode = false
+			performUpdate()
 		}
 		return this.updateFields(
 			fieldData,
@@ -372,21 +414,16 @@ class AccessorTreeGenerator {
 			(updatedField: FieldName, updatedData: EntityData.FieldData) => {
 				const entityAccessor = entityData[reference.placeholderName]
 				if (entityAccessor instanceof EntityAccessor) {
-					onUpdate(
-						reference.placeholderName,
-						(entityData[reference.placeholderName] = this.withUpdatedField(entityAccessor, updatedField, updatedData))
-					)
+					onUpdateProxy(this.withUpdatedField(entityAccessor, updatedField, updatedData))
 				}
 			},
 			replacement => {
 				const entityAccessor = entityData[reference.placeholderName]
 				if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
-					onUpdate(
-						reference.placeholderName,
-						(entityData[reference.placeholderName] = this.asDifferentEntity(entityAccessor, replacement, onRemove))
-					)
+					onUpdateProxy(this.asDifferentEntity(entityAccessor, replacement, onRemove))
 				}
 			},
+			batchUpdates,
 			onRemove
 		)
 	}
@@ -403,19 +440,42 @@ class AccessorTreeGenerator {
 			)
 		}
 
-		const update = () => {
-			onUpdate(
-				reference.placeholderName,
-				(collectionAccessor = new EntityCollectionAccessor(
-					collectionAccessor.entities,
-					collectionAccessor.errors,
-					collectionAccessor.addNew
-				))
+		let inBatchUpdateMode = false
+		const performUpdate = () => {
+			onUpdate(reference.placeholderName, collectionAccessor)
+		}
+		const batchUpdates = (): BatchEntityCollectionUpdates => performUpdates => {
+			inBatchUpdateMode = true
+			performUpdates(() => collectionAccessor)
+			inBatchUpdateMode = false
+			performUpdate()
+		}
+		const onUpdateProxy = (i: number, newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
+			collectionAccessor = new EntityCollectionAccessor(
+				collectionAccessor.entities,
+				collectionAccessor.errors,
+				collectionAccessor.batchUpdates,
+				collectionAccessor.addNew
 			)
+			collectionAccessor.entities[i] = newValue
+
+			if (!inBatchUpdateMode) {
+				performUpdate()
+			}
+		}
+		const getSingleEntityBatchUpdates = (i: number) => (): BatchEntityUpdates => {
+			if (inBatchUpdateMode) {
+				return undefined
+			}
+			return performUpdates => {
+				inBatchUpdateMode = true
+				performUpdates(() => collectionAccessor.entities[i] as EntityAccessor) // TODO add checks
+				inBatchUpdateMode = false
+				performUpdate()
+			}
 		}
 		const getOnRemove = (i: number) => (removalType: EntityAccessor.RemovalType) => {
-			collectionAccessor.entities[i] = this.removeEntity(collectionAccessor.entities[i], removalType)
-			update()
+			onUpdateProxy(i, this.removeEntity(collectionAccessor.entities[i], removalType))
 		}
 		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData, i: number): EntityAccessor => {
 			const onRemove = getOnRemove(i)
@@ -426,23 +486,22 @@ class AccessorTreeGenerator {
 				(updatedField: FieldName, updatedData: EntityData.FieldData) => {
 					const entityAccessor = collectionAccessor.entities[i]
 					if (entityAccessor instanceof EntityAccessor) {
-						collectionAccessor.entities[i] = this.withUpdatedField(entityAccessor, updatedField, updatedData)
-						update()
+						onUpdateProxy(i, this.withUpdatedField(entityAccessor, updatedField, updatedData))
 					}
 				},
 				replacement => {
 					const entityAccessor = collectionAccessor.entities[i]
 					if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
-						collectionAccessor.entities[i] = this.asDifferentEntity(entityAccessor, replacement, onRemove)
-						update()
+						onUpdateProxy(i, this.asDifferentEntity(entityAccessor, replacement, onRemove))
 					}
 				},
+				getSingleEntityBatchUpdates(i),
 				onRemove
 			)
 		}
-		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], newEntity => {
+		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
 			collectionAccessor.entities.push(generateNewAccessor(newEntity, collectionAccessor.entities.length))
-			update()
+			performUpdate()
 		})
 
 		let sourceData = fieldData instanceof EntityCollectionAccessor ? fieldData.entities : fieldData || [undefined]
@@ -471,6 +530,7 @@ class AccessorTreeGenerator {
 			}),
 			original.errors,
 			original.replaceWith,
+			original.batchUpdates,
 			original.remove
 		)
 	}
@@ -487,6 +547,7 @@ class AccessorTreeGenerator {
 			replacement.data,
 			original.errors,
 			original.replaceWith,
+			original.batchUpdates,
 			onRemove || original.remove
 		)
 	}

@@ -202,14 +202,25 @@ namespace Sortable {
 				}
 			}
 			const fieldName = Sortable.resolveSortByFieldName(this.props.sortBy, environment)
-			for (const entity of this.entities) {
-				const target = order[entity.getKey()]
-				const orderField = entity.data.getField(fieldName)
 
-				if (target !== undefined && orderField instanceof FieldAccessor && orderField.onChange) {
-					orderField.onChange(target)
-				}
-			}
+			this.props.entities.batchUpdates &&
+				this.props.entities.batchUpdates(getAccessor => {
+					let collectionAccessor: EntityCollectionAccessor = getAccessor()
+					for (let i = 0, length = collectionAccessor.entities.length; i < length; i++) {
+						const entity = collectionAccessor.entities[i]
+
+						if (!(entity instanceof EntityAccessor)) {
+							continue
+						}
+						const target = order[entity.getKey()]
+						const orderField = entity.data.getField(fieldName)
+
+						if (target !== undefined && orderField instanceof FieldAccessor && orderField.onChange) {
+							orderField.onChange(target)
+							collectionAccessor = getAccessor()
+						}
+					}
+				})
 		}
 
 		private updateUnpersistedEntities() {

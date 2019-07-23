@@ -52,8 +52,9 @@ export class MarkerTreeGenerator {
 
 		if (typeof node === 'function') {
 			throw new DataBindingError(
-				'Render props (functions as React Component children) are not supported within the schema. ' +
-					'Please refer to the documentation.'
+				`Render props (functions as React component children) are not supported within the schema. ` +
+					`You have likely used a bare custom component as opposed to wrapping in with \`Component\`. ` +
+					`Please refer to the documentation.`
 			)
 		}
 

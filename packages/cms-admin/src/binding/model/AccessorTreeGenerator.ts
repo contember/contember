@@ -92,22 +92,12 @@ class AccessorTreeGenerator {
 		}
 		const entityData: EntityData.EntityData = {}
 
-		if (Array.isArray(data) || data === undefined || data instanceof EntityCollectionAccessor) {
-			return createAccessorTreeRoot(
-				(entityData[rootName] = this.generateEntityCollectionAccessor(rootName, tree.fields, data, errorNode, onUpdate))
-			)
-		} else {
-			return createAccessorTreeRoot(
-				(entityData[rootName] = this.generateEntityAccessor(
-					rootName,
-					tree.fields,
-					data,
-					errorNode,
-					onUpdate,
-					entityData
-				))
-			)
-		}
+		return createAccessorTreeRoot(
+			(entityData[rootName] =
+				Array.isArray(data) || data === undefined || data instanceof EntityCollectionAccessor
+					? this.generateEntityCollectionAccessor(rootName, tree.fields, data, errorNode, onUpdate)
+					: this.generateEntityAccessor(rootName, tree.fields, data, errorNode, onUpdate, entityData))
+		)
 	}
 
 	private updateFields(
@@ -317,7 +307,13 @@ class AccessorTreeGenerator {
 		}
 		const batchUpdates = (): BatchEntityUpdates => performUpdates => {
 			inBatchUpdateMode = true
-			performUpdates(() => entityData[placeholderName] as EntityAccessor) // TODO add checks
+			performUpdates(() => {
+				const accessor = entityData[placeholderName]
+				if (accessor instanceof EntityAccessor) {
+					return accessor
+				}
+				throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
+			})
 			inBatchUpdateMode = false
 			performUpdate()
 		}
@@ -366,6 +362,9 @@ class AccessorTreeGenerator {
 			performUpdate()
 		}
 		const onUpdateProxy = (i: number, newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
+			if (inBatchUpdateMode && !(newValue instanceof EntityAccessor)) {
+				throw new DataBindingError(`Removing entities while they are being batch updated is a no-op.`)
+			}
 			collectionAccessor = new EntityCollectionAccessor(
 				collectionAccessor.entities,
 				collectionAccessor.errors,
@@ -384,7 +383,13 @@ class AccessorTreeGenerator {
 			}
 			return performUpdates => {
 				inBatchUpdateMode = true
-				performUpdates(() => collectionAccessor.entities[i] as EntityAccessor) // TODO add checks
+				performUpdates(() => {
+					const accessor = collectionAccessor.entities[i]
+					if (accessor instanceof EntityAccessor) {
+						return accessor
+					}
+					throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
+				})
 				inBatchUpdateMode = false
 				performUpdate()
 			}
@@ -402,6 +407,8 @@ class AccessorTreeGenerator {
 					const entityAccessor = collectionAccessor.entities[i]
 					if (entityAccessor instanceof EntityAccessor) {
 						onUpdateProxy(i, this.withUpdatedField(entityAccessor, updatedField, updatedData))
+					} else if (entityAccessor instanceof EntityForRemovalAccessor) {
+						throw new DataBindingError(`Updating entities for removal is currently not supported.`)
 					}
 				},
 				replacement => {

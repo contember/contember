@@ -87,8 +87,9 @@ class AccessorTreeGenerator {
 				updatedData instanceof EntityForRemovalAccessor ||
 				updatedData instanceof EntityCollectionAccessor
 			) {
-				updateData(createAccessorTreeRoot(updatedData))
+				return updateData(createAccessorTreeRoot(updatedData))
 			}
+			return this.rejectInvalidAccessorTree()
 		}
 		const entityData: EntityData.EntityData = {}
 
@@ -226,9 +227,7 @@ class AccessorTreeGenerator {
 					fieldData instanceof EntityAccessor ||
 					fieldData instanceof EntityForRemovalAccessor
 				) {
-					throw new DataBindingError(
-						`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`
-					)
+					return this.rejectInvalidAccessorTree()
 				} else if (Array.isArray(fieldData)) {
 					throw new DataBindingError(
 						`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
@@ -324,14 +323,16 @@ class AccessorTreeGenerator {
 			(updatedField: FieldName, updatedData: EntityData.FieldData) => {
 				const entityAccessor = entityData[placeholderName]
 				if (entityAccessor instanceof EntityAccessor) {
-					onUpdateProxy(this.withUpdatedField(entityAccessor, updatedField, updatedData))
+					return onUpdateProxy(this.withUpdatedField(entityAccessor, updatedField, updatedData))
 				}
+				return this.rejectInvalidAccessorTree()
 			},
 			replacement => {
 				const entityAccessor = entityData[placeholderName]
 				if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
-					onUpdateProxy(this.asDifferentEntity(entityAccessor, replacement, onRemove))
+					return onUpdateProxy(this.asDifferentEntity(entityAccessor, replacement, onRemove))
 				}
+				return this.rejectInvalidAccessorTree()
 			},
 			batchUpdates,
 			onRemove
@@ -413,8 +414,9 @@ class AccessorTreeGenerator {
 				replacement => {
 					const entityAccessor = collectionAccessor.entities[i]
 					if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
-						onUpdateProxy(i, this.asDifferentEntity(entityAccessor, replacement, onRemove))
+						return onUpdateProxy(i, this.asDifferentEntity(entityAccessor, replacement, onRemove))
 					}
+					return this.rejectInvalidAccessorTree()
 				},
 				getSingleEntityBatchUpdates(i),
 				onRemove
@@ -499,6 +501,12 @@ class AccessorTreeGenerator {
 			}
 		}
 		return undefined
+	}
+
+	private rejectInvalidAccessorTree(): never {
+		throw new DataBindingError(
+			`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`
+		)
 	}
 }
 

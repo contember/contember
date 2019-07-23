@@ -422,10 +422,15 @@ class AccessorTreeGenerator {
 			)
 		}
 		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
-			onUpdateProxy(
-				collectionAccessor.entities.length,
-				generateNewAccessor(newEntity, collectionAccessor.entities.length)
+			const newAccessor = generateNewAccessor(
+				typeof newEntity === 'function' ? undefined : newEntity,
+				collectionAccessor.entities.length
 			)
+
+			if (typeof newEntity === 'function') {
+				newAccessor.batchUpdates && newAccessor.batchUpdates(newEntity)
+			}
+			onUpdateProxy(collectionAccessor.entities.length, newAccessor)
 		})
 
 		let sourceData = fieldData instanceof EntityCollectionAccessor ? fieldData.entities : fieldData || [undefined]

@@ -31,8 +31,8 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
 type OnReplace = EntityAccessor['replaceWith']
 type OnUnlink = EntityAccessor['remove']
-type BatchEntityUpdates = EntityAccessor['batchUpdates']
-type BatchEntityCollectionUpdates = EntityCollectionAccessor['batchUpdates']
+type BatchEntityUpdates = Exclude<EntityAccessor['batchUpdates'], undefined>
+type BatchEntityCollectionUpdates = Exclude<EntityCollectionAccessor['batchUpdates'], undefined>
 
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined
@@ -352,10 +352,18 @@ class AccessorTreeGenerator {
 		}
 
 		let inBatchUpdateMode = false
-		const performUpdate = () => {
-			onUpdate(placeholderName, collectionAccessor)
+		const updateAccessorInstance = () => {
+			return (collectionAccessor = new EntityCollectionAccessor(
+				collectionAccessor.entities.slice(),
+				collectionAccessor.errors,
+				collectionAccessor.batchUpdates,
+				collectionAccessor.addNew
+			))
 		}
-		const batchUpdates = (): BatchEntityCollectionUpdates => performUpdates => {
+		const performUpdate = () => {
+			onUpdate(placeholderName, updateAccessorInstance())
+		}
+		const batchUpdates: BatchEntityCollectionUpdates = performUpdates => {
 			inBatchUpdateMode = true
 			performUpdates(() => collectionAccessor)
 			inBatchUpdateMode = false
@@ -365,34 +373,25 @@ class AccessorTreeGenerator {
 			if (inBatchUpdateMode && !(newValue instanceof EntityAccessor)) {
 				throw new DataBindingError(`Removing entities while they are being batch updated is a no-op.`)
 			}
-			collectionAccessor = new EntityCollectionAccessor(
-				collectionAccessor.entities,
-				collectionAccessor.errors,
-				collectionAccessor.batchUpdates,
-				collectionAccessor.addNew
-			)
 			collectionAccessor.entities[i] = newValue
 
-			if (!inBatchUpdateMode) {
+			if (inBatchUpdateMode) {
+				updateAccessorInstance()
+			} else {
 				performUpdate()
 			}
 		}
-		const getSingleEntityBatchUpdates = (i: number) => (): BatchEntityUpdates => {
-			if (inBatchUpdateMode) {
-				return undefined
-			}
-			return performUpdates => {
-				inBatchUpdateMode = true
-				performUpdates(() => {
-					const accessor = collectionAccessor.entities[i]
-					if (accessor instanceof EntityAccessor) {
-						return accessor
-					}
-					throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
-				})
-				inBatchUpdateMode = false
-				performUpdate()
-			}
+		const getSingleEntityBatchUpdates = (i: number): BatchEntityUpdates => performUpdates => {
+			inBatchUpdateMode = true
+			performUpdates(() => {
+				const accessor = collectionAccessor.entities[i]
+				if (accessor instanceof EntityAccessor) {
+					return accessor
+				}
+				throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
+			})
+			inBatchUpdateMode = false
+			performUpdate()
 		}
 		const getOnRemove = (i: number) => (removalType: EntityAccessor.RemovalType) => {
 			onUpdateProxy(i, this.removeEntity(collectionAccessor.entities[i], removalType))

@@ -12,6 +12,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly data: EntityData,
 		public readonly errors: ErrorAccessor[],
 		public readonly replaceWith: (replacement: EntityAccessor) => void,
+		public readonly batchUpdates?: (performUpdates: (getAccessor: () => EntityAccessor) => void) => void,
 		public readonly remove?: (removalType: EntityAccessor.RemovalType) => void
 	) {
 		super()

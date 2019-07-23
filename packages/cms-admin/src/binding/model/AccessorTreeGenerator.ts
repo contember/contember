@@ -422,8 +422,10 @@ class AccessorTreeGenerator {
 			)
 		}
 		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
-			collectionAccessor.entities.push(generateNewAccessor(newEntity, collectionAccessor.entities.length))
-			performUpdate()
+			onUpdateProxy(
+				collectionAccessor.entities.length,
+				generateNewAccessor(newEntity, collectionAccessor.entities.length)
+			)
 		})
 
 		let sourceData = fieldData instanceof EntityCollectionAccessor ? fieldData.entities : fieldData || [undefined]

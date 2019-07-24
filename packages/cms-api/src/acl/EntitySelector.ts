@@ -4,8 +4,7 @@ import { acceptFieldVisitor } from '../content-schema/modelUtils'
 type Matcher = (schema: Model.Schema, entity: Model.Entity) => boolean
 
 export default class EntitySelector {
-	private constructor(private readonly matchers: Matcher[]) {
-	}
+	private constructor(private readonly matchers: Matcher[]) {}
 
 	public static every() {
 		return new EntitySelector([])

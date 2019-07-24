@@ -9,7 +9,7 @@ export class EntityForRemovalAccessor extends Accessor implements EntityAccessor
 		public readonly typename: string | undefined,
 		public readonly data: EntityData,
 		public readonly errors: ErrorAccessor[],
-		public readonly replaceWith: (replacement: EntityAccessor) => void,
+		public readonly replaceWith: ((replacement: EntityAccessor) => void) | undefined,
 		public readonly removalType: EntityAccessor.RemovalType
 	) {
 		super()

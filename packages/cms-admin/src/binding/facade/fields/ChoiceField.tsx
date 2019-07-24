@@ -409,7 +409,7 @@ namespace ChoiceField {
 								entity.remove(EntityAccessor.RemovalType.Disconnect)
 							}
 						} else {
-							entity.replaceWith(filteredData[newValue])
+							entity.replaceWith && entity.replaceWith(filteredData[newValue])
 						}
 					}
 				})

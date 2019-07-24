@@ -71,12 +71,11 @@ class AccessorTreeGenerator {
 
 	private generateSubTree(
 		tree: MarkerTreeRoot,
-		initialData: ReceivedData<undefined> | RootAccessor,
+		data: ReceivedData<undefined> | RootAccessor,
 		updateData: AccessorTreeGenerator.UpdateData,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot
 	): AccessorTreeRoot {
 		const rootName = 'data'
-		const data = initialData === undefined ? undefined : initialData
 		const errorNode = errors === undefined ? undefined : errors[tree.id]
 
 		const createAccessorTreeRoot = (accessor: RootAccessor): AccessorTreeRoot =>

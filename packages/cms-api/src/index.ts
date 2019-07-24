@@ -9,6 +9,7 @@ import OneHasOneBuilder from './content-schema/builder/OneHasOneBuilder'
 import FieldBuilder from './content-schema/builder/FieldBuilder'
 import { readConfig } from './config/config'
 import AllowAllPermissionFactory from './acl/AllowAllPermissionFactory'
+import PermissionsBuilder from './acl/PermissionsBuilder'
 import Application from './core/cli/Application'
 import * as SchemaDefinition from './content-schema/definition'
 import * as InputValidation from './content-api/input-validation'
@@ -25,6 +26,7 @@ export {
 	FieldBuilder,
 	readConfig,
 	AllowAllPermissionFactory,
+	PermissionsBuilder,
 	Application,
 	SchemaDefinition,
 	InputValidation,

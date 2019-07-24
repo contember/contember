@@ -39,9 +39,10 @@ export default class PermissionFactory {
 				const predicateReferences: string[] = Object.entries(fieldPermissions)
 					.filter(([key]) => key !== entity.primary)
 					.map(([key, value]) => value)
+					.filter(value => value !== false)
 					.filter((value, index, array): value is string => array.indexOf(value) === index)
 
-				let idPermissions: Acl.PredicateReference = fieldPermissions[entity.primary] as Acl.PredicateReference
+				let idPermissions: Acl.Predicate = fieldPermissions[entity.primary] || false
 				const predicates = { ...entityPermissions.predicates }
 
 				for (let predicateReference of predicateReferences) {
@@ -58,7 +59,8 @@ export default class PermissionFactory {
 					predicates[predicate] = predicateDefinition
 				}
 				fieldPermissions[entity.primary] = idPermissions
-				entityPermissions.predicates[idPermissions] = predicates[idPermissions]
+				entityPermissions.predicates[idPermissions as Acl.PredicateReference] =
+					predicates[idPermissions as Acl.PredicateReference]
 			}
 		}
 	}
@@ -102,9 +104,9 @@ export default class PermissionFactory {
 
 		const [predicateDefinition, predicate] = this.mergePredicates(
 			left.predicates,
-			left.operations.delete,
+			left.operations.delete || false,
 			right.predicates,
-			right.operations.delete
+			right.operations.delete || false
 		)
 		if (predicate === true) {
 			operations.delete = true
@@ -131,9 +133,9 @@ export default class PermissionFactory {
 		for (let field in { ...leftFieldPermissions, ...rightFieldPermissions }) {
 			const [predicateDefinition, predicate] = this.mergePredicates(
 				leftPredicates,
-				leftFieldPermissions[field],
+				leftFieldPermissions[field] || false,
 				rightPredicates,
-				rightFieldPermissions[field]
+				rightFieldPermissions[field] || false
 			)
 			if (predicate === true) {
 				fields[field] = true
@@ -148,15 +150,15 @@ export default class PermissionFactory {
 
 	private mergePredicates(
 		leftPredicates: Acl.PredicateMap,
-		leftReference: Acl.Predicate | undefined,
+		leftReference: Acl.Predicate,
 		rightPredicates: Acl.PredicateMap,
-		rightReference: Acl.Predicate | undefined
+		rightReference: Acl.Predicate
 	): [Acl.PredicateDefinition, Acl.PredicateReference] | [undefined, boolean] {
 		if (leftReference === true || rightReference === true) {
 			return [undefined, true]
 		}
 
-		if (leftReference !== undefined && rightReference !== undefined) {
+		if (leftReference !== false && rightReference !== false) {
 			const leftPredicate: Acl.PredicateDefinition = leftPredicates[leftReference]
 			const rightPredicate: Acl.PredicateDefinition = rightPredicates[rightReference]
 			if (leftPredicate === rightPredicate) {
@@ -173,9 +175,9 @@ export default class PermissionFactory {
 				} as Acl.PredicateDefinition,
 				predicateName,
 			]
-		} else if (leftReference !== undefined) {
+		} else if (leftReference !== false) {
 			return [leftPredicates[leftReference], leftReference]
-		} else if (rightReference !== undefined) {
+		} else if (rightReference !== false) {
 			let predicateName = rightReference
 			if (rightPredicates !== leftPredicates) {
 				while (leftPredicates[predicateName]) {

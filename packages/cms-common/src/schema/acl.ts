@@ -30,7 +30,7 @@ namespace Acl {
 	}
 
 	export type PredicateVariable = string //{ name: string }
-	export type PredicateDefinition = Input.Where<PredicateVariable | Input.Condition>
+	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
 
 	export type PredicateMap = { [name: string]: PredicateDefinition }
 
@@ -53,10 +53,10 @@ namespace Acl {
 		delete?: Predicate
 	}
 
-	export type FieldPermissions = { [field: string]: Predicate }
+	export type FieldPermissions = { [field: string]: Predicate | undefined }
 
 	export type PredicateReference = string
-	export type Predicate = PredicateReference | true
+	export type Predicate = PredicateReference | boolean
 
 	export type AnyStage = '*'
 	export type StagesDefinition = AnyStage | (string[])

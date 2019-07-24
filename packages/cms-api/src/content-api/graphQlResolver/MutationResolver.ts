@@ -2,9 +2,10 @@ import { Input, Model, Result, Value } from 'cms-common'
 import ObjectNode from './ObjectNode'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import Mapper from '../sql/Mapper'
-import { UserError } from 'graphql-errors'
 import InputValidator from '../input-validation/InputValidator'
 import ValidationResolver from './ValidationResolver'
+import { ConstraintViolation } from '../sql/Constraints'
+import UserError from '../../core/graphql/UserError'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -27,10 +28,7 @@ export default class MutationResolver {
 		try {
 			await this.mapper.update(entity, input.by, input.data)
 		} catch (e) {
-			if (!(e instanceof Mapper.NoResultError)) {
-				throw e
-			}
-			throw new UserError('Mutation failed, operation denied by ACL rules')
+			return this.handleError(e)
 		}
 
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
@@ -58,10 +56,7 @@ export default class MutationResolver {
 		try {
 			primary = await this.mapper.insert(entity, input.data)
 		} catch (e) {
-			if (!(e instanceof Mapper.NoResultError)) {
-				throw e
-			}
-			throw new UserError('Mutation failed, operation denied by ACL rules')
+			return this.handleError(e)
 		}
 
 		const nodes = await this.resolveResultNodes(entity, { [entity.primary]: { eq: primary } }, queryAst)
@@ -83,13 +78,20 @@ export default class MutationResolver {
 		try {
 			await this.mapper.delete(entity, queryAst.args.by)
 		} catch (e) {
-			if (!(e instanceof Mapper.NoResultError)) {
-				throw e
-			}
-			throw new UserError('Mutation failed, operation denied by ACL rules')
+			return this.handleError(e)
 		}
 
 		return { ok: true, ...nodes }
+	}
+
+	private handleError(e: Error): never {
+		if (e instanceof Mapper.NoResultError) {
+			throw new UserError('Mutation failed, operation denied by ACL rules')
+		} else if (e instanceof ConstraintViolation) {
+			console.error(e)
+			throw new UserError('Constraint violations: ' + e.message)
+		}
+		throw e
 	}
 
 	private async resolveResultNodes(

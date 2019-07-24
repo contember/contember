@@ -16,7 +16,7 @@ class SchemaDiffer {
 
 		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
 			const patch = createPatch(originalSchema.acl, updatedSchema.acl)
-			if (patch.length <= 20) {
+			if (patch.length <= 40) {
 				builder.patchAclSchema(patch)
 			} else {
 				builder.updateAclSchema(updatedSchema.acl)

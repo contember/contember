@@ -7,8 +7,7 @@ import FieldSelector from './FieldSelector'
 import Reference from './PredicateReference'
 
 class PermissionsBuilder {
-	constructor(public readonly schema: Model.Schema, public readonly permissions: Acl.Permissions) {
-	}
+	constructor(public readonly schema: Model.Schema, public readonly permissions: Acl.Permissions) {}
 
 	public static create(model: Model.Schema): PermissionsBuilder {
 		return new PermissionsBuilder(model, {})

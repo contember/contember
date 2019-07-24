@@ -37,7 +37,10 @@ export default class EntityPermissionsBuilder {
 	}
 
 	allowAll(predicate: Acl.Predicate = true): EntityPermissionsBuilder {
-		return this.updateAll([Acl.Operation.read, Acl.Operation.create, Acl.Operation.update, Acl.Operation.delete], predicate)
+		return this.updateAll(
+			[Acl.Operation.read, Acl.Operation.create, Acl.Operation.update, Acl.Operation.delete],
+			predicate
+		)
 	}
 
 	allowOnlyRead(predicate: Acl.Predicate = true): EntityPermissionsBuilder {

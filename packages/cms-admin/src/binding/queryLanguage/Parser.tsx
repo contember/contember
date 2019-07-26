@@ -17,6 +17,7 @@ import { tokenList, TokenRegExps, tokens } from './tokenList'
  * 	- filtering toOne
  */
 class Parser extends ChevrotainParser {
+	private static rawInput: string = ''
 	private static lexer = new Lexer(tokenList)
 	private static parser = new Parser()
 	private static environment: Environment = new Environment()
@@ -64,18 +65,20 @@ class Parser extends ChevrotainParser {
 	private relativeSingleField: () => Parser.AST.RelativeSingleField = this.RULE<Parser.AST.RelativeSingleField>(
 		'relativeSingleField',
 		() => {
-			const toOneProps: Parser.AST.AtomicToOneProps[] = []
+			const { toOneProps } = this.SUBRULE(this.relativeSingleEntity)
 
-			// Deliberately using a combination of consuming the Dot inside MANY as opposed to using MANY_SEP so as to
-			// disambiguate the grammar. Otherwise inputs such as "field(fooParam = 1).foo.bar" where a MANY_SEP alternative
-			// would match it all the way to "bar", leaving nothing to be matched subsequently. It would be possible to get
-			// around this, although it would be somewhat cumbersome.
-			this.MANY(() => {
-				toOneProps.push(this.SUBRULE(this.toOneProps))
-				this.CONSUME(tokens.Dot)
-			})
+			const last = toOneProps[toOneProps.length - 1]
 
-			const fieldName = this.SUBRULE(this.fieldName)
+			if (last.reducedBy !== undefined || last.filter !== undefined) {
+				throw new QueryLanguageError(
+					`Cannot parse '${Parser.rawInput}': the last field '${
+						last.field
+					}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`
+				)
+			}
+
+			const fieldName = last.field
+			toOneProps.pop()
 
 			return {
 				toOneProps,
@@ -89,7 +92,7 @@ class Parser extends ChevrotainParser {
 		() => {
 			const toOneProps: Parser.AST.AtomicToOneProps[] = []
 
-			this.MANY_SEP({
+			this.AT_LEAST_ONE_SEP({
 				SEP: tokens.Dot,
 				DEF: () => {
 					toOneProps.push(this.SUBRULE(this.toOneProps))
@@ -140,13 +143,11 @@ class Parser extends ChevrotainParser {
 		const cnfWhere: Parser.AST.Filter[] = []
 
 		this.AT_LEAST_ONE(() => {
-			this.SUBRULE(this.optionalWhitespace)
 			this.CONSUME(tokens.LeftBracket)
 
 			cnfWhere.push(this.SUBRULE(this.disjunction))
 
 			this.CONSUME(tokens.RightBracket)
-			this.SUBRULE2(this.optionalWhitespace)
 		})
 		if (cnfWhere.length === 1) {
 			return cnfWhere[0]
@@ -256,8 +257,7 @@ class Parser extends ChevrotainParser {
 	})
 
 	private conditionOperator: () => Parser.AST.ConditionOperator = this.RULE('conditionOperator', () => {
-		this.SUBRULE(this.optionalWhitespace)
-		const operator = this.OR<Parser.AST.ConditionOperator>([
+		return this.OR<Parser.AST.ConditionOperator>([
 			{
 				ALT: () => {
 					this.CONSUME(tokens.Equals)
@@ -295,13 +295,10 @@ class Parser extends ChevrotainParser {
 				}
 			}
 		])
-		this.SUBRULE1(this.optionalWhitespace)
-		return operator
 	})
 
 	private columnValue: () => Parser.AST.ColumnValue = this.RULE('columnValue', () => {
-		this.SUBRULE(this.optionalWhitespace)
-		const value = this.OR<Parser.AST.ColumnValue>([
+		return this.OR<Parser.AST.ColumnValue>([
 			{
 				ALT: () => {
 					this.CONSUME(tokens.Null)
@@ -324,14 +321,11 @@ class Parser extends ChevrotainParser {
 				ALT: () => this.SUBRULE(this.primaryValue)
 			}
 		])
-		this.SUBRULE1(this.optionalWhitespace)
-		return value
 	})
 
 	private uniqueWhere = this.RULE('uniqueWhere', () => {
 		const where: Input.UniqueWhere<GraphQlBuilder.Literal> = {}
 
-		this.SUBRULE(this.optionalWhitespace)
 		this.CONSUME(tokens.LeftParenthesis)
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.Comma,
@@ -380,7 +374,6 @@ class Parser extends ChevrotainParser {
 			}
 		})
 		this.CONSUME(tokens.RightParenthesis)
-		this.SUBRULE1(this.optionalWhitespace)
 
 		return where
 	})
@@ -423,8 +416,7 @@ class Parser extends ChevrotainParser {
 	})
 
 	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {
-		this.SUBRULE(this.optionalWhitespace)
-		const identifier = this.OR([
+		return this.OR([
 			{
 				ALT: () => this.SUBRULE(this.identifier)
 			},
@@ -438,9 +430,6 @@ class Parser extends ChevrotainParser {
 				}
 			}
 		])
-		this.SUBRULE1(this.optionalWhitespace)
-
-		return identifier
 	})
 
 	private identifier: () => string = this.RULE('identifier', () => {
@@ -448,8 +437,7 @@ class Parser extends ChevrotainParser {
 	})
 
 	private entityIdentifier: () => EntityName = this.RULE('entityIdentifier', () => {
-		this.SUBRULE(this.optionalWhitespace)
-		const identifier = this.OR([
+		return this.OR([
 			{
 				ALT: () => this.CONSUME(tokens.EntityIdentifier).image
 			},
@@ -463,15 +451,10 @@ class Parser extends ChevrotainParser {
 				}
 			}
 		])
-		this.SUBRULE1(this.optionalWhitespace)
-
-		return identifier
 	})
 
 	private string = this.RULE('string', () => {
-		this.SUBRULE(this.optionalWhitespace)
 		const image = this.CONSUME(tokens.StringLiteral).image
-		this.SUBRULE1(this.optionalWhitespace)
 		return image
 			.substring(1, image.length - 1)
 			.replace("\\'", "'")
@@ -484,23 +467,13 @@ class Parser extends ChevrotainParser {
 	})
 
 	private number = this.RULE('number', () => {
-		this.SUBRULE(this.optionalWhitespace)
-		const number = parseFloat(this.CONSUME(tokens.NumberLiteral).image)
-		this.SUBRULE1(this.optionalWhitespace)
-
-		return number
+		return parseFloat(this.CONSUME(tokens.NumberLiteral).image)
 	})
 
 	private graphQlLiteral = this.RULE('graphQlLiteral', () => {
-		this.SUBRULE(this.optionalWhitespace)
 		const image = this.SUBRULE1(this.identifier)
-		this.SUBRULE2(this.optionalWhitespace)
 
 		return new GraphQlBuilder.Literal(image)
-	})
-
-	private optionalWhitespace = this.RULE('optionalWhitespace', () => {
-		this.OPTION(() => this.CONSUME(tokens.WhiteSpace))
 	})
 
 	private variable = this.RULE('variable', () => {
@@ -526,7 +499,7 @@ class Parser extends ChevrotainParser {
 	})
 
 	private constructor() {
-		super(tokenList, { outputCst: false })
+		super(tokenList, { outputCst: false, maxLookahead: 1 })
 		this.performSelfAnalysis()
 	}
 
@@ -535,7 +508,7 @@ class Parser extends ChevrotainParser {
 		entry: E,
 		environment: Environment
 	): Parser.ParserResult[E] {
-		const lexingResult = Parser.lexer.tokenize(input)
+		const lexingResult = Parser.lexer.tokenize((Parser.rawInput = input))
 
 		if (lexingResult.errors.length !== 0) {
 			throw new QueryLanguageError(

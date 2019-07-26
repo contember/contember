@@ -83,6 +83,10 @@ describe('single relative fields QueryLanguage parser', () => {
 		expect(() => parse("foo(a='b', a = 123).name")).throws(/duplicate/i)
 	})
 
+	it('should reject relation fields at the end', () => {
+		expect(() => parse("foo(a='b')")).throws(/relation/i)
+	})
+
 	it('should parse nested unique where', () => {
 		expect(parse('foo(nested.structure.is.deep = 123, nested.structure.be.indeed.not.shallow = baz).name')).eql({
 			fieldName: 'name',

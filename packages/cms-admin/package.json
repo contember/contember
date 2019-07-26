@@ -7,7 +7,7 @@
 	"scripts": {
 		"build": "tsc --build --verbose",
 		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js",
-		"storybook": "start-storybook -p 9001 -c dist/storybook/config"
+		"storybook": "start-storybook --ci -p 9001 -c dist/storybook/config"
 	},
 	"dependencies": {
 		"@blueprintjs/core": "^3.0.1",

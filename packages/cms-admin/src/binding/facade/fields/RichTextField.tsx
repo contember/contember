@@ -4,7 +4,7 @@ import RichEditor, { LineBreakBehavior, RichEditorProps } from '../../../compone
 import { FieldName } from '../../bindingTypes'
 import { Field } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
-import { SimpleRelativeSingleField } from '../aux'
+import { SimpleRelativeSingleField } from '../auxiliary'
 
 export { LineBreakBehavior, Block, Mark } from '../../../components/RichEditor'
 

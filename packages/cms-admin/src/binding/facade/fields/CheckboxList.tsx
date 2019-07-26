@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { FormGroup, FormGroupProps } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
-import { Component } from '../aux'
+import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
 
 export interface CheckboxListPublicProps {

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { FormGroup } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
-import { Component } from '../aux'
+import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
 
 export interface RadioFieldPublicProps {

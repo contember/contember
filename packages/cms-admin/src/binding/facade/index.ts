@@ -1,4 +1,4 @@
-export * from './aux'
+export * from './auxiliary'
 export * from './buttons'
 export * from './environment'
 export * from './fields'

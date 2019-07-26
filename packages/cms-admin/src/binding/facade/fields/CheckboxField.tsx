@@ -4,7 +4,7 @@ import { FormGroup, FormGroupProps } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Field } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
-import { SimpleRelativeSingleField } from '../aux'
+import { SimpleRelativeSingleField } from '../auxiliary'
 
 export interface CheckboxFieldProps {
 	name: FieldName

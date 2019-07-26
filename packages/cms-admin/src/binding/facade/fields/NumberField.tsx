@@ -4,7 +4,7 @@ import { FormGroup, FormGroupProps, InputGroup, InputGroupProps } from '../../..
 import { FieldName } from '../../bindingTypes'
 import { Field } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
-import { SimpleRelativeSingleField } from '../aux'
+import { SimpleRelativeSingleField } from '../auxiliary'
 
 export interface NumberFieldProps {
 	name: FieldName

@@ -7,10 +7,9 @@ import { DummyAdmin } from '../DummyAdmin'
 export const menu = (
 	<Menu>
 		<MenuList title="Menu">
-			<MenuPageLinkPrimary change={() => ({ name: 'dashboard', params: {} })} avatar="DA" name="Dashboard" />
+			<MenuPageLinkPrimary change={() => ({ name: 'dashboard', params: {} })} name="Dashboard" />
 			<MenuPageLinkPrimary
 				change={() => ({ name: 'dashboard', params: {} })}
-				avatar={<Icon icon="dashboard" color="currentColor" />}
 				name="Dashboard"
 				note="The starting point"
 			/>

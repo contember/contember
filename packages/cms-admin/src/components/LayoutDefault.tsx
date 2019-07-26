@@ -20,7 +20,7 @@ export interface LayoutOwnProps {
 }
 
 export interface LayoutStateProps {
-	identity: string | null
+	identity: string | undefined
 }
 
 interface LayoutDefaultState {
@@ -86,10 +86,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 						<LogoutLink
 							Component={props => (
 								<a {...props} className="navbar-link">
-									<Avatar size={AvatarSize.Size2}>
-										HS
-										{/*{this.props.identity}*/}
-									</Avatar>
+									<Avatar size={AvatarSize.Size2} email={this.props.identity} />
 								</a>
 							)}
 						/>
@@ -114,6 +111,6 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 }
 export default connect<LayoutStateProps, {}, LayoutOwnProps, State>(state => {
 	return {
-		identity: state.auth.identity ? state.auth.identity.email : null
+		identity: state.auth.identity ? state.auth.identity.email : undefined
 	}
 })(LayoutDefault)

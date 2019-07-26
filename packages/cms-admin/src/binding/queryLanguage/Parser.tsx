@@ -21,6 +21,27 @@ class Parser extends ChevrotainParser {
 	private static parser = new Parser()
 	private static environment: Environment = new Environment()
 
+	private qualifiedEntityList: () => Parser.AST.QualifiedEntityList = this.RULE<Parser.AST.QualifiedEntityList>(
+		'qualifiedEntityList',
+		() => {
+			const entityName = this.SUBRULE(this.entityIdentifier)
+			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+
+			const toOneProps: Parser.AST.AtomicToOneProps[] = []
+
+			this.MANY(() => {
+				this.CONSUME(tokens.Dot)
+				toOneProps.push(this.SUBRULE(this.toOneProps))
+			})
+
+			return {
+				entityName,
+				filter,
+				toOneProps
+			}
+		}
+	)
+
 	private qualifiedFieldList: () => Parser.AST.QualifiedFieldList = this.RULE<Parser.AST.QualifiedFieldList>(
 		'qualifiedFieldList',
 		() => {
@@ -364,7 +385,7 @@ class Parser extends ChevrotainParser {
 		return where
 	})
 
-	private fieldName = this.RULE<FieldName>('fieldName', () => {
+	private fieldName: () => FieldName = this.RULE<FieldName>('fieldName', () => {
 		return this.OR([
 			{
 				ALT: () => this.SUBRULE(this.fieldIdentifier)
@@ -537,6 +558,9 @@ class Parser extends ChevrotainParser {
 			case Parser.EntryPoint.RelativeEntityList:
 				expression = Parser.parser.relativeEntityList()
 				break
+			case Parser.EntryPoint.QualifiedEntityList:
+				expression = Parser.parser.qualifiedEntityList()
+				break
 			case Parser.EntryPoint.QualifiedFieldList:
 				expression = Parser.parser.qualifiedFieldList()
 				break
@@ -578,6 +602,11 @@ namespace Parser {
 			toManyProps: AtomicToManyProps
 		}
 
+		export interface QualifiedEntityList extends RelativeSingleEntity {
+			entityName: EntityName
+			filter?: Filter
+		}
+
 		export interface QualifiedFieldList extends RelativeSingleEntity {
 			entityName: EntityName
 			fieldName: FieldName
@@ -598,7 +627,8 @@ namespace Parser {
 	}
 
 	export enum EntryPoint {
-		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].son.siblings.name
+		QualifiedEntityList = 'qualifiedEntityList', // E.g. "Author[age < 123].son.sisters(name = 'Jane')
+		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].son.sister.name
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
 		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
@@ -607,6 +637,7 @@ namespace Parser {
 	}
 
 	export interface ParserResult {
+		qualifiedEntityList: AST.QualifiedEntityList
 		qualifiedFieldList: AST.QualifiedFieldList
 		relativeSingleField: AST.RelativeSingleField
 		relativeSingleEntity: AST.RelativeSingleEntity

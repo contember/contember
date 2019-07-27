@@ -26,7 +26,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 			<div className="centerCard-wrap">
 				<Card elevation={Elevation.ONE} className="centerCard">
 					<div className="login-site">
-						<img src="https://www.mangoweb.cz/images/logo.png" className="login-site-logo" />
+						<img src="https://www.mangoweb.cz/favicon-64x64.png" className="login-site-logo" />
 						<h1 className="login-site-name">manGoweb CMS</h1>
 					</div>
 					<form

@@ -85,9 +85,9 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 						{this.props.header.right}
 						<LogoutLink
 							Component={props => (
-								<a {...props} className="navbar-link">
+								<button type="button" {...props} className="navbar-link">
 									<Avatar size={AvatarSize.Size2} email={this.props.identity} />
-								</a>
+								</button>
 							)}
 						/>
 					</div>

@@ -17,6 +17,7 @@
 		"@blueprintjs/table": "^3.0.0",
 		"@mangoweb/sass-base": "0.0.2",
 		"@types/gravatar": "^1.8.0",
+		"@types/webappsec-credential-management": "^0.5.1",
 		"bourbon": "^5.1.0",
 		"chevrotain": "^4.1.0",
 		"classnames": "^2.2.6",

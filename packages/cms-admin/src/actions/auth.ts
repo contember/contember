@@ -20,6 +20,17 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 		services.config.loginToken
 	)
 	if (signIn.ok) {
+		if ('PasswordCredential' in window) {
+			const credentials = await navigator.credentials.create({
+				password: {
+					password,
+					id: email
+				}
+			})
+			if (credentials) {
+				await navigator.credentials.store(credentials)
+			}
+		}
 		dispatch(
 			createAction<AuthIdentity>(SET_IDENTITY, () => ({
 				token: signIn.result.token,
@@ -32,6 +43,22 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 		dispatch(
 			createAction(SET_ERROR, () => signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', '))()
 		)
+	}
+}
+
+export const tryAutoLogin = (): ActionCreator => async dispatch => {
+	if ('PasswordCredential' in window) {
+		try {
+			const credentials = await navigator.credentials.get({
+				password: true,
+				mediation: 'silent'
+			})
+			if (credentials instanceof PasswordCredential && credentials.password) {
+				dispatch(login(credentials.id, credentials.password, false))
+			}
+		} catch (error) {
+			console.error(error)
+		}
 	}
 }
 

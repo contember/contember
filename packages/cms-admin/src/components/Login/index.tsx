@@ -2,7 +2,7 @@ import { Callout, Card, Elevation } from '@blueprintjs/core'
 import { Button, FormGroup, InputGroup } from '..'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { login } from '../../actions/auth'
+import { login, tryAutoLogin } from '../../actions/auth'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { AuthStatus } from '../../state/auth'
@@ -13,6 +13,10 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 		email: '',
 		password: '',
 		rememberMe: false
+	}
+
+	componentDidMount() {
+		this.props.tryAutoLogin()
 	}
 
 	render() {
@@ -85,6 +89,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 namespace Login {
 	export interface DispatchProps {
 		login: (email: string, password: string, rememberMe: boolean) => void
+		tryAutoLogin: () => void
 	}
 
 	export interface StateProps {
@@ -104,6 +109,7 @@ namespace Login {
 export default connect<Login.StateProps, Login.DispatchProps, {}, State>(
 	({ auth }) => ({ errorMessage: auth.errorMessage, status: auth.status }),
 	(dispatch: Dispatch) => ({
-		login: (email: string, password: string, rememberMe: boolean) => dispatch(login(email, password, rememberMe))
+		login: (email: string, password: string, rememberMe: boolean) => dispatch(login(email, password, rememberMe)),
+		tryAutoLogin: () => dispatch(tryAutoLogin())
 	})
 )(Login)

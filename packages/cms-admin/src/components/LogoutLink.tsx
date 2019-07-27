@@ -19,9 +19,7 @@ interface LogoutDispatchProps {
 type Props = LogoutDispatchProps & LogoutLinkProps
 
 class LogoutLink extends React.Component<Props, {}> {
-	onClick = () => {
-		// this.props
-	}
+	onClick = this.props.logout
 
 	defaultComponent: React.StatelessComponent<InnerProps> = () => (
 		<a href="#" onClick={this.props.logout}>

@@ -66,7 +66,7 @@ describe('update with db', () => {
             }
           }`,
 					throws: {
-						message: 'Not null constraint violation on ContactPage::site in path ',
+						message: 'Constraint violations: Not null constraint violation on ContactPage::site in path ',
 					},
 					expectDatabase: {
 						site: [{ id: testUuid(2), slug: 'en' }],

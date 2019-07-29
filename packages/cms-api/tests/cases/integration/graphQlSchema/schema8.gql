@@ -107,7 +107,12 @@ input FrontPageUpdateInput {
 }
 
 input FrontPageUpdateIntroVideoEntityRelationInput {
+  create: VideoWithoutFrontPageForIntroCreateInput
   update: VideoWithoutFrontPageForIntroUpdateInput
+  upsert: FrontPageUpsertIntroVideoRelationInput
+  connect: VideoUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
 }
 
 type FrontPageUpdateResult {
@@ -120,6 +125,11 @@ input FrontPageUpsertInHouseVideosRelationInput {
   by: VideoUniqueWhere
   update: VideoWithoutFrontPageUpdateInput
   create: VideoWithoutFrontPageCreateInput
+}
+
+input FrontPageUpsertIntroVideoRelationInput {
+  update: VideoWithoutFrontPageForIntroUpdateInput
+  create: VideoWithoutFrontPageForIntroCreateInput
 }
 
 input FrontPageWhere {
@@ -260,6 +270,7 @@ input VideoCreateFrontPageEntityRelationInput {
 }
 
 input VideoCreateFrontPageForIntroEntityRelationInput {
+  connect: FrontPageUniqueWhere
   create: FrontPageWithoutIntroVideoCreateInput
 }
 
@@ -310,7 +321,12 @@ input VideoUpdateFrontPageEntityRelationInput {
 }
 
 input VideoUpdateFrontPageForIntroEntityRelationInput {
+  create: FrontPageWithoutIntroVideoCreateInput
   update: FrontPageWithoutIntroVideoUpdateInput
+  upsert: VideoUpsertFrontPageForIntroRelationInput
+  connect: FrontPageUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
 }
 
 input VideoUpdateInput {
@@ -324,6 +340,11 @@ type VideoUpdateResult {
   ok: Boolean!
   node: Video
   validation: _ValidationResult!
+}
+
+input VideoUpsertFrontPageForIntroRelationInput {
+  update: FrontPageWithoutIntroVideoUpdateInput
+  create: FrontPageWithoutIntroVideoCreateInput
 }
 
 input VideoUpsertFrontPageRelationInput {

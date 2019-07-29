@@ -13,7 +13,9 @@ export interface Test {
 }
 
 export const executeGraphQlTest = async (test: Test) => {
-	maskErrors(test.schema)
+	maskErrors(test.schema, error => {
+		return error.message
+	})
 
 	await withMockedUuid(() =>
 		withMockedDate(async () => {

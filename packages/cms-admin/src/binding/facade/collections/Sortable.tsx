@@ -20,19 +20,12 @@ import {
 	SyntheticChildrenProvider
 } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
-import {
-	DataBindingError,
-	EntityAccessor,
-	EntityCollectionAccessor,
-	Environment,
-	FieldAccessor,
-	VariableScalar
-} from '../../dao'
+import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
-	sortBy: FieldName | VariableScalar
+	sortBy: FieldName
 }
 
 export interface SortableInternalProps {
@@ -85,7 +78,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 	public static generateSyntheticChildren(props: Props<SortableProps>, environment: Environment): React.ReactNode {
 		return (
 			<>
-				<Field name={Sortable.resolveSortByFieldName(props.sortBy, environment)} isNonbearing={true} />
+				<Field name={props.sortBy} isNonbearing={true} />
 				{props.children}
 			</>
 		)
@@ -93,23 +86,6 @@ class Sortable extends React.PureComponent<SortableProps> {
 }
 
 namespace Sortable {
-	export const resolveSortByFieldName = (sortBy: FieldName | VariableScalar, environment: Environment): FieldName => {
-		if (sortBy instanceof VariableScalar) {
-			const fieldName = environment.getValueOrElse(sortBy.variable, undefined)
-
-			if (fieldName === undefined) {
-				throw new DataBindingError(`Attempting to sort by a variable field '${sortBy.variable}' which is not defined.`)
-			}
-			if (typeof fieldName !== 'string') {
-				throw new DataBindingError(
-					`Attempting to sort by a variable field '${sortBy.variable}' which exists but resolves to a non-string value.`
-				)
-			}
-			return fieldName
-		}
-		return sortBy
-	}
-
 	export interface DragHandleProps {
 		isMutating: boolean
 	}

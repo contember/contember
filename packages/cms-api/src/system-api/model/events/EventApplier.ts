@@ -53,6 +53,9 @@ class EventApplier {
 	}
 
 	private async applyUpdate(stage: Stage, event: UpdateEvent): Promise<void> {
+		if (Object.values(event.values).length === 0) {
+			return
+		}
 		await this.db
 			.forSchema(formatSchemaName(stage))
 			.updateBuilder()

@@ -24,6 +24,10 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 			builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)} 
   SET ${wrapIdentifier(column.columnName)} = ${escapeValue(this.data.fillValue)}`)
 
+			// event applier defers constraint check, we need to fire them before ALTER
+			builder.sql(`SET CONSTRAINTS ALL IMMEDIATE`)
+			builder.sql(`SET CONSTRAINTS ALL DEFERRED`)
+
 			if (!column.nullable) {
 				builder.alterColumn(entity.tableName, column.columnName, {
 					notNull: true,

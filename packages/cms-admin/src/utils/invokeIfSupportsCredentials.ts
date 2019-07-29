@@ -1,5 +1,5 @@
 export const invokeIfSupportsCredentials = async function(callback: () => void) {
-	if ('PasswordCredential' in window) {
+	if ('credentials' in navigator && 'PasswordCredential' in window) {
 		try {
 			await callback()
 		} catch (error) {

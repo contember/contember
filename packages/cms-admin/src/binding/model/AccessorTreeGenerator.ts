@@ -319,6 +319,7 @@ class AccessorTreeGenerator {
 		}
 		const batchUpdates = (): BatchEntityUpdates => performUpdates => {
 			inBatchUpdateMode = true
+			const accessorBeforeUpdates = entityData[placeholderName]
 			performUpdates(() => {
 				const accessor = entityData[placeholderName]
 				if (accessor instanceof EntityAccessor) {
@@ -327,7 +328,9 @@ class AccessorTreeGenerator {
 				throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
 			})
 			inBatchUpdateMode = false
-			performUpdate()
+			if (accessorBeforeUpdates !== entityData[placeholderName]) {
+				performUpdate()
+			}
 		}
 		return this.updateFields(persistedData, entityFields, errors, onUpdate, onReplace, batchUpdates, onRemove)
 	}
@@ -359,9 +362,12 @@ class AccessorTreeGenerator {
 		}
 		const batchUpdates: BatchEntityCollectionUpdates = performUpdates => {
 			inBatchUpdateMode = true
+			const accessorBeforeUpdates = collectionAccessor
 			performUpdates(() => collectionAccessor)
 			inBatchUpdateMode = false
-			performUpdate()
+			if (accessorBeforeUpdates !== collectionAccessor) {
+				performUpdate()
+			}
 		}
 		const onUpdateProxy = (i: number, newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			if (childInBatchUpdateMode[i] && !(newValue instanceof EntityAccessor)) {
@@ -386,6 +392,7 @@ class AccessorTreeGenerator {
 				}
 			}
 			const batchUpdates: BatchEntityUpdates = performUpdates => {
+				const accessorBeforeUpdates = collectionAccessor.entities[i]
 				childInBatchUpdateMode[i] = true
 				performUpdates(() => {
 					const accessor = collectionAccessor.entities[i]
@@ -395,7 +402,10 @@ class AccessorTreeGenerator {
 					throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
 				})
 				childInBatchUpdateMode[i] = false
-				performUpdate()
+
+				if (accessorBeforeUpdates !== collectionAccessor.entities[i]) {
+					performUpdate()
+				}
 			}
 			const onReplace: OnReplace = replacement => {
 				const entityAccessor = collectionAccessor.entities[i]
@@ -408,18 +418,22 @@ class AccessorTreeGenerator {
 				onUpdateProxy(i, this.removeEntity(collectionAccessor.entities[i], removalType))
 			}
 
+			childInBatchUpdateMode[i] = false
 			return this.updateFields(datum, entityFields, childErrors, onUpdate, onReplace, batchUpdates, onRemove)
 		}
 		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
-			const newAccessor = generateNewAccessor(
-				typeof newEntity === 'function' ? undefined : newEntity,
-				collectionAccessor.entities.length
-			)
+			const newEntityIndex = collectionAccessor.entities.length
+			const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity, newEntityIndex)
 
 			if (typeof newEntity === 'function') {
-				newAccessor.batchUpdates && newAccessor.batchUpdates(newEntity)
+				collectionAccessor.batchUpdates &&
+					collectionAccessor.batchUpdates(getAccessor => {
+						onUpdateProxy(newEntityIndex, newAccessor)
+						newEntity(getAccessor, newEntityIndex)
+					})
+			} else {
+				onUpdateProxy(newEntityIndex, newAccessor)
 			}
-			onUpdateProxy(collectionAccessor.entities.length, newAccessor)
 		})
 
 		let sourceData = fieldData instanceof EntityCollectionAccessor ? fieldData.entities : fieldData || [undefined]

@@ -29,11 +29,13 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 								firstOptionCaption="Choose…"
 								isMutating={isMutating}
 							/>
-							<div className="alternativeFields-items">
-								<div className="alternativeFields-item" key={currentValue}>
-									{this.props.alternatives[currentValue][2]}
+							{currentValue in this.props.alternatives && (
+								<div className="alternativeFields-items">
+									<div className="alternativeFields-item" key={currentValue}>
+										{this.props.alternatives[currentValue][2]}
+									</div>
 								</div>
-							</div>
+							)}
 						</>
 					)}
 				</ChoiceField>

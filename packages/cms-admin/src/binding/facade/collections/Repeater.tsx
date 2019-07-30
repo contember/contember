@@ -1,5 +1,5 @@
-import { FormGroup, IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
+import { FormGroup, FormGroupProps } from '../../../components/ui'
 import {
 	DataContext,
 	EnforceSubtypeRelation,
@@ -82,7 +82,7 @@ namespace Repeater {
 	}
 
 	export interface EntityCollectionPublicProps extends ItemPublicProps {
-		label?: IFormGroupProps['label']
+		label?: FormGroupProps['label']
 		enableUnlink?: boolean
 		enableUnlinkAll?: boolean
 		enableAddingNew?: boolean

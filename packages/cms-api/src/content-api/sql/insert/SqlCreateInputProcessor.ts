@@ -25,7 +25,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 			await this.mapper.connectJunction(
 				context.targetEntity,
 				context.targetRelation,
-				{ [context.targetEntity.primary]: context.input[context.targetEntity.primary] },
+				context.input,
 				{ [context.entity.primary]: primaryInversed }
 			)
 		},
@@ -48,7 +48,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 				context.entity,
 				context.relation,
 				{ [context.entity.primary]: primary },
-				{ [context.targetEntity.primary]: context.input[context.targetEntity.primary] }
+				context.input
 			)
 		},
 		create: async (context: Context.ManyHasManyOwnerContext & { input: Input.CreateDataInput }): Promise<void> => {

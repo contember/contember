@@ -119,6 +119,9 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 					targetEntity,
 					objectNode
 				)
+				if (junctionValues.length === 0) {
+					return {}
+				}
 
 				const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary, {})
 				const inversedJoiningColumn = joiningColumns.targetColumn.columnName

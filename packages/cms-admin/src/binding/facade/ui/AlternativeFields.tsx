@@ -1,4 +1,3 @@
-import cn from 'classnames'
 import * as React from 'react'
 import { Props } from '../../coreComponents'
 import { Environment } from '../../dao'

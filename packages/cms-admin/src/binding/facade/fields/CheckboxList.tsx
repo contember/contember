@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FormGroup, FormGroupProps } from '../../../components/ui'
+import { Checkbox, FormGroup, FormGroupProps } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
@@ -22,17 +22,13 @@ export const CheckboxList = Component<CheckboxListProps>(
 				// TODO this formGroup should be a fieldset
 				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
 					{data.map(({ key, label }) => (
-						<div key={key}>
-							<label>
-								<input
-									type="checkbox"
-									readOnly={isMutating}
-									checked={(currentValues || []).indexOf(key) !== -1}
-									onChange={e => onChange(key, e.currentTarget.checked)}
-								/>
-								{label}
-							</label>
-						</div>
+						<Checkbox
+							key={key}
+							checked={(currentValues || []).indexOf(key) !== -1}
+							readOnly={isMutating}
+							label={label}
+							onChange={isChecked => onChange(key, isChecked)}
+						/>
 					))}
 				</FormGroup>
 			)}

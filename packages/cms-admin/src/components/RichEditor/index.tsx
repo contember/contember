@@ -146,7 +146,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 									onClick={this.changeBlockMarkingTo(block.block)}
 								/>
 							))}
-						{blocks.length > 1 && marksToShow.length > 0 && <Divider />}
+						{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
 						{marksToShow.map(mark => (
 							<ActionButton
 								icon={this.getIcon(mark)}

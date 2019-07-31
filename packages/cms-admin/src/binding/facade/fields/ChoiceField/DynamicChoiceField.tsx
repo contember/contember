@@ -1,6 +1,7 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
 import { FieldName } from '../../../bindingTypes'
+import { ToOne } from '../../../coreComponents'
 import {
 	AccessorTreeRoot,
 	DataBindingError,
@@ -25,11 +26,12 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 			throw new DataBindingError('Corrupted data')
 		}
 
-		const { fieldName, toOneProps } = Parser.parseQueryLanguageExpression(
+		const parsedOptions = Parser.parseQueryLanguageExpression(
 			this.props.options,
-			Parser.EntryPoint.QualifiedFieldList,
+			this.props.optionFieldFactory ? Parser.EntryPoint.QualifiedEntityList : Parser.EntryPoint.QualifiedFieldList,
 			this.props.rawMetadata.environment
 		)
+		const { toOneProps } = parsedOptions
 
 		const subTreeRootAccessor = data.data.getTreeRoot(this.props.rawMetadata.fieldName)
 		const currentValueEntity = data.data.getField(this.props.rawMetadata.fieldName)
@@ -108,8 +110,14 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 
 		const normalizedData = optionEntities.map(
 			(item, i): ChoiceField.SingleDatum => {
-				const field = item.data.getField(fieldName)
-				const label: ChoiceField.Label = field instanceof FieldAccessor ? field.currentValue : undefined
+				let label: ChoiceField.Label
+
+				if (this.props.optionFieldFactory) {
+					label = <ToOne.AccessorRenderer accessor={item}>{this.props.optionFieldFactory}</ToOne.AccessorRenderer>
+				} else if ('fieldName' in parsedOptions) {
+					const field = item.data.getField(parsedOptions.fieldName)
+					label = field instanceof FieldAccessor ? (field.currentValue as ChoiceField.Label) : null
+				}
 
 				return {
 					key: i,
@@ -125,8 +133,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 		const baseMetadata: BaseChoiceMetadata = {
 			...this.props.rawMetadata,
 			data: normalizedData,
-			errors: currentValueEntity.errors,
-			fieldName: fieldName
+			errors: currentValueEntity.errors
 		}
 
 		if (this.props.arity === ChoiceArity.Multiple) {

@@ -38,8 +38,9 @@ export interface MultipleChoiceFieldMetadata extends BaseChoiceMetadata {
 	onChange: (optionKey: ChoiceField.ValueRepresentation, isChosen: boolean) => void
 }
 
-export type ChoiceFieldBaseProps = ChoiceFieldPublicProps &
-	(
+export type ChoiceFieldBaseProps = ChoiceFieldPublicProps & {
+	optionFieldFactory?: React.ReactNode
+} & (
 		| {
 				arity: ChoiceArity.Single
 				children: (metadata: SingleChoiceFieldMetadata) => React.ReactNode
@@ -66,7 +67,8 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 						name: this.props.name,
 						options: this.props.options,
 						arity: this.props.arity,
-						children: this.props.children
+						children: this.props.children,
+						optionFieldFactory: this.props.optionFieldFactory
 					}
 
 					if (Array.isArray(this.props.options)) {
@@ -86,11 +88,11 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 			return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 		}
 
-		const metadata = QueryLanguage.wrapQualifiedFieldList(
-			props.options,
-			fieldName => <Field name={fieldName} />,
-			environment
-		)
+		const metadata:
+			| QueryLanguage.WrappedQualifiedEntityList
+			| QueryLanguage.WrappedQualifiedFieldList = props.optionFieldFactory
+			? QueryLanguage.wrapQualifiedEntityList(props.options, props.optionFieldFactory, environment)
+			: QueryLanguage.wrapQualifiedFieldList(props.options, fieldName => <Field name={fieldName} />, environment)
 
 		return QueryLanguage.wrapRelativeSingleField(
 			props.name,

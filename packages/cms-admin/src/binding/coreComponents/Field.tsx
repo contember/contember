@@ -50,13 +50,18 @@ class Field<
 	public static displayName = 'Field'
 
 	public render() {
+		const children = this.props.children
+		if (!children) {
+			return null
+		}
+
 		return (
 			<Field.DataRetriever name={this.props.name}>
 				{({ fieldName, data, isMutating, environment }) => {
 					if (data instanceof EntityAccessor) {
 						const fieldData = data.data.getField(fieldName)
 
-						if (this.props.children && fieldData instanceof FieldAccessor) {
+						if (fieldData instanceof FieldAccessor) {
 							return (
 								<Field.FieldInner<Persisted, Produced>
 									fieldName={fieldName}
@@ -65,7 +70,7 @@ class Field<
 									errors={fieldData.errors}
 									environment={environment}
 								>
-									{this.props.children}
+									{children}
 								</Field.FieldInner>
 							)
 						} else {

@@ -2,6 +2,8 @@ import { Input, Model } from 'cms-common'
 import CreateInputProcessor from './CreateInputProcessor'
 import { isIt } from '../../utils/type'
 import * as Context from './InputContext'
+import { filterObject } from '../../utils/object'
+import UserError from '../../core/graphql/UserError'
 
 export default class CreateInputVisitor<Result>
 	implements
@@ -137,6 +139,7 @@ export default class CreateInputVisitor<Result>
 		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
+		input = filterObject(input, (k, v) => v !== null && v !== undefined)
 		this.verifyOperations(input)
 		if (isIt<Input.ConnectRelationInput>(input, 'connect')) {
 			return processor.connect({ ...context, input: input.connect })
@@ -157,8 +160,9 @@ export default class CreateInputVisitor<Result>
 		}
 		const promises: Array<Promise<Result>> = []
 		let i = 0
-		for (const element of input) {
+		for (let element of input) {
 			const alias = element.alias
+			element = filterObject(element, (k, v) => v !== null && v !== undefined)
 			this.verifyOperations(element)
 			let result
 			if (isIt<Input.ConnectRelationInput>(element, 'connect')) {
@@ -178,7 +182,7 @@ export default class CreateInputVisitor<Result>
 		const keys = Object.keys(input).filter(it => it !== 'alias')
 		if (keys.length !== 1) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
-			throw new Error(`Expected either "create" or "connect". ${found} found.`)
+			throw new UserError(`Expected either "create" or "connect". ${found} found.`)
 		}
 	}
 }

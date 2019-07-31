@@ -32,6 +32,11 @@ class InputValidator {
 		if (fieldsWithRules.length > 0) {
 			return true
 		}
+		const visitor = this.createHasValidationOnUpdateVisitor(data)
+		return await this.checkRelationHasValidation(entity, visitor)
+	}
+
+	private createHasValidationOnUpdateVisitor(data: Input.UpdateDataInput): UpdateInputVisitor<boolean> {
 		const hasManyProcessor: UpdateInputProcessor.HasManyRelationInputProcessor<
 			{
 				targetEntity: Model.Entity
@@ -73,8 +78,7 @@ class InputValidator {
 			oneHasOneInversed: hasOneProcessor,
 			oneHasOneOwner: hasOneProcessor,
 		}
-		const visitor = new UpdateInputVisitor(processor, this.model, data)
-		return await this.checkRelationHasValidation(entity, visitor)
+		return new UpdateInputVisitor(processor, this.model, data)
 	}
 
 	async hasValidationRulesOnCreate(entity: Model.Entity, data: Input.CreateDataInput): Promise<boolean> {
@@ -82,6 +86,12 @@ class InputValidator {
 		if (fieldsWithRules.length > 0) {
 			return true
 		}
+		const visitor = this.createHasValidationOnCreateVisitor(data)
+
+		return await this.checkRelationHasValidation(entity, visitor)
+	}
+
+	private createHasValidationOnCreateVisitor(data: Input.CreateDataInput): CreateInputVisitor<boolean> {
 		const hasManyProcessor: CreateInputProcessor.HasManyRelationProcessor<
 			{
 				targetEntity: Model.Entity
@@ -112,23 +122,33 @@ class InputValidator {
 			oneHasOneOwner: hasOneProcessor,
 		}
 		const visitor = new CreateInputVisitor(processor, this.model, data)
-
-		return await this.checkRelationHasValidation(entity, visitor)
+		return visitor
 	}
 
 	private async checkRelationHasValidation(
 		entity: Model.Entity,
 		visitor: Model.FieldVisitor<Promise<boolean | boolean[] | undefined>>
 	): Promise<boolean> {
+		return (await this.getRelationsWithValidation(entity, visitor)).length > 0
+	}
+
+	private async getRelationsWithValidation(
+		entity: Model.Entity,
+		visitor: Model.FieldVisitor<Promise<boolean | boolean[] | undefined>>
+	): Promise<string[]> {
 		const validateRelationsResult = acceptEveryFieldVisitor<Promise<boolean | boolean[] | undefined>>(
 			this.model,
 			entity,
 			visitor
 		)
-
-		const results = await Promise.all(Object.values(validateRelationsResult))
-
-		return results.find(it => it === true || (Array.isArray(it) && it.includes(true))) !== undefined
+		const relationsWithValidation: string[] = []
+		for (const key in validateRelationsResult) {
+			const result = await validateRelationsResult[key]
+			if (result === true || (Array.isArray(result) && result.includes(true))) {
+				relationsWithValidation.push(key)
+			}
+		}
+		return relationsWithValidation
 	}
 
 	async validateCreate(
@@ -143,7 +163,14 @@ class InputValidator {
 		const { [overRelation ? overRelation.name : '']: dropRule, ...entityRules } = this.getEntityRules(entity.name, data)
 		const fieldsWithRules = Object.keys(entityRules).filter(field => entityRules[field].length > 0)
 
-		const dependencies = this.buildDependencies(fieldsWithRules, entityRules)
+		const relationsWithRules = await this.getRelationsWithValidation(
+			entity,
+			this.createHasValidationOnCreateVisitor(data)
+		)
+		const dependencies = this.buildDependencies([...fieldsWithRules, ...relationsWithRules], {
+			...relationsWithRules.reduce((acc, it) => ({ ...acc, [it]: [] }), {}),
+			...entityRules,
+		})
 
 		const context = ValidationContext.createRootContext(
 			await this.validationContextFactory.createForCreate(entity, data, dependencies)
@@ -169,7 +196,15 @@ class InputValidator {
 		}
 		const entityRules = this.getEntityRules(entity.name, data)
 
-		const dependencies = this.buildDependencies(Object.keys(data), entityRules)
+		const relationsWithRules = await this.getRelationsWithValidation(
+			entity,
+			this.createHasValidationOnUpdateVisitor(data)
+		)
+
+		const dependencies = this.buildDependencies(Object.keys(data), {
+			...relationsWithRules.reduce((acc, it) => ({ ...acc, [it]: [] }), {}),
+			...entityRules,
+		})
 
 		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data), data)
 

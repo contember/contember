@@ -1,21 +1,25 @@
+import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
+import { Scalar } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { TextFieldProps } from '../fields'
 
-interface FieldTextProps {
+interface FieldTextProps<AcceptableValue extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal> {
 	name: string
-	formatter?: (value: string | null) => React.ReactNode
+	format?: (value: AcceptableValue | null) => React.ReactNode
 }
 
-export class FieldText extends React.PureComponent<FieldTextProps> {
+export class FieldText<
+	AcceptableValue extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal
+> extends React.PureComponent<FieldTextProps<AcceptableValue>> {
 	public static displayName = 'FieldText'
 
 	public render() {
 		return (
-			<Field<string> name={this.props.name}>
-				{({ data }) => (this.props.formatter ? this.props.formatter(data.currentValue) : data.currentValue)}
+			<Field<AcceptableValue> name={this.props.name}>
+				{({ data }) => (this.props.format ? this.props.format(data.currentValue) : data.currentValue)}
 			</Field>
 		)
 	}

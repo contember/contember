@@ -136,19 +136,32 @@ namespace Field {
 				propsName,
 				fieldName => (
 					<DataContext.Consumer>
-						{(data: DataContextValue) =>
-							propsChildren({
-								fieldName,
-								data,
-								isMutating,
-								environment
-							})
-						}
+						{(data: DataContextValue) => (
+							<RawMetadataGenerator fieldName={fieldName} data={data} isMutating={isMutating} environment={environment}>
+								{propsChildren}
+							</RawMetadataGenerator>
+						)}
 					</DataContext.Consumer>
 				),
 				environment
 			)
 		}, [environment, isMutating, propsName, propsChildren])
+	})
+
+	export interface RawMetadataGeneratorProps extends RawMetadata {
+		children: DataRetrieverProps['children']
+	}
+
+	export const RawMetadataGenerator = React.memo((props: RawMetadataGeneratorProps) => {
+		const rawMetadata = React.useMemo(() => {
+			return {
+				fieldName: props.fieldName,
+				data: props.data,
+				isMutating: props.isMutating,
+				environment: props.environment
+			}
+		}, [props.fieldName, props.data, props.isMutating, props.environment])
+		return <>{props.children(rawMetadata)}</>
 	})
 }
 

@@ -8,7 +8,7 @@ import {
 	SortableHandle,
 	SortEndHandler
 } from 'react-sortable-hoc'
-import { Button, DragHandle as DragHandleIcon } from '../../../components/ui'
+import { DragHandle as DragHandleIcon } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import {
 	DataContext,
@@ -285,15 +285,15 @@ namespace Sortable {
 		}
 
 		componentDidUpdate(): void {
-			this.updateUnpersistedEntities()
+			this.fixOrderlessEntities()
 		}
 
-		private updateUnpersistedEntities() {
+		private fixOrderlessEntities() {
 			this.props.entities.batchUpdates &&
 				this.props.entities.batchUpdates(getAccessor => {
 					let collectionAccessor: EntityCollectionAccessor = getAccessor()
 					for (const [i, entity] of this.entities.entries()) {
-						if (!entity || !(entity.primaryKey instanceof EntityAccessor.UnpersistedEntityID)) {
+						if (!(entity instanceof EntityAccessor)) {
 							continue
 						}
 

@@ -24,7 +24,7 @@ export default class ListPage<DRP extends CommonRendererProps> extends React.Com
 			<PageWithLayout layout={this.props.layout}>
 				<EntityListDataProvider
 					entityName={this.props.entity}
-					renderer={this.props.renderer || (ListRenderer as React.ComponentClass<DRP & DataRendererProps>)}
+					renderer={this.props.renderer || (ListRenderer as React.ComponentType<DRP & DataRendererProps>)}
 					rendererProps={this.props.rendererProps}
 					filter={this.props.filter}
 					orderBy={this.props.orderBy}

@@ -19,7 +19,7 @@ export interface EntityListDataProviderProps<DRP> {
 	orderBy?: Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
 	offset?: number
 	limit?: number
-	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
 	immutable?: boolean
 }

@@ -24,7 +24,7 @@ export interface DataRendererProps {
 
 export interface DataProviderOwnProps<DRP> {
 	markerTree: MarkerTreeRoot
-	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
 	onDataAvailable?: (data: DataRendererProps['data']) => void
 }

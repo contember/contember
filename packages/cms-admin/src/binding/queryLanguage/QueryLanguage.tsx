@@ -8,7 +8,7 @@ import { Parser } from './Parser'
 export namespace QueryLanguage {
 	const wrap = <P extends {}>(
 		innerNode: React.ReactNode,
-		Component: React.ComponentClass<P & { environment: Environment }>,
+		Component: React.ComponentType<P & { environment: Environment }>,
 		layers: P[],
 		environment: Environment
 	): React.ReactElement | null => {

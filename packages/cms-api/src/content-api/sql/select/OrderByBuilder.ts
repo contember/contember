@@ -4,6 +4,7 @@ import JoinBuilder from './JoinBuilder'
 import QueryBuilder from '../../../core/database/QueryBuilder'
 import { getColumnName, getTargetEntity } from '../../../content-schema/modelUtils'
 import SelectBuilder from '../../../core/database/SelectBuilder'
+import UserError from '../../../core/graphql/UserError'
 
 class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}
@@ -30,7 +31,8 @@ class OrderByBuilder {
 	): [SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
-			throw new Error()
+			const fields = entries.join(', ')
+			throw new UserError('Order by: only one field is expected in each item of order by clause, got: ' + fields)
 		}
 		const [fieldName, value]: [string, Input.FieldOrderBy] = entries[0]
 

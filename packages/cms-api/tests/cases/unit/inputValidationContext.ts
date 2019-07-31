@@ -6,7 +6,7 @@ import schema from '../../example-project/src'
 import ValidationDataSelector from '../../../src/content-api/input-validation/ValidationDataSelector'
 import { createMock } from '../../../src/utils/testing'
 import DependencyCollector from '../../../src/content-api/input-validation/DependencyCollector'
-import { testUuid, withMockedUuid } from '../../src/testUuid'
+import { withMockedUuid } from '../../src/testUuid'
 import DependencyPruner from '../../../src/content-api/input-validation/DependencyPruner'
 
 type PrimaryValueExpectation = { entity: string; where: Input.UniqueWhere; result: Value.PrimaryValue }
@@ -55,12 +55,12 @@ type Test = {
 	result: any
 } & (
 	| {
-			createInput: Input.CreateDataInput
-	  }
+	createInput: Input.CreateDataInput
+}
 	| {
-			nodeInput: { node: Value.Object } | { where: Input.UniqueWhere }
-			updateInput: Input.UpdateDataInput
-	  })
+	nodeInput: { node: Value.Object } | { where: Input.UniqueWhere }
+	updateInput: Input.UpdateDataInput
+})
 
 const test = async (test: Test) => {
 	const contextFactory = new ValidationContextFactory(
@@ -158,7 +158,7 @@ describe('input validation context', () => {
 				{
 					entity: 'Author',
 					where: { id: 1 },
-					dependencies: { posts: { id: {}, title: {}, tags: { label: {} } } },
+					dependencies: { name: {}, contact: {email: {}},  posts: { id: {}, title: {}, tags: { label: {} } } },
 					result: {
 						name: 'Db name',
 						contact: {
@@ -200,7 +200,7 @@ describe('input validation context', () => {
 				{
 					entity: 'Post',
 					where: { id: 103 },
-					dependencies: { id: {}, tags: { label: {} } },
+					dependencies: { id: {}, title: {}, tags: { label: {} } },
 					result: {
 						id: 103,
 						title: 'DB title 103',

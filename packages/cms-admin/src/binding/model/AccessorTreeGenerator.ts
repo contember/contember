@@ -426,11 +426,13 @@ class AccessorTreeGenerator {
 			const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity, newEntityIndex)
 
 			if (typeof newEntity === 'function') {
-				collectionAccessor.batchUpdates &&
-					collectionAccessor.batchUpdates(getAccessor => {
-						onUpdateProxy(newEntityIndex, newAccessor)
-						newEntity(getAccessor, newEntityIndex)
-					})
+				if (!collectionAccessor.batchUpdates) {
+					throw new DataBindingError(`Internally inconsistent Accessor tree detected. This should never happen.`)
+				}
+				collectionAccessor.batchUpdates(getAccessor => {
+					onUpdateProxy(newEntityIndex, newAccessor)
+					newEntity(getAccessor, newEntityIndex)
+				})
 			} else {
 				onUpdateProxy(newEntityIndex, newAccessor)
 			}

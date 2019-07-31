@@ -9,7 +9,7 @@ import { MarkerTreeRootProvider } from './MarkerProvider'
 
 interface EntityCreatorProps<DRP> {
 	name: EntityName
-	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
 }
 

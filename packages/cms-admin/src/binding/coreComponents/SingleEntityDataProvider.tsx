@@ -14,7 +14,7 @@ export interface SingleEntityDataProviderProps<DRP> {
 	entityName: EntityName
 	associatedField?: FieldName
 	where: string | Input.UniqueWhere<GraphQlBuilder.Literal>
-	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
 	children: React.ReactNode
 }

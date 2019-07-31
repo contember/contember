@@ -11,7 +11,7 @@ export default interface SpecificPageProps<DRP> {
 		| ((routingParameters: Parameters, environment: Environment) => SingleEntityDataProviderProps<DRP>['where'])
 	pageName?: string
 	layout?: React.ComponentType<{ children?: React.ReactNode }>
-	renderer?: React.ComponentClass<DRP & DataRendererProps>
+	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
 	children: React.ReactNode
 }

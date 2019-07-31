@@ -55,12 +55,12 @@ type Test = {
 	result: any
 } & (
 	| {
-	createInput: Input.CreateDataInput
-}
+			createInput: Input.CreateDataInput
+	  }
 	| {
-	nodeInput: { node: Value.Object } | { where: Input.UniqueWhere }
-	updateInput: Input.UpdateDataInput
-})
+			nodeInput: { node: Value.Object } | { where: Input.UniqueWhere }
+			updateInput: Input.UpdateDataInput
+	  })
 
 const test = async (test: Test) => {
 	const contextFactory = new ValidationContextFactory(
@@ -158,7 +158,7 @@ describe('input validation context', () => {
 				{
 					entity: 'Author',
 					where: { id: 1 },
-					dependencies: { name: {}, contact: {email: {}},  posts: { id: {}, title: {}, tags: { label: {} } } },
+					dependencies: { name: {}, contact: { email: {} }, posts: { id: {}, title: {}, tags: { label: {} } } },
 					result: {
 						name: 'Db name',
 						contact: {

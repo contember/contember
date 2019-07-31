@@ -106,6 +106,11 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
+							sql: SQL`select "root_"."author_id" as "root_author", "root_"."id" as "root_id" from "public"."post" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: { rows: [{ root_id: testUuid(2), root_author: null }] },
+						},
+						{
 							sql: SQL`with "root_" as 
 							(select ? :: uuid as "id", ? :: text as "name") 
 							insert into "public"."author" ("id", "name") 
@@ -481,6 +486,16 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
+							sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: { rows: [{ root_id: testUuid(2) }] },
+						},
+						{
+							sql: SQL`select "root_"."post_id" as "__grouping_key", "root_"."id" as "root_id" from "public"."post_locale" as "root_" where "root_"."post_id" in (?)`,
+							parameters: [testUuid(2)],
+							response: { rows: [] },
+						},
+						{
 							sql: SQL`with "root_" as 
 							(select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") 
 							insert into "public"."post_locale" ("id", "title", "locale", "post_id") 
@@ -807,6 +822,16 @@ describe('update', () => {
       }`,
 				executes: [
 					...sqlTransaction([
+						{
+							sql: SQL`select "root_"."setting_id" as "root_setting", "root_"."id" as "root_id" from "public"."site" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: { rows: [{ root_id: testUuid(2), root_setting: testUuid(99) }] },
+						},
+						{
+							sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."site_setting" as "root_" where "root_"."id" in (?)`,
+							parameters: [testUuid(99)],
+							response: { rows: [{ root_id: testUuid(99) }] },
+						},
 						{
 							sql: SQL`with "root_" as 
 							(select ? :: uuid as "id", ? :: text as "url") 
@@ -1271,6 +1296,20 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
+							sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [{ root_id: testUuid(2) }],
+							},
+						},
+						{
+							sql: SQL`select "root_"."setting_id" as "root_setting", "root_"."id" as "root_id" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [{ root_id: testUuid(99), root_setting: testUuid(2) }],
+							},
+						},
+						{
 							sql: SQL`select "root_"."id"
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = ?`,
@@ -1328,6 +1367,20 @@ describe('update', () => {
       }`,
 				executes: [
 					...sqlTransaction([
+						{
+							sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [{ root_id: testUuid(2) }],
+							},
+						},
+						{
+							sql: SQL`select "root_"."setting_id" as "root_setting", "root_"."id" as "root_id" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [{ root_id: testUuid(99), root_setting: testUuid(2) }],
+							},
+						},
 						{
 							sql: SQL`select "root_"."id"
                        from "public"."site" as "root_"
@@ -1796,6 +1849,20 @@ describe('update', () => {
 				executes: [
 					...sqlTransaction([
 						{
+							sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [{ root_id: testUuid(2) }],
+							},
+						},
+						{
+							sql: SQL`select "junction_"."category_id", "junction_"."post_id" from "public"."post_categories" as "junction_" where "junction_"."post_id" in (?)`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [],
+							},
+						},
+						{
 							sql: SQL`with "root_" as 
 							(select ? :: uuid as "id", ? :: text as "name") 
 							insert into "public"."category" ("id", "name") 
@@ -2109,6 +2176,20 @@ describe('update', () => {
       }`,
 				executes: [
 					...sqlTransaction([
+						{
+							sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."category" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [{ root_id: testUuid(2) }],
+							},
+						},
+						{
+							sql: SQL`select "junction_"."category_id", "junction_"."post_id" from "public"."post_categories" as "junction_" where "junction_"."category_id" in (?)`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [],
+							},
+						},
 						{
 							sql: SQL`with "root_" as 
 							(select ? :: uuid as "id", ? :: text as "title") 
@@ -2691,10 +2772,10 @@ describe('update', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."book" as "root_" where "root_"."id" = ?`,
+						sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."book" as "root_" where "root_"."id" = ?`,
 						parameters: [testUuid(1)],
 						response: {
-							rows: [{ root_id: testUuid(1) }],
+							rows: [{ root_id: testUuid(1), name: 'John' }],
 						},
 					},
 					{

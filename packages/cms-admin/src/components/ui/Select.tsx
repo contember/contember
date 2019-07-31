@@ -1,4 +1,5 @@
 import * as React from 'react'
+import ReactDOMServer from 'react-dom/server'
 
 class Select extends React.PureComponent<Select.Props> {
 	render() {
@@ -11,9 +12,20 @@ class Select extends React.PureComponent<Select.Props> {
 					className="select"
 					multiple={this.props.multiple}
 				>
+					{/*
+						This is a super ugly workaround to React's unfortunate limitation that all <option> contents must be just
+						strings, otherwise it will just call .toString() which, in our case, would result into '[object Object]'.
+
+						We, however, need to support JSX in order to allow for custom field formatting, and the like. It does,
+						of course, depend on people only attempting to render components that render just text but that is fine.
+
+						Relevant issue: https://github.com/facebook/react/issues/13586
+					*/}
 					{this.props.options.map(option => (
 						<option value={option.value} disabled={option.disabled} key={option.value}>
-							{option.label}
+							{typeof option.label === 'object' && option.label !== null
+								? ReactDOMServer.renderToStaticMarkup(option.label as React.ReactElement)
+								: option.label}
 						</option>
 					))}
 				</select>
@@ -25,7 +37,7 @@ class Select extends React.PureComponent<Select.Props> {
 namespace Select {
 	export interface Option {
 		value: string | number
-		label: string
+		label: React.ReactNode
 		disabled?: boolean
 	}
 

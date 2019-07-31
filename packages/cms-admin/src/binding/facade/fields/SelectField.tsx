@@ -1,4 +1,3 @@
-import { arrayDifference } from 'cms-common'
 import * as React from 'react'
 import { FormGroup, FormGroupProps, Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
@@ -9,19 +8,22 @@ import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata }
 export interface SelectFieldPublicProps {
 	name: FieldName
 	label?: FormGroupProps['label']
-	firstOptionCaption?: string
-	allowNull?: boolean
-}
-
-export interface SelectFieldInternalProps {
+	firstOptionCaption?: React.ReactNode
 	options: ChoiceFieldProps['options']
+	allowNull?: boolean
+	children?: ChoiceFieldProps['optionFieldFactory']
 }
 
-export type SelectFieldProps = SelectFieldPublicProps & SelectFieldInternalProps
+export type SelectFieldProps = SelectFieldPublicProps
 
 export const SelectField = Component<SelectFieldProps>(props => {
 	return (
-		<ChoiceField name={props.name} options={props.options} arity={ChoiceArity.Single}>
+		<ChoiceField
+			name={props.name}
+			options={props.options}
+			arity={ChoiceArity.Single}
+			optionFieldFactory={props.children}
+		>
 			{({ data, currentValue, onChange, environment, isMutating, errors }: SingleChoiceFieldMetadata) => {
 				return (
 					<SelectFieldInner
@@ -42,7 +44,9 @@ export const SelectField = Component<SelectFieldProps>(props => {
 	)
 }, 'SelectField')
 
-export interface SelectFieldInnerProps extends SelectFieldPublicProps, Omit<SingleChoiceFieldMetadata, 'fieldName'> {
+export interface SelectFieldInnerProps
+	extends Omit<SelectFieldPublicProps, 'options'>,
+		Omit<SingleChoiceFieldMetadata, 'fieldName'> {
 	environment: Environment
 	errors: ErrorAccessor[]
 	isMutating: boolean
@@ -50,18 +54,16 @@ export interface SelectFieldInnerProps extends SelectFieldPublicProps, Omit<Sing
 
 export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps> {
 	public render() {
-		const options: Select.Option[] = [
-			{
-				disabled: this.props.allowNull !== true,
-				value: -1,
-				label: this.props.firstOptionCaption || (typeof this.props.label === 'string' ? this.props.label : '')
-			}
-		].concat(
+		const options = Array<Select.Option>({
+			disabled: this.props.allowNull !== true,
+			value: -1,
+			label: this.props.firstOptionCaption || this.props.label || ''
+		}).concat(
 			this.props.data.map(({ key, label }) => {
 				return {
 					disabled: false,
 					value: key,
-					label: label as string
+					label: label
 				}
 			})
 		)

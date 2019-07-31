@@ -39,7 +39,8 @@ export default class ValidationContextFactory {
 		data: Input.UpdateDataInput,
 		dependencies: DependencyCollector.Dependencies
 	): Promise<ValidationContext.NodeType | undefined> {
-		const prunedDependencies = this.dependencyPruner.pruneDependencies(entity, dependencies, data)
+		// const prunedDependencies = this.dependencyPruner.pruneDependencies(entity, dependencies, data)
+		const prunedDependencies = dependencies
 		const node = 'where' in input ? await this.dataSelector.select(entity, input.where, prunedDependencies) : input.node
 		if (!node) {
 			return undefined

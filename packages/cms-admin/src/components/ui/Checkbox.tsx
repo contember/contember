@@ -2,7 +2,7 @@ import * as React from 'react'
 
 export interface CheckboxProps {
 	checked: boolean
-	readOnly: boolean
+	readOnly?: boolean
 	label: React.ReactNode
 	onChange: (isChecked: boolean) => void
 }

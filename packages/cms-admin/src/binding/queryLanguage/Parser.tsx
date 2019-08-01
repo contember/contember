@@ -492,7 +492,8 @@ class Parser extends ChevrotainParser {
 			throw new QueryLanguageError(
 				`The variable \$${variableName} resolved to a dimension which exists but contains ${
 					dimensionValue.length
-				} values. It has to contain exactly one.`
+				} values. It has to contain exactly one. ` +
+					`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`
 			)
 		}
 		throw new QueryLanguageError(`Undefined variable \$${variableName}.`)

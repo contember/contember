@@ -18,7 +18,6 @@ import {
 	ToOne
 } from '../../index'
 import { QueryLanguage } from '../../queryLanguage'
-import { LoadingSpinner } from '../renderers/userFeedback'
 
 export interface DimensionsSwitcherBaseProps extends Omit<DimensionsSwitcher.DimensionsRendererProps, 'labelFactory'> {
 	options: string
@@ -214,6 +213,11 @@ namespace DimensionsSwitcher {
 
 		const uniqueDimensions = getUniqueDimensions(environment.getAllDimensions()[props.dimension] || [])
 		const normalizedData = getNormalizedData(uniqueDimensions, props.data)
+
+		if (normalizedData.length === 1) {
+			// If there is just one alternative to choose from, render no drop-downs
+			return <>renderSelected(normalizedData)</>
+		}
 
 		return (
 			<Manager>

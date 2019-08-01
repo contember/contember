@@ -122,28 +122,37 @@ namespace DimensionsSwitcher {
 			dimensionData: StatefulDimensionDatum[],
 			selectedDimensions: StatefulDimensionDatum<true>[]
 		) => {
-			//const selectedDimensionsCount = selectedDimensions.length
-			//const canSelectAnother = selectedDimensionsCount < props.maxItems
+			const canSelectJustOne = props.minItems === 1 && props.maxItems === 1
+			const selectedDimensionsCount = selectedDimensions.length
+			const canSelectAnother = selectedDimensionsCount < props.maxItems
+			const canSelectLess = selectedDimensionsCount > props.minItems
 			const getRequestChangeCallback = (dimension: StatefulDimensionDatum): RequestChange => reqState => {
-				console.log('xxx', dimension)
 				if (reqState.name !== 'project_page') {
 					return reqState
 				}
 
-				const updatedDimensions = dimensionData
-					.filter(item => {
+				let updatedDimensions: StatefulDimensionDatum[]
+
+				if (!dimension.isSelected && !canSelectAnother) {
+					// We're about to select another dimension but we have no more slots for it se we need to bump one off.
+					updatedDimensions = [...selectedDimensions.slice(1), dimension] // isSelected is technically wrong here but it doesn't matter
+				} else if (dimension.isSelected && !canSelectLess) {
+					// We're trying to unselect a dimension but our 'minItems' prop disallows it. Do nothing then.
+					updatedDimensions = selectedDimensions
+				} else {
+					updatedDimensions = dimensionData.filter(item => {
 						if (item.slug === dimension.slug) {
 							return !item.isSelected
 						}
 						return item.isSelected
 					})
-					.map(item => item.slug)
+				}
 
 				return {
 					...reqState,
 					dimensions: {
 						...(reqState.dimensions || {}),
-						[props.dimension]: getUniqueDimensions(updatedDimensions)
+						[props.dimension]: getUniqueDimensions(updatedDimensions.map(item => item.slug))
 					}
 				}
 			}
@@ -153,14 +162,29 @@ namespace DimensionsSwitcher {
 					{dimensionData.map(dimension => (
 						<li key={dimension.slug}>
 							<Link
-								Component={({ onClick }) => (
-									<Checkbox
-										key={dimension.slug}
-										checked={dimension.isSelected}
-										label={dimension.label}
-										onChange={() => onClick()}
-									/>
-								)}
+								Component={({ href, onClick }) => {
+									if (canSelectJustOne) {
+										return (
+											<a
+												href={href}
+												onClick={e => {
+													setIsOpen(false)
+													onClick(e)
+												}}
+											>
+												{dimension.label}
+											</a>
+										)
+									}
+									return (
+										<Checkbox
+											key={dimension.slug}
+											checked={dimension.isSelected}
+											label={dimension.label}
+											onChange={() => onClick()}
+										/>
+									)
+								}}
 								requestChange={getRequestChangeCallback(dimension)}
 							/>
 						</li>

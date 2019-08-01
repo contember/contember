@@ -3,6 +3,7 @@ import { Manager, Popper, Reference } from 'react-popper'
 import { Button, Checkbox, Link } from '../../../components'
 import { Portal } from '../../../components/ui/Portal'
 import { RequestChange } from '../../../state/request'
+import { isSpecialLinkClick } from '../../../utils/isSpecialLinkClick'
 import {
 	AccessorTreeRoot,
 	DataBindingError,
@@ -168,6 +169,9 @@ namespace DimensionsSwitcher {
 											<a
 												href={href}
 												onClick={e => {
+													if (isSpecialLinkClick(e)) {
+														return
+													}
 													setIsOpen(false)
 													onClick(e)
 												}}

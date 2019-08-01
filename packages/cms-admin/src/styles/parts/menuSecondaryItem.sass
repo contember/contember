@@ -5,16 +5,13 @@
 
 	&-link
 		display: block
-		color: $menu-link-color
+		color: var(--menu-link-color)
 		font-size: $fs-small
-		padding: rem(11px) $spacing-extraLarge
+		padding: $spacing-small $spacing-extraLarge
 		text-decoration: none
 		font-weight: $fw-medium
 
-		$hover-color: #1665D8
-		&:hover, &-active
-			background: rgba($hover-color, .15)
-			color: $hover-color
-
+		&:hover,
 		&-active
-			box-shadow: inset rem(3px) 0 0 $hover-color
+			background-color: var(--menu-link-active-background-color)
+			color: var(--menu-link-active-color)

@@ -26,7 +26,7 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 				// intent={Intent.PRIMARY}
 				disabled={isDisabled}
 				ref={buttonRef}
-				// large={true}
+				large
 			>
 				{props.children || 'Save'}
 			</Button>

@@ -2,8 +2,8 @@ import * as React from 'react'
 import { RequestChange } from '../../state/request'
 
 class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkComponent.State> {
-	onClick = (e: React.SyntheticEvent<Element>) => {
-		e.preventDefault()
+	onClick = (e?: React.SyntheticEvent<Element>) => {
+		e && e.preventDefault()
 		this.props.goTo()
 	}
 
@@ -21,7 +21,7 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkCompone
 
 export interface InnerProps {
 	href: string
-	onClick: (e: React.SyntheticEvent<Element>) => void
+	onClick: (e?: React.SyntheticEvent<Element>) => void
 }
 
 namespace LinkComponent {

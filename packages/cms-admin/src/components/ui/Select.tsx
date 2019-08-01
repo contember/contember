@@ -21,13 +21,24 @@ class Select extends React.PureComponent<Select.Props> {
 
 						Relevant issue: https://github.com/facebook/react/issues/13586
 					*/}
-					{this.props.options.map(option => (
-						<option value={option.value} disabled={option.disabled} key={option.value}>
-							{typeof option.label === 'object' && option.label !== null
-								? ReactDOMServer.renderToStaticMarkup(option.label as React.ReactElement)
-								: option.label}
-						</option>
-					))}
+					{this.props.options.map(option => {
+						const optionProps: React.DetailedHTMLProps<
+							React.OptionHTMLAttributes<HTMLOptionElement>,
+							HTMLOptionElement
+						> = {
+							value: option.value,
+							disabled: option.disabled,
+							key: option.value
+						}
+						if (typeof option.label === 'object' && option.label !== null) {
+							optionProps.dangerouslySetInnerHTML = {
+								__html: ReactDOMServer.renderToStaticMarkup(option.label as React.ReactElement)
+							}
+						} else {
+							optionProps.children = option.label
+						}
+						return <option {...optionProps} />
+					})}
 				</select>
 			</div>
 		)

@@ -2,227 +2,169 @@ import * as React from 'react'
 import { Manager, Popper, Reference } from 'react-popper'
 import { Button, Dropdown, Link } from '../../../components'
 import { Portal } from '../../../components/ui/Portal'
+import { RequestChange } from '../../../state/request'
 import {
 	AccessorTreeRoot,
+	DataBindingError,
 	EntityAccessor,
 	EntityCollectionAccessor,
 	EntityListDataProvider,
+	EntityListDataProviderProps,
 	Environment,
 	EnvironmentContext,
-	Field,
 	FieldAccessor,
-	RendererProps
+	FieldText,
+	RendererProps,
+	ToOne
 } from '../../index'
 import { QueryLanguage } from '../../queryLanguage'
 import { LoadingSpinner } from '../renderers/userFeedback'
 
-export interface DimensionsSwitcherProps extends DimensionsSwitcher.DimensionsRendererProps {
-	entityName: string
+export interface DimensionsSwitcherBaseProps extends Omit<DimensionsSwitcher.DimensionsRendererProps, 'labelFactory'> {
+	options: string
+	orderBy?: EntityListDataProviderProps<unknown>['orderBy']
 }
+
+export type DimensionsSwitcherProps = DimensionsSwitcherBaseProps &
+	({ labelField: string } | { children: DimensionsSwitcher.DimensionsRendererProps['labelFactory'] })
 
 class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 	static defaultProps: Partial<DimensionsSwitcherProps> = {
+		minItems: 1,
 		maxItems: 2
 	}
 
 	render() {
+		this.validateProps()
+
+		const labelFactory: React.ReactNode =
+			'labelField' in this.props ? <FieldText name={this.props.labelField} /> : this.props.children
+
+		const metadata = QueryLanguage.wrapQualifiedEntityList(this.props.options, labelFactory, new Environment())
+
 		return (
 			<EntityListDataProvider<DimensionsSwitcher.DimensionsRendererProps>
-				entityName={this.props.entityName}
+				entityName={metadata.entityName}
 				immutable={true}
+				orderBy={this.props.orderBy}
 				renderer={DimensionsSwitcher.DimensionsRenderer}
 				rendererProps={{
 					buttonProps: this.props.buttonProps,
+					defaultValue: this.props.defaultValue,
 					dimension: this.props.dimension,
-					emptyText: this.props.emptyText,
-					labelName: this.props.labelName,
+					labelFactory: labelFactory,
+					minItems: this.props.minItems,
 					maxItems: this.props.maxItems,
-					renderSelectedText: this.props.renderSelectedText,
-					valueName: this.props.valueName
+					renderSelected: this.props.renderSelected,
+					slugField: this.props.slugField
 				}}
 			>
-				<DimensionsSwitcher.Item labelName={this.props.labelName} valueName={this.props.valueName} />
+				{metadata.children}
+				<FieldText name={this.props.slugField} />
 			</EntityListDataProvider>
 		)
+	}
+
+	private validateProps() {
+		if (this.props.minItems > this.props.maxItems) {
+			throw new DataBindingError(
+				`DimensionSwitcher: 'minItems' for dimension ${this.props.dimension} must be no greater than 'maxItems'.`
+			)
+		}
+		if (this.props.minItems < 1) {
+			throw new DataBindingError(
+				`DimensionSwitcher: 'minItems' for dimension ${this.props.dimension} must be at least 1.`
+			)
+		}
+		if (this.props.defaultValue.length < this.props.minItems || this.props.defaultValue.length > this.props.maxItems) {
+			throw new DataBindingError(
+				`DimensionSwitcher: the number of default values for dimension ${this.props.dimension} must not be between` +
+					`'minItems' and 'maxItems'.`
+			)
+		}
 	}
 }
 
 namespace DimensionsSwitcher {
-	export interface ItemProps {
-		labelName: string
-		valueName: string
-	}
-
-	export class Item extends React.PureComponent<ItemProps> {
-		public static displayName = 'DimensionSwitcherItem'
-		public render() {
-			return null
-		}
-		public static generateSyntheticChildren(props: ItemProps, environment: Environment): React.ReactNode {
-			return (
-				<>
-					{QueryLanguage.wrapRelativeSingleField(
-						props.labelName,
-						fieldName => (
-							<Field name={fieldName} />
-						),
-						environment
-					)}
-					{QueryLanguage.wrapRelativeSingleField(
-						props.valueName,
-						fieldName => (
-							<Field name={fieldName} />
-						),
-						environment
-					)}
-				</>
-			)
-		}
-	}
+	export type SelectedDimensionRenderer = (dimensionData: StatefulDimensionDatum<true>[]) => React.ReactNode
 
 	export interface DimensionsRendererProps {
-		dimension: string
-		labelName: string
-		valueName: string
-		maxItems: number
-		emptyText: React.ReactNode
-		renderSelectedText?: (dimensionData: NormalizedDimensionData[]) => React.ReactNode
 		buttonProps?: any // Pick<IButtonProps, Exclude<keyof IButtonProps, 'text'>>
+		defaultValue: DimensionDatum[]
+		dimension: string
+		labelFactory: React.ReactNode
+		maxItems: number
+		minItems: number
+		renderSelected?: SelectedDimensionRenderer
+		slugField: string
 	}
 
-	interface DimensionsRendererState {
-		isAdding: boolean
-		isOpen: boolean
-	}
-
-	interface NormalizedDimensionData {
+	export interface DimensionDatum {
 		slug: string
-		label: string
-		isSelected: boolean
+		label: React.ReactNode
+	}
+	export interface StatefulDimensionDatum<IsSelected extends boolean = boolean> extends DimensionDatum {
+		isSelected: IsSelected
 	}
 
-	export class DimensionsRenderer extends React.Component<
-		RendererProps & DimensionsRendererProps,
-		DimensionsRendererState
-	> {
-		static defaultProps: Partial<DimensionsSwitcherProps> = {
-			maxItems: 2
+	export const DimensionsRenderer = (props: RendererProps & DimensionsRendererProps) => {
+		const environment = React.useContext(EnvironmentContext)
+		const [isAdding, setIsAdding] = React.useState(false)
+		const [isOpen, setIsOpen] = React.useState(false)
+
+		const toggleIsOpen = React.useCallback(() => setIsOpen(!isOpen), [isOpen])
+		const startAdding = React.useCallback(() => setIsAdding(true), [])
+
+		const renderSelected = (dimensionData: StatefulDimensionDatum[]): React.ReactNode => {
+			const normalizedSelected = dimensionData.filter((item): item is StatefulDimensionDatum<true> => item.isSelected)
+			const renderer = props.renderSelected || renderByJoining
+
+			return renderer(normalizedSelected)
 		}
 
-		state: DimensionsRendererState = {
-			isAdding: false,
-			isOpen: false
-		}
-
-		public render() {
-			return (
-				<EnvironmentContext.Consumer>
-					{environment => {
-						const uniqueDimensions = this.getUniqueDimensions(
-							environment.getAllDimensions()[this.props.dimension] || []
-						)
-						const normalizedData = this.getNormalizedData(uniqueDimensions, this.props.data)
-
-						return (
-							<Manager>
-								<Reference>
-									{({ ref }) => (
-										<Button
-											ref={ref}
-											onClick={() => this.setState(p => ({ ...p, isOpen: !p.isOpen, isAdding: false }))}
-										>
-											{this.renderTarget(normalizedData)}
-										</Button>
-									)}
-								</Reference>
-								{this.state.isOpen && (
-									<Portal>
-										<Popper placement="auto">
-											{({ ref, style, placement, arrowProps }) => (
-												<div ref={ref} style={{ ...style, zIndex: 20 }} data-placement={placement}>
-													{this.renderContent(normalizedData, uniqueDimensions)}
-													<div ref={arrowProps.ref} style={arrowProps.style} />
-												</div>
-											)}
-										</Popper>
-									</Portal>
-								)}
-							</Manager>
-						)
-					}}
-				</EnvironmentContext.Consumer>
-			)
-		}
-
-		private renderTarget(dimensionData: undefined | NormalizedDimensionData[]): React.ReactNode {
-			let text: React.ReactNode
-
-			if (dimensionData) {
-				const normalizedSelected = dimensionData.filter(item => item.isSelected)
-
-				if (normalizedSelected.length) {
-					if (this.props.renderSelectedText) {
-						text = this.props.renderSelectedText(normalizedSelected)
-					} else {
-						text = normalizedSelected.map(datum => datum.label).join(', ')
-					}
-				} else {
-					text = this.props.emptyText
-				}
-			} else {
-				text = this.props.emptyText
-			}
-			return text
-		}
-
-		private renderContent(dimensionData: undefined | NormalizedDimensionData[], selectedDimensions: string[]) {
-			if (!dimensionData) {
-				return <LoadingSpinner />
-			}
+		const renderContent = (dimensionData: StatefulDimensionDatum[], selectedDimensions: string[]) => {
 			const selectedDimensionsCount = selectedDimensions.length
-			const canSelectAnother = selectedDimensionsCount < this.props.maxItems
-			const columnCount = selectedDimensionsCount + (this.state.isAdding && canSelectAnother ? 1 : 0)
+			const canSelectAnother = selectedDimensionsCount < props.maxItems
+			const columnCount = selectedDimensionsCount + (isAdding && canSelectAnother ? 1 : 0)
+			const getRequestChangeCallback = (i: number, dimension: StatefulDimensionDatum): RequestChange => reqState => {
+				if (reqState.name !== 'project_page') {
+					return reqState
+				}
+				const dimensionName = props.dimension
+				const dimensions = [...selectedDimensions]
+				if (dimensions[i] === dimension.slug) {
+					dimensions.splice(i, 1)
+				} else {
+					dimensions[i] = dimension.slug
+				}
+				return {
+					...reqState,
+					dimensions: {
+						...(reqState.dimensions || {}),
+						[dimensionName]: getUniqueDimensions(dimensions)
+					}
+				}
+			}
 
 			return (
 				<Dropdown columns>
-					{[...Array(columnCount)].map((_, i) => {
-						return (
-							<Dropdown.Column key={i}>
-								{dimensionData.map(dimension => {
-									const active = selectedDimensions[i] === dimension.slug
-									return (
-										<Link
-											key={dimension.slug}
-											Component={({ href, onClick }) => (
-												<Dropdown.Item {...{ href, onClick, active }}>{dimension.label}</Dropdown.Item>
-											)}
-											requestChange={reqState => {
-												if (reqState.name !== 'project_page') {
-													return reqState
-												}
-												const dimensionName = this.props.dimension
-												const dimensions = [...selectedDimensions]
-												if (dimensions[i] === dimension.slug) {
-													dimensions.splice(i, 1)
-												} else {
-													dimensions[i] = dimension.slug
-												}
-												return {
-													...reqState,
-													dimensions: {
-														...(reqState.dimensions || {}),
-														[dimensionName]: this.getUniqueDimensions(dimensions)
-													}
-												}
-											}}
-										/>
-									)
-								})}
-							</Dropdown.Column>
-						)
-					})}
-					{!this.state.isAdding && canSelectAnother && (
-						<Button onClick={() => this.setState({ isAdding: true })} small>
+					{[...Array(columnCount)].map((_, i) => (
+						<Dropdown.Column key={i}>
+							{dimensionData.map(dimension => (
+								<Link
+									key={dimension.slug}
+									Component={({ href, onClick }) => (
+										<Dropdown.Item {...{ href, onClick, active: selectedDimensions[i] === dimension.slug }}>
+											{dimension.label}
+										</Dropdown.Item>
+									)}
+									requestChange={getRequestChangeCallback(i, dimension)}
+								/>
+							))}
+						</Dropdown.Column>
+					))}
+					{!isAdding && canSelectAnother && (
+						<Button onClick={startAdding} small>
 							Add
 						</Button>
 					)}
@@ -230,32 +172,34 @@ namespace DimensionsSwitcher {
 			)
 		}
 
-		private getNormalizedData(
-			currentDimensions: string[],
-			data?: AccessorTreeRoot
-		): undefined | NormalizedDimensionData[] {
+		const getNormalizedData = (currentDimensions: string[], data?: AccessorTreeRoot): StatefulDimensionDatum[] => {
 			if (!data) {
-				return undefined
+				return currentDimensions.map(dimension => {
+					return {
+						slug: dimension,
+						label: dimension, // We don't have the data to match the defaults with so this is better than nothing
+						isSelected: true
+					}
+				})
 			}
 			const entities = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
-			const normalized: NormalizedDimensionData[] = []
+			const normalized: StatefulDimensionDatum[] = []
 
 			for (const entity of entities) {
 				if (!(entity instanceof EntityAccessor)) {
 					continue
 				}
-				const slug = entity.data.getField(this.props.valueName)
-				const label = entity.data.getField(this.props.labelName)
+				const slug = entity.data.getField(props.slugField)
+				const label = <ToOne.AccessorRenderer accessor={entity}>{props.labelFactory}</ToOne.AccessorRenderer>
 
-				if (slug instanceof FieldAccessor && label instanceof FieldAccessor) {
+				if (slug instanceof FieldAccessor) {
 					const slugValue = slug.currentValue
-					const labelValue = label.currentValue
 
-					if (typeof slugValue === 'string' && typeof labelValue === 'string') {
+					if (typeof slugValue === 'string') {
 						normalized.push({
 							slug: slugValue,
-							label: labelValue,
-							isSelected: currentDimensions.indexOf(slugValue) !== -1
+							isSelected: currentDimensions.indexOf(slugValue) !== -1,
+							label
 						})
 					}
 				}
@@ -264,9 +208,50 @@ namespace DimensionsSwitcher {
 			return normalized
 		}
 
-		private getUniqueDimensions(selectedDimensions: string[]): string[] {
+		const getUniqueDimensions = (selectedDimensions: string[]): string[] => {
 			return selectedDimensions.filter((item, i, array) => array.indexOf(item) === i)
 		}
+
+		const uniqueDimensions = getUniqueDimensions(environment.getAllDimensions()[props.dimension] || [])
+		const normalizedData = getNormalizedData(uniqueDimensions, props.data)
+
+		return (
+			<Manager>
+				<Reference>
+					{({ ref }) => (
+						<Button ref={ref} onClick={toggleIsOpen}>
+							{renderSelected(normalizedData)}
+						</Button>
+					)}
+				</Reference>
+				{isOpen && (
+					<Portal>
+						<Popper placement="auto">
+							{({ ref, style, placement, arrowProps }) => (
+								<div ref={ref} style={{ ...style, zIndex: 20 }} data-placement={placement}>
+									{renderContent(normalizedData, uniqueDimensions)}
+									<div ref={arrowProps.ref} style={arrowProps.style} />
+								</div>
+							)}
+						</Popper>
+					</Portal>
+				)}
+			</Manager>
+		)
+	}
+
+	const renderByJoining: SelectedDimensionRenderer = dimensionData => {
+		const output: React.ReactNode[] = []
+
+		for (const [i, dimension] of dimensionData.entries()) {
+			output.push(<React.Fragment key={dimension.slug}>{dimension.label}</React.Fragment>)
+
+			if (i + 1 < dimensionData.length) {
+				output.push(<React.Fragment key={`${dimension.slug}_separator`}>{', '}</React.Fragment>)
+			}
+		}
+
+		return output
 	}
 }
 

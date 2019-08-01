@@ -10,23 +10,21 @@
 		height: $layout-navbar-height
 		padding: 1rem $spacing-extraLarge
 		z-index: 19
-		background-color: $layout-background-color
-		color: $layout-text-color
-		border-bottom: rem(1px) solid #EAEDF3
+		background-color: var(--navbar-background-color)
+		color: var(--navbar-color)
 
 	&-container
 		display: flex
-		background: #fbfbfd
+		background-color: var(--layout-background-color)
 
 	&-side
 		+sticky($layout-navbar-height null null)
 		width: rem(270px)
 		max-width: 80vw
-		border-right: rem(1px) solid #EAEDF3
+		border-right: rem(1px) solid var(--side-border-color)
 		height: calc(100vh - #{$layout-navbar-height})
 		z-index: 19
-		background-color: $layout-background-color
-		color: $layout-text-color
+		background-color: var(--side-background-color)
 		overflow-y: auto
 
 	&-menuBtn

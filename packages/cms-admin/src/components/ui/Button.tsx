@@ -13,6 +13,7 @@ interface ButtonInnerProps<T> {
 	disabled?: boolean
 	noBorder?: boolean
 	small?: boolean
+	large?: boolean
 	minimal?: boolean
 	Component?: React.ReactType<ComponentProps & T> | any // Hotfix
 }
@@ -33,6 +34,7 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 			disabled,
 			noBorder,
 			small,
+			large,
 			minimal,
 			children,
 			forwardRef,
@@ -46,6 +48,7 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 				intent && `view-${intent}`,
 				noBorder && 'button-noBorder',
 				small && 'button-small',
+				large && 'button-large',
 				minimal && 'button-minimal'
 			),
 			ref: forwardRef,

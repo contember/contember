@@ -6,11 +6,16 @@
 	$shadow-color: rgba(22, 29, 37, 0.05)
 	box-shadow: 0 rem(1px) rem(1px) $shadow-color, inset 0 rem(2px) 0 rgba(255, 255, 255, 0.05)
 	border-radius: rem(4px)
-	padding: $spacing-small $spacing-normal
+	padding: $spacing-extraSmall ($spacing-large / 2)
 	margin: $spacing-small 0
+	font-size: $fs-small
 
 	&-small
-		padding: $spacing-small
+		padding: $spacing-extraSmall
+
+	&-large
+		font-size: $fs-normal
+		padding: $spacing-small $spacing-normal
 
 	$color: #F6F7F9
 	color: $c-text

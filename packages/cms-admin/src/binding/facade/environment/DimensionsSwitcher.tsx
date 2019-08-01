@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Manager, Popper, Reference } from 'react-popper'
-import { Button, Dropdown, Link } from '../../../components'
+import { Button, Checkbox, Link } from '../../../components'
 import { Portal } from '../../../components/ui/Portal'
 import { RequestChange } from '../../../state/request'
 import {
@@ -108,66 +108,64 @@ namespace DimensionsSwitcher {
 
 	export const DimensionsRenderer = (props: RendererProps & DimensionsRendererProps) => {
 		const environment = React.useContext(EnvironmentContext)
-		const [isAdding, setIsAdding] = React.useState(false)
 		const [isOpen, setIsOpen] = React.useState(false)
 
 		const toggleIsOpen = React.useCallback(() => setIsOpen(!isOpen), [isOpen])
-		const startAdding = React.useCallback(() => setIsAdding(true), [])
 
-		const renderSelected = (dimensionData: StatefulDimensionDatum[]): React.ReactNode => {
-			const normalizedSelected = dimensionData.filter((item): item is StatefulDimensionDatum<true> => item.isSelected)
+		const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
 			const renderer = props.renderSelected || renderByJoining
 
-			return renderer(normalizedSelected)
+			return renderer(selectedDimensions)
 		}
 
-		const renderContent = (dimensionData: StatefulDimensionDatum[], selectedDimensions: string[]) => {
-			const selectedDimensionsCount = selectedDimensions.length
-			const canSelectAnother = selectedDimensionsCount < props.maxItems
-			const columnCount = selectedDimensionsCount + (isAdding && canSelectAnother ? 1 : 0)
-			const getRequestChangeCallback = (i: number, dimension: StatefulDimensionDatum): RequestChange => reqState => {
+		const renderContent = (
+			dimensionData: StatefulDimensionDatum[],
+			selectedDimensions: StatefulDimensionDatum<true>[]
+		) => {
+			//const selectedDimensionsCount = selectedDimensions.length
+			//const canSelectAnother = selectedDimensionsCount < props.maxItems
+			const getRequestChangeCallback = (dimension: StatefulDimensionDatum): RequestChange => reqState => {
+				console.log('xxx', dimension)
 				if (reqState.name !== 'project_page') {
 					return reqState
 				}
-				const dimensionName = props.dimension
-				const dimensions = [...selectedDimensions]
-				if (dimensions[i] === dimension.slug) {
-					dimensions.splice(i, 1)
-				} else {
-					dimensions[i] = dimension.slug
-				}
+
+				const updatedDimensions = dimensionData
+					.filter(item => {
+						if (item.slug === dimension.slug) {
+							return !item.isSelected
+						}
+						return item.isSelected
+					})
+					.map(item => item.slug)
+
 				return {
 					...reqState,
 					dimensions: {
 						...(reqState.dimensions || {}),
-						[dimensionName]: getUniqueDimensions(dimensions)
+						[props.dimension]: getUniqueDimensions(updatedDimensions)
 					}
 				}
 			}
 
 			return (
-				<Dropdown columns>
-					{[...Array(columnCount)].map((_, i) => (
-						<Dropdown.Column key={i}>
-							{dimensionData.map(dimension => (
-								<Link
-									key={dimension.slug}
-									Component={({ href, onClick }) => (
-										<Dropdown.Item {...{ href, onClick, active: selectedDimensions[i] === dimension.slug }}>
-											{dimension.label}
-										</Dropdown.Item>
-									)}
-									requestChange={getRequestChangeCallback(i, dimension)}
-								/>
-							))}
-						</Dropdown.Column>
+				<ul>
+					{dimensionData.map(dimension => (
+						<li key={dimension.slug}>
+							<Link
+								Component={({ onClick }) => (
+									<Checkbox
+										key={dimension.slug}
+										checked={dimension.isSelected}
+										label={dimension.label}
+										onChange={() => onClick()}
+									/>
+								)}
+								requestChange={getRequestChangeCallback(dimension)}
+							/>
+						</li>
 					))}
-					{!isAdding && canSelectAnother && (
-						<Button onClick={startAdding} small>
-							Add
-						</Button>
-					)}
-				</Dropdown>
+				</ul>
 			)
 		}
 
@@ -213,10 +211,11 @@ namespace DimensionsSwitcher {
 
 		const uniqueDimensions = getUniqueDimensions(environment.getAllDimensions()[props.dimension] || [])
 		const normalizedData = getNormalizedData(uniqueDimensions, props.data)
+		const selectedDimensions = normalizedData.filter((item): item is StatefulDimensionDatum<true> => item.isSelected)
 
 		if (normalizedData.length === 1) {
 			// If there is just one alternative to choose from, render no drop-downs
-			return <>renderSelected(normalizedData)</>
+			return <>{renderSelected(selectedDimensions)}</>
 		}
 
 		return (
@@ -224,7 +223,7 @@ namespace DimensionsSwitcher {
 				<Reference>
 					{({ ref }) => (
 						<Button ref={ref} onClick={toggleIsOpen}>
-							{renderSelected(normalizedData)}
+							{renderSelected(selectedDimensions)}
 						</Button>
 					)}
 				</Reference>
@@ -233,7 +232,7 @@ namespace DimensionsSwitcher {
 						<Popper placement="auto">
 							{({ ref, style, placement, arrowProps }) => (
 								<div ref={ref} style={{ ...style, zIndex: 20 }} data-placement={placement}>
-									{renderContent(normalizedData, uniqueDimensions)}
+									{renderContent(normalizedData, selectedDimensions)}
 									<div ref={arrowProps.ref} style={arrowProps.style} />
 								</div>
 							)}

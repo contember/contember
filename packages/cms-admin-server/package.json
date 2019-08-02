@@ -5,7 +5,6 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"build": "tsc --build --verbose"
 	},
 	"bin": {
 		"run-admin": "dist/src/run-admin.js"

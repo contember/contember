@@ -1,0 +1,50 @@
+@import '../common'
+
+.checkbox
+	$root: &
+
+	&-in
+		position: relative
+		display: flex
+		align-items: center
+		font-size: $fs-small
+		cursor: pointer
+		line-height: 1.2
+
+	input
+		opacity: 0
+		position: absolute
+		pointer-events: none
+
+	&-label
+		margin-right: 0.5em
+
+	&-box
+		position: relative
+		width: 1em
+		height: 1em
+		border-radius: rem(2px)
+		border: rem(1px) solid #D8DCE6
+
+	input:checked ~ #{$root}
+		&-box
+			&::before
+				content: ''
+				position: absolute
+				bottom: 15%
+				right: 60%
+				border-bottom: rem(2px) solid
+				border-right: rem(2px) solid
+				width: 0.4em
+				height: 0.7em
+				transform-origin: 100% 100%
+				transform: rotate(45deg)
+
+	&-in:hover,
+	&-in:focus
+		& #{$root}-box
+			box-shadow: 0 0 2px #00000055
+
+	input:disabled ~ #{$root}
+		&-box
+			opacity: 0.5

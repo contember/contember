@@ -5,6 +5,7 @@ import { FieldName } from '../../bindingTypes'
 import { Field } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
 import { SimpleRelativeSingleField } from '../auxiliary'
+import { FormErrors } from '../../../components/ui/FormErrors'
 
 export interface CheckboxFieldProps {
 	name: FieldName
@@ -19,14 +20,19 @@ const renderCheckboxField: React.FunctionComponent<CheckboxFieldProps> = (props:
 	return (
 		<Field<boolean> name={props.name}>
 			{({ data, isMutating, environment, errors }): React.ReactNode => (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
-					<input
-						type="checkbox"
-						readOnly={isMutating}
-						checked={!!data.currentValue}
-						onChange={generateOnChange(data)}
-					/>
-				</FormGroup>
+				<div className="checkbox">
+					<FormErrors errors={errors} />
+					<label className="checkbox-in">
+						<input
+							type="checkbox"
+							readOnly={isMutating}
+							checked={!!data.currentValue}
+							onChange={generateOnChange(data)}
+						/>
+						<span className="checkbox-label">{environment.applySystemMiddleware('labelMiddleware', props.label)}</span>
+						<span className="checkbox-box" />
+					</label>
+				</div>
 			)}
 		</Field>
 	)

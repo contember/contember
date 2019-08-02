@@ -21,7 +21,7 @@ class S3 {
 
 	public getSignedUrl(contentType: string): { objectKey: string; url: string; bucket: string; publicUrl: string } {
 		const ext = extension(contentType) || 'bin'
-		const objectKey = `${this.config.prefix}/${uuid()}.${ext}`
+		const objectKey = (this.config.prefix ? this.config.prefix + '/' : '') + `${uuid()}.${ext}`
 		const bucket = this.config.bucket
 		const url = this.s3.getSignedUrl('putObject', {
 			Bucket: bucket,

@@ -14,11 +14,11 @@ export class FormGroup extends React.PureComponent<FormGroupProps> {
 		const { label, children, horizontal } = this.props
 
 		return (
-			<label className={cn('formGroup', horizontal && 'formGroup-horizontal')}>
+			<div className={cn('formGroup', horizontal && 'formGroup-horizontal')}>
 				{label && <div className="formGroup-label">{label}</div>}
 				<FormErrors errors={this.props.errors} />
-				<div className="formGroup-field"> {children}</div>
-			</label>
+				<div className="formGroup-field">{children}</div>
+			</div>
 		)
 	}
 }

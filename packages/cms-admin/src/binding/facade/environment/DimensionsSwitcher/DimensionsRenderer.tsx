@@ -163,7 +163,11 @@ export const DimensionsRenderer = (props: RendererProps & DimensionsRendererProp
 
 	if (normalizedData.length === 1) {
 		// If there is just one alternative to choose from, render no drop-downs
-		return <div className="dimensionsSwitcher-staticSelected">{renderSelected(selectedDimensions)}</div>
+		return (
+			<div className="dimensionsSwitcher">
+				<div className="dimensionsSwitcher-staticSelected">{renderSelected(selectedDimensions)}</div>
+			</div>
+		)
 	}
 
 	return (

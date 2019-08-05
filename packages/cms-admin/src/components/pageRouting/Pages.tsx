@@ -32,6 +32,10 @@ function isPageElement(el: any): el is PageElement {
 	}
 }
 
+function isPageList(children: React.ReactNodeArray): children is PageChild[] {
+	return children.every(child => isPageElement(child) || isPageProvider(child))
+}
+
 export type Parameters = any
 export const ParametersContext = React.createContext<Parameters>({})
 
@@ -40,29 +44,39 @@ export const LayoutContext = React.createContext<React.ComponentType<{ children?
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
-class Pages extends React.Component<PagesProps & PagesStateProps> {
+class Pages extends React.PureComponent<PagesProps & PagesStateProps> {
 	render() {
 		if (!this.props.children) return null
-		let children: unknown[] = Array.isArray(this.props.children) ? this.props.children : [this.props.children]
+		const children: React.ReactNodeArray = Array.isArray(this.props.children)
+			? this.props.children
+			: [this.props.children]
 
-		if (children.some(child => !isPageElement(child) && !isPageProvider(child))) {
+		if (!isPageList(children)) {
 			throw new Error('Pages has a child which is not a Page')
 		}
 
-		const matchedPage = (children as PageChild[]).find(
-			child => (isPageProvider(child) ? child.type.getPageName(child.props) : child.props.name) === this.props.name
+		const pageNames = children.map(child =>
+			isPageProvider(child) ? child.type.getPageName(child.props) : child.props.name
 		)
-		if (matchedPage === undefined) {
+		const matchedPageIndex = pageNames.findIndex(name => name === this.props.name)
+
+		if (matchedPageIndex === -1) {
 			throw new Error(`No such page as ${this.props.name}.`)
 		}
+		const matchedPage = children[matchedPageIndex]
+		const pageName = pageNames[matchedPageIndex]
 
 		const isProvider = isPageProvider(matchedPage)
 		return (
 			<LayoutContext.Provider value={this.props.layout || React.Fragment}>
 				{isProvider && (
-					<ParametersContext.Provider value={this.props.parameters}>{matchedPage}</ParametersContext.Provider>
+					<ParametersContext.Provider value={this.props.parameters}>
+						<React.Fragment key={pageName}>{matchedPage}</React.Fragment>
+					</ParametersContext.Provider>
 				)}
-				{isProvider || matchedPage.props.children(this.props.parameters)}
+				{isProvider || (
+					<React.Fragment key={pageName}>{matchedPage.props.children(this.props.parameters)}</React.Fragment>
+				)}
 			</LayoutContext.Provider>
 		)
 	}

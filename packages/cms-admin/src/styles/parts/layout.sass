@@ -9,13 +9,14 @@
 		align-items: center
 		height: $layout-navbar-height
 		padding: 1rem $spacing-extraLarge
-		z-index: 20
+		z-index: 5
 		background-color: var(--navbar-background-color)
 		color: var(--navbar-color)
 
 	&-container
 		display: flex
 		background-color: var(--layout-background-color)
+		z-index: 0
 
 	&-side
 		+sticky($layout-navbar-height null null)
@@ -23,7 +24,7 @@
 		max-width: 80vw
 		border-right: rem(1px) solid var(--side-border-color)
 		height: calc(100vh - #{$layout-navbar-height})
-		z-index: 19
+		z-index: 2
 		background-color: var(--side-background-color)
 		overflow-y: auto
 
@@ -32,6 +33,7 @@
 
 	&-menuShadow
 		display: none
+		z-index: 1
 
 	+media($break768M)
 		&-side
@@ -65,6 +67,7 @@
 		flex-grow: 1
 		max-width: 50rem
 		margin: 0 auto
+		z-index: 0
 
 		&-title
 			margin: 0

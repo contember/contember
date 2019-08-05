@@ -244,7 +244,7 @@ namespace DimensionsSwitcher {
 			return selectedDimensions.filter((item, i, array) => array.indexOf(item) === i)
 		}
 
-		const uniqueDimensions = getUniqueDimensions(environment.getAllDimensions()[props.dimension] || [])
+		const uniqueDimensions = getUniqueDimensions(environment.getDimension(props.dimension) || [])
 		const normalizedData = getNormalizedData(uniqueDimensions, props.data)
 		const selectedDimensions = normalizedData.filter((item): item is StatefulDimensionDatum<true> => item.isSelected)
 

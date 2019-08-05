@@ -191,6 +191,7 @@ namespace DimensionsSwitcher {
 											key={dimension.slug}
 											checked={dimension.isSelected}
 											label={dimension.label}
+											readOnly={dimension.isSelected && !canSelectLess}
 											onChange={() => onClick()}
 										/>
 									)

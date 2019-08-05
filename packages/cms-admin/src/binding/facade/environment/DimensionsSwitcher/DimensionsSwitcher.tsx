@@ -23,7 +23,7 @@ export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {
 	children?: DimensionsRendererProps['labelFactory']
 }
 
-export const DimensionsSwitcher: React.FunctionComponent<DimensionsSwitcherProps> = props => {
+export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) => {
 	const minItems = props.minItems === undefined ? 1 : props.minItems
 	const maxItems = props.maxItems === undefined ? 2 : props.maxItems
 
@@ -72,6 +72,6 @@ export const DimensionsSwitcher: React.FunctionComponent<DimensionsSwitcherProps
 			{metadata.children}
 		</EntityListDataProvider>
 	)
-}
+})
 
 DimensionsSwitcher.displayName = 'DimensionsSwitcher'

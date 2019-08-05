@@ -21,7 +21,7 @@ export interface DimensionsRendererProps {
 	slugField: string
 }
 
-export const DimensionsRenderer = (props: RendererProps & DimensionsRendererProps) => {
+export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsRendererProps) => {
 	const environment = React.useContext(EnvironmentContext)
 	const [isOpen, setIsOpen] = React.useState(false)
 
@@ -178,4 +178,4 @@ export const DimensionsRenderer = (props: RendererProps & DimensionsRendererProp
 			{isOpen && <div className="dimensionsSwitcher-content">{renderContent(normalizedData, selectedDimensions)}</div>}
 		</div>
 	)
-}
+})

@@ -1,6 +1,7 @@
 import * as React from 'react'
+import cn from 'classnames'
 import { Manager, Popper, Reference } from 'react-popper'
-import { Button, Checkbox, Link } from '../../../components'
+import { Button, Checkbox, Dropdown, Link } from '../../../components'
 import { DynamicLink } from '../../../components/DynamicLink'
 import { Portal } from '../../../components/ui/Portal'
 import { RequestChange } from '../../../state/request'
@@ -167,9 +168,9 @@ namespace DimensionsSwitcher {
 			}
 
 			return (
-				<ul>
+				<Dropdown>
 					{dimensionData.map(dimension => (
-						<li key={dimension.slug}>
+						<Dropdown.Item key={dimension.slug} active={dimension.isSelected}>
 							{canSelectJustOne && (
 								<Link
 									requestChange={getRequestChangeCallback(dimension)}
@@ -203,9 +204,9 @@ namespace DimensionsSwitcher {
 									)}
 								/>
 							)}
-						</li>
+						</Dropdown.Item>
 					))}
-				</ul>
+				</Dropdown>
 			)
 		}
 
@@ -257,31 +258,18 @@ namespace DimensionsSwitcher {
 
 		if (normalizedData.length === 1) {
 			// If there is just one alternative to choose from, render no drop-downs
-			return <>{renderSelected(selectedDimensions)}</>
+			return <div className="dimensionsSwitcher-staticSelected">{renderSelected(selectedDimensions)}</div>
 		}
 
 		return (
-			<Manager>
-				<Reference>
-					{({ ref }) => (
-						<Button ref={ref} onClick={toggleIsOpen}>
-							{renderSelected(selectedDimensions)}
-						</Button>
-					)}
-				</Reference>
+			<div className="dimensionsSwitcher">
+				<Button onClick={toggleIsOpen} className="dimensionsSwitcher-button">
+					{renderSelected(selectedDimensions)}
+				</Button>
 				{isOpen && (
-					<Portal>
-						<Popper placement="auto">
-							{({ ref, style, placement, arrowProps }) => (
-								<div ref={ref} style={{ ...style, zIndex: 20 }} data-placement={placement}>
-									{renderContent(normalizedData, selectedDimensions)}
-									<div ref={arrowProps.ref} style={arrowProps.style} />
-								</div>
-							)}
-						</Popper>
-					</Portal>
+					<div className="dimensionsSwitcher-content">{renderContent(normalizedData, selectedDimensions)}</div>
 				)}
-			</Manager>
+			</div>
 		)
 	}
 

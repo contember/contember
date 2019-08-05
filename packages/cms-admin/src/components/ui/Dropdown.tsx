@@ -12,20 +12,19 @@ namespace Dropdown {
 		columns?: boolean
 	}
 
-	export const Column: React.FunctionComponent<{}> = props => <ul className="dropdown-column">{props.children}</ul>
-
-	export interface ItemProps {
-		href?: React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>['href']
-		onClick?: React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>['onClick']
-		active?: boolean
+	export interface ColumnProps {
+		children?: React.ReactNode
 	}
 
-	export const Item: React.FunctionComponent<ItemProps> = props => (
-		<li className="dropdown-item">
-			<a className={cn('dropdown-link', props.active && 'is-active')} href={props.href} onClick={props.onClick}>
-				{props.children}
-			</a>
-		</li>
+	export const Column = (props: ColumnProps) => <ul className="dropdown-column">{props.children}</ul>
+
+	export interface ItemProps {
+		active?: boolean
+		children?: React.ReactNode
+	}
+
+	export const Item = (props: ItemProps) => (
+		<li className={cn('dropdown-item', props.active && 'is-active')}>{props.children}</li>
 	)
 }
 

@@ -31,12 +31,13 @@ export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {
 }
 
 class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
-	static defaultProps: Partial<DimensionsSwitcherProps> = {
+	public static displayName = 'DimensionsSwitcher'
+	public static defaultProps: Partial<DimensionsSwitcherProps> = {
 		minItems: 1,
 		maxItems: 2
 	}
 
-	render() {
+	public render() {
 		this.validateProps()
 
 		const environment = new Environment()

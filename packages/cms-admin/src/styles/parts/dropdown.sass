@@ -1,29 +1,39 @@
 @import '../common'
 
 .dropdown
+	$border-radius: rem(4px)
+	$border-width: rem(1px)
+
 	list-style: none
-	box-shadow: 0 rem(1px) rem(2px) rgba(0, 0, 0, 0.08)
-	border-radius: rem(4px)
-	border: rem(1px) solid #d8dce6
-	background-color: white
-	font-size: $fs-small
-	min-width: rem(150px)
-	display: inline-block
+	box-shadow: 0 rem(1px) rem(2px) rgba(0, 0, 0, .08)
+	border-radius: $border-radius
+	background: var(--dropdown-background-color)
+	border: $border-width solid var(--dropdown-border-color)
+	font-size: $fs-normal
 	width: fit-content
 	margin: rem(4px) 0
 
 	&-item
-		//
+		$item-border-radius: $border-radius - $border-width
 
-	&-link
-		border-bottom: rem(1px) solid #eaedf3
-		padding: $spacing-small rem(15px)
-		color: inherit
-		text-decoration: none
-		display: block
+		color: var(--dropdown-color)
+		padding: .25em .75em
 
 		&.is-active
-			background: #fbfbfd
+			background: var(--dropdown-item-selected-background-color)
+			color: var(--dropdown-item-selected-text-color)
+
+		&.is-active:hover,
+		&:hover
+			background: var(--dropdown-item-hover-background-color)
+			color: var(--dropdown-item-hover-color)
+
+		&:first-child
+			border-top-left-radius: $item-border-radius
+			border-top-right-radius: $item-border-radius
+		&:last-child
+			border-bottom-left-radius: $item-border-radius
+			border-bottom-right-radius: $item-border-radius
 
 	&.view-columns
 		display: flex

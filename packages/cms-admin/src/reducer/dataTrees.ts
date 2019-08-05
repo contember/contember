@@ -38,7 +38,7 @@ export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
 			if (action.payload === undefined) {
 				throw new ReducerError('Action payload can not be undefined')
 			}
-			const treeState = state[action.payload.dataTreeId] || {}
+			const treeState = state[action.payload.dataTreeId] || createEmptyDataTreeState()
 			return { ...state, [action.payload.dataTreeId]: { ...treeState, isDirty: action.payload.isDirty } }
 		},
 		[DATA_TREE_REQUEST_CREATE]: (state: DataTreesState, action: Action<DataTreeCreateRequest>): DataTreesState => {
@@ -87,6 +87,7 @@ export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
 					...state,
 					[action.payload.dataTreeId]: {
 						...treeState,
+						isDirty: false,
 						requests: {
 							mutation: {
 								readyState: DataTreeRequestReadyState.Uninitialized

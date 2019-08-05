@@ -81,7 +81,10 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		const { query, mutation } = this.props.requests
 		if (
 			mutation.readyState === DataTreeRequestReadyState.Pending ||
-			!(query.readyState === DataTreeRequestReadyState.Success || query.readyState === DataTreeRequestReadyState.Error)
+			query.readyState === DataTreeRequestReadyState.Pending ||
+			(query.readyState === DataTreeRequestReadyState.Uninitialized &&
+				mutation.readyState !== DataTreeRequestReadyState.Success &&
+				mutation.readyState !== DataTreeRequestReadyState.Error)
 		) {
 			if (this.state.showingErrors) {
 				this.setState({ showingErrors: false })
@@ -105,24 +108,26 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			const mutationResult: MutationRequestResult = mutation.data
 
 			console.log('mut error!', mutationResult)
-			return this.initializeAccessorTree(query.data, this.state.accessorTree, mutationResult)
+			return this.initializeAccessorTree(
+				query.readyState === DataTreeRequestReadyState.Success || query.readyState === DataTreeRequestReadyState.Error
+					? query.data
+					: undefined,
+				this.state.accessorTree,
+				mutationResult
+			)
 		}
 
 		if (query.readyState === DataTreeRequestReadyState.Success) {
 			if (prevProps.requests.query.readyState === DataTreeRequestReadyState.Pending) {
 				this.initializeAccessorTree(query.data, query.data)
-			} else if (
-				this.state.accessorTree &&
-				prevState.accessorTree &&
-				this.state.accessorTree !== prevState.accessorTree &&
-				!this.props.isDirty
-			) {
-				this.props.setDataTreeDirtiness(true)
+			} else if (this.state.accessorTree) {
+				const generator = new MutationGenerator(query.data, this.state.accessorTree, this.props.markerTree)
+				const mutation = generator.getPersistMutation() // TODO this REALLY should go off the UI thread
+				this.props.setDataTreeDirtiness(mutation !== undefined)
 			}
 		} else if (query.readyState === DataTreeRequestReadyState.Error) {
 			// TODO handle query error
-		} else {
-			return assertNever(query)
+			return
 		}
 	}
 
@@ -173,6 +178,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			}
 		} else {
 			this.initializeAccessorTree(undefined, undefined)
+			this.props.setDataTreeDirtiness(true)
 		}
 	}
 

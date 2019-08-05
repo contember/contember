@@ -107,12 +107,13 @@ export const sendDataTreeRequest = (
 	if (!('stage' in state.request) || !('project' in state.request)) {
 		return
 	}
+	const { stage, project } = state.request
 	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 
 	dispatch(initializeDataTreeRequest(dataTreeId, type))
 	try {
 		const response = await services.contentClientFactory
-			.create(state.request.project, state.request.stage)
+			.create(project, stage)
 			.request(request, {}, apiToken || undefined)
 		dispatch(handleDataTreeRequestEnd(dataTreeId, type, response))
 	} catch (error) {

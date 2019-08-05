@@ -13,6 +13,7 @@ import {
 	EntityListDataProviderProps,
 	Environment,
 	EnvironmentContext,
+	Field,
 	FieldAccessor,
 	FieldText,
 	RendererProps,
@@ -25,8 +26,9 @@ export interface DimensionsSwitcherBaseProps extends Omit<DimensionsSwitcher.Dim
 	orderBy?: EntityListDataProviderProps<unknown>['orderBy']
 }
 
-export type DimensionsSwitcherProps = DimensionsSwitcherBaseProps &
-	({ labelField: string } | { children: DimensionsSwitcher.DimensionsRendererProps['labelFactory'] })
+export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {
+	children?: DimensionsSwitcher.DimensionsRendererProps['labelFactory']
+}
 
 class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 	static defaultProps: Partial<DimensionsSwitcherProps> = {
@@ -37,10 +39,15 @@ class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 	render() {
 		this.validateProps()
 
-		const labelFactory: React.ReactNode =
-			'labelField' in this.props ? <FieldText name={this.props.labelField} /> : this.props.children
-
-		const metadata = QueryLanguage.wrapQualifiedEntityList(this.props.options, labelFactory, new Environment())
+		const environment = new Environment()
+		const children = this.props.children
+		const metadata: QueryLanguage.WrappedQualifiedEntityList | QueryLanguage.WrappedQualifiedFieldList = children
+			? QueryLanguage.wrapQualifiedEntityList(this.props.options, children, environment)
+			: QueryLanguage.wrapQualifiedFieldList(
+					this.props.options,
+					fieldName => <FieldText name={fieldName} />,
+					environment
+			  )
 
 		return (
 			<EntityListDataProvider<DimensionsSwitcher.DimensionsRendererProps>
@@ -52,7 +59,7 @@ class DimensionsSwitcher extends React.PureComponent<DimensionsSwitcherProps> {
 					buttonProps: this.props.buttonProps,
 					defaultValue: this.props.defaultValue,
 					dimension: this.props.dimension,
-					labelFactory: labelFactory,
+					labelFactory: metadata.children,
 					minItems: this.props.minItems,
 					maxItems: this.props.maxItems,
 					renderSelected: this.props.renderSelected,

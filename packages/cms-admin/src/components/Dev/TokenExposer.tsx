@@ -21,6 +21,9 @@ const TokenExposerComponent = (props: TokenExposerProps) => {
 
 	return (
 		<Button
+			style={{
+				marginLeft: '.75em'
+			}}
 			onClick={_ => {
 				if (isCopying) {
 					return

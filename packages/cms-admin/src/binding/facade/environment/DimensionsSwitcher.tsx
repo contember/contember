@@ -13,7 +13,6 @@ import {
 	EntityListDataProviderProps,
 	Environment,
 	EnvironmentContext,
-	Field,
 	FieldAccessor,
 	FieldText,
 	RendererProps,

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Manager, Popper, Reference } from 'react-popper'
 import { Button, Checkbox, Link } from '../../../components'
+import { DynamicLink } from '../../../components/DynamicLink'
 import { Portal } from '../../../components/ui/Portal'
 import { RequestChange } from '../../../state/request'
 import { isSpecialLinkClick } from '../../../utils/isSpecialLinkClick'
@@ -168,25 +169,29 @@ namespace DimensionsSwitcher {
 				<ul>
 					{dimensionData.map(dimension => (
 						<li key={dimension.slug}>
-							<Link
-								Component={({ href, onClick }) => {
-									if (canSelectJustOne) {
-										return (
-											<a
-												href={href}
-												onClick={e => {
-													if (isSpecialLinkClick(e)) {
-														return
-													}
-													setIsOpen(false)
-													onClick(e)
-												}}
-											>
-												{dimension.label}
-											</a>
-										)
-									}
-									return (
+							{canSelectJustOne && (
+								<Link
+									requestChange={getRequestChangeCallback(dimension)}
+									Component={({ href, onClick }) => (
+										<a
+											href={href}
+											onClick={e => {
+												if (isSpecialLinkClick(e)) {
+													return
+												}
+												setIsOpen(false)
+												onClick(e)
+											}}
+										>
+											{dimension.label}
+										</a>
+									)}
+								/>
+							)}
+							{!canSelectJustOne && (
+								<DynamicLink
+									requestChange={getRequestChangeCallback(dimension)}
+									Component={({ onClick }) => (
 										<Checkbox
 											key={dimension.slug}
 											checked={dimension.isSelected}
@@ -194,10 +199,9 @@ namespace DimensionsSwitcher {
 											readOnly={dimension.isSelected && !canSelectLess}
 											onChange={() => onClick()}
 										/>
-									)
-								}}
-								requestChange={getRequestChangeCallback(dimension)}
-							/>
+									)}
+								/>
+							)}
 						</li>
 					))}
 				</ul>

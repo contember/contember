@@ -246,7 +246,9 @@ namespace DimensionsSwitcher {
 
 		const uniqueDimensions = getUniqueDimensions(environment.getDimension(props.dimension) || [])
 		const normalizedData = getNormalizedData(uniqueDimensions, props.data)
-		const selectedDimensions = normalizedData.filter((item): item is StatefulDimensionDatum<true> => item.isSelected)
+		const selectedDimensions = uniqueDimensions
+			.map(dimension => normalizedData.find(item => item.slug === dimension))
+			.filter((item): item is StatefulDimensionDatum<true> => !!item && item.isSelected)
 
 		if (normalizedData.length === 1) {
 			// If there is just one alternative to choose from, render no drop-downs

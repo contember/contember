@@ -14,7 +14,7 @@ export interface FloatFieldProps {
 
 export const FloatField = SimpleRelativeSingleField<FloatFieldProps>(props => {
 	const generateOnChange = (data: FieldAccessor<number>) => (e: ChangeEvent<HTMLInputElement>) => {
-		data.onChange && data.onChange(parseFloat(e.target.value))
+		data.updateValue && data.updateValue(parseFloat(e.target.value))
 	}
 	return (
 		<Field<number> name={props.name}>

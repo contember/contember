@@ -14,7 +14,7 @@ export interface NumberFieldProps {
 
 export const NumberField = SimpleRelativeSingleField<NumberFieldProps>(props => {
 	const generateOnChange = (data: FieldAccessor<number>) => (e: ChangeEvent<HTMLInputElement>) => {
-		data.onChange && data.onChange(parseInt(e.target.value, 10))
+		data.updateValue && data.updateValue(parseInt(e.target.value, 10))
 	}
 	return (
 		<Field<number> name={props.name}>

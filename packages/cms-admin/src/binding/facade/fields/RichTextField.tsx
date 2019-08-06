@@ -17,7 +17,7 @@ export interface RichTextFieldProps {
 
 export const RichTextField = SimpleRelativeSingleField<RichTextFieldProps>(props => {
 	const generateOnChange = (data: FieldAccessor<string>) => (val: string) => {
-		data.onChange && data.onChange(val)
+		data.updateValue && data.updateValue(val)
 	}
 	return (
 		<Field<string> name={props.name}>

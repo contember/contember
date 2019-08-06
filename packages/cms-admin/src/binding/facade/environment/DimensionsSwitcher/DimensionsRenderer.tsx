@@ -102,10 +102,11 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 									<Checkbox
 										key={dimension.slug}
 										checked={dimension.isSelected}
-										label={dimension.label}
 										readOnly={dimension.isSelected && !canSelectLess}
 										onChange={() => onClick()}
-									/>
+									>
+										{dimension.label}
+									</Checkbox>
 								)}
 							/>
 						)}

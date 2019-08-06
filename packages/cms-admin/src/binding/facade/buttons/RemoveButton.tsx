@@ -2,12 +2,10 @@ import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import { Button, ButtonProps } from '../../../components'
-import { DataContext, DataContextValue, MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
+import { DataContext, MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
 import { EntityAccessor } from '../../dao'
-
-// This type is technically useless but it allows users to avoid importing EntityAccessor.RemovalType
-export type RemovalType = 'disconnect' | 'delete'
+import { RemovalType } from '../types'
 
 export interface RemoveButtonProps extends ButtonProps {
 	removeType?: RemovalType

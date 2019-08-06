@@ -1,4 +1,3 @@
-import { GraphQlBuilder } from 'cms-client'
 import { Input } from 'cms-common'
 import { Literal, VariableLiteral, VariableScalar } from './dao'
 

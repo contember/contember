@@ -23,9 +23,6 @@ export interface DimensionsRendererProps {
 
 export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsRendererProps) => {
 	const environment = React.useContext(EnvironmentContext)
-	const [isOpen, setIsOpen] = React.useState(false)
-
-	const toggleIsOpen = React.useCallback(() => setIsOpen(!isOpen), [isOpen])
 
 	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
 		const renderer = props.renderSelected || renderByJoining
@@ -86,7 +83,6 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 											if (isSpecialLinkClick(e)) {
 												return
 											}
-											setIsOpen(false)
 											onClick(e)
 										}}
 									>
@@ -173,10 +169,8 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 
 	return (
 		<div className="dimensionsSwitcher">
-			<Button onClick={toggleIsOpen} className="dimensionsSwitcher-button">
-				{renderSelected(selectedDimensions)}
-			</Button>
-			{isOpen && <div className="dimensionsSwitcher-content">{renderContent(normalizedData, selectedDimensions)}</div>}
+			<Button className="dimensionsSwitcher-button">{renderSelected(selectedDimensions)}</Button>
+			<div className="dimensionsSwitcher-content">{renderContent(normalizedData, selectedDimensions)}</div>
 		</div>
 	)
 })

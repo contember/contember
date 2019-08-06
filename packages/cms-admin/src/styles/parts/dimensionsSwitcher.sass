@@ -10,3 +10,11 @@
 	&-content
 		position: absolute
 		width: fit-content
+		visibility: hidden
+		opacity: 0
+		transition-duration: .1s
+		transition-property: visibility, opacity
+
+	&:hover &-content
+		opacity: 1
+		visibility: visible

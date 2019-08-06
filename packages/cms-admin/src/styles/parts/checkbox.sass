@@ -45,6 +45,8 @@
 		& #{$root}-box
 			box-shadow: 0 0 2px #00000055
 
-	input:disabled ~ #{$root}
+	input[readonly] ~ #{$root},
+	input[disabled] ~ #{$root}
+		&-label,
 		&-box
 			opacity: 0.5

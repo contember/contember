@@ -26,9 +26,10 @@ export const CheckboxList = Component<CheckboxListProps>(
 							key={key}
 							checked={(currentValues || []).indexOf(key) !== -1}
 							readOnly={isMutating}
-							label={label}
 							onChange={isChecked => onChange(key, isChecked)}
-						/>
+						>
+							{label}
+						</Checkbox>
 					))}
 				</FormGroup>
 			)}

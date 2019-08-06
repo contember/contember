@@ -52,7 +52,7 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 						})),
 						currentValue,
 						onChange: (newValue: ChoiceField.ValueRepresentation) => {
-							data.onChange && data.onChange(options[newValue][0])
+							data.updateValue && data.updateValue(options[newValue][0])
 						},
 						...otherMetadata
 					})

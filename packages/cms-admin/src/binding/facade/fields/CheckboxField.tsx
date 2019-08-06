@@ -13,7 +13,7 @@ export interface CheckboxFieldProps {
 
 const renderCheckboxField: React.FunctionComponent<CheckboxFieldProps> = (props: CheckboxFieldProps) => {
 	const generateOnChange = (data: FieldAccessor<boolean>) => (isChecked: boolean) => {
-		data.onChange && data.onChange(isChecked)
+		data.updateValue && data.updateValue(isChecked)
 	}
 	return (
 		<Field<boolean> name={props.name}>

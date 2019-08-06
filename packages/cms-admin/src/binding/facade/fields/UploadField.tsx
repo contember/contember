@@ -122,7 +122,7 @@ namespace UploadFieldComponent {
 			const { upload, data } = this.props.metadata
 
 			if (upload && upload.status === UploadStatus.FINISHED && upload.resultUrl !== data.currentValue) {
-				data.onChange && data.onChange(upload.resultUrl)
+				data.updateValue && data.updateValue(upload.resultUrl)
 			}
 		}
 

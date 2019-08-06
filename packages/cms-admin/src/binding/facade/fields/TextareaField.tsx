@@ -14,7 +14,7 @@ export interface TextAreaFieldProps {
 
 export const TextAreaField = SimpleRelativeSingleField<TextAreaFieldProps>(props => {
 	const generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLTextAreaElement>) => {
-		data.onChange && data.onChange(e.target.value)
+		data.updateValue && data.updateValue(e.target.value)
 	}
 	return (
 		<Field<string> name={props.name}>

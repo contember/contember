@@ -173,8 +173,8 @@ namespace Sortable {
 				const target = order[entity.getKey()]
 				const orderField = entity.data.getField(this.props.sortBy)
 
-				if (target !== undefined && orderField instanceof FieldAccessor && orderField.onChange) {
-					orderField.onChange(target)
+				if (target !== undefined && orderField instanceof FieldAccessor && orderField.updateValue) {
+					orderField.updateValue(target)
 					collectionAccessor = getAccessor()
 				}
 			}
@@ -187,7 +187,7 @@ namespace Sortable {
 				const entity = this.entities[i]
 				const orderField = entity.data.getField(this.props.sortBy)
 
-				if (orderField instanceof FieldAccessor && orderField.onChange) {
+				if (orderField instanceof FieldAccessor && orderField.updateValue) {
 					let targetValue
 
 					if (i === oldIndex) {
@@ -247,7 +247,7 @@ namespace Sortable {
 						return
 					}
 
-					sortableField.onChange && sortableField.onChange(this.entities.length)
+					sortableField.updateValue && sortableField.updateValue(this.entities.length)
 
 					accessor = getCollectionAccessor()
 					newlyAdded = accessor.entities[newIndex]
@@ -299,8 +299,8 @@ namespace Sortable {
 
 						const orderField = entity.data.getField(this.props.sortBy)
 
-						if (orderField instanceof FieldAccessor && orderField.currentValue === null && orderField.onChange) {
-							orderField.onChange(i)
+						if (orderField instanceof FieldAccessor && orderField.currentValue === null && orderField.updateValue) {
+							orderField.updateValue(i)
 							collectionAccessor = getAccessor()
 						}
 					}

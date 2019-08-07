@@ -55,11 +55,6 @@ export interface FieldFormNodeProps<
 	field: RelativeSingleField
 
 	defaultValue?: VariableInput | Produced
-	onChange?: (
-		currentValue: FieldAccessor<Persisted, Produced>['currentValue'],
-		container: EntityAccessor,
-		metadata: FieldMetadata<Persisted, Produced>
-	) => void
 
 	// TODO some size control
 }

@@ -91,6 +91,7 @@ export const uploadFile = (id: string, file: File): ActionCreator => async (disp
 				headers: {
 					'Content-Type': file.type,
 					'Cache-Control': 'immutable',
+					'x-amz-acl': 'public-read',
 				},
 				body: content,
 			},

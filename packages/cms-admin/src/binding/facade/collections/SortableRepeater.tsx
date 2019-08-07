@@ -41,7 +41,6 @@ export const SortableRepeater = Component(
 			environment,
 		)
 	},
-	'SortableRepeater',
 	(props: Props<SortableRepeaterProps>): React.ReactNode => {
 		return (
 			<ToMany field={props.field}>
@@ -49,4 +48,5 @@ export const SortableRepeater = Component(
 			</ToMany>
 		)
 	},
+	'SortableRepeater',
 )

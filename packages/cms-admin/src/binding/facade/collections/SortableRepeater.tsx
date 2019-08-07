@@ -41,12 +41,10 @@ export const SortableRepeater = Component(
 			environment,
 		)
 	},
-	(props: SortableRepeaterProps): React.ReactNode => {
-		return (
-			<ToMany field={props.field}>
-				<Sortable sortBy={props.sortBy}>{props.children}</Sortable>
-			</ToMany>
-		)
-	},
+	(props: SortableRepeaterProps): React.ReactNode => (
+		<ToMany field={props.field}>
+			<Sortable sortBy={props.sortBy}>{props.children}</Sortable>
+		</ToMany>
+	),
 	'SortableRepeater',
 )

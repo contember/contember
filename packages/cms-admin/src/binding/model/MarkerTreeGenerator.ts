@@ -1,7 +1,7 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import { MarkerProvider } from '../coreComponents'
+import { MarkerProvider, NamedComponent } from '../coreComponents'
 import {
 	ConnectionMarker,
 	DataBindingError,
@@ -93,6 +93,7 @@ export class MarkerTreeGenerator {
 			// React.Component, React.PureComponent, React.FunctionComponent
 
 			const dataMarker = node.type as MarkerProvider &
+				NamedComponent &
 				(React.ComponentClass<unknown> | React.FunctionComponent<unknown> | React.NamedExoticComponent<unknown>)
 
 			if ('generateEnvironmentDelta' in dataMarker && dataMarker.generateEnvironmentDelta) {

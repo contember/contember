@@ -37,15 +37,15 @@ function Component<P extends {}>(
 
 		return augmentedRender as RenderFunction<P> & SyntheticChildrenProvider<P>
 	}
+
+	augmentedRender.displayName = displayName || defaultName
+
 	if (typeof decider === 'function') {
-		augmentedRender.displayName = displayName || defaultName
 		augmentedRender.generateSyntheticChildren = decider
 
 		return augmentedRender
 	}
 	if (typeof decider === 'object') {
-		augmentedRender.displayName = displayName || defaultName
-
 		for (const provisionName in decider as CompleteMarkerProvider<P>) {
 			const methodName = provisionName as keyof MarkerProvider<P>
 			;(augmentedRender[methodName] as MarkerProvider<P>[typeof methodName]) = decider[methodName]

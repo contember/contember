@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DataRendererProps, EnforceSubtypeRelation, Props, SyntheticChildrenProvider } from '../../coreComponents'
+import { DataRendererProps, EnforceSubtypeRelation, SyntheticChildrenProvider } from '../../coreComponents'
 import { EntityAccessor } from '../../dao'
 import { PersistButton, RemoveButton } from '../buttons'
 import { Repeater } from '../collections'
@@ -54,7 +54,7 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 		)
 	}
 
-	public static generateSyntheticChildren(props: Props<MultiEditRendererProps>) {
+	public static generateSyntheticChildren(props: MultiEditRendererProps) {
 		return (
 			<>
 				{DefaultRenderer.renderTitle(props.title)}

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Field, FieldPublicProps, Props } from '../../coreComponents'
+import { Field, FieldPublicProps } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component } from './Component'
@@ -10,7 +10,7 @@ export const SimpleRelativeSingleField = function<P extends FieldPublicProps>(
 ) {
 	return Component<P>(
 		render,
-		(props: Props<P>, environment: Environment) =>
+		(props: P, environment: Environment) =>
 			QueryLanguage.wrapRelativeSingleField(
 				props.name,
 				fieldName => (

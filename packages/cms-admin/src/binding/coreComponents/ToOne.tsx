@@ -4,15 +4,15 @@ import * as React from 'react'
 import { FormErrors } from '../../components/ui/FormErrors'
 import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
-import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
 import { DataContext } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
-import { Props, ReferenceMarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
+import { ReferenceMarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
 
 export interface ToOneProps {
 	field: RelativeEntityList
+	children: React.ReactNode
 }
 
 class ToOne extends React.PureComponent<ToOneProps> {
@@ -26,7 +26,7 @@ class ToOne extends React.PureComponent<ToOneProps> {
 		)
 	}
 
-	public static generateSyntheticChildren(props: Props<ToOneProps>, environment: Environment): React.ReactNode {
+	public static generateSyntheticChildren(props: ToOneProps, environment: Environment): React.ReactNode {
 		return QueryLanguage.wrapRelativeSingleEntity(props.field, props.children, environment)
 	}
 }

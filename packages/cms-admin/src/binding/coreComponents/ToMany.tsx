@@ -6,10 +6,11 @@ import { QueryLanguage } from '../queryLanguage'
 import { DataContext, DataContextValue } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
-import { Props, ReferenceMarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
+import { ReferenceMarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
 
 export interface ToManyProps {
 	field: RelativeEntityList
+	children?: React.ReactNode
 }
 
 class ToMany extends React.PureComponent<ToManyProps> {
@@ -23,7 +24,7 @@ class ToMany extends React.PureComponent<ToManyProps> {
 		)
 	}
 
-	public static generateSyntheticChildren(props: Props<ToManyProps>, environment: Environment): React.ReactNode {
+	public static generateSyntheticChildren(props: ToManyProps, environment: Environment): React.ReactNode {
 		return QueryLanguage.wrapRelativeEntityList(
 			props.field,
 			ToMany.getAtomicPrimitiveFactory(props.children),
@@ -60,7 +61,7 @@ namespace ToMany {
 		}
 
 		public static generateReferenceMarker(
-			props: Props<AtomicPrimitiveProps>,
+			props: AtomicPrimitiveProps,
 			fields: EntityFields,
 			environment: Environment,
 		): ReferenceMarker {

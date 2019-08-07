@@ -1,30 +1,20 @@
 import * as React from 'react'
 import { ConnectionMarker, Environment, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
 
-export interface RenderFunction<P extends {} = any> {
-	(props: Props<P>): React.ReactElement | null
-}
-
 export interface NamedComponent {
 	displayName: string
 }
 
-export type Props<P> = React.PropsWithChildren<P>
-
 export interface EnvironmentDeltaProvider<P extends {} = any> {
-	generateEnvironmentDelta: (props: Props<P>, oldEnvironment: Environment) => Partial<Environment.NameStore>
+	generateEnvironmentDelta: (props: P, oldEnvironment: Environment) => Partial<Environment.NameStore>
 }
 
 export interface FieldMarkerProvider<P extends {} = any> {
-	generateFieldMarker: (props: Props<P>, environment: Environment) => FieldMarker
+	generateFieldMarker: (props: P, environment: Environment) => FieldMarker
 }
 
 export interface MarkerTreeRootProvider<P extends {} = any> {
-	generateMarkerTreeRoot: (
-		props: Props<P>,
-		fields: MarkerTreeRoot['fields'],
-		environment: Environment,
-	) => MarkerTreeRoot
+	generateMarkerTreeRoot: (props: P, fields: MarkerTreeRoot['fields'], environment: Environment) => MarkerTreeRoot
 }
 
 export interface ReferenceMarkerProvider<P extends {} = any> {
@@ -40,7 +30,7 @@ export interface ConnectionMarkerProvider<P extends {} = any> {
 }
 
 export interface SyntheticChildrenProvider<P extends {} = any> {
-	generateSyntheticChildren: (props: Props<P>, environment: Environment) => React.ReactNode
+	generateSyntheticChildren: (props: P, environment: Environment) => React.ReactNode
 }
 
 export type CompleteMarkerProvider<P extends {} = any> = EnvironmentDeltaProvider<P> &

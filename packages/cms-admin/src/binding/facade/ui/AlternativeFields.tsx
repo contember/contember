@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Props } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { RadioFieldPublicProps, SelectFieldInner } from '../fields'
 import { ChoiceArity, ChoiceField, SingleChoiceFieldMetadata } from '../fields/ChoiceField'
@@ -42,10 +41,7 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 		)
 	}
 
-	public static generateSyntheticChildren(
-		props: Props<AlternativeFieldsProps>,
-		environment: Environment,
-	): React.ReactNode {
+	public static generateSyntheticChildren(props: AlternativeFieldsProps, environment: Environment): React.ReactNode {
 		const alternatives: React.ReactNodeArray = []
 
 		for (let i = 0, length = props.alternatives.length; i < length; i++) {

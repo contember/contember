@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { FormGroup } from '../../../components'
-import { EnvironmentContext, Props, ToMany, ToManyProps } from '../../coreComponents'
+import { EnvironmentContext, ToMany, ToManyProps } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component } from '../auxiliary'
@@ -9,7 +9,7 @@ import { Sortable, SortablePublicProps } from './Sortable'
 
 interface SortableRepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {
 	sortBy: SortablePublicProps['sortBy']
-	children: React.ReactNode
+	children?: React.ReactNode
 }
 
 export const SortableRepeater = Component(
@@ -41,7 +41,7 @@ export const SortableRepeater = Component(
 			environment,
 		)
 	},
-	(props: Props<SortableRepeaterProps>): React.ReactNode => {
+	(props: SortableRepeaterProps): React.ReactNode => {
 		return (
 			<ToMany field={props.field}>
 				<Sortable sortBy={props.sortBy}>{props.children}</Sortable>

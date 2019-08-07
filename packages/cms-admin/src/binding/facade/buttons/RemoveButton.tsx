@@ -2,7 +2,7 @@ import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
 import * as React from 'react'
 import { Button, ButtonProps } from '../../../components'
-import { DataContext, MetaOperationsContext, MetaOperationsContextValue } from '../../coreComponents'
+import { DataContext, MetaOperationsContext } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
 import { EntityAccessor } from '../../dao'
 import { RemovalType } from '../types'
@@ -18,35 +18,30 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 	const value = React.useContext(DataContext)
 	const metaOperations = React.useContext(MetaOperationsContext)
 	const isMutating = React.useContext(MutationStateContext)
+	const onClick = React.useCallback(() => {
+		if (!(value instanceof EntityAccessor) || !value.remove) {
+			return
+		}
+		if (props.immediatePersist && !confirm('Really?')) {
+			return
+		}
+		value.remove(mapToRemovalType(props.removeType))
 
-	if (value instanceof EntityAccessor) {
-		return (
-			<Button {...rest} onClick={getOnClick(props, value, metaOperations)} disabled={isMutating} small minimal>
-				<Icon icon={icon || IconNames.CROSS} color="currentColor" />
-			</Button>
-		)
+		if (props.immediatePersist && metaOperations) {
+			metaOperations.triggerPersist()
+		}
+	}, [metaOperations, props.immediatePersist, props.removeType, value])
+
+	if (!(value instanceof EntityAccessor)) {
+		return null
 	}
-	return null
+
+	return (
+		<Button {...rest} onClick={onClick} disabled={isMutating} small minimal>
+			<Icon icon={icon || IconNames.CROSS} color="currentColor" />
+		</Button>
+	)
 })
-
-const getOnClick = (
-	props: RemoveButtonProps,
-	entityAccessor: EntityAccessor,
-	metaOperations: MetaOperationsContextValue
-) => () => {
-	if (!entityAccessor.remove) {
-		return
-	}
-	if (props.immediatePersist && !confirm('Really?')) {
-		return
-	}
-
-	entityAccessor.remove(mapToRemovalType(props.removeType))
-
-	if (props.immediatePersist && metaOperations) {
-		metaOperations.triggerPersist()
-	}
-}
 
 const mapToRemovalType = (removalType?: RemovalType): EntityAccessor.RemovalType => {
 	switch (removalType) {

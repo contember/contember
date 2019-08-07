@@ -4,7 +4,6 @@ import {
 	DataContext,
 	EnforceSubtypeRelation,
 	EnvironmentContext,
-	Props,
 	SyntheticChildrenProvider,
 	ToMany,
 	ToManyProps,
@@ -49,7 +48,7 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 		)
 	}
 
-	public static generateSyntheticChildren(props: Props<RepeaterProps>): React.ReactNode {
+	public static generateSyntheticChildren(props: RepeaterProps): React.ReactNode {
 		return <ToMany field={props.field}>{props.children}</ToMany>
 	}
 }
@@ -57,6 +56,7 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 namespace Repeater {
 	export interface ItemPublicProps {
 		removeType?: RemoveButtonProps['removeType']
+		children?: React.ReactNode
 	}
 
 	export interface ItemProps extends ItemPublicProps {

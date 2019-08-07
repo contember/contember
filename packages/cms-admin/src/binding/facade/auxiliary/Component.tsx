@@ -1,31 +1,25 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
-import {
-	CompleteMarkerProvider,
-	MarkerProvider,
-	Props,
-	RenderFunction,
-	SyntheticChildrenProvider,
-} from '../../coreComponents'
+import { CompleteMarkerProvider, MarkerProvider, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
 
 function Component<P extends {}>(
 	statelessRender: React.FunctionComponent<P>,
 	displayName?: string,
-): RenderFunction<P> & SyntheticChildrenProvider<P>
+): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
 function Component<P extends {}>(
 	statefulRender: React.FunctionComponent<P>,
-	generateSyntheticChildren: (props: Props<P>, environment: Environment) => React.ReactNode,
+	generateSyntheticChildren: (props: P, environment: Environment) => React.ReactNode,
 	displayName?: string,
-): RenderFunction<P> & SyntheticChildrenProvider<P>
+): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
 function Component<P extends {}>(
 	statefulRender: React.FunctionComponent<P>,
 	markerProvisions: MarkerProvider<P>,
 	displayName?: string,
-): RenderFunction<P> & MarkerProvider<P>
+): React.NamedExoticComponent<P> & MarkerProvider<P>
 function Component<P extends {}>(
 	render: React.FunctionComponent<P>,
-	decider?: string | ((props: Props<P>, environment: Environment) => React.ReactNode) | MarkerProvider<P>,
+	decider?: string | ((props: P, environment: Environment) => React.ReactNode) | MarkerProvider<P>,
 	displayName?: string,
 ) {
 	const augmentedRender: React.NamedExoticComponent<P> & MarkerProvider<P> = React.memo<P>(render)
@@ -35,7 +29,7 @@ function Component<P extends {}>(
 		augmentedRender.displayName = decider || defaultName
 		augmentedRender.generateSyntheticChildren = render
 
-		return augmentedRender as RenderFunction<P> & SyntheticChildrenProvider<P>
+		return augmentedRender as React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
 	}
 
 	augmentedRender.displayName = displayName || defaultName

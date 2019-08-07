@@ -16,7 +16,6 @@ import {
 	EnforceSubtypeRelation,
 	EnvironmentContext,
 	Field,
-	Props,
 	SyntheticChildrenProvider,
 } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
@@ -75,7 +74,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 		)
 	}
 
-	public static generateSyntheticChildren(props: Props<SortableProps>, environment: Environment): React.ReactNode {
+	public static generateSyntheticChildren(props: SortableProps, environment: Environment): React.ReactNode {
 		return (
 			<>
 				<Field name={props.sortBy} isNonbearing={true} />
@@ -91,7 +90,7 @@ namespace Sortable {
 	}
 
 	export const DragHandle = React.memo(
-		SortableHandle((props: Props<DragHandleProps>) => (
+		SortableHandle((props: DragHandleProps) => (
 			<div className={cn('sortable-item-handle', props.isMutating && 'sortable-item-handle-disabled')}>
 				<DragHandleIcon />
 			</div>
@@ -101,7 +100,7 @@ namespace Sortable {
 	export interface SortableItemProps extends Repeater.ItemProps, DragHandleProps {}
 
 	export const SortableItem = React.memo(
-		SortableElement((props: Props<SortableItemProps & SortableElementProps>) => (
+		SortableElement((props: SortableItemProps & SortableElementProps) => (
 			<li className="sortable-item">
 				<DragHandle isMutating={props.isMutating} />
 				<div className="sortable-item-content">
@@ -118,7 +117,7 @@ namespace Sortable {
 	}
 
 	export const SortableList = React.memo(
-		SortableContainer((props: Props<SortableListProps & SortableContainerProps>) => {
+		SortableContainer((props: SortableListProps & SortableContainerProps) => {
 			const isMutating = React.useContext(MutationStateContext)
 			return (
 				<Repeater.Cloneable

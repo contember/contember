@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
-import { Props, ToMany, ToOne } from '../coreComponents'
+import { ToMany, ToOne } from '../coreComponents'
 import { Environment } from '../dao'
 import { reactNodeToElement } from '../utils'
 import { Parser } from './Parser'
@@ -52,7 +52,7 @@ export namespace QueryLanguage {
 
 	export const wrapRelativeEntityList = (
 		input: string,
-		generateAtomicToMany: (atomicPrimitiveProps: Props<ToMany.AtomicPrimitiveProps>) => React.ReactNode,
+		generateAtomicToMany: (atomicPrimitiveProps: ToMany.AtomicPrimitiveProps) => React.ReactNode,
 		environment: Environment,
 	): React.ReactElement | null => {
 		const { toOneProps, toManyProps } = Parser.parseQueryLanguageExpression(

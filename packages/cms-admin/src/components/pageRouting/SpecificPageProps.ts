@@ -13,5 +13,5 @@ export default interface SpecificPageProps<DRP> {
 	layout?: React.ComponentType<{ children?: React.ReactNode }>
 	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
-	children: React.ReactNode
+	children?: React.ReactNode
 }

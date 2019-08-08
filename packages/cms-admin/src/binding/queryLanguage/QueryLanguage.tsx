@@ -61,15 +61,7 @@ export namespace QueryLanguage {
 			environment,
 		)
 
-		return wrap(
-			generateAtomicToMany({
-				...toManyProps,
-				environment,
-			}),
-			ToOne.AtomicPrimitive,
-			toOneProps,
-			environment,
-		)
+		return wrap(generateAtomicToMany(toManyProps), ToOne.AtomicPrimitive, toOneProps, environment)
 	}
 
 	export interface WrappedQualifiedEntityList {

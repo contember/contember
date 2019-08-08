@@ -558,7 +558,7 @@ namespace Parser {
 	export namespace AST {
 		export type AtomicToOneProps = ToOne.AtomicPrimitivePublicProps
 
-		export type AtomicToManyProps = ToMany.AtomicPrimitivePublicProps
+		export type AtomicToManyProps = ToMany.AtomicPrimitiveProps
 
 		export interface RelativeSingleEntity {
 			toOneProps: AtomicToOneProps[]

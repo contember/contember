@@ -48,7 +48,7 @@ export default class OperationProcessor {
 		this.accessor.batchUpdates &&
 			this.accessor.batchUpdates(getAccessor => {
 				const presentKeys = new Set<string>()
-				let maxOrder: number = 0
+				let maxOrder = 0
 				value.document.nodes.forEach((block_, key) => {
 					const block = block_!
 					const accessor: EntityAccessor | { primaryKey: string | { value: string } } | undefined = block.data.get(

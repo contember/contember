@@ -14,7 +14,7 @@ import {
 	MarkerTreeConstraints,
 	MarkerTreeRoot,
 	ReferenceMarker,
-	RootAccessor
+	RootAccessor,
 } from '../dao'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
@@ -25,7 +25,7 @@ export class MutationGenerator {
 	public constructor(
 		private persistedData: any,
 		private currentData: AccessorTreeRoot,
-		private markerTree: MarkerTreeRoot
+		private markerTree: MarkerTreeRoot,
 	) {}
 
 	public getPersistMutation(): string | undefined {
@@ -36,7 +36,7 @@ export class MutationGenerator {
 				this.markerTree.fields,
 				this.currentData.root,
 				this.markerTree.id,
-				this.markerTree.constraints
+				this.markerTree.constraints,
 			)
 			return builder.getGql()
 		} catch (e) {
@@ -51,7 +51,7 @@ export class MutationGenerator {
 		entity: RootAccessor,
 		alias: string,
 		constraints?: MarkerTreeConstraints,
-		queryBuilder?: QueryBuilder
+		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
@@ -80,7 +80,7 @@ export class MutationGenerator {
 							currentEntity,
 							`${alias}${MutationGenerator.ALIAS_SEPARATOR}${entityI}`,
 							constraints,
-							queryBuilder
+							queryBuilder,
 						)
 					} else if (currentEntity === undefined) {
 						// Do nothing. This was a non-persisted entity that was subsequently deleted.
@@ -102,7 +102,7 @@ export class MutationGenerator {
 		entityName: EntityName,
 		alias: string,
 		constraints?: MarkerTreeConstraints,
-		queryBuilder?: QueryBuilder
+		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
@@ -121,7 +121,7 @@ export class MutationGenerator {
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
-			alias
+			alias,
 		)
 	}
 
@@ -132,7 +132,7 @@ export class MutationGenerator {
 		data: ReceivedEntityData<undefined>,
 		alias: string,
 		constraints?: MarkerTreeConstraints,
-		queryBuilder?: QueryBuilder
+		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
@@ -159,7 +159,7 @@ export class MutationGenerator {
 					.ok()
 					.validation()
 			},
-			alias
+			alias,
 		)
 	}
 
@@ -169,7 +169,7 @@ export class MutationGenerator {
 		entityFields: EntityFields,
 		alias: string,
 		constraints?: MarkerTreeConstraints,
-		queryBuilder?: QueryBuilder
+		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
@@ -184,22 +184,22 @@ export class MutationGenerator {
 							entity,
 							entityFields,
 							new CrudQueryBuilder.WriteDataBuilder(
-								constraints && constraints.whereType === 'unique' ? constraints.where : undefined
-							)
-						)
+								constraints && constraints.whereType === 'unique' ? constraints.where : undefined,
+							),
+						),
 					)
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.ok()
 					.validation()
 			},
-			alias
+			alias,
 		)
 	}
 
 	private registerCreateMutationPart(
 		currentData: EntityAccessor,
 		entityFields: EntityFields,
-		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>
+		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		const allData = currentData.data.allFieldData
 		const nonbearingFields: Array<{
@@ -219,7 +219,7 @@ export class MutationGenerator {
 						if (marker.isNonbearing) {
 							nonbearingFields.push({
 								value,
-								placeholderName
+								placeholderName,
 							})
 						} else {
 							builder = builder.set(placeholderName, value)
@@ -271,7 +271,7 @@ export class MutationGenerator {
 						if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
 							const innerBuilder = this.createCreateDataBuilderByReference(reference)
 							const createBuilder = createOneRelationBuilder.create(
-								this.registerCreateMutationPart(accessor, reference.fields, innerBuilder)
+								this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
 							)
 							if (createBuilder.data) {
 								builder = builder.one(placeholderName, createBuilder)
@@ -280,8 +280,8 @@ export class MutationGenerator {
 							builder = builder.one(
 								placeholderName,
 								createOneRelationBuilder.connect({
-									[PRIMARY_KEY_NAME]: accessor.primaryKey
-								})
+									[PRIMARY_KEY_NAME]: accessor.primaryKey,
+								}),
 							)
 						}
 					} else {
@@ -296,7 +296,7 @@ export class MutationGenerator {
 								const innerBuilder = this.createCreateDataBuilderByReference(reference)
 								builder = builder.create(
 									this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
-									alias
+									alias,
 								)
 							} else {
 								builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
@@ -327,7 +327,7 @@ export class MutationGenerator {
 		currentData: EntityAccessor,
 		entityFields: EntityFields,
 		persistedData: ReceivedEntityData<undefined>,
-		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>
+		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
 		const allData = currentData.data.allFieldData
 
@@ -385,7 +385,7 @@ export class MutationGenerator {
 										accessor: innerAccessor,
 										reference,
 										persistedField: innerField,
-										alias: i.toString()
+										alias: i.toString(),
 									})
 								}
 							}
@@ -398,7 +398,7 @@ export class MutationGenerator {
 				if (unreducedHasOnePresent) {
 					if (accessorReference.length === 1) {
 						const subBuilder = ((
-							builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>
+							builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
 						) => {
 							const { accessor, reference, persistedField, alias } = accessorReference[0]
 
@@ -408,12 +408,12 @@ export class MutationGenerator {
 									return builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
 								} else {
 									const updated = builder.update(builder =>
-										this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder)
+										this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder),
 									)
 
 									if (!persistedField || (persistedField && accessor.primaryKey !== persistedField[PRIMARY_KEY_NAME])) {
 										return updated.connect({
-											[PRIMARY_KEY_NAME]: accessor.primaryKey
+											[PRIMARY_KEY_NAME]: accessor.primaryKey,
 										})
 									}
 									return updated
@@ -449,7 +449,7 @@ export class MutationGenerator {
 									const innerBuilder = this.createCreateDataBuilderByReference(reference)
 									builder = builder.create(
 										this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
-										alias
+										alias,
 									)
 								} else {
 									builder = builder.update(
@@ -457,7 +457,7 @@ export class MutationGenerator {
 										builder => {
 											return this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder)
 										},
-										alias
+										alias,
 									)
 
 									if (!persistedField || (persistedField && accessor.primaryKey !== persistedField[PRIMARY_KEY_NAME])) {
@@ -495,10 +495,10 @@ export class MutationGenerator {
 	}
 
 	private createCreateDataBuilderByReference(
-		reference: ReferenceMarker.Reference
+		reference: ReferenceMarker.Reference,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		const registerReductionFields = (
-			where: Input.UniqueWhere<GraphQlBuilder.Literal>
+			where: Input.UniqueWhere<GraphQlBuilder.Literal>,
 		): Input.CreateDataInput<GraphQlBuilder.Literal> => {
 			const data: Input.CreateDataInput<GraphQlBuilder.Literal> = {}
 
@@ -514,7 +514,7 @@ export class MutationGenerator {
 					data[key] = field
 				} else {
 					data[key] = {
-						connect: field
+						connect: field,
 					}
 				}
 			}

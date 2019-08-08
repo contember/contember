@@ -20,11 +20,11 @@ export function simpleMarkPlugin(markType: string, htmlTag: string, attrs: strin
 				return React.createElement(
 					htmlTag,
 					{ ...attributes, ...attrs.reduce((acc, attr) => ({ ...acc, [attr]: mark.data.get(attr) }), {}) },
-					children
+					children,
 				)
 			}
 			return next()
-		}
+		},
 	}
 }
 
@@ -32,7 +32,7 @@ export function simpleHtmlSerializerRule(
 	nodeType: NodeType,
 	type: string,
 	htmlTag: string | string[],
-	attrs: string[] = []
+	attrs: string[] = [],
 ): Rule {
 	const tags = Array.isArray(htmlTag) ? htmlTag : [htmlTag]
 	return {
@@ -42,7 +42,7 @@ export function simpleHtmlSerializerRule(
 					object: nodeType,
 					type: type,
 					data: attrs.reduce((acc, attr) => ({ ...acc, [attr]: el.getAttribute(attr) }), {}),
-					nodes: next(el.childNodes)
+					nodes: next(el.childNodes),
 				}
 			}
 		},
@@ -51,10 +51,10 @@ export function simpleHtmlSerializerRule(
 				return React.createElement(
 					htmlTag[0],
 					attrs.reduce((acc, attr) => ({ ...acc, [attr]: obj.data.get(attr) }), {}),
-					children
+					children,
 				)
 			}
-		}
+		},
 	}
 }
 
@@ -74,7 +74,7 @@ export function simpleMarkConfig(markType: string, htmlTags: string | [string, .
 		type: markType,
 		plugin: simpleMarkPlugin(markType, tags[0]),
 		htmlSerializer: simpleHtmlSerializerRule('mark', markType, tags),
-		onToggle: simpleMarkToggle(markType)
+		onToggle: simpleMarkToggle(markType),
 	}
 }
 
@@ -86,7 +86,7 @@ export function createBlockPluginConfig(name: string, tag: string, attrs: string
 		onToggle(editor) {
 			const isCurrent = editor.value.blocks.toArray().every(block => block.type == name)
 			editor.setBlocks({
-				type: isCurrent ? defaultBlock : name
+				type: isCurrent ? defaultBlock : name,
 			})
 		},
 		plugin: {
@@ -95,12 +95,12 @@ export function createBlockPluginConfig(name: string, tag: string, attrs: string
 					return React.createElement(
 						tag,
 						{ ...attributes, ...attrs.reduce((acc, attr) => ({ ...acc, [attr]: node.data.get(attr) }), {}) },
-						children
+						children,
 					)
 				}
 				return next()
-			}
+			},
 		},
-		htmlSerializer: simpleHtmlSerializerRule('block', name, tag)
+		htmlSerializer: simpleHtmlSerializerRule('block', name, tag),
 	}
 }

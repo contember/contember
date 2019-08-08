@@ -54,7 +54,7 @@ export class MultipleSelectFieldInner extends React.PureComponent<MultipleSelect
 			return {
 				disabled: false,
 				value: key,
-				label: label as string
+				label: label as string,
 			}
 		})
 

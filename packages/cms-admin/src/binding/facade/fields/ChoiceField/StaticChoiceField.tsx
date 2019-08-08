@@ -48,13 +48,13 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 						data: options.map((item, i) => ({
 							key: i,
 							label: item[1],
-							actualValue: item[0]
+							actualValue: item[0],
 						})),
 						currentValue,
 						onChange: (newValue: ChoiceField.ValueRepresentation) => {
 							data.updateValue && data.updateValue(options[newValue][0])
 						},
-						...otherMetadata
+						...otherMetadata,
 					})
 				}}
 			</Field>
@@ -63,30 +63,30 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 
 	private normalizeLiteralStaticOptions(
 		options: Array<[ChoiceField.LiteralValue, ChoiceField.Label]>,
-		environment: Environment
+		environment: Environment,
 	): Array<[GraphQlBuilder.Literal, ChoiceField.Label]> {
 		return options.map(
 			([key, value]): [GraphQlBuilder.Literal, ChoiceField.Label] => [
 				key instanceof VariableLiteral ? VariableInputTransformer.transformVariableLiteral(key, environment) : key,
-				value
-			]
+				value,
+			],
 		)
 	}
 
 	private normalizeScalarStaticOptions(
 		options: Array<[ChoiceField.ScalarValue, ChoiceField.Label]>,
-		environment: Environment
+		environment: Environment,
 	): Array<[Scalar, ChoiceField.Label]> {
 		return options.map(
 			([key, value]): [Scalar, ChoiceField.Label] => [
 				key instanceof VariableScalar ? VariableInputTransformer.transformVariableScalar(key, environment) : key,
-				value
-			]
+				value,
+			],
 		)
 	}
 
 	private isLiteralStaticMode(
-		options: ChoiceFieldProps['options']
+		options: ChoiceFieldProps['options'],
 	): options is Array<[ChoiceField.LiteralValue, ChoiceField.Label]> {
 		if (options.length === 0) {
 			return false

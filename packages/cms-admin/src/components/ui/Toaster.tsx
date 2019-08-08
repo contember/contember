@@ -11,7 +11,7 @@ const typeClassName: { [K in ToastType]: string } = {
 	[ToastType.Success]: 'view-success',
 	[ToastType.Warning]: 'view-warning',
 	[ToastType.Error]: 'view-error',
-	[ToastType.Info]: 'view-info'
+	[ToastType.Info]: 'view-info',
 }
 
 class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {
@@ -39,7 +39,7 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 
 const Toaster = connect<Toaster.ToasterStateProps, Toaster.ToasterDispatcherProps, {}, State>(
 	state => ({ toasts: state.toasts.toasts }),
-	(dispatch: Dispatch) => ({ dismissToast: (toastId: ToastId) => dispatch(dismissToast(toastId)) })
+	(dispatch: Dispatch) => ({ dismissToast: (toastId: ToastId) => dispatch(dismissToast(toastId)) }),
 )(ToasterConnected)
 
 namespace Toaster {

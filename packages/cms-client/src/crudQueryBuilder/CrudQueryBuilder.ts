@@ -13,7 +13,7 @@ import {
 	Queries,
 	UpdateMutationArguments,
 	UpdateMutationFields,
-	WriteOperation
+	WriteOperation,
 } from './types'
 import { WriteBuilder } from './WriteBuilder'
 
@@ -25,13 +25,13 @@ type Client<T extends any> = (query: string | object, variables?: Variables) => 
 export class CrudQueryBuilder {
 	constructor(
 		private type: undefined | 'query' | 'mutation' = undefined,
-		private rootObjectBuilder: RootObjectBuilder = new RootObjectBuilder()
+		private rootObjectBuilder: RootObjectBuilder = new RootObjectBuilder(),
 	) {}
 
 	public list(
 		name: string,
 		query: ReadBuilder.BuilderFactory<ListQueryArguments>,
-		alias?: string
+		alias?: string,
 	): Omit<CrudQueryBuilder, Mutations> {
 		if (this.type === 'mutation') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
@@ -48,7 +48,7 @@ export class CrudQueryBuilder {
 	public get(
 		name: string,
 		query: ReadBuilder.BuilderFactory<GetQueryArguments>,
-		alias?: string
+		alias?: string,
 	): Omit<CrudQueryBuilder, Mutations> {
 		if (this.type === 'mutation') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
@@ -65,7 +65,7 @@ export class CrudQueryBuilder {
 	public update(
 		name: string,
 		query: WriteBuilder.BuilderFactory<UpdateMutationArguments, UpdateMutationFields, WriteOperation.Update>,
-		alias?: string
+		alias?: string,
 	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
@@ -86,7 +86,7 @@ export class CrudQueryBuilder {
 	public create(
 		name: string,
 		query: WriteBuilder.BuilderFactory<CreateMutationArguments, CreateMutationFields, WriteOperation.Create>,
-		alias?: string
+		alias?: string,
 	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
@@ -107,7 +107,7 @@ export class CrudQueryBuilder {
 	public delete(
 		name: string,
 		query: WriteBuilder.BuilderFactory<DeleteMutationArguments, DeleteMutationFields, WriteOperation.Delete>,
-		alias?: string
+		alias?: string,
 	): Omit<CrudQueryBuilder, Queries> {
 		if (this.type === 'query') {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')

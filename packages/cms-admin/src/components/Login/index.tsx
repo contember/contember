@@ -12,7 +12,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 	state: Login.State = {
 		email: '',
 		password: '',
-		rememberMe: false
+		rememberMe: false,
 	}
 
 	componentDidMount() {
@@ -110,6 +110,6 @@ export default connect<Login.StateProps, Login.DispatchProps, {}, State>(
 	({ auth }) => ({ errorMessage: auth.errorMessage, status: auth.status }),
 	(dispatch: Dispatch) => ({
 		login: (email: string, password: string, rememberMe: boolean) => dispatch(login(email, password, rememberMe)),
-		tryAutoLogin: () => dispatch(tryAutoLogin())
-	})
+		tryAutoLogin: () => dispatch(tryAutoLogin()),
+	}),
 )(Login)

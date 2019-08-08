@@ -8,7 +8,7 @@ export default handleActions<ViewState, any>(
 	{
 		[VIEW_REPLACE]: (state, action: Action<ViewState>) => {
 			return action.payload as ViewState
-		}
+		},
 	},
-	emptyViewState
+	emptyViewState,
 ) as Reducer

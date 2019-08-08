@@ -36,9 +36,9 @@ class ErrorsPreprocessor {
 					treeRoot[treeId] = {
 						nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
 						children: {
-							[itemIndex]: processedResult
+							[itemIndex]: processedResult,
 						},
-						errors: []
+						errors: [],
 					}
 				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
 					child.children[itemIndex] = processedResult
@@ -90,7 +90,7 @@ class ErrorsPreprocessor {
 
 						if (alias === null) {
 							throw new ErrorsPreprocessor.ErrorsPreprocessorError(
-								`Corrupt data: undefined alias for node with index ${pathNode.index}.`
+								`Corrupt data: undefined alias for node with index ${pathNode.index}.`,
 							)
 						}
 
@@ -119,7 +119,7 @@ class ErrorsPreprocessor {
 	private getRootNode(error: MutationError, startIndex: number = 0): ErrorsPreprocessor.ErrorNode {
 		let rootNode: ErrorsPreprocessor.ErrorNode = {
 			errors: [new ErrorAccessor(error.message.text)],
-			nodeType: ErrorsPreprocessor.ErrorNodeType.Leaf
+			nodeType: ErrorsPreprocessor.ErrorNodeType.Leaf,
 		}
 
 		for (let i = error.path.length - 1; i >= startIndex; i--) {
@@ -129,23 +129,23 @@ class ErrorsPreprocessor {
 					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.FieldIndexed,
 					children: {
-						[pathNode.field]: rootNode
-					}
+						[pathNode.field]: rootNode,
+					},
 				}
 			} else if (pathNode.__typename === '_IndexPathFragment') {
 				const alias = pathNode.alias
 
 				if (alias === null) {
 					throw new ErrorsPreprocessor.ErrorsPreprocessorError(
-						`Corrupt data: undefined alias for node with index ${pathNode.index}.`
+						`Corrupt data: undefined alias for node with index ${pathNode.index}.`,
 					)
 				}
 				rootNode = {
 					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
 					children: {
-						[parseInt(alias, 10)]: rootNode
-					}
+						[parseInt(alias, 10)]: rootNode,
+					},
 				}
 			} else {
 				assertNever(pathNode)
@@ -157,7 +157,7 @@ class ErrorsPreprocessor {
 
 	private rejectCorruptData(): never {
 		throw new ErrorsPreprocessor.ErrorsPreprocessorError(
-			'Received corrupted data: a node cannot be simultaneously field-indexed and path-indexed.'
+			'Received corrupted data: a node cannot be simultaneously field-indexed and path-indexed.',
 		)
 	}
 }
@@ -190,7 +190,7 @@ namespace ErrorsPreprocessor {
 	export enum ErrorNodeType {
 		Leaf = 'Leaf',
 		NumberIndexed = 'NumberIndexed',
-		FieldIndexed = 'FieldIndexed'
+		FieldIndexed = 'FieldIndexed',
 	}
 
 	export interface ErrorTreeRoot {

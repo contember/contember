@@ -6,7 +6,7 @@ import { DataBindingError, Environment, Literal, VariableLiteral, VariableScalar
 export class VariableInputTransformer {
 	public static transformFilter(
 		input: Filter | undefined,
-		environment: Environment
+		environment: Environment,
 	): Filter<GraphQlBuilder.Literal> | undefined {
 		if (input === undefined) {
 			return undefined
@@ -23,7 +23,7 @@ export class VariableInputTransformer {
 
 	private static transformWhere(
 		where: VariableInputTransformer.Where<VariableInput> | By,
-		environment: Environment
+		environment: Environment,
 	): VariableInputTransformer.Where<GraphQlBuilder.Literal> {
 		const mapped: VariableInputTransformer.Where<GraphQlBuilder.Literal> = {}
 
@@ -58,7 +58,7 @@ export class VariableInputTransformer {
 
 	public static transformValue(
 		value: VariableInput | Scalar,
-		environment: Environment
+		environment: Environment,
 	): GraphQlBuilder.Literal | Scalar {
 		if (value instanceof VariableScalar) {
 			return VariableInputTransformer.transformVariableScalar(value, environment)
@@ -74,7 +74,7 @@ export class VariableInputTransformer {
 
 		if (typeof value !== 'string' && typeof value !== 'boolean' && typeof value !== 'number' && value !== null) {
 			throw new DataBindingError(
-				`The value of the '${variableScalar.variable}' must be a scalar or null, not '${typeof value}'.`
+				`The value of the '${variableScalar.variable}' must be a scalar or null, not '${typeof value}'.`,
 			)
 		}
 		return value
@@ -82,13 +82,13 @@ export class VariableInputTransformer {
 
 	public static transformVariableLiteral(
 		variableLiteral: VariableLiteral,
-		environment: Environment
+		environment: Environment,
 	): GraphQlBuilder.Literal {
 		const value = environment.getValueOrElse(variableLiteral.variable, undefined)
 
 		if (typeof value !== 'string') {
 			throw new DataBindingError(
-				`The value of the '${variableLiteral.variable}' must be a string, not '${typeof value}'.`
+				`The value of the '${variableLiteral.variable}' must be a string, not '${typeof value}'.`,
 			)
 		}
 

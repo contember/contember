@@ -25,7 +25,7 @@ export class Hashing {
 				constraints.filter,
 				constraints.orderBy,
 				constraints.offset,
-				constraints.limit
+				constraints.limit,
 			])
 		} else if (constraints.whereType === 'unique') {
 			return Hashing.hashArray([constraints.whereType, constraints.where])

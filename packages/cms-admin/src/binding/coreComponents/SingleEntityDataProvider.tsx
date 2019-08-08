@@ -28,7 +28,7 @@ export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEnt
 				{(environment: Environment) => {
 					const markerTreeGenerator = new MarkerTreeGenerator(
 						<SingleEntityDataProvider {...this.props}>{this.props.children}</SingleEntityDataProvider>,
-						environment
+						environment,
 					)
 					const DataProvider = getDataProvider<DRP>()
 
@@ -49,16 +49,16 @@ export class SingleEntityDataProvider<DRP> extends React.PureComponent<SingleEnt
 	public static generateMarkerTreeRoot(
 		props: SingleEntityDataProviderProps<unknown>,
 		fields: MarkerTreeRoot['fields'],
-		environment: Environment
+		environment: Environment,
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(
 			props.entityName,
 			fields,
 			{
 				where: typeof props.where === 'string' ? QueryLanguage.parseUniqueWhere(props.where, environment) : props.where,
-				whereType: 'unique'
+				whereType: 'unique',
 			},
-			props.associatedField
+			props.associatedField,
 		)
 	}
 }

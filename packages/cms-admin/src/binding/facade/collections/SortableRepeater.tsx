@@ -38,7 +38,7 @@ export const SortableRepeater = Component(
 					)}
 				</ToMany.AccessorRetriever>
 			),
-			environment
+			environment,
 		)
 	},
 	'SortableRepeater',
@@ -48,5 +48,5 @@ export const SortableRepeater = Component(
 				<Sortable sortBy={props.sortBy}>{props.children}</Sortable>
 			</ToMany>
 		)
-	}
+	},
 )

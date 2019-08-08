@@ -8,7 +8,7 @@ export enum DataTreeRequestReadyState {
 	Uninitialized = 'Uninitialized',
 	Pending = 'Pending',
 	Success = 'Success',
-	Error = 'Error'
+	Error = 'Error',
 }
 
 export type DataTreeRequestSuccessData = any
@@ -32,7 +32,7 @@ export type DataTreeRequestState<
 
 export enum DataTreeRequestType {
 	Query = 'query',
-	Mutation = 'mutation'
+	Mutation = 'mutation',
 }
 
 export type DataTreeRequestList = { [Type in DataTreeRequestType]: DataTreeRequestState }

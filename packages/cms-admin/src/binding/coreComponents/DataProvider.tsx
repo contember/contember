@@ -9,7 +9,7 @@ import {
 	DataTreeDirtinessState,
 	DataTreeRequestReadyState,
 	DataTreeRequestType,
-	DataTreeState
+	DataTreeState,
 } from '../../state/dataTrees'
 import { MutationRequestResult, ReceivedDataTree } from '../bindingTypes'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
@@ -48,7 +48,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	public state: DataProviderState = {
 		accessorTree: undefined,
 		query: undefined,
-		showingErrors: false
+		showingErrors: false,
 	}
 
 	protected triggerPersist = () => {
@@ -74,7 +74,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 	protected metaOperations: MetaOperationsContextValue = new MetaOperationsAccessor(
 		this.props.markerTree.id,
-		this.triggerPersist
+		this.triggerPersist,
 	)
 
 	async componentDidUpdate(prevProps: DataProviderInnerProps<DRP>, prevState: DataProviderState) {
@@ -113,7 +113,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 					? query.data
 					: undefined,
 				this.state.accessorTree,
-				mutationResult
+				mutationResult,
 			)
 		}
 
@@ -189,7 +189,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	private initializeAccessorTree(
 		persistedData: ReceivedDataTree<undefined> | undefined,
 		initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
-		errors?: MutationRequestResult
+		errors?: MutationRequestResult,
 	) {
 		const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree)
 		accessTreeGenerator.generateLiveTree(
@@ -200,7 +200,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 				this.props.onDataAvailable && this.props.onDataAvailable(accessorTree)
 				this.setState({ accessorTree, showingErrors: errors !== undefined })
 			},
-			errors
+			errors,
 		)
 	}
 }
@@ -213,8 +213,8 @@ const getDataProvider = <DRP extends {}>() =>
 			setDataTreeDirtiness: (isDirty: DataTreeDirtinessState) =>
 				dispatch(setDataTreeDirtiness(ownProps.markerTree.id, isDirty)),
 			sendDataTreeRequest: (type: DataTreeRequestType, request: string) =>
-				dispatch(sendDataTreeRequest(ownProps.markerTree.id, type, request))
-		})
+				dispatch(sendDataTreeRequest(ownProps.markerTree.id, type, request)),
+		}),
 	)(DataProvider as new (props: DataProviderInnerProps<DRP>) => DataProvider<DRP>)
 
 export { getDataProvider }

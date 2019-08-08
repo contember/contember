@@ -18,7 +18,7 @@ export default handleActions<ToastsState, any>(
 				throw new Error('Action payload can not be undefined')
 			}
 			return { ...state, toasts: [...state.toasts.filter(t => t.id !== action.payload)] }
-		}
+		},
 	},
-	emptyToastsState
+	emptyToastsState,
 ) as Reducer

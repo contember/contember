@@ -14,17 +14,17 @@ describe('GraphQlQueryBuilder', () => {
 						.fragment('Article', new GraphQlBuilder.ObjectBuilder().field('leadParagraph'))
 						.fragment(
 							'BlogPost',
-							new GraphQlBuilder.ObjectBuilder().object('comments', new GraphQlBuilder.ObjectBuilder().field('id'))
+							new GraphQlBuilder.ObjectBuilder().object('comments', new GraphQlBuilder.ObjectBuilder().field('id')),
 						)
 						.object(
 							'locales',
 							new GraphQlBuilder.ObjectBuilder()
 								.argument('where', { locale: { eq: new GraphQlBuilder.Literal('cs') } })
 								.field('id')
-								.field('title')
-						)
+								.field('title'),
+						),
 				)
-				.object('Authors', o => o.field('id'))
+				.object('Authors', o => o.field('id')),
 		)
 		expect(query).equals(`query {
 	Post(where: {id: "123"}) {

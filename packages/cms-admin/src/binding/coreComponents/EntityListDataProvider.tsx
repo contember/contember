@@ -40,7 +40,7 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 							{(environment: Environment) => {
 								const markerTreeGenerator = new MarkerTreeGenerator(
 									<EntityListDataProvider {...this.props}>{this.renderRenderer(undefined)}</EntityListDataProvider>,
-									environment
+									environment,
 								)
 								const DataProvider = getDataProvider<DRP>()
 
@@ -85,7 +85,7 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 	public static generateMarkerTreeRoot(
 		props: EntityListDataProviderProps<unknown>,
 		fields: MarkerTreeRoot['fields'],
-		environment: Environment
+		environment: Environment,
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(
 			props.entityName,
@@ -95,9 +95,9 @@ export class EntityListDataProvider<DRP> extends React.PureComponent<EntityListD
 				orderBy: props.orderBy,
 				offset: props.offset,
 				limit: props.limit,
-				whereType: 'nonUnique'
+				whereType: 'nonUnique',
 			},
-			props.associatedField
+			props.associatedField,
 		)
 	}
 }

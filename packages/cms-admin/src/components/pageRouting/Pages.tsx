@@ -56,7 +56,7 @@ class Pages extends React.PureComponent<PagesProps & PagesStateProps> {
 		}
 
 		const pageNames = children.map(child =>
-			isPageProvider(child) ? child.type.getPageName(child.props) : child.props.name
+			isPageProvider(child) ? child.type.getPageName(child.props) : child.props.name,
 		)
 		const matchedPageIndex = pageNames.findIndex(name => name === this.props.name)
 

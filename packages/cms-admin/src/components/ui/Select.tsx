@@ -28,11 +28,11 @@ class Select extends React.PureComponent<Select.Props> {
 						> = {
 							value: option.value,
 							disabled: option.disabled,
-							key: option.value
+							key: option.value,
 						}
 						if (typeof option.label === 'object' && option.label !== null) {
 							optionProps.dangerouslySetInnerHTML = {
-								__html: ReactDOMServer.renderToStaticMarkup(option.label as React.ReactElement)
+								__html: ReactDOMServer.renderToStaticMarkup(option.label as React.ReactElement),
 							}
 						} else {
 							optionProps.children = option.label

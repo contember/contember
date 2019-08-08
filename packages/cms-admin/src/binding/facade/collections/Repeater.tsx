@@ -7,7 +7,7 @@ import {
 	Props,
 	SyntheticChildrenProvider,
 	ToMany,
-	ToManyProps
+	ToManyProps,
 } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
@@ -42,7 +42,7 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 								}}
 							</ToMany.AccessorRetriever>
 						),
-						environment
+						environment,
 					)
 				}
 			</EnvironmentContext.Consumer>
@@ -139,10 +139,10 @@ namespace Repeater {
 
 	export const filterEntities = (
 		entities: EntityCollectionAccessor,
-		excludeUnpersisted: boolean = false
+		excludeUnpersisted: boolean = false,
 	): EntityAccessor[] => {
 		return entities.entities.filter(
-			(item): item is EntityAccessor => item instanceof EntityAccessor && (!excludeUnpersisted || item.isPersisted())
+			(item): item is EntityAccessor => item instanceof EntityAccessor && (!excludeUnpersisted || item.isPersisted()),
 		)
 	}
 }

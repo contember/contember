@@ -17,5 +17,5 @@ export default combineReducers<State>({
 	upload: Upload,
 	toasts: Toasts,
 	dataTrees: dataTreesReducer,
-	system: System
+	system: System,
 })

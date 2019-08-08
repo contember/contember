@@ -22,7 +22,7 @@ export const AddNewButton = React.memo((props: AddNewButtonProps) => {
 					style={{
 						marginRight: '0.2em',
 						position: 'relative',
-						top: '0.2em'
+						top: '0.2em',
 					}}
 				/>
 				{props.children || 'Add'}

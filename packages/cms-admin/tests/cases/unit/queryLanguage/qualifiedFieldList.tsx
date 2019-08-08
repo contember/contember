@@ -13,7 +13,7 @@ describe('qualified field list QueryLanguage parser', () => {
 			entityName: 'Author',
 			filter: undefined,
 			toOneProps: [],
-			fieldName: 'name'
+			fieldName: 'name',
 		})
 	})
 
@@ -21,10 +21,10 @@ describe('qualified field list QueryLanguage parser', () => {
 		expect(parse('Author[age > 20].son.name')).eql({
 			entityName: 'Author',
 			filter: {
-				age: { gt: 20 }
+				age: { gt: 20 },
 			},
 			toOneProps: [{ field: 'son' }],
-			fieldName: 'name'
+			fieldName: 'name',
 		})
 	})
 })

@@ -15,5 +15,5 @@ export default interface ProjectsConfigsState {
 }
 
 export const emptyProjectsConfigsState: ProjectsConfigsState = {
-	configs: []
+	configs: [],
 }

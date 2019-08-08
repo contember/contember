@@ -11,7 +11,7 @@ export class FieldMarker {
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly defaultValue?: GraphQlBuilder.Literal | Scalar,
-		public readonly isNonbearing: boolean = false
+		public readonly isNonbearing: boolean = false,
 	) {}
 
 	public get placeholderName(): string {

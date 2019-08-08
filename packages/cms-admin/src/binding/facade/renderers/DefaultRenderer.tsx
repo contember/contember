@@ -22,7 +22,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 											{DefaultRenderer.renderTitle(this.props.title)}
 											{this.props.children}
 										</DataContext.Provider>
-									)
+									),
 							)}
 							<PersistButton />
 						</>

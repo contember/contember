@@ -38,7 +38,7 @@ type RequestState = LoginRequest | ProjectsListRequest | PageRequest<any>
 export default RequestState
 
 export const emptyRequestState: RequestState = {
-	name: 'login'
+	name: 'login',
 }
 
 export type RequestChange = (currentState: RequestState) => RequestState
@@ -49,12 +49,12 @@ export const pageRequest = <P extends PageParameters>(
 	project: string,
 	stage: string,
 	pageName: string,
-	parameters: P
+	parameters: P,
 ): RequestChange => (currentState): PageRequest<P> => ({
 	name: 'project_page',
 	project,
 	stage,
 	pageName,
 	parameters,
-	dimensions: (currentState as StageRequest).dimensions || {}
+	dimensions: (currentState as StageRequest).dimensions || {},
 })

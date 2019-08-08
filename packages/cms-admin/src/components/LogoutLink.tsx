@@ -41,5 +41,5 @@ class LogoutLink extends React.Component<Props, {}> {
 
 export default connect<{}, LogoutDispatchProps, LogoutLinkProps, State>(
 	null,
-	(dispatch: Dispatch, ownProps) => ({ logout: () => dispatch(logout()) })
+	(dispatch: Dispatch, ownProps) => ({ logout: () => dispatch(logout()) }),
 )(LogoutLink)

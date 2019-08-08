@@ -10,7 +10,7 @@ import {
 	FieldMarker,
 	Marker,
 	MarkerTreeRoot,
-	ReferenceMarker
+	ReferenceMarker,
 } from '../dao'
 import { Hashing } from '../utils'
 
@@ -21,8 +21,8 @@ export class MarkerTreeGenerator {
 	public constructor(
 		private sourceTree: React.ReactNode,
 		private environment: Environment = new Environment({
-			dimensions: {}
-		})
+			dimensions: {},
+		}),
 	) {}
 
 	public generate(): MarkerTreeRoot {
@@ -54,7 +54,7 @@ export class MarkerTreeGenerator {
 			throw new DataBindingError(
 				`Render props (functions as React component children) are not supported within the schema. ` +
 					`You have likely used a bare custom component as opposed to wrapping in with \`Component\`. ` +
-					`Please refer to the documentation.`
+					`Please refer to the documentation.`,
 			)
 		}
 
@@ -113,7 +113,7 @@ export class MarkerTreeGenerator {
 					return dataMarker.generateMarkerTreeRoot(
 						node.props,
 						this.mapNodeResultToEntityFields(this.processNode(children, environment)),
-						environment
+						environment,
 					)
 				}
 				throw new DataBindingError(`Each ${dataMarker.displayName} component must have children.`)
@@ -124,7 +124,7 @@ export class MarkerTreeGenerator {
 					const referenceMarker = dataMarker.generateReferenceMarker(
 						node.props,
 						this.mapNodeResultToEntityFields(this.processNode(children, environment)),
-						environment
+						environment,
 					)
 
 					for (const placeholderName in referenceMarker.references) {
@@ -206,7 +206,7 @@ export class MarkerTreeGenerator {
 							fields: {},
 							filter: fresh.references[placeholderName].filter,
 							reducedBy: fresh.references[placeholderName].reducedBy,
-							expectedCount: fresh.references[placeholderName].expectedCount
+							expectedCount: fresh.references[placeholderName].expectedCount,
 						}
 					}
 
@@ -257,7 +257,7 @@ export class MarkerTreeGenerator {
 				marker instanceof FieldMarker ? 'field' : marker instanceof ReferenceMarker ? 'relation' : 'connection'
 
 			throw new DataBindingError(
-				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`
+				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
 			)
 		}
 		throw new DataBindingError('Empty data tree discovered. Try adding some fields…')
@@ -269,7 +269,7 @@ export class MarkerTreeGenerator {
 
 	private rejectConnectionMarkerCombo(connectionMarker: ConnectionMarker): never {
 		throw new DataBindingError(
-			`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`
+			`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`,
 		)
 	}
 }

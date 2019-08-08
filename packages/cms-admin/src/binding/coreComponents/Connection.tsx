@@ -28,7 +28,7 @@ class Connection extends React.PureComponent<ConnectionProps> {
 					to={typeof props.to === 'string' ? QueryLanguage.parseUniqueWhere(props.to, environment) : props.to}
 				/>
 			),
-			environment
+			environment,
 		)
 	}
 }

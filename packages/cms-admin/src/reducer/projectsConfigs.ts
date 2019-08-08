@@ -8,7 +8,7 @@ export default handleActions<ProjectConfigsState, any>(
 	{
 		[PROJECT_CONFIGS_REPLACE]: (state, action: Action<ProjectConfigsState['configs']>) => {
 			return { configs: action.payload } as ProjectConfigsState
-		}
+		},
 	},
-	emptyProjectsConfigsState
+	emptyProjectsConfigsState,
 ) as Reducer

@@ -12,8 +12,8 @@ describe('relative entity list QueryLanguage parser', () => {
 		expect(parse('foo.bar.baz')).eql({
 			toOneProps: [{ field: 'foo' }, { field: 'bar' }],
 			toManyProps: {
-				field: 'baz'
-			}
+				field: 'baz',
+			},
 		})
 	})
 
@@ -23,9 +23,9 @@ describe('relative entity list QueryLanguage parser', () => {
 			toManyProps: {
 				field: 'foo',
 				filter: {
-					bar: { eq: 123 }
-				}
-			}
+					bar: { eq: 123 },
+				},
+			},
 		})
 	})
 
@@ -35,9 +35,9 @@ describe('relative entity list QueryLanguage parser', () => {
 			toManyProps: {
 				field: 'foo',
 				filter: {
-					and: [{ bar: { eq: 'value' } }, { baz: { gte: 456 } }]
-				}
-			}
+					and: [{ bar: { eq: 'value' } }, { baz: { gte: 456 } }],
+				},
+			},
 		}
 		expect(parse("foo[bar = 'value'][baz >= 456]")).eql(expected)
 		expect(parse("foo[bar = 'value' && baz >= 456]")).eql(expected)
@@ -52,14 +52,14 @@ describe('relative entity list QueryLanguage parser', () => {
 					or: [
 						{ a: { lt: 1 } },
 						{
-							and: [{ b: { eq: 2 } }, { c: { notEq: 3 } }]
+							and: [{ b: { eq: 2 } }, { c: { notEq: 3 } }],
 						},
 						{
-							d: { gt: 4 }
-						}
-					]
-				}
-			}
+							d: { gt: 4 },
+						},
+					],
+				},
+			},
 		})
 	})
 
@@ -69,9 +69,9 @@ describe('relative entity list QueryLanguage parser', () => {
 			toManyProps: {
 				field: 'foo',
 				filter: {
-					and: [{ a: { b: { c: { lt: 123 } } } }, { a: { d: { eq: 456 } } }]
-				}
-			}
+					and: [{ a: { b: { c: { lt: 123 } } } }, { a: { d: { eq: 456 } } }],
+				},
+			},
 		})
 	})
 })

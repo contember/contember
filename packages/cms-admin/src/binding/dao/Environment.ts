@@ -6,8 +6,8 @@ import SystemMiddleware = Environment.SystemMiddleware
 class Environment {
 	public constructor(
 		private readonly names: Environment.NameStore = {
-			dimensions: {}
-		}
+			dimensions: {},
+		},
 	) {}
 
 	public hasName(name: keyof Environment.NameStore): boolean {
@@ -56,13 +56,13 @@ class Environment {
 		return new Environment({
 			...this.names,
 			dimensions: { ...this.names.dimensions },
-			[name]: value
+			[name]: value,
 		})
 	}
 
 	public putSystemVariable<N extends Environment.SystemVariableName>(
 		name: N,
-		value: Environment.SystemVariables[N]
+		value: Environment.SystemVariables[N],
 	): Environment {
 		return this.putName(name, value)
 	}
@@ -84,11 +84,11 @@ class Environment {
 
 	public updateDimensionsIfNecessary(
 		dimensions: Environment.NameStore['dimensions'],
-		defaultDimensions: Environment.NameStore['dimensions']
+		defaultDimensions: Environment.NameStore['dimensions'],
 	): Environment {
 		const normalizedDimensions: Environment.NameStore['dimensions'] = {
 			...defaultDimensions,
-			...dimensions
+			...dimensions,
 		}
 
 		const dimensionsEqual = JSON.stringify(this.names.dimensions) === JSON.stringify(normalizedDimensions)
@@ -96,13 +96,13 @@ class Environment {
 			? this
 			: new Environment({
 					...this.names,
-					dimensions: { ...normalizedDimensions }
+					dimensions: { ...normalizedDimensions },
 			  })
 	}
 
 	public static generateDelta(
 		currentEnvironment: Environment,
-		delta: Environment.DeltaFactory
+		delta: Environment.DeltaFactory,
 	): Partial<Environment.NameStore> {
 		const newDelta: Partial<Environment.NameStore> = {}
 

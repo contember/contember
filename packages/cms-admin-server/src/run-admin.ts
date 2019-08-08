@@ -7,7 +7,7 @@ import Server from './Server'
 		const configFile = process.cwd() + '/src/config/config.yaml'
 		const loader = new ConfigLoader()
 		const config = await loader.load(configFile, {
-			env: process.env
+			env: process.env,
 		})
 		const server = new Server()
 		server.run(config)

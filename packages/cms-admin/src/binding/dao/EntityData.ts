@@ -12,19 +12,19 @@ class EntityData {
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
-		filter: ReferenceMarker.ReferenceConstraints['filter']
+		filter: ReferenceMarker.ReferenceConstraints['filter'],
 	): EntityData.FieldData
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
-		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy']
+		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy'],
 	): EntityData.FieldData
 	public getField(
 		fieldName: FieldName,
 		expectedCount?: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter?: ReferenceMarker.ReferenceConstraints['filter'],
-		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy']
+		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy'],
 	): EntityData.FieldData {
 		let placeholder: FieldName
 
@@ -32,7 +32,7 @@ class EntityData {
 			placeholder = PlaceholderGenerator.getReferencePlaceholder(fieldName, {
 				expectedCount,
 				reducedBy,
-				filter
+				filter,
 			})
 		} else {
 			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldName)

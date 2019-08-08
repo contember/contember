@@ -31,5 +31,5 @@ DynamicLinkComponent.displayName = 'DynamicLink'
 
 export const DynamicLink = connect<{}, DynamicLinkDispatchProps, DynamicLinkOwnProps, State>(
 	undefined,
-	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) })
+	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(DynamicLinkComponent)

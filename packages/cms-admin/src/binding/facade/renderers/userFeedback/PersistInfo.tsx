@@ -38,7 +38,7 @@ export class PersistInfoConnected extends React.PureComponent<PersistInfoProps> 
 	private displayFeedback(result: ToastType) {
 		const toastId = this.props.showToast({
 			type: result,
-			message: this.getUserMessage(result)
+			message: this.getUserMessage(result),
 		})
 		const timeout = this.props.timeout !== undefined ? this.props.timeout : 5000
 
@@ -80,6 +80,6 @@ export const PersistInfo: PersistInfoType = connect<{}, PersistInfoDispatchProps
 		},
 		dismissToast: (toastId: ToastId) => {
 			dispatch(dismissToast(toastId))
-		}
-	})
+		},
+	}),
 )(PersistInfoConnected)

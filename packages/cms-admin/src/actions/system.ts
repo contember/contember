@@ -17,8 +17,8 @@ export const setFetching = (baseStage: string): ActionCreator => async (dispatch
 			project,
 			headStage,
 			baseStage,
-			state: StageDiffState.DIFF_FETCHING
-		}
+			state: StageDiffState.DIFF_FETCHING,
+		},
 	})
 }
 
@@ -37,9 +37,9 @@ export const fetchDiff = (baseStage: string): ActionCreator => async (dispatch, 
 		diffQuery,
 		{
 			headStage: headStage,
-			baseStage: baseStage
+			baseStage: baseStage,
 		},
-		apiToken
+		apiToken,
 	)
 
 	dispatch({
@@ -51,15 +51,15 @@ export const fetchDiff = (baseStage: string): ActionCreator => async (dispatch, 
 			state:
 				response.diff.errors && response.diff.errors.length > 0 ? StageDiffState.DIFF_FAILED : StageDiffState.DIFF_DONE,
 			events: response.diff.result && response.diff.result.events,
-			errors: response.diff.errors
-		}
+			errors: response.diff.errors,
+		},
 	})
 }
 
 export const executeRelease = (baseStage: string, events: string[]): ActionCreator => async (
 	dispatch,
 	getState,
-	services
+	services,
 ) => {
 	const state = getState()
 	const request = state.request
@@ -76,9 +76,9 @@ export const executeRelease = (baseStage: string, events: string[]): ActionCreat
 		{
 			headStage,
 			baseStage,
-			events: events.filter((val, i, arr) => arr.indexOf(val) === i)
+			events: events.filter((val, i, arr) => arr.indexOf(val) === i),
 		},
-		apiToken
+		apiToken,
 	)
 
 	await dispatch(fetchDiff(baseStage))

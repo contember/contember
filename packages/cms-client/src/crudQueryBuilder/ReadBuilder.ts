@@ -6,13 +6,13 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
 	public static instantiate<AllowedArgs extends ReadArguments = ReadArguments>(
-		objectBuilder: ObjectBuilder = new ObjectBuilder()
+		objectBuilder: ObjectBuilder = new ObjectBuilder(),
 	): ReadBuilder.Builder<AllowedArgs> {
 		return new ReadBuilder<AllowedArgs>(objectBuilder)
 	}
 
 	public static instantiateFromFactory<AllowedArgs extends ReadArguments>(
-		builder: ReadBuilder.BuilderFactory<AllowedArgs>
+		builder: ReadBuilder.BuilderFactory<AllowedArgs>,
 	): ReadBuilder.Builder<never> {
 		if (typeof builder === 'function') {
 			return builder(ReadBuilder.instantiate())
@@ -21,7 +21,7 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 	}
 
 	protected instantiate<AA extends ReadArguments = ReadArguments>(
-		objectBuilder: ObjectBuilder = new ObjectBuilder()
+		objectBuilder: ObjectBuilder = new ObjectBuilder(),
 	): ReadBuilder.Builder<AA> {
 		return ReadBuilder.instantiate<AA>(objectBuilder)
 	}

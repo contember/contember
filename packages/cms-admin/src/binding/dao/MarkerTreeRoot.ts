@@ -32,7 +32,7 @@ class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
 		public readonly entityName: EntityName,
 		public readonly fields: EntityFields,
 		public readonly constraints: C,
-		public readonly associatedField?: FieldName
+		public readonly associatedField?: FieldName,
 	) {
 		this.id = MarkerTreeRoot.getNewTreeId()
 	}

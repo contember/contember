@@ -22,7 +22,7 @@ export class EntityCreator<DRP> extends React.PureComponent<EntityCreatorProps<D
 				{(environment: Environment) => {
 					const markerTreeGenerator = new MarkerTreeGenerator(
 						<EntityCreator {...this.props}>{this.props.children}</EntityCreator>,
-						environment
+						environment,
 					)
 					const DataProvider = getDataProvider<DRP>()
 
@@ -42,7 +42,7 @@ export class EntityCreator<DRP> extends React.PureComponent<EntityCreatorProps<D
 
 	public static generateMarkerTreeRoot(
 		props: EntityCreatorProps<unknown>,
-		fields: MarkerTreeRoot['fields']
+		fields: MarkerTreeRoot['fields'],
 	): MarkerTreeRoot {
 		return new MarkerTreeRoot(props.name, fields, undefined)
 	}

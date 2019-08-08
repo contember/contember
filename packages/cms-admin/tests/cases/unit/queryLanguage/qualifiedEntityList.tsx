@@ -12,7 +12,7 @@ describe('qualified entity list QueryLanguage parser', () => {
 		expect(parse('Author')).eql({
 			entityName: 'Author',
 			filter: undefined,
-			toOneProps: []
+			toOneProps: [],
 		})
 	})
 
@@ -20,9 +20,9 @@ describe('qualified entity list QueryLanguage parser', () => {
 		expect(parse(`Author[age > 20 && homeTown = 'Prague'].son.sisters(name = 'Jane')`)).eql({
 			entityName: 'Author',
 			filter: {
-				and: [{ age: { gt: 20 } }, { homeTown: { eq: 'Prague' } }]
+				and: [{ age: { gt: 20 } }, { homeTown: { eq: 'Prague' } }],
 			},
-			toOneProps: [{ field: 'son' }, { field: 'sisters', reducedBy: { name: 'Jane' } }]
+			toOneProps: [{ field: 'son' }, { field: 'sisters', reducedBy: { name: 'Jane' } }],
 		})
 	})
 })

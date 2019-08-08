@@ -32,7 +32,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 
 	const renderContent = (
 		dimensionData: StatefulDimensionDatum[],
-		selectedDimensions: StatefulDimensionDatum<true>[]
+		selectedDimensions: StatefulDimensionDatum<true>[],
 	) => {
 		const canSelectJustOne = props.minItems === 1 && props.maxItems === 1
 		const selectedDimensionsCount = selectedDimensions.length
@@ -64,8 +64,8 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 				...reqState,
 				dimensions: {
 					...(reqState.dimensions || {}),
-					[props.dimension]: getUniqueDimensions(updatedDimensions.map(item => item.slug))
-				}
+					[props.dimension]: getUniqueDimensions(updatedDimensions.map(item => item.slug)),
+				},
 			}
 		}
 
@@ -118,7 +118,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 				return {
 					slug: dimension,
 					label: dimension, // We don't have the data to match the defaults with so this is better than nothing
-					isSelected: true
+					isSelected: true,
 				}
 			})
 		}
@@ -139,7 +139,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 					normalized.push({
 						slug: slugValue,
 						isSelected: currentDimensions.indexOf(slugValue) !== -1,
-						label
+						label,
 					})
 				}
 			}

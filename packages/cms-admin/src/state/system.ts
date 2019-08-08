@@ -1,7 +1,7 @@
 export enum StageDiffState {
 	DIFF_FETCHING = 'fetching',
 	DIFF_FAILED = 'failed',
-	DIFF_DONE = 'done'
+	DIFF_DONE = 'done',
 }
 
 export interface StageDiff {
@@ -31,7 +31,7 @@ export enum EventType {
 	UPDATE = 'UPDATE',
 	DELETE = 'DELETE',
 	CREATE = 'CREATE',
-	RUN_MIGRATION = 'RUN_MIGRATION'
+	RUN_MIGRATION = 'RUN_MIGRATION',
 }
 
 export interface Event {
@@ -47,5 +47,5 @@ export default interface SystemState {
 }
 
 export const emptySystemState: SystemState = {
-	diffs: []
+	diffs: [],
 }

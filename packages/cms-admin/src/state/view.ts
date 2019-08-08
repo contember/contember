@@ -7,5 +7,5 @@ export default interface ViewState {
 
 export const emptyViewState: ViewState = {
 	loading: false,
-	route: null
+	route: null,
 }

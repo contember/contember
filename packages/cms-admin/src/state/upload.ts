@@ -2,7 +2,7 @@ export enum UploadStatus {
 	PREPARING,
 	UPLOADING,
 	FINISHED,
-	FAILED
+	FAILED,
 }
 
 export interface Upload {
@@ -39,5 +39,5 @@ export default interface UploadState {
 }
 
 export const emptyUploadState: UploadState = {
-	uploads: {}
+	uploads: {},
 }

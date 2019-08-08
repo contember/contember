@@ -6,7 +6,7 @@ import { DummyAdmin } from '../DummyAdmin'
 const ItemWithPageLink: React.FunctionComponent = ({ children }) => (
 	<PageLink
 		change={() => ({
-			name: 'dashboard'
+			name: 'dashboard',
 		})}
 		Component={({ href, onClick }) => <Dropdown.Item {...{ href, onClick }}>{children}</Dropdown.Item>}
 	/>

@@ -9,7 +9,7 @@ import {
 	EntityCollectionAccessor,
 	EntityForRemovalAccessor,
 	FieldAccessor,
-	ReferenceMarker
+	ReferenceMarker,
 } from '../../../dao'
 import { Parser } from '../../../queryLanguage'
 import { BaseChoiceMetadata, ChoiceArity, ChoiceField, SingleChoiceFieldMetadata } from './ChoiceField'
@@ -29,7 +29,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 		const parsedOptions = Parser.parseQueryLanguageExpression(
 			this.props.options,
 			this.props.optionFieldFactory ? Parser.EntryPoint.QualifiedEntityList : Parser.EntryPoint.QualifiedFieldList,
-			this.props.rawMetadata.environment
+			this.props.rawMetadata.environment,
 		)
 		const { toOneProps } = parsedOptions
 
@@ -55,7 +55,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 		}
 		if (this.props.arity === ChoiceArity.Multiple && !(currentValueEntity instanceof EntityCollectionAccessor)) {
 			throw new DataBindingError(
-				'Corrupted data: dynamic multiple-choice field must be a reference to a collection of entities.'
+				'Corrupted data: dynamic multiple-choice field must be a reference to a collection of entities.',
 			)
 		}
 
@@ -65,7 +65,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 			throw new DataBindingError('Corrupted data')
 		}
 		const filteredData = subTreeData.entities.filter(
-			(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor && !!accessor.getPersistedKey()
+			(accessor): accessor is EntityAccessor => accessor instanceof EntityAccessor && !!accessor.getPersistedKey(),
 		)
 
 		const optionEntities: EntityAccessor[] = []
@@ -78,7 +78,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 					props.field,
 					ReferenceMarker.ExpectedCount.UpToOne,
 					props.filter,
-					props.reducedBy
+					props.reducedBy,
 				)
 
 				if (field instanceof EntityAccessor) {
@@ -125,15 +125,15 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 
 					// We can get away with the "!" since this collection was created from filteredData above.
 					// If this is actually an unpersisted entity, we've got a huge problem.
-					actualValue: item.getPersistedKey()!
+					actualValue: item.getPersistedKey()!,
 				}
-			}
+			},
 		)
 
 		const baseMetadata: BaseChoiceMetadata = {
 			...this.props.rawMetadata,
 			data: normalizedData,
-			errors: currentValueEntity.errors
+			errors: currentValueEntity.errors,
 		}
 
 		if (this.props.arity === ChoiceArity.Multiple) {
@@ -158,7 +158,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 							}
 						}
 					}
-				}
+				},
 			})
 		} else if (this.props.arity === ChoiceArity.Single) {
 			// No idea why this cast is necessary. TS is just being silly here…
@@ -178,7 +178,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 					} else {
 						entity.replaceWith && entity.replaceWith(filteredData[newValue])
 					}
-				}
+				},
 			})
 		} else {
 			return assertNever(this.props)

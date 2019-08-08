@@ -8,7 +8,7 @@ export default handleActions<RequestState, any>(
 	{
 		[REQUEST_REPLACE]: (state, action: Action<RequestState>) => {
 			return action.payload || emptyRequestState
-		}
+		},
 	},
-	emptyRequestState
+	emptyRequestState,
 ) as Reducer

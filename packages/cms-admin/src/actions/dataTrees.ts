@@ -6,7 +6,7 @@ import {
 	DATA_TREE_REQUEST_END,
 	DATA_TREE_REQUEST_ERROR,
 	DATA_TREE_REQUEST_INITIALIZE,
-	DATA_TREE_SET_DIRTINESS
+	DATA_TREE_SET_DIRTINESS,
 } from '../reducer/dataTrees'
 import { DataTreeDirtinessState, DataTreeId, DataTreeRequestErrorData, DataTreeRequestType } from '../state/dataTrees'
 import { loginRequest } from '../state/request'
@@ -22,7 +22,7 @@ export const setDataTreeDirtiness = (dataTreeId: DataTreeId, isDirty: DataTreeDi
 	createAction<DataTreeDirtinessDelta>(DATA_TREE_SET_DIRTINESS, () => {
 		return {
 			dataTreeId,
-			isDirty
+			isDirty,
 		}
 	})()
 
@@ -35,7 +35,7 @@ export const createDataTreeRequest = (dataTreeId: DataTreeId, type: DataTreeRequ
 	createAction<DataTreeCreateRequest>(DATA_TREE_REQUEST_CREATE, () => {
 		return {
 			dataTreeId,
-			type
+			type,
 		}
 	})()
 
@@ -48,7 +48,7 @@ export const initializeDataTreeRequest = (dataTreeId: DataTreeId, type: DataTree
 	createAction<DataTreeInitializeRequest>(DATA_TREE_REQUEST_INITIALIZE, () => {
 		return {
 			dataTreeId,
-			type
+			type,
 		}
 	})()
 
@@ -69,7 +69,7 @@ export const handleDataTreeRequestEnd = (dataTreeId: DataTreeId, type: DataTreeR
 		return {
 			dataTreeId,
 			type,
-			data
+			data,
 		}
 	})()
 
@@ -82,13 +82,13 @@ export interface DataTreeSetRequestError<ErrorData extends DataTreeRequestErrorD
 export const setDataTreeRequestError = <ErrorData extends DataTreeRequestErrorData>(
 	dataTreeId: DataTreeId,
 	type: DataTreeRequestType,
-	data: ErrorData
+	data: ErrorData,
 ) =>
 	createAction<DataTreeSetRequestError<ErrorData>>(DATA_TREE_REQUEST_ERROR, () => {
 		return {
 			dataTreeId,
 			type,
-			data
+			data,
 		}
 	})()
 
@@ -101,7 +101,7 @@ export interface DataTreeQuery {
 export const sendDataTreeRequest = (
 	dataTreeId: DataTreeId,
 	type: DataTreeRequestType,
-	request: string
+	request: string,
 ): ActionCreator => async (dispatch, getState, services) => {
 	const state = getState()
 	if (!('stage' in state.request) || !('project' in state.request)) {

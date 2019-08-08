@@ -22,7 +22,7 @@ export default function httpFetch(url: string, opts: RequestOpts = {}, callbacks
 
 		xhr.onload = e => {
 			res({
-				body: xhr.responseText
+				body: xhr.responseText,
 			})
 		}
 		xhr.onerror = rej

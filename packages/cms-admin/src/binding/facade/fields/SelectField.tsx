@@ -57,15 +57,15 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 		const options = Array<Select.Option>({
 			disabled: this.props.allowNull !== true,
 			value: -1,
-			label: this.props.firstOptionCaption || this.props.label || ''
+			label: this.props.firstOptionCaption || this.props.label || '',
 		}).concat(
 			this.props.data.map(({ key, label }) => {
 				return {
 					disabled: false,
 					value: key,
-					label: label
+					label: label,
 				}
-			})
+			}),
 		)
 
 		return (

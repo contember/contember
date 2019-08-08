@@ -3,7 +3,7 @@ import {
 	EnforceSubtypeRelation,
 	EnvironmentContext,
 	EnvironmentDeltaProvider,
-	SyntheticChildrenProvider
+	SyntheticChildrenProvider,
 } from '../../coreComponents'
 import { DataBindingError, Environment } from '../../dao'
 
@@ -30,7 +30,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 	public static generateSyntheticChildren(props: SideDimensionsProps, environment: Environment): React.ReactNode {
 		if ((props.dimension === undefined) === (props.staticOptions === undefined)) {
 			throw new DataBindingError(
-				`The SideDimensions component needs to be passed exactly one of its 'dimension' or 'staticOptions' props.`
+				`The SideDimensions component needs to be passed exactly one of its 'dimension' or 'staticOptions' props.`,
 			)
 		}
 
@@ -94,7 +94,7 @@ namespace SideDimensions {
 			return (
 				<EnvironmentContext.Provider
 					value={this.props.environment.putDelta(
-						SingleDimension.generateEnvironmentDelta(this.props, this.props.environment)
+						SingleDimension.generateEnvironmentDelta(this.props, this.props.environment),
 					)}
 				>
 					<div className="sideDimensions-dimensions-dimension">{this.props.children}</div>
@@ -104,7 +104,7 @@ namespace SideDimensions {
 
 		public static generateEnvironmentDelta(
 			props: SingleDimensionProps,
-			oldEnvironment: Environment
+			oldEnvironment: Environment,
 		): Partial<Environment.NameStore> {
 			if (!props.variables) {
 				return {}

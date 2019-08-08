@@ -10,7 +10,7 @@ class DummyAdmin extends React.Component<DummyAdmin.Props> {
 	store: Store
 
 	public static defaultProps: Partial<DummyAdmin.Props> = {
-		toasts: []
+		toasts: [],
 	}
 
 	constructor(props: DummyAdmin.Props) {
@@ -26,8 +26,8 @@ class DummyAdmin extends React.Component<DummyAdmin.Props> {
 					} else {
 						return undefined
 					}
-				}
-			}
+				},
+			},
 		)
 
 		this.store = configureStore(
@@ -41,8 +41,8 @@ class DummyAdmin extends React.Component<DummyAdmin.Props> {
 						pageName: 'dummy',
 						parameters: {},
 						project: 'storybook',
-						stage: 'dev'
-					}
+						stage: 'dev',
+					},
 				},
 				projectsConfigs: {
 					configs: [
@@ -50,13 +50,13 @@ class DummyAdmin extends React.Component<DummyAdmin.Props> {
 							project: 'storybook',
 							stage: 'dev',
 							component: () => Promise.reject(),
-							routes: everyPage
-						}
-					]
+							routes: everyPage,
+						},
+					],
 				},
-				toasts: { toasts: this.props.toasts }
+				toasts: { toasts: this.props.toasts },
 			},
-			{ apiServer: 'https://example.com', loginToken: 'XXX' }
+			{ apiServer: 'https://example.com', loginToken: 'XXX' },
 		)
 	}
 

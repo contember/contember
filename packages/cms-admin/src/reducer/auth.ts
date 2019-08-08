@@ -20,7 +20,7 @@ export default handleActions<AuthState, any>(
 		},
 		[SET_LOGOUT]: (state: AuthState, action: Action<undefined>): AuthState => {
 			return { ...state, errorMessage: null, identity: null, status: AuthStatus.NOT_LOGGED_IN }
-		}
+		},
 	},
-	emptyAuthState
+	emptyAuthState,
 ) as Reducer

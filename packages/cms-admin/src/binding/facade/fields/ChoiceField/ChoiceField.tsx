@@ -8,7 +8,7 @@ import {
 	FieldMetadata,
 	SyntheticChildrenProvider,
 	ToMany,
-	ToOne
+	ToOne,
 } from '../../../coreComponents'
 import { EntityAccessor, Environment, Literal, VariableLiteral, VariableScalar } from '../../../dao'
 import { QueryLanguage } from '../../../queryLanguage'
@@ -17,7 +17,7 @@ import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'
 
 export enum ChoiceArity {
 	Single = 'single',
-	Multiple = 'multiple'
+	Multiple = 'multiple',
 }
 
 export interface ChoiceFieldPublicProps {
@@ -68,7 +68,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 						options: this.props.options,
 						arity: this.props.arity,
 						children: this.props.children,
-						optionFieldFactory: this.props.optionFieldFactory
+						optionFieldFactory: this.props.optionFieldFactory,
 					}
 
 					if (Array.isArray(this.props.options)) {
@@ -82,7 +82,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 
 	public static generateSyntheticChildren(
 		props: Omit<ChoiceFieldProps, 'children'>,
-		environment: Environment
+		environment: Environment,
 	): React.ReactNode {
 		if (Array.isArray(props.options)) {
 			return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
@@ -117,7 +117,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 					)}
 				</>
 			),
-			environment
+			environment,
 		)
 	}
 }

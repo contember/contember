@@ -8,7 +8,7 @@ export const addToast = (() => {
 	return (toast: ToastDefinition) =>
 		createAction<Toast>(TOASTS_ADD, () => ({
 			...toast,
-			id: `${toastId++}`
+			id: `${toastId++}`,
 		}))()
 })()
 

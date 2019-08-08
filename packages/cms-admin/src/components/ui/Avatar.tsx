@@ -7,12 +7,12 @@ export enum AvatarSize {
 	Size2 = 2,
 	Size3 = 3,
 	Size4 = 4,
-	Size5 = 5
+	Size5 = 5,
 }
 
 export enum AvatarShape {
 	Circle = 'Circle',
-	Square = 'Square'
+	Square = 'Square',
 }
 
 export interface AvatarProps {
@@ -32,7 +32,7 @@ export const Avatar: React.FunctionComponent<AvatarProps> = props => {
 					className="avatar-image"
 					src={gravatar.url(email, {
 						s: `${size * 40}`,
-						d: 'mp'
+						d: 'mp',
 					})}
 					alt={email.substring(0, 1).toUpperCase()}
 				/>

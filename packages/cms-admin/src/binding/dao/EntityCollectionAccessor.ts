@@ -10,8 +10,8 @@ export class EntityCollectionAccessor extends Accessor implements Errorable {
 		public readonly errors: ErrorAccessor[],
 		public readonly batchUpdates?: (performUpdates: (getAccessor: () => EntityCollectionAccessor) => void) => void,
 		public readonly addNew?: (
-			newEntity?: EntityAccessor | ((getAccessor: () => EntityCollectionAccessor, newIndex: number) => void)
-		) => void
+			newEntity?: EntityAccessor | ((getAccessor: () => EntityCollectionAccessor, newIndex: number) => void),
+		) => void,
 	) {
 		super()
 	}

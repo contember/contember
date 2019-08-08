@@ -14,12 +14,12 @@ export default handleActions<SystemState, any>(
 						it =>
 							it.project !== action.payload!.project ||
 							it.headStage !== action.payload!.headStage ||
-							it.baseStage !== action.payload!.baseStage
+							it.baseStage !== action.payload!.baseStage,
 					),
-					action.payload!
-				]
+					action.payload!,
+				],
 			}
-		}
+		},
 	},
-	emptySystemState
+	emptySystemState,
 ) as Reducer

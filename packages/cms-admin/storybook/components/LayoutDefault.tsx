@@ -13,7 +13,7 @@ storiesOf('Layout', module).add('simple', () => (
 						Blog
 					</a>
 				),
-				right: ''
+				right: '',
 			}}
 			side={menu}
 			content={<div style={{ background: 'red', width: '100%', height: '100vh' }} />}

@@ -23,7 +23,7 @@ export interface MarkerTreeRootProvider<P = any> extends DataBindingComponent {
 	generateMarkerTreeRoot: (
 		props: Props<P>,
 		fields: MarkerTreeRoot['fields'],
-		environment: Environment
+		environment: Environment,
 	) => MarkerTreeRoot
 }
 
@@ -31,7 +31,7 @@ export interface ReferenceMarkerProvider<P = any> extends DataBindingComponent {
 	generateReferenceMarker: (
 		props: P,
 		fields: ReferenceMarker.Reference['fields'],
-		environment: Environment
+		environment: Environment,
 	) => ReferenceMarker
 }
 

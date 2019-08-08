@@ -14,7 +14,7 @@ class LocalStorageManager {
 
 namespace LocalStorageManager {
 	export enum Keys {
-		API_IDENTITY = 'api_identity'
+		API_IDENTITY = 'api_identity',
 	}
 }
 

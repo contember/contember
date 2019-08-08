@@ -19,7 +19,7 @@ interface AlertLinkState {
 export default (props: AlertLinkProps): React.ComponentType<InnerProps> => {
 	return class AlertLink extends React.Component<InnerProps, AlertLinkState> {
 		public state: Readonly<AlertLinkState> = {
-			isOpen: false
+			isOpen: false,
 		}
 
 		private onClick: React.MouseEventHandler = e => {
@@ -28,7 +28,7 @@ export default (props: AlertLinkProps): React.ComponentType<InnerProps> => {
 				return
 			}
 			this.setState({
-				isOpen: true
+				isOpen: true,
 			})
 		}
 
@@ -43,7 +43,7 @@ export default (props: AlertLinkProps): React.ComponentType<InnerProps> => {
 
 		private closeAlert() {
 			this.setState({
-				isOpen: false
+				isOpen: false,
 			})
 		}
 

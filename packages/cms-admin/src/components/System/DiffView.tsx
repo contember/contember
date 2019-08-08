@@ -13,18 +13,18 @@ import { assertNever } from 'cms-common'
 
 enum SelectionType {
 	explicit = 'explicit',
-	dependency = 'dependency'
+	dependency = 'dependency',
 }
 
 class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.DispatchProps, DiffView.State> {
 	state: DiffView.State = {
-		selected: []
+		selected: [],
 	}
 
 	calculateSelected(): { [id: string]: SelectionType } {
 		const explicit: { [id: string]: SelectionType } = this.state.selected.reduce(
 			(acc, id) => ({ ...acc, [id]: SelectionType.explicit }),
-			{}
+			{},
 		)
 		const dependencies: { [id: string]: SelectionType } = this.state.selected
 			.map(id => this.getDependencies(id))
@@ -46,14 +46,14 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 		const newVisited = [...visited, ...dependencies]
 		return [
 			...dependencies,
-			...dependencies.map(id => this.getDependencies(id, newVisited)).reduce((acc, val) => [...acc, ...val], [])
+			...dependencies.map(id => this.getDependencies(id, newVisited)).reduce((acc, val) => [...acc, ...val], []),
 		]
 	}
 
 	execRelease = () => {
 		const events = [
 			...this.state.selected,
-			...this.state.selected.map(it => this.getDependencies(it)).reduce((acc, val) => [...acc, ...val], [])
+			...this.state.selected.map(it => this.getDependencies(it)).reduce((acc, val) => [...acc, ...val], []),
 		]
 		this.setState({ selected: [] })
 		this.props.onRelease(this.props.diff!.baseStage, events)
@@ -98,14 +98,14 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 							className={cn(
 								'diffView-row',
 								selected[it.id] === SelectionType.explicit && 'is-explicit',
-								selected[it.id] === SelectionType.dependency && 'is-dependency'
+								selected[it.id] === SelectionType.dependency && 'is-dependency',
 							)}
 							onClick={e => {
 								this.setState(prev => ({
 									selected: [
 										...prev.selected.filter(id => id !== it.id),
-										...(prev.selected.includes(it.id) ? [] : [it.id])
-									]
+										...(prev.selected.includes(it.id) ? [] : [it.id]),
+									],
 								}))
 							}}
 						>
@@ -117,7 +117,7 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 									onChange={e => {
 										const targetState = e.target.checked
 										this.setState(prev => ({
-											selected: [...prev.selected.filter(id => id !== it.id), ...(targetState ? [it.id] : [])]
+											selected: [...prev.selected.filter(id => id !== it.id), ...(targetState ? [it.id] : [])],
 										}))
 									}}
 								/>
@@ -160,13 +160,13 @@ export const DiffView = connect<DiffView.StateProps, DiffView.DispatchProps, {},
 
 		return {
 			diff,
-			targetStage
+			targetStage,
 		}
 	},
 	(dispatch: Dispatch) => {
 		return {
 			onRelease: (baseStage, events) => dispatch(executeRelease(baseStage, events)),
-			onFetch: baseStage => dispatch(fetchDiff(baseStage))
+			onFetch: baseStage => dispatch(fetchDiff(baseStage)),
 		}
-	}
+	},
 )(DiffViewInner)

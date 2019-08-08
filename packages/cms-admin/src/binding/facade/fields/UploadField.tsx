@@ -71,7 +71,7 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 								...metadata,
 								upload,
 								label: this.props.label,
-								emptyText: this.props.emptyText
+								emptyText: this.props.emptyText,
 							}}
 						>
 							{this.props.children}
@@ -158,9 +158,9 @@ type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
 
 export const UploadField = connect<UploadFieldStateProps, UploadFieldDispatchProps, UploadFieldOwnProps, State>(
 	state => ({
-		uploads: state.upload.uploads
+		uploads: state.upload.uploads,
 	}),
 	(dispatch: Dispatch) => ({
-		onUpload: (id, file) => dispatch(uploadFile(id, file))
-	})
+		onUpload: (id, file) => dispatch(uploadFile(id, file)),
+	}),
 )(UploadFieldComponent)

@@ -15,7 +15,7 @@ describe('single relative fields QueryLanguage parser', () => {
 	it('should parse single field names', () => {
 		expect(parse('fooName')).eql({
 			fieldName: 'fooName',
-			toOneProps: []
+			toOneProps: [],
 		})
 	})
 
@@ -24,9 +24,9 @@ describe('single relative fields QueryLanguage parser', () => {
 			fieldName: 'fooName',
 			toOneProps: [
 				{
-					field: 'fooRelation'
-				}
-			]
+					field: 'fooRelation',
+				},
+			],
 		})
 	})
 
@@ -35,15 +35,15 @@ describe('single relative fields QueryLanguage parser', () => {
 			fieldName: 'name',
 			toOneProps: [
 				{
-					field: 'foo'
+					field: 'foo',
 				},
 				{
-					field: 'bar'
+					field: 'bar',
 				},
 				{
-					field: 'baz'
-				}
-			]
+					field: 'baz',
+				},
+			],
 		})
 	})
 
@@ -52,15 +52,15 @@ describe('single relative fields QueryLanguage parser', () => {
 			fieldName: 'name',
 			toOneProps: [
 				{
-					field: 'foo'
+					field: 'foo',
 				},
 				{
 					field: 'bar',
 					reducedBy: {
-						a: 'b'
-					}
-				}
-			]
+						a: 'b',
+					},
+				},
+			],
 		})
 	})
 
@@ -72,10 +72,10 @@ describe('single relative fields QueryLanguage parser', () => {
 					field: 'foo',
 					reducedBy: {
 						a: 'b',
-						bar: 123
-					}
-				}
-			]
+						bar: 123,
+					},
+				},
+			],
 		})
 	})
 
@@ -97,26 +97,26 @@ describe('single relative fields QueryLanguage parser', () => {
 						nested: {
 							structure: {
 								is: {
-									deep: 123
+									deep: 123,
 								},
 								be: {
 									indeed: {
 										not: {
-											shallow: new GraphQlBuilder.Literal('baz')
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			]
+											shallow: new GraphQlBuilder.Literal('baz'),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			],
 		})
 	})
 
 	it('should reject malformed nested unique where', () => {
 		expect(() => parse('foo(nested.field = 123, nested.field.treated.as.relation = baz).name')).throws(
-			/'nested\.field'/i
+			/'nested\.field'/i,
 		)
 		expect(() => parse('foo(nested.field = 123, nested.field = baz).name')).throws(/'nested\.field'/i)
 	})
@@ -126,7 +126,7 @@ describe('single relative fields QueryLanguage parser', () => {
 		const result = QueryLanguage.wrapRelativeSingleField(
 			'this(better=work).as.expected(and = 1).correctly',
 			name => <TextField name={name} />,
-			environment
+			environment,
 		)
 		const expected = (
 			<ToOne.AtomicPrimitive

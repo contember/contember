@@ -27,14 +27,14 @@ class ToMany extends React.PureComponent<ToManyProps> {
 		return QueryLanguage.wrapRelativeEntityList(
 			props.field,
 			ToMany.getAtomicPrimitiveFactory(props.children),
-			environment
+			environment,
 		)
 	}
 }
 
 namespace ToMany {
 	export const getAtomicPrimitiveFactory = (children: React.ReactNode) => (
-		atomicPrimitiveProps: AtomicPrimitiveProps
+		atomicPrimitiveProps: AtomicPrimitiveProps,
 	) => <ToMany.AtomicPrimitive {...atomicPrimitiveProps}>{children}</ToMany.AtomicPrimitive>
 
 	export interface AtomicPrimitivePublicProps {
@@ -62,7 +62,7 @@ namespace ToMany {
 		public static generateReferenceMarker(
 			props: Props<AtomicPrimitiveProps>,
 			fields: EntityFields,
-			environment: Environment
+			environment: Environment,
 		): ReferenceMarker {
 			return new ReferenceMarker(props.field, ReferenceMarker.ExpectedCount.PossiblyMany, fields, props.filter)
 		}
@@ -85,7 +85,7 @@ namespace ToMany {
 							const field = data.data.getField(
 								this.props.field,
 								ReferenceMarker.ExpectedCount.PossiblyMany,
-								this.props.filter
+								this.props.filter,
 							)
 
 							if (field instanceof EntityCollectionAccessor) {
@@ -113,7 +113,7 @@ namespace ToMany {
 								<DataContext.Provider value={datum} key={datum.getKey()}>
 									{this.props.children}
 								</DataContext.Provider>
-							)
+							),
 					)}
 				</>
 			)

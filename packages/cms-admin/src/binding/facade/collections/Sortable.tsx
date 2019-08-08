@@ -6,7 +6,7 @@ import {
 	SortableElement,
 	SortableElementProps,
 	SortableHandle,
-	SortEndHandler
+	SortEndHandler,
 } from 'react-sortable-hoc'
 import { DragHandle as DragHandleIcon } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
@@ -17,7 +17,7 @@ import {
 	EnvironmentContext,
 	Field,
 	Props,
-	SyntheticChildrenProvider
+	SyntheticChildrenProvider,
 } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
 import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../dao'
@@ -95,7 +95,7 @@ namespace Sortable {
 			<div className={cn('sortable-item-handle', props.isMutating && 'sortable-item-handle-disabled')}>
 				<DragHandleIcon />
 			</div>
-		))
+		)),
 	)
 
 	export interface SortableItemProps extends Repeater.ItemProps, DragHandleProps {}
@@ -108,7 +108,7 @@ namespace Sortable {
 					<Repeater.Item {...props}>{props.children}</Repeater.Item>
 				</div>
 			</li>
-		))
+		)),
 	)
 
 	export interface SortableListProps extends EntityCollectionPublicProps {
@@ -145,7 +145,7 @@ namespace Sortable {
 					</ul>
 				</Repeater.Cloneable>
 			)
-		})
+		}),
 	)
 
 	export interface EntityOrder {

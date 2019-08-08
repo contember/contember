@@ -13,7 +13,7 @@ export const HoverMenuItem: React.FC<HoverMenuItemProps> = props => {
 			e.preventDefault()
 			props.onClick()
 		},
-		[props.onClick]
+		[props]
 	)
 
 	return (

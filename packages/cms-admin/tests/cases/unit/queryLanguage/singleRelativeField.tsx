@@ -129,13 +129,9 @@ describe('single relative fields QueryLanguage parser', () => {
 			environment,
 		)
 		const expected = (
-			<ToOne.AtomicPrimitive
-				field="this"
-				reducedBy={{ better: new GraphQlBuilder.Literal('work') }}
-				environment={environment}
-			>
-				<ToOne.AtomicPrimitive field="as" environment={environment}>
-					<ToOne.AtomicPrimitive field="expected" reducedBy={{ and: 1 }} environment={environment}>
+			<ToOne.AtomicPrimitive field="this" reducedBy={{ better: new GraphQlBuilder.Literal('work') }}>
+				<ToOne.AtomicPrimitive field="as">
+					<ToOne.AtomicPrimitive field="expected" reducedBy={{ and: 1 }}>
 						<TextField name="correctly" />
 					</ToOne.AtomicPrimitive>
 				</ToOne.AtomicPrimitive>

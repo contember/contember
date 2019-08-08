@@ -18,11 +18,11 @@ export function createPluginsFromMarks(marks: MarksDefinitions, blocks: BlocksDe
 				if (isHotkey(event)) {
 					const currentBlockTypes = editor.value.blocks.toArray().map(block => block.type)
 					const currentBlockDefinitions = currentBlockTypes.map(currentBlock =>
-						Object.entries(blocks).find(([blockName]) => blockName === currentBlock)
+						Object.entries(blocks).find(([blockName]) => blockName === currentBlock),
 					)
 					if (
 						currentBlockDefinitions.every(
-							b => typeof b !== 'undefined' && 'marks' in b[1] && (b[1].marks || []).includes(markType)
+							b => typeof b !== 'undefined' && 'marks' in b[1] && (b[1].marks || []).includes(markType),
 						)
 					) {
 						event.preventDefault()
@@ -33,7 +33,7 @@ export function createPluginsFromMarks(marks: MarksDefinitions, blocks: BlocksDe
 				} else {
 					next()
 				}
-			}
+			},
 		}
 	})
 }

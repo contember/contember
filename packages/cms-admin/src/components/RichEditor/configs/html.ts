@@ -14,7 +14,7 @@ export const createSpanWithStyleRule = (mark: string, checkStyle: (_: CSSStyleDe
 						object: 'mark',
 						type: mark,
 						data: {},
-						nodes: next([el])
+						nodes: next([el]),
 					}
 				}
 			}
@@ -22,7 +22,7 @@ export const createSpanWithStyleRule = (mark: string, checkStyle: (_: CSSStyleDe
 
 		serialize(obj, children) {
 			return undefined
-		}
+		},
 	}
 }
 
@@ -41,5 +41,5 @@ export const TEXT_HTML_RULE: Rule = {
 
 	serialize(obj, children) {
 		return undefined
-	}
+	},
 }

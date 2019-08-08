@@ -110,10 +110,11 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			...props.blocks
 				.flatMap(t => t.marks || [])
 				.filter((v, i, self) => self.indexOf(v) === i)
-				.map(t => markConfigs[t])
+				.map(t => markConfigs[t]),
 		]
 		this.htmlSerializer = new HtmlSerializer({
-			rules: [...configs.map(c => c.htmlSerializer), TEXT_HTML_RULE]
+			rules: [...configs.map(c => c.htmlSerializer), TEXT_HTML_RULE],
+		})
 		this.serializer =
 			props.serializer == RichEditorSerializer.HTML
 				? this.htmlSerializer

@@ -17,7 +17,7 @@ export const HoverMenuManager: React.FC<HoverMenuManagerProps> = ({ editor, mark
 	const renderEntries = (
 		entries: WithHoverMenu,
 		isActive: (name: string) => boolean,
-		toggle: (name: string) => void
+		toggle: (name: string) => void,
 	): React.ReactNode => {
 		return (
 			<>
@@ -27,7 +27,7 @@ export const HoverMenuManager: React.FC<HoverMenuManagerProps> = ({ editor, mark
 							<HoverMenuItem key={name} isActive={isActive(name)} onClick={() => toggle(name)}>
 								{def.menuButton()}
 							</HoverMenuItem>
-						)
+						),
 				)}
 			</>
 		)
@@ -40,7 +40,7 @@ export const HoverMenuManager: React.FC<HoverMenuManagerProps> = ({ editor, mark
 				markType => editor.value.activeMarks.some(mark => (mark ? mark.type == markType : false)),
 				markType => {
 					editor.toggleMark(markType)
-				}
+				},
 			)}
 			{inlines &&
 				renderEntries(
@@ -48,7 +48,7 @@ export const HoverMenuManager: React.FC<HoverMenuManagerProps> = ({ editor, mark
 					type => editor.value.inlines.some(inline => (inline ? inline.type == type : false)),
 					type => {
 						editor.wrapInline(type)
-					}
+					},
 				)}
 		</HoverMenu>
 	)

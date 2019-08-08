@@ -16,7 +16,7 @@ const Handle = SortableHandle(() => (
 const Container = React.memo(
 	SortableContainer<{ children: React.ReactNode }>(({ children }: { children: React.ReactNode }) => {
 		return <>{children}</>
-	})
+	}),
 )
 
 const Element = SortableElement<{ children: React.ReactNode }>(({ children }: { children: React.ReactNode }) => {
@@ -78,6 +78,6 @@ export function createRenderBlockPlugin(blocks: BlocksDefinitions): PluginOrPlug
 				)
 			}
 			return next()
-		}
+		},
 	}
 }

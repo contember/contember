@@ -5,7 +5,7 @@ import * as Immutable from 'immutable'
 export default class JsonBlockSerializer {
 	serialize(block: Block): string {
 		const jsonBlock = (block as Block & { toJSON: (options?: Record<string, any>) => BlockJSON }).toJSON({
-			preserveKeys: true
+			preserveKeys: true,
 		})
 		return JSON.stringify(jsonBlock.nodes)
 	}

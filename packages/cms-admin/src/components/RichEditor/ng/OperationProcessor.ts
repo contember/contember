@@ -12,7 +12,7 @@ export default class OperationProcessor {
 		private readonly sortBy: string,
 		private readonly typeField: string,
 		private readonly blocks: BlocksDefinitions,
-		private readonly defaultBlock: string
+		private readonly defaultBlock: string,
 	) {}
 
 	private readonly blockNodesSerializer = new JsonBlockSerializer()
@@ -52,7 +52,7 @@ export default class OperationProcessor {
 				value.document.nodes.forEach((block_, key) => {
 					const block = block_!
 					const accessor: EntityAccessor | { primaryKey: string | { value: string } } | undefined = block.data.get(
-						'accessor'
+						'accessor',
 					)
 					const definition = this.blocks[block.type]
 					if (definition == undefined) {
@@ -91,7 +91,9 @@ export default class OperationProcessor {
 							}
 							if (typeof valueFieldAccessor.currentValue !== 'string') {
 								throw new Error(
-									`Value for block ${block.type} is of type ${typeof valueFieldAccessor.currentValue} instead of string`
+									`Value for block ${
+										block.type
+									} is of type ${typeof valueFieldAccessor.currentValue} instead of string`,
 								)
 							}
 							const newValue: string = this.blockNodesSerializer.serialize(block)

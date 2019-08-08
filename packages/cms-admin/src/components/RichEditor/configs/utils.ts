@@ -53,7 +53,7 @@ export function simpleMarkPlugin(
 			} else {
 				next()
 			}
-		}
+		},
 	}
 }
 
@@ -107,7 +107,7 @@ export function simpleMarkConfig(
 	markType: string,
 	htmlTags: string | [string, ...string[]],
 	alternativeHtmlSerializer: Rule = {},
-	hotkey: string | string[] = []
+	hotkey: string | string[] = [],
 ): RichEditorPluginConfig {
 	const tags = Array.isArray(htmlTags) ? htmlTags : [htmlTags]
 	return {

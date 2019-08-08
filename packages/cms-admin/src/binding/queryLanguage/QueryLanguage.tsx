@@ -10,7 +10,6 @@ export namespace QueryLanguage {
 		innerNode: React.ReactNode,
 		Component: React.ComponentType<P>,
 		layers: P[],
-		environment: Environment,
 	): React.ReactElement | null => {
 		let currentNode: React.ReactNode = innerNode
 
@@ -29,7 +28,7 @@ export namespace QueryLanguage {
 	): React.ReactElement | null => {
 		const expression = Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeSingleField, environment)
 
-		return wrap(generateField(expression.fieldName), ToOne.AtomicPrimitive, expression.toOneProps, environment)
+		return wrap(generateField(expression.fieldName), ToOne.AtomicPrimitive, expression.toOneProps)
 	}
 
 	export const wrapRelativeSingleEntity = (
@@ -43,7 +42,7 @@ export namespace QueryLanguage {
 			environment,
 		)
 
-		return wrap(subordinateFields, ToOne.AtomicPrimitive, toOneProps, environment)
+		return wrap(subordinateFields, ToOne.AtomicPrimitive, toOneProps)
 	}
 
 	export const wrapRelativeEntityList = (
@@ -57,7 +56,7 @@ export namespace QueryLanguage {
 			environment,
 		)
 
-		return wrap(generateAtomicToMany(toManyProps), ToOne.AtomicPrimitive, toOneProps, environment)
+		return wrap(generateAtomicToMany(toManyProps), ToOne.AtomicPrimitive, toOneProps)
 	}
 
 	export interface WrappedQualifiedEntityList {
@@ -79,7 +78,7 @@ export namespace QueryLanguage {
 		return {
 			entityName,
 			filter,
-			children: wrap(fieldSelection, ToOne.AtomicPrimitive, toOneProps, environment),
+			children: wrap(fieldSelection, ToOne.AtomicPrimitive, toOneProps),
 		}
 	}
 
@@ -104,7 +103,7 @@ export namespace QueryLanguage {
 			fieldName,
 			entityName,
 			filter,
-			children: wrap(generateField(fieldName), ToOne.AtomicPrimitive, toOneProps, environment),
+			children: wrap(generateField(fieldName), ToOne.AtomicPrimitive, toOneProps),
 		}
 	}
 

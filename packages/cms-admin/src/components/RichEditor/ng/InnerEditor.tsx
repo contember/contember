@@ -70,10 +70,10 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 					throw new Error('')
 				}
 				const definition = blocks[type]
-				if (definition == undefined) throw new Error(`Unknown type ${type}.`)
+				if (definition === undefined) throw new Error(`Unknown type ${type}.`)
 
 				let nodes: Immutable.List<Block | Text | Inline>
-				if (definition.renderBlock != undefined) {
+				if (definition.renderBlock !== undefined) {
 					const fieldAccessor = entityAccessor.data.getField(definition.valueField)
 					if (!(fieldAccessor instanceof FieldAccessor)) {
 						throw new Error('')
@@ -136,7 +136,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 		}
 
 		const voidBlockTypes: string[] = Object.entries(blocks)
-			.filter(([key, value]) => value.renderBlock == undefined)
+			.filter(([key, value]) => value.renderBlock === undefined)
 			.map(([name]) => name)
 		const result = {
 			blocks: Object.fromEntries<Rules>(voidBlockTypes.map(name => [name, { isVoid: true }])),

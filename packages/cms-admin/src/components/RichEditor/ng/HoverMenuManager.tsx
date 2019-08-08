@@ -37,7 +37,7 @@ export const HoverMenuManager: React.FC<HoverMenuManagerProps> = ({ editor, mark
 		<HoverMenu selection={selection}>
 			{renderEntries(
 				marks,
-				markType => editor.value.activeMarks.some(mark => (mark ? mark.type == markType : false)),
+				markType => editor.value.activeMarks.some(mark => (mark ? mark.type === markType : false)),
 				markType => {
 					editor.toggleMark(markType)
 				},
@@ -45,7 +45,7 @@ export const HoverMenuManager: React.FC<HoverMenuManagerProps> = ({ editor, mark
 			{inlines &&
 				renderEntries(
 					inlines,
-					type => editor.value.inlines.some(inline => (inline ? inline.type == type : false)),
+					type => editor.value.inlines.some(inline => (inline ? inline.type === type : false)),
 					type => {
 						editor.wrapInline(type)
 					},

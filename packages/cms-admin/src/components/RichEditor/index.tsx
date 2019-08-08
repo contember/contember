@@ -116,9 +116,9 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			rules: [...configs.map(c => c.htmlSerializer), TEXT_HTML_RULE],
 		})
 		this.serializer =
-			props.serializer == RichEditorSerializer.HTML
+			props.serializer === RichEditorSerializer.HTML
 				? this.htmlSerializer
-				: props.serializer == RichEditorSerializer.JSON
+				: props.serializer === RichEditorSerializer.JSON
 				? new JsonSerializer(this.htmlSerializer)
 				: assertNever(props.serializer)
 		this.plugins = configs.map(c => c.plugin)
@@ -300,7 +300,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 					editor.splitBlock(1)
 					let first
 					if (
-						editor.value.anchorBlock.nodes.size == 1 &&
+						editor.value.anchorBlock.nodes.size === 1 &&
 						(first = editor.value.anchorBlock.nodes.first()) &&
 						first.object === 'text' &&
 						first.text === ''
@@ -341,7 +341,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 		const transfer = getEventTransfer(event)
 		if (transfer.type !== 'html') return next()
 		const { document } = this.htmlSerializer.deserialize(((transfer as unknown) as { html: string }).html)
-		const nodes = document.nodes.filter(block => block != undefined && block.text.length > 0).toList()
+		const nodes = document.nodes.filter(block => block !== undefined && block.text.length > 0).toList()
 		editor.insertFragment(Document.create(nodes))
 	}
 }

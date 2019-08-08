@@ -64,7 +64,7 @@ export function createRenderBlockPlugin(blocks: BlocksDefinitions): PluginOrPlug
 				}
 				const content: React.ReactNode = (
 					<div>
-						{definition.renderBlock != undefined ? (
+						{definition.renderBlock !== undefined ? (
 							definition.renderBlock({ children: props.children })
 						) : (
 							<DataContext.Provider value={accessor}>{definition.render}</DataContext.Provider>

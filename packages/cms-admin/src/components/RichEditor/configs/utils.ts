@@ -128,7 +128,7 @@ export function createBlockPluginConfig(name: string, tag: string, attrs: string
 		node: 'block',
 		type: name,
 		onToggle(editor) {
-			const isCurrent = editor.value.blocks.toArray().every(block => block.type == name)
+			const isCurrent = editor.value.blocks.toArray().every(block => block.type === name)
 			editor.setBlocks({
 				type: isCurrent ? defaultBlock : name,
 			})

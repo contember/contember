@@ -28,7 +28,7 @@ export default class OperationProcessor {
 
 	private addToEnd = (getCollectionAccessor: GetCollectionAccessor, type: string): EntityAccessor => {
 		const collectionAccessor = getCollectionAccessor()
-		if (collectionAccessor.addNew == undefined) {
+		if (collectionAccessor.addNew === undefined) {
 			throw new Error('')
 		}
 		collectionAccessor.addNew && collectionAccessor.addNew()
@@ -37,10 +37,10 @@ export default class OperationProcessor {
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('')
 		}
-		if (typeField.onChange == undefined) {
+		if (typeField.updateValue === undefined) {
 			throw new Error('')
 		}
-		typeField.onChange(new GraphQlBuilder.Literal(type))
+		typeField.updateValue(new GraphQlBuilder.Literal(type))
 		return this.getLastInCollection(getCollectionAccessor)
 	}
 
@@ -55,7 +55,7 @@ export default class OperationProcessor {
 						'accessor',
 					)
 					const definition = this.blocks[block.type]
-					if (definition == undefined) {
+					if (definition === undefined) {
 						throw new Error('Unknown block')
 					}
 					// If accessor not present (node added) or node already processed (splitted node)
@@ -72,21 +72,21 @@ export default class OperationProcessor {
 						// New block
 						const entity = this.addToEnd(getAccessor, block.type)
 						presentKeys.add(entity.getKey())
-						if (definition.renderBlock != undefined) {
+						if (definition.renderBlock !== undefined) {
 							// SlateBlock
 							const valueFieldAccessor = this.getValueFieldAccessor(entity)
-							if (valueFieldAccessor.onChange == undefined) {
+							if (valueFieldAccessor.updateValue === undefined) {
 								return
 							}
-							valueFieldAccessor.onChange(this.blockNodesSerializer.serialize(block))
+							valueFieldAccessor.updateValue(this.blockNodesSerializer.serialize(block))
 						}
 						afterAccessor = this.getLastInCollection(getAccessor)
 					} else {
 						// Persisted, maybe with change
 						presentKeys.add(accessor.getKey())
-						if (definition.renderBlock != undefined) {
+						if (definition.renderBlock !== undefined) {
 							const valueFieldAccessor = this.getValueFieldAccessor(accessor)
-							if (valueFieldAccessor.onChange == undefined) {
+							if (valueFieldAccessor.updateValue === undefined) {
 								return
 							}
 							if (typeof valueFieldAccessor.currentValue !== 'string') {
@@ -99,7 +99,7 @@ export default class OperationProcessor {
 							const newValue: string = this.blockNodesSerializer.serialize(block)
 							const oldValue: string = valueFieldAccessor.currentValue
 							if (newValue !== oldValue) {
-								valueFieldAccessor.onChange(newValue)
+								valueFieldAccessor.updateValue(newValue)
 							}
 							const afterAccessorUnchecked = getAccessor().findByKey(accessor.getKey())
 							if (!(afterAccessorUnchecked instanceof EntityAccessor)) {
@@ -111,15 +111,15 @@ export default class OperationProcessor {
 						}
 					}
 					const sortField = this.getSortFieldAccessor(afterAccessor)
-					if (sortField.onChange == undefined) {
+					if (sortField.updateValue === undefined) {
 						throw new Error('Unable to change sort field')
 					}
 					if (
-						sortField.currentValue == null ||
+						sortField.currentValue === null ||
 						typeof sortField.currentValue !== 'number' ||
 						sortField.currentValue <= maxOrder
 					) {
-						sortField.onChange(maxOrder + 1)
+						sortField.updateValue(maxOrder + 1)
 						maxOrder = maxOrder + 1
 					} else {
 						maxOrder = sortField.currentValue
@@ -130,14 +130,14 @@ export default class OperationProcessor {
 				let collection = getAccessor()
 				const toRemove = new Set<string>()
 				collection.entities.forEach(ea => {
-					if (ea != undefined && !(ea instanceof EntityForRemovalAccessor) && !presentKeys.has(ea.getKey())) {
+					if (ea !== undefined && !(ea instanceof EntityForRemovalAccessor) && !presentKeys.has(ea.getKey())) {
 						toRemove.add(ea.getKey())
 					}
 				})
 				toRemove.forEach(key => {
 					console.log(`Removing ${key}`)
 					const ea = collection.findByKey(key)
-					if (ea == undefined || ea instanceof EntityForRemovalAccessor) {
+					if (ea === undefined || ea instanceof EntityForRemovalAccessor) {
 						throw new Error('This should never happen')
 					}
 					ea.remove && ea.remove(EntityAccessor.RemovalType.Delete)
@@ -167,7 +167,7 @@ export default class OperationProcessor {
 			throw new Error('Value of type field is not string or GraphQL literal')
 		}
 		const definition = this.blocks[type]
-		if (definition.renderBlock == undefined) {
+		if (definition.renderBlock === undefined) {
 			throw new Error('Unable to get value block for custom field')
 		}
 		const valueFieldAccessor = entityAccessor.data.getField(definition.valueField)

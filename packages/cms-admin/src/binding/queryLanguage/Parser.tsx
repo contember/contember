@@ -71,9 +71,7 @@ class Parser extends ChevrotainParser {
 
 			if (last.reducedBy !== undefined || last.filter !== undefined) {
 				throw new QueryLanguageError(
-					`Cannot parse '${Parser.rawInput}': the last field '${
-						last.field
-					}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`,
+					`Cannot parse '${Parser.rawInput}': the last field '${last.field}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`,
 				)
 			}
 
@@ -490,9 +488,7 @@ class Parser extends ChevrotainParser {
 				return dimensionValue[0]
 			}
 			throw new QueryLanguageError(
-				`The variable \$${variableName} resolved to a dimension which exists but contains ${
-					dimensionValue.length
-				} values. It has to contain exactly one. ` +
+				`The variable \$${variableName} resolved to a dimension which exists but contains ${dimensionValue.length} values. It has to contain exactly one. ` +
 					`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`,
 			)
 		}

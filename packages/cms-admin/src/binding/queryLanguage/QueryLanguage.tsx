@@ -8,7 +8,7 @@ import { Parser } from './Parser'
 export namespace QueryLanguage {
 	const wrap = <P extends {}>(
 		innerNode: React.ReactNode,
-		Component: React.ComponentType<P & { environment: Environment }>,
+		Component: React.ComponentType<P>,
 		layers: P[],
 		environment: Environment,
 	): React.ReactElement | null => {
@@ -16,11 +16,7 @@ export namespace QueryLanguage {
 
 		for (let i = layers.length - 1; i >= 0; i--) {
 			const currentProps = layers[i]
-			currentNode = (
-				<Component {...currentProps} environment={environment}>
-					{currentNode}
-				</Component>
-			)
+			currentNode = <Component {...currentProps}>{currentNode}</Component>
 		}
 
 		return reactNodeToElement(currentNode)

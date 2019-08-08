@@ -7,7 +7,7 @@ export default class AllowAllPermissionFactory {
 			Acl.Operation.update,
 			Acl.Operation.delete,
 			Acl.Operation.create,
-		]
+		],
 	) {}
 
 	create(schema: Pick<Model.Schema, 'entities'>): Acl.Permissions {
@@ -21,7 +21,7 @@ export default class AllowAllPermissionFactory {
 				(permissions: Acl.FieldPermissions, fieldName): Acl.FieldPermissions => {
 					return { ...permissions, [fieldName]: true }
 				},
-				{}
+				{},
 			)
 
 			permissions[entityName] = {

@@ -98,10 +98,10 @@ describe('Delete mutation', () => {
 		await execute({
 			schema: new SchemaBuilder()
 				.entity('Post', entity =>
-					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.cascade))
+					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.cascade)),
 				)
 				.entity('PostLocales', entity =>
-					entity.manyHasOne('post', relation => relation.target('Post').onDelete(Model.OnDelete.cascade))
+					entity.manyHasOne('post', relation => relation.target('Post').onDelete(Model.OnDelete.cascade)),
 				)
 				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -183,7 +183,7 @@ describe('Delete mutation', () => {
 		await execute({
 			schema: new SchemaBuilder()
 				.entity('Post', entity =>
-					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull))
+					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)),
 				)
 				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),

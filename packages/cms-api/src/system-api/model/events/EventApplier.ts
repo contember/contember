@@ -12,7 +12,7 @@ class EventApplier {
 	constructor(
 		private readonly db: Client,
 		private readonly migrationExecutor: MigrationExecutor,
-		private readonly migrationResolver: MigrationsResolver
+		private readonly migrationResolver: MigrationsResolver,
 	) {}
 
 	public async applyEvents(stage: Stage, events: AnyEvent[]): Promise<void> {

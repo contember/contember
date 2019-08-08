@@ -15,7 +15,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
-		private readonly executionContext: SelectExecutionHandler.Context
+		private readonly executionContext: SelectExecutionHandler.Context,
 	) {}
 
 	visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
@@ -42,12 +42,12 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 										whenExpr.selectCondition(condition => {
 											cb(condition)
 										}),
-									thenExpr => thenExpr.select([tableAlias, column.columnName])
+									thenExpr => thenExpr.select([tableAlias, column.columnName]),
 								)
-								.else(elseExpr => elseExpr.raw('null'))
+								.else(elseExpr => elseExpr.raw('null')),
 						),
-					columnAlias
-				)
+					columnAlias,
+				),
 			)
 		})
 	}
@@ -56,7 +56,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation
+		targetRelation: Model.ManyHasManyOwnerRelation,
 	): void {
 		const joiningTable = targetRelation.joiningTable
 		const columns: Mapper.JoiningColumns = {
@@ -70,7 +70,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 	public visitManyHasManyOwner(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		targetEntity: Model.Entity
+		targetEntity: Model.Entity,
 	): void {
 		const joiningTable = relation.joiningTable
 		const columns: Mapper.JoiningColumns = {
@@ -85,7 +85,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		entity: Model.Entity,
 		relation: Model.OneHasManyRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation
+		targetRelation: Model.ManyHasOneRelation,
 	): void {
 		this.executionContext.addData(
 			entity.primary,
@@ -99,14 +99,14 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 				return this.mapper.selectGrouped(targetEntity, objectNodeWithWhere, targetRelation)
 			},
-			[]
+			[],
 		)
 	}
 
 	private createManyHasManyGroups(
 		targetEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		joiningColumns: Mapper.JoiningColumns
+		joiningColumns: Mapper.JoiningColumns,
 	): void {
 		this.executionContext.addData(
 			this.executionContext.entity.primary,
@@ -117,7 +117,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 					ids,
 					joiningColumns,
 					targetEntity,
-					objectNode
+					objectNode,
 				)
 				if (junctionValues.length === 0) {
 					return {}
@@ -140,7 +140,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 				return this.buildManyHasManyGroups(targetEntity, joiningColumns, result, junctionValues)
 			},
-			[]
+			[],
 		)
 	}
 
@@ -148,7 +148,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		entity: Model.Entity,
 		joiningColumns: Mapper.JoiningColumns,
 		resultObjects: SelectHydrator.ResultObjects,
-		junctionValues: SelectHydrator.Rows
+		junctionValues: SelectHydrator.Rows,
 	): SelectHydrator.GroupedObjects {
 		const dataById: { [id: string]: SelectHydrator.ResultObject } = {}
 		for (let object of resultObjects) {
@@ -173,7 +173,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		entity: Model.Entity,
 		relation: Model.OneHasOneInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation
+		targetRelation: Model.OneHasOneOwnerRelation,
 	): void {
 		this.executionContext.addData(
 			entity.primary,
@@ -193,7 +193,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 				return this.mapper.select(targetEntity, objectWithWhere, targetRelation.name)
 			},
-			null
+			null,
 		)
 	}
 
@@ -201,7 +201,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null
+		targetRelation: Model.OneHasOneInversedRelation | null,
 	): void {
 		this.executionContext.addData(
 			relation.name,
@@ -219,7 +219,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
 			},
-			null
+			null,
 		)
 	}
 
@@ -240,7 +240,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
 			},
-			null
+			null,
 		)
 	}
 }

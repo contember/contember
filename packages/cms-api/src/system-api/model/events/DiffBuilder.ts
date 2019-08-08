@@ -12,13 +12,13 @@ class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly queryHandler: QueryHandler<DbQueryable>,
-		private readonly permissionsVerifier: PermissionsVerifier
+		private readonly permissionsVerifier: PermissionsVerifier,
 	) {}
 
 	public async build(
 		permissionContext: PermissionsVerifier.Context,
 		baseStage: Stage,
-		headStage: Stage
+		headStage: Stage,
 	): Promise<DiffBuilder.Response> {
 		const count = await this.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
 
@@ -61,7 +61,10 @@ namespace DiffBuilder {
 		public readonly ok: true = true
 
 		constructor(
-			public readonly events: (AnyEvent & { dependencies: string[]; permission: PermissionsVerifier.EventPermission })[]
+			public readonly events: (AnyEvent & {
+				dependencies: string[]
+				permission: PermissionsVerifier.EventPermission
+			})[],
 		) {}
 	}
 }

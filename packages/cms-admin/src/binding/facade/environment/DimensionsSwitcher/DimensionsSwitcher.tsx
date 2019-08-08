@@ -5,7 +5,7 @@ import {
 	EntityListDataProviderProps,
 	Environment,
 	Field,
-	FieldText
+	FieldText,
 } from '../../../index'
 import { QueryLanguage } from '../../../queryLanguage'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
@@ -29,7 +29,7 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 
 	if (minItems > maxItems) {
 		throw new DataBindingError(
-			`DimensionSwitcher: 'minItems' for dimension ${props.dimension} must be no greater than 'maxItems'.`
+			`DimensionSwitcher: 'minItems' for dimension ${props.dimension} must be no greater than 'maxItems'.`,
 		)
 	}
 	if (minItems < 1) {
@@ -38,7 +38,7 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 	if (props.defaultValue.length < minItems || props.defaultValue.length > maxItems) {
 		throw new DataBindingError(
 			`DimensionSwitcher: the number of default values for dimension ${props.dimension} must not be between` +
-				`'minItems' and 'maxItems'.`
+				`'minItems' and 'maxItems'.`,
 		)
 	}
 
@@ -49,7 +49,7 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 			{props.children || <FieldText name={props.labelField} />}
 			<Field name={props.slugField} />
 		</>,
-		environment
+		environment,
 	)
 
 	return (
@@ -66,7 +66,7 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 				minItems: minItems,
 				maxItems: maxItems,
 				renderSelected: props.renderSelected,
-				slugField: props.slugField
+				slugField: props.slugField,
 			}}
 		>
 			{metadata.children}

@@ -7,7 +7,7 @@ export default class ObjectNode<Args = any> {
 		public readonly fields: (ObjectNode | FieldNode)[],
 		public readonly args: Args,
 		public readonly meta: { [key: string]: any },
-		public readonly path: string[]
+		public readonly path: string[],
 	) {}
 
 	public withArg<
@@ -21,7 +21,7 @@ export default class ObjectNode<Args = any> {
 			this.fields,
 			{ ...(this.args as any), [name]: value },
 			this.meta,
-			this.path
+			this.path,
 		)
 	}
 
@@ -36,7 +36,7 @@ export default class ObjectNode<Args = any> {
 			[...this.fields.filter(it => it.alias !== field.alias), field],
 			this.args,
 			this.meta,
-			this.path
+			this.path,
 		)
 	}
 

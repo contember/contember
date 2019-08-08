@@ -10,7 +10,7 @@ export default class RemoveProjectMemberMutationResolver implements MutationReso
 	async removeProjectMember(
 		parent: any,
 		{ projectId, identityId }: MutationRemoveProjectMemberArgs,
-		context: ResolverContext
+		context: ResolverContext,
 	): Promise<RemoveProjectMemberResponse> {
 		await context.requireAccess({
 			scope: new ProjectScope(projectId),

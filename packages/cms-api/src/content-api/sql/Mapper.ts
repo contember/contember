@@ -31,7 +31,7 @@ class Mapper {
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly junctionTableManager: JunctionTableManager,
-		private readonly deleteExecutor: DeleteExecutor
+		private readonly deleteExecutor: DeleteExecutor,
 	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
@@ -50,17 +50,17 @@ class Mapper {
 
 	public async select(
 		entity: Model.Entity,
-		input: ObjectNode<Input.ListQueryInput>
+		input: ObjectNode<Input.ListQueryInput>,
 	): Promise<SelectHydrator.ResultObjects>
 	public async select(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
-		indexBy: string
+		indexBy: string,
 	): Promise<SelectHydrator.IndexedResultObjects>
 	public async select(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
-		indexBy?: string
+		indexBy?: string,
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		const hydrator = new SelectHydrator()
 		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = this.db.selectBuilder()
@@ -77,7 +77,7 @@ class Mapper {
 
 	public async selectUnique(
 		entity: Model.Entity,
-		query: ObjectNode<Input.UniqueQueryInput>
+		query: ObjectNode<Input.UniqueQueryInput>,
 	): Promise<SelectHydrator.ResultObject | null> {
 		const where = this.uniqueWhereExpander.expand(entity, query.args.by)
 		const queryExpanded = query.withArg<Input.ListQueryInput>('filter', where)
@@ -88,7 +88,7 @@ class Mapper {
 	public async selectGrouped(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
-		relation: Model.JoiningColumnRelation & Model.Relation
+		relation: Model.JoiningColumnRelation & Model.Relation,
 	) {
 		const hydrator = new SelectHydrator()
 		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = this.db.selectBuilder()
@@ -105,7 +105,7 @@ class Mapper {
 		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
-		groupBy?: string
+		groupBy?: string,
 	) {
 		const path = new Path([])
 		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
@@ -172,7 +172,7 @@ class Mapper {
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
-		inversedUnique: Input.UniqueWhere
+		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
 		await this.junctionTableManager.connectJunction(owningEntity, relation, ownerUnique, inversedUnique)
 	}
@@ -181,14 +181,14 @@ class Mapper {
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
-		inversedUnique: Input.UniqueWhere
+		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
 		await this.junctionTableManager.disconnectJunction(owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
 	public async getPrimaryValue(
 		entity: Model.Entity,
-		where: Input.UniqueWhere
+		where: Input.UniqueWhere,
 	): Promise<Input.PrimaryValue | undefined> {
 		if (where[entity.primary] !== undefined) {
 			return where[entity.primary] as Input.PrimaryValue

@@ -13,7 +13,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly errors: ErrorAccessor[],
 		public readonly replaceWith?: (replacement: EntityAccessor) => void,
 		public readonly batchUpdates?: (performUpdates: (getAccessor: () => EntityAccessor) => void) => void,
-		public readonly remove?: (removalType: EntityAccessor.RemovalType) => void
+		public readonly remove?: (removalType: EntityAccessor.RemovalType) => void,
 	) {
 		super()
 		this.primaryKey = primaryKey || new EntityAccessor.UnpersistedEntityID()
@@ -48,7 +48,7 @@ namespace EntityAccessor {
 
 	export enum RemovalType {
 		Disconnect = 'disconnect',
-		Delete = 'delete'
+		Delete = 'delete',
 	}
 }
 

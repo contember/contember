@@ -26,5 +26,5 @@ export const emptyState: State = {
 	upload: emptyUploadState,
 	toasts: emptyToastsState,
 	dataTrees: emptyDataTreesState,
-	system: emptySystemState
+	system: emptySystemState,
 }

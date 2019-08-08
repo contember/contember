@@ -14,7 +14,7 @@ class UpdateEnumModification implements Modification<UpdateEnumModification.Data
 		builder.sql(
 			`ALTER DOMAIN "${this.data.enumName}" ADD CONSTRAINT ${
 				this.data.enumName
-			}_check CHECK (VALUE IN(${joinedValues}))`
+			}_check CHECK (VALUE IN(${joinedValues}))`,
 		)
 	}
 

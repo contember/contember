@@ -57,6 +57,6 @@ export function requestStateToPath(routes: RouteMap, state: RequestState): strin
 			const encodeParams =
 				routes[state.name].encodeParams || ((name: unknown, value: string) => encodeURIComponent(value))
 			return encodeParams(token.name, val)
-		}
+		},
 	})
 }

@@ -7,7 +7,7 @@ class PredicateDefinitionProcessor {
 	public process<WhereValue, PredicateExtension = never>(
 		entity: Model.Entity,
 		definition: Acl.PredicateDefinition<PredicateExtension>,
-		handler: PredicateDefinitionProcessor.Handler<WhereValue, PredicateExtension>
+		handler: PredicateDefinitionProcessor.Handler<WhereValue, PredicateExtension>,
 	): Input.Where<WhereValue> {
 		return Object.entries(definition).reduce((result, [key, value]) => {
 			if (value === undefined) {

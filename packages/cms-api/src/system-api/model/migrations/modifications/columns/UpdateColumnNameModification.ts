@@ -18,8 +18,8 @@ class UpdateColumnNameModification implements Modification<UpdateColumnNameModif
 		return updateModel(
 			updateEntity(
 				this.data.entityName,
-				updateField(this.data.fieldName, field => ({ ...field, columnName: this.data.columnName }))
-			)
+				updateField(this.data.fieldName, field => ({ ...field, columnName: this.data.columnName })),
+			),
 		)
 	}
 

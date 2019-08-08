@@ -17,7 +17,7 @@ namespace Authorizator {
 		public async isAllowed(
 			identity: Identity,
 			scope: AuthorizationScope<Identity>,
-			action: Authorizator.Action
+			action: Authorizator.Action,
 		): Promise<boolean> {
 			const scopeNode = await scope.getIdentityAccess(identity)
 			const globalNode = new AccessNode.Roles(identity.roles)

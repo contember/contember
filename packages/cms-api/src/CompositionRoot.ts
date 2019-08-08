@@ -62,7 +62,7 @@ class CompositionRoot {
 	createMasterContainer(
 		config: Config,
 		projectsDirectory: string,
-		projectSchemas: { [name: string]: Schema }
+		projectSchemas: { [name: string]: Schema },
 	): MasterContainer {
 		const tenantContainer = this.createTenantContainer(config.tenant.db)
 		const projectContainers = this.createProjectContainers(config.projects, projectsDirectory, projectSchemas)
@@ -73,22 +73,22 @@ class CompositionRoot {
 			.addService(
 				'projectContainerResolver',
 				({ projectContainers }): ProjectContainerResolver => slug =>
-					projectContainers.find(it => it.project.slug === slug)
+					projectContainers.find(it => it.project.slug === slug),
 			)
 
 			.addService('homepageMiddlewareFactory', () => new HomepageMiddlewareFactory())
 
 			.addService(
 				'authMiddlewareFactory',
-				({ tenantContainer }) => new AuthMiddlewareFactory(tenantContainer.apiKeyManager)
+				({ tenantContainer }) => new AuthMiddlewareFactory(tenantContainer.apiKeyManager),
 			)
 			.addService(
 				'projectMemberMiddlewareFactory',
-				({ tenantContainer }) => new ProjectMemberMiddlewareFactory(tenantContainer.projectMemberManager)
+				({ tenantContainer }) => new ProjectMemberMiddlewareFactory(tenantContainer.projectMemberManager),
 			)
 			.addService(
 				'projectResolveMiddlewareFactory',
-				({ projectContainers }) => new ProjectResolveMiddlewareFactory(projectContainers)
+				({ projectContainers }) => new ProjectResolveMiddlewareFactory(projectContainers),
 			)
 			.addService('stageResolveMiddlewareFactory', () => new StageResolveMiddlewareFactory())
 			.addService('databaseTransactionMiddlewareFactory', () => {
@@ -97,7 +97,7 @@ class CompositionRoot {
 			.addService(
 				'tenantMiddlewareFactory',
 				({ tenantContainer, authMiddlewareFactory }) =>
-					new TenantMiddlewareFactory(tenantContainer.apolloServer, authMiddlewareFactory)
+					new TenantMiddlewareFactory(tenantContainer.apolloServer, authMiddlewareFactory),
 			)
 			.addService('setupSystemVariablesMiddlewareFactory', () => new SetupSystemVariablesMiddlewareFactory())
 			.addService(
@@ -116,8 +116,8 @@ class CompositionRoot {
 						authMiddlewareFactory,
 						projectMemberMiddlewareFactory,
 						databaseTransactionMiddlewareFactory,
-						setupSystemVariablesMiddlewareFactory
-					)
+						setupSystemVariablesMiddlewareFactory,
+					),
 			)
 			.addService(
 				'systemMiddlewareFactory',
@@ -133,8 +133,8 @@ class CompositionRoot {
 						authMiddlewareFactory,
 						projectMemberMiddlewareFactory,
 						databaseTransactionMiddlewareFactory,
-						setupSystemVariablesMiddlewareFactory
-					)
+						setupSystemVariablesMiddlewareFactory,
+					),
 			)
 			.addService('timerMiddlewareFactory', () => new TimerMiddlewareFactory())
 
@@ -152,8 +152,8 @@ class CompositionRoot {
 						homepageMiddlewareFactory,
 						contentMiddlewareFactory,
 						tenantMiddlewareFactory,
-						systemMiddlewareFactory
-					)
+						systemMiddlewareFactory,
+					),
 			)
 
 			.addService('koa', ({ middlewareStackFactory }) => {
@@ -173,7 +173,7 @@ class CompositionRoot {
 						['start']: () => new StartCommand(koa, config),
 						['setup']: () => new SetupCommand(tenantContainer.signUpManager, tenantContainer.apiKeyManager),
 						['dry-run-sql']: () => new DryRunCommand(projectContainers),
-					})
+					}),
 			)
 			.addService('cli', ({ commandManager }) => new Application(commandManager))
 
@@ -185,7 +185,7 @@ class CompositionRoot {
 	createProjectContainers(
 		projects: Array<Project>,
 		projectsDir: string,
-		schemas: Record<string, Schema>
+		schemas: Record<string, Schema>,
 	): ProjectContainer[] {
 		return projects.map((project: Project) => {
 			const projectContainer = new Container.Builder({})
@@ -200,7 +200,7 @@ class CompositionRoot {
 							password: project.dbCredentials.password,
 							database: project.dbCredentials.database,
 						},
-						{ timing: true }
+						{ timing: true },
 					)
 				})
 				.addService(
@@ -209,27 +209,27 @@ class CompositionRoot {
 						new MigrationsRunner(
 							project.dbCredentials,
 							'system',
-							MigrationFilesManager.createForEngine('project').directory
-						)
+							MigrationFilesManager.createForEngine('project').directory,
+						),
 				)
 				.addService('migrationFilesManager', ({ project }) =>
-					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug)
+					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),
 				)
 				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
 				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
 				.addService('systemQueryHandler', ({ systemDbClient }) => systemDbClient.createQueryHandler())
 				.addService(
 					'modificationHandlerFactory',
-					() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
+					() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
 				)
 				.addService(
 					'schemaMigrator',
-					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory)
+					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory),
 				)
 				.addService(
 					'schemaVersionBuilder',
 					({ systemQueryHandler, migrationsResolver, schemaMigrator }) =>
-						new SchemaVersionBuilder(systemQueryHandler, migrationsResolver, schemaMigrator)
+						new SchemaVersionBuilder(systemQueryHandler, migrationsResolver, schemaMigrator),
 				)
 				.addService('s3', ({ project }) => {
 					return new S3(project.s3)
@@ -241,12 +241,12 @@ class CompositionRoot {
 						new PermissionsByIdentityFactory([
 							new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
 							new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
-						])
+						]),
 				)
 				.addService(
 					'graphQlSchemaFactory',
 					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory }) =>
-						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory)
+						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory),
 				)
 				.addService('apolloServerFactory', ({ connection }) => new ContentApolloServerFactory(connection))
 				.addService(
@@ -257,8 +257,8 @@ class CompositionRoot {
 							schemaVersionBuilder,
 							graphQlSchemaFactory,
 							apolloServerFactory,
-							schema
-						)
+							schema,
+						),
 				)
 				.build()
 
@@ -270,8 +270,8 @@ class CompositionRoot {
 					'permissionsByIdentityFactory',
 					'schemaMigrator',
 					'modificationHandlerFactory',
-					'schemaVersionBuilder'
-				)
+					'schemaVersionBuilder',
+				),
 			)
 
 			return projectContainer

@@ -37,7 +37,7 @@ export const execute = async (test: Test) => {
 		new Identity.StaticIdentity(testUuid(999), [], {}),
 		{
 			isAllowed: () => Promise.resolve(true),
-		}
+		},
 	)
 
 	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.resolvers as any })
@@ -444,7 +444,7 @@ describe('tenant api', () => {
 			await execute({
 				query: GQL`mutation {
           updateProjectMember(projectId: "${testUuid(5)}", identityId: "${testUuid(
-					6
+					6,
 				)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]) {
             ok
 	          errors {

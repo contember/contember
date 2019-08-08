@@ -62,7 +62,7 @@ class ContentApolloServerFactory {
 					identityVariables: ctx.state.projectVariables,
 				}
 				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions).create(
-					partialContext
+					partialContext,
 				)
 				return {
 					...partialContext,

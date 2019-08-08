@@ -16,14 +16,14 @@ import PersonQuery from '../../../model/queries/person/PersonQuery'
 export default class ChangePasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordChangeManager: PasswordChangeManager,
-		private readonly queryHandler: QueryHandler<DbQueryable>
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 	) {}
 
 	async changePassword(
 		parent: any,
 		args: MutationChangePasswordArgs,
 		context: ResolverContext,
-		info: GraphQLResolveInfo
+		info: GraphQLResolveInfo,
 	): Promise<ChangePasswordResponse> {
 		const person = await this.queryHandler.fetch(PersonQuery.byId(args.personId))
 		if (!person) {

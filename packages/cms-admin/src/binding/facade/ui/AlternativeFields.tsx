@@ -44,7 +44,7 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 
 	public static generateSyntheticChildren(
 		props: Props<AlternativeFieldsProps>,
-		environment: Environment
+		environment: Environment,
 	): React.ReactNode {
 		const alternatives: React.ReactNodeArray = []
 
@@ -58,9 +58,9 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 					{
 						name: props.name,
 						options: Object.values(props.alternatives),
-						arity: ChoiceArity.Single
+						arity: ChoiceArity.Single,
 					},
-					environment
+					environment,
 				)}
 				{alternatives}
 			</>

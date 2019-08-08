@@ -17,7 +17,7 @@ namespace With {
 				ctes.map(([alias, expr]) => {
 					return new Literal(wrapIdentifier(alias) + ' as (' + expr.sql + ')', expr.parameters)
 				}),
-				', '
+				', ',
 			)
 		}
 

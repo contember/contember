@@ -22,7 +22,7 @@ class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition.Option
 				entityName,
 				name,
 				entityRegistry.getName(options.target),
-				options.inversedBy
+				options.inversedBy,
 			)
 			joiningTable = {
 				tableName: conventions.getJoiningTableName(entityName, name),

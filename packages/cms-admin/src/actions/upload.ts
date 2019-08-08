@@ -12,7 +12,7 @@ import {
 	UploadFinishPayload,
 	UploadSetFailurePayload,
 	UploadStartPayload,
-	UploadUpdateProgressPayload
+	UploadUpdateProgressPayload,
 } from '../reducer/upload'
 import { UploadStatus } from '../state/upload'
 import { readAsArrayBuffer } from '../utils/fileReader'
@@ -33,21 +33,21 @@ const startUpload = createAction<UploadStartPayload, string, File, string | unde
 			name: file.name,
 			mime: file.type,
 			size: file.size,
-			objectURL
-		}
-	})
+			objectURL,
+		},
+	}),
 )
 const setUploadFailed = createAction<UploadSetFailurePayload, string, string>(UPLOAD_SET_FAILURE, (id, reason) => ({
 	id,
-	reason
+	reason,
 }))
 const updateUploadProgress = createAction<UploadUpdateProgressPayload, string, number | null>(
 	UPLOAD_UPDATE_PROGRESS,
-	(id, progress) => ({ id, progress })
+	(id, progress) => ({ id, progress }),
 )
 const finishUpload = createAction<UploadFinishPayload, string, string>(UPLOAD_FINISH, (id, resultUrl) => ({
 	id,
-	resultUrl
+	resultUrl,
 }))
 
 export const uploadFile = (id: string, file: File): ActionCreator => async (dispatch, getState, services) => {
@@ -66,7 +66,7 @@ export const uploadFile = (id: string, file: File): ActionCreator => async (disp
 	let publicUrl: string
 	try {
 		const variables = {
-			contentType: file.type
+			contentType: file.type,
 		}
 		const result = await graphqlClient.request(mutation, variables, apiToken || undefined)
 
@@ -90,15 +90,15 @@ export const uploadFile = (id: string, file: File): ActionCreator => async (disp
 				method: 'PUT',
 				headers: {
 					'Content-Type': file.type,
-					'Cache-Control': 'immutable'
+					'Cache-Control': 'immutable',
 				},
-				body: content
+				body: content,
 			},
 			{
 				onUploadProgress: e => {
 					dispatch(updateUploadProgress(id, e.lengthComputable ? (e.loaded / e.total) * 100 : null))
-				}
-			}
+				},
+			},
 		)
 	} catch (error) {
 		dispatch(setUploadFailed(id, `An error has occurred while uploading a file`))

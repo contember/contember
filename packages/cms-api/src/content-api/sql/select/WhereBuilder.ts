@@ -13,7 +13,7 @@ class WhereBuilder {
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly conditionBuilder: ConditionBuilder,
-		private readonly db: Client
+		private readonly db: Client,
 	) {}
 
 	public build<Filled extends keyof SelectBuilder.Options>(
@@ -21,7 +21,7 @@ class WhereBuilder {
 		entity: Model.Entity,
 		path: Path,
 		where: Input.Where,
-		allowManyJoin: boolean = false
+		allowManyJoin: boolean = false,
 	) {
 		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)), allowManyJoin)
 	}
@@ -31,14 +31,14 @@ class WhereBuilder {
 		path: Path,
 		where: Input.Where,
 		callback: (clauseCb: (clause: SqlConditionBuilder) => void) => SelectBuilder<SelectBuilder.Result, Filled>,
-		allowManyJoin: boolean = false
+		allowManyJoin: boolean = false,
 	) {
 		const joinList: WhereBuilder.JoinDefinition[] = []
 
 		const qbWithWhere = callback(clause => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
 		return joinList.reduce<SelectBuilder<SelectBuilder.Result, Filled | 'join'>>(
 			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
-			qbWithWhere
+			qbWithWhere,
 		)
 	}
 
@@ -48,20 +48,20 @@ class WhereBuilder {
 		path: Path,
 		where: Input.Where,
 		allowManyJoin: boolean,
-		joinList: WhereBuilder.JoinDefinition[]
+		joinList: WhereBuilder.JoinDefinition[],
 	): void {
 		const tableName = path.getAlias()
 
 		if (where.and !== undefined && where.and.length > 0) {
 			const expr = where.and
 			whereClause.and(clause =>
-				expr.map((where: Input.Where) => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
+				expr.map((where: Input.Where) => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList)),
 			)
 		}
 		if (where.or !== undefined && where.or.length > 0) {
 			const expr = where.or
 			whereClause.or(clause =>
-				expr.map((where: Input.Where) => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
+				expr.map((where: Input.Where) => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList)),
 			)
 		}
 		if (where.not !== undefined) {
@@ -115,8 +115,8 @@ class WhereBuilder {
 							relationWhere,
 							targetEntity,
 							targetRelation.joiningTable,
-							'inversed'
-						)
+							'inversed',
+						),
 					)
 				},
 				visitManyHasManyOwner: (entity, relation, targetEntity) => {
@@ -134,8 +134,8 @@ class WhereBuilder {
 							relationWhere,
 							targetEntity,
 							relation.joiningTable,
-							'owner'
-						)
+							'owner',
+						),
 					)
 				},
 				visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
@@ -156,8 +156,8 @@ class WhereBuilder {
 							targetEntity,
 							new Path([]),
 							relationWhere,
-							true
-						)
+							true,
+						),
 					)
 				},
 			})
@@ -169,7 +169,7 @@ class WhereBuilder {
 		relationWhere: Input.Where,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
-		fromSide: 'owner' | 'inversed'
+		fromSide: 'owner' | 'inversed',
 	) {
 		let augmentedBuilder: SelectBuilder<SelectBuilder.Result, Filled | 'select' | 'from' | 'join'> = qb
 		const fromColumn =
@@ -180,19 +180,19 @@ class WhereBuilder {
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {
 			return augmentedBuilder.where(whereClause =>
-				this.conditionBuilder.build(whereClause, 'junction_', toColumn, primaryCondition)
+				this.conditionBuilder.build(whereClause, 'junction_', toColumn, primaryCondition),
 			)
 		}
 
 		augmentedBuilder = augmentedBuilder.join(targetEntity.tableName, 'root_', clause =>
-			clause.compareColumns(['junction_', toColumn], SqlConditionBuilder.Operator.eq, ['root_', targetEntity.primary])
+			clause.compareColumns(['junction_', toColumn], SqlConditionBuilder.Operator.eq, ['root_', targetEntity.primary]),
 		)
 		return this.buildAdvanced(
 			targetEntity,
 			new Path([]),
 			relationWhere,
 			cb => augmentedBuilder.where(clause => cb(clause)),
-			true
+			true,
 		)
 	}
 

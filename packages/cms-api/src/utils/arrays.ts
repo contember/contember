@@ -22,7 +22,7 @@ const arraySplit = <T>(source: T[], condition: (value: T) => boolean): [T[], T[]
 			const valid = condition(value)
 			return [[...res1, ...(valid ? [value] : [])], [...res2, ...(!valid ? [value] : [])]]
 		},
-		[[], []]
+		[[], []],
 	)
 }
 

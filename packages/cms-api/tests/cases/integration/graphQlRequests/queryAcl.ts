@@ -13,7 +13,7 @@ describe('Queries with acl', () => {
 			.entity('PostLocale', entity =>
 				entity
 					.column('title', column => column.type(Model.ColumnType.String))
-					.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' }))
+					.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })),
 			)
 			.buildSchema()
 
@@ -339,10 +339,10 @@ describe('Queries with acl', () => {
 						e
 							.column('name', c => c.type(Model.ColumnType.String))
 							.manyHasOne('country', r =>
-								r.target('Country', e => e.column('name', c => c.type(Model.ColumnType.String)))
-							)
-					)
-				)
+								r.target('Country', e => e.column('name', c => c.type(Model.ColumnType.String))),
+							),
+					),
+				),
 			)
 			.buildSchema()
 

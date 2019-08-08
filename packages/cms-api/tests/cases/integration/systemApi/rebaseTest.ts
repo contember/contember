@@ -48,7 +48,7 @@ describe('system api - rebase', () => {
 			},
 			{
 				99: createRunMigrationEvent('2019-02-01-163923'),
-			}
+			},
 		)
 	})
 })

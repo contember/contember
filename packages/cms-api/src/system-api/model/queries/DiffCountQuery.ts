@@ -20,7 +20,7 @@ class DiffCountQuery extends DbQuery<DiffCountQuery.Response> {
   )
 SELECT index from events where events.id = ?
 `,
-			[this.headEvent, this.baseEvent]
+			[this.headEvent, this.baseEvent],
 		)
 
 		return diff.rows.length === 0

@@ -16,7 +16,7 @@ describe('input validation', () => {
 		const r = validation.rules
 		const rule = r.conditional(
 			r.on('books', r.filter(r.on('deleted', r.equals(false)), r.on('published', r.any(r.equals(true))))),
-			r.on('published', r.equals(true))
+			r.on('published', r.equals(true)),
 		)
 
 		const author = {
@@ -49,7 +49,7 @@ describe('input validation', () => {
 		const r = validation.rules
 		const validator = r.conditional(
 			r.on('books', r.filter(r.on('deleted', r.equals(false)), r.on('published', r.any(r.equals(true))))),
-			r.on('published', r.equals(true))
+			r.on('published', r.equals(true)),
 		)
 
 		const collector = new DependencyCollector()
@@ -104,13 +104,13 @@ describe('input validation', () => {
 				e
 					.column('deleted', c => c.type(Model.ColumnType.Bool))
 					.column('published', c => c.type(Model.ColumnType.Bool))
-					.manyHasOne('category', r => r.target('Category'))
+					.manyHasOne('category', r => r.target('Category')),
 			)
 			.entity('Category', e => e.column('name'))
 			.entity('Author', e =>
 				e
 					.oneHasMany('books', r => r.target('Book').ownedBy('author'))
-					.column('published', c => c.type(Model.ColumnType.Bool))
+					.column('published', c => c.type(Model.ColumnType.Bool)),
 			)
 			.buildSchema()
 		const dependencies: DependencyCollector.Dependencies = {
@@ -145,19 +145,19 @@ describe('input validation', () => {
 								[new FieldNode('id', 'id', {}), new FieldNode('name', 'name', {})],
 								{},
 								{},
-								[]
+								[],
 							),
 						],
 						{},
 						{},
-						[]
+						[],
 					),
 					new FieldNode('published', 'published', {}),
 				],
 				{},
 				{},
-				[]
-			)
+				[],
+			),
 		)
 	})
 })

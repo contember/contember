@@ -3,7 +3,7 @@ import ValidationContext from './ValidationContext'
 
 const getValueOrLiteral = (
 	context: ValidationContext.AnyContext,
-	argument: Validation.PathArgument | Validation.LiteralArgument
+	argument: Validation.PathArgument | Validation.LiteralArgument,
 ): any => {
 	if (argument.type === Validation.ArgumentType.literal) {
 		return argument.value
@@ -66,7 +66,7 @@ const validatorEvaluators: {
 	conditional: (
 		context: ValidationContext.AnyContext,
 		{ validator: condition }: Validation.ValidatorArgument,
-		{ validator: rule }: Validation.ValidatorArgument
+		{ validator: rule }: Validation.ValidatorArgument,
 	) => {
 		return !evaluateValidation(context, condition) || evaluateValidation(context, rule)
 	},
@@ -79,7 +79,7 @@ const validatorEvaluators: {
 	lengthRange: (
 		context: ValidationContext.AnyContext,
 		min: Validation.LiteralArgument<number | undefined>,
-		max: Validation.LiteralArgument<number | undefined>
+		max: Validation.LiteralArgument<number | undefined>,
 	) => {
 		let value: number
 		if (ValidationContext.isValueContext(context)) {
@@ -102,7 +102,7 @@ const validatorEvaluators: {
 	inContext: (
 		context: ValidationContext.AnyContext,
 		contextArg: Validation.PathArgument,
-		{ validator }: Validation.ValidatorArgument
+		{ validator }: Validation.ValidatorArgument,
 	) => {
 		return evaluateValidation(ValidationContext.changeContext(context, contextArg.path), validator)
 	},
@@ -121,14 +121,14 @@ const validatorEvaluators: {
 	filter: (
 		context: ValidationContext.AnyContext,
 		{ validator: filter }: Validation.ValidatorArgument,
-		{ validator }: Validation.ValidatorArgument
+		{ validator }: Validation.ValidatorArgument,
 	) => {
 		if (!ValidationContext.isNodeListContext(context)) {
 			throw new Error('NodeListContext expected for "filter" operation')
 		}
 		const filteredContext = ValidationContext.createNodeListContext(
 			context.root,
-			context.nodes.filter(it => evaluateValidation(it, filter))
+			context.nodes.filter(it => evaluateValidation(it, filter)),
 		)
 		return evaluateValidation(filteredContext, validator)
 	},

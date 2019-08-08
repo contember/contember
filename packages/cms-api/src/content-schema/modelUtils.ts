@@ -38,7 +38,7 @@ export const getColumnType = (schema: Model.Schema, entity: Model.Entity, fieldN
 export const getTargetEntity = (
 	schema: Model.Schema,
 	entity: Model.Entity,
-	relationName: string
+	relationName: string,
 ): Model.Entity | null => {
 	return acceptFieldVisitor(schema, entity, relationName, {
 		visitColumn: () => null,
@@ -62,7 +62,7 @@ export const getUniqueConstraints = (schema: Model.Schema, entity: Model.Entity)
 				fields: [relation.name],
 				name: SqlNameHelper.createUniqueConstraintName(entity.name, [relation.name]),
 			}),
-		})
+		}),
 	).filter((it): it is Model.UniqueConstraint => !!it)
 
 	return [...Object.values(entity.unique), ...additionalConstraints]
@@ -71,7 +71,7 @@ export const getUniqueConstraints = (schema: Model.Schema, entity: Model.Entity)
 export const acceptEveryFieldVisitor = <T>(
 	schema: Model.Schema,
 	entity: string | Model.Entity,
-	visitor: Model.FieldVisitor<T>
+	visitor: Model.FieldVisitor<T>,
 ): { [fieldName: string]: T } => {
 	const entityObj: Model.Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
 	if (!entityObj) {
@@ -88,7 +88,7 @@ export const acceptFieldVisitor = <T>(
 	schema: Model.Schema,
 	entity: string | Model.Entity,
 	field: string | Model.AnyField,
-	visitor: Model.FieldVisitor<T>
+	visitor: Model.FieldVisitor<T>,
 ): T => {
 	const entityObj: Model.Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
 	if (!entityObj) {
@@ -142,7 +142,7 @@ export const acceptRelationTypeVisitor = <T>(
 	schema: Model.Schema,
 	entity: string | Model.Entity,
 	relation: string | Model.AnyRelation,
-	visitor: Model.RelationByTypeVisitor<T>
+	visitor: Model.RelationByTypeVisitor<T>,
 ): T => {
 	const entityObj: Model.Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
 	if (!entityObj) {
@@ -169,21 +169,21 @@ export const acceptRelationTypeVisitor = <T>(
 					entityObj,
 					relationObj as Model.ManyHasManyInversedRelation,
 					targetEntity,
-					targetRelation as Model.ManyHasManyOwnerRelation
+					targetRelation as Model.ManyHasManyOwnerRelation,
 				)
 			case Model.RelationType.OneHasOne:
 				return visitor.visitOneHasOneInversed(
 					entityObj,
 					relationObj as Model.OneHasOneInversedRelation,
 					targetEntity,
-					targetRelation as Model.OneHasOneOwnerRelation
+					targetRelation as Model.OneHasOneOwnerRelation,
 				)
 			case Model.RelationType.OneHasMany:
 				return visitor.visitOneHasMany(
 					entityObj,
 					relationObj as Model.OneHasManyRelation,
 					targetEntity,
-					targetRelation as Model.ManyHasOneRelation
+					targetRelation as Model.ManyHasOneRelation,
 				)
 		}
 		throw new Error()
@@ -196,21 +196,21 @@ export const acceptRelationTypeVisitor = <T>(
 					entityObj,
 					relationObj as Model.ManyHasManyOwnerRelation,
 					targetEntity,
-					targetRelation as Model.ManyHasManyInversedRelation
+					targetRelation as Model.ManyHasManyInversedRelation,
 				)
 			case Model.RelationType.OneHasOne:
 				return visitor.visitOneHasOneOwner(
 					entityObj,
 					relationObj as Model.OneHasOneOwnerRelation,
 					targetEntity,
-					targetRelation as Model.OneHasOneInversedRelation
+					targetRelation as Model.OneHasOneInversedRelation,
 				)
 			case Model.RelationType.ManyHasOne:
 				return visitor.visitManyHasOne(
 					entityObj,
 					relationObj as Model.ManyHasOneRelation,
 					targetEntity,
-					targetRelation as Model.OneHasManyRelation
+					targetRelation as Model.OneHasManyRelation,
 				)
 		}
 		throw new Error()

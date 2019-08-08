@@ -16,24 +16,24 @@ describe('crud query builder', () => {
 								b
 									.connect({ id: '1' }, 'connectId1')
 									.create({ name: 'foo' }, 'createNameFoo')
-									.disconnect({ id: 2 })
+									.disconnect({ id: 2 }),
 							)
 							.many('locales', [{ update: { by: { id: '123' }, data: { foo: 'bar' } } }])
-							.one('author', { create: { name: 'John' } })
+							.one('author', { create: { name: 'John' } }),
 					)
 					.by({ id: '123' })
 					.node(builder =>
 						builder
 							.column('id')
 							.inlineFragment('Foo', builder => builder.column('bar'))
-							.hasOneRelation('author', o => o.column('name'))
-					)
+							.hasOneRelation('author', o => o.column('name')),
+					),
 			)
 			.delete(
 				'Category',
 				CrudQueryBuilder.ReadBuilder.instantiate<DeleteMutationArguments>()
 					.by({ id: '123' })
-					.column('id')
+					.column('id'),
 			)
 			.create('Author', builder =>
 				builder
@@ -41,8 +41,8 @@ describe('crud query builder', () => {
 					.data(builder =>
 						builder
 							.set('name', 'John')
-							.many('posts', builder => builder.connect({ id: '456' }).create(builder => builder.set('title', 'Abcd')))
-					)
+							.many('posts', builder => builder.connect({ id: '456' }).create(builder => builder.set('title', 'Abcd'))),
+					),
 			)
 
 		expect(builder.getGql()).equals(`mutation {
@@ -76,7 +76,7 @@ describe('crud query builder', () => {
 					.filter({ foo: { eq: 'bar' } })
 					.column('title')
 					.hasOneRelation('author', o => o.column('name')),
-			'myPostsAlias'
+			'myPostsAlias',
 		)
 		expect(builder.getGql()).equals(`query {
 	myPostsAlias: listPosts(filter: {foo: {eq: "bar"}}) {
@@ -93,7 +93,7 @@ describe('crud query builder', () => {
 			builder
 				.data({ bar: '123' })
 				.ok()
-				.validation()
+				.validation(),
 		)
 		expect(builder.getGql()).equals(`mutation {
 	createFoo(data: {bar: "123"}) {

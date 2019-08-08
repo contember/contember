@@ -31,7 +31,7 @@ class DiffQuery extends DbQuery<AnyEvent[]> {
   )
 SELECT * FROM events ORDER BY index DESC
 `,
-			[this.headEvent, this.baseEvent]
+			[this.headEvent, this.baseEvent],
 		)
 
 		const rows = diff.rows
@@ -53,8 +53,8 @@ SELECT * FROM events ORDER BY index DESC
 							event.transaction_id,
 							data.rowId,
 							data.tableName,
-							data.values
-						)
+							data.values,
+						),
 					)
 					break
 				case EventType.update:
@@ -66,8 +66,8 @@ SELECT * FROM events ORDER BY index DESC
 							event.transaction_id,
 							data.rowId,
 							data.tableName,
-							data.values
-						)
+							data.values,
+						),
 					)
 					break
 				case EventType.delete:
@@ -78,13 +78,13 @@ SELECT * FROM events ORDER BY index DESC
 							event.identity_id,
 							event.transaction_id,
 							data.rowId,
-							data.tableName
-						)
+							data.tableName,
+						),
 					)
 					break
 				case EventType.runMigration:
 					result.push(
-						new RunMigrationEvent(event.id, event.created_at, event.identity_id, event.transaction_id, data.version)
+						new RunMigrationEvent(event.id, event.created_at, event.identity_id, event.transaction_id, data.version),
 					)
 					break
 

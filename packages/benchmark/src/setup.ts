@@ -26,7 +26,7 @@ const setup = async (tenantEndpoint: string): Promise<string> => {
       }
     }
   }
-}`
+}`,
 	})
 
 	if (!setupResponse.data.setup.ok) {
@@ -52,7 +52,7 @@ const login = async (tenantEndpoint: string, loginToken: string): Promise<string
       }
     }
   }
-}`
+}`,
 	})
 
 	if (!loginResponse.data.signIn.ok) {
@@ -68,7 +68,7 @@ const dataInit = async (contentEndpoint: string, accessToken: string) => {
 	await graphqlRequest({
 		endpoint: contentEndpoint,
 		query: initGql,
-		authorizationToken: accessToken
+		authorizationToken: accessToken,
 	})
 }
 ;(async () => {

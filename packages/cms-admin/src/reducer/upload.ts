@@ -20,8 +20,8 @@ const updateUploadStatus = (state: UploadState, id: string, updater: (upload: An
 		...state,
 		uploads: {
 			...state.uploads,
-			[id]: { ...state.uploads[id], ...updater(state.uploads[id]) }
-		}
+			[id]: { ...state.uploads[id], ...updater(state.uploads[id]) },
+		},
 	}
 }
 
@@ -42,7 +42,7 @@ export default handleActions<UploadState, any>(
 		[UPLOAD_SET_FAILURE]: (state, action: Action<UploadSetFailurePayload>) => {
 			const { id, reason } = action.payload!
 			return updateUploadStatus(state, id, upload => ({ ...upload, status: UploadStatus.FAILED, reason }))
-		}
+		},
 	},
-	emptyUploadState
+	emptyUploadState,
 ) as Reducer

@@ -33,7 +33,7 @@ class ResolverFactory {
 			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
-		}
+		},
 	) {}
 
 	create(): Resolvers {
@@ -55,24 +55,24 @@ class ResolverFactory {
 				signIn: this.resolvers.signInMutationResolver.signIn.bind(this.resolvers.signInMutationResolver),
 				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),
 				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(
-					this.resolvers.changePasswordMutationResolver
+					this.resolvers.changePasswordMutationResolver,
 				),
 
 				addProjectMember: this.resolvers.addProjectMemberMutationResolver.addProjectMember.bind(
-					this.resolvers.addProjectMemberMutationResolver
+					this.resolvers.addProjectMemberMutationResolver,
 				),
 				updateProjectMember: this.resolvers.updateProjectMemberMutationResolver.updateProjectMember.bind(
-					this.resolvers.updateProjectMemberMutationResolver
+					this.resolvers.updateProjectMemberMutationResolver,
 				),
 				removeProjectMember: this.resolvers.removeProjectMemberMutationResolver.removeProjectMember.bind(
-					this.resolvers.updateProjectMemberMutationResolver
+					this.resolvers.updateProjectMemberMutationResolver,
 				),
 
 				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(
-					this.resolvers.createApiKeyMutationResolver
+					this.resolvers.createApiKeyMutationResolver,
 				),
 				disableApiKey: this.resolvers.disableApiKeyMutationResolver.disableApiKey.bind(
-					this.resolvers.disableApiKeyMutationResolver
+					this.resolvers.disableApiKeyMutationResolver,
 				),
 			},
 		}

@@ -29,7 +29,7 @@ interface LayoutDefaultState {
 
 class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProps, LayoutDefaultState> {
 	state: LayoutDefaultState = {
-		menuOpen: false
+		menuOpen: false,
 	}
 
 	private sideRef = React.createRef<HTMLElement>()
@@ -50,10 +50,10 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 								executed = true
 							}
 						},
-						{ once: true }
+						{ once: true },
 					)
 				}
-			}
+			},
 		)
 	}
 
@@ -111,6 +111,6 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 }
 export default connect<LayoutStateProps, {}, LayoutOwnProps, State>(state => {
 	return {
-		identity: state.auth.identity ? state.auth.identity.email : undefined
+		identity: state.auth.identity ? state.auth.identity.email : undefined,
 	}
 })(LayoutDefault)

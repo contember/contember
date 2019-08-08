@@ -6,7 +6,7 @@ import { Component } from './Component'
 
 export const SimpleRelativeSingleField = function<P extends FieldPublicProps>(
 	render: React.FunctionComponent<P>,
-	displayName: string
+	displayName: string,
 ) {
 	return Component<P>(render, displayName, (props: Props<P>, environment: Environment) =>
 		QueryLanguage.wrapRelativeSingleField(
@@ -23,7 +23,7 @@ export const SimpleRelativeSingleField = function<P extends FieldPublicProps>(
 					name={fieldName}
 				/>
 			),
-			environment
-		)
+			environment,
+		),
 	)
 }

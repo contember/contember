@@ -16,6 +16,6 @@ export const prependSchema = (tableExpression: string | Literal, schema: string,
 	return new Literal(
 		cteAliases.has(tableExpression)
 			? wrapIdentifier(tableExpression)
-			: `${wrapIdentifier(schema)}.${wrapIdentifier(tableExpression)}`
+			: `${wrapIdentifier(schema)}.${wrapIdentifier(tableExpression)}`,
 	)
 }

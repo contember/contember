@@ -41,7 +41,7 @@ export const execute = async (test: Test) => {
 				key: '',
 				secret: '',
 			},
-		})
+		}),
 	).create(test.schema, permissions)
 	const graphQLSchema = builder.build()
 

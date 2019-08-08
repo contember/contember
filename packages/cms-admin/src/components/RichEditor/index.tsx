@@ -23,14 +23,14 @@ interface Serializer<F, T> {
 
 export enum RichEditorSerializer {
 	HTML,
-	JSON
+	JSON,
 }
 
 export enum LineBreakBehavior {
 	NEWLINE = 'newline',
 	NEWBLOCK = 'newblock',
 	DISABLE = 'disable',
-	SMART = 'smart'
+	SMART = 'smart',
 }
 
 export interface RichEditorProps {
@@ -54,26 +54,26 @@ const CONFIGS: RichEditorPluginConfig[] = [BOLD, ITALIC, UNDERLINED, LINK, PARAG
 
 export enum Block {
 	HEADING = 'heading',
-	PARAGRAPH = 'paragraph'
+	PARAGRAPH = 'paragraph',
 }
 
 export enum Mark {
 	BOLD = 'bold',
 	ITALIC = 'italic',
 	UNDERLINED = 'underlined',
-	LINK = 'link'
+	LINK = 'link',
 }
 
 const blockConfigs: { [_ in Block]: RichEditorPluginConfig } = {
 	[Block.HEADING]: HEADING,
-	[Block.PARAGRAPH]: PARAGRAPH
+	[Block.PARAGRAPH]: PARAGRAPH,
 }
 
 const markConfigs: { [_ in Mark]: RichEditorPluginConfig } = {
 	[Mark.BOLD]: BOLD,
 	[Mark.ITALIC]: ITALIC,
 	[Mark.UNDERLINED]: UNDERLINED,
-	[Mark.LINK]: LINK
+	[Mark.LINK]: LINK,
 }
 
 export default class RichEditor extends React.Component<RichEditorProps, RichTextFieldState> {
@@ -88,13 +88,13 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 	static defaultProps: Partial<RichEditorProps> = {
 		serializer: RichEditorSerializer.JSON,
 		lineBreakBehavior: LineBreakBehavior.NEWBLOCK,
-		blocks: [{ block: Block.HEADING }, { block: Block.PARAGRAPH, marks: [Mark.BOLD] }]
+		blocks: [{ block: Block.HEADING }, { block: Block.PARAGRAPH, marks: [Mark.BOLD] }],
 	}
 
 	constructor(props: RichEditorProps) {
 		super(props)
 		const htmlSerializer = new HtmlSerializer({
-			rules: CONFIGS.map(c => c.htmlSerializer)
+			rules: CONFIGS.map(c => c.htmlSerializer),
 		})
 		this.serializer =
 			props.serializer == RichEditorSerializer.HTML
@@ -255,7 +255,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						first.text === ''
 					) {
 						editor.setBlocks({
-							type: 'paragraph'
+							type: 'paragraph',
 						})
 					}
 					break
@@ -270,7 +270,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 		const currentBlockTypes = editor.value.blocks.toArray().map(block => block.type)
 		const blockDefinitions = currentBlockTypes.map(currentBlock =>
-			this.props.blocks.find(block => block.block === currentBlock)
+			this.props.blocks.find(block => block.block === currentBlock),
 		)
 		if (blockDefinitions.every(b => typeof b !== 'undefined' && (b.marks || []).includes(mark))) {
 			event.preventDefault()
@@ -279,7 +279,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			console.warn(
 				`Mark "${mark}" is not available in at least some of following blocks: ${blockDefinitions
 					.map(block => block && block.block)
-					.join(', ')}.`
+					.join(', ')}.`,
 			)
 		}
 

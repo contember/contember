@@ -26,5 +26,5 @@ export const ClearFieldButton = SimpleRelativeSingleField<ClearFieldButtonProps>
 			}}
 		</Field>
 	),
-	'ClearFieldButton'
+	'ClearFieldButton',
 )

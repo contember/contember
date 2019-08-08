@@ -19,7 +19,7 @@ export default class WhereTypeProvider {
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly columnTypeResolver: ColumnTypeResolver,
-		private readonly conditionTypeProvider: ConditionTypeProvider
+		private readonly conditionTypeProvider: ConditionTypeProvider,
 	) {}
 
 	public getEntityWhereType(entityName: string): GraphQLInputObjectType {
@@ -47,8 +47,8 @@ export default class WhereTypeProvider {
 		const definedUniqueKeys = getUniqueConstraints(this.schema, entity).map(it => it.fields)
 		const uniqueKeys: string[][] = [[entity.primary], ...definedUniqueKeys].filter(uniqueKey =>
 			uniqueKey.every(it =>
-				acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator))
-			)
+				acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator)),
+			),
 		)
 		for (const uniqueKey of uniqueKeys) {
 			combinations.push(uniqueKey.join(', '))

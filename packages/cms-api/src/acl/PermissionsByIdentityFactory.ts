@@ -11,7 +11,7 @@ class PermissionsByIdentityFactory {
 	public createPermissions(
 		stageSlug: string,
 		schema: Schema,
-		identity: PermissionsByIdentityFactory.Identity
+		identity: PermissionsByIdentityFactory.Identity,
 	): PermissionsByIdentityFactory.PermissionResult {
 		const permissionFactory = this.permissionFactories.find(it => it.isEligible(identity))
 		if (!permissionFactory) {
@@ -22,7 +22,7 @@ class PermissionsByIdentityFactory {
 				...schema,
 				acl: this.extractAclForStage(schema.acl, stageSlug),
 			},
-			identity
+			identity,
 		)
 	}
 
@@ -31,7 +31,7 @@ class PermissionsByIdentityFactory {
 			...acl,
 			roles: filterObject(
 				acl.roles,
-				(key, value) => value.stages === '*' || !!value.stages.find(pattern => this.matches(stageSlug, pattern))
+				(key, value) => value.stages === '*' || !!value.stages.find(pattern => this.matches(stageSlug, pattern)),
 			),
 		}
 	}

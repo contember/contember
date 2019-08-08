@@ -13,7 +13,7 @@ type ContextWithRequest = KoaContext<KoaRequestState>
 function createRoutingMiddleware(
 	method: string | undefined,
 	mask: string,
-	app: Koa | Koa.Middleware
+	app: Koa | Koa.Middleware,
 ): compose.Middleware<ContextWithRequest> {
 	const downstream = app instanceof Koa ? compose(app.middleware) : app
 

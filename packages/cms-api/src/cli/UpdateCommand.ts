@@ -8,7 +8,7 @@ class UpdateCommand extends Command<{}, {}> {
 	constructor(
 		private readonly tenantDbMigrationsRunner: MigrationsRunner,
 		private readonly projectManager: ProjectManager,
-		private readonly projectContainers: ProjectContainer[]
+		private readonly projectContainers: ProjectContainer[],
 	) {
 		super()
 	}
@@ -37,7 +37,7 @@ class UpdateCommand extends Command<{}, {}> {
 					const init = executionContainer.projectIntializer
 					await init.initialize()
 				})
-			})
+			}),
 		)
 	}
 }

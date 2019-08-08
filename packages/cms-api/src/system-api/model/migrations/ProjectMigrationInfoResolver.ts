@@ -9,18 +9,18 @@ class ProjectMigrationInfoResolver {
 	constructor(
 		private readonly project: Project,
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly queryHandler: QueryHandler<DbQueryable>
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 	) {}
 
 	public async getMigrationsInfo(): Promise<ProjectMigrationInfoResolver.Result> {
 		const stages = this.project.stages
 		const versions = (await Promise.all(
-			stages.map(stage => this.queryHandler.fetch(new LatestMigrationByStageQuery(stage.id)))
+			stages.map(stage => this.queryHandler.fetch(new LatestMigrationByStageQuery(stage.id))),
 		)).map(it => (it ? it.data.version : null))
 		if (stages.length > 1 && versions.filter(it => it === versions[0]).length !== versions.length) {
 			throw new Error(
 				'Stages in different versions found: \n' +
-					stages.map((stage, i) => `\t${stage.slug}: ${versions[i]}`).join('\n')
+					stages.map((stage, i) => `\t${stage.slug}: ${versions[i]}`).join('\n'),
 			)
 		}
 
@@ -29,7 +29,7 @@ class ProjectMigrationInfoResolver {
 		// todo check previously executed migrations
 
 		const migrationsToExecute = (await this.migrationsResolver.getMigrations()).filter(
-			({ version }) => currentVersion === null || version > currentVersion
+			({ version }) => currentVersion === null || version > currentVersion,
 		)
 
 		return { currentVersion, migrationsToExecute }

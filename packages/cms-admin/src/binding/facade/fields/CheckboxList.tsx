@@ -35,5 +35,5 @@ export const CheckboxList = Component<CheckboxListProps>(
 			)}
 		</ChoiceField>
 	),
-	'CheckboxList'
+	'CheckboxList',
 )

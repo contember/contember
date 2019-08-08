@@ -13,7 +13,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	constructor(
 		public readonly wrapper: Client,
 		public readonly options: SelectBuilder.Options,
-		private readonly cteAliases: Set<string> = new Set()
+		private readonly cteAliases: Set<string> = new Set(),
 	) {}
 
 	public static create<Result = SelectBuilder.Result>(wrapper: Client) {
@@ -33,7 +33,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	public with(alias: string, expression: With.Expression): SelectBuilder<Result, Filled | 'with'> {
 		return this.withOption(
 			'with',
-			this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression))
+			this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression)),
 		).withCteAliases([...this.cteAliases, alias])
 	}
 
@@ -45,7 +45,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	public select(callback: QueryBuilder.ColumnExpression, alias?: string): SelectBuilder<Result, Filled | 'select'>
 	public select(
 		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression,
-		alias?: string
+		alias?: string,
 	): SelectBuilder<Result, Filled | 'select'> {
 		let raw = QueryBuilder.columnExpressionToLiteral(expr)
 		if (raw === undefined) {
@@ -60,7 +60,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 
 	public orderBy(
 		columnName: QueryBuilder.ColumnIdentifier,
-		direction: 'asc' | 'desc' = 'asc'
+		direction: 'asc' | 'desc' = 'asc',
 	): SelectBuilder<Result, Filled | 'orderBy'> {
 		return this.withOption('orderBy', [
 			...this.options.orderBy,
@@ -71,7 +71,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	public join(
 		table: string,
 		alias?: string,
-		condition?: SelectBuilder.JoinCondition
+		condition?: SelectBuilder.JoinCondition,
 	): SelectBuilder<Result, Filled | 'join'> {
 		return this.withOption('join', [
 			...this.options.join,
@@ -82,7 +82,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	public leftJoin(
 		table: string,
 		alias?: string,
-		condition?: SelectBuilder.JoinCondition
+		condition?: SelectBuilder.JoinCondition,
 	): SelectBuilder<Result, Filled | 'join'> {
 		return this.withOption('join', [
 			...this.options.join,
@@ -130,12 +130,12 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 
 	protected withOption<K extends keyof SelectBuilder.Options, V extends SelectBuilder.Options[K]>(
 		key: K,
-		value: V
+		value: V,
 	): SelectBuilder<Result, Filled | K> {
 		return new SelectBuilder<Result, Filled | K>(
 			this.wrapper,
 			{ ...this.options, [key]: value },
-			this.cteAliases
+			this.cteAliases,
 		) as SelectBuilder<Result, Filled | K>
 	}
 

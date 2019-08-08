@@ -33,5 +33,5 @@ export const FeedbackRenderer = React.memo(
 				{props.children(data)}
 			</>
 		)
-	}
+	},
 )

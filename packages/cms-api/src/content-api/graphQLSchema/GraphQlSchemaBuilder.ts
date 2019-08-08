@@ -12,7 +12,7 @@ export default class GraphQlSchemaBuilder {
 		private queryProvider: QueryProvider,
 		private validationQueriesProvider: ValidationQueriesProvider,
 		private mutationProvider: MutationProvider,
-		private s3: S3
+		private s3: S3,
 	) {}
 
 	public build(): GraphQLSchema {
@@ -34,7 +34,7 @@ export default class GraphQlSchemaBuilder {
 							region: { type: new GraphQLNonNull(GraphQLString) },
 							publicUrl: { type: new GraphQLNonNull(GraphQLString) },
 						},
-					})
+					}),
 				),
 				args: {
 					contentType: { type: new GraphQLNonNull(GraphQLString) },

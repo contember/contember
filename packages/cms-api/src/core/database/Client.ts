@@ -43,7 +43,7 @@ class Client<ConnectionType extends Connection.Queryable & Connection.Transactio
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		config: Connection.QueryConfig = {}
+		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		return this.connection.query<Row>(sql, parameters, meta, config)
 	}
@@ -54,7 +54,7 @@ class Client<ConnectionType extends Connection.Queryable & Connection.Transactio
 				get(): QueryHandler<DbQueryable> {
 					return handler
 				},
-			})
+			}),
 		)
 		return handler
 	}

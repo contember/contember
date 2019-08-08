@@ -15,7 +15,7 @@ export default class UpdateEntityRelationInputProvider {
 
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly updateEntityRelationInputFieldVisitor: UpdateEntityRelationInputFieldVisitor
+		private readonly updateEntityRelationInputFieldVisitor: UpdateEntityRelationInputFieldVisitor,
 	) {}
 
 	public getUpdateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
@@ -24,7 +24,7 @@ export default class UpdateEntityRelationInputProvider {
 
 	private createUpdateEntityRelationInput(
 		entityName: string,
-		relationName: string
+		relationName: string,
 	): GraphQLInputObjectType | undefined {
 		return acceptFieldVisitor(this.schema, entityName, relationName, this.updateEntityRelationInputFieldVisitor)
 	}

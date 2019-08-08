@@ -13,14 +13,14 @@ import { wrapIdentifier } from '../../../core/database/utils'
 class MigrationExecutor {
 	constructor(
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async execute(
 		db: Client,
 		stage: Stage,
 		migrations: Migration[],
-		progressCb: (version: string) => void
+		progressCb: (version: string) => void,
 	): Promise<Stage> {
 		if (migrations.length === 0) {
 			return stage
@@ -48,7 +48,7 @@ class MigrationExecutor {
 				{
 					version,
 				},
-				previousId
+				previousId,
 			).execute(db)
 		}
 

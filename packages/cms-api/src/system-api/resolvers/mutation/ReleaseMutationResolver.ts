@@ -9,7 +9,7 @@ export default class ReleaseMutationResolver implements MutationResolver<'releas
 		parent: any,
 		args: MutationReleaseArgs,
 		context: ResolverContext,
-		info: GraphQLResolveInfo
+		info: GraphQLResolveInfo,
 	): Promise<ReleaseResponse> {
 		const [baseStage, headStage] = await Promise.all([
 			context.container.queryHandler.fetch(createStageQuery(args.baseStage)),
@@ -31,7 +31,7 @@ export default class ReleaseMutationResolver implements MutationResolver<'releas
 			},
 			baseStage,
 			headStage,
-			[...args.events]
+			[...args.events],
 		)
 
 		return {

@@ -27,7 +27,7 @@ const renderCheckboxField: React.FunctionComponent<CheckboxFieldProps> = (props:
 }
 
 renderCheckboxField.defaultProps = {
-	defaultValue: false
+	defaultValue: false,
 }
 
 export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps>(renderCheckboxField, 'CheckboxField')

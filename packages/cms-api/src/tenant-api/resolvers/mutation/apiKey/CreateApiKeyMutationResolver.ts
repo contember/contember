@@ -11,7 +11,7 @@ export default class CreateApiKeyMutationResolver implements MutationResolvers {
 		parent: any,
 		{ projects, roles }: MutationCreateApiKeyArgs,
 		context: ResolverContext,
-		info: GraphQLResolveInfo
+		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
 		await context.requireAccess({
 			action: Actions.API_KEY_CREATE,
@@ -24,7 +24,7 @@ export default class CreateApiKeyMutationResolver implements MutationResolvers {
 				variables: [...(it.variables || [])],
 				id: it.projectId,
 				roles: [...(it.roles || [])],
-			}))
+			})),
 		)
 
 		if (!result.ok) {

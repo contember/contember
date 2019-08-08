@@ -6,7 +6,7 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 	private constructor(
 		private readonly windowFunction: Literal | undefined,
 		private readonly partitionByExpr: Literal | undefined,
-		private readonly orderByColumns: Literal[]
+		private readonly orderByColumns: Literal[],
 	) {}
 
 	public static createEmpty(): WindowFunction<false> {

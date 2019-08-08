@@ -23,7 +23,7 @@ const RuleMetaKey = Symbol('Rule')
 function updateMetadata<T>(
 	{ key, target, propertyKey }: { key: symbol; target: any; propertyKey: string | symbol },
 	generator: (previous: T) => T,
-	initialValue: T
+	initialValue: T,
 ) {
 	const metadata = Reflect.hasMetadata(key, target, propertyKey)
 		? Reflect.getMetadata(key, target, propertyKey)
@@ -203,12 +203,12 @@ export function parseDefinition(definitions: Record<string, EnumDefinition | { n
 					})
 					.reduce<Validation.EntityRules>(
 						(ruleSet, [field, rules]) => (rules.length > 0 ? { ...ruleSet, [field]: rules } : ruleSet),
-						{}
-					)
+						{},
+					),
 			)
 		})
 		.reduce<Validation.Schema>(
 			(acc, [name, defs]) => (Object.keys(defs).length > 0 ? { ...acc, [name]: defs } : acc),
-			{}
+			{},
 		)
 }

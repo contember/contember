@@ -5,7 +5,7 @@ class ProjectAwareIdentity implements Identity {
 	constructor(
 		public readonly id: string,
 		public readonly roles: string[],
-		private readonly memberManager: ProjectMemberManager
+		private readonly memberManager: ProjectMemberManager,
 	) {}
 
 	async getProjectRoles(projectId: string): Promise<string[]> {

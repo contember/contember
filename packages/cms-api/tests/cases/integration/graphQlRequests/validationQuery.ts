@@ -28,7 +28,7 @@ const testCreate = async (test: CreateTest) => {
 			data: {
 				result: {
 					errors: (test.errors as any).map((it: string | Result.ValidationError) =>
-						typeof it === 'string' ? { message: { text: it } } : it
+						typeof it === 'string' ? { message: { text: it } } : it,
 					),
 					valid: test.errors.length === 0,
 				},
@@ -62,7 +62,7 @@ const testUpdate = async (test: UpdateTest) => {
 			data: {
 				result: {
 					errors: (test.errors as any).map((it: string | Result.ValidationError) =>
-						typeof it === 'string' ? { message: { text: it } } : it
+						typeof it === 'string' ? { message: { text: it } } : it,
 					),
 					valid: test.errors.length === 0,
 				},

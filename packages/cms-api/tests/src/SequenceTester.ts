@@ -15,7 +15,7 @@ export default class SequenceTester {
 	constructor(
 		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly contentApiTester: ContentApiTester,
-		private readonly systemApiTester: SystemApiTester
+		private readonly systemApiTester: SystemApiTester,
 	) {}
 
 	public async runSequence(sequences: EventSequence.StringSequenceSet): Promise<void> {
@@ -42,7 +42,7 @@ export default class SequenceTester {
                 ok
               }
             }`,
-						{ number: event.number }
+						{ number: event.number },
 					)
 					break
 				case 'follow':
@@ -61,7 +61,7 @@ export default class SequenceTester {
 
 	public async verifySequence(
 		sequences: EventSequence.StringSequenceSet,
-		eventsMap: Record<number, AnyEvent>
+		eventsMap: Record<number, AnyEvent>,
 	): Promise<void> {
 		const sequenceSet = EventSequence.parseSet(sequences)
 

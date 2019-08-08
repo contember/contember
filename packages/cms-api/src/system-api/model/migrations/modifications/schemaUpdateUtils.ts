@@ -22,7 +22,7 @@ export const updateEntity = (name: string, entityUpdate: EntityUpdater): ModelUp
 
 export const updateField = <T extends Model.AnyField = Model.AnyField>(
 	name: string,
-	fieldUpdater: FieldUpdater<T>
+	fieldUpdater: FieldUpdater<T>,
 ): EntityUpdater => entity => ({
 	...entity,
 	fields: {

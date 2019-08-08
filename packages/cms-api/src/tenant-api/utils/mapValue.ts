@@ -5,7 +5,7 @@ type MappingMap<Input extends string, Output extends string> = {
 }
 
 export const mapValue = <Input extends string, Output extends string>(mapping: MappingMap<Input, Output>) => (
-	input: Input
+	input: Input,
 ): Output => {
 	const mappingElement = mapping[input] as Output | (() => Output | never)
 	if (!mappingElement) {
@@ -18,7 +18,7 @@ export const mapValue = <Input extends string, Output extends string>(mapping: M
 }
 
 export const mapValues = <Input extends string, Output extends string>(mapping: MappingMap<Input, Output>) => (
-	values: Input[]
+	values: Input[],
 ): Output[] => {
 	const mapper = mapValue(mapping)
 	return values.map(mapper)

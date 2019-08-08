@@ -6,7 +6,7 @@ class GraphqlClient {
 
 	async request<T = any>(query: string, variables: Variables, apiToken?: string): Promise<T> {
 		const headers: Headers = {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
 		}
 
 		if (apiToken) {
@@ -16,7 +16,7 @@ class GraphqlClient {
 		const response = await fetch(this.apiUrl, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify({ query, variables })
+			body: JSON.stringify({ query, variables }),
 		})
 		if (response.ok) {
 			return (await response.json()).data // It may still have errors (e.g. unfilled fields) but as far as the request goes, it is ok.

@@ -9,123 +9,123 @@ export const tokens = {
 	WhiteSpace: createToken({
 		name: 'WhiteSpace',
 		pattern: /\s+/,
-		group: Lexer.SKIPPED
+		group: Lexer.SKIPPED,
 	}),
 
 	EntityIdentifier: createToken({
 		name: 'EntityIdentifier',
-		pattern: TokenRegExps.entityIdentifier
+		pattern: TokenRegExps.entityIdentifier,
 	}),
 
 	Identifier: createToken({
 		name: 'Identifier',
-		pattern: TokenRegExps.identifier
+		pattern: TokenRegExps.identifier,
 	}),
 
 	DollarSign: createToken({
 		name: 'DollarSign',
-		pattern: /\$/
+		pattern: /\$/,
 	}),
 
 	Dot: createToken({
 		name: 'Dot',
-		pattern: /\./
+		pattern: /\./,
 	}),
 
 	Comma: createToken({
 		name: 'Comma',
-		pattern: /,/
+		pattern: /,/,
 	}),
 
 	NumberLiteral: createToken({
 		name: 'NumberLiteral',
-		pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+		pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/,
 	}),
 
 	StringLiteral: createToken({
 		name: 'StringLiteral',
-		pattern: /'(:?[^\\']|\\(:?[bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/
+		pattern: /'(:?[^\\']|\\(:?[bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/,
 	}),
 
 	LeftParenthesis: createToken({
 		name: 'LeftParenthesis',
-		pattern: /\(/
+		pattern: /\(/,
 	}),
 
 	RightParenthesis: createToken({
 		name: 'RightParenthesis',
-		pattern: /\)/
+		pattern: /\)/,
 	}),
 
 	LeftBracket: createToken({
 		name: 'LeftBracket',
-		pattern: /\[/
+		pattern: /\[/,
 	}),
 
 	RightBracket: createToken({
 		name: 'RightBracket',
-		pattern: /]/
+		pattern: /]/,
 	}),
 
 	NotEquals: createToken({
 		name: 'NotEquals',
-		pattern: /!=/
+		pattern: /!=/,
 	}),
 
 	True: createToken({
 		name: 'True',
-		pattern: /true/
+		pattern: /true/,
 	}),
 
 	False: createToken({
 		name: 'False',
-		pattern: /false/
+		pattern: /false/,
 	}),
 
 	Null: createToken({
 		name: 'Null',
-		pattern: /null/
+		pattern: /null/,
 	}),
 
 	Equals: createToken({
 		name: 'Equals',
-		pattern: /=/
+		pattern: /=/,
 	}),
 
 	Not: createToken({
 		name: 'Not',
-		pattern: /!/
+		pattern: /!/,
 	}),
 
 	And: createToken({
 		name: 'And',
-		pattern: /&&/
+		pattern: /&&/,
 	}),
 
 	Or: createToken({
 		name: 'Or',
-		pattern: /\|\|/
+		pattern: /\|\|/,
 	}),
 
 	LowerEqual: createToken({
 		name: 'LowerEqual',
-		pattern: /<=/
+		pattern: /<=/,
 	}),
 
 	GreaterEqual: createToken({
 		name: 'GreaterEqual',
-		pattern: />=/
+		pattern: />=/,
 	}),
 
 	LowerThan: createToken({
 		name: 'LowerThan',
-		pattern: /</
+		pattern: /</,
 	}),
 
 	GreaterThan: createToken({
 		name: 'GreaterThan',
-		pattern: />/
-	})
+		pattern: />/,
+	}),
 }
 
 const tokenList = [
@@ -152,7 +152,7 @@ const tokenList = [
 	tokens.LowerEqual,
 	tokens.LowerThan,
 	tokens.And,
-	tokens.Or
+	tokens.Or,
 ]
 
 export { tokenList }

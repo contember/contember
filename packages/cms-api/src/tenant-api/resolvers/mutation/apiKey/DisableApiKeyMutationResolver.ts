@@ -16,7 +16,7 @@ export default class DisableApiKeyMutationResolver implements MutationResolvers 
 		parent: any,
 		{ id }: MutationDisableApiKeyArgs,
 		context: ResolverContext,
-		info: GraphQLResolveInfo
+		info: GraphQLResolveInfo,
 	): Promise<DisableApiKeyResponse> {
 		await context.requireAccess({
 			action: Actions.API_KEY_DISABLE,

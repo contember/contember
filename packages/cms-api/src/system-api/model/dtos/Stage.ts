@@ -3,7 +3,7 @@ export class Stage {
 		public readonly id: string,
 		public readonly name: string,
 		public readonly slug: string,
-		public readonly event_id: string
+		public readonly event_id: string,
 	) {}
 }
 

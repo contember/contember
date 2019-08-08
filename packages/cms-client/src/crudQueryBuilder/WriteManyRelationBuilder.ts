@@ -31,49 +31,49 @@ class WriteManyRelationBuilder<
 
 	public create(
 		data: WriteDataBuilder.DataLike<WriteOperation.Create>,
-		alias?: string
+		alias?: string,
 	): WriteManyRelationBuilder.Builder<Op> {
 		const resolvedData = WriteDataBuilder.resolveData(data)
 		return (resolvedData === undefined
 			? this
 			: WriteManyRelationBuilder.instantiate<Op>([
 					...this.data,
-					this.withAlias({ create: resolvedData }, alias)
+					this.withAlias({ create: resolvedData }, alias),
 			  ] as WriteManyRelationBuilder.DataFormat[WriteOperation.Create['op']])) as WriteManyRelationBuilder.Builder<Op>
 	}
 
 	public connect(where: Input.UniqueWhere<Literal>, alias?: string) {
 		return WriteManyRelationBuilder.instantiate<Op>([
 			...this.data,
-			this.withAlias({ connect: where }, alias)
+			this.withAlias({ connect: where }, alias),
 		] as WriteManyRelationBuilder.DataFormat[Op['op']])
 	}
 
 	public delete(where: Input.UniqueWhere<Literal>, alias?: string) {
 		return WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
 			...this.data,
-			this.withAlias({ delete: where }, alias)
+			this.withAlias({ delete: where }, alias),
 		])
 	}
 
 	public disconnect(where: Input.UniqueWhere<Literal>, alias?: string) {
 		return WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
 			...this.data,
-			this.withAlias({ disconnect: where }, alias)
+			this.withAlias({ disconnect: where }, alias),
 		])
 	}
 
 	public update(
 		where: Input.UniqueWhere<Literal>,
 		data: WriteDataBuilder.DataLike<WriteOperation.Update>,
-		alias?: string
+		alias?: string,
 	): WriteManyRelationBuilder.Builder<WriteOperation.Update> {
 		const resolvedData = WriteDataBuilder.resolveData(data)
 		return (resolvedData === undefined
 			? this
 			: WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
 					...this.data,
-					this.withAlias({ update: { by: where, data: resolvedData } }, alias)
+					this.withAlias({ update: { by: where, data: resolvedData } }, alias),
 			  ])) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
 	}
 
@@ -81,7 +81,7 @@ class WriteManyRelationBuilder<
 		where: Input.UniqueWhere<Literal>,
 		update: WriteDataBuilder.DataLike<WriteOperation.Update>,
 		create: WriteDataBuilder.DataLike<WriteOperation.Create>,
-		alias?: string
+		alias?: string,
 	): WriteManyRelationBuilder.Builder<WriteOperation.Update> {
 		const resolvedUpdate = WriteDataBuilder.resolveData(update)
 		const resolvedCreate = WriteDataBuilder.resolveData(create)
@@ -94,17 +94,17 @@ class WriteManyRelationBuilder<
 							upsert: {
 								by: where,
 								update: resolvedUpdate || {},
-								create: resolvedCreate || {}
-							}
+								create: resolvedCreate || {},
+							},
 						},
-						alias
-					)
+						alias,
+					),
 			  ])) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
 	}
 
 	private withAlias<D extends Input.CreateOneRelationInput<Literal> | Input.UpdateManyRelationInputItem<Literal>>(
 		data: D,
-		alias?: string
+		alias?: string,
 	): D {
 		if (alias !== undefined) {
 			data.alias = alias

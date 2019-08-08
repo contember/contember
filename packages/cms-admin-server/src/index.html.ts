@@ -1,6 +1,6 @@
 export default function render({
 	config,
-	assets
+	assets,
 }: {
 	config: any
 	assets: { js: string | undefined; css: string | undefined }

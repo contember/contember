@@ -12,7 +12,7 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 		parent: any,
 		args: QueryDiffArgs,
 		context: ResolverContext,
-		info: GraphQLResolveInfo
+		info: GraphQLResolveInfo,
 	): Promise<DiffResponse> {
 		const [baseStage, headStage] = await Promise.all([
 			context.container.queryHandler.fetch(createStageQuery(args.baseStage)),
@@ -22,7 +22,7 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 			return {
 				ok: false,
 				errors: [!baseStage ? DiffErrorCode.BaseNotFound : null, !headStage ? DiffErrorCode.HeadNotFound : null].filter(
-					(it): it is DiffErrorCode => !!it
+					(it): it is DiffErrorCode => !!it,
 				),
 			}
 		}
@@ -33,7 +33,7 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 				identity: context.identity,
 			},
 			baseStage,
-			headStage
+			headStage,
 		)
 		if (!diff.ok) {
 			return diff

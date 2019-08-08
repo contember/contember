@@ -50,42 +50,42 @@ type KeysOfType<T, TProp> = { [P in keyof T]: T[P] extends TProp ? P : never }[k
 
 export function manyHasOne<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<OneHasManyDefinition>> & string
+	inversedBy?: KeysOfType<T, Interface<OneHasManyDefinition>> & string,
 ): ManyHasOneDefinition {
 	return new ManyHasOneDefinition({ target, inversedBy })
 }
 
 export function oneHasMany<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<ManyHasOneDefinition>> & string
+	ownedBy: KeysOfType<T, Interface<ManyHasOneDefinition>> & string,
 ): OneHasManyDefinition {
 	return new OneHasManyDefinition({ target, ownedBy })
 }
 
 export function manyHasMany<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<ManyHasManyInversedDefinition>> & string
+	inversedBy?: KeysOfType<T, Interface<ManyHasManyInversedDefinition>> & string,
 ): ManyHasManyDefinition {
 	return new ManyHasManyDefinition({ target, inversedBy })
 }
 
 export function manyHasManyInversed<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<ManyHasManyDefinition>> & string
+	ownedBy: KeysOfType<T, Interface<ManyHasManyDefinition>> & string,
 ): ManyHasManyInversedDefinition {
 	return new ManyHasManyInversedDefinition({ target, ownedBy })
 }
 
 export function oneHasOne<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<OneHasOneInversedDefinition>> & string
+	inversedBy?: KeysOfType<T, Interface<OneHasOneInversedDefinition>> & string,
 ): OneHasOneDefinition {
 	return new OneHasOneDefinition({ target, inversedBy })
 }
 
 export function oneHasOneInversed<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<OneHasOneDefinition>> & string
+	ownedBy: KeysOfType<T, Interface<OneHasOneDefinition>> & string,
 ): OneHasOneInversedDefinition {
 	return new OneHasOneInversedDefinition({ target, ownedBy })
 }

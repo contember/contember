@@ -6,7 +6,7 @@ import {
 	Field,
 	SingleEntityDataProvider,
 	ToMany,
-	ToOne
+	ToOne,
 } from '../../../../src/binding/coreComponents'
 import { MarkerTreeGenerator } from '../../../../src/binding/model'
 

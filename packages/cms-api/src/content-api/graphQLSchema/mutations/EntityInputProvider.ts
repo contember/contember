@@ -19,7 +19,7 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 		private operation: Operation,
 		private schema: Model.Schema,
 		private authorizator: Authorizator,
-		private visitor: Model.FieldVisitor<GraphQLInputFieldConfig | undefined>
+		private visitor: Model.FieldVisitor<GraphQLInputFieldConfig | undefined>,
 	) {}
 
 	public getInput(entityName: string, withoutRelation?: string): GraphQLInputType | undefined {

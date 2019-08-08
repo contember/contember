@@ -30,7 +30,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					entity.tableName,
 					relation.joiningColumn.columnName,
 					targetEntity.tableName,
-					targetEntity.primaryColumn
+					targetEntity.primaryColumn,
 				)
 				builder.addConstraint(entity.tableName, fkName, {
 					foreignKeys: {
@@ -59,7 +59,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					entity.tableName,
 					relation.joiningColumn.columnName,
 					targetEntity.tableName,
-					targetEntity.primaryColumn
+					targetEntity.primaryColumn,
 				)
 				builder.addConstraint(entity.tableName, fkName, {
 					foreignKeys: {
@@ -101,7 +101,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 								relation.joiningTable.inverseJoiningColumn.columnName,
 							],
 						},
-					}
+					},
 				)
 				createEventTrigger(builder, relation.joiningTable.tableName)
 			},
@@ -114,7 +114,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 			updateEntity(this.data.entityName, addField(this.data.owningSide)),
 			this.data.inverseSide !== undefined
 				? updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
-				: undefined
+				: undefined,
 		)
 	}
 

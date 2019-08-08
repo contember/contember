@@ -15,7 +15,7 @@ class JunctionFetcher {
 		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderBuilder: OrderByBuilder,
-		private readonly predicateInjector: PredicatesInjector
+		private readonly predicateInjector: PredicatesInjector,
 	) {}
 
 	public async fetchJunction(
@@ -23,7 +23,7 @@ class JunctionFetcher {
 		values: Input.PrimaryValue[],
 		column: Mapper.JoiningColumns,
 		targetEntity: Model.Entity,
-		object: ObjectNode<Input.ListQueryInput>
+		object: ObjectNode<Input.ListQueryInput>,
 	): Promise<Record<string, Value.AtomicValue>[]> {
 		const joiningTable = relation.joiningTable
 
@@ -43,7 +43,7 @@ class JunctionFetcher {
 				condition.compareColumns(['junction_', column.targetColumn.columnName], ConditionBuilder.Operator.eq, [
 					path.getAlias(),
 					targetEntity.primaryColumn,
-				])
+				]),
 			)
 			qb = this.whereBuilder.build(qb, targetEntity, path, where)
 		}
@@ -57,7 +57,7 @@ class JunctionFetcher {
 				return [orderable, qb]
 			},
 			object.args.offset,
-			object.args.limit
+			object.args.limit,
 		)
 
 		return await wrapper.getResult(qb)

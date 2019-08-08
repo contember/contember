@@ -23,7 +23,7 @@ export class CollectionRenderer extends React.PureComponent<CollectionRendererPr
 
 					return this.props.children(
 						data.root,
-						Repeater.filterEntities(data.root, this.props.includeUnpersisted !== true)
+						Repeater.filterEntities(data.root, this.props.includeUnpersisted !== true),
 					)
 				}}
 			</FeedbackRenderer>

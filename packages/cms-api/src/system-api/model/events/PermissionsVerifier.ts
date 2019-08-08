@@ -31,20 +31,20 @@ class PermissionsVerifier {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly db: Client,
 		private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
-		private readonly authorizator: Authorizator
+		private readonly authorizator: Authorizator,
 	) {}
 
 	public async verify(
 		permissionContext: PermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
-		events: AnyEvent[]
+		events: AnyEvent[],
 	): Promise<PermissionsVerifier.Result> {
 		if (
 			await this.authorizator.isAllowed(
 				permissionContext.identity,
 				new AuthorizationScope.Global(),
-				Actions.PROJECT_RELEASE_ANY
+				Actions.PROJECT_RELEASE_ANY,
 			)
 		) {
 			return events.map(it => it.id).reduce((acc, id) => ({ ...acc, [id]: true }), {})
@@ -57,7 +57,7 @@ class PermissionsVerifier {
 		context: PermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
-		events: AnyEvent[]
+		events: AnyEvent[],
 	): Promise<PermissionsVerifier.Result> {
 		const contentEvents: ContentEvent[] = []
 
@@ -76,13 +76,13 @@ class PermissionsVerifier {
 			context,
 			sourceStage,
 			eventsByTable,
-			this.verifyReadPermissionsForTable.bind(this)
+			this.verifyReadPermissionsForTable.bind(this),
 		)
 		const writePermissions = await this.verifyPermissionsCb(
 			context,
 			targetStage,
 			eventsByTable,
-			this.verifyWritePermissionsForTable.bind(this)
+			this.verifyWritePermissionsForTable.bind(this),
 		)
 
 		const permissionsResult: PermissionsVerifier.Result = {}
@@ -110,7 +110,7 @@ class PermissionsVerifier {
 		context: PermissionsVerifier.Context,
 		stage: Stage,
 		eventsByTable: ContentEventsByTable,
-		cb: PermissionsVerifier['verifyReadPermissionsForTable'] | PermissionsVerifier['verifyWritePermissionsForTable']
+		cb: PermissionsVerifier['verifyReadPermissionsForTable'] | PermissionsVerifier['verifyWritePermissionsForTable'],
 	): Promise<PermissionsByTable> {
 		const db = this.db.forSchema(formatSchemaName(stage))
 		const schema = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
@@ -122,7 +122,7 @@ class PermissionsVerifier {
 		const predicateFactory = new PredicateFactory(permissions, new VariableInjector(schema.model, context.variables))
 		const entitiesByTable = Object.values(schema.model.entities).reduce<{ [tableName: string]: Model.Entity }>(
 			(tables, entity) => ({ ...tables, [entity.tableName]: entity }),
-			{}
+			{},
 		)
 		const result: PermissionsByTable = {}
 		for (let table in eventsByTable) {
@@ -134,7 +134,7 @@ class PermissionsVerifier {
 	private groupEventsByTable(events: ContentEvent[]): ContentEventsByTable {
 		return events.reduce<ContentEventsByTable>(
 			(groups, event) => ({ ...groups, [event.tableName]: [...(groups[event.tableName] || []), event] }),
-			{}
+			{},
 		)
 	}
 
@@ -143,7 +143,7 @@ class PermissionsVerifier {
 		entity: Model.Entity,
 		db: Client,
 		events: ContentEvent[],
-		predicateFactory: PredicateFactory
+		predicateFactory: PredicateFactory,
 	): Promise<PermissionsByRow> {
 		const rowAffectedColumns = this.getAffectedColumnsByRow(events)
 
@@ -165,7 +165,7 @@ class PermissionsVerifier {
 		entity: Model.Entity,
 		db: Client,
 		events: ContentEvent[],
-		predicateFactory: PredicateFactory
+		predicateFactory: PredicateFactory,
 	): Promise<PermissionsByRow> {
 		const ids = events.map(it => it.rowId)
 
@@ -173,7 +173,7 @@ class PermissionsVerifier {
 		let qb: SelectBuilder<SelectBuilder.Result, 'select' | 'from' | 'where' | 'join'> = this.createBaseSelectBuilder(
 			db,
 			entity,
-			ids
+			ids,
 		)
 
 		const eventToOperationMapping = {
@@ -191,7 +191,7 @@ class PermissionsVerifier {
 				affectedColumnsByType[eventType],
 				entity,
 				predicateFactory,
-				schema
+				schema,
 			)
 		}
 
@@ -218,21 +218,21 @@ class PermissionsVerifier {
 		rowAffectedColumns: AffectedColumnsByRow,
 		entity: Model.Entity,
 		predicateFactory: PredicateFactory,
-		schema: Model.Schema
+		schema: Model.Schema,
 	) {
 		const columnToField = Object.values(entity.fields).reduce<{ [column: string]: string }>(
 			(result, field) => ({
 				...result,
 				[getColumnName(schema, entity, field.name)]: field.name,
 			}),
-			{}
+			{},
 		)
 
 		const whereBuilder = new WhereBuilder(schema, new JoinBuilder(schema), new ConditionBuilder(), db)
 
 		const columns = Object.values(rowAffectedColumns).reduce(
 			(result, fields) => [...result, ...fields.filter(it => result.indexOf(it) < 0)],
-			[]
+			[],
 		)
 
 		let withPredicates: SelectBuilder<SelectBuilder.Result, Filled | 'select' | 'join'> = qb
@@ -251,8 +251,8 @@ class PermissionsVerifier {
 								condition.raw('true')
 							}
 						}),
-					this.formatPermissionColumn(column, operation)
-				)
+					this.formatPermissionColumn(column, operation),
+				),
 			)
 		}
 
@@ -280,11 +280,11 @@ class PermissionsVerifier {
 	private extractRowPermissions(
 		row: { [column: string]: any },
 		affectedColumnsByRow: AffectedColumnsByRow,
-		operation: Acl.Operation
+		operation: Acl.Operation,
 	) {
 		return affectedColumnsByRow[row.__primary].reduce(
 			(acc, column) => acc && row[this.formatPermissionColumn(column, operation)],
-			true
+			true,
 		)
 	}
 

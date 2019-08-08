@@ -13,7 +13,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 	private constructor(
 		private readonly wrapper: Client,
 		private readonly options: DeleteBuilder.Options,
-		private readonly cteAliases: string[]
+		private readonly cteAliases: string[],
 	) {}
 
 	public static create(wrapper: Client): DeleteBuilder.NewDeleteBuilder {
@@ -26,7 +26,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 				using: {},
 				where: new Where.Statement([]),
 			},
-			[]
+			[],
 		) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
 	}
 
@@ -47,7 +47,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 	}
 
 	public returning(
-		column: QueryBuilder.ColumnIdentifier | Literal
+		column: QueryBuilder.ColumnIdentifier | Literal,
 	): DeleteBuilder.DeleteBuilderState<Returning.Result[], Filled | 'returning'> {
 		return this.withOption('returning', new Returning(column)) as DeleteBuilder.DeleteBuilderState<
 			Returning.Result[],
@@ -69,7 +69,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 
 	protected withOption<K extends keyof DeleteBuilder.Options, V extends DeleteBuilder.Options[K]>(
 		key: K,
-		value: V
+		value: V,
 	): DeleteBuilder.DeleteBuilderState<Result, Filled | K> {
 		return new DeleteBuilder<Result, Filled | K>(
 			this.wrapper,
@@ -77,7 +77,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 				...this.options,
 				[key]: value,
 			},
-			this.cteAliases
+			this.cteAliases,
 		) as DeleteBuilder.DeleteBuilderState<Result, Filled | K>
 	}
 

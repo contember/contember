@@ -64,21 +64,21 @@ export default class Admin extends React.Component<AdminProps> {
 										throw new Error(
 											`Duplicate project-stage pair supplied for project '${config.project}' and stage '${
 												config.stage
-											}'`
+											}'`,
 										)
 									}
 									normalizedConfigs[config.project][config.stage] = {
 										...config,
 										lazyComponent: React.lazy(config.component),
 										rootEnvironment: new Environment({
-											dimensions: config.defaultDimensions || {}
-										})
+											dimensions: config.defaultDimensions || {},
+										}),
 									}
 								}
 
 								return ({ route }: { route: PageRequest<any> }) => {
 									const config = this.props.configs.find(
-										({ project, stage }) => project === route.project && stage === route.stage
+										({ project, stage }) => project === route.project && stage === route.stage,
 									)
 									const relevantConfig = normalizedConfigs[route.project][route.stage]
 									const Component = relevantConfig.lazyComponent
@@ -86,7 +86,7 @@ export default class Admin extends React.Component<AdminProps> {
 									if (config) {
 										relevantConfig.rootEnvironment = relevantConfig.rootEnvironment.updateDimensionsIfNecessary(
 											route.dimensions,
-											config.defaultDimensions || {}
+											config.defaultDimensions || {},
 										)
 										return (
 											<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
@@ -99,7 +99,7 @@ export default class Admin extends React.Component<AdminProps> {
 										return <>{`No such project or stage as ${route.project}/${route.stage}`}</>
 									}
 								}
-							})()
+							})(),
 						}}
 					/>
 					<Toaster />

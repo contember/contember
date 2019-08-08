@@ -12,7 +12,7 @@ export default class CreateEntityInputFieldVisitor
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly columnTypeResolver: ColumnTypeResolver,
-		private readonly createEntityRelationInputProvider: CreateEntityRelationInputProvider
+		private readonly createEntityRelationInputProvider: CreateEntityRelationInputProvider,
 	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLInputFieldConfig | undefined {
@@ -30,7 +30,7 @@ export default class CreateEntityInputFieldVisitor
 
 	public visitHasOne(
 		entity: Model.Entity,
-		relation: Model.Relation & Model.NullableRelation
+		relation: Model.Relation & Model.NullableRelation,
 	): GraphQLInputFieldConfig | undefined {
 		const type = this.createEntityRelationInputProvider.getCreateEntityRelationInput(entity.name, relation.name)
 		if (type === undefined) {

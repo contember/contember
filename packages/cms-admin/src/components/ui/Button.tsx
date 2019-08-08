@@ -49,10 +49,10 @@ class InnerButton<T = React.BaseHTMLAttributes<HTMLButtonElement>> extends React
 				noBorder && 'button-noBorder',
 				small && 'button-small',
 				large && 'button-large',
-				minimal && 'button-minimal'
+				minimal && 'button-minimal',
 			),
 			ref: forwardRef,
-			disabled: disabled === true
+			disabled: disabled === true,
 		}
 
 		return React.createElement(Component, { ...(rest as T), ...attrs }, children)

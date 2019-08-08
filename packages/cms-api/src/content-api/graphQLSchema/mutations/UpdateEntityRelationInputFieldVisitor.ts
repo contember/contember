@@ -16,7 +16,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 		private readonly whereTypeBuilder: WhereTypeProvider,
 		private readonly updateEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputProvider.Type.update>>,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
-		private readonly updateEntityRelationAllowedOperationsVisitor: UpdateEntityRelationAllowedOperationsVisitor
+		private readonly updateEntityRelationAllowedOperationsVisitor: UpdateEntityRelationAllowedOperationsVisitor,
 	) {}
 
 	public visitColumn(): never {
@@ -27,7 +27,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 		entity: Model.Entity,
 		relation: Model.Relation & Model.NullableRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null
+		targetRelation: Model.Relation | null,
 	): GraphQLInputObjectType | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
@@ -86,7 +86,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 		entity: Model.Entity,
 		relation: Model.Relation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null
+		targetRelation: Model.Relation | null,
 	): GraphQLInputObjectType | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
@@ -157,18 +157,18 @@ export default class UpdateEntityRelationInputFieldVisitor
 	private filterAllowedOperations(
 		entity: Model.Entity,
 		relation: Model.Relation,
-		graphQlFields: { [key: string]: GraphQLInputFieldConfig | undefined }
+		graphQlFields: { [key: string]: GraphQLInputFieldConfig | undefined },
 	): GraphQLInputFieldConfigMap {
 		const allowedOperations = acceptFieldVisitor(
 			this.schema,
 			entity,
 			relation.name,
-			this.updateEntityRelationAllowedOperationsVisitor
+			this.updateEntityRelationAllowedOperationsVisitor,
 		)
 		return filterObject(
 			graphQlFields,
 			(key, value): value is GraphQLInputFieldConfig =>
-				allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined
+				allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined,
 		)
 	}
 }

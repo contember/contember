@@ -9,7 +9,7 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 		private readonly projectId: string,
 		private readonly identityId: string,
 		private readonly roles: readonly string[],
-		private readonly variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[]
+		private readonly variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	) {}
 
 	async execute(db: Client): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {

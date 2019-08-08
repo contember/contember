@@ -18,7 +18,7 @@ export default class SystemMiddlewareFactory {
 		private readonly authMiddlewareFactory: AuthMiddlewareFactory,
 		private readonly projectMemberMiddlewareFactory: ProjectMemberMiddlewareFactory,
 		private readonly databaseTransactionMiddlewareFactory: DatabaseTransactionMiddlewareFactory,
-		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory
+		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory,
 	) {}
 
 	create(): Koa.Middleware {
@@ -44,14 +44,14 @@ export default class SystemMiddlewareFactory {
 							ProjectResolveMiddlewareFactory.KoaState &
 							ProjectMemberMiddlewareFactory.KoaState
 					>,
-					next
+					next,
 				) => {
 					const projectContainer = ctx.state.projectContainer
 					const serverFactory = projectContainer.systemApolloServerFactory
 					const server = serverFactory.create()
 					await graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next)
 				},
-			])
+			]),
 		)
 	}
 }

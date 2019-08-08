@@ -14,7 +14,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		private readonly inputValidator: InputValidator,
 		private readonly path: ValidationPath,
 		private readonly node: Value.Object,
-		private readonly dataSelector: ValidationDataSelector
+		private readonly dataSelector: ValidationDataSelector,
 	) {}
 
 	async column(context: Context.ColumnContext): Promise<Result> {
@@ -118,7 +118,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				context.targetEntity,
 				context.input.create,
 				newPath,
-				context.targetRelation
+				context.targetRelation,
 			)
 		}
 		const primary = relNode[context.targetEntity.primary] as Value.PrimaryValue
@@ -155,14 +155,14 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				context.targetEntity,
 				{ [context.targetEntity.primary]: id },
 				context.input.update,
-				newPath
+				newPath,
 			)
 		}
 		return this.inputValidator.validateCreate(
 			context.targetEntity,
 			context.input.create,
 			newPath,
-			context.targetRelation
+			context.targetRelation,
 		)
 	}
 
@@ -207,14 +207,14 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				context.targetEntity,
 				{ [context.targetEntity.primary]: id },
 				context.input.update,
-				newPath
+				newPath,
 			)
 		}
 		return this.inputValidator.validateCreate(
 			context.targetEntity,
 			context.input.create,
 			newPath,
-			context.targetRelation
+			context.targetRelation,
 		)
 	}
 }

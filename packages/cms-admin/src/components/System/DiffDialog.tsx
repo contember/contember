@@ -12,7 +12,7 @@ class ConnectedDiffDialog extends React.PureComponent<
 	DiffDialog.State
 > {
 	state: DiffDialog.State = {
-		targetStage: ''
+		targetStage: '',
 	}
 
 	updateTargetState(value: string) {
@@ -69,12 +69,12 @@ export const DiffDialog = connect<DiffDialog.StateProps, DiffDialog.DispatchProp
 		return {
 			project: state.request.project,
 			stage: state.request.stage,
-			pageName: state.request.pageName
+			pageName: state.request.pageName,
 		}
 	},
 	(dispatch: Dispatch) => ({
 		onShowDiff: (project, headStage, pageName, baseStage) => {
 			dispatch(pushRequest(pageRequest(project, headStage, pageName, { targetStage: baseStage })))
-		}
-	})
+		},
+	}),
 )(ConnectedDiffDialog)

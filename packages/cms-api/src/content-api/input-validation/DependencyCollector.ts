@@ -9,7 +9,7 @@ class DependencyCollector {
 
 	private withDependency(
 		object: DependencyCollector.Dependencies,
-		dependency: string[]
+		dependency: string[],
 	): DependencyCollector.Dependencies {
 		const part = dependency.shift()
 		if (!part) {

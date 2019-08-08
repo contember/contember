@@ -35,7 +35,7 @@ describe('system api - release', () => {
 				createAuthor(data: {name: "John Doe"}) {
 					ok
 				}
-			}`
+			}`,
 		)
 
 		await tester.content.queryContent(
@@ -44,7 +44,7 @@ describe('system api - release', () => {
 				createAuthor(data: {name: "Jack Black"}) {
 					ok
 				}
-			}`
+			}`,
 		)
 
 		const diff = await tester.system.querySystem(GQL`query {
@@ -75,7 +75,7 @@ describe('system api - release', () => {
 				baseStage: testUuid(2),
 				headStage: testUuid(1),
 				events: [diff.data.diff.result.events[1].id],
-			}
+			},
 		)
 
 		expect(result.data.release.ok).eq(true)
@@ -86,7 +86,7 @@ describe('system api - release', () => {
 				listAuthor {
 					name
 				}
-			}`
+			}`,
 		)
 
 		expect(authors).deep.eq({
@@ -147,7 +147,7 @@ describe('system api - release', () => {
 				baseStage: testUuid(1),
 				headStage: testUuid(2),
 				events: [diff.data.diff.result.events[1].id],
-			}
+			},
 		)
 
 		await tester.sequences.verifySequence(
@@ -160,7 +160,7 @@ describe('system api - release', () => {
 			},
 			{
 				99: createRunMigrationEvent('2019-02-01-163923'),
-			}
+			},
 		)
 	})
 })

@@ -15,5 +15,5 @@ export const VideoUploadField = SimpleRelativeSingleField<VideoUploadFieldProps>
 			{url => <video src={url} controls />}
 		</UploadField>
 	),
-	'VideoUploadField'
+	'VideoUploadField',
 )

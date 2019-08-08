@@ -7,7 +7,7 @@ export default class ValidationDataSelector {
 	constructor(
 		private readonly model: Model.Schema,
 		private readonly queryAstFactory: QueryAstFactory,
-		private readonly mapper: Mapper
+		private readonly mapper: Mapper,
 	) {}
 
 	public async getPrimaryValue(entity: Model.Entity, where: Input.UniqueWhere) {
@@ -17,7 +17,7 @@ export default class ValidationDataSelector {
 	public async select(
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
-		dependencies: DependencyCollector.Dependencies
+		dependencies: DependencyCollector.Dependencies,
 	): Promise<Value.Object | null> {
 		if (Object.keys(dependencies).length === 0) {
 			return {}

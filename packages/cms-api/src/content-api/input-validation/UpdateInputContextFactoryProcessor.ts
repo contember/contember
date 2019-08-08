@@ -12,7 +12,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		private node: Value.Object,
 		private readonly validationContextFactory: ValidationContextFactory,
 		private readonly dependencies: DependencyCollector.Dependencies,
-		private readonly dataSelector: ValidationDataSelector
+		private readonly dataSelector: ValidationDataSelector,
 	) {}
 
 	async column(context: Context.ColumnContext): Promise<Result> {
@@ -82,7 +82,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		this.node[context.relation.name] = await this.dataSelector.select(
 			context.targetEntity,
 			context.input,
-			this.dependencies[context.relation.name]
+			this.dependencies[context.relation.name],
 		)
 	}
 
@@ -94,7 +94,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		this.node[context.relation.name] = await this.validationContextFactory.createForCreate(
 			context.targetEntity,
 			context.input,
-			this.dependencies[context.relation.name]
+			this.dependencies[context.relation.name],
 		)
 	}
 
@@ -110,7 +110,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 			context.targetEntity,
 			{ node: this.node[context.relation.name] as Value.Object },
 			context.input,
-			this.dependencies[context.relation.name]
+			this.dependencies[context.relation.name],
 		))!
 	}
 
@@ -138,7 +138,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		const item = await this.dataSelector.select(
 			context.targetEntity,
 			context.input,
-			this.dependencies[context.relation.name]
+			this.dependencies[context.relation.name],
 		)
 		if (!item) {
 			return
@@ -158,7 +158,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		const nestedCreateContext = await this.validationContextFactory.createForCreate(
 			context.targetEntity,
 			context.input,
-			this.dependencies[context.relation.name]
+			this.dependencies[context.relation.name],
 		)
 		;(this.node[context.relation.name] as Value.List).push(nestedCreateContext)
 	}
@@ -198,14 +198,14 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 			context.targetEntity,
 			{ where: { [context.targetEntity.primary]: context.id! } },
 			context.input,
-			this.dependencies[context.relation.name]
+			this.dependencies[context.relation.name],
 		)
 		if (!nestedUpdateContext) {
 			return
 		}
 		this.node[context.relation.name] = [
 			...(this.node[context.relation.name] as Value.List).filter(
-				(it: any) => it[context.targetEntity.primary] !== context.id
+				(it: any) => it[context.targetEntity.primary] !== context.id,
 			),
 			nestedUpdateContext,
 		]
@@ -218,7 +218,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 	}): Promise<void> {
 		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, context.input)
 		this.node[context.relation.name] = (this.node[context.relation.name] as Value.List).filter(
-			(it: any) => it[context.targetEntity.primary] !== id
+			(it: any) => it[context.targetEntity.primary] !== id,
 		)
 	}
 }

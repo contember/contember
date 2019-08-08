@@ -23,6 +23,6 @@ export const executeGraphQlTest = async (test: Test) => {
 			const response = await graphql(test.schema, test.query, null, test.context, test.queryVariables)
 			// console.log(response)
 			expect(response).deep.equal(test.return)
-		})
+		}),
 	)
 }

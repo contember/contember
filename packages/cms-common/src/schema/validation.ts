@@ -4,7 +4,7 @@ namespace Validation {
 	export enum ArgumentType {
 		validator = 'validator',
 		path = 'path',
-		literal = 'literal'
+		literal = 'literal',
 	}
 
 	export type ValidatorArgument = { type: ArgumentType.validator; validator: Validator }

@@ -14,14 +14,14 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 		entityName: string,
 		fieldName: string,
 		options: ManyHasOneBuilder.Options,
-		registerField: FieldProcessor.FieldRegistrar
+		registerField: FieldProcessor.FieldRegistrar,
 	): void {
 		registerField(entityName, this.createManyHasOneOwning(options, fieldName))
 		if (options.inversedBy) {
 			const inversed = this.createManyHasOneInversed(
 				options as ManyHasOneBuilder.Options & { inversedBy: string },
 				entityName,
-				fieldName
+				fieldName,
 			)
 			registerField(options.target, inversed)
 		}
@@ -30,7 +30,7 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 	private createManyHasOneInversed(
 		options: ManyHasOneBuilder.Options & { inversedBy: string },
 		entityName: string,
-		fieldName: string
+		fieldName: string,
 	): Model.OneHasManyRelation {
 		return {
 			name: options.inversedBy,

@@ -33,6 +33,6 @@ class RoutesRenderer extends React.PureComponent<RoutesRendererProps> {
 export const Router = connect<RoutesRendererStateProps, {}, RoutesRendererOwnProps, State>(
 	({ view: { loading, route } }) => ({
 		loading,
-		route
-	})
+		route,
+	}),
 )(RoutesRenderer)

@@ -11,7 +11,7 @@ class EntityBuilder {
 	constructor(
 		private readonly options: Partial<EntityBuilder.EntityOptions>,
 		private readonly fields: FieldBuilder.Map = {},
-		private readonly addEntity: AddEntityCallback
+		private readonly addEntity: AddEntityCallback,
 	) {}
 
 	tableName(tableName: string): EntityBuilder {
@@ -22,13 +22,13 @@ class EntityBuilder {
 		return new EntityBuilder(
 			{ ...this.options, unique: [...(this.options.unique || []), { fields: fields }] },
 			this.fields,
-			this.addEntity
+			this.addEntity,
 		)
 	}
 
 	column(
 		name: string,
-		configurator?: EntityBuilder.FieldConfigurator<ColumnBuilder, ColumnBuilder.Options>
+		configurator?: EntityBuilder.FieldConfigurator<ColumnBuilder, ColumnBuilder.Options>,
 	): EntityBuilder {
 		const options: ColumnBuilder.Options = configurator
 			? configurator(new ColumnBuilder({})).getOption()
@@ -41,20 +41,20 @@ class EntityBuilder {
 
 	oneHasOne(
 		name: string,
-		configurator: EntityBuilder.FieldConfigurator<OneHasOneBuilder, OneHasOneBuilder.Options>
+		configurator: EntityBuilder.FieldConfigurator<OneHasOneBuilder, OneHasOneBuilder.Options>,
 	): EntityBuilder {
 		const options = configurator(new OneHasOneBuilder({}, this.addEntity)).getOption()
 
 		return new EntityBuilder(
 			this.options,
 			{ ...this.fields, [name]: { type: FieldBuilder.Type.OneHasOne, options } },
-			this.addEntity
+			this.addEntity,
 		)
 	}
 
 	manyHasMany(
 		name: string,
-		configurator: EntityBuilder.FieldConfigurator<ManyHasManyBuilder, ManyHasManyBuilder.Options>
+		configurator: EntityBuilder.FieldConfigurator<ManyHasManyBuilder, ManyHasManyBuilder.Options>,
 	): EntityBuilder {
 		const options = configurator(new ManyHasManyBuilder({}, this.addEntity)).getOption()
 		const fields: FieldBuilder.Map = { ...this.fields, [name]: { type: FieldBuilder.Type.ManyHasMany, options } }
@@ -64,7 +64,7 @@ class EntityBuilder {
 
 	oneHasMany(
 		name: string,
-		configurator: EntityBuilder.FieldConfigurator<OneHasManyBuilder, OneHasManyBuilder.Options>
+		configurator: EntityBuilder.FieldConfigurator<OneHasManyBuilder, OneHasManyBuilder.Options>,
 	): EntityBuilder {
 		const options = configurator(new OneHasManyBuilder({}, this.addEntity)).getOption()
 		const fields: FieldBuilder.Map = { ...this.fields, [name]: { type: FieldBuilder.Type.OneHasMany, options } }
@@ -74,7 +74,7 @@ class EntityBuilder {
 
 	manyHasOne(
 		name: string,
-		configurator: EntityBuilder.FieldConfigurator<ManyHasOneBuilder, ManyHasOneBuilder.Options>
+		configurator: EntityBuilder.FieldConfigurator<ManyHasOneBuilder, ManyHasOneBuilder.Options>,
 	): EntityBuilder {
 		const options = configurator(new ManyHasOneBuilder({}, this.addEntity)).getOption()
 		const fields: FieldBuilder.Map = { ...this.fields, [name]: { type: FieldBuilder.Type.ManyHasOne, options } }

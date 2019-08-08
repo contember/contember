@@ -35,7 +35,7 @@ class EntityTypeProvider {
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
-		private readonly entityFieldProviders: { [key: string]: EntityFieldsProvider }
+		private readonly entityFieldProviders: { [key: string]: EntityFieldsProvider },
 	) {}
 
 	public getEntity(entityName: string): GraphQLObjectType {
@@ -53,7 +53,7 @@ class EntityTypeProvider {
 		const entity = getEntityFromSchema(this.schema, entityName)
 		const accessVisitor = new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
 		const accessibleFields = Object.keys(entity.fields).filter(fieldName =>
-			acceptFieldVisitor(this.schema, entity, fieldName, accessVisitor)
+			acceptFieldVisitor(this.schema, entity, fieldName, accessVisitor),
 		)
 		const metaFields: { [field: string]: GraphQLFieldConfig<any, any> } = accessibleFields.reduce(
 			(result, fieldName) => ({
@@ -63,7 +63,7 @@ class EntityTypeProvider {
 					resolve: aliasAwareResolver,
 				},
 			}),
-			{}
+			{},
 		)
 
 		const metaField = {
@@ -91,7 +91,7 @@ class EntityTypeProvider {
 			},
 			{
 				_meta: metaField,
-			}
+			},
 		)
 
 		return Object.entries(this.entityFieldProviders)
@@ -101,9 +101,9 @@ class EntityTypeProvider {
 						([fieldName, fieldConfig]): [string, GraphQLFieldConfig<any, any> & { meta: any }] => [
 							fieldName,
 							{ ...fieldConfig, meta: { ...(fieldConfig.meta || {}), extensionKey: key } },
-						]
+						],
 					)
-					.reduce((result, [name, value]) => ({ ...result, [name]: value }), {})
+					.reduce((result, [name, value]) => ({ ...result, [name]: value }), {}),
 			)
 			.reduce((result, providerFields) => ({ ...result, ...providerFields }), fields)
 	}

@@ -9,7 +9,7 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}
 
 	public static instantiate<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation>(
-		objectBuilder: ObjectBuilder = new ObjectBuilder()
+		objectBuilder: ObjectBuilder = new ObjectBuilder(),
 	): WriteBuilder.Builder<AA, AF, Op> {
 		return new WriteBuilder<AA, AF, Op>(objectBuilder)
 	}
@@ -28,7 +28,7 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 	public data<SubOp extends Op & WriteOperation.ContentfulOperation>(data: WriteDataBuilder.DataLike<SubOp>) {
 		const resolvedData = WriteDataBuilder.resolveData(data)
 		return WriteBuilder.instantiate<Exclude<AA, 'data'>, AF, Op>(
-			resolvedData === undefined ? this.objectBuilder : this.objectBuilder.argument('data', resolvedData)
+			resolvedData === undefined ? this.objectBuilder : this.objectBuilder.argument('data', resolvedData),
 		)
 	}
 
@@ -42,14 +42,14 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 
 	public validation() {
 		return WriteBuilder.instantiate<AA, Exclude<AF, 'validation'>, Op>(
-			ValidationRelationBuilder.validationRelation(this.objectBuilder)
+			ValidationRelationBuilder.validationRelation(this.objectBuilder),
 		)
 	}
 
 	public node(builder: ReadBuilder.BuilderFactory<never>) {
 		const readBuilder = ReadBuilder.instantiateFromFactory(builder)
 		return WriteBuilder.instantiate<AA, Exclude<AF, 'node'>, Op>(
-			this.objectBuilder.object('node', readBuilder.objectBuilder)
+			this.objectBuilder.object('node', readBuilder.objectBuilder),
 		)
 	}
 }

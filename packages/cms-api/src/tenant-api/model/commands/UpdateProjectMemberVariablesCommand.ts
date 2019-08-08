@@ -11,7 +11,7 @@ class UpdateProjectMemberVariablesCommand
 		private readonly projectId: string,
 		private readonly identityId: string,
 		private readonly variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
-		private readonly deleteOld: boolean
+		private readonly deleteOld: boolean,
 	) {}
 
 	async execute(db: Client): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberResponse> {

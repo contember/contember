@@ -44,19 +44,19 @@ class ConditionBuilder {
 	compareColumns(
 		columnName1: QueryBuilder.ColumnIdentifier,
 		operator: ConditionBuilder.Operator,
-		columnName2: QueryBuilder.ColumnIdentifier
+		columnName2: QueryBuilder.ColumnIdentifier,
 	) {
 		if (!Object.values(ConditionBuilder.Operator).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
 		this.expressions.push(
-			new Literal(`${QueryBuilder.toFqnWrap(columnName1)} ${operator} ${QueryBuilder.toFqnWrap(columnName2)}`)
+			new Literal(`${QueryBuilder.toFqnWrap(columnName1)} ${operator} ${QueryBuilder.toFqnWrap(columnName2)}`),
 		)
 	}
 
 	in<Filled extends keyof SelectBuilder.Options>(
 		columnName: QueryBuilder.ColumnIdentifier,
-		values: Value[] | SelectBuilder<SelectBuilder.Result, Filled>
+		values: Value[] | SelectBuilder<SelectBuilder.Result, Filled>,
 	): void {
 		if (!Array.isArray(values)) {
 			const query = values.createQuery()

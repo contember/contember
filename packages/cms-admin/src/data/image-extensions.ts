@@ -118,5 +118,5 @@ export default [
 	'sid',
 	'ras',
 	'sun',
-	'tga'
+	'tga',
 ]

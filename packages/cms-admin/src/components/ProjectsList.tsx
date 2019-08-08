@@ -19,7 +19,7 @@ const selectProjectRequest = (project: ProjectConfig): RequestChange => () => ({
 	stage: project.stage,
 	pageName: 'dashboard',
 	parameters: {},
-	dimensions: {}
+	dimensions: {},
 })
 
 class ProjectsList extends React.Component<ProjectsListProps, {}> {
@@ -62,10 +62,10 @@ export default connect<
 	(state, ownProps) => {
 		const projects = state.auth.identity ? state.auth.identity.projects : []
 		return {
-			configs: ownProps.configs.filter(it => projects.includes(it.project))
+			configs: ownProps.configs.filter(it => projects.includes(it.project)),
 		}
 	},
 	(dispatch: Dispatch) => ({
-		onSelectProject: project => dispatch(pushRequest(selectProjectRequest(project)))
-	})
+		onSelectProject: project => dispatch(pushRequest(selectProjectRequest(project))),
+	}),
 )(ProjectsList)

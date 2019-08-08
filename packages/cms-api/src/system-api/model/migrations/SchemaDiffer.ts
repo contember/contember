@@ -133,7 +133,7 @@ class SchemaDiffer {
 								if (
 									deepEqual(
 										{ ...updatedRelation, inversedBy: undefined },
-										{ ...originalRelation, inversedBy: undefined }
+										{ ...originalRelation, inversedBy: undefined },
 									)
 								) {
 									return
@@ -205,7 +205,7 @@ class SchemaDiffer {
 	private trackUniqueConstraintDiff(
 		builder: ModificationBuilder,
 		originalEntity: Model.Entity,
-		updatedEntity: Model.Entity
+		updatedEntity: Model.Entity,
 	) {
 		const originalUnique = originalEntity.unique
 		const originalUniqueNames = new Set(Object.keys(originalUnique))

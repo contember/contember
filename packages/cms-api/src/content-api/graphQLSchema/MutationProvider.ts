@@ -55,7 +55,7 @@ export default class MutationProvider {
 						fields: {
 							text: { type: new GraphQLNonNull(GraphQLString) },
 						},
-					})
+					}),
 				),
 			},
 		},
@@ -75,7 +75,7 @@ export default class MutationProvider {
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
-		private readonly queryAstAFactory: GraphQlQueryAstFactory
+		private readonly queryAstAFactory: GraphQlQueryAstFactory,
 	) {}
 
 	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {
@@ -105,7 +105,7 @@ export default class MutationProvider {
 					args,
 					this.queryAstAFactory.create(info, (node, path) => {
 						return path.length !== 1 || node.name.value === 'node'
-					})
+					}),
 				),
 		}
 	}
@@ -126,7 +126,7 @@ export default class MutationProvider {
 					args,
 					this.queryAstAFactory.create(info, (node, path) => {
 						return path.length !== 1 || node.name.value === 'node'
-					})
+					}),
 				),
 		}
 	}
@@ -150,7 +150,7 @@ export default class MutationProvider {
 					args,
 					this.queryAstAFactory.create(info, (node, path) => {
 						return path.length !== 1 || node.name.value === 'node'
-					})
+					}),
 				),
 		}
 	}

@@ -54,10 +54,10 @@ export default (map: ProjectConfig[]): RouteMap => {
 						.slice(1),
 					project,
 					stage,
-					dimensions: dimensionsStr
+					dimensions: dimensionsStr,
 				}
-			}
-		}
+			},
+		},
 	}
 }
 

@@ -5,7 +5,7 @@ export default class MigrationsRunner {
 	constructor(
 		private readonly db: DatabaseCredentials,
 		private readonly schema: string,
-		private readonly dir: string
+		private readonly dir: string,
 	) {}
 
 	public async migrate(log: boolean = true) {

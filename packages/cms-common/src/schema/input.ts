@@ -10,12 +10,12 @@ namespace Input {
 		create = 'create',
 		update = 'update',
 		upsert = 'upsert',
-		delete = 'delete'
+		delete = 'delete',
 	}
 
 	export enum CreateRelationOperation {
 		connect = 'connect',
-		create = 'create'
+		create = 'create',
 	}
 
 	export interface ConnectRelationInput<E = never> {
@@ -116,7 +116,7 @@ namespace Input {
 
 	export enum OrderDirection {
 		asc = 'asc',
-		desc = 'desc'
+		desc = 'desc',
 	}
 
 	export type FieldOrderBy<T = OrderDirection> = T | OrderBy<T>
@@ -161,7 +161,7 @@ namespace Input {
 
 	export enum FieldMeta {
 		readable = 'readable',
-		updatable = 'updatable'
+		updatable = 'updatable',
 	}
 }
 

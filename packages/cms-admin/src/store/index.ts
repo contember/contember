@@ -30,7 +30,7 @@ export function createServices(config: Config): Services {
 		tenantClient,
 		contentClientFactory,
 		systemClientFactory,
-		config
+		config,
 	}
 }
 

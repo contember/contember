@@ -30,7 +30,7 @@ class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>
 	private withOption<K extends keyof ManyHasManyBuilder.Options>(key: K, value: ManyHasManyBuilder.Options[K]) {
 		return new ManyHasManyBuilder<O & PartialOptions<K>>(
 			{ ...(this.options as object), [key]: value } as O & PartialOptions<K>,
-			this.addEntity
+			this.addEntity,
 		)
 	}
 }

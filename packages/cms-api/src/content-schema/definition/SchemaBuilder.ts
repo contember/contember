@@ -58,7 +58,7 @@ class SchemaBuilder {
 						}, {}),
 					tableName: this.conventions.getTableName(entityName),
 				}
-			}
+			},
 		)
 
 		return {
@@ -77,7 +77,7 @@ class SchemaBuilder {
 	private createUnique(
 		entityName: string,
 		uniqueDefinition: UniqueDefinition.Options[],
-		fieldDefinitions: Record<string, Interface<FieldDefinition<any>>>
+		fieldDefinitions: Record<string, Interface<FieldDefinition<any>>>,
 	): Model.UniqueConstraints {
 		const unique: Model.UniqueConstraints = {}
 		for (let { name, fields } of uniqueDefinition) {

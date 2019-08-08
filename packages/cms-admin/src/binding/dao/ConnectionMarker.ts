@@ -6,7 +6,7 @@ import { PlaceholderGenerator } from '../model'
 export class ConnectionMarker {
 	public constructor(
 		public readonly fieldName: FieldName,
-		public readonly target: Input.UniqueWhere<GraphQlBuilder.Literal>
+		public readonly target: Input.UniqueWhere<GraphQlBuilder.Literal>,
 	) {}
 
 	get placeholderName(): string {

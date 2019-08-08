@@ -19,7 +19,7 @@ export class RunMigrationEvent implements Event {
 		public readonly createdAt: Date,
 		public readonly identityId: string,
 		public readonly transactionId: string,
-		public readonly version: string
+		public readonly version: string,
 	) {}
 }
 
@@ -33,7 +33,7 @@ export class UpdateEvent implements Event {
 		public readonly transactionId: string,
 		public readonly rowId: string,
 		public readonly tableName: string,
-		public readonly values: { [column: string]: any }
+		public readonly values: { [column: string]: any },
 	) {}
 }
 
@@ -47,7 +47,7 @@ export class CreateEvent implements Event {
 		public readonly transactionId: string,
 		public readonly rowId: string,
 		public readonly tableName: string,
-		public readonly values: { [column: string]: any }
+		public readonly values: { [column: string]: any },
 	) {}
 }
 
@@ -60,6 +60,6 @@ export class DeleteEvent implements Event {
 		public readonly identityId: string,
 		public readonly transactionId: string,
 		public readonly rowId: string,
-		public readonly tableName: string
+		public readonly tableName: string,
 	) {}
 }

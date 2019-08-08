@@ -17,7 +17,7 @@ class ProjectInitializer {
 		private readonly projectMigrator: ProjectMigrator,
 		private readonly rebaseExecutor: RebaseExecutor,
 		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver,
-		private readonly stageCreator: StageCreator
+		private readonly stageCreator: StageCreator,
 	) {}
 
 	public async initialize() {
@@ -64,7 +64,7 @@ class ProjectInitializer {
 		await this.rebaseExecutor.rebaseAll()
 
 		await this.projectMigrator.migrate(currentVersion, migrationsToExecute, version =>
-			console.log(`Executing migration ${version} for project ${this.project.slug} `)
+			console.log(`Executing migration ${version} for project ${this.project.slug} `),
 		)
 	}
 }

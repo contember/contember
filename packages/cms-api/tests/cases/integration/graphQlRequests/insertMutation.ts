@@ -130,7 +130,7 @@ describe('Insert mutation', () => {
 				.entity('Site', entity =>
 					entity
 						.column('name', c => c.type(Model.ColumnType.String))
-						.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+						.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
 				)
 				.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -193,7 +193,7 @@ describe('Insert mutation', () => {
 				.entity('Site', entity =>
 					entity
 						.column('name', c => c.type(Model.ColumnType.String))
-						.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+						.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
 				)
 				.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -254,7 +254,7 @@ describe('Insert mutation', () => {
 		await execute({
 			schema: new SchemaBuilder()
 				.entity('Post', e =>
-					e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author'))
+					e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author')),
 				)
 				.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -322,12 +322,12 @@ describe('Insert mutation', () => {
 				.entity('Post', e =>
 					e
 						.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
-						.oneHasMany('locales', r => r.target('PostLocale'))
+						.oneHasMany('locales', r => r.target('PostLocale')),
 				)
 				.entity('PostLocale', e =>
 					e
 						.column('locale', c => c.type(Model.ColumnType.Enum, { enumName: 'locale' }))
-						.column('title', c => c.type(Model.ColumnType.String))
+						.column('title', c => c.type(Model.ColumnType.String)),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -404,7 +404,7 @@ describe('Insert mutation', () => {
 		await execute({
 			schema: new SchemaBuilder()
 				.entity('Post', e =>
-					e.column('name', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category'))
+					e.column('name', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
 				)
 				.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -492,7 +492,7 @@ describe('Insert mutation', () => {
 				.entity('Post', e =>
 					e
 						.column('name', c => c.type(Model.ColumnType.String))
-						.manyHasMany('categories', r => r.target('Category').inversedBy('posts'))
+						.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
 				)
 				.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -576,7 +576,7 @@ describe('Insert mutation', () => {
 
 	const bookSchema = new SchemaBuilder()
 		.entity('Book', entity =>
-			entity.column('name', c => c.type(Model.ColumnType.String)).oneHasMany('tags', r => r.target('Tag'))
+			entity.column('name', c => c.type(Model.ColumnType.String)).oneHasMany('tags', r => r.target('Tag')),
 		)
 		.entity('Tag', e => e.column('label'))
 		.buildSchema()

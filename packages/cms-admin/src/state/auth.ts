@@ -1,7 +1,7 @@
 export enum AuthStatus {
 	LOGGED_IN,
 	NOT_LOGGED_IN,
-	LOADING
+	LOADING,
 }
 
 export default interface AuthState {
@@ -21,5 +21,5 @@ export const emptyAuthState: AuthState = {
 	token: null,
 	identity: null,
 	errorMessage: null,
-	status: AuthStatus.NOT_LOGGED_IN
+	status: AuthStatus.NOT_LOGGED_IN,
 }

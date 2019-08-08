@@ -17,7 +17,7 @@ export default class TesterStageManager {
 		private readonly db: Client,
 		private readonly stageCreator: StageCreator,
 		private readonly projectMigrator: ProjectMigrator,
-		private readonly migrationResolver: MigrationsResolver
+		private readonly migrationResolver: MigrationsResolver,
 	) {}
 
 	public getStage(slug: string): Project.Stage {

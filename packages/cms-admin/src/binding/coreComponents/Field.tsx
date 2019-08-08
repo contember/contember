@@ -9,7 +9,7 @@ import {
 	Environment,
 	ErrorAccessor,
 	FieldAccessor,
-	FieldMarker
+	FieldMarker,
 } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
@@ -92,7 +92,7 @@ class Field<
 			props.defaultValue !== undefined
 				? VariableInputTransformer.transformValue(props.defaultValue, environment)
 				: undefined,
-			props.isNonbearing === true
+			props.isNonbearing === true,
 		)
 	}
 }
@@ -119,7 +119,7 @@ namespace Field {
 				data: this.props.data,
 				errors: this.props.errors,
 				isMutating: this.props.isMutating,
-				environment: this.props.environment
+				environment: this.props.environment,
 			})
 		}
 	}
@@ -148,7 +148,7 @@ namespace Field {
 						)}
 					</DataContext.Consumer>
 				),
-				environment
+				environment,
 			)
 		}, [environment, isMutating, propsName, propsChildren])
 	})
@@ -163,7 +163,7 @@ namespace Field {
 				fieldName: props.fieldName,
 				data: props.data,
 				isMutating: props.isMutating,
-				environment: props.environment
+				environment: props.environment,
 			}
 		}, [props.fieldName, props.data, props.isMutating, props.environment])
 		return <>{props.children(rawMetadata)}</>

@@ -10,7 +10,7 @@ import {
 	Marker,
 	MarkerTreeRoot,
 	ReferenceMarker,
-	SingleEntityTreeConstraints
+	SingleEntityTreeConstraints,
 } from '../dao'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
@@ -36,7 +36,7 @@ export class QueryGenerator {
 		if (subTree.constraints === undefined) {
 			const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
 				baseQueryBuilder,
-				this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate())
+				this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
 			)
 			return populatedBaseQueryBuilder
 		} else if (subTree.constraints.whereType === 'unique') {
@@ -49,28 +49,28 @@ export class QueryGenerator {
 
 	private addGetQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>
+		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>,
 	): BaseQueryBuilder {
 		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
 			this.registerQueryPart(
 				subTree.fields,
-				CrudQueryBuilder.ReadBuilder.instantiate<GetQueryArguments>().by(subTree.constraints.where)
-			)
+				CrudQueryBuilder.ReadBuilder.instantiate<GetQueryArguments>().by(subTree.constraints.where),
+			),
 		)
 
 		return populatedBaseQueryBuilder.get(
 			subTree.entityName,
 			CrudQueryBuilder.ReadBuilder.instantiate(
-				populatedListQueryBuilder ? populatedListQueryBuilder.objectBuilder : undefined
+				populatedListQueryBuilder ? populatedListQueryBuilder.objectBuilder : undefined,
 			),
-			subTree.id
+			subTree.id,
 		)
 	}
 
 	private addListQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerTreeRoot<EntityListTreeConstraints>
+		subTree: MarkerTreeRoot<EntityListTreeConstraints>,
 	): BaseQueryBuilder {
 		let finalBuilder: ReadBuilder
 
@@ -96,19 +96,19 @@ export class QueryGenerator {
 
 		const [newBaseQueryBuilder, newReadBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
-			this.registerQueryPart(subTree.fields, finalBuilder)
+			this.registerQueryPart(subTree.fields, finalBuilder),
 		)
 
 		return newBaseQueryBuilder.list(
 			subTree.entityName,
 			newReadBuilder || CrudQueryBuilder.ReadBuilder.instantiate(),
-			subTree.id
+			subTree.id,
 		)
 	}
 
 	private *registerQueryPart(
 		fields: EntityFields,
-		builder: ReadBuilder
+		builder: ReadBuilder,
 	): IterableIterator<MarkerTreeRoot | ReadBuilder> {
 		builder = builder.column(PRIMARY_KEY_NAME)
 		builder = builder.column(TYPENAME_KEY_NAME)
@@ -144,13 +144,13 @@ export class QueryGenerator {
 						builder = builder.reductionRelation(
 							relationField,
 							filteredBuilder.by(reference.reducedBy),
-							referenceName === relationField ? undefined : referenceName
+							referenceName === relationField ? undefined : referenceName,
 						)
 					} else {
 						builder = builder.anyRelation(
 							fieldValue.fieldName,
 							filteredBuilder,
-							referenceName === fieldValue.fieldName ? undefined : referenceName
+							referenceName === fieldValue.fieldName ? undefined : referenceName,
 						)
 					}
 				}
@@ -170,7 +170,7 @@ export class QueryGenerator {
 
 	private addMarkerTreeRootQueries(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTrees: IterableIterator<MarkerTreeRoot | ReadBuilder>
+		subTrees: IterableIterator<MarkerTreeRoot | ReadBuilder>,
 	): [BaseQueryBuilder, ReadBuilder | undefined] {
 		let listQueryBuilder: ReadBuilder | undefined = undefined
 

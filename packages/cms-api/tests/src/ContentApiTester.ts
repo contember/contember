@@ -17,7 +17,7 @@ export default class ContentApiTester {
 		private readonly db: Client,
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly stageManager: TesterStageManager,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {

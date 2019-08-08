@@ -44,7 +44,7 @@ export default class ApiTester {
 		public readonly sequences: SequenceTester,
 		public readonly systemExecutionContainer: ReturnType<
 			ReturnType<SystemExecutionContainer.Factory['createBuilder']>['build']
-		>
+		>,
 	) {}
 
 	public static async create(
@@ -52,9 +52,9 @@ export default class ApiTester {
 			project?: Partial<Project>
 			migrationsResolver?: MigrationsResolver
 			systemExecutionContainerHook?: (
-				container: ReturnType<SystemExecutionContainer.Factory['createBuilder']>
+				container: ReturnType<SystemExecutionContainer.Factory['createBuilder']>,
 			) => ReturnType<SystemExecutionContainer.Factory['createBuilder']>
-		} = {}
+		} = {},
 	): Promise<ApiTester> {
 		const dbCredentials = (dbName: string) => {
 			return {
@@ -73,7 +73,7 @@ export default class ApiTester {
 					max: 1,
 					min: 1,
 				},
-				{}
+				{},
 			)
 		}
 
@@ -84,7 +84,7 @@ export default class ApiTester {
 		await connection.query('CREATE DATABASE ' + wrapIdentifier(dbName), [])
 
 		const systemMigrationsManager = new MigrationFilesManager(
-			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/migrations/project'
+			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/migrations/project',
 		)
 		const migrationsRunner = new MigrationsRunner(dbCredentials(dbName), 'system', systemMigrationsManager.directory)
 		await migrationsRunner.migrate(false)
@@ -104,7 +104,7 @@ export default class ApiTester {
 		const schemaVersionBuilder = new SchemaVersionBuilder(
 			projectDb.createQueryHandler(),
 			migrationsResolver,
-			schemaMigrator
+			schemaMigrator,
 		)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(
 			createMock<S3>({
@@ -114,7 +114,7 @@ export default class ApiTester {
 				getSignedUrl() {
 					throw new Error()
 				},
-			})
+			}),
 		)
 
 		const systemContainerFactory = new SystemContainerFactory()
@@ -158,14 +158,14 @@ export default class ApiTester {
 			projectDb,
 			systemExecutionContainer.stageCreator,
 			systemExecutionContainer.projectMigrator,
-			migrationsResolver
+			migrationsResolver,
 		)
 
 		const contentApiTester = new ContentApiTester(
 			projectDb,
 			gqlSchemaBuilderFactory,
 			stageManager,
-			schemaVersionBuilder
+			schemaVersionBuilder,
 		)
 		const systemApiTester = new SystemApiTester(projectDb, systemSchema, systemContainer, systemExecutionContainer)
 		const sequenceTester = new SequenceTester(projectDb.createQueryHandler(), contentApiTester, systemApiTester)
@@ -176,13 +176,13 @@ export default class ApiTester {
 			systemApiTester,
 			stageManager,
 			sequenceTester,
-			systemExecutionContainer
+			systemExecutionContainer,
 		)
 	}
 
 	private static createProjectMigrationFilesManager(): MigrationFilesManager {
 		return new MigrationFilesManager(
-			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/tests/example-project/migrations'
+			process.cwd() + (process.env.TEST_CWD_SUFFIX || '') + '/tests/example-project/migrations',
 		)
 	}
 }

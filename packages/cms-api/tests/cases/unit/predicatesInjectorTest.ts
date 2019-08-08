@@ -16,7 +16,7 @@ describe('predicates injector', () => {
 			entity
 				.column('title', column => column.type(Model.ColumnType.String))
 				.column('content', column => column.type(Model.ColumnType.String))
-				.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' }))
+				.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })),
 		)
 		.buildSchema()
 
@@ -49,7 +49,7 @@ describe('predicates injector', () => {
 	it('injects predicate', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
+			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
 		)
 		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id', {})], {}, {}, [])
 		const result = injector.inject(schema.entities['PostLocale'], obj)
@@ -66,7 +66,7 @@ describe('predicates injector', () => {
 	it('injects predicate and ignore duplicates', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
+			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
 		)
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
@@ -74,7 +74,7 @@ describe('predicates injector', () => {
 			[new FieldNode('id', 'id', {}), new FieldNode('title', 'title', {})],
 			{},
 			{},
-			[]
+			[],
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
@@ -90,7 +90,7 @@ describe('predicates injector', () => {
 	it('merges predicate with explicit where', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
+			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
 		)
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
@@ -100,7 +100,7 @@ describe('predicates injector', () => {
 				filter: { id: { in: [1, 2] } },
 			},
 			{},
-			[]
+			[],
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 
@@ -128,7 +128,7 @@ describe('predicates injector', () => {
 	it('injects predicate to where', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] }))
+			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
 		)
 		const obj: ObjectNode = new ObjectNode(
 			'PostLocale',
@@ -138,7 +138,7 @@ describe('predicates injector', () => {
 				filter: { title: { eq: 'abc' } },
 			},
 			{},
-			[]
+			[],
 		)
 		const result = injector.inject(schema.entities['PostLocale'], obj)
 

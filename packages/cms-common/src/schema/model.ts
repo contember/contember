@@ -35,7 +35,7 @@ namespace Model {
 		Bool = 'Bool',
 		Enum = 'Enum',
 		DateTime = 'DateTime',
-		Date = 'Date'
+		Date = 'Date',
 	}
 
 	export type Column<T extends ColumnType> = Field<T> &
@@ -111,42 +111,42 @@ namespace Model {
 			entity: Entity,
 			relation: ManyHasOneRelation,
 			targetEntity: Entity,
-			targetRelation: OneHasManyRelation | null
+			targetRelation: OneHasManyRelation | null,
 		): T
 
 		visitOneHasMany(
 			entity: Entity,
 			relation: OneHasManyRelation,
 			targetEntity: Entity,
-			targetRelation: ManyHasOneRelation
+			targetRelation: ManyHasOneRelation,
 		): T
 
 		visitOneHasOneOwner(
 			entity: Entity,
 			relation: OneHasOneOwnerRelation,
 			targetEntity: Entity,
-			targetRelation: OneHasOneInversedRelation | null
+			targetRelation: OneHasOneInversedRelation | null,
 		): T
 
 		visitOneHasOneInversed(
 			entity: Entity,
 			relation: OneHasOneInversedRelation,
 			targetEntity: Entity,
-			targetRelation: OneHasOneOwnerRelation
+			targetRelation: OneHasOneOwnerRelation,
 		): T
 
 		visitManyHasManyOwner(
 			entity: Entity,
 			relation: ManyHasManyOwnerRelation,
 			targetEntity: Entity,
-			targetRelation: ManyHasManyInversedRelation | null
+			targetRelation: ManyHasManyInversedRelation | null,
 		): T
 
 		visitManyHasManyInversed(
 			entity: Entity,
 			relation: ManyHasManyInversedRelation,
 			targetEntity: Entity,
-			targetRelation: ManyHasManyOwnerRelation
+			targetRelation: ManyHasManyOwnerRelation,
 		): T
 	}
 
@@ -157,7 +157,7 @@ namespace Model {
 			entity: Entity,
 			relation: Relation & NullableRelation,
 			targetEntity: Entity,
-			targetRelation: Relation | null
+			targetRelation: Relation | null,
 		): T
 	}
 
@@ -165,7 +165,7 @@ namespace Model {
 		OneHasOne = 'OneHasOne',
 		OneHasMany = 'OneHasMany',
 		ManyHasOne = 'ManyHasOne',
-		ManyHasMany = 'ManyHasMany'
+		ManyHasMany = 'ManyHasMany',
 	}
 
 	export type AnyInversedRelation = OneHasManyRelation | OneHasOneInversedRelation | ManyHasManyInversedRelation
@@ -191,7 +191,7 @@ namespace Model {
 	export enum OnDelete {
 		cascade = 'cascade',
 		restrict = 'restrict',
-		setNull = 'set null'
+		setNull = 'set null',
 	}
 
 	export type JoiningColumn = {

@@ -62,14 +62,14 @@ namespace ToOne {
 		public static generateReferenceMarker(
 			props: AtomicPrimitiveProps,
 			fields: EntityFields,
-			environment: Environment
+			environment: Environment,
 		): ReferenceMarker {
 			return new ReferenceMarker(
 				props.field,
 				ReferenceMarker.ExpectedCount.UpToOne,
 				fields,
 				props.filter,
-				props.reducedBy
+				props.reducedBy,
 			)
 		}
 	}
@@ -91,7 +91,7 @@ namespace ToOne {
 					props.field,
 					ReferenceMarker.ExpectedCount.UpToOne,
 					props.filter,
-					props.reducedBy
+					props.reducedBy,
 				)
 
 				if (fieldEntityAccessor instanceof EntityAccessor) {

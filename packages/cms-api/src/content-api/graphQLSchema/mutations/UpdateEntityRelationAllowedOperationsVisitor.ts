@@ -16,7 +16,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 	public visitManyHasManyOwner(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		targetEntity: Model.Entity
+		targetEntity: Model.Entity,
 	) {
 		return this.getAllowedOperations(targetEntity, entity, relation)
 	}
@@ -38,7 +38,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		{},
 		relation: Model.OneHasOneInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation
+		targetRelation: Model.OneHasOneOwnerRelation,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 		if (relation.nullable || targetRelation.nullable) {
@@ -51,7 +51,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null
+		targetRelation: Model.OneHasOneInversedRelation | null,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
 		if (relation.nullable || (targetRelation && targetRelation.nullable)) {
@@ -63,7 +63,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 	private getAllowedOperations(
 		targetEntity: Model.Entity,
 		owningEntity: Model.Entity,
-		owningRelation: Model.Relation
+		owningRelation: Model.Relation,
 	): Input.UpdateRelationOperation[] {
 		const result: Input.UpdateRelationOperation[] = []
 
@@ -74,7 +74,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		const canUpdateOwningRelation = this.authorizator.isAllowed(
 			Acl.Operation.update,
 			owningEntity.name,
-			owningRelation.name
+			owningRelation.name,
 		)
 
 		if (canReadTargetEntity && canUpdateOwningRelation) {

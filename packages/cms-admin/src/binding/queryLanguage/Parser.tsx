@@ -38,9 +38,9 @@ class Parser extends ChevrotainParser {
 			return {
 				entityName,
 				filter,
-				toOneProps
+				toOneProps,
 			}
-		}
+		},
 	)
 
 	private qualifiedFieldList: () => Parser.AST.QualifiedFieldList = this.RULE<Parser.AST.QualifiedFieldList>(
@@ -57,9 +57,9 @@ class Parser extends ChevrotainParser {
 				entityName,
 				fieldName,
 				filter,
-				toOneProps
+				toOneProps,
 			}
-		}
+		},
 	)
 
 	private relativeSingleField: () => Parser.AST.RelativeSingleField = this.RULE<Parser.AST.RelativeSingleField>(
@@ -73,7 +73,7 @@ class Parser extends ChevrotainParser {
 				throw new QueryLanguageError(
 					`Cannot parse '${Parser.rawInput}': the last field '${
 						last.field
-					}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`
+					}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`,
 				)
 			}
 
@@ -82,9 +82,9 @@ class Parser extends ChevrotainParser {
 
 			return {
 				toOneProps,
-				fieldName
+				fieldName,
 			}
-		}
+		},
 	)
 
 	private relativeSingleEntity: () => Parser.AST.RelativeSingleEntity = this.RULE<Parser.AST.RelativeSingleEntity>(
@@ -96,13 +96,13 @@ class Parser extends ChevrotainParser {
 				SEP: tokens.Dot,
 				DEF: () => {
 					toOneProps.push(this.SUBRULE(this.toOneProps))
-				}
+				},
 			})
 
 			return {
-				toOneProps
+				toOneProps,
 			}
-		}
+		},
 	)
 
 	private relativeEntityList: () => Parser.AST.RelativeEntityList = this.RULE<Parser.AST.RelativeEntityList>(
@@ -111,7 +111,7 @@ class Parser extends ChevrotainParser {
 			const { toOneProps, fieldName } = this.SUBRULE(this.relativeSingleField)
 			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
 			const toManyProps: Parser.AST.AtomicToManyProps = {
-				field: fieldName
+				field: fieldName,
 			}
 
 			if (filter !== undefined) {
@@ -120,16 +120,16 @@ class Parser extends ChevrotainParser {
 
 			return {
 				toOneProps,
-				toManyProps
+				toManyProps,
 			}
-		}
+		},
 	)
 
 	private toOneProps = this.RULE('toOneProps', () => {
 		const fieldName = this.SUBRULE(this.fieldName)
 		const reducedBy = this.OPTION(() => this.SUBRULE(this.uniqueWhere))
 		const props: Parser.AST.AtomicToOneProps = {
-			field: fieldName
+			field: fieldName,
 		}
 
 		if (reducedBy !== undefined) {
@@ -153,7 +153,7 @@ class Parser extends ChevrotainParser {
 			return cnfWhere[0]
 		}
 		return {
-			and: cnfWhere
+			and: cnfWhere,
 		}
 	})
 
@@ -164,13 +164,13 @@ class Parser extends ChevrotainParser {
 			SEP: tokens.Or,
 			DEF: () => {
 				conjunctions.push(this.SUBRULE(this.conjunction))
-			}
+			},
 		})
 		if (conjunctions.length === 1) {
 			return conjunctions[0]
 		}
 		return {
-			or: conjunctions
+			or: conjunctions,
 		}
 	})
 
@@ -181,13 +181,13 @@ class Parser extends ChevrotainParser {
 			SEP: tokens.And,
 			DEF: () => {
 				negations.push(this.SUBRULE(this.negation))
-			}
+			},
 		})
 		if (negations.length === 1) {
 			return negations[0]
 		}
 		return {
-			and: negations
+			and: negations,
 		}
 	})
 
@@ -198,15 +198,15 @@ class Parser extends ChevrotainParser {
 				ALT: () => {
 					this.CONSUME(tokens.Not)
 					return {
-						not: this.SUBRULE(this.fieldWhere)
+						not: this.SUBRULE(this.fieldWhere),
 					}
-				}
+				},
 			},
 			{
 				ALT: () => {
 					return this.SUBRULE1(this.fieldWhere)
-				}
-			}
+				},
+			},
 		])
 	})
 
@@ -217,19 +217,19 @@ class Parser extends ChevrotainParser {
 			SEP: tokens.Dot,
 			DEF: () => {
 				fields.push(this.SUBRULE(this.fieldIdentifier))
-			}
+			},
 		})
 
 		const condition = this.SUBRULE(this.condition)
 
 		let i = fields.length - 1
 		let where: Parser.AST.FieldWhere = {
-			[fields[i--]]: condition
+			[fields[i--]]: condition,
 		}
 
 		while (i >= 0) {
 			where = {
-				[fields[i--]]: where
+				[fields[i--]]: where,
 			}
 		}
 
@@ -262,38 +262,38 @@ class Parser extends ChevrotainParser {
 				ALT: () => {
 					this.CONSUME(tokens.Equals)
 					return 'eq'
-				}
+				},
 			},
 			{
 				ALT: () => {
 					this.CONSUME(tokens.NotEquals)
 					return 'notEq'
-				}
+				},
 			},
 			{
 				ALT: () => {
 					this.CONSUME(tokens.LowerThan)
 					return 'lt'
-				}
+				},
 			},
 			{
 				ALT: () => {
 					this.CONSUME(tokens.LowerEqual)
 					return 'lte'
-				}
+				},
 			},
 			{
 				ALT: () => {
 					this.CONSUME(tokens.GreaterThan)
 					return 'gt'
-				}
+				},
 			},
 			{
 				ALT: () => {
 					this.CONSUME(tokens.GreaterEqual)
 					return 'gte'
-				}
-			}
+				},
+			},
 		])
 	})
 
@@ -303,23 +303,23 @@ class Parser extends ChevrotainParser {
 				ALT: () => {
 					this.CONSUME(tokens.Null)
 					return null
-				}
+				},
 			},
 			{
 				ALT: () => {
 					this.CONSUME(tokens.True)
 					return true
-				}
+				},
 			},
 			{
 				ALT: () => {
 					this.CONSUME(tokens.False)
 					return false
-				}
+				},
 			},
 			{
-				ALT: () => this.SUBRULE(this.primaryValue)
-			}
+				ALT: () => this.SUBRULE(this.primaryValue),
+			},
 		])
 	})
 
@@ -335,7 +335,7 @@ class Parser extends ChevrotainParser {
 					SEP: tokens.Dot,
 					DEF: () => {
 						nestedFields.push(this.SUBRULE(this.fieldIdentifier))
-					}
+					},
 				})
 				this.CONSUME(tokens.Equals)
 				const primaryValue = this.SUBRULE<Input.PrimaryValue<GraphQlBuilder.Literal>>(this.primaryValue)
@@ -361,7 +361,7 @@ class Parser extends ChevrotainParser {
 							} else {
 								throw new QueryLanguageError(
 									`Malformed expression: cannot simultaneously treat the '${nestedFields.slice(0, i + 1).join('.')}' ` +
-										`field as a scalar as well as a relation.`
+										`field as a scalar as well as a relation.`,
 								)
 							}
 						} else {
@@ -371,7 +371,7 @@ class Parser extends ChevrotainParser {
 						}
 					}
 				}
-			}
+			},
 		})
 		this.CONSUME(tokens.RightParenthesis)
 
@@ -381,21 +381,21 @@ class Parser extends ChevrotainParser {
 	private fieldName: () => FieldName = this.RULE<FieldName>('fieldName', () => {
 		return this.OR([
 			{
-				ALT: () => this.SUBRULE(this.fieldIdentifier)
-			}
+				ALT: () => this.SUBRULE(this.fieldIdentifier),
+			},
 		])
 	})
 
 	private primaryValue = this.RULE('primaryValue', () => {
 		return this.OR<Input.PrimaryValue<GraphQlBuilder.Literal>>([
 			{
-				ALT: () => this.SUBRULE(this.string)
+				ALT: () => this.SUBRULE(this.string),
 			},
 			{
-				ALT: () => this.SUBRULE(this.number)
+				ALT: () => this.SUBRULE(this.number),
 			},
 			{
-				ALT: () => this.SUBRULE(this.graphQlLiteral)
+				ALT: () => this.SUBRULE(this.graphQlLiteral),
 			},
 			{
 				ALT: () => {
@@ -408,17 +408,17 @@ class Parser extends ChevrotainParser {
 						return variableValue
 					}
 					throw new QueryLanguageError(
-						`A variable can resolve to a literal, string or a number, not ${typeof variableValue}`
+						`A variable can resolve to a literal, string or a number, not ${typeof variableValue}`,
 					)
-				}
-			}
+				},
+			},
 		])
 	})
 
 	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {
 		return this.OR([
 			{
-				ALT: () => this.SUBRULE(this.identifier)
+				ALT: () => this.SUBRULE(this.identifier),
 			},
 			{
 				ALT: () => {
@@ -427,8 +427,8 @@ class Parser extends ChevrotainParser {
 						throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
 					}
 					return variable
-				}
-			}
+				},
+			},
 		])
 	})
 
@@ -439,7 +439,7 @@ class Parser extends ChevrotainParser {
 	private entityIdentifier: () => EntityName = this.RULE('entityIdentifier', () => {
 		return this.OR([
 			{
-				ALT: () => this.CONSUME(tokens.EntityIdentifier).image
+				ALT: () => this.CONSUME(tokens.EntityIdentifier).image,
 			},
 			{
 				ALT: () => {
@@ -448,8 +448,8 @@ class Parser extends ChevrotainParser {
 						throw new QueryLanguageError(`The value of the variable \$${variable} is not a valid entity identifier.`)
 					}
 					return variable
-				}
-			}
+				},
+			},
 		])
 	})
 
@@ -493,7 +493,7 @@ class Parser extends ChevrotainParser {
 				`The variable \$${variableName} resolved to a dimension which exists but contains ${
 					dimensionValue.length
 				} values. It has to contain exactly one. ` +
-					`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`
+					`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`,
 			)
 		}
 		throw new QueryLanguageError(`Undefined variable \$${variableName}.`)
@@ -507,13 +507,13 @@ class Parser extends ChevrotainParser {
 	public static parseQueryLanguageExpression<E extends Parser.EntryPoint>(
 		input: string,
 		entry: E,
-		environment: Environment
+		environment: Environment,
 	): Parser.ParserResult[E] {
 		const lexingResult = Parser.lexer.tokenize((Parser.rawInput = input))
 
 		if (lexingResult.errors.length !== 0) {
 			throw new QueryLanguageError(
-				`Failed to tokenize '${input}'.\n\n${lexingResult.errors.map(i => i.message).join('\n')}`
+				`Failed to tokenize '${input}'.\n\n${lexingResult.errors.map(i => i.message).join('\n')}`,
 			)
 		}
 
@@ -550,7 +550,7 @@ class Parser extends ChevrotainParser {
 
 		if (Parser.parser.errors.length !== 0) {
 			throw new QueryLanguageError(
-				`Failed to parse '${input}'.\n\n${Parser.parser.errors.map(i => i.message).join('\n')}`
+				`Failed to parse '${input}'.\n\n${Parser.parser.errors.map(i => i.message).join('\n')}`,
 			)
 		}
 
@@ -607,7 +607,7 @@ namespace Parser {
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
 		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
 		UniqueWhere = 'uniqueWhere', // E.g. (author.mother.id = 123)
-		Filter = 'filter' // E.g. [author.son.age < 123]
+		Filter = 'filter', // E.g. [author.son.age < 123]
 	}
 
 	export interface ParserResult {

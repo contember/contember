@@ -50,7 +50,7 @@ describe('project initializer', () => {
                   id
               }
           }
-      }`
+      }`,
 		)
 
 		stages['prod'] = [
@@ -76,7 +76,7 @@ describe('project initializer', () => {
 			{
 				1: createRunMigrationEvent('2019-02-01-163923'),
 				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
-			}
+			},
 		)
 	})
 
@@ -134,7 +134,7 @@ describe('project initializer', () => {
                   id
               }
           }
-      }`
+      }`,
 		)
 
 		const response2 = await tester.content.queryContent(
@@ -145,7 +145,7 @@ describe('project initializer', () => {
                   id
               }
           }
-      }`
+      }`,
 		)
 
 		await tester.sequences.verifySequence(
@@ -157,7 +157,7 @@ describe('project initializer', () => {
 				1: createRunMigrationEvent('2019-02-01-163923'),
 				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
 				3: createCreateEvent(response2.createAuthor.node.id, 'author', { name: 'Jack Black' }),
-			}
+			},
 		)
 
 		stages['preview'] = [preview2Stage]
@@ -181,7 +181,7 @@ describe('project initializer', () => {
 				1: createRunMigrationEvent('2019-02-01-163923'),
 				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
 				3: createCreateEvent(response2.createAuthor.node.id, 'author', { name: 'Jack Black' }),
-			}
+			},
 		)
 	})
 
@@ -275,7 +275,7 @@ describe('project initializer', () => {
                   id
               }
           }
-      }`
+      }`,
 		)
 
 		const response2 = await tester.content.queryContent(
@@ -286,7 +286,7 @@ describe('project initializer', () => {
                   id
               }
           }
-      }`
+      }`,
 		)
 
 		migrations.push({
@@ -314,7 +314,7 @@ describe('project initializer', () => {
 				2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
 				3: createRunMigrationEvent('2019-04-17-123600'),
 				4: createCreateEvent(response2.createAuthor.node.id, 'author', { fullName: 'Jack Black' }),
-			}
+			},
 		)
 	})
 })

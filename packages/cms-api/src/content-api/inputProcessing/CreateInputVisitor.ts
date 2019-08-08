@@ -12,7 +12,7 @@ export default class CreateInputVisitor<Result>
 	constructor(
 		private readonly createInputProcessor: CreateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
-		private readonly data: Input.CreateDataInput
+		private readonly data: Input.CreateDataInput,
 	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<Result> {
@@ -27,7 +27,7 @@ export default class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation
+		targetRelation: Model.ManyHasManyOwnerRelation,
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyInversedContext>(
 			this.createInputProcessor.manyHasManyInversed,
@@ -37,7 +37,7 @@ export default class CreateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateManyRelationInput
+			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
@@ -45,7 +45,7 @@ export default class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInversedRelation | null
+		targetRelation: Model.ManyHasManyInversedRelation | null,
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyOwnerContext>(
 			this.createInputProcessor.manyHasManyOwner,
@@ -55,7 +55,7 @@ export default class CreateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateManyRelationInput
+			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
@@ -63,7 +63,7 @@ export default class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasOneRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasManyRelation | null
+		targetRelation: Model.OneHasManyRelation | null,
 	) {
 		return this.processRelationInput<Context.ManyHasOneContext>(
 			this.createInputProcessor.manyHasOne,
@@ -73,7 +73,7 @@ export default class CreateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateOneRelationInput
+			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
@@ -81,7 +81,7 @@ export default class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasManyRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation
+		targetRelation: Model.ManyHasOneRelation,
 	) {
 		return this.processManyRelationInput<Context.OneHasManyContext>(
 			this.createInputProcessor.oneHasMany,
@@ -91,7 +91,7 @@ export default class CreateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateManyRelationInput
+			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
@@ -99,7 +99,7 @@ export default class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasOneInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation
+		targetRelation: Model.OneHasOneOwnerRelation,
 	) {
 		return this.processRelationInput<Context.OneHasOneInversedContext>(
 			this.createInputProcessor.oneHasOneInversed,
@@ -109,7 +109,7 @@ export default class CreateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateOneRelationInput
+			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
@@ -117,7 +117,7 @@ export default class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null
+		targetRelation: Model.OneHasOneInversedRelation | null,
 	) {
 		return this.processRelationInput<Context.OneHasOneOwnerContext>(
 			this.createInputProcessor.oneHasOneOwner,
@@ -127,14 +127,14 @@ export default class CreateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateOneRelationInput
+			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
 	private processRelationInput<Context>(
 		processor: CreateInputProcessor.HasOneRelationProcessor<Context, Result>,
 		context: Context,
-		input: Input.CreateOneRelationInput | undefined
+		input: Input.CreateOneRelationInput | undefined,
 	): Promise<undefined | Result> {
 		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
@@ -153,7 +153,7 @@ export default class CreateInputVisitor<Result>
 	private processManyRelationInput<Context>(
 		processor: CreateInputProcessor.HasManyRelationProcessor<Context, Result>,
 		context: Context,
-		input: Input.CreateManyRelationInput | undefined
+		input: Input.CreateManyRelationInput | undefined,
 	): Promise<undefined | Result[]> {
 		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)

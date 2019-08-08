@@ -5,7 +5,7 @@ interface ImmutableDataProviderProps {
 	immutable: boolean
 	children: (
 		data: DataRendererProps['data'],
-		onDataAvailable: (data: DataRendererProps['data']) => void
+		onDataAvailable: (data: DataRendererProps['data']) => void,
 	) => React.ReactNode
 }
 
@@ -15,14 +15,14 @@ interface ImmutableDataProviderState {
 
 export class ImmutableDataProvider extends React.PureComponent<ImmutableDataProviderProps, ImmutableDataProviderState> {
 	state = {
-		data: undefined
+		data: undefined,
 	}
 
 	public render() {
 		return this.props.children(this.state.data, data => {
 			if (!this.state.data || !this.props.immutable) {
 				this.setState({
-					data: data
+					data: data,
 				})
 			}
 		})

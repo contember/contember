@@ -9,7 +9,7 @@ import { PersonRow } from '../queries/person/types'
 class SignInManager {
 	constructor(
 		private readonly queryHandler: QueryHandler<DbQueryable>,
-		private readonly apiKeyManager: ApiKeyManager
+		private readonly apiKeyManager: ApiKeyManager,
 	) {}
 
 	async signIn(email: string, password: string, expiration?: number): Promise<SignInManager.SignInResult> {

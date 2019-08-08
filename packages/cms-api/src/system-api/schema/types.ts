@@ -134,7 +134,7 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => Promise<TResult> | TResult
 
 export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
@@ -150,14 +150,14 @@ export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => AsyncIterator<TResult> | Promise<AsyncIterator<TResult>>
 
 export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
 
 export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
@@ -172,7 +172,7 @@ export type SubscriptionResolver<TResult, TParent = {}, TContext = {}, TArgs = {
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
 	parent: TParent,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => Maybe<TTypes>
 
 export type NextResolverFn<T> = () => Promise<T>
@@ -182,7 +182,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
 
 export type CreateEventResolvers<Context = any, ParentType = CreateEvent> = {

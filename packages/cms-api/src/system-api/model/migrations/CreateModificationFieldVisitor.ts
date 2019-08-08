@@ -10,7 +10,7 @@ export default class CreateFieldVisitor
 		Model.RelationByTypeVisitor<Migration.Modification<any>> {
 	public visitColumn(
 		entity: Model.Entity,
-		updatedColumn: Model.AnyColumn
+		updatedColumn: Model.AnyColumn,
 	): Migration.Modification<CreateColumnModification.Data> {
 		return {
 			modification: CreateColumnModification.id,
@@ -23,7 +23,7 @@ export default class CreateFieldVisitor
 		entity: Model.Entity,
 		relation: Model.ManyHasOneRelation,
 		{},
-		targetRelation: Model.OneHasManyRelation | null
+		targetRelation: Model.OneHasManyRelation | null,
 	): Migration.Modification<CreateRelationModification.Data> {
 		return {
 			modification: CreateRelationModification.id,
@@ -35,7 +35,7 @@ export default class CreateFieldVisitor
 
 	public visitOneHasMany(
 		entity: Model.Entity,
-		relation: Model.OneHasManyRelation
+		relation: Model.OneHasManyRelation,
 	): Migration.Modification<CreateRelationInverseSideModification.Data> {
 		return {
 			modification: CreateRelationInverseSideModification.id,
@@ -48,7 +48,7 @@ export default class CreateFieldVisitor
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		{},
-		targetRelation: Model.OneHasOneInversedRelation | null
+		targetRelation: Model.OneHasOneInversedRelation | null,
 	): Migration.Modification<CreateRelationModification.Data> {
 		return {
 			modification: CreateRelationModification.id,
@@ -60,7 +60,7 @@ export default class CreateFieldVisitor
 
 	public visitOneHasOneInversed(
 		entity: Model.Entity,
-		relation: Model.OneHasOneInversedRelation
+		relation: Model.OneHasOneInversedRelation,
 	): Migration.Modification<CreateRelationInverseSideModification.Data> {
 		return {
 			modification: CreateRelationInverseSideModification.id,
@@ -73,7 +73,7 @@ export default class CreateFieldVisitor
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		{},
-		targetRelation: Model.ManyHasManyInversedRelation | null
+		targetRelation: Model.ManyHasManyInversedRelation | null,
 	): Migration.Modification<CreateRelationModification.Data> {
 		return {
 			modification: CreateRelationModification.id,
@@ -85,7 +85,7 @@ export default class CreateFieldVisitor
 
 	public visitManyHasManyInversed(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyInversedRelation
+		relation: Model.ManyHasManyInversedRelation,
 	): Migration.Modification<CreateRelationInverseSideModification.Data> {
 		return {
 			modification: CreateRelationInverseSideModification.id,

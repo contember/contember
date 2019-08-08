@@ -54,12 +54,12 @@ class DiffResponseBuilder {
 	private filterEvents(events: EventWithMeta[], filter: ReadonlyArray<EventFilter>): EventWithMeta[] {
 		const entityIds = filter.map(it => it.id)
 		const rootEvents: EventWithMeta[] = events.filter(
-			it => it.type !== EventType.runMigration && entityIds.includes(it.rowId)
+			it => it.type !== EventType.runMigration && entityIds.includes(it.rowId),
 		)
 		const eventIds = new Set<string>([])
 		const dependenciesMap: { [id: string]: string[] } = events.reduce(
 			(acc, event) => ({ ...acc, [event.id]: event.dependencies }),
-			{}
+			{},
 		)
 		const collectDependencies = (ids: string[]) => {
 			ids.forEach(id => {

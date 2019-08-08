@@ -22,7 +22,7 @@ const TokenExposerComponent = (props: TokenExposerProps) => {
 	return (
 		<Button
 			style={{
-				marginLeft: '.75em'
+				marginLeft: '.75em',
 			}}
 			onClick={_ => {
 				if (isCopying) {
@@ -52,6 +52,6 @@ const TokenExposerComponent = (props: TokenExposerProps) => {
 
 export const TokenExposer = connect<TokenExposerStateProps, {}, TokenExposerOwnProps, State>(state => {
 	return {
-		token: state.auth.identity ? state.auth.identity.token : undefined
+		token: state.auth.identity ? state.auth.identity.token : undefined,
 	}
 })(TokenExposerComponent)

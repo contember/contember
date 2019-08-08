@@ -15,14 +15,14 @@ describe('query language parser', () => {
 			x: 'x',
 			fieldVariable: 'fieldVariableName',
 			literal: new GraphQlBuilder.Literal('literal'),
-			dimensions: {}
+			dimensions: {},
 		})
 		expect(
 			QueryLanguage.wrapRelativeSingleField(
 				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = $x).foo',
 				name => <TextField name={name} />,
-				environment
-			)
+				environment,
+			),
 		).eql(
 			<ToOne.AtomicPrimitive field="a" reducedBy={{ a: 123 }} environment={environment}>
 				<ToOne.AtomicPrimitive
@@ -34,7 +34,7 @@ describe('query language parser', () => {
 						<TextField name="foo" />
 					</ToOne.AtomicPrimitive>
 				</ToOne.AtomicPrimitive>
-			</ToOne.AtomicPrimitive>
+			</ToOne.AtomicPrimitive>,
 		)
 	})
 })

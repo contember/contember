@@ -4,7 +4,7 @@ export class ObjectBuilder {
 		public readonly objects: { [name: string]: ObjectBuilder } = {},
 		public readonly args: { [name: string]: any } = {},
 		public readonly fragments: { [typeName: string]: ObjectBuilder } = {},
-		public readonly objectName?: string
+		public readonly objectName?: string,
 	) {}
 
 	public argument(name: string, value: any): ObjectBuilder {
@@ -13,7 +13,7 @@ export class ObjectBuilder {
 			this.objects,
 			{ ...this.args, [name]: value },
 			this.fragments,
-			this.objectName
+			this.objectName,
 		)
 	}
 
@@ -35,13 +35,13 @@ export class ObjectBuilder {
 			{ ...this.objects, [name]: builder },
 			this.args,
 			this.fragments,
-			this.objectName
+			this.objectName,
 		)
 	}
 
 	public fragment(
 		typeName: string,
-		builder: ((builder: ObjectBuilder) => ObjectBuilder) | ObjectBuilder
+		builder: ((builder: ObjectBuilder) => ObjectBuilder) | ObjectBuilder,
 	): ObjectBuilder {
 		if (!(builder instanceof ObjectBuilder)) {
 			builder = builder(new ObjectBuilder())
@@ -52,7 +52,7 @@ export class ObjectBuilder {
 			this.objects,
 			this.args,
 			{ ...this.fragments, [typeName]: builder },
-			this.objectName
+			this.objectName,
 		)
 	}
 }

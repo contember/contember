@@ -7,7 +7,7 @@ import 'mocha'
 
 const schema = new SchemaBuilder()
 	.entity('FrontPage', entity =>
-		entity.column('title', column => column.type(Model.ColumnType.String)).oneHasOne('site', c => c.target('Site'))
+		entity.column('title', column => column.type(Model.ColumnType.String)).oneHasOne('site', c => c.target('Site')),
 	)
 	.entity('Site', entity => entity.column('slug', column => column.type(Model.ColumnType.String).unique()))
 	.buildSchema()

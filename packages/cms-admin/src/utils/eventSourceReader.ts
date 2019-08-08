@@ -23,7 +23,7 @@ export async function* readLines(reader: ReadableStreamDefaultReader): AsyncIter
 }
 
 export async function* readEventStream(
-	lines: AsyncIterable<string>
+	lines: AsyncIterable<string>,
 ): AsyncIterable<{ data: string; lastEventId?: string }> {
 	let lastEventId: string | undefined = undefined
 	let dataBuffer = ''

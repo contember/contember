@@ -34,7 +34,7 @@ class DropCommand extends Command<{}, {}> {
 				schemas.map(async schema => {
 					await trx.query(`DROP SCHEMA IF EXISTS ${wrapIdentifier(schema)} CASCADE`)
 					console.log(`Dropped schema ${schema} in DB ${db.database}`)
-				})
+				}),
 			)
 		})
 	}

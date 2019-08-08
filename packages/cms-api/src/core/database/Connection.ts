@@ -9,7 +9,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 	constructor(
 		private readonly config: PoolConfig,
 		private readonly queryConfig: Connection.QueryConfig,
-		public readonly eventManager: EventManager = new EventManager()
+		public readonly eventManager: EventManager = new EventManager(),
 	) {
 		this.pool = new Pool(config)
 	}
@@ -19,7 +19,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 	}
 
 	async transaction<Result>(
-		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 	): Promise<Result> {
 		const client = await this.pool.connect()
 		await client.query('BEGIN')
@@ -50,7 +50,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		sql: string,
 		parameters: any[],
 		meta: Record<string, any> = {},
-		config: Connection.QueryConfig = {}
+		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		const client = await this.pool.connect()
 		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
@@ -77,7 +77,7 @@ namespace Connection {
 			sql: string,
 			parameters?: any[],
 			meta?: Record<string, any>,
-			config?: Connection.QueryConfig
+			config?: Connection.QueryConfig,
 		): Promise<Connection.Result<Row>>
 	}
 
@@ -103,7 +103,7 @@ namespace Connection {
 		pgClient: PoolClient,
 		eventManager: EventManager,
 		{ sql, parameters, meta, timing }: Query & QueryConfig,
-		context: QueryContext
+		context: QueryContext,
 	): Promise<Connection.Result<Row>> {
 		try {
 			eventManager.fire(EventManager.Event.queryStart, { sql, parameters, meta })

@@ -30,7 +30,7 @@ namespace StageTree {
 						...acc,
 						[stage.base!]: [...(acc[stage.base!] || []), stage],
 					}),
-					{}
+					{},
 				)
 			return new StageTree(rootStage, stages)
 		}

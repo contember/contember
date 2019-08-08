@@ -2,7 +2,7 @@ export enum ToastType {
 	Success = 'success',
 	Error = 'error',
 	Warning = 'warning',
-	Info = 'info'
+	Info = 'info',
 }
 
 export type ToastId = string
@@ -21,5 +21,5 @@ export default interface ToastsState {
 }
 
 export const emptyToastsState: ToastsState = {
-	toasts: []
+	toasts: [],
 }

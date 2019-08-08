@@ -7,7 +7,7 @@ import {
 	RelativeSingleEntity,
 	RelativeSingleField,
 	Scalar,
-	VariableInput
+	VariableInput,
 } from '../bindingTypes'
 import { FieldMetadata } from '../coreComponents'
 import { EntityAccessor, ErrorAccessor, FieldAccessor } from '../dao'

@@ -5,7 +5,7 @@ import {
 	DataTreeCreateRequest,
 	DataTreeDirtinessDelta,
 	DataTreeInitializeRequest,
-	DataTreeSetRequestEnd
+	DataTreeSetRequestEnd,
 } from '../actions/dataTrees'
 import { MutationRequestResult } from '../binding'
 import { DataTreeRequestReadyState, DataTreeRequestType, DataTreesState, emptyDataTreesState } from '../state/dataTrees'
@@ -23,12 +23,12 @@ export const createEmptyDataTreeState = () => {
 		isMutating: false,
 		requests: {
 			query: {
-				readyState: DataTreeRequestReadyState.Uninitialized
+				readyState: DataTreeRequestReadyState.Uninitialized,
 			},
 			mutation: {
-				readyState: DataTreeRequestReadyState.Uninitialized
-			}
-		}
+				readyState: DataTreeRequestReadyState.Uninitialized,
+			},
+		},
 	} as const
 }
 
@@ -50,12 +50,12 @@ export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
 			}
 			return {
 				...state,
-				[action.payload.dataTreeId]: createEmptyDataTreeState()
+				[action.payload.dataTreeId]: createEmptyDataTreeState(),
 			}
 		},
 		[DATA_TREE_REQUEST_INITIALIZE]: (
 			state: DataTreesState,
-			action: Action<DataTreeInitializeRequest>
+			action: Action<DataTreeInitializeRequest>,
 		): DataTreesState => {
 			if (action.payload === undefined) {
 				throw new ReducerError('Action payload can not be undefined')
@@ -70,10 +70,10 @@ export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
 					requests: {
 						...treeState.requests,
 						[action.payload.type]: {
-							readyState: DataTreeRequestReadyState.Pending
-						}
-					}
-				}
+							readyState: DataTreeRequestReadyState.Pending,
+						},
+					},
+				},
 			}
 		},
 		[DATA_TREE_REQUEST_END]: (state: DataTreesState, action: Action<DataTreeSetRequestEnd>): DataTreesState => {
@@ -90,14 +90,14 @@ export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
 						isDirty: false,
 						requests: {
 							mutation: {
-								readyState: DataTreeRequestReadyState.Uninitialized
+								readyState: DataTreeRequestReadyState.Uninitialized,
 							},
 							query: {
 								readyState: DataTreeRequestReadyState.Success,
-								data: action.payload.data // TODO handle this being null
-							}
-						}
-					}
+								data: action.payload.data, // TODO handle this being null
+							},
+						},
+					},
 				}
 			} else if (action.payload.type === DataTreeRequestType.Mutation) {
 				const mutationRequestResult = action.payload.data
@@ -115,15 +115,15 @@ export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
 							query: treeState.requests.query,
 							mutation: {
 								readyState: allOk ? DataTreeRequestReadyState.Success : DataTreeRequestReadyState.Error,
-								data: mutationRequestResult
-							}
-						}
-					}
+								data: mutationRequestResult,
+							},
+						},
+					},
 				}
 			} else {
 				return assertNever(action.payload)
 			}
-		}
+		},
 	},
-	emptyDataTreesState
+	emptyDataTreesState,
 )

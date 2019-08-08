@@ -8,9 +8,9 @@ import LinkComponent, { InnerProps } from './LinkComponent'
 
 export default connect<LinkComponent.StateProps, LinkComponent.DispatchProps, LinkComponent.OwnProps, State>(
 	({ view, projectsConfigs, request }, { requestChange }) => ({
-		url: requestStateToPath(routes(projectsConfigs.configs), requestChange(request))
+		url: requestStateToPath(routes(projectsConfigs.configs), requestChange(request)),
 	}),
-	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) })
+	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(LinkComponent)
 
 export { InnerProps }

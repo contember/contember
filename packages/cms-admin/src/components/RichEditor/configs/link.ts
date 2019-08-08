@@ -16,7 +16,7 @@ export const LINK: RichEditorPluginConfig = {
 			if (href) {
 				editor.addMark({
 					type: 'link',
-					data: { href }
+					data: { href },
 				})
 			}
 		} else {
@@ -29,11 +29,11 @@ export const LINK: RichEditorPluginConfig = {
 					.moveFocusBackward(text.length)
 					.addMark({
 						type: 'link',
-						data: { href }
+						data: { href },
 					})
 			}
 		}
 
 		return editor
-	}
+	},
 }

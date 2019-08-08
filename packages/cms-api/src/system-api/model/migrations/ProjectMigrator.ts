@@ -29,13 +29,13 @@ export default class ProjectMigrator {
 		private readonly stageTree: StageTree,
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async migrate(
 		currentVersion: string | null,
 		migrationsToExecute: Migration[],
-		progressCb: (version: string) => void
+		progressCb: (version: string) => void,
 	) {
 		const queryHandler = this.db.createQueryHandler()
 		const rootStage = this.stageTree.getRoot()
@@ -56,7 +56,7 @@ export default class ProjectMigrator {
 				{
 					version: migration.version,
 				},
-				previousId
+				previousId,
 			).execute(this.db)
 		}
 
@@ -68,7 +68,7 @@ export default class ProjectMigrator {
 	private async applyModification(
 		schema: Schema,
 		events: StageEventsMap,
-		modification: Migration.Modification
+		modification: Migration.Modification,
 	): Promise<[Schema, StageEventsMap]> {
 		const stage = this.stageTree.getRoot()
 		const builder = createMigrationBuilder()
@@ -88,7 +88,7 @@ export default class ProjectMigrator {
 		stage: StageWithoutEvent,
 		modificationHandler: Modification<any>,
 		events: StageEventsMap,
-		sql: string
+		sql: string,
 	): Promise<StageEventsMap> {
 		for (const childStage of this.stageTree.getChildren(stage)) {
 			const stageEvents = events[childStage.id]
@@ -111,7 +111,7 @@ export default class ProjectMigrator {
 	private async fetchStageEvents(
 		queryHandler: QueryHandler<DbQueryable>,
 		eventsMatrix: StageCommonEventsMatrixQuery.Result,
-		stage: StageWithoutEvent
+		stage: StageWithoutEvent,
 	): Promise<StageEventsMap> {
 		let result: StageEventsMap = {}
 		for (const child of this.stageTree.getChildren(stage)) {

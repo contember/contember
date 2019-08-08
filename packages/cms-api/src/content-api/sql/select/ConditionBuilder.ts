@@ -7,7 +7,7 @@ export default class ConditionBuilder {
 		clause: SqlConditionBuilder,
 		tableName: string,
 		columnName: string,
-		condition: Input.Condition<any>
+		condition: Input.Condition<any>,
 	): void {
 		const keys = Object.keys(condition)
 		if (keys.length > 1) {

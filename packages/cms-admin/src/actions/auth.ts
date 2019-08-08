@@ -8,7 +8,7 @@ import { invokeIfSupportsCredentials } from '../utils/invokeIfSupportsCredential
 export const login = (email: string, password: string, rememberMe: boolean): ActionCreator => async (
 	dispatch,
 	getState,
-	services
+	services,
 ) => {
 	dispatch(createAction(SET_LOADING)())
 	const { signIn } = await services.tenantClient.request(
@@ -16,17 +16,17 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 		{
 			email,
 			password,
-			expiration: rememberMe ? 3600 * 24 * 14 : undefined
+			expiration: rememberMe ? 3600 * 24 * 14 : undefined,
 		},
-		services.config.loginToken
+		services.config.loginToken,
 	)
 	if (signIn.ok) {
 		await invokeIfSupportsCredentials(async () => {
 			const credentials = await navigator.credentials.create({
 				password: {
 					password,
-					id: email
-				}
+					id: email,
+				},
 			})
 			if (credentials) {
 				await navigator.credentials.store(credentials)
@@ -36,13 +36,13 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 			createAction<AuthIdentity>(SET_IDENTITY, () => ({
 				token: signIn.result.token,
 				email: signIn.result.person.email,
-				projects: signIn.result.person.identity.projects.map((it: any) => it.slug)
-			}))()
+				projects: signIn.result.person.identity.projects.map((it: any) => it.slug),
+			}))(),
 		)
 		dispatch(pushRequest(() => ({ name: 'projects_list' })))
 	} else {
 		dispatch(
-			createAction(SET_ERROR, () => signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', '))()
+			createAction(SET_ERROR, () => signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', '))(),
 		)
 	}
 }
@@ -51,7 +51,7 @@ export const tryAutoLogin = (): ActionCreator => async dispatch => {
 	await invokeIfSupportsCredentials(async () => {
 		const credentials = await navigator.credentials.get({
 			password: true,
-			mediation: 'silent'
+			mediation: 'silent',
 		})
 		if (credentials instanceof PasswordCredential && credentials.password) {
 			dispatch(login(credentials.id, credentials.password, false))

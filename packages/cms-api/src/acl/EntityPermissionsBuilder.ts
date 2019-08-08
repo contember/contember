@@ -26,7 +26,7 @@ export default class EntityPermissionsBuilder {
 					predicates: { [name]: resolvePredicateReference(this.schema, this.permissions, entity, predicate) },
 				},
 			}),
-			{}
+			{},
 		)
 
 		return this.add(predicates)
@@ -39,7 +39,7 @@ export default class EntityPermissionsBuilder {
 	allowAll(predicate: Acl.Predicate = true): EntityPermissionsBuilder {
 		return this.updateAll(
 			[Acl.Operation.read, Acl.Operation.create, Acl.Operation.update, Acl.Operation.delete],
-			predicate
+			predicate,
 		)
 	}
 
@@ -61,7 +61,7 @@ export default class EntityPermissionsBuilder {
 				(permissions: Acl.FieldPermissions, fieldName): Acl.FieldPermissions => {
 					return { ...permissions, [fieldName]: predicate }
 				},
-				{}
+				{},
 			)
 			const entityOperations: Acl.EntityOperations = {}
 			if (operations.includes(Acl.Operation.read)) {
@@ -84,11 +84,11 @@ export default class EntityPermissionsBuilder {
 	}
 
 	private addEntityPermission(
-		entityPermission: (entity: Model.Entity) => Acl.EntityPermissions
+		entityPermission: (entity: Model.Entity) => Acl.EntityPermissions,
 	): EntityPermissionsBuilder {
 		const permissions = this.entities.reduce<Acl.Permissions>(
 			(acc, entity) => ({ ...acc, [entity.name]: entityPermission(entity) }),
-			{}
+			{},
 		)
 		return this.add(permissions)
 	}
@@ -114,11 +114,11 @@ export default class EntityPermissionsBuilder {
 		const fieldSelectorConst = fieldSelector
 		const fields = this.entities
 			.map(it =>
-				tuple(it, Object.values(it.fields).filter(field => fieldSelectorConst.matches(this.schema, it, field)))
+				tuple(it, Object.values(it.fields).filter(field => fieldSelectorConst.matches(this.schema, it, field))),
 			)
 			.reduce<[Model.Entity, Model.AnyField][]>(
 				(acc, [entity, fields]) => [...acc, ...fields.map(it => tuple(entity, it))],
-				[]
+				[],
 			)
 		return new FieldPermissionsBuilder(this, fields)
 	}

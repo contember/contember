@@ -14,7 +14,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 		entityName: string,
 		fieldName: string,
 		options: ManyHasManyBuilder.Options,
-		registerField: FieldProcessor.FieldRegistrar
+		registerField: FieldProcessor.FieldRegistrar,
 	): void {
 		registerField(entityName, this.createManyHasManyOwner(options, entityName, fieldName))
 		if (options.inversedBy) {
@@ -25,7 +25,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 	private createManyHasManyInversed(
 		inversedBy: string,
 		entityName: string,
-		fieldName: string
+		fieldName: string,
 	): Model.ManyHasManyInversedRelation {
 		return {
 			name: inversedBy,
@@ -38,7 +38,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 	private createManyHasManyOwner(
 		options: ManyHasManyBuilder.Options,
 		entityName: string,
-		fieldName: string
+		fieldName: string,
 	): Model.ManyHasManyOwnerRelation {
 		let joiningTable: Model.JoiningTable | undefined = options.joiningTable
 		if (!joiningTable) {
@@ -46,7 +46,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 				entityName,
 				fieldName,
 				options.target,
-				options.inversedBy
+				options.inversedBy,
 			)
 			joiningTable = {
 				tableName: this.conventions.getJoiningTableName(entityName, fieldName),

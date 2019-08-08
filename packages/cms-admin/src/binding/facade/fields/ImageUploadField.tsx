@@ -15,5 +15,5 @@ export const ImageUploadField = SimpleRelativeSingleField<ImageUploadFieldProps>
 			{url => <img src={url} />}
 		</UploadField>
 	),
-	'ImageUploadField'
+	'ImageUploadField',
 )

@@ -37,7 +37,7 @@ class WriteOneRelationBuilder<
 		return resolvedData === undefined
 			? this
 			: WriteOneRelationBuilder.instantiate<Op, never>({
-					create: resolvedData
+					create: resolvedData,
 			  })
 	}
 
@@ -60,7 +60,7 @@ class WriteOneRelationBuilder<
 
 	public upsert(
 		update: WriteDataBuilder.DataLike<WriteOperation.Update>,
-		create: WriteDataBuilder.DataLike<WriteOperation.Create>
+		create: WriteDataBuilder.DataLike<WriteOperation.Create>,
 	) {
 		const resolvedCreate = WriteDataBuilder.resolveData(create)
 		const resolvedUpdate = WriteDataBuilder.resolveData(update)
@@ -70,8 +70,8 @@ class WriteOneRelationBuilder<
 			: WriteOneRelationBuilder.instantiate<WriteOperation.Update, never>({
 					upsert: {
 						update: resolvedUpdate || {},
-						create: resolvedCreate || {}
-					}
+						create: resolvedCreate || {},
+					},
 			  })
 	}
 }

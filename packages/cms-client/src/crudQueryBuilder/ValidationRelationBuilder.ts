@@ -9,10 +9,10 @@ export class ValidationRelationBuilder {
 						builder
 							.field('__typename')
 							.fragment('_FieldPathFragment', builder => builder.field('field'))
-							.fragment('_IndexPathFragment', builder => builder.field('index').field('alias'))
+							.fragment('_IndexPathFragment', builder => builder.field('index').field('alias')),
 					)
-					.object('message', builder => builder.field('text'))
-			)
+					.object('message', builder => builder.field('text')),
+			),
 		)
 	}
 }

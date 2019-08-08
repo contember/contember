@@ -21,7 +21,7 @@ class TableReferencingResolver {
 					visitManyHasManyOwner(
 						entity: Model.Entity,
 						relation: Model.ManyHasManyOwnerRelation,
-						targetEntity: Model.Entity
+						targetEntity: Model.Entity,
 					) {
 						return {
 							[relation.joiningTable.joiningColumn.columnName]: entity.tableName,
@@ -44,7 +44,7 @@ class TableReferencingResolver {
 					visitOneHasOneInversed() {
 						return {}
 					}
-				})()
+				})(),
 			)
 			result[entity.tableName] = Object.values(referencing).reduce((acc, val) => ({ ...acc, ...val }), {})
 		}

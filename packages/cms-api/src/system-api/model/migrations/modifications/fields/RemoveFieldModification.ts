@@ -44,9 +44,9 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 			isIt<Model.InversedRelation>(field, 'ownedBy')
 				? updateEntity(
 						field.target,
-						updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field)
+						updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field),
 				  )
-				: undefined
+				: undefined,
 		)
 	}
 

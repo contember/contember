@@ -12,7 +12,7 @@ class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
 	}
 
 	public static resolveData<Op extends WriteOperation.ContentfulOperation>(
-		dataLike: WriteDataBuilder.DataLike<Op>
+		dataLike: WriteDataBuilder.DataLike<Op>,
 	): WriteDataBuilder.DataFormat[Op['op']] | undefined {
 		let resolvedData: WriteDataBuilder.DataFormat[Op['op']]
 
@@ -40,7 +40,7 @@ class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
 			? this
 			: new WriteDataBuilder<Op>({
 					...this.data,
-					[fieldName]: resolvedData
+					[fieldName]: resolvedData,
 			  })
 	}
 

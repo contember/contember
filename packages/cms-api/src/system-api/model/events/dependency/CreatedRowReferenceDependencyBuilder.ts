@@ -19,7 +19,7 @@ import SchemaVersionBuilder from '../../../../content-schema/SchemaVersionBuilde
 class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 	constructor(
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly tableReferencingResolver: TableReferencingResolver
+		private readonly tableReferencingResolver: TableReferencingResolver,
 	) {}
 
 	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {

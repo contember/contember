@@ -13,7 +13,7 @@ interface NamingConventions {
 		owningEntity: string,
 		owningRelation: string,
 		inversedEntity: string,
-		inversedRelation?: string
+		inversedRelation?: string,
 	): [string, string]
 }
 
@@ -45,7 +45,7 @@ namespace NamingConventions {
 			owningEntity: string,
 			owningRelation: string,
 			inversedEntity: string,
-			inversedRelation?: string
+			inversedRelation?: string,
 		): [string, string] {
 			return [
 				toUnderscore(owningEntity) + '_id',

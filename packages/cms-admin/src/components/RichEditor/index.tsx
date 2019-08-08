@@ -1,3 +1,4 @@
+import { Divider, IconName } from '@blueprintjs/core'
 import { IconName } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { assertNever } from '@contember/utils'
@@ -5,14 +6,19 @@ import { ButtonGroup, TextInputOwnProps, toEnumStateClass, toEnumViewClass, toVi
 import cn from 'classnames'
 import { isKeyHotkey } from 'is-hotkey'
 import * as React from 'react'
-import { Editor as CoreEditor, Value } from 'slate'
+import { Document, Editor as CoreEditor, Value } from 'slate'
 import HtmlSerializer from 'slate-html-serializer'
 import { Editor, EventHook, Plugin } from 'slate-react'
 import { SimpleRelativeSingleFieldProps } from '../../binding/facade/auxiliary'
 import { BOLD, HEADING, ITALIC, LINK, PARAGRAPH, RichEditorPluginConfig, UNDERLINED } from './configs'
 import { HEADING_H2, HEADING_H3 } from './configs/heading'
+import { Editor, EventHook, getEventTransfer, Plugin } from 'slate-react'
+import { BOLD, HEADING, ITALIC, LINK, PARAGRAPH, RichEditorPluginConfig, UNDERLINED } from './configs'
+import { ActionButton, getSlateController, Toolbar } from './utils'
+import { assertNever } from 'cms-common'
 import JsonSerializer from './JsonSerializer'
 import { ActionButton, getSlateController, Toolbar } from './utils'
+import { TEXT_HTML_RULE } from './configs/html'
 
 const isBoldHotkey = isKeyHotkey('mod+b')
 const isItalicHotkey = isKeyHotkey('mod+i')
@@ -81,11 +87,14 @@ const markConfigs: { [_ in Mark]: RichEditorPluginConfig } = {
 
 export default class RichEditor extends React.Component<RichEditorProps, RichTextFieldState> {
 	serializer: Serializer<Value, string>
+	private readonly htmlSerializer: HtmlSerializer
 	plugins: Plugin[]
 	editor?: Editor
+
 	get coreEditor(): CoreEditor | undefined {
 		return this.editor && getSlateController(this.editor.controller)
 	}
+
 	ref = (editor: Editor) => (this.editor = editor)
 
 	static defaultProps: Partial<RichEditorProps> = {
@@ -96,16 +105,22 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 	constructor(props: RichEditorProps) {
 		super(props)
-		const htmlSerializer = new HtmlSerializer({
-			rules: CONFIGS.map(c => c.htmlSerializer),
-		})
+		const configs = [
+			...props.blocks.map(t => blockConfigs[t.block]),
+			...props.blocks
+				.flatMap(t => t.marks || [])
+				.filter((v, i, self) => self.indexOf(v) === i)
+				.map(t => markConfigs[t])
+		]
+		this.htmlSerializer = new HtmlSerializer({
+			rules: [...configs.map(c => c.htmlSerializer), TEXT_HTML_RULE]
 		this.serializer =
 			props.serializer == RichEditorSerializer.HTML
-				? htmlSerializer
+				? this.htmlSerializer
 				: props.serializer == RichEditorSerializer.JSON
-				? new JsonSerializer(htmlSerializer)
+				? new JsonSerializer(this.htmlSerializer)
 				: assertNever(props.serializer)
-		this.plugins = CONFIGS.map(c => c.plugin)
+		this.plugins = configs.map(c => c.plugin)
 		this.state = { value: this.serializer.deserialize(props.value) }
 	}
 
@@ -188,9 +203,11 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						value={this.state.value}
 						onChange={this.onChange}
 						onKeyDown={this.onKeyDown}
+						onPaste={this.onPaste}
 						readOnly={this.props.readOnly}
-					/>
-				</div>
+						/>
+					</div>
+
 			</div>
 		)
 	}
@@ -318,4 +335,14 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 		return
 	}
+
+	private onPaste: EventHook = (event: Event, editor: CoreEditor, next) => {
+		const transfer = getEventTransfer(event)
+		if (transfer.type !== 'html') return next()
+		const { document } = this.htmlSerializer.deserialize(((transfer as unknown) as { html: string }).html)
+		const nodes = document.nodes.filter(block => block != undefined && block.text.length > 0).toList()
+		editor.insertFragment(Document.create(nodes))
+	}
 }
+
+export * from './RichEditorNG'

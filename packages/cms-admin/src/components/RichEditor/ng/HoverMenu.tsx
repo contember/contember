@@ -24,7 +24,7 @@ export const HoverMenu: React.FC<HoverMenuProps> = ({ selection, children }) => 
 			const centerFromLeft = rect.left + rect.width / 2
 			setPosition({
 				x: centerFromLeft,
-				y: top
+				y: top,
 			})
 		} else {
 			setPosition(null)
@@ -36,7 +36,7 @@ export const HoverMenu: React.FC<HoverMenuProps> = ({ selection, children }) => 
 			<div
 				className="hoverMenu"
 				style={{
-					transform: `translate(${position.x}px, ${position.y}px) translate(-50%, -110%)`
+					transform: `translate(${position.x}px, ${position.y}px) translate(-50%, -110%)`,
 				}}
 			>
 				{children}

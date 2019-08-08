@@ -15,7 +15,7 @@ export function createRenderInlinePlugin(inlines: InlinesDefinitions, blocks: Bl
 					data: props.node.data.toJS(),
 					setData: (newData: any) => {
 						editor.setNodeByKey(node.key, { data: newData } as any)
-					}
+					},
 				})
 			}
 			return next()
@@ -23,17 +23,17 @@ export function createRenderInlinePlugin(inlines: InlinesDefinitions, blocks: Bl
 		onKeyDown: (event_, editor, next) => {
 			const event = event_ as KeyboardEvent
 			const entry = Object.entries(inlines).find(([name, definition]) =>
-				isKeyHotkey(definition.keyboardShortcut || [])(event)
+				isKeyHotkey(definition.keyboardShortcut || [])(event),
 			)
 			if (entry) {
 				const [inlineName, definition] = entry
 				const currentBlockTypes = editor.value.blocks.toArray().map(block => block.type)
 				const currentBlockDefinitions = currentBlockTypes.map(currentBlock =>
-					Object.entries(blocks).find(([blockName]) => blockName === currentBlock)
+					Object.entries(blocks).find(([blockName]) => blockName === currentBlock),
 				)
 				if (
 					currentBlockDefinitions.every(
-						b => typeof b !== 'undefined' && 'inlines' in b[1] && (b[1].inlines || []).includes(inlineName)
+						b => typeof b !== 'undefined' && 'inlines' in b[1] && (b[1].inlines || []).includes(inlineName),
 					)
 				) {
 					event.preventDefault()
@@ -44,6 +44,6 @@ export function createRenderInlinePlugin(inlines: InlinesDefinitions, blocks: Bl
 			} else {
 				next()
 			}
-		}
+		},
 	}
 }

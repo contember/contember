@@ -16,7 +16,7 @@ export const AddBlockButton: React.FC<{
 			setActive(false)
 			addBlock(blockName)
 		},
-		[setActive, addBlock]
+		[setActive, addBlock],
 	)
 
 	return (

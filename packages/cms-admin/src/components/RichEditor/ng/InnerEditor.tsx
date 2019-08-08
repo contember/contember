@@ -86,8 +86,8 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 				} else {
 					nodes = List([
 						Text.create({
-							key: entityAccessor.getKey() + '-text'
-						})
+							key: entityAccessor.getKey() + '-text',
+						}),
 					])
 				}
 
@@ -95,13 +95,13 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 					key: entityAccessor.getKey(),
 					type: type,
 					data: {
-						accessor: entityAccessor
+						accessor: entityAccessor,
 					},
-					nodes: nodes
+					nodes: nodes,
 				})
 				blockCache.set(entityAccessor, slateBlock)
 				return slateBlock
-			})
+			}),
 		})
 	}, [docId, entityAccessors, blockCache, name, blocks])
 
@@ -113,7 +113,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 
 			const selection = value.selection
 			const isInCustomBlock = value.blocks.some(
-				node => node !== undefined && blocks[node.type].renderBlock === undefined
+				node => node !== undefined && blocks[node.type].renderBlock === undefined,
 			)
 
 			setValueData(value.data)
@@ -126,7 +126,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 				setSelection(undefined)
 			}
 		},
-		[accessor, sortBy, name, blocks, defaultBlock]
+		[accessor, sortBy, name, blocks, defaultBlock],
 	)
 
 	const [schemaCache] = useState(() => new WeakMap<BlocksDefinitions, EditorProps['schema']>())
@@ -139,7 +139,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 			.filter(([key, value]) => value.renderBlock == undefined)
 			.map(([name]) => name)
 		const result = {
-			blocks: Object.fromEntries<Rules>(voidBlockTypes.map(name => [name, { isVoid: true }]))
+			blocks: Object.fromEntries<Rules>(voidBlockTypes.map(name => [name, { isVoid: true }])),
 		}
 
 		schemaCache.set(blocks, result)
@@ -151,7 +151,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 			createPluginsFromMarks(marks, blocks),
 			createRenderBlockPlugin(blocks),
 			createPastePlugin([blocks, marks, inlines || { htmlSerializer: {} }]),
-			inlines !== undefined ? createRenderInlinePlugin(inlines, blocks) : []
+			inlines !== undefined ? createRenderInlinePlugin(inlines, blocks) : [],
 		]
 	}, [marks, blocks, inlines])
 
@@ -164,7 +164,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 				</>
 			)
 		},
-		[blocks, marks, inlines]
+		[blocks, marks, inlines],
 	)
 
 	const editorRef = useRef<Editor | null>()
@@ -177,7 +177,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 			value={Value.create({
 				selection: selection,
 				document: document,
-				data: valueData
+				data: valueData,
 			})}
 			onChange={onChange}
 			renderEditor={renderEditor}

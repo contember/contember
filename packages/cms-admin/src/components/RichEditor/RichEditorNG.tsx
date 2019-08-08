@@ -14,11 +14,9 @@ export function generateUuid() {
 	})
 }
 
-KeyUtils.setGenerator(
-	(): string => {
-		return generateUuid()
-	}
-)
+KeyUtils.setGenerator((): string => {
+	return generateUuid()
+})
 
 export class RichEditorNG extends React.PureComponent<RTEProps> {
 	render() {
@@ -34,7 +32,7 @@ export class RichEditorNG extends React.PureComponent<RTEProps> {
 								</ToMany.AccessorRetriever>
 							)
 						},
-						environment
+						environment,
 					)
 				}}
 			</EnvironmentContext.Consumer>
@@ -47,7 +45,7 @@ export class RichEditorNG extends React.PureComponent<RTEProps> {
 				return QueryLanguage.wrapRelativeSingleField(
 					definition.valueField,
 					fieldName => <Field name={fieldName} />,
-					environment
+					environment,
 				)
 			} else {
 				return <React.Fragment key={i}>{definition.render}</React.Fragment>
@@ -62,7 +60,7 @@ export class RichEditorNG extends React.PureComponent<RTEProps> {
 					fieldName => (
 						<Field name={fieldName} />
 					),
-					environment
+					environment,
 				)}
 				{fields}
 			</ToMany>

@@ -42,7 +42,7 @@ namespace ToOne {
 
 	export const AtomicPrimitive = Component<AtomicPrimitiveProps>(
 		props => {
-			const accessor = useEntityAccessor(props)
+			const accessor = useEntityAccessor(props.field, props.filter, props.reducedBy)
 
 			if (!accessor) {
 				return null
@@ -81,7 +81,7 @@ namespace ToOne {
 	}
 
 	export const AccessorRetriever = React.memo((props: React.PropsWithChildren<AccessorRetrieverProps>) => {
-		const accessor = useEntityAccessor(props)
+		const accessor = useEntityAccessor(props.field, props.filter, props.reducedBy)
 
 		if (!accessor) {
 			return null

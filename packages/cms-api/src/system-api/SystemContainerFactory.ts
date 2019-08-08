@@ -46,7 +46,7 @@ export default class SystemContainerFactory {
 			.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder())
 			.addService(
 				'systemDiffQueryResolver',
-				({ systemDiffResponseBuilder }) => new DiffQueryResolver(systemDiffResponseBuilder)
+				({ systemDiffResponseBuilder }) => new DiffQueryResolver(systemDiffResponseBuilder),
 			)
 			.addService('releaseMutationResolver', () => new ReleaseMutationResolver())
 			.addService('rebaseMutationResolver', () => new RebeaseAllMutationResolver())
@@ -57,8 +57,8 @@ export default class SystemContainerFactory {
 						systemStagesQueryResolver,
 						systemDiffQueryResolver,
 						releaseMutationResolver,
-						rebaseMutationResolver
-					).create()
+						rebaseMutationResolver,
+					).create(),
 			)
 			.addService(
 				'systemExecutionContainerFactory',
@@ -69,13 +69,13 @@ export default class SystemContainerFactory {
 						container.migrationFilesManager,
 						authorizator,
 						container.permissionsByIdentityFactory,
-						container.modificationHandlerFactory
-					)
+						container.modificationHandlerFactory,
+					),
 			)
 			.addService(
 				'systemApolloServerFactory',
 				({ systemResolvers, authorizator, systemExecutionContainerFactory }) =>
-					new SystemApolloServerFactory(systemResolvers, authorizator, systemExecutionContainerFactory)
+					new SystemApolloServerFactory(systemResolvers, authorizator, systemExecutionContainerFactory),
 			)
 
 			.build()

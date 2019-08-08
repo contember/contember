@@ -10,7 +10,7 @@ export default class AddProjectMemberMutationResolver implements MutationResolve
 	async addProjectMember(
 		parent: any,
 		{ projectId, identityId, roles, variables }: MutationAddProjectMemberArgs,
-		context: ResolverContext
+		context: ResolverContext,
 	): Promise<AddProjectMemberResponse> {
 		await context.requireAccess({
 			scope: new ProjectScope(projectId),

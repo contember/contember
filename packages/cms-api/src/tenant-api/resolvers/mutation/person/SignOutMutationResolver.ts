@@ -9,7 +9,7 @@ import PersonQuery from '../../../model/queries/person/PersonQuery'
 export default class SignOutMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
-		private readonly queryHandler: QueryHandler<DbQueryable>
+		private readonly queryHandler: QueryHandler<DbQueryable>,
 	) {}
 
 	async signOut(parent: any, args: MutationSignOutArgs, context: ResolverContext): Promise<SignOutResponse> {

@@ -14,7 +14,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 		entityName: string,
 		fieldName: string,
 		options: OneHasManyBuilder.Options,
-		registerField: FieldProcessor.FieldRegistrar
+		registerField: FieldProcessor.FieldRegistrar,
 	): void {
 		const optionsFinalized = {
 			...options,
@@ -26,7 +26,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 
 	private createInversed(
 		options: OneHasManyBuilder.Options & { ownedBy: string },
-		fieldName: string
+		fieldName: string,
 	): Model.OneHasManyRelation {
 		return {
 			name: fieldName,
@@ -39,7 +39,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 	private createOwning(
 		options: OneHasManyBuilder.Options & { ownedBy: string },
 		entityName: string,
-		fieldName: string
+		fieldName: string,
 	): Model.ManyHasOneRelation {
 		const joiningColumn = options.ownerJoiningColumn || {}
 

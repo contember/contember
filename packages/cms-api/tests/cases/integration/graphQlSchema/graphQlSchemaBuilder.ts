@@ -34,7 +34,7 @@ const testSchema = async (test: Test) => {
 				key: '',
 				secret: '',
 			},
-		})
+		}),
 	)
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
@@ -50,7 +50,7 @@ const testSchema = async (test: Test) => {
 					description
 				}
 			}
-		`
+		`,
 	)
 	const errors = (result.errors || []).map(it => it.message)
 	expect(errors).deep.equals([])
@@ -78,16 +78,16 @@ describe('build gql schema from model schema', () => {
 					.entity('Author', e =>
 						e
 							.column('name', c => c.type(Model.ColumnType.String))
-							.oneHasMany('posts', r => r.target('Post').ownedBy('author'))
+							.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
 					)
 					.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 					.entity('Post', e =>
 						e
 							.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
 							.oneHasMany('locales', r =>
-								r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String)))
+								r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
 							)
-							.manyHasMany('categories', r => r.target('Category').inversedBy('posts'))
+							.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
 					),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema1.gql',
@@ -101,7 +101,7 @@ describe('build gql schema from model schema', () => {
 					e
 						.column('a', c => c.type(Model.ColumnType.String))
 						.column('b', c => c.type(Model.ColumnType.String))
-						.column('c', c => c.type(Model.ColumnType.String))
+						.column('c', c => c.type(Model.ColumnType.String)),
 				),
 			permissions: () => ({
 				Test: {
@@ -132,8 +132,8 @@ describe('build gql schema from model schema', () => {
 				e
 					.column('foo', c => c.type(Model.ColumnType.String))
 					.oneHasMany('r', r =>
-						r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2')
-					)
+						r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2'),
+					),
 			)
 
 		it('all allowed', async () => {
@@ -233,9 +233,9 @@ describe('build gql schema from model schema', () => {
 								e
 									.unique(['locale', 'post'])
 									.column('locale', c => c.type(Model.ColumnType.String))
-									.column('title', c => c.type(Model.ColumnType.String))
-							)
-						)
+									.column('title', c => c.type(Model.ColumnType.String)),
+							),
+						),
 				),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema7.gql',
@@ -254,15 +254,15 @@ describe('build gql schema from model schema', () => {
 								column
 									.type(Model.ColumnType.Enum, { enumName: 'one' })
 									.unique()
-									.notNull()
+									.notNull(),
 							)
 							.oneHasOne('introVideo', relation =>
 								relation
 									.target('Video')
 									.notNull()
-									.inversedBy('frontPageForIntro')
+									.inversedBy('frontPageForIntro'),
 							)
-							.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage'))
+							.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage')),
 					),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema8.gql',

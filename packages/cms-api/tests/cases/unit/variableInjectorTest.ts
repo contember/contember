@@ -13,7 +13,7 @@ describe('variable injector', () => {
 					.column('locale', c => c.type(Model.ColumnType.Enum, { enumName: 'locale' }))
 					.column('foo', c => c.type(Model.ColumnType.String))
 					.column('public', c => c.type(Model.ColumnType.Bool))
-					.manyHasOne('post', r => r.target('Post', e => e.manyHasOne('site', r => r.target('Site', e => e))))
+					.manyHasOne('post', r => r.target('Post', e => e.manyHasOne('site', r => r.target('Site', e => e)))),
 			)
 			.buildSchema()
 

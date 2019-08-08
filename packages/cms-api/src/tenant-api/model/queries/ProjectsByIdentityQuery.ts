@@ -37,7 +37,7 @@ class ProjectsByIdentityQuery extends DbQuery<ProjectsByIdentityQuery.Result> {
 			.select(['project', 'slug'])
 			.from('project')
 			.join('project_member', 'project_member', clause =>
-				clause.compareColumns(['project_member', 'project_id'], ConditionBuilder.Operator.eq, ['project', 'id'])
+				clause.compareColumns(['project_member', 'project_id'], ConditionBuilder.Operator.eq, ['project', 'id']),
 			)
 			.where(where => where.compare(['project_member', 'identity_id'], ConditionBuilder.Operator.eq, this.identityId))
 			.getResult()

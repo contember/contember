@@ -19,7 +19,7 @@ namespace Identity {
 		constructor(
 			public readonly id: string,
 			public readonly roles: string[],
-			private readonly projectRoles: { [projectId: string]: string[] }
+			private readonly projectRoles: { [projectId: string]: string[] },
 		) {}
 
 		getProjectRoles(projectId: string): Promise<string[]> {

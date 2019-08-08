@@ -12,7 +12,7 @@ export default class UpdateInputVisitor<Result>
 	constructor(
 		private readonly updateInputProcessor: UpdateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
-		private readonly data: Input.UpdateDataInput
+		private readonly data: Input.UpdateDataInput,
 	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<Result> {
@@ -27,12 +27,12 @@ export default class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation
+		targetRelation: Model.ManyHasManyOwnerRelation,
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyInversedContext>(
 			this.updateInputProcessor.manyHasManyInversed,
 			{ entity, relation, targetEntity, targetRelation },
-			this.data[relation.name] as Input.CreateManyRelationInput
+			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
@@ -40,12 +40,12 @@ export default class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInversedRelation | null
+		targetRelation: Model.ManyHasManyInversedRelation | null,
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyOwnerContext>(
 			this.updateInputProcessor.manyHasManyOwner,
 			{ entity, relation, targetEntity, targetRelation },
-			this.data[relation.name] as Input.CreateManyRelationInput
+			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
@@ -53,7 +53,7 @@ export default class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasOneRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasManyRelation | null
+		targetRelation: Model.OneHasManyRelation | null,
 	) {
 		return this.processRelationInput<Context.ManyHasOneContext>(
 			this.updateInputProcessor.manyHasOne,
@@ -63,7 +63,7 @@ export default class UpdateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateOneRelationInput
+			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
@@ -71,12 +71,12 @@ export default class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasManyRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation
+		targetRelation: Model.ManyHasOneRelation,
 	) {
 		return this.processManyRelationInput<Context.OneHasManyContext>(
 			this.updateInputProcessor.oneHasMany,
 			{ entity, relation, targetEntity, targetRelation },
-			this.data[relation.name] as Input.CreateManyRelationInput
+			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
@@ -84,7 +84,7 @@ export default class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasOneInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation
+		targetRelation: Model.OneHasOneOwnerRelation,
 	) {
 		return this.processRelationInput<Context.OneHasOneInversedContext>(
 			this.updateInputProcessor.oneHasOneInversed,
@@ -94,7 +94,7 @@ export default class UpdateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateOneRelationInput
+			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
@@ -102,7 +102,7 @@ export default class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null
+		targetRelation: Model.OneHasOneInversedRelation | null,
 	) {
 		return this.processRelationInput<Context.OneHasOneOwnerContext>(
 			this.updateInputProcessor.oneHasOneOwner,
@@ -112,14 +112,14 @@ export default class UpdateInputVisitor<Result>
 				targetEntity,
 				targetRelation,
 			},
-			this.data[relation.name] as Input.CreateOneRelationInput
+			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
 	private processRelationInput<Context>(
 		processor: UpdateInputProcessor.HasOneRelationInputProcessor<Context, Result>,
 		context: Context,
-		input: Input.UpdateOneRelationInput | undefined
+		input: Input.UpdateOneRelationInput | undefined,
 	): Promise<undefined | Result> {
 		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
@@ -150,7 +150,7 @@ export default class UpdateInputVisitor<Result>
 	private processManyRelationInput<Context>(
 		processor: UpdateInputProcessor.HasManyRelationInputProcessor<Context, Result>,
 		context: Context,
-		input: Input.UpdateManyRelationInput | undefined
+		input: Input.UpdateManyRelationInput | undefined,
 	): Promise<undefined | Result[]> {
 		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
@@ -203,7 +203,7 @@ export default class UpdateInputVisitor<Result>
 		if (keys.length !== 1) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new UserError(
-				`Expected exactly one of: "create", "connect", "delete", "disconnect", "update" or "upsert". ${found} found.`
+				`Expected exactly one of: "create", "connect", "delete", "disconnect", "update" or "upsert". ${found} found.`,
 			)
 		}
 	}

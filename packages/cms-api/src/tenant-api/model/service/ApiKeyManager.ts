@@ -67,7 +67,7 @@ class ApiKeyManager {
 
 	async createPermanentApiKey(
 		roles: string[],
-		projects: { id: string; roles: string[]; variables: UpdateProjectMemberVariablesCommand.VariableUpdate[] }[]
+		projects: { id: string; roles: string[]; variables: UpdateProjectMemberVariablesCommand.VariableUpdate[] }[],
 	): Promise<ApiKeyManager.CreateApiKeyResponse> {
 		return await this.db.transaction(async db => {
 			const identityId = await new CreateIdentityCommand(roles).execute(db)
@@ -76,7 +76,7 @@ class ApiKeyManager {
 			const addMemberResponses = (await Promise.all(
 				projects.map(async project => {
 					return new AddProjectMemberCommand(project.id, identityId, project.roles, project.variables).execute(db)
-				})
+				}),
 			))
 				.filter((it): it is AddProjectMemberCommand.AddProjectMemberResponseError => !it.ok)
 				.map(it => it.errors)
@@ -86,7 +86,7 @@ class ApiKeyManager {
 						[AddProjectMemberErrorCode.VariableNotFound]: CreateApiKeyErrorCode.VariableNotFound,
 						[AddProjectMemberErrorCode.IdentityNotFound]: ImplementationException.Throw,
 						[AddProjectMemberErrorCode.AlreadyMember]: ImplementationException.Throw,
-					})
+					}),
 				)
 				.reduce((acc, val) => [...acc, ...val], [])
 
@@ -108,7 +108,7 @@ namespace ApiKeyManager {
 		constructor(
 			public readonly identityId: string,
 			public readonly apiKeyId: string,
-			public readonly roles: string[]
+			public readonly roles: string[],
 		) {}
 	}
 

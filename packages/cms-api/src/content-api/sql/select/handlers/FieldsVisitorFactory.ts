@@ -13,7 +13,7 @@ class FieldsVisitorFactory {
 		private readonly junctionFetcher: JunctionFetcher,
 		private readonly mapperAccessor: Accessor<Mapper>,
 		private readonly predicateFactory: PredicateFactory,
-		private readonly whereBuilder: WhereBuilder
+		private readonly whereBuilder: WhereBuilder,
 	) {}
 
 	create(context: SelectExecutionHandler.Context): FieldsVisitor {
@@ -23,7 +23,7 @@ class FieldsVisitorFactory {
 			this.predicateFactory,
 			this.whereBuilder,
 			this.mapperAccessor.get(),
-			context
+			context,
 		)
 	}
 }

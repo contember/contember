@@ -10,7 +10,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 		private readonly primaryValue: Input.PrimaryValue,
 		private readonly data: Input.UpdateDataInput,
 		private readonly updateBuilder: UpdateBuilder,
-		private readonly mapper: Mapper
+		private readonly mapper: Mapper,
 	) {}
 
 	public column({ entity, column }: Context.ColumnContext) {
@@ -30,7 +30,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				targetEntity,
 				targetRelation,
 				{ [targetEntity.primary]: primaryOwner },
-				{ [entity.primary]: this.primaryValue }
+				{ [entity.primary]: this.primaryValue },
 			)
 		},
 		update: async ({ targetEntity, targetRelation, input: { where, data }, entity }) => {
@@ -48,7 +48,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 						targetEntity,
 						targetRelation,
 						{ [targetEntity.primary]: primaryValue },
-						{ [entity.primary]: this.primaryValue }
+						{ [entity.primary]: this.primaryValue },
 					)
 				} else {
 					throw e
@@ -73,7 +73,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				entity,
 				relation,
 				{ [entity.primary]: this.primaryValue },
-				{ [targetEntity.primary]: primaryOwner }
+				{ [targetEntity.primary]: primaryOwner },
 			)
 		},
 		update: async ({ targetEntity, input: { where, data }, entity, relation }) => {
@@ -91,7 +91,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 						entity,
 						relation,
 						{ [entity.primary]: this.primaryValue },
-						{ [targetEntity.primary]: primaryValue }
+						{ [targetEntity.primary]: primaryValue },
 					)
 				} else {
 					throw e
@@ -117,7 +117,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
-				relation.name
+				relation.name,
 			)
 			await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
 		},
@@ -146,7 +146,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
-				relation.name
+				relation.name,
 			)
 			await this.updateBuilder.update
 			await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
@@ -178,7 +178,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				{
 					...data,
 					// [targetRelation.name]: {connect: thisPrimary}
-				}
+				},
 			)
 		},
 		upsert: async ({ targetEntity, targetRelation, input: { create, where, update }, entity }) => {
@@ -188,7 +188,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				{
 					...update,
 					// [targetRelation.name]: {connect: thisPrimary}
-				}
+				},
 			)
 			if (result === 0) {
 				await this.mapper.insert(targetEntity, {
@@ -207,7 +207,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			await this.mapper.update(
 				targetEntity,
 				{ ...input, [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-				{ [targetRelation.name]: { disconnect: true } }
+				{ [targetRelation.name]: { disconnect: true } },
 			)
 		},
 	}
@@ -222,7 +222,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-				{ [targetRelation.name]: { disconnect: true } }
+				{ [targetRelation.name]: { disconnect: true } },
 			)
 			await this.mapper.insert(targetEntity, {
 				...input,
@@ -236,7 +236,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			const result = await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-				update
+				update,
 			)
 			if (result === 0) {
 				await this.mapper.insert(targetEntity, {
@@ -252,7 +252,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-				{ [targetRelation.name]: { disconnect: true } }
+				{ [targetRelation.name]: { disconnect: true } },
 			)
 		},
 	}
@@ -265,7 +265,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				const currentOwner = await this.mapper.selectField(
 					entity,
 					{ [relation.name]: { [targetEntity.primary]: relationPrimary } },
-					entity.primary
+					entity.primary,
 				)
 				if (currentOwner === this.primaryValue) {
 					return undefined
@@ -276,7 +276,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 						{
 							[entity.primary]: currentOwner,
 						},
-						{ [relation.name]: { disconnect: true } }
+						{ [relation.name]: { disconnect: true } },
 					)
 				}
 				return relationPrimary
@@ -289,7 +289,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
-				relation.name
+				relation.name,
 			)
 			await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
 		},
@@ -318,7 +318,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
-				relation.name
+				relation.name,
 			)
 			await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
 		},

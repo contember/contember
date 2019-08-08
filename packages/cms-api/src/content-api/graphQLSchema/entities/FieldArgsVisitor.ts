@@ -10,7 +10,7 @@ export default class FieldArgsVisitor
 		Model.RelationByGenericTypeVisitor<GraphQLFieldConfigArgumentMap | undefined> {
 	constructor(
 		private readonly whereTypeProvider: WhereTypeProvider,
-		private readonly orderByTypeProvider: OrderByTypeProvider
+		private readonly orderByTypeProvider: OrderByTypeProvider,
 	) {
 		this.whereTypeProvider = whereTypeProvider
 	}

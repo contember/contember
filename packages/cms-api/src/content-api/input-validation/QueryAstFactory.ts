@@ -19,7 +19,7 @@ class QueryAstFactory {
 	private createField(
 		entity: Model.Entity,
 		fieldName: string,
-		dependency: DependencyCollector.Dependencies
+		dependency: DependencyCollector.Dependencies,
 	): ObjectNode | FieldNode {
 		let [targetEntity, newField] = acceptFieldVisitor<[Model.Entity | null, FieldNode | ObjectNode]>(
 			this.model,
@@ -30,10 +30,10 @@ class QueryAstFactory {
 				visitRelation: ({}, {}, targetEntity) => [
 					targetEntity,
 					new ObjectNode(fieldName, fieldName, [], {}, {}, []).withField(
-						new FieldNode(targetEntity.primary, targetEntity.primary, {})
+						new FieldNode(targetEntity.primary, targetEntity.primary, {}),
 					),
 				],
-			}
+			},
 		)
 		const dependencyEntries = Object.entries(dependency)
 		if (dependencyEntries.length > 0) {

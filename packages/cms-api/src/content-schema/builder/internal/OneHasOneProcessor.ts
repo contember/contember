@@ -14,7 +14,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 		entityName: string,
 		fieldName: string,
 		options: OneHasOneBuilder.Options,
-		registerField: FieldProcessor.FieldRegistrar
+		registerField: FieldProcessor.FieldRegistrar,
 	): void {
 		registerField(entityName, this.createOneHasOneOwner(options, fieldName))
 		if (options.inversedBy) {
@@ -23,8 +23,8 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 				this.createOneHasOneInversed(
 					options as OneHasOneBuilder.Options & { inversedBy: string },
 					entityName,
-					fieldName
-				)
+					fieldName,
+				),
 			)
 		}
 	}
@@ -32,7 +32,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 	private createOneHasOneInversed(
 		options: OneHasOneBuilder.Options & { inversedBy: string },
 		entityName: string,
-		fieldName: string
+		fieldName: string,
 	): Model.OneHasOneInversedRelation {
 		return {
 			name: options.inversedBy,

@@ -36,7 +36,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 	}
 
 	public returning(
-		column: string | Literal
+		column: string | Literal,
 	): UpdateBuilder.UpdateBuilderState<Returning.Result[], Filled | 'returning'> {
 		return this.withOption('returning', new Returning(column)) as UpdateBuilder.UpdateBuilderState<
 			Returning.Result[],
@@ -66,7 +66,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		const cteAliases = this.options.with.getAliases()
 		if (this.options.from !== undefined) {
 			let fromQb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create(this.wrapper).withCteAliases(
-				cteAliases
+				cteAliases,
 			)
 			fromQb = this.options.from(fromQb)
 			fromQb = this.options.where.values.reduce((builder, value) => builder.where(value), fromQb)
@@ -91,7 +91,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 
 	protected withOption<K extends keyof UpdateBuilder.Options, V extends UpdateBuilder.Options[K]>(
 		key: K,
-		value: V
+		value: V,
 	): UpdateBuilder.UpdateBuilderState<Result, Filled | K> {
 		return new UpdateBuilder<Result, Filled | K>(this.wrapper, {
 			...this.options,

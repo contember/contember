@@ -20,7 +20,7 @@ class ProjectVariablesByIdentityQuery extends DbQuery<ProjectVariablesByIdentity
 
 		return result.reduce<ProjectVariablesByIdentityQuery.Result>(
 			(result, row) => ({ ...result, [row.variable]: row.values }),
-			{}
+			{},
 		)
 	}
 }

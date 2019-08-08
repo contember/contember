@@ -11,7 +11,7 @@ type Args = {
 class DiffCommand extends Command<Args, {}> {
 	constructor(
 		private readonly projectContainerResolver: ProjectContainerResolver,
-		private readonly schemas: { [name: string]: Schema }
+		private readonly schemas: { [name: string]: Schema },
 	) {
 		super()
 	}

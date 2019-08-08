@@ -13,7 +13,7 @@ class TenantApolloServerFactory {
 	constructor(
 		private readonly resolvers: Resolvers,
 		private readonly projectMemberManager: ProjectMemberManager,
-		private readonly authorizator: Authorizator<Identity>
+		private readonly authorizator: Authorizator<Identity>,
 	) {}
 
 	create(): ApolloServer {
@@ -27,7 +27,7 @@ class TenantApolloServerFactory {
 				return new ResolverContext(
 					apiKeyId,
 					new ProjectAwareIdentity(identityId, roles, this.projectMemberManager),
-					this.authorizator
+					this.authorizator,
 				)
 			},
 		})

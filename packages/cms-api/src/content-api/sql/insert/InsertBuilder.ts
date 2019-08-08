@@ -27,7 +27,7 @@ export default class InsertBuilder {
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
 		private readonly db: Client,
-		private readonly whereBuilder: WhereBuilder
+		private readonly whereBuilder: WhereBuilder,
 	) {
 		const blocker: Promise<void> = new Promise(resolver => (this.firer = resolver))
 		this.insert = this.createInsertPromise(blocker)
@@ -55,7 +55,7 @@ export default class InsertBuilder {
 		const resolvedData = this.rowData.map((it, index) => ({ ...it, value: resolvedValues[index] }))
 		const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
 			(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
-			{}
+			{},
 		)
 		const qb = this.db
 			.insertBuilder()
@@ -63,7 +63,7 @@ export default class InsertBuilder {
 				return resolvedData.reduce(
 					(qb, value) =>
 						qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
-					qb
+					qb,
 				)
 			})
 			.into(this.entity.tableName)

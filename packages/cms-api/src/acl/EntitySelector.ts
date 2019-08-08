@@ -25,7 +25,7 @@ export default class EntitySelector {
 				acceptFieldVisitor(schema, entity, name, {
 					visitColumn: () => false,
 					visitRelation: ({}, {}, target) => !targetEntity || target.name === targetEntity,
-				})
+				}),
 		)
 	}
 

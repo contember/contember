@@ -85,7 +85,7 @@ class ModificationBuilder {
 				return !this.modifications.find(
 					it =>
 						it.modification === CreateRelationModification.id &&
-						(it as Migration.Modification<CreateRelationModification.Data>).inverseSide === relation
+						(it as Migration.Modification<CreateRelationModification.Data>).inverseSide === relation,
 				)
 			}
 			return true
@@ -262,7 +262,7 @@ namespace ModificationBuilder {
 	export class Marker {
 		constructor(
 			private readonly builder: ModificationBuilder,
-			public readonly modifications: Migration.Modification[]
+			public readonly modifications: Migration.Modification[],
 		) {}
 
 		public rewind() {

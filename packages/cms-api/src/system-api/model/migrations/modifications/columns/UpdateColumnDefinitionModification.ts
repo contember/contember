@@ -27,8 +27,8 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 						name: field.name,
 						columnName: field.columnName,
 					}
-				})
-			)
+				}),
+			),
 		)
 	}
 

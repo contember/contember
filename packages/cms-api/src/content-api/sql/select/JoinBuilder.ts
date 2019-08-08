@@ -12,7 +12,7 @@ export default class JoinBuilder {
 		qb: SelectBuilder<SelectBuilder.Result, Filled>,
 		path: Path,
 		entity: Model.Entity,
-		relationName: string
+		relationName: string,
 	) {
 		const targetEntity = getTargetEntity(this.schema, entity, relationName)
 		if (!targetEntity) {
@@ -32,7 +32,7 @@ export default class JoinBuilder {
 				clause.compareColumns([sourceAlias, join.sourceColumn], ConditionBuilder.Operator.eq, [
 					targetAlias,
 					join.targetColumn,
-				])
+				]),
 			)
 		}, qb)
 	}

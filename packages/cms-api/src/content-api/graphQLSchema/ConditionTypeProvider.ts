@@ -8,7 +8,7 @@ import { GqlTypeName } from './utils'
 export default class ConditionTypeProvider {
 	private columnTypeResolver: ColumnTypeResolver
 	private conditions = singletonFactory<GraphQLInputObjectType, string, GraphQLScalarType | GraphQLEnumType>(
-		(name, type) => this.createCondition(type)
+		(name, type) => this.createCondition(type),
 	)
 
 	constructor(columnTypeResolver: ColumnTypeResolver) {

@@ -27,7 +27,7 @@ class MetaHandler implements SelectExecutionHandler<{}> {
 		context: SelectExecutionHandler.Context,
 		fieldName: string,
 		metaPath: Path,
-		operation: Acl.Operation.read | Acl.Operation.update
+		operation: Acl.Operation.read | Acl.Operation.update,
 	): void {
 		const { entity, path } = context
 		if (entity.primary === fieldName) {
@@ -44,8 +44,8 @@ class MetaHandler implements SelectExecutionHandler<{}> {
 								condition.raw('true')
 							}
 						}),
-					metaPath.getAlias()
-				)
+					metaPath.getAlias(),
+				),
 			)
 		}, metaPath)
 	}

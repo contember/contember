@@ -14,7 +14,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 			context.column.name,
 			((): Value.GenericValueLike<Value.AtomicValue> => {
 				return resolveColumnValue(context)
-			})()
+			})(),
 		)
 		return Promise.resolve()
 	}
@@ -33,7 +33,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 				context.targetEntity,
 				context.targetRelation,
 				{ [context.targetEntity.primary]: primaryOwner },
-				{ [context.entity.primary]: primaryInversed }
+				{ [context.entity.primary]: primaryInversed },
 			)
 		},
 	}
@@ -45,7 +45,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 				context.entity,
 				context.relation,
 				{ [context.entity.primary]: primary },
-				context.input
+				context.input,
 			)
 		},
 		create: async (context: Context.ManyHasManyOwnerContext & { input: Input.CreateDataInput }): Promise<void> => {
@@ -55,7 +55,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 				context.entity,
 				context.relation,
 				{ [context.entity.primary]: primary },
-				{ [context.targetEntity.primary]: primaryInversed }
+				{ [context.targetEntity.primary]: primaryInversed },
 			)
 		},
 	}
@@ -64,7 +64,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 		connect: async (context: Context.ManyHasOneContext & { input: Input.UniqueWhere }): Promise<void> => {
 			this.insertBuilder.addFieldValue(
 				context.relation.name,
-				this.mapper.getPrimaryValue(context.targetEntity, context.input)
+				this.mapper.getPrimaryValue(context.targetEntity, context.input),
 			)
 		},
 		create: async (context: Context.ManyHasOneContext & { input: Input.CreateDataInput }): Promise<void> => {
@@ -96,7 +96,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor {
 		connect: async (context: Context.OneHasOneOwnerContext & { input: Input.UniqueWhere }): Promise<void> => {
 			this.insertBuilder.addFieldValue(
 				context.relation.name,
-				this.mapper.getPrimaryValue(context.targetEntity, context.input)
+				this.mapper.getPrimaryValue(context.targetEntity, context.input),
 			)
 		},
 		create: async (context: Context.OneHasOneOwnerContext & { input: Input.CreateDataInput }): Promise<void> => {

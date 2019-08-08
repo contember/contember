@@ -4,7 +4,7 @@ import Authorizator from '../../acl/Authorizator'
 export class FieldAccessVisitor implements Model.ColumnVisitor<boolean>, Model.RelationVisitor<boolean> {
 	constructor(
 		private readonly operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update,
-		private readonly authorizator: Authorizator
+		private readonly authorizator: Authorizator,
 	) {}
 
 	visitColumn(entity: Model.Entity, column: Model.AnyColumn) {

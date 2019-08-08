@@ -39,7 +39,7 @@ class StageCommonEventsMatrixQuery extends DbQuery<StageCommonEventsMatrixQuery.
 SELECT stage_a_id, stage_a_event_id, stage_b_id, stage_b_event_id, distance, common_event_id
 FROM matrix
 WHERE num = 1
-`
+`,
 		)).rows
 		const result: StageCommonEventsMatrixQuery.Result = {}
 		for (const row of rows) {

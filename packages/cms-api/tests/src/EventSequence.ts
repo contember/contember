@@ -5,7 +5,7 @@ class EventSequence {
 	constructor(
 		public readonly stage: string,
 		public readonly baseStage: string | undefined,
-		public readonly sequence: EventSequence.SequencePart[]
+		public readonly sequence: EventSequence.SequencePart[],
 	) {}
 }
 

@@ -17,7 +17,7 @@ export default class TenantMiddlewareFactory {
 		}
 		return route(
 			'/tenant$',
-			compose([corsMiddleware(), bodyParser(), this.authMiddlewareFactory.create(), graphQlMiddleware])
+			compose([corsMiddleware(), bodyParser(), this.authMiddlewareFactory.create(), graphQlMiddleware]),
 		)
 	}
 }

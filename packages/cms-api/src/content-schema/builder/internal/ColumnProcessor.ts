@@ -14,7 +14,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 		entityName: string,
 		fieldName: string,
 		options: ColumnBuilder.Options,
-		registerField: FieldProcessor.FieldRegistrar
+		registerField: FieldProcessor.FieldRegistrar,
 	): void {
 		registerField(entityName, this.toColumnType(fieldName, options))
 	}

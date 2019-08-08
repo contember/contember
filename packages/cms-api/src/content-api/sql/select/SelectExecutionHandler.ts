@@ -19,7 +19,7 @@ namespace SelectExecutionHandler {
 
 		addColumn: (
 			queryCallback: (qb: SelectBuilder<SelectBuilder.Result, any>) => SelectBuilder<SelectBuilder.Result, any>,
-			path?: Path
+			path?: Path,
 		) => void
 		addData: (parentField: string, cb: DataCallback, defaultValue?: SelectHydrator.NestedDefaultValue) => void
 	}

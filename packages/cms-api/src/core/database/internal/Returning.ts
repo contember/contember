@@ -16,7 +16,7 @@ class Returning {
 	}
 
 	public parseResponse<ProcessedResult extends number | Returning.Result[]>(
-		result: Connection.Result
+		result: Connection.Result,
 	): ProcessedResult {
 		const returningColumn = this.column
 		if (returningColumn) {

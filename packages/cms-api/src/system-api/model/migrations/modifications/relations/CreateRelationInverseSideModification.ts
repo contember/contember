@@ -17,8 +17,8 @@ class CreateRelationInverseSideModification implements Modification<CreateRelati
 				updateField<Model.AnyRelation & Model.OwnerRelation>(this.data.relation.ownedBy, field => ({
 					...field,
 					inversedBy: this.data.relation.name,
-				}))
-			)
+				})),
+			),
 		)
 	}
 

@@ -14,7 +14,7 @@ export default class SetupMutationResolver implements MutationResolvers {
 		parent: any,
 		args: MutationSetupArgs,
 		context: ResolverContext,
-		info: GraphQLResolveInfo
+		info: GraphQLResolveInfo,
 	): Promise<SetupResponse> {
 		await context.requireAccess({
 			action: Actions.SYSTEM_SETUP,

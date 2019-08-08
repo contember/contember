@@ -20,7 +20,7 @@ class UpdateFieldNameModification implements Modification<UpdateFieldNameModific
 						[this.data.newFieldName]: { ...updated, name: this.data.newFieldName },
 					},
 				}
-			})
+			}),
 		)
 	}
 

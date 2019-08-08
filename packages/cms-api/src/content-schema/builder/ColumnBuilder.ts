@@ -10,7 +10,7 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 
 	public type(
 		type: Model.ColumnType,
-		typeOptions: ColumnBuilder.TypeOptions = {}
+		typeOptions: ColumnBuilder.TypeOptions = {},
 	): ColumnBuilder<O & PartialColumnOptions<'type'>> {
 		return new ColumnBuilder<O & PartialColumnOptions<'type'>>({
 			...(this.options as object),

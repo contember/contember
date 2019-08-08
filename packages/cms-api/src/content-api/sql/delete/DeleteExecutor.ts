@@ -18,7 +18,7 @@ class DeleteExecutor {
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
-		private readonly updateBuilderFactory: UpdateBuilderFactory
+		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}
 
 	public async execute(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
@@ -52,7 +52,7 @@ class DeleteExecutor {
 					default:
 						assertNever(relation.joiningColumn.onDelete)
 				}
-			})
+			}),
 		)
 	}
 
@@ -76,7 +76,7 @@ class DeleteExecutor {
 	private async setNull(
 		entity: Model.Entity,
 		relation: Model.Relation & Model.JoiningColumnRelation,
-		where: Input.Where
+		where: Input.Where,
 	): Promise<void> {
 		const updateBuilder = this.updateBuilderFactory.create(entity, where)
 		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, [relation.name])
@@ -97,14 +97,14 @@ class DeleteExecutor {
 					visitOneHasMany: () => null,
 					visitOneHasOneOwner: ({}, relation): EntityRelationTuple => [entity, relation],
 					visitManyHasOne: ({}, relation): EntityRelationTuple => [entity, relation],
-				})
+				}),
 			)
 			.reduce<EntityRelationTuple[]>(
 				(acc, value) => [
 					...acc,
 					...Object.values(value).filter<EntityRelationTuple>((it): it is EntityRelationTuple => it !== null),
 				],
-				[]
+				[],
 			)
 			.filter(([{}, relation]) => relation.target === entity.name)
 	}

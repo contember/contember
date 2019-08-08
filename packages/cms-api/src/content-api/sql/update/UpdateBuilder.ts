@@ -31,7 +31,7 @@ export default class UpdateBuilder {
 		private readonly entity: Model.Entity,
 		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder,
-		private readonly uniqueWhere: Input.Where
+		private readonly uniqueWhere: Input.Where,
 	) {
 		const blocker: Promise<void> = new Promise(resolver => (this.firer = resolver))
 		this.update = this.createUpdatePromise(blocker)
@@ -73,7 +73,7 @@ export default class UpdateBuilder {
 				qb = resolvedData.reduce(
 					(qb, value) =>
 						qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
-					qb
+					qb,
 				)
 				const columns = new Set(resolvedData.map(it => it.columnName))
 				const allColumns: string[] = Object.values(
@@ -85,7 +85,7 @@ export default class UpdateBuilder {
 						visitManyHasManyOwner: () => null,
 						visitOneHasOneInversed: () => null,
 						visitOneHasMany: () => null,
-					})
+					}),
 				).filter((it): it is string => it !== null)
 
 				const remainingColumns = allColumns.filter(it => !columns.has(it))
@@ -106,8 +106,8 @@ export default class UpdateBuilder {
 						...result,
 						[item.columnName]: expr => expr.select(['newData_', item.columnName]),
 					}),
-					{}
-				)
+					{},
+				),
 			)
 			.from(qb => {
 				qb = qb.from('newData_')

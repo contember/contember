@@ -17,11 +17,11 @@ export class Transaction implements Connection.TransactionLike {
 	constructor(
 		private readonly pgClient: PoolClient,
 		public readonly eventManager: EventManager,
-		private readonly config: Connection.QueryConfig
+		private readonly config: Connection.QueryConfig,
 	) {}
 
 	async transaction<Result>(
-		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 	): Promise<Result> {
 		const savepointName = `savepoint_${this.savepointCounter++}`
 		await this.pgClient.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
@@ -44,7 +44,7 @@ export class Transaction implements Connection.TransactionLike {
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		config: Connection.QueryConfig = {}
+		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error('Transaction is already closed')
@@ -53,7 +53,7 @@ export class Transaction implements Connection.TransactionLike {
 			this.pgClient,
 			this.eventManager,
 			{ sql, parameters, meta, ...this.config, ...config },
-			this.queryContext
+			this.queryContext,
 		)
 	}
 
@@ -85,11 +85,11 @@ class SavePoint implements Connection.TransactionLike {
 	constructor(
 		public readonly savepointName: string,
 		private readonly transactionInst: Transaction,
-		private readonly pgClient: PoolClient
+		private readonly pgClient: PoolClient,
 	) {}
 
 	async transaction<Result>(
-		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 	): Promise<Result> {
 		return await this.transactionInst.transaction(callback)
 	}
@@ -97,7 +97,7 @@ class SavePoint implements Connection.TransactionLike {
 	async query<Row extends Record<string, any>>(
 		sql: string,
 		parameters: any[],
-		meta: Record<string, any> = {}
+		meta: Record<string, any> = {},
 	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error(`Savepoint ${this.savepointName} is already closed.`)

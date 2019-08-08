@@ -31,7 +31,7 @@ class CommandConfiguration {
 		for (let argument of this.arguments) {
 			if (hasOptional && !argument.optional) {
 				throw new CommandConfiguration.InvalidConfigurationError(
-					`Required argument ${argument.name} cannot follow an optional `
+					`Required argument ${argument.name} cannot follow an optional `,
 				)
 			}
 			if (hasVariadic) {

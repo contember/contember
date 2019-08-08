@@ -8,13 +8,13 @@ class HasManyToHasOneReducer implements EntityFieldsProvider<HasManyToHasOneRedu
 
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly visitor: HasManyToHasOneRelationReducerFieldVisitor
+		private readonly visitor: HasManyToHasOneRelationReducerFieldVisitor,
 	) {}
 
 	getFields(entity: Model.Entity, fields: string[]): EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta> {
 		return fields.reduce(
 			(result, field) => ({ ...result, ...acceptFieldVisitor(this.schema, entity, field, this.visitor) }),
-			{}
+			{},
 		)
 	}
 }

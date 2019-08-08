@@ -50,7 +50,7 @@ export default class PermissionFactory {
 						predicates,
 						idPermissions,
 						predicates,
-						predicateReference
+						predicateReference,
 					)
 					if (typeof predicate !== 'string' || predicateDefinition === undefined) {
 						throw new Error('should not happen')
@@ -94,7 +94,7 @@ export default class PermissionFactory {
 				left.predicates,
 				leftFieldPermissions,
 				right.predicates,
-				rightFieldPermissions
+				rightFieldPermissions,
 			)
 			predicates = { ...predicates, ...operationPredicates }
 			if (Object.keys(fieldPermissions).length > 0) {
@@ -106,7 +106,7 @@ export default class PermissionFactory {
 			left.predicates,
 			left.operations.delete || false,
 			right.predicates,
-			right.operations.delete || false
+			right.operations.delete || false,
 		)
 		if (predicate === true) {
 			operations.delete = true
@@ -125,7 +125,7 @@ export default class PermissionFactory {
 		leftPredicates: Acl.PredicateMap,
 		leftFieldPermissions: Acl.FieldPermissions,
 		rightPredicates: Acl.PredicateMap,
-		rightFieldPermissions: Acl.FieldPermissions
+		rightFieldPermissions: Acl.FieldPermissions,
 	): [Acl.PredicateMap, Acl.FieldPermissions] {
 		const fields: Acl.FieldPermissions = {}
 		const predicates: Acl.PredicateMap = {}
@@ -135,7 +135,7 @@ export default class PermissionFactory {
 				leftPredicates,
 				leftFieldPermissions[field] || false,
 				rightPredicates,
-				rightFieldPermissions[field] || false
+				rightFieldPermissions[field] || false,
 			)
 			if (predicate === true) {
 				fields[field] = true
@@ -152,7 +152,7 @@ export default class PermissionFactory {
 		leftPredicates: Acl.PredicateMap,
 		leftReference: Acl.Predicate,
 		rightPredicates: Acl.PredicateMap,
-		rightReference: Acl.Predicate
+		rightReference: Acl.Predicate,
 	): [Acl.PredicateDefinition, Acl.PredicateReference] | [undefined, boolean] {
 		if (leftReference === true || rightReference === true) {
 			return [undefined, true]

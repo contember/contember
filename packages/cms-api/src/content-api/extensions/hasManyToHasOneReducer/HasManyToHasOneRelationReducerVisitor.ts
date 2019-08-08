@@ -18,7 +18,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly entityTypeProviderAccessor: Accessor<EntityTypeProvider>,
-		private readonly whereTypeProvider: WhereTypeProvider
+		private readonly whereTypeProvider: WhereTypeProvider,
 	) {}
 
 	public visitColumn() {
@@ -49,7 +49,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		entity: Model.Entity,
 		relation: Model.AnyRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.AnyRelation | null
+		targetRelation: Model.AnyRelation | null,
 	) {
 		if (!targetRelation) {
 			return {}
@@ -65,8 +65,8 @@ class HasManyToHasOneRelationReducerFieldVisitor
 					this.schema,
 					targetEntity.name,
 					field,
-					new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
-				)
+					new FieldAccessVisitor(Acl.Operation.read, this.authorizator),
+				),
 			)
 			.reduce<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta>>((fields, fieldName) => {
 				const graphQlName = relation.name + GqlTypeName`By${fieldName}`

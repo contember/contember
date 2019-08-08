@@ -251,9 +251,9 @@ describe('query builder', () => {
 							condition.or(condition => {
 								condition.compare('foo', ConditionBuilder.Operator.gte, 1)
 								condition.compare('foo', ConditionBuilder.Operator.lte, 0)
-							})
+							}),
 						),
-					'bar'
+					'bar',
 				)
 				await qb.getResult()
 			},
@@ -291,8 +291,8 @@ describe('query builder', () => {
 						window
 							.orderBy(['foo', 'bar'], 'desc')
 							.rowNumber()
-							.partitionBy(['lorem', 'ipsum'])
-					)
+							.partitionBy(['lorem', 'ipsum']),
+					),
 				)
 
 				await qb.getResult()
@@ -316,7 +316,7 @@ describe('query builder', () => {
 					['foo', 'lorem'],
 					(orderable, qb) => [orderable.orderBy(['foo', 'ipsum']), qb],
 					1,
-					3
+					3,
 				).getResult(qb)
 			},
 			sql: SQL`with "data" as 

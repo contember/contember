@@ -4,7 +4,7 @@ namespace Acl {
 	export enum VariableType {
 		enum = 'enum',
 		entity = 'entity',
-		column = 'column'
+		column = 'column',
 	}
 
 	export type Variable = EnumVariable | EntityVariable | ColumnValueVariable
@@ -43,7 +43,7 @@ namespace Acl {
 		read = 'read',
 		create = 'create',
 		update = 'update',
-		delete = 'delete'
+		delete = 'delete',
 	}
 
 	export interface EntityOperations {

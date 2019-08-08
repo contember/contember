@@ -13,13 +13,13 @@ export default class ValidationContextFactory {
 	constructor(
 		private readonly model: Model.Schema,
 		private readonly dataSelector: ValidationDataSelector,
-		private readonly dependencyPruner: DependencyPruner
+		private readonly dependencyPruner: DependencyPruner,
 	) {}
 
 	public async createForCreate(
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
-		dependencies: DependencyCollector.Dependencies
+		dependencies: DependencyCollector.Dependencies,
 	): Promise<ValidationContext.NodeType> {
 		const contextFactoryProcessor = new CreateInputContextFactoryProcessor(this, dependencies, this.dataSelector)
 		const visitor = new CreateInputVisitor(contextFactoryProcessor, this.model, data)
@@ -27,7 +27,7 @@ export default class ValidationContextFactory {
 		const results = await Promise.all(
 			Object.keys(dependencies).map(async field => {
 				return [field, await acceptFieldVisitor(this.model, entity, field, visitor)]
-			})
+			}),
 		)
 
 		return results.reduce((acc, [field, value]) => ({ ...acc, [field]: value }), {})
@@ -37,7 +37,7 @@ export default class ValidationContextFactory {
 		entity: Model.Entity,
 		input: { node: Value.Object } | { where: Input.UniqueWhere },
 		data: Input.UpdateDataInput,
-		dependencies: DependencyCollector.Dependencies
+		dependencies: DependencyCollector.Dependencies,
 	): Promise<ValidationContext.NodeType | undefined> {
 		// const prunedDependencies = this.dependencyPruner.pruneDependencies(entity, dependencies, data)
 		const prunedDependencies = dependencies
@@ -51,7 +51,7 @@ export default class ValidationContextFactory {
 		await Promise.all(
 			Object.keys(dependencies).map(async field => {
 				return await acceptFieldVisitor<void>(this.model, entity, field, visitor)
-			})
+			}),
 		)
 
 		return node

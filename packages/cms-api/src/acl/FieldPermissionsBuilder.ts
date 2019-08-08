@@ -7,7 +7,7 @@ import PermissionsBuilder from './PermissionsBuilder'
 export default class FieldPermissionsBuilder {
 	public constructor(
 		public entityPermissionsBuilder: EntityPermissionsBuilder,
-		private readonly fields: [Model.Entity, Model.AnyField][]
+		private readonly fields: [Model.Entity, Model.AnyField][],
 	) {}
 
 	get builder(): PermissionsBuilder {
@@ -40,7 +40,7 @@ export default class FieldPermissionsBuilder {
 
 	public allow(
 		operations: (Acl.Operation.create | Acl.Operation.read | Acl.Operation.update)[],
-		predicate: Acl.Predicate = true
+		predicate: Acl.Predicate = true,
 	): FieldPermissionsBuilder {
 		const permissions: Acl.Permissions = {}
 		for (const [entity, field] of this.fields) {

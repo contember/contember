@@ -7,7 +7,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 	visitOneHasOneOwner(
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
-		targetEntity: Model.Entity
+		targetEntity: Model.Entity,
 	): JoinVisitor.JoinDefinition[] {
 		return [
 			{
@@ -22,7 +22,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		entity: Model.Entity,
 		relation: Model.OneHasOneInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation
+		targetRelation: Model.OneHasOneOwnerRelation,
 	): JoinVisitor.JoinDefinition[] {
 		return [
 			{
@@ -36,7 +36,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 	visitManyHasOne(
 		entity: Model.Entity,
 		relation: Model.ManyHasOneRelation,
-		targetEntity: Model.Entity
+		targetEntity: Model.Entity,
 	): JoinVisitor.JoinDefinition[] {
 		return [
 			{
@@ -51,7 +51,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		entity: Model.Entity,
 		relation: Model.OneHasManyRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation
+		targetRelation: Model.ManyHasOneRelation,
 	): JoinVisitor.JoinDefinition[] {
 		return [
 			{
@@ -66,7 +66,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 	visitManyHasManyOwner(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		targetEntity: Model.Entity
+		targetEntity: Model.Entity,
 	): JoinVisitor.JoinDefinition[] {
 		const sourceAlias = this.path.back().getAlias()
 		const targetAlias = this.path.getAlias()
@@ -94,7 +94,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation
+		targetRelation: Model.ManyHasManyOwnerRelation,
 	): JoinVisitor.JoinDefinition[] {
 		const sourceAlias = this.path.back().getAlias()
 		const targetAlias = this.path.getAlias()

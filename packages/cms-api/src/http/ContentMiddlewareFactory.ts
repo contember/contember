@@ -21,7 +21,7 @@ class ContentMiddlewareFactory {
 		private readonly authMiddlewareFactory: AuthMiddlewareFactory,
 		private readonly projectMemberMiddlewareFactory: ProjectMemberMiddlewareFactory,
 		private readonly databaseTransactionMiddlewareFactory: DatabaseTransactionMiddlewareFactory,
-		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory
+		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory,
 	) {}
 
 	create(): Koa.Middleware {
@@ -38,7 +38,7 @@ class ContentMiddlewareFactory {
 		> = async (ctx, next) => {
 			await ctx.state.projectContainer.contentApolloMiddlewareFactory.create(ctx.state.stage)(
 				ctx as KoaContext<any>,
-				next
+				next,
 			)
 		}
 
@@ -58,8 +58,8 @@ class ContentMiddlewareFactory {
 					this.setupSystemVariablesMiddlewareFactory.create(),
 					contentApollo,
 				],
-				true
-			)
+				true,
+			),
 		)
 	}
 }

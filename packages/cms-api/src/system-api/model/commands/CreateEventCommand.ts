@@ -6,7 +6,7 @@ class CreateEventCommand {
 	constructor(
 		private readonly type: EventType,
 		private readonly data: any,
-		private readonly previousId: string | null
+		private readonly previousId: string | null,
 	) {}
 
 	public async execute(db: Client): Promise<string> {

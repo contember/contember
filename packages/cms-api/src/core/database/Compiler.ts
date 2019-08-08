@@ -68,7 +68,7 @@ class Compiler {
 		}
 		return new Literal(' using ').appendAll(
 			usingEntries.map(([alias, table]) => aliasLiteral(this.prependSchema(table, namespaceContext), alias)),
-			', '
+			', ',
 		)
 	}
 
@@ -86,7 +86,7 @@ class Compiler {
 		}
 		return new Literal(' order by ').appendAll(
 			orderBy.map(([column, direction]) => column.appendString(' ' + direction)),
-			', '
+			', ',
 		)
 	}
 
@@ -140,7 +140,7 @@ class Compiler {
 
 	private compileFromStatement(
 		fromExpr: SelectBuilder.Options['from'],
-		namespaceContext: Compiler.NamespaceContext
+		namespaceContext: Compiler.NamespaceContext,
 	): Literal {
 		if (!fromExpr) {
 			return Literal.empty
@@ -152,12 +152,12 @@ class Compiler {
 	private compileIntoStatement(
 		into: Exclude<InsertBuilder.Options['into'], undefined>,
 		values: Exclude<InsertBuilder.Options['values'], undefined>,
-		namespaceContext: Compiler.NamespaceContext
+		namespaceContext: Compiler.NamespaceContext,
 	): Literal {
 		return this.prependSchema(into, namespaceContext).appendAll(
 			Object.keys(values).map(it => new Literal(wrapIdentifier(it))),
 			', ',
-			[' (', ')']
+			[' (', ')'],
 		)
 	}
 
@@ -193,7 +193,7 @@ class Compiler {
 	private createSet(values: QueryBuilder.ResolvedValues): Literal {
 		return Literal.empty.appendAll(
 			Object.entries(values).map(([col, value]) => new Literal(wrapIdentifier(col) + ' = ').append(value)),
-			', '
+			', ',
 		)
 	}
 

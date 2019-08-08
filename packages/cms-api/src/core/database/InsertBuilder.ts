@@ -12,7 +12,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	private constructor(
 		private readonly wrapper: Client,
 		private readonly options: InsertBuilder.Options,
-		private readonly cteAliases: string[]
+		private readonly cteAliases: string[],
 	) {}
 
 	public static create(wrapper: Client): InsertBuilder.NewInsertBuilder {
@@ -26,7 +26,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 				returning: new Returning(),
 				from: undefined,
 			},
-			[]
+			[],
 		) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
 	}
 
@@ -45,16 +45,16 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	public onConflict(
 		type: InsertBuilder.ConflictActionType.update,
 		target: InsertBuilder.ConflictTarget,
-		values: QueryBuilder.Values
+		values: QueryBuilder.Values,
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
 		type: InsertBuilder.ConflictActionType.doNothing,
-		target?: InsertBuilder.ConflictTarget
+		target?: InsertBuilder.ConflictTarget,
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
 		type: InsertBuilder.ConflictActionType,
 		target?: InsertBuilder.ConflictTarget,
-		values?: QueryBuilder.Values
+		values?: QueryBuilder.Values,
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'> {
 		let conflictAction: InsertBuilder.ConflictAction
 		if (type === InsertBuilder.ConflictActionType.update && values && target) {
@@ -68,7 +68,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	}
 
 	public returning(
-		column: string | Literal
+		column: string | Literal,
 	): InsertBuilder.InsertBuilderState<Returning.Result[], Filled | 'returning'> {
 		return this.withOption('returning', new Returning(column)) as InsertBuilder.InsertBuilderState<
 			Returning.Result[],
@@ -93,7 +93,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		const cteAliases = [...this.options.with.getAliases(), ...this.cteAliases]
 		if (this.options.from !== undefined) {
 			let queryBuilder: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create(this.wrapper).withCteAliases(
-				cteAliases
+				cteAliases,
 			)
 			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
 			queryBuilder = this.options.from(queryBuilder)
@@ -113,12 +113,12 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 
 	private withOption<K extends keyof InsertBuilder.Options, V extends InsertBuilder.Options[K]>(
 		key: K,
-		value: V
+		value: V,
 	): InsertBuilder.InsertBuilderState<Result, Filled | K> {
 		return new InsertBuilder<Result, Filled | K>(
 			this.wrapper,
 			{ ...this.options, [key]: value },
-			this.cteAliases
+			this.cteAliases,
 		) as InsertBuilder.InsertBuilderState<Result, Filled | K>
 	}
 

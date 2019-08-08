@@ -6,7 +6,7 @@ interface Authorizator {
 	isAllowed(
 		operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update,
 		entity: string,
-		field: string
+		field: string,
 	): boolean
 }
 

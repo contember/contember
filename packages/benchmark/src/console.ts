@@ -9,7 +9,7 @@ import App from './projects/app/src/model'
 	const projectsDirectory = path.join(__dirname, '../../src/projects')
 
 	const container = new CompositionRoot().createMasterContainer(config, projectsDirectory, {
-		app: App
+		app: App,
 	})
 
 	container.cli.run(process.argv)

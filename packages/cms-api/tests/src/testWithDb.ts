@@ -79,7 +79,7 @@ export const executeDbTest = async (test: Test) => {
 			const columns = Object.keys((test.expectDatabase || {})[table][0] || { id: null })
 			const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>, 'from' | 'select'>>(
 				(qb, column) => qb.select(column),
-				qb
+				qb,
 			)
 			dbData[table] = await qbWithSelect.getResult()
 		}

@@ -6,7 +6,7 @@ class RemoveProjectMemberVariablesCommand implements Command<void> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
-		private readonly except: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[]
+		private readonly except: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	) {}
 
 	async execute(db: Client): Promise<void> {

@@ -67,7 +67,7 @@ namespace ValidationContext {
 
 	export const createSingleNodeContext = (
 		parent: NodeContext,
-		value: object | null | string | number | boolean
+		value: object | null | string | number | boolean,
 	): NodeContext => {
 		if (Array.isArray(value)) {
 			throw new Error('Nested arrays are not allowed')
@@ -89,7 +89,7 @@ namespace ValidationContext {
 				.map(it => ensureNodeListContext(it))
 				.reduce<NodeListContext>(
 					(acc, context) => createNodeListContext(acc.root, [...acc.nodes, ...context.nodes]),
-					emptyContext
+					emptyContext,
 				)
 		}
 		if (context.node === undefined) {

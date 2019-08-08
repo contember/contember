@@ -13,13 +13,13 @@ export default class MutationResolver {
 	constructor(
 		private readonly mapper: Mapper,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
-		private readonly inputValidator: InputValidator
+		private readonly inputValidator: InputValidator,
 	) {}
 
 	public async resolveUpdate(
 		entity: Model.Entity,
 		input: Input.UpdateInput,
-		queryAst: ObjectNode<Input.UpdateInput>
+		queryAst: ObjectNode<Input.UpdateInput>,
 	): Promise<WithoutNode<Result.UpdateResult>> {
 		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data, [])
 		if (validationResult.length > 0) {
@@ -46,7 +46,7 @@ export default class MutationResolver {
 	public async resolveCreate(
 		entity: Model.Entity,
 		input: Input.CreateInput,
-		queryAst: ObjectNode
+		queryAst: ObjectNode,
 	): Promise<WithoutNode<Result.CreateResult>> {
 		const validationResult = await this.inputValidator.validateCreate(entity, input.data, [], null)
 		if (validationResult.length > 0) {
@@ -97,7 +97,7 @@ export default class MutationResolver {
 	private async resolveResultNodes(
 		entity: Model.Entity,
 		where: Input.Where,
-		queryAst: ObjectNode
+		queryAst: ObjectNode,
 	): Promise<Record<string, Value.Object>> {
 		const nodeQuery = queryAst.findFieldByName('node')
 		let nodes: Record<string, any> = {}

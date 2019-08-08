@@ -7,7 +7,7 @@ class InsertBuilderFactory {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly whereBuilder: WhereBuilder,
-		private readonly db: Client
+		private readonly db: Client,
 	) {}
 
 	public create(entity: Model.Entity): InsertBuilder {

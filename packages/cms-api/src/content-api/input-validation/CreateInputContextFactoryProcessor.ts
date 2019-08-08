@@ -12,7 +12,7 @@ export default class CreateInputContextFactoryProcessor implements CreateInputPr
 	constructor(
 		private readonly validationContextFactory: ValidationContextFactory,
 		private readonly dependencies: DependencyCollector.Dependencies,
-		private readonly dataSelector: ValidationDataSelector
+		private readonly dataSelector: ValidationDataSelector,
 	) {}
 
 	manyHasManyInversed: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInversedContext, Result> = {

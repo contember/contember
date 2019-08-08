@@ -12,7 +12,7 @@ export default class ResolverContext implements ErrorHandlerExtension.Context {
 		public readonly variables: Acl.VariablesMap,
 		private readonly authorizator: Authorizator<Identity>,
 		public readonly container: SystemExecutionContainer,
-		public readonly errorHandler: ErrorHandlerExtension.Context['errorHandler']
+		public readonly errorHandler: ErrorHandlerExtension.Context['errorHandler'],
 	) {}
 
 	public async isAllowed(scope: AuthorizationScope<Identity>, action: Authorizator.Action): Promise<boolean> {
@@ -22,7 +22,7 @@ export default class ResolverContext implements ErrorHandlerExtension.Context {
 	public async requireAccess(
 		scope: AuthorizationScope<Identity>,
 		action: Authorizator.Action,
-		message?: string
+		message?: string,
 	): Promise<void> {
 		if (!(await this.isAllowed(scope, action))) {
 			throw new ForbiddenError(message || 'Forbidden')

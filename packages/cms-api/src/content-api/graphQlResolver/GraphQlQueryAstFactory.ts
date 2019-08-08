@@ -31,8 +31,8 @@ export default class GraphQlQueryAstFactory {
 			newGraphQlFieldNodes.push(
 				this.mergeFieldNodes(
 					newGraphQlFieldNodes.pop() as GraphQlFieldNode,
-					newGraphQlFieldNodes.pop() as GraphQlFieldNode
-				)
+					newGraphQlFieldNodes.pop() as GraphQlFieldNode,
+				),
 			)
 		}
 		return newGraphQlFieldNodes[0]
@@ -56,7 +56,7 @@ export default class GraphQlQueryAstFactory {
 		parentType: GraphQLObjectType,
 		node: GraphQlFieldNode,
 		path: string[],
-		filter: NodeFilter
+		filter: NodeFilter,
 	): ObjectNode | FieldNode | null {
 		if (!filter(node, path)) {
 			return null
@@ -75,7 +75,7 @@ export default class GraphQlQueryAstFactory {
 			resolvedType,
 			node.selectionSet,
 			[...path, alias],
-			filter
+			filter,
 		)
 
 		return new ObjectNode(
@@ -84,7 +84,7 @@ export default class GraphQlQueryAstFactory {
 			fields,
 			getArgumentValues(field, node, info.variableValues),
 			(field as any).meta || {},
-			path
+			path,
 		)
 	}
 
@@ -93,7 +93,7 @@ export default class GraphQlQueryAstFactory {
 		parentType: GraphQLObjectType,
 		selectionSet: SelectionSetNode,
 		path: string[],
-		filter: NodeFilter
+		filter: NodeFilter,
 	): (FieldNode | ObjectNode)[] {
 		const fields: (FieldNode | ObjectNode)[] = []
 		for (let subNode of selectionSet.selections) {
@@ -118,8 +118,8 @@ export default class GraphQlQueryAstFactory {
 						subField as GraphQLObjectType,
 						fragmentDefinition.selectionSet,
 						path,
-						filter
-					)
+						filter,
+					),
 				)
 			} else {
 				throw new Error('FragmentSpread and InlineFragment are not supported yet')

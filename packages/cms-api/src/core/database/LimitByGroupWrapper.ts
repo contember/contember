@@ -8,11 +8,11 @@ class LimitByGroupWrapper {
 		private readonly orderByCallback:
 			| (<Orderable extends QueryBuilder.Orderable<any>>(
 					orderable: Orderable,
-					qb: SelectBuilder<any, any>
+					qb: SelectBuilder<any, any>,
 			  ) => [Orderable, SelectBuilder<any, any>])
 			| undefined,
 		private readonly skip: number | undefined,
-		private readonly limit: number | undefined
+		private readonly limit: number | undefined,
 	) {}
 
 	public async getResult<R>(qb: SelectBuilder<R, any>): Promise<R[]> {
@@ -27,7 +27,7 @@ class LimitByGroupWrapper {
 
 						return window
 					}),
-				'rowNumber_'
+				'rowNumber_',
 			)
 
 			/*
@@ -55,7 +55,7 @@ class LimitByGroupWrapper {
 			const limit = this.limit
 			if (limit !== undefined) {
 				wrapperQb = wrapperQb.where(expr =>
-					expr.compare(['data', 'rowNumber_'], ConditionBuilder.Operator.lte, start + limit)
+					expr.compare(['data', 'rowNumber_'], ConditionBuilder.Operator.lte, start + limit),
 				)
 			}
 

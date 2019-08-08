@@ -11,7 +11,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly mapperAccessor: Accessor<Mapper>,
-		private readonly uniqueWhereExpander: UniqueWhereExpander
+		private readonly uniqueWhereExpander: UniqueWhereExpander,
 	) {}
 
 	process(context: SelectExecutionHandler.Context): void {
@@ -37,13 +37,13 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 
 				return this.mapperAccessor.get().select(targetEntity, newObjectNode, targetRelation.name)
 			},
-			null
+			null,
 		)
 	}
 
 	private getRelationTarget(
 		entity: Model.Entity,
-		relationName: string
+		relationName: string,
 	): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] {
 		return acceptFieldVisitor(this.schema, entity, relationName, {
 			visitColumn: (): never => {
@@ -53,7 +53,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 				entity,
 				relation,
 				targetEntity,
-				targetRelation
+				targetRelation,
 			): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] => {
 				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
 					throw new Error()

@@ -25,7 +25,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 	const queryResponse = await graphqlRequest({
 		endpoint: contentEndpoint,
 		query: queryGql,
-		authorizationToken: accessToken
+		authorizationToken: accessToken,
 	})
 	console.log('Query count: ' + queryResponse.extensions.dbQueries.length)
 
@@ -36,9 +36,9 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 				graphqlRequest({
 					endpoint: contentEndpoint,
 					query: queryGql,
-					authorizationToken: accessToken
-				})
-			)
+					authorizationToken: accessToken,
+				}),
+			),
 		)
 	}
 	console.log('Warmup done')
@@ -52,8 +52,8 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 			...createHttpOptions({
 				endpoint: contentEndpoint,
 				query: queryGql,
-				authorizationToken: accessToken
-			})
+				authorizationToken: accessToken,
+			}),
 		})
 
 		autocannon.track(instance, { renderProgressBar: false })
@@ -63,7 +63,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 					__dirname,
 					'/../../results/',
 					testName,
-					'test' + String(connections).padStart(2, '0') + '.json'
+					'test' + String(connections).padStart(2, '0') + '.json',
 				)
 				await fileWrite(filename, JSON.stringify(result), { encoding: 'utf8' })
 			}

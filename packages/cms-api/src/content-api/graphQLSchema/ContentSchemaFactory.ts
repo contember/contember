@@ -54,7 +54,7 @@ export class ContentSchemaFactory {
 		}
 
 		const processedRules = rules.map(
-			(it): ContentSchema._Rule => ({ message: it.message, validator: processValidator(it.validator) })
+			(it): ContentSchema._Rule => ({ message: it.message, validator: processValidator(it.validator) }),
 		)
 		return {
 			name: fieldName,
@@ -73,7 +73,7 @@ export class ContentSchemaFactory {
 						entities: Object.values(this.schema.model.entities).map(entity => ({
 							name: entity.name,
 							fields: Object.values(entity.fields).map(
-								(field): ContentSchema._Field => this.createFieldSchema(entity.name, field.name)
+								(field): ContentSchema._Field => this.createFieldSchema(entity.name, field.name),
 							),
 						})),
 					}),

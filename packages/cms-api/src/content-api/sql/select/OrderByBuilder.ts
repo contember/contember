@@ -14,11 +14,11 @@ class OrderByBuilder {
 		orderable: Orderable,
 		entity: Model.Entity,
 		path: Path,
-		orderBy: Input.OrderBy[]
+		orderBy: Input.OrderBy[],
 	): [SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable] {
 		return orderBy.reduce<[SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable]>(
 			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy),
-			[qb, orderable]
+			[qb, orderable],
 		)
 	}
 
@@ -27,7 +27,7 @@ class OrderByBuilder {
 		orderable: Orderable,
 		entity: Model.Entity,
 		path: Path,
-		orderBy: Input.FieldOrderBy
+		orderBy: Input.FieldOrderBy,
 	): [SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {

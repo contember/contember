@@ -16,7 +16,7 @@ export default class SystemApiTester {
 		private readonly db: Client,
 		private readonly systemSchema: GraphQLSchema,
 		private readonly systemContainer: SystemContainer,
-		private readonly systemExecutionContainer: SystemExecutionContainer
+		private readonly systemExecutionContainer: SystemExecutionContainer,
 	) {}
 
 	public async querySystem(
@@ -26,7 +26,7 @@ export default class SystemApiTester {
 			identity?: Identity
 			roles?: string[]
 			projectRoles?: string[]
-		} = {}
+		} = {},
 	): Promise<any> {
 		await setupSystemVariables(this.db, unnamedIdentity)
 		const context: ResolverContext = new ResolverContext(
@@ -37,7 +37,7 @@ export default class SystemApiTester {
 			{},
 			this.systemContainer.authorizator,
 			this.systemExecutionContainer,
-			() => null
+			() => null,
 		)
 
 		return await graphql(this.systemSchema, gql, null, context, variables)
@@ -60,7 +60,7 @@ export default class SystemApiTester {
           }
         }
       }`,
-			{ baseStage, headStage }
+			{ baseStage, headStage },
 		)
 
 		if (!result.data.diff.ok) {
@@ -86,7 +86,7 @@ export default class SystemApiTester {
 			{
 				headStage,
 				baseStage,
-			}
+			},
 		)
 		if (!diff.data.diff.ok) {
 			throw diff.data.diff.errors
@@ -106,7 +106,7 @@ export default class SystemApiTester {
 			headStageObj!,
 			(diff.data.diff.result.events as any[])
 				.slice(0, eventsCount || diff.data.diff.result.events.length)
-				.map(it => it.id)
+				.map(it => it.id),
 		)
 	}
 }

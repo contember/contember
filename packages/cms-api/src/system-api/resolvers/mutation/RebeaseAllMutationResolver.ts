@@ -10,7 +10,7 @@ export default class RebeaseAllMutationResolver implements MutationResolver<'reb
 		parent: any,
 		args: any,
 		context: ResolverContext,
-		info: GraphQLResolveInfo
+		info: GraphQLResolveInfo,
 	): Promise<RebaseAllResponse> {
 		await context.requireAccess(new AuthorizationScope.Global(), Actions.PROJECT_REBASE_ALL)
 

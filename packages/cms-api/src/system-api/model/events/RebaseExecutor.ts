@@ -16,7 +16,7 @@ class RebaseExecutor {
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
-		private readonly stageTree: StageTree
+		private readonly stageTree: StageTree,
 	) {}
 
 	public async rebaseAll() {
@@ -32,7 +32,7 @@ class RebaseExecutor {
 		stage: StageWithoutEvent,
 		base: StageWithoutEvent,
 		prevEventsToApply: AnyEvent[] = [],
-		newBase?: string
+		newBase?: string,
 	) {
 		const eventsInfo = eventsInfoMatrix[base.id][stage.id]
 		let newHead: string = eventsInfo.stageBEventId
@@ -69,7 +69,7 @@ class RebaseExecutor {
 				eventsInfo.stageBEventId,
 				eventsInfo.commonEventId,
 				newBase || eventsInfo.stageAEventId,
-				[]
+				[],
 			)
 		}
 

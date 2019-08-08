@@ -14,8 +14,8 @@ describe('update with db', () => {
 						r
 							.target('Site')
 							.inversedBy('contactPage')
-							.notNull()
-					)
+							.notNull(),
+					),
 				)
 				.buildSchema()
 

@@ -11,8 +11,8 @@ class Loader {
 	constructor(
 		private readonly adapters: { [extensions: string]: Loader.Adapter } = {
 			yaml: new YamlAdapter(),
-			json: new JsonAdapter()
-		}
+			json: new JsonAdapter(),
+		},
 	) {}
 
 	public async load(filename: string, parameters: any = {}): Promise<any> {
@@ -43,7 +43,7 @@ class Loader {
 			return data
 		}
 		const { _include, ...rest } = (await Promise.all(
-			Object.entries(data).map(async ([key, value]) => [key, await this.includeConfigs(value, baseDir, parameters)])
+			Object.entries(data).map(async ([key, value]) => [key, await this.includeConfigs(value, baseDir, parameters)]),
 		)).reduce<any>((acc, [key, value]) => ({ ...acc, [key]: value }), {})
 
 		if (!_include) {
@@ -60,9 +60,9 @@ class Loader {
 						throw new Loader.InvalidConfigError(`Only object configs can be included`)
 					}
 					return nestedConfig
-				})
+				}),
 			)),
-			rest
+			rest,
 		)
 	}
 

@@ -19,14 +19,14 @@ class ReleaseExecutor {
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
 		private readonly stageTree: StageTree,
-		private readonly db: Client
+		private readonly db: Client,
 	) {}
 
 	public async execute(
 		permissionContext: PermissionsVerifier.Context,
 		targetStage: Stage,
 		sourceStage: Stage,
-		eventsToApply: string[]
+		eventsToApply: string[],
 	): Promise<void> {
 		if (eventsToApply.length === 0) {
 			return
@@ -67,7 +67,7 @@ class ReleaseExecutor {
 			rebasedStage.event_id,
 			oldBase,
 			newBase,
-			droppedEvents
+			droppedEvents,
 		)
 		for (const child of this.stageTree.getChildren(rebasedStage)) {
 			const childWithEvent = await this.queryHandler.fetch(new StageByIdQuery(child.id))

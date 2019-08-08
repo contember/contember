@@ -4,7 +4,7 @@ export default class Literal {
 	constructor(
 		public readonly sql: string,
 		public readonly parameters: any[] = [],
-		public readonly meta: Record<string, any> = {}
+		public readonly meta: Record<string, any> = {},
 	) {}
 
 	public append(literal: Literal) {

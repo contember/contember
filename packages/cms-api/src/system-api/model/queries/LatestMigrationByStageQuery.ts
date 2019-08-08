@@ -24,7 +24,7 @@ class LatestMigrationByStageQuery extends DbQuery<LatestMigrationByStageQuery.Re
 			WHERE type = 'run_migration'
 			LIMIT 1
 		`,
-			[this.stageId]
+			[this.stageId],
 		)).rows
 
 		return this.fetchOneOrNull(rows)

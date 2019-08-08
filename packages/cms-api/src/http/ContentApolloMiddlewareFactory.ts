@@ -17,11 +17,11 @@ class ContentApolloMiddlewareFactory {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly graphqlSchemaFactory: GraphQlSchemaFactory,
 		private readonly apolloServerFactory: ContentApolloServerFactory,
-		private readonly currentSchema: Schema
+		private readonly currentSchema: Schema,
 	) {}
 
 	create(
-		stage: Project.Stage
+		stage: Project.Stage,
 	): KoaMiddleware<
 		AuthMiddlewareFactory.KoaState &
 			ProjectMemberMiddlewareFactory.KoaState &

@@ -51,40 +51,40 @@ class ExecutionContainerFactory {
 			.addService('variableInjector', () => new VariableInjector(this.schema.model, context.identityVariables))
 			.addService(
 				'predicateFactory',
-				({ variableInjector }) => new PredicateFactory(this.permissions, variableInjector)
+				({ variableInjector }) => new PredicateFactory(this.permissions, variableInjector),
 			)
 			.addService(
 				'predicatesInjector',
-				({ predicateFactory }) => new PredicatesInjector(this.schema.model, predicateFactory)
+				({ predicateFactory }) => new PredicatesInjector(this.schema.model, predicateFactory),
 			)
 			.addService('joinBuilder', () => new JoinBuilder(this.schema.model))
 			.addService('conditionBuilder', () => new ConditionBuilder())
 			.addService(
 				'whereBuilder',
 				({ joinBuilder, conditionBuilder, db }) =>
-					new WhereBuilder(this.schema.model, joinBuilder, conditionBuilder, db)
+					new WhereBuilder(this.schema.model, joinBuilder, conditionBuilder, db),
 			)
 			.addService('orderByBuilder', ({ joinBuilder }) => new OrderByBuilder(this.schema.model, joinBuilder))
 			.addService(
 				'junctionFetcher',
 				({ whereBuilder, orderByBuilder, predicatesInjector, db }) =>
-					new JunctionFetcher(db, whereBuilder, orderByBuilder, predicatesInjector)
+					new JunctionFetcher(db, whereBuilder, orderByBuilder, predicatesInjector),
 			)
 			.addService('mapperAccessor', () => new Accessor<Mapper>())
 			.addService(
 				'fieldsVisitorFactory',
 				({ junctionFetcher, mapperAccessor, predicateFactory, whereBuilder }) =>
-					new FieldsVisitorFactory(this.schema.model, junctionFetcher, mapperAccessor, predicateFactory, whereBuilder)
+					new FieldsVisitorFactory(this.schema.model, junctionFetcher, mapperAccessor, predicateFactory, whereBuilder),
 			)
 			.addService(
 				'metaHandler',
-				({ whereBuilder, predicateFactory }) => new MetaHandler(whereBuilder, predicateFactory)
+				({ whereBuilder, predicateFactory }) => new MetaHandler(whereBuilder, predicateFactory),
 			)
 			.addService('uniqueWhereExpander', () => new UniqueWhereExpander(this.schema.model))
 			.addService(
 				'hasManyToHasOneReducer',
 				({ mapperAccessor, uniqueWhereExpander }) =>
-					new HasManyToHasOneReducerExecutionHandler(this.schema.model, mapperAccessor, uniqueWhereExpander)
+					new HasManyToHasOneReducerExecutionHandler(this.schema.model, mapperAccessor, uniqueWhereExpander),
 			)
 			.addService('selectHandlers', ({ hasManyToHasOneReducer }) => ({
 				[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,
@@ -110,18 +110,18 @@ class ExecutionContainerFactory {
 								qb,
 								hydrator,
 								fieldsVisitorFactory,
-								selectHandlers
+								selectHandlers,
 							)
 						}
-					})()
+					})(),
 			)
 			.addService(
 				'insertBuilderFactory',
-				({ whereBuilder, db }) => new InsertBuilderFactory(this.schema.model, whereBuilder, db)
+				({ whereBuilder, db }) => new InsertBuilderFactory(this.schema.model, whereBuilder, db),
 			)
 			.addService(
 				'updateBuilderFactory',
-				({ whereBuilder, db }) => new UpdateBuilderFactory(this.schema.model, whereBuilder, db)
+				({ whereBuilder, db }) => new UpdateBuilderFactory(this.schema.model, whereBuilder, db),
 			)
 
 			.addService('connectJunctionHandler', ({ db }) => new JunctionTableManager.JunctionConnectHandler(db))
@@ -135,8 +135,8 @@ class ExecutionContainerFactory {
 						uniqueWhereExpander,
 						whereBuilder,
 						connectJunctionHandler,
-						disconnectJunctionHandler
-					)
+						disconnectJunctionHandler,
+					),
 			)
 			.addService(
 				'deleteExecutor',
@@ -147,8 +147,8 @@ class ExecutionContainerFactory {
 						uniqueWhereExpander,
 						predicateFactory,
 						whereBuilder,
-						updateBuilderFactory
-					)
+						updateBuilderFactory,
+					),
 			)
 
 			.addService(
@@ -177,12 +177,12 @@ class ExecutionContainerFactory {
 						uniqueWhereExpander,
 						whereBuilder,
 						junctionTableManager,
-						deleteExecutor
+						deleteExecutor,
 					)
 					mapperAccessor.set(mapper)
 
 					return mapper
-				}
+				},
 			)
 
 			.addService('readResolver', ({ mapper, uniqueWhereExpander }) => new ReadResolver(mapper, uniqueWhereExpander))
@@ -191,13 +191,13 @@ class ExecutionContainerFactory {
 			.addService(
 				'dataSelector',
 				({ validationQueryAstFactory, mapper }) =>
-					new ValidationDataSelector(this.schema.model, validationQueryAstFactory, mapper)
+					new ValidationDataSelector(this.schema.model, validationQueryAstFactory, mapper),
 			)
 			.addService('dependencyPruner', () => new DependencyPruner(this.schema.model))
 			.addService(
 				'validationContextFactory',
 				({ dataSelector, dependencyPruner }) =>
-					new ValidationContextFactory(this.schema.model, dataSelector, dependencyPruner)
+					new ValidationContextFactory(this.schema.model, dataSelector, dependencyPruner),
 			)
 			.addService(
 				'inputValidator',
@@ -207,13 +207,13 @@ class ExecutionContainerFactory {
 						this.schema.model,
 						validationDependencyCollector,
 						validationContextFactory,
-						dataSelector
-					)
+						dataSelector,
+					),
 			)
 			.addService(
 				'mutationResolver',
 				({ mapper, uniqueWhereExpander, inputValidator }) =>
-					new MutationResolver(mapper, uniqueWhereExpander, inputValidator)
+					new MutationResolver(mapper, uniqueWhereExpander, inputValidator),
 			)
 			.addService('validationResolver', ({ inputValidator }) => new ValidationResolver(inputValidator))
 

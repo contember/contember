@@ -19,21 +19,21 @@ class JunctionTableManager {
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly connectJunctionHandler: JunctionTableManager.JunctionConnectHandler,
-		private readonly disconnectJunctionHandler: JunctionTableManager.JunctionDisconnectHandler
+		private readonly disconnectJunctionHandler: JunctionTableManager.JunctionDisconnectHandler,
 	) {}
 
 	public async connectJunction(
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
-		inversedUnique: Input.UniqueWhere
+		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
 		await this.executeJunctionModification(
 			owningEntity,
 			relation,
 			ownerUnique,
 			inversedUnique,
-			this.connectJunctionHandler
+			this.connectJunctionHandler,
 		)
 	}
 
@@ -41,14 +41,14 @@ class JunctionTableManager {
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
-		inversedUnique: Input.UniqueWhere
+		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
 		await this.executeJunctionModification(
 			owningEntity,
 			relation,
 			ownerUnique,
 			inversedUnique,
-			this.disconnectJunctionHandler
+			this.disconnectJunctionHandler,
 		)
 	}
 
@@ -57,7 +57,7 @@ class JunctionTableManager {
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere,
-		handler: JunctionTableManager.JunctionHandler
+		handler: JunctionTableManager.JunctionHandler,
 	): Promise<void> {
 		const joiningTable = relation.joiningTable
 		const inversedEntity = getEntity(this.schema, relation.target)
@@ -89,7 +89,7 @@ class JunctionTableManager {
 					.select(expr => expr.select(['owning', owningEntity.primaryColumn]), joiningTable.joiningColumn.columnName)
 					.select(
 						expr => expr.select(['inversed', inversedEntity.primaryColumn]),
-						joiningTable.inverseJoiningColumn.columnName
+						joiningTable.inverseJoiningColumn.columnName,
 					)
 					.select(expr => expr.raw('true'), 'selected')
 					.from(new Literal('(values (null))'), 't')
@@ -111,7 +111,7 @@ namespace JunctionTableManager {
 		executeSimple(
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
-			inversedPrimary: Input.PrimaryValue
+			inversedPrimary: Input.PrimaryValue,
 		): Promise<void>
 
 		executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void>
@@ -123,7 +123,7 @@ namespace JunctionTableManager {
 		async executeSimple(
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
-			inversedPrimary: Input.PrimaryValue
+			inversedPrimary: Input.PrimaryValue,
 		): Promise<void> {
 			await this.db
 				.insertBuilder()
@@ -175,14 +175,14 @@ namespace JunctionTableManager {
 		public async executeSimple(
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
-			inversedPrimary: Input.PrimaryValue
+			inversedPrimary: Input.PrimaryValue,
 		): Promise<void> {
 			const qb = this.db
 				.deleteBuilder()
 				.from(joiningTable.tableName)
 				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, ConditionBuilder.Operator.eq, ownerPrimary))
 				.where(cond =>
-					cond.compare(joiningTable.inverseJoiningColumn.columnName, ConditionBuilder.Operator.eq, inversedPrimary)
+					cond.compare(joiningTable.inverseJoiningColumn.columnName, ConditionBuilder.Operator.eq, inversedPrimary),
 				)
 
 			await qb.execute()
@@ -197,12 +197,12 @@ namespace JunctionTableManager {
 					cond.compareColumns(
 						[joiningTable.tableName, joiningTable.joiningColumn.columnName],
 						ConditionBuilder.Operator.eq,
-						['data', joiningTable.joiningColumn.columnName]
+						['data', joiningTable.joiningColumn.columnName],
 					)
 					cond.compareColumns(
 						[joiningTable.tableName, joiningTable.inverseJoiningColumn.columnName],
 						ConditionBuilder.Operator.eq,
-						['data', joiningTable.inverseJoiningColumn.columnName]
+						['data', joiningTable.inverseJoiningColumn.columnName],
 					)
 				})
 				.withCteAliases(['data'])

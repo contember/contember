@@ -51,7 +51,7 @@ namespace SystemExecutionContainer {
 			private readonly migrationFilesManager: MigrationFilesManager,
 			private readonly authorizator: Authorizator,
 			private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
-			private readonly modificationHandlerFactory: ModificationHandlerFactory
+			private readonly modificationHandlerFactory: ModificationHandlerFactory,
 		) {}
 
 		public create(db: Client): SystemExecutionContainer {
@@ -64,7 +64,7 @@ namespace SystemExecutionContainer {
 					'rebaseExecutor',
 					'migrationDiffCreator',
 					'projectIntializer',
-					'migrationSqlDryRunner'
+					'migrationSqlDryRunner',
 				)
 		}
 
@@ -80,18 +80,18 @@ namespace SystemExecutionContainer {
 				.addService('queryHandler', ({ db }) => db.createQueryHandler())
 				.addService(
 					'schemaMigrator',
-					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory)
+					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory),
 				)
 				.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
 				.addService(
 					'schemaVersionBuilder',
 					({ queryHandler, schemaMigrator, migrationsResolver }) =>
-						new SchemaVersionBuilder(queryHandler, migrationsResolver, schemaMigrator)
+						new SchemaVersionBuilder(queryHandler, migrationsResolver, schemaMigrator),
 				)
 				.addService(
 					'migrationExecutor',
 					({ schemaVersionBuilder, modificationHandlerFactory }) =>
-						new MigrationExecutor(modificationHandlerFactory, schemaVersionBuilder)
+						new MigrationExecutor(modificationHandlerFactory, schemaVersionBuilder),
 				)
 
 				.addService('tableReferencingResolver', () => new TableReferencingResolver())
@@ -104,28 +104,29 @@ namespace SystemExecutionContainer {
 							new TransactionDependencyBuilder(),
 							new DeletedRowReferenceDependencyBuilder(schemaVersionBuilder, tableReferencingResolver),
 							new CreatedRowReferenceDependencyBuilder(schemaVersionBuilder, tableReferencingResolver),
-						])
+						]),
 				)
 				.addService(
 					'permissionVerifier',
 					({ schemaVersionBuilder, db, authorizator, permissionsByIdentityFactory }) =>
-						new PermissionsVerifier(this.project, schemaVersionBuilder, db, permissionsByIdentityFactory, authorizator)
+						new PermissionsVerifier(this.project, schemaVersionBuilder, db, permissionsByIdentityFactory, authorizator),
 				)
 				.addService(
 					'diffBuilder',
 					({ dependencyBuilder, queryHandler, permissionVerifier }) =>
-						new DiffBuilder(dependencyBuilder, queryHandler, permissionVerifier)
+						new DiffBuilder(dependencyBuilder, queryHandler, permissionVerifier),
 				)
 				.addService(
 					'eventApplier',
-					({ db, migrationExecutor, migrationsResolver }) => new EventApplier(db, migrationExecutor, migrationsResolver)
+					({ db, migrationExecutor, migrationsResolver }) =>
+						new EventApplier(db, migrationExecutor, migrationsResolver),
 				)
 				.addService('eventsRebaser', ({ db }) => new EventsRebaser(db))
 				.addService('stageTree', () => new StageTree.Factory().create(this.project))
 				.addService(
 					'rebaseExecutor',
 					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree }) =>
-						new RebaseExecutor(queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree)
+						new RebaseExecutor(queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree),
 				)
 				.addService(
 					'releaseExecutor',
@@ -137,23 +138,23 @@ namespace SystemExecutionContainer {
 							eventApplier,
 							eventsRebaser,
 							stageTree,
-							db
-						)
+							db,
+						),
 				)
 				.addService(
 					'migrationDiffCreator',
 					({ schemaDiffer, migrationFilesManager, schemaVersionBuilder }) =>
-						new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer)
+						new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer),
 				)
 				.addService(
 					'projectMigrationInfoResolver',
 					({ queryHandler, migrationsResolver }) =>
-						new ProjectMigrationInfoResolver(this.project, migrationsResolver, queryHandler)
+						new ProjectMigrationInfoResolver(this.project, migrationsResolver, queryHandler),
 				)
 				.addService(
 					'projectMigrator',
 					({ db, stageTree, migrationsResolver, schemaVersionBuilder, modificationHandlerFactory }) =>
-						new ProjectMigrator(db, stageTree, migrationsResolver, modificationHandlerFactory, schemaVersionBuilder)
+						new ProjectMigrator(db, stageTree, migrationsResolver, modificationHandlerFactory, schemaVersionBuilder),
 				)
 				.addService('stageCreator', ({ db, eventApplier }) => new StageCreator(db, eventApplier))
 				.addService(
@@ -166,8 +167,8 @@ namespace SystemExecutionContainer {
 							projectMigrator,
 							rebaseExecutor,
 							projectMigrationInfoResolver,
-							stageCreator
-						)
+							stageCreator,
+						),
 				)
 				.addService(
 					'migrationSqlDryRunner',
@@ -176,8 +177,8 @@ namespace SystemExecutionContainer {
 							this.project,
 							migrationsResolver,
 							modificationHandlerFactory,
-							schemaVersionBuilder
-						)
+							schemaVersionBuilder,
+						),
 				)
 		}
 	}

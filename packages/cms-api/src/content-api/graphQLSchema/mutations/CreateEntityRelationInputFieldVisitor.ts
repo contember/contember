@@ -14,7 +14,7 @@ export default class CreateEntityRelationInputFieldVisitor
 		private readonly schema: Model.Schema,
 		private readonly whereTypeBuilder: WhereTypeProvider,
 		private readonly createEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputProvider.Type.create>>,
-		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor
+		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor,
 	) {}
 
 	public visitColumn(): never {
@@ -25,7 +25,7 @@ export default class CreateEntityRelationInputFieldVisitor
 		entity: Model.Entity,
 		relation: Model.Relation & Model.NullableRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null
+		targetRelation: Model.Relation | null,
 	): GraphQLInputObjectType | undefined {
 		return this.createInputObject(entity, relation, targetEntity, targetRelation, false)
 	}
@@ -34,7 +34,7 @@ export default class CreateEntityRelationInputFieldVisitor
 		entity: Model.Entity,
 		relation: Model.Relation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null
+		targetRelation: Model.Relation | null,
 	): GraphQLInputObjectType | undefined {
 		return this.createInputObject(entity, relation, targetEntity, targetRelation, true)
 	}
@@ -44,7 +44,7 @@ export default class CreateEntityRelationInputFieldVisitor
 		relation: Model.Relation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.Relation | null,
-		withAliasField: boolean
+		withAliasField: boolean,
 	): GraphQLInputObjectType | undefined {
 		const targetName = targetRelation ? targetRelation.name : undefined
 		const fields: GraphQLInputFieldConfigMap = {}
@@ -52,7 +52,7 @@ export default class CreateEntityRelationInputFieldVisitor
 			this.schema,
 			entity,
 			relation.name,
-			this.createEntityRelationAllowedOperationsVisitor
+			this.createEntityRelationAllowedOperationsVisitor,
 		)
 
 		if (allowedOperations.includes(Input.CreateRelationOperation.connect)) {

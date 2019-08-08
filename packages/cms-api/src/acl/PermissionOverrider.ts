@@ -15,7 +15,7 @@ export default class PermissionOverrider {
 
 	private overrideEntityPermissions(
 		original: Acl.EntityPermissions,
-		overrides: Acl.EntityPermissions
+		overrides: Acl.EntityPermissions,
 	): Acl.EntityPermissions {
 		return {
 			predicates: { ...original.predicates, ...overrides.predicates },

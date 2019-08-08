@@ -8,7 +8,7 @@ class PredicateFactory {
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
-		fieldNames: string[]
+		fieldNames: string[],
 	): Input.Where
 	public create(entity: Model.Entity, operation: Acl.Operation, fieldNames?: string[]): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
@@ -51,7 +51,7 @@ class PredicateFactory {
 				const predicateWhere: Input.Where = this.variableInjector.inject(entity, entityPermissions.predicates[name])
 				return [...result, predicateWhere]
 			},
-			[]
+			[],
 		)
 		if (predicatesWhere.length === 0) {
 			return {}
@@ -65,7 +65,7 @@ class PredicateFactory {
 
 	private getRequiredPredicates(
 		fieldNames: string[],
-		fieldPermissions: Acl.FieldPermissions
+		fieldPermissions: Acl.FieldPermissions,
 	): Acl.PredicateReference[] | false {
 		const predicates: Acl.PredicateReference[] = []
 		for (let name of fieldNames) {

@@ -20,7 +20,7 @@ class RemoveUniqueConstraintModification implements Modification<RemoveUniqueCon
 					...entity,
 					unique,
 				}
-			})
+			}),
 		)
 	}
 

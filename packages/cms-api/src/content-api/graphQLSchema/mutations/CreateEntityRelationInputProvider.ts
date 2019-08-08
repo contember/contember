@@ -12,7 +12,7 @@ export default class CreateEntityRelationInputProvider {
 
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly createEntityRelationInputFieldVisitor: CreateEntityRelationInputFieldVisitor
+		private readonly createEntityRelationInputFieldVisitor: CreateEntityRelationInputFieldVisitor,
 	) {}
 
 	public getCreateEntityRelationInput(entityName: string, relationName: string): GraphQLInputObjectType | undefined {
@@ -21,7 +21,7 @@ export default class CreateEntityRelationInputProvider {
 
 	private createCreateEntityRelationInput(
 		entityName: string,
-		relationName: string
+		relationName: string,
 	): GraphQLInputObjectType | undefined {
 		return acceptFieldVisitor(this.schema, entityName, relationName, this.createEntityRelationInputFieldVisitor)
 	}

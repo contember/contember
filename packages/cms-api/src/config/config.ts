@@ -32,21 +32,21 @@ function isObject(input: unknown): input is UnknownObject {
 
 function hasStringProperty<Input extends UnknownObject, Property extends string>(
 	input: Input,
-	property: Property
+	property: Property,
 ): input is Input & { [key in Property]: string } {
 	return typeof input[property] === 'string'
 }
 
 function hasNumberProperty<Input extends UnknownObject, Property extends string>(
 	input: Input,
-	property: Property
+	property: Property,
 ): input is Input & { [key in Property]: number } {
 	return typeof input[property] === 'number'
 }
 
 function hasArrayProperty<Input extends UnknownObject, Property extends string>(
 	input: Input,
-	property: Property
+	property: Property,
 ): input is Input & { [key in Property]: unknown[] } {
 	return Array.isArray(input[property])
 }
@@ -61,7 +61,7 @@ function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredenti
 	if (!hasNumberProperty(json, 'port')) {
 		if (hasStringProperty({ ...json }, 'port')) {
 			console.warn(
-				deprecated(`Property ${path}.port must be a number, but string was found. Use ::number typecast in config.`)
+				deprecated(`Property ${path}.port must be a number, but string was found. Use ::number typecast in config.`),
 			)
 			json.port = Number(json.port)
 		} else {
@@ -175,7 +175,7 @@ function checkServerStructure(json: unknown): Config['server'] {
 	if (!hasNumberProperty(json, 'port')) {
 		if (hasStringProperty({ ...json }, 'port')) {
 			console.warn(
-				deprecated(`Property server.port must be a number, but string was found. Use ::number typecast in config.`)
+				deprecated(`Property server.port must be a number, but string was found. Use ::number typecast in config.`),
 			)
 			json.port = Number(json.port)
 		} else {
@@ -211,8 +211,8 @@ export async function readConfig(...filenames: string[]): Promise<Config> {
 		filenames.map(it =>
 			loader.load(it, {
 				env: process.env,
-			})
-		)
+			}),
+		),
 	)
 	const config = Merger.merge(...configs)
 

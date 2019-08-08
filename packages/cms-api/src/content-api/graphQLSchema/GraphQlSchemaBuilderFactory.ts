@@ -39,7 +39,7 @@ export default class GraphQlSchemaBuilderFactory {
 			schema,
 			authorizator,
 			entityTypeProviderAccessor,
-			whereTypeProvider
+			whereTypeProvider,
 		)
 		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
 
@@ -51,7 +51,7 @@ export default class GraphQlSchemaBuilderFactory {
 			orderByTypeProvider,
 			{
 				[HasManyToHasOneReducer.extensionName]: hasManyToOneReducer,
-			}
+			},
 		)
 		entityTypeProviderAccessor.set(entityTypeProvider)
 
@@ -62,7 +62,7 @@ export default class GraphQlSchemaBuilderFactory {
 			whereTypeProvider,
 			orderByTypeProvider,
 			entityTypeProvider,
-			queryAstFactory
+			queryAstFactory,
 		)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputProvider.Type.create>>()
@@ -71,23 +71,23 @@ export default class GraphQlSchemaBuilderFactory {
 			schema,
 			whereTypeProvider,
 			createEntityInputProviderAccessor,
-			createEntityRelationAllowedOperationsVisitor
+			createEntityRelationAllowedOperationsVisitor,
 		)
 		const createEntityRelationInputProvider = new CreateEntityRelationInputProvider(
 			schema,
-			createEntityRelationInputFieldVisitor
+			createEntityRelationInputFieldVisitor,
 		)
 		const createEntityInputFieldVisitor = new CreateEntityInputFieldVisitor(
 			schema,
 			authorizator,
 			columnTypeResolver,
-			createEntityRelationInputProvider
+			createEntityRelationInputProvider,
 		)
 		const createEntityInputProvider = new EntityInputProvider(
 			EntityInputProvider.Type.create,
 			schema,
 			authorizator,
-			createEntityInputFieldVisitor
+			createEntityInputFieldVisitor,
 		)
 		createEntityInputProviderAccessor.set(createEntityInputProvider)
 
@@ -98,22 +98,22 @@ export default class GraphQlSchemaBuilderFactory {
 			whereTypeProvider,
 			updateEntityInputProviderAccessor,
 			createEntityInputProvider,
-			updateEntityRelationAllowedOperationsVisitor
+			updateEntityRelationAllowedOperationsVisitor,
 		)
 		const updateEntityRelationInputProvider = new UpdateEntityRelationInputProvider(
 			schema,
-			updateEntityRelationInputFieldVisitor
+			updateEntityRelationInputFieldVisitor,
 		)
 		const updateEntityInputFieldVisitor = new UpdateEntityInputFieldVisitor(
 			authorizator,
 			columnTypeResolver,
-			updateEntityRelationInputProvider
+			updateEntityRelationInputProvider,
 		)
 		const updateEntityInputProvider = new EntityInputProvider(
 			EntityInputProvider.Type.update,
 			schema,
 			authorizator,
-			updateEntityInputFieldVisitor
+			updateEntityInputFieldVisitor,
 		)
 		updateEntityInputProviderAccessor.set(updateEntityInputProvider)
 
@@ -124,13 +124,13 @@ export default class GraphQlSchemaBuilderFactory {
 			entityTypeProvider,
 			createEntityInputProvider,
 			updateEntityInputProvider,
-			queryAstFactory
+			queryAstFactory,
 		)
 		const validationQueriesProvider = new ValidationQueriesProvider(
 			schema,
 			whereTypeProvider,
 			createEntityInputProvider,
-			updateEntityInputProvider
+			updateEntityInputProvider,
 		)
 
 		return new GraphQlSchemaBuilder(schema, queryProvider, validationQueriesProvider, mutationProvider, this.s3)

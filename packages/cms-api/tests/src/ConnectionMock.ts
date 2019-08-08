@@ -19,7 +19,7 @@ export const createConnectionMock = (queries: SqlQuery[]): Connection.Transactio
 			sql: string,
 			parameters?: any[],
 			meta?: any,
-			config?: Connection.QueryConfig
+			config?: Connection.QueryConfig,
 		): Promise<Connection.Result<Row>> {
 			if (sql === 'ROLLBACK;') {
 				return null as any
@@ -40,7 +40,7 @@ ${JSON.stringify(parameters)}
 ACTUAL:   ${actualSql}
 EXPECTED: ${expectedSql}
 --- original message ---
-`
+`,
 			)
 			if (expected.parameters) {
 				expect(parameters || []).length(expected.parameters.length)
@@ -61,7 +61,7 @@ EXPECTED: ${expectedSql}
 		}
 
 		async transaction<Result>(
-			trx: (connection: Connection.TransactionLike) => Promise<Result> | Result
+			trx: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		): Promise<Result> {
 			await this.query('BEGIN;')
 			const result = await trx(createConnectionMock(queries))

@@ -24,7 +24,7 @@ class InputValidator {
 		private readonly model: Model.Schema,
 		private readonly dependencyCollector: DependencyCollector,
 		private readonly validationContextFactory: ValidationContextFactory,
-		private readonly validationDataSelector: ValidationDataSelector
+		private readonly validationDataSelector: ValidationDataSelector,
 	) {}
 
 	async hasValidationRulesOnUpdate(entity: Model.Entity, data: Input.UpdateDataInput): Promise<boolean> {
@@ -127,19 +127,19 @@ class InputValidator {
 
 	private async checkRelationHasValidation(
 		entity: Model.Entity,
-		visitor: Model.FieldVisitor<Promise<boolean | boolean[] | undefined>>
+		visitor: Model.FieldVisitor<Promise<boolean | boolean[] | undefined>>,
 	): Promise<boolean> {
 		return (await this.getRelationsWithValidation(entity, visitor)).length > 0
 	}
 
 	private async getRelationsWithValidation(
 		entity: Model.Entity,
-		visitor: Model.FieldVisitor<Promise<boolean | boolean[] | undefined>>
+		visitor: Model.FieldVisitor<Promise<boolean | boolean[] | undefined>>,
 	): Promise<string[]> {
 		const validateRelationsResult = acceptEveryFieldVisitor<Promise<boolean | boolean[] | undefined>>(
 			this.model,
 			entity,
-			visitor
+			visitor,
 		)
 		const relationsWithValidation: string[] = []
 		for (const key in validateRelationsResult) {
@@ -155,7 +155,7 @@ class InputValidator {
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
 		path: ValidationPath = [],
-		overRelation: Model.AnyRelation | null
+		overRelation: Model.AnyRelation | null,
 	): Promise<InputValidator.Result> {
 		if (!(await this.hasValidationRulesOnCreate(entity, data))) {
 			return []
@@ -165,7 +165,7 @@ class InputValidator {
 
 		const relationsWithRules = await this.getRelationsWithValidation(
 			entity,
-			this.createHasValidationOnCreateVisitor(data)
+			this.createHasValidationOnCreateVisitor(data),
 		)
 		const dependencies = this.buildDependencies([...fieldsWithRules, ...relationsWithRules], {
 			...relationsWithRules.reduce((acc, it) => ({ ...acc, [it]: [] }), {}),
@@ -173,7 +173,7 @@ class InputValidator {
 		})
 
 		const context = ValidationContext.createRootContext(
-			await this.validationContextFactory.createForCreate(entity, data, dependencies)
+			await this.validationContextFactory.createForCreate(entity, data, dependencies),
 		)
 
 		const fieldsResult = this.validateFields(fieldsWithRules, entityRules, context, path)
@@ -189,7 +189,7 @@ class InputValidator {
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
-		path: ValidationPath
+		path: ValidationPath,
 	): Promise<InputValidator.Result> {
 		if (!(await this.hasValidationRulesOnUpdate(entity, data))) {
 			return []
@@ -198,7 +198,7 @@ class InputValidator {
 
 		const relationsWithRules = await this.getRelationsWithValidation(
 			entity,
-			this.createHasValidationOnUpdateVisitor(data)
+			this.createHasValidationOnUpdateVisitor(data),
 		)
 
 		const dependencies = this.buildDependencies(Object.keys(data), {
@@ -225,7 +225,7 @@ class InputValidator {
 	private getFieldsWithRules(
 		entity: Model.Entity,
 		fields: string[] | undefined,
-		data: Input.UpdateDataInput | Input.CreateDataInput
+		data: Input.UpdateDataInput | Input.CreateDataInput,
 	): string[] {
 		const entityRules = this.getEntityRules(entity.name, data)
 		const fields2 = fields || Object.keys(this.model.entities[entity.name].fields)
@@ -237,12 +237,12 @@ class InputValidator {
 		fields: string[],
 		entityRules: Validation.EntityRules,
 		context: ValidationContext.NodeContext,
-		path: ValidationPath
+		path: ValidationPath,
 	) {
 		return fields
 			.map(field => tuple(field, entityRules[field]))
 			.map(([field, fieldRules]) =>
-				tuple(field, fieldRules.find(it => !evaluateValidation(context, rules.on(field, it.validator))))
+				tuple(field, fieldRules.find(it => !evaluateValidation(context, rules.on(field, it.validator)))),
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])
 			.map(([field, { message }]) => ({ path: [...path, { field }], message }))
@@ -250,7 +250,7 @@ class InputValidator {
 
 	private async validateRelations(
 		entity: Model.Entity,
-		visitor: Model.FieldVisitor<Promise<InputValidator.Result | InputValidator.Result[] | undefined>>
+		visitor: Model.FieldVisitor<Promise<InputValidator.Result | InputValidator.Result[] | undefined>>,
 	): Promise<InputValidator.FieldResult[]> {
 		const validateRelationsResult = acceptEveryFieldVisitor(this.model, entity, visitor)
 
@@ -271,12 +271,12 @@ class InputValidator {
 
 	private getEntityRules(
 		entityName: string,
-		data: Input.UpdateDataInput | Input.CreateDataInput
+		data: Input.UpdateDataInput | Input.CreateDataInput,
 	): Validation.EntityRules {
 		const definedRules = this.validationSchema[entityName] || {}
 		const fieldsNotNullFlag = acceptEveryFieldVisitor(this.model, entityName, new NotNullFieldsVisitor())
 		const notNullFields = Object.keys(filterObject(fieldsNotNullFlag, (field, val) => val)).filter(
-			field => data[field] === undefined || data[field] === null
+			field => data[field] === undefined || data[field] === null,
 		)
 		return notNullFields.reduce(
 			(entityRules, field) => ({
@@ -286,7 +286,7 @@ class InputValidator {
 					{ validator: rules.defined(), message: { text: 'Field is required' } },
 				],
 			}),
-			definedRules
+			definedRules,
 		)
 	}
 }

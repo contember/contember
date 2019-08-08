@@ -18,7 +18,7 @@ class SelectHydrator {
 		path: Path,
 		parentKeyPath: Path,
 		data: PromiseLike<SelectHydrator.NestedData>,
-		defaultValue: SelectHydrator.NestedDefaultValue
+		defaultValue: SelectHydrator.NestedDefaultValue,
 	) {
 		this.promises.push({ path, parentKeyPath, data, defaultValue })
 	}
@@ -41,7 +41,7 @@ class SelectHydrator {
 
 	public async hydrateAll(
 		rows: SelectHydrator.Rows,
-		indexBy?: string
+		indexBy?: string,
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		await Promise.all(this.promises.map(it => it.data))
 		if (indexBy) {

@@ -10,7 +10,7 @@ export default class UpdateProjectMemberMutationResolver implements MutationReso
 	async updateProjectMember(
 		parent: any,
 		{ projectId, identityId, variables, roles }: MutationUpdateProjectMemberArgs,
-		context: ResolverContext
+		context: ResolverContext,
 	): Promise<UpdateProjectMemberResponse> {
 		await context.requireAccess({
 			scope: new ProjectScope(projectId),
@@ -22,7 +22,7 @@ export default class UpdateProjectMemberMutationResolver implements MutationReso
 			projectId,
 			identityId,
 			roles || undefined,
-			variables || undefined
+			variables || undefined,
 		)
 
 		if (!result.ok) {

@@ -80,9 +80,9 @@ describe('update', () => {
 						r
 							.target('Author')
 							.notNull()
-							.inversedBy('posts')
+							.inversedBy('posts'),
 					)
-					.column('title', c => c.type(Model.ColumnType.String))
+					.column('title', c => c.type(Model.ColumnType.String)),
 			)
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
@@ -450,9 +450,9 @@ describe('update', () => {
 						e
 							.unique(['locale', 'post'])
 							.column('title', c => c.type(Model.ColumnType.String))
-							.column('locale', c => c.type(Model.ColumnType.String))
-					)
-				)
+							.column('locale', c => c.type(Model.ColumnType.String)),
+					),
+				),
 			)
 			.buildSchema()
 
@@ -466,9 +466,9 @@ describe('update', () => {
 							e
 								.unique(['locale', 'post'])
 								.column('title', c => c.type(Model.ColumnType.String))
-								.column('locale', c => c.type(Model.ColumnType.String))
-						)
-				)
+								.column('locale', c => c.type(Model.ColumnType.String)),
+						),
+				),
 			)
 			.buildSchema()
 
@@ -793,8 +793,8 @@ describe('update', () => {
 			entity
 				.column('name', c => c.type(Model.ColumnType.String))
 				.oneHasOne('setting', r =>
-					r.inversedBy('site').target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-				)
+					r.inversedBy('site').target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String))),
+				),
 		)
 		.buildSchema()
 
@@ -1796,7 +1796,7 @@ describe('update', () => {
 		.entity('Post', e =>
 			e
 				.manyHasMany('categories', r => r.target('Category').inversedBy('posts'))
-				.column('title', c => c.type(Model.ColumnType.String))
+				.column('title', c => c.type(Model.ColumnType.String)),
 		)
 		.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 		.buildSchema()
@@ -2021,7 +2021,7 @@ describe('update', () => {
         updatePost(
             by: {id: "${testUuid(2)}"},
             data: {categories: [{upsert: {by: {id: "${testUuid(
-							1
+							1,
 						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           ok
@@ -2068,7 +2068,7 @@ describe('update', () => {
         updatePost(
             by: {id: "${testUuid(2)}"},
             data: {categories: [{upsert: {by: {id: "${testUuid(
-							1
+							1,
 						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           ok
@@ -2593,8 +2593,8 @@ describe('update', () => {
 						e
 							.column('name', c => c.type(Model.ColumnType.String))
 							.manyHasMany('categories', r =>
-								r.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))).inversedBy('posts')
-							)
+								r.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))).inversedBy('posts'),
+							),
 					)
 					.buildSchema(),
 				permissions: {
@@ -2720,7 +2720,7 @@ describe('update', () => {
 
 	const bookSchema = new SchemaBuilder()
 		.entity('Book', entity =>
-			entity.column('name', c => c.type(Model.ColumnType.String)).oneHasMany('tags', r => r.target('Tag'))
+			entity.column('name', c => c.type(Model.ColumnType.String)).oneHasMany('tags', r => r.target('Tag')),
 		)
 		.entity('Tag', e => e.column('label'))
 		.buildSchema()
@@ -2745,7 +2745,7 @@ describe('update', () => {
 			query: GQL`
           mutation {
               updateBook(by: {id: "${testUuid(1)}"}, data: {name: "", tags: [{connect: {id: "${testUuid(
-				2
+				2,
 			)}"}}, {disconnect: {id: "${testUuid(3)}"}}]}) {
                   ok
                   validation {

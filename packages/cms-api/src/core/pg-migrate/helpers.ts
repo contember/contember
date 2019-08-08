@@ -8,7 +8,7 @@ export function createMigrationBuilder(): MigrationBuilder & { getSql: () => str
 		{
 			query: null,
 			select: null,
-		}
+		},
 	)
 }
 

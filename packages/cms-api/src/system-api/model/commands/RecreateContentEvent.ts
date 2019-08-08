@@ -8,7 +8,7 @@ class RecreateContentEvent {
 	constructor(
 		private readonly event: ContentEvent,
 		private readonly previousId: string,
-		private readonly transactionContext: RecreateContentEvent.TransactionContext
+		private readonly transactionContext: RecreateContentEvent.TransactionContext,
 	) {}
 
 	public async execute(db: Client) {

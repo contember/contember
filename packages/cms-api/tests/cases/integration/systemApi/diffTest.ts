@@ -34,7 +34,7 @@ describe('system api - diff', () => {
                   id
               }
           }
-      }`
+      }`,
 		)
 
 		await tester.content.queryContent(
@@ -43,7 +43,7 @@ describe('system api - diff', () => {
           createAuthor(data: {name: "Jack Black"}) {
               ok
           }
-      }`
+      }`,
 		)
 
 		const diff = await tester.system.querySystem(GQL`query {
@@ -92,7 +92,7 @@ describe('system api - diff', () => {
           createAuthor(data: {name: "John Doe"}) {
               ok
           }
-      }`
+      }`,
 		)
 
 		const diff = await tester.system.querySystem(
@@ -113,7 +113,7 @@ describe('system api - diff', () => {
 			{
 				roles: [],
 				projectRoles: ['viewer'],
-			}
+			},
 		)
 
 		expect(diff.data.diff.result.events).length(1)

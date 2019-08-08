@@ -44,13 +44,13 @@ describe('Queries', () => {
 				.entity('Post', entity =>
 					entity
 						.column('title', column => column.type(Model.ColumnType.String))
-						.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post'))
+						.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post')),
 				)
 				.entity('PostLocale', entity =>
 					entity
 						.unique(['locale', 'post'])
 						.column('locale', column => column.type(Model.ColumnType.String))
-						.column('title', column => column.type(Model.ColumnType.String))
+						.column('title', column => column.type(Model.ColumnType.String)),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -118,12 +118,12 @@ describe('Queries', () => {
 		await execute({
 			schema: new SchemaBuilder()
 				.entity('Post', entity =>
-					entity.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post'))
+					entity.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post')),
 				)
 				.entity('PostLocale', entity =>
 					entity
 						.column('locale', column => column.type(Model.ColumnType.String))
-						.column('title', column => column.type(Model.ColumnType.String))
+						.column('title', column => column.type(Model.ColumnType.String)),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -331,7 +331,7 @@ describe('Queries', () => {
 				.entity('Site', entity =>
 					entity
 						.column('name', column => column.type(Model.ColumnType.String))
-						.oneHasOne('setting', relation => relation.target('SiteSetting'))
+						.oneHasOne('setting', relation => relation.target('SiteSetting')),
 				)
 				.entity('SiteSetting', entity => entity.column('url', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -426,7 +426,7 @@ describe('Queries', () => {
 				.entity('Site', entity =>
 					entity
 						.column('name', column => column.type(Model.ColumnType.String))
-						.oneHasOne('setting', relation => relation.target('SiteSetting').inversedBy('site'))
+						.oneHasOne('setting', relation => relation.target('SiteSetting').inversedBy('site')),
 				)
 				.entity('SiteSetting', entity => entity.column('url', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -519,12 +519,12 @@ describe('Queries', () => {
 				.entity('Category', entity =>
 					entity
 						.column('visible', c => c.type(Model.ColumnType.Bool))
-						.oneHasMany('locales', relation => relation.target('CategoryLocale'))
+						.oneHasMany('locales', relation => relation.target('CategoryLocale')),
 				)
 				.entity('CategoryLocale', entity =>
 					entity
 						.column('name', column => column.type(Model.ColumnType.String))
-						.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' }))
+						.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -709,7 +709,7 @@ describe('Queries', () => {
 				.entity('Post', entity =>
 					entity
 						.manyHasMany('categories', relation => relation.target('Category').inversedBy('posts'))
-						.manyHasOne('author', relation => relation.target('Author'))
+						.manyHasOne('author', relation => relation.target('Author')),
 				)
 				.entity('Category', entity => entity)
 				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
@@ -918,7 +918,7 @@ describe('Queries', () => {
 				.entity('Post', entity =>
 					entity
 						.manyHasOne('author', relation => relation.target('Author').inversedBy('posts'))
-						.column('title', column => column.type(Model.ColumnType.String))
+						.column('title', column => column.type(Model.ColumnType.String)),
 				)
 				.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 				.buildSchema(),
@@ -970,8 +970,8 @@ describe('Queries', () => {
 			schema: new SchemaBuilder()
 				.entity('Post', entity =>
 					entity.manyHasMany('categories', relation =>
-						relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-					)
+						relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))),
+					),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -1022,8 +1022,8 @@ describe('Queries', () => {
 			schema: new SchemaBuilder()
 				.entity('Post', entity =>
 					entity.manyHasMany('categories', relation =>
-						relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-					)
+						relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))),
+					),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -1073,12 +1073,12 @@ describe('Queries', () => {
 		await execute({
 			schema: new SchemaBuilder()
 				.entity('Post', entity =>
-					entity.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post'))
+					entity.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post')),
 				)
 				.entity('PostLocale', entity =>
 					entity
 						.column('locale', column => column.type(Model.ColumnType.String))
-						.column('title', column => column.type(Model.ColumnType.String))
+						.column('title', column => column.type(Model.ColumnType.String)),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -1229,10 +1229,10 @@ describe('Queries', () => {
 					entity.manyHasOne('post', r =>
 						r.target('Post', e =>
 							e.manyHasOne('author', r =>
-								r.target('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-							)
-						)
-					)
+								r.target('Author', e => e.column('name', c => c.type(Model.ColumnType.String))),
+							),
+						),
+					),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -1350,8 +1350,8 @@ describe('Queries', () => {
 						.column('title', c => c.type(Model.ColumnType.String))
 						.column('locale', c => c.type(Model.ColumnType.String))
 						.manyHasMany('categories', r =>
-							r.target('Category', e => e.column('title', c => c.type(Model.ColumnType.String))).inversedBy('posts')
-						)
+							r.target('Category', e => e.column('title', c => c.type(Model.ColumnType.String))).inversedBy('posts'),
+						),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -1467,10 +1467,10 @@ describe('Queries', () => {
 								.target('Post', e =>
 									e
 										.column('title', c => c.type(Model.ColumnType.String))
-										.column('locale', c => c.type(Model.ColumnType.String))
+										.column('locale', c => c.type(Model.ColumnType.String)),
 								)
-								.ownedBy('author')
-						)
+								.ownedBy('author'),
+						),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -1690,7 +1690,7 @@ describe('Queries', () => {
 				.entity('Author', e =>
 					e
 						.column('name', c => c.type(Model.ColumnType.String))
-						.oneHasMany('posts', r => r.target('Post', e => e.column('title', c => c.type(Model.ColumnType.String))))
+						.oneHasMany('posts', r => r.target('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))),
 				)
 				.buildSchema(),
 			query: GQL`
@@ -1766,9 +1766,9 @@ describe('Queries', () => {
 								e
 									.unique(['locale', 'post'])
 									.column('locale', c => c.type(Model.ColumnType.String))
-									.column('title', c => c.type(Model.ColumnType.String))
-							)
-						)
+									.column('title', c => c.type(Model.ColumnType.String)),
+							),
+						),
 				)
 				.buildSchema(),
 			query: GQL`				

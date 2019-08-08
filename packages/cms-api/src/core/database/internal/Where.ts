@@ -32,12 +32,12 @@ namespace Where {
 			const valueWhereToLiteral = (where: Where.ValueWhere): Literal =>
 				new Literal('').appendAll(
 					Object.keys(where).map(it => new Literal(wrapIdentifier(it) + ' = ?', [where[it]])),
-					' and '
+					' and ',
 				)
 
 			return new Literal(' where ').appendAll(
 				this.values.map(it => (it instanceof Literal ? it : valueWhereToLiteral(it))),
-				' and '
+				' and ',
 			)
 		}
 

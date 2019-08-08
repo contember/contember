@@ -45,7 +45,7 @@ namespace UpdateInputProcessor {
 		connect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 
 		create(
-			context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }
+			context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string },
 		): Promise<Result>
 
 		update(context: ContextWithInput<Context, UpdateManyInput> & { index: number; alias?: string }): Promise<Result>
@@ -53,7 +53,7 @@ namespace UpdateInputProcessor {
 		upsert(context: ContextWithInput<Context, UpsertManyInput> & { index: number; alias?: string }): Promise<Result>
 
 		disconnect(
-			context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }
+			context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string },
 		): Promise<Result>
 
 		delete(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>

@@ -17,8 +17,8 @@ class UpdateRelationOnDeleteModification implements Modification<UpdateRelationO
 				updateField<Model.AnyRelation & Model.JoiningColumnRelation>(fieldName, field => ({
 					...field,
 					joiningColumn: { ...field.joiningColumn, onDelete },
-				}))
-			)
+				})),
+			),
 		)
 	}
 

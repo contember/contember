@@ -9,7 +9,7 @@ export default class DbQueriesExtension extends GraphQLExtension<{ db: Client }>
 
 	requestDidStart({ context: { db } }: { context: { db: Client } }): void {
 		db.eventManager.on(EventManager.Event.queryEnd, ({ sql, parameters, meta }, { timing }) =>
-			this.queries.push({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta })
+			this.queries.push({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta }),
 		)
 	}
 

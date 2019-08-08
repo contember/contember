@@ -31,7 +31,7 @@ const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], select
 		select: async (
 			entity: Model.Entity,
 			where: Input.UniqueWhere<never>,
-			dependencies: DependencyCollector.Dependencies
+			dependencies: DependencyCollector.Dependencies,
 		) => {
 			const entry = selects.shift()
 			console.log(JSON.stringify({ entity: entity.name, where, dependencies, result: {} }))
@@ -66,7 +66,7 @@ const test = async (test: Test) => {
 	const contextFactory = new ValidationContextFactory(
 		schema.model,
 		createDataSelectorMock(test.primaryValues || [], test.selects || []),
-		new DependencyPruner(schema.model)
+		new DependencyPruner(schema.model),
 	)
 	await withMockedUuid(async () => {
 		if ('createInput' in test) {
@@ -77,7 +77,7 @@ const test = async (test: Test) => {
 				test.entity,
 				test.nodeInput,
 				test.updateInput,
-				test.dependencies
+				test.dependencies,
 			)
 			expect(result).deep.eq(test.result)
 		}

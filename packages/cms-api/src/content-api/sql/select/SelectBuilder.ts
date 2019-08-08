@@ -29,7 +29,7 @@ export default class SelectBuilder {
 		private qb: DbSelectBuilder<DbSelectBuilder.Result, any>,
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
-		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> }
+		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },
 	) {
 		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
 		this.rows = this.createRowsPromise(blocker)
@@ -59,7 +59,7 @@ export default class SelectBuilder {
 					return [orderable, qb]
 				},
 				input.args.offset,
-				input.args.limit
+				input.args.limit,
 			)
 		} else {
 			if (orderBy) {

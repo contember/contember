@@ -9,7 +9,7 @@ export default class DependencyPruner {
 	public pruneDependencies(
 		entity: Model.Entity,
 		dependencies: DependencyCollector.Dependencies,
-		input: Input.UpdateDataInput
+		input: Input.UpdateDataInput,
 	): DependencyCollector.Dependencies {
 		return filterObject(
 			acceptEveryFieldVisitor<DependencyCollector.Dependencies | undefined>(this.model, entity, {
@@ -23,7 +23,7 @@ export default class DependencyPruner {
 					return input[relation.name] === undefined ? dependencies[relation.name] : undefined
 				},
 			}),
-			(key, value) => value !== undefined
+			(key, value) => value !== undefined,
 		)
 	}
 }

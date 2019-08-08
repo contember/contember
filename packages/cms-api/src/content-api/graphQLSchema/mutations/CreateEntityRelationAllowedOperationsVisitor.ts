@@ -16,7 +16,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 	public visitManyHasManyOwner(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		targetEntity: Model.Entity
+		targetEntity: Model.Entity,
 	) {
 		return this.getAllowedOperations(targetEntity, entity, relation)
 	}
@@ -33,7 +33,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 		{},
 		relation: Model.OneHasOneInversedRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation
+		targetRelation: Model.OneHasOneOwnerRelation,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 		if (relation.nullable || targetRelation.nullable) {
@@ -46,7 +46,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null
+		targetRelation: Model.OneHasOneInversedRelation | null,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
 		if (!targetRelation || targetRelation.nullable || relation.nullable) {
@@ -58,7 +58,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 	private getAllowedOperations(
 		targetEntity: Model.Entity,
 		owningEntity: Model.Entity,
-		owningRelation: Model.Relation
+		owningRelation: Model.Relation,
 	): Input.CreateRelationOperation[] {
 		const result: Input.CreateRelationOperation[] = []
 

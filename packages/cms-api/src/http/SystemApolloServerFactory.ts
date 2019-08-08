@@ -18,7 +18,7 @@ class SystemApolloServerFactory {
 	constructor(
 		private readonly resolvers: Resolvers,
 		private readonly authorizator: Authorizator<Identity>,
-		private readonly executionContainerFactory: SystemExecutionContainer.Factory
+		private readonly executionContainerFactory: SystemExecutionContainer.Factory,
 	) {}
 
 	create(): ApolloServer {
@@ -53,7 +53,7 @@ class SystemApolloServerFactory {
 					ctx.state.projectVariables,
 					this.authorizator,
 					this.executionContainerFactory.create(ctx.state.db),
-					ctx.state.planRollback
+					ctx.state.planRollback,
 				)
 			},
 		})

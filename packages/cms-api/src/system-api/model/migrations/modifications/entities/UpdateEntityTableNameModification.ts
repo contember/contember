@@ -17,7 +17,7 @@ class UpdateEntityTableNameModification implements Modification<UpdateEntityTabl
 			updateEntity(this.data.entityName, entity => ({
 				...entity,
 				tableName: this.data.tableName,
-			}))
+			})),
 		)
 	}
 

@@ -15,14 +15,14 @@ it('Filter by has many with additional join', async () => {
 						.target('PersonLocale')
 						.onDelete(Model.OnDelete.cascade)
 						.ownedBy('person')
-						.ownerNotNull()
-				)
+						.ownerNotNull(),
+				),
 			)
 			.entity('PersonLocale', entity =>
 				entity
 					.unique(['locale', 'person'])
 					.manyHasOne('locale', relation => relation.target('Language').notNull())
-					.column('urlSlug')
+					.column('urlSlug'),
 			)
 
 			.buildSchema(),

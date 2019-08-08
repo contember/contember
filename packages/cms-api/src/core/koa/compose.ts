@@ -3,7 +3,7 @@ import Koa from 'koa'
 
 export function compose(
 	middlewares: (KoaMiddleware<any> | Koa.Middleware)[],
-	debug: boolean = false
+	debug: boolean = false,
 ): KoaMiddleware<any> {
 	return async (context, mainNext) => {
 		let next = mainNext

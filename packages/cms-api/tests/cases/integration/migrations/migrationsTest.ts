@@ -18,12 +18,12 @@ const schemaDiffer = new SchemaDiffer(schemaMigrator)
 function testDiffSchemas(
 	originalSchema: Model.Schema,
 	updatedSchema: Model.Schema,
-	expectedDiff: Migration.Modification[]
+	expectedDiff: Migration.Modification[],
 ) {
 	const actual = schemaDiffer.diffSchemas(
 		{ model: originalSchema, acl: emptyAcl, validation: {} },
 		{ model: updatedSchema, acl: emptyAcl, validation: {} },
-		false
+		false,
 	)
 	expect(actual).deep.equals(expectedDiff)
 	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl, validation: {} }, actual)).deep.equals({
@@ -61,7 +61,7 @@ describe('Diff schemas', () => {
 				e
 					.column('name', c => c.type(Model.ColumnType.String))
 					.column('email', c => c.type(Model.ColumnType.String).unique())
-					.column('registeredAt', c => c.type(Model.ColumnType.Date))
+					.column('registeredAt', c => c.type(Model.ColumnType.Date)),
 			)
 			.buildSchema()
 		const diff: Migration.Modification[] = [
@@ -152,7 +152,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
-					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade))
+					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
 			)
 			.buildSchema()
 		const diff: Migration.Modification[] = [
@@ -226,14 +226,14 @@ describe('Diff schemas', () => {
 					r
 						.target('PostLocale')
 						.ownerNotNull()
-						.ownedBy('post')
-				)
+						.ownedBy('post'),
+				),
 			)
 			.entity('PostLocale', e =>
 				e
 					.unique(['post', 'locale'])
 					.column('title', c => c.type(Model.ColumnType.String))
-					.column('locale', c => c.type(Model.ColumnType.String))
+					.column('locale', c => c.type(Model.ColumnType.String)),
 			)
 			.buildSchema()
 		const diff: Migration.Modification[] = [
@@ -431,7 +431,7 @@ describe('Diff schemas', () => {
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('Post', e =>
-				e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category'))
+				e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
 			)
 			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
@@ -514,7 +514,7 @@ describe('Diff schemas', () => {
 			.entity('Site', entity =>
 				entity
 					.column('name', c => c.type(Model.ColumnType.String))
-					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
 			)
 			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
@@ -628,7 +628,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
-					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade))
+					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
 			)
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
@@ -666,7 +666,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
-					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' }))
+					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 			)
 			.enum('postStatus', ['publish', 'draft', 'auto-draft'])
 			.buildSchema()
@@ -707,7 +707,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
-					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' }))
+					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 			)
 			.enum('postStatus', ['publish', 'draft', 'auto-draft'])
 			.buildSchema()
@@ -715,7 +715,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
-					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' }))
+					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 			)
 			.enum('postStatus', ['publish', 'draft', 'auto-draft', "SQL', 'injection"])
 			.buildSchema()
@@ -744,7 +744,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
-					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' }))
+					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 			)
 			.enum('postStatus', ['publish', 'draft', 'auto-draft'])
 			.buildSchema()
@@ -780,14 +780,14 @@ describe('Diff schemas', () => {
 			.entity('Author', e =>
 				e
 					.column('name', c => c.type(Model.ColumnType.String))
-					.column('registeredAt', c => c.type(Model.ColumnType.Date))
+					.column('registeredAt', c => c.type(Model.ColumnType.Date)),
 			)
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('Author', e =>
 				e
 					.column('name', c => c.type(Model.ColumnType.String))
-					.column('registeredAt', c => c.type(Model.ColumnType.DateTime))
+					.column('registeredAt', c => c.type(Model.ColumnType.DateTime)),
 			)
 			.buildSchema()
 		const diff: Migration.Modification[] = [
@@ -869,7 +869,7 @@ describe('Diff schemas', () => {
 			.entity('Post', e =>
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
-					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade))
+					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
 			)
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
@@ -902,20 +902,20 @@ describe('Diff schemas', () => {
 					r
 						.target('PostLocale')
 						.ownerNotNull()
-						.ownedBy('post')
-				)
+						.ownedBy('post'),
+				),
 			)
 			.entity('PostLocale', e =>
 				e
 					.unique(['post', 'locale'])
 					.column('title', c => c.type(Model.ColumnType.String))
-					.column('locale', c => c.type(Model.ColumnType.String))
+					.column('locale', c => c.type(Model.ColumnType.String)),
 			)
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('Post', e => e)
 			.entity('PostLocale', e =>
-				e.column('title', c => c.type(Model.ColumnType.String)).column('locale', c => c.type(Model.ColumnType.String))
+				e.column('title', c => c.type(Model.ColumnType.String)).column('locale', c => c.type(Model.ColumnType.String)),
 			)
 			.buildSchema()
 		const diff: Migration.Modification[] = [
@@ -951,7 +951,7 @@ describe('Diff schemas', () => {
 	describe('drop relation (many has many)', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Post', e =>
-				e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category'))
+				e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
 			)
 			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
@@ -983,7 +983,7 @@ describe('Diff schemas', () => {
 			.entity('Site', entity =>
 				entity
 					.column('name', c => c.type(Model.ColumnType.String))
-					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
 			)
 			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
@@ -1021,13 +1021,13 @@ describe('Diff schemas', () => {
 			.entity('Site', entity =>
 				entity
 					.column('name', c => c.type(Model.ColumnType.String))
-					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site'))
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
 			)
 			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('Site', entity =>
-				entity.column('name', c => c.type(Model.ColumnType.String)).oneHasOne('setting', r => r.target('SiteSetting'))
+				entity.column('name', c => c.type(Model.ColumnType.String)).oneHasOne('setting', r => r.target('SiteSetting')),
 			)
 			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 			.buildSchema()

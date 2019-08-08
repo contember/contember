@@ -3,7 +3,7 @@ export type ValidationPath = ({ field: string } | { index: number; alias?: strin
 export const appendRelationToPath = (
 	path: ValidationPath,
 	relationName: string,
-	index?: { index?: number; alias?: string }
+	index?: { index?: number; alias?: string },
 ): ValidationPath => {
 	const newPath = [...path, { field: relationName }]
 	if (index && index.index !== undefined) {

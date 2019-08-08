@@ -14,7 +14,7 @@ export class ValidationQueriesProvider {
 		private readonly schema: Model.Schema,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
-		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>
+		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
 	) {}
 
 	public getQueries(entityName: string): { [fieldName: string]: FieldConfig<any> } {

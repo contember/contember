@@ -72,7 +72,7 @@ export default class SchemaBuilderInternal {
 			entityName,
 			fieldName,
 			this.fieldOptions[entityName][fieldName].options,
-			this.registerField.bind(this)
+			this.registerField.bind(this),
 		)
 	}
 
@@ -116,7 +116,7 @@ export default class SchemaBuilderInternal {
 	private getPrimaryFieldName(
 		entityOptions: EntityBuilder.EntityOptions,
 		entityName: string,
-		fields: FieldBuilder.Map
+		fields: FieldBuilder.Map,
 	) {
 		let primary: string[] = []
 		if (entityOptions.primary) {
@@ -154,7 +154,7 @@ export default class SchemaBuilderInternal {
 	private createUnique(
 		entityName: string,
 		options: EntityBuilder.EntityOptions,
-		fieldOptions: FieldBuilder.Map
+		fieldOptions: FieldBuilder.Map,
 	): Model.UniqueConstraints {
 		const unique: Model.UniqueConstraints = {}
 		for (const singleUnique of options.unique || []) {

@@ -20,10 +20,10 @@ class ProjectMemberManager {
 		projectId: string,
 		identityId: string,
 		roles: readonly string[],
-		variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[]
+		variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
 		return await this.db.transaction(
-			async trx => await new AddProjectMemberCommand(projectId, identityId, roles, variables).execute(trx)
+			async trx => await new AddProjectMemberCommand(projectId, identityId, roles, variables).execute(trx),
 		)
 	}
 
@@ -31,19 +31,19 @@ class ProjectMemberManager {
 		projectId: string,
 		identityId: string,
 		roles?: readonly string[],
-		variables?: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[]
+		variables?: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
 		return await this.db.transaction(
-			async trx => await new UpdateProjectMemberCommand(projectId, identityId, roles, variables).execute(trx)
+			async trx => await new UpdateProjectMemberCommand(projectId, identityId, roles, variables).execute(trx),
 		)
 	}
 
 	async removeProjectMember(
 		projectId: string,
-		identityId: string
+		identityId: string,
 	): Promise<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
 		return await this.db.transaction(
-			async trx => await new RemoveProjectMemberCommand(projectId, identityId).execute(trx)
+			async trx => await new RemoveProjectMemberCommand(projectId, identityId).execute(trx),
 		)
 	}
 

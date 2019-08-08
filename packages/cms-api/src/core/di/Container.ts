@@ -15,7 +15,7 @@ namespace Container {
 
 		addService<N extends ServiceName, T extends ServiceType>(
 			name: N extends keyof M ? 'Service with this name already exists' : N,
-			factory: ServiceFactory<M, T>
+			factory: ServiceFactory<M, T>,
 		): Builder<M & { [K in N]: T }> {
 			type TypeMapA = M
 			type TypeMapB = { [K in N]: T }
@@ -34,7 +34,7 @@ namespace Container {
 
 		replaceService<N extends ServiceName, T extends { [P in keyof M[N]]: M[N][P] }>(
 			name: N extends keyof M ? N : 'Service with this name does not exist',
-			factory: ServiceFactory<M, T>
+			factory: ServiceFactory<M, T>,
 		): Builder<M> {
 			return new Builder({ ...this.factories, [name]: factory } as ServiceFactoryMap<M>)
 		}

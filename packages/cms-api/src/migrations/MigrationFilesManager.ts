@@ -43,14 +43,14 @@ class MigrationFilesManager {
 				.filter(file => file.endsWith(`.${extension}`))
 				.filter(async file => {
 					return (await lstatFile(`${this.directory}/${file}`)).isFile()
-				})
+				}),
 		)
 		return filteredFiles.sort()
 	}
 
 	public async readFiles(
 		extension: string,
-		predicate?: (version: string) => boolean
+		predicate?: (version: string) => boolean,
 	): Promise<MigrationFilesManager.MigrationFile[]> {
 		let files = await this.listFiles(extension)
 		if (predicate) {

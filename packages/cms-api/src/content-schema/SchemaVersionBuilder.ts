@@ -12,7 +12,7 @@ class SchemaVersionBuilder {
 	constructor(
 		private readonly queryHandler: QueryHandler<DbQueryable>,
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly schemaMigrator: SchemaMigrator
+		private readonly schemaMigrator: SchemaMigrator,
 	) {}
 
 	async buildSchemaForStage(stageId: string): Promise<Schema> {

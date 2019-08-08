@@ -12,9 +12,7 @@ class UpdateEnumModification implements Modification<UpdateEnumModification.Data
 		const joinedValues = this.data.values.map(it => `'${escapeSqlString(it)}'`).join(',')
 		builder.sql(`ALTER DOMAIN "${this.data.enumName}" DROP CONSTRAINT ${this.data.enumName}_check`)
 		builder.sql(
-			`ALTER DOMAIN "${this.data.enumName}" ADD CONSTRAINT ${
-				this.data.enumName
-			}_check CHECK (VALUE IN(${joinedValues}))`,
+			`ALTER DOMAIN "${this.data.enumName}" ADD CONSTRAINT ${this.data.enumName}_check CHECK (VALUE IN(${joinedValues}))`,
 		)
 	}
 

@@ -32,9 +32,7 @@ export const resolvePredicateReference = (
 					const predicate = permissions[targetEntity.name].predicates[value.name]
 					if (!predicate) {
 						throw new Error(
-							`Predicate ${value.name} of entity ${
-								targetEntity.name
-							} not found. Make sure you are defining it in a right order.`,
+							`Predicate ${value.name} of entity ${targetEntity.name} not found. Make sure you are defining it in a right order.`,
 						)
 					}
 					return predicate

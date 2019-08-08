@@ -24,13 +24,12 @@ describe('query language parser', () => {
 				environment,
 			),
 		).eql(
-			<ToOne.AtomicPrimitive field="a" reducedBy={{ a: 123 }} environment={environment}>
+			<ToOne.AtomicPrimitive field="a" reducedBy={{ a: 123 }}>
 				<ToOne.AtomicPrimitive
 					field="fieldVariableName"
 					reducedBy={{ ab: 456, literalColumn: new GraphQlBuilder.Literal('literal') }}
-					environment={environment}
 				>
-					<ToOne.AtomicPrimitive field="x" reducedBy={{ x: 'x' }} environment={environment}>
+					<ToOne.AtomicPrimitive field="x" reducedBy={{ x: 'x' }}>
 						<TextField name="foo" />
 					</ToOne.AtomicPrimitive>
 				</ToOne.AtomicPrimitive>

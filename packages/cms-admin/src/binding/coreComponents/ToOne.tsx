@@ -13,7 +13,7 @@ import { SyntheticChildrenProvider } from './MarkerProvider'
 
 export interface ToOneProps {
 	field: RelativeEntityList
-	children: React.ReactNode
+	children?: React.ReactNode
 }
 
 class ToOne extends React.PureComponent<ToOneProps> {
@@ -37,6 +37,7 @@ namespace ToOne {
 		field: FieldName
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
 		filter?: Filter
+		children?: React.ReactNode
 	}
 
 	export const AtomicPrimitive = Component<AtomicPrimitiveProps>(

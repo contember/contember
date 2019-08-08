@@ -65,24 +65,20 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 		options: Array<[ChoiceField.LiteralValue, ChoiceField.Label]>,
 		environment: Environment,
 	): Array<[GraphQlBuilder.Literal, ChoiceField.Label]> {
-		return options.map(
-			([key, value]): [GraphQlBuilder.Literal, ChoiceField.Label] => [
-				key instanceof VariableLiteral ? VariableInputTransformer.transformVariableLiteral(key, environment) : key,
-				value,
-			],
-		)
+		return options.map(([key, value]): [GraphQlBuilder.Literal, ChoiceField.Label] => [
+			key instanceof VariableLiteral ? VariableInputTransformer.transformVariableLiteral(key, environment) : key,
+			value,
+		])
 	}
 
 	private normalizeScalarStaticOptions(
 		options: Array<[ChoiceField.ScalarValue, ChoiceField.Label]>,
 		environment: Environment,
 	): Array<[Scalar, ChoiceField.Label]> {
-		return options.map(
-			([key, value]): [Scalar, ChoiceField.Label] => [
-				key instanceof VariableScalar ? VariableInputTransformer.transformVariableScalar(key, environment) : key,
-				value,
-			],
-		)
+		return options.map(([key, value]): [Scalar, ChoiceField.Label] => [
+			key instanceof VariableScalar ? VariableInputTransformer.transformVariableScalar(key, environment) : key,
+			value,
+		])
 	}
 
 	private isLiteralStaticMode(

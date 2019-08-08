@@ -62,9 +62,7 @@ export default class Admin extends React.Component<AdminProps> {
 									}
 									if (config.stage in normalizedConfigs[config.project]) {
 										throw new Error(
-											`Duplicate project-stage pair supplied for project '${config.project}' and stage '${
-												config.stage
-											}'`,
+											`Duplicate project-stage pair supplied for project '${config.project}' and stage '${config.stage}'`,
 										)
 									}
 									normalizedConfigs[config.project][config.stage] = {

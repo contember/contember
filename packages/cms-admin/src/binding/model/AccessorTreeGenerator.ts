@@ -157,9 +157,8 @@ class AccessorTreeGenerator {
 					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
 						if (Array.isArray(fieldData) || fieldData instanceof EntityCollectionAccessor) {
 							throw new DataBindingError(
-								`Received a collection of entities for field '${
-									field.fieldName
-								}' where a single entity was expected. ` + `Perhaps you wanted to use a <Repeater />?`,
+								`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
+									`Perhaps you wanted to use a <Repeater />?`,
 							)
 						} else if (
 							!(fieldData instanceof FieldAccessor) &&
@@ -200,9 +199,8 @@ class AccessorTreeGenerator {
 							// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
 							// relation is unlinked, e.g. a Person does not have a linked Nationality.
 							throw new DataBindingError(
-								`Received a referenced entity for field '${
-									field.fieldName
-								}' where a collection of entities was expected.` + `Perhaps you wanted to use a <SingleReference />?`,
+								`Received a referenced entity for field '${field.fieldName}' where a collection of entities was expected.` +
+									`Perhaps you wanted to use a <SingleReference />?`,
 							)
 						} else {
 							throw new DataBindingError(

@@ -15,4 +15,8 @@ export class EntityCollectionAccessor extends Accessor implements Errorable {
 	) {
 		super()
 	}
+
+	findByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
+		return this.entities.find((e) => e != undefined && e.getKey() == key)
+	}
 }

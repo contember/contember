@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Editor, Mark } from 'slate'
 import { Rule } from 'slate-html-serializer'
 import { Plugin } from 'slate-react'
+import { isKeyHotkey } from 'is-hotkey'
 
 type NodeType = 'mark' | 'block'
 
@@ -13,7 +14,13 @@ export interface RichEditorPluginConfig {
 	onToggle: (editor: Editor) => void
 }
 
-export function simpleMarkPlugin(markType: string, htmlTag: string, attrs: string[] = []): Plugin {
+export function simpleMarkPlugin(
+	markType: string,
+	htmlTag: string,
+	attrs: string[] = [],
+	hotkey: string | string[] = [],
+): Plugin {
+	const isHotkey = isKeyHotkey(hotkey)
 	return {
 		renderMark: ({ mark, children, attributes }, editor, next) => {
 			if (mark.type === markType) {
@@ -25,6 +32,28 @@ export function simpleMarkPlugin(markType: string, htmlTag: string, attrs: strin
 			}
 			return next()
 		},
+		onKeyDown: (event_, editor, next) => {
+			const event = event_ as KeyboardEvent
+			if (isHotkey(event)) {
+				// const currentBlockTypes = editor.value.blocks.toArray().map(block => block.type)
+				// const blockDefinitions = currentBlockTypes.map(currentBlock =>
+				// 	this.props.blocks.find(block => block.block === currentBlock)
+				// )
+				// if (blockDefinitions.every(b => typeof b !== 'undefined' && (b.marks || []).includes(markType))) {
+				// TODO: Handle marks available only in some blocks
+				event.preventDefault()
+				editor.toggleMark(markType)
+				// } else {
+				// 	console.warn(
+				// 		`Mark "${markType}" is not available in at least some of following blocks: ${blockDefinitions
+				// 			.map(block => block && block.block)
+				// 			.join(', ')}.`
+				// 	)
+				// }
+			} else {
+				next()
+			}
+		}
 	}
 }
 
@@ -67,13 +96,28 @@ export const simpleMarkToggle = (markType: string): RichEditorPluginConfig['onTo
 	}
 }
 
-export function simpleMarkConfig(markType: string, htmlTags: string | [string, ...string[]]): RichEditorPluginConfig {
+function composeHtmlSerializerRules(a: Rule, b: Rule): Rule {
+	return {
+		serialize: (...args) => (a.serialize && a.serialize(...args)) || (b.serialize && b.serialize(...args)),
+		deserialize: (...args) => (a.deserialize && a.deserialize(...args)) || (b.deserialize && b.deserialize(...args)),
+	}
+}
+
+export function simpleMarkConfig(
+	markType: string,
+	htmlTags: string | [string, ...string[]],
+	alternativeHtmlSerializer: Rule = {},
+	hotkey: string | string[] = []
+): RichEditorPluginConfig {
 	const tags = Array.isArray(htmlTags) ? htmlTags : [htmlTags]
 	return {
 		node: 'mark',
 		type: markType,
-		plugin: simpleMarkPlugin(markType, tags[0]),
-		htmlSerializer: simpleHtmlSerializerRule('mark', markType, tags),
+		plugin: simpleMarkPlugin(markType, tags[0], [], hotkey),
+		htmlSerializer: composeHtmlSerializerRules(
+			simpleHtmlSerializerRule('mark', markType, tags),
+			alternativeHtmlSerializer,
+		),
 		onToggle: simpleMarkToggle(markType),
 	}
 }
@@ -90,7 +134,7 @@ export function createBlockPluginConfig(name: string, tag: string, attrs: string
 			})
 		},
 		plugin: {
-			renderNode({ node, children, attributes }, editor, next) {
+			renderBlock({ node, children, attributes }, editor, next) {
 				if (node.type === name) {
 					return React.createElement(
 						tag,

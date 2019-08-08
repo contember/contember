@@ -23,16 +23,14 @@ function Component<P extends {}>(
 	displayName?: string,
 ) {
 	const augmentedRender: React.NamedExoticComponent<P> & MarkerProvider<P> = React.memo<P>(render)
-	const defaultName = 'UserComponent'
-
 	if (decider === undefined || typeof decider === 'string') {
-		augmentedRender.displayName = decider || defaultName
+		augmentedRender.displayName = decider
 		augmentedRender.generateSyntheticChildren = render
 
 		return augmentedRender as React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
 	}
 
-	augmentedRender.displayName = displayName || defaultName
+	augmentedRender.displayName = displayName
 
 	if (typeof decider === 'function') {
 		augmentedRender.generateSyntheticChildren = decider

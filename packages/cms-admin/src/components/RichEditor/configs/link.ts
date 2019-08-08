@@ -21,7 +21,7 @@ export const LINK: RichEditorPluginConfig = {
 	},
 	htmlSerializer: simpleHtmlSerializerRule('mark', 'link', 'a', ['href']),
 	onToggle: (editor: Editor) => {
-		const hasLinks = editor.value.activeMarks.some(mark => mark !== undefined && mark.type == 'link')
+		const hasLinks = editor.value.activeMarks.some(mark => mark !== undefined && mark.type === 'link')
 
 		if (hasLinks) {
 			editor.removeMark('link')

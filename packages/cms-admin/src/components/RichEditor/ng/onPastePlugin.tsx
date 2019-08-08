@@ -15,7 +15,7 @@ export function createPastePlugin(defs: WithHtmlSerializer[]): Plugins {
 				const transfer = getEventTransfer(event)
 				if (transfer.type !== 'html') return next()
 				const { document } = htmlSerializer.deserialize(((transfer as unknown) as { html: string }).html)
-				const nodes = document.nodes.filter(block => block != undefined && block.text.length > 0).toList()
+				const nodes = document.nodes.filter(block => block !== undefined && block.text.length > 0).toList()
 				editor.insertFragment(Document.create(nodes))
 			},
 		},

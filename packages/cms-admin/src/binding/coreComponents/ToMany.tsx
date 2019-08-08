@@ -46,10 +46,7 @@ namespace ToMany {
 
 	export const AtomicPrimitive = Component<AtomicPrimitiveProps>(
 		props => {
-			const accessor = useEntityCollectionAccessor({
-				field: props.field,
-				filter: props.filter,
-			})
+			const accessor = useEntityCollectionAccessor(props.field, props.filter)
 			if (!accessor) {
 				return null
 			}
@@ -89,10 +86,7 @@ namespace ToMany {
 	}
 
 	export const AccessorRetriever = React.memo((props: AccessorRetrieverProps) => {
-		const accessor = useEntityCollectionAccessor({
-			field: props.field,
-			filter: props.filter,
-		})
+		const accessor = useEntityCollectionAccessor(props.field, props.filter)
 
 		if (accessor) {
 			return <>{props.children(accessor)}</>

@@ -1,4 +1,7 @@
+import { GraphQlBuilder } from 'cms-client'
+import { Input } from 'cms-common'
 import * as React from 'react'
+import { FieldName, Filter } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
 	EntityAccessor,
@@ -9,8 +12,6 @@ import {
 	ReferenceMarker,
 } from '../dao'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
-import { ToMany } from './ToMany'
-import { ToOne } from './ToOne'
 
 export type DataContextValue = undefined | FieldAccessor | EntityAccessor | AccessorTreeRoot | EntityForRemovalAccessor
 
@@ -19,7 +20,11 @@ type _FieldAccessorErrorable = EnforceSubtypeRelation<FieldAccessor, Errorable>
 
 export const DataContext = React.createContext<DataContextValue>(undefined)
 
-export const useEntityAccessor = ({ field, filter, reducedBy }: ToOne.AtomicPrimitiveProps) => {
+export const useEntityAccessor = (
+	field: FieldName,
+	filter?: Filter,
+	reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>,
+) => {
 	const data = React.useContext(DataContext)
 
 	if (!(data instanceof EntityAccessor)) {
@@ -33,7 +38,7 @@ export const useEntityAccessor = ({ field, filter, reducedBy }: ToOne.AtomicPrim
 	return desiredField
 }
 
-export const useEntityCollectionAccessor = ({ field, filter }: ToMany.AtomicPrimitiveProps) => {
+export const useEntityCollectionAccessor = (field: FieldName, filter?: Filter) => {
 	const data = React.useContext(DataContext)
 
 	if (!(data instanceof EntityAccessor)) {

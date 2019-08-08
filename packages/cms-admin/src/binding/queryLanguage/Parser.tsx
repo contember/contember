@@ -556,7 +556,7 @@ class Parser extends ChevrotainParser {
 
 namespace Parser {
 	export namespace AST {
-		export type AtomicToOneProps = ToOne.AtomicPrimitivePublicProps
+		export type AtomicToOneProps = ToOne.AtomicPrimitiveProps
 
 		export type AtomicToManyProps = ToMany.AtomicPrimitiveProps
 

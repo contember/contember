@@ -4,7 +4,7 @@ import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { Component } from '../facade/auxiliary'
 import { QueryLanguage } from '../queryLanguage'
-import { DataContext } from './DataContext'
+import { DataContext, useEntityCollectionAccessor } from './DataContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { SyntheticChildrenProvider } from './MarkerProvider'
@@ -62,19 +62,6 @@ namespace ToMany {
 		},
 		'ToMany.AtomicPrimitive',
 	)
-
-	export const useEntityCollectionAccessor = ({ field, filter }: AtomicPrimitiveProps) => {
-		const data = React.useContext(DataContext)
-
-		if (data instanceof EntityAccessor) {
-			const desiredField = data.data.getField(field, ReferenceMarker.ExpectedCount.PossiblyMany, filter)
-
-			if (desiredField instanceof EntityCollectionAccessor) {
-				return desiredField
-			}
-			return undefined
-		}
-	}
 
 	export interface AccessorRendererProps {
 		accessor: EntityCollectionAccessor

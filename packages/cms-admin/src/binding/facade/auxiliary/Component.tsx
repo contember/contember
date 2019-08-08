@@ -40,7 +40,7 @@ function Component<P extends {}>(
 		return augmentedRender
 	}
 	if (typeof decider === 'object') {
-		for (const provisionName in decider as CompleteMarkerProvider<P>) {
+		for (const provisionName in decider) {
 			const methodName = provisionName as keyof MarkerProvider<P>
 			;(augmentedRender[methodName] as MarkerProvider<P>[typeof methodName]) = decider[methodName]
 		}

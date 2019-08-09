@@ -1,5 +1,5 @@
 import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLScalarType, GraphQLString } from 'graphql'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import { GraphQLDate, GraphQLDateTime, GraphQLUUID } from './customTypes'
 import EnumsProvider from './EnumsProvider'
 

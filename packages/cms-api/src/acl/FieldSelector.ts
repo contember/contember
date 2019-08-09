@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 type Matcher = (schema: Model.Schema, entity: Model.Entity, field: Model.AnyField) => boolean
 

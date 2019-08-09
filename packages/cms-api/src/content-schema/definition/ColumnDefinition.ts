@@ -1,5 +1,5 @@
 import FieldDefinition from './FieldDefinition'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import { Interface } from '../../utils/interfaceType'
 import EnumDefinition from './EnumDefinition'
 

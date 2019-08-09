@@ -1,6 +1,6 @@
 import FieldSelector from './FieldSelector'
 import EntityPermissionsBuilder from './EntityPermissionsBuilder'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import EntitySelector from './EntitySelector'
 import PermissionsBuilder from './PermissionsBuilder'
 

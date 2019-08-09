@@ -1,4 +1,4 @@
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import { expect } from 'chai'
 import { SQL } from '../../../src/tags'
 import 'mocha'

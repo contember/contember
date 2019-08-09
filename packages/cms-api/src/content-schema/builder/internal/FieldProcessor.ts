@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 interface FieldProcessor<O> {
 	process(entityName: string, fieldName: string, options: O, registerField: FieldProcessor.FieldRegistrar): void

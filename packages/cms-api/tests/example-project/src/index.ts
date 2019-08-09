@@ -1,4 +1,4 @@
-import { Schema } from 'cms-common'
+import { Schema } from '@contember/schema'
 import { emptySchema } from '../../../src/content-schema/schemaUtils'
 import * as definitions from './model'
 import { createModel } from '../../../src/content-schema/definition'

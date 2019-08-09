@@ -1,4 +1,4 @@
-import { Model, Schema } from 'cms-common'
+import { Model, Schema } from '@contember/schema'
 
 export type SchemaUpdater = (schema: Schema) => Schema
 type ModelUpdater = (model: Model.Schema) => Model.Schema

@@ -1,4 +1,4 @@
-import { Validation, Value } from 'cms-common'
+import { Validation, Value } from '@contember/schema'
 
 namespace ValidationContext {
 	export type AnyContext = NodeContext | ValueContext | NodeListContext | UndefinedNodeContext

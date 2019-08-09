@@ -5,6 +5,7 @@
 	},
 	"references": [
 		{ "path": "../../cms-api/src" },
+		{ "path": "../../schema/src" },
 		{ "path": "../../cms-common/src" }
 	]
 }

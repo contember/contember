@@ -1,5 +1,5 @@
 import FieldBuilder from './FieldBuilder'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O> {
 	constructor(private readonly options: O) {}

@@ -1,7 +1,7 @@
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import FieldNode from '../graphQlResolver/FieldNode'
 import { acceptFieldVisitor, getEntity } from '../../content-schema/modelUtils'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import DependencyCollector from './DependencyCollector'
 
 class QueryAstFactory {

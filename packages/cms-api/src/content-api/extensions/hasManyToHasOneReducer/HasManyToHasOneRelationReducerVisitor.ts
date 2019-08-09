@@ -1,5 +1,5 @@
 import { GraphQLInputObjectType } from 'graphql'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import EntityTypeProvider from '../../graphQLSchema/EntityTypeProvider'
 import WhereTypeProvider from '../../graphQLSchema/WhereTypeProvider'
 import { acceptFieldVisitor, getUniqueConstraints } from '../../../content-schema/modelUtils'

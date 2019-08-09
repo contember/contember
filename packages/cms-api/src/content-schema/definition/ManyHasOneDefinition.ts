@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import FieldDefinition from './FieldDefinition'
 import { Interface } from '../../utils/interfaceType'
 import { RelationTarget } from './types'

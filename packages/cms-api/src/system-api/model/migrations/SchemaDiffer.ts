@@ -1,4 +1,5 @@
-import { deepCopy, Model, Schema } from 'cms-common'
+import { Model, Schema } from '@contember/schema'
+import { deepCopy } from 'cms-common'
 import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import SchemaMigrator from '../../../content-schema/differ/SchemaMigrator'

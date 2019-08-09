@@ -1,5 +1,5 @@
 import Path from './Path'
-import { Value } from 'cms-common'
+import { Value } from '@contember/schema'
 
 class SelectHydrator {
 	private columns: Path[] = []

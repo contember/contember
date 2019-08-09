@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder'
 import { AddEntityCallback, EntityConfigurator } from './SchemaBuilder'
 

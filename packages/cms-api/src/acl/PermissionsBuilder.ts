@@ -1,4 +1,4 @@
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import AllowAllPermissionFactory from './AllowAllPermissionFactory'
 import PermissionOverrider from './PermissionOverrider'
 import EntitySelector from './EntitySelector'

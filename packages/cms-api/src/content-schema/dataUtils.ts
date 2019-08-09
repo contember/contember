@@ -1,4 +1,4 @@
-import { Input, Model, Value } from 'cms-common'
+import { Input, Model, Value } from '@contember/schema'
 import { uuid } from '../utils/uuid'
 
 export const resolveDefaultValue = (column: Model.AnyColumn, now: Date) => {

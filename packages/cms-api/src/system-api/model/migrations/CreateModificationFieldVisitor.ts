@@ -1,4 +1,5 @@
-import { deepCopy, Model } from 'cms-common'
+import { Model } from '@contember/schema'
+import { deepCopy } from 'cms-common'
 import CreateColumnModification from './modifications/columns/CreateColumnModification'
 import CreateRelationModification from './modifications/relations/CreateRelationModification'
 import CreateRelationInverseSideModification from './modifications/relations/CreateRelationInverseSideModification'

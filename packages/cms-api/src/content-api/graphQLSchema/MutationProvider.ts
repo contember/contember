@@ -9,7 +9,7 @@ import {
 	GraphQLString,
 	GraphQLUnionType,
 } from 'graphql'
-import { Acl, Input, Model } from 'cms-common'
+import { Acl, Input, Model } from '@contember/schema'
 import { getEntity } from '../../content-schema/modelUtils'
 import { Context } from '../types'
 import ColumnTypeResolver from './ColumnTypeResolver'

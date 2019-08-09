@@ -5,7 +5,7 @@ import ManyHasManyBuilder from './ManyHasManyBuilder'
 import OneHasManyBuilder from './OneHasManyBuilder'
 import ManyHasOneBuilder from './ManyHasOneBuilder'
 import { AddEntityCallback } from './SchemaBuilder'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 class EntityBuilder {
 	constructor(

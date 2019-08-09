@@ -1,4 +1,4 @@
-import { Schema } from 'cms-common'
+import { Schema } from '@contember/schema'
 import SchemaMigrator from './differ/SchemaMigrator'
 import QueryHandler from '../core/query/QueryHandler'
 import DbQueryable from '../core/database/DbQueryable'

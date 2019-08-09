@@ -1,6 +1,6 @@
 import 'mocha'
 import { expect } from 'chai'
-import { Input, Model, Value } from 'cms-common'
+import { Input, Model, Value } from '@contember/schema'
 import ValidationContextFactory from '../../../src/content-api/input-validation/ValidationContextFactory'
 import schema from '../../example-project/src'
 import ValidationDataSelector from '../../../src/content-api/input-validation/ValidationDataSelector'

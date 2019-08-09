@@ -1,4 +1,5 @@
-import { Acl, deepCopy, Model, Schema, Validation } from 'cms-common'
+import { Acl, Model, Schema, Validation } from '@contember/schema'
+import { deepCopy } from 'cms-common'
 import { acceptFieldVisitor } from '../../../../content-schema/modelUtils'
 import CreateModificationFieldVisitor from '../CreateModificationFieldVisitor'
 import Migration from '../Migration'

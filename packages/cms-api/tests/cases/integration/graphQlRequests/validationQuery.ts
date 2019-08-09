@@ -3,7 +3,7 @@ import { GQL } from '../../../src/tags'
 import 'mocha'
 import schema from '../../../example-project/src'
 import { testUuid } from '../../../src/testUuid'
-import { Input, Result } from 'cms-common'
+import { Input, Result } from '@contember/schema'
 
 interface CreateTest {
 	entity: string

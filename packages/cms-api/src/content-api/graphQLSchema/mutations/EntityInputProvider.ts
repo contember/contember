@@ -1,7 +1,7 @@
 import { GraphQLBoolean, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType } from 'graphql'
 import { acceptFieldVisitor, getEntity } from '../../../content-schema/modelUtils'
 import { GqlTypeName } from '../utils'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import Authorizator from '../../../acl/Authorizator'
 import singletonFactory from '../../../utils/singletonFactory'
 import { GraphQLInputType } from 'graphql/type/definition'

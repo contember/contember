@@ -1,4 +1,5 @@
-import { assertNever, Validation } from 'cms-common'
+import { Validation } from '@contember/schema'
+import { assertNever } from 'cms-common'
 import { InContextOperation } from './ValidationDefinition'
 
 class DependencyCollector {

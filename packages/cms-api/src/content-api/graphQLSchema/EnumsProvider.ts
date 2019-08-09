@@ -1,6 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 import { GraphQLEnumValueConfigMap } from 'graphql/type/definition'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import singletonFactory from '../../utils/singletonFactory'
 import { capitalizeFirstLetter } from '../../utils/strings'
 

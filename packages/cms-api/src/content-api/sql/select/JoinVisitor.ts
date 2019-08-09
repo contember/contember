@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import Path from './Path'
 
 class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinition[]> {

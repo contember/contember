@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import { acceptFieldVisitor } from '../content-schema/modelUtils'
 
 type Matcher = (schema: Model.Schema, entity: Model.Entity) => boolean

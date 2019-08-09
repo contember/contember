@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 import UniqueWhereExpander from './UniqueWhereExpander'
 import ObjectNode from './ObjectNode'
 import Mapper from '../sql/Mapper'

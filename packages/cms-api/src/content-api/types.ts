@@ -1,4 +1,4 @@
-import { Acl } from 'cms-common'
+import { Acl } from '@contember/schema'
 import Client from '../core/database/Client'
 import ReadResolver from './graphQlResolver/ReadResolver'
 import MutationResolver from './graphQlResolver/MutationResolver'

@@ -1,5 +1,5 @@
 import { MigrationBuilder } from 'node-pg-migrate'
-import { Validation } from 'cms-common'
+import { Validation } from '@contember/schema'
 import { ContentEvent } from '../../../dtos/Event'
 import { SchemaUpdater } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'

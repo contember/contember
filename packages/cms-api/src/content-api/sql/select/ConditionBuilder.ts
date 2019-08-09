@@ -1,4 +1,4 @@
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import SqlConditionBuilder from '../../../core/database/ConditionBuilder'
 import QueryBuilder from '../../../core/database/QueryBuilder'
 

@@ -9,6 +9,9 @@
 		},
 		{
 			"path": "../../cms-server-common/src"
+		},
+		{
+			"path": "../../schema/src"
 		}
 	]
 }

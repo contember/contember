@@ -1,4 +1,4 @@
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import Authorizator from '../../acl/Authorizator'
 
 export class FieldAccessVisitor implements Model.ColumnVisitor<boolean>, Model.RelationVisitor<boolean> {

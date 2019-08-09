@@ -1,6 +1,6 @@
 import Path from './Path'
 import { acceptRelationTypeVisitor, getTargetEntity } from '../../../content-schema/modelUtils'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import JoinVisitor from './JoinVisitor'
 import ConditionBuilder from '../../../core/database/ConditionBuilder'
 import SelectBuilder from '../../../core/database/SelectBuilder'

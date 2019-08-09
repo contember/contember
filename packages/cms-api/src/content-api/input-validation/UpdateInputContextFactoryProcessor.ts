@@ -1,6 +1,6 @@
 import UpdateInputProcessor from '../inputProcessing/UpdateInputProcessor'
 import * as Context from '../inputProcessing/InputContext'
-import { Input, Model, Value } from 'cms-common'
+import { Input, Model, Value } from '@contember/schema'
 import ValidationContextFactory from './ValidationContextFactory'
 import DependencyCollector from './DependencyCollector'
 import ValidationDataSelector from './ValidationDataSelector'

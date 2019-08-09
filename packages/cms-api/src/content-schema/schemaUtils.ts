@@ -1,5 +1,5 @@
 import { emptyModelSchema } from './modelUtils'
-import { Schema } from 'cms-common'
+import { Schema } from '@contember/schema'
 
 export const emptySchema: Schema = {
 	model: emptyModelSchema,

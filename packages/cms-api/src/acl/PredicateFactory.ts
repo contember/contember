@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from 'cms-common'
+import { Acl, Input, Model } from '@contember/schema'
 import VariableInjector from './VariableInjector'
 
 class PredicateFactory {

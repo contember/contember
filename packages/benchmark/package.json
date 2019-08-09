@@ -9,6 +9,7 @@
 		"start": "dotenv -- ./run.sh"
 	},
 	"dependencies": {
+		"@contember/schema": "^0.0.0",
 		"autocannon": "^3.2.1",
 		"autocannon-compare": "^0.4.0",
 		"autocannon-reporter": "0.0.6",

@@ -1,4 +1,4 @@
-import { Acl, Schema } from 'cms-common'
+import { Acl, Schema } from '@contember/schema'
 import { GraphQLSchema } from 'graphql'
 import GraphQlSchemaBuilderFactory from '../content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'

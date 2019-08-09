@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 import SelectExecutionHandler from '../../sql/select/SelectExecutionHandler'
 import { Accessor } from '../../../utils/accessor'
 import Mapper from '../../sql/Mapper'

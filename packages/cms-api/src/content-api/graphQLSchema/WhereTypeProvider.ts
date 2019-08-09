@@ -1,6 +1,6 @@
 import { GraphQLInputObjectType, GraphQLList } from 'graphql'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull } from 'graphql/type/definition'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import { acceptFieldVisitor, getEntity, getUniqueConstraints } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
 import { capitalizeFirstLetter } from '../../utils/strings'

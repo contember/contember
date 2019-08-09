@@ -1,6 +1,6 @@
 import FieldsVisitor from './FieldsVisitor'
 import JunctionFetcher from '../JunctionFetcher'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import Mapper from '../../Mapper'
 import { Accessor } from '../../../../utils/accessor'
 import SelectExecutionHandler from '../SelectExecutionHandler'

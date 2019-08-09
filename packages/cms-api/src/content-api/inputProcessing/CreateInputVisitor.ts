@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 import CreateInputProcessor from './CreateInputProcessor'
 import { isIt } from '../../utils/type'
 import * as Context from './InputContext'

@@ -1,4 +1,4 @@
-import { Acl } from 'cms-common'
+import { Acl } from '@contember/schema'
 import Authorizator from './Authorizator'
 
 export default class StaticAuthorizator implements Authorizator {

@@ -1,5 +1,5 @@
 import { SchemaBuilder } from '../../../../src'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import { executeDbTest } from '../../../src/testWithDb'
 import { GQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'

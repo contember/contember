@@ -1,5 +1,5 @@
 import { Schema } from '@contember/schema'
-import { InputValidation, SchemaDefinition} from '@contember/schema-definition'
+import { InputValidation, SchemaDefinition } from '@contember/schema-definition'
 import { emptySchema } from '../../../src/content-schema/schemaUtils'
 import * as definitions from './model'
 

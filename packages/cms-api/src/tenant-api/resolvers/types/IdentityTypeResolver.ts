@@ -12,7 +12,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		return await this.queryHandler.fetch(PersonQuery.byIdentity(parent.id))
 	}
 
-	async projects(parent: { id: string }, {}: any, context: ResolverContext) {
+	async projects(parent: { id: string }, {  }: any, context: ResolverContext) {
 		return await this.queryHandler.fetch(new ProjectsByIdentityQuery(context.authorizator, parent.id))
 	}
 }

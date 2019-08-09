@@ -2571,14 +2571,7 @@ describe('update', () => {
 					data: null,
 					errors: [
 						{
-							locations: [
-								{
-									column: 9,
-									line: 2,
-								},
-							],
 							message: 'Mutation failed, operation denied by ACL rules',
-							path: ['updateAuthor'],
 						},
 					],
 				},

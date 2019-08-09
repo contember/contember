@@ -1,4 +1,4 @@
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import { Literal, VariableLiteral, VariableScalar } from './dao'
 
 // TODO These shouldn't just be strings

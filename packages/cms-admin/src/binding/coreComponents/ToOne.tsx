@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import * as React from 'react'
 import { FormErrors } from '../../components/ui/FormErrors'
 import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'

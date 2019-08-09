@@ -1,4 +1,4 @@
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
 import { ReadBuilder } from './ReadBuilder'
 import { WriteArguments, WriteFields, WriteOperation } from './types'

@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import * as React from 'react'
 import { FieldName, RelativeSingleField } from '../bindingTypes'
 import { ConnectionMarker, Environment } from '../dao'

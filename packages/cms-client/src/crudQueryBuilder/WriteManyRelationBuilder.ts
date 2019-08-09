@@ -1,4 +1,4 @@
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import { Literal } from '../graphQlBuilder'
 import { WriteOperation, WriteRelationOps } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'

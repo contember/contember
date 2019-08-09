@@ -4,5 +4,15 @@
 		"outDir": "../dist/src",
 		"esModuleInterop": true
 	},
-	"references": [{ "path": "../../../packages/cms-client/src" }]
+	"references": [
+		{
+			"path": "../../../packages/cms-client/src"
+		},
+		{
+			"path": "../../../packages/cms-common/src"
+		},
+		{
+			"path": "../../../packages/schema/src"
+		}
+	]
 }

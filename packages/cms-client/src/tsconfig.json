@@ -2,5 +2,13 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/src"
-	}
+	},
+	"references": [
+		{
+			"path": "../../schema/src"
+		},
+		{
+			"path": "../../cms-common/src"
+		}
+	]
 }

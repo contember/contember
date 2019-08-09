@@ -1,6 +1,6 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
-import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
+import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import S3 from '../../src/utils/S3'
 import { executeGraphQlTest } from './testGraphql'
 import Client from '../../src/core/database/Client'

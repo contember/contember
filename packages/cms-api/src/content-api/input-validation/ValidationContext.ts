@@ -3,17 +3,6 @@ import { Validation, Value } from '@contember/schema'
 namespace ValidationContext {
 	export type AnyContext = NodeContext | ValueContext | NodeListContext | UndefinedNodeContext
 
-	export type ContextPath = Validation.ContextPath | string | undefined
-	export const parsePath = (path: ContextPath): string[] => {
-		if (!path) {
-			return []
-		}
-		if (typeof path === 'string') {
-			return path.split('.')
-		}
-		return path
-	}
-
 	interface ValidationContext {
 		root: NodeContext
 	}

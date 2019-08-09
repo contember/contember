@@ -1,4 +1,4 @@
-import { getEntity } from '../../content-schema/modelUtils'
+import { getEntity } from '@contember/schema-utils'
 import Path from './select/Path'
 import Mapper from './Mapper'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'

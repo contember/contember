@@ -1,10 +1,9 @@
-import { MigrationBuilder } from 'node-pg-migrate'
 import { Model, Schema } from '@contember/schema'
+import { NamingHelper, acceptRelationTypeVisitor} from '@contember/schema-utils'
+import { MigrationBuilder } from 'node-pg-migrate'
 import { ContentEvent } from '../../../dtos/Event'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { acceptRelationTypeVisitor } from '../../../../../content-schema/modelUtils'
-import SqlNameHelper from '../../../../../content-api/sqlSchema/SqlNameHelper'
 import { createEventTrigger } from '../sqlUpdateUtils'
 
 const getPrimaryType = (entity: Model.Entity): string => {
@@ -26,7 +25,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 						notNull: !relation.nullable,
 					},
 				})
-				const fkName = SqlNameHelper.createForeignKeyName(
+				const fkName = NamingHelper.createForeignKeyName(
 					entity.tableName,
 					relation.joiningColumn.columnName,
 					targetEntity.tableName,
@@ -51,11 +50,11 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 						notNull: !relation.nullable,
 					},
 				})
-				const uniqueConstraintName = SqlNameHelper.createUniqueConstraintName(entity.name, [relation.name])
+				const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
 
 				builder.addConstraint(entity.tableName, uniqueConstraintName, { unique: [relation.joiningColumn.columnName] })
 
-				const fkName = SqlNameHelper.createForeignKeyName(
+				const fkName = NamingHelper.createForeignKeyName(
 					entity.tableName,
 					relation.joiningColumn.columnName,
 					targetEntity.tableName,

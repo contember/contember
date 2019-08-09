@@ -1,11 +1,11 @@
 import { Model, Schema } from '@contember/schema'
+import { acceptFieldVisitor } from '@contember/schema-utils'
+import { isIt } from '@contember/utils'
 import { deepCopy } from 'cms-common'
-import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
 import ImplementationException from '../../../core/exceptions/ImplementationException'
 import SchemaMigrator from '../../../content-schema/differ/SchemaMigrator'
 import ModificationBuilder from './modifications/ModificationBuilder'
 import Migration from './Migration'
-import { isIt } from '../../../utils/type'
 import { createPatch } from 'rfc6902'
 import deepEqual = require('fast-deep-equal')
 

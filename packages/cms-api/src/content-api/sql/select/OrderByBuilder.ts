@@ -2,7 +2,7 @@ import { Input, Model } from '@contember/schema'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import QueryBuilder from '../../../core/database/QueryBuilder'
-import { getColumnName, getTargetEntity } from '../../../content-schema/modelUtils'
+import { getColumnName, getTargetEntity } from '@contember/schema-utils'
 import SelectBuilder from '../../../core/database/SelectBuilder'
 import UserError from '../../../core/graphql/UserError'
 

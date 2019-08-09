@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'
 import { EntityFields } from './EntityFields'

@@ -1,5 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
-import { assertNever, Input } from 'cms-common'
+import { assertNever } from 'cms-common'
+import { Input } from '@contember/schema'
 import { MarkerTreeConstraints, ReferenceMarker } from '../dao'
 
 export class Hashing {

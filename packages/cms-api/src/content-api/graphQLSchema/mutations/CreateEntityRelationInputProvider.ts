@@ -1,4 +1,4 @@
-import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import CreateEntityRelationInputFieldVisitor from './CreateEntityRelationInputFieldVisitor'
 import { GraphQLInputObjectType } from 'graphql'
 import singletonFactory from '../../../utils/singletonFactory'

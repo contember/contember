@@ -1,5 +1,5 @@
+import { tuple } from '@contember/utils'
 import DependencyCollector from './DependencyCollector'
-import { tuple } from '../../utils/tuple'
 
 export default class DependencyMerger {
 	static merge(

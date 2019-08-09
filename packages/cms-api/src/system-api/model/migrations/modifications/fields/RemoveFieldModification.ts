@@ -1,12 +1,11 @@
+import { acceptFieldVisitor, NamingHelper } from '@contember/schema-utils'
+import { isIt } from '@contember/utils'
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '../../../dtos/Event'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { acceptFieldVisitor } from '../../../../../content-schema/modelUtils'
 import { EventType } from '../../../EventType'
-import { isIt } from '../../../../../utils/type'
-import SqlNameHelper from '../../../../../content-api/sqlSchema/SqlNameHelper'
 
 class RemoveFieldModification implements Modification<RemoveFieldModification.Data> {
 	constructor(private readonly data: RemoveFieldModification.Data, private readonly schema: Schema) {}
@@ -21,7 +20,7 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 			},
 			visitOneHasMany: () => {},
 			visitOneHasOneOwner: (entity, relation, {}, _) => {
-				builder.dropConstraint(entity.tableName, SqlNameHelper.createUniqueConstraintName(entity.name, [relation.name]))
+				builder.dropConstraint(entity.tableName, NamingHelper.createUniqueConstraintName(entity.name, [relation.name]))
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasOneInversed: () => {},

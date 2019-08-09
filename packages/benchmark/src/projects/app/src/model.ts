@@ -1,4 +1,4 @@
-import { AllowAllPermissionFactory, SchemaBuilder } from 'cms-api'
+import { AllowAllPermissionFactory, SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model, Schema } from '@contember/schema'
 
 const builder = new SchemaBuilder()

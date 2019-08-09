@@ -1,5 +1,5 @@
 import EntityFieldsProvider from '../EntityFieldsProvider'
-import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import HasManyToHasOneRelationReducerFieldVisitor from './HasManyToHasOneRelationReducerVisitor'
 

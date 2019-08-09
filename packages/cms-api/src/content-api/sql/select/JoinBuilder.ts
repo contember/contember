@@ -1,5 +1,5 @@
 import Path from './Path'
-import { acceptRelationTypeVisitor, getTargetEntity } from '../../../content-schema/modelUtils'
+import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import JoinVisitor from './JoinVisitor'
 import ConditionBuilder from '../../../core/database/ConditionBuilder'

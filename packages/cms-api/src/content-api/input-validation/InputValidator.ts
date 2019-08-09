@@ -1,9 +1,10 @@
+import { acceptEveryFieldVisitor } from '@contember/schema-utils'
+import { tuple } from '@contember/utils'
 import { Input, Model, Validation } from '@contember/schema'
+import { InputValidation } from '@contember/schema-definition'
 import DependencyCollector from './DependencyCollector'
 import DependencyMerger from './DependencyMerger'
-import { acceptEveryFieldVisitor } from '../../content-schema/modelUtils'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
-import { tuple } from '../../utils/tuple'
 import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
 import UpdateInputValidationProcessor from './UpdateInputValidationProcessor'
 import ValidationContextFactory from './ValidationContextFactory'
@@ -13,7 +14,6 @@ import UpdateInputProcessor from '../inputProcessing/UpdateInputProcessor'
 import CreateInputProcessor from '../inputProcessing/CreateInputProcessor'
 import ValidationContext from './ValidationContext'
 import { evaluateValidation } from './ValidationEvaluation'
-import { rules } from './ValidationDefinition'
 import { ValidationPath } from './ValidationPath'
 import NotNullFieldsVisitor from './NotNullFieldsVisitor'
 import { filterObject } from '../../utils/object'
@@ -242,7 +242,7 @@ class InputValidator {
 		return fields
 			.map(field => tuple(field, entityRules[field]))
 			.map(([field, fieldRules]) =>
-				tuple(field, fieldRules.find(it => !evaluateValidation(context, rules.on(field, it.validator)))),
+				tuple(field, fieldRules.find(it => !evaluateValidation(context, InputValidation.rules.on(field, it.validator)))),
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])
 			.map(([field, { message }]) => ({ path: [...path, { field }], message }))
@@ -283,7 +283,7 @@ class InputValidator {
 				...entityRules,
 				[field]: [
 					...(entityRules[field] || []),
-					{ validator: rules.defined(), message: { text: 'Field is required' } },
+					{ validator: InputValidation.rules.defined(), message: { text: 'Field is required' } },
 				],
 			}),
 			definedRules,

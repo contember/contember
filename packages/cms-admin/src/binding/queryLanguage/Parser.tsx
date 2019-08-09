@@ -1,6 +1,6 @@
 import { Lexer, Parser as ChevrotainParser } from 'chevrotain'
 import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import { EntityName, FieldName } from '../bindingTypes'
 import { ToMany, ToOne } from '../coreComponents'
 import { Environment } from '../dao'

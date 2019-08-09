@@ -1,4 +1,5 @@
-import { Input, lcfirst } from 'cms-common'
+import { lcfirst } from 'cms-common'
+import { Input } from '@contember/schema'
 import * as React from 'react'
 import { DataRendererProps, EntityListDataProvider } from '../../binding/coreComponents'
 import { CommonRendererProps, ListRenderer } from '../../binding/facade/renderers'

@@ -1,5 +1,4 @@
-import * as d from '../../../src/content-schema/definition'
-import * as v from '../../../src/content-api/input-validation'
+import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 
 export class Author {
 	@v.required('Author name is required')

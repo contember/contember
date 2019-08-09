@@ -1,13 +1,13 @@
-import { resolveValue } from '../utils'
+import { tuple } from '@contember/utils'
 import { Input, Model, Value } from '@contember/schema'
+import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
+import { resolveValue } from '../utils'
 import Client from '../../../core/database/Client'
-import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '../../../content-schema/modelUtils'
 import QueryBuilder from '../../../core/database/QueryBuilder'
 import { Value as DbValue } from '../../../core/database/types'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import ConditionBuilder from '../../../core/database/ConditionBuilder'
-import { tuple } from '../../../utils/tuple'
 
 type ColumnValue = {
 	value: PromiseLike<Value.AtomicValue | undefined>

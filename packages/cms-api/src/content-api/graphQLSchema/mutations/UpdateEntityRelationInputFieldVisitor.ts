@@ -5,7 +5,7 @@ import WhereTypeProvider from '../WhereTypeProvider'
 import { Accessor } from '../../../utils/accessor'
 import EntityInputProvider from './EntityInputProvider'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql/type/definition'
-import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import UpdateEntityRelationAllowedOperationsVisitor from './UpdateEntityRelationAllowedOperationsVisitor'
 import { filterObject } from '../../../utils/object'
 

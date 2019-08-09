@@ -1,5 +1,5 @@
 import { setupSystemVariables } from '../../src/system-api/SystemVariablesSetupHelper'
-import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
+import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import { formatSchemaName } from '../../src/system-api/model/helpers/stageHelpers'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
 import { Context as ContentContext } from '../../src/content-api/types'

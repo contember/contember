@@ -1,5 +1,5 @@
 import { GraphQLBoolean, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType } from 'graphql'
-import { acceptFieldVisitor, getEntity } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { GqlTypeName } from '../utils'
 import { Acl, Model } from '@contember/schema'
 import Authorizator from '../../../acl/Authorizator'

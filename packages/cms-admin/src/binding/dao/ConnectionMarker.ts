@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from 'cms-client'
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import { FieldName } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'
 

@@ -1,3 +1,4 @@
+import { isIt } from '@contember/utils'
 import {
 	FieldNode as GraphQlFieldNode,
 	FragmentSpreadNode,
@@ -9,7 +10,6 @@ import {
 } from 'graphql'
 import { SelectionSetNode } from 'graphql/language/ast'
 import FieldNode from './FieldNode'
-import { isIt } from '../../utils/type'
 import ObjectNode from './ObjectNode'
 import { getArgumentValues } from 'graphql/execution/values'
 

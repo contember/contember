@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { isIt } from '../../utils/type'
+import { isIt } from '@contember/utils'
 import UpdateInputProcessor from './UpdateInputProcessor'
 import * as Context from './InputContext'
 import { filterObject } from '../../utils/object'

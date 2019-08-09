@@ -1,4 +1,5 @@
-import { Input, isEmptyObject } from 'cms-common'
+import { Input } from '@contember/schema'
+import { isEmptyObject } from 'cms-common'
 import { Literal } from '../graphQlBuilder'
 import { WriteOperation } from './types'
 import { WriteManyRelationBuilder } from './WriteManyRelationBuilder'

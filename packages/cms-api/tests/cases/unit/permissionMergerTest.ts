@@ -2,7 +2,7 @@ import 'mocha'
 import { Acl, Model } from '@contember/schema'
 import { expect } from 'chai'
 import PermissionFactory from '../../../src/acl/PermissionFactory'
-import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
+import { SchemaBuilder } from '@contember/schema-definition'
 
 interface Test {
 	acl: Acl.Schema

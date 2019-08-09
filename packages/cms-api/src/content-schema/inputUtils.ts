@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { getTargetEntity, getUniqueConstraints } from './modelUtils'
+import { getTargetEntity, getUniqueConstraints } from '@contember/schema-utils'
 
 export const isUniqueWhere = (schema: Model.Schema, entity: Model.Entity, where: Input.UniqueWhere): boolean => {
 	if (where[entity.primary] !== undefined) {

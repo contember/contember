@@ -6,7 +6,7 @@ import { Accessor } from '../../../utils/accessor'
 import EntityInputProvider from './EntityInputProvider'
 import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import CreateEntityRelationAllowedOperationsVisitor from './CreateEntityRelationAllowedOperationsVisitor'
-import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 
 export default class CreateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {

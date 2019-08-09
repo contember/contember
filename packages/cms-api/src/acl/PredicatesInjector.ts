@@ -1,6 +1,6 @@
 import { Acl, Input, Model } from '@contember/schema'
 import ObjectNode from '../content-api/graphQlResolver/ObjectNode'
-import { acceptFieldVisitor } from '../content-schema/modelUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import PredicateFactory from './PredicateFactory'
 
 class PredicatesInjector {

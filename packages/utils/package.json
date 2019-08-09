@@ -1,0 +1,13 @@
+{
+	"name": "@contember/utils",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {},
+	"dependencies": {
+	},
+	"devDependencies": {
+		"typescript": "^3.5.2"
+	}
+}

@@ -1,6 +1,6 @@
+import { isIt } from '@contember/utils'
 import { Input, Model } from '@contember/schema'
 import CreateInputProcessor from './CreateInputProcessor'
-import { isIt } from '../../utils/type'
 import * as Context from './InputContext'
 import { filterObject } from '../../utils/object'
 import UserError from '../../core/graphql/UserError'

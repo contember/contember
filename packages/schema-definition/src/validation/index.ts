@@ -188,7 +188,9 @@ export const assertMinLength = (min: number, message: MessageOrString) => fluent
 export const combine = (...decorators: PropertyDecorator[]): PropertyDecorator => (target, propertyKey) =>
 	decorators.forEach(it => it(target, propertyKey))
 
-export function parseDefinition(definitions: Record<string, SchemaDefinition.EnumDefinition | { new (): any }>): Validation.Schema {
+export function parseDefinition(
+	definitions: Record<string, SchemaDefinition.EnumDefinition | { new (): any }>,
+): Validation.Schema {
 	return Object.entries(definitions)
 		.filter((it): it is [string, { new (): any }] => !(it[1] instanceof SchemaDefinition.EnumDefinition))
 		.map(([name, definition]) => {

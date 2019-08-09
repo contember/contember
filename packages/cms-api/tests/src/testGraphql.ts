@@ -1,4 +1,4 @@
-import { expect, AssertionError } from 'chai'
+import { expect } from 'chai'
 import { graphql, GraphQLSchema } from 'graphql'
 import { maskErrors } from 'graphql-errors'
 import { withMockedUuid } from './testUuid'
@@ -14,14 +14,16 @@ export interface Test {
 
 export const executeGraphQlTest = async (test: Test) => {
 	maskErrors(test.schema, error => {
-		console.error(error)
-		return error.message
+		return error
 	})
 
 	await withMockedUuid(() =>
 		withMockedDate(async () => {
 			const response = await graphql(test.schema, test.query, null, test.context, test.queryVariables)
-			// console.log(response)
+			if ('errors' in response) {
+				response.errors = (response.errors as any).map(({ message }: any) => ({ message }))
+			}
+			console.log(response)
 			expect(response).deep.equal(test.return)
 		}),
 	)

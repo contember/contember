@@ -242,7 +242,10 @@ class InputValidator {
 		return fields
 			.map(field => tuple(field, entityRules[field]))
 			.map(([field, fieldRules]) =>
-				tuple(field, fieldRules.find(it => !evaluateValidation(context, InputValidation.rules.on(field, it.validator)))),
+				tuple(
+					field,
+					fieldRules.find(it => !evaluateValidation(context, InputValidation.rules.on(field, it.validator))),
+				),
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])
 			.map(([field, { message }]) => ({ path: [...path, { field }], message }))

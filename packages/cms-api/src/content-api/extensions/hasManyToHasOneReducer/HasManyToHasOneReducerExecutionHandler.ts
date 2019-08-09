@@ -1,10 +1,10 @@
 import { Input, Model } from '@contember/schema'
+import { isIt } from '@contember/utils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import SelectExecutionHandler from '../../sql/select/SelectExecutionHandler'
 import { Accessor } from '../../../utils/accessor'
 import Mapper from '../../sql/Mapper'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
-import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
-import { isIt } from '../../../utils/type'
 import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 
 class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {

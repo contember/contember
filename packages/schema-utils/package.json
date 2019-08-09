@@ -1,0 +1,16 @@
+{
+	"name": "@contember/schema-utils",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {},
+	"dependencies": {
+		"@contember/schema": "^0.0.0",
+		"@contember/utils": "^0.0.0"
+	},
+	"devDependencies": {
+		"@types/node": "^12.7.1",
+		"typescript": "^3.5.2"
+	}
+}

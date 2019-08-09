@@ -6,12 +6,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
 
-import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
+import { SchemaBuilder, AllowAllPermissionFactory, SchemaDefinition } from '@contember/schema-definition'
 import GraphQlSchemaBuilderFactory from '../../../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
-import AllowAllPermissionFactory from '../../../../src/acl/AllowAllPermissionFactory'
 import S3 from '../../../../src/utils/S3'
 import * as model from './model'
-import { createModel } from '../../../../src/content-schema/definition'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -271,7 +269,7 @@ describe('build gql schema from model schema', () => {
 
 	it('builds basic schema with new builder', async () => {
 		await testSchema({
-			schema: () => createModel(model),
+			schema: () => SchemaDefinition.createModel(model),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema9.gql',
 		})

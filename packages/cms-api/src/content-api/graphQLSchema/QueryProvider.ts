@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
-import { getEntity } from '../../content-schema/modelUtils'
+import { getEntity } from '@contember/schema-utils'
 import { Context } from '../types'
 import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'

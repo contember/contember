@@ -1,7 +1,7 @@
 import 'mocha'
 import { expect } from 'chai'
 import VariableInjector from '../../../src/acl/VariableInjector'
-import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
+import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 
 describe('variable injector', () => {

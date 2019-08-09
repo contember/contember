@@ -1,10 +1,9 @@
 import { execute, sqlTransaction } from '../../../src/test'
 import { Model, Validation } from '@contember/schema'
-import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
+import { SchemaBuilder, InputValidation as v } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import 'mocha'
-import * as v from '../../../../src/content-api/input-validation'
 
 describe('update', () => {
 	const selectUpdatePostSql = {

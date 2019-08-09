@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
-import { acceptFieldVisitor, getColumnName } from '../../../content-schema/modelUtils'
+import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import WhereBuilder from './WhereBuilder'

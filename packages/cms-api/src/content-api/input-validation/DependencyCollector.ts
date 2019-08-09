@@ -1,6 +1,6 @@
 import { Validation } from '@contember/schema'
 import { assertNever } from 'cms-common'
-import { InContextOperation } from './ValidationDefinition'
+import { InputValidation } from '@contember/schema-definition'
 
 class DependencyCollector {
 	public collect(validator: Validation.Validator): DependencyCollector.Dependencies {
@@ -24,7 +24,7 @@ class DependencyCollector {
 	}
 
 	private doCollect(validator: Validation.Validator, prefix: string[]): DependencyCollector.DependenciesList {
-		if (validator.operation === InContextOperation) {
+		if (validator.operation === InputValidation.InContextOperation) {
 			const [pathArg, validatorArg] = validator.args
 			const newPrefix = [...prefix, ...pathArg.path]
 			const dependencies = this.doCollect(validatorArg.validator, newPrefix)

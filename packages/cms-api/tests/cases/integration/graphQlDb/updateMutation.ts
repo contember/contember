@@ -1,4 +1,4 @@
-import { SchemaBuilder } from '../../../../src'
+import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { executeDbTest } from '../../../src/testWithDb'
 import { GQL } from '../../../src/tags'

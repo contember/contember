@@ -1,4 +1,4 @@
-import AllowAllPermissionFactory from './AllowAllPermissionFactory'
+import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import PermissionFactory from './PermissionFactory'
 import { arrayEquals } from '../utils/arrays'
 import { Acl, Schema } from '@contember/schema'

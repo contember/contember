@@ -1,7 +1,7 @@
 import 'mocha'
 import { expect } from 'chai'
 import VariableInjector from '../../../src/acl/VariableInjector'
-import SchemaBuilder from '../../../src/content-schema/builder/SchemaBuilder'
+import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import PredicatesInjector from '../../../src/acl/PredicatesInjector'
 import ObjectNode from '../../../src/content-api/graphQlResolver/ObjectNode'

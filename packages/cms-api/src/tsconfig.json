@@ -12,6 +12,15 @@
 		},
 		{
 			"path": "../../schema/src"
+		},
+		{
+			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../schema-definition/src"
+		},
+		{
+			"path": "../../utils/src"
 		}
 	]
 }

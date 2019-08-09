@@ -1,4 +1,4 @@
-import * as d from '../../../../src/content-schema/definition'
+import { SchemaDefinition as d } from '@contember/schema-definition'
 
 export const Locale = d.createEnum('cs', 'en')
 

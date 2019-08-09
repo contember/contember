@@ -3,7 +3,7 @@ import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '../../../dtos/Event'
 import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { acceptFieldVisitor } from '../../../../../content-schema/modelUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 
 class CreateUniqueConstraintModification implements Modification<CreateUniqueConstraintModification.Data> {
 	constructor(private readonly data: CreateUniqueConstraintModification.Data, private readonly schema: Schema) {}

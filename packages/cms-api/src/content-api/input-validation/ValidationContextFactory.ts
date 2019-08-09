@@ -1,6 +1,6 @@
 import DependencyCollector from './DependencyCollector'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
-import { acceptFieldVisitor } from '../../content-schema/modelUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
 import { Input, Model, Value } from '@contember/schema'
 import ValidationDataSelector from './ValidationDataSelector'

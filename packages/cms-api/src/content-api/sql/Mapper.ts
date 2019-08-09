@@ -1,5 +1,5 @@
 import { Acl, Input, Model } from '@contember/schema'
-import { acceptEveryFieldVisitor, getColumnName } from '../../content-schema/modelUtils'
+import { acceptEveryFieldVisitor, getColumnName } from '@contember/schema-utils'
 import SqlCreateInputProcessor from './insert/SqlCreateInputProcessor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'

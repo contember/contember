@@ -1,4 +1,4 @@
-import { emptyModelSchema } from './modelUtils'
+import { emptyModelSchema } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
 
 export const emptySchema: Schema = {

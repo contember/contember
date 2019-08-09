@@ -1,6 +1,6 @@
 import DependencyCollector from './DependencyCollector'
 import { Input, Model } from '@contember/schema'
-import { acceptEveryFieldVisitor } from '../../content-schema/modelUtils'
+import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import { filterObject } from '../../utils/object'
 
 export default class DependencyPruner {

@@ -10,7 +10,7 @@ import {
 	GraphQLUnionType,
 } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
-import { getEntity } from '../../content-schema/modelUtils'
+import { getEntity } from '@contember/schema-utils'
 import { Context } from '../types'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import EntityTypeProvider from './EntityTypeProvider'

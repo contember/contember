@@ -7,8 +7,6 @@
 	"scripts": {
 	},
 	"devDependencies": {
-		"ts-node": "^7.0.0",
-		"tslint": "^5.10.0",
 		"typescript": "^3.5.2"
 	}
 }

@@ -16,7 +16,7 @@ class ErrorHandlerExtension extends GraphQLExtension {
 
 namespace ErrorHandlerExtension {
 	export interface Context {
-		errorHandler: (errors: any[]) => void
+		errorHandler: (errors: readonly any[]) => void
 	}
 }
 export default ErrorHandlerExtension

@@ -1,13 +1,12 @@
 import { Schema } from '@contember/schema'
+import { InputValidation, SchemaDefinition} from '@contember/schema-definition'
 import { emptySchema } from '../../../src/content-schema/schemaUtils'
 import * as definitions from './model'
-import { createModel } from '../../../src/content-schema/definition'
-import { parseDefinition } from '../../../src/content-api/input-validation'
 
-const model = createModel(definitions)
+const model = SchemaDefinition.createModel(definitions)
 const schema: Schema = {
 	...emptySchema,
-	validation: parseDefinition(definitions),
+	validation: InputValidation.parseDefinition(definitions),
 	model,
 }
 

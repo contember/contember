@@ -6,7 +6,7 @@ import Migration from '../../../../src/system-api/model/migrations/Migration'
 import SchemaDiffer from '../../../../src/system-api/model/migrations/SchemaDiffer'
 import SchemaMigrator from '../../../../src/content-schema/differ/SchemaMigrator'
 import { createMigrationBuilder } from '../../../../src/core/pg-migrate/helpers'
-import SchemaBuilder from '../../../../src/content-schema/builder/SchemaBuilder'
+import { SchemaBuilder } from '@contember/schema-definition'
 import ModificationHandlerFactory from '../../../../src/system-api/model/migrations/modifications/ModificationHandlerFactory'
 
 const emptyAcl = { roles: {}, variables: {} }

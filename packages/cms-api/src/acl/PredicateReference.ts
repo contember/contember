@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from 'cms-common'
+import { Acl, Input, Model } from '@contember/schema'
 import PredicateDefinitionProcessor from './PredicateDefinitionProcessor'
 
 export default class PredicateReference {

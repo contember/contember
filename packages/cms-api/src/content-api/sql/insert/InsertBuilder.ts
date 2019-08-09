@@ -1,5 +1,5 @@
 import { resolveValue } from '../utils'
-import { Input, Model, Value } from 'cms-common'
+import { Input, Model, Value } from '@contember/schema'
 import Client from '../../../core/database/Client'
 import { Value as DbValue } from '../../../core/database/types'
 import WhereBuilder from '../select/WhereBuilder'

@@ -1,5 +1,5 @@
 import WhereBuilder from '../select/WhereBuilder'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import InsertBuilder from './InsertBuilder'
 import Client from '../../../core/database/Client'
 

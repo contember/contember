@@ -1,4 +1,4 @@
-import { Schema } from 'cms-common'
+import { Schema } from '@contember/schema'
 import ModificationHandlerFactory from '../../system-api/model/migrations/modifications/ModificationHandlerFactory'
 import Migration from '../../system-api/model/migrations/Migration'
 

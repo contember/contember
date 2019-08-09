@@ -1,5 +1,5 @@
 import { isIt } from '../utils/type'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import SqlNameHelper from '../content-api/sqlSchema/SqlNameHelper'
 
 export const getEntity = (schema: Model.Schema, entityName: string): Model.Entity => {

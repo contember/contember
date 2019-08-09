@@ -1,4 +1,5 @@
-import { assertNever, Input, Model, Result } from 'cms-common'
+import { Input, Model, Result } from '@contember/schema'
+import { assertNever } from 'cms-common'
 import InputValidator from '../input-validation/InputValidator'
 
 export default class ValidationResolver {

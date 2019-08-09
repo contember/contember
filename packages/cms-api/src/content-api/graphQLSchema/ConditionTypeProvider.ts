@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import { GraphQLBoolean, GraphQLEnumType, GraphQLInputObjectType, GraphQLList, GraphQLScalarType } from 'graphql'
 import { GraphQLNonNull } from 'graphql/type/definition'
 import singletonFactory from '../../utils/singletonFactory'

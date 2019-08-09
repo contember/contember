@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import WhereTypeProvider from '../WhereTypeProvider'
 import { GraphQLFieldConfigArgumentMap } from 'graphql/type/definition'
 import OrderByTypeProvider from '../OrderByTypeProvider'

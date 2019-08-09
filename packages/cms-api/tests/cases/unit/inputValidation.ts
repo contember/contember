@@ -1,7 +1,7 @@
 import * as validation from '../../../src/content-api/input-validation'
 import 'mocha'
 import { expect } from 'chai'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import ObjectNode from '../../../src/content-api/graphQlResolver/ObjectNode'
 import FieldNode from '../../../src/content-api/graphQlResolver/FieldNode'
 import { SchemaBuilder } from '../../../src'

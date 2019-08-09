@@ -1,5 +1,5 @@
 import { GraphQLInputObjectType, GraphQLString } from 'graphql'
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
 import { Accessor } from '../../../utils/accessor'

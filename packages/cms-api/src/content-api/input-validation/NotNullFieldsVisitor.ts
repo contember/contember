@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 export default class NotNullFieldsVisitor
 	implements Model.RelationByTypeVisitor<boolean>, Model.ColumnVisitor<boolean> {

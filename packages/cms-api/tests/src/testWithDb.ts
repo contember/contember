@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import { createMock } from '../../src/utils/testing'
 import MigrationsResolver from '../../src/content-schema/MigrationsResolver'
 import Migration from '../../src/system-api/model/migrations/Migration'

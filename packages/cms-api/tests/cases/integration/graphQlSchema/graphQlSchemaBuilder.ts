@@ -1,7 +1,7 @@
 import 'mocha'
 import { graphql, printSchema } from 'graphql'
 import { expect } from 'chai'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'

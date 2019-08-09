@@ -1,7 +1,7 @@
 import AuthorizationScope from '../../core/authorization/AuthorizationScope'
 import Authorizator from '../../core/authorization/Authorizator'
 import Identity from '../../common/auth/Identity'
-import { Acl } from 'cms-common'
+import { Acl } from '@contember/schema'
 import SystemExecutionContainer from '../SystemExecutionContainer'
 import ErrorHandlerExtension from '../../core/graphql/ErrorHandlerExtension'
 import { ForbiddenError } from 'apollo-server-koa'

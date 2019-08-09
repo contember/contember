@@ -1,4 +1,4 @@
-import { Input, Model, Validation } from 'cms-common'
+import { Input, Model, Validation } from '@contember/schema'
 import DependencyCollector from './DependencyCollector'
 import DependencyMerger from './DependencyMerger'
 import { acceptEveryFieldVisitor } from '../../content-schema/modelUtils'

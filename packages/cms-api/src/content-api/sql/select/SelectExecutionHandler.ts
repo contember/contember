@@ -1,7 +1,7 @@
 import FieldNode from '../../graphQlResolver/FieldNode'
 import Path from './Path'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 import SelectHydrator from './SelectHydrator'
 import SelectBuilder from '../../../core/database/SelectBuilder'
 

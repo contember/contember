@@ -1,7 +1,7 @@
 import FieldProcessor from './FieldProcessor'
 import ColumnBuilder from '../ColumnBuilder'
 import NamingConventions from '../NamingConventions'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Options> {
 	private conventions: NamingConventions

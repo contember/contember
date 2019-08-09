@@ -1,4 +1,4 @@
-import { Validation } from 'cms-common'
+import { Validation } from '@contember/schema'
 import ValidationContext from './ValidationContext'
 
 const getValueOrLiteral = (

@@ -1,4 +1,4 @@
-import deepCopy from '../utils/deepCopy'
+import { deepCopy } from 'cms-common'
 
 namespace Model {
 	export interface Entity {

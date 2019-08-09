@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import { acceptEveryFieldVisitor } from '../../../content-schema/modelUtils'
 
 class TableReferencingResolver {

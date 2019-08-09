@@ -1,0 +1,17 @@
+{
+	"name": "@contember/schema",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {
+	},
+	"dependencies": {
+		"cms-common": "^0.0.0"
+	},
+	"devDependencies": {
+		"ts-node": "^7.0.0",
+		"tslint": "^5.10.0",
+		"typescript": "^3.5.2"
+	}
+}

@@ -8,7 +8,7 @@ import { graphql } from 'graphql'
 import Client from '../../src/core/database/Client'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import TesterStageManager from './TesterStageManager'
-import { Schema } from 'cms-common'
+import { Schema } from '@contember/schema'
 import SchemaVersionBuilder from '../../src/content-schema/SchemaVersionBuilder'
 import { emptySchema } from '../../src/content-schema/schemaUtils'
 

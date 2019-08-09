@@ -2,7 +2,7 @@ import singletonFactory from '../../../utils/singletonFactory'
 import { GraphQLInputObjectType } from 'graphql'
 import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
 import UpdateEntityRelationInputFieldVisitor from './UpdateEntityRelationInputFieldVisitor'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 export default class UpdateEntityRelationInputProvider {
 	private updateEntityRelationInputs = singletonFactory<

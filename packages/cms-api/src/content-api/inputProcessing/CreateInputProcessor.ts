@@ -1,4 +1,4 @@
-import { Input } from 'cms-common'
+import { Input } from '@contember/schema'
 import * as Context from './InputContext'
 
 interface CreateInputProcessor<Result = void> {

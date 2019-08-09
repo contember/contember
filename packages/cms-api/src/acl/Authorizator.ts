@@ -1,4 +1,4 @@
-import { Acl } from 'cms-common'
+import { Acl } from '@contember/schema'
 
 interface Authorizator {
 	isAllowed(operation: Acl.Operation, entity: string): boolean

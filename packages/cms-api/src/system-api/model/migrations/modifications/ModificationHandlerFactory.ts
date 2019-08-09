@@ -1,5 +1,5 @@
 import UpdateAclSchemaModification from './acl/UpdateAclSchemaModification'
-import { Schema } from 'cms-common'
+import { Schema } from '@contember/schema'
 import { Modification } from './Modification'
 import CreateColumnModification from './columns/CreateColumnModification'
 import UpdateColumnDefinitionModification from './columns/UpdateColumnDefinitionModification'

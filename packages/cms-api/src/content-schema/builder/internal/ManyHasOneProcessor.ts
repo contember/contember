@@ -1,5 +1,5 @@
 import FieldProcessor from './FieldProcessor'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import ManyHasOneBuilder from '../ManyHasOneBuilder'
 import NamingConventions from '../NamingConventions'
 

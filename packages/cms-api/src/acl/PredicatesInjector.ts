@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from 'cms-common'
+import { Acl, Input, Model } from '@contember/schema'
 import ObjectNode from '../content-api/graphQlResolver/ObjectNode'
 import { acceptFieldVisitor } from '../content-schema/modelUtils'
 import PredicateFactory from './PredicateFactory'

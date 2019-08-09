@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 
 export interface ColumnContext {
 	entity: Model.Entity

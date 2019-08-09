@@ -1,4 +1,4 @@
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import EntityTypeProvider from './EntityTypeProvider'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import EnumsProvider from './EnumsProvider'

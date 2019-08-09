@@ -1,5 +1,5 @@
 import ColumnDefinition from './ColumnDefinition'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import ManyHasOneDefinition from './ManyHasOneDefinition'
 import OneHasManyDefinition from './OneHasManyDefinition'
 import ManyHasManyDefinition from './ManyHasManyDefinition'

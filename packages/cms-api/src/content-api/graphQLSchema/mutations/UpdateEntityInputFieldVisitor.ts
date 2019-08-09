@@ -1,5 +1,5 @@
 import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import ColumnTypeResolver from '../ColumnTypeResolver'
 import UpdateEntityRelationInputProvider from './UpdateEntityRelationInputProvider'
 import Authorizator from '../../../acl/Authorizator'

@@ -1,7 +1,7 @@
 import AllowAllPermissionFactory from './AllowAllPermissionFactory'
 import PermissionFactory from './PermissionFactory'
 import { arrayEquals } from '../utils/arrays'
-import { Acl, Schema } from 'cms-common'
+import { Acl, Schema } from '@contember/schema'
 import AuthIdentity from '../common/auth/Identity'
 import { filterObject } from '../utils/object'
 

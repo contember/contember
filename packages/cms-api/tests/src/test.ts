@@ -1,4 +1,4 @@
-import { Acl, Model, Schema } from 'cms-common'
+import { Acl, Model, Schema, Validation } from '@contember/schema'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import AllowAllPermissionFactory from '../../src/acl/AllowAllPermissionFactory'
 import S3 from '../../src/utils/S3'
@@ -6,7 +6,6 @@ import { executeGraphQlTest } from './testGraphql'
 import Client from '../../src/core/database/Client'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
 import { createConnectionMock } from './ConnectionMock'
-import Validation from 'cms-common/dist/src/schema/validation'
 import { emptySchema } from '../../src/content-schema/schemaUtils'
 
 export interface SqlQuery {

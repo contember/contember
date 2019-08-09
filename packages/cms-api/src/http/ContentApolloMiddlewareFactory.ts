@@ -6,7 +6,7 @@ import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import ContentApolloServerFactory from './ContentApolloServerFactory'
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
-import { Acl, Model, Schema } from 'cms-common'
+import { Acl, Model, Schema } from '@contember/schema'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 
 class ContentApolloMiddlewareFactory {

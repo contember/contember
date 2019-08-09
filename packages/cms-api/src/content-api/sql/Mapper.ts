@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from 'cms-common'
+import { Acl, Input, Model } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName } from '../../content-schema/modelUtils'
 import SqlCreateInputProcessor from './insert/SqlCreateInputProcessor'
 import ObjectNode from '../graphQlResolver/ObjectNode'

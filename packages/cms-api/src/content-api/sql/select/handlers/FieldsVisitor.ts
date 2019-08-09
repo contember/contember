@@ -1,4 +1,4 @@
-import { Acl, Input, Model, Value } from 'cms-common'
+import { Acl, Input, Model, Value } from '@contember/schema'
 import ObjectNode from '../../../graphQlResolver/ObjectNode'
 import SelectHydrator from '../SelectHydrator'
 import Mapper from '../../Mapper'

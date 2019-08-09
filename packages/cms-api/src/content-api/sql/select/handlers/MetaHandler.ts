@@ -1,7 +1,7 @@
 import SelectExecutionHandler from '../SelectExecutionHandler'
 import Path from '../Path'
 import ObjectNode from '../../../graphQlResolver/ObjectNode'
-import { Acl, Input } from 'cms-common'
+import { Acl, Input } from '@contember/schema'
 import PredicateFactory from '../../../../acl/PredicateFactory'
 import WhereBuilder from '../WhereBuilder'
 

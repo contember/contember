@@ -1,6 +1,6 @@
 import FieldProcessor from './FieldProcessor'
 import OneHasManyBuilder from '../OneHasManyBuilder'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import NamingConventions from '../NamingConventions'
 
 export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBuilder.Options> {

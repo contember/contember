@@ -1,6 +1,6 @@
 import { GraphQLEnumType, GraphQLInputObjectType } from 'graphql'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputType } from 'graphql/type/definition'
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import { acceptFieldVisitor } from '../../content-schema/modelUtils'
 import singletonFactory from '../../utils/singletonFactory'
 import { GqlTypeName } from './utils'

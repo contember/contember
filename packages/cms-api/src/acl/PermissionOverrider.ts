@@ -1,4 +1,4 @@
-import { Acl } from 'cms-common'
+import { Acl } from '@contember/schema'
 import { tuple } from '../utils/tuple'
 
 export default class PermissionOverrider {

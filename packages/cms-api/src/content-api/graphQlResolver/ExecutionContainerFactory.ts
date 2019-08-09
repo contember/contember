@@ -1,5 +1,5 @@
 import Container from '../../core/di/Container'
-import { Acl, Schema } from 'cms-common'
+import { Acl, Schema } from '@contember/schema'
 import JoinBuilder from '../sql/select/JoinBuilder'
 import ConditionBuilder from '../sql/select/ConditionBuilder'
 import WhereBuilder from '../sql/select/WhereBuilder'

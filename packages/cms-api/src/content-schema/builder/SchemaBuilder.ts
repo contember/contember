@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import EntityBuilder from './EntityBuilder'
 import NamingConventions from './NamingConventions'
 import SchemaBuilderInternal from './SchemaBuilderInternal'

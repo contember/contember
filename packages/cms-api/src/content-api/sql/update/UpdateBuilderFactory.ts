@@ -1,6 +1,6 @@
 import Client from '../../../core/database/Client'
 import WhereBuilder from '../select/WhereBuilder'
-import { Model, Input } from 'cms-common'
+import { Model, Input } from '@contember/schema'
 import UpdateBuilder from './UpdateBuilder'
 
 class UpdateBuilderFactory {

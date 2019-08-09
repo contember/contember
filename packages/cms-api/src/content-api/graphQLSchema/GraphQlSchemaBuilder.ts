@@ -1,5 +1,5 @@
 import { GraphQLFieldConfigMap, GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import MutationProvider from './MutationProvider'
 import QueryProvider from './QueryProvider'
 import S3 from '../../utils/S3'

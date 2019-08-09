@@ -1,7 +1,7 @@
 import FieldDefinition from './FieldDefinition'
 import { RelationTarget } from './types'
 import { Interface } from '../../utils/interfaceType'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 class OneHasOneInversedDefinition extends FieldDefinition<OneHasOneInversedDefinition.Options> {
 	type = 'OneHasOneInversedDefinition' as const

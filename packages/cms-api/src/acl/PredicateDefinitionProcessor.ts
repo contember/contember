@@ -1,5 +1,5 @@
 import { acceptFieldVisitor } from '../content-schema/modelUtils'
-import { Acl, Input, Model } from 'cms-common'
+import { Acl, Input, Model } from '@contember/schema'
 
 class PredicateDefinitionProcessor {
 	constructor(private readonly schema: Model.Schema) {}

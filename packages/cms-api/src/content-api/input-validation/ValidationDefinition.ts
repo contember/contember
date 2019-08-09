@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Validation, Value } from 'cms-common'
+import { Validation, Value } from '@contember/schema'
 import EnumDefinition from '../../content-schema/definition/EnumDefinition'
 import { tuple } from '../../utils/tuple'
 import ValidationContext from './ValidationContext'

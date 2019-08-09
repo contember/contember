@@ -1,7 +1,7 @@
 import MigrationFilesManager from '../../../migrations/MigrationFilesManager'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
 import SchemaDiffer from './SchemaDiffer'
-import { Schema } from 'cms-common'
+import { Schema } from '@contember/schema'
 
 class MigrationDiffCreator {
 	constructor(

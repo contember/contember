@@ -1,4 +1,4 @@
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 import EntityBuilder from './EntityBuilder'
 import { SchemaBuilderError } from './SchemaBuilder'
 import { Error } from 'tslint/lib/error'

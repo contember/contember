@@ -1,4 +1,4 @@
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 import { getTargetEntity } from '../../content-schema/modelUtils'
 import { isUniqueWhere } from '../../content-schema/inputUtils'
 

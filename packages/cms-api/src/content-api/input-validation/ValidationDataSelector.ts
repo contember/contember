@@ -1,7 +1,7 @@
 import QueryAstFactory from './QueryAstFactory'
 import Mapper from '../sql/Mapper'
 import DependencyCollector from './DependencyCollector'
-import { Input, Model, Value } from 'cms-common'
+import { Input, Model, Value } from '@contember/schema'
 
 export default class ValidationDataSelector {
 	constructor(

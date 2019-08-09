@@ -1,5 +1,5 @@
 import { resolveValue } from '../utils'
-import { Input, Model, Value } from 'cms-common'
+import { Input, Model, Value } from '@contember/schema'
 import Client from '../../../core/database/Client'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '../../../content-schema/modelUtils'
 import QueryBuilder from '../../../core/database/QueryBuilder'

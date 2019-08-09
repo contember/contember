@@ -1,5 +1,5 @@
 import { acceptFieldVisitor } from '../../../content-schema/modelUtils'
-import { Input, Model } from 'cms-common'
+import { Input, Model } from '@contember/schema'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import ConditionBuilder from './ConditionBuilder'

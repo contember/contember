@@ -1,6 +1,6 @@
 import FieldDefinition from './FieldDefinition'
 import { RelationTarget } from './types'
-import { Model } from 'cms-common'
+import { Model } from '@contember/schema'
 
 class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinition.Options> {
 	type = 'OneHasManyDefinition' as const

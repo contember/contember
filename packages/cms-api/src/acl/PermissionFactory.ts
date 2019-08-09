@@ -1,4 +1,4 @@
-import { Acl, Model } from 'cms-common'
+import { Acl, Model } from '@contember/schema'
 import { getEntity } from '../content-schema/modelUtils'
 
 export default class PermissionFactory {

@@ -2,7 +2,8 @@ import { GraphQLSchema } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 import schema from './content-schema.graphql'
 import * as ContentSchema from './content-schema.types'
-import { assertNever, Schema, Validation } from 'cms-common'
+import { Schema, Validation } from '@contember/schema'
+import { assertNever } from 'cms-common'
 
 export class ContentSchemaFactory {
 	constructor(private readonly schema: Schema) {}

@@ -1,4 +1,4 @@
-import { Input, Value } from 'cms-common'
+import { Input, Value } from '@contember/schema'
 import Mapper from '../Mapper'
 import UpdateBuilder from './UpdateBuilder'
 import UpdateInputProcessor from '../../inputProcessing/UpdateInputProcessor'

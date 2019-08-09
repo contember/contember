@@ -6,9 +6,6 @@
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 	},
-	"dependencies": {
-		"cms-common": "^0.0.0"
-	},
 	"devDependencies": {
 		"ts-node": "^7.0.0",
 		"tslint": "^5.10.0",

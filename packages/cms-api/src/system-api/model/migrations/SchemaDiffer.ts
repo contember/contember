@@ -112,8 +112,9 @@ class SchemaDiffer {
 								if (updatedColumn.columnName != originalColumn.columnName) {
 									builder.updateColumnName(entityName, fieldName, updatedColumn.columnName)
 								}
-								const updatedDefinition = Model.getColumnDefinition(updatedColumn)
-								const originalDefinition = Model.getColumnDefinition(originalColumn)
+								const { name: _a, columnName: _b, ...updatedDefinition } = updatedColumn
+								const { name: _c, columnName: _d, ...originalDefinition } = originalColumn
+
 								if (!deepEqual(updatedDefinition, originalDefinition)) {
 									builder.updateColumnDefinition(entityName, fieldName, updatedDefinition)
 								}

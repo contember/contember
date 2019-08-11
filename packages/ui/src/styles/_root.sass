@@ -1,0 +1,16 @@
+@import 'common'
+@import 'customProperties'
+
+$cui-buildState-alreadyOutputRoot: false !default
+
+@if $cui-buildState-alreadyOutputRoot == false
+	$cui-buildState-alreadyOutputRoot: true
+
+	#{$cui-conf-rootSelector}
+		+customProperties
+
+		box-sizing: border-box
+		*,
+		*::before,
+		*::after
+			box-sizing: inherit

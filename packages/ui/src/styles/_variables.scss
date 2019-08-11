@@ -1,0 +1,11 @@
+@import '~@mangoweb/sass-base/crucialVariables';
+@import '~@mangoweb/sass-base/functions/index';
+@import './functions/index';
+
+// "cui" stands for Contember UI
+
+$cui-cl-globalPrefix: '' !default;
+$cui-cl-viewPrefix: 'view-' !default;
+$cui-cl-statePrefix: 'is-' !default;
+
+$cui-conf-defaultView: default !default;

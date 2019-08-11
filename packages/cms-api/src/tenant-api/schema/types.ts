@@ -1,5 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
-export type Maybe<T> = T | null
+type Maybe<T> = T | null
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -10,7 +9,6 @@ export type Scalars = {
 }
 
 export type AddProjectMemberError = {
-	__typename?: 'AddProjectMemberError'
 	readonly code: AddProjectMemberErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -24,7 +22,6 @@ export enum AddProjectMemberErrorCode {
 }
 
 export type AddProjectMemberResponse = {
-	__typename?: 'AddProjectMemberResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<AddProjectMemberError>
 }
@@ -35,7 +32,6 @@ export type AdminCredentials = {
 }
 
 export type ApiKey = {
-	__typename?: 'ApiKey'
 	readonly id: Scalars['String']
 	readonly token: Scalars['String']
 	readonly identity: Identity
@@ -48,7 +44,6 @@ export type ApiKeyProjectInput = {
 }
 
 export type ChangePasswordError = {
-	__typename?: 'ChangePasswordError'
 	readonly code: ChangePasswordErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -60,13 +55,11 @@ export enum ChangePasswordErrorCode {
 }
 
 export type ChangePasswordResponse = {
-	__typename?: 'ChangePasswordResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<ChangePasswordError>
 }
 
 export type CreateApiKeyError = {
-	__typename?: 'CreateApiKeyError'
 	readonly code: CreateApiKeyErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -78,21 +71,18 @@ export enum CreateApiKeyErrorCode {
 }
 
 export type CreateApiKeyResponse = {
-	__typename?: 'CreateApiKeyResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<CreateApiKeyError>
 	readonly result?: Maybe<CreateApiKeyResult>
 }
 
 export type CreateApiKeyResult = {
-	__typename?: 'CreateApiKeyResult'
 	readonly id: Scalars['String']
 	readonly token: Scalars['String']
 	readonly identity: IdentityWithoutPerson
 }
 
 export type DisableApiKeyError = {
-	__typename?: 'DisableApiKeyError'
 	readonly code: DisableApiKeyErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -103,26 +93,22 @@ export enum DisableApiKeyErrorCode {
 }
 
 export type DisableApiKeyResponse = {
-	__typename?: 'DisableApiKeyResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<DisableApiKeyError>
 }
 
 export type Identity = {
-	__typename?: 'Identity'
 	readonly id: Scalars['String']
 	readonly projects: ReadonlyArray<Project>
 	readonly person?: Maybe<PersonWithoutIdentity>
 }
 
 export type IdentityWithoutPerson = {
-	__typename?: 'IdentityWithoutPerson'
 	readonly id: Scalars['String']
 	readonly projects: ReadonlyArray<Project>
 }
 
 export type Mutation = {
-	__typename?: 'Mutation'
 	readonly setup?: Maybe<SetupResponse>
 	readonly signUp?: Maybe<SignUpResponse>
 	readonly signIn?: Maybe<SignInResponse>
@@ -188,32 +174,27 @@ export type MutationDisableApiKeyArgs = {
 }
 
 export type Person = {
-	__typename?: 'Person'
 	readonly id: Scalars['String']
 	readonly email: Scalars['String']
 	readonly identity: IdentityWithoutPerson
 }
 
 export type PersonWithoutIdentity = {
-	__typename?: 'PersonWithoutIdentity'
 	readonly id: Scalars['String']
 	readonly email: Scalars['String']
 }
 
 export type Project = {
-	__typename?: 'Project'
 	readonly id: Scalars['String']
 	readonly name: Scalars['String']
 	readonly slug: Scalars['String']
 }
 
 export type Query = {
-	__typename?: 'Query'
 	readonly me: Identity
 }
 
 export type RemoveProjectMemberError = {
-	__typename?: 'RemoveProjectMemberError'
 	readonly code: RemoveProjectMemberErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -224,13 +205,11 @@ export enum RemoveProjectMemberErrorCode {
 }
 
 export type RemoveProjectMemberResponse = {
-	__typename?: 'RemoveProjectMemberResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<RemoveProjectMemberError>
 }
 
 export type SetupError = {
-	__typename?: 'SetupError'
 	readonly code: SetupErrorCode
 	readonly endPersonMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -241,20 +220,17 @@ export enum SetupErrorCode {
 }
 
 export type SetupResponse = {
-	__typename?: 'SetupResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<SetupErrorCode>
 	readonly result?: Maybe<SetupResult>
 }
 
 export type SetupResult = {
-	__typename?: 'SetupResult'
 	readonly superadmin: Person
 	readonly loginKey: ApiKey
 }
 
 export type SignInError = {
-	__typename?: 'SignInError'
 	readonly code: SignInErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -266,20 +242,17 @@ export enum SignInErrorCode {
 }
 
 export type SignInResponse = {
-	__typename?: 'SignInResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<SignInError>
 	readonly result?: Maybe<SignInResult>
 }
 
 export type SignInResult = {
-	__typename?: 'SignInResult'
 	readonly token: Scalars['String']
 	readonly person: Person
 }
 
 export type SignOutError = {
-	__typename?: 'SignOutError'
 	readonly code: SignOutErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -290,13 +263,11 @@ export enum SignOutErrorCode {
 }
 
 export type SignOutResponse = {
-	__typename?: 'SignOutResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<SignOutError>
 }
 
 export type SignUpError = {
-	__typename?: 'SignUpError'
 	readonly code: SignUpErrorCode
 	readonly endPersonMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -308,19 +279,16 @@ export enum SignUpErrorCode {
 }
 
 export type SignUpResponse = {
-	__typename?: 'SignUpResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<SignUpError>
 	readonly result?: Maybe<SignUpResult>
 }
 
 export type SignUpResult = {
-	__typename?: 'SignUpResult'
 	readonly person: Person
 }
 
 export type UpdateProjectMemberError = {
-	__typename?: 'UpdateProjectMemberError'
 	readonly code: UpdateProjectMemberErrorCode
 	readonly endUserMessage?: Maybe<Scalars['String']>
 	readonly developerMessage?: Maybe<Scalars['String']>
@@ -332,7 +300,6 @@ export enum UpdateProjectMemberErrorCode {
 }
 
 export type UpdateProjectMemberResponse = {
-	__typename?: 'UpdateProjectMemberResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<UpdateProjectMemberError>
 }
@@ -342,7 +309,7 @@ export type VariableUpdate = {
 	readonly values: ReadonlyArray<Scalars['String']>
 }
 
-export type ResolverTypeWrapper<T> = Promise<T> | T
+import { GraphQLResolveInfo } from 'graphql'
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
@@ -399,458 +366,238 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
 
-/** Mapping between all available schema types and the resolvers types */
-export type ResolversTypes = {
-	Query: ResolverTypeWrapper<{}>
-	Identity: ResolverTypeWrapper<Identity>
-	String: ResolverTypeWrapper<Scalars['String']>
-	Project: ResolverTypeWrapper<Project>
-	PersonWithoutIdentity: ResolverTypeWrapper<PersonWithoutIdentity>
-	Mutation: ResolverTypeWrapper<{}>
-	AdminCredentials: AdminCredentials
-	SetupResponse: ResolverTypeWrapper<SetupResponse>
-	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
-	SetupErrorCode: SetupErrorCode
-	SetupResult: ResolverTypeWrapper<SetupResult>
-	Person: ResolverTypeWrapper<Person>
-	IdentityWithoutPerson: ResolverTypeWrapper<IdentityWithoutPerson>
-	ApiKey: ResolverTypeWrapper<ApiKey>
-	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
-	SignUpError: ResolverTypeWrapper<SignUpError>
-	SignUpErrorCode: SignUpErrorCode
-	SignUpResult: ResolverTypeWrapper<SignUpResult>
-	Int: ResolverTypeWrapper<Scalars['Int']>
-	SignInResponse: ResolverTypeWrapper<SignInResponse>
-	SignInError: ResolverTypeWrapper<SignInError>
-	SignInErrorCode: SignInErrorCode
-	SignInResult: ResolverTypeWrapper<SignInResult>
-	SignOutResponse: ResolverTypeWrapper<SignOutResponse>
-	SignOutError: ResolverTypeWrapper<SignOutError>
-	SignOutErrorCode: SignOutErrorCode
-	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
-	ChangePasswordError: ResolverTypeWrapper<ChangePasswordError>
-	ChangePasswordErrorCode: ChangePasswordErrorCode
-	VariableUpdate: VariableUpdate
-	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
-	AddProjectMemberError: ResolverTypeWrapper<AddProjectMemberError>
-	AddProjectMemberErrorCode: AddProjectMemberErrorCode
-	UpdateProjectMemberResponse: ResolverTypeWrapper<UpdateProjectMemberResponse>
-	UpdateProjectMemberError: ResolverTypeWrapper<UpdateProjectMemberError>
-	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
-	RemoveProjectMemberResponse: ResolverTypeWrapper<RemoveProjectMemberResponse>
-	RemoveProjectMemberError: ResolverTypeWrapper<RemoveProjectMemberError>
-	RemoveProjectMemberErrorCode: RemoveProjectMemberErrorCode
-	ApiKeyProjectInput: ApiKeyProjectInput
-	CreateApiKeyResponse: ResolverTypeWrapper<CreateApiKeyResponse>
-	CreateApiKeyError: ResolverTypeWrapper<CreateApiKeyError>
-	CreateApiKeyErrorCode: CreateApiKeyErrorCode
-	CreateApiKeyResult: ResolverTypeWrapper<CreateApiKeyResult>
-	DisableApiKeyResponse: ResolverTypeWrapper<DisableApiKeyResponse>
-	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
-	DisableApiKeyErrorCode: DisableApiKeyErrorCode
-	SetupError: ResolverTypeWrapper<SetupError>
+export type AddProjectMemberErrorResolvers<Context = any, ParentType = AddProjectMemberError> = {
+	code?: Resolver<AddProjectMemberErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-/** Mapping between all available schema types and the resolvers parents */
-export type ResolversParentTypes = {
-	Query: {}
-	Identity: Identity
-	String: Scalars['String']
-	Project: Project
-	PersonWithoutIdentity: PersonWithoutIdentity
-	Mutation: {}
-	AdminCredentials: AdminCredentials
-	SetupResponse: SetupResponse
-	Boolean: Scalars['Boolean']
-	SetupErrorCode: SetupErrorCode
-	SetupResult: SetupResult
-	Person: Person
-	IdentityWithoutPerson: IdentityWithoutPerson
-	ApiKey: ApiKey
-	SignUpResponse: SignUpResponse
-	SignUpError: SignUpError
-	SignUpErrorCode: SignUpErrorCode
-	SignUpResult: SignUpResult
-	Int: Scalars['Int']
-	SignInResponse: SignInResponse
-	SignInError: SignInError
-	SignInErrorCode: SignInErrorCode
-	SignInResult: SignInResult
-	SignOutResponse: SignOutResponse
-	SignOutError: SignOutError
-	SignOutErrorCode: SignOutErrorCode
-	ChangePasswordResponse: ChangePasswordResponse
-	ChangePasswordError: ChangePasswordError
-	ChangePasswordErrorCode: ChangePasswordErrorCode
-	VariableUpdate: VariableUpdate
-	AddProjectMemberResponse: AddProjectMemberResponse
-	AddProjectMemberError: AddProjectMemberError
-	AddProjectMemberErrorCode: AddProjectMemberErrorCode
-	UpdateProjectMemberResponse: UpdateProjectMemberResponse
-	UpdateProjectMemberError: UpdateProjectMemberError
-	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
-	RemoveProjectMemberResponse: RemoveProjectMemberResponse
-	RemoveProjectMemberError: RemoveProjectMemberError
-	RemoveProjectMemberErrorCode: RemoveProjectMemberErrorCode
-	ApiKeyProjectInput: ApiKeyProjectInput
-	CreateApiKeyResponse: CreateApiKeyResponse
-	CreateApiKeyError: CreateApiKeyError
-	CreateApiKeyErrorCode: CreateApiKeyErrorCode
-	CreateApiKeyResult: CreateApiKeyResult
-	DisableApiKeyResponse: DisableApiKeyResponse
-	DisableApiKeyError: DisableApiKeyError
-	DisableApiKeyErrorCode: DisableApiKeyErrorCode
-	SetupError: SetupError
+export type AddProjectMemberResponseResolvers<Context = any, ParentType = AddProjectMemberResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<AddProjectMemberError>, ParentType, Context>
 }
 
-export type AddProjectMemberErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['AddProjectMemberError'] = ResolversParentTypes['AddProjectMemberError']
-> = {
-	code?: Resolver<ResolversTypes['AddProjectMemberErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type ApiKeyResolvers<Context = any, ParentType = ApiKey> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	token?: Resolver<Scalars['String'], ParentType, Context>
+	identity?: Resolver<Identity, ParentType, Context>
 }
 
-export type AddProjectMemberResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['AddProjectMemberResponse'] = ResolversParentTypes['AddProjectMemberResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['AddProjectMemberError']>, ParentType, ContextType>
+export type ChangePasswordErrorResolvers<Context = any, ParentType = ChangePasswordError> = {
+	code?: Resolver<ChangePasswordErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type ApiKeyResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ApiKey'] = ResolversParentTypes['ApiKey']
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+export type ChangePasswordResponseResolvers<Context = any, ParentType = ChangePasswordResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<ChangePasswordError>, ParentType, Context>
 }
 
-export type ChangePasswordErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ChangePasswordError'] = ResolversParentTypes['ChangePasswordError']
-> = {
-	code?: Resolver<ResolversTypes['ChangePasswordErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type CreateApiKeyErrorResolvers<Context = any, ParentType = CreateApiKeyError> = {
+	code?: Resolver<CreateApiKeyErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type ChangePasswordResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ChangePasswordResponse'] = ResolversParentTypes['ChangePasswordResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
+export type CreateApiKeyResponseResolvers<Context = any, ParentType = CreateApiKeyResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<CreateApiKeyError>, ParentType, Context>
+	result?: Resolver<Maybe<CreateApiKeyResult>, ParentType, Context>
 }
 
-export type CreateApiKeyErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['CreateApiKeyError'] = ResolversParentTypes['CreateApiKeyError']
-> = {
-	code?: Resolver<ResolversTypes['CreateApiKeyErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type CreateApiKeyResultResolvers<Context = any, ParentType = CreateApiKeyResult> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	token?: Resolver<Scalars['String'], ParentType, Context>
+	identity?: Resolver<IdentityWithoutPerson, ParentType, Context>
 }
 
-export type CreateApiKeyResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['CreateApiKeyResponse'] = ResolversParentTypes['CreateApiKeyResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['CreateApiKeyError']>, ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['CreateApiKeyResult']>, ParentType, ContextType>
+export type DisableApiKeyErrorResolvers<Context = any, ParentType = DisableApiKeyError> = {
+	code?: Resolver<DisableApiKeyErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type CreateApiKeyResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['CreateApiKeyResult'] = ResolversParentTypes['CreateApiKeyResult']
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identity?: Resolver<ResolversTypes['IdentityWithoutPerson'], ParentType, ContextType>
+export type DisableApiKeyResponseResolvers<Context = any, ParentType = DisableApiKeyResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<DisableApiKeyError>, ParentType, Context>
 }
 
-export type DisableApiKeyErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['DisableApiKeyError'] = ResolversParentTypes['DisableApiKeyError']
-> = {
-	code?: Resolver<ResolversTypes['DisableApiKeyErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type IdentityResolvers<Context = any, ParentType = Identity> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	projects?: Resolver<ReadonlyArray<Project>, ParentType, Context>
+	person?: Resolver<Maybe<PersonWithoutIdentity>, ParentType, Context>
 }
 
-export type DisableApiKeyResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['DisableApiKeyResponse'] = ResolversParentTypes['DisableApiKeyResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableApiKeyError']>, ParentType, ContextType>
+export type IdentityWithoutPersonResolvers<Context = any, ParentType = IdentityWithoutPerson> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	projects?: Resolver<ReadonlyArray<Project>, ParentType, Context>
 }
 
-export type IdentityResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Identity'] = ResolversParentTypes['Identity']
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
-	person?: Resolver<Maybe<ResolversTypes['PersonWithoutIdentity']>, ParentType, ContextType>
-}
-
-export type IdentityWithoutPersonResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['IdentityWithoutPerson'] = ResolversParentTypes['IdentityWithoutPerson']
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
-}
-
-export type MutationResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
-> = {
-	setup?: Resolver<Maybe<ResolversTypes['SetupResponse']>, ParentType, ContextType, MutationSetupArgs>
-	signUp?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, MutationSignUpArgs>
-	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, MutationSignInArgs>
-	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, MutationSignOutArgs>
-	changePassword?: Resolver<
-		Maybe<ResolversTypes['ChangePasswordResponse']>,
-		ParentType,
-		ContextType,
-		MutationChangePasswordArgs
-	>
-	addProjectMember?: Resolver<
-		Maybe<ResolversTypes['AddProjectMemberResponse']>,
-		ParentType,
-		ContextType,
-		MutationAddProjectMemberArgs
-	>
+export type MutationResolvers<Context = any, ParentType = Mutation> = {
+	setup?: Resolver<Maybe<SetupResponse>, ParentType, Context, MutationSetupArgs>
+	signUp?: Resolver<Maybe<SignUpResponse>, ParentType, Context, MutationSignUpArgs>
+	signIn?: Resolver<Maybe<SignInResponse>, ParentType, Context, MutationSignInArgs>
+	signOut?: Resolver<Maybe<SignOutResponse>, ParentType, Context, MutationSignOutArgs>
+	changePassword?: Resolver<Maybe<ChangePasswordResponse>, ParentType, Context, MutationChangePasswordArgs>
+	addProjectMember?: Resolver<Maybe<AddProjectMemberResponse>, ParentType, Context, MutationAddProjectMemberArgs>
 	updateProjectMember?: Resolver<
-		Maybe<ResolversTypes['UpdateProjectMemberResponse']>,
+		Maybe<UpdateProjectMemberResponse>,
 		ParentType,
-		ContextType,
+		Context,
 		MutationUpdateProjectMemberArgs
 	>
 	removeProjectMember?: Resolver<
-		Maybe<ResolversTypes['RemoveProjectMemberResponse']>,
+		Maybe<RemoveProjectMemberResponse>,
 		ParentType,
-		ContextType,
+		Context,
 		MutationRemoveProjectMemberArgs
 	>
-	createApiKey?: Resolver<
-		Maybe<ResolversTypes['CreateApiKeyResponse']>,
-		ParentType,
-		ContextType,
-		MutationCreateApiKeyArgs
-	>
-	disableApiKey?: Resolver<
-		Maybe<ResolversTypes['DisableApiKeyResponse']>,
-		ParentType,
-		ContextType,
-		MutationDisableApiKeyArgs
-	>
+	createApiKey?: Resolver<Maybe<CreateApiKeyResponse>, ParentType, Context, MutationCreateApiKeyArgs>
+	disableApiKey?: Resolver<Maybe<DisableApiKeyResponse>, ParentType, Context, MutationDisableApiKeyArgs>
 }
 
-export type PersonResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identity?: Resolver<ResolversTypes['IdentityWithoutPerson'], ParentType, ContextType>
+export type PersonResolvers<Context = any, ParentType = Person> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	email?: Resolver<Scalars['String'], ParentType, Context>
+	identity?: Resolver<IdentityWithoutPerson, ParentType, Context>
 }
 
-export type PersonWithoutIdentityResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['PersonWithoutIdentity'] = ResolversParentTypes['PersonWithoutIdentity']
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+export type PersonWithoutIdentityResolvers<Context = any, ParentType = PersonWithoutIdentity> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	email?: Resolver<Scalars['String'], ParentType, Context>
 }
 
-export type ProjectResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+export type ProjectResolvers<Context = any, ParentType = Project> = {
+	id?: Resolver<Scalars['String'], ParentType, Context>
+	name?: Resolver<Scalars['String'], ParentType, Context>
+	slug?: Resolver<Scalars['String'], ParentType, Context>
 }
 
-export type QueryResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
-> = {
-	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+export type QueryResolvers<Context = any, ParentType = Query> = {
+	me?: Resolver<Identity, ParentType, Context>
 }
 
-export type RemoveProjectMemberErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['RemoveProjectMemberError'] = ResolversParentTypes['RemoveProjectMemberError']
-> = {
-	code?: Resolver<ResolversTypes['RemoveProjectMemberErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type RemoveProjectMemberErrorResolvers<Context = any, ParentType = RemoveProjectMemberError> = {
+	code?: Resolver<RemoveProjectMemberErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type RemoveProjectMemberResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['RemoveProjectMemberResponse'] = ResolversParentTypes['RemoveProjectMemberResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveProjectMemberError']>, ParentType, ContextType>
+export type RemoveProjectMemberResponseResolvers<Context = any, ParentType = RemoveProjectMemberResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<RemoveProjectMemberError>, ParentType, Context>
 }
 
-export type SetupErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SetupError'] = ResolversParentTypes['SetupError']
-> = {
-	code?: Resolver<ResolversTypes['SetupErrorCode'], ParentType, ContextType>
-	endPersonMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type SetupErrorResolvers<Context = any, ParentType = SetupError> = {
+	code?: Resolver<SetupErrorCode, ParentType, Context>
+	endPersonMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type SetupResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SetupResponse'] = ResolversParentTypes['SetupResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SetupErrorCode']>, ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['SetupResult']>, ParentType, ContextType>
+export type SetupResponseResolvers<Context = any, ParentType = SetupResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SetupErrorCode>, ParentType, Context>
+	result?: Resolver<Maybe<SetupResult>, ParentType, Context>
 }
 
-export type SetupResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SetupResult'] = ResolversParentTypes['SetupResult']
-> = {
-	superadmin?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
-	loginKey?: Resolver<ResolversTypes['ApiKey'], ParentType, ContextType>
+export type SetupResultResolvers<Context = any, ParentType = SetupResult> = {
+	superadmin?: Resolver<Person, ParentType, Context>
+	loginKey?: Resolver<ApiKey, ParentType, Context>
 }
 
-export type SignInErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignInError'] = ResolversParentTypes['SignInError']
-> = {
-	code?: Resolver<ResolversTypes['SignInErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type SignInErrorResolvers<Context = any, ParentType = SignInError> = {
+	code?: Resolver<SignInErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type SignInResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignInResponse'] = ResolversParentTypes['SignInResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInError']>, ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['SignInResult']>, ParentType, ContextType>
+export type SignInResponseResolvers<Context = any, ParentType = SignInResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SignInError>, ParentType, Context>
+	result?: Resolver<Maybe<SignInResult>, ParentType, Context>
 }
 
-export type SignInResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignInResult'] = ResolversParentTypes['SignInResult']
-> = {
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+export type SignInResultResolvers<Context = any, ParentType = SignInResult> = {
+	token?: Resolver<Scalars['String'], ParentType, Context>
+	person?: Resolver<Person, ParentType, Context>
 }
 
-export type SignOutErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignOutError'] = ResolversParentTypes['SignOutError']
-> = {
-	code?: Resolver<ResolversTypes['SignOutErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type SignOutErrorResolvers<Context = any, ParentType = SignOutError> = {
+	code?: Resolver<SignOutErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type SignOutResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignOutResponse'] = ResolversParentTypes['SignOutResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SignOutError']>, ParentType, ContextType>
+export type SignOutResponseResolvers<Context = any, ParentType = SignOutResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SignOutError>, ParentType, Context>
 }
 
-export type SignUpErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignUpError'] = ResolversParentTypes['SignUpError']
-> = {
-	code?: Resolver<ResolversTypes['SignUpErrorCode'], ParentType, ContextType>
-	endPersonMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type SignUpErrorResolvers<Context = any, ParentType = SignUpError> = {
+	code?: Resolver<SignUpErrorCode, ParentType, Context>
+	endPersonMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type SignUpResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignUpResponse'] = ResolversParentTypes['SignUpResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SignUpError']>, ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['SignUpResult']>, ParentType, ContextType>
+export type SignUpResponseResolvers<Context = any, ParentType = SignUpResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<SignUpError>, ParentType, Context>
+	result?: Resolver<Maybe<SignUpResult>, ParentType, Context>
 }
 
-export type SignUpResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SignUpResult'] = ResolversParentTypes['SignUpResult']
-> = {
-	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+export type SignUpResultResolvers<Context = any, ParentType = SignUpResult> = {
+	person?: Resolver<Person, ParentType, Context>
 }
 
-export type UpdateProjectMemberErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['UpdateProjectMemberError'] = ResolversParentTypes['UpdateProjectMemberError']
-> = {
-	code?: Resolver<ResolversTypes['UpdateProjectMemberErrorCode'], ParentType, ContextType>
-	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+export type UpdateProjectMemberErrorResolvers<Context = any, ParentType = UpdateProjectMemberError> = {
+	code?: Resolver<UpdateProjectMemberErrorCode, ParentType, Context>
+	endUserMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
+	developerMessage?: Resolver<Maybe<Scalars['String']>, ParentType, Context>
 }
 
-export type UpdateProjectMemberResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['UpdateProjectMemberResponse'] = ResolversParentTypes['UpdateProjectMemberResponse']
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['UpdateProjectMemberError']>, ParentType, ContextType>
+export type UpdateProjectMemberResponseResolvers<Context = any, ParentType = UpdateProjectMemberResponse> = {
+	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+	errors?: Resolver<ReadonlyArray<UpdateProjectMemberError>, ParentType, Context>
 }
 
-export type Resolvers<ContextType = any> = {
-	AddProjectMemberError?: AddProjectMemberErrorResolvers<ContextType>
-	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<ContextType>
-	ApiKey?: ApiKeyResolvers<ContextType>
-	ChangePasswordError?: ChangePasswordErrorResolvers<ContextType>
-	ChangePasswordResponse?: ChangePasswordResponseResolvers<ContextType>
-	CreateApiKeyError?: CreateApiKeyErrorResolvers<ContextType>
-	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<ContextType>
-	CreateApiKeyResult?: CreateApiKeyResultResolvers<ContextType>
-	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
-	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
-	Identity?: IdentityResolvers<ContextType>
-	IdentityWithoutPerson?: IdentityWithoutPersonResolvers<ContextType>
-	Mutation?: MutationResolvers<ContextType>
-	Person?: PersonResolvers<ContextType>
-	PersonWithoutIdentity?: PersonWithoutIdentityResolvers<ContextType>
-	Project?: ProjectResolvers<ContextType>
-	Query?: QueryResolvers<ContextType>
-	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<ContextType>
-	RemoveProjectMemberResponse?: RemoveProjectMemberResponseResolvers<ContextType>
-	SetupError?: SetupErrorResolvers<ContextType>
-	SetupResponse?: SetupResponseResolvers<ContextType>
-	SetupResult?: SetupResultResolvers<ContextType>
-	SignInError?: SignInErrorResolvers<ContextType>
-	SignInResponse?: SignInResponseResolvers<ContextType>
-	SignInResult?: SignInResultResolvers<ContextType>
-	SignOutError?: SignOutErrorResolvers<ContextType>
-	SignOutResponse?: SignOutResponseResolvers<ContextType>
-	SignUpError?: SignUpErrorResolvers<ContextType>
-	SignUpResponse?: SignUpResponseResolvers<ContextType>
-	SignUpResult?: SignUpResultResolvers<ContextType>
-	UpdateProjectMemberError?: UpdateProjectMemberErrorResolvers<ContextType>
-	UpdateProjectMemberResponse?: UpdateProjectMemberResponseResolvers<ContextType>
+export type Resolvers<Context = any> = {
+	AddProjectMemberError?: AddProjectMemberErrorResolvers<Context>
+	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<Context>
+	ApiKey?: ApiKeyResolvers<Context>
+	ChangePasswordError?: ChangePasswordErrorResolvers<Context>
+	ChangePasswordResponse?: ChangePasswordResponseResolvers<Context>
+	CreateApiKeyError?: CreateApiKeyErrorResolvers<Context>
+	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<Context>
+	CreateApiKeyResult?: CreateApiKeyResultResolvers<Context>
+	DisableApiKeyError?: DisableApiKeyErrorResolvers<Context>
+	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<Context>
+	Identity?: IdentityResolvers<Context>
+	IdentityWithoutPerson?: IdentityWithoutPersonResolvers<Context>
+	Mutation?: MutationResolvers<Context>
+	Person?: PersonResolvers<Context>
+	PersonWithoutIdentity?: PersonWithoutIdentityResolvers<Context>
+	Project?: ProjectResolvers<Context>
+	Query?: QueryResolvers<Context>
+	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<Context>
+	RemoveProjectMemberResponse?: RemoveProjectMemberResponseResolvers<Context>
+	SetupError?: SetupErrorResolvers<Context>
+	SetupResponse?: SetupResponseResolvers<Context>
+	SetupResult?: SetupResultResolvers<Context>
+	SignInError?: SignInErrorResolvers<Context>
+	SignInResponse?: SignInResponseResolvers<Context>
+	SignInResult?: SignInResultResolvers<Context>
+	SignOutError?: SignOutErrorResolvers<Context>
+	SignOutResponse?: SignOutResponseResolvers<Context>
+	SignUpError?: SignUpErrorResolvers<Context>
+	SignUpResponse?: SignUpResponseResolvers<Context>
+	SignUpResult?: SignUpResultResolvers<Context>
+	UpdateProjectMemberError?: UpdateProjectMemberErrorResolvers<Context>
+	UpdateProjectMemberResponse?: UpdateProjectMemberResponseResolvers<Context>
 }
 
 /**
  * @deprecated
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
-export type IResolvers<ContextType = any> = Resolvers<ContextType>
+export type IResolvers<Context = any> = Resolvers<Context>

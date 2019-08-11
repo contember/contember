@@ -9,7 +9,6 @@ import { Sortable, SortablePublicProps } from './Sortable'
 
 export interface SortableRepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {
 	sortBy: SortablePublicProps['sortBy']
-	children?: React.ReactNode
 }
 
 export const SortableRepeater = Component<SortableRepeaterProps>(

@@ -2,10 +2,13 @@
 @import '~@mangoweb/sass-base/functions/index';
 @import './functions/index';
 
-// "cui" stands for Contember UI
+// "CUI" stands for Contember UI
 
-$cui-cl-globalPrefix: '' !default;
-$cui-cl-viewPrefix: 'view-' !default;
-$cui-cl-statePrefix: 'is-' !default;
-
+// Core configurations
+$cui-conf-globalPrefix: '' !default; // If you need to avoid a name conflict, you can prefix all CUI classes
+$cui-conf-viewClassCallback: 'formatViewClass' !default;
+$cui-conf-stateClassCallback: 'formatStateClass' !default;
+$cui-conf-rootSelector: ':root'; // Override this if you need to scope CUI custom properties. See _root.sass
 $cui-conf-defaultView: default !default;
+
+$cui-formGroup-separation: 1.25em

@@ -1,0 +1,11 @@
+@import '../common'
+
+=baseControl()
+	+_abstract(baseControl)
+		&-control
+			+disableWebkitAutoFill()
+			&:focus
+				outline: none
+
+			&[disabled]
+				cursor: not-allowed

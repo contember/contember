@@ -1,0 +1,5 @@
+// import * as React from 'react'
+// import { storiesOf } from '@storybook/react'
+// import { FileInput } from '../../../cms-admin/src/components/ui/FileInput'
+//
+// storiesOf('FileInput', module).add('simple', () => <FileInput />)

@@ -3,7 +3,7 @@
 	"include": [],
 	"references": [
 		{ "path": "./src" },
-		{ "path": "./tests" }
+		{ "path": "./storybook" }
 	],
 	"compilerOptions": {
 		"jsx": "react"

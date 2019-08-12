@@ -2,7 +2,7 @@ import { uuid } from '../../../utils/uuid'
 import { Client } from '@contember/database'
 import { ContentEvent } from '../dtos/Event'
 import { EventType } from '../EventType'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 
 class RecreateContentEvent {
 	constructor(

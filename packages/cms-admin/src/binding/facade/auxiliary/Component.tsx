@@ -1,4 +1,4 @@
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import { MarkerProvider, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'

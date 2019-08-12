@@ -1,4 +1,4 @@
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import { MutationError, MutationRequestResult, MutationResult } from '../bindingTypes'
 import { ErrorAccessor } from '../dao'
 import { MutationGenerator } from './MutationGenerator'

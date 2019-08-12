@@ -1,5 +1,5 @@
 import { Button, FormGroup } from '@contember/ui'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
 import { connect } from 'react-redux'

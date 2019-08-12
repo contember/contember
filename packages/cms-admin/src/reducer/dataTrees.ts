@@ -1,4 +1,4 @@
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import { Reducer } from 'redux'
 import { Action, handleActions } from 'redux-actions'
 import {

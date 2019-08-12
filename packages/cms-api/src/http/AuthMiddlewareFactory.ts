@@ -1,6 +1,6 @@
-import ApiKeyManager from '../tenant-api/model/service/ApiKeyManager'
 import { KoaContext, KoaMiddleware } from '../core/koa/types'
 import { createGraphqlInvalidAuthResponse } from './responseUtils'
+import { ApiKeyManager } from '@contember/engine-tenant-api'
 
 class AuthMiddlewareFactory {
 	constructor(private apiKeyManager: ApiKeyManager) {}

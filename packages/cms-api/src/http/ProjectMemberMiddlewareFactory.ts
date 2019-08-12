@@ -1,7 +1,7 @@
-import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
 import { KoaMiddleware } from '../core/koa/types'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
+import { ProjectMemberManager } from '@contember/engine-tenant-api'
 
 type InputState = ProjectMemberMiddlewareFactory.KoaState &
 	AuthMiddlewareFactory.KoaState &

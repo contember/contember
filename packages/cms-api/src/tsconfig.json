@@ -33,6 +33,9 @@
 		},
 		{
 			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../engine-tenant-api/src"
 		}
 	]
 }

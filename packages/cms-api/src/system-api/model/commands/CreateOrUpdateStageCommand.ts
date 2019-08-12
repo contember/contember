@@ -1,9 +1,9 @@
-import Client from '../../../core/database/Client'
-import InsertBuilder from '../../../core/database/InsertBuilder'
+import { Client } from '@contember/database'
+import { InsertBuilder } from '@contember/database'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import { StageWithoutEvent } from '../dtos/Stage'
 import InitEventQuery from '../queries/InitEventQuery'
-import { wrapIdentifier } from '../../../core/database/utils'
+import { wrapIdentifier } from '@contember/database'
 
 class CreateOrUpdateStageCommand {
 	constructor(private readonly stage: StageWithoutEvent) {}

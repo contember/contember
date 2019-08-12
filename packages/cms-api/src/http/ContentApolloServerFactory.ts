@@ -11,7 +11,7 @@ import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewar
 import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
-import Connection from '../core/database/Connection'
+import { Connection } from '@contember/database'
 import { extractOriginalError } from '../core/graphql/errorExtract'
 import UserError from '../core/graphql/UserError'
 

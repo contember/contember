@@ -1,5 +1,5 @@
 import Command from './Command'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import bcrypt from 'bcrypt'
 import { uuid } from '../../../utils/uuid'
 import { PersonRow } from '../queries/person/types'

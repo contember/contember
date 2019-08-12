@@ -10,15 +10,15 @@ import EventsRebaser from './model/events/EventsRebaser'
 import ReleaseExecutor from './model/events/ReleaseExecutor'
 import Container from '../core/di/Container'
 import TableReferencingResolver from './model/events/TableReferencingResolver'
-import Client from '../core/database/Client'
+import { Client } from '@contember/database'
 import SchemaVersionBuilder from '../content-schema/SchemaVersionBuilder'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import PermissionsVerifier from './model/events/PermissionsVerifier'
 import DependencyBuilder from './model/events/DependencyBuilder'
 import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
 import DiffBuilder from './model/events/DiffBuilder'
-import QueryHandler from '../core/query/QueryHandler'
-import DbQueryable from '../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import Project from '../config/Project'
 import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
 import MigrationsResolver from '../content-schema/MigrationsResolver'
@@ -38,7 +38,7 @@ interface SystemExecutionContainer {
 	rebaseExecutor: RebaseExecutor
 	diffBuilder: DiffBuilder
 	migrationDiffCreator: MigrationDiffCreator
-	queryHandler: QueryHandler<DbQueryable>
+	queryHandler: QueryHandler<DatabaseQueryable>
 	projectIntializer: ProjectInitializer
 	migrationSqlDryRunner: MigrationSqlDryRunner
 }

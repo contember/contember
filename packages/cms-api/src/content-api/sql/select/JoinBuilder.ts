@@ -2,8 +2,8 @@ import Path from './Path'
 import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import JoinVisitor from './JoinVisitor'
-import ConditionBuilder from '../../../core/database/ConditionBuilder'
-import SelectBuilder from '../../../core/database/SelectBuilder'
+import { ConditionBuilder } from '@contember/database'
+import { SelectBuilder } from '@contember/database'
 
 export default class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}

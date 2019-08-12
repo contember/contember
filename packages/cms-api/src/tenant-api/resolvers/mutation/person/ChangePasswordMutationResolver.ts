@@ -6,8 +6,8 @@ import {
 } from '../../../schema/types'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../../ResolverContext'
-import QueryHandler from '../../../../core/query/QueryHandler'
-import DbQueryable from '../../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import Actions from '../../../model/authorization/Actions'
 import IdentityScope from '../../../model/authorization/IdentityScope'
 import PasswordChangeManager from '../../../model/service/PasswordChangeManager'
@@ -16,7 +16,7 @@ import PersonQuery from '../../../model/queries/person/PersonQuery'
 export default class ChangePasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordChangeManager: PasswordChangeManager,
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 	) {}
 
 	async changePassword(

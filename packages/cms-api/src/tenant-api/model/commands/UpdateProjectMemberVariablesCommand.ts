@@ -1,7 +1,7 @@
 import Command from './Command'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { uuid } from '../../../utils/uuid'
-import InsertBuilder from '../../../core/database/InsertBuilder'
+import { InsertBuilder } from '@contember/database'
 import { UpdateProjectMemberErrorCode } from '../../schema/types'
 import RemoveProjectMemberVariablesCommand from './RemoveProjectMemberVariablesCommand'
 

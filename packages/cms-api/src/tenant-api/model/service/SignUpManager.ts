@@ -1,7 +1,7 @@
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import { SignUpErrorCode } from '../../schema/types'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import CreatePersonCommand from '../commands/CreatePersonCommand'
 import Identity from '../../../common/auth/Identity'
@@ -9,7 +9,7 @@ import PersonQuery from '../queries/person/PersonQuery'
 import { PersonRow } from '../queries/person/types'
 
 class SignUpManager {
-	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
+	constructor(private readonly queryHandler: QueryHandler<DatabaseQueryable>, private readonly db: Client) {}
 
 	async signUp(email: string, password: string, roles: string[] = []): Promise<SignUpManager.SignUpResult> {
 		if (await this.isEmailAlreadyUsed(email)) {

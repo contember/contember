@@ -1,4 +1,4 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import { Model, Input } from '@contember/schema'
 import UpdateBuilder from './UpdateBuilder'

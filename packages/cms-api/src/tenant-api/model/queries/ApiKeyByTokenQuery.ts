@@ -1,14 +1,12 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { ConditionBuilder, DatabaseQueryable, DatabaseQuery } from '@contember/database'
 import ApiKey from '../type/ApiKey'
-import ConditionBuilder from '../../../core/database/ConditionBuilder'
 
-class ApiKeyByTokenQuery extends DbQuery<ApiKeyByTokenQuery.Result> {
+class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 	constructor(private readonly token: string) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<ApiKeyByTokenQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<ApiKeyByTokenQuery.Result> {
 		const tokenHash = ApiKey.computeTokenHash(this.token)
 		const rows = await queryable
 			.createSelectBuilder<ApiKeyByTokenQuery.Row>()

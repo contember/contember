@@ -1,4 +1,4 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { uuid } from '../../../utils/uuid'
 import Command from './Command'
 

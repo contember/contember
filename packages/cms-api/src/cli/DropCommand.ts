@@ -2,8 +2,8 @@ import { Config, DatabaseCredentials } from '../config/config'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import { formatSchemaName } from '../system-api/model/helpers/stageHelpers'
 import Command from '../core/cli/Command'
-import Connection from '../core/database/Connection'
-import { wrapIdentifier } from '../core/database/utils'
+import { Connection } from '@contember/database'
+import { wrapIdentifier } from '@contember/database'
 
 class DropCommand extends Command<{}, {}> {
 	constructor(private readonly config: Config) {

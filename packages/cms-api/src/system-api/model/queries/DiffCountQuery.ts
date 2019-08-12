@@ -1,13 +1,13 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 import { DiffErrorCode } from '../../schema/types'
 
-class DiffCountQuery extends DbQuery<DiffCountQuery.Response> {
+class DiffCountQuery extends DatabaseQuery<DiffCountQuery.Response> {
 	constructor(private readonly baseEvent: string, private readonly headEvent: string) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<DiffCountQuery.Response> {
+	async fetch(queryable: DatabaseQueryable): Promise<DiffCountQuery.Response> {
 		const diff = await queryable.createWrapper().query<{ index: number }>(
 			`WITH RECURSIVE events(id, previous_id, index) AS (
     SELECT id, previous_id, 0

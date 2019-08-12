@@ -1,6 +1,6 @@
 import StageTree from '../stages/StageTree'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
@@ -13,13 +13,13 @@ import CreateEventCommand from '../commands/CreateEventCommand'
 import { EventType, isContentEvent } from '../EventType'
 import { Stage, StageWithoutEvent } from '../dtos/Stage'
 import { ContentEvent } from '../dtos/Event'
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import DiffQuery from '../queries/DiffQuery'
 import { Modification } from './modifications/Modification'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import RecreateContentEvent from '../commands/RecreateContentEvent'
-import { wrapIdentifier } from '../../../core/database/utils'
+import { wrapIdentifier } from '@contember/database'
 
 type StageEventsMap = Record<string, ContentEvent[]>
 
@@ -109,7 +109,7 @@ export default class ProjectMigrator {
 	}
 
 	private async fetchStageEvents(
-		queryHandler: QueryHandler<DbQueryable>,
+		queryHandler: QueryHandler<DatabaseQueryable>,
 		eventsMatrix: StageCommonEventsMatrixQuery.Result,
 		stage: StageWithoutEvent,
 	): Promise<StageEventsMap> {

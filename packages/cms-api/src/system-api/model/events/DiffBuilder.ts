@@ -2,16 +2,16 @@ import DependencyBuilder from './DependencyBuilder'
 import { DiffErrorCode } from '../../schema/types'
 import { Stage } from '../dtos/Stage'
 import { AnyEvent } from '../dtos/Event'
-import QueryHandler from '../../../core/query/QueryHandler'
+import { QueryHandler } from '@contember/queryable'
 import DiffCountQuery from '../queries/DiffCountQuery'
 import DiffQuery from '../queries/DiffQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQueryable } from '@contember/database'
 import PermissionsVerifier from './PermissionsVerifier'
 
 class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly permissionsVerifier: PermissionsVerifier,
 	) {}
 

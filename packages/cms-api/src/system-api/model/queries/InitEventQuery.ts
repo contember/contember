@@ -1,8 +1,8 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 
-class InitEventQuery extends DbQuery<InitEventQuery.InitEvent> {
-	async fetch(queryable: DbQueryable): Promise<InitEventQuery.InitEvent> {
+class InitEventQuery extends DatabaseQuery<InitEventQuery.InitEvent> {
+	async fetch(queryable: DatabaseQueryable): Promise<InitEventQuery.InitEvent> {
 		return (await queryable
 			.createSelectBuilder<InitEventQuery.InitEvent>()
 			.from('event')

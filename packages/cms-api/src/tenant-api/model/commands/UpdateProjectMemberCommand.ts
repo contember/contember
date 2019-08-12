@@ -1,5 +1,5 @@
 import Command from './Command'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { UpdateProjectMemberErrorCode } from '../../schema/types'
 import UpdateProjectMemberVariablesCommand from './UpdateProjectMemberVariablesCommand'
 

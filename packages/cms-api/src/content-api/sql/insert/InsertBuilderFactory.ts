@@ -1,7 +1,7 @@
 import WhereBuilder from '../select/WhereBuilder'
 import { Model } from '@contember/schema'
 import InsertBuilder from './InsertBuilder'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 
 class InsertBuilderFactory {
 	constructor(

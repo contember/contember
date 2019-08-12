@@ -1,8 +1,8 @@
 import { Schema } from '@contember/schema'
 import { tuple } from '@contember/utils'
 import SchemaMigrator from './differ/SchemaMigrator'
-import QueryHandler from '../core/query/QueryHandler'
-import DbQueryable from '../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import LatestMigrationByStageQuery from '../system-api/model/queries/LatestMigrationByStageQuery'
 import LatestMigrationByEventQuery from '../system-api/model/queries/LatestMigrationByEventQuery'
 import { emptySchema } from './schemaUtils'
@@ -10,7 +10,7 @@ import MigrationsResolver from './MigrationsResolver'
 
 class SchemaVersionBuilder {
 	constructor(
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly schemaMigrator: SchemaMigrator,
 	) {}

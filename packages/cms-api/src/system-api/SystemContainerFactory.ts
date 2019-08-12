@@ -15,7 +15,7 @@ import MigrationsResolver from '../content-schema/MigrationsResolver'
 import Project from '../config/Project'
 import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
 import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
-import Client from '../core/database/Client'
+import { Client } from '@contember/database'
 import RebeaseAllMutationResolver from './resolvers/mutation/RebeaseAllMutationResolver'
 import { Resolvers } from './schema/types'
 

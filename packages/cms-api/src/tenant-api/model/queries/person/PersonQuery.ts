@@ -1,8 +1,8 @@
-import DbQuery from '../../../../core/database/DbQuery'
-import DbQueryable from '../../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 import { MaybePersonRow, PersonRow } from './types'
 
-class PersonQuery extends DbQuery<MaybePersonRow> {
+class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 	constructor(private readonly condition: { email: string } | { id: string } | { identity_id: string }) {
 		super()
 	}
@@ -19,7 +19,7 @@ class PersonQuery extends DbQuery<MaybePersonRow> {
 		return new PersonQuery({ identity_id })
 	}
 
-	async fetch(queryable: DbQueryable): Promise<MaybePersonRow> {
+	async fetch(queryable: DatabaseQueryable): Promise<MaybePersonRow> {
 		const rows = await queryable
 			.createSelectBuilder<PersonRow>()
 			.select('id')

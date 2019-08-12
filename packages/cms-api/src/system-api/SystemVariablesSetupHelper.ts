@@ -1,4 +1,4 @@
-import Client from '../core/database/Client'
+import { Client } from '@contember/database'
 import { uuid } from '../utils/uuid'
 
 export const unnamedIdentity = '11111111-1111-1111-1111-111111111111'

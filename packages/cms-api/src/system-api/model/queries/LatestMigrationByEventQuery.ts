@@ -1,12 +1,12 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 
-class LatestMigrationByEventQuery extends DbQuery<LatestMigrationByEventQuery.Result> {
+class LatestMigrationByEventQuery extends DatabaseQuery<LatestMigrationByEventQuery.Result> {
 	constructor(private readonly eventId: string) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<LatestMigrationByEventQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<LatestMigrationByEventQuery.Result> {
 		const rows = (await queryable.createWrapper().query<LatestMigrationByEventQuery.Row>(
 			`
 			WITH RECURSIVE recent_events(type, previous_id, data) AS (

@@ -1,4 +1,4 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 
 interface Command<Result> {
 	execute(db: Client): Promise<Result>

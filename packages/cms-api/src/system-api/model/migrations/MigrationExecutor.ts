@@ -2,13 +2,13 @@ import { Stage } from '../dtos/Stage'
 import CreateEventCommand from '../commands/CreateEventCommand'
 import { EventType } from '../EventType'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import Migration from './Migration'
 import { createMigrationBuilder } from '../../../core/pg-migrate/helpers'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
 import SchemaVersionBuilder from '../../../content-schema/SchemaVersionBuilder'
-import { wrapIdentifier } from '../../../core/database/utils'
+import { wrapIdentifier } from '@contember/database'
 
 class MigrationExecutor {
 	constructor(

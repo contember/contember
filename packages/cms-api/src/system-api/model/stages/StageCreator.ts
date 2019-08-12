@@ -1,4 +1,4 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import CreateOrUpdateStageCommand from '../commands/CreateOrUpdateStageCommand'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import EventApplier from '../events/EventApplier'

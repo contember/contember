@@ -1,5 +1,5 @@
 import { Acl } from '@contember/schema'
-import Client from '../core/database/Client'
+import { Client } from '@contember/database'
 import ReadResolver from './graphQlResolver/ReadResolver'
 import MutationResolver from './graphQlResolver/MutationResolver'
 import Container from '../core/di/Container'

@@ -2,7 +2,7 @@ import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } fr
 import { Stage } from '../dtos/Stage'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'

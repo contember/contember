@@ -24,6 +24,12 @@
 		},
 		{
 			"path": "../../authorization/src"
+		},
+		{
+			"path": "../../database/src"
+		},
+		{
+			"path": "../../queryable/src"
 		}
 	]
 }

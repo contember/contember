@@ -1,14 +1,14 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 import { Stage } from '../dtos/Stage'
 import { prepareStageQueryBuilder } from './StageQueryHelper'
 
-class StageBySlugQuery extends DbQuery<StageBySlugQuery.Result> {
+class StageBySlugQuery extends DatabaseQuery<StageBySlugQuery.Result> {
 	constructor(private readonly slug: string) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<StageBySlugQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<StageBySlugQuery.Result> {
 		let selectBuilder = prepareStageQueryBuilder(queryable).where({ slug: this.slug })
 
 		const rows = await selectBuilder.getResult()

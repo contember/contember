@@ -1,6 +1,6 @@
 import Project from '../../src/config/Project'
 import FileNameHelper from '../../src/migrations/FileNameHelper'
-import Client from '../../src/core/database/Client'
+import { Client } from '@contember/database'
 import StageCreator from '../../src/system-api/model/stages/StageCreator'
 import ProjectMigrator from '../../src/system-api/model/migrations/ProjectMigrator'
 import Migration from '../../src/system-api/model/migrations/Migration'

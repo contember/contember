@@ -1,5 +1,5 @@
 import { uuid } from '../../../utils/uuid'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { ContentEvent } from '../dtos/Event'
 import { EventType } from '../EventType'
 import { assertNever } from 'cms-common'

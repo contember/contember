@@ -1,15 +1,15 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 import { EventType } from '../EventType'
 import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
 import { assertNever } from 'cms-common'
 
-class DiffQuery extends DbQuery<AnyEvent[]> {
+class DiffQuery extends DatabaseQuery<AnyEvent[]> {
 	constructor(private readonly baseEvent: string, private readonly headEvent: string) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<AnyEvent[]> {
+	async fetch(queryable: DatabaseQueryable): Promise<AnyEvent[]> {
 		const diff = await queryable.createWrapper().query<{
 			id: string
 			type: EventType

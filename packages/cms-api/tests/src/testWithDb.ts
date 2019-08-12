@@ -9,7 +9,7 @@ import { emptySchema } from '../../src/content-schema/schemaUtils'
 import ApiTester from './ApiTester'
 import { testUuid, withMockedUuid } from './testUuid'
 import { expect } from 'chai'
-import SelectBuilder from '../../src/core/database/SelectBuilder'
+import { SelectBuilder } from '@contember/database'
 
 type Test = {
 	schema: Model.Schema

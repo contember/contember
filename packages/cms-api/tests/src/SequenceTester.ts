@@ -5,15 +5,15 @@ import { expect } from 'chai'
 import EventSequence from './EventSequence'
 import InitEventQuery from '../../src/system-api/model/queries/InitEventQuery'
 import StageBySlugQuery from '../../src/system-api/model/queries/StageBySlugQuery'
-import QueryHandler from '../../src/core/query/QueryHandler'
-import DbQueryable from '../../src/core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import ContentApiTester from './ContentApiTester'
 import SystemApiTester from './SystemApiTester'
 import { createCreateEvent } from './DummyEventFactory'
 
 export default class SequenceTester {
 	constructor(
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly contentApiTester: ContentApiTester,
 		private readonly systemApiTester: SystemApiTester,
 	) {}

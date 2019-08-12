@@ -22,9 +22,7 @@ import SystemApiTester from './SystemApiTester'
 import TesterStageManager from './TesterStageManager'
 import SequenceTester from './SequenceTester'
 import SystemExecutionContainer from '../../src/system-api/SystemExecutionContainer'
-import Connection from '../../src/core/database/Connection'
-import { wrapIdentifier } from '../../src/core/database/utils'
-import Client from '../../src/core/database/Client'
+import { Connection, Client, wrapIdentifier } from '@contember/database'
 
 export default class ApiTester {
 	public static project: Project = {

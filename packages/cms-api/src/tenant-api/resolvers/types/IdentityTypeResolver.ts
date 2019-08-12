@@ -1,6 +1,6 @@
 import { Identity, IdentityResolvers, Project } from '../../schema/types'
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import ProjectsByIdentityQuery from '../../model/queries/ProjectsByIdentityQuery'
 import PersonQuery from '../../model/queries/person/PersonQuery'
 import ResolverContext from '../ResolverContext'
@@ -8,7 +8,7 @@ import ProjectMemberManager from '../../model/service/ProjectMemberManager'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	constructor(
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly projectMemberManager: ProjectMemberManager,
 	) {}
 

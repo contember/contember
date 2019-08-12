@@ -1,9 +1,9 @@
 import { Input, Model } from '@contember/schema'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
-import QueryBuilder from '../../../core/database/QueryBuilder'
+import { QueryBuilder } from '@contember/database'
 import { getColumnName, getTargetEntity } from '@contember/schema-utils'
-import SelectBuilder from '../../../core/database/SelectBuilder'
+import { SelectBuilder } from '@contember/database'
 import UserError from '../../../core/graphql/UserError'
 
 class OrderByBuilder {

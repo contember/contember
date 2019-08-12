@@ -1,4 +1,4 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { EventType } from '../EventType'
 import { uuid } from '../../../utils/uuid'
 

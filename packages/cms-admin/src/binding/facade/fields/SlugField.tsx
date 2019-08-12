@@ -4,6 +4,7 @@ import { FormGroup, InputGroup } from '../../../components/ui'
 import { RelativeSingleField } from '../../bindingTypes'
 import { Field, useEnvironment } from '../../coreComponents'
 import { useMutationState } from '../../coreComponents/PersistState'
+import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component } from '../auxiliary'
 import { useRelativeSingleField } from '../utils'
@@ -12,7 +13,7 @@ export interface SlugFieldProps {
 	field: RelativeSingleField
 	drivenBy: RelativeSingleField
 	label?: React.ReactNode
-	prefix?: string
+	format?: (currentValue: string, environment: Environment) => string
 }
 
 export const SlugField = Component<SlugFieldProps>(
@@ -49,9 +50,15 @@ const SlugFieldInner = (props: SlugFieldInnerProps) => {
 	const isMutating = useMutationState()
 
 	// TODO maybe be smarter when the field is already persisted?
-	const slugValue = hasEditedSlug
-		? slugField.currentValue || ''
-		: `${props.prefix || ''}${slugify(driverField.currentValue || '')}`
+	let slugValue = slugField.currentValue || ''
+
+	if (!hasEditedSlug) {
+		slugValue = slugify(driverField.currentValue || '')
+
+		if (props.format) {
+			slugValue = props.format(slugValue, environment)
+		}
+	}
 
 	return (
 		<FormGroup

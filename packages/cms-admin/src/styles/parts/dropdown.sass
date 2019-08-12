@@ -15,6 +15,7 @@
 	&-item
 		$item-border-radius: $border-radius - $border-width
 
+		position: relative
 		color: var(--dropdown-color)
 		padding: .25em .75em
 
@@ -33,6 +34,16 @@
 		&:last-child
 			border-bottom-left-radius: $item-border-radius
 			border-bottom-right-radius: $item-border-radius
+
+		// Dirty solution to stretch an injected anchor element without a class across the whole item
+		> a:not([class])
+			&::before
+				content: ''
+				position: absolute
+				top: 0
+				bottom: 0
+				right: 0
+				left: 0
 
 	&.view-columns
 		display: flex

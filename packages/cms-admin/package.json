@@ -16,6 +16,7 @@
 		"@blueprintjs/table": "^3.0.0",
 		"@contember/schema": "^0.0.0",
 		"@mangoweb/sass-base": "0.0.2",
+		"@sindresorhus/slugify": "^0.9.1",
 		"@types/gravatar": "^1.8.0",
 		"@types/webappsec-credential-management": "^0.5.1",
 		"bourbon": "^5.1.0",

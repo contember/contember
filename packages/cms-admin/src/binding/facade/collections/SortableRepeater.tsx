@@ -7,13 +7,13 @@ import { Component } from '../auxiliary'
 import { Repeater } from './Repeater'
 import { Sortable, SortablePublicProps } from './Sortable'
 
-interface SortableRepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {
+export interface SortableRepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {
 	sortBy: SortablePublicProps['sortBy']
 	children?: React.ReactNode
 }
 
-export const SortableRepeater = Component(
-	(props: SortableRepeaterProps) => {
+export const SortableRepeater = Component<SortableRepeaterProps>(
+	props => {
 		const environment = React.useContext(EnvironmentContext)
 
 		return QueryLanguage.wrapRelativeEntityList(
@@ -41,7 +41,7 @@ export const SortableRepeater = Component(
 			environment,
 		)
 	},
-	(props: SortableRepeaterProps): React.ReactNode => (
+	props => (
 		<ToMany field={props.field}>
 			<Sortable sortBy={props.sortBy}>{props.children}</Sortable>
 		</ToMany>

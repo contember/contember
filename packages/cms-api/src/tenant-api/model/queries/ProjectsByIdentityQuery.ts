@@ -2,7 +2,7 @@ import { Authorizator, AuthorizationScope } from '@contember/authorization'
 import { DatabaseQuery } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
 import { ConditionBuilder } from '@contember/database'
-import Identity from '../../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import Actions from '../authorization/Actions'
 import ProjectsQuery from './ProjectsQuery'
 

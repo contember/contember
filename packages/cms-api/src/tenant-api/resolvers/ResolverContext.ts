@@ -1,5 +1,5 @@
 import { Authorizator, AuthorizationScope } from '@contember/authorization'
-import Identity from '../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import { ForbiddenError } from 'apollo-server-koa'
 
 export default class ResolverContext {

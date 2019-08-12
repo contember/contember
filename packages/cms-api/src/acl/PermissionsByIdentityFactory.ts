@@ -2,7 +2,7 @@ import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import PermissionFactory from './PermissionFactory'
 import { arrayEquals } from '../utils/arrays'
 import { Acl, Schema } from '@contember/schema'
-import AuthIdentity from '../common/auth/Identity'
+import { Identity as AuthIdentity } from '@contember/engine-common'
 import { filterObject } from '../utils/object'
 
 class PermissionsByIdentityFactory {

@@ -17,7 +17,7 @@ import VariableInjector from '../../../acl/VariableInjector'
 import Actions from '../authorization/Actions'
 import { SelectBuilder } from '@contember/database'
 import Project from '../../../config/Project'
-import Identity from '../../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 
 type AffectedColumnsByRow = { [rowId: string]: string[] }
 type PermissionsByRow = { [rowId: string]: boolean }

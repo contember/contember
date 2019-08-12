@@ -1,4 +1,4 @@
-import Identity from '../../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import ProjectMemberManager from '../service/ProjectMemberManager'
 
 class ProjectAwareIdentity implements Identity {

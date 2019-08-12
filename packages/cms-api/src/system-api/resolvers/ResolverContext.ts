@@ -1,5 +1,4 @@
-import AuthorizationScope from '../../core/authorization/AuthorizationScope'
-import Authorizator from '../../core/authorization/Authorizator'
+import { Authorizator, AuthorizationScope } from '@contember/authorization'
 import Identity from '../../common/auth/Identity'
 import { Acl } from '@contember/schema'
 import SystemExecutionContainer from '../SystemExecutionContainer'

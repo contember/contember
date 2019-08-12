@@ -1,3 +1,4 @@
+import { Authorizator } from '@contember/authorization'
 import { Config } from 'apollo-server-core'
 import { ApolloServer } from 'apollo-server-koa'
 import typeDefs from '../tenant-api/schema/tenant.graphql'
@@ -5,7 +6,6 @@ import ResolverContext from '../tenant-api/resolvers/ResolverContext'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
 import ProjectAwareIdentity from '../tenant-api/model/authorization/ProjectAwareIdentity'
-import Authorizator from '../core/authorization/Authorizator'
 import Identity from '../common/auth/Identity'
 import { Resolvers } from '../tenant-api/schema/types'
 

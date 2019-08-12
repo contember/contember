@@ -1,8 +1,8 @@
+import { AuthorizationScope } from '@contember/authorization'
 import { GraphQLResolveInfo } from 'graphql'
 import ResolverContext from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { RebaseAllResponse } from '../../schema/types'
-import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import Actions from '../../model/authorization/Actions'
 
 export default class RebeaseAllMutationResolver implements MutationResolver<'rebaseAll'> {

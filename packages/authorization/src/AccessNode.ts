@@ -1,4 +1,4 @@
-import AccessEvaluator from './AccessEvalutator'
+import AccessEvaluator from './AccessEvaluator'
 import Authorizator from './Authorizator'
 
 interface AccessNode {

@@ -1,6 +1,5 @@
-import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
+import { AuthorizationScope, AccessNode } from '@contember/authorization'
 import Identity from '../../../common/auth/Identity'
-import AccessNode from '../../../core/authorization/AccessNode'
 
 class ProjectScope implements AuthorizationScope<Identity> {
 	constructor(private readonly projectId: string) {}

@@ -21,6 +21,9 @@
 		},
 		{
 			"path": "../../utils/src"
+		},
+		{
+			"path": "../../authorization/src"
 		}
 	]
 }

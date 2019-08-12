@@ -1,5 +1,5 @@
 import AuthorizationScope from './AuthorizationScope'
-import AccessEvaluator from './AccessEvalutator'
+import AccessEvaluator from './AccessEvaluator'
 import AccessNode from './AccessNode'
 
 interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Identity> {

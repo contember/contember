@@ -1,4 +1,4 @@
-import Permissions from '../../../core/authorization/Permissions'
+import { Permissions } from '@contember/authorization'
 import Identity from '../../../common/auth/Identity'
 
 class PermissionsFactory {

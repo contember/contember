@@ -1,9 +1,8 @@
+import { Authorizator, AuthorizationScope } from '@contember/authorization'
 import DbQuery from '../../../core/database/DbQuery'
 import DbQueryable from '../../../core/database/DbQueryable'
 import ConditionBuilder from '../../../core/database/ConditionBuilder'
-import Authorizator from '../../../core/authorization/Authorizator'
 import Identity from '../../../common/auth/Identity'
-import AuthorizationScope from '../../../core/authorization/AuthorizationScope'
 import Actions from '../authorization/Actions'
 import ProjectsQuery from './ProjectsQuery'
 

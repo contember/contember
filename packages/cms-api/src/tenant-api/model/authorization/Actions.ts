@@ -1,4 +1,4 @@
-import Authorizator from '../../../core/authorization/Authorizator'
+import { Authorizator } from '@contember/authorization'
 
 namespace Actions {
 	export enum Resources {

@@ -1,4 +1,3 @@
-import { assertNever } from 'cms-common'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { sendDataTreeRequest, setDataTreeDirtiness } from '../../actions/dataTrees'

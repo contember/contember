@@ -5,7 +5,7 @@ import SignUpManager from '../../../model/service/SignUpManager'
 import ImplementationException from '../../../../core/exceptions/ImplementationException'
 import Actions from '../../../model/authorization/Actions'
 import ApiKeyManager from '../../../model/service/ApiKeyManager'
-import Identity from '../../../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 
 export default class SetupMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}

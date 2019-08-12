@@ -4,7 +4,7 @@ import { SignUpErrorCode } from '../../schema/types'
 import { Client } from '@contember/database'
 import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import CreatePersonCommand from '../commands/CreatePersonCommand'
-import Identity from '../../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import PersonQuery from '../queries/person/PersonQuery'
 import { PersonRow } from '../queries/person/types'
 

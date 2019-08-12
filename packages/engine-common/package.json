@@ -1,5 +1,5 @@
 {
-	"name": "@contember/",
+	"name": "@contember/engine-common",
 	"version": "0.0.0",
 	"private": true,
 	"main": "dist/src/index.js",

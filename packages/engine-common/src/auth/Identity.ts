@@ -28,4 +28,4 @@ namespace Identity {
 	}
 }
 
-export default Identity
+export { Identity }

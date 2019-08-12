@@ -6,7 +6,7 @@ import ResolverContext from '../tenant-api/resolvers/ResolverContext'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import ProjectMemberManager from '../tenant-api/model/service/ProjectMemberManager'
 import ProjectAwareIdentity from '../tenant-api/model/authorization/ProjectAwareIdentity'
-import Identity from '../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import { Resolvers } from '../tenant-api/schema/types'
 
 class TenantApolloServerFactory {

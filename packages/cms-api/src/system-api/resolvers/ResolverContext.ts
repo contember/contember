@@ -1,5 +1,5 @@
 import { Authorizator, AuthorizationScope } from '@contember/authorization'
-import Identity from '../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import { Acl } from '@contember/schema'
 import SystemExecutionContainer from '../SystemExecutionContainer'
 import ErrorHandlerExtension from '../../core/graphql/ErrorHandlerExtension'

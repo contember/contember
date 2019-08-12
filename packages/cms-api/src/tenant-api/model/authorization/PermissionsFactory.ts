@@ -1,5 +1,5 @@
 import { Permissions } from '@contember/authorization'
-import Identity from '../../../common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import Actions from './Actions'
 
 class PermissionsFactory {

@@ -168,9 +168,8 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	}
 
 	return (
-		<div className="dimensionsSwitcher">
-			<Button className="dimensionsSwitcher-button">{renderSelected(selectedDimensions)}</Button>
-			<div className="dimensionsSwitcher-content">{renderContent(normalizedData, selectedDimensions)}</div>
-		</div>
+		<Dropdown.Revealer opener={<Button noMargin>{renderSelected(selectedDimensions)}</Button>}>
+			{renderContent(normalizedData, selectedDimensions)}
+		</Dropdown.Revealer>
 	)
 })

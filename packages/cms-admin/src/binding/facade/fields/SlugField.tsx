@@ -8,15 +8,15 @@ import { QueryLanguage } from '../../queryLanguage'
 import { Component } from '../auxiliary'
 import { useRelativeSingleField } from '../utils'
 
-export interface SlugProps {
+export interface SlugFieldProps {
 	field: RelativeSingleField
 	drivenBy: RelativeSingleField
 	label?: React.ReactNode
 	prefix?: string
 }
 
-export const Slug = Component<SlugProps>(
-	props => <SlugInner {...props} />,
+export const SlugField = Component<SlugFieldProps>(
+	props => <SlugFieldInner {...props} />,
 	(props, environment) => (
 		<>
 			{QueryLanguage.wrapRelativeSingleField(
@@ -39,9 +39,9 @@ export const Slug = Component<SlugProps>(
 	'Slug',
 )
 
-interface SlugInnerProps extends SlugProps {}
+interface SlugFieldInnerProps extends SlugFieldProps {}
 
-const SlugInner = (props: SlugInnerProps) => {
+const SlugFieldInner = (props: SlugFieldInnerProps) => {
 	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
 	const slugField = useRelativeSingleField<string>(props.field)
 	const driverField = useRelativeSingleField<string>(props.drivenBy)

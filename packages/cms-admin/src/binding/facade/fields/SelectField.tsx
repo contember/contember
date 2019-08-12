@@ -27,7 +27,6 @@ export const SelectField = Component<SelectFieldProps>(props => {
 			{({ data, currentValue, onChange, environment, isMutating, errors }: SingleChoiceFieldMetadata) => {
 				return (
 					<SelectFieldInner
-						name={props.name}
 						label={props.label}
 						allowNull={props.allowNull}
 						firstOptionCaption={props.firstOptionCaption}
@@ -45,7 +44,7 @@ export const SelectField = Component<SelectFieldProps>(props => {
 }, 'SelectField')
 
 export interface SelectFieldInnerProps
-	extends Omit<SelectFieldPublicProps, 'options'>,
+	extends Omit<SelectFieldPublicProps, 'options' | 'name'>,
 		Omit<SingleChoiceFieldMetadata, 'fieldName'> {
 	environment: Environment
 	errors: ErrorAccessor[]

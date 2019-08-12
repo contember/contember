@@ -52,3 +52,24 @@
 		&-column
 			list-style: none
 			border-right: rem(1px) solid #eaedf3
+
+	&-revealer
+		display: inline-block
+
+		&-opener
+			display: flex
+
+		&-dropdown
+			position: absolute
+			padding-top: $spacing-small
+			width: fit-content
+			visibility: hidden
+			opacity: 0
+			transition-duration: .1s
+			transition-property: visibility, opacity
+
+		&:hover &,
+		&:focus-within &
+			&-dropdown
+				opacity: 1
+				visibility: visible

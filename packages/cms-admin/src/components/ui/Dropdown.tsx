@@ -26,6 +26,18 @@ namespace Dropdown {
 	export const Item = (props: ItemProps) => (
 		<li className={cn('dropdown-item', props.active && 'is-active')}>{props.children}</li>
 	)
+
+	export interface RevealerProps {
+		opener: any
+		children?: React.ReactNode
+	}
+
+	export const Revealer = (props: RevealerProps) => (
+		<div className="dropdown-revealer">
+			<div className="dropdown-revealer-opener">{props.opener}</div>
+			<div className="dropdown-revealer-dropdown">{props.children}</div>
+		</div>
+	)
 }
 
 export { Dropdown }

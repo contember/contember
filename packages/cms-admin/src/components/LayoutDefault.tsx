@@ -2,7 +2,7 @@ import * as React from 'react'
 import cn from 'classnames'
 import { TokenExposer } from './Dev'
 import LogoutLink from './LogoutLink'
-import { Avatar, AvatarSize } from './ui'
+import { Avatar, AvatarSize, Dropdown } from './ui'
 import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { connect } from 'react-redux'
@@ -83,13 +83,25 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 					<div className="navbar-center">{this.props.header.center}</div>
 					<div className="navbar-right">
 						{this.props.header.right}
-						<LogoutLink
-							Component={props => (
-								<button type="button" {...props} className="navbar-link">
+						<Dropdown.Revealer
+							opener={
+								<button type="button">
 									<Avatar size={AvatarSize.Size2} email={this.props.identity} />
 								</button>
-							)}
-						/>
+							}
+						>
+							<Dropdown>
+								<Dropdown.Item>
+									<LogoutLink
+										Component={props => (
+											<button type="button" {...props}>
+												Sign Out
+											</button>
+										)}
+									/>
+								</Dropdown.Item>
+							</Dropdown>
+						</Dropdown.Revealer>
 					</div>
 				</header>
 

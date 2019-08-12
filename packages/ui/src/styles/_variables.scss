@@ -12,10 +12,10 @@ $cui-conf-rootSelector: ':root'; // Override this if you need to scope CUI custo
 $cui-conf-defaultView: default !default;
 
 // Global values
-$cui-focusTransitionDuration: .3s;
+$cui-focusTransitionDuration: .3s !default;
 
 // FormGroup
-$cui-formGroup-separation: 1.25em;
+$cui-formGroup-separation: 1.25em !default;
 
 // Buttons
-$cui-button-focusTransitionDuration: $cui-focusTransitionDuration;
+$cui-button-focusTransitionDuration: $cui-focusTransitionDuration !default;

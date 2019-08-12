@@ -7,6 +7,7 @@ import State from '../state'
 import { pushRequest } from '../actions/request'
 import { RequestChange } from '../state/request'
 import { Dispatch } from '../actions/types'
+import { Collapsible } from './ui'
 
 interface ProjectsListProps {
 	configs: ProjectConfig[]
@@ -23,6 +24,9 @@ const selectProjectRequest = (project: ProjectConfig): RequestChange => () => ({
 })
 
 class ProjectsList extends React.Component<ProjectsListProps, {}> {
+	state = {
+		expanded: true,
+	}
 	componentDidMount(): void {
 		if (this.props.configs.length === 1) {
 			this.props.onSelectProject(this.props.configs[0])
@@ -30,23 +34,35 @@ class ProjectsList extends React.Component<ProjectsListProps, {}> {
 	}
 
 	render() {
+		const { expanded } = this.state
+
 		return (
 			<div className="centerCard-wrap">
 				<Card className="centerCard">
 					<H1>Projects</H1>
-					<div>
-						{this.props.configs.map((config, i) => (
-							<Link
-								key={i}
-								requestChange={selectProjectRequest(config)}
-								Component={props => (
-									<a {...props} className="projectsList-item">
-										{config.project}/{config.stage}
-									</a>
-								)}
-							/>
-						))}
-					</div>
+					<button
+						type="button"
+						onClick={() => {
+							this.setState({ expanded: !this.state.expanded })
+						}}
+					>
+						Toggle
+					</button>
+					<Collapsible expanded={expanded}>
+						<div>
+							{this.props.configs.map((config, i) => (
+								<Link
+									key={i}
+									requestChange={selectProjectRequest(config)}
+									Component={props => (
+										<a {...props} className="projectsList-item">
+											{config.project}/{config.stage}
+										</a>
+									)}
+								/>
+							))}
+						</div>
+					</Collapsible>
 				</Card>
 			</div>
 		)

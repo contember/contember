@@ -1,0 +1,23 @@
+@import '../common'
+
+.collapsible
+	--transition-duration: 0.2s
+	overflow: hidden
+	height: 0
+	visibility: hidden
+	opacity: 0
+	display: flex
+	align-items: flex-end
+	transition-property: height, opacity, visibility
+	transition-duration: var(--transition-duration)
+
+	@media (prefers-reduced-motion: reduce)
+		--transition-duration: 0s
+
+	&.is-expanded
+		height: var(--target-height, auto)
+		visibility: visible
+		opacity: 1
+
+	&-content
+		width: 100%

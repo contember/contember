@@ -10,7 +10,7 @@ import { executeRelease, fetchDiff } from '../../actions/system'
 import { Dispatch } from '../../actions/types'
 import { LoadingSpinner } from '../../binding/facade/renderers/userFeedback'
 import { Table } from '../ui'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 
 enum SelectionType {
 	explicit = 'explicit',

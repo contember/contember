@@ -15,6 +15,9 @@
 			"path": "../../../packages/schema/src"
 		},
 		{
+			"path": "../../../packages/utils/src"
+		},
+		{
 			"path": "../../../packages/ui/src"
 		}
 	]

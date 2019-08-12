@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from 'cms-client'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
 import { FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'

@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from 'cms-client'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import {
 	FieldName,
 	MutationRequestResult,

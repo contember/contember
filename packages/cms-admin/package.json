@@ -15,6 +15,7 @@
 		"@blueprintjs/table": "^3.0.0",
 		"@contember/schema": "^0.0.0",
 		"@contember/ui": "^0.0.0",
+		"@contember/utils": "^0.0.0",
 		"@mangoweb/sass-base": "0.0.2",
 		"@sindresorhus/slugify": "^0.9.1",
 		"bourbon": "^5.1.0",

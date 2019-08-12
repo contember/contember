@@ -1,6 +1,7 @@
 import { CrudQueryBuilder } from 'cms-client'
 import { GetQueryArguments } from 'cms-client/dist/src/crudQueryBuilder'
-import { assertNever, ucfirst } from 'cms-common'
+import { ucfirst } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	ConnectionMarker,

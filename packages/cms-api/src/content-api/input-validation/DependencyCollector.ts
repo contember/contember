@@ -1,5 +1,5 @@
 import { Validation } from '@contember/schema'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import { InputValidation } from '@contember/schema-definition'
 
 class DependencyCollector {

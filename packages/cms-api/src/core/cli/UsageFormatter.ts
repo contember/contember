@@ -1,6 +1,6 @@
 import Argument from './Argument'
 import Option from './Option'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 
 class UsageFormatter {
 	public static format(args: Argument[], options: Option[]): string {

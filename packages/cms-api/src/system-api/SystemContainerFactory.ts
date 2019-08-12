@@ -6,7 +6,6 @@ import SystemApolloServerFactory from '../http/SystemApolloServerFactory'
 import Container from '../core/di/Container'
 import TableReferencingResolver from './model/events/TableReferencingResolver'
 import ResolverFactory from './resolvers/ResolverFactory'
-import PermissionsFactory from '../tenant-api/model/authorization/PermissionsFactory'
 import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolver'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
@@ -15,9 +14,9 @@ import MigrationsResolver from '../content-schema/MigrationsResolver'
 import Project from '../config/Project'
 import SchemaMigrator from '../content-schema/differ/SchemaMigrator'
 import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
-import { Client } from '@contember/database'
 import RebeaseAllMutationResolver from './resolvers/mutation/RebeaseAllMutationResolver'
 import { Resolvers } from './schema/types'
+import PermissionsFactory from './model/authorization/PermissionsFactory'
 
 export interface SystemContainer {
 	systemApolloServerFactory: SystemApolloServerFactory

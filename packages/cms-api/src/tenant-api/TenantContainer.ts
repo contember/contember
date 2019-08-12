@@ -1,31 +1,32 @@
-import { Authorizator, AccessEvaluator } from '@contember/authorization'
+import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { DatabaseCredentials } from '../config/config'
 import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
-import MeQueryResolver from './resolvers/query/MeQueryResolver'
-import CreateApiKeyMutationResolver from './resolvers/mutation/apiKey/CreateApiKeyMutationResolver'
-import SignUpMutationResolver from './resolvers/mutation/person/SignUpMutationResolver'
-import SignInMutationResolver from './resolvers/mutation/person/SignInMutationResolver'
-import AddProjectMemberMutationResolver from './resolvers/mutation/projectMember/AddProjectMemberMutationResolver'
-import UpdateProjectMemberMutationResolver from './resolvers/mutation/projectMember/UpdateProjectMemberMutationResolver'
-import SetupMutationResolver from './resolvers/mutation/setup/SetupMutationResolver'
-import PermissionsFactory from './model/authorization/PermissionsFactory'
+import { Connection, DatabaseQueryable } from '@contember/database'
 import TenantApolloServerFactory from '../http/TenantApolloServerFactory'
 import Container from '../core/di/Container'
-import ApiKeyManager from './model/service/ApiKeyManager'
-import SignUpManager from './model/service/SignUpManager'
-import SignInManager from './model/service/SignInManager'
-import ProjectMemberManager from './model/service/ProjectMemberManager'
-import ResolverFactory from './resolvers/ResolverFactory'
 import { ApolloServer } from 'apollo-server-koa'
-import ProjectManager from './model/service/ProjectManager'
-import { Connection } from '@contember/database'
-import ChangePasswordMutationResolver from './resolvers/mutation/person/ChangePasswordMutationResolver'
-import PasswordChangeManager from './model/service/PasswordChangeManager'
-import SignOutMutationResolver from './resolvers/mutation/person/SignOutMutationResolver'
-import RemoveProjectMemberMutationResolver from './resolvers/mutation/projectMember/RemoveProjectMemberMutationResolver'
-import DisableApiKeyMutationResolver from './resolvers/mutation/apiKey/DisableApiKeyMutationResolver'
-import { IdentityTypeResolver } from './resolvers/types/IdentityTypeResolver'
+import {
+	AddProjectMemberMutationResolver,
+	ApiKeyManager,
+	ChangePasswordMutationResolver,
+	CreateApiKeyMutationResolver,
+	DisableApiKeyMutationResolver,
+	IdentityTypeResolver,
+	MeQueryResolver,
+	PasswordChangeManager,
+	PermissionsFactory,
+	ProjectManager,
+	ProjectMemberManager,
+	RemoveProjectMemberMutationResolver,
+	ResolverFactory,
+	SetupMutationResolver,
+	SignInManager,
+	SignInMutationResolver,
+	SignOutMutationResolver,
+	SignUpManager,
+	SignUpMutationResolver,
+	UpdateProjectMemberMutationResolver,
+} from '@contember/engine-tenant-api'
 import MigrationsRunner from '../core/migrations/MigrationsRunner'
 import MigrationFilesManager from '../migrations/MigrationFilesManager'
 

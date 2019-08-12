@@ -1,5 +1,5 @@
 import { Acl, Input, Model } from '@contember/schema'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import WhereBuilder from '../select/WhereBuilder'

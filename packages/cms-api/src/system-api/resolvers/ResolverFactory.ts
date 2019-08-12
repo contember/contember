@@ -1,7 +1,7 @@
 import StagesQueryResolver from './query/StagesQueryResolver'
 import DiffQueryResolver from './query/DiffQueryResolver'
 import { Event, EventType, Resolvers } from '../schema/types'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import ResolverContext from './ResolverContext'
 import { GraphQLResolveInfo } from 'graphql'
 import ReleaseMutationResolver from './mutation/ReleaseMutationResolver'

@@ -1,5 +1,5 @@
 import { makeExecutableSchema } from 'graphql-tools'
-import typeDefs from '../../../../src/tenant-api/schema/tenant.graphql'
+import { schemaDocument, ApiKey, ResolverContext } from '@contember/engine-tenant-api'
 import { executeGraphQlTest } from '../../../src/testGraphql'
 import { GQL, SQL } from '../../../src/tags'
 import 'mocha'
@@ -8,9 +8,7 @@ import { testUuid } from '../../../src/testUuid'
 import crypto from 'crypto'
 import sinon from 'sinon'
 import { Buffer } from 'buffer'
-import ApiKey from '../../../../src/tenant-api/model/type/ApiKey'
-import ResolverContext from '../../../../src/tenant-api/resolvers/ResolverContext'
-import Identity from '../../../../src/common/auth/Identity'
+import { Identity } from '@contember/engine-common'
 import TenantContainer from '../../../../src/tenant-api/TenantContainer'
 import { createConnectionMock, ExpectedQuery } from '@contember/database'
 
@@ -40,7 +38,7 @@ export const execute = async (test: Test) => {
 		},
 	)
 
-	const schema = makeExecutableSchema({ typeDefs, resolvers: tenantContainer.resolvers as any })
+	const schema = makeExecutableSchema({ typeDefs: schemaDocument, resolvers: tenantContainer.resolvers as any })
 	await executeGraphQlTest({
 		context: context,
 		query: test.query,

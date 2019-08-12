@@ -1,7 +1,7 @@
 import { AnyEvent } from '../dtos/Event'
 import { Event as ApiEvent, EventType as ApiEventType } from '../../schema/types'
 import { EventType } from '../EventType'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 import PermissionsVerifier from './PermissionsVerifier'
 
 type EventWithMeta = AnyEvent & { dependencies: string[]; permission: PermissionsVerifier.EventPermission }

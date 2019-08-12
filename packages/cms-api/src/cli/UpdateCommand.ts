@@ -1,8 +1,8 @@
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import { ProjectContainer } from '../CompositionRoot'
 import Command from '../core/cli/Command'
-import ProjectManager from '../tenant-api/model/service/ProjectManager'
 import MigrationsRunner from '../core/migrations/MigrationsRunner'
+import { ProjectManager } from '@contember/engine-tenant-api'
 
 class UpdateCommand extends Command<{}, {}> {
 	constructor(

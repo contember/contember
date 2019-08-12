@@ -1,9 +1,8 @@
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import Command from '../core/cli/Command'
-import ApiKeyManager from '../tenant-api/model/service/ApiKeyManager'
-import SignUpManager from '../tenant-api/model/service/SignUpManager'
 import prompts from 'prompts'
 import { Identity } from '@contember/engine-common'
+import { ApiKeyManager, SignUpManager } from '@contember/engine-tenant-api'
 
 class SetupCommand extends Command<{}, {}> {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {

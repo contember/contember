@@ -2,7 +2,7 @@ import { DatabaseQuery } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
 import { EventType } from '../EventType'
 import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
-import { assertNever } from 'cms-common'
+import { assertNever } from '@contember/utils'
 
 class DiffQuery extends DatabaseQuery<AnyEvent[]> {
 	constructor(private readonly baseEvent: string, private readonly headEvent: string) {

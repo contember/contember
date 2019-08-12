@@ -1,22 +1,18 @@
+import { FieldName } from '../../bindingTypes'
 import { ToOne } from '../../coreComponents'
-import { DataBindingError, EntityAccessor, ReferenceMarker } from '../../dao'
+import { DataBindingError, EntityAccessor, FieldAccessor } from '../../dao'
+import { getNestedEntity } from './getNestedEntity'
 
-export const getNestedField = (entity: EntityAccessor, toOneProps: ToOne.AtomicPrimitiveProps[]) => {
-	for (let i = toOneProps.length - 1; i >= 0; i--) {
-		const props = toOneProps[i]
+export const getNestedField = (
+	entity: EntityAccessor,
+	toOneProps: ToOne.AtomicPrimitiveProps[],
+	fieldName: FieldName,
+) => {
+	const nestedEntity = getNestedEntity(entity, toOneProps)
+	const field = nestedEntity.data.getField(fieldName)
 
-		const field = entity.data.getField(
-			props.field,
-			ReferenceMarker.ExpectedCount.UpToOne,
-			props.filter,
-			props.reducedBy,
-		)
-
-		if (field instanceof EntityAccessor) {
-			entity = field
-		} else {
-			throw new DataBindingError('Corrupted data')
-		}
+	if (!(field instanceof FieldAccessor)) {
+		throw new DataBindingError(`Corrupted data`)
 	}
-	return entity
+	return field
 }

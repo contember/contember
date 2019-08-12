@@ -12,7 +12,7 @@ import {
 	ReferenceMarker,
 } from '../../../dao'
 import { Parser } from '../../../queryLanguage'
-import { getNestedField } from '../../utils'
+import { getNestedEntity } from '../../utils'
 import { BaseChoiceMetadata, ChoiceArity, ChoiceField, SingleChoiceFieldMetadata } from './ChoiceField'
 
 export type DynamicChoiceFieldProps = ChoiceField.InnerBaseProps & {
@@ -72,7 +72,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 		const optionEntities: EntityAccessor[] = []
 
 		for (let entity of filteredData) {
-			optionEntities.push(getNestedField(entity, toOneProps))
+			optionEntities.push(getNestedEntity(entity, toOneProps))
 		}
 
 		const entities =

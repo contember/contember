@@ -12,6 +12,7 @@ import {
 	ReferenceMarker,
 } from '../../../dao'
 import { Parser } from '../../../queryLanguage'
+import { getNestedField } from '../../utils'
 import { BaseChoiceMetadata, ChoiceArity, ChoiceField, SingleChoiceFieldMetadata } from './ChoiceField'
 
 export type DynamicChoiceFieldProps = ChoiceField.InnerBaseProps & {
@@ -71,23 +72,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 		const optionEntities: EntityAccessor[] = []
 
 		for (let entity of filteredData) {
-			for (let i = toOneProps.length - 1; i >= 0; i--) {
-				const props = toOneProps[i]
-
-				const field = entity.data.getField(
-					props.field,
-					ReferenceMarker.ExpectedCount.UpToOne,
-					props.filter,
-					props.reducedBy,
-				)
-
-				if (field instanceof EntityAccessor) {
-					entity = field
-				} else {
-					throw new DataBindingError('Corrupted data')
-				}
-			}
-			optionEntities.push(entity)
+			optionEntities.push(getNestedField(entity, toOneProps))
 		}
 
 		const entities =

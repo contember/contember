@@ -1,19 +1,19 @@
 import { Stage } from '../dtos/Stage'
 import DiffQuery from '../queries/DiffQuery'
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import DependencyBuilder from './DependencyBuilder'
 import PermissionsVerifier from './PermissionsVerifier'
 import EventApplier from './EventApplier'
 import EventsRebaser from './EventsRebaser'
 import StageByIdQuery from '../queries/StageByIdQuery'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import StageTree from '../stages/StageTree'
 
 class ReleaseExecutor {
 	constructor(
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly permissionsVerifier: PermissionsVerifier,
 		private readonly eventApplier: EventApplier,

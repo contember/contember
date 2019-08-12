@@ -1,6 +1,6 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { uuid } from '../../../utils/uuid'
-import InsertBuilder from '../../../core/database/InsertBuilder'
+import { InsertBuilder } from '@contember/database'
 import { EventType } from '../EventType'
 
 class CreateInitEventCommand {

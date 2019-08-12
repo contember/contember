@@ -1,8 +1,8 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 
-class ProjectsQuery extends DbQuery<ProjectsQuery.Result> {
-	async fetch(queryable: DbQueryable): Promise<ProjectsQuery.Result> {
+class ProjectsQuery extends DatabaseQuery<ProjectsQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<ProjectsQuery.Result> {
 		return await queryable
 			.createSelectBuilder<ProjectsQuery.Row>()
 			.select('id')

@@ -1,5 +1,5 @@
 import Command from './Command'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import UpdateProjectMemberVariablesCommand from './UpdateProjectMemberVariablesCommand'
 
 class RemoveProjectMemberVariablesCommand implements Command<void> {

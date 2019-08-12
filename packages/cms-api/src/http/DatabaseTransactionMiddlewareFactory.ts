@@ -1,5 +1,5 @@
 import { KoaMiddleware } from '../core/koa/types'
-import Client from '../core/database/Client'
+import { Client } from '@contember/database'
 
 class DatabaseTransactionMiddlewareFactory {
 	public create(): KoaMiddleware<DatabaseTransactionMiddlewareFactory.KoaState> {

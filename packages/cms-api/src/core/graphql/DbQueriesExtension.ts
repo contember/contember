@@ -1,6 +1,5 @@
 import { GraphQLExtension } from 'graphql-extensions'
-import Client from '../database/Client'
-import EventManager from '../database/EventManager'
+import { Client, EventManager } from '@contember/database'
 
 type Query = { sql: string; bindings: any; elapsed: number; error?: string; meta?: any }
 

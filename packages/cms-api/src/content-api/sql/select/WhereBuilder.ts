@@ -4,9 +4,7 @@ import { Input, Model } from '@contember/schema'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import ConditionBuilder from './ConditionBuilder'
-import SelectBuilder from '../../../core/database/SelectBuilder'
-import SqlConditionBuilder from '../../../core/database/ConditionBuilder'
-import Client from '../../../core/database/Client'
+import { Client, SelectBuilder, ConditionBuilder as SqlConditionBuilder } from '@contember/database'
 
 class WhereBuilder {
 	constructor(

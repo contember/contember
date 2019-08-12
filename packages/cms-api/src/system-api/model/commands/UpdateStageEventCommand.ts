@@ -1,4 +1,4 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 
 class UpdateStageEventCommand {
 	constructor(private readonly stageId: string, private readonly eventId: string) {}

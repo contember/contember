@@ -1,6 +1,6 @@
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import Command from './Command'
-import InsertBuilder from '../../../core/database/InsertBuilder'
+import { InsertBuilder } from '@contember/database'
 import Project from '../type/Project'
 
 class CreateOrUpdateProjectCommand implements Command<void> {

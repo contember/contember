@@ -1,7 +1,7 @@
 import CreateInitEventCommand from './model/commands/CreateInitEventCommand'
 import { setupSystemVariables, unnamedIdentity } from './SystemVariablesSetupHelper'
 import Project from '../config/Project'
-import Client from '../core/database/Client'
+import { Client } from '@contember/database'
 import ProjectMigrator from './model/migrations/ProjectMigrator'
 import RebaseExecutor from './model/events/RebaseExecutor'
 import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'

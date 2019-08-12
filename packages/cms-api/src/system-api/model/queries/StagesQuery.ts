@@ -1,9 +1,9 @@
-import DbQuery from '../../../core/database/DbQuery'
+import { DatabaseQuery } from '@contember/database'
 import { Stage } from '../../schema/types'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQueryable } from '@contember/database'
 
-class StagesQuery extends DbQuery<Stage[]> {
-	async fetch(queryable: DbQueryable): Promise<Stage[]> {
+class StagesQuery extends DatabaseQuery<Stage[]> {
+	async fetch(queryable: DatabaseQueryable): Promise<Stage[]> {
 		const select = queryable
 			.createSelectBuilder<Stage>()
 			.from('stage')

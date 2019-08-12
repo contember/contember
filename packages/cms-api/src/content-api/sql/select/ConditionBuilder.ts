@@ -1,6 +1,5 @@
 import { Input } from '@contember/schema'
-import SqlConditionBuilder from '../../../core/database/ConditionBuilder'
-import QueryBuilder from '../../../core/database/QueryBuilder'
+import { QueryBuilder, ConditionBuilder as SqlConditionBuilder } from '@contember/database'
 
 export default class ConditionBuilder {
 	public build(

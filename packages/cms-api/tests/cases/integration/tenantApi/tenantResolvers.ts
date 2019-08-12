@@ -12,11 +12,11 @@ import ApiKey from '../../../../src/tenant-api/model/type/ApiKey'
 import ResolverContext from '../../../../src/tenant-api/resolvers/ResolverContext'
 import Identity from '../../../../src/common/auth/Identity'
 import TenantContainer from '../../../../src/tenant-api/TenantContainer'
-import { createConnectionMock, SqlQuery } from '../../../src/ConnectionMock'
+import { createConnectionMock, ExpectedQuery } from '@contember/database'
 
 export interface Test {
 	query: string
-	executes: SqlQuery[]
+	executes: ExpectedQuery[]
 	return: object
 }
 

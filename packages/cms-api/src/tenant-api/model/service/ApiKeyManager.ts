@@ -1,8 +1,7 @@
-import DbQueryable from '../../../core/database/DbQueryable'
-import QueryHandler from '../../../core/query/QueryHandler'
+import { Client, DatabaseQueryable } from '@contember/database'
+import { QueryHandler } from '@contember/queryable'
 import ApiKey from '../type/ApiKey'
 import ApiKeyByTokenQuery from '../queries/ApiKeyByTokenQuery'
-import Client from '../../../core/database/Client'
 import CreateIdentityCommand from '../commands/CreateIdentityCommand'
 import Identity from '../../../common/auth/Identity'
 import CreateApiKey from '../commands/CreateApiKey'
@@ -17,7 +16,7 @@ import DisableIdentityApiKeysCommand from '../commands/DisableIdentityApiKeysCom
 import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMemberVariablesCommand'
 
 class ApiKeyManager {
-	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
+	constructor(private readonly queryHandler: QueryHandler<DatabaseQueryable>, private readonly db: Client) {}
 
 	async verifyAndProlong(token: string): Promise<ApiKeyManager.VerifyResult> {
 		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))

@@ -1,14 +1,14 @@
 import Path from '../select/Path'
 import Mapper from '../Mapper'
 import WhereBuilder from '../select/WhereBuilder'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { Input, Model, Value } from '@contember/schema'
-import ConditionBuilder from '../../../core/database/ConditionBuilder'
+import { ConditionBuilder } from '@contember/database'
 import OrderByBuilder from './OrderByBuilder'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import PredicatesInjector from '../../../acl/PredicatesInjector'
-import LimitByGroupWrapper from '../../../core/database/LimitByGroupWrapper'
-import SelectBuilder from '../../../core/database/SelectBuilder'
+import { LimitByGroupWrapper } from '@contember/database'
+import { SelectBuilder } from '@contember/database'
 
 class JunctionFetcher {
 	constructor(

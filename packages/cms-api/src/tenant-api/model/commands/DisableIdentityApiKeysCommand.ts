@@ -1,5 +1,5 @@
 import Command from './Command'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 
 class DisableIdentityApiKeysCommand implements Command<void> {
 	constructor(private readonly identityId: string) {}

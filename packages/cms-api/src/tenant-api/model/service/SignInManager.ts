@@ -1,14 +1,14 @@
 import bcrypt from 'bcrypt'
 import { SignInErrorCode } from '../../schema/types'
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import ApiKeyManager from './ApiKeyManager'
 import PersonQuery from '../queries/person/PersonQuery'
 import { PersonRow } from '../queries/person/types'
 
 class SignInManager {
 	constructor(
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly apiKeyManager: ApiKeyManager,
 	) {}
 

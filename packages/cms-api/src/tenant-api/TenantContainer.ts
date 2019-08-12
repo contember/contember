@@ -1,7 +1,7 @@
 import { Authorizator, AccessEvaluator } from '@contember/authorization'
 import { DatabaseCredentials } from '../config/config'
-import QueryHandler from '../core/query/QueryHandler'
-import DbQueryable from '../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import MeQueryResolver from './resolvers/query/MeQueryResolver'
 import CreateApiKeyMutationResolver from './resolvers/mutation/apiKey/CreateApiKeyMutationResolver'
 import SignUpMutationResolver from './resolvers/mutation/person/SignUpMutationResolver'
@@ -19,7 +19,7 @@ import ProjectMemberManager from './model/service/ProjectMemberManager'
 import ResolverFactory from './resolvers/ResolverFactory'
 import { ApolloServer } from 'apollo-server-koa'
 import ProjectManager from './model/service/ProjectManager'
-import Connection from '../core/database/Connection'
+import { Connection } from '@contember/database'
 import ChangePasswordMutationResolver from './resolvers/mutation/person/ChangePasswordMutationResolver'
 import PasswordChangeManager from './model/service/PasswordChangeManager'
 import SignOutMutationResolver from './resolvers/mutation/person/SignOutMutationResolver'
@@ -70,8 +70,8 @@ namespace TenantContainer {
 				)
 				.addService('queryHandler', ({ db }) => {
 					const handler = new QueryHandler(
-						new DbQueryable(db, {
-							get(): QueryHandler<DbQueryable> {
+						new DatabaseQueryable(db, {
+							get(): QueryHandler<DatabaseQueryable> {
 								return handler
 							},
 						}),

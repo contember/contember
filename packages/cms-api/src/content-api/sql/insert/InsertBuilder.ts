@@ -1,12 +1,12 @@
 import { resolveValue } from '../utils'
 import { Input, Model, Value } from '@contember/schema'
-import Client from '../../../core/database/Client'
-import { Value as DbValue } from '../../../core/database/types'
+import { Client } from '@contember/database'
+import { Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
 import Mapper from '../Mapper'
-import QueryBuilder from '../../../core/database/QueryBuilder'
+import { QueryBuilder } from '@contember/database'
 
 type ColumnValue<E = never> = {
 	value: PromiseLike<Value.AtomicValue<E>>

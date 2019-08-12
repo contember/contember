@@ -1,6 +1,6 @@
 import { ChangePasswordErrorCode } from '../../schema/types'
 import ChangePasswordCommand from '../commands/ChangePasswordCommand'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 
 class PasswordChangeManager {
 	constructor(private readonly db: Client) {}

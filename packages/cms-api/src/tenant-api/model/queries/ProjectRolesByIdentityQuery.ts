@@ -1,12 +1,12 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 
-class ProjectRolesByIdentityQuery extends DbQuery<ProjectRolesByIdentityQuery.Result> {
+class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQuery.Result> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
 		const result = await queryable
 			.createSelectBuilder<ProjectRolesByIdentityQuery.Result>()
 			.select('roles')

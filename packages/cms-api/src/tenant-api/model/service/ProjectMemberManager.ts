@@ -1,6 +1,6 @@
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
-import Client from '../../../core/database/Client'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
+import { Client } from '@contember/database'
 import ProjectRolesByIdentityQuery from '../queries/ProjectRolesByIdentityQuery'
 import UpdateProjectMemberCommand from '../commands/UpdateProjectMemberCommand'
 import ProjectVariablesByIdentityQuery from '../queries/ProjectVariablesByIdentityQuery'
@@ -9,7 +9,7 @@ import UpdateProjectMemberVariablesCommand from '../commands/UpdateProjectMember
 import RemoveProjectMemberCommand from '../commands/RemoveProjectMemberCommand'
 
 class ProjectMemberManager {
-	constructor(private readonly queryHandler: QueryHandler<DbQueryable>, private readonly db: Client) {}
+	constructor(private readonly queryHandler: QueryHandler<DatabaseQueryable>, private readonly db: Client) {}
 
 	async getProjectRoles(projectId: string, identityId: string): Promise<ProjectMemberManager.GetProjectRolesResponse> {
 		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery(projectId, identityId))

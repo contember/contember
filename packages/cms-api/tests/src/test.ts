@@ -3,9 +3,8 @@ import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/Gra
 import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import S3 from '../../src/utils/S3'
 import { executeGraphQlTest } from './testGraphql'
-import Client from '../../src/core/database/Client'
+import { Client, createConnectionMock } from '@contember/database'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
-import { createConnectionMock } from './ConnectionMock'
 import { emptySchema } from '../../src/content-schema/schemaUtils'
 
 export interface SqlQuery {

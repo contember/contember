@@ -1,17 +1,17 @@
 import { Authorizator, AuthorizationScope } from '@contember/authorization'
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
-import ConditionBuilder from '../../../core/database/ConditionBuilder'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
+import { ConditionBuilder } from '@contember/database'
 import Identity from '../../../common/auth/Identity'
 import Actions from '../authorization/Actions'
 import ProjectsQuery from './ProjectsQuery'
 
-class ProjectsByIdentityQuery extends DbQuery<ProjectsByIdentityQuery.Result> {
+class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Result> {
 	constructor(private readonly authorizator: Authorizator<Identity>, private readonly identityId: string) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<ProjectsByIdentityQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<ProjectsByIdentityQuery.Result> {
 		const identityResult = await queryable
 			.createSelectBuilder<{ roles: string[] }>()
 			.from('identity')

@@ -1,6 +1,6 @@
 import Command from './Command'
 import ApiKey from '../type/ApiKey'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import ApiKeyHelper from './ApiKeyHelper'
 
 class ProlongApiKey implements Command<void> {

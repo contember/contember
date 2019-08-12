@@ -5,7 +5,7 @@ import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/Exe
 import { Context as ContentContext } from '../../src/content-api/types'
 import { maskErrors } from 'graphql-errors'
 import { graphql } from 'graphql'
-import Client from '../../src/core/database/Client'
+import { Client } from '@contember/database'
 import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
 import TesterStageManager from './TesterStageManager'
 import { Schema } from '@contember/schema'

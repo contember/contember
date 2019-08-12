@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import ApiKey from '../type/ApiKey'
 import { uuid } from '../../../utils/uuid'
 import { now } from '../../../utils/date'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import ApiKeyHelper from './ApiKeyHelper'
 
 class CreateApiKey implements Command<CreateApiKey.Result> {

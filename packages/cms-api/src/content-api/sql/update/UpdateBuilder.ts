@@ -2,12 +2,12 @@ import { tuple } from '@contember/utils'
 import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { resolveValue } from '../utils'
-import Client from '../../../core/database/Client'
-import QueryBuilder from '../../../core/database/QueryBuilder'
-import { Value as DbValue } from '../../../core/database/types'
+import { Client } from '@contember/database'
+import { QueryBuilder } from '@contember/database'
+import { Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
-import ConditionBuilder from '../../../core/database/ConditionBuilder'
+import { ConditionBuilder } from '@contember/database'
 
 type ColumnValue = {
 	value: PromiseLike<Value.AtomicValue | undefined>

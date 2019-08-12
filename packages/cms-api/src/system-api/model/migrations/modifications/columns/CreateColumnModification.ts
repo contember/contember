@@ -5,7 +5,7 @@ import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpd
 import { Modification } from '../Modification'
 import { EventType } from '../../../EventType'
 import { resolveDefaultValue } from '../../../../../content-schema/dataUtils'
-import { wrapIdentifier } from '../../../../../core/database/utils'
+import { wrapIdentifier } from '@contember/database'
 import { escapeValue } from '../../../../../core/pg-migrate/helpers'
 
 class CreateColumnModification implements Modification<CreateColumnModification.Data> {

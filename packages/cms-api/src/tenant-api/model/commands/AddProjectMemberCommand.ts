@@ -1,6 +1,6 @@
 import Command from './Command'
 import { AddProjectMemberErrorCode } from '../../schema/types'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import { uuid } from '../../../utils/uuid'
 import UpdateProjectMemberVariablesCommand from './UpdateProjectMemberVariablesCommand'
 

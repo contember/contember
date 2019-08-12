@@ -3,7 +3,7 @@ import Path from './Path'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { Input, Model } from '@contember/schema'
 import SelectHydrator from './SelectHydrator'
-import SelectBuilder from '../../../core/database/SelectBuilder'
+import { SelectBuilder } from '@contember/database'
 
 interface SelectExecutionHandler<MetaArgs> {
 	process(context: SelectExecutionHandler.Context): void

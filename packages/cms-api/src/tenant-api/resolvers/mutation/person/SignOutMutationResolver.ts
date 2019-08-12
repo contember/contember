@@ -1,7 +1,7 @@
 import { MutationResolvers, MutationSignOutArgs, SignOutErrorCode, SignOutResponse } from '../../../schema/types'
 import ResolverContext from '../../ResolverContext'
-import QueryHandler from '../../../../core/query/QueryHandler'
-import DbQueryable from '../../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 import Actions from '../../../model/authorization/Actions'
 import ApiKeyManager from '../../../model/service/ApiKeyManager'
 import PersonQuery from '../../../model/queries/person/PersonQuery'
@@ -9,7 +9,7 @@ import PersonQuery from '../../../model/queries/person/PersonQuery'
 export default class SignOutMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 	) {}
 
 	async signOut(parent: any, args: MutationSignOutArgs, context: ResolverContext): Promise<SignOutResponse> {

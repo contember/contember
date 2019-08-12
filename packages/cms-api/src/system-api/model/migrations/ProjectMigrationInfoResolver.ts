@@ -2,14 +2,14 @@ import Migration from './Migration'
 import Project from '../../../config/Project'
 import LatestMigrationByStageQuery from '../queries/LatestMigrationByStageQuery'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
-import QueryHandler from '../../../core/query/QueryHandler'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { QueryHandler } from '@contember/queryable'
+import { DatabaseQueryable } from '@contember/database'
 
 class ProjectMigrationInfoResolver {
 	constructor(
 		private readonly project: Project,
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly queryHandler: QueryHandler<DbQueryable>,
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 	) {}
 
 	public async getMigrationsInfo(): Promise<ProjectMigrationInfoResolver.Result> {

@@ -1,15 +1,15 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
-import SelectBuilder from '../../../core/database/SelectBuilder'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
+import { SelectBuilder } from '@contember/database'
 import { Stage } from '../dtos/Stage'
 import { prepareStageQueryBuilder } from './StageQueryHelper'
 
-class StageByIdQuery extends DbQuery<StageByIdQuery.Result> {
+class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {
 	constructor(private readonly stageId: string, private readonly forUpdate: boolean = false) {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<StageByIdQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<StageByIdQuery.Result> {
 		let selectBuilder: SelectBuilder<StageByIdQuery.Result, any> = prepareStageQueryBuilder(queryable).where({
 			id: this.stageId,
 		})

@@ -1,6 +1,6 @@
 import Command from './Command'
 import { RemoveProjectMemberErrorCode } from '../../schema/types'
-import Client from '../../../core/database/Client'
+import { Client } from '@contember/database'
 import RemoveProjectMemberVariablesCommand from './RemoveProjectMemberVariablesCommand'
 
 class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {

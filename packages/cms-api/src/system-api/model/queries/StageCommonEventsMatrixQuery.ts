@@ -1,12 +1,12 @@
-import DbQuery from '../../../core/database/DbQuery'
-import DbQueryable from '../../../core/database/DbQueryable'
+import { DatabaseQuery } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 
-class StageCommonEventsMatrixQuery extends DbQuery<StageCommonEventsMatrixQuery.Result> {
+class StageCommonEventsMatrixQuery extends DatabaseQuery<StageCommonEventsMatrixQuery.Result> {
 	constructor() {
 		super()
 	}
 
-	async fetch(queryable: DbQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
 		const rows = (await queryable.createWrapper().query<{
 			stage_a_id: string
 			stage_b_id: string

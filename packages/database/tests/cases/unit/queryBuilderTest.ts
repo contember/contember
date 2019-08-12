@@ -1,4 +1,4 @@
-import 'jest'
+import 'jasmine'
 import {
 	Client,
 	ConditionBuilder,
@@ -29,7 +29,7 @@ const execute = async (test: Test) => {
 }
 
 describe('query builder', () => {
-	test('constructs condition', async () => {
+	it('constructs condition', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper
@@ -63,7 +63,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs "on"', async () => {
+	it('constructs "on"', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper
@@ -94,7 +94,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs simple insert', async () => {
+	it('constructs simple insert', async () => {
 		await execute({
 			query: async wrapper => {
 				const builder = wrapper
@@ -112,7 +112,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs insert with cte', async () => {
+	it('constructs insert with cte', async () => {
 		await execute({
 			query: async wrapper => {
 				const builder = wrapper
@@ -144,7 +144,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs insert with on conflict update', async () => {
+	it('constructs insert with on conflict update', async () => {
 		await execute({
 			query: async wrapper => {
 				const builder = wrapper
@@ -174,7 +174,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs insert with on conflict do nothing', async () => {
+	it('constructs insert with on conflict do nothing', async () => {
 		await execute({
 			query: async wrapper => {
 				const builder = wrapper
@@ -193,7 +193,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs simple update', async () => {
+	it('constructs simple update', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper
@@ -212,7 +212,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs update with cte', async () => {
+	it('constructs update with cte', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper
@@ -244,7 +244,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs select with condition', async () => {
+	it('constructs select with condition', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper.selectBuilder().select(
@@ -264,7 +264,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs delete', async () => {
+	it('constructs delete', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper
@@ -285,7 +285,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('constructs window function', async () => {
+	it('constructs window function', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper.selectBuilder().select(expr =>
@@ -306,7 +306,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('applies limit by group', async () => {
+	it('applies limit by group', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper
@@ -330,7 +330,7 @@ describe('query builder', () => {
 		})
 	})
 
-	test('select with no key update', async () => {
+	it('select with no key update', async () => {
 		await execute({
 			query: async wrapper => {
 				const qb = wrapper

@@ -11,4 +11,11 @@ $cui-conf-stateClassCallback: 'formatStateClass' !default;
 $cui-conf-rootSelector: ':root'; // Override this if you need to scope CUI custom properties. See _root.sass
 $cui-conf-defaultView: default !default;
 
-$cui-formGroup-separation: 1.25em
+// Global values
+$cui-focusTransitionDuration: .3s;
+
+// FormGroup
+$cui-formGroup-separation: 1.25em;
+
+// Buttons
+$cui-button-focusTransitionDuration: $cui-focusTransitionDuration;

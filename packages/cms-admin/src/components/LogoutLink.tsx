@@ -19,9 +19,9 @@ interface LogoutDispatchProps {
 type Props = LogoutDispatchProps & LogoutLinkProps
 
 class LogoutLink extends React.Component<Props, {}> {
-	onClick = () => {
+	onClick = async () => {
 		if (navigator.credentials && navigator.credentials.preventSilentAccess) {
-			navigator.credentials.preventSilentAccess()
+			await navigator.credentials.preventSilentAccess()
 		}
 
 		this.props.logout()

@@ -14,12 +14,16 @@ $cui-conf-defaultView: default !default;
 // Global values
 $cui-focusTransitionDuration: .3s !default;
 
-// FormGroup
-$cui-formGroup-separation: 1.25em !default;
 
 // Buttons
 $cui-button-focusTransitionDuration: $cui-focusTransitionDuration !default;
 
+
+// FormGroup
+$cui-formGroup-separation: 1.25em !default;
+
+
 // Spinner
 $cui-spinner-appearSpeed: .2s !default;
+$cui-spinner-color: currentColor !default;
 $cui-spinner-period: 1.5s !default;

@@ -32,7 +32,7 @@ export const createEmptyDataTreeState = () => {
 	} as const
 }
 
-export const dataTreesReducer: Reducer = handleActions<DataTreesState, any>(
+export const dataTreesReducer = handleActions<DataTreesState, any>(
 	{
 		[DATA_TREE_SET_DIRTINESS]: (state: DataTreesState, action: Action<DataTreeDirtinessDelta>): DataTreesState => {
 			if (action.payload === undefined) {

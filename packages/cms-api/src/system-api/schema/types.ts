@@ -1,4 +1,5 @@
-type Maybe<T> = T | null
+import { GraphQLResolveInfo } from 'graphql'
+export type Maybe<T> = T | null
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -9,6 +10,7 @@ export type Scalars = {
 }
 
 export type CreateEvent = Event & {
+	__typename?: 'CreateEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>
@@ -19,6 +21,7 @@ export type CreateEvent = Event & {
 }
 
 export type DeleteEvent = Event & {
+	__typename?: 'DeleteEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>
@@ -40,12 +43,14 @@ export type DiffFilter = {
 }
 
 export type DiffResponse = {
+	__typename?: 'DiffResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<DiffErrorCode>
 	readonly result?: Maybe<DiffResult>
 }
 
 export type DiffResult = {
+	__typename?: 'DiffResult'
 	readonly base: Stage
 	readonly head: Stage
 	readonly events: ReadonlyArray<Event>
@@ -67,6 +72,7 @@ export enum EventType {
 }
 
 export type Mutation = {
+	__typename?: 'Mutation'
 	readonly release: ReleaseResponse
 	readonly rebaseAll: RebaseAllResponse
 }
@@ -78,6 +84,7 @@ export type MutationReleaseArgs = {
 }
 
 export type Query = {
+	__typename?: 'Query'
 	readonly stages: ReadonlyArray<Stage>
 	readonly diff: DiffResponse
 }
@@ -89,6 +96,7 @@ export type QueryDiffArgs = {
 }
 
 export type RebaseAllResponse = {
+	__typename?: 'RebaseAllResponse'
 	readonly ok: Scalars['Boolean']
 }
 
@@ -98,11 +106,13 @@ export enum ReleaseErrorCode {
 }
 
 export type ReleaseResponse = {
+	__typename?: 'ReleaseResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<ReleaseErrorCode>
 }
 
 export type RunMigrationEvent = Event & {
+	__typename?: 'RunMigrationEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>
@@ -112,12 +122,14 @@ export type RunMigrationEvent = Event & {
 }
 
 export type Stage = {
+	__typename?: 'Stage'
 	readonly id: Scalars['String']
 	readonly name: Scalars['String']
 	readonly slug: Scalars['String']
 }
 
 export type UpdateEvent = Event & {
+	__typename?: 'UpdateEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>
@@ -128,7 +140,7 @@ export type UpdateEvent = Event & {
 	readonly fields: ReadonlyArray<Scalars['String']>
 }
 
-import { GraphQLResolveInfo } from 'graphql'
+export type ResolverTypeWrapper<T> = Promise<T> | T
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
@@ -185,109 +197,193 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
 
-export type CreateEventResolvers<Context = any, ParentType = CreateEvent> = {
-	id?: Resolver<Scalars['String'], ParentType, Context>
-	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
-	type?: Resolver<Maybe<EventType>, ParentType, Context>
-	description?: Resolver<Scalars['String'], ParentType, Context>
-	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
-	entity?: Resolver<Scalars['String'], ParentType, Context>
-	rowId?: Resolver<Scalars['String'], ParentType, Context>
+/** Mapping between all available schema types and the resolvers types */
+export type ResolversTypes = {
+	Query: ResolverTypeWrapper<{}>
+	Stage: ResolverTypeWrapper<Stage>
+	String: ResolverTypeWrapper<Scalars['String']>
+	DiffFilter: DiffFilter
+	DiffResponse: ResolverTypeWrapper<DiffResponse>
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+	DiffErrorCode: DiffErrorCode
+	DiffResult: ResolverTypeWrapper<DiffResult>
+	Event: ResolverTypeWrapper<Event>
+	EventType: EventType
+	Mutation: ResolverTypeWrapper<{}>
+	ReleaseResponse: ResolverTypeWrapper<ReleaseResponse>
+	ReleaseErrorCode: ReleaseErrorCode
+	RebaseAllResponse: ResolverTypeWrapper<RebaseAllResponse>
+	UpdateEvent: ResolverTypeWrapper<UpdateEvent>
+	DeleteEvent: ResolverTypeWrapper<DeleteEvent>
+	CreateEvent: ResolverTypeWrapper<CreateEvent>
+	RunMigrationEvent: ResolverTypeWrapper<RunMigrationEvent>
 }
 
-export type DeleteEventResolvers<Context = any, ParentType = DeleteEvent> = {
-	id?: Resolver<Scalars['String'], ParentType, Context>
-	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
-	type?: Resolver<Maybe<EventType>, ParentType, Context>
-	description?: Resolver<Scalars['String'], ParentType, Context>
-	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
-	entity?: Resolver<Scalars['String'], ParentType, Context>
-	rowId?: Resolver<Scalars['String'], ParentType, Context>
+/** Mapping between all available schema types and the resolvers parents */
+export type ResolversParentTypes = {
+	Query: {}
+	Stage: Stage
+	String: Scalars['String']
+	DiffFilter: DiffFilter
+	DiffResponse: DiffResponse
+	Boolean: Scalars['Boolean']
+	DiffErrorCode: DiffErrorCode
+	DiffResult: DiffResult
+	Event: Event
+	EventType: EventType
+	Mutation: {}
+	ReleaseResponse: ReleaseResponse
+	ReleaseErrorCode: ReleaseErrorCode
+	RebaseAllResponse: RebaseAllResponse
+	UpdateEvent: UpdateEvent
+	DeleteEvent: DeleteEvent
+	CreateEvent: CreateEvent
+	RunMigrationEvent: RunMigrationEvent
 }
 
-export type DiffResponseResolvers<Context = any, ParentType = DiffResponse> = {
-	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
-	errors?: Resolver<ReadonlyArray<DiffErrorCode>, ParentType, Context>
-	result?: Resolver<Maybe<DiffResult>, ParentType, Context>
+export type CreateEventResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateEvent'] = ResolversParentTypes['CreateEvent']
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
-export type DiffResultResolvers<Context = any, ParentType = DiffResult> = {
-	base?: Resolver<Stage, ParentType, Context>
-	head?: Resolver<Stage, ParentType, Context>
-	events?: Resolver<ReadonlyArray<Event>, ParentType, Context>
+export type DeleteEventResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DeleteEvent'] = ResolversParentTypes['DeleteEvent']
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
-export type EventResolvers<Context = any, ParentType = Event> = {
-	__resolveType: TypeResolveFn<'UpdateEvent' | 'DeleteEvent' | 'CreateEvent' | 'RunMigrationEvent', ParentType, Context>
-	id?: Resolver<Scalars['String'], ParentType, Context>
-	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
-	description?: Resolver<Scalars['String'], ParentType, Context>
-	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
-	type?: Resolver<Maybe<EventType>, ParentType, Context>
+export type DiffResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DiffResponse'] = ResolversParentTypes['DiffResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['DiffErrorCode']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['DiffResult']>, ParentType, ContextType>
 }
 
-export type MutationResolvers<Context = any, ParentType = Mutation> = {
-	release?: Resolver<ReleaseResponse, ParentType, Context, MutationReleaseArgs>
-	rebaseAll?: Resolver<RebaseAllResponse, ParentType, Context>
+export type DiffResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DiffResult'] = ResolversParentTypes['DiffResult']
+> = {
+	base?: Resolver<ResolversTypes['Stage'], ParentType, ContextType>
+	head?: Resolver<ResolversTypes['Stage'], ParentType, ContextType>
+	events?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType>
 }
 
-export type QueryResolvers<Context = any, ParentType = Query> = {
-	stages?: Resolver<ReadonlyArray<Stage>, ParentType, Context>
-	diff?: Resolver<DiffResponse, ParentType, Context, QueryDiffArgs>
+export type EventResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Event'] = ResolversParentTypes['Event']
+> = {
+	__resolveType: TypeResolveFn<
+		'UpdateEvent' | 'DeleteEvent' | 'CreateEvent' | 'RunMigrationEvent',
+		ParentType,
+		ContextType
+	>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
 }
 
-export type RebaseAllResponseResolvers<Context = any, ParentType = RebaseAllResponse> = {
-	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
+export type MutationResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
+> = {
+	release?: Resolver<ResolversTypes['ReleaseResponse'], ParentType, ContextType, MutationReleaseArgs>
+	rebaseAll?: Resolver<ResolversTypes['RebaseAllResponse'], ParentType, ContextType>
 }
 
-export type ReleaseResponseResolvers<Context = any, ParentType = ReleaseResponse> = {
-	ok?: Resolver<Scalars['Boolean'], ParentType, Context>
-	errors?: Resolver<ReadonlyArray<ReleaseErrorCode>, ParentType, Context>
+export type QueryResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
+> = {
+	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
+	diff?: Resolver<ResolversTypes['DiffResponse'], ParentType, ContextType, QueryDiffArgs>
 }
 
-export type RunMigrationEventResolvers<Context = any, ParentType = RunMigrationEvent> = {
-	id?: Resolver<Scalars['String'], ParentType, Context>
-	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
-	type?: Resolver<Maybe<EventType>, ParentType, Context>
-	description?: Resolver<Scalars['String'], ParentType, Context>
-	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
-	version?: Resolver<Scalars['String'], ParentType, Context>
+export type RebaseAllResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RebaseAllResponse'] = ResolversParentTypes['RebaseAllResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
-export type StageResolvers<Context = any, ParentType = Stage> = {
-	id?: Resolver<Scalars['String'], ParentType, Context>
-	name?: Resolver<Scalars['String'], ParentType, Context>
-	slug?: Resolver<Scalars['String'], ParentType, Context>
+export type ReleaseResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ReleaseResponse'] = ResolversParentTypes['ReleaseResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ReleaseErrorCode']>, ParentType, ContextType>
 }
 
-export type UpdateEventResolvers<Context = any, ParentType = UpdateEvent> = {
-	id?: Resolver<Scalars['String'], ParentType, Context>
-	dependencies?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
-	type?: Resolver<Maybe<EventType>, ParentType, Context>
-	description?: Resolver<Scalars['String'], ParentType, Context>
-	allowed?: Resolver<Scalars['Boolean'], ParentType, Context>
-	entity?: Resolver<Scalars['String'], ParentType, Context>
-	rowId?: Resolver<Scalars['String'], ParentType, Context>
-	fields?: Resolver<ReadonlyArray<Scalars['String']>, ParentType, Context>
+export type RunMigrationEventResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RunMigrationEvent'] = ResolversParentTypes['RunMigrationEvent']
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
-export type Resolvers<Context = any> = {
-	CreateEvent?: CreateEventResolvers<Context>
-	DeleteEvent?: DeleteEventResolvers<Context>
-	DiffResponse?: DiffResponseResolvers<Context>
-	DiffResult?: DiffResultResolvers<Context>
+export type StageResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['Stage'] = ResolversParentTypes['Stage']
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type UpdateEventResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateEvent'] = ResolversParentTypes['UpdateEvent']
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	fields?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+}
+
+export type Resolvers<ContextType = any> = {
+	CreateEvent?: CreateEventResolvers<ContextType>
+	DeleteEvent?: DeleteEventResolvers<ContextType>
+	DiffResponse?: DiffResponseResolvers<ContextType>
+	DiffResult?: DiffResultResolvers<ContextType>
 	Event?: EventResolvers
-	Mutation?: MutationResolvers<Context>
-	Query?: QueryResolvers<Context>
-	RebaseAllResponse?: RebaseAllResponseResolvers<Context>
-	ReleaseResponse?: ReleaseResponseResolvers<Context>
-	RunMigrationEvent?: RunMigrationEventResolvers<Context>
-	Stage?: StageResolvers<Context>
-	UpdateEvent?: UpdateEventResolvers<Context>
+	Mutation?: MutationResolvers<ContextType>
+	Query?: QueryResolvers<ContextType>
+	RebaseAllResponse?: RebaseAllResponseResolvers<ContextType>
+	ReleaseResponse?: ReleaseResponseResolvers<ContextType>
+	RunMigrationEvent?: RunMigrationEventResolvers<ContextType>
+	Stage?: StageResolvers<ContextType>
+	UpdateEvent?: UpdateEventResolvers<ContextType>
 }
 
 /**
  * @deprecated
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
-export type IResolvers<Context = any> = Resolvers<Context>
+export type IResolvers<ContextType = any> = Resolvers<ContextType>

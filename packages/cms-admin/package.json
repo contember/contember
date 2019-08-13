@@ -5,8 +5,7 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js",
-		"storybook": "start-storybook --ci -p 9001 -c dist/storybook/config"
+		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js"
 	},
 	"dependencies": {
 		"@blueprintjs/core": "^3.0.1",
@@ -46,8 +45,6 @@
 		"slate-react": "0.21.15"
 	},
 	"devDependencies": {
-		"@storybook/addon-info": "^4.1.11",
-		"@storybook/react": "^4.1.11",
 		"@types/chai": "^4.1.6",
 		"@types/classnames": "^2.2.9",
 		"@types/gravatar": "^1.8.0",
@@ -64,7 +61,6 @@
 		"@types/slate": "^0.43.8",
 		"@types/slate-html-serializer": "^0.6.3",
 		"@types/slate-react": "^0.20.3",
-		"@types/storybook__react": "^4.0.0",
 		"@types/webappsec-credential-management": "^0.5.1",
 		"awesome-typescript-loader": "^5.2.1",
 		"chai": "^4.2.0",

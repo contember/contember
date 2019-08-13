@@ -12,7 +12,8 @@
 	transition-duration: var(--transition-duration)
 
 	@media (prefers-reduced-motion: reduce)
-		--transition-duration: 0s
+		--transition-duration: #{(1s / 60)} // 1 frame at 60 fps
+		transition-timing-function: step-end
 
 	&.is-expanded
 		height: var(--content-height, auto)

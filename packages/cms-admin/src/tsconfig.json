@@ -13,6 +13,9 @@
 		},
 		{
 			"path": "../../../packages/schema/src"
+		},
+		{
+			"path": "../../../packages/ui/src"
 		}
 	]
 }

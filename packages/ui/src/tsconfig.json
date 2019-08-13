@@ -2,6 +2,7 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/src",
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"jsx": "react"
 	}
 }

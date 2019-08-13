@@ -1,12 +1,8 @@
 import * as React from 'react'
-import { Spinner } from '../../../../components'
+import { Spinner } from '@contember/ui'
 
-export class LoadingSpinner extends React.Component<{}> {
-	public render() {
-		return (
-			<div className="loadingSpinner">
-				<Spinner />
-			</div>
-		)
-	}
-}
+export const LoadingSpinner = React.memo(() => (
+	<div className="loadingSpinner">
+		<Spinner />
+	</div>
+))

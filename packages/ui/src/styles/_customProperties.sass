@@ -1,11 +1,11 @@
 @import 'common'
 
 =customProperties()
-	--cui-formGroup-separation: $cui-formGroup-separation
+	--cui-formGroup-separation: #{$cui-formGroup-separation}
 
-	--cui-spinner-appearSpeed: $cui-spinner-appearSpeed
-	--cui-spinner-period: $cui-spinner-period
+	--cui-spinner-appearSpeed: #{$cui-spinner-appearSpeed}
+	--cui-spinner-period: #{$cui-spinner-period}
 
 	@media (prefers-reduced-motion: reduce)
 		--cui-spinner-appearSpeed: 0s
-		--cui-spinner-period: 3 * $cui-spinner-period
+		--cui-spinner-period: #{3 * $cui-spinner-period}

@@ -1,64 +1,48 @@
 import * as React from 'react'
 import cn from 'classnames'
-import { createRef } from 'react'
 
 export interface CollapsibleProps {
 	expanded: boolean
+	children?: React.ReactNode
 }
 
-interface CollapsibleState {
-	targetHeight: string
-	delayedExpanded: boolean
-}
+export function Collapsible(props: CollapsibleProps) {
+	const contentRef = React.useRef<HTMLDivElement>(null)
+	const [contentHeight, setContentHeight] = React.useState('auto')
+	const [delayedExpanded, setDelayedExpanded] = React.useState(props.expanded)
 
-export class Collapsible extends React.Component<CollapsibleProps> {
-	protected contentRef = createRef<HTMLDivElement>()
-
-	state: CollapsibleState = {
-		targetHeight: 'auto',
-		delayedExpanded: this.props.expanded,
+	const setContentHeightToAuto = () => {
+		setContentHeight('auto')
 	}
 
-	componentWillReceiveProps(nextProps: Readonly<CollapsibleProps>): void {
-		if (nextProps.expanded !== this.props.expanded) {
-			this.updateTargetHeight(() => {
-				setTimeout(() => {
-					this.setState({
-						delayedExpanded: nextProps.expanded,
-					})
-				}, 50)
+	const updateContentHeight = () => {
+		const contentHeight = `${contentRef.current!.getBoundingClientRect().height}px`
+		setContentHeight(contentHeight)
+	}
+
+	React.useEffect(() => {
+		if (props.expanded !== delayedExpanded) {
+			updateContentHeight()
+			requestAnimationFrame(() => {
+				setDelayedExpanded(props.expanded)
 			})
 		}
-	}
+	}, [delayedExpanded, props.expanded])
 
-	render() {
-		const { expanded } = this.props
-		const { delayedExpanded, targetHeight } = this.state
-
-		return (
-			<div
-				className={cn('collapsible', delayedExpanded && 'is-expanded')}
-				style={
-					{
-						'--target-height': targetHeight,
-					} as React.CSSProperties // Custom properties not supported workaround
-				}
-				aria-hidden={!expanded}
-				onTransitionEnd={this.setTargetHeightToAuto}
-			>
-				<div className="collapsible-content" ref={this.contentRef}>
-					{this.props.children}
-				</div>
+	return (
+		<div
+			className={cn('collapsible', delayedExpanded && 'is-expanded')}
+			style={
+				{
+					'--content-height': contentHeight,
+				} as React.CSSProperties // Custom properties not supported workaround
+			}
+			aria-hidden={!props.expanded}
+			onTransitionEnd={setContentHeightToAuto}
+		>
+			<div className="collapsible-content" ref={contentRef}>
+				{props.children}
 			</div>
-		)
-	}
-
-	protected setTargetHeightToAuto = () => {
-		this.setState({ targetHeight: 'auto' })
-	}
-
-	protected updateTargetHeight(callback?: () => void) {
-		const targetHeight = `${this.contentRef.current!.getBoundingClientRect().height}px`
-		this.setState({ targetHeight }, callback)
-	}
+		</div>
+	)
 }

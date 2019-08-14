@@ -1,7 +1,6 @@
 export * from './Avatar'
 export * from './Button'
 export * from './Checkbox'
-export * from './Collapsible'
 export * from './DragHandle'
 export * from './Dropdown'
 export * from './FileInput'

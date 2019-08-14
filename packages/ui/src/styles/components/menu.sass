@@ -5,12 +5,19 @@
 
 	padding: $menu-link-vertical-padding 0 0
 
-	&-subgroup,
-	&-action,
-	&-tooDeep
+	&-subgroup
 		&.is-active > &-title,
 		&-title:hover
 			background-color: $c-active
+
+	&-action,
+	&-tooDeep
+		&-title
+			opacity: .8
+
+		&.is-active > &-title,
+		&-title:hover
+			opacity: 1
 
 	&-group
 		&-title
@@ -34,7 +41,28 @@
 			font-weight: $fw-medium
 
 		&-list
-			padding-bottom: em(8px)
+			padding: em(4px) 0 em(8px)
+
+		&.is-expanded &,
+		&.is-collapsed &
+			&-title::after
+				content: ''
+				display: inline-block
+				margin-top: .6em
+				width: .5em
+				height: .5em
+				margin-left: 1em
+				border-bottom: rem(2px) solid
+				border-right: rem(2px) solid
+				opacity: .5
+				float: right
+				transition: transform .2s
+				transform-origin: 70% 70%
+				transform: rotate(45deg)
+
+		&.is-collapsed &
+			&-title::after
+				transform: rotate(135deg)
 
 	&-action
 		font-size: $cui-menu-action-title-font-size

@@ -21,6 +21,7 @@ export const executeGraphQlTest = async (test: Test) => {
 		withMockedDate(async () => {
 			const response = await graphql(test.schema, test.query, null, test.context, test.queryVariables)
 			if ('errors' in response) {
+				console.error((response.errors as any)[0])
 				response.errors = (response.errors as any).map(({ message }: any) => ({ message }))
 			}
 			console.log(response)

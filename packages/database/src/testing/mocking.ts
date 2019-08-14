@@ -11,13 +11,35 @@ class MockExpectationError extends Error {}
 const assertEquals = (expected: any, actual: any) => {
 	if (expected !== actual) {
 		throw new MockExpectationError(`Assertion failed:
-ACTUAL:   ${actual}
-EXPECTED: ${expected}
+ACTUAL:   ${JSON.stringify(actual)}
+EXPECTED: ${JSON.stringify(expected)}
 `)
 	}
 }
 const assertDeepEquals = (expected: any, actual: any) => {
-	assertEquals(expected, actual) // todo
+	try {
+		assertEquals(typeof expected, typeof actual)
+		if (Array.isArray(expected)) {
+			assertEquals(Array.isArray(actual), true)
+			assertLength(expected.length, actual)
+			for (let i in expected) {
+				assertDeepEquals(expected[i], actual[i])
+			}
+		} else {
+			assertEquals(expected, actual) // todo
+		}
+	} catch (e) {
+		if (e instanceof MockExpectationError) {
+			throw new MockExpectationError(
+				`Assertion failed:
+ACTUAL:   ${JSON.stringify(actual)}
+EXPECTED: ${JSON.stringify(expected)}
+---- prev:
+` + e.message,
+			)
+		}
+		throw e
+	}
 }
 
 const assertLength = (expectedLength: number, actual: any[]) => {

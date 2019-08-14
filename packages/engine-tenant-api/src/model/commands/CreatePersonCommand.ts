@@ -1,8 +1,8 @@
 import { Command } from './'
 import { Client } from '@contember/database'
 import bcrypt from 'bcrypt'
-import { uuid } from '../../utils/uuid'
-import { PersonRow } from '../queries/person/types'
+import { uuid } from '../..'
+import { PersonRow } from '../queries'
 
 class CreatePersonCommand implements Command<PersonRow> {
 	constructor(private readonly identityId: string, private readonly email: string, private readonly password: string) {}

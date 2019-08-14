@@ -1,7 +1,7 @@
 import { Command } from './Command'
 import crypto from 'crypto'
 import { ApiKey } from '../'
-import { uuid } from '../../utils/uuid'
+import { uuid } from '../..'
 import { now } from '../../utils/date'
 import { Client } from '@contember/database'
 import { ApiKeyHelper } from './ApiKeyHelper'

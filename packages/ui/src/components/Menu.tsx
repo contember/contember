@@ -53,9 +53,15 @@ namespace Menu {
 		const [expanded, setExpanded] = React.useState(props.active || false)
 
 		return (
-			<li className={cn('menu-subgroup', props.active && 'is-active')}>
+			<li
+				className={cn(
+					'menu-subgroup',
+					props.active && 'is-active',
+					props.children && (expanded ? 'is-expanded' : 'is-collapsed'),
+				)}
+			>
 				{props.title && (
-					<h2 className="menu-subgroup-title" onClick={() => setExpanded(!expanded)}>
+					<h2 className="menu-subgroup-title" onClick={props.children ? () => setExpanded(!expanded) : undefined}>
 						{props.title}
 					</h2>
 				)}

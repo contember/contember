@@ -1,17 +1,16 @@
 @import '../common'
 
 .collapsible
-	--transition-duration: #{$cui-collapsible-transition-duration}
 	height: 0
 	visibility: hidden
 	opacity: 0
 	display: flex
 	align-items: flex-end
 	transition-property: height, opacity, visibility
-	transition-duration: var(--transition-duration)
+	transition-duration: $cui-collapsible-transition-duration
 
 	@media (prefers-reduced-motion: reduce)
-		--transition-duration: #{(1s / 60)} // 1 frame at 60 fps
+		transition-duration: #{(1s / 60)} // 1 frame at 60 fps
 		transition-timing-function: step-end
 
 	&.is-expanded

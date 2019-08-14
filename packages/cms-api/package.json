@@ -16,8 +16,7 @@
 		"prebuild": "npm run prebuild-system-api && npm run prebuild-content-schema-api && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
 		"test": "mocha --ui bdd --timeout 5000 './dist/tests/cases/**/*.js'",
 		"test:debug": "mocha --inspect --ui bdd",
-		"test:clean": "rm -rf ./dist && npm run build && npm run test",
-		"console": "node dist/src/engine-console.js"
+		"test:clean": "rm -rf ./dist && npm run build && npm run test"
 	},
 	"dependencies": {
 		"@apollographql/graphql-playground-html": "^1.6.6",

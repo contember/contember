@@ -24,6 +24,7 @@ export function Collapsible(props: CollapsibleProps) {
 		if (props.expanded !== delayedExpanded) {
 			updateContentHeight()
 			requestAnimationFrame(() => {
+				contentRef.current!.clientHeight // Force reflow
 				setDelayedExpanded(props.expanded)
 			})
 		}

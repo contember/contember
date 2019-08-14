@@ -8,11 +8,13 @@ export interface CollapsibleProps {
 
 export function Collapsible(props: CollapsibleProps) {
 	const contentRef = React.useRef<HTMLDivElement>(null)
+	const [isTransitioning, setIsTransitioning] = React.useState(false)
 	const [contentHeight, setContentHeight] = React.useState('auto')
 	const [delayedExpanded, setDelayedExpanded] = React.useState(props.expanded)
 
-	const setContentHeightToAuto = () => {
+	const onTransitionEnd = () => {
 		setContentHeight('auto')
+		setIsTransitioning(false)
 	}
 
 	const updateContentHeight = () => {
@@ -22,6 +24,7 @@ export function Collapsible(props: CollapsibleProps) {
 
 	React.useEffect(() => {
 		if (props.expanded !== delayedExpanded) {
+			setIsTransitioning(true)
 			updateContentHeight()
 			requestAnimationFrame(() => {
 				contentRef.current!.clientHeight // Force reflow
@@ -32,14 +35,14 @@ export function Collapsible(props: CollapsibleProps) {
 
 	return (
 		<div
-			className={cn('collapsible', delayedExpanded && 'is-expanded')}
+			className={cn('collapsible', delayedExpanded && 'is-expanded', isTransitioning && 'is-transitioning')}
 			style={
 				{
 					'--content-height': contentHeight,
 				} as React.CSSProperties // Custom properties not supported workaround
 			}
 			aria-hidden={!props.expanded}
-			onTransitionEnd={setContentHeightToAuto}
+			onTransitionEnd={onTransitionEnd}
 		>
 			<div className="collapsible-content" ref={contentRef}>
 				{props.children}

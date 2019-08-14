@@ -2,7 +2,6 @@
 
 .collapsible
 	--transition-duration: 0.2s
-	overflow: hidden
 	height: 0
 	visibility: hidden
 	opacity: 0
@@ -19,6 +18,9 @@
 		height: var(--content-height, auto)
 		visibility: visible
 		opacity: 1
+
+	&.is-transitioning
+		overflow: hidden
 
 	&-content
 		width: 100%

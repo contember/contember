@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { graphql, GraphQLSchema } from 'graphql'
+import { graphql, GraphQLSchema, execute } from 'graphql'
 import { maskErrors } from 'graphql-errors'
 import { withMockedUuid } from './testUuid'
 import { withMockedDate } from './testDate'

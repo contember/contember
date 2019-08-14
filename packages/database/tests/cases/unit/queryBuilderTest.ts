@@ -1,12 +1,6 @@
 import 'jasmine'
-import {
-	Client,
-	ConditionBuilder,
-	InsertBuilder,
-	LimitByGroupWrapper,
-	SelectBuilder,
-	createConnectionMock,
-} from '../../../src'
+import { Client, ConditionBuilder, InsertBuilder, LimitByGroupWrapper, SelectBuilder } from '../../../src'
+import { createConnectionMock } from '@contember/database-tester/src'
 import { SQL } from '../../src/tags'
 
 interface Test {
@@ -16,13 +10,16 @@ interface Test {
 }
 
 const execute = async (test: Test) => {
-	const connection = createConnectionMock([
-		{
-			sql: test.sql,
-			parameters: test.parameters,
-			response: { rows: [] },
-		},
-	])
+	const connection = createConnectionMock(
+		[
+			{
+				sql: test.sql,
+				parameters: test.parameters,
+				response: { rows: [] },
+			},
+		],
+		(expected, actual, message) => expect(actual).toEqual(expected, message),
+	)
 	const wrapper = new Client(connection, 'public')
 
 	await test.query(wrapper)

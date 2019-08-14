@@ -1,0 +1,15 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src",
+		"esModuleInterop": true
+	},
+	"references": [
+		{
+			"path": "../../queryable/src"
+		},
+		{
+			"path": "../../utils/src"
+		}
+	]
+}

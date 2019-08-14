@@ -1,0 +1,68 @@
+@import '../common'
+
+.menu
+	$c-active: #EDEDED
+
+	padding: $menu-link-vertical-padding 0 0
+
+	&-subgroup,
+	&-action,
+	&-tooDeep
+		&.is-active > &-title,
+		&-title:hover
+			background-color: $c-active
+
+	&-group
+		&-title
+			color: var(--menu-title-color)
+			font-size: $cui-menu-group-title-font-size
+			margin: (rem(28px) / 2 + rem(8px)) 0 (rem(24px) / 2)
+			padding: 0 $cui-menu-link-horizontal-padding
+			font-weight: $fw-medium
+			text-transform: uppercase
+
+		&-list
+			//
+
+	&-subgroup
+		&-title
+			margin: 0
+			color: var(--menu-link-color)
+			font-size: $cui-menu-subgroup-title-font-size
+			padding: rem(8px) rem(28px)
+			text-decoration: none
+			font-weight: $fw-medium
+
+		&-list
+			padding-bottom: em(8px)
+
+	&-action
+		font-size: $cui-menu-action-title-font-size
+
+		&-title
+			margin: 0
+			color: var(--menu-link-color)
+			padding: rem(2px) rem(28px) rem(2px) rem(56px)
+			text-decoration: none
+			font-weight: $fw-medium
+
+		&-list
+			padding: 0 0 rem(4px) rem(56px)
+
+	&-tooDeep
+		font-size: .9em
+		list-style-type: none
+
+		&-title,
+		&-list
+			padding-left: 2em
+
+		&-title
+			margin: 0
+			color: var(--menu-link-color)
+			text-decoration: none
+			padding-right: rem(28px)
+			font-weight: $fw-medium
+
+		&-list
+			//

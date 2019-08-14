@@ -1,6 +1,6 @@
 import { Command, RemoveProjectMemberVariablesCommand } from './'
 import { Client } from '@contember/database'
-import { uuid } from '../../utils/uuid'
+import { uuid } from '../..'
 import { InsertBuilder } from '@contember/database'
 import { UpdateProjectMemberErrorCode } from '../../schema'
 

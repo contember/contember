@@ -1,7 +1,7 @@
 import { Command } from './Command'
 import { AddProjectMemberErrorCode } from '../../schema'
 import { Client } from '@contember/database'
-import { uuid } from '../../utils/uuid'
+import { uuid } from '../..'
 import { UpdateProjectMemberVariablesCommand } from '../'
 
 class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProjectMemberResponse> {

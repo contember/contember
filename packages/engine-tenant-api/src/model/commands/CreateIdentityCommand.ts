@@ -1,5 +1,5 @@
 import { Client } from '@contember/database'
-import { uuid } from '../../utils/uuid'
+import { uuid } from '../..'
 import { Command } from './'
 
 class CreateIdentityCommand implements Command<string> {

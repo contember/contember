@@ -157,7 +157,7 @@ describe('tenant api', () => {
 			})
 		})
 
-		it('signs in', async () => {
+		it.skip('signs in', async () => {
 			const buffer = (length: number) => Buffer.from(Array.from({ length: length }, () => 0x1234))
 			const randomBytesStub = sinon.stub(crypto, 'randomBytes').callsFake(function(length, cb) {
 				const val = buffer(length)

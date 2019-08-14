@@ -1,4 +1,4 @@
-import { Client, Connection, EventManager } from '../'
+import { Client, Connection, EventManager } from '@contember/database'
 
 export interface ExpectedQuery {
 	sql: string
@@ -6,50 +6,9 @@ export interface ExpectedQuery {
 	response: Partial<Connection.Result>
 }
 
-class MockExpectationError extends Error {}
-
-const assertEquals = (expected: any, actual: any) => {
-	if (expected !== actual) {
-		throw new MockExpectationError(`Assertion failed:
-ACTUAL:   ${JSON.stringify(actual)}
-EXPECTED: ${JSON.stringify(expected)}
-`)
-	}
-}
-const assertDeepEquals = (expected: any, actual: any) => {
-	try {
-		assertEquals(typeof expected, typeof actual)
-		if (Array.isArray(expected)) {
-			assertEquals(Array.isArray(actual), true)
-			assertLength(expected.length, actual)
-			for (let i in expected) {
-				assertDeepEquals(expected[i], actual[i])
-			}
-		} else {
-			assertEquals(expected, actual) // todo
-		}
-	} catch (e) {
-		if (e instanceof MockExpectationError) {
-			throw new MockExpectationError(
-				`Assertion failed:
-ACTUAL:   ${JSON.stringify(actual)}
-EXPECTED: ${JSON.stringify(expected)}
----- prev:
-` + e.message,
-			)
-		}
-		throw e
-	}
-}
-
-const assertLength = (expectedLength: number, actual: any[]) => {
-	if (actual.length !== expectedLength) {
-		throw new MockExpectationError(`Assertion failed: ${actual.length} should be ${expectedLength}`)
-	}
-}
-
 export const createConnectionMock = (
 	queries: ExpectedQuery[],
+	assertFunction: (expected: any, actual: any, message?: string) => void | never,
 ): Connection.TransactionLike & Connection.ClientFactory => {
 	return new (class implements Connection.TransactionLike {
 		public readonly eventManager = new EventManager()
@@ -65,27 +24,35 @@ export const createConnectionMock = (
 			}
 
 			const expected = queries.shift()
-			if (!expected) {
-				throw new MockExpectationError(`Unexpected query:
+			assertFunction(
+				true,
+				expected !== undefined,
+				`Unexpected query:
 ${sql}
 ${JSON.stringify(parameters)}
-`)
+`,
+			)
+
+			if (!expected) {
+				throw new Error()
 			}
+
 			const actualSql = sql.replace(/\s+/g, ' ')
 			const expectedSql = expected.sql.replace(/\s+/g, ' ')
-			assertEquals(expectedSql, actualSql)
+			assertFunction(expectedSql, actualSql)
 
 			if (expected.parameters) {
-				assertLength(expected.parameters.length, parameters || [])
+				assertFunction(expected.parameters.length, (parameters || []).length)
+
 				for (let index in expected.parameters) {
 					const expectedParameter = expected.parameters[index]
 					const actualParameter = (parameters || [])[index]
 					if (typeof expectedParameter === 'function') {
-						assertEquals(true, expectedParameter(actualParameter))
+						assertFunction(true, expectedParameter(actualParameter))
 					} else if (expectedParameter instanceof Date && actualParameter instanceof Date) {
-						assertEquals(actualParameter.getTime(), expectedParameter.getTime())
+						assertFunction(expectedParameter.getTime(), actualParameter.getTime())
 					} else {
-						assertDeepEquals(expectedParameter, actualParameter)
+						assertFunction(expectedParameter, actualParameter)
 					}
 				}
 			}
@@ -97,7 +64,7 @@ ${JSON.stringify(parameters)}
 			trx: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		): Promise<Result> {
 			await this.query('BEGIN;')
-			const result = await trx(createConnectionMock(queries))
+			const result = await trx(createConnectionMock(queries, assertFunction))
 			await this.commit()
 			return result
 		}

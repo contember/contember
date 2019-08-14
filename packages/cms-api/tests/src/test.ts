@@ -3,9 +3,11 @@ import GraphQlSchemaBuilderFactory from '../../src/content-api/graphQLSchema/Gra
 import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import S3 from '../../src/utils/S3'
 import { executeGraphQlTest } from './testGraphql'
-import { Client, createConnectionMock } from '@contember/database'
+import { Client } from '@contember/database'
+import { createConnectionMock } from '@contember/database-tester'
 import ExecutionContainerFactory from '../../src/content-api/graphQlResolver/ExecutionContainerFactory'
 import { emptySchema } from '../../src/content-schema/schemaUtils'
+import { expect } from 'chai'
 
 export interface SqlQuery {
 	sql: string
@@ -43,7 +45,9 @@ export const execute = async (test: Test) => {
 	).create(test.schema, permissions)
 	const graphQLSchema = builder.build()
 
-	const connection = createConnectionMock(test.executes)
+	const connection = createConnectionMock(test.executes, (expected, actual, message) => {
+		expect(actual).deep.eq(expected, message)
+	})
 
 	// @ts-ignore
 	const db = new Client(connection, 'public')

@@ -1,5 +1,6 @@
 import { Pool, PoolClient, PoolConfig } from 'pg'
 import { EventManager, Client, Transaction } from '../'
+import { Interface } from '@contember/utils'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory {
 	private readonly pool: Pool
@@ -69,7 +70,7 @@ namespace Connection {
 	}
 
 	export interface Queryable {
-		readonly eventManager: EventManager
+		readonly eventManager: Interface<EventManager>
 
 		query<Row extends Record<string, any>>(
 			sql: string,

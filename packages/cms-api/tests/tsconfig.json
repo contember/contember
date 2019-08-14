@@ -3,5 +3,5 @@
 	"compilerOptions": {
 		"outDir": "../dist/tests"
 	},
-	"references": [{ "path": "../src" }]
+	"references": [{ "path": "../src" }, { "path": "../../database-tester/src" }]
 }

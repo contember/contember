@@ -10,7 +10,8 @@ import sinon from 'sinon'
 import { Buffer } from 'buffer'
 import { Identity } from '@contember/engine-common'
 import TenantContainer from '../../../../src/tenant-api/TenantContainer'
-import { createConnectionMock, ExpectedQuery } from '@contember/database'
+import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
+import { expect } from 'chai'
 
 export interface Test {
 	query: string
@@ -27,7 +28,11 @@ export const execute = async (test: Test) => {
 			password: '123',
 			user: 'foo',
 		})
-		.replaceService('connection', () => createConnectionMock(test.executes))
+		.replaceService('connection', () =>
+			createConnectionMock(test.executes, (expected, actual, message) => {
+				expect(actual).deep.eq(expected, message)
+			}),
+		)
 		.build()
 
 	const context: ResolverContext = new ResolverContext(

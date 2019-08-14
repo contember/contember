@@ -8,12 +8,13 @@ import {
 	UpdateBuilder,
 } from '../'
 import { QueryHandler } from '@contember/queryable'
+import { Interface } from '@contember/utils'
 
 class Client<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
 	implements Connection.Queryable {
 	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {}
 
-	get eventManager(): EventManager {
+	get eventManager(): Interface<EventManager> {
 		return this.connection.eventManager
 	}
 

@@ -44,22 +44,19 @@ class ContentMiddlewareFactory {
 
 		return route(
 			'/content/:projectSlug/:stageSlug$',
-			compose(
-				[
-					new PlaygroundMiddlewareFactory().create(),
-					corsMiddleware(),
-					bodyParser(),
-					this.authMiddlewareFactory.create(),
-					this.projectFindMiddlewareFactory.create(),
-					this.stageFindMiddlewareFactory.create(),
-					this.projectMemberMiddlewareFactory.create(),
-					assignDb,
-					this.databaseTransactionMiddlewareFactory.create(),
-					this.setupSystemVariablesMiddlewareFactory.create(),
-					contentApollo,
-				],
-				true,
-			),
+			compose([
+				new PlaygroundMiddlewareFactory().create(),
+				corsMiddleware(),
+				bodyParser(),
+				this.authMiddlewareFactory.create(),
+				this.projectFindMiddlewareFactory.create(),
+				this.stageFindMiddlewareFactory.create(),
+				this.projectMemberMiddlewareFactory.create(),
+				assignDb,
+				this.databaseTransactionMiddlewareFactory.create(),
+				this.setupSystemVariablesMiddlewareFactory.create(),
+				contentApollo,
+			]),
 		)
 	}
 }

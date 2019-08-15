@@ -179,6 +179,13 @@ $cui-menu-subgroup-title-font-size: rem(14px) !default;
 $cui-menu-action-title-font-size: rem(12px) !default;
 $cui-menu-link-vertical-padding: rem(8px) !default;
 $cui-menu-link-horizontal-padding: rem(28px) !default;
+$cui-menu-action-inactive-opacity: .8 !default;
+$cui-menu-group-color: #00000045 !default;
+$cui-menu-subgroup-color: #484848 !default;
+$cui-menu-subgroup-active-background: #00000012 !default;
+$cui-menu-action-color: #6D6D6D !default;
+$cui-menu-action-active-color: #484848 !default;
+$cui-menu-caret-transition-duration: $cui-collapsible-transition-duration !default;
 
 
 // Spinner

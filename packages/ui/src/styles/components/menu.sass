@@ -1,29 +1,18 @@
 @import '../common'
 
 .menu
-	$c-active: #EDEDED
-
 	padding: $menu-link-vertical-padding 0 0
 
 	&-subgroup
 		&.is-active > &-title,
 		&-title:hover
-			background-color: $c-active
-
-	&-action,
-	&-tooDeep
-		&-title
-			opacity: .8
-
-		&.is-active > &-title,
-		&-title:hover
-			opacity: 1
+			background-color: $cui-menu-subgroup-active-background
 
 	&-group
 		&-title
-			color: var(--menu-title-color)
+			color: $cui-menu-group-color
 			font-size: $cui-menu-group-title-font-size
-			margin: (rem(28px) / 2 + rem(8px)) 0 (rem(24px) / 2)
+			margin: ($cui-menu-link-horizontal-padding / 2 + rem(8px)) 0 (rem(24px) / 2)
 			padding: 0 $cui-menu-link-horizontal-padding
 			font-weight: $fw-medium
 			text-transform: uppercase
@@ -34,9 +23,9 @@
 	&-subgroup
 		&-title
 			margin: 0
-			color: var(--menu-link-color)
+			color: $cui-menu-subgroup-color
 			font-size: $cui-menu-subgroup-title-font-size
-			padding: rem(8px) rem(28px)
+			padding: rem(8px) $cui-menu-link-horizontal-padding
 			text-decoration: none
 			font-weight: $fw-medium
 
@@ -56,7 +45,7 @@
 				border-right: rem(2px) solid
 				opacity: .5
 				float: right
-				transition: transform .2s
+				transition: transform var(--cui-menu-caret-transition-duration)
 				transform-origin: 70% 70%
 				transform: rotate(45deg)
 
@@ -69,8 +58,8 @@
 
 		&-title
 			margin: 0
-			color: var(--menu-link-color)
-			padding: rem(2px) rem(28px) rem(2px) rem(56px)
+			color: $cui-menu-action-color
+			padding: rem(2px) $cui-menu-link-horizontal-padding rem(2px) (2 * $cui-menu-link-horizontal-padding)
 			text-decoration: none
 			font-weight: $fw-medium
 
@@ -87,10 +76,16 @@
 
 		&-title
 			margin: 0
-			color: var(--menu-link-color)
+			color: $cui-menu-action-color
 			text-decoration: none
-			padding-right: rem(28px)
+			padding-right: $cui-menu-link-horizontal-padding
 			font-weight: $fw-medium
 
 		&-list
 			//
+
+	&-action,
+	&-tooDeep
+		&.is-active > &-title,
+		&-title:hover
+			color: $cui-menu-action-active-color

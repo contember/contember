@@ -26,7 +26,7 @@
 
 		&#{$view}#{$primary-selector}:focus#{$secondary-selector}
 			@extend %implementsCustomFocusEffects
-			box-shadow: 0 0 0 .2em rgba($background, .4)
+			box-shadow: 0 0 0 .2em rgba($borderColor, .4)
 
 		&#{$view}#{$primary-selector}[disabled]#{$secondary-selector},
 		&#{$view}#{$primary-selector}[readonly]#{$secondary-selector}
@@ -42,7 +42,10 @@
 			border-color: transparent
 			color: $distinctionColor
 		&#{$view}.view-outlined#{$primary-selector}#{$secondary-selector}
-			border-color: currentColor
+			border-color: $distinctionColor
 		&#{$view}.view-seamless#{$primary-selector}:hover#{$secondary-selector},
-		&#{$view}.view-outlined#{$primary-selector}:hover#{$secondary-selector}
-			color: darken($distinctionColor, 10)
+		&#{$view}.view-outlined#{$primary-selector}:hover#{$secondary-selector},
+		&#{$view}.view-seamless#{$primary-selector}:focus#{$secondary-selector},
+		&#{$view}.view-outlined#{$primary-selector}:focus#{$secondary-selector}
+			color: darken($distinctionColor, 5)
+			background: rgba(lighten($distinctionColor, 20), .3)

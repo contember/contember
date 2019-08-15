@@ -1,13 +1,13 @@
 import * as React from 'react'
 
 namespace Navigation {
-	export interface CustomTarget {
+	export interface CustomTo {
 		pageName: string
 		parameters?: any
 	}
 
 	export type MiddlewareProps = {
-		target: string | CustomTarget
+		to: string | CustomTo
 		children?: React.ReactNode
 	} & (
 		| {
@@ -17,12 +17,12 @@ namespace Navigation {
 					children?: React.ReactNode
 				}>
 		  }
-		| Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'target'>)
+		| Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>)
 
 	export type Middleware = React.ComponentType<MiddlewareProps>
 
-	export const MiddlewareContext = React.createContext<Middleware>(({ target, children, ...props }) => {
-		if (typeof target !== 'string') {
+	export const MiddlewareContext = React.createContext<Middleware>(({ to, children, ...props }) => {
+		if (typeof to !== 'string') {
 			throw new Error(`If you wish to support custom targets, implement your own navigation middleware.`)
 		}
 
@@ -30,9 +30,9 @@ namespace Navigation {
 			const Component = props.Component
 			return (
 				<Component
-					isActive={location.pathname === target}
+					isActive={location.pathname === to}
 					navigate={() => {
-						location.href = target
+						location.href = to
 					}}
 				>
 					{children}
@@ -40,7 +40,7 @@ namespace Navigation {
 			)
 		}
 		return (
-			<a href={target} {...props}>
+			<a href={to} {...props}>
 				{children}
 			</a>
 		)

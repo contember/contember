@@ -13,14 +13,12 @@ namespace Navigation {
 		| {
 				Component: React.ComponentType<{
 					navigate: () => void
+					isActive: boolean
 					children?: React.ReactNode
 				}>
 		  }
 		| {
-				linkProps?: Omit<
-					React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>,
-					'href'
-				>
+				linkProps?: Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 		  })
 
 	export type Middleware = React.ComponentType<MiddlewareProps>
@@ -34,6 +32,7 @@ namespace Navigation {
 			const Component = props.Component
 			return (
 				<Component
+					isActive={location.href === target}
 					navigate={() => {
 						location.href = target
 					}}

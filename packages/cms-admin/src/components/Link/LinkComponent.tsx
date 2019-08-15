@@ -18,13 +18,14 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkCompone
 
 	render() {
 		const Component = this.props.Component || this.defaultComponent
-		return <Component href={this.props.url} onClick={this.onClick} />
+		return <Component href={this.props.url} onClick={this.onClick} isActive={location.href === this.props.url} />
 	}
 }
 
 export interface InnerProps {
 	href: string
 	onClick: (e?: React.SyntheticEvent<Element>) => void
+	isActive: boolean
 }
 
 namespace LinkComponent {

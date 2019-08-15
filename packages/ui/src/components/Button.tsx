@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { Intent, Size } from '../types'
+import { ButtonDistinction, Intent, Size } from '../types'
 import { toViewClass } from '../utils'
 
 // TODO these types are wonky
@@ -19,12 +19,13 @@ interface GenericProps extends React.HTMLAttributes<HTMLElement> {
 export type ButtonProps = {
 	intent?: Intent
 	size?: Size
+	distinction?: ButtonDistinction
 	disabled?: boolean
 	children?: React.ReactNode
 } & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
 export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
-	const { Component, intent, size, children, ...rest } = props
+	const { Component, intent, size, distinction, children, ...rest } = props
 
 	if (props.disabled === true) {
 		rest['aria-disabled'] = true
@@ -35,7 +36,7 @@ export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
 	}
 
 	const attrs = {
-		className: cn(rest.className, 'button', toViewClass(intent), toViewClass(size)),
+		className: cn(rest.className, 'button', toViewClass(intent), toViewClass(size), toViewClass(distinction)),
 		ref: ref,
 	}
 

@@ -1,4 +1,4 @@
-import { number, text, radios } from '@storybook/addon-knobs'
+import { boolean, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { Button, ButtonProps } from '../../src'
@@ -13,6 +13,18 @@ storiesOf('Button', module).add('simple', () => {
 					Small: 'small',
 					Default: 'default',
 					Large: 'large',
+				},
+				'default',
+			),
+		),
+		disabled: boolean('Disabled', false),
+		distinction: defaultToUndefined(
+			radios(
+				'Distinction',
+				{
+					Default: 'default',
+					Seamless: 'seamless',
+					Outlined: 'outlined',
 				},
 				'default',
 			),

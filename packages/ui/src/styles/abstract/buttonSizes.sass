@@ -8,3 +8,13 @@
 			min-height: $height
 			line-height: 1.25
 			padding: ($edgeOffset / 2) $edgeOffset
+
+			&.view-squarish
+				+size($height)
+				overflow: hidden
+			&.view-generous
+				padding-left: 1.5 * $height
+				padding-right: 1.5 * $height
+			&.view-block
+				display: flex
+				width: 100%

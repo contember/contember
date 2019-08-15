@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { ButtonDistinction, Intent, Size } from '../types'
+import { ButtonDistinction, ButtonFlow, Intent, Size } from '../types'
 import { toStateClass, toViewClass } from '../utils'
 import { Spinner } from './Spinner'
 
@@ -20,6 +20,7 @@ interface GenericProps extends React.HTMLAttributes<HTMLElement> {
 export type ButtonProps = {
 	intent?: Intent
 	size?: Size
+	flow?: ButtonFlow
 	distinction?: ButtonDistinction
 	isLoading?: boolean
 	disabled?: boolean
@@ -27,7 +28,7 @@ export type ButtonProps = {
 } & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
 export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
-	const { Component, intent, size, distinction, isLoading, children, ...rest } = props
+	const { Component, intent, size, flow, distinction, isLoading, children, ...rest } = props
 
 	if (props.disabled === true) {
 		rest['aria-disabled'] = true
@@ -44,6 +45,7 @@ export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
 			toViewClass(intent),
 			toViewClass(size),
 			toViewClass(distinction),
+			toViewClass(flow),
 			toStateClass('loading', isLoading),
 		),
 		ref: ref,

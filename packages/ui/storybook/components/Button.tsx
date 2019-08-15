@@ -31,6 +31,18 @@ storiesOf('Button', module).add('simple', () => {
 				'default',
 			),
 		),
+		flow: defaultToUndefined(
+			radios(
+				'Flow',
+				{
+					Default: 'default',
+					Squarish: 'squarish',
+					Generous: 'generous',
+					Block: 'block',
+				},
+				'default',
+			),
+		),
 		children: content,
 	}
 

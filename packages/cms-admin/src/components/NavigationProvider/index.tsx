@@ -22,7 +22,9 @@ export function NavigationProvider(props: NavigationProviderProps) {
 								return { ...requestState, ...target }
 							}}
 							Component={innerProps => (
-								<Component navigate={() => innerProps.onClick()}>{innerProps.children}</Component>
+								<Component navigate={() => innerProps.onClick()} isActive={innerProps.isActive}>
+									{innerProps.children}
+								</Component>
 							)}
 						>
 							<>{children}</>
@@ -48,6 +50,8 @@ export function NavigationProvider(props: NavigationProviderProps) {
 					</PageLink>
 				)
 			}}
-		>{props.children}</Navigation.MiddlewareContext.Provider>
+		>
+			{props.children}
+		</Navigation.MiddlewareContext.Provider>
 	)
 }

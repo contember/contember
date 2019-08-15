@@ -7,11 +7,14 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkCompone
 		this.props.goTo()
 	}
 
-	defaultComponent: React.FunctionComponent<InnerProps> = () => (
-		<a href={this.props.url} onClick={this.onClick}>
-			{this.props.children}
-		</a>
-	)
+	defaultComponent: React.FunctionComponent<InnerProps> = () => {
+		const { url, Component, requestChange, goTo, dispatch, ...props } = this.props
+		return (
+			<a href={url} onClick={this.onClick} {...props}>
+				{this.props.children}
+			</a>
+		)
+	}
 
 	render() {
 		const Component = this.props.Component || this.defaultComponent
@@ -38,7 +41,13 @@ namespace LinkComponent {
 		url: string
 	}
 
-	export type Props = StateProps & DispatchProps & OwnProps
+	export type Props = StateProps &
+		DispatchProps &
+		OwnProps &
+		Omit<React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>, 'href'> &
+		{
+			dispatch?: any
+		} // Dispatch shouldn't be here
 
 	export interface State {}
 }

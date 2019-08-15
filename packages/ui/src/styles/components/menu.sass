@@ -1,12 +1,15 @@
 @import '../common'
 
 .menu
-	padding: $menu-link-vertical-padding 0 0
+	padding-top: $menu-link-vertical-padding
 
-	&-subgroup
-		&.is-active > &-title,
-		&-title:hover
-			background-color: $cui-menu-subgroup-active-background
+	&-group,
+	&-subgroup,
+	&-action,
+	&-tooDeep
+		&-title
+			display: block
+			width: 100%
 
 	&-group
 		&-title
@@ -37,7 +40,7 @@
 			&-title::after
 				content: ''
 				display: inline-block
-				margin-top: .6em
+				margin-top: .5em
 				width: .5em
 				height: .5em
 				margin-left: 1em
@@ -84,8 +87,21 @@
 		&-list
 			//
 
+	&-subgroup
+		&.is-active > &-title
+			background-color: $cui-menu-subgroup-active-background
+
 	&-action,
 	&-tooDeep
-		&.is-active > &-title,
-		&-title:hover
+		&.is-active > &-title
 			color: $cui-menu-action-active-color
+
+	a#{&},
+	button#{&}
+		&-subgroup-title:hover
+			background-color: $cui-menu-subgroup-active-background
+
+		&-action,
+		&-tooDeep
+			&-title:hover
+				color: $cui-menu-action-active-color

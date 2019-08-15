@@ -23,7 +23,6 @@ namespace Menu {
 	export interface ItemProps {
 		children?: React.ReactNode
 		title?: string | React.ReactNode
-		active?: boolean
 		target?: Navigation.MiddlewareProps['target']
 	}
 
@@ -90,13 +89,38 @@ namespace Menu {
 		}
 	}
 
+	function IsActive(props: { children: (isActive: boolean) => void; target: ItemProps['target'] }) {
+		const Link = React.useContext(Navigation.MiddlewareContext)
+
+		if (props.target) {
+			return (
+				<Link
+					target={props.target}
+					Component={innerProps => {
+						return <>{props.children(innerProps.isActive)}</>
+					}}
+				/>
+			)
+		} else {
+			return <>{props.children(false)}</>
+		}
+	}
+
+	function ItemWrapper(props: { children?: React.ReactNode; className: string; target: ItemProps['target'] }) {
+		return (
+			<IsActive target={props.target}>
+				{isActive => <li className={cn(props.className, isActive && 'is-active')}>{props.children}</li>}
+			</IsActive>
+		)
+	}
+
 	function GroupItem(props: ItemProps) {
 		const Title = useTitle({ target: props.target })
 		return (
-			<section className={cn('menu-group', props.active && 'is-active')}>
+			<ItemWrapper className={cn('menu-group')} target={props.target}>
 				{props.title && <Title className="menu-group-title">{props.title}</Title>}
 				{props.children && <ul className="menu-group-list">{props.children}</ul>}
-			</section>
+			</ItemWrapper>
 		)
 	}
 
@@ -109,15 +133,12 @@ namespace Menu {
 			options = { target: props.target }
 		}
 		const Title = useTitle(options)
-		const [expanded, setExpanded] = React.useState(props.active || false)
+		const [expanded, setExpanded] = React.useState(false)
 
 		return (
-			<li
-				className={cn(
-					'menu-subgroup',
-					props.active && 'is-active',
-					props.children && (expanded ? 'is-expanded' : 'is-collapsed'),
-				)}
+			<ItemWrapper
+				className={cn('menu-subgroup', props.children && (expanded ? 'is-expanded' : 'is-collapsed'))}
+				target={props.target}
 			>
 				{props.title && <Title className="menu-subgroup-title">{props.title}</Title>}
 				{props.children && (
@@ -125,26 +146,26 @@ namespace Menu {
 						<ul className="menu-subgroup-list">{props.children}</ul>
 					</Collapsible>
 				)}
-			</li>
+			</ItemWrapper>
 		)
 	}
 
 	function ActionItem(props: ItemProps) {
 		const Title = useTitle({ target: props.target })
 		return (
-			<li className={cn('menu-action', props.active && 'is-active')}>
+			<ItemWrapper className="menu-action" target={props.target}>
 				{props.title && <Title className="menu-action-title">{props.title}</Title>}
 				{props.children && <ul className="menu-action-list">{props.children}</ul>}
-			</li>
+			</ItemWrapper>
 		)
 	}
 
 	function TooDeepItem(props: ItemProps) {
 		return (
-			<li className={cn('menu-tooDeep', props.active && 'is-active')}>
+			<ItemWrapper className="menu-tooDeep" target={props.target}>
 				{props.title && <h4 className="menu-tooDeep-title">{props.title}</h4>}
 				{props.children && <ul className="menu-tooDeep-list">{props.children}</ul>}
-			</li>
+			</ItemWrapper>
 		)
 	}
 

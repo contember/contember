@@ -3,6 +3,7 @@
 .menu
 	padding: $cui-menu-link-vertical-padding 0 0
 	line-height: 1.5
+	text-align: left
 
 	&-group,
 	&-subgroup,
@@ -28,8 +29,12 @@
 	&-action,
 	&-tooDeep
 		&-title
-			display: block
+			display: flex
+			align-items: center
 			width: 100%
+
+	&-titleContent
+		flex-grow: 1
 
 	&-group
 		&-title
@@ -49,7 +54,6 @@
 			color: $cui-menu-subgroup-color
 			font-size: $cui-menu-subgroup-title-font-size
 			padding: rem(8px) $cui-menu-link-horizontal-padding
-			margin: 0
 			text-align: inherit
 			text-decoration: none
 			border: none
@@ -66,14 +70,13 @@
 			&-title::after
 				content: ''
 				display: inline-block
-				margin-top: .3em
+				margin-top: -0.2em
 				width: .5em
 				height: .5em
 				margin-left: 1em
 				border-bottom: rem(2px) solid
 				border-right: rem(2px) solid
 				opacity: .5
-				float: right
 				transition: transform var(--cui-menu-caret-transition-duration)
 				transform-origin: 70% 70%
 				transform: rotate(45deg)

@@ -67,7 +67,7 @@ $cui-button-view-default: (
 
 $cui-button-view-primary-color: $cui-color-white !default;
 $cui-button-view-primary-background: $cui-color-primary !default;
-$cui-button-view-primary-border-color: darken($cui-color-primary, 7) !default;
+$cui-button-view-primary-border-color: darken($cui-color-primary, 5) !default;
 $cui-button-view-primary: (
 	'color': $cui-button-view-primary-color,
 	'background': $cui-button-view-primary-background,
@@ -76,7 +76,7 @@ $cui-button-view-primary: (
 
 $cui-button-view-secondary-color: $cui-color-white !default;
 $cui-button-view-secondary-background: $cui-color-secondary !default;
-$cui-button-view-secondary-border-color: darken($cui-color-secondary, 7) !default;
+$cui-button-view-secondary-border-color: darken($cui-color-secondary, 5) !default;
 $cui-button-view-secondary: (
 	'color': $cui-button-view-secondary-color,
 	'background': $cui-button-view-secondary-background,
@@ -85,7 +85,7 @@ $cui-button-view-secondary: (
 
 $cui-button-view-tertiary-color: $cui-color-white !default;
 $cui-button-view-tertiary-background: $cui-color-tertiary !default;
-$cui-button-view-tertiary-border-color: darken($cui-color-tertiary, 7) !default;
+$cui-button-view-tertiary-border-color: darken($cui-color-tertiary, 5) !default;
 $cui-button-view-tertiary: (
 	'color': $cui-button-view-tertiary-color,
 	'background': $cui-button-view-tertiary-background,
@@ -94,7 +94,7 @@ $cui-button-view-tertiary: (
 
 $cui-button-view-success-color: $cui-color-white !default;
 $cui-button-view-success-background: $cui-color-success !default;
-$cui-button-view-success-border-color: darken($cui-color-success, 7) !default;
+$cui-button-view-success-border-color: darken($cui-color-success, 5) !default;
 $cui-button-view-success: (
 	'color': $cui-button-view-success-color,
 	'background': $cui-button-view-success-background,
@@ -103,7 +103,7 @@ $cui-button-view-success: (
 
 $cui-button-view-warn-color: $cui-color-white !default;
 $cui-button-view-warn-background: $cui-color-warn !default;
-$cui-button-view-warn-border-color: darken($cui-color-warn, 7) !default;
+$cui-button-view-warn-border-color: darken($cui-color-warn, 5) !default;
 $cui-button-view-warn: (
 	'color': $cui-button-view-warn-color,
 	'background': $cui-button-view-warn-background,
@@ -112,7 +112,7 @@ $cui-button-view-warn: (
 
 $cui-button-view-danger-color: $cui-color-white !default;
 $cui-button-view-danger-background: $cui-color-danger !default;
-$cui-button-view-danger-border-color: darken($cui-color-danger, 7) !default;
+$cui-button-view-danger-border-color: darken($cui-color-danger, 5) !default;
 $cui-button-view-danger: (
 	'color': $cui-button-view-danger-color,
 	'background': $cui-button-view-danger-background,
@@ -121,7 +121,7 @@ $cui-button-view-danger: (
 
 $cui-button-view-dark-color: $cui-color-gray-2 !default;
 $cui-button-view-dark-background: $cui-color-dark !default;
-$cui-button-view-dark-border-color: darken($cui-color-dark, 7) !default;
+$cui-button-view-dark-border-color: darken($cui-color-dark, 5) !default;
 $cui-button-view-dark: (
 	'color': $cui-button-view-dark-color,
 	'background': $cui-button-view-dark-background,

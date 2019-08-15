@@ -32,7 +32,7 @@ namespace Navigation {
 			const Component = props.Component
 			return (
 				<Component
-					isActive={location.href === target}
+					isActive={location.pathname === target}
 					navigate={() => {
 						location.href = target
 					}}

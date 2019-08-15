@@ -33,7 +33,7 @@ const DynamicLinkComponent = (props: DynamicLinkProps) => {
 	const Component = props.Component
 
 	return (
-		<Component onClick={props.goTo} isActive={props.url === location.href}>
+		<Component onClick={props.goTo} isActive={props.url === location.pathname}>
 			{props.children || null}
 		</Component>
 	)

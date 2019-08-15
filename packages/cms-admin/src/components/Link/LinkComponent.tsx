@@ -18,7 +18,7 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkCompone
 
 	render() {
 		const Component = this.props.Component || this.defaultComponent
-		return <Component href={this.props.url} onClick={this.onClick} isActive={location.href === this.props.url} />
+		return <Component href={this.props.url} onClick={this.onClick} isActive={location.pathname === this.props.url} />
 	}
 }
 

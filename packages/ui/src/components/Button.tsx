@@ -35,7 +35,7 @@ export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
 	}
 
 	if (props.Component === 'button' || !props.Component) {
-		;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = 'button'
+		;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
 	}
 
 	const attrs = {

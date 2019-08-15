@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { InnerProps } from '../../../components/Link'
-import PageLink, { AnyParams, PageConfig } from '../../../components/pageRouting/PageLink'
+import PageLink, { PageConfig } from '../../../components/pageRouting/PageLink'
 import { DataContext } from '../../coreComponents'
 import { DataBindingError, EntityAccessor, EntityForRemovalAccessor } from '../../dao'
 
-interface PageLinkByIdProps<P extends AnyParams> {
-	change: (id: string) => PageConfig<P, keyof P>
+interface PageLinkByIdProps {
+	change: (id: string) => PageConfig
 	Component?: React.ComponentType<InnerProps>
 	children?: ReactNode
 }
 
-export const PageLinkById = React.memo(function<P extends AnyParams>(props: PageLinkByIdProps<P>) {
+export const PageLinkById = React.memo(function(props: PageLinkByIdProps) {
 	const data = React.useContext(DataContext)
 
 	if (data instanceof EntityAccessor) {

@@ -4,20 +4,16 @@ import State from '../../state'
 import { pageRequest } from '../../state/request'
 import Link, { InnerProps } from '../Link'
 
-// type ParamByName<P extends AnyParams, N extends string> = P extends { [A in N]: infer R } ? R : never
-export type AnyParams = { [key: string]: any }
-type ParamNames<P extends AnyParams> = keyof P
-
-export type PageConfig<P extends AnyParams, N extends ParamNames<P>> = {
-	name: N & string
-	params?: any // ParamByName<P, N>
+export type PageConfig = {
+	name: string
+	params?: {}
 }
 
-type PageChange<P extends AnyParams> = () => PageConfig<P, keyof P>
+type PageChange = () => PageConfig
 
-class PageLink<P> extends React.Component<any | Props<P>> {
+class PageLink extends React.Component<Props> {
 	render() {
-		const { children, Component, project, change, stage, name, ...props } = this.props
+		const { children, Component, project, change, stage, ...props } = this.props
 		const changed = change()
 		return (
 			<Link
@@ -36,14 +32,14 @@ interface StateProps {
 	stage: string
 }
 
-export interface PageLinkProps<P> {
-	change: PageChange<P>
+export interface PageLinkProps {
+	change: PageChange
 	Component?: React.ComponentType<InnerProps>
 }
 
-type Props<P> = PageLinkProps<P> & StateProps
+type Props = PageLinkProps & StateProps
 
-export default connect<StateProps, {}, PageLinkProps<any>, State>(({ view }) => {
+export default connect<StateProps, {}, PageLinkProps, State>(({ view }) => {
 	if (view.route && view.route.name === 'project_page') {
 		return { project: view.route.project, stage: view.route.stage }
 	} else {

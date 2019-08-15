@@ -1,1 +1,3 @@
-export type Size = 'small' | 'large'
+import { Default } from './Default'
+
+export type Size = Default | 'small' | 'large'

@@ -1,1 +1,3 @@
-export type ButtonFlow = 'squarish' | 'generous' | 'block'
+import { Default } from './Default'
+
+export type ButtonFlow = Default | 'squarish' | 'generous' | 'block'

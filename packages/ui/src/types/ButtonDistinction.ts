@@ -1,1 +1,3 @@
-export type ButtonDistinction = 'outlined' | 'seamless'
+import { Default } from './Default'
+
+export type ButtonDistinction = Default | 'outlined' | 'seamless'

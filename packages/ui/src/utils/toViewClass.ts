@@ -1,1 +1,1 @@
-export const toViewClass = (name?: string) => name && `view-${name}`
+export const toViewClass = (name: string | undefined) => (name && name !== 'default' ? `view-${name}` : undefined)

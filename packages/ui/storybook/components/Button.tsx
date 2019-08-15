@@ -11,7 +11,7 @@ storiesOf('Button', module).add('simple', () => {
 		max: 64,
 		step: 1,
 	})
-	const props: Partial<ButtonProps> = {
+	const props: ButtonProps = {
 		children: text('Text', 'Pretty button'),
 	}
 

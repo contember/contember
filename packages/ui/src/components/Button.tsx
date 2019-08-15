@@ -2,24 +2,29 @@ import cn from 'classnames'
 import * as React from 'react'
 import { Intent } from '../types'
 
+// TODO these types are wonky
+interface ButtonBasedProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+	Component?: 'button' | undefined
+}
+
+interface AnchorBasedProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+	Component: 'a'
+}
+
+interface GenericProps extends React.HTMLAttributes<HTMLElement> {
+	Component: Exclude<keyof JSX.IntrinsicElements, 'button' | 'a'>
+}
+
 export type ButtonProps = {
 	intent?: Intent
 	readOnly?: boolean
 	children?: React.ReactNode
-} & (
-	| {
-			[E in keyof JSX.IntrinsicElements]: {
-				Component: E
-			} & Omit<JSX.IntrinsicElements[E], 'ref' | 'key'>
-	  }[keyof JSX.IntrinsicElements]
-	| ({
-			Component?: undefined
-	  } & React.ButtonHTMLAttributes<HTMLButtonElement>))
+} & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
 export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
-	const { Component = 'button', intent, children, ...rest } = props
+	const { Component, intent, children, ...rest } = props
 
-	if (props.Component === 'button') {
+	if (props.Component === 'button' || !props.Component) {
 		props.type = 'button'
 
 		if (props.readOnly) {
@@ -33,5 +38,5 @@ export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
 		ref: ref,
 	}
 
-	return React.createElement(Component, { ...rest, ...attrs }, children)
+	return React.createElement(Component || 'button', { ...rest, ...attrs }, children)
 })

@@ -17,13 +17,15 @@ type PageChange<P extends AnyParams> = () => PageConfig<P, keyof P>
 
 class PageLink<P> extends React.Component<any | Props<P>> {
 	render() {
-		const changed = this.props.change()
+		const { children, Component, project, change, stage, name, ...props } = this.props
+		const changed = change()
 		return (
 			<Link
-				Component={this.props.Component}
-				requestChange={pageRequest(this.props.project, this.props.stage, changed.name, changed.params || {})}
+				Component={Component}
+				requestChange={pageRequest(project, stage, changed.name, changed.params || {})}
+				{...props}
 			>
-				{this.props.children}
+				{children}
 			</Link>
 		)
 	}

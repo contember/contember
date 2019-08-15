@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Collapsible } from './Collapsible'
+import { Navigation } from './../Navigation'
 import cn from 'classnames'
 
 const DepthContext = React.createContext(0)
@@ -23,7 +24,7 @@ namespace Menu {
 		children?: React.ReactNode
 		title?: string | React.ReactNode
 		active?: boolean
-		change?: any
+		target?: Navigation.MiddlewareProps['target']
 	}
 
 	function ItemContent(props: ItemProps) {
@@ -40,16 +41,34 @@ namespace Menu {
 		}
 	}
 
+	function useTitle(target: ItemProps['target'], defaultComponent: string = 'div') {
+		const Link = React.useContext(Navigation.MiddlewareContext)
+
+		const Wrap = target ? Link : defaultComponent
+
+		/* any => other HTML[Anchor]Element props*/
+		return function Title(props: { children?: React.ReactNode } | any) {
+			const { children, ...wrapProps } = props
+			return (
+				<Wrap target={target!} {...wrapProps}>
+					{children}
+				</Wrap>
+			)
+		}
+	}
+
 	function GroupItem(props: ItemProps) {
+		const Title = useTitle(props.target)
 		return (
 			<section className={cn('menu-group', props.active && 'is-active')}>
-				{props.title && <h1 className="menu-group-title">{props.title}</h1>}
+				{props.title && <Title className="menu-group-title">{props.title}</Title>}
 				{props.children && <ul className="menu-group-list">{props.children}</ul>}
 			</section>
 		)
 	}
 
 	function SubGroupItem(props: ItemProps) {
+		const Title = useTitle(props.target, props.children ? 'button' : 'div')
 		const [expanded, setExpanded] = React.useState(props.active || false)
 
 		return (
@@ -61,9 +80,13 @@ namespace Menu {
 				)}
 			>
 				{props.title && (
-					<h2 className="menu-subgroup-title" onClick={props.children ? () => setExpanded(!expanded) : undefined}>
+					<Title
+						className="menu-subgroup-title"
+						onClick={props.children ? () => setExpanded(!expanded) : undefined}
+						type={props.children && 'button'}
+					>
 						{props.title}
-					</h2>
+					</Title>
 				)}
 				{props.children && (
 					<Collapsible expanded={expanded}>
@@ -75,9 +98,10 @@ namespace Menu {
 	}
 
 	function ActionItem(props: ItemProps) {
+		const Title = useTitle(props.target)
 		return (
 			<li className={cn('menu-action', props.active && 'is-active')}>
-				{props.title && <h3 className="menu-action-title">{props.title}</h3>}
+				{props.title && <Title className="menu-action-title">{props.title}</Title>}
 				{props.children && <ul className="menu-action-list">{props.children}</ul>}
 			</li>
 		)

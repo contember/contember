@@ -1,0 +1,9 @@
+%buttonSizes
+	// $cui-button-sizes
+	@each $name, $height in $cui-button-sizes
+		$view: toView($name)
+		&#{$view}
+			$line-height: $height - 2 * $cui-control-border-width
+			height: $height
+			line-height: $line-height
+			padding: 0 (($line-height - 1em) / 2)

@@ -17,9 +17,7 @@ namespace Navigation {
 					children?: React.ReactNode
 				}>
 		  }
-		| {
-				linkProps?: Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
-		  })
+		| Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'target'>)
 
 	export type Middleware = React.ComponentType<MiddlewareProps>
 
@@ -42,7 +40,7 @@ namespace Navigation {
 			)
 		}
 		return (
-			<a href={target} {...props.linkProps}>
+			<a href={target} {...props}>
 				{children}
 			</a>
 		)

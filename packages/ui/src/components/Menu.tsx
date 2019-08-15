@@ -81,7 +81,7 @@ namespace Menu {
 				const { children, ...otherProps } = props
 				return (
 					<button type="button" onClick={onClick} {...otherProps}>
-						{children}
+						<div className="menu-titleContent">{children}</div>
 					</button>
 				)
 			}

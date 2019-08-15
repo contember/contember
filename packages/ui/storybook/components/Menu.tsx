@@ -34,13 +34,7 @@ storiesOf('Menu', module).add('simple', () => {
 						</Menu.Item>
 					</Menu.Item>
 				</Menu.Item>
-				<Menu.Item
-					title={
-						<button type="button" style={{ border: '1px solid', padding: '0 4px' }}>
-							Arbitrary JSX content
-						</button>
-					}
-				/>
+				<Menu.Item title={<button type="button">Arbitrary JSX content</button>} />
 				<Menu.Item title="Last item" />
 			</Menu.Item>
 		</Menu>

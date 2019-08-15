@@ -1,10 +1,27 @@
 @import '../common'
 
 .menu
-	padding-top: $cui-menu-link-vertical-padding
+	padding: $cui-menu-link-vertical-padding 0 0
+	line-height: 1.5
 
-	&-list
-		//
+	&-group,
+	&-subgroup,
+	&-action,
+	&-tooDeep
+		padding: 0
+
+	&,
+	&-group,
+	&-subgroup,
+	&-action,
+	&-tooDeep
+		&,
+		&-list
+			margin: 0
+
+		&-list
+			padding: 0
+			list-style-type: none
 
 	&-group,
 	&-subgroup,
@@ -32,8 +49,14 @@
 			color: $cui-menu-subgroup-color
 			font-size: $cui-menu-subgroup-title-font-size
 			padding: rem(8px) $cui-menu-link-horizontal-padding
+			margin: 0
+			text-align: inherit
 			text-decoration: none
+			border: none
+			background: transparent
+			text-transform: inherit
 			font-weight: $fw-medium
+			font-family: inherit
 
 		&-list
 			padding: em(4px) 0 em(8px)
@@ -43,7 +66,7 @@
 			&-title::after
 				content: ''
 				display: inline-block
-				margin-top: .5em
+				margin-top: .3em
 				width: .5em
 				height: .5em
 				margin-left: 1em
@@ -101,8 +124,11 @@
 
 	a#{&},
 	button#{&}
-		&-subgroup-title:hover
-			background-color: $cui-menu-subgroup-active-background
+		&-subgroup-title
+			cursor: pointer
+
+			&:hover
+				background-color: $cui-menu-subgroup-active-background
 
 		&-action,
 		&-tooDeep

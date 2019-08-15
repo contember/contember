@@ -1,9 +1,9 @@
+import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { Button, Intent } from '../../../components'
 import { MetaOperationsContext } from '../../coreComponents'
 import { DirtinessContext, MutationStateContext } from '../../coreComponents/PersistState'
 
-export type PersistButtonProps = React.PropsWithChildren<{}>
+export type PersistButtonProps = ButtonProps
 
 export const PersistButton = React.memo((props: PersistButtonProps) => {
 	const isMutating = React.useContext(MutationStateContext)
@@ -16,17 +16,15 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 	if (value) {
 		return (
 			<Button
-				intent={Intent.Success}
-				// icon="floppy-disk"
+				intent="primary"
 				onClick={() => {
 					value.triggerPersist()
-
 					buttonRef.current && buttonRef.current.blur()
 				}}
-				// intent={Intent.PRIMARY}
 				disabled={isDisabled}
+				isLoading={isMutating}
 				ref={buttonRef}
-				large
+				size="large"
 			>
 				{props.children || 'Save'}
 			</Button>

@@ -1,8 +1,9 @@
 import { ButtonGroup, IconName } from '@blueprintjs/core'
+import { Button } from '@contember/ui'
 import * as React from 'react'
 import { Editor } from 'slate'
 import { Editor as ReactEditor } from 'slate-react'
-import { Button, Intent } from '../ui'
+import { Intent } from '../ui'
 import { Icon } from '@blueprintjs/core'
 
 interface ToolbarProps {
@@ -18,7 +19,7 @@ interface ActionButtonProps {
 }
 
 export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive }) => (
-	<Button intent={isActive ? Intent.Info : undefined} small onClick={() => onClick()}>
+	<Button intent={isActive ? 'primary' : undefined} size="small" flow="squarish" onClick={() => onClick()}>
 		<Icon icon={icon} />
 	</Button>
 	// <Button active={isActive} icon={icon} onClick={() => onClick()} />

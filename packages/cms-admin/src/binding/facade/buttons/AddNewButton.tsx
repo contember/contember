@@ -1,11 +1,11 @@
 import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
+import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { Button, ButtonProps } from '../../../components'
 import { MutationStateContext } from '../../coreComponents/PersistState'
 import { EntityCollectionAccessor } from '../../dao'
 
-export interface AddNewButtonProps extends React.PropsWithChildren<ButtonProps> {
+export type AddNewButtonProps = ButtonProps & {
 	addNew: EntityCollectionAccessor['addNew']
 	icon?: IconName
 }
@@ -16,7 +16,7 @@ export const AddNewButton = React.memo((props: AddNewButtonProps) => {
 	const addNewCallback = React.useCallback(() => addNew && addNew(), [addNew])
 	if (addNew) {
 		return (
-			<Button onClick={addNewCallback} disabled={isMutating} small {...rest}>
+			<Button onClick={addNewCallback} disabled={isMutating} size="small" distinction="seamless" {...rest}>
 				<Icon
 					icon={icon || IconNames.ADD}
 					style={{

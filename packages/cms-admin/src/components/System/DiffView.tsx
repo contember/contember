@@ -1,3 +1,4 @@
+import { Button } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cn from 'classnames'
@@ -8,7 +9,7 @@ import State from '../../state'
 import { executeRelease, fetchDiff } from '../../actions/system'
 import { Dispatch } from '../../actions/types'
 import { LoadingSpinner } from '../../binding/facade/renderers/userFeedback'
-import { Button, Table } from '../ui'
+import { Table } from '../ui'
 import { assertNever } from 'cms-common'
 
 enum SelectionType {

@@ -5,6 +5,7 @@ import { Button, ButtonProps } from '../../src'
 import { allIntents, defaultToUndefined } from '../utils'
 
 storiesOf('Button', module).add('simple', () => {
+	const content = text('Text', 'Pretty button')
 	const props: ButtonProps = {
 		size: defaultToUndefined(
 			radios(
@@ -29,7 +30,7 @@ storiesOf('Button', module).add('simple', () => {
 				'default',
 			),
 		),
-		children: text('Text', 'Pretty button'),
+		children: content,
 	}
 
 	return allIntents.map(intent => <Button intent={intent} {...props} />)

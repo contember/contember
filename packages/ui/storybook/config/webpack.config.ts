@@ -13,7 +13,18 @@ module.exports = ({ config }: any) => {
 	config.resolve.extensions.push('.ts', '.tsx')
 	config.module.rules.push({
 		test: /\.((s*)css|sass)$/,
-		use: ['style-loader', 'css-loader', 'resolve-url-loader', 'sass-loader'],
+		use: [
+			'style-loader',
+			'css-loader',
+			'resolve-url-loader',
+			{
+				loader: 'sass-loader',
+				options: {
+					sourceMap: true,
+					sourceMapContents: false,
+				},
+			},
+		],
 		exclude: /node_modules/,
 		include: require('path').resolve('./'),
 	})

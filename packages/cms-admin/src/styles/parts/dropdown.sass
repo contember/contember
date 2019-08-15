@@ -11,6 +11,8 @@
 	border: $border-width solid var(--dropdown-border-color)
 	font-size: $fs-normal
 	width: fit-content
+	margin: 0
+	padding: 0
 
 	&-item
 		$item-border-radius: $border-radius - $border-width
@@ -36,7 +38,18 @@
 			border-bottom-right-radius: $item-border-radius
 
 		// Dirty solution to stretch an injected anchor element without a class across the whole item
-		> a:not([class])
+		> a:not([class]),
+		> button:not([class])
+			color: inherit
+			border: none
+			background: transparent
+			padding: 0
+			margin: 0
+			font-size: inherit
+			font-family: inherit
+			font-weight: inherit
+			cursor: pointer
+
 			&::before
 				content: ''
 				position: absolute

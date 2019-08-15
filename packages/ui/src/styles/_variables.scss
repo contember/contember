@@ -10,11 +10,136 @@ $cui-conf-rootSelector: ':root'; // Override this if you need to scope CUI custo
 $cui-conf-defaultView: default !default;
 
 // Global values
-$cui-focusTransitionDuration: .3s !default;
+$cui-color-blue: #0094FF !default;
+$cui-color-pink: #FF00B8 !default;
+$cui-color-purple: #9013FE !default;
+$cui-color-green: #7ED321 !default;
+$cui-color-yellow: #FFBE00 !default;
+$cui-color-red: #FF0000 !default;
+
+$cui-color-white: #FFFFFF !default;
+$cui-color-gray-1: #F7F7F7 !default;
+$cui-color-gray-2: #E6E6E6 !default;
+$cui-color-gray-3: #C7C7C7 !default;
+$cui-color-gray-4: #AEAEAE !default;
+$cui-color-gray-5: #9E9E9E !default;
+$cui-color-gray-6: #6A6A6A !default;
+$cui-color-gray-7: #404040 !default;
+$cui-color-gray-8: #343434 !default;
+$cui-color-gray-9: #222222 !default;
+$cui-color-black: #000000 !default;
+
+
+$cui-color-bland: $cui-color-gray-3 !default;
+$cui-color-primary: $cui-color-blue !default;
+$cui-color-secondary: $cui-color-pink !default;
+$cui-color-tertiary: $cui-color-purple !default;
+$cui-color-success: $cui-color-green !default;
+$cui-color-warn: $cui-color-yellow !default;
+$cui-color-danger: $cui-color-red !default;
+$cui-color-dark: $cui-color-gray-8 !default;
+$cui-color-inactive: $cui-color-gray-6 !default;
+
+// - Global controls
+$cui-effect-transition-duration: .3s !default;
+
+$cui-control-border-width: em(1px) !default;
+$cui-control-border-radius: em(3px) !default;
+
+$cui-control-height-small: 1.2em !default;
+$cui-control-height-default: 1.75em !default;
+$cui-control-height-large: 2.25em !default;
+
+$cui-control-inactive-opacity: .6 !default;
 
 
 // Buttons
-$cui-button-focusTransitionDuration: $cui-focusTransitionDuration !default;
+$cui-button-effect-transition-duration: $cui-effect-transition-duration !default;
+
+$cui-button-view-default-color: $cui-color-gray-7 !default;
+$cui-button-view-default-background: $cui-color-gray-2 !default;
+$cui-button-view-default-border-color: $cui-color-gray-3 !default;
+$cui-button-view-default: (
+	'color': $cui-button-view-default-color,
+	'background': $cui-button-view-default-background,
+	'borderColor': $cui-button-view-default-border-color,
+) !default;
+
+$cui-button-view-primary-color: $cui-color-white !default;
+$cui-button-view-primary-background: $cui-color-primary !default;
+$cui-button-view-primary-border-color: darken($cui-color-primary, 7) !default;
+$cui-button-view-primary: (
+	'color': $cui-button-view-primary-color,
+	'background': $cui-button-view-primary-background,
+	'borderColor': $cui-button-view-primary-border-color,
+) !default;
+
+$cui-button-view-secondary-color: $cui-color-white !default;
+$cui-button-view-secondary-background: $cui-color-secondary !default;
+$cui-button-view-secondary-border-color: darken($cui-color-secondary, 7) !default;
+$cui-button-view-secondary: (
+	'color': $cui-button-view-secondary-color,
+	'background': $cui-button-view-secondary-background,
+	'borderColor': $cui-button-view-secondary-border-color,
+) !default;
+
+$cui-button-view-tertiary-color: $cui-color-white !default;
+$cui-button-view-tertiary-background: $cui-color-tertiary !default;
+$cui-button-view-tertiary-border-color: darken($cui-color-tertiary, 7) !default;
+$cui-button-view-tertiary: (
+	'color': $cui-button-view-tertiary-color,
+	'background': $cui-button-view-tertiary-background,
+	'borderColor': $cui-button-view-tertiary-border-color,
+) !default;
+
+$cui-button-view-success-color: $cui-color-white !default;
+$cui-button-view-success-background: $cui-color-success !default;
+$cui-button-view-success-border-color: darken($cui-color-success, 7) !default;
+$cui-button-view-success: (
+	'color': $cui-button-view-success-color,
+	'background': $cui-button-view-success-background,
+	'borderColor': $cui-button-view-success-border-color,
+) !default;
+
+$cui-button-view-warn-color: $cui-color-white !default;
+$cui-button-view-warn-background: $cui-color-warn !default;
+$cui-button-view-warn-border-color: darken($cui-color-warn, 7) !default;
+$cui-button-view-warn: (
+	'color': $cui-button-view-warn-color,
+	'background': $cui-button-view-warn-background,
+	'borderColor': $cui-button-view-warn-border-color,
+) !default;
+
+$cui-button-view-danger-color: $cui-color-white !default;
+$cui-button-view-danger-background: $cui-color-danger !default;
+$cui-button-view-danger-border-color: darken($cui-color-danger, 7) !default;
+$cui-button-view-danger: (
+	'color': $cui-button-view-danger-color,
+	'background': $cui-button-view-danger-background,
+	'borderColor': $cui-button-view-danger-border-color,
+) !default;
+
+$cui-button-view-dark-color: $cui-color-gray-2 !default;
+$cui-button-view-dark-background: $cui-color-dark !default;
+$cui-button-view-dark-border-color: darken($cui-color-dark, 7) !default;
+$cui-button-view-dark: (
+	'color': $cui-button-view-dark-color,
+	'background': $cui-button-view-dark-background,
+	'borderColor': $cui-button-view-dark-border-color,
+) !default;
+
+
+$cui-button-variants: () !default;
+$cui-button-variants: map_merge((
+	$cui-conf-defaultView: $cui-button-view-default,
+	'primary': $cui-button-view-primary,
+	'secondary': $cui-button-view-secondary,
+	'tertiary': $cui-button-view-tertiary,
+	'success': $cui-button-view-success,
+	'warn': $cui-button-view-warn,
+	'danger': $cui-button-view-danger,
+	'dark': $cui-button-view-dark,
+), $cui-button-variants);
 
 
 // FormGroup

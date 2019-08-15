@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
-import { Button } from '../ui'
+import { Button } from '@contember/ui'
 import { isDevMode } from './isDevMode'
 
 interface TokenExposerStateProps {
@@ -24,7 +24,7 @@ const TokenExposerComponent = (props: TokenExposerProps) => {
 			style={{
 				marginLeft: '.75em',
 			}}
-			onClick={_ => {
+			onClick={() => {
 				if (isCopying) {
 					return
 				}

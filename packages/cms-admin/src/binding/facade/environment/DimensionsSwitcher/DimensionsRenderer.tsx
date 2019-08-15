@@ -1,5 +1,6 @@
+import { Button } from '@contember/ui'
 import * as React from 'react'
-import { Button, Checkbox, Link } from '../../../../components'
+import { Checkbox, Link } from '../../../../components'
 import { DynamicLink } from '../../../../components/DynamicLink'
 import { Dropdown } from '../../../../components/ui'
 import { RequestChange } from '../../../../state/request'
@@ -168,7 +169,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	}
 
 	return (
-		<Dropdown.Revealer opener={<Button noMargin>{renderSelected(selectedDimensions)}</Button>}>
+		<Dropdown.Revealer opener={<Button>{renderSelected(selectedDimensions)}</Button>}>
 			{renderContent(normalizedData, selectedDimensions)}
 		</Dropdown.Revealer>
 	)

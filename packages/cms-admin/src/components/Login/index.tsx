@@ -1,5 +1,6 @@
 import { Callout, Card, Elevation } from '@blueprintjs/core'
-import { Button, FormGroup, InputGroup } from '..'
+import { Button } from '@contember/ui'
+import { FormGroup, InputGroup } from '..'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { login, tryAutoLogin } from '../../actions/auth'
@@ -73,12 +74,9 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 								Remember me
 							</label>
 						</div>
-						<Button
-							Component={({ children, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
-								<input type="submit" value="Submit" {...props} />
-							)}
-							disabled={loading}
-						/>
+						<Button type="submit" disabled={loading} intent="primary">
+							Submit
+						</Button>
 					</form>
 				</Card>
 			</div>

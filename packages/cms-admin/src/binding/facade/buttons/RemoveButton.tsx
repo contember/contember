@@ -1,13 +1,13 @@
 import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
+import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { Button, ButtonProps } from '../../../components'
 import { DataContext, MetaOperationsContext } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
 import { EntityAccessor } from '../../dao'
 import { RemovalType } from '../types'
 
-export interface RemoveButtonProps extends ButtonProps {
+export type RemoveButtonProps = ButtonProps & {
 	removeType?: RemovalType
 	immediatePersist?: true
 	icon?: IconName
@@ -37,7 +37,7 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 	}
 
 	return (
-		<Button {...rest} onClick={onClick} disabled={isMutating} small minimal>
+		<Button onClick={onClick} disabled={isMutating} size="small" flow="squarish" distinction="seamless" {...rest}>
 			<Icon icon={icon || IconNames.CROSS} color="currentColor" />
 		</Button>
 	)

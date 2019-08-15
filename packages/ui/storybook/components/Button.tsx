@@ -19,6 +19,7 @@ storiesOf('Button', module).add('simple', () => {
 			),
 		),
 		disabled: boolean('Disabled', false),
+		isLoading: boolean('Is loading', false),
 		distinction: defaultToUndefined(
 			radios(
 				'Distinction',

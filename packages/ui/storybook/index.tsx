@@ -1,3 +1,4 @@
+import 'manrope/latin-extended/font.css'
 import '../../storybook/index.sass'
 
 import './components/Button'

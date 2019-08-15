@@ -9,6 +9,7 @@
 		$color: map_get($settings, color)
 		$background: map_get($settings, background)
 		$borderColor: map_get($settings, borderColor)
+		$distinctionColor: map_get($settings, distinctionColor)
 
 		$view: toView($name)
 
@@ -20,7 +21,7 @@
 		&#{$view}#{$primary-selector}:hover#{$secondary-selector}
 			background: darken($background, 5)
 
-		&#{$view}#{$primary-selector}:active#{$secondary-selector}
+		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector}
 			@extend %buttonPress
 
 		&#{$view}#{$primary-selector}:focus#{$secondary-selector}
@@ -31,5 +32,17 @@
 		&#{$view}#{$primary-selector}[readonly]#{$secondary-selector}
 			cursor: not-allowed
 			color: lighten($color, 5)
-			background: lighten($background, 5)
+			background: lighten($background, 10)
+			border-color: lighten($borderColor, 10)
 			opacity: $cui-control-inactive-opacity
+
+		&#{$view}.view-seamless#{$primary-selector}#{$secondary-selector},
+		&#{$view}.view-outlined#{$primary-selector}#{$secondary-selector}
+			background: transparent
+			border-color: transparent
+			color: $distinctionColor
+		&#{$view}.view-outlined#{$primary-selector}#{$secondary-selector}
+			border-color: currentColor
+		&#{$view}.view-seamless#{$primary-selector}:hover#{$secondary-selector},
+		&#{$view}.view-outlined#{$primary-selector}:hover#{$secondary-selector}
+			color: darken($distinctionColor, 10)

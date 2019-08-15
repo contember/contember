@@ -46,9 +46,9 @@ $cui-effect-transition-duration: .3s !default;
 $cui-control-border-width: em(1px) !default;
 $cui-control-border-radius: em(3px) !default;
 
-$cui-control-height-small: 1.2em !default;
-$cui-control-height-default: 1.75em !default;
-$cui-control-height-large: 2.25em !default;
+$cui-control-height-small: 1.5em !default;
+$cui-control-height-default: 2em !default;
+$cui-control-height-large: 2.5em !default;
 
 $cui-control-inactive-opacity: .6 !default;
 
@@ -56,9 +56,9 @@ $cui-control-inactive-opacity: .6 !default;
 // Buttons
 $cui-button-effect-transition-duration: $cui-effect-transition-duration !default;
 
-$cui-button-view-default-color: $cui-color-gray-7 !default;
-$cui-button-view-default-background: $cui-color-gray-2 !default;
-$cui-button-view-default-border-color: $cui-color-gray-3 !default;
+$cui-button-view-default-color: $cui-color-gray-8 !default;
+$cui-button-view-default-background: $cui-color-gray-1 !default;
+$cui-button-view-default-border-color: $cui-color-gray-4 !default;
 $cui-button-view-default: (
 	'color': $cui-button-view-default-color,
 	'background': $cui-button-view-default-background,
@@ -140,6 +140,13 @@ $cui-button-variants: map_merge((
 	'danger': $cui-button-view-danger,
 	'dark': $cui-button-view-dark,
 ), $cui-button-variants);
+
+$cui-button-sizes: () !default;
+$cui-button-sizes: map_merge((
+	$cui-conf-defaultView: $cui-control-height-default,
+	'small': $cui-control-height-small,
+	'large': $cui-control-height-large,
+), $cui-button-sizes);
 
 
 // FormGroup

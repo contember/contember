@@ -1,6 +1,7 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { Intent } from '../types'
+import { Intent, Size } from '../types'
+import { toViewClass } from '../utils'
 
 // TODO these types are wonky
 interface ButtonBasedProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,12 +18,13 @@ interface GenericProps extends React.HTMLAttributes<HTMLElement> {
 
 export type ButtonProps = {
 	intent?: Intent
+	size?: Size
 	disabled?: boolean
 	children?: React.ReactNode
 } & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
 export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
-	const { Component, intent, children, ...rest } = props
+	const { Component, intent, size, children, ...rest } = props
 
 	if (props.disabled === true) {
 		rest['aria-disabled'] = true
@@ -32,9 +34,8 @@ export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
 		;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = 'button'
 	}
 
-	const intentClass = intent ? `view-${intent}` : undefined
 	const attrs = {
-		className: cn(rest.className, 'button', intentClass),
+		className: cn(rest.className, 'button', toViewClass(intent), toViewClass(size)),
 		ref: ref,
 	}
 

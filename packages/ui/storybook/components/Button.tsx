@@ -1,29 +1,24 @@
-import { number, text } from '@storybook/addon-knobs'
+import { number, text, radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { Button, ButtonProps } from '../../src'
-import { allIntents } from '../utils/intents'
+import { allIntents, defaultToUndefined } from '../utils'
 
 storiesOf('Button', module).add('simple', () => {
-	const fontSize = number('Font size', 16, {
-		range: true,
-		min: 16,
-		max: 64,
-		step: 1,
-	})
 	const props: ButtonProps = {
+		size: defaultToUndefined(
+			radios(
+				'Size',
+				{
+					Small: 'small',
+					Default: 'default',
+					Large: 'large',
+				},
+				'default',
+			),
+		),
 		children: text('Text', 'Pretty button'),
 	}
 
-	return (
-		<div
-			style={{
-				fontSize: `${fontSize / 16}rem`,
-			}}
-		>
-			{allIntents.map(intent => (
-				<Button intent={intent} {...props} />
-			))}
-		</div>
-	)
+	return allIntents.map(intent => <Button intent={intent} {...props} />)
 })

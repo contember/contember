@@ -1,4 +1,3 @@
-@import '../mixinCommon'
 //
 	The idea here is to separate the element that *drives* the state from the element whose styles are affected by it.
 	Typically, for a normal button, both would be the same element. In that case, the $targetSelector should just be
@@ -20,9 +19,6 @@
 
 		&#{$view}#{$primary-selector}:hover#{$secondary-selector}
 			background: darken($background, 5)
-
-		&#{$view}#{$primary-selector}:hover:focus#{$secondary-selector}
-			text-decoration: none
 
 		&#{$view}#{$primary-selector}:active#{$secondary-selector}
 			@extend %buttonPress

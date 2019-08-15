@@ -6,14 +6,14 @@ storiesOf('Menu', module).add('simple', () => {
 	return (
 		<Menu>
 			<Menu.Item>
-				<Menu.Item title="Front page" target="#front-page" />
+				<Menu.Item title="Front page" to="#front-page" />
 				<Menu.Item title="Pages">
 					<Menu.Item title="List all" />
 					<Menu.Item title="Add new" />
 				</Menu.Item>
 			</Menu.Item>
 			<Menu.Item title="Other">
-				<Menu.Item title="External link" target="https://example.com" />
+				<Menu.Item title="External link" to="https://example.com" />
 				<Menu.Item title="Code of conduct" />
 				<Menu.Item title="Terms and conditions" />
 			</Menu.Item>

@@ -23,7 +23,7 @@ namespace Menu {
 	export interface ItemProps {
 		children?: React.ReactNode
 		title?: string | React.ReactNode
-		target?: Navigation.MiddlewareProps['target']
+		to?: Navigation.MiddlewareProps['to']
 	}
 
 	interface TitleProps {
@@ -34,15 +34,15 @@ namespace Menu {
 	type TitleOptions =
 		| {
 				onClick?: never
-				target?: never
+				to?: never
 		  }
 		| {
-				target: Navigation.MiddlewareProps['target'] | undefined
+				to: Navigation.MiddlewareProps['to'] | undefined
 				onClick?: never
 		  }
 		| {
 				onClick: () => void
-				target?: never
+				to?: never
 		  }
 
 	function ItemContent(props: ItemProps) {
@@ -61,13 +61,13 @@ namespace Menu {
 
 	function useTitle(options: TitleOptions) {
 		const Link = React.useContext(Navigation.MiddlewareContext)
-		const { target, onClick } = options
+		const { to, onClick } = options
 
-		if (target) {
+		if (to) {
 			return (props: TitleProps) => {
 				const { children, ...otherProps } = props
 				return (
-					<Link target={target} {...otherProps}>
+					<Link to={to} {...otherProps}>
 						{children}
 					</Link>
 				)
@@ -89,13 +89,13 @@ namespace Menu {
 		}
 	}
 
-	function IsActive(props: { children: (isActive: boolean) => void; target: ItemProps['target'] }) {
+	function IsActive(props: { children: (isActive: boolean) => void; to: ItemProps['to'] }) {
 		const Link = React.useContext(Navigation.MiddlewareContext)
 
-		if (props.target) {
+		if (props.to) {
 			return (
 				<Link
-					target={props.target}
+					to={props.to}
 					Component={innerProps => {
 						return <>{props.children(innerProps.isActive)}</>
 					}}
@@ -106,18 +106,18 @@ namespace Menu {
 		}
 	}
 
-	function ItemWrapper(props: { children?: React.ReactNode; className: string; target: ItemProps['target'] }) {
+	function ItemWrapper(props: { children?: React.ReactNode; className: string; to: ItemProps['to'] }) {
 		return (
-			<IsActive target={props.target}>
+			<IsActive to={props.to}>
 				{isActive => <li className={cn(props.className, isActive && 'is-active')}>{props.children}</li>}
 			</IsActive>
 		)
 	}
 
 	function GroupItem(props: ItemProps) {
-		const Title = useTitle({ target: props.target })
+		const Title = useTitle({ to: props.to })
 		return (
-			<ItemWrapper className={cn('menu-group')} target={props.target}>
+			<ItemWrapper className={cn('menu-group')} to={props.to}>
 				{props.title && <Title className="menu-group-title">{props.title}</Title>}
 				{props.children && <ul className="menu-group-list">{props.children}</ul>}
 			</ItemWrapper>
@@ -129,8 +129,8 @@ namespace Menu {
 
 		if (props.children) {
 			options = { onClick: () => setExpanded(!expanded) }
-		} else if (props.target) {
-			options = { target: props.target }
+		} else if (props.to) {
+			options = { to: props.to }
 		}
 		const Title = useTitle(options)
 		const [expanded, setExpanded] = React.useState(false)
@@ -138,7 +138,7 @@ namespace Menu {
 		return (
 			<ItemWrapper
 				className={cn('menu-subgroup', props.children && (expanded ? 'is-expanded' : 'is-collapsed'))}
-				target={props.target}
+				to={props.to}
 			>
 				{props.title && <Title className="menu-subgroup-title">{props.title}</Title>}
 				{props.children && (
@@ -151,9 +151,9 @@ namespace Menu {
 	}
 
 	function ActionItem(props: ItemProps) {
-		const Title = useTitle({ target: props.target })
+		const Title = useTitle({ to: props.to })
 		return (
-			<ItemWrapper className="menu-action" target={props.target}>
+			<ItemWrapper className="menu-action" to={props.to}>
 				{props.title && <Title className="menu-action-title">{props.title}</Title>}
 				{props.children && <ul className="menu-action-list">{props.children}</ul>}
 			</ItemWrapper>
@@ -162,7 +162,7 @@ namespace Menu {
 
 	function TooDeepItem(props: ItemProps) {
 		return (
-			<ItemWrapper className="menu-tooDeep" target={props.target}>
+			<ItemWrapper className="menu-tooDeep" to={props.to}>
 				{props.title && <h4 className="menu-tooDeep-title">{props.title}</h4>}
 				{props.children && <ul className="menu-tooDeep-list">{props.children}</ul>}
 			</ItemWrapper>

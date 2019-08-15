@@ -10,16 +10,16 @@ export interface NavigationProviderProps {
 export function NavigationProvider(props: NavigationProviderProps) {
 	return (
 		<Navigation.MiddlewareContext.Provider
-			value={({ target, children, ...props }: Navigation.MiddlewareProps) => {
+			value={({ to, children, ...props }: Navigation.MiddlewareProps) => {
 				if ('Component' in props) {
 					const Component = props.Component
 					return (
 						<DynamicLink
 							requestChange={requestState => {
-								if (typeof target === 'string') {
-									return { ...requestState, pageName: target }
+								if (typeof to === 'string') {
+									return { ...requestState, pageName: to }
 								}
-								return { ...requestState, ...target }
+								return { ...requestState, ...to }
 							}}
 							Component={innerProps => (
 								<Component navigate={() => innerProps.onClick()} isActive={innerProps.isActive}>
@@ -34,14 +34,14 @@ export function NavigationProvider(props: NavigationProviderProps) {
 				return (
 					<PageLink
 						change={() => {
-							if (typeof target === 'string') {
+							if (typeof to === 'string') {
 								return {
-									name: target,
+									name: to,
 								}
 							}
 							return {
-								name: target.pageName,
-								params: target.parameters,
+								name: to.pageName,
+								params: to.parameters,
 							}
 						}}
 						{...props}

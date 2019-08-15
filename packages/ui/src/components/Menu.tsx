@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Collapsible } from './Collapsible'
-import { Navigation } from './../Navigation'
+import { Navigation } from '../Navigation'
 import cn from 'classnames'
 
 const DepthContext = React.createContext(0)
@@ -27,6 +27,25 @@ namespace Menu {
 		target?: Navigation.MiddlewareProps['target']
 	}
 
+	interface TitleProps {
+		children?: React.ReactNode
+		className?: string
+	}
+
+	type TitleOptions =
+		| {
+				onClick?: never
+				target?: never
+		  }
+		| {
+				target: Navigation.MiddlewareProps['target'] | undefined
+				onClick?: never
+		  }
+		| {
+				onClick: () => void
+				target?: never
+		  }
+
 	function ItemContent(props: ItemProps) {
 		const depth = React.useContext(DepthContext)
 
@@ -41,24 +60,38 @@ namespace Menu {
 		}
 	}
 
-	function useTitle(target: ItemProps['target'], defaultComponent: string = 'div') {
+	function useTitle(options: TitleOptions) {
 		const Link = React.useContext(Navigation.MiddlewareContext)
+		const { target, onClick } = options
 
-		const Wrap = target ? Link : defaultComponent
-
-		/* any => other HTML[Anchor]Element props*/
-		return function Title(props: { children?: React.ReactNode } | any) {
-			const { children, ...wrapProps } = props
-			return (
-				<Wrap target={target!} {...wrapProps}>
-					{children}
-				</Wrap>
-			)
+		if (target) {
+			return (props: TitleProps) => {
+				const { children, ...otherProps } = props
+				return (
+					<Link target={target} {...otherProps}>
+						{children}
+					</Link>
+				)
+			}
+		} else if (onClick) {
+			return (props: TitleProps) => {
+				const { children, ...otherProps } = props
+				return (
+					<button type="button" onClick={onClick} {...otherProps}>
+						{children}
+					</button>
+				)
+			}
+		} else {
+			return (props: TitleProps) => {
+				const { children, ...otherProps } = props
+				return <div {...otherProps}>{children}</div>
+			}
 		}
 	}
 
 	function GroupItem(props: ItemProps) {
-		const Title = useTitle(props.target)
+		const Title = useTitle({ target: props.target })
 		return (
 			<section className={cn('menu-group', props.active && 'is-active')}>
 				{props.title && <Title className="menu-group-title">{props.title}</Title>}
@@ -68,7 +101,14 @@ namespace Menu {
 	}
 
 	function SubGroupItem(props: ItemProps) {
-		const Title = useTitle(props.target, props.children ? 'button' : 'div')
+		let options: TitleOptions = {}
+
+		if (props.children) {
+			options = { onClick: () => setExpanded(!expanded) }
+		} else if (props.target) {
+			options = { target: props.target }
+		}
+		const Title = useTitle(options)
 		const [expanded, setExpanded] = React.useState(props.active || false)
 
 		return (
@@ -79,15 +119,7 @@ namespace Menu {
 					props.children && (expanded ? 'is-expanded' : 'is-collapsed'),
 				)}
 			>
-				{props.title && (
-					<Title
-						className="menu-subgroup-title"
-						onClick={props.children ? () => setExpanded(!expanded) : undefined}
-						type={props.children && 'button'}
-					>
-						{props.title}
-					</Title>
-				)}
+				{props.title && <Title className="menu-subgroup-title">{props.title}</Title>}
 				{props.children && (
 					<Collapsible expanded={expanded}>
 						<ul className="menu-subgroup-list">{props.children}</ul>
@@ -98,7 +130,7 @@ namespace Menu {
 	}
 
 	function ActionItem(props: ItemProps) {
-		const Title = useTitle(props.target)
+		const Title = useTitle({ target: props.target })
 		return (
 			<li className={cn('menu-action', props.active && 'is-active')}>
 				{props.title && <Title className="menu-action-title">{props.title}</Title>}

@@ -13,7 +13,7 @@ storiesOf('Menu', module).add('simple', () => {
 				</Menu.Item>
 			</Menu.Item>
 			<Menu.Item title="Other">
-				<Menu.Item title="External link" to="https://example.com" />
+				<Menu.Item title="External link" to="https://example.com" external />
 				<Menu.Item title="Code of conduct" />
 				<Menu.Item title="Terms and conditions" />
 			</Menu.Item>

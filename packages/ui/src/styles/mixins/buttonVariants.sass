@@ -19,8 +19,7 @@
 			border-color: $borderColor
 
 		&#{$view}#{$primary-selector}:hover#{$secondary-selector}
-			background: darken($background, 3)
-			text-decoration: underline
+			background: darken($background, 5)
 
 		&#{$view}#{$primary-selector}:hover:focus#{$secondary-selector}
 			text-decoration: none
@@ -30,7 +29,7 @@
 
 		&#{$view}#{$primary-selector}:focus#{$secondary-selector}
 			@extend %implementsCustomFocusEffects
-			box-shadow: 0 0 0 .2em rgba($background, .5)
+			box-shadow: 0 0 0 .2em rgba($background, .4)
 
 		&#{$view}#{$primary-selector}[disabled]#{$secondary-selector},
 		&#{$view}#{$primary-selector}[readonly]#{$secondary-selector}

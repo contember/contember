@@ -24,6 +24,7 @@ namespace Menu {
 		children?: React.ReactNode
 		title?: string | React.ReactNode
 		to?: Navigation.MiddlewareProps['to']
+		external?: boolean
 	}
 
 	interface TitleProps {
@@ -35,14 +36,17 @@ namespace Menu {
 		| {
 				onClick?: never
 				to?: never
+				external?: never
 		  }
 		| {
 				to: Navigation.MiddlewareProps['to'] | undefined
+				external?: ItemProps['external']
 				onClick?: never
 		  }
 		| {
 				onClick: () => void
 				to?: never
+				external?: never
 		  }
 
 	function ItemContent(props: ItemProps) {
@@ -61,13 +65,13 @@ namespace Menu {
 
 	function useTitle(options: TitleOptions) {
 		const Link = React.useContext(Navigation.MiddlewareContext)
-		const { to, onClick } = options
+		const { to, external, onClick } = options
 
 		if (to) {
 			return (props: TitleProps) => {
 				const { children, ...otherProps } = props
 				return (
-					<Link to={to} {...otherProps}>
+					<Link to={to} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} {...otherProps}>
 						{children}
 					</Link>
 				)
@@ -115,7 +119,7 @@ namespace Menu {
 	}
 
 	function GroupItem(props: ItemProps) {
-		const Title = useTitle({ to: props.to })
+		const Title = useTitle({ to: props.to, external: props.external })
 		return (
 			<ItemWrapper className={cn('menu-group')} to={props.to}>
 				{props.title && <Title className="menu-group-title">{props.title}</Title>}
@@ -130,7 +134,7 @@ namespace Menu {
 		if (props.children) {
 			options = { onClick: () => setExpanded(!expanded) }
 		} else if (props.to) {
-			options = { to: props.to }
+			options = { to: props.to, external: props.external }
 		}
 		const Title = useTitle(options)
 		const [expanded, setExpanded] = React.useState(false)
@@ -151,7 +155,7 @@ namespace Menu {
 	}
 
 	function ActionItem(props: ItemProps) {
-		const Title = useTitle({ to: props.to })
+		const Title = useTitle({ to: props.to, external: props.external })
 		return (
 			<ItemWrapper className="menu-action" to={props.to}>
 				{props.title && <Title className="menu-action-title">{props.title}</Title>}

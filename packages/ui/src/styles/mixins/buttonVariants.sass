@@ -15,11 +15,11 @@
 
 		&#{$view}#{$primary-selector}#{$secondary-selector}
 			color: $color
-			background: $background
+			background: linear-gradient(to bottom, lighten($background, 3), darken($background, 3))
 			border-color: $borderColor
 
 		&#{$view}#{$primary-selector}:hover#{$secondary-selector}
-			background: darken($background, 5)
+			background: linear-gradient(to bottom, lighten($background, 5), darken($background, 5))
 
 		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector}
 			@extend %buttonPress

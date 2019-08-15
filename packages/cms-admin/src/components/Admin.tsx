@@ -15,6 +15,7 @@ import Login from './Login'
 import ProjectsList from './ProjectsList'
 import Config, { validateConfig } from '../config'
 import { Toaster } from './ui/Toaster'
+import { NavigationProvider } from './NavigationProvider'
 
 export interface AdminProps {
 	configs: ProjectConfig[]
@@ -41,7 +42,7 @@ export default class Admin extends React.Component<AdminProps> {
 	render() {
 		return (
 			<Provider store={this.store}>
-				<>
+				<NavigationProvider>
 					<Router
 						routes={{
 							login: () => <Login />,
@@ -101,7 +102,7 @@ export default class Admin extends React.Component<AdminProps> {
 						}}
 					/>
 					<Toaster />
-				</>
+				</NavigationProvider>
 			</Provider>
 		)
 	}

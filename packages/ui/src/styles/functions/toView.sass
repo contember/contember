@@ -1,0 +1,2 @@
+@function toView($viewName)
+	@return if($viewName == $cui-conf-defaultView, '', '.view-#{$viewName}')

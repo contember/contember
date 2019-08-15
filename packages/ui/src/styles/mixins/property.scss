@@ -1,3 +1,5 @@
+@import '../mixinCommon';
+
 @mixin property($name, $map, $key) {
 	@if map_has_key($map, $key) {
 		#{$name}: map_get($map, $key)

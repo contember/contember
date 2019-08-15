@@ -1,0 +1,40 @@
+@import '../mixinCommon'
+//
+	The idea here is to separate the element that *drives* the state from the element whose styles are affected by it.
+	Typically, for a normal button, both would be the same element. In that case, the $targetSelector should just be
+	left the empty string. Alternatively, however, we may want an invisible file input, for instance, to be the source
+	of state but also have an "Upload" button next to it that reacts visually to any state change so as to give the
+	illusion that it is the button that is being focused.
+=buttonVariants($primary-selector: '', $secondary-selector: '')
+	@each $name, $settings in $cui-button-variants
+		$color: map_get($settings, color)
+		$background: map_get($settings, background)
+		$borderColor: map_get($settings, borderColor)
+
+		$view: toView($name)
+
+		&#{$view}#{$primary-selector}#{$secondary-selector}
+			color: $color
+			background: $background
+			border-color: $borderColor
+
+		&#{$view}#{$primary-selector}:hover#{$secondary-selector}
+			background: darken($background, 3)
+			text-decoration: underline
+
+		&#{$view}#{$primary-selector}:hover:focus#{$secondary-selector}
+			text-decoration: none
+
+		&#{$view}#{$primary-selector}:active#{$secondary-selector}
+			@extend %buttonPress
+
+		&#{$view}#{$primary-selector}:focus#{$secondary-selector}
+			@extend %implementsCustomFocusEffects
+			box-shadow: 0 0 0 .2em rgba($background, .5)
+
+		&#{$view}#{$primary-selector}[disabled]#{$secondary-selector},
+		&#{$view}#{$primary-selector}[readonly]#{$secondary-selector}
+			cursor: not-allowed
+			color: lighten($color, 5)
+			background: lighten($background, 5)
+			opacity: $cui-control-inactive-opacity

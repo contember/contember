@@ -3,7 +3,8 @@
 	@each $name, $height in $cui-button-sizes
 		$view: toView($name)
 		&#{$view}
-			$line-height: $height - 2 * $cui-control-border-width
-			height: $height
-			line-height: $line-height
-			padding: 0 (($line-height - 1em) / 2)
+			$visualLineHeight: $height - 2 * $cui-control-border-width
+			$edgeOffset: ($visualLineHeight - 1em) / 2
+			min-height: $height
+			line-height: 1.25
+			padding: ($edgeOffset / 2) $edgeOffset

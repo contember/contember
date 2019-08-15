@@ -17,19 +17,19 @@ interface GenericProps extends React.HTMLAttributes<HTMLElement> {
 
 export type ButtonProps = {
 	intent?: Intent
-	readOnly?: boolean
+	disabled?: boolean
 	children?: React.ReactNode
 } & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
 export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
 	const { Component, intent, children, ...rest } = props
 
-	if (props.Component === 'button' || !props.Component) {
-		props.type = 'button'
+	if (props.disabled === true) {
+		rest['aria-disabled'] = true
+	}
 
-		if (props.readOnly) {
-			props.disabled = props['aria-disabled'] = true
-		}
+	if (props.Component === 'button' || !props.Component) {
+		;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = 'button'
 	}
 
 	const intentClass = intent ? `view-${intent}` : undefined

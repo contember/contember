@@ -32,7 +32,7 @@ export default class SystemApiTester {
 		const context: ResolverContext = new ResolverContext(
 			options.identity ||
 				new Identity.StaticIdentity(testUuid(888), options.roles || [Identity.SystemRole.SUPER_ADMIN], {
-					[ApiTester.project.id]: options.projectRoles || [],
+					[ApiTester.project.slug]: options.projectRoles || [],
 				}),
 			{},
 			this.systemContainer.authorizator,

@@ -2,8 +2,8 @@ import { QueryHandler } from '@contember/queryable'
 import { Client, DatabaseQueryable } from '@contember/database'
 import {
 	AddProjectMemberCommand,
+	ProjectBySlugVariablesByIdentityQuery,
 	ProjectRolesByIdentityQuery,
-	ProjectVariablesByIdentityQuery,
 	RemoveProjectMemberCommand,
 	UpdateProjectMemberCommand,
 	UpdateProjectMemberVariablesCommand,
@@ -13,7 +13,15 @@ class ProjectMemberManager {
 	constructor(private readonly queryHandler: QueryHandler<DatabaseQueryable>, private readonly db: Client) {}
 
 	async getProjectRoles(projectId: string, identityId: string): Promise<ProjectMemberManager.GetProjectRolesResponse> {
-		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery(projectId, identityId))
+		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
+		return new ProjectMemberManager.GetProjectRolesResponse(row.roles)
+	}
+
+	async getProjectBySlugRoles(
+		projectSlug: string,
+		identityId: string,
+	): Promise<ProjectMemberManager.GetProjectRolesResponse> {
+		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery({ slug: projectSlug }, identityId))
 		return new ProjectMemberManager.GetProjectRolesResponse(row.roles)
 	}
 
@@ -48,8 +56,11 @@ class ProjectMemberManager {
 		)
 	}
 
-	async getProjectVariables(projectId: string, identityId: string): Promise<ProjectVariablesByIdentityQuery.Result> {
-		return this.queryHandler.fetch(new ProjectVariablesByIdentityQuery(projectId, identityId))
+	async getProjectBySlugVariables(
+		projectSlug: string,
+		identityId: string,
+	): Promise<ProjectBySlugVariablesByIdentityQuery.Result> {
+		return this.queryHandler.fetch(new ProjectBySlugVariablesByIdentityQuery(projectSlug, identityId))
 	}
 }
 

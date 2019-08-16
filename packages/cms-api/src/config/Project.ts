@@ -1,5 +1,4 @@
 interface Project {
-	readonly id: string
 	readonly slug: string
 	readonly directory?: string
 	readonly name: string

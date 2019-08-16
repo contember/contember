@@ -1,21 +1,26 @@
-import { DatabaseQuery } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { byProjectSlug } from './ProjectSlugSpecification'
 
 class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQuery.Result> {
-	constructor(private readonly projectId: string, private readonly identityId: string) {
+	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string) {
 		super()
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
-		const result = await queryable
+		let qb = queryable
 			.createSelectBuilder<ProjectRolesByIdentityQuery.Result>()
 			.select('roles')
 			.from('project_member')
 			.where({
 				identity_id: this.identityId,
-				project_id: this.projectId,
 			})
-			.getResult()
+		const qbWithProjectWhere =
+			'id' in this.project
+				? qb.where({
+						project_id: this.project.id,
+				  })
+				: qb.match(byProjectSlug(this.project.slug))
+		const result = await qbWithProjectWhere.getResult()
 
 		const row = this.fetchOneOrNull(result)
 

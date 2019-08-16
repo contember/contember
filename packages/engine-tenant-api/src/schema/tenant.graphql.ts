@@ -20,18 +20,18 @@ const schema: DocumentNode = gql`
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 
 		addProjectMember(
-			projectId: String!
+			projectSlug: String!
 			identityId: String!
 			roles: [String!]!
 			variables: [VariableUpdate!]
 		): AddProjectMemberResponse
 		updateProjectMember(
-			projectId: String!
+			projectSlug: String!
 			identityId: String!
 			roles: [String!]
 			variables: [VariableUpdate!]
 		): UpdateProjectMemberResponse
-		removeProjectMember(projectId: String!, identityId: String!): RemoveProjectMemberResponse
+		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
 
 		createApiKey(roles: [String!], projects: [ApiKeyProjectInput!]): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
@@ -179,6 +179,7 @@ const schema: DocumentNode = gql`
 	}
 
 	enum UpdateProjectMemberErrorCode {
+		PROJECT_NOT_FOUND
 		VARIABLE_NOT_FOUND
 		NOT_MEMBER
 	}
@@ -198,12 +199,13 @@ const schema: DocumentNode = gql`
 
 	enum RemoveProjectMemberErrorCode {
 		NOT_MEMBER
+		PROJECT_NOT_FOUND
 	}
 
 	# === createApiKey ===
 
 	input ApiKeyProjectInput {
-		projectId: String!
+		projectSlug: String!
 		roles: [String!]
 		variables: [VariableUpdate!]
 	}

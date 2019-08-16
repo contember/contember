@@ -115,7 +115,7 @@ class PermissionsVerifier {
 		const schema = await this.schemaVersionBuilder.buildSchemaForStage(stage.id)
 		const { permissions } = this.permissionsByIdentityFactory.createPermissions(stage.slug, schema, {
 			globalRoles: context.identity.roles,
-			projectRoles: (await context.identity.getProjectRoles(this.project.id)) || [],
+			projectRoles: (await context.identity.getProjectRoles(this.project.slug)) || [],
 		})
 
 		const predicateFactory = new PredicateFactory(permissions, new VariableInjector(schema.model, context.variables))

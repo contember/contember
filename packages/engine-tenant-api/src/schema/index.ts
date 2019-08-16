@@ -44,7 +44,7 @@ export type ApiKey = {
 }
 
 export type ApiKeyProjectInput = {
-	readonly projectId: Scalars['String']
+	readonly projectSlug: Scalars['String']
 	readonly roles?: Maybe<ReadonlyArray<Scalars['String']>>
 	readonly variables?: Maybe<ReadonlyArray<VariableUpdate>>
 }
@@ -162,21 +162,21 @@ export type MutationChangePasswordArgs = {
 }
 
 export type MutationAddProjectMemberArgs = {
-	projectId: Scalars['String']
+	projectSlug: Scalars['String']
 	identityId: Scalars['String']
 	roles: ReadonlyArray<Scalars['String']>
 	variables?: Maybe<ReadonlyArray<VariableUpdate>>
 }
 
 export type MutationUpdateProjectMemberArgs = {
-	projectId: Scalars['String']
+	projectSlug: Scalars['String']
 	identityId: Scalars['String']
 	roles?: Maybe<ReadonlyArray<Scalars['String']>>
 	variables?: Maybe<ReadonlyArray<VariableUpdate>>
 }
 
 export type MutationRemoveProjectMemberArgs = {
-	projectId: Scalars['String']
+	projectSlug: Scalars['String']
 	identityId: Scalars['String']
 }
 
@@ -224,6 +224,7 @@ export type RemoveProjectMemberError = {
 
 export enum RemoveProjectMemberErrorCode {
 	NotMember = 'NOT_MEMBER',
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
 }
 
 export type RemoveProjectMemberResponse = {
@@ -330,6 +331,7 @@ export type UpdateProjectMemberError = {
 }
 
 export enum UpdateProjectMemberErrorCode {
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
 	VariableNotFound = 'VARIABLE_NOT_FOUND',
 	NotMember = 'NOT_MEMBER',
 }

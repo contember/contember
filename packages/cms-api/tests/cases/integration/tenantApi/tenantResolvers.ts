@@ -396,7 +396,7 @@ describe('tenant api', () => {
 			await execute({
 				query: GQL`mutation {
           addProjectMember(
-          projectId: "${testUuid(5)}", 
+          projectSlug: "blog", 
           identityId: "${testUuid(6)}", 
           roles: ["editor"], 
           variables: [{name: "language", values: ["cs"]}]
@@ -408,6 +408,11 @@ describe('tenant api', () => {
           }
         }`,
 				executes: [
+					{
+						sql: SQL`select "id", "name", "slug" from "tenant"."project" where "slug" = ?`,
+						parameters: ['blog'],
+						response: { rows: [{ id: testUuid(5), name: 'Blog', slug: 'blog' }] },
+					},
 					{
 						sql: SQL`BEGIN;`,
 						response: { rowCount: 1 },
@@ -446,9 +451,9 @@ describe('tenant api', () => {
 		it('update project member', async () => {
 			await execute({
 				query: GQL`mutation {
-          updateProjectMember(projectId: "${testUuid(5)}", identityId: "${testUuid(
-					6,
-				)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]) {
+          updateProjectMember(projectSlug: "blog", identityId: "${testUuid(
+						6,
+					)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]) {
             ok
 	          errors {
 		          code
@@ -457,11 +462,17 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
+						sql: SQL`select "id", "name", "slug" from "tenant"."project" where "slug" = ?`,
+						parameters: ['blog'],
+						response: { rows: [{ id: testUuid(5), name: 'Blog', slug: 'blog' }] },
+					},
+					{
 						sql: SQL`BEGIN;`,
 						response: { rowCount: 1 },
 					},
 					{
 						sql: SQL`select "id" from "tenant"."project_member" where "project_id" = ? and "identity_id" = ?`,
+						parameters: [testUuid(5), testUuid(6)],
 						response: {
 							rows: [{ id: testUuid(10) }],
 						},
@@ -507,7 +518,7 @@ describe('tenant api', () => {
 		it('remove project member', async () => {
 			await execute({
 				query: GQL`mutation {
-          removeProjectMember(projectId: "${testUuid(5)}", identityId: "${testUuid(6)}") {
+          removeProjectMember(projectSlug: "blog", identityId: "${testUuid(6)}") {
             ok
 	          errors {
 		          code
@@ -516,11 +527,17 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
+						sql: SQL`select "id", "name", "slug" from "tenant"."project" where "slug" = ?`,
+						parameters: ['blog'],
+						response: { rows: [{ id: testUuid(5), name: 'Blog', slug: 'blog' }] },
+					},
+					{
 						sql: SQL`BEGIN;`,
 						response: { rowCount: 1 },
 					},
 					{
 						sql: SQL`select "id" from "tenant"."project_member" where "project_id" = ? and "identity_id" = ?`,
+						parameters: [testUuid(5), testUuid(6)],
 						response: {
 							rows: [{ id: testUuid(10) }],
 						},
@@ -559,7 +576,7 @@ describe('tenant api', () => {
 			await execute({
 				query: GQL`mutation {
           createApiKey(roles: ["test"], projects: [
-          	{projectId: "${testUuid(6)}", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]}
+          	{projectSlug: "blog", roles: ["editor"], variables: [{name: "language", values: ["cs"]}]}
           ]) {
             ok
 	          errors {
@@ -576,6 +593,11 @@ describe('tenant api', () => {
           }
         }`,
 				executes: [
+					{
+						sql: SQL`select "id", "name", "slug" from "tenant"."project" where "slug" = ?`,
+						parameters: ['blog'],
+						response: { rows: [{ id: testUuid(6), name: 'Blog', slug: 'blog' }] },
+					},
 					{
 						sql: SQL`BEGIN;`,
 						response: { rowCount: 1 },

@@ -1,3 +1,11 @@
+import { With } from './builders/internal/With'
+import { Where } from './builders/internal/Where'
+import { Returning } from './builders/internal/Returning'
+
+export type WithAware = With.Aware
+export type WhereAware = Where.Aware
+export type ReturningAware = Returning.Aware
+
 export * from './client/Client'
 export * from './client/Connection'
 export * from './client/EventManager'

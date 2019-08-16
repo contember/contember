@@ -3,6 +3,7 @@ import '../../storybook/index.sass'
 
 import './components/Button'
 import './components/Collapsible'
+import './components/ContainerSpinner'
 //import './components/Dropdown'
 //import './components/FileInput'
 //import './components/FormGroup'

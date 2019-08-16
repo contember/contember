@@ -219,3 +219,17 @@ $cui-menu-caret-transition-duration: $cui-collapsible-transition-duration !defau
 $cui-spinner-appearSpeed: .2s !default;
 $cui-spinner-color: currentColor !default;
 $cui-spinner-period: 1.5s !default;
+
+// Container spinner
+$cui-containerSpinner-background: $cui-color-gray-1 !default;
+
+$cui-containerSpinner-default-size: 2.5em !default;
+$cui-containerSpinner-small-size: 1.5em !default;
+$cui-containerSpinner-large-size: 4em !default;
+
+$cui-containerSpinner-sizes: () !default;
+$cui-containerSpinner-sizes: map_merge((
+	$cui-conf-defaultView: $cui-containerSpinner-default-size,
+	'small': $cui-containerSpinner-small-size,
+	'large': $cui-containerSpinner-large-size,
+), $cui-containerSpinner-sizes);

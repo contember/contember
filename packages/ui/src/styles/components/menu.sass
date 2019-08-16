@@ -1,7 +1,7 @@
 @import '../common'
 
 .menu
-	padding: $cui-menu-link-vertical-padding 0 0
+	padding: $cui-menu-vertical-padding 0 0
 	line-height: 1.5
 	text-align: left
 
@@ -40,8 +40,8 @@
 		&-title
 			color: $cui-menu-group-color
 			font-size: $cui-menu-group-title-font-size
-			margin: ($cui-menu-link-horizontal-padding / 2 + rem(8px)) 0 (rem(24px) / 2)
-			padding: 0 $cui-menu-link-horizontal-padding
+			margin: (2 * $cui-menu-vertical-padding) 0 $cui-menu-vertical-padding
+			padding: 0 $cui-menu-horizontal-padding
 			font-weight: $fw-medium
 			text-transform: uppercase
 
@@ -53,7 +53,7 @@
 			margin: 0
 			color: $cui-menu-subgroup-color
 			font-size: $cui-menu-subgroup-title-font-size
-			padding: rem(8px) $cui-menu-link-horizontal-padding
+			padding: $cui-menu-vertical-padding $cui-menu-horizontal-padding
 			text-align: inherit
 			text-decoration: none
 			border: none
@@ -63,7 +63,7 @@
 			font-family: inherit
 
 		&-list
-			padding: em(4px) 0 em(8px)
+			padding: ($cui-menu-vertical-padding / 2) 0 $cui-menu-vertical-padding
 
 		&.is-expanded &,
 		&.is-collapsed &
@@ -90,13 +90,13 @@
 
 		&-title
 			margin: 0
-			color: $cui-menu-action-color
-			padding: rem(2px) $cui-menu-link-horizontal-padding rem(2px) (1.5 * $cui-menu-link-horizontal-padding)
+			color: $cui-menu-action-inactive-color
+			padding: rem(2px) $cui-menu-horizontal-padding rem(2px) (1.5 * $cui-menu-horizontal-padding)
 			text-decoration: none
 			font-weight: $fw-medium
 
 		&-list
-			padding: 0 0 rem(4px) rem(56px)
+			padding: 0 0 ($cui-menu-vertical-padding / 2) ($cui-menu-horizontal-padding * 2)
 
 	&-tooDeep
 		font-size: .9em
@@ -108,9 +108,9 @@
 
 		&-title
 			margin: 0
-			color: $cui-menu-action-color
+			color: $cui-menu-action-inactive-color
 			text-decoration: none
-			padding: rem(1px) $cui-menu-link-horizontal-padding rem(1px) 0
+			padding: rem(1px) $cui-menu-horizontal-padding rem(1px) 0
 			font-weight: $fw-medium
 
 		&-list

@@ -9,7 +9,7 @@ export const LINK: RichEditorPluginConfig = {
 	plugin: {
 		renderMark: ({ mark, children, attributes }: RenderMarkProps, editor: Editor, next: () => any) => {
 			if (mark.type === 'link') {
-				const href = mark.data.get('href');
+				const href = mark.data.get('href')
 				return React.createElement(
 					'a',
 					{ ...attributes, href: href, style: { color: 'blue', textDecoration: 'underline' }, title: href },

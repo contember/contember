@@ -19,7 +19,7 @@ interface ActionButtonProps {
 }
 
 export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive, disabled }) => (
-	<button onClick={() => onClick()} className={cn("toolbar-item", isActive && "isActive")} disabled={disabled}>
+	<button onClick={() => onClick()} className={cn('toolbar-item', isActive && 'isActive')} disabled={disabled}>
 		<Icon icon={icon} color="currentColor" />
 	</button>
 )

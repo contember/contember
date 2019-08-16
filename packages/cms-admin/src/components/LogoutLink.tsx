@@ -27,7 +27,7 @@ class LogoutLink extends React.Component<Props, {}> {
 		this.props.logout()
 	}
 
-	defaultComponent: React.StatelessComponent<InnerProps> = () => (
+	defaultComponent: React.FunctionComponent<InnerProps> = () => (
 		<a href="#" onClick={this.props.logout}>
 			{this.props.children}
 		</a>

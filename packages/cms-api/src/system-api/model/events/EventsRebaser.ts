@@ -6,7 +6,7 @@ class EventsRebaser {
 	constructor(private readonly db: Client) {}
 
 	public async rebaseStageEvents(
-		stageId: string,
+		stageSlug: string,
 		headEvent: string,
 		oldBase: string,
 		newBase: string,
@@ -25,7 +25,7 @@ class EventsRebaser {
 
 		console.log(debug('New head: ' + newHead))
 
-		await new UpdateStageEventCommand(stageId, newHead).execute(this.db)
+		await new UpdateStageEventCommand(stageSlug, newHead).execute(this.db)
 
 		return newHead
 		// return result.rows.reduce((result, row) => ({ ...result, [row.old_id]: row.new_id }), {})

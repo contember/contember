@@ -4,6 +4,7 @@ import { formatSchemaName } from '../helpers/stageHelpers'
 import { StageWithoutEvent } from '../dtos/Stage'
 import InitEventQuery from '../queries/InitEventQuery'
 import { wrapIdentifier } from '@contember/database'
+import { uuid } from '../../../utils/uuid'
 
 class CreateOrUpdateStageCommand {
 	constructor(private readonly stage: StageWithoutEvent) {}
@@ -15,14 +16,13 @@ class CreateOrUpdateStageCommand {
 			.insertBuilder()
 			.into('stage')
 			.values({
-				id: this.stage.id,
+				id: uuid(),
 				name: this.stage.name,
 				slug: this.stage.slug,
 				event_id: initEvent.id,
 			})
-			.onConflict(InsertBuilder.ConflictActionType.update, ['id'], {
+			.onConflict(InsertBuilder.ConflictActionType.update, ['slug'], {
 				name: this.stage.name,
-				slug: this.stage.slug,
 			})
 			.returning('event_id')
 			.execute()

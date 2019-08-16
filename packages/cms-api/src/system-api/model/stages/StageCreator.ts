@@ -5,6 +5,7 @@ import EventApplier from '../events/EventApplier'
 import DiffQuery from '../queries/DiffQuery'
 import StageByIdQuery from '../queries/StageByIdQuery'
 import { StageWithoutEvent } from '../dtos/Stage'
+import StageBySlugQuery from '../queries/StageBySlugQuery'
 
 class StageCreator {
 	constructor(private readonly db: Client, private readonly eventApplier: EventApplier) {}
@@ -20,8 +21,8 @@ class StageCreator {
 
 		const queryHandler = this.db.createQueryHandler()
 
-		const newStage = (await queryHandler.fetch(new StageByIdQuery(stage.id)))!
-		const parentStage = (await queryHandler.fetch(new StageByIdQuery(parent.id)))!
+		const newStage = (await queryHandler.fetch(new StageBySlugQuery(stage.slug)))!
+		const parentStage = (await queryHandler.fetch(new StageBySlugQuery(parent.slug)))!
 
 		// both are new
 		if (newStage.event_id === parentStage.event_id) {
@@ -31,7 +32,7 @@ class StageCreator {
 		const events = await queryHandler.fetch(new DiffQuery(newStage.event_id, parentStage.event_id))
 		await this.eventApplier.applyEvents(newStage, events)
 
-		await new UpdateStageEventCommand(newStage.id, parentStage.event_id).execute(this.db)
+		await new UpdateStageEventCommand(newStage.slug, parentStage.event_id).execute(this.db)
 
 		return true
 	}

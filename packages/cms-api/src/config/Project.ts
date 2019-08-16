@@ -10,7 +10,6 @@ interface Project {
 
 namespace Project {
 	export interface Stage {
-		readonly id: string
 		readonly slug: string
 		readonly name: string
 		readonly base?: string

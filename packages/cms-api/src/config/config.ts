@@ -120,17 +120,6 @@ function checkTenantStructure(json: unknown): Config['tenant'] {
 	return { db: checkDatabaseCredentials(json.db, 'tenant.db') }
 }
 
-function checkIdProperty<Input extends UnknownObject>(json: Input, path: string): string {
-	if (!hasStringProperty(json, 'id') && hasStringProperty(json, 'uuid')) {
-		console.warn(deprecated(`Property ${path}.id in config file is deprecated, use ${path}.id instead`))
-		return json.uuid
-	}
-	if (!hasStringProperty(json, 'id')) {
-		return typeError(path + '.uuid', json.uuid, 'string')
-	}
-	return json.id
-}
-
 function checkStageStructure(json: unknown, path: string): Project.Stage {
 	if (!isObject(json)) {
 		return typeError(path, json, 'object')
@@ -142,7 +131,7 @@ function checkStageStructure(json: unknown, path: string): Project.Stage {
 	if (!hasStringProperty(json, 'name')) {
 		return typeError(path + '.name', json.name, 'string')
 	}
-	return { ...json, id: checkIdProperty(json, path) }
+	return { ...json }
 }
 
 function checkProjectStructure(json: unknown, path: string): Project {

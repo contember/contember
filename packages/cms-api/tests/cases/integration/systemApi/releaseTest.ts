@@ -1,5 +1,4 @@
 import 'mocha'
-import { testUuid } from '../../../src/testUuid'
 import ApiTester from '../../../src/ApiTester'
 import { GQL } from '../../../src/tags'
 import { expect } from 'chai'
@@ -12,12 +11,10 @@ describe('system api - release', () => {
 			project: {
 				stages: [
 					{
-						id: testUuid(2),
 						name: 'Prod',
 						slug: 'prod',
 					},
 					{
-						id: testUuid(1),
 						name: 'Preview',
 						slug: 'preview',
 						base: 'prod',
@@ -48,7 +45,7 @@ describe('system api - release', () => {
 		)
 
 		const diff = await tester.system.querySystem(GQL`query {
-			diff(baseStage: "${testUuid(2)}", headStage: "${testUuid(1)}") {
+			diff(baseStage: "prod", headStage: "preview") {
 				result {
 					events {
 						id
@@ -72,8 +69,8 @@ describe('system api - release', () => {
 				}
 			}`,
 			{
-				baseStage: testUuid(2),
-				headStage: testUuid(1),
+				baseStage: 'prod',
+				headStage: 'preview',
 				events: [diff.data.diff.result.events[1].id],
 			},
 		)
@@ -93,7 +90,7 @@ describe('system api - release', () => {
 			listAuthor: [{ name: 'Jack Black' }],
 		})
 
-		const diff2 = await tester.system.diff(testUuid(2), testUuid(1))
+		const diff2 = await tester.system.diff('prod', 'preview')
 
 		expect(diff2.events).length(1)
 		expect(diff2.events[0].type).eq('CREATE')
@@ -121,7 +118,7 @@ describe('system api - release', () => {
 		await tester.sequences.runSequence(eventsSequence)
 
 		const diff = await tester.system.querySystem(GQL`query {
-			diff(baseStage: "${testUuid(1)}", headStage: "${testUuid(2)}") {
+			diff(baseStage: "a", headStage: "b") {
 				result {
 					events {
 						id
@@ -144,8 +141,8 @@ describe('system api - release', () => {
 				}
 			}`,
 			{
-				baseStage: testUuid(1),
-				headStage: testUuid(2),
+				baseStage: 'a',
+				headStage: 'b',
 				events: [diff.data.diff.result.events[1].id],
 			},
 		)

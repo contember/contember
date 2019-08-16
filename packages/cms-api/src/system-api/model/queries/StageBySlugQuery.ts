@@ -1,6 +1,6 @@
 import { DatabaseQuery } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
-import { Stage } from '../dtos/Stage'
+import { Stage, StageWithId } from '../dtos/Stage'
 import { prepareStageQueryBuilder } from './StageQueryHelper'
 
 class StageBySlugQuery extends DatabaseQuery<StageBySlugQuery.Result> {
@@ -18,7 +18,7 @@ class StageBySlugQuery extends DatabaseQuery<StageBySlugQuery.Result> {
 }
 
 namespace StageBySlugQuery {
-	export type Result = null | Stage
+	export type Result = null | StageWithId
 }
 
 export default StageBySlugQuery

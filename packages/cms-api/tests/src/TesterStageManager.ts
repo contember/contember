@@ -30,15 +30,14 @@ export default class TesterStageManager {
 
 	public async refreshCreatedStages(): Promise<Set<string>> {
 		const stages = await this.db
-			.selectBuilder<{ slug: string; id: string }>()
+			.selectBuilder<{ slug: string }>()
 			.select('slug')
-			.select('id')
 			.from('stage')
 			.getResult()
 
 		this.createdStages = new Set(stages.map(it => it.slug))
 		if (stages.length > 0) {
-			const latestVersion = await this.db.createQueryHandler().fetch(new LatestMigrationByStageQuery(stages[0].id))
+			const latestVersion = await this.db.createQueryHandler().fetch(new LatestMigrationByStageQuery(stages[0].slug))
 			this.migrationVersion = latestVersion ? latestVersion.data.version : null
 		}
 

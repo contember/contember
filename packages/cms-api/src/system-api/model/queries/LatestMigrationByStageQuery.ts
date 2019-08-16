@@ -2,7 +2,7 @@ import { DatabaseQuery } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
 
 class LatestMigrationByStageQuery extends DatabaseQuery<LatestMigrationByStageQuery.Result> {
-	constructor(private readonly stageId: string) {
+	constructor(private readonly stageSlug: string) {
 		super()
 	}
 
@@ -13,7 +13,7 @@ class LatestMigrationByStageQuery extends DatabaseQuery<LatestMigrationByStageQu
 					SELECT type, previous_id, data
 					FROM system.event
 					JOIN system.stage ON stage.event_id = event.id
-					WHERE stage.id = ?
+					WHERE stage.slug = ?
 				UNION ALL
 					SELECT event.type, event.previous_id, event.data
 					FROM system.event, recent_events
@@ -24,7 +24,7 @@ class LatestMigrationByStageQuery extends DatabaseQuery<LatestMigrationByStageQu
 			WHERE type = 'run_migration'
 			LIMIT 1
 		`,
-			[this.stageId],
+			[this.stageSlug],
 		)).rows
 
 		return this.fetchOneOrNull(rows)

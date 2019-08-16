@@ -1,4 +1,4 @@
-import { Stage } from '../dtos/Stage'
+import { Stage, StageWithId } from '../dtos/Stage'
 import DiffQuery from '../queries/DiffQuery'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
@@ -10,6 +10,7 @@ import StageByIdQuery from '../queries/StageByIdQuery'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import { Client } from '@contember/database'
 import StageTree from '../stages/StageTree'
+import StageBySlugQuery from '../queries/StageBySlugQuery'
 
 class ReleaseExecutor {
 	constructor(
@@ -50,12 +51,12 @@ class ReleaseExecutor {
 		}
 
 		await this.eventApplier.applyEvents(targetStage, events)
-		const newBase = await this.queryHandler.fetch(new StageByIdQuery(targetStage.id))
+		const newBase = await this.queryHandler.fetch(new StageBySlugQuery(targetStage.slug))
 		if (!newBase) {
 			throw new Error('should not happen')
 		}
 		if (this.isFastForward(eventsToApply, allEvents.map(it => it.id))) {
-			await new UpdateStageEventCommand(targetStage.id, eventsToApply[eventsToApply.length - 1]).execute(this.db)
+			await new UpdateStageEventCommand(targetStage.slug, eventsToApply[eventsToApply.length - 1]).execute(this.db)
 		} else {
 			await this.rebaseRecursive(sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
 		}
@@ -63,14 +64,14 @@ class ReleaseExecutor {
 
 	private async rebaseRecursive(rebasedStage: Stage, oldBase: string, newBase: string, droppedEvents: string[]) {
 		const newHead = await this.eventsRebaser.rebaseStageEvents(
-			rebasedStage.id,
+			rebasedStage.slug,
 			rebasedStage.event_id,
 			oldBase,
 			newBase,
 			droppedEvents,
 		)
 		for (const child of this.stageTree.getChildren(rebasedStage)) {
-			const childWithEvent = await this.queryHandler.fetch(new StageByIdQuery(child.id))
+			const childWithEvent = await this.queryHandler.fetch(new StageBySlugQuery(child.slug))
 			await this.rebaseRecursive(childWithEvent!, rebasedStage.event_id, newHead, [])
 		}
 	}

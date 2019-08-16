@@ -10,12 +10,10 @@ describe('system api - diff', () => {
 			project: {
 				stages: [
 					{
-						id: testUuid(2),
 						name: 'Prod',
 						slug: 'prod',
 					},
 					{
-						id: testUuid(1),
 						name: 'Preview',
 						slug: 'preview',
 						base: 'prod',
@@ -69,12 +67,10 @@ describe('system api - diff', () => {
 			project: {
 				stages: [
 					{
-						id: testUuid(2),
 						name: 'Prod',
 						slug: 'prod',
 					},
 					{
-						id: testUuid(1),
 						name: 'Preview',
 						slug: 'preview',
 						base: 'prod',

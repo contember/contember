@@ -7,6 +7,7 @@ import { formatSchemaName } from '../helpers/stageHelpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
 import MigrationsResolver from '../../../content-schema/MigrationsResolver'
 import StageByIdQuery from '../queries/StageByIdQuery'
+import StageBySlugQuery from '../queries/StageBySlugQuery'
 
 class EventApplier {
 	constructor(
@@ -75,7 +76,7 @@ class EventApplier {
 	}
 
 	private async applyRunMigration(stage: Stage, event: RunMigrationEvent): Promise<void> {
-		const event_id = (await this.db.createQueryHandler().fetch(new StageByIdQuery(stage.id)))!.event_id
+		const event_id = (await this.db.createQueryHandler().fetch(new StageBySlugQuery(stage.slug)))!.event_id
 		const files = (await this.migrationResolver.getMigrations()).filter(({ version }) => version === event.version)
 		await this.migrationExecutor.execute(this.db, { ...stage, event_id }, files, () => null)
 	}

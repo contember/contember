@@ -1,10 +1,24 @@
 import { Editor } from 'slate'
-import { RichEditorPluginConfig, simpleMarkPlugin, simpleHtmlSerializerRule } from './utils'
+import { RichEditorPluginConfig, simpleHtmlSerializerRule } from './utils'
+import * as React from 'react'
+import { RenderMarkProps } from 'slate-react'
 
 export const LINK: RichEditorPluginConfig = {
 	node: 'mark',
 	type: 'link',
-	plugin: simpleMarkPlugin('link', 'a', ['href']),
+	plugin: {
+		renderMark: ({ mark, children, attributes }: RenderMarkProps, editor: Editor, next: () => any) => {
+			if (mark.type === 'link') {
+				const href = mark.data.get('href');
+				return React.createElement(
+					'a',
+					{ ...attributes, href: href, style: { color: 'blue', textDecoration: 'underline' }, title: href },
+					children,
+				)
+			}
+			return next()
+		},
+	},
 	htmlSerializer: simpleHtmlSerializerRule('mark', 'link', 'a', ['href']),
 	onToggle: (editor: Editor) => {
 		const hasLinks = editor.value.activeMarks.some(mark => mark !== undefined && mark.type == 'link')

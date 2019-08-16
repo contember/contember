@@ -94,7 +94,7 @@ namespace TenantContainer {
 					({ queryHandler, apiKeyManager }) => new SignInManager(queryHandler, apiKeyManager),
 				)
 				.addService('projectMemberManager', ({ queryHandler, db }) => new ProjectMemberManager(queryHandler, db))
-				.addService('projectManager', ({ db }) => new ProjectManager(db))
+				.addService('projectManager', ({ queryHandler, db }) => new ProjectManager(queryHandler, db))
 
 				.addService('meQueryResolver', () => new MeQueryResolver())
 				.addService(
@@ -113,7 +113,8 @@ namespace TenantContainer {
 				)
 				.addService(
 					'addProjectMemberMutationResolver',
-					({ projectMemberManager }) => new AddProjectMemberMutationResolver(projectMemberManager),
+					({ projectMemberManager, projectManager }) =>
+						new AddProjectMemberMutationResolver(projectMemberManager, projectManager),
 				)
 				.addService(
 					'setupMutationResolver',
@@ -121,15 +122,17 @@ namespace TenantContainer {
 				)
 				.addService(
 					'updateProjectMemberMutationResolver',
-					({ projectMemberManager }) => new UpdateProjectMemberMutationResolver(projectMemberManager),
+					({ projectMemberManager, projectManager }) =>
+						new UpdateProjectMemberMutationResolver(projectMemberManager, projectManager),
 				)
 				.addService(
 					'removeProjectMemberMutationResolver',
-					({ projectMemberManager }) => new RemoveProjectMemberMutationResolver(projectMemberManager),
+					({ projectMemberManager, projectManager }) =>
+						new RemoveProjectMemberMutationResolver(projectMemberManager, projectManager),
 				)
 				.addService(
 					'createApiKeyMutationResolver',
-					({ apiKeyManager }) => new CreateApiKeyMutationResolver(apiKeyManager),
+					({ apiKeyManager, projectManager }) => new CreateApiKeyMutationResolver(apiKeyManager, projectManager),
 				)
 				.addService(
 					'disableApiKeyMutationResolver',

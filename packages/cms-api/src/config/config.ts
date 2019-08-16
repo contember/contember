@@ -161,7 +161,6 @@ function checkProjectStructure(json: unknown, path: string): Project {
 	}
 	return {
 		...json,
-		id: checkIdProperty(json, path),
 		stages: json.stages.map((stage, i) => checkStageStructure(stage, `${path}.stages${i}`)),
 		dbCredentials: checkDatabaseCredentials(json.dbCredentials, `${path}.dbCredentials`),
 		s3: checkS3Config(json.s3, `${path}.s3`),

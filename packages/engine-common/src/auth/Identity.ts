@@ -3,7 +3,7 @@ interface Identity {
 
 	readonly roles: string[]
 
-	getProjectRoles(projectId: string): Promise<string[]>
+	getProjectRoles(projectSlug: string): Promise<string[]>
 }
 
 namespace Identity {
@@ -19,11 +19,11 @@ namespace Identity {
 		constructor(
 			public readonly id: string,
 			public readonly roles: string[],
-			private readonly projectRoles: { [projectId: string]: string[] },
+			private readonly projectRoles: { [projectSlug: string]: string[] },
 		) {}
 
-		getProjectRoles(projectId: string): Promise<string[]> {
-			return Promise.resolve(this.projectRoles[projectId] || [])
+		getProjectRoles(projectSlug: string): Promise<string[]> {
+			return Promise.resolve(this.projectRoles[projectSlug] || [])
 		}
 	}
 }

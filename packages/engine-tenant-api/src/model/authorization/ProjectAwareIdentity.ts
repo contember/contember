@@ -8,8 +8,8 @@ class ProjectAwareIdentity implements Identity {
 		private readonly memberManager: ProjectMemberManager,
 	) {}
 
-	async getProjectRoles(projectId: string): Promise<string[]> {
-		return (await this.memberManager.getProjectRoles(projectId, this.id)).roles
+	async getProjectRoles(projectSlug: string): Promise<string[]> {
+		return (await this.memberManager.getProjectBySlugRoles(projectSlug, this.id)).roles
 	}
 }
 

@@ -13,8 +13,8 @@ class ProjectMemberMiddlewareFactory {
 		const projectMember: KoaMiddleware<InputState> = async (ctx, next) => {
 			const project = ctx.state.projectContainer.project
 			const [projectRoles, projectVariables] = await Promise.all([
-				this.projectMemberManager.getProjectRoles(project.id, ctx.state.authResult.identityId),
-				this.projectMemberManager.getProjectVariables(project.id, ctx.state.authResult.identityId),
+				this.projectMemberManager.getProjectBySlugRoles(project.slug, ctx.state.authResult.identityId),
+				this.projectMemberManager.getProjectBySlugVariables(project.slug, ctx.state.authResult.identityId),
 			])
 			ctx.state.projectRoles = projectRoles.roles
 			ctx.state.projectVariables = projectVariables

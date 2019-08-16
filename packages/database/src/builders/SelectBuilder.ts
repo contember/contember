@@ -4,6 +4,13 @@ import { Where } from './internal/Where'
 import { aliasLiteral } from '../utils'
 import { Compiler } from './Compiler'
 
+export type SelectBuilderSpecification<OutputOptions extends keyof SelectBuilder.Options> = <
+	Result,
+	InputOptions extends keyof SelectBuilder.Options
+>(
+	qb: SelectBuilder<Result, InputOptions>,
+) => SelectBuilder<Result, InputOptions | OutputOptions>
+
 class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder.Options = never>
 	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled | 'orderBy'>>, QueryBuilder {
 	constructor(
@@ -106,6 +113,12 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 
 	public meta(key: string, value: any): SelectBuilder<Result, Filled | 'meta'> {
 		return this.withOption('meta', { ...this.options.meta, [key]: value })
+	}
+
+	public match<AdditionalOptions extends keyof SelectBuilder.Options>(
+		spec: SelectBuilderSpecification<AdditionalOptions>,
+	): SelectBuilder<Result, Filled | AdditionalOptions> {
+		return spec(this)
 	}
 
 	public async getResult(): Promise<Result[]> {

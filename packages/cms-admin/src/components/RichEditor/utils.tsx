@@ -1,28 +1,27 @@
-import { ButtonGroup, IconName } from '@blueprintjs/core'
-import { Button } from '@contember/ui'
+import { IconName } from '@blueprintjs/core'
 import * as React from 'react'
 import { Editor } from 'slate'
 import { Editor as ReactEditor } from 'slate-react'
-import { Intent } from '../ui'
 import { Icon } from '@blueprintjs/core'
+import cn from 'classnames'
 
 interface ToolbarProps {
 	children: React.ReactNode
 }
 
-export const Toolbar: React.SFC<ToolbarProps> = ({ children }) => <ButtonGroup minimal={true}>{children}</ButtonGroup>
+export const Toolbar: React.SFC<ToolbarProps> = ({ children }) => <div className="toolbar">{children}</div>
 
 interface ActionButtonProps {
 	icon: IconName
 	onClick: () => unknown | void
 	isActive: boolean
+	disabled?: boolean
 }
 
-export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive }) => (
-	<Button intent={isActive ? 'primary' : undefined} size="small" flow="squarish" onClick={() => onClick()}>
-		<Icon icon={icon} />
-	</Button>
-	// <Button active={isActive} icon={icon} onClick={() => onClick()} />
+export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive, disabled }) => (
+	<button onClick={() => onClick()} className={cn("toolbar-item", isActive && "isActive")} disabled={disabled}>
+		<Icon icon={icon} color="currentColor" />
+	</button>
 )
 
 // This is a bad thing, but slate or slate's typings are bad

@@ -127,6 +127,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 	public render() {
 		const { blocks } = this.props
+		const allMarksNames = Array.from(new Set(blocks.map(block => block.marks || []).reduce<Mark[]>((acc, el) => [...acc, ...el], []))).sort()
 		const [firstBlockMarks, ...otherBlocksMarks] = blocks
 			.filter(block => this.isBlockActive(block.block))
 			.map(block => (block.marks || []).sort())
@@ -146,16 +147,18 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 									onClick={this.changeBlockMarkingTo(block.block)}
 								/>
 							))}
+							&nbsp;
 						{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
-						{marksToShow.map(mark => (
+						{allMarksNames.map(mark => (
 							<ActionButton
 								icon={this.getIcon(mark)}
 								isActive={this.isMarkActive(mark)}
 								onClick={this.changeMarkMarkingTo(mark)}
+								disabled={!this.isMarkAvailable(mark)}
 							/>
 						))}
 					</Toolbar>
-					<div className="inputGroup">
+					<div className="inputGroup view-topFluent">
 						<Editor
 							ref={this.ref}
 							className={cn('inputGroup-text', 'input', 'view-autoHeight')}
@@ -178,6 +181,16 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 	private isBlockActive(block: Block): boolean {
 		return this.state.value.blocks.some(node => node !== undefined && node.type === blockConfigs[block].type)
+	}
+
+	private isMarkAvailable(mark: Mark): boolean {
+		return this.state.value.blocks.every(block => {
+			if (block === undefined) {
+				return true
+			}
+			const definition = this.props.blocks.find(bd => bd.block == block.type)
+			return definition !== undefined && (definition.marks || []).includes(mark);
+		})
 	}
 
 	private changeBlockMarkingTo(block: Block) {

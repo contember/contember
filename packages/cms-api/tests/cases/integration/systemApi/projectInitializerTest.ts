@@ -13,7 +13,6 @@ import Migration from '../../../../src/system-api/model/migrations/Migration'
 describe('project initializer', () => {
 	it('create preview stage', async () => {
 		const prodStage: StageWithoutEvent = {
-			id: testUuid(1),
 			name: 'Prod',
 			slug: 'prod',
 		}
@@ -55,7 +54,6 @@ describe('project initializer', () => {
 
 		stages['prod'] = [
 			{
-				id: testUuid(2),
 				name: 'Preview',
 				slug: 'preview',
 			},
@@ -82,17 +80,14 @@ describe('project initializer', () => {
 
 	it('creates second preview stage', async () => {
 		const prodStage: StageWithoutEvent = {
-			id: testUuid(1),
 			name: 'Prod',
 			slug: 'prod',
 		}
 		const previewStage: StageWithoutEvent = {
-			id: testUuid(2),
 			name: 'Preview',
 			slug: 'preview',
 		}
 		const preview2Stage: StageWithoutEvent = {
-			id: testUuid(3),
 			name: 'Preview 2',
 			slug: 'preview2',
 		}
@@ -187,12 +182,10 @@ describe('project initializer', () => {
 
 	it('migrate stages with rebase', async () => {
 		const prodStage: StageWithoutEvent = {
-			id: testUuid(1),
 			name: 'Prod',
 			slug: 'prod',
 		}
 		const previewStage: StageWithoutEvent = {
-			id: testUuid(2),
 			name: 'Preview',
 			slug: 'preview',
 		}

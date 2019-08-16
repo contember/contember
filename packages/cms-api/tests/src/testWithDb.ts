@@ -43,7 +43,6 @@ export const executeDbTest = async (test: Test) => {
 		project: {
 			stages: [
 				{
-					id: testUuid(1),
 					name: 'Prod',
 					slug: 'prod',
 				},

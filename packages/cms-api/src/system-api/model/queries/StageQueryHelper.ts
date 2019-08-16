@@ -1,5 +1,5 @@
 import { DatabaseQueryable } from '@contember/database'
-import { Stage } from '../dtos/Stage'
+import { Stage, StageWithId } from '../dtos/Stage'
 import { SelectBuilder } from '@contember/database'
 import { isUuid } from '../../../utils/uuid'
 import StageByIdQuery from './StageByIdQuery'
@@ -7,7 +7,7 @@ import StageBySlugQuery from './StageBySlugQuery'
 
 export const prepareStageQueryBuilder = (queryable: DatabaseQueryable) => {
 	return queryable
-		.createSelectBuilder<Stage>()
+		.createSelectBuilder<StageWithId>()
 		.select('id')
 		.select('name')
 		.select('slug')

@@ -52,7 +52,7 @@ class MigrationExecutor {
 			).execute(db)
 		}
 
-		await new UpdateStageEventCommand(stage.id, previousId).execute(db)
+		await new UpdateStageEventCommand(stage.slug, previousId).execute(db)
 		return { ...stage, event_id: previousId }
 	}
 }

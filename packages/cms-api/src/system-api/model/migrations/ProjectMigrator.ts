@@ -43,7 +43,7 @@ export default class ProjectMigrator {
 		let schema = currentVersion ? await this.schemaVersionBuilder.buildSchema(currentVersion) : emptySchema
 		let stageEvents = await this.fetchStageEvents(queryHandler, commonEventsMatrix, rootStage)
 
-		let previousId = commonEventsMatrix[rootStage.id][rootStage.id].stageAEventId
+		let previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
 		for (const migration of migrationsToExecute) {
 			progressCb(migration.version)
 
@@ -60,7 +60,7 @@ export default class ProjectMigrator {
 			).execute(this.db)
 		}
 
-		await new UpdateStageEventCommand(rootStage.id, previousId).execute(this.db)
+		await new UpdateStageEventCommand(rootStage.slug, previousId).execute(this.db)
 
 		await this.reCreateEvents(this.db, { ...rootStage, event_id: previousId }, stageEvents)
 	}
@@ -91,11 +91,11 @@ export default class ProjectMigrator {
 		sql: string,
 	): Promise<StageEventsMap> {
 		for (const childStage of this.stageTree.getChildren(stage)) {
-			const stageEvents = events[childStage.id]
+			const stageEvents = events[childStage.slug]
 
 			const transformedEvents = await modificationHandler.transformEvents(stageEvents)
 			if (stageEvents !== transformedEvents) {
-				events = { ...events, [childStage.id]: transformedEvents }
+				events = { ...events, [childStage.slug]: transformedEvents }
 			}
 			await this.executeOnStage(childStage, sql)
 			events = await this.applyOnChildren(childStage, modificationHandler, events, sql)
@@ -115,12 +115,12 @@ export default class ProjectMigrator {
 	): Promise<StageEventsMap> {
 		let result: StageEventsMap = {}
 		for (const child of this.stageTree.getChildren(stage)) {
-			const info = eventsMatrix[stage.id][child.id]
+			const info = eventsMatrix[stage.slug][child.slug]
 			if (info.distance !== 0) {
 				throw new Error('Not rebased')
 			}
 			const events =
-				eventsMatrix[child.id][stage.id].distance > 0
+				eventsMatrix[child.slug][stage.slug].distance > 0
 					? await queryHandler.fetch(new DiffQuery(info.commonEventId, info.stageBEventId))
 					: []
 			for (const event of events) {
@@ -130,7 +130,7 @@ export default class ProjectMigrator {
 			}
 			result = {
 				...result,
-				[child.id]: events as ContentEvent[],
+				[child.slug]: events as ContentEvent[],
 				...(await this.fetchStageEvents(queryHandler, eventsMatrix, child)),
 			}
 		}
@@ -141,10 +141,10 @@ export default class ProjectMigrator {
 		for (const childStage of this.stageTree.getChildren(stage)) {
 			let previousId = stage.event_id
 			const transactionContext = new RecreateContentEvent.TransactionContext()
-			for (const event of events[childStage.id]) {
+			for (const event of events[childStage.slug]) {
 				previousId = await new RecreateContentEvent(event, previousId, transactionContext).execute(db)
 			}
-			await new UpdateStageEventCommand(childStage.id, previousId).execute(db)
+			await new UpdateStageEventCommand(childStage.slug, previousId).execute(db)
 			await this.reCreateEvents(db, { ...childStage, event_id: previousId }, events)
 		}
 	}

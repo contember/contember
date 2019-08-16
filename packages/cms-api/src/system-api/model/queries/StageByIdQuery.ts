@@ -1,7 +1,7 @@
 import { DatabaseQuery } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
-import { Stage } from '../dtos/Stage'
+import { Stage, StageWithId } from '../dtos/Stage'
 import { prepareStageQueryBuilder } from './StageQueryHelper'
 
 class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {
@@ -25,7 +25,7 @@ class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {
 }
 
 namespace StageByIdQuery {
-	export type Result = null | Stage
+	export type Result = null | StageWithId
 }
 
 export default StageByIdQuery

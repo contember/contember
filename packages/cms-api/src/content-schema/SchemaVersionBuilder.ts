@@ -15,8 +15,8 @@ class SchemaVersionBuilder {
 		private readonly schemaMigrator: SchemaMigrator,
 	) {}
 
-	async buildSchemaForStage(stageId: string): Promise<Schema> {
-		const currentMigration = await this.queryHandler.fetch(new LatestMigrationByStageQuery(stageId))
+	async buildSchemaForStage(stageSlug: string): Promise<Schema> {
+		const currentMigration = await this.queryHandler.fetch(new LatestMigrationByStageQuery(stageSlug))
 		const currentVersion = currentMigration ? currentMigration.data.version : null
 		if (!currentVersion) {
 			return emptySchema

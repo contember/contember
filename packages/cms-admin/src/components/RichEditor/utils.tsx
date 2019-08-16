@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Editor } from 'slate'
 import { Editor as ReactEditor } from 'slate-react'
 import { Icon } from '@blueprintjs/core'
-import cn from 'classnames'
+import { Button } from '@contember/ui'
 
 interface ToolbarProps {
 	children: React.ReactNode
@@ -19,9 +19,9 @@ interface ActionButtonProps {
 }
 
 export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive, disabled }) => (
-	<button onClick={() => onClick()} className={cn('toolbar-item', isActive && 'isActive')} disabled={disabled}>
+	<Button onClick={() => onClick()} distinction={isActive ? 'default' : 'seamless'} intent={isActive ? "primary" : "default"} disabled={disabled} flow="squarish">
 		<Icon icon={icon} color="currentColor" />
-	</button>
+	</Button>
 )
 
 // This is a bad thing, but slate or slate's typings are bad

@@ -46,9 +46,13 @@ $cui-effect-transition-duration: .3s !default;
 $cui-control-border-width: em(1px) !default;
 $cui-control-border-radius: em(3px) !default;
 
-$cui-control-height-small: 1.5em !default;
-$cui-control-height-default: 2em !default;
-$cui-control-height-large: 2.5em !default;
+$cui-control-small-height: 1.5em !default;
+$cui-control-default-height: 2em !default;
+$cui-control-large-height: 2.5em !default;
+
+$cui-control-small-font-size: .9em !default;
+$cui-control-default-font-size: 1em !default;
+$cui-control-large-font-size: 1.3em !default;
 
 $cui-control-inactive-opacity: .6 !default;
 
@@ -157,11 +161,34 @@ $cui-button-variants: map_merge((
 	'dark': $cui-button-view-dark,
 ), $cui-button-variants);
 
+
+$cui-button-small-height: $cui-control-small-height !default;
+$cui-button-small-font-size: $cui-control-small-font-size !default;
+$cui-button-size-small: (
+	'height': $cui-button-small-height,
+	'fontSize': $cui-button-small-font-size,
+) !default;
+
+$cui-button-default-height: $cui-control-default-height !default;
+$cui-button-default-font-size: $cui-control-default-font-size !default;
+$cui-button-size-default: (
+	'height': $cui-button-default-height,
+	'fontSize': $cui-button-default-font-size,
+) !default;
+
+$cui-button-large-height: $cui-control-large-height !default;
+$cui-button-large-font-size: $cui-control-large-font-size !default;
+$cui-button-size-large: (
+	'height': $cui-button-large-height,
+	'fontSize': $cui-button-large-font-size,
+) !default;
+
+
 $cui-button-sizes: () !default;
 $cui-button-sizes: map_merge((
-	$cui-conf-defaultView: $cui-control-height-default,
-	'small': $cui-control-height-small,
-	'large': $cui-control-height-large,
+	$cui-conf-defaultView: $cui-button-size-default,
+	'small': $cui-button-size-small,
+	'large': $cui-button-size-large,
 ), $cui-button-sizes);
 
 

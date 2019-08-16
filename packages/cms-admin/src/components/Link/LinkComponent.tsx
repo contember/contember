@@ -1,28 +1,28 @@
 import * as React from 'react'
 import { RequestChange } from '../../state/request'
 
-class LinkComponent extends React.PureComponent<LinkComponent.Props, LinkComponent.State> {
+class LinkComponent extends React.PureComponent<LinkComponent.Props> {
 	onClick = (e?: React.SyntheticEvent<Element>) => {
 		e && e.preventDefault()
 		this.props.goTo()
 	}
 
-	defaultComponent: React.FunctionComponent<InnerProps> = () => {
-		const { url, Component, requestChange, goTo, ...props } = this.props
-		return (
-			<a href={url} onClick={this.onClick} {...props}>
-				{this.props.children}
-			</a>
-		)
-	}
+	defaultComponent: React.FunctionComponent<InnerProps> = ({ href, onClick, isActive, ...props }) => (
+		// TODO do something with isActive?
+		<a href={href} onClick={onClick} {...props}>
+			{this.props.children}
+		</a>
+	)
 
 	render() {
-		const Component = this.props.Component || this.defaultComponent
-		return <Component href={this.props.url} onClick={this.onClick} isActive={location.pathname === this.props.url} />
+		const { Component = this.defaultComponent, requestChange, goTo, dispatch, ...innerProps } = this.props
+		return <Component onClick={this.onClick} isActive={location.pathname === this.props.href} {...innerProps} />
 	}
 }
 
-export interface InnerProps {
+export type PublicAnchorProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'onClick'>
+
+export interface InnerProps extends PublicAnchorProps {
 	href: string
 	onClick: (e?: React.SyntheticEvent<Element>) => void
 	isActive: boolean
@@ -32,6 +32,7 @@ namespace LinkComponent {
 	export interface OwnProps {
 		requestChange: RequestChange
 		Component?: React.ComponentType<InnerProps>
+		children?: React.ReactNode
 	}
 
 	export interface DispatchProps {
@@ -39,15 +40,15 @@ namespace LinkComponent {
 	}
 
 	export interface StateProps {
-		url: string
+		href: string
 	}
 
 	export type Props = StateProps &
 		DispatchProps &
 		OwnProps &
-		Omit<React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>, 'href' | 'onClick'>
-
-	export interface State {}
+		PublicAnchorProps & {
+			dispatch?: any // TODO: For some reason, Redux sends a dispatch prop, no ide why.
+		}
 }
 
 export default LinkComponent

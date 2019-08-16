@@ -69,14 +69,9 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 							</button>
 						)}
 						{this.props.header.title && (
-							<PageLink
-								change={() => ({ name: 'dashboard' })}
-								Component={props => (
-									<a {...props} className="navbar-title">
-										{this.props.header.title}
-									</a>
-								)}
-							/>
+							<PageLink change={() => ({ name: 'dashboard' })} className="navbar-title">
+								{this.props.header.title}
+							</PageLink>
 						)}
 						{this.props.header.left}
 						{<TokenExposer />}

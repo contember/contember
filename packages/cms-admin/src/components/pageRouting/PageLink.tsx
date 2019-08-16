@@ -2,7 +2,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
 import { pageRequest } from '../../state/request'
-import Link, { InnerProps } from '../Link'
+import Link, { PublicAnchorProps } from '../Link'
+import LinkComponent from '../Link/LinkComponent'
 
 export type PageConfig = {
 	name: string
@@ -11,33 +12,21 @@ export type PageConfig = {
 
 type PageChange = () => PageConfig
 
-class PageLink extends React.Component<Props> {
-	render() {
-		const { children, Component, project, change, stage, ...props } = this.props
-		const changed = change()
-		return (
-			<Link
-				Component={Component}
-				requestChange={pageRequest(project, stage, changed.name, changed.params || {})}
-				{...props}
-			>
-				{children}
-			</Link>
-		)
-	}
-}
+const PageLink = React.memo(({ project, change, stage, ...props }: Props) => {
+	const changed = change()
+	return <Link requestChange={pageRequest(project, stage, changed.name, changed.params || {})} {...props} />
+})
 
 interface StateProps {
 	project: string
 	stage: string
 }
 
-export interface PageLinkProps {
+export interface PageLinkProps extends Omit<LinkComponent.Props, 'goTo' | 'href' | 'requestChange'> {
 	change: PageChange
-	Component?: React.ComponentType<InnerProps>
 }
 
-type Props = PageLinkProps & StateProps
+type Props = PageLinkProps & StateProps & PublicAnchorProps
 
 export default connect<StateProps, {}, PageLinkProps, State>(({ view }) => {
 	if (view.route && view.route.name === 'project_page') {

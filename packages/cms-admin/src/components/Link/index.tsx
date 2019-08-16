@@ -4,13 +4,13 @@ import { Dispatch } from '../../actions/types'
 import routes from '../../routes'
 import State from '../../state'
 import { requestStateToPath } from '../../utils/url'
-import LinkComponent, { InnerProps } from './LinkComponent'
+import LinkComponent, { InnerProps, PublicAnchorProps } from './LinkComponent'
 
 export default connect<LinkComponent.StateProps, LinkComponent.DispatchProps, LinkComponent.OwnProps, State>(
 	({ view, projectsConfigs, request }, { requestChange }) => ({
-		url: requestStateToPath(routes(projectsConfigs.configs), requestChange(request)),
+		href: requestStateToPath(routes(projectsConfigs.configs), requestChange(request)),
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(LinkComponent)
 
-export { InnerProps }
+export { InnerProps, PublicAnchorProps }

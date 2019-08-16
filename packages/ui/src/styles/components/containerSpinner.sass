@@ -1,0 +1,15 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}containerSpinner
+	+absolute(0)
+	+size(100%)
+	z-index: 10
+	display: flex
+	justify-content: center
+	align-items: center
+	background: $cui-containerSpinner-background
+
+	@each $name, $size in $cui-containerSpinner-sizes
+		$view: toView($name)
+		&#{$view}
+			font-size: $size

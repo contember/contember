@@ -11,7 +11,7 @@ import { assertNever } from 'cms-common'
 import JsonSerializer from './JsonSerializer'
 import { IconNames } from '@blueprintjs/icons'
 import { FormGroup, FormGroupProps } from '../ui'
-import { HEADING_H2, HEADING_H3 } from "./configs/heading";
+import { HEADING_H2, HEADING_H3 } from './configs/heading'
 
 const isBoldHotkey = isKeyHotkey('mod+b')
 const isItalicHotkey = isKeyHotkey('mod+i')
@@ -136,7 +136,9 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 	public render() {
 		const { blocks } = this.props
-		const allMarksNames = Array.from(new Set(blocks.map(block => block.marks || []).reduce<Mark[]>((acc, el) => [...acc, ...el], []))).sort()
+		const allMarksNames = Array.from(
+			new Set(blocks.map(block => block.marks || []).reduce<Mark[]>((acc, el) => [...acc, ...el], [])),
+		).sort()
 		const [firstBlockMarks, ...otherBlocksMarks] = blocks
 			.filter(block => this.isBlockActive(block.block))
 			.map(block => (block.marks || []).sort())
@@ -157,7 +159,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 									onClick={this.changeBlockMarkingTo(block.block)}
 								/>
 							))}
-							&nbsp;
+						&nbsp;
 						{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
 						{allMarksNames.map(mark => (
 							<ActionButton
@@ -200,7 +202,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 				return true
 			}
 			const definition = this.props.blocks.find(bd => bd.block == block.type)
-			return definition !== undefined && (definition.marks || []).includes(mark);
+			return definition !== undefined && (definition.marks || []).includes(mark)
 		})
 	}
 

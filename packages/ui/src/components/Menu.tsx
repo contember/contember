@@ -49,7 +49,7 @@ namespace Menu {
 				external?: never
 		  }
 
-	function ItemContent(props: ItemProps) {
+	function DepthSpecificItem(props: ItemProps) {
 		const depth = React.useContext(DepthContext)
 
 		if (depth === 1) {
@@ -121,7 +121,7 @@ namespace Menu {
 	function GroupItem(props: ItemProps) {
 		const Title = useTitle({ to: props.to, external: props.external })
 		return (
-			<ItemWrapper className={cn('menu-group')} to={props.to}>
+			<ItemWrapper className="menu-group" to={props.to}>
 				{props.title && <Title className="menu-group-title">{props.title}</Title>}
 				{props.children && <ul className="menu-group-list">{props.children}</ul>}
 			</ItemWrapper>
@@ -129,6 +129,7 @@ namespace Menu {
 	}
 
 	function SubGroupItem(props: ItemProps) {
+		const [expanded, setExpanded] = React.useState(false)
 		let options: TitleOptions = {}
 
 		if (props.children) {
@@ -137,7 +138,6 @@ namespace Menu {
 			options = { to: props.to, external: props.external }
 		}
 		const Title = useTitle(options)
-		const [expanded, setExpanded] = React.useState(false)
 
 		return (
 			<ItemWrapper
@@ -178,7 +178,7 @@ namespace Menu {
 
 		return (
 			<DepthContext.Provider value={depth + 1}>
-				<ItemContent {...props} />
+				<DepthSpecificItem {...props} />
 			</DepthContext.Provider>
 		)
 	}

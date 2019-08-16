@@ -165,9 +165,10 @@ namespace Menu {
 	}
 
 	function TooDeepItem(props: ItemProps) {
+		const Title = useTitle({ to: props.to, external: props.external })
 		return (
 			<ItemWrapper className="menu-tooDeep" to={props.to}>
-				{props.title && <h4 className="menu-tooDeep-title">{props.title}</h4>}
+				{props.title && <Title className="menu-tooDeep-title">{props.title}</Title>}
 				{props.children && <ul className="menu-tooDeep-list">{props.children}</ul>}
 			</ItemWrapper>
 		)

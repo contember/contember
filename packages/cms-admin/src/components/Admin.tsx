@@ -1,3 +1,4 @@
+import { ContainerSpinner } from '@contember/ui'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createAction } from 'redux-actions'
@@ -89,7 +90,7 @@ export default class Admin extends React.Component<AdminProps> {
 										)
 										return (
 											<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
-												<React.Suspense fallback={'Loading...'}>
+												<React.Suspense fallback={<ContainerSpinner />}>
 													<Component />
 												</React.Suspense>
 											</EnvironmentContext.Provider>

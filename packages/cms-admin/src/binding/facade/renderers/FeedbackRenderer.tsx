@@ -1,7 +1,8 @@
+import { ContainerSpinner } from '@contember/ui'
 import * as React from 'react'
 import { DataRendererProps } from '../../coreComponents'
 import { DirtinessContext, MutationStateContext } from '../../coreComponents/PersistState'
-import { LoadingSpinner, PersistInfo, PersistInfoPublicProps } from './userFeedback'
+import { PersistInfo, PersistInfoPublicProps } from './userFeedback'
 
 export interface FeedbackRendererPublicProps extends DataRendererProps {
 	loadingFallback?: React.ReactElement
@@ -23,7 +24,7 @@ export const FeedbackRenderer = React.memo((props: FeedbackRendererProps): React
 		if (props.loadingFallback !== undefined) {
 			return props.loadingFallback
 		}
-		return <LoadingSpinner />
+		return <ContainerSpinner />
 	}
 
 	return (

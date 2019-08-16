@@ -16,20 +16,13 @@ export const AddNewButton = React.memo((props: AddNewButtonProps) => {
 	const addNewCallback = React.useCallback(() => addNew && addNew(), [addNew])
 	if (addNew) {
 		return (
-			<Button
-				onClick={addNewCallback}
-				disabled={isMutating}
-				size="large"
-				distinction="seamless"
-				flow="default"
-				{...rest}
-			>
+			<Button onClick={addNewCallback} disabled={isMutating} distinction="seamless" flow="default" {...rest}>
 				<Icon
 					icon={icon || IconNames.ADD}
 					style={{
 						marginRight: '0.2em',
 						position: 'relative',
-						top: '0.1em',
+						top: '0.05em',
 					}}
 				/>
 				{props.children || 'Add'}

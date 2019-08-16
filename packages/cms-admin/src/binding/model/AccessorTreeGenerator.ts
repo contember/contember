@@ -50,7 +50,7 @@ class AccessorTreeGenerator {
 		const preprocessor = new ErrorsPreprocessor(errors)
 
 		this.errorTreeRoot = preprocessor.preprocess()
-		console.log(this.errorTreeRoot, errors)
+		console.debug(this.errorTreeRoot, errors)
 
 		this.persistedData = persistedData
 		this.initialData = initialData

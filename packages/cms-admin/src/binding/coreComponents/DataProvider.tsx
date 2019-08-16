@@ -63,7 +63,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		const generator = new MutationGenerator(persistedData, this.state.accessorTree, this.props.markerTree)
 		const mutation = generator.getPersistMutation()
 
-		console.log('mutation', mutation)
+		console.debug('mutation', mutation)
 		if (mutation === undefined) {
 			return // There's nothing to do
 		}
@@ -95,7 +95,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			if (!this.state.query) {
 				return
 			}
-			console.log('query', this.state.query)
+			console.debug('query', this.state.query)
 			return this.props.sendDataTreeRequest(DataTreeRequestType.Query, this.state.query)
 		}
 
@@ -106,7 +106,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 
 			const mutationResult: MutationRequestResult = mutation.data
 
-			console.log('mut error!', mutationResult)
+			console.debug('mut error!', mutationResult)
 			return this.initializeAccessorTree(
 				query.readyState === DataTreeRequestReadyState.Success || query.readyState === DataTreeRequestReadyState.Error
 					? query.data
@@ -165,11 +165,11 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	protected unmounted: boolean = false
 
 	public async componentDidMount() {
-		console.log('The structure is', this.props.markerTree)
+		console.debug('The structure is', this.props.markerTree)
 
 		const query = new QueryGenerator(this.props.markerTree).getReadQuery()
 
-		console.log('query', query)
+		console.debug('query', query)
 		if (query) {
 			this.props.sendDataTreeRequest(DataTreeRequestType.Query, query)
 			if (!this.unmounted) {
@@ -195,7 +195,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			persistedData,
 			initialData,
 			accessorTree => {
-				console.log('data', accessorTree)
+				console.debug('data', accessorTree)
 				this.props.onDataAvailable && this.props.onDataAvailable(accessorTree)
 				this.setState({ accessorTree, showingErrors: errors !== undefined })
 			},

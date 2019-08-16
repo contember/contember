@@ -11,6 +11,7 @@ import { assertNever } from 'cms-common'
 import JsonSerializer from './JsonSerializer'
 import { IconNames } from '@blueprintjs/icons'
 import { FormGroup, FormGroupProps } from '../ui'
+import { HEADING_H2, HEADING_H3 } from "./configs/heading";
 
 const isBoldHotkey = isKeyHotkey('mod+b')
 const isItalicHotkey = isKeyHotkey('mod+i')
@@ -50,10 +51,12 @@ export interface RichTextFieldState {
 	value: Value
 }
 
-const CONFIGS: RichEditorPluginConfig[] = [BOLD, ITALIC, UNDERLINED, LINK, PARAGRAPH, HEADING]
+const CONFIGS: RichEditorPluginConfig[] = [BOLD, ITALIC, UNDERLINED, LINK, PARAGRAPH, HEADING, HEADING_H3]
 
 export enum Block {
 	HEADING = 'heading',
+	HEADING_H2 = 'heading_h2',
+	HEADING_H3 = 'heading_h3',
 	PARAGRAPH = 'paragraph',
 }
 
@@ -66,6 +69,8 @@ export enum Mark {
 
 const blockConfigs: { [_ in Block]: RichEditorPluginConfig } = {
 	[Block.HEADING]: HEADING,
+	[Block.HEADING_H2]: HEADING_H2,
+	[Block.HEADING_H3]: HEADING_H3,
 	[Block.PARAGRAPH]: PARAGRAPH,
 }
 
@@ -118,6 +123,10 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 				return IconNames.LINK
 			case Block.HEADING:
 				return IconNames.HEADER
+			case Block.HEADING_H2:
+				return IconNames.HEADER_ONE
+			case Block.HEADING_H3:
+				return IconNames.HEADER_TWO
 			case Block.PARAGRAPH:
 				return IconNames.PARAGRAPH
 			default:
@@ -142,6 +151,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						{blocks.length > 1 &&
 							blocks.map(block => (
 								<ActionButton
+									key={block.block}
 									icon={this.getIcon(block.block)}
 									isActive={this.isBlockActive(block.block)}
 									onClick={this.changeBlockMarkingTo(block.block)}
@@ -151,6 +161,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
 						{allMarksNames.map(mark => (
 							<ActionButton
+								key={mark}
 								icon={this.getIcon(mark)}
 								isActive={this.isMarkActive(mark)}
 								onClick={this.changeMarkMarkingTo(mark)}

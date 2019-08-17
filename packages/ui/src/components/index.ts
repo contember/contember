@@ -1,4 +1,5 @@
 export * from './Button'
+export * from './ButtonGroup'
 export * from './Collapsible'
 export * from './ContainerSpinner'
 export * from './Menu'

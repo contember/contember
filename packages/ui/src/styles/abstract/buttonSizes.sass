@@ -4,7 +4,8 @@
 		$fontSize: map_get($settings, fontSize)
 
 		$view: toView($name)
-		&#{$view}
+		&#{$view},
+		&-group#{$view}
 			$visualLineHeight: $height - 2 * $cui-control-border-width
 			$edgeOffset: ($visualLineHeight - 1em) / 2
 			min-height: $height

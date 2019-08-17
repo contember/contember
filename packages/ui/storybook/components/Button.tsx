@@ -2,20 +2,13 @@ import { boolean, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { Button, ButtonProps } from '../../src'
-import { allIntents } from '../utils'
+import { Size } from '../../src/types'
+import { allIntents, sizeKnob } from '../utils'
 
-storiesOf('Button', module).add('simple', () => {
+export const simpleButtonStory = (size?: Size) => {
 	const content = text('Text', 'Pretty button')
 	const props: ButtonProps = {
-		size: radios(
-			'Size',
-			{
-				Small: 'small',
-				Default: 'default',
-				Large: 'large',
-			},
-			'default',
-		),
+		size: size || sizeKnob(),
 		disabled: boolean('Disabled', false),
 		isLoading: boolean('Is loading', false),
 		distinction: radios(
@@ -41,4 +34,6 @@ storiesOf('Button', module).add('simple', () => {
 	}
 
 	return allIntents.map(intent => <Button intent={intent} {...props} />)
-})
+}
+
+storiesOf('Button', module).add('simple', simpleButtonStory)

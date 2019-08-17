@@ -23,6 +23,7 @@
 
 		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector}
 			@extend %buttonPress
+			background: linear-gradient(to bottom, darken($background, 3), darken($background, 9))
 
 		&#{$view}#{$primary-selector}:focus#{$secondary-selector}
 			@extend %implementsCustomFocusEffects

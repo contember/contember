@@ -5,12 +5,12 @@ import TextareaAutosize from 'react-textarea-autosize'
 import { ControlDistinction, ControlFlow, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toViewClass } from '../../utils'
 
-interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
+interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'size'> {
 	allowNewlines: true
 	minRows?: number
 }
 
-interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size'> {
 	allowNewlines?: false
 }
 

@@ -147,47 +147,45 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 		return (
 			<div className="editor">
-				<FormGroup {...this.props}>
-					<Toolbar>
-						{blocks.length > 1 &&
-							blocks.map(block => (
-								<ActionButton
-									key={block.block}
-									icon={this.getIcon(block.block)}
-									isActive={this.isBlockActive(block.block)}
-									onClick={this.changeBlockMarkingTo(block.block)}
-								/>
-							))}
-						&nbsp;
-						{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
-						{allMarksNames.map(mark => (
+				<Toolbar>
+					{blocks.length > 1 &&
+						blocks.map(block => (
 							<ActionButton
-								key={mark}
-								icon={this.getIcon(mark)}
-								isActive={this.isMarkActive(mark)}
-								onClick={this.changeMarkMarkingTo(mark)}
-								disabled={!this.isMarkAvailable(mark)}
+								key={block.block}
+								icon={this.getIcon(block.block)}
+								isActive={this.isBlockActive(block.block)}
+								onClick={this.changeBlockMarkingTo(block.block)}
 							/>
 						))}
-					</Toolbar>
-					<div className="inputGroup view-topFluent">
-						<Editor
-							ref={this.ref}
-							className={cn(
-								'input',
-								toViewClass(this.props.size),
-								toViewClass(this.props.distinction),
-								toEnumStateClass(this.props.validationState),
-							)}
-							spellCheck
-							plugins={this.plugins}
-							value={this.state.value}
-							onChange={this.onChange}
-							onKeyDown={this.onKeyDown}
-							readOnly={this.props.readOnly}
+					&nbsp;
+					{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
+					{allMarksNames.map(mark => (
+						<ActionButton
+							key={mark}
+							icon={this.getIcon(mark)}
+							isActive={this.isMarkActive(mark)}
+							onClick={this.changeMarkMarkingTo(mark)}
+							disabled={!this.isMarkAvailable(mark)}
 						/>
-					</div>
-				</FormGroup>
+					))}
+				</Toolbar>
+				<div className="inputGroup view-topFluent">
+					<Editor
+						ref={this.ref}
+						className={cn(
+							'input',
+							toViewClass(this.props.size),
+							toViewClass(this.props.distinction),
+							toEnumStateClass(this.props.validationState),
+						)}
+						spellCheck
+						plugins={this.plugins}
+						value={this.state.value}
+						onChange={this.onChange}
+						onKeyDown={this.onKeyDown}
+						readOnly={this.props.readOnly}
+					/>
+				</div>
 			</div>
 		)
 	}

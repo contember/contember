@@ -3,12 +3,12 @@ import { FieldErrors } from '../../types'
 import { ValidationMessage, ValidationMessageProps } from './ValidationMessage'
 
 export interface ErrorListProps {
-	errors: FieldErrors
+	errors?: FieldErrors
 	size?: ValidationMessageProps['size']
 }
 
 export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
-	if (!errors.length) {
+	if (!errors || !errors.length) {
 		return null
 	}
 	return (

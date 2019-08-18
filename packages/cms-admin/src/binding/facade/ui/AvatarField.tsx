@@ -31,7 +31,7 @@ export class AvatarField extends React.PureComponent<AvatarFieldProps> {
 		)
 	}
 
-	public static generateSyntheticChildren(props: TextFieldProps, environment: Environment): React.ReactNode {
+	public static generateSyntheticChildren(props: AvatarFieldProps, environment: Environment): React.ReactNode {
 		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }

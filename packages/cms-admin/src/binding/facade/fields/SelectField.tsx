@@ -1,13 +1,13 @@
+import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { FormGroup, FormGroupProps, Select } from '../../../components'
+import { Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
 
-export interface SelectFieldPublicProps {
+export interface SelectFieldPublicProps extends Omit<FormGroupProps, 'children'> {
 	name: FieldName
-	label?: FormGroupProps['label']
 	firstOptionCaption?: React.ReactNode
 	options: ChoiceFieldProps['options']
 	allowNull?: boolean
@@ -68,7 +68,10 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 		)
 
 		return (
-			<FormGroup label={this.props.label} errors={this.props.errors}>
+			<FormGroup
+				{...this.props}
+				label={this.props.environment.applySystemMiddleware('labelMiddleware', this.props.label)}
+			>
 				<Select
 					value={this.props.currentValue.toString()}
 					onChange={event => {

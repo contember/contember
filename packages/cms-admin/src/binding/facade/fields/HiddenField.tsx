@@ -1,9 +1,6 @@
 import * as React from 'react'
-import { FieldPublicProps } from '../../coreComponents'
-import { SimpleRelativeSingleField } from '../auxiliary'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
-export interface HiddenFieldProps extends FieldPublicProps {
-	defaultValue: FieldPublicProps['defaultValue']
-}
+export type HiddenFieldProps = SimpleRelativeSingleFieldProps
 
-export const HiddenField = SimpleRelativeSingleField<HiddenFieldProps>(() => null, 'HiddenField')
+export const HiddenField = SimpleRelativeSingleField<HiddenFieldProps>(undefined, 'HiddenField')

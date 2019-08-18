@@ -1,7 +1,6 @@
 export * from './ButtonDistinction'
 export * from './ButtonFlow'
 export * from './ControlDistinction'
-export * from './ControlFlow'
 export * from './Default'
 export * from './Errors'
 export * from './FormGroupLabelPosition'

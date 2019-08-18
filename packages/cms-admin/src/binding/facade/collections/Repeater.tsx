@@ -1,5 +1,5 @@
+import { FieldSet, FieldSetProps } from '@contember/ui'
 import * as React from 'react'
-import { FormGroup, FormGroupProps } from '../../../components/ui'
 import {
 	DataContext,
 	EnforceSubtypeRelation,
@@ -82,7 +82,7 @@ namespace Repeater {
 	}
 
 	export interface EntityCollectionPublicProps extends ItemPublicProps {
-		label?: FormGroupProps['label']
+		label?: FieldSetProps['legend']
 		enableUnlink?: boolean
 		enableUnlinkAll?: boolean
 		enableAddingNew?: boolean
@@ -97,7 +97,7 @@ namespace Repeater {
 			const entities = filterEntities(this.props.entities)
 			return (
 				// Intentionally not applying label system middleware
-				<FormGroup label={this.props.label}>
+				<FieldSet legend={this.props.label} errors={this.props.entities.errors}>
 					<Cloneable appendNew={this.props.entities.addNew} enableAddingNew={this.props.enableAddingNew}>
 						{entities.map(entity => (
 							<Item
@@ -112,7 +112,7 @@ namespace Repeater {
 							</Item>
 						))}
 					</Cloneable>
-				</FormGroup>
+				</FieldSet>
 			)
 		}
 	}

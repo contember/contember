@@ -4,7 +4,7 @@ import { FormGroupLabelPosition } from '../../types'
 import { toViewClass } from '../../utils'
 import { ErrorList, ErrorListProps } from './'
 
-export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement>, ErrorListProps {
+export interface FormGroupProps extends ErrorListProps {
 	label: React.ReactNode
 	children: React.ReactNode // The actual field
 
@@ -15,19 +15,9 @@ export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement>, Er
 }
 
 export const FormGroup = React.memo(
-	({
-		label,
-		children,
-		className,
-		labelPosition,
-		labelDescription,
-		description,
-		size,
-		errors,
-		...divProps
-	}: FormGroupProps) => {
+	({ label, children, labelPosition, labelDescription, description, size, errors }: FormGroupProps) => {
 		return (
-			<div className={cn(className, 'formGroup', toViewClass(size), toViewClass(labelPosition))} {...divProps}>
+			<div className={cn('formGroup', toViewClass(size), toViewClass(labelPosition))}>
 				<label className="formGroup-label">
 					{label && <span className="formGroup-label-text">{label}</span>}
 					{labelDescription && <span className="formGroup-labelDescription">{labelDescription}</span>}

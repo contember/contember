@@ -47,8 +47,8 @@ $cui-control-border-width: em(1px) !default;
 $cui-control-border-radius: em(3px) !default;
 
 $cui-control-view-default-color: $cui-color-gray-7 !default;
-$cui-control-view-default-background: $cui-color-gray-1 !default;
-$cui-control-view-default-border-color: $cui-color-gray-3 !default;
+$cui-control-view-default-background: $cui-color-white !default;
+$cui-control-view-default-border-color: $cui-color-gray-2 !default;
 $cui-control-view-default-distinction-color: $cui-color-primary !default;
 $cui-control-view-default: (
 	'color': $cui-control-view-default-color,
@@ -274,9 +274,9 @@ $cui-validationMessage-variants: map_merge((
 
 // FormGroup
 $cui-formGroup-separation: 1.25em !default;
-$cui-formGroup-label-color: $cui-color-gray-6 !default;
-$cui-formGroup-labelDescription-color: $cui-color-gray-5 !default;
-$cui-formGroup-description-color: $cui-color-gray-5 !default;
+$cui-formGroup-label-color: $cui-color-gray-5 !default;
+$cui-formGroup-labelDescription-color: $cui-color-gray-4 !default;
+$cui-formGroup-description-color: $cui-color-gray-4 !default;
 
 $cui-formGroup-size-small: .75em !default;
 $cui-formGroup-size-default: .9em !default;

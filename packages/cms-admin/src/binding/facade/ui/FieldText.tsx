@@ -4,7 +4,6 @@ import { Scalar } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
-import { TextFieldProps } from '../fields'
 
 interface FieldTextProps<AcceptableValue extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal> {
 	name: string
@@ -24,7 +23,7 @@ export class FieldText<
 		)
 	}
 
-	public static generateSyntheticChildren(props: TextFieldProps, environment: Environment): React.ReactNode {
+	public static generateSyntheticChildren(props: FieldTextProps, environment: Environment): React.ReactNode {
 		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
 	}
 }

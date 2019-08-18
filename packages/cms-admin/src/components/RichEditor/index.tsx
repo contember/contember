@@ -1,16 +1,18 @@
 import { IconName, Divider } from '@blueprintjs/core'
+import { FormGroup, TextInputProps } from '@contember/ui'
+import { toEnumStateClass, toViewClass } from '@contember/ui/dist/src/utils'
 import cn from 'classnames'
 import { isKeyHotkey } from 'is-hotkey'
 import * as React from 'react'
 import { Editor as CoreEditor, Value } from 'slate'
 import HtmlSerializer from 'slate-html-serializer'
 import { Editor, Plugin, EventHook } from 'slate-react'
+import { SimpleRelativeSingleFieldProps } from '../../binding/facade/auxiliary'
 import { BOLD, ITALIC, LINK, UNDERLINED, PARAGRAPH, HEADING, RichEditorPluginConfig } from './configs'
 import { ActionButton, Toolbar, getSlateController } from './utils'
 import { assertNever } from 'cms-common'
 import JsonSerializer from './JsonSerializer'
 import { IconNames } from '@blueprintjs/icons'
-import { FormGroup, FormGroupProps } from '../ui'
 import { HEADING_H2, HEADING_H3 } from './configs/heading'
 
 const isBoldHotkey = isKeyHotkey('mod+b')
@@ -34,18 +36,15 @@ export enum LineBreakBehavior {
 	SMART = 'smart',
 }
 
-export interface RichEditorProps {
-	inlineLabel?: boolean
-	value: string
-	onChange: (value: string) => void
-	label?: FormGroupProps['label']
-	errors?: FormGroupProps['errors']
-	serializer: RichEditorSerializer
-	lineBreakBehavior: LineBreakBehavior
-	defaultBlock: Block
-	blocks: { block: Block; marks?: Mark[] }[]
-	readOnly?: boolean
-}
+export type RichEditorProps = SimpleRelativeSingleFieldProps &
+	TextInputProps & {
+		value: string
+		onChange: (value: string) => void
+		serializer: RichEditorSerializer
+		lineBreakBehavior: LineBreakBehavior
+		defaultBlock: Block
+		blocks: { block: Block; marks?: Mark[] }[]
+	}
 
 export interface RichTextFieldState {
 	value: Value
@@ -148,7 +147,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 
 		return (
 			<div className="editor">
-				<FormGroup label={this.props.label}>
+				<FormGroup {...this.props}>
 					<Toolbar>
 						{blocks.length > 1 &&
 							blocks.map(block => (
@@ -174,7 +173,12 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 					<div className="inputGroup view-topFluent">
 						<Editor
 							ref={this.ref}
-							className={cn('inputGroup-text', 'input', 'view-autoHeight')}
+							className={cn(
+								'input',
+								toViewClass(this.props.size),
+								toViewClass(this.props.distinction),
+								toEnumStateClass(this.props.validationState),
+							)}
 							spellCheck
 							plugins={this.plugins}
 							value={this.state.value}

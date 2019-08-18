@@ -25,14 +25,6 @@ const SimpleTextInputStory = () => {
 				},
 				'default',
 			)}
-			flow={radios(
-				'Flow',
-				{
-					Default: 'default',
-					Block: 'block',
-				},
-				'default',
-			)}
 			validationState={radios(
 				'Validation state',
 				{

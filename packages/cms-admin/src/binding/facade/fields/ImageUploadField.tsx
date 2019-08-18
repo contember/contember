@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { FormGroupProps } from '../../../components/ui'
-import { FieldName } from '../../bindingTypes'
-import { SimpleRelativeSingleField } from '../auxiliary'
+import { Field } from '../../coreComponents'
+import { QueryLanguage } from '../../queryLanguage'
+import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { UploadField } from './UploadField'
 
-export interface ImageUploadFieldProps {
-	name: FieldName
-	label?: FormGroupProps['label']
-}
+export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps
 
-export const ImageUploadField = SimpleRelativeSingleField<ImageUploadFieldProps>(
+export const ImageUploadField = Component<ImageUploadFieldProps>(
 	props => (
-		<UploadField name={props.name} label={props.label} accept="image/*" emptyText={'No image'}>
+		<UploadField {...props} accept="image/*" emptyText={'No image'}>
 			{url => <img src={url} />}
 		</UploadField>
 	),
+	(props, environment) =>
+		QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment),
 	'ImageUploadField',
 )

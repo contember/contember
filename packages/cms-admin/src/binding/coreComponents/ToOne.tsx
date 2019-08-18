@@ -1,7 +1,7 @@
+import { ErrorList } from '@contember/ui'
 import { GraphQlBuilder } from 'cms-client'
 import { Input } from '@contember/schema'
 import * as React from 'react'
-import { FormErrors } from '../../components/ui/FormErrors'
 import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { Component } from '../facade/auxiliary'
@@ -70,7 +70,7 @@ namespace ToOne {
 
 	export const AccessorRenderer = React.memo((props: AccessorRendererProps) => (
 		<DataContext.Provider value={props.accessor}>
-			<FormErrors errors={props.accessor.errors} />
+			<ErrorList errors={props.accessor.errors} />
 			{props.children}
 		</DataContext.Provider>
 	))

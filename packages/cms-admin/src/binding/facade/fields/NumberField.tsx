@@ -1,34 +1,21 @@
+import { TextInput, TextInputProps } from '@contember/ui'
 import * as React from 'react'
-import { ChangeEvent } from 'react'
-import { FormGroup, FormGroupProps, InputGroup, InputGroupProps } from '../../../components'
-import { FieldName } from '../../bindingTypes'
-import { Field } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
-import { SimpleRelativeSingleField } from '../auxiliary'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
-export interface NumberFieldProps {
-	name: FieldName
-	label?: FormGroupProps['label']
-	large?: InputGroupProps['large']
-}
+export type NumberFieldProps = SimpleRelativeSingleFieldProps &
+	Omit<TextInputProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'>
 
-export const NumberField = SimpleRelativeSingleField<NumberFieldProps>(props => {
-	const generateOnChange = (data: FieldAccessor<number>) => (e: ChangeEvent<HTMLInputElement>) => {
-		data.updateValue && data.updateValue(parseInt(e.target.value, 10))
+export const NumberField = SimpleRelativeSingleField<NumberFieldProps, number>((fieldMetadata, props) => {
+	const generateOnChange = (data: FieldAccessor<number>) => (newValue: string) => {
+		data.updateValue && data.updateValue(parseInt(newValue, 10))
 	}
 	return (
-		<Field<number> name={props.name}>
-			{({ data, isMutating, environment, errors }): React.ReactNode => (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
-					<InputGroup
-						value={typeof data.currentValue === 'number' ? data.currentValue.toFixed(0) : '0'}
-						onChange={generateOnChange(data)}
-						large={props.large}
-						readOnly={isMutating}
-						type="number"
-					/>
-				</FormGroup>
-			)}
-		</Field>
+		<TextInput
+			value={typeof fieldMetadata.data.currentValue === 'number' ? fieldMetadata.data.currentValue.toString(10) : '0'}
+			onChange={generateOnChange(fieldMetadata.data)}
+			validationState={fieldMetadata.errors.length ? 'invalid' : undefined}
+			{...props}
+		/>
 	)
 }, 'NumberField')

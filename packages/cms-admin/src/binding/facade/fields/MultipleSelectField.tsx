@@ -1,14 +1,14 @@
+import { FormGroup, FormGroupProps } from '@contember/ui'
 import { arrayDifference } from 'cms-common'
 import * as React from 'react'
-import { FormGroup, FormGroupProps, Select } from '../../../components'
+import { Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
 
-export interface MultipleSelectFieldPublicProps {
+export type MultipleSelectFieldPublicProps = FormGroupProps & {
 	name: FieldName
-	label?: FormGroupProps['label']
 	firstOptionCaption?: string
 }
 
@@ -24,15 +24,13 @@ export const MultipleSelectField = Component<MultipleSelectFieldProps>(props => 
 			{({ data, currentValues, onChange, environment, isMutating, errors }: MultipleChoiceFieldMetadata) => {
 				return (
 					<MultipleSelectFieldInner
-						name={props.name}
-						label={props.label}
-						firstOptionCaption={props.firstOptionCaption}
 						data={data}
 						currentValues={currentValues}
 						onChange={onChange}
 						environment={environment}
 						errors={errors}
 						isMutating={isMutating}
+						{...props}
 					/>
 				)
 			}}
@@ -61,7 +59,7 @@ export class MultipleSelectFieldInner extends React.PureComponent<MultipleSelect
 		const normalizedValues = this.props.currentValues ? this.props.currentValues.map(value => value.toString()) : ['-1']
 
 		return (
-			<FormGroup label={this.props.label} errors={this.props.errors}>
+			<FormGroup {...this.props}>
 				<Select
 					value={normalizedValues}
 					onChange={event => {

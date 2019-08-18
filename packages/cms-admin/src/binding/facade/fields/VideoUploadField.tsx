@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { FormGroupProps } from '../../../components/ui'
-import { FieldName } from '../../bindingTypes'
-import { SimpleRelativeSingleField } from '../auxiliary'
+import { Field } from '../../coreComponents'
+import { QueryLanguage } from '../../queryLanguage'
+import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { UploadField } from './UploadField'
 
-export interface VideoUploadFieldProps {
-	name: FieldName
-	label?: FormGroupProps['label']
-}
+export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps
 
-export const VideoUploadField = SimpleRelativeSingleField<VideoUploadFieldProps>(
+export const VideoUploadField = Component<VideoUploadFieldProps>(
 	props => (
-		<UploadField name={props.name} accept="video/*">
+		<UploadField {...props} accept="video/*">
 			{url => <video src={url} controls />}
 		</UploadField>
 	),
+	(props, environment) =>
+		QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment),
 	'VideoUploadField',
 )

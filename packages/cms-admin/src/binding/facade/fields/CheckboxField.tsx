@@ -1,33 +1,22 @@
 import * as React from 'react'
-import { Checkbox, FormGroupProps } from '../../../components'
-import { FieldName } from '../../bindingTypes'
-import { Field } from '../../coreComponents'
+import { Checkbox } from '../../../components'
 import { FieldAccessor } from '../../dao'
-import { SimpleRelativeSingleField } from '../auxiliary'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
-export interface CheckboxFieldProps {
-	name: FieldName
-	label?: FormGroupProps['label']
-	defaultValue?: boolean
-}
+export type CheckboxFieldProps = SimpleRelativeSingleFieldProps
 
-const renderCheckboxField: React.FunctionComponent<CheckboxFieldProps> = (props: CheckboxFieldProps) => {
+export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps, boolean>((fieldMetadata, props) => {
 	const generateOnChange = (data: FieldAccessor<boolean>) => (isChecked: boolean) => {
 		data.updateValue && data.updateValue(isChecked)
 	}
 	return (
-		<Field<boolean> name={props.name}>
-			{({ data, isMutating, environment, errors }): React.ReactNode => (
-				<Checkbox checked={!!data.currentValue} onChange={generateOnChange(data)} readOnly={isMutating} errors={errors}>
-					{environment.applySystemMiddleware('labelMiddleware', props.label)}
-				</Checkbox>
-			)}
-		</Field>
+		<Checkbox
+			checked={!!fieldMetadata.data.currentValue}
+			onChange={generateOnChange(fieldMetadata.data)}
+			readOnly={fieldMetadata.isMutating}
+			errors={fieldMetadata.errors}
+		>
+			{fieldMetadata.environment.applySystemMiddleware('labelMiddleware', props.label)}
+		</Checkbox>
 	)
-}
-
-renderCheckboxField.defaultProps = {
-	defaultValue: false,
-}
-
-export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps>(renderCheckboxField, 'CheckboxField')
+}, 'CheckboxField')

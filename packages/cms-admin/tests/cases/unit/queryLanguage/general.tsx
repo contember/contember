@@ -1,10 +1,9 @@
 import { expect } from 'chai'
-import 'mocha'
 import { GraphQlBuilder } from 'cms-client'
+import 'mocha'
 import * as React from 'react'
-import { ToOne } from '../../../../src/binding/coreComponents'
+import { Field, ToOne } from '../../../../src/binding/coreComponents'
 import { Environment } from '../../../../src/binding/dao'
-import { TextField } from '../../../../src/binding/facade'
 import { QueryLanguage } from '../../../../src/binding/queryLanguage'
 
 describe('query language parser', () => {
@@ -20,7 +19,7 @@ describe('query language parser', () => {
 		expect(
 			QueryLanguage.wrapRelativeSingleField(
 				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = $x).foo',
-				name => <TextField name={name} />,
+				name => <Field name={name} />,
 				environment,
 			),
 		).eql(
@@ -30,7 +29,7 @@ describe('query language parser', () => {
 					reducedBy={{ ab: 456, literalColumn: new GraphQlBuilder.Literal('literal') }}
 				>
 					<ToOne.AtomicPrimitive field="x" reducedBy={{ x: 'x' }}>
-						<TextField name="foo" />
+						<Field name="foo" />
 					</ToOne.AtomicPrimitive>
 				</ToOne.AtomicPrimitive>
 			</ToOne.AtomicPrimitive>,

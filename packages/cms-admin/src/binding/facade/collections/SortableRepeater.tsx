@@ -1,5 +1,5 @@
+import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { FormGroup } from '../../../components'
 import { EnvironmentContext, ToMany, ToManyProps } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
@@ -21,7 +21,7 @@ export const SortableRepeater = Component<SortableRepeaterProps>(
 				<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
 					{(field: EntityCollectionAccessor) => (
 						// Intentionally not applying label system middleware
-						<FormGroup label={props.label} errors={field.errors}>
+						<FieldSet legend={props.label} errors={field.errors}>
 							<Sortable
 								entities={field}
 								sortBy={props.sortBy}
@@ -33,7 +33,7 @@ export const SortableRepeater = Component<SortableRepeaterProps>(
 							>
 								{props.children}
 							</Sortable>
-						</FormGroup>
+						</FieldSet>
 					)}
 				</ToMany.AccessorRetriever>
 			),

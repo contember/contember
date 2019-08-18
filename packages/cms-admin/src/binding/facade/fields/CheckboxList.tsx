@@ -1,12 +1,12 @@
+import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { Checkbox, FormGroup, FormGroupProps } from '../../../components/ui'
+import { Checkbox } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
 
-export interface CheckboxListPublicProps {
+export interface CheckboxListPublicProps extends Omit<FormGroupProps, 'children'> {
 	name: FieldName
-	label?: FormGroupProps['label']
 }
 
 export interface CheckboxListInternalProps {
@@ -20,7 +20,7 @@ export const CheckboxList = Component<CheckboxListProps>(
 		<ChoiceField name={props.name} options={props.options} arity={ChoiceArity.Multiple}>
 			{({ data, currentValues, onChange, environment, isMutating, errors }: MultipleChoiceFieldMetadata) => (
 				// TODO this formGroup should be a fieldset
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', props.label)} errors={errors}>
+				<FormGroup {...props}>
 					{data.map(({ key, label }) => (
 						<Checkbox
 							key={key}

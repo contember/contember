@@ -1,26 +1,23 @@
+import { FormGroup } from '@contember/ui'
 import { assertNever } from 'cms-common'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
 import { connect } from 'react-redux'
 import { Dispatch } from '../../../actions/types'
 import { uploadFile } from '../../../actions/upload'
-import { FormGroup, FormGroupProps } from '../../../components'
 import State from '../../../state'
 import { AnyUpload, UploadStatus } from '../../../state/upload'
-import { FieldName } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, FieldMetadata, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
+import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export interface UploadFieldMetadata extends FieldMetadata<string> {
 	upload?: AnyUpload
-	label?: FormGroupProps['label']
 	emptyText?: React.ReactNode
 }
 
-export interface UploadFieldOwnProps {
-	name: FieldName
-	label?: FormGroupProps['label']
+export type UploadFieldOwnProps = SimpleRelativeSingleFieldProps & {
 	accept: string
 	children: (url: string) => React.ReactNode
 	emptyText?: React.ReactNode
@@ -70,9 +67,9 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 							metadata={{
 								...metadata,
 								upload,
-								label: this.props.label,
 								emptyText: this.props.emptyText,
 							}}
+							{...this.props}
 						>
 							{this.props.children}
 						</UploadFieldComponent.Inner>
@@ -88,7 +85,7 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 }
 
 namespace UploadFieldComponent {
-	export interface InnerProps {
+	export type InnerProps = SimpleRelativeSingleFieldProps & {
 		metadata: UploadFieldMetadata
 		emptyText?: React.ReactNode
 		children: (url: string) => React.ReactNode
@@ -96,12 +93,17 @@ namespace UploadFieldComponent {
 
 	export class Inner extends React.PureComponent<InnerProps> {
 		public render() {
-			const { environment, upload, label, errors } = this.props.metadata
 			return (
-				<FormGroup label={environment.applySystemMiddleware('labelMiddleware', label)} errors={errors}>
+				<FormGroup
+					label={this.props.metadata.environment.applySystemMiddleware('labelMiddleware', this.props.label)}
+					labelDescription={this.props.labelDescription}
+					labelPosition={this.props.labelPosition}
+					description={this.props.description}
+					errors={this.props.metadata.errors}
+				>
 					<label className="fileInput">
 						<span className="fileInput-preview">{this.renderPreview()}</span>
-						<span className="fileInput-message">{this.renderUploadStatusMessage(upload)}</span>
+						<span className="fileInput-message">{this.renderUploadStatusMessage(this.props.metadata.upload)}</span>
 					</label>
 				</FormGroup>
 			)

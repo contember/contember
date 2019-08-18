@@ -1,5 +1,5 @@
+import { ErrorList } from '@contember/ui'
 import * as React from 'react'
-import { FormErrors } from '../../components/ui/FormErrors'
 import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { Component } from '../facade/auxiliary'
@@ -67,7 +67,7 @@ namespace ToMany {
 
 	export const AccessorRenderer = React.memo((props: AccessorRendererProps) => (
 		<>
-			<FormErrors errors={props.accessor.errors} />
+			<ErrorList errors={props.accessor.errors} />
 			{props.accessor.entities.map(
 				datum =>
 					datum instanceof EntityAccessor && (

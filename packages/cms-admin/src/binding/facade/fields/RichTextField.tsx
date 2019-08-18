@@ -1,38 +1,30 @@
-import { IFormGroupProps } from '@blueprintjs/core'
+import { TextInputProps } from '@contember/ui'
 import * as React from 'react'
 import RichEditor, { LineBreakBehavior, RichEditorProps } from '../../../components/RichEditor'
-import { FieldName } from '../../bindingTypes'
-import { Field } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
-import { SimpleRelativeSingleField } from '../auxiliary'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export { LineBreakBehavior, Block, Mark } from '../../../components/RichEditor'
 
-export interface RichTextFieldProps {
-	name: FieldName
-	label?: IFormGroupProps['label']
-	lineBreakBehavior?: LineBreakBehavior
-	blocks?: RichEditorProps['blocks']
-}
+export type RichTextFieldProps = SimpleRelativeSingleFieldProps &
+	Omit<TextInputProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'> & {
+		lineBreakBehavior?: LineBreakBehavior
+		blocks?: RichEditorProps['blocks']
+	}
 
-export const RichTextField = SimpleRelativeSingleField<RichTextFieldProps>(props => {
+export const RichTextField = SimpleRelativeSingleField<RichTextFieldProps, string>((fieldMetadata, props) => {
 	const generateOnChange = (data: FieldAccessor<string>) => (val: string) => {
 		data.updateValue && data.updateValue(val)
 	}
 	return (
-		<Field<string> name={props.name}>
-			{({ data, isMutating, environment }): React.ReactNode => {
-				return (
-					<RichEditor
-						onChange={generateOnChange(data)}
-						value={data.currentValue || ''}
-						lineBreakBehavior={props.lineBreakBehavior}
-						label={environment.applySystemMiddleware('labelMiddleware', props.label)}
-						blocks={props.blocks}
-						readOnly={isMutating}
-					/>
-				)
-			}}
-		</Field>
+		<RichEditor
+			onChange={generateOnChange(fieldMetadata.data)}
+			value={fieldMetadata.data.currentValue || ''}
+			lineBreakBehavior={props.lineBreakBehavior}
+			label={fieldMetadata.environment.applySystemMiddleware('labelMiddleware', props.label)}
+			blocks={props.blocks}
+			readOnly={fieldMetadata.isMutating}
+			{...props}
+		/>
 	)
 }, 'RichTextField')

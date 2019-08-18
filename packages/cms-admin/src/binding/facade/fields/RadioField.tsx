@@ -1,15 +1,14 @@
-import { IRadioGroupProps, Radio, RadioGroup } from '@blueprintjs/core'
+import { Radio, RadioGroup } from '@blueprintjs/core'
+import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { FormGroup } from '../../../components'
-import { FieldName } from '../../bindingTypes'
+import { RelativeSingleField } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
 
-export interface RadioFieldPublicProps {
-	name: FieldName
-	label?: IRadioGroupProps['label']
+export interface RadioFieldPublicProps extends Omit<FormGroupProps, 'children'> {
 	inline?: boolean
+	name: RelativeSingleField
 }
 
 export interface RadioFieldInternalProps {
@@ -52,7 +51,7 @@ interface RadioFieldInnerProps extends RadioFieldPublicProps {
 class RadioFieldInner extends React.PureComponent<RadioFieldInnerProps> {
 	public render() {
 		return (
-			<FormGroup label={this.props.label} errors={this.props.errors}>
+			<FormGroup {...this.props}>
 				<RadioGroup
 					disabled={this.props.isMutating}
 					selectedValue={this.props.currentValue === null ? undefined : this.props.currentValue}

@@ -1,4 +1,4 @@
-import { Button } from '@contember/ui'
+import { Button, FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { fetchDiff } from '../../actions/system'
@@ -6,7 +6,6 @@ import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { pushRequest } from '../../actions/request'
 import { pageRequest } from '../../state/request'
-import { FormGroup, InputGroup } from '../ui'
 
 class ConnectedDiffDialog extends React.PureComponent<
 	DiffDialog.Props & DiffDialog.StateProps & DiffDialog.DispatchProps,
@@ -29,7 +28,11 @@ class ConnectedDiffDialog extends React.PureComponent<
 		return (
 			<form onSubmit={this.onSubmit}>
 				<FormGroup label="Stage slug">
-					<InputGroup onChange={e => this.updateTargetState(e.target.value)} />
+					<TextInput
+						value={this.state.targetStage}
+						onChange={newValue => this.updateTargetState(newValue)}
+						allowNewlines={false}
+					/>
 				</FormGroup>
 
 				<Button type="submit">Show diff</Button>

@@ -2,9 +2,8 @@ import { expect } from 'chai'
 import { GraphQlBuilder } from 'cms-client'
 import 'mocha'
 import * as React from 'react'
-import { ToOne } from '../../../../src/binding/coreComponents'
+import { Field, ToOne } from '../../../../src/binding/coreComponents'
 import { Environment } from '../../../../src/binding/dao'
-import { TextField } from '../../../../src/binding/facade'
 import { Parser, QueryLanguage } from '../../../../src/binding/queryLanguage'
 
 const parse = (input: string) => {
@@ -125,14 +124,14 @@ describe('single relative fields QueryLanguage parser', () => {
 		const environment = new Environment()
 		const result = QueryLanguage.wrapRelativeSingleField(
 			'this(better=work).as.expected(and = 1).correctly',
-			name => <TextField name={name} />,
+			name => <Field name={name} />,
 			environment,
 		)
 		const expected = (
 			<ToOne.AtomicPrimitive field="this" reducedBy={{ better: new GraphQlBuilder.Literal('work') }}>
 				<ToOne.AtomicPrimitive field="as">
 					<ToOne.AtomicPrimitive field="expected" reducedBy={{ and: 1 }}>
-						<TextField name="correctly" />
+						<Field name="correctly" />
 					</ToOne.AtomicPrimitive>
 				</ToOne.AtomicPrimitive>
 			</ToOne.AtomicPrimitive>

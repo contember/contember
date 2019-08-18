@@ -1,5 +1,5 @@
+import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { FormGroup } from '../../../components/ui'
 import { RelativeSingleField } from '../../bindingTypes'
 import { EnvironmentContext, ToMany } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
@@ -45,7 +45,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 				<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
 					{(field: EntityCollectionAccessor) => (
 						// Intentionally not applying label system middleware
-						<FormGroup label={props.label} errors={field.errors}>
+						<FieldSet legend={props.label} errors={field.errors}>
 							<div className="cloneable">
 								<div className="cloneable-content">
 									<Sortable
@@ -58,6 +58,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 										removeType={props.removeType}
 									>
 										<AlternativeFields
+											label={props.label}
 											alternatives={props.alternatives}
 											name={props.discriminationField}
 											allowBlockTypeChange={true}
@@ -97,7 +98,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 									</div>
 								)}
 							</div>
-						</FormGroup>
+						</FieldSet>
 					)}
 				</ToMany.AccessorRetriever>
 			),
@@ -111,6 +112,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 					{
 						name: props.discriminationField,
 						alternatives: props.alternatives,
+						label: props.label,
 					},
 					environment,
 				)}

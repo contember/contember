@@ -1,6 +1,6 @@
+import { ErrorList } from '@contember/ui'
 import * as React from 'react'
 import { ErrorAccessor } from '../../binding/dao'
-import { FormErrors } from './FormErrors'
 
 export interface CheckboxProps {
 	checked: boolean
@@ -12,7 +12,7 @@ export interface CheckboxProps {
 
 export const Checkbox = React.memo((props: CheckboxProps) => (
 	<div className="checkbox">
-		<FormErrors errors={props.errors} />
+		<ErrorList errors={props.errors} />
 		<label className="checkbox-in">
 			<input
 				type="checkbox"

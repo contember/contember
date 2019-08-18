@@ -1,13 +1,11 @@
 import { Callout, Card, Elevation } from '@blueprintjs/core'
-import { Button } from '@contember/ui'
-import { FormGroup, InputGroup } from '..'
+import { Button, FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { login, tryAutoLogin } from '../../actions/auth'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
 import { AuthStatus } from '../../state/auth'
-import cn from 'classnames'
 
 class Login extends React.PureComponent<Login.Props, Login.State> {
 	state: Login.State = {
@@ -41,38 +39,35 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 							</Callout>
 						)}
 						<FormGroup label="Email">
-							<InputGroup
+							<TextInput
 								value={this.state.email}
 								autoComplete="username"
 								type="email"
 								disabled={loading}
-								onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ email: e.currentTarget.value })}
+								onChange={newValue => this.setState({ email: newValue })}
 							/>
 						</FormGroup>
 						<FormGroup label="Password">
-							<InputGroup
+							<TextInput
 								type="password"
 								autoComplete="current-password"
 								value={this.state.password}
 								disabled={loading}
-								onChange={(e: React.FormEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })}
+								onChange={newValue => this.setState({ password: newValue })}
 							/>
 						</FormGroup>
 
-						<div className={cn('formGroup')}>
-							<label className="formGroup-label">
-								<input
-									type="checkbox"
-									checked={this.state.rememberMe}
-									value={this.state.password}
-									disabled={loading}
-									onChange={(e: React.FormEvent<HTMLInputElement>) =>
-										this.setState({ rememberMe: e.currentTarget.checked })
-									}
-								/>
-								Remember me
-							</label>
-						</div>
+						<FormGroup label="Remember me">
+							<input
+								type="checkbox"
+								checked={this.state.rememberMe}
+								value={this.state.password}
+								disabled={loading}
+								onChange={(e: React.FormEvent<HTMLInputElement>) =>
+									this.setState({ rememberMe: e.currentTarget.checked })
+								}
+							/>
+						</FormGroup>
 						<Button type="submit" disabled={loading}>
 							Submit
 						</Button>

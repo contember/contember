@@ -1,18 +1,16 @@
+import { FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
 import slugify from '@sindresorhus/slugify'
-import { FormGroup, InputGroup } from '../../../components/ui'
 import { RelativeSingleField } from '../../bindingTypes'
 import { Field, useEnvironment } from '../../coreComponents'
 import { useMutationState } from '../../coreComponents/PersistState'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
-import { Component } from '../auxiliary'
+import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { useRelativeSingleField } from '../utils'
 
-export interface SlugFieldProps {
-	field: RelativeSingleField
+export type SlugFieldProps = SimpleRelativeSingleFieldProps & {
 	drivenBy: RelativeSingleField
-	label?: React.ReactNode
 	format?: (currentValue: string, environment: Environment) => string
 }
 
@@ -21,7 +19,7 @@ export const SlugField = Component<SlugFieldProps>(
 	(props, environment) => (
 		<>
 			{QueryLanguage.wrapRelativeSingleField(
-				props.field,
+				props.name,
 				fieldName => (
 					<Field name={fieldName} />
 				),
@@ -44,7 +42,7 @@ interface SlugFieldInnerProps extends SlugFieldProps {}
 
 const SlugFieldInner = (props: SlugFieldInnerProps) => {
 	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
-	const slugField = useRelativeSingleField<string>(props.field)
+	const slugField = useRelativeSingleField<string>(props.name)
 	const driverField = useRelativeSingleField<string>(props.drivenBy)
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
@@ -64,14 +62,19 @@ const SlugFieldInner = (props: SlugFieldInnerProps) => {
 		<FormGroup
 			label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
 			errors={slugField.errors}
+			labelDescription={props.labelDescription}
+			labelPosition={props.labelPosition}
+			description={props.description}
 		>
-			<InputGroup
+			<TextInput
 				value={slugValue}
-				onChange={event => {
+				onChange={newValue => {
 					hasEditedSlug || setHasEditedSlug(true)
-					slugField.updateValue && slugField.updateValue(event.currentTarget.value)
+					slugField.updateValue && slugField.updateValue(newValue)
 				}}
 				readOnly={isMutating}
+				validationState={slugField.errors.length ? 'invalid' : undefined}
+				{...props}
 			/>
 		</FormGroup>
 	)

@@ -40,10 +40,10 @@ export const SlugField = Component<SlugFieldProps>(
 
 interface SlugFieldInnerProps extends SlugFieldProps {}
 
-const SlugFieldInner = (props: SlugFieldInnerProps) => {
+const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => {
 	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
 	const slugField = useRelativeSingleField<string>(props.name)
-	const driverField = useRelativeSingleField<string>(props.drivenBy)
+	const driverField = useRelativeSingleField<string>(drivenBy)
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 
@@ -53,8 +53,8 @@ const SlugFieldInner = (props: SlugFieldInnerProps) => {
 	if (!hasEditedSlug) {
 		slugValue = slugify(driverField.currentValue || '')
 
-		if (props.format) {
-			slugValue = props.format(slugValue, environment)
+		if (format) {
+			slugValue = format(slugValue, environment)
 		}
 	}
 

@@ -274,6 +274,20 @@ $cui-validationMessage-variants: map_merge((
 
 // FormGroup
 $cui-formGroup-separation: 1.25em !default;
+$cui-formGroup-label-color: $cui-color-gray-6 !default;
+$cui-formGroup-labelDescription-color: $cui-color-gray-5 !default;
+$cui-formGroup-description-color: $cui-color-gray-5 !default;
+
+$cui-formGroup-size-small: .75em !default;
+$cui-formGroup-size-default: .9em !default;
+$cui-formGroup-size-large: 1.2em !default;
+
+$cui-formGroup-sizes: () !default;
+$cui-formGroup-sizes: map_merge((
+	$cui-conf-defaultView: $cui-formGroup-size-default,
+	'small': $cui-formGroup-size-small,
+	'large': $cui-formGroup-size-large,
+), $cui-formGroup-sizes);
 
 
 // Collapsible

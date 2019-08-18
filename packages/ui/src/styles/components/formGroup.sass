@@ -1,0 +1,48 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}formGroup
+	@extend %formGroup
+
+	display: flex
+	flex-direction: column
+	width: 100%
+
+	&-label
+		display: flex
+		flex-direction: column
+		cursor: text
+
+		&-text
+			color: $cui-formGroup-label-color
+			font-weight: $fw-medium
+			text-transform: uppercase
+			line-height: 1.2
+
+	&-labelDescription
+		font-weight: $fw-normal
+		line-height: 1.2
+		color: $cui-formGroup-labelDescription-color
+		display: inline-block
+		margin: em(4px) 0 em(2px)
+
+	&-field
+		margin-top: em(8px)
+	&-description
+		font-weight: $fw-light
+		color: $cui-formGroup-description-color
+
+	@each $name, $fontSize in $cui-formGroup-sizes
+		$view: toView($name)
+
+		&#{$view} &
+			&-label
+				&-text
+					font-size: $fontSize
+			&-labelDescription
+				font-size: $fontSize * .9
+			&-description
+				font-size: $fontSize * .85
+
+
+	&.view-labelLeft
+		//

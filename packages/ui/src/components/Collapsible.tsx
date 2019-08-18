@@ -6,7 +6,7 @@ export interface CollapsibleProps {
 	children?: React.ReactNode
 }
 
-export function Collapsible(props: CollapsibleProps) {
+export const Collapsible = React.memo((props: CollapsibleProps) => {
 	const contentRef = React.useRef<HTMLDivElement>(null)
 	const [isTransitioning, setIsTransitioning] = React.useState(false)
 	const [contentHeight, setContentHeight] = React.useState('auto')
@@ -49,4 +49,4 @@ export function Collapsible(props: CollapsibleProps) {
 			</div>
 		</div>
 	)
-}
+})

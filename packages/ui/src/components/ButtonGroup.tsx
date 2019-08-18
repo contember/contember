@@ -8,8 +8,8 @@ export interface ButtonGroupProps {
 	size?: Size
 }
 
-export const ButtonGroup = ({ size, children }: ButtonGroupProps) => (
+export const ButtonGroup = React.memo(({ size, children }: ButtonGroupProps) => (
 	<div className={cn('button-group', toViewClass(size))} role="group">
 		{children}
 	</div>
-)
+))

@@ -5,14 +5,16 @@ import cn from 'classnames'
 
 const DepthContext = React.createContext(0)
 
-function Menu(props: Menu.Props) {
-	return (
-		<DepthContext.Provider value={0}>
-			<section className="menu">
-				<ul className="menu-list">{props.children}</ul>
-			</section>
-		</DepthContext.Provider>
-	)
+class Menu extends React.PureComponent<Menu.Props> {
+	public render() {
+		return (
+			<DepthContext.Provider value={0}>
+				<section className="menu">
+					<ul className="menu-list">{this.props.children}</ul>
+				</section>
+			</DepthContext.Provider>
+		)
+	}
 }
 
 namespace Menu {

@@ -27,39 +27,41 @@ export type ButtonProps = {
 	children?: React.ReactNode
 } & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
-export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
-	const { Component, intent, size, flow, distinction, isLoading, children, ...rest } = props
+export const Button = React.memo(
+	React.forwardRef<any, ButtonProps>((props, ref) => {
+		const { Component, intent, size, flow, distinction, isLoading, children, ...rest } = props
 
-	if (props.disabled === true) {
-		rest['aria-disabled'] = true
-	}
+		if (props.disabled === true) {
+			rest['aria-disabled'] = true
+		}
 
-	if (props.Component === 'button' || !props.Component) {
-		;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
-	}
+		if (props.Component === 'button' || !props.Component) {
+			;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
+		}
 
-	const attrs = {
-		className: cn(
-			rest.className,
-			'button',
-			toViewClass(intent),
-			toViewClass(size),
-			toViewClass(distinction),
-			toViewClass(flow),
-			toStateClass('loading', isLoading),
-		),
-		ref: ref,
-	}
-	const content = (
-		<>
-			<div className="button-content">{children}</div>
-			{isLoading && (
-				<span className="button-spinner">
-					<Spinner />
-				</span>
-			)}
-		</>
-	)
+		const attrs = {
+			className: cn(
+				rest.className,
+				'button',
+				toViewClass(intent),
+				toViewClass(size),
+				toViewClass(distinction),
+				toViewClass(flow),
+				toStateClass('loading', isLoading),
+			),
+			ref: ref,
+		}
+		const content = (
+			<>
+				<div className="button-content">{children}</div>
+				{isLoading && (
+					<span className="button-spinner">
+						<Spinner />
+					</span>
+				)}
+			</>
+		)
 
-	return React.createElement(Component || 'button', { ...rest, ...attrs }, content)
-})
+		return React.createElement(Component || 'button', { ...rest, ...attrs }, content)
+	}),
+)

@@ -38,12 +38,20 @@ export const SimpleRelativeSingleField = function<
 				</Field>
 			)
 		},
-		(props: P, environment: Environment) =>
-			QueryLanguage.wrapRelativeSingleField(
-				props.name,
-				fieldName => <Field defaultValue={props.defaultValue} name={fieldName} />,
-				environment,
-			),
+		(props: P, environment: Environment) => (
+			<>
+				{QueryLanguage.wrapRelativeSingleField(
+					props.name,
+					fieldName => (
+						<Field defaultValue={props.defaultValue} name={fieldName} />
+					),
+					environment,
+				)}
+				{props.label}
+				{props.labelDescription}
+				{props.description}
+			</>
+		),
 		displayName,
 	)
 }

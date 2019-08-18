@@ -1,21 +1,23 @@
 import * as React from 'react'
 import { FieldErrors } from '../../types'
-import { ValidationMessage } from './ValidationMessage'
+import { ValidationMessage, ValidationMessageProps } from './ValidationMessage'
 
 export interface ErrorListProps {
 	errors: FieldErrors
+	size?: ValidationMessageProps['size']
 }
 
-export const ErrorList = React.memo(({ errors }: ErrorListProps) => {
+export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
 	if (!errors.length) {
 		return null
 	}
-	console.log('xxxx', errors)
 	return (
 		<ul className="errorList">
 			{errors.map(error => (
 				<li className="errorList-item" key={error.key}>
-					<ValidationMessage type="invalid">{error.message}</ValidationMessage>
+					<ValidationMessage type="invalid" size={size}>
+						{error.message}
+					</ValidationMessage>
 				</li>
 			))}
 		</ul>

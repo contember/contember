@@ -8,8 +8,8 @@ export interface ContainerSpinnerProps {
 	size?: Size
 }
 
-export const ContainerSpinner = ({ size }: ContainerSpinnerProps) => (
+export const ContainerSpinner = React.memo(({ size }: ContainerSpinnerProps) => (
 	<div className={cn('containerSpinner', toViewClass(size))}>
 		<Spinner />
 	</div>
-)
+))

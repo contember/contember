@@ -10,25 +10,26 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 	const isDirty = React.useContext(DirtinessContext)
 	const value = React.useContext(MetaOperationsContext)
 	const buttonRef = React.useRef<HTMLButtonElement | null>(null)
+	const onClick = React.useCallback(() => {
+		value!.triggerPersist()
+		//buttonRef.current && buttonRef.current.blur()
+	}, [value])
 
 	const isDisabled = isMutating || !isDirty
 
-	if (value) {
-		return (
-			<Button
-				intent="primary"
-				onClick={() => {
-					value.triggerPersist()
-					buttonRef.current && buttonRef.current.blur()
-				}}
-				disabled={isDisabled}
-				isLoading={isMutating}
-				ref={buttonRef}
-				size="large"
-			>
-				{props.children || 'Save'}
-			</Button>
-		)
+	if (!value) {
+		return null
 	}
-	return null
+	return (
+		<Button
+			intent="primary"
+			onClick={onClick}
+			disabled={isDisabled}
+			isLoading={isMutating}
+			ref={buttonRef}
+			size="large"
+		>
+			{props.children || 'Save'}
+		</Button>
+	)
 })

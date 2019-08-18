@@ -251,6 +251,26 @@ $cui-button-sizes: map_merge((
 	'large': $cui-button-size-large,
 ), $cui-button-sizes);
 
+// ValidationMessage
+$cui-validationMessage-size-small: .8em !default;
+$cui-validationMessage-size-default: .9em !default;
+$cui-validationMessage-size-large: 1.1em !default;
+
+$cui-validationMessage-sizes: () !default;
+$cui-validationMessage-sizes: map_merge((
+	$cui-conf-defaultView: $cui-validationMessage-size-default,
+	'small': $cui-validationMessage-size-small,
+	'large': $cui-validationMessage-size-large,
+), $cui-validationMessage-sizes);
+
+$cui-validationMessage-valid-color: $cui-color-success !default;
+$cui-validationMessage-invalid-color: $cui-color-danger !default;
+
+$cui-validationMessage-variants: () !default;
+$cui-validationMessage-variants: map_merge((
+	'valid': $cui-validationMessage-valid-color,
+	'invalid': $cui-validationMessage-invalid-color,
+), $cui-validationMessage-variants);
 
 // FormGroup
 $cui-formGroup-separation: 1.25em !default;

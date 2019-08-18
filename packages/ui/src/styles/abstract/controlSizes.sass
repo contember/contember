@@ -5,12 +5,15 @@
 
 		$view: toView($name)
 		&#{$view}
-			$visualLineHeight: $height - 2 * $cui-control-border-width
+			$c: $fontSize / 1em
+			$normalizedHeight: $height / $c
+			$visualLineHeight: $normalizedHeight - 2 * ($cui-control-border-width / $c)
 			$actualLineHeight: 1.25em
 			$edgeOffset: ($visualLineHeight - $actualLineHeight) / 2
-			min-height: $height
+			min-height: $normalizedHeight
 			line-height: $actualLineHeight
-			padding: $edgeOffset (($visualLineHeight - 1em) / 2)
+			padding: $edgeOffset .5em
+			font-size: $fontSize
 
 	&.view-block
 		display: block

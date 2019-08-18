@@ -6,14 +6,16 @@
 		$view: toView($name)
 		&#{$view},
 		&-group#{$view}
-			$visualLineHeight: $height - 2 * $cui-control-border-width
-			$edgeOffset: ($visualLineHeight - 1em) / 2
-			min-height: $height
-			line-height: 1.25
-			padding: ($edgeOffset / 2) $edgeOffset
+			$c: $fontSize / 1em
+			$normalizedHeight: $height / $c
+			$visualLineHeight: $normalizedHeight - 2 * ($cui-control-border-width / $c)
+			$actualLineHeight: 1.25em
+			$edgeOffset: ($visualLineHeight - $actualLineHeight) / 2
+			min-height: $normalizedHeight
+			line-height: $actualLineHeight
+			padding: $edgeOffset .5em
+			font-size: $fontSize
 
-			> *
-				font-size: $fontSize
 
 		&.view-squarish
 			+size($height)

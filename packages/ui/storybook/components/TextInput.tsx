@@ -33,6 +33,15 @@ const SimpleTextInputStory = () => {
 				},
 				'default',
 			)}
+			validationState={radios(
+				'Validation state',
+				{
+					Default: 'default',
+					Valid: 'valid',
+					Invalid: 'invalid',
+				},
+				'default',
+			)}
 		/>
 	)
 }

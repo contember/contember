@@ -1,0 +1,17 @@
+%controlStates
+	@each $name, $settings in $cui-control-validation
+		$color: map_get($settings, color)
+		$borderColor: map_get($settings, borderColor)
+
+		&.is-#{$name}
+			color: $color
+			border-color: $borderColor
+
+			&:not(.view-seamless)
+				&:hover
+					border-color: darken($borderColor, 3)
+				&:focus
+					border-color: darken($borderColor, 5)
+
+			&:focus
+				box-shadow: 0 0 0 .2em rgba($borderColor, .3)

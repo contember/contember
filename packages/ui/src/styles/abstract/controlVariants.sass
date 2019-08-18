@@ -1,0 +1,52 @@
+%controlVariants
+	@each $name, $settings in $cui-control-variants
+		$color: map_get($settings, color)
+		$background: map_get($settings, background)
+		$borderColor: map_get($settings, borderColor)
+		$distinctionColor: map_get($settings, distinctionColor)
+
+		$view: toView($name)
+
+		&#{$view}
+			color: $color
+			background: $background
+			border-color: $borderColor
+
+			+disableWebkitAutoFill($background)
+
+			&:hover
+				border-color: darken($borderColor, 5)
+
+			&:focus
+				@extend %implementsCustomFocusEffects
+				border-color: lighten($distinctionColor, 10)
+				box-shadow: 0 0 0 .2em rgba($distinctionColor, .3)
+
+			&::placeholder
+				color: lighten($color, 15)
+
+			&[disabled],
+			&[readonly]
+				cursor: not-allowed
+				color: lighten($color, 5)
+				background: lighten($background, 10)
+				border-color: lighten($borderColor, 10)
+				opacity: $cui-control-inactive-opacity
+
+				&,
+				&::placeholder
+					color: lighten($color, 25)
+
+			&.view-seamless,
+			&.view-outlined
+				background: transparent
+				border-color: transparent
+				color: $distinctionColor
+			&.view-outlined
+				border-color: $distinctionColor
+			&.view-seamless:hover,
+			&.view-outlined:hover,
+			&.view-seamless:focus,
+			&.view-outlined:focus
+				color: darken($distinctionColor, 5)
+				background: rgba(lighten($distinctionColor, 20), .3)

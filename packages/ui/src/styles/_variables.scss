@@ -46,6 +46,23 @@ $cui-effect-transition-duration: .3s !default;
 $cui-control-border-width: em(1px) !default;
 $cui-control-border-radius: em(3px) !default;
 
+$cui-control-view-default-color: $cui-color-gray-7 !default;
+$cui-control-view-default-background: $cui-color-gray-1 !default;
+$cui-control-view-default-border-color: $cui-color-gray-3 !default;
+$cui-control-view-default-distinction-color: $cui-color-primary !default;
+$cui-control-view-default: (
+	'color': $cui-control-view-default-color,
+	'background': $cui-control-view-default-background,
+	'borderColor': $cui-control-view-default-border-color,
+	'distinctionColor': $cui-control-view-default-distinction-color,
+) !default;
+
+$cui-control-variants: () !default;
+$cui-control-variants: map_merge((
+	$cui-conf-defaultView: $cui-control-view-default,
+), $cui-control-variants);
+
+
 $cui-control-small-height: 1.5em !default;
 $cui-control-default-height: 2em !default;
 $cui-control-large-height: 2.5em !default;
@@ -53,6 +70,29 @@ $cui-control-large-height: 2.5em !default;
 $cui-control-small-font-size: .9em !default;
 $cui-control-default-font-size: 1em !default;
 $cui-control-large-font-size: 1.3em !default;
+
+$cui-control-size-small: (
+	'height': $cui-control-small-height,
+	'fontSize': $cui-control-small-font-size,
+) !default;
+
+$cui-control-size-default: (
+	'height': $cui-control-default-height,
+	'fontSize': $cui-control-default-font-size,
+) !default;
+
+$cui-control-size-large: (
+	'height': $cui-control-large-height,
+	'fontSize': $cui-control-large-font-size,
+) !default;
+
+$cui-control-sizes: () !default;
+$cui-control-sizes: map_merge((
+	$cui-conf-defaultView: $cui-control-size-default,
+	'small': $cui-control-size-small,
+	'large': $cui-control-size-large,
+), $cui-control-sizes);
+
 
 $cui-control-inactive-opacity: .6 !default;
 

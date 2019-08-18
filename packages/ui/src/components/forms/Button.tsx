@@ -1,8 +1,8 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { ButtonDistinction, ButtonFlow, Intent, Size } from '../types'
-import { toStateClass, toViewClass } from '../utils'
-import { Spinner } from './Spinner'
+import { ButtonDistinction, ButtonFlow, Intent, Size } from '../../types'
+import { toStateClass, toViewClass } from '../../utils'
+import { Spinner } from '../Spinner'
 
 // TODO these types are wonky
 interface ButtonBasedProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

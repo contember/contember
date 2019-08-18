@@ -2,6 +2,7 @@
 
 .#{$cui-conf-globalPrefix}validationMessage
 	font-weight: $fw-light
+	display: inline-block
 
 	@each $name, $color in $cui-validationMessage-variants
 		$view: toView($name)

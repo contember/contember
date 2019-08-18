@@ -2,8 +2,8 @@ import { ChangeEventHandler } from 'react'
 import * as React from 'react'
 import cn from 'classnames'
 import TextareaAutosize from 'react-textarea-autosize'
-import { ControlDistinction, ControlFlow, Size } from '../types'
-import { toViewClass } from '../utils'
+import { ControlDistinction, ControlFlow, Size } from '../../types'
+import { toViewClass } from '../../utils'
 
 interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
 	allowNewlines: true

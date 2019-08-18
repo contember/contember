@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
-import { Size } from '../types'
-import { toViewClass } from '../utils'
+import { Size } from '../../types'
+import { toViewClass } from '../../utils'
 
 export interface ButtonGroupProps {
 	children?: React.ReactNode

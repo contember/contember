@@ -1,0 +1,19 @@
+%controlEssentials
+	display: inline-block
+	font-family: inherit
+	transition-duration: var(--cui-button-effect-transition-duration)
+	transition-property: box-shadow, color, background, opacity
+	font-weight: $fw-normal
+	font-size: inherit
+	text-decoration: none
+	position: relative
+	margin: 0
+	border-style: solid
+	border-width: $cui-control-border-width
+	border-radius: $cui-control-border-radius
+	resize: none
+	vertical-align: middle
+	width: em(250px)
+
+	&:-webkit-autofill
+		-webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important

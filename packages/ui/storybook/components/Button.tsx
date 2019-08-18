@@ -36,4 +36,6 @@ export const simpleButtonStory = (size?: Size) => {
 	return allIntents.map(intent => <Button intent={intent} {...props} />)
 }
 
-storiesOf('Button', module).add('simple', simpleButtonStory)
+storiesOf('Button', module).add('simple', () => {
+	return simpleButtonStory()
+})

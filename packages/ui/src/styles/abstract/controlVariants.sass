@@ -37,16 +37,9 @@
 				&::placeholder
 					color: lighten($color, 25)
 
-			&.view-seamless,
-			&.view-outlined
+			&.view-seamless
 				background: transparent
 				border-color: transparent
-				color: $distinctionColor
-			&.view-outlined
-				border-color: $distinctionColor
-			&.view-seamless:hover,
-			&.view-outlined:hover,
-			&.view-seamless:focus,
-			&.view-outlined:focus
-				color: darken($distinctionColor, 5)
-				background: rgba(lighten($distinctionColor, 20), .3)
+				&:hover,
+				&:focus
+					background: $background

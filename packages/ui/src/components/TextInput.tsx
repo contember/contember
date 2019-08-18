@@ -2,7 +2,7 @@ import { ChangeEventHandler } from 'react'
 import * as React from 'react'
 import cn from 'classnames'
 import TextareaAutosize from 'react-textarea-autosize'
-import { ControlDistinction, Size } from '../types'
+import { ControlDistinction, ControlFlow, Size } from '../types'
 import { toViewClass } from '../utils'
 
 interface TextAreaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
@@ -18,12 +18,13 @@ export type TextInputProps = {
 	value: string
 	size?: Size
 	distinction?: ControlDistinction
+	flow?: ControlFlow
 	onChange: (newValue: string) => void
 } & (TextAreaProps | InputProps)
 
 export const TextInput = React.memo(
-	React.forwardRef(({ className, size, distinction, onChange, ...otherProps }: TextInputProps, ref) => {
-		const finalClassName = cn('input', toViewClass(size), toViewClass(distinction), className)
+	React.forwardRef(({ className, size, distinction, flow, onChange, ...otherProps }: TextInputProps, ref) => {
+		const finalClassName = cn('input', toViewClass(size), toViewClass(distinction), toViewClass(flow), className)
 		const innerOnChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = event =>
 			onChange(event.target.value)
 

@@ -1,0 +1,14 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}validationMessage
+	font-weight: $fw-light
+
+	@each $name, $color in $cui-validationMessage-variants
+		$view: toView($name)
+		&#{$view}
+			color: $color
+
+	@each $name, $fontSize in $cui-validationMessage-sizes
+		$view: toView($name)
+		&#{$view}
+			font-size: $fontSize

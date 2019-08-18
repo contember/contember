@@ -25,6 +25,7 @@ import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
 	sortBy: FieldName
+	enablePrepending?: boolean
 }
 
 export interface SortableInternalProps {
@@ -270,7 +271,7 @@ namespace Sortable {
 					useDragHandle={true}
 					lockAxis="y"
 					lockToContainerEdges={true}
-					prependNew={this.prependNew}
+					prependNew={this.props.enablePrepending ? this.prependNew : undefined}
 					appendNew={this.props.entities.addNew}
 					enableUnlinkAll={this.props.enableUnlinkAll}
 					enableAddingNew={this.props.enableAddingNew}

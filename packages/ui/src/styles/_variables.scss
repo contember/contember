@@ -63,6 +63,26 @@ $cui-control-variants: map_merge((
 ), $cui-control-variants);
 
 
+$cui-control-validation-valid-color: $cui-color-success !default;
+$cui-control-validation-valid-border-color: darken($cui-color-success, 5) !default;
+$cui-control-validation-valid: (
+	'color': $cui-control-validation-valid-color,
+	'borderColor': $cui-control-validation-valid-border-color,
+);
+$cui-control-validation-invalid-color: $cui-color-danger !default;
+$cui-control-validation-invalid-border-color: darken($cui-color-danger, 5) !default;
+$cui-control-validation-invalid: (
+	'color': $cui-control-validation-invalid-color,
+	'borderColor': $cui-control-validation-invalid-border-color,
+);
+
+$cui-control-validation: () !default;
+$cui-control-validation: map_merge((
+	'valid': $cui-control-validation-valid,
+	'invalid': $cui-control-validation-invalid,
+), $cui-control-validation);
+
+
 $cui-control-small-height: 1.5em !default;
 $cui-control-default-height: 2em !default;
 $cui-control-large-height: 2.5em !default;

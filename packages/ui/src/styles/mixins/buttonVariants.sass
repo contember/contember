@@ -50,3 +50,6 @@
 		&#{$view}.view-outlined#{$primary-selector}:focus#{$secondary-selector}
 			color: darken($distinctionColor, 5)
 			background: rgba(lighten($distinctionColor, 20), .3)
+		&#{$view}.view-seamless#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
+		&#{$view}.view-outlined#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector}
+			background: rgba(lighten($distinctionColor, 5), .3)

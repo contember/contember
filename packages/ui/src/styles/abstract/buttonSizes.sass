@@ -17,12 +17,12 @@
 			font-size: $fontSize
 
 
-		&.view-squarish
-			+size($height)
-			overflow: hidden
-		&.view-generous
-			padding-left: 1.5 * $height
-			padding-right: 1.5 * $height
+			&.view-squarish
+				+size($normalizedHeight)
+				overflow: hidden
+			&.view-generous
+				padding-left: 1.5 * $normalizedHeight
+				padding-right: 1.5 * $normalizedHeight
 
 
 	&.view-block

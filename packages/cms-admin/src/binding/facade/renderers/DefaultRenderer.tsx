@@ -68,7 +68,6 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	}
 
 	public static generateSyntheticChildren(props: RendererProps, environment: Environment): React.ReactNode {
-		console.log(':/')
 		return (
 			<>
 				{props.side}

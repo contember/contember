@@ -11,6 +11,7 @@ export const simpleButtonStory = (size?: Size) => {
 		size: size || sizeKnob(),
 		disabled: boolean('Disabled', false),
 		isLoading: boolean('Is loading', false),
+		isActive: boolean('Is active', false),
 		distinction: radios(
 			'Distinction',
 			{

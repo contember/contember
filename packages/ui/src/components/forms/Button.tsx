@@ -23,13 +23,14 @@ export type ButtonProps = {
 	flow?: ButtonFlow
 	distinction?: ButtonDistinction
 	isLoading?: boolean
+	isActive?: boolean
 	disabled?: boolean
 	children?: React.ReactNode
 } & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
 export const Button = React.memo(
 	React.forwardRef<any, ButtonProps>((props, ref) => {
-		const { Component, intent, size, flow, distinction, isLoading, children, ...rest } = props
+		const { Component, intent, size, flow, distinction, isLoading, isActive, children, ...rest } = props
 
 		if (props.disabled === true) {
 			rest['aria-disabled'] = true
@@ -48,6 +49,7 @@ export const Button = React.memo(
 				toViewClass(distinction),
 				toViewClass(flow),
 				toStateClass('loading', isLoading),
+				toStateClass('active', isActive),
 			),
 			ref: ref,
 		}

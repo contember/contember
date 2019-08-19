@@ -2,7 +2,7 @@ import { Button, FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import * as React from 'react'
 import { RelativeSingleField } from '../../bindingTypes'
-import { Field, useEnvironment } from '../../coreComponents'
+import { Field, useEntityContext, useEnvironment } from '../../coreComponents'
 import { useMutationState } from '../../coreComponents/PersistState'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
@@ -42,6 +42,7 @@ interface SlugFieldInnerProps extends SlugFieldProps {}
 
 const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => {
 	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
+	const hostEntity = useEntityContext() // TODO this will fail for some QL uses
 	const slugField = useRelativeSingleField<string>(props.name)
 	const driverField = useRelativeSingleField<string>(drivenBy)
 	const environment = useEnvironment()
@@ -55,16 +56,22 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 		}
 	}, [isEditing])
 
-	// TODO maybe be smarter when the field is already persisted?
 	let slugValue = slugField.currentValue || ''
 
-	if (!hasEditedSlug) {
+	if (!hasEditedSlug && !hostEntity.isPersisted()) {
 		slugValue = slugify(driverField.currentValue || '')
 
 		if (format) {
 			slugValue = format(slugValue, environment)
 		}
 	}
+
+	React.useEffect(() => {
+		if (slugField.currentValue === slugValue || !slugField.updateValue) {
+			return
+		}
+		slugField.updateValue(slugValue)
+	}, [slugField, slugValue])
 
 	if (!isEditing) {
 		return (

@@ -1,6 +1,6 @@
-import { FormGroup, TextInput } from '@contember/ui'
-import * as React from 'react'
+import { Button, FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
+import * as React from 'react'
 import { RelativeSingleField } from '../../bindingTypes'
 import { Field, useEnvironment } from '../../coreComponents'
 import { useMutationState } from '../../coreComponents/PersistState'
@@ -46,6 +46,14 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 	const driverField = useRelativeSingleField<string>(drivenBy)
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
+	const [isEditing, setIsEditing] = React.useState(false)
+	const inputRef = React.useRef<HTMLInputElement>()
+
+	React.useLayoutEffect(() => {
+		if (isEditing && inputRef.current) {
+			inputRef.current.focus()
+		}
+	}, [isEditing])
 
 	// TODO maybe be smarter when the field is already persisted?
 	let slugValue = slugField.currentValue || ''
@@ -58,6 +66,22 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 		}
 	}
 
+	if (!isEditing) {
+		return (
+			<div
+				className="slugField"
+				onClick={() => {
+					setIsEditing(true)
+				}}
+			>
+				<div className="slugField-value">{slugValue}</div>
+				<Button size="small" distinction="seamless" className="slugField-button">
+					Edit
+				</Button>
+			</div>
+		)
+	}
+
 	return (
 		<FormGroup
 			label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
@@ -65,6 +89,7 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 			labelDescription={props.labelDescription}
 			labelPosition={props.labelPosition}
 			description={props.description}
+			size="small"
 		>
 			<TextInput
 				value={slugValue}
@@ -74,6 +99,8 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 				}}
 				readOnly={isMutating}
 				validationState={slugField.errors.length ? 'invalid' : undefined}
+				size="small"
+				ref={inputRef}
 				{...props}
 			/>
 		</FormGroup>

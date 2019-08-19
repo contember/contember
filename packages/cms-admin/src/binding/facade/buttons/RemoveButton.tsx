@@ -28,7 +28,7 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		value.remove(mapToRemovalType(props.removeType))
 
 		if (props.immediatePersist && metaOperations) {
-			metaOperations.triggerPersist()
+			setTimeout(() => metaOperations.triggerPersist(), 100) // TODO This is a *nasty* hack.
 		}
 	}, [metaOperations, props.immediatePersist, props.removeType, value])
 

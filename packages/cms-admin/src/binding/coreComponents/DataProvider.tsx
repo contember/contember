@@ -26,6 +26,7 @@ export interface DataProviderOwnProps<DRP> {
 	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
 	onDataAvailable?: (data: DataRendererProps['data']) => void
+	onSuccessfulPersist?: () => void
 }
 
 export interface DataProviderDispatchProps {
@@ -92,6 +93,9 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 		}
 
 		if (mutation.readyState === DataTreeRequestReadyState.Success) {
+			if (this.props.onSuccessfulPersist) {
+				this.props.onSuccessfulPersist()
+			}
 			if (!this.state.query) {
 				return
 			}

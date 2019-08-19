@@ -11,6 +11,7 @@ interface EntityCreatorProps<DRP> {
 	name: EntityName
 	renderer?: React.ComponentType<DRP & DataRendererProps>
 	rendererProps?: DRP
+	onSuccessfulPersist?: () => void
 }
 
 export class EntityCreator<DRP> extends React.PureComponent<EntityCreatorProps<DRP>> {
@@ -31,6 +32,7 @@ export class EntityCreator<DRP> extends React.PureComponent<EntityCreatorProps<D
 							markerTree={markerTreeGenerator.generate()}
 							renderer={this.props.renderer}
 							rendererProps={this.props.rendererProps}
+							onSuccessfulPersist={this.props.onSuccessfulPersist}
 						>
 							{this.props.children}
 						</DataProvider>

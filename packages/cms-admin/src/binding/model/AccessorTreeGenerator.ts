@@ -148,10 +148,8 @@ class AccessorTreeGenerator {
 					}
 
 					const referenceError =
-						errors &&
-						errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
-						field.fieldName in errors.children
-							? errors.children[field.fieldName]
+						errors && errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed
+							? errors.children[field.fieldName] || errors.children[referencePlaceholder] || undefined
 							: undefined
 
 					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {

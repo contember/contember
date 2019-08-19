@@ -367,7 +367,12 @@ export class MutationGenerator {
 							((persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField)) ||
 								(persistedField === undefined || persistedField === null))
 						) {
-							accessorReference.push({ accessor, reference, persistedField: persistedField || undefined })
+							accessorReference.push({
+								accessor,
+								reference,
+								persistedField: persistedField || undefined,
+								alias: referencePlaceholder,
+							})
 
 							if (reference.reducedBy === undefined) {
 								unreducedHasOnePresent = true

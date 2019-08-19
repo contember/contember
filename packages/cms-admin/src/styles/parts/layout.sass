@@ -81,6 +81,15 @@
 			max-width: 20rem
 			position: sticky
 			top: $layout-navbar-height + rem(25px)
+			margin: 0 rem(25px)
+
+			&.view-boxed
+				+box
 
 		&-title
 			margin: 0
+
+	+media($break1200M)
+		&-content
+			flex-direction: column
+			align-items: stretch

@@ -1,5 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
+import { useState } from 'react'
+import { Collapsible } from '@contember/ui'
 
 class Dropdown extends React.PureComponent<Dropdown.Props> {
 	render() {
@@ -32,12 +34,25 @@ namespace Dropdown {
 		children?: React.ReactNode
 	}
 
-	export const Revealer = (props: RevealerProps) => (
-		<div className="dropdown-revealer">
-			<div className="dropdown-revealer-opener">{props.opener}</div>
-			<div className="dropdown-revealer-dropdown">{props.children}</div>
-		</div>
-	)
+	export const Revealer = (props: RevealerProps) => {
+		const [isRevealed, setIsRevealed] = useState(false)
+		return (
+			<div
+				className="dropdown-revealer"
+				onPointerEnter={() => setIsRevealed(true)}
+				onPointerLeave={() => setIsRevealed(false)}
+			>
+				<div className="dropdown-revealer-opener" onClick={() => setIsRevealed(true)}>
+					{props.opener}
+				</div>
+				<div className="dropdown-revealer-dropdown">
+					<Collapsible expanded={isRevealed} transition="bottomInsert">
+						{props.children}
+					</Collapsible>
+				</div>
+			</div>
+		)
+	}
 }
 
 export { Dropdown }

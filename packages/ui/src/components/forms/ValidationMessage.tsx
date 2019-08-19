@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
 import { Default, Size, ValidationState } from '../../types'
-import { toViewClass } from '../../utils'
+import { toEnumViewClass } from '../../utils'
 
 export interface ValidationMessageProps {
 	type: Exclude<ValidationState, Default>
@@ -10,5 +10,5 @@ export interface ValidationMessageProps {
 }
 
 export const ValidationMessage = React.memo(({ children, size, type }: ValidationMessageProps) => (
-	<span className={cn('validationMessage', toViewClass(size), toViewClass(type))}>{children}</span>
+	<span className={cn('validationMessage', toEnumViewClass(size), toEnumViewClass(type))}>{children}</span>
 ))

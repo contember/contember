@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import * as React from 'react'
 import { ButtonDistinction, ButtonFlow, Intent, Size } from '../../types'
-import { toStateClass, toViewClass } from '../../utils'
+import { toStateClass, toEnumViewClass } from '../../utils'
 import { Spinner } from '../Spinner'
 
 // TODO these types are wonky
@@ -44,10 +44,10 @@ export const Button = React.memo(
 			className: cn(
 				rest.className,
 				'button',
-				toViewClass(intent),
-				toViewClass(size),
-				toViewClass(distinction),
-				toViewClass(flow),
+				toEnumViewClass(intent),
+				toEnumViewClass(size),
+				toEnumViewClass(distinction),
+				toEnumViewClass(flow),
 				toStateClass('loading', isLoading),
 				toStateClass('active', isActive),
 			),

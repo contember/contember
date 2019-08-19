@@ -1,3 +1,1 @@
-import { toEnumClass } from './toEnumClass'
-
-export const toViewClass = (name: string | undefined) => toEnumClass('view-', name)
+export const toViewClass = (name: string, viewEnabled?: boolean) => viewEnabled && `view-${name}`

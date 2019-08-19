@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import * as React from 'react'
 import { FormGroupLabelPosition } from '../../types'
-import { toViewClass } from '../../utils'
+import { toEnumViewClass } from '../../utils'
 import { ErrorList, ErrorListProps } from './'
 
 export interface FormGroupProps extends ErrorListProps {
@@ -17,7 +17,7 @@ export interface FormGroupProps extends ErrorListProps {
 export const FormGroup = React.memo(
 	({ label, children, labelPosition, labelDescription, description, size, errors }: FormGroupProps) => {
 		return (
-			<div className={cn('formGroup', toViewClass(size), toViewClass(labelPosition))}>
+			<div className={cn('formGroup', toEnumViewClass(size), toEnumViewClass(labelPosition))}>
 				<label className="formGroup-label">
 					{label && <span className="formGroup-label-text">{label}</span>}
 					{labelDescription && <span className="formGroup-labelDescription">{labelDescription}</span>}

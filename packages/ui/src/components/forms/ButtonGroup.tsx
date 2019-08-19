@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
 import { Size } from '../../types'
-import { toViewClass } from '../../utils'
+import { toEnumViewClass } from '../../utils'
 
 export interface ButtonGroupProps {
 	children?: React.ReactNode
@@ -9,7 +9,7 @@ export interface ButtonGroupProps {
 }
 
 export const ButtonGroup = React.memo(({ size, children }: ButtonGroupProps) => (
-	<div className={cn('button-group', toViewClass(size))} role="group">
+	<div className={cn('button-group', toEnumViewClass(size))} role="group">
 		{children}
 	</div>
 ))

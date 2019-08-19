@@ -34,6 +34,7 @@ const SimpleTextInputStory = () => {
 				},
 				'default',
 			)}
+			withTopToolbar={boolean('With top toolbar', false)}
 		/>
 	)
 }

@@ -1,6 +1,6 @@
 import { IconName, Divider } from '@blueprintjs/core'
 import { ButtonGroup, FormGroup, TextInputProps } from '@contember/ui'
-import { toEnumStateClass, toViewClass } from '@contember/ui/dist/src/utils'
+import { toEnumStateClass, toEnumViewClass } from '@contember/ui/dist/src/utils'
 import cn from 'classnames'
 import { isKeyHotkey } from 'is-hotkey'
 import * as React from 'react'
@@ -179,8 +179,8 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						ref={this.ref}
 						className={cn(
 							'input',
-							toViewClass(this.props.size),
-							toViewClass(this.props.distinction),
+							toEnumViewClass(this.props.size),
+							toEnumViewClass(this.props.distinction),
 							toEnumStateClass(this.props.validationState),
 						)}
 						spellCheck

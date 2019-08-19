@@ -6,6 +6,7 @@ import { DataRendererProps, getDataProvider } from './DataProvider'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { MarkerTreeRootProvider } from './MarkerProvider'
+import { DefaultRenderer } from '../facade/renderers'
 
 interface EntityCreatorProps<DRP> {
 	name: EntityName
@@ -22,7 +23,7 @@ export class EntityCreator<DRP> extends React.PureComponent<EntityCreatorProps<D
 			<EnvironmentContext.Consumer>
 				{(environment: Environment) => {
 					const markerTreeGenerator = new MarkerTreeGenerator(
-						<EntityCreator {...this.props}>{this.props.children}</EntityCreator>,
+						<EntityCreator {...this.props}>{this.renderRenderer()}</EntityCreator>,
 						environment,
 					)
 					const DataProvider = getDataProvider<DRP>()
@@ -40,6 +41,18 @@ export class EntityCreator<DRP> extends React.PureComponent<EntityCreatorProps<D
 				}}
 			</EnvironmentContext.Consumer>
 		)
+	}
+
+	private renderRenderer(): React.ReactNode {
+		if (this.props.renderer) {
+			const Renderer = this.props.renderer
+			if (typeof this.props.rendererProps === 'undefined') {
+				throw new Error(`No rendererProps passed to custom renderer.`)
+			}
+			return <Renderer {...this.props.rendererProps}>{this.props.children}</Renderer>
+		} else {
+			return <DefaultRenderer {...this.props.rendererProps}>{this.props.children}</DefaultRenderer>
+		}
 	}
 
 	public static generateMarkerTreeRoot(

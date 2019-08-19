@@ -1,7 +1,7 @@
 import { H1 } from '@blueprintjs/core'
 import * as React from 'react'
 import { DataContext, Field } from '../../coreComponents'
-import { EntityCollectionAccessor, Environment } from '../../dao'
+import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, Environment } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
 import { FeedbackRenderer } from './FeedbackRenderer'
@@ -13,7 +13,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 		return (
 			<FeedbackRenderer data={this.props.data}>
 				{data => {
-					if (data.root instanceof EntityCollectionAccessor) {
+					if (data.root instanceof EntityCollectionAccessor && !this.props.onlyOneInCollection) {
 						const normalizedData = data.root.entities
 						return (
 							<>
@@ -34,19 +34,25 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 							</>
 						)
 					} else {
-						const value = data.root
+						const value: EntityAccessor | EntityForRemovalAccessor | undefined =
+							this.props.onlyOneInCollection && data.root instanceof EntityCollectionAccessor
+								? data.root.entities[0]
+								: (data.root as EntityAccessor | EntityForRemovalAccessor | undefined)
 						return (
-							<>
-								<LayoutInner>
-									<DataContext.Provider value={value}>
+							value && (
+								<DataContext.Provider value={value}>
+									<LayoutInner>
 										{DefaultRenderer.renderTitle(this.props.title)}
 										{this.props.children}
-									</DataContext.Provider>
-								</LayoutInner>
-								<LayoutSide>
-									<PersistButton />
-								</LayoutSide>
-							</>
+									</LayoutInner>
+									<LayoutSide showBox={!!this.props.side}>
+										<>
+											{this.props.side}
+											<PersistButton />
+										</>
+									</LayoutSide>
+								</DataContext.Provider>
+							)
 						)
 					}
 				}}
@@ -62,6 +68,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	}
 
 	public static generateSyntheticChildren(props: RendererProps, environment: Environment): React.ReactNode {
+		console.log(':/')
 		return (
 			<>
 				{props.side}

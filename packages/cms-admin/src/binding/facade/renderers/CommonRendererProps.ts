@@ -6,6 +6,7 @@ export interface CommonRendererProps {
 	beforeContent?: React.ReactNode
 	side?: React.ReactNode
 	children?: React.ReactNode
+	onlyOneInCollection?: boolean
 }
 
 export interface RendererProps extends CommonRendererProps, DataRendererProps {}

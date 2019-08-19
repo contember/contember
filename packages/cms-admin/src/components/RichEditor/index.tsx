@@ -1,5 +1,5 @@
 import { IconName, Divider } from '@blueprintjs/core'
-import { FormGroup, TextInputProps } from '@contember/ui'
+import { ButtonGroup, FormGroup, TextInputProps } from '@contember/ui'
 import { toEnumStateClass, toViewClass } from '@contember/ui/dist/src/utils'
 import cn from 'classnames'
 import { isKeyHotkey } from 'is-hotkey'
@@ -148,26 +148,31 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 		return (
 			<div className="editor">
 				<Toolbar>
-					{blocks.length > 1 &&
-						blocks.map(block => (
-							<ActionButton
-								key={block.block}
-								icon={this.getIcon(block.block)}
-								isActive={this.isBlockActive(block.block)}
-								onClick={this.changeBlockMarkingTo(block.block)}
-							/>
-						))}
+					{blocks.length > 1 && (
+						<ButtonGroup>
+							{blocks.map(block => (
+								<ActionButton
+									key={block.block}
+									icon={this.getIcon(block.block)}
+									isActive={this.isBlockActive(block.block)}
+									onClick={this.changeBlockMarkingTo(block.block)}
+								/>
+							))}
+						</ButtonGroup>
+					)}
 					&nbsp;
 					{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
-					{allMarksNames.map(mark => (
-						<ActionButton
-							key={mark}
-							icon={this.getIcon(mark)}
-							isActive={this.isMarkActive(mark)}
-							onClick={this.changeMarkMarkingTo(mark)}
-							disabled={!this.isMarkAvailable(mark)}
-						/>
-					))}
+					<ButtonGroup>
+						{allMarksNames.map(mark => (
+							<ActionButton
+								key={mark}
+								icon={this.getIcon(mark)}
+								isActive={this.isMarkActive(mark)}
+								onClick={this.changeMarkMarkingTo(mark)}
+								disabled={!this.isMarkAvailable(mark)}
+							/>
+						))}
+					</ButtonGroup>
 				</Toolbar>
 				<div className="inputGroup view-topFluent">
 					<Editor

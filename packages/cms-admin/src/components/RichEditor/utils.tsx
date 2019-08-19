@@ -19,13 +19,7 @@ interface ActionButtonProps {
 }
 
 export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive, disabled }) => (
-	<Button
-		onClick={() => onClick()}
-		distinction={isActive ? 'default' : 'seamless'}
-		intent={isActive ? 'primary' : 'default'}
-		disabled={disabled}
-		flow="squarish"
-	>
+	<Button onClick={() => onClick()} distinction="seamless" isActive={isActive} disabled={disabled} flow="squarish">
 		<Icon icon={icon} color="currentColor" />
 	</Button>
 )

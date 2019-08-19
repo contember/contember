@@ -23,6 +23,8 @@
 
 		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector}
 			@extend %buttonPress
+		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
+		&#{$view}#{$primary-selector}.is-active#{$secondary-selector}
 			background: linear-gradient(to bottom, darken($background, 3), darken($background, 9))
 
 		&#{$view}#{$primary-selector}:focus#{$secondary-selector}
@@ -52,5 +54,7 @@
 			color: darken($distinctionColor, 5)
 			background: rgba(lighten($distinctionColor, 20), .3)
 		&#{$view}.view-seamless#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
-		&#{$view}.view-outlined#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector}
+		&#{$view}.view-outlined#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
+		&#{$view}.view-seamless#{$primary-selector}:not([disabled]):not([readonly]).is-active#{$secondary-selector},
+		&#{$view}.view-outlined#{$primary-selector}:not([disabled]):not([readonly]).is-active#{$secondary-selector}
 			background: rgba(lighten($distinctionColor, 5), .3)

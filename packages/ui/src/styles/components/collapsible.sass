@@ -1,20 +1,23 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}collapsible
-	height: 0
+	$root: &
+	$transition-timing-function: ease
+
+	--transition-duration: #{$cui-collapsible-transition-duration}
+	--transition-timing-function: #{$transition-timing-function}
 	visibility: hidden
 	opacity: 0
 	display: flex
-	align-items: flex-end
-	transition-property: height, opacity, visibility
-	transition-duration: $cui-collapsible-transition-duration
+	transition-property: height, width, opacity, visibility
+	transition-timing-function: var(--transition-timing-function)
+	transition-duration: var(--transition-duration)
 
 	@media (prefers-reduced-motion: reduce)
-		transition-duration: #{(1s / 60)} // 1 frame at 60 fps
-		transition-timing-function: step-end
+		--transition-duration: #{(1s / 60)} // 1 frame at 60 fps
+		--transition-timing-function: step-end
 
 	&.is-expanded
-		height: var(--content-height, auto)
 		visibility: visible
 		opacity: 1
 
@@ -23,3 +26,44 @@
 
 	&-content
 		width: 100%
+
+	&.view-transition-topInsert,
+	&.view-transition-bottomInsert
+		height: 0
+
+		&.is-expanded
+			height: var(--content-height, auto)
+
+	&.view-transition-topInsert
+		align-items: flex-end
+
+	&.view-transition-bottomInsert
+		align-items: flex-start
+
+	&.view-transition-fade,
+	&.view-transition-leftInsert,
+	&.view-transition-rightInsert
+		align-items: flex-start
+		height: 0
+		transition-timing-function: step-end, var(--transition-timing-function), var(--transition-timing-function), var(--transition-timing-function)
+
+		&.is-expanded
+			height: var(--content-height, auto)
+			transition-timing-function: step-start, var(--transition-timing-function), var(--transition-timing-function), var(--transition-timing-function)
+
+	&.view-transition-leftInsert,
+	&.view-transition-rightInsert
+		#{$root}-content
+			transition-property: transform
+			transition-timing-function: var(--transition-timing-function)
+			transition-duration: var(--transition-duration)
+			transform: translateX(-100%)
+
+	&.view-transition-rightInsert
+		#{$root}-content
+			transform: translateX(100%)
+
+	&.view-transition-leftInsert,
+	&.view-transition-rightInsert
+		&.is-expanded #{$root}-content
+			transform: none

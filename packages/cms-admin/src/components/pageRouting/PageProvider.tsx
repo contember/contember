@@ -1,3 +1,3 @@
-export default interface PageProvider<P = {}> {
+export interface PageProvider<P = {}> {
 	getPageName(props: P): string
 }

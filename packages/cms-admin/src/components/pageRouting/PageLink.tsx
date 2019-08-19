@@ -10,7 +10,7 @@ export type PageConfig = {
 	params?: {}
 }
 
-type PageChange = () => PageConfig
+export type PageChange = () => PageConfig
 
 const PageLink = React.memo(({ project, change, stage, ...props }: Props) => {
 	const changed = change()

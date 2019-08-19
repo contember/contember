@@ -10,7 +10,7 @@ export interface PageProps<P extends Params = Params, N extends keyof P = keyof 
 /**
  * Page specifies one page. It must have a `name` prop and it's child must be a function which takes page's params and returns React node to render.
  */
-export default class Page<P extends Params, N extends keyof P = keyof P, K = P[N]> extends React.Component<{
+export class Page<P extends Params, N extends keyof P = keyof P, K = P[N]> extends React.Component<{
 	name: N
 	children: (params: K) => React.ReactNode
 }> {

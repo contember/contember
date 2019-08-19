@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
-import Page, { PageProps } from './Page'
-import PageProvider from './PageProvider'
+import { Page, PageProps } from './Page'
+import { PageProvider } from './PageProvider'
 
 type PageProviderElement = React.ReactElement<any> & { type: PageProvider }
 type PageElement = React.ReactElement<PageProps>
@@ -39,8 +39,6 @@ function isPageList(children: React.ReactNodeArray): children is PageChild[] {
 export type Parameters = any
 export const ParametersContext = React.createContext<Parameters>({})
 
-export const LayoutContext = React.createContext<React.ComponentType<{ children?: React.ReactNode }>>(React.Fragment)
-
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
@@ -67,8 +65,9 @@ class Pages extends React.PureComponent<PagesProps & PagesStateProps> {
 		const pageName = pageNames[matchedPageIndex]
 
 		const isProvider = isPageProvider(matchedPage)
+		const Layout = this.props.layout || React.Fragment
 		return (
-			<LayoutContext.Provider value={this.props.layout || React.Fragment}>
+			<Layout>
 				{isProvider && (
 					<ParametersContext.Provider value={this.props.parameters}>
 						<React.Fragment key={pageName}>{matchedPage}</React.Fragment>
@@ -77,7 +76,7 @@ class Pages extends React.PureComponent<PagesProps & PagesStateProps> {
 				{isProvider || (
 					<React.Fragment key={pageName}>{matchedPage.props.children(this.props.parameters)}</React.Fragment>
 				)}
-			</LayoutContext.Provider>
+			</Layout>
 		)
 	}
 }

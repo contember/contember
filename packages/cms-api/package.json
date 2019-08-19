@@ -78,6 +78,8 @@
 		"@types/sinon": "^7.0.8",
 		"@types/uuid": "^3.4.3",
 		"@types/ws": "^6.0.3",
+		"chai": "^4.1.2",
+		"mocha": "^6.0.2",
 		"dotenv": "^6.2.0",
 		"sinon": "^7.2.7",
 		"ts-node": "^8.0.2",

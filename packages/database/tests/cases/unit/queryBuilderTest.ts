@@ -1,6 +1,6 @@
 import 'jasmine'
 import { Client, ConditionBuilder, InsertBuilder, LimitByGroupWrapper, SelectBuilder } from '../../../src'
-import { createConnectionMock } from '@contember/database-tester/src'
+import { createConnectionMock } from '@contember/database-tester'
 import { SQL } from '../../src/tags'
 
 interface Test {

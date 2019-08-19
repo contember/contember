@@ -96,6 +96,11 @@ class ErrorsPreprocessor {
 
 						const numericAlias = parseInt(alias, 10)
 
+						if (isNaN(numericAlias)) {
+							// See this.getRootNode
+							throw new ErrorsPreprocessor.ErrorsPreprocessorError(`Not implemented! Encountered a non-numeric alias.`)
+						}
+
 						if (!(numericAlias in currentNode.children)) {
 							currentNode.children[numericAlias] = this.getRootNode(mutationError, i + 1)
 							if (i + 1 <= mutationError.path.length) {

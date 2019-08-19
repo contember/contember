@@ -4,7 +4,7 @@ import { EntityCollectionAccessor } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
 import { FeedbackRenderer } from './FeedbackRenderer'
-import { DefaultRenderer } from "./DefaultRenderer";
+import { DefaultRenderer } from './DefaultRenderer'
 
 export class NoUiRenderer extends React.PureComponent<RendererProps> {
 	public render() {

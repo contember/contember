@@ -111,9 +111,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 						</>
 					)}
 
-					<main className="layout-content">
-						{this.props.content}
-					</main>
+					<main className="layout-content">{this.props.content}</main>
 				</div>
 			</>
 		)

@@ -112,13 +112,14 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 					)}
 
 					<main className="layout-content">
-						<div className="layout-content-in">{this.props.content}</div>
+						{this.props.content}
 					</main>
 				</div>
 			</>
 		)
 	}
 }
+
 export default connect<LayoutStateProps, {}, LayoutOwnProps, State>(state => {
 	return {
 		identity: state.auth.identity ? state.auth.identity.email : undefined,

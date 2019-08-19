@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { LayoutInner } from '../LayoutInner'
 
 interface GenericPageProps {
 	pageName: string
@@ -10,6 +11,6 @@ export class GenericPage extends React.Component<GenericPageProps> {
 	}
 
 	render(): React.ReactNode {
-		return this.props.children
+		return <LayoutInner>{this.props.children}</LayoutInner>
 	}
 }

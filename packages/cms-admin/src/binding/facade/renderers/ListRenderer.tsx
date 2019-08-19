@@ -4,13 +4,14 @@ import { DataContext } from '../../coreComponents'
 import { CollectionRenderer } from './CollectionRenderer'
 import { RendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
+import { LayoutInner } from '../../../components'
 
 export class ListRenderer extends React.PureComponent<RendererProps> {
 	public render() {
 		return (
 			<CollectionRenderer data={this.props.data}>
 				{(rawData, entities) => (
-					<>
+					<LayoutInner>
 						{DefaultRenderer.renderTitle(this.props.title)}
 						{this.props.beforeContent}
 						<UL>
@@ -20,7 +21,7 @@ export class ListRenderer extends React.PureComponent<RendererProps> {
 								</li>
 							))}
 						</UL>
-					</>
+					</LayoutInner>
 				)}
 			</CollectionRenderer>
 		)

@@ -67,11 +67,20 @@
 		+relative
 		z-index: 0
 		flex-grow: 1
+		display: flex
+		justify-content: center
+		align-items: flex-start
+		padding: rem(25px) 0
 
 		&-in
-			padding: rem(25px)
+			padding: 0 rem(25px)
 			max-width: 50rem
-			margin: 0 auto
+			flex-grow: 1
+
+		&-side
+			max-width: 20rem
+			position: sticky
+			top: $layout-navbar-height + rem(25px)
 
 		&-title
 			margin: 0

@@ -8,6 +8,7 @@ import { CollectionRenderer } from './CollectionRenderer'
 import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
+import { LayoutInner } from '../../../components'
 
 export interface MultiEditRendererProps extends CommonRendererProps, EntityCollectionPublicProps {
 	enablePersist?: boolean
@@ -21,7 +22,7 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 		return (
 			<CollectionRenderer data={this.props.data}>
 				{rawData => (
-					<>
+					<LayoutInner>
 						{DefaultRenderer.renderTitle(this.props.title)}
 						{this.props.beforeContent}
 						{this.props.sortable === undefined && (
@@ -48,7 +49,7 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 							</Sortable>
 						)}
 						{this.props.enablePersist !== false && <PersistButton />}
-					</>
+					</LayoutInner>
 				)}
 			</CollectionRenderer>
 		)

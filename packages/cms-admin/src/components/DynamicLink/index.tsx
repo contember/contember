@@ -15,6 +15,7 @@ export interface DynamicLinkInnerProps {
 
 export interface DynamicLinkStateProps {
 	url: string
+	pathname: string
 }
 
 export interface DynamicLinkDispatchProps {
@@ -33,7 +34,7 @@ const DynamicLinkComponent = (props: DynamicLinkProps) => {
 	const Component = props.Component
 
 	return (
-		<Component onClick={props.goTo} isActive={props.url === location.pathname}>
+		<Component onClick={props.goTo} isActive={props.url === props.pathname}>
 			{props.children || null}
 		</Component>
 	)
@@ -43,6 +44,7 @@ DynamicLinkComponent.displayName = 'DynamicLink'
 export const DynamicLink = connect<DynamicLinkStateProps, DynamicLinkDispatchProps, DynamicLinkOwnProps, State>(
 	({ view, projectsConfigs, request }, { requestChange }) => ({
 		url: requestStateToPath(routes(projectsConfigs.configs), requestChange(request)),
+		pathname: location.pathname,
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(DynamicLinkComponent)

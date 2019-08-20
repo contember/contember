@@ -270,9 +270,8 @@ export class MutationGenerator {
 						const { accessor, reference } = accessorReference[0]
 
 						if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-							const innerBuilder = this.createCreateDataBuilderByReference(reference)
 							const createBuilder = createOneRelationBuilder.create(
-								this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
+								this.registerCreateReferenceMutationPart(accessor, reference),
 							)
 							if (createBuilder.data) {
 								builder = builder.one(placeholderName, createBuilder)
@@ -294,11 +293,7 @@ export class MutationGenerator {
 							const { alias, accessor, reference } = referencePair
 
 							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-								const innerBuilder = this.createCreateDataBuilderByReference(reference)
-								builder = builder.create(
-									this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
-									alias,
-								)
+								builder = builder.create(this.registerCreateReferenceMutationPart(accessor, reference), alias)
 							} else {
 								builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 							}
@@ -410,8 +405,7 @@ export class MutationGenerator {
 
 							if (accessor instanceof EntityAccessor) {
 								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-									const innerBuilder = this.createCreateDataBuilderByReference(reference)
-									return builder.create(this.registerCreateMutationPart(accessor, reference.fields, innerBuilder))
+									return builder.create(this.registerCreateReferenceMutationPart(accessor, reference))
 								} else {
 									const updated = builder.update(builder =>
 										this.registerUpdateMutationPart(accessor, reference.fields, persistedField, builder),
@@ -452,11 +446,7 @@ export class MutationGenerator {
 
 							if (accessor instanceof EntityAccessor) {
 								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-									const innerBuilder = this.createCreateDataBuilderByReference(reference)
-									builder = builder.create(
-										this.registerCreateMutationPart(accessor, reference.fields, innerBuilder),
-										alias,
-									)
+									builder = builder.create(this.registerCreateReferenceMutationPart(accessor, reference), alias)
 								} else {
 									builder = builder.update(
 										{ [PRIMARY_KEY_NAME]: accessor.primaryKey },
@@ -500,7 +490,8 @@ export class MutationGenerator {
 		return builder
 	}
 
-	private createCreateDataBuilderByReference(
+	private registerCreateReferenceMutationPart(
+		accessor: EntityAccessor,
 		reference: ReferenceMarker.Reference,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		const registerReductionFields = (
@@ -528,7 +519,19 @@ export class MutationGenerator {
 			return data
 		}
 
-		return new CrudQueryBuilder.WriteDataBuilder(reference.reducedBy && registerReductionFields(reference.reducedBy))
+		const dataBuilder = this.registerCreateMutationPart(
+			accessor,
+			reference.fields,
+			new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
+		)
+
+		if (!reference.reducedBy || isEmptyObject(dataBuilder.data)) {
+			return dataBuilder
+		}
+		return new CrudQueryBuilder.WriteDataBuilder({
+			...dataBuilder.data,
+			...registerReductionFields(reference.reducedBy),
+		})
 	}
 
 	private primaryKeyToAlias(primaryKey: string): string {

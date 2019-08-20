@@ -79,11 +79,11 @@
 				opacity: .5
 				transition: transform var(--cui-menu-caret-transition-duration)
 				transform-origin: 70% 70%
-				transform: rotate(45deg)
+				transform: rotate(#{45deg + 180deg})
 
 		&.is-collapsed &
 			&-title::after
-				transform: rotate(135deg)
+				transform: rotate(45deg)
 
 	&-action
 		font-size: $cui-menu-action-title-font-size

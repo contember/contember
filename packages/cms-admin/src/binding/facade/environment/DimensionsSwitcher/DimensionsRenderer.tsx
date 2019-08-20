@@ -1,7 +1,6 @@
-import { Button } from '@contember/ui'
+import { Button, ButtonProps, Spinner } from '@contember/ui'
 import * as React from 'react'
-import { Checkbox, Link } from '../../../../components'
-import { DynamicLink } from '../../../../components/DynamicLink'
+import { Checkbox, Link, useRedirect } from '../../../../components'
 import { Dropdown } from '../../../../components/ui'
 import { RequestChange } from '../../../../state/request'
 import { isSpecialLinkClick } from '../../../../utils/isSpecialLinkClick'
@@ -9,11 +8,10 @@ import { EnvironmentContext, ToOne } from '../../../coreComponents'
 import { AccessorTreeRoot, EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../../dao'
 import { RendererProps } from '../../renderers'
 import { renderByJoining } from './renderByJoining'
-import { DimensionDatum, SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
+import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 
 export interface DimensionsRendererProps {
-	buttonProps?: any // Pick<IButtonProps, Exclude<keyof IButtonProps, 'text'>>
-	defaultValue: DimensionDatum[]
+	buttonProps?: ButtonProps
 	dimension: string
 	labelFactory: React.ReactNode
 	maxItems: number
@@ -24,6 +22,7 @@ export interface DimensionsRendererProps {
 
 export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsRendererProps) => {
 	const environment = React.useContext(EnvironmentContext)
+	const redirect = useRedirect()
 
 	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
 		const renderer = props.renderSelected || renderByJoining
@@ -65,7 +64,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 				...reqState,
 				dimensions: {
 					...(reqState.dimensions || {}),
-					[props.dimension]: getUniqueDimensions(updatedDimensions.map(item => item.slug)),
+					[props.dimension]: getUniqueDimensions(updatedDimensions.map(item => item.slug).slice(0, props.maxItems)),
 				},
 			}
 		}
@@ -93,19 +92,14 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 							/>
 						)}
 						{!canSelectJustOne && (
-							<DynamicLink
-								requestChange={getRequestChangeCallback(dimension)}
-								Component={({ onClick }) => (
-									<Checkbox
-										key={dimension.slug}
-										checked={dimension.isSelected}
-										readOnly={dimension.isSelected && !canSelectLess}
-										onChange={() => onClick()}
-									>
-										{dimension.label}
-									</Checkbox>
-								)}
-							/>
+							<Checkbox
+								key={dimension.slug}
+								checked={dimension.isSelected}
+								readOnly={dimension.isSelected && !canSelectLess}
+								onChange={() => redirect(getRequestChangeCallback(dimension))}
+							>
+								{dimension.label}
+							</Checkbox>
 						)}
 					</Dropdown.Item>
 				))}
@@ -113,15 +107,19 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 		)
 	}
 
-	const getNormalizedData = (currentDimensions: string[], data?: AccessorTreeRoot): StatefulDimensionDatum[] => {
+	const getNormalizedData = (
+		currentDimensions: string[],
+		data?: AccessorTreeRoot,
+	): StatefulDimensionDatum[] | undefined => {
 		if (!data) {
-			return currentDimensions.map(dimension => {
+			return undefined
+			/*return currentDimensions.map(dimension => {
 				return {
 					slug: dimension,
 					label: dimension, // We don't have the data to match the defaults with so this is better than nothing
 					isSelected: true,
 				}
-			})
+			})*/
 		}
 		const entities = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
 		const normalized: StatefulDimensionDatum[] = []
@@ -155,9 +153,40 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 
 	const uniqueDimensions = getUniqueDimensions(environment.getDimension(props.dimension) || [])
 	const normalizedData = getNormalizedData(uniqueDimensions, props.data)
-	const selectedDimensions = uniqueDimensions
-		.map(dimension => normalizedData.find(item => item.slug === dimension))
-		.filter((item): item is StatefulDimensionDatum<true> => !!item && item.isSelected)
+
+	const selectedDimensions = normalizedData
+		? uniqueDimensions
+				.filter(slug => normalizedData.find(item => item.slug === slug) !== undefined)
+				.map(dimension => normalizedData.find(item => item.slug === dimension))
+				.filter((item): item is StatefulDimensionDatum<true> => !!item && item.isSelected)
+		: []
+
+	React.useEffect(() => {
+		const redirectTarget = selectedDimensions.length === 0 ? normalizedData || [] : selectedDimensions
+
+		if (normalizedData !== undefined) {
+			redirect(requestState => {
+				if (requestState.name !== 'project_page') {
+					return requestState
+				}
+				return {
+					...requestState,
+					dimensions: {
+						...(requestState.dimensions || {}),
+						[props.dimension]: getUniqueDimensions(redirectTarget.map(item => item.slug).slice(0, props.maxItems)),
+					},
+				}
+			})
+		}
+	}, [normalizedData, props.dimension, props.maxItems, redirect, selectedDimensions])
+
+	if (normalizedData === undefined) {
+		return <Spinner />
+	}
+
+	if (normalizedData.length === 0) {
+		return null // What do we even do here…?
+	}
 
 	if (normalizedData.length === 1) {
 		// If there is just one alternative to choose from, render no drop-downs
@@ -169,7 +198,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	}
 
 	return (
-		<Dropdown.Revealer opener={<Button>{renderSelected(selectedDimensions)}</Button>}>
+		<Dropdown.Revealer opener={<Button {...props.buttonProps}>{renderSelected(selectedDimensions)}</Button>}>
 			{renderContent(normalizedData, selectedDimensions)}
 		</Dropdown.Revealer>
 	)

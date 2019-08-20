@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useRedirect } from '../../../../components/pageRouting'
 import {
 	DataBindingError,
 	EntityListDataProvider,
@@ -11,7 +12,7 @@ import { QueryLanguage } from '../../../queryLanguage'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps
-	extends Omit<DimensionsRendererProps, 'labelFactory' | 'minItems' | 'maxItems'> {
+	extends Omit<DimensionsRendererProps, 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'> {
 	optionEntities: string
 	minItems?: number
 	maxItems?: number
@@ -35,12 +36,6 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 	if (minItems < 1) {
 		throw new DataBindingError(`DimensionSwitcher: 'minItems' for dimension ${props.dimension} must be at least 1.`)
 	}
-	if (props.defaultValue.length < minItems || props.defaultValue.length > maxItems) {
-		throw new DataBindingError(
-			`DimensionSwitcher: the number of default values for dimension ${props.dimension} must not be between` +
-				`'minItems' and 'maxItems'.`,
-		)
-	}
 
 	const environment = new Environment()
 	const metadata = QueryLanguage.wrapQualifiedEntityList(
@@ -60,7 +55,6 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 			renderer={DimensionsRenderer}
 			rendererProps={{
 				buttonProps: props.buttonProps,
-				defaultValue: props.defaultValue,
 				dimension: props.dimension,
 				labelFactory: metadata.children,
 				minItems: minItems,

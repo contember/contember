@@ -1,12 +1,11 @@
 import { H1 } from '@blueprintjs/core'
 import * as React from 'react'
-import { DataContext, Field } from '../../coreComponents'
+import { LayoutInner, LayoutSide } from '../../../components'
+import { DataContext } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, Environment } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
 import { FeedbackRenderer } from './FeedbackRenderer'
-import { LayoutInner, LayoutSide } from '../../../components'
-import { SortableProps } from '../collections'
 
 export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	public render() {
@@ -14,11 +13,10 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 			<FeedbackRenderer data={this.props.data}>
 				{data => {
 					if (data.root instanceof EntityCollectionAccessor && !this.props.onlyOneInCollection) {
-						const normalizedData = data.root.entities
 						return (
 							<>
 								<LayoutInner>
-									{normalizedData.map(
+									{data.root.entities.map(
 										value =>
 											value && (
 												<DataContext.Provider value={value} key={value.getKey()}>
@@ -27,6 +25,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 												</DataContext.Provider>
 											),
 									)}
+									<PersistButton />
 								</LayoutInner>
 								<LayoutSide>
 									<PersistButton />
@@ -44,6 +43,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 									<LayoutInner>
 										{DefaultRenderer.renderTitle(this.props.title)}
 										{this.props.children}
+										<PersistButton />
 									</LayoutInner>
 									<LayoutSide showBox={!!this.props.side}>
 										<>

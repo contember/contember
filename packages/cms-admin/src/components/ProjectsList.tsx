@@ -36,9 +36,17 @@ class ProjectsList extends React.Component<ProjectsListProps, {}> {
 					<H1>Projects</H1>
 					<div>
 						{this.props.configs.map((config, i) => (
-							<Link key={i} requestChange={selectProjectRequest(config)} className="projectsList-item">
-								{config.project}/{config.stage}
-							</Link>
+							<Link
+								key={i}
+								requestChange={selectProjectRequest(config)}
+								className="projectsList-item"
+								Component={props => (
+									// todo
+									<a {...props} onClick={undefined}>
+										{config.project}/{config.stage}
+									</a>
+								)}
+							/>
 						))}
 					</div>
 				</Card>

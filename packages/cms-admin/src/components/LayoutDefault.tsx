@@ -8,6 +8,7 @@ import { default as PageLink } from './pageRouting/PageLink'
 import { connect } from 'react-redux'
 import State from '../state'
 import { Button } from '@contember/ui'
+import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutOwnProps {
 	header: {
@@ -87,6 +88,13 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 							}
 						>
 							<Dropdown>
+								<SwitchProjectLink
+									Component={props => (
+										<Dropdown.Item>
+											<a {...props}>Switch project</a>
+										</Dropdown.Item>
+									)}
+								/>
 								<Dropdown.Item>
 									<LogoutLink
 										Component={props => (

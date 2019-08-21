@@ -9,8 +9,6 @@ type PageElement = React.ReactElement<PageProps>
 type PageChild = PageElement | PageProviderElement
 
 export interface PagesProps {
-	project: string
-	stage: string
 	children: PageChild[] | PageChild
 	layout?: React.ComponentType<{ children?: React.ReactNode }>
 }

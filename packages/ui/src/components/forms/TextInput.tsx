@@ -16,7 +16,7 @@ interface InputProps extends Pick<React.InputHTMLAttributes<HTMLInputElement>, P
 	allowNewlines?: false
 }
 
-export type TextInputProps = {
+export interface TextInputOwnProps {
 	value: string
 	onChange: (newValue: string) => void
 
@@ -25,7 +25,9 @@ export type TextInputProps = {
 	validationState?: ValidationState
 	withTopToolbar?: boolean
 	readOnly?: boolean
-} & (TextAreaProps | InputProps)
+}
+
+export type TextInputProps = TextInputOwnProps & (TextAreaProps | InputProps)
 
 export const TextInput = React.memo(
 	React.forwardRef(

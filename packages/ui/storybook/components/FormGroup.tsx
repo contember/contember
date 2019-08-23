@@ -1,11 +1,11 @@
-import { boolean, text } from '@storybook/addon-knobs'
+import { text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
-import { FormGroup, TextInput } from '../../src'
+import { FormGroup } from '../../src'
 import { sizeKnob } from '../utils/knobs'
+import { SimpleTextInputStory } from './TextInput'
 
 const FormGroupStory = () => {
-	const [value, setValue] = React.useState('')
 	const label = text('Label', 'Phone number')
 	const size = sizeKnob()
 	const labelDescription = text('Label description', 'We may need to contact you.')
@@ -26,13 +26,7 @@ const FormGroupStory = () => {
 			description={description}
 			size={size}
 		>
-			<TextInput
-				value={value}
-				onChange={newValue => setValue(newValue)}
-				allowNewlines={boolean('Allow newlines', false) as false}
-				size={size}
-				validationState={error ? 'invalid' : undefined}
-			/>
+			<SimpleTextInputStory size={size} validationState={error === '' ? undefined : 'invalid'} />
 		</FormGroup>
 	)
 }

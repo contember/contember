@@ -185,6 +185,10 @@ export function required(message: MessageOrString): PropertyDecorator {
 	return combine(requiredOrOptional(true), assert(rules.notEmpty(), message))
 }
 
+export function requiredWhen(condition: Validation.Validator, message: MessageOrString) {
+	return combine(requiredOrOptional(true), when(condition).assert(rules.notEmpty(), message))
+}
+
 export const assertPattern = (pattern: RegExp, message: MessageOrString) => fluent().assertPattern(pattern, message)
 export const assertMinLength = (min: number, message: MessageOrString) => fluent().assertMinLength(min, message)
 

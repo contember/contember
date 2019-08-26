@@ -1,1 +1,1 @@
-export const toViewClass = (name: string, viewEnabled?: boolean) => viewEnabled && `view-${name}`
+export const toViewClass = (name: string, viewEnabled: boolean | undefined) => viewEnabled && `view-${name}`

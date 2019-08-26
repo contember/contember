@@ -5,14 +5,14 @@ import TextareaAutosize from 'react-textarea-autosize'
 import { ControlDistinction, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toEnumViewClass, toViewClass } from '../../utils'
 
-type PropWhiteList = 'autoComplete' | 'disabled' | 'placeholder' | 'readOnly'
+type PropBlackList = 'onChange' | 'ref' | 'defaultValue' | 'size'
 
-interface TextAreaProps extends Pick<React.TextareaHTMLAttributes<HTMLTextAreaElement>, PropWhiteList> {
-	allowNewlines?: true
+export type UnderlyingTextAreaProps = Omit<JSX.IntrinsicElements['textarea'], PropBlackList> & {
+	allowNewlines: true
 	minRows?: number
 }
 
-interface InputProps extends Pick<React.InputHTMLAttributes<HTMLInputElement>, PropWhiteList | 'type'> {
+export type UnderlyingInputProps = Omit<JSX.IntrinsicElements['input'], PropBlackList> & {
 	allowNewlines?: false
 }
 
@@ -27,11 +27,17 @@ export interface TextInputOwnProps {
 	readOnly?: boolean
 }
 
-export type TextInputProps = TextInputOwnProps & (TextAreaProps | InputProps)
+export type TextInputProps = TextInputOwnProps & (UnderlyingTextAreaProps | UnderlyingInputProps)
+
+export type SingleLineTextInputProps = TextInputOwnProps & UnderlyingInputProps
+export type MultiLineTextInputProps = TextInputOwnProps & UnderlyingTextAreaProps
 
 export const TextInput = React.memo(
 	React.forwardRef(
-		({ size, distinction, validationState, onChange, withTopToolbar, ...otherProps }: TextInputProps, ref) => {
+		(
+			{ size, distinction, validationState, onChange, withTopToolbar, ...otherProps }: TextInputProps,
+			ref: React.Ref<any>,
+		) => {
 			const finalClassName = cn(
 				'input',
 				toEnumViewClass(size),

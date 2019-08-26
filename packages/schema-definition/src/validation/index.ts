@@ -61,7 +61,10 @@ class RuleBranch {
 			return this.branchRules
 		}
 		return this.branchRules.map(rule => ({
-			validator: rules.conditional(rule.validator, rules.and(...this.conditions)),
+			validator: rules.conditional(
+				this.conditions.length === 1 ? this.conditions[0] : rules.and(...this.conditions),
+				rule.validator,
+			),
 			message: rule.message,
 		}))
 	}

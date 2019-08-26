@@ -4,8 +4,7 @@
 	"private": true,
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
-	"scripts": {
-	},
+	"scripts": {},
 	"devDependencies": {
 		"typescript": "^3.5.2"
 	}

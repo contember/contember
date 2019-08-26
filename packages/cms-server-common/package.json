@@ -4,12 +4,11 @@
 	"private": true,
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
-	"scripts": {
-	},
+	"scripts": {},
 	"devDependencies": {
 		"@types/js-yaml": "^3.11.2",
 		"@types/node": "^10.12.10",
-		"typescript": "^3.5.2"
+		"typescript": "^3.5.3"
 	},
 	"dependencies": {
 		"js-yaml": "^3.12.0"

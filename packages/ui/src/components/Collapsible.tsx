@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
 import { CollapsibleTransition } from '../types'
-import { toStateClass, toViewClass } from '../utils'
+import { toEnumViewClass, toStateClass } from '../utils'
 
 export interface CollapsibleProps {
 	expanded: boolean
@@ -40,7 +40,7 @@ export const Collapsible = React.memo(({ transition = 'topInsert', ...otherProps
 		<div
 			className={cn(
 				'collapsible',
-				toViewClass(`transition-${transition}`),
+				toEnumViewClass(`transition-${transition}`),
 				toStateClass('expanded', delayedExpanded),
 				toStateClass('transitioning', isTransitioning),
 			)}

@@ -3,6 +3,8 @@
 .#{$cui-conf-globalPrefix}formGroup
 	@extend %formGroup
 
+	$label-lineHeight: 1.2
+
 	display: flex
 	flex-direction: column
 	width: 100%
@@ -12,24 +14,32 @@
 		flex-direction: column
 		cursor: text
 
+		&-wrap
+			display: flex
+			flex-direction: column
+
 		&-text
 			color: $cui-formGroup-label-color
 			font-weight: $fw-medium
 			text-transform: uppercase
-			line-height: 1.2
+			line-height: $label-lineHeight
 
 	&-labelDescription
 		font-weight: $fw-normal
-		line-height: 1.2
+		line-height: $label-lineHeight
 		color: $cui-formGroup-labelDescription-color
 		display: inline-block
 		margin: em(4px) 0 em(2px)
 
 	&-field
 		margin-top: em(8px)
-	&-description
-		font-weight: $fw-light
-		color: $cui-formGroup-description-color
+		display: block
+		&-in
+			display: block
+		&-description
+			font-weight: $fw-light
+			color: $cui-formGroup-description-color
+			display: block
 
 	@each $name, $fontSize in $cui-formGroup-sizes
 		$view: toView($name)
@@ -39,10 +49,52 @@
 				&-text
 					font-size: $fontSize
 			&-labelDescription
-				font-size: $fontSize * .9
-			&-description
-				font-size: $fontSize * .85
+				font-size: .9em
+			&-field
+				&-description
+					font-size: $fontSize * .85
+
+		@if map_has_key($cui-control-sizes, $name)
+			$controlSettings: map_get($cui-control-sizes, $name)
+			$controlHeight: map_get($controlSettings, height)
+			&#{$view}.view-labelLeft &,
+			&#{$view}.view-labelInlineLeft &
+				&-label
+					&-wrap
+						$edgeOffset: ($controlHeight - $fontSize * $label-lineHeight) / 2
+						padding-top: $edgeOffset
 
 
-	&.view-labelLeft
-		//
+
+	&.view-labelLeft &,
+	&.view-labelInlineLeft &
+		&-label
+			display: grid
+			grid-template-rows: auto
+			&-wrap
+				padding-right: .5em
+		&-field
+			margin-top: 0
+			grid-area: 1 / 2
+	&.view-labelLeft &
+		&-label
+			grid-template-columns: 1fr 3fr
+	&.view-labelInlineLeft &
+		&-label
+			grid-template-columns: minmax(auto, 2fr) 5fr
+
+	@supports (display: contents)
+		&.view-labelLeft,
+		&.view-labelInlineLeft
+			display: grid
+			grid-template-rows: auto auto
+		&.view-labelLeft
+			grid-template-columns: 1fr 3fr
+		&.view-labelInlineLeft
+			grid-template-columns: minmax(auto, 2fr) 5fr
+		&.view-labelLeft &,
+		&.view-labelInlineLeft &
+			&-label
+				display: contents
+			&-errors
+				grid-area: 2 / 2

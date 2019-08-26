@@ -1,3 +1,3 @@
 import { Default } from './Default'
 
-export type FormGroupLabelPosition = Default | 'labelLeft'
+export type FormGroupLabelPosition = Default | 'labelLeft' | 'labelInlineLeft'

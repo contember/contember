@@ -19,12 +19,22 @@ export const FormGroup = React.memo(
 		return (
 			<div className={cn('formGroup', toEnumViewClass(size), toEnumViewClass(labelPosition))}>
 				<label className="formGroup-label">
-					{label && <span className="formGroup-label-text">{label}</span>}
-					{labelDescription && <span className="formGroup-labelDescription">{labelDescription}</span>}
-					<span className="formGroup-field">{children}</span>
-					{description && <span className="formGroup-description">{description}</span>}
+					{(label || labelDescription) && (
+						<span className="formGroup-label-wrap">
+							{label && <span className="formGroup-label-text">{label}</span>}
+							{labelDescription && <span className="formGroup-labelDescription">{labelDescription}</span>}
+						</span>
+					)}
+					<span className="formGroup-field">
+						<span className="formGroup-field-in">{children}</span>
+						{description && <span className="formGroup-field-description">{description}</span>}
+					</span>
 				</label>
-				<ErrorList errors={errors} size={size} />
+				{errors && errors.length && (
+					<div className="formGroup-errors">
+						<ErrorList errors={errors} size={size} />
+					</div>
+				)}
 			</div>
 		)
 	},

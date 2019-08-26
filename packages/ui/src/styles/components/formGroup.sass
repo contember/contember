@@ -32,9 +32,8 @@
 		margin: em(4px) 0 em(2px)
 
 	&-field
-		margin-top: em(8px)
-		display: block
-		&-in
+		&-wrap
+			margin-top: em(8px)
 			display: block
 		&-description
 			font-weight: $fw-light
@@ -49,7 +48,7 @@
 				&-text
 					font-size: $fontSize
 			&-labelDescription
-				font-size: .9em
+				font-size: $fontSize * .9
 			&-field
 				&-description
 					font-size: $fontSize * .85
@@ -65,36 +64,40 @@
 						padding-top: $edgeOffset
 
 
-
 	&.view-labelLeft &,
 	&.view-labelInlineLeft &
 		&-label
 			display: grid
-			grid-template-rows: auto
+			grid-template-rows: auto auto 1fr
 			&-wrap
 				padding-right: .5em
+				grid-row: 1 / 4
+				grid-column: 1
 		&-field
-			margin-top: 0
-			grid-area: 1 / 2
+			&-wrap
+				margin-top: 0
+				grid-area: 1 / 2
+			&-description
+				grid-area: 2 / 2
 	&.view-labelLeft &
 		&-label
-			grid-template-columns: 1fr 3fr
+			grid-template-columns: 2fr 5fr
 	&.view-labelInlineLeft &
 		&-label
-			grid-template-columns: minmax(auto, 2fr) 5fr
+			grid-template-columns: fit-content(28.57%) 1fr
 
 	@supports (display: contents)
 		&.view-labelLeft,
 		&.view-labelInlineLeft
 			display: grid
-			grid-template-rows: auto auto
+			grid-template-rows: auto auto 1fr
 		&.view-labelLeft
-			grid-template-columns: 1fr 3fr
+			grid-template-columns: 2fr 5fr
 		&.view-labelInlineLeft
-			grid-template-columns: minmax(auto, 2fr) 5fr
+			grid-template-columns: fit-content(28.57%) 1fr
 		&.view-labelLeft &,
 		&.view-labelInlineLeft &
 			&-label
 				display: contents
 			&-errors
-				grid-area: 2 / 2
+				grid-area: 3 / 2

@@ -25,10 +25,8 @@ export const FormGroup = React.memo(
 							{labelDescription && <span className="formGroup-labelDescription">{labelDescription}</span>}
 						</span>
 					)}
-					<span className="formGroup-field">
-						<span className="formGroup-field-in">{children}</span>
-						{description && <span className="formGroup-field-description">{description}</span>}
-					</span>
+					<span className="formGroup-field-wrap">{children}</span>
+					{description && <span className="formGroup-field-description">{description}</span>}
 				</label>
 				{errors && errors.length && (
 					<div className="formGroup-errors">

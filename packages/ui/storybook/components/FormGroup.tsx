@@ -1,4 +1,4 @@
-import { text } from '@storybook/addon-knobs'
+import { radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { FormGroup } from '../../src'
@@ -23,6 +23,15 @@ const FormGroupStory = () => {
 				},
 			]}
 			labelDescription={labelDescription}
+			labelPosition={radios(
+				'Label position',
+				{
+					Default: 'default',
+					Left: 'labelLeft',
+					InlineLeft: 'labelInlineLeft',
+				},
+				'default',
+			)}
 			description={description}
 			size={size}
 		>

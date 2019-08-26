@@ -73,43 +73,46 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 		slugField.updateValue(slugValue)
 	}, [slugField, slugValue])
 
-	if (!isEditing) {
-		return (
-			<div
-				className="slugField"
-				onClick={() => {
-					setIsEditing(true)
-				}}
-			>
-				<div className="slugField-value">{slugValue}</div>
-				<Button size="small" distinction="seamless" className="slugField-button">
-					Edit
-				</Button>
-			</div>
-		)
-	}
-
 	return (
-		<FormGroup
-			label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
-			errors={slugField.errors}
-			labelDescription={props.labelDescription}
-			labelPosition={props.labelPosition || 'labelInlineLeft'}
-			description={props.description}
-			size="small"
-		>
-			<TextInput
-				value={slugValue}
-				onChange={newValue => {
-					hasEditedSlug || setHasEditedSlug(true)
-					slugField.updateValue && slugField.updateValue(newValue)
-				}}
-				readOnly={isMutating}
-				validationState={slugField.errors.length ? 'invalid' : undefined}
-				size="small"
-				ref={inputRef}
-				{...props}
-			/>
-		</FormGroup>
+		<div className="slugField">
+			{!isEditing && (
+				<div
+					className="slugField-in"
+					onClick={() => {
+						setIsEditing(true)
+					}}
+					key="slugField-in"
+				>
+					<div className="slugField-value">{slugValue}</div>
+					<Button size="small" distinction="seamless" className="slugField-button">
+						Edit
+					</Button>
+				</div>
+			)}
+			{isEditing && (
+				<FormGroup
+					label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
+					errors={slugField.errors}
+					labelDescription={props.labelDescription}
+					labelPosition={props.labelPosition || 'labelInlineLeft'}
+					description={props.description}
+					size="small"
+					key="slugField-formGroup"
+				>
+					<TextInput
+						value={slugValue}
+						onChange={newValue => {
+							hasEditedSlug || setHasEditedSlug(true)
+							slugField.updateValue && slugField.updateValue(newValue)
+						}}
+						readOnly={isMutating}
+						validationState={slugField.errors.length ? 'invalid' : undefined}
+						size="small"
+						ref={inputRef}
+						{...props}
+					/>
+				</FormGroup>
+			)}
+		</div>
 	)
 }

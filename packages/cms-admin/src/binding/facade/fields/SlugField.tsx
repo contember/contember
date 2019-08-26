@@ -94,7 +94,7 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 			label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
 			errors={slugField.errors}
 			labelDescription={props.labelDescription}
-			labelPosition={props.labelPosition}
+			labelPosition={props.labelPosition || 'labelInlineLeft'}
 			description={props.description}
 			size="small"
 		>

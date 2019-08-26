@@ -33,12 +33,13 @@
 
 	&-field
 		&-wrap
-			margin-top: em(8px)
 			display: block
 		&-description
 			font-weight: $fw-light
 			color: $cui-formGroup-description-color
 			display: block
+	&-label-wrap ~ &-field-wrap
+		margin-top: em(8px)
 
 	@each $name, $fontSize in $cui-formGroup-sizes
 		$view: toView($name)

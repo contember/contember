@@ -7,7 +7,7 @@ import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { connect } from 'react-redux'
 import State from '../state'
-import { Button } from '@contember/ui'
+import { Button, Dropdown2 } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutOwnProps {
@@ -27,11 +27,13 @@ export interface LayoutStateProps {
 
 interface LayoutDefaultState {
 	menuOpen: boolean
+	isAvatarDropdownOpen: boolean
 }
 
 class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProps, LayoutDefaultState> {
 	state: LayoutDefaultState = {
 		menuOpen: false,
+		isAvatarDropdownOpen: false,
 	}
 
 	private sideRef = React.createRef<HTMLElement>()
@@ -81,32 +83,31 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 					<div className="navbar-center">{this.props.header.center}</div>
 					<div className="navbar-right">
 						{this.props.header.right}
-						<Dropdown.Revealer
-							opener={
-								<Button distinction="seamless" flow="circular" size="large">
+						<Dropdown2
+							isOpen={this.state.isAvatarDropdownOpen}
+							alignment="end"
+							handle={
+								<Button size="large" distinction="seamless" flow="circular" onClick={this.toggleAvatarDropdownOpen}>
 									<Avatar size={AvatarSize.Size2} email={this.props.identity} />
 								</Button>
 							}
+							onRequestClose={this.closeAvatarDropdown}
 						>
-							<Dropdown>
-								<SwitchProjectLink
-									Component={({ isActive, ...props }) => (
-										<Dropdown.Item>
-											<a {...props}>Switch project</a>
-										</Dropdown.Item>
-									)}
-								/>
-								<Dropdown.Item>
-									<LogoutLink
-										Component={props => (
-											<button type="button" {...props}>
-												Sign Out
-											</button>
-										)}
-									/>
-								</Dropdown.Item>
-							</Dropdown>
-						</Dropdown.Revealer>
+							<SwitchProjectLink
+								Component={({ onClick }) => (
+									<Button distinction="seamless" flow="block" onClick={onClick}>
+										Switch project
+									</Button>
+								)}
+							/>
+							<LogoutLink
+								Component={props => (
+									<Button distinction="seamless" flow="block" {...props}>
+										Sign Out
+									</Button>
+								)}
+							/>
+						</Dropdown2>
 					</div>
 				</header>
 
@@ -124,6 +125,18 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 				</div>
 			</>
 		)
+	}
+
+	toggleAvatarDropdownOpen = () => {
+		this.setState({
+			isAvatarDropdownOpen: !this.state.isAvatarDropdownOpen,
+		})
+	}
+
+	closeAvatarDropdown = () => {
+		this.setState({
+			isAvatarDropdownOpen: false,
+		})
 	}
 }
 

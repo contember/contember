@@ -342,3 +342,9 @@ $cui-containerSpinner-sizes: map_merge((
 	'small': $cui-containerSpinner-small-size,
 	'large': $cui-containerSpinner-large-size,
 ), $cui-containerSpinner-sizes);
+
+
+// Dropdown2
+$cui-dropdown2-content-color: $cui-color-black !default;
+$cui-dropdown2-content-background: $cui-color-white !default;
+$cui-dropdown2-content-border-color: $cui-color-gray-3 !default !default;

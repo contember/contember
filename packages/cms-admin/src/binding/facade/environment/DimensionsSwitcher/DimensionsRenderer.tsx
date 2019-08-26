@@ -1,7 +1,6 @@
-import { Button, ButtonProps, Spinner } from '@contember/ui'
+import { Button, ButtonProps, Spinner, Dropdown2 } from '@contember/ui'
 import * as React from 'react'
 import { Checkbox, Link, useRedirect } from '../../../../components'
-import { Dropdown } from '../../../../components/ui'
 import { RequestChange } from '../../../../state/request'
 import { isSpecialLinkClick } from '../../../../utils/isSpecialLinkClick'
 import { EnvironmentContext, ToOne } from '../../../coreComponents'
@@ -9,6 +8,7 @@ import { AccessorTreeRoot, EntityAccessor, EntityCollectionAccessor, FieldAccess
 import { RendererProps } from '../../renderers'
 import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
+import { useState } from 'react'
 
 export interface DimensionsRendererProps {
 	buttonProps?: ButtonProps
@@ -23,6 +23,7 @@ export interface DimensionsRendererProps {
 export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsRendererProps) => {
 	const environment = React.useContext(EnvironmentContext)
 	const redirect = useRedirect()
+	const [isOpen, setIsOpen] = useState(false)
 
 	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
 		const renderer = props.renderSelected || renderByJoining
@@ -70,9 +71,9 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 		}
 
 		return (
-			<Dropdown>
+			<>
 				{dimensionData.map(dimension => (
-					<Dropdown.Item key={dimension.slug} active={dimension.isSelected}>
+					<div key={dimension.slug} /*active={dimension.isSelected}*/>
 						{canSelectJustOne && (
 							<Link
 								requestChange={getRequestChangeCallback(dimension)}
@@ -101,9 +102,9 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 								{dimension.label}
 							</Checkbox>
 						)}
-					</Dropdown.Item>
+					</div>
 				))}
-			</Dropdown>
+			</>
 		)
 	}
 
@@ -198,8 +199,16 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	}
 
 	return (
-		<Dropdown.Revealer opener={<Button {...props.buttonProps}>{renderSelected(selectedDimensions)}</Button>}>
+		<Dropdown2
+			handle={
+				<Button {...props.buttonProps} onClick={() => setIsOpen(!isOpen)}>
+					{renderSelected(selectedDimensions)}
+				</Button>
+			}
+			isOpen={isOpen}
+			onRequestClose={() => setIsOpen(false)}
+		>
 			{renderContent(normalizedData, selectedDimensions)}
-		</Dropdown.Revealer>
+		</Dropdown2>
 	)
 })

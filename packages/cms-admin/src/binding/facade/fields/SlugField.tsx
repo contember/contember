@@ -1,4 +1,4 @@
-import { Button, FormGroup, TextInput } from '@contember/ui'
+import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import * as React from 'react'
 import { RelativeSingleField } from '../../bindingTypes'
@@ -7,14 +7,15 @@ import { useMutationState } from '../../coreComponents/PersistState'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { ConcealableField } from '../ui'
+import { ConcealableField, ConcealableFieldProps } from '../ui'
 import { useRelativeSingleField } from '../utils'
 
-export type SlugFieldProps = SimpleRelativeSingleFieldProps & {
-	drivenBy: RelativeSingleField
-	format?: (currentValue: string, environment: Environment) => string
-	concealTimeout?: number
-}
+export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
+	SimpleRelativeSingleFieldProps & {
+		drivenBy: RelativeSingleField
+		format?: (currentValue: string, environment: Environment) => string
+		concealTimeout?: number
+	}
 
 export const SlugField = Component<SlugFieldProps>(
 	props => <SlugFieldInner {...props} />,
@@ -42,7 +43,13 @@ export const SlugField = Component<SlugFieldProps>(
 
 interface SlugFieldInnerProps extends SlugFieldProps {}
 
-const SlugFieldInner: React.FunctionComponent<SlugFieldInnerProps> = ({ format, drivenBy, concealTimeout = 2000, ...props }) => {
+const SlugFieldInner: React.FunctionComponent<SlugFieldInnerProps> = ({
+	buttonProps,
+	concealTimeout,
+	format,
+	drivenBy,
+	...props
+}) => {
 	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
 	const hostEntity = useEntityContext() // TODO this will fail for some QL uses
 	const slugField = useRelativeSingleField<string>(props.name)
@@ -68,7 +75,7 @@ const SlugFieldInner: React.FunctionComponent<SlugFieldInnerProps> = ({ format, 
 	}, [slugField, slugValue])
 
 	return (
-		<ConcealableField renderConcealedValue={() => slugValue}>
+		<ConcealableField renderConcealedValue={() => slugValue} buttonProps={buttonProps} concealTimeout={concealTimeout}>
 			{({ inputRef, onFocus, onBlur }) => (
 				<FormGroup
 					label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}

@@ -60,10 +60,11 @@
 			&#{$view}.view-labelInlineLeft &
 				&-label
 					&-wrap
-						$edgeOffset: ($controlHeight - $fontSize * $label-lineHeight) / 2
-						padding-top: $edgeOffset
+						// TODO somehow disable this for controls with unknown height
+						padding-top: ($controlHeight - $fontSize * $label-lineHeight) / 2
 
 
+	$inlineLabel-maxWidth: (2 / 7) * 100%
 	&.view-labelLeft &,
 	&.view-labelInlineLeft &
 		&-label
@@ -84,7 +85,7 @@
 			grid-template-columns: 2fr 5fr
 	&.view-labelInlineLeft &
 		&-label
-			grid-template-columns: fit-content(28.57%) 1fr
+			grid-template-columns: fit-content($inlineLabel-maxWidth) 1fr
 
 	@supports (display: contents)
 		&.view-labelLeft,
@@ -94,7 +95,7 @@
 		&.view-labelLeft
 			grid-template-columns: 2fr 5fr
 		&.view-labelInlineLeft
-			grid-template-columns: fit-content(28.57%) 1fr
+			grid-template-columns: fit-content($inlineLabel-maxWidth) 1fr
 		&.view-labelLeft &,
 		&.view-labelInlineLeft &
 			&-label

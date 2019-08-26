@@ -7,6 +7,7 @@ import { useMutationState } from '../../coreComponents/PersistState'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { ConcealableField } from '../ui'
 import { useRelativeSingleField } from '../utils'
 
 export type SlugFieldProps = SimpleRelativeSingleFieldProps & {
@@ -36,35 +37,18 @@ export const SlugField = Component<SlugFieldProps>(
 			{props.label}
 		</>
 	),
-	'Slug',
+	'SlugField',
 )
 
 interface SlugFieldInnerProps extends SlugFieldProps {}
 
-const SlugFieldInner = ({ format, drivenBy, concealTimeout = 2000, ...props }: SlugFieldInnerProps) => {
+const SlugFieldInner: React.FunctionComponent<SlugFieldInnerProps> = ({ format, drivenBy, concealTimeout = 2000, ...props }) => {
 	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
 	const hostEntity = useEntityContext() // TODO this will fail for some QL uses
 	const slugField = useRelativeSingleField<string>(props.name)
 	const driverField = useRelativeSingleField<string>(drivenBy)
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
-	const [isEditing, setIsEditing] = React.useState(false)
-	const inputRef = React.useRef<HTMLInputElement>()
-	const [concealTimeoutId, setConcealTimeoutId] = React.useState<number | undefined>(undefined)
-	const onFocus = React.useCallback(() => {
-		if (concealTimeoutId !== undefined) {
-			clearTimeout(concealTimeoutId)
-		}
-	}, [concealTimeoutId])
-	const onBlur = React.useCallback(() => {
-		setConcealTimeoutId(setTimeout(() => setIsEditing(false), concealTimeout))
-	}, [concealTimeout])
-
-	React.useLayoutEffect(() => {
-		if (isEditing && inputRef.current) {
-			inputRef.current.focus()
-		}
-	}, [isEditing])
 
 	let slugValue = slugField.currentValue || ''
 
@@ -84,22 +68,8 @@ const SlugFieldInner = ({ format, drivenBy, concealTimeout = 2000, ...props }: S
 	}, [slugField, slugValue])
 
 	return (
-		<div className="slugField">
-			{!isEditing && (
-				<div
-					className="slugField-in"
-					onClick={() => {
-						setIsEditing(true)
-					}}
-					key="slugField-in"
-				>
-					<div className="slugField-value">{slugValue}</div>
-					<Button size="small" distinction="seamless" className="slugField-button">
-						Edit
-					</Button>
-				</div>
-			)}
-			{isEditing && (
+		<ConcealableField renderConcealedValue={() => slugValue}>
+			{({ inputRef, onFocus, onBlur }) => (
 				<FormGroup
 					label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
 					errors={slugField.errors}
@@ -107,7 +77,7 @@ const SlugFieldInner = ({ format, drivenBy, concealTimeout = 2000, ...props }: S
 					labelPosition={props.labelPosition || 'labelInlineLeft'}
 					description={props.description}
 					size="small"
-					key="slugField-formGroup"
+					key="concealableField-formGroup"
 				>
 					<TextInput
 						value={slugValue}
@@ -125,6 +95,7 @@ const SlugFieldInner = ({ format, drivenBy, concealTimeout = 2000, ...props }: S
 					/>
 				</FormGroup>
 			)}
-		</div>
+		</ConcealableField>
 	)
 }
+SlugFieldInner.displayName = 'SlugFieldInner'

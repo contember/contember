@@ -1,4 +1,4 @@
-import { TextInputProps } from '@contember/ui'
+import { TextInputOwnProps } from '@contember/ui'
 import * as React from 'react'
 import RichEditor, { LineBreakBehavior, RichEditorProps } from '../../../components/RichEditor'
 import { Field } from '../../coreComponents'
@@ -9,7 +9,7 @@ import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
 export { LineBreakBehavior, Block, Mark } from '../../../components/RichEditor'
 
 export type RichTextFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<TextInputProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'> & {
+	Omit<TextInputOwnProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'> & {
 		lineBreakBehavior?: LineBreakBehavior
 		blocks?: RichEditorProps['blocks']
 	}

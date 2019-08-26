@@ -6,17 +6,19 @@ import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../au
 export type TextFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<TextInputProps, 'value' | 'onChange' | 'validationState'>
 
-export const TextField = SimpleRelativeSingleField<TextFieldProps, string>((fieldMetadata, props) => {
-	const generateOnChange = (data: FieldAccessor<string>) => (newValue: string) => {
-		data.updateValue && data.updateValue(newValue)
-	}
-	return (
-		<TextInput
-			value={fieldMetadata.data.currentValue || ''}
-			onChange={generateOnChange(fieldMetadata.data)}
-			validationState={fieldMetadata.errors.length ? 'invalid' : undefined}
-			allowNewlines={props.allowNewlines as any}
-			{...props}
-		/>
-	)
-}, 'TextField')
+export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
+	(fieldMetadata, { defaultValue, ...props }) => {
+		const generateOnChange = (data: FieldAccessor<string>) => (newValue: string) => {
+			data.updateValue && data.updateValue(newValue)
+		}
+		return (
+			<TextInput
+				value={fieldMetadata.data.currentValue || ''}
+				onChange={generateOnChange(fieldMetadata.data)}
+				validationState={fieldMetadata.errors.length ? 'invalid' : undefined}
+				{...(props as any)}
+			/>
+		)
+	},
+	'TextField',
+)

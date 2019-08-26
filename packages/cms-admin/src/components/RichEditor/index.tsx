@@ -1,6 +1,6 @@
 import { IconName } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
-import { ButtonGroup, TextInputProps, toEnumStateClass, toEnumViewClass, toViewClass } from '@contember/ui'
+import { ButtonGroup, TextInputOwnProps, toEnumStateClass, toEnumViewClass, toViewClass } from '@contember/ui'
 import cn from 'classnames'
 import { assertNever } from 'cms-common'
 import { isKeyHotkey } from 'is-hotkey'
@@ -36,7 +36,7 @@ export enum LineBreakBehavior {
 }
 
 export type RichEditorProps = SimpleRelativeSingleFieldProps &
-	TextInputProps & {
+	TextInputOwnProps & {
 		value: string
 		onChange: (value: string) => void
 		serializer: RichEditorSerializer

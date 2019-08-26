@@ -12,6 +12,7 @@ import { useRelativeSingleField } from '../utils'
 export type SlugFieldProps = SimpleRelativeSingleFieldProps & {
 	drivenBy: RelativeSingleField
 	format?: (currentValue: string, environment: Environment) => string
+	concealTimeout?: number
 }
 
 export const SlugField = Component<SlugFieldProps>(
@@ -40,7 +41,7 @@ export const SlugField = Component<SlugFieldProps>(
 
 interface SlugFieldInnerProps extends SlugFieldProps {}
 
-const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => {
+const SlugFieldInner = ({ format, drivenBy, concealTimeout = 2000, ...props }: SlugFieldInnerProps) => {
 	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
 	const hostEntity = useEntityContext() // TODO this will fail for some QL uses
 	const slugField = useRelativeSingleField<string>(props.name)
@@ -49,6 +50,15 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 	const isMutating = useMutationState()
 	const [isEditing, setIsEditing] = React.useState(false)
 	const inputRef = React.useRef<HTMLInputElement>()
+	const [concealTimeoutId, setConcealTimeoutId] = React.useState<number | undefined>(undefined)
+	const onFocus = React.useCallback(() => {
+		if (concealTimeoutId !== undefined) {
+			clearTimeout(concealTimeoutId)
+		}
+	}, [concealTimeoutId])
+	const onBlur = React.useCallback(() => {
+		setConcealTimeoutId(setTimeout(() => setIsEditing(false), concealTimeout))
+	}, [concealTimeout])
 
 	React.useLayoutEffect(() => {
 		if (isEditing && inputRef.current) {
@@ -109,6 +119,8 @@ const SlugFieldInner = ({ format, drivenBy, ...props }: SlugFieldInnerProps) => 
 						validationState={slugField.errors.length ? 'invalid' : undefined}
 						size="small"
 						ref={inputRef}
+						onFocus={onFocus}
+						onBlur={onBlur}
 						{...props}
 					/>
 				</FormGroup>

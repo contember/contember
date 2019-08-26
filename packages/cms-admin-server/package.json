@@ -4,8 +4,7 @@
 	"private": true,
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
-	"scripts": {
-	},
+	"scripts": {},
 	"bin": {
 		"run-admin": "dist/src/run-admin.js"
 	},
@@ -17,6 +16,6 @@
 	"devDependencies": {
 		"@types/koa": "^2.0.47",
 		"@types/koa-static": "^4.0.0",
-		"typescript": "^3.5.2"
+		"typescript": "^3.5.3"
 	}
 }

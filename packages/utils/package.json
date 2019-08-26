@@ -5,8 +5,7 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
-	"dependencies": {
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"typescript": "^3.5.2"
 	}

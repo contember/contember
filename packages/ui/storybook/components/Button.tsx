@@ -26,6 +26,7 @@ export const simpleButtonStory = (size?: Size) => {
 			{
 				Default: 'default',
 				Squarish: 'squarish',
+				Circular: 'circular',
 				Generous: 'generous',
 				Block: 'block',
 			},

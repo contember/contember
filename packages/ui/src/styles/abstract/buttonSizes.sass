@@ -17,9 +17,9 @@
 			font-size: $fontSize
 
 
-			&.view-squarish
+			&.view-squarish,
+			&.view-circular
 				+size($normalizedHeight)
-				overflow: hidden
 			&.view-generous
 				padding-left: 1.5 * $normalizedHeight
 				padding-right: 1.5 * $normalizedHeight
@@ -28,3 +28,9 @@
 	&.view-block
 		display: flex
 		width: 100%
+	&.view-circular
+		border-radius: 50%
+	&.view-squarish,
+	&.view-circular
+		overflow: hidden
+		padding: 0

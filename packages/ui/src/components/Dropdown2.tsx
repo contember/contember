@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Manager, Reference, Popper } from 'react-popper'
 import { Collapsible } from './Collapsible'
+import { useEffect } from 'react'
 
 export type DropdownAlignment = 'start' | 'end' | 'auto'
 
@@ -9,7 +10,7 @@ export interface Dropdown2Props {
 	handle: React.ReactNode
 	alignment?: DropdownAlignment
 	children?: React.ReactNode
-	onRequestClose?: () => void // @TODO
+	onCloseRequest?: () => void
 }
 
 const alignmentToPlacement = (alignment: DropdownAlignment) => {
@@ -22,7 +23,26 @@ const alignmentToPlacement = (alignment: DropdownAlignment) => {
 	}
 }
 
-export const Dropdown2 = React.memo(({ alignment = 'start', ...props }: Dropdown2Props) => {
+const useRequestCloseOnEscape = (isOpen: boolean, callback: () => void) => {
+	useEffect(() => {
+		if (isOpen) {
+			const requestCloseOnEscapeKey = (event: KeyboardEvent) => {
+				if (event.key === 'Escape') {
+					callback()
+				}
+			}
+
+			window.addEventListener('keydown', requestCloseOnEscapeKey)
+			return () => {
+				window.removeEventListener('keydown', requestCloseOnEscapeKey)
+			}
+		}
+	}, [callback, isOpen])
+}
+
+export const Dropdown2 = React.memo(({ alignment = 'start', onCloseRequest = () => {}, ...props }: Dropdown2Props) => {
+	useRequestCloseOnEscape(props.isOpen, onCloseRequest)
+
 	return (
 		<Manager>
 			<div className="dropdown2">

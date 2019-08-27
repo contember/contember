@@ -124,7 +124,6 @@ describe('single relative fields QueryLanguage parser', () => {
 		const environment = new Environment()
 		const result = QueryLanguage.wrapRelativeSingleField(
 			'this(better=work).as.expected(and = 1).correctly',
-			name => <Field name={name} />,
 			environment,
 		)
 		const expected = (

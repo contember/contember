@@ -1,4 +1,4 @@
-import { FormGroup } from '@contember/ui'
+import { Button, FormGroup } from '@contember/ui'
 import { assertNever } from 'cms-common'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
@@ -56,24 +56,32 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 		return (
 			<Field<string> name={this.props.name}>
 				{(metadata): React.ReactNode => (
-					<Dropzone
-						disabled={metadata.isMutating}
-						onDrop={this.handleStartUpload}
-						accept={this.props.accept}
-						multiple={false}
-						style={{}}
+					<FormGroup
+						label={metadata.environment.applySystemMiddleware('labelMiddleware', this.props.label)}
+						labelDescription={this.props.labelDescription}
+						labelPosition={this.props.labelPosition}
+						description={this.props.description}
+						errors={metadata.errors}
 					>
-						<UploadFieldComponent.Inner
-							metadata={{
-								...metadata,
-								upload,
-								emptyText: this.props.emptyText,
-							}}
-							{...this.props}
+						<Dropzone
+							disabled={metadata.isMutating}
+							onDrop={this.handleStartUpload}
+							accept={this.props.accept}
+							multiple={false}
+							style={{}}
 						>
-							{this.props.children}
-						</UploadFieldComponent.Inner>
-					</Dropzone>
+							<UploadFieldComponent.Inner
+								metadata={{
+									...metadata,
+									upload,
+									emptyText: this.props.emptyText,
+								}}
+								{...this.props}
+							>
+								{this.props.children}
+							</UploadFieldComponent.Inner>
+						</Dropzone>
+					</FormGroup>
 				)}
 			</Field>
 		)
@@ -94,18 +102,10 @@ namespace UploadFieldComponent {
 	export class Inner extends React.PureComponent<InnerProps> {
 		public render() {
 			return (
-				<FormGroup
-					label={this.props.metadata.environment.applySystemMiddleware('labelMiddleware', this.props.label)}
-					labelDescription={this.props.labelDescription}
-					labelPosition={this.props.labelPosition}
-					description={this.props.description}
-					errors={this.props.metadata.errors}
-				>
-					<label className="fileInput">
-						<span className="fileInput-preview">{this.renderPreview()}</span>
-						<span className="fileInput-message">{this.renderUploadStatusMessage(this.props.metadata.upload)}</span>
-					</label>
-				</FormGroup>
+				<span className="fileInput">
+					<span className="fileInput-preview">{this.renderPreview()}</span>
+					<span className="fileInput-message">{this.renderUploadStatusMessage(this.props.metadata.upload)}</span>
+				</span>
 			)
 		}
 
@@ -132,7 +132,7 @@ namespace UploadFieldComponent {
 			if (!upload) {
 				return (
 					<>
-						<button className={'button'}>Select a file to upload</button>
+						<Button>Select a file to upload</Button>
 						<span className={'fileInput-drop'}>or drag & drop</span>
 					</>
 				)

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Manager, Reference, Popper } from 'react-popper'
 import { Collapsible } from './Collapsible'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export type DropdownAlignment = 'start' | 'end' | 'auto'
 
@@ -23,32 +23,40 @@ const alignmentToPlacement = (alignment: DropdownAlignment) => {
 	}
 }
 
-const useRequestCloseOnEscape = (isOpen: boolean, callback: () => void) => {
+const useRequestCloseOnEscapeOrClickOutside = <T extends Node>(isOpen: boolean, requestClose: () => void) => {
+	const wrapperRef = useRef<T>(null)
+
 	useEffect(() => {
 		if (isOpen) {
 			const requestCloseOnEscapeKey = (event: KeyboardEvent) => {
 				if (event.key === 'Escape') {
-					callback()
+					requestClose()
+				}
+			}
+			const requestCloseOnClickOutside = (event: MouseEvent) => {
+				if (!(wrapperRef.current && event.target instanceof Node && wrapperRef.current.contains(event.target))) {
+					requestClose()
 				}
 			}
 
 			window.addEventListener('keydown', requestCloseOnEscapeKey)
+			window.addEventListener('click', requestCloseOnClickOutside)
 			return () => {
 				window.removeEventListener('keydown', requestCloseOnEscapeKey)
+				window.removeEventListener('click', requestCloseOnClickOutside)
 			}
 		}
-	}, [callback, isOpen])
+	}, [requestClose, isOpen])
+
+	return wrapperRef
 }
 
 export const Dropdown2 = React.memo(({ alignment = 'start', onCloseRequest = () => {}, ...props }: Dropdown2Props) => {
-	useRequestCloseOnEscape(props.isOpen, onCloseRequest)
+	const wrapperRef = useRequestCloseOnEscapeOrClickOutside<HTMLDivElement>(props.isOpen, onCloseRequest)
 
 	return (
 		<Manager>
-			<div className="dropdown2">
-				{props.isOpen && (
-					<button type="button" className="dropdown2-background" aria-label="Close" onClick={onCloseRequest} />
-				)}
+			<div className="dropdown2" ref={wrapperRef}>
 				<Reference>
 					{({ ref }) => (
 						<div className="dropdown2-handle" ref={ref}>

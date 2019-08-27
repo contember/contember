@@ -51,6 +51,9 @@ export default class OperationProcessor {
 				let maxOrder = 0
 				value.document.nodes.forEach((block_, key) => {
 					const block = block_!
+					if (block.object !== 'block') {
+						throw new Error('Only blocks are supported on top level in document.')
+					}
 					const accessor: EntityAccessor | { primaryKey: string | { value: string } } | undefined = block.data.get(
 						'accessor',
 					)

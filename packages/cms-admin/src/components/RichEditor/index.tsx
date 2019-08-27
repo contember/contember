@@ -201,9 +201,8 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 						onKeyDown={this.onKeyDown}
 						onPaste={this.onPaste}
 						readOnly={this.props.readOnly}
-						/>
-					</div>
-
+					/>
+				</div>
 			</div>
 		)
 	}

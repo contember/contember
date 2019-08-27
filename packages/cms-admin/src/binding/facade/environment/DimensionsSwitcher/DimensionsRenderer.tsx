@@ -212,7 +212,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 				</Button>
 			}
 			isOpen={isOpen}
-			onRequestClose={closeDropdown}
+			onCloseRequest={closeDropdown}
 		>
 			{renderContent(normalizedData, selectedDimensions)}
 		</Dropdown2>

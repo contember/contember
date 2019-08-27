@@ -91,7 +91,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 									<Avatar size={AvatarSize.Size2} email={this.props.identity} />
 								</Button>
 							}
-							onRequestClose={this.closeAvatarDropdown}
+							onCloseRequest={this.closeAvatarDropdown}
 						>
 							<SwitchProjectLink
 								Component={({ onClick }) => (

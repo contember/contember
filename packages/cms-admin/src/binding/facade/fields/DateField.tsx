@@ -1,11 +1,13 @@
-import { TextInputProps } from '@contember/ui'
+import { SingleLineTextInputProps, TextInput } from '@contember/ui'
 import * as React from 'react'
 import DatePicker from 'react-datepicker'
 import { FieldAccessor } from '../../dao'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type DateFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<TextInputProps, 'value' | 'onChange' | 'validationState'>
+	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState'> & {
+		ref?: React.Ref<HTMLInputElement>
+	}
 
 export const DateField = SimpleRelativeSingleField<DateFieldProps, string>((fieldMetadata, props) => {
 	const generateOnChange = (data: FieldAccessor<string>) => (date: Date | null) => {
@@ -17,7 +19,13 @@ export const DateField = SimpleRelativeSingleField<DateFieldProps, string>((fiel
 			onChange={generateOnChange(fieldMetadata.data)}
 			readOnly={fieldMetadata.isMutating}
 			isClearable={true}
-			//customInput={} // TODO explore this
+			customInput={<UnderlyingTextInput />}
+			customInputRef={props.ref as any}
 		/>
 	)
 }, 'DateField')
+
+const UnderlyingTextInput = React.forwardRef<any, any>((props, ref) => {
+	const { className, ...legalProps } = props
+	return <TextInput {...legalProps} ref={ref} />
+})

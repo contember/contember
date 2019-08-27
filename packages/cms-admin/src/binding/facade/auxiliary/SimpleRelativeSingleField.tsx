@@ -21,13 +21,9 @@ export const SimpleRelativeSingleField = function<
 		props => <RelativeSingleField<P, Persisted, Produced> {...props} render={render} />,
 		(props: P, environment: Environment) => (
 			<>
-				{QueryLanguage.wrapRelativeSingleField(
-					props.name,
-					fieldName => (
-						<Field defaultValue={props.defaultValue} name={fieldName} />
-					),
-					environment,
-				)}
+				{QueryLanguage.wrapRelativeSingleField(props.name, environment, fieldName => (
+					<Field defaultValue={props.defaultValue} name={fieldName} />
+				))}
 				{props.label}
 				{props.labelDescription}
 				{props.description}

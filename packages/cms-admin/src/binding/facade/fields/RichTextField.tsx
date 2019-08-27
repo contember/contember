@@ -37,13 +37,7 @@ export const RichTextField = Component<RichTextFieldProps>(
 	),
 	(props, environment) => (
 		<>
-			{QueryLanguage.wrapRelativeSingleField(
-				props.name,
-				fieldName => (
-					<Field defaultValue={props.defaultValue} name={fieldName} />
-				),
-				environment,
-			)}
+			{QueryLanguage.wrapRelativeSingleField(props.name, environment)}
 			{props.label}
 			{props.labelDescription}
 			{props.description}

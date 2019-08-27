@@ -80,7 +80,7 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 	}
 
 	public static generateSyntheticChildren(props: UploadFieldOwnProps, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(props.name, environment)
 	}
 }
 

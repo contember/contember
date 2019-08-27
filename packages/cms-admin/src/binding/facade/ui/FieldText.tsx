@@ -24,7 +24,7 @@ export class FieldText<
 	}
 
 	public static generateSyntheticChildren(props: FieldTextProps, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
+		return QueryLanguage.wrapRelativeSingleField(props.name, environment)
 	}
 }
 

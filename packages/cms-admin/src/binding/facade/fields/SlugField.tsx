@@ -80,20 +80,8 @@ export const SlugField = Component<SlugFieldProps>(
 	},
 	(props, environment) => (
 		<>
-			{QueryLanguage.wrapRelativeSingleField(
-				props.name,
-				fieldName => (
-					<Field name={fieldName} />
-				),
-				environment,
-			)}
-			{QueryLanguage.wrapRelativeSingleField(
-				props.drivenBy,
-				fieldName => (
-					<Field name={fieldName} />
-				),
-				environment,
-			)}
+			{QueryLanguage.wrapRelativeSingleField(props.name, environment)}
+			{QueryLanguage.wrapRelativeSingleField(props.drivenBy, environment)}
 			{props.label}
 		</>
 	),

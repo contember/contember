@@ -8,7 +8,7 @@ import { AccessorTreeRoot, EntityAccessor, EntityCollectionAccessor, FieldAccess
 import { RendererProps } from '../../renderers'
 import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export interface DimensionsRendererProps {
 	buttonProps?: ButtonProps
@@ -24,6 +24,12 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	const environment = React.useContext(EnvironmentContext)
 	const redirect = useRedirect()
 	const [isOpen, setIsOpen] = useState(false)
+	const toggleDropdownIsOpen = useCallback(() => {
+		setIsOpen(!isOpen)
+	}, [isOpen])
+	const closeDropdown = useCallback(() => {
+		setIsOpen(false)
+	}, [])
 
 	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
 		const renderer = props.renderSelected || renderByJoining
@@ -201,12 +207,12 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	return (
 		<Dropdown2
 			handle={
-				<Button {...props.buttonProps} onClick={() => setIsOpen(!isOpen)}>
+				<Button {...props.buttonProps} onClick={toggleDropdownIsOpen}>
 					{renderSelected(selectedDimensions)}
 				</Button>
 			}
 			isOpen={isOpen}
-			onRequestClose={() => setIsOpen(false)}
+			onRequestClose={closeDropdown}
 		>
 			{renderContent(normalizedData, selectedDimensions)}
 		</Dropdown2>

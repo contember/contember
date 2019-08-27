@@ -46,6 +46,9 @@ export const Dropdown2 = React.memo(({ alignment = 'start', onCloseRequest = () 
 	return (
 		<Manager>
 			<div className="dropdown2">
+				{props.isOpen && (
+					<button type="button" className="dropdown2-background" aria-label="Close" onClick={onCloseRequest} />
+				)}
 				<Reference>
 					{({ ref }) => (
 						<div className="dropdown2-handle" ref={ref}>

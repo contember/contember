@@ -148,7 +148,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			<div className="editor">
 				<Toolbar>
 					{blocks.length > 1 && (
-						<ButtonGroup>
+						<ButtonGroup isTopToolbar>
 							{blocks.map(block => (
 								<ActionButton
 									key={block.block}
@@ -161,7 +161,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 					)}
 					&nbsp;
 					{/*{blocks.length > 1 && marksToShow.length > 0 && <Divider />}*/}
-					<ButtonGroup>
+					<ButtonGroup isTopToolbar>
 						{allMarksNames.map(mark => (
 							<ActionButton
 								key={mark}

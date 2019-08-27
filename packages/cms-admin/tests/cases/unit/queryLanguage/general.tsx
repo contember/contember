@@ -19,7 +19,6 @@ describe('query language parser', () => {
 		expect(
 			QueryLanguage.wrapRelativeSingleField(
 				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = $x).foo',
-				name => <Field name={name} />,
 				environment,
 			),
 		).eql(

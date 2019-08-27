@@ -45,9 +45,13 @@ export const ConcealableField = React.memo(
 						key="concealableField-in"
 					>
 						<div className="concealableField-value">{renderConcealedValue()}</div>
-						<Button size="small" distinction="seamless" {...buttonProps} className="concealableField-button">
-							Edit
-						</Button>
+						<Button
+							size="small"
+							distinction="seamless"
+							children="Edit"
+							{...buttonProps}
+							className="concealableField-button"
+						/>
 					</div>
 				)}
 				{isEditing &&

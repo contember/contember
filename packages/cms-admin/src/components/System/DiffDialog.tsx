@@ -30,7 +30,7 @@ class ConnectedDiffDialog extends React.PureComponent<
 				<FormGroup label="Stage slug">
 					<TextInput
 						value={this.state.targetStage}
-						onChange={newValue => this.updateTargetState(newValue)}
+						onChange={e => this.updateTargetState(e.target.value)}
 						allowNewlines={false}
 					/>
 				</FormGroup>

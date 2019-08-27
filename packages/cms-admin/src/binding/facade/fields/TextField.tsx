@@ -8,8 +8,8 @@ export type TextFieldProps = SimpleRelativeSingleFieldProps &
 
 export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
 	(fieldMetadata, { defaultValue, ...props }) => {
-		const generateOnChange = (data: FieldAccessor<string>) => (newValue: string) => {
-			data.updateValue && data.updateValue(newValue)
+		const generateOnChange = (data: FieldAccessor<string>): TextInputProps['onChange'] => e => {
+			data.updateValue && data.updateValue(e.target.value)
 		}
 		return (
 			<TextInput

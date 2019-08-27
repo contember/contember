@@ -17,7 +17,7 @@ export const SimpleTextInputStory = ({ size, validationState }: SimpleTextInputS
 	return (
 		<TextInput
 			value={value}
-			onChange={newValue => setValue(newValue)}
+			onChange={e => setValue(e.target.value)}
 			allowNewlines={boolean('Allow newlines', false) as true}
 			size={size || sizeKnob()}
 			placeholder={text('Placeholder', 'Placeholder text')}

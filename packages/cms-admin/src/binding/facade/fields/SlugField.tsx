@@ -61,9 +61,9 @@ export const SlugField = Component<SlugFieldProps>(
 					>
 						<TextInput
 							value={slugValue}
-							onChange={newValue => {
+							onChange={e => {
 								hasEditedSlug || setHasEditedSlug(true)
-								slugField.updateValue && slugField.updateValue(newValue)
+								slugField.updateValue && slugField.updateValue(e.target.value)
 							}}
 							readOnly={isMutating}
 							validationState={slugField.errors.length ? 'invalid' : undefined}

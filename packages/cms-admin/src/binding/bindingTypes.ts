@@ -9,6 +9,8 @@ export type RelativeSingleField = string
 export type RelativeSingleEntity = string
 export type RelativeEntityList = string
 
+export type UniqueWhere = string
+
 export type FieldName = string
 export type EntityName = string
 

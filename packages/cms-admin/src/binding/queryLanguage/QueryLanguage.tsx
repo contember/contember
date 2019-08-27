@@ -8,6 +8,7 @@ import {
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
+	UniqueWhere,
 } from '../bindingTypes'
 import { Field, ToMany, ToOne } from '../coreComponents'
 import { Environment } from '../dao'
@@ -117,7 +118,7 @@ export namespace QueryLanguage {
 		}
 	}
 
-	export const parseUniqueWhere = (input: string, environment: Environment) =>
+	export const parseUniqueWhere = (input: UniqueWhere, environment: Environment) =>
 		Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.UniqueWhere, environment)
 
 	export const parseFilter = (input: string, environment: Environment) =>

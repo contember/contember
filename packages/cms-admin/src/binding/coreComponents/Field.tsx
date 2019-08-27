@@ -137,19 +137,15 @@ namespace Field {
 		const propsChildren = props.children
 
 		return React.useMemo(() => {
-			return QueryLanguage.wrapRelativeSingleField(
-				propsName,
-				fieldName => (
-					<DataContext.Consumer>
-						{(data: DataContextValue) => (
-							<RawMetadataGenerator fieldName={fieldName} data={data} isMutating={isMutating} environment={environment}>
-								{propsChildren}
-							</RawMetadataGenerator>
-						)}
-					</DataContext.Consumer>
-				),
-				environment,
-			)
+			return QueryLanguage.wrapRelativeSingleField(propsName, environment, fieldName => (
+				<DataContext.Consumer>
+					{(data: DataContextValue) => (
+						<RawMetadataGenerator fieldName={fieldName} data={data} isMutating={isMutating} environment={environment}>
+							{propsChildren}
+						</RawMetadataGenerator>
+					)}
+				</DataContext.Consumer>
+			))
 		}, [environment, isMutating, propsName, propsChildren])
 	})
 

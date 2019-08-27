@@ -1,6 +1,15 @@
 import * as React from 'react'
-import { EntityName, FieldName, Filter } from '../bindingTypes'
-import { ToMany, ToOne } from '../coreComponents'
+import {
+	EntityName,
+	FieldName,
+	Filter,
+	QualifiedEntityList,
+	QualifiedFieldList,
+	RelativeEntityList,
+	RelativeSingleEntity,
+	RelativeSingleField,
+} from '../bindingTypes'
+import { Field, ToMany, ToOne } from '../coreComponents'
 import { Environment } from '../dao'
 import { reactNodeToElement } from '../utils'
 import { Parser } from './Parser'
@@ -22,17 +31,18 @@ export namespace QueryLanguage {
 	}
 
 	export const wrapRelativeSingleField = (
-		input: string,
-		generateField: (fieldName: FieldName) => React.ReactNode,
+		input: RelativeSingleField,
 		environment: Environment,
+		generateField?: (fieldName: FieldName) => React.ReactNode,
 	): React.ReactElement | null => {
 		const expression = Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeSingleField, environment)
+		const callback = generateField || (fieldName => <Field name={fieldName} />)
 
-		return wrap(generateField(expression.fieldName), ToOne.AtomicPrimitive, expression.toOneProps)
+		return wrap(callback(expression.fieldName), ToOne.AtomicPrimitive, expression.toOneProps)
 	}
 
 	export const wrapRelativeSingleEntity = (
-		input: string,
+		input: RelativeSingleEntity,
 		subordinateFields: React.ReactNode,
 		environment: Environment,
 	): React.ReactElement | null => {
@@ -46,7 +56,7 @@ export namespace QueryLanguage {
 	}
 
 	export const wrapRelativeEntityList = (
-		input: string,
+		input: RelativeEntityList,
 		generateAtomicToMany: (atomicPrimitiveProps: ToMany.AtomicPrimitiveProps) => React.ReactNode,
 		environment: Environment,
 	): React.ReactElement | null => {
@@ -65,7 +75,7 @@ export namespace QueryLanguage {
 		children: React.ReactElement | null
 	}
 	export const wrapQualifiedEntityList = (
-		input: string,
+		input: QualifiedEntityList,
 		fieldSelection: React.ReactNode,
 		environment: Environment,
 	): WrappedQualifiedEntityList => {
@@ -89,7 +99,7 @@ export namespace QueryLanguage {
 		fieldName: FieldName
 	}
 	export const wrapQualifiedFieldList = (
-		input: string,
+		input: QualifiedFieldList,
 		generateField: (fieldName: FieldName) => React.ReactNode,
 		environment: Environment,
 	): WrappedQualifiedFieldList => {

@@ -20,16 +20,12 @@ class Connection extends React.PureComponent<ConnectionProps> {
 	}
 
 	public static generateSyntheticChildren(props: ConnectionProps, environment: Environment) {
-		return QueryLanguage.wrapRelativeSingleField(
-			props.field,
-			field => (
-				<Connection.ConnectionGenerator
-					field={field}
-					to={typeof props.to === 'string' ? QueryLanguage.parseUniqueWhere(props.to, environment) : props.to}
-				/>
-			),
-			environment,
-		)
+		return QueryLanguage.wrapRelativeSingleField(props.field, environment, field => (
+			<Connection.ConnectionGenerator
+				field={field}
+				to={typeof props.to === 'string' ? QueryLanguage.parseUniqueWhere(props.to, environment) : props.to}
+			/>
+		))
 	}
 }
 

@@ -12,7 +12,6 @@ export const VideoUploadField = Component<VideoUploadFieldProps>(
 			{url => <video src={url} controls />}
 		</UploadField>
 	),
-	(props, environment) =>
-		QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment),
+	(props, environment) => QueryLanguage.wrapRelativeSingleField(props.name, environment),
 	'VideoUploadField',
 )

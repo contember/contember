@@ -85,7 +85,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 		environment: Environment,
 	): React.ReactNode {
 		if (Array.isArray(props.options)) {
-			return QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment)
+			return QueryLanguage.wrapRelativeSingleField(props.name, environment)
 		}
 
 		const metadata:
@@ -94,31 +94,23 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 			? QueryLanguage.wrapQualifiedEntityList(props.options, props.optionFieldFactory, environment)
 			: QueryLanguage.wrapQualifiedFieldList(props.options, fieldName => <Field name={fieldName} />, environment)
 
-		return QueryLanguage.wrapRelativeSingleField(
-			props.name,
-			fieldName => (
-				<>
-					<EntityListDataProvider
-						entityName={metadata.entityName}
-						filter={metadata.filter}
-						associatedField={props.name}
-					>
-						{metadata.children}
-					</EntityListDataProvider>
-					{props.arity === ChoiceArity.Single && (
-						<ToOne field={fieldName}>
-							<Field name={PRIMARY_KEY_NAME} />
-						</ToOne>
-					)}
-					{props.arity === ChoiceArity.Multiple && (
-						<ToMany field={fieldName}>
-							<Field name={PRIMARY_KEY_NAME} />
-						</ToMany>
-					)}
-				</>
-			),
-			environment,
-		)
+		return QueryLanguage.wrapRelativeSingleField(props.name, environment, fieldName => (
+			<>
+				<EntityListDataProvider entityName={metadata.entityName} filter={metadata.filter} associatedField={props.name}>
+					{metadata.children}
+				</EntityListDataProvider>
+				{props.arity === ChoiceArity.Single && (
+					<ToOne field={fieldName}>
+						<Field name={PRIMARY_KEY_NAME} />
+					</ToOne>
+				)}
+				{props.arity === ChoiceArity.Multiple && (
+					<ToMany field={fieldName}>
+						<Field name={PRIMARY_KEY_NAME} />
+					</ToMany>
+				)}
+			</>
+		))
 	}
 }
 

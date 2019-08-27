@@ -12,7 +12,6 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 			{url => <img src={url} />}
 		</UploadField>
 	),
-	(props, environment) =>
-		QueryLanguage.wrapRelativeSingleField(props.name, fieldName => <Field name={fieldName} />, environment),
+	(props, environment) => QueryLanguage.wrapRelativeSingleField(props.name, environment),
 	'ImageUploadField',
 )

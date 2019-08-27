@@ -171,7 +171,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	React.useEffect(() => {
 		const redirectTarget = selectedDimensions.length === 0 ? normalizedData || [] : selectedDimensions
 
-		if (normalizedData !== undefined) {
+		if (normalizedData !== undefined && selectedDimensions.length === 0) {
 			redirect(requestState => {
 				if (requestState.name !== 'project_page') {
 					return requestState

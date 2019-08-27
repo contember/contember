@@ -18,7 +18,66 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 	}
 
 export const SlugField = Component<SlugFieldProps>(
-	props => <SlugFieldInner {...props} />,
+	({ buttonProps, concealTimeout, format, drivenBy, ...props }) => {
+		const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
+		const hostEntity = useEntityContext() // TODO this will fail for some QL uses
+		const slugField = useRelativeSingleField<string>(props.name)
+		const driverField = useRelativeSingleField<string>(drivenBy)
+		const environment = useEnvironment()
+		const isMutating = useMutationState()
+
+		let slugValue = slugField.currentValue || ''
+
+		if (!hasEditedSlug && !hostEntity.isPersisted()) {
+			slugValue = slugify(driverField.currentValue || '')
+
+			if (format) {
+				slugValue = format(slugValue, environment)
+			}
+		}
+
+		React.useEffect(() => {
+			if (slugField.currentValue === slugValue || !slugField.updateValue) {
+				return
+			}
+			slugField.updateValue(slugValue)
+		}, [slugField, slugValue])
+
+		return (
+			<ConcealableField
+				renderConcealedValue={() => slugValue}
+				buttonProps={buttonProps}
+				concealTimeout={concealTimeout}
+			>
+				{({ inputRef, onFocus, onBlur }) => (
+					<FormGroup
+						label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
+						errors={slugField.errors}
+						labelDescription={props.labelDescription}
+						labelPosition={props.labelPosition || 'labelInlineLeft'}
+						description={props.description}
+						size="small"
+						key="concealableField-formGroup"
+					>
+						<TextInput
+							value={slugValue}
+							onChange={newValue => {
+								hasEditedSlug || setHasEditedSlug(true)
+								slugField.updateValue && slugField.updateValue(newValue)
+							}}
+							readOnly={isMutating}
+							validationState={slugField.errors.length ? 'invalid' : undefined}
+							size="small"
+							ref={inputRef}
+							onFocus={onFocus}
+							onBlur={onBlur}
+							{...props}
+						/>
+					</FormGroup>
+				)}
+			</ConcealableField>
+		)
+	},
 	(props, environment) => (
 		<>
 			{QueryLanguage.wrapRelativeSingleField(
@@ -40,69 +99,3 @@ export const SlugField = Component<SlugFieldProps>(
 	),
 	'SlugField',
 )
-
-interface SlugFieldInnerProps extends SlugFieldProps {}
-
-const SlugFieldInner: React.FunctionComponent<SlugFieldInnerProps> = ({
-	buttonProps,
-	concealTimeout,
-	format,
-	drivenBy,
-	...props
-}) => {
-	const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
-	const hostEntity = useEntityContext() // TODO this will fail for some QL uses
-	const slugField = useRelativeSingleField<string>(props.name)
-	const driverField = useRelativeSingleField<string>(drivenBy)
-	const environment = useEnvironment()
-	const isMutating = useMutationState()
-
-	let slugValue = slugField.currentValue || ''
-
-	if (!hasEditedSlug && !hostEntity.isPersisted()) {
-		slugValue = slugify(driverField.currentValue || '')
-
-		if (format) {
-			slugValue = format(slugValue, environment)
-		}
-	}
-
-	React.useEffect(() => {
-		if (slugField.currentValue === slugValue || !slugField.updateValue) {
-			return
-		}
-		slugField.updateValue(slugValue)
-	}, [slugField, slugValue])
-
-	return (
-		<ConcealableField renderConcealedValue={() => slugValue} buttonProps={buttonProps} concealTimeout={concealTimeout}>
-			{({ inputRef, onFocus, onBlur }) => (
-				<FormGroup
-					label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
-					errors={slugField.errors}
-					labelDescription={props.labelDescription}
-					labelPosition={props.labelPosition || 'labelInlineLeft'}
-					description={props.description}
-					size="small"
-					key="concealableField-formGroup"
-				>
-					<TextInput
-						value={slugValue}
-						onChange={newValue => {
-							hasEditedSlug || setHasEditedSlug(true)
-							slugField.updateValue && slugField.updateValue(newValue)
-						}}
-						readOnly={isMutating}
-						validationState={slugField.errors.length ? 'invalid' : undefined}
-						size="small"
-						ref={inputRef}
-						onFocus={onFocus}
-						onBlur={onBlur}
-						{...props}
-					/>
-				</FormGroup>
-			)}
-		</ConcealableField>
-	)
-}
-SlugFieldInner.displayName = 'SlugFieldInner'

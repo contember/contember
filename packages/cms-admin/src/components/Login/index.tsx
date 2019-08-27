@@ -53,7 +53,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 								autoComplete="username"
 								type="email"
 								disabled={loading}
-								onChange={newValue => this.setState({ email: newValue })}
+								onChange={e => this.setState({ email: e.target.value })}
 							/>
 						</FormGroup>
 						<FormGroup label="Password">
@@ -62,7 +62,7 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 								autoComplete="current-password"
 								value={this.state.password}
 								disabled={loading}
-								onChange={newValue => this.setState({ password: newValue })}
+								onChange={e => this.setState({ password: e.target.value })}
 							/>
 						</FormGroup>
 

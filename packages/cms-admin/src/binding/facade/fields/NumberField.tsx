@@ -8,8 +8,8 @@ export type NumberFieldProps = SimpleRelativeSingleFieldProps &
 
 export const NumberField = SimpleRelativeSingleField<NumberFieldProps, number>(
 	(fieldMetadata, { defaultValue, ...props }) => {
-		const generateOnChange = (data: FieldAccessor<number>) => (newValue: string) => {
-			data.updateValue && data.updateValue(parseInt(newValue, 10))
+		const generateOnChange = (data: FieldAccessor<number>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+			data.updateValue && data.updateValue(parseInt(e.target.value, 10))
 		}
 		return (
 			<TextInput

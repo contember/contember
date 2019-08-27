@@ -36,7 +36,7 @@ export enum LineBreakBehavior {
 }
 
 export type RichEditorProps = SimpleRelativeSingleFieldProps &
-	TextInputOwnProps & {
+	Omit<TextInputOwnProps, 'onChange'> & {
 		value: string
 		onChange: (value: string) => void
 		serializer: RichEditorSerializer

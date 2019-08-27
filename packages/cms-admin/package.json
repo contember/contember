@@ -41,10 +41,10 @@
 		"redux": "^4.0.4",
 		"redux-actions": "^2.6.5",
 		"redux-thunk": "^2.3.0",
-		"slate": "0.47.4",
-		"slate-html-serializer": "0.8.6",
-		"slate-plain-serializer": "0.7.6",
-		"slate-react": "0.22.4"
+		"slate": "^0.47.7",
+		"slate-html-serializer": "^0.8.9",
+		"slate-plain-serializer": "^0.7.9",
+		"slate-react": "^0.22.7"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.1.6",
@@ -59,10 +59,10 @@
 		"@types/react-redux": "^7.1.1",
 		"@types/react-table": "^6.7.12",
 		"@types/redux-actions": "^2.6.1",
-		"@types/slate": "^0.44.12",
+		"@types/slate": "^0.47.1",
 		"@types/slate-html-serializer": "^0.6.3",
 		"@types/slate-plain-serializer": "^0.6.1",
-		"@types/slate-react": "^0.22.4",
+		"@types/slate-react": "^0.22.5",
 		"@types/webappsec-credential-management": "^0.5.1",
 		"awesome-typescript-loader": "^5.2.1",
 		"chai": "^4.2.0",

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Manager, Reference, Popper } from 'react-popper'
 import { Collapsible } from './Collapsible'
-import { useEffect, useRef } from 'react'
 
 export type DropdownAlignment = 'start' | 'end' | 'auto'
 
@@ -24,9 +23,9 @@ const alignmentToPlacement = (alignment: DropdownAlignment) => {
 }
 
 const useRequestCloseOnEscapeOrClickOutside = <T extends Node>(isOpen: boolean, requestClose: () => void) => {
-	const wrapperRef = useRef<T>(null)
+	const wrapperRef = React.useRef<T>(null)
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (isOpen) {
 			const requestCloseOnEscapeKey = (event: KeyboardEvent) => {
 				if (event.key === 'Escape') {

@@ -8,7 +8,6 @@ import { AccessorTreeRoot, EntityAccessor, EntityCollectionAccessor, FieldAccess
 import { RendererProps } from '../../renderers'
 import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
-import { useCallback, useState } from 'react'
 
 export interface DimensionsRendererProps {
 	buttonProps?: ButtonProps
@@ -23,11 +22,11 @@ export interface DimensionsRendererProps {
 export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsRendererProps) => {
 	const environment = React.useContext(EnvironmentContext)
 	const redirect = useRedirect()
-	const [isOpen, setIsOpen] = useState(false)
-	const toggleDropdownIsOpen = useCallback(() => {
+	const [isOpen, setIsOpen] = React.useState(false)
+	const toggleDropdownIsOpen = React.useCallback(() => {
 		setIsOpen(!isOpen)
 	}, [isOpen])
-	const closeDropdown = useCallback(() => {
+	const closeDropdown = React.useCallback(() => {
 		setIsOpen(false)
 	}, [])
 

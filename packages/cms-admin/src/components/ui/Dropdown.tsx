@@ -1,6 +1,5 @@
 import * as React from 'react'
 import cn from 'classnames'
-import { useState } from 'react'
 import { Collapsible } from '@contember/ui'
 
 class Dropdown extends React.PureComponent<Dropdown.Props> {
@@ -35,7 +34,7 @@ namespace Dropdown {
 	}
 
 	export const Revealer = (props: RevealerProps) => {
-		const [isRevealed, setIsRevealed] = useState(false)
+		const [isRevealed, setIsRevealed] = React.useState(false)
 		return (
 			<div
 				className="dropdown-revealer"

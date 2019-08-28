@@ -67,3 +67,4 @@ export const Button = React.memo(
 		return React.createElement(Component || 'button', { ...rest, ...attrs }, content)
 	}),
 )
+Button.displayName = 'Button'

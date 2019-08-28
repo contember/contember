@@ -12,3 +12,4 @@ export interface ValidationMessageProps {
 export const ValidationMessage = React.memo(({ children, size, type }: ValidationMessageProps) => (
 	<span className={cn('validationMessage', toEnumViewClass(size), toEnumViewClass(type))}>{children}</span>
 ))
+ValidationMessage.displayName = 'ValidationMessage'

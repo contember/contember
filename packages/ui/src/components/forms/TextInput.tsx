@@ -53,3 +53,4 @@ export const TextInput = React.memo(
 		},
 	),
 )
+TextInput.displayName = 'TextInput'

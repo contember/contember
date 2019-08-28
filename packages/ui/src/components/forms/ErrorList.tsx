@@ -23,3 +23,4 @@ export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
 		</ul>
 	)
 })
+ErrorList.displayName = 'ErrorList'

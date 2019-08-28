@@ -14,3 +14,4 @@ export const ButtonGroup = React.memo(({ size, isTopToolbar, children }: ButtonG
 		{children}
 	</div>
 ))
+ButtonGroup.displayName = 'ButtonGroup'

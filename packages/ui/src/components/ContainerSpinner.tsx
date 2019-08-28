@@ -13,3 +13,4 @@ export const ContainerSpinner = React.memo(({ size }: ContainerSpinnerProps) => 
 		<Spinner />
 	</div>
 ))
+ContainerSpinner.displayName = 'ContainerSpinner'

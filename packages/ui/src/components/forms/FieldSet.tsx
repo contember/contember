@@ -13,3 +13,4 @@ export const FieldSet = React.memo<FieldSetProps>(props => (
 		{props.children}
 	</div>
 ))
+FieldSet.displayName = 'FieldSet'

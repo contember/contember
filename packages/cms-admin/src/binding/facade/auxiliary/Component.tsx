@@ -1,6 +1,6 @@
 import { assertNever } from 'cms-common'
 import * as React from 'react'
-import { CompleteMarkerProvider, MarkerProvider, SyntheticChildrenProvider } from '../../coreComponents'
+import { MarkerProvider, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
 
 function Component<P extends {}>(

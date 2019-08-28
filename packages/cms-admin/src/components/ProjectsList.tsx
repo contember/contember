@@ -54,7 +54,7 @@ export default connect<
 	State
 >(
 	(state, ownProps) => {
-		const projects = state.auth.identity ? state.auth.identity.projects : []
+		const projects = (state.auth.identity ? state.auth.identity.projects : []).map(it => it.slug)
 		return {
 			configs: ownProps.configs.filter(it => projects.includes(it.project)),
 		}

@@ -14,7 +14,12 @@ export default interface AuthState {
 export interface AuthIdentity {
 	token: string
 	email: string
-	projects: string[]
+	projects: Project[]
+}
+
+export interface Project {
+	slug: string
+	roles: string[]
 }
 
 export const emptyAuthState: AuthState = {

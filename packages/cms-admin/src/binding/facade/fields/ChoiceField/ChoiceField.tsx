@@ -43,11 +43,11 @@ export type ChoiceFieldBaseProps = ChoiceFieldPublicProps & {
 } & (
 		| {
 				arity: ChoiceArity.Single
-				children: (metadata: SingleChoiceFieldMetadata) => React.ReactNode
+				children: (metadata: SingleChoiceFieldMetadata) => React.ReactElement | null
 		  }
 		| {
 				arity: ChoiceArity.Multiple
-				children: (metadata: MultipleChoiceFieldMetadata) => React.ReactNode
+				children: (metadata: MultipleChoiceFieldMetadata) => React.ReactElement | null
 		  })
 
 export type ChoiceFieldProps = ChoiceFieldBaseProps & {

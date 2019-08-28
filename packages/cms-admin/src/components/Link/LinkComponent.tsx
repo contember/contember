@@ -3,6 +3,13 @@ import { RequestChange } from '../../state/request'
 
 class LinkComponent extends React.PureComponent<LinkComponent.Props> {
 	onClick = (e?: React.SyntheticEvent<Element>) => {
+		if (
+			e &&
+			e.nativeEvent instanceof MouseEvent &&
+			(e.nativeEvent.altKey || e.nativeEvent.ctrlKey || e.nativeEvent.metaKey || e.nativeEvent.shiftKey)
+		) {
+			return
+		}
 		e && e.preventDefault()
 		this.props.goTo()
 	}

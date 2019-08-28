@@ -135,7 +135,10 @@ namespace TenantContainer {
 					'disableApiKeyMutationResolver',
 					({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager),
 				)
-				.addService('identityTypeResolver', ({ queryHandler }) => new IdentityTypeResolver(queryHandler))
+				.addService(
+					'identityTypeResolver',
+					({ queryHandler, projectMemberManager }) => new IdentityTypeResolver(queryHandler, projectMemberManager),
+				)
 
 				.addService('resolvers', container => new ResolverFactory(container).create())
 

@@ -566,6 +566,7 @@ describe('tenant api', () => {
 		          identity {
 			            projects {
 			              id
+			              roles
 			            }
 		          }
 	          }
@@ -630,6 +631,13 @@ describe('tenant api', () => {
 							rows: [{ id: testUuid(11), name: 'test', slug: 'test' }],
 						},
 					},
+					{
+						sql: SQL`select "roles" from  "tenant"."project_member"   where "identity_id" = ? and "project_id" = ?`,
+						parameters: [testUuid(1), testUuid(11)],
+						response: {
+							rows: [{ roles: ['admin'] }],
+						},
+					},
 				],
 				return: {
 					data: {
@@ -638,7 +646,7 @@ describe('tenant api', () => {
 							errors: [],
 							result: {
 								identity: {
-									projects: [{ id: testUuid(11) }],
+									projects: [{ id: testUuid(11), roles: ['admin'] }],
 								},
 							},
 						},

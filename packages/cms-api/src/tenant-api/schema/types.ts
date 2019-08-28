@@ -1,5 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
+export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
+	{ [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -205,6 +207,7 @@ export type Project = {
 	readonly id: Scalars['String']
 	readonly name: Scalars['String']
 	readonly slug: Scalars['String']
+	readonly roles: ReadonlyArray<Scalars['String']>
 }
 
 export type Query = {
@@ -374,14 +377,23 @@ export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
 	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
 
-export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
-	subscribe: SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs>
-	resolve?: SubscriptionResolveFn<TResult, TParent, TContext, TArgs>
+export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
+	subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>
+	resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>
 }
 
-export type SubscriptionResolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
-	| ((...args: any[]) => SubscriptionResolverObject<TResult, TParent, TContext, TArgs>)
+export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
+	subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>
+	resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>
+}
+
+export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
+	| SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
 	| SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
+
+export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+	| ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+	| SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
 	parent: TParent,
@@ -611,33 +623,48 @@ export type MutationResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = {
-	setup?: Resolver<Maybe<ResolversTypes['SetupResponse']>, ParentType, ContextType, MutationSetupArgs>
-	signUp?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, MutationSignUpArgs>
-	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, MutationSignInArgs>
+	setup?: Resolver<
+		Maybe<ResolversTypes['SetupResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationSetupArgs, 'superadmin'>
+	>
+	signUp?: Resolver<
+		Maybe<ResolversTypes['SignUpResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationSignUpArgs, 'email' | 'password'>
+	>
+	signIn?: Resolver<
+		Maybe<ResolversTypes['SignInResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationSignInArgs, 'email' | 'password'>
+	>
 	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, MutationSignOutArgs>
 	changePassword?: Resolver<
 		Maybe<ResolversTypes['ChangePasswordResponse']>,
 		ParentType,
 		ContextType,
-		MutationChangePasswordArgs
+		RequireFields<MutationChangePasswordArgs, 'personId' | 'password'>
 	>
 	addProjectMember?: Resolver<
 		Maybe<ResolversTypes['AddProjectMemberResponse']>,
 		ParentType,
 		ContextType,
-		MutationAddProjectMemberArgs
+		RequireFields<MutationAddProjectMemberArgs, 'projectId' | 'identityId' | 'roles'>
 	>
 	updateProjectMember?: Resolver<
 		Maybe<ResolversTypes['UpdateProjectMemberResponse']>,
 		ParentType,
 		ContextType,
-		MutationUpdateProjectMemberArgs
+		RequireFields<MutationUpdateProjectMemberArgs, 'projectId' | 'identityId'>
 	>
 	removeProjectMember?: Resolver<
 		Maybe<ResolversTypes['RemoveProjectMemberResponse']>,
 		ParentType,
 		ContextType,
-		MutationRemoveProjectMemberArgs
+		RequireFields<MutationRemoveProjectMemberArgs, 'projectId' | 'identityId'>
 	>
 	createApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
@@ -649,7 +676,7 @@ export type MutationResolvers<
 		Maybe<ResolversTypes['DisableApiKeyResponse']>,
 		ParentType,
 		ContextType,
-		MutationDisableApiKeyArgs
+		RequireFields<MutationDisableApiKeyArgs, 'id'>
 	>
 }
 
@@ -677,6 +704,7 @@ export type ProjectResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	roles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 }
 
 export type QueryResolvers<

@@ -1,5 +1,6 @@
-import { Button, ButtonProps } from '@contember/ui'
+import { Button, ButtonProps, toViewClass } from '@contember/ui'
 import * as React from 'react'
+import cn from 'classnames'
 
 export interface ConcealableFieldRendererProps {
 	onFocus: () => void
@@ -12,10 +13,11 @@ export type ConcealableFieldProps = {
 	concealTimeout?: number
 	renderConcealedValue: () => React.ReactNode
 	children: (rendererProps: ConcealableFieldRendererProps) => React.ReactNode
+	isExtended?: boolean
 }
 
 export const ConcealableField = React.memo(
-	({ buttonProps, concealTimeout = 2000, renderConcealedValue, children }: ConcealableFieldProps) => {
+	({ buttonProps, concealTimeout = 2000, renderConcealedValue, isExtended, children }: ConcealableFieldProps) => {
 		const [isEditing, setIsEditing] = React.useState(false)
 		const [concealTimeoutId, setConcealTimeoutId] = React.useState<number | undefined>(undefined)
 		const inputRef = React.useRef<HTMLInputElement>()
@@ -35,7 +37,7 @@ export const ConcealableField = React.memo(
 		}, [isEditing])
 
 		return (
-			<div className="concealableField">
+			<div className={cn('concealableField', toViewClass('extended', isExtended))}>
 				{!isEditing && (
 					<div
 						className="concealableField-in"

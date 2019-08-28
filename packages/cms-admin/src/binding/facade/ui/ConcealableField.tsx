@@ -30,12 +30,6 @@ export const ConcealableField = React.memo(
 			setConcealTimeoutId(setTimeout(() => setIsEditing(false), concealTimeout))
 		}, [concealTimeout])
 
-		React.useLayoutEffect(() => {
-			if (isEditing && inputRef.current) {
-				inputRef.current.focus()
-			}
-		}, [isEditing])
-
 		return (
 			<div className={cn('concealableField', toViewClass('extended', isExtended), toStateClass('editing', isEditing))}>
 				<div className={cn('concealableField-field')}>
@@ -51,6 +45,11 @@ export const ConcealableField = React.memo(
 						setIsEditing(true)
 					}}
 					key="concealableField-cover"
+					onTransitionEnd={e => {
+						if (isEditing && inputRef.current && e.currentTarget === e.target) {
+							inputRef.current.focus()
+						}
+					}}
 				>
 					<div className="concealableField-value">{renderConcealedValue()}</div>
 					<Button

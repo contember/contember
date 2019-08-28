@@ -294,6 +294,17 @@ $cui-formGroup-sizes: map_merge((
 $cui-collapsible-transition-duration: .2s !default;
 
 
+// Heading
+$cui-heading-color: $cui-color-gray-9 !default;
+
+$cui-heading-1-fontSize: 1.9em !default;
+$cui-heading-2-fontSize: 1.75em !default;
+$cui-heading-3-fontSize: 1.5em !default;
+$cui-heading-4-fontSize: 1.25em !default;
+$cui-heading-5-fontSize: 1.15em !default;
+$cui-heading-6-fontSize: 1em !default
+
+
 // Menu
 $cui-menu-vertical-padding: rem(8px) !default;
 $cui-menu-horizontal-padding: rem(28px) !default;

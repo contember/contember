@@ -280,6 +280,7 @@ const schema: DocumentNode = gql`
 		id: String!
 		name: String!
 		slug: String!
+		roles: [String!]!
 	}
 
 	type ApiKey {

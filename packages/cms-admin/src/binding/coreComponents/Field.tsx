@@ -148,6 +148,7 @@ namespace Field {
 			))
 		}, [environment, isMutating, propsName, propsChildren])
 	})
+	DataRetriever.displayName = 'Field.DataRetriever'
 
 	export interface RawMetadataGeneratorProps extends RawMetadata {
 		children: DataRetrieverProps['children']
@@ -164,6 +165,7 @@ namespace Field {
 		}, [props.fieldName, props.data, props.isMutating, props.environment])
 		return <>{props.children(rawMetadata)}</>
 	})
+	RawMetadataGenerator.displayName = 'Field.RawMetadataGenerator'
 }
 
 export { Field }

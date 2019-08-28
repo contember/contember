@@ -74,6 +74,7 @@ namespace ToOne {
 			{props.children}
 		</DataContext.Provider>
 	))
+	AccessorRenderer.displayName = 'ToOne.AccessorRenderer'
 
 	// AccessorRetriever is really legacy API to retain support for class components
 	export interface AccessorRetrieverProps extends AtomicPrimitiveProps {

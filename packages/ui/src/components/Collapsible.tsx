@@ -50,3 +50,4 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 		</div>
 	)
 })
+Collapsible.displayName = 'Collapsible'

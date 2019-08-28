@@ -37,3 +37,4 @@ export const FormGroup = React.memo(
 		)
 	},
 )
+FormGroup.displayName = 'FormGroup'

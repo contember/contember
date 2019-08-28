@@ -6,6 +6,8 @@ import cn from 'classnames'
 const DepthContext = React.createContext(0)
 
 class Menu extends React.PureComponent<Menu.Props> {
+	public static displayName = 'Menu'
+
 	public render() {
 		return (
 			<DepthContext.Provider value={0}>

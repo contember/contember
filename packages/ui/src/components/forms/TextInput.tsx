@@ -44,12 +44,10 @@ export const TextInput = React.memo(
 
 			if (otherProps.allowNewlines) {
 				const { allowNewlines, ...textareaProps } = otherProps
-				return (
-					<TextareaAutosize ref={ref as any} className={finalClassName} useCacheForDOMMeasurements {...textareaProps} />
-				)
+				return <TextareaAutosize ref={ref} className={finalClassName} useCacheForDOMMeasurements {...textareaProps} />
 			}
 			const { allowNewlines, ...inputProps } = otherProps
-			return <input ref={ref as any} type="text" className={finalClassName} {...inputProps} />
+			return <input ref={ref} type="text" className={finalClassName} {...inputProps} />
 		},
 	),
 )

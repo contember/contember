@@ -20,7 +20,7 @@ export interface DateFieldInnerProps extends Omit<DateFieldProps, 'name' | 'labe
 }
 
 export const DateFieldInner = React.memo(
-	React.forwardRef((props: DateFieldInnerProps, ref: React.Ref<any>) => {
+	React.forwardRef((props: DateFieldInnerProps, suppliedRef: React.Ref<any>) => {
 		const generateOnChange = (data: FieldAccessor<string>) => (date: Date | null) => {
 			data.updateValue && data.updateValue(date ? date.toISOString() : null)
 		}
@@ -32,7 +32,7 @@ export const DateFieldInner = React.memo(
 					return (
 						<TextInput
 							{...legalProps}
-							ref={ref}
+							ref={suppliedRef}
 							onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
 								outerOnFocus && outerOnFocus(e)
 								innerProps.onFocus && innerProps.onFocus(e)
@@ -44,7 +44,7 @@ export const DateFieldInner = React.memo(
 						/>
 					)
 				}),
-			[outerOnBlur, outerOnFocus],
+			[outerOnBlur, outerOnFocus, suppliedRef],
 		)
 		return (
 			<DatePicker
@@ -55,7 +55,6 @@ export const DateFieldInner = React.memo(
 				readOnly={props.fieldMetadata.isMutating}
 				isClearable={true}
 				customInput={<UnderlyingTextInput />}
-				customInputRef={ref as any}
 				dateFormat={props.dateFormat}
 			/>
 		)

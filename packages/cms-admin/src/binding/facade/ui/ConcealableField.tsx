@@ -1,4 +1,4 @@
-import { Button, ButtonProps, toViewClass } from '@contember/ui'
+import { Button, ButtonProps, toStateClass, toViewClass } from '@contember/ui'
 import * as React from 'react'
 import cn from 'classnames'
 
@@ -37,31 +37,30 @@ export const ConcealableField = React.memo(
 		}, [isEditing])
 
 		return (
-			<div className={cn('concealableField', toViewClass('extended', isExtended))}>
-				{!isEditing && (
-					<div
-						className="concealableField-in"
-						onClick={() => {
-							setIsEditing(true)
-						}}
-						key="concealableField-in"
-					>
-						<div className="concealableField-value">{renderConcealedValue()}</div>
-						<Button
-							size="small"
-							distinction="seamless"
-							children="Edit"
-							{...buttonProps}
-							className="concealableField-button"
-						/>
-					</div>
-				)}
-				{isEditing &&
-					children({
+			<div className={cn('concealableField', toViewClass('extended', isExtended), toStateClass('editing', isEditing))}>
+				<div className={cn('concealableField-field')}>
+					{children({
 						onBlur,
 						onFocus,
 						inputRef,
 					})}
+				</div>
+				<div
+					className="concealableField-cover"
+					onClick={() => {
+						setIsEditing(true)
+					}}
+					key="concealableField-cover"
+				>
+					<div className="concealableField-value">{renderConcealedValue()}</div>
+					<Button
+						size="small"
+						distinction="seamless"
+						children="Edit"
+						{...buttonProps}
+						className="concealableField-button"
+					/>
+				</div>
 			</div>
 		)
 	},

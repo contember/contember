@@ -1,18 +1,43 @@
 @import '../common'
 
 .concealableField
+	$t-toggle: .2s
+
 	margin: .5em 0 1em
 	cursor: pointer
+	position: relative
 
-	&-in
+	&-field
+		visibility: hidden
+		opacity: 0
+		transition-delay: 0s
+
+	&-cover
+		+absolute(0)
 		display: flex
 		align-items: center
+		transition-delay: $t-toggle
+
+	&-field,
+	&-cover
+		transition-property: opacity, visibility
+		transition-duration: $t-toggle
 
 	&-value
 		color: $c-text-light
 
 	&-button
 		margin-left: 1em
+
+	&.is-editing &
+		&-cover
+			visibility: hidden
+			opacity: 0
+			transition-delay: 0s
+		&-field
+			visibility: visible
+			opacity: 1
+			transition-delay: $t-toggle
 
 	&.view-extended &
 		&-value

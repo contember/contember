@@ -9,7 +9,6 @@ import {
 	EntityCollectionAccessor,
 	EntityForRemovalAccessor,
 	FieldAccessor,
-	ReferenceMarker,
 } from '../../../dao'
 import { Parser } from '../../../queryLanguage'
 import { getNestedEntity } from '../../utils'
@@ -21,7 +20,7 @@ export type DynamicChoiceFieldProps = ChoiceField.InnerBaseProps & {
 
 export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldProps> {
 	public render() {
-		const data = this.props.rawMetadata.data
+		const data = this.props.data
 
 		if (!(data instanceof EntityAccessor)) {
 			throw new DataBindingError('Corrupted data')
@@ -30,12 +29,12 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 		const parsedOptions = Parser.parseQueryLanguageExpression(
 			this.props.options,
 			this.props.optionFieldFactory ? Parser.EntryPoint.QualifiedEntityList : Parser.EntryPoint.QualifiedFieldList,
-			this.props.rawMetadata.environment,
+			this.props.environment,
 		)
 		const { toOneProps } = parsedOptions
 
-		const subTreeRootAccessor = data.data.getTreeRoot(this.props.rawMetadata.fieldName)
-		const currentValueEntity = data.data.getField(this.props.rawMetadata.fieldName)
+		const subTreeRootAccessor = data.data.getTreeRoot(this.props.fieldName)
+		const currentValueEntity = data.data.getField(this.props.fieldName)
 
 		if (!(subTreeRootAccessor instanceof AccessorTreeRoot)) {
 			throw new DataBindingError('Corrupted data: dynamic choice field options have not been retrieved.')
@@ -116,7 +115,7 @@ export class DynamicChoiceField extends React.PureComponent<DynamicChoiceFieldPr
 		)
 
 		const baseMetadata: BaseChoiceMetadata = {
-			...this.props.rawMetadata,
+			...this.props,
 			data: normalizedData,
 			errors: currentValueEntity.errors,
 		}

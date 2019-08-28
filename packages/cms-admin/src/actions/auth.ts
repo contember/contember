@@ -11,39 +11,44 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 	services,
 ) => {
 	dispatch(createAction(SET_LOADING)())
-	const { signIn } = await services.tenantClient.request(
-		loginMutation,
-		{
-			email,
-			password,
-			expiration: rememberMe ? 3600 * 24 * 14 : undefined,
-		},
-		services.config.loginToken,
-	)
-	if (signIn.ok) {
-		await invokeIfSupportsCredentials(async () => {
-			const credentials = await navigator.credentials.create({
-				password: {
-					password,
-					id: email,
-				},
+	try {
+		const { signIn } = await services.tenantClient.request(
+			loginMutation,
+			{
+				email,
+				password,
+				expiration: rememberMe ? 3600 * 24 * 14 : undefined,
+			},
+			services.config.loginToken,
+		)
+		if (signIn.ok) {
+			await invokeIfSupportsCredentials(async () => {
+				const credentials = await navigator.credentials.create({
+					password: {
+						password,
+						id: email,
+					},
+				})
+				if (credentials) {
+					await navigator.credentials.store(credentials)
+				}
 			})
-			if (credentials) {
-				await navigator.credentials.store(credentials)
-			}
-		})
-		dispatch(
-			createAction<AuthIdentity>(SET_IDENTITY, () => ({
-				token: signIn.result.token,
-				email: signIn.result.person.email,
-				projects: signIn.result.person.identity.projects.map((it: any) => it.slug),
-			}))(),
-		)
-		dispatch(pushRequest(() => ({ name: 'projects_list' })))
-	} else {
-		dispatch(
-			createAction(SET_ERROR, () => signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', '))(),
-		)
+			dispatch(
+				createAction<AuthIdentity>(SET_IDENTITY, () => ({
+					token: signIn.result.token,
+					email: signIn.result.person.email,
+					projects: signIn.result.person.identity.projects.map((it: any) => it.slug),
+				}))(),
+			)
+			dispatch(pushRequest(() => ({ name: 'projects_list' })))
+		} else {
+			dispatch(
+				createAction(SET_ERROR, () => signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', '))(),
+			)
+		}
+	} catch (error) {
+		console.error(error.message)
+		dispatch(createAction(SET_ERROR, () => 'Something went wrong')())
 	}
 }
 

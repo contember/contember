@@ -95,8 +95,8 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 						>
 							<ButtonGroup isVertical>
 								<SwitchProjectLink
-									Component={({ onClick }) => (
-										<Button distinction="seamless" flow="block" onClick={onClick}>
+									Component={({ onClick, href }) => (
+										<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
 											Switch project
 										</Button>
 									)}

@@ -23,13 +23,13 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 			return null
 		}
 
-		const environment = this.props.rawMetadata.environment
+		const environment = this.props.environment
 		const options: Array<[GraphQlBuilder.Literal | Scalar, ChoiceField.Label]> = this.isLiteralStaticMode(rawOptions)
 			? this.normalizeLiteralStaticOptions(rawOptions, environment)
 			: this.normalizeScalarStaticOptions(rawOptions, environment)
 
 		return (
-			<Field name={this.props.rawMetadata.fieldName}>
+			<Field name={this.props.fieldName}>
 				{({ data, ...otherMetadata }): React.ReactNode => {
 					if (this.props.arity === ChoiceArity.Multiple) {
 						throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')

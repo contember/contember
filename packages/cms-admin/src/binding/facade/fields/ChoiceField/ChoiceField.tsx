@@ -63,7 +63,7 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 				{rawMetadata => {
 					// Unfortunately, the "any" type is necessary because the TS inference otherwise fails here for some reason.
 					const commonProps: any = {
-						rawMetadata,
+						...rawMetadata,
 						name: this.props.name,
 						options: this.props.options,
 						arity: this.props.arity,
@@ -136,9 +136,7 @@ namespace ChoiceField {
 
 	export type Data<ActualValue extends Environment.Value = string> = SingleDatum<ActualValue>[]
 
-	export type InnerBaseProps = ChoiceFieldBaseProps & {
-		rawMetadata: Field.RawMetadata
-	}
+	export type InnerBaseProps = Field.RawMetadata & ChoiceFieldBaseProps
 }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<

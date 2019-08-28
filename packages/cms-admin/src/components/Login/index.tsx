@@ -1,5 +1,5 @@
-import { Callout, Card, Elevation } from '@blueprintjs/core'
-import { Button, FormGroup, TextInput } from '@contember/ui'
+import { Card, Elevation } from '@blueprintjs/core'
+import { Button, FormGroup, TextInput, ErrorList } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { login, tryAutoLogin } from '../../actions/auth'
@@ -34,9 +34,18 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 						}}
 					>
 						{this.props.errorMessage && (
-							<Callout intent="danger" icon={null}>
-								{this.props.errorMessage}
-							</Callout>
+							<>
+								<ErrorList
+									size="large"
+									errors={[
+										{
+											key: '1',
+											message: this.props.errorMessage,
+										},
+									]}
+								/>
+								<br />
+							</>
 						)}
 						<FormGroup label="Email">
 							<TextInput

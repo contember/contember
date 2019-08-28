@@ -2,12 +2,12 @@ import * as React from 'react'
 import cn from 'classnames'
 import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
 import LogoutLink from './LogoutLink'
-import { Avatar, AvatarSize, Dropdown } from './ui'
+import { Avatar, AvatarSize } from './ui'
 import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { connect } from 'react-redux'
 import State from '../state'
-import { Button, Dropdown2 } from '@contember/ui'
+import { Button, ButtonGroup, Dropdown2 } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutOwnProps {
@@ -93,20 +93,22 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 							}
 							onCloseRequest={this.closeAvatarDropdown}
 						>
-							<SwitchProjectLink
-								Component={({ onClick }) => (
-									<Button distinction="seamless" flow="block" onClick={onClick}>
-										Switch project
-									</Button>
-								)}
-							/>
-							<LogoutLink
-								Component={props => (
-									<Button distinction="seamless" flow="block" {...props}>
-										Sign Out
-									</Button>
-								)}
-							/>
+							<ButtonGroup isVertical>
+								<SwitchProjectLink
+									Component={({ onClick }) => (
+										<Button distinction="seamless" flow="block" onClick={onClick}>
+											Switch project
+										</Button>
+									)}
+								/>
+								<LogoutLink
+									Component={props => (
+										<Button distinction="seamless" flow="block" {...props}>
+											Sign Out
+										</Button>
+									)}
+								/>
+							</ButtonGroup>
 						</Dropdown2>
 					</div>
 				</header>

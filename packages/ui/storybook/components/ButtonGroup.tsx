@@ -7,9 +7,11 @@ import { simpleButtonStory } from './Button'
 
 storiesOf('ButtonGroup', module).add('simple', () => {
 	const size = sizeKnob()
+	const isVertical = boolean('Is vertical', false)
+	const isTopToolbar = boolean('Is top toolbar', false)
 
 	return (
-		<ButtonGroup size={size} isTopToolbar={boolean('Is top toolbar', false)}>
+		<ButtonGroup size={size} isVertical={isVertical} isTopToolbar={isTopToolbar}>
 			{simpleButtonStory(size)}
 		</ButtonGroup>
 	)

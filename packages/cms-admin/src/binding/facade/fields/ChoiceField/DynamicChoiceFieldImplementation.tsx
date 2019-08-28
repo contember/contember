@@ -41,7 +41,7 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 
 	const optionEntities: EntityAccessor[] = []
 
-	for (let entity of filteredData) {
+	for (const entity of filteredData) {
 		optionEntities.push(getNestedEntity(entity, toOneProps))
 	}
 

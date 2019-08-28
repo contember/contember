@@ -82,14 +82,14 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 						{this.props.header.right}
 						<Dropdown.Revealer
 							opener={
-								<Button distinction="seamless">
+								<Button distinction="seamless" flow="circular" size="large">
 									<Avatar size={AvatarSize.Size2} email={this.props.identity} />
 								</Button>
 							}
 						>
 							<Dropdown>
 								<SwitchProjectLink
-									Component={props => (
+									Component={({ isActive, ...props }) => (
 										<Dropdown.Item>
 											<a {...props}>Switch project</a>
 										</Dropdown.Item>

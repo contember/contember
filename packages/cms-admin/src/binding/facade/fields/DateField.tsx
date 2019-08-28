@@ -1,12 +1,14 @@
 import { SingleLineTextInputProps, TextInput } from '@contember/ui'
 import * as React from 'react'
-import DatePicker from 'react-datepicker'
+import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
 import { FieldMetadata } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type DateFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState'>
+	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState'> & {
+		dateFormat?: ReactDatePickerProps['dateFormat']
+	}
 
 export const DateField = SimpleRelativeSingleField<DateFieldProps, string>(
 	(fieldMetadata, props) => <DateFieldInner fieldMetadata={fieldMetadata} {...props} />,
@@ -50,6 +52,7 @@ export const DateFieldInner = React.memo<DateFieldInnerProps>(props => {
 			readOnly={props.fieldMetadata.isMutating}
 			isClearable={true}
 			customInput={<UnderlyingTextInput />}
+			dateFormat={props.dateFormat}
 		/>
 	)
 })

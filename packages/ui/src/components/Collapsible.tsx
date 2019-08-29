@@ -9,11 +9,11 @@ export interface CollapsibleProps {
 	children?: React.ReactNode
 }
 
-export const Collapsible = React.memo(({ transition = 'topInsert', ...otherProps }: CollapsibleProps) => {
+export const Collapsible = React.memo(({ transition = 'topInsert', ...props }: CollapsibleProps) => {
 	const contentRef = React.useRef<HTMLDivElement>(null)
 	const [isTransitioning, setIsTransitioning] = React.useState(false)
 	const [contentHeight, setContentHeight] = React.useState('auto')
-	const [delayedExpanded, setDelayedExpanded] = React.useState(otherProps.expanded)
+	const [delayedExpanded, setDelayedExpanded] = React.useState(props.expanded)
 
 	const onTransitionEnd = () => {
 		setContentHeight('auto')
@@ -26,15 +26,15 @@ export const Collapsible = React.memo(({ transition = 'topInsert', ...otherProps
 	}
 
 	React.useEffect(() => {
-		if (otherProps.expanded !== delayedExpanded) {
+		if (props.expanded !== delayedExpanded) {
 			setIsTransitioning(true)
 			updateContentHeight()
 			requestAnimationFrame(() => {
 				contentRef.current!.clientHeight // Force reflow
-				setDelayedExpanded(otherProps.expanded)
+				setDelayedExpanded(props.expanded)
 			})
 		}
-	}, [delayedExpanded, otherProps.expanded])
+	}, [delayedExpanded, props.expanded])
 
 	return (
 		<div
@@ -49,11 +49,11 @@ export const Collapsible = React.memo(({ transition = 'topInsert', ...otherProps
 					'--cui-collapsible-content-height': contentHeight,
 				} as React.CSSProperties // Custom properties not supported workaround
 			}
-			aria-hidden={!otherProps.expanded}
+			aria-hidden={!props.expanded}
 			onTransitionEnd={onTransitionEnd}
 		>
 			<div className="collapsible-content" ref={contentRef}>
-				{otherProps.children}
+				{props.children}
 			</div>
 		</div>
 	)

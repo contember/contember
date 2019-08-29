@@ -9,11 +9,18 @@
 	&-navigation
 		margin-bottom: .25em
 		flex: 1 0 100%
+	&-in
+		display: flex
+		flex-wrap: wrap
+		align-items: center
+		margin-top: 1em
+		width: 100%
+	&-navigation + &-in
+		margin-top: 0
+
 	&-heading
 		flex: 1 1 auto
+		padding-right: .5em
 	&-actions
 		flex: 0 0 auto
 		margin-left: auto
-	&-heading,
-	&-actions
-		margin-bottom: .5em

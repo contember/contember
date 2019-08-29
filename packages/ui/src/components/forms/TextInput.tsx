@@ -6,12 +6,12 @@ import { toEnumStateClass, toEnumViewClass, toViewClass } from '../../utils'
 
 type PropBlackList = 'onChange' | 'ref' | 'defaultValue' | 'size'
 
-export type UnderlyingTextAreaProps = Omit<JSX.IntrinsicElements['textarea'], PropBlackList> & {
+type UnderlyingTextAreaProps = Omit<JSX.IntrinsicElements['textarea'], PropBlackList> & {
 	allowNewlines: true
 	minRows?: number
 }
 
-export type UnderlyingInputProps = Omit<JSX.IntrinsicElements['input'], PropBlackList> & {
+type UnderlyingInputProps = Omit<JSX.IntrinsicElements['input'], PropBlackList> & {
 	allowNewlines?: false
 }
 

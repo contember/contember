@@ -6,14 +6,14 @@ import { Button, ButtonProps } from './forms'
 
 export type DropdownAlignment = 'start' | 'end' | 'auto'
 
-interface Dropdown2RenderProps {
+interface DropdownRenderProps {
 	requestClose: () => void
 }
 
-export interface Dropdown2Props {
+export interface DropdownProps {
 	buttonProps?: ButtonProps // @TODO: omit 'onClick' and 'Component'
 	alignment?: DropdownAlignment
-	children?: React.ReactElement | ((props: Dropdown2RenderProps) => React.ReactNode)
+	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)
 }
 
 const alignmentToPlacement = (alignment: DropdownAlignment) => {
@@ -62,7 +62,7 @@ const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: 
 	return { buttonRef, contentRef }
 }
 
-export const Dropdown2 = React.memo(({ alignment = 'start', ...props }: Dropdown2Props) => {
+export const Dropdown = React.memo(({ alignment = 'start', ...props }: DropdownProps) => {
 	const [isOpen, setIsOpen] = React.useState(false)
 	const toggleIsOpen = React.useCallback(() => {
 		setIsOpen(!isOpen)
@@ -74,10 +74,10 @@ export const Dropdown2 = React.memo(({ alignment = 'start', ...props }: Dropdown
 
 	return (
 		<Manager>
-			<div className="dropdown2">
+			<div className="dropdown">
 				<Reference>
 					{({ ref }) => (
-						<div className="dropdown2-button" ref={ref}>
+						<div className="dropdown-button" ref={ref}>
 							<Button ref={refs.buttonRef} {...props.buttonProps} onClick={toggleIsOpen} />
 						</div>
 					)}
@@ -85,9 +85,9 @@ export const Dropdown2 = React.memo(({ alignment = 'start', ...props }: Dropdown
 				{createPortal(
 					<Popper placement={alignmentToPlacement(alignment)}>
 						{({ ref, style, placement }) => (
-							<div ref={refs.contentRef} className="dropdown2-content" style={style} data-placement={placement}>
+							<div ref={refs.contentRef} className="dropdown-content" style={style} data-placement={placement}>
 								<Collapsible expanded={isOpen} transition="fade">
-									<div ref={ref} className="dropdown2-content-in">
+									<div ref={ref} className="dropdown-content-in">
 										{typeof props.children === 'function' ? props.children({ requestClose: close }) : props.children}
 									</div>
 								</Collapsible>

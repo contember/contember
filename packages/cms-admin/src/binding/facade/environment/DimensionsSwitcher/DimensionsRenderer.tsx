@@ -1,4 +1,4 @@
-import { Button, ButtonProps, ButtonGroup, Spinner, Dropdown2 } from '@contember/ui'
+import { Button, ButtonProps, ButtonGroup, Spinner, Dropdown } from '@contember/ui'
 import * as React from 'react'
 import { Checkbox, Link, useRedirect } from '../../../../components'
 import { RequestChange } from '../../../../state/request'
@@ -212,13 +212,13 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	}
 
 	return (
-		<Dropdown2
+		<Dropdown
 			buttonProps={{
 				...props.buttonProps,
 				children: renderSelected(selectedDimensions),
 			}}
 		>
 			{renderContent(normalizedData, selectedDimensions)}
-		</Dropdown2>
+		</Dropdown>
 	)
 })

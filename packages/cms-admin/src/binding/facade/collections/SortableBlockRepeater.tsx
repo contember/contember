@@ -10,7 +10,7 @@ import { Component } from '../auxiliary'
 import { AlternativeFields } from '../ui'
 import { Sortable } from './Sortable'
 import { SortableRepeaterProps } from './SortableRepeater'
-import { Button, ButtonGroup, Dropdown2 } from '@contember/ui'
+import { Button, ButtonGroup, Dropdown } from '@contember/ui'
 
 export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
 	alternatives: AlternativeFields.ControllerFieldLiteralMetadata[]
@@ -88,7 +88,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 									)}
 									{field.addNew && (
 										<div className="cloneable-button">
-											<Dropdown2
+											<Dropdown
 												buttonProps={{
 													children: '+ Add new',
 												}}
@@ -137,7 +137,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 														))}
 													</ButtonGroup>
 												)}
-											</Dropdown2>
+											</Dropdown>
 										</div>
 									)}
 								</div>

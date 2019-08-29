@@ -4,17 +4,14 @@ import { ButtonDistinction, ButtonFlow, Intent, Size } from '../../types'
 import { toStateClass, toEnumViewClass } from '../../utils'
 import { Spinner } from '../Spinner'
 
-// TODO these types are wonky
-interface ButtonBasedProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+type PropBlackList = 'onChange' | 'ref' | 'size'
+
+interface ButtonBasedProps extends Omit<JSX.IntrinsicElements['button'], PropBlackList> {
 	Component?: 'button' | undefined
 }
 
-interface AnchorBasedProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+interface AnchorBasedProps extends Omit<JSX.IntrinsicElements['a'], PropBlackList> {
 	Component: 'a'
-}
-
-interface GenericProps extends React.HTMLAttributes<HTMLElement> {
-	Component: Exclude<keyof JSX.IntrinsicElements, 'button' | 'a'>
 }
 
 export interface ButtonOwnProps {
@@ -28,7 +25,7 @@ export interface ButtonOwnProps {
 	children?: React.ReactNode
 }
 
-export type ButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps | GenericProps)
+export type ButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps)
 
 export const Button = React.memo(
 	React.forwardRef<any, ButtonProps>((props, ref) => {

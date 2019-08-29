@@ -37,7 +37,10 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 				createAction<AuthIdentity>(SET_IDENTITY, () => ({
 					token: signIn.result.token,
 					email: signIn.result.person.email,
-					projects: signIn.result.person.identity.projects,
+					projects: signIn.result.person.identity.projects.map((project: any) => ({
+						...project,
+						roles: new Set(project.roles),
+					})),
 				}))(),
 			)
 			dispatch(pushRequest(() => ({ name: 'projects_list' })))

@@ -19,7 +19,7 @@ export class NoUiRenderer extends React.PureComponent<RendererProps> {
 								value =>
 									value && (
 										<DataContext.Provider value={value} key={value.getKey()}>
-											{DefaultRenderer.renderTitle(this.props.title)}
+											{DefaultRenderer.renderTitleBar(this.props)}
 											{this.props.children}
 										</DataContext.Provider>
 									),

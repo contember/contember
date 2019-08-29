@@ -22,13 +22,6 @@ export interface DimensionsRendererProps {
 export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsRendererProps) => {
 	const environment = React.useContext(EnvironmentContext)
 	const redirect = useRedirect()
-	const [isOpen, setIsOpen] = React.useState(false)
-	const toggleDropdownIsOpen = React.useCallback(() => {
-		setIsOpen(!isOpen)
-	}, [isOpen])
-	const closeDropdown = React.useCallback(() => {
-		setIsOpen(false)
-	}, [])
 
 	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
 		const renderer = props.renderSelected || renderByJoining
@@ -205,13 +198,10 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 
 	return (
 		<Dropdown2
-			handle={
-				<Button {...props.buttonProps} onClick={toggleDropdownIsOpen}>
-					{renderSelected(selectedDimensions)}
-				</Button>
-			}
-			isOpen={isOpen}
-			onCloseRequest={closeDropdown}
+			buttonProps={{
+				...props.buttonProps,
+				children: renderSelected(selectedDimensions),
+			}}
 		>
 			{renderContent(normalizedData, selectedDimensions)}
 		</Dropdown2>

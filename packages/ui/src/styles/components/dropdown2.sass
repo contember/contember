@@ -6,29 +6,24 @@
 		//
 
 	&-content
+		$space: .5em
+
 		color: $cui-dropdown2-content-color
+		z-index: 100
 
 		&-in
+			margin-top: $space
 			border-style: solid
 			border-width: $cui-control-border-width
 			border-radius: $cui-control-border-radius + $cui-control-border-width
 			border-color: $cui-dropdown2-content-border-color
 			background: $cui-dropdown2-content-background
 
-	&-arrow
-		position: relative
-		width: 1em
-		display: flex
-		justify-content: center
+		&[data-placement^="top"] &-in
+			margin-bottom: $space
 
-		&-in
-			flex-shrink: 0
-			width: 0.5em
-			height: 0.5em
-			margin-bottom: -$cui-control-border-width
-			border-style: solid
-			border-width: $cui-control-border-width
-			border-color: $cui-dropdown2-content-border-color
-			background-color: $cui-dropdown2-content-background
-			transform: translateY(50%) rotate(45deg)
-			clip-path: polygon(0 100%, 0 0, 100% 0)
+		&[data-placement^="left"] &-in
+			margin-right: $space
+
+		&[data-placement^="right"] &-in
+			margin-left: $space

@@ -70,13 +70,12 @@ export const Dropdown2 = React.memo(({ alignment = 'start', ...props }: Dropdown
 					)}
 				</Reference>
 				<Popper placement={alignmentToPlacement(alignment)}>
-					{({ ref, style, placement, arrowProps }) => (
-						<div className="dropdown2-content" ref={ref} style={style} data-placement={placement}>
-							<Collapsible expanded={isOpen} transition="topInsert">
-								<div className="dropdown2-arrow" ref={arrowProps.ref} style={arrowProps.style}>
-									<div className="dropdown2-arrow-in" />
+					{({ ref, style, placement }) => (
+						<div className="dropdown2-content" style={style} data-placement={placement}>
+							<Collapsible expanded={isOpen} transition="fade">
+								<div ref={ref} className="dropdown2-content-in">
+									{props.children}
 								</div>
-								<div className="dropdown2-content-in">{props.children}</div>
 							</Collapsible>
 						</div>
 					)}

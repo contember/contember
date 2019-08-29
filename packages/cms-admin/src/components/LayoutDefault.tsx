@@ -27,13 +27,11 @@ export interface LayoutStateProps {
 
 interface LayoutDefaultState {
 	menuOpen: boolean
-	isAvatarDropdownOpen: boolean
 }
 
 class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProps, LayoutDefaultState> {
 	state: LayoutDefaultState = {
 		menuOpen: false,
-		isAvatarDropdownOpen: false,
 	}
 
 	private sideRef = React.createRef<HTMLElement>()
@@ -84,14 +82,13 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 					<div className="navbar-right">
 						{this.props.header.right}
 						<Dropdown2
-							isOpen={this.state.isAvatarDropdownOpen}
 							alignment="end"
-							handle={
-								<Button size="large" distinction="seamless" flow="circular" onClick={this.toggleAvatarDropdownOpen}>
-									<Avatar size={AvatarSize.Size2} email={this.props.identity} />
-								</Button>
-							}
-							onCloseRequest={this.closeAvatarDropdown}
+							buttonProps={{
+								size: 'large',
+								distinction: 'seamless',
+								flow: 'circular',
+								children: <Avatar size={AvatarSize.Size2} email={this.props.identity} />,
+							}}
 						>
 							<ButtonGroup isVertical>
 								<SwitchProjectLink
@@ -127,18 +124,6 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 				</div>
 			</>
 		)
-	}
-
-	toggleAvatarDropdownOpen = () => {
-		this.setState({
-			isAvatarDropdownOpen: !this.state.isAvatarDropdownOpen,
-		})
-	}
-
-	closeAvatarDropdown = () => {
-		this.setState({
-			isAvatarDropdownOpen: false,
-		})
 	}
 }
 

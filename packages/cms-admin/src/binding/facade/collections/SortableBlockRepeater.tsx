@@ -7,15 +7,14 @@ import { EntityAccessor, EntityCollectionAccessor, FieldAccessor, VariableLitera
 import { VariableInputTransformer } from '../../model/VariableInputTransformer'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component } from '../auxiliary'
-import { SelectFieldInner } from '../fields'
 import { AlternativeFields } from '../ui'
 import { Sortable } from './Sortable'
 import { SortableRepeaterProps } from './SortableRepeater'
+import { Button, ButtonGroup, Dropdown2 } from '@contember/ui'
 
 export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
 	alternatives: AlternativeFields.ControllerFieldLiteralMetadata[]
 	discriminationField: RelativeSingleField
-	addNewLabel?: React.ReactNode
 	children?: never
 	emptyMessage?: React.ReactNode
 }
@@ -89,38 +88,56 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 									)}
 									{field.addNew && (
 										<div className="cloneable-button">
-											<SelectFieldInner
-												label={props.addNewLabel}
-												data={addNewOptions}
-												currentValue={-1}
-												onChange={newValue => {
-													if (!(newValue in addNewOptions)) {
-														return
-													}
-													const targetValue = addNewOptions[newValue].actualValue
-													if (filteredEntities.length === 1 && firstDiscriminationNull) {
-														return firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
-													}
-													field.addNew &&
-														field.addNew(getAccessor => {
-															const accessor = getAccessor()
-															const newlyAdded = accessor.entities[accessor.entities.length - 1]
-															if (!(newlyAdded instanceof EntityAccessor)) {
-																return
-															}
-															// TODO this will fail horribly if QL is present here
-															const discriminationField = newlyAdded.data.getField(props.discriminationField)
-															if (!(discriminationField instanceof FieldAccessor) || !discriminationField.updateValue) {
-																return
-															}
-															discriminationField.updateValue(targetValue)
-														})
+											<Dropdown2
+												buttonProps={{
+													children: '+ Add new',
 												}}
-												environment={environment}
-												errors={[]}
-												firstOptionCaption="+ Add new"
-												isMutating={isMutating}
-											/>
+												alignment="auto"
+											>
+												{({ requestClose }) => (
+													<ButtonGroup isVertical>
+														{addNewOptions.map(option => (
+															<Button
+																key={option.key}
+																distinction="seamless"
+																flow="block"
+																disabled={isMutating}
+																onClick={() => {
+																	requestClose()
+																	if (!(option.key in addNewOptions)) {
+																		return
+																	}
+																	const targetValue = addNewOptions[option.key].actualValue
+																	if (filteredEntities.length === 1 && firstDiscriminationNull) {
+																		return (
+																			firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
+																		)
+																	}
+																	field.addNew &&
+																		field.addNew(getAccessor => {
+																			const accessor = getAccessor()
+																			const newlyAdded = accessor.entities[accessor.entities.length - 1]
+																			if (!(newlyAdded instanceof EntityAccessor)) {
+																				return
+																			}
+																			// TODO this will fail horribly if QL is present here
+																			const discriminationField = newlyAdded.data.getField(props.discriminationField)
+																			if (
+																				!(discriminationField instanceof FieldAccessor) ||
+																				!discriminationField.updateValue
+																			) {
+																				return
+																			}
+																			discriminationField.updateValue(targetValue)
+																		})
+																}}
+															>
+																{option.label}
+															</Button>
+														))}
+													</ButtonGroup>
+												)}
+											</Dropdown2>
 										</div>
 									)}
 								</div>

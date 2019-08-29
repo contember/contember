@@ -15,7 +15,7 @@ export class TableRenderer extends React.PureComponent<DataRendererProps & Table
 			<CollectionRenderer data={this.props.data}>
 				{(rawData, entities) => (
 					<>
-						{DefaultRenderer.renderTitle(this.props.title)}
+						{DefaultRenderer.renderTitleBar(this.props)}
 						{this.props.beforeContent}
 						{(entities.length > 0 || this.props.tableHeader) && (
 							<Table>

@@ -12,7 +12,7 @@ export class ListRenderer extends React.PureComponent<RendererProps> {
 			<CollectionRenderer data={this.props.data}>
 				{(rawData, entities) => (
 					<LayoutInner>
-						{DefaultRenderer.renderTitle(this.props.title)}
+						{DefaultRenderer.renderTitleBar(this.props)}
 						{this.props.beforeContent}
 						<UL>
 							{entities.map(value => (

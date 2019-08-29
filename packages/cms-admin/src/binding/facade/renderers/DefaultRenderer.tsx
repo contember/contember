@@ -1,10 +1,11 @@
 import { H1 } from '@blueprintjs/core'
+import { TitleBar } from '@contember/ui'
 import * as React from 'react'
 import { LayoutInner, LayoutSide } from '../../../components'
 import { DataContext } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, Environment } from '../../dao'
 import { PersistButton } from '../buttons'
-import { RendererProps } from './CommonRendererProps'
+import { RendererProps, TitleBarRendererProps } from './CommonRendererProps'
 import { FeedbackRenderer } from './FeedbackRenderer'
 
 export class DefaultRenderer extends React.PureComponent<RendererProps> {
@@ -20,7 +21,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 										value =>
 											value && (
 												<DataContext.Provider value={value} key={value.getKey()}>
-													{DefaultRenderer.renderTitle(this.props.title)}
+													{DefaultRenderer.renderTitleBar(this.props)}
 													{this.props.children}
 												</DataContext.Provider>
 											),
@@ -41,7 +42,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 							value && (
 								<DataContext.Provider value={value}>
 									<LayoutInner>
-										{DefaultRenderer.renderTitle(this.props.title)}
+										{DefaultRenderer.renderTitleBar(this.props)}
 										{this.props.children}
 										<PersistButton />
 									</LayoutInner>
@@ -60,9 +61,13 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 		)
 	}
 
-	public static renderTitle(title: RendererProps['title']): React.ReactNode {
+	public static renderTitleBar({ title, navigation, actions, headingProps }: TitleBarRendererProps): React.ReactNode {
 		if (title) {
-			return <H1>{title}</H1>
+			return (
+				<TitleBar navigation={navigation} actions={actions} headingProps={headingProps}>
+					{title}
+				</TitleBar>
+			)
 		}
 		return null
 	}

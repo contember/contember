@@ -9,7 +9,7 @@ const Component = () => {
 				children: 'Toggle',
 			}}
 		>
-			Dropdown content goes here
+			<>Dropdown content goes here</>
 		</Dropdown2>
 	)
 }

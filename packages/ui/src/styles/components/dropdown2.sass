@@ -6,25 +6,25 @@
 		//
 
 	&-content
-		$space: .5em
+		$gap: .5em
 
 		color: $cui-dropdown2-content-color
-		z-index: 100
+		z-index: $cui-dropdown2-zIndex
 
 		&-in
-			margin-top: $space
+			margin-top: $gap
 			border-style: solid
-			border-width: $cui-control-border-width
-			border-radius: $cui-control-border-radius + $cui-control-border-width
+			border-width: $cui-dropdown2-content-border-width
+			border-radius: $cui-dropdown2-content-border-radius
 			border-color: $cui-dropdown2-content-border-color
 			background: $cui-dropdown2-content-background
 			box-shadow: 0 rem(1px) rem(2px) rgba(0, 0, 0, .08)
 
 		&[data-placement^="top"] &-in
-			margin-bottom: $space
+			margin-bottom: $gap
 
 		&[data-placement^="left"] &-in
-			margin-right: $space
+			margin-right: $gap
 
 		&[data-placement^="right"] &-in
-			margin-left: $space
+			margin-left: $gap

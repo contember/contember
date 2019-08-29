@@ -12,8 +12,14 @@ export type PageConfig = {
 
 export type PageChange = () => PageConfig
 
-const PageLink = React.memo(({ project, change, stage, ...props }: Props) => {
-	const changed = change()
+const PageLink = React.memo(({ project, to, stage, ...props }: Props) => {
+	const changed =
+		typeof to === 'string'
+			? {
+					name: to,
+					params: {},
+			  }
+			: to()
 	return <Link requestChange={pageRequest(project, stage, changed.name, changed.params || {})} {...props} />
 })
 
@@ -23,7 +29,7 @@ interface StateProps {
 }
 
 export interface PageLinkProps extends Omit<LinkComponent.Props, 'goTo' | 'href' | 'requestChange'> {
-	change: PageChange
+	to: PageChange | string
 }
 
 type Props = PageLinkProps & StateProps & PublicAnchorProps

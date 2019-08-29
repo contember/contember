@@ -33,17 +33,14 @@ export function NavigationProvider(props: NavigationProviderProps) {
 				}
 				return (
 					<PageLink
-						change={() => {
-							if (typeof to === 'string') {
-								return {
-									name: to,
-								}
-							}
-							return {
-								name: to.pageName,
-								params: to.parameters,
-							}
-						}}
+						to={
+							typeof to === 'string'
+								? to
+								: () => ({
+										name: to.pageName,
+										params: to.parameters,
+								  })
+						}
 						{...props}
 					>
 						{children}

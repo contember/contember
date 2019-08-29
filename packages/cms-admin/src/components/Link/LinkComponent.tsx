@@ -6,7 +6,7 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props> {
 		if (
 			e &&
 			e.nativeEvent instanceof MouseEvent &&
-			(e.nativeEvent.altKey || e.nativeEvent.ctrlKey || e.nativeEvent.metaKey || e.nativeEvent.shiftKey)
+			(e.nativeEvent.altKey || e.nativeEvent.ctrlKey || e.nativeEvent.metaKey || e.nativeEvent.shiftKey) // @TODO: use isSpecialLinkClick.ts
 		) {
 			return
 		}

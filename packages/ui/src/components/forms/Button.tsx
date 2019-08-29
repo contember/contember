@@ -17,7 +17,7 @@ interface GenericProps extends React.HTMLAttributes<HTMLElement> {
 	Component: Exclude<keyof JSX.IntrinsicElements, 'button' | 'a'>
 }
 
-export type ButtonProps = {
+export interface ButtonOwnProps {
 	intent?: Intent
 	size?: Size
 	flow?: ButtonFlow
@@ -26,7 +26,9 @@ export type ButtonProps = {
 	isActive?: boolean
 	disabled?: boolean
 	children?: React.ReactNode
-} & (ButtonBasedProps | AnchorBasedProps | GenericProps)
+}
+
+export type ButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps | GenericProps)
 
 export const Button = React.memo(
 	React.forwardRef<any, ButtonProps>((props, ref) => {

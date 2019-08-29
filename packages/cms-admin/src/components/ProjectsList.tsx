@@ -1,6 +1,6 @@
 import { Card, H1 } from '@blueprintjs/core'
 import * as React from 'react'
-import { ProjectConfig } from '../state/projectsConfigs'
+import { ProjectConfig } from '..'
 import Link from './Link'
 import { connect } from 'react-redux'
 import State from '../state'
@@ -36,17 +36,9 @@ class ProjectsList extends React.Component<ProjectsListProps, {}> {
 					<H1>Projects</H1>
 					<div>
 						{this.props.configs.map((config, i) => (
-							<Link
-								key={i}
-								requestChange={selectProjectRequest(config)}
-								className="projectsList-item"
-								Component={props => (
-									// todo
-									<a {...props} onClick={undefined}>
-										{config.project}/{config.stage}
-									</a>
-								)}
-							/>
+							<Link key={i} requestChange={selectProjectRequest(config)} className="projectsList-item">
+								{config.project}/{config.stage}
+							</Link>
 						))}
 					</div>
 				</Card>

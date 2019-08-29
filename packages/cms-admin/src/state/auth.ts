@@ -19,8 +19,10 @@ export interface AuthIdentity {
 
 export interface Project {
 	slug: string
-	roles: string[]
+	roles: ProjectUserRoles
 }
+
+export type ProjectUserRoles = Set<string>
 
 export const emptyAuthState: AuthState = {
 	token: null,

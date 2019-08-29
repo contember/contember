@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cn from 'classnames'
-import { TokenExposer } from './Dev'
+import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
 import LogoutLink from './LogoutLink'
 import { Avatar, AvatarSize, Dropdown } from './ui'
 import { Icon } from '@blueprintjs/core'
@@ -76,6 +76,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 						)}
 						{this.props.header.left}
 						{<TokenExposer />}
+						{<ProjectUserRolesRevealer />}
 					</div>
 					<div className="navbar-center">{this.props.header.center}</div>
 					<div className="navbar-right">

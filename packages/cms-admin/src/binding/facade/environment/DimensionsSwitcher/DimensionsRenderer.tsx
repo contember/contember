@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Spinner, Dropdown2 } from '@contember/ui'
+import { Button, ButtonProps, ButtonGroup, Spinner, Dropdown2 } from '@contember/ui'
 import * as React from 'react'
 import { Checkbox, Link, useRedirect } from '../../../../components'
 import { RequestChange } from '../../../../state/request'
@@ -68,17 +68,22 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 			}
 		}
 
-		return (
+		const RenderDimensions = () => (
 			<>
-				{dimensionData.map(dimension => (
-					<div key={dimension.slug} /*active={dimension.isSelected}*/>
-						{canSelectJustOne && (
+				{dimensionData.map(dimension => {
+					if (canSelectJustOne) {
+						return (
 							<Link
+								key={dimension.slug}
 								requestChange={getRequestChangeCallback(dimension)}
 								Component={({ href, onClick }) => (
-									<a
+									<Button
+										Component="a"
 										href={href}
-										onClick={e => {
+										flow="block"
+										distinction="seamless"
+										isActive={dimension.isSelected}
+										onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
 											if (isSpecialLinkClick(e)) {
 												return
 											}
@@ -86,11 +91,12 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 										}}
 									>
 										{dimension.label}
-									</a>
+									</Button>
 								)}
 							/>
-						)}
-						{!canSelectJustOne && (
+						)
+					} else {
+						return (
 							<Checkbox
 								key={dimension.slug}
 								checked={dimension.isSelected}
@@ -99,11 +105,20 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 							>
 								{dimension.label}
 							</Checkbox>
-						)}
-					</div>
-				))}
+						)
+					}
+				})}
 			</>
 		)
+
+		if (canSelectJustOne) {
+			return (
+				<ButtonGroup isVertical>
+					<RenderDimensions />
+				</ButtonGroup>
+			)
+		}
+		return <RenderDimensions />
 	}
 
 	const getNormalizedData = (

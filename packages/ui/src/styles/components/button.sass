@@ -15,7 +15,13 @@
 	&-list
 		display: inline-flex
 		flex-wrap: wrap
-		gap: .5em
+		align-items: center
+		// gap: $cui-button-list-separation-y $cui-button-list-separation-x // This is FF only.
+		// <instead>
+		margin: (-$cui-button-list-separation-y / 2) (-$cui-button-list-separation-x / 2)
+	&-list &
+		margin: ($cui-button-list-separation-y / 2) ($cui-button-list-separation-x / 2)
+		// </instead>
 
 	&-group
 		display: inline-block

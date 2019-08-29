@@ -1,7 +1,6 @@
 export * from './Avatar'
 export * from './Checkbox'
 export * from './DragHandle'
-export * from './Dropdown'
 export * from './FileInput'
 export * from './InputGroup'
 export * from './Intent'

@@ -77,7 +77,7 @@ export const Dropdown2 = React.memo(({ alignment = 'start', ...props }: Dropdown
 			<div className="dropdown2">
 				<Reference>
 					{({ ref }) => (
-						<div className="dropdown2-handle" ref={ref}>
+						<div className="dropdown2-button" ref={ref}>
 							<Button ref={refs.buttonRef} {...props.buttonProps} onClick={toggleIsOpen} />
 						</div>
 					)}

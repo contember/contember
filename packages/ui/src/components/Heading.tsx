@@ -4,7 +4,7 @@ import { HeadingLevel } from '../types'
 import cn from 'classnames'
 
 export interface HeadingProps
-	extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement> {
+	extends Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>, 'ref'> {
 	level?: HeadingLevel
 }
 

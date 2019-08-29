@@ -251,6 +251,10 @@ $cui-button-sizes: map_merge((
 	'large': $cui-button-size-large,
 ), $cui-button-sizes);
 
+
+$cui-button-list-separation-x: .5em !default;
+$cui-button-list-separation-y: .5em !default;
+
 // ValidationMessage
 $cui-validationMessage-size-small: .8em !default;
 $cui-validationMessage-size-default: .9em !default;

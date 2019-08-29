@@ -19,7 +19,7 @@ export const PageLinkById = React.memo(function(props: PageLinkByIdProps) {
 
 		if (typeof id === 'string') {
 			return (
-				<PageLink change={() => props.change(id)} Component={props.Component}>
+				<PageLink to={() => props.change(id)} Component={props.Component}>
 					{props.children}
 				</PageLink>
 			)

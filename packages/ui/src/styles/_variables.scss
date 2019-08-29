@@ -345,6 +345,9 @@ $cui-containerSpinner-sizes: map_merge((
 
 
 // Dropdown2
+$cui-dropdown2-zIndex: 100 !default;
 $cui-dropdown2-content-color: $cui-color-black !default;
 $cui-dropdown2-content-background: $cui-color-white !default;
-$cui-dropdown2-content-border-color: $cui-color-gray-3 !default !default;
+$cui-dropdown2-content-border-color: $cui-color-gray-3 !default;
+$cui-dropdown2-content-border-radius: $cui-control-border-radius + $cui-control-border-width !default;
+$cui-dropdown2-content-border-width: $cui-control-border-width !default;

@@ -7,7 +7,7 @@ import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { connect } from 'react-redux'
 import State from '../state'
-import { Button, ButtonGroup, Dropdown2 } from '@contember/ui'
+import { Button, ButtonGroup, Dropdown } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutOwnProps {
@@ -81,7 +81,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 					<div className="navbar-center">{this.props.header.center}</div>
 					<div className="navbar-right">
 						{this.props.header.right}
-						<Dropdown2
+						<Dropdown
 							alignment="end"
 							buttonProps={{
 								size: 'large',
@@ -106,7 +106,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 									)}
 								/>
 							</ButtonGroup>
-						</Dropdown2>
+						</Dropdown>
 					</div>
 				</header>
 

@@ -1,20 +1,20 @@
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
-import { Dropdown2 } from '../../src'
+import { Dropdown } from '../../src'
 
 const Component = () => {
 	return (
-		<Dropdown2
+		<Dropdown
 			buttonProps={{
 				children: 'Toggle',
 			}}
 		>
 			<>Dropdown content goes here</>
-		</Dropdown2>
+		</Dropdown>
 	)
 }
 
-storiesOf('Dropdown2', module).add('simple', () => {
+storiesOf('Dropdown', module).add('simple', () => {
 	return (
 		<div style={{ display: 'flex' }}>
 			<Component />

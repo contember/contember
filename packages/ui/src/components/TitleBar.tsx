@@ -17,14 +17,16 @@ export const TitleBar = React.memo(({ navigation, children, headingProps, action
 					<ButtonList>{navigation}</ButtonList>
 				</nav>
 			)}
-			<div className="titleBar-heading">
-				<Heading {...headingProps}>{children}</Heading>
-			</div>
-			{actions && (
-				<div className="titleBar-actions">
-					<ButtonList>{actions}</ButtonList>
+			<div className="titleBar-in">
+				<div className="titleBar-heading">
+					<Heading {...headingProps}>{children}</Heading>
 				</div>
-			)}
+				{actions && (
+					<div className="titleBar-actions">
+						<ButtonList>{actions}</ButtonList>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 })

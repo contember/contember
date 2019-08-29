@@ -1,6 +1,6 @@
 import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
-import { Button, ButtonProps } from '@contember/ui'
+import { Button, ButtonOwnProps, ButtonProps } from '@contember/ui'
 import * as React from 'react'
 import { DataContext, MetaOperationsContext } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
@@ -11,10 +11,11 @@ export type RemoveButtonProps = ButtonProps & {
 	removeType?: RemovalType
 	immediatePersist?: true
 	icon?: IconName
+	children?: React.ReactNode
 }
 
 export const RemoveButton = React.memo((props: RemoveButtonProps) => {
-	const { removeType, icon, immediatePersist, ...rest } = props
+	const { removeType, icon, children, immediatePersist, ...rest } = props
 	const value = React.useContext(DataContext)
 	const metaOperations = React.useContext(MetaOperationsContext)
 	const isMutating = React.useContext(MutationStateContext)
@@ -36,9 +37,18 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		return null
 	}
 
+	let defaultProps: ButtonOwnProps = {}
+	if (!children) {
+		defaultProps = {
+			size: 'small',
+			flow: 'squarish',
+			distinction: 'seamless',
+		}
+	}
+
 	return (
-		<Button onClick={onClick} disabled={isMutating} size="small" flow="squarish" distinction="seamless" {...rest}>
-			<Icon icon={icon || IconNames.CROSS} color="currentColor" />
+		<Button {...defaultProps} {...rest} disabled={isMutating} onClick={onClick}>
+			{children || <Icon icon={icon || IconNames.CROSS} color="currentColor" />}
 		</Button>
 	)
 })

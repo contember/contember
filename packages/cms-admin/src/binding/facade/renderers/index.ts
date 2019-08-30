@@ -1,6 +1,7 @@
 export * from './CollectionRenderer'
 export * from './CommonRendererProps'
 export * from './DefaultRenderer'
+export * from './FeedbackRenderer'
 export * from './ListRenderer'
 export * from './MultiEditRenderer'
 export * from './TableRenderer'

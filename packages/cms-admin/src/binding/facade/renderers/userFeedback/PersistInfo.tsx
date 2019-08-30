@@ -83,3 +83,4 @@ export const PersistInfo: PersistInfoType = connect<{}, PersistInfoDispatchProps
 		},
 	}),
 )(PersistInfoConnected)
+PersistInfo.displayName = 'PersistInfo'

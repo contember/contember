@@ -28,22 +28,22 @@
 	&-content
 		width: 100%
 
-	&.view-transition-topInsert,
-	&.view-transition-bottomInsert
+	&.view-topInsert,
+	&.view-bottomInsert
 		height: 0
 
 		&.is-expanded
 			height: var(--cui-collapsible-content-height)
 
-	&.view-transition-topInsert
+	&.view-topInsert
 		align-items: flex-end
 
-	&.view-transition-bottomInsert
+	&.view-bottomInsert
 		align-items: flex-start
 
-	&.view-transition-fade,
-	&.view-transition-leftInsert,
-	&.view-transition-rightInsert
+	&.view-fade,
+	&.view-leftInsert,
+	&.view-rightInsert
 		align-items: flex-start
 		height: 0
 		transition-timing-function: step-end, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function)
@@ -52,19 +52,19 @@
 			height: var(--cui-collapsible-content-height)
 			transition-timing-function: step-start, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function)
 
-	&.view-transition-leftInsert,
-	&.view-transition-rightInsert
+	&.view-leftInsert,
+	&.view-rightInsert
 		#{$root}-content
 			transition-property: transform
 			transition-timing-function: var(--cui-collapsible-transition-timing-function)
 			transition-duration: var(--cui-collapsible-transition-duration)
 			transform: translateX(-100%)
 
-	&.view-transition-rightInsert
+	&.view-rightInsert
 		#{$root}-content
 			transform: translateX(100%)
 
-	&.view-transition-leftInsert,
-	&.view-transition-rightInsert
+	&.view-leftInsert,
+	&.view-rightInsert
 		&.is-expanded #{$root}-content
 			transform: none

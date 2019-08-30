@@ -1,4 +1,4 @@
-export { default as LayoutDefault } from './components/LayoutDefault'
+export * from './components/LayoutDefault'
 export { GraphQlBuilder } from 'cms-client'
 export * from './acl'
 export * from './binding'

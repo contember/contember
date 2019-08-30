@@ -10,7 +10,7 @@ interface DropdownRenderProps {
 }
 
 export interface DropdownProps {
-	buttonProps?: ButtonProps // @TODO: omit 'onClick'
+	buttonProps?: ButtonProps // TODO omit 'onClick'
 	alignment?: DropdownAlignment
 	contentContainer?: HTMLElement
 	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)

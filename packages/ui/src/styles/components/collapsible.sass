@@ -4,19 +4,19 @@
 	$root: &
 	$transition-timing-function: ease
 
-	--cui-collapsible-transition-duration: #{$cui-collapsible-transition-duration}
-	--cui-collapsible-transition-timing-function: #{$transition-timing-function}
-	--cui-collapsible-content-height: auto
+	--cui-collapsible-private-transition-duration: var(--cui-collapsible-transition-duration, #{$cui-collapsible-transition-duration})
+	--cui-collapsible-private-transition-timing-function: #{$transition-timing-function}
+	--cui-collapsible-private-content-height: auto
 	visibility: hidden
 	opacity: 0
 	display: flex
 	transition-property: height, width, opacity, visibility
-	transition-timing-function: var(--cui-collapsible-transition-timing-function)
-	transition-duration: var(--cui-collapsible-transition-duration)
+	transition-timing-function: var(--cui-collapsible-private-transition-timing-function)
+	transition-duration: var(--cui-collapsible-private-transition-duration)
 
 	@media (prefers-reduced-motion: reduce)
-		--cui-collapsible-transition-duration: #{(1s / 60)} // 1 frame at 60 fps
-		--cui-collapsible-transition-timing-function: step-end
+		--cui-collapsible-private-transition-duration: #{(1s / 60)} // 1 frame at 60 fps
+		--cui-collapsible-private-transition-timing-function: step-end
 
 	&.is-expanded
 		visibility: visible
@@ -33,7 +33,7 @@
 		height: 0
 
 		&.is-expanded
-			height: var(--cui-collapsible-content-height)
+			height: var(--cui-collapsible-private-content-height)
 
 	&.view-topInsert
 		align-items: flex-end
@@ -46,18 +46,18 @@
 	&.view-rightInsert
 		align-items: flex-start
 		height: 0
-		transition-timing-function: step-end, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function)
+		transition-timing-function: step-end, var(--cui-collapsible-private-transition-timing-function), var(--cui-collapsible-private-transition-timing-function), var(--cui-collapsible-private-transition-timing-function)
 
 		&.is-expanded
-			height: var(--cui-collapsible-content-height)
-			transition-timing-function: step-start, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function)
+			height: var(--cui-collapsible-private-content-height)
+			transition-timing-function: step-start, var(--cui-collapsible-private-transition-timing-function), var(--cui-collapsible-private-transition-timing-function), var(--cui-collapsible-private-transition-timing-function)
 
 	&.view-leftInsert,
 	&.view-rightInsert
 		#{$root}-content
 			transition-property: transform
-			transition-timing-function: var(--cui-collapsible-transition-timing-function)
-			transition-duration: var(--cui-collapsible-transition-duration)
+			transition-timing-function: var(--cui-collapsible-private-transition-timing-function)
+			transition-duration: var(--cui-collapsible-private-transition-duration)
 			transform: translateX(-100%)
 
 	&.view-rightInsert

@@ -92,7 +92,6 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 												buttonProps={{
 													children: '+ Add new',
 												}}
-												alignment="auto"
 											>
 												{({ requestClose }) => (
 													<ButtonGroup orientation="vertical">

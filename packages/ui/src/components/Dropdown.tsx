@@ -3,8 +3,7 @@ import { createPortal } from 'react-dom'
 import { Manager, Reference, Popper } from 'react-popper'
 import { Collapsible } from './Collapsible'
 import { Button, ButtonProps } from './forms'
-
-export type DropdownAlignment = 'start' | 'end' | 'auto'
+import { DropdownAlignment } from '../types/DropdownAlignment'
 
 interface DropdownRenderProps {
 	requestClose: () => void
@@ -16,7 +15,7 @@ export interface DropdownProps {
 	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)
 }
 
-const alignmentToPlacement = (alignment: DropdownAlignment) => {
+const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 	if (alignment === 'start') {
 		return 'bottom-start'
 	} else if (alignment === 'end') {
@@ -62,7 +61,7 @@ const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: 
 	return { buttonRef, contentRef }
 }
 
-export const Dropdown = React.memo(({ alignment = 'start', ...props }: DropdownProps) => {
+export const Dropdown = React.memo((props: DropdownProps) => {
 	const [isOpen, setIsOpen] = React.useState(false)
 	const toggleIsOpen = React.useCallback(() => {
 		setIsOpen(!isOpen)
@@ -83,7 +82,7 @@ export const Dropdown = React.memo(({ alignment = 'start', ...props }: DropdownP
 					)}
 				</Reference>
 				{createPortal(
-					<Popper placement={alignmentToPlacement(alignment)}>
+					<Popper placement={alignmentToPlacement(props.alignment)}>
 						{({ ref, style, placement }) => (
 							<div ref={refs.contentRef} className="dropdown-content" style={style} data-placement={placement}>
 								<Collapsible expanded={isOpen} transition="fade">

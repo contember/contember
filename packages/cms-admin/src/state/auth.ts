@@ -19,7 +19,7 @@ export interface AuthIdentity {
 
 export interface Project {
 	slug: string
-	roles: ProjectUserRoles
+	roles: string[]
 }
 
 export type ProjectUserRoles = Set<string>

@@ -15,6 +15,6 @@ export const useProjectUserRoles = () => {
 			return new Set()
 		}
 
-		return targetProject.roles
+		return new Set(targetProject.roles)
 	}, shallowEqual)
 }

@@ -1,8 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
-import { Size } from '../../types'
+import { ButtonGroupOrientation, Size } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
-import { ButtonGroupOrientation } from '../../types/ButtonGroupOrientation'
 
 export interface ButtonGroupProps {
 	children?: React.ReactNode

@@ -7,7 +7,7 @@ import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { connect } from 'react-redux'
 import State from '../state'
-import { Button, ButtonGroup, Dropdown } from '@contember/ui'
+import { Button, ButtonGroup, Dropdown, forceReflow } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutOwnProps {
@@ -25,107 +25,100 @@ export interface LayoutStateProps {
 	identity: string | undefined
 }
 
-interface LayoutDefaultState {
-	menuOpen: boolean
-}
+const LayoutDefault = React.memo((props: LayoutOwnProps & LayoutStateProps) => {
+	const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+	const sideRef = React.useRef<HTMLElement>(null)
 
-class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProps, LayoutDefaultState> {
-	state: LayoutDefaultState = {
-		menuOpen: false,
-	}
+	const toggleMenu = React.useCallback(
+		(event: React.MouseEvent) => {
+			event.preventDefault()
+			setIsMenuOpen(!isMenuOpen)
 
-	private sideRef = React.createRef<HTMLElement>()
+			const el = sideRef.current
+			if (el) {
+				forceReflow(el)
+				let executed = false
+				el.addEventListener(
+					'transitionend',
+					() => {
+						if (!executed) {
+							el.scrollTo(0, 0)
+							executed = true
+						}
+					},
+					{ once: true },
+				)
+			}
+		},
+		[isMenuOpen, sideRef],
+	)
 
-	toggleMenu = (event: React.MouseEvent) => {
-		event.preventDefault()
-		this.setState(
-			state => ({ ...state, menuOpen: !state.menuOpen }),
-			() => {
-				const el = this.sideRef.current
-				if (el) {
-					let executed = false
-					el.addEventListener(
-						'transitionend',
-						() => {
-							if (!executed) {
-								el.scrollTo(0, 0)
-								executed = true
-							}
-						},
-						{ once: true },
-					)
-				}
-			},
-		)
-	}
-
-	render() {
-		return (
-			<>
-				<header className="layout-navbar">
-					<div className="navbar-left">
-						{this.props.side && (
-							<button className="layout-menuBtn" onClick={this.toggleMenu}>
-								<Icon icon="menu" />
-							</button>
-						)}
-						{this.props.header.title && (
-							<PageLink to="dashboard" className="navbar-title">
-								{this.props.header.title}
-							</PageLink>
-						)}
-						{this.props.header.left}
-						{<TokenExposer />}
-						{<ProjectUserRolesRevealer />}
-					</div>
-					<div className="navbar-center">{this.props.header.center}</div>
-					<div className="navbar-right">
-						{this.props.header.right}
-						<Dropdown
-							alignment="end"
-							buttonProps={{
-								size: 'large',
-								distinction: 'seamless',
-								flow: 'circular',
-								children: <Avatar size={AvatarSize.Size2} email={this.props.identity} />,
-							}}
-						>
-							<ButtonGroup orientation="vertical">
-								<SwitchProjectLink
-									Component={({ onClick, href }) => (
-										<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
-											Switch project
-										</Button>
-									)}
-								/>
-								<LogoutLink
-									Component={props => (
-										<Button distinction="seamless" flow="block" {...props}>
-											Sign Out
-										</Button>
-									)}
-								/>
-							</ButtonGroup>
-						</Dropdown>
-					</div>
-				</header>
-
-				<div className={cn('layout-container', this.state.menuOpen && 'layout-menuOpen')}>
-					{this.props.side && (
-						<>
-							<div className="layout-menuShadow" onClick={this.toggleMenu} />
-							<aside className="layout-side" ref={this.sideRef}>
-								{this.props.side}
-							</aside>
-						</>
+	return (
+		<>
+			<header className="layout-navbar">
+				<div className="navbar-left">
+					{props.side && (
+						<button className="layout-menuBtn" onClick={toggleMenu}>
+							<Icon icon="menu" />
+						</button>
 					)}
-
-					<main className="layout-content">{this.props.content}</main>
+					{props.header.title && (
+						<PageLink to="dashboard" className="navbar-title">
+							{props.header.title}
+						</PageLink>
+					)}
+					{props.header.left}
+					{<TokenExposer />}
+					{<ProjectUserRolesRevealer />}
 				</div>
-			</>
-		)
-	}
-}
+				<div className="navbar-center">{props.header.center}</div>
+				<div className="navbar-right">
+					{props.header.right}
+					<Dropdown
+						alignment="end"
+						buttonProps={{
+							size: 'large',
+							distinction: 'seamless',
+							flow: 'circular',
+							children: <Avatar size={AvatarSize.Size2} email={props.identity} />,
+						}}
+					>
+						<ButtonGroup orientation="vertical">
+							<SwitchProjectLink
+								Component={({ onClick, href }) => (
+									<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
+										Switch project
+									</Button>
+								)}
+							/>
+							<LogoutLink
+								Component={props => (
+									<Button distinction="seamless" flow="block" {...props}>
+										Sign Out
+									</Button>
+								)}
+							/>
+						</ButtonGroup>
+					</Dropdown>
+				</div>
+			</header>
+
+			<div className={cn('layout-container', isMenuOpen && 'layout-menuOpen')}>
+				{props.side && (
+					<>
+						<div className="layout-menuShadow" onClick={toggleMenu} />
+						<aside className="layout-side" ref={sideRef}>
+							{props.side}
+						</aside>
+					</>
+				)}
+
+				<main className="layout-content">{props.content}</main>
+			</div>
+		</>
+	)
+})
+LayoutDefault.displayName = 'LayoutDefault'
 
 export default connect<LayoutStateProps, {}, LayoutOwnProps, State>(state => {
 	return {

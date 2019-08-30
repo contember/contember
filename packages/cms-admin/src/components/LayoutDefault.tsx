@@ -90,7 +90,7 @@ class LayoutDefault extends React.PureComponent<LayoutOwnProps & LayoutStateProp
 								children: <Avatar size={AvatarSize.Size2} email={this.props.identity} />,
 							}}
 						>
-							<ButtonGroup isVertical>
+							<ButtonGroup orientation="vertical">
 								<SwitchProjectLink
 									Component={({ onClick, href }) => (
 										<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">

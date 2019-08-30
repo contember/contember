@@ -95,7 +95,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 												alignment="auto"
 											>
 												{({ requestClose }) => (
-													<ButtonGroup isVertical>
+													<ButtonGroup orientation="vertical">
 														{addNewOptions.map(option => (
 															<Button
 																key={option.key}

@@ -113,7 +113,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 
 		if (canSelectJustOne) {
 			return (
-				<ButtonGroup isVertical>
+				<ButtonGroup orientation="vertical">
 					<RenderDimensions />
 				</ButtonGroup>
 			)

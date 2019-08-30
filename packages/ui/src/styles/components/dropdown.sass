@@ -6,13 +6,11 @@
 		//
 
 	&-content
-		$gap: .5em
-
 		color: $cui-dropdown-content-color
 		z-index: $cui-dropdown-zIndex
 
 		&-in
-			margin-top: $gap
+			margin-top: $cui-dropdown-button-content-gap-size
 			border-style: solid
 			border-width: $cui-dropdown-content-border-width
 			border-radius: $cui-dropdown-content-border-radius
@@ -21,10 +19,10 @@
 			box-shadow: 0 rem(1px) rem(2px) rgba(0, 0, 0, .08)
 
 		&[data-placement^="top"] &-in
-			margin-bottom: $gap
+			margin-bottom: $cui-dropdown-button-content-gap-size
 
 		&[data-placement^="left"] &-in
-			margin-right: $gap
+			margin-right: $cui-dropdown-button-content-gap-size
 
 		&[data-placement^="right"] &-in
-			margin-left: $gap
+			margin-left: $cui-dropdown-button-content-gap-size

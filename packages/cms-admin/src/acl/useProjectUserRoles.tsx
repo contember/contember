@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import State from '../state'
-import { ProjectUserRoles } from '../state/auth'
+
+export type ProjectUserRoles = Set<string>
 
 export const useProjectUserRoles = () => {
 	return useSelector<State, ProjectUserRoles>(state => {

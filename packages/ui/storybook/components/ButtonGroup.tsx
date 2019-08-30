@@ -1,17 +1,21 @@
-import { boolean } from '@storybook/addon-knobs'
+import { boolean, radios } from '@storybook/addon-knobs'
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { ButtonGroup } from '../../src/components'
+import { ButtonGroup, ButtonGroupProps } from '../../src/components'
 import { sizeKnob } from '../utils/knobs'
 import { simpleButtonStory } from './Button'
 
 storiesOf('ButtonGroup', module).add('simple', () => {
 	const size = sizeKnob()
-	const isVertical = boolean('Is vertical', false)
+	const orientation: ButtonGroupProps['orientation'] = radios('Orientation', {
+		Default: 'default',
+		Horizontal: 'horizontal',
+		Vertical: 'vertical',
+	})
 	const isTopToolbar = boolean('Is top toolbar', false)
 
 	return (
-		<ButtonGroup size={size} isVertical={isVertical} isTopToolbar={isTopToolbar}>
+		<ButtonGroup size={size} orientation={orientation} isTopToolbar={isTopToolbar}>
 			{simpleButtonStory(size)}
 		</ButtonGroup>
 	)

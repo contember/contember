@@ -2,20 +2,21 @@ import * as React from 'react'
 import cn from 'classnames'
 import { Size } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
+import { ButtonGroupOrientation } from '../../types/ButtonGroupOrientation'
 
 export interface ButtonGroupProps {
 	children?: React.ReactNode
 	size?: Size
-	isVertical?: boolean
+	orientation?: ButtonGroupOrientation
 	isTopToolbar?: boolean
 }
 
-export const ButtonGroup = React.memo(({ size, isVertical = false, isTopToolbar, children }: ButtonGroupProps) => (
+export const ButtonGroup = React.memo(({ size, orientation, isTopToolbar, children }: ButtonGroupProps) => (
 	<div
 		className={cn(
 			'button-group',
 			toEnumViewClass(size),
-			toViewClass('vertical', isVertical),
+			toEnumViewClass(orientation, 'horizontal'),
 			toViewClass('isTopToolbar', isTopToolbar),
 		)}
 		role="group"

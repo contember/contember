@@ -22,8 +22,6 @@ export interface Project {
 	roles: string[]
 }
 
-export type ProjectUserRoles = Set<string>
-
 export const emptyAuthState: AuthState = {
 	token: null,
 	identity: null,

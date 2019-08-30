@@ -9,7 +9,7 @@ export interface CollapsibleProps {
 	children?: React.ReactNode
 }
 
-export const Collapsible = React.memo(({ transition = 'topInsert', ...props }: CollapsibleProps) => {
+export const Collapsible = React.memo((props: CollapsibleProps) => {
 	const contentRef = React.useRef<HTMLDivElement>(null)
 	const [isTransitioning, setIsTransitioning] = React.useState(false)
 	const [contentHeight, setContentHeight] = React.useState('auto')
@@ -40,7 +40,7 @@ export const Collapsible = React.memo(({ transition = 'topInsert', ...props }: C
 		<div
 			className={cn(
 				'collapsible',
-				toEnumViewClass(`transition-${transition}`),
+				toEnumViewClass(props.transition, 'topInsert'),
 				toStateClass('expanded', delayedExpanded),
 				toStateClass('transitioning', isTransitioning),
 			)}

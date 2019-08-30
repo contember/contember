@@ -5,12 +5,12 @@ import LogoutLink from './LogoutLink'
 import { Avatar, AvatarSize } from './ui'
 import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import State from '../state'
 import { Button, ButtonGroup, Dropdown, forceReflow } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
-export interface LayoutOwnProps {
+export interface LayoutProps {
 	header: {
 		title?: React.ReactNode
 		left: React.ReactNode
@@ -21,12 +21,11 @@ export interface LayoutOwnProps {
 	content: React.ReactNode
 }
 
-export interface LayoutStateProps {
-	identity: string | undefined
-}
-
-const LayoutDefault = React.memo((props: LayoutOwnProps & LayoutStateProps) => {
+export const LayoutDefault = React.memo((props: LayoutProps) => {
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+	const email = useSelector<State, string | undefined>(state =>
+		state.auth.identity ? state.auth.identity.email : undefined,
+	)
 	const sideRef = React.useRef<HTMLElement>(null)
 	const navbarRef = React.useRef<HTMLElement>(null)
 
@@ -81,7 +80,7 @@ const LayoutDefault = React.memo((props: LayoutOwnProps & LayoutStateProps) => {
 							size: 'large',
 							distinction: 'seamless',
 							flow: 'circular',
-							children: <Avatar size={AvatarSize.Size2} email={props.identity} />,
+							children: <Avatar size={AvatarSize.Size2} email={email} />,
 						}}
 						contentContainer={navbarRef.current || undefined}
 					>
@@ -121,9 +120,3 @@ const LayoutDefault = React.memo((props: LayoutOwnProps & LayoutStateProps) => {
 	)
 })
 LayoutDefault.displayName = 'LayoutDefault'
-
-export default connect<LayoutStateProps, {}, LayoutOwnProps, State>(state => {
-	return {
-		identity: state.auth.identity ? state.auth.identity.email : undefined,
-	}
-})(LayoutDefault)

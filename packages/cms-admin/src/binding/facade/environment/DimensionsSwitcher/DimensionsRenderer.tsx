@@ -84,7 +84,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 										distinction="seamless"
 										isActive={dimension.isSelected}
 										onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-											if (isSpecialLinkClick(e)) {
+											if (isSpecialLinkClick(e.nativeEvent)) {
 												return
 											}
 											onClick(e)

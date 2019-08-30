@@ -12,6 +12,7 @@ interface DropdownRenderProps {
 export interface DropdownProps {
 	buttonProps?: ButtonProps // @TODO: omit 'onClick'
 	alignment?: DropdownAlignment
+	contentContainer?: HTMLElement
 	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)
 }
 
@@ -93,7 +94,7 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 							</div>
 						)}
 					</Popper>,
-					document.body,
+					props.contentContainer || document.body,
 				)}
 			</div>
 		</Manager>

@@ -28,6 +28,7 @@ export interface LayoutStateProps {
 const LayoutDefault = React.memo((props: LayoutOwnProps & LayoutStateProps) => {
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false)
 	const sideRef = React.useRef<HTMLElement>(null)
+	const navbarRef = React.useRef<HTMLElement>(null)
 
 	const toggleMenu = React.useCallback(
 		(event: React.MouseEvent) => {
@@ -55,7 +56,7 @@ const LayoutDefault = React.memo((props: LayoutOwnProps & LayoutStateProps) => {
 
 	return (
 		<>
-			<header className="layout-navbar">
+			<header className="layout-navbar" ref={navbarRef}>
 				<div className="navbar-left">
 					{props.side && (
 						<button className="layout-menuBtn" onClick={toggleMenu}>
@@ -82,6 +83,7 @@ const LayoutDefault = React.memo((props: LayoutOwnProps & LayoutStateProps) => {
 							flow: 'circular',
 							children: <Avatar size={AvatarSize.Size2} email={props.identity} />,
 						}}
+						contentContainer={navbarRef.current || undefined}
 					>
 						<ButtonGroup orientation="vertical">
 							<SwitchProjectLink

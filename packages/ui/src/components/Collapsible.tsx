@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
 import { CollapsibleTransition } from '../types'
-import { toEnumViewClass, toStateClass } from '../utils'
+import { forceReflow, toEnumViewClass, toStateClass } from '../utils'
 
 export interface CollapsibleProps {
 	expanded: boolean
@@ -30,7 +30,7 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 			setIsTransitioning(true)
 			updateContentHeight()
 			requestAnimationFrame(() => {
-				contentRef.current!.clientHeight // Force reflow
+				forceReflow(contentRef.current!)
 				setDelayedExpanded(props.expanded)
 			})
 		}

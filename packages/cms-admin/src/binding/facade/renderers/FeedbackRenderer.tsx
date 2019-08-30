@@ -34,3 +34,4 @@ export const FeedbackRenderer = React.memo((props: FeedbackRendererProps): React
 		</>
 	)
 })
+FeedbackRenderer.displayName = 'FeedbackRenderer'

@@ -33,3 +33,4 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 		</Button>
 	)
 })
+PersistButton.displayName = 'PersistButton'

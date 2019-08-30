@@ -24,7 +24,7 @@ export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldN
 
 export const getColumnType = (schema: Model.Schema, entity: Model.Entity, fieldName: string): string => {
 	return acceptFieldVisitor(schema, entity, fieldName, {
-		//@todo solve enum handling properly maybe we should distinguish between domain and column type
+		// TODO solve enum handling properly maybe we should distinguish between domain and column type
 		visitColumn: (entity, column) => (column.type === Model.ColumnType.Enum ? 'text' : column.columnType),
 		visitRelation: (entity, relation, targetEntity) => {
 			if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {

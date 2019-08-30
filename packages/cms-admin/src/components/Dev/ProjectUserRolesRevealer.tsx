@@ -10,8 +10,6 @@ export const ProjectUserRolesRevealer = React.memo(() => {
 		return null
 	}
 
-	console.log('roles', myRoles)
-
 	return (
 		<div style={{ marginLeft: '.75em' }}>
 			{hasRoles || 'User has no roles'}
@@ -19,7 +17,7 @@ export const ProjectUserRolesRevealer = React.memo(() => {
 				<>
 					Roles:{' '}
 					{Array.from(myRoles).map(role => (
-						<span>{role}</span>
+						<span key={role}>{role}</span>
 					))}
 				</>
 			)}

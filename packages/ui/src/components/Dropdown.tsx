@@ -5,6 +5,7 @@ import { Collapsible } from './Collapsible'
 import { Button, ButtonProps } from './forms'
 import { DropdownAlignment } from '../types/DropdownAlignment'
 import { assertNever } from '../utils'
+import { useEffect } from 'react'
 
 interface DropdownRenderProps {
 	requestClose: () => void
@@ -110,14 +111,22 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 })
 
 export interface DropdownContainerProviderProps {
-	contentContainerRef?: HTMLElement
 	children?: React.ReactNode
 }
 
 export const DropdownContentContainerProvider = React.memo((props: DropdownContainerProviderProps) => {
+	const [contentContainer, setContentContainer] = React.useState<HTMLElement | undefined>(undefined)
+	const contentContainerRef = React.useRef<HTMLDivElement>(null)
+	useEffect(() => {
+		// Run once ref is set
+		setContentContainer(contentContainerRef.current || undefined)
+	}, [])
+
 	return (
-		<DropdownContentContainerContext.Provider value={props.contentContainerRef}>
-			{props.children}
-		</DropdownContentContainerContext.Provider>
+		<div className="dropdown-contentContainer" ref={contentContainerRef}>
+			<DropdownContentContainerContext.Provider value={contentContainer}>
+				{props.children}
+			</DropdownContentContainerContext.Provider>
+		</div>
 	)
 })

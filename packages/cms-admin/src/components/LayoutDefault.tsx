@@ -27,7 +27,6 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 		state.auth.identity ? state.auth.identity.email : undefined,
 	)
 	const sideRef = React.useRef<HTMLElement>(null)
-	const navbarRef = React.useRef<HTMLElement>(null)
 
 	const toggleMenu = React.useCallback(
 		(event: React.MouseEvent) => {
@@ -54,8 +53,8 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 	)
 
 	return (
-		<DropdownContentContainerProvider contentContainerRef={navbarRef.current || undefined}>
-			<header className="layout-navbar" ref={navbarRef}>
+		<>
+			<header className="layout-navbar">
 				<div className="navbar-left">
 					{props.side && (
 						<button className="layout-menuBtn" onClick={toggleMenu}>
@@ -67,39 +66,41 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 							{props.header.title}
 						</PageLink>
 					)}
-					{props.header.left}
+					<DropdownContentContainerProvider>{props.header.left}</DropdownContentContainerProvider>
 					{<TokenExposer />}
 					{<ProjectUserRolesRevealer />}
 				</div>
 				<div className="navbar-center">{props.header.center}</div>
 				<div className="navbar-right">
 					{props.header.right}
-					<Dropdown
-						alignment="end"
-						buttonProps={{
-							size: 'large',
-							distinction: 'seamless',
-							flow: 'circular',
-							children: <Avatar size={AvatarSize.Size2} email={email} />,
-						}}
-					>
-						<ButtonGroup orientation="vertical">
-							<SwitchProjectLink
-								Component={({ onClick, href }) => (
-									<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
-										Switch project
-									</Button>
-								)}
-							/>
-							<LogoutLink
-								Component={props => (
-									<Button distinction="seamless" flow="block" {...props}>
-										Sign Out
-									</Button>
-								)}
-							/>
-						</ButtonGroup>
-					</Dropdown>
+					<DropdownContentContainerProvider>
+						<Dropdown
+							alignment="end"
+							buttonProps={{
+								size: 'large',
+								distinction: 'seamless',
+								flow: 'circular',
+								children: <Avatar size={AvatarSize.Size2} email={email} />,
+							}}
+						>
+							<ButtonGroup orientation="vertical">
+								<SwitchProjectLink
+									Component={({ onClick, href }) => (
+										<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
+											Switch project
+										</Button>
+									)}
+								/>
+								<LogoutLink
+									Component={props => (
+										<Button distinction="seamless" flow="block" {...props}>
+											Sign Out
+										</Button>
+									)}
+								/>
+							</ButtonGroup>
+						</Dropdown>
+					</DropdownContentContainerProvider>
 				</div>
 			</header>
 
@@ -115,7 +116,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 
 				<main className="layout-content">{props.content}</main>
 			</div>
-		</DropdownContentContainerProvider>
+		</>
 	)
 })
 LayoutDefault.displayName = 'LayoutDefault'

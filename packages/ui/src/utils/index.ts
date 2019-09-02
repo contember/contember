@@ -1,3 +1,4 @@
+export * from './assertNever'
 export * from './forceReflow'
 export * from './toEnumClass'
 export * from './toEnumStateClass'

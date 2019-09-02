@@ -4,6 +4,7 @@ import { Manager, Reference, Popper } from 'react-popper'
 import { Collapsible } from './Collapsible'
 import { Button, ButtonProps } from './forms'
 import { DropdownAlignment } from '../types/DropdownAlignment'
+import { assertNever } from '../utils'
 
 interface DropdownRenderProps {
 	requestClose: () => void
@@ -21,8 +22,10 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 		return 'bottom-start'
 	} else if (alignment === 'end') {
 		return 'bottom-end'
-	} else {
+	} else if (alignment === 'center' || alignment === 'default' || alignment === undefined) {
 		return 'auto'
+	} else {
+		return assertNever(alignment)
 	}
 }
 

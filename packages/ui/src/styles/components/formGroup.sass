@@ -21,7 +21,6 @@
 		&-text
 			color: $cui-formGroup-label-color
 			font-weight: $fw-medium
-			text-transform: uppercase
 			line-height: $label-lineHeight
 
 	&-labelDescription
@@ -39,7 +38,7 @@
 			color: $cui-formGroup-description-color
 			display: block
 	&-label-wrap ~ &-field-wrap
-		margin-top: em(4px)
+		margin-top: .2em
 
 	@each $name, $fontSize in $cui-formGroup-sizes
 		$view: toView($name)

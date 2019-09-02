@@ -7,7 +7,7 @@ import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { useSelector } from 'react-redux'
 import State from '../state'
-import { Button, ButtonGroup, Dropdown, forceReflow } from '@contember/ui'
+import { Button, ButtonGroup, Dropdown, DropdownContentContainerProvider, forceReflow } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutProps {
@@ -54,7 +54,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 	)
 
 	return (
-		<>
+		<DropdownContentContainerProvider contentContainerRef={navbarRef.current || undefined}>
 			<header className="layout-navbar" ref={navbarRef}>
 				<div className="navbar-left">
 					{props.side && (
@@ -82,7 +82,6 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 							flow: 'circular',
 							children: <Avatar size={AvatarSize.Size2} email={email} />,
 						}}
-						contentContainer={navbarRef.current || undefined}
 					>
 						<ButtonGroup orientation="vertical">
 							<SwitchProjectLink
@@ -116,7 +115,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 
 				<main className="layout-content">{props.content}</main>
 			</div>
-		</>
+		</DropdownContentContainerProvider>
 	)
 })
 LayoutDefault.displayName = 'LayoutDefault'

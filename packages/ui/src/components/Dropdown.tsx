@@ -65,6 +65,8 @@ const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: 
 	return { buttonRef, contentRef }
 }
 
+export const DropdownContentContainerContext = React.createContext<HTMLElement | undefined>(undefined)
+
 export const Dropdown = React.memo((props: DropdownProps) => {
 	const [isOpen, setIsOpen] = React.useState(false)
 	const toggleIsOpen = React.useCallback(() => {
@@ -74,6 +76,9 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 		setIsOpen(false)
 	}, [])
 	const refs = useCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>(isOpen, close)
+
+	const contentContainerFromContent = React.useContext(DropdownContentContainerContext)
+	const contentContainer = props.contentContainer || contentContainerFromContent || document.body
 
 	return (
 		<Manager>
@@ -97,9 +102,22 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 							</div>
 						)}
 					</Popper>,
-					props.contentContainer || document.body,
+					contentContainer,
 				)}
 			</div>
 		</Manager>
+	)
+})
+
+export interface DropdownContainerProviderProps {
+	contentContainerRef?: HTMLElement
+	children?: React.ReactNode
+}
+
+export const DropdownContentContainerProvider = React.memo((props: DropdownContainerProviderProps) => {
+	return (
+		<DropdownContentContainerContext.Provider value={props.contentContainerRef}>
+			{props.children}
+		</DropdownContentContainerContext.Provider>
 	)
 })

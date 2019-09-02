@@ -1,4 +1,4 @@
 import { toEnumClass } from './toEnumClass'
 
-export const toEnumStateClass = (name: string | undefined, namedDefault?: string) =>
-	toEnumClass('is-', name, namedDefault)
+export const toEnumStateClass = <N extends string>(name: N | undefined, namedDefault?: N) =>
+	toEnumClass<N>('is-', name, namedDefault)

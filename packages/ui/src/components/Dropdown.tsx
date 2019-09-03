@@ -71,17 +71,22 @@ export const DropdownContentContainerContext = React.createContext<HTMLElement |
 export const Dropdown = React.memo((props: DropdownProps) => {
 	const suppliedButtonOnClickHandler = props.buttonProps && props.buttonProps.onClick
 	const [isOpen, setIsOpen] = React.useState(false)
+	const [popperEventsEnabled, setPopperEventsEnabled] = React.useState(false)
 	const onButtonClick = React.useCallback<MouseEventHandler<HTMLButtonElement>>(
 		e => {
-			setIsOpen(!isOpen)
+			setPopperEventsEnabled(!isOpen)
 			suppliedButtonOnClickHandler && suppliedButtonOnClickHandler(e)
 		},
 		[isOpen, suppliedButtonOnClickHandler],
 	)
 	const close = React.useCallback(() => {
-		setIsOpen(false)
+		setPopperEventsEnabled(false)
 	}, [])
 	const refs = useCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>(isOpen, close)
+
+	React.useEffect(() => {
+		setIsOpen(popperEventsEnabled)
+	}, [popperEventsEnabled])
 
 	const contentContainerFromContent = React.useContext(DropdownContentContainerContext)
 	const contentContainer = props.contentContainer || contentContainerFromContent || document.body
@@ -97,7 +102,7 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 					)}
 				</Reference>
 				{createPortal(
-					<Popper placement={alignmentToPlacement(props.alignment)}>
+					<Popper placement={alignmentToPlacement(props.alignment)} eventsEnabled={popperEventsEnabled}>
 						{({ ref, style, placement }) => (
 							<div ref={refs.contentRef} className="dropdown-content" style={style} data-placement={placement}>
 								<Collapsible expanded={isOpen} transition="fade">

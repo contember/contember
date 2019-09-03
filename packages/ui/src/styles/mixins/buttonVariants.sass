@@ -21,8 +21,9 @@
 		&#{$view}#{$primary-selector}:hover#{$secondary-selector}
 			background: linear-gradient(to bottom, lighten($background, 5), darken($background, 5))
 
-		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector}
-			@extend %buttonPress
+		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector} &
+			&-content
+				transform: translateZ(-.02em)
 		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
 		&#{$view}#{$primary-selector}.is-active#{$secondary-selector}
 			background: linear-gradient(to bottom, darken($background, 3), darken($background, 9))

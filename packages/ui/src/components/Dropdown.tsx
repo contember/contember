@@ -117,7 +117,7 @@ export interface DropdownContainerProviderProps {
 export const DropdownContentContainerProvider = React.memo((props: DropdownContainerProviderProps) => {
 	const [contentContainer, setContentContainer] = React.useState<HTMLElement | undefined>(undefined)
 	const contentContainerRef = React.useRef<HTMLDivElement>(null)
-	useEffect(() => {
+	React.useEffect(() => {
 		// Run once ref is set
 		setContentContainer(contentContainerRef.current || undefined)
 	}, [])

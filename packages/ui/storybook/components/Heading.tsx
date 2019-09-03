@@ -14,10 +14,7 @@ const headingSizeKnob = (): 'small' | 'default' =>
 		'default',
 	)
 
-storiesOf('Heading', module).add('without level', () => (
-	<Heading size={headingSizeKnob()}>{text('Text', 'Lorem ipsum dolor')}</Heading>
-))
-storiesOf('Heading', module).add('with explicit level', () => {
+storiesOf('Heading', module).add('simple', () => {
 	const depth = number('Depth', 1, {
 		step: 1,
 		min: 1,

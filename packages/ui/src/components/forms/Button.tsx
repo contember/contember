@@ -25,6 +25,9 @@ export interface ButtonOwnProps {
 	children?: React.ReactNode
 }
 
+export type ButtonBasedButtonProps = ButtonOwnProps & ButtonBasedProps
+export type AnchorBasedButtonProps = ButtonOwnProps & AnchorBasedProps
+
 export type ButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps)
 
 export const Button = React.memo(

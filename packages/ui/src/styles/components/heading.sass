@@ -8,9 +8,6 @@
 	color: $cui-heading-color
 	margin: ((1em - $line-height) / 2) 0
 
-	&.view-small
-		font-weight: $fw-semiBold
-
 @for $depth from 1 through 6
 	h#{$depth}.#{$cui-conf-globalPrefix}heading
 		@each $name, $fontSizes in $cui-heading-sizes

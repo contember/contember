@@ -1,5 +1,5 @@
-import { H1 } from '@blueprintjs/core'
 import { TitleBar } from '@contember/ui'
+import { IncreaseHeadingDepth } from '@contember/ui/dist/src/auxiliary'
 import * as React from 'react'
 import { LayoutInner, LayoutSide } from '../../../components'
 import { DataContext } from '../../coreComponents'
@@ -10,6 +10,13 @@ import { FeedbackRenderer } from './FeedbackRenderer'
 
 export class DefaultRenderer extends React.PureComponent<RendererProps> {
 	public render() {
+		const content = (
+			<>
+				{DefaultRenderer.renderTitleBar(this.props)}
+				<IncreaseHeadingDepth currentDepth={1}>{this.props.children}</IncreaseHeadingDepth>
+			</>
+		)
+
 		return (
 			<FeedbackRenderer data={this.props.data}>
 				{data => {
@@ -21,8 +28,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 										value =>
 											value && (
 												<DataContext.Provider value={value} key={value.getKey()}>
-													{DefaultRenderer.renderTitleBar(this.props)}
-													{this.props.children}
+													{content}
 												</DataContext.Provider>
 											),
 									)}
@@ -42,8 +48,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 							value && (
 								<DataContext.Provider value={value}>
 									<LayoutInner>
-										{DefaultRenderer.renderTitleBar(this.props)}
-										{this.props.children}
+										{content}
 										<PersistButton />
 									</LayoutInner>
 									<LayoutSide showBox={!!this.props.side}>

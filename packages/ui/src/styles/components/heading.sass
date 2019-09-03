@@ -1,10 +1,12 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}heading
+	$line-height: 1.2em
+
 	font-weight: $fw-medium
-	line-height: 1.25
+	line-height: $line-height
 	color: $cui-heading-color
-	margin: 0
+	margin: ((1em - $line-height) / 2) 0
 
 h1.#{$cui-conf-globalPrefix}heading
 	font-size: $cui-heading-1-fontSize

@@ -1,6 +1,7 @@
 export * from './forms'
 
 export * from './Aether'
+export * from './Box'
 export * from './Collapsible'
 export * from './ContainerSpinner'
 export * from './Dropdown'

@@ -1,6 +1,7 @@
 import 'manrope/latin-extended/font.css'
 import '../../storybook/index.sass'
 
+import './components/Aether'
 import './components/Button'
 import './components/ButtonGroup'
 import './components/ButtonList'

@@ -1,23 +1,33 @@
-import { radios, text } from '@storybook/addon-knobs'
+import { number, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { Heading } from '../../src/components'
 import { HeadingDepth } from '../../src/types'
 
-storiesOf('Heading', module).add('without level', () => <Heading>{text('Text', 'Lorem ipsum dolor')}</Heading>)
-storiesOf('Heading', module).add('with explicit level', () => {
-	const depth = radios<HeadingDepth>(
-		'Depth',
+const headingSizeKnob = (): 'small' | 'default' =>
+	radios(
+		'Size',
 		{
-			'1': 1,
-			'2': 2,
-			'3': 3,
-			'4': 4,
-			'5': 5,
-			'6': 6,
+			Small: 'small',
+			Default: 'default',
 		},
-		1,
+		'default',
 	)
 
-	return <Heading depth={depth}>{text('Text', 'Lorem ipsum dolor')}</Heading>
+storiesOf('Heading', module).add('without level', () => (
+	<Heading size={headingSizeKnob()}>{text('Text', 'Lorem ipsum dolor')}</Heading>
+))
+storiesOf('Heading', module).add('with explicit level', () => {
+	const depth = number('Depth', 1, {
+		step: 1,
+		min: 1,
+		max: 6,
+		range: false,
+	}) as HeadingDepth
+
+	return (
+		<Heading depth={depth} size={headingSizeKnob()}>
+			{text('Text', 'Lorem ipsum dolor')}
+		</Heading>
+	)
 })

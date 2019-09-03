@@ -304,12 +304,38 @@ $cui-collapsible-transition-duration: .2s !default;
 // Heading
 $cui-heading-color: $cui-color-gray-9 !default;
 
-$cui-heading-1-fontSize: 2em !default;
-$cui-heading-2-fontSize: 1.75em !default;
-$cui-heading-3-fontSize: 1.5em !default;
-$cui-heading-4-fontSize: 1.3em !default;
-$cui-heading-5-fontSize: 1.15em !default;
-$cui-heading-6-fontSize: 1em !default
+$cui-heading-1-fontSize-default: 2em !default;
+$cui-heading-2-fontSize-default: 1.75em !default;
+$cui-heading-3-fontSize-default: 1.5em !default;
+$cui-heading-4-fontSize-default: 1.3em !default;
+$cui-heading-5-fontSize-default: 1.15em !default;
+$cui-heading-6-fontSize-default: 1em !default
+
+$cui-heading-1-fontSize-small: 1.4em !default;
+$cui-heading-2-fontSize-small: 1.2em !default;
+$cui-heading-3-fontSize-small: 1.1em !default;
+$cui-heading-4-fontSize-small: 1em !default;
+$cui-heading-5-fontSize-small: .95em !default;
+$cui-heading-6-fontSize-small: .9em !default
+
+$cui-heading-sizes: (
+	$cui-conf-defaultView: (
+		$cui-heading-1-fontSize-default,
+		$cui-heading-2-fontSize-default,
+		$cui-heading-3-fontSize-default,
+		$cui-heading-4-fontSize-default,
+		$cui-heading-5-fontSize-default,
+		$cui-heading-6-fontSize-default,
+	),
+	'small': (
+		$cui-heading-1-fontSize-small,
+		$cui-heading-2-fontSize-small,
+		$cui-heading-3-fontSize-small,
+		$cui-heading-4-fontSize-small,
+		$cui-heading-5-fontSize-small,
+		$cui-heading-6-fontSize-small,
+	),
+);
 
 
 // Menu

@@ -8,15 +8,13 @@
 	color: $cui-heading-color
 	margin: ((1em - $line-height) / 2) 0
 
-h1.#{$cui-conf-globalPrefix}heading
-	font-size: $cui-heading-1-fontSize
-h2.#{$cui-conf-globalPrefix}heading
-	font-size: $cui-heading-2-fontSize
-h3.#{$cui-conf-globalPrefix}heading
-	font-size: $cui-heading-3-fontSize
-h4.#{$cui-conf-globalPrefix}heading
-	font-size: $cui-heading-4-fontSize
-h5.#{$cui-conf-globalPrefix}heading
-	font-size: $cui-heading-5-fontSize
-h6.#{$cui-conf-globalPrefix}heading
-	font-size: $cui-heading-6-fontSize
+	&.view-small
+		font-weight: $fw-semiBold
+
+@for $depth from 1 through 6
+	h#{$depth}.#{$cui-conf-globalPrefix}heading
+		@each $name, $fontSizes in $cui-heading-sizes
+
+			$view: toView($name)
+			&#{$view}
+				font-size: nth($fontSizes, $depth)

@@ -11,7 +11,7 @@ export interface HeadingProps
 export const Heading = React.memo(
 	React.forwardRef<HTMLHeadingElement, HeadingProps>(({ level, className, children, ...headingProps }, ref) => {
 		const levelContext = React.useContext(HeadingLevelContext)
-		const normalizedLevel = level || levelContext || 1
+		const normalizedLevel = level || levelContext
 		const headingElement = `h${normalizedLevel}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
 		return React.createElement(headingElement, { ref, className: cn('heading', className), ...headingProps }, children)

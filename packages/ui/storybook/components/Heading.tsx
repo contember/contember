@@ -2,12 +2,12 @@ import { radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { Heading } from '../../src/components'
-import { HeadingLevel } from '../../src/types'
+import { HeadingDepth } from '../../src/types'
 
 storiesOf('Heading', module).add('without level', () => <Heading>{text('Text', 'Lorem ipsum dolor')}</Heading>)
 storiesOf('Heading', module).add('with explicit level', () => {
-	const level = radios<HeadingLevel>(
-		'Level',
+	const depth = radios<HeadingDepth>(
+		'Depth',
 		{
 			'1': 1,
 			'2': 2,
@@ -19,5 +19,5 @@ storiesOf('Heading', module).add('with explicit level', () => {
 		1,
 	)
 
-	return <Heading level={level}>{text('Text', 'Lorem ipsum dolor')}</Heading>
+	return <Heading depth={depth}>{text('Text', 'Lorem ipsum dolor')}</Heading>
 })

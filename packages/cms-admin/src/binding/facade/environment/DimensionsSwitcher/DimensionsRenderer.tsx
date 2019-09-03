@@ -1,4 +1,4 @@
-import { Button, ButtonProps, ButtonGroup, Spinner, Dropdown } from '@contember/ui'
+import { Button, ButtonGroup, Spinner, Dropdown, ButtonBasedButtonProps } from '@contember/ui'
 import * as React from 'react'
 import { Checkbox, Link, useRedirect } from '../../../../components'
 import { RequestChange } from '../../../../state/request'
@@ -10,7 +10,7 @@ import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 
 export interface DimensionsRendererProps {
-	buttonProps?: ButtonProps
+	buttonProps?: ButtonBasedButtonProps
 	dimension: string
 	labelFactory: React.ReactNode
 	maxItems: number

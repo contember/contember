@@ -1,18 +1,18 @@
+import { MouseEventHandler } from 'react'
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { Manager, Reference, Popper } from 'react-popper'
-import { Collapsible } from './Collapsible'
-import { Button, ButtonProps } from './forms'
+import { Manager, Popper, Reference } from 'react-popper'
 import { DropdownAlignment } from '../types/DropdownAlignment'
 import { assertNever } from '../utils'
-import { useEffect } from 'react'
+import { Collapsible } from './Collapsible'
+import { Button, ButtonBasedButtonProps } from './forms'
 
 interface DropdownRenderProps {
 	requestClose: () => void
 }
 
 export interface DropdownProps {
-	buttonProps?: ButtonProps // TODO omit 'onClick'
+	buttonProps?: ButtonBasedButtonProps
 	alignment?: DropdownAlignment
 	contentContainer?: HTMLElement
 	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)
@@ -69,10 +69,15 @@ const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: 
 export const DropdownContentContainerContext = React.createContext<HTMLElement | undefined>(undefined)
 
 export const Dropdown = React.memo((props: DropdownProps) => {
+	const suppliedButtonOnClickHandler = props.buttonProps && props.buttonProps.onClick
 	const [isOpen, setIsOpen] = React.useState(false)
-	const toggleIsOpen = React.useCallback(() => {
-		setIsOpen(!isOpen)
-	}, [isOpen])
+	const onButtonClick = React.useCallback<MouseEventHandler<HTMLButtonElement>>(
+		e => {
+			setIsOpen(!isOpen)
+			suppliedButtonOnClickHandler && suppliedButtonOnClickHandler(e)
+		},
+		[isOpen, suppliedButtonOnClickHandler],
+	)
 	const close = React.useCallback(() => {
 		setIsOpen(false)
 	}, [])
@@ -87,7 +92,7 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 				<Reference>
 					{({ ref }) => (
 						<div className="dropdown-button" ref={ref}>
-							<Button ref={refs.buttonRef} {...props.buttonProps} onClick={toggleIsOpen} />
+							<Button ref={refs.buttonRef} {...props.buttonProps} onClick={onButtonClick} />
 						</div>
 					)}
 				</Reference>

@@ -7,7 +7,7 @@ import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { useSelector } from 'react-redux'
 import State from '../state'
-import { Button, ButtonGroup, Dropdown, DropdownContentContainerProvider, forceReflow } from '@contember/ui'
+import { Aether, Button, ButtonGroup, Dropdown, DropdownContentContainerProvider, forceReflow } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutProps {
@@ -53,7 +53,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 	)
 
 	return (
-		<>
+		<Aether className="layout">
 			<header className="layout-navbar">
 				<div className="navbar-left">
 					{props.side && (
@@ -116,7 +116,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 
 				<main className="layout-content">{props.content}</main>
 			</div>
-		</>
+		</Aether>
 	)
 })
 LayoutDefault.displayName = 'LayoutDefault'

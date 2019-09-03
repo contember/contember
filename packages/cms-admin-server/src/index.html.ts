@@ -16,7 +16,7 @@ export default function render({
 
 	<meta name="theme-color" content="#FACB01">
 	<link rel="icon" type="image/png" href="/images/icons/36x36.png" sizes="36x36">
-	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&subset=latin-ext" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&subset=latin-ext" rel="stylesheet">
 	${assets.css ? `<link rel="stylesheet" href="${assets.css}">` : ''}
 </head>
 <body>

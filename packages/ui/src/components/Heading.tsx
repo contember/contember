@@ -7,7 +7,7 @@ import { toEnumViewClass } from '../utils'
 export interface HeadingProps
 	extends Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>, 'ref'> {
 	depth?: HeadingDepth
-	size?: Exclude<Size, 'large'>
+	size?: { [S in Size]: S }['small' | 'default'] // This silly-ish type disallows typos on our part & improves user intellisense
 }
 
 export const Heading = React.memo(

@@ -8,7 +8,7 @@ export interface LowerHeadingLevelProps {
 }
 
 export const IncreaseHeadingDepth = React.memo<LowerHeadingLevelProps>(({ currentDepth, children }) => (
-	<HeadingDepthContext.Provider value={Math.max(currentDepth + 1, 6) as HeadingDepth}>
+	<HeadingDepthContext.Provider value={Math.min(currentDepth + 1, 6) as HeadingDepth}>
 		{children}
 	</HeadingDepthContext.Provider>
 ))

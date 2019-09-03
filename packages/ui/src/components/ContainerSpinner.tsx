@@ -2,6 +2,7 @@ import * as React from 'react'
 import cn from 'classnames'
 import { Size } from '../types'
 import { toEnumViewClass } from '../utils'
+import { Aether } from './Aether'
 import { Spinner } from './Spinner'
 
 export interface ContainerSpinnerProps {
@@ -9,8 +10,8 @@ export interface ContainerSpinnerProps {
 }
 
 export const ContainerSpinner = React.memo(({ size }: ContainerSpinnerProps) => (
-	<div className={cn('containerSpinner', toEnumViewClass(size))}>
+	<Aether className={cn('containerSpinner', toEnumViewClass(size))}>
 		<Spinner />
-	</div>
+	</Aether>
 ))
 ContainerSpinner.displayName = 'ContainerSpinner'

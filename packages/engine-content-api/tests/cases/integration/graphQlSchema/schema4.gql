@@ -38,7 +38,6 @@ type Mutation {
   updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
-  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 type OneHasManyEntity {
@@ -229,14 +228,6 @@ input RootWithoutRCreateInput {
 
 input RootWithoutRUpdateInput {
   _update: Boolean
-}
-
-type SignedUpload {
-  url: String!
-  objectKey: String!
-  bucket: String!
-  region: String!
-  publicUrl: String!
 }
 
 input StringCondition {

@@ -177,7 +177,6 @@ type Mutation {
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
-  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 enum One {
@@ -214,14 +213,6 @@ type Query {
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
   _info: Info
-}
-
-type SignedUpload {
-  url: String!
-  objectKey: String!
-  bucket: String!
-  region: String!
-  publicUrl: String!
 }
 
 input StringCondition {

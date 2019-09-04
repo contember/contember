@@ -35,7 +35,6 @@ type Info {
 type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
-  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 enum OrderDirection {
@@ -49,14 +48,6 @@ type Query {
   validateCreateTest(data: TestCreateInput!): _ValidationResult!
   validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
   _info: Info
-}
-
-type SignedUpload {
-  url: String!
-  objectKey: String!
-  bucket: String!
-  region: String!
-  publicUrl: String!
 }
 
 input StringCondition {

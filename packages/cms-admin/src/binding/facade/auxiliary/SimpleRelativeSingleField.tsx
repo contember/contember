@@ -66,6 +66,7 @@ const RelativeSingleField = <
 							</DataContext.Provider>
 						)
 					}
+					size={props.size}
 					labelDescription={
 						props.labelDescription && (
 							<DataContext.Provider value={dataContext}>{props.labelDescription}</DataContext.Provider>

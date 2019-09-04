@@ -36,13 +36,17 @@
 			color: $cui-formGroup-description-color
 			display: block
 	&-label-wrap ~ &-field-wrap
-		margin-top: .2em
+		margin-top: .3em
 
 	@each $name, $fontSize in $cui-formGroup-sizes
 		$view: toView($name)
 
 		&#{$view} &
 			&-label
+				&-wrap
+					// Simplified version of (((1em - ($cui-base-lineHeight * 1em)) / 2) * ($fontSize / 1em))
+					margin: (($fontSize * (1 - $cui-base-lineHeight)) / 2) 0
+					line-height: $cui-base-lineHeight
 				&-text
 					font-size: $fontSize
 			&-labelDescription

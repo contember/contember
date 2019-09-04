@@ -12,7 +12,7 @@ export type Scalars = {
 }
 
 export type CreateEvent = Event & {
-	__typename?: 'CreateEvent'
+	readonly __typename?: 'CreateEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>
@@ -23,7 +23,7 @@ export type CreateEvent = Event & {
 }
 
 export type DeleteEvent = Event & {
-	__typename?: 'DeleteEvent'
+	readonly __typename?: 'DeleteEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>
@@ -45,14 +45,14 @@ export type DiffFilter = {
 }
 
 export type DiffResponse = {
-	__typename?: 'DiffResponse'
+	readonly __typename?: 'DiffResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<DiffErrorCode>
 	readonly result?: Maybe<DiffResult>
 }
 
 export type DiffResult = {
-	__typename?: 'DiffResult'
+	readonly __typename?: 'DiffResult'
 	readonly base: Stage
 	readonly head: Stage
 	readonly events: ReadonlyArray<Event>
@@ -74,7 +74,7 @@ export enum EventType {
 }
 
 export type Mutation = {
-	__typename?: 'Mutation'
+	readonly __typename?: 'Mutation'
 	readonly release: ReleaseResponse
 	readonly rebaseAll: RebaseAllResponse
 }
@@ -86,7 +86,7 @@ export type MutationReleaseArgs = {
 }
 
 export type Query = {
-	__typename?: 'Query'
+	readonly __typename?: 'Query'
 	readonly stages: ReadonlyArray<Stage>
 	readonly diff: DiffResponse
 }
@@ -98,7 +98,7 @@ export type QueryDiffArgs = {
 }
 
 export type RebaseAllResponse = {
-	__typename?: 'RebaseAllResponse'
+	readonly __typename?: 'RebaseAllResponse'
 	readonly ok: Scalars['Boolean']
 }
 
@@ -108,13 +108,13 @@ export enum ReleaseErrorCode {
 }
 
 export type ReleaseResponse = {
-	__typename?: 'ReleaseResponse'
+	readonly __typename?: 'ReleaseResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<ReleaseErrorCode>
 }
 
 export type RunMigrationEvent = Event & {
-	__typename?: 'RunMigrationEvent'
+	readonly __typename?: 'RunMigrationEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>
@@ -124,14 +124,14 @@ export type RunMigrationEvent = Event & {
 }
 
 export type Stage = {
-	__typename?: 'Stage'
+	readonly __typename?: 'Stage'
 	readonly id: Scalars['String']
 	readonly name: Scalars['String']
 	readonly slug: Scalars['String']
 }
 
 export type UpdateEvent = Event & {
-	__typename?: 'UpdateEvent'
+	readonly __typename?: 'UpdateEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type?: Maybe<EventType>

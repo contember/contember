@@ -116,9 +116,11 @@
 		&-list
 			//
 
-	&-subgroup
+	&-subgroup,
+	&-action,
+	&-tooDeep
 		&.is-active > &-title
-			background-color: $cui-menu-subgroup-active-background
+			background-color: $cui-menu-active-background
 
 	&-action,
 	&-tooDeep
@@ -131,7 +133,7 @@
 			cursor: pointer
 
 			&:hover
-				background-color: $cui-menu-subgroup-active-background
+				background-color: $cui-menu-active-background
 
 		&-action,
 		&-tooDeep

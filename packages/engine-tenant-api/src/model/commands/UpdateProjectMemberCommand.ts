@@ -10,7 +10,7 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 		private readonly variables?: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	) {}
 
-	async execute(db: Client): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
+	async execute({ db, bus }: Command.Args): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
 		const memberWhere = {
 			project_id: this.projectId,
 			identity_id: this.identityId,
@@ -38,7 +38,7 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 		}
 
 		if (this.variables) {
-			await new UpdateProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables, true).execute(db)
+			await bus.execute(new UpdateProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables, true))
 		}
 
 		return new UpdateProjectMemberCommand.UpdateProjectMemberResponseOk()

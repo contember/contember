@@ -1,9 +1,12 @@
 import { Acl, Schema } from '@contember/schema'
 import { GraphQLSchema } from 'graphql'
-import GraphQlSchemaBuilderFactory from '../content-api/graphQLSchema/GraphQlSchemaBuilderFactory'
-import PermissionsByIdentityFactory from '../acl/PermissionsByIdentityFactory'
-import { ContentSchemaFactory } from '../content-api/graphQLSchema/ContentSchemaFactory'
-import { mergeSchemas } from 'graphql-tools'
+import {
+	ContentSchemaFactory,
+	GraphQlSchemaBuilderFactory,
+	PermissionsByIdentityFactory,
+} from '@contember/engine-content-api'
+import { makeExecutableSchema, mergeSchemas } from 'graphql-tools'
+import { S3SchemaFactory } from '@contember/engine-s3-plugin'
 
 class GraphQlSchemaFactory {
 	private cache: {
@@ -18,6 +21,7 @@ class GraphQlSchemaFactory {
 	constructor(
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly permissionFactory: PermissionsByIdentityFactory,
+		private readonly s3SchemaFactory?: S3SchemaFactory,
 	) {}
 
 	public create(
@@ -43,7 +47,10 @@ class GraphQlSchemaFactory {
 
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, permissions)
 		const contentSchemaFactory = new ContentSchemaFactory(schema)
-		const graphQlSchema = mergeSchemas({ schemas: [dataSchemaBuilder.build(), contentSchemaFactory.create()] })
+		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
+		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())
+		const s3schema = this.s3SchemaFactory ? this.s3SchemaFactory.create() : null
+		const graphQlSchema = mergeSchemas({ schemas: [dataSchema, contentSchema, ...(s3schema ? [s3schema] : [])] })
 		schemaCacheEntry.entries.push({ graphQlSchema, verifier, permissions })
 
 		return [graphQlSchema, permissions]

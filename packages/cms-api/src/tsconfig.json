@@ -36,6 +36,15 @@
 		},
 		{
 			"path": "../../engine-tenant-api/src"
+		},
+		{
+			"path": "../../engine-system-api/src"
+		},
+		{
+			"path": "../../engine-content-api/src"
+		},
+		{
+			"path": "../../engine-s3-plugin/src"
 		}
 	]
 }

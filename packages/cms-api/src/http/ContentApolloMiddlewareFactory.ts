@@ -1,5 +1,5 @@
 import { KoaMiddleware } from '../core/koa/types'
-import SchemaVersionBuilder from '../content-schema/SchemaVersionBuilder'
+import { SchemaVersionBuilder } from '@contember/engine-system-api'
 import Project from '../config/Project'
 import GraphQlSchemaFactory from './GraphQlSchemaFactory'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'

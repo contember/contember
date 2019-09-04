@@ -5,7 +5,7 @@ import { Client } from '@contember/database'
 class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {}
 
-	async execute(db: Client): Promise<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
+	async execute({ db, bus }: Command.Args): Promise<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
 		const memberWhere = {
 			project_id: this.projectId,
 			identity_id: this.identityId,
@@ -26,7 +26,7 @@ class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.R
 			.where(memberWhere)
 			.execute()
 
-		await new RemoveProjectMemberVariablesCommand(this.projectId, this.identityId, []).execute(db)
+		await bus.execute(new RemoveProjectMemberVariablesCommand(this.projectId, this.identityId, []))
 
 		return new RemoveProjectMemberCommand.RemoveProjectMemberResponseOk()
 	}

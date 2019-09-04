@@ -1,0 +1,43 @@
+{
+	"name": "@contember/engine-system-api",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {
+		"prebuild": "npx gql-gen --config graphql.codegen.yml",
+		"test": "jasmine --config=jasmine.json"
+	},
+	"dependencies": {
+		"@contember/authorization": "^0.0.0",
+		"@contember/database": "^0.0.0",
+		"@contember/dic": "^0.0.0",
+		"@contember/engine-common": "^0.0.0",
+		"@contember/queryable": "^0.0.0",
+		"@contember/schema": "^0.0.0",
+		"@contember/schema-utils": "^0.0.0",
+		"@contember/utils": "^0.0.0",
+		"apollo-server-core": "^2.9.1",
+		"apollo-server-errors": "^2.3.1",
+		"graphql": "^14.5.4",
+		"node-pg-migrate": "^3.22.0",
+		"pg": "^7.12.1",
+		"rfc6902": "^3.0.4",
+		"uuid": "^3.3.3"
+	},
+	"devDependencies": {
+		"@contember/engine-api-tester": "^0.0.0",
+		"@contember/schema-definition": "^0.0.0",
+		"@graphql-codegen/cli": "^1.5.0",
+		"@graphql-codegen/typescript": "^1.5.0",
+		"@graphql-codegen/typescript-operations": "^1.5.0",
+		"@graphql-codegen/typescript-resolvers": "^1.5.0",
+		"@types/graphql": "^14.5.0",
+		"@types/jasmine": "^3.4.0",
+		"@types/node": "^10.12.10",
+		"@types/pg": "^7.11.0",
+		"@types/uuid": "^3.4.5",
+		"jasmine": "^3.4.0",
+		"typescript": "^3.5.3"
+	}
+}

@@ -1,7 +1,12 @@
 import * as Schema from './schema'
+import { MigrationFilesManager } from '@contember/engine-common'
 
 export * from './model'
+export * from './TenantContainer'
 export * from './resolvers'
-export * from './utils/uuid'
 export { Schema }
-export { default as schemaDocument } from './schema/tenant.graphql'
+export { default as typeDefs } from './schema/tenant.graphql'
+
+export const createMigrationFilesManager = (): MigrationFilesManager => {
+	return new MigrationFilesManager(__dirname + '/../../migrations')
+}

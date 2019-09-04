@@ -1,0 +1,30 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src",
+		"esModuleInterop": true
+	},
+	"references": [
+		{
+			"path": "../../queryable/src"
+		},
+		{
+			"path": "../../database/src"
+		},
+		{
+			"path": "../../authorization/src"
+		},
+		{
+			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../schema/src"
+		},
+		{
+			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../dic/src"
+		}
+	]
+}

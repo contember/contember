@@ -7,10 +7,12 @@
 	"scripts": {},
 	"dependencies": {
 		"@contember/schema": "^0.0.0",
-		"@contember/utils": "^0.0.0"
+		"@contember/utils": "^0.0.0",
+		"uuid": "^3.3.3"
 	},
 	"devDependencies": {
-		"@types/node": "^12.7.1",
-		"typescript": "^3.5.2"
+		"@types/node": "^10.12.10",
+		"@types/uuid": "^3.4.5",
+		"typescript": "^3.5.3"
 	}
 }

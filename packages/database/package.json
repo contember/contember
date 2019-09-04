@@ -7,19 +7,17 @@
 	"scripts": {
 		"test": "jasmine --config=jasmine.json"
 	},
+	"dependencies": {
+		"pg": "^7.12.1",
+		"@contember/queryable": "^0.0.0",
+		"@contember/utils": "^0.0.0"
+	},
 	"devDependencies": {
 		"@contember/database-tester": "^0.0.0",
 		"@types/jasmine": "^3.4.0",
-		"@types/node": "^12.7.1",
-		"@types/pg": "^7.4.14",
+		"@types/node": "^10.12.10",
+		"@types/pg": "^7.11.0",
 		"jasmine": "^3.4.0",
-		"jasmine-ts": "^0.3.0",
-		"ts-node": "^8.3.0",
-		"typescript": "^3.5.2"
-	},
-	"dependencies": {
-		"@contember/queryable": "^0.0.0",
-		"@contember/utils": "^0.0.0",
-		"pg": "^7.12.1"
+		"typescript": "^3.5.3"
 	}
 }

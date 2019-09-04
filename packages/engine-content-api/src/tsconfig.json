@@ -1,0 +1,27 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src",
+		"esModuleInterop": true
+	},
+	"references": [
+		{
+			"path": "../../database/src"
+		},
+		{
+			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../schema/src"
+		},
+		{
+			"path": "../../schema-definition/src"
+		},
+		{
+			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../dic/src"
+		}
+	]
+}

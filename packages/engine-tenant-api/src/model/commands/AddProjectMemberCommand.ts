@@ -1,7 +1,5 @@
 import { Command } from './Command'
 import { AddProjectMemberErrorCode } from '../../schema'
-import { Client } from '@contember/database'
-import { uuid } from '../..'
 import { UpdateProjectMemberVariablesCommand } from '../'
 
 class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProjectMemberResponse> {
@@ -12,19 +10,19 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 		private readonly variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	) {}
 
-	async execute(db: Client): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
+	async execute({ db, providers, bus }: Command.Args): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
 		try {
 			await db
 				.insertBuilder()
 				.into('project_member')
 				.values({
-					id: uuid(),
+					id: providers.uuid(),
 					project_id: this.projectId,
 					identity_id: this.identityId,
 					roles: JSON.stringify(this.roles),
 				})
 				.execute()
-			await new UpdateProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables, false).execute(db)
+			await bus.execute(new UpdateProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables, false))
 
 			return new AddProjectMemberCommand.AddProjectMemberResponseOk()
 		} catch (e) {

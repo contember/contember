@@ -18,8 +18,7 @@
 		"@contember/utils": "^0.0.0",
 		"apollo-server-core": "^2.9.1",
 		"graphql": "^14.5.4",
-		"graphql-tools": "^4.0.5",
-		"uuid": "^3.3.3"
+		"graphql-tools": "^4.0.5"
 	},
 	"devDependencies": {
 		"@contember/database-tester": "^0.0.0",
@@ -27,11 +26,7 @@
 		"@types/graphql": "^14.5.0",
 		"@types/jasmine": "^3.4.0",
 		"@types/node": "^10.12.10",
-		"@types/sinon": "^7.0.13",
-		"@types/uuid": "^3.4.5",
-		"graphql-errors": "^2.1.0",
 		"jasmine": "^3.4.0",
-		"sinon": "^7.4.2",
 		"typescript": "^3.5.3"
 	}
 }

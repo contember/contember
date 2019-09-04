@@ -3,7 +3,7 @@ import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import { PersonQuery, ProjectsByIdentityQuery } from '../../model'
 import { ResolverContext } from '../ResolverContext'
-import ProjectMemberManager from '../../model/service/ProjectMemberManager'
+import { ProjectMemberManager } from '../../model/service'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	constructor(

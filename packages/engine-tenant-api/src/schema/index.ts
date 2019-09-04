@@ -1,7 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
-export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
-	{ [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -379,23 +377,14 @@ export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
 	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
 
-export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
-	subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>
-	resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>
-}
-
 export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
-	subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>
-	resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>
+	subscribe: SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs>
+	resolve?: SubscriptionResolveFn<TResult, TParent, TContext, TArgs>
 }
 
-export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
-	| SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
+export type SubscriptionResolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+	| ((...args: any[]) => SubscriptionResolverObject<TResult, TParent, TContext, TArgs>)
 	| SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
-
-export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
-	| ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
-	| SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
 	parent: TParent,
@@ -625,48 +614,33 @@ export type MutationResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = {
-	setup?: Resolver<
-		Maybe<ResolversTypes['SetupResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationSetupArgs, 'superadmin'>
-	>
-	signUp?: Resolver<
-		Maybe<ResolversTypes['SignUpResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationSignUpArgs, 'email' | 'password'>
-	>
-	signIn?: Resolver<
-		Maybe<ResolversTypes['SignInResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationSignInArgs, 'email' | 'password'>
-	>
+	setup?: Resolver<Maybe<ResolversTypes['SetupResponse']>, ParentType, ContextType, MutationSetupArgs>
+	signUp?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, MutationSignUpArgs>
+	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, MutationSignInArgs>
 	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, MutationSignOutArgs>
 	changePassword?: Resolver<
 		Maybe<ResolversTypes['ChangePasswordResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationChangePasswordArgs, 'personId' | 'password'>
+		MutationChangePasswordArgs
 	>
 	addProjectMember?: Resolver<
 		Maybe<ResolversTypes['AddProjectMemberResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationAddProjectMemberArgs, 'projectId' | 'identityId' | 'roles'>
+		MutationAddProjectMemberArgs
 	>
 	updateProjectMember?: Resolver<
 		Maybe<ResolversTypes['UpdateProjectMemberResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationUpdateProjectMemberArgs, 'projectId' | 'identityId'>
+		MutationUpdateProjectMemberArgs
 	>
 	removeProjectMember?: Resolver<
 		Maybe<ResolversTypes['RemoveProjectMemberResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationRemoveProjectMemberArgs, 'projectId' | 'identityId'>
+		MutationRemoveProjectMemberArgs
 	>
 	createApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
@@ -678,7 +652,7 @@ export type MutationResolvers<
 		Maybe<ResolversTypes['DisableApiKeyResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationDisableApiKeyArgs, 'id'>
+		MutationDisableApiKeyArgs
 	>
 }
 

@@ -1,0 +1,12 @@
+{
+	"name": "@contember/dic",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {
+	},
+	"devDependencies": {
+		"typescript": "^3.5.3"
+	}
+}

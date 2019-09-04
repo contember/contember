@@ -1,10 +1,9 @@
 import { Command } from './'
-import { Client } from '@contember/database'
 
 class DisableApiKeyCommand implements Command<boolean> {
 	constructor(private readonly apiKeyId: string) {}
 
-	async execute(db: Client): Promise<boolean> {
+	async execute({ db }: Command.Args): Promise<boolean> {
 		const qb = db
 			.updateBuilder()
 			.table('api_key')

@@ -1,8 +1,7 @@
 import { ApolloServer, AuthenticationError } from 'apollo-server-koa'
 import { ApolloError } from 'apollo-server-errors'
 import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
-import { Context } from '../content-api/types'
-import ExecutionContainerFactory from '../content-api/graphQlResolver/ExecutionContainerFactory'
+import { Context, ExecutionContainerFactory, UserError } from '@contember/engine-content-api'
 import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
 import { GraphQLError, GraphQLSchema } from 'graphql'
 import { KoaContext } from '../core/koa/types'
@@ -13,7 +12,7 @@ import LRUCache from 'lru-cache'
 import TimerMiddlewareFactory from './TimerMiddlewareFactory'
 import { Connection } from '@contember/database'
 import { extractOriginalError } from '../core/graphql/errorExtract'
-import UserError from '../core/graphql/UserError'
+import uuid = require('uuid')
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
@@ -61,9 +60,10 @@ class ContentApolloServerFactory {
 					db: ctx.state.db,
 					identityVariables: ctx.state.projectVariables,
 				}
-				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions).create(
-					partialContext,
-				)
+				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions, {
+					uuid: () => uuid.v4(),
+					now: () => new Date(),
+				}).create(partialContext)
 				return {
 					...partialContext,
 					executionContainer,

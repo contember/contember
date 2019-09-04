@@ -1,6 +1,4 @@
 import { Command, RemoveProjectMemberVariablesCommand } from './'
-import { Client } from '@contember/database'
-import { uuid } from '../..'
 import { InsertBuilder } from '@contember/database'
 import { UpdateProjectMemberErrorCode } from '../../schema'
 
@@ -13,13 +11,17 @@ class UpdateProjectMemberVariablesCommand
 		private readonly deleteOld: boolean,
 	) {}
 
-	async execute(db: Client): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberResponse> {
+	async execute({
+		db,
+		providers,
+		bus,
+	}: Command.Args): Promise<UpdateProjectMemberVariablesCommand.UpdateProjectMemberResponse> {
 		const queries = this.variables.map(update => {
 			return db
 				.insertBuilder()
 				.into('project_member_variable')
 				.values({
-					id: uuid(),
+					id: providers.uuid(),
 					project_id: this.projectId,
 					identity_id: this.identityId,
 					variable: update.name,
@@ -33,7 +35,7 @@ class UpdateProjectMemberVariablesCommand
 		await Promise.all(queries)
 
 		if (this.deleteOld) {
-			await new RemoveProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables).execute(db)
+			await bus.execute(new RemoveProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables))
 		}
 
 		return new UpdateProjectMemberVariablesCommand.UpdateProjectMemberResponseOk()

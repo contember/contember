@@ -1,14 +1,16 @@
 import Project from './Project'
 import { ConfigLoader, Merger } from 'cms-server-common'
 import { deprecated } from '../core/console/messages'
+import { DatabaseCredentials } from '@contember/engine-common'
+import { S3Config } from '@contember/engine-s3-plugin/dist/src/Config'
 
-export type DatabaseCredentials = Project.DatabaseCredentials
+export type ProjectWithS3 = Project & { s3: S3Config }
 
 export interface Config {
 	tenant: {
 		db: DatabaseCredentials
 	}
-	projects: Array<Project>
+	projects: Array<ProjectWithS3>
 	server: {
 		port: number
 	}
@@ -83,7 +85,7 @@ function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredenti
 	return json
 }
 
-function checkS3Config(json: unknown, path: string): Project.S3Config {
+function checkS3Config(json: unknown, path: string): S3Config {
 	if (!isObject(json)) {
 		return error(`Property ${path} must be an object`)
 	}
@@ -100,7 +102,7 @@ function checkS3Config(json: unknown, path: string): Project.S3Config {
 	return { ...json, credentials: checkS3Credentials(json.credentials, `${path}.credentials`) }
 }
 
-function checkS3Credentials(json: unknown, path: string): Project.S3Config['credentials'] {
+function checkS3Credentials(json: unknown, path: string): S3Config['credentials'] {
 	if (!isObject(json)) {
 		return typeError(path, json, 'object')
 	}
@@ -134,7 +136,7 @@ function checkStageStructure(json: unknown, path: string): Project.Stage {
 	return { ...json }
 }
 
-function checkProjectStructure(json: unknown, path: string): Project {
+function checkProjectStructure(json: unknown, path: string): ProjectWithS3 {
 	if (!isObject(json)) {
 		return typeError(path, json, 'object')
 	}

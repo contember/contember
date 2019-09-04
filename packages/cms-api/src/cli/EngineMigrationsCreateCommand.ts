@@ -1,6 +1,9 @@
 import Command from '../core/cli/Command'
-import MigrationFilesManager from '../migrations/MigrationFilesManager'
+import { createMigrationFilesManager as createTenantMigrationFilesManager } from '@contember/engine-tenant-api'
+import { createMigrationFilesManager as createProjectMigrationFilesManager } from '@contember/engine-system-api'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
+import { assertNever } from '@contember/utils'
+import { MigrationFilesManager } from '@contember/engine-common'
 
 type Args = {
 	type: 'project' | 'tenant'
@@ -19,7 +22,17 @@ class EngineMigrationsCreateCommand extends Command<Args, {}> {
 
 	protected async execute(input: Command.Input<Args, {}>): Promise<void> {
 		const [type, name] = [input.getArgument('type'), input.getArgument('name')]
-		const migrationsFileManager = MigrationFilesManager.createForEngine(type)
+		let migrationsFileManager: MigrationFilesManager
+		switch (type) {
+			case 'tenant':
+				migrationsFileManager = createTenantMigrationFilesManager()
+				break
+			case 'project':
+				migrationsFileManager = createProjectMigrationFilesManager()
+				break
+			default:
+				return assertNever(type)
+		}
 		console.log(await migrationsFileManager.createEmptyFile(name, 'sql'))
 	}
 }

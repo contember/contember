@@ -1,5 +1,4 @@
 import { Command, UpdateProjectMemberVariablesCommand } from './'
-import { Client } from '@contember/database'
 
 class RemoveProjectMemberVariablesCommand implements Command<void> {
 	constructor(
@@ -8,7 +7,7 @@ class RemoveProjectMemberVariablesCommand implements Command<void> {
 		private readonly except: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	) {}
 
-	async execute(db: Client): Promise<void> {
+	async execute({ db }: Command.Args): Promise<void> {
 		await db
 			.deleteBuilder()
 			.where({

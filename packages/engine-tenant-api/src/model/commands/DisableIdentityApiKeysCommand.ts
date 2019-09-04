@@ -1,10 +1,9 @@
 import { Command } from './'
-import { Client } from '@contember/database'
 
 class DisableIdentityApiKeysCommand implements Command<void> {
 	constructor(private readonly identityId: string) {}
 
-	async execute(db: Client): Promise<void> {
+	async execute({ db }: Command.Args): Promise<void> {
 		const qb = db
 			.updateBuilder()
 			.table('api_key')

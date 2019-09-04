@@ -29,11 +29,11 @@
 		"@storybook/addon-info": "^5.1.11",
 		"@storybook/addon-knobs": "^5.1.11",
 		"@storybook/react": "^5.1.11",
-		"@types/classnames": "^2.2.6",
+		"@types/classnames": "^2.2.9",
 		"@types/gravatar": "^1.8.0",
-		"@types/react": "^16.8.23",
+		"@types/react": "^16.9.1",
 		"@types/react-datepicker": "^2.8.1",
-		"@types/react-dom": "^16.8.4",
+		"@types/react-dom": "^16.8.5",
 		"@types/react-sortable-hoc": "^0.6.4",
 		"@types/react-textarea-autosize": "^4.3.4",
 		"@types/storybook__addon-info": "^4.1.2",
@@ -50,6 +50,6 @@
 		"sass-loader": "^7.1.0",
 		"source-map-loader": "^0.2.4",
 		"style-loader": "^0.23.1",
-		"typescript": "^3.5.2"
+		"typescript": "^3.5.3"
 	}
 }

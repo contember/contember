@@ -1,10 +1,8 @@
 import { Command } from './Command'
 import crypto from 'crypto'
 import { ApiKey } from '../'
-import { uuid } from '../..'
-import { now } from '../../utils/date'
-import { Client } from '@contember/database'
 import { ApiKeyHelper } from './ApiKeyHelper'
+import { Providers } from '../providers'
 
 class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 	private readonly type: ApiKey.Type
@@ -19,9 +17,9 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 		this.expiration = expiration
 	}
 
-	async execute(db: Client): Promise<CreateApiKeyCommand.Result> {
-		const apiKeyId = uuid()
-		const token = await this.generateToken()
+	async execute({ db, providers }: Command.Args): Promise<CreateApiKeyCommand.Result> {
+		const apiKeyId = providers.uuid()
+		const token = await this.generateToken(providers)
 		const tokenHash = ApiKey.computeTokenHash(token)
 
 		await db
@@ -33,25 +31,17 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 				type: this.type,
 				identity_id: this.identityId,
 				disabled_at: null,
-				expires_at: ApiKeyHelper.getExpiration(this.type, this.expiration),
+				expires_at: ApiKeyHelper.getExpiration(providers, this.type, this.expiration),
 				expiration: this.expiration || null,
-				created_at: now(),
+				created_at: providers.now(),
 			})
 			.execute()
 
 		return new CreateApiKeyCommand.Result(apiKeyId, token)
 	}
 
-	private generateToken(): Promise<string> {
-		return new Promise<string>((resolve, reject) => {
-			crypto.randomBytes(20, (error, buffer) => {
-				if (error) {
-					reject(error)
-				} else {
-					resolve(buffer.toString('hex'))
-				}
-			})
-		})
+	private async generateToken(providers: Providers): Promise<string> {
+		return (await providers.randomBytes(20)).toString('hex')
 	}
 }
 

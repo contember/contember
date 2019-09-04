@@ -5,7 +5,7 @@ import { Client } from '@contember/database'
 class DisableOneOffApiKeyCommand implements Command<void> {
 	constructor(private readonly apiKeyId: string) {}
 
-	async execute(db: Client): Promise<void> {
+	async execute({ db }: Command.Args): Promise<void> {
 		const qb = db
 			.updateBuilder()
 			.table('api_key')

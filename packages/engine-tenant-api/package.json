@@ -5,30 +5,32 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"prebuild": "gql-gen --config graphql-tenant.codegen.yml"
+		"prebuild": "gql-gen --config graphql-tenant.codegen.yml",
+		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
 		"@contember/authorization": "^0.0.0",
 		"@contember/database": "^0.0.0",
+		"@contember/dic": "^0.0.0",
 		"@contember/engine-common": "^0.0.0",
 		"@contember/queryable": "^0.0.0",
-		"apollo-server-core": "^2.8.1",
+		"apollo-server-core": "^2.9.1",
 		"apollo-server-errors": "^2.3.1",
 		"bcrypt": "^3.0.6",
-		"graphql": "^14.4.2",
-		"graphql-tools": "^4.0.5",
-		"uuid": "^3.3.2"
+		"graphql": "^14.5.4",
+		"graphql-tools": "^4.0.5"
 	},
 	"devDependencies": {
+		"@contember/database-tester": "^0.0.0",
 		"@graphql-codegen/cli": "^1.5.0",
 		"@graphql-codegen/typescript": "^1.5.0",
 		"@graphql-codegen/typescript-operations": "^1.5.0",
 		"@graphql-codegen/typescript-resolvers": "^1.5.0",
 		"@types/bcrypt": "^3.0.0",
-		"@types/graphql": "^14.2.3",
-		"@types/node": "^12.7.1",
-		"@types/uuid": "^3.4.5",
-		"ts-node": "^8.3.0",
-		"typescript": "^3.5.2"
+		"@types/graphql": "^14.5.0",
+		"@types/jasmine": "^3.4.0",
+		"@types/node": "^10.12.10",
+		"jasmine": "^3.4.0",
+		"typescript": "^3.5.3"
 	}
 }

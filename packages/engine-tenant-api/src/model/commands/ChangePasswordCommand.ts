@@ -1,16 +1,14 @@
 import { Command } from './'
-import { Client } from '@contember/database'
-import bcrypt from 'bcrypt'
 
 class ChangePasswordCommand implements Command<void> {
 	constructor(private readonly personId: string, private readonly password: string) {}
 
-	async execute(db: Client): Promise<void> {
+	async execute({ db, providers }: Command.Args): Promise<void> {
 		await db
 			.updateBuilder()
 			.table('person')
 			.values({
-				password_hash: await bcrypt.hash(this.password, 10),
+				password_hash: await providers.bcrypt(this.password),
 			})
 			.where({
 				id: this.personId,

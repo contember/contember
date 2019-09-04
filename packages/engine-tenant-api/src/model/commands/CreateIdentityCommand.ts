@@ -1,12 +1,10 @@
-import { Client } from '@contember/database'
-import { uuid } from '../..'
 import { Command } from './'
 
 class CreateIdentityCommand implements Command<string> {
 	constructor(private readonly roles: string[]) {}
 
-	public async execute(db: Client): Promise<string> {
-		const identityId = uuid()
+	public async execute({ db, providers }: Command.Args): Promise<string> {
+		const identityId = providers.uuid()
 		await db
 			.insertBuilder()
 			.into('identity')

@@ -8,9 +8,13 @@ import {
 	UpdateProjectMemberCommand,
 	UpdateProjectMemberVariablesCommand,
 } from '../'
+import { CommandBus } from '../commands/CommandBus'
 
 class ProjectMemberManager {
-	constructor(private readonly queryHandler: QueryHandler<DatabaseQueryable>, private readonly db: Client) {}
+	constructor(
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly commandBus: CommandBus,
+	) {}
 
 	async getProjectRoles(projectId: string, identityId: string): Promise<ProjectMemberManager.GetProjectRolesResponse> {
 		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
@@ -31,8 +35,8 @@ class ProjectMemberManager {
 		roles: readonly string[],
 		variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
-		return await this.db.transaction(
-			async trx => await new AddProjectMemberCommand(projectId, identityId, roles, variables).execute(trx),
+		return await this.commandBus.transaction(
+			async bus => await bus.execute(new AddProjectMemberCommand(projectId, identityId, roles, variables)),
 		)
 	}
 
@@ -42,8 +46,8 @@ class ProjectMemberManager {
 		roles?: readonly string[],
 		variables?: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
 	): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
-		return await this.db.transaction(
-			async trx => await new UpdateProjectMemberCommand(projectId, identityId, roles, variables).execute(trx),
+		return await this.commandBus.transaction(
+			async bus => await bus.execute(new UpdateProjectMemberCommand(projectId, identityId, roles, variables)),
 		)
 	}
 
@@ -51,8 +55,8 @@ class ProjectMemberManager {
 		projectId: string,
 		identityId: string,
 	): Promise<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
-		return await this.db.transaction(
-			async trx => await new RemoveProjectMemberCommand(projectId, identityId).execute(trx),
+		return await this.commandBus.transaction(
+			async bus => await bus.execute(new RemoveProjectMemberCommand(projectId, identityId)),
 		)
 	}
 

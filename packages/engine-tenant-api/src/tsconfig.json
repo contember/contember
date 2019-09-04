@@ -16,6 +16,9 @@
 		},
 		{
 			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../dic/src"
 		}
 	]
 }

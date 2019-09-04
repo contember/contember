@@ -6,7 +6,7 @@ import {
 	ProjectMemberManager,
 	ResolverContext,
 	Schema,
-	schemaDocument,
+	typeDefs,
 } from '@contember/engine-tenant-api'
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import { Identity } from '@contember/engine-common'
@@ -20,7 +20,7 @@ class TenantApolloServerFactory {
 
 	create(): ApolloServer {
 		return new ApolloServer({
-			typeDefs: schemaDocument,
+			typeDefs,
 			introspection: true,
 			tracing: true,
 			resolvers: this.resolvers as Config['resolvers'],

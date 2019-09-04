@@ -7,6 +7,6 @@
 	"scripts": {},
 	"dependencies": {},
 	"devDependencies": {
-		"typescript": "^3.5.2"
+		"typescript": "^3.5.3"
 	}
 }

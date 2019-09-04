@@ -5,7 +5,7 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"devDependencies": {
-		"typescript": "^3.5.2"
+		"typescript": "^3.5.3"
 	},
 	"dependencies": {
 		"@contember/database": "^0.0.0"

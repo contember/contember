@@ -233,7 +233,7 @@ namespace Model {
 		entities: { [name: string]: Entity }
 	}
 
-	interface UniqueConstraints {
+	export interface UniqueConstraints {
 		[name: string]: UniqueConstraint
 	}
 

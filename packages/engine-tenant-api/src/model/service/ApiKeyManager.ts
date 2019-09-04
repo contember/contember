@@ -1,12 +1,12 @@
-import { Client, DatabaseQueryable } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
 import { Identity } from '@contember/engine-common'
 import {
 	AddProjectMemberCommand,
 	ApiKey,
 	ApiKeyByTokenQuery,
-	CreateIdentityCommand,
 	CreateApiKeyCommand,
+	CreateIdentityCommand,
 	DisableApiKeyCommand,
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
@@ -16,9 +16,13 @@ import {
 import { AddProjectMemberErrorCode, CreateApiKeyErrorCode } from '../../schema'
 import { ImplementationException } from '../../exceptions'
 import { mapValues } from '../../utils/mapValue'
+import { CommandBus } from '../commands/CommandBus'
 
 class ApiKeyManager {
-	constructor(private readonly queryHandler: QueryHandler<DatabaseQueryable>, private readonly db: Client) {}
+	constructor(
+		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly commandBus: CommandBus,
+	) {}
 
 	async verifyAndProlong(token: string): Promise<ApiKeyManager.VerifyResult> {
 		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))
@@ -36,14 +40,16 @@ class ApiKeyManager {
 		}
 
 		setImmediate(async () => {
-			await new ProlongApiKeyCommand(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined).execute(this.db)
+			await this.commandBus.execute(
+				new ProlongApiKeyCommand(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined),
+			)
 		})
 
 		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles)
 	}
 
 	async createSessionApiKey(identityId: string, expiration?: number): Promise<string> {
-		return (await new CreateApiKeyCommand(ApiKey.Type.SESSION, identityId, expiration).execute(this.db)).token
+		return (await this.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.SESSION, identityId, expiration))).token
 	}
 
 	async createLoginApiKey(): Promise<ApiKeyManager.CreateApiKeyResult> {
@@ -55,28 +61,28 @@ class ApiKeyManager {
 	}
 
 	async disableOneOffApiKey(apiKeyId: string): Promise<void> {
-		await new DisableOneOffApiKeyCommand(apiKeyId).execute(this.db)
+		await this.commandBus.execute(new DisableOneOffApiKeyCommand(apiKeyId))
 	}
 
 	async disableApiKey(apiKeyId: string): Promise<boolean> {
-		return await new DisableApiKeyCommand(apiKeyId).execute(this.db)
+		return await this.commandBus.execute(new DisableApiKeyCommand(apiKeyId))
 	}
 
 	async disableIdentityApiKeys(identityId: string): Promise<void> {
-		await new DisableIdentityApiKeysCommand(identityId).execute(this.db)
+		await this.commandBus.execute(new DisableIdentityApiKeysCommand(identityId))
 	}
 
 	async createPermanentApiKey(
 		roles: string[],
 		projects: { id: string; roles: string[]; variables: UpdateProjectMemberVariablesCommand.VariableUpdate[] }[],
 	): Promise<ApiKeyManager.CreateApiKeyResponse> {
-		return await this.db.transaction(async db => {
-			const identityId = await new CreateIdentityCommand(roles).execute(db)
-			const apiKeyResult = await new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId).execute(db)
+		return await this.commandBus.transaction(async bus => {
+			const identityId = await bus.execute(new CreateIdentityCommand(roles))
+			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
 
 			const addMemberResponses = (await Promise.all(
 				projects.map(async project => {
-					return new AddProjectMemberCommand(project.id, identityId, project.roles, project.variables).execute(db)
+					return bus.execute(new AddProjectMemberCommand(project.id, identityId, project.roles, project.variables))
 				}),
 			))
 				.filter((it): it is AddProjectMemberCommand.AddProjectMemberResponseError => !it.ok)

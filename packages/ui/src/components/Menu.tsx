@@ -43,14 +43,9 @@ namespace Menu {
 				external?: never
 		  }
 		| {
-				to: Navigation.MiddlewareProps['to'] | undefined
+				onClick?: () => void
+				to?: Navigation.MiddlewareProps['to']
 				external?: ItemProps['external']
-				onClick?: never
-		  }
-		| {
-				onClick: () => void
-				to?: never
-				external?: never
 		  }
 
 	function DepthSpecificItem(props: ItemProps) {
@@ -71,22 +66,41 @@ namespace Menu {
 		const Link = React.useContext(Navigation.MiddlewareContext)
 		const { to, external, onClick } = options
 
-		if (to) {
+		if (onClick) {
+			return (props: TitleProps) => {
+				const { children, ...otherProps } = props
+				if (to) {
+					return (
+						<Link
+							to={to}
+							Component={({ navigate }) => (
+								<button
+									type="button"
+									onClick={() => {
+										onClick()
+										navigate()
+									}}
+									{...otherProps}
+								>
+									<div className="menu-titleContent">{children}</div>
+								</button>
+							)}
+						/>
+					)
+				}
+				return (
+					<button type="button" onClick={onClick} {...otherProps}>
+						<div className="menu-titleContent">{children}</div>
+					</button>
+				)
+			}
+		} else if (to) {
 			return (props: TitleProps) => {
 				const { children, ...otherProps } = props
 				return (
 					<Link to={to} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} {...otherProps}>
 						{children}
 					</Link>
-				)
-			}
-		} else if (onClick) {
-			return (props: TitleProps) => {
-				const { children, ...otherProps } = props
-				return (
-					<button type="button" onClick={onClick} {...otherProps}>
-						<div className="menu-titleContent">{children}</div>
-					</button>
 				)
 			}
 		} else {
@@ -114,10 +128,17 @@ namespace Menu {
 		}
 	}
 
-	function ItemWrapper(props: { children?: React.ReactNode; className: string; to: ItemProps['to'] }) {
+	function ItemWrapper(props: {
+		children?: React.ReactNode
+		className: string
+		to: ItemProps['to']
+		suppressIsActive?: boolean
+	}) {
 		return (
 			<IsActive to={props.to}>
-				{isActive => <li className={cn(props.className, isActive && 'is-active')}>{props.children}</li>}
+				{isActive => (
+					<li className={cn(props.className, isActive && !props.suppressIsActive && 'is-active')}>{props.children}</li>
+				)}
 			</IsActive>
 		)
 	}
@@ -134,12 +155,15 @@ namespace Menu {
 
 	function SubGroupItem(props: ItemProps) {
 		const [expanded, setExpanded] = React.useState(false)
-		let options: TitleOptions = {}
-
-		if (props.children) {
-			options = { onClick: () => setExpanded(!expanded) }
-		} else if (props.to) {
-			options = { to: props.to, external: props.external }
+		const onClick = React.useCallback(() => {
+			setExpanded(!expanded)
+		}, [setExpanded, expanded])
+		const options: TitleOptions = {
+			onClick: props.children ? onClick : undefined,
+		}
+		if (!expanded) {
+			options.to = props.to
+			options.external = props.external
 		}
 		const Title = useTitle(options)
 
@@ -147,6 +171,7 @@ namespace Menu {
 			<ItemWrapper
 				className={cn('menu-subgroup', props.children && (expanded ? 'is-expanded' : 'is-collapsed'))}
 				to={props.to}
+				suppressIsActive={!!props.children}
 			>
 				{props.title && <Title className="menu-subgroup-title">{props.title}</Title>}
 				{props.children && (

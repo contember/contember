@@ -1,10 +1,10 @@
 schema:
-  - "./src/system-api/schema/system.graphql.ts"
+  - "./src/schema/system.graphql.ts"
 documents: []
 config:
   immutableTypes: "1"
 generates:
-  ./src/system-api/schema/index.ts:
+  ./src/schema/index.ts:
     config:
       immutableTypes: "1"
     plugins:

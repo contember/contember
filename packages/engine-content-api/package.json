@@ -5,6 +5,7 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
+		"prebuild": "mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {

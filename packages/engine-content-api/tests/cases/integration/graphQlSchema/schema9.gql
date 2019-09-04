@@ -277,7 +277,6 @@ type Mutation {
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): AuthorUpdateResult!
-  generateUploadUrl(contentType: String!): SignedUpload!
 }
 
 enum OrderDirection {
@@ -627,14 +626,6 @@ type Query {
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
   validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
   _info: Info
-}
-
-type SignedUpload {
-  url: String!
-  objectKey: String!
-  bucket: String!
-  region: String!
-  publicUrl: String!
 }
 
 input StringCondition {

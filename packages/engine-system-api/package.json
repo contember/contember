@@ -19,11 +19,11 @@
 		"@contember/utils": "^0.0.0",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-errors": "^2.3.1",
+		"fast-deep-equal": "^2.0.1",
 		"graphql": "^14.5.4",
 		"node-pg-migrate": "^3.22.0",
 		"pg": "^7.12.1",
-		"rfc6902": "^3.0.4",
-		"uuid": "^3.3.3"
+		"rfc6902": "^3.0.4"
 	},
 	"devDependencies": {
 		"@contember/engine-api-tester": "^0.0.0",

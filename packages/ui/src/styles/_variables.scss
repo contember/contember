@@ -40,6 +40,10 @@ $cui-color-danger: $cui-color-red !default;
 $cui-color-dark: $cui-color-gray-8 !default;
 $cui-color-inactive: $cui-color-gray-6 !default;
 
+// Common, super-global settings
+
+$cui-base-lineHeight: 1.2 !default; // In order for computations to work, keep this a scalar
+
 // - Global controls
 $cui-effect-transition-duration: .3s !default;
 

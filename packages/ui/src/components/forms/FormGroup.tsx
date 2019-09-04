@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { FormGroupLabelPosition } from '../../types'
+import { FormGroupLabelPosition, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 import { ErrorList, ErrorListProps } from './'
 
@@ -8,6 +8,7 @@ export interface FormGroupProps extends ErrorListProps {
 	label: React.ReactNode
 	children: React.ReactNode // The actual field
 
+	size?: Size
 	labelPosition?: FormGroupLabelPosition
 
 	labelDescription?: React.ReactNode // Expands on the label e.g. to provide the additional explanation

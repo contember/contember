@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Field } from '../../coreComponents'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { UploadField } from './UploadField'

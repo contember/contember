@@ -2,7 +2,7 @@ import { TitleBar } from '@contember/ui'
 import { IncreaseHeadingDepth } from '@contember/ui/dist/src/auxiliary'
 import * as React from 'react'
 import { LayoutInner, LayoutSide } from '../../../components'
-import { DataContext } from '../../coreComponents'
+import { AccessorContext } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, Environment } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps, TitleBarRendererProps } from './CommonRendererProps'
@@ -27,9 +27,9 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 									{data.root.entities.map(
 										value =>
 											value && (
-												<DataContext.Provider value={value} key={value.getKey()}>
+												<AccessorContext.Provider value={value} key={value.getKey()}>
 													{content}
-												</DataContext.Provider>
+												</AccessorContext.Provider>
 											),
 									)}
 									<PersistButton />
@@ -46,7 +46,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 								: (data.root as EntityAccessor | EntityForRemovalAccessor | undefined)
 						return (
 							value && (
-								<DataContext.Provider value={value}>
+								<AccessorContext.Provider value={value}>
 									<LayoutInner>
 										{content}
 										<PersistButton />
@@ -57,7 +57,7 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 											<PersistButton />
 										</>
 									</LayoutSide>
-								</DataContext.Provider>
+								</AccessorContext.Provider>
 							)
 						)
 					}

@@ -1,7 +1,7 @@
 import { FieldSet, FieldSetProps } from '@contember/ui'
 import * as React from 'react'
 import {
-	DataContext,
+	AccessorContext,
 	EnforceSubtypeRelation,
 	EnvironmentContext,
 	SyntheticChildrenProvider,
@@ -67,7 +67,7 @@ namespace Repeater {
 	export class Item extends React.PureComponent<ItemProps> {
 		public render() {
 			return (
-				<DataContext.Provider value={this.props.entity}>
+				<AccessorContext.Provider value={this.props.entity}>
 					<div className="repeaterItem">
 						<div className="repeaterItem-in">
 							<div className="repeaterItem-content">{this.props.children}</div>
@@ -76,7 +76,7 @@ namespace Repeater {
 							)}
 						</div>
 					</div>
-				</DataContext.Provider>
+				</AccessorContext.Provider>
 			)
 		}
 	}

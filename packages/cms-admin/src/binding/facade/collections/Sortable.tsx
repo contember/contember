@@ -11,8 +11,8 @@ import {
 import { DragHandle as DragHandleIcon } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import {
-	DataContext,
-	DataContextValue,
+	AccessorContext,
+	AccessorContextValue,
 	EnforceSubtypeRelation,
 	EnvironmentContext,
 	Field,
@@ -58,8 +58,8 @@ class Sortable extends React.PureComponent<SortableProps> {
 						)
 					}
 					return (
-						<DataContext.Consumer>
-							{(data: DataContextValue) => {
+						<AccessorContext.Consumer>
+							{(data: AccessorContextValue) => {
 								if (data instanceof EntityCollectionAccessor) {
 									return (
 										<Sortable.SortableInner environment={environment} sortBy={this.props.sortBy} entities={data}>
@@ -68,7 +68,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 									)
 								}
 							}}
-						</DataContext.Consumer>
+						</AccessorContext.Consumer>
 					)
 				}}
 			</EnvironmentContext.Consumer>

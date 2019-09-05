@@ -1,6 +1,6 @@
 import { UL } from '@blueprintjs/core'
 import * as React from 'react'
-import { DataContext } from '../../coreComponents'
+import { AccessorContext } from '../../coreComponents'
 import { CollectionRenderer } from './CollectionRenderer'
 import { RendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
@@ -17,7 +17,7 @@ export class ListRenderer extends React.PureComponent<RendererProps> {
 						<UL>
 							{entities.map(value => (
 								<li key={value.getKey()}>
-									<DataContext.Provider value={value}>{this.props.children}</DataContext.Provider>
+									<AccessorContext.Provider value={value}>{this.props.children}</AccessorContext.Provider>
 								</li>
 							))}
 						</UL>

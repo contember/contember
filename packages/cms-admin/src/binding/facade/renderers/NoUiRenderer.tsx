@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DataContext } from '../../coreComponents'
+import { AccessorContext } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { PersistButton } from '../buttons'
 import { RendererProps } from './CommonRendererProps'
@@ -18,10 +18,10 @@ export class NoUiRenderer extends React.PureComponent<RendererProps> {
 							{normalizedData.map(
 								value =>
 									value && (
-										<DataContext.Provider value={value} key={value.getKey()}>
+										<AccessorContext.Provider value={value} key={value.getKey()}>
 											{DefaultRenderer.renderTitleBar(this.props)}
 											{this.props.children}
-										</DataContext.Provider>
+										</AccessorContext.Provider>
 									),
 							)}
 							<PersistButton />

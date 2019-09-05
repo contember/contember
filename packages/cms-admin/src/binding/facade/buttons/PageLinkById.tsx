@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import { InnerProps } from '../../../components/Link'
 import PageLink, { PageConfig } from '../../../components/pageRouting/PageLink'
-import { DataContext } from '../../coreComponents'
+import { AccessorContext } from '../../coreComponents'
 import { DataBindingError, EntityAccessor, EntityForRemovalAccessor } from '../../dao'
 
 interface PageLinkByIdProps {
@@ -12,7 +12,7 @@ interface PageLinkByIdProps {
 }
 
 export const PageLinkById = React.memo(function(props: PageLinkByIdProps) {
-	const data = React.useContext(DataContext)
+	const data = React.useContext(AccessorContext)
 
 	if (data instanceof EntityAccessor) {
 		const id = data.primaryKey

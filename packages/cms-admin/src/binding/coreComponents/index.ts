@@ -1,5 +1,5 @@
 export * from './Connection'
-export * from './DataContext'
+export * from './AccessorContext'
 export * from './DataProvider'
 export * from './EnforceSubtypeRelation'
 export * from './Entity'

@@ -4,7 +4,7 @@ import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { Component } from '../facade/auxiliary'
 import { QueryLanguage } from '../queryLanguage'
-import { DataContext, useEntityCollectionAccessor } from './DataContext'
+import { AccessorContext, useEntityCollectionAccessor } from './AccessorContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { SyntheticChildrenProvider } from './MarkerProvider'
@@ -71,9 +71,9 @@ namespace ToMany {
 			{props.accessor.entities.map(
 				datum =>
 					datum instanceof EntityAccessor && (
-						<DataContext.Provider value={datum} key={datum.getKey()}>
+						<AccessorContext.Provider value={datum} key={datum.getKey()}>
 							{props.children}
-						</DataContext.Provider>
+						</AccessorContext.Provider>
 					),
 			)}
 		</>

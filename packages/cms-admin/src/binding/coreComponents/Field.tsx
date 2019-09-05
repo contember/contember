@@ -13,7 +13,7 @@ import {
 } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
-import { DataContext, DataContextValue } from './DataContext'
+import { AccessorContext, AccessorContextValue } from './AccessorContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
@@ -99,7 +99,7 @@ class Field<
 
 namespace Field {
 	export interface RawMetadata extends Omit<FieldMetadata, 'data' | 'errors'> {
-		data: DataContextValue
+		data: AccessorContextValue
 	}
 
 	export interface FieldInnerProps<
@@ -138,13 +138,13 @@ namespace Field {
 
 		return React.useMemo(() => {
 			return QueryLanguage.wrapRelativeSingleField(propsName, environment, fieldName => (
-				<DataContext.Consumer>
-					{(data: DataContextValue) => (
+				<AccessorContext.Consumer>
+					{(data: AccessorContextValue) => (
 						<RawMetadataGenerator fieldName={fieldName} data={data} isMutating={isMutating} environment={environment}>
 							{propsChildren}
 						</RawMetadataGenerator>
 					)}
-				</DataContext.Consumer>
+				</AccessorContext.Consumer>
 			))
 		}, [environment, isMutating, propsName, propsChildren])
 	})

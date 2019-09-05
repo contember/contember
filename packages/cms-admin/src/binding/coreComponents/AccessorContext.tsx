@@ -1,28 +1,21 @@
-import { GraphQlBuilder } from 'cms-client'
 import { Input } from '@contember/schema'
+import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { FieldName, Filter } from '../bindingTypes'
 import {
-	AccessorTreeRoot,
 	DataBindingError,
 	EntityAccessor,
 	EntityCollectionAccessor,
 	EntityForRemovalAccessor,
-	Errorable,
-	FieldAccessor,
 	ReferenceMarker,
 } from '../dao'
-import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 
-export type DataContextValue = undefined | FieldAccessor | EntityAccessor | AccessorTreeRoot | EntityForRemovalAccessor
+export type AccessorContextValue = undefined | EntityAccessor | EntityForRemovalAccessor
 
-type _EntityAccessorErrorable = EnforceSubtypeRelation<EntityAccessor, Errorable>
-type _FieldAccessorErrorable = EnforceSubtypeRelation<FieldAccessor, Errorable>
-
-export const DataContext = React.createContext<DataContextValue>(undefined)
+export const AccessorContext = React.createContext<AccessorContextValue>(undefined)
 
 export const useEntityContext = (): EntityAccessor => {
-	const data = React.useContext(DataContext)
+	const data = React.useContext(AccessorContext)
 
 	if (!(data instanceof EntityAccessor)) {
 		throw new DataBindingError(`Corrupted data`)

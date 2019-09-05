@@ -1,4 +1,4 @@
-import { Button, FormGroup } from '@contember/ui'
+import { Box, Button, FormGroup } from '@contember/ui'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import Dropzone from 'react-dropzone'
@@ -102,10 +102,12 @@ namespace UploadFieldComponent {
 	export class Inner extends React.PureComponent<InnerProps> {
 		public render() {
 			return (
-				<span className="fileInput">
-					<span className="fileInput-preview">{this.renderPreview()}</span>
-					<span className="fileInput-message">{this.renderUploadStatusMessage(this.props.metadata.upload)}</span>
-				</span>
+				<Box distinction="seamlessIfNested">
+					<span className="fileInput">
+						<span className="fileInput-preview">{this.renderPreview()}</span>
+						<span className="fileInput-message">{this.renderUploadStatusMessage(this.props.metadata.upload)}</span>
+					</span>
+				</Box>
 			)
 		}
 

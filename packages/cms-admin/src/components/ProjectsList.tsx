@@ -1,16 +1,16 @@
-import { Card, H1 } from '@blueprintjs/core'
+import { Button, ButtonList } from '@contember/ui'
 import * as React from 'react'
-import { ProjectConfig } from '..'
-import Link from './Link'
 import { connect } from 'react-redux'
-import State from '../state'
+import { MiscPageLayout, ProjectConfig } from '..'
 import { pushRequest } from '../actions/request'
-import { RequestChange } from '../state/request'
 import { Dispatch } from '../actions/types'
+import State from '../state'
+import { RequestChange } from '../state/request'
+import Link from './Link'
 
 interface ProjectsListProps {
 	configs: ProjectConfig[]
-	onSelectProject: (projet: ProjectConfig) => void
+	onSelectProject: (project: ProjectConfig) => void
 }
 
 const selectProjectRequest = (project: ProjectConfig): RequestChange => () => ({
@@ -31,18 +31,21 @@ class ProjectsList extends React.Component<ProjectsListProps, {}> {
 
 	render() {
 		return (
-			<div className="centerCard-wrap">
-				<Card className="centerCard">
-					<H1>Projects</H1>
-					<div>
-						{this.props.configs.map((config, i) => (
-							<Link key={i} requestChange={selectProjectRequest(config)} className="projectsList-item">
-								{config.project}/{config.stage}
-							</Link>
-						))}
-					</div>
-				</Card>
-			</div>
+			<MiscPageLayout heading="Projects">
+				<ButtonList flow="block">
+					{this.props.configs.map((config, i) => (
+						<Link
+							key={i}
+							requestChange={selectProjectRequest(config)}
+							Component={({ isActive, ...props }) => (
+								<Button {...props} Component="a" distinction="seamless" flow="block" justification="justifyStart" />
+							)}
+						>
+							{config.project}/{config.stage}
+						</Link>
+					))}
+				</ButtonList>
+			</MiscPageLayout>
 		)
 	}
 }

@@ -2,18 +2,11 @@
 	@for $depth from 1 through $maxdepth
 		$depthConfig: nth($cui-box-depths, $depth)
 
-		$background: map_get($depthConfig, background)
 		$separation: map_get($depthConfig, separation)
-		$borderRadius: map_get($depthConfig, borderRadius)
-		$paddingX: map_get($depthConfig, paddingX)
 		$paddingY: map_get($depthConfig, paddingY)
-		$boxShadow: map_get($depthConfig, boxShadow)
 
 		&.view-depth-#{$depth}
-			background: $background
-			border-radius: $borderRadius
-			box-shadow: $boxShadow
-			padding: $paddingY $paddingX
+			+box($depth)
 
 			& + &
 				margin-top: $separation

@@ -57,19 +57,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 							</Sortable.SortableInner>
 						)
 					}
-					return (
-						<AccessorContext.Consumer>
-							{(data: AccessorContextValue) => {
-								if (data instanceof EntityCollectionAccessor) {
-									return (
-										<Sortable.SortableInner environment={environment} sortBy={this.props.sortBy} entities={data}>
-											{this.props.children}
-										</Sortable.SortableInner>
-									)
-								}
-							}}
-						</AccessorContext.Consumer>
-					)
+					return null
 				}}
 			</EnvironmentContext.Consumer>
 		)

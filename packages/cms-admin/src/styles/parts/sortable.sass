@@ -2,17 +2,16 @@
 
 .sortable
 	list-style-type: none
-	background: white
-	box-shadow: 0 rem(1px) rem(3px) rgba(0, 0, 0, 0.04)
 	margin: 0
 	padding: 0
 
 	&-item
-		background: white
 		display: flex
 		align-items: flex-start
-		border-bottom: rem(1px) solid #eaedf3
-		padding: $spacing-normal $spacing-small
+		padding: $spacing-normal 0
+
+		& + &
+			border-top: em(1px) solid #eaedf3
 
 		&-handle
 			display: flex

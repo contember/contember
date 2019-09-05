@@ -3,6 +3,12 @@
 .#{$cui-conf-globalPrefix}box
 	+boxNesting
 
+	& &.view-seamlessIfNested
+		box-shadow: none
+		background: inherit
+		padding: 0
+		border-radius: unset
+
 	&-heading
 
 	&-content

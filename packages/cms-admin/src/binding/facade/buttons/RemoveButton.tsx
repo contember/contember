@@ -43,6 +43,7 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 			size: 'small',
 			flow: 'squarish',
 			distinction: 'seamless',
+			bland: true,
 		}
 	}
 

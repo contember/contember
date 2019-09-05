@@ -344,12 +344,6 @@ $cui-heading-sizes: (
 );
 
 // Boxes
-$cui-box-separation-y: 1.5em !default;
-$cui-box-padding-y: 1.2em !default;
-$cui-box-border-radius: $cui-control-border-radius !default;
-$cui-box-background: $cui-color-white !default;
-$cui-box-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(3px) 0 rgba($cui-color-gray-8, .15) !default;
-
 $cui-box-depth-1-background: $cui-color-white !default;
 $cui-box-depth-1-separation: $cui-heading-1-fontSize-small !default;
 $cui-box-depth-1-border-radius: em(3px) !default;

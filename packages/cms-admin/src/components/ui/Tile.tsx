@@ -1,7 +1,10 @@
+import { Box, BoxProps } from '@contember/ui'
 import * as React from 'react'
 
-export class Tile extends React.PureComponent {
-	render() {
-		return <section className="tile">{this.props.children}</section>
-	}
-}
+export interface TileProps extends BoxProps {}
+
+export const Tile = React.memo<TileProps>(({ children, ...props }) => (
+	<div className="tile">
+		<Box {...props}>{children}</Box>
+	</div>
+))

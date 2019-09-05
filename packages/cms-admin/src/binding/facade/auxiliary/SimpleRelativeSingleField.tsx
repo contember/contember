@@ -2,7 +2,7 @@ import { FormGroup, FormGroupProps } from '@contember/ui'
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { Scalar } from '../../bindingTypes'
-import { DataContext, Field, FieldMetadata, FieldPublicProps, SyntheticChildrenProvider } from '../../coreComponents'
+import { AccessorContext, Field, FieldMetadata, FieldPublicProps, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component } from './Component'
@@ -49,7 +49,7 @@ const RelativeSingleField = <
 	render,
 	...props
 }: RelativeSingleFieldProps<P, Persisted, Produced>) => {
-	const dataContext = React.useContext(DataContext)
+	const dataContext = React.useContext(AccessorContext)
 
 	if (!render) {
 		return null
@@ -61,20 +61,20 @@ const RelativeSingleField = <
 				<FormGroup
 					label={
 						props.label && (
-							<DataContext.Provider value={dataContext}>
+							<AccessorContext.Provider value={dataContext}>
 								{fieldMetadata.environment.applySystemMiddleware('labelMiddleware', props.label)}
-							</DataContext.Provider>
+							</AccessorContext.Provider>
 						)
 					}
 					size={props.size}
 					labelDescription={
 						props.labelDescription && (
-							<DataContext.Provider value={dataContext}>{props.labelDescription}</DataContext.Provider>
+							<AccessorContext.Provider value={dataContext}>{props.labelDescription}</AccessorContext.Provider>
 						)
 					}
 					labelPosition={props.labelPosition}
 					description={
-						props.description && <DataContext.Provider value={dataContext}>{props.description}</DataContext.Provider>
+						props.description && <AccessorContext.Provider value={dataContext}>{props.description}</AccessorContext.Provider>
 					}
 					errors={fieldMetadata.errors}
 				>

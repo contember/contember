@@ -6,7 +6,7 @@ import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { Component } from '../facade/auxiliary'
 import { QueryLanguage } from '../queryLanguage'
-import { DataContext, useEntityAccessor } from './DataContext'
+import { AccessorContext, useEntityAccessor } from './AccessorContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { SyntheticChildrenProvider } from './MarkerProvider'
@@ -69,10 +69,10 @@ namespace ToOne {
 	}
 
 	export const AccessorRenderer = React.memo((props: AccessorRendererProps) => (
-		<DataContext.Provider value={props.accessor}>
+		<AccessorContext.Provider value={props.accessor}>
 			<ErrorList errors={props.accessor.errors} />
 			{props.children}
-		</DataContext.Provider>
+		</AccessorContext.Provider>
 	))
 	AccessorRenderer.displayName = 'ToOne.AccessorRenderer'
 

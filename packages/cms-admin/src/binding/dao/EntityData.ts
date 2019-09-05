@@ -1,7 +1,9 @@
 import { FieldName } from '../bindingTypes'
-import { DataContextValue } from '../coreComponents'
+import { AccessorContextValue } from '../coreComponents'
 import { PlaceholderGenerator } from '../model'
+import { AccessorTreeRoot } from './AccessorTreeRoot'
 import { EntityCollectionAccessor } from './EntityCollectionAccessor'
+import { FieldAccessor } from './FieldAccessor'
 import { MarkerTreeRoot } from './MarkerTreeRoot'
 import { ReferenceMarker } from './ReferenceMarker'
 
@@ -53,7 +55,7 @@ class EntityData {
 }
 
 namespace EntityData {
-	export type FieldData = DataContextValue | EntityCollectionAccessor
+	export type FieldData = AccessorContextValue | EntityCollectionAccessor | FieldAccessor | AccessorTreeRoot
 
 	export type EntityData = { [placeholder in FieldName]: FieldData }
 }

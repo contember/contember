@@ -2,7 +2,13 @@ import { FormGroup, FormGroupProps } from '@contember/ui'
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { Scalar } from '../../bindingTypes'
-import { AccessorContext, Field, FieldMetadata, FieldPublicProps, SyntheticChildrenProvider } from '../../coreComponents'
+import {
+	AccessorContext,
+	Field,
+	FieldMetadata,
+	FieldPublicProps,
+	SyntheticChildrenProvider,
+} from '../../coreComponents'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component } from './Component'
@@ -74,7 +80,9 @@ const RelativeSingleField = <
 					}
 					labelPosition={props.labelPosition}
 					description={
-						props.description && <AccessorContext.Provider value={dataContext}>{props.description}</AccessorContext.Provider>
+						props.description && (
+							<AccessorContext.Provider value={dataContext}>{props.description}</AccessorContext.Provider>
+						)
 					}
 					errors={fieldMetadata.errors}
 				>

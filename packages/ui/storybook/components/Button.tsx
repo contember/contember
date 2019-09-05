@@ -33,6 +33,16 @@ export const simpleButtonStory = (size?: Size) => {
 			},
 			'default',
 		),
+		justification: radios(
+			'Justification',
+			{
+				Default: 'default',
+				Start: 'justifyStart',
+				Center: 'justifyCenter',
+				End: 'justifyEnd',
+			},
+			'default',
+		),
 		children: content,
 	}
 

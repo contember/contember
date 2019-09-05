@@ -1,5 +1,5 @@
 import * as React from 'react'
-import cn from 'classnames'
+import { Box } from '../Box'
 import { ErrorList, ErrorListProps } from './ErrorList'
 
 export interface FieldSetProps extends ErrorListProps {
@@ -8,9 +8,9 @@ export interface FieldSetProps extends ErrorListProps {
 }
 
 export const FieldSet = React.memo<FieldSetProps>(props => (
-	<div className={cn('fieldSet')}>
+	<Box heading={props.legend}>
 		<ErrorList size={props.size} errors={props.errors} />
 		{props.children}
-	</div>
+	</Box>
 ))
 FieldSet.displayName = 'FieldSet'

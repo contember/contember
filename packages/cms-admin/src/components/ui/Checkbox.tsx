@@ -1,11 +1,12 @@
 import { ErrorList } from '@contember/ui'
 import * as React from 'react'
 import { ErrorAccessor } from '../../binding/dao'
+import { FieldErrors } from '@contember/ui/dist/src/types'
 
 export interface CheckboxProps {
 	checked: boolean
 	readOnly?: boolean
-	errors?: ErrorAccessor[]
+	errors?: FieldErrors
 	onChange: (isChecked: boolean) => void
 	children: React.ReactNode
 }

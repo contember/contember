@@ -19,6 +19,7 @@ export interface LayoutProps {
 	}
 	side: React.ReactNode
 	content: React.ReactNode
+	userMenu?: React.ReactNode
 }
 
 export const LayoutDefault = React.memo((props: LayoutProps) => {
@@ -98,6 +99,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 										</Button>
 									)}
 								/>
+								{props.userMenu}
 							</ButtonGroup>
 						</Dropdown>
 					</DropdownContentContainerProvider>

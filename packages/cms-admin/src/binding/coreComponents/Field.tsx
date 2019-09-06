@@ -18,6 +18,7 @@ import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { EnvironmentContext } from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
 import { MutationStateContext } from './PersistState'
+import { FieldErrors } from '@contember/ui/dist/src/types'
 
 export interface FieldPublicProps {
 	name: FieldName
@@ -30,7 +31,7 @@ export interface FieldMetadata<
 > {
 	fieldName: FieldName
 	data: FieldAccessor<Persisted, Produced>
-	errors: ErrorAccessor[]
+	errors: FieldErrors
 	isMutating: DataTreeMutationState
 	environment: Environment
 }

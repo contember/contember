@@ -479,3 +479,8 @@ $cui-dropdown-content-boxShadow: $cui-box-depth-1-boxShadow !default;
 $cui-dropdown-content-border-radius: $cui-control-border-radius + $cui-control-border-width !default;
 $cui-dropdown-button-content-gap-size: .3em !default;
 $cui-dropdown-transition-duration: .1s !default;
+
+// Tag
+$cui-tag-color: $cui-color-white;
+$cui-tag-background: $cui-color-gray-6;
+$cui-tag-remove-color: $cui-color-gray-3;

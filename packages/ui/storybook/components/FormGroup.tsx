@@ -18,7 +18,6 @@ const FormGroupStory = () => {
 			label={label}
 			errors={[
 				{
-					key: error,
 					message: error,
 				},
 			]}

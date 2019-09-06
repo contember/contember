@@ -37,6 +37,7 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 				createAction<AuthIdentity>(SET_IDENTITY, () => ({
 					token: signIn.result.token,
 					email: signIn.result.person.email,
+					personId: signIn.result.person.id,
 					projects: signIn.result.person.identity.projects.map(
 						(it: any): Project => ({
 							slug: it.project.slug,
@@ -80,6 +81,7 @@ const loginMutation = `
 			result {
 				token
 				person {
+					id
 					email
 					identity {
 						projects {

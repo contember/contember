@@ -6,7 +6,6 @@ export enum AuthStatus {
 
 export default interface AuthState {
 	identity: AuthIdentity | null
-	token: string | null
 	errorMessage: string | null
 	status: AuthStatus
 }
@@ -14,6 +13,7 @@ export default interface AuthState {
 export interface AuthIdentity {
 	token: string
 	email: string
+	personId: string
 	projects: Project[]
 }
 
@@ -23,7 +23,6 @@ export interface Project {
 }
 
 export const emptyAuthState: AuthState = {
-	token: null,
 	identity: null,
 	errorMessage: null,
 	status: AuthStatus.NOT_LOGGED_IN,

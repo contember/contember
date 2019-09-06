@@ -11,3 +11,10 @@ export function createMigrationBuilder(): MigrationBuilder & { getSql: () => str
 		},
 	)
 }
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pgEscape = require('node-pg-migrate/dist/utils').escapeValue
+
+export function escapeValue(value: any): any {
+	return pgEscape(value)
+}

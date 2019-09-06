@@ -6,7 +6,7 @@ import { Modification } from '../Modification'
 import { EventType } from '../../../EventType'
 import { wrapIdentifier } from '@contember/database'
 import { resolveDefaultValue } from '@contember/schema-utils'
-import { escapeSqlString } from '../../../../utils/escapeSqlString'
+import { escapeValue } from '../../../../utils/pgMigrateHelpers'
 
 class CreateColumnModification implements Modification<CreateColumnModification.Data> {
 	constructor(private readonly data: CreateColumnModification.Data, private readonly schema: Schema) {}
@@ -22,7 +22,7 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 		})
 		if (this.data.fillValue !== undefined) {
 			builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)} 
-  SET ${wrapIdentifier(column.columnName)} = '${escapeSqlString(this.data.fillValue)}'`)
+  SET ${wrapIdentifier(column.columnName)} = ${escapeValue(this.data.fillValue)}`)
 
 			// event applier defers constraint check, we need to fire them before ALTER
 			builder.sql(`SET CONSTRAINTS ALL IMMEDIATE`)

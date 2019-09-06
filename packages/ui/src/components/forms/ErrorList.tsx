@@ -14,7 +14,7 @@ export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
 	return (
 		<ul className="errorList">
 			{errors.map(error => (
-				<li className="errorList-item" key={error.key}>
+				<li className="errorList-item" key={error.message}>
 					<ValidationMessage type="invalid" size={size}>
 						{error.message}
 					</ValidationMessage>

@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 export default interface Config {
 	apiServer: string
 	loginToken: string
@@ -13,3 +15,5 @@ export function validateConfig(config: any) {
 }
 
 export class ConfigurationError extends Error {}
+
+export const ConfigContext = React.createContext<Config | undefined>(undefined)

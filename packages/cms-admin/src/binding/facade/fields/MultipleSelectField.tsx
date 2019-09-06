@@ -6,6 +6,7 @@ import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
+import { FieldErrors } from '@contember/ui/dist/src/types'
 
 export type MultipleSelectFieldPublicProps = FormGroupProps & {
 	name: FieldName
@@ -42,7 +43,7 @@ export interface MultipleSelectFieldInnerProps
 	extends MultipleSelectFieldPublicProps,
 		Omit<MultipleChoiceFieldMetadata, 'fieldName'> {
 	environment: Environment
-	errors: ErrorAccessor[]
+	errors: FieldErrors
 	isMutating: boolean
 }
 

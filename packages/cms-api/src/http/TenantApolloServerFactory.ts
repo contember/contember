@@ -7,8 +7,7 @@ class TenantApolloServerFactory {
 	constructor(
 		private readonly resolvers: Schema.Resolvers,
 		private readonly resolverContextFactory: ResolverContextFactory,
-	) {
-	}
+	) {}
 
 	create(): ApolloServer {
 		return new ApolloServer({

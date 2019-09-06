@@ -83,10 +83,12 @@ class ProjectMemberManager {
 	async getProjectMembers(projectId: string): Promise<ProjectMemberManager.GetProjectMembersResponse> {
 		const members = await this.queryHandler.fetch(new ProjectMembersQuery(projectId))
 
-		return await Promise.all(members.map(async it => ({
-			identity: it,
-			memberships: await this.getProjectMemberships(projectId, it.id)
-		})))
+		return await Promise.all(
+			members.map(async it => ({
+				identity: it,
+				memberships: await this.getProjectMemberships(projectId, it.id),
+			})),
+		)
 	}
 }
 
@@ -96,7 +98,7 @@ namespace ProjectMemberManager {
 	}
 
 	export type GetProjectMembersResponse = {
-		identity: {id: string},
+		identity: { id: string }
 		memberships: readonly Membership[]
 	}[]
 }

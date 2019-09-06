@@ -8,8 +8,7 @@ export class ProjectManager {
 	constructor(
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly commandBus: CommandBus,
-	) {
-	}
+	) {}
 
 	public async createOrUpdateProject(project: Pick<Project, 'name' | 'slug'>) {
 		await this.commandBus.execute(new CreateOrUpdateProjectCommand(project))

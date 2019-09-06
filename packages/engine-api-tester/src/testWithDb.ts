@@ -29,7 +29,7 @@ export const executeDbTest = async (test: Test) => {
 	const schemaDiffer = new SchemaDiffer(schemaMigrator)
 	const modifications = schemaDiffer.diffSchemas(emptySchema, {
 		model: test.schema,
-		acl: { roles: {}, variables: {} },
+		acl: { roles: {} },
 		validation: {},
 	})
 

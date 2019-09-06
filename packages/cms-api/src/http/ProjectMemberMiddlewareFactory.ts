@@ -12,12 +12,11 @@ class ProjectMemberMiddlewareFactory {
 	public create(): KoaMiddleware<InputState> {
 		const projectMember: KoaMiddleware<InputState> = async (ctx, next) => {
 			const project = ctx.state.projectContainer.project
-			const [projectRoles, projectVariables] = await Promise.all([
-				this.projectMemberManager.getProjectBySlugRoles(project.slug, ctx.state.authResult.identityId),
-				this.projectMemberManager.getProjectBySlugVariables(project.slug, ctx.state.authResult.identityId),
-			])
-			ctx.state.projectRoles = projectRoles.roles
-			ctx.state.projectVariables = projectVariables
+			const projectMemberships = await this.projectMemberManager.getProjectBySlugMemberships(
+				project.slug,
+				ctx.state.authResult.identityId,
+			)
+			ctx.state.projectMemberships = projectMemberships
 			await next()
 		}
 		return projectMember
@@ -26,8 +25,7 @@ class ProjectMemberMiddlewareFactory {
 
 namespace ProjectMemberMiddlewareFactory {
 	export interface KoaState {
-		projectRoles: string[]
-		projectVariables: { [name: string]: string[] }
+		projectMemberships: readonly { role: string; variables: readonly { name: string, values: readonly string[] }[] }[]
 	}
 }
 

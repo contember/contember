@@ -28,6 +28,9 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 			select: [],
 			with: new With.Statement({}),
 			where: new Where.Statement([]),
+			grouping: {
+				groupingElement: [],
+			},
 			lock: undefined,
 			meta: {},
 		})
@@ -103,6 +106,21 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		return builder.getSql() || undefined
 	}
 
+	public groupBy(columnName: QueryBuilder.ColumnIdentifier): SelectBuilder<Result, Filled | 'grouping'>
+	public groupBy(callback: QueryBuilder.ColumnExpression): SelectBuilder<Result, Filled | 'grouping'>
+	public groupBy(
+		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression,
+	): SelectBuilder<Result, Filled | 'grouping'> {
+		let raw = QueryBuilder.columnExpressionToLiteral(expr)
+		if (raw === undefined) {
+			return this
+		}
+		return this.withOption('grouping', {
+			...this.options.grouping,
+			groupingElement: [...this.options.grouping.groupingElement, raw],
+		})
+	}
+
 	public limit(limit: number, offset?: number): SelectBuilder<Result, Filled | 'limit'> {
 		return this.withOption('limit', [limit, offset || 0])
 	}
@@ -171,6 +189,9 @@ namespace SelectBuilder {
 					alias: string | undefined
 					condition: Literal | undefined
 				})[]
+				grouping: {
+					groupingElement: Literal[]
+				}
 				lock?: LockType
 				meta: Record<string, any>
 			}

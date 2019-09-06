@@ -16,7 +16,7 @@ import {
 	PermissionsFactory,
 	ProjectManager,
 	ProjectMemberManager,
-	RemoveProjectMemberMutationResolver,
+	RemoveProjectMemberMutationResolver, ResolverContextFactory,
 	ResolverFactory,
 	Schema,
 	SetupMutationResolver,
@@ -29,6 +29,8 @@ import {
 } from './'
 import { CommandBus } from './model/commands/CommandBus'
 import { Providers } from './model/providers'
+import { ProjectTypeResolver } from './resolvers/types/ProjectTypeResolver'
+import { ProjectQueryResolver } from './resolvers/query/ProjectQueryResolver'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -37,6 +39,7 @@ interface TenantContainer {
 	projectManager: ProjectManager
 	dbMigrationsRunner: MigrationsRunner
 	resolvers: Schema.Resolvers
+	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
 }
 
@@ -53,6 +56,7 @@ namespace TenantContainer {
 					'signUpManager',
 					'resolvers',
 					'authorizator',
+					'resolverContextFactory',
 				)
 		}
 
@@ -99,6 +103,7 @@ namespace TenantContainer {
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
 
 				.addService('meQueryResolver', () => new MeQueryResolver())
+				.addService('projectQueryResolver', ({projectManager}) => new ProjectQueryResolver(projectManager))
 				.addService(
 					'signUpMutationResolver',
 					({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager),
@@ -142,9 +147,14 @@ namespace TenantContainer {
 				)
 				.addService(
 					'identityTypeResolver',
-					({ queryHandler, projectMemberManager }) => new IdentityTypeResolver(queryHandler, projectMemberManager),
+					({ queryHandler, projectMemberManager, projectManager }) => new IdentityTypeResolver(queryHandler, projectMemberManager, projectManager),
+				)
+				.addService(
+					'projectTypeResolver',
+					({ projectMemberManager }) => new ProjectTypeResolver(projectMemberManager),
 				)
 
+				.addService('resolverContextFactory', ({authorizator, projectMemberManager}) => new ResolverContextFactory(projectMemberManager, authorizator))
 				.addService('resolvers', container => new ResolverFactory(container).create())
 		}
 	}

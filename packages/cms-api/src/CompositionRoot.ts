@@ -105,8 +105,7 @@ class CompositionRoot {
 			.addService('tenantApolloServer', ({ tenantContainer }) =>
 				new TenantApolloServerFactory(
 					tenantContainer.resolvers,
-					tenantContainer.projectMemberManager,
-					tenantContainer.authorizator,
+					tenantContainer.resolverContextFactory
 				).create(),
 			)
 			.addService(

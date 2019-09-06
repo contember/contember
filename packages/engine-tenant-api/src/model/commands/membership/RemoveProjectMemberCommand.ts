@@ -1,6 +1,5 @@
-import { Command, RemoveProjectMemberVariablesCommand } from './'
-import { RemoveProjectMemberErrorCode } from '../../schema'
-import { Client } from '@contember/database'
+import { Command } from '../'
+import { RemoveProjectMemberErrorCode } from '../../../schema'
 
 class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {}
@@ -11,22 +10,14 @@ class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.R
 			identity_id: this.identityId,
 		}
 		const result = await db
-			.selectBuilder()
-			.where(memberWhere)
-			.from('project_member')
-			.select('id')
-			.getResult()
-
-		if (result.length === 0) {
-			return new RemoveProjectMemberCommand.RemoveProjectMemberResponseError([RemoveProjectMemberErrorCode.NotMember])
-		}
-		await db
 			.deleteBuilder()
-			.from('project_member')
+			.from('project_membership')
 			.where(memberWhere)
 			.execute()
 
-		await bus.execute(new RemoveProjectMemberVariablesCommand(this.projectId, this.identityId, []))
+		if (result === 0) {
+			return new RemoveProjectMemberCommand.RemoveProjectMemberResponseError([RemoveProjectMemberErrorCode.NotMember])
+		}
 
 		return new RemoveProjectMemberCommand.RemoveProjectMemberResponseOk()
 	}

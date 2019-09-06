@@ -6,9 +6,13 @@ import {
 	ProjectRolesByIdentityQuery,
 	RemoveProjectMemberCommand,
 	UpdateProjectMemberCommand,
-	UpdateProjectMemberVariablesCommand,
+	UpdateProjectMembershipVariablesCommand,
 } from '../'
 import { CommandBus } from '../commands/CommandBus'
+import { ProjectMembershipByIdentityQuery } from '../queries/ProjectMembershipByIdentityQuery'
+import { Membership } from '../type/Membership'
+import { PermissionContext } from '../authorization/PermissionContext'
+import { ProjectMembersQuery } from '../queries/ProjectMembersQuery'
 
 class ProjectMemberManager {
 	constructor(
@@ -32,22 +36,20 @@ class ProjectMemberManager {
 	async addProjectMember(
 		projectId: string,
 		identityId: string,
-		roles: readonly string[],
-		variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
+		memberships: readonly Membership[],
 	): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
 		return await this.commandBus.transaction(
-			async bus => await bus.execute(new AddProjectMemberCommand(projectId, identityId, roles, variables)),
+			async bus => await bus.execute(new AddProjectMemberCommand(projectId, identityId, memberships)),
 		)
 	}
 
 	async updateProjectMember(
 		projectId: string,
 		identityId: string,
-		roles?: readonly string[],
-		variables?: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
+		memberships: readonly Membership[],
 	): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
 		return await this.commandBus.transaction(
-			async bus => await bus.execute(new UpdateProjectMemberCommand(projectId, identityId, roles, variables)),
+			async bus => await bus.execute(new UpdateProjectMemberCommand(projectId, identityId, memberships)),
 		)
 	}
 
@@ -66,12 +68,37 @@ class ProjectMemberManager {
 	): Promise<ProjectBySlugVariablesByIdentityQuery.Result> {
 		return this.queryHandler.fetch(new ProjectBySlugVariablesByIdentityQuery(projectSlug, identityId))
 	}
+
+	async getProjectMemberships(projectId: string, identityId: string): Promise<ProjectMembershipByIdentityQuery.Result> {
+		return this.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: projectId }, identityId))
+	}
+
+	async getProjectBySlugMemberships(
+		projectSlug: string,
+		identityId: string,
+	): Promise<ProjectMembershipByIdentityQuery.Result> {
+		return this.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ slug: projectSlug }, identityId))
+	}
+
+	async getProjectMembers(projectId: string): Promise<ProjectMemberManager.GetProjectMembersResponse> {
+		const members = await this.queryHandler.fetch(new ProjectMembersQuery(projectId))
+
+		return await Promise.all(members.map(async it => ({
+			identity: it,
+			memberships: await this.getProjectMemberships(projectId, it.id)
+		})))
+	}
 }
 
 namespace ProjectMemberManager {
 	export class GetProjectRolesResponse {
 		constructor(public readonly roles: string[]) {}
 	}
+
+	export type GetProjectMembersResponse = {
+		identity: {id: string},
+		memberships: readonly Membership[]
+	}[]
 }
 
 export { ProjectMemberManager }

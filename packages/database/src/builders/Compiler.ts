@@ -11,6 +11,7 @@ class Compiler {
 			.append(this.compileFromStatement(options.from, namespaceContext))
 			.append(this.compileJoin(options.join, namespaceContext))
 			.append(options.where.compile())
+			.append(this.compileGrouping(options.grouping))
 			.append(this.compileOrderBy(options.orderBy))
 			.append(this.compileLimit(options.limit))
 			.append(this.compileLock(options.lock))
@@ -83,6 +84,13 @@ class Compiler {
 			orderBy.map(([column, direction]) => column.appendString(' ' + direction)),
 			', ',
 		)
+	}
+
+	private compileGrouping(grouping: SelectBuilder.Options['grouping']): Literal {
+		if (grouping.groupingElement.length === 0) {
+			return Literal.empty
+		}
+		return new Literal(' group by ').appendAll(grouping.groupingElement, ', ')
 	}
 
 	private compileLock(lock?: SelectBuilder.Options['lock']): Literal {

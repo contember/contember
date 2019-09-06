@@ -15,8 +15,9 @@ namespace PermissionActions {
 	export const PERSON_SIGN_OUT: Authorizator.Action = [Resources.person, 'signOut']
 	export const PERSON_CHANGE_PASSWORD: Authorizator.Action = [Resources.person, 'changePassword']
 
-	export const PROJECT_VIEW_ALL: Authorizator.Action = [Resources.project, 'viewAll']
+	export const PROJECT_VIEW: Authorizator.Action = [Resources.project, 'view']
 	export const PROJECT_ADD_MEMBER: Authorizator.Action = [Resources.project, 'addMember']
+	export const PROJECT_VIEW_MEMBERS: Authorizator.Action = [Resources.project, 'viewMembers']
 	export const PROJECT_UPDATE_MEMBER_VARIABLES: Authorizator.Action = [Resources.project, 'updateMemberVariables']
 
 	export const API_KEY_CREATE: Authorizator.Action = [Resources.apiKey, 'create']

@@ -9,6 +9,8 @@ const schema: DocumentNode = gql`
 
 	type Query {
 		me: Identity!
+		projects: [Project!]!
+		projectBySlug(slug: String!): Project
 	}
 
 	type Mutation {
@@ -22,16 +24,14 @@ const schema: DocumentNode = gql`
 		addProjectMember(
 			projectSlug: String!
 			identityId: String!
-			roles: [String!]!
-			variables: [VariableUpdate!]
+			memberships: [MembershipInput!]!
 		): AddProjectMemberResponse
+		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
 		updateProjectMember(
 			projectSlug: String!
 			identityId: String!
-			roles: [String!]
-			variables: [VariableUpdate!]
+			memberships: [MembershipInput!]!
 		): UpdateProjectMemberResponse
-		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
 
 		createApiKey(roles: [String!], projects: [ApiKeyProjectInput!]): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
@@ -62,7 +62,7 @@ const schema: DocumentNode = gql`
 
 	type SetupResult {
 		superadmin: Person!
-		loginKey: ApiKey!
+		loginKey: ApiKeyWithToken!
 	}
 
 	# === signUp ===
@@ -206,8 +206,7 @@ const schema: DocumentNode = gql`
 
 	input ApiKeyProjectInput {
 		projectSlug: String!
-		roles: [String!]
-		variables: [VariableUpdate!]
+		memberships: [MembershipInput!]!
 	}
 
 	type CreateApiKeyResponse {
@@ -228,9 +227,7 @@ const schema: DocumentNode = gql`
 	}
 
 	type CreateApiKeyResult {
-		id: String!
-		token: String!
-		identity: IdentityWithoutPerson!
+		apiKey: ApiKeyWithToken!
 	}
 
 	# === disableApiKey ===
@@ -251,44 +248,95 @@ const schema: DocumentNode = gql`
 	}
 
 	# === common ===
-	input VariableUpdate {
+
+	# === variables ===
+
+	input VariableEntryInput {
 		name: String!
 		values: [String!]!
 	}
 
+	type VariableEntry {
+		name: String!
+		values: [String!]!
+	}
+
+	# === membership ===
+
+	input MembershipInput {
+		role: String!
+		variables: [VariableEntryInput!]!
+	}
+
+	type Membership {
+		role: String!
+		variables: [VariableEntry!]!
+	}
+
+	# === person ====
+
 	type Person {
 		id: String!
 		email: String!
-		identity: IdentityWithoutPerson!
+		identity: Identity!
 	}
 
-	type PersonWithoutIdentity {
+	# === api key ===
+
+	type ApiKey {
 		id: String!
-		email: String!
+		identity: Identity!
 	}
+
+	type ApiKeyWithToken {
+		id: String!
+		token: String!
+		identity: Identity!
+	}
+
+	# === identity ===
 
 	type Identity {
 		id: String!
-		projects: [Project!]!
-		person: PersonWithoutIdentity
+		person: Person
+		apiKey: ApiKey
+		projects: [IdentityProjectRelation!]!
 	}
 
-	type IdentityWithoutPerson {
-		id: String!
-		projects: [Project!]!
+	type IdentityProjectRelation {
+		project: Project!
+		memberships: [Membership!]!
 	}
+
+	# === project ===
 
 	type Project {
 		id: String!
 		name: String!
 		slug: String!
-		roles: [String!]!
+		rolesDefinition: [RoleDefinition!]
+		members(memberType: MEMBER_TYPE): [ProjectIdentityRelation!]!
 	}
 
-	type ApiKey {
-		id: String!
-		token: String!
+	enum MEMBER_TYPE {
+		API_KEY
+		PERSON
+	}
+
+	type ProjectIdentityRelation {
 		identity: Identity!
+		memberships: [Membership!]!
+	}
+
+	type RoleDefinition {
+		name: String!
+		variables: [RoleVariableDefinition!]!
+	}
+
+	union RoleVariableDefinition = RoleEntityVariableDefintion
+
+	type RoleEntityVariableDefintion {
+		entityName: String!
 	}
 `
 

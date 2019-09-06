@@ -11,7 +11,7 @@ interface Test {
 
 const execute = (test: Test) => {
 	const schema: Model.Schema = new SchemaBuilder()
-		.entity('Entity1', e => e)
+		.entity('Entity1', e => e.column('lorem').column('bar'))
 		.entity('Entity2', e => e)
 		.buildSchema()
 	const merger = new PermissionFactory(schema)
@@ -423,6 +423,54 @@ describe('permission merger', () => {
 						bar: { lorem: { eq: 'ipsum' } },
 						__merge__foo__bar: {
 							or: [{ lorem: { eq: 'ipsum' } }, { lorem: { eq: 'ipsum' } }],
+						},
+					},
+					operations: {
+						read: {
+							id: '__merge__foo__bar',
+							title: 'foo',
+							description: 'bar',
+							content: 'bar',
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('prefixes variables', () => {
+		execute({
+			acl: {
+				variables: {},
+				roles: {
+					role1: {
+						stages: '*',
+						entities: {
+							Entity1: {
+								predicates: {
+									foo: { lorem: 'foo' },
+									bar: { lorem: 'bar' },
+								},
+								operations: {
+									read: {
+										title: 'foo',
+										description: 'bar',
+										content: 'bar',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			result: {
+				Entity1: {
+					predicates: {
+						foo: { lorem: 'role1__foo' },
+						bar: { lorem: 'role1__bar' },
+						__merge__foo__bar: {
+							or: [{ lorem: 'role1__foo' }, { lorem: 'role1__bar' }],
 						},
 					},
 					operations: {

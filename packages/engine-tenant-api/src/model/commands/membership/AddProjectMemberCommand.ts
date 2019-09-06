@@ -1,40 +1,40 @@
-import { Command } from './Command'
-import { AddProjectMemberErrorCode } from '../../schema'
-import { UpdateProjectMemberVariablesCommand } from '../'
+import { Command } from '../Command'
+import { AddProjectMemberErrorCode } from '../../../schema'
+import { Membership } from '../../type/Membership'
+import { CreateProjectMembershipsCommand } from './CreateProjectMembershipsCommand'
 
 class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProjectMemberResponse> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
-		private readonly roles: readonly string[],
-		private readonly variables: readonly UpdateProjectMemberVariablesCommand.VariableUpdate[],
+		private readonly memberships: readonly Membership[],
 	) {}
 
 	async execute({ db, providers, bus }: Command.Args): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
+		const result = await db
+			.selectBuilder()
+			.select('id')
+			.from('project_membership')
+			.where({
+				project_id: this.projectId,
+				identity_id: this.identityId,
+			})
+			.getResult()
+		if (result.length > 0) {
+			return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.AlreadyMember])
+		}
+
 		try {
-			await db
-				.insertBuilder()
-				.into('project_member')
-				.values({
-					id: providers.uuid(),
-					project_id: this.projectId,
-					identity_id: this.identityId,
-					roles: JSON.stringify(this.roles),
-				})
-				.execute()
-			await bus.execute(new UpdateProjectMemberVariablesCommand(this.projectId, this.identityId, this.variables, false))
+			await bus.execute(new CreateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships))
 
 			return new AddProjectMemberCommand.AddProjectMemberResponseOk()
 		} catch (e) {
 			switch (e.constraint) {
-				case 'project_member_project_id_fkey':
+				case 'project_membership_project':
 					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.ProjectNotFound])
 
-				case 'project_member_identity':
+				case 'project_membership_identity':
 					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.IdentityNotFound])
-
-				case 'project_member_project_identity':
-					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.AlreadyMember])
 
 				default:
 					throw e

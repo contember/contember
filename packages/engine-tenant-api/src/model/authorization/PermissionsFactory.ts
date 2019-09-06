@@ -10,6 +10,8 @@ class PermissionsFactory {
 		permissions.allow(Identity.SystemRole.SETUP, ...PermissionActions.SYSTEM_SETUP)
 		permissions.allow(Identity.SystemRole.SELF, ...PermissionActions.PERSON_CHANGE_PASSWORD)
 		permissions.allow(Identity.SystemRole.PERSON, ...PermissionActions.PERSON_SIGN_OUT)
+		permissions.allow(Identity.SystemRole.PROJECT_MEMBER, ...PermissionActions.PROJECT_VIEW)
+		// permissions.allow(Identity.SystemRole.PROJECT_MEMBER, ...PermissionActions.PROJECT_VIEW_MEMBERS)
 
 		return permissions
 	}

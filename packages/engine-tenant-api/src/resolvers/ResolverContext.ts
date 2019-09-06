@@ -1,35 +1,26 @@
-import { Authorizator, AuthorizationScope } from '@contember/authorization'
+import { AuthorizationScope, Authorizator } from '@contember/authorization'
 import { Identity } from '@contember/engine-common'
-import { ForbiddenError } from 'apollo-server-errors'
+import { PermissionContext } from '../model/authorization'
 
 export class ResolverContext {
-	constructor(
-		public readonly apiKeyId: string,
-		public readonly identity: Identity,
-		public readonly authorizator: Authorizator<Identity>,
-	) {}
+	constructor(public readonly apiKeyId: string, public readonly permissionContext: PermissionContext) {}
 
-	public async isAllowed({
-		scope,
-		action,
-	}: {
+	get identity(): Identity {
+		return this.permissionContext.identity
+	}
+
+	public async isAllowed(args: {
 		scope?: AuthorizationScope<Identity>
 		action: Authorizator.Action
 	}): Promise<boolean> {
-		return await this.authorizator.isAllowed(this.identity, scope || new AuthorizationScope.Global(), action)
+		return this.permissionContext.isAllowed(args)
 	}
 
-	public async requireAccess({
-		scope,
-		action,
-		message,
-	}: {
+	public async requireAccess(args: {
 		scope?: AuthorizationScope<Identity>
 		action: Authorizator.Action
 		message?: string
 	}): Promise<void> {
-		if (!(await this.isAllowed({ scope, action }))) {
-			throw new ForbiddenError(message || 'Forbidden')
-		}
+		this.permissionContext.requireAccess(args)
 	}
 }

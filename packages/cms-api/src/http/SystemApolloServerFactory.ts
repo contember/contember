@@ -10,6 +10,7 @@ import { KoaContext } from '../core/koa/types'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
+import { flattenVariables } from '@contember/engine-content-api'
 
 class SystemApolloServerFactory {
 	constructor(
@@ -45,9 +46,9 @@ class SystemApolloServerFactory {
 			}): ResolverContext => {
 				return new ResolverContext(
 					new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {
-						[ctx.state.projectContainer.project.slug]: ctx.state.projectRoles,
+						[ctx.state.projectContainer.project.slug]: ctx.state.projectMemberships.map(it => it.role),
 					}),
-					ctx.state.projectVariables,
+					flattenVariables(ctx.state.projectMemberships),
 					this.authorizator,
 					this.executionContainerFactory.create(ctx.state.db),
 					ctx.state.planRollback,

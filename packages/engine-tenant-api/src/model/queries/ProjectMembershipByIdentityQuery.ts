@@ -17,9 +17,9 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 					.groupBy('membership_id'),
 			)
 			.select('role')
-			.select('variables')
+			.select(expr => expr.raw("coalesce(variables, '[]'::json)"), 'variables')
 			.from('project_membership')
-			.join('variables', undefined, expr =>
+			.leftJoin('variables', undefined, expr =>
 				expr.columnsEq(['project_membership', 'id'], ['variables', 'membership_id']),
 			)
 			.where({

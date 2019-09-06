@@ -14,11 +14,13 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 	SimpleRelativeSingleFieldProps & {
 		drivenBy: RelativeSingleField
 		format?: (currentValue: string, environment: Environment) => string
+		unpersistedHardPrefix?: string
+		persistedHardPrefix?: string
 		concealTimeout?: number
 	}
 
 export const SlugField = Component<SlugFieldProps>(
-	({ buttonProps, concealTimeout, format, drivenBy, ...props }) => {
+	({ buttonProps, concealTimeout, format, unpersistedHardPrefix, persistedHardPrefix, drivenBy, ...props }) => {
 		const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
 		const hostEntity = useEntityContext() // TODO this will fail for some QL uses
 		const slugField = useRelativeSingleField<string>(props.name)
@@ -34,6 +36,9 @@ export const SlugField = Component<SlugFieldProps>(
 			if (format) {
 				slugValue = format(slugValue, environment)
 			}
+			if (persistedHardPrefix) {
+				slugValue = `${persistedHardPrefix}${slugValue}`
+			}
 		}
 
 		React.useEffect(() => {
@@ -43,9 +48,12 @@ export const SlugField = Component<SlugFieldProps>(
 			slugField.updateValue(slugValue)
 		}, [slugField, slugValue])
 
+		const completePrefix = `${unpersistedHardPrefix || ''}${persistedHardPrefix || ''}`
+		const presentedValue = `${unpersistedHardPrefix || ''}${slugValue}`
+
 		return (
 			<ConcealableField
-				renderConcealedValue={() => slugValue}
+				renderConcealedValue={() => presentedValue}
 				buttonProps={buttonProps}
 				concealTimeout={concealTimeout}
 			>
@@ -57,13 +65,16 @@ export const SlugField = Component<SlugFieldProps>(
 						labelPosition={props.labelPosition || 'labelInlineLeft'}
 						description={props.description}
 						size="small"
-						key="concealableField-formGroup"
 					>
 						<TextInput
-							value={slugValue}
+							value={presentedValue}
 							onChange={e => {
 								hasEditedSlug || setHasEditedSlug(true)
-								slugField.updateValue && slugField.updateValue(e.target.value)
+								if (slugField.updateValue) {
+									const rawValue = e.target.value
+									const unprefixedValue = rawValue.substring(completePrefix.length)
+									slugField.updateValue(`${persistedHardPrefix || ''}${unprefixedValue}`)
+								}
 							}}
 							readOnly={isMutating}
 							validationState={slugField.errors.length ? 'invalid' : undefined}

@@ -1,4 +1,4 @@
-import { Value, QueryBuilder, SelectBuilder, Literal } from '../'
+import { Literal, QueryBuilder, SelectBuilder, Value } from '../'
 
 type ConditionBuilderCallback = (builder: ConditionBuilder) => void
 
@@ -36,6 +36,10 @@ class ConditionBuilder {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
 		this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} ${operator} ?`, [value]))
+	}
+
+	columnsEq(columnName1: QueryBuilder.ColumnIdentifier, columnName2: QueryBuilder.ColumnIdentifier) {
+		return this.compareColumns(columnName1, ConditionBuilder.Operator.eq, columnName2)
 	}
 
 	compareColumns(

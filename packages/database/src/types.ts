@@ -4,10 +4,10 @@ export type Value =
 	| number
 	| boolean
 	| Date
-	| ReadonlyArray<string>
-	| ReadonlyArray<number>
-	| ReadonlyArray<Date>
-	| ReadonlyArray<boolean>
+	| readonly string[]
+	| readonly number[]
+	| readonly Date[]
+	| readonly boolean[]
 	| Buffer
 
 export interface Raw {

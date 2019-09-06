@@ -1,10 +1,11 @@
-import { AuthorizationScope, Authorizator } from '@contember/authorization'
-import { ConditionBuilder, DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { AuthorizationScope } from '@contember/authorization'
+import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
 import { Identity } from '@contember/engine-common'
 import { PermissionActions, ProjectsQuery } from '../'
+import { PermissionContext } from '../authorization/PermissionContext'
 
 class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Result> {
-	constructor(private readonly authorizator: Authorizator<Identity>, private readonly identityId: string) {
+	constructor(private readonly identityId: string, private readonly permissionContext: PermissionContext) {
 		super()
 	}
 
@@ -22,23 +23,54 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 			return []
 		}
 		const identity = new Identity.StaticIdentity(this.identityId, identityRow.roles, {})
-		if (
-			await this.authorizator.isAllowed(identity, new AuthorizationScope.Global(), PermissionActions.PROJECT_VIEW_ALL)
-		) {
+		const canViewAll = await this.permissionContext.authorizator.isAllowed(
+			identity,
+			new AuthorizationScope.Global(),
+			PermissionActions.PROJECT_VIEW,
+		)
+		const canAuthorizedEntityViewAll = await this.permissionContext.authorizator.isAllowed(
+			this.permissionContext.identity,
+			new AuthorizationScope.Global(),
+			PermissionActions.PROJECT_VIEW,
+		)
+		if (canViewAll && canAuthorizedEntityViewAll) {
 			return await new ProjectsQuery().fetch(queryable)
 		}
 
-		return await queryable
+		const qb = queryable
 			.createSelectBuilder<ProjectsByIdentityQuery.Row>()
 			.select(['project', 'id'])
 			.select(['project', 'name'])
 			.select(['project', 'slug'])
 			.from('project')
-			.join('project_member', 'project_member', clause =>
-				clause.compareColumns(['project_member', 'project_id'], ConditionBuilder.Operator.eq, ['project', 'id']),
+			.where(where =>
+				where.in(
+					['project', 'id'],
+					queryable
+						.createSelectBuilder()
+						.from('project_membership')
+						.select('project_id')
+						.where({
+							identity_id: this.identityId,
+						}),
+				),
 			)
-			.where(where => where.compare(['project_member', 'identity_id'], ConditionBuilder.Operator.eq, this.identityId))
-			.getResult()
+		const qbWithIdentityPermissions = canAuthorizedEntityViewAll
+			? qb
+			: qb.where(where =>
+					where.in(
+						['project', 'id'],
+						queryable
+							.createSelectBuilder()
+							.from('project_membership')
+							.select('project_id')
+							.where({
+								identity_id: this.permissionContext.identity.id,
+							}),
+					),
+			  )
+
+		return await qbWithIdentityPermissions.getResult()
 	}
 }
 

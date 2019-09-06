@@ -16,4 +16,11 @@ function filterObject<Input extends {}, Result extends { [Key in keyof Input]: I
 		.reduce((result: Result, [key, value]: [string, any]) => ({ ...(result as any), [key]: value }), {} as Result)
 }
 
-export { filterObject }
+function mapObject<Input, Result>(
+	input: { [key: string]: Input },
+	callback: (value: Input, key: string) => Result,
+): { [key: string]: Result } {
+	return Object.keys(input).reduce((acc, key) => ({ ...acc, [key]: callback(input[key], key) }), {})
+}
+
+export { filterObject, mapObject }

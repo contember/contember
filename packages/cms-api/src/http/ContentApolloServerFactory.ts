@@ -1,7 +1,7 @@
 import { ApolloServer, AuthenticationError } from 'apollo-server-koa'
 import { ApolloError } from 'apollo-server-errors'
 import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
-import { Context, ExecutionContainerFactory, UserError } from '@contember/engine-content-api'
+import { Context, ExecutionContainerFactory, flattenVariables, UserError } from '@contember/engine-content-api'
 import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
 import { GraphQLError, GraphQLSchema } from 'graphql'
 import { KoaContext } from '../core/koa/types'
@@ -58,7 +58,7 @@ class ContentApolloServerFactory {
 			}): Promise<Context> => {
 				const partialContext = {
 					db: ctx.state.db,
-					identityVariables: ctx.state.projectVariables,
+					identityVariables: flattenVariables(ctx.state.projectMemberships),
 				}
 				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions, {
 					uuid: () => uuid.v4(),

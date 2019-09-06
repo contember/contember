@@ -1,6 +1,6 @@
 import 'jasmine'
 import { makeExecutableSchema } from 'graphql-tools'
-import { typeDefs, ResolverContext, TenantContainer } from '../../../src'
+import { typeDefs, ResolverContext, TenantContainer, PermissionContext } from '../../../src'
 import { executeGraphQlTest } from '../../src/testGraphql'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
@@ -46,10 +46,9 @@ export const execute = async (test: Test) => {
 
 	const context: ResolverContext = new ResolverContext(
 		testUuid(998),
-		new Identity.StaticIdentity(testUuid(999), [], {}),
-		{
+		new PermissionContext(new Identity.StaticIdentity(testUuid(999), [], {}), {
 			isAllowed: () => Promise.resolve(true),
-		},
+		}),
 	)
 
 	const schema = makeExecutableSchema({ typeDefs: typeDefs, resolvers: tenantContainer.resolvers as any })

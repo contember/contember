@@ -47,9 +47,8 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		const result = await this.apiKeyManager.createPermanentApiKey(
 			[...(roles || [])],
 			(projects || []).map(it => ({
-				variables: [...(it.variables || [])],
 				id: projectsRows.find(row => row && row.slug)!.id,
-				roles: [...(it.roles || [])],
+				memberships: it.memberships,
 			})),
 		)
 
@@ -64,11 +63,13 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			ok: true,
 			errors: [],
 			result: {
-				id: result.result.apiKey.id,
-				token: result.result.apiKey.token,
-				identity: {
-					id: result.result.identityId,
-					projects: [],
+				apiKey: {
+					id: result.result.apiKey.id,
+					token: result.result.apiKey.token,
+					identity: {
+						id: result.result.identityId,
+						projects: [],
+					},
 				},
 			},
 		}

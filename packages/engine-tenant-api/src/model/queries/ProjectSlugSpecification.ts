@@ -1,16 +1,12 @@
-import { ConditionBuilder, SelectBuilder, SelectBuilderSpecification } from '@contember/database'
+import { ConditionBuilder, SelectBuilderSpecification } from '@contember/database'
 
 export const byProjectSlug = (slug: string): SelectBuilderSpecification<'where' | 'with' | 'join'> => qb =>
 	qb
-		.where((expr: ConditionBuilder) =>
-			expr.compareColumns('project_id', ConditionBuilder.Operator.eq, ['project', 'id']),
-		)
+		.where((expr: ConditionBuilder) => expr.columnsEq('project_id', ['project', 'id']))
 		.with('project', qb =>
 			qb
 				.from('project')
 				.select('id')
 				.where({ slug: slug }),
 		)
-		.join('project', 'project', (cond: ConditionBuilder) =>
-			cond.compareColumns(['project', 'id'], ConditionBuilder.Operator.eq, 'project_id'),
-		)
+		.join('project', 'project', (cond: ConditionBuilder) => cond.columnsEq(['project', 'id'], 'project_id'))

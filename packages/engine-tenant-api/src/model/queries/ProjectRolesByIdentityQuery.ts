@@ -8,9 +8,9 @@ class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQu
 
 	async fetch(queryable: DatabaseQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
 		let qb = queryable
-			.createSelectBuilder<ProjectRolesByIdentityQuery.Result>()
-			.select('roles')
-			.from('project_member')
+			.createSelectBuilder<{ role: string }>()
+			.select('role')
+			.from('project_membership')
 			.where({
 				identity_id: this.identityId,
 			})
@@ -22,9 +22,7 @@ class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQu
 				: qb.match(byProjectSlug(this.project.slug))
 		const result = await qbWithProjectWhere.getResult()
 
-		const row = this.fetchOneOrNull(result)
-
-		return row ? row : { roles: [] }
+		return { roles: result.map(it => it.role) }
 	}
 }
 

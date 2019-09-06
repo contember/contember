@@ -15,7 +15,7 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 
 	async addProjectMember(
 		parent: any,
-		{ projectSlug, identityId, roles, variables }: MutationAddProjectMemberArgs,
+		{ projectSlug, identityId, memberships }: MutationAddProjectMemberArgs,
 		context: ResolverContext,
 	): Promise<AddProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
@@ -31,7 +31,7 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.projectMemberManager.addProjectMember(project.id, identityId, roles, variables || [])
+		const result = await this.projectMemberManager.addProjectMember(project.id, identityId, memberships)
 
 		if (!result.ok) {
 			return {

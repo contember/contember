@@ -11,12 +11,13 @@ import {
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
 	ProlongApiKeyCommand,
-	UpdateProjectMemberVariablesCommand,
+	UpdateProjectMembershipVariablesCommand,
 } from '../'
 import { AddProjectMemberErrorCode, CreateApiKeyErrorCode } from '../../schema'
 import { ImplementationException } from '../../exceptions'
 import { mapValues } from '../../utils/mapValue'
 import { CommandBus } from '../commands/CommandBus'
+import { Membership } from '../type/Membership'
 
 class ApiKeyManager {
 	constructor(
@@ -74,7 +75,7 @@ class ApiKeyManager {
 
 	async createPermanentApiKey(
 		roles: string[],
-		projects: { id: string; roles: string[]; variables: UpdateProjectMemberVariablesCommand.VariableUpdate[] }[],
+		projects: { id: string; memberships: readonly Membership[] }[],
 	): Promise<ApiKeyManager.CreateApiKeyResponse> {
 		return await this.commandBus.transaction(async bus => {
 			const identityId = await bus.execute(new CreateIdentityCommand(roles))
@@ -82,7 +83,7 @@ class ApiKeyManager {
 
 			const addMemberResponses = (await Promise.all(
 				projects.map(async project => {
-					return bus.execute(new AddProjectMemberCommand(project.id, identityId, project.roles, project.variables))
+					return bus.execute(new AddProjectMemberCommand(project.id, identityId, project.memberships))
 				}),
 			))
 				.filter((it): it is AddProjectMemberCommand.AddProjectMemberResponseError => !it.ok)

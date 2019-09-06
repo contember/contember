@@ -4,11 +4,14 @@ import { SelectedDimension } from '../../state/request'
 import SystemMiddleware = Environment.SystemMiddleware
 
 class Environment {
-	public constructor(
-		private readonly names: Environment.NameStore = {
-			dimensions: {},
-		},
-	) {}
+	private readonly names: Environment.NameStore
+
+	public constructor(names: Environment.NameStore = Environment.defaultNameStore) {
+		this.names = {
+			...Environment.defaultNameStore,
+			...names,
+		}
+	}
 
 	public hasName(name: keyof Environment.NameStore): boolean {
 		return name in this.names
@@ -110,7 +113,9 @@ class Environment {
 			const value = delta[name]
 
 			newDelta[name] =
-				value && value instanceof Function && !Environment.systemVariableNames.includes(name as any)
+				value &&
+				value instanceof Function &&
+				!Environment.systemVariableNames.has(name as Environment.SystemVariableName)
 					? value(currentEnvironment)
 					: delta[name]
 		}
@@ -139,7 +144,7 @@ namespace Environment {
 		labelMiddleware?: (label: IFormGroupProps['label']) => React.ReactNode
 	}
 
-	export const systemVariableNames: SystemVariableName[] = ['labelMiddleware']
+	export const systemVariableNames: Set<SystemVariableName> = new Set(['labelMiddleware'])
 
 	export type SystemVariableName = keyof SystemVariables
 
@@ -159,6 +164,15 @@ namespace Environment {
 	}
 
 	export type SystemMiddlewareName = keyof SystemMiddleware
+
+	export const defaultSystemVariables: SystemVariables = {
+		labelMiddleware: label => label,
+	}
+
+	export const defaultNameStore: NameStore = {
+		...defaultSystemVariables,
+		dimensions: {},
+	}
 }
 
 export { Environment }

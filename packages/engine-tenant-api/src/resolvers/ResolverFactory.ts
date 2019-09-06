@@ -50,6 +50,7 @@ class ResolverFactory {
 			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
+				roles: this.resolvers.projectTypeResolver.roles.bind(this.resolvers.projectTypeResolver),
 			},
 			Query: {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),

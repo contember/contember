@@ -33,8 +33,8 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		return await Promise.all(
 			projects.map(
 				async (it): Promise<IdentityProjectRelation> => ({
-					project: { ...it, members: [] },
-					memberships: (await this.projectMemberManager.getProjectMemberships(it.id, parent.id)),
+					project: { ...it, members: [], roles: [] },
+					memberships: await this.projectMemberManager.getProjectMemberships(it.id, parent.id),
 				}),
 			),
 		)

@@ -31,7 +31,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 						project_id: this.project.id,
 				  })
 				: qb.match(byProjectSlug(this.project.slug))
-		return (await qbWithProjectWhere.getResult())
+		return await qbWithProjectWhere.getResult()
 	}
 }
 

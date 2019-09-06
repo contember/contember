@@ -314,7 +314,7 @@ const schema: DocumentNode = gql`
 		id: String!
 		name: String!
 		slug: String!
-		rolesDefinition: [RoleDefinition!]
+		roles: [RoleDefinition!]!
 		members(memberType: MEMBER_TYPE): [ProjectIdentityRelation!]!
 	}
 
@@ -333,9 +333,12 @@ const schema: DocumentNode = gql`
 		variables: [RoleVariableDefinition!]!
 	}
 
-	union RoleVariableDefinition = RoleEntityVariableDefintion
+	interface RoleVariableDefinition {
+		name: String!
+	}
 
-	type RoleEntityVariableDefintion {
+	type RoleEntityVariableDefinition implements RoleVariableDefinition {
+		name: String!
 		entityName: String!
 	}
 `

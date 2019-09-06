@@ -25,7 +25,7 @@ class ProjectMemberMiddlewareFactory {
 
 namespace ProjectMemberMiddlewareFactory {
 	export interface KoaState {
-		projectMemberships: readonly { role: string; variables: readonly { name: string, values: readonly string[] }[] }[]
+		projectMemberships: readonly { role: string; variables: readonly { name: string; values: readonly string[] }[] }[]
 	}
 }
 

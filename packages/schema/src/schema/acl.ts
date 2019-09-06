@@ -7,23 +7,23 @@ namespace Acl {
 		column = 'column',
 	}
 
-	export type Variable = EnumVariable | EntityVariable | ColumnValueVariable
+	export type Variable = EntityVariable // | EnumVariable | ColumnValueVariable
 
-	export interface EnumVariable {
-		type: VariableType.enum
-		enumName: string
-	}
+	// export interface EnumVariable {
+	// 	type: VariableType.enum
+	// 	enumName: string
+	// }
 
 	export interface EntityVariable {
 		type: VariableType.entity
 		entityName: string
 	}
 
-	export interface ColumnValueVariable {
-		type: VariableType.column
-		entityName: string
-		fieldName: string
-	}
+	// export interface ColumnValueVariable {
+	// 	type: VariableType.column
+	// 	entityName: string
+	// 	fieldName: string
+	// }
 
 	export interface VariablesMap {
 		[name: string]: string | number | (string | number)[]
@@ -63,6 +63,7 @@ namespace Acl {
 
 	export interface RolePermissions {
 		inherits?: string[]
+		variables: Acl.Variables
 		stages: StagesDefinition
 		entities: Permissions
 	}
@@ -75,7 +76,6 @@ namespace Acl {
 	export type Variables = { [name: string]: Variable }
 
 	export interface Schema {
-		variables: Acl.Variables
 		roles: Acl.Roles
 	}
 }

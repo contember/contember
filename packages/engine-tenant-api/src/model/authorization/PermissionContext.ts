@@ -3,10 +3,7 @@ import { AuthorizationScope, Authorizator } from '@contember/authorization'
 import { ForbiddenError } from 'apollo-server-errors'
 
 export class PermissionContext {
-	constructor(
-		public readonly identity: Identity,
-		public readonly authorizator: Authorizator<Identity>,
-	) {}
+	constructor(public readonly identity: Identity, public readonly authorizator: Authorizator<Identity>) {}
 
 	public async isAllowed({
 		scope,

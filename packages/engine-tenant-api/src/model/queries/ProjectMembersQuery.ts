@@ -6,7 +6,8 @@ class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQuery.Result> {
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<ProjectMembersQuery.Result> {
-		return await queryable.createSelectBuilder<{ id: string }>()
+		return await queryable
+			.createSelectBuilder<{ id: string }>()
 			.select(expr => expr.raw('distinct (identity_id)'), 'id')
 			.from('project_membership')
 			.where({

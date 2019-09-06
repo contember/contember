@@ -8,6 +8,6 @@ export * from './dataUtils'
 
 export const emptySchema: Schema = {
 	model: emptyModelSchema,
-	acl: { variables: {}, roles: {} },
+	acl: { roles: {} },
 	validation: {},
 }

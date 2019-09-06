@@ -1,6 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -218,7 +217,7 @@ export type Project = {
 	readonly id: Scalars['String']
 	readonly name: Scalars['String']
 	readonly slug: Scalars['String']
-	readonly rolesDefinition?: Maybe<ReadonlyArray<RoleDefinition>>
+	readonly roles: ReadonlyArray<RoleDefinition>
 	readonly members: ReadonlyArray<ProjectIdentityRelation>
 }
 
@@ -267,12 +266,15 @@ export type RoleDefinition = {
 	readonly variables: ReadonlyArray<RoleVariableDefinition>
 }
 
-export type RoleEntityVariableDefintion = {
-	__typename?: 'RoleEntityVariableDefintion'
+export type RoleEntityVariableDefinition = RoleVariableDefinition & {
+	__typename?: 'RoleEntityVariableDefinition'
+	readonly name: Scalars['String']
 	readonly entityName: Scalars['String']
 }
 
-export type RoleVariableDefinition = RoleEntityVariableDefintion
+export type RoleVariableDefinition = {
+	readonly name: Scalars['String']
+}
 
 export type SetupError = {
 	__typename?: 'SetupError'
@@ -460,11 +462,8 @@ export type ResolversTypes = {
 	ApiKey: ResolverTypeWrapper<ApiKey>
 	IdentityProjectRelation: ResolverTypeWrapper<IdentityProjectRelation>
 	Project: ResolverTypeWrapper<Project>
-	RoleDefinition: ResolverTypeWrapper<
-		Omit<RoleDefinition, 'variables'> & { variables: Array<ResolversTypes['RoleVariableDefinition']> }
-	>
-	RoleVariableDefinition: ResolversTypes['RoleEntityVariableDefintion']
-	RoleEntityVariableDefintion: ResolverTypeWrapper<RoleEntityVariableDefintion>
+	RoleDefinition: ResolverTypeWrapper<RoleDefinition>
+	RoleVariableDefinition: ResolverTypeWrapper<RoleVariableDefinition>
 	MEMBER_TYPE: Member_Type
 	ProjectIdentityRelation: ResolverTypeWrapper<ProjectIdentityRelation>
 	Membership: ResolverTypeWrapper<Membership>
@@ -511,6 +510,7 @@ export type ResolversTypes = {
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
 	SetupError: ResolverTypeWrapper<SetupError>
+	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -522,9 +522,8 @@ export type ResolversParentTypes = {
 	ApiKey: ApiKey
 	IdentityProjectRelation: IdentityProjectRelation
 	Project: Project
-	RoleDefinition: Omit<RoleDefinition, 'variables'> & { variables: Array<ResolversTypes['RoleVariableDefinition']> }
-	RoleVariableDefinition: ResolversTypes['RoleEntityVariableDefintion']
-	RoleEntityVariableDefintion: RoleEntityVariableDefintion
+	RoleDefinition: RoleDefinition
+	RoleVariableDefinition: RoleVariableDefinition
 	MEMBER_TYPE: Member_Type
 	ProjectIdentityRelation: ProjectIdentityRelation
 	Membership: Membership
@@ -571,6 +570,7 @@ export type ResolversParentTypes = {
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
 	SetupError: SetupError
+	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 }
 
 export type AddProjectMemberErrorResolvers<
@@ -754,7 +754,7 @@ export type ProjectResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	rolesDefinition?: Resolver<Maybe<ReadonlyArray<ResolversTypes['RoleDefinition']>>, ParentType, ContextType>
+	roles?: Resolver<ReadonlyArray<ResolversTypes['RoleDefinition']>, ParentType, ContextType>
 	members?: Resolver<
 		ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>,
 		ParentType,
@@ -805,10 +805,11 @@ export type RoleDefinitionResolvers<
 	variables?: Resolver<ReadonlyArray<ResolversTypes['RoleVariableDefinition']>, ParentType, ContextType>
 }
 
-export type RoleEntityVariableDefintionResolvers<
+export type RoleEntityVariableDefinitionResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['RoleEntityVariableDefintion'] = ResolversParentTypes['RoleEntityVariableDefintion']
+	ParentType extends ResolversParentTypes['RoleEntityVariableDefinition'] = ResolversParentTypes['RoleEntityVariableDefinition']
 > = {
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	entityName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
@@ -816,7 +817,8 @@ export type RoleVariableDefinitionResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['RoleVariableDefinition'] = ResolversParentTypes['RoleVariableDefinition']
 > = {
-	__resolveType: TypeResolveFn<'RoleEntityVariableDefintion', ParentType, ContextType>
+	__resolveType: TypeResolveFn<'RoleEntityVariableDefinition', ParentType, ContextType>
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type SetupErrorResolvers<
@@ -961,7 +963,7 @@ export type Resolvers<ContextType = any> = {
 	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<ContextType>
 	RemoveProjectMemberResponse?: RemoveProjectMemberResponseResolvers<ContextType>
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>
-	RoleEntityVariableDefintion?: RoleEntityVariableDefintionResolvers<ContextType>
+	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
 	RoleVariableDefinition?: RoleVariableDefinitionResolvers
 	SetupError?: SetupErrorResolvers<ContextType>
 	SetupResponse?: SetupResponseResolvers<ContextType>

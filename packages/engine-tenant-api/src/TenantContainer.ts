@@ -37,6 +37,7 @@ import { InviteMutationResolver } from './resolvers/mutation/person/InviteMutati
 import { InviteManager } from './model/service/InviteManager'
 import { GraphQLError, GraphQLFormattedError } from 'graphql'
 import { formatError } from './resolvers/ErrorFormatter'
+import { ProjectMembersQueryResolver } from './resolvers/query/ProjectMembersQueryResolver'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -121,6 +122,11 @@ namespace TenantContainer {
 
 				.addService('meQueryResolver', () => new MeQueryResolver())
 				.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
+				.addService(
+					'projectMembersQueryResolver',
+					({ projectManager, projectMemberManager }) =>
+						new ProjectMembersQueryResolver(projectManager, projectMemberManager),
+				)
 				.addService(
 					'signUpMutationResolver',
 					({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager),

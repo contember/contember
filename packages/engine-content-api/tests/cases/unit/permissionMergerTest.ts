@@ -23,9 +23,9 @@ describe('permission merger', () => {
 	it('merges inheritance', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -39,6 +39,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						variables: {},
 						inherits: ['role1'],
 						stages: '*',
 						entities: {
@@ -79,9 +80,9 @@ describe('permission merger', () => {
 	it('merges entity operations', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -95,6 +96,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -127,9 +129,9 @@ describe('permission merger', () => {
 	it('merges entity operations with predicates', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -143,6 +145,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -179,9 +182,10 @@ describe('permission merger', () => {
 	it('merges entity operations and drops predicate', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
+
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -196,6 +200,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -230,9 +235,9 @@ describe('permission merger', () => {
 	it('merges entity operations and merges predicates', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -249,6 +254,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -287,9 +293,9 @@ describe('permission merger', () => {
 	it('merges delete operation', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -303,6 +309,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -336,9 +343,9 @@ describe('permission merger', () => {
 	it('merges predicates and resolves conflicts', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -355,6 +362,7 @@ describe('permission merger', () => {
 						},
 					},
 					role2: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -393,9 +401,9 @@ describe('permission merger', () => {
 	it('makes primary predicate union of all other fields', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {
@@ -441,9 +449,9 @@ describe('permission merger', () => {
 	it('prefixes variables', () => {
 		execute({
 			acl: {
-				variables: {},
 				roles: {
 					role1: {
+						variables: {},
 						stages: '*',
 						entities: {
 							Entity1: {

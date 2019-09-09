@@ -134,7 +134,7 @@ namespace UploadFieldComponent {
 			if (!upload) {
 				return (
 					<>
-						<Button>Select a file to upload</Button>
+						<Button size="small">Select a file to upload</Button>
 						<span className={'fileInput-drop'}>or drag & drop</span>
 					</>
 				)

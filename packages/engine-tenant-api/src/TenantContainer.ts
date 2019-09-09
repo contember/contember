@@ -33,6 +33,8 @@ import { Providers } from './model/providers'
 import { ProjectTypeResolver } from './resolvers/types/ProjectTypeResolver'
 import { ProjectQueryResolver } from './resolvers/query/ProjectQueryResolver'
 import { ProjectVariablesResolver } from './model/type/Variables'
+import { InviteMutationResolver } from './resolvers/mutation/person/InviteMutationResolver'
+import { InviteManager } from './model/service/InviteManager'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -111,6 +113,7 @@ namespace TenantContainer {
 					({ queryHandler, commandBus }) => new ProjectMemberManager(queryHandler, commandBus),
 				)
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
+				.addService('inviteManager', ({ db, providers }) => new InviteManager(db, providers))
 
 				.addService('meQueryResolver', () => new MeQueryResolver())
 				.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
@@ -127,6 +130,10 @@ namespace TenantContainer {
 					'changePasswordMutationResolver',
 					({ passwordChangeManager, queryHandler }) =>
 						new ChangePasswordMutationResolver(passwordChangeManager, queryHandler),
+				)
+				.addService(
+					'inviteMutationResolver',
+					({ inviteManager, projectManager }) => new InviteMutationResolver(inviteManager, projectManager),
 				)
 				.addService(
 					'addProjectMemberMutationResolver',

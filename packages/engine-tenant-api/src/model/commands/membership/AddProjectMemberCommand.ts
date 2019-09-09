@@ -1,16 +1,18 @@
 import { Command } from '../Command'
-import { AddProjectMemberErrorCode } from '../../../schema'
 import { Membership } from '../../type/Membership'
 import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 
-class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProjectMemberResponse> {
+type CommandResponse = Response<undefined, AddProjectMemberCommandError>
+
+export class AddProjectMemberCommand implements Command<CommandResponse> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
 		private readonly memberships: readonly Membership[],
 	) {}
 
-	async execute({ db, providers, bus }: Command.Args): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
+	async execute({ db, providers, bus }: Command.Args): Promise<CommandResponse> {
 		const result = await db
 			.selectBuilder()
 			.select('id')
@@ -21,23 +23,20 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 			})
 			.getResult()
 		if (result.length > 0) {
-			return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.AlreadyMember])
+			return new ResponseError(AddProjectMemberCommandError.alreadyMember)
 		}
 
 		try {
 			await bus.execute(
 				new CreateOrUpdateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships, false),
 			)
-
-			return new AddProjectMemberCommand.AddProjectMemberResponseOk()
+			return new ResponseOk(undefined)
 		} catch (e) {
 			switch (e.constraint) {
 				case 'project_membership_project':
-					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.ProjectNotFound])
-
+					return new ResponseError(AddProjectMemberCommandError.projectNotFound)
 				case 'project_membership_identity':
-					return new AddProjectMemberCommand.AddProjectMemberResponseError([AddProjectMemberErrorCode.IdentityNotFound])
-
+					return new ResponseError(AddProjectMemberCommandError.identityNotfound)
 				default:
 					throw e
 			}
@@ -45,20 +44,8 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 	}
 }
 
-namespace AddProjectMemberCommand {
-	export type AddProjectMemberResponse = AddProjectMemberResponseOk | AddProjectMemberResponseError
-
-	export class AddProjectMemberResponseOk {
-		readonly ok = true
-
-		constructor() {}
-	}
-
-	export class AddProjectMemberResponseError {
-		readonly ok = false
-
-		constructor(public readonly errors: Array<AddProjectMemberErrorCode>) {}
-	}
+export enum AddProjectMemberCommandError {
+	alreadyMember,
+	projectNotFound,
+	identityNotfound,
 }
-
-export { AddProjectMemberCommand }

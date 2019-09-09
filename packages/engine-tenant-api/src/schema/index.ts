@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -38,11 +39,6 @@ export type ApiKey = {
 	__typename?: 'ApiKey'
 	readonly id: Scalars['String']
 	readonly identity: Identity
-}
-
-export type ApiKeyProjectInput = {
-	readonly projectSlug: Scalars['String']
-	readonly memberships: ReadonlyArray<MembershipInput>
 }
 
 export type ApiKeyWithToken = {
@@ -125,6 +121,39 @@ export type IdentityProjectRelation = {
 	readonly memberships: ReadonlyArray<Membership>
 }
 
+export type InviteError = {
+	__typename?: 'InviteError'
+	readonly code: InviteErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum InviteErrorCode {
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	VariableNotFound = 'VARIABLE_NOT_FOUND',
+	AlreadyMember = 'ALREADY_MEMBER',
+}
+
+export type InviteExistingResult = {
+	__typename?: 'InviteExistingResult'
+	readonly person: Person
+}
+
+export type InviteNewResult = {
+	__typename?: 'InviteNewResult'
+	readonly generatedPassword: Scalars['String']
+	readonly person: Person
+}
+
+export type InviteResponse = {
+	__typename?: 'InviteResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<InviteError>
+	readonly result?: Maybe<InviteResult>
+}
+
+export type InviteResult = InviteExistingResult | InviteNewResult
+
 export enum Member_Type {
 	ApiKey = 'API_KEY',
 	Person = 'PERSON',
@@ -148,6 +177,7 @@ export type Mutation = {
 	readonly signIn?: Maybe<SignInResponse>
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
+	readonly invite?: Maybe<InviteResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
 	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
@@ -179,6 +209,12 @@ export type MutationChangePasswordArgs = {
 	password: Scalars['String']
 }
 
+export type MutationInviteArgs = {
+	email: Scalars['String']
+	projectSlug: Scalars['String']
+	memberships: ReadonlyArray<MembershipInput>
+}
+
 export type MutationAddProjectMemberArgs = {
 	projectSlug: Scalars['String']
 	identityId: Scalars['String']
@@ -197,8 +233,8 @@ export type MutationUpdateProjectMemberArgs = {
 }
 
 export type MutationCreateApiKeyArgs = {
-	roles?: Maybe<ReadonlyArray<Scalars['String']>>
-	projects?: Maybe<ReadonlyArray<ApiKeyProjectInput>>
+	projectSlug: Scalars['String']
+	memberships: ReadonlyArray<MembershipInput>
 }
 
 export type MutationDisableApiKeyArgs = {
@@ -492,6 +528,14 @@ export type ResolversTypes = {
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
+	InviteResponse: ResolverTypeWrapper<
+		Omit<InviteResponse, 'result'> & { result?: Maybe<ResolversTypes['InviteResult']> }
+	>
+	InviteError: ResolverTypeWrapper<InviteError>
+	InviteErrorCode: InviteErrorCode
+	InviteResult: ResolversTypes['InviteExistingResult'] | ResolversTypes['InviteNewResult']
+	InviteExistingResult: ResolverTypeWrapper<InviteExistingResult>
+	InviteNewResult: ResolverTypeWrapper<InviteNewResult>
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
 	AddProjectMemberError: ResolverTypeWrapper<AddProjectMemberError>
 	AddProjectMemberErrorCode: AddProjectMemberErrorCode
@@ -501,7 +545,6 @@ export type ResolversTypes = {
 	UpdateProjectMemberResponse: ResolverTypeWrapper<UpdateProjectMemberResponse>
 	UpdateProjectMemberError: ResolverTypeWrapper<UpdateProjectMemberError>
 	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
-	ApiKeyProjectInput: ApiKeyProjectInput
 	CreateApiKeyResponse: ResolverTypeWrapper<CreateApiKeyResponse>
 	CreateApiKeyError: ResolverTypeWrapper<CreateApiKeyError>
 	CreateApiKeyErrorCode: CreateApiKeyErrorCode
@@ -552,6 +595,12 @@ export type ResolversParentTypes = {
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
+	InviteResponse: Omit<InviteResponse, 'result'> & { result?: Maybe<ResolversTypes['InviteResult']> }
+	InviteError: InviteError
+	InviteErrorCode: InviteErrorCode
+	InviteResult: ResolversTypes['InviteExistingResult'] | ResolversTypes['InviteNewResult']
+	InviteExistingResult: InviteExistingResult
+	InviteNewResult: InviteNewResult
 	AddProjectMemberResponse: AddProjectMemberResponse
 	AddProjectMemberError: AddProjectMemberError
 	AddProjectMemberErrorCode: AddProjectMemberErrorCode
@@ -561,7 +610,6 @@ export type ResolversParentTypes = {
 	UpdateProjectMemberResponse: UpdateProjectMemberResponse
 	UpdateProjectMemberError: UpdateProjectMemberError
 	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
-	ApiKeyProjectInput: ApiKeyProjectInput
 	CreateApiKeyResponse: CreateApiKeyResponse
 	CreateApiKeyError: CreateApiKeyError
 	CreateApiKeyErrorCode: CreateApiKeyErrorCode
@@ -684,6 +732,46 @@ export type IdentityProjectRelationResolvers<
 	memberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType>
 }
 
+export type InviteErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InviteError'] = ResolversParentTypes['InviteError']
+> = {
+	code?: Resolver<ResolversTypes['InviteErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+}
+
+export type InviteExistingResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InviteExistingResult'] = ResolversParentTypes['InviteExistingResult']
+> = {
+	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+}
+
+export type InviteNewResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InviteNewResult'] = ResolversParentTypes['InviteNewResult']
+> = {
+	generatedPassword?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+}
+
+export type InviteResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InviteResponse'] = ResolversParentTypes['InviteResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['InviteError']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['InviteResult']>, ParentType, ContextType>
+}
+
+export type InviteResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InviteResult'] = ResolversParentTypes['InviteResult']
+> = {
+	__resolveType: TypeResolveFn<'InviteExistingResult' | 'InviteNewResult', ParentType, ContextType>
+}
+
 export type MembershipResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Membership'] = ResolversParentTypes['Membership']
@@ -706,6 +794,7 @@ export type MutationResolvers<
 		ContextType,
 		MutationChangePasswordArgs
 	>
+	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, MutationInviteArgs>
 	addProjectMember?: Resolver<
 		Maybe<ResolversTypes['AddProjectMemberResponse']>,
 		ParentType,
@@ -954,6 +1043,11 @@ export type Resolvers<ContextType = any> = {
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>
+	InviteError?: InviteErrorResolvers<ContextType>
+	InviteExistingResult?: InviteExistingResultResolvers<ContextType>
+	InviteNewResult?: InviteNewResultResolvers<ContextType>
+	InviteResponse?: InviteResponseResolvers<ContextType>
+	InviteResult?: InviteResultResolvers
 	Membership?: MembershipResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
 	Person?: PersonResolvers<ContextType>

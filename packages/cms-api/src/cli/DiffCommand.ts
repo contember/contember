@@ -2,6 +2,8 @@ import Command from '../core/cli/Command'
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import { Schema } from '@contember/schema'
 import { ProjectContainerResolver } from '../CompositionRoot'
+import { SchemaValidator } from '@contember/schema-utils'
+import { isDeepStrictEqual } from 'util'
 
 type Args = {
 	projectName: string
@@ -32,7 +34,22 @@ class DiffCommand extends Command<Args, {}> {
 
 		const executionContainer = projectContainer.systemExecutionContainerFactory.create(projectContainer.systemDbClient)
 		const migrationDiffCreator = executionContainer.migrationDiffCreator
-		const result = await migrationDiffCreator.createDiff(this.schemas[projectName], migrationName)
+		const schema = this.schemas[projectName]
+		const validator = new SchemaValidator()
+		const [validSchema, errors] = validator.validate(schema)
+
+		if (errors.length === 0 && !isDeepStrictEqual(validSchema, schema)) {
+			throw new Error('Something is wrong with a schema validator')
+		}
+		if (errors.length > 0) {
+			console.error('Schema is invalid:')
+			for (const err of errors) {
+				console.error('\t' + err.path.join('.') + ': ' + err.message)
+			}
+			return
+		}
+
+		const result = await migrationDiffCreator.createDiff(schema, migrationName)
 
 		if (result === null) {
 			console.log('Nothing to do')

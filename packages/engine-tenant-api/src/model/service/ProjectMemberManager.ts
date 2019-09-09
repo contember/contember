@@ -1,18 +1,18 @@
 import { QueryHandler } from '@contember/queryable'
-import { Client, DatabaseQueryable } from '@contember/database'
+import { DatabaseQueryable } from '@contember/database'
 import {
 	AddProjectMemberCommand,
+	AddProjectMemberCommandError,
 	ProjectBySlugVariablesByIdentityQuery,
 	ProjectRolesByIdentityQuery,
 	RemoveProjectMemberCommand,
 	UpdateProjectMemberCommand,
-	UpdateProjectMembershipVariablesCommand,
 } from '../'
 import { CommandBus } from '../commands/CommandBus'
 import { ProjectMembershipByIdentityQuery } from '../queries/ProjectMembershipByIdentityQuery'
 import { Membership } from '../type/Membership'
-import { PermissionContext } from '../authorization/PermissionContext'
 import { ProjectMembersQuery } from '../queries/ProjectMembersQuery'
+import { AddProjectMemberErrorCode } from '../../schema'
 
 class ProjectMemberManager {
 	constructor(
@@ -37,10 +37,21 @@ class ProjectMemberManager {
 		projectId: string,
 		identityId: string,
 		memberships: readonly Membership[],
-	): Promise<AddProjectMemberCommand.AddProjectMemberResponse> {
-		return await this.commandBus.transaction(
-			async bus => await bus.execute(new AddProjectMemberCommand(projectId, identityId, memberships)),
-		)
+	): Promise<AddProjectMemberResponse> {
+		return await this.commandBus.transaction(async bus => {
+			const result = await bus.execute(new AddProjectMemberCommand(projectId, identityId, memberships))
+			if (result.ok) {
+				return new AddProjectMemberResponseOk()
+			}
+			switch (result.error) {
+				case AddProjectMemberCommandError.alreadyMember:
+					return new AddProjectMemberResponseError([AddProjectMemberErrorCode.AlreadyMember])
+				case AddProjectMemberCommandError.projectNotFound:
+					return new AddProjectMemberResponseError([AddProjectMemberErrorCode.ProjectNotFound])
+				case AddProjectMemberCommandError.identityNotfound:
+					return new AddProjectMemberResponseError([AddProjectMemberErrorCode.IdentityNotFound])
+			}
+		})
 	}
 
 	async updateProjectMember(
@@ -90,6 +101,20 @@ class ProjectMemberManager {
 			})),
 		)
 	}
+}
+
+export type AddProjectMemberResponse = AddProjectMemberResponseOk | AddProjectMemberResponseError
+
+export class AddProjectMemberResponseOk {
+	readonly ok = true
+
+	constructor() {}
+}
+
+export class AddProjectMemberResponseError {
+	readonly ok = false
+
+	constructor(public readonly errors: Array<AddProjectMemberErrorCode>) {}
 }
 
 namespace ProjectMemberManager {

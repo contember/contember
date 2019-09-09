@@ -3,6 +3,7 @@ import { QueryHandler } from '@contember/queryable'
 import { Identity } from '@contember/engine-common'
 import {
 	AddProjectMemberCommand,
+	AddProjectMemberCommandError,
 	ApiKey,
 	ApiKeyByTokenQuery,
 	CreateApiKeyCommand,
@@ -11,11 +12,9 @@ import {
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
 	ProlongApiKeyCommand,
-	UpdateProjectMembershipVariablesCommand,
 } from '../'
-import { AddProjectMemberErrorCode, CreateApiKeyErrorCode } from '../../schema'
+import { CreateApiKeyErrorCode } from '../../schema'
 import { ImplementationException } from '../../exceptions'
-import { mapValues } from '../../utils/mapValue'
 import { CommandBus } from '../commands/CommandBus'
 import { Membership } from '../type/Membership'
 
@@ -54,7 +53,7 @@ class ApiKeyManager {
 	}
 
 	async createLoginApiKey(): Promise<ApiKeyManager.CreateApiKeyResult> {
-		const response = await this.createPermanentApiKey([Identity.SystemRole.LOGIN], [])
+		const response = await this.createGlobalApiKey([Identity.SystemRole.LOGIN])
 		if (!response.ok) {
 			throw new ImplementationException(response.errors.join(', '))
 		}
@@ -73,34 +72,34 @@ class ApiKeyManager {
 		await this.commandBus.execute(new DisableIdentityApiKeysCommand(identityId))
 	}
 
-	async createPermanentApiKey(
-		roles: string[],
-		projects: { id: string; memberships: readonly Membership[] }[],
+	async createProjectPermanentApiKey(
+		projectId: string,
+		memberships: readonly Membership[],
 	): Promise<ApiKeyManager.CreateApiKeyResponse> {
+		return await this.commandBus.transaction(async bus => {
+			const identityId = await bus.execute(new CreateIdentityCommand([]))
+			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
+
+			const addMemberResult = await bus.execute(new AddProjectMemberCommand(projectId, identityId, memberships))
+			if (!addMemberResult.ok) {
+				bus.client.connection.rollback()
+				switch (addMemberResult.error) {
+					case AddProjectMemberCommandError.projectNotFound:
+						return new ApiKeyManager.CreateApiKeyResponseError([CreateApiKeyErrorCode.ProjectNotFound])
+					case AddProjectMemberCommandError.alreadyMember:
+					case AddProjectMemberCommandError.identityNotfound:
+						throw new ImplementationException()
+				}
+			}
+
+			return new ApiKeyManager.CreateApiKeyResponseOk(new ApiKeyManager.CreateApiKeyResult(identityId, apiKeyResult))
+		})
+	}
+
+	async createGlobalApiKey(roles: Identity.SystemRole[]): Promise<ApiKeyManager.CreateApiKeyResponse> {
 		return await this.commandBus.transaction(async bus => {
 			const identityId = await bus.execute(new CreateIdentityCommand(roles))
 			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
-
-			const addMemberResponses = (await Promise.all(
-				projects.map(async project => {
-					return bus.execute(new AddProjectMemberCommand(project.id, identityId, project.memberships))
-				}),
-			))
-				.filter((it): it is AddProjectMemberCommand.AddProjectMemberResponseError => !it.ok)
-				.map(it => it.errors)
-				.map(
-					mapValues<AddProjectMemberErrorCode, CreateApiKeyErrorCode>({
-						[AddProjectMemberErrorCode.ProjectNotFound]: CreateApiKeyErrorCode.ProjectNotFound,
-						[AddProjectMemberErrorCode.VariableNotFound]: CreateApiKeyErrorCode.VariableNotFound,
-						[AddProjectMemberErrorCode.IdentityNotFound]: ImplementationException.Throw,
-						[AddProjectMemberErrorCode.AlreadyMember]: ImplementationException.Throw,
-					}),
-				)
-				.reduce((acc, val) => [...acc, ...val], [])
-
-			if (addMemberResponses.length > 0) {
-				return new ApiKeyManager.CreateApiKeyResponseError(addMemberResponses)
-			}
 
 			return new ApiKeyManager.CreateApiKeyResponseOk(new ApiKeyManager.CreateApiKeyResult(identityId, apiKeyResult))
 		})

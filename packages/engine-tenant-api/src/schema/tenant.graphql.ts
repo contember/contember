@@ -21,6 +21,8 @@ const schema: DocumentNode = gql`
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 
+		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!): InviteResponse
+
 		addProjectMember(
 			projectSlug: String!
 			identityId: String!
@@ -33,7 +35,7 @@ const schema: DocumentNode = gql`
 			memberships: [MembershipInput!]!
 		): UpdateProjectMemberResponse
 
-		createApiKey(roles: [String!], projects: [ApiKeyProjectInput!]): CreateApiKeyResponse
+		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 	}
 
@@ -144,6 +146,36 @@ const schema: DocumentNode = gql`
 		PERSON_NOT_FOUND
 		TOO_WEAK
 	}
+	# === invite ===
+
+	type InviteResponse {
+		ok: Boolean!
+		errors: [InviteError!]!
+		result: InviteResult
+	}
+
+	type InviteError {
+		code: InviteErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum InviteErrorCode {
+		PROJECT_NOT_FOUND
+		VARIABLE_NOT_FOUND
+		ALREADY_MEMBER
+	}
+
+	union InviteResult = InviteExistingResult | InviteNewResult
+
+	type InviteExistingResult {
+		person: Person!
+	}
+
+	type InviteNewResult {
+		generatedPassword: String!
+		person: Person!
+	}
 
 	# === addProjectMember ===
 
@@ -203,11 +235,6 @@ const schema: DocumentNode = gql`
 	}
 
 	# === createApiKey ===
-
-	input ApiKeyProjectInput {
-		projectSlug: String!
-		memberships: [MembershipInput!]!
-	}
 
 	type CreateApiKeyResponse {
 		ok: Boolean!

@@ -1,4 +1,5 @@
 import {
+	AddProjectMemberErrorCode,
 	CreateApiKeyErrorCode,
 	CreateApiKeyResponse,
 	MutationCreateApiKeyArgs,
@@ -14,43 +15,24 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createApiKey(
 		parent: any,
-		{ projects, roles }: MutationCreateApiKeyArgs,
+		{ projectSlug, memberships }: MutationCreateApiKeyArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
-		const projectsRows = await Promise.all(
-			(projects || []).map(async it => await this.projectManager.getProjectBySlug(it.projectSlug)),
-		)
-
-		if (roles || !projects) {
-			await context.requireAccess({
-				action: PermissionActions.API_KEY_CREATE,
-				message: 'You are not allowed to create api key',
-			})
-		} else {
-			const scopes = projectsRows.map(it => new ProjectScope(it))
-			const scope = new AuthorizationScope.Intersection(scopes)
-			await context.requireAccess({
-				scope,
-				action: PermissionActions.API_KEY_CREATE,
-				message: 'You are not allowed to create api key',
-			})
-		}
-
-		if ((projects || []).find(it => !projectsRows.find(row => row && row.slug === it.projectSlug))) {
+		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		await context.requireAccess({
+			scope: new ProjectScope(project),
+			action: PermissionActions.PROJECT_ADD_MEMBER,
+			message: 'You are not allowed to add a project member',
+		})
+		if (!project) {
 			return {
 				ok: false,
 				errors: [{ code: CreateApiKeyErrorCode.ProjectNotFound }],
 			}
 		}
 
-		const result = await this.apiKeyManager.createPermanentApiKey(
-			[...(roles || [])],
-			(projects || []).map(it => ({
-				id: projectsRows.find(row => row && row.slug)!.id,
-				memberships: it.memberships,
-			})),
-		)
+		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships)
 
 		if (!result.ok) {
 			return {

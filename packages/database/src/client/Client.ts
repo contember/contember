@@ -10,20 +10,22 @@ import {
 import { QueryHandler } from '@contember/queryable'
 import { Interface } from '@contember/utils'
 
-class Client<ConnectionType extends Connection.Queryable & Connection.Transactional = Connection>
+class Client<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike>
 	implements Connection.Queryable {
-	constructor(public readonly connection: Connection.ConnectionLike, public readonly schema: string) {}
+	constructor(public readonly connection: ConnectionType, public readonly schema: string) {}
 
 	get eventManager(): Interface<EventManager> {
 		return this.connection.eventManager
 	}
 
-	public forSchema(schema: string): Client {
-		return new Client(this.connection, schema)
+	public forSchema(schema: string): Client<ConnectionType> {
+		return new Client<ConnectionType>(this.connection, schema)
 	}
 
-	async transaction<T>(transactionScope: (wrapper: Client) => Promise<T> | T): Promise<T> {
-		return await this.connection.transaction(connection => transactionScope(new Client(connection, this.schema)))
+	async transaction<T>(transactionScope: (wrapper: Client<Connection.TransactionLike>) => Promise<T> | T): Promise<T> {
+		return await this.connection.transaction(connection =>
+			transactionScope(new Client<Connection.TransactionLike>(connection, this.schema)),
+		)
 	}
 
 	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result, never> {

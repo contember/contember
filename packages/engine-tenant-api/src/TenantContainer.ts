@@ -35,6 +35,8 @@ import { ProjectQueryResolver } from './resolvers/query/ProjectQueryResolver'
 import { ProjectVariablesResolver } from './model/type/Variables'
 import { InviteMutationResolver } from './resolvers/mutation/person/InviteMutationResolver'
 import { InviteManager } from './model/service/InviteManager'
+import { GraphQLError, GraphQLFormattedError } from 'graphql'
+import { formatError } from './resolvers/ErrorFormatter'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -45,6 +47,7 @@ interface TenantContainer {
 	resolvers: Schema.Resolvers
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
+	errorFormatter: (error: GraphQLError) => GraphQLFormattedError
 }
 
 namespace TenantContainer {
@@ -65,6 +68,7 @@ namespace TenantContainer {
 					'resolvers',
 					'authorizator',
 					'resolverContextFactory',
+					'errorFormatter',
 				)
 		}
 
@@ -177,6 +181,7 @@ namespace TenantContainer {
 					({ authorizator, projectMemberManager }) => new ResolverContextFactory(projectMemberManager, authorizator),
 				)
 				.addService('resolvers', container => new ResolverFactory(container).create())
+				.addService('errorFormatter', () => formatError)
 		}
 	}
 }

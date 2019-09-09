@@ -1,7 +1,7 @@
 import { Command } from '../Command'
 import { AddProjectMemberErrorCode } from '../../../schema'
 import { Membership } from '../../type/Membership'
-import { CreateProjectMembershipsCommand } from './CreateProjectMembershipsCommand'
+import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'
 
 class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProjectMemberResponse> {
 	constructor(
@@ -25,7 +25,9 @@ class AddProjectMemberCommand implements Command<AddProjectMemberCommand.AddProj
 		}
 
 		try {
-			await bus.execute(new CreateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships))
+			await bus.execute(
+				new CreateOrUpdateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships, false),
+			)
 
 			return new AddProjectMemberCommand.AddProjectMemberResponseOk()
 		} catch (e) {

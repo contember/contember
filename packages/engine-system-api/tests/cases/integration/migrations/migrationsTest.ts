@@ -1079,6 +1079,7 @@ describe('Diff schemas', () => {
 						op: 'add',
 						path: '/roles/admin',
 						value: {
+							variables: {},
 							entities: {
 								Site: {
 									operations: {

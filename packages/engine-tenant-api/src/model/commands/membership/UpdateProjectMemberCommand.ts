@@ -1,7 +1,7 @@
 import { Command } from '../'
 import { UpdateProjectMemberErrorCode } from '../../../schema'
 import { Membership } from '../../type/Membership'
-import { CreateProjectMembershipsCommand } from './CreateProjectMembershipsCommand'
+import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'
 import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipCommand'
 
 class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
@@ -26,7 +26,9 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 		}
 
 		try {
-			await bus.execute(new CreateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships))
+			await bus.execute(
+				new CreateOrUpdateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships, true),
+			)
 			await bus.execute(
 				new RemoveProjectMembershipCommand(this.projectId, this.identityId, this.memberships.map(it => it.role)),
 			)

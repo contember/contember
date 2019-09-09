@@ -4,11 +4,12 @@ import { Membership } from '../../type/Membership'
 import { InsertBuilder } from '@contember/database'
 import { ImplementationException } from '../../../exceptions'
 
-class CreateProjectMembershipsCommand implements Command<void> {
+class CreateOrUpdateProjectMembershipsCommand implements Command<void> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
 		private readonly memberships: readonly Membership[],
+		private readonly deleteOld: boolean,
 	) {}
 
 	async execute({ db, bus, providers }: Command.Args): Promise<void> {
@@ -31,9 +32,11 @@ class CreateProjectMembershipsCommand implements Command<void> {
 			if (result.length !== 1) {
 				throw new ImplementationException()
 			}
-			await bus.execute(new UpdateProjectMembershipVariablesCommand(result[0] as string, membership.variables, false))
+			await bus.execute(
+				new UpdateProjectMembershipVariablesCommand(result[0] as string, membership.variables, this.deleteOld),
+			)
 		}
 	}
 }
 
-export { CreateProjectMembershipsCommand }
+export { CreateOrUpdateProjectMembershipsCommand }

@@ -36,6 +36,7 @@ export const execute = async (test: Test) => {
 				randomBytes: (length: number) => Promise.resolve(new Buffer(length)),
 				uuid: createUuidGenerator(),
 			},
+			project => Promise.resolve({roles: []}),
 		)
 		.replaceService('connection', () =>
 			createConnectionMock(test.executes, (expected, actual, message) => {

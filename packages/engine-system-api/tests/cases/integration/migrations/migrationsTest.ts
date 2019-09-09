@@ -8,7 +8,7 @@ import { SchemaMigrator } from '../../../../src'
 import { createMigrationBuilder } from '../../../../src/utils/pgMigrateHelpers'
 import ModificationHandlerFactory from '../../../../src/model/migrations/modifications/ModificationHandlerFactory'
 
-const emptyAcl = { roles: {}, variables: {} }
+const emptyAcl = { roles: {} }
 
 const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(modificationFactory)
@@ -1054,9 +1054,9 @@ describe('Diff schemas', () => {
 			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
 		const acl: Acl.Schema = {
-			variables: {},
 			roles: {
 				admin: {
+					variables: {},
 					stages: '*',
 					entities: {
 						Site: {

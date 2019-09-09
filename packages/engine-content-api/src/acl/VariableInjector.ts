@@ -18,8 +18,7 @@ class VariableInjector {
 				if (typeof value === 'string') {
 					return { [targetEntity.primary]: this.createCondition(this.variables[value] || undefined) }
 				}
-
-				return this.inject(targetEntity, value as Acl.PredicateDefinition)
+				return value
 			},
 		})
 	}

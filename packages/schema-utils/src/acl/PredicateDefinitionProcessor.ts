@@ -23,11 +23,14 @@ class PredicateDefinitionProcessor {
 					return handler.handleColumn({ entity, column, value: value as Input.Condition | PredicateExtension })
 				},
 				visitRelation: (entity, relation, targetEntity) => {
+					if (typeof value === 'object' && 'constructor' in value && value.constructor.name === 'Object') {
+						return this.process(targetEntity, value as Acl.PredicateDefinition<PredicateExtension>, handler)
+					}
 					return handler.handleRelation({
 						relation,
 						entity,
 						targetEntity,
-						value: value as Input.Condition | PredicateExtension,
+						value: value as Acl.PredicateVariable | PredicateExtension,
 					})
 				},
 			})
@@ -45,7 +48,7 @@ namespace PredicateDefinitionProcessor {
 		}): R | Input.Where
 
 		handleRelation(ctx: {
-			value: T | Acl.PredicateVariable | Input.Condition
+			value: T | Acl.PredicateVariable
 			entity: Model.Entity
 			relation: Model.Relation
 			targetEntity: Model.Entity

@@ -1,5 +1,4 @@
-import { Icon } from '@blueprintjs/core'
-import { IconName, IconNames } from '@blueprintjs/icons'
+import { IconName } from '@blueprintjs/icons'
 import { Button, ButtonOwnProps, ButtonProps } from '@contember/ui'
 import * as React from 'react'
 import { AccessorContext, MetaOperationsContext } from '../../coreComponents'
@@ -49,7 +48,14 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 
 	return (
 		<Button {...defaultProps} {...rest} disabled={isMutating} onClick={onClick}>
-			{children || <Icon icon={icon || IconNames.CROSS} color="currentColor" />}
+			{children || (
+				<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+					<path
+						fill="currentColor"
+						d="M9 19c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm4 0c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm4 0c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm5-17v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.315c0 .901.73 2 1.631 2h5.712zm-3 4v16h-14v-16h-2v18h18v-18h-2z"
+					/>
+				</svg>
+			)}
 		</Button>
 	)
 })

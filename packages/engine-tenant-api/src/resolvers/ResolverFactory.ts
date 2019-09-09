@@ -17,12 +17,14 @@ import { Resolvers } from '../schema'
 import { ProjectQueryResolver } from './query/ProjectQueryResolver'
 import { ProjectTypeResolver } from './types/ProjectTypeResolver'
 import { InviteMutationResolver } from './mutation/person/InviteMutationResolver'
+import { ProjectMembersQueryResolver } from './query/ProjectMembersQueryResolver'
 
 class ResolverFactory {
 	public constructor(
 		private readonly resolvers: {
 			meQueryResolver: MeQueryResolver
 			projectQueryResolver: ProjectQueryResolver
+			projectMembersQueryResolver: ProjectMembersQueryResolver
 
 			setupMutationResolver: SetupMutationResolver
 
@@ -58,6 +60,9 @@ class ResolverFactory {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),
 				projectBySlug: this.resolvers.projectQueryResolver.projectBySlug.bind(this.resolvers.projectQueryResolver),
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
+				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(
+					this.resolvers.projectMembersQueryResolver,
+				),
 			},
 			Mutation: {
 				setup: this.resolvers.setupMutationResolver.setup.bind(this.resolvers.setupMutationResolver),

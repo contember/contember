@@ -272,10 +272,16 @@ export type Query = {
 	readonly me: Identity
 	readonly projects: ReadonlyArray<Project>
 	readonly projectBySlug?: Maybe<Project>
+	readonly projectMemberships: ReadonlyArray<Membership>
 }
 
 export type QueryProjectBySlugArgs = {
 	slug: Scalars['String']
+}
+
+export type QueryProjectMembershipsArgs = {
+	projectSlug: Scalars['String']
+	identityId: Scalars['String']
 }
 
 export type RemoveProjectMemberError = {
@@ -867,6 +873,12 @@ export type QueryResolvers<
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, QueryProjectBySlugArgs>
+	projectMemberships?: Resolver<
+		ReadonlyArray<ResolversTypes['Membership']>,
+		ParentType,
+		ContextType,
+		QueryProjectMembershipsArgs
+	>
 }
 
 export type RemoveProjectMemberErrorResolvers<

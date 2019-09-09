@@ -11,6 +11,7 @@ const schema: DocumentNode = gql`
 		me: Identity!
 		projects: [Project!]!
 		projectBySlug(slug: String!): Project
+		projectMemberships(projectSlug: String!, identityId: String!): [Membership!]!
 	}
 
 	type Mutation {

@@ -1,7 +1,6 @@
 @import '../common'
 
 .fileInput
-	font-size: $fs-small
 	width: 100%
 	display: flex
 
@@ -13,12 +12,15 @@
 		overflow: hidden
 
 	&-preview
-		display: block
+		display: flex
+		justify-content: center
+		align-items: center
 		width: 40%
 		height: rem(100px)
 		background: #FFF
 		padding: rem(5px)
-		border: rem(1px) solid #E2E5ED
+		border: $cui-control-border-width solid $cui-control-view-default-border-color
+		border-radius: $cui-control-border-radius
 		text-align: center
 
 		> *
@@ -33,9 +35,10 @@
 		text-align: center
 	&-drop
 		display: block
-		color: #777
+		color: $c-text-light
 		font-size: $fs-small
 		text-align: center
 	&-empty
-		color: #777
+		color: $c-text-light
 		font-style: italic
+		font-size: $fs-small

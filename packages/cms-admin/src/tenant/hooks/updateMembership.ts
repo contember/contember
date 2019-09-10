@@ -41,7 +41,11 @@ const useUpdateMembership = () =>
 	useAuthedTenantMutation<UpdateMembershipResult, UpdateMembershipVariables>(UPDATE_MEMBERSHIP_QUERY)
 
 export const useUpdateProjectMembership = (): [
-	(project: string, identityId: string, memberships: UpdateMembershipVariables['memberships']) => Promise<unknown>,
+	(
+		project: string,
+		identityId: string,
+		memberships: UpdateMembershipVariables['memberships'],
+	) => Promise<UpdateMembershipResult>,
 	MutationRequestState<UpdateMembershipResult>,
 ] => {
 	const [update, state] = useUpdateMembership()
@@ -62,7 +66,7 @@ export const useUpdateProjectMembership = (): [
 }
 
 export const useUpdateCurrentProjectMembership = (): [
-	(identityId: string, memberships: UpdateMembershipVariables['memberships']) => Promise<unknown>,
+	(identityId: string, memberships: UpdateMembershipVariables['memberships']) => Promise<UpdateMembershipResult>,
 	MutationRequestState<UpdateMembershipResult>,
 ] => {
 	const project = useProjectSlug()

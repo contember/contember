@@ -1,15 +1,17 @@
 import * as React from 'react'
 import {
 	Membership,
+	useAddToast,
 	useAuthedContentQuery,
 	useListUsersQuery,
-	useUpdateCurrentProjectMembership,
 	useProjectSlug,
 	useRemoveProjectMembership,
+	useUpdateCurrentProjectMembership,
 } from '../hooks'
 import { Button, ButtonList, ContainerSpinner, Tag, TitleBar } from '@contember/ui'
 import { Table } from '../../components/ui'
 import { PageLinkButton } from '../../components/pageRouting'
+import { ToastType } from '../../state/toasts'
 
 export interface UsersListProps<T> {
 	project: string
@@ -27,43 +29,57 @@ interface RoleRenderers<T> {
 }
 
 export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRenderers, rolesDataQuery }) => {
+	const addToast = useAddToast()
 	const { state: query, refetch: refetchUserList } = useListUsersQuery(project)
 	const { state: rolesData } = useAuthedContentQuery<any, {}>(rolesDataQuery, {})
 	const [updateMembership, updateMembershipState] = useUpdateCurrentProjectMembership()
 	const removeMembership = React.useCallback(
 		async (identityId: string, memberships: Membership[], membershipToRemove: Membership) => {
-			await updateMembership(identityId, memberships.filter(membership => membership !== membershipToRemove))
+			const result = await updateMembership(
+				identityId,
+				memberships.filter(membership => membership !== membershipToRemove),
+			)
+			if (result.updateProjectMember.ok) {
+				addToast({
+					message: `Membership updated`,
+					type: ToastType.Success,
+				})
+			} else {
+				addToast({
+					message: `Error updating membership: ${result.updateProjectMember.errors.map(it => it.code).join(', ')}`,
+					type: ToastType.Error,
+				})
+			}
 			await refetchUserList()
 		},
-		[refetchUserList, updateMembership],
+		[addToast, refetchUserList, updateMembership],
 	)
 	const [removeMemberInner, removeMemberState] = useRemoveProjectMembership()
 	const removeMember = React.useCallback(
 		async (id: string) => {
-			await removeMemberInner(project, id)
+			const result = await removeMemberInner(project, id)
+			if (result.removeProjectMember.ok) {
+				addToast({
+					message: `Member removed`,
+					type: ToastType.Success,
+				})
+			} else {
+				addToast({
+					message: `Error removing member: ${result.removeProjectMember.errors.map(it => it.code).join(', ')}`,
+					type: ToastType.Error,
+				})
+			}
 			await refetchUserList()
 		},
-		[project, refetchUserList, removeMemberInner],
+		[addToast, project, refetchUserList, removeMemberInner],
 	)
 
 	if (query.error || rolesData.error || updateMembershipState.error || removeMemberState.error) {
-		return <>Error</>
+		return <>Error loading data</>
 	}
 
 	if (query.loading || rolesData.loading || updateMembershipState.loading || removeMemberState.loading) {
 		return <ContainerSpinner />
-	}
-
-	if (updateMembershipState.finished && !updateMembershipState.data.updateProjectMember.ok) {
-		return (
-			<>
-				Error updating membership: {updateMembershipState.data.updateProjectMember.errors.map(it => it.code).join(', ')}
-			</>
-		)
-	}
-
-	if (removeMemberState.finished && !removeMemberState.data.removeProjectMember.ok) {
-		return <>Error removing member: {removeMemberState.data.removeProjectMember.errors.map(it => it.code).join(', ')}</>
 	}
 
 	return (

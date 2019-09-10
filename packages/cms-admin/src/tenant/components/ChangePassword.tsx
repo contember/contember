@@ -36,12 +36,13 @@ export const ChangePassword: React.FC<{}> = ({}) => {
 	)
 
 	const success = changePasswordState.finished && changePasswordState.success
-	const error = notEqualError
-		? 'Passwords are different'
+	const errorFirstField = notEqualError
+		? undefined
 		: changePasswordState.finished && !changePasswordState.success && !errorsResolved
 		? changePasswordState.errors.join(', ')
 		: undefined
-	const validation = error ? 'invalid' : success ? 'valid' : 'default'
+	const errorSecondField = notEqualError ? 'Passwords are different' : undefined
+	const validation = errorFirstField ? 'invalid' : success ? 'valid' : 'default'
 	const disabled = changePasswordState.loading || success
 
 	return (
@@ -49,7 +50,10 @@ export const ChangePassword: React.FC<{}> = ({}) => {
 			<TitleBar>Change your password</TitleBar>
 			<Box>
 				<div style={{ marginBottom: '1em' }}>
-					<FormGroup label="New password" errors={error === undefined ? undefined : [{ message: error }]}>
+					<FormGroup
+						label="New password"
+						errors={errorFirstField === undefined ? undefined : [{ message: errorFirstField }]}
+					>
 						<TextInput
 							validationState={validation}
 							disabled={disabled}
@@ -60,7 +64,10 @@ export const ChangePassword: React.FC<{}> = ({}) => {
 							autoComplete="new-password"
 						/>
 					</FormGroup>
-					<FormGroup label="New password (once more)">
+					<FormGroup
+						label="New password (once more)"
+						errors={errorSecondField === undefined ? undefined : [{ message: errorSecondField }]}
+					>
 						<TextInput
 							validationState={validation}
 							disabled={disabled}

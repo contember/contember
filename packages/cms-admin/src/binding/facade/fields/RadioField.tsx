@@ -5,7 +5,6 @@ import { RelativeSingleField } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
-import { FieldErrors } from '@contember/ui/dist/src/types'
 
 export interface RadioFieldPublicProps extends Omit<FormGroupProps, 'children'> {
 	inline?: boolean
@@ -45,7 +44,7 @@ interface RadioFieldInnerProps extends RadioFieldPublicProps {
 	currentValue: ChoiceField.ValueRepresentation
 	onChange: SingleChoiceFieldMetadata['onChange']
 	environment: Environment
-	errors: FieldErrors
+	errors: ErrorAccessor[]
 	isMutating: boolean
 }
 

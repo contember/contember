@@ -85,6 +85,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 							}}
 						>
 							<ButtonGroup orientation="vertical">
+								{props.userMenu}
 								<SwitchProjectLink
 									Component={({ onClick, href }) => (
 										<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
@@ -99,7 +100,6 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 										</Button>
 									)}
 								/>
-								{props.userMenu}
 							</ButtonGroup>
 						</Dropdown>
 					</DropdownContentContainerProvider>

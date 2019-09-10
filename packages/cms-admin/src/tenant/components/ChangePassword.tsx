@@ -8,7 +8,7 @@ export const ChangePassword: React.FC<{}> = ({}) => {
 	const [changePassword, changePasswordState] = useChangePassword()
 	const [notEqualError, setNotEqualError] = React.useState(false)
 	const [errorsResolved, setErrorsResolved] = React.useState(false)
-	const cb = React.useCallback(() => {
+	const onSubmit = React.useCallback(() => {
 		setErrorsResolved(true)
 		if (newPassword !== newPasswordRepeated) {
 			setNotEqualError(true)
@@ -74,7 +74,7 @@ export const ChangePassword: React.FC<{}> = ({}) => {
 				</div>
 				<Button
 					intent={success ? 'success' : 'primary'}
-					onClick={cb}
+					onClick={onSubmit}
 					isLoading={changePasswordState.loading}
 					disabled={disabled}
 				>

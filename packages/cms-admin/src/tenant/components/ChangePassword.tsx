@@ -9,7 +9,7 @@ export const ChangePassword: React.FC<{}> = ({}) => {
 	const [notEqualError, setNotEqualError] = React.useState(false)
 	const [errorsResolved, setErrorsResolved] = React.useState(false)
 	const onSubmit = React.useCallback(() => {
-		setErrorsResolved(true)
+		setErrorsResolved(false)
 		if (newPassword !== newPasswordRepeated) {
 			setNotEqualError(true)
 		} else {

@@ -35,6 +35,10 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 	const [updateMembership, updateMembershipState] = useUpdateCurrentProjectMembership()
 	const removeMembership = React.useCallback(
 		async (identityId: string, memberships: Membership[], membershipToRemove: Membership) => {
+			const confirmed = confirm(`Do you want to remove user's role in project?`)
+			if (!confirmed) {
+				return
+			}
 			const result = await updateMembership(
 				identityId,
 				memberships.filter(membership => membership !== membershipToRemove),
@@ -57,6 +61,10 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 	const [removeMemberInner, removeMemberState] = useRemoveProjectMembership()
 	const removeMember = React.useCallback(
 		async (id: string) => {
+			const confirmed = confirm('Do you want to remove user from project?')
+			if (!confirmed) {
+				return
+			}
 			const result = await removeMemberInner(project, id)
 			if (result.removeProjectMember.ok) {
 				addToast({

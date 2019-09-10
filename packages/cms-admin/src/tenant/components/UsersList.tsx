@@ -7,7 +7,7 @@ import {
 	useProjectSlug,
 	useRemoveProjectMembership,
 } from '../hooks'
-import { Button, ButtonGroup, ContainerSpinner, Tag, TitleBar } from '@contember/ui'
+import { Button, ButtonList, ContainerSpinner, Tag, TitleBar } from '@contember/ui'
 import { Table } from '../../components/ui'
 import { PageLinkButton } from '../../components/pageRouting'
 
@@ -96,17 +96,17 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 							})}
 						</Table.Cell>
 						<Table.Cell>
-							<ButtonGroup>
+							<ButtonList>
 								<PageLinkButton
 									distinction="outlined"
 									to={() => ({ name: 'tenantEditUser', params: { id: member.identity.id } })}
 								>
 									Add role
 								</PageLinkButton>
-								<Button distinction="outlined" onClick={() => removeMember(member.identity.id)}>
+								<Button intent="danger" distinction="outlined" onClick={() => removeMember(member.identity.id)}>
 									Revoke access
 								</Button>
-							</ButtonGroup>
+							</ButtonList>
 						</Table.Cell>
 					</Table.Row>
 				))}

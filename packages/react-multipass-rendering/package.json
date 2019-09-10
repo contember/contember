@@ -1,0 +1,15 @@
+{
+	"name": "@contember/react-multipass-rendering",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {},
+	"peerDependencies": {
+		"react": "^16.9.0"
+	},
+	"devDependencies": {
+		"@types/react": "^16.9.2",
+		"typescript": "^3.5.3"
+	}
+}

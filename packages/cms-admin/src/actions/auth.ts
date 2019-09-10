@@ -2,7 +2,7 @@ import { createAction } from 'redux-actions'
 import { SET_ERROR, SET_IDENTITY, SET_LOADING, SET_LOGOUT } from '../reducer/auth'
 import { pushRequest } from './request'
 import { ActionCreator } from './types'
-import { AuthIdentity } from '../state/auth'
+import { AuthIdentity, Project } from '../state/auth'
 import { invokeIfSupportsCredentials } from '../utils/invokeIfSupportsCredentials'
 
 export const login = (email: string, password: string, rememberMe: boolean): ActionCreator => async (
@@ -37,7 +37,12 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 				createAction<AuthIdentity>(SET_IDENTITY, () => ({
 					token: signIn.result.token,
 					email: signIn.result.person.email,
-					projects: signIn.result.person.identity.projects,
+					projects: signIn.result.person.identity.projects.map(
+						(it: any): Project => ({
+							slug: it.project.slug,
+							roles: it.memberships.map((membership: { role: string }) => membership.role),
+						}),
+					),
 				}))(),
 			)
 			dispatch(pushRequest(() => ({ name: 'projects_list' })))
@@ -78,8 +83,13 @@ const loginMutation = `
 					email
 					identity {
 						projects {
-							slug
-							roles
+							project {
+								id
+								slug
+							}
+							memberships {
+								role
+							}
 						}
 					}
 				}

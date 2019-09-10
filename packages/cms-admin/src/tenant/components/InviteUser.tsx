@@ -2,9 +2,17 @@ import * as React from 'react'
 import { useEffect } from 'react'
 import { Box, Button, ContainerSpinner, FormGroup, Heading, TextInput } from '@contember/ui'
 import { Select } from '../../components/ui'
-import { useProjectSlug } from '../hooks/lib'
-import { RoleVariableDefinition, useInvite, useListRolesQuery, useUpdateProjectMembership } from '../hooks'
+import {
+	RoleVariableDefinition,
+	useAddToast,
+	useInvite,
+	useListRolesQuery,
+	useUpdateProjectMembership,
+	usePageLink,
+	useProjectSlug,
+} from '../hooks'
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
+import { ToastType } from '../../state/toasts'
 
 interface VariableConfig {
 	render: React.ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
@@ -214,6 +222,8 @@ const EditUserMembership: React.FC<EditUserMembershipProps> = ({
 
 export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }> = ({ project, rolesConfig }) => {
 	const [email, setEmailInner] = React.useState('')
+	const { goTo: goToUsersList } = usePageLink('tenantUsers')
+	const addToast = useAddToast()
 	const [emailNotValidError, setEmailNotValidError] = React.useState(false)
 	const setEmail = React.useCallback((email: string) => {
 		setEmailNotValidError(false)
@@ -244,8 +254,18 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 			setEmailNotValidError(true)
 			return
 		}
-		await invite(email, membershipsToSave)
-	}, [email, invite, memberships])
+		const inviteResult = await invite(email, membershipsToSave)
+		if (inviteResult.invite.ok) {
+			const password = inviteResult.invite.result.generatedPassword
+			goToUsersList()
+			addToast({
+				type: ToastType.Success,
+				message: password
+					? `User can now log in with password: “${password}”.`
+					: `User now has access to this project. This user already has an account in Contember CMS.`,
+			})
+		}
+	}, [addToast, email, goToUsersList, invite, memberships])
 
 	const props: EditUserMembershipProps = {
 		project: project,
@@ -258,20 +278,6 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 		submitState,
 	}
 
-	if (inviteState.finished && !inviteState.error && inviteState.data.invite.ok) {
-		const password = inviteState.data.invite.result.generatedPassword
-		return (
-			<div>
-				{password ? (
-					<>
-						User can now log in with password: “<span>{password}</span>”.
-					</>
-				) : (
-					<>User now has access to this project. This user already has an account in Contember CMS.</>
-				)}
-			</div>
-		)
-	}
 	return <EditUserMembership {...props} />
 }
 
@@ -311,13 +317,23 @@ export const EditUser: React.FC<{ project: string; rolesConfig: RolesConfig; ide
 		})
 	}, [previousMembershipsState.data, previousMembershipsState.error, previousMembershipsState.finished])
 
+	const { goTo: goToUsersList } = usePageLink('tenantUsers')
+	const addToast = useAddToast()
+
 	const submit = React.useCallback(async () => {
 		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
 		if (membershipsToSave.length === 0) {
 			return
 		}
-		await updateMembership(project, identityId, membershipsToSave)
-	}, [identityId, memberships, project, updateMembership])
+		const result = await updateMembership(project, identityId, membershipsToSave)
+		if (result.updateProjectMember.ok) {
+			goToUsersList()
+			addToast({
+				type: ToastType.Success,
+				message: `Updated user's roles successfully.`,
+			})
+		}
+	}, [addToast, goToUsersList, identityId, memberships, project, updateMembership])
 
 	const props: EditUserMembershipProps = {
 		project: project,

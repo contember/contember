@@ -236,7 +236,11 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 	const submit = React.useCallback(async () => {
 		setEmailNotValidError(false)
 		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
-		if (email.match(/^.+@.+\..+$/) === null) {
+		if (
+			email.match(
+				/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+			) === null
+		) {
 			setEmailNotValidError(true)
 			return
 		}

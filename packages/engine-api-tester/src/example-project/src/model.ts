@@ -11,7 +11,10 @@ export class Author {
 
 export class AuthorContact {
 	@v.required('Contact e-mail is required')
-	@v.assertPattern(/^.+@.+$/, 'E-mail is invalid')
+	@v.assertPattern(
+		/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+		'E-mail is invalid',
+	)
 	email = d.stringColumn()
 	author = d.oneHasOneInversed(Author, 'contact')
 }

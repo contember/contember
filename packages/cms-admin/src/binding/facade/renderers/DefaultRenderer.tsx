@@ -1,5 +1,4 @@
-import { TitleBar } from '@contember/ui'
-import { IncreaseHeadingDepth } from '@contember/ui/dist/src/auxiliary'
+import { TitleBar, IncreaseHeadingDepth } from '@contember/ui'
 import * as React from 'react'
 import { LayoutInner, LayoutSide } from '../../../components'
 import { AccessorContext } from '../../coreComponents'

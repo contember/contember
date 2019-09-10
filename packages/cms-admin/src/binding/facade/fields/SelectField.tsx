@@ -4,8 +4,8 @@ import { Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../auxiliary'
+
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
-import { FieldErrors } from '@contember/ui/dist/src/types'
 
 export interface SelectFieldPublicProps extends Omit<FormGroupProps, 'children'> {
 	name: FieldName
@@ -48,7 +48,7 @@ export interface SelectFieldInnerProps
 	extends Omit<SelectFieldPublicProps, 'options' | 'name'>,
 		Omit<SingleChoiceFieldMetadata, 'fieldName'> {
 	environment: Environment
-	errors: FieldErrors
+	errors: ErrorAccessor[]
 	isMutating: boolean
 }
 

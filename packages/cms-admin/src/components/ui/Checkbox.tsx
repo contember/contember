@@ -1,7 +1,5 @@
-import { ErrorList } from '@contember/ui'
+import { ErrorList, FieldErrors } from '@contember/ui'
 import * as React from 'react'
-import { ErrorAccessor } from '../../binding/dao'
-import { FieldErrors } from '@contember/ui/dist/src/types'
 
 export interface CheckboxProps {
 	checked: boolean

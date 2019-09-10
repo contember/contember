@@ -32,7 +32,6 @@ class Login extends React.PureComponent<Login.Props, Login.State> {
 					{this.props.errorMessage && (
 						<>
 							<ErrorList size="large" errors={[{ message: this.props.errorMessage }]} />
-							<br />
 						</>
 					)}
 					<FormGroup label="Email">

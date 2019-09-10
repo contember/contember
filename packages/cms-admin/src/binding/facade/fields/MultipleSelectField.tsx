@@ -6,7 +6,6 @@ import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
-import { FieldErrors } from '@contember/ui/dist/src/types'
 
 export type MultipleSelectFieldPublicProps = FormGroupProps & {
 	name: FieldName
@@ -23,13 +22,14 @@ export const MultipleSelectField = Component<MultipleSelectFieldProps>(props => 
 	return (
 		<ChoiceField name={props.name} options={props.options} arity={ChoiceArity.Multiple}>
 			{({ data, currentValues, onChange, environment, isMutating, errors }: MultipleChoiceFieldMetadata) => {
+				const e: ErrorAccessor[] = errors
 				return (
 					<MultipleSelectFieldInner
 						data={data}
 						currentValues={currentValues}
 						onChange={onChange}
 						environment={environment}
-						errors={errors}
+						errors={e as any} // should be correct, but TS disagrees
 						isMutating={isMutating}
 						{...props}
 					/>
@@ -43,7 +43,7 @@ export interface MultipleSelectFieldInnerProps
 	extends MultipleSelectFieldPublicProps,
 		Omit<MultipleChoiceFieldMetadata, 'fieldName'> {
 	environment: Environment
-	errors: FieldErrors
+	errors: ErrorAccessor[]
 	isMutating: boolean
 }
 

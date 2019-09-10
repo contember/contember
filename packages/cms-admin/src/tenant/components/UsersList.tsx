@@ -4,12 +4,10 @@ import {
 	useAuthedContentQuery,
 	useListUsersQuery,
 	useUpdateCurrentProjectMembership,
-	useRemoveCurrentProjectMembership,
 	useProjectSlug,
 	useRemoveProjectMembership,
 } from '../hooks'
-import { Button, ButtonGroup, Tag, TitleBar } from '@contember/ui'
-import { LoadingSpinner } from '../../binding/facade/renderers/userFeedback'
+import { Button, ButtonGroup, ContainerSpinner, Tag, TitleBar } from '@contember/ui'
 import { Table } from '../../components/ui'
 import { PageLinkButton } from '../../components/pageRouting'
 
@@ -53,7 +51,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 	}
 
 	if (query.loading || rolesData.loading || updateMembershipState.loading || removeMemberState.loading) {
-		return <LoadingSpinner />
+		return <ContainerSpinner />
 	}
 
 	if (updateMembershipState.finished && !updateMembershipState.data.updateProjectMember.ok) {
@@ -73,7 +71,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 			<TitleBar actions={<PageLinkButton to="tenantInviteUser">Add user</PageLinkButton>}>Users in project</TitleBar>
 			<Table>
 				{query.data.project.members.map(member => (
-					<Table.Row>
+					<Table.Row key={member.identity.id}>
 						<Table.Cell>{member.identity.person ? member.identity.person.email : '?'}</Table.Cell>
 						<Table.Cell>
 							{member.memberships.map((membership, i) => {

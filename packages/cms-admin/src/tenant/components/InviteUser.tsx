@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useEffect } from 'react'
-import { Box, Button, FormGroup, Heading, Spinner, TextInput } from '@contember/ui'
+import { Box, Button, ContainerSpinner, FormGroup, Heading, TextInput } from '@contember/ui'
 import { Select } from '../../components/ui'
 import { useProjectSlug } from '../hooks/lib'
 import { RoleVariableDefinition, useInvite, useListRolesQuery, useUpdateProjectMembership } from '../hooks'
@@ -102,7 +102,7 @@ const EditUserMembership: React.FC<EditUserMembershipProps> = ({
 	}, [setMemberships])
 
 	if ((submitState && submitState.loading) || roleDefinitionState.loading) {
-		return <Spinner />
+		return <ContainerSpinner />
 	}
 
 	if (submitState && submitState.success) {
@@ -126,6 +126,7 @@ const EditUserMembership: React.FC<EditUserMembershipProps> = ({
 					errors={submitState && submitState.errorEmail ? [{ message: submitState.errorEmail }] : undefined}
 				>
 					<TextInput
+						validationState={submitState && submitState.errorEmail ? 'invalid' : 'default'}
 						readOnly={setEmail === undefined}
 						value={email}
 						onChange={e => setEmail && setEmail(e.target.value)}

@@ -1,4 +1,4 @@
-import { MutationRequestState, useAuth, useAuthedTenantMutation } from './lib'
+import { useAuth, useAuthedTenantMutation } from './lib'
 import { useCallback, useMemo } from 'react'
 
 const CHANGE_PASSWORD_MUTATION = `
@@ -47,7 +47,7 @@ export const useChangePassword = (): [(password: string) => void, ReturnedState]
 	const [triggerChangePassword, state] = useAuthedTenantMutation<ChangePasswordResponse, ChangePasswordVariables>(
 		CHANGE_PASSWORD_MUTATION,
 	)
-	const cb = useCallback(
+	const changePassword = useCallback(
 		(newPassword: string) => {
 			if (personId !== undefined) {
 				triggerChangePassword({
@@ -68,5 +68,5 @@ export const useChangePassword = (): [(password: string) => void, ReturnedState]
 				[],
 		}
 	}, [state])
-	return [cb, returnState]
+	return [changePassword, returnState]
 }

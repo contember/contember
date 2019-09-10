@@ -10,6 +10,7 @@
 
 	&-text
 		font-size: .8em
+		line-height: $cui-base-lineHeight
 
 	&-remove
 		background: none
@@ -21,4 +22,5 @@
 		font-size: .8em
 
 		&:focus
-			outline: none
+			%implementsCustomFocusEffects
+			color: $cui-tag-remove-color-focused

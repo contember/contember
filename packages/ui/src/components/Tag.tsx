@@ -9,7 +9,7 @@ export const Tag = React.memo<TagProps>(({ children, onRemove }) => (
 	<span className="tag">
 		<span className="tag-text">{children}</span>
 		{onRemove && (
-			<button className="tag-remove" onClick={onRemove}>
+			<button type="button" className="tag-remove" onClick={onRemove}>
 				×
 			</button>
 		)}

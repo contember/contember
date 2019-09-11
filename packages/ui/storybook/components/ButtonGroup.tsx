@@ -12,10 +12,14 @@ storiesOf('ButtonGroup', module).add('simple', () => {
 		Horizontal: 'horizontal',
 		Vertical: 'vertical',
 	})
+	const flow: ButtonGroupProps['flow'] = radios('Flow', {
+		Default: 'default',
+		Block: 'block',
+	})
 	const isTopToolbar = boolean('Is top toolbar', false)
 
 	return (
-		<ButtonGroup size={size} orientation={orientation} isTopToolbar={isTopToolbar}>
+		<ButtonGroup size={size} orientation={orientation} flow={flow} isTopToolbar={isTopToolbar}>
 			{simpleButtonStory(size)}
 		</ButtonGroup>
 	)

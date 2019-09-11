@@ -77,7 +77,8 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "email" = ?`,
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "email" = ?`,
 						parameters: ['john@doe.com'],
 						response: { rows: [] },
 					},
@@ -150,9 +151,10 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "email" = ?`,
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "email" = ?`,
 						parameters: ['john@doe.com'],
-						response: { rows: [{ id: testUuid(1), password_hash: null, identity_id: null }] },
+						response: { rows: [{ id: testUuid(1), password_hash: null, identity_id: null, roles: [] }] },
 					},
 				],
 				return: {
@@ -182,13 +184,24 @@ describe('tenant api', () => {
               token
               person {
                 id
+	              identity {
+		              projects {
+			              project {
+				              slug
+			              }
+			              memberships {
+				              role
+			              }
+		              }
+	              }
               }
             }
           }
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "email" = ?`,
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "email" = ?`,
 						parameters: ['john@doe.com'],
 						response: {
 							rows: [
@@ -196,6 +209,7 @@ describe('tenant api', () => {
 									id: testUuid(1),
 									password_hash: '$2b$10$OA65yEx6dAHWBKqzQXNiG.iTNWDLFYszOCOMFSMbp7aSk78YHHL1i',
 									identity_id: testUuid(2),
+									roles: [],
 								},
 							],
 						},
@@ -214,6 +228,26 @@ describe('tenant api', () => {
 							new Date('2019-09-04 12:00'),
 						],
 						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select "roles" from "tenant"."identity" where "id" = ?`,
+						parameters: [testUuid(2)],
+						response: { rows: [{ roles: [] }] },
+					},
+					{
+						sql: SQL`select "project"."id", "project"."name", "project"."slug" 
+from "tenant"."project" 
+where "project"."id" in (select "project_id" from "tenant"."project_membership" where "identity_id" = ?) 
+      and "project"."id" in (select "project_id" from "tenant"."project_membership" where "identity_id" = ?)`,
+						parameters: [testUuid(2), testUuid(2)],
+						response: { rows: [{ id: testUuid(10), name: 'Foo', slug: 'foo' }] },
+					},
+					{
+						sql: SQL`with "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" group by "membership_id") 
+select "role", coalesce(variables, '[]'::json) as "variables" 
+from "tenant"."project_membership" left join "variables" on "project_membership"."id" = "variables"."membership_id" where "identity_id" = ? and "project_id" = ?`,
+						parameters: [testUuid(2), testUuid(10)],
+						response: { rows: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }] },
 					},
 					{
 						sql: SQL`select
@@ -244,6 +278,20 @@ describe('tenant api', () => {
 							result: {
 								person: {
 									id: testUuid(1),
+									identity: {
+										projects: [
+											{
+												project: {
+													slug: 'foo',
+												},
+												memberships: [
+													{
+														role: 'editor',
+													},
+												],
+											},
+										],
+									},
 								},
 								token: '0000000000000000000000000000000000000000',
 							},
@@ -262,7 +310,8 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "id" = ?`,
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "id" = ?`,
 						parameters: [testUuid(1)],
 						response: {
 							rows: [
@@ -301,7 +350,8 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "identity_id" = ?`,
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [
@@ -337,13 +387,15 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "identity_id" = ?`,
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [
 								{
 									id: testUuid(1),
 									email: 'john@doe.com',
+									roles: [],
 								},
 							],
 						},
@@ -376,7 +428,8 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "id", "password_hash", "identity_id", "email" from "tenant"."person" where "identity_id" = ?`,
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [],

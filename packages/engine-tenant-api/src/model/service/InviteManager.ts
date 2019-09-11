@@ -6,12 +6,12 @@ import {
 	CreateIdentityCommand,
 	CreatePersonCommand,
 } from '../commands'
-import { Identity } from '@contember/engine-common'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
 import { Membership } from '../type/Membership'
 import { InviteErrorCode } from '../../schema'
 import { ImplementationException } from '../../exceptions'
+import { TenantRole } from '../authorization/Roles'
 
 export class InviteManager {
 	constructor(private readonly client: Client, private readonly providers: Providers) {}
@@ -22,7 +22,7 @@ export class InviteManager {
 			let person: Omit<PersonRow, 'roles'> | null = await trx.createQueryHandler().fetch(PersonQuery.byEmail(email))
 			let generatedPassword
 			if (!person) {
-				const identityId = await bus.execute(new CreateIdentityCommand([Identity.SystemRole.PERSON]))
+				const identityId = await bus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
 				generatedPassword = (await this.providers.randomBytes(9)).toString('base64')
 				person = await bus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
 			}

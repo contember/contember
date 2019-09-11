@@ -2,10 +2,10 @@ import * as React from 'react'
 import { PluginOrPlugins } from 'slate-react'
 import { Block, PathUtils } from 'slate'
 import { AddBlockButton } from './AddBlockButton'
-import { DataContext } from '../../../binding/coreComponents'
 import { BlocksDefinitions } from './types'
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { DragHandle } from '../../ui'
+import { AccessorContext } from '../../../binding/coreComponents'
 
 const Handle = SortableHandle(() => (
 	<div className="richEditor-handle" contentEditable={false}>
@@ -67,7 +67,7 @@ export function createRenderBlockPlugin(blocks: BlocksDefinitions): PluginOrPlug
 						{definition.renderBlock !== undefined ? (
 							definition.renderBlock({ children: props.children })
 						) : (
-							<DataContext.Provider value={accessor}>{definition.render}</DataContext.Provider>
+							<AccessorContext.Provider value={accessor}>{definition.render}</AccessorContext.Provider>
 						)}
 					</div>
 				)

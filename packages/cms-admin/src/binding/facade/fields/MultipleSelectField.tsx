@@ -29,7 +29,7 @@ export const MultipleSelectField = Component<MultipleSelectFieldProps>(props => 
 						currentValues={currentValues}
 						onChange={onChange}
 						environment={environment}
-						errors={e as any} // should be correct, but TS disagrees
+						errors={e}
 						isMutating={isMutating}
 						{...props}
 					/>

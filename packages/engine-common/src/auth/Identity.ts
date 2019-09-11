@@ -7,14 +7,12 @@ interface Identity {
 }
 
 namespace Identity {
-	export const enum SystemRole {
+	export enum SystemRole {
 		SUPER_ADMIN = 'super_admin',
-		LOGIN = 'login',
-		SETUP = 'setup',
-		SELF = 'self',
-		PERSON = 'person',
-		PROJECT_MEMBER = 'project_member',
-		PROJECT_ADMIN = 'project_admin',
+	}
+
+	export enum ProjectRole {
+		ADMIN = 'admin',
 	}
 
 	export class StaticIdentity implements Identity {

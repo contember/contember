@@ -1,6 +1,7 @@
 import { AuthorizationScope, AccessNode } from '@contember/authorization'
 import { Identity } from '@contember/engine-common'
 import { Project } from '../type'
+import { TenantRole } from './Roles'
 
 class ProjectScope implements AuthorizationScope<Identity> {
 	constructor(private readonly project: Pick<Project, 'slug'> | null) {}
@@ -10,7 +11,14 @@ class ProjectScope implements AuthorizationScope<Identity> {
 			return new AccessNode.Roles([])
 		}
 		const roles = await identity.getProjectRoles(this.project.slug)
-		return new AccessNode.Roles(roles.length > 0 ? [...roles, Identity.SystemRole.PROJECT_MEMBER] : [])
+		const tenantRoles = []
+		if (roles.length > 0) {
+			tenantRoles.push(TenantRole.PROJECT_MEMBER)
+		}
+		if (roles.includes(Identity.ProjectRole.ADMIN)) {
+			tenantRoles.push(TenantRole.PROJECT_ADMIN)
+		}
+		return new AccessNode.Roles(tenantRoles)
 	}
 }
 

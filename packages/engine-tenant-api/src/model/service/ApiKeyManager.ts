@@ -1,6 +1,5 @@
 import { DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
-import { Identity } from '@contember/engine-common'
 import {
 	AddProjectMemberCommand,
 	AddProjectMemberCommandError,
@@ -17,6 +16,7 @@ import { CreateApiKeyErrorCode } from '../../schema'
 import { ImplementationException } from '../../exceptions'
 import { CommandBus } from '../commands/CommandBus'
 import { Membership } from '../type/Membership'
+import { TenantRole } from '../authorization/Roles'
 
 class ApiKeyManager {
 	constructor(
@@ -53,7 +53,7 @@ class ApiKeyManager {
 	}
 
 	async createLoginApiKey(): Promise<ApiKeyManager.CreateApiKeyResult> {
-		const response = await this.createGlobalApiKey([Identity.SystemRole.LOGIN])
+		const response = await this.createGlobalApiKey([TenantRole.LOGIN])
 		if (!response.ok) {
 			throw new ImplementationException(response.errors.join(', '))
 		}
@@ -96,7 +96,7 @@ class ApiKeyManager {
 		})
 	}
 
-	async createGlobalApiKey(roles: Identity.SystemRole[]): Promise<ApiKeyManager.CreateApiKeyResponse> {
+	async createGlobalApiKey(roles: TenantRole[]): Promise<ApiKeyManager.CreateApiKeyResponse> {
 		return await this.commandBus.transaction(async bus => {
 			const identityId = await bus.execute(new CreateIdentityCommand(roles))
 			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))

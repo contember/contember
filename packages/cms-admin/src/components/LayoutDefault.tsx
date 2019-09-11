@@ -7,7 +7,15 @@ import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { useSelector } from 'react-redux'
 import State from '../state'
-import { Aether, Button, ButtonGroup, Dropdown, DropdownContentContainerProvider, forceReflow } from '@contember/ui'
+import {
+	Aether,
+	Button,
+	ButtonGroup,
+	Dropdown,
+	DropdownContentContainerProvider,
+	forceReflow,
+	Heading,
+} from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
 
 export interface LayoutProps {
@@ -84,23 +92,28 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 								children: <Avatar size={AvatarSize.Size2} email={email} />,
 							}}
 						>
-							<ButtonGroup orientation="vertical">
-								{props.userMenu}
-								<SwitchProjectLink
-									Component={({ onClick, href }) => (
-										<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
-											Switch project
-										</Button>
-									)}
-								/>
-								<LogoutLink
-									Component={props => (
-										<Button distinction="seamless" flow="block" {...props}>
-											Sign Out
-										</Button>
-									)}
-								/>
-							</ButtonGroup>
+							<>
+								<Heading size="small" depth={3} style={{ padding: '.5em' }}>
+									{email}
+								</Heading>
+								<ButtonGroup orientation="vertical" flow="block">
+									{props.userMenu}
+									<SwitchProjectLink
+										Component={({ onClick, href }) => (
+											<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
+												Switch project
+											</Button>
+										)}
+									/>
+									<LogoutLink
+										Component={props => (
+											<Button distinction="seamless" flow="block" {...props}>
+												Sign Out
+											</Button>
+										)}
+									/>
+								</ButtonGroup>
+							</>
 						</Dropdown>
 					</DropdownContentContainerProvider>
 				</div>

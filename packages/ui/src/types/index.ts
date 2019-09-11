@@ -1,6 +1,7 @@
 export * from './BoxDistinction'
 export * from './ButtonDistinction'
 export * from './ButtonFlow'
+export * from './ButtonGroupFlow'
 export * from './ButtonGroupOrientation'
 export * from './ButtonListFlow'
 export * from './CollapsibleTransition'

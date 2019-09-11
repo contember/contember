@@ -21,7 +21,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
 		await context.requireAccess({
 			scope: new ProjectScope(project),
-			action: PermissionActions.PROJECT_UPDATE_MEMBER_VARIABLES,
+			action: PermissionActions.PROJECT_UPDATE_MEMBER,
 			message: 'You are not allowed to update project member variables',
 		})
 		if (!project) {

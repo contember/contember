@@ -14,6 +14,7 @@ namespace Identity {
 		SELF = 'self',
 		PERSON = 'person',
 		PROJECT_MEMBER = 'project_member',
+		PROJECT_ADMIN = 'project_admin',
 	}
 
 	export class StaticIdentity implements Identity {

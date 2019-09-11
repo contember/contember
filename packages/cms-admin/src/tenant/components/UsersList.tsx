@@ -92,7 +92,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 
 	return (
 		<div>
-			<TitleBar actions={<PageLinkButton to="tenantInviteUser">Add user</PageLinkButton>}>Users in project</TitleBar>
+			<TitleBar actions={<PageLinkButton to="tenantInviteUser">Add a user</PageLinkButton>}>Users in project</TitleBar>
 			<Table>
 				{query.data.project.members.map(member => (
 					<Table.Row key={member.identity.id}>

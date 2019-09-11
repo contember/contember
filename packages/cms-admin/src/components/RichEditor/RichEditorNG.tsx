@@ -42,11 +42,9 @@ export class RichEditorNG extends React.PureComponent<RTEProps> {
 	public static generateSyntheticChildren(props: RTEProps, environment: Environment): React.ReactNode {
 		const fields = Object.values(props.blocks).map((definition, i) => {
 			if (definition.renderBlock !== undefined) {
-				return QueryLanguage.wrapRelativeSingleField(
-					definition.valueField,
-					fieldName => <Field name={fieldName} />,
-					environment,
-				)
+				return QueryLanguage.wrapRelativeSingleField(definition.valueField, environment, fieldName => (
+					<Field name={fieldName} />
+				))
 			} else {
 				return <React.Fragment key={i}>{definition.render}</React.Fragment>
 			}
@@ -55,13 +53,9 @@ export class RichEditorNG extends React.PureComponent<RTEProps> {
 		return (
 			<ToMany field={props.field}>
 				<Field name={props.sortBy} isNonbearing={true} />
-				{QueryLanguage.wrapRelativeSingleField(
-					props.name,
-					fieldName => (
-						<Field name={fieldName} />
-					),
-					environment,
-				)}
+				{QueryLanguage.wrapRelativeSingleField(props.name, environment, fieldName => (
+					<Field name={fieldName} />
+				))}
 				{fields}
 			</ToMany>
 		)

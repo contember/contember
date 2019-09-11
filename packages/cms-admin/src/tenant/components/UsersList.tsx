@@ -110,9 +110,9 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 								return (
 									<Tag
 										key={membership.role}
-										onRemove={() => {
-											removeMembership(member.identity.id, member.memberships, membership)
-										}}
+										//onRemove={() => {
+										//	removeMembership(member.identity.id, member.memberships, membership)
+										//}}
 									>
 										<Renderer variables={vars} rolesData={rolesData.data} />
 									</Tag>

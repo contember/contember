@@ -38,6 +38,8 @@ import { InviteManager } from './model/service/InviteManager'
 import { GraphQLError, GraphQLFormattedError } from 'graphql'
 import { formatError } from './resolvers/ErrorFormatter'
 import { ProjectMembersQueryResolver } from './resolvers/query/ProjectMembersQueryResolver'
+import { PermissionContextFactory } from './model/authorization/PermissionContextFactory'
+import { IdentityFactory } from './model/authorization/IdentityFactory'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -117,9 +119,22 @@ namespace TenantContainer {
 					'projectMemberManager',
 					({ queryHandler, commandBus }) => new ProjectMemberManager(queryHandler, commandBus),
 				)
+				.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
+				.addService(
+					'permissionContextFactory',
+					({ authorizator, identityFactory }) => new PermissionContextFactory(authorizator, identityFactory),
+				)
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
 				.addService('inviteManager', ({ db, providers }) => new InviteManager(db, providers))
-
+				.addService(
+					'identityTypeResolver',
+					({ queryHandler, projectMemberManager, projectManager }) =>
+						new IdentityTypeResolver(queryHandler, projectMemberManager, projectManager),
+				)
+				.addService(
+					'projectTypeResolver',
+					({ projectMemberManager }) => new ProjectTypeResolver(projectMemberManager, projectVariablesResolver),
+				)
 				.addService('meQueryResolver', () => new MeQueryResolver())
 				.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
 				.addService(
@@ -131,7 +146,11 @@ namespace TenantContainer {
 					'signUpMutationResolver',
 					({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager),
 				)
-				.addService('signInMutationResolver', ({ signInManager }) => new SignInMutationResolver(signInManager))
+				.addService(
+					'signInMutationResolver',
+					({ signInManager, permissionContextFactory, identityTypeResolver }) =>
+						new SignInMutationResolver(signInManager, identityTypeResolver, permissionContextFactory),
+				)
 				.addService(
 					'signOutMutationResolver',
 					({ apiKeyManager, queryHandler }) => new SignOutMutationResolver(apiKeyManager, queryHandler),
@@ -172,19 +191,10 @@ namespace TenantContainer {
 					'disableApiKeyMutationResolver',
 					({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager),
 				)
-				.addService(
-					'identityTypeResolver',
-					({ queryHandler, projectMemberManager, projectManager }) =>
-						new IdentityTypeResolver(queryHandler, projectMemberManager, projectManager),
-				)
-				.addService(
-					'projectTypeResolver',
-					({ projectMemberManager }) => new ProjectTypeResolver(projectMemberManager, projectVariablesResolver),
-				)
 
 				.addService(
 					'resolverContextFactory',
-					({ authorizator, projectMemberManager }) => new ResolverContextFactory(projectMemberManager, authorizator),
+					({ permissionContextFactory }) => new ResolverContextFactory(permissionContextFactory),
 				)
 				.addService('resolvers', container => new ResolverFactory(container).create())
 				.addService('errorFormatter', () => formatError)

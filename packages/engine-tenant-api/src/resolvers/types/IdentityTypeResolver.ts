@@ -25,10 +25,13 @@ export class IdentityTypeResolver implements IdentityResolvers {
 	}
 
 	async projects(
-		parent: { id: string },
+		parent: { id: string; projects: readonly IdentityProjectRelation[] },
 		{  }: any,
 		context: ResolverContext,
 	): Promise<readonly IdentityProjectRelation[]> {
+		if (parent.projects.length > 0) {
+			return parent.projects
+		}
 		const projects = await this.projectManager.getProjectsByIdentity(parent.id, context.permissionContext)
 		return await Promise.all(
 			projects.map(

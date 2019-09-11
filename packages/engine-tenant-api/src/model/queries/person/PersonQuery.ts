@@ -22,11 +22,13 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 	async fetch(queryable: DatabaseQueryable): Promise<MaybePersonRow> {
 		const rows = await queryable
 			.createSelectBuilder<PersonRow>()
-			.select('id')
-			.select('password_hash')
-			.select('identity_id')
-			.select('email')
+			.select(['person', 'id'])
+			.select(['person', 'password_hash'])
+			.select(['person', 'identity_id'])
+			.select(['person', 'email'])
+			.select(['identity', 'roles'])
 			.from('person')
+			.join('identity', 'identity', expr => expr.columnsEq(['identity', 'id'], ['person', 'identity_id']))
 			.where(this.condition)
 			.getResult()
 

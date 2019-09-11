@@ -122,12 +122,12 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 						<Table.Cell>
 							<ButtonList>
 								<PageLinkButton
-									distinction="outlined"
+									size="small"
 									to={() => ({ name: 'tenantEditUser', params: { id: member.identity.id } })}
 								>
-									Add role
+									Edit roles
 								</PageLinkButton>
-								<Button intent="danger" distinction="outlined" onClick={() => removeMember(member.identity.id)}>
+								<Button size="small" intent="danger" onClick={() => removeMember(member.identity.id)}>
 									Revoke access
 								</Button>
 							</ButtonList>

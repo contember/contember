@@ -19,7 +19,7 @@ export class InviteManager {
 	async invite(email: string, projectId: string, memberships: readonly Membership[]): Promise<InviteResponse> {
 		return await this.client.transaction(async trx => {
 			const bus = new CommandBus(trx, this.providers)
-			let person = await trx.createQueryHandler().fetch(PersonQuery.byEmail(email))
+			let person: Omit<PersonRow, 'roles'> | null = await trx.createQueryHandler().fetch(PersonQuery.byEmail(email))
 			let generatedPassword
 			if (!person) {
 				const identityId = await bus.execute(new CreateIdentityCommand([Identity.SystemRole.PERSON]))
@@ -47,7 +47,7 @@ export type InviteResponse = InviteResponseOk | InviteResponseError
 export class InviteResponseOk {
 	readonly ok = true
 
-	constructor(public readonly person: PersonRow, public readonly generatedPassword?: string) {}
+	constructor(public readonly person: Omit<PersonRow, 'roles'>, public readonly generatedPassword?: string) {}
 }
 
 export class InviteResponseError {

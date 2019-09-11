@@ -38,7 +38,7 @@ namespace SignUpManager {
 	export class SignUpResultOk {
 		readonly ok = true
 
-		constructor(public readonly person: PersonRow) {}
+		constructor(public readonly person: Omit<PersonRow, 'roles'>) {}
 	}
 
 	export class SignUpResultError {

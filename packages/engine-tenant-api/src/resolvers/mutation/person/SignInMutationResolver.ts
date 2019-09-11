@@ -1,9 +1,14 @@
 import { MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, SignInManager } from '../../../'
+import { IdentityTypeResolver, PermissionActions, PermissionContext, SignInManager } from '../../../'
+import { PermissionContextFactory } from '../../../model/authorization/PermissionContextFactory'
 
 export class SignInMutationResolver implements MutationResolvers {
-	constructor(private readonly signInManager: SignInManager) {}
+	constructor(
+		private readonly signInManager: SignInManager,
+		private readonly identityTypeResolver: IdentityTypeResolver,
+		private readonly permissionContextFactory: PermissionContextFactory,
+	) {}
 
 	async signIn(parent: any, args: MutationSignInArgs, context: ResolverContext): Promise<SignInResponse> {
 		await context.requireAccess({
@@ -20,6 +25,13 @@ export class SignInMutationResolver implements MutationResolvers {
 			}
 		}
 
+		const identityId = result.person.identity_id
+		const permissionContext = this.permissionContextFactory.create({ id: identityId, roles: result.person.roles })
+		const projects = await this.identityTypeResolver.projects(
+			{ id: identityId, projects: [] },
+			{},
+			new ResolverContext(context.apiKeyId, permissionContext),
+		)
 		return {
 			ok: true,
 			errors: [],
@@ -29,8 +41,8 @@ export class SignInMutationResolver implements MutationResolvers {
 					id: result.person.id,
 					email: result.person.email,
 					identity: {
-						id: result.person.identity_id,
-						projects: [],
+						id: identityId,
+						projects,
 					},
 				},
 			},

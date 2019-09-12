@@ -6,8 +6,9 @@ export const ErrorCodeString: { [key: string]: string } = {
 	ALREADY_MEMBER: 'User is already member of this project.',
 }
 
-export const getErrorCodeString = (code: string): string {
+export const getErrorCodeString = (code: string): string => {
 	if (code in ErrorCodeString) {
 		return ErrorCodeString[code]
 	}
+	return code
 }

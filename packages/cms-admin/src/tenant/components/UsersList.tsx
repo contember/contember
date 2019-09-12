@@ -82,7 +82,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 		[addToast, project, refetchUserList, removeMemberInner],
 	)
 
-	if (query.error || rolesData.error || updateMembershipState.error || removeMemberState.error) {
+	if (query.error || updateMembershipState.error || removeMemberState.error) {
 		return <>Error loading data</>
 	}
 
@@ -114,7 +114,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 										//	removeMembership(member.identity.id, member.memberships, membership)
 										//}}
 									>
-										<Renderer variables={vars} rolesData={rolesData.data} />
+										{rolesData.error ? 'Error loading data' : <Renderer variables={vars} rolesData={rolesData.data} />}
 									</Tag>
 								)
 							})}

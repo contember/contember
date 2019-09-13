@@ -9,7 +9,7 @@ class Terminal<
 	FactoryMethodName extends ValidFactoryName,
 	Props extends {},
 	Representation,
-	ComponentType extends ComponentWithTerminalFactory<FactoryMethodName, Props, Environment, Representation>,
+	ComponentType extends ComponentWithTerminalFactory<FactoryMethodName, Props, Representation, Environment>,
 	Environment
 > {
 	public readonly specification: Terminal.Specification<
@@ -22,11 +22,11 @@ class Terminal<
 
 	public constructor(factoryMethodName: FactoryMethodName)
 	public constructor(
-		staticFactory: TerminalRepresentationFactory<Props, Environment, Representation>,
+		staticFactory: TerminalRepresentationFactory<Props, Representation, Environment>,
 		ComponentType?: ComponentType,
 	)
 	public constructor(
-		factory: FactoryMethodName | TerminalRepresentationFactory<Props, Environment, Representation>,
+		factory: FactoryMethodName | TerminalRepresentationFactory<Props, Representation, Environment>,
 		ComponentType?: ComponentType,
 	) {
 		if (typeof factory === 'function') {
@@ -49,7 +49,7 @@ namespace Terminal {
 		FactoryMethodName extends ValidFactoryName,
 		Props extends {},
 		Representation,
-		ComponentType extends ComponentWithTerminalFactory<FactoryMethodName, Props, Environment, Representation>,
+		ComponentType extends ComponentWithTerminalFactory<FactoryMethodName, Props, Representation, Environment>,
 		Environment
 	> =
 		| {
@@ -58,7 +58,9 @@ namespace Terminal {
 		  }
 		| {
 				type: RepresentationFactorySite.UseSite
-				factory: TerminalRepresentationFactory<Props, Environment, Representation>
+				factory: TerminalRepresentationFactory<Props, Representation, Environment>
 				ComponentType?: ComponentType
 		  }
 }
+
+export { Terminal }

@@ -1,3 +1,4 @@
+import { NonterminalOptions } from './NonterminalOptions'
 import {
 	ChildrenRepresentationReducer,
 	ComponentWithNonterminalFactory,
@@ -21,6 +22,10 @@ class Nonterminal<
 	>,
 	Environment
 > {
+	private static defaultOptions: NonterminalOptions = {
+		childrenAbsentErrorMessage: 'Component must have children!',
+	}
+
 	public readonly specification: Nonterminal.Specification<
 		FactoryMethodName,
 		Props,
@@ -31,13 +36,17 @@ class Nonterminal<
 		Environment
 	>
 
+	public readonly options: NonterminalOptions
+
 	public constructor(
 		factoryMethodName: FactoryMethodName,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
+		options?: Partial<NonterminalOptions>,
 	)
 	public constructor(
 		staticFactory: NonterminalRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
+		options?: Partial<NonterminalOptions>,
 		ComponentType?: ComponentType,
 	)
 	public constructor(
@@ -45,6 +54,7 @@ class Nonterminal<
 			| FactoryMethodName
 			| NonterminalRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
+		options?: Partial<NonterminalOptions>,
 		ComponentType?: ComponentType,
 	) {
 		if (typeof factory === 'function') {
@@ -61,6 +71,7 @@ class Nonterminal<
 				childrenRepresentationReducer,
 			}
 		}
+		this.options = { ...Nonterminal.defaultOptions, ...options }
 	}
 }
 

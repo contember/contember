@@ -1,1 +1,1 @@
-export type ValidFactoryName = string | symbol | number
+export type ValidFactoryName = string | number

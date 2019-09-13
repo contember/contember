@@ -4,16 +4,20 @@ import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
 import { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
 import {
 	NonterminalRepresentationFactory,
+	RawNodeRepresentation,
 	RepresentationFactorySite,
 	TerminalRepresentationFactory,
 	ValidFactoryName,
 } from './nodeSpecs'
-import { RawNodeRepresentation } from './nodeSpecs/RawNodeRepresentation'
 import { BaseComponent, EnvironmentFactory, SyntheticChildrenFactory } from './nodeSpecs/types'
 import { NonterminalList } from './NonterminalList'
 import { TerminalList } from './TerminalList'
 
-export class ChildrenAnalyzer<AllTerminalsRepresentation, AllNonterminalsRepresentation, Environment> {
+export class ChildrenAnalyzer<
+	AllTerminalsRepresentation = any,
+	AllNonterminalsRepresentation = never,
+	Environment = undefined
+> {
 	private static defaultOptions: ChildrenAnalyzerOptions = {
 		ignoreRenderProps: true,
 		renderPropsErrorMessage: 'Render props (functions as React component children) are not supported.',

@@ -1,7 +1,47 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { PageLink } from '../pageRouting'
 import { DynamicLink } from '../DynamicLink'
 import { Navigation } from '@contember/ui'
+import State from '../../state'
+import { requestStateToPath } from '../../utils/url'
+import routes from '../../routes'
+import { pageRequest } from '../../state/request'
+
+export interface NavigationIsActiveProviderProps {
+	children?: React.ReactNode
+}
+
+export function NavigationIsActiveProvider(props: NavigationIsActiveProviderProps) {
+	const isActive = useSelector<State, (to: Navigation.IsActiveProps['to']) => boolean>(state => {
+		return (to: Navigation.IsActiveProps['to']) => {
+			if (state.view.route && state.view.route.name === 'project_page') {
+				const url = requestStateToPath(
+					routes(state.projectsConfigs.configs),
+					pageRequest(
+						state.view.route.project,
+						state.view.route.stage,
+						typeof to === 'string' ? to : to.pageName,
+						typeof to === 'string' ? {} : to.parameters,
+					)(state.request),
+				)
+				return url === location.pathname
+			} else {
+				return false
+			}
+		}
+	})
+
+	return (
+		<Navigation.IsActiveContext.Provider
+			value={(props: Navigation.IsActiveProps) => {
+				return <>{props.children(isActive(props.to))}</>
+			}}
+		>
+			{props.children}
+		</Navigation.IsActiveContext.Provider>
+	)
+}
 
 export interface NavigationProviderProps {
 	children?: React.ReactNode

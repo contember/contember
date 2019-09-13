@@ -1,0 +1,12 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/tests",
+		"esModuleInterop": true
+	},
+	"references": [
+		{
+			"path": "../src"
+		}
+	]
+}

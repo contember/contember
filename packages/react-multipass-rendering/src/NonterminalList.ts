@@ -1,9 +1,8 @@
-import { Nonterminal, ValidFactoryName } from './nodeSpecs'
-import { RawNodeRepresentation } from './nodeSpecs/RawNodeRepresentation'
+import { Nonterminal, RawNodeRepresentation, ValidFactoryName } from './nodeSpecs'
 
 export type NonterminalList<TerminalsRepresentationUnion, NonterminalsRepresentationUnion, Environment> = Nonterminal<
 	ValidFactoryName,
-	{},
+	any,
 	RawNodeRepresentation<TerminalsRepresentationUnion, NonterminalsRepresentationUnion>,
 	any,
 	NonterminalsRepresentationUnion,

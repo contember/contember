@@ -49,46 +49,48 @@ export interface NavigationProviderProps {
 
 export function NavigationProvider(props: NavigationProviderProps) {
 	return (
-		<Navigation.MiddlewareContext.Provider
-			value={({ to, children, ...props }: Navigation.MiddlewareProps) => {
-				if ('Component' in props) {
-					const Component = props.Component
+		<NavigationIsActiveProvider>
+			<Navigation.MiddlewareContext.Provider
+				value={({ to, children, ...props }: Navigation.MiddlewareProps) => {
+					if ('Component' in props) {
+						const Component = props.Component
+						return (
+							<DynamicLink
+								requestChange={requestState => {
+									if (typeof to === 'string') {
+										return { ...requestState, pageName: to }
+									}
+									return { ...requestState, ...to }
+								}}
+								Component={innerProps => (
+									<Component navigate={() => innerProps.onClick()} isActive={innerProps.isActive}>
+										{innerProps.children}
+									</Component>
+								)}
+							>
+								<>{children}</>
+							</DynamicLink>
+						)
+					}
 					return (
-						<DynamicLink
-							requestChange={requestState => {
-								if (typeof to === 'string') {
-									return { ...requestState, pageName: to }
-								}
-								return { ...requestState, ...to }
-							}}
-							Component={innerProps => (
-								<Component navigate={() => innerProps.onClick()} isActive={innerProps.isActive}>
-									{innerProps.children}
-								</Component>
-							)}
+						<PageLink
+							to={
+								typeof to === 'string'
+									? to
+									: () => ({
+											name: to.pageName,
+											params: to.parameters,
+									  })
+							}
+							{...props}
 						>
-							<>{children}</>
-						</DynamicLink>
+							{children}
+						</PageLink>
 					)
-				}
-				return (
-					<PageLink
-						to={
-							typeof to === 'string'
-								? to
-								: () => ({
-										name: to.pageName,
-										params: to.parameters,
-								  })
-						}
-						{...props}
-					>
-						{children}
-					</PageLink>
-				)
-			}}
-		>
-			{props.children}
-		</Navigation.MiddlewareContext.Provider>
+				}}
+			>
+				{props.children}
+			</Navigation.MiddlewareContext.Provider>
+		</NavigationIsActiveProvider>
 	)
 }

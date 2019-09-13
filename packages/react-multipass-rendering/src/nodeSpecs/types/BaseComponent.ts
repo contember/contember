@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export type BaseComponent =
-	| React.ComponentClass<unknown>
-	| React.FunctionComponent<unknown>
-	| React.NamedExoticComponent<unknown>
+export type BaseComponent<Props extends {}> =
+	| React.ComponentClass<Props>
+	| React.FunctionComponent<Props>
+	| React.NamedExoticComponent<Props>

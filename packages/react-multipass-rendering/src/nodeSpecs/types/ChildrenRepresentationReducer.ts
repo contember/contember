@@ -1,3 +1,3 @@
 export type ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation> = (
-	childrenRepresentations: ChildrenRepresentation[],
+	childrenRepresentations: ChildrenRepresentation,
 ) => ReducedChildrenRepresentation

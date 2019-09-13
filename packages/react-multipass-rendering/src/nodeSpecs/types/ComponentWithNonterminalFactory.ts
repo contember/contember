@@ -8,7 +8,7 @@ export type ComponentWithNonterminalFactory<
 	ReducedChildrenRepresentation,
 	Representation,
 	Environment
-> = BaseComponent &
+> = BaseComponent<Props> &
 	{
 		[N in FactoryMethodName]: NonterminalRepresentationFactory<
 			Props,

@@ -7,7 +7,7 @@ export type ComponentWithTerminalFactory<
 	Props extends {},
 	Representation,
 	Environment
-> = BaseComponent &
+> = BaseComponent<Props> &
 	{
 		[N in FactoryMethodName]: TerminalRepresentationFactory<Props, Representation, Environment>
 	}

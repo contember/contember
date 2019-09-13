@@ -1,6 +1,11 @@
 import { BaseComponent, RepresentationFactorySite, TerminalRepresentationFactory, ValidFactoryName } from './types'
 
-class Terminal<FactoryMethodName extends ValidFactoryName, Props extends {}, Representation, Environment> {
+class Terminal<
+	FactoryMethodName extends ValidFactoryName = string,
+	Props extends {} = {},
+	Representation = any,
+	Environment = undefined
+> {
 	public readonly specification: Terminal.Specification<FactoryMethodName, Props, Representation, Environment>
 
 	public constructor(factoryMethodName: FactoryMethodName)

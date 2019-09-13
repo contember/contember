@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Collapsible } from './Collapsible'
 import { Navigation } from '../Navigation'
 import cn from 'classnames'
+import { isSpecialLinkClick } from '../utils'
 
 const DepthContext = React.createContext(0)
 
@@ -41,11 +42,13 @@ namespace Menu {
 				onClick?: never
 				to?: never
 				external?: never
+				suppressTo?: never
 		  }
 		| {
 				onClick?: () => void
 				to?: Navigation.MiddlewareProps['to']
 				external?: ItemProps['external']
+				suppressTo?: boolean
 		  }
 
 	function DepthSpecificItem(props: ItemProps) {
@@ -64,48 +67,35 @@ namespace Menu {
 
 	function useTitle(options: TitleOptions) {
 		const Link = React.useContext(Navigation.MiddlewareContext)
-		const { to, external, onClick } = options
+		const { to, external, suppressTo, onClick } = options
 
-		if (onClick) {
-			return (props: TitleProps) => {
-				const { children, ...otherProps } = props
-				if (to) {
-					return (
-						<Link
-							to={to}
-							Component={({ navigate }) => (
-								<button
-									type="button"
-									onClick={() => {
-										onClick()
-										navigate()
-									}}
-									{...otherProps}
-								>
-									<div className="menu-titleContent">{children}</div>
-								</button>
-							)}
-						/>
-					)
-				}
+		return (props: TitleProps) => {
+			const { children, ...otherProps } = props
+			if (to) {
+				return (
+					<Link
+						to={to}
+						{...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+						onClick={event => {
+							if (onClick && !isSpecialLinkClick(event.nativeEvent)) {
+								onClick()
+								if (suppressTo) {
+									event.preventDefault()
+								}
+							}
+						}}
+						{...otherProps}
+					>
+						{children}
+					</Link>
+				)
+			} else if (onClick) {
 				return (
 					<button type="button" onClick={onClick} {...otherProps}>
 						<div className="menu-titleContent">{children}</div>
 					</button>
 				)
-			}
-		} else if (to) {
-			return (props: TitleProps) => {
-				const { children, ...otherProps } = props
-				return (
-					<Link to={to} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} {...otherProps}>
-						{children}
-					</Link>
-				)
-			}
-		} else {
-			return (props: TitleProps) => {
-				const { children, ...otherProps } = props
+			} else {
 				return <div {...otherProps}>{children}</div>
 			}
 		}
@@ -160,10 +150,9 @@ namespace Menu {
 		}, [setExpanded, expanded])
 		const options: TitleOptions = {
 			onClick: props.children ? onClick : undefined,
-		}
-		if (!expanded) {
-			options.to = props.to
-			options.external = props.external
+			to: props.to,
+			external: props.external,
+			suppressTo: expanded,
 		}
 		const Title = useTitle(options)
 

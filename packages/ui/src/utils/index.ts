@@ -1,5 +1,6 @@
 export * from './assertNever'
 export * from './forceReflow'
+export * from './isSpecialLinkClick'
 export * from './toEnumClass'
 export * from './toEnumStateClass'
 export * from './toEnumViewClass'

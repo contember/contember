@@ -45,6 +45,17 @@ namespace Navigation {
 			</a>
 		)
 	})
+
+	export type IsActiveProps = {
+		to: string | CustomTo
+		children: (isActive: boolean) => React.ReactNode
+	}
+
+	export type IsActive = React.ComponentType<IsActiveProps>
+
+	export const IsActiveContext = React.createContext<IsActive>(({ to, children }) => {
+		return <>{children(false)}</>
+	})
 }
 
 export { Navigation }

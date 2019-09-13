@@ -3,11 +3,16 @@ import { RequestChange } from '../../state/request'
 import { isSpecialLinkClick } from '../../utils/isSpecialLinkClick'
 
 class LinkComponent extends React.PureComponent<LinkComponent.Props> {
-	onClick = (e?: React.SyntheticEvent<Element>) => {
-		if (e && e.nativeEvent instanceof MouseEvent && isSpecialLinkClick(e.nativeEvent)) {
-			return
+	onClick = (e?: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+		if (e) {
+			if (this.props.onClick) {
+				this.props.onClick(e)
+			}
+			if (e.isDefaultPrevented() || isSpecialLinkClick(e.nativeEvent)) {
+				return
+			}
+			e.preventDefault()
 		}
-		e && e.preventDefault()
 		this.props.goTo()
 	}
 
@@ -20,15 +25,14 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props> {
 
 	render() {
 		const { Component = this.defaultComponent, requestChange, goTo, dispatch, ...innerProps } = this.props
-		return <Component onClick={this.onClick} isActive={location.pathname === this.props.href} {...innerProps} />
+		return <Component isActive={location.pathname === this.props.href} {...innerProps} onClick={this.onClick} />
 	}
 }
 
-export type PublicAnchorProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'onClick'>
+export type PublicAnchorProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 
 export interface InnerProps extends PublicAnchorProps {
 	href: string
-	onClick: (e?: React.SyntheticEvent<Element>) => void
 	isActive: boolean
 }
 
@@ -51,7 +55,7 @@ namespace LinkComponent {
 		DispatchProps &
 		OwnProps &
 		PublicAnchorProps & {
-			dispatch?: any // TODO: For some reason, Redux sends a dispatch prop, no ide why.
+			dispatch?: any // TODO: For some reason, Redux sends a dispatch prop, no idea why.
 		}
 }
 

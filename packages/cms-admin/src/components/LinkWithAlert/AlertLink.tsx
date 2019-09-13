@@ -32,8 +32,10 @@ export default (props: AlertLinkProps): React.ComponentType<InnerProps> => {
 			})
 		}
 
-		private onConfirm = (e: React.SyntheticEvent<HTMLElement>) => {
-			this.props.onClick(e)
+		private onConfirm = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+			if (this.props.onClick) {
+				this.props.onClick(e)
+			}
 			this.closeAlert()
 		}
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RequestChange } from '../../state/request'
-import { isSpecialLinkClick } from '../../utils/isSpecialLinkClick'
+import { isSpecialLinkClick } from '@contember/ui'
 
 class LinkComponent extends React.PureComponent<LinkComponent.Props> {
 	onClick = (e?: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {

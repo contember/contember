@@ -38,7 +38,14 @@ class ProjectsList extends React.Component<ProjectsListProps, {}> {
 							key={i}
 							requestChange={selectProjectRequest(config)}
 							Component={({ isActive, ...props }) => (
-								<Button {...props} Component="a" distinction="seamless" flow="block" justification="justifyStart" />
+								<Button
+									{...props}
+									onClick={undefined} /* css reload workaround */
+									Component="a"
+									distinction="seamless"
+									flow="block"
+									justification="justifyStart"
+								/>
 							)}
 						>
 							{config.project}/{config.stage}

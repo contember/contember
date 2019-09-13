@@ -6,6 +6,5 @@ export type NonterminalList<TerminalsRepresentationUnion, NonterminalsRepresenta
 	RawNodeRepresentation<TerminalsRepresentationUnion, NonterminalsRepresentationUnion>,
 	any,
 	NonterminalsRepresentationUnion,
-	any,
 	Environment
 >[]

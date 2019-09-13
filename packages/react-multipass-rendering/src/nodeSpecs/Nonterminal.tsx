@@ -1,26 +1,19 @@
 import { NonterminalOptions } from './NonterminalOptions'
 import {
+	BaseComponent,
 	ChildrenRepresentationReducer,
-	ComponentWithNonterminalFactory,
 	NonterminalRepresentationFactory,
 	RepresentationFactorySite,
 	ValidFactoryName,
 } from './types'
 
 class Nonterminal<
-	FactoryMethodName extends ValidFactoryName,
-	Props extends {},
-	ChildrenRepresentation,
-	ReducedChildrenRepresentation,
-	Representation,
-	ComponentType extends ComponentWithNonterminalFactory<
-		FactoryMethodName,
-		Props,
-		ReducedChildrenRepresentation,
-		Representation,
-		Environment
-	>,
-	Environment
+	FactoryMethodName extends ValidFactoryName = string,
+	Props extends {} = {},
+	ChildrenRepresentation = any,
+	ReducedChildrenRepresentation = any,
+	Representation = any,
+	Environment = undefined
 > {
 	private static defaultOptions: NonterminalOptions = {
 		childrenAbsentErrorMessage: 'Component must have children!',
@@ -32,7 +25,6 @@ class Nonterminal<
 		ChildrenRepresentation,
 		ReducedChildrenRepresentation,
 		Representation,
-		ComponentType,
 		Environment
 	>
 
@@ -47,7 +39,7 @@ class Nonterminal<
 		staticFactory: NonterminalRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
 		options?: Partial<NonterminalOptions>,
-		ComponentType?: ComponentType,
+		ComponentType?: BaseComponent<Props>,
 	)
 	public constructor(
 		factory:
@@ -55,7 +47,7 @@ class Nonterminal<
 			| NonterminalRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
 		options?: Partial<NonterminalOptions>,
-		ComponentType?: ComponentType,
+		ComponentType?: BaseComponent<Props>,
 	) {
 		if (typeof factory === 'function') {
 			this.specification = {
@@ -77,19 +69,12 @@ class Nonterminal<
 
 namespace Nonterminal {
 	export type Specification<
-		FactoryMethodName extends ValidFactoryName,
-		Props extends {},
-		ChildrenRepresentation,
-		ReducedChildrenRepresentation,
-		Representation,
-		ComponentType extends ComponentWithNonterminalFactory<
-			FactoryMethodName,
-			Props,
-			ReducedChildrenRepresentation,
-			Representation,
-			Environment
-		>,
-		Environment
+		FactoryMethodName extends ValidFactoryName = string,
+		Props extends {} = {},
+		ChildrenRepresentation = any,
+		ReducedChildrenRepresentation = any,
+		Representation = any,
+		Environment = undefined
 	> =
 		| {
 				type: RepresentationFactorySite.DeclarationSite
@@ -106,7 +91,7 @@ namespace Nonterminal {
 					ChildrenRepresentation,
 					ReducedChildrenRepresentation
 				>
-				ComponentType?: ComponentType
+				ComponentType?: BaseComponent<Props>
 		  }
 }
 

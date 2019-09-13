@@ -4,7 +4,7 @@ import SqlCreateInputProcessor from './insert/SqlCreateInputProcessor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
-import { Client } from '@contember/database'
+import { Client, Connection } from '@contember/database'
 import PredicateFactory from '../acl/PredicateFactory'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
 import InsertBuilderFactory from './insert/InsertBuilderFactory'
@@ -18,6 +18,7 @@ import { SelectBuilder } from '@contember/database'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
 import SqlUpdateInputProcessor from './update/SqlUpdateInputProcessor'
 import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
+import { ForeignKeyViolation, NotNullConstraintViolation, UniqueKeyViolation } from './Constraints'
 
 class Mapper {
 	constructor(
@@ -133,11 +134,14 @@ class Mapper {
 
 		const promise = Promise.all(Object.values(promises).filter((it: any) => !!it))
 
-		const result = await insertBuilder.execute()
+		try {
+			const result = await insertBuilder.execute()
+			await promise
 
-		await promise
-
-		return result
+			return result
+		} catch (e) {
+			return this.handleError(e)
+		}
 	}
 
 	public async update(entity: Model.Entity, where: Input.UniqueWhere, data: Input.UpdateDataInput): Promise<number> {
@@ -160,17 +164,24 @@ class Mapper {
 
 		await Promise.all(Object.values(promises).filter((it: any) => !!it))
 
-		const affectedRows = await executeResult
+		try {
+			const affectedRows = await executeResult
+			if (affectedRows !== 1 && affectedRows !== null) {
+				throw new Mapper.NoResultError()
+			}
 
-		if (affectedRows !== 1 && affectedRows !== null) {
-			throw new Mapper.NoResultError()
+			return affectedRows || 0
+		} catch (e) {
+			return this.handleError(e)
 		}
-
-		return affectedRows || 0
 	}
 
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
-		await this.deleteExecutor.execute(entity, where)
+		try {
+			await this.deleteExecutor.execute(entity, where)
+		} catch (e) {
+			return this.handleError(e)
+		}
 	}
 
 	public async connectJunction(
@@ -200,6 +211,19 @@ class Mapper {
 		}
 
 		return this.selectField(entity, where, entity.primary)
+	}
+
+	private handleError(error: Error): never {
+		if (error instanceof Connection.NotNullViolationError) {
+			throw new NotNullConstraintViolation()
+		}
+		if (error instanceof Connection.ForeignKeyViolationError) {
+			throw new ForeignKeyViolation()
+		}
+		if (error instanceof Connection.UniqueViolationError) {
+			throw new UniqueKeyViolation()
+		}
+		throw error
 	}
 }
 

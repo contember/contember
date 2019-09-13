@@ -137,7 +137,17 @@ namespace Connection {
 			return result
 		} catch (error) {
 			eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
-			throw new ConnectionError(sql, parameters, error)
+
+			switch (error.code) {
+				case '23502':
+					throw new NotNullViolationError(sql, parameters, error)
+				case '23503':
+					throw new ForeignKeyViolationError(sql, parameters, error)
+				case '23505':
+					throw new UniqueViolationError(sql, parameters, error)
+				default:
+					throw new ConnectionError(sql, parameters, error)
+			}
 		}
 	}
 
@@ -156,6 +166,10 @@ ${'message' in previous ? previous.message : JSON.stringify(previous)}
 			this.constraint = previous.constraint
 		}
 	}
+
+	export class NotNullViolationError extends ConnectionError {}
+	export class ForeignKeyViolationError extends ConnectionError {}
+	export class UniqueViolationError extends ConnectionError {}
 
 	function prepareSql(sql: string) {
 		let parameterIndex = 0

@@ -166,29 +166,31 @@ export class ChildrenAnalyzer<
 			const processedChildren = this.processNode(children, environment)
 
 			for (const nonterminal of this.nonterminals) {
-				if (children) {
-					if (nonterminal.specification.type === RepresentationFactorySite.DeclarationSite) {
-						const { factoryMethodName, childrenRepresentationReducer } = nonterminal.specification
+				if (nonterminal.specification.type === RepresentationFactorySite.DeclarationSite) {
+					const { factoryMethodName, childrenRepresentationReducer } = nonterminal.specification
 
-						if (factoryMethodName in treeNode) {
-							const factory = treeNode[factoryMethodName] as NonterminalRepresentationFactory<
-								any,
-								unknown,
-								AllNonterminalsRepresentation,
-								Environment
-							>
-							return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
+					if (factoryMethodName in treeNode) {
+						if (!processedChildren) {
+							throw new ChildrenAnalyzerError(nonterminal.options.childrenAbsentErrorMessage)
 						}
-					} else if (nonterminal.specification.type === RepresentationFactorySite.UseSite) {
-						const { factory, ComponentType, childrenRepresentationReducer } = nonterminal.specification
-						if (ComponentType === undefined || node.type === ComponentType) {
-							return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
+						const factory = treeNode[factoryMethodName] as NonterminalRepresentationFactory<
+							any,
+							unknown,
+							AllNonterminalsRepresentation,
+							Environment
+						>
+						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
+					}
+				} else if (nonterminal.specification.type === RepresentationFactorySite.UseSite) {
+					const { factory, ComponentType, childrenRepresentationReducer } = nonterminal.specification
+					if (ComponentType === undefined || node.type === ComponentType) {
+						if (!processedChildren) {
+							throw new ChildrenAnalyzerError(nonterminal.options.childrenAbsentErrorMessage)
 						}
-					} else {
-						return assertNever(nonterminal.specification)
+						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
 					}
 				} else {
-					throw new ChildrenAnalyzerError(nonterminal.options.childrenAbsentErrorMessage)
+					return assertNever(nonterminal.specification)
 				}
 			}
 

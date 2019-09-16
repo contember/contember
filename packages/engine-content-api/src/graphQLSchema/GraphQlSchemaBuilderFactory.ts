@@ -164,6 +164,7 @@ export default class GraphQlSchemaBuilderFactory {
 			validationQueriesProvider,
 			mutationProvider,
 			this.graphqlObjectFactories,
+			validationSchemaTypeProvider,
 		)
 	}
 }

@@ -9,61 +9,77 @@ import { LockType } from './LockType'
 import { ConflictActionType } from './ConflictActionType'
 
 class Compiler {
-	compileSelect(options: SelectBuilder.Options, namespaceContext: Compiler.NamespaceContext): Literal {
-		return Literal.empty
-			.append(options.with.compile())
-			.appendString(' select')
-			.append(this.compileSelectStatement(options.select))
-			.append(this.compileFromStatement(options.from, namespaceContext))
-			.append(this.compileJoin(options.join, namespaceContext))
-			.append(options.where.compile())
-			.append(this.compileGrouping(options.grouping))
-			.append(this.compileOrderBy(options.orderBy))
-			.append(this.compileLimit(options.limit))
-			.append(this.compileLock(options.lock))
-			.trim()
+	compileSelect(options: SelectBuilder.Options, namespaceContext: Compiler.Context): Literal {
+		return this.finalizeLiteral(
+			Literal.empty
+				.append(options.with.compile(namespaceContext))
+				.appendString(' select')
+				.append(this.compileSelectStatement(options.select))
+				.append(this.compileFromStatement(options.from, namespaceContext))
+				.append(this.compileJoin(options.join, namespaceContext))
+				.append(options.where.compile())
+				.append(this.compileGrouping(options.grouping))
+				.append(this.compileOrderBy(options.orderBy))
+				.append(this.compileLimit(options.limit))
+				.append(this.compileLock(options.lock)),
+			namespaceContext,
+		)
 	}
 
-	compileDelete(options: DeleteBuilder.Options, namespaceContext: Compiler.NamespaceContext): Literal {
+	compileDelete(options: DeleteBuilder.Options, namespaceContext: Compiler.Context): Literal {
 		const { from, using, where, returning } = options
 		if (from === undefined) {
 			throw Error()
 		}
 
-		return Literal.empty
-			.append(options.with.compile())
-			.appendString(' delete from')
-			.append(this.prependSchema(from, namespaceContext))
-			.append(this.compileUsing(using, namespaceContext))
-			.append(where.compile())
-			.append(returning.compile())
-			.trim()
+		return this.finalizeLiteral(
+			Literal.empty
+				.append(options.with.compile(namespaceContext))
+				.appendString(' delete from')
+				.append(this.prependSchema(from, namespaceContext))
+				.append(this.compileUsing(using, namespaceContext))
+				.append(where.compile())
+				.append(returning.compile()),
+			namespaceContext,
+		)
 	}
 
-	compileInsert(options: InsertBuilder.ResolvedOptions, namespaceContext: Compiler.NamespaceContext): Literal {
-		return Literal.empty
-			.append(options.with.compile())
-			.appendString(' insert into ')
-			.append(this.compileIntoStatement(options.into, options.values, namespaceContext))
-			.append(options.from ? options.from : new Literal(' values ').append(this.createValues(options.values)))
-			.append(this.compileOnConflictStatement(options.onConflict))
-			.append(options.returning.compile())
-			.trim()
+	compileInsert(options: InsertBuilder.ResolvedOptions, namespaceContext: Compiler.Context): Literal {
+		return this.finalizeLiteral(
+			Literal.empty
+				.append(options.with.compile(namespaceContext))
+				.appendString(' insert into ')
+				.append(this.compileIntoStatement(options.into, options.values, namespaceContext))
+				.append(options.from ? options.from : new Literal(' values ').append(this.createValues(options.values)))
+				.append(this.compileOnConflictStatement(options.onConflict))
+				.append(options.returning.compile()),
+			namespaceContext,
+		)
 	}
 
-	compileUpdate(options: UpdateBuilder.ResolvedOptions, namespaceContext: Compiler.NamespaceContext): Literal {
-		return Literal.empty
-			.append(options.with.compile())
-			.appendString(' update ')
-			.append(this.prependSchema(options.table, namespaceContext))
-			.appendString(' set ')
-			.append(this.createSet(options.values))
-			.append(options.from || options.where.compile())
-			.append(options.returning.compile())
-			.trim()
+	compileUpdate(options: UpdateBuilder.ResolvedOptions, namespaceContext: Compiler.Context): Literal {
+		return this.finalizeLiteral(
+			Literal.empty
+				.append(options.with.compile(namespaceContext))
+				.appendString(' update ')
+				.append(this.prependSchema(options.table, namespaceContext))
+				.appendString(' set ')
+				.append(this.createSet(options.values))
+				.append(options.from || options.where.compile())
+				.append(options.returning.compile()),
+			namespaceContext,
+		)
 	}
 
-	private compileUsing(using: DeleteBuilder.Options['using'], namespaceContext: Compiler.NamespaceContext): Literal {
+	private finalizeLiteral(literal: Literal, context: Compiler.Context): Literal {
+		if (context.schema !== Compiler.SCHEMA_PLACEHOLDER) {
+			const sql = literal.sql.trim().replace(new RegExp(Compiler.SCHEMA_PLACEHOLDER, 'g'), context.schema)
+			return new Literal(sql, literal.parameters)
+		}
+		return literal.trim()
+	}
+
+	private compileUsing(using: DeleteBuilder.Options['using'], namespaceContext: Compiler.Context): Literal {
 		const usingEntries = Object.entries(using)
 		if (usingEntries.length === 0) {
 			return Literal.empty
@@ -117,7 +133,7 @@ class Compiler {
 		}
 	}
 
-	private compileJoin(join: SelectBuilder.Options['join'], namespaceContext: Compiler.NamespaceContext): Literal {
+	private compileJoin(join: SelectBuilder.Options['join'], namespaceContext: Compiler.Context): Literal {
 		return join.reduce((query, { table, alias, condition, type }) => {
 			const tableArg = aliasLiteral(this.prependSchema(table, namespaceContext), alias)
 			const conditionArg = condition || new Literal('true')
@@ -147,10 +163,7 @@ class Compiler {
 		return new Literal('*')
 	}
 
-	private compileFromStatement(
-		fromExpr: SelectBuilder.Options['from'],
-		namespaceContext: Compiler.NamespaceContext,
-	): Literal {
+	private compileFromStatement(fromExpr: SelectBuilder.Options['from'], namespaceContext: Compiler.Context): Literal {
 		if (!fromExpr) {
 			return Literal.empty
 		}
@@ -161,7 +174,7 @@ class Compiler {
 	private compileIntoStatement(
 		into: Exclude<InsertBuilder.Options['into'], undefined>,
 		values: Exclude<InsertBuilder.Options['values'], undefined>,
-		namespaceContext: Compiler.NamespaceContext,
+		namespaceContext: Compiler.Context,
 	): Literal {
 		return this.prependSchema(into, namespaceContext).appendAll(
 			Object.keys(values).map(it => new Literal(wrapIdentifier(it))),
@@ -218,15 +231,16 @@ class Compiler {
 		)
 	}
 
-	private prependSchema(tableExpression: string | Literal, { schema, cteAliases }: Compiler.NamespaceContext): Literal {
+	private prependSchema(tableExpression: string | Literal, { schema, cteAliases }: Compiler.Context): Literal {
 		return prependSchema(tableExpression, schema, cteAliases)
 	}
 }
 
 namespace Compiler {
-	export class NamespaceContext {
+	export class Context {
 		constructor(public readonly schema: string, public cteAliases: Set<string>) {}
 	}
+	export const SCHEMA_PLACEHOLDER = '__SCHEMA__'
 }
 
 export { Compiler }

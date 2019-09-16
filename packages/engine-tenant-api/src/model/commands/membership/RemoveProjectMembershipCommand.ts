@@ -1,4 +1,5 @@
 import { Command } from '../Command'
+import { DeleteBuilder } from '@contember/database'
 
 class RemoveProjectMembershipCommand implements Command<void> {
 	constructor(
@@ -8,15 +9,14 @@ class RemoveProjectMembershipCommand implements Command<void> {
 	) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
-		await db
-			.deleteBuilder()
+		await DeleteBuilder.create()
 			.where({
 				identity_id: this.identityId,
 				project_id: this.projectId,
 			})
 			.where(expr => expr.not(expr => expr.in('role', [...this.exceptRoles])))
 			.from('project_membership')
-			.execute()
+			.execute(db)
 	}
 }
 

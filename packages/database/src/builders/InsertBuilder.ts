@@ -10,29 +10,21 @@ import { ConflictActionType } from './ConflictActionType'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
 	implements With.Aware, QueryBuilder {
-	private constructor(
-		private readonly wrapper: Client,
-		private readonly options: InsertBuilder.Options,
-		private readonly cteAliases: string[],
-	) {}
+	private constructor(private readonly options: InsertBuilder.Options) {}
 
-	public static create(wrapper: Client): InsertBuilder.NewInsertBuilder {
-		return new InsertBuilder(
-			wrapper,
-			{
-				into: undefined,
-				with: new With.Statement({}),
-				values: undefined,
-				onConflict: undefined,
-				returning: new Returning(),
-				from: undefined,
-			},
-			[],
-		) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
+	public static create(): InsertBuilder.NewInsertBuilder {
+		return new InsertBuilder({
+			into: undefined,
+			with: new With.Statement({}),
+			values: undefined,
+			onConflict: undefined,
+			returning: new Returning(),
+			from: undefined,
+		}) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
 	}
 
 	public with(alias: string, expression: With.Expression): InsertBuilder.InsertBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression)))
+		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
 	}
 
 	public into(intoTable: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {
@@ -81,7 +73,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		return this.withOption('from', from)
 	}
 
-	public createQuery(): Literal {
+	public createQuery(context: Compiler.Context): Literal {
 		const values = this.options.values
 		const into = this.options.into
 
@@ -91,24 +83,21 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 
 		let from: Literal | undefined
 
-		const cteAliases = [...this.options.with.getAliases(), ...this.cteAliases]
 		if (this.options.from !== undefined) {
-			let queryBuilder: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create(this.wrapper).withCteAliases(
-				cteAliases,
-			)
+			let queryBuilder: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
 			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
 			queryBuilder = this.options.from(queryBuilder)
-			from = queryBuilder.createQuery()
+			from = queryBuilder.createQuery(context)
 		}
 
 		const compiler = new Compiler()
-		const namespaceContext = new Compiler.NamespaceContext(this.wrapper.schema, new Set(cteAliases))
-		return compiler.compileInsert({ ...this.options, values, into, from }, namespaceContext)
+		return compiler.compileInsert({ ...this.options, values, into, from }, context)
 	}
 
-	public async execute(): Promise<Result> {
-		const query = this.createQuery()
-		const result: Connection.Result = await this.wrapper.query(query.sql, query.parameters)
+	public async execute(db: Client): Promise<Result> {
+		const namespaceContext = new Compiler.Context(db.schema, new Set(this.options.with.getAliases()))
+		const query = this.createQuery(namespaceContext)
+		const result: Connection.Result = await db.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
 	}
 
@@ -116,15 +105,10 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		key: K,
 		value: V,
 	): InsertBuilder.InsertBuilderState<Result, Filled | K> {
-		return new InsertBuilder<Result, Filled | K>(
-			this.wrapper,
-			{ ...this.options, [key]: value },
-			this.cteAliases,
-		) as InsertBuilder.InsertBuilderState<Result, Filled | K>
-	}
-
-	public withCteAliases(aliases: string[]): InsertBuilder.InsertBuilderState<Result, Filled> {
-		return new InsertBuilder(this.wrapper, this.options, aliases) as InsertBuilder.InsertBuilderState<Result, Filled>
+		return new InsertBuilder<Result, Filled | K>({ ...this.options, [key]: value }) as InsertBuilder.InsertBuilderState<
+			Result,
+			Filled | K
+		>
 	}
 }
 

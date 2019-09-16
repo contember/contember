@@ -1,6 +1,6 @@
 import { resolveValue } from '../utils'
 import { Input, Model, Value } from '@contember/schema'
-import { Client } from '@contember/database'
+import { Client, InsertBuilder as DbInsertBuilder } from '@contember/database'
 import { Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
@@ -57,8 +57,7 @@ export default class InsertBuilder {
 			(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
 			{},
 		)
-		const qb = this.db
-			.insertBuilder()
+		const qb = DbInsertBuilder.create()
 			.with('root_', qb => {
 				return resolvedData.reduce(
 					(qb, value) =>
@@ -74,7 +73,7 @@ export default class InsertBuilder {
 			})
 			.returning(this.entity.primaryColumn)
 
-		const returning = await qb.execute()
+		const returning = await qb.execute(this.db)
 		if (returning === null) {
 			throw new NoResultError()
 		}

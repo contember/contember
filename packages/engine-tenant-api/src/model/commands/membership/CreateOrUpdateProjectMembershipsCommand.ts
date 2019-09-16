@@ -1,7 +1,7 @@
 import { Command } from '../Command'
 import { UpdateProjectMembershipVariablesCommand } from './UpdateProjectMembershipVariablesCommand'
 import { Membership } from '../../type/Membership'
-import { ConflictActionType } from '@contember/database'
+import { ConflictActionType, InsertBuilder } from '@contember/database'
 import { ImplementationException } from '../../../exceptions'
 
 class CreateOrUpdateProjectMembershipsCommand implements Command<void> {
@@ -14,8 +14,7 @@ class CreateOrUpdateProjectMembershipsCommand implements Command<void> {
 
 	async execute({ db, bus, providers }: Command.Args): Promise<void> {
 		for (const membership of this.memberships) {
-			const result = await db
-				.insertBuilder()
+			const result = await InsertBuilder.create()
 				.into('project_membership')
 				.values({
 					id: providers.uuid(),
@@ -28,7 +27,7 @@ class CreateOrUpdateProjectMembershipsCommand implements Command<void> {
 					role: membership.role,
 				})
 				.returning('id')
-				.execute()
+				.execute(db)
 			if (result.length !== 1) {
 				throw new ImplementationException()
 			}

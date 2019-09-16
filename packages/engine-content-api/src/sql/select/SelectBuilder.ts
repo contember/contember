@@ -4,7 +4,7 @@ import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import WhereBuilder from './WhereBuilder'
-import { SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import OrderByBuilder from './OrderByBuilder'
 import FieldsVisitorFactory from './handlers/FieldsVisitorFactory'
 import { LimitByGroupWrapper } from '@contember/database'
@@ -30,6 +30,7 @@ export default class SelectBuilder {
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },
+		private readonly db: Client,
 	) {
 		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
 		this.rows = this.createRowsPromise(blocker)
@@ -124,9 +125,9 @@ export default class SelectBuilder {
 	private async createRowsPromise(blocker: PromiseLike<void>): Promise<SelectHydrator.Rows> {
 		await blocker
 		if (this.queryWrapper) {
-			return await this.queryWrapper.getResult(this.qb)
+			return await this.queryWrapper.getResult(this.qb, this.db)
 		}
-		return await this.qb.getResult()
+		return await this.qb.getResult(this.db)
 	}
 
 	private async getColumnValues(columnPath: Path, columnName: string): Promise<Input.PrimaryValue[]> {

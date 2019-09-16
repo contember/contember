@@ -1,4 +1,4 @@
-import { DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
+import { DatabaseQueryable, DatabaseQuery, SelectBuilder, Operator } from '@contember/database'
 import { ApiKey } from '../type'
 
 class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
@@ -6,10 +6,9 @@ class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 		super()
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<ApiKeyByTokenQuery.Result> {
+	async fetch({ db }: DatabaseQueryable): Promise<ApiKeyByTokenQuery.Result> {
 		const tokenHash = ApiKey.computeTokenHash(this.token)
-		const rows = await queryable
-			.createSelectBuilder<ApiKeyByTokenQuery.Row>()
+		const rows = await SelectBuilder.create<ApiKeyByTokenQuery.Row>()
 			.select(['api_key', 'id'])
 			.select(['api_key', 'type'])
 			.select(['api_key', 'identity_id'])
@@ -24,7 +23,7 @@ class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 			.where({
 				token_hash: tokenHash,
 			})
-			.getResult()
+			.getResult(db)
 
 		return this.fetchOneOrNull(rows)
 	}

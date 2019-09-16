@@ -1,9 +1,8 @@
-import { DatabaseQueryable } from '@contember/database'
+import { SelectBuilder } from '@contember/database'
 import { StageWithId } from '../dtos/Stage'
 
-export const prepareStageQueryBuilder = (queryable: DatabaseQueryable) => {
-	return queryable
-		.createSelectBuilder<StageWithId>()
+export const prepareStageQueryBuilder = () => {
+	return SelectBuilder.create<StageWithId>()
 		.select('id')
 		.select('name')
 		.select('slug')

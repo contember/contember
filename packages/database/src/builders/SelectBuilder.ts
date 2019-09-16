@@ -18,14 +18,10 @@ export type SelectBuilderSpecification<OutputOptions extends keyof SelectBuilder
 
 class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder.Options = never>
 	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled | 'orderBy'>>, QueryBuilder {
-	constructor(
-		public readonly wrapper: Client,
-		public readonly options: SelectBuilder.Options,
-		private readonly cteAliases: Set<string> = new Set(),
-	) {}
+	constructor(public readonly options: SelectBuilder.Options) {}
 
-	public static create<Result = SelectBuilder.Result>(wrapper: Client) {
-		return new SelectBuilder<Result>(wrapper, {
+	public static create<Result = SelectBuilder.Result>() {
+		return new SelectBuilder<Result>({
 			from: undefined,
 			orderBy: [],
 			join: [],
@@ -42,10 +38,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	}
 
 	public with(alias: string, expression: With.Expression): SelectBuilder<Result, Filled | 'with'> {
-		return this.withOption(
-			'with',
-			this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression)),
-		).withCteAliases([...this.cteAliases.values(), alias])
+		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
 	}
 
 	public from(tableName: string | Literal, alias?: string): SelectBuilder<Result, Filled | 'from'> {
@@ -140,18 +133,18 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		return spec(this)
 	}
 
-	public async getResult(): Promise<Result[]> {
-		const query = this.createQuery()
-		const result: Connection.Result = await this.wrapper.query(query.sql, query.parameters, query.meta)
+	public async getResult(db: Client): Promise<Result[]> {
+		const namespaceContext = new Compiler.Context(db.schema, new Set(this.options.with.getAliases()))
+		const query = this.createQuery(namespaceContext)
+		const result: Connection.Result = await db.query(query.sql, query.parameters, query.meta)
 
 		return (result.rows as any) as Result[]
 	}
 
-	public createQuery(): Literal {
+	public createQuery(context: Compiler.Context): Literal {
 		const compiler = new Compiler()
 
-		const namespaceContext = new Compiler.NamespaceContext(this.wrapper.schema, this.cteAliases)
-		const compiled = compiler.compileSelect(this.options, namespaceContext)
+		const compiled = compiler.compileSelect(this.options, context)
 
 		return new Literal(compiled.sql, compiled.parameters, this.options.meta)
 	}
@@ -160,15 +153,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		key: K,
 		value: V,
 	): SelectBuilder<Result, Filled | K> {
-		return new SelectBuilder<Result, Filled | K>(
-			this.wrapper,
-			{ ...this.options, [key]: value },
-			this.cteAliases,
-		) as SelectBuilder<Result, Filled | K>
-	}
-
-	public withCteAliases(aliases: string[]): SelectBuilder<Result, Filled> {
-		return new SelectBuilder(this.wrapper, this.options, new Set(aliases))
+		return new SelectBuilder<Result, Filled | K>({ ...this.options, [key]: value }) as SelectBuilder<Result, Filled | K>
 	}
 }
 

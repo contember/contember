@@ -1,17 +1,16 @@
-import { Client } from '@contember/database'
+import { Client, UpdateBuilder } from '@contember/database'
 
 class UpdateStageEventCommand {
 	constructor(private readonly stageSlug: string, private readonly eventId: string) {}
 
 	public async execute(db: Client) {
-		await db
-			.updateBuilder()
+		await UpdateBuilder.create()
 			.table('stage')
 			.where({ slug: this.stageSlug })
 			.values({
 				event_id: this.eventId,
 			})
-			.execute()
+			.execute(db)
 	}
 }
 

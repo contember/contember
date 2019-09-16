@@ -1,5 +1,6 @@
 import { Command } from '../Command'
 import { RemoveProjectMemberErrorCode } from '../../../schema'
+import { DeleteBuilder } from '@contember/database'
 
 class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {}
@@ -9,11 +10,10 @@ class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.R
 			project_id: this.projectId,
 			identity_id: this.identityId,
 		}
-		const result = await db
-			.deleteBuilder()
+		const result = await DeleteBuilder.create()
 			.from('project_membership')
 			.where(memberWhere)
-			.execute()
+			.execute(db)
 
 		if (result === 0) {
 			return new RemoveProjectMemberCommand.RemoveProjectMemberResponseError([RemoveProjectMemberErrorCode.NotMember])

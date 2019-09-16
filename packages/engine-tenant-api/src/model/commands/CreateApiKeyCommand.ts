@@ -2,6 +2,7 @@ import { Command } from './Command'
 import { ApiKey } from '../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 import { Providers } from '../providers'
+import { InsertBuilder } from '@contember/database'
 
 class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 	private readonly type: ApiKey.Type
@@ -21,8 +22,7 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 		const token = await this.generateToken(providers)
 		const tokenHash = ApiKey.computeTokenHash(token)
 
-		await db
-			.insertBuilder()
+		await InsertBuilder.create()
 			.into('api_key')
 			.values({
 				id: apiKeyId,
@@ -34,7 +34,7 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 				expiration: this.expiration || null,
 				created_at: providers.now(),
 			})
-			.execute()
+			.execute(db)
 
 		return new CreateApiKeyCommand.Result(apiKeyId, token)
 	}

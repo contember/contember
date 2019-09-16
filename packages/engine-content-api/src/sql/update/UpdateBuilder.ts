@@ -2,9 +2,7 @@ import { tuple } from '../../utils'
 import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { resolveValue } from '../utils'
-import { Client, Operator } from '@contember/database'
-import { QueryBuilder } from '@contember/database'
-import { Value as DbValue } from '@contember/database'
+import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 
@@ -66,8 +64,7 @@ export default class UpdateBuilder {
 			return null
 		}
 
-		const qb = this.db
-			.updateBuilder()
+		const qb = DbUpdateBuilder.create()
 			.with('newData_', qb => {
 				qb = resolvedData.reduce(
 					(qb, value) =>
@@ -116,6 +113,6 @@ export default class UpdateBuilder {
 				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
 				return qb
 			})
-		return await qb.execute()
+		return await qb.execute(this.db)
 	}
 }

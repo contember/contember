@@ -1,15 +1,14 @@
-import { DatabaseQuery } from '@contember/database'
+import { DatabaseQuery, SelectBuilder } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
 
 class InitEventQuery extends DatabaseQuery<InitEventQuery.InitEvent> {
 	async fetch(queryable: DatabaseQueryable): Promise<InitEventQuery.InitEvent> {
 		return (
-			await queryable
-				.createSelectBuilder<InitEventQuery.InitEvent>()
+			await SelectBuilder.create<InitEventQuery.InitEvent>()
 				.from('event')
 				.select('id')
 				.where({ type: 'init' })
-				.getResult()
+				.getResult(queryable.db)
 		)[0]
 	}
 }

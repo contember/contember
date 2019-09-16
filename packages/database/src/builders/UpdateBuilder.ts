@@ -10,10 +10,10 @@ import { resolveValues } from './utils'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>>
 	implements With.Aware, Where.Aware, QueryBuilder {
-	private constructor(private readonly wrapper: Client, private readonly options: UpdateBuilder.Options) {}
+	private constructor(private readonly options: UpdateBuilder.Options) {}
 
-	public static create(wrapper: Client): UpdateBuilder.NewUpdateBuilder {
-		return new UpdateBuilder(wrapper, {
+	public static create(): UpdateBuilder.NewUpdateBuilder {
+		return new UpdateBuilder({
 			table: undefined,
 			with: new With.Statement({}),
 			values: undefined,
@@ -24,7 +24,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 	}
 
 	public with(alias: string, expression: With.Expression): UpdateBuilder.UpdateBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(this.wrapper, expression)))
+		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
 	}
 
 	public table(name: string): UpdateBuilder.UpdateBuilderState<Result, Filled | 'table'> {
@@ -52,7 +52,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		return this.withOption('where', this.options.where.withWhere(where))
 	}
 
-	public createQuery(): Literal {
+	public createQuery(context: Compiler.Context): Literal {
 		const values = this.options.values
 		const table = this.options.table
 
@@ -63,14 +63,11 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		let from: Literal | undefined
 		let where = this.options.where
 
-		const cteAliases = this.options.with.getAliases()
 		if (this.options.from !== undefined) {
-			let fromQb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create(this.wrapper).withCteAliases(
-				cteAliases,
-			)
+			let fromQb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
 			fromQb = this.options.from(fromQb)
 			fromQb = this.options.where.values.reduce((builder, value) => builder.where(value), fromQb)
-			const selectSql = fromQb.createQuery()
+			const selectSql = fromQb.createQuery(context)
 			if (!selectSql.sql.startsWith('select *')) {
 				throw new Error(`Query does not start with "select *": ${selectSql.sql}`)
 			}
@@ -79,13 +76,14 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		}
 
 		const compiler = new Compiler()
-		const namespaceContext = new Compiler.NamespaceContext(this.wrapper.schema, new Set(cteAliases))
-		return compiler.compileUpdate({ ...this.options, values, table, from, where }, namespaceContext)
+		return compiler.compileUpdate({ ...this.options, values, table, from, where }, context)
 	}
 
-	public async execute(): Promise<Result> {
-		const query = this.createQuery()
-		const result: Connection.Result = await this.wrapper.query(query.sql, query.parameters)
+	public async execute(db: Client): Promise<Result> {
+		const cteAliases = this.options.with.getAliases()
+		const namespaceContext = new Compiler.Context(db.schema, new Set(cteAliases))
+		const query = this.createQuery(namespaceContext)
+		const result: Connection.Result = await db.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)
 	}
 
@@ -93,7 +91,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		key: K,
 		value: V,
 	): UpdateBuilder.UpdateBuilderState<Result, Filled | K> {
-		return new UpdateBuilder<Result, Filled | K>(this.wrapper, {
+		return new UpdateBuilder<Result, Filled | K>({
 			...this.options,
 			[key]: value,
 		}) as UpdateBuilder.UpdateBuilderState<Result, Filled | K>

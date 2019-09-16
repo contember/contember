@@ -34,10 +34,7 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
-	const builder = new GraphQlSchemaBuilderFactory(graphqlObjectFactories, getArgumentValues).create(
-		test.schema,
-		permissions,
-	)
+	const builder = new GraphQlSchemaBuilderFactory(graphqlObjectFactories).create(test.schema, permissions)
 	const graphQLSchema = builder.build()
 
 	const connection = createConnectionMock(test.executes, (expected, actual, message) => {
@@ -51,10 +48,15 @@ export const execute = async (test: Test) => {
 		context: {
 			db: db,
 			identityVariables: test.variables || {},
-			executionContainer: new ExecutionContainerFactory(schema, permissions, {
-				uuid: createUuidGenerator(),
-				now: () => new Date('2019-09-04 12:00'),
-			}).create({
+			executionContainer: new ExecutionContainerFactory(
+				schema,
+				permissions,
+				{
+					uuid: createUuidGenerator(),
+					now: () => new Date('2019-09-04 12:00'),
+				},
+				getArgumentValues,
+			).create({
 				db,
 				identityVariables: test.variables || {},
 			}),

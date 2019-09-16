@@ -6,6 +6,8 @@ import InputValidator from '../input-validation/InputValidator'
 import ValidationResolver from './ValidationResolver'
 import { ConstraintViolation } from '../sql/Constraints'
 import { UserError } from './UserError'
+import { GraphQLResolveInfo } from 'graphql'
+import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { NoResultError } from '../sql/NoResultError'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
@@ -15,13 +17,17 @@ export default class MutationResolver {
 		private readonly mapper: Mapper,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly inputValidator: InputValidator,
+		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
 	) {}
 
 	public async resolveUpdate(
 		entity: Model.Entity,
 		input: Input.UpdateInput,
-		queryAst: ObjectNode<Input.UpdateInput>,
+		info: GraphQLResolveInfo,
 	): Promise<WithoutNode<Result.UpdateResult>> {
+		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
+			return path.length !== 1 || node.name.value === 'node'
+		})
 		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data, [])
 		if (validationResult.length > 0) {
 			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
@@ -47,8 +53,12 @@ export default class MutationResolver {
 	public async resolveCreate(
 		entity: Model.Entity,
 		input: Input.CreateInput,
-		queryAst: ObjectNode,
+		info: GraphQLResolveInfo,
 	): Promise<WithoutNode<Result.CreateResult>> {
+		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
+			return path.length !== 1 || node.name.value === 'node'
+		})
+
 		const validationResult = await this.inputValidator.validateCreate(entity, input.data, [], null)
 		if (validationResult.length > 0) {
 			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
@@ -71,7 +81,10 @@ export default class MutationResolver {
 		}
 	}
 
-	public async resolveDelete(entity: Model.Entity, input: Input.DeleteInput, queryAst: ObjectNode) {
+	public async resolveDelete(entity: Model.Entity, input: Input.DeleteInput, info: GraphQLResolveInfo) {
+		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
+			return path.length !== 1 || node.name.value === 'node'
+		})
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
 
 		const nodes = await this.resolveResultNodes(entity, whereExpanded, queryAst)

@@ -1,12 +1,12 @@
 import { BaseComponent, RepresentationFactorySite, TerminalRepresentationFactory, ValidFactoryName } from './types'
 
 class Terminal<
+	Environment = any,
 	FactoryMethodName extends ValidFactoryName = string,
-	Props extends {} = {},
 	Representation = any,
-	Environment = undefined
+	Props extends {} = {}
 > {
-	public readonly specification: Terminal.Specification<FactoryMethodName, Props, Representation, Environment>
+	public readonly specification: Terminal.Specification<FactoryMethodName, Representation, Props, Environment>
 
 	public constructor(factoryMethodName: FactoryMethodName)
 	public constructor(
@@ -35,8 +35,8 @@ class Terminal<
 namespace Terminal {
 	export type Specification<
 		FactoryMethodName extends ValidFactoryName,
-		Props extends {},
 		Representation,
+		Props extends {},
 		Environment
 	> =
 		| {

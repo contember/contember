@@ -8,24 +8,24 @@ import {
 } from './types'
 
 class Nonterminal<
+	Environment = undefined,
 	FactoryMethodName extends ValidFactoryName = string,
 	Props extends {} = {},
 	ChildrenRepresentation = any,
 	ReducedChildrenRepresentation = any,
-	Representation = any,
-	Environment = undefined
+	Representation = any
 > {
 	private static defaultOptions: NonterminalOptions = {
 		childrenAbsentErrorMessage: 'Component must have children!',
 	}
 
 	public readonly specification: Nonterminal.Specification<
+		Environment,
 		FactoryMethodName,
 		Props,
 		ChildrenRepresentation,
 		ReducedChildrenRepresentation,
-		Representation,
-		Environment
+		Representation
 	>
 
 	public readonly options: NonterminalOptions
@@ -69,12 +69,12 @@ class Nonterminal<
 
 namespace Nonterminal {
 	export type Specification<
+		Environment = any,
 		FactoryMethodName extends ValidFactoryName = string,
 		Props extends {} = {},
 		ChildrenRepresentation = any,
 		ReducedChildrenRepresentation = any,
-		Representation = any,
-		Environment = undefined
+		Representation = any
 	> =
 		| {
 				type: RepresentationFactorySite.DeclarationSite

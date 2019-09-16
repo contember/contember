@@ -12,7 +12,7 @@
 	},
 	"devDependencies": {
 		"@types/jasmine": "^3.4.0",
-		"@types/react": "^16.9.2",
+		"@types/react": "^16.9.1",
 		"jasmine": "^3.4.0",
 		"react": "^16.9.0",
 		"typescript": "^3.5.3"

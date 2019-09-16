@@ -182,6 +182,18 @@ type Mutation {
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  validation: _ValidationResult!
+  createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
+  deleteFrontPage(by: FrontPageUniqueWhere!): FrontPageDeleteResult!
+  updateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): FrontPageUpdateResult!
+  createVideo(data: VideoCreateInput!): VideoCreateResult!
+  deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
+  updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
 }
 
 enum One {
@@ -218,6 +230,20 @@ type Query {
   listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video]
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getFrontPage(by: FrontPageUniqueWhere!): FrontPage
+  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage]
+  validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
+  validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
+  getVideo(by: VideoUniqueWhere!): Video
+  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video]
+  validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
+  validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
   _info: Info
 }
 

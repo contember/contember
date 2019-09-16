@@ -5,12 +5,7 @@ import corsMiddleware from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
 import { Client } from '@contember/database'
 import { formatSchemaName } from '@contember/engine-system-api'
-import {
-	DatabaseTransactionMiddlewareFactory,
-	ProjectMemberMiddlewareFactory,
-	ProjectResolveMiddlewareFactory,
-	SetupSystemVariablesMiddlewareFactory,
-} from '../project-common'
+import { ProjectMemberMiddlewareFactory, ProjectResolveMiddlewareFactory } from '../project-common'
 import { StageResolveMiddlewareFactory } from './StageResolveMiddlewareFactory'
 import { NotModifiedMiddlewareFactory } from './NotModifiedMiddlewareFactory'
 
@@ -20,8 +15,6 @@ class ContentMiddlewareFactory {
 		private readonly stageFindMiddlewareFactory: StageResolveMiddlewareFactory,
 		private readonly authMiddlewareFactory: AuthMiddlewareFactory,
 		private readonly projectMemberMiddlewareFactory: ProjectMemberMiddlewareFactory,
-		private readonly databaseTransactionMiddlewareFactory: DatabaseTransactionMiddlewareFactory,
-		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory,
 		private readonly notModifiedMiddlewareFactory: NotModifiedMiddlewareFactory,
 	) {}
 
@@ -52,8 +45,6 @@ class ContentMiddlewareFactory {
 				this.notModifiedMiddlewareFactory.create(),
 				this.projectMemberMiddlewareFactory.create(),
 				assignDb,
-				this.databaseTransactionMiddlewareFactory.create(),
-				this.setupSystemVariablesMiddlewareFactory.create(),
 				contentApollo,
 			]),
 		)

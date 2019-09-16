@@ -7,11 +7,7 @@ import ObjectNode from '../../graphQlResolver/ObjectNode'
 import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 
 class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
-	constructor(
-		private readonly schema: Model.Schema,
-		private readonly mapperAccessor: Accessor<Mapper>,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
-	) {}
+	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
 	process(context: SelectExecutionHandler.Context): void {
 		const { addData, entity, field } = context
@@ -34,7 +30,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 				}
 				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ filter: whereWithParentId })
 
-				return this.mapperAccessor.get().select(targetEntity, newObjectNode, targetRelation.name)
+				return context.mapper.select(targetEntity, newObjectNode, targetRelation.name)
 			},
 			null,
 		)

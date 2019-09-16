@@ -6,6 +6,7 @@ import ValidationDataSelector from '../../../src/input-validation/ValidationData
 import { createMock } from '../../src/utils'
 import DependencyCollector from '../../../src/input-validation/DependencyCollector'
 import DependencyPruner from '../../../src/input-validation/DependencyPruner'
+import Mapper from '../../../src/sql/Mapper'
 
 type PrimaryValueExpectation = { entity: string; where: Input.UniqueWhere; result: Value.PrimaryValue }
 type SelectExpectation = {
@@ -16,7 +17,7 @@ type SelectExpectation = {
 }
 const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], selects: SelectExpectation[]) => {
 	return createMock<ValidationDataSelector>({
-		getPrimaryValue: async (entity: Model.Entity, where: Input.UniqueWhere) => {
+		getPrimaryValue: async (mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere) => {
 			const entry = primaryValues.shift()
 			//console.log(JSON.stringify({ entity: entity.name, where, result: undefined }))
 			if (!entry) {
@@ -27,6 +28,7 @@ const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], select
 			return entry.result
 		},
 		select: async (
+			mapper: Mapper,
 			entity: Model.Entity,
 			where: Input.UniqueWhere<never>,
 			dependencies: DependencyCollector.Dependencies,
@@ -72,10 +74,11 @@ const test = async (test: Test) => {
 		},
 	)
 	if ('createInput' in test) {
-		const result = await contextFactory.createForCreate(test.entity, test.createInput, test.dependencies)
+		const result = await contextFactory.createForCreate(null as any, test.entity, test.createInput, test.dependencies)
 		expect(result).toEqual(test.result)
 	} else {
 		const result = await contextFactory.createForUpdate(
+			null as any,
 			test.entity,
 			test.nodeInput,
 			test.updateInput,

@@ -1,12 +1,20 @@
 import { Input, Model, Result } from '@contember/schema'
 import { assertNever } from '../utils'
 import InputValidator from '../input-validation/InputValidator'
+import { Client } from '@contember/database'
+import Mapper from '../sql/Mapper'
 
 export default class ValidationResolver {
-	constructor(private readonly inputValidator: InputValidator) {}
+	constructor(
+		private readonly db: Client,
+		private readonly mapperFactory: Mapper.Factory,
+		private readonly inputValidator: InputValidator,
+	) {}
 
 	public async validateUpdate(entity: Model.Entity, input: Input.UpdateInput): Promise<Result.ValidationResult> {
-		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data, [])
+		const mapper = this.mapperFactory(this.db)
+		const validationResult = await this.inputValidator.validateUpdate(mapper, entity, input.by, input.data, [])
+
 		if (validationResult.length > 0) {
 			return ValidationResolver.createValidationResponse(validationResult)
 		}
@@ -17,7 +25,8 @@ export default class ValidationResolver {
 	}
 
 	public async validateCreate(entity: Model.Entity, input: Input.CreateInput): Promise<Result.ValidationResult> {
-		const validationResult = await this.inputValidator.validateCreate(entity, input.data, [], null)
+		const mapper = this.mapperFactory(this.db)
+		const validationResult = await this.inputValidator.validateCreate(mapper, entity, input.data, [], null)
 		if (validationResult.length > 0) {
 			return ValidationResolver.createValidationResponse(validationResult)
 		}

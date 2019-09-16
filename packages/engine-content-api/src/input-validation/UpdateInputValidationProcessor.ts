@@ -4,6 +4,7 @@ import { Input, Model, Value } from '@contember/schema'
 import InputValidator from './InputValidator'
 import ValidationDataSelector from './ValidationDataSelector'
 import { appendRelationToPath, ValidationPath } from './ValidationPath'
+import Mapper from '../sql/Mapper'
 
 type Result = any
 
@@ -15,6 +16,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		private readonly path: ValidationPath,
 		private readonly node: Value.Object,
 		private readonly dataSelector: ValidationDataSelector,
+		private readonly mapper: Mapper,
 	) {}
 
 	async column(context: Context.ColumnContext): Promise<Result> {
@@ -84,7 +86,13 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 	}) {
 		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 
-		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath, context.targetRelation)
+		return this.inputValidator.validateCreate(
+			this.mapper,
+			context.targetEntity,
+			context.input,
+			newPath,
+			context.targetRelation,
+		)
 	}
 
 	async processHasOneUpdate(context: {
@@ -102,7 +110,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		const where = {
 			[context.targetEntity.primary]: primary,
 		}
-		return this.inputValidator.validateUpdate(context.targetEntity, where, context.input, newPath)
+		return this.inputValidator.validateUpdate(this.mapper, context.targetEntity, where, context.input, newPath)
 	}
 
 	async processHasOneUpsert(context: {
@@ -115,6 +123,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		const relNode = this.node[context.relation.name] as Value.Object | undefined
 		if (!relNode) {
 			return this.inputValidator.validateCreate(
+				this.mapper,
 				context.targetEntity,
 				context.input.create,
 				newPath,
@@ -125,7 +134,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		const where = {
 			[context.targetEntity.primary]: primary,
 		}
-		return this.inputValidator.validateUpdate(context.targetEntity, where, context.input.update, newPath)
+		return this.inputValidator.validateUpdate(this.mapper, context.targetEntity, where, context.input.update, newPath)
 	}
 
 	async processManyManyUpdate(context: {
@@ -137,7 +146,13 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		alias?: string
 	}) {
 		const newPath = appendRelationToPath(this.path, context.relation.name, context)
-		return this.inputValidator.validateUpdate(context.targetEntity, context.input.where, context.input.data, newPath)
+		return this.inputValidator.validateUpdate(
+			this.mapper,
+			context.targetEntity,
+			context.input.where,
+			context.input.data,
+			newPath,
+		)
 	}
 
 	async processManyManyUpsert(context: {
@@ -148,10 +163,11 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		index: number
 		alias?: string
 	}) {
-		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, context.input.where)
+		const id = await this.dataSelector.getPrimaryValue(this.mapper, context.targetEntity, context.input.where)
 		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 		if (id) {
 			return this.inputValidator.validateUpdate(
+				this.mapper,
 				context.targetEntity,
 				{ [context.targetEntity.primary]: id },
 				context.input.update,
@@ -159,6 +175,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 			)
 		}
 		return this.inputValidator.validateCreate(
+			this.mapper,
 			context.targetEntity,
 			context.input.create,
 			newPath,
@@ -182,7 +199,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				[context.entity.primary]: this.node[context.entity.primary] as Value.PrimaryValue,
 			},
 		}
-		return this.inputValidator.validateUpdate(context.targetEntity, fullWhere, context.input.data, newPath)
+		return this.inputValidator.validateUpdate(this.mapper, context.targetEntity, fullWhere, context.input.data, newPath)
 	}
 
 	processOneManyUpsert = async (context: {
@@ -200,10 +217,11 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 				[context.entity.primary]: this.node[context.entity.primary] as Value.PrimaryValue,
 			},
 		}
-		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, fullWhere)
+		const id = await this.dataSelector.getPrimaryValue(this.mapper, context.targetEntity, fullWhere)
 		const newPath = appendRelationToPath(this.path, context.relation.name, context)
 		if (id) {
 			return this.inputValidator.validateUpdate(
+				this.mapper,
 				context.targetEntity,
 				{ [context.targetEntity.primary]: id },
 				context.input.update,
@@ -211,6 +229,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 			)
 		}
 		return this.inputValidator.validateCreate(
+			this.mapper,
 			context.targetEntity,
 			context.input.create,
 			newPath,

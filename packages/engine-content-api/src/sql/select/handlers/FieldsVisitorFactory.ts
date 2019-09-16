@@ -11,18 +11,17 @@ class FieldsVisitorFactory {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly junctionFetcher: JunctionFetcher,
-		private readonly mapperAccessor: Accessor<Mapper>,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
 	) {}
 
-	create(context: SelectExecutionHandler.Context): FieldsVisitor {
+	create(mapper: Mapper, context: SelectExecutionHandler.Context): FieldsVisitor {
 		return new FieldsVisitor(
 			this.schema,
 			this.junctionFetcher,
 			this.predicateFactory,
 			this.whereBuilder,
-			this.mapperAccessor.get(),
+			mapper,
 			context,
 		)
 	}

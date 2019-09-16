@@ -4,6 +4,7 @@ import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { Input, Model } from '@contember/schema'
 import SelectHydrator from './SelectHydrator'
 import { SelectBuilder } from '@contember/database'
+import Mapper from '../Mapper'
 
 interface SelectExecutionHandler<MetaArgs> {
 	process(context: SelectExecutionHandler.Context): void
@@ -13,6 +14,7 @@ namespace SelectExecutionHandler {
 	export type DataCallback = (ids: Input.PrimaryValue[]) => Promise<SelectHydrator.NestedData>
 
 	export interface Context {
+		mapper: Mapper
 		path: Path
 		field: ObjectNode | FieldNode
 		entity: Model.Entity

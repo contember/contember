@@ -8,6 +8,7 @@ import CreateInputContextFactoryProcessor from './CreateInputContextFactoryProce
 import UpdateInputContextFactoryProcessor from './UpdateInputContextFactoryProcessor'
 import ValidationContext from './ValidationContext'
 import DependencyPruner from './DependencyPruner'
+import Mapper from '../sql/Mapper'
 
 export default class ValidationContextFactory {
 	constructor(
@@ -18,6 +19,7 @@ export default class ValidationContextFactory {
 	) {}
 
 	public async createForCreate(
+		mapper: Mapper,
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
 		dependencies: DependencyCollector.Dependencies,
@@ -27,6 +29,7 @@ export default class ValidationContextFactory {
 			dependencies,
 			this.dataSelector,
 			this.providers,
+			mapper,
 		)
 		const visitor = new CreateInputVisitor(contextFactoryProcessor, this.model, data)
 
@@ -40,6 +43,7 @@ export default class ValidationContextFactory {
 	}
 
 	public async createForUpdate(
+		mapper: Mapper,
 		entity: Model.Entity,
 		input: { node: Value.Object } | { where: Input.UniqueWhere },
 		data: Input.UpdateDataInput,
@@ -47,12 +51,19 @@ export default class ValidationContextFactory {
 	): Promise<ValidationContext.NodeType | undefined> {
 		// const prunedDependencies = this.dependencyPruner.pruneDependencies(entity, dependencies, data)
 		const prunedDependencies = dependencies
-		const node = 'where' in input ? await this.dataSelector.select(entity, input.where, prunedDependencies) : input.node
+		const node =
+			'where' in input ? await this.dataSelector.select(mapper, entity, input.where, prunedDependencies) : input.node
 		if (!node) {
 			return undefined
 		}
 
-		const contextFactoryProcessor = new UpdateInputContextFactoryProcessor(node, this, dependencies, this.dataSelector)
+		const contextFactoryProcessor = new UpdateInputContextFactoryProcessor(
+			node,
+			this,
+			dependencies,
+			this.dataSelector,
+			mapper,
+		)
 		const visitor = new UpdateInputVisitor(contextFactoryProcessor, this.model, data)
 		await Promise.all(
 			Object.keys(dependencies).map(async field => {

@@ -51,8 +51,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 	}
 
 	public async execute(db: Client): Promise<Result> {
-		const cteAliases = new Set(this.options.with.getAliases())
-		const context = new Compiler.Context(db.schema, cteAliases)
+		const context = new Compiler.Context(db.schema, new Set())
 		const query = this.createQuery(context)
 		const result: Connection.Result = await db.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)

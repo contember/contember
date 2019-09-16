@@ -5,6 +5,7 @@ import ValidationContextFactory from './ValidationContextFactory'
 import DependencyCollector from './DependencyCollector'
 import ValidationDataSelector from './ValidationDataSelector'
 import { NoDataError, Providers, resolveColumnValue } from '@contember/schema-utils'
+import Mapper from '../sql/Mapper'
 
 type Result = any
 
@@ -14,6 +15,7 @@ export default class CreateInputContextFactoryProcessor implements CreateInputPr
 		private readonly dependencies: DependencyCollector.Dependencies,
 		private readonly dataSelector: ValidationDataSelector,
 		private readonly providers: Providers,
+		private readonly mapper: Mapper,
 	) {}
 
 	manyHasManyInversed: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInversedContext, Result> = {
@@ -50,12 +52,12 @@ export default class CreateInputContextFactoryProcessor implements CreateInputPr
 		input: Input.CreateDataInput
 	}) {
 		const dependency = this.dependencies[context.relation.name]
-		return this.validationContextFactory.createForCreate(context.targetEntity, context.input, dependency)
+		return this.validationContextFactory.createForCreate(this.mapper, context.targetEntity, context.input, dependency)
 	}
 
 	async processConnect(context: { targetEntity: Model.Entity; relation: Model.AnyRelation; input: Input.UniqueWhere }) {
 		const dependency = this.dependencies[context.relation.name]
-		return this.dataSelector.select(context.targetEntity, context.input, dependency)
+		return this.dataSelector.select(this.mapper, context.targetEntity, context.input, dependency)
 	}
 
 	async column(context: Context.ColumnContext): Promise<Result> {

@@ -10,12 +10,17 @@ import { GraphQLObjectType, GraphQLResolveInfo } from 'graphql'
 import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
 import { NoResultError } from '../sql/NoResultError'
+import { Client, Connection } from '@contember/database'
+import { MutationOperation, readMutationMeta } from '../graphQLSchema/MutationExtension'
+import { assertNever } from '@contember/utils'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
 export default class MutationResolver {
 	constructor(
-		private readonly mapper: Mapper,
+		private readonly db: Client,
+		private readonly mapperFactory: Mapper.Factory,
+		private readonly systemVariablesSetup: (db: Client) => Promise<void>,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly inputValidator: InputValidator,
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
@@ -32,51 +37,95 @@ export default class MutationResolver {
 		})
 		const fields = (info.returnType as GraphQLObjectType).getFields()
 
-		// todo: pre-validation
+		const prefixValidationErrors = (errors: Result.ValidationError[], field: string) =>
+			errors.map(it => ({
+				...it,
+				path: [{ __typename: '_FieldPathFragment', field }, ...it.path],
+			}))
 
-		const trxResult: Record<string, any> = {}
-
-		for (const field of queryAst.fields) {
-			if (!(field instanceof ObjectNode)) {
-				throw new ImplementationException()
-			}
-			const fieldConfig = fields[field.name]
-			const extra = fieldConfig.extensions || {}
-			if (!extra.operation || !extra.entity) {
-				throw new ImplementationException()
-			}
-			let result: { ok: boolean; validation?: Result.ValidationResult }
-			switch (extra.operation) {
-				case 'create':
-					result = await this.resolveCreateInternal(extra.entity, field)
-					break
-				case 'update':
-					result = await this.resolveUpdateInternal(extra.entity, field)
-					break
-				case 'delete':
-					result = await this.resolveDeleteInternal(extra.entity, field)
-					break
-				default:
+		return this.transaction(async (mapper, trx) => {
+			const validationResult: Record<string, { ok: boolean; validation?: Result.ValidationResult }> = {}
+			const validationErrors: Result.ValidationError[] = []
+			for (const field of queryAst.fields) {
+				if (!(field instanceof ObjectNode)) {
 					throw new ImplementationException()
-			}
-			if (!result.ok) {
-				return {
-					ok: false,
-					validation: result.validation
-						? {
-								valid: result.validation.valid,
-								errors: result.validation.errors.map(it => ({
-									...it,
-									path: [{ __typename: '_FieldPathFragment', field: field.alias }, ...it.path],
-								})),
-						  }
-						: { valid: true, errors: [] },
+				}
+				const fieldConfig = fields[field.name]
+				if (!fieldConfig) {
+					throw new ImplementationException()
+				}
+				const meta = readMutationMeta(fieldConfig.extensions)
+
+				const result: Result.ValidationResult | null = await (() => {
+					switch (meta.operation) {
+						case MutationOperation.create:
+							return this.validateCreate(mapper, meta.entity, field)
+						case MutationOperation.update:
+							return this.validateUpdate(mapper, meta.entity, field)
+						case MutationOperation.delete:
+							return null
+					}
+					return assertNever(meta.operation)
+				})()
+				if (result !== null) {
+					validationResult[field.alias] = { ok: false, validation: result }
+					validationErrors.push(...prefixValidationErrors(result.errors, field.alias))
+				} else {
+					validationResult[field.alias] = { ok: false, validation: { valid: true, errors: [] } }
 				}
 			}
-			trxResult[field.alias] = result
-		}
+			if (validationErrors.length) {
+				return {
+					ok: false,
+					validation: {
+						valid: false,
+						errors: validationErrors,
+					},
+					...validationResult,
+				}
+			}
 
-		return { ok: true, validation: { valid: true, errors: [] }, ...trxResult }
+			const trxResult: Record<string, { ok: boolean; validation?: Result.ValidationResult }> = {}
+			for (const field of queryAst.fields) {
+				if (!(field instanceof ObjectNode)) {
+					throw new ImplementationException()
+				}
+				const fieldConfig = fields[field.name]
+				if (!fieldConfig) {
+					throw new ImplementationException()
+				}
+				const meta = readMutationMeta(fieldConfig.extensions)
+
+				const result: { ok: boolean; validation?: Result.ValidationResult } = await (() => {
+					switch (meta.operation) {
+						case MutationOperation.create:
+							return this.resolveCreateInternal(mapper, meta.entity, field)
+						case MutationOperation.update:
+							return this.resolveUpdateInternal(mapper, meta.entity, field)
+						case MutationOperation.delete:
+							return this.resolveDeleteInternal(mapper, meta.entity, field)
+					}
+					return assertNever(meta.operation)
+				})()
+
+				if (!result.ok) {
+					return {
+						ok: false,
+						validation: result.validation
+							? {
+									valid: result.validation.valid,
+									errors: prefixValidationErrors(result.validation.errors, field.alias),
+							  }
+							: { valid: true, errors: [] },
+						...validationResult,
+						[field.alias]: result,
+					}
+				}
+				trxResult[field.alias] = result
+			}
+
+			return { ok: true, validation: { valid: true, errors: [] }, ...trxResult }
+		})
 	}
 
 	public async resolveUpdate(
@@ -84,26 +133,42 @@ export default class MutationResolver {
 		info: GraphQLResolveInfo,
 	): Promise<WithoutNode<Result.UpdateResult>> {
 		const queryAst = this.createQueryAst(info)
-		return await this.resolveUpdateInternal(entity, queryAst)
+		return this.transaction(async mapper => {
+			const validation = await this.validateUpdate(mapper, entity, queryAst)
+			if (validation !== null) {
+				return { ok: false, validation }
+			}
+			return await this.resolveUpdateInternal(mapper, entity, queryAst)
+		})
+	}
+
+	private async validateUpdate(
+		mapper: Mapper,
+		entity: Model.Entity,
+		queryAst: ObjectNode<Input.UpdateInput>,
+	): Promise<Result.ValidationResult | null> {
+		const input = queryAst.args
+		const validationResult = await this.inputValidator.validateUpdate(mapper, entity, input.by, input.data, [])
+		if (validationResult.length > 0) {
+			return ValidationResolver.createValidationResponse(validationResult)
+		}
+		return null
 	}
 
 	private async resolveUpdateInternal(
+		mapper: Mapper,
 		entity: Model.Entity,
 		queryAst: ObjectNode<Input.UpdateInput>,
 	): Promise<WithoutNode<Result.UpdateResult>> {
 		const input = queryAst.args
-		const validationResult = await this.inputValidator.validateUpdate(entity, input.by, input.data, [])
-		if (validationResult.length > 0) {
-			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
-		}
 		try {
-			await this.mapper.update(entity, input.by, input.data)
+			await mapper.update(entity, input.by, input.data)
 		} catch (e) {
 			return this.handleError(e)
 		}
 
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
-		const nodes = await this.resolveResultNodes(entity, whereExpanded, queryAst)
+		const nodes = await this.resolveResultNodes(mapper, entity, whereExpanded, queryAst)
 		return {
 			ok: true,
 			validation: {
@@ -119,27 +184,42 @@ export default class MutationResolver {
 		info: GraphQLResolveInfo,
 	): Promise<WithoutNode<Result.CreateResult>> {
 		const queryAst = this.createQueryAst(info)
+		return this.transaction(async mapper => {
+			const validation = await this.validateCreate(mapper, entity, queryAst)
+			if (validation !== null) {
+				return { ok: false, validation }
+			}
+			return await this.resolveCreateInternal(mapper, entity, queryAst)
+		})
+	}
 
-		return await this.resolveCreateInternal(entity, queryAst)
+	private async validateCreate(
+		mapper: Mapper,
+		entity: Model.Entity,
+		queryAst: ObjectNode<Input.CreateInput>,
+	): Promise<Result.ValidationResult | null> {
+		const input = queryAst.args
+		const validationResult = await this.inputValidator.validateCreate(mapper, entity, input.data, [], null)
+		if (validationResult.length > 0) {
+			return ValidationResolver.createValidationResponse(validationResult)
+		}
+		return null
 	}
 
 	private async resolveCreateInternal(
+		mapper: Mapper,
 		entity: Model.Entity,
 		queryAst: ObjectNode<Input.CreateInput>,
 	): Promise<WithoutNode<Result.CreateResult>> {
 		const input = queryAst.args
-		const validationResult = await this.inputValidator.validateCreate(entity, input.data, [], null)
-		if (validationResult.length > 0) {
-			return { ok: false, validation: ValidationResolver.createValidationResponse(validationResult) }
-		}
 		let primary: Input.PrimaryValue
 		try {
-			primary = await this.mapper.insert(entity, input.data)
+			primary = await mapper.insert(entity, input.data)
 		} catch (e) {
 			return this.handleError(e)
 		}
 
-		const nodes = await this.resolveResultNodes(entity, { [entity.primary]: { eq: primary } }, queryAst)
+		const nodes = await this.resolveResultNodes(mapper, entity, { [entity.primary]: { eq: primary } }, queryAst)
 		return {
 			ok: true,
 			validation: {
@@ -155,20 +235,23 @@ export default class MutationResolver {
 		info: GraphQLResolveInfo,
 	): Promise<WithoutNode<Result.DeleteResult>> {
 		const queryAst = this.createQueryAst(info)
-		return await this.resolveDeleteInternal(entity, queryAst)
+		return this.transaction(async mapper => {
+			return await this.resolveDeleteInternal(mapper, entity, queryAst)
+		})
 	}
 
 	private async resolveDeleteInternal(
+		mapper: Mapper,
 		entity: Model.Entity,
 		queryAst: ObjectNode<Input.DeleteInput>,
 	): Promise<WithoutNode<Result.DeleteResult>> {
 		const input = queryAst.args
 		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
 
-		const nodes = await this.resolveResultNodes(entity, whereExpanded, queryAst)
+		const nodes = await this.resolveResultNodes(mapper, entity, whereExpanded, queryAst)
 
 		try {
-			await this.mapper.delete(entity, queryAst.args.by)
+			await mapper.delete(entity, queryAst.args.by)
 		} catch (e) {
 			return this.handleError(e)
 		}
@@ -194,6 +277,7 @@ export default class MutationResolver {
 	}
 
 	private async resolveResultNodes(
+		mapper: Mapper,
 		entity: Model.Entity,
 		where: Input.Where,
 		queryAst: ObjectNode,
@@ -205,8 +289,24 @@ export default class MutationResolver {
 				throw new Error()
 			}
 			const objectWithArgs = singleNodeQuery.withArgs({ filter: where })
-			nodes[singleNodeQuery.alias] = (await this.mapper.select(entity, objectWithArgs))[0] || null
+			nodes[singleNodeQuery.alias] = (await mapper.select(entity, objectWithArgs))[0] || null
 		}
 		return nodes
+	}
+
+	private async transaction<R extends { ok: boolean }>(
+		cb: (mapper: Mapper, db: Client<Connection.TransactionLike>) => Promise<R>,
+	): Promise<R> {
+		return this.db.transaction(async trx => {
+			await trx.connection.query(Connection.REPEATABLE_READ)
+			await this.systemVariablesSetup(trx)
+			const mapper = this.mapperFactory(trx)
+
+			const result = await cb(mapper, trx)
+			if (!result.ok) {
+				trx.connection.rollback()
+			}
+			return result
+		})
 	}
 }

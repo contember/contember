@@ -27,16 +27,18 @@ export default class GraphQlSchemaBuilder {
 			}, {}),
 		}
 		mutations.transaction = {
-			type: this.graphqlObjectFactories.createObjectType({
-				name: 'MutationTransaction',
-				fields: {
-					ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
-					validation: {
-						type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+			type: this.graphqlObjectFactories.createNotNull(
+				this.graphqlObjectFactories.createObjectType({
+					name: 'MutationTransaction',
+					fields: {
+						ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
+						validation: {
+							type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+						},
+						...mutations,
 					},
-					...mutations,
-				},
-			}),
+				}),
+			),
 			resolve: async (parent, args, context: Context, info) => {
 				return await context.executionContainer.mutationResolver.resolveTransaction(info)
 			},

@@ -7,6 +7,5 @@ export interface Context {
 	db: Client
 	identityVariables: Acl.VariablesMap
 	executionContainer: Container<ExecutionContainer>
-	errorHandler: (errors: readonly any[]) => void
 	timer: <T>(event: string, cb?: () => T) => Promise<T>
 }

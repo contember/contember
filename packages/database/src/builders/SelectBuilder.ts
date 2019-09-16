@@ -134,7 +134,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	}
 
 	public async getResult(db: Client): Promise<Result[]> {
-		const namespaceContext = new Compiler.Context(db.schema, new Set(this.options.with.getAliases()))
+		const namespaceContext = new Compiler.Context(db.schema, new Set())
 		const query = this.createQuery(namespaceContext)
 		const result: Connection.Result = await db.query(query.sql, query.parameters, query.meta)
 

@@ -12,13 +12,13 @@ import { SelectBuilder } from '@contember/database'
 
 class JunctionFetcher {
 	constructor(
-		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderBuilder: OrderByBuilder,
 		private readonly predicateInjector: PredicatesInjector,
 	) {}
 
 	public async fetchJunction(
+		db: Client,
 		relation: Model.ManyHasManyOwnerRelation,
 		values: Input.PrimaryValue[],
 		column: Mapper.JoiningColumns,
@@ -59,7 +59,7 @@ class JunctionFetcher {
 			object.args.limit,
 		)
 
-		return await wrapper.getResult(qb, this.db)
+		return await wrapper.getResult(qb, db)
 	}
 }
 

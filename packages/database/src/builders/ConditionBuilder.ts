@@ -72,7 +72,7 @@ export class ConditionBuilder {
 	): ConditionBuilder {
 		if (!Array.isArray(values)) {
 			// todo: replace placeholder with some kind of callback
-			const query = values.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set([])))
+			const query = values.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set()))
 			return this.with(new Literal(`${toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
 		}
 		values = values.filter(it => it !== undefined)

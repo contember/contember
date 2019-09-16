@@ -21,7 +21,7 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 				>
 					{({ data, currentValue, onChange, isMutating, environment, errors }: SingleChoiceFieldMetadata) => (
 						<>
-							{!this.props.allowBlockTypeChange && (
+							{this.props.allowBlockTypeChange !== false && (
 								<SelectFieldInner
 									label={this.props.label}
 									data={data}

@@ -1,6 +1,6 @@
 import 'jasmine'
 import * as React from 'react'
-import { ChildrenAnalyzer, Nonterminal, RawNodeRepresentation, Terminal } from '../../../src'
+import { ChildrenAnalyzer, BranchNode, RawNodeRepresentation, Leaf } from '../../../src'
 
 interface FooComponentProps {
 	foo: string
@@ -37,12 +37,12 @@ enum Op {
 	Minus,
 	Times,
 }
-interface CalculatorNonterminalProps {
+interface CalculatorBranchNodeProps {
 	op: number
 	children: React.ReactNode
 }
-const CalculatorNonterminal = (props: CalculatorNonterminalProps) => null
-CalculatorNonterminal.compute = (props: CalculatorNonterminalProps, [operand1, operand2]: [number, number]) => {
+const CalculatorBranchNode = (props: CalculatorBranchNodeProps) => null
+CalculatorBranchNode.compute = (props: CalculatorBranchNodeProps, [operand1, operand2]: [number, number]) => {
 	if (props.op === Op.Plus) {
 		return operand1 + operand2
 	} else if (props.op === Op.Minus) {
@@ -58,26 +58,26 @@ const NumberComponent = (props: NumberComponentProps) => null
 
 const calculatorFormula = ( // 10 * ((5 - 3) + (2 * 6)) === 140
 	<>
-		<CalculatorNonterminal op={Op.Times}>
+		<CalculatorBranchNode op={Op.Times}>
 			<NumberComponent value={10} />
-			<CalculatorNonterminal op={Op.Plus}>
-				<CalculatorNonterminal op={Op.Minus}>
+			<CalculatorBranchNode op={Op.Plus}>
+				<CalculatorBranchNode op={Op.Minus}>
 					<NumberComponent value={5} />
 					<NumberComponent value={3} />
-				</CalculatorNonterminal>
-				<CalculatorNonterminal op={Op.Times}>
+				</CalculatorBranchNode>
+				<CalculatorBranchNode op={Op.Times}>
 					<NumberComponent value={2} />
 					<NumberComponent value={6} />
-				</CalculatorNonterminal>
-			</CalculatorNonterminal>
-		</CalculatorNonterminal>
+				</CalculatorBranchNode>
+			</CalculatorBranchNode>
+		</CalculatorBranchNode>
 	</>
 )
 
 describe('children analyzer', () => {
 	it('should gather children props', () => {
-		const fooTerminal = new Terminal((props: FooComponentProps): FooComponentProps => props)
-		const analyzer = new ChildrenAnalyzer<FooComponentProps>([fooTerminal])
+		const fooLeaf = new Leaf((props: FooComponentProps): FooComponentProps => props)
+		const analyzer = new ChildrenAnalyzer<FooComponentProps>([fooLeaf])
 
 		expect(analyzer.processChildren(simpleFooComponentTree, undefined)).toEqual([
 			{ foo: 'abc', baz: 123 },
@@ -85,16 +85,16 @@ describe('children analyzer', () => {
 			{ foo: 'ghi', baz: 789 },
 		])
 	})
-	it('should filter terminals by component type', () => {
-		const fooTerminal = new Terminal((props: FooComponentProps): FooComponentProps => props, FooComponent)
-		const barTerminal = new Terminal(
+	it('should filter leaves by component type', () => {
+		const fooLeaf = new Leaf((props: FooComponentProps): FooComponentProps => props, FooComponent)
+		const barLeaf = new Leaf(
 			(props: BarComponentProps): BarComponentProps => ({
 				bar: `${props.bar}${props.bar}`,
 				baz: props.baz + 1,
 			}),
 			BarComponent,
 		)
-		const analyzer = new ChildrenAnalyzer<FooComponentProps | BarComponentProps>([fooTerminal, barTerminal])
+		const analyzer = new ChildrenAnalyzer<FooComponentProps | BarComponentProps>([fooLeaf, barLeaf])
 
 		expect(analyzer.processChildren(simpleFooBarComponentTree, undefined)).toEqual([
 			{ foo: 'abc', baz: 123 },
@@ -102,9 +102,9 @@ describe('children analyzer', () => {
 			{ foo: 'ghi', baz: 789 },
 		])
 	})
-	it('should correctly process terminals & nonterminals', () => {
-		const numberTerminal = new Terminal((props: NumberComponentProps) => props.value, NumberComponent)
-		const calculatorNonterminal = new Nonterminal('compute', (children: RawNodeRepresentation<number, number>): [
+	it('should correctly process leaves & branch nodes', () => {
+		const numberLeaf = new Leaf((props: NumberComponentProps) => props.value, NumberComponent)
+		const calculatorBranchNode = new BranchNode('compute', (children: RawNodeRepresentation<number, number>): [
 			number,
 			number,
 		] => {
@@ -113,7 +113,7 @@ describe('children analyzer', () => {
 			}
 			return [children[0], children[1]]
 		})
-		const analyser = new ChildrenAnalyzer<number, number>([numberTerminal], [calculatorNonterminal])
+		const analyser = new ChildrenAnalyzer<number, number>([numberLeaf], [calculatorBranchNode])
 		expect(analyser.processChildren(calculatorFormula, undefined)).toEqual([140])
 	})
 })

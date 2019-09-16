@@ -1,6 +1,6 @@
 export * from './types'
 
-export * from './Nonterminal'
-export * from './NonterminalOptions'
+export * from './BranchNode'
+export * from './BranchNodeOptions'
+export * from './Leaf'
 export * from './RawNodeRepresentation'
-export * from './Terminal'

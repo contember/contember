@@ -1,20 +1,20 @@
-import { BaseComponent, RepresentationFactorySite, TerminalRepresentationFactory, ValidFactoryName } from './types'
+import { BaseComponent, RepresentationFactorySite, LeafRepresentationFactory, ValidFactoryName } from './types'
 
-class Terminal<
+class Leaf<
 	Environment = any,
 	FactoryMethodName extends ValidFactoryName = string,
 	Representation = any,
 	Props extends {} = {}
 > {
-	public readonly specification: Terminal.Specification<FactoryMethodName, Representation, Props, Environment>
+	public readonly specification: Leaf.Specification<FactoryMethodName, Representation, Props, Environment>
 
 	public constructor(factoryMethodName: FactoryMethodName)
 	public constructor(
-		staticFactory: TerminalRepresentationFactory<Props, Representation, Environment>,
+		staticFactory: LeafRepresentationFactory<Props, Representation, Environment>,
 		ComponentType?: BaseComponent<Props>,
 	)
 	public constructor(
-		factory: FactoryMethodName | TerminalRepresentationFactory<Props, Representation, Environment>,
+		factory: FactoryMethodName | LeafRepresentationFactory<Props, Representation, Environment>,
 		ComponentType?: BaseComponent<Props>,
 	) {
 		if (typeof factory === 'function') {
@@ -32,7 +32,7 @@ class Terminal<
 	}
 }
 
-namespace Terminal {
+namespace Leaf {
 	export type Specification<
 		FactoryMethodName extends ValidFactoryName,
 		Representation,
@@ -45,9 +45,9 @@ namespace Terminal {
 		  }
 		| {
 				type: RepresentationFactorySite.UseSite
-				factory: TerminalRepresentationFactory<Props, Representation, Environment>
+				factory: LeafRepresentationFactory<Props, Representation, Environment>
 				ComponentType?: BaseComponent<Props>
 		  }
 }
 
-export { Terminal }
+export { Leaf }

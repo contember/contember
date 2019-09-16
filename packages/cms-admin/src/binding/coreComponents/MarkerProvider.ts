@@ -6,7 +6,7 @@ export interface NamedComponent {
 }
 
 export interface EnvironmentDeltaProvider<P extends {} = any> {
-	generateEnvironmentDelta: (props: P, oldEnvironment: Environment) => Partial<Environment.NameStore>
+	generateEnvironment: (props: P, oldEnvironment: Environment) => Environment
 }
 
 export interface FieldMarkerProvider<P extends {} = any> {

@@ -13,6 +13,7 @@
 		"@blueprintjs/icons": "^3.0.0",
 		"@blueprintjs/select": "^3.0.0",
 		"@blueprintjs/table": "^3.0.0",
+		"@contember/react-multipass-rendering": "^0.0.0",
 		"@contember/schema": "^0.0.0",
 		"@contember/ui": "^0.0.0",
 		"@contember/utils": "^0.0.0",

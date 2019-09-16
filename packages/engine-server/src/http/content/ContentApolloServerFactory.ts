@@ -9,6 +9,7 @@ import { KoaContext } from '../../core/koa'
 import { DatabaseTransactionMiddlewareFactory, ProjectMemberMiddlewareFactory } from '../project-common'
 import { ContentApolloMiddlewareFactory } from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
+import { getArgumentValues } from 'graphql/execution/values'
 import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
 import { extractOriginalError } from '../../core/graphql/errorExtract'
 import uuid from 'uuid'
@@ -71,10 +72,15 @@ class ContentApolloServerFactory {
 					db: ctx.state.db,
 					identityVariables: flattenVariables(ctx.state.projectMemberships),
 				}
-				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions, {
-					uuid: () => uuid.v4(),
-					now: () => new Date(),
-				}).create(partialContext)
+				const executionContainer = new ExecutionContainerFactory(
+					ctx.state.schema,
+					ctx.state.permissions,
+					{
+						uuid: () => uuid.v4(),
+						now: () => new Date(),
+					},
+					getArgumentValues,
+				).create(partialContext)
 				return {
 					...partialContext,
 					executionContainer,

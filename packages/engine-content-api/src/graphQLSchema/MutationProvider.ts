@@ -22,7 +22,6 @@ export default class MutationProvider {
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
-		private readonly queryAstAFactory: GraphQlQueryAstFactory,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 		private readonly validationSchemaTypeProvider: ValidationSchemaTypeProvider,
 	) {}
@@ -52,9 +51,7 @@ export default class MutationProvider {
 				context.executionContainer.get('mutationResolver').resolveCreate(
 					entity,
 					args,
-					this.queryAstAFactory.create(info, (node, path) => {
-						return path.length !== 1 || node.name.value === 'node'
-					}),
+					info,
 				),
 		}
 	}
@@ -75,9 +72,7 @@ export default class MutationProvider {
 				context.executionContainer.get('mutationResolver').resolveDelete(
 					entity,
 					args,
-					this.queryAstAFactory.create(info, (node, path) => {
-						return path.length !== 1 || node.name.value === 'node'
-					}),
+					info
 				),
 		}
 	}
@@ -101,9 +96,7 @@ export default class MutationProvider {
 				context.executionContainer.get('mutationResolver').resolveUpdate(
 					entity,
 					args,
-					this.queryAstAFactory.create(info, (node, path) => {
-						return path.length !== 1 || node.name.value === 'node'
-					}),
+					info,
 				),
 		}
 	}

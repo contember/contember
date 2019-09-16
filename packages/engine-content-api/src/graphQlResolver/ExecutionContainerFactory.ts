@@ -34,6 +34,8 @@ import ValidationDataSelector from '../input-validation/ValidationDataSelector'
 import ValidationResolver from './ValidationResolver'
 import DependencyPruner from '../input-validation/DependencyPruner'
 import { Providers } from '@contember/schema-utils'
+import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
+import { getArgumentValues } from 'graphql/execution/values'
 
 export interface ExecutionContainer {
 	readResolver: ReadResolver
@@ -46,6 +48,7 @@ export class ExecutionContainerFactory {
 		private readonly schema: Schema,
 		private readonly permissions: Acl.Permissions,
 		private readonly providers: Providers,
+		private readonly argumentValuesResolver: typeof getArgumentValues,
 	) {}
 
 	public create(context: Pick<Context, 'db' | 'identityVariables'>): Container<ExecutionContainer> {
@@ -197,8 +200,8 @@ export class ExecutionContainerFactory {
 					return mapper
 				},
 			)
-
-			.addService('readResolver', ({ mapper, uniqueWhereExpander }) => new ReadResolver(mapper, uniqueWhereExpander))
+			.addService('queryAstFactory', () => new GraphQlQueryAstFactory(this.argumentValuesResolver))
+			.addService('readResolver', ({ mapper, queryAstFactory }) => new ReadResolver(mapper, queryAstFactory))
 			.addService('validationDependencyCollector', () => new DependencyCollector())
 			.addService('validationQueryAstFactory', () => new QueryAstFactory(this.schema.model))
 			.addService(
@@ -225,8 +228,8 @@ export class ExecutionContainerFactory {
 			)
 			.addService(
 				'mutationResolver',
-				({ mapper, uniqueWhereExpander, inputValidator }) =>
-					new MutationResolver(mapper, uniqueWhereExpander, inputValidator),
+				({ mapper, uniqueWhereExpander, inputValidator, queryAstFactory }) =>
+					new MutationResolver(mapper, uniqueWhereExpander, inputValidator, queryAstFactory),
 			)
 			.addService('validationResolver', ({ inputValidator }) => new ValidationResolver(inputValidator))
 

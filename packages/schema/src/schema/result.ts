@@ -13,6 +13,16 @@ namespace Result {
 		node: Value.Object | null
 	}
 
+	export interface DeleteResult {
+		ok: boolean
+		node: Value.Object | null
+	}
+
+	export interface TransactionResult {
+		ok: boolean
+		validation: ValidationResult
+	}
+
 	export interface ValidationResult {
 		valid: boolean
 		errors: ValidationError[]

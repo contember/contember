@@ -47,12 +47,13 @@ export default class MutationProvider {
 			args: {
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveCreate(
-					entity,
-					args,
-					info,
-				),
+			extensions: { entity, operation: 'create' },
+			resolve: (parent, args, context: Context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('mutationResolver').resolveCreate(entity, info)
+			},
 		}
 	}
 
@@ -68,12 +69,13 @@ export default class MutationProvider {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
 			},
-			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveDelete(
-					entity,
-					args,
-					info
-				),
+			extensions: { entity, operation: 'delete' },
+			resolve: (parent, args, context: Context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('mutationResolver').resolveDelete(entity, info)
+			},
 		}
 	}
 
@@ -92,12 +94,13 @@ export default class MutationProvider {
 				},
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveUpdate(
-					entity,
-					args,
-					info,
-				),
+			extensions: { entity, operation: 'update' },
+			resolve: (parent, args, context: Context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('mutationResolver').resolveUpdate(entity, info)
+			},
 		}
 	}
 

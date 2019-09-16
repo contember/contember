@@ -4,6 +4,8 @@ import MutationProvider from './MutationProvider'
 import QueryProvider from './QueryProvider'
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { Context } from '../types'
+import { ValidationSchemaTypeProvider } from './ValidationSchemaTypeProvider'
 
 export default class GraphQlSchemaBuilder {
 	constructor(
@@ -12,6 +14,7 @@ export default class GraphQlSchemaBuilder {
 		private readonly validationQueriesProvider: ValidationQueriesProvider,
 		private readonly mutationProvider: MutationProvider,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
+		private readonly validationSchemaTypeProvider: ValidationSchemaTypeProvider,
 	) {}
 
 	public build(): GraphQLSchema {
@@ -23,6 +26,21 @@ export default class GraphQlSchemaBuilder {
 				}
 			}, {}),
 		}
+		mutations.transaction = {
+			type: this.graphqlObjectFactories.createObjectType({
+				name: 'MutationTransaction',
+				fields: {
+					ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
+					validation: {
+						type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+					},
+					...mutations,
+				},
+			}),
+			resolve: async (parent, args, context: Context, info) => {
+				return await context.executionContainer.mutationResolver.resolveTransaction(info)
+			},
+		}
 
 		const queries = Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
 			return {
@@ -31,6 +49,15 @@ export default class GraphQlSchemaBuilder {
 				...queries,
 			}
 		}, {})
+		queries.transaction = {
+			type: this.graphqlObjectFactories.createObjectType({
+				name: 'QueryTransaction',
+				fields: queries,
+			}),
+			resolve: async (parent, args, context: Context, info) => {
+				return await context.executionContainer.readResolver.resolveTransaction(info)
+			},
+		}
 
 		queries['_info'] = {
 			type: this.graphqlObjectFactories.createObjectType({

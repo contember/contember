@@ -37,8 +37,12 @@ export default class QueryProvider {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
 			},
-			resolve: (parent, args, context, info) =>
-				context.executionContainer.get('readResolver').resolveGetQuery(entity, info),
+			resolve: (parent, args, context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('readResolver').resolveGetQuery(entity, info)
+			},
 		}
 	}
 
@@ -57,8 +61,12 @@ export default class QueryProvider {
 				offset: { type: this.graphqlObjectFactories.int },
 				limit: { type: this.graphqlObjectFactories.int },
 			},
-			resolve: (parent, args, context, info) =>
-				context.executionContainer.get('readResolver').resolveListQuery(entity, info),
+			resolve: (parent, args, context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('readResolver').resolveListQuery(entity, info)
+			},
 		}
 	}
 }

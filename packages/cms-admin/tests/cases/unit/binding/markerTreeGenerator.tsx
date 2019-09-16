@@ -20,12 +20,12 @@ describe('Marker tree generator', () => {
 	it('should reject top-level fields and relations', () => {
 		const topOne = (
 			<ToOne field="foo">
-				<></>
+				<Field name="bar" />
 			</ToOne>
 		)
 		const topMany = (
 			<ToMany field="foo">
-				<></>
+				<Field name="bar" />
 			</ToMany>
 		)
 		const topField = <Field name="foo" />

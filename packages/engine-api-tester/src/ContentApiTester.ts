@@ -42,6 +42,7 @@ export class ContentApiTester {
 				now: () => new Date('2019-09-04 12:00'),
 			},
 			getArgumentValues,
+			() => Promise.resolve(),
 		).create({
 			db,
 			identityVariables: {},
@@ -50,7 +51,6 @@ export class ContentApiTester {
 			db,
 			identityVariables: {},
 			executionContainer,
-			errorHandler: () => null,
 			timer: async (label, cb) => (cb ? await cb() : (undefined as any)),
 		}
 		const result = await graphql(gqlSchema, gql, null, context, variables)

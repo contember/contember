@@ -38,6 +38,17 @@ type Mutation {
   updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
   deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  validation: _ValidationResult!
+  createRoot(data: RootCreateInput!): RootCreateResult!
+  deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
+  updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
+  createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
 }
 
 type OneHasManyEntity {
@@ -112,6 +123,19 @@ type Query {
   getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
   validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getRoot(by: RootUniqueWhere!): Root
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
+  validateCreateRoot(data: RootCreateInput!): _ValidationResult!
+  validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
+  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
+  validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
+  transaction: QueryTransaction
   _info: Info
 }
 

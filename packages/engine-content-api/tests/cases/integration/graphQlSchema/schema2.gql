@@ -35,6 +35,14 @@ type Info {
 type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  validation: _ValidationResult!
+  createTest(data: TestCreateInput!): TestCreateResult!
+  updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
 }
 
 enum OrderDirection {
@@ -47,6 +55,16 @@ type Query {
   listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
   validateCreateTest(data: TestCreateInput!): _ValidationResult!
   validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getTest(by: TestUniqueWhere!): Test
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
+  validateCreateTest(data: TestCreateInput!): _ValidationResult!
+  validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
   _info: Info
 }
 

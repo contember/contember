@@ -120,6 +120,8 @@ namespace Connection {
 			selfDuration: number
 		}
 	}
+
+	export const REPEATABLE_READ = 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ'
 }
 
 export { Connection }

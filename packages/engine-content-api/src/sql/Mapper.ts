@@ -14,7 +14,7 @@ import PredicatesInjector from '../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
 import DeleteExecutor from './delete/DeleteExecutor'
-import { SelectBuilder } from '@contember/database'
+import { Client, SelectBuilder } from '@contember/database'
 import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
 import SqlUpdateInputProcessor from './update/SqlUpdateInputProcessor'
 import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
@@ -25,7 +25,7 @@ import { OrderByHelper } from './select/OrderByHelper'
 class Mapper {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly db: database.Client,
+		public readonly db: database.Client,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
@@ -115,8 +115,8 @@ class Mapper {
 		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
-		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, inputWithOrder), path, groupBy)
-		const rows = await selector.execute()
+		const selectPromise = selector.select(this, entity, this.predicatesInjector.inject(entity, inputWithOrder), path, groupBy)
+		const rows = await selector.execute(this.db)
 		await selectPromise
 
 		return rows
@@ -137,7 +137,7 @@ class Mapper {
 		const promise = Promise.all(Object.values(promises).filter((it: any) => !!it))
 
 		try {
-			const result = await insertBuilder.execute()
+			const result = await insertBuilder.execute(this.db)
 			await promise
 
 			return result
@@ -162,7 +162,7 @@ class Mapper {
 		const updateVisitor = new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, this)
 		const visitor = new UpdateInputVisitor(updateVisitor, this.schema, data)
 		const promises = acceptEveryFieldVisitor<any>(this.schema, entity, visitor)
-		const executeResult = updateBuilder.execute()
+		const executeResult = updateBuilder.execute(this.db)
 
 		await Promise.all(Object.values(promises).filter((it: any) => !!it))
 
@@ -180,7 +180,7 @@ class Mapper {
 
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
 		try {
-			await this.deleteExecutor.execute(entity, where)
+			await this.deleteExecutor.execute(this.db, entity, where)
 		} catch (e) {
 			return this.handleError(e)
 		}
@@ -192,7 +192,7 @@ class Mapper {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
-		await this.junctionTableManager.connectJunction(owningEntity, relation, ownerUnique, inversedUnique)
+		await this.junctionTableManager.connectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
 	public async disconnectJunction(
@@ -201,7 +201,7 @@ class Mapper {
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
-		await this.junctionTableManager.disconnectJunction(owningEntity, relation, ownerUnique, inversedUnique)
+		await this.junctionTableManager.disconnectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
 	}
 
 	public async getPrimaryValue(
@@ -231,6 +231,8 @@ class Mapper {
 
 namespace Mapper {
 	export type JoiningColumns = { sourceColumn: Model.JoiningColumn; targetColumn: Model.JoiningColumn }
+
+	export type Factory = (db: Client) => Mapper
 }
 
 export default Mapper

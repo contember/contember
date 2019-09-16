@@ -11,6 +11,8 @@ import {
 	SchemaMigrator,
 	SchemaVersionBuilder,
 	SystemContainerFactory,
+	SystemExecutionContainer,
+	Providers as SystemProviders,
 } from '@contember/engine-system-api'
 import { DatabaseCredentials, MigrationFilesManager } from '@contember/engine-common'
 import {
@@ -133,8 +135,6 @@ class CompositionRoot {
 					projectMemberMiddlewareFactory,
 					projectResolveMiddlewareFactory,
 					stageResolveMiddlewareFactory,
-					databaseTransactionMiddlewareFactory,
-					setupSystemVariablesMiddlewareFactory,
 					notModifiedMiddlewareFactory,
 				}) =>
 					new ContentMiddlewareFactory(
@@ -142,8 +142,6 @@ class CompositionRoot {
 						stageResolveMiddlewareFactory,
 						authMiddlewareFactory,
 						projectMemberMiddlewareFactory,
-						databaseTransactionMiddlewareFactory,
-						setupSystemVariablesMiddlewareFactory,
 						notModifiedMiddlewareFactory,
 					),
 			)

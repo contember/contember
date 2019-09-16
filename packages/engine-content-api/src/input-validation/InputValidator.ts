@@ -17,6 +17,7 @@ import { evaluateValidation } from './ValidationEvaluation'
 import { ValidationPath } from './ValidationPath'
 import NotNullFieldsVisitor from './NotNullFieldsVisitor'
 import { filterObject } from '../utils/object'
+import Mapper from '../sql/Mapper'
 
 class InputValidator {
 	constructor(
@@ -152,6 +153,7 @@ class InputValidator {
 	}
 
 	async validateCreate(
+		mapper: Mapper,
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
 		path: ValidationPath = [],
@@ -173,12 +175,12 @@ class InputValidator {
 		})
 
 		const context = ValidationContext.createRootContext(
-			await this.validationContextFactory.createForCreate(entity, data, dependencies),
+			await this.validationContextFactory.createForCreate(mapper, entity, data, dependencies),
 		)
 
 		const fieldsResult = this.validateFields(fieldsWithRules, entityRules, context, path)
 
-		const processor = new CreateInputValidationProcessor(this, path)
+		const processor = new CreateInputValidationProcessor(this, path, mapper)
 		const visitor = new CreateInputVisitor(processor, this.model, data)
 		const relationResult = await this.validateRelations(entity, visitor)
 
@@ -186,6 +188,7 @@ class InputValidator {
 	}
 
 	async validateUpdate(
+		mapper: Mapper,
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
@@ -209,13 +212,14 @@ class InputValidator {
 		const fieldsWithRules = this.getFieldsWithRules(entity, Object.keys(data), data)
 
 		let fieldsResult: InputValidator.Result = []
-		const node = (await this.validationContextFactory.createForUpdate(entity, { where }, data, dependencies)) || {}
+		const node =
+			(await this.validationContextFactory.createForUpdate(mapper, entity, { where }, data, dependencies)) || {}
 		if (fieldsWithRules.length > 0) {
 			const context = ValidationContext.createRootContext(node)
 			fieldsResult = this.validateFields(fieldsWithRules, entityRules, context, path)
 		}
 
-		const processor = new UpdateInputValidationProcessor(this, path, node, this.validationDataSelector)
+		const processor = new UpdateInputValidationProcessor(this, path, node, this.validationDataSelector, mapper)
 		const visitor = new UpdateInputVisitor(processor, this.model, data)
 		const relationResult = await this.validateRelations(entity, visitor)
 

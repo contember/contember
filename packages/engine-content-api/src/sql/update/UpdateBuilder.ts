@@ -14,7 +14,7 @@ type ColumnValue = {
 
 export default class UpdateBuilder {
 	public readonly update: Promise<number | null>
-	private firer: () => void = () => {
+	private firer: (db: Client) => void = () => {
 		throw new Error()
 	}
 
@@ -26,16 +26,15 @@ export default class UpdateBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
-		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly uniqueWhere: Input.Where,
 	) {
-		const blocker: Promise<void> = new Promise(resolver => (this.firer = resolver))
+		const blocker: Promise<Client> = new Promise(resolver => (this.firer = resolver))
 		this.update = this.createUpdatePromise(blocker)
 	}
 
-	public async execute(): Promise<number | null> {
-		this.firer()
+	public async execute(db: Client): Promise<number | null> {
+		this.firer(db)
 		return this.update
 	}
 
@@ -53,8 +52,8 @@ export default class UpdateBuilder {
 		this.oldWhere = { and: [where, this.oldWhere] }
 	}
 
-	private async createUpdatePromise(blocker: PromiseLike<void>) {
-		await blocker
+	private async createUpdatePromise(blocker: PromiseLike<Client>) {
+		const db = await blocker
 
 		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
 		const resolvedData = this.rowData
@@ -113,6 +112,6 @@ export default class UpdateBuilder {
 				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
 				return qb
 			})
-		return await qb.execute(this.db)
+		return await qb.execute(db)
 	}
 }

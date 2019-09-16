@@ -71,7 +71,7 @@ describe('update', () => {
 		})
 	})
 
-	describe('many has one (post and author)', () => {
+	describe('many has one post and author', () => {
 		const postWithAuthor = new SchemaBuilder()
 			.entity('Post', e =>
 				e
@@ -133,7 +133,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -172,7 +171,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -219,7 +217,6 @@ describe('update', () => {
 							parameters: ['John', testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -265,7 +262,6 @@ describe('update', () => {
 							parameters: ['Jack', testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -323,7 +319,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -361,7 +356,6 @@ describe('update', () => {
 							parameters: [null, testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -427,7 +421,6 @@ describe('update', () => {
 							parameters: [],
 							response: 1,
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -504,7 +497,6 @@ describe('update', () => {
 							parameters: [testUuid(1), 'Hello', 'cs', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -553,7 +545,6 @@ describe('update', () => {
 							parameters: ['Hello', 'cs', testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -603,7 +594,6 @@ describe('update', () => {
 							parameters: ['Hello', 'cs', testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -648,7 +638,6 @@ describe('update', () => {
 							parameters: [testUuid(1), 'World', 'cs', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -693,7 +682,6 @@ describe('update', () => {
 							parameters: [],
 							response: 1,
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -733,7 +721,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -773,7 +760,6 @@ describe('update', () => {
 							parameters: [null, testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -854,7 +840,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -901,7 +886,6 @@ describe('update', () => {
 							parameters: ['http://mangoweb.cz', testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -936,7 +920,6 @@ describe('update', () => {
 								rows: [{ id: testUuid(2) }],
 							},
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -984,7 +967,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -1045,7 +1027,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -1092,7 +1073,6 @@ describe('update', () => {
 							parameters: ['http://mangoweb.cz', testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -1150,7 +1130,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -1189,7 +1168,6 @@ describe('update', () => {
 							parameters: [null, testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -1256,7 +1234,6 @@ describe('update', () => {
 							parameters: [],
 							response: 1,
 						},
-						selectUpdateSiteSql,
 					]),
 				],
 				return: {
@@ -1340,7 +1317,6 @@ describe('update', () => {
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1399,7 +1375,6 @@ describe('update', () => {
 							parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1447,7 +1422,6 @@ describe('update', () => {
 							parameters: ['Mangoweb', testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1495,7 +1469,6 @@ describe('update', () => {
 							parameters: ['Mangoweb', testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1540,7 +1513,6 @@ describe('update', () => {
 							parameters: [testUuid(1), 'Mgw', testUuid(2)],
 							response: { rows: [{ id: testUuid(1) }] },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1588,7 +1560,6 @@ describe('update', () => {
 							parameters: [null, testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1633,7 +1604,6 @@ describe('update', () => {
 							parameters: [],
 							response: 1,
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1668,7 +1638,6 @@ describe('update', () => {
 								rows: [{ id: testUuid(1) }],
 							},
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1716,7 +1685,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1777,7 +1745,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateSiteSettingSql,
 					]),
 				],
 				return: {
@@ -1821,7 +1788,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2), testUuid(3)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -1878,7 +1844,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -1923,7 +1888,6 @@ describe('update', () => {
 							parameters: [],
 							response: 1,
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -1955,7 +1919,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -2000,7 +1963,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -2047,7 +2009,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -2104,7 +2065,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
-						selectUpdatePostSql,
 					]),
 				],
 				return: {
@@ -2149,7 +2109,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(1), testUuid(2)],
 							response: 1,
 						},
-						selectUpdateCategorySql,
 					]),
 				],
 				return: {
@@ -2206,7 +2165,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1), testUuid(2)],
 							response: 1,
 						},
-						selectUpdateCategorySql,
 					]),
 				],
 				return: {
@@ -2251,7 +2209,6 @@ describe('update', () => {
 							parameters: [],
 							response: 1,
 						},
-						selectUpdateCategorySql,
 					]),
 				],
 				return: {
@@ -2283,7 +2240,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(2)],
 							response: { rowCount: 1 },
 						},
-						selectUpdateCategorySql,
 					]),
 				],
 				return: {
@@ -2328,7 +2284,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(1), testUuid(2)],
 							response: 1,
 						},
-						selectUpdateCategorySql,
 					]),
 				],
 				return: {
@@ -2373,7 +2328,6 @@ describe('update', () => {
 							parameters: [testUuid(1), testUuid(1), testUuid(2)],
 							response: 1,
 						},
-						selectUpdateCategorySql,
 					]),
 				],
 				return: {
@@ -2428,7 +2382,6 @@ describe('update', () => {
 							parameters: [testUuid(2), testUuid(1), testUuid(2)],
 							response: 1,
 						},
-						selectUpdateCategorySql,
 					]),
 				],
 				return: {
@@ -2489,15 +2442,6 @@ describe('update', () => {
 							parameters: ['John', testUuid(1), 'John', 'Jack', 'John', 'Jack'],
 							response: { rowCount: 1 },
 						},
-						{
-							sql: SQL`select "root_"."id" as "root_id"
-                     from "public"."author" as "root_"
-                     where "root_"."id" = ?`,
-							response: {
-								rows: [{ root_id: testUuid(1) }],
-							},
-							parameters: [testUuid(1)],
-						},
 					]),
 				],
 				return: {
@@ -2555,15 +2499,6 @@ describe('update', () => {
               where "author"."id" = "newData_"."id" and false`,
 							parameters: ['John', testUuid(1)],
 							response: 0,
-						},
-						{
-							sql: SQL`select "root_"."id" as "root_id"
-                     from "public"."author" as "root_"
-                     where "root_"."id" = ?`,
-							response: {
-								rows: [{ root_id: testUuid(1) }],
-							},
-							parameters: [testUuid(1)],
 						},
 					]),
 				],
@@ -2689,15 +2624,6 @@ describe('update', () => {
 							rows: [{ selected: true, deleted: true }],
 						},
 					},
-					{
-						sql: SQL`select "root_"."id" as "root_id"
-                     from "public"."post" as "root_"
-                     where "root_"."id" = ?`,
-						response: {
-							rows: [{ root_id: testUuid(1) }],
-						},
-						parameters: [testUuid(1)],
-					},
 				]),
 				return: {
 					data: {
@@ -2775,13 +2701,6 @@ describe('update', () => {
 						parameters: [testUuid(1)],
 						response: {
 							rows: [{ __grouping_key: testUuid(1), root_id: testUuid(3) }],
-						},
-					},
-					{
-						sql: SQL`select "root_"."id" as "root_id" from  "public"."tag" as "root_"  where "root_"."id" = ?`,
-						parameters: [testUuid(2)],
-						response: {
-							rows: [{ root_id: testUuid(2) }],
 						},
 					},
 				]),

@@ -87,7 +87,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			let queryBuilder: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
 			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
 			queryBuilder = this.options.from(queryBuilder)
-			from = queryBuilder.createQuery(context)
+			from = queryBuilder.createQuery(context.withAlias(...this.options.with.getAliases()))
 		}
 
 		const compiler = new Compiler()
@@ -95,7 +95,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	}
 
 	public async execute(db: Client): Promise<Result> {
-		const namespaceContext = new Compiler.Context(db.schema, new Set(this.options.with.getAliases()))
+		const namespaceContext = new Compiler.Context(db.schema, new Set())
 		const query = this.createQuery(namespaceContext)
 		const result: Connection.Result = await db.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)

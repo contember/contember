@@ -29,7 +29,24 @@ export interface Test {
 }
 
 export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
-	return executes
+	return [
+		{
+			sql: 'BEGIN;',
+			parameters: [],
+			response: {},
+		},
+		{
+			sql: 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ',
+			parameters: [],
+			response: {},
+		},
+		...executes,
+		{
+			sql: 'COMMIT;',
+			parameters: [],
+			response: {},
+		},
+	]
 }
 
 export const execute = async (test: Test) => {
@@ -56,6 +73,7 @@ export const execute = async (test: Test) => {
 					now: () => new Date('2019-09-04 12:00'),
 				},
 				getArgumentValues,
+				() => Promise.resolve(),
 			).create({
 				db,
 				identityVariables: test.variables || {},

@@ -22,12 +22,14 @@ class JunctionTableManager {
 	) {}
 
 	public async connectJunction(
+		db: Client,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
 		await this.executeJunctionModification(
+			db,
 			owningEntity,
 			relation,
 			ownerUnique,
@@ -37,12 +39,14 @@ class JunctionTableManager {
 	}
 
 	public async disconnectJunction(
+		db: Client,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
 		inversedUnique: Input.UniqueWhere,
 	): Promise<void> {
 		await this.executeJunctionModification(
+			db,
 			owningEntity,
 			relation,
 			ownerUnique,
@@ -52,6 +56,7 @@ class JunctionTableManager {
 	}
 
 	private async executeJunctionModification(
+		db: Client,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerUnique: Input.UniqueWhere,
@@ -73,7 +78,7 @@ class JunctionTableManager {
 		if (hasNoPredicates && hasPrimaryValues) {
 			const ownerPrimary = ownerUnique[owningEntity.primary] as Input.PrimaryValue
 			const inversedPrimary = inversedUnique[inversedEntity.primary] as Input.PrimaryValue
-			await handler.executeSimple(joiningTable, ownerPrimary, inversedPrimary)
+			await handler.executeSimple(db, joiningTable, ownerPrimary, inversedPrimary)
 		} else {
 			const ownerWhere: Input.Where = {
 				and: [owningPredicate, this.uniqueWhereExpander.expand(owningEntity, ownerUnique)],
@@ -100,7 +105,7 @@ class JunctionTableManager {
 				return qb
 			}
 
-			await handler.executeComplex(joiningTable, dataCallback)
+			await handler.executeComplex(db, joiningTable, dataCallback)
 		}
 	}
 }
@@ -108,18 +113,20 @@ class JunctionTableManager {
 namespace JunctionTableManager {
 	export interface JunctionHandler {
 		executeSimple(
+			db: Client,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue,
 		): Promise<void>
 
-		executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void>
+		executeComplex(db: Client, joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void>
 	}
 
 	export class JunctionConnectHandler implements JunctionHandler {
-		constructor(private readonly db: Client, private readonly providers: { uuid: () => string }) {}
+		constructor(private readonly providers: { uuid: () => string }) {}
 
 		async executeSimple(
+			db: Client,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue,
@@ -132,10 +139,14 @@ namespace JunctionTableManager {
 					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimary),
 				})
 				.onConflict(ConflictActionType.doNothing)
-				.execute(this.db)
+				.execute(db)
 		}
 
-		async executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void> {
+		async executeComplex(
+			db: Client,
+			joiningTable: Model.JoiningTable,
+			dataCallback: SelectBuilder.Callback,
+		): Promise<void> {
 			const insert = InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
@@ -157,7 +168,7 @@ namespace JunctionTableManager {
 				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
 				.select(expr => expr.raw('coalesce(insert.inserted, false)'), 'inserted')
 
-			const result = await qb.getResult(this.db)
+			const result = await qb.getResult(db)
 			if (result[0]['selected'] === false) {
 				throw new NoResultError()
 			}
@@ -165,9 +176,8 @@ namespace JunctionTableManager {
 	}
 
 	export class JunctionDisconnectHandler implements JunctionHandler {
-		constructor(private readonly db: Client) {}
-
 		public async executeSimple(
+			db: Client,
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue,
@@ -177,10 +187,14 @@ namespace JunctionTableManager {
 				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, Operator.eq, ownerPrimary))
 				.where(cond => cond.compare(joiningTable.inverseJoiningColumn.columnName, Operator.eq, inversedPrimary))
 
-			await qb.execute(this.db)
+			await qb.execute(db)
 		}
 
-		public async executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void> {
+		public async executeComplex(
+			db: Client,
+			joiningTable: Model.JoiningTable,
+			dataCallback: SelectBuilder.Callback,
+		): Promise<void> {
 			const deleteQb = DeleteBuilder.create()
 				.from(joiningTable.tableName)
 				.using('data')
@@ -207,7 +221,7 @@ namespace JunctionTableManager {
 				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
 				.select(expr => expr.raw('coalesce(delete.deleted, false)'), 'deleted')
 
-			const result = await qb.getResult(this.db)
+			const result = await qb.getResult(db)
 			if (result[0]['selected'] === false) {
 				throw new NoResultError()
 			}

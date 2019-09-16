@@ -4,6 +4,7 @@ import { Input, Model, Value } from '@contember/schema'
 import ValidationContextFactory from './ValidationContextFactory'
 import DependencyCollector from './DependencyCollector'
 import ValidationDataSelector from './ValidationDataSelector'
+import Mapper from '../sql/Mapper'
 
 type Result = any
 
@@ -13,6 +14,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		private readonly validationContextFactory: ValidationContextFactory,
 		private readonly dependencies: DependencyCollector.Dependencies,
 		private readonly dataSelector: ValidationDataSelector,
+		private readonly mapper: Mapper,
 	) {}
 
 	async column(context: Context.ColumnContext): Promise<Result> {
@@ -80,6 +82,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		input: Input.UniqueWhere
 	}) {
 		this.node[context.relation.name] = await this.dataSelector.select(
+			this.mapper,
 			context.targetEntity,
 			context.input,
 			this.dependencies[context.relation.name],
@@ -92,6 +95,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		input: Input.CreateDataInput
 	}) {
 		this.node[context.relation.name] = await this.validationContextFactory.createForCreate(
+			this.mapper,
 			context.targetEntity,
 			context.input,
 			this.dependencies[context.relation.name],
@@ -107,6 +111,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 			return
 		}
 		this.node[context.relation.name] = (await this.validationContextFactory.createForUpdate(
+			this.mapper,
 			context.targetEntity,
 			{ node: this.node[context.relation.name] as Value.Object },
 			context.input,
@@ -136,6 +141,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		input: Input.UniqueWhere
 	}) {
 		const item = await this.dataSelector.select(
+			this.mapper,
 			context.targetEntity,
 			context.input,
 			this.dependencies[context.relation.name],
@@ -156,6 +162,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		input: Input.CreateDataInput
 	}): Promise<void> {
 		const nestedCreateContext = await this.validationContextFactory.createForCreate(
+			this.mapper,
 			context.targetEntity,
 			context.input,
 			this.dependencies[context.relation.name],
@@ -168,7 +175,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		relation: Model.AnyRelation
 		input: UpdateInputProcessor.UpdateManyInput
 	}): Promise<void> {
-		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, context.input.where)
+		const id = await this.dataSelector.getPrimaryValue(this.mapper, context.targetEntity, context.input.where)
 		if (!id) {
 			return
 		}
@@ -180,7 +187,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		relation: Model.AnyRelation
 		input: UpdateInputProcessor.UpsertManyInput
 	}): Promise<void> {
-		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, context.input.where)
+		const id = await this.dataSelector.getPrimaryValue(this.mapper, context.targetEntity, context.input.where)
 		if (id) {
 			this.doProcessHasManyUpdate({ ...context, input: context.input.update, id })
 		} else {
@@ -195,6 +202,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		input: Input.UpdateDataInput
 	}) {
 		const nestedUpdateContext = await this.validationContextFactory.createForUpdate(
+			this.mapper,
 			context.targetEntity,
 			{ where: { [context.targetEntity.primary]: context.id! } },
 			context.input,
@@ -216,7 +224,7 @@ export default class UpdateInputValidationProcessor implements UpdateInputProces
 		relation: Model.AnyRelation
 		input: Input.UniqueWhere
 	}): Promise<void> {
-		const id = await this.dataSelector.getPrimaryValue(context.targetEntity, context.input)
+		const id = await this.dataSelector.getPrimaryValue(this.mapper, context.targetEntity, context.input)
 		this.node[context.relation.name] = (this.node[context.relation.name] as Value.List).filter(
 			(it: any) => it[context.targetEntity.primary] !== id,
 		)

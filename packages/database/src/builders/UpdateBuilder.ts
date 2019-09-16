@@ -67,7 +67,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 			let fromQb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
 			fromQb = this.options.from(fromQb)
 			fromQb = this.options.where.values.reduce((builder, value) => builder.where(value), fromQb)
-			const selectSql = fromQb.createQuery(context)
+			const selectSql = fromQb.createQuery(context.withAlias(...this.options.with.getAliases()))
 			if (!selectSql.sql.startsWith('select *')) {
 				throw new Error(`Query does not start with "select *": ${selectSql.sql}`)
 			}
@@ -80,8 +80,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 	}
 
 	public async execute(db: Client): Promise<Result> {
-		const cteAliases = this.options.with.getAliases()
-		const namespaceContext = new Compiler.Context(db.schema, new Set(cteAliases))
+		const namespaceContext = new Compiler.Context(db.schema, new Set())
 		const query = this.createQuery(namespaceContext)
 		const result: Connection.Result = await db.query(query.sql, query.parameters)
 		return this.options.returning.parseResponse<Result>(result)

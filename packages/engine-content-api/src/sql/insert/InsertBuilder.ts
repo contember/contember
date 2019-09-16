@@ -16,7 +16,7 @@ type ColumnValue<E = never> = {
 
 export default class InsertBuilder {
 	public readonly insert: Promise<Value.PrimaryValue>
-	private firer: () => void = () => {
+	private firer: (db: Client) => void = () => {
 		throw new Error()
 	}
 
@@ -26,10 +26,9 @@ export default class InsertBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
-		private readonly db: Client,
 		private readonly whereBuilder: WhereBuilder,
 	) {
-		const blocker: Promise<void> = new Promise(resolver => (this.firer = resolver))
+		const blocker: Promise<Client> = new Promise(resolver => (this.firer = resolver))
 		this.insert = this.createInsertPromise(blocker)
 	}
 
@@ -43,13 +42,13 @@ export default class InsertBuilder {
 		this.where = { and: [where, this.where] }
 	}
 
-	public async execute(): Promise<Value.PrimaryValue> {
-		this.firer()
+	public async execute(db: Client): Promise<Value.PrimaryValue> {
+		this.firer(db)
 		return this.insert
 	}
 
-	private async createInsertPromise(blocker: PromiseLike<void>): Promise<Value.PrimaryValue> {
-		await blocker
+	private async createInsertPromise(blocker: Promise<Client>): Promise<Value.PrimaryValue> {
+		const db = await blocker
 
 		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
 		const resolvedData = this.rowData.map((it, index) => ({ ...it, value: resolvedValues[index] }))
@@ -73,7 +72,7 @@ export default class InsertBuilder {
 			})
 			.returning(this.entity.primaryColumn)
 
-		const returning = await qb.execute(this.db)
+		const returning = await qb.execute(db)
 		if (returning === null) {
 			throw new NoResultError()
 		}

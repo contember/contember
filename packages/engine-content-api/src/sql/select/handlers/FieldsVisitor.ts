@@ -120,6 +120,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 				const objectNode = OrderByHelper.appendDefaultOrderBy(targetEntity, baseObjectNode, defaultOrderBy)
 
 				const junctionValues = await this.junctionFetcher.fetchJunction(
+					this.mapper.db,
 					relation,
 					ids,
 					joiningColumns,

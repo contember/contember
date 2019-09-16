@@ -6,11 +6,11 @@ import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../acl/Authorizator'
 import EntityInputProvider from './mutations/EntityInputProvider'
-import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import { filterObject } from '../utils/object'
 import { aliasAwareResolver, GqlTypeName } from './utils'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
 import { ValidationSchemaTypeProvider } from './ValidationSchemaTypeProvider'
+import { ExtensionKey, MutationMeta, MutationOperation } from './MutationExtension'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
 
@@ -47,7 +47,7 @@ export default class MutationProvider {
 			args: {
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			extensions: { entity, operation: 'create' },
+			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.create, entity) },
 			resolve: (parent, args, context: Context, info) => {
 				if (parent) {
 					return parent
@@ -69,7 +69,7 @@ export default class MutationProvider {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
 			},
-			extensions: { entity, operation: 'delete' },
+			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.delete, entity) },
 			resolve: (parent, args, context: Context, info) => {
 				if (parent) {
 					return parent
@@ -94,7 +94,7 @@ export default class MutationProvider {
 				},
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			extensions: { entity, operation: 'update' },
+			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.update, entity) },
 			resolve: (parent, args, context: Context, info) => {
 				if (parent) {
 					return parent

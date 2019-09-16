@@ -71,7 +71,6 @@ class AlternativeFields extends React.PureComponent<AlternativeFieldsProps> {
 }
 
 namespace AlternativeFields {
-	// This isn't React.ReactNode so as to exclude arrays and other likely irrelevant values
 	export type ControllerFieldLabel = React.ReactNode
 
 	export type ControllerFieldLiteralMetadata = [ChoiceField.LiteralValue, ControllerFieldLabel, React.ReactNode]

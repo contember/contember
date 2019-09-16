@@ -1,5 +1,5 @@
 import { BaseComponent } from './BaseComponent'
-import { BranchNodeRepresentationFactory } from './BranchNodeRepresentationFactory'
+import { DeclarationSiteNodeRepresentationFactory } from './DeclarationSiteNodeRepresentationFactory'
 import { ValidFactoryName } from './ValidFactoryName'
 
 export type ComponentWithBranchNodeFactory<
@@ -10,7 +10,7 @@ export type ComponentWithBranchNodeFactory<
 	Environment
 > = BaseComponent<Props> &
 	{
-		[N in FactoryMethodName]: BranchNodeRepresentationFactory<
+		[N in FactoryMethodName]: DeclarationSiteNodeRepresentationFactory<
 			Props,
 			ReducedChildrenRepresentation,
 			Representation,

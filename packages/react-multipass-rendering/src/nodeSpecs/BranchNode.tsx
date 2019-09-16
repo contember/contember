@@ -1,8 +1,9 @@
+import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError'
 import { BranchNodeOptions } from './BranchNodeOptions'
 import {
 	BaseComponent,
 	ChildrenRepresentationReducer,
-	BranchNodeRepresentationFactory,
+	UseSiteBranchNodeRepresentationFactory,
 	RepresentationFactorySite,
 	ValidFactoryName,
 } from './types'
@@ -36,34 +37,38 @@ class BranchNode<
 		options?: Partial<BranchNodeOptions>,
 	)
 	public constructor(
-		staticFactory: BranchNodeRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
-		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
+		useSiteFactory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>,
 		options?: Partial<BranchNodeOptions>,
 		ComponentType?: BaseComponent<Props>,
 	)
 	public constructor(
 		factory:
 			| FactoryMethodName
-			| BranchNodeRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
-		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
-		options?: Partial<BranchNodeOptions>,
-		ComponentType?: BaseComponent<Props>,
+			| UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>,
+		optionsOrReducer?:
+			| Partial<BranchNodeOptions>
+			| ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
+		optionsOrComponentType?: Partial<BranchNodeOptions> | BaseComponent<Props>,
 	) {
-		if (typeof factory === 'function') {
+		if (typeof factory === 'function' && typeof optionsOrComponentType === 'function') {
 			this.specification = {
 				type: RepresentationFactorySite.UseSite,
 				factory,
-				childrenRepresentationReducer,
-				ComponentType,
+				ComponentType: optionsOrComponentType,
 			}
-		} else {
+		} else if (typeof factory !== 'function' && typeof optionsOrReducer === 'function') {
 			this.specification = {
 				type: RepresentationFactorySite.DeclarationSite,
 				factoryMethodName: factory,
-				childrenRepresentationReducer,
+				childrenRepresentationReducer: optionsOrReducer,
 			}
+		} else {
+			throw new ChildrenAnalyzerError('Invalid arguments')
 		}
-		this.options = { ...BranchNode.defaultOptions, ...options }
+		this.options = {
+			...BranchNode.defaultOptions,
+			...(typeof optionsOrReducer === 'object' ? optionsOrReducer : optionsOrComponentType),
+		}
 	}
 }
 
@@ -86,11 +91,7 @@ namespace BranchNode {
 		  }
 		| {
 				type: RepresentationFactorySite.UseSite
-				factory: BranchNodeRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>
-				childrenRepresentationReducer: ChildrenRepresentationReducer<
-					ChildrenRepresentation,
-					ReducedChildrenRepresentation
-				>
+				factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>
 				ComponentType?: BaseComponent<Props>
 		  }
 }

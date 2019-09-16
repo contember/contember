@@ -3,11 +3,11 @@ import { assertNever } from './assertNever'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
 import { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
 import {
-	BranchNodeRepresentationFactory,
 	RawNodeRepresentation,
 	RepresentationFactorySite,
 	LeafRepresentationFactory,
 	ValidFactoryName,
+	DeclarationSiteNodeRepresentationFactory,
 } from './nodeSpecs'
 import { BaseComponent, EnvironmentFactory, SyntheticChildrenFactory } from './nodeSpecs/types'
 import { BranchNodeList } from './BranchNodeList'
@@ -118,7 +118,7 @@ export class ChildrenAnalyzer<
 						| EnvironmentFactory<any, Environment>
 						| SyntheticChildrenFactory<any, Environment>
 						| LeafRepresentationFactory<any, AllLeafsRepresentation, Environment>
-						| BranchNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, Environment>
+						| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, Environment>
 				}
 
 			if (this.options.environmentFactoryName in treeNode) {
@@ -166,7 +166,7 @@ export class ChildrenAnalyzer<
 						if (!processedChildren) {
 							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
-						const factory = treeNode[factoryMethodName] as BranchNodeRepresentationFactory<
+						const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
 							any,
 							unknown,
 							AllBranchNodesRepresentation,
@@ -175,12 +175,12 @@ export class ChildrenAnalyzer<
 						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
 					}
 				} else if (branchNode.specification.type === RepresentationFactorySite.UseSite) {
-					const { factory, ComponentType, childrenRepresentationReducer } = branchNode.specification
+					const { factory, ComponentType } = branchNode.specification
 					if (ComponentType === undefined || node.type === ComponentType) {
 						if (!processedChildren) {
 							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
-						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
+						return factory(node.props, processedChildren, environment)
 					}
 				} else {
 					return assertNever(branchNode.specification)

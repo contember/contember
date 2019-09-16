@@ -76,7 +76,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 													label={props.label}
 													alternatives={props.alternatives}
 													name={props.discriminationField}
-													allowBlockTypeChange={true}
+													allowBlockTypeChange={false}
 												/>
 											</Sortable>
 										</div>

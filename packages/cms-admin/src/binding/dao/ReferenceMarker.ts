@@ -3,6 +3,7 @@ import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
 import { FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'
+import { DataBindingError } from './DataBindingError'
 import { EntityFields } from './EntityFields'
 
 class ReferenceMarker {
@@ -47,6 +48,18 @@ class ReferenceMarker {
 			}
 		} else {
 			throw assertNever(decider)
+		}
+
+		for (const placeholderName in references) {
+			const reference = references[placeholderName]
+			if (reference.reducedBy) {
+				const fields = Object.keys(reference.reducedBy)
+
+				if (fields.length !== 1) {
+					// TODO this will change in future
+					throw new DataBindingError(`A hasMany relation can only be reduced to a hasOne by exactly one field.`)
+				}
+			}
 		}
 
 		this.fieldName = fieldName

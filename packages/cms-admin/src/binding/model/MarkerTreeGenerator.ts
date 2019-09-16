@@ -1,3 +1,4 @@
+import { ChildrenAnalyzer, Nonterminal, RawNodeRepresentation, Terminal } from '@contember/react-multipass-rendering'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
@@ -14,12 +15,16 @@ import {
 } from '../dao'
 import { Hashing } from '../utils'
 
-type NodeResult = FieldMarker | MarkerTreeRoot | ReferenceMarker | ConnectionMarker
-type RawNodeResult = NodeResult | NodeResult[] | undefined
+type Terminals = FieldMarker | ConnectionMarker
+type Nonterminals = MarkerTreeRoot | ReferenceMarker
+
+type NodeResult = Terminals | Nonterminals
 type DataMarker = MarkerProvider &
 	(React.ComponentClass<unknown> | React.FunctionComponent<unknown> | React.NamedExoticComponent<unknown>)
 
 export class MarkerTreeGenerator {
+	private static childrenAnalyzer = MarkerTreeGenerator.initializeChildrenAnalyzer()
+
 	public constructor(
 		private sourceTree: React.ReactNode,
 		private environment: Environment = new Environment({
@@ -28,138 +33,20 @@ export class MarkerTreeGenerator {
 	) {}
 
 	public generate(): MarkerTreeRoot {
-		const processed = this.processNode(this.sourceTree, this.environment)
+		const processed = MarkerTreeGenerator.childrenAnalyzer.processChildren(this.sourceTree, this.environment)
 
-		let result: NodeResult | undefined = undefined
+		if (processed.length === 1) {
+			const result = processed[0]
 
-		if (!Array.isArray(processed)) {
-			result = processed
-		} else {
-			if (processed.length === 1) {
-				result = processed[0]
+			if (result instanceof MarkerTreeRoot) {
+				return result
 			}
 		}
 
-		if (result instanceof MarkerTreeRoot) {
-			return result
-		}
-
-		return this.reportInvalidTreeError(result)
+		return this.reportInvalidTreeError(processed)
 	}
 
-	private processNode(node: React.ReactNode | Function, environment: Environment): RawNodeResult {
-		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
-			return undefined
-		}
-
-		if (typeof node === 'function') {
-			throw new DataBindingError(
-				`Render props (functions as React component children) are not supported within the schema. ` +
-					`You have likely used a bare custom component as opposed to wrapping in with \`Component\`. ` +
-					`Please refer to the documentation.`,
-			)
-		}
-
-		if (Array.isArray(node)) {
-			let mapped: NodeResult[] = []
-
-			for (const subNode of node) {
-				const processed = this.processNode(subNode, environment)
-
-				if (processed) {
-					if (Array.isArray(processed)) {
-						mapped = mapped.concat(processed)
-					} else {
-						mapped.push(processed)
-					}
-				}
-			}
-
-			if (mapped.length === 1) {
-				return mapped[0]
-			}
-
-			return mapped
-		}
-
-		let children: React.ReactNode
-
-		if ('type' in node) {
-			children = node.props.children
-
-			if (typeof node.type === 'symbol' || typeof node.type === 'string') {
-				// React.Fragment, React.Portal or other non-component
-				return this.processNode(children, environment)
-			}
-
-			// React.Component, React.PureComponent, React.FunctionComponent
-
-			const dataMarker = node.type as DataMarker
-
-			if ('generateEnvironmentDelta' in dataMarker && dataMarker.generateEnvironmentDelta) {
-				const delta = dataMarker.generateEnvironmentDelta(node.props, environment)
-				environment = environment.putDelta(delta)
-			}
-
-			if ('generateSyntheticChildren' in dataMarker && dataMarker.generateSyntheticChildren) {
-				children = dataMarker.generateSyntheticChildren(node.props, environment)
-			}
-
-			if ('generateFieldMarker' in dataMarker && dataMarker.generateFieldMarker) {
-				return dataMarker.generateFieldMarker(node.props, environment)
-			}
-
-			if ('generateMarkerTreeRoot' in dataMarker && dataMarker.generateMarkerTreeRoot) {
-				if (children) {
-					return dataMarker.generateMarkerTreeRoot(
-						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children, environment)),
-						environment,
-					)
-				}
-				throw new DataBindingError(`Each ${this.getDataMarkerName(dataMarker)} component must have children.`)
-			}
-
-			if ('generateReferenceMarker' in dataMarker && dataMarker.generateReferenceMarker) {
-				if (children) {
-					const referenceMarker = dataMarker.generateReferenceMarker(
-						node.props,
-						this.mapNodeResultToEntityFields(this.processNode(children, environment)),
-						environment,
-					)
-
-					for (const placeholderName in referenceMarker.references) {
-						const reference = referenceMarker.references[placeholderName]
-						if (reference.reducedBy) {
-							const fields = Object.keys(reference.reducedBy)
-
-							if (fields.length !== 1) {
-								// TODO this will change in future
-								throw new DataBindingError(`A hasMany relation can only be reduced to a hasOne by exactly one field.`)
-							}
-						}
-					}
-
-					return referenceMarker
-				}
-				throw new DataBindingError(`Each ${this.getDataMarkerName(dataMarker)} component must have children.`)
-			}
-
-			if ('generateConnectionMarker' in dataMarker && dataMarker.generateConnectionMarker) {
-				return dataMarker.generateConnectionMarker(node.props, environment)
-			}
-
-			if (children) {
-				return this.processNode(children, environment)
-			}
-
-			return undefined
-		}
-
-		return this.processNode(children, environment)
-	}
-
-	private mapNodeResultToEntityFields(result: RawNodeResult): EntityFields {
+	private static mapNodeResultToEntityFields(result: RawNodeRepresentation<Terminals, Nonterminals>): EntityFields {
 		const fields: EntityFields = {}
 
 		if (!result) {
@@ -173,29 +60,30 @@ export class MarkerTreeGenerator {
 		for (const marker of result) {
 			const placeholderName = marker.placeholderName
 
-			fields[placeholderName] = placeholderName in fields ? this.mergeMarkers(fields[placeholderName], marker) : marker
+			fields[placeholderName] =
+				placeholderName in fields ? MarkerTreeGenerator.mergeMarkers(fields[placeholderName], marker) : marker
 		}
 
 		return fields
 	}
 
 	// This method assumes their placeholder names are the same
-	private mergeMarkers(original: Marker, fresh: Marker): Marker {
+	private static mergeMarkers(original: Marker, fresh: Marker): Marker {
 		if (original instanceof FieldMarker) {
 			if (fresh instanceof FieldMarker) {
 				return original
 			} else if (fresh instanceof ReferenceMarker) {
-				return this.rejectRelationScalarCombo(original.fieldName)
+				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof MarkerTreeRoot) {
 				throw new DataBindingError('Merging fields and tree roots is an undefined operation.')
 			} else if (fresh instanceof ConnectionMarker) {
-				return this.rejectConnectionMarkerCombo(fresh)
+				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
 			} else {
 				return assertNever(fresh)
 			}
 		} else if (original instanceof ReferenceMarker) {
 			if (fresh instanceof FieldMarker) {
-				return this.rejectRelationScalarCombo(original.fieldName)
+				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof ReferenceMarker) {
 				const newReferences = { ...original.references }
 				for (const placeholderName in fresh.references) {
@@ -212,19 +100,22 @@ export class MarkerTreeGenerator {
 					}
 
 					newReferences[placeholderName].fields = namePresentInOriginal
-						? this.mergeEntityFields(newReferences[placeholderName].fields, fresh.references[placeholderName].fields)
+						? MarkerTreeGenerator.mergeEntityFields(
+								newReferences[placeholderName].fields,
+								fresh.references[placeholderName].fields,
+						  )
 						: fresh.references[placeholderName].fields
 				}
 				return new ReferenceMarker(original.fieldName, newReferences)
 			} else if (fresh instanceof ConnectionMarker) {
-				return this.rejectConnectionMarkerCombo(fresh)
+				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
 			} else if (fresh instanceof MarkerTreeRoot) {
 				throw new DataBindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
 			} else {
 				return assertNever(fresh)
 			}
 		} else if (original instanceof ConnectionMarker) {
-			return this.rejectConnectionMarkerCombo(original)
+			return MarkerTreeGenerator.rejectConnectionMarkerCombo(original)
 		} else if (original instanceof MarkerTreeRoot) {
 			if (fresh instanceof MarkerTreeRoot) {
 				if (
@@ -242,18 +133,23 @@ export class MarkerTreeGenerator {
 		}
 	}
 
-	private mergeEntityFields(original: EntityFields, fresh: EntityFields): EntityFields {
+	private static mergeEntityFields(original: EntityFields, fresh: EntityFields): EntityFields {
 		for (const placeholderName in fresh) {
 			original[placeholderName] =
 				placeholderName in original
-					? this.mergeMarkers(original[placeholderName], fresh[placeholderName])
+					? MarkerTreeGenerator.mergeMarkers(original[placeholderName], fresh[placeholderName])
 					: fresh[placeholderName]
 		}
 		return original
 	}
 
-	private reportInvalidTreeError(marker: FieldMarker | ReferenceMarker | ConnectionMarker | undefined): never {
-		if (marker) {
+	private reportInvalidTreeError(markers: NodeResult[]): never {
+		if (markers.length) {
+			if (markers.length > 1) {
+				throw new DataBindingError(`Multi-root data trees are not supported.`) // TODO this is planned to chane
+			}
+			const marker = markers[0]
+
 			const kind =
 				marker instanceof FieldMarker ? 'field' : marker instanceof ReferenceMarker ? 'relation' : 'connection'
 
@@ -264,17 +160,48 @@ export class MarkerTreeGenerator {
 		throw new DataBindingError('Empty data tree discovered. Try adding some fields…')
 	}
 
-	private rejectRelationScalarCombo(fieldName: FieldName): never {
+	private static rejectRelationScalarCombo(fieldName: FieldName): never {
 		throw new DataBindingError(`Cannot combine a relation with a scalar field '${fieldName}'.`)
 	}
 
-	private rejectConnectionMarkerCombo(connectionMarker: ConnectionMarker): never {
+	private static rejectConnectionMarkerCombo(connectionMarker: ConnectionMarker): never {
 		throw new DataBindingError(
 			`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`,
 		)
 	}
 
-	private getDataMarkerName(marker: DataMarker): string {
-		return marker.displayName || marker.name || 'Component'
+	private static initializeChildrenAnalyzer(): ChildrenAnalyzer<Terminals, Nonterminals, Environment> {
+		const fieldMarkerTerminal = new Terminal<Environment>('generateFieldMarker')
+		const connectionMarkerTerminal = new Terminal<Environment>('generateConnectionMarker')
+
+		const markerTreeRootNonterminal = new Nonterminal<Environment>(
+			'generateMarkerTreeRoot',
+			MarkerTreeGenerator.mapNodeResultToEntityFields,
+			{
+				childrenAbsentErrorMessage: 'All data providers must have children',
+			},
+		)
+
+		const referenceMarkerNonterminal = new Nonterminal<Environment>(
+			'generateReferenceMarker',
+			MarkerTreeGenerator.mapNodeResultToEntityFields,
+			{
+				childrenAbsentErrorMessage: 'All references must have children',
+			},
+		)
+
+		return new ChildrenAnalyzer(
+			[fieldMarkerTerminal, connectionMarkerTerminal],
+			[markerTreeRootNonterminal, referenceMarkerNonterminal],
+			{
+				syntheticChildrenFactoryName: 'generateSyntheticChildren',
+				renderPropsErrorMessage:
+					`Render props (functions as React component children) are not supported within the schema. ` +
+					`You have likely used a bare custom component as opposed to wrapping in with \`Component\`. ` +
+					`Please refer to the documentation.`,
+				ignoreRenderProps: false,
+				environmentFactoryName: 'generateEnvironment',
+			},
+		)
 	}
 }

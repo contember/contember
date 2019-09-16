@@ -92,22 +92,15 @@ namespace SideDimensions {
 
 		public render() {
 			return (
-				<EnvironmentContext.Provider
-					value={this.props.environment.putDelta(
-						SingleDimension.generateEnvironmentDelta(this.props, this.props.environment),
-					)}
-				>
+				<EnvironmentContext.Provider value={SingleDimension.generateEnvironment(this.props, this.props.environment)}>
 					<div className="sideDimensions-dimensions-dimension">{this.props.children}</div>
 				</EnvironmentContext.Provider>
 			)
 		}
 
-		public static generateEnvironmentDelta(
-			props: SingleDimensionProps,
-			oldEnvironment: Environment,
-		): Partial<Environment.NameStore> {
+		public static generateEnvironment(props: SingleDimensionProps, oldEnvironment: Environment): Environment {
 			if (!props.variables) {
-				return {}
+				return oldEnvironment
 			}
 
 			let deltaFactory: Environment.DeltaFactory
@@ -125,7 +118,7 @@ namespace SideDimensions {
 				deltaFactory[props.variableName] = props.dimensionValue
 			}
 
-			return Environment.generateDelta(oldEnvironment, deltaFactory)
+			return oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, deltaFactory))
 		}
 	}
 

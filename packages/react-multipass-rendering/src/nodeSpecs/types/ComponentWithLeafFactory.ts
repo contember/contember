@@ -1,13 +1,13 @@
 import { BaseComponent } from './BaseComponent'
-import { TerminalRepresentationFactory } from './TerminalRepresentationFactory'
+import { LeafRepresentationFactory } from './LeafRepresentationFactory'
 import { ValidFactoryName } from './ValidFactoryName'
 
-export type ComponentWithTerminalFactory<
+export type ComponentWithLeafFactory<
 	FactoryMethodName extends ValidFactoryName,
 	Props extends {},
 	Representation,
 	Environment
 > = BaseComponent<Props> &
 	{
-		[N in FactoryMethodName]: TerminalRepresentationFactory<Props, Representation, Environment>
+		[N in FactoryMethodName]: LeafRepresentationFactory<Props, Representation, Environment>
 	}

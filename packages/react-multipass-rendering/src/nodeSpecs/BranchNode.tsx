@@ -1,13 +1,13 @@
-import { NonterminalOptions } from './NonterminalOptions'
+import { BranchNodeOptions } from './BranchNodeOptions'
 import {
 	BaseComponent,
 	ChildrenRepresentationReducer,
-	NonterminalRepresentationFactory,
+	BranchNodeRepresentationFactory,
 	RepresentationFactorySite,
 	ValidFactoryName,
 } from './types'
 
-class Nonterminal<
+class BranchNode<
 	Environment = undefined,
 	FactoryMethodName extends ValidFactoryName = string,
 	Props extends {} = {},
@@ -15,11 +15,11 @@ class Nonterminal<
 	ReducedChildrenRepresentation = any,
 	Representation = any
 > {
-	private static defaultOptions: NonterminalOptions = {
+	private static defaultOptions: BranchNodeOptions = {
 		childrenAbsentErrorMessage: 'Component must have children!',
 	}
 
-	public readonly specification: Nonterminal.Specification<
+	public readonly specification: BranchNode.Specification<
 		Environment,
 		FactoryMethodName,
 		Props,
@@ -28,25 +28,25 @@ class Nonterminal<
 		Representation
 	>
 
-	public readonly options: NonterminalOptions
+	public readonly options: BranchNodeOptions
 
 	public constructor(
 		factoryMethodName: FactoryMethodName,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
-		options?: Partial<NonterminalOptions>,
+		options?: Partial<BranchNodeOptions>,
 	)
 	public constructor(
-		staticFactory: NonterminalRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
+		staticFactory: BranchNodeRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
-		options?: Partial<NonterminalOptions>,
+		options?: Partial<BranchNodeOptions>,
 		ComponentType?: BaseComponent<Props>,
 	)
 	public constructor(
 		factory:
 			| FactoryMethodName
-			| NonterminalRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
+			| BranchNodeRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>,
 		childrenRepresentationReducer: ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
-		options?: Partial<NonterminalOptions>,
+		options?: Partial<BranchNodeOptions>,
 		ComponentType?: BaseComponent<Props>,
 	) {
 		if (typeof factory === 'function') {
@@ -63,11 +63,11 @@ class Nonterminal<
 				childrenRepresentationReducer,
 			}
 		}
-		this.options = { ...Nonterminal.defaultOptions, ...options }
+		this.options = { ...BranchNode.defaultOptions, ...options }
 	}
 }
 
-namespace Nonterminal {
+namespace BranchNode {
 	export type Specification<
 		Environment = any,
 		FactoryMethodName extends ValidFactoryName = string,
@@ -86,7 +86,7 @@ namespace Nonterminal {
 		  }
 		| {
 				type: RepresentationFactorySite.UseSite
-				factory: NonterminalRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>
+				factory: BranchNodeRepresentationFactory<Props, ReducedChildrenRepresentation, Representation, Environment>
 				childrenRepresentationReducer: ChildrenRepresentationReducer<
 					ChildrenRepresentation,
 					ReducedChildrenRepresentation
@@ -95,4 +95,4 @@ namespace Nonterminal {
 		  }
 }
 
-export { Nonterminal }
+export { BranchNode }

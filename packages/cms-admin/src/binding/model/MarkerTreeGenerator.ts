@@ -1,4 +1,4 @@
-import { ChildrenAnalyzer, Nonterminal, RawNodeRepresentation, Terminal } from '@contember/react-multipass-rendering'
+import { ChildrenAnalyzer, BranchNode, RawNodeRepresentation, Leaf } from '@contember/react-multipass-rendering'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
@@ -171,10 +171,10 @@ export class MarkerTreeGenerator {
 	}
 
 	private static initializeChildrenAnalyzer(): ChildrenAnalyzer<Terminals, Nonterminals, Environment> {
-		const fieldMarkerTerminal = new Terminal<Environment>('generateFieldMarker')
-		const connectionMarkerTerminal = new Terminal<Environment>('generateConnectionMarker')
+		const fieldMarkerLeaf = new Leaf<Environment>('generateFieldMarker')
+		const connectionMarkerLeaf = new Leaf<Environment>('generateConnectionMarker')
 
-		const markerTreeRootNonterminal = new Nonterminal<Environment>(
+		const markerTreeRootBranchNode = new BranchNode<Environment>(
 			'generateMarkerTreeRoot',
 			MarkerTreeGenerator.mapNodeResultToEntityFields,
 			{
@@ -182,7 +182,7 @@ export class MarkerTreeGenerator {
 			},
 		)
 
-		const referenceMarkerNonterminal = new Nonterminal<Environment>(
+		const referenceMarkerBranchNode = new BranchNode<Environment>(
 			'generateReferenceMarker',
 			MarkerTreeGenerator.mapNodeResultToEntityFields,
 			{
@@ -191,8 +191,8 @@ export class MarkerTreeGenerator {
 		)
 
 		return new ChildrenAnalyzer(
-			[fieldMarkerTerminal, connectionMarkerTerminal],
-			[markerTreeRootNonterminal, referenceMarkerNonterminal],
+			[fieldMarkerLeaf, connectionMarkerLeaf],
+			[markerTreeRootBranchNode, referenceMarkerBranchNode],
 			{
 				syntheticChildrenFactoryName: 'generateSyntheticChildren',
 				renderPropsErrorMessage:

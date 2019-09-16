@@ -1,3 +1,3 @@
-export interface NonterminalOptions {
+export interface BranchNodeOptions {
 	childrenAbsentErrorMessage: string
 }

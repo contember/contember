@@ -1,8 +1,8 @@
 import { BaseComponent } from './BaseComponent'
-import { NonterminalRepresentationFactory } from './NonterminalRepresentationFactory'
+import { BranchNodeRepresentationFactory } from './BranchNodeRepresentationFactory'
 import { ValidFactoryName } from './ValidFactoryName'
 
-export type ComponentWithNonterminalFactory<
+export type ComponentWithBranchNodeFactory<
 	FactoryMethodName extends ValidFactoryName,
 	Props extends {},
 	ReducedChildrenRepresentation,
@@ -10,7 +10,7 @@ export type ComponentWithNonterminalFactory<
 	Environment
 > = BaseComponent<Props> &
 	{
-		[N in FactoryMethodName]: NonterminalRepresentationFactory<
+		[N in FactoryMethodName]: BranchNodeRepresentationFactory<
 			Props,
 			ReducedChildrenRepresentation,
 			Representation,

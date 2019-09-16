@@ -1,4 +1,4 @@
-export type NonterminalRepresentationFactory<
+export type BranchNodeRepresentationFactory<
 	Props extends {},
 	ReducedChildrenRepresentation,
 	Representation,

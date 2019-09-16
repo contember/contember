@@ -3,19 +3,19 @@ import { assertNever } from './assertNever'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
 import { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
 import {
-	NonterminalRepresentationFactory,
+	BranchNodeRepresentationFactory,
 	RawNodeRepresentation,
 	RepresentationFactorySite,
-	TerminalRepresentationFactory,
+	LeafRepresentationFactory,
 	ValidFactoryName,
 } from './nodeSpecs'
 import { BaseComponent, EnvironmentFactory, SyntheticChildrenFactory } from './nodeSpecs/types'
-import { NonterminalList } from './NonterminalList'
-import { TerminalList } from './TerminalList'
+import { BranchNodeList } from './BranchNodeList'
+import { LeafList } from './LeafList'
 
 export class ChildrenAnalyzer<
-	AllTerminalsRepresentation = any,
-	AllNonterminalsRepresentation = never,
+	AllLeafsRepresentation = any,
+	AllBranchNodesRepresentation = never,
 	Environment = undefined
 > {
 	private static defaultOptions: ChildrenAnalyzerOptions = {
@@ -26,32 +26,29 @@ export class ChildrenAnalyzer<
 		syntheticChildrenFactoryName: 'generateSyntheticChildren',
 	}
 
-	private readonly terminals: TerminalList<AllTerminalsRepresentation, Environment>
-	private readonly nonterminals: NonterminalList<AllTerminalsRepresentation, AllNonterminalsRepresentation, Environment>
+	private readonly leafs: LeafList<AllLeafsRepresentation, Environment>
+	private readonly branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, Environment>
 	private readonly options: ChildrenAnalyzerOptions
 
+	public constructor(leafs: LeafList<AllLeafsRepresentation, Environment>, options?: Partial<ChildrenAnalyzerOptions>)
 	public constructor(
-		terminals: TerminalList<AllTerminalsRepresentation, Environment>,
+		leafs: LeafList<AllLeafsRepresentation, Environment>,
+		branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, Environment>,
 		options?: Partial<ChildrenAnalyzerOptions>,
 	)
 	public constructor(
-		terminals: TerminalList<AllTerminalsRepresentation, Environment>,
-		nonterminals: NonterminalList<AllTerminalsRepresentation, AllNonterminalsRepresentation, Environment>,
-		options?: Partial<ChildrenAnalyzerOptions>,
-	)
-	public constructor(
-		terminals: TerminalList<AllTerminalsRepresentation, Environment>,
+		leafs: LeafList<AllLeafsRepresentation, Environment>,
 		decider:
 			| Partial<ChildrenAnalyzerOptions>
-			| NonterminalList<AllTerminalsRepresentation, AllNonterminalsRepresentation, Environment> = [],
+			| BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, Environment> = [],
 		options: Partial<ChildrenAnalyzerOptions> = {},
 	) {
-		this.terminals = terminals
+		this.leafs = leafs
 
 		if (Array.isArray(decider)) {
-			this.nonterminals = decider
+			this.branchNodes = decider
 		} else {
-			this.nonterminals = []
+			this.branchNodes = []
 			options = decider
 		}
 		this.options = { ...ChildrenAnalyzer.defaultOptions, ...options }
@@ -60,24 +57,20 @@ export class ChildrenAnalyzer<
 	public processChildren(
 		children: React.ReactNode,
 		initialEnvironment: Environment,
-	): Array<AllTerminalsRepresentation | AllNonterminalsRepresentation> {
+	): Array<AllLeafsRepresentation | AllBranchNodesRepresentation> {
 		const processed = this.processNode(children, initialEnvironment)
 
-		const rawResult: Array<AllTerminalsRepresentation | AllNonterminalsRepresentation | undefined> = Array.isArray(
-			processed,
-		)
+		const rawResult: Array<AllLeafsRepresentation | AllBranchNodesRepresentation | undefined> = Array.isArray(processed)
 			? processed
 			: [processed]
 
-		return rawResult.filter(
-			(item): item is AllTerminalsRepresentation | AllNonterminalsRepresentation => item !== undefined,
-		)
+		return rawResult.filter((item): item is AllLeafsRepresentation | AllBranchNodesRepresentation => item !== undefined)
 	}
 
 	private processNode(
 		node: React.ReactNode | Function,
 		environment: Environment,
-	): RawNodeRepresentation<AllTerminalsRepresentation, AllNonterminalsRepresentation> {
+	): RawNodeRepresentation<AllLeafsRepresentation, AllBranchNodesRepresentation> {
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
 			return undefined
 		}
@@ -90,7 +83,7 @@ export class ChildrenAnalyzer<
 		}
 
 		if (Array.isArray(node)) {
-			let mapped: Array<AllTerminalsRepresentation | AllNonterminalsRepresentation> = []
+			let mapped: Array<AllLeafsRepresentation | AllBranchNodesRepresentation> = []
 
 			for (const subNode of node) {
 				const processed = this.processNode(subNode, environment)
@@ -124,8 +117,8 @@ export class ChildrenAnalyzer<
 					[staticMethod in ValidFactoryName]:
 						| EnvironmentFactory<any, Environment>
 						| SyntheticChildrenFactory<any, Environment>
-						| TerminalRepresentationFactory<any, AllTerminalsRepresentation, Environment>
-						| NonterminalRepresentationFactory<any, unknown, AllNonterminalsRepresentation, Environment>
+						| LeafRepresentationFactory<any, AllLeafsRepresentation, Environment>
+						| BranchNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, Environment>
 				}
 
 			if (this.options.environmentFactoryName in treeNode) {
@@ -141,56 +134,56 @@ export class ChildrenAnalyzer<
 				children = factory(node.props, environment)
 			}
 
-			for (const terminal of this.terminals) {
-				if (terminal.specification.type === RepresentationFactorySite.DeclarationSite) {
-					const { factoryMethodName } = terminal.specification
+			for (const leaf of this.leafs) {
+				if (leaf.specification.type === RepresentationFactorySite.DeclarationSite) {
+					const { factoryMethodName } = leaf.specification
 
 					if (factoryMethodName in treeNode) {
-						const factory = treeNode[factoryMethodName] as TerminalRepresentationFactory<
+						const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
 							any,
-							AllTerminalsRepresentation,
+							AllLeafsRepresentation,
 							Environment
 						>
 						return factory(node.props, environment)
 					}
-				} else if (terminal.specification.type === RepresentationFactorySite.UseSite) {
-					const { ComponentType, factory } = terminal.specification
+				} else if (leaf.specification.type === RepresentationFactorySite.UseSite) {
+					const { ComponentType, factory } = leaf.specification
 					if (ComponentType === undefined || node.type === ComponentType) {
 						return factory(node.props, environment)
 					}
 				} else {
-					return assertNever(terminal.specification)
+					return assertNever(leaf.specification)
 				}
 			}
 
 			const processedChildren = this.processNode(children, environment)
 
-			for (const nonterminal of this.nonterminals) {
-				if (nonterminal.specification.type === RepresentationFactorySite.DeclarationSite) {
-					const { factoryMethodName, childrenRepresentationReducer } = nonterminal.specification
+			for (const branchNode of this.branchNodes) {
+				if (branchNode.specification.type === RepresentationFactorySite.DeclarationSite) {
+					const { factoryMethodName, childrenRepresentationReducer } = branchNode.specification
 
 					if (factoryMethodName in treeNode) {
 						if (!processedChildren) {
-							throw new ChildrenAnalyzerError(nonterminal.options.childrenAbsentErrorMessage)
+							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
-						const factory = treeNode[factoryMethodName] as NonterminalRepresentationFactory<
+						const factory = treeNode[factoryMethodName] as BranchNodeRepresentationFactory<
 							any,
 							unknown,
-							AllNonterminalsRepresentation,
+							AllBranchNodesRepresentation,
 							Environment
 						>
 						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
 					}
-				} else if (nonterminal.specification.type === RepresentationFactorySite.UseSite) {
-					const { factory, ComponentType, childrenRepresentationReducer } = nonterminal.specification
+				} else if (branchNode.specification.type === RepresentationFactorySite.UseSite) {
+					const { factory, ComponentType, childrenRepresentationReducer } = branchNode.specification
 					if (ComponentType === undefined || node.type === ComponentType) {
 						if (!processedChildren) {
-							throw new ChildrenAnalyzerError(nonterminal.options.childrenAbsentErrorMessage)
+							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
 						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
 					}
 				} else {
-					return assertNever(nonterminal.specification)
+					return assertNever(branchNode.specification)
 				}
 			}
 

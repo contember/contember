@@ -1,14 +1,13 @@
-import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 
 class ProjectsQuery extends DatabaseQuery<ProjectsQuery.Result> {
-	async fetch(queryable: DatabaseQueryable): Promise<ProjectsQuery.Result> {
-		return await queryable
-			.createSelectBuilder<ProjectsQuery.Row>()
+	async fetch({ db }: DatabaseQueryable): Promise<ProjectsQuery.Result> {
+		return await SelectBuilder.create<ProjectsQuery.Row>()
 			.select('id')
 			.select('name')
 			.select('slug')
 			.from('project')
-			.getResult()
+			.getResult(db)
 	}
 }
 

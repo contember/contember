@@ -8,7 +8,7 @@ class LatestMigrationByEventQuery extends DatabaseQuery<LatestMigrationByEventQu
 
 	async fetch(queryable: DatabaseQueryable): Promise<LatestMigrationByEventQuery.Result> {
 		const rows = (
-			await queryable.createWrapper().query<LatestMigrationByEventQuery.Row>(
+			await queryable.db.query<LatestMigrationByEventQuery.Row>(
 				`
 			WITH RECURSIVE recent_events(type, previous_id, data) AS (
 					SELECT type, previous_id, data

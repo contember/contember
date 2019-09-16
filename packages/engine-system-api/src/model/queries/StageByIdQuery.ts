@@ -10,7 +10,7 @@ class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<StageByIdQuery.Result> {
-		let selectBuilder: SelectBuilder<StageByIdQuery.Result, any> = prepareStageQueryBuilder(queryable).where({
+		let selectBuilder: SelectBuilder<StageByIdQuery.Result, any> = prepareStageQueryBuilder().where({
 			id: this.stageId,
 		})
 
@@ -18,7 +18,7 @@ class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {
 			selectBuilder = selectBuilder.lock(LockType.forNoKeyUpdate)
 		}
 
-		const rows = await selectBuilder.getResult()
+		const rows = await selectBuilder.getResult(queryable.db)
 
 		return this.fetchOneOrNull(rows)
 	}

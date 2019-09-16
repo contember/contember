@@ -1,6 +1,6 @@
 import { Command } from '../Command'
 import { RemoveProjectMembershipVariablesCommand } from './RemoveProjectMembershipVariablesCommand'
-import { ConflictActionType } from '@contember/database'
+import { ConflictActionType, InsertBuilder } from '@contember/database'
 
 class UpdateProjectMembershipVariablesCommand implements Command<void> {
 	constructor(
@@ -11,8 +11,7 @@ class UpdateProjectMembershipVariablesCommand implements Command<void> {
 
 	async execute({ db, providers, bus }: Command.Args): Promise<void> {
 		const queries = this.variables.map(update => {
-			return db
-				.insertBuilder()
+			return InsertBuilder.create()
 				.into('project_membership_variable')
 				.values({
 					id: providers.uuid(),
@@ -23,7 +22,7 @@ class UpdateProjectMembershipVariablesCommand implements Command<void> {
 				.onConflict(ConflictActionType.update, ['membership_id', 'variable'], {
 					value: JSON.stringify(update.values),
 				})
-				.execute()
+				.execute(db)
 		})
 		await Promise.all(queries)
 

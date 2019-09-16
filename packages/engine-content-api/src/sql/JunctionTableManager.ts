@@ -3,12 +3,12 @@ import Path from './select/Path'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../acl/PredicateFactory'
-import { Client, Operator } from '@contember/database'
+import { Client, DeleteBuilder, Operator } from '@contember/database'
 import { Acl, Input, Model } from '@contember/schema'
 import { ConflictActionType } from '@contember/database'
 import { ConditionBuilder } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
-import { Literal } from '@contember/database'
+import { Literal, InsertBuilder } from '@contember/database'
 import { NoResultError } from './NoResultError'
 
 class JunctionTableManager {
@@ -124,8 +124,7 @@ namespace JunctionTableManager {
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue,
 		): Promise<void> {
-			await this.db
-				.insertBuilder()
+			await InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
 					id: this.providers.uuid(),
@@ -133,12 +132,11 @@ namespace JunctionTableManager {
 					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimary),
 				})
 				.onConflict(ConflictActionType.doNothing)
-				.execute()
+				.execute(this.db)
 		}
 
 		async executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void> {
-			const insert = this.db
-				.insertBuilder()
+			const insert = InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
 					id: expr => expr.selectValue(this.providers.uuid()),
@@ -148,20 +146,18 @@ namespace JunctionTableManager {
 				})
 				.returning(new Literal('true as inserted'))
 				.from(qb => qb.from('data'))
-				.withCteAliases(['data'])
 				.onConflict(ConflictActionType.doNothing)
 
-			const qb = this.db
-				.selectBuilder()
+			const qb = SelectBuilder.create()
 				.with('data', dataCallback)
-				.with('insert', insert.createQuery())
+				.with('insert', insert)
 				.from(new Literal('(values (null))'), 't')
 				.leftJoin('data', 'data', condition => condition.raw('true'))
 				.leftJoin('insert', 'insert', condition => condition.raw('true'))
 				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
 				.select(expr => expr.raw('coalesce(insert.inserted, false)'), 'inserted')
 
-			const result = await qb.getResult()
+			const result = await qb.getResult(this.db)
 			if (result[0]['selected'] === false) {
 				throw new NoResultError()
 			}
@@ -169,25 +165,23 @@ namespace JunctionTableManager {
 	}
 
 	export class JunctionDisconnectHandler implements JunctionHandler {
-		constructor(private readonly db: Client, private readonly providers: { uuid: () => string }) {}
+		constructor(private readonly db: Client) {}
 
 		public async executeSimple(
 			joiningTable: Model.JoiningTable,
 			ownerPrimary: Input.PrimaryValue,
 			inversedPrimary: Input.PrimaryValue,
 		): Promise<void> {
-			const qb = this.db
-				.deleteBuilder()
+			const qb = DeleteBuilder.create()
 				.from(joiningTable.tableName)
 				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, Operator.eq, ownerPrimary))
 				.where(cond => cond.compare(joiningTable.inverseJoiningColumn.columnName, Operator.eq, inversedPrimary))
 
-			await qb.execute()
+			await qb.execute(this.db)
 		}
 
 		public async executeComplex(joiningTable: Model.JoiningTable, dataCallback: SelectBuilder.Callback): Promise<void> {
-			const deleteQb = this.db
-				.deleteBuilder()
+			const deleteQb = DeleteBuilder.create()
 				.from(joiningTable.tableName)
 				.using('data')
 				.where(cond => {
@@ -202,20 +196,18 @@ namespace JunctionTableManager {
 					)
 					return cond
 				})
-				.withCteAliases(['data'])
 				.returning(new Literal('true as deleted'))
 
-			const qb = this.db
-				.selectBuilder()
+			const qb = SelectBuilder.create()
 				.with('data', dataCallback)
-				.with('delete', deleteQb.createQuery())
+				.with('delete', deleteQb)
 				.from(new Literal('(values (null))'), 't')
 				.leftJoin('data', 'data', condition => condition.raw('true'))
 				.leftJoin('delete', 'delete', condition => condition.raw('true'))
 				.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
 				.select(expr => expr.raw('coalesce(delete.deleted, false)'), 'deleted')
 
-			const result = await qb.getResult()
+			const result = await qb.getResult(this.db)
 			if (result[0]['selected'] === false) {
 				throw new NoResultError()
 			}

@@ -23,19 +23,19 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 	}
 
 	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result, never> {
-		return SelectBuilder.create<Result>(this)
+		return SelectBuilder.create<Result>()
 	}
 
 	insertBuilder(): InsertBuilder.NewInsertBuilder {
-		return InsertBuilder.create(this)
+		return InsertBuilder.create()
 	}
 
 	updateBuilder(): UpdateBuilder.NewUpdateBuilder {
-		return UpdateBuilder.create(this)
+		return UpdateBuilder.create()
 	}
 
 	deleteBuilder(): DeleteBuilder.NewDeleteBuilder {
-		return DeleteBuilder.create(this)
+		return DeleteBuilder.create()
 	}
 
 	async query<Row extends Record<string, any>>(

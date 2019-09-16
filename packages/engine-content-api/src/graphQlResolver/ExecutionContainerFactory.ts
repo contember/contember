@@ -69,8 +69,7 @@ export class ExecutionContainerFactory {
 			.addService('conditionBuilder', () => new ConditionBuilder())
 			.addService(
 				'whereBuilder',
-				({ joinBuilder, conditionBuilder, db }) =>
-					new WhereBuilder(this.schema.model, joinBuilder, conditionBuilder, db),
+				({ joinBuilder, conditionBuilder }) => new WhereBuilder(this.schema.model, joinBuilder, conditionBuilder),
 			)
 			.addService('orderByBuilder', ({ joinBuilder }) => new OrderByBuilder(this.schema.model, joinBuilder))
 			.addService(
@@ -99,15 +98,7 @@ export class ExecutionContainerFactory {
 			}))
 			.addService(
 				'selectBuilderFactory',
-				({
-					joinBuilder,
-					whereBuilder,
-					orderByBuilder,
-					predicateFactory,
-					fieldsVisitorFactory,
-					metaHandler,
-					selectHandlers,
-				}) =>
+				({ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers, db }) =>
 					new (class implements SelectBuilderFactory {
 						create(qb: DbSelectBuilder, hydrator: SelectHydrator): SelectBuilder {
 							return new SelectBuilder(
@@ -119,6 +110,7 @@ export class ExecutionContainerFactory {
 								hydrator,
 								fieldsVisitorFactory,
 								selectHandlers,
+								db,
 							)
 						}
 					})(),
@@ -138,7 +130,7 @@ export class ExecutionContainerFactory {
 			)
 			.addService(
 				'disconnectJunctionHandler',
-				({ db, providers }) => new JunctionTableManager.JunctionDisconnectHandler(db, providers),
+				({ db, providers }) => new JunctionTableManager.JunctionDisconnectHandler(db),
 			)
 			.addService(
 				'junctionTableManager',

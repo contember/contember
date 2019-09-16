@@ -1,4 +1,4 @@
-import { Client, ConflictActionType } from '@contember/database'
+import { Client, ConflictActionType, InsertBuilder } from '@contember/database'
 import { UuidProvider } from '../../utils/uuid'
 import { EventType } from '@contember/engine-common'
 
@@ -6,8 +6,7 @@ class CreateInitEventCommand {
 	constructor(private readonly providers: UuidProvider) {}
 
 	public async execute(db: Client): Promise<number> {
-		return await db
-			.insertBuilder()
+		return await InsertBuilder.create()
 			.into('event')
 			.values({
 				id: this.providers.uuid(),
@@ -16,7 +15,7 @@ class CreateInitEventCommand {
 				previous_id: null,
 			})
 			.onConflict(ConflictActionType.doNothing, { constraint: 'unique_init' })
-			.execute()
+			.execute(db)
 	}
 }
 

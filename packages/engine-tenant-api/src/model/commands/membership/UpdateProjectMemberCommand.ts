@@ -3,6 +3,7 @@ import { UpdateProjectMemberErrorCode } from '../../../schema'
 import { Membership } from '../../type/Membership'
 import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'
 import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipCommand'
+import { SelectBuilder } from '@contember/database'
 
 class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
 	constructor(
@@ -12,15 +13,14 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 	) {}
 
 	async execute({ db, bus, providers }: Command.Args): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
-		const result = await db
-			.selectBuilder()
+		const result = await SelectBuilder.create()
 			.select('id')
 			.from('project_membership')
 			.where({
 				project_id: this.projectId,
 				identity_id: this.identityId,
 			})
-			.getResult()
+			.getResult(db)
 		if (result.length === 0) {
 			return new UpdateProjectMemberCommand.UpdateProjectMemberResponseError([UpdateProjectMemberErrorCode.NotMember])
 		}

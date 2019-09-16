@@ -28,8 +28,7 @@ class JunctionFetcher {
 		const joiningTable = relation.joiningTable
 
 		const whereColumn = column.sourceColumn.columnName
-		let qb: SelectBuilder<SelectBuilder.Result, any> = this.db
-			.selectBuilder()
+		let qb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
 			.from(joiningTable.tableName, 'junction_')
 			.select(['junction_', joiningTable.inverseJoiningColumn.columnName])
 			.select(['junction_', joiningTable.joiningColumn.columnName])
@@ -60,7 +59,7 @@ class JunctionFetcher {
 			object.args.limit,
 		)
 
-		return await wrapper.getResult(qb)
+		return await wrapper.getResult(qb, this.db)
 	}
 }
 

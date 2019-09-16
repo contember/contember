@@ -3,7 +3,7 @@ import { assertNever } from '../../utils'
 import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import WhereBuilder from '../select/WhereBuilder'
-import { Client } from '@contember/database'
+import { Client, DeleteBuilder, SelectBuilder } from '@contember/database'
 import Path from '../select/Path'
 import PredicateFactory from '../../acl/PredicateFactory'
 import Mapper from '../Mapper'
@@ -59,19 +59,17 @@ class DeleteExecutor {
 
 	private async delete(entity: Model.Entity, where: Input.Where): Promise<string[]> {
 		const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-		const inQb = this.db
-			.selectBuilder()
+		const inQb = SelectBuilder.create()
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn])
 		const inQbWithWhere = this.whereBuilder.build(inQb, entity, new Path([]), { and: [where, predicate] })
 
-		const qb = this.db
-			.deleteBuilder()
+		const qb = DeleteBuilder.create()
 			.from(entity.tableName)
 			.where(condition => condition.in(entity.primaryColumn, inQbWithWhere))
 			.returning(entity.primaryColumn)
 
-		return (await qb.execute()) as string[]
+		return (await qb.execute(this.db)) as string[]
 	}
 
 	private async setNull(

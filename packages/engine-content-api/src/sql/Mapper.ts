@@ -41,13 +41,12 @@ class Mapper {
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
-		const qb = this.db
-			.selectBuilder()
+		const qb = SelectBuilder.create()
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
 		const builtQb = this.whereBuilder.build(qb, entity, new Path([]), expandedWhere)
-		const result = await builtQb.getResult()
+		const result = await builtQb.getResult(this.db)
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
@@ -67,7 +66,7 @@ class Mapper {
 		indexBy?: string,
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = this.db.selectBuilder()
+		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = SelectBuilder.create()
 		let indexByAlias: string | null = null
 		if (indexBy) {
 			const path = new Path([])
@@ -95,7 +94,7 @@ class Mapper {
 		relation: Model.JoiningColumnRelation & Model.Relation,
 	) {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = this.db.selectBuilder()
+		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = SelectBuilder.create()
 		const path = new Path([])
 		const groupingKey = '__grouping_key'
 		qb = qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)

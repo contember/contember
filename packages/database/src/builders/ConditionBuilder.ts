@@ -3,6 +3,7 @@ import { Literal } from '../Literal'
 import { QueryBuilder } from './QueryBuilder'
 import { SelectBuilder } from './SelectBuilder'
 import { toFqnWrap } from './formatUtils'
+import { Compiler } from './Compiler'
 
 export type ConditionCallback = (builder: ConditionBuilder) => ConditionBuilder
 
@@ -70,7 +71,8 @@ export class ConditionBuilder {
 		values: Value[] | SelectBuilder<SelectBuilder.Result, Filled>,
 	): ConditionBuilder {
 		if (!Array.isArray(values)) {
-			const query = values.createQuery()
+			// todo: replace placeholder with some kind of callback
+			const query = values.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set([])))
 			return this.with(new Literal(`${toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
 		}
 		values = values.filter(it => it !== undefined)

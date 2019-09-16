@@ -8,7 +8,7 @@ class DiffCountQuery extends DatabaseQuery<DiffCountQuery.Response> {
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<DiffCountQuery.Response> {
-		const diff = await queryable.createWrapper().query<{ index: number }>(
+		const diff = await queryable.db.query<{ index: number }>(
 			`WITH RECURSIVE events(id, previous_id, index) AS (
     SELECT id, previous_id, 0
     FROM system.event

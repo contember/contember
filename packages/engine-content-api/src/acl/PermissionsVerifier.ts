@@ -129,11 +129,11 @@ export class PermissionsVerifier {
 		const rowAffectedColumns = this.getAffectedColumnsByRow(events)
 
 		const ids = events.map(it => it.rowId)
-		let qb: SelectBuilder<SelectBuilder.Result, any> = this.createBaseSelectBuilder(db, entity, ids)
+		let qb: SelectBuilder<SelectBuilder.Result, any> = this.createBaseSelectBuilder(entity, ids)
 
 		qb = this.buildPredicates(db, qb, Acl.Operation.read, rowAffectedColumns, entity, predicateFactory, schema)
 
-		const result = await qb.getResult()
+		const result = await qb.getResult(db)
 		const permissions: PermissionsByRow = {}
 		for (let row of result) {
 			permissions[row.__primary] = this.extractRowPermissions(row, rowAffectedColumns, Acl.Operation.read)
@@ -152,7 +152,6 @@ export class PermissionsVerifier {
 
 		const affectedColumnsByType: { [type: string]: AffectedColumnsByRow } = {}
 		let qb: SelectBuilder<SelectBuilder.Result, 'select' | 'from' | 'where' | 'join'> = this.createBaseSelectBuilder(
-			db,
 			entity,
 			ids,
 		)
@@ -168,7 +167,7 @@ export class PermissionsVerifier {
 			qb = this.buildPredicates(db, qb, operation, affectedColumnsByType[eventType], entity, predicateFactory, schema)
 		}
 
-		const result = await qb.getResult()
+		const result = await qb.getResult(db)
 		const permissions: PermissionsByRow = {}
 		for (let row of result) {
 			let result = true
@@ -182,9 +181,8 @@ export class PermissionsVerifier {
 		return permissions
 	}
 
-	private createBaseSelectBuilder(db: Client, entity: Model.Entity, ids: string[]) {
-		return db
-			.selectBuilder()
+	private createBaseSelectBuilder(entity: Model.Entity, ids: string[]) {
+		return SelectBuilder.create()
 			.select(entity.primaryColumn, '__primary')
 			.from(entity.tableName, new Path([]).getAlias())
 			.where(clause => clause.in(entity.primaryColumn, ids))
@@ -207,7 +205,7 @@ export class PermissionsVerifier {
 			{},
 		)
 
-		const whereBuilder = new WhereBuilder(schema, new JoinBuilder(schema), new ConditionBuilder(), db)
+		const whereBuilder = new WhereBuilder(schema, new JoinBuilder(schema), new ConditionBuilder())
 
 		const columns = Object.values(rowAffectedColumns).reduce(
 			(result, fields) => [...result, ...fields.filter(it => result.indexOf(it) < 0)],

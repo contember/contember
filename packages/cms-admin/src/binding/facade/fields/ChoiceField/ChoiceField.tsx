@@ -115,12 +115,6 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 }
 
 namespace ChoiceField {
-	export type Label = React.ReactNode
-
-	export type ScalarValue = Scalar | VariableScalar
-
-	export type LiteralValue = VariableLiteral | Literal
-
 	export type StaticValue = GraphQlBuilder.Literal | Scalar
 
 	export type DynamicValue = EntityAccessor['primaryKey']
@@ -130,7 +124,8 @@ namespace ChoiceField {
 
 	export interface SingleDatum<ActualValue extends Environment.Value = string> {
 		key: ValueRepresentation
-		label: Label
+		label: React.ReactNode
+		description?: React.ReactNode
 		actualValue: ActualValue
 	}
 

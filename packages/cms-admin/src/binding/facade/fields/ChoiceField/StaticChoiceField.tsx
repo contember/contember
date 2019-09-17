@@ -2,12 +2,29 @@ import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { Scalar } from '../../../bindingTypes'
 import { Field } from '../../../coreComponents'
-import { DataBindingError, Environment, Literal, VariableLiteral, VariableScalar } from '../../../dao'
+import { DataBindingError, Environment, VariableLiteral, VariableScalar } from '../../../dao'
 import { VariableInputTransformer } from '../../../model/VariableInputTransformer'
-import { ChoiceArity, ChoiceField, ChoiceFieldProps } from './ChoiceField'
+import { ChoiceArity, ChoiceField } from './ChoiceField'
+
+export interface StaticOption {
+	label: React.ReactNode
+	description?: React.ReactNode
+}
+
+export interface ScalarStaticOption extends StaticOption {
+	value: Scalar | VariableScalar
+}
+
+export interface NormalizedStaticOption extends StaticOption {
+	value: GraphQlBuilder.Literal | Scalar
+}
+
+export interface LiteralStaticOption extends StaticOption {
+	value: VariableLiteral | GraphQlBuilder.Literal
+}
 
 export type StaticChoiceFieldProps = ChoiceField.InnerBaseProps & {
-	options: Array<[ChoiceField.LiteralValue, ChoiceField.Label]> | Array<[ChoiceField.ScalarValue, ChoiceField.Label]>
+	options: ScalarStaticOption[] | LiteralStaticOption[]
 }
 
 export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProps> {
@@ -24,9 +41,7 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 		}
 
 		const environment = this.props.environment
-		const options: Array<[GraphQlBuilder.Literal | Scalar, ChoiceField.Label]> = this.isLiteralStaticMode(rawOptions)
-			? this.normalizeLiteralStaticOptions(rawOptions, environment)
-			: this.normalizeScalarStaticOptions(rawOptions, environment)
+		const options = this.normalizeOptions(rawOptions, environment)
 
 		return (
 			<Field name={this.props.fieldName}>
@@ -35,7 +50,7 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 						throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
 					}
 
-					const currentValue: ChoiceField.ValueRepresentation = options.findIndex(([value]) => {
+					const currentValue: ChoiceField.ValueRepresentation = options.findIndex(({ value }) => {
 						return (
 							data.hasValue(value) ||
 							(value instanceof GraphQlBuilder.Literal &&
@@ -45,14 +60,15 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 					}, null)
 
 					return children({
-						data: options.map((item, i) => ({
+						data: options.map(({ label, description, value: actualValue }, i) => ({
 							key: i,
-							label: item[1],
-							actualValue: item[0],
+							description,
+							label,
+							actualValue,
 						})),
 						currentValue,
 						onChange: (newValue: ChoiceField.ValueRepresentation) => {
-							data.updateValue && data.updateValue(options[newValue][0])
+							data.updateValue && data.updateValue(options[newValue].value)
 						},
 						...otherMetadata,
 					})
@@ -61,34 +77,13 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 		)
 	}
 
-	private normalizeLiteralStaticOptions(
-		options: Array<[ChoiceField.LiteralValue, ChoiceField.Label]>,
-		environment: Environment,
-	): Array<[GraphQlBuilder.Literal, ChoiceField.Label]> {
-		return options.map(([key, value]): [GraphQlBuilder.Literal, ChoiceField.Label] => [
-			key instanceof VariableLiteral ? VariableInputTransformer.transformVariableLiteral(key, environment) : key,
-			value,
-		])
-	}
-
-	private normalizeScalarStaticOptions(
-		options: Array<[ChoiceField.ScalarValue, ChoiceField.Label]>,
-		environment: Environment,
-	): Array<[Scalar, ChoiceField.Label]> {
-		return options.map(([key, value]): [Scalar, ChoiceField.Label] => [
-			key instanceof VariableScalar ? VariableInputTransformer.transformVariableScalar(key, environment) : key,
-			value,
-		])
-	}
-
-	private isLiteralStaticMode(
-		options: ChoiceFieldProps['options'],
-	): options is Array<[ChoiceField.LiteralValue, ChoiceField.Label]> {
-		if (options.length === 0) {
-			return false
-		}
-
-		const optionIndicator = options[0][0]
-		return optionIndicator instanceof VariableLiteral || optionIndicator instanceof Literal
+	private normalizeOptions(options: Array<ScalarStaticOption | LiteralStaticOption>, environment: Environment) {
+		return options.map(
+			(options): NormalizedStaticOption => ({
+				value: VariableInputTransformer.transformValue(options.value, environment),
+				label: options.label,
+				description: options.description,
+			}),
+		)
 	}
 }

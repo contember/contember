@@ -1,17 +1,18 @@
 import * as React from 'react'
 import { assertNever } from './assertNever'
+import { BranchNodeList } from './BranchNodeList'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
 import { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
+import { getErrorMessage } from './helpers'
+import { LeafList } from './LeafList'
 import {
+	DeclarationSiteNodeRepresentationFactory,
+	LeafRepresentationFactory,
 	RawNodeRepresentation,
 	RepresentationFactorySite,
-	LeafRepresentationFactory,
 	ValidFactoryName,
-	DeclarationSiteNodeRepresentationFactory,
 } from './nodeSpecs'
 import { BaseComponent, EnvironmentFactory, SyntheticChildrenFactory } from './nodeSpecs/types'
-import { BranchNodeList } from './BranchNodeList'
-import { LeafList } from './LeafList'
 
 export class ChildrenAnalyzer<
 	AllLeafsRepresentation = any,
@@ -21,6 +22,9 @@ export class ChildrenAnalyzer<
 	private static defaultOptions: ChildrenAnalyzerOptions = {
 		ignoreRenderProps: true,
 		renderPropsErrorMessage: 'Render props (functions as React component children) are not supported.',
+
+		ignoreUnhandledNodes: true,
+		unhandledNodeErrorMessage: 'Encountered an unknown child.',
 
 		environmentFactoryName: 'generateEnvironment',
 		syntheticChildrenFactoryName: 'generateSyntheticChildren',
@@ -79,7 +83,7 @@ export class ChildrenAnalyzer<
 			if (this.options.ignoreRenderProps) {
 				return undefined
 			}
-			throw new ChildrenAnalyzerError(this.options.renderPropsErrorMessage)
+			throw new ChildrenAnalyzerError(getErrorMessage(this.options.renderPropsErrorMessage, node))
 		}
 
 		if (Array.isArray(node)) {
@@ -185,6 +189,10 @@ export class ChildrenAnalyzer<
 				} else {
 					return assertNever(branchNode.specification)
 				}
+			}
+
+			if (!this.options.ignoreUnhandledNodes) {
+				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node))
 			}
 
 			return processedChildren

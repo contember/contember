@@ -65,13 +65,13 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 
 	const normalizedData = optionEntities.map(
 		(item, i): ChoiceField.SingleDatum => {
-			let label: ChoiceField.Label
+			let label: React.ReactNode
 
 			if (props.optionFieldFactory) {
 				label = <ToOne.AccessorRenderer accessor={item}>{props.optionFieldFactory}</ToOne.AccessorRenderer>
 			} else if ('fieldName' in parsedOptions) {
 				const field = item.data.getField(parsedOptions.fieldName)
-				label = field instanceof FieldAccessor ? (field.currentValue as ChoiceField.Label) : null
+				label = field instanceof FieldAccessor ? (field.currentValue as React.ReactNode) : null
 			}
 
 			return {

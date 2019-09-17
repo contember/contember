@@ -1,21 +1,20 @@
-import { FieldSet } from '@contember/ui'
+import { Button, ButtonGroup, Dropdown, FieldSet } from '@contember/ui'
+import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { RelativeSingleField } from '../../bindingTypes'
-import { EnvironmentContext, ToMany } from '../../coreComponents'
+import { EnvironmentContext, Field, ToMany } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
-import { EntityAccessor, EntityCollectionAccessor, FieldAccessor, VariableLiteral } from '../../dao'
-import { VariableInputTransformer } from '../../model/VariableInputTransformer'
+import { DataBindingError, EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component } from '../auxiliary'
-import { AlternativeFields } from '../ui'
+import { DiscriminatedBlocks, NormalizedBlockProps } from '../ui'
+import { useNormalizedBlockList } from '../ui/blocks/useNormalizedBlockList'
 import { Sortable } from './Sortable'
 import { SortableRepeaterProps } from './SortableRepeater'
-import { Button, ButtonGroup, Dropdown } from '@contember/ui'
 
 export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
-	alternatives: AlternativeFields.ControllerFieldLiteralMetadata[]
 	discriminationField: RelativeSingleField
-	children?: never
+	children: React.ReactNode
 	emptyMessage?: React.ReactNode
 }
 
@@ -23,21 +22,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 	props => {
 		const environment = React.useContext(EnvironmentContext)
 		const isMutating = React.useContext(MutationStateContext)
-
-		const addNewOptions = React.useMemo(
-			() =>
-				props.alternatives.map(([value, label, foo], index) => {
-					return {
-						key: index,
-						label,
-						actualValue:
-							value instanceof VariableLiteral
-								? VariableInputTransformer.transformVariableLiteral(value, environment)
-								: value,
-					}
-				}),
-			[environment, props.alternatives],
-		)
+		const normalizedBlockList: NormalizedBlockProps[] = useNormalizedBlockList(props.children)
 
 		return QueryLanguage.wrapRelativeEntityList(
 			props.field,
@@ -72,11 +57,9 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 												enableUnlinkAll={props.enableUnlinkAll}
 												removeType={props.removeType}
 											>
-												<AlternativeFields
-													label={props.label}
-													alternatives={props.alternatives}
-													name={props.discriminationField}
-													allowBlockTypeChange={false}
+												<SortableBlock
+													normalizedBlockProps={normalizedBlockList}
+													discriminationField={props.discriminationField}
 												/>
 											</Sortable>
 										</div>
@@ -95,18 +78,15 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 											>
 												{({ requestClose }) => (
 													<ButtonGroup orientation="vertical">
-														{addNewOptions.map(option => (
+														{normalizedBlockList.map((blockProps, i) => (
 															<Button
-																key={option.key}
+																key={i}
 																distinction="seamless"
 																flow="block"
 																disabled={isMutating}
 																onClick={() => {
 																	requestClose()
-																	if (!(option.key in addNewOptions)) {
-																		return
-																	}
-																	const targetValue = addNewOptions[option.key].actualValue
+																	const targetValue = blockProps.discriminateBy
 																	if (filteredEntities.length === 1 && firstDiscriminationNull) {
 																		return (
 																			firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
@@ -131,7 +111,8 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 																		})
 																}}
 															>
-																{option.label}
+																{blockProps.label}
+																{blockProps.description && <small>{blockProps.description}</small>}
 															</Button>
 														))}
 													</ButtonGroup>
@@ -148,19 +129,50 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 			environment,
 		)
 	},
-	(props, environment) => (
+	props => (
 		<ToMany field={props.field}>
 			<Sortable sortBy={props.sortBy}>
-				{AlternativeFields.generateSyntheticChildren(
-					{
-						name: props.discriminationField,
-						alternatives: props.alternatives,
-						label: props.label,
-					},
-					environment,
-				)}
+				<DiscriminatedBlocks name={props.discriminationField} label={props.label}>
+					{props.children}
+				</DiscriminatedBlocks>
 			</Sortable>
 		</ToMany>
 	),
 	'SortableBlockRepeater',
 )
+
+interface SortableBlockProps {
+	discriminationField: RelativeSingleField
+	normalizedBlockProps: NormalizedBlockProps[]
+}
+
+const SortableBlock = React.memo<SortableBlockProps>(props => (
+	<Field.DataRetriever name={props.discriminationField}>
+		{rawMetadata => {
+			const data = rawMetadata.data
+
+			if (!(data instanceof EntityAccessor)) {
+				throw new DataBindingError(`Corrupt data`)
+			}
+			const field = data.data.getField(props.discriminationField)
+
+			if (!(field instanceof FieldAccessor)) {
+				throw new DataBindingError(`Corrupt data`)
+			}
+
+			const currentValue = field.currentValue
+			const selectedBlock = props.normalizedBlockProps.find(block =>
+				block.discriminateBy instanceof GraphQlBuilder.Literal
+					? block.discriminateBy.value === currentValue
+					: block.discriminateBy === currentValue,
+			)
+
+			if (!selectedBlock) {
+				return null
+			}
+
+			return selectedBlock.children
+		}}
+	</Field.DataRetriever>
+))
+SortableBlock.displayName = 'SortableBlock'

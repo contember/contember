@@ -7,6 +7,7 @@ import State from '../../state'
 import { requestStateToPath } from '../../utils/url'
 import routes from '../../routes'
 import { pageRequest } from '../../state/request'
+import { isUrlActive } from '../../utils/isUrlActive'
 
 export interface NavigationIsActiveProviderProps {
 	children?: React.ReactNode
@@ -25,7 +26,7 @@ export function NavigationIsActiveProvider(props: NavigationIsActiveProviderProp
 						typeof to === 'string' ? {} : to.parameters,
 					)(state.request),
 				)
-				return url === location.pathname
+				return isUrlActive(url)
 			} else {
 				return false
 			}

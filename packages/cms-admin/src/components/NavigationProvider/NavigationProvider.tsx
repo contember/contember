@@ -13,8 +13,8 @@ export interface NavigationIsActiveProviderProps {
 }
 
 export function NavigationIsActiveProvider(props: NavigationIsActiveProviderProps) {
-	const isActive = useSelector<State, (to: Navigation.IsActiveProps['to']) => boolean>(state => {
-		return (to: Navigation.IsActiveProps['to']) => {
+	const isActive = useSelector<State, (to: string | Navigation.CustomTo) => boolean>(state => {
+		return (to: string | Navigation.CustomTo) => {
 			if (state.view.route && state.view.route.name === 'project_page') {
 				const url = requestStateToPath(
 					routes(state.projectsConfigs.configs),
@@ -32,15 +32,7 @@ export function NavigationIsActiveProvider(props: NavigationIsActiveProviderProp
 		}
 	})
 
-	return (
-		<Navigation.IsActiveContext.Provider
-			value={(props: Navigation.IsActiveProps) => {
-				return <>{props.children(isActive(props.to))}</>
-			}}
-		>
-			{props.children}
-		</Navigation.IsActiveContext.Provider>
-	)
+	return <Navigation.IsActiveContext.Provider value={isActive}>{props.children}</Navigation.IsActiveContext.Provider>
 }
 
 export interface NavigationProviderProps {

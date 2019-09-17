@@ -101,29 +101,14 @@ namespace Menu {
 		}
 	}
 
-	function IsActive(props: { children: (isActive: boolean) => React.ReactNode; to: ItemProps['to'] }) {
-		const NavigationIsActive = React.useContext(Navigation.IsActiveContext)
-
-		if (props.to) {
-			return <NavigationIsActive to={props.to}>{props.children}</NavigationIsActive>
-		} else {
-			return <>{props.children(false)}</>
-		}
-	}
-
 	function ItemWrapper(props: {
 		children?: React.ReactNode
 		className: string
 		to: ItemProps['to']
 		suppressIsActive?: boolean
 	}) {
-		return (
-			<IsActive to={props.to}>
-				{isActive => (
-					<li className={cn(props.className, isActive && !props.suppressIsActive && 'is-active')}>{props.children}</li>
-				)}
-			</IsActive>
-		)
+		const isActive = Navigation.useIsActive(props.to)
+		return <li className={cn(props.className, isActive && !props.suppressIsActive && 'is-active')}>{props.children}</li>
 	}
 
 	function GroupItem(props: ItemProps) {

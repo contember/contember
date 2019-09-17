@@ -6,6 +6,7 @@ import State from '../../state'
 import { RequestChange } from '../../state/request'
 import { requestStateToPath } from '../../utils/url'
 import routes from '../../routes'
+import { isUrlActive } from '../../utils/isUrlActive'
 
 export interface DynamicLinkInnerProps {
 	onClick: () => void
@@ -15,7 +16,6 @@ export interface DynamicLinkInnerProps {
 
 export interface DynamicLinkStateProps {
 	url: string
-	pathname: string
 }
 
 export interface DynamicLinkDispatchProps {
@@ -34,7 +34,7 @@ const DynamicLinkComponent = (props: DynamicLinkProps) => {
 	const Component = props.Component
 
 	return (
-		<Component onClick={props.goTo} isActive={props.url === props.pathname}>
+		<Component onClick={props.goTo} isActive={isUrlActive(props.url)}>
 			{props.children || null}
 		</Component>
 	)
@@ -44,7 +44,6 @@ DynamicLinkComponent.displayName = 'DynamicLink'
 export const DynamicLink = connect<DynamicLinkStateProps, DynamicLinkDispatchProps, DynamicLinkOwnProps, State>(
 	({ view, projectsConfigs, request }, { requestChange }) => ({
 		url: requestStateToPath(routes(projectsConfigs.configs), requestChange(request)),
-		pathname: location.pathname,
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(DynamicLinkComponent)

@@ -71,6 +71,7 @@ namespace Menu {
 
 		return (props: TitleProps) => {
 			const { children, ...otherProps } = props
+			const content = <div className="menu-titleContent">{children}</div>
 			if (to) {
 				return (
 					<Link
@@ -86,17 +87,17 @@ namespace Menu {
 						}}
 						{...otherProps}
 					>
-						{children}
+						{content}
 					</Link>
 				)
 			} else if (onClick) {
 				return (
 					<button type="button" onClick={onClick} {...otherProps}>
-						<div className="menu-titleContent">{children}</div>
+						{content}
 					</button>
 				)
 			} else {
-				return <div {...otherProps}>{children}</div>
+				return <div {...otherProps}>{content}</div>
 			}
 		}
 	}

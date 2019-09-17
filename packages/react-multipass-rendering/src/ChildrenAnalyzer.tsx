@@ -32,7 +32,7 @@ export class ChildrenAnalyzer<
 
 	private readonly leafs: LeafList<AllLeafsRepresentation, Environment>
 	private readonly branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, Environment>
-	private readonly options: ChildrenAnalyzerOptions
+	private readonly options: ChildrenAnalyzerOptions<Environment>
 
 	public constructor(leafs: LeafList<AllLeafsRepresentation, Environment>, options?: Partial<ChildrenAnalyzerOptions>)
 	public constructor(
@@ -83,7 +83,7 @@ export class ChildrenAnalyzer<
 			if (this.options.ignoreRenderProps) {
 				return undefined
 			}
-			throw new ChildrenAnalyzerError(getErrorMessage(this.options.renderPropsErrorMessage, node))
+			throw new ChildrenAnalyzerError(getErrorMessage(this.options.renderPropsErrorMessage, node, environment))
 		}
 
 		if (Array.isArray(node)) {
@@ -192,7 +192,7 @@ export class ChildrenAnalyzer<
 			}
 
 			if (!this.options.ignoreUnhandledNodes) {
-				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node))
+				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, environment))
 			}
 
 			return processedChildren

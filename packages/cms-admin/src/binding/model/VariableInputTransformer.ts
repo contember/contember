@@ -69,7 +69,10 @@ export class VariableInputTransformer {
 		}
 	}
 
-	public static transformVariableScalar(variableScalar: VariableScalar, environment: Environment): Scalar {
+	public static transformVariableScalar(variableScalar: VariableScalar | Scalar, environment: Environment): Scalar {
+		if (!(variableScalar instanceof VariableScalar)) {
+			return variableScalar
+		}
 		const value = environment.getValueOrElse(variableScalar.variable, undefined)
 
 		if (typeof value !== 'string' && typeof value !== 'boolean' && typeof value !== 'number' && value !== null) {
@@ -81,9 +84,16 @@ export class VariableInputTransformer {
 	}
 
 	public static transformVariableLiteral(
-		variableLiteral: VariableLiteral,
+		variableLiteral: VariableLiteral | GraphQlBuilder.Literal | string,
 		environment: Environment,
 	): GraphQlBuilder.Literal {
+		if (variableLiteral instanceof GraphQlBuilder.Literal) {
+			return variableLiteral
+		}
+		if (typeof variableLiteral === 'string') {
+			return new GraphQlBuilder.Literal(variableLiteral)
+		}
+
 		const value = environment.getValueOrElse(variableLiteral.variable, undefined)
 
 		if (typeof value !== 'string') {

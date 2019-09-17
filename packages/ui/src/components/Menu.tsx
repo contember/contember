@@ -102,10 +102,10 @@ namespace Menu {
 	}
 
 	function IsActive(props: { children: (isActive: boolean) => React.ReactNode; to: ItemProps['to'] }) {
-		const IsActive = React.useContext(Navigation.IsActiveContext)
+		const NavigationIsActive = React.useContext(Navigation.IsActiveContext)
 
 		if (props.to) {
-			return <IsActive to={props.to}>{props.children}</IsActive>
+			return <NavigationIsActive to={props.to}>{props.children}</NavigationIsActive>
 		} else {
 			return <>{props.children(false)}</>
 		}

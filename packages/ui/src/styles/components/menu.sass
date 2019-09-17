@@ -51,7 +51,7 @@
 	&-subgroup
 		&-title
 			margin: 0
-			color: $cui-menu-subgroup-color
+			color: $cui-menu-subgroup-inactive-color
 			font-size: $cui-menu-subgroup-title-font-size
 			padding: $cui-menu-vertical-padding $cui-menu-horizontal-padding
 			text-align: inherit
@@ -122,6 +122,10 @@
 		&.is-active > &-title
 			background-color: $cui-menu-active-background
 
+	&subgroup
+		&.is-active > &-title
+			color: $cui-menu-subgroup-active-color
+
 	&-action,
 	&-tooDeep
 		&.is-active > &-title
@@ -133,7 +137,7 @@
 			cursor: pointer
 
 			&:hover
-				background-color: $cui-menu-active-background
+				color: $cui-menu-subgroup-active-color
 
 		&-action,
 		&-tooDeep

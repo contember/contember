@@ -6,7 +6,7 @@ import { FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
-export { LineBreakBehavior, Block, Mark } from '../../../components/RichEditor'
+export { LineBreakBehavior, Block as EditorBlock, Mark } from '../../../components/RichEditor'
 
 export type RichTextFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<TextInputOwnProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'> & {

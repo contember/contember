@@ -9,7 +9,7 @@
 		"run-admin": "dist/src/run-admin.js"
 	},
 	"dependencies": {
-		"cms-server-common": "0.0.0",
+		"cms-server-common": "^0.0.0",
 		"koa": "^2.8.1",
 		"koa-static": "^5.0.0"
 	},

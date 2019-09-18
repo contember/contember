@@ -38,6 +38,6 @@
 		"@types/pg": "^7.11.0",
 		"@types/uuid": "^3.4.5",
 		"jasmine": "^3.4.0",
-		"typescript": "^3.5.3"
+		"typescript": "^3.6.3"
 	}
 }

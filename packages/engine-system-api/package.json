@@ -34,7 +34,7 @@
 		"@graphql-codegen/typescript-resolvers": "^1.5.0",
 		"@types/graphql": "^14.5.0",
 		"@types/jasmine": "^3.4.0",
-		"@types/node": "^10.12.10",
+		"@types/node": "^12.7.5",
 		"@types/pg": "^7.11.0",
 		"@types/uuid": "^3.4.5",
 		"jasmine": "^3.4.0",

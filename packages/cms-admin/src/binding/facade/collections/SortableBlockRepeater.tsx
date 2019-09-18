@@ -111,8 +111,14 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 																		})
 																}}
 															>
-																{blockProps.label}
-																{blockProps.description && <small>{blockProps.description}</small>}
+																{!!blockProps.description && (
+																	<span>
+																		{blockProps.label}
+																		<br />
+																		<small>{blockProps.description}</small>
+																	</span>
+																)}
+																{!blockProps.description && blockProps.label}
 															</Button>
 														))}
 													</ButtonGroup>

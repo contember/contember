@@ -339,5 +339,3 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 		editor.insertFragment(Document.create(nodes))
 	}
 }
-
-export * from './RichEditorNG'

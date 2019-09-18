@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions'
 import { SET_ERROR, SET_IDENTITY, SET_LOADING, SET_LOGOUT } from '../reducer/auth'
+import { getErrorCodeString } from '../tenant/hooks/strings'
 import { pushRequest } from './request'
 import { ActionCreator } from './types'
 import { AuthIdentity, Project } from '../state/auth'
@@ -49,7 +50,9 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 			dispatch(pushRequest(() => ({ name: 'projects_list' })))
 		} else {
 			dispatch(
-				createAction(SET_ERROR, () => signIn.errors.map((err: any) => err.endUserMessage || err.code).join(', '))(),
+				createAction(SET_ERROR, () =>
+					signIn.errors.map((err: any) => err.endUserMessage || getErrorCodeString(err.code)).join(', '),
+				)(),
 			)
 		}
 	} catch (error) {

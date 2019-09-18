@@ -1,5 +1,6 @@
 import { useAuth, useAuthedTenantMutation } from './lib'
 import { useCallback, useMemo } from 'react'
+import { getErrorCodeString } from './strings'
 
 const CHANGE_PASSWORD_MUTATION = `
 	mutation(
@@ -64,7 +65,7 @@ export const useChangePassword = (): [(password: string) => void, ReturnedState]
 			finished: state.finished,
 			loading: state.loading,
 			errors:
-				(state.finished && !state.error && state.data.changePassword.errors.map(it => it.endUserMessage || it.code)) ||
+				(state.finished && !state.error && state.data.changePassword.errors.map(it => getErrorCodeString(it.code))) ||
 				[],
 		}
 	}, [state])

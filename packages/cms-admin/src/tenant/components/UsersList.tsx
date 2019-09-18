@@ -12,6 +12,7 @@ import { Button, ButtonList, ContainerSpinner, Tag, TitleBar } from '@contember/
 import { Table } from '../../components/ui'
 import { PageLinkButton } from '../../components/pageRouting'
 import { ToastType } from '../../state/toasts'
+import { getErrorCodeString } from '../hooks/strings'
 
 export interface UsersListProps<T> {
 	project: string
@@ -50,7 +51,9 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 				})
 			} else {
 				addToast({
-					message: `Error updating membership: ${result.updateProjectMember.errors.map(it => it.code).join(', ')}`,
+					message: `Error updating membership: ${result.updateProjectMember.errors
+						.map(it => getErrorCodeString(it.code))
+						.join(', ')}`,
 					type: ToastType.Error,
 				})
 			}
@@ -73,7 +76,9 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 				})
 			} else {
 				addToast({
-					message: `Error removing member: ${result.removeProjectMember.errors.map(it => it.code).join(', ')}`,
+					message: `Error removing member: ${result.removeProjectMember.errors
+						.map(it => getErrorCodeString(it.code))
+						.join(', ')}`,
 					type: ToastType.Error,
 				})
 			}

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Dropdown, FieldSet } from '@contember/ui'
+import { Box, Button, ButtonGroup, Dropdown, FieldSet } from '@contember/ui'
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { RelativeSingleField } from '../../bindingTypes'
@@ -160,18 +160,17 @@ const SortableBlock = React.memo<SortableBlockProps>(props => (
 				throw new DataBindingError(`Corrupt data`)
 			}
 
-			const currentValue = field.currentValue
-			const selectedBlock = props.normalizedBlockProps.find(block =>
-				block.discriminateBy instanceof GraphQlBuilder.Literal
-					? block.discriminateBy.value === currentValue
-					: block.discriminateBy === currentValue,
-			)
+			const selectedBlock = props.normalizedBlockProps.find(block => field.hasValue(block.discriminateBy))
 
 			if (!selectedBlock) {
 				return null
 			}
 
-			return selectedBlock.children
+			return (
+				<Box heading={selectedBlock.label} distinction="seamlessIfNested">
+					{selectedBlock.children}
+				</Box>
+			)
 		}}
 	</Field.DataRetriever>
 ))

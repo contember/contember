@@ -20,9 +20,9 @@ export class FieldAccessor<
 	public hasValue(candidate: this['currentValue']): boolean {
 		const currentValue = this.currentValue
 
-		if (currentValue instanceof GraphQlBuilder.Literal) {
-			return candidate instanceof GraphQlBuilder.Literal && currentValue.value === candidate.value
-		}
-		return currentValue === candidate
+		const left = currentValue instanceof GraphQlBuilder.Literal ? currentValue.value : currentValue
+		const right = candidate instanceof GraphQlBuilder.Literal ? candidate.value : candidate
+
+		return left === right
 	}
 }

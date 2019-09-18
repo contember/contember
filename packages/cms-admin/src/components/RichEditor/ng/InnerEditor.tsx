@@ -63,6 +63,9 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 				}
 
 				let type = (entityAccessor.data.getField(name) as FieldAccessor).currentValue
+				if (type === null) {
+					type = props.defaultBlock
+				}
 				if (type instanceof GraphQlBuilder.Literal) {
 					type = type.value
 				}
@@ -78,7 +81,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 					if (!(fieldAccessor instanceof FieldAccessor)) {
 						throw new Error('')
 					}
-					const currentValue = fieldAccessor.currentValue
+					const currentValue = fieldAccessor.currentValue || ''
 					if (typeof currentValue !== 'string') {
 						throw new Error('')
 					}
@@ -103,7 +106,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 				return slateBlock
 			}),
 		})
-	}, [docId, entityAccessors, blockCache, name, blocks])
+	}, [docId, entityAccessors, blockCache, name, blocks, props.defaultBlock])
 
 	const onChange: OnChangeFn = useCallback(
 		({ value }) => {

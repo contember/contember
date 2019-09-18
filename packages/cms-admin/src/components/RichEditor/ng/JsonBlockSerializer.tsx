@@ -11,11 +11,16 @@ export default class JsonBlockSerializer {
 	}
 
 	deserialize(str: string): Immutable.List<Block | Text | Inline> {
-		const nodes = JSON.parse(str)
-		// @ts-ignore
-		return ((slate.Node as unknown) as SlateNode & { createList: (_: Array<NodeJSON>) => Immutable.List<SlateNode> })
-			.createList(nodes)
-			.filter(node => !Document.isDocument(node))
-			.toList() as Immutable.List<Block | Text | Inline>
+		try {
+			const nodes = JSON.parse(str)
+			// @ts-ignore
+			return ((slate.Node as unknown) as SlateNode & { createList: (_: Array<NodeJSON>) => Immutable.List<SlateNode> })
+				.createList(nodes)
+				.filter(node => !Document.isDocument(node))
+				.toList() as Immutable.List<Block | Text | Inline>
+		} catch (e) {
+			// @ts-ignore
+			return (slate.Node as any).createList([])
+		}
 	}
 }

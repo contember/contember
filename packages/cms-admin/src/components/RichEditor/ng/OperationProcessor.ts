@@ -92,15 +92,11 @@ export default class OperationProcessor {
 							if (valueFieldAccessor.updateValue === undefined) {
 								return
 							}
-							if (typeof valueFieldAccessor.currentValue !== 'string') {
-								throw new Error(
-									`Value for block ${
-										block.type
-									} is of type ${typeof valueFieldAccessor.currentValue} instead of string`,
-								)
+							const oldValue = valueFieldAccessor.currentValue || ''
+							if (typeof oldValue !== 'string') {
+								throw new Error(`Value for block ${block.type} is of type ${typeof oldValue} instead of string`)
 							}
 							const newValue: string = this.blockNodesSerializer.serialize(block)
-							const oldValue: string = valueFieldAccessor.currentValue
 							if (newValue !== oldValue) {
 								valueFieldAccessor.updateValue(newValue)
 							}
@@ -162,7 +158,7 @@ export default class OperationProcessor {
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('Not found type field')
 		}
-		let type = typeField.currentValue
+		let type = typeField.currentValue || this.defaultBlock
 		if (type instanceof GraphQlBuilder.Literal) {
 			type = type.value
 		}

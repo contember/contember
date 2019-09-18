@@ -20,6 +20,9 @@ export class FieldAccessor<
 	public hasValue(candidate: this['currentValue']): boolean {
 		const currentValue = this.currentValue
 
+		// This may seem like absolute bogus but it is indeed desirable because when updating entities with fields whose
+		// values are supposed to be literals, we still get strings from the API, and so, at least for now, this sort of
+		// looser definition of equality is necessary.
 		const left = currentValue instanceof GraphQlBuilder.Literal ? currentValue.value : currentValue
 		const right = candidate instanceof GraphQlBuilder.Literal ? candidate.value : candidate
 

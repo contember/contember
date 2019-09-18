@@ -442,15 +442,16 @@ $cui-box-depths: (
 $cui-menu-vertical-padding: rem(8px) !default;
 $cui-menu-horizontal-padding: rem(28px) !default;
 $cui-menu-group-title-font-size: rem(12px) !default;
-$cui-menu-group-color: #00000045 !default;
+$cui-menu-group-color: $cui-color-gray-3 !default;
 $cui-menu-subgroup-title-font-size: rem(14px) !default;
-$cui-menu-subgroup-active-color: #000000 !default;
-$cui-menu-subgroup-inactive-color: #3A3A3A !default;
-$cui-menu-active-background: #00000012 !default;
+$cui-menu-subgroup-active-color: $cui-color-black !default;
+$cui-menu-subgroup-inactive-color: $cui-color-gray-8 !default;
+$cui-menu-hover-background: $cui-color-gray-1 !default;
+$cui-menu-active-background: $cui-color-gray-2 !default;
 $cui-menu-action-title-font-size: rem(12px) !default;
 $cui-menu-action-inactive-opacity: .8 !default;
-$cui-menu-action-active-color: #484848 !default;
-$cui-menu-action-inactive-color: #6D6D6D !default;
+$cui-menu-action-active-color: $cui-color-gray-7 !default;
+$cui-menu-action-inactive-color: $cui-color-gray-6 !default;
 $cui-menu-caret-transition-duration: $cui-collapsible-transition-duration !default;
 
 

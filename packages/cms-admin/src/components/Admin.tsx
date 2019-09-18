@@ -34,7 +34,7 @@ export default class Admin extends React.Component<AdminProps> {
 		this.store = configureStore(emptyState, props.config)
 		this.store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => this.props.configs)())
 		this.store.dispatch(populateRequest(document.location!))
-		window.onpopstate = e => {
+		window.onpopstate = (e: PopStateEvent) => {
 			e.preventDefault()
 			this.store.dispatch(populateRequest(document.location!))
 		}

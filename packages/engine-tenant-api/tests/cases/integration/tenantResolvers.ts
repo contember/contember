@@ -78,7 +78,7 @@ describe('tenant api', () => {
 				executes: [
 					{
 						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "email" = ?`,
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
 						parameters: ['john@doe.com'],
 						response: { rows: [] },
 					},
@@ -152,7 +152,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 				executes: [
 					{
 						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "email" = ?`,
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
 						parameters: ['john@doe.com'],
 						response: { rows: [{ id: testUuid(1), password_hash: null, identity_id: null, roles: [] }] },
 					},
@@ -201,7 +201,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 				executes: [
 					{
 						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "email" = ?`,
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
 						parameters: ['john@doe.com'],
 						response: {
 							rows: [
@@ -311,7 +311,7 @@ from "tenant"."project_membership" left join "variables" on "project_membership"
 				executes: [
 					{
 						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "id" = ?`,
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."id" = ?`,
 						parameters: [testUuid(1)],
 						response: {
 							rows: [
@@ -351,7 +351,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 				executes: [
 					{
 						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "identity_id" = ?`,
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [
@@ -388,7 +388,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 				executes: [
 					{
 						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "identity_id" = ?`,
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [
@@ -429,7 +429,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 				executes: [
 					{
 						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "identity_id" = ?`,
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
 							rows: [],

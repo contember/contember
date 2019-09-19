@@ -2,7 +2,6 @@ import { EntityCollectionAccessor, Environment } from '../../binding/dao'
 import { QueryLanguage } from '../../binding/queryLanguage'
 import { EnvironmentContext, Field, ToMany } from '../../binding'
 import * as React from 'react'
-import { Sortable } from '../../binding/facade/collections/Sortable'
 import { KeyUtils } from 'slate'
 import { InnerEditor, RTEProps } from './ng/InnerEditor'
 

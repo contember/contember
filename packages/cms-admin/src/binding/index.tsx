@@ -1,3 +1,4 @@
+export * from './accessorRetrievers'
 export * from './coreComponents'
 export * from './dao'
 export * from './facade'

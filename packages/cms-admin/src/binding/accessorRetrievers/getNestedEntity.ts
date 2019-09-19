@@ -1,5 +1,5 @@
-import { ToOne } from '../../coreComponents'
-import { DataBindingError, EntityAccessor, ReferenceMarker } from '../../dao'
+import { ToOne } from '../coreComponents'
+import { DataBindingError, EntityAccessor, ReferenceMarker } from '../dao'
 
 export const getNestedEntity = (entity: EntityAccessor, toOneProps: ToOne.AtomicPrimitiveProps[]) => {
 	for (let i = toOneProps.length - 1; i >= 0; i--) {

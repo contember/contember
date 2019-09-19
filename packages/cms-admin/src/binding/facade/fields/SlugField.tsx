@@ -1,14 +1,14 @@
 import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import * as React from 'react'
+import { useEntityContext, useRelativeSingleField } from '../../accessorRetrievers'
 import { RelativeSingleField } from '../../bindingTypes'
-import { Field, useEntityContext, useEnvironment } from '../../coreComponents'
+import { useEnvironment } from '../../coreComponents'
 import { useMutationState } from '../../coreComponents/PersistState'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
-import { useRelativeSingleField } from '../utils'
 
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
 	SimpleRelativeSingleFieldProps & {

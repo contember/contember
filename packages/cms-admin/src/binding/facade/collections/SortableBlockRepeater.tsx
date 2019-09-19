@@ -1,11 +1,10 @@
 import { Box, Button, ButtonGroup, Dropdown, FieldSet } from '@contember/ui'
-import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
+import { useEntityCollectionAccessor, useRelativeEntityList } from '../../accessorRetrievers'
 import { RelativeSingleField } from '../../bindingTypes'
-import { EnvironmentContext, Field, ToMany } from '../../coreComponents'
+import { Field, ToMany } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
-import { DataBindingError, EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../dao'
-import { QueryLanguage } from '../../queryLanguage'
+import { DataBindingError, EntityAccessor, FieldAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { DiscriminatedBlocks, NormalizedBlockProps } from '../ui'
 import { useNormalizedBlockList } from '../ui/blocks/useNormalizedBlockList'
@@ -20,119 +19,104 @@ export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
 
 export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 	props => {
-		const environment = React.useContext(EnvironmentContext)
 		const isMutating = React.useContext(MutationStateContext)
 		const normalizedBlockList: NormalizedBlockProps[] = useNormalizedBlockList(props.children)
+		const field = useRelativeEntityList(props.field)
 
-		return QueryLanguage.wrapRelativeEntityList(
-			props.field,
-			atomicPrimitiveProps => (
-				<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
-					{(field: EntityCollectionAccessor) => {
-						const filteredEntities: EntityAccessor[] = field.entities.filter(
-							(item): item is EntityAccessor => item instanceof EntityAccessor,
-						)
-						const firstEntity = filteredEntities[0]
-						const firstDiscrimination = firstEntity.data.getField(props.discriminationField)
+		const filteredEntities: EntityAccessor[] = field.entities.filter(
+			(item): item is EntityAccessor => item instanceof EntityAccessor,
+		)
+		const firstEntity = filteredEntities[0]
+		const firstDiscrimination = firstEntity.data.getField(props.discriminationField)
 
-						if (!(firstDiscrimination instanceof FieldAccessor)) {
-							return
-						}
-						const firstDiscriminationNull = firstDiscrimination.currentValue === null
+		if (!(firstDiscrimination instanceof FieldAccessor)) {
+			return null
+		}
+		const firstDiscriminationNull = firstDiscrimination.currentValue === null
 
-						const shouldViewContent = filteredEntities.length > 1 || !firstDiscriminationNull
+		const shouldViewContent = filteredEntities.length > 1 || !firstDiscriminationNull
 
-						return (
-							// Intentionally not applying label system middleware
-							<FieldSet legend={props.label} errors={field.errors}>
-								<div className="cloneable">
-									{shouldViewContent && (
-										<div className="cloneable-content">
-											<Sortable
-												entities={field}
-												sortBy={props.sortBy}
-												label={props.label}
-												enableAddingNew={false}
-												enableUnlink={props.enableUnlink}
-												enableUnlinkAll={props.enableUnlinkAll}
-												removeType={props.removeType}
-											>
-												<SortableBlock
-													normalizedBlockProps={normalizedBlockList}
-													discriminationField={props.discriminationField}
-												/>
-											</Sortable>
-										</div>
-									)}
-									{shouldViewContent || (
-										<div className="cloneable-emptyMessage">
-											{props.emptyMessage || 'There is no content yet. Try adding a new block.'}
-										</div>
-									)}
-									{field.addNew && (
-										<div className="cloneable-button">
-											<Dropdown
-												buttonProps={{
-													children: '+ Add new',
+		return (
+			// Intentionally not applying label system middleware
+			<FieldSet legend={props.label} errors={field.errors}>
+				<div className="cloneable">
+					{shouldViewContent && (
+						<div className="cloneable-content">
+							<Sortable
+								entities={field}
+								sortBy={props.sortBy}
+								label={props.label}
+								enableAddingNew={false}
+								enableUnlink={props.enableUnlink}
+								enableUnlinkAll={props.enableUnlinkAll}
+								removeType={props.removeType}
+							>
+								<SortableBlock
+									normalizedBlockProps={normalizedBlockList}
+									discriminationField={props.discriminationField}
+								/>
+							</Sortable>
+						</div>
+					)}
+					{shouldViewContent || (
+						<div className="cloneable-emptyMessage">
+							{props.emptyMessage || 'There is no content yet. Try adding a new block.'}
+						</div>
+					)}
+					{field.addNew && (
+						<div className="cloneable-button">
+							<Dropdown
+								buttonProps={{
+									children: '+ Add new',
+								}}
+							>
+								{({ requestClose }) => (
+									<ButtonGroup orientation="vertical">
+										{normalizedBlockList.map((blockProps, i) => (
+											<Button
+												key={i}
+												distinction="seamless"
+												flow="block"
+												disabled={isMutating}
+												onClick={() => {
+													requestClose()
+													const targetValue = blockProps.discriminateBy
+													if (filteredEntities.length === 1 && firstDiscriminationNull) {
+														return firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
+													}
+													field.addNew &&
+														field.addNew(getAccessor => {
+															const accessor = getAccessor()
+															const newlyAdded = accessor.entities[accessor.entities.length - 1]
+															if (!(newlyAdded instanceof EntityAccessor)) {
+																return
+															}
+															// TODO this will fail horribly if QL is present here
+															const discriminationField = newlyAdded.data.getField(props.discriminationField)
+															if (!(discriminationField instanceof FieldAccessor) || !discriminationField.updateValue) {
+																return
+															}
+															discriminationField.updateValue(targetValue)
+														})
 												}}
 											>
-												{({ requestClose }) => (
-													<ButtonGroup orientation="vertical">
-														{normalizedBlockList.map((blockProps, i) => (
-															<Button
-																key={i}
-																distinction="seamless"
-																flow="block"
-																disabled={isMutating}
-																onClick={() => {
-																	requestClose()
-																	const targetValue = blockProps.discriminateBy
-																	if (filteredEntities.length === 1 && firstDiscriminationNull) {
-																		return (
-																			firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
-																		)
-																	}
-																	field.addNew &&
-																		field.addNew(getAccessor => {
-																			const accessor = getAccessor()
-																			const newlyAdded = accessor.entities[accessor.entities.length - 1]
-																			if (!(newlyAdded instanceof EntityAccessor)) {
-																				return
-																			}
-																			// TODO this will fail horribly if QL is present here
-																			const discriminationField = newlyAdded.data.getField(props.discriminationField)
-																			if (
-																				!(discriminationField instanceof FieldAccessor) ||
-																				!discriminationField.updateValue
-																			) {
-																				return
-																			}
-																			discriminationField.updateValue(targetValue)
-																		})
-																}}
-															>
-																{!!blockProps.description && (
-																	<span>
-																		{blockProps.label}
-																		<br />
-																		<small>{blockProps.description}</small>
-																	</span>
-																)}
-																{!blockProps.description && blockProps.label}
-															</Button>
-														))}
-													</ButtonGroup>
+												{!!blockProps.description && (
+													<span>
+														{blockProps.label}
+														<br />
+														<small>{blockProps.description}</small>
+													</span>
 												)}
-											</Dropdown>
-										</div>
-									)}
-								</div>
-							</FieldSet>
-						)
-					}}
-				</ToMany.AccessorRetriever>
-			),
-			environment,
+												{!blockProps.description && blockProps.label}
+											</Button>
+										))}
+									</ButtonGroup>
+								)}
+							</Dropdown>
+						</div>
+					)}
+				</div>
+			</FieldSet>
 		)
 	},
 	props => (

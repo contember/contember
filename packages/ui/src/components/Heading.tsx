@@ -23,3 +23,4 @@ export const Heading = React.memo(
 		)
 	}),
 )
+Heading.displayName = 'Heading'

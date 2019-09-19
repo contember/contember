@@ -15,3 +15,4 @@ export const Tag = React.memo<TagProps>(({ children, onRemove }) => (
 		)}
 	</span>
 ))
+Tag.displayName = 'Tag'

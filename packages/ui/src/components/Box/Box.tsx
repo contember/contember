@@ -37,3 +37,4 @@ export const Box = React.memo(({ actions, children, heading, distinction }: BoxP
 		</div>
 	)
 })
+Box.displayName = 'Box'

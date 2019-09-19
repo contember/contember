@@ -13,3 +13,4 @@ export const IncreaseBoxDepth = React.memo<LowerBoxLevelProps>(({ currentDepth, 
 		{children}
 	</BoxDepthContext.Provider>
 ))
+IncreaseBoxDepth.displayName = 'IncreaseBoxDepth'

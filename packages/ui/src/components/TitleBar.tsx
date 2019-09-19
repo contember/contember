@@ -30,3 +30,4 @@ export const TitleBar = React.memo(({ navigation, children, headingProps, action
 		</div>
 	)
 })
+TitleBar.displayName = 'TitleBar'

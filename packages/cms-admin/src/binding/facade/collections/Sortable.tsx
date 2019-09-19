@@ -271,6 +271,7 @@ namespace Sortable {
 					entities={this.entities}
 					onSortEnd={this.getOnSortEnd(this.props.entities)}
 					useDragHandle={true}
+					shouldCancelStart={() => false}
 					lockAxis="y"
 					lockToContainerEdges={true}
 					prependNew={this.props.enablePrepending ? this.prependNew : undefined}

@@ -4,14 +4,7 @@ import { EnvironmentContext, Field, ToMany } from '../../binding'
 import * as React from 'react'
 import { KeyUtils } from 'slate'
 import { InnerEditor, RTEProps } from './ng/InnerEditor'
-
-export function generateUuid() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-		const r = (Math.random() * 16) | 0
-		const v = c === 'x' ? r : (r & 0x3) | 0x8
-		return v.toString(16)
-	})
-}
+import { generateUuid } from './utils'
 
 KeyUtils.setGenerator((): string => {
 	return generateUuid()

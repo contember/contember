@@ -80,6 +80,9 @@ const markConfigs: { [_ in Mark]: RichEditorPluginConfig } = {
 	[Mark.LINK]: LINK,
 }
 
+/**
+ * @deprecated Use RichEditorNG instead.
+ */
 export default class RichEditor extends React.Component<RichEditorProps, RichTextFieldState> {
 	serializer: Serializer<Value, string>
 	private readonly htmlSerializer: HtmlSerializer

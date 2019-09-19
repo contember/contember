@@ -6,7 +6,6 @@ import { Block, Data, Document, Inline, Rules, Selection, Text, Value } from 'sl
 import { Editor, EditorProps, OnChangeFn, Plugin } from 'slate-react'
 import { GraphQlBuilder } from 'cms-client'
 import { default as Immutable, List } from 'immutable'
-import { generateUuid } from '../RichEditorNG'
 import JsonBlockSerializer from './JsonBlockSerializer'
 import OperationProcessor from './OperationProcessor'
 import { createRenderBlockPlugin } from './renderBlock'
@@ -14,6 +13,7 @@ import { createPastePlugin } from './onPastePlugin'
 import { createRenderInlinePlugin } from './renderInline'
 import { createPluginsFromMarks } from './renderMark'
 import { HoverMenuManager } from './HoverMenuManager'
+import { generateUuid } from '../utils'
 
 export interface RTEProps {
 	sortBy: string

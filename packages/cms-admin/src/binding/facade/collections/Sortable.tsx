@@ -85,6 +85,7 @@ namespace Sortable {
 			</div>
 		)),
 	)
+	DragHandle.displayName = 'Sortable.DragHandle'
 
 	export interface SortableItemProps extends Repeater.ItemProps, DragHandleProps {}
 
@@ -98,6 +99,7 @@ namespace Sortable {
 			</li>
 		)),
 	)
+	SortableItem.displayName = 'Sortable.SortableItem'
 
 	export interface SortableListProps extends EntityCollectionPublicProps {
 		entities: EntityAccessor[]
@@ -135,6 +137,7 @@ namespace Sortable {
 			)
 		}),
 	)
+	SortableList.displayName = 'Sortable.SortableList'
 
 	export interface EntityOrder {
 		[primaryKey: string]: number
@@ -146,6 +149,8 @@ namespace Sortable {
 	}
 
 	export class SortableInner extends React.PureComponent<SortableInnerProps> {
+		public static displayName = 'Sortable.SortableInner'
+
 		private entities: EntityAccessor[] = []
 
 		private getOnSortEnd = (accessor: EntityCollectionAccessor): SortEndHandler => ({ oldIndex, newIndex }) => {

@@ -64,22 +64,17 @@ namespace Repeater {
 		displayUnlinkButton: boolean
 	}
 
-	export class Item extends React.PureComponent<ItemProps> {
-		public render() {
-			return (
-				<AccessorContext.Provider value={this.props.entity}>
-					<div className="repeaterItem">
-						<div className="repeaterItem-in">
-							<div className="repeaterItem-content">{this.props.children}</div>
-							{this.props.displayUnlinkButton && (
-								<RemoveButton className="repeaterItem-button" removeType={this.props.removeType} />
-							)}
-						</div>
-					</div>
-				</AccessorContext.Provider>
-			)
-		}
-	}
+	export const Item = React.memo<ItemProps>(props => (
+		<AccessorContext.Provider value={props.entity}>
+			<div className="repeaterItem">
+				<div className="repeaterItem-in">
+					<div className="repeaterItem-content">{props.children}</div>
+					{props.displayUnlinkButton && <RemoveButton className="repeaterItem-button" removeType={props.removeType} />}
+				</div>
+			</div>
+		</AccessorContext.Provider>
+	))
+	Item.displayName = 'Repeater.Item'
 
 	export interface EntityCollectionPublicProps extends ItemPublicProps {
 		label?: FieldSetProps['legend']

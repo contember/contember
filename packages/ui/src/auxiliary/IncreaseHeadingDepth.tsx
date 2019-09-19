@@ -12,3 +12,4 @@ export const IncreaseHeadingDepth = React.memo<LowerHeadingLevelProps>(({ curren
 		{children}
 	</HeadingDepthContext.Provider>
 ))
+IncreaseHeadingDepth.displayName = 'IncreaseHeadingDepth'

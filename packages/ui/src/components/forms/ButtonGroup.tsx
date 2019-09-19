@@ -25,5 +25,4 @@ export const ButtonGroup = React.memo(({ size, flow, orientation, isTopToolbar, 
 		{children}
 	</div>
 ))
-
 ButtonGroup.displayName = 'ButtonGroup'

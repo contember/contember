@@ -8,3 +8,4 @@ export const Aether = React.memo(({ children, className, ...divProps }: AetherPr
 		{children}
 	</div>
 ))
+Aether.displayName = 'Aether'

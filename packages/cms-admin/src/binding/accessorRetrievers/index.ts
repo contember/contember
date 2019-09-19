@@ -1,3 +1,6 @@
+export * from './getNestedEntity'
+export * from './getNestedField'
 export * from './useEntityAccessor'
 export * from './useEntityCollectionAccessor'
 export * from './useEntityContext'
+export * from './useRelativeSingleField'

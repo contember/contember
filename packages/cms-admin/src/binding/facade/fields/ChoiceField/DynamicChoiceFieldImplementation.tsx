@@ -1,5 +1,6 @@
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
+import { getNestedEntity } from '../../../accessorRetrievers'
 import { FieldName } from '../../../bindingTypes'
 import { Field, ToOne } from '../../../coreComponents'
 import {
@@ -11,7 +12,6 @@ import {
 	FieldAccessor,
 } from '../../../dao'
 import { Parser } from '../../../queryLanguage'
-import { getNestedEntity } from '../../utils'
 import { BaseChoiceMetadata, ChoiceArity, ChoiceField, ChoiceFieldBaseProps } from './ChoiceField'
 
 export type DynamicChoiceFieldImplementationProps = ChoiceFieldBaseProps &

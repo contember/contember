@@ -1,8 +1,9 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { RelativeSingleField, Scalar } from '../../bindingTypes'
-import { useEntityContext, useEnvironment } from '../../coreComponents'
-import { Parser } from '../../queryLanguage'
+import { useEntityContext } from './index'
+import { RelativeSingleField, Scalar } from '../bindingTypes'
+import { useEnvironment } from '../coreComponents'
+import { Parser } from '../queryLanguage'
 import { getNestedField } from './getNestedField'
 
 export const useRelativeSingleField = <

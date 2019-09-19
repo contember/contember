@@ -15,8 +15,7 @@ $buttonSize: 2em
 	&-block
 		position: relative
 
-	&-top
-		+absolute(calc(#{-1*$betweenBlocks} - #{$hoverHeight / 2}) 0 null -1*$leftOver)
+	&-addBtnWrapper
 		height: $hoverHeight
 		opacity: 0
 		transition: opacity 300ms
@@ -30,6 +29,12 @@ $buttonSize: 2em
 			+absolute(50% 0 null $leftOver)
 			transform: translateY(-50%)
 			background: rebeccapurple
+
+	&-top
+		+absolute(calc(#{-1*$betweenBlocks} - #{$hoverHeight / 2}) 0 null -1*$leftOver)
+
+	&-bottom
+		+absolute(null 0 calc(#{-1*$betweenBlocks} - #{$hoverHeight / 2}) -1*$leftOver)
 
 	&-addBtn
 		$overflow: ($hoverHeight - $buttonSize) / 2

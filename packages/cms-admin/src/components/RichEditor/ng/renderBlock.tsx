@@ -57,10 +57,12 @@ export function createRenderBlockPlugin(blocks: BlocksDefinitions): PluginOrPlug
 
 			if (definition) {
 				const index = props.parent.nodes.indexOf(node)
+				const isLast = index === props.parent.nodes.size - 1
 				const accessor = node.data.get('accessor')
-				const addBlock = (blockName: string) => {
+				const addBlock = (blockName: string, after: boolean) => {
 					const blockToAdd = Block.create(blockName)
-					editor.insertNodeByKey(props.parent.key, index, blockToAdd)
+					const insertionIndex = after ? index + 1 : index
+					editor.insertNodeByKey(props.parent.key, insertionIndex, blockToAdd)
 				}
 				const content: React.ReactNode = (
 					<div>
@@ -72,7 +74,7 @@ export function createRenderBlockPlugin(blocks: BlocksDefinitions): PluginOrPlug
 					</div>
 				)
 				return (
-					<AddBlockButton attributes={props.attributes} availableBlocks={blocks} addBlock={addBlock}>
+					<AddBlockButton attributes={props.attributes} availableBlocks={blocks} addBlock={addBlock} isLast={isLast}>
 						<Element index={index}>{content}</Element>
 					</AddBlockButton>
 				)

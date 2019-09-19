@@ -116,27 +116,6 @@
 		&-list
 			//
 
-	&-subgroup,
-	&-action,
-	&-tooDeep
-		&.is-active > &-title
-			background-color: $cui-menu-active-background
-
-	&-subgroup,
-	&-action,
-	&-tooDeep
-		&:not(.is-active) > &-title:hover
-			background-color: $cui-menu-hover-background
-
-	&subgroup
-		&.is-active > &-title
-			color: $cui-menu-subgroup-active-color
-
-	&-action,
-	&-tooDeep
-		&.is-active > &-title
-			color: $cui-menu-action-active-color
-
 	a#{&},
 	button#{&}
 		&-subgroup-title
@@ -145,7 +124,34 @@
 			&:hover
 				color: $cui-menu-subgroup-active-color
 
+		&-subgroup,
 		&-action,
 		&-tooDeep
 			&-title:hover
+				background-color: $cui-menu-hover-background
+
+		&-action,
+		&-tooDeep
+			&-title:hover
+				color: $cui-menu-action-active-color
+
+	&-subgroup,
+	&-action,
+	&-tooDeep
+		&.is-active > &-title
+			&,
+			&:hover
+				background-color: $cui-menu-active-background
+
+	&-subgroup
+		&.is-active > &-title
+			&,
+			&:hover
+				color: $cui-menu-subgroup-active-color
+
+	&-action,
+	&-tooDeep
+		&.is-active > &-title
+			&,
+			&:hover
 				color: $cui-menu-action-active-color

@@ -121,8 +121,6 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 
 			setValueData(value.data)
 
-			console.log(`RE: ${isInCustomBlock}`, selection)
-
 			if (!isInCustomBlock) {
 				setSelection(selection)
 			} else {

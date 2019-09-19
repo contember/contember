@@ -71,7 +71,6 @@ export default class OperationProcessor {
 						!(accessor instanceof EntityAccessor) ||
 						presentKeys.has(accessor.getKey())
 					) {
-						console.log(`New block ${block.type}`)
 						// New block
 						const entity = this.addToEnd(getAccessor, block.type)
 						presentKeys.add(entity.getKey())
@@ -125,7 +124,6 @@ export default class OperationProcessor {
 					}
 				})
 
-				console.log(presentKeys)
 				let collection = getAccessor()
 				const toRemove = new Set<string>()
 				collection.entities.forEach(ea => {
@@ -134,7 +132,6 @@ export default class OperationProcessor {
 					}
 				})
 				toRemove.forEach(key => {
-					console.log(`Removing ${key}`)
 					const ea = collection.findByKey(key)
 					if (ea === undefined || ea instanceof EntityForRemovalAccessor) {
 						throw new Error('This should never happen')

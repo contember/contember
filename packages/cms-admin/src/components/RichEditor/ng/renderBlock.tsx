@@ -33,14 +33,12 @@ export function createRenderBlockPlugin(blocks: BlocksDefinitions): PluginOrPlug
 		renderEditor: (props, editor, next) => {
 			return (
 				<Container
-					useDragHandle
+					useDragHandle={true}
 					lockAxis="y"
 					onSortEnd={(sort, event) => {
 						editor.moveNodeByPath(PathUtils.create([sort.oldIndex]), PathUtils.create([]), sort.newIndex)
 					}}
-					shouldCancelStart={e => {
-						return false
-					}}
+					shouldCancelStart={() => false}
 					useWindowAsScrollContainer={true}
 				>
 					{next()}

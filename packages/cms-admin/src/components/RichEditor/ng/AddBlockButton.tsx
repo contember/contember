@@ -1,28 +1,32 @@
 import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { RenderAttributes } from 'slate-react'
+import cn from 'classnames'
 import { BlocksDefinitions } from './types'
 
-export const AddBlockButton: React.FC<{
-	attributes: RenderAttributes
-	addBlock: (blockName: string) => void
+const AddBlockInnerButton: React.FC<{
+	addBlock: (blockName: string, after: boolean) => void
 	availableBlocks: BlocksDefinitions
-}> = props => {
+	placement: 'top' | 'bottom'
+}> = ({ addBlock, availableBlocks, placement }) => {
 	const [isActive, setActive] = useState(false)
 	const makeActive = useCallback(() => setActive(true), [setActive])
-	const { addBlock } = props
 	const addBlockAndDeactivate = useCallback(
 		blockName => {
 			setActive(false)
-			addBlock(blockName)
+			const addAfter = placement === 'bottom'
+			addBlock(blockName, addAfter)
 		},
 		[setActive, addBlock],
 	)
 
 	return (
-		<div className="richEditor-block" {...props.attributes}>
+		<>
 			{!isActive && (
-				<div className="richEditor-top" contentEditable={false}>
+				<div
+					className={cn('richEditor-addBtnWrapper', placement === 'top' ? 'richEditor-top' : 'richEditor-bottom')}
+					contentEditable={false}
+				>
 					<button className="richEditor-addBtn" onClick={makeActive}>
 						+
 					</button>
@@ -30,7 +34,7 @@ export const AddBlockButton: React.FC<{
 			)}
 			{isActive && (
 				<div className="richEditor-availableBlocks" contentEditable={false}>
-					{Object.entries(props.availableBlocks).map(([blockName, definition]) => (
+					{Object.entries(availableBlocks).map(([blockName, definition]) => (
 						<button
 							className="richEditor-availableBlock"
 							key={blockName}
@@ -44,7 +48,23 @@ export const AddBlockButton: React.FC<{
 					</button>
 				</div>
 			)}
+		</>
+	)
+}
+
+export const AddBlockButton: React.FC<{
+	attributes: RenderAttributes
+	addBlock: (blockName: string, after: boolean) => void
+	availableBlocks: BlocksDefinitions
+	isLast: boolean
+}> = props => {
+	return (
+		<div className="richEditor-block" {...props.attributes}>
+			<AddBlockInnerButton addBlock={props.addBlock} availableBlocks={props.availableBlocks} placement="top" />
 			{props.children}
+			{props.isLast && (
+				<AddBlockInnerButton addBlock={props.addBlock} availableBlocks={props.availableBlocks} placement="bottom" />
+			)}
 		</div>
 	)
 }

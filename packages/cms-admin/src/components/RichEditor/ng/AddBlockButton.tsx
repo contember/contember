@@ -17,7 +17,7 @@ const AddBlockInnerButton: React.FC<{
 			const addAfter = placement === 'bottom'
 			addBlock(blockName, addAfter)
 		},
-		[setActive, addBlock],
+		[placement, addBlock],
 	)
 
 	return (

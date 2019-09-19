@@ -1,5 +1,5 @@
-import { Block, Inline, Text, Node as SlateNode, Document, NodeJSON, BlockJSON } from 'slate'
 import * as slate from 'slate'
+import { Block, BlockJSON, Document, Inline, Node as SlateNode, NodeJSON, Text } from 'slate'
 import * as Immutable from 'immutable'
 
 export default class JsonBlockSerializer {
@@ -11,16 +11,16 @@ export default class JsonBlockSerializer {
 	}
 
 	deserialize(str: string): Immutable.List<Block | Text | Inline> {
+		const Node = ((slate as any).Node as unknown) as SlateNode & {
+			createList: (_: Array<NodeJSON>) => Immutable.List<SlateNode>
+		}
 		try {
 			const nodes = JSON.parse(str)
-			// @ts-ignore
-			return ((slate.Node as unknown) as SlateNode & { createList: (_: Array<NodeJSON>) => Immutable.List<SlateNode> })
-				.createList(nodes)
+			return Node.createList(nodes)
 				.filter(node => !Document.isDocument(node))
 				.toList() as Immutable.List<Block | Text | Inline>
 		} catch (e) {
-			// @ts-ignore
-			return (slate.Node as any).createList([])
+			return Node.createList([]) as Immutable.List<never>
 		}
 	}
 }

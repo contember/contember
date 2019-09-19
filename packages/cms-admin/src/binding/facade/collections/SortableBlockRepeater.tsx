@@ -1,6 +1,6 @@
 import { Box, Button, ButtonGroup, Dropdown, FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { useEntityCollectionAccessor, useRelativeEntityList } from '../../accessorRetrievers'
+import { useRelativeEntityList } from '../../accessorRetrievers'
 import { RelativeSingleField } from '../../bindingTypes'
 import { Field, ToMany } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
@@ -36,6 +36,14 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 
 		const shouldViewContent = filteredEntities.length > 1 || !firstDiscriminationNull
 
+		const blockChildren = React.useMemo(
+			// This is to avoid unnecessary re-renders
+			() => (
+				<SortableBlock normalizedBlockProps={normalizedBlockList} discriminationField={props.discriminationField} />
+			),
+			[normalizedBlockList, props.discriminationField],
+		)
+
 		return (
 			// Intentionally not applying label system middleware
 			<FieldSet legend={props.label} errors={field.errors}>
@@ -51,10 +59,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 								enableUnlinkAll={props.enableUnlinkAll}
 								removeType={props.removeType}
 							>
-								<SortableBlock
-									normalizedBlockProps={normalizedBlockList}
-									discriminationField={props.discriminationField}
-								/>
+								{blockChildren}
 							</Sortable>
 						</div>
 					)}

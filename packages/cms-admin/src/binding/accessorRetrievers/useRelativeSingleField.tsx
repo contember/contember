@@ -1,10 +1,10 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { useEntityContext } from './index'
 import { RelativeSingleField, Scalar } from '../bindingTypes'
 import { useEnvironment } from '../coreComponents'
 import { Parser } from '../queryLanguage'
 import { getNestedField } from './getNestedField'
+import { useEntityContext } from './useEntityContext'
 
 export const useRelativeSingleField = <
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
@@ -14,12 +14,13 @@ export const useRelativeSingleField = <
 ) => {
 	const entity = useEntityContext()
 	const environment = useEnvironment()
-	return React.useMemo(() => {
-		const { fieldName, toOneProps } = Parser.parseQueryLanguageExpression(
-			field,
-			Parser.EntryPoint.RelativeSingleField,
-			environment,
-		)
-		return getNestedField<Persisted, Produced>(entity, toOneProps, fieldName)
-	}, [entity, environment, field])
+	const expression = React.useMemo(
+		() => Parser.parseQueryLanguageExpression(field, Parser.EntryPoint.RelativeSingleField, environment),
+		[environment, field],
+	)
+	return React.useMemo(() => getNestedField<Persisted, Produced>(entity, expression.toOneProps, expression.fieldName), [
+		entity,
+		expression.fieldName,
+		expression.toOneProps,
+	])
 }

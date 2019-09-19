@@ -40,13 +40,17 @@ export class RichEditorNG extends React.PureComponent<RTEProps> {
 	}
 
 	public static generateSyntheticChildren(props: RTEProps, environment: Environment): React.ReactNode {
-		const fields = Object.values(props.blocks).map((definition, i) => {
+		const fields = Object.entries(props.blocks).map(([name, definition]) => {
 			if (definition.renderBlock !== undefined) {
-				return QueryLanguage.wrapRelativeSingleField(definition.valueField, environment, fieldName => (
-					<Field name={fieldName} />
-				))
+				return (
+					<React.Fragment key={name}>
+						{QueryLanguage.wrapRelativeSingleField(definition.valueField, environment, fieldName => (
+							<Field name={fieldName} />
+						))}
+					</React.Fragment>
+				)
 			} else {
-				return <React.Fragment key={i}>{definition.render}</React.Fragment>
+				return <React.Fragment key={name}>{definition.render}</React.Fragment>
 			}
 		})
 

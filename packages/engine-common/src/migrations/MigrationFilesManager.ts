@@ -36,7 +36,7 @@ class MigrationFilesManager {
 	}
 
 	public async listFiles(extension: string): Promise<string[]> {
-		const files: string[] = await readDir(this.directory)
+		const files: string[] = await this.tryReadDir()
 
 		const filteredFiles: string[] = await Promise.all(
 			files
@@ -46,6 +46,17 @@ class MigrationFilesManager {
 				}),
 		)
 		return filteredFiles.sort()
+	}
+
+	private async tryReadDir(): Promise<string[]> {
+		try {
+			return await readDir(this.directory)
+		} catch (e) {
+			if (e.code === 'ENOENT') {
+				return []
+			}
+			throw e
+		}
 	}
 
 	public async readFiles(

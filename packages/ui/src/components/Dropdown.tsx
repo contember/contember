@@ -7,7 +7,7 @@ import { assertNever } from '../utils'
 import { Collapsible } from './Collapsible'
 import { Button, ButtonBasedButtonProps } from './forms'
 
-interface DropdownRenderProps {
+export interface DropdownRenderProps {
 	requestClose: () => void
 }
 

@@ -1,10 +1,10 @@
-import { Box, Button, ButtonGroup, Dropdown, FieldSet } from '@contember/ui'
+import { Box, Button, ButtonGroup, Dropdown, DropdownRenderProps, FieldSet } from '@contember/ui'
 import * as React from 'react'
 import { useRelativeEntityList } from '../../accessorRetrievers'
 import { RelativeSingleField } from '../../bindingTypes'
 import { Field, ToMany } from '../../coreComponents'
 import { MutationStateContext } from '../../coreComponents/PersistState'
-import { DataBindingError, EntityAccessor, FieldAccessor } from '../../dao'
+import { DataBindingError, EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../dao'
 import { Component } from '../auxiliary'
 import { DiscriminatedBlocks, NormalizedBlockProps } from '../ui'
 import { useNormalizedBlockList } from '../ui/blocks/useNormalizedBlockList'
@@ -69,56 +69,12 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 						</div>
 					)}
 					{field.addNew && (
-						<div className="cloneable-button">
-							<Dropdown
-								buttonProps={{
-									children: '+ Add new',
-								}}
-							>
-								{({ requestClose }) => (
-									<ButtonGroup orientation="vertical">
-										{normalizedBlockList.map((blockProps, i) => (
-											<Button
-												key={i}
-												distinction="seamless"
-												flow="block"
-												disabled={isMutating}
-												onClick={() => {
-													requestClose()
-													const targetValue = blockProps.discriminateBy
-													if (filteredEntities.length === 1 && firstDiscriminationNull) {
-														return firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
-													}
-													field.addNew &&
-														field.addNew(getAccessor => {
-															const accessor = getAccessor()
-															const newlyAdded = accessor.entities[accessor.entities.length - 1]
-															if (!(newlyAdded instanceof EntityAccessor)) {
-																return
-															}
-															// TODO this will fail horribly if QL is present here
-															const discriminationField = newlyAdded.data.getField(props.discriminationField)
-															if (!(discriminationField instanceof FieldAccessor) || !discriminationField.updateValue) {
-																return
-															}
-															discriminationField.updateValue(targetValue)
-														})
-												}}
-											>
-												{!!blockProps.description && (
-													<span>
-														{blockProps.label}
-														<br />
-														<small>{blockProps.description}</small>
-													</span>
-												)}
-												{!blockProps.description && blockProps.label}
-											</Button>
-										))}
-									</ButtonGroup>
-								)}
-							</Dropdown>
-						</div>
+						<AddNewBlockButton
+							addNew={field.addNew}
+							normalizedBlockProps={normalizedBlockList}
+							isMutating={isMutating}
+							discriminationField={props.discriminationField}
+						/>
 					)}
 				</div>
 			</FieldSet>
@@ -170,3 +126,80 @@ const SortableBlock = React.memo<SortableBlockProps>(props => (
 	</Field.DataRetriever>
 ))
 SortableBlock.displayName = 'SortableBlock'
+
+interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
+
+const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
+	return (
+		<div className="cloneable-button">
+			<Dropdown
+				buttonProps={{
+					children: '+ Add new',
+				}}
+			>
+				{({ requestClose }) => (
+					<AddNewBlockButtonInner
+						normalizedBlockProps={props.normalizedBlockProps}
+						addNew={props.addNew}
+						isMutating={props.isMutating}
+						discriminationField={props.discriminationField}
+						requestClose={requestClose}
+					/>
+				)}
+			</Dropdown>
+		</div>
+	)
+})
+AddNewBlockButton.displayName = 'AddNewBlockButton'
+
+interface AddNewBlockButtonInnerProps extends DropdownRenderProps {
+	addNew: Exclude<EntityCollectionAccessor['addNew'], undefined>
+	normalizedBlockProps: NormalizedBlockProps[]
+	discriminationField: RelativeSingleField
+	isMutating: boolean
+}
+
+const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(props => {
+	return (
+		<ButtonGroup orientation="vertical">
+			{props.normalizedBlockProps.map((blockProps, i) => (
+				<Button
+					key={i}
+					distinction="seamless"
+					flow="block"
+					disabled={props.isMutating}
+					onClick={() => {
+						props.requestClose()
+						const targetValue = blockProps.discriminateBy
+						//if (filteredEntities.length === 1 && firstDiscriminationNull) {
+						//	return firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
+						//}
+						props.addNew &&
+							props.addNew(getAccessor => {
+								const accessor = getAccessor()
+								const newlyAdded = accessor.entities[accessor.entities.length - 1]
+								if (!(newlyAdded instanceof EntityAccessor)) {
+									return
+								}
+								// TODO this will fail horribly if QL is present here
+								const discriminationField = newlyAdded.data.getField(props.discriminationField)
+								if (!(discriminationField instanceof FieldAccessor) || !discriminationField.updateValue) {
+									return
+								}
+								discriminationField.updateValue(targetValue)
+							})
+					}}
+				>
+					{!!blockProps.description && (
+						<span>
+							{blockProps.label}
+							<br />
+							<small>{blockProps.description}</small>
+						</span>
+					)}
+					{!blockProps.description && blockProps.label}
+				</Button>
+			))}
+		</ButtonGroup>
+	)
+})

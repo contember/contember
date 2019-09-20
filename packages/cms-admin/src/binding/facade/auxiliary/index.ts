@@ -1,2 +1,2 @@
-export * from './Component'
 export * from './SimpleRelativeSingleField'
+export * from './Component'

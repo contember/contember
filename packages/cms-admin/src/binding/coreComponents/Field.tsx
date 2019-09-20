@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { DataTreeMutationState } from '../../state/dataTrees'
-import { FieldName, Scalar, VariableInput } from '../bindingTypes'
+import { FieldName, RelativeSingleField, Scalar, VariableInput } from '../bindingTypes'
 import {
 	DataBindingError,
 	EntityAccessor,
@@ -20,7 +20,7 @@ import { FieldMarkerProvider } from './MarkerProvider'
 import { MutationStateContext } from './PersistState'
 
 export interface FieldPublicProps {
-	name: FieldName
+	name: RelativeSingleField
 	defaultValue?: VariableInput | Scalar
 }
 

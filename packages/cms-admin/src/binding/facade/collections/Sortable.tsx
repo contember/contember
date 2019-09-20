@@ -11,14 +11,12 @@ import {
 import { DragHandle as DragHandleIcon } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import {
-	AccessorContext,
-	AccessorContextValue,
 	EnforceSubtypeRelation,
 	EnvironmentContext,
 	Field,
+	MutationStateContext,
 	SyntheticChildrenProvider,
 } from '../../coreComponents'
-import { MutationStateContext } from '../../coreComponents/PersistState'
 import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps

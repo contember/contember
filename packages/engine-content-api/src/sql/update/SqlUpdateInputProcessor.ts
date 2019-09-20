@@ -320,6 +320,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
 			)
+			await this.updateBuilder.update
 			await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
 		},
 		disconnect: async ({ entity, relation }) => {

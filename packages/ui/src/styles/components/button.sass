@@ -1,6 +1,8 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}button
+	$root: &
+
 	@extend %buttonEssentials
 	@extend %buttonSizes
 	@extend %buttonStates
@@ -51,12 +53,14 @@
 			border-right: none
 			border-radius: 0
 
-		&:first-child
+		&:first-child:not(#{$root}-group-last),
+		&-group-first
 			border-top-right-radius: 0
 			border-bottom-right-radius: 0
 			border-right: none
 
-		&:last-child
+		&:last-child:not(#{$root}-group-first),
+		&-group-last
 			border-top-left-radius: 0
 			border-bottom-left-radius: 0
 			border-left: none
@@ -67,12 +71,14 @@
 			border-bottom: none
 			border-radius: 0
 
-		&:first-child
+		&:first-child:not(#{$root}-group-last),
+		&-group-first
 			border-bottom-left-radius: 0
 			border-bottom-right-radius: 0
 			border-bottom: none
 
-		&:last-child
+		&:last-child:not(#{$root}-group-first),
+		&-group-last
 			border-top-left-radius: 0
 			border-top-right-radius: 0
 			border-top: none

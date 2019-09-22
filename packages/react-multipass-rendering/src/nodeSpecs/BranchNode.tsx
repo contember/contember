@@ -38,36 +38,39 @@ class BranchNode<
 	)
 	public constructor(
 		useSiteFactory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>,
-		options?: Partial<BranchNodeOptions>,
 		ComponentType?: BaseComponent<Props>,
+		options?: Partial<BranchNodeOptions>,
 	)
 	public constructor(
 		factory:
 			| FactoryMethodName
 			| UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>,
-		optionsOrReducer?:
-			| Partial<BranchNodeOptions>
-			| ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>,
-		optionsOrComponentType?: Partial<BranchNodeOptions> | BaseComponent<Props>,
+		componentOrReducer?:
+			| ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>
+			| BaseComponent<Props>,
+		options?: Partial<BranchNodeOptions>,
 	) {
-		if (typeof factory === 'function' && typeof optionsOrComponentType === 'function') {
-			this.specification = {
-				type: RepresentationFactorySite.UseSite,
-				factory,
-				ComponentType: optionsOrComponentType,
-			}
-		} else if (typeof factory !== 'function' && typeof optionsOrReducer === 'function') {
+		if (typeof factory !== 'function') {
 			this.specification = {
 				type: RepresentationFactorySite.DeclarationSite,
 				factoryMethodName: factory,
-				childrenRepresentationReducer: optionsOrReducer,
+				childrenRepresentationReducer: componentOrReducer as ChildrenRepresentationReducer<
+					ChildrenRepresentation,
+					ReducedChildrenRepresentation
+				>,
+			}
+		} else if (typeof factory === 'function') {
+			this.specification = {
+				type: RepresentationFactorySite.UseSite,
+				factory,
+				ComponentType: componentOrReducer as BaseComponent<Props>,
 			}
 		} else {
 			throw new ChildrenAnalyzerError('Invalid arguments')
 		}
 		this.options = {
 			...BranchNode.defaultOptions,
-			...(typeof optionsOrReducer === 'object' ? optionsOrReducer : optionsOrComponentType),
+			...options,
 		}
 	}
 }

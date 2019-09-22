@@ -1,6 +1,6 @@
-import { GraphQlBuilder } from 'cms-client'
-import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
+import { assertNever } from '@contember/utils'
+import { GraphQlBuilder } from 'cms-client'
 import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from '../model'
 import { DataBindingError } from './DataBindingError'
@@ -10,8 +10,8 @@ class ReferenceMarker {
 	public readonly fieldName: FieldName
 	public readonly references: ReferenceMarker.References
 
-	private static defaultReferencePreferences: {
-		[index in ExpectedCount]: ReferenceMarker.ReferencePreferences
+	public static readonly defaultReferencePreferences: {
+		readonly [index in ExpectedCount]: ReferenceMarker.ReferencePreferences
 	} = {
 		[ExpectedCount.UpToOne]: {
 			initialEntityCount: 1,
@@ -27,7 +27,7 @@ class ReferenceMarker {
 		fields: EntityFields,
 		filter?: Filter<GraphQlBuilder.Literal>,
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>,
-		preferences?: ReferenceMarker.ReferencePreferences,
+		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	)
 	public constructor(fieldName: FieldName, references: ReferenceMarker.References)
 	public constructor(
@@ -36,7 +36,7 @@ class ReferenceMarker {
 		fields?: EntityFields,
 		filter?: Filter<GraphQlBuilder.Literal>,
 		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>,
-		preferences?: ReferenceMarker.ReferencePreferences,
+		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) {
 		let references: ReferenceMarker.References
 
@@ -49,12 +49,22 @@ class ReferenceMarker {
 				reducedBy,
 			}
 			const placeholderName = PlaceholderGenerator.getReferencePlaceholder(fieldName, constraints)
+			const normalizedPreferences: ReferenceMarker.ReferencePreferences = {
+				...ReferenceMarker.defaultReferencePreferences[decider],
+				...preferences,
+			}
+			if (normalizedPreferences.initialEntityCount < 0 || !Number.isInteger(normalizedPreferences.initialEntityCount)) {
+				throw new DataBindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
+			}
+			if (decider === ExpectedCount.UpToOne && normalizedPreferences.initialEntityCount > 1) {
+				throw new DataBindingError(`A ToOne reference cannot prefer more than one entity!`)
+			}
 
 			references = {
 				[placeholderName]: Object.assign(constraints, {
 					placeholderName,
 					fields: fields || {},
-					preferences: { ...ReferenceMarker.defaultReferencePreferences[decider], ...preferences },
+					preferences: normalizedPreferences,
 				}),
 			}
 		} else {
@@ -90,7 +100,7 @@ namespace ReferenceMarker {
 	}
 
 	export interface ReferencePreferences {
-		initialEntityCount: number
+		readonly initialEntityCount: number
 	}
 
 	export interface Reference extends ReferenceConstraints {

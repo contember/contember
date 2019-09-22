@@ -30,7 +30,7 @@ class ToMany extends React.PureComponent<ToManyProps> {
 	public static generateSyntheticChildren(props: ToManyProps, environment: Environment): React.ReactNode {
 		return QueryLanguage.wrapRelativeEntityList(
 			props.field,
-			ToMany.getAtomicPrimitiveFactory(props.children),
+			ToMany.getAtomicPrimitiveFactory(props.children, props.preferences),
 			environment,
 		)
 	}
@@ -41,7 +41,7 @@ namespace ToMany {
 		children: React.ReactNode,
 		preferences?: ReferenceMarker.ReferencePreferences,
 	) => (atomicPrimitiveProps: AtomicPrimitiveProps) => (
-		<AtomicPrimitive preferences={preferences} {...atomicPrimitiveProps}>
+		<AtomicPrimitive {...atomicPrimitiveProps} preferences={preferences}>
 			{children}
 		</AtomicPrimitive>
 	)

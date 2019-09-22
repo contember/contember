@@ -81,6 +81,7 @@ namespace Repeater {
 		enableUnlink?: boolean
 		enableUnlinkAll?: boolean
 		enableAddingNew?: boolean
+		emptyMessage?: React.ReactNode
 	}
 
 	export interface EntityCollectionProps extends EntityCollectionPublicProps {

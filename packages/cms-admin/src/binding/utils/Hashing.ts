@@ -1,6 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
+import { ExpectedCount } from '../bindingTypes'
 import { MarkerTreeConstraints, ReferenceMarker } from '../dao'
 
 export class Hashing {
@@ -10,7 +11,7 @@ export class Hashing {
 			| Input.UniqueWhere<GraphQlBuilder.Literal>
 			| Input.Where
 			| undefined
-			| ReferenceMarker.ExpectedCount
+			| ExpectedCount
 		> = [constraints.filter, constraints.reducedBy, constraints.expectedCount]
 
 		return Hashing.hashArray(where)

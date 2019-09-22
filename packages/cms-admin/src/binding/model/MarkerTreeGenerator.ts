@@ -96,9 +96,11 @@ export class MarkerTreeGenerator {
 							filter: fresh.references[placeholderName].filter,
 							reducedBy: fresh.references[placeholderName].reducedBy,
 							expectedCount: fresh.references[placeholderName].expectedCount,
+							preferences: fresh.references[placeholderName].preferences,
 						}
 					}
 
+					// TODO what to do with preferences?
 					newReferences[placeholderName].fields = namePresentInOriginal
 						? MarkerTreeGenerator.mergeEntityFields(
 								newReferences[placeholderName].fields,

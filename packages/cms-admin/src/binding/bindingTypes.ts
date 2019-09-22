@@ -14,6 +14,11 @@ export type UniqueWhere = string
 export type FieldName = string
 export type EntityName = string
 
+export enum ExpectedCount {
+	UpToOne = 'UpToOne',
+	PossiblyMany = 'PossiblyMany',
+}
+
 export const PRIMARY_KEY_NAME = 'id'
 export const TYPENAME_KEY_NAME = '__typename'
 

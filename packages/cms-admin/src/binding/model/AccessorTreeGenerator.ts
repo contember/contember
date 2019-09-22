@@ -1,6 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from '@contember/utils'
 import {
+	ExpectedCount,
 	FieldName,
 	MutationRequestResult,
 	PRIMARY_KEY_NAME,
@@ -152,7 +153,7 @@ class AccessorTreeGenerator {
 							? errors.children[field.fieldName] || errors.children[referencePlaceholder] || undefined
 							: undefined
 
-					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
+					if (reference.expectedCount === ExpectedCount.UpToOne) {
 						if (Array.isArray(fieldData) || fieldData instanceof EntityCollectionAccessor) {
 							throw new DataBindingError(
 								`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
@@ -176,7 +177,7 @@ class AccessorTreeGenerator {
 									`Perhaps you meant to use a variant of <Field />?`,
 							)
 						}
-					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
+					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
 						if (fieldData === undefined) {
 							entityData[referencePlaceholder] = this.generateEntityCollectionAccessor(
 								referencePlaceholder,

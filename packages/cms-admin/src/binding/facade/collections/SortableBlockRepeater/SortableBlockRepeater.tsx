@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { useRelativeEntityList } from '../../../accessorRetrievers'
 import { RelativeSingleField } from '../../../bindingTypes'
-import { MutationStateContext, ToMany } from '../../../coreComponents'
+import { ToMany } from '../../../coreComponents'
 import { EntityAccessor, FieldAccessor } from '../../../dao'
 import { Component } from '../../auxiliary'
-import { DiscriminatedBlocks, NormalizedBlockProps } from '../../ui/blocks'
-import { useNormalizedBlockList } from '../../ui/blocks/useNormalizedBlockList'
+import { DiscriminatedBlocks } from '../../ui/blocks'
 import { Sortable } from '../Sortable'
 import { SortableRepeaterProps } from '../SortableRepeater'
 import { SortableBlockRepeaterInner } from './SortableBlockRepeaterInner'
@@ -42,7 +41,12 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 		)
 	},
 	props => (
-		<ToMany field={props.field}>
+		<ToMany
+			field={props.field}
+			preferences={{
+				initialEntityCount: 0,
+			}}
+		>
 			<Sortable sortBy={props.sortBy}>
 				<DiscriminatedBlocks name={props.discriminationField} label={props.label}>
 					{props.children}

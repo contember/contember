@@ -3,7 +3,7 @@ import { GraphQlBuilder } from 'cms-client'
 import { Input } from '@contember/schema'
 import * as React from 'react'
 import { useEntityAccessor } from '../accessorRetrievers'
-import { FieldName, Filter, RelativeEntityList } from '../bindingTypes'
+import { ExpectedCount, FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { Component } from '../facade/auxiliary'
 import { QueryLanguage } from '../queryLanguage'
@@ -52,13 +52,7 @@ namespace ToOne {
 		},
 		{
 			generateReferenceMarker(props: AtomicPrimitiveProps, fields: EntityFields): ReferenceMarker {
-				return new ReferenceMarker(
-					props.field,
-					ReferenceMarker.ExpectedCount.UpToOne,
-					fields,
-					props.filter,
-					props.reducedBy,
-				)
+				return new ReferenceMarker(props.field, ExpectedCount.UpToOne, fields, props.filter, props.reducedBy)
 			},
 		},
 		'ToOne.AtomicPrimitive',

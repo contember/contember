@@ -2,7 +2,7 @@ import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import { isEmptyObject } from 'cms-common'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
-import { EntityName, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
+import { EntityName, ExpectedCount, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
 	ConnectionMarker,
@@ -241,7 +241,7 @@ export class MutationGenerator {
 					const reference = references[referencePlaceholder]
 					const accessor = allData[reference.placeholderName]
 
-					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
+					if (reference.expectedCount === ExpectedCount.UpToOne) {
 						if (accessor instanceof EntityAccessor) {
 							accessorReference.push({ accessor, reference })
 
@@ -249,7 +249,7 @@ export class MutationGenerator {
 								unreducedHasOnePresent = true
 							}
 						}
-					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
+					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
 						if (accessor instanceof EntityCollectionAccessor) {
 							for (let i = 0, accessorCount = accessor.entities.length; i < accessorCount; i++) {
 								const innerAccessor = accessor.entities[i]
@@ -357,7 +357,7 @@ export class MutationGenerator {
 					const accessor = allData[reference.placeholderName]
 					const persistedField = persistedData ? persistedData[reference.placeholderName] : undefined
 
-					if (reference.expectedCount === ReferenceMarker.ExpectedCount.UpToOne) {
+					if (reference.expectedCount === ExpectedCount.UpToOne) {
 						if (
 							(accessor instanceof EntityAccessor || accessor instanceof EntityForRemovalAccessor) &&
 							((persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField)) ||
@@ -374,7 +374,7 @@ export class MutationGenerator {
 								unreducedHasOnePresent = true
 							}
 						}
-					} else if (reference.expectedCount === ReferenceMarker.ExpectedCount.PossiblyMany) {
+					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
 						if (
 							accessor instanceof EntityCollectionAccessor &&
 							(Array.isArray(persistedField) || persistedField === undefined || persistedField === null)

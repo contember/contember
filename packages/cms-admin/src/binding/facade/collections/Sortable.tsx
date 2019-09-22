@@ -11,6 +11,7 @@ import {
 import { DragHandle as DragHandleIcon } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import {
+	AccessorContext,
 	EnforceSubtypeRelation,
 	EnvironmentContext,
 	Field,
@@ -49,6 +50,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 								sortBy={this.props.sortBy}
 								entities={this.props.entities}
 								removeType={this.props.removeType}
+								emptyMessage={this.props.emptyMessage}
 								environment={environment}
 							>
 								{this.props.children}
@@ -254,6 +256,15 @@ namespace Sortable {
 
 		public render() {
 			this.entities = this.prepareEntities(this.props.entities)
+
+			if (!this.props.entities.entities.length || !this.entities.length) {
+				return (
+					// TODO use a dedicated message component
+					<div className="cloneable-emptyMessage">
+						{this.props.emptyMessage || 'There is no content yet. Try adding a new item.'}
+					</div>
+				)
+			}
 
 			return (
 				<SortableList

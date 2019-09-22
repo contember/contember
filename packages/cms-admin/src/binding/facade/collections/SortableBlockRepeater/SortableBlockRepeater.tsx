@@ -1,43 +1,62 @@
+import { FieldSet } from '@contember/ui'
 import * as React from 'react'
 import { useRelativeEntityList } from '../../../accessorRetrievers'
 import { RelativeSingleField } from '../../../bindingTypes'
-import { ToMany } from '../../../coreComponents'
-import { EntityAccessor, FieldAccessor } from '../../../dao'
+import { MutationStateContext, ToMany } from '../../../coreComponents'
 import { Component } from '../../auxiliary'
-import { DiscriminatedBlocks } from '../../ui/blocks'
+import { DiscriminatedBlocks, NormalizedBlockProps } from '../../ui/blocks'
+import { useNormalizedBlockList } from '../../ui/blocks/useNormalizedBlockList'
 import { Sortable } from '../Sortable'
 import { SortableRepeaterProps } from '../SortableRepeater'
-import { SortableBlockRepeaterInner } from './SortableBlockRepeaterInner'
+import { AddNewBlockButton } from './AddNewBlockButton'
+import { SortableBlock } from './SortableBlock'
 
 export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
 	discriminationField: RelativeSingleField
 	children: React.ReactNode
-	emptyMessage?: React.ReactNode
 }
 
 export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 	props => {
 		const collectionAccessor = useRelativeEntityList(props.field)
-
-		const filteredEntities: EntityAccessor[] = collectionAccessor.entities.filter(
-			(item): item is EntityAccessor => item instanceof EntityAccessor,
+		const isMutating = React.useContext(MutationStateContext)
+		const normalizedBlockList: NormalizedBlockProps[] = useNormalizedBlockList(props.children)
+		const blockChildren = React.useMemo(
+			// This is to avoid unnecessary re-renders
+			() => (
+				<SortableBlock normalizedBlockProps={normalizedBlockList} discriminationField={props.discriminationField} />
+			),
+			[normalizedBlockList, props.discriminationField],
 		)
-		const firstEntity = filteredEntities[0]
-		const firstDiscrimination = firstEntity.data.getField(props.discriminationField)
-
-		if (!(firstDiscrimination instanceof FieldAccessor)) {
-			return null
-		}
-		const firstDiscriminationNull = firstDiscrimination.currentValue === null
-
-		const shouldViewContent = filteredEntities.length > 1 || !firstDiscriminationNull
 
 		return (
-			<SortableBlockRepeaterInner
-				{...props}
-				collectionAccessor={collectionAccessor}
-				shouldViewContent={shouldViewContent}
-			/>
+			// Intentionally not applying label system middleware
+			<FieldSet legend={props.label} errors={collectionAccessor.errors}>
+				<div className="cloneable">
+					<div className="cloneable-content">
+						<Sortable
+							entities={collectionAccessor}
+							sortBy={props.sortBy}
+							label={props.label}
+							enableAddingNew={false}
+							enableUnlink={props.enableUnlink}
+							enableUnlinkAll={props.enableUnlinkAll}
+							removeType={props.removeType}
+							emptyMessage={props.emptyMessage}
+						>
+							{blockChildren}
+						</Sortable>
+					</div>
+					{collectionAccessor.addNew && (
+						<AddNewBlockButton
+							addNew={collectionAccessor.addNew}
+							normalizedBlockProps={normalizedBlockList}
+							isMutating={isMutating}
+							discriminationField={props.discriminationField}
+						/>
+					)}
+				</div>
+			</FieldSet>
 		)
 	},
 	props => (

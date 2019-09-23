@@ -1,22 +1,49 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}table2
-	outline: 1px solid
+	--cui-table2-spacing: .75em
 
-	display: grid
+	display: table
 	border-collapse: collapse
-
-	thead,
-	tbody,
-	tfoot,
-	tr
-		display: contents
-
-	td
-		display: block
+	width: 100%
 
 	&-row
-		//
+		display: table-row
+
+		&:nth-child(even)
+			background-color: rgba(#000000, 0.02)
 
 	&-cell
-		//
+		display: table-cell
+		white-space: nowrap
+		padding: calc(var(--cui-table2-spacing) / 2) var(--cui-table2-spacing)
+
+		&:not(:first-child)
+			padding-left: calc(var(--cui-table2-spacing) / 2)
+
+		&:not(:last-child)
+			padding-right: calc(var(--cui-table2-spacing) / 2)
+
+		&.view-shrink
+			width: 0.001px
+
+	&.view-compact
+		--cui-table2-spacing: .4em
+
+		font-size: .9em
+
+	&-row,
+	&-cell
+		text-align: inherit
+
+	&,
+	&-row,
+	&-cell
+		&.view-justifyStart
+			text-align: left
+
+		&.view-justifyCenter
+			text-align: center
+
+		&.view-justifyEnd
+			text-align: right

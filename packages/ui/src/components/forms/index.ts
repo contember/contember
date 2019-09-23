@@ -1,4 +1,4 @@
-export * from './MultiButton/index'
+export * from './MultiButton'
 
 export * from './Button'
 export * from './ButtonGroup'

@@ -56,12 +56,18 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		if (!targetRelation) {
 			return {}
 		}
-		return getUniqueConstraints(this.schema, targetEntity)
-			.map(unique => unique.fields)
+		const uniqueConstraints = getUniqueConstraints(this.schema, targetEntity).map(unique => unique.fields)
+		const composedUnique = uniqueConstraints
 			.filter(fields => fields.length === 2) //todo support all uniques
 			.filter(fields => fields.includes(targetRelation.name))
 			.map(fields => fields.filter(it => it !== targetRelation.name))
 			.map(fields => fields[0])
+		const singleUnique = uniqueConstraints
+			.filter(fields => fields.length === 1)
+			.map(fields => fields[0])
+			.filter(it => it !== targetRelation.name)
+
+		return [...composedUnique, ...singleUnique]
 			.filter(field =>
 				acceptFieldVisitor(
 					this.schema,

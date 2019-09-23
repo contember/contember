@@ -86,10 +86,11 @@ export default class Admin extends React.Component<AdminProps> {
 											const Component = relevantConfig.lazyComponent
 
 											if (config) {
-												relevantConfig.rootEnvironment = relevantConfig.rootEnvironment.updateDimensionsIfNecessary(
-													route.dimensions,
-													config.defaultDimensions || {},
-												)
+												relevantConfig.rootEnvironment = relevantConfig.rootEnvironment
+													.updateDimensionsIfNecessary(route.dimensions, config.defaultDimensions || {})
+													.putDelta({
+														...route.parameters,
+													})
 												return (
 													<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
 														<React.Suspense fallback={<ContainerSpinner />}>

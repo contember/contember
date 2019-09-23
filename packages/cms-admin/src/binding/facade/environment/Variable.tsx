@@ -1,13 +1,20 @@
 import * as React from 'react'
-import { EnvironmentContext } from '../../coreComponents'
+import { useEnvironment } from '../../coreComponents'
 import { Environment } from '../../dao'
 
 interface VariableProps {
 	name: Environment.Name
+	format?: (value: React.ReactNode) => React.ReactNode
 }
 
-export const Variable = (props: VariableProps): React.ReactElement => {
-	const environment = React.useContext(EnvironmentContext)
+export const Variable = React.memo(
+	({ name, format }: VariableProps): React.ReactElement => {
+		const environment = useEnvironment()
+		const value = environment.getValueOrElse(name, null)
 
-	return <>{environment.getValueOrElse(props.name, null)}</>
-}
+		const formatted = React.useMemo(() => (format ? format(value) : value), [format, value])
+
+		return <>{formatted}</>
+	},
+)
+Variable.displayName = 'Variable'

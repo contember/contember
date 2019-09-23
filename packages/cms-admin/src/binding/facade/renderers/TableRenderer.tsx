@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Table } from '../../../components'
+import { Table2, Table2Cell, Table2Row } from '@contember/ui'
 import { AccessorContext, DataRendererProps } from '../../coreComponents'
 import { CollectionRenderer } from './CollectionRenderer'
 import { CommonRendererProps } from './CommonRendererProps'
@@ -18,14 +18,13 @@ export class TableRenderer extends React.PureComponent<DataRendererProps & Table
 						{DefaultRenderer.renderTitleBar(this.props)}
 						{this.props.beforeContent}
 						{(entities.length > 0 || this.props.tableHeader) && (
-							<Table>
-								{this.props.tableHeader}
+							<Table2 heading={this.props.tableHeader}>
 								{entities.map(value => (
 									<AccessorContext.Provider value={value} key={value.getKey()}>
-										<Table.Row>{this.props.children}</Table.Row>
+										<Table2Row>{this.props.children}</Table2Row>
 									</AccessorContext.Provider>
 								))}
-							</Table>
+							</Table2>
 						)}
 						{!!entities.length || <div>There are no items to display.</div>}
 					</>

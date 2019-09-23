@@ -7,6 +7,7 @@ import {
 	Environment,
 	Field,
 	FieldText,
+	Filter,
 } from '../../../index'
 import { QueryLanguage } from '../../../queryLanguage'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
@@ -18,6 +19,7 @@ export interface DimensionsSwitcherBaseProps
 	maxItems?: number
 	labelField: string
 	orderBy?: EntityListDataProviderProps<unknown>['orderBy']
+	filter?: string | Filter
 }
 
 export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {
@@ -50,8 +52,9 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 	return (
 		<EntityListDataProvider<DimensionsRendererProps>
 			entityName={metadata.entityName}
-			immutable={true}
+			immutable={!props.filter}
 			orderBy={props.orderBy}
+			filter={props.filter}
 			renderer={DimensionsRenderer}
 			rendererProps={{
 				buttonProps: props.buttonProps,

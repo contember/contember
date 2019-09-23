@@ -4,7 +4,7 @@ import { addToast, dismissToast } from '../../../../actions/toasts'
 import { Dispatch } from '../../../../actions/types'
 import State from '../../../../state'
 import { ToastDefinition, ToastId, ToastType } from '../../../../state/toasts'
-import { DirtinessContextValue, MutationStateContextValue } from '../../../coreComponents/PersistState'
+import { DirtinessContextValue, MutationStateContextValue } from '../../../coreComponents'
 
 export interface PersistInfoPublicProps {
 	timeout?: number

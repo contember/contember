@@ -1,7 +1,6 @@
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { MetaOperationsContext } from '../../coreComponents'
-import { DirtinessContext, MutationStateContext } from '../../coreComponents/PersistState'
+import { DirtinessContext, MetaOperationsContext, MutationStateContext } from '../../coreComponents'
 
 export type PersistButtonProps = ButtonProps
 

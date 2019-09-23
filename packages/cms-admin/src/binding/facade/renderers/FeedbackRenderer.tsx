@@ -1,7 +1,6 @@
 import { ContainerSpinner } from '@contember/ui'
 import * as React from 'react'
-import { DataRendererProps } from '../../coreComponents'
-import { DirtinessContext, MutationStateContext } from '../../coreComponents/PersistState'
+import { DataRendererProps, DirtinessContext, MutationStateContext } from '../../coreComponents'
 import { PersistInfo, PersistInfoPublicProps } from './userFeedback'
 
 export interface FeedbackRendererPublicProps extends DataRendererProps {

@@ -2,7 +2,7 @@ import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { MutationStateContext } from '../../coreComponents/PersistState'
+import { MutationStateContext } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 
 export type AddNewButtonProps = ButtonProps & {

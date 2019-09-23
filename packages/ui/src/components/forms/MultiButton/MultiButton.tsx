@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Dropdown } from '../../Dropdown'
-import { Button, ButtonProps } from '../Button'
+import { Button } from '../Button'
 import { ButtonGroup, ButtonGroupProps } from '../ButtonGroup'
-import { BoxedButtonProps, buttonAnalyzer } from './buttonAnalyzer'
+import { FormGroup } from '../FormGroup'
+import { buttonAnalyzer, ButtonFormGroupProps } from './buttonAnalyzer'
 
 export interface MultiButtonProps extends ButtonGroupProps {
 	triggerFromDropdown?: boolean
@@ -14,54 +15,76 @@ export const MultiButton = React.memo(({ triggerFromDropdown = false, ...props }
 	const augmentedButtons = React.useMemo(() => buttonAnalyzer.processChildren(props.children, undefined), [
 		props.children,
 	])
-	const buttonProps = React.useMemo(
+	const formGroupsPresent = React.useMemo(() => augmentedButtons.some(props => props instanceof ButtonFormGroupProps), [
+		augmentedButtons,
+	])
+	const buttonFormGroupProps = React.useMemo(
 		() =>
 			augmentedButtons.map(item => {
-				if (item instanceof BoxedButtonProps) {
-					return item.props
+				if (item instanceof ButtonFormGroupProps) {
+					return new ButtonFormGroupProps(
+						{
+							...item.formGroupProps,
+							useLabelElement: false,
+						},
+						item.buttonProps,
+					)
 				}
-				return item.buttonProps
+				return new ButtonFormGroupProps(
+					{
+						label: undefined,
+						children: undefined,
+						useLabelElement: false,
+					},
+					item.props,
+				)
 			}),
 		[augmentedButtons],
 	)
-	if (buttonProps.length === 0) {
+	if (buttonFormGroupProps.length === 0) {
 		return null
 	}
-	const activeButtonProps = buttonProps[currentButtonIndex]
+	const Wrapper = formGroupsPresent ? FormGroup : React.Fragment
+	const activeButtonFormGroupProps = buttonFormGroupProps[currentButtonIndex]
+	const activeWrapperProps = formGroupsPresent ? activeButtonFormGroupProps.formGroupProps : {}
 	return (
-		<ButtonGroup {...props}>
-			<Button {...activeButtonProps} />
-			<Dropdown
-				buttonProps={{
-					intent: activeButtonProps.intent,
-					size: activeButtonProps.size,
-					distinction: activeButtonProps.distinction,
-					flow: activeButtonProps.flow,
-					isLoading: activeButtonProps.isLoading,
-					bland: activeButtonProps.bland,
-					children: '↓',
-					className: 'button-group-last',
-				}}
-			>
-				{({ requestClose }) => (
-					<ButtonGroup orientation="vertical">
-						{buttonProps.map((buttonProps, i) => (
-							<Button
-								{...buttonProps}
-								key={i}
-								onClick={(e: React.MouseEvent<any>) => {
-									triggerFromDropdown && buttonProps.onClick && buttonProps.onClick(e)
-									setCurrentButtonIndex(i)
-									requestClose()
-								}}
-								flow="block"
-								distinction="seamless"
-							/>
-						))}
-					</ButtonGroup>
-				)}
-			</Dropdown>
-		</ButtonGroup>
+		<Wrapper {...(activeWrapperProps as any)}>
+			<ButtonGroup {...props}>
+				<Button {...activeButtonFormGroupProps.buttonProps} />
+				<Dropdown
+					buttonProps={{
+						intent: activeButtonFormGroupProps.buttonProps.intent,
+						size: activeButtonFormGroupProps.buttonProps.size,
+						distinction: activeButtonFormGroupProps.buttonProps.distinction,
+						flow: activeButtonFormGroupProps.buttonProps.flow,
+						isLoading: activeButtonFormGroupProps.buttonProps.isLoading,
+						bland: activeButtonFormGroupProps.buttonProps.bland,
+						children: '↓',
+						className: 'button-group-last',
+					}}
+				>
+					{({ requestClose }) => (
+						<ButtonGroup orientation="vertical">
+							{buttonFormGroupProps.map((buttonFormGroupProps, i) => (
+								<Button
+									{...buttonFormGroupProps.buttonProps}
+									key={i}
+									onClick={(e: React.MouseEvent<any>) => {
+										triggerFromDropdown &&
+											buttonFormGroupProps.buttonProps.onClick &&
+											buttonFormGroupProps.buttonProps.onClick(e)
+										setCurrentButtonIndex(i)
+										requestClose()
+									}}
+									flow="block"
+									distinction="seamless"
+								/>
+							))}
+						</ButtonGroup>
+					)}
+				</Dropdown>
+			</ButtonGroup>
+		</Wrapper>
 	)
 })
 MultiButton.displayName = 'MultiButton'

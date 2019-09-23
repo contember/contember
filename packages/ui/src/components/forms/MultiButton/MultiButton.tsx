@@ -59,7 +59,7 @@ export const MultiButton = React.memo(({ triggerFromDropdown = false, ...props }
 						flow: activeButtonFormGroupProps.buttonProps.flow,
 						isLoading: activeButtonFormGroupProps.buttonProps.isLoading,
 						bland: activeButtonFormGroupProps.buttonProps.bland,
-						children: '↓',
+						children: <span style={{ fontSize: '.7em' }}>▼</span>,
 						className: 'button-group-last',
 					}}
 				>

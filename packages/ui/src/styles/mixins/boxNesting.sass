@@ -3,10 +3,13 @@
 		$depthConfig: nth($cui-box-depths, $depth)
 
 		$separation: map_get($depthConfig, separation)
+		$paddingX: map_get($depthConfig, paddingX)
 		$paddingY: map_get($depthConfig, paddingY)
 
 		&.view-depth-#{$depth}
 			+box($depth)
+
+			--cui-boxNesting-paddingX: #{$paddingX}
 
 			& + &
 				margin-top: $separation

@@ -1,11 +1,13 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}table2
-	--cui-table2-spacing: .75em
+	--cui-table2-spacingX: .75em
+	--cui-table2-spacingY: .75em
 
 	display: table
 	border-collapse: collapse
-	width: 100%
+	margin: 0 calc(-1 * var(--cui-boxNesting-paddingX, 0))
+	width: calc(100% + 2 * var(--cui-boxNesting-paddingX, 0))
 
 	&-row
 		display: table-row
@@ -16,19 +18,20 @@
 	&-cell
 		display: table-cell
 		white-space: nowrap
-		padding: calc(var(--cui-table2-spacing) / 2) var(--cui-table2-spacing)
+		padding: calc(var(--cui-table2-spacingY) / 2) var(--cui-boxNesting-paddingX, var(--cui-table2-spacingX))
 
 		&:not(:first-child)
-			padding-left: calc(var(--cui-table2-spacing) / 2)
+			padding-left: calc(var(--cui-table2-spacingX) / 2)
 
 		&:not(:last-child)
-			padding-right: calc(var(--cui-table2-spacing) / 2)
+			padding-right: calc(var(--cui-table2-spacingX) / 2)
 
 		&.view-shrink
 			width: 0.001px
 
 	&.view-compact
-		--cui-table2-spacing: .4em
+		--cui-table2-spacingX: .4em
+		--cui-table2-spacingY: .4em
 
 		font-size: .9em
 

@@ -10,6 +10,7 @@ import {
 } from '../reducer/dataTrees'
 import { DataTreeDirtinessState, DataTreeId, DataTreeRequestErrorData, DataTreeRequestType } from '../state/dataTrees'
 import { loginRequest } from '../state/request'
+import ViewState from '../state/view'
 import { pushRequest } from './request'
 import { ActionCreator } from './types'
 
@@ -52,17 +53,19 @@ export const initializeDataTreeRequest = (dataTreeId: DataTreeId, type: DataTree
 		}
 	})()
 
-export type DataTreeSetRequestEnd =
-	| {
-			dataTreeId: DataTreeId
-			type: DataTreeRequestType.Mutation
-			data: MutationRequestResult | null
-	  }
-	| {
-			dataTreeId: DataTreeId
-			type: DataTreeRequestType.Query
-			data: QueryRequestResult | null
-	  }
+export interface MutationRequestEnd {
+	dataTreeId: DataTreeId
+	type: DataTreeRequestType.Mutation
+	data: MutationRequestResult | null
+}
+
+export interface QueryRequestEnd {
+	dataTreeId: DataTreeId
+	type: DataTreeRequestType.Query
+	data: QueryRequestResult | null
+}
+
+export type DataTreeSetRequestEnd = MutationRequestEnd | QueryRequestEnd
 
 export const handleDataTreeRequestEnd = (dataTreeId: DataTreeId, type: DataTreeRequestType, data: any) =>
 	createAction<DataTreeSetRequestEnd>(DATA_TREE_REQUEST_END, () => {
@@ -102,10 +105,14 @@ export const sendDataTreeRequest = (
 	dataTreeId: DataTreeId,
 	type: DataTreeRequestType,
 	request: string,
-): ActionCreator => async (dispatch, getState, services) => {
+): ActionCreator<DataTreeSetRequestEnd | ViewState | DataTreeSetRequestError<undefined>> => async (
+	dispatch,
+	getState,
+	services,
+) => {
 	const state = getState()
 	if (!('stage' in state.request) || !('project' in state.request)) {
-		return
+		return dispatch(pushRequest(() => ({ name: 'projects_list' })))
 	}
 	const { stage, project } = state.request
 	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
@@ -115,12 +122,12 @@ export const sendDataTreeRequest = (
 		const response = await services.contentClientFactory
 			.create(project, stage)
 			.request(request, {}, apiToken || undefined)
-		dispatch(handleDataTreeRequestEnd(dataTreeId, type, response))
+		return dispatch(handleDataTreeRequestEnd(dataTreeId, type, response))
 	} catch (error) {
-		dispatch(setDataTreeRequestError<undefined>(dataTreeId, type, undefined))
+		const requestError = dispatch(setDataTreeRequestError<undefined>(dataTreeId, type, undefined))
 		if (error instanceof GraphqlClient.GraphqlAuthenticationError) {
 			dispatch(pushRequest(loginRequest()))
-			return
+			return requestError
 		}
 		throw error
 	}

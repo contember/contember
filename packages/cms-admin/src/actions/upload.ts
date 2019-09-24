@@ -50,7 +50,11 @@ const finishUpload = createAction<UploadFinishPayload, string, string>(UPLOAD_FI
 	resultUrl,
 }))
 
-export const uploadFile = (id: string, file: File): ActionCreator => async (dispatch, getState, services) => {
+export const uploadFile = (id: string, file: File): ActionCreator<any> => async (
+	dispatch,
+	getState,
+	services,
+): Promise<any> => {
 	const state = getState()
 	if (!('stage' in state.request) || !('project' in state.request)) {
 		return

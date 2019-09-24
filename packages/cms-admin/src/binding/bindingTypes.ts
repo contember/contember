@@ -65,6 +65,9 @@ export interface MutationResult {
 		valid: boolean
 		errors: MutationError[]
 	}
+	node: {
+		id: string
+	}
 }
 
 export interface MutationRequestResult {

@@ -107,10 +107,7 @@ export class QueryGenerator {
 		)
 	}
 
-	private *registerQueryPart(
-		fields: EntityFields,
-		builder: ReadBuilder,
-	): IterableIterator<MarkerTreeRoot | ReadBuilder> {
+	private *registerQueryPart(fields: EntityFields, builder: ReadBuilder): Generator<MarkerTreeRoot, ReadBuilder> {
 		builder = builder.column(PRIMARY_KEY_NAME)
 		builder = builder.column(TYPENAME_KEY_NAME)
 
@@ -126,14 +123,15 @@ export class QueryGenerator {
 					const reference = fieldValue.references[referenceName]
 
 					let builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate()
-					for (const item of this.registerQueryPart(reference.fields, builderWithBody)) {
-						if (item instanceof CrudQueryBuilder.ReadBuilder) {
-							// This branch will only get executed at most once per recursive call
-							builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(item.objectBuilder)
-						} else {
-							yield item
-						}
+					const subPart = this.registerQueryPart(reference.fields, builderWithBody)
+
+					let item = subPart.next()
+
+					while (!item.done) {
+						yield item.value
+						item = subPart.next()
 					}
+					builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(item.value.objectBuilder)
 
 					const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<
 						Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
@@ -162,27 +160,19 @@ export class QueryGenerator {
 			}
 		}
 
-		// Ideally, this would have been a `return`, not a `yield`, and the return type would have been something slightly
-		// different. Unfortunately, https://github.com/Microsoft/TypeScript/issues/2983 prevents this but it's not too big
-		// of a deal.
-		// UPDATE: waiting for https://github.com/microsoft/TypeScript/pull/30790 to be merged
-		yield builder
+		return builder
 	}
 
 	private addMarkerTreeRootQueries(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTrees: IterableIterator<MarkerTreeRoot | ReadBuilder>,
+		subTrees: Generator<MarkerTreeRoot, ReadBuilder>,
 	): [BaseQueryBuilder, ReadBuilder | undefined] {
-		let listQueryBuilder: ReadBuilder | undefined = undefined
-
-		for (const item of subTrees) {
-			if (item instanceof MarkerTreeRoot) {
-				baseQueryBuilder = this.addSubQuery(item, baseQueryBuilder)
-			} else {
-				listQueryBuilder = item
-			}
+		let item = subTrees.next()
+		while (!item.done) {
+			baseQueryBuilder = this.addSubQuery(item.value, baseQueryBuilder)
+			item = subTrees.next()
 		}
 
-		return [baseQueryBuilder, listQueryBuilder]
+		return [baseQueryBuilder, item.value]
 	}
 }

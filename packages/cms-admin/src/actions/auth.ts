@@ -2,8 +2,8 @@ import { createAction } from 'redux-actions'
 import { SET_ERROR, SET_IDENTITY, SET_LOADING, SET_LOGOUT } from '../reducer/auth'
 import { getErrorCodeString } from '../tenant/hooks/strings'
 import { pushRequest } from './request'
-import { ActionCreator } from './types'
-import { AuthIdentity, Project } from '../state/auth'
+import { ActionCreator, Dispatch } from './types'
+import AuthState, { AuthIdentity, Project } from '../state/auth'
 import { invokeIfSupportsCredentials } from '../utils/invokeIfSupportsCredentials'
 
 export const login = (email: string, password: string, rememberMe: boolean): ActionCreator => async (
@@ -47,9 +47,9 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 					),
 				}))(),
 			)
-			dispatch(pushRequest(() => ({ name: 'projects_list' })))
+			return dispatch(pushRequest(() => ({ name: 'projects_list' })))
 		} else {
-			dispatch(
+			return dispatch(
 				createAction(SET_ERROR, () =>
 					signIn.errors.map((err: any) => err.endUserMessage || getErrorCodeString(err.code)).join(', '),
 				)(),
@@ -57,11 +57,11 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 		}
 	} catch (error) {
 		console.error(error.message)
-		dispatch(createAction(SET_ERROR, () => 'Something went wrong')())
+		return dispatch(createAction(SET_ERROR, () => 'Something went wrong')())
 	}
 }
 
-export const tryAutoLogin = (): ActionCreator => async dispatch => {
+export const tryAutoLogin = (): ActionCreator => async (dispatch): Promise<any> => {
 	await invokeIfSupportsCredentials(async () => {
 		const credentials = await navigator.credentials.get({
 			password: true,
@@ -103,7 +103,7 @@ const loginMutation = `
 	}
 `
 
-export const logout = (): ActionCreator => (dispatch, getState, services) => {
+export const logout = () => (dispatch: Dispatch) => {
 	dispatch(createAction(SET_LOGOUT)())
-	dispatch(pushRequest(() => ({ name: 'login' })))
+	return dispatch(pushRequest(() => ({ name: 'login' })))
 }

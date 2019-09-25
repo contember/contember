@@ -2,7 +2,8 @@ import bcrypt from 'bcrypt'
 import { SignInErrorCode } from '../../schema'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
-import { ApiKeyManager, PersonQuery, PersonRow } from '../'
+import { ApiKeyManager } from '../service'
+import { PersonQuery, PersonRow } from '../queries'
 
 class SignInManager {
 	constructor(

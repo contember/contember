@@ -1,15 +1,15 @@
 import { getEntity } from '@contember/schema-utils'
 import Path from './select/Path'
-import Mapper from './Mapper'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../acl/PredicateFactory'
 import { Client } from '@contember/database'
 import { Acl, Input, Model } from '@contember/schema'
-import { InsertBuilder } from '@contember/database'
+import { ConflictActionType } from '@contember/database'
 import { ConditionBuilder } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
 import { Literal } from '@contember/database'
+import { NoResultError } from './NoResultError'
 
 class JunctionTableManager {
 	constructor(
@@ -132,7 +132,7 @@ namespace JunctionTableManager {
 					[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(ownerPrimary),
 					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimary),
 				})
-				.onConflict(InsertBuilder.ConflictActionType.doNothing)
+				.onConflict(ConflictActionType.doNothing)
 				.execute()
 		}
 
@@ -149,7 +149,7 @@ namespace JunctionTableManager {
 				.returning(new Literal('true as inserted'))
 				.from(qb => qb.from('data'))
 				.withCteAliases(['data'])
-				.onConflict(InsertBuilder.ConflictActionType.doNothing)
+				.onConflict(ConflictActionType.doNothing)
 
 			const qb = this.db
 				.selectBuilder()
@@ -163,7 +163,7 @@ namespace JunctionTableManager {
 
 			const result = await qb.getResult()
 			if (result[0]['selected'] === false) {
-				throw new Mapper.NoResultError()
+				throw new NoResultError()
 			}
 		}
 	}
@@ -219,7 +219,7 @@ namespace JunctionTableManager {
 
 			const result = await qb.getResult()
 			if (result[0]['selected'] === false) {
-				throw new Mapper.NoResultError()
+				throw new NoResultError()
 			}
 		}
 	}

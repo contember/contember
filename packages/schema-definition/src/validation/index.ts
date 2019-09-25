@@ -1,5 +1,5 @@
 import { tuple } from '@contember/utils'
-import { SchemaDefinition } from '../'
+import { SchemaDefinition } from '../model'
 import 'reflect-metadata'
 import { Validation } from '@contember/schema'
 

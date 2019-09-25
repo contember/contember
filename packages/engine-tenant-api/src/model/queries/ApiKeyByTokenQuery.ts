@@ -1,5 +1,5 @@
 import { ConditionBuilder, DatabaseQueryable, DatabaseQuery } from '@contember/database'
-import { ApiKey } from '../'
+import { ApiKey } from '../type'
 
 class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 	constructor(private readonly token: string) {

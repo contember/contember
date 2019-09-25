@@ -1,6 +1,7 @@
 import { Acl, Model } from '@contember/schema'
 import { checkExtraProperties, everyIs, hasStringProperty, isObject } from './utils'
-import { getEntity, PredicateDefinitionProcessor } from '..'
+import { PredicateDefinitionProcessor } from '../acl'
+import { getEntity } from '../model'
 import { ErrorBuilder, ValidationError } from './errors'
 
 export class AclValidator {

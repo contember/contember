@@ -1,7 +1,7 @@
-import { Command } from '../'
-import { UpdateProjectMembershipVariablesCommand } from './'
+import { Command } from '../Command'
+import { UpdateProjectMembershipVariablesCommand } from './UpdateProjectMembershipVariablesCommand'
 import { Membership } from '../../type/Membership'
-import { InsertBuilder } from '@contember/database'
+import { ConflictActionType } from '@contember/database'
 import { ImplementationException } from '../../../exceptions'
 
 class CreateOrUpdateProjectMembershipsCommand implements Command<void> {
@@ -24,7 +24,7 @@ class CreateOrUpdateProjectMembershipsCommand implements Command<void> {
 					role: membership.role,
 				})
 				// intentionally using update instead of "do nothing" so I can use "returning id"
-				.onConflict(InsertBuilder.ConflictActionType.update, ['project_id', 'identity_id', 'role'], {
+				.onConflict(ConflictActionType.update, ['project_id', 'identity_id', 'role'], {
 					role: membership.role,
 				})
 				.returning('id')

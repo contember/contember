@@ -4,6 +4,7 @@ import { Schema } from '@contember/schema'
 import { ProjectContainerResolver } from '../CompositionRoot'
 import { SchemaValidator } from '@contember/schema-utils'
 import { isDeepStrictEqual } from 'util'
+import { Input } from '../core/cli/Input'
 
 type Args = {
 	projectName: string
@@ -24,7 +25,7 @@ class DiffCommand extends Command<Args, {}> {
 		configuration.argument('migrationName')
 	}
 
-	protected async execute(input: Command.Input<Args, {}>): Promise<void> {
+	protected async execute(input: Input<Args, {}>): Promise<void> {
 		const [projectName, migrationName] = [input.getArgument('projectName'), input.getArgument('migrationName')]
 
 		const projectContainer = this.projectContainerResolver(projectName)

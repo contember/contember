@@ -1,4 +1,4 @@
-import { acceptFieldVisitor } from '../'
+import { acceptFieldVisitor } from '../model'
 import { Acl, Input, Model } from '@contember/schema'
 
 class PredicateDefinitionProcessor {

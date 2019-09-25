@@ -1,4 +1,6 @@
-import { Literal, QueryBuilder } from '../'
+import { QueryBuilder } from './QueryBuilder'
+import { Literal } from '../Literal'
+import { columnExpressionToLiteral, toFqnWrap } from './utils'
 
 class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable<WindowFunction<HasFunction>> {
 	private constructor(
@@ -18,7 +20,7 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 	public partitionBy(columnName: QueryBuilder.ColumnIdentifier): WindowFunction<HasFunction>
 	public partitionBy(callback: QueryBuilder.ColumnExpression): WindowFunction<HasFunction>
 	public partitionBy(expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression): WindowFunction<HasFunction> {
-		const raw = QueryBuilder.columnExpressionToLiteral(expr)
+		const raw = columnExpressionToLiteral(expr)
 		if (raw === undefined) {
 			return this
 		}
@@ -26,7 +28,7 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 	}
 
 	orderBy(columnName: QueryBuilder.ColumnIdentifier, direction: 'asc' | 'desc' = 'asc'): WindowFunction<HasFunction> {
-		const raw = new Literal(QueryBuilder.toFqnWrap(columnName) + (direction === 'asc' ? ' asc' : ' desc'))
+		const raw = new Literal(toFqnWrap(columnName) + (direction === 'asc' ? ' asc' : ' desc'))
 		return new WindowFunction(this.windowFunction, this.partitionByExpr, [...this.orderByColumns, raw])
 	}
 

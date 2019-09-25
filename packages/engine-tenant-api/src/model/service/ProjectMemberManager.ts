@@ -3,16 +3,15 @@ import { DatabaseQueryable } from '@contember/database'
 import {
 	AddProjectMemberCommand,
 	AddProjectMemberCommandError,
-	ProjectBySlugVariablesByIdentityQuery,
-	ProjectRolesByIdentityQuery,
 	RemoveProjectMemberCommand,
 	UpdateProjectMemberCommand,
-} from '../'
+} from '../commands'
 import { CommandBus } from '../commands/CommandBus'
 import { ProjectMembershipByIdentityQuery } from '../queries/ProjectMembershipByIdentityQuery'
 import { Membership } from '../type/Membership'
 import { ProjectMembersQuery } from '../queries/ProjectMembersQuery'
 import { AddProjectMemberErrorCode } from '../../schema'
+import { ProjectBySlugVariablesByIdentityQuery, ProjectRolesByIdentityQuery } from '../queries'
 
 class ProjectMemberManager {
 	constructor(

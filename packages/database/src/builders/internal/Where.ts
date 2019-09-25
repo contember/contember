@@ -1,5 +1,7 @@
-import { Value, ConditionBuilder, Literal } from '../../'
 import { wrapIdentifier } from '../../utils'
+import { Literal } from '../../Literal'
+import { ConditionBuilder } from '../ConditionBuilder'
+import { Value } from '../../types'
 
 namespace Where {
 	export interface Options {

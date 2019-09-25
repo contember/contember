@@ -1,12 +1,11 @@
 import {
-	AddProjectMemberErrorCode,
 	MutationRemoveProjectMemberArgs,
 	MutationResolvers,
 	RemoveProjectMemberErrorCode,
 	RemoveProjectMemberResponse,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../'
+import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../model'
 
 export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 	constructor(

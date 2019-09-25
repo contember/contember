@@ -1,7 +1,8 @@
 import { MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { IdentityTypeResolver, PermissionActions, PermissionContext, SignInManager } from '../../../'
+import { PermissionActions, SignInManager } from '../../../model'
 import { PermissionContextFactory } from '../../../model/authorization/PermissionContextFactory'
+import { IdentityTypeResolver } from '../../types'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(

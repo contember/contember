@@ -1,4 +1,4 @@
-import { Command } from './'
+import { Command } from './Command'
 import { PersonRow } from '../queries'
 
 class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {

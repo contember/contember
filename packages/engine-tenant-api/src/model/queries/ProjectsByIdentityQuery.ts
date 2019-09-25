@@ -1,8 +1,8 @@
 import { AuthorizationScope } from '@contember/authorization'
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
 import { Identity } from '@contember/engine-common'
-import { PermissionActions, ProjectsQuery } from '../'
-import { PermissionContext } from '../authorization/PermissionContext'
+import { ProjectsQuery } from './ProjectsQuery'
+import { PermissionActions, PermissionContext } from '../authorization'
 
 class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Result> {
 	constructor(private readonly identityId: string, private readonly permissionContext: PermissionContext) {

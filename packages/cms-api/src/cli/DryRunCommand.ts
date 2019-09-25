@@ -1,6 +1,7 @@
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import { ProjectContainer } from '../CompositionRoot'
 import Command from '../core/cli/Command'
+import { Input } from '../core/cli/Input'
 
 type Args = {
 	project: string
@@ -18,7 +19,7 @@ class DryRunCommand extends Command<Args, {}> {
 		configuration.argument('migration').optional()
 	}
 
-	protected async execute(input: Command.Input<Args, {}>): Promise<void> {
+	protected async execute(input: Input<Args, {}>): Promise<void> {
 		const projectSlug = input.getArgument('project')
 		const projectContainer = this.projectContainers.find(it => it.project.slug === projectSlug)
 		if (!projectContainer) {

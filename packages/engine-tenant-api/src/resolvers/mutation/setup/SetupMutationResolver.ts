@@ -2,7 +2,7 @@ import { MutationResolvers, MutationSetupArgs, SetupResponse } from '../../../sc
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import { ImplementationException } from '../../../exceptions'
-import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../'
+import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../model'
 import { Identity } from '@contember/engine-common'
 
 export class SetupMutationResolver implements MutationResolvers {

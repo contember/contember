@@ -3,20 +3,20 @@ import { QueryHandler } from '@contember/queryable'
 import {
 	AddProjectMemberCommand,
 	AddProjectMemberCommandError,
-	ApiKey,
-	ApiKeyByTokenQuery,
 	CreateApiKeyCommand,
 	CreateIdentityCommand,
 	DisableApiKeyCommand,
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
 	ProlongApiKeyCommand,
-} from '../'
+} from '../commands'
+import { ApiKey } from '../type'
 import { CreateApiKeyErrorCode } from '../../schema'
 import { ImplementationException } from '../../exceptions'
 import { CommandBus } from '../commands/CommandBus'
 import { Membership } from '../type/Membership'
 import { TenantRole } from '../authorization/Roles'
+import { ApiKeyByTokenQuery } from '../queries'
 
 class ApiKeyManager {
 	constructor(

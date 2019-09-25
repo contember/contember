@@ -2,7 +2,7 @@ import { MutationResolvers, MutationSignOutArgs, SignOutErrorCode, SignOutRespon
 import { ResolverContext } from '../../ResolverContext'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
-import { PermissionActions, ApiKeyManager, PersonQuery } from '../../../'
+import { PermissionActions, ApiKeyManager, PersonQuery } from '../../../model'
 
 export class SignOutMutationResolver implements MutationResolvers {
 	constructor(

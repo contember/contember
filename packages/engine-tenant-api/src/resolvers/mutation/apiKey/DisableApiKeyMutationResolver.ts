@@ -6,7 +6,7 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ApiKeyManager } from '../../../'
+import { PermissionActions, ApiKeyManager } from '../../../model'
 
 export class DisableApiKeyMutationResolver implements MutationResolvers {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}

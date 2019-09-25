@@ -1,12 +1,7 @@
-import {
-	Connection,
-	DatabaseQueryable,
-	DeleteBuilder,
-	EventManager,
-	InsertBuilder,
-	SelectBuilder,
-	UpdateBuilder,
-} from '../'
+import { DeleteBuilder, InsertBuilder, SelectBuilder, UpdateBuilder } from '../builders'
+import { DatabaseQueryable } from '../queryable'
+import { Connection } from './Connection'
+import { EventManager } from './EventManager'
 import { QueryHandler } from '@contember/queryable'
 import { Interface } from '@contember/utils'
 

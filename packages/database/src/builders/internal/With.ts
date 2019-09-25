@@ -1,5 +1,8 @@
-import { Client, Literal, QueryBuilder, SelectBuilder } from '../../'
 import { wrapIdentifier } from '../../utils'
+import { Literal } from '../../Literal'
+import { QueryBuilder } from '../QueryBuilder'
+import { SelectBuilder } from '../SelectBuilder'
+import { Client } from '../../client'
 
 namespace With {
 	export class Statement {
@@ -43,7 +46,7 @@ namespace With {
 
 	export function createLiteral(wrapper: Client, expr: Expression): Literal {
 		if (typeof expr === 'function') {
-			return expr(SelectBuilder.create(wrapper)).createQuery()
+			return expr(wrapper.selectBuilder()).createQuery()
 		} else if (((expr: any): expr is QueryBuilder => 'createQuery' in expr)(expr)) {
 			return expr.createQuery()
 		} else {

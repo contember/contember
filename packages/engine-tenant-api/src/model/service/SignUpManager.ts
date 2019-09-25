@@ -1,6 +1,7 @@
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
-import { CreateIdentityCommand, CreatePersonCommand, PersonQuery, PersonRow } from '../'
+import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
+import { PersonQuery, PersonRow } from '../queries'
 import { SignUpErrorCode } from '../../schema'
 import { CommandBus } from '../commands/CommandBus'
 import { TenantRole } from '../authorization/Roles'

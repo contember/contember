@@ -1,4 +1,4 @@
-import { ApiKey } from '../'
+import { ApiKey } from '../type'
 import { Providers } from '../providers'
 
 class ApiKeyHelper {

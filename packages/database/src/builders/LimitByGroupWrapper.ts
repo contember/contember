@@ -1,4 +1,6 @@
-import { QueryBuilder, ConditionBuilder, SelectBuilder } from '../'
+import { QueryBuilder } from './QueryBuilder'
+import { SelectBuilder } from './SelectBuilder'
+import { ConditionBuilder } from './ConditionBuilder'
 
 class LimitByGroupWrapper {
 	constructor(

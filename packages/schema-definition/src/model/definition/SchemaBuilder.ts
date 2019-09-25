@@ -5,15 +5,17 @@ import { Interface } from './types'
 import NamingConventions from './NamingConventions'
 import FieldDefinition from './FieldDefinition'
 import UniqueDefinition from './UniqueDefinition'
-import { EntityConstructor, EntityType } from './types'
+import { EntityConstructor } from './types'
 import ColumnDefinition from './ColumnDefinition'
 import EnumDefinition from './EnumDefinition'
 import 'reflect-metadata'
+import { EntityRegistry } from './EntityRegistry'
+import { EnumRegistry } from './EnumRegistry'
 
 class SchemaBuilder {
-	private entityRegistry = new SchemaBuilder.EntityRegistry()
+	private entityRegistry = new EntityRegistry()
 
-	private enumRegistry = new SchemaBuilder.EnumRegistry()
+	private enumRegistry = new EnumRegistry()
 
 	constructor(private readonly conventions: NamingConventions) {}
 
@@ -91,56 +93,6 @@ class SchemaBuilder {
 			}
 		}
 		return unique
-	}
-}
-
-namespace SchemaBuilder {
-	export class EnumRegistry {
-		public readonly enums: Record<string, EnumDefinition> = {}
-
-		register(name: string, definition: EnumDefinition) {
-			if (this.enums[name]) {
-				throw new Error(`Enum with name ${name} is already registered`)
-			}
-			this.enums[name] = definition
-		}
-
-		has(definition: EnumDefinition): boolean {
-			return Object.values(this.enums).includes(definition)
-		}
-
-		getName(definition: EnumDefinition): string {
-			for (const [name, def] of Object.entries(this.enums)) {
-				if (def === definition) {
-					return name
-				}
-			}
-			throw new Error(`Enum with values ${definition.values.join(', ')} is not registered.`)
-		}
-	}
-
-	export class EntityRegistry {
-		public readonly entities: Record<string, EntityConstructor<EntityType<any>>> = {}
-
-		register(name: string, definition: EntityConstructor<EntityType<any>>) {
-			if (this.entities[name]) {
-				throw new Error(`Entity with name ${name} is already registered`)
-			}
-			this.entities[name] = definition
-		}
-
-		has(definition: EntityConstructor<EntityType<any>>): boolean {
-			return Object.values(this.entities).includes(definition)
-		}
-
-		getName(definition: EntityConstructor<EntityType<any>>): string {
-			for (const [name, def] of Object.entries(this.entities)) {
-				if (def === definition) {
-					return name
-				}
-			}
-			throw new Error(`Entity ${definition.name} is not registered. Have you exported the definition?`)
-		}
 	}
 }
 

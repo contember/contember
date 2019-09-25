@@ -1,6 +1,5 @@
-import { Command } from './'
-import { ApiKey } from '../'
-import { Client } from '@contember/database'
+import { Command } from './Command'
+import { ApiKey } from '../type'
 
 class DisableOneOffApiKeyCommand implements Command<void> {
 	constructor(private readonly apiKeyId: string) {}

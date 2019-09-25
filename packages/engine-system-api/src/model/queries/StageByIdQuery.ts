@@ -1,8 +1,8 @@
 import { DatabaseQuery } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
-import { SelectBuilder } from '@contember/database'
-import { Stage, StageWithId } from '../dtos/Stage'
-import { prepareStageQueryBuilder } from './StageQueryHelper'
+import { SelectBuilder, LockType } from '@contember/database'
+import { StageWithId } from '../dtos/Stage'
+import { prepareStageQueryBuilder } from './StageQueryFactory'
 
 class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {
 	constructor(private readonly stageId: string, private readonly forUpdate: boolean = false) {
@@ -15,7 +15,7 @@ class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {
 		})
 
 		if (this.forUpdate) {
-			selectBuilder = selectBuilder.lock(SelectBuilder.LockType.forNoKeyUpdate)
+			selectBuilder = selectBuilder.lock(LockType.forNoKeyUpdate)
 		}
 
 		const rows = await selectBuilder.getResult()

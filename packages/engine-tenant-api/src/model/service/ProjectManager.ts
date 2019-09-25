@@ -1,8 +1,10 @@
 import { DatabaseQueryable } from '@contember/database'
-import { CreateOrUpdateProjectCommand, Project, ProjectBySlugQuery, ProjectsByIdentityQuery } from '../'
 import { QueryHandler } from '@contember/queryable'
 import { CommandBus } from '../commands/CommandBus'
-import { PermissionContext } from '../authorization/PermissionContext'
+import { PermissionContext } from '../authorization'
+import { Project } from '../type'
+import { CreateOrUpdateProjectCommand } from '../commands'
+import { ProjectBySlugQuery, ProjectsByIdentityQuery } from '../queries'
 
 export class ProjectManager {
 	constructor(

@@ -1,8 +1,10 @@
-import { Client, Connection, Literal, QueryBuilder } from '../'
 import { Returning } from './internal/Returning'
 import { With } from './internal/With'
 import { Where } from './internal/Where'
 import { Compiler } from './Compiler'
+import { QueryBuilder } from './QueryBuilder'
+import { Client, Connection } from '../client'
+import { Literal } from '../Literal'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>>
 	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {

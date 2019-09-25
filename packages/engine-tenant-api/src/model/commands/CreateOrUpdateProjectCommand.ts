@@ -1,6 +1,6 @@
-import { InsertBuilder } from '@contember/database'
-import { Command } from './'
-import { Project } from '../'
+import { ConflictActionType } from '@contember/database'
+import { Command } from './Command'
+import { Project } from '../type'
 
 class CreateOrUpdateProjectCommand implements Command<void> {
 	constructor(private readonly project: Pick<Project, 'name' | 'slug'>) {}
@@ -14,7 +14,7 @@ class CreateOrUpdateProjectCommand implements Command<void> {
 				name: this.project.name,
 				slug: this.project.slug,
 			})
-			.onConflict(InsertBuilder.ConflictActionType.update, ['slug'], {
+			.onConflict(ConflictActionType.update, ['slug'], {
 				name: this.project.name,
 				slug: this.project.slug,
 			})

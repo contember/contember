@@ -1,4 +1,6 @@
-import { QueryBuilder, Literal } from '../'
+import { QueryBuilder } from './QueryBuilder'
+import { Literal } from '../Literal'
+import { columnExpressionToLiteral } from './utils'
 
 class CaseStatement {
 	constructor(private readonly options: CaseStatement.Options) {}
@@ -13,8 +15,8 @@ class CaseStatement {
 			whenClauses: [
 				...this.options.whenClauses,
 				{
-					when: QueryBuilder.columnExpressionToLiteral(when) || new Literal('null'),
-					then: QueryBuilder.columnExpressionToLiteral(then) || new Literal('null'),
+					when: columnExpressionToLiteral(when) || new Literal('null'),
+					then: columnExpressionToLiteral(then) || new Literal('null'),
 				},
 			],
 		})
@@ -23,7 +25,7 @@ class CaseStatement {
 	public else(elseClause: QueryBuilder.ColumnExpression): CaseStatement {
 		return new CaseStatement({
 			...this.options,
-			elseClause: QueryBuilder.columnExpressionToLiteral(elseClause) || new Literal('null'),
+			elseClause: columnExpressionToLiteral(elseClause) || new Literal('null'),
 		})
 	}
 

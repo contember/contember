@@ -1,4 +1,4 @@
-import { Command } from './'
+import { Command } from './Command'
 
 class DisableIdentityApiKeysCommand implements Command<void> {
 	constructor(private readonly identityId: string) {}

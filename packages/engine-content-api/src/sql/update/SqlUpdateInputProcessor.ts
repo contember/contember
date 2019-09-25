@@ -4,6 +4,7 @@ import UpdateBuilder from './UpdateBuilder'
 import UpdateInputProcessor from '../../inputProcessing/UpdateInputProcessor'
 import * as Context from '../../inputProcessing/InputContext'
 import { NotNullConstraintViolation } from '../Constraints'
+import { NoResultError } from '../NoResultError'
 
 export default class SqlUpdateInputProcessor implements UpdateInputProcessor<void> {
 	constructor(
@@ -42,7 +43,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				await this.mapper.update(targetEntity, where, update)
 				await this.mapper.connectJunction(targetEntity, targetRelation, where, { [entity.primary]: this.primaryValue })
 			} catch (e) {
-				if (e instanceof Mapper.NoResultError) {
+				if (e instanceof NoResultError) {
 					const primaryValue = await this.mapper.insert(targetEntity, create)
 					await this.mapper.connectJunction(
 						targetEntity,
@@ -85,7 +86,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				await this.mapper.update(targetEntity, where, update)
 				await this.mapper.connectJunction(entity, relation, { [entity.primary]: this.primaryValue }, where)
 			} catch (e) {
-				if (e instanceof Mapper.NoResultError) {
+				if (e instanceof NoResultError) {
 					const primaryValue = await this.mapper.insert(targetEntity, create)
 					await this.mapper.connectJunction(
 						entity,

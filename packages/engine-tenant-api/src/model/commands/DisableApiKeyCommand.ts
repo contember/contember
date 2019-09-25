@@ -1,4 +1,4 @@
-import { Command } from './'
+import { Command } from './Command'
 
 class DisableApiKeyCommand implements Command<boolean> {
 	constructor(private readonly apiKeyId: string) {}

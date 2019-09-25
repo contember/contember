@@ -1,6 +1,8 @@
-import { Connection, EventManager } from '../'
+import { Connection } from './Connection'
+import { EventManager } from './EventManager'
 import { PoolClient } from 'pg'
 import { wrapIdentifier } from '../utils'
+import { executeQuery } from './execution'
 
 export class Transaction implements Connection.TransactionLike {
 	private _isClosed = false
@@ -48,7 +50,7 @@ export class Transaction implements Connection.TransactionLike {
 		if (this.isClosed) {
 			throw new Error('Transaction is already closed')
 		}
-		return await Connection.executeQuery<Row>(
+		return await executeQuery<Row>(
 			this.pgClient,
 			this.eventManager,
 			{ sql, parameters, meta, ...this.config, ...config },

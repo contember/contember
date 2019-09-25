@@ -2,9 +2,7 @@ import { Model } from '@contember/schema'
 import EntityBuilder from './EntityBuilder'
 import NamingConventions from './NamingConventions'
 import SchemaBuilderInternal from './SchemaBuilderInternal'
-
-export type EntityConfigurator = (entityBuilder: EntityBuilder) => EntityBuilder
-export type AddEntityCallback = (name: string, configurator: EntityConfigurator) => void
+import { EntityConfigurator } from './types'
 
 export default class SchemaBuilder {
 	private entities: { [name: string]: EntityConfigurator } = {}
@@ -41,4 +39,4 @@ export default class SchemaBuilder {
 	}
 }
 
-export class SchemaBuilderError extends Error {}
+export * from './SchemaBuilderError'

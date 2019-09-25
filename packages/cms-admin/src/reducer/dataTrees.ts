@@ -1,5 +1,4 @@
 import { assertNever } from '@contember/utils'
-import { Reducer } from 'redux'
 import { Action, handleActions } from 'redux-actions'
 import {
 	DataTreeCreateRequest,
@@ -7,7 +6,6 @@ import {
 	DataTreeInitializeRequest,
 	DataTreeSetRequestEnd,
 } from '../actions/dataTrees'
-import { MutationRequestResult } from '../binding'
 import { DataTreeRequestReadyState, DataTreeRequestType, DataTreesState, emptyDataTreesState } from '../state/dataTrees'
 import { ReducerError } from './ReducerError'
 

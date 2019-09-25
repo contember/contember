@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder'
-import { AddEntityCallback, EntityConfigurator } from './SchemaBuilder'
+import { AddEntityCallback, EntityConfigurator } from './types'
 
 type PartialOptions<K extends keyof ManyHasManyBuilder.Options> = Partial<ManyHasManyBuilder.Options> &
 	Pick<ManyHasManyBuilder.Options, K>

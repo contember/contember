@@ -1,4 +1,4 @@
-import { Command } from './'
+import { Command } from './Command'
 
 class CreateIdentityCommand implements Command<string> {
 	constructor(private readonly roles: string[]) {}

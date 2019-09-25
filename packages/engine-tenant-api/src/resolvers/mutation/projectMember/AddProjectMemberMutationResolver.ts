@@ -5,7 +5,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../'
+import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../model'
 
 export class AddProjectMemberMutationResolver implements MutationResolvers {
 	constructor(

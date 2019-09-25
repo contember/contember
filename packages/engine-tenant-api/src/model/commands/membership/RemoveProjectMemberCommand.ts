@@ -1,4 +1,4 @@
-import { Command } from '../'
+import { Command } from '../Command'
 import { RemoveProjectMemberErrorCode } from '../../../schema'
 
 class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {

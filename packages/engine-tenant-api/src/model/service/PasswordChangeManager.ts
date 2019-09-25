@@ -1,6 +1,5 @@
 import { ChangePasswordErrorCode } from '../../schema'
-import { ChangePasswordCommand } from '../'
-import { Client } from '@contember/database'
+import { ChangePasswordCommand } from '../commands'
 import { CommandBus } from '../commands/CommandBus'
 
 class PasswordChangeManager {

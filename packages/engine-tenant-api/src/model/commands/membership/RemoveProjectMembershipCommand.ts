@@ -1,4 +1,4 @@
-import { Command } from '../'
+import { Command } from '../Command'
 
 class RemoveProjectMembershipCommand implements Command<void> {
 	constructor(

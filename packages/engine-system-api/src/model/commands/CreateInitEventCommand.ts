@@ -1,6 +1,5 @@
-import { Client } from '@contember/database'
+import { Client, ConflictActionType } from '@contember/database'
 import { UuidProvider } from '../../utils/uuid'
-import { InsertBuilder } from '@contember/database'
 import { EventType } from '../EventType'
 
 class CreateInitEventCommand {
@@ -16,7 +15,7 @@ class CreateInitEventCommand {
 				data: '{}',
 				previous_id: null,
 			})
-			.onConflict(InsertBuilder.ConflictActionType.doNothing, { constraint: 'unique_init' })
+			.onConflict(ConflictActionType.doNothing, { constraint: 'unique_init' })
 			.execute()
 	}
 }

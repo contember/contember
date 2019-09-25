@@ -1,14 +1,6 @@
-import {
-	AddProjectMemberErrorCode,
-	InviteErrorCode,
-	InviteResponse,
-	MutationInviteArgs,
-	MutationResolvers,
-	MutationSignUpArgs,
-	SignUpResponse,
-} from '../../../schema'
+import { InviteErrorCode, InviteResponse, MutationInviteArgs, MutationResolvers } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectScope } from '../../../'
+import { PermissionActions, ProjectManager, ProjectScope } from '../../../model'
 import { InviteManager } from '../../../model/service/InviteManager'
 
 export class InviteMutationResolver implements MutationResolvers {

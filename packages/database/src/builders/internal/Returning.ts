@@ -1,4 +1,7 @@
-import { QueryBuilder, Literal, Connection } from '../../'
+import { QueryBuilder } from '../'
+import { Literal } from '../../Literal'
+import { Connection } from '../../client'
+import { toFqnWrap } from '../utils'
 
 class Returning {
 	constructor(private readonly column: QueryBuilder.ColumnIdentifier | Literal | null = null) {}
@@ -10,7 +13,7 @@ class Returning {
 		if (this.column instanceof Literal) {
 			return new Literal(' returning ').append(this.column)
 		}
-		return new Literal(' returning ' + QueryBuilder.toFqnWrap(this.column))
+		return new Literal(' returning ' + toFqnWrap(this.column))
 	}
 
 	public parseResponse<ProcessedResult extends number | Returning.Result[]>(

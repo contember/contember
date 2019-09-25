@@ -6,6 +6,7 @@ import InputValidator from '../input-validation/InputValidator'
 import ValidationResolver from './ValidationResolver'
 import { ConstraintViolation } from '../sql/Constraints'
 import { UserError } from './UserError'
+import { NoResultError } from '../sql/NoResultError'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -85,7 +86,7 @@ export default class MutationResolver {
 	}
 
 	private handleError(e: Error): never {
-		if (e instanceof Mapper.NoResultError) {
+		if (e instanceof NoResultError) {
 			throw new UserError('Mutation failed, operation denied by ACL rules')
 		} else if (e instanceof ConstraintViolation) {
 			console.error(e)

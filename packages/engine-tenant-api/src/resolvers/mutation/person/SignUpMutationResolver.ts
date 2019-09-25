@@ -1,6 +1,6 @@
 import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../'
+import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../model'
 
 export class SignUpMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}

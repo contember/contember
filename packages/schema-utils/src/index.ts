@@ -1,9 +1,8 @@
 import { Schema } from '@contember/schema'
-import { emptyModelSchema } from './model/modelUtils'
+import { emptyModelSchema } from './model'
 
-export * from './model/modelUtils'
-export * from './model/NamingHelper'
-export * from './acl/PredicateDefinitionProcessor'
+export * from './model'
+export * from './acl'
 export * from './dataUtils'
 export * from './validation'
 

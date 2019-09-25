@@ -1,5 +1,5 @@
 import { Client } from '@contember/database'
-import { Providers } from '..//providers'
+import { Providers } from '../providers'
 import { CommandBus } from './CommandBus'
 
 interface Command<Result> {

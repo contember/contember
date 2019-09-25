@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
 import EntityBuilder from './EntityBuilder'
-import { SchemaBuilderError } from './SchemaBuilder'
+import { SchemaBuilderError } from './SchemaBuilderError'
 import FieldProcessor from './internal/FieldProcessor'
 import ColumnProcessor from './internal/ColumnProcessor'
 import ManyHasManyProcessor from './internal/ManyHasManyProcessor'

@@ -1,7 +1,12 @@
-import { Client, SelectBuilder, QueryBuilder, Literal, Connection } from '../'
 import { Returning } from './internal/Returning'
 import { With } from './internal/With'
 import { Compiler } from './Compiler'
+import { QueryBuilder } from './QueryBuilder'
+import { Client, Connection } from '../client'
+import { Literal } from '../Literal'
+import { SelectBuilder } from './SelectBuilder'
+import { resolveValues } from './utils'
+import { ConflictActionType } from './ConflictActionType'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
 	implements With.Aware, QueryBuilder {
@@ -35,27 +40,27 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	}
 
 	public values(columns: QueryBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
-		return this.withOption('values', QueryBuilder.resolveValues(columns))
+		return this.withOption('values', resolveValues(columns))
 	}
 
 	public onConflict(
-		type: InsertBuilder.ConflictActionType.update,
+		type: ConflictActionType.update,
 		target: InsertBuilder.ConflictTarget,
 		values: QueryBuilder.Values,
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
-		type: InsertBuilder.ConflictActionType.doNothing,
+		type: ConflictActionType.doNothing,
 		target?: InsertBuilder.ConflictTarget,
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
 	public onConflict(
-		type: InsertBuilder.ConflictActionType,
+		type: ConflictActionType,
 		target?: InsertBuilder.ConflictTarget,
 		values?: QueryBuilder.Values,
 	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'> {
 		let conflictAction: InsertBuilder.ConflictAction
-		if (type === InsertBuilder.ConflictActionType.update && values && target) {
-			conflictAction = { type, values: QueryBuilder.resolveValues(values), target }
-		} else if (type === InsertBuilder.ConflictActionType.doNothing) {
+		if (type === ConflictActionType.update && values && target) {
+			conflictAction = { type, values: resolveValues(values), target }
+		} else if (type === ConflictActionType.doNothing) {
 			conflictAction = { type, target }
 		} else {
 			throw Error()
@@ -153,11 +158,6 @@ namespace InsertBuilder {
 		: InsertBuilderWithoutExecute<Result, Filled>
 
 	export type NewInsertBuilder = InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
-
-	export enum ConflictActionType {
-		doNothing = 'doNothing',
-		update = 'update',
-	}
 
 	export type ConflictAction =
 		| { type: ConflictActionType.doNothing; target?: ConflictTarget }

@@ -1,6 +1,6 @@
-import { Command } from '../'
-import { RemoveProjectMembershipVariablesCommand } from './'
-import { InsertBuilder } from '@contember/database'
+import { Command } from '../Command'
+import { RemoveProjectMembershipVariablesCommand } from './RemoveProjectMembershipVariablesCommand'
+import { ConflictActionType } from '@contember/database'
 
 class UpdateProjectMembershipVariablesCommand implements Command<void> {
 	constructor(
@@ -20,7 +20,7 @@ class UpdateProjectMembershipVariablesCommand implements Command<void> {
 					variable: update.name,
 					value: JSON.stringify(update.values),
 				})
-				.onConflict(InsertBuilder.ConflictActionType.update, ['membership_id', 'variable'], {
+				.onConflict(ConflictActionType.update, ['membership_id', 'variable'], {
 					value: JSON.stringify(update.values),
 				})
 				.execute()

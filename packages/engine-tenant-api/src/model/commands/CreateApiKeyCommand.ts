@@ -1,5 +1,5 @@
 import { Command } from './Command'
-import { ApiKey } from '../'
+import { ApiKey } from '../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 import { Providers } from '../providers'
 

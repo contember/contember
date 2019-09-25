@@ -1,11 +1,4 @@
-import {
-	Maybe,
-	Membership,
-	Project,
-	QueryProjectBySlugArgs,
-	QueryProjectMembershipsArgs,
-	QueryResolvers,
-} from '../../schema'
+import { Membership, QueryProjectMembershipsArgs, QueryResolvers } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
 import { ProjectManager, ProjectMemberManager } from '../../model/service'
 import { PermissionActions, ProjectScope } from '../../model/authorization'

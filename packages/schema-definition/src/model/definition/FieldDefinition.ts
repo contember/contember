@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
 import NamingConventions from './NamingConventions'
-import SchemaBuilder from './SchemaBuilder'
+import { EnumRegistry } from './EnumRegistry'
+import { EntityRegistry } from './EntityRegistry'
 
 abstract class FieldDefinition<O> {
 	constructor(public readonly options: O) {}
@@ -17,8 +18,8 @@ namespace FieldDefinition {
 		name: string
 		entityName: string
 		conventions: NamingConventions
-		enumRegistry: SchemaBuilder.EnumRegistry
-		entityRegistry: SchemaBuilder.EntityRegistry
+		enumRegistry: EnumRegistry
+		entityRegistry: EntityRegistry
 	}
 	export type Map = { [name: string]: FieldDefinition<any> }
 }

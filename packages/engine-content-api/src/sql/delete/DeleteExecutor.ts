@@ -8,6 +8,7 @@ import Path from '../select/Path'
 import PredicateFactory from '../../acl/PredicateFactory'
 import Mapper from '../Mapper'
 import UpdateBuilderFactory from '../update/UpdateBuilderFactory'
+import { NoResultError } from '../NoResultError'
 
 type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwnerRelation]
 
@@ -26,7 +27,7 @@ class DeleteExecutor {
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
 		const result = await this.delete(entity, uniqueWhere)
 		if (result.length === 0) {
-			throw new Mapper.NoResultError()
+			throw new NoResultError()
 		}
 		await this.executeCascade(entity, result)
 

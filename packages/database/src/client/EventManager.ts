@@ -1,4 +1,4 @@
-import { Connection } from '../'
+import { Connection } from './Connection'
 
 class EventManager {
 	private readonly listeners: EventManager.ListenersList = {

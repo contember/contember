@@ -4,7 +4,7 @@ import SqlCreateInputProcessor from './insert/SqlCreateInputProcessor'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
-import { Client, Connection } from '@contember/database'
+import * as database from '@contember/database'
 import PredicateFactory from '../acl/PredicateFactory'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
 import InsertBuilderFactory from './insert/InsertBuilderFactory'
@@ -19,11 +19,12 @@ import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
 import SqlUpdateInputProcessor from './update/SqlUpdateInputProcessor'
 import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
 import { ForeignKeyViolation, NotNullConstraintViolation, UniqueKeyViolation } from './Constraints'
+import { NoResultError } from './NoResultError'
 
 class Mapper {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly db: Client,
+		private readonly db: database.Client,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
@@ -167,7 +168,7 @@ class Mapper {
 		try {
 			const affectedRows = await executeResult
 			if (affectedRows !== 1 && affectedRows !== null) {
-				throw new Mapper.NoResultError()
+				throw new NoResultError()
 			}
 
 			return affectedRows || 0
@@ -214,13 +215,13 @@ class Mapper {
 	}
 
 	private handleError(error: Error): never {
-		if (error instanceof Connection.NotNullViolationError) {
+		if (error instanceof database.NotNullViolationError) {
 			throw new NotNullConstraintViolation()
 		}
-		if (error instanceof Connection.ForeignKeyViolationError) {
+		if (error instanceof database.ForeignKeyViolationError) {
 			throw new ForeignKeyViolation()
 		}
-		if (error instanceof Connection.UniqueViolationError) {
+		if (error instanceof database.UniqueViolationError) {
 			throw new UniqueKeyViolation()
 		}
 		throw error
@@ -228,8 +229,6 @@ class Mapper {
 }
 
 namespace Mapper {
-	export class NoResultError extends Error {}
-
 	export type JoiningColumns = { sourceColumn: Model.JoiningColumn; targetColumn: Model.JoiningColumn }
 }
 

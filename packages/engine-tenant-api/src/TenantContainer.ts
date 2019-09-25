@@ -4,35 +4,35 @@ import { QueryHandler } from '@contember/queryable'
 import { Connection, DatabaseQueryable } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
-	AddProjectMemberMutationResolver,
 	ApiKeyManager,
-	ChangePasswordMutationResolver,
-	CreateApiKeyMutationResolver,
-	createMigrationFilesManager,
-	DisableApiKeyMutationResolver,
-	IdentityTypeResolver,
-	MeQueryResolver,
 	PasswordChangeManager,
 	PermissionsFactory,
 	ProjectManager,
 	ProjectMemberManager,
-	RemoveProjectMemberMutationResolver,
-	ResolverContextFactory,
-	ResolverFactory,
-	Schema,
-	SetupMutationResolver,
 	SignInManager,
+	SignUpManager,
+} from './model'
+import {
+	AddProjectMemberMutationResolver,
+	ChangePasswordMutationResolver,
+	CreateApiKeyMutationResolver,
+	DisableApiKeyMutationResolver,
+	IdentityTypeResolver,
+	RemoveProjectMemberMutationResolver,
+	SetupMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
-	SignUpManager,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
-} from './'
+	MeQueryResolver,
+	ResolverContextFactory,
+	ResolverFactory,
+} from './resolvers'
 import { CommandBus } from './model/commands/CommandBus'
-import { Providers } from './model/providers'
+import { Providers } from './model'
 import { ProjectTypeResolver } from './resolvers/types/ProjectTypeResolver'
 import { ProjectQueryResolver } from './resolvers/query/ProjectQueryResolver'
-import { ProjectVariablesResolver } from './model/type/Variables'
+import { ProjectVariablesResolver } from './model/type'
 import { InviteMutationResolver } from './resolvers/mutation/person/InviteMutationResolver'
 import { InviteManager } from './model/service/InviteManager'
 import { GraphQLError, GraphQLFormattedError } from 'graphql'
@@ -40,6 +40,8 @@ import { formatError } from './resolvers/ErrorFormatter'
 import { ProjectMembersQueryResolver } from './resolvers/query/ProjectMembersQueryResolver'
 import { PermissionContextFactory } from './model/authorization/PermissionContextFactory'
 import { IdentityFactory } from './model/authorization/IdentityFactory'
+import * as Schema from './schema'
+import { createMigrationFilesManager } from './utils'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager

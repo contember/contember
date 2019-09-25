@@ -1,4 +1,4 @@
-import { Command } from './'
+import { Command } from './Command'
 
 class ChangePasswordCommand implements Command<void> {
 	constructor(private readonly personId: string, private readonly password: string) {}

@@ -1,8 +1,13 @@
-import { Client, ConditionBuilder, Connection, Literal, QueryBuilder } from '../'
 import { With } from './internal/With'
 import { Where } from './internal/Where'
 import { aliasLiteral } from '../utils'
 import { Compiler } from './Compiler'
+import { QueryBuilder } from './QueryBuilder'
+import { Client, Connection } from '../client'
+import { Literal } from '../Literal'
+import { ConditionBuilder } from './ConditionBuilder'
+import { LockType } from './LockType'
+import { columnExpressionToLiteral, toFqnWrap } from './utils'
 
 export type SelectBuilderSpecification<OutputOptions extends keyof SelectBuilder.Options> = <
 	Result,
@@ -53,7 +58,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression,
 		alias?: string,
 	): SelectBuilder<Result, Filled | 'select'> {
-		let raw = QueryBuilder.columnExpressionToLiteral(expr)
+		let raw = columnExpressionToLiteral(expr)
 		if (raw === undefined) {
 			return this
 		}
@@ -68,10 +73,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		columnName: QueryBuilder.ColumnIdentifier,
 		direction: 'asc' | 'desc' = 'asc',
 	): SelectBuilder<Result, Filled | 'orderBy'> {
-		return this.withOption('orderBy', [
-			...this.options.orderBy,
-			[new Literal(QueryBuilder.toFqnWrap(columnName)), direction],
-		])
+		return this.withOption('orderBy', [...this.options.orderBy, [new Literal(toFqnWrap(columnName)), direction]])
 	}
 
 	public join(
@@ -111,7 +113,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	public groupBy(
 		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression,
 	): SelectBuilder<Result, Filled | 'grouping'> {
-		let raw = QueryBuilder.columnExpressionToLiteral(expr)
+		let raw = columnExpressionToLiteral(expr)
 		if (raw === undefined) {
 			return this
 		}
@@ -125,7 +127,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		return this.withOption('limit', [limit, offset || 0])
 	}
 
-	public lock(type: SelectBuilder.LockType): SelectBuilder<Result, Filled | 'lock'> {
+	public lock(type: LockType): SelectBuilder<Result, Filled | 'lock'> {
 		return this.withOption('lock', type)
 	}
 
@@ -196,13 +198,6 @@ namespace SelectBuilder {
 				meta: Record<string, any>
 			}
 	>
-
-	export enum LockType {
-		forUpdate = 'forUpdate',
-		forNoKeyUpdate = 'forNoKeyUpdate',
-		forShare = 'forShare',
-		forKeyShare = 'forKeyShare',
-	}
 
 	export type JoinCondition = (joinClause: ConditionBuilder) => void
 }

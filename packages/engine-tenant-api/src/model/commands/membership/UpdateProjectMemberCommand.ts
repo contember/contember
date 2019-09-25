@@ -1,4 +1,4 @@
-import { Command } from '../'
+import { Command } from '../Command'
 import { UpdateProjectMemberErrorCode } from '../../../schema'
 import { Membership } from '../../type/Membership'
 import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'

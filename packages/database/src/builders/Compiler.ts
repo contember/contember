@@ -1,6 +1,13 @@
 import { assertNever } from '@contember/utils'
-import { DeleteBuilder, InsertBuilder, Literal, QueryBuilder, SelectBuilder, UpdateBuilder } from '../'
 import { aliasLiteral, prependSchema, wrapIdentifier } from '../utils'
+import { SelectBuilder } from './SelectBuilder'
+import { Literal } from '../Literal'
+import { DeleteBuilder } from './DeleteBuilder'
+import { InsertBuilder } from './InsertBuilder'
+import { UpdateBuilder } from './UpdateBuilder'
+import { QueryBuilder } from './QueryBuilder'
+import { LockType } from './LockType'
+import { ConflictActionType } from './ConflictActionType'
 
 class Compiler {
 	compileSelect(options: SelectBuilder.Options, namespaceContext: Compiler.NamespaceContext): Literal {
@@ -98,13 +105,13 @@ class Compiler {
 			return Literal.empty
 		}
 		switch (lock) {
-			case SelectBuilder.LockType.forUpdate:
+			case LockType.forUpdate:
 				return new Literal(' for update')
-			case SelectBuilder.LockType.forNoKeyUpdate:
+			case LockType.forNoKeyUpdate:
 				return new Literal(' for no key update')
-			case SelectBuilder.LockType.forShare:
+			case LockType.forShare:
 				return new Literal(' for share')
-			case SelectBuilder.LockType.forKeyShare:
+			case LockType.forKeyShare:
 				return new Literal(' for key share')
 			default:
 				return assertNever(lock)
@@ -169,11 +176,11 @@ class Compiler {
 			return Literal.empty
 		}
 		switch (onConflict.type) {
-			case InsertBuilder.ConflictActionType.doNothing:
+			case ConflictActionType.doNothing:
 				return new Literal(' on conflict ')
 					.append(this.compileOnConflictTarget(onConflict.target))
 					.appendString(' do nothing')
-			case InsertBuilder.ConflictActionType.update:
+			case ConflictActionType.update:
 				return new Literal('on conflict ')
 					.append(this.compileOnConflictTarget(onConflict.target))
 					.appendString(' do update set ')

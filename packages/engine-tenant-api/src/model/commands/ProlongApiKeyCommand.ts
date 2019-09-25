@@ -1,5 +1,5 @@
-import { Command } from './'
-import { ApiKey } from '../'
+import { Command } from './Command'
+import { ApiKey } from '../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 
 class ProlongApiKeyCommand implements Command<void> {

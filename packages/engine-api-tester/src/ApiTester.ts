@@ -29,12 +29,10 @@ import { Client, Connection, wrapIdentifier } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { graphqlObjectFactories } from './graphqlObjectFactories'
 import { getArgumentValues } from 'graphql/execution/values'
+import { project } from './project'
 
 export class ApiTester {
-	public static project: ProjectConfig = {
-		stages: [],
-		slug: 'test',
-	}
+	public static project = project
 
 	constructor(
 		public readonly client: Client,

@@ -5,7 +5,7 @@ import {
 	UpdateProjectMemberResponse,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../'
+import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../model'
 
 export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	constructor(

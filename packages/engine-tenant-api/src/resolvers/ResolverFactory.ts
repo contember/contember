@@ -1,23 +1,20 @@
 import {
-	IdentityTypeResolver,
 	AddProjectMemberMutationResolver,
 	ChangePasswordMutationResolver,
 	CreateApiKeyMutationResolver,
 	DisableApiKeyMutationResolver,
-	MeQueryResolver,
 	RemoveProjectMemberMutationResolver,
 	SetupMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
-} from './'
+	InviteMutationResolver,
+} from './mutation'
 
 import { Resolvers } from '../schema'
-import { ProjectQueryResolver } from './query/ProjectQueryResolver'
-import { ProjectTypeResolver } from './types/ProjectTypeResolver'
-import { InviteMutationResolver } from './mutation/person/InviteMutationResolver'
-import { ProjectMembersQueryResolver } from './query/ProjectMembersQueryResolver'
+import { MeQueryResolver, ProjectQueryResolver, ProjectMembersQueryResolver } from './query'
+import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 
 class ResolverFactory {
 	public constructor(

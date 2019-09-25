@@ -1,5 +1,4 @@
 import {
-	AddProjectMemberErrorCode,
 	CreateApiKeyErrorCode,
 	CreateApiKeyResponse,
 	MutationCreateApiKeyArgs,
@@ -7,8 +6,7 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
-import { ApiKeyManager, PermissionActions, ProjectManager, ProjectScope } from '../../../'
-import { AuthorizationScope } from '@contember/authorization'
+import { ApiKeyManager, PermissionActions, ProjectManager, ProjectScope } from '../../../model'
 
 export class CreateApiKeyMutationResolver implements MutationResolvers {
 	constructor(private readonly apiKeyManager: ApiKeyManager, private readonly projectManager: ProjectManager) {}

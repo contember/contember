@@ -1,5 +1,5 @@
 import { Identity } from '@contember/engine-common'
-import { ProjectMemberManager } from '../'
+import { ProjectMemberManager } from '../service'
 
 class ProjectAwareIdentity implements Identity {
 	constructor(

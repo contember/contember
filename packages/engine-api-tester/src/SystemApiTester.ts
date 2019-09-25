@@ -2,7 +2,6 @@ import { createUuidGenerator, testUuid } from './testUuid'
 import { graphql, GraphQLSchema } from 'graphql'
 import { GQL } from './tags'
 import { Identity } from '@contember/engine-common'
-import { ApiTester } from './ApiTester'
 import { Client } from '@contember/database'
 import {
 	ResolverContext,
@@ -13,6 +12,7 @@ import {
 	SystemExecutionContainer,
 	unnamedIdentity,
 } from '@contember/engine-system-api'
+import { project } from './project'
 
 export class SystemApiTester {
 	private readonly uuidGenerator = createUuidGenerator('a454')
@@ -37,7 +37,7 @@ export class SystemApiTester {
 		const context: ResolverContext = new ResolverContext(
 			options.identity ||
 				new Identity.StaticIdentity(testUuid(888), options.roles || [Identity.SystemRole.SUPER_ADMIN], {
-					[ApiTester.project.slug]: options.projectRoles || [],
+					[project.slug]: options.projectRoles || [],
 				}),
 			{},
 			this.systemContainer.authorizator,

@@ -5,8 +5,8 @@ import { Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
-import Mapper from '../Mapper'
 import { QueryBuilder } from '@contember/database'
+import { NoResultError } from '../NoResultError'
 
 type ColumnValue<E = never> = {
 	value: PromiseLike<Value.AtomicValue<E>>
@@ -76,7 +76,7 @@ export default class InsertBuilder {
 
 		const returning = await qb.execute()
 		if (returning === null) {
-			throw new Mapper.NoResultError()
+			throw new NoResultError()
 		}
 
 		return returning[0]

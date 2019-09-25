@@ -1,8 +1,12 @@
-import { Client, Connection, Literal, QueryBuilder, SelectBuilder } from '../'
 import { Returning } from './internal/Returning'
 import { With } from './internal/With'
 import { Where } from './internal/Where'
 import { Compiler } from './Compiler'
+import { QueryBuilder } from './QueryBuilder'
+import { Client, Connection } from '../client'
+import { Literal } from '../Literal'
+import { SelectBuilder } from './SelectBuilder'
+import { resolveValues } from './utils'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>>
 	implements With.Aware, Where.Aware, QueryBuilder {
@@ -28,7 +32,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 	}
 
 	public values(columns: QueryBuilder.Values): UpdateBuilder.UpdateBuilderState<Result, Filled | 'values'> {
-		return this.withOption('values', QueryBuilder.resolveValues(columns))
+		return this.withOption('values', resolveValues(columns))
 	}
 
 	public returning(

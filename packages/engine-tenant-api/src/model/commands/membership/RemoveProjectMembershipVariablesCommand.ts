@@ -1,5 +1,5 @@
-import { Command } from '../'
-import { UpdateProjectMembershipVariablesCommand } from './'
+import { Command } from '../Command'
+import { UpdateProjectMembershipVariablesCommand } from './UpdateProjectMembershipVariablesCommand'
 
 class RemoveProjectMembershipVariablesCommand implements Command<void> {
 	constructor(

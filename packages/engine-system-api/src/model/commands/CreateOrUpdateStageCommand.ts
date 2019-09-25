@@ -1,5 +1,4 @@
-import { Client } from '@contember/database'
-import { InsertBuilder } from '@contember/database'
+import { Client, ConflictActionType } from '@contember/database'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import InitEventQuery from '../queries/InitEventQuery'
 import { wrapIdentifier } from '@contember/database'
@@ -21,7 +20,7 @@ class CreateOrUpdateStageCommand {
 				slug: this.stage.slug,
 				event_id: initEvent.id,
 			})
-			.onConflict(InsertBuilder.ConflictActionType.update, ['slug'], {
+			.onConflict(ConflictActionType.update, ['slug'], {
 				name: this.stage.name,
 			})
 			.returning('event_id')

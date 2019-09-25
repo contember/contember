@@ -1,4 +1,8 @@
-import { Literal, QueryBuilder, SelectBuilder, Value } from '../'
+import { Value } from '../types'
+import { Literal } from '../Literal'
+import { QueryBuilder } from './QueryBuilder'
+import { SelectBuilder } from './SelectBuilder'
+import { toFqnWrap } from './formatUtils'
 
 type ConditionBuilderCallback = (builder: ConditionBuilder) => void
 
@@ -35,7 +39,7 @@ class ConditionBuilder {
 		if (!Object.values(ConditionBuilder.Operator).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
-		this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} ${operator} ?`, [value]))
+		this.expressions.push(new Literal(`${toFqnWrap(columnName)} ${operator} ?`, [value]))
 	}
 
 	columnsEq(columnName1: QueryBuilder.ColumnIdentifier, columnName2: QueryBuilder.ColumnIdentifier) {
@@ -50,9 +54,7 @@ class ConditionBuilder {
 		if (!Object.values(ConditionBuilder.Operator).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
-		this.expressions.push(
-			new Literal(`${QueryBuilder.toFqnWrap(columnName1)} ${operator} ${QueryBuilder.toFqnWrap(columnName2)}`),
-		)
+		this.expressions.push(new Literal(`${toFqnWrap(columnName1)} ${operator} ${toFqnWrap(columnName2)}`))
 	}
 
 	in<Filled extends keyof SelectBuilder.Options>(
@@ -61,20 +63,20 @@ class ConditionBuilder {
 	): void {
 		if (!Array.isArray(values)) {
 			const query = values.createQuery()
-			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
+			this.expressions.push(new Literal(`${toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
 			return
 		}
 		values = values.filter(it => it !== undefined)
 		if (values.length > 0) {
 			const parameters = values.map(() => '?').join(', ')
-			this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} in (${parameters})`, values))
+			this.expressions.push(new Literal(`${toFqnWrap(columnName)} in (${parameters})`, values))
 		} else {
 			this.raw('false')
 		}
 	}
 
 	null(columnName: QueryBuilder.ColumnIdentifier): void {
-		this.expressions.push(new Literal(`${QueryBuilder.toFqnWrap(columnName)} is null`))
+		this.expressions.push(new Literal(`${toFqnWrap(columnName)} is null`))
 	}
 
 	raw(sql: string, ...bindings: (Value)[]): void {

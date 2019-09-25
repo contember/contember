@@ -8,7 +8,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
-import { PermissionActions, IdentityScope, PasswordChangeManager, PersonQuery } from '../../../'
+import { PermissionActions, IdentityScope, PasswordChangeManager, PersonQuery } from '../../../model'
 
 export class ChangePasswordMutationResolver implements MutationResolvers {
 	constructor(

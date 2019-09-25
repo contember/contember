@@ -4,6 +4,7 @@ import { createMigrationFilesManager as createProjectMigrationFilesManager } fro
 import CommandConfiguration from '../core/cli/CommandConfiguration'
 import { assertNever } from '@contember/utils'
 import { MigrationFilesManager } from '@contember/engine-common'
+import { Input } from '../core/cli/Input'
 
 type Args = {
 	type: 'project' | 'tenant'
@@ -20,7 +21,7 @@ class EngineMigrationsCreateCommand extends Command<Args, {}> {
 		configuration.argument('name')
 	}
 
-	protected async execute(input: Command.Input<Args, {}>): Promise<void> {
+	protected async execute(input: Input<Args, {}>): Promise<void> {
 		const [type, name] = [input.getArgument('type'), input.getArgument('name')]
 		let migrationsFileManager: MigrationFilesManager
 		switch (type) {

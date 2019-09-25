@@ -1,5 +1,13 @@
 import 'jasmine'
-import { Client, ConditionBuilder, InsertBuilder, LimitByGroupWrapper, SelectBuilder } from '../../../src'
+import {
+	Client,
+	ConditionBuilder,
+	ConflictActionType,
+	InsertBuilder,
+	LimitByGroupWrapper,
+	LockType,
+	SelectBuilder,
+} from '../../../src'
 import { createConnectionMock } from '@contember/database-tester'
 import { SQL } from '../../src/tags'
 
@@ -129,7 +137,7 @@ describe('query builder', () => {
 						return qb.from('root_')
 					})
 					.returning('id')
-					.onConflict(InsertBuilder.ConflictActionType.doNothing)
+					.onConflict(ConflictActionType.doNothing)
 				await builder.execute()
 			},
 			sql: SQL`
@@ -155,7 +163,7 @@ describe('query builder', () => {
 						return qb.from('foo')
 					})
 					.returning('id')
-					.onConflict(InsertBuilder.ConflictActionType.update, ['id'], {
+					.onConflict(ConflictActionType.update, ['id'], {
 						id: expr => expr.selectValue('123'),
 						title: expr => expr.select('title'),
 					})
@@ -180,7 +188,7 @@ describe('query builder', () => {
 					.values({
 						id: expr => expr.selectValue('123'),
 					})
-					.onConflict(InsertBuilder.ConflictActionType.doNothing, { constraint: 'bar' })
+					.onConflict(ConflictActionType.doNothing, { constraint: 'bar' })
 				await builder.execute()
 			},
 			sql: SQL`insert into "public"."author" ("id")
@@ -334,7 +342,7 @@ describe('query builder', () => {
 					.selectBuilder()
 					.select('id')
 					.from('foo')
-					.lock(SelectBuilder.LockType.forNoKeyUpdate)
+					.lock(LockType.forNoKeyUpdate)
 
 				await qb.getResult()
 			},

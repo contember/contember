@@ -95,7 +95,7 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 				<Table>
 					{diff.events.map(it => (
 						<TableRow>
-							<TableCell shrink>
+							<TableCell shrunk>
 								<button
 									role="button"
 									onClick={e => {

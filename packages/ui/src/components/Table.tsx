@@ -50,11 +50,11 @@ TableRow.displayName = 'TableRow'
 export interface TableCellProps {
 	children?: React.ReactNode
 	justification?: Justification
-	shrink?: boolean
+	shrunk?: boolean
 }
-export const TableCell = React.memo(({ shrink = false, ...props }: TableCellProps) => {
+export const TableCell = React.memo(({ shrunk = false, ...props }: TableCellProps) => {
 	const useTableElement = React.useContext(UseTableElementContext)
-	const className = cn('table-cell', toEnumViewClass(props.justification), toViewClass('shrink', shrink))
+	const className = cn('table-cell', toEnumViewClass(props.justification), toViewClass('shrunk', shrunk))
 
 	if (useTableElement) {
 		return <td className={className}>{props.children}</td>

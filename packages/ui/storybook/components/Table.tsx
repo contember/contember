@@ -28,7 +28,7 @@ storiesOf('Table', module).add('simple', () => {
 				<TableRow justification={row === 6 ? justificationLastRow : undefined}>
 					{['A', 'B', 'C', 'D'].map(column => (
 						<TableCell
-							shrink={column === 'D' && shrinkLastColumn}
+							shrunk={column === 'D' && shrinkLastColumn}
 							justification={column === 'A' ? justificationFirstColumn : undefined}
 						>
 							Cell {row}

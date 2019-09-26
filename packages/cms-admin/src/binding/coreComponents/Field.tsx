@@ -74,6 +74,7 @@ class Field<
 								</Field.FieldInner>
 							)
 						} else {
+							console.error(`Undefined field`, fieldName, data)
 							throw new DataBindingError(`Undefined field '${fieldName}'`)
 						}
 					} else if (data instanceof EntityForRemovalAccessor) {

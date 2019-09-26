@@ -1,5 +1,5 @@
 import { FieldName } from '../bindingTypes'
-import { ConnectionMarker, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
+import { ConnectionMarker, FieldMarker, MarkerTreeRoot, ReferenceMarker } from './index'
 import { Hashing } from '../utils'
 
 export class PlaceholderGenerator {

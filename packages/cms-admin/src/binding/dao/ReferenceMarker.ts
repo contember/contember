@@ -2,7 +2,7 @@ import { Input } from '@contember/schema'
 import { assertNever } from '@contember/utils'
 import { GraphQlBuilder } from 'cms-client'
 import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
-import { PlaceholderGenerator } from '../model'
+import { PlaceholderGenerator } from './PlaceholderGenerator'
 import { DataBindingError } from './DataBindingError'
 import { EntityFields } from './EntityFields'
 

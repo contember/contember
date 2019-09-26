@@ -1,6 +1,6 @@
 import { FieldName } from '../bindingTypes'
 import { AccessorContextValue } from '../coreComponents'
-import { PlaceholderGenerator } from '../model'
+import { PlaceholderGenerator } from './PlaceholderGenerator'
 import { AccessorTreeRoot } from './AccessorTreeRoot'
 import { EntityCollectionAccessor } from './EntityCollectionAccessor'
 import { FieldAccessor } from './FieldAccessor'

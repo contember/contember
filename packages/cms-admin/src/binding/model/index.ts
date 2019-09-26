@@ -1,5 +1,4 @@
 export * from './AccessorTreeGenerator'
 export * from './MarkerTreeGenerator'
 export * from './MutationGenerator'
-export * from './PlaceholderGenerator'
 export * from './QueryGenerator'

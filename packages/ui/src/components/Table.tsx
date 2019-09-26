@@ -6,15 +6,15 @@ import { toEnumViewClass, toViewClass } from '../utils'
 
 const UseTableElementContext = React.createContext(true)
 
-export interface Table2Props {
+export interface TableProps {
 	children?: React.ReactNode
 	heading?: React.ReactNode
 	compact?: boolean
 	justification?: Justification
 	useTableElement?: boolean
 }
-export const Table2 = React.memo(({ useTableElement = true, compact = false, ...props }: Table2Props) => {
-	const className = cn('table2', compact && 'view-compact', toEnumViewClass(props.justification, 'justifyStart'))
+export const Table = React.memo(({ useTableElement = true, compact = false, ...props }: TableProps) => {
+	const className = cn('table', compact && 'view-compact', toEnumViewClass(props.justification, 'justifyStart'))
 
 	return (
 		<UseTableElementContext.Provider value={useTableElement}>
@@ -30,35 +30,35 @@ export const Table2 = React.memo(({ useTableElement = true, compact = false, ...
 		</UseTableElementContext.Provider>
 	)
 })
-Table2.displayName = 'Table2'
+Table.displayName = 'Table'
 
-export interface Table2RowProps {
+export interface TableRowProps {
 	children?: React.ReactNode
 	justification?: Justification
 }
-export const Table2Row = React.memo((props: Table2RowProps) => {
+export const TableRow = React.memo((props: TableRowProps) => {
 	const useTableElement = React.useContext(UseTableElementContext)
-	const className = cn('table2-row', toEnumViewClass(props.justification))
+	const className = cn('table-row', toEnumViewClass(props.justification))
 
 	if (useTableElement) {
 		return <tr className={className}>{props.children}</tr>
 	}
 	return <div className={className}>{props.children}</div>
 })
-Table2Row.displayName = 'Table2Row'
+TableRow.displayName = 'TableRow'
 
-export interface Table2CellProps {
+export interface TableCellProps {
 	children?: React.ReactNode
 	justification?: Justification
 	shrink?: boolean
 }
-export const Table2Cell = React.memo(({ shrink = false, ...props }: Table2CellProps) => {
+export const TableCell = React.memo(({ shrink = false, ...props }: TableCellProps) => {
 	const useTableElement = React.useContext(UseTableElementContext)
-	const className = cn('table2-cell', toEnumViewClass(props.justification), toViewClass('shrink', shrink))
+	const className = cn('table-cell', toEnumViewClass(props.justification), toViewClass('shrink', shrink))
 
 	if (useTableElement) {
 		return <td className={className}>{props.children}</td>
 	}
 	return <div className={className}>{props.children}</div>
 })
-Table2Cell.displayName = 'Table2Cell'
+TableCell.displayName = 'TableCell'

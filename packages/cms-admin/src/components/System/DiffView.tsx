@@ -1,4 +1,4 @@
-import { Button, Table2Row, Table2, Table2Cell } from '@contember/ui'
+import { Button, TableRow, Table, TableCell } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cn from 'classnames'
@@ -92,10 +92,10 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 		const selected = this.calculateSelected()
 		return (
 			<>
-				<Table2>
+				<Table>
 					{diff.events.map(it => (
-						<Table2Row>
-							<Table2Cell shrink>
+						<TableRow>
+							<TableCell shrink>
 								<button
 									role="button"
 									onClick={e => {
@@ -114,8 +114,8 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 								>
 									Click
 								</button>
-							</Table2Cell>
-							<Table2Cell>
+							</TableCell>
+							<TableCell>
 								<input
 									type="checkbox"
 									checked={selected[it.id] ? true : false}
@@ -127,12 +127,12 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 										}))
 									}}
 								/>
-							</Table2Cell>
-							<Table2Cell>{this.renderIcon(it.type)}</Table2Cell>
-							<Table2Cell>{it.description}</Table2Cell>
-						</Table2Row>
+							</TableCell>
+							<TableCell>{this.renderIcon(it.type)}</TableCell>
+							<TableCell>{it.description}</TableCell>
+						</TableRow>
 					))}
-				</Table2>
+				</Table>
 				<Button onClick={this.execRelease}>Release</Button>
 			</>
 		)

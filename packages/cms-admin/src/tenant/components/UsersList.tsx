@@ -8,7 +8,7 @@ import {
 	useRemoveProjectMembership,
 	useUpdateCurrentProjectMembership,
 } from '../hooks'
-import { Button, ButtonList, ContainerSpinner, Tag, TitleBar, Table2, Table2Cell, Table2Row } from '@contember/ui'
+import { Button, ButtonList, ContainerSpinner, Tag, TitleBar, Table, TableCell, TableRow } from '@contember/ui'
 import { PageLinkButton } from '../../components/pageRouting'
 import { ToastType } from '../../state/toasts'
 import { getErrorCodeString } from '../hooks/strings'
@@ -97,11 +97,11 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 	return (
 		<div>
 			<TitleBar actions={<PageLinkButton to="tenantInviteUser">Add a user</PageLinkButton>}>Users in project</TitleBar>
-			<Table2>
+			<Table>
 				{query.data.project.members.map(member => (
-					<Table2Row key={member.identity.id}>
-						<Table2Cell>{member.identity.person ? member.identity.person.email : '?'}</Table2Cell>
-						<Table2Cell>
+					<TableRow key={member.identity.id}>
+						<TableCell>{member.identity.person ? member.identity.person.email : '?'}</TableCell>
+						<TableCell>
 							{member.memberships.map((membership, i) => {
 								const Renderer =
 									membership.role in roleRenderers
@@ -122,8 +122,8 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 									</Tag>
 								)
 							})}
-						</Table2Cell>
-						<Table2Cell>
+						</TableCell>
+						<TableCell>
 							<ButtonList>
 								<PageLinkButton
 									size="small"
@@ -135,10 +135,10 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 									Revoke access
 								</Button>
 							</ButtonList>
-						</Table2Cell>
-					</Table2Row>
+						</TableCell>
+					</TableRow>
 				))}
-			</Table2>
+			</Table>
 		</div>
 	)
 })

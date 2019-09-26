@@ -1,7 +1,7 @@
 import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import { Input } from '@contember/schema'
 import { EntityName, FieldName, Filter } from '../bindingTypes'
-import { PlaceholderGenerator } from '../model'
+import { PlaceholderGenerator } from './PlaceholderGenerator'
 import { EntityFields } from './EntityFields'
 
 export interface SingleEntityTreeConstraints {

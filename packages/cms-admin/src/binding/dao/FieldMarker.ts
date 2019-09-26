@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { FieldName, Scalar } from '../bindingTypes'
-import { PlaceholderGenerator } from '../model'
+import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 /**
  * A nonbearing field is only defined in context of create mutations. An entity will be created if and only if some

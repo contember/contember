@@ -27,7 +27,7 @@
 			padding-right: calc(var(--cui-table-spacingX) / 2)
 
 		&.view-shrunk
-			width: 0.001px
+			width: 0.001px // Forces table cell to be as narrow as possible without content overflow and wrapping. 0px gets ignored.
 
 	&.view-small
 		--cui-table-spacingX: .4em

@@ -12,15 +12,15 @@ export type SimpleRelativeSingleFieldProxyProps = FieldPublicProps &
 	}
 
 export const SimpleRelativeSingleFieldProxy = React.memo((props: SimpleRelativeSingleFieldProxyProps) => {
-	const entity = useEntityContext()
+	const immediateParentEntity = useEntityContext()
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 	const expression = React.useMemo(
 		() => Parser.parseQueryLanguageExpression(props.name, Parser.EntryPoint.RelativeSingleField, environment),
 		[environment, props.name],
 	)
-	const immediateParentEntity = getNestedEntity(entity, expression.toOneProps)
-	const field = immediateParentEntity.data.getField(expression.fieldName)
+	const nestedEntity = getNestedEntity(immediateParentEntity, expression.toOneProps)
+	const field = nestedEntity.data.getField(expression.fieldName)
 
 	if (!(field instanceof FieldAccessor)) {
 		throw new DataBindingError(`Corrupted data`)

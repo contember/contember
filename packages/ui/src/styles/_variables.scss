@@ -482,6 +482,32 @@ $cui-dropdown-content-border-radius: $cui-control-border-radius + $cui-control-b
 $cui-dropdown-button-content-gap-size: .3em !default;
 $cui-dropdown-transition-duration: .1s !default;
 
+
+// Table
+$cui-table-small: (
+	'spacingX': .4em,
+	'spacingY': .4em,
+	'font-size': .9em,
+) !default;
+$cui-table-default: (
+	'spacingX': .75em,
+	'spacingY': .75em,
+	'font-size': 1em,
+) !default;
+$cui-table-large: (
+	'spacingX': 1em,
+	'spacingY': 1em,
+	'font-size': 1.3em,
+) !default;
+
+$cui-table-sizes: () !default;
+$cui-table-sizes: map_merge((
+	$cui-conf-defaultView: $cui-table-default,
+	'small': $cui-table-small,
+	'large': $cui-table-large,
+), $cui-table-sizes);
+
+
 // Tag
 $cui-tag-color: $cui-color-white;
 $cui-tag-background: $cui-color-gray-6;

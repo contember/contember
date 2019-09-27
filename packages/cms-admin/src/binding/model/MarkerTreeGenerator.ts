@@ -117,6 +117,13 @@ export class MarkerTreeGenerator {
 				return assertNever(fresh)
 			}
 		} else if (original instanceof ConnectionMarker) {
+			if (
+				fresh instanceof ConnectionMarker &&
+				fresh.fieldName === original.fieldName &&
+				JSON.stringify(fresh.target) === JSON.stringify(original.target)
+			) {
+				return original
+			}
 			return MarkerTreeGenerator.rejectConnectionMarkerCombo(original)
 		} else if (original instanceof MarkerTreeRoot) {
 			if (fresh instanceof MarkerTreeRoot) {

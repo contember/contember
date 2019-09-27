@@ -128,19 +128,24 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 			if (!(entity instanceof EntityAccessor)) {
 				continue
 			}
-			const slug = entity.data.getField(props.slugField)
 			const label = <ToOne.AccessorRenderer accessor={entity}>{props.labelFactory}</ToOne.AccessorRenderer>
-
-			if (slug instanceof FieldAccessor) {
-				const slugValue = slug.currentValue
-
-				if (typeof slugValue === 'string') {
-					normalized.push({
-						slug: slugValue,
-						isSelected: currentDimensions.indexOf(slugValue) !== -1,
-						label,
-					})
+			let slugValue: string | undefined
+			if (props.slugField !== 'id') {
+				const slug = props.slugField === 'id' ? entity.primaryKey : entity.data.getField(props.slugField)
+				if (slug instanceof FieldAccessor && typeof slug.currentValue === 'string') {
+					slugValue = slug.currentValue
 				}
+			} else {
+				if (typeof entity.primaryKey === 'string') {
+					slugValue = entity.primaryKey
+				}
+			}
+			if (slugValue !== undefined) {
+				normalized.push({
+					slug: slugValue,
+					isSelected: currentDimensions.indexOf(slugValue) !== -1,
+					label,
+				})
 			}
 		}
 

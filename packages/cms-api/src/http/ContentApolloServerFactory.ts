@@ -38,6 +38,9 @@ class ContentApolloServerFactory {
 					return error
 				}
 				const originalError = extractOriginalError(error)
+				if (originalError instanceof GraphQLError) {
+					return error
+				}
 				if (originalError instanceof UserError) {
 					return { message: error.message, locations: undefined, path: undefined }
 				}

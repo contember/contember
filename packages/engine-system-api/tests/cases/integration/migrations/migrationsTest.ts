@@ -1082,6 +1082,75 @@ describe('Diff schemas', () => {
 		})
 	})
 
+	describe('update relation onDelete', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.column('name', c => c.type(Model.ColumnType.String)).manyHasOne('category', r => r.target('Category')),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Post', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.manyHasOne('category', r => r.target('Category').onDelete(Model.OnDelete.cascade)),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateRelationOnDelete',
+				entityName: 'Post',
+				fieldName: 'category',
+				onDelete: Model.OnDelete.cascade,
+			},
+		]
+		const sql = SQL``
+		it('diff schemas', () => {
+			testDiffSchemas(originalSchema, updatedSchema, diff)
+		})
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
+	describe('make relation not null', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.column('name', c => c.type(Model.ColumnType.String)).manyHasOne('category', r => r.target('Category')),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Post', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.manyHasOne('category', r => r.target('Category').notNull()),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'makeRelationNotNull',
+				entityName: 'Post',
+				fieldName: 'category',
+			},
+		]
+		const sql = SQL`ALTER TABLE "post" ALTER "category_id" SET NOT NULL;`
+		it('diff schemas', () => {
+			testDiffSchemas(originalSchema, updatedSchema, diff)
+		})
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
 	describe('update ACL', () => {
 		const model = new SchemaBuilder()
 			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))

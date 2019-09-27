@@ -89,6 +89,16 @@ class SchemaDiffer {
 					builder.updateRelationOnDelete(entityName, updatedRelation.name, updatedRelation.joiningColumn.onDelete)
 				}
 
+				if (
+					isIt<Model.NullableRelation>(updatedRelation, 'nullable') &&
+					isIt<Model.NullableRelation>(originalRelation, 'nullable') &&
+					!updatedRelation.nullable &&
+					originalRelation.nullable
+				) {
+					;(tmpRelation as Model.AnyRelation & Model.NullableRelation).nullable = false
+					builder.makeRelationNotNull(entityName, updatedRelation.name)
+				}
+
 				if (!deepEqual(tmpRelation, updatedRelation)) {
 					marker.rewind()
 					return false

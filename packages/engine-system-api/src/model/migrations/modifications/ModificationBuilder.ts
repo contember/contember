@@ -25,6 +25,7 @@ import UpdateRelationOnDeleteModification from './relations/UpdateRelationOnDele
 import UpdateValidationSchemaModification from './validation/UpdateValidationSchemaModification'
 import PatchValidationSchemaModification from './validation/PatchValidationSchemaModification'
 import deepCopy from '../../../utils/deepCopy'
+import MakeRelationNotNullModification from './relations/MakeRelationNotNullModification'
 
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
@@ -219,6 +220,14 @@ class ModificationBuilder {
 			entityName,
 			fieldName,
 			onDelete,
+		})
+	}
+
+	public makeRelationNotNull(entityName: string, fieldName: string) {
+		this.modifications.push({
+			modification: MakeRelationNotNullModification.id,
+			entityName,
+			fieldName,
 		})
 	}
 

@@ -13,7 +13,7 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 		builder.alterColumn(entity.tableName, field.columnName, {
 			type: this.data.definition.columnType,
 			default: this.data.definition.default,
-			allowNull: this.data.definition.nullable,
+			notNull: !this.data.definition.nullable,
 		})
 	}
 

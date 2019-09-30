@@ -278,11 +278,13 @@ $cui-validationMessage-sizes: map_merge((
 
 $cui-validationMessage-valid-color: $cui-color-success !default;
 $cui-validationMessage-invalid-color: $cui-color-danger !default;
+$cui-validationMessage-info-color: $cui-color-blue !default;
 
 $cui-validationMessage-variants: () !default;
 $cui-validationMessage-variants: map_merge((
 	'valid': $cui-validationMessage-valid-color,
 	'invalid': $cui-validationMessage-invalid-color,
+	'info': $cui-validationMessage-info-color,
 ), $cui-validationMessage-variants);
 
 // FormGroup

@@ -17,3 +17,4 @@ const renderMessage = (type: ValidationMessageProps['type']) => {
 storiesOf('ValidationMessage', module)
 	.add('valid', () => renderMessage('valid'))
 	.add('invalid', () => renderMessage('invalid'))
+	.add('info', () => renderMessage('info'))

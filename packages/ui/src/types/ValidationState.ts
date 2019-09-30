@@ -1,3 +1,3 @@
 import { Default } from './Default'
 
-export type ValidationState = Default | 'valid' | 'invalid'
+export type ValidationState = Default | 'valid' | 'invalid' | 'info'

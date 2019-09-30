@@ -8,6 +8,7 @@ import { CollectionRenderer } from './CollectionRenderer'
 import { CommonRendererProps } from './CommonRendererProps'
 import { DefaultRenderer } from './DefaultRenderer'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
+import { Box } from '@contember/ui'
 
 export interface MultiEditRendererProps extends CommonRendererProps, EntityCollectionPublicProps {
 	enablePersist?: boolean
@@ -23,31 +24,37 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 				{rawData => (
 					<LayoutInner>
 						{DefaultRenderer.renderTitleBar(this.props)}
-						{this.props.beforeContent}
-						{this.props.sortable === undefined && (
-							<Repeater.EntityCollection
-								entities={rawData}
-								enableUnlinkAll={this.props.enableUnlinkAll}
-								enableAddingNew={this.props.enableAddingNew}
-								enableUnlink={this.props.enableUnlink}
-								label={this.props.label}
-							>
-								{this.props.children}
-							</Repeater.EntityCollection>
+						<Box>
+							{this.props.beforeContent}
+							{this.props.sortable === undefined && (
+								<Repeater.EntityCollection
+									entities={rawData}
+									enableUnlinkAll={this.props.enableUnlinkAll}
+									enableAddingNew={this.props.enableAddingNew}
+									enableUnlink={this.props.enableUnlink}
+									label={this.props.label}
+								>
+									{this.props.children}
+								</Repeater.EntityCollection>
+							)}
+							{this.props.sortable !== undefined && (
+								<Sortable
+									enableUnlinkAll={this.props.enableUnlinkAll}
+									enableAddingNew={this.props.enableAddingNew}
+									enableUnlink={this.props.enableUnlink}
+									label={this.props.label}
+									{...this.props.sortable}
+									entities={rawData}
+								>
+									{this.props.children}
+								</Sortable>
+							)}
+						</Box>
+						{this.props.enablePersist !== false && (
+							<div style={{ margin: '1em 0' }}>
+								<PersistButton />
+							</div>
 						)}
-						{this.props.sortable !== undefined && (
-							<Sortable
-								enableUnlinkAll={this.props.enableUnlinkAll}
-								enableAddingNew={this.props.enableAddingNew}
-								enableUnlink={this.props.enableUnlink}
-								label={this.props.label}
-								{...this.props.sortable}
-								entities={rawData}
-							>
-								{this.props.children}
-							</Sortable>
-						)}
-						{this.props.enablePersist !== false && <PersistButton />}
 					</LayoutInner>
 				)}
 			</CollectionRenderer>

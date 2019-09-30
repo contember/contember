@@ -24,6 +24,7 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 							type={toastTypeToMessageType[toast.type]}
 							flow="block"
 							framed
+							lifted
 							action={
 								<Button
 									intent="default"

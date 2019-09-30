@@ -11,7 +11,6 @@ import {
 import { DragHandle as DragHandleIcon } from '../../../components/ui'
 import { FieldName } from '../../bindingTypes'
 import {
-	AccessorContext,
 	EnforceSubtypeRelation,
 	EnvironmentContext,
 	Field,
@@ -21,6 +20,7 @@ import {
 import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
+import { ValidationMessage } from '@contember/ui'
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
 	sortBy: FieldName
@@ -259,10 +259,15 @@ namespace Sortable {
 
 			if (!this.props.entities.entities.length || !this.entities.length) {
 				return (
-					// TODO use a dedicated message component
-					<div className="cloneable-emptyMessage">
-						{this.props.emptyMessage || 'There is no content yet. Try adding a new item.'}
-					</div>
+					<ValidationMessage type="neutral" flow="generous" framed>
+						{this.props.emptyMessage || (
+							<>
+								There is no content yet.
+								<br />
+								Try adding a new item.
+							</>
+						)}
+					</ValidationMessage>
 				)
 			}
 

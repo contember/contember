@@ -48,7 +48,9 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 								<AccessorContext.Provider value={value}>
 									<LayoutInner>
 										{content}
-										<PersistButton />
+										<div style={{ margin: '1em 0' }}>
+											<PersistButton />
+										</div>
 									</LayoutInner>
 									<LayoutSide showBox={!!this.props.side}>
 										<>

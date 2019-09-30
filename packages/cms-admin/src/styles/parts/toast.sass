@@ -1,42 +1,14 @@
 @import '../common'
 
-.toast
-	&-wrap
-		+fixed($spacing-normal $spacing-normal null)
-		pointer-events: none
-		z-index: 20
+.toaster
+	+fixed($spacing-normal $spacing-normal null)
+	pointer-events: none
+	z-index: 20
 
-	&-message
-		flex-grow: 1
-		margin: 0
+	&-item
+		pointer-events: auto
+		max-width: rem(400px)
+		margin: 0 auto
 
-	&-button
-		background: none
-		border: none
-		padding: $spacing-small / 2
-		margin: -($spacing-small / 2)
-		color: inherit
-
-		&:focus,
-		&:hover
-			outline: none
-			border-radius: rem(4px)
-			background: rgba(white, .1)
-
-	display: flex
-	max-width: rem(720px)
-	margin: 0 auto $spacing-small
-	padding: rem(15px)
-	border-radius: rem(4px)
-	box-shadow: 0 rem(1px) rem(1px) rgba(22, 29, 37, 0.1)
-	color: white
-	pointer-events: auto
-
-	&.view-success
-		background: #34AA44
-	&.view-warning
-		background: #F6AB2F
-	&.view-error
-		background: #E6492D
-	&.view-info
-		background: #1665D8
+		& + &
+			margin-top: $spacing-small

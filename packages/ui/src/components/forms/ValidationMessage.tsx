@@ -8,18 +8,20 @@ export interface ValidationMessageProps {
 	size?: Size
 	flow?: ValidationMessageFlow
 	framed?: boolean
+	lifted?: boolean
 	children?: React.ReactNode
 	action?: React.ReactNode
 }
 
 export const ValidationMessage = React.memo(
-	({ children, size, flow, type, framed, action }: ValidationMessageProps) => (
+	({ children, size, flow, type, framed, lifted, action }: ValidationMessageProps) => (
 		<div
 			className={cn(
 				'validationMessage',
 				toEnumViewClass(size),
 				toEnumViewClass(type),
 				toViewClass('framed', framed),
+				toViewClass('lifted', lifted),
 				toEnumViewClass(flow),
 			)}
 		>

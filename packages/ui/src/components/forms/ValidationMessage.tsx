@@ -9,19 +9,23 @@ export interface ValidationMessageProps {
 	flow?: ValidationMessageFlow
 	framed?: boolean
 	children?: React.ReactNode
+	action?: React.ReactNode
 }
 
-export const ValidationMessage = React.memo(({ children, size, flow, type, framed }: ValidationMessageProps) => (
-	<span
-		className={cn(
-			'validationMessage',
-			toEnumViewClass(size),
-			toEnumViewClass(type),
-			toViewClass('framed', framed),
-			toEnumViewClass(flow),
-		)}
-	>
-		{children}
-	</span>
-))
+export const ValidationMessage = React.memo(
+	({ children, size, flow, type, framed, action }: ValidationMessageProps) => (
+		<div
+			className={cn(
+				'validationMessage',
+				toEnumViewClass(size),
+				toEnumViewClass(type),
+				toViewClass('framed', framed),
+				toEnumViewClass(flow),
+			)}
+		>
+			<div className="validationMessage-content">{children}</div>
+			{action && <div className="validationMessage-action">{action}</div>}
+		</div>
+	),
+)
 ValidationMessage.displayName = 'ValidationMessage'

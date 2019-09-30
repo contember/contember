@@ -3,9 +3,16 @@
 .#{$cui-conf-globalPrefix}validationMessage
 	position: relative
 	font-weight: $fw-light
-	display: inline-block
-	text-align: center
+	display: inline-flex
+	align-items: center
 	line-height: $cui-base-lineHeight
+
+	&-content
+		flex-grow: 1
+
+	&-action
+		margin-left: .5em
+		margin-right: -.5em
 
 	@each $name, $data in $cui-validationMessage-variants
 		$view: toView($name)
@@ -29,7 +36,8 @@
 
 	&.view-block,
 	&.view-generous
-		display: block
+		display: flex
 
 	&.view-generous
 		padding: 2em
+		text-align: center

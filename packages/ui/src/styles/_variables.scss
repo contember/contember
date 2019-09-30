@@ -288,6 +288,9 @@ $cui-validationMessage-info-border-color: lighten($cui-validationMessage-info-co
 $cui-validationMessage-neutral-color: $cui-color-gray-5 !default;
 $cui-validationMessage-neutral-background-color: $cui-color-gray-1 !default;
 $cui-validationMessage-neutral-border-color: $cui-color-gray-2 !default;
+$cui-validationMessage-warning-color: $cui-color-warn !default;
+$cui-validationMessage-warning-background-color: lighten($cui-validationMessage-warning-color, 44%) !default;
+$cui-validationMessage-warning-border-color: lighten($cui-validationMessage-warning-color, 30%) !default;
 $cui-validationMessage-border-width: 1px !default;
 $cui-validationMessage-border-radius: .3em !default;
 
@@ -312,6 +315,11 @@ $cui-validationMessage-variants: map_merge((
 		'color': $cui-validationMessage-neutral-color,
 		'background-color': $cui-validationMessage-neutral-background-color,
 		'border-color': $cui-validationMessage-neutral-border-color,
+	),
+	'warning': (
+		'color': $cui-validationMessage-warning-color,
+		'background-color': $cui-validationMessage-warning-background-color,
+		'border-color': $cui-validationMessage-warning-border-color,
 	),
 ), $cui-validationMessage-variants);
 

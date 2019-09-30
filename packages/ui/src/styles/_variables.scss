@@ -277,14 +277,42 @@ $cui-validationMessage-sizes: map_merge((
 ), $cui-validationMessage-sizes);
 
 $cui-validationMessage-valid-color: $cui-color-success !default;
+$cui-validationMessage-valid-background-color: lighten($cui-validationMessage-valid-color, 50%) !default;
+$cui-validationMessage-valid-border-color: lighten($cui-validationMessage-valid-color, 32%) !default;
 $cui-validationMessage-invalid-color: $cui-color-danger !default;
+$cui-validationMessage-invalid-background-color: lighten($cui-validationMessage-invalid-color, 40%) !default;
+$cui-validationMessage-invalid-border-color: lighten($cui-validationMessage-invalid-color, 34%) !default;
 $cui-validationMessage-info-color: $cui-color-blue !default;
+$cui-validationMessage-info-background-color: lighten($cui-validationMessage-info-color, 39%) !default;
+$cui-validationMessage-info-border-color: lighten($cui-validationMessage-info-color, 29%) !default;
+$cui-validationMessage-neutral-color: $cui-color-gray-5 !default;
+$cui-validationMessage-neutral-background-color: $cui-color-gray-1 !default;
+$cui-validationMessage-neutral-border-color: $cui-color-gray-2 !default;
+$cui-validationMessage-border-width: 1px !default;
+$cui-validationMessage-border-radius: .3em !default;
 
 $cui-validationMessage-variants: () !default;
 $cui-validationMessage-variants: map_merge((
-	'valid': $cui-validationMessage-valid-color,
-	'invalid': $cui-validationMessage-invalid-color,
-	'info': $cui-validationMessage-info-color,
+	'valid': (
+		'color': $cui-validationMessage-valid-color,
+		'background-color': $cui-validationMessage-valid-background-color,
+		'border-color': $cui-validationMessage-valid-border-color,
+	),
+	'invalid': (
+		'color': $cui-validationMessage-invalid-color,
+		'background-color': $cui-validationMessage-invalid-background-color,
+		'border-color': $cui-validationMessage-invalid-border-color,
+	),
+	'info': (
+		'color': $cui-validationMessage-info-color,
+		'background-color': $cui-validationMessage-info-background-color,
+		'border-color': $cui-validationMessage-info-border-color,
+	),
+	'neutral': (
+		'color': $cui-validationMessage-neutral-color,
+		'background-color': $cui-validationMessage-neutral-background-color,
+		'border-color': $cui-validationMessage-neutral-border-color,
+	),
 ), $cui-validationMessage-variants);
 
 // FormGroup

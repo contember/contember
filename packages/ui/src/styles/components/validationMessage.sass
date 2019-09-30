@@ -1,15 +1,35 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}validationMessage
+	position: relative
 	font-weight: $fw-light
 	display: inline-block
+	text-align: center
+	line-height: $cui-base-lineHeight
 
-	@each $name, $color in $cui-validationMessage-variants
+	@each $name, $data in $cui-validationMessage-variants
 		$view: toView($name)
 		&#{$view}
-			color: $color
+			color: map-get($data, 'color')
+
+			&.view-framed
+				background-color: map-get($data, 'background-color')
+				border-color: map-get($data, 'border-color')
 
 	@each $name, $fontSize in $cui-validationMessage-sizes
 		$view: toView($name)
 		&#{$view}
 			font-size: $fontSize
+
+	&.view-framed
+		border-width: $cui-validationMessage-border-width
+		border-style: solid
+		border-radius: $cui-validationMessage-border-radius
+		padding: .3em 1em
+
+	&.view-block,
+	&.view-generous
+		display: block
+
+	&.view-generous
+		padding: 2em

@@ -5,13 +5,19 @@ import State from '../../state'
 import { Icon } from '@blueprintjs/core'
 import { Dispatch } from '../../actions/types'
 import { dismissToast } from '../../actions/toasts'
-import { Button, ValidationMessage, ValidationMessageProps } from '@contember/ui'
+import { Button, Intent, ValidationMessage, ValidationMessageProps } from '@contember/ui'
 
 const toastTypeToMessageType: { [K in ToastType]: ValidationMessageProps['type'] } = {
 	[ToastType.Success]: 'valid',
 	[ToastType.Warning]: 'warning',
 	[ToastType.Error]: 'invalid',
 	[ToastType.Info]: 'info',
+}
+const toastTypeToIntent: { [K in ToastType]: Intent } = {
+	[ToastType.Success]: 'success',
+	[ToastType.Warning]: 'warn',
+	[ToastType.Error]: 'danger',
+	[ToastType.Info]: 'primary',
 }
 
 class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {
@@ -27,7 +33,7 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 							lifted
 							action={
 								<Button
-									intent="default"
+									intent={toastTypeToIntent[toast.type]}
 									distinction="seamless"
 									flow="squarish"
 									onClick={() => {

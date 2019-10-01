@@ -20,7 +20,7 @@ import {
 import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
-import { ValidationMessage } from '@contember/ui'
+import { Message } from '@contember/ui'
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
 	sortBy: FieldName
@@ -259,7 +259,7 @@ namespace Sortable {
 
 			if (!this.props.entities.entities.length || !this.entities.length) {
 				return (
-					<ValidationMessage type="neutral" flow="generous" framed>
+					<Message flow="generous">
 						{this.props.emptyMessage || (
 							<>
 								There is no content yet.
@@ -267,7 +267,7 @@ namespace Sortable {
 								Try adding a new item.
 							</>
 						)}
-					</ValidationMessage>
+					</Message>
 				)
 			}
 

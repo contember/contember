@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { FieldErrors } from '../../types'
-import { ValidationMessage, ValidationMessageProps } from './ValidationMessage'
+import { Message, MessageProps } from './Message'
 
 export interface ErrorListProps {
 	errors?: FieldErrors
-	size?: ValidationMessageProps['size']
+	size?: MessageProps['size']
 }
 
 export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
@@ -15,9 +15,9 @@ export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
 		<ul className="errorList">
 			{errors.map(error => (
 				<li className="errorList-item" key={error.message}>
-					<ValidationMessage type="invalid" size={size}>
+					<Message type="danger" size={size}>
 						{error.message}
-					</ValidationMessage>
+					</Message>
 				</li>
 			))}
 		</ul>

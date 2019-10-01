@@ -5,12 +5,12 @@ import State from '../../state'
 import { Icon } from '@blueprintjs/core'
 import { Dispatch } from '../../actions/types'
 import { dismissToast } from '../../actions/toasts'
-import { Button, Intent, ValidationMessage, ValidationMessageProps } from '@contember/ui'
+import { Button, Intent, Message, MessageProps } from '@contember/ui'
 
-const toastTypeToMessageType: { [K in ToastType]: ValidationMessageProps['type'] } = {
-	[ToastType.Success]: 'valid',
-	[ToastType.Warning]: 'warning',
-	[ToastType.Error]: 'invalid',
+const toastTypeToMessageType: { [K in ToastType]: MessageProps['type'] } = {
+	[ToastType.Success]: 'success',
+	[ToastType.Warning]: 'warn',
+	[ToastType.Error]: 'danger',
 	[ToastType.Info]: 'info',
 }
 const toastTypeToIntent: { [K in ToastType]: Intent } = {
@@ -26,10 +26,9 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 			<div className="toaster">
 				{this.props.toasts.map(toast => (
 					<div key={toast.id} className="toaster-item">
-						<ValidationMessage
+						<Message
 							type={toastTypeToMessageType[toast.type]}
 							flow="block"
-							framed
 							lifted
 							action={
 								<Button
@@ -46,7 +45,7 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 							}
 						>
 							{toast.message}
-						</ValidationMessage>
+						</Message>
 					</div>
 				))}
 			</div>

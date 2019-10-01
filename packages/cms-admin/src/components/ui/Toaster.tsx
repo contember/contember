@@ -30,6 +30,7 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 							type={toastTypeToMessageType[toast.type]}
 							flow="block"
 							lifted
+							distinction="striking"
 							action={
 								<Button
 									intent={toastTypeToIntent[toast.type]}
@@ -38,9 +39,8 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 									onClick={() => {
 										this.props.dismissToast(toast.id)
 									}}
-									bland
 								>
-									<Icon icon="cross" color="currentColor" />
+									<Icon icon="cross" color="white" />
 								</Button>
 							}
 						>

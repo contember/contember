@@ -25,7 +25,7 @@
 				background: map-get($data, background)
 
 			&.view-lifted
-				border-color: map-get($data, boxShadow)
+				box-shadow: map-get($data, boxShadow)
 
 	@each $name, $fontSize in $cui-message-sizes
 		$view: toView($name)
@@ -38,8 +38,13 @@
 	&.view-striking
 		padding: .25em .5em
 		font-weight: $fw-normal
+	&.view-striking &-action
+		margin-left: .25em
+		margin-right: -.25em
 
-	&.view-generous,
-	&.view-block
+	&.view-generous
 		padding: .5em 2em
 		text-align: center
+	&.view-generous &-action
+		margin-left: 1em
+		margin-right: -1em

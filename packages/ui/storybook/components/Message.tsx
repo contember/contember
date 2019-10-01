@@ -17,6 +17,7 @@ const renderMessage = (type: MessageProps['type']) => {
 			Default: 'default',
 			Generous: 'generous',
 			Block: 'block',
+			GenerousBlock: 'generousBlock',
 		},
 		'default',
 	)

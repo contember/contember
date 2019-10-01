@@ -32,7 +32,8 @@
 		&#{$view}
 			font-size: $fontSize
 
-	&.view-block
+	&.view-block,
+	&.view-generousBlock
 		display: flex
 
 	&.view-striking
@@ -42,9 +43,12 @@
 		margin-left: .25em
 		margin-right: -.25em
 
-	&.view-generous
+	&.view-generous,
+	&.view-generousBlock
 		padding: .5em 2em
 		text-align: center
-	&.view-generous &-action
-		margin-left: 1em
-		margin-right: -1em
+	&.view-generous &,
+	&.view-generousBlock &
+		&-action
+			margin-left: 1em
+			margin-right: -1em

@@ -278,30 +278,32 @@ $cui-message-sizes: map_merge((
 ), $cui-message-sizes);
 
 
+$cui-message-common-boxShadow: 0 em(4px) em(6px) rgba($cui-color-black, .1), 0 em(8px) em(12px) rgba($cui-color-black, .1), 0 em(16px) em(24px) rgba($cui-color-black, .1) !default;
+
 $cui-message-default-defaultColor: $cui-color-gray-5 !default;
 $cui-message-default-strikingColor: $cui-color-white !default;
 $cui-message-default-background: $cui-color-gray-4 !default;
-$cui-message-default-boxShadow: 123 !default;
+$cui-message-default-boxShadow: $cui-message-common-boxShadow !default;
 
 $cui-message-success-defaultColor: $cui-color-success !default;
 $cui-message-success-strikingColor: $cui-color-white !default;
 $cui-message-success-background: $cui-color-success !default;
-$cui-message-success-boxShadow: 123 !default;
+$cui-message-success-boxShadow: $cui-message-default-boxShadow !default;
 
 $cui-message-info-defaultColor: $cui-color-info !default;
 $cui-message-info-strikingColor: $cui-color-white !default;
 $cui-message-info-background: $cui-color-info !default;
-$cui-message-info-boxShadow: 123 !default;
+$cui-message-info-boxShadow: $cui-message-default-boxShadow !default;
 
 $cui-message-warn-defaultColor: $cui-color-warn !default;
 $cui-message-warn-strikingColor: $cui-color-white !default;
 $cui-message-warn-background: $cui-color-warn !default;
-$cui-message-warn-boxShadow: 123 !default;
+$cui-message-warn-boxShadow: $cui-message-default-boxShadow !default;
 
 $cui-message-danger-defaultColor: $cui-color-danger !default;
 $cui-message-danger-strikingColor: $cui-color-white !default;
 $cui-message-danger-background: $cui-color-danger !default;
-$cui-message-danger-boxShadow: 123 !default;
+$cui-message-danger-boxShadow: $cui-message-default-boxShadow !default;
 
 
 $cui-message-border-radius: .3em !default;

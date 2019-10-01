@@ -24,8 +24,8 @@
 				color: map-get($data, strikingColor)
 				background: map-get($data, background)
 
-			&.view-lifted
-				box-shadow: map-get($data, boxShadow)
+				&.view-lifted
+					box-shadow: map-get($data, boxShadow)
 
 	@each $name, $fontSize in $cui-message-sizes
 		$view: toView($name)

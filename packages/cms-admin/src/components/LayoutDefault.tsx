@@ -93,21 +93,21 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 							}}
 						>
 							<>
-								<Heading size="small" depth={3} style={{ padding: '.5em' }}>
+								<Heading size="small" depth={3} style={{ padding: '.5em', textAlign: 'center' }}>
 									{email}
 								</Heading>
 								<ButtonGroup orientation="vertical" flow="block">
 									{props.userMenu}
 									<SwitchProjectLink
 										Component={({ onClick, href }) => (
-											<Button distinction="seamless" flow="block" onClick={onClick} href={href} Component="a">
+											<Button distinction="seamless" flow="generousBlock" onClick={onClick} href={href} Component="a">
 												Switch project
 											</Button>
 										)}
 									/>
 									<LogoutLink
 										Component={props => (
-											<Button distinction="seamless" flow="block" {...props}>
+											<Button distinction="seamless" flow="generousBlock" {...props}>
 												Sign Out
 											</Button>
 										)}

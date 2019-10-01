@@ -259,14 +259,8 @@ namespace Sortable {
 
 			if (!this.props.entities.entities.length || !this.entities.length) {
 				return (
-					<Message flow="generous">
-						{this.props.emptyMessage || (
-							<>
-								There is no content yet.
-								<br />
-								Try adding a new item.
-							</>
-						)}
+					<Message flow="generousBlock">
+						{this.props.emptyMessage || 'There is no content yet. Try adding a new item.'}
 					</Message>
 				)
 			}

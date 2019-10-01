@@ -1,3 +1,3 @@
 import { Default } from './Default'
 
-export type MessageFlow = Default | 'generous' | 'block'
+export type MessageFlow = Default | 'generous' | 'block' | 'generousBlock'

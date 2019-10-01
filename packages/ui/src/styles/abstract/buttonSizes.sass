@@ -20,12 +20,14 @@
 			&.view-squarish,
 			&.view-circular
 				+size($normalizedHeight)
-			&.view-generous
+			&.view-generous,
+			&.view-generousBlock
 				padding-left: 1.5 * $normalizedHeight
 				padding-right: 1.5 * $normalizedHeight
 
 
-	&.view-block
+	&.view-block,
+	&.view-generousBlock
 		display: flex
 		width: 100%
 	&.view-circular

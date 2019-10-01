@@ -30,6 +30,7 @@ export const simpleButtonStory = (size?: Size) => {
 				Circular: 'circular',
 				Generous: 'generous',
 				Block: 'block',
+				GenerousBlock: 'generousBlock',
 			},
 			'default',
 		),

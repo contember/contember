@@ -1,5 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
-import { FieldName, Scalar } from '../bindingTypes'
+import { FieldName } from '../bindingTypes'
+import { Scalar } from '../dataTree'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 /**

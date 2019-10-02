@@ -2,7 +2,7 @@ import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import { isEmptyObject } from 'cms-common'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
-import { EntityName, ExpectedCount, PRIMARY_KEY_NAME, ReceivedData, ReceivedEntityData, Scalar } from '../bindingTypes'
+import { EntityName, ExpectedCount, PRIMARY_KEY_NAME } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
 	ConnectionMarker,
@@ -18,6 +18,7 @@ import {
 	ReferenceMarker,
 	RootAccessor,
 } from '../dao'
+import { ReceivedData, ReceivedEntityData, Scalar } from '../dataTree'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 

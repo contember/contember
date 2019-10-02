@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { FieldName, PRIMARY_KEY_NAME, Scalar } from '../../../bindingTypes'
+import { FieldName, PRIMARY_KEY_NAME } from '../../../bindingTypes'
 import {
 	EnforceSubtypeRelation,
 	EntityListDataProvider,
@@ -11,6 +11,7 @@ import {
 	ToOne,
 } from '../../../coreComponents'
 import { EntityAccessor, Environment, Literal, VariableLiteral, VariableScalar } from '../../../dao'
+import { Scalar } from '../../../dataTree'
 import { QueryLanguage } from '../../../queryLanguage'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
 import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'

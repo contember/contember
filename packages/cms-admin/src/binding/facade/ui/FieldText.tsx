@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { Scalar } from '../../bindingTypes'
 import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { Environment } from '../../dao'
+import { Scalar } from '../../dataTree'
 import { QueryLanguage } from '../../queryLanguage'
 
 interface FieldTextProps<AcceptableValue extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal> {

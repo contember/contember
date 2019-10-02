@@ -1,7 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
-import { FieldName, Scalar } from '../bindingTypes'
+import { FieldName } from '../bindingTypes'
 import { ToOne } from '../coreComponents'
 import { DataBindingError, EntityAccessor, FieldAccessor } from '../dao'
+import { Scalar } from '../dataTree'
 import { getNestedEntity } from './getNestedEntity'
 
 export const getNestedField = <

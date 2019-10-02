@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { DataTreeMutationState } from '../../state/dataTrees'
-import { FieldName, RelativeSingleField, Scalar, VariableInput } from '../bindingTypes'
+import { FieldName, RelativeSingleField, VariableInput } from '../bindingTypes'
 import {
 	DataBindingError,
 	EntityAccessor,
@@ -11,6 +11,7 @@ import {
 	FieldAccessor,
 	FieldMarker,
 } from '../dao'
+import { Scalar } from '../dataTree'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
 import { AccessorContext, AccessorContextValue } from './AccessorContext'

@@ -1,7 +1,8 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from '@contember/utils'
-import { By, Filter, Scalar, VariableInput } from '../bindingTypes'
+import { By, Filter, VariableInput } from '../bindingTypes'
 import { DataBindingError, Environment, Literal, VariableLiteral, VariableScalar } from '../dao'
+import { Scalar } from '../dataTree'
 
 export class VariableInputTransformer {
 	public static transformFilter(

@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions'
-import { MutationRequestResult, QueryRequestResult } from '../binding'
+import { MutationRequestResponse, QueryRequestResponse } from '../binding'
 import GraphqlClient from '../model/GraphqlClient'
 import {
 	DATA_TREE_REQUEST_CREATE,
@@ -56,13 +56,13 @@ export const initializeDataTreeRequest = (dataTreeId: DataTreeId, type: DataTree
 export interface MutationRequestEnd {
 	dataTreeId: DataTreeId
 	type: DataTreeRequestType.Mutation
-	data: MutationRequestResult | null
+	data: MutationRequestResponse | null
 }
 
 export interface QueryRequestEnd {
 	dataTreeId: DataTreeId
 	type: DataTreeRequestType.Query
-	data: QueryRequestResult | null
+	data: QueryRequestResponse | null
 }
 
 export type DataTreeSetRequestEnd = MutationRequestEnd | QueryRequestEnd

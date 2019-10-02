@@ -1,23 +1,23 @@
 import { assertNever } from '@contember/utils'
-import { MutationError, MutationRequestResult, MutationResult } from '../bindingTypes'
 import { ErrorAccessor } from '../dao'
+import { MutationError, MutationRequestResponse, MutationResponse } from '../dataTree'
 import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {
-	public constructor(private readonly requestResult?: MutationRequestResult) {}
+	public constructor(private readonly requestResponse?: MutationRequestResponse) {}
 
 	public preprocess(): ErrorsPreprocessor.ErrorTreeRoot {
 		const treeRoot: ErrorsPreprocessor.ErrorTreeRoot = {}
 
-		if (this.requestResult === undefined) {
+		if (this.requestResponse === undefined) {
 			return treeRoot
 		}
 
-		for (const mutationAlias in this.requestResult) {
-			const mutationResult = this.requestResult[mutationAlias]
-			const processedResult = this.processMutationResult(mutationResult)
+		for (const mutationAlias in this.requestResponse) {
+			const mutationResponse = this.requestResponse[mutationAlias]
+			const processedResponse = this.processMutationResponse(mutationResponse)
 
-			if (processedResult === undefined) {
+			if (processedResponse === undefined) {
 				continue
 			}
 
@@ -27,7 +27,7 @@ class ErrorsPreprocessor {
 				if (treeId in treeRoot) {
 					return this.rejectCorruptData()
 				}
-				treeRoot[treeId] = processedResult
+				treeRoot[treeId] = processedResponse
 			} else {
 				const itemIndex = parseInt(itemNumber, 10)
 				const child = treeRoot[treeId]
@@ -36,23 +36,23 @@ class ErrorsPreprocessor {
 					treeRoot[treeId] = {
 						nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
 						children: {
-							[itemIndex]: processedResult,
+							[itemIndex]: processedResponse,
 						},
 						errors: [],
 					}
 				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
-					child.children[itemIndex] = processedResult
+					child.children[itemIndex] = processedResponse
 				}
 			}
 		}
 		return treeRoot
 	}
 
-	private processMutationResult(mutationResult: MutationResult): ErrorsPreprocessor.ErrorNode | undefined {
-		if ((mutationResult.ok && mutationResult.validation.valid) || mutationResult.validation.errors.length === 0) {
+	private processMutationResponse(mutationResponse: MutationResponse): ErrorsPreprocessor.ErrorNode | undefined {
+		if ((mutationResponse.ok && mutationResponse.validation.valid) || mutationResponse.validation.errors.length === 0) {
 			return undefined
 		}
-		return this.getErrorNode(mutationResult.validation.errors)
+		return this.getErrorNode(mutationResponse.validation.errors)
 	}
 
 	private getErrorNode(errors: MutationError[]): ErrorsPreprocessor.ErrorNode {

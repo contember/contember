@@ -11,8 +11,8 @@ import {
 	DataTreeRequestType,
 	DataTreeState,
 } from '../../state/dataTrees'
-import { MutationRequestResult, MutationResult, ReceivedDataTree } from '../bindingTypes'
 import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
+import { MutationRequestResponse, ReceivedDataTree } from '../dataTree'
 import { DefaultRenderer } from '../facade/renderers'
 import { AccessorTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
 import { MetaOperationsContext, MetaOperationsContextValue } from './MetaOperationsContext'
@@ -228,7 +228,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 			this.props.onSuccessfulPersist && this.props.onSuccessfulPersist()
 			this.state.resolvePersistResult &&
 				this.state.resolvePersistResult({
-					persistedEntityId: (mutation.data as MutationRequestResult)[this.props.markerTree.id].node.id,
+					persistedEntityId: (mutation.data as MutationRequestResponse)[this.props.markerTree.id].node.id,
 					type: PersistResultSuccessType.JustSuccess,
 				})
 			if (!this.state.query) {
@@ -247,7 +247,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 				return
 			}
 
-			const mutationResult: MutationRequestResult = mutation.data
+			const mutationResult: MutationRequestResponse = mutation.data
 
 			console.debug('mut error!', mutationResult)
 			return this.initializeAccessorTree(
@@ -331,7 +331,7 @@ class DataProvider<DRP> extends React.PureComponent<DataProviderInnerProps<DRP>,
 	private initializeAccessorTree(
 		persistedData: ReceivedDataTree<undefined> | undefined,
 		initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
-		errors?: MutationRequestResult,
+		errors?: MutationRequestResponse,
 	) {
 		const accessTreeGenerator = new AccessorTreeGenerator(this.props.markerTree)
 		accessTreeGenerator.generateLiveTree(

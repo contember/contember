@@ -1,16 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from '@contember/utils'
-import {
-	ExpectedCount,
-	FieldName,
-	MutationRequestResult,
-	PRIMARY_KEY_NAME,
-	ReceivedData,
-	ReceivedDataTree,
-	ReceivedEntityData,
-	Scalar,
-	TYPENAME_KEY_NAME,
-} from '../bindingTypes'
+import { ExpectedCount, FieldName, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	Accessor,
 	AccessorTreeRoot,
@@ -27,6 +17,7 @@ import {
 	ReferenceMarker,
 	RootAccessor,
 } from '../dao'
+import { MutationRequestResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData, Scalar } from '../dataTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
@@ -46,7 +37,7 @@ class AccessorTreeGenerator {
 		persistedData: ReceivedDataTree<undefined> | undefined,
 		initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
 		updateData: AccessorTreeGenerator.UpdateData,
-		errors?: MutationRequestResult,
+		errors?: MutationRequestResponse,
 	): void {
 		const preprocessor = new ErrorsPreprocessor(errors)
 

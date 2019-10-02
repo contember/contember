@@ -1,16 +1,9 @@
-import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import { Input } from '@contember/schema'
+import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import {
-	Filter,
-	RelativeEntityList,
-	RelativeSingleEntity,
-	RelativeSingleField,
-	Scalar,
-	VariableInput,
-} from '../bindingTypes'
-import { FieldMetadata } from '../coreComponents'
-import { EntityAccessor, ErrorAccessor, FieldAccessor } from '../dao'
+import { Filter, RelativeEntityList, RelativeSingleEntity, RelativeSingleField, VariableInput } from '../bindingTypes'
+import { ErrorAccessor } from '../dao'
+import { Scalar } from '../dataTree'
 
 export type RelativeLabelPosition = 'top' | 'left' | 'right'
 

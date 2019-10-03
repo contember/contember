@@ -1,5 +1,6 @@
 import { GraphQlClient } from 'cms-client'
 import * as React from 'react'
+import { ApiRequestAction } from './ApiRequestAction'
 import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReadyState } from './ApiRequestReadyState'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
@@ -28,7 +29,9 @@ const initialState: ApiRequestState<any> = {
 	readyState: ApiRequestReadyState.Uninitialized,
 }
 
-export const useApiRequest = <SuccessData>(client: GraphQlClient) => {
+export const useApiRequest = <SuccessData>(
+	client: GraphQlClient,
+): [ApiRequestState<SuccessData>, (query: string, variables: GraphQlClient.Variables, apiToken?: string) => void] => {
 	const [state, dispatch] = React.useReducer(apiRequestReducer as ApiRequestReducer<SuccessData>, initialState)
 
 	const isUnmountedRef = React.useRef(false)

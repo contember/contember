@@ -1,6 +1,7 @@
 export * from './apiRequest'
 
 export * from './ApiClientError'
+export * from './tenantErrorMessages'
 export * from './useApiServer'
 export * from './useAuthIdentity'
 export * from './useContentGraphQlClient'

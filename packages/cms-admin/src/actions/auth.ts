@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions'
+import { getTenantErrorMessage } from '../apiClient'
 import { SET_ERROR, SET_IDENTITY, SET_LOADING, SET_LOGOUT } from '../reducer/auth'
-import { getErrorCodeString } from '../tenant/hooks/strings'
 import { pushRequest } from './request'
 import { ActionCreator, Dispatch } from './types'
 import AuthState, { AuthIdentity, Project } from '../state/auth'
@@ -51,7 +51,7 @@ export const login = (email: string, password: string, rememberMe: boolean): Act
 		} else {
 			return dispatch(
 				createAction(SET_ERROR, () =>
-					signIn.errors.map((err: any) => err.endUserMessage || getErrorCodeString(err.code)).join(', '),
+					signIn.errors.map((err: any) => err.endUserMessage || getTenantErrorMessage(err.code)).join(', '),
 				)(),
 			)
 		}

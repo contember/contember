@@ -1,4 +1,4 @@
-import { useAuthedTenantQuery, useProjectSlug } from './lib'
+import { useAuthedTenantQuery } from './lib'
 
 const LIST_ROLES_QUERY = `
 	query($slug: String!) {

@@ -1,16 +1,23 @@
-import { useSelector } from 'react-redux'
-import State from '../state'
+import * as React from 'react'
+import { useProjectSlug } from './useProjectSlug'
+import { useStageSlug } from './useStageSlug'
 
 export interface ProjectAndStage {
 	project: string
 	stage: string
 }
 
-export const useProjectAndStage = () =>
-	useSelector<State, ProjectAndStage | undefined>(state => {
-		const route = state.view.route
-		if (route !== null && route.name === 'project_page') {
-			return { project: route.project, stage: route.stage }
+export const useProjectAndStage = (): ProjectAndStage | undefined => {
+	const project = useProjectSlug()
+	const stage = useStageSlug()
+
+	return React.useMemo(() => {
+		if (project === undefined || stage === undefined) {
+			return undefined
 		}
-		return undefined
-	})
+		return {
+			project,
+			stage,
+		}
+	}, [project, stage])
+}

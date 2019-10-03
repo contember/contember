@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { useProjectSlug } from '../../apiClient'
 import {
 	Membership,
 	useAddToast,
 	useAuthedContentQuery,
 	useListUsersQuery,
-	useProjectSlug,
 	useRemoveProjectMembership,
 	useUpdateCurrentProjectMembership,
 } from '../hooks'

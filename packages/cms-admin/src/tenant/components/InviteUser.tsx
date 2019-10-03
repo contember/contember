@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useEffect } from 'react'
 import { Box, Button, ContainerSpinner, FormGroup, Heading, TextInput, TitleBar } from '@contember/ui'
+import { useProjectSlug } from '../../apiClient'
 import { Select } from '../../components/ui'
 import {
 	RoleVariableDefinition,
@@ -9,7 +10,6 @@ import {
 	useListRolesQuery,
 	useUpdateProjectMembership,
 	usePageLink,
-	useProjectSlug,
 } from '../hooks'
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
 import { ToastType } from '../../state/toasts'

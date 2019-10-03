@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useEffect } from 'react'
 import { Box, Button, ContainerSpinner, FormGroup, Heading, TextInput, TitleBar } from '@contember/ui'
-import { useProjectSlug } from '../../apiClient'
+import { getTenantErrorMessage, useProjectSlug } from '../../apiClient'
 import { Select } from '../../components/ui'
 import {
 	RoleVariableDefinition,
@@ -15,7 +15,6 @@ import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
 import { ToastType } from '../../state/toasts'
 import { PageLinkButton } from '../../components/pageRouting'
 import { NavigateBackButton } from '../../components/pageRouting/NavigateBackButton'
-import { getErrorCodeString } from '../hooks/strings'
 
 interface VariableConfig {
 	render: React.ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
@@ -247,7 +246,7 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 		error: inviteState.error
 			? 'Unable to submit'
 			: inviteState.finished && !inviteState.data.invite.ok
-			? inviteState.data.invite.errors.map(it => getErrorCodeString(it.code)).join(', ')
+			? inviteState.data.invite.errors.map(it => getTenantErrorMessage(it.code)).join(', ')
 			: undefined,
 	}
 
@@ -308,7 +307,7 @@ export const EditUser: React.FC<{ project: string; rolesConfig: RolesConfig; ide
 		error: updateMembershipElement.error
 			? 'Unable to submit'
 			: updateMembershipElement.finished && !updateMembershipElement.data.updateProjectMember.ok
-			? updateMembershipElement.data.updateProjectMember.errors.map(it => getErrorCodeString(it.code)).join(', ')
+			? updateMembershipElement.data.updateProjectMember.errors.map(it => getTenantErrorMessage(it.code)).join(', ')
 			: undefined,
 	}
 

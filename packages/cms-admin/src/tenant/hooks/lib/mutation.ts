@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react'
 import { MutationRequestState } from './requestState'
-import GraphqlClient from '../../../model/GraphqlClient'
+import { GraphQlClient } from 'cms-client'
 
 export type UseMutationReturn<R, V> = [(variables: V) => Promise<R>, MutationRequestState<R>]
 
-export const useMutation = <R, V>(client: GraphqlClient, query: string, apiToken?: string): UseMutationReturn<R, V> => {
+export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken?: string): UseMutationReturn<R, V> => {
 	const [state, setState] = useState<MutationRequestState<R>>({
 		error: false,
 		loading: false,
@@ -18,7 +18,7 @@ export const useMutation = <R, V>(client: GraphqlClient, query: string, apiToken
 					finished: false,
 					error: false,
 				})
-				const response = client.request<R>(query, variables, apiToken)
+				const response = client.sendRequest<R>(query, variables, apiToken)
 				response.then(
 					data => {
 						setState({

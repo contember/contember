@@ -1,6 +1,6 @@
+import { GraphQlClient } from 'cms-client'
 import * as React from 'react'
 import { QueryRequestObject, QueryRequestState } from './requestState'
-import GraphqlClient from '../../../model/GraphqlClient'
 
 export const useJsonEqualMemo = <V>(memoFn: () => V, key: any): V => {
 	const ref = React.useRef<{ key: string; value: V }>()
@@ -14,7 +14,7 @@ export const useJsonEqualMemo = <V>(memoFn: () => V, key: any): V => {
 }
 
 export const useQuery = <R, V>(
-	client: GraphqlClient,
+	client: GraphQlClient,
 	query: string,
 	variables: V,
 	apiToken?: string,
@@ -25,10 +25,10 @@ export const useQuery = <R, V>(
 		error: false,
 	})
 	const vars = useJsonEqualMemo(() => variables, variables)
-	const fetch = React.useCallback((client: GraphqlClient, query: string, vars: V, apiToken?: string) => {
+	const fetch = React.useCallback((client: GraphQlClient, query: string, vars: V, apiToken?: string) => {
 		if (client) {
 			setState({ loading: true, finished: false, error: false })
-			client.request<R>(query, vars, apiToken).then(
+			client.sendRequest<R>(query, vars, apiToken).then(
 				data => {
 					setState({
 						data: data,

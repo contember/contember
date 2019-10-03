@@ -1,5 +1,4 @@
 export * from './auth'
-export * from './client'
 export * from './mutation'
 export * from './project'
 export * from './query'

@@ -1,16 +1,11 @@
-import { useSelector } from 'react-redux'
-import { useCurrentContentGraphQlClient, useTenantGraphQlClient } from '../../../apiClient'
-import State from '../../../state'
-import { AuthIdentity } from '../../../state/auth'
-import { QueryRequestObject } from './requestState'
-import { useQuery } from './query'
+import { useAuthIdentity, useCurrentContentGraphQlClient, useTenantGraphQlClient } from '../../../apiClient'
 import { useMutation, UseMutationReturn } from './mutation'
+import { useQuery } from './query'
+import { QueryRequestObject } from './requestState'
 
-export const useAuth = () => useSelector<State, AuthIdentity | null>(state => state.auth.identity)
-
-export const useToken = (): string | undefined => {
-	const auth = useAuth()
-	return auth != null ? auth.token : undefined
+export const useToken = () => {
+	const auth = useAuthIdentity()
+	return auth ? auth.token : undefined
 }
 
 export const useAuthedTenantQuery = <R, V>(query: string, variables: V): QueryRequestObject<R> => {

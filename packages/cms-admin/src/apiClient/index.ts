@@ -1,4 +1,5 @@
 export * from './useApiServer'
+export * from './useAuthIdentity'
 export * from './useContentGraphQlClient'
 export * from './useCurrentContentGraphQlClient'
 export * from './useGraphQlClient'

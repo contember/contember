@@ -1,4 +1,5 @@
-import { useAuth, useAuthedTenantMutation } from './lib'
+import { useAuthIdentity } from '../../apiClient'
+import { useAuthedTenantMutation } from './lib'
 import { useCallback, useMemo } from 'react'
 import { getErrorCodeString } from './strings'
 
@@ -43,8 +44,8 @@ interface ReturnedState {
 }
 
 export const useChangePassword = (): [(password: string) => void, ReturnedState] => {
-	const auth = useAuth()
-	const personId = auth != null ? auth.personId : undefined
+	const auth = useAuthIdentity()
+	const personId = auth ? auth.personId : undefined
 	const [triggerChangePassword, state] = useAuthedTenantMutation<ChangePasswordResponse, ChangePasswordVariables>(
 		CHANGE_PASSWORD_MUTATION,
 	)

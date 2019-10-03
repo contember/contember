@@ -14,7 +14,7 @@ import { PageRequest } from '../state/request'
 import { configureStore, Store } from '../store'
 import Login from './Login'
 import ProjectsList from './ProjectsList'
-import Config, { validateConfig, ConfigContext } from '../config'
+import { Config, isValidConfig, ConfigContext, ConfigurationError } from '../config'
 import { Toaster } from './ui/Toaster'
 import { NavigationIsActiveProvider, NavigationProvider } from './NavigationProvider'
 
@@ -29,7 +29,9 @@ export default class Admin extends React.Component<AdminProps> {
 	constructor(props: AdminProps) {
 		super(props)
 
-		validateConfig(props.config)
+		if (!isValidConfig(props.config)) {
+			throw new ConfigurationError()
+		}
 
 		this.store = configureStore(emptyState, props.config)
 		this.store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => this.props.configs)())

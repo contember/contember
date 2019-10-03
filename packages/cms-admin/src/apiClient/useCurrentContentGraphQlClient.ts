@@ -1,15 +1,15 @@
+import { ApiClientError } from './ApiClientError'
 import { useContentGraphQlClient } from './useContentGraphQlClient'
 import { useProjectAndStage } from './useProjectAndStage'
 
 export const useCurrentContentGraphQlClient = () => {
 	const projectAndStage = useProjectAndStage()
-	const potentiallyInvalidClient = useContentGraphQlClient(
+
+	if (projectAndStage === undefined) {
+		throw new ApiClientError()
+	}
+	return useContentGraphQlClient(
 		projectAndStage ? projectAndStage.project : '',
 		projectAndStage ? projectAndStage.stage : '',
 	)
-
-	if (projectAndStage === undefined) {
-		return undefined
-	}
-	return potentiallyInvalidClient
 }

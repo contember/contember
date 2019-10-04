@@ -12,7 +12,7 @@ import { ProjectConfig } from '../state/projectsConfigs'
 import { PageRequest } from '../state/request'
 
 import { configureStore, Store } from '../store'
-import Login from './Login'
+import { Login } from './Login'
 import ProjectsList from './ProjectsList'
 import { Config, isValidConfig, ConfigContext, ConfigurationError } from '../config'
 import { Toaster } from './ui/Toaster'

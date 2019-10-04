@@ -1,7 +1,6 @@
 export enum AuthStatus {
 	LOGGED_IN,
 	NOT_LOGGED_IN,
-	LOADING,
 }
 
 export default interface AuthState {

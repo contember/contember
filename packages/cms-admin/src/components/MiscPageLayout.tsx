@@ -12,3 +12,4 @@ export const MiscPageLayout = React.memo<MiscPageLayoutProps>(props => (
 		</div>
 	</Aether>
 ))
+MiscPageLayout.displayName = 'MiscPageLayout'

@@ -1,29 +1,9 @@
 import { GraphQlClient } from 'cms-client'
 import * as React from 'react'
-import { ApiRequestAction } from './ApiRequestAction'
 import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReadyState } from './ApiRequestReadyState'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
 import { ApiRequestState } from './ApiRequestState'
-
-/*
-
-export type SuccessfulApiRequestState<Data> =
-	| {
-			data: Data
-			//extensions: {
-			//	dbQueries: any[] // We don't use this yet.
-			//}
-	  }
-	| {
-			error: {
-				errors: {
-					message: string
-					code: number
-				}[]
-			}
-	  }
- */
 
 const initialState: ApiRequestState<any> = {
 	readyState: ApiRequestReadyState.Uninitialized,
@@ -31,39 +11,47 @@ const initialState: ApiRequestState<any> = {
 
 export const useApiRequest = <SuccessData>(
 	client: GraphQlClient,
-): [ApiRequestState<SuccessData>, (query: string, variables: GraphQlClient.Variables, apiToken?: string) => void] => {
+): [
+	ApiRequestState<SuccessData>,
+	(query: string, variables: GraphQlClient.Variables, apiToken?: string) => Promise<SuccessData>,
+] => {
 	const [state, dispatch] = React.useReducer(apiRequestReducer as ApiRequestReducer<SuccessData>, initialState)
 
 	const isUnmountedRef = React.useRef(false)
 	const sendRequest = React.useCallback(
-		async (query: string, variables: GraphQlClient.Variables = {}, apiToken?: string) => {
+		async (query: string, variables: GraphQlClient.Variables = {}, apiToken?: string): Promise<SuccessData> => {
 			if (isUnmountedRef.current) {
-				return
+				return Promise.reject()
 			}
 			dispatch({
 				type: ApiRequestActionType.Initialize,
 			})
-			client
+			return client
 				.sendRequest<SuccessData>(query, variables, apiToken)
-				.then(data =>
+				.then(data => {
 					dispatch({
 						type: ApiRequestActionType.ResolveSuccessfully,
 						data,
-					}),
-				)
-				.catch((error: GraphQlClient.FailedRequestMetadata) =>
+					})
+					return Promise.resolve(data)
+				})
+				.catch((error: GraphQlClient.FailedRequestMetadata) => {
 					dispatch({
 						type: ApiRequestActionType.ResolveWithError,
 						error,
-					}),
-				)
+					})
+					return Promise.reject()
+				})
 		},
 		[client],
 	)
 
-	React.useEffect(() => () => {
-		isUnmountedRef.current = true
-	})
+	React.useEffect(
+		() => () => {
+			isUnmountedRef.current = true
+		},
+		[], // This empty array is crucial! Otherwise it will first "unmount" before second render no matter what.
+	)
 
 	return [state, sendRequest]
 }

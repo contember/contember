@@ -43,7 +43,7 @@ storiesOf('Icon', module).add('simple', () => {
 				</a>
 			</h1>
 			{blueprintIconNames.map(blueprintIcon => (
-				<div>
+				<div key={blueprintIcon}>
 					<Icon blueprintIcon={blueprintIcon} /> {blueprintIcon}
 				</div>
 			))}

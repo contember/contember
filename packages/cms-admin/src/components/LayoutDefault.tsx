@@ -3,7 +3,6 @@ import cn from 'classnames'
 import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
 import LogoutLink from './LogoutLink'
 import { Avatar, AvatarSize } from './ui'
-import { Icon } from '@blueprintjs/core'
 import { default as PageLink } from './pageRouting/PageLink'
 import { useSelector } from 'react-redux'
 import State from '../state'
@@ -17,6 +16,7 @@ import {
 	Heading,
 } from '@contember/ui'
 import SwitchProjectLink from './SwitchProjectLink'
+import { Icon } from '@contember/ui'
 
 export interface LayoutProps {
 	header: {
@@ -67,7 +67,7 @@ export const LayoutDefault = React.memo((props: LayoutProps) => {
 				<div className="navbar-left">
 					{props.side && (
 						<button className="layout-menuBtn" onClick={toggleMenu}>
-							<Icon icon="menu" />
+							<Icon blueprintIcon="menu" />
 						</button>
 					)}
 					{props.header.title && (

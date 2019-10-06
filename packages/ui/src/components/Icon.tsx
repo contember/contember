@@ -5,6 +5,7 @@ export interface IconProps {
 	children?: never
 	title?: string
 	blueprintIcon: IconName
+	style?: React.CSSProperties
 }
 
 const renderSvgPaths = (iconName: IconName): JSX.Element[] | null => {
@@ -17,7 +18,7 @@ const renderSvgPaths = (iconName: IconName): JSX.Element[] | null => {
 
 export const Icon = React.memo((props: IconProps) => {
 	return (
-		<div className="icon">
+		<div className="icon" style={props.style}>
 			<svg viewBox="0 0 16 16" className="icon-blueprintSvg">
 				{props.title && <desc>{props.title}</desc>}
 				{renderSvgPaths(props.blueprintIcon)}

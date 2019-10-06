@@ -1,7 +1,12 @@
-import { IconName } from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
 import { assertNever } from '@contember/utils'
-import { ButtonGroup, TextInputOwnProps, toEnumStateClass, toEnumViewClass, toViewClass } from '@contember/ui'
+import {
+	ButtonGroup,
+	TextInputOwnProps,
+	IconProps,
+	toEnumStateClass,
+	toEnumViewClass,
+	toViewClass,
+} from '@contember/ui'
 import cn from 'classnames'
 import { isKeyHotkey } from 'is-hotkey'
 import * as React from 'react'
@@ -123,24 +128,24 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 		this.state = { value: this.serializer.deserialize(props.value) }
 	}
 
-	private getIcon(node: Mark | Block): IconName {
+	private getIcon(node: Mark | Block): IconProps['blueprintIcon'] {
 		switch (node) {
 			case Mark.BOLD:
-				return IconNames.BOLD
+				return 'bold'
 			case Mark.ITALIC:
-				return IconNames.ITALIC
+				return 'italic'
 			case Mark.UNDERLINED:
-				return IconNames.UNDERLINE
+				return 'underline'
 			case Mark.LINK:
-				return IconNames.LINK
+				return 'link'
 			case Block.HEADING:
-				return IconNames.HEADER
+				return 'header'
 			case Block.HEADING_H2:
-				return IconNames.HEADER_ONE
+				return 'header-one'
 			case Block.HEADING_H3:
-				return IconNames.HEADER_TWO
+				return 'header-two'
 			case Block.PARAGRAPH:
-				return IconNames.PARAGRAPH
+				return 'paragraph'
 			default:
 				return assertNever(node)
 		}

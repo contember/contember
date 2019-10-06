@@ -1,4 +1,4 @@
-import { Icon } from '@blueprintjs/core'
+import { Icon } from '@contember/ui'
 import moment from 'moment'
 import * as React from 'react'
 import ReactTable, { Column } from 'react-table'
@@ -22,7 +22,7 @@ export default class List extends React.Component {
 				accessor: 'published',
 				Cell: props => (
 					<div className="text-center">
-						<Icon icon={props.value ? 'tick' : 'cross'} intent={props.value ? 'success' : 'none'} />
+						<Icon blueprintIcon={props.value ? 'tick' : 'cross'} />
 					</div>
 				),
 			},

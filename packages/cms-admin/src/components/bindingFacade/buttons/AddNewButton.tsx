@@ -1,12 +1,10 @@
-import { Icon } from '@blueprintjs/core'
-import { IconName, IconNames } from '@blueprintjs/icons'
-import { Button, ButtonProps, FormGroup } from '@contember/ui'
+import { Button, ButtonProps, Icon, IconProps, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { EntityCollectionAccessor, useMutationState } from '../../../binding'
 
 export type AddNewButtonProps = ButtonProps & {
 	addNew: EntityCollectionAccessor['addNew']
-	icon?: IconName
+	icon?: IconProps['blueprintIcon']
 }
 
 export const AddNewButton = React.memo((props: AddNewButtonProps) => {
@@ -18,7 +16,7 @@ export const AddNewButton = React.memo((props: AddNewButtonProps) => {
 			<FormGroup label={undefined}>
 				<Button onClick={addNewCallback} disabled={isMutating} distinction="seamless" flow="block" {...rest}>
 					<Icon
-						icon={icon || IconNames.ADD}
+						blueprintIcon={icon || 'add'}
 						style={{
 							marginRight: '0.2em',
 							position: 'relative',

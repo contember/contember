@@ -1,8 +1,7 @@
-import { Icon, IconName } from '@blueprintjs/core'
 import * as React from 'react'
 import { Editor } from 'slate'
 import { Editor as ReactEditor } from 'slate-react'
-import { Button } from '@contember/ui'
+import { Button, Icon, IconProps } from '@contember/ui'
 
 interface ToolbarProps {
 	children: React.ReactNode
@@ -11,7 +10,7 @@ interface ToolbarProps {
 export const Toolbar: React.SFC<ToolbarProps> = ({ children }) => <div className="toolbar">{children}</div>
 
 interface ActionButtonProps {
-	icon: IconName
+	icon: IconProps['blueprintIcon']
 	onClick: () => unknown | void
 	isActive: boolean
 	disabled?: boolean
@@ -19,7 +18,7 @@ interface ActionButtonProps {
 
 export const ActionButton: React.SFC<ActionButtonProps> = ({ icon, onClick, isActive, disabled }) => (
 	<Button onClick={() => onClick()} distinction="seamless" isActive={isActive} disabled={disabled} flow="squarish">
-		<Icon icon={icon} color="currentColor" />
+		<Icon blueprintIcon={icon} />
 	</Button>
 )
 

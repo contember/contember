@@ -2,10 +2,9 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import ToastsState, { ToastId, ToastType } from '../../state/toasts'
 import State from '../../state'
-import { Icon } from '@blueprintjs/core'
 import { Dispatch } from '../../actions/types'
 import { dismissToast } from '../../actions/toasts'
-import { Button, Intent, Message, MessageProps } from '@contember/ui'
+import { Button, Icon, Intent, Message, MessageProps } from '@contember/ui'
 
 const toastTypeToMessageType: { [K in ToastType]: MessageProps['type'] } = {
 	[ToastType.Success]: 'success',
@@ -40,7 +39,7 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 										this.props.dismissToast(toast.id)
 									}}
 								>
-									<Icon icon="cross" color="white" />
+									<Icon blueprintIcon="cross" />
 								</Button>
 							}
 						>

@@ -1,9 +1,7 @@
-import { Button, TableRow, Table, TableCell, Spinner } from '@contember/ui'
+import { Button, Icon, TableRow, Table, TableCell, Spinner } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cn from 'classnames'
-import { Icon } from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
 import { AnyStageDiff, StageDiffState, EventType } from '../../state/system'
 import State from '../../state'
 import { executeRelease, fetchDiff } from '../../actions/system'
@@ -65,13 +63,13 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 	private renderIcon(type: EventType) {
 		switch (type) {
 			case EventType.RUN_MIGRATION:
-				return <Icon icon={IconNames.CODE} />
+				return <Icon blueprintIcon="code" />
 			case EventType.CREATE:
-				return <Icon icon={IconNames.PLUS} />
+				return <Icon blueprintIcon="plus" />
 			case EventType.UPDATE:
-				return <Icon icon={IconNames.EDIT} />
+				return <Icon blueprintIcon="edit" />
 			case EventType.DELETE:
-				return <Icon icon={IconNames.TRASH} />
+				return <Icon blueprintIcon="trash" />
 			default:
 				assertNever(type)
 		}

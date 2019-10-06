@@ -1,6 +1,4 @@
-import { Icon } from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
-import { Button, ButtonProps } from '@contember/ui'
+import { Button, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
 import { FieldAccessor } from '../../../../binding'
 
@@ -31,7 +29,7 @@ export const ClearFieldButtonInner = (props: ClearFieldButtonInnerProps) => {
 			distinction="seamless"
 			{...buttonProps}
 		>
-			<Icon icon={IconNames.CROSS} color="currentColor" />
+			<Icon blueprintIcon="cross" />
 		</Button>
 	)
 }

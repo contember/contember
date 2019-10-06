@@ -12,6 +12,7 @@
 	},
 	"typings": "dist/src/index.d.ts",
 	"dependencies": {
+		"@blueprintjs/icons": "^3.11.0",
 		"@contember/react-multipass-rendering": "^0.0.0",
 		"@mangoweb/sass-base": "0.0.5",
 		"classnames": "^2.2.6",

@@ -1,15 +1,10 @@
-import { useAuthIdentity, useCurrentContentGraphQlClient, useTenantGraphQlClient } from '../../../apiClient'
+import { useAuthToken, useCurrentContentGraphQlClient, useTenantGraphQlClient } from '../../../apiClient'
 import { useMutation, UseMutationReturn } from './mutation'
 import { useQuery } from './query'
 import { QueryRequestObject } from './requestState'
 
-export const useToken = () => {
-	const auth = useAuthIdentity()
-	return auth ? auth.token : undefined
-}
-
 export const useAuthedTenantQuery = <R, V>(query: string, variables: V): QueryRequestObject<R> => {
-	const token = useToken()
+	const token = useAuthToken()
 	const client = useTenantGraphQlClient()
 	if (client === undefined) {
 		throw new Error('Cannot get a tenant client - maybe missing config context?')
@@ -18,7 +13,7 @@ export const useAuthedTenantQuery = <R, V>(query: string, variables: V): QueryRe
 }
 
 export const useAuthedTenantMutation = <R, V>(query: string): UseMutationReturn<R, V> => {
-	const token = useToken()
+	const token = useAuthToken()
 	const client = useTenantGraphQlClient()
 	if (client === undefined) {
 		throw new Error('Cannot get a tenant client - maybe missing config context?')
@@ -27,7 +22,7 @@ export const useAuthedTenantMutation = <R, V>(query: string): UseMutationReturn<
 }
 
 export const useAuthedContentQuery = <R, V>(query: string, variables: V): QueryRequestObject<R> => {
-	const token = useToken()
+	const token = useAuthToken()
 	const client = useCurrentContentGraphQlClient()
 	if (client === undefined) {
 		throw new Error('Cannot get a tenant client - maybe missing config context?')

@@ -36,7 +36,7 @@ export const Login = React.memo(() => {
 			errors.push('Something went wrong. Please try again.')
 		} else if (requestState.readyState === ApiRequestReadyState.Success) {
 			errors = errors.concat(
-				requestState.data.signIn.errors.map(
+				requestState.data.data.signIn.errors.map(
 					(error: { endUserMessage: string | null; code: string }) =>
 						error.endUserMessage || getTenantErrorMessage(error.code),
 				),
@@ -49,7 +49,7 @@ export const Login = React.memo(() => {
 	const redirect = useRedirect()
 	React.useEffect(() => {
 		if (requestState.readyState === ApiRequestReadyState.Success) {
-			const signIn = requestState.data.signIn
+			const signIn = requestState.data.data.signIn
 
 			if (!signIn.ok) {
 				return

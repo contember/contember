@@ -40,7 +40,7 @@ export const useApiRequest = <SuccessData>(
 						type: ApiRequestActionType.ResolveWithError,
 						error,
 					})
-					return Promise.reject()
+					return Promise.reject(error)
 				})
 		},
 		[client],

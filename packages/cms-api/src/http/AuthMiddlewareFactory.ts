@@ -8,7 +8,7 @@ class AuthMiddlewareFactory {
 	create(): KoaMiddleware<AuthMiddlewareFactory.KoaState> {
 		const auth: KoaMiddleware<AuthMiddlewareFactory.KoaState> = async (ctx, next) => {
 			const authHeader = ctx.request.get('Authorization')
-			if (typeof authHeader !== 'string') {
+			if (typeof authHeader !== 'string' || authHeader === '') {
 				return createGraphqlInvalidAuthResponse(ctx, `Auth failure: Authorization header is missing`)
 			}
 

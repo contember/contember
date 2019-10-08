@@ -8,8 +8,5 @@ export const useCurrentContentGraphQlClient = () => {
 	if (projectAndStage === undefined) {
 		throw new ApiClientError()
 	}
-	return useContentGraphQlClient(
-		projectAndStage ? projectAndStage.project : '',
-		projectAndStage ? projectAndStage.stage : '',
-	)
+	return useContentGraphQlClient(projectAndStage.project, projectAndStage.stage)
 }

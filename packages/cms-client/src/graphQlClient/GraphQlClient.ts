@@ -19,7 +19,7 @@ class GraphQlClient {
 		})
 		if (response.ok) {
 			// It may still have errors (e.g. unfilled fields) but as far as the request goes, it is ok.
-			return (await response.json()).data
+			return await response.json()
 		}
 		const failedRequest: GraphQlClient.FailedRequestMetadata = {
 			status: response.status,

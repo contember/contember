@@ -1,5 +1,6 @@
-import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from '@contember/utils'
+import { GraphQlBuilder } from 'cms-client'
+import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData, Scalar } from '../accessorTree'
 import { ExpectedCount, FieldName, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	Accessor,
@@ -17,7 +18,6 @@ import {
 	ReferenceMarker,
 	RootAccessor,
 } from '../dao'
-import { MutationRequestResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData, Scalar } from '../dataTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
@@ -37,7 +37,7 @@ class AccessorTreeGenerator {
 		persistedData: ReceivedDataTree<undefined> | undefined,
 		initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
 		updateData: AccessorTreeGenerator.UpdateData,
-		errors?: MutationRequestResponse,
+		errors?: MutationDataResponse,
 	): void {
 		const preprocessor = new ErrorsPreprocessor(errors)
 
@@ -123,6 +123,7 @@ class AccessorTreeGenerator {
 						? undefined
 						: this.initialData[field.id],
 					() => undefined,
+					undefined,
 				)
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
@@ -507,7 +508,7 @@ class AccessorTreeGenerator {
 }
 
 namespace AccessorTreeGenerator {
-	export type UpdateData = (newData?: AccessorTreeRoot) => void
+	export type UpdateData = (newData: AccessorTreeRoot) => void
 
 	export type InitialEntityData = ReceivedEntityData<undefined> | EntityAccessor | EntityForRemovalAccessor
 }

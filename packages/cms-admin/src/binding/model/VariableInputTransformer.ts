@@ -2,7 +2,7 @@ import { GraphQlBuilder } from 'cms-client'
 import { assertNever } from '@contember/utils'
 import { By, Filter, VariableInput } from '../bindingTypes'
 import { DataBindingError, Environment, Literal, VariableLiteral, VariableScalar } from '../dao'
-import { Scalar } from '../dataTree'
+import { Scalar } from '../accessorTree'
 
 export class VariableInputTransformer {
 	public static transformFilter(

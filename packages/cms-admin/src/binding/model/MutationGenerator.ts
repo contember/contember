@@ -18,7 +18,7 @@ import {
 	ReferenceMarker,
 	RootAccessor,
 } from '../dao'
-import { ReceivedData, ReceivedEntityData, Scalar } from '../dataTree'
+import { ReceivedData, ReceivedEntityData, Scalar } from '../accessorTree'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 

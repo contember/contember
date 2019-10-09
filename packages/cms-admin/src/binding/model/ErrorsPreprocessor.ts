@@ -1,10 +1,10 @@
 import { assertNever } from '@contember/utils'
+import { MutationDataResponse, MutationError, MutationResponse } from '../accessorTree'
 import { ErrorAccessor } from '../dao'
-import { MutationError, MutationRequestResponse, MutationResponse } from '../dataTree'
 import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {
-	public constructor(private readonly requestResponse?: MutationRequestResponse) {}
+	public constructor(private readonly requestResponse?: MutationDataResponse) {}
 
 	public preprocess(): ErrorsPreprocessor.ErrorTreeRoot {
 		const treeRoot: ErrorsPreprocessor.ErrorTreeRoot = {}

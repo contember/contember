@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { Scalar } from '../../../dataTree'
+import { Scalar } from '../../../accessorTree'
 import { Component } from '../../auxiliary'
 import { LiteralStaticOption, ScalarStaticOption } from '../../fields/ChoiceField'
 

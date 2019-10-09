@@ -3,7 +3,7 @@ import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { Filter, RelativeEntityList, RelativeSingleEntity, RelativeSingleField, VariableInput } from '../bindingTypes'
 import { ErrorAccessor } from '../dao'
-import { Scalar } from '../dataTree'
+import { Scalar } from '../accessorTree'
 
 export type RelativeLabelPosition = 'top' | 'left' | 'right'
 

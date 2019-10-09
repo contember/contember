@@ -11,7 +11,7 @@ import {
 	ToOne,
 } from '../../../coreComponents'
 import { EntityAccessor, Environment, Literal, VariableLiteral, VariableScalar } from '../../../dao'
-import { Scalar } from '../../../dataTree'
+import { Scalar } from '../../../accessorTree'
 import { QueryLanguage } from '../../../queryLanguage'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
 import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'

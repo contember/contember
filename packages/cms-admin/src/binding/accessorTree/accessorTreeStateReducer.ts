@@ -16,15 +16,13 @@ export const accessorTreeStateReducer = (
 				}
 			}
 			if (
-				(previousState.name === AccessorTreeStateName.Uninitialized ||
-					previousState.name === AccessorTreeStateName.Querying) &&
-				actionData.metaOperations
+				previousState.name === AccessorTreeStateName.Uninitialized ||
+				previousState.name === AccessorTreeStateName.Querying
 			) {
 				return {
 					...actionData,
 					name: AccessorTreeStateName.Interactive,
 					isDirty: previousState.name === AccessorTreeStateName.Uninitialized,
-					metaOperations: actionData.metaOperations,
 				}
 			}
 			if (previousState.name === AccessorTreeStateName.Mutating) {
@@ -32,7 +30,6 @@ export const accessorTreeStateReducer = (
 					...actionData,
 					name: AccessorTreeStateName.Interactive,
 					isDirty: false,
-					metaOperations: previousState.metaOperations,
 				}
 			}
 			return previousState // Ignore input in other states

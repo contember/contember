@@ -1,5 +1,6 @@
-import { AccessorTreeRoot, MetaOperationsAccessor } from '../dao'
+import { AccessorTreeRoot } from '../dao'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
+import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'
 
 export type AccessorTreeStateAction =
@@ -10,7 +11,7 @@ export type AccessorTreeStateAction =
 	| {
 			type: AccessorTreeStateActionType.SetData
 			data: AccessorTreeRoot
-			metaOperations?: MetaOperationsAccessor
+			triggerPersist: () => Promise<SuccessfulPersistResult>
 	  }
 	| {
 			type: AccessorTreeStateActionType.InitializeQuery

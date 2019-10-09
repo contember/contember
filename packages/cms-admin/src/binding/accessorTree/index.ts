@@ -1,6 +1,7 @@
 export * from './AccessorTreeState'
 export * from './AccessorTreeStateAction'
 export * from './AccessorTreeStateActionType'
+export * from './AccessorTreeStateContext'
 export * from './accessorTreeStateReducer'
 export * from './metadataToRequestError'
 export * from './MutationRequestResponse'

@@ -77,6 +77,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 						dispatch({
 							type: AccessorTreeStateActionType.SetData,
 							data: latestAccessorTree,
+							triggerPersist,
 						})
 						if (!allSubMutationsOk) {
 							return Promise.reject({
@@ -96,6 +97,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 								dispatch({
 									type: AccessorTreeStateActionType.SetData,
 									data: accessorTree,
+									triggerPersist,
 								})
 							})
 							return Promise.resolve({
@@ -107,6 +109,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 							dispatch({
 								type: AccessorTreeStateActionType.SetData,
 								data: latestAccessorTree,
+								triggerPersist,
 							})
 							// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
 							// data made it successfully to the server. Thus we'll just resolve from here no matter what.
@@ -122,11 +125,6 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 		})
 	}, [accessorTreeGenerator, authToken, markerTree, query, rejectFailedRequest, sendMutation, sendQuery])
 
-	const metaOperations = React.useMemo(() => new MetaOperationsAccessor(markerTree.id, triggerPersist), [
-		markerTree.id,
-		triggerPersist,
-	])
-
 	const initializeAccessorTree = React.useCallback(
 		(
 			persistedData: ReceivedDataTree<undefined> | undefined,
@@ -141,13 +139,13 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 					dispatch({
 						type: AccessorTreeStateActionType.SetData,
 						data: accessorTree,
-						metaOperations,
+						triggerPersist,
 					})
 				},
 				errors,
 			)
 		},
-		[accessorTreeGenerator, metaOperations],
+		[accessorTreeGenerator, triggerPersist],
 	)
 
 	React.useEffect(() => {

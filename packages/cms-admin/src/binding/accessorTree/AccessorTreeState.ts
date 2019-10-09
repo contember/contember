@@ -1,4 +1,5 @@
-import { AccessorTreeRoot, MarkerTreeRoot, MetaOperationsAccessor } from '../dao'
+import { AccessorTreeRoot, MarkerTreeRoot } from '../dao'
+import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'
 
 export enum AccessorTreeStateName {
@@ -28,13 +29,13 @@ export type AccessorTreeState =
 			name: AccessorTreeStateName.Mutating
 			data: AccessorTreeRoot
 
-			// This will really just no-ops but we want to avoid having to un-render all e.g. persist buttons
-			metaOperations: MetaOperationsAccessor
+			// This is really a no-op but we want to avoid having to un-render all e.g. persist buttons
+			triggerPersist: () => Promise<SuccessfulPersistResult>
 	  } & AccessorTreeGlobalState)
 	| ({
 			name: AccessorTreeStateName.Interactive
 			data: AccessorTreeRoot
-			metaOperations: MetaOperationsAccessor
+			triggerPersist: () => Promise<SuccessfulPersistResult>
 	  } & AccessorTreeGlobalState)
 
 export type AccessorTreeGlobalStateById = {

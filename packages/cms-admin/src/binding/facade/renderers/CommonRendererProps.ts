@@ -1,6 +1,5 @@
 import { TitleBarProps } from '@contember/ui'
 import * as React from 'react'
-import { DataRendererProps } from '../../coreComponents'
 
 export interface TitleBarRendererProps extends Omit<TitleBarProps, 'children'> {
 	title?: React.ReactNode
@@ -13,4 +12,4 @@ export interface CommonRendererProps extends TitleBarRendererProps {
 	onlyOneInCollection?: boolean
 }
 
-export interface RendererProps extends CommonRendererProps, DataRendererProps {}
+export interface RendererProps extends CommonRendererProps {}

@@ -9,14 +9,9 @@ import {
 	SortEndHandler,
 } from 'react-sortable-hoc'
 import { DragHandle as DragHandleIcon } from '../../../components/ui'
+import { useMutationState } from '../../accessorTree'
 import { FieldName } from '../../bindingTypes'
-import {
-	EnforceSubtypeRelation,
-	EnvironmentContext,
-	Field,
-	MutationStateContext,
-	SyntheticChildrenProvider,
-} from '../../coreComponents'
+import { EnforceSubtypeRelation, EnvironmentContext, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
@@ -109,7 +104,7 @@ namespace Sortable {
 
 	export const SortableList = React.memo(
 		SortableContainer((props: SortableListProps & SortableContainerProps) => {
-			const isMutating = React.useContext(MutationStateContext)
+			const isMutating = useMutationState()
 			return (
 				<Repeater.Cloneable
 					prependNew={props.prependNew}

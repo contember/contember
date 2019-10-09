@@ -1,10 +1,11 @@
-import { Button, ButtonGroup, Spinner, Dropdown, ButtonBasedButtonProps } from '@contember/ui'
+import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown, Spinner } from '@contember/ui'
 import * as React from 'react'
+import { useContext } from 'react'
 import { Checkbox, Link, useRedirect } from '../../../../components'
 import { RequestChange } from '../../../../state/request'
-import { EnvironmentContext, ToOne } from '../../../coreComponents'
-import { AccessorTreeRoot, EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../../dao'
-import { RendererProps } from '../../renderers'
+import { AccessorTreeState, AccessorTreeStateContext, AccessorTreeStateName } from '../../../accessorTree'
+import { ToOne, useEnvironment } from '../../../coreComponents'
+import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../../dao'
 import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 
@@ -18,8 +19,9 @@ export interface DimensionsRendererProps {
 	slugField: string
 }
 
-export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsRendererProps) => {
-	const environment = React.useContext(EnvironmentContext)
+export const DimensionsRenderer = React.memo((props: DimensionsRendererProps) => {
+	const accessorTreeState = useContext(AccessorTreeStateContext)
+	const environment = useEnvironment()
 	const redirect = useRedirect()
 
 	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
@@ -109,9 +111,9 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 
 	const getNormalizedData = (
 		currentDimensions: string[],
-		data?: AccessorTreeRoot,
+		treeState: AccessorTreeState,
 	): StatefulDimensionDatum[] | undefined => {
-		if (!data) {
+		if (treeState.name !== AccessorTreeStateName.Interactive) {
 			return undefined
 			/*return currentDimensions.map(dimension => {
 				return {
@@ -121,7 +123,8 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 				}
 			})*/
 		}
-		const entities = data.root instanceof EntityCollectionAccessor ? data.root.entities : [data.root]
+		const entities =
+			treeState.data.root instanceof EntityCollectionAccessor ? treeState.data.root.entities : [treeState.data.root]
 		const normalized: StatefulDimensionDatum[] = []
 
 		for (const entity of entities) {
@@ -157,7 +160,7 @@ export const DimensionsRenderer = React.memo((props: RendererProps & DimensionsR
 	}
 
 	const uniqueDimensions = getUniqueDimensions(environment.getDimension(props.dimension) || [])
-	const normalizedData = getNormalizedData(uniqueDimensions, props.data)
+	const normalizedData = getNormalizedData(uniqueDimensions, accessorTreeState)
 
 	const selectedDimensions = normalizedData
 		? uniqueDimensions

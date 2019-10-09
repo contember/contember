@@ -1,18 +1,16 @@
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { ErrorPersistResult } from '../../accessorTree'
-import { DirtinessContext, MetaOperationsContext, MutationStateContext } from '../../coreComponents'
+import { ErrorPersistResult, useDirtinessState, useMutationState, useTriggerPersist } from '../../accessorTree'
 
 export type PersistButtonProps = ButtonProps
 
 export const PersistButton = React.memo((props: PersistButtonProps) => {
-	const isMutating = React.useContext(MutationStateContext)
-	const isDirty = React.useContext(DirtinessContext)
-	const value = React.useContext(MetaOperationsContext)
+	const isMutating = useMutationState()
+	const isDirty = useDirtinessState()
+	const triggerPersist = useTriggerPersist()
 	const buttonRef = React.useRef<HTMLButtonElement | null>(null)
 	const onClick = React.useCallback(() => {
-		value!
-			.triggerPersist()
+		triggerPersist!()
 			.catch((result: ErrorPersistResult) => {
 				console.log('persist error', result)
 
@@ -22,11 +20,11 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 				console.log('persist success', result)
 			})
 		//buttonRef.current && buttonRef.current.blur()
-	}, [value])
+	}, [triggerPersist])
 
 	const isDisabled = isMutating || !isDirty
 
-	if (!value) {
+	if (!triggerPersist) {
 		return null
 	}
 	return (

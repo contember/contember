@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useRedirect } from '../../../../components/pageRouting'
 import {
 	DataBindingError,
 	EntityListDataProvider,
@@ -18,7 +17,7 @@ export interface DimensionsSwitcherBaseProps
 	minItems?: number
 	maxItems?: number
 	labelField: string
-	orderBy?: EntityListDataProviderProps<unknown>['orderBy']
+	orderBy?: EntityListDataProviderProps['orderBy']
 	filter?: string | Filter
 }
 
@@ -50,23 +49,16 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 	)
 
 	return (
-		<EntityListDataProvider<DimensionsRendererProps>
-			entityName={metadata.entityName}
-			immutable={!props.filter}
-			orderBy={props.orderBy}
-			filter={props.filter}
-			renderer={DimensionsRenderer}
-			rendererProps={{
-				buttonProps: props.buttonProps,
-				dimension: props.dimension,
-				labelFactory: metadata.children,
-				minItems: minItems,
-				maxItems: maxItems,
-				renderSelected: props.renderSelected,
-				slugField: props.slugField,
-			}}
-		>
-			{metadata.children}
+		<EntityListDataProvider entityName={metadata.entityName} orderBy={props.orderBy} filter={props.filter}>
+			<DimensionsRenderer
+				buttonProps={props.buttonProps}
+				dimension={props.dimension}
+				labelFactory={metadata.children}
+				minItems={minItems}
+				maxItems={maxItems}
+				renderSelected={props.renderSelected}
+				slugField={props.slugField}
+			/>
 		</EntityListDataProvider>
 	)
 })

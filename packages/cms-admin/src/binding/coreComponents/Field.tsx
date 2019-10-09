@@ -1,6 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { DataTreeMutationState } from '../../state/dataTrees'
+import { Scalar, useMutationState } from '../accessorTree'
 import { FieldName, RelativeSingleField, VariableInput } from '../bindingTypes'
 import {
 	DataBindingError,
@@ -11,14 +12,12 @@ import {
 	FieldAccessor,
 	FieldMarker,
 } from '../dao'
-import { Scalar } from '../dataTree'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
 import { AccessorContext, AccessorContextValue } from './AccessorContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
-import { EnvironmentContext } from './EnvironmentContext'
+import { useEnvironment } from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
-import { MutationStateContext } from './PersistState'
 
 export interface FieldPublicProps {
 	name: RelativeSingleField
@@ -132,8 +131,8 @@ namespace Field {
 	}
 
 	export const DataRetriever = React.memo((props: DataRetrieverProps) => {
-		const environment = React.useContext(EnvironmentContext)
-		const isMutating = React.useContext(MutationStateContext)
+		const environment = useEnvironment()
+		const isMutating = useMutationState()
 
 		const propsName = props.name
 		const propsChildren = props.children

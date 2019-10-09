@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import { FieldName } from '../bindingTypes'
-import { Scalar } from '../dataTree'
+import { Scalar } from '../accessorTree'
 import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'

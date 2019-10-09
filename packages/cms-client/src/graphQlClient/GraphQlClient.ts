@@ -12,6 +12,8 @@ class GraphQlClient {
 			headers['Authorization'] = `Bearer ${apiToken}`
 		}
 
+		console.debug(query)
+
 		const response = await fetch(this.apiUrl, {
 			method: 'POST',
 			headers,

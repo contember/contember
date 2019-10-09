@@ -1,7 +1,6 @@
 import { combineReducers } from 'redux'
 import State from '../state'
 import Auth from './auth'
-import { dataTreesReducer } from './dataTrees'
 import ProjectsConfigs from './projectsConfigs'
 import Request from './request'
 import System from './system'
@@ -16,6 +15,5 @@ export default combineReducers<State>({
 	projectsConfigs: ProjectsConfigs,
 	upload: Upload,
 	toasts: Toasts,
-	dataTrees: dataTreesReducer,
 	system: System,
 })

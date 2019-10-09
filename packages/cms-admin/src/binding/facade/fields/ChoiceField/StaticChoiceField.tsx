@@ -2,7 +2,7 @@ import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { Field } from '../../../coreComponents'
 import { DataBindingError, Environment, VariableLiteral, VariableScalar } from '../../../dao'
-import { Scalar } from '../../../dataTree'
+import { Scalar } from '../../../accessorTree'
 import { VariableInputTransformer } from '../../../model/VariableInputTransformer'
 import { ChoiceArity, ChoiceField } from './ChoiceField'
 

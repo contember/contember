@@ -1,6 +1,7 @@
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { DirtinessContext, ErrorPersistResult, MetaOperationsContext, MutationStateContext } from '../../coreComponents'
+import { ErrorPersistResult } from '../../accessorTree'
+import { DirtinessContext, MetaOperationsContext, MutationStateContext } from '../../coreComponents'
 
 export type PersistButtonProps = ButtonProps
 
@@ -12,11 +13,13 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 	const onClick = React.useCallback(() => {
 		value!
 			.triggerPersist()
-			.then(result => {
-				console.log('persist success', result)
-			})
 			.catch((result: ErrorPersistResult) => {
 				console.log('persist error', result)
+
+				return Promise.reject()
+			})
+			.then(result => {
+				console.log('persist success', result)
 			})
 		//buttonRef.current && buttonRef.current.blur()
 	}, [value])

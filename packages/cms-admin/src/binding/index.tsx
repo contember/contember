@@ -1,6 +1,6 @@
 export * from './accessorRetrievers'
 export * from './coreComponents'
 export * from './dao'
-export * from './dataTree'
+export * from './accessorTree'
 export * from './facade'
 export * from './bindingTypes'

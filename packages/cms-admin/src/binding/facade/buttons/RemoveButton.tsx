@@ -1,7 +1,8 @@
 import { IconName } from '@blueprintjs/icons'
 import { Button, ButtonOwnProps, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, MetaOperationsContext, MutationStateContext } from '../../coreComponents'
+import { useMutationState, useTriggerPersist } from '../../accessorTree'
+import { AccessorContext } from '../../coreComponents'
 import { EntityAccessor } from '../../dao'
 import { RemovalType } from '../types'
 
@@ -15,8 +16,8 @@ export type RemoveButtonProps = ButtonProps & {
 export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 	const { removeType, icon, children, immediatePersist, ...rest } = props
 	const value = React.useContext(AccessorContext)
-	const metaOperations = React.useContext(MetaOperationsContext)
-	const isMutating = React.useContext(MutationStateContext)
+	const triggerPersist = useTriggerPersist()
+	const isMutating = useMutationState()
 	const onClick = React.useCallback(() => {
 		if (!(value instanceof EntityAccessor) || !value.remove) {
 			return
@@ -26,10 +27,10 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		}
 		value.remove(mapToRemovalType(props.removeType))
 
-		if (props.immediatePersist && metaOperations) {
-			setTimeout(() => metaOperations.triggerPersist(), 100) // TODO This is a *nasty* hack.
+		if (props.immediatePersist && triggerPersist) {
+			setTimeout(() => triggerPersist(), 100) // TODO This is a *nasty* hack.
 		}
-	}, [metaOperations, props.immediatePersist, props.removeType, value])
+	}, [triggerPersist, props.immediatePersist, props.removeType, value])
 
 	if (!(value instanceof EntityAccessor)) {
 		return null

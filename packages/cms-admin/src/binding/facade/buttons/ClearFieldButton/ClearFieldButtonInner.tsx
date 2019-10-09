@@ -2,14 +2,13 @@ import { Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { MutationStateContextValue } from '../../../coreComponents'
 import { FieldAccessor } from '../../../dao'
 
 export type ClearFieldButtonInnerPublicProps = ButtonProps
 
 export interface ClearFieldButtonInnerInternalProps {
 	field: FieldAccessor
-	isMutating: MutationStateContextValue
+	isMutating: boolean
 }
 
 export type ClearFieldButtonInnerProps = ClearFieldButtonInnerPublicProps & ClearFieldButtonInnerInternalProps

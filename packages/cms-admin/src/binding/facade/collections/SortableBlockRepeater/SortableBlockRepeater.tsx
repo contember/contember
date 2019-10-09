@@ -1,8 +1,9 @@
 import { FieldSet } from '@contember/ui'
 import * as React from 'react'
 import { useRelativeEntityList } from '../../../accessorRetrievers'
+import { useMutationState } from '../../../accessorTree'
 import { RelativeSingleField } from '../../../bindingTypes'
-import { MutationStateContext, ToMany } from '../../../coreComponents'
+import { ToMany } from '../../../coreComponents'
 import { Component } from '../../auxiliary'
 import { DiscriminatedBlocks, NormalizedBlockProps } from '../../ui/blocks'
 import { useNormalizedBlockList } from '../../ui/blocks/useNormalizedBlockList'
@@ -19,7 +20,7 @@ export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
 export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 	props => {
 		const collectionAccessor = useRelativeEntityList(props.field)
-		const isMutating = React.useContext(MutationStateContext)
+		const isMutating = useMutationState()
 		const normalizedBlockList: NormalizedBlockProps[] = useNormalizedBlockList(props.children)
 		const blockChildren = React.useMemo(
 			// This is to avoid unnecessary re-renders

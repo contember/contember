@@ -2,7 +2,7 @@ import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { MutationStateContext } from '../../coreComponents'
+import { useMutationState } from '../../accessorTree'
 import { EntityCollectionAccessor } from '../../dao'
 
 export type AddNewButtonProps = ButtonProps & {
@@ -11,7 +11,7 @@ export type AddNewButtonProps = ButtonProps & {
 }
 
 export const AddNewButton = React.memo((props: AddNewButtonProps) => {
-	const isMutating = React.useContext(MutationStateContext)
+	const isMutating = useMutationState()
 	const { addNew, icon, ...rest } = props
 	const addNewCallback = React.useCallback(() => addNew && addNew(), [addNew])
 	if (addNew) {

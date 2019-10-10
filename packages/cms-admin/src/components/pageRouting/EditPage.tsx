@@ -1,43 +1,20 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
-import { DataRendererProps, EnvironmentContext, SingleEntityDataProvider } from '../../binding/coreComponents'
-import { CommonRendererProps } from '../../binding/facade/renderers'
-import { ParametersContext } from './Pages'
-import { SpecificPageProps } from './SpecificPageProps'
+import { SingleEntityDataProvider } from '../../binding/coreComponents'
+import { SingleEntityPageProps } from './SingleEntityPageProps'
 
-interface EditPageProps<DRP> extends SpecificPageProps<DRP> {}
+interface EditPageProps extends SingleEntityPageProps {}
 
-export class EditPage<DRP extends CommonRendererProps = CommonRendererProps> extends React.Component<
-	EditPageProps<DRP>
-> {
-	static getPageName(props: EditPageProps<DataRendererProps>) {
-		return props.pageName || `edit_${lcfirst(props.entity)}`
+export class EditPage extends React.Component<EditPageProps> {
+	static getPageName(props: EditPageProps) {
+		return props.pageName || `edit_${lcfirst(props.entityName)}`
 	}
 
 	render(): React.ReactNode {
 		return (
-			<ParametersContext.Consumer>
-				{parameters => (
-					<EnvironmentContext.Consumer>
-						{environment => (
-							<SingleEntityDataProvider
-								where={
-									typeof this.props.where === 'function'
-										? this.props.where(parameters, environment)
-										: this.props.where === undefined
-										? parameters
-										: this.props.where
-								}
-								entityName={this.props.entity}
-								renderer={this.props.renderer}
-								rendererProps={this.props.rendererProps}
-							>
-								{this.props.children}
-							</SingleEntityDataProvider>
-						)}
-					</EnvironmentContext.Consumer>
-				)}
-			</ParametersContext.Consumer>
+			<SingleEntityDataProvider where={this.props.where} entityName={this.props.entityName}>
+				{this.props.children}
+			</SingleEntityDataProvider>
 		)
 	}
 }

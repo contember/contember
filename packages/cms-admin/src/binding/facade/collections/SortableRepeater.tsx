@@ -1,9 +1,8 @@
 import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { EnvironmentContext, ToMany, ToManyProps } from '../../coreComponents'
+import { Component, EnvironmentContext, ToMany, ToManyProps } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
-import { Component } from '../auxiliary'
 import { Repeater } from './Repeater'
 import { Sortable, SortablePublicProps } from './Sortable'
 

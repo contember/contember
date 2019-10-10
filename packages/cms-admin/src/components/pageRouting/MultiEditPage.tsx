@@ -1,33 +1,23 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
-import { DataRendererProps, EntityListDataProvider } from '../../binding/coreComponents'
-import { MultiEditRenderer, MultiEditRendererProps } from '../../binding/facade/renderers'
-import { SpecificPageProps } from './SpecificPageProps'
-import { Input } from '@contember/schema'
-import { CrudQueryBuilder } from 'cms-client'
+import { EntityListDataProvider } from '../../binding/coreComponents'
+import { EntityListPageProps } from './EntityListPageProps'
 
-interface MultiEditPageProps<DRP extends MultiEditRendererProps> extends SpecificPageProps<DRP> {
-	orderBy?: Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
-}
+interface MultiEditPageProps extends EntityListPageProps {}
 
-export class MultiEditPage<DRP extends MultiEditRendererProps = MultiEditRendererProps> extends React.Component<
-	MultiEditPageProps<DRP>
-> {
-	static getPageName(props: MultiEditPageProps<MultiEditRendererProps>) {
-		return props.pageName || `multiEdit_${lcfirst(props.entity)}`
+export class MultiEditPage extends React.PureComponent<MultiEditPageProps> {
+	static getPageName(props: MultiEditPageProps) {
+		return props.pageName || `multiEdit_${lcfirst(props.entityName)}`
 	}
 
 	render(): React.ReactNode {
 		return (
-			<EntityListDataProvider<DRP>
-				entityName={this.props.entity}
+			<EntityListDataProvider
+				entityName={this.props.entityName}
 				orderBy={this.props.orderBy}
-				renderer={
-					this.props.renderer ||
-					// The as any cast is necessary because MultiEditRenderer is also a namespace… 🙄
-					((MultiEditRenderer as any) as React.ComponentType<DRP & DataRendererProps>)
-				}
-				rendererProps={this.props.rendererProps}
+				offset={this.props.offset}
+				limit={this.props.limit}
+				filter={this.props.filter}
 			>
 				{this.props.children}
 			</EntityListDataProvider>

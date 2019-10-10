@@ -4,10 +4,10 @@ import * as React from 'react'
 import { useEntityContext, useRelativeSingleField } from '../../accessorRetrievers'
 import { useMutationState } from '../../accessorTree'
 import { RelativeSingleField } from '../../bindingTypes'
-import { useEnvironment } from '../../coreComponents'
+import { Component, useEnvironment } from '../../coreComponents'
 import { Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
-import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &

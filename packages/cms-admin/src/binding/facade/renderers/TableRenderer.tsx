@@ -1,18 +1,14 @@
 import * as React from 'react'
-import { Table, TableRow } from '@contember/ui'
-import { AccessorContext, DataRendererProps } from '../../coreComponents'
-import { CollectionRenderer } from './CollectionRenderer'
-import { CommonRendererProps } from './CommonRendererProps'
-import { DefaultRenderer } from './DefaultRenderer'
+import { CommonRendererProps } from './CommonRenderer'
 
 export interface TableRendererProps extends CommonRendererProps {
 	tableHeader?: React.ReactNode
 }
 
-export class TableRenderer extends React.PureComponent<DataRendererProps & TableRendererProps> {
+export class TableRenderer extends React.PureComponent<any & TableRendererProps> {
 	public render() {
-		return (
-			<CollectionRenderer data={this.props.data}>
+		return null
+		/*<CollectionRenderer data={this.props.data}>
 				{(rawData, entities) => (
 					<>
 						{DefaultRenderer.renderTitleBar(this.props)}
@@ -29,7 +25,6 @@ export class TableRenderer extends React.PureComponent<DataRendererProps & Table
 						{!!entities.length || <div>There are no items to display.</div>}
 					</>
 				)}
-			</CollectionRenderer>
-		)
+			</CollectionRenderer>*/
 	}
 }

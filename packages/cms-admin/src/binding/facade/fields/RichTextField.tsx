@@ -1,10 +1,10 @@
 import { TextInputOwnProps } from '@contember/ui'
 import * as React from 'react'
 import RichEditor, { LineBreakBehavior, RichEditorProps } from '../../../components/RichEditor'
-import { Field } from '../../coreComponents'
+import { Component, Field } from '../../coreComponents'
 import { FieldAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
-import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export { LineBreakBehavior, Block as BlockType, Mark } from '../../../components/RichEditor'
 

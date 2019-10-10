@@ -2,9 +2,9 @@ import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
 import { EntityName, FieldName } from '../bindingTypes'
 import { MarkerTreeRoot, SugaredSingleEntityTreeConstraints } from '../dao'
-import { Component } from '../facade/auxiliary'
+import { Component } from './Component'
 
-export interface SingleEntityDataProviderProps extends SugaredSingleEntityTreeConstraints {
+export interface SingleEntityDataProviderProps extends Omit<SugaredSingleEntityTreeConstraints, 'whereType'> {
 	entityName: EntityName
 	associatedField?: FieldName
 	children: React.ReactNode

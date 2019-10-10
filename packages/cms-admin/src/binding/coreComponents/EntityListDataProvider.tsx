@@ -2,7 +2,7 @@ import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
 import { EntityName, FieldName } from '../bindingTypes'
 import { MarkerTreeRoot, SugaredEntityListTreeConstraints } from '../dao'
-import { Component } from '../facade/auxiliary'
+import { Component } from './Component'
 
 export interface EntityListDataProviderProps extends Omit<SugaredEntityListTreeConstraints, 'whereType'> {
 	entityName: EntityName

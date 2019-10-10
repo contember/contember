@@ -3,8 +3,8 @@ import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { RelativeSingleField, UniqueWhere } from '../bindingTypes'
 import { ConnectionMarker } from '../dao'
-import { Component } from '../facade/auxiliary'
 import { QueryLanguage } from '../queryLanguage'
+import { Component } from './Component'
 
 export interface ConnectionProps {
 	field: RelativeSingleField

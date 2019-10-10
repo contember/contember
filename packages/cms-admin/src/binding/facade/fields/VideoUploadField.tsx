@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Field } from '../../coreComponents'
+import { Component } from '../../coreComponents'
 import { QueryLanguage } from '../../queryLanguage'
-import { Component, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { UploadField } from './UploadField'
 
 export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps

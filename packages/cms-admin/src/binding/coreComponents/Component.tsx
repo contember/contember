@@ -1,7 +1,7 @@
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
-import { MarkerProvider, SyntheticChildrenProvider } from '../../coreComponents'
-import { Environment } from '../../dao'
+import { Environment } from '../dao'
+import { MarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
 
 function Component<P extends {}>(
 	statelessRender: React.FunctionComponent<P>,

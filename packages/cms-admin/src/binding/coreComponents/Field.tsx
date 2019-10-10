@@ -1,6 +1,5 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { DataTreeMutationState } from '../../state/dataTrees'
 import { Scalar, useMutationState } from '../accessorTree'
 import { FieldName, RelativeSingleField, VariableInput } from '../bindingTypes'
 import {
@@ -31,7 +30,7 @@ export interface FieldMetadata<
 	fieldName: FieldName
 	data: FieldAccessor<Persisted, Produced>
 	errors: ErrorAccessor[]
-	isMutating: DataTreeMutationState
+	isMutating: boolean
 	environment: Environment
 }
 

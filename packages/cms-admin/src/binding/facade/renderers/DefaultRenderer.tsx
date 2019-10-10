@@ -1,17 +1,35 @@
-import { TitleBar, IncreaseHeadingDepth } from '@contember/ui'
+import { ContainerSpinner, IncreaseHeadingDepth, TitleBar } from '@contember/ui'
 import * as React from 'react'
 import { LayoutInner, LayoutSide } from '../../../components'
+import { AccessorTreeStateContext, AccessorTreeStateName } from '../../accessorTree'
 import { AccessorContext } from '../../coreComponents'
+import { Component } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, Environment } from '../../dao'
 import { PersistButton } from '../buttons'
-import { RendererProps, TitleBarRendererProps } from './CommonRendererProps'
-import { FeedbackRenderer } from './FeedbackRenderer'
+import { CommonRendererProps } from './CommonRenderer'
 
-export class DefaultRenderer extends React.PureComponent<RendererProps> {
-	public render() {
+export interface DefaultRendererProps extends CommonRendererProps {
+	persistButtonComponent: React.ComponentType
+	side?: React.ReactNode
+}
+
+export const DefaultRenderer = Component<DefaultRendererProps>(
+	props => {
+		return null
+		/*const accessorTreeState = React.useContext(AccessorTreeStateContext)
+
+		if (accessorTreeState.name === AccessorTreeStateName.Uninitialized || accessorTreeState.name === AccessorTreeStateName.Querying) {
+			return <ContainerSpinner />
+		}
+		if (accessorTreeState.name === AccessorTreeStateName.RequestError) {
+			return 'Faill'
+		}
+
 		const content = (
 			<>
-				{DefaultRenderer.renderTitleBar(this.props)}
+				<TitleBar navigation={navigation} actions={actions} headingProps={headingProps}>
+					{title}
+				</TitleBar>
 				<IncreaseHeadingDepth currentDepth={1}>{this.props.children}</IncreaseHeadingDepth>
 			</>
 		)
@@ -64,26 +82,13 @@ export class DefaultRenderer extends React.PureComponent<RendererProps> {
 					}
 				}}
 			</FeedbackRenderer>
-		)
-	}
-
-	public static renderTitleBar({ title, navigation, actions, headingProps }: TitleBarRendererProps): React.ReactNode {
-		if (title) {
-			return (
-				<TitleBar navigation={navigation} actions={actions} headingProps={headingProps}>
-					{title}
-				</TitleBar>
-			)
-		}
-		return null
-	}
-
-	public static generateSyntheticChildren(props: RendererProps, environment: Environment): React.ReactNode {
-		return (
-			<>
-				{props.side}
-				{props.children}
-			</>
-		)
-	}
-}
+		)*/
+	},
+	(props: DefaultRendererProps, environment: Environment): React.ReactNode => (
+		<>
+			{props.side}
+			{props.children}
+		</>
+	),
+	'DefaultRenderer',
+)

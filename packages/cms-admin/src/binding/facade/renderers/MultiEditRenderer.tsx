@@ -1,25 +1,23 @@
 import * as React from 'react'
-import { LayoutInner } from '../../../components'
-import { DataRendererProps, EnforceSubtypeRelation, SyntheticChildrenProvider } from '../../coreComponents'
+import { EnforceSubtypeRelation, SyntheticChildrenProvider } from '../../coreComponents'
 import { EntityAccessor } from '../../dao'
-import { PersistButton, RemoveButton } from '../buttons'
+import { RemoveButton } from '../buttons'
 import { Repeater, Sortable, SortablePublicProps } from '../collections'
-import { CollectionRenderer } from './CollectionRenderer'
-import { CommonRendererProps } from './CommonRendererProps'
+import { CommonRendererProps } from './CommonRenderer'
 import { DefaultRenderer } from './DefaultRenderer'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
-import { Box } from '@contember/ui'
 
 export interface MultiEditRendererProps extends CommonRendererProps, EntityCollectionPublicProps {
 	enablePersist?: boolean
 	sortable?: SortablePublicProps
 }
 
-class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & DataRendererProps> {
+class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & any> {
 	public static displayName = 'MultiEditRenderer'
 
 	public render() {
-		return (
+		return null
+		/*return (
 			<CollectionRenderer data={this.props.data}>
 				{rawData => (
 					<LayoutInner>
@@ -58,13 +56,12 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & Dat
 					</LayoutInner>
 				)}
 			</CollectionRenderer>
-		)
+		)*/
 	}
 
 	public static generateSyntheticChildren(props: MultiEditRendererProps) {
 		return (
 			<>
-				{DefaultRenderer.renderTitleBar(props)}
 				{props.sortable !== undefined && <Sortable {...props.sortable} />}
 				{props.children}
 			</>

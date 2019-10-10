@@ -1,11 +1,10 @@
-import * as React from 'react'
 import { FormGroupProps } from '@contember/ui'
 import { GraphQlBuilder } from 'cms-client'
-import { Field, FieldMetadata, FieldPublicProps, SyntheticChildrenProvider } from '../../../coreComponents'
-import { Environment } from '../../../dao'
+import * as React from 'react'
 import { Scalar } from '../../../accessorTree'
+import { Component, Field, FieldMetadata, FieldPublicProps, SyntheticChildrenProvider } from '../../../coreComponents'
+import { Environment } from '../../../dao'
 import { QueryLanguage } from '../../../queryLanguage'
-import { Component } from '../Component'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeSingleFieldProxy'
 
 export type SimpleRelativeSingleFieldProps = FieldPublicProps & Omit<FormGroupProps, 'children'>

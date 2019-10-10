@@ -1,4 +1,5 @@
 export * from './AccessorContext'
+export * from './Component'
 export * from './Connection'
 export * from './EnforceSubtypeRelation'
 export * from './EntityCreator'

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Select } from '../../../components'
 import { FieldName } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
-import { Component } from '../auxiliary'
+import { Component } from '../../coreComponents'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
 
 export type MultipleSelectFieldPublicProps = FormGroupProps & {

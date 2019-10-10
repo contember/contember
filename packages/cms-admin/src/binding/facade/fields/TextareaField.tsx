@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component } from '../auxiliary'
+import { Component } from '../../coreComponents'
 import { TextField, TextFieldProps } from './TextField'
 
 export type TextareaFieldProps = TextFieldProps

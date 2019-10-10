@@ -1,4 +1,4 @@
-import { Button, TableRow, Table, TableCell } from '@contember/ui'
+import { Button, TableRow, Table, TableCell, Spinner } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cn from 'classnames'
@@ -8,7 +8,6 @@ import { AnyStageDiff, StageDiffState, EventType } from '../../state/system'
 import State from '../../state'
 import { executeRelease, fetchDiff } from '../../actions/system'
 import { Dispatch } from '../../actions/types'
-import { LoadingSpinner } from '../../binding/facade/renderers/userFeedback'
 import { assertNever } from '@contember/utils'
 
 enum SelectionType {
@@ -84,7 +83,7 @@ class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.D
 			return null
 		}
 		if (diff.state === StageDiffState.DIFF_FETCHING) {
-			return <LoadingSpinner />
+			return <Spinner />
 		}
 		if (diff.state === StageDiffState.DIFF_FAILED) {
 			return `Failed loading because ${diff.errors && diff.errors.join(', ')}`

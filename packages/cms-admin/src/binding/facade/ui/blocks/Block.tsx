@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import { Scalar } from '../../../accessorTree'
-import { Component } from '../../auxiliary'
+import { Component } from '../../../coreComponents'
 import { LiteralStaticOption, ScalarStaticOption } from '../../fields/ChoiceField'
 
 export interface BlockCommonProps {

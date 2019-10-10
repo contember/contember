@@ -3,7 +3,7 @@ import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { RelativeSingleField } from '../../bindingTypes'
 import { Environment, ErrorAccessor } from '../../dao'
-import { Component } from '../auxiliary'
+import { Component } from '../../coreComponents'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
 
 export interface RadioFieldPublicProps extends Omit<FormGroupProps, 'children'> {

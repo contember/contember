@@ -1,7 +1,7 @@
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { RelativeSingleField } from '../../../bindingTypes'
-import { Component } from '../../auxiliary'
+import { Component } from '../../../coreComponents'
 import { SelectFieldInner } from '../../fields'
 import {
 	ChoiceArity,

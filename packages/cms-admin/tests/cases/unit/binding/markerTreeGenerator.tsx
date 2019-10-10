@@ -36,7 +36,11 @@ describe('Marker tree generator', () => {
 	})
 
 	it('should enforce mandatory children', () => {
-		const list = <EntityListDataProvider filter={{ foo: {} }} entityName="Foo" />
+		const list = (
+			<EntityListDataProvider filter={{ foo: {} }} entityName="Foo">
+				<></>
+			</EntityListDataProvider>
+		)
 		const toOne = (
 			<SingleEntityDataProvider where={{ foo: '' }} entityName="Foo">
 				<ToOne field="foo" />

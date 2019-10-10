@@ -1,7 +1,5 @@
-import { IFormGroupProps } from '@blueprintjs/core'
 import * as React from 'react'
 import { SelectedDimension } from '../../state/request'
-import SystemMiddleware = Environment.SystemMiddleware
 
 class Environment {
 	private readonly names: Environment.NameStore
@@ -127,7 +125,7 @@ class Environment {
 		N extends Environment.SystemMiddlewareName,
 		A extends Parameters<Exclude<Environment.SystemMiddleware[N], undefined>>
 	>(name: N, ...args: A): ReturnType<Exclude<Environment.SystemMiddleware[N], undefined>> | A {
-		const middleware: SystemMiddleware[N] = this.names[name]
+		const middleware: Environment.SystemMiddleware[N] = this.names[name]
 		if (typeof middleware === 'function') {
 			return (middleware as (...args: A) => any)(...args)
 		}
@@ -141,7 +139,7 @@ namespace Environment {
 	export type Value = React.ReactNode
 
 	export interface SystemVariables {
-		labelMiddleware?: (label: IFormGroupProps['label']) => React.ReactNode
+		labelMiddleware?: (label: React.ReactNode) => React.ReactNode
 	}
 
 	export const systemVariableNames: Set<SystemVariableName> = new Set(['labelMiddleware'])

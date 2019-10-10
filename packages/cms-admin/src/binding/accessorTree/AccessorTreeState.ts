@@ -10,34 +10,41 @@ export enum AccessorTreeStateName {
 	Mutating = 'mutating',
 }
 
-export interface AccessorTreeGlobalState {
+export interface UninitializedAccessorTreeState {
+	name: AccessorTreeStateName.Uninitialized
+}
+
+export interface QueryingAccessorTreeState {
+	name: AccessorTreeStateName.Querying
+}
+
+export interface MutatingAccessorTreeState {
+	name: AccessorTreeStateName.Mutating
+	data: AccessorTreeRoot
+	// This is really a no-op but we want to avoid having to un-render all e.g. persist buttons
+	triggerPersist: () => Promise<SuccessfulPersistResult>
 	isDirty: boolean
 }
 
-export type AccessorTreeState =
-	| {
-			name: AccessorTreeStateName.Uninitialized
-	  }
-	| {
-			name: AccessorTreeStateName.Querying
-	  }
-	| {
-			name: AccessorTreeStateName.RequestError
-			error: RequestError
-	  }
-	| ({
-			name: AccessorTreeStateName.Mutating
-			data: AccessorTreeRoot
-
-			// This is really a no-op but we want to avoid having to un-render all e.g. persist buttons
-			triggerPersist: () => Promise<SuccessfulPersistResult>
-	  } & AccessorTreeGlobalState)
-	| ({
-			name: AccessorTreeStateName.Interactive
-			data: AccessorTreeRoot
-			triggerPersist: () => Promise<SuccessfulPersistResult>
-	  } & AccessorTreeGlobalState)
-
-export type AccessorTreeGlobalStateById = {
-	[Id in MarkerTreeRoot.TreeId]: AccessorTreeGlobalState
+export interface InteractiveAccessorTreeState {
+	name: AccessorTreeStateName.Interactive
+	data: AccessorTreeRoot
+	triggerPersist: () => Promise<SuccessfulPersistResult>
+	isDirty: boolean
 }
+
+export interface RequestErrorAccessorTreeState {
+	name: AccessorTreeStateName.RequestError
+	error: RequestError
+}
+
+export type AccessorTreeState =
+	| UninitializedAccessorTreeState
+	| QueryingAccessorTreeState
+	| MutatingAccessorTreeState
+	| RequestErrorAccessorTreeState
+	| InteractiveAccessorTreeState
+
+//export type AccessorTreeGlobalStateById = {
+//	[Id in MarkerTreeRoot.TreeId]: any
+//}

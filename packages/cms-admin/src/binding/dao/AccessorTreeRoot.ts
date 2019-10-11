@@ -16,4 +16,8 @@ export class AccessorTreeRoot {
 	) {
 		this.id = markerTreeRoot.id
 	}
+
+	public map<T>(mapper: (accessor: EntityAccessor | EntityForRemovalAccessor | undefined) => T): T[] {
+		return (this.root instanceof EntityCollectionAccessor ? this.root.entities : [this.root]).map(mapper)
+	}
 }

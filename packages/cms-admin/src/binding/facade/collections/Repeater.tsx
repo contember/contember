@@ -56,7 +56,7 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 namespace Repeater {
 	export interface ItemPublicProps {
 		removeType?: RemoveButtonProps['removeType']
-		children?: React.ReactNode
+		children: React.ReactNode
 	}
 
 	export interface ItemProps extends ItemPublicProps {

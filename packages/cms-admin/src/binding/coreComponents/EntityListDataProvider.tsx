@@ -12,7 +12,10 @@ export interface EntityListDataProviderProps extends Omit<SugaredEntityListTreeC
 
 export const EntityListDataProvider = Component<EntityListDataProviderProps>(
 	props => {
-		const accessorTreeState = useAccessorTreeState(props.children)
+		const children = React.useMemo(() => <EntityListDataProvider {...props}>{props.children}</EntityListDataProvider>, [
+			props,
+		])
+		const accessorTreeState = useAccessorTreeState(children)
 
 		return (
 			<AccessorTreeStateContext.Provider value={accessorTreeState}>{props.children}</AccessorTreeStateContext.Provider>

@@ -1,5 +1,7 @@
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
+import { useShowToast } from '../../../components/ui'
+import { ToastType } from '../../../state/toasts'
 import { ErrorPersistResult, useDirtinessState, useMutationState, useTriggerPersist } from '../../accessorTree'
 
 export type PersistButtonProps = ButtonProps
@@ -9,18 +11,28 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 	const isDirty = useDirtinessState()
 	const triggerPersist = useTriggerPersist()
 	const buttonRef = React.useRef<HTMLButtonElement | null>(null)
+	const showToast = useShowToast()
 	const onClick = React.useCallback(() => {
-		triggerPersist!()
-			.catch((result: ErrorPersistResult) => {
-				console.log('persist error', result)
+		if (!triggerPersist) {
+			return
+		}
 
-				return Promise.reject()
-			})
+		triggerPersist()
 			.then(result => {
+				showToast({
+					type: ToastType.Success,
+					message: 'Success!',
+				})
 				console.log('persist success', result)
 			})
-		//buttonRef.current && buttonRef.current.blur()
-	}, [triggerPersist])
+			.catch((result: ErrorPersistResult) => {
+				console.log('persist error', result)
+				showToast({
+					type: ToastType.Error,
+					message: 'Error!',
+				})
+			})
+	}, [showToast, triggerPersist])
 
 	const isDisabled = isMutating || !isDirty
 

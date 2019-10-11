@@ -13,7 +13,7 @@ import { SyntheticChildrenProvider } from './MarkerProvider'
 export interface ToManyProps {
 	field: RelativeEntityList
 	preferences?: ReferenceMarker.ReferencePreferences
-	children?: React.ReactNode
+	children: React.ReactNode
 }
 
 class ToMany extends React.PureComponent<ToManyProps> {

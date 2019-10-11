@@ -12,7 +12,11 @@ export interface SingleEntityDataProviderProps extends Omit<SugaredSingleEntityT
 
 export const SingleEntityDataProvider = Component<SingleEntityDataProviderProps>(
 	props => {
-		const accessorTreeState = useAccessorTreeState(props.children)
+		const children = React.useMemo(
+			() => <SingleEntityDataProvider {...props}>{props.children}</SingleEntityDataProvider>,
+			[props],
+		)
+		const accessorTreeState = useAccessorTreeState(children)
 
 		return (
 			<AccessorTreeStateContext.Provider value={accessorTreeState}>{props.children}</AccessorTreeStateContext.Provider>

@@ -1,0 +1,110 @@
+import { IncreaseHeadingDepth, TitleBar, TitleBarProps } from '@contember/ui'
+import * as React from 'react'
+import { LayoutInner, LayoutSide } from '../../../components'
+import { AccessorTreeStateWithDataContext } from '../../accessorTree'
+import { AccessorContext, Component } from '../../coreComponents'
+import { EntityCollectionAccessor } from '../../dao'
+import { PersistButton } from '../buttons'
+import { CommonRenderer, CommonRendererProps } from './CommonRenderer'
+
+export interface ContentLayoutRendererProps extends ContentLayoutRendererInnerProps {}
+
+export const ContentLayoutRenderer = Component<ContentLayoutRendererProps>(
+	props => (
+		<CommonRenderer>
+			<ContentLayoutRendererInner {...props} />
+		</CommonRenderer>
+	),
+	'ContentLayoutRenderer',
+)
+
+interface ContentLayoutRendererInnerProps extends CommonRendererProps, Omit<TitleBarProps, 'children'> {
+	persistButtonComponent?: React.ComponentType
+	side?: React.ReactNode
+	title?: React.ReactNode
+	beforeContent?: React.ReactNode
+	afterContent?: React.ReactNode
+}
+
+const ContentLayoutRendererInner = Component<ContentLayoutRendererInnerProps>(
+	({
+		side,
+		persistButtonComponent: PersistButtonComponent = PersistButton,
+		children,
+		title,
+		beforeContent,
+		afterContent,
+
+		navigation,
+		actions,
+		headingProps,
+	}) => {
+		const accessorTreeState = React.useContext(AccessorTreeStateWithDataContext)
+		const titleBar = React.useMemo(
+			() =>
+				title && (
+					<TitleBar navigation={navigation} actions={actions} headingProps={headingProps}>
+						{title}
+					</TitleBar>
+				),
+			[actions, headingProps, navigation, title],
+		)
+		const content = React.useMemo(() => <IncreaseHeadingDepth currentDepth={1}>{children}</IncreaseHeadingDepth>, [
+			children,
+		])
+
+		if (accessorTreeState === undefined) {
+			return null
+		}
+
+		const data = accessorTreeState.data.root
+
+		return (
+			<>
+				<LayoutInner>
+					{data instanceof EntityCollectionAccessor ? (
+						<>
+							{titleBar}
+							{beforeContent}
+							{data.entities.map(
+								value =>
+									value && (
+										<AccessorContext.Provider value={value} key={value.getKey()}>
+											{content}
+										</AccessorContext.Provider>
+									),
+							)}
+							{afterContent}
+						</>
+					) : (
+						<AccessorContext.Provider value={data}>
+							{titleBar}
+							{beforeContent}
+							{content}
+							{afterContent}
+						</AccessorContext.Provider>
+					)}
+				</LayoutInner>
+				<LayoutSide>
+					{data instanceof EntityCollectionAccessor ? (
+						side
+					) : (
+						<AccessorContext.Provider value={data}>{side}</AccessorContext.Provider>
+					)}
+					<PersistButtonComponent />
+				</LayoutSide>
+			</>
+		)
+	},
+	props => (
+		<>
+			{props.title}
+			{props.beforeContent}
+			{props.children}
+			{props.afterContent}
+			{props.side}
+			{props.persistButtonComponent}
+		</>
+	),
+	'ContentLayoutRendererInner',
+)

@@ -57,19 +57,20 @@ const ContentLayoutRendererInner = Component<ContentLayoutRendererInnerProps>(
 			return null
 		}
 
-		const data = accessorTreeState.data.root
+		const data = accessorTreeState.data
+		const root = data.root
 
 		return (
 			<>
 				<LayoutInner>
-					{data instanceof EntityCollectionAccessor ? (
+					{root instanceof EntityCollectionAccessor ? (
 						<>
 							{titleBar}
 							{beforeContent}
-							{data.entities.map(
-								value =>
-									value && (
-										<AccessorContext.Provider value={value} key={value.getKey()}>
+							{data.map(
+								accessor =>
+									accessor && (
+										<AccessorContext.Provider value={accessor} key={accessor.getKey()}>
 											{content}
 										</AccessorContext.Provider>
 									),
@@ -77,7 +78,7 @@ const ContentLayoutRendererInner = Component<ContentLayoutRendererInnerProps>(
 							{afterContent}
 						</>
 					) : (
-						<AccessorContext.Provider value={data}>
+						<AccessorContext.Provider value={root}>
 							{titleBar}
 							{beforeContent}
 							{content}
@@ -86,11 +87,15 @@ const ContentLayoutRendererInner = Component<ContentLayoutRendererInnerProps>(
 					)}
 				</LayoutInner>
 				<LayoutSide>
-					{data instanceof EntityCollectionAccessor ? (
-						side
-					) : (
-						<AccessorContext.Provider value={data}>{side}</AccessorContext.Provider>
-					)}
+					{side &&
+						data.map(
+							accessor =>
+								accessor && (
+									<AccessorContext.Provider value={accessor} key={accessor.getKey()}>
+										{side}
+									</AccessorContext.Provider>
+								),
+						)}
 					<PersistButtonComponent />
 				</LayoutSide>
 			</>

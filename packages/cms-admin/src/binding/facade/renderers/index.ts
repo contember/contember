@@ -1,4 +1,5 @@
 export * from './CommonRenderer'
+export * from './ContentLayoutRenderer'
 export * from './DefaultRenderer'
 export * from './MultiEditRenderer'
 export * from './TableRenderer'

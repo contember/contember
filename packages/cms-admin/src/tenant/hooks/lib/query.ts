@@ -28,10 +28,10 @@ export const useQuery = <R, V>(
 	const fetch = React.useCallback((client: GraphQlClient, query: string, vars: V, apiToken?: string) => {
 		if (client) {
 			setState({ loading: true, finished: false, error: false })
-			client.sendRequest<R>(query, vars, apiToken).then(
+			client.sendRequest<{ data: R }>(query, vars, apiToken).then(
 				data => {
 					setState({
-						data: data,
+						data: data.data,
 						loading: false,
 						finished: true,
 						error: false,

@@ -11,7 +11,7 @@ export interface NothingToPersistPersistResult {
 
 export interface JustSuccessPersistResult {
 	type: PersistResultSuccessType.JustSuccess
-	persistedEntityId: string
+	persistedEntityIds: string[]
 }
 
 export enum MutationErrorType {

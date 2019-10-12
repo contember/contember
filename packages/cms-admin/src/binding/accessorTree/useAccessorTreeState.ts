@@ -71,23 +71,36 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 			return sendMutation(mutation, {}, authToken)
 				.catch(rejectFailedRequest)
 				.then(data => {
-					const allSubMutationsOk = data.data !== null && Object.keys(data.data).every(item => data.data[item].ok)
+					const aliases = data.data === null ? [] : Object.keys(data.data)
+					const allSubMutationsOk = aliases.every(item => data.data[item].ok)
+					const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
 
-					if (!allSubMutationsOk || !query) {
+					if (!allSubMutationsOk) {
+						accessorTreeGenerator.generateLiveTree(
+							persistedData,
+							latestAccessorTree,
+							accessorTree => {
+								dispatch({
+									type: AccessorTreeStateActionType.SetData,
+									data: accessorTree,
+									triggerPersist,
+								})
+							},
+							data.data,
+						)
+						return Promise.reject({
+							type: MutationErrorType.InvalidInput,
+						})
+					}
+					if (!query) {
 						dispatch({
 							type: AccessorTreeStateActionType.SetData,
 							data: latestAccessorTree,
 							triggerPersist,
 						})
-						if (!allSubMutationsOk) {
-							return Promise.reject({
-								type: MutationErrorType.InvalidInput,
-							})
-						}
-
 						return Promise.resolve({
 							type: PersistResultSuccessType.JustSuccess,
-							persistedEntityId: data.data[markerTree.id].node.id,
+							persistedEntityIds,
 						})
 					}
 
@@ -102,7 +115,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 							})
 							return Promise.resolve({
 								type: PersistResultSuccessType.JustSuccess,
-								persistedEntityId: data.data[markerTree.id].node.id,
+								persistedEntityIds,
 							})
 						})
 						.catch(() => {
@@ -115,7 +128,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 							// data made it successfully to the server. Thus we'll just resolve from here no matter what.
 							return Promise.resolve({
 								type: PersistResultSuccessType.JustSuccess,
-								persistedEntityId: data.data[markerTree.id].node.id,
+								persistedEntityIds,
 							})
 						})
 				})

@@ -1,3 +1,4 @@
+import { Message } from '@contember/ui'
 import cn from 'classnames'
 import * as React from 'react'
 import {
@@ -9,13 +10,13 @@ import {
 	SortEndHandler,
 } from 'react-sortable-hoc'
 import { DragHandle as DragHandleIcon } from '../../../components/ui'
+import { EnvironmentContext } from '../../accessorRetrievers'
 import { useMutationState } from '../../accessorTree'
 import { FieldName } from '../../bindingTypes'
-import { EnforceSubtypeRelation, EnvironmentContext, Field, SyntheticChildrenProvider } from '../../coreComponents'
+import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
-import { Message } from '@contember/ui'
 
 export interface SortablePublicProps extends EntityCollectionPublicProps {
 	sortBy: FieldName

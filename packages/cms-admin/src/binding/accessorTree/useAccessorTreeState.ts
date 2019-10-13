@@ -2,7 +2,7 @@ import { GraphQlClient } from 'cms-client'
 import * as React from 'react'
 import { ApiRequestReadyState, useAuthToken } from '../../apiClient'
 import { useContentApiRequest } from '../../apiClient/useContentApiRequest'
-import { EnvironmentContext } from '../coreComponents'
+import { useEnvironment } from '../accessorRetrievers'
 import { AccessorTreeRoot } from '../dao'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
@@ -23,7 +23,7 @@ const initialState: AccessorTreeState = {
 }
 
 export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeState => {
-	const environment = React.useContext(EnvironmentContext)
+	const environment = useEnvironment()
 	const authToken = useAuthToken()
 
 	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, environment).generate(), [

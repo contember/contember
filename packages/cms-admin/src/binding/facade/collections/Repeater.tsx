@@ -1,13 +1,7 @@
 import { FieldSet, FieldSetProps } from '@contember/ui'
 import * as React from 'react'
-import {
-	AccessorContext,
-	EnforceSubtypeRelation,
-	EnvironmentContext,
-	SyntheticChildrenProvider,
-	ToMany,
-	ToManyProps,
-} from '../../coreComponents'
+import { AccessorContext, EnvironmentContext } from '../../accessorRetrievers'
+import { EnforceSubtypeRelation, SyntheticChildrenProvider, ToMany, ToManyProps } from '../../coreComponents'
 import { EntityAccessor, EntityCollectionAccessor, Environment } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { AddNewButton, RemoveButton, RemoveButtonProps } from '../buttons'

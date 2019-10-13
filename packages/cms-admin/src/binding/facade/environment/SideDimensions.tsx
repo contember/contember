@@ -1,10 +1,6 @@
 import * as React from 'react'
-import {
-	EnforceSubtypeRelation,
-	EnvironmentContext,
-	EnvironmentDeltaProvider,
-	SyntheticChildrenProvider,
-} from '../../coreComponents'
+import { EnvironmentContext } from '../../accessorRetrievers'
+import { EnforceSubtypeRelation, EnvironmentDeltaProvider, SyntheticChildrenProvider } from '../../coreComponents'
 import { DataBindingError, Environment } from '../../dao'
 
 interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {

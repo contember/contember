@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useEnvironment } from '../../coreComponents'
+import { useEnvironment } from '../../accessorRetrievers'
 import { Environment } from '../../dao'
 
 interface VariableProps {

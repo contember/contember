@@ -1,11 +1,11 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { RelativeSingleField } from '../bindingTypes'
-import { useEnvironment } from '../coreComponents'
 import { Scalar } from '../accessorTree'
+import { RelativeSingleField } from '../bindingTypes'
 import { Parser } from '../queryLanguage'
 import { getNestedField } from './getNestedField'
 import { useEntityContext } from './useEntityContext'
+import { useEnvironment } from './useEnvironment'
 
 export const useRelativeSingleField = <
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,

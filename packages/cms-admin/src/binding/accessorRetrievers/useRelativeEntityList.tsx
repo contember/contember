@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { RelativeEntityList } from '../bindingTypes'
-import { useEnvironment } from '../coreComponents'
 import { EntityCollectionAccessor } from '../dao'
 import { Parser } from '../queryLanguage'
 import { getNestedEntityList } from './getNestedEntityList'
 import { useEntityContext } from './useEntityContext'
+import { useEnvironment } from './useEnvironment'
 
 export const useRelativeEntityList = (field: RelativeEntityList): EntityCollectionAccessor => {
 	const entity = useEntityContext()

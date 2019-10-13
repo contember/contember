@@ -1,5 +1,6 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
+import { AccessorContext, useEnvironment } from '../accessorRetrievers'
 import { Scalar, useMutationState } from '../accessorTree'
 import { FieldName, RelativeSingleField, VariableInput } from '../bindingTypes'
 import {
@@ -13,9 +14,7 @@ import {
 } from '../dao'
 import { VariableInputTransformer } from '../model/VariableInputTransformer'
 import { QueryLanguage } from '../queryLanguage'
-import { AccessorContext, AccessorContextValue } from './AccessorContext'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
-import { useEnvironment } from './EnvironmentContext'
 import { FieldMarkerProvider } from './MarkerProvider'
 
 export interface FieldPublicProps {
@@ -99,7 +98,7 @@ class Field<
 
 namespace Field {
 	export interface RawMetadata extends Omit<FieldMetadata, 'data' | 'errors'> {
-		data: AccessorContextValue
+		data: undefined | EntityAccessor | EntityForRemovalAccessor
 	}
 
 	export interface FieldInnerProps<
@@ -139,7 +138,7 @@ namespace Field {
 		return React.useMemo(() => {
 			return QueryLanguage.wrapRelativeSingleField(propsName, environment, fieldName => (
 				<AccessorContext.Consumer>
-					{(data: AccessorContextValue) => (
+					{(data: undefined | EntityAccessor | EntityForRemovalAccessor) => (
 						<RawMetadataGenerator fieldName={fieldName} data={data} isMutating={isMutating} environment={environment}>
 							{propsChildren}
 						</RawMetadataGenerator>

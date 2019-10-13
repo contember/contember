@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
 import { EntityName, FieldName } from '../bindingTypes'
-import { MarkerTreeRoot, SugaredEntityListTreeConstraints } from '../dao'
+import { MarkerFactory } from '../queryLanguage'
 import { Component } from './Component'
 
-export interface EntityListDataProviderProps extends Omit<SugaredEntityListTreeConstraints, 'whereType'> {
+export interface EntityListDataProviderProps extends Omit<MarkerFactory.SugaredEntityListTreeConstraints, 'whereType'> {
 	entityName: EntityName
 	associatedField?: FieldName
 	children: React.ReactNode
@@ -23,7 +23,7 @@ export const EntityListDataProvider = Component<EntityListDataProviderProps>(
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerTreeRoot.createFromSugaredEntityListConstraints(
+			MarkerFactory.createEntityListMarkerTreeRoot(
 				environment,
 				props.entityName,
 				fields,

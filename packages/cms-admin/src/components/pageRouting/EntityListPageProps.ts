@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { EntityName, SugaredEntityListTreeConstraints } from '../../binding'
+import { EntityName } from '../../binding'
+import { MarkerFactory } from '../../binding/queryLanguage'
 
 export interface EntityListPageProps {
 	entityName: EntityName
-	orderBy?: SugaredEntityListTreeConstraints['orderBy']
-	offset?: SugaredEntityListTreeConstraints['offset']
-	limit?: SugaredEntityListTreeConstraints['limit']
-	filter?: SugaredEntityListTreeConstraints['filter']
+	orderBy?: MarkerFactory.SugaredEntityListTreeConstraints['orderBy']
+	offset?: MarkerFactory.SugaredEntityListTreeConstraints['offset']
+	limit?: MarkerFactory.SugaredEntityListTreeConstraints['limit']
+	filter?: MarkerFactory.SugaredEntityListTreeConstraints['filter']
 	pageName?: string
 	children?: React.ReactNode
 }

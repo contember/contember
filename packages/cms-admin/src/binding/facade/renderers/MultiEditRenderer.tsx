@@ -4,12 +4,12 @@ import { EntityAccessor } from '../../dao'
 import { RemoveButton } from '../buttons'
 import { Repeater, Sortable, SortablePublicProps } from '../collections'
 import { CommonRendererProps } from './CommonRenderer'
-import { DefaultRenderer } from './DefaultRenderer'
+import { ContentLayoutRendererProps } from './ContentLayoutRenderer'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
-export interface MultiEditRendererProps extends CommonRendererProps, EntityCollectionPublicProps {
+export interface MultiEditRendererProps extends ContentLayoutRendererProps, EntityCollectionPublicProps {
 	enablePersist?: boolean
-	sortable?: SortablePublicProps
+	sortable?: Omit<SortablePublicProps, 'children'>
 }
 
 class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & any> {
@@ -62,8 +62,8 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & any
 	public static generateSyntheticChildren(props: MultiEditRendererProps) {
 		return (
 			<>
-				{props.sortable !== undefined && <Sortable {...props.sortable} />}
-				{props.children}
+				{props.sortable !== undefined && <Sortable {...props.sortable}>{props.children}</Sortable>}
+				{props.sortable && props.children}
 			</>
 		)
 	}

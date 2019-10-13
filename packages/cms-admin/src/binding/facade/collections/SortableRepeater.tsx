@@ -1,6 +1,7 @@
 import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { Component, EnvironmentContext, ToMany, ToManyProps } from '../../coreComponents'
+import { useEnvironment } from '../../accessorRetrievers'
+import { Component, ToMany, ToManyProps } from '../../coreComponents'
 import { EntityCollectionAccessor } from '../../dao'
 import { QueryLanguage } from '../../queryLanguage'
 import { Repeater } from './Repeater'
@@ -12,7 +13,7 @@ export interface SortableRepeaterProps extends ToManyProps, Repeater.EntityColle
 
 export const SortableRepeater = Component<SortableRepeaterProps>(
 	props => {
-		const environment = React.useContext(EnvironmentContext)
+		const environment = useEnvironment()
 
 		return QueryLanguage.wrapRelativeEntityList(
 			props.field,

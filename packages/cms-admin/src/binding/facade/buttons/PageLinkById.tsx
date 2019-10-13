@@ -2,8 +2,7 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import { InnerProps } from '../../../components/Link'
 import PageLink, { PageConfig } from '../../../components/pageRouting/PageLink'
-import { AccessorContext } from '../../coreComponents'
-import { DataBindingError, EntityAccessor, EntityForRemovalAccessor } from '../../dao'
+import { useEntityContext } from '../../accessorRetrievers'
 
 interface PageLinkByIdProps {
 	change: (id: string) => PageConfig
@@ -12,21 +11,16 @@ interface PageLinkByIdProps {
 }
 
 export const PageLinkById = React.memo(function(props: PageLinkByIdProps) {
-	const data = React.useContext(AccessorContext)
+	const data = useEntityContext()
 
-	if (data instanceof EntityAccessor) {
-		const id = data.primaryKey
+	const id = data.primaryKey
 
-		if (typeof id === 'string') {
-			return (
-				<PageLink to={() => props.change(id)} Component={props.Component}>
-					{props.children}
-				</PageLink>
-			)
-		}
-		return null
-	} else if (data instanceof EntityForRemovalAccessor) {
-		return null // Do nothing
+	if (typeof id === 'string') {
+		return (
+			<PageLink to={() => props.change(id)} Component={props.Component}>
+				{props.children}
+			</PageLink>
+		)
 	}
-	throw new DataBindingError('Corrupted data')
+	return null
 })

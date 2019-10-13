@@ -48,7 +48,9 @@ describe('Marker tree generator', () => {
 		)
 		const toMany = (
 			<SingleEntityDataProvider where={{ foo: '' }} entityName="Foo">
-				<ToMany field="foo" />
+				<ToMany field="foo">
+					<></>
+				</ToMany>
 			</SingleEntityDataProvider>
 		)
 

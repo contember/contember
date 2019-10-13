@@ -1,15 +1,13 @@
+import { Input } from '@contember/schema'
 import { ErrorList } from '@contember/ui'
 import { GraphQlBuilder } from 'cms-client'
-import { Input } from '@contember/schema'
 import * as React from 'react'
-import { useEntityAccessor } from '../accessorRetrievers'
+import { AccessorContext, EnvironmentContext, useEntityAccessor } from '../accessorRetrievers'
 import { ExpectedCount, FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { QueryLanguage } from '../queryLanguage'
-import { AccessorContext } from './AccessorContext'
 import { Component } from './Component'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
-import { EnvironmentContext } from './EnvironmentContext'
 import { SyntheticChildrenProvider } from './MarkerProvider'
 
 export interface ToOneProps {

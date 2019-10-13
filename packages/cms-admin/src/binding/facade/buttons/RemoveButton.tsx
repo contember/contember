@@ -2,7 +2,7 @@ import { IconName } from '@blueprintjs/icons'
 import { Button, ButtonOwnProps, ButtonProps } from '@contember/ui'
 import * as React from 'react'
 import { useMutationState, useTriggerPersist } from '../../accessorTree'
-import { AccessorContext } from '../../coreComponents'
+import { AccessorContext } from '../../accessorRetrievers'
 import { EntityAccessor } from '../../dao'
 import { RemovalType } from '../types'
 

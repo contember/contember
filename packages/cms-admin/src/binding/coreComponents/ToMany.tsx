@@ -1,13 +1,11 @@
 import { ErrorList } from '@contember/ui'
 import * as React from 'react'
-import { useEntityCollectionAccessor } from '../accessorRetrievers'
+import { AccessorContext, EnvironmentContext, useEntityCollectionAccessor } from '../accessorRetrievers'
 import { ExpectedCount, FieldName, Filter, RelativeEntityList } from '../bindingTypes'
 import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { QueryLanguage } from '../queryLanguage'
-import { AccessorContext } from './AccessorContext'
 import { Component } from './Component'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
-import { EnvironmentContext } from './EnvironmentContext'
 import { SyntheticChildrenProvider } from './MarkerProvider'
 
 export interface ToManyProps {

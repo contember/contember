@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { CommonRendererProps } from './CommonRenderer'
+import { ContentLayoutRendererProps } from './ContentLayoutRenderer'
 
-export interface TableRendererProps extends CommonRendererProps {
+export interface TableRendererProps extends ContentLayoutRendererProps {
 	tableHeader?: React.ReactNode
 }
 

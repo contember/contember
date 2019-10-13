@@ -5,5 +5,5 @@ export interface SingleEntityPageProps {
 	entityName: EntityName
 	where: SugaredSingleEntityTreeConstraints['where']
 	pageName?: string
-	children?: React.ReactNode
+	children: React.ReactNode
 }

@@ -1,26 +1,28 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
 import { EntityListDataProvider } from '../../binding/coreComponents'
+import { MultiEditRenderer, MultiEditRendererProps } from '../../binding/facade/renderers'
 import { EntityListPageProps } from './EntityListPageProps'
+import { PageProvider } from './PageProvider'
 
-interface MultiEditPageProps extends EntityListPageProps {}
-
-export class MultiEditPage extends React.PureComponent<MultiEditPageProps> {
-	static getPageName(props: MultiEditPageProps) {
-		return props.pageName || `multiEdit_${lcfirst(props.entityName)}`
-	}
-
-	render(): React.ReactNode {
-		return (
-			<EntityListDataProvider
-				entityName={this.props.entityName}
-				orderBy={this.props.orderBy}
-				offset={this.props.offset}
-				limit={this.props.limit}
-				filter={this.props.filter}
-			>
-				{this.props.children}
-			</EntityListDataProvider>
-		)
-	}
+interface MultiEditPageProps extends EntityListPageProps {
+	rendererProps?: Omit<MultiEditRendererProps, 'children'>
 }
+
+const MultiEditPage: Partial<PageProvider<MultiEditPageProps>> & React.ComponentType<MultiEditPageProps> = React.memo(
+	(props: MultiEditPageProps) => (
+		<EntityListDataProvider
+			entityName={props.entityName}
+			orderBy={props.orderBy}
+			offset={props.offset}
+			limit={props.limit}
+			filter={props.filter}
+		>
+			<MultiEditRenderer {...props.rendererProps}>{props.children}</MultiEditRenderer>
+		</EntityListDataProvider>
+	),
+)
+
+MultiEditPage.getPageName = (props: MultiEditPageProps) => props.pageName || `multiEdit_${lcfirst(props.entityName)}`
+
+export { MultiEditPage }

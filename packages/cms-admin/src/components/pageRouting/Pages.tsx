@@ -19,7 +19,7 @@ export interface PagesStateProps {
 }
 
 function isPageProvider(el: any): el is PageProviderElement {
-	return React.isValidElement(el) && typeof el.type === 'function' && typeof (el.type as any).getPageName === 'function'
+	return React.isValidElement(el) && typeof (el.type as any).getPageName === 'function'
 }
 
 function isPageElement(el: any): el is PageElement {

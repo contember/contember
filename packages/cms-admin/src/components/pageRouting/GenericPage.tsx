@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { LayoutInner } from '../LayoutInner'
+import { PageProvider } from './PageProvider'
 
 interface GenericPageProps {
 	pageName: string
+	children: React.ReactNode
 }
 
-export class GenericPage extends React.Component<GenericPageProps> {
-	static getPageName(props: GenericPageProps) {
-		return props.pageName
-	}
+const GenericPage: Partial<PageProvider<GenericPageProps>> & React.ComponentType<GenericPageProps> = React.memo(
+	(props: GenericPageProps) => <LayoutInner>{props.children}</LayoutInner>,
+)
 
-	render(): React.ReactNode {
-		return <LayoutInner>{this.props.children}</LayoutInner>
-	}
-}
+GenericPage.getPageName = (props: GenericPageProps) => props.pageName
+
+export { GenericPage }

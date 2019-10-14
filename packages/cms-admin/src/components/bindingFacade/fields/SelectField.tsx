@@ -23,7 +23,14 @@ export const SelectField = Component<SelectFieldProps>(props => {
 			arity={ChoiceFieldData.ChoiceArity.Single}
 			optionFieldFactory={props.children}
 		>
-			{({ data, currentValue, onChange, environment, isMutating, errors }: ChoiceFieldData.SingleChoiceFieldMetadata) => {
+			{({
+				data,
+				currentValue,
+				onChange,
+				environment,
+				isMutating,
+				errors,
+			}: ChoiceFieldData.SingleChoiceFieldMetadata) => {
 				return (
 					<SelectFieldInner
 						label={props.label}

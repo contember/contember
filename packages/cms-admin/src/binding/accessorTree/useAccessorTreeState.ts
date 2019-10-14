@@ -1,6 +1,6 @@
 import { GraphQlClient } from 'cms-client'
 import * as React from 'react'
-import { ApiRequestReadyState, useAuthToken, useContentApiRequest } from '../../apiClient'
+import { ApiRequestReadyState, useAuthToken, useContentApiRequest, useIsFirstRenderRef } from '../../apiClient'
 import { useEnvironment } from '../accessorRetrievers'
 import { AccessorTreeRoot } from '../dao'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -25,8 +25,12 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	const environment = useEnvironment()
 	const authToken = useAuthToken()
 
-	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, environment).generate(), [
-		environment,
+	const normalizedEnvironment = React.useMemo(() => {
+		let id = 0
+		return environment.putSystemVariable('treeIdFactory', () => id++)
+	}, [environment])
+	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, normalizedEnvironment).generate(), [
+		normalizedEnvironment,
 		nodeTree,
 	])
 	const accessorTreeGenerator = React.useMemo(() => new AccessorTreeGenerator(markerTree), [markerTree])
@@ -35,6 +39,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	const [queryState, sendQuery] = useContentApiRequest<QueryRequestResponse>()
 	const [mutationState, sendMutation] = useContentApiRequest<MutationRequestResponse>()
 
+	const isFirstRenderRef = useIsFirstRenderRef()
 	const stateRef = React.useRef(state)
 	const queryStateRef = React.useRef(queryState)
 
@@ -198,10 +203,12 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	}, [markerTree, queryState, state])
 
 	React.useEffect(() => {
-		dispatch({
-			type: AccessorTreeStateActionType.Uninitialize,
-		})
-	}, [query])
+		if (!isFirstRenderRef.current) {
+			dispatch({
+				type: AccessorTreeStateActionType.Uninitialize,
+			})
+		}
+	}, [query, isFirstRenderRef])
 
 	return state
 }

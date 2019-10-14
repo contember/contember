@@ -145,7 +145,7 @@ namespace Environment {
 	export type Value = React.ReactNode
 
 	export interface SystemVariables {
-		treeIdSeed: number
+		treeIdFactory: () => number
 		labelMiddleware?: (label: React.ReactNode) => React.ReactNode
 	}
 
@@ -167,15 +167,16 @@ namespace Environment {
 		{ [N in keyof SystemVariables]?: SystemVariables[N] }
 
 	export type SystemMiddleware = {
-		[N1 in {
-			[N2 in SystemVariableName]: SystemVariables[N2] extends (undefined | ((...args: any[]) => any)) ? N2 : never
-		}[SystemVariableName]]: SystemVariables[N1]
+		[N in SystemMiddlewareName]: SystemVariables[N]
 	}
 
-	export type SystemMiddlewareName = keyof SystemMiddleware
+	export type SystemMiddlewareName = 'labelMiddleware'
 
 	export const defaultSystemVariables: SystemVariables = {
-		treeIdSeed: 0,
+		treeIdFactory: (() => {
+			let treeId = 0
+			return () => treeId++
+		})(),
 		labelMiddleware: label => label,
 	}
 

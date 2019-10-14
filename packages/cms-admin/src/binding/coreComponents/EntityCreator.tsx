@@ -20,7 +20,7 @@ export const EntityCreator = Component<EntityCreatorProps>(
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			new MarkerTreeRoot(environment.getSystemVariable('treeIdSeed'), props.entityName, fields, undefined),
+			new MarkerTreeRoot(environment.getSystemVariable('treeIdFactory')(), props.entityName, fields, undefined),
 	},
 	'EntityCreator',
 )

@@ -10,6 +10,13 @@ class Environment {
 		}
 	}
 
+	public static create(delta: Partial<Environment.NameStore> = {}) {
+		return new Environment({
+			...Environment.defaultSystemVariables,
+			dimensions: {},
+		}).putDelta(delta)
+	}
+
 	public hasName(name: keyof Environment.NameStore): boolean {
 		return name in this.names
 	}
@@ -138,6 +145,7 @@ namespace Environment {
 	export type Value = React.ReactNode
 
 	export interface SystemVariables {
+		treeIdSeed: number
 		labelMiddleware?: (label: React.ReactNode) => React.ReactNode
 	}
 
@@ -156,7 +164,7 @@ namespace Environment {
 	}
 
 	export type DeltaFactory = { [N in string]: ((environment: Environment) => Environment.Value) | Environment.Value } &
-		{ [N in keyof SystemVariables]: SystemVariables[N] }
+		{ [N in keyof SystemVariables]?: SystemVariables[N] }
 
 	export type SystemMiddleware = {
 		[N1 in {
@@ -167,6 +175,7 @@ namespace Environment {
 	export type SystemMiddlewareName = keyof SystemMiddleware
 
 	export const defaultSystemVariables: SystemVariables = {
+		treeIdSeed: 0,
 		labelMiddleware: label => label,
 	}
 

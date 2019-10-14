@@ -20,21 +20,16 @@ export interface EntityListTreeConstraints {
 export type MarkerTreeConstraints = SingleEntityTreeConstraints | EntityListTreeConstraints | undefined
 
 class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
-	private static getNewTreeId: () => MarkerTreeRoot.TreeId = (() => {
-		let id = 0
-
-		return () => `treeRoot${(id++).toFixed(0)}`
-	})()
-
 	public readonly id: MarkerTreeRoot.TreeId
 
 	public constructor(
+		idSeed: number,
 		public readonly entityName: EntityName,
 		public readonly fields: EntityFields,
 		public readonly constraints: C,
 		public readonly associatedField?: FieldName,
 	) {
-		this.id = MarkerTreeRoot.getNewTreeId()
+		this.id = `treeRoot${idSeed.toFixed(0)}`
 	}
 
 	public get placeholderName(): string {

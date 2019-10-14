@@ -20,4 +20,3 @@ const EditPage: Partial<PageProvider<EditPageProps>> & React.ComponentType<EditP
 EditPage.getPageName = (props: EditPageProps) => props.pageName || `edit_${lcfirst(props.entityName)}`
 
 export { EditPage }
-

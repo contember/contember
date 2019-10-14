@@ -9,12 +9,19 @@ import {
 	SortableHandle,
 	SortEndHandler,
 } from 'react-sortable-hoc'
+import {
+	EnforceSubtypeRelation,
+	EntityAccessor,
+	EntityCollectionAccessor,
+	Environment,
+	EnvironmentContext,
+	Field,
+	FieldAccessor,
+	FieldName,
+	SyntheticChildrenProvider,
+	useMutationState,
+} from '../../../binding'
 import { DragHandle as DragHandleIcon } from '../../ui'
-import { EnvironmentContext } from '../../../binding/accessorRetrievers'
-import { useMutationState } from '../../../binding/accessorTree'
-import { FieldName } from '../../../binding/bindingTypes'
-import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../../binding/coreComponents'
-import { EntityAccessor, EntityCollectionAccessor, Environment, FieldAccessor } from '../../../binding/dao'
 import { Repeater } from './Repeater'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 

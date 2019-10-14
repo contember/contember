@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Checkbox } from '../../index'
-import { FieldAccessor } from '../../../binding/dao'
+import { FieldAccessor } from '../../../binding'
+import { Checkbox } from '../../ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type CheckboxFieldProps = SimpleRelativeSingleFieldProps

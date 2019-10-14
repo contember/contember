@@ -1,10 +1,16 @@
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { getNestedEntity, useEntityContext, useEnvironment } from '../../../../binding/accessorRetrievers'
-import { useMutationState } from '../../../../binding/accessorTree'
-import { FieldMetadata, FieldPublicProps } from '../../../../binding/coreComponents'
-import { DataBindingError, FieldAccessor } from '../../../../binding/dao'
-import { Parser } from '../../../../binding/queryLanguage'
+import {
+	DataBindingError,
+	FieldAccessor,
+	FieldMetadata,
+	FieldPublicProps,
+	getNestedEntity,
+	Parser,
+	useEntityContext,
+	useEnvironment,
+	useMutationState,
+} from '../../../../binding'
 import { SimpleRelativeSingleFieldInner } from './SimpleRelativeSingleFieldInner'
 
 export type SimpleRelativeSingleFieldProxyProps = FieldPublicProps &

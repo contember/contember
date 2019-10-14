@@ -6,8 +6,8 @@ import {
 	Environment,
 	Field,
 	Filter,
+	QueryLanguage,
 } from '../../../../binding'
-import { QueryLanguage } from '../../../../binding/queryLanguage'
 import { FieldText } from '../../ui'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 

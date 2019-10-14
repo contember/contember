@@ -1,9 +1,7 @@
 import { Radio, RadioGroup } from '@blueprintjs/core'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { RelativeSingleField } from '../../../binding/bindingTypes'
-import { Environment, ErrorAccessor } from '../../../binding/dao'
-import { Component } from '../../../binding/coreComponents'
+import { Component, Environment, ErrorAccessor, RelativeSingleField } from '../../../binding'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
 
 export interface RadioFieldPublicProps extends Omit<FormGroupProps, 'children'> {

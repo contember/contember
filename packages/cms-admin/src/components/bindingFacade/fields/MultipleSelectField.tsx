@@ -1,10 +1,8 @@
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import { arrayDifference } from 'cms-common'
 import * as React from 'react'
-import { Select } from '../../index'
-import { FieldName } from '../../../binding/bindingTypes'
-import { Environment, ErrorAccessor } from '../../../binding/dao'
-import { Component } from '../../../binding/coreComponents'
+import { Component, Environment, ErrorAccessor, FieldName } from '../../../binding'
+import { Select } from '../../ui'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
 
 export type MultipleSelectFieldPublicProps = FormGroupProps & {

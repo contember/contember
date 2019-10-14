@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
 import { pageRequest } from '../../state/request'
-import Link, { PublicAnchorProps } from '../Link'
+import { Link, PublicAnchorProps } from '../Link'
 import LinkComponent from '../Link/LinkComponent'
 
 export type PageConfig = {

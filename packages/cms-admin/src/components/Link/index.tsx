@@ -6,7 +6,7 @@ import State from '../../state'
 import { requestStateToPath } from '../../utils/url'
 import LinkComponent, { InnerProps, PublicAnchorProps } from './LinkComponent'
 
-export default connect<LinkComponent.StateProps, LinkComponent.DispatchProps, LinkComponent.OwnProps, State>(
+export const Link = connect<LinkComponent.StateProps, LinkComponent.DispatchProps, LinkComponent.OwnProps, State>(
 	({ view, projectsConfigs, request }, { requestChange }) => ({
 		href: requestStateToPath(routes(projectsConfigs.configs), requestChange(request)),
 	}),

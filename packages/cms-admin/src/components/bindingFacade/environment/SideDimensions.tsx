@@ -1,7 +1,12 @@
 import * as React from 'react'
-import { EnvironmentContext } from '../../../binding/accessorRetrievers'
-import { EnforceSubtypeRelation, EnvironmentDeltaProvider, SyntheticChildrenProvider } from '../../../binding/coreComponents'
-import { DataBindingError, Environment } from '../../../binding/dao'
+import {
+	DataBindingError,
+	EnforceSubtypeRelation,
+	Environment,
+	EnvironmentContext,
+	EnvironmentDeltaProvider,
+	SyntheticChildrenProvider,
+} from '../../../binding'
 
 interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	dimension?: string

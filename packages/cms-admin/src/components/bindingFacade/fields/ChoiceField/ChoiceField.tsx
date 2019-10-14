@@ -1,18 +1,20 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { FieldName, PRIMARY_KEY_NAME } from '../../../../binding/bindingTypes'
 import {
 	EnforceSubtypeRelation,
+	EntityAccessor,
 	EntityListDataProvider,
+	Environment,
 	Field,
 	FieldMetadata,
+	FieldName,
+	PRIMARY_KEY_NAME,
+	QueryLanguage,
+	Scalar,
 	SyntheticChildrenProvider,
 	ToMany,
 	ToOne,
-} from '../../../../binding/coreComponents'
-import { EntityAccessor, Environment, Literal, VariableLiteral, VariableScalar } from '../../../../binding/dao'
-import { Scalar } from '../../../../binding/accessorTree'
-import { QueryLanguage } from '../../../../binding/queryLanguage'
+} from '../../../../binding'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
 import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'
 

@@ -1,12 +1,16 @@
 import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import * as React from 'react'
-import { useEntityContext, useEnvironment, useRelativeSingleField } from '../../../binding/accessorRetrievers'
-import { useMutationState } from '../../../binding/accessorTree'
-import { RelativeSingleField } from '../../../binding/bindingTypes'
-import { Component } from '../../../binding/coreComponents'
-import { Environment } from '../../../binding/dao'
-import { QueryLanguage } from '../../../binding/queryLanguage'
+import {
+	Component,
+	Environment,
+	QueryLanguage,
+	RelativeSingleField,
+	useEntityContext,
+	useEnvironment,
+	useMutationState,
+	useRelativeSingleField,
+} from '../../../binding'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 

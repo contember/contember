@@ -1,3 +1,5 @@
+export * from './ChoiceField'
+
 export * from './CheckboxField'
 export * from './CheckboxList'
 export * from './DateField'

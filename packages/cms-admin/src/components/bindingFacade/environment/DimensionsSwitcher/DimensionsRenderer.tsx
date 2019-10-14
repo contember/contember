@@ -1,12 +1,21 @@
 import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown, Spinner } from '@contember/ui'
 import * as React from 'react'
 import { useContext } from 'react'
-import { Checkbox, Link, useRedirect } from '../../../index'
+import {
+	AccessorTreeState,
+	AccessorTreeStateContext,
+	AccessorTreeStateName,
+	Component,
+	EntityAccessor,
+	EntityCollectionAccessor,
+	FieldAccessor,
+	ToOne,
+	useEnvironment,
+} from '../../../../binding'
 import { RequestChange } from '../../../../state/request'
-import { useEnvironment } from '../../../../binding/accessorRetrievers'
-import { AccessorTreeState, AccessorTreeStateContext, AccessorTreeStateName } from '../../../../binding/accessorTree'
-import { Component, ToOne } from '../../../../binding/coreComponents'
-import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../../../binding/dao'
+import { Link } from '../../../Link'
+import { useRedirect } from '../../../pageRouting'
+import { Checkbox } from '../../../ui'
 import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 

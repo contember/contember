@@ -58,5 +58,9 @@ export const accessorTreeStateReducer = (
 				name: AccessorTreeStateName.RequestError,
 				error: action.error,
 			}
+		case AccessorTreeStateActionType.Uninitialize:
+			return {
+				name: AccessorTreeStateName.Uninitialized,
+			}
 	}
 }

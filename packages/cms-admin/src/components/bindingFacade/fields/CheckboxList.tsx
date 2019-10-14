@@ -1,8 +1,7 @@
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
+import { Component, FieldName } from '../../../binding'
 import { Checkbox } from '../../ui'
-import { FieldName } from '../../../binding/bindingTypes'
-import { Component } from '../../../binding/coreComponents'
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
 
 export interface CheckboxListPublicProps extends Omit<FormGroupProps, 'children'> {

@@ -1,17 +1,18 @@
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
-import { getNestedEntity } from '../../../../binding/accessorRetrievers'
-import { FieldName } from '../../../../binding/bindingTypes'
-import { Field, ToOne } from '../../../../binding/coreComponents'
 import {
 	AccessorTreeRoot,
 	DataBindingError,
 	EntityAccessor,
 	EntityCollectionAccessor,
 	EntityForRemovalAccessor,
+	Field,
 	FieldAccessor,
-} from '../../../../binding/dao'
-import { Parser } from '../../../../binding/queryLanguage'
+	FieldName,
+	getNestedEntity,
+	Parser,
+	ToOne,
+} from '../../../../binding'
 import { BaseChoiceMetadata, ChoiceArity, ChoiceField, ChoiceFieldBaseProps } from './ChoiceField'
 
 export type DynamicChoiceFieldImplementationProps = ChoiceFieldBaseProps &

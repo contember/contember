@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Component } from '../../../binding/coreComponents'
-import { QueryLanguage } from '../../../binding/queryLanguage'
+import { Component, QueryLanguage } from '../../../binding'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { UploadField } from './UploadField'
 

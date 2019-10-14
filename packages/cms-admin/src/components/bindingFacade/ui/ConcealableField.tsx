@@ -1,6 +1,6 @@
 import { Button, ButtonProps, toStateClass, toViewClass } from '@contember/ui'
-import * as React from 'react'
 import cn from 'classnames'
+import * as React from 'react'
 
 export interface ConcealableFieldRendererProps {
 	onFocus: () => void

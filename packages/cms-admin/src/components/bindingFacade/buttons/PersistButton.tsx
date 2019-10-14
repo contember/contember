@@ -1,8 +1,8 @@
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { useShowToast } from '../../ui'
+import { ErrorPersistResult, useDirtinessState, useMutationState, useTriggerPersist } from '../../../binding'
 import { ToastType } from '../../../state/toasts'
-import { ErrorPersistResult, useDirtinessState, useMutationState, useTriggerPersist } from '../../../binding/accessorTree'
+import { useShowToast } from '../../ui'
 
 export type PersistButtonProps = ButtonProps
 

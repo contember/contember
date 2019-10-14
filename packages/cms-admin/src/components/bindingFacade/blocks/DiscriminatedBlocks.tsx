@@ -1,15 +1,14 @@
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { RelativeSingleField } from '../../../../binding/bindingTypes'
-import { Component } from '../../../../binding/coreComponents'
-import { SelectFieldInner } from '../../fields'
+import { Component, RelativeSingleField } from '../../../binding'
 import {
 	ChoiceArity,
 	ChoiceField,
 	LiteralStaticOption,
 	ScalarStaticOption,
+	SelectFieldInner,
 	SingleChoiceFieldMetadata,
-} from '../../fields/ChoiceField'
+} from '../fields'
 import { NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
 import { useNormalizedBlockList } from './useNormalizedBlockList'
 

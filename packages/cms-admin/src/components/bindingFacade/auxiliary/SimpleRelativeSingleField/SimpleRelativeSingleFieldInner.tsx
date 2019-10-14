@@ -1,8 +1,6 @@
 import { FormGroup } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext } from '../../../../binding/accessorRetrievers'
-import { FieldMetadata } from '../../../../binding/coreComponents'
-import { EntityAccessor } from '../../../../binding/dao'
+import { AccessorContext, EntityAccessor, FieldMetadata } from '../../../../binding'
 import { SimpleRelativeSingleFieldProxyProps } from './SimpleRelativeSingleFieldProxy'
 
 export type SimpleRelativeSingleFieldInnerProps = SimpleRelativeSingleFieldProxyProps & {

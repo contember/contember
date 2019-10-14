@@ -1,8 +1,7 @@
 import { SingleLineTextInputProps, TextInput } from '@contember/ui'
 import * as React from 'react'
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
-import { FieldMetadata } from '../../../binding/coreComponents'
-import { FieldAccessor } from '../../../binding/dao'
+import { FieldAccessor, FieldMetadata } from '../../../binding'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type DateFieldProps = SimpleRelativeSingleFieldProps &

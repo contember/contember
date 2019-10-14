@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useEnvironment } from '../../../../binding/accessorRetrievers'
+import { useEnvironment } from '../../../binding'
 import { BlockProps } from './Block'
 import { blockAnalyzer } from './blockAnalyzer'
 

@@ -2,7 +2,7 @@ import { Icon } from '@blueprintjs/core'
 import { IconNames } from '@blueprintjs/icons'
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { FieldAccessor } from '../../../../binding/dao'
+import { FieldAccessor } from '../../../../binding'
 
 export type ClearFieldButtonInnerPublicProps = ButtonProps
 

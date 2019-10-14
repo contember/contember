@@ -1,9 +1,7 @@
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { Select } from '../../index'
-import { FieldName } from '../../../binding/bindingTypes'
-import { Environment, ErrorAccessor } from '../../../binding/dao'
-import { Component } from '../../../binding/coreComponents'
+import { Component, Environment, ErrorAccessor, FieldName } from '../../../binding'
+import { Select } from '../../ui'
 
 import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
 

@@ -1,9 +1,17 @@
 import { FieldSet, FieldSetProps } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, EnvironmentContext } from '../../../binding/accessorRetrievers'
-import { EnforceSubtypeRelation, SyntheticChildrenProvider, ToMany, ToManyProps } from '../../../binding/coreComponents'
-import { EntityAccessor, EntityCollectionAccessor, Environment } from '../../../binding/dao'
-import { QueryLanguage } from '../../../binding/queryLanguage'
+import {
+	AccessorContext,
+	EnforceSubtypeRelation,
+	EntityAccessor,
+	EntityCollectionAccessor,
+	Environment,
+	EnvironmentContext,
+	QueryLanguage,
+	SyntheticChildrenProvider,
+	ToMany,
+	ToManyProps,
+} from '../../../binding'
 import { AddNewButton, RemoveButton, RemoveButtonProps } from '../buttons'
 
 export interface RepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {}

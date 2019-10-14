@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { FieldName } from '../../../../binding/bindingTypes'
-import { AccessorTreeRoot, DataBindingError, EntityAccessor, FieldAccessor } from '../../../../binding/dao'
+import { AccessorTreeRoot, DataBindingError, EntityAccessor, FieldAccessor, FieldName } from '../../../../binding'
 import { ChoiceField } from './ChoiceField'
 import { DynamicChoiceFieldImplementation } from './DynamicChoiceFieldImplementation'
 

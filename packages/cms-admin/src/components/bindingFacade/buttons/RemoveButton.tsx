@@ -1,9 +1,7 @@
 import { IconName } from '@blueprintjs/icons'
 import { Button, ButtonOwnProps, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { useMutationState, useTriggerPersist } from '../../../binding/accessorTree'
-import { AccessorContext } from '../../../binding/accessorRetrievers'
-import { EntityAccessor } from '../../../binding/dao'
+import { AccessorContext, EntityAccessor, useMutationState, useTriggerPersist } from '../../../binding'
 import { RemovalType } from '../types'
 
 export type RemoveButtonProps = ButtonProps & {

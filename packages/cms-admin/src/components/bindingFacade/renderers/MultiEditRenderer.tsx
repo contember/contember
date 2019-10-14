@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { EnforceSubtypeRelation, SyntheticChildrenProvider } from '../../../binding/coreComponents'
-import { EntityAccessor } from '../../../binding/dao'
+import { EnforceSubtypeRelation, EntityAccessor, SyntheticChildrenProvider } from '../../../binding'
 import { RemoveButton } from '../buttons'
 import { Repeater, Sortable, SortablePublicProps } from '../collections'
-import { CommonRendererProps } from './CommonRenderer'
 import { ContentLayoutRendererProps } from './ContentLayoutRenderer'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 

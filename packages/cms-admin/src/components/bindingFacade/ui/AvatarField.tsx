@@ -1,9 +1,6 @@
 import * as React from 'react'
-import { Avatar, AvatarProps } from '../../index'
-import { EnforceSubtypeRelation, Field, SyntheticChildrenProvider } from '../../../binding/coreComponents'
-import { Environment } from '../../../binding/dao'
-import { QueryLanguage } from '../../../binding/queryLanguage'
-import { TextFieldProps } from '../fields'
+import { EnforceSubtypeRelation, Environment, Field, QueryLanguage, SyntheticChildrenProvider } from '../../../binding'
+import { Avatar, AvatarProps } from '../../ui'
 
 interface AvatarFieldProps {
 	name: string

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { useEnvironment } from '../../../binding/accessorRetrievers'
-import { Environment } from '../../../binding/dao'
+import { Environment, useEnvironment } from '../../../binding'
 
 interface VariableProps {
 	name: Environment.Name

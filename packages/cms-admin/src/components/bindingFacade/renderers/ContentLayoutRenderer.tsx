@@ -1,10 +1,12 @@
 import { IncreaseHeadingDepth, TitleBar, TitleBarProps } from '@contember/ui'
 import * as React from 'react'
-import { LayoutInner, LayoutSide } from '../../index'
-import { AccessorTreeStateWithDataContext } from '../../../binding/accessorTree'
-import { Component } from '../../../binding/coreComponents'
-import { AccessorContext } from '../../../binding/accessorRetrievers'
-import { EntityCollectionAccessor } from '../../../binding/dao'
+import {
+	AccessorContext,
+	AccessorTreeStateWithDataContext,
+	Component,
+	EntityCollectionAccessor,
+} from '../../../binding'
+import { LayoutInner, LayoutSide } from '../../LayoutInner'
 import { PersistButton } from '../buttons'
 import { CommonRenderer, CommonRendererProps } from './CommonRenderer'
 

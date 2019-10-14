@@ -1,4 +1,5 @@
 export * from './auxiliary'
+export * from './blocks'
 export * from './buttons'
 export * from './environment'
 export * from './fields'

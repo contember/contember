@@ -2,8 +2,7 @@ import { Icon } from '@blueprintjs/core'
 import { IconName, IconNames } from '@blueprintjs/icons'
 import { Button, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { useMutationState } from '../../../binding/accessorTree'
-import { EntityCollectionAccessor } from '../../../binding/dao'
+import { EntityCollectionAccessor, useMutationState } from '../../../binding'
 
 export type AddNewButtonProps = ButtonProps & {
 	addNew: EntityCollectionAccessor['addNew']

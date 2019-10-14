@@ -1,9 +1,14 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { Field } from '../../../../binding/coreComponents'
-import { DataBindingError, Environment, VariableLiteral, VariableScalar } from '../../../../binding/dao'
-import { Scalar } from '../../../../binding/accessorTree'
-import { VariableInputTransformer } from '../../../../binding/model/VariableInputTransformer'
+import {
+	DataBindingError,
+	Environment,
+	Field,
+	Scalar,
+	VariableInputTransformer,
+	VariableLiteral,
+	VariableScalar,
+} from '../../../../binding'
 import { ChoiceArity, ChoiceField } from './ChoiceField'
 
 export interface StaticOption {

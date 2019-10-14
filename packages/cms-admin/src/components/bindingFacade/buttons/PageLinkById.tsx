@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
+import { useEntityContext } from '../../../binding'
 import { InnerProps } from '../../Link'
 import PageLink, { PageConfig } from '../../pageRouting/PageLink'
-import { useEntityContext } from '../../../binding/accessorRetrievers'
 
 interface PageLinkByIdProps {
 	change: (id: string) => PageConfig

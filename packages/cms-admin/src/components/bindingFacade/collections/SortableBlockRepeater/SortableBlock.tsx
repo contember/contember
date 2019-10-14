@@ -1,9 +1,7 @@
 import { Box } from '@contember/ui'
 import * as React from 'react'
-import { RelativeSingleField } from '../../../../binding/bindingTypes'
-import { Field } from '../../../../binding/coreComponents'
-import { DataBindingError, EntityAccessor, FieldAccessor } from '../../../../binding/dao'
-import { NormalizedBlockProps } from '../../ui/blocks'
+import { DataBindingError, EntityAccessor, Field, FieldAccessor, RelativeSingleField } from '../../../../binding'
+import { NormalizedBlockProps } from '../../blocks'
 
 export interface SortableBlockProps {
 	discriminationField: RelativeSingleField

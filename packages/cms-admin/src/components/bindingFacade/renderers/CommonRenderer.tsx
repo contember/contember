@@ -1,14 +1,14 @@
 import { ContainerSpinner, Message } from '@contember/ui'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
-import { useRedirect } from '../../index'
 import {
 	AccessorTreeStateContext,
 	AccessorTreeStateName,
 	AccessorTreeStateWithDataContext,
+	Component,
 	RequestErrorType,
-} from '../../../binding/accessorTree'
-import { Component } from '../../../binding/coreComponents'
+} from '../../../binding'
+import { useRedirect } from '../../pageRouting'
 
 export interface CommonRendererProps {
 	children: React.ReactNode

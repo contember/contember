@@ -1,7 +1,5 @@
 import * as React from 'react'
-import { useEnvironment } from '../../../../binding/accessorRetrievers'
-import { DataBindingError } from '../../../../binding/dao'
-import { VariableInputTransformer } from '../../../../binding/model/VariableInputTransformer'
+import { DataBindingError, useEnvironment, VariableInputTransformer } from '../../../binding'
 import { BlockCommonProps, NormalizedBlockList, NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
 import { useBlockProps } from './useBlockProps'
 

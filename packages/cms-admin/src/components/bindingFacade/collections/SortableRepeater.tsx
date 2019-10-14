@@ -1,9 +1,13 @@
 import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { useEnvironment } from '../../../binding/accessorRetrievers'
-import { Component, ToMany, ToManyProps } from '../../../binding/coreComponents'
-import { EntityCollectionAccessor } from '../../../binding/dao'
-import { QueryLanguage } from '../../../binding/queryLanguage'
+import {
+	Component,
+	EntityCollectionAccessor,
+	QueryLanguage,
+	ToMany,
+	ToManyProps,
+	useEnvironment,
+} from '../../../binding'
 import { Repeater } from './Repeater'
 import { Sortable, SortablePublicProps } from './Sortable'
 

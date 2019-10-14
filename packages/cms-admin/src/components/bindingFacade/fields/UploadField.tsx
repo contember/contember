@@ -5,11 +5,16 @@ import Dropzone from 'react-dropzone'
 import { connect } from 'react-redux'
 import { Dispatch } from '../../../actions/types'
 import { uploadFile } from '../../../actions/upload'
+import {
+	EnforceSubtypeRelation,
+	Environment,
+	Field,
+	FieldMetadata,
+	QueryLanguage,
+	SyntheticChildrenProvider,
+} from '../../../binding'
 import State from '../../../state'
 import { AnyUpload, UploadStatus } from '../../../state/upload'
-import { EnforceSubtypeRelation, Field, FieldMetadata, SyntheticChildrenProvider } from '../../../binding/coreComponents'
-import { Environment } from '../../../binding/dao'
-import { QueryLanguage } from '../../../binding/queryLanguage'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export interface UploadFieldMetadata extends FieldMetadata<string> {

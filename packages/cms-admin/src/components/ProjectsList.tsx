@@ -6,7 +6,7 @@ import { pushRequest } from '../actions/request'
 import { Dispatch } from '../actions/types'
 import State from '../state'
 import { RequestChange } from '../state/request'
-import Link from './Link'
+import { Link } from './Link'
 
 interface ProjectsListProps {
 	configs: ProjectConfig[]

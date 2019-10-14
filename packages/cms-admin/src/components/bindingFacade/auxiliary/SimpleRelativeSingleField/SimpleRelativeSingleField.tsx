@@ -1,10 +1,16 @@
 import { FormGroupProps } from '@contember/ui'
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { Scalar } from '../../../../binding/accessorTree'
-import { Component, Field, FieldMetadata, FieldPublicProps, SyntheticChildrenProvider } from '../../../../binding/coreComponents'
-import { Environment } from '../../../../binding/dao'
-import { QueryLanguage } from '../../../../binding/queryLanguage'
+import {
+	Component,
+	Environment,
+	Field,
+	FieldMetadata,
+	FieldPublicProps,
+	QueryLanguage,
+	Scalar,
+	SyntheticChildrenProvider,
+} from '../../../../binding'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeSingleFieldProxy'
 
 export type SimpleRelativeSingleFieldProps = FieldPublicProps & Omit<FormGroupProps, 'children'>

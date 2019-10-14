@@ -1,8 +1,7 @@
 import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
-import { Scalar } from '../../../../binding/accessorTree'
-import { Component } from '../../../../binding/coreComponents'
-import { LiteralStaticOption, ScalarStaticOption } from '../../fields/ChoiceField'
+import { Component, Scalar } from '../../../binding'
+import { LiteralStaticOption, ScalarStaticOption } from '../fields/ChoiceField'
 
 export interface BlockCommonProps {
 	label?: React.ReactNode

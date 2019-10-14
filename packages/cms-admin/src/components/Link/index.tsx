@@ -4,7 +4,7 @@ import { Dispatch } from '../../actions/types'
 import routes from '../../routes'
 import State from '../../state'
 import { requestStateToPath } from '../../utils/url'
-import LinkComponent, { InnerProps, PublicAnchorProps } from './LinkComponent'
+import { InnerProps, LinkComponent, PublicAnchorProps } from './LinkComponent'
 
 export const Link = connect<LinkComponent.StateProps, LinkComponent.DispatchProps, LinkComponent.OwnProps, State>(
 	({ view, projectsConfigs, request }, { requestChange }) => ({

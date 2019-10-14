@@ -9,7 +9,7 @@ import {
 	VariableLiteral,
 	VariableScalar,
 } from '../../../../binding'
-import { ChoiceArity, ChoiceField } from './ChoiceField'
+import { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {
 	label: React.ReactNode
@@ -28,13 +28,13 @@ export interface LiteralStaticOption extends StaticOption {
 	value: VariableLiteral | GraphQlBuilder.Literal
 }
 
-export type StaticChoiceFieldProps = ChoiceField.InnerBaseProps & {
+export type StaticChoiceFieldProps = ChoiceFieldData.InnerBaseProps & {
 	options: ScalarStaticOption[] | LiteralStaticOption[]
 }
 
 export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProps> {
 	public render() {
-		if (this.props.arity === ChoiceArity.Multiple) {
+		if (this.props.arity === ChoiceFieldData.ChoiceArity.Multiple) {
 			throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
 		}
 
@@ -51,11 +51,11 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 		return (
 			<Field name={this.props.fieldName}>
 				{({ data, ...otherMetadata }): React.ReactNode => {
-					if (this.props.arity === ChoiceArity.Multiple) {
+					if (this.props.arity === ChoiceFieldData.ChoiceArity.Multiple) {
 						throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
 					}
 
-					const currentValue: ChoiceField.ValueRepresentation = options.findIndex(({ value }) => {
+					const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => {
 						return (
 							data.hasValue(value) ||
 							(value instanceof GraphQlBuilder.Literal &&
@@ -72,7 +72,7 @@ export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProp
 							actualValue,
 						})),
 						currentValue,
-						onChange: (newValue: ChoiceField.ValueRepresentation) => {
+						onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
 							data.updateValue && data.updateValue(options[newValue].value)
 						},
 						...otherMetadata,

@@ -1,59 +1,20 @@
-import { GraphQlBuilder } from 'cms-client'
 import * as React from 'react'
 import {
 	EnforceSubtypeRelation,
-	EntityAccessor,
 	EntityListDataProvider,
 	Environment,
 	Field,
-	FieldMetadata,
-	FieldName,
 	PRIMARY_KEY_NAME,
 	QueryLanguage,
-	Scalar,
 	SyntheticChildrenProvider,
 	ToMany,
 	ToOne,
 } from '../../../../binding'
+import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
 import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'
 
-export enum ChoiceArity {
-	Single = 'single',
-	Multiple = 'multiple',
-}
-
-export interface ChoiceFieldPublicProps {
-	name: FieldName
-}
-
-export interface BaseChoiceMetadata extends Omit<FieldMetadata, 'data'> {
-	data: ChoiceField.Data<ChoiceField.DynamicValue | ChoiceField.StaticValue>
-}
-
-export interface SingleChoiceFieldMetadata extends BaseChoiceMetadata {
-	currentValue: ChoiceField.ValueRepresentation
-	onChange: (newValue: ChoiceField.ValueRepresentation) => void
-}
-
-export interface MultipleChoiceFieldMetadata extends BaseChoiceMetadata {
-	currentValues: Array<ChoiceField.ValueRepresentation>
-	onChange: (optionKey: ChoiceField.ValueRepresentation, isChosen: boolean) => void
-}
-
-export type ChoiceFieldBaseProps = ChoiceFieldPublicProps & {
-	optionFieldFactory?: React.ReactNode
-} & (
-		| {
-				arity: ChoiceArity.Single
-				children: (metadata: SingleChoiceFieldMetadata) => React.ReactElement | null
-		  }
-		| {
-				arity: ChoiceArity.Multiple
-				children: (metadata: MultipleChoiceFieldMetadata) => React.ReactElement | null
-		  })
-
-export type ChoiceFieldProps = ChoiceFieldBaseProps & {
+export type ChoiceFieldProps = ChoiceFieldData.BaseProps & {
 	options: StaticChoiceFieldProps['options'] | DynamicChoiceFieldProps['options']
 }
 
@@ -102,12 +63,12 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 				<EntityListDataProvider entityName={metadata.entityName} filter={metadata.filter} associatedField={props.name}>
 					{metadata.children}
 				</EntityListDataProvider>
-				{props.arity === ChoiceArity.Single && (
+				{props.arity === ChoiceFieldData.ChoiceArity.Single && (
 					<ToOne field={fieldName}>
 						<Field name={PRIMARY_KEY_NAME} />
 					</ToOne>
 				)}
-				{props.arity === ChoiceArity.Multiple && (
+				{props.arity === ChoiceFieldData.ChoiceArity.Multiple && (
 					<ToMany field={fieldName}>
 						<Field name={PRIMARY_KEY_NAME} />
 					</ToMany>
@@ -115,26 +76,6 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 			</>
 		))
 	}
-}
-
-namespace ChoiceField {
-	export type StaticValue = GraphQlBuilder.Literal | Scalar
-
-	export type DynamicValue = EntityAccessor['primaryKey']
-
-	// This is just the JS array index as specified in options or as returned from the server.
-	export type ValueRepresentation = number
-
-	export interface SingleDatum<ActualValue extends Environment.Value = string> {
-		key: ValueRepresentation
-		label: React.ReactNode
-		description?: React.ReactNode
-		actualValue: ActualValue
-	}
-
-	export type Data<ActualValue extends Environment.Value = string> = SingleDatum<ActualValue>[]
-
-	export type InnerBaseProps = Field.RawMetadata & ChoiceFieldBaseProps
 }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<

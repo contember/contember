@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { AccessorTreeRoot, DataBindingError, EntityAccessor, FieldAccessor, FieldName } from '../../../../binding'
-import { ChoiceField } from './ChoiceField'
+import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicChoiceFieldImplementation } from './DynamicChoiceFieldImplementation'
 
-export type DynamicChoiceFieldProps = ChoiceField.InnerBaseProps & {
+export type DynamicChoiceFieldProps = ChoiceFieldData.InnerBaseProps & {
 	options: FieldName
 }
 

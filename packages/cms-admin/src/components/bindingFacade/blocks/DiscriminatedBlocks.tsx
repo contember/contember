@@ -1,14 +1,7 @@
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { Component, RelativeSingleField } from '../../../binding'
-import {
-	ChoiceArity,
-	ChoiceField,
-	LiteralStaticOption,
-	ScalarStaticOption,
-	SelectFieldInner,
-	SingleChoiceFieldMetadata,
-} from '../fields'
+import { ChoiceField, ChoiceFieldData, LiteralStaticOption, ScalarStaticOption, SelectFieldInner } from '../fields'
 import { NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
 import { useNormalizedBlockList } from './useNormalizedBlockList'
 
@@ -31,8 +24,15 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 			[normalizedBlockList],
 		) as ScalarStaticOption[] | LiteralStaticOption[]
 		return (
-			<ChoiceField name={props.name} options={transformedBlockList} arity={ChoiceArity.Single}>
-				{({ data, currentValue, onChange, isMutating, environment, errors }: SingleChoiceFieldMetadata) => (
+			<ChoiceField name={props.name} options={transformedBlockList} arity={ChoiceFieldData.ChoiceArity.Single}>
+				{({
+					data,
+					currentValue,
+					onChange,
+					isMutating,
+					environment,
+					errors,
+				}: ChoiceFieldData.SingleChoiceFieldMetadata) => (
 					<>
 						{props.allowBlockTypeChange !== false && (
 							<SelectFieldInner
@@ -57,7 +57,7 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 			{ChoiceField.generateSyntheticChildren(
 				{
 					name: props.name,
-					arity: ChoiceArity.Single,
+					arity: ChoiceFieldData.ChoiceArity.Single,
 					options: [],
 				},
 				environment,

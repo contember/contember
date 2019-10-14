@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Component, Environment, ErrorAccessor, FieldName } from '../../../binding'
 import { Select } from '../../ui'
 
-import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
+import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
 
 export interface SelectFieldPublicProps extends Omit<FormGroupProps, 'children'> {
 	name: FieldName
@@ -20,10 +20,10 @@ export const SelectField = Component<SelectFieldProps>(props => {
 		<ChoiceField
 			name={props.name}
 			options={props.options}
-			arity={ChoiceArity.Single}
+			arity={ChoiceFieldData.ChoiceArity.Single}
 			optionFieldFactory={props.children}
 		>
-			{({ data, currentValue, onChange, environment, isMutating, errors }: SingleChoiceFieldMetadata) => {
+			{({ data, currentValue, onChange, environment, isMutating, errors }: ChoiceFieldData.SingleChoiceFieldMetadata) => {
 				return (
 					<SelectFieldInner
 						label={props.label}
@@ -44,7 +44,7 @@ export const SelectField = Component<SelectFieldProps>(props => {
 
 export interface SelectFieldInnerProps
 	extends Omit<SelectFieldPublicProps, 'options' | 'name'>,
-		Omit<SingleChoiceFieldMetadata, 'fieldName'> {
+		Omit<ChoiceFieldData.SingleChoiceFieldMetadata, 'fieldName'> {
 	environment: Environment
 	errors: ErrorAccessor[]
 	isMutating: boolean

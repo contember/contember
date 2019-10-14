@@ -7,7 +7,7 @@ export interface TableRendererProps extends ContentLayoutRendererProps {
 
 export class TableRenderer extends React.PureComponent<any & TableRendererProps> {
 	public render() {
-		return null
+		return 'Multi edit pages are currently broken. Hang on!'
 		/*<CollectionRenderer data={this.props.data}>
 				{(rawData, entities) => (
 					<>

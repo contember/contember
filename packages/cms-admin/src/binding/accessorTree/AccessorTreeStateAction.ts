@@ -5,6 +5,9 @@ import { RequestError } from './RequestError'
 
 export type AccessorTreeStateAction =
 	| {
+			type: AccessorTreeStateActionType.Uninitialize
+	  }
+	| {
 			type: AccessorTreeStateActionType.SetDirtiness
 			isDirty: boolean
 	  }

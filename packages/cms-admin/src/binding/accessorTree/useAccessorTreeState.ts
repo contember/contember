@@ -161,10 +161,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	)
 
 	React.useEffect(() => {
-		if (
-			state.name === AccessorTreeStateName.Uninitialized &&
-			queryState.readyState === ApiRequestReadyState.Uninitialized
-		) {
+		if (state.name === AccessorTreeStateName.Uninitialized) {
 			if (query === undefined) {
 				// We're creating
 				initializeAccessorTree(undefined, undefined)
@@ -199,6 +196,12 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 			}
 		}
 	}, [markerTree, queryState, state])
+
+	React.useEffect(() => {
+		dispatch({
+			type: AccessorTreeStateActionType.Uninitialize,
+		})
+	}, [query])
 
 	return state
 }

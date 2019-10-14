@@ -14,7 +14,7 @@ class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & any
 	public static displayName = 'MultiEditRenderer'
 
 	public render() {
-		return null
+		return 'Multi edit pages are currently broken. Hang on!'
 		/*return (
 			<CollectionRenderer data={this.props.data}>
 				{rawData => (

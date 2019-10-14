@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { SelectedDimension } from '../../state/request'
 
 class Environment {
 	private readonly names: Environment.NameStore
@@ -15,7 +14,7 @@ class Environment {
 		return name in this.names
 	}
 
-	public hasDimension(dimensionName: keyof SelectedDimension): boolean {
+	public hasDimension(dimensionName: keyof Environment.SelectedDimensions): boolean {
 		return dimensionName in this.names.dimensions
 	}
 
@@ -26,7 +25,7 @@ class Environment {
 		return this.names[name]
 	}
 
-	public getDimensionOrElse<F>(dimensionName: keyof SelectedDimension, fallback: F): string[] | F {
+	public getDimensionOrElse<F>(dimensionName: keyof Environment.SelectedDimensions, fallback: F): string[] | F {
 		if (!this.hasDimension(dimensionName)) {
 			return fallback
 		}
@@ -37,7 +36,7 @@ class Environment {
 		return this.names[name]
 	}
 
-	public getDimension(dimensionName: keyof SelectedDimension): string[] {
+	public getDimension(dimensionName: keyof Environment.SelectedDimensions): string[] {
 		return this.names.dimensions[dimensionName]
 	}
 
@@ -45,7 +44,7 @@ class Environment {
 		return { ...this.names }
 	}
 
-	public getAllDimensions(): SelectedDimension {
+	public getAllDimensions(): Environment.SelectedDimensions {
 		return { ...this.names.dimensions }
 	}
 
@@ -146,8 +145,12 @@ namespace Environment {
 
 	export type SystemVariableName = keyof SystemVariables
 
+	export interface SelectedDimensions {
+		[key: string]: string[]
+	}
+
 	export interface NameStore extends SystemVariables {
-		dimensions: SelectedDimension
+		dimensions: SelectedDimensions
 
 		[name: string]: Value
 	}

@@ -1,7 +1,6 @@
 import { GraphQlClient } from 'cms-client'
 import * as React from 'react'
-import { ApiRequestReadyState, useAuthToken } from '../../apiClient'
-import { useContentApiRequest } from '../../apiClient/useContentApiRequest'
+import { ApiRequestReadyState, useAuthToken, useContentApiRequest } from '../../apiClient'
 import { useEnvironment } from '../accessorRetrievers'
 import { AccessorTreeRoot } from '../dao'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'

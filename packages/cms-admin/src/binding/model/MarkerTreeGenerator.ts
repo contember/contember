@@ -27,9 +27,7 @@ export class MarkerTreeGenerator {
 
 	public constructor(
 		private sourceTree: React.ReactNode,
-		private environment: Environment = new Environment({
-			dimensions: {},
-		}),
+		private environment: Environment = Environment.create(),
 	) {}
 
 	public generate(): MarkerTreeRoot {

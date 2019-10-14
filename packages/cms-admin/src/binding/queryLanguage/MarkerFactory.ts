@@ -23,6 +23,7 @@ export namespace MarkerFactory {
 		associatedField?: FieldName,
 	): MarkerTreeRoot<SingleEntityTreeConstraints> =>
 		new MarkerTreeRoot<SingleEntityTreeConstraints>(
+			environment.getSystemVariable('treeIdSeed'),
 			entityName,
 			fields,
 			{
@@ -46,6 +47,7 @@ export namespace MarkerFactory {
 		associatedField?: FieldName,
 	): MarkerTreeRoot<EntityListTreeConstraints> =>
 		new MarkerTreeRoot<EntityListTreeConstraints>(
+			environment.getSystemVariable('treeIdSeed'),
 			entityName,
 			fields,
 			{

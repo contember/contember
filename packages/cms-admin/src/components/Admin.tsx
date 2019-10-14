@@ -74,7 +74,7 @@ export default class Admin extends React.Component<AdminProps> {
 											normalizedConfigs[config.project][config.stage] = {
 												...config,
 												lazyComponent: React.lazy(config.component),
-												rootEnvironment: new Environment({
+												rootEnvironment: Environment.create({
 													dimensions: config.defaultDimensions || {},
 												}),
 											}

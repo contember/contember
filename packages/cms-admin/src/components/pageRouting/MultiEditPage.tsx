@@ -1,7 +1,7 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
 import { EntityListDataProvider } from '../../binding/coreComponents'
-import { MultiEditRenderer, MultiEditRendererProps } from '../../binding/facade/renderers'
+import { MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
 

@@ -1,3 +1,4 @@
+export * from './bindingFacade'
 export { default as Admin, AdminProps } from './Admin'
 export { default as Dimensions } from './Dimensions'
 export { default as Link } from './Link'

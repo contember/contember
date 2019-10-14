@@ -1,7 +1,7 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
 import { SingleEntityDataProvider } from '../../binding/coreComponents'
-import { DefaultRenderer, DefaultRendererProps } from '../../binding/facade/renderers'
+import { DefaultRenderer, DefaultRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 import { SingleEntityPageProps } from './SingleEntityPageProps'
 
@@ -20,3 +20,4 @@ const EditPage: Partial<PageProvider<EditPageProps>> & React.ComponentType<EditP
 EditPage.getPageName = (props: EditPageProps) => props.pageName || `edit_${lcfirst(props.entityName)}`
 
 export { EditPage }
+

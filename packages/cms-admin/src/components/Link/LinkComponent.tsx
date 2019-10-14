@@ -59,4 +59,4 @@ namespace LinkComponent {
 		}
 }
 
-export default LinkComponent
+export { LinkComponent }

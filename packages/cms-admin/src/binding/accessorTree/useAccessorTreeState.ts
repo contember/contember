@@ -1,6 +1,6 @@
 import { GraphQlClient } from 'cms-client'
 import * as React from 'react'
-import { ApiRequestReadyState, useAuthToken, useContentApiRequest, useIsFirstRenderRef } from '../../apiClient'
+import { ApiRequestReadyState, useAuthToken, useContentApiRequest } from '../../apiClient'
 import { useEnvironment } from '../accessorRetrievers'
 import { AccessorTreeRoot } from '../dao'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -39,7 +39,10 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	const [queryState, sendQuery] = useContentApiRequest<QueryRequestResponse>()
 	const [mutationState, sendMutation] = useContentApiRequest<MutationRequestResponse>()
 
-	const isFirstRenderRef = useIsFirstRenderRef()
+	// This ref is really just an implementation of the advice from https://reactjs.org/docs/hooks-faq.html#can-i-run-an-effect-only-on-updates
+	const isFirstRenderRef = React.useRef(true)
+	const isForcingRefreshRef = React.useRef(false) // This ref is described in detail below.
+
 	const stateRef = React.useRef(state)
 	const queryStateRef = React.useRef(queryState)
 
@@ -166,10 +169,18 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	)
 
 	React.useEffect(() => {
-		if (state.name === AccessorTreeStateName.Uninitialized) {
+		if (
+			state.name === AccessorTreeStateName.Uninitialized &&
+			// There can be updates while state.name is still AccessorTreeStateName.Uninitialized, and so that condition is
+			// not sufficient on its own. Thus we typically also enforce that queryStateRef.current.readyState is
+			// ApiRequestReadyState.Uninitialized. However, we may need to force a change even while both conditions hold,
+			// e.g. while a query is loading. For that we have a special ref which we always reset after we're done.
+			(isForcingRefreshRef.current || queryStateRef.current.readyState === ApiRequestReadyState.Uninitialized)
+		) {
 			if (query === undefined) {
 				// We're creating
 				initializeAccessorTree(undefined, undefined)
+				isForcingRefreshRef.current = false
 			} else {
 				dispatch({
 					type: AccessorTreeStateActionType.InitializeQuery,
@@ -180,6 +191,9 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 						return Promise.resolve()
 					})
 					.catch(rejectFailedRequest)
+					.finally(() => {
+						isForcingRefreshRef.current = false
+					})
 			}
 		}
 	}, [authToken, initializeAccessorTree, query, queryState.readyState, rejectFailedRequest, sendQuery, state.name])
@@ -202,13 +216,21 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 		}
 	}, [markerTree, queryState, state])
 
+	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions). We don't want this effect
+	// to run during the initial render.
 	React.useEffect(() => {
 		if (!isFirstRenderRef.current) {
+			isForcingRefreshRef.current = true
 			dispatch({
 				type: AccessorTreeStateActionType.Uninitialize,
 			})
 		}
-	}, [query, isFirstRenderRef])
+	}, [query])
+
+	// For this to work, this effect must be the last one to run.
+	React.useEffect(() => {
+		isFirstRenderRef.current = false
+	}, [])
 
 	return state
 }

@@ -3,7 +3,7 @@ import { arrayDifference } from 'cms-common'
 import * as React from 'react'
 import { Component, Environment, ErrorAccessor, FieldName } from '../../../binding'
 import { Select } from '../../ui'
-import { ChoiceArity, ChoiceField, ChoiceFieldProps, MultipleChoiceFieldMetadata } from './ChoiceField'
+import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
 
 export type MultipleSelectFieldPublicProps = FormGroupProps & {
 	name: FieldName
@@ -18,8 +18,15 @@ export type MultipleSelectFieldProps = MultipleSelectFieldPublicProps & Multiple
 
 export const MultipleSelectField = Component<MultipleSelectFieldProps>(props => {
 	return (
-		<ChoiceField name={props.name} options={props.options} arity={ChoiceArity.Multiple}>
-			{({ data, currentValues, onChange, environment, isMutating, errors }: MultipleChoiceFieldMetadata) => {
+		<ChoiceField name={props.name} options={props.options} arity={ChoiceFieldData.ChoiceArity.Multiple}>
+			{({
+				data,
+				currentValues,
+				onChange,
+				environment,
+				isMutating,
+				errors,
+			}: ChoiceFieldData.MultipleChoiceFieldMetadata) => {
 				const e: ErrorAccessor[] = errors
 				return (
 					<MultipleSelectFieldInner
@@ -39,7 +46,7 @@ export const MultipleSelectField = Component<MultipleSelectFieldProps>(props => 
 
 export interface MultipleSelectFieldInnerProps
 	extends MultipleSelectFieldPublicProps,
-		Omit<MultipleChoiceFieldMetadata, 'fieldName'> {
+		Omit<ChoiceFieldData.MultipleChoiceFieldMetadata, 'fieldName'> {
 	environment: Environment
 	errors: ErrorAccessor[]
 	isMutating: boolean
@@ -62,7 +69,7 @@ export class MultipleSelectFieldInner extends React.PureComponent<MultipleSelect
 				<Select
 					value={normalizedValues}
 					onChange={event => {
-						const selectedOptions: ChoiceField.ValueRepresentation[] = []
+						const selectedOptions: ChoiceFieldData.ValueRepresentation[] = []
 
 						// Not using .selectedOptions due to IE…
 						for (let i = 0; i < event.currentTarget.options.length; i++) {

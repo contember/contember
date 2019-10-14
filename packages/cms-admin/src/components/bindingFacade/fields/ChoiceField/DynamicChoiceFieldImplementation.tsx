@@ -13,9 +13,9 @@ import {
 	Parser,
 	ToOne,
 } from '../../../../binding'
-import { BaseChoiceMetadata, ChoiceArity, ChoiceField, ChoiceFieldBaseProps } from './ChoiceField'
+import { ChoiceFieldData } from './ChoiceFieldData'
 
-export type DynamicChoiceFieldImplementationProps = ChoiceFieldBaseProps &
+export type DynamicChoiceFieldImplementationProps = ChoiceFieldData.BaseProps &
 	Omit<Field.RawMetadata, 'data'> & {
 		subTreeRootAccessor: AccessorTreeRoot
 		currentValueEntity: EntityAccessor | EntityForRemovalAccessor | EntityCollectionAccessor
@@ -49,7 +49,7 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 	const entities =
 		currentValueEntity instanceof EntityCollectionAccessor ? currentValueEntity.entities : [currentValueEntity]
 
-	const currentValues: ChoiceField.ValueRepresentation[] = []
+	const currentValues: ChoiceFieldData.ValueRepresentation[] = []
 
 	for (const entity of entities) {
 		if (entity instanceof EntityAccessor) {
@@ -65,7 +65,7 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 	}
 
 	const normalizedData = optionEntities.map(
-		(item, i): ChoiceField.SingleDatum => {
+		(item, i): ChoiceFieldData.SingleDatum => {
 			let label: React.ReactNode
 
 			if (props.optionFieldFactory) {
@@ -86,17 +86,17 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 		},
 	)
 
-	const baseMetadata: BaseChoiceMetadata = {
+	const baseMetadata: ChoiceFieldData.BaseChoiceMetadata = {
 		...props,
 		data: normalizedData,
 		errors: currentValueEntity.errors,
 	}
 
-	if (props.arity === ChoiceArity.Multiple) {
+	if (props.arity === ChoiceFieldData.ChoiceArity.Multiple) {
 		return props.children({
 			...baseMetadata,
 			currentValues: currentValues,
-			onChange: (optionKey: ChoiceField.ValueRepresentation, isChosen: boolean) => {
+			onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
 				if (currentValueEntity instanceof EntityCollectionAccessor && currentValueEntity.addNew) {
 					if (isChosen) {
 						currentValueEntity.addNew(optionEntities[optionKey])
@@ -116,12 +116,12 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 				}
 			},
 		})
-	} else if (props.arity === ChoiceArity.Single) {
+	} else if (props.arity === ChoiceFieldData.ChoiceArity.Single) {
 		// No idea why this cast is necessary. TS is just being silly here…
 		return props.children({
 			...baseMetadata,
 			currentValue: currentValues.length ? currentValues[0] : -1,
-			onChange: (newValue: ChoiceField.ValueRepresentation) => {
+			onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
 				const entity = entities[0]
 				if (entity === undefined) {
 					return

@@ -2,7 +2,7 @@ import { Radio, RadioGroup } from '@blueprintjs/core'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { Component, Environment, ErrorAccessor, RelativeSingleField } from '../../../binding'
-import { ChoiceArity, ChoiceField, ChoiceFieldProps, SingleChoiceFieldMetadata } from './ChoiceField'
+import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
 
 export interface RadioFieldPublicProps extends Omit<FormGroupProps, 'children'> {
 	inline?: boolean
@@ -17,8 +17,15 @@ export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 
 export const RadioField = Component<RadioFieldProps>(props => {
 	return (
-		<ChoiceField name={props.name} options={props.options} arity={ChoiceArity.Single}>
-			{({ data, currentValue, onChange, isMutating, environment, errors }: SingleChoiceFieldMetadata) => {
+		<ChoiceField name={props.name} options={props.options} arity={ChoiceFieldData.ChoiceArity.Single}>
+			{({
+				data,
+				currentValue,
+				onChange,
+				isMutating,
+				environment,
+				errors,
+			}: ChoiceFieldData.SingleChoiceFieldMetadata) => {
 				return (
 					<RadioFieldInner
 						name={props.name}
@@ -38,9 +45,9 @@ export const RadioField = Component<RadioFieldProps>(props => {
 }, 'RadioField')
 
 interface RadioFieldInnerProps extends RadioFieldPublicProps {
-	data: SingleChoiceFieldMetadata['data']
-	currentValue: ChoiceField.ValueRepresentation
-	onChange: SingleChoiceFieldMetadata['onChange']
+	data: ChoiceFieldData.SingleChoiceFieldMetadata['data']
+	currentValue: ChoiceFieldData.ValueRepresentation
+	onChange: ChoiceFieldData.SingleChoiceFieldMetadata['onChange']
 	environment: Environment
 	errors: ErrorAccessor[]
 	isMutating: boolean

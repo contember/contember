@@ -13,6 +13,10 @@ export const apiRequestReducer = <SuccessData>(
 	action: ApiRequestAction<SuccessData>,
 ): ApiRequestState<SuccessData> => {
 	switch (action.type) {
+		case ApiRequestActionType.Uninitialize:
+			return {
+				readyState: ApiRequestReadyState.Uninitialized,
+			}
 		case ApiRequestActionType.Initialize:
 			return {
 				readyState: ApiRequestReadyState.Pending,

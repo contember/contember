@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from '@contember/ui'
+import { Button, ButtonProps, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { ErrorPersistResult, useDirtinessState, useMutationState, useTriggerPersist } from '../../../binding'
 import { ToastType } from '../../../state/toasts'
@@ -36,20 +36,32 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 
 	const isDisabled = isMutating || !isDirty
 
+	const message = React.useMemo(
+		() => (
+			<div style={{ textAlign: 'center' }}>
+				{!isDirty ? 'There is nothing to submit.' : isMutating ? 'Submitting…' : 'There are unsaved changes.'}
+			</div>
+		),
+		[isDirty, isMutating],
+	)
+
 	if (!triggerPersist) {
 		return null
 	}
 	return (
-		<Button
-			intent="primary"
-			onClick={onClick}
-			disabled={isDisabled}
-			isLoading={isMutating}
-			ref={buttonRef}
-			size="large"
-		>
-			{props.children || 'Save'}
-		</Button>
+		<FormGroup label={undefined} size="large" description={message}>
+			<Button
+				intent={isDisabled ? 'default' : 'primary'}
+				onClick={onClick}
+				disabled={isDisabled}
+				isLoading={isMutating}
+				ref={buttonRef}
+				size="large"
+				flow="block"
+			>
+				{props.children || 'Save'}
+			</Button>
+		</FormGroup>
 	)
 })
 PersistButton.displayName = 'PersistButton'

@@ -35,6 +35,8 @@
 			font-weight: $fw-light
 			color: $cui-formGroup-description-color
 			display: block
+			margin-top: .15em
+			line-height: $cui-base-lineHeight
 	&-label-wrap ~ &-field-wrap
 		margin-top: .3em
 
@@ -50,10 +52,10 @@
 				&-text
 					font-size: $fontSize
 			&-labelDescription
-				font-size: $fontSize * .9
+				font-size: $fontSize * .95
 			&-field
 				&-description
-					font-size: $fontSize * .85
+					font-size: $fontSize * .9
 
 		@if map_has_key($cui-control-sizes, $name)
 			$controlSettings: map_get($cui-control-sizes, $name)

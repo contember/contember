@@ -1,4 +1,6 @@
-import { Dropdown } from '@contember/ui'
+import { Icon } from '@blueprintjs/core'
+import { IconNames } from '@blueprintjs/icons'
+import { Dropdown, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
 
@@ -6,10 +8,25 @@ export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps
 
 export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
 	return (
-		<div className="cloneable-button">
+		<FormGroup label={undefined}>
 			<Dropdown
 				buttonProps={{
-					children: '+ Add new',
+					children: (
+						<>
+							<Icon
+								icon={IconNames.ADD}
+								style={{
+									marginRight: '0.2em',
+									position: 'relative',
+									top: '0.05em',
+								}}
+							/>
+							{'Add'}
+						</>
+					),
+					disabled: props.isMutating,
+					distinction: 'seamless',
+					flow: 'block',
 				}}
 			>
 				{({ requestClose }) => (
@@ -22,7 +39,7 @@ export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
 					/>
 				)}
 			</Dropdown>
-		</div>
+		</FormGroup>
 	)
 })
 AddNewBlockButton.displayName = 'AddNewBlockButton'

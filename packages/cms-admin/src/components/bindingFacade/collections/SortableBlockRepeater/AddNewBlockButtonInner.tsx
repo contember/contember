@@ -17,7 +17,7 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 				<Button
 					key={i}
 					distinction="seamless"
-					flow="block"
+					flow="generousBlock"
 					disabled={props.isMutating}
 					onClick={() => {
 						props.requestClose()

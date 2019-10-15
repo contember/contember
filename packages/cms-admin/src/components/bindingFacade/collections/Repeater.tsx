@@ -127,9 +127,9 @@ namespace Repeater {
 				this.props.children
 			) : (
 				<div className="cloneable">
-					{this.props.prependNew && <AddNewButton addNew={this.props.prependNew} className="cloneable-button" />}
+					{this.props.prependNew && <AddNewButton addNew={this.props.prependNew} />}
 					<div className="cloneable-content">{this.props.children}</div>
-					{this.props.appendNew && <AddNewButton addNew={this.props.appendNew} className="cloneable-button" />}
+					{this.props.appendNew && <AddNewButton addNew={this.props.appendNew} />}
 				</div>
 			)
 		}

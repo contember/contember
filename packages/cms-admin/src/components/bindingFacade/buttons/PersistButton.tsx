@@ -2,7 +2,7 @@ import { Button, ButtonProps, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { ErrorPersistResult, useDirtinessState, useMutationState, useTriggerPersist } from '../../../binding'
 import { ToastType } from '../../../state/toasts'
-import { useShowToast } from '../../ui'
+import { useShowToastWithTimeout } from '../../ui'
 
 export type PersistButtonProps = ButtonProps
 
@@ -11,7 +11,7 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 	const isDirty = useDirtinessState()
 	const triggerPersist = useTriggerPersist()
 	const buttonRef = React.useRef<HTMLButtonElement | null>(null)
-	const showToast = useShowToast()
+	const showToast = useShowToastWithTimeout()
 	const onClick = React.useCallback(() => {
 		if (!triggerPersist) {
 			return

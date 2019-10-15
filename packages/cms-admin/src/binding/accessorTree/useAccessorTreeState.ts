@@ -81,7 +81,6 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 					const normalizedData = data.data === null ? {} : data.data
 					const aliases = Object.keys(normalizedData)
 					const allSubMutationsOk = aliases.every(item => data.data[item].ok)
-					const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
 
 					if (!allSubMutationsOk) {
 						accessorTreeGenerator.generateLiveTree(
@@ -100,6 +99,8 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 							type: MutationErrorType.InvalidInput,
 						})
 					}
+					const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
+
 					if (!query) {
 						dispatch({
 							type: AccessorTreeStateActionType.SetData,

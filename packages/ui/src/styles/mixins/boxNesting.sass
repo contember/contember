@@ -12,7 +12,8 @@
 			--cui-boxNesting-paddingX: #{$paddingX}
 			--cui-boxNesting-paddingY: #{$paddingY}
 
-			& + &
+			& + &,
+			.formGroup + & // TODO this selector is not ideal. Solve this better.
 				margin-top: $separation
 		&.view-depth-#{$depth} &-heading + &-content
 			margin-top: $paddingY

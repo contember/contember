@@ -45,6 +45,8 @@ export type AccessorTreeState =
 	| RequestErrorAccessorTreeState
 	| InteractiveAccessorTreeState
 
+export type AccessorTreeStateWithData = MutatingAccessorTreeState | InteractiveAccessorTreeState
+
 //export type AccessorTreeGlobalStateById = {
 //	[Id in MarkerTreeRoot.TreeId]: any
 //}

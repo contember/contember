@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { InteractiveAccessorTreeState, MutatingAccessorTreeState } from './AccessorTreeState'
+import { AccessorTreeStateWithData } from './AccessorTreeState'
 
-export type AccessorTreeStateWithDataContextValue = MutatingAccessorTreeState | InteractiveAccessorTreeState | undefined
+export type AccessorTreeStateWithDataContextValue = AccessorTreeStateWithData | undefined
 
 export const AccessorTreeStateWithDataContext = React.createContext<AccessorTreeStateWithDataContextValue>(undefined)

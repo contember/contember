@@ -24,22 +24,10 @@ export const ImmutableContentLayoutRenderer = Component<ImmutableContentLayoutRe
 interface ImmutableContentLayoutRendererInnerProps extends FeedbackRendererProps, Omit<TitleBarProps, 'children'> {
 	side?: React.ReactNode
 	title?: React.ReactNode
-	beforeContent?: React.ReactNode
-	afterContent?: React.ReactNode
 }
 
 const ImmutableContentLayoutRendererInner = Component<ImmutableContentLayoutRendererInnerProps>(
-	({
-		side,
-		children,
-		title,
-		beforeContent,
-		afterContent,
-
-		navigation,
-		actions,
-		headingProps,
-	}) => {
+	({ side, children, title, navigation, actions, headingProps }) => {
 		const accessorTreeState = React.useContext(AccessorTreeStateWithDataContext)
 		const titleBar = React.useMemo(
 			() =>
@@ -73,11 +61,11 @@ const ImmutableContentLayoutRendererInner = Component<ImmutableContentLayoutRend
 		)
 	},
 	props => (
-		<>
+		<FeedbackRenderer>
 			{props.title}
 			{props.children}
 			{props.side}
-		</>
+		</FeedbackRenderer>
 	),
 	'ImmutableContentLayoutRendererInner',
 )

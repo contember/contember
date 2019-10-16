@@ -1,5 +1,6 @@
+export * from './DefaultRenderer'
 export * from './FeedbackRenderer'
 export * from './ImmutableContentLayoutRenderer'
-export * from './DefaultRenderer'
 export * from './MultiEditRenderer'
+export * from './MutableContentLayoutRenderer'
 export * from './TableRenderer'

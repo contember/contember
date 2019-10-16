@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { ContentLayoutRendererProps } from './ContentLayoutRenderer'
+import { ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 
-export interface TableRendererProps extends ContentLayoutRendererProps {
+export interface TableRendererProps extends ImmutableContentLayoutRendererProps {
 	tableHeader?: React.ReactNode
 }
 

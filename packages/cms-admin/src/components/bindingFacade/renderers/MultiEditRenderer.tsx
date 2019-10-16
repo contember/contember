@@ -2,10 +2,10 @@ import * as React from 'react'
 import { EnforceSubtypeRelation, EntityAccessor, SyntheticChildrenProvider } from '../../../binding'
 import { RemoveButton } from '../buttons'
 import { Repeater, Sortable, SortablePublicProps } from '../collections'
-import { ContentLayoutRendererProps } from './ContentLayoutRenderer'
+import { ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
 
-export interface MultiEditRendererProps extends ContentLayoutRendererProps, EntityCollectionPublicProps {
+export interface MultiEditRendererProps extends ImmutableContentLayoutRendererProps, EntityCollectionPublicProps {
 	enablePersist?: boolean
 	sortable?: Omit<SortablePublicProps, 'children'>
 }

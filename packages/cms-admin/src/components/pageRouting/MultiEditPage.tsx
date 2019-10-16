@@ -6,7 +6,7 @@ import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
 
 interface MultiEditPageProps extends EntityListPageProps {
-	rendererProps?: Omit<MultiEditRendererProps, 'children'>
+	rendererProps?: any & Omit<MultiEditRendererProps, 'children'>
 }
 
 const MultiEditPage: Partial<PageProvider<MultiEditPageProps>> & React.ComponentType<MultiEditPageProps> = React.memo(

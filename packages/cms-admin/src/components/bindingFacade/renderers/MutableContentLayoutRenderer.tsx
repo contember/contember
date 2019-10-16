@@ -24,8 +24,11 @@ export const MutableContentLayoutRenderer = Component<MutableContentLayoutRender
 			</ImmutableContentLayoutRenderer>
 		)
 	},
-	({ persistButtonComponent, ...immutableProps }) => (
-		<ImmutableContentLayoutRenderer {...immutableProps}>{persistButtonComponent}</ImmutableContentLayoutRenderer>
+	({ persistButtonComponent, children, ...immutableProps }) => (
+		<ImmutableContentLayoutRenderer {...immutableProps}>
+			{children}
+			{persistButtonComponent}
+		</ImmutableContentLayoutRenderer>
 	),
 	'MutableContentLayoutRenderer',
 )

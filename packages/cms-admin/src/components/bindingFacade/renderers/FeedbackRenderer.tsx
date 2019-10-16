@@ -10,11 +10,11 @@ import {
 } from '../../../binding'
 import { useRedirect } from '../../pageRouting'
 
-export interface CommonRendererProps {
+export interface FeedbackRendererProps {
 	children: React.ReactNode
 }
 
-export const CommonRenderer = Component<CommonRendererProps>(
+export const FeedbackRenderer = Component<FeedbackRendererProps>(
 	({ children }) => {
 		const accessorTreeState = React.useContext(AccessorTreeStateContext)
 		const redirect = useRedirect()
@@ -52,6 +52,6 @@ export const CommonRenderer = Component<CommonRendererProps>(
 			</AccessorTreeStateWithDataContext.Provider>
 		)
 	},
-	(props: CommonRendererProps): React.ReactNode => props.children,
-	'CommonRenderer',
+	(props: FeedbackRendererProps): React.ReactNode => props.children,
+	'FeedbackRenderer',
 )

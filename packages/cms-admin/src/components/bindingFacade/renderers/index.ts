@@ -1,4 +1,4 @@
-export * from './CommonRenderer'
+export * from './FeedbackRenderer'
 export * from './ContentLayoutRenderer'
 export * from './DefaultRenderer'
 export * from './MultiEditRenderer'

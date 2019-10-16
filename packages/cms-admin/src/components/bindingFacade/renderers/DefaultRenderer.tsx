@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { ContentLayoutRenderer, ContentLayoutRendererProps } from './ContentLayoutRenderer'
+import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 
-export type DefaultRendererProps = ContentLayoutRendererProps
+export type DefaultRendererProps = ImmutableContentLayoutRendererProps
 
-export const DefaultRenderer = ContentLayoutRenderer
+export const DefaultRenderer = ImmutableContentLayoutRenderer

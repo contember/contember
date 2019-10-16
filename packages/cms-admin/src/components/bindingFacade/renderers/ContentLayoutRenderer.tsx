@@ -8,20 +8,20 @@ import {
 } from '../../../binding'
 import { LayoutInner, LayoutSide } from '../../LayoutInner'
 import { PersistButton } from '../buttons'
-import { CommonRenderer, CommonRendererProps } from './CommonRenderer'
+import { FeedbackRenderer, FeedbackRendererProps } from './FeedbackRenderer'
 
 export interface ContentLayoutRendererProps extends ContentLayoutRendererInnerProps {}
 
 export const ContentLayoutRenderer = Component<ContentLayoutRendererProps>(
 	props => (
-		<CommonRenderer>
+		<FeedbackRenderer>
 			<ContentLayoutRendererInner {...props} />
-		</CommonRenderer>
+		</FeedbackRenderer>
 	),
 	'ContentLayoutRenderer',
 )
 
-interface ContentLayoutRendererInnerProps extends CommonRendererProps, Omit<TitleBarProps, 'children'> {
+interface ContentLayoutRendererInnerProps extends FeedbackRendererProps, Omit<TitleBarProps, 'children'> {
 	persistButtonComponent?: React.ComponentType
 	side?: React.ReactNode
 	title?: React.ReactNode

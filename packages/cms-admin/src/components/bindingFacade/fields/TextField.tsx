@@ -7,7 +7,7 @@ export type TextFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<TextInputProps, 'value' | 'onChange' | 'validationState'>
 
 export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
-	(fieldMetadata, { defaultValue, ...props }) => {
+	(fieldMetadata, { defaultValue, name, label, ...props }) => {
 		const generateOnChange = (data: FieldAccessor<string>): TextInputProps['onChange'] => e => {
 			data.updateValue && data.updateValue(e.target.value)
 		}
@@ -16,7 +16,7 @@ export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
 				value={fieldMetadata.data.currentValue || ''}
 				onChange={generateOnChange(fieldMetadata.data)}
 				validationState={fieldMetadata.errors.length ? 'invalid' : undefined}
-				{...(props as any)}
+				{...(props as any)} // This is VERY wrong.
 			/>
 		)
 	},

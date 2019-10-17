@@ -5,7 +5,7 @@ import { Sortable, SortablePublicProps } from '../collections'
 import {
 	ImmutableEntityCollectionRenderer,
 	ImmutableEntityCollectionRendererProps,
-	ImmutableEntityCollectionWrapperProps,
+	EntityCollectionWrapperProps,
 } from './ImmutableEntityCollectionRenderer'
 
 export interface MutableEntityCollectionRendererProps extends ImmutableEntityCollectionRendererProps {
@@ -27,7 +27,7 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		emptyMessage,
 	}) => {
 		const normalizedWrapper = React.useCallback(
-			(props: ImmutableEntityCollectionWrapperProps) => {
+			(props: EntityCollectionWrapperProps) => {
 				const Wrapper = wrapperComponent || Box
 
 				return (

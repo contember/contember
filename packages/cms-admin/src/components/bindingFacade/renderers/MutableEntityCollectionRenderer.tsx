@@ -2,13 +2,14 @@ import { Box } from '@contember/ui'
 import * as React from 'react'
 import { Component } from '../../../binding'
 import { AddNewButton } from '../buttons'
-import { Sortable, SortablePublicProps } from '../collections'
+import { Repeater, Sortable, SortablePublicProps } from '../collections'
 import {
 	EntityCollectionWrapperProps,
 	ImmutableEntityCollectionRenderer,
 	ImmutableEntityCollectionRendererProps,
 } from './ImmutableEntityCollectionRenderer'
 
+// TODO properly unify with repeaters
 export interface MutableEntityCollectionRendererProps extends ImmutableEntityCollectionRendererProps {
 	sortable?: Omit<SortablePublicProps, 'children'> // TODO this contains props that we don't want to set from here
 	enableAddingNew?: boolean
@@ -19,7 +20,7 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 	({
 		sortable,
 		enableAddingNew = true,
-		enableRemove, // TODO use this
+		enableRemove = true,
 		wrapperComponent,
 		children,
 
@@ -46,11 +47,22 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 							{children}
 						</Sortable>
 					) : (
-						props.children
+						<Repeater.Cloneable enableAddingNew={enableAddingNew}>
+							{props.accessor.entities.map(
+								entity =>
+									!!entity && ( // TODO this is temporary
+										<Box key={entity.getKey()}>
+											<Repeater.Item displayUnlinkButton={enableRemove} entity={entity} removeType="delete">
+												{children}
+											</Repeater.Item>
+										</Box>
+									),
+							)}
+						</Repeater.Cloneable>
 					)}
 				</Wrapper>
 			),
-			[children, enableAddingNew, sortable],
+			[children, enableAddingNew, enableRemove, sortable],
 		)
 
 		return (

@@ -31,10 +31,10 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 			(props: EntityCollectionWrapperProps) => (
 				<Box>
 					{props.children}
-					{enableAddingNew && <AddNewButton addNew={props.accessor.addNew} />}
+					{enableAddingNew && !sortable && <AddNewButton addNew={props.accessor.addNew} />}
 				</Box>
 			),
-			[enableAddingNew],
+			[enableAddingNew, sortable],
 		)
 		const Wrapper = wrapperComponent || fallbackWrapper
 		const normalizedWrapper = React.useCallback(

@@ -1,12 +1,12 @@
 import { lcfirst } from 'cms-common'
 import * as React from 'react'
 import { EntityListDataProvider } from '../../binding/coreComponents'
-import { MutableEntityCollectionRenderer, MutableEntityCollectionRendererProps } from '../bindingFacade/renderers'
+import { MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
 
 interface MultiEditPageProps extends EntityListPageProps {
-	rendererProps?: Omit<MutableEntityCollectionRendererProps, 'children'>
+	rendererProps?: Omit<MultiEditRendererProps, 'children'>
 }
 
 const MultiEditPage: Partial<PageProvider<MultiEditPageProps>> & React.ComponentType<MultiEditPageProps> = React.memo(
@@ -18,11 +18,12 @@ const MultiEditPage: Partial<PageProvider<MultiEditPageProps>> & React.Component
 			limit={props.limit}
 			filter={props.filter}
 		>
-			<MutableEntityCollectionRenderer {...props.rendererProps}>{props.children}</MutableEntityCollectionRenderer>
+			<MultiEditRenderer {...props.rendererProps}>{props.children}</MultiEditRenderer>
 		</EntityListDataProvider>
 	),
 )
 
+MultiEditPage.displayName = 'MultiEditPage'
 MultiEditPage.getPageName = (props: MultiEditPageProps) => props.pageName || `multiEdit_${lcfirst(props.entityName)}`
 
 export { MultiEditPage }

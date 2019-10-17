@@ -1,93 +1,40 @@
 import * as React from 'react'
-import { EnforceSubtypeRelation, EntityAccessor, SyntheticChildrenProvider } from '../../../binding'
-import { RemoveButton } from '../buttons'
-import { Repeater, Sortable, SortablePublicProps } from '../collections'
-import { ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
-import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
+import { Component } from '../../../binding'
+import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
+import {
+	MutableEntityCollectionRenderer,
+	MutableEntityCollectionRendererProps,
+} from './MutableEntityCollectionRenderer'
 
-export interface MultiEditRendererProps extends ImmutableContentLayoutRendererProps, EntityCollectionPublicProps {
-	enablePersist?: boolean
-	sortable?: Omit<SortablePublicProps, 'children'>
-}
+export interface MultiEditRendererProps
+	extends MutableContentLayoutRendererProps,
+		MutableEntityCollectionRendererProps {}
 
-class MultiEditRenderer extends React.PureComponent<MultiEditRendererProps & any> {
-	public static displayName = 'MultiEditRenderer'
+export const MultiEditRenderer = Component<MultiEditRendererProps>(
+	({
+		sortable,
+		enableAddingNew,
+		enableRemove,
+		children,
 
-	public render() {
-		return 'Multi edit pages are currently broken. Hang on!'
-		/*return (
-			<CollectionRenderer data={this.props.data}>
-				{rawData => (
-					<LayoutInner>
-						{DefaultRenderer.renderTitleBar(this.props)}
-						<Box>
-							{this.props.beforeContent}
-							{this.props.sortable === undefined && (
-								<Repeater.EntityCollection
-									entities={rawData}
-									enableUnlinkAll={this.props.enableUnlinkAll}
-									enableAddingNew={this.props.enableAddingNew}
-									enableUnlink={this.props.enableUnlink}
-									label={this.props.label}
-								>
-									{this.props.children}
-								</Repeater.EntityCollection>
-							)}
-							{this.props.sortable !== undefined && (
-								<Sortable
-									enableUnlinkAll={this.props.enableUnlinkAll}
-									enableAddingNew={this.props.enableAddingNew}
-									enableUnlink={this.props.enableUnlink}
-									label={this.props.label}
-									{...this.props.sortable}
-									entities={rawData}
-								>
-									{this.props.children}
-								</Sortable>
-							)}
-						</Box>
-						{this.props.enablePersist !== false && (
-							<div style={{ margin: '1em 0' }}>
-								<PersistButton />
-							</div>
-						)}
-					</LayoutInner>
-				)}
-			</CollectionRenderer>
-		)*/
-	}
+		beforeContent,
+		afterContent,
+		emptyMessage,
 
-	public static generateSyntheticChildren(props: MultiEditRendererProps) {
-		return (
-			<>
-				{props.sortable !== undefined && <Sortable {...props.sortable}>{props.children}</Sortable>}
-				{props.sortable && props.children}
-			</>
-		)
-	}
-}
-
-namespace MultiEditRenderer {
-	export interface MultiEditItemProps {
-		entity: EntityAccessor
-		displayUnlinkButton: boolean
-	}
-
-	export class MultiEditItem extends React.PureComponent<MultiEditItemProps> {
-		public render() {
-			return (
-				<>
-					{this.props.children}
-					{this.props.displayUnlinkButton && <RemoveButton />}
-				</>
-			)
-		}
-	}
-}
-
-type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
-	typeof MultiEditRenderer,
-	SyntheticChildrenProvider<MultiEditRendererProps>
->
-
-export { MultiEditRenderer }
+		...layoutProps
+	}) => (
+		<MutableContentLayoutRenderer {...layoutProps}>
+			<MutableEntityCollectionRenderer
+				sortable={sortable}
+				enableAddingNew={enableAddingNew}
+				enableRemove={enableRemove}
+				beforeContent={beforeContent}
+				afterContent={afterContent}
+				emptyMessage={emptyMessage}
+			>
+				{children}
+			</MutableEntityCollectionRenderer>
+		</MutableContentLayoutRenderer>
+	),
+	'',
+)

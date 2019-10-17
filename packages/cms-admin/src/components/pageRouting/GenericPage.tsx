@@ -11,6 +11,7 @@ const GenericPage: Partial<PageProvider<GenericPageProps>> & React.ComponentType
 	(props: GenericPageProps) => <LayoutInner>{props.children}</LayoutInner>,
 )
 
+GenericPage.displayName = 'GenericPage'
 GenericPage.getPageName = (props: GenericPageProps) => props.pageName
 
 export { GenericPage }

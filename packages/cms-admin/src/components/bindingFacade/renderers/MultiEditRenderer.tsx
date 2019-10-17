@@ -12,25 +12,26 @@ export interface MultiEditRendererProps
 
 export const MultiEditRenderer = Component<MultiEditRendererProps>(
 	({
-		sortable,
+		afterContent,
+		beforeContent,
+		children,
+		emptyMessage,
 		enableAddingNew,
 		enableRemove,
-		children,
-
-		beforeContent,
-		afterContent,
-		emptyMessage,
+		sortable,
+		wrapperComponent,
 
 		...layoutProps
 	}) => (
 		<MutableContentLayoutRenderer {...layoutProps}>
 			<MutableEntityCollectionRenderer
-				sortable={sortable}
+				afterContent={afterContent}
+				beforeContent={beforeContent}
+				emptyMessage={emptyMessage}
 				enableAddingNew={enableAddingNew}
 				enableRemove={enableRemove}
-				beforeContent={beforeContent}
-				afterContent={afterContent}
-				emptyMessage={emptyMessage}
+				sortable={sortable}
+				wrapperComponent={wrapperComponent}
 			>
 				{children}
 			</MutableEntityCollectionRenderer>

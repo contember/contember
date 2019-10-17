@@ -7,9 +7,10 @@ import {
 } from '../../../binding'
 import { Repeater } from '../collections'
 
-export interface ImmutableEntityCollectionWrapperProps {
+export interface EntityCollectionWrapperProps {
 	accessor: EntityCollectionAccessor
 	isEmpty: boolean
+	originalChildren: React.ReactNode
 	children: React.ReactNode
 }
 
@@ -17,7 +18,7 @@ export interface ImmutableEntityCollectionRendererProps {
 	beforeContent?: React.ReactNode
 	afterContent?: React.ReactNode
 	emptyMessage?: React.ReactNode
-	wrapperComponent?: React.ComponentType<ImmutableEntityCollectionWrapperProps>
+	wrapperComponent?: React.ComponentType<EntityCollectionWrapperProps>
 	children: React.ReactNode
 }
 
@@ -53,7 +54,7 @@ export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollec
 			<>
 				{beforeContent}
 				{!!Wrapper && (
-					<Wrapper isEmpty={isEmpty} accessor={root}>
+					<Wrapper isEmpty={isEmpty} accessor={root} originalChildren={children}>
 						{content}
 					</Wrapper>
 				)}

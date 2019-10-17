@@ -1,15 +1,16 @@
 import { Box } from '@contember/ui'
 import * as React from 'react'
 import { Component } from '../../../binding'
+import { AddNewButton } from '../buttons'
 import { Sortable, SortablePublicProps } from '../collections'
 import {
+	EntityCollectionWrapperProps,
 	ImmutableEntityCollectionRenderer,
 	ImmutableEntityCollectionRendererProps,
-	EntityCollectionWrapperProps,
 } from './ImmutableEntityCollectionRenderer'
 
 export interface MutableEntityCollectionRendererProps extends ImmutableEntityCollectionRendererProps {
-	sortable?: Omit<SortablePublicProps, 'children'>
+	sortable?: Omit<SortablePublicProps, 'children'> // TODO this contains props that we don't want to set from here
 	enableAddingNew?: boolean
 	enableRemove?: boolean
 }
@@ -17,7 +18,7 @@ export interface MutableEntityCollectionRendererProps extends ImmutableEntityCol
 export const MutableEntityCollectionRenderer = Component<MutableEntityCollectionRendererProps>(
 	({
 		sortable,
-		enableAddingNew,
+		enableAddingNew = true,
 		enableRemove, // TODO use this
 		wrapperComponent,
 		children,
@@ -26,27 +27,31 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		afterContent,
 		emptyMessage,
 	}) => {
-		const normalizedWrapper = React.useCallback(
-			(props: EntityCollectionWrapperProps) => {
-				const Wrapper = wrapperComponent || Box
-
-				return (
-					<Wrapper {...props}>
-						{sortable ? (
-							// Deliberately not using props.children
-							<Sortable {...sortable} entities={props.accessor}>
-								{children}
-							</Sortable>
-						) : (
-							props.children
-						)}
-					</Wrapper>
-				)
-			},
-			[children, sortable, wrapperComponent],
+		const fallbackWrapper: React.ComponentType<EntityCollectionWrapperProps> = React.useCallback(
+			(props: EntityCollectionWrapperProps) => (
+				<Box>
+					{props.children}
+					{enableAddingNew && <AddNewButton addNew={props.accessor.addNew} />}
+				</Box>
+			),
+			[enableAddingNew],
 		)
-
-		// TODO enableAddingNew
+		const Wrapper = wrapperComponent || fallbackWrapper
+		const normalizedWrapper = React.useCallback(
+			(props: EntityCollectionWrapperProps) => (
+				<Wrapper {...props}>
+					{sortable ? (
+						// Deliberately not using props.children
+						<Sortable {...sortable} entities={props.accessor} enableAddingNew={enableAddingNew}>
+							{children}
+						</Sortable>
+					) : (
+						props.children
+					)}
+				</Wrapper>
+			),
+			[children, enableAddingNew, sortable],
+		)
 
 		return (
 			// TODO maybe use Repeater.Item?

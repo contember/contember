@@ -34,6 +34,7 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<C
 	},
 )
 
+CreatePage.displayName = 'CreatePage'
 CreatePage.getPageName = (props: CreatePageProps) => props.pageName || `create_${lcfirst(props.entityName)}`
 
 export { CreatePage }

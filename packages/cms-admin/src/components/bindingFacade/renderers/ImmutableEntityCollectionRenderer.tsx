@@ -52,12 +52,12 @@ export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollec
 		return (
 			<>
 				{beforeContent}
-				{Wrapper && (
+				{!!Wrapper && (
 					<Wrapper isEmpty={isEmpty} accessor={root}>
 						{content}
 					</Wrapper>
 				)}
-				{Wrapper || content}
+				{!!Wrapper || content}
 				{afterContent}
 			</>
 		)

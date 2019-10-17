@@ -7,11 +7,8 @@ import {
 	ImmutableEntityCollectionRendererProps,
 	ImmutableEntityCollectionWrapperProps,
 } from './ImmutableEntityCollectionRenderer'
-import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
 
-export interface MutableEntityCollectionRendererProps
-	extends Omit<ImmutableEntityCollectionRendererProps, 'wrapperComponent'>,
-		MutableContentLayoutRendererProps {
+export interface MutableEntityCollectionRendererProps extends ImmutableEntityCollectionRendererProps {
 	sortable?: Omit<SortablePublicProps, 'children'>
 	enableAddingNew?: boolean
 	enableRemove?: boolean
@@ -22,41 +19,46 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		sortable,
 		enableAddingNew,
 		enableRemove, // TODO use this
+		wrapperComponent,
 		children,
 
 		beforeContent,
 		afterContent,
 		emptyMessage,
-
-		...layoutProps
 	}) => {
-		const SortableWrapper = React.useCallback(
-			(props: ImmutableEntityCollectionWrapperProps) => (
-				// ! because otherwise we won't use this entire component
-				// Deliberately not using props.children
-				<Box>
-					<Sortable {...sortable!} entities={props.accessor}>
-						{children}
-					</Sortable>
-				</Box>
-			),
-			[children, sortable],
+		const normalizedWrapper = React.useCallback(
+			(props: ImmutableEntityCollectionWrapperProps) => {
+				const Wrapper = wrapperComponent || Box
+
+				return (
+					<Wrapper {...props}>
+						{sortable ? (
+							// Deliberately not using props.children
+							<Sortable {...sortable} entities={props.accessor}>
+								{children}
+							</Sortable>
+						) : (
+							props.children
+						)}
+					</Wrapper>
+				)
+			},
+			[children, sortable, wrapperComponent],
 		)
 
 		// TODO enableAddingNew
 
 		return (
 			// TODO maybe use Repeater.Item?
-			<MutableContentLayoutRenderer {...layoutProps}>
-				<ImmutableEntityCollectionRenderer
-					beforeContent={beforeContent}
-					afterContent={afterContent}
-					emptyMessage={emptyMessage}
-					wrapperComponent={sortable !== undefined ? SortableWrapper : undefined}
-				>
-					{children}
-				</ImmutableEntityCollectionRenderer>
-			</MutableContentLayoutRenderer>
+
+			<ImmutableEntityCollectionRenderer
+				beforeContent={beforeContent}
+				afterContent={afterContent}
+				emptyMessage={emptyMessage}
+				wrapperComponent={normalizedWrapper}
+			>
+				{children}
+			</ImmutableEntityCollectionRenderer>
 		)
 	},
 	({
@@ -68,19 +70,15 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		beforeContent,
 		afterContent,
 		emptyMessage,
-
-		...layoutProps
 	}) => (
-		<MutableContentLayoutRenderer {...layoutProps}>
-			<ImmutableEntityCollectionRenderer
-				beforeContent={beforeContent}
-				afterContent={afterContent}
-				emptyMessage={emptyMessage}
-			>
-				{sortable && <Sortable {...sortable}>{children}</Sortable>}
-				{sortable || children}
-			</ImmutableEntityCollectionRenderer>
-		</MutableContentLayoutRenderer>
+		<ImmutableEntityCollectionRenderer
+			beforeContent={beforeContent}
+			afterContent={afterContent}
+			emptyMessage={emptyMessage}
+		>
+			{sortable && <Sortable {...sortable}>{children}</Sortable>}
+			{sortable || children}
+		</ImmutableEntityCollectionRenderer>
 	),
 	'MutableEntityCollectionRenderer',
 )

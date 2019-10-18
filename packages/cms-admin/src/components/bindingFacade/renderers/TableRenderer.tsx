@@ -28,24 +28,29 @@ export const TableRenderer = Component<TableRendererProps>(
 		enableRemove = true,
 		...layoutProps
 	}) => {
-		const tableWrapper = (props: EntityCollectionWrapperProps) => (
-			<Table {...tableProps}>
-				{props.accessor.entities.map(entity =>
-					entity ? (
-						<AccessorContext.Provider value={entity} key={entity.getKey()}>
-							<TableRow {...tableRowProps}>
-								{props.originalChildren}
-								{enableRemove && (
-									<TableCell shrunk>
-										<RemoveButton removeType={'delete'} immediatePersist={true} />
-									</TableCell>
-								)}
-							</TableRow>
-						</AccessorContext.Provider>
-					) : null,
-				)}
-			</Table>
-		)
+		const tableWrapper = (props: EntityCollectionWrapperProps) => {
+			if (props.isEmpty) {
+				return <>{props.children}</>
+			}
+			return (
+				<Table {...tableProps}>
+					{props.accessor.entities.map(entity =>
+						entity ? (
+							<AccessorContext.Provider value={entity} key={entity.getKey()}>
+								<TableRow {...tableRowProps}>
+									{props.originalChildren}
+									{enableRemove && (
+										<TableCell shrunk>
+											<RemoveButton removeType={'delete'} immediatePersist={true} />
+										</TableCell>
+									)}
+								</TableRow>
+							</AccessorContext.Provider>
+						) : null,
+					)}
+				</Table>
+			)
+		}
 		return (
 			<ImmutableContentLayoutRenderer {...layoutProps}>
 				<ImmutableEntityCollectionRenderer

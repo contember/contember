@@ -8,13 +8,14 @@ import { Component } from './Component'
 export interface ConnectionProps {
 	field: RelativeSingleField
 	to: UniqueWhere | Input.UniqueWhere<GraphQlBuilder.Literal>
+	isNonbearing?: boolean
 }
 
 export const Connection = Component<ConnectionProps>(
 	() => null,
 	{
 		generateConnectionMarker: (props, environment) =>
-			MarkerFactory.createConnectionMarker(props.field, props.to, environment),
+			MarkerFactory.createConnectionMarker(props.field, props.to, props.isNonbearing, environment),
 	},
 	'Connection',
 )

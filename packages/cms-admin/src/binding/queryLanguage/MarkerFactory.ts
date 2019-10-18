@@ -63,6 +63,12 @@ export namespace MarkerFactory {
 	export const createConnectionMarker = (
 		field: RelativeSingleField,
 		to: UniqueWhere | Input.UniqueWhere<GraphQlBuilder.Literal>,
+		isNonbearing: boolean | undefined,
 		environment: Environment,
-	) => new ConnectionMarker(field, typeof to === 'string' ? QueryLanguage.parseUniqueWhere(to, environment) : to)
+	) =>
+		new ConnectionMarker(
+			field,
+			typeof to === 'string' ? QueryLanguage.parseUniqueWhere(to, environment) : to,
+			isNonbearing,
+		)
 }

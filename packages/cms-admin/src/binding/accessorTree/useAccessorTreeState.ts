@@ -201,8 +201,12 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	}, [authToken, initializeAccessorTree, query, queryState.readyState, rejectFailedRequest, sendQuery, state.name])
 
 	React.useEffect(() => {
-		if (queryState.readyState === ApiRequestReadyState.Success && state.name === AccessorTreeStateName.Interactive) {
-			const generator = new MutationGenerator(queryState.data.data, state.data, markerTree)
+		if (state.name === AccessorTreeStateName.Interactive) {
+			const generator = new MutationGenerator(
+				queryState.readyState === ApiRequestReadyState.Success ? queryState.data.data : undefined,
+				state.data,
+				markerTree,
+			)
 
 			// TODO this is not as bad as it's an effect, and thus it doesn't block but it should still go off the UI thread.
 			const persistMutation = generator.getPersistMutation()

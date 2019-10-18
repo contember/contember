@@ -32,5 +32,5 @@ export const ListRenderer = Component<ListRendererProps>(
 			</ImmutableEntityCollectionRenderer>
 		</ImmutableContentLayoutRenderer>
 	),
-	'',
+	'ListRenderer',
 )

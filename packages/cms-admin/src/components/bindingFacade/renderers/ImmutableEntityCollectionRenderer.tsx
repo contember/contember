@@ -1,3 +1,4 @@
+import { Box, Message } from '@contember/ui'
 import * as React from 'react'
 import {
 	AccessorContext,
@@ -23,7 +24,13 @@ export interface ImmutableEntityCollectionRendererProps {
 }
 
 export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollectionRendererProps>(
-	({ beforeContent, afterContent, emptyMessage, wrapperComponent: Wrapper, children }) => {
+	({
+		beforeContent,
+		afterContent,
+		emptyMessage = 'There is no data at the moment.',
+		wrapperComponent: Wrapper,
+		children,
+	}) => {
 		const accessorTreeState = React.useContext(AccessorTreeStateWithDataContext)
 
 		if (accessorTreeState === undefined) {
@@ -35,7 +42,7 @@ export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollec
 			return null
 		}
 
-		const entities = Repeater.filterEntities(root)
+		const entities = Repeater.filterEntities(root, true)
 		const isEmpty = !entities.length
 
 		const content = (
@@ -46,7 +53,11 @@ export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollec
 							{children}
 						</AccessorContext.Provider>
 					))}
-				{isEmpty && emptyMessage}
+				{isEmpty && (
+					<Box>
+						<Message flow="generousBlock">{emptyMessage}</Message>
+					</Box>
+				)}
 			</>
 		)
 

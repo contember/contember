@@ -14,10 +14,10 @@
 	},
 	"devDependencies": {
 		"@contember/database-tester": "^0.0.0",
-		"@types/jasmine": "^3.4.0",
-		"@types/node": "^12.7.5",
+		"@types/jasmine": "^3.4.4",
+		"@types/node": "^12.11.1",
 		"@types/pg": "^7.11.0",
-		"jasmine": "^3.4.0",
-		"typescript": "^3.6.3"
+		"jasmine": "^3.5.0",
+		"typescript": "^3.6.4"
 	}
 }

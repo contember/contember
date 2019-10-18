@@ -55,6 +55,6 @@
 		"@types/lru-cache": "^5.1.0",
 		"@types/prompts": "^2.4.0",
 		"@types/uuid": "^3.4.5",
-		"typescript": "^3.6.3"
+		"typescript": "^3.6.4"
 	}
 }

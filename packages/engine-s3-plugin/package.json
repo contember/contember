@@ -9,7 +9,7 @@
 		"@types/graphql": "^14.5.0",
 		"@types/mime-types": "^2.1.0",
 		"@types/uuid": "^3.4.5",
-		"typescript": "^3.6.3"
+		"typescript": "^3.6.4"
 	},
 	"dependencies": {
 		"@contember/engine-common": "^0.0.0",

@@ -226,10 +226,18 @@ class AccessorTreeGenerator {
 						field.fieldName in errors.children
 							? errors.children[field.fieldName].errors
 							: []
+					const persistedValue =
+						fieldData instanceof FieldAccessor ? fieldData.persistedValue : fieldData === undefined ? null : fieldData
 					const onChange = (newValue: Scalar | GraphQlBuilder.Literal) => {
 						onUpdate(
 							placeholderName,
-							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(placeholderName, newValue, fieldErrors, onChange),
+							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+								placeholderName,
+								newValue,
+								persistedValue,
+								fieldErrors,
+								onChange,
+							),
 						)
 					}
 					// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
@@ -241,6 +249,7 @@ class AccessorTreeGenerator {
 							: fieldData instanceof FieldAccessor
 							? fieldData.currentValue
 							: fieldData,
+						persistedValue,
 						fieldErrors,
 						onChange,
 					)

@@ -1,7 +1,8 @@
 import { IconName } from '@blueprintjs/icons'
 import { Button, ButtonOwnProps, ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, EntityAccessor, useMutationState, useTriggerPersist } from '../../../binding'
+import { AccessorContext, EntityAccessor, useMutationState } from '../../../binding'
+import { useTriggerPersistWithFeedback } from '../../ui'
 import { RemovalType } from '../types'
 
 export type RemoveButtonProps = ButtonProps & {
@@ -14,7 +15,7 @@ export type RemoveButtonProps = ButtonProps & {
 export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 	const { removeType, icon, children, immediatePersist, ...rest } = props
 	const value = React.useContext(AccessorContext)
-	const triggerPersist = useTriggerPersist()
+	const triggerPersist = useTriggerPersistWithFeedback()
 	const isMutating = useMutationState()
 	const onClick = React.useCallback(() => {
 		if (!(value instanceof EntityAccessor) || !value.remove) {

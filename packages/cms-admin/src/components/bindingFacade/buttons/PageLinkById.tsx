@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { useEntityContext } from '../../../binding'
+import { AccessorContext, EntityAccessor, useEntityContext } from '../../../binding'
 import { InnerProps } from '../../Link'
 import PageLink, { PageConfig } from '../../pageRouting/PageLink'
 
@@ -11,7 +11,11 @@ interface PageLinkByIdProps {
 }
 
 export const PageLinkById = React.memo(function(props: PageLinkByIdProps) {
-	const data = useEntityContext()
+	const data = React.useContext(AccessorContext)
+
+	if (!(data instanceof EntityAccessor)) {
+		return null
+	}
 
 	const id = data.primaryKey
 

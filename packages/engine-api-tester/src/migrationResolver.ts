@@ -1,4 +1,4 @@
-import { Migration, MigrationsResolver } from '@contember/engine-system-api'
+import { Migration, MigrationsResolver } from '@contember/schema-migrations'
 import { createMock } from './utils'
 
 export const createMigrationResolver = (migrations: Migration[]): MigrationsResolver =>

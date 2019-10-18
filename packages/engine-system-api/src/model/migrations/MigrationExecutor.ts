@@ -1,14 +1,12 @@
 import { Stage } from '../dtos/Stage'
 import CreateEventCommand from '../commands/CreateEventCommand'
-import { EventType } from '../EventType'
+import { EventType } from '@contember/engine-common'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import { Client } from '@contember/database'
 import { formatSchemaName } from '../helpers/stageHelpers'
-import Migration from './Migration'
-import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
+import { Migration, ModificationHandlerFactory, createMigrationBuilder } from '@contember/schema-migrations'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { wrapIdentifier } from '@contember/database'
-import { createMigrationBuilder } from '../../utils/pgMigrateHelpers'
 import { UuidProvider } from '../../utils/uuid'
 
 class MigrationExecutor {

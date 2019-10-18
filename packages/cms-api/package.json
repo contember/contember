@@ -21,6 +21,7 @@
 		"@contember/queryable": "^0.0.0",
 		"@contember/schema": "^0.0.0",
 		"@contember/schema-definition": "^0.0.0",
+		"@contember/schema-migrations": "^0.0.0",
 		"@contember/schema-utils": "^0.0.0",
 		"@contember/utils": "^0.0.0",
 		"@koa/cors": "^2.2.3",

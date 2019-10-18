@@ -1,5 +1,4 @@
-import { AnyEvent } from '../../dtos/Event'
-import { EventType } from '../../EventType'
+import { AnyEvent, EventType } from '@contember/engine-common'
 import DependencyBuilder from '../DependencyBuilder'
 
 /**

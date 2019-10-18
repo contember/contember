@@ -1,18 +1,16 @@
 import { Schema } from '@contember/schema'
 import { tuple } from '@contember/utils'
 import { emptySchema } from '@contember/schema-utils'
-import { SchemaMigrator } from './SchemaMigrator'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import LatestMigrationByStageQuery from './model/queries/LatestMigrationByStageQuery'
 import LatestMigrationByEventQuery from './model/queries/LatestMigrationByEventQuery'
-import { MigrationsResolver } from './MigrationsResolver'
+import { SchemaVersionBuilder as SchemaVersionBuilderInternal } from '@contember/schema-migrations'
 
 export class SchemaVersionBuilder {
 	constructor(
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
-		private readonly migrationsResolver: MigrationsResolver,
-		private readonly schemaMigrator: SchemaMigrator,
+		private readonly internalBuilder: SchemaVersionBuilderInternal,
 	) {}
 
 	async buildSchemaForStage(stageSlug: string): Promise<Schema> {
@@ -36,21 +34,14 @@ export class SchemaVersionBuilder {
 	}
 
 	async buildSchema(targetVersion?: string): Promise<Schema> {
-		return this.doBuild(emptySchema, version => !targetVersion || version <= targetVersion)
+		return this.internalBuilder.buildSchema(targetVersion)
 	}
 
 	async buildSchemaUntil(targetVersion: string): Promise<Schema> {
-		return this.doBuild(emptySchema, version => version < targetVersion)
+		return this.internalBuilder.buildSchemaUntil(targetVersion)
 	}
 
 	async continue(schema: Schema, previousVersion: string | null, targetVersion: string): Promise<Schema> {
-		return this.doBuild(schema, version => version <= targetVersion && version > (previousVersion || ''))
-	}
-
-	private async doBuild(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
-		return (await this.migrationsResolver.getMigrations())
-			.filter(({ version }) => condition(version))
-			.map(({ modifications }) => modifications)
-			.reduce<Schema>((schema, modifications) => this.schemaMigrator.applyDiff(schema, modifications), initialSchema)
+		return this.internalBuilder.continue(schema, previousVersion, targetVersion)
 	}
 }

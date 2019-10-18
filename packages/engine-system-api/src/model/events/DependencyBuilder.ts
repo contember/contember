@@ -1,4 +1,4 @@
-import { AnyEvent } from '../dtos/Event'
+import { AnyEvent } from '@contember/engine-common'
 
 interface DependencyBuilder {
 	build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies>

@@ -2,12 +2,12 @@ import { FileNameHelper } from '@contember/engine-common'
 import { Client } from '@contember/database'
 import {
 	LatestMigrationByStageQuery,
-	Migration,
 	MigrationsResolver,
 	ProjectMigrator,
 	StageCreator,
 	StageConfig,
 } from '@contember/engine-system-api'
+import { Migration } from '@contember/schema-migrations'
 
 export class TesterStageManager {
 	private createdStages = new Set<string>()

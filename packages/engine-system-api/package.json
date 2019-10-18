@@ -16,14 +16,12 @@
 		"@contember/queryable": "^0.0.0",
 		"@contember/schema": "^0.0.0",
 		"@contember/schema-utils": "^0.0.0",
+		"@contember/schema-migrations": "^0.0.0",
 		"@contember/utils": "^0.0.0",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-errors": "^2.3.1",
-		"fast-deep-equal": "^2.0.1",
 		"graphql": "^14.5.4",
-		"node-pg-migrate": "^3.22.0",
-		"pg": "^7.12.1",
-		"rfc6902": "^3.0.4"
+		"pg": "^7.12.1"
 	},
 	"devDependencies": {
 		"@contember/engine-api-tester": "^0.0.0",
@@ -36,7 +34,6 @@
 		"@types/jasmine": "^3.4.4",
 		"@types/node": "^12.11.1",
 		"@types/pg": "^7.11.0",
-		"@types/uuid": "^3.4.5",
 		"jasmine": "^3.5.0",
 		"typescript": "^3.6.4"
 	}

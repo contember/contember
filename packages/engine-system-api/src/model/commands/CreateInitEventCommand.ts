@@ -1,6 +1,6 @@
 import { Client, ConflictActionType } from '@contember/database'
 import { UuidProvider } from '../../utils/uuid'
-import { EventType } from '../EventType'
+import { EventType } from '@contember/engine-common'
 
 class CreateInitEventCommand {
 	constructor(private readonly providers: UuidProvider) {}

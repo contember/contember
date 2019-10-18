@@ -2,13 +2,13 @@ import { AuthorizationScope, Authorizator } from '@contember/authorization'
 import { Acl, Schema } from '@contember/schema'
 import { Identity } from '@contember/engine-common'
 import { Stage } from '../dtos/Stage'
-import { AnyEvent, ContentEvent } from '../dtos/Event'
+import { AnyEvent, ContentEvent } from '@contember/engine-common'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import Actions from '../authorization/Actions'
 import { ProjectConfig } from '../../types'
 import { Client } from '@contember/database'
-import { isContentEvent } from '../EventType'
+import { isContentEvent } from '@contember/engine-common'
 
 type PermissionsByRow = { [rowId: string]: boolean }
 type PermissionsByTable = { [tableName: string]: PermissionsByRow }

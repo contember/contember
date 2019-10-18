@@ -1,7 +1,5 @@
-import { DatabaseQuery } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
-import { EventType } from '../EventType'
-import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } from '../dtos/Event'
+import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { AnyEvent, CreateEvent, DeleteEvent, EventType, RunMigrationEvent, UpdateEvent } from '@contember/engine-common'
 import { assertNever } from '@contember/utils'
 
 class DiffQuery extends DatabaseQuery<AnyEvent[]> {

@@ -5,8 +5,8 @@ import { ListRenderer, ListRendererProps } from '../bindingFacade'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
 
-interface ListPageProps extends EntityListPageProps {
-	rendererProps?: any & Omit<ListRendererProps, 'children'>
+export interface ListPageProps extends EntityListPageProps {
+	rendererProps?: Omit<ListRendererProps, 'children'>
 }
 
 const ListPage: Partial<PageProvider<ListPageProps>> & React.ComponentType<ListPageProps> = React.memo(

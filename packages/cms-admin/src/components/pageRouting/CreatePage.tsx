@@ -7,7 +7,7 @@ import { DynamicLink } from '../DynamicLink'
 import { PageProvider } from './PageProvider'
 import { SingleEntityPageProps } from './SingleEntityPageProps'
 
-interface CreatePageProps extends Omit<SingleEntityPageProps, 'where'> {
+export interface CreatePageProps extends Omit<SingleEntityPageProps, 'where'> {
 	redirectOnSuccess?: RequestChange // TODO we cannot really redirect to an edit page of the newly-created entity.
 	rendererProps?: Omit<MutableSingleEntityRendererProps, 'children'>
 }

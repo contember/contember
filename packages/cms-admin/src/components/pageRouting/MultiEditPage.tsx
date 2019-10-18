@@ -5,7 +5,7 @@ import { MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/rend
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
 
-interface MultiEditPageProps extends EntityListPageProps {
+export interface MultiEditPageProps extends EntityListPageProps {
 	rendererProps?: Omit<MultiEditRendererProps, 'children'>
 }
 

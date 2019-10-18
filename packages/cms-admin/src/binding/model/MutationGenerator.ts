@@ -209,6 +209,7 @@ export class MutationGenerator {
 			placeholderName: string
 			value: GraphQlBuilder.Literal | Scalar
 		}> = []
+		const nonbearingConnections: ConnectionMarker[] = []
 
 		for (const placeholderName in entityFields) {
 			const marker = entityFields[placeholderName]
@@ -304,7 +305,11 @@ export class MutationGenerator {
 					})
 				}
 			} else if (marker instanceof ConnectionMarker) {
-				builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
+				if (marker.isNonbearing) {
+					nonbearingConnections.push(marker)
+				} else {
+					builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
+				}
 			} else if (marker instanceof MarkerTreeRoot) {
 				// Do nothing: we don't support persisting nested queries (yet?).
 			} else {
@@ -312,9 +317,12 @@ export class MutationGenerator {
 			}
 		}
 
-		if (nonbearingFields.length && builder.data !== undefined && !isEmptyObject(builder.data)) {
+		if (builder.data !== undefined && !isEmptyObject(builder.data)) {
 			for (const { value, placeholderName } of nonbearingFields) {
 				builder = builder.set(placeholderName, value)
+			}
+			for (const marker of nonbearingConnections) {
+				builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
 			}
 		}
 

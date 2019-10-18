@@ -28,6 +28,9 @@
 		},
 		{
 			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../schema-migrations/src"
 		}
 	]
 }

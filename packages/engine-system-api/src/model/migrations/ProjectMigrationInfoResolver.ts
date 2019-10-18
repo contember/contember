@@ -1,7 +1,6 @@
-import Migration from './Migration'
 import { ProjectConfig } from '../../types'
 import LatestMigrationByStageQuery from '../queries/LatestMigrationByStageQuery'
-import { MigrationsResolver } from '../../MigrationsResolver'
+import { MigrationsResolver, Migration } from '@contember/schema-migrations'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 

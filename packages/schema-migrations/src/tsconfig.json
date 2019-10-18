@@ -1,0 +1,22 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src",
+		"esModuleInterop": true,
+		"downlevelIteration": true
+	},
+	"references": [
+		{
+			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../schema/src"
+		},
+		{
+			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../utils/src"
+		}
+	]
+}

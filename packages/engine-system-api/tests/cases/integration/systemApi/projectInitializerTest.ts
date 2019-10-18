@@ -3,7 +3,7 @@ import { ApiTester, createCreateEvent, createRunMigrationEvent, GQL } from '@con
 import { createMock } from '../../../src/utils'
 import StageTree from '../../../../src/model/stages/StageTree'
 import { StageWithoutEvent } from '../../../../src/model/dtos/Stage'
-import Migration from '../../../../src/model/migrations/Migration'
+import { Migration } from '@contember/schema-migrations'
 import { createMigrationResolver } from '@contember/engine-api-tester/dist/src/migrationResolver'
 
 describe('project initializer', () => {

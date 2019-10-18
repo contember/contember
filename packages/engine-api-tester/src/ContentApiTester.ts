@@ -1,4 +1,5 @@
-import { formatSchemaName, SchemaVersionBuilder, setupSystemVariables } from '@contember/engine-system-api'
+import { formatSchemaName, setupSystemVariables } from '@contember/engine-system-api'
+import { SchemaVersionBuilder } from '@contember/schema-migrations'
 import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import { Client } from '@contember/database'
 import {

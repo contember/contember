@@ -6,19 +6,17 @@ import {
 	PermissionsVerifier,
 } from '@contember/engine-content-api'
 import {
-	SchemaVersionBuilder,
-	SystemContainerFactory,
+	createMigrationFilesManager,
 	MigrationsResolver,
 	SchemaMigrator,
-	ModificationHandlerFactory,
+	SchemaVersionBuilder,
+	SystemContainerFactory,
 	SystemExecutionContainer,
-	createMigrationFilesManager,
-	Providers as SystemProviders,
 } from '@contember/engine-system-api'
 import { DatabaseCredentials, MigrationFilesManager, MigrationsRunner } from '@contember/engine-common'
 import { Providers as TenantProviders, TenantContainer } from '@contember/engine-tenant-api'
 import { Schema } from '@contember/schema'
-import { Container, Builder } from '@contember/dic'
+import { Builder, Container } from '@contember/dic'
 import AuthMiddlewareFactory from './http/AuthMiddlewareFactory'
 import TenantMiddlewareFactory from './http/TenantMiddlewareFactory'
 import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
@@ -50,6 +48,11 @@ import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { getArgumentValues } from 'graphql/execution/values'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
+import {
+	ModificationHandlerFactory,
+	SchemaVersionBuilder as SchemaVersionBuilderInternal,
+} from '@contember/schema-migrations'
+
 export type ProjectContainer = Container<{
 	project: ProjectWithS3
 	systemDbClient: Client
@@ -244,7 +247,10 @@ class CompositionRoot {
 				.addService(
 					'schemaVersionBuilder',
 					({ systemQueryHandler, migrationsResolver, schemaMigrator }) =>
-						new SchemaVersionBuilder(systemQueryHandler, migrationsResolver, schemaMigrator),
+						new SchemaVersionBuilder(
+							systemQueryHandler,
+							new SchemaVersionBuilderInternal(migrationsResolver, schemaMigrator),
+						),
 				)
 				.addService('s3', ({ project }) => {
 					return new S3Service(project.s3)

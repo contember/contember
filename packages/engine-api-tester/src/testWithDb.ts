@@ -2,12 +2,12 @@ import 'jasmine'
 import { Model } from '@contember/schema'
 import { createMock } from './utils'
 import {
+	SchemaMigrator,
 	Migration,
 	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaDiffer,
-	SchemaMigrator,
-} from '@contember/engine-system-api'
+} from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { ApiTester } from './ApiTester'
 import { SelectBuilder } from '@contember/database'

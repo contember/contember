@@ -1,7 +1,7 @@
 import DependencyBuilder from './DependencyBuilder'
 import { DiffErrorCode } from '../../schema'
 import { Stage } from '../dtos/Stage'
-import { AnyEvent } from '../dtos/Event'
+import { AnyEvent } from '@contember/engine-common'
 import { QueryHandler } from '@contember/queryable'
 import DiffCountQuery from '../queries/DiffCountQuery'
 import DiffQuery from '../queries/DiffQuery'

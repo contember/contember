@@ -8,29 +8,31 @@ import MigrationExecutor from './model/migrations/MigrationExecutor'
 import EventApplier from './model/events/EventApplier'
 import EventsRebaser from './model/events/EventsRebaser'
 import ReleaseExecutor from './model/events/ReleaseExecutor'
-import { Builder, Container } from '@contember/dic'
+import { Builder } from '@contember/dic'
 import TableReferencingResolver from './model/events/TableReferencingResolver'
-import { Client } from '@contember/database'
+import { Client, DatabaseQueryable } from '@contember/database'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { MigrationFilesManager } from '@contember/engine-common'
 import { ContentPermissionVerifier, EventsPermissionsVerifier } from './model/events/EventsPermissionsVerifier'
 import DependencyBuilder from './model/events/DependencyBuilder'
 import DiffBuilder from './model/events/DiffBuilder'
 import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
 import { ProjectConfig } from './types'
-import { SchemaMigrator } from './SchemaMigrator'
-import { MigrationsResolver } from './MigrationsResolver'
+import {
+	MigrationDiffCreator,
+	MigrationSqlDryRunner,
+	MigrationsResolver,
+	ModificationHandlerFactory,
+	SchemaDiffer,
+	SchemaMigrator,
+	SchemaVersionBuilder as SchemaVersionBuilderInternal,
+} from '@contember/schema-migrations'
 import RebaseExecutor from './model/events/RebaseExecutor'
 import StageTree from './model/stages/StageTree'
-import ModificationHandlerFactory from './model/migrations/modifications/ModificationHandlerFactory'
-import MigrationDiffCreator from './model/migrations/MigrationDiffCreator'
 import ProjectInitializer from './ProjectInitializer'
 import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
 import ProjectMigrator from './model/migrations/ProjectMigrator'
-import SchemaDiffer from './model/migrations/SchemaDiffer'
 import StageCreator from './model/stages/StageCreator'
-import MigrationSqlDryRunner from './model/migrations/MigrationSqlDryRunner'
 import { UuidProvider } from './utils/uuid'
 
 interface SystemExecutionContainer {
@@ -85,9 +87,14 @@ namespace SystemExecutionContainer {
 				)
 				.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
 				.addService(
+					'schemaVersionBuilderInternal',
+					({ schemaMigrator, migrationsResolver }) =>
+						new SchemaVersionBuilderInternal(migrationsResolver, schemaMigrator),
+				)
+				.addService(
 					'schemaVersionBuilder',
-					({ queryHandler, schemaMigrator, migrationsResolver }) =>
-						new SchemaVersionBuilder(queryHandler, migrationsResolver, schemaMigrator),
+					({ queryHandler, schemaVersionBuilderInternal }) =>
+						new SchemaVersionBuilder(queryHandler, schemaVersionBuilderInternal),
 				)
 				.addService(
 					'migrationExecutor',
@@ -150,8 +157,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'migrationDiffCreator',
-					({ schemaDiffer, migrationFilesManager, schemaVersionBuilder }) =>
-						new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer),
+					({ schemaDiffer, migrationFilesManager, schemaVersionBuilderInternal }) =>
+						new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilderInternal, schemaDiffer),
 				)
 				.addService(
 					'projectMigrationInfoResolver',
@@ -187,8 +194,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'migrationSqlDryRunner',
-					({ schemaVersionBuilder, modificationHandlerFactory, migrationsResolver }) =>
-						new MigrationSqlDryRunner(migrationsResolver, modificationHandlerFactory, schemaVersionBuilder),
+					({ schemaVersionBuilderInternal, modificationHandlerFactory, migrationsResolver }) =>
+						new MigrationSqlDryRunner(migrationsResolver, modificationHandlerFactory, schemaVersionBuilderInternal),
 				)
 		}
 	}

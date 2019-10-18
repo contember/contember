@@ -1,6 +1,7 @@
 import 'jasmine'
 import { GQL } from './tags'
-import { AnyEvent, CreateEvent, DiffQuery, InitEventQuery, StageBySlugQuery } from '@contember/engine-system-api'
+import { DiffQuery, InitEventQuery, StageBySlugQuery } from '@contember/engine-system-api'
+import { AnyEvent, CreateEvent } from '@contember/engine-common'
 import { EventSequence } from './EventSequence'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'

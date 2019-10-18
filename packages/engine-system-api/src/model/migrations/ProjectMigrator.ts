@@ -1,25 +1,24 @@
 import StageTree from '../stages/StageTree'
-import { MigrationsResolver } from '../../MigrationsResolver'
-import { Client } from '@contember/database'
+import {
+	createMigrationBuilder,
+	Migration,
+	MigrationsResolver,
+	Modification,
+	ModificationHandlerFactory,
+} from '@contember/schema-migrations'
+import { Client, DatabaseQueryable, wrapIdentifier } from '@contember/database'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
-import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import { emptySchema } from '@contember/schema-utils'
-import Migration from './Migration'
 import { Schema } from '@contember/schema'
 import CreateEventCommand from '../commands/CreateEventCommand'
-import { EventType, isContentEvent } from '../EventType'
+import { ContentEvent, EventType, isContentEvent } from '@contember/engine-common'
 import { Stage, StageWithoutEvent } from '../dtos/Stage'
-import { ContentEvent } from '../dtos/Event'
 import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
 import DiffQuery from '../queries/DiffQuery'
-import { Modification } from './modifications/Modification'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import RecreateContentEvent from '../commands/RecreateContentEvent'
-import { wrapIdentifier } from '@contember/database'
-import { createMigrationBuilder } from '../../utils/pgMigrateHelpers'
 import { UuidProvider } from '../../utils/uuid'
 
 type StageEventsMap = Record<string, ContentEvent[]>

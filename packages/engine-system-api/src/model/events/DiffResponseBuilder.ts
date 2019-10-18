@@ -1,6 +1,5 @@
-import { AnyEvent } from '../dtos/Event'
+import { AnyEvent, EventType } from '@contember/engine-common'
 import { Event as ApiEvent, EventType as ApiEventType } from '../../schema'
-import { EventType } from '../EventType'
 import { assertNever } from '@contember/utils'
 import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
 

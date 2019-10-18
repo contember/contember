@@ -1,5 +1,5 @@
 import { Client } from '@contember/database'
-import { EventType } from '../EventType'
+import { EventType } from '@contember/engine-common'
 import { UuidProvider } from '../../utils/uuid'
 
 class CreateEventCommand {

@@ -3,17 +3,19 @@ import { MigrationFilesManager, MigrationsRunner } from '@contember/engine-commo
 import {
 	CreateInitEventCommand,
 	createMigrationFilesManager,
-	MigrationsResolver,
-	ModificationHandlerFactory,
 	ProjectConfig,
-	SchemaMigrator,
-	SchemaVersionBuilder,
 	setupSystemVariables,
 	SystemContainerFactory,
 	SystemExecutionContainer,
 	typeDefs as systemTypeDefs,
 	unnamedIdentity,
 } from '@contember/engine-system-api'
+import {
+	SchemaMigrator,
+	MigrationsResolver,
+	ModificationHandlerFactory,
+	SchemaVersionBuilder,
+} from '@contember/schema-migrations'
 import {
 	GraphQlSchemaBuilderFactory,
 	PermissionsByIdentityFactory,
@@ -96,11 +98,7 @@ export class ApiTester {
 		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(projectMigrationFilesManager)
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const schemaMigrator = new SchemaMigrator(modificationHandlerFactory)
-		const schemaVersionBuilder = new SchemaVersionBuilder(
-			projectDb.createQueryHandler(),
-			migrationsResolver,
-			schemaMigrator,
-		)
+		const schemaVersionBuilder = new SchemaVersionBuilder(migrationsResolver, schemaMigrator)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories, getArgumentValues)
 
 		const systemContainerFactory = new SystemContainerFactory()

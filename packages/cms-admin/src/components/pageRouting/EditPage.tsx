@@ -5,7 +5,7 @@ import { MutableSingleEntityRenderer, MutableSingleEntityRendererProps } from '.
 import { PageProvider } from './PageProvider'
 import { SingleEntityPageProps } from './SingleEntityPageProps'
 
-interface EditPageProps extends SingleEntityPageProps {
+export interface EditPageProps extends SingleEntityPageProps {
 	rendererProps?: Omit<MutableSingleEntityRendererProps, 'children'>
 }
 

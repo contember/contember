@@ -22,19 +22,30 @@ export const SimpleRelativeSingleField = function<
 >(
 	render: undefined | ((fieldMetadata: FieldMetadata<Persisted, Produced>, props: P) => React.ReactNode),
 	displayName: string,
+	defaultProps?: Partial<P>,
 ): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P> {
 	return Component<P>(
-		props => <SimpleRelativeSingleFieldProxy {...props} render={render} />,
-		(props: P, environment: Environment) => (
-			<>
-				{QueryLanguage.wrapRelativeSingleField(props.name, environment, fieldName => (
-					<Field defaultValue={props.defaultValue} name={fieldName} />
-				))}
-				{props.label}
-				{props.labelDescription}
-				{props.description}
-			</>
-		),
+		props => <SimpleRelativeSingleFieldProxy {...defaultProps} {...props} render={render} />,
+		(props: P, environment: Environment) => {
+			const normalizedProps = {
+				...defaultProps,
+				...props,
+			}
+			return (
+				<>
+					{QueryLanguage.wrapRelativeSingleField(normalizedProps.name, environment, fieldName => (
+						<Field
+							defaultValue={normalizedProps.defaultValue}
+							name={fieldName}
+							isNonbearing={normalizedProps.isNonbearing}
+						/>
+					))}
+					{normalizedProps.label}
+					{normalizedProps.labelDescription}
+					{normalizedProps.description}
+				</>
+			)
+		},
 		displayName,
 	)
 }

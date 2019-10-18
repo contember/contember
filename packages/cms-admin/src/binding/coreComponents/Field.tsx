@@ -20,6 +20,7 @@ import { FieldMarkerProvider } from './MarkerProvider'
 export interface FieldPublicProps {
 	name: RelativeSingleField
 	defaultValue?: VariableInput | Scalar
+	isNonbearing?: boolean
 }
 
 export interface FieldMetadata<

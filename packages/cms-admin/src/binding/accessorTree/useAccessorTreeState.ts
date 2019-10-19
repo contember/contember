@@ -6,6 +6,8 @@ import { AccessorTreeRoot } from '../dao'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
+import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
+import { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
 import { metadataToRequestError } from './metadataToRequestError'
 import { MutationDataResponse, MutationRequestResponse } from './MutationRequestResponse'
@@ -21,7 +23,10 @@ const initialState: AccessorTreeState = {
 	name: AccessorTreeStateName.Uninitialized,
 }
 
-export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeState => {
+export const useAccessorTreeState = ({
+	nodeTree,
+	autoInitialize = true,
+}: AccessorTreeStateOptions): [AccessorTreeState, AccessorTreeStateMetadata] => {
 	const environment = useEnvironment()
 	const authToken = useAuthToken()
 
@@ -39,6 +44,8 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 	const [queryState, sendQuery] = useContentApiRequest<QueryRequestResponse>()
 	const [mutationState, sendMutation] = useContentApiRequest<MutationRequestResponse>()
 
+	const [isInitialized, setIsInitialized] = React.useState(autoInitialize)
+
 	// This ref is really just an implementation of the advice from https://reactjs.org/docs/hooks-faq.html#can-i-run-an-effect-only-on-updates
 	const isFirstRenderRef = React.useRef(true)
 	const isForcingRefreshRef = React.useRef(false) // This ref is described in detail below.
@@ -48,6 +55,15 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 
 	stateRef.current = state
 	queryStateRef.current = queryState
+
+	const initialize = React.useCallback(() => {
+		if (!isInitialized) {
+			setIsInitialized(true)
+		}
+	}, [isInitialized])
+	const stateMetadata: AccessorTreeStateMetadata = {
+		initialize: autoInitialize ? undefined : initialize,
+	}
 
 	const rejectFailedRequest = React.useCallback((metadata: GraphQlClient.FailedRequestMetadata) => {
 		const error = metadataToRequestError(metadata)
@@ -172,6 +188,7 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 
 	React.useEffect(() => {
 		if (
+			isInitialized &&
 			state.name === AccessorTreeStateName.Uninitialized &&
 			// There can be updates while state.name is still AccessorTreeStateName.Uninitialized, and so that condition is
 			// not sufficient on its own. Thus we typically also enforce that queryStateRef.current.readyState is
@@ -198,7 +215,16 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 					})
 			}
 		}
-	}, [authToken, initializeAccessorTree, query, queryState.readyState, rejectFailedRequest, sendQuery, state.name])
+	}, [
+		authToken,
+		initializeAccessorTree,
+		isInitialized,
+		query,
+		queryState.readyState,
+		rejectFailedRequest,
+		sendQuery,
+		state.name,
+	])
 
 	React.useEffect(() => {
 		if (state.name === AccessorTreeStateName.Interactive) {
@@ -238,5 +264,5 @@ export const useAccessorTreeState = (nodeTree: React.ReactNode): AccessorTreeSta
 		isFirstRenderRef.current = false
 	}, [])
 
-	return state
+	return [state, stateMetadata]
 }

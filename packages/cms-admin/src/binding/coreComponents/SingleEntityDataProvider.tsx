@@ -17,7 +17,9 @@ export const SingleEntityDataProvider = Component<SingleEntityDataProviderProps>
 			() => <SingleEntityDataProvider {...props}>{props.children}</SingleEntityDataProvider>,
 			[props],
 		)
-		const accessorTreeState = useAccessorTreeState(children)
+		const [accessorTreeState] = useAccessorTreeState({
+			nodeTree: children,
+		})
 
 		return (
 			<AccessorTreeStateContext.Provider value={accessorTreeState}>{props.children}</AccessorTreeStateContext.Provider>

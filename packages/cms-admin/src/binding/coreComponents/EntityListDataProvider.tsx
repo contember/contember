@@ -15,7 +15,9 @@ export const EntityListDataProvider = Component<EntityListDataProviderProps>(
 		const children = React.useMemo(() => <EntityListDataProvider {...props}>{props.children}</EntityListDataProvider>, [
 			props,
 		])
-		const accessorTreeState = useAccessorTreeState(children)
+		const [accessorTreeState] = useAccessorTreeState({
+			nodeTree: children,
+		})
 
 		return (
 			<AccessorTreeStateContext.Provider value={accessorTreeState}>{props.children}</AccessorTreeStateContext.Provider>

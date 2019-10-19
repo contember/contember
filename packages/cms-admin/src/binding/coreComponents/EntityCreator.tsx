@@ -12,7 +12,9 @@ interface EntityCreatorProps {
 export const EntityCreator = Component<EntityCreatorProps>(
 	props => {
 		const children = React.useMemo(() => <EntityCreator {...props}>{props.children}</EntityCreator>, [props])
-		const accessorTreeState = useAccessorTreeState(children)
+		const [accessorTreeState] = useAccessorTreeState({
+			nodeTree: children,
+		})
 
 		return (
 			<AccessorTreeStateContext.Provider value={accessorTreeState}>{props.children}</AccessorTreeStateContext.Provider>

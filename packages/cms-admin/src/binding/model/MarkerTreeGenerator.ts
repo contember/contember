@@ -25,10 +25,7 @@ type DataMarker = MarkerProvider &
 export class MarkerTreeGenerator {
 	private static childrenAnalyzer = MarkerTreeGenerator.initializeChildrenAnalyzer()
 
-	public constructor(
-		private sourceTree: React.ReactNode,
-		private environment: Environment = Environment.create(),
-	) {}
+	public constructor(private sourceTree: React.ReactNode, private environment: Environment = Environment.create()) {}
 
 	public generate(): MarkerTreeRoot {
 		const processed = MarkerTreeGenerator.childrenAnalyzer.processChildren(this.sourceTree, this.environment)

@@ -1,0 +1,23 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src"
+	},
+	"references": [
+		{
+			"path": "../../dic/src"
+		},
+		{
+			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../schema/src"
+		},
+		{
+			"path": "../../schema-migrations/src"
+		},
+		{
+			"path": "../../schema-utils/src"
+		}
+	]
+}

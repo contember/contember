@@ -1,19 +1,11 @@
-import CommandConfiguration from '../core/cli/CommandConfiguration'
+import { Config } from './config/config'
 import Koa from 'koa'
-import { Config } from '../config/config'
-import Command from '../core/cli/Command'
-import { success } from '../core/console/messages'
+import { success } from './core/console/messages'
 
-class StartCommand extends Command<{}, {}> {
-	constructor(private readonly koa: Koa, private readonly config: Config) {
-		super()
-	}
+export class ServerRunner {
+	constructor(private readonly koa: Koa, private readonly config: Config) {}
 
-	protected configure(configuration: CommandConfiguration): void {
-		configuration.description('Starts a server')
-	}
-
-	protected async execute(): Promise<true> {
+	public async run(): Promise<void> {
 		const port = this.config.server.port
 		this.koa.listen(Number.parseInt(String(port)), () => {
 			console.log(success(`Tenant API running on http://localhost:${port}/tenant`))
@@ -26,8 +18,5 @@ class StartCommand extends Command<{}, {}> {
 				})
 			})
 		})
-		return true
 	}
 }
-
-export default StartCommand

@@ -1,4 +1,3 @@
-import Command from './Command'
 import Argument from './Argument'
 import Option from './Option'
 import { Arguments, Input, Options } from './Input'
@@ -6,7 +5,7 @@ import { Arguments, Input, Options } from './Input'
 class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}
 
-	parse(args: string[], allowRest: boolean): Input<Arguments, Options> {
+	parse<Args extends Arguments, Opts extends Options>(args: string[], allowRest: boolean): Input<Args, Opts> {
 		let options: Options = {}
 		let argumentValues: Arguments = {}
 
@@ -104,7 +103,7 @@ class InputParser {
 			}
 		}
 
-		return new Input(argumentValues, options, rest)
+		return new Input<Args, Opts>(argumentValues as Args, options as Opts, rest)
 	}
 
 	private tryParseValue(arg: string | undefined): string | undefined {

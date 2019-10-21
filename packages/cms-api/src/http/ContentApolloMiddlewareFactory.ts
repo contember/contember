@@ -17,7 +17,7 @@ class ContentApolloMiddlewareFactory {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly graphqlSchemaFactory: GraphQlSchemaFactory,
 		private readonly apolloServerFactory: ContentApolloServerFactory,
-		private readonly currentSchema: Schema,
+		private readonly currentSchema?: Schema,
 	) {}
 
 	create(
@@ -30,8 +30,11 @@ class ContentApolloMiddlewareFactory {
 	> {
 		return async (ctx, next) => {
 			if (!this.schemaCache[stage.slug]) {
+				if (this.project.ignoreMigrations && !this.currentSchema) {
+					throw new Error('Current schema was not provided, cannot use ')
+				}
 				this.schemaCache[stage.slug] = this.project.ignoreMigrations
-					? this.currentSchema
+					? this.currentSchema!
 					: await this.schemaVersionBuilder.buildSchemaForStage(stage.slug)
 			}
 			const schema = this.schemaCache[stage.slug]

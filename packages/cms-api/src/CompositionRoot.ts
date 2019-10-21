@@ -34,14 +34,6 @@ import StageResolveMiddlewareFactory from './http/StageResolveMiddlewareFactory'
 import DatabaseTransactionMiddlewareFactory from './http/DatabaseTransactionMiddlewareFactory'
 import SetupSystemVariablesMiddlewareFactory from './http/SetupSystemVariablesMiddlewareFactory'
 import ContentApolloServerFactory from './http/ContentApolloServerFactory'
-import Application from './core/cli/Application'
-import DiffCommand from './cli/DiffCommand'
-import UpdateCommand from './cli/UpdateCommand'
-import DropCommand from './cli/DropCommand'
-import StartCommand from './cli/StartCommand'
-import { CommandManager } from './core/cli/CommandManager'
-import SetupCommand from './cli/SetupCommand'
-import DryRunCommand from './cli/DryRunCommand'
 import { S3SchemaFactory, S3Service } from '@contember/engine-s3-plugin'
 import TenantApolloServerFactory from './http/TenantApolloServerFactory'
 import { providers } from './utils/providers'
@@ -52,6 +44,8 @@ import {
 	ModificationHandlerFactory,
 	SchemaVersionBuilder as SchemaVersionBuilderInternal,
 } from '@contember/schema-migrations'
+import { Initializer } from './Initializer'
+import { ServerRunner } from './ServerRunner'
 
 export type ProjectContainer = Container<{
 	project: ProjectWithS3
@@ -65,7 +59,8 @@ export type ProjectContainer = Container<{
 }>
 
 export interface MasterContainer {
-	cli: Application
+	initializer: Initializer
+	serverRunner: ServerRunner
 }
 
 export type ProjectContainerResolver = (slug: string) => ProjectContainer | undefined
@@ -74,7 +69,7 @@ class CompositionRoot {
 	createMasterContainer(
 		config: Config,
 		projectsDirectory: string,
-		projectSchemas: { [name: string]: Schema },
+		projectSchemas?: { [name: string]: Schema },
 	): MasterContainer {
 		const projectContainers = this.createProjectContainers(config.projects, projectsDirectory, projectSchemas)
 
@@ -185,35 +180,26 @@ class CompositionRoot {
 				return app
 			})
 			.addService(
-				'commandManager',
-				({ projectContainerResolver, koa }) =>
-					new CommandManager({
-						['diff']: () => new DiffCommand(projectContainerResolver, projectSchemas),
-						['update']: () =>
-							new UpdateCommand(tenantContainer.dbMigrationsRunner, tenantContainer.projectManager, projectContainers),
-						['drop']: () => new DropCommand(config),
-						['start']: () => new StartCommand(koa, config),
-						['setup']: () => new SetupCommand(tenantContainer.signUpManager, tenantContainer.apiKeyManager),
-						['dry-run-sql']: () => new DryRunCommand(projectContainers),
-					}),
+				'initializer',
+				() => new Initializer(tenantContainer.dbMigrationsRunner, tenantContainer.projectManager, projectContainers),
 			)
-			.addService('cli', ({ commandManager }) => new Application(commandManager))
+			.addService('serverRunner', ({ koa }) => new ServerRunner(koa, config))
 
 			.build()
 
-		return masterContainer.pick('cli')
+		return masterContainer.pick('initializer', 'serverRunner')
 	}
 
 	createProjectContainers(
 		projects: Array<ProjectWithS3>,
 		projectsDir: string,
-		schemas: Record<string, Schema>,
+		schemas?: Record<string, Schema>,
 	): ProjectContainer[] {
 		return projects.map((project: ProjectWithS3) => {
 			const projectContainer = new Builder({})
 				.addService('providers', () => providers)
 				.addService('project', () => project)
-				.addService('schema', ({ project }) => schemas[project.slug])
+				.addService('schema', ({ project }) => (schemas ? schemas[project.slug] : undefined))
 				.addService('connection', ({ project }) => {
 					return new Connection(
 						{

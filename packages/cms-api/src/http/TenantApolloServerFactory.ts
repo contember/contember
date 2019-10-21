@@ -4,6 +4,7 @@ import { ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@cont
 import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import { GraphQLError, GraphQLFormattedError } from 'graphql'
 import { ApolloError } from 'apollo-server-errors'
+import { extractOriginalError } from '../core/graphql/errorExtract'
 
 class TenantApolloServerFactory {
 	constructor(
@@ -20,6 +21,10 @@ class TenantApolloServerFactory {
 			resolvers: this.resolvers as Config['resolvers'],
 			formatError: err => {
 				if (err instanceof ApolloError) {
+					return err
+				}
+				const originalError = extractOriginalError(err)
+				if (originalError instanceof GraphQLError) {
 					return err
 				}
 				return this.errorFormatter(err)

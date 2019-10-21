@@ -4,10 +4,8 @@ import { CommandManager } from './cli/CommandManager'
 import { DiffCommand } from './commands/DiffCommand'
 import Application from './cli/Application'
 import DryRunCommand from './commands/DryRunCommand'
-;
 import SetupCommand from './commands/SetupCommand'
-
-(async () => {
+;(async () => {
 	register({
 		compilerOptions: {
 			experimentalDecorators: true,

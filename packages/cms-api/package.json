@@ -30,9 +30,7 @@
 		"apollo-server-koa": "^2.9.0",
 		"bcrypt": "^3.0.6",
 		"chalk": "^2.4.2",
-		"cms-common": "^0.0.0",
 		"cms-server-common": "^0.0.0",
-		"fast-deep-equal": "^2.0.1",
 		"graphql": "^14.5.4",
 		"graphql-errors": "^2.1.0",
 		"graphql-extensions": "^0.5.7",
@@ -43,18 +41,15 @@
 		"lru-cache": "^5.1.1",
 		"path-to-regexp": "^3.0.0",
 		"pg": "^7.12.1",
-		"prompts": "^2.0.4",
 		"uuid": "^3.3.3"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.0.0",
 		"@types/bcrypt": "^3.0.0",
 		"@types/graphql": "^14.5.0",
 		"@types/koa": "^2.0.48",
 		"@types/koa-bodyparser": "^4.2.2",
 		"@types/koa2-cors": "^2.0.1",
 		"@types/lru-cache": "^5.1.0",
-		"@types/prompts": "^2.4.0",
 		"@types/uuid": "^3.4.5",
 		"typescript": "^3.6.4"
 	}

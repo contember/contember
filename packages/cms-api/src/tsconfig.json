@@ -5,9 +5,6 @@
 	},
 	"references": [
 		{
-			"path": "../../cms-common/src"
-		},
-		{
 			"path": "../../cms-server-common/src"
 		},
 		{

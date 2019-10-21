@@ -1,23 +1,15 @@
-import CommandConfiguration from '../core/cli/CommandConfiguration'
-import { ProjectContainer } from '../CompositionRoot'
-import Command from '../core/cli/Command'
+import { ProjectContainer } from './CompositionRoot'
 import { MigrationsRunner } from '@contember/engine-common'
 import { ProjectManager } from '@contember/engine-tenant-api'
 
-class UpdateCommand extends Command<{}, {}> {
+export class Initializer {
 	constructor(
 		private readonly tenantDbMigrationsRunner: MigrationsRunner,
 		private readonly projectManager: ProjectManager,
 		private readonly projectContainers: ProjectContainer[],
-	) {
-		super()
-	}
+	) {}
 
-	protected configure(configuration: CommandConfiguration): void {
-		configuration.description('Executes tenant, system and project migrations and updates project entries.')
-	}
-
-	protected async execute(): Promise<void> {
+	public async initialize(): Promise<void> {
 		console.log(`Executing tenant db migration`)
 		await this.tenantDbMigrationsRunner.migrate()
 		console.log(`done`)
@@ -41,5 +33,3 @@ class UpdateCommand extends Command<{}, {}> {
 		)
 	}
 }
-
-export default UpdateCommand

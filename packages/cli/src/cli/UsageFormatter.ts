@@ -1,6 +1,6 @@
 import Argument from './Argument'
 import Option from './Option'
-import { assertNever } from '@contember/utils'
+import { assertNever } from './assertNever'
 
 class UsageFormatter {
 	public static format(args: Argument[], options: Option[]): string {

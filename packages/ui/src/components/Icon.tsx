@@ -17,11 +17,13 @@ const renderSvgPaths = (iconName: IconName): JSX.Element[] | null => {
 }
 
 export const Icon = React.memo((props: IconProps) => {
+	const svgPaths = React.useMemo(() => renderSvgPaths(props.blueprintIcon), [props.blueprintIcon])
+
 	return (
 		<div className="icon" style={props.style}>
 			<svg viewBox="0 0 16 16" className="icon-blueprintSvg">
 				{props.title && <desc>{props.title}</desc>}
-				{renderSvgPaths(props.blueprintIcon)}
+				{svgPaths}
 			</svg>
 		</div>
 	)

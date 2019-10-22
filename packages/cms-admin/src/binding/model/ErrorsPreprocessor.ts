@@ -75,9 +75,9 @@ class ErrorsPreprocessor {
 				if (pathNode.__typename === '_FieldPathFragment') {
 					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {
 						let alias = pathNode.field
-						let startIndex = i + 1
-						if (startIndex in mutationError.path) {
-							const nextPathNode = mutationError.path[startIndex]
+						let nextIndex = i + 1
+						if (nextIndex in mutationError.path) {
+							const nextPathNode = mutationError.path[nextIndex]
 
 							if (
 								nextPathNode.__typename === '_IndexPathFragment' &&
@@ -86,14 +86,15 @@ class ErrorsPreprocessor {
 							) {
 								// We're dealing with a reduced hasMany relation.
 								i++
-								startIndex++
+								nextIndex++
 								alias = nextPathNode.alias
 							}
 						}
 
 						if (!(alias in currentNode.children)) {
-							currentNode.children[alias] = this.getRootNode(mutationError, startIndex)
-							if (startIndex <= mutationError.path.length) {
+							currentNode.children[alias] = this.getRootNode(mutationError, nextIndex)
+							if (nextIndex <= mutationError.path.length) {
+								// This path has been handled by getRootNode
 								continue errorLoop
 							}
 						}
@@ -121,6 +122,7 @@ class ErrorsPreprocessor {
 						if (!(numericAlias in currentNode.children)) {
 							currentNode.children[numericAlias] = this.getRootNode(mutationError, i + 1)
 							if (i + 1 <= mutationError.path.length) {
+								// This path has been handled by getRootNode
 								continue errorLoop
 							}
 						}

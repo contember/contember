@@ -495,6 +495,21 @@ $cui-box-depths: (
 ) !default;
 
 
+// Icon
+$cui-icon-default-size: 1em !default;
+$cui-icon-small-size: .75em !default;
+$cui-icon-large-size: 1.5em !default;
+$cui-icon-lowercase-size: 1ex !default;
+
+$cui-icon-sizes: () !default;
+$cui-icon-sizes: map_merge((
+	$cui-conf-defaultView: $cui-icon-default-size,
+	'small': $cui-icon-small-size,
+	'large': $cui-icon-large-size,
+	'lowercase': $cui-icon-lowercase-size,
+), $cui-icon-sizes);
+
+
 // Menu
 $cui-menu-vertical-padding: rem(8px) !default;
 $cui-menu-horizontal-padding: rem(28px) !default;

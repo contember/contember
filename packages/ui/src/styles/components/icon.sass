@@ -7,3 +7,8 @@
 		width: 1em
 		height: 1em
 		fill: currentColor
+
+	@each $name, $size in $cui-icon-sizes
+		$view: toView($name)
+		&#{$view}
+			font-size: $size

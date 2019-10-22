@@ -3,6 +3,7 @@ import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { Icon, IconProps } from '../../../src'
 import { blueprintIconNames } from './blueprintIconNames'
+import { iconSizeKnob } from '../../utils/knobs'
 
 storiesOf('Icon', module).add('simple', () => {
 	const blueprintIcon = text('Blueprint icon name', 'chart') as IconProps['blueprintIcon'] // Cast is sort of ok since Blueprint icons can handle corrupted icon name
@@ -13,6 +14,7 @@ storiesOf('Icon', module).add('simple', () => {
 		step: 1,
 	})
 	const fontColor = color('Font color', '#000000')
+	const size = iconSizeKnob()
 
 	return (
 		<div style={{ color: fontColor }}>
@@ -22,7 +24,7 @@ storiesOf('Icon', module).add('simple', () => {
 					fontSize: `${fontSize / 16}rem`,
 				}}
 			>
-				<Icon blueprintIcon={blueprintIcon} />
+				<Icon blueprintIcon={blueprintIcon} size={size} />
 			</div>
 			<hr />
 			<h1>Predefined sizes:</h1>
@@ -33,13 +35,13 @@ storiesOf('Icon', module).add('simple', () => {
 					}}
 					key={fontSize}
 				>
-					{fontSize}px: <Icon blueprintIcon={blueprintIcon} /> example
+					{fontSize}px: <Icon blueprintIcon={blueprintIcon} size={size} /> example
 				</div>
 			))}
 			<hr />
 			<h1>
 				<a href="https://blueprintjs.com/docs/#icons" target="_blank" rel="noopener noreferrer">
-					Blueprint icon names <Icon blueprintIcon="arrow-top-right" />
+					Blueprint icon names <Icon blueprintIcon="arrow-top-right" size="lowercase" />
 				</a>
 			</h1>
 			{blueprintIconNames.map(blueprintIcon => (

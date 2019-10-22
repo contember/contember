@@ -11,7 +11,7 @@ export const PersistButton = React.memo((props: PersistButtonProps) => {
 	const triggerPersist = useTriggerPersistWithFeedback()
 	const buttonRef = React.useRef<HTMLButtonElement | null>(null)
 	const onClick = React.useCallback(() => {
-		triggerPersist()
+		triggerPersist().catch(() => {})
 	}, [triggerPersist])
 
 	const isDisabled = isMutating || !isDirty

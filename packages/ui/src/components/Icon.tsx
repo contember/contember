@@ -1,10 +1,14 @@
 import * as React from 'react'
+import cn from 'classnames'
 import { IconName, IconSvgPaths16 } from '@blueprintjs/icons'
+import { IconSize } from '../types'
+import { toEnumViewClass } from '../utils'
 
 export interface IconProps {
 	children?: never
 	title?: string
 	blueprintIcon: IconName
+	size?: IconSize
 	style?: React.CSSProperties
 }
 
@@ -20,7 +24,7 @@ export const Icon = React.memo((props: IconProps) => {
 	const svgPaths = React.useMemo(() => renderSvgPaths(props.blueprintIcon), [props.blueprintIcon])
 
 	return (
-		<div className="icon" style={props.style}>
+		<div className={cn('icon', toEnumViewClass(props.size))} style={props.style}>
 			<svg viewBox="0 0 16 16" className="icon-blueprintSvg">
 				{props.title && <desc>{props.title}</desc>}
 				{svgPaths}

@@ -41,10 +41,10 @@
 		"redux": "^4.0.4",
 		"redux-actions": "^2.6.5",
 		"redux-thunk": "^2.3.0",
-		"slate": "^0.47.7",
-		"slate-html-serializer": "^0.8.9",
+		"slate": "^0.47.8",
+		"slate-html-serializer": "^0.8.10",
 		"slate-plain-serializer": "^0.7.9",
-		"slate-react": "^0.22.7"
+		"slate-react": "^0.22.9"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.1.6",
@@ -59,7 +59,7 @@
 		"@types/react-redux": "^7.1.1",
 		"@types/react-table": "^6.7.12",
 		"@types/redux-actions": "^2.6.1",
-		"@types/slate": "^0.47.1",
+		"@types/slate": "^0.47.2",
 		"@types/slate-html-serializer": "^0.6.3",
 		"@types/slate-plain-serializer": "^0.6.1",
 		"@types/slate-react": "^0.22.5",

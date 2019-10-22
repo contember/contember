@@ -210,6 +210,7 @@ export const useAccessorTreeState = ({
 						return Promise.resolve()
 					})
 					.catch(rejectFailedRequest)
+					.catch(() => {}) // Don't let any errors get out of this hook.
 					.finally(() => {
 						isForcingRefreshRef.current = false
 					})

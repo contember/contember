@@ -25,11 +25,14 @@ class Environment {
 		return dimensionName in this.names.dimensions
 	}
 
-	public getValueOrElse<F>(name: keyof Environment.NameStore, fallback: F): Environment.Value | F {
+	public getValueOrElse<F, V extends Environment.Value = Environment.Value>(
+		name: keyof Environment.NameStore,
+		fallback: F,
+	): V | F {
 		if (!this.hasName(name)) {
 			return fallback
 		}
-		return this.names[name]
+		return this.names[name] as V
 	}
 
 	public getDimensionOrElse<F>(dimensionName: keyof Environment.SelectedDimensions, fallback: F): string[] | F {
@@ -39,8 +42,8 @@ class Environment {
 		return this.names.dimensions[dimensionName]
 	}
 
-	public getValue(name: keyof Environment.NameStore): Environment.Value {
-		return this.names[name]
+	public getValue<V extends Environment.Value = Environment.Value>(name: keyof Environment.NameStore): V {
+		return this.names[name] as V
 	}
 
 	public getDimension(dimensionName: keyof Environment.SelectedDimensions): string[] {

@@ -39,7 +39,7 @@ class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & T
 										this.props.dismissToast(toast.id)
 									}}
 								>
-									<Icon blueprintIcon="cross" />
+									<Icon blueprintIcon="cross" style={{ color: 'white' }} />
 								</Button>
 							}
 						>

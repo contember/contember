@@ -245,7 +245,7 @@ export class MutationGenerator {
 
 					if (reference.expectedCount === ExpectedCount.UpToOne) {
 						if (accessor instanceof EntityAccessor) {
-							accessorReference.push({ accessor, reference })
+							accessorReference.push({ accessor, reference, alias: referencePlaceholder })
 
 							if (reference.reducedBy === undefined) {
 								unreducedHasOnePresent = true

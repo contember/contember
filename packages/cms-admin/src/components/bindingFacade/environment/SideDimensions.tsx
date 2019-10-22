@@ -5,7 +5,9 @@ import {
 	Environment,
 	EnvironmentContext,
 	EnvironmentDeltaProvider,
+	RelativeSingleField,
 	SyntheticChildrenProvider,
+	ToOne,
 } from '../../../binding'
 
 interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
@@ -65,6 +67,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 									dimensionValue={item}
 									variableName={props.variableName}
 									variables={props.variables}
+									toOneField={props.toOneField}
 									key={j}
 								>
 									{child}
@@ -80,11 +83,13 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 namespace SideDimensions {
 	export interface CommonDimensionProps {
+		toOneField?: RelativeSingleField
 		variableName?: Environment.Name
 		variables?: Environment.DeltaFactory | ((dimensionValue: Environment.Value) => Environment.DeltaFactory)
 	}
 
 	export interface SingleDimensionProps extends CommonDimensionProps {
+		children: React.ReactNode
 		environment: Environment
 		dimensionValue: Environment.Value
 	}
@@ -93,11 +98,16 @@ namespace SideDimensions {
 		static displayName = 'SideDimension'
 
 		public render() {
+			const children = SingleDimension.generateSyntheticChildren(this.props, this.props.environment)
 			return (
 				<EnvironmentContext.Provider value={SingleDimension.generateEnvironment(this.props, this.props.environment)}>
-					<div className="sideDimensions-dimensions-dimension">{this.props.children}</div>
+					<div className="sideDimensions-dimensions-dimension">{children}</div>
 				</EnvironmentContext.Provider>
 			)
+		}
+
+		public static generateSyntheticChildren(props: SingleDimensionProps, environment: Environment): React.ReactNode {
+			return props.toOneField ? <ToOne field={props.toOneField}>{props.children}</ToOne> : props.children
 		}
 
 		public static generateEnvironment(props: SingleDimensionProps, oldEnvironment: Environment): Environment {

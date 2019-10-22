@@ -4,6 +4,7 @@ import * as React from 'react'
 import {
 	Component,
 	Environment,
+	Field,
 	QueryLanguage,
 	RelativeSingleField,
 	useEntityContext,
@@ -95,7 +96,9 @@ export const SlugField = Component<SlugFieldProps>(
 	},
 	(props, environment) => (
 		<>
-			{QueryLanguage.wrapRelativeSingleField(props.name, environment)}
+			{QueryLanguage.wrapRelativeSingleField(props.name, environment, fieldName => (
+				<Field name={fieldName} isNonbearing={true} />
+			))}
 			{QueryLanguage.wrapRelativeSingleField(props.drivenBy, environment)}
 			{props.label}
 		</>

@@ -1,8 +1,7 @@
-import { Icon } from '@blueprintjs/core'
-import { IconNames } from '@blueprintjs/icons'
 import { Dropdown, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
+import { Icon } from '@contember/ui'
 
 export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
 
@@ -14,11 +13,11 @@ export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
 					children: (
 						<>
 							<Icon
-								icon={IconNames.ADD}
+								blueprintIcon="add"
 								style={{
 									marginRight: '0.2em',
 									position: 'relative',
-									top: '0.05em',
+									top: '-0.071em',
 								}}
 							/>
 							{'Add'}

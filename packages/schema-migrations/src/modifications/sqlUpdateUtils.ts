@@ -9,5 +9,6 @@ export const createEventTrigger = (builder: MigrationBuilder, tableName: string)
 			schema: 'system',
 			name: 'trigger_event',
 		},
+		language: '',
 	})
 }

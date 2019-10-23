@@ -1,4 +1,4 @@
-import { isEmptyObject } from 'cms-common'
+import { isEmptyObject } from '@contember/utils'
 import { QueryBuilder, RootObjectBuilder } from '../graphQlBuilder'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
 import { ReadBuilder } from './ReadBuilder'

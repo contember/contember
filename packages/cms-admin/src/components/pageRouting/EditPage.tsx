@@ -1,4 +1,4 @@
-import { lcfirst } from 'cms-common'
+import { lcfirst } from '@contember/utils'
 import * as React from 'react'
 import { SingleEntityDataProvider } from '../../binding/coreComponents'
 import { MutableSingleEntityRenderer, MutableSingleEntityRendererProps } from '../bindingFacade'

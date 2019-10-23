@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
 import { ExpectedCount } from '../bindingTypes'

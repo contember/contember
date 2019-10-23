@@ -1,4 +1,4 @@
-import { isEmptyObject } from 'cms-common'
+import { isEmptyObject } from '@contember/utils'
 import * as React from 'react'
 
 export const reactNodeToElement = function(node: React.ReactNode): React.ReactElement | null {

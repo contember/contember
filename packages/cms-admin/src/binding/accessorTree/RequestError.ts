@@ -1,4 +1,4 @@
-import { GraphQlClient } from 'cms-client'
+import { GraphQlClient } from '@contember/client'
 
 export enum RequestErrorType {
 	Unauthorized = 'unauthorized',

@@ -1,6 +1,6 @@
 import { Input } from '@contember/schema'
 import { ErrorList } from '@contember/ui'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { AccessorContext, EnvironmentContext, useEntityAccessor } from '../accessorRetrievers'
 import { ExpectedCount, FieldName, Filter, RelativeEntityList } from '../bindingTypes'

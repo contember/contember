@@ -1,4 +1,4 @@
-import { GraphQlClient } from 'cms-client'
+import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
 import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReadyState } from './ApiRequestReadyState'

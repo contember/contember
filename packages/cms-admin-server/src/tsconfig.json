@@ -4,5 +4,5 @@
 		"outDir": "../dist/src",
 		"esModuleInterop": true
 	},
-	"references": [{ "path": "../../../packages/cms-server-common/src" }]
+	"references": [{ "path": "../../../packages/config-loader/src" }]
 }

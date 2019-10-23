@@ -1,0 +1,11 @@
+{
+	"schema": {
+		"file": "packages/projects/blog/dist/src/schema.graphql"
+	},
+	"endpoints": [
+		{
+			"name": "Default",
+			"url": "http://localhost:4000/"
+		}
+	]
+}

@@ -1,7 +1,7 @@
 import { Value } from 'slate'
 import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, FieldAccessor } from '../../../binding/dao'
 import JsonBlockSerializer from './JsonBlockSerializer'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { BlocksDefinitions } from './types'
 
 type GetCollectionAccessor = () => EntityCollectionAccessor

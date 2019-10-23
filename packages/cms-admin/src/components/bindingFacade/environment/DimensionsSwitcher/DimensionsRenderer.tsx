@@ -183,7 +183,7 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 		React.useEffect(() => {
 			const redirectTarget = selectedDimensions.length === 0 ? normalizedData || [] : selectedDimensions
 
-			if (normalizedData !== undefined && selectedDimensions.length === 0) {
+			if (normalizedData !== undefined && selectedDimensions.length === 0 && redirectTarget.length > 0) {
 				redirect(requestState => {
 					if (requestState.name !== 'project_page') {
 						return requestState

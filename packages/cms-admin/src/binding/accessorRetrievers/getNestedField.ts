@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { FieldName } from '../bindingTypes'
 import { ToOne } from '../coreComponents'
 import { DataBindingError, EntityAccessor, FieldAccessor } from '../dao'

@@ -1,16 +1,15 @@
 {
-	"name": "cms-client",
-	"version": "0.0.0",
-	"private": true,
+	"name": "@contember/client",
+	"version": "0.1.1-alpha.1",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js"
 	},
 	"dependencies": {
-		"cms-common": "^0.0.0",
-		"@contember/schema": "^0.0.0",
-		"graphql-request": "^1.7.0"
+		"@contember/schema": "^0.1.1-alpha.1",
+		"@contember/utils": "^0.1.1-alpha.1",
+		"graphql-request": "^1.8.2"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.1.6",

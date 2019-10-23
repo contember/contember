@@ -1,5 +1,5 @@
 import { assertNever } from '@contember/utils'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData, Scalar } from '../accessorTree'
 import { ExpectedCount, FieldName, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {

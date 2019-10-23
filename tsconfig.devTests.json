@@ -1,0 +1,18 @@
+{
+	"include": ["packages/**/*"],
+	"compilerOptions": {
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"noEmitOnError": true,
+		"esModuleInterop": true,
+		"target": "es6",
+		"moduleResolution": "node",
+		"module": "commonjs",
+		"outDir": "dist",
+		"strict": true,
+		"lib": ["esnext", "dom"],
+		"experimentalDecorators": true,
+		"typeRoots": ["packages/cms-api/src/types"]
+	}
+}

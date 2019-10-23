@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import State from '../state'
-import { Link } from './index'
-import { InnerProps } from './Link'
+import { InnerProps, Link } from './Link'
 
 interface SwitchProjectLinkProps {
 	Component?: React.ComponentType<InnerProps>

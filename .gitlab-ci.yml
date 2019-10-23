@@ -1,0 +1,77 @@
+stages:
+  - install
+  - build
+  - test
+  - publish
+variables:
+  DOCKER_HOST: tcp://gitlab-prod-dind-svc:2375
+
+install:
+  stage: install
+  image: node:12
+  script:
+    - npm ci
+    - npm run bootstrap
+    - rm -rf packages/*/node_modules/typescript packages/*/node_modules/.bin/{tsc,tsserver}
+  artifacts:
+    paths:
+      - "node_modules"
+      - "packages/*/node_modules"
+
+build:
+  stage: build
+  image: node:12
+
+  script:
+    - npm run build
+
+  artifacts:
+    paths:
+      - "packages/*/dist"
+
+test:
+  stage: test
+  image: node:12
+  services:
+    - postgres:10
+  variables:
+    TEST_DB_HOST: 127.0.0.1
+    TEST_DB_PASSWORD: "123"
+    TEST_DB_USER: cms_test
+    TEST_DB_NAME: cms_test
+    TEST_DB_PORT: 5432
+    POSTGRES_USER: cms_test
+    POSTGRES_DB: cms_test
+    POSTGRES_PASSWORD: "123"
+
+  script:
+    - npm run test
+
+eslint:
+  stage: test
+  image: node:12
+  script:
+    - npm run eslint:lint
+
+build:docker:
+  image: 831119889470.dkr.ecr.eu-central-1.amazonaws.com/mangoweb/docker-ecr:1.1
+  stage: publish
+  dependencies:
+    - build
+  only:
+    refs:
+      - tags
+  variables:
+    VERSION: "$CI_COMMIT_REF_NAME"
+  script:
+    - sh scripts/docker/build.sh
+
+publish:
+  image: node:12
+  stage: publish
+  only:
+    refs:
+      - tags
+  script:
+    - sh ./scripts/npm/setup.sh
+    - sh ./scripts/npm/publish.sh

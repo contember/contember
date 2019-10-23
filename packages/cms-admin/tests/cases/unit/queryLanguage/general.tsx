@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import 'mocha'
 import * as React from 'react'
 import { Field, ToOne } from '../../../../src/binding/coreComponents'

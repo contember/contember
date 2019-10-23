@@ -1,12 +1,13 @@
 import { Button, ButtonList } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { MiscPageLayout, ProjectConfig } from '..'
+import { MiscPageLayout } from '../components'
 import { pushRequest } from '../actions/request'
 import { Dispatch } from '../actions/types'
 import State from '../state'
 import { RequestChange } from '../state/request'
 import { Link } from './Link'
+import { ProjectConfig } from '../state/projectsConfigs'
 
 interface ProjectsListProps {
 	configs: ProjectConfig[]

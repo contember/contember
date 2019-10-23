@@ -1,6 +1,5 @@
-import { CrudQueryBuilder } from 'cms-client'
-import { GetQueryArguments } from 'cms-client/dist/src/crudQueryBuilder'
-import { ucfirst } from 'cms-common'
+import { CrudQueryBuilder } from '@contember/client'
+import { ucfirst } from '@contember/utils'
 import { assertNever } from '@contember/utils'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
@@ -56,7 +55,7 @@ export class QueryGenerator {
 			baseQueryBuilder,
 			this.registerQueryPart(
 				subTree.fields,
-				CrudQueryBuilder.ReadBuilder.instantiate<GetQueryArguments>().by(subTree.constraints.where),
+				CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.constraints.where),
 			),
 		)
 

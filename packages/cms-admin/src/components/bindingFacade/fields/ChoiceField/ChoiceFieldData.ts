@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { EntityAccessor, Environment, Field, FieldMetadata, FieldName, Scalar } from '../../../../binding'
 

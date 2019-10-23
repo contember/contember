@@ -1,4 +1,4 @@
-import { lcfirst } from 'cms-common'
+import { lcfirst } from '@contember/utils'
 import * as React from 'react'
 import { EntityListDataProvider } from '../../binding/coreComponents'
 import { MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'

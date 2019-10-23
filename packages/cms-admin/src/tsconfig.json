@@ -9,9 +9,6 @@
 			"path": "../../../packages/cms-client/src"
 		},
 		{
-			"path": "../../../packages/cms-common/src"
-		},
-		{
 			"path": "../../../packages/react-multipass-rendering/src"
 		},
 		{

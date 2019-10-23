@@ -17,7 +17,7 @@ export const RichTextField = Component<RichTextFieldProps>(
 		<Field<string> name={props.name} defaultValue={props.defaultValue}>
 			{fieldMetadata => {
 				const generateOnChange = (data: FieldAccessor<string>) => (val: string) => {
-					data.updateValue && data.updateValue(val || data.persistedValue)
+					data.updateValue && data.updateValue(!val && data.persistedValue === null ? null : val)
 				}
 				return (
 					<RichEditor

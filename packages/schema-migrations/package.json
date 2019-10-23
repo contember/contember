@@ -13,7 +13,7 @@
 		"@contember/schema-utils": "^0.0.0",
 		"@contember/utils": "^0.0.0",
 		"fast-deep-equal": "^2.0.1",
-		"node-pg-migrate": "^3.22.0",
+		"node-pg-migrate": "~3.22.1",
 		"rfc6902": "^3.0.4"
 	},
 	"devDependencies": {

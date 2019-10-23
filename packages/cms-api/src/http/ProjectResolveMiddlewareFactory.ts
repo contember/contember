@@ -1,5 +1,5 @@
 import { KoaMiddleware } from '../core/koa/types'
-import { ProjectContainer, ProjectContainerResolver } from '../CompositionRoot'
+import { ProjectContainer, ProjectContainerResolver } from '../ProjectContainer'
 import { KoaRequestState } from '../core/koa/router'
 
 type InputState = ProjectResolveMiddlewareFactory.KoaState & KoaRequestState

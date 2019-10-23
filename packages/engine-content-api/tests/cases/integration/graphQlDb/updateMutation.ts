@@ -47,7 +47,7 @@ describe('update with db', () => {
 						contact_page: [{ site_id: testUuid(1), id: testUuid(2), title: 'Test' }],
 					},
 				})
-			})
+			}, 100000)
 
 			it('update site & try to create contact page which however exists', async () => {
 				await executeDbTest({
@@ -74,7 +74,7 @@ describe('update with db', () => {
 						contact_page: [{ site_id: testUuid(1), id: testUuid(2), title: 'Test' }],
 					},
 				})
-			})
+			}, 100000)
 		})
 	})
 })

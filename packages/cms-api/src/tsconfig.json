@@ -5,7 +5,7 @@
 	},
 	"references": [
 		{
-			"path": "../../cms-server-common/src"
+			"path": "../../config-loader/src"
 		},
 		{
 			"path": "../../schema/src"

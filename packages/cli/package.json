@@ -1,20 +1,19 @@
 {
 	"name": "@contember/cli",
-	"version": "0.0.0",
-	"private": true,
+	"version": "0.1.1-alpha.1",
 	"bin": {
-		"contember": "./dist/cli.js"
+		"contember": "./dist/src/cli.js"
 	},
 	"scripts": {},
 	"devDependencies": {
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
-		"@contember/dic": "^0.0.0",
-		"@contember/engine-common": "^0.0.0",
-		"@contember/schema": "^0.0.0",
-		"@contember/schema-migrations": "^0.0.0",
-		"@contember/schema-utils": "^0.0.0",
+		"@contember/dic": "^0.1.1-alpha.1",
+		"@contember/engine-common": "^0.1.1-alpha.1",
+		"@contember/schema": "^0.1.1-alpha.1",
+		"@contember/schema-migrations": "^0.1.1-alpha.1",
+		"@contember/schema-utils": "^0.1.1-alpha.1",
 		"graphql-request": "^1.8.2",
 		"prompts": "^2.2.1",
 		"ts-node": "^8.4.1",

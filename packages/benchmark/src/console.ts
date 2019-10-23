@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { CompositionRoot, run } from 'cms-api'
+import { CompositionRoot, run } from '@contember/api'
 import * as path from 'path'
 import App from './projects/app/src/model'
 ;(async () => {

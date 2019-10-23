@@ -32,6 +32,7 @@ export const execute = async (test: Test) => {
 			},
 			{
 				bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
+				bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
 				now: () => now,
 				randomBytes: (length: number) => Promise.resolve(new Buffer(length)),
 				uuid: createUuidGenerator(),
@@ -207,7 +208,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 							rows: [
 								{
 									id: testUuid(1),
-									password_hash: '$2b$10$OA65yEx6dAHWBKqzQXNiG.iTNWDLFYszOCOMFSMbp7aSk78YHHL1i',
+									password_hash: 'BCRYPTED-123',
 									identity_id: testUuid(2),
 									roles: [],
 								},

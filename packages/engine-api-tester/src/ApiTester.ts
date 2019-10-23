@@ -1,5 +1,5 @@
 import 'jasmine'
-import { MigrationFilesManager, MigrationsRunner } from '@contember/engine-common'
+import { MigrationFilesManager } from '@contember/engine-common'
 import {
 	CreateInitEventCommand,
 	createMigrationFilesManager,
@@ -32,6 +32,7 @@ import { createUuidGenerator } from './testUuid'
 import { graphqlObjectFactories } from './graphqlObjectFactories'
 import { getArgumentValues } from 'graphql/execution/values'
 import { project } from './project'
+import { migrate } from './migrationsRunner'
 
 export class ApiTester {
 	public static project = project
@@ -83,8 +84,7 @@ export class ApiTester {
 		await connection.query('CREATE DATABASE ' + wrapIdentifier(dbName), [])
 
 		const systemMigrationsManager = createMigrationFilesManager()
-		const migrationsRunner = new MigrationsRunner(dbCredentials(dbName), 'system', systemMigrationsManager.directory)
-		await migrationsRunner.migrate(false)
+		await migrate({ db: dbCredentials(dbName), schema: 'system', dir: systemMigrationsManager.directory })
 		await connection.end()
 
 		const projectConnection = createConnection(dbName)

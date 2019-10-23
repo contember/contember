@@ -1,5 +1,4 @@
 import * as Schema from './schema'
-import { MigrationFilesManager } from '@contember/engine-common'
 
 export * from './model'
 export * from './TenantContainer'

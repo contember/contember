@@ -6,7 +6,6 @@
 	"references": [
 		{ "path": "../../cms-api/src" },
 		{ "path": "../../schema/src" },
-		{ "path": "../../schema-definition/src" },
-		{ "path": "../../cms-common/src" }
+		{ "path": "../../schema-definition/src" }
 	]
 }

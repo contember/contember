@@ -1,0 +1,31 @@
+{
+	"files": [],
+	"include": [],
+	"references": [
+		{ "path": "./packages/authorization" },
+		{ "path": "./packages/benchmark" },
+		{ "path": "./packages/cli" },
+		{ "path": "./packages/cms-api" },
+		{ "path": "./packages/cms-admin" },
+		{ "path": "./packages/cms-client" },
+		{ "path": "./packages/cms-admin-server" },
+		{ "path": "./packages/config-loader" },
+		{ "path": "./packages/database" },
+		{ "path": "./packages/database-tester" },
+		{ "path": "./packages/dic" },
+		{ "path": "./packages/engine-api-tester" },
+		{ "path": "./packages/engine-common" },
+		{ "path": "./packages/engine-content-api" },
+		{ "path": "./packages/engine-tenant-api" },
+		{ "path": "./packages/engine-s3-plugin" },
+		{ "path": "./packages/engine-system-api" },
+		{ "path": "./packages/queryable" },
+		{ "path": "./packages/react-multipass-rendering"},
+		{ "path": "./packages/schema" },
+		{ "path": "./packages/schema-definition" },
+		{ "path": "./packages/schema-migrations" },
+		{ "path": "./packages/schema-utils" },
+		{ "path": "./packages/ui" },
+		{ "path": "./packages/utils" }
+	]
+}

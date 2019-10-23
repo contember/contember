@@ -6,15 +6,19 @@ import {
 	PermissionsVerifier,
 } from '@contember/engine-content-api'
 import {
-	createMigrationFilesManager,
+	createMigrationFilesManager as createSystemMigrationFilesManager,
 	MigrationsResolver,
 	SchemaMigrator,
 	SchemaVersionBuilder,
 	SystemContainerFactory,
 	SystemExecutionContainer,
 } from '@contember/engine-system-api'
-import { DatabaseCredentials, MigrationFilesManager, MigrationsRunner } from '@contember/engine-common'
-import { Providers as TenantProviders, TenantContainer } from '@contember/engine-tenant-api'
+import { DatabaseCredentials, MigrationFilesManager } from '@contember/engine-common'
+import {
+	Providers as TenantProviders,
+	TenantContainer,
+	createMigrationFilesManager as createTenantMigrationFilesManager,
+} from '@contember/engine-tenant-api'
 import { Schema } from '@contember/schema'
 import { Builder, Container } from '@contember/dic'
 import AuthMiddlewareFactory from './http/AuthMiddlewareFactory'
@@ -44,26 +48,15 @@ import {
 	ModificationHandlerFactory,
 	SchemaVersionBuilder as SchemaVersionBuilderInternal,
 } from '@contember/schema-migrations'
-import { Initializer } from './Initializer'
-import { ServerRunner } from './ServerRunner'
-
-export type ProjectContainer = Container<{
-	project: ProjectWithS3
-	systemDbClient: Client
-	systemApolloServerFactory: SystemApolloServerFactory
-	contentApolloMiddlewareFactory: ContentApolloMiddlewareFactory
-	systemExecutionContainerFactory: SystemExecutionContainer.Factory
-	connection: Connection
-	systemDbMigrationsRunner: MigrationsRunner
-	schemaVersionBuilder: SchemaVersionBuilder
-}>
+import { Initializer } from './bootstrap/Initializer'
+import { ServerRunner } from './bootstrap/ServerRunner'
+import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
+import { MigrationsRunner } from './bootstrap/MigrationsRunner'
 
 export interface MasterContainer {
 	initializer: Initializer
 	serverRunner: ServerRunner
 }
-
-export type ProjectContainerResolver = (slug: string) => ProjectContainer | undefined
 
 class CompositionRoot {
 	createMasterContainer(
@@ -180,8 +173,13 @@ class CompositionRoot {
 				return app
 			})
 			.addService(
+				'tenantMigrationsRunner',
+				() => new MigrationsRunner(config.tenant.db, 'tenant', createTenantMigrationFilesManager().directory),
+			)
+			.addService(
 				'initializer',
-				() => new Initializer(tenantContainer.dbMigrationsRunner, tenantContainer.projectManager, projectContainers),
+				({ tenantMigrationsRunner }) =>
+					new Initializer(tenantMigrationsRunner, tenantContainer.projectManager, projectContainers),
 			)
 			.addService('serverRunner', ({ koa }) => new ServerRunner(koa, config))
 
@@ -214,7 +212,7 @@ class CompositionRoot {
 				})
 				.addService(
 					'systemDbMigrationsRunner',
-					() => new MigrationsRunner(project.dbCredentials, 'system', createMigrationFilesManager().directory),
+					() => new MigrationsRunner(project.dbCredentials, 'system', createSystemMigrationFilesManager().directory),
 				)
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),

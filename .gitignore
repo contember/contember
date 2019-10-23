@@ -1,0 +1,7 @@
+/instances/*/*/dist
+/instances/*/*/node_modules
+/packages/*/dist
+/packages/*/node_modules
+/lerna-debug.log
+/node_modules
+docker-compose.override.yaml

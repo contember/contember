@@ -1,4 +1,4 @@
-import { GraphQlClient } from 'cms-client'
+import { GraphQlClient } from '@contember/client'
 import { ApiRequestReadyState } from './ApiRequestReadyState'
 
 export type ApiRequestState<SuccessData> =

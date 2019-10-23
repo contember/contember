@@ -1,5 +1,5 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import { DatabaseCredentials, MigrationsRunner, Identity } from '@contember/engine-common'
+import { DatabaseCredentials, Identity } from '@contember/engine-common'
 import { QueryHandler } from '@contember/queryable'
 import { Connection, DatabaseQueryable } from '@contember/database'
 import { Builder } from '@contember/dic'
@@ -48,7 +48,6 @@ interface TenantContainer {
 	apiKeyManager: ApiKeyManager
 	signUpManager: SignUpManager
 	projectManager: ProjectManager
-	dbMigrationsRunner: MigrationsRunner
 	resolvers: Schema.Resolvers
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
@@ -68,7 +67,6 @@ namespace TenantContainer {
 					'apiKeyManager',
 					'projectMemberManager',
 					'projectManager',
-					'dbMigrationsRunner',
 					'signUpManager',
 					'resolvers',
 					'authorizator',
@@ -89,10 +87,6 @@ namespace TenantContainer {
 				.addService('db', ({ connection }) => connection.createClient('tenant'))
 				.addService('providers', () => providers)
 				.addService('commandBus', ({ db, providers }) => new CommandBus(db, providers))
-				.addService(
-					'dbMigrationsRunner',
-					() => new MigrationsRunner(tenantDbCredentials, 'tenant', createMigrationFilesManager().directory),
-				)
 				.addService('queryHandler', ({ db }) => {
 					const handler = new QueryHandler(
 						new DatabaseQueryable(db, {
@@ -115,7 +109,7 @@ namespace TenantContainer {
 				.addService('passwordChangeManager', ({ commandBus }) => new PasswordChangeManager(commandBus))
 				.addService(
 					'signInManager',
-					({ queryHandler, apiKeyManager }) => new SignInManager(queryHandler, apiKeyManager),
+					({ queryHandler, apiKeyManager, providers }) => new SignInManager(queryHandler, apiKeyManager, providers),
 				)
 				.addService(
 					'projectMemberManager',

@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { Component, Scalar } from '../../../binding'
 import { LiteralStaticOption, ScalarStaticOption } from '../fields/ChoiceField'

@@ -1,0 +1,15 @@
+{
+	"name": "@contember/config-loader",
+	"version": "0.1.1-alpha.1",
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
+	"scripts": {},
+	"devDependencies": {
+		"@types/js-yaml": "^3.11.2",
+		"@types/node": "^12.11.7",
+		"typescript": "^3.6.4"
+	},
+	"dependencies": {
+		"js-yaml": "^3.12.0"
+	}
+}

@@ -1,5 +1,1 @@
-dist/
-node_modules/
-.env
-results
-!.gitkeep
+/results

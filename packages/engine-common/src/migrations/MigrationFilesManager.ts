@@ -2,8 +2,6 @@ import { FileNameHelper } from './FileNameHelper'
 import * as fs from 'fs'
 import { promisify } from 'util'
 
-type EngineMigrationType = 'tenant' | 'project'
-
 const readFile = promisify(fs.readFile)
 const fsWrite = promisify(fs.writeFile)
 const fsRealpath = promisify(fs.realpath)

@@ -1,6 +1,6 @@
 import { Input } from '@contember/schema'
 import { assertNever } from '@contember/utils'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 import { DataBindingError } from './DataBindingError'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { PluginOrPlugins } from 'slate-react'
 import { BlocksDefinitions, InlinesDefinitions } from './types'
-import { isKeyHotkey } from 'is-hotkey'
+import isKeyHotkey from 'is-hotkey'
 
 export function createRenderInlinePlugin(inlines: InlinesDefinitions, blocks: BlocksDefinitions): PluginOrPlugins {
 	return {

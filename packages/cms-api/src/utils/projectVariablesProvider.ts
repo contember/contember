@@ -1,4 +1,4 @@
-import { ProjectContainerResolver } from '../CompositionRoot'
+import { ProjectContainerResolver } from '../ProjectContainer'
 import { ProjectVariablesResolver, RoleVariablesDefinition, VariableDefinition } from '@contember/engine-tenant-api'
 
 export const projectVariablesResolver = (

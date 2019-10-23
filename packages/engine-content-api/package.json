@@ -1,7 +1,6 @@
 {
 	"name": "@contember/engine-content-api",
-	"version": "0.0.0",
-	"private": true,
+	"version": "0.1.1-alpha.1",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
@@ -9,23 +8,23 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/database": "^0.0.0",
-		"@contember/dic": "^0.0.0",
-		"@contember/engine-common": "^0.0.0",
-		"@contember/schema": "^0.0.0",
-		"@contember/schema-definition": "^0.0.0",
-		"@contember/schema-utils": "^0.0.0",
-		"@contember/utils": "^0.0.0",
+		"@contember/database": "^0.1.1-alpha.1",
+		"@contember/dic": "^0.1.1-alpha.1",
+		"@contember/engine-common": "^0.1.1-alpha.1",
+		"@contember/schema": "^0.1.1-alpha.1",
+		"@contember/schema-definition": "^0.1.1-alpha.1",
+		"@contember/schema-utils": "^0.1.1-alpha.1",
+		"@contember/utils": "^0.1.1-alpha.1",
 		"apollo-server-core": "^2.9.1",
 		"graphql": "^14.5.4",
 		"graphql-tools": "^4.0.5"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.0.0",
-		"@contember/engine-api-tester": "^0.0.0",
+		"@contember/database-tester": "^0.1.1-alpha.1",
+		"@contember/engine-api-tester": "^0.1.1-alpha.1",
 		"@types/graphql": "^14.5.0",
 		"@types/jasmine": "^3.4.4",
-		"@types/node": "^12.11.1",
+		"@types/node": "^12.11.7",
 		"jasmine": "^3.5.0",
 		"typescript": "^3.6.4"
 	}

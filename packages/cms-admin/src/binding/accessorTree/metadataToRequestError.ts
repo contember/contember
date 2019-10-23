@@ -1,4 +1,4 @@
-import { GraphQlClient } from 'cms-client'
+import { GraphQlClient } from '@contember/client'
 import { RequestError, RequestErrorType } from './RequestError'
 
 export const metadataToRequestError = (metadata: GraphQlClient.FailedRequestMetadata): RequestError => {

@@ -1,5 +1,5 @@
-import { CrudQueryBuilder, GraphQlBuilder } from 'cms-client'
-import { isEmptyObject } from 'cms-common'
+import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
+import { isEmptyObject } from '@contember/utils'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
 import { EntityName, ExpectedCount, PRIMARY_KEY_NAME } from '../bindingTypes'

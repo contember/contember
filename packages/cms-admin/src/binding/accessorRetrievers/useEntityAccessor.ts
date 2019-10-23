@@ -1,5 +1,5 @@
 import { Input } from '@contember/schema'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
 import { EntityAccessor } from '../dao'
 import { useEntityContext } from './useEntityContext'

@@ -1,5 +1,5 @@
 import { Input } from '@contember/schema'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { RelativeSingleField, UniqueWhere } from '../bindingTypes'
 import { MarkerFactory } from '../queryLanguage'

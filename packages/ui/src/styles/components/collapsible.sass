@@ -15,7 +15,8 @@
 	transition-duration: var(--cui-collapsible-private-transition-duration)
 
 	@media (prefers-reduced-motion: reduce)
-		--cui-collapsible-private-transition-duration: #{(1s / 60)} // 1 frame at 60 fps
+		// 1 frame at 60 fps
+		--cui-collapsible-private-transition-duration: #{(1s / 60)}
 		--cui-collapsible-transition-timing-function: step-end
 
 	&.is-expanded

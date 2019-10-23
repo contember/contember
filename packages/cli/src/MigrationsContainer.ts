@@ -1,5 +1,5 @@
 import { Builder } from '@contember/dic'
-import { MigrationFilesManager } from '@contember/engine-common'
+import { MigrationFilesManager } from '@contember/engine-common/dist/src/migrations/MigrationFilesManager'
 import {
 	MigrationDiffCreator,
 	MigrationSqlDryRunner,

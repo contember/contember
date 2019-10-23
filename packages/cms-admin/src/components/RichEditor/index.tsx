@@ -8,7 +8,7 @@ import {
 	toViewClass,
 } from '@contember/ui'
 import cn from 'classnames'
-import { isKeyHotkey } from 'is-hotkey'
+import isKeyHotkey from 'is-hotkey'
 import * as React from 'react'
 import { Document, Editor as CoreEditor, Value } from 'slate'
 import HtmlSerializer from 'slate-html-serializer'

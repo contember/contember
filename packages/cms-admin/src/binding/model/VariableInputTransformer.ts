@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
 import { By, Filter, VariableInput } from '../bindingTypes'
 import { DataBindingError, Environment, Literal, VariableLiteral, VariableScalar } from '../dao'

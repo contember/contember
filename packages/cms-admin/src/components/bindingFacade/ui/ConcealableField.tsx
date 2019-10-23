@@ -27,7 +27,7 @@ export const ConcealableField = React.memo(
 			}
 		}, [concealTimeoutId])
 		const onBlur = React.useCallback(() => {
-			setConcealTimeoutId(setTimeout(() => setIsEditing(false), concealTimeout))
+			setConcealTimeoutId((setTimeout(() => setIsEditing(false), concealTimeout) as any) as number)
 		}, [concealTimeout])
 
 		return (

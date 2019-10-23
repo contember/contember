@@ -1,7 +1,6 @@
 {
 	"name": "@contember/engine-s3-plugin",
-	"version": "0.0.0",
-	"private": true,
+	"version": "0.1.1-alpha.1",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
@@ -12,7 +11,7 @@
 		"typescript": "^3.6.4"
 	},
 	"dependencies": {
-		"@contember/engine-common": "^0.0.0",
+		"@contember/engine-common": "^0.1.1-alpha.1",
 		"aws-sdk": "^2.520.0",
 		"graphql": "^14.5.4",
 		"mime-types": "^2.1.24",

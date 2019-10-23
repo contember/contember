@@ -1,5 +1,5 @@
 import { Input } from '@contember/schema'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { EntityName, FieldName, Filter, RelativeSingleField, UniqueWhere } from '../bindingTypes'
 import {
 	ConnectionMarker,

@@ -4,7 +4,7 @@ import { BlocksDefinitions, InlinesDefinitions, MarksDefinitions } from './types
 import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../../binding/dao'
 import { Block, Data, Document, Inline, Rules, Selection, Text, Value } from 'slate'
 import { Editor, EditorProps, OnChangeFn, Plugin } from 'slate-react'
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { default as Immutable, List } from 'immutable'
 import JsonBlockSerializer from './JsonBlockSerializer'
 import OperationProcessor from './OperationProcessor'

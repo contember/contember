@@ -8,7 +8,7 @@
 			"path": "../../schema/src"
 		},
 		{
-			"path": "../../cms-common/src"
+			"path": "../../utils/src"
 		}
 	]
 }

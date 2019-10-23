@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from 'cms-client'
+import { GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { FieldName } from '../bindingTypes'
 import { PlaceholderGenerator } from './PlaceholderGenerator'

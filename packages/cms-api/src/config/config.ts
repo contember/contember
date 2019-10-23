@@ -1,5 +1,5 @@
 import Project from './Project'
-import { ConfigLoader, Merger } from 'cms-server-common'
+import { ConfigLoader, Merger } from '@contember/config-loader'
 import { deprecated } from '../core/console/messages'
 import { DatabaseCredentials } from '@contember/engine-common'
 import { S3Config } from '@contember/engine-s3-plugin/dist/src/Config'

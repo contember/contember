@@ -1,6 +1,6 @@
 import { BlocksDefinitions, MarksDefinitions } from './types'
 import { Plugins } from 'slate-react'
-import { isKeyHotkey } from 'is-hotkey'
+import isKeyHotkey from 'is-hotkey'
 
 export function createPluginsFromMarks(marks: MarksDefinitions, blocks: BlocksDefinitions): Plugins {
 	return Object.entries(marks).map(([markType, definition]) => {

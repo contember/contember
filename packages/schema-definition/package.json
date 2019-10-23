@@ -1,14 +1,13 @@
 {
 	"name": "@contember/schema-definition",
-	"version": "0.0.0",
-	"private": true,
+	"version": "0.1.1-alpha.1",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
 	"dependencies": {
-		"@contember/schema": "^0.0.0",
-		"@contember/schema-utils": "^0.0.0",
-		"@contember/utils": "^0.0.0",
+		"@contember/schema": "^0.1.1-alpha.1",
+		"@contember/schema-utils": "^0.1.1-alpha.1",
+		"@contember/utils": "^0.1.1-alpha.1",
 		"reflect-metadata": "^0.1.13"
 	},
 	"devDependencies": {

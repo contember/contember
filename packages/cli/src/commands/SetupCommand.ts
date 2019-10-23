@@ -50,7 +50,7 @@ class SetupCommand extends Command<Args, {}> {
 		const result = await client.request(query, { email, password })
 		console.log('Superadmin created.')
 		console.log('Login token:')
-		console.log(result.data.setup.result.loginKey.token)
+		console.log(result.setup.result.loginKey.token)
 	}
 }
 

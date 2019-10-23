@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"composite": true,
+		"noEmitOnError": true,
+		"experimentalDecorators": true,
+
+		"target": "es6",
+		"moduleResolution": "node",
+		"module": "commonjs",
+		"outDir": "dist",
+
+		"strict": true,
+		"incremental": true,
+
+		"lib": ["esnext", "dom"]
+	}
+}

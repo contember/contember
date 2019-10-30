@@ -1,14 +1,12 @@
 import { boolean, radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
-import { Select, SelectProps } from '../../src/components'
+import { Select } from '../../src/components'
 import { sizeKnob } from '../utils/knobs'
 
 export const SelectStory = () => {
 	const [value, setValue] = React.useState('')
 
-	// The cast is frankly just TS inference being insufficient but in practice that won't matter as the value of
-	// the 'allowNewlines' props will typically be a constant which TS handles just fine.
 	return (
 		<Select
 			value={value}
@@ -33,6 +31,7 @@ export const SelectStory = () => {
 				'default',
 			)}
 			options={[
+				{ value: '', label: 'Here', disabled: true },
 				{ value: 'north', label: 'North' },
 				{ value: 'south', label: 'South' },
 				{ value: 'west', label: 'West' },

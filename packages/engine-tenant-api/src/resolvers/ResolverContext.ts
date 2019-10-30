@@ -21,6 +21,6 @@ export class ResolverContext {
 		action: Authorizator.Action
 		message?: string
 	}): Promise<void> {
-		this.permissionContext.requireAccess(args)
+		await this.permissionContext.requireAccess(args)
 	}
 }

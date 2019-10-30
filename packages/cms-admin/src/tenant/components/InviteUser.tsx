@@ -1,20 +1,28 @@
+import {
+	Box,
+	Button,
+	ContainerSpinner,
+	FormGroup,
+	Heading,
+	Select,
+	SelectOption,
+	TextInput,
+	TitleBar,
+} from '@contember/ui'
 import * as React from 'react'
 import { useEffect } from 'react'
-import { Box, Button, ContainerSpinner, FormGroup, Heading, TextInput, TitleBar } from '@contember/ui'
 import { getTenantErrorMessage, useProjectSlug } from '../../apiClient'
-import { Select } from '../../components/ui'
+import { NavigateBackButton } from '../../components/pageRouting'
+import { ToastType } from '../../state/toasts'
 import {
 	RoleVariableDefinition,
 	useAddToast,
 	useInvite,
 	useListRolesQuery,
-	useUpdateProjectMembership,
 	usePageLink,
+	useUpdateProjectMembership,
 } from '../hooks'
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
-import { ToastType } from '../../state/toasts'
-import { PageLinkButton } from '../../components/pageRouting'
-import { NavigateBackButton } from '../../components/pageRouting/NavigateBackButton'
 
 interface VariableConfig {
 	render: React.ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
@@ -182,7 +190,7 @@ const EditUserMembership: React.FC<EditUserMembershipProps> = ({
 										options={[
 											{ value: -1, label: 'Select role', disabled: true },
 											...rolesToShow.map(
-												({ name: roleName }): Select.Option => {
+												({ name: roleName }): SelectOption => {
 													const otherIndex = memberships.findIndex(mem => mem && mem.role === roleName)
 													const enabled = otherIndex === -1 || otherIndex === membershipIndex
 													return {

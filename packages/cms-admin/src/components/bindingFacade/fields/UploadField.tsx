@@ -23,7 +23,7 @@ export interface UploadFieldMetadata extends FieldMetadata<string> {
 }
 
 export type UploadFieldOwnProps = SimpleRelativeSingleFieldProps & {
-	accept: string
+	accept?: string
 	children: (url: string) => React.ReactNode
 	emptyText?: React.ReactNode
 }

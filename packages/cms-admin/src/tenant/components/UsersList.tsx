@@ -97,46 +97,55 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 		<div>
 			<TitleBar actions={<PageLinkButton to="tenantInviteUser">Add a user</PageLinkButton>}>Users in project</TitleBar>
 			<Table>
-				{query.data.project.members.map(member => (
-					<TableRow key={member.identity.id}>
-						<TableCell>{member.identity.person ? member.identity.person.email : '?'}</TableCell>
-						<TableCell>
-							{member.memberships.map((membership, i) => {
-								const Renderer =
-									membership.role in roleRenderers
-										? roleRenderers[membership.role]
-										: () => <>Unknown role "{membership.role}"</>
-								const vars: Variables = {}
-								for (let variable of membership.variables) {
-									vars[variable.name] = variable.values
-								}
-								return (
-									<Tag
-										key={membership.role}
-										//onRemove={() => {
-										//	removeMembership(member.identity.id, member.memberships, membership)
-										//}}
+				{query.data.project.members.map(member => {
+					if (!member.identity.person) {
+						return <React.Fragment key={member.identity.id} />
+					}
+					return (
+						<TableRow key={member.identity.id}>
+							<TableCell>{member.identity.person ? member.identity.person.email : '?'}</TableCell>
+							<TableCell>
+								{member.memberships.map((membership, i) => {
+									const Renderer =
+										membership.role in roleRenderers
+											? roleRenderers[membership.role]
+											: () => <>Unknown role "{membership.role}"</>
+									const vars: Variables = {}
+									for (let variable of membership.variables) {
+										vars[variable.name] = variable.values
+									}
+									return (
+										<Tag
+											key={membership.role}
+											//onRemove={() => {
+											//	removeMembership(member.identity.id, member.memberships, membership)
+											//}}
+										>
+											{rolesData.error ? (
+												'Error loading data'
+											) : (
+												<Renderer variables={vars} rolesData={rolesData.data} />
+											)}
+										</Tag>
+									)
+								})}
+							</TableCell>
+							<TableCell>
+								<ButtonList>
+									<PageLinkButton
+										size="small"
+										to={() => ({ name: 'tenantEditUser', params: { id: member.identity.id } })}
 									>
-										{rolesData.error ? 'Error loading data' : <Renderer variables={vars} rolesData={rolesData.data} />}
-									</Tag>
-								)
-							})}
-						</TableCell>
-						<TableCell>
-							<ButtonList>
-								<PageLinkButton
-									size="small"
-									to={() => ({ name: 'tenantEditUser', params: { id: member.identity.id } })}
-								>
-									Edit roles
-								</PageLinkButton>
-								<Button size="small" intent="danger" onClick={() => removeMember(member.identity.id)}>
-									Revoke access
-								</Button>
-							</ButtonList>
-						</TableCell>
-					</TableRow>
-				))}
+										Edit roles
+									</PageLinkButton>
+									<Button size="small" intent="danger" onClick={() => removeMember(member.identity.id)}>
+										Revoke access
+									</Button>
+								</ButtonList>
+							</TableCell>
+						</TableRow>
+					)
+				})}
 			</Table>
 		</div>
 	)

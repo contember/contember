@@ -1,6 +1,6 @@
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, Component } from '../../../binding'
+import { AccessorContext, Component, EntityAccessor } from '../../../binding'
 import { RemoveButton } from '../buttons'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import {
@@ -28,14 +28,15 @@ export const TableRenderer = Component<TableRendererProps>(
 		enableRemove = true,
 		...layoutProps
 	}) => {
-		const tableWrapper = (props: EntityCollectionWrapperProps) => {
+		const TableWrapper: React.ComponentType<EntityCollectionWrapperProps> = props => {
 			if (props.isEmpty) {
 				return <>{props.children}</>
 			}
 			return (
 				<Table {...tableProps}>
 					{props.accessor.entities.map(entity =>
-						entity ? (
+						// TODO this check is wrong but likely necessary for the time being
+						entity instanceof EntityAccessor ? (
 							<AccessorContext.Provider value={entity} key={entity.getKey()}>
 								<TableRow {...tableRowProps}>
 									{props.originalChildren}
@@ -51,13 +52,14 @@ export const TableRenderer = Component<TableRendererProps>(
 				</Table>
 			)
 		}
+		TableWrapper.displayName = 'TableWrapper'
 		return (
 			<ImmutableContentLayoutRenderer {...layoutProps}>
 				<ImmutableEntityCollectionRenderer
 					beforeContent={beforeContent}
 					afterContent={afterContent}
 					emptyMessage={emptyMessage}
-					wrapperComponent={tableWrapper}
+					wrapperComponent={TableWrapper}
 				>
 					{children}
 				</ImmutableEntityCollectionRenderer>

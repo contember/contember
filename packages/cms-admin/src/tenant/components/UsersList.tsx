@@ -130,18 +130,18 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 									)
 								})}
 							</TableCell>
-							<TableCell>
-								<ButtonList>
-									<PageLinkButton
-										size="small"
-										to={() => ({ name: 'tenantEditUser', params: { id: member.identity.id } })}
-									>
-										Edit roles
-									</PageLinkButton>
-									<Button size="small" intent="danger" onClick={() => removeMember(member.identity.id)}>
-										Revoke access
-									</Button>
-								</ButtonList>
+							<TableCell shrunk>
+								<PageLinkButton
+									size="small"
+									to={() => ({ name: 'tenantEditUser', params: { id: member.identity.id } })}
+								>
+									Edit roles
+								</PageLinkButton>
+							</TableCell>
+							<TableCell shrunk>
+								<Button size="small" intent="danger" onClick={() => removeMember(member.identity.id)}>
+									Revoke access
+								</Button>
 							</TableCell>
 						</TableRow>
 					)

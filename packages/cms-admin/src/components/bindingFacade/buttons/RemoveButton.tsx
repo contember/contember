@@ -25,7 +25,7 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		value.remove(mapToRemovalType(props.removeType))
 
 		if (props.immediatePersist && triggerPersist) {
-			setTimeout(() => triggerPersist(), 100) // TODO This is a *nasty* hack.
+			triggerPersist().catch(() => {})
 		}
 	}, [triggerPersist, props.immediatePersist, props.removeType, value])
 
@@ -49,6 +49,7 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		</Button>
 	)
 })
+RemoveButton.displayName = 'RemoveButton'
 
 const mapToRemovalType = (removalType?: RemovalType): EntityAccessor.RemovalType => {
 	switch (removalType) {

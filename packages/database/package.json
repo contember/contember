@@ -1,18 +1,18 @@
 {
 	"name": "@contember/database",
-	"version": "0.1.1-alpha.1",
+	"version": "0.2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/queryable": "^0.1.1-alpha.1",
-		"@contember/utils": "^0.1.1-alpha.1",
+		"@contember/queryable": "^0.2.0",
+		"@contember/utils": "^0.2.0",
 		"pg": "^7.12.1"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.1.1-alpha.1",
+		"@contember/database-tester": "^0.2.0",
 		"@types/jasmine": "^3.4.4",
 		"@types/node": "^12.11.7",
 		"@types/pg": "^7.11.0",

@@ -56,6 +56,7 @@ import { MigrationsRunner } from './bootstrap/MigrationsRunner'
 export interface MasterContainer {
 	initializer: Initializer
 	serverRunner: ServerRunner
+	koa: Koa
 }
 
 class CompositionRoot {
@@ -185,7 +186,7 @@ class CompositionRoot {
 
 			.build()
 
-		return masterContainer.pick('initializer', 'serverRunner')
+		return masterContainer.pick('initializer', 'serverRunner', 'koa')
 	}
 
 	createProjectContainers(

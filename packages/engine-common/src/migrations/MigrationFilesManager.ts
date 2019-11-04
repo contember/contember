@@ -1,6 +1,7 @@
 import { FileNameHelper } from './FileNameHelper'
 import * as fs from 'fs'
 import { promisify } from 'util'
+import * as path from 'path'
 
 const readFile = promisify(fs.readFile)
 const fsWrite = promisify(fs.writeFile)
@@ -76,7 +77,8 @@ class MigrationFilesManager {
 	}
 
 	public static createForProject(projectsDirectory: string, projectSlug: string): MigrationFilesManager {
-		return new MigrationFilesManager(`${projectsDirectory}/${projectSlug}/migrations`)
+		const migrationsDir = path.join(projectsDirectory, projectSlug, 'migrations')
+		return new MigrationFilesManager(migrationsDir)
 	}
 }
 

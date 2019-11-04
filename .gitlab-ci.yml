@@ -39,6 +39,7 @@ test:
     TEST_DB_PASSWORD: "123"
     TEST_DB_USER: cms_test
     TEST_DB_NAME: cms_test
+    TEST_DB_NAME_TENANT: cms_test_tenant
     TEST_DB_PORT: 5432
     POSTGRES_USER: cms_test
     POSTGRES_DB: cms_test

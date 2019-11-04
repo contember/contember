@@ -4,7 +4,7 @@ import {
 	AccessorContext,
 	EnforceSubtypeRelation,
 	EntityAccessor,
-	EntityCollectionAccessor,
+	EntityListAccessor,
 	Environment,
 	EnvironmentContext,
 	QueryLanguage,
@@ -14,7 +14,7 @@ import {
 } from '../../../binding'
 import { AddNewButton, RemoveButton, RemoveButtonProps } from '../buttons'
 
-export interface RepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {}
+export interface RepeaterProps extends ToManyProps, Repeater.EntityListPublicProps {}
 
 class Repeater extends React.PureComponent<RepeaterProps> {
 	static displayName = 'Repeater'
@@ -27,9 +27,9 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 						this.props.field,
 						atomicPrimitiveProps => (
 							<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
-								{(field: EntityCollectionAccessor) => {
+								{(field: EntityListAccessor) => {
 									return (
-										<Repeater.EntityCollection
+										<Repeater.EntityList
 											entities={field}
 											label={this.props.label}
 											enableAddingNew={this.props.enableAddingNew}
@@ -38,7 +38,7 @@ class Repeater extends React.PureComponent<RepeaterProps> {
 											removeType={this.props.removeType}
 										>
 											{this.props.children}
-										</Repeater.EntityCollection>
+										</Repeater.EntityList>
 									)
 								}}
 							</ToMany.AccessorRetriever>
@@ -78,7 +78,7 @@ namespace Repeater {
 	))
 	Item.displayName = 'Repeater.Item'
 
-	export interface EntityCollectionPublicProps extends ItemPublicProps {
+	export interface EntityListPublicProps extends ItemPublicProps {
 		label?: FieldSetProps['legend']
 		enableUnlink?: boolean
 		enableUnlinkAll?: boolean
@@ -86,11 +86,11 @@ namespace Repeater {
 		emptyMessage?: React.ReactNode
 	}
 
-	export interface EntityCollectionProps extends EntityCollectionPublicProps {
-		entities: EntityCollectionAccessor
+	export interface EntityListProps extends EntityListPublicProps {
+		entities: EntityListAccessor
 	}
 
-	export class EntityCollection extends React.PureComponent<EntityCollectionProps> {
+	export class EntityList extends React.PureComponent<EntityListProps> {
 		public render() {
 			const entities = filterEntities(this.props.entities)
 			return (
@@ -116,8 +116,8 @@ namespace Repeater {
 	}
 
 	export interface CloneableProps {
-		prependNew?: EntityCollectionAccessor['addNew']
-		appendNew?: EntityCollectionAccessor['addNew']
+		prependNew?: EntityListAccessor['addNew']
+		appendNew?: EntityListAccessor['addNew']
 		enableAddingNew?: boolean
 	}
 
@@ -136,7 +136,7 @@ namespace Repeater {
 	}
 
 	export const filterEntities = (
-		entities: EntityCollectionAccessor,
+		entities: EntityListAccessor,
 		excludeUnpersisted: boolean = false,
 	): EntityAccessor[] => {
 		return entities.entities.filter(

@@ -1,14 +1,9 @@
 import * as React from 'react'
 import { Component } from '../../../binding'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
-import {
-	ImmutableEntityCollectionRenderer,
-	ImmutableEntityCollectionRendererProps,
-} from './ImmutableEntityCollectionRenderer'
+import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 
-export interface ListRendererProps
-	extends ImmutableContentLayoutRendererProps,
-		ImmutableEntityCollectionRendererProps {}
+export interface ListRendererProps extends ImmutableContentLayoutRendererProps, ImmutableEntityListRendererProps {}
 
 export const ListRenderer = Component<ListRendererProps>(
 	({
@@ -22,14 +17,14 @@ export const ListRenderer = Component<ListRendererProps>(
 		...layoutProps
 	}) => (
 		<ImmutableContentLayoutRenderer {...layoutProps}>
-			<ImmutableEntityCollectionRenderer
+			<ImmutableEntityListRenderer
 				beforeContent={beforeContent}
 				afterContent={afterContent}
 				emptyMessage={emptyMessage}
 				wrapperComponent={wrapperComponent}
 			>
 				{children}
-			</ImmutableEntityCollectionRenderer>
+			</ImmutableEntityListRenderer>
 		</ImmutableContentLayoutRenderer>
 	),
 	'ListRenderer',

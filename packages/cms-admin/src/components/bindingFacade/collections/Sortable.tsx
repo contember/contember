@@ -12,7 +12,7 @@ import {
 import {
 	EnforceSubtypeRelation,
 	EntityAccessor,
-	EntityCollectionAccessor,
+	EntityListAccessor,
 	Environment,
 	EnvironmentContext,
 	Field,
@@ -23,15 +23,15 @@ import {
 } from '../../../binding'
 import { DragHandle as DragHandleIcon } from '../../ui'
 import { Repeater } from './Repeater'
-import EntityCollectionPublicProps = Repeater.EntityCollectionPublicProps
+import EntityListPublicProps = Repeater.EntityListPublicProps
 
-export interface SortablePublicProps extends EntityCollectionPublicProps {
+export interface SortablePublicProps extends EntityListPublicProps {
 	sortBy: FieldName
 	enablePrepending?: boolean
 }
 
 export interface SortableInternalProps {
-	entities?: EntityCollectionAccessor
+	entities?: EntityListAccessor
 }
 
 export interface SortableProps extends SortablePublicProps, SortableInternalProps {}
@@ -104,10 +104,10 @@ namespace Sortable {
 	)
 	SortableItem.displayName = 'Sortable.SortableItem'
 
-	export interface SortableListProps extends EntityCollectionPublicProps {
+	export interface SortableListProps extends EntityListPublicProps {
 		entities: EntityAccessor[]
-		prependNew?: EntityCollectionAccessor['addNew']
-		appendNew?: EntityCollectionAccessor['addNew']
+		prependNew?: EntityListAccessor['addNew']
+		appendNew?: EntityListAccessor['addNew']
 	}
 
 	export const SortableList = React.memo(
@@ -147,7 +147,7 @@ namespace Sortable {
 	}
 
 	export interface SortableInnerProps extends SortablePublicProps {
-		entities: EntityCollectionAccessor
+		entities: EntityListAccessor
 		environment: Environment
 	}
 
@@ -156,12 +156,12 @@ namespace Sortable {
 
 		private entities: EntityAccessor[] = []
 
-		private getOnSortEnd = (accessor: EntityCollectionAccessor): SortEndHandler => ({ oldIndex, newIndex }) => {
+		private getOnSortEnd = (accessor: EntityListAccessor): SortEndHandler => ({ oldIndex, newIndex }) => {
 			this.reconcileOrderFields(accessor, oldIndex, newIndex)
 		}
 
-		private getBatchUpdater = (order: EntityOrder) => (getAccessor: () => EntityCollectionAccessor) => {
-			let collectionAccessor: EntityCollectionAccessor = getAccessor()
+		private getBatchUpdater = (order: EntityOrder) => (getAccessor: () => EntityListAccessor) => {
+			let collectionAccessor: EntityListAccessor = getAccessor()
 			for (const entity of collectionAccessor.entities) {
 				if (!(entity instanceof EntityAccessor)) {
 					continue
@@ -204,12 +204,12 @@ namespace Sortable {
 			return order
 		}
 
-		private reconcileOrderFields(accessor: EntityCollectionAccessor, oldIndex: number, newIndex: number) {
+		private reconcileOrderFields(accessor: EntityListAccessor, oldIndex: number, newIndex: number) {
 			const order = this.computeNewEntityOrder(oldIndex, newIndex)
 			accessor.batchUpdates && accessor.batchUpdates(this.getBatchUpdater(order))
 		}
 
-		private prepareEntities(accessor: EntityCollectionAccessor): EntityAccessor[] {
+		private prepareEntities(accessor: EntityListAccessor): EntityAccessor[] {
 			const entities = accessor.entities.filter((item): item is EntityAccessor => item instanceof EntityAccessor)
 
 			return entities.sort((a, b) => {
@@ -296,7 +296,7 @@ namespace Sortable {
 		private fixOrderlessEntities() {
 			this.props.entities.batchUpdates &&
 				this.props.entities.batchUpdates(getAccessor => {
-					let collectionAccessor: EntityCollectionAccessor = getAccessor()
+					let collectionAccessor: EntityListAccessor = getAccessor()
 					for (const [i, entity] of this.entities.entries()) {
 						if (!(entity instanceof EntityAccessor)) {
 							continue

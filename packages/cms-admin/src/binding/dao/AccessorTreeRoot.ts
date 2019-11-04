@@ -1,10 +1,10 @@
 import { EntityName } from '../bindingTypes'
 import { EntityAccessor } from './EntityAccessor'
-import { EntityCollectionAccessor } from './EntityCollectionAccessor'
+import { EntityListAccessor } from './EntityListAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { MarkerTreeRoot } from './MarkerTreeRoot'
 
-export type RootAccessor = (EntityAccessor | EntityForRemovalAccessor) | EntityCollectionAccessor
+export type RootAccessor = (EntityAccessor | EntityForRemovalAccessor) | EntityListAccessor
 
 export class AccessorTreeRoot {
 	public readonly id: MarkerTreeRoot.TreeId
@@ -18,6 +18,6 @@ export class AccessorTreeRoot {
 	}
 
 	public map<T>(mapper: (accessor: EntityAccessor | EntityForRemovalAccessor | undefined) => T): T[] {
-		return (this.root instanceof EntityCollectionAccessor ? this.root.entities : [this.root]).map(mapper)
+		return (this.root instanceof EntityListAccessor ? this.root.entities : [this.root]).map(mapper)
 	}
 }

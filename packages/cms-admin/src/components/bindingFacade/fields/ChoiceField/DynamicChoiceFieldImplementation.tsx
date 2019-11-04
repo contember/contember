@@ -4,7 +4,7 @@ import {
 	AccessorTreeRoot,
 	DataBindingError,
 	EntityAccessor,
-	EntityCollectionAccessor,
+	EntityListAccessor,
 	EntityForRemovalAccessor,
 	Field,
 	FieldAccessor,
@@ -18,7 +18,7 @@ import { ChoiceFieldData } from './ChoiceFieldData'
 export type DynamicChoiceFieldImplementationProps = ChoiceFieldData.BaseProps &
 	Omit<Field.RawMetadata, 'data'> & {
 		subTreeRootAccessor: AccessorTreeRoot
-		currentValueEntity: EntityAccessor | EntityForRemovalAccessor | EntityCollectionAccessor
+		currentValueEntity: EntityAccessor | EntityForRemovalAccessor | EntityListAccessor
 		options: FieldName
 	}
 
@@ -33,7 +33,7 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 
 	const subTreeData = subTreeRootAccessor.root
 
-	if (!(subTreeData instanceof EntityCollectionAccessor)) {
+	if (!(subTreeData instanceof EntityListAccessor)) {
 		throw new DataBindingError('Corrupted data')
 	}
 	const filteredData = subTreeData.entities.filter(
@@ -46,8 +46,7 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 		optionEntities.push(getNestedEntity(entity, toOneProps))
 	}
 
-	const entities =
-		currentValueEntity instanceof EntityCollectionAccessor ? currentValueEntity.entities : [currentValueEntity]
+	const entities = currentValueEntity instanceof EntityListAccessor ? currentValueEntity.entities : [currentValueEntity]
 
 	const currentValues: ChoiceFieldData.ValueRepresentation[] = []
 
@@ -97,7 +96,7 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 			...baseMetadata,
 			currentValues: currentValues,
 			onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
-				if (currentValueEntity instanceof EntityCollectionAccessor && currentValueEntity.addNew) {
+				if (currentValueEntity instanceof EntityListAccessor && currentValueEntity.addNew) {
 					if (isChosen) {
 						currentValueEntity.addNew(optionEntities[optionKey])
 					} else {

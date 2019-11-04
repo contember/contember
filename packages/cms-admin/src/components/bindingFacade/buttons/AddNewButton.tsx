@@ -1,9 +1,9 @@
 import { Button, ButtonProps, Icon, IconProps, FormGroup } from '@contember/ui'
 import * as React from 'react'
-import { EntityCollectionAccessor, useMutationState } from '../../../binding'
+import { EntityListAccessor, useMutationState } from '../../../binding'
 
 export type AddNewButtonProps = ButtonProps & {
-	addNew: EntityCollectionAccessor['addNew']
+	addNew: EntityListAccessor['addNew']
 	icon?: IconProps['blueprintIcon']
 }
 

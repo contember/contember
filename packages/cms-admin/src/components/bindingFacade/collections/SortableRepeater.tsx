@@ -1,17 +1,10 @@
 import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import {
-	Component,
-	EntityCollectionAccessor,
-	QueryLanguage,
-	ToMany,
-	ToManyProps,
-	useEnvironment,
-} from '../../../binding'
+import { Component, EntityListAccessor, QueryLanguage, ToMany, ToManyProps, useEnvironment } from '../../../binding'
 import { Repeater } from './Repeater'
 import { Sortable, SortablePublicProps } from './Sortable'
 
-export interface SortableRepeaterProps extends ToManyProps, Repeater.EntityCollectionPublicProps {
+export interface SortableRepeaterProps extends ToManyProps, Repeater.EntityListPublicProps {
 	sortBy: SortablePublicProps['sortBy']
 }
 
@@ -23,7 +16,7 @@ export const SortableRepeater = Component<SortableRepeaterProps>(
 			props.field,
 			atomicPrimitiveProps => (
 				<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
-					{(field: EntityCollectionAccessor) => (
+					{(field: EntityListAccessor) => (
 						// Intentionally not applying label system middleware
 						<FieldSet legend={props.label} errors={field.errors}>
 							<Sortable

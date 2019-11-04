@@ -4,14 +4,14 @@ import { AccessorContext, Component, EntityAccessor } from '../../../binding'
 import { RemoveButton } from '../buttons'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import {
-	EntityCollectionWrapperProps,
-	ImmutableEntityCollectionRenderer,
-	ImmutableEntityCollectionRendererProps,
-} from './ImmutableEntityCollectionRenderer'
+	EntityListWrapperProps,
+	ImmutableEntityListRenderer,
+	ImmutableEntityListRendererProps,
+} from './ImmutableEntityListRenderer'
 
 export interface TableRendererProps
 	extends ImmutableContentLayoutRendererProps,
-		Omit<ImmutableEntityCollectionRendererProps, 'wrapperComponent'> {
+		Omit<ImmutableEntityListRendererProps, 'wrapperComponent'> {
 	tableProps?: Omit<TableProps, 'children'>
 	tableRowProps?: Omit<TableRowProps, 'children'>
 	enableRemove?: boolean
@@ -28,7 +28,7 @@ export const TableRenderer = Component<TableRendererProps>(
 		enableRemove = true,
 		...layoutProps
 	}) => {
-		const TableWrapper: React.ComponentType<EntityCollectionWrapperProps> = props => {
+		const TableWrapper: React.ComponentType<EntityListWrapperProps> = props => {
 			if (props.isEmpty) {
 				return <>{props.children}</>
 			}
@@ -55,14 +55,14 @@ export const TableRenderer = Component<TableRendererProps>(
 		TableWrapper.displayName = 'TableWrapper'
 		return (
 			<ImmutableContentLayoutRenderer {...layoutProps}>
-				<ImmutableEntityCollectionRenderer
+				<ImmutableEntityListRenderer
 					beforeContent={beforeContent}
 					afterContent={afterContent}
 					emptyMessage={emptyMessage}
 					wrapperComponent={TableWrapper}
 				>
 					{children}
-				</ImmutableEntityCollectionRenderer>
+				</ImmutableEntityListRenderer>
 			</ImmutableContentLayoutRenderer>
 		)
 	},

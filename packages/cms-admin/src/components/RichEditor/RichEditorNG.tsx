@@ -1,4 +1,4 @@
-import { EntityCollectionAccessor, Environment } from '../../binding/dao'
+import { EntityListAccessor, Environment } from '../../binding/dao'
 import { QueryLanguage } from '../../binding/queryLanguage'
 import { EnvironmentContext, Field, ToMany } from '../../binding'
 import * as React from 'react'
@@ -20,7 +20,7 @@ export class RichEditorNG extends React.PureComponent<RTEProps> {
 						atomicPrimitiveProps => {
 							return (
 								<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
-									{(accessor: EntityCollectionAccessor) => <InnerEditor {...this.props} accessor={accessor} />}
+									{(accessor: EntityListAccessor) => <InnerEditor {...this.props} accessor={accessor} />}
 								</ToMany.AccessorRetriever>
 							)
 						},

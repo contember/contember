@@ -1,7 +1,7 @@
 import { FieldName } from '../bindingTypes'
 import { AccessorTreeRoot } from './AccessorTreeRoot'
 import { EntityAccessor } from './EntityAccessor'
-import { EntityCollectionAccessor } from './EntityCollectionAccessor'
+import { EntityListAccessor } from './EntityListAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { FieldAccessor } from './FieldAccessor'
 import { MarkerTreeRoot } from './MarkerTreeRoot'
@@ -60,7 +60,7 @@ namespace EntityData {
 		| undefined
 		| EntityAccessor
 		| EntityForRemovalAccessor
-		| EntityCollectionAccessor
+		| EntityListAccessor
 		| FieldAccessor
 		| AccessorTreeRoot
 

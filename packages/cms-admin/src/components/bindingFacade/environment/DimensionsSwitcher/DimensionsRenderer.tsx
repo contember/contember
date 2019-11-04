@@ -7,7 +7,7 @@ import {
 	AccessorTreeStateName,
 	Component,
 	EntityAccessor,
-	EntityCollectionAccessor,
+	EntityListAccessor,
 	FieldAccessor,
 	ToOne,
 	useEnvironment,
@@ -135,7 +135,7 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 			})*/
 			}
 			const entities =
-				treeState.data.root instanceof EntityCollectionAccessor ? treeState.data.root.entities : [treeState.data.root]
+				treeState.data.root instanceof EntityListAccessor ? treeState.data.root.entities : [treeState.data.root]
 			const normalized: StatefulDimensionDatum[] = []
 
 			for (const entity of entities) {

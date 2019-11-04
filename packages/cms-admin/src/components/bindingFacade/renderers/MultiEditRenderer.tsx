@@ -1,14 +1,9 @@
 import * as React from 'react'
 import { Component } from '../../../binding'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
-import {
-	MutableEntityCollectionRenderer,
-	MutableEntityCollectionRendererProps,
-} from './MutableEntityCollectionRenderer'
+import { MutableEntityListRenderer, MutableEntityListRendererProps } from './MutableEntityListRenderer'
 
-export interface MultiEditRendererProps
-	extends MutableContentLayoutRendererProps,
-		MutableEntityCollectionRendererProps {}
+export interface MultiEditRendererProps extends MutableContentLayoutRendererProps, MutableEntityListRendererProps {}
 
 export const MultiEditRenderer = Component<MultiEditRendererProps>(
 	({
@@ -24,7 +19,7 @@ export const MultiEditRenderer = Component<MultiEditRendererProps>(
 		...layoutProps
 	}) => (
 		<MutableContentLayoutRenderer {...layoutProps}>
-			<MutableEntityCollectionRenderer
+			<MutableEntityListRenderer
 				afterContent={afterContent}
 				beforeContent={beforeContent}
 				emptyMessage={emptyMessage}
@@ -34,7 +29,7 @@ export const MultiEditRenderer = Component<MultiEditRendererProps>(
 				wrapperComponent={wrapperComponent}
 			>
 				{children}
-			</MutableEntityCollectionRenderer>
+			</MutableEntityListRenderer>
 		</MutableContentLayoutRenderer>
 	),
 	'',

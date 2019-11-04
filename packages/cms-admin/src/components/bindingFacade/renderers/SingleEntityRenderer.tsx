@@ -4,7 +4,7 @@ import {
 	AccessorTreeStateWithDataContext,
 	Component,
 	EntityAccessor,
-	EntityCollectionAccessor,
+	EntityListAccessor,
 	EntityForRemovalAccessor,
 } from '../../../binding'
 
@@ -19,10 +19,9 @@ export const SingleEntityRenderer = Component<SingleEntityRendererProps>(
 		if (accessorTreeState === undefined) {
 			return null
 		}
-		let root: EntityCollectionAccessor | EntityAccessor | EntityForRemovalAccessor | undefined =
-			accessorTreeState.data.root
+		let root: EntityListAccessor | EntityAccessor | EntityForRemovalAccessor | undefined = accessorTreeState.data.root
 
-		if (root instanceof EntityCollectionAccessor) {
+		if (root instanceof EntityListAccessor) {
 			// This can actually legitimately happen when creating ‒ it will be a collection accessor
 			root = root.entities[0]
 		}

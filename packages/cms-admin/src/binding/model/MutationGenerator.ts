@@ -8,7 +8,7 @@ import {
 	ConnectionMarker,
 	DataBindingError,
 	EntityAccessor,
-	EntityCollectionAccessor,
+	EntityListAccessor,
 	EntityFields,
 	EntityForRemovalAccessor,
 	FieldAccessor,
@@ -68,7 +68,7 @@ export class MutationGenerator {
 			}
 		} else if (entity instanceof EntityForRemovalAccessor) {
 			queryBuilder = this.addDeleteMutation(entity, entityName, alias, constraints, queryBuilder)
-		} else if (entity instanceof EntityCollectionAccessor) {
+		} else if (entity instanceof EntityListAccessor) {
 			if (Array.isArray(data) || data === undefined) {
 				const entityCount = entity.entities.length
 
@@ -260,7 +260,7 @@ export class MutationGenerator {
 							}
 						}
 					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
-						if (accessor instanceof EntityCollectionAccessor) {
+						if (accessor instanceof EntityListAccessor) {
 							for (let i = 0, accessorCount = accessor.entities.length; i < accessorCount; i++) {
 								const innerAccessor = accessor.entities[i]
 								if (innerAccessor instanceof EntityAccessor) {
@@ -394,7 +394,7 @@ export class MutationGenerator {
 						}
 					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
 						if (
-							accessor instanceof EntityCollectionAccessor &&
+							accessor instanceof EntityListAccessor &&
 							(Array.isArray(persistedField) || persistedField === undefined || persistedField === null)
 						) {
 							for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {

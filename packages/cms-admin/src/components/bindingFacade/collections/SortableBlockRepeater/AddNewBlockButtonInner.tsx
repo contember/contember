@@ -1,10 +1,10 @@
 import { Button, ButtonGroup, DropdownRenderProps } from '@contember/ui'
 import * as React from 'react'
-import { EntityAccessor, EntityCollectionAccessor, FieldAccessor, RelativeSingleField } from '../../../../binding'
+import { EntityAccessor, EntityListAccessor, FieldAccessor, RelativeSingleField } from '../../../../binding'
 import { NormalizedBlockProps } from '../../blocks'
 
 export interface AddNewBlockButtonInnerProps extends DropdownRenderProps {
-	addNew: Exclude<EntityCollectionAccessor['addNew'], undefined>
+	addNew: Exclude<EntityListAccessor['addNew'], undefined>
 	normalizedBlockProps: NormalizedBlockProps[]
 	discriminationField: RelativeSingleField
 	isMutating: boolean

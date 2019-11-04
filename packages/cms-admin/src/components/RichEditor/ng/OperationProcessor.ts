@@ -1,14 +1,14 @@
 import { Value } from 'slate'
-import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, FieldAccessor } from '../../../binding/dao'
+import { EntityAccessor, EntityListAccessor, EntityForRemovalAccessor, FieldAccessor } from '../../../binding/dao'
 import JsonBlockSerializer from './JsonBlockSerializer'
 import { GraphQlBuilder } from '@contember/client'
 import { BlocksDefinitions } from './types'
 
-type GetCollectionAccessor = () => EntityCollectionAccessor
+type GetCollectionAccessor = () => EntityListAccessor
 
 export default class OperationProcessor {
 	constructor(
-		private readonly accessor: EntityCollectionAccessor,
+		private readonly accessor: EntityListAccessor,
 		private readonly sortBy: string,
 		private readonly typeField: string,
 		private readonly blocks: BlocksDefinitions,

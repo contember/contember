@@ -8,7 +8,7 @@ import {
 	ConnectionMarker,
 	DataBindingError,
 	EntityAccessor,
-	EntityCollectionAccessor,
+	EntityListAccessor,
 	EntityData,
 	EntityFields,
 	EntityForRemovalAccessor,
@@ -24,7 +24,7 @@ type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => 
 type OnReplace = EntityAccessor['replaceWith']
 type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = Exclude<EntityAccessor['batchUpdates'], undefined>
-type BatchEntityCollectionUpdates = Exclude<EntityCollectionAccessor['batchUpdates'], undefined>
+type BatchEntityListUpdates = Exclude<EntityListAccessor['batchUpdates'], undefined>
 
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined
@@ -76,7 +76,7 @@ class AccessorTreeGenerator {
 			if (
 				updatedData instanceof EntityAccessor ||
 				updatedData instanceof EntityForRemovalAccessor ||
-				updatedData instanceof EntityCollectionAccessor
+				updatedData instanceof EntityListAccessor
 			) {
 				return updateData(createAccessorTreeRoot(updatedData))
 			}
@@ -86,8 +86,8 @@ class AccessorTreeGenerator {
 
 		return createAccessorTreeRoot(
 			(entityData[rootName] =
-				Array.isArray(data) || data === undefined || data instanceof EntityCollectionAccessor
-					? this.generateEntityCollectionAccessor(rootName, tree.fields, data, errorNode, onUpdate)
+				Array.isArray(data) || data === undefined || data instanceof EntityListAccessor
+					? this.generateEntityListAccessor(rootName, tree.fields, data, errorNode, onUpdate)
 					: this.generateEntityAccessor(rootName, tree.fields, data, errorNode, onUpdate, entityData)),
 		)
 	}
@@ -146,7 +146,7 @@ class AccessorTreeGenerator {
 							: undefined
 
 					if (reference.expectedCount === ExpectedCount.UpToOne) {
-						if (Array.isArray(fieldData) || fieldData instanceof EntityCollectionAccessor) {
+						if (Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
 							throw new DataBindingError(
 								`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
 									`Perhaps you wanted to use a <Repeater />?`,
@@ -170,8 +170,8 @@ class AccessorTreeGenerator {
 							)
 						}
 					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
-						if (fieldData === undefined || Array.isArray(fieldData) || fieldData instanceof EntityCollectionAccessor) {
-							entityData[referencePlaceholder] = this.generateEntityCollectionAccessor(
+						if (fieldData === undefined || Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
+							entityData[referencePlaceholder] = this.generateEntityListAccessor(
 								referencePlaceholder,
 								reference.fields,
 								fieldData,
@@ -204,7 +204,7 @@ class AccessorTreeGenerator {
 					: undefined
 				if (
 					fieldData instanceof AccessorTreeRoot ||
-					fieldData instanceof EntityCollectionAccessor ||
+					fieldData instanceof EntityListAccessor ||
 					fieldData instanceof EntityAccessor ||
 					fieldData instanceof EntityForRemovalAccessor
 				) {
@@ -326,16 +326,16 @@ class AccessorTreeGenerator {
 		return this.updateFields(persistedData, entityFields, errors, onUpdate, onReplace, batchUpdates, onRemove)
 	}
 
-	private generateEntityCollectionAccessor(
+	private generateEntityListAccessor(
 		placeholderName: string,
 		entityFields: EntityFields,
-		fieldData: Array<ReceivedEntityData<undefined>> | EntityCollectionAccessor | undefined,
+		fieldData: Array<ReceivedEntityData<undefined>> | EntityListAccessor | undefined,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
 		preferences: ReferenceMarker.ReferencePreferences = ReferenceMarker.defaultReferencePreferences[
 			ExpectedCount.PossiblyMany
 		],
-	): EntityCollectionAccessor {
+	): EntityListAccessor {
 		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
 			throw new DataBindingError(
 				`The error tree structure does not correspond to the marker tree. This should never happen.`,
@@ -344,7 +344,7 @@ class AccessorTreeGenerator {
 
 		let inBatchUpdateMode = false
 		const updateAccessorInstance = () => {
-			return (collectionAccessor = new EntityCollectionAccessor(
+			return (collectionAccessor = new EntityListAccessor(
 				collectionAccessor.entities.slice(),
 				collectionAccessor.errors,
 				collectionAccessor.batchUpdates,
@@ -354,7 +354,7 @@ class AccessorTreeGenerator {
 		const performUpdate = () => {
 			parentOnUpdate(placeholderName, updateAccessorInstance())
 		}
-		const batchUpdates: BatchEntityCollectionUpdates = performUpdates => {
+		const batchUpdates: BatchEntityListUpdates = performUpdates => {
 			inBatchUpdateMode = true
 			const accessorBeforeUpdates = collectionAccessor
 			performUpdates(() => collectionAccessor)
@@ -415,7 +415,7 @@ class AccessorTreeGenerator {
 			childInBatchUpdateMode[i] = false
 			return this.updateFields(datum, entityFields, childErrors, onUpdate, onReplace, batchUpdates, onRemove)
 		}
-		let collectionAccessor = new EntityCollectionAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
+		let collectionAccessor = new EntityListAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
 			const newEntityIndex = collectionAccessor.entities.length
 			const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity, newEntityIndex)
 
@@ -432,7 +432,7 @@ class AccessorTreeGenerator {
 			}
 		})
 
-		let sourceData = fieldData instanceof EntityCollectionAccessor ? fieldData.entities : fieldData || [undefined]
+		let sourceData = fieldData instanceof EntityListAccessor ? fieldData.entities : fieldData || [undefined]
 		if (
 			sourceData.length === 0 ||
 			sourceData.every(

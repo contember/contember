@@ -4,19 +4,19 @@ import { Component } from '../../../binding'
 import { AddNewButton } from '../buttons'
 import { Repeater, Sortable, SortablePublicProps } from '../collections'
 import {
-	EntityCollectionWrapperProps,
-	ImmutableEntityCollectionRenderer,
-	ImmutableEntityCollectionRendererProps,
-} from './ImmutableEntityCollectionRenderer'
+	EntityListWrapperProps,
+	ImmutableEntityListRenderer,
+	ImmutableEntityListRendererProps,
+} from './ImmutableEntityListRenderer'
 
 // TODO properly unify with repeaters
-export interface MutableEntityCollectionRendererProps extends ImmutableEntityCollectionRendererProps {
+export interface MutableEntityListRendererProps extends ImmutableEntityListRendererProps {
 	sortable?: Omit<SortablePublicProps, 'children'> // TODO this contains props that we don't want to set from here
 	enableAddingNew?: boolean
 	enableRemove?: boolean
 }
 
-export const MutableEntityCollectionRenderer = Component<MutableEntityCollectionRendererProps>(
+export const MutableEntityListRenderer = Component<MutableEntityListRendererProps>(
 	({
 		sortable,
 		enableAddingNew = true,
@@ -28,8 +28,8 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		afterContent,
 		emptyMessage,
 	}) => {
-		const fallbackWrapper: React.ComponentType<EntityCollectionWrapperProps> = React.useCallback(
-			(props: EntityCollectionWrapperProps) => (
+		const fallbackWrapper: React.ComponentType<EntityListWrapperProps> = React.useCallback(
+			(props: EntityListWrapperProps) => (
 				<Box>
 					{props.children}
 					{enableAddingNew && !sortable && <AddNewButton addNew={props.accessor.addNew} />}
@@ -39,7 +39,7 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		)
 		const Wrapper = wrapperComponent || fallbackWrapper
 		const normalizedWrapper = React.useCallback(
-			(props: EntityCollectionWrapperProps) => (
+			(props: EntityListWrapperProps) => (
 				<Wrapper {...props}>
 					{sortable ? (
 						// Deliberately not using props.children
@@ -68,14 +68,14 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		return (
 			// TODO maybe use Repeater.Item?
 
-			<ImmutableEntityCollectionRenderer
+			<ImmutableEntityListRenderer
 				beforeContent={beforeContent}
 				afterContent={afterContent}
 				emptyMessage={emptyMessage}
 				wrapperComponent={normalizedWrapper}
 			>
 				{children}
-			</ImmutableEntityCollectionRenderer>
+			</ImmutableEntityListRenderer>
 		)
 	},
 	({
@@ -88,14 +88,10 @@ export const MutableEntityCollectionRenderer = Component<MutableEntityCollection
 		afterContent,
 		emptyMessage,
 	}) => (
-		<ImmutableEntityCollectionRenderer
-			beforeContent={beforeContent}
-			afterContent={afterContent}
-			emptyMessage={emptyMessage}
-		>
+		<ImmutableEntityListRenderer beforeContent={beforeContent} afterContent={afterContent} emptyMessage={emptyMessage}>
 			{sortable && <Sortable {...sortable}>{children}</Sortable>}
 			{sortable || children}
-		</ImmutableEntityCollectionRenderer>
+		</ImmutableEntityListRenderer>
 	),
-	'MutableEntityCollectionRenderer',
+	'MutableEntityListRenderer',
 )

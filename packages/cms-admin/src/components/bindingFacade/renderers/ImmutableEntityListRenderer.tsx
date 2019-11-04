@@ -1,29 +1,24 @@
 import { Box, Message } from '@contember/ui'
 import * as React from 'react'
-import {
-	AccessorContext,
-	AccessorTreeStateWithDataContext,
-	Component,
-	EntityCollectionAccessor,
-} from '../../../binding'
+import { AccessorContext, AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '../../../binding'
 import { Repeater } from '../collections'
 
-export interface EntityCollectionWrapperProps {
-	accessor: EntityCollectionAccessor
+export interface EntityListWrapperProps {
+	accessor: EntityListAccessor
 	isEmpty: boolean
 	originalChildren: React.ReactNode
 	children: React.ReactNode
 }
 
-export interface ImmutableEntityCollectionRendererProps {
+export interface ImmutableEntityListRendererProps {
 	beforeContent?: React.ReactNode
 	afterContent?: React.ReactNode
 	emptyMessage?: React.ReactNode
-	wrapperComponent?: React.ComponentType<EntityCollectionWrapperProps>
+	wrapperComponent?: React.ComponentType<EntityListWrapperProps>
 	children: React.ReactNode
 }
 
-export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollectionRendererProps>(
+export const ImmutableEntityListRenderer = Component<ImmutableEntityListRendererProps>(
 	({
 		beforeContent,
 		afterContent,
@@ -38,7 +33,7 @@ export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollec
 		}
 		const root = accessorTreeState.data.root
 
-		if (!(root instanceof EntityCollectionAccessor)) {
+		if (!(root instanceof EntityListAccessor)) {
 			return null
 		}
 
@@ -82,5 +77,5 @@ export const ImmutableEntityCollectionRenderer = Component<ImmutableEntityCollec
 			{props.afterContent}
 		</>
 	),
-	'ImmutableEntityCollectionRenderer',
+	'ImmutableEntityListRenderer',
 )

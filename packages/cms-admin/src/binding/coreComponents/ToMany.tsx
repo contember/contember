@@ -1,8 +1,8 @@
 import { ErrorList } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, EnvironmentContext, useEntityCollectionAccessor } from '../accessorRetrievers'
+import { AccessorContext, EnvironmentContext, useEntityListAccessor } from '../accessorRetrievers'
 import { ExpectedCount, FieldName, Filter, RelativeEntityList } from '../bindingTypes'
-import { EntityAccessor, EntityCollectionAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
+import { EntityAccessor, EntityListAccessor, EntityFields, Environment, ReferenceMarker } from '../dao'
 import { QueryLanguage } from '../queryLanguage'
 import { Component } from './Component'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
@@ -53,7 +53,7 @@ namespace ToMany {
 
 	export const AtomicPrimitive = Component<AtomicPrimitiveProps>(
 		props => {
-			const accessor = useEntityCollectionAccessor(props.field, props.filter)
+			const accessor = useEntityListAccessor(props.field, props.filter)
 			if (!accessor) {
 				return null
 			}
@@ -75,7 +75,7 @@ namespace ToMany {
 	)
 
 	export interface AccessorRendererProps {
-		accessor: EntityCollectionAccessor
+		accessor: EntityListAccessor
 		children?: React.ReactNode
 	}
 
@@ -96,11 +96,11 @@ namespace ToMany {
 
 	// AccessorRetriever is really legacy API to retain support for class components
 	export interface AccessorRetrieverProps extends AtomicPrimitiveProps {
-		children: (accessor: EntityCollectionAccessor) => React.ReactNode
+		children: (accessor: EntityListAccessor) => React.ReactNode
 	}
 
 	export const AccessorRetriever = React.memo((props: AccessorRetrieverProps) => {
-		const accessor = useEntityCollectionAccessor(props.field, props.filter)
+		const accessor = useEntityListAccessor(props.field, props.filter)
 
 		if (accessor) {
 			return <>{props.children(accessor)}</>

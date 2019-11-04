@@ -9,7 +9,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 	private readonly pool: Pool
 
 	constructor(
-		private readonly config: PoolConfig,
+		public readonly config: PoolConfig,
 		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(),
 	) {

@@ -11,7 +11,7 @@
 		"react": "16.9.0"
 	},
 	"devDependencies": {
-		"@types/jasmine": "^3.4.4",
+		"@types/jasmine": "^3.4.5",
 		"@types/react": "^16.9.2",
 		"jasmine": "^3.5.0",
 		"react": "^16.9.0",

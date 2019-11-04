@@ -20,9 +20,9 @@ class CommandConfiguration {
 	}
 
 	public option(name: string): Option.Configuration {
-		const options: Option = { name, required: false, mode: Option.Mode.VALUE_NONE }
-
-		return new Option.Configuration(options)
+		const option: Option = { name, required: false, mode: Option.Mode.VALUE_NONE }
+		this.options.push(option)
+		return new Option.Configuration(option)
 	}
 
 	public validate() {

@@ -1,5 +1,5 @@
 import { Lexer, Parser as ChevrotainParser } from 'chevrotain'
-import { GraphQlBuilder } from '@contember/client'
+import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { EntityName, FieldName } from '../bindingTypes'
 import { ToMany, ToOne } from '../coreComponents'
@@ -376,6 +376,44 @@ class Parser extends ChevrotainParser {
 		return where
 	})
 
+	private orderBy: () => Input.OrderBy<CrudQueryBuilder.OrderDirection>[] = this.RULE<
+		Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
+	>('orderBy', () => {
+		const order: Input.OrderBy<CrudQueryBuilder.OrderDirection>[] = []
+
+		this.AT_LEAST_ONE_SEP({
+			SEP: tokens.Comma,
+			DEF: () => {
+				const fieldNames: FieldName[] = []
+				this.AT_LEAST_ONE_SEP1({
+					SEP: tokens.Dot,
+					DEF: () => {
+						fieldNames.push(this.SUBRULE(this.fieldIdentifier))
+					},
+				})
+				let literal = this.OPTION(() => this.SUBRULE1(this.graphQlLiteral)) as
+					| CrudQueryBuilder.OrderDirection
+					| undefined
+
+				if (literal) {
+					if (literal.value !== 'asc' && literal.value !== 'desc') {
+						throw new QueryLanguageError(`The only valid order directions are \`asc\` and \`desc\`.`)
+					}
+				} else {
+					literal = new GraphQlBuilder.Literal('asc')
+				}
+				let orderBy: Input.FieldOrderBy<CrudQueryBuilder.OrderDirection> = literal
+
+				for (let i = fieldNames.length - 1; i >= 0; i--) {
+					orderBy = { [fieldNames[i]]: orderBy }
+				}
+				order.push(orderBy as Input.OrderBy<CrudQueryBuilder.OrderDirection>)
+			},
+		})
+
+		return order
+	})
+
 	private fieldName: () => FieldName = this.RULE<FieldName>('fieldName', () => {
 		return this.OR([
 			{
@@ -468,8 +506,8 @@ class Parser extends ChevrotainParser {
 		return parseFloat(this.CONSUME(tokens.NumberLiteral).image)
 	})
 
-	private graphQlLiteral = this.RULE('graphQlLiteral', () => {
-		const image = this.SUBRULE1(this.identifier)
+	private graphQlLiteral: () => GraphQlBuilder.Literal = this.RULE('graphQlLiteral', () => {
+		const image = this.SUBRULE(this.identifier)
 
 		return new GraphQlBuilder.Literal(image)
 	})
@@ -540,6 +578,9 @@ class Parser extends ChevrotainParser {
 			case Parser.EntryPoint.Filter:
 				expression = Parser.parser.nonUniqueWhere()
 				break
+			case Parser.EntryPoint.OrderBy:
+				expression = Parser.parser.orderBy()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented entry point '${entry}'`)
 		}
@@ -583,6 +624,8 @@ namespace Parser {
 			filter?: Filter
 		}
 
+		export type OrderBy = Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
+
 		export type FieldWhere = Input.FieldWhere<Condition>
 
 		export type Filter = Input.Where<Condition>
@@ -597,13 +640,14 @@ namespace Parser {
 	}
 
 	export enum EntryPoint {
-		QualifiedEntityList = 'qualifiedEntityList', // E.g. "Author[age < 123].son.sisters(name = 'Jane')
-		QualifiedFieldList = 'qualifiedFieldList', // E.g. "Author[age < 123].son.sister.name
+		QualifiedEntityList = 'qualifiedEntityList', // E.g. Author[age < 123].son.sisters(name = 'Jane')
+		QualifiedFieldList = 'qualifiedFieldList', // E.g. Author[age < 123].son.sister.name
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
 		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
 		UniqueWhere = 'uniqueWhere', // E.g. (author.mother.id = 123)
 		Filter = 'filter', // E.g. [author.son.age < 123]
+		OrderBy = 'orderBy', // E.g. items.order asc, items.content.name asc
 	}
 
 	export interface ParserResult {
@@ -614,6 +658,7 @@ namespace Parser {
 		relativeEntityList: AST.RelativeEntityList
 		uniqueWhere: AST.UniqueWhere
 		filter: AST.Filter
+		orderBy: AST.OrderBy
 	}
 }
 

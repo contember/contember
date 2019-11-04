@@ -75,8 +75,8 @@ const validatorEvaluators: {
 		const ruleResult = evaluateValidation(context, rule)
 		return ruleResult
 	},
-	pattern: (context: ValidationContext.AnyContext, patternArgument: Validation.LiteralArgument) => {
-		return new RegExp(patternArgument.value).test(getValueFromContext(context))
+	pattern: (context: ValidationContext.AnyContext, patternArgument: Validation.LiteralArgument<[string, string]>) => {
+		return new RegExp(patternArgument.value[0], patternArgument.value[1]).test(getValueFromContext(context))
 	},
 	equals: (context: ValidationContext.AnyContext, other: Validation.LiteralArgument | Validation.PathArgument) => {
 		return getValueFromContext(context) === getValueOrLiteral(context, other)

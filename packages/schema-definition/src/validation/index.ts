@@ -104,7 +104,7 @@ const conditionalOperation = (condition: Validation.Validator, rule: Validation.
 
 const patternOperation = (pattern: RegExp): Validation.Validator => ({
 	operation: 'pattern',
-	args: [ArgumentFactory.literal(pattern)],
+	args: [ArgumentFactory.literal([pattern.source, pattern.flags])],
 })
 
 const lengthRangeOperation = (min?: number, max?: number): Validation.Validator => ({

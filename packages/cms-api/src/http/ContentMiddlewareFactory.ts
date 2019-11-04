@@ -13,6 +13,7 @@ import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
 import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 import SetupSystemVariablesMiddlewareFactory from './SetupSystemVariablesMiddlewareFactory'
 import { compose } from '../core/koa/compose'
+import { NotModifiedMiddlewareFactory } from './NotModifiedMiddlewareFactory'
 
 class ContentMiddlewareFactory {
 	constructor(
@@ -22,6 +23,7 @@ class ContentMiddlewareFactory {
 		private readonly projectMemberMiddlewareFactory: ProjectMemberMiddlewareFactory,
 		private readonly databaseTransactionMiddlewareFactory: DatabaseTransactionMiddlewareFactory,
 		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory,
+		private readonly notModifiedMiddlewareFactory: NotModifiedMiddlewareFactory,
 	) {}
 
 	create(): Koa.Middleware {
@@ -51,6 +53,7 @@ class ContentMiddlewareFactory {
 				this.authMiddlewareFactory.create(),
 				this.projectFindMiddlewareFactory.create(),
 				this.stageFindMiddlewareFactory.create(),
+				this.notModifiedMiddlewareFactory.create(),
 				this.projectMemberMiddlewareFactory.create(),
 				assignDb,
 				this.databaseTransactionMiddlewareFactory.create(),

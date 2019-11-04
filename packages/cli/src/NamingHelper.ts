@@ -1,2 +1,10 @@
-export const getProjectDir = (projectName: string) => process.cwd() + '/projects/' + projectName + '/api/'
-export const getProjectMigrationsDir = (projectName: string) => getProjectDir(projectName) + 'migrations'
+import * as path from 'path'
+
+export const getDirectories = (
+	projectName: string,
+	options: { projectDir?: string; migrationsDir?: string } = {},
+): { projectDir: string; migrationsDir: string } => {
+	const projectDir = path.resolve(process.cwd(), options.projectDir || path.join('projects', projectName, 'api'))
+	const migrationsDir = path.resolve(process.cwd(), options.migrationsDir || path.join(projectDir, 'migrations'))
+	return { projectDir, migrationsDir }
+}

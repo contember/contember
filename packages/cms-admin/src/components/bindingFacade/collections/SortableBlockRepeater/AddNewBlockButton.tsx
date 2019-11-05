@@ -27,6 +27,7 @@ export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
 					distinction: 'seamless',
 					flow: 'block',
 				}}
+				alignment="center"
 			>
 				{({ requestClose }) => (
 					<AddNewBlockButtonInner

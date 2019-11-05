@@ -37,7 +37,7 @@ export const ImmutableEntityListRenderer = Component<ImmutableEntityListRenderer
 			return null
 		}
 
-		const entities = Repeater.filterEntities(root, true)
+		const entities = root.getFilteredEntities()
 		const isEmpty = !entities.length
 
 		const content = (

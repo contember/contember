@@ -92,7 +92,7 @@ namespace Repeater {
 
 	export class EntityList extends React.PureComponent<EntityListProps> {
 		public render() {
-			const entities = filterEntities(this.props.entities)
+			const entities = this.props.entities.getFilteredEntities()
 			return (
 				// Intentionally not applying label system middleware
 				<FieldSet legend={this.props.label} errors={this.props.entities.errors}>
@@ -133,15 +133,6 @@ namespace Repeater {
 				</div>
 			)
 		}
-	}
-
-	export const filterEntities = (
-		entities: EntityListAccessor,
-		excludeUnpersisted: boolean = false,
-	): EntityAccessor[] => {
-		return entities.entities.filter(
-			(item): item is EntityAccessor => item instanceof EntityAccessor && (!excludeUnpersisted || item.isPersisted()),
-		)
 	}
 }
 

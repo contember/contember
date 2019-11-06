@@ -43,7 +43,6 @@ export const FeedbackRenderer = Component<FeedbackRendererProps>(
 				case RequestErrorType.UnknownError:
 					return <Message type="danger">Unknown error</Message> // TODO
 			}
-			return assertNever(accessorTreeState.error)
 		}
 
 		return (

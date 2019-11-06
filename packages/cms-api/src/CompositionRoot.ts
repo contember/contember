@@ -252,11 +252,7 @@ class CompositionRoot {
 				)
 				.addService(
 					'permissionsByIdentityFactory',
-					({}) =>
-						new PermissionsByIdentityFactory([
-							new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
-							new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
-						]),
+					({}) => new PermissionsByIdentityFactory([new PermissionsByIdentityFactory.RoleBasedPermissionFactory()]),
 				)
 				.addService(
 					'contentPermissionsVerifier',

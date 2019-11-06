@@ -36,8 +36,8 @@ export class SystemApiTester {
 		await setupSystemVariables(this.db, unnamedIdentity, { uuid: this.uuidGenerator })
 		const context: ResolverContext = new ResolverContext(
 			options.identity ||
-				new Identity.StaticIdentity(testUuid(888), options.roles || [Identity.SystemRole.SUPER_ADMIN], {
-					[project.slug]: options.projectRoles || [],
+				new Identity.StaticIdentity(testUuid(888), options.roles || [], {
+					[project.slug]: options.projectRoles || [Identity.ProjectRole.ADMIN],
 				}),
 			{},
 			this.systemContainer.authorizator,
@@ -104,7 +104,9 @@ export class SystemApiTester {
 
 		await this.systemExecutionContainer.releaseExecutor.execute(
 			{
-				identity: new Identity.StaticIdentity(testUuid(666), [Identity.SystemRole.SUPER_ADMIN], {}),
+				identity: new Identity.StaticIdentity(testUuid(666), [], {
+					[project.slug]: [Identity.ProjectRole.ADMIN],
+				}),
 				variables: {},
 			},
 			baseStageObj!,

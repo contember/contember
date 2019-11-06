@@ -1,8 +1,6 @@
-import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import PermissionFactory from './PermissionFactory'
 import { arrayEquals } from '../utils/arrays'
 import { Acl, Schema } from '@contember/schema'
-import { Identity as AuthIdentity } from '@contember/engine-common'
 import { filterObject } from '../utils/object'
 
 class PermissionsByIdentityFactory {
@@ -56,19 +54,6 @@ namespace PermissionsByIdentityFactory {
 		isEligible(identity: Identity): boolean
 
 		createPermissions(schema: Schema, identity: Identity): PermissionResult
-	}
-
-	export class SuperAdminPermissionFactory implements PermissionFactory {
-		public isEligible(identity: Identity) {
-			return identity.globalRoles.includes(AuthIdentity.SystemRole.SUPER_ADMIN)
-		}
-
-		public createPermissions(schema: Schema) {
-			return {
-				permissions: new AllowAllPermissionFactory().create(schema.model),
-				verifier: this.isEligible.bind(this),
-			}
-		}
 	}
 
 	export class RoleBasedPermissionFactory implements PermissionFactory {

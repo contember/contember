@@ -8,6 +8,8 @@ import { Acl, Schema } from '@contember/schema'
 import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
 import { ProjectMemberMiddlewareFactory } from '../project-common'
+import { Identity } from '@contember/engine-common'
+import { AllowAllPermissionFactory } from '@contember/schema-definition'
 
 class ContentApolloMiddlewareFactory {
 	private schemaCache: { [stage: string]: Schema } = {}
@@ -33,9 +35,10 @@ class ContentApolloMiddlewareFactory {
 				if (this.project.ignoreMigrations && !this.currentSchema) {
 					throw new Error('Current schema was not provided, cannot use "ignoreMigrations" option')
 				}
-				this.schemaCache[stage.slug] = this.project.ignoreMigrations
+				const schema = this.project.ignoreMigrations
 					? this.currentSchema!
 					: await this.schemaVersionBuilder.buildSchemaForStage(stage.slug)
+				this.schemaCache[stage.slug] = this.modifySchema(schema)
 			}
 			const schema = this.schemaCache[stage.slug]
 
@@ -50,6 +53,26 @@ class ContentApolloMiddlewareFactory {
 
 			await ctx.state.timer('exec graphql', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
 		}
+	}
+
+	private modifySchema(schema: Schema): Schema {
+		if (!schema.acl.roles[Identity.ProjectRole.ADMIN]) {
+			schema = {
+				...schema,
+				acl: {
+					...schema.acl,
+					roles: {
+						...schema.acl.roles,
+						[Identity.ProjectRole.ADMIN]: {
+							stages: '*',
+							variables: {},
+							entities: new AllowAllPermissionFactory().create(schema.model),
+						},
+					},
+				},
+			}
+		}
+		return schema
 	}
 }
 

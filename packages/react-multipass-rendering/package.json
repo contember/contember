@@ -1,22 +1,22 @@
 {
-	"name": "@contember/react-multipass-rendering",
-	"version": "0.2.0",
-	"main": "index.js",
-	"scripts": {
-		"build": "rollup --config",
-		"test": "jasmine --config=jasmine.json"
-	},
-	"typings": "dist/src/index.d.ts",
-	"peerDependencies": {
-		"react": "16.9.0"
-	},
-	"devDependencies": {
-		"@types/jasmine": "^3.4.5",
-		"@types/react": "^16.9.2",
-		"jasmine": "^3.5.0",
-		"react": "^16.9.0",
-		"rollup": "^1.25.2",
-		"rollup-plugin-commonjs": "^10.1.0",
-		"typescript": "^3.6.4"
-	}
+  "name": "@contember/react-multipass-rendering",
+  "version": "0.2.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup --config",
+    "test": "jasmine --config=jasmine.json"
+  },
+  "typings": "dist/src/index.d.ts",
+  "peerDependencies": {
+    "react": "^16.11.0"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^3.4.5",
+    "@types/react": "^16.9.2",
+    "jasmine": "^3.5.0",
+    "react": "^16.9.0",
+    "rollup": "^1.25.2",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "typescript": "^3.6.4"
+  }
 }

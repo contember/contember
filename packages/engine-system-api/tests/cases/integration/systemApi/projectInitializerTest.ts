@@ -43,7 +43,7 @@ describe('project initializer', () => {
 			const response = await tester.content.queryContent(
 				'prod',
 				GQL`mutation {
-        createAuthor(data: {name: "John Doe"}) {
+        createTag(data: {label: "graphql"}) {
           node {
             id
           }
@@ -72,7 +72,8 @@ describe('project initializer', () => {
 				},
 				{
 					1: createRunMigrationEvent('2019-02-01-163923'),
-					2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
+					2: createRunMigrationEvent('2019-11-04-130244'),
+					3: createCreateEvent(response.createTag.node.id, 'tag', { label: 'graphql' }),
 				},
 			)
 			await tester.cleanup()
@@ -128,7 +129,7 @@ describe('project initializer', () => {
 			const response = await tester.content.queryContent(
 				'prod',
 				GQL`mutation {
-        createAuthor(data: {name: "John Doe"}) {
+        createTag(data: {label: "graphql"}) {
           node {
             id
           }
@@ -139,7 +140,7 @@ describe('project initializer', () => {
 			const response2 = await tester.content.queryContent(
 				'preview',
 				GQL`mutation {
-        createAuthor(data: {name: "Jack Black"}) {
+        createTag(data: {label: "typescript"}) {
           node {
             id
           }
@@ -149,13 +150,14 @@ describe('project initializer', () => {
 
 			await tester.sequences.verifySequence(
 				{
-					prod: '        1 2',
-					preview: 'prod - 3',
+					prod: '        1 2 3',
+					preview: 'prod - - 4',
 				},
 				{
 					1: createRunMigrationEvent('2019-02-01-163923'),
-					2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
-					3: createCreateEvent(response2.createAuthor.node.id, 'author', { name: 'Jack Black' }),
+					2: createRunMigrationEvent('2019-11-04-130244'),
+					3: createCreateEvent(response.createTag.node.id, 'tag', { label: 'graphql' }),
+					4: createCreateEvent(response2.createTag.node.id, 'tag', { label: 'typescript' }),
 				},
 			)
 
@@ -172,14 +174,15 @@ describe('project initializer', () => {
 
 			await tester.sequences.verifySequence(
 				{
-					prod: '            1 2',
-					preview: 'prod     - 3',
-					preview2: 'preview - -',
+					prod: '            1 2 3',
+					preview: 'prod     - - 4',
+					preview2: 'preview - - -',
 				},
 				{
 					1: createRunMigrationEvent('2019-02-01-163923'),
-					2: createCreateEvent(response.createAuthor.node.id, 'author', { name: 'John Doe' }),
-					3: createCreateEvent(response2.createAuthor.node.id, 'author', { name: 'Jack Black' }),
+					2: createRunMigrationEvent('2019-11-04-130244'),
+					3: createCreateEvent(response.createTag.node.id, 'tag', { label: 'graphql' }),
+					4: createCreateEvent(response2.createTag.node.id, 'tag', { label: 'typescript' }),
 				},
 			)
 			await tester.cleanup()

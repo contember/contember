@@ -36,3 +36,7 @@ export class Tag {
 	label = d.stringColumn()
 	posts = d.manyHasManyInversed(Post, 'tags')
 }
+
+export class Entry {
+	number = d.intColumn()
+}

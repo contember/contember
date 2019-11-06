@@ -15,7 +15,7 @@ namespace Validation {
 		and: ValidatorArgument[]
 		or: ValidatorArgument[]
 		conditional: [ValidatorArgument, ValidatorArgument]
-		pattern: [LiteralArgument<RegExp>]
+		pattern: [LiteralArgument<[string, string]>]
 		lengthRange: [LiteralArgument<number | undefined>, LiteralArgument<number | undefined>]
 		equals: [LiteralArgument<any>]
 		not: [ValidatorArgument]

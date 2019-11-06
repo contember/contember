@@ -3,7 +3,9 @@
 	"version": "0.2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
-	"scripts": {},
+	"scripts": {
+		"test": "jasmine --config=jasmine.json"
+	},
 	"dependencies": {
 		"@apollographql/graphql-playground-html": "^1.6.6",
 		"@contember/authorization": "^0.2.0",
@@ -41,14 +43,19 @@
 		"uuid": "^3.3.3"
 	},
 	"devDependencies": {
+		"@contember/engine-api-tester": "^0.2.0",
 		"@types/bcrypt": "^3.0.0",
 		"@types/graphql": "^14.5.0",
+		"@types/jasmine": "^3.4.5",
 		"@types/koa": "^2.0.48",
 		"@types/koa-bodyparser": "^4.2.2",
 		"@types/koa2-cors": "^2.0.1",
 		"@types/lru-cache": "^5.1.0",
 		"@types/node": "^12.11.7",
+		"@types/supertest": "^2.0.8",
 		"@types/uuid": "^3.4.5",
+		"jasmine": "^3.5.0",
+		"supertest": "^4.0.2",
 		"typescript": "^3.6.4"
 	}
 }

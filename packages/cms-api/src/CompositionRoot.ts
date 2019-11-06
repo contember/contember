@@ -52,10 +52,12 @@ import { Initializer } from './bootstrap/Initializer'
 import { ServerRunner } from './bootstrap/ServerRunner'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { MigrationsRunner } from './bootstrap/MigrationsRunner'
+import { NotModifiedMiddlewareFactory } from './http/NotModifiedMiddlewareFactory'
 
 export interface MasterContainer {
 	initializer: Initializer
 	serverRunner: ServerRunner
+	koa: Koa
 }
 
 class CompositionRoot {
@@ -110,6 +112,7 @@ class CompositionRoot {
 				'setupSystemVariablesMiddlewareFactory',
 				({ providers }) => new SetupSystemVariablesMiddlewareFactory(providers),
 			)
+			.addService('notModifiedMiddlewareFactory', () => new NotModifiedMiddlewareFactory())
 			.addService(
 				'contentMiddlewareFactory',
 				({
@@ -119,6 +122,7 @@ class CompositionRoot {
 					stageResolveMiddlewareFactory,
 					databaseTransactionMiddlewareFactory,
 					setupSystemVariablesMiddlewareFactory,
+					notModifiedMiddlewareFactory,
 				}) =>
 					new ContentMiddlewareFactory(
 						projectResolveMiddlewareFactory,
@@ -127,6 +131,7 @@ class CompositionRoot {
 						projectMemberMiddlewareFactory,
 						databaseTransactionMiddlewareFactory,
 						setupSystemVariablesMiddlewareFactory,
+						notModifiedMiddlewareFactory,
 					),
 			)
 			.addService(
@@ -185,7 +190,7 @@ class CompositionRoot {
 
 			.build()
 
-		return masterContainer.pick('initializer', 'serverRunner')
+		return masterContainer.pick('initializer', 'serverRunner', 'koa')
 	}
 
 	createProjectContainers(
@@ -307,6 +312,7 @@ class CompositionRoot {
 					'project',
 					'contentApolloMiddlewareFactory',
 					'systemDbClient',
+					'systemQueryHandler',
 					'connection',
 					'systemDbMigrationsRunner',
 					'schemaVersionBuilder',

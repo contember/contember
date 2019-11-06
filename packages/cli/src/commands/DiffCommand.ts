@@ -5,26 +5,36 @@ import { Schema } from '@contember/schema'
 import { isDeepStrictEqual } from 'util'
 import { Input } from '../cli/Input'
 import { MigrationsContainerFactory } from '../MigrationsContainer'
-import { getProjectDir, getProjectMigrationsDir } from '../NamingHelper'
+import { getDirectories } from '../NamingHelper'
 
 type Args = {
 	projectName: string
 	migrationName: string
 }
 
-export class DiffCommand extends Command<Args, {}> {
+type Options = {
+	['migrations-dir']?: string
+	['project-dir']?: string
+}
+
+export class DiffCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration): void {
 		configuration.description('Creates .json schema migration for given project')
 		configuration.argument('projectName')
 		configuration.argument('migrationName')
+		configuration.option('migrations-dir').valueRequired()
+		configuration.option('project-dir').valueRequired()
 	}
 
-	protected async execute(input: Input<Args, {}>): Promise<void> {
+	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const [projectName, migrationName] = [input.getArgument('projectName'), input.getArgument('migrationName')]
-		const projectDir = getProjectDir(projectName)
+		const { migrationsDir, projectDir } = getDirectories(projectName, {
+			projectDir: input.getOption('project-dir'),
+			migrationsDir: input.getOption('migrations-dir'),
+		})
 		const schema: Schema = require(projectDir).default
 
-		const container = new MigrationsContainerFactory(getProjectMigrationsDir(projectName)).create()
+		const container = new MigrationsContainerFactory(migrationsDir).create()
 		const validator = new SchemaValidator()
 		const [validSchema, errors] = validator.validate(schema)
 

@@ -33,6 +33,7 @@ import { graphqlObjectFactories } from './graphqlObjectFactories'
 import { getArgumentValues } from 'graphql/execution/values'
 import { project } from './project'
 import { migrate } from './migrationsRunner'
+import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 
 export class ApiTester {
 	public static project = project
@@ -56,32 +57,8 @@ export class ApiTester {
 			container: ReturnType<SystemExecutionContainer.Factory['createBuilder']>,
 		) => ReturnType<SystemExecutionContainer.Factory['createBuilder']>
 	}): Promise<ApiTester> {
-		const dbCredentials = (dbName: string) => {
-			return {
-				host: String(process.env.TEST_DB_HOST),
-				port: Number(process.env.TEST_DB_PORT),
-				user: String(process.env.TEST_DB_USER),
-				password: String(process.env.TEST_DB_PASSWORD),
-				database: dbName,
-			}
-		}
-
-		const createConnection = (dbName: string): Connection => {
-			return new Connection(
-				{
-					...dbCredentials(dbName),
-					max: 1,
-					min: 1,
-				},
-				{},
-			)
-		}
-
-		const connection = createConnection(process.env.TEST_DB_MAINTENANCE_NAME || 'postgres')
-
 		const dbName = String(process.env.TEST_DB_NAME)
-		await connection.query('DROP DATABASE IF EXISTS ' + wrapIdentifier(dbName), [])
-		await connection.query('CREATE DATABASE ' + wrapIdentifier(dbName), [])
+		const connection = await recreateDatabase(dbName)
 
 		const systemMigrationsManager = createMigrationFilesManager()
 		await migrate({ db: dbCredentials(dbName), schema: 'system', dir: systemMigrationsManager.directory })

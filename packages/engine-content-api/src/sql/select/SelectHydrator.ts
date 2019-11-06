@@ -63,7 +63,8 @@ class SelectHydrator {
 			const last: string = path.pop() as string
 			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || {}), result)
 
-			currentObject[last] = row[columnPath.getAlias()]
+			const field = row[columnPath.getAlias()]
+			currentObject[last] = this.formatValue(field)
 		}
 
 		for (let { path, parentKeyPath, data, defaultValue } of this.promises) {
@@ -78,6 +79,13 @@ class SelectHydrator {
 		}
 
 		return result
+	}
+
+	private formatValue(value: any) {
+		if (value instanceof Date) {
+			return value.toISOString()
+		}
+		return value
 	}
 }
 

@@ -1,6 +1,6 @@
-import { KoaMiddleware } from '../core/koa/types'
-import AuthMiddlewareFactory from './AuthMiddlewareFactory'
-import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
+import { KoaMiddleware } from '../../core/koa'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
+import { ProjectResolveMiddlewareFactory } from './ProjectResolveMiddlewareFactory'
 import { ProjectMemberManager } from '@contember/engine-tenant-api'
 
 type InputState = ProjectMemberMiddlewareFactory.KoaState &
@@ -29,4 +29,4 @@ namespace ProjectMemberMiddlewareFactory {
 	}
 }
 
-export default ProjectMemberMiddlewareFactory
+export { ProjectMemberMiddlewareFactory }

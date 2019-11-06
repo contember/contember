@@ -1,5 +1,5 @@
 import Koa from 'koa'
-import { KoaContext } from '../core/koa/types'
+import { KoaContext } from '../core/koa'
 
 class TimerMiddlewareFactory {
 	public create(): Koa.Middleware {
@@ -39,4 +39,4 @@ namespace TimerMiddlewareFactory {
 	}
 }
 
-export default TimerMiddlewareFactory
+export { TimerMiddlewareFactory }

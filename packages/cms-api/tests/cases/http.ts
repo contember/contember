@@ -1,7 +1,7 @@
 import supertest from 'supertest'
 import CompositionRoot from '../../src/CompositionRoot'
 import { getExampleProjectDirectory } from '@contember/engine-api-tester'
-import { recreateDatabase } from '@contember/engine-api-tester/dist/src/dbUtils'
+import { recreateDatabase } from '@contember/engine-api-tester'
 import { deepStrictEqual } from 'assert'
 
 const dbCredentials = (dbName: string) => {

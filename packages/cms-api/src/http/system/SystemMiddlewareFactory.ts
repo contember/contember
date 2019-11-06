@@ -1,18 +1,19 @@
 import Koa from 'koa'
 import koaCompose from 'koa-compose'
-import { route } from '../core/koa/router'
 import corsMiddleware from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
-import { Client } from '@contember/database'
-import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
-import AuthMiddlewareFactory from './AuthMiddlewareFactory'
-import { KoaContext } from '../core/koa/types'
-import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
-import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
-import SetupSystemVariablesMiddlewareFactory from './SetupSystemVariablesMiddlewareFactory'
+import { Client } from '@contember/database'
+import { KoaContext, route } from '../../core/koa'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
+import {
+	SetupSystemVariablesMiddlewareFactory,
+	DatabaseTransactionMiddlewareFactory,
+	ProjectMemberMiddlewareFactory,
+	ProjectResolveMiddlewareFactory,
+} from '../project-common'
 
-export default class SystemMiddlewareFactory {
+export class SystemMiddlewareFactory {
 	constructor(
 		private readonly projectResolveMiddlewareFactory: ProjectResolveMiddlewareFactory,
 		private readonly authMiddlewareFactory: AuthMiddlewareFactory,

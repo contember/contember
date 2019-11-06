@@ -1,10 +1,10 @@
 import { Config } from 'apollo-server-core'
 import { ApolloServer } from 'apollo-server-koa'
 import { ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@contember/engine-tenant-api'
-import AuthMiddlewareFactory from './AuthMiddlewareFactory'
 import { GraphQLError, GraphQLFormattedError } from 'graphql'
 import { ApolloError } from 'apollo-server-errors'
-import { extractOriginalError } from '../core/graphql/errorExtract'
+import { extractOriginalError } from '../../core/graphql/errorExtract'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 
 class TenantApolloServerFactory {
 	constructor(
@@ -36,4 +36,4 @@ class TenantApolloServerFactory {
 	}
 }
 
-export default TenantApolloServerFactory
+export { TenantApolloServerFactory }

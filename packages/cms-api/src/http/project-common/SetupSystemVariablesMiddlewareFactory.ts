@@ -1,6 +1,6 @@
-import { KoaMiddleware } from '../core/koa/types'
-import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
-import AuthMiddlewareFactory from './AuthMiddlewareFactory'
+import { KoaMiddleware } from '../../core/koa'
+import { DatabaseTransactionMiddlewareFactory } from './DatabaseTransactionMiddlewareFactory'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import { setupSystemVariables as setupSystemVariablesFn } from '@contember/engine-system-api'
 
 type InputState = DatabaseTransactionMiddlewareFactory.KoaState & AuthMiddlewareFactory.KoaState
@@ -17,4 +17,4 @@ class SetupSystemVariablesMiddlewareFactory {
 	}
 }
 
-export default SetupSystemVariablesMiddlewareFactory
+export { SetupSystemVariablesMiddlewareFactory }

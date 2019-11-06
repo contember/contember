@@ -1,4 +1,4 @@
-import { KoaContext } from '../core/koa/types'
+import { KoaContext } from './types'
 
 export const createGraphqlInvalidAuthResponse = (ctx: KoaContext<any>, message: string): void => {
 	ctx.set('Content-type', 'application/json')

@@ -1,13 +1,13 @@
-import { KoaMiddleware } from '../core/koa/types'
+import { KoaMiddleware } from '../../core/koa'
 import { SchemaVersionBuilder } from '@contember/engine-system-api'
-import Project from '../config/Project'
-import GraphQlSchemaFactory from './GraphQlSchemaFactory'
-import AuthMiddlewareFactory from './AuthMiddlewareFactory'
-import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
-import ContentApolloServerFactory from './ContentApolloServerFactory'
+import Project from '../../config/Project'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
+import { ContentApolloServerFactory } from './ContentApolloServerFactory'
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
-import { Acl, Model, Schema } from '@contember/schema'
-import TimerMiddlewareFactory from './TimerMiddlewareFactory'
+import { Acl, Schema } from '@contember/schema'
+import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
+import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
+import { ProjectMemberMiddlewareFactory } from '../project-common'
 
 class ContentApolloMiddlewareFactory {
 	private schemaCache: { [stage: string]: Schema } = {}
@@ -31,7 +31,7 @@ class ContentApolloMiddlewareFactory {
 		return async (ctx, next) => {
 			if (!this.schemaCache[stage.slug]) {
 				if (this.project.ignoreMigrations && !this.currentSchema) {
-					throw new Error('Current schema was not provided, cannot use ')
+					throw new Error('Current schema was not provided, cannot use "ignoreMigrations" option')
 				}
 				this.schemaCache[stage.slug] = this.project.ignoreMigrations
 					? this.currentSchema!
@@ -60,4 +60,4 @@ namespace ContentApolloMiddlewareFactory {
 	}
 }
 
-export default ContentApolloMiddlewareFactory
+export { ContentApolloMiddlewareFactory }

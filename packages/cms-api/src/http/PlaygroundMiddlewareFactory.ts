@@ -1,5 +1,5 @@
 import Koa from 'koa'
-import { get } from '../core/koa/router'
+import { get } from '../core/koa'
 import {
 	RenderPageOptions as PlaygroundRenderPageOptions,
 	renderPlaygroundPage,
@@ -30,4 +30,4 @@ class PlaygroundMiddlewareFactory {
 	}
 }
 
-export default PlaygroundMiddlewareFactory
+export { PlaygroundMiddlewareFactory }

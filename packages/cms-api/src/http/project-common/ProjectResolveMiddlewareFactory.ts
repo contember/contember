@@ -1,6 +1,5 @@
-import { KoaMiddleware } from '../core/koa/types'
-import { ProjectContainer, ProjectContainerResolver } from '../ProjectContainer'
-import { KoaRequestState } from '../core/koa/router'
+import { KoaMiddleware, KoaRequestState } from '../../core/koa'
+import { ProjectContainer, ProjectContainerResolver } from '../../ProjectContainer'
 
 type InputState = ProjectResolveMiddlewareFactory.KoaState & KoaRequestState
 
@@ -27,4 +26,4 @@ namespace ProjectResolveMiddlewareFactory {
 	}
 }
 
-export default ProjectResolveMiddlewareFactory
+export { ProjectResolveMiddlewareFactory }

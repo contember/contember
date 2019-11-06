@@ -1,6 +1,5 @@
-import { KoaContext, KoaMiddleware } from '../core/koa/types'
-import { createGraphqlInvalidAuthResponse } from './responseUtils'
 import { ApiKeyManager } from '@contember/engine-tenant-api'
+import { createGraphqlInvalidAuthResponse, KoaContext, KoaMiddleware } from '../core/koa'
 
 class AuthMiddlewareFactory {
 	constructor(private apiKeyManager: ApiKeyManager) {}
@@ -37,4 +36,4 @@ namespace AuthMiddlewareFactory {
 	}
 }
 
-export default AuthMiddlewareFactory
+export { AuthMiddlewareFactory }

@@ -4,23 +4,17 @@ import { Client } from '@contember/database'
 class DatabaseTransactionMiddlewareFactory {
 	public create(): KoaMiddleware<DatabaseTransactionMiddlewareFactory.KoaState> {
 		const databaseTransaction: KoaMiddleware<DatabaseTransactionMiddlewareFactory.KoaState> = async (ctx, next) => {
-			try {
-				await ctx.state.db.transaction(async db => {
-					await db.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
+			await ctx.state.db.transaction(async db => {
+				await db.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
 
-					ctx.state.db = db
-					let rollback = false
-					ctx.state.planRollback = () => (rollback = true)
-					await next()
-					if (rollback) {
-						throw new DatabaseTransactionMiddlewareFactory.RollbackMarker()
-					}
-				})
-			} catch (e) {
-				if (!(e instanceof DatabaseTransactionMiddlewareFactory.RollbackMarker)) {
-					throw e
+				ctx.state.db = db
+				let planRollback = false
+				ctx.state.planRollback = () => (planRollback = true)
+				await next()
+				if (planRollback) {
+					await db.connection.rollback()
 				}
-			}
+			})
 		}
 		return databaseTransaction
 	}

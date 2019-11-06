@@ -73,9 +73,8 @@ export class MarkerTreeGenerator {
 				throw new DataBindingError('Merging fields and tree roots is an undefined operation.')
 			} else if (fresh instanceof ConnectionMarker) {
 				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
-			} else {
-				return assertNever(fresh)
 			}
+			assertNever(fresh)
 		} else if (original instanceof ReferenceMarker) {
 			if (fresh instanceof FieldMarker) {
 				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
@@ -108,9 +107,8 @@ export class MarkerTreeGenerator {
 				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
 			} else if (fresh instanceof MarkerTreeRoot) {
 				throw new DataBindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
-			} else {
-				return assertNever(fresh)
 			}
+			assertNever(fresh)
 		} else if (original instanceof ConnectionMarker) {
 			if (
 				fresh instanceof ConnectionMarker &&
@@ -132,9 +130,8 @@ export class MarkerTreeGenerator {
 			} else {
 				throw new DataBindingError('MarkerTreeGenerator merging: error code aa') // TODO msg
 			}
-		} else {
-			return assertNever(original)
 		}
+		assertNever(original)
 	}
 
 	private static mergeEntityFields(original: EntityFields, fresh: EntityFields): EntityFields {

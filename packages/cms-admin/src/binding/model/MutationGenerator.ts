@@ -443,12 +443,10 @@ export class MutationGenerator {
 									return builder.delete()
 								} else if (removalType === EntityAccessor.RemovalType.Disconnect) {
 									return builder.disconnect()
-								} else {
-									return assertNever(removalType)
 								}
-							} else {
-								return assertNever(accessor)
+								assertNever(removalType)
 							}
+							assertNever(accessor)
 						})(CrudQueryBuilder.WriteOneRelationBuilder.instantiate<CrudQueryBuilder.WriteOperation.Update>())
 
 						if (subBuilder.data) {

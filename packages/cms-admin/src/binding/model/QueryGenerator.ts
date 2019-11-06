@@ -44,7 +44,7 @@ export class QueryGenerator {
 		} else if (subTree.constraints.whereType === 'nonUnique') {
 			return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<EntityListTreeConstraints>)
 		}
-		return assertNever(subTree.constraints)
+		assertNever(subTree.constraints)
 	}
 
 	private addGetQuery(

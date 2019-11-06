@@ -31,9 +31,8 @@ export class Hashing {
 			])
 		} else if (constraints.whereType === 'unique') {
 			return Hashing.hashArray([constraints.whereType, constraints.where])
-		} else {
-			return assertNever(constraints)
 		}
+		assertNever(constraints)
 	}
 
 	private static hashArray(array: any[]): number {

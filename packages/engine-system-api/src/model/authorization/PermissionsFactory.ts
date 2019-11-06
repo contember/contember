@@ -4,7 +4,7 @@ import { Identity } from '@contember/engine-common'
 class PermissionsFactory {
 	public create(): Permissions {
 		const permissions = new Permissions()
-		permissions.allow(Identity.SystemRole.SUPER_ADMIN, Permissions.ALL, Permissions.ALL)
+		permissions.allow(Identity.ProjectRole.ADMIN, Permissions.ALL, Permissions.ALL)
 
 		return permissions
 	}

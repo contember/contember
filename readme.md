@@ -3,9 +3,7 @@
 ## Repository Structure
 
 ~~~
-/packages = reusable TypeScript libraries which will later be published as open-source
-/projects = individual projects
-/instances = set of projects, which run on a single contember instance
+/packages = reusable TypeScript libraries
 ~~~
 
 ## Docker dev setup
@@ -13,24 +11,10 @@
 ### Initial setup
 
 - create `docker-compose.override.yaml` using `docker-compose.override.dist.yaml`
-- create `instances/mangoweb/api/src/config/config.yaml`  using `instances/mangoweb/api/src/config/config.sample.yaml`
-- run `./docker/bootstrap.sh` 
-- follow instructions
 
 ### Regular run
 
 - run `docker-compose up`
-
-### Running tests
-
-- run `./docker/npm test`
-
-### Generating project migrations
-
-- run `npm run cli diff project migration-name` (e.g. `npm run cli diff mangoweb gallery`)
-- review generated file
-- restart API using `npm run restart-api`
-
 
 ## Misc
 

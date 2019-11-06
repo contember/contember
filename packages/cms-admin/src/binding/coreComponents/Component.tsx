@@ -45,7 +45,7 @@ function Component<P extends {}>(
 
 		return augmentedRender
 	}
-	return assertNever(decider)
+	assertNever(decider)
 }
 
 export { Component }

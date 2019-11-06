@@ -136,8 +136,7 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 				}
 			},
 		})
-	} else {
-		return assertNever(props)
 	}
+	assertNever(props)
 })
 DynamicChoiceFieldImplementation.displayName = 'DynamicChoiceFieldImplementation'

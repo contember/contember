@@ -59,19 +59,17 @@ build:docker:
   dependencies:
     - build
   only:
-    refs:
-      - tags
+    - tags
   variables:
     VERSION: "$CI_COMMIT_REF_NAME"
   script:
-    - sh scripts/docker/build.sh
+    - bash scripts/docker/build.sh
 
 publish:
   image: node:12
   stage: publish
   only:
-    refs:
-      - tags
+    - tags
   script:
-    - sh ./scripts/npm/setup.sh
-    - sh ./scripts/npm/publish.sh
+    - bash ./scripts/npm/setup.sh
+    - bash ./scripts/npm/publish.sh

@@ -1,4 +1,4 @@
-import { KoaMiddleware } from '../core/koa/types'
+import { KoaMiddleware } from '../../core/koa'
 import { Client } from '@contember/database'
 
 class DatabaseTransactionMiddlewareFactory {
@@ -35,4 +35,4 @@ namespace DatabaseTransactionMiddlewareFactory {
 	export class RollbackMarker {}
 }
 
-export default DatabaseTransactionMiddlewareFactory
+export { DatabaseTransactionMiddlewareFactory }

@@ -1,7 +1,7 @@
 import Koa from 'koa'
-import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
-import StageResolveMiddlewareFactory from './StageResolveMiddlewareFactory'
-import { KoaMiddleware } from '../core/koa/types'
+import { ProjectResolveMiddlewareFactory } from '../project-common'
+import { StageResolveMiddlewareFactory } from './StageResolveMiddlewareFactory'
+import { KoaMiddleware } from '../../core/koa'
 import { LatestEventIdByStageQuery } from '@contember/engine-system-api'
 
 export class NotModifiedMiddlewareFactory {

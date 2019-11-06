@@ -1,7 +1,7 @@
-import { KoaMiddleware } from '../core/koa/types'
-import { KoaRequestState } from '../core/koa/router'
-import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
-import Project from '../config/Project'
+import { KoaMiddleware } from '../../core/koa'
+import { KoaRequestState } from '../../core/koa'
+import { ProjectResolveMiddlewareFactory } from '../project-common'
+import Project from '../../config/Project'
 
 type InputState = StageResolveMiddlewareFactory.KoaState & ProjectResolveMiddlewareFactory.KoaState & KoaRequestState
 
@@ -28,4 +28,4 @@ namespace StageResolveMiddlewareFactory {
 	}
 }
 
-export default StageResolveMiddlewareFactory
+export { StageResolveMiddlewareFactory }

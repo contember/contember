@@ -17,6 +17,6 @@
     "react": "^16.9.0",
     "rollup": "^1.25.2",
     "rollup-plugin-commonjs": "^10.1.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   }
 }

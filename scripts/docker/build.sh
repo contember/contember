@@ -16,10 +16,9 @@ if [[ $VERSION =~ ^v((([0-9]+)\.([0-9]+))\.[0-9]+)$ ]]; then
 else
   ALL_VERSIONS=( "$VERSION" )
 fi
-
+MAIN_VERSION=${ALL_VERSIONS[0]}
 
 REPO="mangoweb/contember/api"
-MAIN_VERSION=${ALL_VERSIONS[0]}
 docker build -t "$ECR/$REPO:$MAIN_VERSION" -f ./packages/cms-api/Dockerfile .
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do
@@ -30,7 +29,6 @@ docker push "$ECR/$REPO"
 
 REPO="mangoweb/contember/admin"
 docker build -t "$ECR/$REPO:$MAIN_VERSION" -f ./packages/cms-admin-server/Dockerfile .
-docker tag "$ECR/$REPO:$VERSION" "$ECR/$REPO:latest"
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do
   docker tag "$ECR/$REPO:$MAIN_VERSION" "$ECR/$REPO:$VERSION"

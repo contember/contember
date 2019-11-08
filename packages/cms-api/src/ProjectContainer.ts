@@ -1,6 +1,5 @@
 import { ProjectWithS3 } from './config/config'
-import SystemApolloServerFactory from './http/SystemApolloServerFactory'
-import ContentApolloMiddlewareFactory from './http/ContentApolloMiddlewareFactory'
+import { ContentApolloMiddlewareFactory, SystemApolloServerFactory } from './http'
 import { Container } from '@contember/dic'
 import { Client, Connection, DatabaseQueryable } from '@contember/database'
 import { SchemaVersionBuilder, SystemExecutionContainer } from '@contember/engine-system-api'

@@ -4,6 +4,7 @@ import { ResolverContext } from '../../ResolverContext'
 import { ImplementationException } from '../../../exceptions'
 import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../model'
 import { Identity } from '@contember/engine-common'
+import { TenantRole } from '../../../model/authorization/Roles'
 
 export class SetupMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}
@@ -20,7 +21,7 @@ export class SetupMutationResolver implements MutationResolvers {
 		})
 
 		const { email, password } = args.superadmin
-		const result = await this.signUpManager.signUp(email, password, [Identity.SystemRole.SUPER_ADMIN])
+		const result = await this.signUpManager.signUp(email, password, [TenantRole.SUPER_ADMIN])
 
 		if (!result.ok) {
 			throw new ImplementationException()

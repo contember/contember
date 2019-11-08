@@ -43,6 +43,7 @@ interface SystemExecutionContainer {
 	queryHandler: QueryHandler<DatabaseQueryable>
 	projectIntializer: ProjectInitializer
 	migrationSqlDryRunner: MigrationSqlDryRunner
+	project: ProjectConfig
 }
 
 namespace SystemExecutionContainer {
@@ -61,6 +62,7 @@ namespace SystemExecutionContainer {
 			return this.createBuilder(db)
 				.build()
 				.pick(
+					'project',
 					'queryHandler',
 					'releaseExecutor',
 					'diffBuilder',
@@ -73,6 +75,7 @@ namespace SystemExecutionContainer {
 
 		public createBuilder(db: Client) {
 			return new Builder({})
+				.addService('project', () => this.project)
 				.addService('providers', () => this.providers)
 				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
 				.addService('migrationsResolver', () => this.migrationsResolver)
@@ -116,9 +119,9 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'permissionVerifier',
-					({ schemaVersionBuilder, db, authorizator }) =>
+					({ schemaVersionBuilder, db, authorizator, project }) =>
 						new EventsPermissionsVerifier(
-							this.project,
+							project,
 							schemaVersionBuilder,
 							db,
 							authorizator,
@@ -136,7 +139,7 @@ namespace SystemExecutionContainer {
 						new EventApplier(db, migrationExecutor, migrationsResolver),
 				)
 				.addService('eventsRebaser', ({ db }) => new EventsRebaser(db))
-				.addService('stageTree', () => new StageTree.Factory().create(this.project))
+				.addService('stageTree', ({ project }) => new StageTree.Factory().create(project))
 				.addService(
 					'rebaseExecutor',
 					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree }) =>
@@ -162,8 +165,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'projectMigrationInfoResolver',
-					({ queryHandler, migrationsResolver }) =>
-						new ProjectMigrationInfoResolver(this.project, migrationsResolver, queryHandler),
+					({ queryHandler, migrationsResolver, project }) =>
+						new ProjectMigrationInfoResolver(project, migrationsResolver, queryHandler),
 				)
 				.addService(
 					'projectMigrator',
@@ -180,10 +183,19 @@ namespace SystemExecutionContainer {
 				.addService('stageCreator', ({ db, eventApplier, providers }) => new StageCreator(db, eventApplier, providers))
 				.addService(
 					'projectIntializer',
-					({ db, stageTree, projectMigrator, rebaseExecutor, projectMigrationInfoResolver, stageCreator, providers }) =>
+					({
+						db,
+						stageTree,
+						projectMigrator,
+						rebaseExecutor,
+						projectMigrationInfoResolver,
+						stageCreator,
+						providers,
+						project,
+					}) =>
 						new ProjectInitializer(
 							db,
-							this.project,
+							project,
 							stageTree,
 							projectMigrator,
 							rebaseExecutor,

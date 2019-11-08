@@ -1,15 +1,17 @@
 import { Authorizator } from '@contember/authorization'
 import { Config } from 'apollo-server-core'
 import { ApolloServer, AuthenticationError } from 'apollo-server-koa'
-import { typeDefs, ResolverContext, SystemExecutionContainer, Schema } from '@contember/engine-system-api'
-import AuthMiddlewareFactory from './AuthMiddlewareFactory'
+import { ResolverContext, Schema, SystemExecutionContainer, typeDefs } from '@contember/engine-system-api'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import { Identity } from '@contember/engine-common'
 import { ApolloError } from 'apollo-server-errors'
-import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
-import { KoaContext } from '../core/koa/types'
-import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
-import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
-import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
+import ErrorHandlerExtension from '../../core/graphql/ErrorHandlerExtension'
+import { KoaContext } from '../../core/koa'
+import {
+	DatabaseTransactionMiddlewareFactory,
+	ProjectMemberMiddlewareFactory,
+	ProjectResolveMiddlewareFactory,
+} from '../project-common'
 import { flattenVariables } from '@contember/engine-content-api'
 
 class SystemApolloServerFactory {
@@ -58,4 +60,4 @@ class SystemApolloServerFactory {
 	}
 }
 
-export default SystemApolloServerFactory
+export { SystemApolloServerFactory }

@@ -1,25 +1,21 @@
 import { ApolloServer, AuthenticationError } from 'apollo-server-koa'
 import { ApolloError } from 'apollo-server-errors'
-import DbQueriesExtension from '../core/graphql/DbQueriesExtension'
+import DbQueriesExtension from '../../core/graphql/DbQueriesExtension'
 import { Context, ExecutionContainerFactory, flattenVariables, UserError } from '@contember/engine-content-api'
-import ErrorHandlerExtension from '../core/graphql/ErrorHandlerExtension'
+import ErrorHandlerExtension from '../../core/graphql/ErrorHandlerExtension'
 import { GraphQLError, GraphQLSchema } from 'graphql'
-import { KoaContext } from '../core/koa/types'
-import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
-import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
-import ContentApolloMiddlewareFactory from './ContentApolloMiddlewareFactory'
+import { KoaContext } from '../../core/koa'
+import { DatabaseTransactionMiddlewareFactory, ProjectMemberMiddlewareFactory } from '../project-common'
+import { ContentApolloMiddlewareFactory } from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
-import TimerMiddlewareFactory from './TimerMiddlewareFactory'
-import { Connection } from '@contember/database'
-import { extractOriginalError } from '../core/graphql/errorExtract'
-import uuid = require('uuid')
+import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
+import { extractOriginalError } from '../../core/graphql/errorExtract'
+import uuid from 'uuid'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
 		max: 100,
 	})
-
-	constructor(private readonly connection: Connection) {}
 
 	public create(dataSchema: GraphQLSchema): ApolloServer {
 		const server = this.cache.get(dataSchema)
@@ -81,4 +77,4 @@ class ContentApolloServerFactory {
 	}
 }
 
-export default ContentApolloServerFactory
+export { ContentApolloServerFactory }

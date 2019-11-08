@@ -1,12 +1,13 @@
 import Koa from 'koa'
-import TimerMiddlewareFactory from './TimerMiddlewareFactory'
-import HomepageMiddlewareFactory from './HomepageMiddlewareFactory'
-import ContentMiddlewareFactory from './ContentMiddlewareFactory'
-import TenantMiddlewareFactory from './TenantMiddlewareFactory'
-import SystemMiddlewareFactory from './SystemMiddlewareFactory'
-import { compose } from '../core/koa/compose'
+import { TimerMiddlewareFactory } from './TimerMiddlewareFactory'
+import { HomepageMiddlewareFactory } from './HomepageMiddlewareFactory'
+import { ContentMiddlewareFactory } from './content'
+import { TenantMiddlewareFactory } from './tenant'
+import { SystemMiddlewareFactory } from './system'
+import { compose, route } from '../core/koa'
+import { PlaygroundMiddlewareFactory } from './PlaygroundMiddlewareFactory'
 
-class MiddlewareStackFactory {
+export class MiddlewareStackFactory {
 	constructor(
 		private readonly timerMiddlewareFactory: TimerMiddlewareFactory,
 		private readonly homepageMiddlewareFactory: HomepageMiddlewareFactory,
@@ -18,6 +19,7 @@ class MiddlewareStackFactory {
 	create(): Koa.Middleware {
 		return compose([
 			this.timerMiddlewareFactory.create(),
+			route('/playground$', new PlaygroundMiddlewareFactory().create()),
 			this.homepageMiddlewareFactory.create(),
 			this.contentMiddlewareFactory.create(),
 			this.tenantMiddlewareFactory.create(),
@@ -25,5 +27,3 @@ class MiddlewareStackFactory {
 		])
 	}
 }
-
-export default MiddlewareStackFactory

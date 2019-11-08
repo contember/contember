@@ -1,18 +1,17 @@
-import AuthMiddlewareFactory from './AuthMiddlewareFactory'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import Koa from 'koa'
-import { route } from '../core/koa/router'
+import { compose, KoaContext, KoaMiddleware, route } from '../../core/koa'
 import corsMiddleware from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
-import PlaygroundMiddlewareFactory from './PlaygroundMiddlewareFactory'
 import { Client } from '@contember/database'
 import { formatSchemaName } from '@contember/engine-system-api'
-import ProjectResolveMiddlewareFactory from './ProjectResolveMiddlewareFactory'
-import StageResolveMiddlewareFactory from './StageResolveMiddlewareFactory'
-import { KoaContext, KoaMiddleware } from '../core/koa/types'
-import ProjectMemberMiddlewareFactory from './ProjectMemberMiddlewareFactory'
-import DatabaseTransactionMiddlewareFactory from './DatabaseTransactionMiddlewareFactory'
-import SetupSystemVariablesMiddlewareFactory from './SetupSystemVariablesMiddlewareFactory'
-import { compose } from '../core/koa/compose'
+import {
+	DatabaseTransactionMiddlewareFactory,
+	ProjectMemberMiddlewareFactory,
+	ProjectResolveMiddlewareFactory,
+	SetupSystemVariablesMiddlewareFactory,
+} from '../project-common'
+import { StageResolveMiddlewareFactory } from './StageResolveMiddlewareFactory'
 import { NotModifiedMiddlewareFactory } from './NotModifiedMiddlewareFactory'
 
 class ContentMiddlewareFactory {
@@ -47,7 +46,6 @@ class ContentMiddlewareFactory {
 		return route(
 			'/content/:projectSlug/:stageSlug$',
 			compose([
-				new PlaygroundMiddlewareFactory().create(),
 				corsMiddleware(),
 				bodyParser(),
 				this.authMiddlewareFactory.create(),
@@ -64,4 +62,4 @@ class ContentMiddlewareFactory {
 	}
 }
 
-export default ContentMiddlewareFactory
+export { ContentMiddlewareFactory }

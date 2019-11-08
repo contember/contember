@@ -1,6 +1,5 @@
-import { KoaMiddleware } from '../core/koa/types'
-import { ProjectContainer, ProjectContainerResolver } from '../ProjectContainer'
-import { KoaRequestState } from '../core/koa/router'
+import { KoaContext, KoaMiddleware, KoaRequestState } from '../../core/koa'
+import { ProjectContainer, ProjectContainerResolver } from '../../ProjectContainer'
 
 type InputState = ProjectResolveMiddlewareFactory.KoaState & KoaRequestState
 
@@ -9,10 +8,11 @@ class ProjectResolveMiddlewareFactory {
 
 	public create(): KoaMiddleware<InputState> {
 		const projectResolve: KoaMiddleware<InputState> = async (ctx, next) => {
-			const projectContainer = this.projectContainerResolver(ctx.state.params.projectSlug)
+			const projectSlug = ctx.state.params.projectSlug
+			const projectContainer = this.projectContainerResolver(projectSlug)
 
 			if (projectContainer === undefined) {
-				return ctx.throw(404, `Project ${ctx.state.params.projectSlug} NOT found`)
+				return throwProjectNotFound(ctx, projectSlug)
 			}
 			ctx.state.projectContainer = projectContainer
 			await next()
@@ -27,4 +27,7 @@ namespace ProjectResolveMiddlewareFactory {
 	}
 }
 
-export default ProjectResolveMiddlewareFactory
+export const throwProjectNotFound = (ctx: KoaContext<any>, projectSlug: string) =>
+	ctx.throw(404, `Project ${projectSlug} NOT found`)
+
+export { ProjectResolveMiddlewareFactory }

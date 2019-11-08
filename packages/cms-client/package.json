@@ -1,14 +1,14 @@
 {
 	"name": "@contember/client",
-	"version": "0.2.0",
+	"version": "0.2.3",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.2.0",
-		"@contember/utils": "^0.2.0",
+		"@contember/schema": "^0.2.3",
+		"@contember/utils": "^0.2.3",
 		"graphql-request": "^1.8.2"
 	},
 	"devDependencies": {

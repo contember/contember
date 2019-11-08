@@ -3,7 +3,7 @@ set -euo pipefail
 
 ECR="831119889470.dkr.ecr.eu-central-1.amazonaws.com"
 
-#ecr-login
+ecr-login
 
 if [[ $VERSION =~ ^v((([0-9]+)\.([0-9]+))\.[0-9]+)$ ]]; then
   ALL_VERSIONS=( "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" )

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/cli",
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"bin": {
 		"contember": "./dist/src/cli.js"
 	},
@@ -9,11 +9,11 @@
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
-		"@contember/dic": "^0.2.4",
-		"@contember/engine-common": "^0.2.4",
-		"@contember/schema": "^0.2.4",
-		"@contember/schema-migrations": "^0.2.4",
-		"@contember/schema-utils": "^0.2.4",
+		"@contember/dic": "^0.2.5",
+		"@contember/engine-common": "^0.2.5",
+		"@contember/schema": "^0.2.5",
+		"@contember/schema-migrations": "^0.2.5",
+		"@contember/schema-utils": "^0.2.5",
 		"graphql-request": "^1.8.2",
 		"prompts": "^2.2.1",
 		"ts-node": "^8.4.1",

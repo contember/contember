@@ -7,10 +7,6 @@ interface Identity {
 }
 
 namespace Identity {
-	export enum SystemRole {
-		SUPER_ADMIN = 'super_admin',
-	}
-
 	export enum ProjectRole {
 		ADMIN = 'admin',
 	}

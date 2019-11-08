@@ -1,5 +1,5 @@
 import Koa from 'koa'
-import { Client, Connection } from '@contember/database'
+import { Connection } from '@contember/database'
 import {
 	GraphQlSchemaBuilderFactory,
 	PermissionsByIdentityFactory,
@@ -11,35 +11,37 @@ import {
 	SchemaMigrator,
 	SchemaVersionBuilder,
 	SystemContainerFactory,
-	SystemExecutionContainer,
 } from '@contember/engine-system-api'
 import { DatabaseCredentials, MigrationFilesManager } from '@contember/engine-common'
 import {
+	createMigrationFilesManager as createTenantMigrationFilesManager,
 	Providers as TenantProviders,
 	TenantContainer,
-	createMigrationFilesManager as createTenantMigrationFilesManager,
 } from '@contember/engine-tenant-api'
 import { Schema } from '@contember/schema'
-import { Builder, Container } from '@contember/dic'
-import AuthMiddlewareFactory from './http/AuthMiddlewareFactory'
-import TenantMiddlewareFactory from './http/TenantMiddlewareFactory'
-import ContentMiddlewareFactory from './http/ContentMiddlewareFactory'
+import { Builder } from '@contember/dic'
+import {
+	AuthMiddlewareFactory,
+	ContentApolloMiddlewareFactory,
+	ContentApolloServerFactory,
+	ContentMiddlewareFactory,
+	DatabaseTransactionMiddlewareFactory,
+	GraphQlSchemaFactory,
+	HomepageMiddlewareFactory,
+	MiddlewareStackFactory,
+	NotModifiedMiddlewareFactory,
+	ProjectMemberMiddlewareFactory,
+	ProjectResolveMiddlewareFactory,
+	SetupSystemVariablesMiddlewareFactory,
+	StageResolveMiddlewareFactory,
+	SystemApolloServerFactory,
+	SystemMiddlewareFactory,
+	TenantApolloServerFactory,
+	TenantMiddlewareFactory,
+	TimerMiddlewareFactory,
+} from './http'
 import { Config, ProjectWithS3 } from './config/config'
-import TimerMiddlewareFactory from './http/TimerMiddlewareFactory'
-import GraphQlSchemaFactory from './http/GraphQlSchemaFactory'
-import SystemMiddlewareFactory from './http/SystemMiddlewareFactory'
-import SystemApolloServerFactory from './http/SystemApolloServerFactory'
-import HomepageMiddlewareFactory from './http/HomepageMiddlewareFactory'
-import MiddlewareStackFactory from './http/MiddlewareStackFactory'
-import ContentApolloMiddlewareFactory from './http/ContentApolloMiddlewareFactory'
-import ProjectResolveMiddlewareFactory from './http/ProjectResolveMiddlewareFactory'
-import ProjectMemberMiddlewareFactory from './http/ProjectMemberMiddlewareFactory'
-import StageResolveMiddlewareFactory from './http/StageResolveMiddlewareFactory'
-import DatabaseTransactionMiddlewareFactory from './http/DatabaseTransactionMiddlewareFactory'
-import SetupSystemVariablesMiddlewareFactory from './http/SetupSystemVariablesMiddlewareFactory'
-import ContentApolloServerFactory from './http/ContentApolloServerFactory'
 import { S3SchemaFactory, S3Service } from '@contember/engine-s3-plugin'
-import TenantApolloServerFactory from './http/TenantApolloServerFactory'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { getArgumentValues } from 'graphql/execution/values'
@@ -48,11 +50,8 @@ import {
 	ModificationHandlerFactory,
 	SchemaVersionBuilder as SchemaVersionBuilderInternal,
 } from '@contember/schema-migrations'
-import { Initializer } from './bootstrap/Initializer'
-import { ServerRunner } from './bootstrap/ServerRunner'
+import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
-import { MigrationsRunner } from './bootstrap/MigrationsRunner'
-import { NotModifiedMiddlewareFactory } from './http/NotModifiedMiddlewareFactory'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -253,11 +252,7 @@ class CompositionRoot {
 				)
 				.addService(
 					'permissionsByIdentityFactory',
-					({}) =>
-						new PermissionsByIdentityFactory([
-							new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
-							new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
-						]),
+					({}) => new PermissionsByIdentityFactory([new PermissionsByIdentityFactory.RoleBasedPermissionFactory()]),
 				)
 				.addService(
 					'contentPermissionsVerifier',
@@ -268,7 +263,7 @@ class CompositionRoot {
 					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory }) =>
 						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory),
 				)
-				.addService('apolloServerFactory', ({ connection }) => new ContentApolloServerFactory(connection))
+				.addService('apolloServerFactory', () => new ContentApolloServerFactory())
 				.addService(
 					'contentApolloMiddlewareFactory',
 					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory, schema }) =>

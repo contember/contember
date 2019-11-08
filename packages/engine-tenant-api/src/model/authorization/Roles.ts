@@ -1,12 +1,9 @@
-import { Identity } from '@contember/engine-common'
-
 export enum TenantRole {
 	LOGIN = 'login',
 	SETUP = 'setup',
 	SELF = 'self',
 	PERSON = 'person',
-	PROJECT_MEMBER = 'project_member',
-	PROJECT_ADMIN = 'project_admin',
+	SUPER_ADMIN = 'super_admin',
+	PROJECT_MEMBER = 'project:member',
+	PROJECT_ADMIN = 'project:admin',
 }
-
-export type AllRoles = TenantRole | Identity.SystemRole

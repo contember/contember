@@ -12,6 +12,8 @@ import { Membership } from '../type/Membership'
 import { ProjectMembersQuery } from '../queries/ProjectMembersQuery'
 import { AddProjectMemberErrorCode } from '../../schema'
 import { ProjectBySlugVariablesByIdentityQuery, ProjectRolesByIdentityQuery } from '../queries'
+import { Identity } from '@contember/engine-common'
+import { TenantRole } from '../authorization/Roles'
 
 class ProjectMemberManager {
 	constructor(
@@ -85,9 +87,13 @@ class ProjectMemberManager {
 
 	async getProjectBySlugMemberships(
 		projectSlug: string,
-		identityId: string,
+		identity: { id: string; roles: string[] },
 	): Promise<ProjectMembershipByIdentityQuery.Result> {
-		return this.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ slug: projectSlug }, identityId))
+		if (identity.roles.includes(TenantRole.SUPER_ADMIN)) {
+			return [{ role: Identity.ProjectRole.ADMIN, variables: [] }]
+		}
+
+		return this.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ slug: projectSlug }, identity.id))
 	}
 
 	async getProjectMembers(projectId: string): Promise<ProjectMemberManager.GetProjectMembersResponse> {

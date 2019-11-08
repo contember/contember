@@ -84,10 +84,7 @@ export class ApiTester {
 			migrationsResolver: migrationsResolver,
 			migrationFilesManager: projectMigrationFilesManager,
 			contentPermissionsVerifier: new PermissionsVerifier(
-				new PermissionsByIdentityFactory([
-					new PermissionsByIdentityFactory.SuperAdminPermissionFactory(),
-					new PermissionsByIdentityFactory.RoleBasedPermissionFactory(),
-				]),
+				new PermissionsByIdentityFactory([new PermissionsByIdentityFactory.RoleBasedPermissionFactory()]),
 			),
 			schemaMigrator,
 			modificationHandlerFactory,

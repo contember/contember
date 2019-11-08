@@ -1,8 +1,7 @@
 import supertest from 'supertest'
 import CompositionRoot from '../../src/CompositionRoot'
-import { getExampleProjectDirectory } from '@contember/engine-api-tester'
-import { recreateDatabase } from '@contember/engine-api-tester/dist/src/dbUtils'
-import { deepStrictEqual } from 'assert'
+import { getExampleProjectDirectory, recreateDatabase } from '@contember/engine-api-tester'
+import assert from 'assert'
 
 const dbCredentials = (dbName: string) => {
 	return {
@@ -15,6 +14,7 @@ const dbCredentials = (dbName: string) => {
 }
 
 let authKey = ''
+let loginToken = ''
 
 const container = new CompositionRoot().createMasterContainer(
 	{
@@ -46,13 +46,37 @@ const container = new CompositionRoot().createMasterContainer(
 	getExampleProjectDirectory(),
 )
 
-const executeGraphql = (query: string, options: { authorizationToken?: string; path?: string } = {}) => {
+const executeGraphql = (
+	query: string,
+	options: { authorizationToken?: string; path?: string; variables?: Record<string, any> } = {},
+) => {
 	return supertest(container.koa.callback())
 		.post(options.path || '/content/test/prod')
 		.set('Authorization', 'Bearer ' + (options.authorizationToken || authKey))
 		.send({
 			query,
+			variables: options.variables || {},
 		})
+}
+
+const signIn = async (email: string, password: string): Promise<string> => {
+	const response2 = await executeGraphql(
+		`mutation($email: String!, $password: String!) {
+  signIn(email: $email, password: $password ) {
+    ok
+    result {
+      token
+    }
+  }
+}`,
+		{
+			variables: { email, password },
+			authorizationToken: loginToken,
+			path: '/tenant',
+		},
+	)
+
+	return response2.body.data.signIn.result.token
 }
 
 beforeAll(async () => {
@@ -85,23 +109,8 @@ beforeAll(async () => {
 			authorizationToken: '12345123451234512345',
 		},
 	)
-	const loginToken = response.body.data.setup.result.loginKey.token
-	const response2 = await await executeGraphql(
-		`mutation {
-  signIn(email: "admin@example.com", password: "123456" ) {
-    ok
-    result {
-      token
-    }
-  }
-}`,
-		{
-			authorizationToken: loginToken,
-			path: '/tenant',
-		},
-	)
-
-	authKey = response2.body.data.signIn.result.token
+	loginToken = response.body.data.setup.result.loginKey.token
+	authKey = await signIn('admin@example.com', '123456')
 })
 
 describe('http tests', () => {
@@ -119,7 +128,7 @@ describe('http tests', () => {
 		}
 }`)
 			.expect(response => {
-				deepStrictEqual(response.body.data, {
+				assert.deepStrictEqual(response.body.data, {
 					createTag: {
 						ok: true,
 					},
@@ -133,7 +142,7 @@ describe('http tests', () => {
 		}
 }`)
 			.expect(response => {
-				deepStrictEqual(response.body.data, {
+				assert.deepStrictEqual(response.body.data, {
 					listTag: [
 						{
 							label: 'graphql',
@@ -158,7 +167,7 @@ describe('http tests', () => {
 }`)
 			.set('X-Contember-Ref', 'None')
 			.expect(response => {
-				deepStrictEqual(response.body.data, {
+				assert.deepStrictEqual(response.body.data, {
 					listTag: [
 						{
 							label: 'typescript',
@@ -183,6 +192,79 @@ describe('http tests', () => {
 		}
 }`)
 			.set('X-Contember-Ref', eventKey)
+			.expect(200)
+	})
+
+	it('returns proper error for invalid schema', async () => {
+		await executeGraphql(`mutation {
+		createFoo(data: {label: "graphql"})  {
+			ok
+		}
+}`)
+			.expect(400)
+			.expect(response => {
+				assert.equal(
+					response.body.errors[0].message,
+					'Cannot query field "createFoo" on type "Mutation". Did you mean "createTag", "createPost", "createEntry", or "createAuthor"?',
+				)
+			})
+	})
+
+	it('sign up, add to a project and check project access', async () => {
+		const signUpResponse = await executeGraphql(
+			`mutation {
+  signUp(email: "john@doe.com", password: "123456") {
+    ok
+    result {
+      person {
+        identity {
+          id
+        }
+      }
+    }
+  }
+}`,
+			{ path: '/tenant' },
+		).expect(200)
+
+		const identityId = signUpResponse.body.data.signUp.result.person.identity.id
+
+		const authKey = await signIn('john@doe.com', '123456')
+		await executeGraphql(
+			`query {
+		listTag {
+			id
+		}
+}`,
+			{ authorizationToken: authKey },
+		)
+			.expect(404)
+			.expect('Project test NOT found')
+
+		await executeGraphql(
+			`mutation($identity: String!) {
+  addProjectMember(identityId: $identity, projectSlug: "test", memberships: [{role: "admin", variables: []}]) {
+    ok
+  }
+}`,
+			{ path: '/tenant', variables: { identity: identityId } },
+		)
+			.expect(200)
+			.expect(response => {
+				assert.deepStrictEqual(response.body.data, { addProjectMember: { ok: true } })
+			})
+
+		await executeGraphql(
+			`query {
+		listAuthor {
+			id
+		}
+}`,
+			{ authorizationToken: authKey },
+		)
+			.expect(response => {
+				assert.deepStrictEqual(response.body.data, { listAuthor: [] })
+			})
 			.expect(200)
 	})
 })

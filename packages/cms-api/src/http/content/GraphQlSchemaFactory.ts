@@ -57,4 +57,4 @@ class GraphQlSchemaFactory {
 	}
 }
 
-export default GraphQlSchemaFactory
+export { GraphQlSchemaFactory }

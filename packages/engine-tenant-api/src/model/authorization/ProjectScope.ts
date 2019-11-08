@@ -3,7 +3,7 @@ import { Identity } from '@contember/engine-common'
 import { Project } from '../type'
 import { TenantRole } from './Roles'
 
-class ProjectScope implements AuthorizationScope<Identity> {
+export class ProjectScope implements AuthorizationScope<Identity> {
 	constructor(private readonly project: Pick<Project, 'slug'> | null) {}
 
 	async getIdentityAccess(identity: Identity): Promise<AccessNode> {
@@ -21,5 +21,3 @@ class ProjectScope implements AuthorizationScope<Identity> {
 		return new AccessNode.Roles(tenantRoles)
 	}
 }
-
-export { ProjectScope }

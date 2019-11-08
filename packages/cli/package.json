@@ -1,6 +1,6 @@
 {
 	"name": "@contember/cli",
-	"version": "0.2.5",
+	"version": "0.2.6",
 	"bin": {
 		"contember": "./dist/src/cli.js"
 	},
@@ -12,7 +12,7 @@
 		"@contember/dic": "^0.2.5",
 		"@contember/engine-common": "^0.2.5",
 		"@contember/schema": "^0.2.5",
-		"@contember/schema-migrations": "^0.2.5",
+		"@contember/schema-migrations": "^0.2.6",
 		"@contember/schema-utils": "^0.2.5",
 		"graphql-request": "^1.8.2",
 		"prompts": "^2.2.1",

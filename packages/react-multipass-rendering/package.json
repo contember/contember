@@ -1,6 +1,6 @@
 {
   "name": "@contember/react-multipass-rendering",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "main": "index.js",
   "scripts": {
     "build": "rollup --config",

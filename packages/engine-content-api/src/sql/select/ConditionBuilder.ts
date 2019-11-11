@@ -35,6 +35,8 @@ export default class ConditionBuilder {
 			not: (builder, expression) => builder.not(builder2 => this.build(builder2, tableName, columnName, expression)),
 			eq: (builder, value) => builder.compare(columnIdentifier, Operator.eq, value),
 			notEq: (builder, value) => builder.compare(columnIdentifier, Operator.notEq, value),
+			isNull: (builder, value) =>
+				value ? builder.null(columnIdentifier) : builder.not(clause => clause.null(columnIdentifier)),
 			in: (builder, values) => builder.in(columnIdentifier, values),
 			notIn: (builder, values) => builder.not(builder2 => builder2.in(columnIdentifier, values)),
 			lt: (builder, value) => builder.compare(columnIdentifier, Operator.lt, value),
@@ -43,6 +45,7 @@ export default class ConditionBuilder {
 			gte: (builder, value) => builder.compare(columnIdentifier, Operator.gte, value),
 			never: builder => builder.raw('false'),
 			always: builder => builder.raw('true'),
+			// deprecated
 			null: (builder, value) =>
 				value ? builder.null(columnIdentifier) : builder.not(clause => clause.null(columnIdentifier)),
 		}

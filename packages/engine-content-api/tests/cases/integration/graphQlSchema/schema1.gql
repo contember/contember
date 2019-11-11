@@ -225,6 +225,7 @@ input DateTimeCondition {
   not: DateTimeCondition
   eq: DateTime
   null: Boolean
+  isNull: Boolean
   notEq: DateTime
   in: [DateTime!]
   notIn: [DateTime!]
@@ -565,6 +566,7 @@ input StringCondition {
   not: StringCondition
   eq: String
   null: Boolean
+  isNull: Boolean
   notEq: String
   in: [String!]
   notIn: [String!]
@@ -582,6 +584,7 @@ input UUIDCondition {
   not: UUIDCondition
   eq: UUID
   null: Boolean
+  isNull: Boolean
   notEq: UUID
   in: [UUID!]
   notIn: [UUID!]

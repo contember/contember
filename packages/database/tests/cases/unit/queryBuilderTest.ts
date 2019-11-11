@@ -6,6 +6,7 @@ import {
 	InsertBuilder,
 	LimitByGroupWrapper,
 	LockType,
+	Operator,
 	SelectBuilder,
 } from '../../../src'
 import { createConnectionMock } from '@contember/database-tester'
@@ -40,23 +41,20 @@ describe('query builder', () => {
 				const qb = wrapper
 					.selectBuilder()
 					.from('foo')
-					.where(cond => {
-						cond.compare('a', ConditionBuilder.Operator.eq, 1)
-						cond.compare('b', ConditionBuilder.Operator.notEq, 2)
-						cond.compare('c', ConditionBuilder.Operator.lt, 3)
-						cond.compare('d', ConditionBuilder.Operator.lte, 4)
-						cond.compare('e', ConditionBuilder.Operator.gt, 5)
-						cond.compare('f', ConditionBuilder.Operator.gte, 6)
-
-						cond.compareColumns('z', ConditionBuilder.Operator.eq, ['foo', 'x'])
-
-						cond.in('o', [1, 2, 3])
-						cond.in('m', wrapper.selectBuilder().select(expr => expr.selectValue(1)))
-
-						cond.null('n')
-
-						cond.raw('false')
-					})
+					.where(cond =>
+						cond
+							.compare('a', Operator.eq, 1)
+							.compare('b', Operator.notEq, 2)
+							.compare('c', Operator.lt, 3)
+							.compare('d', Operator.lte, 4)
+							.compare('e', Operator.gt, 5)
+							.compare('f', Operator.gte, 6)
+							.compareColumns('z', Operator.eq, ['foo', 'x'])
+							.in('o', [1, 2, 3])
+							.in('m', wrapper.selectBuilder().select(expr => expr.selectValue(1)))
+							.null('n')
+							.raw('false'),
+					)
 
 				await qb.getResult()
 			},
@@ -75,19 +73,22 @@ describe('query builder', () => {
 					.selectBuilder()
 					.select(['foo', 'id'])
 					.from('foo')
-					.join('bar', 'bar', clause => {
-						clause.or(clause => {
-							clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 1)
-							clause.compare(['bar', 'a'], ConditionBuilder.Operator.eq, 2)
-							clause.not(clause => clause.compare(['bar', 'b'], ConditionBuilder.Operator.eq, 1))
-						})
-						clause.and(clause => {
-							clause.in(['bar', 'c'], [1, 2, 3])
-							clause.null(['bar', 'd'])
-							clause.not(clause => clause.null(['bar', 'd']))
-							clause.compareColumns(['bar', 'e'], ConditionBuilder.Operator.lte, ['bar', 'f'])
-						})
-					})
+					.join('bar', 'bar', clause =>
+						clause
+							.or(clause =>
+								clause
+									.compare(['bar', 'a'], Operator.eq, 1)
+									.compare(['bar', 'a'], Operator.eq, 2)
+									.not(clause => clause.compare(['bar', 'b'], Operator.eq, 1)),
+							)
+							.and(clause =>
+								clause
+									.in(['bar', 'c'], [1, 2, 3])
+									.null(['bar', 'd'])
+									.not(clause => clause.null(['bar', 'd']))
+									.compareColumns(['bar', 'e'], Operator.lte, ['bar', 'f']),
+							),
+					)
 				await qb.getResult()
 			},
 			sql: SQL`select "foo"."id"
@@ -252,16 +253,15 @@ describe('query builder', () => {
 	it('constructs select with condition', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.selectBuilder().select(
-					expr =>
-						expr.selectCondition(condition =>
-							condition.or(condition => {
-								condition.compare('foo', ConditionBuilder.Operator.gte, 1)
-								condition.compare('foo', ConditionBuilder.Operator.lte, 0)
-							}),
-						),
-					'bar',
-				)
+				const qb = wrapper
+					.selectBuilder()
+					.select(
+						expr =>
+							expr.selectCondition(condition =>
+								condition.or(condition => condition.compare('foo', Operator.gte, 1).compare('foo', Operator.lte, 0)),
+							),
+						'bar',
+					)
 				await qb.getResult()
 			},
 			sql: SQL`select ("foo" >= ? or "foo" <= ?) as "bar"`,
@@ -277,7 +277,7 @@ describe('query builder', () => {
 					.with('data', qb => qb.from('abc'))
 					.from('bar')
 					.using('data')
-					.where(cond => cond.compare(['data', 'a'], ConditionBuilder.Operator.gte, 1))
+					.where(cond => cond.compare(['data', 'a'], Operator.gte, 1))
 					.returning('xyz')
 				await qb.execute()
 			},

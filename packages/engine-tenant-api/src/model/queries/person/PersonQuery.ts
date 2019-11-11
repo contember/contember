@@ -1,4 +1,4 @@
-import { ConditionBuilder, DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
 import { MaybePersonRow, PersonRow } from './types'
 
 class PersonQuery extends DatabaseQuery<MaybePersonRow> {
@@ -34,13 +34,13 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 		return this.fetchOneOrNull(rows)
 	}
 
-	private applyCondition(conditionBuilder: ConditionBuilder): void {
+	private applyCondition(conditionBuilder: ConditionBuilder): ConditionBuilder {
 		if ('email' in this.condition) {
-			conditionBuilder.compare(['person', 'email'], ConditionBuilder.Operator.eq, this.condition.email)
+			return conditionBuilder.compare(['person', 'email'], Operator.eq, this.condition.email)
 		} else if ('id' in this.condition) {
-			conditionBuilder.compare(['person', 'id'], ConditionBuilder.Operator.eq, this.condition.id)
+			return conditionBuilder.compare(['person', 'id'], Operator.eq, this.condition.id)
 		} else if ('identity_id' in this.condition) {
-			conditionBuilder.compare(['person', 'identity_id'], ConditionBuilder.Operator.eq, this.condition.identity_id)
+			return conditionBuilder.compare(['person', 'identity_id'], Operator.eq, this.condition.identity_id)
 		} else {
 			;((_: never): never => {
 				throw new Error()

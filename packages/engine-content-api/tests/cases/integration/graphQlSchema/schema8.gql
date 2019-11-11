@@ -194,6 +194,7 @@ input OneEnumCondition {
   not: OneEnumCondition
   eq: One
   null: Boolean
+  isNull: Boolean
   notEq: One
   in: [One!]
   notIn: [One!]
@@ -226,6 +227,7 @@ input StringCondition {
   not: StringCondition
   eq: String
   null: Boolean
+  isNull: Boolean
   notEq: String
   in: [String!]
   notIn: [String!]
@@ -243,6 +245,7 @@ input UUIDCondition {
   not: UUIDCondition
   eq: UUID
   null: Boolean
+  isNull: Boolean
   notEq: UUID
   in: [UUID!]
   notIn: [UUID!]

@@ -2,6 +2,7 @@
   "name": "@contember/react-multipass-rendering",
   "version": "0.2.5",
   "main": "index.js",
+  "module": "dist/src/index.js",
   "scripts": {
     "build": "rollup --config",
     "test": "jasmine --config=jasmine.json"
@@ -17,6 +18,9 @@
     "react": "^16.9.0",
     "rollup": "^1.25.2",
     "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "tslib": "^1.10.0",
     "typescript": "^3.7.2"
   }
 }

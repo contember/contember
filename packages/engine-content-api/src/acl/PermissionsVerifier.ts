@@ -225,10 +225,11 @@ export class PermissionsVerifier {
 				withPredicates.select(
 					expr =>
 						expr.selectCondition(condition => {
-							cb(condition)
+							condition = cb(condition)
 							if (condition.isEmpty()) {
-								condition.raw('true')
+								return condition.raw('true')
 							}
+							return condition
 						}),
 					this.formatPermissionColumn(column, operation),
 				),

@@ -3,7 +3,7 @@ import Path from './select/Path'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../acl/PredicateFactory'
-import { Client } from '@contember/database'
+import { Client, Operator } from '@contember/database'
 import { Acl, Input, Model } from '@contember/schema'
 import { ConflictActionType } from '@contember/database'
 import { ConditionBuilder } from '@contember/database'
@@ -179,10 +179,8 @@ namespace JunctionTableManager {
 			const qb = this.db
 				.deleteBuilder()
 				.from(joiningTable.tableName)
-				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, ConditionBuilder.Operator.eq, ownerPrimary))
-				.where(cond =>
-					cond.compare(joiningTable.inverseJoiningColumn.columnName, ConditionBuilder.Operator.eq, inversedPrimary),
-				)
+				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, Operator.eq, ownerPrimary))
+				.where(cond => cond.compare(joiningTable.inverseJoiningColumn.columnName, Operator.eq, inversedPrimary))
 
 			await qb.execute()
 		}
@@ -193,16 +191,16 @@ namespace JunctionTableManager {
 				.from(joiningTable.tableName)
 				.using('data')
 				.where(cond => {
-					cond.compareColumns(
-						[joiningTable.tableName, joiningTable.joiningColumn.columnName],
-						ConditionBuilder.Operator.eq,
-						['data', joiningTable.joiningColumn.columnName],
-					)
-					cond.compareColumns(
+					cond = cond.compareColumns([joiningTable.tableName, joiningTable.joiningColumn.columnName], Operator.eq, [
+						'data',
+						joiningTable.joiningColumn.columnName,
+					])
+					cond = cond.compareColumns(
 						[joiningTable.tableName, joiningTable.inverseJoiningColumn.columnName],
-						ConditionBuilder.Operator.eq,
+						Operator.eq,
 						['data', joiningTable.inverseJoiningColumn.columnName],
 					)
+					return cond
 				})
 				.withCteAliases(['data'])
 				.returning(new Literal('true as deleted'))

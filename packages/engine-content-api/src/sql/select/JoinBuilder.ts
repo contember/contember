@@ -2,7 +2,7 @@ import Path from './Path'
 import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import JoinVisitor from './JoinVisitor'
-import { ConditionBuilder } from '@contember/database'
+import { ConditionBuilder, Operator } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
 
 export default class JoinBuilder {
@@ -29,10 +29,7 @@ export default class JoinBuilder {
 			const sourceAlias = join.sourceAlias || path.back().getAlias()
 
 			return qb.leftJoin(join.tableName, targetAlias, clause =>
-				clause.compareColumns([sourceAlias, join.sourceColumn], ConditionBuilder.Operator.eq, [
-					targetAlias,
-					join.targetColumn,
-				]),
+				clause.compareColumns([sourceAlias, join.sourceColumn], Operator.eq, [targetAlias, join.targetColumn]),
 			)
 		}, qb)
 	}

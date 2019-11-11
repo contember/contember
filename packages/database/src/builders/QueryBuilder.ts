@@ -15,7 +15,6 @@ namespace QueryBuilder {
 	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value }
 	export type ResolvedValues = { [columnName: string]: Literal }
 
-	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 	export type ColumnExpression = Literal | ((expressionFactory: ColumnExpressionFactory) => Literal | undefined)
 	export type ColumnExpressionMap = { [columnName: string]: QueryBuilder.ColumnExpression }
 

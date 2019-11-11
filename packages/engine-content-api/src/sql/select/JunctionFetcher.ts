@@ -1,7 +1,7 @@
 import Path from '../select/Path'
 import Mapper from '../Mapper'
 import WhereBuilder from '../select/WhereBuilder'
-import { Client } from '@contember/database'
+import { Client, Operator } from '@contember/database'
 import { Input, Model, Value } from '@contember/schema'
 import { ConditionBuilder } from '@contember/database'
 import OrderByBuilder from './OrderByBuilder'
@@ -40,7 +40,7 @@ class JunctionFetcher {
 		if (where && Object.keys(where).length > 0) {
 			const path = new Path([])
 			qb = qb.join(targetEntity.tableName, path.getAlias(), condition =>
-				condition.compareColumns(['junction_', column.targetColumn.columnName], ConditionBuilder.Operator.eq, [
+				condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
 					path.getAlias(),
 					targetEntity.primaryColumn,
 				]),

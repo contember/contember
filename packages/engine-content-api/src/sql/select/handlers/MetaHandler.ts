@@ -39,10 +39,11 @@ class MetaHandler implements SelectExecutionHandler<{}> {
 				qb.select(
 					expr =>
 						expr.selectCondition(condition => {
-							cb(condition)
+							condition = cb(condition)
 							if (condition.isEmpty()) {
-								condition.raw('true')
+								return condition.raw('true')
 							}
+							return condition
 						}),
 					metaPath.getAlias(),
 				),

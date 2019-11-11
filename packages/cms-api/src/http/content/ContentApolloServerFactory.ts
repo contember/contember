@@ -1,5 +1,6 @@
 import { ApolloServer, AuthenticationError } from 'apollo-server-koa'
 import { ApolloError } from 'apollo-server-errors'
+import { ApolloError as ApolloCoreError } from 'apollo-server-core'
 import DbQueriesExtension from '../../core/graphql/DbQueriesExtension'
 import { Context, ExecutionContainerFactory, flattenVariables, UserError } from '@contember/engine-content-api'
 import ErrorHandlerExtension from '../../core/graphql/ErrorHandlerExtension'
@@ -34,13 +35,17 @@ class ContentApolloServerFactory {
 					return error
 				}
 				const originalError = extractOriginalError(error)
-				if (originalError instanceof GraphQLError) {
+				if (
+					originalError instanceof GraphQLError ||
+					originalError instanceof ApolloError ||
+					originalError instanceof ApolloCoreError
+				) {
 					return error
 				}
 				if (originalError instanceof UserError) {
 					return { message: error.message, locations: undefined, path: undefined }
 				}
-				console.error(error.originalError || error)
+				console.error(originalError || error)
 				return { message: 'Internal server error', locations: undefined, path: undefined }
 			},
 			schema: dataSchema,

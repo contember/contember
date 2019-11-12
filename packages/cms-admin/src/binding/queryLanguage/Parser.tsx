@@ -1,4 +1,4 @@
-import { Lexer, Parser as ChevrotainParser } from 'chevrotain'
+import { Lexer, EmbeddedActionsParser } from 'chevrotain'
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { EntityName, FieldName } from '../bindingTypes'
@@ -16,7 +16,7 @@ import { tokenList, TokenRegExps, tokens } from './tokenList'
  * 	- collection operators (e.g. 'in', 'notIn', etc.)
  * 	- filtering toOne
  */
-class Parser extends ChevrotainParser {
+class Parser extends EmbeddedActionsParser {
 	private static rawInput: string = ''
 	private static lexer = new Lexer(tokenList)
 	private static parser = new Parser()
@@ -191,7 +191,7 @@ class Parser extends ChevrotainParser {
 
 	// TODO this is to naïve and needs rewriting
 	private negation: () => Parser.AST.Filter = this.RULE('negation', () => {
-		return this.OR<Parser.AST.Filter>([
+		return this.OR([
 			{
 				ALT: () => {
 					this.CONSUME(tokens.Not)
@@ -254,49 +254,52 @@ class Parser extends ChevrotainParser {
 		return condition
 	})
 
-	private conditionOperator: () => Parser.AST.ConditionOperator = this.RULE('conditionOperator', () => {
-		return this.OR<Parser.AST.ConditionOperator>([
-			{
-				ALT: () => {
-					this.CONSUME(tokens.Equals)
-					return 'eq'
+	private conditionOperator: () => Parser.AST.ConditionOperator = this.RULE<Parser.AST.ConditionOperator>(
+		'conditionOperator',
+		() => {
+			return this.OR([
+				{
+					ALT: () => {
+						this.CONSUME(tokens.Equals)
+						return 'eq'
+					},
 				},
-			},
-			{
-				ALT: () => {
-					this.CONSUME(tokens.NotEquals)
-					return 'notEq'
+				{
+					ALT: () => {
+						this.CONSUME(tokens.NotEquals)
+						return 'notEq'
+					},
 				},
-			},
-			{
-				ALT: () => {
-					this.CONSUME(tokens.LowerThan)
-					return 'lt'
+				{
+					ALT: () => {
+						this.CONSUME(tokens.LowerThan)
+						return 'lt'
+					},
 				},
-			},
-			{
-				ALT: () => {
-					this.CONSUME(tokens.LowerEqual)
-					return 'lte'
+				{
+					ALT: () => {
+						this.CONSUME(tokens.LowerEqual)
+						return 'lte'
+					},
 				},
-			},
-			{
-				ALT: () => {
-					this.CONSUME(tokens.GreaterThan)
-					return 'gt'
+				{
+					ALT: () => {
+						this.CONSUME(tokens.GreaterThan)
+						return 'gt'
+					},
 				},
-			},
-			{
-				ALT: () => {
-					this.CONSUME(tokens.GreaterEqual)
-					return 'gte'
+				{
+					ALT: () => {
+						this.CONSUME(tokens.GreaterEqual)
+						return 'gte'
+					},
 				},
-			},
-		])
-	})
+			])
+		},
+	)
 
-	private columnValue: () => Parser.AST.ColumnValue = this.RULE('columnValue', () => {
-		return this.OR<Parser.AST.ColumnValue>([
+	private columnValue: () => Parser.AST.ColumnValue = this.RULE<Parser.AST.ColumnValue>('columnValue', () => {
+		return this.OR([
 			{
 				ALT: () => {
 					this.CONSUME(tokens.Null)
@@ -422,8 +425,8 @@ class Parser extends ChevrotainParser {
 		])
 	})
 
-	private primaryValue = this.RULE('primaryValue', () => {
-		return this.OR<Input.PrimaryValue<GraphQlBuilder.Literal>>([
+	private primaryValue = this.RULE<Input.PrimaryValue<GraphQlBuilder.Literal>>('primaryValue', () => {
+		return this.OR([
 			{
 				ALT: () => this.SUBRULE(this.string),
 			},
@@ -459,7 +462,7 @@ class Parser extends ChevrotainParser {
 			{
 				ALT: () => {
 					const variable = this.SUBRULE(this.variable)
-					if (!TokenRegExps.identifier.test(variable)) {
+					if (!(typeof variable === 'string') || !TokenRegExps.identifier.test(variable)) {
 						throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
 					}
 					return variable
@@ -480,7 +483,7 @@ class Parser extends ChevrotainParser {
 			{
 				ALT: () => {
 					const variable = this.SUBRULE(this.variable)
-					if (!TokenRegExps.entityIdentifier.test(variable)) {
+					if (!(typeof variable === 'string') || !TokenRegExps.entityIdentifier.test(variable)) {
 						throw new QueryLanguageError(`The value of the variable \$${variable} is not a valid entity identifier.`)
 					}
 					return variable
@@ -512,7 +515,7 @@ class Parser extends ChevrotainParser {
 		return new GraphQlBuilder.Literal(image)
 	})
 
-	private variable = this.RULE('variable', () => {
+	private variable = this.RULE<string | number | GraphQlBuilder.Literal>('variable', () => {
 		this.CONSUME(tokens.DollarSign)
 		const variableName = this.CONSUME(tokens.Identifier).image
 

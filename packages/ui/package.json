@@ -7,7 +7,7 @@
     "src"
   ],
   "scripts": {
-    "build": "rollup --config && node ./scripts/build-style.js && du -h ./dist/bundle.js",
+    "build": "rollup --config && node ./scripts/build-style.js",
     "storybook": "start-storybook --ci -p 9001 -c dist/storybook/config"
   },
   "typings": "dist/src/index.d.ts",
@@ -28,6 +28,7 @@
     "react-dom": "^16.11.0"
   },
   "devDependencies": {
+    "@rollup/plugin-replace": "^2.2.1",
     "@storybook/addon-info": "^5.2.5",
     "@storybook/addon-knobs": "^5.2.5",
     "@storybook/react": "^5.2.5",
@@ -38,8 +39,6 @@
     "@types/react-dom": "^16.9.4",
     "@types/react-sortable-hoc": "^0.6.6",
     "@types/react-textarea-autosize": "^4.3.5",
-    "@types/storybook__addon-info": "^4.1.2",
-    "@types/storybook__react": "^4.0.2",
     "@types/webappsec-credential-management": "^0.5.1",
     "babel-loader": "^8.0.6",
     "css-loader": "^2.1.0",
@@ -52,7 +51,7 @@
     "rollup-plugin-analyzer": "^3.2.2",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-typescript": "^1.0.1",
+    "rollup-plugin-terser": "^5.1.2",
     "sass-loader": "^7.3.1",
     "source-map-loader": "^0.2.4",
     "style-loader": "^0.23.1",

@@ -14,7 +14,7 @@ export function createPluginsFromMarks(marks: MarksDefinitions, blocks: BlocksDe
 				return next()
 			},
 			onKeyDown: (event_, editor, next) => {
-				const event = event_ as KeyboardEvent
+				const event = event_.nativeEvent
 				if (isHotkey(event)) {
 					const currentBlockTypes = editor.value.blocks.toArray().map(block => block.type)
 					const currentBlockDefinitions = currentBlockTypes.map(currentBlock =>

@@ -21,7 +21,7 @@ export function createRenderInlinePlugin(inlines: InlinesDefinitions, blocks: Bl
 			return next()
 		},
 		onKeyDown: (event_, editor, next) => {
-			const event = event_ as KeyboardEvent
+			const event = event_.nativeEvent
 			const entry = Object.entries(inlines).find(([name, definition]) =>
 				isKeyHotkey(definition.keyboardShortcut || [])(event),
 			)

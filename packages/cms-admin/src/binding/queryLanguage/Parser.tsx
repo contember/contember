@@ -65,18 +65,19 @@ class Parser extends EmbeddedActionsParser {
 	private relativeSingleField: () => Parser.AST.RelativeSingleField = this.RULE<Parser.AST.RelativeSingleField>(
 		'relativeSingleField',
 		() => {
-			const { toOneProps } = this.SUBRULE(this.relativeSingleEntity)
+			let { toOneProps } = this.SUBRULE(this.relativeSingleEntity)
 
-			const last = toOneProps[toOneProps.length - 1]
+			const last = this.ACTION(() => toOneProps.pop()!)
 
-			if (last.reducedBy !== undefined || last.filter !== undefined) {
-				throw new QueryLanguageError(
-					`Cannot parse '${Parser.rawInput}': the last field '${last.field}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`,
-				)
-			}
+			this.ACTION(() => {
+				if (last.reducedBy !== undefined || last.filter !== undefined) {
+					throw new QueryLanguageError(
+						`Cannot parse '${Parser.rawInput}': the last field '${last.field}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`,
+					)
+				}
+			})
 
-			const fieldName = last.field
-			toOneProps.pop()
+			const fieldName = this.ACTION(() => last.field)
 
 			return {
 				toOneProps,
@@ -239,19 +240,21 @@ class Parser extends EmbeddedActionsParser {
 		const columnValue = this.SUBRULE(this.columnValue)
 		const condition: Parser.AST.Condition = {}
 
-		if (columnValue === null) {
-			if (operator === 'eq') {
-				condition.null = true
-			} else if (operator === 'notEq') {
-				condition.null = false
-			} else {
-				throw new QueryLanguageError(`The null keyword as a right hand operand can only be tested for (in)equality.`)
+		return this.ACTION(() => {
+			if (columnValue === null) {
+				if (operator === 'eq') {
+					condition.null = true
+				} else if (operator === 'notEq') {
+					condition.null = false
+				} else {
+					throw new QueryLanguageError(`The null keyword as a right hand operand can only be tested for (in)equality.`)
+				}
+				return condition
 			}
-			return condition
-		}
-		condition[operator] = columnValue
+			condition[operator] = columnValue
 
-		return condition
+			return condition
+		})
 	})
 
 	private conditionOperator: () => Parser.AST.ConditionOperator = this.RULE<Parser.AST.ConditionOperator>(
@@ -341,37 +344,40 @@ class Parser extends EmbeddedActionsParser {
 				this.CONSUME(tokens.Equals)
 				const primaryValue = this.SUBRULE<Input.PrimaryValue<GraphQlBuilder.Literal>>(this.primaryValue)
 
-				let nestedWhere = where
-				for (let i = 0, len = nestedFields.length; i < len; i++) {
-					const nestedField = nestedFields[i]
+				this.ACTION(() => {
+					let nestedWhere = where
+					for (let i = 0, len = nestedFields.length; i < len; i++) {
+						const nestedField = nestedFields[i]
 
-					const isLast = len - 1 === i
+						const isLast = len - 1 === i
 
-					if (isLast) {
-						if (nestedField in nestedWhere) {
-							throw new QueryLanguageError(`Duplicate '${nestedFields.slice(0, i + 1).join('.')}' field`)
-						}
-
-						nestedWhere[nestedField] = primaryValue
-					} else {
-						if (nestedField in nestedWhere) {
-							const existingWhere = nestedWhere[nestedField]
-
-							if (typeof existingWhere === 'object' && !(existingWhere instanceof GraphQlBuilder.Literal)) {
-								nestedWhere = existingWhere
-							} else {
-								throw new QueryLanguageError(
-									`Malformed expression: cannot simultaneously treat the '${nestedFields.slice(0, i + 1).join('.')}' ` +
-										`field as a scalar as well as a relation.`,
-								)
+						if (isLast) {
+							if (nestedField in nestedWhere) {
+								throw new QueryLanguageError(`Duplicate '${nestedFields.slice(0, i + 1).join('.')}' field`)
 							}
+
+							nestedWhere[nestedField] = primaryValue
 						} else {
-							const newWhere = {}
-							nestedWhere[nestedField] = newWhere
-							nestedWhere = newWhere
+							if (nestedField in nestedWhere) {
+								const existingWhere = nestedWhere[nestedField]
+
+								if (typeof existingWhere === 'object' && !(existingWhere instanceof GraphQlBuilder.Literal)) {
+									nestedWhere = existingWhere
+								} else {
+									throw new QueryLanguageError(
+										`Malformed expression: cannot simultaneously treat the '${nestedFields
+											.slice(0, i + 1)
+											.join('.')}' ` + `field as a scalar as well as a relation.`,
+									)
+								}
+							} else {
+								const newWhere = {}
+								nestedWhere[nestedField] = newWhere
+								nestedWhere = newWhere
+							}
 						}
 					}
-				}
+				})
 			},
 		})
 		this.CONSUME(tokens.RightParenthesis)
@@ -398,19 +404,21 @@ class Parser extends EmbeddedActionsParser {
 					| CrudQueryBuilder.OrderDirection
 					| undefined
 
-				if (literal) {
-					if (literal.value !== 'asc' && literal.value !== 'desc') {
-						throw new QueryLanguageError(`The only valid order directions are \`asc\` and \`desc\`.`)
+				this.ACTION(() => {
+					if (literal) {
+						if (literal.value !== 'asc' && literal.value !== 'desc') {
+							throw new QueryLanguageError(`The only valid order directions are \`asc\` and \`desc\`.`)
+						}
+					} else {
+						literal = new GraphQlBuilder.Literal('asc')
 					}
-				} else {
-					literal = new GraphQlBuilder.Literal('asc')
-				}
-				let orderBy: Input.FieldOrderBy<CrudQueryBuilder.OrderDirection> = literal
+					let orderBy: Input.FieldOrderBy<CrudQueryBuilder.OrderDirection> = literal
 
-				for (let i = fieldNames.length - 1; i >= 0; i--) {
-					orderBy = { [fieldNames[i]]: orderBy }
-				}
-				order.push(orderBy as Input.OrderBy<CrudQueryBuilder.OrderDirection>)
+					for (let i = fieldNames.length - 1; i >= 0; i--) {
+						orderBy = { [fieldNames[i]]: orderBy }
+					}
+					order.push(orderBy as Input.OrderBy<CrudQueryBuilder.OrderDirection>)
+				})
 			},
 		})
 
@@ -439,16 +447,18 @@ class Parser extends EmbeddedActionsParser {
 			{
 				ALT: () => {
 					const variableValue = this.SUBRULE(this.variable)
-					if (
-						typeof variableValue === 'string' ||
-						typeof variableValue === 'number' ||
-						variableValue instanceof GraphQlBuilder.Literal
-					) {
-						return variableValue
-					}
-					throw new QueryLanguageError(
-						`A variable can resolve to a literal, string or a number, not ${typeof variableValue}`,
-					)
+					return this.ACTION(() => {
+						if (
+							typeof variableValue === 'string' ||
+							typeof variableValue === 'number' ||
+							variableValue instanceof GraphQlBuilder.Literal
+						) {
+							return variableValue
+						}
+						throw new QueryLanguageError(
+							`A variable can resolve to a literal, string or a number, not ${typeof variableValue}`,
+						)
+					})
 				},
 			},
 		])
@@ -462,10 +472,12 @@ class Parser extends EmbeddedActionsParser {
 			{
 				ALT: () => {
 					const variable = this.SUBRULE(this.variable)
-					if (!(typeof variable === 'string') || !TokenRegExps.identifier.test(variable)) {
-						throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
-					}
-					return variable
+					return this.ACTION(() => {
+						if (!(typeof variable === 'string') || !TokenRegExps.identifier.test(variable)) {
+							throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
+						}
+						return variable
+					})
 				},
 			},
 		])
@@ -483,10 +495,12 @@ class Parser extends EmbeddedActionsParser {
 			{
 				ALT: () => {
 					const variable = this.SUBRULE(this.variable)
-					if (!(typeof variable === 'string') || !TokenRegExps.entityIdentifier.test(variable)) {
-						throw new QueryLanguageError(`The value of the variable \$${variable} is not a valid entity identifier.`)
-					}
-					return variable
+					return this.ACTION(() => {
+						if (!(typeof variable === 'string') || !TokenRegExps.entityIdentifier.test(variable)) {
+							throw new QueryLanguageError(`The value of the variable \$${variable} is not a valid entity identifier.`)
+						}
+						return variable
+					})
 				},
 			},
 		])
@@ -519,21 +533,23 @@ class Parser extends EmbeddedActionsParser {
 		this.CONSUME(tokens.DollarSign)
 		const variableName = this.CONSUME(tokens.Identifier).image
 
-		if (Parser.environment.hasName(variableName)) {
-			return Parser.environment.getValue(variableName)
-		}
-		if (Parser.environment.hasDimension(variableName)) {
-			const dimensionValue = Parser.environment.getDimension(variableName)
-
-			if (dimensionValue.length === 1) {
-				return dimensionValue[0]
+		return this.ACTION(() => {
+			if (Parser.environment.hasName(variableName)) {
+				return Parser.environment.getValue(variableName)
 			}
-			throw new QueryLanguageError(
-				`The variable \$${variableName} resolved to a dimension which exists but contains ${dimensionValue.length} values. It has to contain exactly one. ` +
-					`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`,
-			)
-		}
-		throw new QueryLanguageError(`Undefined variable \$${variableName}.`)
+			if (Parser.environment.hasDimension(variableName)) {
+				const dimensionValue = Parser.environment.getDimension(variableName)
+
+				if (dimensionValue.length === 1) {
+					return dimensionValue[0]
+				}
+				throw new QueryLanguageError(
+					`The variable \$${variableName} resolved to a dimension which exists but contains ${dimensionValue.length} values. It has to contain exactly one. ` +
+						`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`,
+				)
+			}
+			throw new QueryLanguageError(`Undefined variable \$${variableName}.`)
+		})
 	})
 
 	private constructor() {

@@ -8,7 +8,8 @@ export default {
 	input: 'dist/src/index.js',
 	output: {
 		file: 'dist/bundle.js',
-		format: 'es',
+		format: 'esm',
+		sourcemap: true,
 	},
 	external: ['react', 'react-dom'],
 	plugins: [
@@ -27,7 +28,7 @@ export default {
 			},
 		}),
 		terser({
-			sourcemap: false,
+			sourcemap: true,
 		}),
 		analyzer(),
 	],

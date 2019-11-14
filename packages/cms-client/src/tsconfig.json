@@ -1,8 +1,7 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src",
-		"target": "esnext"
+		"outDir": "../dist/src"
 	},
 	"references": [
 		{

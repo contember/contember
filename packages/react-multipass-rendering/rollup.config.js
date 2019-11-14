@@ -3,21 +3,39 @@ import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
 import { terser } from 'rollup-plugin-terser'
 
-export default {
-	input: 'dist/src/index.js',
-	output: {
-		file: 'dist/bundle.js',
-		format: 'esm',
-		sourcemap: true,
+export default [
+	{
+		input: 'dist/src/index.js',
+		output: {
+			file: 'dist/bundle.js',
+			format: 'esm',
+			sourcemap: true,
+		},
+		external: ['react'],
+		plugins: [
+			replace({
+				//__DEV__: 'false',
+				'process.env.NODE_ENV': 'production',
+			}),
+			resolve(),
+			commonjs(),
+			terser(),
+		],
 	},
-	external: ['react'],
-	plugins: [
-		replace({
-			//__DEV__: 'false',
-			'process.env.NODE_ENV': 'production',
-		}),
-		resolve(),
-		commonjs(),
-		terser(),
-	],
-}
+	{
+		input: 'dist/tests/index.js',
+		output: {
+			file: 'dist/tests/bundle.js',
+			format: 'cjs',
+			sourcemap: false,
+		},
+		external: ['react', 'jasmine'],
+		plugins: [
+			replace({
+				'process.env.NODE_ENV': 'development',
+			}),
+			resolve(),
+			commonjs(),
+		],
+	},
+]

@@ -1,7 +1,6 @@
-import { expect } from 'chai'
+import 'jasmine'
 import { GraphQlBuilder } from '@contember/client'
-import 'mocha'
-import * as React from 'react'
+import React from 'react'
 import { Field, ToOne } from '../../../../src/binding/coreComponents'
 import { Environment } from '../../../../src/binding/dao'
 import { QueryLanguage } from '../../../../src/binding/queryLanguage'
@@ -21,7 +20,7 @@ describe('query language parser', () => {
 				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = $x).foo',
 				environment,
 			),
-		).eql(
+		).toEqual(
 			<ToOne.AtomicPrimitive field="a" reducedBy={{ a: 123 }}>
 				<ToOne.AtomicPrimitive
 					field="fieldVariableName"

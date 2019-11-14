@@ -7,7 +7,8 @@ export default {
 	input: 'dist/src/index.js',
 	output: {
 		file: 'dist/bundle.js',
-		format: 'es',
+		format: 'esm',
+		sourcemap: true,
 	},
 	external: ['react'],
 	plugins: [
@@ -17,8 +18,6 @@ export default {
 		}),
 		resolve(),
 		commonjs(),
-		terser({
-			sourcemap: false,
-		}),
+		terser(),
 	],
 }

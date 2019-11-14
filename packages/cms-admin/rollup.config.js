@@ -1,14 +1,16 @@
-import analyzer from 'rollup-plugin-analyzer'
 import replace from '@rollup/plugin-replace'
+//import analyzer from 'rollup-plugin-analyzer'
 import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
 import { terser } from 'rollup-plugin-terser'
+import visualizer from 'rollup-plugin-visualizer'
 
 export default {
 	input: 'dist/src/index.js',
 	output: {
 		file: 'dist/bundle.js',
-		format: 'es',
+		format: 'esm',
+		sourcemap: true,
 	},
 	//external: ['react', 'react-dom'],
 	plugins: [
@@ -24,25 +26,31 @@ export default {
 		commonjs({
 			namedExports: {
 				react: [
+					'Children',
 					'cloneElement',
+					'Component',
 					'createContext',
 					'createElement',
-					'Children',
-					'Component',
+					'createFactory',
+					'createRef',
 					'forwardRef',
 					'Fragment',
 					'isValidElement',
 					'lazy',
 					'memo',
+					'Profiler',
 					'PureComponent',
+					'StrictMode',
 					'Suspense',
-					'useLayoutEffect',
-					'useEffect',
-					'useMemo',
 					'useCallback',
 					'useContext',
-					'useRef',
+					'useDebugValue',
+					'useEffect',
+					'useImperativeHandle',
+					'useLayoutEffect',
+					'useMemo',
 					'useReducer',
+					'useRef',
 					'useState',
 				],
 				['react-is']: ['isValidElementType', 'isContextConsumer'],
@@ -63,8 +71,11 @@ export default {
 			},
 		}),
 		terser({
-			sourcemap: false,
+			sourcemap: true,
 		}),
-		analyzer(),
+		visualizer({
+			filename: 'dist/bundleStats.html',
+			sourcemap: true,
+		}),
 	],
 }

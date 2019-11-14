@@ -2,7 +2,9 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/tests",
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"module": "esnext",
+		"allowSyntheticDefaultImports": true
 	},
 	"references": [
 		{

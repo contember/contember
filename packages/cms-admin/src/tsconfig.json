@@ -2,8 +2,7 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/src",
-		"esModuleInterop": true,
-		"target": "esnext"
+		"esModuleInterop": true
 	},
 	"references": [
 		{

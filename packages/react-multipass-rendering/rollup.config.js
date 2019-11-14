@@ -32,7 +32,7 @@ export default [
 		external: ['react', 'jasmine'],
 		plugins: [
 			replace({
-				'process.env.NODE_ENV': 'development',
+				'process.env.NODE_ENV': JSON.stringify('production'),
 			}),
 			resolve(),
 			commonjs(),

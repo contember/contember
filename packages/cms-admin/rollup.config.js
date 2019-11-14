@@ -7,6 +7,7 @@ import visualizer from 'rollup-plugin-visualizer'
 
 const commonJsConfig = {
 	namedExports: {
+		['@contember/utils']: ['assertNever', 'arrayDifference', 'isEmptyObject', 'lcfirst', 'ucfirst'],
 		react: [
 			'Children',
 			'cloneElement',

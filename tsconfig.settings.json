@@ -9,7 +9,7 @@
 
 		"target": "es6",
 		"moduleResolution": "node",
-		"module": "es6",
+		"module": "commonjs",
 		"outDir": "dist",
 
 		"strict": true,

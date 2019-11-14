@@ -7,15 +7,23 @@ import { simpleButtonStory } from './Button'
 
 storiesOf('ButtonGroup', module).add('simple', () => {
 	const size = sizeKnob()
-	const orientation: ButtonGroupProps['orientation'] = radios('Orientation', {
-		Default: 'default',
-		Horizontal: 'horizontal',
-		Vertical: 'vertical',
-	})
-	const flow: ButtonGroupProps['flow'] = radios('Flow', {
-		Default: 'default',
-		Block: 'block',
-	})
+	const orientation: ButtonGroupProps['orientation'] = radios(
+		'Orientation',
+		{
+			Default: 'default',
+			Horizontal: 'horizontal',
+			Vertical: 'vertical',
+		},
+		'default',
+	)
+	const flow: ButtonGroupProps['flow'] = radios(
+		'Flow',
+		{
+			Default: 'default',
+			Block: 'block',
+		},
+		'default',
+	)
 	const isTopToolbar = boolean('Is top toolbar', false)
 
 	return (

@@ -1,5 +1,4 @@
-import 'mocha'
-import { expect } from 'chai'
+import 'jasmine'
 import { GraphQlBuilder } from '../../../src'
 
 describe('GraphQlQueryBuilder', () => {
@@ -26,7 +25,7 @@ describe('GraphQlQueryBuilder', () => {
 				)
 				.object('Authors', o => o.field('id')),
 		)
-		expect(query).equals(`query {
+		expect(query).toEqual(`query {
 	Post(where: {id: "123"}) {
 		id
 		publishedAt

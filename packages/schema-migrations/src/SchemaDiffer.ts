@@ -5,7 +5,7 @@ import { SchemaMigrator } from './SchemaMigrator'
 import ModificationBuilder from './modifications/ModificationBuilder'
 import Migration from './Migration'
 import { createPatch } from 'rfc6902'
-import deepEqual = require('fast-deep-equal')
+import deepEqual from 'fast-deep-equal'
 import deepCopy from './utils/deepCopy'
 import { ImplementationException } from './exceptions'
 

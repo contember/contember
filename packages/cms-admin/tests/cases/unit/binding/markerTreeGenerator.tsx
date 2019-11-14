@@ -1,6 +1,5 @@
-import { expect } from 'chai'
-import 'mocha'
-import * as React from 'react'
+import 'jasmine'
+import React from 'react'
 import {
 	EntityListDataProvider,
 	Field,
@@ -14,7 +13,7 @@ describe('Marker tree generator', () => {
 	it('should reject empty trees', () => {
 		const generator = new MarkerTreeGenerator(<></>)
 
-		expect(() => generator.generate()).throws(/empty/i)
+		expect(() => generator.generate()).toThrowError(/empty/i)
 	})
 
 	it('should reject top-level fields and relations', () => {
@@ -31,7 +30,7 @@ describe('Marker tree generator', () => {
 		const topField = <Field name="foo" />
 
 		for (const faultyTop of [topOne, topMany, topField]) {
-			expect(() => new MarkerTreeGenerator(faultyTop).generate()).throws(/top\-level/i)
+			expect(() => new MarkerTreeGenerator(faultyTop).generate()).toThrowError(/top-level/i)
 		}
 	})
 
@@ -55,7 +54,7 @@ describe('Marker tree generator', () => {
 		)
 
 		for (const faultyChildren of [list, toOne, toMany]) {
-			expect(() => new MarkerTreeGenerator(faultyChildren).generate()).throws(/children/i)
+			expect(() => new MarkerTreeGenerator(faultyChildren).generate()).toThrowError(/children/i)
 		}
 	})
 })

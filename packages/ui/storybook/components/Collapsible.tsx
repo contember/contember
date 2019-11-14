@@ -5,14 +5,18 @@ import { Collapsible, CollapsibleProps } from '../../src'
 
 storiesOf('Collapsible', module).add('simple', () => {
 	const expanded: CollapsibleProps['expanded'] = boolean('Expanded', true)
-	const transition: CollapsibleProps['transition'] = radios('Transition', {
-		Default: 'default',
-		'Top insert': 'topInsert',
-		'Bottom insert': 'bottomInsert',
-		'Left insert': 'leftInsert',
-		'Right insert': 'rightInsert',
-		Fade: 'fade',
-	})
+	const transition: CollapsibleProps['transition'] = radios(
+		'Transition',
+		{
+			Default: 'default',
+			'Top insert': 'topInsert',
+			'Bottom insert': 'bottomInsert',
+			'Left insert': 'leftInsert',
+			'Right insert': 'rightInsert',
+			Fade: 'fade',
+		},
+		'default',
+	)
 
 	return (
 		<div style={{ overflow: 'hidden' }}>

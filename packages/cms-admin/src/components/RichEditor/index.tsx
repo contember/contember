@@ -271,8 +271,12 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 	/**
 	 * On key down, if it's a formatting command toggle a mark.
 	 */
-	private onKeyDown: EventHook = (event_: Event, editor: CoreEditor, next): unknown => {
-		const event = event_ as KeyboardEvent
+	private onKeyDown: EventHook<React.KeyboardEvent> = (
+		event_: React.KeyboardEvent,
+		editor: CoreEditor,
+		next,
+	): unknown => {
+		const event = event_.nativeEvent
 
 		let mark: Mark
 
@@ -339,7 +343,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 		return
 	}
 
-	private onPaste: EventHook = (event: Event, editor: CoreEditor, next) => {
+	private onPaste: EventHook<React.ClipboardEvent> = (event: React.ClipboardEvent, editor: CoreEditor, next) => {
 		const transfer = getEventTransfer(event)
 		if (transfer.type !== 'html') return next()
 		const { document } = this.htmlSerializer.deserialize(((transfer as unknown) as { html: string }).html)

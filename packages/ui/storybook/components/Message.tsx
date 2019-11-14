@@ -7,10 +7,14 @@ import { sizeKnob } from '../utils/knobs'
 const renderMessage = (type: MessageProps['type']) => {
 	const message = text('Message', `Lorem ipsum is ${type}!`)
 	const lifted = boolean('Lifted', false)
-	const distinction = radios<MessageProps['distinction']>('Distinction', {
-		Default: 'default',
-		Striking: 'striking',
-	})
+	const distinction = radios<MessageProps['distinction']>(
+		'Distinction',
+		{
+			Default: 'default',
+			Striking: 'striking',
+		},
+		'default',
+	)
 	const flow = radios<MessageProps['flow']>(
 		'Flow',
 		{

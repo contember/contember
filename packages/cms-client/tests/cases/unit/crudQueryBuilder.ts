@@ -1,5 +1,4 @@
-import { expect } from 'chai'
-import 'mocha'
+import 'jasmine'
 import { CrudQueryBuilder } from '../../../src'
 import { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
 
@@ -45,7 +44,7 @@ describe('crud query builder', () => {
 					),
 			)
 
-		expect(builder.getGql()).equals(`mutation {
+		expect(builder.getGql()).toEqual(`mutation {
 	updatePost(data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}, alias: "connectId1"}, {create: {name: "foo"}, alias: "createNameFoo"}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}, by: {id: "123"}) {
 		node {
 			id
@@ -78,7 +77,7 @@ describe('crud query builder', () => {
 					.hasOneRelation('author', o => o.column('name')),
 			'myPostsAlias',
 		)
-		expect(builder.getGql()).equals(`query {
+		expect(builder.getGql()).toEqual(`query {
 	myPostsAlias: listPosts(filter: {foo: {eq: "bar"}}) {
 		title
 		author {
@@ -95,7 +94,7 @@ describe('crud query builder', () => {
 				.ok()
 				.validation(),
 		)
-		expect(builder.getGql()).equals(`mutation {
+		expect(builder.getGql()).toEqual(`mutation {
 	createFoo(data: {bar: "123"}) {
 		ok
 		validation {

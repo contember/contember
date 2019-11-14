@@ -2,6 +2,7 @@
 	"name": "@contember/admin",
 	"version": "0.2.5",
 	"main": "index.js",
+	"type": "module",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"build": "rollup --config && node ./scripts/build-style.js",

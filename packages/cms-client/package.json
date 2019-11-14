@@ -3,6 +3,7 @@
 	"version": "0.2.5",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
+	"type": "module",
 	"scripts": {
 		"test": "mocha --ui bdd ./dist/tests/cases/**/*.js"
 	},

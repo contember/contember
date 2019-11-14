@@ -3,6 +3,7 @@
   "version": "0.2.5",
   "main": "index.js",
   "module": "dist/src/index.js",
+  "type": "module",
   "scripts": {
     "build": "rollup --config",
     "test": "jasmine --config=jasmine.json"

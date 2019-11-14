@@ -1,5 +1,4 @@
-import { expect } from 'chai'
-import 'mocha'
+import 'jasmine'
 import { Environment } from '../../../../src/binding/dao'
 import { Parser } from '../../../../src/binding/queryLanguage'
 
@@ -9,7 +8,7 @@ const parse = (input: string): Parser.AST.RelativeEntityList => {
 
 describe('relative entity list QueryLanguage parser', () => {
 	it('should parse unconstrained fields', () => {
-		expect(parse('foo.bar.baz')).eql({
+		expect(parse('foo.bar.baz')).toEqual({
 			toOneProps: [{ field: 'foo' }, { field: 'bar' }],
 			toManyProps: {
 				field: 'baz',
@@ -18,7 +17,7 @@ describe('relative entity list QueryLanguage parser', () => {
 	})
 
 	it('should parse simple conditions', () => {
-		expect(parse('foo[bar = 123]')).eql({
+		expect(parse('foo[bar = 123]')).toEqual({
 			toOneProps: [],
 			toManyProps: {
 				field: 'foo',
@@ -39,12 +38,12 @@ describe('relative entity list QueryLanguage parser', () => {
 				},
 			},
 		}
-		expect(parse("foo[bar = 'value'][baz >= 456]")).eql(expected)
-		expect(parse("foo[bar = 'value' && baz >= 456]")).eql(expected)
+		expect(parse("foo[bar = 'value'][baz >= 456]")).toEqual(expected)
+		expect(parse("foo[bar = 'value' && baz >= 456]")).toEqual(expected)
 	})
 
 	it('should parse complex filter conditions', () => {
-		expect(parse('foo[a < 1 || b = 2 && c != 3 || d > 4]')).eql({
+		expect(parse('foo[a < 1 || b = 2 && c != 3 || d > 4]')).toEqual({
 			toOneProps: [],
 			toManyProps: {
 				field: 'foo',
@@ -64,7 +63,7 @@ describe('relative entity list QueryLanguage parser', () => {
 	})
 
 	it('should parse conditions with nested fields', () => {
-		expect(parse('foo[a.b.c < 123 && a.d = 456]')).eql({
+		expect(parse('foo[a.b.c < 123 && a.d = 456]')).toEqual({
 			toOneProps: [],
 			toManyProps: {
 				field: 'foo',

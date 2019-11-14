@@ -1,7 +1,6 @@
-import { expect } from 'chai'
 import { GraphQlBuilder } from '@contember/client'
-import 'mocha'
-import * as React from 'react'
+import 'jasmine'
+import React from 'react'
 import { Field, ToOne } from '../../../../src/binding/coreComponents'
 import { Environment } from '../../../../src/binding/dao'
 import { Parser, QueryLanguage } from '../../../../src/binding/queryLanguage'
@@ -12,14 +11,14 @@ const parse = (input: string) => {
 
 describe('single relative fields QueryLanguage parser', () => {
 	it('should parse single field names', () => {
-		expect(parse('fooName')).eql({
+		expect(parse('fooName')).toEqual({
 			fieldName: 'fooName',
 			toOneProps: [],
 		})
 	})
 
 	it('should parse single relation with a name', () => {
-		expect(parse('fooRelation.fooName')).eql({
+		expect(parse('fooRelation.fooName')).toEqual({
 			fieldName: 'fooName',
 			toOneProps: [
 				{
@@ -30,7 +29,7 @@ describe('single relative fields QueryLanguage parser', () => {
 	})
 
 	it('should parse a chain of fields without wheres', () => {
-		expect(parse('foo.bar.baz.name')).eql({
+		expect(parse('foo.bar.baz.name')).toEqual({
 			fieldName: 'name',
 			toOneProps: [
 				{
@@ -47,7 +46,7 @@ describe('single relative fields QueryLanguage parser', () => {
 	})
 
 	it('should parse unique where', () => {
-		expect(parse("foo.bar(a='b').name")).eql({
+		expect(parse("foo.bar(a='b').name")).toEqual({
 			fieldName: 'name',
 			toOneProps: [
 				{
@@ -64,7 +63,7 @@ describe('single relative fields QueryLanguage parser', () => {
 	})
 
 	it('should parse composite unique where', () => {
-		expect(parse("foo(a='b', bar = 123).name")).eql({
+		expect(parse("foo(a='b', bar = 123).name")).toEqual({
 			fieldName: 'name',
 			toOneProps: [
 				{
@@ -79,15 +78,15 @@ describe('single relative fields QueryLanguage parser', () => {
 	})
 
 	it('should reject duplicate fields in unique where', () => {
-		expect(() => parse("foo(a='b', a = 123).name")).throws(/duplicate/i)
+		expect(() => parse("foo(a='b', a = 123).name")).toThrowError(/duplicate/i)
 	})
 
 	it('should reject relation fields at the end', () => {
-		expect(() => parse("foo(a='b')")).throws(/relation/i)
+		expect(() => parse("foo(a='b')")).toThrowError(/relation/i)
 	})
 
 	it('should parse nested unique where', () => {
-		expect(parse('foo(nested.structure.is.deep = 123, nested.structure.be.indeed.not.shallow = baz).name')).eql({
+		expect(parse('foo(nested.structure.is.deep = 123, nested.structure.be.indeed.not.shallow = baz).name')).toEqual({
 			fieldName: 'name',
 			toOneProps: [
 				{
@@ -114,10 +113,10 @@ describe('single relative fields QueryLanguage parser', () => {
 	})
 
 	it('should reject malformed nested unique where', () => {
-		expect(() => parse('foo(nested.field = 123, nested.field.treated.as.relation = baz).name')).throws(
+		expect(() => parse('foo(nested.field = 123, nested.field.treated.as.relation = baz).name')).toThrowError(
 			/'nested\.field'/i,
 		)
-		expect(() => parse('foo(nested.field = 123, nested.field = baz).name')).throws(/'nested\.field'/i)
+		expect(() => parse('foo(nested.field = 123, nested.field = baz).name')).toThrowError(/'nested\.field'/i)
 	})
 
 	it('should correctly generate JSX', () => {
@@ -135,6 +134,6 @@ describe('single relative fields QueryLanguage parser', () => {
 				</ToOne.AtomicPrimitive>
 			</ToOne.AtomicPrimitive>
 		)
-		expect(result).eql(expected)
+		expect(result).toEqual(expected)
 	})
 })

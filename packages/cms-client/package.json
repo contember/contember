@@ -1,6 +1,6 @@
 {
 	"name": "@contember/client",
-	"version": "0.2.5",
+	"version": "0.2.8",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@contember/schema": "^0.2.5",
-		"@contember/utils": "^0.2.5",
+		"@contember/utils": "^0.2.8",
 		"graphql-request": "^1.8.2"
 	},
 	"devDependencies": {

@@ -1,5 +1,4 @@
-import { expect } from 'chai'
-import 'mocha'
+import 'jasmine'
 import { Environment } from '../../../../src/binding/dao'
 import { Parser } from '../../../../src/binding/queryLanguage'
 
@@ -9,7 +8,7 @@ const parse = (input: string) => {
 
 describe('qualified entity list QueryLanguage parser', () => {
 	it('Should parse just the entity name', () => {
-		expect(parse('Author')).eql({
+		expect(parse('Author')).toEqual({
 			entityName: 'Author',
 			filter: undefined,
 			toOneProps: [],
@@ -17,7 +16,7 @@ describe('qualified entity list QueryLanguage parser', () => {
 	})
 
 	it('should parse a qualified field list up to an entity', () => {
-		expect(parse(`Author[age > 20 && homeTown = 'Prague'].son.sisters(name = 'Jane')`)).eql({
+		expect(parse(`Author[age > 20 && homeTown = 'Prague'].son.sisters(name = 'Jane')`)).toEqual({
 			entityName: 'Author',
 			filter: {
 				and: [{ age: { gt: 20 } }, { homeTown: { eq: 'Prague' } }],

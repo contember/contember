@@ -5,11 +5,15 @@ import { Table, TableCell, TableProps, TableRow } from '../../src/components'
 import { sizeKnob } from '../utils/knobs'
 
 const radiosJustification = (label: string): TableProps['justification'] =>
-	radios(label, {
-		Left: 'justifyStart',
-		Center: 'justifyCenter',
-		Right: 'justifyEnd',
-	})
+	radios(
+		label,
+		{
+			Left: 'justifyStart',
+			Center: 'justifyCenter',
+			Right: 'justifyEnd',
+		},
+		'justifyStart',
+	)
 
 storiesOf('Table', module).add('simple', () => {
 	const useTableElement = boolean('Use table element', true)

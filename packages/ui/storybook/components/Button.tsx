@@ -5,7 +5,7 @@ import { Button, ButtonProps } from '../../src'
 import { Size } from '../../src/types'
 import { allIntents, sizeKnob } from '../utils'
 
-export const simpleButtonStory = (size?: Size) => {
+export const simpleButtonStory = (size?: Size): React.ReactElement => {
 	const content = text('Text', 'Pretty button')
 	const props: ButtonProps = {
 		size: size || sizeKnob(),
@@ -47,7 +47,13 @@ export const simpleButtonStory = (size?: Size) => {
 		children: content,
 	}
 
-	return allIntents.map(intent => <Button intent={intent} {...props} />)
+	return (
+		<>
+			{allIntents.map(intent => (
+				<Button intent={intent} {...props} />
+			))}
+		</>
+	)
 }
 
 storiesOf('Button', module).add('simple', () => {

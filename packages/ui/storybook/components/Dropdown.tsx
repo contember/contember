@@ -4,12 +4,16 @@ import { Dropdown, DropdownProps } from '../../src'
 import { radios } from '@storybook/addon-knobs'
 
 const Component = () => {
-	const alignment: DropdownProps['alignment'] = radios('Alignment', {
-		Default: 'default',
-		Center: 'center',
-		Start: 'start',
-		End: 'end',
-	})
+	const alignment: DropdownProps['alignment'] = radios(
+		'Alignment',
+		{
+			Default: 'default',
+			Center: 'center',
+			Start: 'start',
+			End: 'end',
+		},
+		'default',
+	)
 
 	return (
 		<Dropdown

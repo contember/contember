@@ -12,9 +12,11 @@ export default {
 	plugins: [
 		resolve({
 			preferBuiltins: true,
-			dedupe: ['react', 'react-dom', 'react-is'],
-			// modulesOnly: true
 		}),
-		commonjs(),
+		commonjs({
+			namedExports: {
+				['@contember/utils']: ['assertNever', 'arrayDifference', 'isEmptyObject', 'lcfirst', 'ucfirst'],
+			},
+		}),
 	],
 }

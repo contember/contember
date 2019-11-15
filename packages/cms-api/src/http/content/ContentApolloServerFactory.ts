@@ -12,21 +12,28 @@ import LRUCache from 'lru-cache'
 import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
 import { extractOriginalError } from '../../core/graphql/errorExtract'
 import uuid from 'uuid'
+import { GraphQLExtension } from 'graphql-extensions'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
 		max: 100,
 	})
 
+	constructor(private readonly debug: boolean) {}
+
 	public create(dataSchema: GraphQLSchema): ApolloServer {
 		const server = this.cache.get(dataSchema)
 		if (server) {
 			return server
 		}
+		const extensions: Array<() => GraphQLExtension> = [() => new ErrorHandlerExtension()]
+		if (this.debug) {
+			extensions.push(() => new DbQueriesExtension())
+		}
 		const newServer = new ApolloServer({
 			tracing: true,
 			introspection: true,
-			extensions: [() => new ErrorHandlerExtension(), () => new DbQueriesExtension()],
+			extensions: extensions,
 			formatError: (error: any) => {
 				if (error instanceof AuthenticationError) {
 					return { message: error.message, locations: undefined, path: undefined }

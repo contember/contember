@@ -61,11 +61,12 @@ export interface MasterContainer {
 
 class CompositionRoot {
 	createMasterContainer(
+		debug: boolean,
 		config: Config,
 		projectsDirectory: string,
 		projectSchemas?: { [name: string]: Schema },
 	): MasterContainer {
-		const projectContainers = this.createProjectContainers(config.projects, projectsDirectory, projectSchemas)
+		const projectContainers = this.createProjectContainers(debug, config.projects, projectsDirectory, projectSchemas)
 
 		const projectContainerResolver: ProjectContainerResolver = slug =>
 			projectContainers.find(it => it.project.slug === slug)
@@ -193,6 +194,7 @@ class CompositionRoot {
 	}
 
 	createProjectContainers(
+		debug: boolean,
 		projects: Array<ProjectWithS3>,
 		projectsDir: string,
 		schemas?: Record<string, Schema>,
@@ -263,7 +265,7 @@ class CompositionRoot {
 					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory }) =>
 						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory),
 				)
-				.addService('apolloServerFactory', () => new ContentApolloServerFactory())
+				.addService('apolloServerFactory', () => new ContentApolloServerFactory(debug))
 				.addService(
 					'contentApolloMiddlewareFactory',
 					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory, schema }) =>

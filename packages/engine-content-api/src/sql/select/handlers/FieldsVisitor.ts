@@ -7,6 +7,7 @@ import JunctionFetcher from '../JunctionFetcher'
 import SelectExecutionHandler from '../SelectExecutionHandler'
 import PredicateFactory from '../../../acl/PredicateFactory'
 import WhereBuilder from '../WhereBuilder'
+import { OrderByHelper } from '../OrderByHelper'
 
 class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
@@ -61,7 +62,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 			targetColumn: joiningTable.joiningColumn,
 		}
 
-		this.createManyHasManyGroups(targetEntity, targetRelation, columns)
+		this.createManyHasManyGroups(targetEntity, targetRelation, columns, relation.orderBy || [])
 	}
 
 	public visitManyHasManyOwner(
@@ -75,7 +76,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 			targetColumn: joiningTable.inverseJoiningColumn,
 		}
 
-		this.createManyHasManyGroups(targetEntity, relation, columns)
+		this.createManyHasManyGroups(targetEntity, relation, columns, relation.orderBy || [])
 	}
 
 	public visitOneHasMany(
@@ -93,8 +94,14 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 					[targetRelation.name]: { [entity.primary]: { in: ids } },
 				}
 				const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('filter', whereWithParentId)
+				const objectNodeWithOrder = OrderByHelper.appendDefaultOrderBy(
+					entity,
+					objectNodeWithWhere,
+					relation.orderBy || [],
+				)
+				console.log(relation.orderBy)
 
-				return this.mapper.selectGrouped(targetEntity, objectNodeWithWhere, targetRelation)
+				return this.mapper.selectGrouped(targetEntity, objectNodeWithOrder, targetRelation)
 			},
 			[],
 		)
@@ -104,11 +111,14 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		targetEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		joiningColumns: Mapper.JoiningColumns,
+		defaultOrderBy: Model.OrderBy[],
 	): void {
 		this.executionContext.addData(
 			this.executionContext.entity.primary,
 			async ids => {
-				const objectNode = this.executionContext.field as ObjectNode
+				const baseObjectNode = this.executionContext.field as ObjectNode<Input.ListQueryInput>
+				const objectNode = OrderByHelper.appendDefaultOrderBy(targetEntity, baseObjectNode, defaultOrderBy)
+
 				const junctionValues = await this.junctionFetcher.fetchJunction(
 					relation,
 					ids,

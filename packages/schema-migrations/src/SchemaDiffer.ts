@@ -99,6 +99,17 @@ export class SchemaDiffer {
 					builder.makeRelationNotNull(entityName, updatedRelation.name)
 				}
 
+				const isItOrderable = (relation: Model.AnyRelation): relation is Model.OrderableRelation & Model.AnyRelation =>
+					relation.type === Model.RelationType.ManyHasMany || relation.type === Model.RelationType.OneHasMany
+				if (
+					isItOrderable(updatedRelation) &&
+					isItOrderable(originalRelation) &&
+					!deepEqual(updatedRelation.orderBy || [], originalRelation.orderBy || [])
+				) {
+					;(tmpRelation as Model.AnyRelation & Model.OrderableRelation).orderBy = updatedRelation.orderBy || []
+					builder.updateRelationOrderBy(entityName, updatedRelation.name, updatedRelation.orderBy || [])
+				}
+
 				if (!deepEqual(tmpRelation, updatedRelation)) {
 					marker.rewind()
 					return false

@@ -139,6 +139,7 @@ export function createModel<M extends ModelDefinition<M>>(definitions: M): Model
 }
 
 export const OnDelete = Model.OnDelete
+export const OrderDirection = Model.OrderDirection
 
 type OneHasManyDefinitionInterface = Interface<OneHasManyDefinition>
 type OneHasOneDefinitionInterface = Interface<OneHasOneDefinition>

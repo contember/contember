@@ -258,8 +258,13 @@ describe('build gql schema from model schema', () => {
 	})
 
 	it('builds basic schema with new builder', async () => {
+		const schema1 = SchemaDefinition.createModel(model)
+		const relation = schema1.entities['Author'].fields['posts']
+		expect((relation as Model.OneHasManyRelation).orderBy).toEqual([
+			{ path: ['publishedAt'], direction: Model.OrderDirection.desc },
+		])
 		await testSchema({
-			schema: () => SchemaDefinition.createModel(model),
+			schema: () => schema1,
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema9.gql',
 		})

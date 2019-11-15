@@ -29,7 +29,6 @@ export class SystemContainerFactory {
 		migrationFilesManager: MigrationFilesManager
 		contentPermissionsVerifier: ContentPermissionVerifier
 		migrationsResolver: MigrationsResolver
-		schemaMigrator: SchemaMigrator
 		modificationHandlerFactory: ModificationHandlerFactory
 	}): Container<SystemContainer> {
 		return new Builder({})

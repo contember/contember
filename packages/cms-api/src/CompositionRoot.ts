@@ -44,7 +44,6 @@ import { Config, ProjectWithS3 } from './config/config'
 import { S3SchemaFactory, S3Service } from '@contember/engine-s3-plugin'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
-import { getArgumentValues } from 'graphql/execution/values'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
 import {
 	ModificationHandlerFactory,
@@ -52,6 +51,8 @@ import {
 } from '@contember/schema-migrations'
 import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
+import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
+import { getArgumentValues } from 'graphql/execution/values'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -152,6 +153,7 @@ class CompositionRoot {
 					),
 			)
 			.addService('timerMiddlewareFactory', () => new TimerMiddlewareFactory())
+			.addService('errorResponseMiddlewareFactory', () => new ErrorResponseMiddlewareFactory(debug))
 
 			.addService(
 				'middlewareStackFactory',
@@ -161,9 +163,11 @@ class CompositionRoot {
 					contentMiddlewareFactory,
 					tenantMiddlewareFactory,
 					systemMiddlewareFactory,
+					errorResponseMiddlewareFactory,
 				}) =>
 					new MiddlewareStackFactory(
 						timerMiddlewareFactory,
+						errorResponseMiddlewareFactory,
 						homepageMiddlewareFactory,
 						contentMiddlewareFactory,
 						tenantMiddlewareFactory,
@@ -285,7 +289,6 @@ class CompositionRoot {
 					'migrationsResolver',
 					'migrationFilesManager',
 					'contentPermissionsVerifier',
-					'schemaMigrator',
 					'modificationHandlerFactory',
 					'schemaVersionBuilder',
 					'providers',

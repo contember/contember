@@ -6,10 +6,12 @@ import { TenantMiddlewareFactory } from './tenant'
 import { SystemMiddlewareFactory } from './system'
 import { compose, route } from '../core/koa'
 import { PlaygroundMiddlewareFactory } from './PlaygroundMiddlewareFactory'
+import { ErrorResponseMiddlewareFactory } from './ErrorResponseMiddlewareFactory'
 
 export class MiddlewareStackFactory {
 	constructor(
 		private readonly timerMiddlewareFactory: TimerMiddlewareFactory,
+		private readonly errorResponseMiddlewareFactory: ErrorResponseMiddlewareFactory,
 		private readonly homepageMiddlewareFactory: HomepageMiddlewareFactory,
 		private readonly contentMiddlewareFactory: ContentMiddlewareFactory,
 		private readonly tenantMiddlewareFactory: TenantMiddlewareFactory,
@@ -18,6 +20,7 @@ export class MiddlewareStackFactory {
 
 	create(): Koa.Middleware {
 		return compose([
+			this.errorResponseMiddlewareFactory.create(),
 			this.timerMiddlewareFactory.create(),
 			route('/playground$', new PlaygroundMiddlewareFactory().create()),
 			this.homepageMiddlewareFactory.create(),

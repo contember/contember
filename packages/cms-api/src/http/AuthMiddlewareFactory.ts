@@ -1,26 +1,27 @@
 import { ApiKeyManager } from '@contember/engine-tenant-api'
-import { createGraphqlInvalidAuthResponse, KoaContext, KoaMiddleware } from '../core/koa'
+import { KoaContext, KoaMiddleware } from '../core/koa'
+import { ErrorResponseMiddlewareState } from './ErrorResponseMiddlewareFactory'
 
 class AuthMiddlewareFactory {
-	constructor(private apiKeyManager: ApiKeyManager) {}
+	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
-	create(): KoaMiddleware<AuthMiddlewareFactory.KoaState> {
-		const auth: KoaMiddleware<AuthMiddlewareFactory.KoaState> = async (ctx, next) => {
+	create(): KoaMiddleware<ErrorResponseMiddlewareState & AuthMiddlewareFactory.KoaState> {
+		const auth: KoaMiddleware<ErrorResponseMiddlewareState & AuthMiddlewareFactory.KoaState> = async (ctx, next) => {
 			const authHeader = ctx.request.get('Authorization')
 			if (typeof authHeader !== 'string' || authHeader === '') {
-				return createGraphqlInvalidAuthResponse(ctx, `Auth failure: Authorization header is missing`)
+				return ctx.state.fail.authorizationFailure(`Authorization header is missing`)
 			}
 
 			const authHeaderPattern = /^Bearer\s+(\w+)$/i
 
 			const match = authHeader.match(authHeaderPattern)
 			if (match === null) {
-				return createGraphqlInvalidAuthResponse(ctx, `Auth failure: invalid Authorization header format`)
+				return ctx.state.fail.authorizationFailure(`invalid Authorization header format`)
 			}
 			const [, token] = match
 			const authResult = await this.apiKeyManager.verifyAndProlong(token)
 			if (!authResult.valid) {
-				return createGraphqlInvalidAuthResponse(ctx, `Auth failure: ${authResult.error}`)
+				return ctx.state.fail.authorizationFailure(authResult.error)
 			}
 			ctx.state.authResult = authResult
 			await next()

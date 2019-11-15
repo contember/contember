@@ -17,6 +17,7 @@ let authKey = ''
 let loginToken = ''
 
 const container = new CompositionRoot().createMasterContainer(
+	true,
 	{
 		tenant: {
 			db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),

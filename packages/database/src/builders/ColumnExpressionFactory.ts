@@ -1,7 +1,7 @@
 import { QueryBuilder } from './QueryBuilder'
 import { Literal } from '../Literal'
 import { Value } from '../types'
-import { ConditionBuilder } from './ConditionBuilder'
+import { ConditionBuilder, ConditionCallback } from './ConditionBuilder'
 import { WindowFunction } from './WindowFunction'
 import { CaseStatement } from './CaseStatement'
 import { toFqnWrap } from './formatUtils'
@@ -18,9 +18,8 @@ export class ColumnExpressionFactory {
 		return new Literal(sql, [value])
 	}
 
-	public selectCondition(condition: QueryBuilder.ConditionCallback): Literal | undefined {
-		const builder = new ConditionBuilder()
-		condition(builder)
+	public selectCondition(condition: ConditionCallback): Literal | undefined {
+		const builder = ConditionBuilder.invoke(condition)
 		return builder.getSql() || undefined
 	}
 

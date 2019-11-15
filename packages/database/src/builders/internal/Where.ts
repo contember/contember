@@ -1,6 +1,6 @@
 import { wrapIdentifier } from '../../utils'
 import { Literal } from '../../Literal'
-import { ConditionBuilder } from '../ConditionBuilder'
+import { ConditionBuilder, ConditionCallback } from '../ConditionBuilder'
 import { Value } from '../../types'
 
 namespace Where {
@@ -15,8 +15,7 @@ namespace Where {
 			if (typeof expression !== 'function') {
 				return new Statement([...this.values, expression])
 			}
-			const builder = new ConditionBuilder()
-			expression(builder)
+			const builder = ConditionBuilder.invoke(expression)
 			const sql = builder.getSql()
 			if (!sql) {
 				return this
@@ -50,7 +49,6 @@ namespace Where {
 		where(expression: Expression): any
 	}
 
-	export type ConditionCallback = (whereClause: ConditionBuilder) => void
 	export type ValueWhere = { [columName: string]: Value }
 	export type Expression = ValueWhere | ConditionCallback | Literal
 }

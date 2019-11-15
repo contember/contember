@@ -38,10 +38,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 						expr.case(caseExpr =>
 							caseExpr
 								.when(
-									whenExpr =>
-										whenExpr.selectCondition(condition => {
-											cb(condition)
-										}),
+									whenExpr => whenExpr.selectCondition(cb),
 									thenExpr => thenExpr.select([tableAlias, column.columnName]),
 								)
 								.else(elseExpr => elseExpr.raw('null')),

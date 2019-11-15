@@ -1,65 +1,55 @@
 import { Input } from '@contember/schema'
-import { QueryBuilder, ConditionBuilder as SqlConditionBuilder } from '@contember/database'
+import { QueryBuilder, ConditionBuilder as SqlConditionBuilder, Operator } from '@contember/database'
+import { UserError } from '../../graphQlResolver'
 
 export default class ConditionBuilder {
 	public build(
-		clause: SqlConditionBuilder,
+		builder: SqlConditionBuilder,
 		tableName: string,
 		columnName: string,
 		condition: Input.Condition<any>,
-	): void {
-		const keys = Object.keys(condition)
+	): SqlConditionBuilder {
+		const keys = Object.keys(condition) as (keyof Required<Input.Condition<any>>)[]
+		if (keys.length === 0) {
+			return builder
+		}
 		if (keys.length > 1) {
-			throw new Error()
+			throw new UserError('Only single field is allowed. If you want to combine multiple conditions, use "and" or "or"')
+		}
+		const columnIdentifier: QueryBuilder.ColumnIdentifier = [tableName, columnName]
+
+		const handler: {
+			[K in keyof Required<Input.Condition<any>>]: (
+				builder: SqlConditionBuilder,
+				param: Exclude<Input.Condition<any>[K], undefined>,
+			) => SqlConditionBuilder
+		} = {
+			and: (builder, expressions) =>
+				builder.and(builder2 =>
+					expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, expr), builder2),
+				),
+			or: (builder, expressions) =>
+				builder.or(builder2 =>
+					expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, expr), builder2),
+				),
+			not: (builder, expression) => builder.not(builder2 => this.build(builder2, tableName, columnName, expression)),
+			eq: (builder, value) => builder.compare(columnIdentifier, Operator.eq, value),
+			notEq: (builder, value) => builder.compare(columnIdentifier, Operator.notEq, value),
+			isNull: (builder, value) =>
+				value ? builder.null(columnIdentifier) : builder.not(clause => clause.null(columnIdentifier)),
+			in: (builder, values) => builder.in(columnIdentifier, values),
+			notIn: (builder, values) => builder.not(builder2 => builder2.in(columnIdentifier, values)),
+			lt: (builder, value) => builder.compare(columnIdentifier, Operator.lt, value),
+			lte: (builder, value) => builder.compare(columnIdentifier, Operator.lte, value),
+			gt: (builder, value) => builder.compare(columnIdentifier, Operator.gt, value),
+			gte: (builder, value) => builder.compare(columnIdentifier, Operator.gte, value),
+			never: builder => builder.raw('false'),
+			always: builder => builder.raw('true'),
+			// deprecated
+			null: (builder, value) =>
+				value ? builder.null(columnIdentifier) : builder.not(clause => clause.null(columnIdentifier)),
 		}
 
-		clause.and(clause => {
-			if (condition.and !== undefined) {
-				condition.and.forEach(it => this.build(clause, tableName, columnName, it))
-			}
-			if (condition.or !== undefined) {
-				condition.or.forEach(it => clause.or(clause => this.build(clause, tableName, columnName, it)))
-			}
-			if (condition.not !== undefined) {
-				clause.not(qb => this.build(qb, tableName, columnName, condition))
-			}
-
-			const columnIdentifier: QueryBuilder.ColumnIdentifier = [tableName, columnName]
-
-			if (condition.eq !== undefined) {
-				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.eq, condition.eq)
-			}
-			if (condition.null !== undefined) {
-				condition.null ? clause.null(columnIdentifier) : clause.not(clause => clause.null(columnIdentifier))
-			}
-			if (condition.notEq !== undefined) {
-				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.notEq, condition.notEq)
-			}
-			if (condition.in !== undefined) {
-				clause.in(columnIdentifier, condition.in)
-			}
-			if (condition.notIn !== undefined) {
-				const values = condition.notIn
-				clause.not(clause => clause.in(columnIdentifier, values))
-			}
-			if (condition.lt !== undefined) {
-				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.lt, condition.lt)
-			}
-			if (condition.lte !== undefined) {
-				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.lte, condition.lte)
-			}
-			if (condition.gt !== undefined) {
-				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.gt, condition.gt)
-			}
-			if (condition.gte !== undefined) {
-				clause.compare(columnIdentifier, SqlConditionBuilder.Operator.gte, condition.gte)
-			}
-			if (condition.never) {
-				clause.raw('false')
-			}
-			if (condition.always) {
-				clause.raw('true')
-			}
-		})
+		return handler[keys[0]](builder, condition[keys[0]])
 	}
 }

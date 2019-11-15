@@ -2,7 +2,7 @@ import { tuple } from '@contember/utils'
 import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { resolveValue } from '../utils'
-import { Client } from '@contember/database'
+import { Client, Operator } from '@contember/database'
 import { QueryBuilder } from '@contember/database'
 import { Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
@@ -113,7 +113,7 @@ export default class UpdateBuilder {
 				qb = qb.from('newData_')
 				const col1 = tuple(this.entity.tableName, this.entity.primaryColumn)
 				const col2 = tuple('newData_', this.entity.primaryColumn)
-				qb = qb.where(expr => expr.compareColumns(col1, ConditionBuilder.Operator.eq, col2))
+				qb = qb.where(expr => expr.compareColumns(col1, Operator.eq, col2))
 				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
 				return qb
 			})

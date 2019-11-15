@@ -165,8 +165,13 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'projectMigrationInfoResolver',
-					({ queryHandler, migrationsResolver, project }) =>
-						new ProjectMigrationInfoResolver(project, migrationsResolver, queryHandler),
+					({ migrationFilesManager, queryHandler, migrationsResolver, project }) =>
+						new ProjectMigrationInfoResolver(
+							migrationFilesManager.directory,
+							project,
+							migrationsResolver,
+							queryHandler,
+						),
 				)
 				.addService(
 					'projectMigrator',

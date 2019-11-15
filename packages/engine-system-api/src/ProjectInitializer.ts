@@ -30,7 +30,7 @@ class ProjectInitializer {
 	private async createInitEvent() {
 		const rowCount = new CreateInitEventCommand(this.providers).execute(this.projectDb)
 		if (rowCount) {
-			console.log(`Created init event for project ${this.project.slug}`)
+			console.log(`${this.project.slug}: Created init event for project`)
 		}
 	}
 
@@ -39,9 +39,9 @@ class ProjectInitializer {
 		const createStage = async (parent: StageConfig | null, stage: StageConfig) => {
 			const created = await this.stageCreator.createStage(parent, stage)
 			if (created) {
-				console.log(`Created stage ${stage.slug} of project ${this.project.slug}`)
+				console.log(`${this.project.slug}: Created stage ${stage.slug} `)
 			} else {
-				console.log(`Updated stage ${stage.slug} of project ${this.project.slug}`)
+				console.log(`${this.project.slug}: Updated stage ${stage.slug}`)
 			}
 		}
 		const createRecursive = async (parent: StageConfig | null, stage: StageConfig) => {
@@ -56,16 +56,27 @@ class ProjectInitializer {
 	}
 
 	private async runMigrations() {
-		const { currentVersion, migrationsToExecute } = await this.projectMigrationInfoResolver.getMigrationsInfo()
+		const {
+			currentVersion,
+			migrationsToExecute,
+			migrationsDirectory,
+			allMigrations,
+		} = await this.projectMigrationInfoResolver.getMigrationsInfo()
+
+		console.log(`${this.project.slug}: reading migrations from directory "${migrationsDirectory}"`)
+		if (allMigrations.length === 0) {
+			console.warn(`${this.project.slug}: No migrations for project found.`)
+			return
+		}
 
 		if (migrationsToExecute.length === 0) {
-			console.log(`No migrations to execute for project ${this.project.slug}`)
+			console.log(`${this.project.slug}: No migrations to execute for project`)
 			return
 		}
 		await this.rebaseExecutor.rebaseAll()
 
 		await this.projectMigrator.migrate(currentVersion, migrationsToExecute, version =>
-			console.log(`Executing migration ${version} for project ${this.project.slug} `),
+			console.log(`${this.project.slug}: Executing migration ${version}`),
 		)
 	}
 }

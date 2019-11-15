@@ -1,11 +1,13 @@
 import { KoaMiddleware } from '../../core/koa'
 import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
-import { ProjectResolveMiddlewareFactory, throwProjectNotFound } from './ProjectResolveMiddlewareFactory'
+import { ProjectResolveMiddlewareFactory } from './ProjectResolveMiddlewareFactory'
 import { ProjectMemberManager } from '@contember/engine-tenant-api'
+import { ErrorResponseMiddlewareState } from '../ErrorResponseMiddlewareFactory'
 
 type InputState = ProjectMemberMiddlewareFactory.KoaState &
 	AuthMiddlewareFactory.KoaState &
-	ProjectResolveMiddlewareFactory.KoaState
+	ProjectResolveMiddlewareFactory.KoaState &
+	ErrorResponseMiddlewareState
 class ProjectMemberMiddlewareFactory {
 	constructor(private readonly projectMemberManager: ProjectMemberManager) {}
 
@@ -17,7 +19,7 @@ class ProjectMemberMiddlewareFactory {
 				roles: ctx.state.authResult.roles,
 			})
 			if (projectMemberships.length === 0) {
-				return throwProjectNotFound(ctx, project.slug)
+				return ctx.state.fail.projectForbidden(project.slug)
 			}
 			ctx.state.projectMemberships = projectMemberships
 			await next()

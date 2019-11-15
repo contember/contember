@@ -44,7 +44,6 @@ import { Config, ProjectWithS3 } from './config/config'
 import { S3SchemaFactory, S3Service } from '@contember/engine-s3-plugin'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
-import { getArgumentValues } from 'graphql/execution/values'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
 import {
 	ModificationHandlerFactory,
@@ -52,6 +51,8 @@ import {
 } from '@contember/schema-migrations'
 import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
+import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
+import { getArgumentValues } from 'graphql/execution/values'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -61,11 +62,12 @@ export interface MasterContainer {
 
 class CompositionRoot {
 	createMasterContainer(
+		debug: boolean,
 		config: Config,
 		projectsDirectory: string,
 		projectSchemas?: { [name: string]: Schema },
 	): MasterContainer {
-		const projectContainers = this.createProjectContainers(config.projects, projectsDirectory, projectSchemas)
+		const projectContainers = this.createProjectContainers(debug, config.projects, projectsDirectory, projectSchemas)
 
 		const projectContainerResolver: ProjectContainerResolver = slug =>
 			projectContainers.find(it => it.project.slug === slug)
@@ -151,6 +153,7 @@ class CompositionRoot {
 					),
 			)
 			.addService('timerMiddlewareFactory', () => new TimerMiddlewareFactory())
+			.addService('errorResponseMiddlewareFactory', () => new ErrorResponseMiddlewareFactory(debug))
 
 			.addService(
 				'middlewareStackFactory',
@@ -160,9 +163,11 @@ class CompositionRoot {
 					contentMiddlewareFactory,
 					tenantMiddlewareFactory,
 					systemMiddlewareFactory,
+					errorResponseMiddlewareFactory,
 				}) =>
 					new MiddlewareStackFactory(
 						timerMiddlewareFactory,
+						errorResponseMiddlewareFactory,
 						homepageMiddlewareFactory,
 						contentMiddlewareFactory,
 						tenantMiddlewareFactory,
@@ -193,6 +198,7 @@ class CompositionRoot {
 	}
 
 	createProjectContainers(
+		debug: boolean,
 		projects: Array<ProjectWithS3>,
 		projectsDir: string,
 		schemas?: Record<string, Schema>,
@@ -263,7 +269,7 @@ class CompositionRoot {
 					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory }) =>
 						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory),
 				)
-				.addService('apolloServerFactory', () => new ContentApolloServerFactory())
+				.addService('apolloServerFactory', () => new ContentApolloServerFactory(debug))
 				.addService(
 					'contentApolloMiddlewareFactory',
 					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory, schema }) =>
@@ -283,7 +289,6 @@ class CompositionRoot {
 					'migrationsResolver',
 					'migrationFilesManager',
 					'contentPermissionsVerifier',
-					'schemaMigrator',
 					'modificationHandlerFactory',
 					'schemaVersionBuilder',
 					'providers',

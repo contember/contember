@@ -86,7 +86,6 @@ export class ApiTester {
 			contentPermissionsVerifier: new PermissionsVerifier(
 				new PermissionsByIdentityFactory([new PermissionsByIdentityFactory.RoleBasedPermissionFactory()]),
 			),
-			schemaMigrator,
 			modificationHandlerFactory,
 			providers: { uuid: createUuidGenerator('a452') },
 		})

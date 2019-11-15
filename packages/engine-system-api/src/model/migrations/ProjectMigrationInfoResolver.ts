@@ -6,6 +6,7 @@ import { DatabaseQueryable } from '@contember/database'
 
 class ProjectMigrationInfoResolver {
 	constructor(
+		private readonly migrationsDirectory: string,
 		private readonly project: ProjectConfig,
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
@@ -27,18 +28,21 @@ class ProjectMigrationInfoResolver {
 
 		// todo check previously executed migrations
 
-		const migrationsToExecute = (await this.migrationsResolver.getMigrations()).filter(
+		const allMigrations = await this.migrationsResolver.getMigrations()
+		const migrationsToExecute = allMigrations.filter(
 			({ version }) => currentVersion === null || version > currentVersion,
 		)
 
-		return { currentVersion, migrationsToExecute }
+		return { migrationsDirectory: this.migrationsDirectory, currentVersion, migrationsToExecute, allMigrations }
 	}
 }
 
 namespace ProjectMigrationInfoResolver {
 	export interface Result {
+		migrationsDirectory: string
 		currentVersion: string | null
 		migrationsToExecute: Migration[]
+		allMigrations: Migration[]
 	}
 }
 

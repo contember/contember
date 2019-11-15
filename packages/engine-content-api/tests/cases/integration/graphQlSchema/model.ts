@@ -4,7 +4,7 @@ export const Locale = d.createEnum('cs', 'en')
 
 export class Author {
 	name = d.stringColumn()
-	posts: d.OneHasManyDefinition = d.oneHasMany(Post, 'author')
+	posts: d.OneHasManyDefinition = d.oneHasMany(Post, 'author').orderBy('publishedAt', d.OrderDirection.desc)
 }
 
 export class Post {

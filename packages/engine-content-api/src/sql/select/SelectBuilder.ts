@@ -46,14 +46,14 @@ export default class SelectBuilder {
 		if (where) {
 			this.qb = this.whereBuilder.build(this.qb, entity, path, where)
 		}
-		const orderBy = input.args.orderBy
+		const orderBy = input.args.orderBy || []
 
 		if (groupBy) {
 			const groupByColumn = getColumnName(this.schema, entity, groupBy)
 			this.queryWrapper = new LimitByGroupWrapper(
 				[path.getAlias(), groupByColumn],
 				(orderable, qb) => {
-					if (orderBy) {
+					if (orderBy.length > 0) {
 						;[qb, orderable] = this.orderByBuilder.build(this.qb, orderable, entity, new Path([]), orderBy)
 					}
 					return [orderable, qb]
@@ -62,7 +62,7 @@ export default class SelectBuilder {
 				input.args.limit,
 			)
 		} else {
-			if (orderBy) {
+			if (orderBy.length > 0) {
 				;[this.qb] = this.orderByBuilder.build(this.qb, this.qb, entity, path, orderBy)
 			}
 			if (input.args.limit) {

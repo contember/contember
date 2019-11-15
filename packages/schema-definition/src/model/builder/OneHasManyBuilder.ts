@@ -35,6 +35,11 @@ class OneHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>>
 		return this.withOption('ownerNullable', true)
 	}
 
+	orderBy(field: string | string[], direction: Model.OrderDirection = Model.OrderDirection.asc): OneHasManyBuilder<O> {
+		const path = typeof field === 'string' ? [field] : field
+		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
+	}
+
 	getOption(): O {
 		return this.options
 	}
@@ -53,6 +58,7 @@ namespace OneHasManyBuilder {
 		ownedBy?: string
 		ownerJoiningColumn?: Partial<Model.JoiningColumn>
 		ownerNullable?: boolean
+		orderBy?: Model.OrderBy[]
 	}
 }
 

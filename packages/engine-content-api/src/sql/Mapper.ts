@@ -20,6 +20,7 @@ import SqlUpdateInputProcessor from './update/SqlUpdateInputProcessor'
 import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
 import { ForeignKeyViolation, NotNullConstraintViolation, UniqueKeyViolation } from './Constraints'
 import { NoResultError } from './NoResultError'
+import { OrderByHelper } from './select/OrderByHelper'
 
 class Mapper {
 	constructor(
@@ -110,11 +111,12 @@ class Mapper {
 		input: ObjectNode<Input.ListQueryInput>,
 		groupBy?: string,
 	) {
+		const inputWithOrder = OrderByHelper.appendDefaultOrderBy(entity, input, [])
 		const path = new Path([])
 		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
-		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, input), path, groupBy)
+		const selectPromise = selector.select(entity, this.predicatesInjector.inject(entity, inputWithOrder), path, groupBy)
 		const rows = await selector.execute()
 		await selectPromise
 

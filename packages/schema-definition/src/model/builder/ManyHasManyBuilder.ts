@@ -23,6 +23,11 @@ class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>
 		return this.withOption('joiningTable', joiningTable)
 	}
 
+	orderBy(field: string | string[], direction: Model.OrderDirection = Model.OrderDirection.asc): ManyHasManyBuilder<O> {
+		const path = typeof field === 'string' ? [field] : field
+		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
+	}
+
 	getOption(): O {
 		return this.options
 	}
@@ -40,6 +45,7 @@ namespace ManyHasManyBuilder {
 		target: string
 		inversedBy?: string
 		joiningTable?: Model.JoiningTable
+		orderBy?: Model.OrderBy[]
 	}
 }
 

@@ -1,7 +1,6 @@
 import { Model } from '@contember/schema'
-import { Interface } from './types'
+import { Interface, RelationTarget } from './types'
 import FieldDefinition from './FieldDefinition'
-import { RelationTarget } from './types'
 
 class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition.Options> {
 	type = 'ManyHasManyDefinition' as const
@@ -12,6 +11,14 @@ class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition.Option
 
 	joiningTable(joiningTable: Model.JoiningTable): Interface<ManyHasManyDefinition> {
 		return this.withOption('joiningTable', joiningTable)
+	}
+
+	orderBy(
+		field: string | string[],
+		direction: Model.OrderDirection = Model.OrderDirection.asc,
+	): Interface<ManyHasManyDefinition> {
+		const path = typeof field === 'string' ? [field] : field
+		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
 	createField({ name, conventions, entityName, entityRegistry }: FieldDefinition.CreateFieldContext): Model.AnyField {
@@ -37,6 +44,7 @@ class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition.Option
 			...(typeof options.inversedBy === 'undefined' ? {} : { inversedBy: options.inversedBy }),
 			target: entityRegistry.getName(options.target),
 			joiningTable: joiningTable,
+			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 		}
 	}
 }
@@ -46,6 +54,7 @@ namespace ManyHasManyDefinition {
 		target: RelationTarget
 		inversedBy?: string
 		joiningTable?: Model.JoiningTable
+		orderBy?: Model.OrderBy[]
 	}
 }
 

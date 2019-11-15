@@ -5,7 +5,7 @@ import { Compiler } from './Compiler'
 import { QueryBuilder } from './QueryBuilder'
 import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
-import { ConditionBuilder } from './ConditionBuilder'
+import { ConditionBuilder, ConditionCallback } from './ConditionBuilder'
 import { LockType } from './LockType'
 import { columnExpressionToLiteral, toFqnWrap } from './utils'
 
@@ -102,8 +102,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		if (joinCondition === undefined) {
 			return undefined
 		}
-		const builder = new ConditionBuilder()
-		joinCondition(builder)
+		const builder = ConditionBuilder.invoke(joinCondition)
 
 		return builder.getSql() || undefined
 	}
@@ -199,7 +198,7 @@ namespace SelectBuilder {
 			}
 	>
 
-	export type JoinCondition = (joinClause: ConditionBuilder) => void
+	export type JoinCondition = ConditionCallback
 }
 
 export { SelectBuilder }

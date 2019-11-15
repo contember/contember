@@ -32,6 +32,7 @@ export default class ConditionTypeProvider {
 
 				eq: { type: type },
 				null: { type: this.graphqlObjectFactories.boolean },
+				isNull: { type: this.graphqlObjectFactories.boolean },
 				notEq: { type: type },
 				in: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(type)) },
 				notIn: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(type)) },

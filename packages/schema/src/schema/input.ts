@@ -131,7 +131,8 @@ namespace Input {
 		not?: Condition<T>
 
 		eq?: T
-		null?: boolean
+		null?: boolean // deprecated
+		isNull?: boolean
 		notEq?: T
 		in?: T[]
 		notIn?: T[]

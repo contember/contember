@@ -1,6 +1,6 @@
 import { QueryBuilder } from './QueryBuilder'
 import { SelectBuilder } from './SelectBuilder'
-import { ConditionBuilder } from './ConditionBuilder'
+import { ConditionBuilder, Operator } from './ConditionBuilder'
 
 class LimitByGroupWrapper {
 	constructor(
@@ -49,14 +49,12 @@ class LimitByGroupWrapper {
 
 			const start = this.skip || 0
 			if (start > 0) {
-				wrapperQb = wrapperQb.where(expr => expr.compare(['data', 'rowNumber_'], ConditionBuilder.Operator.gt, start))
+				wrapperQb = wrapperQb.where(expr => expr.compare(['data', 'rowNumber_'], Operator.gt, start))
 			}
 
 			const limit = this.limit
 			if (limit !== undefined) {
-				wrapperQb = wrapperQb.where(expr =>
-					expr.compare(['data', 'rowNumber_'], ConditionBuilder.Operator.lte, start + limit),
-				)
+				wrapperQb = wrapperQb.where(expr => expr.compare(['data', 'rowNumber_'], Operator.lte, start + limit))
 			}
 
 			return await wrapperQb.getResult()

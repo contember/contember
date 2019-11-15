@@ -1,4 +1,4 @@
-import { ConditionBuilder, DatabaseQueryable, DatabaseQuery } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
 import { ApiKey } from '../type'
 
 class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
@@ -19,7 +19,7 @@ class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 			.select(['api_key', 'expiration'])
 			.from('api_key')
 			.join('identity', 'identity', joinClause =>
-				joinClause.compareColumns(['api_key', 'identity_id'], ConditionBuilder.Operator.eq, ['identity', 'id']),
+				joinClause.compareColumns(['api_key', 'identity_id'], Operator.eq, ['identity', 'id']),
 			)
 			.where({
 				token_hash: tokenHash,

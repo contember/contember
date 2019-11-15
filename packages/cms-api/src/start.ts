@@ -27,7 +27,8 @@ import { Server } from 'net'
 			}
 		})
 	}
-	server = await run(configFile, projectsDir)
+	const debug = process.env.NODE_ENV === 'development'
+	server = await run(debug, configFile, projectsDir)
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

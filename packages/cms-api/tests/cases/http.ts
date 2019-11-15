@@ -16,40 +16,43 @@ const dbCredentials = (dbName: string) => {
 let authKey = ''
 let loginToken = ''
 
-const container = new CompositionRoot().createMasterContainer(
-	{
-		tenant: {
-			db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
-		},
-		projects: [
-			{
-				directory: './',
-				dbCredentials: dbCredentials(String(process.env.TEST_DB_NAME)),
-				name: 'test',
-				slug: 'test',
-				s3: {
-					bucket: '',
-					credentials: {
-						key: '',
-						secret: '',
-					},
-					prefix: '',
-					region: '',
-				},
-				stages: [{ name: 'prod', slug: 'prod' }],
+const createContainer = (debug: boolean) =>
+	new CompositionRoot().createMasterContainer(
+		debug,
+		{
+			tenant: {
+				db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
 			},
-		],
-		server: {
-			port: 0,
+			projects: [
+				{
+					directory: './',
+					dbCredentials: dbCredentials(String(process.env.TEST_DB_NAME)),
+					name: 'test',
+					slug: 'test',
+					s3: {
+						bucket: '',
+						credentials: {
+							key: '',
+							secret: '',
+						},
+						prefix: '',
+						region: '',
+					},
+					stages: [{ name: 'prod', slug: 'prod' }],
+				},
+			],
+			server: {
+				port: 0,
+			},
 		},
-	},
-	getExampleProjectDirectory(),
-)
+		getExampleProjectDirectory(),
+	)
 
 const executeGraphql = (
 	query: string,
-	options: { authorizationToken?: string; path?: string; variables?: Record<string, any> } = {},
+	options: { authorizationToken?: string; path?: string; variables?: Record<string, any>; debug?: boolean } = {},
 ) => {
+	const container = createContainer(options.debug || false)
 	return supertest(container.koa.callback())
 		.post(options.path || '/content/test/prod')
 		.set('Authorization', 'Bearer ' + (options.authorizationToken || authKey))
@@ -84,7 +87,7 @@ beforeAll(async () => {
 	await connection.end()
 	const connection2 = await recreateDatabase(String(process.env.TEST_DB_NAME_TENANT))
 	await connection2.end()
-	await container.initializer.initialize()
+	await createContainer(false).initializer.initialize()
 
 	const response = await executeGraphql(
 		`mutation {
@@ -115,7 +118,7 @@ beforeAll(async () => {
 
 describe('http tests', () => {
 	it('homepage runs', async () => {
-		await supertest(container.koa.callback())
+		await supertest(createContainer(false).koa.callback())
 			.get('/')
 			.expect(200)
 			.expect('App is running')
@@ -239,7 +242,21 @@ describe('http tests', () => {
 			{ authorizationToken: authKey },
 		)
 			.expect(404)
-			.expect('Project test NOT found')
+			.expect({ errors: [{ message: 'Project test NOT found', code: 404 }] })
+
+		await executeGraphql(
+			`query {
+		listTag {
+			id
+		}
+}`,
+			{ authorizationToken: authKey, debug: true },
+		)
+			.expect(403)
+			.expect({
+				errors: [{ message: 'You are not allowed to access project test', code: 403 }],
+				identity: { roles: ['person'] },
+			})
 
 		await executeGraphql(
 			`mutation($identity: String!) {

@@ -1,7 +1,8 @@
 import { KoaContext, KoaMiddleware, KoaRequestState } from '../../core/koa'
 import { ProjectContainer, ProjectContainerResolver } from '../../ProjectContainer'
+import { ErrorResponseMiddlewareState } from '../ErrorResponseMiddlewareFactory'
 
-type InputState = ProjectResolveMiddlewareFactory.KoaState & KoaRequestState
+type InputState = ProjectResolveMiddlewareFactory.KoaState & KoaRequestState & ErrorResponseMiddlewareState
 
 class ProjectResolveMiddlewareFactory {
 	constructor(private readonly projectContainerResolver: ProjectContainerResolver) {}
@@ -12,7 +13,7 @@ class ProjectResolveMiddlewareFactory {
 			const projectContainer = this.projectContainerResolver(projectSlug)
 
 			if (projectContainer === undefined) {
-				return throwProjectNotFound(ctx, projectSlug)
+				return ctx.state.fail.projectNotFound(projectSlug)
 			}
 			ctx.state.projectContainer = projectContainer
 			await next()
@@ -26,8 +27,5 @@ namespace ProjectResolveMiddlewareFactory {
 		projectContainer: ProjectContainer
 	}
 }
-
-export const throwProjectNotFound = (ctx: KoaContext<any>, projectSlug: string) =>
-	ctx.throw(404, `Project ${projectSlug} NOT found`)
 
 export { ProjectResolveMiddlewareFactory }

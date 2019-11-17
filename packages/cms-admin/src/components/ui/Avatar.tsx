@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cn from 'classnames'
-import gravatar from 'gravatar'
+import md5 from 'blueimp-md5'
 
 export enum AvatarSize {
 	Size1 = 1,
@@ -30,10 +30,7 @@ export const Avatar: React.FunctionComponent<AvatarProps> = props => {
 			{
 				<img
 					className="avatar-image"
-					src={gravatar.url(email, {
-						s: `${size * 40}`,
-						d: 'mp',
-					})}
+					src={`https://s.gravatar.com/avatar/${md5(email.trim().toLowerCase())}?s=${size * 40}&d=mp`}
 					alt={email.substring(0, 1).toUpperCase()}
 				/>
 			}

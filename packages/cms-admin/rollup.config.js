@@ -53,6 +53,22 @@ const commonJsConfig = {
 		esrever: ['reverse'],
 	},
 }
+const resolveConfig = {
+	preferBuiltins: true,
+	dedupe: ['react', 'react-dom', 'react-is'],
+	customResolveOptions: {
+		packageFilter: packageJson => {
+			if (packageJson.name === '@contember/ui' || packageJson.name === '@contember/react-multipass-rendering') {
+				return {
+					...packageJson,
+					main: 'dist/bundle.js',
+				}
+			}
+			return packageJson
+		},
+	},
+	// modulesOnly: true
+}
 
 const getReplaceConfig = isProd => ({
 	//__DEV__: JSON.stringify(isProd ? 'true' : 'false'),
@@ -70,11 +86,7 @@ export default [
 		external: ['react', 'react-dom'],
 		plugins: [
 			replace(getReplaceConfig(true)),
-			resolve({
-				preferBuiltins: true,
-				dedupe: ['react', 'react-dom', 'react-is'],
-				// modulesOnly: true
-			}),
+			resolve(resolveConfig),
 			commonjs(commonJsConfig),
 			terser({
 				sourcemap: true,
@@ -93,14 +105,6 @@ export default [
 			sourcemap: false,
 		},
 		external: ['jasmine'],
-		plugins: [
-			replace(getReplaceConfig(false)),
-			resolve({
-				preferBuiltins: true,
-				dedupe: ['react', 'react-dom', 'react-is'],
-				// modulesOnly: true
-			}),
-			commonjs(commonJsConfig),
-		],
+		plugins: [replace(getReplaceConfig(false)), resolve(resolveConfig), commonjs(commonJsConfig)],
 	},
 ]

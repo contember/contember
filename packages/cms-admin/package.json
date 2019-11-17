@@ -9,11 +9,6 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@blueprintjs/core": "^3.7.0",
-		"@blueprintjs/datetime": "^3.0.0",
-		"@blueprintjs/icons": "^3.11.0",
-		"@blueprintjs/select": "^3.0.0",
-		"@blueprintjs/table": "^3.0.0",
 		"@contember/client": "^0.2.8",
 		"@contember/react-multipass-rendering": "^0.2.8",
 		"@contember/schema": "^0.2.5",

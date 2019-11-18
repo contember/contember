@@ -14,8 +14,7 @@ export default {
 	external: ['react', 'react-dom'],
 	plugins: [
 		replace({
-			//__DEV__: 'false',
-			'process.env.NODE_ENV': 'production',
+			'process.env.NODE_ENV': JSON.stringify('production'),
 		}),
 		resolve({
 			preferBuiltins: true,

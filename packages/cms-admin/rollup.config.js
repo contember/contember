@@ -2,7 +2,7 @@ import replace from '@rollup/plugin-replace'
 //import analyzer from 'rollup-plugin-analyzer'
 import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
-import { terser } from 'rollup-plugin-terser'
+//import { terser } from 'rollup-plugin-terser'
 import visualizer from 'rollup-plugin-visualizer'
 
 const commonJsConfig = {
@@ -88,9 +88,9 @@ export default [
 			replace(getReplaceConfig(true)),
 			resolve(resolveConfig),
 			commonjs(commonJsConfig),
-			terser({
-				sourcemap: true,
-			}),
+			//terser({
+			//	sourcemap: true,
+			//}),
 			visualizer({
 				filename: 'dist/bundleStats.html',
 				sourcemap: true,

@@ -2,7 +2,7 @@ import analyzer from 'rollup-plugin-analyzer'
 import replace from '@rollup/plugin-replace'
 import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
-import { terser } from 'rollup-plugin-terser'
+//import { terser } from 'rollup-plugin-terser'
 
 export default {
 	input: 'dist/src/index.js',
@@ -26,9 +26,9 @@ export default {
 				['prop-types']: ['oneOfType', 'func', 'shape', 'any', 'number', 'object', 'bool', 'string'],
 			},
 		}),
-		terser({
-			sourcemap: true,
-		}),
+		//terser({
+		//	sourcemap: true,
+		//}),
 		analyzer(),
 	],
 }

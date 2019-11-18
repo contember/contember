@@ -1,7 +1,7 @@
 import replace from '@rollup/plugin-replace'
 import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
-import { terser } from 'rollup-plugin-terser'
+//import { terser } from 'rollup-plugin-terser'
 
 export default [
 	{
@@ -19,7 +19,7 @@ export default [
 			}),
 			resolve(),
 			commonjs(),
-			terser(),
+			//terser(),
 		],
 	},
 	{

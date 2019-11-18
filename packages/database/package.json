@@ -1,6 +1,6 @@
 {
 	"name": "@contember/database",
-	"version": "0.2.8",
+	"version": "0.2.9",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
@@ -12,7 +12,7 @@
 		"pg": "^7.12.1"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.2.8",
+		"@contember/database-tester": "^0.2.9",
 		"@types/jasmine": "^3.4.5",
 		"@types/node": "^12.11.7",
 		"@types/pg": "^7.11.0",

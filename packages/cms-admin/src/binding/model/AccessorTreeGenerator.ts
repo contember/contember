@@ -344,11 +344,11 @@ class AccessorTreeGenerator {
 
 		let inBatchUpdateMode = false
 		const updateAccessorInstance = () => {
-			return (collectionAccessor = new EntityListAccessor(
-				collectionAccessor.entities.slice(),
-				collectionAccessor.errors,
-				collectionAccessor.batchUpdates,
-				collectionAccessor.addNew,
+			return (listAccessor = new EntityListAccessor(
+				listAccessor.entities.slice(),
+				listAccessor.errors,
+				listAccessor.batchUpdates,
+				listAccessor.addNew,
 			))
 		}
 		const performUpdate = () => {
@@ -356,10 +356,10 @@ class AccessorTreeGenerator {
 		}
 		const batchUpdates: BatchEntityListUpdates = performUpdates => {
 			inBatchUpdateMode = true
-			const accessorBeforeUpdates = collectionAccessor
-			performUpdates(() => collectionAccessor)
+			const accessorBeforeUpdates = listAccessor
+			performUpdates(() => listAccessor)
 			inBatchUpdateMode = false
-			if (accessorBeforeUpdates !== collectionAccessor) {
+			if (accessorBeforeUpdates !== listAccessor) {
 				performUpdate()
 			}
 		}
@@ -367,7 +367,7 @@ class AccessorTreeGenerator {
 			if (childInBatchUpdateMode[i] && !(newValue instanceof EntityAccessor)) {
 				throw new DataBindingError(`Removing entities while they are being batch updated is a no-op.`)
 			}
-			collectionAccessor.entities[i] = newValue
+			listAccessor.entities[i] = newValue
 
 			if (childInBatchUpdateMode[i] || inBatchUpdateMode) {
 				updateAccessorInstance()
@@ -378,7 +378,7 @@ class AccessorTreeGenerator {
 		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData, i: number): EntityAccessor => {
 			const childErrors = errors && i in errors.children ? errors.children[i] : undefined
 			const onUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => {
-				const entityAccessor = collectionAccessor.entities[i]
+				const entityAccessor = listAccessor.entities[i]
 				if (entityAccessor instanceof EntityAccessor) {
 					onUpdateProxy(i, this.withUpdatedField(entityAccessor, updatedField, updatedData))
 				} else if (entityAccessor instanceof EntityForRemovalAccessor) {
@@ -386,10 +386,10 @@ class AccessorTreeGenerator {
 				}
 			}
 			const batchUpdates: BatchEntityUpdates = performUpdates => {
-				const accessorBeforeUpdates = collectionAccessor.entities[i]
+				const accessorBeforeUpdates = listAccessor.entities[i]
 				childInBatchUpdateMode[i] = true
 				performUpdates(() => {
-					const accessor = collectionAccessor.entities[i]
+					const accessor = listAccessor.entities[i]
 					if (accessor instanceof EntityAccessor) {
 						return accessor
 					}
@@ -397,33 +397,33 @@ class AccessorTreeGenerator {
 				})
 				childInBatchUpdateMode[i] = false
 
-				if (accessorBeforeUpdates !== collectionAccessor.entities[i]) {
+				if (accessorBeforeUpdates !== listAccessor.entities[i]) {
 					performUpdate()
 				}
 			}
 			const onReplace: OnReplace = replacement => {
-				const entityAccessor = collectionAccessor.entities[i]
+				const entityAccessor = listAccessor.entities[i]
 				if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
 					return onUpdateProxy(i, this.asDifferentEntity(entityAccessor, replacement, onRemove))
 				}
 				return this.rejectInvalidAccessorTree()
 			}
 			const onRemove = (removalType: EntityAccessor.RemovalType) => {
-				onUpdateProxy(i, this.removeEntity(collectionAccessor.entities[i], removalType))
+				onUpdateProxy(i, this.removeEntity(listAccessor.entities[i], removalType))
 			}
 
 			childInBatchUpdateMode[i] = false
 			return this.updateFields(datum, entityFields, childErrors, onUpdate, onReplace, batchUpdates, onRemove)
 		}
-		let collectionAccessor = new EntityListAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
-			const newEntityIndex = collectionAccessor.entities.length
+		let listAccessor = new EntityListAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
+			const newEntityIndex = listAccessor.entities.length
 			const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity, newEntityIndex)
 
 			if (typeof newEntity === 'function') {
-				if (!collectionAccessor.batchUpdates) {
+				if (!listAccessor.batchUpdates) {
 					throw new DataBindingError(`Internally inconsistent Accessor tree detected. This should never happen.`)
 				}
-				collectionAccessor.batchUpdates(getAccessor => {
+				listAccessor.batchUpdates(getAccessor => {
 					onUpdateProxy(newEntityIndex, newAccessor)
 					newEntity(getAccessor, newEntityIndex)
 				})
@@ -445,11 +445,11 @@ class AccessorTreeGenerator {
 		const childInBatchUpdateMode: boolean[] = []
 
 		for (let i = 0, len = sourceData.length; i < len; i++) {
-			collectionAccessor.entities.push(generateNewAccessor(sourceData[i], i))
+			listAccessor.entities.push(generateNewAccessor(sourceData[i], i))
 			childInBatchUpdateMode.push(false)
 		}
 
-		return collectionAccessor
+		return listAccessor
 	}
 
 	private withUpdatedField(

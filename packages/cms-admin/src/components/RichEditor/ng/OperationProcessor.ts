@@ -4,7 +4,7 @@ import JsonBlockSerializer from './JsonBlockSerializer'
 import { GraphQlBuilder } from '@contember/client'
 import { BlocksDefinitions } from './types'
 
-type GetCollectionAccessor = () => EntityListAccessor
+type GetListAccessor = () => EntityListAccessor
 
 export default class OperationProcessor {
 	constructor(
@@ -17,22 +17,22 @@ export default class OperationProcessor {
 
 	private readonly blockNodesSerializer = new JsonBlockSerializer()
 
-	private getLastInCollection = (getCollectionAccessor: GetCollectionAccessor): EntityAccessor => {
-		const collectionAccessorAfterAddition = getCollectionAccessor()
-		const entity = collectionAccessorAfterAddition.entities[collectionAccessorAfterAddition.entities.length - 1]
+	private getLastInCollection = (getListAccessor: GetListAccessor): EntityAccessor => {
+		const listAccessorAfterAddition = getListAccessor()
+		const entity = listAccessorAfterAddition.entities[listAccessorAfterAddition.entities.length - 1]
 		if (!(entity instanceof EntityAccessor)) {
 			throw new Error('')
 		}
 		return entity
 	}
 
-	private addToEnd = (getCollectionAccessor: GetCollectionAccessor, type: string): EntityAccessor => {
-		const collectionAccessor = getCollectionAccessor()
-		if (collectionAccessor.addNew === undefined) {
+	private addToEnd = (getListAccessor: GetListAccessor, type: string): EntityAccessor => {
+		const listAccessor = getListAccessor()
+		if (listAccessor.addNew === undefined) {
 			throw new Error('')
 		}
-		collectionAccessor.addNew && collectionAccessor.addNew()
-		const entity = this.getLastInCollection(getCollectionAccessor)
+		listAccessor.addNew && listAccessor.addNew()
+		const entity = this.getLastInCollection(getListAccessor)
 		const typeField = entity.data.getField(this.typeField)
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('')
@@ -41,7 +41,7 @@ export default class OperationProcessor {
 			throw new Error('')
 		}
 		typeField.updateValue(new GraphQlBuilder.Literal(type))
-		return this.getLastInCollection(getCollectionAccessor)
+		return this.getLastInCollection(getListAccessor)
 	}
 
 	processValue(value: Value) {

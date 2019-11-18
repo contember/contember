@@ -161,8 +161,8 @@ namespace Sortable {
 		}
 
 		private getBatchUpdater = (order: EntityOrder) => (getAccessor: () => EntityListAccessor) => {
-			let collectionAccessor: EntityListAccessor = getAccessor()
-			for (const entity of collectionAccessor.entities) {
+			let listAccessor: EntityListAccessor = getAccessor()
+			for (const entity of listAccessor.entities) {
 				if (!(entity instanceof EntityAccessor)) {
 					continue
 				}
@@ -171,7 +171,7 @@ namespace Sortable {
 
 				if (target !== undefined && orderField instanceof FieldAccessor && orderField.updateValue) {
 					orderField.updateValue(target)
-					collectionAccessor = getAccessor()
+					listAccessor = getAccessor()
 				}
 			}
 		}
@@ -229,8 +229,8 @@ namespace Sortable {
 
 		private prependNew = () => {
 			this.props.entities.addNew &&
-				this.props.entities.addNew((getCollectionAccessor, newIndex) => {
-					let accessor = getCollectionAccessor()
+				this.props.entities.addNew((getListAccessor, newIndex) => {
+					let accessor = getListAccessor()
 					let newlyAdded = accessor.entities[newIndex]
 
 					if (!(newlyAdded instanceof EntityAccessor)) {
@@ -245,7 +245,7 @@ namespace Sortable {
 
 					sortableField.updateValue && sortableField.updateValue(this.entities.length)
 
-					accessor = getCollectionAccessor()
+					accessor = getListAccessor()
 					newlyAdded = accessor.entities[newIndex]
 
 					if (!(newlyAdded instanceof EntityAccessor)) {
@@ -296,7 +296,7 @@ namespace Sortable {
 		private fixOrderlessEntities() {
 			this.props.entities.batchUpdates &&
 				this.props.entities.batchUpdates(getAccessor => {
-					let collectionAccessor: EntityListAccessor = getAccessor()
+					let listAccessor: EntityListAccessor = getAccessor()
 					for (const [i, entity] of this.entities.entries()) {
 						if (!(entity instanceof EntityAccessor)) {
 							continue
@@ -306,7 +306,7 @@ namespace Sortable {
 
 						if (orderField instanceof FieldAccessor && orderField.currentValue === null && orderField.updateValue) {
 							orderField.updateValue(i)
-							collectionAccessor = getAccessor()
+							listAccessor = getAccessor()
 						}
 					}
 				})

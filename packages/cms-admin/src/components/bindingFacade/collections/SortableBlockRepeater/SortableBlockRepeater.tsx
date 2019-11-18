@@ -15,7 +15,7 @@ export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
 
 export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 	props => {
-		const collectionAccessor = useRelativeEntityList(props.field)
+		const listAccessor = useRelativeEntityList(props.field)
 		const isMutating = useMutationState()
 		const normalizedBlockList: NormalizedBlockProps[] = useNormalizedBlockList(props.children)
 		const blockChildren = React.useMemo(
@@ -28,11 +28,11 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 
 		return (
 			// Intentionally not applying label system middleware
-			<FieldSet legend={props.label} errors={collectionAccessor.errors}>
+			<FieldSet legend={props.label} errors={listAccessor.errors}>
 				<div className="cloneable">
 					<div className="cloneable-content">
 						<Sortable
-							entities={collectionAccessor}
+							entities={listAccessor}
 							sortBy={props.sortBy}
 							label={props.label}
 							enableAddingNew={false}
@@ -44,9 +44,9 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 							{blockChildren}
 						</Sortable>
 					</div>
-					{collectionAccessor.addNew && (
+					{listAccessor.addNew && (
 						<AddNewBlockButton
-							addNew={collectionAccessor.addNew}
+							addNew={listAccessor.addNew}
 							normalizedBlockProps={normalizedBlockList}
 							isMutating={isMutating}
 							discriminationField={props.discriminationField}

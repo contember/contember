@@ -28,7 +28,7 @@ export const Box = React.memo(({ actions, children, heading, distinction }: BoxP
 			)}
 			{actions && <div className="box-actions">{actions}</div>}
 			<div className="box-content">
-				<IncreaseHeadingDepth currentDepth={headingDepth}>
+				<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={!!heading}>
 					<IncreaseBoxDepth currentDepth={boxDepth} onlyIf={distinction !== 'seamlessIfNested'}>
 						{children}
 					</IncreaseBoxDepth>

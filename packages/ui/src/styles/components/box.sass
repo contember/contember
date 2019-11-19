@@ -3,6 +3,10 @@
 .#{$cui-conf-globalPrefix}box
 	+boxNesting
 
+	& & + &-section:not(:first-child)
+		border-top: none
+		padding-top: 0
+
 	&.view-seamless,
 	& &.view-seamlessIfNested
 		box-shadow: none

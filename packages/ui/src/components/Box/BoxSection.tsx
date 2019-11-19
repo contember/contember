@@ -13,10 +13,11 @@ export interface BoxSectionProps {
 }
 
 export const BoxSection = React.memo(({ actions, children, heading }: BoxSectionProps) => {
+	const boxDepth = React.useContext(BoxDepthContext)
 	const headingDepth = React.useContext(HeadingDepthContext)
 
 	return (
-		<div className={cn('box-section')}>
+		<div className={cn('box-section', toViewClass(`depth-${Math.max(boxDepth - 1, 1)}`, true))}>
 			{heading && (
 				<div className="box-section-heading">
 					<Heading depth={headingDepth} size="small">

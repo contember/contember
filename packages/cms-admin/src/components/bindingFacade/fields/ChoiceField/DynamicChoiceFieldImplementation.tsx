@@ -25,7 +25,7 @@ export type DynamicChoiceFieldImplementationProps = ChoiceFieldData.BaseProps &
 export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoiceFieldImplementationProps) => {
 	const parsedOptions = Parser.parseQueryLanguageExpression(
 		props.options,
-		props.optionFieldFactory ? Parser.EntryPoint.QualifiedEntityList : Parser.EntryPoint.QualifiedFieldList,
+		props.optionFieldStaticFactory ? Parser.EntryPoint.QualifiedEntityList : Parser.EntryPoint.QualifiedFieldList,
 		props.environment,
 	)
 	const { toOneProps } = parsedOptions
@@ -65,13 +65,19 @@ export const DynamicChoiceFieldImplementation = React.memo((props: DynamicChoice
 
 	const normalizedData = optionEntities.map(
 		(item, i): ChoiceFieldData.SingleDatum => {
-			let label: React.ReactNode
+			let label: string = ''
 
-			if (props.optionFieldFactory) {
-				label = <ToOne.AccessorRenderer accessor={item}>{props.optionFieldFactory}</ToOne.AccessorRenderer>
+			if (props.optionFieldStaticFactory) {
+				if (props.renderOptionText) {
+					label = props.renderOptionText(item)
+				} else if (process.env.NODE_ENV === 'development') {
+					throw new DataBindingError(
+						`Cannot use a ChoiceField with custom fields but without providing the 'renderOptionText' prop.`,
+					)
+				}
 			} else if ('fieldName' in parsedOptions) {
 				const field = item.data.getField(parsedOptions.fieldName)
-				label = field instanceof FieldAccessor ? (field.currentValue as React.ReactNode) : null
+				label = field instanceof FieldAccessor && typeof field.currentValue === 'string' ? field.currentValue : ''
 			}
 
 			return {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
 import { EntityName } from '../bindingTypes'
-import { MarkerTreeRoot } from '../dao'
+import { MarkerTreeRoot } from '../markers'
 import { Component } from './Component'
 
 interface EntityCreatorProps {

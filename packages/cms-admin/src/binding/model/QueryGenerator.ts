@@ -11,7 +11,7 @@ import {
 	MarkerTreeRoot,
 	ReferenceMarker,
 	SingleEntityTreeConstraints,
-} from '../dao'
+} from '../markers'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
 

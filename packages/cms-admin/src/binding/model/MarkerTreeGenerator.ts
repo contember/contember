@@ -1,18 +1,10 @@
-import { ChildrenAnalyzer, BranchNode, RawNodeRepresentation, Leaf } from '@contember/react-multipass-rendering'
+import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import { FieldName } from '../bindingTypes'
-import { MarkerProvider, NamedComponent } from '../coreComponents'
-import {
-	ConnectionMarker,
-	DataBindingError,
-	EntityFields,
-	Environment,
-	FieldMarker,
-	Marker,
-	MarkerTreeRoot,
-	ReferenceMarker,
-} from '../dao'
+import { MarkerProvider } from '../coreComponents'
+import { DataBindingError, Environment } from '../dao'
+import { ConnectionMarker, EntityFields, FieldMarker, Marker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { Hashing } from '../utils'
 
 type Terminals = FieldMarker | ConnectionMarker

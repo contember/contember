@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { ConnectionMarker, Environment, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
+import { Environment } from '../dao'
+import { ConnectionMarker, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 
 export interface NamedComponent {
 	displayName: string

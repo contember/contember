@@ -2,7 +2,7 @@ import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
 import { ExpectedCount } from '../bindingTypes'
-import { MarkerTreeConstraints, ReferenceMarker } from '../dao'
+import { MarkerTreeConstraints, ReferenceMarker } from '../markers'
 
 export class Hashing {
 	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {

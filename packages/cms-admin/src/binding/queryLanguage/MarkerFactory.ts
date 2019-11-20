@@ -1,14 +1,14 @@
 import { Input } from '@contember/schema'
 import { GraphQlBuilder } from '@contember/client'
 import { EntityName, FieldName, Filter, RelativeSingleField, UniqueWhere } from '../bindingTypes'
+import { Environment } from '../dao'
 import {
 	ConnectionMarker,
 	EntityFields,
 	EntityListTreeConstraints,
-	Environment,
 	MarkerTreeRoot,
 	SingleEntityTreeConstraints,
-} from '../dao'
+} from '../markers'
 import { QueryLanguage } from './QueryLanguage'
 
 export namespace MarkerFactory {

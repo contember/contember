@@ -32,5 +32,5 @@ export const MultiEditRenderer = Component<MultiEditRendererProps>(
 			</MutableEntityListRenderer>
 		</MutableContentLayoutRenderer>
 	),
-	'',
+	'MultiEditRenderer',
 )

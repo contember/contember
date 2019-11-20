@@ -17,7 +17,7 @@ export namespace ChoiceFieldData {
 
 	export interface SingleDatum<ActualValue extends Environment.Value = string> {
 		key: ValueRepresentation
-		label: React.ReactNode
+		label: string
 		description?: React.ReactNode
 		actualValue: ActualValue
 	}
@@ -44,9 +44,14 @@ export namespace ChoiceFieldData {
 		name: FieldName
 	}
 
-	export type BaseProps = ChoiceFieldPublicProps & {
-		optionFieldFactory?: React.ReactNode
-	} & (
+	export interface ChoiceFieldOptionFactoryProps {
+		renderOptionText?: (entityAccessor: EntityAccessor) => string
+		optionFieldStaticFactory?: React.ReactNode
+	}
+
+	export type BaseProps = ChoiceFieldPublicProps &
+		ChoiceFieldOptionFactoryProps &
+		(
 			| {
 					arity: ChoiceArity.Single
 					children: (metadata: SingleChoiceFieldMetadata) => React.ReactElement | null

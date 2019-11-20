@@ -1,12 +1,11 @@
 import cn from 'classnames'
 import * as React from 'react'
-import ReactDOM from 'react-dom'
 import { ControlDistinction, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'
 
 export interface SelectOption {
 	value: string | number
-	label: React.ReactNode
+	label: string
 	disabled?: boolean
 }
 
@@ -49,17 +48,9 @@ export const Select = React.memo(
 								HTMLOptionElement
 							> = {
 								value: option.value,
+								children: option.label,
 								disabled: option.disabled,
 								key: option.value,
-							}
-							if (typeof option.label === 'object' && option.label !== null) {
-								const div = document.createElement('div')
-								ReactDOM.render(option.label as React.ReactElement, div)
-								optionProps.dangerouslySetInnerHTML = {
-									__html: div.innerHTML,
-								}
-							} else {
-								optionProps.children = option.label
 							}
 							return <option {...optionProps} />
 						})}

@@ -12,7 +12,7 @@ import {
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {
-	label: React.ReactNode
+	label: string
 	description?: React.ReactNode
 }
 

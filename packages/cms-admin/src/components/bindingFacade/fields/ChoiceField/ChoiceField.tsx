@@ -32,7 +32,8 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 						options: this.props.options,
 						arity: this.props.arity,
 						children: this.props.children,
-						optionFieldFactory: this.props.optionFieldFactory,
+						renderOptionText: this.props.renderOptionText,
+						optionFieldStaticFactory: this.props.optionFieldStaticFactory,
 					}
 
 					if (Array.isArray(this.props.options)) {
@@ -54,8 +55,8 @@ class ChoiceField extends React.PureComponent<ChoiceFieldProps> {
 
 		const metadata:
 			| QueryLanguage.WrappedQualifiedEntityList
-			| QueryLanguage.WrappedQualifiedFieldList = props.optionFieldFactory
-			? QueryLanguage.wrapQualifiedEntityList(props.options, props.optionFieldFactory, environment)
+			| QueryLanguage.WrappedQualifiedFieldList = props.optionFieldStaticFactory
+			? QueryLanguage.wrapQualifiedEntityList(props.options, props.optionFieldStaticFactory, environment)
 			: QueryLanguage.wrapQualifiedFieldList(props.options, fieldName => <Field name={fieldName} />, environment)
 
 		return QueryLanguage.wrapRelativeSingleField(props.name, environment, fieldName => (

@@ -4,12 +4,14 @@ import { Component, Environment, ErrorAccessor, FieldName } from '../../../bindi
 
 import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
 
-export interface SelectFieldPublicProps extends Omit<FormGroupProps, 'children'> {
+export interface SelectFieldPublicProps
+	extends Omit<FormGroupProps, 'children'>,
+		Omit<ChoiceFieldData.ChoiceFieldOptionFactoryProps, 'optionFieldStaticFactory'> {
 	name: FieldName
-	firstOptionCaption?: React.ReactNode
+	firstOptionCaption?: string
 	options: ChoiceFieldProps['options']
 	allowNull?: boolean
-	children?: ChoiceFieldProps['optionFieldFactory']
+	children?: ChoiceFieldData.ChoiceFieldOptionFactoryProps['optionFieldStaticFactory']
 }
 
 export type SelectFieldProps = SelectFieldPublicProps
@@ -20,7 +22,8 @@ export const SelectField = Component<SelectFieldProps>(props => {
 			name={props.name}
 			options={props.options}
 			arity={ChoiceFieldData.ChoiceArity.Single}
-			optionFieldFactory={props.children}
+			optionFieldStaticFactory={props.children}
+			renderOptionText={props.renderOptionText}
 		>
 			{({
 				data,
@@ -61,7 +64,7 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 		const options = Array<SelectOption>({
 			disabled: this.props.allowNull !== true,
 			value: -1,
-			label: this.props.firstOptionCaption || this.props.label || '',
+			label: this.props.firstOptionCaption || (typeof this.props.label === 'string' ? this.props.label : ''),
 		}).concat(
 			this.props.data.map(({ key, label }) => {
 				return {

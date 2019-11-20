@@ -547,9 +547,9 @@ $cui-menu-caret-transition-duration: $cui-collapsible-transition-duration !defau
 
 
 // Spinner
-$cui-spinner-appearSpeed: .2s !default;
-$cui-spinner-color: currentColor !default;
-$cui-spinner-period: 1.5s !default;
+$cui-spinner-softColor: $cui-color-gray-3 !default;
+$cui-spinner-accentColor: $cui-color-gray-6 !default;
+$cui-spinner-period: .6s !default;
 
 // Container spinner
 $cui-containerSpinner-default-size: 2.5em !default;

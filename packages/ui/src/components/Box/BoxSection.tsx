@@ -1,13 +1,12 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { IncreaseBoxDepth, IncreaseHeadingDepth } from '../../auxiliary'
+import { IncreaseHeadingDepth } from '../../auxiliary'
 import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
-import { BoxDistinction } from '../../types'
-import { toEnumViewClass, toViewClass } from '../../utils'
+import { toViewClass } from '../../utils'
 import { Heading } from '../Heading'
 
 export interface BoxSectionProps {
-	heading?: React.ReactNode
+	heading: React.ReactNode
 	actions?: React.ReactNode
 	children: React.ReactNode
 }

@@ -1,5 +1,5 @@
 import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
-import { EntityListAccessor } from '../dao'
+import { EntityListAccessor } from '../accessors'
 import { useEntityContext } from './useEntityContext'
 
 export const useEntityListAccessor = (field: FieldName, filter?: Filter) => {

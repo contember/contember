@@ -1,5 +1,5 @@
 import { Value } from 'slate'
-import { EntityAccessor, EntityListAccessor, EntityForRemovalAccessor, FieldAccessor } from '../../../binding/dao'
+import { EntityAccessor, EntityListAccessor, EntityForRemovalAccessor, FieldAccessor } from '../../../binding'
 import JsonBlockSerializer from './JsonBlockSerializer'
 import { GraphQlBuilder } from '@contember/client'
 import { BlocksDefinitions } from './types'

@@ -1,8 +1,9 @@
 import { GraphQlBuilder } from '@contember/client'
 import { FieldName } from '../bindingTypes'
 import { ToOne } from '../coreComponents'
-import { DataBindingError, EntityAccessor, FieldAccessor } from '../dao'
+import { EntityAccessor, FieldAccessor } from '../accessors'
 import { Scalar } from '../accessorTree'
+import { DataBindingError } from '../dao'
 import { getNestedEntity } from './getNestedEntity'
 
 export const getNestedField = <

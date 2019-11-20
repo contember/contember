@@ -1,7 +1,7 @@
 import { Input } from '@contember/schema'
 import { GraphQlBuilder } from '@contember/client'
 import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
-import { EntityAccessor } from '../dao'
+import { EntityAccessor } from '../accessors'
 import { useEntityContext } from './useEntityContext'
 
 export const useEntityAccessor = (

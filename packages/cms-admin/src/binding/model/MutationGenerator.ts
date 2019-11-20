@@ -1,17 +1,17 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { assertNever, isEmptyObject } from '@contember/utils'
-import { ReceivedData, ReceivedEntityData, Scalar } from '../accessorTree'
-import { EntityName, ExpectedCount, PRIMARY_KEY_NAME } from '../bindingTypes'
 import {
 	AccessorTreeRoot,
-	DataBindingError,
 	EntityAccessor,
 	EntityForRemovalAccessor,
 	EntityListAccessor,
 	FieldAccessor,
 	RootAccessor,
-} from '../dao'
+} from '../accessors'
+import { ReceivedData, ReceivedEntityData, Scalar } from '../accessorTree'
+import { EntityName, ExpectedCount, PRIMARY_KEY_NAME } from '../bindingTypes'
+import { DataBindingError } from '../dao'
 import {
 	ConnectionMarker,
 	EntityFields,

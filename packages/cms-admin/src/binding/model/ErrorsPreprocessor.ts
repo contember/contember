@@ -1,6 +1,6 @@
 import { assertNever } from '@contember/utils'
 import { MutationDataResponse, MutationError, MutationResponse } from '../accessorTree'
-import { ErrorAccessor } from '../dao'
+import { ErrorAccessor } from '../accessors'
 import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {

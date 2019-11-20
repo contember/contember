@@ -2,17 +2,17 @@ import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData, Scalar } from '../accessorTree'
 import { ExpectedCount, FieldName, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { DataBindingError } from '../dao'
 import {
 	Accessor,
 	AccessorTreeRoot,
-	DataBindingError,
 	EntityAccessor,
 	EntityData,
 	EntityForRemovalAccessor,
 	EntityListAccessor,
 	FieldAccessor,
 	RootAccessor,
-} from '../dao'
+} from '../accessors'
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 

@@ -1,5 +1,6 @@
 import { ToMany, ToOne } from '../coreComponents'
-import { DataBindingError, EntityAccessor, EntityListAccessor } from '../dao'
+import { EntityAccessor, EntityListAccessor } from '../accessors'
+import { DataBindingError } from '../dao'
 import { getNestedEntity } from './getNestedEntity'
 
 export const getNestedEntityList = (

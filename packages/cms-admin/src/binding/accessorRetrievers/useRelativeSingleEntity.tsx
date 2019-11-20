@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useEnvironment } from './useEnvironment'
 import { RelativeSingleEntity } from '../bindingTypes'
-import { EntityAccessor } from '../dao'
+import { EntityAccessor } from '../accessors'
 import { Parser } from '../queryLanguage'
 import { getNestedEntity } from './getNestedEntity'
 import { useEntityContext } from './useEntityContext'

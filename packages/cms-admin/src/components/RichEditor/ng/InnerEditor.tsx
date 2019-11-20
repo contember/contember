@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MutableRefObject, useCallback, useMemo, useRef, useState } from 'react'
 import { BlocksDefinitions, InlinesDefinitions, MarksDefinitions } from './types'
-import { EntityAccessor, EntityListAccessor, FieldAccessor } from '../../../binding/dao'
+import { EntityAccessor, EntityListAccessor, FieldAccessor } from '../../../binding'
 import { Block, Data, Document, Inline, Rules, Selection, Text, Value } from 'slate'
 import { Editor, EditorProps, OnChangeFn, Plugin } from 'slate-react'
 import { GraphQlBuilder } from '@contember/client'

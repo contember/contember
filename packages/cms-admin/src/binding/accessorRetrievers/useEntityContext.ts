@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { DataBindingError, EntityAccessor } from '../dao'
+import { EntityAccessor } from '../accessors'
+import { DataBindingError } from '../dao'
 import { AccessorContext } from './AccessorContext'
 
 export const useEntityContext = (): EntityAccessor => {

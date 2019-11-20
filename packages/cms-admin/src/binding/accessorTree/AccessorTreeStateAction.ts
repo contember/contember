@@ -1,4 +1,4 @@
-import { AccessorTreeRoot } from '../dao'
+import { AccessorTreeRoot } from '../accessors'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'

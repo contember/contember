@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RelativeEntityList } from '../bindingTypes'
-import { EntityListAccessor } from '../dao'
+import { EntityListAccessor } from '../accessors'
 import { Parser } from '../queryLanguage'
 import { getNestedEntityList } from './getNestedEntityList'
 import { useEntityContext } from './useEntityContext'

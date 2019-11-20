@@ -1,3 +1,4 @@
+import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { Aether, Box, BoxSection } from '../../src'
@@ -21,6 +22,12 @@ storiesOf('Box', module)
 	.add('with a heading', () => (
 		<BoxStoryWrapper>
 			<Box heading="Lorem ipsum">{loremIpsum}</Box>
+		</BoxStoryWrapper>
+	))
+	.add('active', () => (
+		<BoxStoryWrapper>
+			<Box heading="Lorem ipsum" isActive={boolean('Is active', false)}>{loremIpsum}</Box>
+			<Box heading="Dolor sit">{loremIpsum}</Box>
 		</BoxStoryWrapper>
 	))
 	.add('nesting', () => (

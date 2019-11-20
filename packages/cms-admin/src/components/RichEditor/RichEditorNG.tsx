@@ -1,4 +1,5 @@
-import { EntityListAccessor, Environment } from '../../binding/dao'
+import { EntityListAccessor } from '../../binding/accessors'
+import { Environment } from '../../binding/dao'
 import { QueryLanguage } from '../../binding/queryLanguage'
 import { EnvironmentContext, Field, ToMany } from '../../binding'
 import * as React from 'react'

@@ -1,16 +1,10 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { AccessorContext, useEnvironment } from '../accessorRetrievers'
+import { EntityAccessor, EntityForRemovalAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
 import { Scalar, useMutationState } from '../accessorTree'
 import { FieldName, RelativeSingleField, VariableInput } from '../bindingTypes'
-import {
-	DataBindingError,
-	EntityAccessor,
-	EntityForRemovalAccessor,
-	Environment,
-	ErrorAccessor,
-	FieldAccessor,
-} from '../dao'
+import { DataBindingError, Environment } from '../dao'
 import { FieldMarker } from '../markers'
 import { VariableInputTransformer } from '../model'
 import { QueryLanguage } from '../queryLanguage'

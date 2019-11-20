@@ -1,6 +1,7 @@
+import { EntityAccessor } from '../accessors'
 import { ExpectedCount } from '../bindingTypes'
 import { ToOne } from '../coreComponents'
-import { DataBindingError, EntityAccessor } from '../dao'
+import { DataBindingError } from '../dao'
 
 export const getNestedEntity = (entity: EntityAccessor, toOneProps: ToOne.AtomicPrimitiveProps[]) => {
 	for (let i = toOneProps.length - 1; i >= 0; i--) {

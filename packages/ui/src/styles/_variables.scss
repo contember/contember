@@ -406,6 +406,8 @@ $cui-heading-sizes: (
 );
 
 // Boxes
+$cui-box-active-color: $cui-control-view-default-distinction-color !default;
+
 $cui-box-depth-1-background: $cui-color-white !default;
 $cui-box-depth-1-separation: $cui-heading-1-fontSize-small !default;
 $cui-box-depth-1-separation-color: rgba($cui-color-gray-8, .15) !default;

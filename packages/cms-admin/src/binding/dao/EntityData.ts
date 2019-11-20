@@ -1,12 +1,11 @@
 import { FieldName } from '../bindingTypes'
+import { MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { PlaceholderGenerator } from '../markers/PlaceholderGenerator'
 import { AccessorTreeRoot } from './AccessorTreeRoot'
 import { EntityAccessor } from './EntityAccessor'
-import { EntityListAccessor } from './EntityListAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
+import { EntityListAccessor } from './EntityListAccessor'
 import { FieldAccessor } from './FieldAccessor'
-import { MarkerTreeRoot } from './MarkerTreeRoot'
-import { PlaceholderGenerator } from './PlaceholderGenerator'
-import { ReferenceMarker } from './ReferenceMarker'
 
 class EntityData {
 	public constructor(private data: EntityData.EntityData) {}

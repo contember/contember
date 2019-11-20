@@ -1,23 +1,19 @@
-import { assertNever } from '@contember/utils'
 import { GraphQlBuilder } from '@contember/client'
+import { assertNever } from '@contember/utils'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData, Scalar } from '../accessorTree'
 import { ExpectedCount, FieldName, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	Accessor,
 	AccessorTreeRoot,
-	ConnectionMarker,
 	DataBindingError,
 	EntityAccessor,
-	EntityListAccessor,
 	EntityData,
-	EntityFields,
 	EntityForRemovalAccessor,
+	EntityListAccessor,
 	FieldAccessor,
-	FieldMarker,
-	MarkerTreeRoot,
-	ReferenceMarker,
 	RootAccessor,
 } from '../dao'
+import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void

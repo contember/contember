@@ -1,10 +1,10 @@
+import { GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { assertNever } from '@contember/utils'
-import { GraphQlBuilder } from '@contember/client'
 import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
-import { PlaceholderGenerator } from './PlaceholderGenerator'
-import { DataBindingError } from './DataBindingError'
+import { DataBindingError } from '../dao'
 import { EntityFields } from './EntityFields'
+import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 class ReferenceMarker {
 	public readonly fieldName: FieldName

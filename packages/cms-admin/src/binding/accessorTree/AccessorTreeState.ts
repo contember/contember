@@ -1,4 +1,4 @@
-import { AccessorTreeRoot, MarkerTreeRoot } from '../dao'
+import { AccessorTreeRoot } from '../dao'
 import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'
 

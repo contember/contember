@@ -2,7 +2,7 @@ import { EntityName } from '../bindingTypes'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityListAccessor } from './EntityListAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
-import { MarkerTreeRoot } from './MarkerTreeRoot'
+import { MarkerTreeRoot } from '../markers'
 
 export type RootAccessor = (EntityAccessor | EntityForRemovalAccessor) | EntityListAccessor
 

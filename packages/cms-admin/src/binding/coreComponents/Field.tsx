@@ -10,9 +10,9 @@ import {
 	Environment,
 	ErrorAccessor,
 	FieldAccessor,
-	FieldMarker,
 } from '../dao'
-import { VariableInputTransformer } from '../model/VariableInputTransformer'
+import { FieldMarker } from '../markers'
+import { VariableInputTransformer } from '../model'
 import { QueryLanguage } from '../queryLanguage'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { FieldMarkerProvider } from './MarkerProvider'

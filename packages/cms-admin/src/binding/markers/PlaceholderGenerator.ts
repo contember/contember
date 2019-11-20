@@ -1,6 +1,9 @@
 import { FieldName } from '../bindingTypes'
-import { ConnectionMarker, FieldMarker, MarkerTreeRoot, ReferenceMarker } from './index'
 import { Hashing } from '../utils'
+import { ConnectionMarker } from './ConnectionMarker'
+import { FieldMarker } from './FieldMarker'
+import { MarkerTreeRoot } from './MarkerTreeRoot'
+import { ReferenceMarker } from './ReferenceMarker'
 
 export class PlaceholderGenerator {
 	public static generateFieldMarkerPlaceholder(marker: FieldMarker): string {

@@ -145,7 +145,7 @@ export class ChildrenAnalyzer<
 					if (factoryMethodName in treeNode) {
 						const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
 							any,
-							AllLeafsRepresentation,
+							AllBranchNodesRepresentation | AllLeafsRepresentation,
 							Environment
 						>
 						return factory(node.props, environment)
@@ -173,7 +173,7 @@ export class ChildrenAnalyzer<
 						const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
 							any,
 							unknown,
-							AllBranchNodesRepresentation,
+							AllBranchNodesRepresentation | AllLeafsRepresentation,
 							Environment
 						>
 						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)

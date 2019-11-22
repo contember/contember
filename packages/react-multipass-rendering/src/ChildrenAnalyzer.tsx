@@ -104,7 +104,7 @@ export class ChildrenAnalyzer<
 			return mapped
 		}
 
-		let children: React.ReactNode
+		let children: React.ReactNode = undefined
 
 		if ('type' in node) {
 			children = node.props.children

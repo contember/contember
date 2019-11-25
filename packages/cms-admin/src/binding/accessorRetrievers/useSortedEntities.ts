@@ -120,7 +120,7 @@ const reconcileOrderFields = (
 
 export const useSortedEntities = (
 	entityList: EntityListAccessor,
-	sortByField?: SugaredRelativeSingleField,
+	sortByField: SugaredRelativeSingleField | undefined,
 ): SortedEntities => {
 	const environment = useEnvironment()
 	const desugaredSortByField = React.useMemo(
@@ -193,6 +193,24 @@ export const useSortedEntities = (
 		},
 		[desugaredSortByField, entityList],
 	)
+
+	React.useEffect(() => {
+		if (!entityList.batchUpdates || !desugaredSortByField) {
+			return
+		}
+		entityList.batchUpdates(getAccessor => {
+			let listAccessor: EntityListAccessor = getAccessor()
+			for (let i = 0, len = sortedEntities.length; i < len; i++) {
+				const entity = sortedEntities[i]
+				const orderField = getRelativeSingleField(entity, desugaredSortByField)
+
+				if (orderField.currentValue === null && orderField.updateValue) {
+					orderField.updateValue(i)
+					listAccessor = getAccessor()
+				}
+			}
+		})
+	}, [desugaredSortByField, entityList, sortedEntities])
 
 	return React.useMemo<SortedEntities>(
 		() => ({

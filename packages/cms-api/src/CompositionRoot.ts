@@ -19,7 +19,7 @@ import {
 	TenantContainer,
 } from '@contember/engine-tenant-api'
 import { Schema } from '@contember/schema'
-import { Builder } from '@contember/dic'
+import { Builder, mergeContainers } from '@contember/dic'
 import {
 	AuthMiddlewareFactory,
 	ContentApolloMiddlewareFactory,
@@ -313,18 +313,20 @@ class CompositionRoot {
 				)
 				.build()
 
-			return projectContainer
-				.pick(
-					'project',
-					'contentApolloMiddlewareFactory',
-					'systemDbClient',
-					'systemQueryHandler',
-					'connection',
-					'systemDbMigrationsRunner',
-					'schemaVersionBuilder',
-				)
-				.merge(systemIntermediateContainer)
-				.merge(systemContainer.pick('systemExecutionContainerFactory'))
+			const projectServices = projectContainer.pick(
+				'project',
+				'contentApolloMiddlewareFactory',
+				'systemDbClient',
+				'systemQueryHandler',
+				'connection',
+				'systemDbMigrationsRunner',
+				'schemaVersionBuilder',
+			)
+
+			return mergeContainers(
+				mergeContainers(projectServices, systemIntermediateContainer),
+				systemContainer.pick('systemExecutionContainerFactory'),
+			)
 		})
 	}
 

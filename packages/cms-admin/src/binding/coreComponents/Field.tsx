@@ -1,18 +1,20 @@
+/*
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { AccessorContext, useEnvironment } from '../accessorRetrievers'
 import { EntityAccessor, EntityForRemovalAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
 import { Scalar, useMutationState } from '../accessorTree'
-import { FieldName, RelativeSingleField, VariableInput } from '../bindingTypes'
+import { VariableInput } from '../bindingTypes'
 import { DataBindingError, Environment } from '../dao'
 import { FieldMarker } from '../markers'
 import { VariableInputTransformer } from '../model'
 import { QueryLanguage } from '../queryLanguage'
+import { FieldName, SugaredRelativeSingleField } from '../treeParameters'
 import { EnforceSubtypeRelation } from './EnforceSubtypeRelation'
 import { FieldMarkerProvider } from './MarkerProvider'
 
 export interface FieldPublicProps {
-	name: RelativeSingleField
+	name: SugaredRelativeSingleField
 	defaultValue?: VariableInput | Scalar
 	isNonbearing?: boolean
 }
@@ -165,3 +167,45 @@ namespace Field {
 export { Field }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<typeof Field, FieldMarkerProvider<FieldProps>>
+*/
+
+import { GraphQlBuilder } from '@contember/client'
+import * as React from 'react'
+import { useRelativeSingleField } from '../accessorRetrievers'
+import { MarkerFactory } from '../markers'
+import { FieldValue, OptionallyVariableFieldValue, SugaredRelativeSingleField } from '../treeParameters'
+import { Component } from './Component'
+
+export interface FieldBasicProps {
+	name: SugaredRelativeSingleField
+	defaultValue?: OptionallyVariableFieldValue
+	isNonbearing?: boolean
+}
+
+export interface FieldRuntimeProps {
+	format?: (value: FieldValue) => React.ReactNode
+}
+
+export interface FieldProps extends FieldBasicProps, FieldRuntimeProps {}
+
+export const Field = Component<FieldProps>(
+	props => {
+		const field = useRelativeSingleField(props.name)
+
+		if (props.format !== undefined) {
+			return <>{props.format(field.currentValue)}</>
+		}
+
+		if (
+			field.currentValue instanceof GraphQlBuilder.Literal ||
+			field.currentValue === null ||
+			typeof field.currentValue === 'boolean'
+		) {
+			return null
+		}
+		return <>{field.currentValue}</>
+	},
+	(props, environment) =>
+		MarkerFactory.createFieldMarker(props.name, environment, props.defaultValue, props.isNonbearing),
+	'Field',
+)

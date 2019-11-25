@@ -1,8 +1,8 @@
-import { EntityName } from '../bindingTypes'
-import { EntityAccessor } from './EntityAccessor'
-import { EntityListAccessor } from './EntityListAccessor'
-import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { MarkerTreeRoot } from '../markers'
+import { EntityName } from '../treeParameters'
+import { EntityAccessor } from './EntityAccessor'
+import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
+import { EntityListAccessor } from './EntityListAccessor'
 
 export type RootAccessor = (EntityAccessor | EntityForRemovalAccessor) | EntityListAccessor
 

@@ -10,7 +10,7 @@ import {
 	RootAccessor,
 } from '../accessors'
 import { ReceivedData, ReceivedEntityData, Scalar } from '../accessorTree'
-import { EntityName, ExpectedCount, PRIMARY_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { DataBindingError } from '../dao'
 import {
 	ConnectionMarker,
@@ -20,6 +20,7 @@ import {
 	MarkerTreeRoot,
 	ReferenceMarker,
 } from '../markers'
+import { EntityName, ExpectedEntityCount } from '../treeParameters'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
@@ -54,7 +55,7 @@ export class MutationGenerator {
 		entityFields: EntityFields,
 		entity: RootAccessor,
 		alias: string,
-		constraints?: MarkerTreeConstraints,
+		constraints: MarkerTreeConstraints,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -105,7 +106,7 @@ export class MutationGenerator {
 		entity: EntityForRemovalAccessor,
 		entityName: EntityName,
 		alias: string,
-		constraints?: MarkerTreeConstraints,
+		constraints: MarkerTreeConstraints,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -116,7 +117,7 @@ export class MutationGenerator {
 			entityName,
 			builder => {
 				let where = {}
-				if (constraints && constraints.whereType === 'unique') {
+				if (constraints && constraints.type === 'unique') {
 					where = constraints.where
 				}
 
@@ -152,7 +153,7 @@ export class MutationGenerator {
 			entityName,
 			builder => {
 				let where = {}
-				if (constraints && constraints.whereType === 'unique') {
+				if (constraints && constraints.type === 'unique') {
 					where = constraints.where
 				}
 
@@ -189,7 +190,7 @@ export class MutationGenerator {
 				)
 				if (
 					constraints &&
-					constraints.whereType === 'unique' &&
+					constraints.type === 'unique' &&
 					writeBuilder.data !== undefined &&
 					!isEmptyObject(writeBuilder.data)
 				) {
@@ -252,7 +253,7 @@ export class MutationGenerator {
 					const reference = references[referencePlaceholder]
 					const accessor = allData[reference.placeholderName]
 
-					if (reference.expectedCount === ExpectedCount.UpToOne) {
+					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (accessor instanceof EntityAccessor) {
 							accessorReference.push({ accessor, reference, alias: referencePlaceholder })
 
@@ -260,7 +261,7 @@ export class MutationGenerator {
 								unreducedHasOnePresent = true
 							}
 						}
-					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
+					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
 						if (accessor instanceof EntityListAccessor) {
 							for (let i = 0, accessorCount = accessor.entities.length; i < accessorCount; i++) {
 								const innerAccessor = accessor.entities[i]
@@ -375,7 +376,7 @@ export class MutationGenerator {
 					const accessor = allData[reference.placeholderName]
 					const persistedField = persistedData ? persistedData[reference.placeholderName] : undefined
 
-					if (reference.expectedCount === ExpectedCount.UpToOne) {
+					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (
 							(accessor instanceof EntityAccessor || accessor instanceof EntityForRemovalAccessor) &&
 							((persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField)) ||
@@ -393,7 +394,7 @@ export class MutationGenerator {
 								unreducedHasOnePresent = true
 							}
 						}
-					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
+					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
 						if (
 							accessor instanceof EntityListAccessor &&
 							(Array.isArray(persistedField) || persistedField === undefined || persistedField === null)
@@ -441,9 +442,9 @@ export class MutationGenerator {
 							} else if (accessor instanceof EntityForRemovalAccessor) {
 								const removalType = accessor.removalType
 
-								if (removalType === EntityAccessor.RemovalType.Delete) {
+								if (removalType === 'delete') {
 									return builder.delete()
-								} else if (removalType === EntityAccessor.RemovalType.Disconnect) {
+								} else if (removalType === 'disconnect') {
 									return builder.disconnect()
 								}
 								assertNever(removalType)
@@ -481,9 +482,9 @@ export class MutationGenerator {
 							} else if (accessor instanceof EntityForRemovalAccessor) {
 								const removalType = accessor.removalType
 
-								if (removalType === EntityAccessor.RemovalType.Delete) {
+								if (removalType === 'delete') {
 									builder = builder.delete({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
-								} else if (removalType === EntityAccessor.RemovalType.Disconnect) {
+								} else if (removalType === 'disconnect') {
 									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 								} else {
 									assertNever(removalType)

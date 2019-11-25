@@ -1,6 +1,6 @@
-import { FieldName } from '../bindingTypes'
 import { MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { PlaceholderGenerator } from '../markers/PlaceholderGenerator'
+import { FieldName, SubTreeIdentifier } from '../treeParameters'
 import { AccessorTreeRoot } from './AccessorTreeRoot'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
@@ -43,9 +43,9 @@ class EntityData {
 		return this.data[placeholder]
 	}
 
-	public getTreeRoot(associatedField: FieldName): EntityData.FieldData
+	public getTreeRoot(subTreeIdentifier: SubTreeIdentifier): EntityData.FieldData
 	public getTreeRoot(id: MarkerTreeRoot.TreeId): EntityData.FieldData
-	public getTreeRoot(identifier: FieldName | MarkerTreeRoot.TreeId): EntityData.FieldData {
+	public getTreeRoot(identifier: SubTreeIdentifier | MarkerTreeRoot.TreeId): EntityData.FieldData {
 		return this.data[PlaceholderGenerator.getMarkerTreePlaceholder(identifier)]
 	}
 

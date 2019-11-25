@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
-import { ExpectedCount } from '../bindingTypes'
 import { MarkerTreeConstraints, ReferenceMarker } from '../markers'
+import { ExpectedEntityCount } from '../treeParameters/ExpectedEntityCount'
 
 export class Hashing {
 	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
@@ -11,26 +11,25 @@ export class Hashing {
 			| Input.UniqueWhere<GraphQlBuilder.Literal>
 			| Input.Where
 			| undefined
-			| ExpectedCount
+			| ExpectedEntityCount
 		> = [constraints.filter, constraints.reducedBy, constraints.expectedCount]
 
 		return Hashing.hashArray(where)
 	}
 
 	public static hashMarkerTreeConstraints(constraints: MarkerTreeConstraints): number {
-		if (constraints === undefined) {
+		if (constraints.type === 'unconstrained') {
 			return 0
-		}
-		if (constraints.whereType === 'nonUnique') {
+		} else if (constraints.type === 'nonUnique') {
 			return Hashing.hashArray([
-				constraints.whereType,
+				constraints.type,
 				constraints.filter,
 				constraints.orderBy,
 				constraints.offset,
 				constraints.limit,
 			])
-		} else if (constraints.whereType === 'unique') {
-			return Hashing.hashArray([constraints.whereType, constraints.where])
+		} else if (constraints.type === 'unique') {
+			return Hashing.hashArray([constraints.type, constraints.where])
 		}
 		assertNever(constraints)
 	}

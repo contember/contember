@@ -1,16 +1,15 @@
 import { CrudQueryBuilder } from '@contember/client'
-import { ucfirst } from '@contember/utils'
-import { assertNever } from '@contember/utils'
+import { assertNever, ucfirst } from '@contember/utils'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	ConnectionMarker,
 	EntityFields,
-	EntityListTreeConstraints,
 	FieldMarker,
 	Marker,
 	MarkerTreeRoot,
 	ReferenceMarker,
-	SingleEntityTreeConstraints,
+	TaggedEntityListTreeConstraints,
+	TaggedSingleEntityTreeConstraints,
 } from '../markers'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
@@ -33,23 +32,23 @@ export class QueryGenerator {
 			baseQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		if (subTree.constraints === undefined) {
+		if (subTree.constraints.type === 'unconstrained') {
 			const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
 				baseQueryBuilder,
 				this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
 			)
 			return populatedBaseQueryBuilder
-		} else if (subTree.constraints.whereType === 'unique') {
-			return this.addGetQuery(baseQueryBuilder, subTree as MarkerTreeRoot<SingleEntityTreeConstraints>)
-		} else if (subTree.constraints.whereType === 'nonUnique') {
-			return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<EntityListTreeConstraints>)
+		} else if (subTree.constraints.type === 'unique') {
+			return this.addGetQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedSingleEntityTreeConstraints>)
+		} else if (subTree.constraints.type === 'nonUnique') {
+			return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedEntityListTreeConstraints>)
 		}
 		assertNever(subTree.constraints)
 	}
 
 	private addGetQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>,
+		subTree: MarkerTreeRoot<TaggedSingleEntityTreeConstraints>,
 	): BaseQueryBuilder {
 		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
@@ -70,7 +69,7 @@ export class QueryGenerator {
 
 	private addListQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerTreeRoot<EntityListTreeConstraints>,
+		subTree: MarkerTreeRoot<TaggedEntityListTreeConstraints>,
 	): BaseQueryBuilder {
 		let finalBuilder: ReadBuilder
 

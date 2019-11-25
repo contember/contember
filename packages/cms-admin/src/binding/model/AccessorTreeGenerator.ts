@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData, Scalar } from '../accessorTree'
-import { ExpectedCount, FieldName, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { DataBindingError } from '../dao'
 import {
 	Accessor,
@@ -14,6 +14,7 @@ import {
 	RootAccessor,
 } from '../accessors'
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { ExpectedEntityCount, FieldName, RemovalType } from '../treeParameters'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityData.FieldData) => void
@@ -141,7 +142,7 @@ class AccessorTreeGenerator {
 							? errors.children[field.fieldName] || errors.children[referencePlaceholder] || undefined
 							: undefined
 
-					if (reference.expectedCount === ExpectedCount.UpToOne) {
+					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
 							throw new DataBindingError(
 								`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
@@ -165,7 +166,7 @@ class AccessorTreeGenerator {
 									`Perhaps you meant to use a variant of <Field />?`,
 							)
 						}
-					} else if (reference.expectedCount === ExpectedCount.PossiblyMany) {
+					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
 						if (fieldData === undefined || Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
 							entityData[referencePlaceholder] = this.generateEntityListAccessor(
 								referencePlaceholder,
@@ -301,7 +302,7 @@ class AccessorTreeGenerator {
 			}
 			return this.rejectInvalidAccessorTree()
 		}
-		const onRemove = (removalType: EntityAccessor.RemovalType) => {
+		const onRemove = (removalType: RemovalType) => {
 			onUpdateProxy(this.removeEntity(entityData[placeholderName], removalType))
 		}
 		const batchUpdates = (): BatchEntityUpdates => performUpdates => {
@@ -329,7 +330,7 @@ class AccessorTreeGenerator {
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
 		preferences: ReferenceMarker.ReferencePreferences = ReferenceMarker.defaultReferencePreferences[
-			ExpectedCount.PossiblyMany
+			ExpectedEntityCount.PossiblyMany
 		],
 	): EntityListAccessor {
 		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
@@ -404,7 +405,7 @@ class AccessorTreeGenerator {
 				}
 				return this.rejectInvalidAccessorTree()
 			}
-			const onRemove = (removalType: EntityAccessor.RemovalType) => {
+			const onRemove = (removalType: RemovalType) => {
 				onUpdateProxy(i, this.removeEntity(listAccessor.entities[i], removalType))
 			}
 
@@ -486,7 +487,7 @@ class AccessorTreeGenerator {
 
 	private removeEntity(
 		currentEntity: EntityData.FieldData,
-		removalType: EntityAccessor.RemovalType,
+		removalType: RemovalType,
 	): EntityForRemovalAccessor | undefined {
 		if (currentEntity instanceof EntityAccessor) {
 			const id = currentEntity.primaryKey

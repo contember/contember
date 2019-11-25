@@ -1,3 +1,4 @@
+import { RemovalType } from '../treeParameters'
 import { Accessor } from './Accessor'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityData } from './EntityData'
@@ -10,7 +11,7 @@ export class EntityForRemovalAccessor extends Accessor implements EntityAccessor
 		public readonly data: EntityData,
 		public readonly errors: ErrorAccessor[],
 		public readonly replaceWith: ((replacement: EntityAccessor) => void) | undefined,
-		public readonly removalType: EntityAccessor.RemovalType,
+		public readonly removalType: RemovalType,
 	) {
 		super()
 	}

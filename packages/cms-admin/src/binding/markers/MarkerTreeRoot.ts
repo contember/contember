@@ -1,39 +1,47 @@
-import { Input } from '@contember/schema'
-import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { EntityName, FieldName, Filter } from '../bindingTypes'
+import {
+	EntityListTreeConstraints,
+	EntityTreeSpecification,
+	SingleEntityTreeConstraints,
+	SubTreeIdentifier,
+} from '../treeParameters'
 import { EntityFields } from './EntityFields'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
-export interface SingleEntityTreeConstraints {
-	where: Input.UniqueWhere<GraphQlBuilder.Literal>
-	whereType: 'unique'
+export interface TaggedSingleEntityTreeConstraints extends SingleEntityTreeConstraints {
+	type: 'unique'
 }
 
-export interface EntityListTreeConstraints {
-	filter?: Filter
-	orderBy?: Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
-	offset?: number
-	limit?: number
-	whereType: 'nonUnique'
+export interface TaggedEntityListTreeConstraints extends EntityListTreeConstraints {
+	type: 'nonUnique'
 }
 
-export type MarkerTreeConstraints = SingleEntityTreeConstraints | EntityListTreeConstraints | undefined
+export interface TaggedUnconstrainedEntityList extends EntityTreeSpecification {
+	type: 'unconstrained'
+}
+
+export type MarkerTreeConstraints =
+	| TaggedSingleEntityTreeConstraints
+	| TaggedEntityListTreeConstraints
+	| TaggedUnconstrainedEntityList
 
 class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
 	public readonly id: MarkerTreeRoot.TreeId
 
 	public constructor(
 		idSeed: number,
-		public readonly entityName: EntityName,
-		public readonly fields: EntityFields,
 		public readonly constraints: C,
-		public readonly associatedField?: FieldName,
+		public readonly fields: EntityFields,
+		public readonly subTreeIdentifier?: SubTreeIdentifier,
 	) {
 		this.id = `treeRoot${idSeed.toFixed(0)}`
 	}
 
 	public get placeholderName(): string {
 		return PlaceholderGenerator.generateMarkerTreeRootPlaceholder(this)
+	}
+
+	public get entityName() {
+		return this.constraints.entityName
 	}
 }
 

@@ -1,20 +1,18 @@
 import { GraphQlBuilder } from '@contember/client'
-import { FieldName } from '../bindingTypes'
-import { ToOne } from '../coreComponents'
 import { EntityAccessor, FieldAccessor } from '../accessors'
 import { Scalar } from '../accessorTree'
 import { DataBindingError } from '../dao'
-import { getNestedEntity } from './getNestedEntity'
+import { RelativeSingleField } from '../treeParameters'
+import { getRelativeSingleEntity } from './getRelativeSingleEntity'
 
-export const getNestedField = <
+export const getRelativeSingleField = <
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
 	Produced extends Persisted = Persisted
 >(
-	entity: EntityAccessor,
-	toOneProps: ToOne.AtomicPrimitiveProps[],
-	fieldName: FieldName,
+	relativeTo: EntityAccessor,
+	{ fieldName, hasOneRelationPath }: RelativeSingleField,
 ) => {
-	const nestedEntity = getNestedEntity(entity, toOneProps)
+	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
 	const field = nestedEntity.data.getField(fieldName)
 
 	if (!(field instanceof FieldAccessor)) {

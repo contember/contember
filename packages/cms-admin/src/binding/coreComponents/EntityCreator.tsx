@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
-import { EntityName } from '../bindingTypes'
 import { MarkerTreeRoot } from '../markers'
+import { EntityName } from '../treeParameters'
 import { Component } from './Component'
 
 interface EntityCreatorProps {
@@ -22,7 +22,15 @@ export const EntityCreator = Component<EntityCreatorProps>(
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			new MarkerTreeRoot(environment.getSystemVariable('treeIdFactory')(), props.entityName, fields, undefined),
+			new MarkerTreeRoot(
+				environment.getSystemVariable('treeIdFactory')(),
+				{
+					entityName: props.entityName,
+					type: 'unconstrained',
+				},
+				fields,
+				undefined,
+			),
 	},
 	'EntityCreator',
 )

@@ -1,13 +1,11 @@
 import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
-import { EntityName, FieldName } from '../bindingTypes'
-import { MarkerFactory } from '../queryLanguage'
+import { MarkerFactory } from '../markers'
+import { SubTreeIdentifier, SugaredSingleEntityTreeConstraints } from '../treeParameters'
 import { Component } from './Component'
 
-export interface SingleEntityDataProviderProps
-	extends Omit<MarkerFactory.SugaredSingleEntityTreeConstraints, 'whereType'> {
-	entityName: EntityName
-	associatedField?: FieldName
+export interface SingleEntityDataProviderProps extends SugaredSingleEntityTreeConstraints {
+	subTreeIdentifier?: SubTreeIdentifier
 	children: React.ReactNode
 }
 
@@ -29,13 +27,12 @@ export const SingleEntityDataProvider = Component<SingleEntityDataProviderProps>
 		generateMarkerTreeRoot: (props, fields, environment) =>
 			MarkerFactory.createSingleEntityMarkerTreeRoot(
 				environment,
-				props.entityName,
-				fields,
 				{
+					entityName: props.entityName,
 					where: props.where,
-					whereType: 'unique',
 				},
-				props.associatedField,
+				fields,
+				props.subTreeIdentifier,
 			),
 	},
 	'SingleEntityDataProvider',

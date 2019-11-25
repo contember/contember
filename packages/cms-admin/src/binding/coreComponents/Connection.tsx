@@ -1,13 +1,11 @@
-import { Input } from '@contember/schema'
-import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { RelativeSingleField, UniqueWhere } from '../bindingTypes'
-import { MarkerFactory } from '../queryLanguage'
+import { MarkerFactory } from '../markers'
+import { SugaredRelativeSingleField, SugaredUniqueWhere } from '../treeParameters'
 import { Component } from './Component'
 
 export interface ConnectionProps {
-	field: RelativeSingleField
-	to: UniqueWhere | Input.UniqueWhere<GraphQlBuilder.Literal>
+	field: SugaredRelativeSingleField
+	to: SugaredUniqueWhere
 	isNonbearing?: boolean
 }
 
@@ -15,7 +13,7 @@ export const Connection = Component<ConnectionProps>(
 	() => null,
 	{
 		generateConnectionMarker: (props, environment) =>
-			MarkerFactory.createConnectionMarker(props.field, props.to, props.isNonbearing, environment),
+			MarkerFactory.createConnectionMarker(props.field, props.to, environment, props.isNonbearing),
 	},
 	'Connection',
 )

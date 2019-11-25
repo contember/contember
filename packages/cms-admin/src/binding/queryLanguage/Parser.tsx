@@ -1,9 +1,21 @@
-import { Lexer, EmbeddedActionsParser } from 'chevrotain'
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
-import { EntityName, FieldName } from '../bindingTypes'
-import { ToMany, ToOne } from '../coreComponents'
+import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
+import {
+	EntityName,
+	FieldName,
+	Filter,
+	HasManyRelation,
+	HasOneRelation,
+	OrderBy,
+	QualifiedEntityList,
+	QualifiedFieldList,
+	RelativeEntityList,
+	RelativeSingleEntity,
+	RelativeSingleField,
+	UniqueWhere,
+} from '../treeParameters'
 import { QueryLanguageError } from './QueryLanguageError'
 import { tokenList, TokenRegExps, tokens } from './tokenList'
 
@@ -22,112 +34,100 @@ class Parser extends EmbeddedActionsParser {
 	private static parser = new Parser()
 	private static environment: Environment = new Environment()
 
-	private qualifiedEntityList: () => Parser.AST.QualifiedEntityList = this.RULE<Parser.AST.QualifiedEntityList>(
-		'qualifiedEntityList',
-		() => {
-			const entityName = this.SUBRULE(this.entityIdentifier)
-			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+	private qualifiedEntityList: () => QualifiedEntityList = this.RULE<QualifiedEntityList>('qualifiedEntityList', () => {
+		const entityName = this.SUBRULE(this.entityIdentifier)
+		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
 
-			const toOneProps: Parser.AST.AtomicToOneProps[] = []
+		const hasOneRelationPath: HasOneRelation[] = []
 
-			this.MANY(() => {
-				this.CONSUME(tokens.Dot)
-				toOneProps.push(this.SUBRULE(this.toOneProps))
-			})
-
-			return {
-				entityName,
-				filter,
-				toOneProps,
-			}
-		},
-	)
-
-	private qualifiedFieldList: () => Parser.AST.QualifiedFieldList = this.RULE<Parser.AST.QualifiedFieldList>(
-		'qualifiedFieldList',
-		() => {
-			const entityName = this.SUBRULE(this.entityIdentifier)
-			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-
+		this.MANY(() => {
 			this.CONSUME(tokens.Dot)
+			hasOneRelationPath.push(this.SUBRULE(this.hasOneRelation))
+		})
 
-			const { toOneProps, fieldName } = this.SUBRULE(this.relativeSingleField)
+		return {
+			entityName,
+			filter,
+			hasOneRelationPath,
+		}
+	})
 
-			return {
-				entityName,
-				fieldName,
-				filter,
-				toOneProps,
+	private qualifiedFieldList: () => QualifiedFieldList = this.RULE<QualifiedFieldList>('qualifiedFieldList', () => {
+		const entityName = this.SUBRULE(this.entityIdentifier)
+		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+
+		this.CONSUME(tokens.Dot)
+
+		const { hasOneRelationPath, fieldName } = this.SUBRULE(this.relativeSingleField)
+
+		return {
+			entityName,
+			fieldName,
+			filter,
+			hasOneRelationPath,
+		}
+	})
+
+	private relativeSingleField: () => RelativeSingleField = this.RULE<RelativeSingleField>('relativeSingleField', () => {
+		let { hasOneRelationPath } = this.SUBRULE(this.relativeSingleEntity)
+
+		const last = this.ACTION(() => hasOneRelationPath.pop()!)
+
+		this.ACTION(() => {
+			if (last.reducedBy !== undefined || last.filter !== undefined) {
+				throw new QueryLanguageError(
+					`Cannot parse '${Parser.rawInput}': the last field '${last.field}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`,
+				)
 			}
-		},
-	)
+		})
 
-	private relativeSingleField: () => Parser.AST.RelativeSingleField = this.RULE<Parser.AST.RelativeSingleField>(
-		'relativeSingleField',
-		() => {
-			let { toOneProps } = this.SUBRULE(this.relativeSingleEntity)
+		const fieldName = this.ACTION(() => last.field)
 
-			const last = this.ACTION(() => toOneProps.pop()!)
+		return {
+			hasOneRelationPath,
+			fieldName,
+		}
+	})
 
-			this.ACTION(() => {
-				if (last.reducedBy !== undefined || last.filter !== undefined) {
-					throw new QueryLanguageError(
-						`Cannot parse '${Parser.rawInput}': the last field '${last.field}' is being reduced or filtered, which, grammatically, makes it a relation but a single field is expected.`,
-					)
-				}
-			})
-
-			const fieldName = this.ACTION(() => last.field)
-
-			return {
-				toOneProps,
-				fieldName,
-			}
-		},
-	)
-
-	private relativeSingleEntity: () => Parser.AST.RelativeSingleEntity = this.RULE<Parser.AST.RelativeSingleEntity>(
+	private relativeSingleEntity: () => RelativeSingleEntity = this.RULE<RelativeSingleEntity>(
 		'relativeSingleEntity',
 		() => {
-			const toOneProps: Parser.AST.AtomicToOneProps[] = []
+			const hasOneRelationPath: HasOneRelation[] = []
 
 			this.AT_LEAST_ONE_SEP({
 				SEP: tokens.Dot,
 				DEF: () => {
-					toOneProps.push(this.SUBRULE(this.toOneProps))
+					hasOneRelationPath.push(this.SUBRULE(this.hasOneRelation))
 				},
 			})
 
 			return {
-				toOneProps,
+				hasOneRelationPath,
 			}
 		},
 	)
 
-	private relativeEntityList: () => Parser.AST.RelativeEntityList = this.RULE<Parser.AST.RelativeEntityList>(
-		'relativeEntityList',
-		() => {
-			const { toOneProps, fieldName } = this.SUBRULE(this.relativeSingleField)
-			const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-			const toManyProps: Parser.AST.AtomicToManyProps = {
-				field: fieldName,
-			}
+	private relativeEntityList: () => RelativeEntityList = this.RULE<RelativeEntityList>('relativeEntityList', () => {
+		const { hasOneRelationPath, fieldName } = this.SUBRULE(this.relativeSingleField)
+		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+		const hasManyRelationPath: HasManyRelation = {
+			field: fieldName,
+		}
 
-			if (filter !== undefined) {
-				toManyProps.filter = filter
-			}
+		if (filter !== undefined) {
+			hasManyRelationPath.filter = filter
+		}
 
-			return {
-				toOneProps,
-				toManyProps,
-			}
-		},
-	)
+		return {
+			hasOneRelationPath,
+			hasManyRelationPath,
+		}
+	})
 
-	private toOneProps = this.RULE('toOneProps', () => {
+	private hasOneRelation = this.RULE('hasOneRelation', () => {
 		const fieldName = this.SUBRULE(this.fieldName)
 		const reducedBy = this.OPTION(() => this.SUBRULE(this.uniqueWhere))
-		const props: Parser.AST.AtomicToOneProps = {
+		const props: HasOneRelation = {
 			field: fieldName,
 		}
 
@@ -138,8 +138,8 @@ class Parser extends EmbeddedActionsParser {
 		return props
 	})
 
-	private nonUniqueWhere: () => Parser.AST.Filter = this.RULE('nonUniqueWhere', () => {
-		const cnfWhere: Parser.AST.Filter[] = []
+	private nonUniqueWhere: () => Filter = this.RULE('nonUniqueWhere', () => {
+		const cnfWhere: Filter[] = []
 
 		this.AT_LEAST_ONE(() => {
 			this.CONSUME(tokens.LeftBracket)
@@ -156,8 +156,8 @@ class Parser extends EmbeddedActionsParser {
 		}
 	})
 
-	private disjunction: () => Parser.AST.Filter = this.RULE('disjunction', () => {
-		const conjunctions: Parser.AST.Filter[] = []
+	private disjunction: () => Filter = this.RULE('disjunction', () => {
+		const conjunctions: Filter[] = []
 
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.Or,
@@ -173,8 +173,8 @@ class Parser extends EmbeddedActionsParser {
 		}
 	})
 
-	private conjunction: () => Parser.AST.Filter = this.RULE('conjunction', () => {
-		const negations: Parser.AST.Filter[] = []
+	private conjunction: () => Filter = this.RULE('conjunction', () => {
+		const negations: Filter[] = []
 
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.And,
@@ -191,7 +191,7 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	// TODO this is to naïve and needs rewriting
-	private negation: () => Parser.AST.Filter = this.RULE('negation', () => {
+	private negation: () => Filter = this.RULE('negation', () => {
 		return this.OR([
 			{
 				ALT: () => {
@@ -616,46 +616,13 @@ class Parser extends EmbeddedActionsParser {
 
 namespace Parser {
 	export namespace AST {
-		export type AtomicToOneProps = ToOne.AtomicPrimitiveProps
-
-		export type AtomicToManyProps = ToMany.AtomicPrimitiveProps
-
-		export interface RelativeSingleEntity {
-			toOneProps: AtomicToOneProps[]
-		}
-
-		export interface RelativeSingleField extends RelativeSingleEntity {
-			fieldName: FieldName
-		}
-
-		export interface RelativeEntityList extends RelativeSingleEntity {
-			toManyProps: AtomicToManyProps
-		}
-
-		export interface QualifiedEntityList extends RelativeSingleEntity {
-			entityName: EntityName
-			filter?: Filter
-		}
-
-		export interface QualifiedFieldList extends RelativeSingleEntity {
-			entityName: EntityName
-			fieldName: FieldName
-			filter?: Filter
-		}
-
-		export type OrderBy = Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
-
 		export type FieldWhere = Input.FieldWhere<Condition>
-
-		export type Filter = Input.Where<Condition>
 
 		export type ColumnValue = Input.ColumnValue<GraphQlBuilder.Literal>
 
 		export type Condition = Input.Condition<ColumnValue>
 
 		export type ConditionOperator = keyof Pick<Condition, 'eq' | 'notEq' | 'lt' | 'lte' | 'gt' | 'gte'>
-
-		export type UniqueWhere = Input.UniqueWhere<GraphQlBuilder.Literal>
 	}
 
 	export enum EntryPoint {
@@ -670,14 +637,14 @@ namespace Parser {
 	}
 
 	export interface ParserResult {
-		qualifiedEntityList: AST.QualifiedEntityList
-		qualifiedFieldList: AST.QualifiedFieldList
-		relativeSingleField: AST.RelativeSingleField
-		relativeSingleEntity: AST.RelativeSingleEntity
-		relativeEntityList: AST.RelativeEntityList
-		uniqueWhere: AST.UniqueWhere
-		filter: AST.Filter
-		orderBy: AST.OrderBy
+		qualifiedEntityList: QualifiedEntityList
+		qualifiedFieldList: QualifiedFieldList
+		relativeSingleField: RelativeSingleField
+		relativeSingleEntity: RelativeSingleEntity
+		relativeEntityList: RelativeEntityList
+		uniqueWhere: UniqueWhere
+		filter: Filter
+		orderBy: OrderBy
 	}
 }
 

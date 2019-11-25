@@ -1,8 +1,6 @@
-import { GraphQlBuilder } from '@contember/client'
-import { Input } from '@contember/schema'
 import { assertNever } from '@contember/utils'
-import { ExpectedCount, FieldName, Filter } from '../bindingTypes'
 import { DataBindingError } from '../dao'
+import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
 import { EntityFields } from './EntityFields'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
@@ -11,38 +9,38 @@ class ReferenceMarker {
 	public readonly references: ReferenceMarker.References
 
 	public static readonly defaultReferencePreferences: {
-		readonly [index in ExpectedCount]: ReferenceMarker.ReferencePreferences
+		readonly [index in ExpectedEntityCount]: ReferenceMarker.ReferencePreferences
 	} = {
-		[ExpectedCount.UpToOne]: {
+		[ExpectedEntityCount.UpToOne]: {
 			initialEntityCount: 1,
 		},
-		[ExpectedCount.PossiblyMany]: {
+		[ExpectedEntityCount.PossiblyMany]: {
 			initialEntityCount: 1,
 		},
 	}
 
 	public constructor(
 		fieldName: FieldName,
-		expectedCount: ExpectedCount,
+		expectedCount: ExpectedEntityCount,
 		fields: EntityFields,
-		filter?: Filter<GraphQlBuilder.Literal>,
-		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>,
+		filter?: Filter,
+		reducedBy?: UniqueWhere,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	)
 	public constructor(fieldName: FieldName, references: ReferenceMarker.References)
 	public constructor(
 		fieldName: FieldName,
-		decider: ExpectedCount | ReferenceMarker.References,
+		decider: ExpectedEntityCount | ReferenceMarker.References,
 		fields?: EntityFields,
-		filter?: Filter<GraphQlBuilder.Literal>,
-		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>,
+		filter?: Filter,
+		reducedBy?: UniqueWhere,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) {
 		let references: ReferenceMarker.References
 
 		if (typeof decider === 'object') {
 			references = decider
-		} else if (decider === ExpectedCount.UpToOne || decider === ExpectedCount.PossiblyMany) {
+		} else if (decider === ExpectedEntityCount.UpToOne || decider === ExpectedEntityCount.PossiblyMany) {
 			const constraints: ReferenceMarker.ReferenceConstraints = {
 				expectedCount: decider,
 				filter,
@@ -56,7 +54,7 @@ class ReferenceMarker {
 			if (normalizedPreferences.initialEntityCount < 0 || !Number.isInteger(normalizedPreferences.initialEntityCount)) {
 				throw new DataBindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
 			}
-			if (decider === ExpectedCount.UpToOne && normalizedPreferences.initialEntityCount > 1) {
+			if (decider === ExpectedEntityCount.UpToOne && normalizedPreferences.initialEntityCount > 1) {
 				throw new DataBindingError(`A ToOne reference cannot prefer more than one entity!`)
 			}
 
@@ -94,9 +92,9 @@ class ReferenceMarker {
 
 namespace ReferenceMarker {
 	export interface ReferenceConstraints {
-		expectedCount: ExpectedCount
-		filter?: Input.Where<Input.Condition<Input.ColumnValue<GraphQlBuilder.Literal>>>
-		reducedBy?: Input.UniqueWhere<GraphQlBuilder.Literal>
+		expectedCount: ExpectedEntityCount
+		filter?: Filter
+		reducedBy?: UniqueWhere
 	}
 
 	export interface ReferencePreferences {

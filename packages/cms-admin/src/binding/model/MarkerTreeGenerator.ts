@@ -1,14 +1,15 @@
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
-import { FieldName } from '../bindingTypes'
 import { MarkerProvider } from '../coreComponents'
 import { DataBindingError, Environment } from '../dao'
 import { ConnectionMarker, EntityFields, FieldMarker, Marker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
 
-type Terminals = FieldMarker | ConnectionMarker
-type Nonterminals = MarkerTreeRoot | ReferenceMarker
+type Fragment = EntityFields
+type Terminals = FieldMarker | ConnectionMarker | Fragment
+type Nonterminals = MarkerTreeRoot | ReferenceMarker | Fragment
 
 type NodeResult = Terminals | Nonterminals
 type DataMarker = MarkerProvider &
@@ -45,10 +46,24 @@ export class MarkerTreeGenerator {
 		}
 
 		for (const marker of result) {
-			const placeholderName = marker.placeholderName
+			if (
+				marker instanceof FieldMarker ||
+				marker instanceof ReferenceMarker ||
+				marker instanceof ConnectionMarker ||
+				marker instanceof MarkerTreeRoot
+			) {
+				const placeholderName = marker.placeholderName
 
-			fields[placeholderName] =
-				placeholderName in fields ? MarkerTreeGenerator.mergeMarkers(fields[placeholderName], marker) : marker
+				fields[placeholderName] =
+					placeholderName in fields ? MarkerTreeGenerator.mergeMarkers(fields[placeholderName], marker) : marker
+			} else {
+				for (const placeholderName in marker) {
+					fields[placeholderName] =
+						placeholderName in fields
+							? MarkerTreeGenerator.mergeMarkers(fields[placeholderName], marker[placeholderName])
+							: marker[placeholderName]
+				}
+			}
 		}
 
 		return fields
@@ -190,8 +205,8 @@ export class MarkerTreeGenerator {
 				syntheticChildrenFactoryName: 'generateSyntheticChildren',
 				renderPropsErrorMessage:
 					`Render props (functions as React component children) are not supported within the schema. ` +
-					`You have likely used a bare custom component as opposed to wrapping in with \`Component\`. ` +
-					`Please refer to the documentation.`,
+					`You have likely used a bare custom component as opposed to wrapping in with \`Component\` ` +
+					`from the \`@contember/admin\` package. Please refer to the documentation.`,
 				ignoreRenderProps: false,
 				environmentFactoryName: 'generateEnvironment',
 			},

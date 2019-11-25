@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
-import { By, Filter, VariableInput } from '../bindingTypes'
-import { DataBindingError, Environment, Literal, VariableLiteral, VariableScalar } from '../dao'
 import { Scalar } from '../accessorTree'
+import { DataBindingError, Environment, VariableLiteral, VariableScalar } from '../dao'
+import { FieldValue, Filter, OptionallyVariableFieldValue, UniqueWhere, VariableFieldValue } from '../treeParameters'
 
 export class VariableInputTransformer {
 	public static transformFilter(
@@ -15,15 +15,15 @@ export class VariableInputTransformer {
 		return VariableInputTransformer.transformWhere(input, environment) as Filter<GraphQlBuilder.Literal>
 	}
 
-	public static transformBy(input: By | undefined, environment: Environment): By<GraphQlBuilder.Literal> | undefined {
+	public static transformBy(input: UniqueWhere | undefined, environment: Environment): UniqueWhere | undefined {
 		if (input === undefined) {
 			return undefined
 		}
-		return VariableInputTransformer.transformWhere(input, environment) as By<GraphQlBuilder.Literal>
+		return VariableInputTransformer.transformWhere(input, environment) as UniqueWhere
 	}
 
 	private static transformWhere(
-		where: VariableInputTransformer.Where<VariableInput> | By,
+		where: VariableInputTransformer.Where<VariableFieldValue> | UniqueWhere,
 		environment: Environment,
 	): VariableInputTransformer.Where<GraphQlBuilder.Literal> {
 		const mapped: VariableInputTransformer.Where<GraphQlBuilder.Literal> = {}
@@ -45,7 +45,7 @@ export class VariableInputTransformer {
 				mapped[key] = VariableInputTransformer.transformVariableScalar(field, environment)
 			} else if (field instanceof VariableLiteral) {
 				mapped[key] = VariableInputTransformer.transformVariableLiteral(field, environment)
-			} else if (field instanceof Literal) {
+			} else if (field instanceof GraphQlBuilder.Literal) {
 				mapped[key] = field
 			} else if (typeof field === 'object') {
 				mapped[key] = VariableInputTransformer.transformWhere(field, environment)
@@ -57,10 +57,7 @@ export class VariableInputTransformer {
 		return mapped
 	}
 
-	public static transformValue(
-		value: VariableInput | Scalar,
-		environment: Environment,
-	): GraphQlBuilder.Literal | Scalar {
+	public static transformValue(value: OptionallyVariableFieldValue, environment: Environment): FieldValue {
 		if (value instanceof VariableScalar) {
 			return VariableInputTransformer.transformVariableScalar(value, environment)
 		} else if (value instanceof VariableLiteral) {

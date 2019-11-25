@@ -16,7 +16,11 @@ export const getRelativeSingleField = <
 	const field = nestedEntity.data.getField(fieldName)
 
 	if (!(field instanceof FieldAccessor)) {
-		throw new DataBindingError(`Corrupted data`)
+		throw new DataBindingError(
+			`Trying to access the field '${fieldName}''${
+				nestedEntity.typename ? `of the '${nestedEntity.typename}' entity` : ''
+			}' but it does not exist.`,
+		)
 	}
 	return (field as unknown) as FieldAccessor<Persisted, Produced>
 }

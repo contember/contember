@@ -1,9 +1,10 @@
+import { EntityTreeSpecification } from './EntityTreeSpecification'
 import { SugaredUniqueWhere, UniqueWhere } from './UniqueWhere'
 
-export interface SingleEntityTreeConstraints {
+export interface SingleEntityTreeConstraints extends EntityTreeSpecification {
 	where: UniqueWhere
 }
 
-export interface SugaredSingleEntityTreeConstraints {
+export interface SugaredSingleEntityTreeConstraints extends EntityTreeSpecification {
 	where: SugaredUniqueWhere
 }

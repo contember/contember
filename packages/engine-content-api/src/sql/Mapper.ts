@@ -1,41 +1,36 @@
-import { Acl, Input, Model } from '@contember/schema'
-import { acceptEveryFieldVisitor, getColumnName, Providers } from '@contember/schema-utils'
-import SqlCreateInputProcessor from './insert/SqlCreateInputProcessor'
+import { Input, Model } from '@contember/schema'
+import { getColumnName } from '@contember/schema-utils'
 import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
 import * as database from '@contember/database'
-import PredicateFactory from '../acl/PredicateFactory'
+import { Client, SelectBuilder } from '@contember/database'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
-import InsertBuilderFactory from './insert/InsertBuilderFactory'
-import UpdateBuilderFactory from './update/UpdateBuilderFactory'
 import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
 import DeleteExecutor from './delete/DeleteExecutor'
-import { Client, SelectBuilder } from '@contember/database'
-import CreateInputVisitor from '../inputProcessing/CreateInputVisitor'
-import SqlUpdateInputProcessor from './update/SqlUpdateInputProcessor'
-import UpdateInputVisitor from '../inputProcessing/UpdateInputVisitor'
-import { ForeignKeyViolation, NotNullConstraintViolation, UniqueKeyViolation } from './Constraints'
-import { NoResultError } from './NoResultError'
+import { ModificationType, MutationResultList } from './Result'
+import { Updater } from './update/Updater'
+import { Inserter } from './insert/Inserter'
+import { convertError, tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select/OrderByHelper'
 
 class Mapper {
+	private primaryKeyCache: Record<string, Promise<string> | string> = {}
+
 	constructor(
 		private readonly schema: Model.Schema,
 		public readonly db: database.Client,
-		private readonly predicateFactory: PredicateFactory,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
-		private readonly insertBuilderFactory: InsertBuilderFactory,
-		private readonly updateBuilderFactory: UpdateBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly junctionTableManager: JunctionTableManager,
 		private readonly deleteExecutor: DeleteExecutor,
-		private readonly providers: Providers,
+		private readonly updater: Updater,
+		private readonly inserter: Inserter,
 	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
@@ -122,110 +117,77 @@ class Mapper {
 		return rows
 	}
 
-	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<Input.PrimaryValue> {
-		const where = this.predicateFactory.create(entity, Acl.Operation.create, Object.keys(data))
-		const insertBuilder = this.insertBuilderFactory.create(entity)
-		insertBuilder.addWhere(where)
-
-		const visitor = new CreateInputVisitor(
-			new SqlCreateInputProcessor(insertBuilder, this, this.providers),
-			this.schema,
-			data,
+	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<MutationResultList> {
+		return tryMutation(() =>
+			this.inserter.insert(this, entity, data, id => {
+				const where = { [entity.primary]: id }
+				this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
+			}),
 		)
-		const promises = acceptEveryFieldVisitor<any>(this.schema, entity, visitor)
-
-		const promise = Promise.all(Object.values(promises).filter((it: any) => !!it))
-
-		try {
-			const result = await insertBuilder.execute(this.db)
-			await promise
-
-			return result
-		} catch (e) {
-			return this.handleError(e)
-		}
 	}
 
-	public async update(entity: Model.Entity, where: Input.UniqueWhere, data: Input.UpdateDataInput): Promise<number> {
-		const primaryValue = await this.getPrimaryValue(entity, where)
-		if (primaryValue === undefined) {
-			return Promise.resolve(0)
-		}
-
-		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-		const updateBuilder = this.updateBuilderFactory.create(entity, uniqueWhere)
-
-		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, Object.keys(data))
-		updateBuilder.addOldWhere(predicateWhere)
-		updateBuilder.addNewWhere(predicateWhere)
-
-		const updateVisitor = new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, this)
-		const visitor = new UpdateInputVisitor(updateVisitor, this.schema, data)
-		const promises = acceptEveryFieldVisitor<any>(this.schema, entity, visitor)
-		const executeResult = updateBuilder.execute(this.db)
-
-		await Promise.all(Object.values(promises).filter((it: any) => !!it))
-
-		try {
-			const affectedRows = await executeResult
-			if (affectedRows !== 1 && affectedRows !== null) {
-				throw new NoResultError()
-			}
-
-			return affectedRows || 0
-		} catch (e) {
-			return this.handleError(e)
-		}
+	public async update(
+		entity: Model.Entity,
+		where: Input.UniqueWhere,
+		data: Input.UpdateDataInput,
+	): Promise<MutationResultList> {
+		return tryMutation(() => this.updater.update(this, entity, where, data))
 	}
 
-	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
-		try {
-			await this.deleteExecutor.execute(this.db, entity, where)
-		} catch (e) {
-			return this.handleError(e)
-		}
+	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {
+		return tryMutation(() => this.deleteExecutor.execute(this, entity, where))
 	}
 
 	public async connectJunction(
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		ownerUnique: Input.UniqueWhere,
-		inversedUnique: Input.UniqueWhere,
-	): Promise<void> {
-		await this.junctionTableManager.connectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
+		ownerPrimary: Input.PrimaryValue,
+		insersePrimary: Input.PrimaryValue,
+	): Promise<MutationResultList> {
+		return await this.junctionTableManager.connectJunction(
+			this.db,
+			owningEntity,
+			relation,
+			ownerPrimary,
+			insersePrimary,
+		)
 	}
 
 	public async disconnectJunction(
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
-		ownerUnique: Input.UniqueWhere,
-		inversedUnique: Input.UniqueWhere,
-	): Promise<void> {
-		await this.junctionTableManager.disconnectJunction(this.db, owningEntity, relation, ownerUnique, inversedUnique)
+		ownerPrimary: Input.PrimaryValue,
+		inversePrimary: Input.PrimaryValue,
+	): Promise<MutationResultList> {
+		return await this.junctionTableManager.disconnectJunction(
+			this.db,
+			owningEntity,
+			relation,
+			ownerPrimary,
+			inversePrimary,
+		)
 	}
 
 	public async getPrimaryValue(
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
 	): Promise<Input.PrimaryValue | undefined> {
-		if (where[entity.primary] !== undefined) {
-			return where[entity.primary] as Input.PrimaryValue
+		const hash = this.hashWhere(entity.name, where)
+		if (this.primaryKeyCache[hash]) {
+			return this.primaryKeyCache[hash]
 		}
-
-		return this.selectField(entity, where, entity.primary)
+		const primaryPromise = this.selectField(entity, where, entity.primary)
+		this.primaryKeyCache[hash] = primaryPromise
+		const primaryValue = await primaryPromise
+		const uniqueFields = Object.keys(where)
+		if (primaryValue && (uniqueFields.length !== 1 || uniqueFields[0] !== entity.primary)) {
+			this.primaryKeyCache[this.hashWhere(entity.name, { [entity.primary]: primaryValue })] = primaryValue
+		}
+		return primaryValue
 	}
 
-	private handleError(error: Error): never {
-		if (error instanceof database.NotNullViolationError) {
-			throw new NotNullConstraintViolation()
-		}
-		if (error instanceof database.ForeignKeyViolationError) {
-			throw new ForeignKeyViolation()
-		}
-		if (error instanceof database.UniqueViolationError) {
-			throw new UniqueKeyViolation()
-		}
-		throw error
+	private hashWhere(entityName: string, where: Input.UniqueWhere): string {
+		return JSON.stringify([entityName, where])
 	}
 }
 

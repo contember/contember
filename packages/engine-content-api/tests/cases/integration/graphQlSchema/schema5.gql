@@ -7,6 +7,20 @@ type _IndexPathFragment {
   alias: String
 }
 
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+}
+
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
 
 type _ValidationError {
@@ -72,12 +86,14 @@ input OneHasManyEntityCreateR2EntityRelationInput {
 type OneHasManyEntityCreateResult {
   ok: Boolean!
   node: OneHasManyEntity
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type OneHasManyEntityDeleteResult {
   ok: Boolean!
   node: OneHasManyEntity
+  errors: [_MutationError!]!
 }
 
 type OneHasManyEntityMeta {
@@ -159,12 +175,14 @@ input RootCreateREntityRelationInput {
 type RootCreateResult {
   ok: Boolean!
   node: Root
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type RootDeleteResult {
   ok: Boolean!
   node: Root
+  errors: [_MutationError!]!
 }
 
 type RootMeta {
@@ -187,6 +205,7 @@ input RootUpdateInput {
 type RootUpdateResult {
   ok: Boolean!
   node: Root
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 

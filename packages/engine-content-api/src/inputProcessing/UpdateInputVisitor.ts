@@ -1,10 +1,11 @@
 import { Input, Model } from '@contember/schema'
 import { filterObject, isIt } from '../utils'
-import UpdateInputProcessor from './UpdateInputProcessor'
+import { UpdateInputProcessor } from './UpdateInputProcessor'
 import * as Context from './InputContext'
 import { UserError } from '../graphQlResolver'
+import { ImplementationException } from '../exception'
 
-export default class UpdateInputVisitor<Result>
+export class UpdateInputVisitor<Result>
 	implements
 		Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
 		Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>> {
@@ -143,7 +144,7 @@ export default class UpdateInputVisitor<Result>
 		if (isIt<Input.UpsertRelationInput>(input, 'upsert')) {
 			return processor.upsert({ ...context, input: input.upsert })
 		}
-		throw new Error()
+		throw new ImplementationException()
 	}
 
 	private processManyRelationInput<Context>(
@@ -199,7 +200,7 @@ export default class UpdateInputVisitor<Result>
 
 	private verifyOperations(input: any) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
-		if (keys.length !== 1) {
+		if (keys.length !== 1 || !['create', 'connect', 'delete', 'disconnect', 'update', 'upsert'].includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new UserError(
 				`Expected exactly one of: "create", "connect", "delete", "disconnect", "update" or "upsert". ${found} found.`,

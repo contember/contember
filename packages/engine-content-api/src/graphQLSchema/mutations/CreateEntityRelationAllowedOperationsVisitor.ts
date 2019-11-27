@@ -1,12 +1,13 @@
 import { Acl, Input, Model } from '@contember/schema'
 import Authorizator from '../../acl/Authorizator'
+import { ImplementationException } from '../../exception'
 
 export default class CreateEntityRelationAllowedOperationsVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByTypeVisitor<Input.CreateRelationOperation[]> {
 	constructor(private readonly authorizator: Authorizator) {}
 
 	visitColumn(): never {
-		throw new Error()
+		throw new ImplementationException('CreateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
 	public visitManyHasManyInversed({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation) {

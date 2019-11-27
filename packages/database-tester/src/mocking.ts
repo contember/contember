@@ -19,10 +19,6 @@ export const createConnectionMock = (
 			meta?: any,
 			config?: Connection.QueryConfig,
 		): Promise<Connection.Result<Row>> {
-			if (sql === 'ROLLBACK;') {
-				return null as any
-			}
-
 			const expected = queries.shift()
 			assertFunction(
 				true,
@@ -64,18 +60,22 @@ ${JSON.stringify(parameters)}
 			trx: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		): Promise<Result> {
 			await this.query('BEGIN;')
-			const result = await trx(createConnectionMock(queries, assertFunction))
-			await this.commit()
+			const result = await trx(this)
+			if (!this.isClosed) {
+				await this.commit()
+			}
 			return result
 		}
 
 		isClosed: boolean = false
 
 		async commit(): Promise<void> {
+			this.isClosed = true
 			await this.query('COMMIT;')
 		}
 
 		async rollback(): Promise<void> {
+			this.isClosed = true
 			await this.query('ROLLBACK;')
 		}
 

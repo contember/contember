@@ -14,7 +14,10 @@ export default class ConditionBuilder {
 			return builder
 		}
 		if (keys.length > 1) {
-			throw new UserError('Only single field is allowed. If you want to combine multiple conditions, use "and" or "or"')
+			throw new UserError(
+				'Only single field is allowed. If you want to combine multiple conditions, use "and" or "or". Got: ' +
+					JSON.stringify(condition),
+			)
 		}
 		const columnIdentifier: QueryBuilder.ColumnIdentifier = [tableName, columnName]
 

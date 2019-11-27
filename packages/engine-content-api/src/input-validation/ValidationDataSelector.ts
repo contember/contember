@@ -1,6 +1,6 @@
 import QueryAstFactory from './QueryAstFactory'
 import Mapper from '../sql/Mapper'
-import DependencyCollector from './DependencyCollector'
+import DependencyCollector from './dependencies/DependencyCollector'
 import { Input, Model, Value } from '@contember/schema'
 
 export default class ValidationDataSelector {

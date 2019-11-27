@@ -7,6 +7,20 @@ type _IndexPathFragment {
   alias: String
 }
 
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+}
+
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
 
 type _ValidationError {
@@ -45,12 +59,14 @@ input AuthorCreatePostsEntityRelationInput {
 type AuthorCreateResult {
   ok: Boolean!
   node: Author
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type AuthorDeleteResult {
   ok: Boolean!
   node: Author
+  errors: [_MutationError!]!
 }
 
 type AuthorMeta {
@@ -92,6 +108,7 @@ input AuthorUpdatePostsRelationInput {
 type AuthorUpdateResult {
   ok: Boolean!
   node: Author
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -142,12 +159,14 @@ input CategoryCreatePostsEntityRelationInput {
 type CategoryCreateResult {
   ok: Boolean!
   node: Category
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type CategoryDeleteResult {
   ok: Boolean!
   node: Category
+  errors: [_MutationError!]!
 }
 
 type CategoryMeta {
@@ -190,6 +209,7 @@ input CategoryUpdatePostsRelationInput {
 type CategoryUpdateResult {
   ok: Boolean!
   node: Category
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -344,12 +364,14 @@ input PostCreateLocalesEntityRelationInput {
 type PostCreateResult {
   ok: Boolean!
   node: Post
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type PostDeleteResult {
   ok: Boolean!
   node: Post
+  errors: [_MutationError!]!
 }
 
 type PostLocale {
@@ -375,12 +397,14 @@ input PostLocaleCreatePostEntityRelationInput {
 type PostLocaleCreateResult {
   ok: Boolean!
   node: PostLocale
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type PostLocaleDeleteResult {
   ok: Boolean!
   node: PostLocale
+  errors: [_MutationError!]!
 }
 
 type PostLocaleMeta {
@@ -426,6 +450,7 @@ input PostLocaleUpdatePostEntityRelationInput {
 type PostLocaleUpdateResult {
   ok: Boolean!
   node: PostLocale
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -549,6 +574,7 @@ input PostUpdateLocalesRelationInput {
 type PostUpdateResult {
   ok: Boolean!
   node: Post
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 

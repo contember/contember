@@ -82,12 +82,12 @@ export default class GraphQlQueryAstFactory {
 			} else if (isIt<FragmentSpreadNode>(subNode, 'kind', 'FragmentSpread')) {
 				const fragmentDefinition = info.fragments[subNode.name.value]
 				if (!fragmentDefinition) {
-					throw new Error(`Fragment definition ${subNode.name.value} not found`)
+					throw new Error(`GraphQlQueryAstFactory: Fragment definition ${subNode.name.value} not found`)
 				}
 				const typeName = fragmentDefinition.typeCondition.name.value
 				const subField = info.schema.getType(typeName)
 				if (!this.itIs<GraphQLObjectType>(subField, 'GraphQLObjectType')) {
-					throw new Error()
+					throw new Error('GraphQlQueryAstFactory: subfield is expected to be GraphQLObjectType')
 				}
 				fields.push(
 					...this.processSelectionSet(

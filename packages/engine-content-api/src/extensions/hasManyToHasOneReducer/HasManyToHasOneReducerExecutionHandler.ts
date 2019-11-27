@@ -5,6 +5,7 @@ import SelectExecutionHandler from '../../sql/select/SelectExecutionHandler'
 import Mapper from '../../sql/Mapper'
 import ObjectNode from '../../graphQlResolver/ObjectNode'
 import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
+import { ImplementationException } from '../../exception'
 
 class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
 	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
@@ -23,7 +24,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 					[targetRelation.name]: { [entity.primary]: ids },
 				})
 				if (Object.keys(uniqueWhere).length !== 2) {
-					throw new Error()
+					throw new Error('HasManyToHasOneReducerExecutionHandler: only tuple unique keys are allowed')
 				}
 				const whereWithParentId = {
 					and: [objectNode.args.filter || {}, uniqueWhere],
@@ -42,7 +43,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 	): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] {
 		return acceptFieldVisitor(this.schema, entity, relationName, {
 			visitColumn: (): never => {
-				throw new Error()
+				throw new ImplementationException('HasManyToHasOneReducerExecutionHandler: Not applicable for a column')
 			},
 			visitRelation: (
 				entity,
@@ -51,7 +52,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 				targetRelation,
 			): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] => {
 				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
-					throw new Error()
+					throw new Error('HasManyToHasOneReducerExecutionHandler: only applicable for relations with joiningColumn')
 				}
 				return [targetEntity, targetRelation]
 			},

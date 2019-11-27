@@ -32,4 +32,4 @@ namespace CreateInputProcessor {
 	}
 }
 
-export default CreateInputProcessor
+export { CreateInputProcessor }

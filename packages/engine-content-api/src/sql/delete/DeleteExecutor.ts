@@ -1,36 +1,52 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { assertNever } from '../../utils'
-import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import WhereBuilder from '../select/WhereBuilder'
-import { Client, DeleteBuilder, SelectBuilder } from '@contember/database'
+import { Client, DeleteBuilder, ForeignKeyViolationError, SelectBuilder } from '@contember/database'
 import Path from '../select/Path'
 import PredicateFactory from '../../acl/PredicateFactory'
-import Mapper from '../Mapper'
 import UpdateBuilderFactory from '../update/UpdateBuilderFactory'
-import { NoResultError } from '../NoResultError'
+import {
+	MutationNoResultError,
+	MutationEntryNotFoundError,
+	ModificationType,
+	MutationResultList,
+	MutationDeleteOk,
+} from '../Result'
+import Mapper from '../Mapper'
 
 type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwnerRelation]
 
 class DeleteExecutor {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}
 
-	public async execute(db: Client, entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
+	public async execute(mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {
+		const db = mapper.db
 		await db.query('SET CONSTRAINTS ALL DEFERRED')
-		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-		const result = await this.delete(db, entity, uniqueWhere)
+		const primaryValue = await mapper.getPrimaryValue(entity, where)
+		if (!primaryValue) {
+			return [new MutationEntryNotFoundError([], where)]
+		}
+		const result = await this.delete(db, entity, { [entity.primary]: { eq: primaryValue } })
 		if (result.length === 0) {
-			throw new NoResultError()
+			return [new MutationNoResultError([])]
 		}
 		await this.executeCascade(db, entity, result)
 
-		await db.query('SET CONSTRAINTS ALL IMMEDIATE')
+		try {
+			await db.query('SET CONSTRAINTS ALL IMMEDIATE')
+			return [new MutationDeleteOk([], entity, primaryValue)]
+		} catch (e) {
+			if (e instanceof ForeignKeyViolationError) {
+				return [new MutationNoResultError([])]
+			}
+			throw e
+		}
 	}
 
 	private async executeCascade(db: Client, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {

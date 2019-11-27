@@ -6,7 +6,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 	constructor(private readonly authorizator: Authorizator) {}
 
 	visitColumn(): never {
-		throw new Error()
+		throw new Error('UpdateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
 	public visitManyHasManyInversed({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation) {

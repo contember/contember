@@ -6,7 +6,7 @@ import EntityInputProvider from './mutations/EntityInputProvider'
 import { Input, Model } from '@contember/schema'
 import { filterObject } from '../utils/object'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
-import { ValidationSchemaTypeProvider } from './ValidationSchemaTypeProvider'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
 
@@ -17,7 +17,7 @@ export class ValidationQueriesProvider {
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
-		private readonly validationSchemaTypeProvider: ValidationSchemaTypeProvider,
+		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
 	public getQueries(entityName: string): { [fieldName: string]: FieldConfig<any> } {
@@ -35,7 +35,7 @@ export class ValidationQueriesProvider {
 			return undefined
 		}
 		return {
-			type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+			type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 			args: {
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
@@ -51,7 +51,7 @@ export class ValidationQueriesProvider {
 			return undefined
 		}
 		return {
-			type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+			type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 			args: {
 				by: {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),

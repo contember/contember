@@ -5,7 +5,7 @@ import QueryProvider from './QueryProvider'
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
 import { Context } from '../types'
-import { ValidationSchemaTypeProvider } from './ValidationSchemaTypeProvider'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 
 export default class GraphQlSchemaBuilder {
 	constructor(
@@ -14,7 +14,7 @@ export default class GraphQlSchemaBuilder {
 		private readonly validationQueriesProvider: ValidationQueriesProvider,
 		private readonly mutationProvider: MutationProvider,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
-		private readonly validationSchemaTypeProvider: ValidationSchemaTypeProvider,
+		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
 	public build(): GraphQLSchema {
@@ -33,7 +33,7 @@ export default class GraphQlSchemaBuilder {
 					fields: {
 						ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
 						validation: {
-							type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+							type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 						},
 						...mutations,
 					},

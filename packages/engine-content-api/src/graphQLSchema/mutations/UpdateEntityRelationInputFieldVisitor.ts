@@ -22,7 +22,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 	) {}
 
 	public visitColumn(): never {
-		throw new Error()
+		throw new Error('UpdateEntityRelationInputFieldVisitor: Not applicable for a column')
 	}
 
 	public visitHasOne(

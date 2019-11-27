@@ -64,10 +64,23 @@ describe('update with db', () => {
 					query: GQL`mutation {
             updateSite(by: { slug: "en" }, data: { contactPage: { create: { title: "Test 2" } } }) {
               ok
+	            errors {
+		            type
+	            }
             }
           }`,
-					throws: {
-						message: 'Constraint violations: Not null constraint violation on ContactPage::site in path ',
+					return: {
+						updateSite: {
+							ok: false,
+							errors: [
+								{
+									type: 'NotNullConstraintViolation',
+								},
+								{
+									type: 'UniqueConstraintViolation',
+								},
+							],
+						},
 					},
 					expectDatabase: {
 						site: [{ id: testUuid(1), slug: 'en' }],

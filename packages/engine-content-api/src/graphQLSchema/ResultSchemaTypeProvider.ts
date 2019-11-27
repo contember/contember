@@ -1,6 +1,7 @@
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { Result } from '@contember/schema'
 
-export class ValidationSchemaTypeProvider {
+export class ResultSchemaTypeProvider {
 	private pathFragmentType = this.graphqlObjectFactories.createUnion({
 		name: '_PathFragment',
 		types: () => [
@@ -50,6 +51,30 @@ export class ValidationSchemaTypeProvider {
 			},
 		},
 	})
+
+	public errorResultType = this.graphqlObjectFactories.createObjectType({
+		name: '_MutationError',
+		fields: {
+			path: {
+				type: this.graphqlObjectFactories.createNotNull(
+					this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.pathFragmentType)),
+				),
+			},
+			type: {
+				type: this.graphqlObjectFactories.createNotNull(
+					this.graphqlObjectFactories.createEnumType({
+						name: '_MutationErrorType',
+						values: Object.values(Result.ExecutionErrorType).reduce((acc, type) => ({ ...acc, [type]: {} }), {}),
+					}),
+				),
+			},
+			message: { type: this.graphqlObjectFactories.string },
+		},
+	})
+
+	public errorListResultType = this.graphqlObjectFactories.createNotNull(
+		this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.errorResultType)),
+	)
 
 	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {}
 }

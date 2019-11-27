@@ -1,5 +1,6 @@
 import { Acl, Input, Model } from '@contember/schema'
 import VariableInjector from './VariableInjector'
+import { ImplementationException } from '../exception'
 
 class PredicateFactory {
 	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {}
@@ -30,7 +31,7 @@ class PredicateFactory {
 			predicates = [deletePredicate]
 		} else {
 			if (fieldNames === undefined) {
-				throw new Error()
+				throw new ImplementationException('PredicateFactory: fieldNames are required for operations other than delete')
 			}
 			const fieldPermissions = entityPermissions.operations[operation]
 			if (fieldPermissions === undefined) {

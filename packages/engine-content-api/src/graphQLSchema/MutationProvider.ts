@@ -9,7 +9,7 @@ import EntityInputProvider from './mutations/EntityInputProvider'
 import { filterObject } from '../utils/object'
 import { aliasAwareResolver, GqlTypeName } from './utils'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
-import { ValidationSchemaTypeProvider } from './ValidationSchemaTypeProvider'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 import { ExtensionKey, MutationMeta, MutationOperation } from './MutationExtension'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
@@ -23,7 +23,7 @@ export default class MutationProvider {
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
-		private readonly validationSchemaTypeProvider: ValidationSchemaTypeProvider,
+		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
 	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {
@@ -109,10 +109,11 @@ export default class MutationProvider {
 		const fields: GraphQLObjectTypeConfig<any, any>['fields'] = {
 			ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
 			node: { type: nodeType, resolve: aliasAwareResolver },
+			errors: { type: this.resultSchemaTypeProvider.errorListResultType },
 		}
 		if (operation !== 'delete') {
 			fields.validation = {
-				type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+				type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 			}
 		}
 		return this.graphqlObjectFactories.createObjectType({

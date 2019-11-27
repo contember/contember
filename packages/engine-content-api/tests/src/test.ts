@@ -28,21 +28,37 @@ export interface Test {
 	return: object
 }
 
+const SQL_BEGIN = {
+	sql: 'BEGIN;',
+	parameters: [],
+	response: {},
+}
+const SQL_REPEATABLE_READ = {
+	sql: 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ',
+	parameters: [],
+	response: {},
+}
+
 export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 	return [
-		{
-			sql: 'BEGIN;',
-			parameters: [],
-			response: {},
-		},
-		{
-			sql: 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ',
-			parameters: [],
-			response: {},
-		},
+		SQL_BEGIN,
+		SQL_REPEATABLE_READ,
 		...executes,
 		{
 			sql: 'COMMIT;',
+			parameters: [],
+			response: {},
+		},
+	]
+}
+
+export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
+	return [
+		SQL_BEGIN,
+		SQL_REPEATABLE_READ,
+		...executes,
+		{
+			sql: 'ROLLBACK;',
 			parameters: [],
 			response: {},
 		},

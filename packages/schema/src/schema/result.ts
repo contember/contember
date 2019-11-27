@@ -3,18 +3,21 @@ import Value from './value'
 namespace Result {
 	export interface CreateResult {
 		ok: boolean
+		errors: ExecutionError[]
 		validation: ValidationResult
 		node: Value.Object | null
 	}
 
 	export interface UpdateResult {
 		ok: boolean
+		errors: ExecutionError[]
 		validation: ValidationResult
 		node: Value.Object | null
 	}
 
 	export interface DeleteResult {
 		ok: boolean
+		errors: ExecutionError[]
 		node: Value.Object | null
 	}
 
@@ -31,6 +34,20 @@ namespace Result {
 	export interface ValidationError {
 		path: PathFragment[]
 		message: ValidationMessage
+	}
+
+	export enum ExecutionErrorType {
+		NotNullConstraintViolation = 'NotNullConstraintViolation',
+		UniqueConstraintViolation = 'UniqueConstraintViolation',
+		ForeignKeyConstraintViolation = 'ForeignKeyConstraintViolation',
+		NotFoundOrDenied = 'NotFoundOrDenied',
+		NonUniqueWhereInput = 'NonUniqueWhereInput',
+	}
+
+	export interface ExecutionError {
+		path: PathFragment[]
+		type: ExecutionErrorType
+		message?: string
 	}
 
 	export type PathFragment = { field: string } | { index: number; alias?: string }

@@ -1,1 +1,1 @@
-export class ImplementationException {}
+export class ImplementationException extends Error {}

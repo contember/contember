@@ -7,6 +7,20 @@ type _IndexPathFragment {
   alias: String
 }
 
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+}
+
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
 
 type _ValidationError {
@@ -58,12 +72,14 @@ input FrontPageCreateIntroVideoEntityRelationInput {
 type FrontPageCreateResult {
   ok: Boolean!
   node: FrontPage
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type FrontPageDeleteResult {
   ok: Boolean!
   node: FrontPage
+  errors: [_MutationError!]!
 }
 
 input FrontPageInHouseVideosByFrontPageForIntroUniqueWhere {
@@ -123,6 +139,7 @@ input FrontPageUpdateIntroVideoEntityRelationInput {
 type FrontPageUpdateResult {
   ok: Boolean!
   node: FrontPage
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -309,12 +326,14 @@ input VideoCreateInput {
 type VideoCreateResult {
   ok: Boolean!
   node: Video
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type VideoDeleteResult {
   ok: Boolean!
   node: Video
+  errors: [_MutationError!]!
 }
 
 type VideoMeta {
@@ -364,6 +383,7 @@ input VideoUpdateInput {
 type VideoUpdateResult {
   ok: Boolean!
   node: Video
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 

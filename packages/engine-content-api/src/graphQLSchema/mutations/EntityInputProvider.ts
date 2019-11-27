@@ -6,6 +6,7 @@ import Authorizator from '../../acl/Authorizator'
 import singletonFactory from '../../utils/singletonFactory'
 import { GraphQLInputType } from 'graphql/type/definition'
 import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import { ImplementationException } from '../../exception'
 
 class EntityInputProvider<Operation extends EntityInputProvider.Type.create | EntityInputProvider.Type.update> {
 	private entityInputs = singletonFactory<
@@ -39,7 +40,7 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 				case EntityInputProvider.Type.update:
 					return Acl.Operation.update
 				default:
-					throw new Error()
+					throw new ImplementationException(`EntityInputProvider: Invalid operation ${this.operation}`)
 			}
 		})()
 		if (!this.authorizator.isAllowed(operation, entity.name, entity.primary)) {

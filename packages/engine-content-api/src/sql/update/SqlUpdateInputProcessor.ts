@@ -1,12 +1,41 @@
-import { Input, Value } from '@contember/schema'
+import { Input, Model, Value } from '@contember/schema'
 import Mapper from '../Mapper'
 import UpdateBuilder from './UpdateBuilder'
-import UpdateInputProcessor from '../../inputProcessing/UpdateInputProcessor'
+import { UpdateInputProcessor } from '../../inputProcessing'
 import * as Context from '../../inputProcessing/InputContext'
-import { NotNullConstraintViolation } from '../Constraints'
-import { NoResultError } from '../NoResultError'
+import {
+	ConstraintType,
+	getInsertPrimary,
+	MutationConstraintViolationError,
+	MutationEntryNotFoundError,
+	MutationNothingToDo,
+	MutationResultList,
+	MutationResultType,
+	NothingToDoReason,
+	prependPath,
+} from '../Result'
 
-export default class SqlUpdateInputProcessor implements UpdateInputProcessor<void> {
+const hasManyProcessor = <Context extends { relation: Model.AnyRelation; index: number; alias?: string }>(
+	innerProcessor: (context: Context) => Promise<MutationResultList>,
+) => {
+	return async (context: Context): Promise<MutationResultList> => {
+		const { relation, index, alias } = context
+		const path = [{ field: relation.name }, { index, alias }]
+		return prependPath(path, await innerProcessor(context))
+	}
+}
+
+const hasOneProcessor = <Context extends { relation: Model.AnyRelation }>(
+	innerProcessor: (context: Context) => Promise<MutationResultList>,
+) => {
+	return async (context: Context): Promise<MutationResultList> => {
+		const { relation } = context
+		const path = [{ field: relation.name }]
+		return prependPath(path, await innerProcessor(context))
+	}
+}
+
+export default class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
 	constructor(
 		private readonly primaryValue: Input.PrimaryValue,
 		private readonly data: Input.UpdateDataInput,
@@ -18,130 +47,194 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 		if (this.data[column.name] !== undefined) {
 			this.updateBuilder.addFieldValue(column.name, this.data[column.name] as Value.AtomicValue)
 		}
-		return Promise.resolve()
+		return Promise.resolve([])
 	}
 
-	manyHasManyInversed: UpdateInputProcessor['manyHasManyInversed'] = {
-		connect: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.connectJunction(targetEntity, targetRelation, input, { [entity.primary]: this.primaryValue })
-		},
-		create: async ({ targetEntity, targetRelation, input, entity }) => {
-			const primaryOwner = await this.mapper.insert(targetEntity, input)
-			await this.mapper.connectJunction(
-				targetEntity,
-				targetRelation,
-				{ [targetEntity.primary]: primaryOwner },
-				{ [entity.primary]: this.primaryValue },
-			)
-		},
-		update: async ({ targetEntity, targetRelation, input: { where, data }, entity }) => {
-			await this.mapper.update(targetEntity, where, data)
-			await this.mapper.connectJunction(targetEntity, targetRelation, where, { [entity.primary]: this.primaryValue })
-		},
-		upsert: async ({ targetEntity, targetRelation, input: { where, update, create }, entity }) => {
-			try {
-				await this.mapper.update(targetEntity, where, update)
-				await this.mapper.connectJunction(targetEntity, targetRelation, where, { [entity.primary]: this.primaryValue })
-			} catch (e) {
-				if (e instanceof NoResultError) {
-					const primaryValue = await this.mapper.insert(targetEntity, create)
-					await this.mapper.connectJunction(
-						targetEntity,
-						targetRelation,
-						{ [targetEntity.primary]: primaryValue },
-						{ [entity.primary]: this.primaryValue },
-					)
-				} else {
-					throw e
-				}
+	manyHasManyInversed: UpdateInputProcessor<MutationResultList>['manyHasManyInversed'] = {
+		connect: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			const primaryValue = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (!primaryValue) {
+				return [new MutationEntryNotFoundError([], input)]
 			}
-		},
-		delete: async ({ targetEntity, input }) => {
-			await this.mapper.delete(targetEntity, input)
-		},
-		disconnect: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.disconnectJunction(targetEntity, targetRelation, input, { [entity.primary]: this.primaryValue })
-		},
-	}
 
-	manyHasManyOwner: UpdateInputProcessor['manyHasManyOwner'] = {
-		connect: async ({ input, entity, relation }) => {
-			await this.mapper.connectJunction(entity, relation, { [entity.primary]: this.primaryValue }, input)
-		},
-		create: async ({ targetEntity, input, entity, relation }) => {
-			const primaryOwner = await this.mapper.insert(targetEntity, input)
-			await this.mapper.connectJunction(
-				entity,
-				relation,
-				{ [entity.primary]: this.primaryValue },
-				{ [targetEntity.primary]: primaryOwner },
-			)
-		},
-		update: async ({ targetEntity, input: { where, data }, entity, relation }) => {
-			await this.mapper.update(targetEntity, where, data)
-			await this.mapper.connectJunction(entity, relation, { [entity.primary]: this.primaryValue }, where)
-		},
-		upsert: async ({ targetEntity, input: { where, update, create }, entity, relation }) => {
-			try {
-				await this.mapper.update(targetEntity, where, update)
-				await this.mapper.connectJunction(entity, relation, { [entity.primary]: this.primaryValue }, where)
-			} catch (e) {
-				if (e instanceof NoResultError) {
-					const primaryValue = await this.mapper.insert(targetEntity, create)
-					await this.mapper.connectJunction(
-						entity,
-						relation,
-						{ [entity.primary]: this.primaryValue },
-						{ [targetEntity.primary]: primaryValue },
-					)
-				} else {
-					throw e
-				}
+			return await this.mapper.connectJunction(targetEntity, targetRelation, primaryValue, this.primaryValue)
+		}),
+		create: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			const insertResult = await this.mapper.insert(targetEntity, input)
+			const primaryValue = getInsertPrimary(insertResult)
+			if (!primaryValue) {
+				return insertResult
 			}
-		},
-		delete: async ({ targetEntity, input }) => {
-			await this.mapper.delete(targetEntity, input)
-		},
-		disconnect: async ({ input, entity, relation }) => {
-			await this.mapper.disconnectJunction(entity, relation, { [entity.primary]: this.primaryValue }, input)
-		},
+			return await this.mapper.connectJunction(targetEntity, targetRelation, primaryValue, this.primaryValue)
+		}),
+		update: hasManyProcessor(async ({ targetEntity, targetRelation, input: { where, data }, entity }) => {
+			const primary = await this.mapper.getPrimaryValue(targetEntity, where)
+			if (!primary) {
+				return [new MutationEntryNotFoundError([], where)]
+			}
+			return [
+				...(await this.mapper.update(targetEntity, { [targetEntity.primary]: primary }, data)),
+				...(await this.mapper.connectJunction(targetEntity, targetRelation, primary, this.primaryValue)),
+			]
+		}),
+		upsert: hasManyProcessor(async ({ targetEntity, targetRelation, input: { where, update, create }, entity }) => {
+			const primary = await this.mapper.getPrimaryValue(targetEntity, where)
+			if (primary) {
+				const updateResult = await this.mapper.update(targetEntity, { [targetEntity.primary]: primary }, update)
+				const connectResult = await this.mapper.connectJunction(
+					targetEntity,
+					targetRelation,
+					primary,
+					this.primaryValue,
+				)
+				return [...updateResult, ...connectResult]
+			} else {
+				const insertResult = await this.mapper.insert(targetEntity, create)
+				const primaryValue = getInsertPrimary(insertResult)
+				if (!primaryValue) {
+					return insertResult
+				}
+				const connectResult = await this.mapper.connectJunction(
+					targetEntity,
+					targetRelation,
+					primaryValue,
+					this.primaryValue,
+				)
+				return [...insertResult, ...connectResult]
+			}
+		}),
+		delete: hasManyProcessor(async ({ targetEntity, input }) => {
+			return await this.mapper.delete(targetEntity, input)
+		}),
+		disconnect: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			const primaryValue = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (!primaryValue) {
+				return [new MutationEntryNotFoundError([], input)]
+			}
+
+			return await this.mapper.disconnectJunction(targetEntity, targetRelation, primaryValue, this.primaryValue)
+		}),
 	}
 
-	manyHasOne: UpdateInputProcessor['manyHasOne'] = {
-		connect: async ({ targetEntity, input, relation }) => {
-			this.updateBuilder.addFieldValue(relation.name, this.mapper.getPrimaryValue(targetEntity, input))
-		},
-		create: async ({ targetEntity, input, relation }) => {
-			this.updateBuilder.addFieldValue(relation.name, this.mapper.insert(targetEntity, input))
-		},
-		update: async ({ targetEntity, input, entity, relation }) => {
+	manyHasManyOwner: UpdateInputProcessor<MutationResultList>['manyHasManyOwner'] = {
+		connect: hasManyProcessor(async ({ input, entity, relation, targetEntity }) => {
+			const primaryValue = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (!primaryValue) {
+				return [new MutationEntryNotFoundError([], input)]
+			}
+			return await this.mapper.connectJunction(entity, relation, this.primaryValue, primaryValue)
+		}),
+		create: hasManyProcessor(async ({ targetEntity, input, entity, relation }) => {
+			const insertResult = await this.mapper.insert(targetEntity, input)
+			const insertPrimary = getInsertPrimary(insertResult)
+			if (!insertPrimary) {
+				return insertResult
+			}
+			return [
+				...insertResult,
+				...(await this.mapper.connectJunction(entity, relation, this.primaryValue, insertPrimary)),
+			]
+		}),
+		update: hasManyProcessor(async ({ targetEntity, input: { where, data }, entity, relation }) => {
+			const primary = await this.mapper.getPrimaryValue(targetEntity, where)
+			if (!primary) {
+				return [new MutationEntryNotFoundError([], where)]
+			}
+			return [
+				...(await this.mapper.update(targetEntity, { [targetEntity.primary]: primary }, data)),
+				...(await this.mapper.connectJunction(entity, relation, this.primaryValue, primary)),
+			]
+		}),
+		upsert: hasManyProcessor(async ({ targetEntity, input: { where, update, create }, entity, relation }) => {
+			const primary = await this.mapper.getPrimaryValue(targetEntity, where)
+			if (primary) {
+				const updateResult = await this.mapper.update(targetEntity, { [targetEntity.primary]: primary }, update)
+				const connectResult = await this.mapper.connectJunction(entity, relation, this.primaryValue, primary)
+				return [...updateResult, ...connectResult]
+			} else {
+				const insertResult = await this.mapper.insert(targetEntity, create)
+
+				const primaryValue = getInsertPrimary(insertResult)
+				if (!primaryValue) {
+					return insertResult
+				}
+				const connectResult = await this.mapper.connectJunction(entity, relation, this.primaryValue, primaryValue)
+				return [...insertResult, ...connectResult]
+			}
+		}),
+		delete: hasManyProcessor(async ({ targetEntity, input }) => {
+			return await this.mapper.delete(targetEntity, input)
+		}),
+		disconnect: hasManyProcessor(async ({ input, entity, relation, targetEntity }) => {
+			const primaryValue = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (!primaryValue) {
+				return [new MutationEntryNotFoundError([], input)]
+			}
+
+			return await this.mapper.disconnectJunction(entity, relation, this.primaryValue, primaryValue)
+		}),
+	}
+
+	manyHasOne: UpdateInputProcessor<MutationResultList>['manyHasOne'] = {
+		connect: hasOneProcessor(async ({ targetEntity, input, relation }) => {
+			const primary = await this.updateBuilder.addFieldValue(
+				relation.name,
+				this.mapper.getPrimaryValue(targetEntity, input),
+			)
+			if (primary === undefined) {
+				return [new MutationEntryNotFoundError([], input)]
+			}
+			return []
+		}),
+		create: hasOneProcessor(async ({ targetEntity, input, relation }) => {
+			// intentionally no await here
+			const insert = this.mapper.insert(targetEntity, input)
+			this.updateBuilder.addFieldValue(relation.name, async () => {
+				const insertResult = await insert
+				return getInsertPrimary(insertResult)
+			})
+			return await insert
+		}),
+		update: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
 			)
-			await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
-		},
-		upsert: async ({ targetEntity, input: { create, update }, entity, relation }) => {
+			if (!inversedPrimary) {
+				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
+			}
+			return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
+		}),
+		upsert: hasOneProcessor(async ({ targetEntity, input: { create, update }, entity, relation }) => {
 			const select = this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
 
-			//addColumnData has to be called synchronously
-			this.updateBuilder.addFieldValue(relation.name, async () => {
+			const result: MutationResultList = []
+			// addFieldValue has to be called immediately
+			await this.updateBuilder.addFieldValue(relation.name, async () => {
 				const primary = await select
 				if (primary) {
 					return undefined
 				}
-				return this.mapper.insert(targetEntity, create)
+				const insertResult = await this.mapper.insert(targetEntity, create)
+				const insertPrimary = getInsertPrimary(insertResult)
+				if (insertPrimary) {
+					return insertPrimary
+				}
+				result.push(...insertResult)
+				return undefined
 			})
 
 			const inversedPrimary = await select
 			if (inversedPrimary) {
-				await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
+				return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
+			} else {
+				return result
 			}
-		},
-		delete: async ({ targetEntity, entity, relation }) => {
+		}),
+		delete: hasOneProcessor(async ({ targetEntity, entity, relation }) => {
 			if (!relation.nullable) {
-				throw new NotNullConstraintViolation(entity.name, relation.name)
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			this.updateBuilder.addFieldValue(relation.name, null)
 			const inversedPrimary = await this.mapper.selectField(
@@ -150,30 +243,31 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				relation.name,
 			)
 			await this.updateBuilder.update
-			await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
-		},
-		disconnect: async ({ entity, relation }) => {
+			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
+		}),
+		disconnect: hasOneProcessor(async ({ entity, relation }) => {
 			if (!relation.nullable) {
-				throw new NotNullConstraintViolation(entity.name, relation.name)
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			this.updateBuilder.addFieldValue(relation.name, null)
-		},
+			return []
+		}),
 	}
 
-	oneHasMany: UpdateInputProcessor['oneHasMany'] = {
-		connect: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.update(targetEntity, input, {
+	oneHasMany: UpdateInputProcessor<MutationResultList>['oneHasMany'] = {
+		connect: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			return await this.mapper.update(targetEntity, input, {
 				[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
 			})
-		},
-		create: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.insert(targetEntity, {
+		}),
+		create: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			return await this.mapper.insert(targetEntity, {
 				...input,
 				[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
 			})
-		},
-		update: async ({ targetEntity, targetRelation, input: { where, data }, entity }) => {
-			await this.mapper.update(
+		}),
+		update: hasManyProcessor(async ({ targetEntity, targetRelation, input: { where, data }, entity }) => {
+			return await this.mapper.update(
 				targetEntity,
 				{ ...where, [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				{
@@ -181,8 +275,8 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 					// [targetRelation.name]: {connect: thisPrimary}
 				},
 			)
-		},
-		upsert: async ({ targetEntity, targetRelation, input: { create, where, update }, entity }) => {
+		}),
+		upsert: hasManyProcessor(async ({ targetEntity, targetRelation, input: { create, where, update }, entity }) => {
 			const result = await this.mapper.update(
 				targetEntity,
 				{ ...where, [targetRelation.name]: { [entity.primary]: this.primaryValue } },
@@ -191,129 +285,164 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 					// [targetRelation.name]: {connect: thisPrimary}
 				},
 			)
-			if (result === 0) {
-				await this.mapper.insert(targetEntity, {
+			if (result[0].result === MutationResultType.notFoundError) {
+				return await this.mapper.insert(targetEntity, {
 					...create,
 					[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
 				})
 			}
-		},
-		delete: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.delete(targetEntity, {
+			return result
+		}),
+		delete: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			return await this.mapper.delete(targetEntity, {
 				...input,
 				[targetRelation.name]: { [entity.primary]: this.primaryValue },
 			})
-		},
-		disconnect: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.update(
+		}),
+		disconnect: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			return await this.mapper.update(
 				targetEntity,
 				{ ...input, [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				{ [targetRelation.name]: { disconnect: true } },
 			)
-		},
+		}),
 	}
 
-	oneHasOneInversed: UpdateInputProcessor['oneHasOneInversed'] = {
-		connect: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.update(targetEntity, input, {
+	oneHasOneInversed: UpdateInputProcessor<MutationResultList>['oneHasOneInversed'] = {
+		connect: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			return await this.mapper.update(targetEntity, input, {
 				[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
 			})
-		},
-		create: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.update(
+		}),
+		create: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			return [
+				...(await this.mapper.update(
+					targetEntity,
+					{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
+					{ [targetRelation.name]: { disconnect: true } },
+				)).filter(it => it.result !== MutationResultType.notFoundError),
+				...(await this.mapper.insert(targetEntity, {
+					...input,
+					[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
+				})),
+			]
+		}),
+		update: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
+			return await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-				{ [targetRelation.name]: { disconnect: true } },
+				input,
 			)
-			await this.mapper.insert(targetEntity, {
-				...input,
-				[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
-			})
-		},
-		update: async ({ targetEntity, targetRelation, input, entity }) => {
-			await this.mapper.update(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } }, input)
-		},
-		upsert: async ({ targetEntity, targetRelation, input: { create, update }, entity }) => {
+		}),
+		upsert: hasOneProcessor(async ({ targetEntity, targetRelation, input: { create, update }, entity }) => {
 			const result = await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				update,
 			)
-			if (result === 0) {
-				await this.mapper.insert(targetEntity, {
+			if (result[0].result === MutationResultType.notFoundError) {
+				return await this.mapper.insert(targetEntity, {
 					...create,
 					[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
 				})
 			}
-		},
-		delete: async ({ targetEntity, targetRelation, entity }) => {
-			await this.mapper.delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } })
-		},
-		disconnect: async ({ targetEntity, targetRelation, entity }) => {
-			await this.mapper.update(
+			return result
+		}),
+		delete: hasOneProcessor(async ({ targetEntity, targetRelation, entity }) => {
+			return await this.mapper.delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } })
+		}),
+		disconnect: hasOneProcessor(async ({ targetEntity, targetRelation, entity }) => {
+			return await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				{ [targetRelation.name]: { disconnect: true } },
 			)
-		},
+		}),
 	}
 
-	oneHasOneOwner: UpdateInputProcessor['oneHasOneOwner'] = {
-		connect: async ({ targetEntity, input, entity, relation }) => {
-			this.updateBuilder.addFieldValue(relation.name, async () => {
-				const relationPrimary = (await this.mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
+	oneHasOneOwner: UpdateInputProcessor<MutationResultList>['oneHasOneOwner'] = {
+		connect: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
+			const result: MutationResultList = []
 
-				const currentOwner = await this.mapper.selectField(
-					entity,
-					{ [relation.name]: { [targetEntity.primary]: relationPrimary } },
-					entity.primary,
-				)
+			await this.updateBuilder.addFieldValue(relation.name, async () => {
+				const relationPrimary = (await this.mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
+				if (!relationPrimary) {
+					result.push(new MutationEntryNotFoundError([], input))
+					return undefined
+				}
+
+				const currentOwner = await this.mapper.getPrimaryValue(entity, {
+					[relation.name]: { [targetEntity.primary]: relationPrimary },
+				})
 				if (currentOwner === this.primaryValue) {
 					return undefined
 				}
 				if (currentOwner) {
-					await this.mapper.update(
-						entity,
-						{
-							[entity.primary]: currentOwner,
-						},
-						{ [relation.name]: { disconnect: true } },
+					result.push(
+						...(await this.mapper.update(
+							entity,
+							{
+								[entity.primary]: currentOwner,
+							},
+							{ [relation.name]: { disconnect: true } },
+						)),
 					)
 				}
 				return relationPrimary
 			})
-		},
-		create: async ({ targetEntity, input, relation }) => {
-			this.updateBuilder.addFieldValue(relation.name, this.mapper.insert(targetEntity, input))
-		},
-		update: async ({ targetEntity, input, entity, relation }) => {
+			return result
+		}),
+		create: hasOneProcessor(async ({ targetEntity, input, relation }) => {
+			const insert = this.mapper.insert(targetEntity, input)
+			this.updateBuilder.addFieldValue(relation.name, async () => {
+				const insertResult = await insert
+				const insertPrimary = getInsertPrimary(insertResult)
+				if (insertPrimary) {
+					return insertPrimary
+				}
+				return undefined
+			})
+			return await insert
+		}),
+		update: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
 			)
-			await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
-		},
-		upsert: async ({ targetEntity, input: { create, update }, entity, relation }) => {
+			if (!inversedPrimary) {
+				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
+			}
+			return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
+		}),
+		upsert: hasOneProcessor(async ({ targetEntity, input: { create, update }, entity, relation }) => {
 			const select = this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
 
+			const result: MutationResultList = []
 			//addColumnData has to be called synchronously
-			this.updateBuilder.addFieldValue(relation.name, async () => {
+			await this.updateBuilder.addFieldValue(relation.name, async () => {
 				const primary = await select
 				if (primary) {
 					return undefined
 				}
-				return this.mapper.insert(targetEntity, create)
+				const insertResult = await this.mapper.insert(targetEntity, create)
+				const insertPrimary = getInsertPrimary(insertResult)
+				if (insertPrimary) {
+					return insertPrimary
+				}
+				result.push(...insertResult)
+				return undefined
 			})
 
 			const inversedPrimary = await select
 			if (inversedPrimary) {
-				await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
+				return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
 			}
-		},
-		delete: async ({ targetEntity, entity, relation }) => {
+			return result
+		}),
+		delete: hasOneProcessor(async ({ targetEntity, entity, relation }) => {
 			if (!relation.nullable) {
-				throw new NotNullConstraintViolation(entity.name, relation.name)
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			this.updateBuilder.addFieldValue(relation.name, null)
 			const inversedPrimary = await this.mapper.selectField(
@@ -322,13 +451,14 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<voi
 				relation.name,
 			)
 			await this.updateBuilder.update
-			await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
-		},
-		disconnect: async ({ entity, relation }) => {
+			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
+		}),
+		disconnect: hasOneProcessor(async ({ entity, relation }) => {
 			if (!relation.nullable) {
-				throw new NotNullConstraintViolation(entity.name, relation.name)
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			this.updateBuilder.addFieldValue(relation.name, null)
-		},
+			return []
+		}),
 	}
 }

@@ -8,6 +8,7 @@ import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import CreateEntityRelationAllowedOperationsVisitor from './CreateEntityRelationAllowedOperationsVisitor'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import { ImplementationException } from '../../exception'
 
 export default class CreateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
@@ -20,7 +21,7 @@ export default class CreateEntityRelationInputFieldVisitor
 	) {}
 
 	public visitColumn(): never {
-		throw new Error()
+		throw new ImplementationException('CreateEntityRelationInputFieldVisitor: Not applicable for a column')
 	}
 
 	public visitHasOne(

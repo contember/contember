@@ -1,22 +1,22 @@
 import { tuple } from '../../utils'
 import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
-import { resolveValue } from '../utils'
 import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
+import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 
-type ColumnValue = {
-	value: PromiseLike<Value.AtomicValue | undefined>
-	columnName: string
-	columnType: string
+export interface UpdateResult {
+	values: ResolvedColumnValue[]
+	executed: boolean
+	affectedRows: number | null
 }
 
 export default class UpdateBuilder {
-	public readonly update: Promise<number | null>
-	private firer: (db: Client) => void = () => {
-		throw new Error()
+	private resolver: (value: number | null) => void = () => {
+		throw new Error('UpdateBuilder: Resolver called too soon')
 	}
+	public readonly update: Promise<number | null> = new Promise(resolve => (this.resolver = resolve))
 
 	private rowData: ColumnValue[] = []
 
@@ -28,20 +28,17 @@ export default class UpdateBuilder {
 		private readonly entity: Model.Entity,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly uniqueWhere: Input.Where,
-	) {
-		const blocker: Promise<Client> = new Promise(resolver => (this.firer = resolver))
-		this.update = this.createUpdatePromise(blocker)
-	}
+	) {}
 
-	public async execute(db: Client): Promise<number | null> {
-		this.firer(db)
-		return this.update
-	}
-
-	public addFieldValue(fieldName: string, value: Value.GenericValueLike<Value.AtomicValue | undefined>) {
+	public async addFieldValue(
+		fieldName: string,
+		value: Value.GenericValueLike<Value.AtomicValue | undefined>,
+	): Promise<Value.AtomicValue | undefined> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
-		this.rowData.push({ columnName, value: resolveValue(value), columnType })
+		const resolvedValue = resolveGenericValue(value)
+		this.rowData.push({ columnName, value: resolvedValue, columnType, fieldName })
+		return resolvedValue
 	}
 
 	public addNewWhere(where: Input.Where): void {
@@ -52,22 +49,18 @@ export default class UpdateBuilder {
 		this.oldWhere = { and: [where, this.oldWhere] }
 	}
 
-	private async createUpdatePromise(blocker: PromiseLike<Client>) {
-		const db = await blocker
-
-		const resolvedValues = await Promise.all(this.rowData.map(it => it.value))
-		const resolvedData = this.rowData
-			.map((it, index) => ({ ...it, value: resolvedValues[index] }))
-			.filter(it => it.value !== undefined)
+	public async execute(db: Client): Promise<UpdateResult> {
+		const resolvedData = await resolveRowData(this.rowData)
 		if (Object.keys(resolvedData).length === 0) {
-			return null
+			this.resolver(null)
+			return { values: [], affectedRows: null, executed: false }
 		}
 
 		const qb = DbUpdateBuilder.create()
 			.with('newData_', qb => {
 				qb = resolvedData.reduce(
 					(qb, value) =>
-						qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
+						qb.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName),
 					qb,
 				)
 				const columns = new Set(resolvedData.map(it => it.columnName))
@@ -112,6 +105,8 @@ export default class UpdateBuilder {
 				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
 				return qb
 			})
-		return await qb.execute(db)
+		const result = await qb.execute(db)
+		this.resolver(result)
+		return { values: resolvedData, affectedRows: result, executed: true }
 	}
 }

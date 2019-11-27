@@ -16,7 +16,7 @@ export default class JoinBuilder {
 	) {
 		const targetEntity = getTargetEntity(this.schema, entity, relationName)
 		if (!targetEntity) {
-			throw new Error()
+			throw new Error(`JoinBuilder: target entity for relation ${entity.name}::${relationName} not found`)
 		}
 
 		const joins = acceptRelationTypeVisitor(this.schema, entity, relationName, new JoinVisitor(path))

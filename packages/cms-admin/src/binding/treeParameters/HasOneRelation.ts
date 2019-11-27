@@ -1,9 +1,17 @@
-import { FieldName } from './FieldName'
-import { Filter } from './Filter'
-import { UniqueWhere } from './UniqueWhere'
+import { SugaredUniqueWhere, UniqueWhere } from './primitives'
+import { Relation, SugarableRelation, UnsugarableRelation } from './Relation'
+import {
+	SingleEntityParameters,
+	SugarableSingleEntityParameters,
+	UnsugarableSingleEntityParameters,
+} from './SingleEntityParameters'
 
-export interface HasOneRelation {
-	field: FieldName
-	filter?: Filter
-	reducedBy?: UniqueWhere
+export interface HasOneRelation extends Relation, SingleEntityParameters {
+	reducedBy: UniqueWhere | undefined
 }
+
+export interface SugarableHasOneRelation extends SugarableRelation, SugarableSingleEntityParameters {
+	reducedBy?: SugaredUniqueWhere
+}
+
+export interface UnsugarableHasOneRelation extends UnsugarableRelation, UnsugarableSingleEntityParameters {}

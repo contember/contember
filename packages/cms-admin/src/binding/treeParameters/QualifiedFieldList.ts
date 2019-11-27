@@ -1,9 +1,17 @@
-import { FieldName } from './FieldName'
-import { QualifiedEntityList } from './QualifiedEntityList'
+import { AnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
+import {
+	QualifiedEntityList,
+	SugarableQualifiedEntityList,
+	UnsugarableQualifiedEntityList,
+} from './QualifiedEntityList'
 
-export interface QualifiedFieldList extends QualifiedEntityList {
-	fieldName: FieldName
-}
+export interface QualifiedFieldList extends QualifiedEntityList, AnyField {}
+
+export interface SugarableQualifiedFieldList extends SugarableQualifiedEntityList, SugarableAnyField {}
+
+export interface UnsugarableQualifiedFieldList extends UnsugarableQualifiedEntityList, UnsugarableAnyField {}
 
 // E.g. Author[age < 123].son.sister.name
-export type SugaredQualifiedFieldList = QualifiedFieldList | string
+export interface SugaredQualifiedFieldList extends UnsugarableQualifiedFieldList {
+	qualifiedFieldList: string | SugarableQualifiedFieldList
+}

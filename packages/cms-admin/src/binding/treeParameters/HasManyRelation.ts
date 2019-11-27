@@ -1,7 +1,12 @@
-import { FieldName } from './FieldName'
-import { Filter } from './Filter'
+import {
+	EntityListParameters,
+	SugarableEntityListParameters,
+	UnsugarableEntityListParameters,
+} from './EntityListParameters'
+import { Relation, SugarableRelation, UnsugarableRelation } from './Relation'
 
-export interface HasManyRelation {
-	field: FieldName
-	filter?: Filter
-}
+export interface HasManyRelation extends Relation, EntityListParameters {}
+
+export interface SugarableHasManyRelation extends SugarableRelation, SugarableEntityListParameters {}
+
+export interface UnsugarableHasManyRelation extends UnsugarableRelation, UnsugarableEntityListParameters {}

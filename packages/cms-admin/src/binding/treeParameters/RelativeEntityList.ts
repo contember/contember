@@ -1,9 +1,22 @@
-import { HasManyRelation } from './HasManyRelation'
-import { RelativeSingleEntity } from './RelativeSingleEntity'
+import { HasManyRelation, SugarableHasManyRelation, UnsugarableHasManyRelation } from './HasManyRelation'
+import { SugarableHasOneRelation } from './HasOneRelation'
+import {
+	RelativeSingleEntity,
+	SugarableRelativeSingleEntity,
+	UnsugarableRelativeSingleEntity,
+} from './RelativeSingleEntity'
 
 export interface RelativeEntityList extends RelativeSingleEntity {
-	hasManyRelationPath: HasManyRelation
+	hasManyRelation: HasManyRelation
 }
 
-// E.g. genres(slug = 'sciFi').authors[age < 123]
-export type SugaredRelativeEntityList = RelativeEntityList | string
+export interface SugarableRelativeEntityList extends SugarableRelativeSingleEntity {
+	hasManyRelation: SugarableHasManyRelation
+}
+
+export interface UnsugarableRelativeEntityList extends UnsugarableRelativeSingleEntity {}
+
+export interface SugaredRelativeEntityList extends UnsugarableRelativeEntityList {
+	// E.g. genres(slug = 'sciFi').authors[age < 123]
+	relativeEntityList: string | SugarableRelativeEntityList
+}

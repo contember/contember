@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
-import { Scalar } from '../accessorTree'
-import { VariableLiteral, VariableScalar } from '../dao'
+import { Scalar } from './Scalar'
+import { VariableLiteral, VariableScalar } from '../../dao'
 
 export type FieldValue = GraphQlBuilder.Literal | Scalar
 

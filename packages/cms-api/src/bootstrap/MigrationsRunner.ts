@@ -24,7 +24,7 @@ export class MigrationsRunner {
 			createSchema: true,
 			singleTransaction: true,
 			log: (msg: string) => {
-				log && console.log('    ' + msg.replace(/\n/g, '\n    '))
+				log && msg.startsWith('> ') && console.log(msg.substring(2))
 			},
 		})
 	}

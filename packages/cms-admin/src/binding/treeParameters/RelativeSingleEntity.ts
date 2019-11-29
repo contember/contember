@@ -1,4 +1,13 @@
-import { HasOneRelation, SugarableHasOneRelation, UnsugarableHasOneRelation } from './HasOneRelation'
+import {
+	DesugaredHasOneRelation,
+	HasOneRelation,
+	SugarableHasOneRelation,
+	UnsugarableHasOneRelation,
+} from './HasOneRelation'
+
+export interface DesugaredRelativeSingleEntity {
+	hasOneRelationPath: DesugaredHasOneRelation[]
+}
 
 export interface RelativeSingleEntity {
 	hasOneRelationPath: HasOneRelation[]
@@ -12,5 +21,5 @@ export interface UnsugarableRelativeSingleEntity extends UnsugarableHasOneRelati
 
 export interface SugaredRelativeSingleEntity extends UnsugarableRelativeSingleEntity {
 	// E.g. localesByLocale(locale.slug = en)
-	relativeSingleEntity: string | SugarableHasOneRelation[]
+	field: string | SugarableHasOneRelation[] | SugarableHasOneRelation
 }

@@ -1,10 +1,14 @@
 import { Filter, Limit, Offset, OrderBy, SugaredFilter, SugaredOrderBy } from './primitives'
 
-export interface EntityListParameters {
+export interface DesugaredEntityListParameters {
 	filter: Filter | undefined
+}
+
+export interface EntityListParameters {
 	orderBy: OrderBy | undefined
 	offset: Offset | undefined
 	limit: Limit | undefined
+	filter: Filter | undefined
 }
 
 export interface SugarableEntityListParameters {

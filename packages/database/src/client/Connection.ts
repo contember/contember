@@ -50,7 +50,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 
 	async query<Row extends Record<string, any>>(
 		sql: string,
-		parameters: any[],
+		parameters: any[] = [],
 		meta: Record<string, any> = {},
 		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {

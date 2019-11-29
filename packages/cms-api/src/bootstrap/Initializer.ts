@@ -13,23 +13,22 @@ export class Initializer {
 		console.log(`Executing tenant db migration`)
 		await this.tenantDbMigrationsRunner.migrate()
 		console.log(`done`)
-		await Promise.all(
-			this.projectContainers.map(async container => {
-				const project = container.project
-				await this.projectManager.createOrUpdateProject(project)
-				console.log(`Project ${project.slug} updated`)
 
-				console.log(`Executing system schema migration for project ${project.slug}`)
-				await container.systemDbMigrationsRunner.migrate()
-				console.log(`Done`)
+		for (const container of this.projectContainers) {
+			const project = container.project
+			await this.projectManager.createOrUpdateProject(project)
+			console.log(`Project ${project.slug} updated`)
 
-				await container.systemDbClient.transaction(async trx => {
-					const executionContainer = container.systemExecutionContainerFactory.create(trx)
+			console.log(`Executing system schema migration for project ${project.slug}`)
+			await container.systemDbMigrationsRunner.migrate()
+			console.log(`Done`)
 
-					const init = executionContainer.projectIntializer
-					await init.initialize()
-				})
-			}),
-		)
+			await container.systemDbClient.transaction(async trx => {
+				const executionContainer = container.systemExecutionContainerFactory.create(trx)
+
+				const init = executionContainer.projectIntializer
+				await init.initialize()
+			})
+		}
 	}
 }

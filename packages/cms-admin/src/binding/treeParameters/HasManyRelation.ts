@@ -1,9 +1,12 @@
 import {
+	DesugaredEntityListParameters,
 	EntityListParameters,
 	SugarableEntityListParameters,
 	UnsugarableEntityListParameters,
 } from './EntityListParameters'
-import { Relation, SugarableRelation, UnsugarableRelation } from './Relation'
+import { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
+
+export interface DesugaredHasManyRelation extends DesugaredRelation, DesugaredEntityListParameters {}
 
 export interface HasManyRelation extends Relation, EntityListParameters {}
 

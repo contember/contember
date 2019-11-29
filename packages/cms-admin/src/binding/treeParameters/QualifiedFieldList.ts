@@ -1,9 +1,12 @@
-import { AnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
+import { AnyField, DesugaredAnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
 import {
+	DesugaredQualifiedEntityList,
 	QualifiedEntityList,
 	SugarableQualifiedEntityList,
 	UnsugarableQualifiedEntityList,
 } from './QualifiedEntityList'
+
+export interface DesugaredQualifiedFieldList extends DesugaredQualifiedEntityList, DesugaredAnyField {}
 
 export interface QualifiedFieldList extends QualifiedEntityList, AnyField {}
 

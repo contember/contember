@@ -1,9 +1,12 @@
-import { AnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
+import { AnyField, DesugaredAnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
 import {
+	DesugaredRelativeSingleEntity,
 	RelativeSingleEntity,
 	SugarableRelativeSingleEntity,
 	UnsugarableRelativeSingleEntity,
 } from './RelativeSingleEntity'
+
+export interface DesugaredRelativeSingleField extends DesugaredRelativeSingleEntity, DesugaredAnyField {}
 
 export interface RelativeSingleField extends RelativeSingleEntity, AnyField {}
 
@@ -13,5 +16,5 @@ export interface UnsugarableRelativeSingleField extends UnsugarableRelativeSingl
 
 export interface SugaredRelativeSingleField extends UnsugarableRelativeSingleField {
 	// E.g. authors(id = 123).person.name
-	relativeSingleField: string | SugarableRelativeSingleField
+	field: string | SugarableRelativeSingleField
 }

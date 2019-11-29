@@ -1,10 +1,15 @@
 import { SugaredUniqueWhere, UniqueWhere } from './primitives'
-import { Relation, SugarableRelation, UnsugarableRelation } from './Relation'
+import { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
 import {
+	DesugaredSingleEntityParameters,
 	SingleEntityParameters,
 	SugarableSingleEntityParameters,
 	UnsugarableSingleEntityParameters,
 } from './SingleEntityParameters'
+
+export interface DesugaredHasOneRelation extends DesugaredRelation, DesugaredSingleEntityParameters {
+	reducedBy: UniqueWhere | undefined
+}
 
 export interface HasOneRelation extends Relation, SingleEntityParameters {
 	reducedBy: UniqueWhere | undefined

@@ -4,7 +4,7 @@ import { MarkerFactory } from '../markers'
 import { SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { Component } from './Component'
 
-interface EntityCreatorProps extends SugaredUnconstrainedQualifiedEntityList {
+export interface EntityCreatorProps extends SugaredUnconstrainedQualifiedEntityList {
 	children: React.ReactNode
 }
 

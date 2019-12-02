@@ -3,7 +3,7 @@ import { QueryLanguage } from '../queryLanguage'
 import { SugaredRelativeSingleField } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 
-export const useDesugaredRelativeSingleField = (sugaredRelativeSingleField: SugaredRelativeSingleField) => {
+export const useDesugaredRelativeSingleField = (sugaredRelativeSingleField: string | SugaredRelativeSingleField) => {
 	const environment = useEnvironment()
 	return React.useMemo(() => QueryLanguage.desugarRelativeSingleField(sugaredRelativeSingleField, environment), [
 		environment,

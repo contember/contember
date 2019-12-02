@@ -120,7 +120,7 @@ const reconcileOrderFields = (
 
 export const useSortedEntities = (
 	entityList: EntityListAccessor,
-	sortByField: SugaredRelativeSingleField | undefined,
+	sortByField: SugaredRelativeSingleField['field'] | undefined,
 ): SortedEntities => {
 	const environment = useEnvironment()
 	const desugaredSortByField = React.useMemo(

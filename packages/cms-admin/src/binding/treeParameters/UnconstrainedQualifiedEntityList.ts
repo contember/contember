@@ -1,31 +1,40 @@
 import {
+	DesugaredEntityCreationParameters,
+	EntityCreationParameters,
+	SugarableEntityCreationParameters,
+	UnsugarableEntityCreationParameters,
+} from './EntityCreationParameters'
+import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import {
 	DesugaredQualifiedEntityParameters,
 	QualifiedEntityParameters,
 	SugarableQualifiedEntityParameters,
 	UnsugarableQualifiedEntityParameters,
 } from './QualifiedEntityParameters'
-import {
-	DesugaredRelativeSingleEntity,
-	RelativeSingleEntity,
-	SugarableRelativeSingleEntity,
-	UnsugarableRelativeSingleEntity,
-} from './RelativeSingleEntity'
 
 export interface DesugaredUnconstrainedQualifiedEntityList
-	extends DesugaredRelativeSingleEntity,
-		DesugaredQualifiedEntityParameters {}
+	extends DesugaredQualifiedEntityParameters,
+		DesugaredEntityCreationParameters {
+	hasOneRelationPath: DesugaredHasOneRelation[]
+}
 
-export interface UnconstrainedQualifiedEntityList extends RelativeSingleEntity, QualifiedEntityParameters {}
+export interface UnconstrainedQualifiedEntityList extends QualifiedEntityParameters, EntityCreationParameters {
+	hasOneRelationPath: HasOneRelation[]
+}
 
 export interface SugarableUnconstrainedQualifiedEntityList
-	extends SugarableRelativeSingleEntity,
-		SugarableQualifiedEntityParameters {}
+	extends SugarableQualifiedEntityParameters,
+		SugarableEntityCreationParameters {
+	hasOneRelationPath: SugarableHasOneRelation[]
+}
 
 export interface UnsugarableUnconstrainedQualifiedEntityList
-	extends UnsugarableRelativeSingleEntity,
-		UnsugarableQualifiedEntityParameters {}
+	extends UnsugarableQualifiedEntityParameters,
+		UnsugarableEntityCreationParameters {
+	// Deliberately leaving out UnsugarableHasOneRelation
+}
 
 // E.g. Author.son.sisters(name = 'Jane')
 export interface SugaredUnconstrainedQualifiedEntityList extends UnsugarableUnconstrainedQualifiedEntityList {
-	unconstrainedQualifiedEntityList: string | SugarableUnconstrainedQualifiedEntityList
+	entities: string | SugarableUnconstrainedQualifiedEntityList
 }

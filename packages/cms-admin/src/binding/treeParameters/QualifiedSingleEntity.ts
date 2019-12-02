@@ -4,6 +4,7 @@ import {
 	SugarableEntityCreationParameters,
 	UnsugarableEntityCreationParameters,
 } from './EntityCreationParameters'
+import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import {
 	DesugaredQualifiedEntityParameters,
 	QualifiedEntityParameters,
@@ -31,32 +32,35 @@ import {
 
 export interface DesugaredQualifiedSingleEntity
 	extends DesugaredQualifiedSingleEntityParameters,
-		DesugaredRelativeSingleEntity,
 		DesugaredSingleEntityParameters,
 		DesugaredQualifiedEntityParameters,
-		DesugaredEntityCreationParameters {}
+		DesugaredEntityCreationParameters {
+	hasOneRelationPath: DesugaredHasOneRelation[]
+}
 
-// TODO remove isNonbearing
 export interface QualifiedSingleEntity
 	extends QualifiedSingleEntityParameters,
-		RelativeSingleEntity,
 		SingleEntityParameters,
 		QualifiedEntityParameters,
-		EntityCreationParameters {}
+		EntityCreationParameters {
+	hasOneRelationPath: HasOneRelation[]
+}
 
 export interface SugarableQualifiedSingleEntity
 	extends SugarableQualifiedSingleEntityParameters,
-		SugarableRelativeSingleEntity,
 		SugarableSingleEntityParameters,
 		SugarableQualifiedEntityParameters,
-		SugarableEntityCreationParameters {}
+		SugarableEntityCreationParameters {
+	hasOneRelationPath: SugarableHasOneRelation[]
+}
 
 export interface UnsugarableQualifiedSingleEntity
 	extends UnsugarableQualifiedSingleEntityParameters,
-		UnsugarableRelativeSingleEntity,
 		UnsugarableSingleEntityParameters,
 		UnsugarableQualifiedEntityParameters,
-		UnsugarableEntityCreationParameters {}
+		UnsugarableEntityCreationParameters {
+	// Deliberately leaving out UnsugarableHasOneRelation
+}
 
 export interface SugaredQualifiedSingleEntity extends UnsugarableQualifiedSingleEntity {
 	entity: string | SugarableQualifiedSingleEntity

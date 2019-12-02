@@ -5,20 +5,19 @@ import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { Component } from './Component'
 import { Entity } from './Entity'
 
-export interface HasOneProps {
-	field: SugaredRelativeSingleEntity
+export interface HasOneProps extends SugaredRelativeSingleEntity {
 	children: React.ReactNode
 }
 
 export const HasOne = Component<HasOneProps>(
 	props => {
-		const entity = useRelativeSingleEntity(props.field)
+		const entity = useRelativeSingleEntity(props)
 
 		return <Entity accessor={entity}>{props.children}</Entity>
 	},
 	{
 		generateReferenceMarker: (props, fields, environment) =>
-			MarkerFactory.createRelativeSingleEntityFields(props.field, environment, fields),
+			MarkerFactory.createRelativeSingleEntityFields(props, environment, fields),
 	},
 	'HasOne',
 )

@@ -1,4 +1,4 @@
-import { AccessorTreeRoot } from '../accessors'
+import { RootAccessor } from '../accessors'
 import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'
 
@@ -20,7 +20,7 @@ export interface QueryingAccessorTreeState {
 
 export interface MutatingAccessorTreeState {
 	name: AccessorTreeStateName.Mutating
-	data: AccessorTreeRoot
+	data: RootAccessor
 	// This is really a no-op but we want to avoid having to un-render all e.g. persist buttons
 	triggerPersist: () => Promise<SuccessfulPersistResult>
 	isDirty: boolean
@@ -28,7 +28,7 @@ export interface MutatingAccessorTreeState {
 
 export interface InteractiveAccessorTreeState {
 	name: AccessorTreeStateName.Interactive
-	data: AccessorTreeRoot
+	data: RootAccessor
 	triggerPersist: () => Promise<SuccessfulPersistResult>
 	isDirty: boolean
 }

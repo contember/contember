@@ -1,7 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { Scalar } from '../accessorTree'
-import { SugaredRelativeSingleField } from '../treeParameters'
+import { Scalar, SugaredRelativeSingleField } from '../treeParameters'
 import { getRelativeSingleField } from './getRelativeSingleField'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
 import { useEntityContext } from './useEntityContext'

@@ -32,6 +32,6 @@ export class EntityListAccessor extends Accessor implements Errorable {
 	}
 
 	public findByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
-		return this.entities.find(e => e !== undefined && e.getKey() === key)
+		return this.entities.find(e => e?.getKey() === key)
 	}
 }

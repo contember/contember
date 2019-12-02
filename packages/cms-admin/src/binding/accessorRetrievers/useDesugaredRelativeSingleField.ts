@@ -5,7 +5,7 @@ import { useEnvironment } from './useEnvironment'
 
 export const useDesugaredRelativeSingleField = (sugaredRelativeSingleField: SugaredRelativeSingleField) => {
 	const environment = useEnvironment()
-	return React.useMemo(() => QueryLanguage.parseRelativeSingleField(sugaredRelativeSingleField, environment), [
+	return React.useMemo(() => QueryLanguage.desugarRelativeSingleField(sugaredRelativeSingleField, environment), [
 		environment,
 		sugaredRelativeSingleField,
 	])

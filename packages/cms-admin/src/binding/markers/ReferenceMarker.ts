@@ -4,6 +4,7 @@ import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treePara
 import { EntityFields } from './EntityFields'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
+// TODO unify with EntityListTreeConstraints / SingleEntityTreeConstraints
 class ReferenceMarker {
 	public readonly fieldName: FieldName
 	public readonly references: ReferenceMarker.References

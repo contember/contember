@@ -128,8 +128,7 @@ export class MarkerTreeGenerator {
 		} else if (original instanceof MarkerTreeRoot) {
 			if (fresh instanceof MarkerTreeRoot) {
 				if (
-					Hashing.hashMarkerTreeConstraints(original.constraints) ===
-					Hashing.hashMarkerTreeConstraints(fresh.constraints)
+					Hashing.hashMarkerTreeParameters(original.parameters) === Hashing.hashMarkerTreeParameters(fresh.parameters)
 				) {
 					return original
 				}

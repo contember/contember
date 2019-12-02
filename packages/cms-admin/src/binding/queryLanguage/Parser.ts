@@ -3,17 +3,19 @@ import { Input } from '@contember/schema'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
 import {
+	DesugaredHasManyRelation,
+	DesugaredHasOneRelation,
+	DesugaredQualifiedEntityList,
+	DesugaredQualifiedFieldList,
+	DesugaredQualifiedSingleEntity,
+	DesugaredRelativeEntityList,
+	DesugaredRelativeSingleEntity,
+	DesugaredRelativeSingleField,
+	DesugaredUnconstrainedQualifiedEntityList,
 	EntityName,
 	FieldName,
 	Filter,
-	HasManyRelation,
-	HasOneRelation,
 	OrderBy,
-	QualifiedEntityList,
-	QualifiedFieldList,
-	RelativeEntityList,
-	RelativeSingleEntity,
-	RelativeSingleField,
 	UniqueWhere,
 } from '../treeParameters'
 import { QueryLanguageError } from './QueryLanguageError'
@@ -34,11 +36,11 @@ class Parser extends EmbeddedActionsParser {
 	private static parser = new Parser()
 	private static environment: Environment = new Environment()
 
-	private qualifiedEntityList: () => QualifiedEntityList = this.RULE<QualifiedEntityList>('qualifiedEntityList', () => {
+	private qualifiedEntityList = this.RULE<DesugaredQualifiedEntityList>('qualifiedEntityList', () => {
 		const entityName = this.SUBRULE(this.entityIdentifier)
 		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
 
-		const hasOneRelationPath: HasOneRelation[] = []
+		const hasOneRelationPath: DesugaredHasOneRelation[] = []
 
 		this.MANY(() => {
 			this.CONSUME(tokens.Dot)
@@ -52,23 +54,52 @@ class Parser extends EmbeddedActionsParser {
 		}
 	})
 
-	private qualifiedFieldList: () => QualifiedFieldList = this.RULE<QualifiedFieldList>('qualifiedFieldList', () => {
+	private qualifiedFieldList = this.RULE<DesugaredQualifiedFieldList>('qualifiedFieldList', () => {
 		const entityName = this.SUBRULE(this.entityIdentifier)
 		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
 
 		this.CONSUME(tokens.Dot)
 
-		const { hasOneRelationPath, fieldName } = this.SUBRULE(this.relativeSingleField)
+		const { hasOneRelationPath, field } = this.SUBRULE(this.relativeSingleField)
 
 		return {
 			entityName,
-			fieldName,
+			field,
 			filter,
 			hasOneRelationPath,
 		}
 	})
 
-	private relativeSingleField: () => RelativeSingleField = this.RULE<RelativeSingleField>('relativeSingleField', () => {
+	private qualifiedSingleEntity = this.RULE<DesugaredQualifiedSingleEntity>('qualifiedSingleEntity', () => {
+		const entityName = this.SUBRULE(this.entityIdentifier)
+
+		// TODO this will probably go away once we support singleton entities
+		const where = this.SUBRULE(this.uniqueWhere)
+		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
+		const { hasOneRelationPath } = this.SUBRULE(this.relativeSingleEntity)
+
+		return {
+			entityName,
+			where,
+			hasOneRelationPath,
+			filter,
+		}
+	})
+
+	private unconstrainedQualifiedEntityList = this.RULE<DesugaredUnconstrainedQualifiedEntityList>(
+		'unconstrainedQualifiedEntityList',
+		() => {
+			const entityName = this.SUBRULE(this.entityIdentifier)
+			const { hasOneRelationPath } = this.SUBRULE(this.relativeSingleEntity)
+
+			return {
+				entityName,
+				hasOneRelationPath,
+			}
+		},
+	)
+
+	private relativeSingleField = this.RULE<DesugaredRelativeSingleField>('relativeSingleField', () => {
 		let { hasOneRelationPath } = this.SUBRULE(this.relativeSingleEntity)
 
 		const last = this.ACTION(() => hasOneRelationPath.pop()!)
@@ -81,61 +112,54 @@ class Parser extends EmbeddedActionsParser {
 			}
 		})
 
-		const fieldName = this.ACTION(() => last.field)
+		const field = this.ACTION(() => last.field)
 
 		return {
 			hasOneRelationPath,
-			fieldName,
+			field,
 		}
 	})
 
-	private relativeSingleEntity: () => RelativeSingleEntity = this.RULE<RelativeSingleEntity>(
-		'relativeSingleEntity',
-		() => {
-			const hasOneRelationPath: HasOneRelation[] = []
+	private relativeSingleEntity = this.RULE<DesugaredRelativeSingleEntity>('relativeSingleEntity', () => {
+		const hasOneRelationPath: DesugaredHasOneRelation[] = []
 
-			this.AT_LEAST_ONE_SEP({
-				SEP: tokens.Dot,
-				DEF: () => {
-					hasOneRelationPath.push(this.SUBRULE(this.hasOneRelation))
-				},
-			})
+		this.AT_LEAST_ONE_SEP({
+			SEP: tokens.Dot,
+			DEF: () => {
+				hasOneRelationPath.push(this.SUBRULE(this.hasOneRelation))
+			},
+		})
 
-			return {
-				hasOneRelationPath,
-			}
-		},
-	)
+		return {
+			hasOneRelationPath,
+		}
+	})
 
-	private relativeEntityList: () => RelativeEntityList = this.RULE<RelativeEntityList>('relativeEntityList', () => {
-		const { hasOneRelationPath, fieldName } = this.SUBRULE(this.relativeSingleField)
+	private relativeEntityList = this.RULE<DesugaredRelativeEntityList>('relativeEntityList', () => {
+		const { hasOneRelationPath, field } = this.SUBRULE(this.relativeSingleField)
 		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-		const hasManyRelationPath: HasManyRelation = {
-			field: fieldName,
-		}
-
-		if (filter !== undefined) {
-			hasManyRelationPath.filter = filter
+		const hasManyRelation: DesugaredHasManyRelation = {
+			field,
+			filter,
 		}
 
 		return {
 			hasOneRelationPath,
-			hasManyRelationPath,
+			hasManyRelation,
 		}
 	})
 
-	private hasOneRelation = this.RULE('hasOneRelation', () => {
+	private hasOneRelation = this.RULE<DesugaredHasOneRelation>('hasOneRelation', () => {
 		const fieldName = this.SUBRULE(this.fieldName)
 		const reducedBy = this.OPTION(() => this.SUBRULE(this.uniqueWhere))
-		const props: HasOneRelation = {
+		const filter = this.OPTION1(() => this.SUBRULE(this.nonUniqueWhere))
+		const hasOneRelation: DesugaredHasOneRelation = {
 			field: fieldName,
+			filter,
+			reducedBy,
 		}
 
-		if (reducedBy !== undefined) {
-			props.reducedBy = reducedBy
-		}
-
-		return props
+		return hasOneRelation
 	})
 
 	private nonUniqueWhere: () => Filter = this.RULE('nonUniqueWhere', () => {
@@ -328,7 +352,7 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private uniqueWhere = this.RULE('uniqueWhere', () => {
-		const where: Input.UniqueWhere<GraphQlBuilder.Literal> = {}
+		const where: UniqueWhere = {}
 
 		this.CONSUME(tokens.LeftParenthesis)
 		this.AT_LEAST_ONE_SEP({
@@ -591,6 +615,12 @@ class Parser extends EmbeddedActionsParser {
 			case Parser.EntryPoint.QualifiedFieldList:
 				expression = Parser.parser.qualifiedFieldList()
 				break
+			case Parser.EntryPoint.QualifiedSingleEntity:
+				expression = Parser.parser.qualifiedSingleEntity()
+				break
+			case Parser.EntryPoint.UnconstrainedQualifiedEntityList:
+				expression = Parser.parser.unconstrainedQualifiedEntityList()
+				break
 			case Parser.EntryPoint.UniqueWhere:
 				expression = Parser.parser.uniqueWhere()
 				break
@@ -628,6 +658,8 @@ namespace Parser {
 	export enum EntryPoint {
 		QualifiedEntityList = 'qualifiedEntityList', // E.g. Author[age < 123].son.sisters(name = 'Jane')
 		QualifiedFieldList = 'qualifiedFieldList', // E.g. Author[age < 123].son.sister.name
+		QualifiedSingleEntity = 'qualifiedSingleEntity', // E.g. Author(id = 123).son.sister
+		UnconstrainedQualifiedEntityList = 'unconstrainedQualifiedEntityList', // E.g. Author.son.sister
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
 		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
@@ -637,11 +669,13 @@ namespace Parser {
 	}
 
 	export interface ParserResult {
-		qualifiedEntityList: QualifiedEntityList
-		qualifiedFieldList: QualifiedFieldList
-		relativeSingleField: RelativeSingleField
-		relativeSingleEntity: RelativeSingleEntity
-		relativeEntityList: RelativeEntityList
+		qualifiedEntityList: DesugaredQualifiedEntityList
+		qualifiedFieldList: DesugaredQualifiedFieldList
+		qualifiedSingleEntity: DesugaredQualifiedSingleEntity
+		unconstrainedQualifiedEntityList: DesugaredUnconstrainedQualifiedEntityList
+		relativeSingleField: DesugaredRelativeSingleField
+		relativeSingleEntity: DesugaredRelativeSingleEntity
+		relativeEntityList: DesugaredRelativeEntityList
 		uniqueWhere: UniqueWhere
 		filter: Filter
 		orderBy: OrderBy

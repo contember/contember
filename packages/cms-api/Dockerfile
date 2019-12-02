@@ -11,6 +11,5 @@ WORKDIR /src
 COPY --from=builder /src/packages/cms-api ./
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT 4000
-EXPOSE $CONTEMBER_PORT
 
 CMD ["node", "./dist/src/start.js"]

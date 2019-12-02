@@ -124,7 +124,7 @@ export const useSortedEntities = (
 ): SortedEntities => {
 	const environment = useEnvironment()
 	const desugaredSortByField = React.useMemo(
-		() => (sortByField ? QueryLanguage.parseRelativeSingleField(sortByField, environment) : undefined),
+		() => (sortByField ? QueryLanguage.desugarRelativeSingleField(sortByField, environment) : undefined),
 		[environment, sortByField],
 	)
 	const sortedEntities = React.useMemo(() => {

@@ -5,10 +5,10 @@ import { getRelativeSingleEntity } from './getRelativeSingleEntity'
 
 export const getRelativeEntityList = (
 	relativeTo: EntityAccessor,
-	{ hasOneRelationPath, hasManyRelationPath }: RelativeEntityList,
+	{ hasOneRelationPath, hasManyRelation }: RelativeEntityList,
 ): EntityListAccessor => {
 	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
-	const field = nestedEntity.data.getField(hasManyRelationPath.field)
+	const field = nestedEntity.data.getField(hasManyRelation.field)
 
 	if (!(field instanceof EntityListAccessor)) {
 		throw new DataBindingError(`Corrupted data`)

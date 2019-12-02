@@ -1,74 +1,94 @@
 import { Environment } from '../dao'
-import { VariableInputTransformer } from '../model'
 import { QueryLanguage } from '../queryLanguage'
 import {
 	ExpectedEntityCount,
 	HasManyRelation,
 	HasOneRelation,
-	OptionallyVariableFieldValue,
 	RelativeSingleField,
 	SubTreeIdentifier,
-	SugaredEntityListTreeConstraints,
+	SugaredQualifiedEntityList,
+	SugaredQualifiedSingleEntity,
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
-	SugaredSingleEntityTreeConstraints,
+	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUniqueWhere,
 } from '../treeParameters'
+import { ConnectionMarker } from './ConnectionMarker'
+import { EntityFields } from './EntityFields'
+import { FieldMarker } from './FieldMarker'
+import { Marker } from './Marker'
 import {
-	ConnectionMarker,
-	EntityFields,
-	FieldMarker,
-	Marker,
 	MarkerTreeRoot,
-	ReferenceMarker,
-	TaggedEntityListTreeConstraints,
-	TaggedSingleEntityTreeConstraints,
-} from './index'
+	TaggedQualifiedEntityList,
+	TaggedQualifiedSingleEntity,
+	TaggedUnconstrainedQualifiedEntityList,
+} from './MarkerTreeRoot'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
+import { ReferenceMarker } from './ReferenceMarker'
 
 export namespace MarkerFactory {
 	export const createSingleEntityMarkerTreeRoot = (
 		environment: Environment,
-		constraints: SugaredSingleEntityTreeConstraints,
+		singleEntity: SugaredQualifiedSingleEntity,
 		fields: EntityFields,
 		subTreeIdentifier?: SubTreeIdentifier,
-	): MarkerTreeRoot<TaggedSingleEntityTreeConstraints> =>
-		new MarkerTreeRoot<TaggedSingleEntityTreeConstraints>(
+	) => {
+		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
+		return new MarkerTreeRoot<TaggedQualifiedSingleEntity>(
 			environment.getSystemVariable('treeIdFactory')(),
 			{
-				...constraints,
-				where: QueryLanguage.parseUniqueWhere(constraints.where, environment),
+				...qualifiedSingleEntity,
 				type: 'unique',
 			},
 			fields,
 			subTreeIdentifier,
 		)
+	}
 
 	export const createEntityListMarkerTreeRoot = (
 		environment: Environment,
-		constraints: SugaredEntityListTreeConstraints,
+		entityList: SugaredQualifiedEntityList,
 		fields: EntityFields,
 		subTreeIdentifier?: SubTreeIdentifier,
-	): MarkerTreeRoot<TaggedEntityListTreeConstraints> =>
-		new MarkerTreeRoot<TaggedEntityListTreeConstraints>(
+	) => {
+		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
+
+		return new MarkerTreeRoot<TaggedQualifiedEntityList>(
 			environment.getSystemVariable('treeIdFactory')(),
 			{
-				...constraints,
-				orderBy: constraints.orderBy ? QueryLanguage.parseOrderBy(constraints.orderBy, environment) : undefined,
-				filter: constraints.filter ? QueryLanguage.parseFilter(constraints.filter, environment) : undefined,
+				...qualifiedEntityList,
 				type: 'nonUnique',
 			},
-			fields,
+			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, fields),
 			subTreeIdentifier,
 		)
+	}
+
+	export const createUnconstrainedMarkerTreeRoot = (
+		environment: Environment,
+		entityList: SugaredUnconstrainedQualifiedEntityList,
+		fields: EntityFields,
+	) => {
+		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
+
+		return new MarkerTreeRoot<TaggedUnconstrainedQualifiedEntityList>(
+			environment.getSystemVariable('treeIdFactory')(),
+			{
+				...qualifiedEntityList,
+				type: 'unconstrained',
+			},
+			fields,
+			undefined,
+		)
+	}
 
 	export const createRelativeSingleEntityFields = (
 		field: SugaredRelativeSingleEntity,
 		environment: Environment,
 		entityFields: EntityFields,
 	) => {
-		const relativeSingleEntity = QueryLanguage.parseRelativeSingleEntity(field, environment)
+		const relativeSingleEntity = QueryLanguage.desugarRelativeSingleEntity(field, environment)
 		return wrapRelativeEntityFields(relativeSingleEntity.hasOneRelationPath, entityFields)
 	}
 
@@ -78,9 +98,9 @@ export namespace MarkerFactory {
 		entityFields: EntityFields,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) => {
-		const relativeEntityList = QueryLanguage.parseRelativeEntityList(field, environment)
+		const relativeEntityList = QueryLanguage.desugarRelativeEntityList(field, environment)
 		const hasManyRelationMarker = createHasManyRelationMarker(
-			relativeEntityList.hasManyRelationPath,
+			relativeEntityList.hasManyRelation,
 			entityFields,
 			preferences,
 		)
@@ -93,34 +113,24 @@ export namespace MarkerFactory {
 		field: SugaredRelativeSingleField,
 		to: SugaredUniqueWhere,
 		environment: Environment,
-		isNonbearing: boolean = true,
 	) =>
 		wrapRelativeSingleField(
 			field,
 			environment,
 			relativeSingleField =>
 				new ConnectionMarker(
-					relativeSingleField.fieldName,
-					QueryLanguage.parseUniqueWhere(to, environment),
-					isNonbearing,
+					relativeSingleField.field,
+					QueryLanguage.desugarUniqueWhere(to, environment),
+					relativeSingleField.isNonbearing,
 				),
 		)
 
-	export const createFieldMarker = (
-		field: SugaredRelativeSingleField,
-		environment: Environment,
-		defaultValue?: OptionallyVariableFieldValue,
-		isNonbearing: boolean = false,
-	) =>
+	export const createFieldMarker = (field: SugaredRelativeSingleField, environment: Environment) =>
 		wrapRelativeSingleField(
 			field,
 			environment,
 			relativeSingleField =>
-				new FieldMarker(
-					relativeSingleField.fieldName,
-					defaultValue === undefined ? undefined : VariableInputTransformer.transformValue(defaultValue, environment),
-					isNonbearing,
-				),
+				new FieldMarker(relativeSingleField.field, relativeSingleField.defaultValue, relativeSingleField.isNonbearing),
 		)
 
 	export const wrapRelativeSingleField = (
@@ -128,8 +138,8 @@ export namespace MarkerFactory {
 		environment: Environment,
 		getMarker: (relativeSingleField: RelativeSingleField) => Marker,
 	): EntityFields => {
-		const relativeSingleField = QueryLanguage.parseRelativeSingleField(field, environment)
-		const placeholderName = PlaceholderGenerator.getFieldPlaceholder(relativeSingleField.fieldName)
+		const relativeSingleField = QueryLanguage.desugarRelativeSingleField(field, environment)
+		const placeholderName = PlaceholderGenerator.getFieldPlaceholder(relativeSingleField.field)
 
 		return wrapRelativeEntityFields(relativeSingleField.hasOneRelationPath, {
 			[placeholderName]: getMarker(relativeSingleField),

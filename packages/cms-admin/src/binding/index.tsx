@@ -10,4 +10,3 @@ export * from './treeParameters'
 export * from './utils'
 
 export * from './bindingTypes'
-export { ExpectedEntityCount } from './treeParameters/ExpectedEntityCount'

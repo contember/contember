@@ -1,35 +1,35 @@
 import {
-	EntityListTreeConstraints,
-	EntityTreeSpecification,
-	SingleEntityTreeConstraints,
+	QualifiedEntityList,
+	QualifiedSingleEntity,
 	SubTreeIdentifier,
+	UnconstrainedQualifiedEntityList,
 } from '../treeParameters'
 import { EntityFields } from './EntityFields'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
-export interface TaggedSingleEntityTreeConstraints extends SingleEntityTreeConstraints {
+export interface TaggedQualifiedSingleEntity extends QualifiedSingleEntity {
 	type: 'unique'
 }
 
-export interface TaggedEntityListTreeConstraints extends EntityListTreeConstraints {
+export interface TaggedQualifiedEntityList extends QualifiedEntityList {
 	type: 'nonUnique'
 }
 
-export interface TaggedUnconstrainedEntityList extends EntityTreeSpecification {
+export interface TaggedUnconstrainedQualifiedEntityList extends UnconstrainedQualifiedEntityList {
 	type: 'unconstrained'
 }
 
-export type MarkerTreeConstraints =
-	| TaggedSingleEntityTreeConstraints
-	| TaggedEntityListTreeConstraints
-	| TaggedUnconstrainedEntityList
+export type MarkerTreeParameters =
+	| TaggedQualifiedSingleEntity
+	| TaggedQualifiedEntityList
+	| TaggedUnconstrainedQualifiedEntityList
 
-class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
+class MarkerTreeRoot<C extends MarkerTreeParameters = MarkerTreeParameters> {
 	public readonly id: MarkerTreeRoot.TreeId
 
 	public constructor(
 		idSeed: number,
-		public readonly constraints: C,
+		public readonly parameters: C,
 		public readonly fields: EntityFields,
 		public readonly subTreeIdentifier?: SubTreeIdentifier,
 	) {
@@ -41,7 +41,7 @@ class MarkerTreeRoot<C extends MarkerTreeConstraints = MarkerTreeConstraints> {
 	}
 
 	public get entityName() {
-		return this.constraints.entityName
+		return this.parameters.entityName
 	}
 }
 

@@ -7,7 +7,7 @@ export class ConnectionMarker {
 	public constructor(
 		public readonly fieldName: FieldName,
 		public readonly target: Input.UniqueWhere<GraphQlBuilder.Literal>,
-		public readonly isNonbearing: boolean,
+		public readonly isNonbearing: boolean | undefined = true,
 	) {}
 
 	get placeholderName(): string {

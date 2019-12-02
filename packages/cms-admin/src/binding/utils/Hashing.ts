@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from '@contember/client'
 import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
-import { MarkerTreeConstraints, ReferenceMarker } from '../markers'
-import { ExpectedEntityCount } from '../treeParameters/ExpectedEntityCount'
+import { MarkerTreeParameters, ReferenceMarker } from '../markers'
+import { ExpectedEntityCount } from '../treeParameters'
 
 export class Hashing {
 	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
@@ -17,21 +17,29 @@ export class Hashing {
 		return Hashing.hashArray(where)
 	}
 
-	public static hashMarkerTreeConstraints(constraints: MarkerTreeConstraints): number {
-		if (constraints.type === 'unconstrained') {
+	public static hashMarkerTreeParameters(parameters: MarkerTreeParameters): number {
+		if (parameters.type === 'unconstrained') {
 			return 0
-		} else if (constraints.type === 'nonUnique') {
+		} else if (parameters.type === 'nonUnique') {
 			return Hashing.hashArray([
-				constraints.type,
-				constraints.filter,
-				constraints.orderBy,
-				constraints.offset,
-				constraints.limit,
+				parameters.type,
+				parameters.entityName,
+				parameters.filter,
+				parameters.orderBy,
+				parameters.offset,
+				parameters.limit,
+				parameters.connectTo,
 			])
-		} else if (constraints.type === 'unique') {
-			return Hashing.hashArray([constraints.type, constraints.where])
+		} else if (parameters.type === 'unique') {
+			return Hashing.hashArray([
+				parameters.type,
+				parameters.where,
+				parameters.entityName,
+				parameters.connectTo,
+				parameters.filter,
+			])
 		}
-		assertNever(constraints)
+		assertNever(parameters)
 	}
 
 	private static hashArray(array: any[]): number {

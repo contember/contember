@@ -1,11 +1,12 @@
+import { DataBindingError } from '../dao'
 import { MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { PlaceholderGenerator } from '../markers/PlaceholderGenerator'
 import { FieldName, SubTreeIdentifier } from '../treeParameters'
-import { AccessorTreeRoot } from './AccessorTreeRoot'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { EntityListAccessor } from './EntityListAccessor'
 import { FieldAccessor } from './FieldAccessor'
+import { RootAccessor } from './RootAccessor'
 
 class EntityData {
 	public constructor(private data: EntityData.EntityData) {}
@@ -45,8 +46,14 @@ class EntityData {
 
 	public getTreeRoot(subTreeIdentifier: SubTreeIdentifier): EntityData.FieldData
 	public getTreeRoot(id: MarkerTreeRoot.TreeId): EntityData.FieldData
-	public getTreeRoot(identifier: SubTreeIdentifier | MarkerTreeRoot.TreeId): EntityData.FieldData {
-		return this.data[PlaceholderGenerator.getMarkerTreePlaceholder(identifier)]
+	public getTreeRoot(identifier: SubTreeIdentifier | MarkerTreeRoot.TreeId): RootAccessor {
+		const root = this.data[PlaceholderGenerator.getMarkerTreePlaceholder(identifier)]
+		if (root === undefined) {
+			throw new DataBindingError(`Requesting an accessor tree '${identifier}' but it does not exist.`)
+		} else if (root instanceof FieldAccessor) {
+			throw new DataBindingError(`Requesting an accessor tree '${identifier}' but it resolves to a field.`)
+		}
+		return root
 	}
 
 	public get allFieldData(): EntityData.EntityData {
@@ -61,7 +68,7 @@ namespace EntityData {
 		| EntityForRemovalAccessor
 		| EntityListAccessor
 		| FieldAccessor
-		| AccessorTreeRoot
+		| RootAccessor
 
 	export type EntityData = { [placeholder in FieldName]: FieldData }
 }

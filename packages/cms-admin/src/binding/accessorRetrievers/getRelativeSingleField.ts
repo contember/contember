@@ -1,8 +1,7 @@
 import { GraphQlBuilder } from '@contember/client'
 import { EntityAccessor, FieldAccessor } from '../accessors'
-import { Scalar } from '../accessorTree'
 import { DataBindingError } from '../dao'
-import { RelativeSingleField } from '../treeParameters'
+import { RelativeSingleField, Scalar } from '../treeParameters'
 import { getRelativeSingleEntity } from './getRelativeSingleEntity'
 
 export const getRelativeSingleField = <
@@ -10,17 +9,17 @@ export const getRelativeSingleField = <
 	Produced extends Persisted = Persisted
 >(
 	relativeTo: EntityAccessor,
-	{ fieldName, hasOneRelationPath }: RelativeSingleField,
+	{ field, hasOneRelationPath }: RelativeSingleField,
 ) => {
 	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
-	const field = nestedEntity.data.getField(fieldName)
+	const accessor = nestedEntity.data.getField(field)
 
-	if (!(field instanceof FieldAccessor)) {
+	if (!(accessor instanceof FieldAccessor)) {
 		throw new DataBindingError(
-			`Trying to access the field '${fieldName}''${
+			`Trying to access the field '${accessor}''${
 				nestedEntity.typename ? `of the '${nestedEntity.typename}' entity` : ''
 			}' but it does not exist.`,
 		)
 	}
-	return (field as unknown) as FieldAccessor<Persisted, Produced>
+	return (accessor as unknown) as FieldAccessor<Persisted, Produced>
 }

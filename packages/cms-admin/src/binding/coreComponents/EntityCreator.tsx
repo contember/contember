@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
-import { MarkerTreeRoot } from '../markers'
-import { EntityName } from '../treeParameters'
+import { MarkerFactory } from '../markers'
+import { SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { Component } from './Component'
 
-interface EntityCreatorProps {
-	entityName: EntityName
+interface EntityCreatorProps extends SugaredUnconstrainedQualifiedEntityList {
 	children: React.ReactNode
 }
 
@@ -22,15 +21,7 @@ export const EntityCreator = Component<EntityCreatorProps>(
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			new MarkerTreeRoot(
-				environment.getSystemVariable('treeIdFactory')(),
-				{
-					entityName: props.entityName,
-					type: 'unconstrained',
-				},
-				fields,
-				undefined,
-			),
+			MarkerFactory.createUnconstrainedMarkerTreeRoot(environment, props, fields),
 	},
 	'EntityCreator',
 )

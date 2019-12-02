@@ -5,7 +5,7 @@ import { useEnvironment } from './useEnvironment'
 
 export const useDesugaredRelativeSingleEntity = (sugaredRelativeSingleEntity: SugaredRelativeSingleEntity) => {
 	const environment = useEnvironment()
-	return React.useMemo(() => QueryLanguage.parseRelativeSingleEntity(sugaredRelativeSingleEntity, environment), [
+	return React.useMemo(() => QueryLanguage.desugarRelativeSingleEntity(sugaredRelativeSingleEntity, environment), [
 		environment,
 		sugaredRelativeSingleEntity,
 	])

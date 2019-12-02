@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
 import { MarkerFactory } from '../markers'
-import { SubTreeIdentifier, SugaredSingleEntityTreeConstraints } from '../treeParameters'
+import { SubTreeIdentifier, SugaredQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
 
-export interface SingleEntityDataProviderProps extends SugaredSingleEntityTreeConstraints {
+export interface SingleEntityDataProviderProps extends SugaredQualifiedSingleEntity {
 	subTreeIdentifier?: SubTreeIdentifier
 	children: React.ReactNode
 }
@@ -25,15 +25,7 @@ export const SingleEntityDataProvider = Component<SingleEntityDataProviderProps>
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerFactory.createSingleEntityMarkerTreeRoot(
-				environment,
-				{
-					entityName: props.entityName,
-					where: props.where,
-				},
-				fields,
-				props.subTreeIdentifier,
-			),
+			MarkerFactory.createSingleEntityMarkerTreeRoot(environment, props, fields, props.subTreeIdentifier),
 	},
 	'SingleEntityDataProvider',
 )

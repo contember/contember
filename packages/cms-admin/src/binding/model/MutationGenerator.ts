@@ -1,26 +1,19 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { assertNever, isEmptyObject } from '@contember/utils'
-import {
-	AccessorTreeRoot,
-	EntityAccessor,
-	EntityForRemovalAccessor,
-	EntityListAccessor,
-	FieldAccessor,
-	RootAccessor,
-} from '../accessors'
-import { ReceivedData, ReceivedEntityData, Scalar } from '../accessorTree'
+import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
+import { ReceivedData, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { DataBindingError } from '../dao'
 import {
 	ConnectionMarker,
 	EntityFields,
 	FieldMarker,
-	MarkerTreeConstraints,
+	MarkerTreeParameters,
 	MarkerTreeRoot,
 	ReferenceMarker,
 } from '../markers'
-import { EntityName, ExpectedEntityCount } from '../treeParameters'
+import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
@@ -29,19 +22,18 @@ export class MutationGenerator {
 
 	public constructor(
 		private persistedData: any,
-		private currentData: AccessorTreeRoot,
+		private currentData: RootAccessor,
 		private markerTree: MarkerTreeRoot,
 	) {}
 
 	public getPersistMutation(): string | undefined {
 		try {
 			const builder = this.addSubMutation(
-				this.persistedData ? this.persistedData[this.currentData.id] : undefined,
-				this.markerTree.entityName,
+				this.persistedData ? this.persistedData[this.markerTree.id] : undefined,
 				this.markerTree.fields,
-				this.currentData.root,
+				this.currentData,
 				this.markerTree.id,
-				this.markerTree.constraints,
+				this.markerTree.parameters,
 			)
 			return builder.getGql()
 		} catch (e) {
@@ -51,11 +43,10 @@ export class MutationGenerator {
 
 	private addSubMutation(
 		data: ReceivedData<undefined>,
-		entityName: EntityName,
 		entityFields: EntityFields,
 		entity: RootAccessor,
 		alias: string,
-		constraints: MarkerTreeConstraints,
+		parameters: MarkerTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -64,12 +55,12 @@ export class MutationGenerator {
 
 		if (entity instanceof EntityAccessor) {
 			if (entity.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
-				queryBuilder = this.addCreateMutation(entity, entityName, entityFields, alias, constraints, queryBuilder)
+				queryBuilder = this.addCreateMutation(entity, entityFields, alias, parameters, queryBuilder)
 			} else if (data && !Array.isArray(data)) {
-				queryBuilder = this.addUpdateMutation(entity, entityName, entityFields, data, alias, constraints, queryBuilder)
+				queryBuilder = this.addUpdateMutation(entity, entityFields, data, alias, parameters, queryBuilder)
 			}
 		} else if (entity instanceof EntityForRemovalAccessor) {
-			queryBuilder = this.addDeleteMutation(entity, entityName, alias, constraints, queryBuilder)
+			queryBuilder = this.addDeleteMutation(entity, alias, parameters, queryBuilder)
 		} else if (entity instanceof EntityListAccessor) {
 			if (Array.isArray(data) || data === undefined) {
 				const entityCount = entity.entities.length
@@ -80,11 +71,10 @@ export class MutationGenerator {
 					if (currentEntity instanceof EntityAccessor || currentEntity instanceof EntityForRemovalAccessor) {
 						queryBuilder = this.addSubMutation(
 							data ? data[dataI++] : undefined,
-							entityName,
 							entityFields,
 							currentEntity,
 							`${alias}${MutationGenerator.ALIAS_SEPARATOR}${entityI}`,
-							constraints,
+							parameters,
 							queryBuilder,
 						)
 					} else if (currentEntity === undefined) {
@@ -104,9 +94,8 @@ export class MutationGenerator {
 
 	private addDeleteMutation(
 		entity: EntityForRemovalAccessor,
-		entityName: EntityName,
 		alias: string,
-		constraints: MarkerTreeConstraints,
+		parameters: MarkerTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -114,11 +103,11 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.delete(
-			entityName,
+			parameters.entityName,
 			builder => {
 				let where = {}
-				if (constraints && constraints.type === 'unique') {
-					where = constraints.where
+				if (parameters && parameters.type === 'unique') {
+					where = parameters.where
 				}
 
 				return builder
@@ -132,11 +121,10 @@ export class MutationGenerator {
 
 	private addUpdateMutation(
 		entity: EntityAccessor,
-		entityName: EntityName,
 		entityFields: EntityFields,
 		data: ReceivedEntityData<undefined>,
 		alias: string,
-		constraints?: MarkerTreeConstraints,
+		parameters: MarkerTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -150,11 +138,11 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.update(
-			entityName,
+			parameters.entityName,
 			builder => {
 				let where = {}
-				if (constraints && constraints.type === 'unique') {
-					where = constraints.where
+				if (parameters && parameters.type === 'unique') {
+					where = parameters.where
 				}
 
 				return builder
@@ -170,10 +158,9 @@ export class MutationGenerator {
 
 	private addCreateMutation(
 		entity: EntityAccessor,
-		entityName: EntityName,
 		entityFields: EntityFields,
 		alias: string,
-		constraints?: MarkerTreeConstraints,
+		parameters: MarkerTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -181,7 +168,7 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.create(
-			entityName,
+			parameters.entityName,
 			builder => {
 				let writeBuilder = this.registerCreateMutationPart(
 					entity,
@@ -189,14 +176,14 @@ export class MutationGenerator {
 					new CrudQueryBuilder.WriteDataBuilder(),
 				)
 				if (
-					constraints &&
-					constraints.type === 'unique' &&
+					parameters &&
+					parameters.type === 'unique' &&
 					writeBuilder.data !== undefined &&
 					!isEmptyObject(writeBuilder.data)
 				) {
-					// Shallow cloning the constraints like this IS too naïve but it will likely last surprisingly long before we
+					// Shallow cloning the parameters like this IS too naïve but it will likely last surprisingly long before we
 					// run into issues.
-					writeBuilder = new CrudQueryBuilder.WriteDataBuilder({ ...writeBuilder.data, ...constraints.where })
+					writeBuilder = new CrudQueryBuilder.WriteDataBuilder({ ...writeBuilder.data, ...parameters.where })
 				}
 
 				return builder
@@ -217,7 +204,7 @@ export class MutationGenerator {
 		const allData = currentData.data.allFieldData
 		const nonbearingFields: Array<{
 			placeholderName: string
-			value: GraphQlBuilder.Literal | Scalar
+			value: FieldValue
 		}> = []
 		const nonbearingConnections: ConnectionMarker[] = []
 
@@ -513,9 +500,7 @@ export class MutationGenerator {
 		accessor: EntityAccessor,
 		reference: ReferenceMarker.Reference,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		const registerReductionFields = (
-			where: Input.UniqueWhere<GraphQlBuilder.Literal>,
-		): Input.CreateDataInput<GraphQlBuilder.Literal> => {
+		const registerReductionFields = (where: UniqueWhere): Input.CreateDataInput<GraphQlBuilder.Literal> => {
 			const data: Input.CreateDataInput<GraphQlBuilder.Literal> = {}
 
 			for (const key in where) {

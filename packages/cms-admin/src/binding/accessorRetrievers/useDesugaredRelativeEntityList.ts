@@ -5,7 +5,7 @@ import { useEnvironment } from './useEnvironment'
 
 export const useDesugaredRelativeEntityList = (sugaredRelativeEntityList: SugaredRelativeEntityList) => {
 	const environment = useEnvironment()
-	return React.useMemo(() => QueryLanguage.parseRelativeEntityList(sugaredRelativeEntityList, environment), [
+	return React.useMemo(() => QueryLanguage.desugarRelativeEntityList(sugaredRelativeEntityList, environment), [
 		environment,
 		sugaredRelativeEntityList,
 	])

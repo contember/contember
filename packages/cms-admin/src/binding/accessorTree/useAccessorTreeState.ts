@@ -2,7 +2,7 @@ import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
 import { ApiRequestReadyState, useAuthToken, useContentApiRequest } from '../../apiClient'
 import { useEnvironment } from '../accessorRetrievers'
-import { AccessorTreeRoot } from '../accessors'
+import { RootAccessor } from '../accessors'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
@@ -166,17 +166,17 @@ export const useAccessorTreeState = ({
 	const initializeAccessorTree = React.useCallback(
 		(
 			persistedData: ReceivedDataTree<undefined> | undefined,
-			initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
+			initialData: RootAccessor | ReceivedDataTree<undefined> | undefined,
 			errors?: MutationDataResponse,
 		) => {
 			accessorTreeGenerator.generateLiveTree(
 				persistedData,
 				initialData,
-				accessorTree => {
-					console.debug('data', accessorTree)
+				accessor => {
+					console.debug('data', accessor)
 					dispatch({
 						type: AccessorTreeStateActionType.SetData,
-						data: accessorTree,
+						data: accessor,
 						triggerPersist,
 					})
 				},

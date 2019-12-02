@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
 import { MarkerFactory } from '../markers'
-import { SubTreeIdentifier, SugaredEntityListTreeConstraints } from '../treeParameters'
+import { SubTreeIdentifier, SugaredQualifiedEntityList } from '../treeParameters'
 import { Component } from './Component'
 
-export interface EntityListDataProviderProps extends SugaredEntityListTreeConstraints {
+export interface EntityListDataProviderProps extends SugaredQualifiedEntityList {
 	subTreeIdentifier?: SubTreeIdentifier
 	children: React.ReactNode
 }
@@ -24,18 +24,7 @@ export const EntityListDataProvider = Component<EntityListDataProviderProps>(
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerFactory.createEntityListMarkerTreeRoot(
-				environment,
-				{
-					entityName: props.entityName,
-					filter: props.filter,
-					orderBy: props.orderBy,
-					offset: props.offset,
-					limit: props.limit,
-				},
-				fields,
-				props.subTreeIdentifier,
-			),
+			MarkerFactory.createEntityListMarkerTreeRoot(environment, props, fields, props.subTreeIdentifier),
 	},
 	'EntityListDataProvider',
 )

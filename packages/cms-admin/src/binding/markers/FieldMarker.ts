@@ -1,6 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import { Scalar } from '../accessorTree'
-import { FieldName } from '../treeParameters'
+import { FieldName, Scalar } from '../treeParameters'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 /**

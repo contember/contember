@@ -1,6 +1,6 @@
 {
 	"name": "@contember/benchmark",
-	"version": "0.2.9",
+	"version": "0.2.11",
 	"scripts": {
 		"console": "dotenv -- node dist/src/console.js",
 		"compare": "node dist/src/compare.js",
@@ -8,7 +8,7 @@
 		"start": "dotenv -- ./run.sh"
 	},
 	"dependencies": {
-		"@contember/api": "^0.2.9",
+		"@contember/api": "^0.2.11",
 		"@contember/schema": "^0.2.9",
 		"@contember/schema-definition": "^0.2.9",
 		"autocannon": "^3.2.1",

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/api",
-	"version": "0.2.9",
+	"version": "0.2.11",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
@@ -10,17 +10,17 @@
 		"@apollographql/graphql-playground-html": "^1.6.6",
 		"@contember/authorization": "^0.2.5",
 		"@contember/config-loader": "^0.2.5",
-		"@contember/database": "^0.2.9",
+		"@contember/database": "^0.2.11",
 		"@contember/dic": "^0.2.5",
 		"@contember/engine-common": "^0.2.5",
 		"@contember/engine-content-api": "^0.2.9",
 		"@contember/engine-s3-plugin": "^0.2.5",
-		"@contember/engine-system-api": "^0.2.9",
+		"@contember/engine-system-api": "^0.2.11",
 		"@contember/engine-tenant-api": "^0.2.9",
 		"@contember/queryable": "^0.2.5",
 		"@contember/schema": "^0.2.9",
 		"@contember/schema-definition": "^0.2.9",
-		"@contember/schema-migrations": "^0.2.9",
+		"@contember/schema-migrations": "^0.2.11",
 		"@contember/schema-utils": "^0.2.9",
 		"@contember/utils": "^0.2.8",
 		"@koa/cors": "^2.2.3",
@@ -43,7 +43,7 @@
 		"uuid": "^3.3.3"
 	},
 	"devDependencies": {
-		"@contember/engine-api-tester": "^0.2.9",
+		"@contember/engine-api-tester": "^0.2.11",
 		"@types/bcrypt": "^3.0.0",
 		"@types/graphql": "^14.5.0",
 		"@types/jasmine": "^3.4.5",

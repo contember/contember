@@ -5,7 +5,9 @@ import { getRelativeEntityList } from './getRelativeEntityList'
 import { useDesugaredRelativeEntityList } from './useDesugaredRelativeEntityList'
 import { useEntityContext } from './useEntityContext'
 
-export const useRelativeEntityList = (sugaredRelativeEntityList: SugaredRelativeEntityList): EntityListAccessor => {
+export const useRelativeEntityList = (
+	sugaredRelativeEntityList: string | SugaredRelativeEntityList,
+): EntityListAccessor => {
 	const entity = useEntityContext()
 	const relativeEntityList = useDesugaredRelativeEntityList(sugaredRelativeEntityList)
 	return React.useMemo(() => getRelativeEntityList(entity, relativeEntityList), [entity, relativeEntityList])

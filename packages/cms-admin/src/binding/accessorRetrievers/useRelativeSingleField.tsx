@@ -9,7 +9,7 @@ export const useRelativeSingleField = <
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
 	Produced extends Persisted = Persisted
 >(
-	sugaredRelativeSingleField: SugaredRelativeSingleField,
+	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 ) => {
 	const entity = useEntityContext()
 	const relativeSingleField = useDesugaredRelativeSingleField(sugaredRelativeSingleField)

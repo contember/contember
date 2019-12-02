@@ -242,9 +242,14 @@ export namespace QueryLanguage {
 	}
 
 	export const desugarRelativeSingleEntity = (
-		{ field, ...unsugarableEntity }: SugaredRelativeSingleEntity,
+		sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity,
 		environment: Environment,
 	): RelativeSingleEntity => {
+		if (typeof sugaredRelativeSingleEntity === 'string') {
+			return desugarRelativeSingleEntity(sugaredRelativeSingleEntity, environment)
+		}
+
+		const { field, ...unsugarableEntity } = sugaredRelativeSingleEntity
 		const hasOneRelationPath =
 			typeof field === 'string'
 				? augmentDesugaredHasOneRelationPath(
@@ -259,9 +264,20 @@ export namespace QueryLanguage {
 	}
 
 	export const desugarRelativeSingleField = (
-		{ field, ...unsugarableField }: SugaredRelativeSingleField,
+		sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 		environment: Environment,
 	): RelativeSingleField => {
+		if (typeof sugaredRelativeSingleField === 'string') {
+			return desugarRelativeSingleField(
+				{
+					field: sugaredRelativeSingleField,
+				},
+				environment,
+			)
+		}
+
+		const { field, ...unsugarableField } = sugaredRelativeSingleField
+
 		let hasOneRelationPath: HasOneRelation[]
 		let fieldName: FieldName
 		if (typeof field === 'string') {
@@ -269,14 +285,7 @@ export namespace QueryLanguage {
 			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugaredField.hasOneRelationPath, environment)
 			fieldName = desugaredField.field
 		} else {
-			hasOneRelationPath = desugarHasOneRelationPath(
-				field.hasOneRelationPath,
-				{
-					connectTo: undefined,
-					isNonbearing: undefined,
-				},
-				environment,
-			)
+			hasOneRelationPath = desugarHasOneRelationPath(field.hasOneRelationPath, {}, environment)
 			fieldName = field.field
 		}
 
@@ -291,9 +300,14 @@ export namespace QueryLanguage {
 	}
 
 	export const desugarRelativeEntityList = (
-		{ field, ...unsugarableEntityList }: SugaredRelativeEntityList,
+		sugaredRelativeEntityList: SugaredRelativeEntityList,
 		environment: Environment,
 	): RelativeEntityList => {
+		if (typeof sugaredRelativeEntityList === 'string') {
+			return desugarRelativeEntityList(sugaredRelativeEntityList, environment)
+		}
+
+		const { field, ...unsugarableEntityList } = sugaredRelativeEntityList
 		let hasOneRelationPath: HasOneRelation[]
 		let hasManyRelation: HasManyRelation
 		if (typeof field === 'string') {

@@ -5,7 +5,9 @@ import { getRelativeSingleEntity } from './getRelativeSingleEntity'
 import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity'
 import { useEntityContext } from './useEntityContext'
 
-export const useRelativeSingleEntity = (sugaredRelativeSingleEntity: SugaredRelativeSingleEntity): EntityAccessor => {
+export const useRelativeSingleEntity = (
+	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity,
+): EntityAccessor => {
 	const entity = useEntityContext()
 	const relativeSingleEntity = useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity)
 	return React.useMemo(() => getRelativeSingleEntity(entity, relativeSingleEntity), [entity, relativeSingleEntity])

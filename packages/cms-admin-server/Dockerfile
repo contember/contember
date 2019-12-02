@@ -14,6 +14,4 @@ ENV CONTEMBER_INDEX /src/public/index.html
 ENV CONTEMBER_CONFIG_PLACEHOLDER "{configuration}"
 ENV CONTEMBER_PORT 4000
 
-EXPOSE $CONTEMBER_PORT
-
 CMD ["node", "./dist/src/run-admin.js"]

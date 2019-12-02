@@ -8,7 +8,7 @@ export class ServerRunner {
 
 	public async run(): Promise<Server> {
 		const port = this.config.server.port
-		return this.koa.listen(Number.parseInt(String(port)), () => {
+		return this.koa.listen(port, () => {
 			console.log(success(`Tenant API running on http://localhost:${port}/tenant`))
 			this.config.projects.forEach(project => {
 				const url = `http://localhost:${port}/system/${project.slug}`

@@ -10,42 +10,38 @@ import {
 	SugarableEntityListParameters,
 	UnsugarableEntityListParameters,
 } from './EntityListParameters'
+import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import {
 	DesugaredQualifiedEntityParameters,
 	QualifiedEntityParameters,
 	SugarableQualifiedEntityParameters,
 	UnsugarableQualifiedEntityParameters,
 } from './QualifiedEntityParameters'
-import {
-	DesugaredRelativeSingleEntity,
-	RelativeSingleEntity,
-	SugarableRelativeSingleEntity,
-	UnsugarableRelativeSingleEntity,
-} from './RelativeSingleEntity'
 
 export interface DesugaredQualifiedEntityList
-	extends DesugaredRelativeSingleEntity,
-		DesugaredEntityListParameters,
+	extends DesugaredEntityListParameters,
 		DesugaredQualifiedEntityParameters,
-		DesugaredEntityCreationParameters {}
+		DesugaredEntityCreationParameters {
+	hasOneRelationPath: DesugaredHasOneRelation[]
+}
 
-export interface QualifiedEntityList
-	extends RelativeSingleEntity,
-		EntityListParameters,
-		QualifiedEntityParameters,
-		EntityCreationParameters {}
+export interface QualifiedEntityList extends EntityListParameters, QualifiedEntityParameters, EntityCreationParameters {
+	hasOneRelationPath: HasOneRelation[]
+}
 
 export interface SugarableQualifiedEntityList
-	extends SugarableRelativeSingleEntity,
-		SugarableEntityListParameters,
+	extends SugarableEntityListParameters,
 		SugarableQualifiedEntityParameters,
-		SugarableEntityCreationParameters {}
+		SugarableEntityCreationParameters {
+	hasOneRelationPath: SugarableHasOneRelation[]
+}
 
 export interface UnsugarableQualifiedEntityList
-	extends UnsugarableRelativeSingleEntity,
-		UnsugarableEntityListParameters,
+	extends UnsugarableEntityListParameters,
 		UnsugarableQualifiedEntityParameters,
-		UnsugarableEntityCreationParameters {}
+		UnsugarableEntityCreationParameters {
+	// Deliberately leaving out UnsugarableHasOneRelation
+}
 
 // E.g. Author[age < 123].son.sisters(name = 'Jane')
 export interface SugaredQualifiedEntityList extends UnsugarableQualifiedEntityList {

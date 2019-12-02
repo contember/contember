@@ -1,13 +1,13 @@
-import { lcfirst } from '@contember/utils'
 import * as React from 'react'
-import { EntityCreator } from '../../binding/coreComponents'
+import { EntityCreator, EntityCreatorProps } from '../../binding/coreComponents'
 import { RequestChange } from '../../state/request'
 import { MutableSingleEntityRenderer, MutableSingleEntityRendererProps } from '../bindingFacade'
 import { DynamicLink } from '../DynamicLink'
 import { PageProvider } from './PageProvider'
 import { SingleEntityPageProps } from './SingleEntityPageProps'
 
-export interface CreatePageProps extends Omit<SingleEntityPageProps, 'where'> {
+export interface CreatePageProps extends EntityCreatorProps {
+	pageName: string
 	redirectOnSuccess?: RequestChange // TODO we cannot really redirect to an edit page of the newly-created entity.
 	rendererProps?: Omit<MutableSingleEntityRendererProps, 'children'>
 }
@@ -17,7 +17,7 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<C
 		if (!props.redirectOnSuccess) {
 			return (
 				<EntityCreator
-					entityName={props.entityName}
+					{...props}
 					//onSuccessfulPersist={onClick}
 				>
 					<MutableSingleEntityRenderer {...props.rendererProps}>{props.children}</MutableSingleEntityRenderer>
@@ -30,7 +30,7 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<C
 				requestChange={props.redirectOnSuccess}
 				Component={({ onClick }) => (
 					<EntityCreator
-						entityName={props.entityName}
+						{...props}
 						//onSuccessfulPersist={onClick}
 					>
 						<MutableSingleEntityRenderer {...props.rendererProps}>{props.children}</MutableSingleEntityRenderer>
@@ -42,6 +42,6 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<C
 )
 
 CreatePage.displayName = 'CreatePage'
-CreatePage.getPageName = (props: CreatePageProps) => props.pageName || `create_${lcfirst(props.entityName)}`
+CreatePage.getPageName = (props: CreatePageProps) => props.pageName
 
 export { CreatePage }

@@ -1,10 +1,5 @@
-import * as React from 'react'
-import { EntityName } from '../../binding'
-import { MarkerFactory } from '../../binding/queryLanguage'
+import { SingleEntityDataProviderProps } from '../../binding'
 
-export interface SingleEntityPageProps {
-	entityName: EntityName
-	where: MarkerFactory.SugaredSingleEntityTreeConstraints['where']
-	pageName?: string
-	children: React.ReactNode
+export interface SingleEntityPageProps extends Omit<SingleEntityDataProviderProps, 'subTreeIdentifier'> {
+	pageName: string
 }

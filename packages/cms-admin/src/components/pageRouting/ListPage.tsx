@@ -1,4 +1,3 @@
-import { lcfirst } from '@contember/utils'
 import * as React from 'react'
 import { EntityListDataProvider } from '../../binding/coreComponents'
 import { ListRenderer, ListRendererProps } from '../bindingFacade'
@@ -10,20 +9,14 @@ export interface ListPageProps extends EntityListPageProps {
 }
 
 const ListPage: Partial<PageProvider<ListPageProps>> & React.ComponentType<ListPageProps> = React.memo(
-	(props: ListPageProps) => (
-		<EntityListDataProvider
-			entityName={props.entityName}
-			orderBy={props.orderBy}
-			offset={props.offset}
-			limit={props.limit}
-			filter={props.filter}
-		>
-			<ListRenderer {...props.rendererProps}>{props.children}</ListRenderer>
+	({ children, rendererProps, pageName, ...entityListProps }: ListPageProps) => (
+		<EntityListDataProvider {...entityListProps}>
+			<ListRenderer {...rendererProps}>{children}</ListRenderer>
 		</EntityListDataProvider>
 	),
 )
 
 ListPage.displayName = 'ListPage'
-ListPage.getPageName = (props: ListPageProps) => props.pageName || `list_${lcfirst(props.entityName)}`
+ListPage.getPageName = (props: ListPageProps) => props.pageName
 
 export { ListPage }

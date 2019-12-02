@@ -64,6 +64,7 @@ build:docker:
   variables:
     VERSION: "$CI_COMMIT_REF_NAME"
   script:
+    - apk --no-cache add git
     - bash scripts/docker/build.sh
 
 publish:

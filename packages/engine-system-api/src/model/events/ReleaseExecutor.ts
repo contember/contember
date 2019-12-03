@@ -54,7 +54,12 @@ class ReleaseExecutor {
 		if (!newBase) {
 			throw new Error('should not happen')
 		}
-		if (this.isFastForward(eventsToApply, allEvents.map(it => it.id))) {
+		if (
+			this.isFastForward(
+				eventsToApply,
+				allEvents.map(it => it.id),
+			)
+		) {
 			await new UpdateStageEventCommand(targetStage.slug, eventsToApply[eventsToApply.length - 1]).execute(this.db)
 		} else {
 			await this.rebaseRecursive(sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)

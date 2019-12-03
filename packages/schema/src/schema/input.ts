@@ -64,7 +64,8 @@ namespace Input {
 
 	export type CreateOneRelationInput<E = never> = { alias?: string } & (
 		| ConnectRelationInput<E>
-		| CreateRelationInput<E>)
+		| CreateRelationInput<E>
+	)
 
 	export type CreateManyRelationInput<E = never> = Array<CreateOneRelationInput<E>>
 
@@ -110,7 +111,8 @@ namespace Input {
 		| DeleteSpecifiedRelationInput<E>
 		| DisconnectSpecifiedRelationInput<E>
 		| UpdateSpecifiedRelationInput<E>
-		| UpsertSpecifiedRelationInput<E>)
+		| UpsertSpecifiedRelationInput<E>
+	)
 
 	export type UpdateManyRelationInput<E = never> = Array<UpdateManyRelationInputItem<E>>
 

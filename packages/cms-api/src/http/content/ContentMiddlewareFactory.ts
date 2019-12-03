@@ -26,17 +26,15 @@ class ContentMiddlewareFactory {
 	) {}
 
 	create(): Koa.Middleware {
-		const assignDb: KoaMiddleware<
-			ProjectResolveMiddlewareFactory.KoaState & StageResolveMiddlewareFactory.KoaState & { db: Client }
-		> = (ctx, next) => {
+		const assignDb: KoaMiddleware<ProjectResolveMiddlewareFactory.KoaState &
+			StageResolveMiddlewareFactory.KoaState & { db: Client }> = (ctx, next) => {
 			const projectContainer = ctx.state.projectContainer
 			const stage = ctx.state.stage
 			ctx.state.db = projectContainer.connection.createClient(formatSchemaName(stage))
 			return next()
 		}
-		const contentApollo: KoaMiddleware<
-			ProjectResolveMiddlewareFactory.KoaState & StageResolveMiddlewareFactory.KoaState
-		> = async (ctx, next) => {
+		const contentApollo: KoaMiddleware<ProjectResolveMiddlewareFactory.KoaState &
+			StageResolveMiddlewareFactory.KoaState> = async (ctx, next) => {
 			await ctx.state.projectContainer.contentApolloMiddlewareFactory.create(ctx.state.stage)(
 				ctx as KoaContext<any>,
 				next,

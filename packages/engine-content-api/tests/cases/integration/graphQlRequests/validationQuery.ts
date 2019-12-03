@@ -281,7 +281,10 @@ describe('Update validation queries', () => {
 					sql: `select "junction_"."tag_id", "junction_"."post_id" from  "public"."post_tags" as "junction_"   where "junction_"."post_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: {
-						rows: [{ post_id: testUuid(1), tag_id: testUuid(10) }, { post_id: testUuid(1), tag_id: testUuid(11) }],
+						rows: [
+							{ post_id: testUuid(1), tag_id: testUuid(10) },
+							{ post_id: testUuid(1), tag_id: testUuid(11) },
+						],
 					},
 				},
 				{
@@ -312,7 +315,10 @@ describe('Update validation queries', () => {
 					sql: `select "junction_"."tag_id", "junction_"."post_id" from  "public"."post_tags" as "junction_"   where "junction_"."post_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: {
-						rows: [{ post_id: testUuid(1), tag_id: testUuid(10) }, { post_id: testUuid(1), tag_id: testUuid(11) }],
+						rows: [
+							{ post_id: testUuid(1), tag_id: testUuid(10) },
+							{ post_id: testUuid(1), tag_id: testUuid(11) },
+						],
 					},
 				},
 				{

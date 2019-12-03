@@ -7,8 +7,9 @@ class LatestMigrationByStageQuery extends DatabaseQuery<LatestMigrationByStageQu
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<LatestMigrationByStageQuery.Result> {
-		const rows = (await queryable.wrapper.query<LatestMigrationByStageQuery.Row>(
-			`
+		const rows = (
+			await queryable.wrapper.query<LatestMigrationByStageQuery.Row>(
+				`
 			WITH RECURSIVE recent_events(type, previous_id, data) AS (
 					SELECT type, previous_id, data
 					FROM system.event
@@ -24,8 +25,9 @@ class LatestMigrationByStageQuery extends DatabaseQuery<LatestMigrationByStageQu
 			WHERE type = 'run_migration'
 			LIMIT 1
 		`,
-			[this.stageSlug],
-		)).rows
+				[this.stageSlug],
+			)
+		).rows
 
 		return this.fetchOneOrNull(rows)
 	}

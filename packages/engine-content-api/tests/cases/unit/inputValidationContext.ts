@@ -58,7 +58,8 @@ type Test = {
 	| {
 			nodeInput: { node: Value.Object } | { where: Input.UniqueWhere }
 			updateInput: Input.UpdateDataInput
-	  })
+	  }
+)
 
 const test = async (test: Test) => {
 	const contextFactory = new ValidationContextFactory(

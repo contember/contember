@@ -7,7 +7,7 @@ type EventWithMeta = AnyEvent & { dependencies: string[]; permission: EventsPerm
 type EventFilter = { entity: string; id: string }
 
 class DiffResponseBuilder {
-	public buildResponse(events: (EventWithMeta)[], filter: ReadonlyArray<EventFilter> | null): ApiEvent[] {
+	public buildResponse(events: EventWithMeta[], filter: ReadonlyArray<EventFilter> | null): ApiEvent[] {
 		if (filter !== null) {
 			if (filter.length === 0) {
 				return []

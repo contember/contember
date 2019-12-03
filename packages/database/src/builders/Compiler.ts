@@ -195,7 +195,11 @@ class Compiler {
 			return Literal.empty
 		}
 		if (Array.isArray(target)) {
-			return Literal.empty.appendAll(target.map(it => new Literal(wrapIdentifier(it))), ', ', ['(', ')'])
+			return Literal.empty.appendAll(
+				target.map(it => new Literal(wrapIdentifier(it))),
+				', ',
+				['(', ')'],
+			)
 		}
 		return new Literal('on constraint ' + wrapIdentifier(target.constraint))
 	}
@@ -208,7 +212,11 @@ class Compiler {
 	}
 
 	private createValues(values: QueryBuilder.ResolvedValues): Literal {
-		return Literal.empty.appendAll(Object.entries(values).map(([col, value]) => value), ', ', ['(', ')'])
+		return Literal.empty.appendAll(
+			Object.entries(values).map(([col, value]) => value),
+			', ',
+			['(', ')'],
+		)
 	}
 
 	private prependSchema(tableExpression: string | Literal, { schema, cteAliases }: Compiler.NamespaceContext): Literal {

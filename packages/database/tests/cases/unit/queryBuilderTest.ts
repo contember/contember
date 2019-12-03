@@ -51,7 +51,10 @@ describe('query builder', () => {
 							.compare('f', Operator.gte, 6)
 							.compareColumns('z', Operator.eq, ['foo', 'x'])
 							.in('o', [1, 2, 3])
-							.in('m', wrapper.selectBuilder().select(expr => expr.selectValue(1)))
+							.in(
+								'm',
+								wrapper.selectBuilder().select(expr => expr.selectValue(1)),
+							)
 							.null('n')
 							.raw('false'),
 					)

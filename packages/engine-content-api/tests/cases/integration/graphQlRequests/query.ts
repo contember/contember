@@ -1374,7 +1374,10 @@ describe('Queries', () => {
                    from "public"."category" as "root_"`,
 					parameters: [],
 					response: {
-						rows: [{ root_id: testUuid(1), root_title: 'Hello' }, { root_id: testUuid(2), root_title: 'World' }],
+						rows: [
+							{ root_id: testUuid(1), root_title: 'Hello' },
+							{ root_id: testUuid(2), root_title: 'World' },
+						],
 					},
 				},
 				{
@@ -1493,7 +1496,10 @@ describe('Queries', () => {
                    from "public"."author" as "root_"`,
 					parameters: [],
 					response: {
-						rows: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+						rows: [
+							{ root_id: testUuid(1), root_name: 'John' },
+							{ root_id: testUuid(2), root_name: 'Jack' },
+						],
 					},
 				},
 				{
@@ -1577,7 +1583,10 @@ describe('Queries', () => {
                    offset 2`,
 					parameters: [],
 					response: {
-						rows: [{ root_id: testUuid(1), root_name: 'John' }, { root_id: testUuid(2), root_name: 'Jack' }],
+						rows: [
+							{ root_id: testUuid(1), root_name: 'John' },
+							{ root_id: testUuid(2), root_name: 'Jack' },
+						],
 					},
 				},
 			]),

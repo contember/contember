@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-system-api",
-	"version": "0.2.11",
+	"version": "0.2.12",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
@@ -9,13 +9,13 @@
 	},
 	"dependencies": {
 		"@contember/authorization": "^0.2.5",
-		"@contember/database": "^0.2.11",
+		"@contember/database": "^0.2.12",
 		"@contember/dic": "^0.2.5",
 		"@contember/engine-common": "^0.2.5",
 		"@contember/queryable": "^0.2.5",
-		"@contember/schema": "^0.2.9",
-		"@contember/schema-migrations": "^0.2.11",
-		"@contember/schema-utils": "^0.2.9",
+		"@contember/schema": "^0.2.12",
+		"@contember/schema-migrations": "^0.2.12",
+		"@contember/schema-utils": "^0.2.12",
 		"@contember/utils": "^0.2.8",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-errors": "^2.3.1",
@@ -23,8 +23,8 @@
 		"pg": "^7.12.1"
 	},
 	"devDependencies": {
-		"@contember/engine-api-tester": "^0.2.11",
-		"@contember/schema-definition": "^0.2.9",
+		"@contember/engine-api-tester": "^0.2.12",
+		"@contember/schema-definition": "^0.2.12",
 		"@graphql-codegen/cli": "^1.5.0",
 		"@graphql-codegen/typescript": "^1.5.0",
 		"@graphql-codegen/typescript-operations": "^1.5.0",

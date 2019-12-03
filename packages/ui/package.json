@@ -25,8 +25,8 @@
     "react-textarea-autosize": "^7.1.2"
   },
   "peerDependencies": {
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0"
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^2.2.1",
@@ -35,7 +35,7 @@
     "@storybook/react": "^5.2.5",
     "@types/classnames": "^2.2.9",
     "@types/gravatar": "^1.8.0",
-    "@types/react": "^16.9.11",
+    "@types/react": "^16.9.14",
     "@types/react-datepicker": "^2.9.3",
     "@types/react-dom": "^16.9.4",
     "@types/react-sortable-hoc": "^0.6.6",

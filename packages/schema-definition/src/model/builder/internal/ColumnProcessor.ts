@@ -45,7 +45,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 			case Model.ColumnType.Enum:
 				return { ...common, type: type, columnType: options.enumName!, enumName: options.enumName! }
 			default:
-				;(({  }: never): never => {
+				;(({}: never): never => {
 					throw new Error()
 				})(type)
 		}

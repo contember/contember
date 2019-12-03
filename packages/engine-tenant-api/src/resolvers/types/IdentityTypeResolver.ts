@@ -26,7 +26,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 
 	async projects(
 		parent: { id: string; projects: readonly IdentityProjectRelation[] },
-		{  }: any,
+		{}: any,
 		context: ResolverContext,
 	): Promise<readonly IdentityProjectRelation[]> {
 		if (parent.projects.length > 0) {

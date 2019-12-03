@@ -6,9 +6,8 @@ import { LatestEventIdByStageQuery } from '@contember/engine-system-api'
 
 export class NotModifiedMiddlewareFactory {
 	create(): Koa.Middleware {
-		const notModifiedMiddleware: KoaMiddleware<
-			ProjectResolveMiddlewareFactory.KoaState & StageResolveMiddlewareFactory.KoaState
-		> = async (ctx, next) => {
+		const notModifiedMiddleware: KoaMiddleware<ProjectResolveMiddlewareFactory.KoaState &
+			StageResolveMiddlewareFactory.KoaState> = async (ctx, next) => {
 			const requestRef = ctx.request.get('X-Contember-Ref')
 			const body = ctx.request.body
 			// todo better detection of mutations

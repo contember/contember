@@ -7,15 +7,16 @@ class StageCommonEventsMatrixQuery extends DatabaseQuery<StageCommonEventsMatrix
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
-		const rows = (await queryable.createWrapper().query<{
-			stage_a_slug: string
-			stage_b_slug: string
-			stage_a_event_id: string
-			stage_b_event_id: string
-			common_event_id: string
-			distance: number
-		}>(
-			`WITH RECURSIVE events(id, previous_id, index, stage) AS (
+		const rows = (
+			await queryable.createWrapper().query<{
+				stage_a_slug: string
+				stage_b_slug: string
+				stage_a_event_id: string
+				stage_b_event_id: string
+				common_event_id: string
+				distance: number
+			}>(
+				`WITH RECURSIVE events(id, previous_id, index, stage) AS (
   SELECT event.id, previous_id, 0, stage.id
   FROM system.event
          JOIN system.stage ON stage.event_id = event.id
@@ -40,7 +41,8 @@ SELECT stage_a_slug, stage_a_event_id, stage_b_slug, stage_b_event_id, distance,
 FROM matrix
 WHERE num = 1
 `,
-		)).rows
+			)
+		).rows
 		const result: StageCommonEventsMatrixQuery.Result = {}
 		for (const row of rows) {
 			result[row.stage_a_slug] = result[row.stage_a_slug] || {}

@@ -183,13 +183,13 @@ namespace SelectBuilder {
 				select: Literal[]
 				limit: undefined | [number, number]
 				from: undefined | [Literal | string, string | undefined]
-				orderBy: ([Literal, 'asc' | 'desc'])[]
-				join: ({
+				orderBy: [Literal, 'asc' | 'desc'][]
+				join: {
 					type: 'inner' | 'left'
 					table: string
 					alias: string | undefined
 					condition: Literal | undefined
-				})[]
+				}[]
 				grouping: {
 					groupingElement: Literal[]
 				}

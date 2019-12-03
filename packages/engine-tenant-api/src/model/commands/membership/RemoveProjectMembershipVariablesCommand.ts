@@ -13,7 +13,14 @@ class RemoveProjectMembershipVariablesCommand implements Command<void> {
 			.where({
 				membership_id: this.membershipId,
 			})
-			.where(expr => expr.not(expr => expr.in('variable', this.except.map(it => it.name))))
+			.where(expr =>
+				expr.not(expr =>
+					expr.in(
+						'variable',
+						this.except.map(it => it.name),
+					),
+				),
+			)
 			.from('project_membership_variable')
 			.execute()
 	}

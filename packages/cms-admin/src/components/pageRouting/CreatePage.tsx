@@ -15,7 +15,14 @@ export interface CreatePageProps extends Omit<SingleEntityPageProps, 'where'> {
 const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<CreatePageProps> = React.memo(
 	(props: CreatePageProps) => {
 		if (!props.redirectOnSuccess) {
-			return <EntityCreator entityName={props.entityName}>{props.children}</EntityCreator>
+			return (
+				<EntityCreator
+					entityName={props.entityName}
+					//onSuccessfulPersist={onClick}
+				>
+					<MutableSingleEntityRenderer {...props.rendererProps}>{props.children}</MutableSingleEntityRenderer>
+				</EntityCreator>
+			)
 		}
 
 		return (

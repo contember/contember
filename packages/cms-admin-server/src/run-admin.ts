@@ -12,7 +12,11 @@ import { Server as HttpServer } from 'net'
 			configPlaceholder: String(process.env['CONTEMBER_CONFIG_PLACEHOLDER']),
 			indexFile: String(process.env['CONTEMBER_INDEX_FILE']),
 		}
-		const signals = [['SIGHUP', 1], ['SIGINT', 2], ['SIGTERM', 15]] as const
+		const signals = [
+			['SIGHUP', 1],
+			['SIGINT', 2],
+			['SIGTERM', 15],
+		] as const
 		let httpServer: HttpServer
 		for (const [signal, code] of signals) {
 			process.on(signal, () => {

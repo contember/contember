@@ -17,7 +17,8 @@ namespace Navigation {
 					children?: React.ReactNode
 				}>
 		  }
-		| Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>)
+		| Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
+	)
 
 	export type Middleware = React.ComponentType<MiddlewareProps>
 

@@ -7,13 +7,15 @@ export class LatestEventIdByStageQuery extends DatabaseQuery<string> {
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<string> {
-		const rows = (await queryable.wrapper.query<{ event_id: string }>(
-			`SELECT event_id
+		const rows = (
+			await queryable.wrapper.query<{ event_id: string }>(
+				`SELECT event_id
          FROM system.stage
          WHERE stage.slug = ?
 			`,
-			[this.stageSlug],
-		)).rows
+				[this.stageSlug],
+			)
+		).rows
 		if (rows.length !== 1) {
 			throw new ImplementationException()
 		}

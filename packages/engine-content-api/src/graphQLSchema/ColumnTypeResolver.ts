@@ -40,7 +40,7 @@ export default class ColumnTypeResolver {
 				}
 				throw new Error(`Undefined enum ${column.enumName}`)
 			default:
-				;(({  }: never): never => {
+				;(({}: never): never => {
 					throw new Error()
 				})(column)
 		}

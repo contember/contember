@@ -14,9 +14,9 @@ class ProjectMigrationInfoResolver {
 
 	public async getMigrationsInfo(): Promise<ProjectMigrationInfoResolver.Result> {
 		const stages = this.project.stages
-		const versions = (await Promise.all(
-			stages.map(stage => this.queryHandler.fetch(new LatestMigrationByStageQuery(stage.slug))),
-		)).map(it => (it ? it.data.version : null))
+		const versions = (
+			await Promise.all(stages.map(stage => this.queryHandler.fetch(new LatestMigrationByStageQuery(stage.slug))))
+		).map(it => (it ? it.data.version : null))
 		if (stages.length > 1 && versions.filter(it => it === versions[0]).length !== versions.length) {
 			throw new Error(
 				'Stages in different versions found: \n' +

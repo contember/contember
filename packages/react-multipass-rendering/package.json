@@ -10,12 +10,12 @@
   },
   "typings": "dist/src/index.d.ts",
   "peerDependencies": {
-    "react": "^16.11.0"
+    "react": "^16.12.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^2.2.1",
     "@types/jasmine": "^3.4.5",
-    "@types/react": "^16.9.11",
+    "@types/react": "^16.9.14",
     "jasmine": "^3.5.0",
     "react": "^16.9.0",
     "rollup": "^1.25.2",

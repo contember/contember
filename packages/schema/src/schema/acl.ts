@@ -59,7 +59,7 @@ namespace Acl {
 	export type Predicate = PredicateReference | boolean
 
 	export type AnyStage = '*'
-	export type StagesDefinition = AnyStage | (string[])
+	export type StagesDefinition = AnyStage | string[]
 
 	export interface RolePermissions {
 		inherits?: string[]

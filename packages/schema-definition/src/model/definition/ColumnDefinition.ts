@@ -63,7 +63,7 @@ class ColumnDefinition extends FieldDefinition<ColumnDefinition.Options> {
 
 				return { ...common, type: type, columnType: enumName!, enumName: enumName! }
 			default:
-				;(({  }: never): never => {
+				;(({}: never): never => {
 					throw new Error()
 				})(type)
 		}

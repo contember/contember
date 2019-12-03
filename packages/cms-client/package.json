@@ -1,6 +1,6 @@
 {
 	"name": "@contember/client",
-	"version": "0.2.9",
+	"version": "0.2.12",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
@@ -9,7 +9,7 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.2.9",
+		"@contember/schema": "^0.2.12",
 		"@contember/utils": "^0.2.8",
 		"graphql-request": "^1.8.2"
 	},

@@ -75,19 +75,22 @@ export class QueryGenerator {
 		let finalBuilder: ReadBuilder
 
 		if (subTree.constraints) {
-			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<
-				Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
-			> = subTree.constraints.filter
+			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+				CrudQueryBuilder.ReadArguments,
+				'filter'
+			>> = subTree.constraints.filter
 				? CrudQueryBuilder.ReadBuilder.instantiate().filter(subTree.constraints.filter)
 				: CrudQueryBuilder.ReadBuilder.instantiate()
 
-			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<
-				Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy'>
-			> = subTree.constraints.orderBy ? withFilter.orderBy(subTree.constraints.orderBy) : withFilter
+			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+				CrudQueryBuilder.ReadArguments,
+				'filter' | 'orderBy'
+			>> = subTree.constraints.orderBy ? withFilter.orderBy(subTree.constraints.orderBy) : withFilter
 
-			const withOffset: CrudQueryBuilder.ReadBuilder.Builder<
-				Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy' | 'offset'>
-			> = subTree.constraints.offset === undefined ? withOrderBy : withOrderBy.offset(subTree.constraints.offset)
+			const withOffset: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+				CrudQueryBuilder.ReadArguments,
+				'filter' | 'orderBy' | 'offset'
+			>> = subTree.constraints.offset === undefined ? withOrderBy : withOrderBy.offset(subTree.constraints.offset)
 
 			finalBuilder = subTree.constraints.limit === undefined ? withOffset : withOffset.limit(subTree.constraints.limit)
 		} else {
@@ -132,9 +135,10 @@ export class QueryGenerator {
 					}
 					builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(item.value.objectBuilder)
 
-					const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<
-						Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
-					> = reference.filter ? builderWithBody.filter(reference.filter) : builderWithBody
+					const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+						CrudQueryBuilder.ReadArguments,
+						'filter'
+					>> = reference.filter ? builderWithBody.filter(reference.filter) : builderWithBody
 
 					if (reference.reducedBy) {
 						// Assuming there's exactly one reducer field as enforced by MarkerTreeGenerator

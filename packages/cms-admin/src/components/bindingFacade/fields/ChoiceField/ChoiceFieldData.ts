@@ -54,5 +54,6 @@ export namespace ChoiceFieldData {
 			| {
 					arity: ChoiceArity.Multiple
 					children: (metadata: MultipleChoiceFieldMetadata) => React.ReactElement | null
-			  })
+			  }
+		)
 }

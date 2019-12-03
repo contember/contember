@@ -30,7 +30,11 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 				new CreateOrUpdateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships, true),
 			)
 			await bus.execute(
-				new RemoveProjectMembershipCommand(this.projectId, this.identityId, this.memberships.map(it => it.role)),
+				new RemoveProjectMembershipCommand(
+					this.projectId,
+					this.identityId,
+					this.memberships.map(it => it.role),
+				),
 			)
 
 			return new UpdateProjectMemberCommand.UpdateProjectMemberResponseOk()

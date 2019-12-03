@@ -11,7 +11,11 @@ import { Server } from 'net'
 	if (!projectsDir) {
 		throw new Error('env variable CONTEMBER_PROJECTS_DIRECTORY is not set')
 	}
-	const signals = [['SIGHUP', 1], ['SIGINT', 2], ['SIGTERM', 15]] as const
+	const signals = [
+		['SIGHUP', 1],
+		['SIGINT', 2],
+		['SIGTERM', 15],
+	] as const
 
 	let server: Server
 	for (const [signal, code] of signals) {

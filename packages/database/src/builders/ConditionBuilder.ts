@@ -85,7 +85,7 @@ export class ConditionBuilder {
 		return this.with(new Literal(`${toFqnWrap(columnName)} is null`))
 	}
 
-	raw(sql: string, ...bindings: (Value)[]): ConditionBuilder {
+	raw(sql: string, ...bindings: Value[]): ConditionBuilder {
 		return this.with(new Literal(sql, bindings))
 	}
 

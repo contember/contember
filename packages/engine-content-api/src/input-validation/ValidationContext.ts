@@ -89,7 +89,10 @@ namespace ValidationContext {
 		}
 		const value = context.node[part]
 		if (Array.isArray(value)) {
-			return createNodeListContext(context.root, value.map(it => createSingleNodeContext(context, it)))
+			return createNodeListContext(
+				context.root,
+				value.map(it => createSingleNodeContext(context, it)),
+			)
 		}
 		return createSingleNodeContext(context, value)
 	}

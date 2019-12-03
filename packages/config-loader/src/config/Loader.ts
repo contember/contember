@@ -42,9 +42,11 @@ class Loader {
 		if (data === null || typeof data !== 'object') {
 			return data
 		}
-		const { _include, ...rest } = (await Promise.all(
-			Object.entries(data).map(async ([key, value]) => [key, await this.includeConfigs(value, baseDir, parameters)]),
-		)).reduce<any>((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+		const { _include, ...rest } = (
+			await Promise.all(
+				Object.entries(data).map(async ([key, value]) => [key, await this.includeConfigs(value, baseDir, parameters)]),
+			)
+		).reduce<any>((acc, [key, value]) => ({ ...acc, [key]: value }), {})
 
 		if (!_include) {
 			return rest

@@ -378,7 +378,8 @@ export class MutationGenerator {
 						if (
 							(accessor instanceof EntityAccessor || accessor instanceof EntityForRemovalAccessor) &&
 							((persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField)) ||
-								(persistedField === undefined || persistedField === null))
+								persistedField === undefined ||
+								persistedField === null)
 						) {
 							accessorReference.push({
 								accessor,

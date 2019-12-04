@@ -26,7 +26,9 @@ storiesOf('Box', module)
 	))
 	.add('active', () => (
 		<BoxStoryWrapper>
-			<Box heading="Lorem ipsum" isActive={boolean('Is active', false)}>{loremIpsum}</Box>
+			<Box heading="Lorem ipsum" isActive={boolean('Is active', false)}>
+				{loremIpsum}
+			</Box>
 			<Box heading="Dolor sit">{loremIpsum}</Box>
 		</BoxStoryWrapper>
 	))

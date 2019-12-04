@@ -1,15 +1,17 @@
-import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { EntityAccessor, Environment, Field, FieldMetadata, FieldName, Scalar } from '../../../../binding'
+import {
+	EntityAccessor,
+	Environment,
+	ErrorAccessor,
+	FieldAccessor,
+	FieldValue,
+	SugaredRelativeSingleField,
+} from '../../../../binding'
 
 export namespace ChoiceFieldData {
-	export enum ChoiceArity {
-		Single = 'single',
-		Multiple = 'multiple',
-	}
+	export type ChoiceArity = 'single' | 'multiple'
 
-	export type StaticValue = GraphQlBuilder.Literal | Scalar
-
+	export type StaticValue = FieldValue
 	export type DynamicValue = EntityAccessor['primaryKey']
 
 	// This is just the JS array index as specified in options or as returned from the server.
@@ -24,41 +26,33 @@ export namespace ChoiceFieldData {
 
 	export type Data<ActualValue extends Environment.Value = string> = SingleDatum<ActualValue>[]
 
-	export interface BaseChoiceMetadata extends Omit<FieldMetadata, 'data'> {
-		data: ChoiceFieldData.Data<ChoiceFieldData.DynamicValue | ChoiceFieldData.StaticValue>
+	export interface BaseChoiceMetadata {
+		data: Data<DynamicValue | StaticValue>
+		errors: ErrorAccessor[]
 	}
 
 	export interface SingleChoiceFieldMetadata extends BaseChoiceMetadata {
-		currentValue: ChoiceFieldData.ValueRepresentation
-		onChange: (newValue: ChoiceFieldData.ValueRepresentation) => void
+		currentValue: ValueRepresentation
+		onChange: (newValue: ValueRepresentation) => void
 	}
 
 	export interface MultipleChoiceFieldMetadata extends BaseChoiceMetadata {
-		currentValues: Array<ChoiceFieldData.ValueRepresentation>
-		onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => void
+		currentValues: ValueRepresentation[]
+		onChange: (optionKey: ValueRepresentation, isChosen: boolean) => void
 	}
 
-	export type InnerBaseProps = Field.RawMetadata & BaseProps
-
-	export interface ChoiceFieldPublicProps {
-		name: FieldName
+	export interface MetadataByArity {
+		single: SingleChoiceFieldMetadata
+		multiple: MultipleChoiceFieldMetadata
 	}
 
-	export interface ChoiceFieldOptionFactoryProps {
-		renderOptionText?: (entityAccessor: EntityAccessor) => string
-		optionFieldStaticFactory?: React.ReactNode
-	}
-
-	export type BaseProps = ChoiceFieldPublicProps &
-		ChoiceFieldOptionFactoryProps &
-		(
-			| {
-					arity: ChoiceArity.Single
-					children: (metadata: SingleChoiceFieldMetadata) => React.ReactElement | null
-			  }
-			| {
-					arity: ChoiceArity.Multiple
-					children: (metadata: MultipleChoiceFieldMetadata) => React.ReactElement | null
-			  }
-		)
+	export type MetadataPropsByArity =
+		| {
+				arity: 'single'
+				children: (metadata: ChoiceFieldData.SingleChoiceFieldMetadata) => React.ReactElement | null
+		  }
+		| {
+				arity: 'multiple'
+				children: (metadata: ChoiceFieldData.MultipleChoiceFieldMetadata) => React.ReactElement | null
+		  }
 }

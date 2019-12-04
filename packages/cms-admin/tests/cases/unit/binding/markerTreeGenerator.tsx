@@ -3,9 +3,9 @@ import React from 'react'
 import {
 	EntityListDataProvider,
 	Field,
+	HasMany,
+	HasOne,
 	SingleEntityDataProvider,
-	ToMany,
-	ToOne,
 } from '../../../../src/binding/coreComponents'
 import { MarkerTreeGenerator } from '../../../../src/binding/model'
 
@@ -18,43 +18,45 @@ describe('Marker tree generator', () => {
 
 	it('should reject top-level fields and relations', () => {
 		const topOne = (
-			<ToOne field="foo">
-				<Field name="bar" />
-			</ToOne>
+			<HasOne field="foo">
+				<Field field="bar" />
+			</HasOne>
 		)
 		const topMany = (
-			<ToMany field="foo">
-				<Field name="bar" />
-			</ToMany>
+			<HasMany field="foo">
+				<Field field="bar" />
+			</HasMany>
 		)
-		const topField = <Field name="foo" />
+		const topField = <Field field="foo" />
 
 		for (const faultyTop of [topOne, topMany, topField]) {
-			expect(() => new MarkerTreeGenerator(faultyTop).generate()).toThrowError(/top-level/i)
+			expect(() => new MarkerTreeGenerator(faultyTop).generate()).toThrowError()
 		}
 	})
 
 	it('should enforce mandatory children', () => {
 		const list = (
-			<EntityListDataProvider filter={{ foo: {} }} entityName="Foo">
+			<EntityListDataProvider entities="Foo">
 				<></>
 			</EntityListDataProvider>
 		)
-		const toOne = (
-			<SingleEntityDataProvider where={{ foo: '' }} entityName="Foo">
-				<ToOne field="foo" />
+		const hasOne = (
+			<SingleEntityDataProvider entity="Foo">
+				<HasOne field="foo">
+					<></>
+				</HasOne>
 			</SingleEntityDataProvider>
 		)
-		const toMany = (
-			<SingleEntityDataProvider where={{ foo: '' }} entityName="Foo">
-				<ToMany field="foo">
+		const hasMany = (
+			<SingleEntityDataProvider entity="Foo">
+				<HasMany field="foo">
 					<></>
-				</ToMany>
+				</HasMany>
 			</SingleEntityDataProvider>
 		)
 
-		for (const faultyChildren of [list, toOne, toMany]) {
-			expect(() => new MarkerTreeGenerator(faultyChildren).generate()).toThrowError(/children/i)
+		for (const faultyChildren of [list, hasOne, hasMany]) {
+			expect(() => new MarkerTreeGenerator(faultyChildren).generate()).toThrowError()
 		}
 	})
 })

@@ -44,8 +44,8 @@ class EntityData {
 		return this.data[placeholder]
 	}
 
-	public getTreeRoot(subTreeIdentifier: SubTreeIdentifier): EntityData.FieldData
-	public getTreeRoot(id: MarkerTreeRoot.TreeId): EntityData.FieldData
+	public getTreeRoot(subTreeIdentifier: SubTreeIdentifier): RootAccessor
+	public getTreeRoot(id: MarkerTreeRoot.TreeId): RootAccessor
 	public getTreeRoot(identifier: SubTreeIdentifier | MarkerTreeRoot.TreeId): RootAccessor {
 		const root = this.data[PlaceholderGenerator.getMarkerTreePlaceholder(identifier)]
 		if (root === undefined) {

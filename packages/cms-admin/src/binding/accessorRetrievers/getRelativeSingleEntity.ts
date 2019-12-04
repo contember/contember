@@ -1,8 +1,11 @@
 import { EntityAccessor } from '../accessors'
 import { DataBindingError } from '../dao'
-import { ExpectedEntityCount, RelativeSingleEntity } from '../treeParameters'
+import { DesugaredRelativeSingleEntity, ExpectedEntityCount, RelativeSingleEntity } from '../treeParameters'
 
-export const getRelativeSingleEntity = (relativeTo: EntityAccessor, { hasOneRelationPath }: RelativeSingleEntity) => {
+export const getRelativeSingleEntity = (
+	relativeTo: EntityAccessor,
+	{ hasOneRelationPath }: RelativeSingleEntity | DesugaredRelativeSingleEntity,
+) => {
 	for (let i = hasOneRelationPath.length - 1; i >= 0; i--) {
 		const hasOneRelation = hasOneRelationPath[i]
 

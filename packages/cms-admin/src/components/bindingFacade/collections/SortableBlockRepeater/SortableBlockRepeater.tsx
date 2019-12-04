@@ -1,6 +1,12 @@
 import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { Component, RelativeSingleField, HasMany, useMutationState, useRelativeEntityList } from '../../../../binding'
+import {
+	Component,
+	HasMany,
+	SugaredRelativeSingleField,
+	useMutationState,
+	useRelativeEntityList,
+} from '../../../../binding'
 import { DiscriminatedBlocks, NormalizedBlockProps } from '../../blocks'
 import { useNormalizedBlockList } from '../../blocks/useNormalizedBlockList'
 import { Sortable } from '../Sortable'
@@ -9,7 +15,7 @@ import { AddNewBlockButton } from './AddNewBlockButton'
 import { SortableBlock } from './SortableBlock'
 
 export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
-	discriminationField: RelativeSingleField
+	discriminationField: string | SugaredRelativeSingleField
 	children: React.ReactNode
 }
 
@@ -64,9 +70,16 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 			}}
 		>
 			<Sortable sortBy={props.sortBy}>
-				<DiscriminatedBlocks name={props.discriminationField} label={props.label}>
-					{props.children}
-				</DiscriminatedBlocks>
+				{typeof props.discriminationField === 'string' && (
+					<DiscriminatedBlocks name={props.discriminationField} label={props.label}>
+						{props.children}
+					</DiscriminatedBlocks>
+				)}
+				{typeof props.discriminationField === 'string' || (
+					<DiscriminatedBlocks {...props.discriminationField} label={props.label}>
+						{props.children}
+					</DiscriminatedBlocks>
+				)}
 			</Sortable>
 		</HasMany>
 	),

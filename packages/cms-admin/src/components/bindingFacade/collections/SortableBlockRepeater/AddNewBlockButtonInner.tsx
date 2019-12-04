@@ -13,7 +13,7 @@ import { NormalizedBlockProps } from '../../blocks'
 export interface AddNewBlockButtonInnerProps extends DropdownRenderProps {
 	addNew: Exclude<EntityListAccessor['addNew'], undefined>
 	normalizedBlockProps: NormalizedBlockProps[]
-	discriminationField: SugaredRelativeSingleField
+	discriminationField: string | SugaredRelativeSingleField
 	isMutating: boolean
 }
 

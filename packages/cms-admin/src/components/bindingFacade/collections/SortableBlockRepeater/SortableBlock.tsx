@@ -4,7 +4,7 @@ import { SugaredRelativeSingleField, useRelativeSingleField } from '../../../../
 import { NormalizedBlockProps } from '../../blocks'
 
 export interface SortableBlockProps {
-	discriminationField: SugaredRelativeSingleField
+	discriminationField: string | SugaredRelativeSingleField
 	normalizedBlockProps: NormalizedBlockProps[]
 }
 

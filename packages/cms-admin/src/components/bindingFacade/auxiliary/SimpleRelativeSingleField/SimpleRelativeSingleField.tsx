@@ -45,7 +45,7 @@ export const SimpleRelativeSingleField = function<
 				<>
 					<Field
 						defaultValue={normalizedProps.defaultValue}
-						field={normalizedProps.field}
+						name={normalizedProps.name}
 						isNonbearing={normalizedProps.isNonbearing}
 					/>
 					{normalizedProps.label}

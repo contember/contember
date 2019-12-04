@@ -9,10 +9,10 @@ export const getRelativeSingleField = <
 	Produced extends Persisted = Persisted
 >(
 	relativeTo: EntityAccessor,
-	{ field, hasOneRelationPath }: RelativeSingleField | DesugaredRelativeSingleField,
+	{ name, hasOneRelationPath }: RelativeSingleField | DesugaredRelativeSingleField,
 ) => {
 	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
-	const accessor = nestedEntity.data.getField(field)
+	const accessor = nestedEntity.data.getField(name)
 
 	if (!(accessor instanceof FieldAccessor)) {
 		throw new DataBindingError(

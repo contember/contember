@@ -1,7 +1,14 @@
-import { Value } from 'slate'
-import { EntityAccessor, EntityListAccessor, EntityForRemovalAccessor, FieldAccessor } from '../../../binding'
-import JsonBlockSerializer from './JsonBlockSerializer'
 import { GraphQlBuilder } from '@contember/client'
+import { Value } from 'slate'
+import {
+	EntityAccessor,
+	EntityForRemovalAccessor,
+	EntityListAccessor,
+	FieldAccessor,
+	getRelativeSingleField,
+	RelativeSingleField,
+} from '../../../binding'
+import JsonBlockSerializer from './JsonBlockSerializer'
 import { BlocksDefinitions } from './types'
 
 type GetListAccessor = () => EntityListAccessor
@@ -9,8 +16,8 @@ type GetListAccessor = () => EntityListAccessor
 export default class OperationProcessor {
 	constructor(
 		private readonly accessor: EntityListAccessor,
-		private readonly sortBy: string,
-		private readonly typeField: string,
+		private readonly sortBy: RelativeSingleField,
+		private readonly typeField: RelativeSingleField,
 		private readonly blocks: BlocksDefinitions,
 		private readonly defaultBlock: string,
 	) {}
@@ -33,7 +40,7 @@ export default class OperationProcessor {
 		}
 		listAccessor.addNew && listAccessor.addNew()
 		const entity = this.getLastInCollection(getListAccessor)
-		const typeField = entity.data.getField(this.typeField)
+		const typeField = getRelativeSingleField(entity, this.typeField)
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('')
 		}
@@ -136,14 +143,14 @@ export default class OperationProcessor {
 					if (ea === undefined || ea instanceof EntityForRemovalAccessor) {
 						throw new Error('This should never happen')
 					}
-					ea.remove && ea.remove(EntityAccessor.RemovalType.Delete)
+					ea.remove && ea.remove('delete')
 					collection = getAccessor()
 				})
 			})
 	}
 
 	private getSortFieldAccessor = (entityAccessor: EntityAccessor): FieldAccessor => {
-		const sortFieldAccessor = entityAccessor.data.getField(this.sortBy)
+		const sortFieldAccessor = getRelativeSingleField(entityAccessor, this.sortBy)
 		if (!(sortFieldAccessor instanceof FieldAccessor)) {
 			throw new Error('Unable to find sort field.')
 		}
@@ -151,7 +158,7 @@ export default class OperationProcessor {
 	}
 
 	private getValueFieldAccessor = (entityAccessor: EntityAccessor): FieldAccessor => {
-		const typeField = entityAccessor.data.getField(this.typeField)
+		const typeField = getRelativeSingleField(entityAccessor, this.typeField)
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('Not found type field')
 		}

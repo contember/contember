@@ -1,7 +1,7 @@
 import { GraphQlBuilder } from '@contember/client'
 import { EntityAccessor, FieldAccessor } from '../accessors'
 import { DataBindingError } from '../dao'
-import { RelativeSingleField, Scalar } from '../treeParameters'
+import { DesugaredRelativeSingleField, RelativeSingleField, Scalar } from '../treeParameters'
 import { getRelativeSingleEntity } from './getRelativeSingleEntity'
 
 export const getRelativeSingleField = <
@@ -9,7 +9,7 @@ export const getRelativeSingleField = <
 	Produced extends Persisted = Persisted
 >(
 	relativeTo: EntityAccessor,
-	{ field, hasOneRelationPath }: RelativeSingleField,
+	{ field, hasOneRelationPath }: RelativeSingleField | DesugaredRelativeSingleField,
 ) => {
 	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
 	const accessor = nestedEntity.data.getField(field)

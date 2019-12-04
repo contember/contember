@@ -41,7 +41,7 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 		},
 		environment,
 	)
-	const labelFactory = <Field field={qualifiedFieldList.field} />
+	const labelFactory = <Field name={qualifiedFieldList.name} />
 
 	return (
 		<EntityListDataProvider

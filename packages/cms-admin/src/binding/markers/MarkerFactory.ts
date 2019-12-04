@@ -119,7 +119,7 @@ export namespace MarkerFactory {
 			environment,
 			relativeSingleField =>
 				new ConnectionMarker(
-					relativeSingleField.field,
+					relativeSingleField.name,
 					QueryLanguage.desugarUniqueWhere(to, environment),
 					relativeSingleField.isNonbearing,
 				),
@@ -130,7 +130,7 @@ export namespace MarkerFactory {
 			field,
 			environment,
 			relativeSingleField =>
-				new FieldMarker(relativeSingleField.field, relativeSingleField.defaultValue, relativeSingleField.isNonbearing),
+				new FieldMarker(relativeSingleField.name, relativeSingleField.defaultValue, relativeSingleField.isNonbearing),
 		)
 
 	export const wrapRelativeSingleField = (
@@ -139,7 +139,7 @@ export namespace MarkerFactory {
 		getMarker: (relativeSingleField: RelativeSingleField) => Marker,
 	): EntityFields => {
 		const relativeSingleField = QueryLanguage.desugarRelativeSingleField(field, environment)
-		const placeholderName = PlaceholderGenerator.getFieldPlaceholder(relativeSingleField.field)
+		const placeholderName = PlaceholderGenerator.getFieldPlaceholder(relativeSingleField.name)
 
 		return wrapRelativeEntityFields(relativeSingleField.hasOneRelationPath, {
 			[placeholderName]: getMarker(relativeSingleField),

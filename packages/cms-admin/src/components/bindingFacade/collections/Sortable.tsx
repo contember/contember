@@ -25,7 +25,7 @@ import { Repeater } from './Repeater'
 import EntityListPublicProps = Repeater.EntityListPublicProps
 
 export interface SortablePublicProps extends EntityListPublicProps {
-	sortBy: SugaredRelativeSingleField['field']
+	sortBy: SugaredRelativeSingleField['name']
 	enablePrepending?: boolean
 }
 
@@ -68,7 +68,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 	public static generateSyntheticChildren(props: SortableProps, environment: Environment): React.ReactNode {
 		return (
 			<>
-				<Field field={props.sortBy} isNonbearing={true} />
+				<Field name={props.sortBy} isNonbearing={true} />
 				{props.children}
 			</>
 		)

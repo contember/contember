@@ -20,5 +20,5 @@ export interface UnsugarableRelativeSingleField extends UnsugarableAnyField, Uns
 
 export interface SugaredRelativeSingleField extends UnsugarableRelativeSingleField {
 	// E.g. authors(id = 123).person.name
-	field: string | SugarableRelativeSingleField
+	name: string | SugarableRelativeSingleField
 }

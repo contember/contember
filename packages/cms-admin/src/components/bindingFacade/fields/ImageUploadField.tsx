@@ -11,6 +11,6 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 			{url => <img src={url} />}
 		</UploadField>
 	),
-	props => <Field field={props.field} />,
+	props => <Field name={props.name} />,
 	'ImageUploadField',
 )

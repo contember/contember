@@ -13,7 +13,7 @@ import {
 export interface RepeaterProps extends HasManyProps {
 	label: React.ReactNode
 
-	sortBy?: SugaredRelativeSingleField['field']
+	sortBy?: SugaredRelativeSingleField['name']
 	initialRowCount?: number
 
 	addButtonText?: React.ReactNode
@@ -35,7 +35,7 @@ export const Repeater = Component<RepeaterProps>(
 				initialEntityCount: props.initialRowCount,
 			}}
 		>
-			{props.sortBy && <Field field={props.sortBy} isNonbearing={true} />}
+			{props.sortBy && <Field name={props.sortBy} isNonbearing={true} />}
 			{props.children}
 		</HasMany>
 	),

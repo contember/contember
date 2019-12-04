@@ -64,7 +64,7 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 			}}
 		>
 			<Sortable sortBy={props.sortBy}>
-				<DiscriminatedBlocks field={props.discriminationField} label={props.label}>
+				<DiscriminatedBlocks name={props.discriminationField} label={props.label}>
 					{props.children}
 				</DiscriminatedBlocks>
 			</Sortable>

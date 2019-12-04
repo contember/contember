@@ -11,7 +11,7 @@ import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRendere
 
 export interface DimensionsSwitcherBaseProps
 	extends Omit<DimensionsRendererProps, 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'>,
-		Omit<SugaredQualifiedFieldList, 'entities'> {
+		Omit<SugaredQualifiedFieldList, 'fields'> {
 	optionEntities: SugaredQualifiedFieldList['fields']
 	minItems?: number
 	maxItems?: number

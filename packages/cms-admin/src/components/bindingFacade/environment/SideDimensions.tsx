@@ -7,11 +7,10 @@ import {
 	EnvironmentDeltaProvider,
 	HasOne,
 	SugaredRelativeSingleEntity,
-	SugaredRelativeSingleField,
 	SyntheticChildrenProvider,
 } from '../../../binding'
 
-interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
+export interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	dimension?: string
 	staticOptions?: Array<Environment.Value>
 	children: React.ReactNode

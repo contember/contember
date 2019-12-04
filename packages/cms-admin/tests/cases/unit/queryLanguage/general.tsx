@@ -1,9 +1,8 @@
-import 'jasmine'
 import { GraphQlBuilder } from '@contember/client'
+import 'jasmine'
 import React from 'react'
-import { Field, ToOne } from '../../../../src/binding/coreComponents'
 import { Environment } from '../../../../src/binding/dao'
-import { QueryLanguage } from '../../../../src/binding/queryLanguage'
+import { Parser } from '../../../../src/binding/queryLanguage'
 
 describe('query language parser', () => {
 	it('should resolve variables adhering to the principle maximal munch', () => {
@@ -16,21 +15,30 @@ describe('query language parser', () => {
 			dimensions: {},
 		})
 		expect(
-			QueryLanguage.wrapRelativeSingleField(
+			Parser.parseQueryLanguageExpression(
 				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = $x).foo',
+				Parser.EntryPoint.RelativeSingleField,
 				environment,
 			),
-		).toEqual(
-			<ToOne.AtomicPrimitive field="a" reducedBy={{ a: 123 }}>
-				<ToOne.AtomicPrimitive
-					field="fieldVariableName"
-					reducedBy={{ ab: 456, literalColumn: new GraphQlBuilder.Literal('literal') }}
-				>
-					<ToOne.AtomicPrimitive field="x" reducedBy={{ x: 'x' }}>
-						<Field name="foo" />
-					</ToOne.AtomicPrimitive>
-				</ToOne.AtomicPrimitive>
-			</ToOne.AtomicPrimitive>,
-		)
+		).toEqual({
+			field: 'foo',
+			hasOneRelationPath: [
+				{
+					field: 'a',
+					filter: undefined,
+					reducedBy: { a: 123 },
+				},
+				{
+					field: 'fieldVariableName',
+					filter: undefined,
+					reducedBy: { ab: 456, literalColumn: new GraphQlBuilder.Literal('literal') },
+				},
+				{
+					field: 'x',
+					filter: undefined,
+					reducedBy: { x: 'x' },
+				},
+			],
+		})
 	})
 })

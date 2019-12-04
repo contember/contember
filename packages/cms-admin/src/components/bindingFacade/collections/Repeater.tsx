@@ -5,53 +5,35 @@ import {
 	EnforceSubtypeRelation,
 	EntityAccessor,
 	EntityListAccessor,
-	Environment,
-	EnvironmentContext,
-	QueryLanguage,
+	HasMany,
+	HasManyProps,
 	SyntheticChildrenProvider,
-	ToMany,
-	ToManyProps,
 } from '../../../binding'
 import { AddNewButton, RemoveButton, RemoveButtonProps } from '../buttons'
 
-export interface RepeaterProps extends ToManyProps, Repeater.EntityListPublicProps {}
+export interface RepeaterProps extends HasManyProps, Repeater.EntityListPublicProps {}
 
 class Repeater extends React.PureComponent<RepeaterProps> {
 	static displayName = 'Repeater'
 
 	public render() {
-		return (
-			<EnvironmentContext.Consumer>
-				{(environment: Environment) =>
-					QueryLanguage.wrapRelativeEntityList(
-						this.props.field,
-						atomicPrimitiveProps => (
-							<ToMany.AccessorRetriever {...atomicPrimitiveProps}>
-								{(field: EntityListAccessor) => {
-									return (
-										<Repeater.EntityList
-											entities={field}
-											label={this.props.label}
-											enableAddingNew={this.props.enableAddingNew}
-											enableUnlink={this.props.enableUnlink}
-											enableUnlinkAll={this.props.enableUnlinkAll}
-											removeType={this.props.removeType}
-										>
-											{this.props.children}
-										</Repeater.EntityList>
-									)
-								}}
-							</ToMany.AccessorRetriever>
-						),
-						environment,
-					)
-				}
-			</EnvironmentContext.Consumer>
-		)
+		/*
+		<Repeater.EntityList
+				entities={field}
+				label={this.props.label}
+				enableAddingNew={this.props.enableAddingNew}
+				enableUnlink={this.props.enableUnlink}
+				enableUnlinkAll={this.props.enableUnlinkAll}
+				removeType={this.props.removeType}
+			>
+
+			</Repeater.EntityList>
+		 */
+		return <HasMany {...this.props}>{this.props.children}</HasMany>
 	}
 
 	public static generateSyntheticChildren(props: RepeaterProps): React.ReactNode {
-		return <ToMany field={props.field}>{props.children}</ToMany>
+		return <HasMany {...props}>{props.children}</HasMany>
 	}
 }
 

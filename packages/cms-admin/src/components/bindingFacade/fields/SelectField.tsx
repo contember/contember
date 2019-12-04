@@ -1,37 +1,25 @@
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import * as React from 'react'
-import { Component, Environment, ErrorAccessor, FieldName } from '../../../binding'
+import { Component, DataBindingError, ErrorAccessor } from '../../../binding'
 
 import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
 
 export interface SelectFieldPublicProps
-	extends Omit<FormGroupProps, 'children'>,
-		Omit<ChoiceFieldData.ChoiceFieldOptionFactoryProps, 'optionFieldStaticFactory'> {
-	name: FieldName
-	firstOptionCaption?: string
-	options: ChoiceFieldProps['options']
-	allowNull?: boolean
-	children?: ChoiceFieldData.ChoiceFieldOptionFactoryProps['optionFieldStaticFactory']
-}
+	extends SelectFieldInnerPublicProps,
+		Omit<ChoiceFieldProps<'single'>, 'children'> {}
 
 export type SelectFieldProps = SelectFieldPublicProps
 
 export const SelectField = Component<SelectFieldProps>(props => {
 	return (
-		<ChoiceField
-			name={props.name}
-			options={props.options}
-			arity={ChoiceFieldData.ChoiceArity.Single}
-			optionFieldStaticFactory={props.children}
-			renderOptionText={props.renderOptionText}
-		>
+		<ChoiceField {...(props as any)} arity="single">
 			{({
 				data,
 				currentValue,
 				onChange,
+				errors,
 				environment,
 				isMutating,
-				errors,
 			}: ChoiceFieldData.SingleChoiceFieldMetadata) => {
 				return (
 					<SelectFieldInner
@@ -51,12 +39,13 @@ export const SelectField = Component<SelectFieldProps>(props => {
 	)
 }, 'SelectField')
 
-export interface SelectFieldInnerProps
-	extends Omit<SelectFieldPublicProps, 'options' | 'name'>,
-		Omit<ChoiceFieldData.SingleChoiceFieldMetadata, 'fieldName'> {
-	environment: Environment
+export interface SelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
+	firstOptionCaption?: string
+	allowNull?: boolean
+}
+
+export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, SelectFieldInnerPublicProps {
 	errors: ErrorAccessor[]
-	isMutating: boolean
 }
 
 export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps> {
@@ -67,6 +56,9 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 			label: this.props.firstOptionCaption || (typeof this.props.label === 'string' ? this.props.label : ''),
 		}).concat(
 			this.props.data.map(({ key, label }) => {
+				if (typeof label !== 'string') {
+					throw new DataBindingError(`The labels of <SelectField /> items must be strings!`)
+				}
 				return {
 					disabled: false,
 					value: key,

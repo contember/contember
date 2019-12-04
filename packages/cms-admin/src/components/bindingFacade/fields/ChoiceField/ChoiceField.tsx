@@ -4,7 +4,11 @@ import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
 import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'
 
-export type ChoiceFieldProps = (StaticChoiceFieldProps | DynamicChoiceFieldProps) & ChoiceFieldData.MetadataPropsByArity
+export type ChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceFieldData.ChoiceArity> = (
+	| StaticChoiceFieldProps<Arity>
+	| DynamicChoiceFieldProps<Arity>
+) &
+	ChoiceFieldData.MetadataPropsByArity
 
 export const ChoiceField = Component<ChoiceFieldProps>(props => {
 	if (Array.isArray(props.options)) {

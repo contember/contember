@@ -1,8 +1,7 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, EntityAccessor, useMutationState } from '../../../binding'
+import { AccessorContext, EntityAccessor, RemovalType, useMutationState } from '../../../binding'
 import { useTriggerPersistWithFeedback } from '../../ui'
-import { RemovalType } from '../types'
 
 export type RemoveButtonProps = ButtonProps & {
 	removeType?: RemovalType
@@ -22,7 +21,7 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		if (props.immediatePersist && !confirm('Really?')) {
 			return
 		}
-		value.remove(mapToRemovalType(props.removeType))
+		value.remove(props.removeType || 'disconnect')
 
 		if (props.immediatePersist && triggerPersist) {
 			triggerPersist().catch(() => {})
@@ -50,15 +49,3 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 	)
 })
 RemoveButton.displayName = 'RemoveButton'
-
-const mapToRemovalType = (removalType?: RemovalType): EntityAccessor.RemovalType => {
-	switch (removalType) {
-		case 'disconnect':
-			return EntityAccessor.RemovalType.Disconnect
-		case 'delete':
-			return EntityAccessor.RemovalType.Delete
-		default:
-			// By default, we just unlink unless explicitly told to actually delete
-			return EntityAccessor.RemovalType.Disconnect
-	}
-}

@@ -13,9 +13,9 @@ export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
 		}
 		return (
 			<TextInput
-				value={fieldMetadata.data.currentValue || ''}
-				onChange={generateOnChange(fieldMetadata.data)}
-				validationState={fieldMetadata.errors.length ? 'invalid' : undefined}
+				value={fieldMetadata.field.currentValue || ''}
+				onChange={generateOnChange(fieldMetadata.field)}
+				validationState={fieldMetadata.field.errors.length ? 'invalid' : undefined}
 				readOnly={fieldMetadata.isMutating}
 				{...(props as any)} // This is VERY wrong.
 			/>

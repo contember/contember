@@ -5,9 +5,9 @@ import {
 	Environment,
 	EnvironmentContext,
 	EnvironmentDeltaProvider,
+	HasOne,
 	RelativeSingleField,
 	SyntheticChildrenProvider,
-	ToOne,
 } from '../../../binding'
 
 interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
@@ -67,7 +67,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 									dimensionValue={item}
 									variableName={props.variableName}
 									variables={props.variables}
-									toOneField={props.toOneField}
+									hasOneField={props.hasOneField}
 									key={j}
 								>
 									{child}
@@ -83,7 +83,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 namespace SideDimensions {
 	export interface CommonDimensionProps {
-		toOneField?: RelativeSingleField
+		hasOneField?: RelativeSingleField
 		variableName?: Environment.Name
 		variables?: Environment.DeltaFactory | ((dimensionValue: Environment.Value) => Environment.DeltaFactory)
 	}
@@ -107,7 +107,7 @@ namespace SideDimensions {
 		}
 
 		public static generateSyntheticChildren(props: SingleDimensionProps, environment: Environment): React.ReactNode {
-			return props.toOneField ? <ToOne field={props.toOneField}>{props.children}</ToOne> : props.children
+			return props.hasOneField ? <HasOne field={props.hasOneField}>{props.children}</HasOne> : props.children
 		}
 
 		public static generateEnvironment(props: SingleDimensionProps, oldEnvironment: Environment): Environment {

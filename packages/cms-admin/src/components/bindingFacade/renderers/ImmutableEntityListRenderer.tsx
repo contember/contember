@@ -1,7 +1,6 @@
 import { Box, Message } from '@contember/ui'
 import * as React from 'react'
 import { AccessorContext, AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '../../../binding'
-import { Repeater } from '../collections'
 
 export interface EntityListWrapperProps {
 	accessor: EntityListAccessor
@@ -31,7 +30,7 @@ export const ImmutableEntityListRenderer = Component<ImmutableEntityListRenderer
 		if (accessorTreeState === undefined) {
 			return null
 		}
-		const root = accessorTreeState.data.root
+		const root = accessorTreeState.data
 
 		if (!(root instanceof EntityListAccessor)) {
 			return null

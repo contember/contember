@@ -1,6 +1,6 @@
 import { FieldSet } from '@contember/ui'
 import * as React from 'react'
-import { Component, RelativeSingleField, ToMany, useMutationState, useRelativeEntityList } from '../../../../binding'
+import { Component, RelativeSingleField, HasMany, useMutationState, useRelativeEntityList } from '../../../../binding'
 import { DiscriminatedBlocks, NormalizedBlockProps } from '../../blocks'
 import { useNormalizedBlockList } from '../../blocks/useNormalizedBlockList'
 import { Sortable } from '../Sortable'
@@ -15,7 +15,7 @@ export interface SortableBlockRepeaterProps extends SortableRepeaterProps {
 
 export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 	props => {
-		const listAccessor = useRelativeEntityList(props.field)
+		const listAccessor = useRelativeEntityList(props)
 		const isMutating = useMutationState()
 		const normalizedBlockList: NormalizedBlockProps[] = useNormalizedBlockList(props.children)
 		const blockChildren = React.useMemo(
@@ -57,18 +57,18 @@ export const SortableBlockRepeater = Component<SortableBlockRepeaterProps>(
 		)
 	},
 	props => (
-		<ToMany
-			field={props.field}
+		<HasMany
+			{...props}
 			preferences={{
 				initialEntityCount: 0,
 			}}
 		>
 			<Sortable sortBy={props.sortBy}>
-				<DiscriminatedBlocks name={props.discriminationField} label={props.label}>
+				<DiscriminatedBlocks field={props.discriminationField} label={props.label}>
 					{props.children}
 				</DiscriminatedBlocks>
 			</Sortable>
-		</ToMany>
+		</HasMany>
 	),
 	'SortableBlockRepeater',
 )

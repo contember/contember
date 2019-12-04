@@ -7,7 +7,6 @@ import {
 	SortableElement,
 	SortableElementProps,
 	SortableHandle,
-	SortEndHandler,
 } from 'react-sortable-hoc'
 import {
 	EnforceSubtypeRelation,
@@ -16,17 +15,17 @@ import {
 	Environment,
 	EnvironmentContext,
 	Field,
-	FieldAccessor,
-	FieldName,
+	SugaredRelativeSingleField,
 	SyntheticChildrenProvider,
 	useMutationState,
+	useSortedEntities,
 } from '../../../binding'
 import { DragHandle as DragHandleIcon } from '../../ui'
 import { Repeater } from './Repeater'
 import EntityListPublicProps = Repeater.EntityListPublicProps
 
 export interface SortablePublicProps extends EntityListPublicProps {
-	sortBy: FieldName
+	sortBy: SugaredRelativeSingleField['field']
 	enablePrepending?: boolean
 }
 
@@ -69,7 +68,7 @@ class Sortable extends React.PureComponent<SortableProps> {
 	public static generateSyntheticChildren(props: SortableProps, environment: Environment): React.ReactNode {
 		return (
 			<>
-				<Field name={props.sortBy} isNonbearing={true} />
+				<Field field={props.sortBy} isNonbearing={true} />
 				{props.children}
 			</>
 		)
@@ -106,8 +105,8 @@ namespace Sortable {
 
 	export interface SortableListProps extends EntityListPublicProps {
 		entities: EntityAccessor[]
-		prependNew?: EntityListAccessor['addNew']
-		appendNew?: EntityListAccessor['addNew']
+		prependNew?: () => void
+		appendNew?: () => void
 	}
 
 	export const SortableList = React.memo(
@@ -142,176 +141,52 @@ namespace Sortable {
 	)
 	SortableList.displayName = 'Sortable.SortableList'
 
-	export interface EntityOrder {
-		[primaryKey: string]: number
-	}
-
 	export interface SortableInnerProps extends SortablePublicProps {
 		entities: EntityListAccessor
 		environment: Environment
 	}
 
-	export class SortableInner extends React.PureComponent<SortableInnerProps> {
-		public static displayName = 'Sortable.SortableInner'
+	export const SortableInner = React.memo((props: SortableInnerProps) => {
+		const { entities, moveEntity, addNewAtIndex, appendNew, prependNew } = useSortedEntities(
+			props.entities,
+			props.sortBy,
+		)
+		const onSortEnd = React.useCallback(
+			({ oldIndex, newIndex }) => {
+				moveEntity(oldIndex, newIndex)
+			},
+			[moveEntity],
+		)
 
-		private entities: EntityAccessor[] = []
-
-		private getOnSortEnd = (accessor: EntityListAccessor): SortEndHandler => ({ oldIndex, newIndex }) => {
-			this.reconcileOrderFields(accessor, oldIndex, newIndex)
-		}
-
-		private getBatchUpdater = (order: EntityOrder) => (getAccessor: () => EntityListAccessor) => {
-			let listAccessor: EntityListAccessor = getAccessor()
-			for (const entity of listAccessor.entities) {
-				if (!(entity instanceof EntityAccessor)) {
-					continue
-				}
-				const target = order[entity.getKey()]
-				const orderField = entity.data.getField(this.props.sortBy)
-
-				if (target !== undefined && orderField instanceof FieldAccessor && orderField.updateValue) {
-					orderField.updateValue(target)
-					listAccessor = getAccessor()
-				}
-			}
-		}
-
-		private computeNewEntityOrder(oldIndex: number, newIndex: number): EntityOrder {
-			const order: EntityOrder = {}
-
-			for (let i = 0, len = this.entities.length; i < len; i++) {
-				const entity = this.entities[i]
-				const orderField = entity.data.getField(this.props.sortBy)
-
-				if (orderField instanceof FieldAccessor && orderField.updateValue) {
-					let targetValue
-
-					if (i === oldIndex) {
-						targetValue = newIndex
-					} else if (oldIndex < newIndex && i > oldIndex && i <= newIndex) {
-						targetValue = i - 1
-					} else if (oldIndex > newIndex && i >= newIndex && i < oldIndex) {
-						targetValue = i + 1
-					} else {
-						targetValue = i
-					}
-
-					if (typeof orderField.currentValue !== 'number' || orderField.currentValue !== targetValue) {
-						order[entity.getKey()] = targetValue
-					}
-				}
-			}
-			return order
-		}
-
-		private reconcileOrderFields(accessor: EntityListAccessor, oldIndex: number, newIndex: number) {
-			const order = this.computeNewEntityOrder(oldIndex, newIndex)
-			accessor.batchUpdates && accessor.batchUpdates(this.getBatchUpdater(order))
-		}
-
-		private prepareEntities(accessor: EntityListAccessor): EntityAccessor[] {
-			const entities = accessor.entities.filter((item): item is EntityAccessor => item instanceof EntityAccessor)
-
-			return entities.sort((a, b) => {
-				const [aField, bField] = [a.data.getField(this.props.sortBy), b.data.getField(this.props.sortBy)]
-
-				if (
-					aField instanceof FieldAccessor &&
-					bField instanceof FieldAccessor &&
-					typeof aField.currentValue === 'number' &&
-					typeof bField.currentValue === 'number'
-				) {
-					return aField.currentValue - bField.currentValue
-				}
-				return 0
-			})
-		}
-
-		private prependNew = () => {
-			this.props.entities.addNew &&
-				this.props.entities.addNew((getListAccessor, newIndex) => {
-					let accessor = getListAccessor()
-					let newlyAdded = accessor.entities[newIndex]
-
-					if (!(newlyAdded instanceof EntityAccessor)) {
-						return
-					}
-
-					const sortableField = newlyAdded.data.getField(this.props.sortBy)
-
-					if (!(sortableField instanceof FieldAccessor)) {
-						return
-					}
-
-					sortableField.updateValue && sortableField.updateValue(this.entities.length)
-
-					accessor = getListAccessor()
-					newlyAdded = accessor.entities[newIndex]
-
-					if (!(newlyAdded instanceof EntityAccessor)) {
-						return
-					}
-
-					this.entities.push(newlyAdded)
-					this.reconcileOrderFields(accessor, this.entities.length - 1, 0)
-				})
-		}
-
-		public render() {
-			this.entities = this.prepareEntities(this.props.entities)
-
-			if (!this.props.entities.entities.length || !this.entities.length) {
-				return (
-					<Message flow="generousBlock">
-						{this.props.emptyMessage || 'There is no content yet. Try adding a new item.'}
-					</Message>
-				)
-			}
-
+		if (!entities.length) {
 			return (
-				<SortableList
-					entities={this.entities}
-					onSortEnd={this.getOnSortEnd(this.props.entities)}
-					useDragHandle={true}
-					shouldCancelStart={() => false}
-					lockAxis="y"
-					lockToContainerEdges={true}
-					prependNew={this.props.enablePrepending ? this.prependNew : undefined}
-					appendNew={this.props.entities.addNew}
-					enableUnlinkAll={this.props.enableUnlinkAll}
-					enableAddingNew={this.props.enableAddingNew}
-					enableUnlink={this.props.enableUnlink}
-					label={this.props.label}
-					removeType={this.props.removeType}
-				>
-					{this.props.children}
-				</SortableList>
+				<Message flow="generousBlock">
+					{props.emptyMessage || 'There is no content yet. Try adding a new item.'}
+				</Message>
 			)
 		}
 
-		componentDidUpdate(): void {
-			this.fixOrderlessEntities()
-		}
-
-		private fixOrderlessEntities() {
-			this.props.entities.batchUpdates &&
-				this.props.entities.batchUpdates(getAccessor => {
-					let listAccessor: EntityListAccessor = getAccessor()
-					for (const [i, entity] of this.entities.entries()) {
-						if (!(entity instanceof EntityAccessor)) {
-							continue
-						}
-
-						const orderField = entity.data.getField(this.props.sortBy)
-
-						if (orderField instanceof FieldAccessor && orderField.currentValue === null && orderField.updateValue) {
-							orderField.updateValue(i)
-							listAccessor = getAccessor()
-						}
-					}
-				})
-		}
-	}
+		return (
+			<SortableList
+				entities={entities}
+				onSortEnd={onSortEnd}
+				useDragHandle={true}
+				shouldCancelStart={() => false}
+				lockAxis="y"
+				lockToContainerEdges={true}
+				prependNew={props.enablePrepending ? prependNew : undefined}
+				appendNew={appendNew}
+				enableUnlinkAll={props.enableUnlinkAll}
+				enableAddingNew={props.enableAddingNew}
+				enableUnlink={props.enableUnlink}
+				label={props.label}
+				removeType={props.removeType}
+			>
+				{props.children}
+			</SortableList>
+		)
+	})
+	SortableInner.displayName = 'Sortable.SortableInner'
 }
 
 export { Sortable }

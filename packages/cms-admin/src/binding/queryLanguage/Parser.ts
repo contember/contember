@@ -136,12 +136,24 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private relativeEntityList = this.RULE<DesugaredRelativeEntityList>('relativeEntityList', () => {
-		const { hasOneRelationPath, field } = this.SUBRULE(this.relativeSingleField)
-		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-		const hasManyRelation: DesugaredHasManyRelation = {
-			field,
-			filter,
-		}
+		let { hasOneRelationPath } = this.SUBRULE(this.relativeSingleEntity)
+
+		const last = this.ACTION(() => hasOneRelationPath.pop()!)
+
+		this.ACTION(() => {
+			if (last.reducedBy !== undefined) {
+				throw new QueryLanguageError(
+					`Cannot parse '${Parser.rawInput}': the last field '${last.field}' is being reduced, which, grammatically, makes it a has-one relation but a has-many relation is expected.`,
+				)
+			}
+		})
+
+		const hasManyRelation = this.ACTION(
+			(): DesugaredHasManyRelation => ({
+				field: last.field,
+				filter: last.filter,
+			}),
+		)
 
 		return {
 			hasOneRelationPath,

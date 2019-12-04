@@ -300,7 +300,7 @@ export namespace QueryLanguage {
 	}
 
 	export const desugarRelativeEntityList = (
-		sugaredRelativeEntityList: SugaredRelativeEntityList,
+		sugaredRelativeEntityList: string | SugaredRelativeEntityList,
 		environment: Environment,
 	): RelativeEntityList => {
 		if (typeof sugaredRelativeEntityList === 'string') {

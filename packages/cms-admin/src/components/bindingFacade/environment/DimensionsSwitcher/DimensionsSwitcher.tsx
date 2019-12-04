@@ -2,28 +2,23 @@ import * as React from 'react'
 import {
 	DataBindingError,
 	EntityListDataProvider,
-	EntityListDataProviderProps,
 	Environment,
 	Field,
-	Filter,
 	QueryLanguage,
+	SugaredQualifiedFieldList,
 } from '../../../../binding'
-import { FieldText } from '../../ui'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps
-	extends Omit<DimensionsRendererProps, 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'> {
-	optionEntities: string
+	extends Omit<DimensionsRendererProps, 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'>,
+		Omit<SugaredQualifiedFieldList, 'entities'> {
+	optionEntities: SugaredQualifiedFieldList['fields']
 	minItems?: number
 	maxItems?: number
 	labelField: string
-	orderBy?: EntityListDataProviderProps['orderBy']
-	filter?: string | Filter
 }
 
-export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {
-	children?: DimensionsRendererProps['labelFactory']
-}
+export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {}
 
 export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) => {
 	const minItems = props.minItems === undefined ? 1 : props.minItems
@@ -39,21 +34,26 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 	}
 
 	const environment = new Environment()
-	const metadata = QueryLanguage.wrapQualifiedEntityList(
-		props.optionEntities,
-		<>
-			{props.children || <FieldText name={props.labelField} />}
-			<Field name={props.slugField} />
-		</>,
+	const qualifiedFieldList = QueryLanguage.desugarQualifiedFieldList(
+		{
+			...props,
+			fields: props.optionEntities,
+		},
 		environment,
 	)
+	const labelFactory = <Field field={qualifiedFieldList.field} />
 
 	return (
-		<EntityListDataProvider entityName={metadata.entityName} orderBy={props.orderBy} filter={props.filter}>
+		<EntityListDataProvider
+			entities={qualifiedFieldList}
+			orderBy={qualifiedFieldList.orderBy}
+			offset={qualifiedFieldList.offset}
+			limit={qualifiedFieldList.limit}
+		>
 			<DimensionsRenderer
 				buttonProps={props.buttonProps}
 				dimension={props.dimension}
-				labelFactory={metadata.children}
+				labelFactory={labelFactory}
 				minItems={minItems}
 				maxItems={maxItems}
 				renderSelected={props.renderSelected}

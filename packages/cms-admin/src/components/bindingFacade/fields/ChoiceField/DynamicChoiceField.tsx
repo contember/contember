@@ -24,6 +24,7 @@ import {
 	SugaredRelativeSingleEntity,
 	useEntityContext,
 	useEnvironment,
+	useMutationState,
 } from '../../../../binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
@@ -55,6 +56,7 @@ export const useDynamicChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>
 ): ChoiceFieldData.MetadataByArity[Arity] => {
 	const parentEntity = useEntityContext()
 	const environment = useEnvironment()
+	const isMutating = useMutationState()
 	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])
 	const subTreeData = React.useMemo(() => {
 		const subTree = parentEntity.data.getTreeRoot(subTreeIdentifier)
@@ -170,6 +172,8 @@ export const useDynamicChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>
 	const baseMetadata: ChoiceFieldData.BaseChoiceMetadata = {
 		data: normalizedData,
 		errors: currentValueEntity.errors,
+		isMutating,
+		environment,
 	}
 
 	if (props.arity === 'single') {

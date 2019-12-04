@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component, QueryLanguage } from '../../../binding'
+import { Component, Field } from '../../../binding'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { UploadField } from './UploadField'
 
@@ -23,6 +23,6 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 			)}
 		</UploadField>
 	),
-	(props, environment) => QueryLanguage.wrapRelativeSingleField(props.name, environment),
+	props => <Field field={props.field} />,
 	'FileUploadField',
 )

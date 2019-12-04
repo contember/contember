@@ -6,10 +6,10 @@ import {
 	AccessorTreeStateContext,
 	AccessorTreeStateName,
 	Component,
+	Entity,
 	EntityAccessor,
 	EntityListAccessor,
 	FieldAccessor,
-	ToOne,
 	useEnvironment,
 } from '../../../../binding'
 import { RequestChange } from '../../../../state/request'
@@ -134,15 +134,14 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 				}
 			})*/
 			}
-			const entities =
-				treeState.data.root instanceof EntityListAccessor ? treeState.data.root.entities : [treeState.data.root]
+			const entities = treeState.data instanceof EntityListAccessor ? treeState.data.entities : [treeState.data]
 			const normalized: StatefulDimensionDatum[] = []
 
 			for (const entity of entities) {
 				if (!(entity instanceof EntityAccessor)) {
 					continue
 				}
-				const label = <ToOne.AccessorRenderer accessor={entity}>{props.labelFactory}</ToOne.AccessorRenderer>
+				const label = <Entity accessor={entity}>{props.labelFactory}</Entity>
 				let slugValue: string | undefined
 				if (props.slugField !== 'id') {
 					const slug = props.slugField === 'id' ? entity.primaryKey : entity.data.getField(props.slugField)
@@ -227,8 +226,6 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 			</Dropdown>
 		)
 	},
-	props => {
-		return props.labelFactory
-	},
+	props => props.labelFactory,
 	'DimensionsRenderer',
 )

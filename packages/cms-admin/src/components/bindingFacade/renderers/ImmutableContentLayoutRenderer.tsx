@@ -43,11 +43,9 @@ const ImmutableContentLayoutRendererInner = Component<ImmutableContentLayoutRend
 		])
 
 		const treeStateRoot =
-			accessorTreeState !== undefined
-				? accessorTreeState.data.root instanceof EntityAccessor ||
-				  accessorTreeState.data.root instanceof EntityForRemovalAccessor
-					? accessorTreeState.data.root
-					: undefined
+			accessorTreeState !== undefined &&
+			(accessorTreeState.data instanceof EntityAccessor || accessorTreeState.data instanceof EntityForRemovalAccessor)
+				? accessorTreeState.data
 				: undefined
 
 		return (

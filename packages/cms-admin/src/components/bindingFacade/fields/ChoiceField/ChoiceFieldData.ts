@@ -19,7 +19,7 @@ export namespace ChoiceFieldData {
 
 	export interface SingleDatum<ActualValue extends Environment.Value = string> {
 		key: ValueRepresentation
-		label: string
+		label: React.ReactNode
 		description?: React.ReactNode
 		actualValue: ActualValue
 	}
@@ -29,6 +29,8 @@ export namespace ChoiceFieldData {
 	export interface BaseChoiceMetadata {
 		data: Data<DynamicValue | StaticValue>
 		errors: ErrorAccessor[]
+		environment: Environment
+		isMutating: boolean
 	}
 
 	export interface SingleChoiceFieldMetadata extends BaseChoiceMetadata {

@@ -1,7 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { Component, Scalar } from '../../../binding'
-import { LiteralStaticOption, ScalarStaticOption } from '../fields/ChoiceField'
+import { Component, Scalar, VariableLiteral } from '../../../binding'
 
 export interface BlockCommonProps {
 	label?: React.ReactNode
@@ -10,10 +9,10 @@ export interface BlockCommonProps {
 }
 
 export interface StaticBlockProps extends BlockCommonProps {
-	discriminateBy: LiteralStaticOption['value'] | string
+	discriminateBy: GraphQlBuilder.Literal | VariableLiteral | string
 }
 export interface DynamicBlockProps extends BlockCommonProps {
-	discriminateByScalar: ScalarStaticOption['value']
+	discriminateByScalar: Scalar
 }
 
 export type BlockProps = StaticBlockProps | DynamicBlockProps

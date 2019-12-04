@@ -1,16 +1,24 @@
 import { Button, ButtonGroup, DropdownRenderProps } from '@contember/ui'
 import * as React from 'react'
-import { EntityAccessor, EntityListAccessor, FieldAccessor, RelativeSingleField } from '../../../../binding'
+import {
+	EntityAccessor,
+	EntityListAccessor,
+	FieldAccessor,
+	getRelativeSingleField,
+	SugaredRelativeSingleField,
+	useDesugaredRelativeSingleField,
+} from '../../../../binding'
 import { NormalizedBlockProps } from '../../blocks'
 
 export interface AddNewBlockButtonInnerProps extends DropdownRenderProps {
 	addNew: Exclude<EntityListAccessor['addNew'], undefined>
 	normalizedBlockProps: NormalizedBlockProps[]
-	discriminationField: RelativeSingleField
+	discriminationField: SugaredRelativeSingleField
 	isMutating: boolean
 }
 
 export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(props => {
+	const desugaredDiscriminationField = useDesugaredRelativeSingleField(props.discriminationField)
 	return (
 		<ButtonGroup orientation="vertical">
 			{props.normalizedBlockProps.map((blockProps, i) => (
@@ -32,8 +40,7 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 								if (!(newlyAdded instanceof EntityAccessor)) {
 									return
 								}
-								// TODO this will fail horribly if QL is present here
-								const discriminationField = newlyAdded.data.getField(props.discriminationField)
+								const discriminationField = getRelativeSingleField(newlyAdded, desugaredDiscriminationField)
 								if (!(discriminationField instanceof FieldAccessor) || !discriminationField.updateValue) {
 									return
 								}

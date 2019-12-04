@@ -5,19 +5,12 @@ import Dropzone from 'react-dropzone'
 import { connect } from 'react-redux'
 import { Dispatch } from '../../../actions/types'
 import { uploadFile } from '../../../actions/upload'
-import {
-	EnforceSubtypeRelation,
-	Environment,
-	Field,
-	FieldMetadata,
-	QueryLanguage,
-	SyntheticChildrenProvider,
-} from '../../../binding'
+import { EnforceSubtypeRelation, SyntheticChildrenProvider } from '../../../binding'
 import State from '../../../state'
 import { AnyUpload, UploadStatus } from '../../../state/upload'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 
-export interface UploadFieldMetadata extends FieldMetadata<string> {
+export interface UploadFieldMetadata /*extends FieldMetadata<string>*/ {
 	upload?: AnyUpload
 	emptyText?: React.ReactNode
 }
@@ -58,7 +51,8 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 	public render() {
 		const upload = this.state.uploadId ? this.props.uploads[this.state.uploadId] : undefined
 
-		return (
+		return null // TODO
+		/*return (
 			<Field<string> name={this.props.name}>
 				{(metadata): React.ReactNode => (
 					<FormGroup
@@ -89,11 +83,12 @@ class UploadFieldComponent extends React.Component<UploadFieldProps, UploadField
 					</FormGroup>
 				)}
 			</Field>
-		)
+		)*/
 	}
 
-	public static generateSyntheticChildren(props: UploadFieldOwnProps, environment: Environment): React.ReactNode {
-		return QueryLanguage.wrapRelativeSingleField(props.name, environment)
+	public static generateSyntheticChildren(props: UploadFieldOwnProps): React.ReactNode {
+		return null
+		//return <Field name={props.name} />
 	}
 }
 
@@ -104,7 +99,7 @@ namespace UploadFieldComponent {
 		children: (url: string) => React.ReactNode
 	}
 
-	export class Inner extends React.PureComponent<InnerProps> {
+	/*export class Inner extends React.PureComponent<InnerProps> {
 		public render() {
 			return (
 				<Box distinction="seamlessIfNested">
@@ -157,7 +152,7 @@ namespace UploadFieldComponent {
 					assertNever(upload)
 			}
 		}
-	}
+	}*/
 }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<

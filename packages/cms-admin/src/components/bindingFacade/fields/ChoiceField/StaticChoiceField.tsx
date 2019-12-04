@@ -8,13 +8,14 @@ import {
 	OptionallyVariableFieldValue,
 	SugaredRelativeSingleField,
 	useEnvironment,
+	useMutationState,
 	useRelativeSingleField,
 	VariableInputTransformer,
 } from '../../../../binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {
-	label: string
+	label: React.ReactNode
 	description?: React.ReactNode
 }
 
@@ -49,6 +50,7 @@ export const useStaticChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>(
 	}
 
 	const environment = useEnvironment()
+	const isMutating = useMutationState()
 	const field = useRelativeSingleField(props)
 	const options = React.useMemo(() => normalizeOptions(props.options, environment), [environment, props.options])
 	const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => field.hasValue(value))
@@ -74,8 +76,10 @@ export const useStaticChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>(
 			data,
 			onChange,
 			errors: field.errors,
+			environment,
+			isMutating,
 		}),
-		[currentValue, data, field.errors, onChange],
+		[currentValue, data, environment, field.errors, isMutating, onChange],
 	)
 
 	return metadata as any // TS… 🙁

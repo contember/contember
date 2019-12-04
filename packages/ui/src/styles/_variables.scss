@@ -18,15 +18,16 @@ $cui-color-yellow: #FFC416 !default;
 $cui-color-red: #FF312E !default;
 
 $cui-color-white: #FFFFFF !default;
-$cui-color-gray-1: #FAFAFA !default;
-$cui-color-gray-2: #E6E6E6 !default;
-$cui-color-gray-3: #C7C7C7 !default;
-$cui-color-gray-4: #AEAEAE !default;
-$cui-color-gray-5: #9E9E9E !default;
-$cui-color-gray-6: #6A6A6A !default;
-$cui-color-gray-7: #404040 !default;
-$cui-color-gray-8: #343434 !default;
-$cui-color-gray-9: #222222 !default;
+$cui-color-gray-1: #F4F4F4 !default;
+$cui-color-gray-2: #E0E0E0 !default;
+$cui-color-gray-3: #C6C6C6 !default;
+$cui-color-gray-4: #A8A8A8 !default;
+$cui-color-gray-5: #8D8D8D !default;
+$cui-color-gray-6: #6F6F6F !default;
+$cui-color-gray-7: #525252 !default;
+$cui-color-gray-8: #393939 !default;
+$cui-color-gray-9: #262626 !default;
+$cui-color-gray-10: #161616 !default;
 $cui-color-black: #000000 !default;
 
 
@@ -547,8 +548,8 @@ $cui-menu-caret-transition-duration: $cui-collapsible-transition-duration !defau
 
 
 // Spinner
-$cui-spinner-softColor: $cui-color-gray-3 !default;
-$cui-spinner-accentColor: $cui-color-gray-6 !default;
+$cui-spinner-softColor: currentColor !default;
+$cui-spinner-accentColor: transparent !default;
 $cui-spinner-period: .6s !default;
 
 // Container spinner

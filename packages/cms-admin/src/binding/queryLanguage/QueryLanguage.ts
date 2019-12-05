@@ -270,28 +270,28 @@ export namespace QueryLanguage {
 		if (typeof sugaredRelativeSingleField === 'string') {
 			return desugarRelativeSingleField(
 				{
-					name: sugaredRelativeSingleField,
+					field: sugaredRelativeSingleField,
 				},
 				environment,
 			)
 		}
 
-		const { name, ...unsugarableField } = sugaredRelativeSingleField
+		const { field, ...unsugarableField } = sugaredRelativeSingleField
 
 		let hasOneRelationPath: HasOneRelation[]
 		let fieldName: FieldName
-		if (typeof name === 'string') {
-			const desugaredField = desugarSugarableRelativeSingleField(name, environment)
+		if (typeof field === 'string') {
+			const desugaredField = desugarSugarableRelativeSingleField(field, environment)
 			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugaredField.hasOneRelationPath, environment)
-			fieldName = desugaredField.name
+			fieldName = desugaredField.field
 		} else {
-			hasOneRelationPath = desugarHasOneRelationPath(name.hasOneRelationPath, {}, environment)
-			fieldName = name.name
+			hasOneRelationPath = desugarHasOneRelationPath(field.hasOneRelationPath, {}, environment)
+			fieldName = field.field
 		}
 
 		return {
 			hasOneRelationPath,
-			name: fieldName,
+			field: fieldName,
 			isNonbearing: unsugarableField.isNonbearing,
 			defaultValue: unsugarableField.defaultValue
 				? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)

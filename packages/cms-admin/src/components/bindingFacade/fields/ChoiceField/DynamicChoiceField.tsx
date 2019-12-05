@@ -155,8 +155,8 @@ export const useDynamicChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>
 								`Cannot use a ChoiceField with custom fields but without providing the 'renderOptionText' prop.`,
 							)
 						}
-					} else if ('name' in desugaredOptionPath) {
-						const field = item.data.getField(desugaredOptionPath.name)
+					} else if ('field' in desugaredOptionPath) {
+						const field = item.data.getField(desugaredOptionPath.field)
 						label = field instanceof FieldAccessor && typeof field.currentValue === 'string' ? field.currentValue : ''
 					}
 
@@ -241,7 +241,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 
 		const subTreeIdentifier = computeSubTreeIdentifier(props.field)
 
-		const idField = <Field name={PRIMARY_KEY_NAME} />
+		const idField = <Field field={PRIMARY_KEY_NAME} />
 		if (props.arity === 'single') {
 			reference = <HasOne field={props.field}>{idField}</HasOne>
 		} else if (props.arity === 'multiple') {
@@ -272,7 +272,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
 			entityListDataProvider = (
 				<EntityListDataProvider {...fieldList} entities={fieldList} subTreeIdentifier={subTreeIdentifier}>
-					<Field name={fieldList.name} />
+					<Field field={fieldList.field} />
 				</EntityListDataProvider>
 			)
 		}

@@ -23,6 +23,6 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 			)}
 		</UploadField>
 	),
-	props => <Field name={props.name} />,
+	props => <Field field={props.field} />,
 	'FileUploadField',
 )

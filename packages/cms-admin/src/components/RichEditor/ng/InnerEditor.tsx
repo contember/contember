@@ -24,8 +24,8 @@ import { createPluginsFromMarks } from './renderMark'
 import { BlocksDefinitions, InlinesDefinitions, MarksDefinitions } from './types'
 
 export interface RTEProps extends HasManyProps {
-	sortBy: SugaredRelativeSingleField['name']
-	name: SugaredRelativeSingleField['name']
+	sortBy: SugaredRelativeSingleField['field']
+	name: SugaredRelativeSingleField['field']
 	blocks: BlocksDefinitions
 	defaultBlock: string
 	marks: MarksDefinitions

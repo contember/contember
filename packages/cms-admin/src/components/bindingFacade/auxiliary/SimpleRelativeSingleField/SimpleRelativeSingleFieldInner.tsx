@@ -43,7 +43,7 @@ export const SimpleRelativeSingleFieldInner = React.memo(
 		const immediateParentEntity = useEntityContext()
 		const environment = useEnvironment()
 		const isMutating = useMutationState()
-		const field = useRelativeSingleField(name)
+		const field = useRelativeSingleField(props)
 
 		const fieldMetadata: SimpleRelativeSingleFieldMetadata = React.useMemo(
 			() => ({
@@ -68,24 +68,28 @@ export const SimpleRelativeSingleFieldInner = React.memo(
 			[environment, immediateParentEntity, props.description],
 		)
 
-		const rendered = React.useMemo(() => {
+		const rendered = React.useMemo<React.ReactNode>(() => {
 			if (render === undefined) {
 				return null
 			}
-			render(fieldMetadata, props)
+			return render(fieldMetadata, props)
 		}, [fieldMetadata, props, render])
 
 		return (
-			<FormGroup
-				label={normalizedLabel}
-				size={props.size}
-				labelDescription={normalizedLabelDescription}
-				labelPosition={props.labelPosition}
-				description={normalizedDescription}
-				errors={fieldMetadata.field.errors}
-			>
-				{rendered}
-			</FormGroup>
+			<>
+				{rendered && (
+					<FormGroup
+						label={normalizedLabel}
+						size={props.size}
+						labelDescription={normalizedLabelDescription}
+						labelPosition={props.labelPosition}
+						description={normalizedDescription}
+						errors={fieldMetadata.field.errors}
+					>
+						{rendered}
+					</FormGroup>
+				)}
+			</>
 		)
 	},
 )

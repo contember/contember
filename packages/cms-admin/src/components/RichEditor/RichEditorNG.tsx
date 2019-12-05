@@ -17,7 +17,7 @@ export const RichEditorNG = Component<RTEProps>(
 	props => {
 		const fields = Object.entries(props.blocks).map(([name, definition]) => {
 			return definition.renderBlock !== undefined ? (
-				<Field name={definition.valueField} key={name} />
+				<Field field={definition.valueField} key={name} />
 			) : (
 				<React.Fragment key={name}>{definition.render}</React.Fragment>
 			)
@@ -25,8 +25,8 @@ export const RichEditorNG = Component<RTEProps>(
 
 		return (
 			<HasMany field={props.field}>
-				<Field name={props.sortBy} isNonbearing={true} />
-				<Field name={props.name} />
+				<Field field={props.sortBy} isNonbearing={true} />
+				<Field field={props.name} />
 				{fields}
 			</HasMany>
 		)

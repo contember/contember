@@ -60,11 +60,11 @@ class Parser extends EmbeddedActionsParser {
 
 		this.CONSUME(tokens.Dot)
 
-		const { hasOneRelationPath, name } = this.SUBRULE(this.relativeSingleField)
+		const { hasOneRelationPath, field } = this.SUBRULE(this.relativeSingleField)
 
 		return {
 			entityName,
-			name,
+			field,
 			filter,
 			hasOneRelationPath,
 		}
@@ -112,11 +112,11 @@ class Parser extends EmbeddedActionsParser {
 			}
 		})
 
-		const name = this.ACTION(() => last.field)
+		const field = this.ACTION(() => last.field)
 
 		return {
 			hasOneRelationPath,
-			name,
+			field,
 		}
 	})
 

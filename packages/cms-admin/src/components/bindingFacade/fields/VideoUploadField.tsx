@@ -11,6 +11,6 @@ export const VideoUploadField = Component<VideoUploadFieldProps>(
 			{url => <video src={url} controls />}
 		</UploadField>
 	),
-	props => <Field name={props.name} />,
+	props => <Field field={props.field} />,
 	'VideoUploadField',
 )

@@ -1,19 +1,14 @@
-import { FieldName, FieldValue, OptionallyVariableFieldValue } from './primitives'
+import { FieldValue, OptionallyVariableFieldValue } from './primitives'
 
 // These are specific to leaf fields. Common but required parameters are in AnyField.
 
-export interface DesugaredLeafField {
-	name: FieldName
-}
+export interface DesugaredLeafField {}
 
 export interface LeafField {
-	name: FieldName
 	defaultValue: FieldValue | undefined
 }
 
-export interface SugarableLeafField {
-	name: FieldName
-}
+export interface SugarableLeafField {}
 
 export interface UnsugarableLeafField {
 	defaultValue?: OptionallyVariableFieldValue

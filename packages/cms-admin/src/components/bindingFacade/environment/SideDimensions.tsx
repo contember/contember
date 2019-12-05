@@ -83,7 +83,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 namespace SideDimensions {
 	export interface CommonDimensionProps {
-		hasOneField?: SugaredRelativeSingleEntity['field'] | SugaredRelativeSingleEntity
+		hasOneField?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField
 		variableName?: Environment.Name
 		variables?: Environment.DeltaFactory | ((dimensionValue: Environment.Value) => Environment.DeltaFactory)
 	}
@@ -111,7 +111,7 @@ namespace SideDimensions {
 				return props.children
 			}
 			const hasOneProps: SugaredRelativeSingleEntity =
-				typeof props.hasOneField === 'string' || !('field' in props.hasOneField)
+				typeof props.hasOneField === 'string' || 'hasOneRelationPath' in props.hasOneField
 					? {
 							field: props.hasOneField,
 					  }

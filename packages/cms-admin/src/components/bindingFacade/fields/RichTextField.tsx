@@ -44,7 +44,7 @@ export const RichTextField = Component<RichTextFieldProps>(
 	},
 	props => (
 		<>
-			<Field name={props.name} />
+			<Field field={props.field} />
 			{props.label}
 			{props.labelDescription}
 			{props.description}

@@ -16,7 +16,7 @@ import { ConcealableField, ConcealableFieldProps } from '../ui'
 
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
 	SimpleRelativeSingleFieldProps & {
-		drivenBy: SugaredRelativeSingleField['name']
+		drivenBy: SugaredRelativeSingleField['field']
 		format?: (currentValue: string, environment: Environment) => string
 		unpersistedHardPrefix?: string
 		persistedHardPrefix?: string
@@ -24,7 +24,7 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 	}
 
 export const SlugField = Component<SlugFieldProps>(
-	({ buttonProps, concealTimeout, format, unpersistedHardPrefix, persistedHardPrefix, drivenBy, name, ...props }) => {
+	({ buttonProps, concealTimeout, format, unpersistedHardPrefix, persistedHardPrefix, drivenBy, field, ...props }) => {
 		const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
 		const hostEntity = useEntityContext() // TODO this will fail for some QL uses
 		const slugField = useRelativeSingleField<string>(name)
@@ -95,8 +95,8 @@ export const SlugField = Component<SlugFieldProps>(
 	},
 	props => (
 		<>
-			<Field name={props.name} defaultValue={props.defaultValue} isNonbearing={true} />
-			<Field name={props.drivenBy} />
+			<Field field={props.field} defaultValue={props.defaultValue} isNonbearing={true} />
+			<Field field={props.drivenBy} />
 			{props.label}
 		</>
 	),

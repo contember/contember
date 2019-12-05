@@ -9,6 +9,7 @@ import {
 	Entity,
 	EntityAccessor,
 	EntityListAccessor,
+	Field,
 	FieldAccessor,
 	useEnvironment,
 } from '../../../../binding'
@@ -226,6 +227,11 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 			</Dropdown>
 		)
 	},
-	props => props.labelFactory,
+	props => (
+		<>
+			{props.labelFactory}
+			<Field field={props.slugField} />
+		</>
+	),
 	'DimensionsRenderer',
 )

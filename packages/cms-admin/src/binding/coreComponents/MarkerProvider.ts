@@ -41,7 +41,7 @@ export interface ConnectionMarkerProvider<P extends {} = any> {
 }
 
 export interface SyntheticChildrenProvider<P extends {} = any> {
-	generateSyntheticChildren: (props: P, environment: Environment) => React.ReactNode | EntityFields
+	generateSyntheticChildren: (props: P, environment: Environment) => React.ReactNode
 }
 
 export type CompleteMarkerProvider<P extends {} = any> = EnvironmentDeltaProvider<P> &

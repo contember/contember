@@ -30,6 +30,8 @@ export const Field = Component<FieldProps>(
 		}
 		return <>{field.currentValue}</>
 	},
-	(props, environment) => MarkerFactory.createFieldMarker(props, environment),
+	{
+		generateFieldMarker: (props, environment) => MarkerFactory.createFieldMarker(props, environment),
+	},
 	'Field',
 )

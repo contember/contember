@@ -73,7 +73,7 @@ describe('single relative fields QueryLanguage parser', () => {
 	})
 
 	it('should parse composite unique where', () => {
-		expect(parse("foo(a='b', bar = 123).name")).toEqual({
+		expect(parse("foo(a='b', bar = Literal).name")).toEqual({
 			field: 'name',
 			hasOneRelationPath: [
 				{
@@ -81,7 +81,7 @@ describe('single relative fields QueryLanguage parser', () => {
 					filter: undefined,
 					reducedBy: {
 						a: 'b',
-						bar: 123,
+						bar: new GraphQlBuilder.Literal('Literal'),
 					},
 				},
 			],

@@ -520,7 +520,15 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private identifier: () => string = this.RULE('identifier', () => {
-		return this.CONSUME(tokens.Identifier).image
+		return this.OR([
+			{
+				ALT: () => this.CONSUME(tokens.Identifier).image,
+			},
+			{
+				// TODO this is a temporary hack to allow for literals that start with an uppercase letter… 🙈
+				ALT: () => this.CONSUME(tokens.EntityIdentifier).image,
+			},
+		])
 	})
 
 	private entityIdentifier: () => EntityName = this.RULE('entityIdentifier', () => {

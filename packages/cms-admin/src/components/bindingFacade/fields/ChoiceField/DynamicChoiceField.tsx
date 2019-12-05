@@ -114,10 +114,10 @@ export const useDynamicChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>
 	const optionEntities = React.useMemo(() => {
 		const entities: EntityAccessor[] = []
 		for (const entity of filteredOptions) {
-			entities.push(getRelativeSingleEntity(entity, desugaredRelativePath))
+			entities.push(getRelativeSingleEntity(entity, desugaredOptionPath))
 		}
 		return entities
-	}, [desugaredRelativePath, filteredOptions])
+	}, [desugaredOptionPath, filteredOptions])
 
 	const currentlyChosenEntities =
 		currentValueEntity instanceof EntityListAccessor ? currentValueEntity.entities : [currentValueEntity]

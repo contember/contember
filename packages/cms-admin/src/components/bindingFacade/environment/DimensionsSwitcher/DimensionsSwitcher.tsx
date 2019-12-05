@@ -2,10 +2,10 @@ import * as React from 'react'
 import {
 	DataBindingError,
 	EntityListDataProvider,
-	Environment,
 	Field,
 	QueryLanguage,
 	SugaredQualifiedFieldList,
+	useEnvironment,
 } from '../../../../binding'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
@@ -33,22 +33,22 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 		throw new DataBindingError(`DimensionSwitcher: 'minItems' for dimension ${props.dimension} must be at least 1.`)
 	}
 
-	const environment = new Environment()
-	const qualifiedFieldList = QueryLanguage.desugarQualifiedFieldList(
+	const environment = useEnvironment()
+	const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(
 		{
 			...props,
-			fields: props.optionEntities,
+			entities: props.optionEntities,
 		},
 		environment,
 	)
-	const labelFactory = <Field field={qualifiedFieldList.field} />
+	const labelFactory = <Field field={props.labelField} />
 
 	return (
 		<EntityListDataProvider
-			entities={qualifiedFieldList}
-			orderBy={qualifiedFieldList.orderBy}
-			offset={qualifiedFieldList.offset}
-			limit={qualifiedFieldList.limit}
+			entities={qualifiedEntityList}
+			orderBy={qualifiedEntityList.orderBy}
+			offset={qualifiedEntityList.offset}
+			limit={qualifiedEntityList.limit}
 		>
 			<DimensionsRenderer
 				buttonProps={props.buttonProps}

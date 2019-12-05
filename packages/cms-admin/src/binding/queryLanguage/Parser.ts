@@ -76,7 +76,11 @@ class Parser extends EmbeddedActionsParser {
 		// TODO this will probably go away once we support singleton entities
 		const where = this.SUBRULE(this.uniqueWhere)
 		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-		const { hasOneRelationPath } = this.SUBRULE(this.relativeSingleEntity)
+		const relativeSingleEntity = this.OPTION1(() => this.SUBRULE(this.relativeSingleEntity))
+
+		const hasOneRelationPath = this.ACTION(() =>
+			relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
+		)
 
 		return {
 			entityName,
@@ -90,7 +94,11 @@ class Parser extends EmbeddedActionsParser {
 		'unconstrainedQualifiedEntityList',
 		() => {
 			const entityName = this.SUBRULE(this.entityIdentifier)
-			const { hasOneRelationPath } = this.SUBRULE(this.relativeSingleEntity)
+			const relativeSingleEntity = this.OPTION1(() => this.SUBRULE(this.relativeSingleEntity))
+
+			const hasOneRelationPath = this.ACTION(() =>
+				relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
+			)
 
 			return {
 				entityName,

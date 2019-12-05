@@ -2,9 +2,16 @@ import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { Component } from '../../../binding'
 import { Checkbox } from '../../ui'
-import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
+import {
+	BaseDynamicChoiceFieldProps,
+	ChoiceField,
+	ChoiceFieldData,
+	DynamicMultipleChoiceFieldProps,
+	StaticChoiceFieldProps,
+} from './ChoiceField'
 
-export type CheckboxListProps = Omit<FormGroupProps, 'children'> & ChoiceFieldProps<'single'>
+export type CheckboxListProps = Omit<FormGroupProps, 'children'> &
+	(Omit<StaticChoiceFieldProps<'multiple'>, 'arity'> | (DynamicMultipleChoiceFieldProps & BaseDynamicChoiceFieldProps))
 
 export const CheckboxList = Component<CheckboxListProps>(
 	props => (

@@ -6,9 +6,7 @@ export const getRelativeSingleEntity = (
 	relativeTo: EntityAccessor,
 	{ hasOneRelationPath }: RelativeSingleEntity | DesugaredRelativeSingleEntity,
 ) => {
-	for (let i = hasOneRelationPath.length - 1; i >= 0; i--) {
-		const hasOneRelation = hasOneRelationPath[i]
-
+	for (const hasOneRelation of hasOneRelationPath) {
 		const field = relativeTo.data.getField(
 			hasOneRelation.field,
 			ExpectedEntityCount.UpToOne,

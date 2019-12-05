@@ -18,7 +18,7 @@ export const DateField = SimpleRelativeSingleField<DateFieldProps, string>(
 	'DateField',
 )
 
-export interface DateFieldInnerProps extends Omit<DateFieldProps, 'name' | 'label'> {
+export interface DateFieldInnerProps extends Omit<DateFieldProps, 'field' | 'label' | 'isNonbearing' | 'defaultValue'> {
 	fieldMetadata: SimpleRelativeSingleFieldMetadata<string>
 }
 

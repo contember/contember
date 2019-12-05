@@ -2,13 +2,17 @@ import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import * as React from 'react'
 import { Component, DataBindingError, ErrorAccessor } from '../../../binding'
 
-import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
+import {
+	BaseDynamicChoiceFieldProps,
+	ChoiceField,
+	ChoiceFieldData,
+	DynamicSingleChoiceFieldProps,
+	StaticChoiceFieldProps,
+} from './ChoiceField'
 
-export interface SelectFieldPublicProps
-	extends SelectFieldInnerPublicProps,
-		Omit<ChoiceFieldProps<'single'>, 'children'> {}
-
-export type SelectFieldProps = SelectFieldPublicProps
+// TODO this is a bit of a mouthful. Express this more elegantly in order to avoid moving so much complexity to places like here.
+export type SelectFieldProps = SelectFieldInnerPublicProps &
+	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | (DynamicSingleChoiceFieldProps & BaseDynamicChoiceFieldProps))
 
 export const SelectField = Component<SelectFieldProps>(props => {
 	return (

@@ -28,24 +28,28 @@ import {
 } from '../../../../binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
+export type BaseDynamicChoiceFieldProps =
+	| {
+			renderOptionText: (entityAccessor: EntityAccessor) => string
+			options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
+			optionFieldStaticFactory: React.ReactNode
+	  }
+	| {
+			options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
+	  }
+
+export type DynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity
+export type DynamicMultipleChoiceFieldProps = SugaredRelativeEntityList
+
 export type DynamicChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceFieldData.ChoiceArity> = (
 	| ({
 			arity: 'single'
-	  } & SugaredRelativeSingleEntity)
+	  } & DynamicSingleChoiceFieldProps)
 	| ({
 			arity: 'multiple'
-	  } & SugaredRelativeEntityList)
+	  } & DynamicMultipleChoiceFieldProps)
 ) &
-	(
-		| {
-				renderOptionText: (entityAccessor: EntityAccessor) => string
-				options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
-				optionFieldStaticFactory: React.ReactNode
-		  }
-		| {
-				options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
-		  }
-	)
+	BaseDynamicChoiceFieldProps
 
 // Now THIS, this is one of the nastiest hacks in the entire codebase 👏.
 // TODO how to improve this though…? 🤔

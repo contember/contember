@@ -7,6 +7,7 @@ import {
 	EnvironmentDeltaProvider,
 	HasOne,
 	SugaredRelativeSingleEntity,
+	SugaredRelativeSingleField,
 	SyntheticChildrenProvider,
 } from '../../../binding'
 
@@ -83,7 +84,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 namespace SideDimensions {
 	export interface CommonDimensionProps {
-		hasOneField?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField
+		hasOneField?: string | SugaredRelativeSingleEntity
 		variableName?: Environment.Name
 		variables?: Environment.DeltaFactory | ((dimensionValue: Environment.Value) => Environment.DeltaFactory)
 	}
@@ -111,7 +112,7 @@ namespace SideDimensions {
 				return props.children
 			}
 			const hasOneProps: SugaredRelativeSingleEntity =
-				typeof props.hasOneField === 'string' || 'hasOneRelationPath' in props.hasOneField
+				typeof props.hasOneField === 'string'
 					? {
 							field: props.hasOneField,
 					  }

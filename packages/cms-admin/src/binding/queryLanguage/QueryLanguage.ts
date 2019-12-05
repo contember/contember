@@ -201,10 +201,47 @@ export namespace QueryLanguage {
 	}
 
 	export const desugarQualifiedFieldList = (
-		{ fields, ...unsugarableEntityList }: SugaredQualifiedFieldList,
+		{ fields, ...unsugarableFieldList }: SugaredQualifiedFieldList,
 		environment: Environment,
 	): QualifiedFieldList => {
-		throw new Error('TODO')
+		let field: FieldName
+		let entityName: EntityName
+		let filter: SugaredFilter | undefined
+		let hasOneRelationPath: HasOneRelation[]
+
+		if (typeof fields === 'string') {
+			const desugared = desugarSugarableQualifiedFieldList(fields, environment)
+
+			field = desugared.field
+			entityName = desugared.entityName
+			filter = desugared.filter
+			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugared.hasOneRelationPath, environment)
+		} else {
+			field = fields.field
+			entityName = fields.entityName
+			filter = fields.filter
+			hasOneRelationPath = desugarHasOneRelationPath(fields.hasOneRelationPath, {}, environment)
+		}
+
+		return {
+			field,
+			entityName,
+			hasOneRelationPath,
+			connectTo: unsugarableFieldList.connectTo
+				? desugarUniqueWhere(unsugarableFieldList.connectTo, environment)
+				: undefined,
+			defaultValue: unsugarableFieldList.defaultValue
+				? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
+				: undefined,
+			isNonbearing: unsugarableFieldList.isNonbearing,
+			...desugarEntityListParameters(
+				{
+					filter,
+				},
+				unsugarableFieldList,
+				environment,
+			),
+		}
 	}
 
 	export const desugarQualifiedSingleEntity = (

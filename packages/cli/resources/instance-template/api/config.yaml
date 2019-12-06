@@ -1,0 +1,11 @@
+tenant:
+    db:
+        host: '%env.TENANT_DB_HOST%'
+        port: '%env.TENANT_DB_PORT::number%'
+        user: '%env.TENANT_DB_USER%'
+        password: '%env.TENANT_DB_PASSWORD%'
+        database: '%env.TENANT_DB_NAME%'
+
+projects: []
+server:
+    port: '%env.CONTEMBER_PORT::number%'

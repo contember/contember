@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"typeRoots": ["./types", "./node_modules/@types"]
 	},
 	"extends": "../../tsconfig.settings.json"
 }

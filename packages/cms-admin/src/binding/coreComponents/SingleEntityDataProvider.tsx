@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
+import { AccessorTree, useAccessorTreeState } from '../accessorTree'
 import { MarkerFactory } from '../markers'
 import { SubTreeIdentifier, SugaredQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
@@ -19,9 +19,7 @@ export const SingleEntityDataProvider = Component<SingleEntityDataProviderProps>
 			nodeTree: children,
 		})
 
-		return (
-			<AccessorTreeStateContext.Provider value={accessorTreeState}>{props.children}</AccessorTreeStateContext.Provider>
-		)
+		return <AccessorTree state={accessorTreeState}>{props.children}</AccessorTree>
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>

@@ -5,3 +5,4 @@ import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 export const AccessorTreeStateContext = React.createContext<AccessorTreeState>({
 	name: AccessorTreeStateName.Uninitialized,
 })
+AccessorTreeStateContext.displayName = 'AccessorTreeStateContext'

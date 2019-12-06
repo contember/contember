@@ -1,12 +1,4 @@
 import * as React from 'react'
-import { AccessorTreeStateName } from './AccessorTreeState'
-import { AccessorTreeStateContext } from './AccessorTreeStateContext'
+import { TriggerPersistContext } from './TriggerPersistContext'
 
-export const useTriggerPersist = () => {
-	const accessorTreeState = React.useContext(AccessorTreeStateContext)
-
-	return accessorTreeState.name === AccessorTreeStateName.Interactive ||
-		accessorTreeState.name === AccessorTreeStateName.Mutating
-		? accessorTreeState.triggerPersist
-		: undefined
-}
+export const useTriggerPersist = () => React.useContext(TriggerPersistContext)

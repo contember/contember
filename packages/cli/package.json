@@ -6,17 +6,25 @@
 	},
 	"scripts": {},
 	"devDependencies": {
+		"@types/fs-extra": "^8.0.1",
+		"@types/js-yaml": "^3.12.1",
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
+		"@contember/config-loader": "^0.2.5",
 		"@contember/dic": "^0.2.5",
 		"@contember/engine-common": "^0.2.5",
 		"@contember/schema": "^0.2.12",
 		"@contember/schema-migrations": "^0.2.12",
+		"@contember/schema-definition": "^0.2.12",
 		"@contember/schema-utils": "^0.2.12",
+		"fs-extra": "^8.1.0",
+		"get-port": "^5.0.0",
 		"graphql-request": "^1.8.2",
+		"js-yaml": "^3.13.1",
 		"prompts": "^2.2.1",
 		"ts-node": "^8.4.1",
-		"typescript": "^3.7.2"
+		"typescript": "^3.7.2",
+		"yawn-yaml": "^1.4.0"
 	}
 }

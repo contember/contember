@@ -2,6 +2,7 @@ import { DatabaseCredentials } from '@contember/engine-common'
 
 interface Project {
 	readonly slug: string
+	readonly alias?: string[]
 	readonly directory?: string
 	readonly name: string
 	readonly stages: Array<Project.Stage>

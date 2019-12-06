@@ -69,8 +69,14 @@ class CompositionRoot {
 	): MasterContainer {
 		const projectContainers = this.createProjectContainers(debug, config.projects, projectsDirectory, projectSchemas)
 
-		const projectContainerResolver: ProjectContainerResolver = slug =>
-			projectContainers.find(it => it.project.slug === slug)
+		const projectContainerResolver: ProjectContainerResolver = (slug, aliasFallback = false) =>
+			projectContainers.find(it => it.project.slug === slug) ||
+			(aliasFallback
+				? projectContainers.find(function(it) {
+						console.log(it.project.alias)
+						return it.project.alias && it.project.alias.includes(slug)
+				  })
+				: undefined)
 
 		const tenantContainer = this.createTenantContainer(config.tenant.db, providers, projectContainerResolver)
 

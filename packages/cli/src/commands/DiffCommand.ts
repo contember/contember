@@ -5,7 +5,7 @@ import { Schema } from '@contember/schema'
 import { isDeepStrictEqual } from 'util'
 import { Input } from '../cli/Input'
 import { MigrationsContainerFactory } from '../MigrationsContainer'
-import { getDirectories } from '../NamingHelper'
+import { getProjectDirectories } from '../NamingHelper'
 
 type Args = {
 	projectName: string
@@ -28,7 +28,7 @@ export class DiffCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const [projectName, migrationName] = [input.getArgument('projectName'), input.getArgument('migrationName')]
-		const { migrationsDir, projectDir } = getDirectories(projectName, {
+		const { migrationsDir, projectDir } = getProjectDirectories(projectName, {
 			projectDir: input.getOption('project-dir'),
 			migrationsDir: input.getOption('migrations-dir'),
 		})

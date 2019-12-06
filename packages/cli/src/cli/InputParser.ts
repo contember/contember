@@ -6,6 +6,7 @@ class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}
 
 	parse<Args extends Arguments, Opts extends Options>(args: string[], allowRest: boolean): Input<Args, Opts> {
+		args = args.reduce<string[]>((acc, arg) => [...acc, ...(arg.startsWith('-') ? arg.split('=', 2) : [arg])], [])
 		let options: Options = {}
 		let argumentValues: Arguments = {}
 

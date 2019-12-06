@@ -30,13 +30,14 @@ export class S3Service {
 			ContentType: contentType,
 			CacheControl: 'immutable',
 			Expires: 3600,
-			ACL: 'public-read',
+			...(this.config.noAcl ? {} : { ACL: 'public-read' }),
 		})
 		const publicUrl = this.formatPublicUrl(objectKey)
 		return { bucket, objectKey, url, publicUrl }
 	}
 
 	public formatPublicUrl(key: string): string {
-		return `https://${this.endpoint}/${this.config.bucket}/${key}`
+		const hostUrl = this.endpoint.includes('://') ? this.endpoint : 'https://' + this.endpoint
+		return `${hostUrl}/${this.config.bucket}/${key}`
 	}
 }

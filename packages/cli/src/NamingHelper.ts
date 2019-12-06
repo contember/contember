@@ -1,6 +1,6 @@
 import * as path from 'path'
 
-export const getDirectories = (
+export const getProjectDirectories = (
 	projectName: string,
 	options: { projectDir?: string; migrationsDir?: string } = {},
 ): { projectDir: string; migrationsDir: string } => {

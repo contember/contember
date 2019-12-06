@@ -18,4 +18,4 @@ export type ProjectContainer = Container<{
 	schemaVersionBuilder: SchemaVersionBuilder
 }>
 
-export type ProjectContainerResolver = (slug: string) => ProjectContainer | undefined
+export type ProjectContainerResolver = (slug: string, aliasFallback?: boolean) => ProjectContainer | undefined

@@ -12,7 +12,10 @@ export async function run(
 	projectsDirectory: string,
 	projectSchemas?: { [name: string]: Schema },
 ): Promise<Server> {
-	const config = await readConfig(configFile)
+	let config = await readConfig(configFile)
+	if (process.env.CONTEMBER_S3_SERVER === 'minio') {
+		config.projects = config.projects.map(it => ({ ...it, s3: { ...it.s3, noAcl: true } }))
+	}
 	const container = new CompositionRoot().createMasterContainer(debug, config, projectsDirectory, projectSchemas)
 	await container.initializer.initialize()
 	return await container.serverRunner.run()

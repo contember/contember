@@ -2,7 +2,7 @@ import CommandConfiguration from '../cli/CommandConfiguration'
 import Command from '../cli/Command'
 import { Input } from '../cli/Input'
 import { MigrationsContainerFactory } from '../MigrationsContainer'
-import { getDirectories } from '../NamingHelper'
+import { getProjectDirectories } from '../NamingHelper'
 
 type Args = {
 	project: string
@@ -19,7 +19,7 @@ class DryRunCommand extends Command<Args, {}> {
 	protected async execute(input: Input<Args, {}>): Promise<void> {
 		const projectName = input.getArgument('project')
 
-		const { migrationsDir } = getDirectories(projectName)
+		const { migrationsDir } = getProjectDirectories(projectName)
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
 		const sql = await container.migrationDryRunner.getSql(input.getArgument('migration'))

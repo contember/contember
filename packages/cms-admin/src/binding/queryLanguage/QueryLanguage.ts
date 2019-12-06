@@ -283,7 +283,12 @@ export namespace QueryLanguage {
 		environment: Environment,
 	): RelativeSingleEntity => {
 		if (typeof sugaredRelativeSingleEntity === 'string') {
-			return desugarRelativeSingleEntity(sugaredRelativeSingleEntity, environment)
+			return desugarRelativeSingleEntity(
+				{
+					field: sugaredRelativeSingleEntity,
+				},
+				environment,
+			)
 		}
 
 		const { field, ...unsugarableEntity } = sugaredRelativeSingleEntity
@@ -341,7 +346,12 @@ export namespace QueryLanguage {
 		environment: Environment,
 	): RelativeEntityList => {
 		if (typeof sugaredRelativeEntityList === 'string') {
-			return desugarRelativeEntityList(sugaredRelativeEntityList, environment)
+			return desugarRelativeEntityList(
+				{
+					field: sugaredRelativeEntityList,
+				},
+				environment,
+			)
 		}
 
 		const { field, ...unsugarableEntityList } = sugaredRelativeEntityList

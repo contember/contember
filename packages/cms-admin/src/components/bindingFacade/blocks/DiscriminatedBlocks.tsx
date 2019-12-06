@@ -17,7 +17,7 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 			() =>
 				(normalizedBlockList as Array<NormalizedStaticBlockProps | NormalizedDynamicBlockProps>).map(item => ({
 					...item,
-					label: <>{item.label}</>,
+					label: item.label,
 					value: item.discriminateBy,
 				})),
 			[normalizedBlockList],

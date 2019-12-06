@@ -10,7 +10,7 @@ import {
 	Scalar,
 	SyntheticChildrenProvider,
 } from '../../../../binding'
-import { SimpleRelativeSingleFieldInner } from './SimpleRelativeSingleFieldInner'
+import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FormGroupProps, 'children'>
 
@@ -35,7 +35,7 @@ export const SimpleRelativeSingleField = function<
 	defaultProps?: Partial<P>,
 ): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P> {
 	return Component<P>(
-		props => <SimpleRelativeSingleFieldInner {...defaultProps} {...props} render={render} />,
+		props => <SimpleRelativeSingleFieldProxy {...defaultProps} {...props} render={render} />,
 		(props: P) => {
 			const normalizedProps = {
 				...defaultProps,

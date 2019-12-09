@@ -4,7 +4,7 @@ import { deprecated } from '../core/console/messages'
 import { DatabaseCredentials } from '@contember/engine-common'
 import { S3Config } from '@contember/engine-s3-plugin/dist/src/Config'
 
-export type ProjectWithS3 = Project & { s3: S3Config }
+export type ProjectWithS3 = Project & { s3?: S3Config }
 
 export interface Config {
 	tenant: {

@@ -19,7 +19,7 @@ import {
 	TenantContainer,
 } from '@contember/engine-tenant-api'
 import { Schema } from '@contember/schema'
-import { Builder } from '@contember/dic'
+import { Builder, mergeContainers } from '@contember/dic'
 import {
 	AuthMiddlewareFactory,
 	ContentApolloMiddlewareFactory,
@@ -41,7 +41,7 @@ import {
 	TimerMiddlewareFactory,
 } from './http'
 import { Config, ProjectWithS3 } from './config/config'
-import { S3SchemaFactory, S3Service } from '@contember/engine-s3-plugin'
+import { S3SchemaFactory, S3Service, S3ServiceFactory } from '@contember/engine-s3-plugin'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
@@ -252,11 +252,11 @@ class CompositionRoot {
 							new SchemaVersionBuilderInternal(migrationsResolver, schemaMigrator),
 						),
 				)
-				.addService('s3', ({ project }) => {
-					return new S3Service(project.s3)
+				.addService('s3Factory', () => {
+					return new S3ServiceFactory()
 				})
-				.addService('s3SchemaFactory', ({ s3 }) => {
-					return new S3SchemaFactory(graphqlObjectFactories, s3)
+				.addService('s3SchemaFactory', ({ s3Factory, project }) => {
+					return new S3SchemaFactory(graphqlObjectFactories, project.s3, s3Factory)
 				})
 				.addService(
 					'graphQlSchemaBuilderFactory',
@@ -313,18 +313,20 @@ class CompositionRoot {
 				)
 				.build()
 
-			return projectContainer
-				.pick(
-					'project',
-					'contentApolloMiddlewareFactory',
-					'systemDbClient',
-					'systemQueryHandler',
-					'connection',
-					'systemDbMigrationsRunner',
-					'schemaVersionBuilder',
-				)
-				.merge(systemIntermediateContainer)
-				.merge(systemContainer.pick('systemExecutionContainerFactory'))
+			const projectServices = projectContainer.pick(
+				'project',
+				'contentApolloMiddlewareFactory',
+				'systemDbClient',
+				'systemQueryHandler',
+				'connection',
+				'systemDbMigrationsRunner',
+				'schemaVersionBuilder',
+			)
+
+			return mergeContainers(
+				mergeContainers(projectServices, systemIntermediateContainer),
+				systemContainer.pick('systemExecutionContainerFactory'),
+			)
 		})
 	}
 

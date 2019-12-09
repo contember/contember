@@ -5,6 +5,9 @@
 	},
 	"references": [
 		{
+			"path": "../../dic/src"
+		},
+		{
 			"path": "../../config-loader/src"
 		},
 		{

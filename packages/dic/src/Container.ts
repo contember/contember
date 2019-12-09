@@ -59,6 +59,10 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 		})
 	}
 
+	getFactories(): ServiceFactoryMap<M> {
+		return this.factories
+	}
+
 	get<N extends keyof M>(name: N): M[N] {
 		const service: M[N] | undefined = this.services[name]
 
@@ -76,11 +80,14 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 		}
 		return new ContainerImpl(factories as ServiceFactoryMap<{ [K in N]: M[K] }>) as Container<{ [K in N]: M[K] }>
 	}
+}
 
-	merge<M2 extends ServiceTypeMap>(container: Container<M2>): Container<M & M2> {
-		return new ContainerImpl({
-			...(this.factories as object),
-			...(container.factories as object),
-		} as ServiceFactoryMap<M & M2>) as Container<M & M2>
-	}
+export function mergeContainers<M1 extends ServiceTypeMap, M2 extends ServiceTypeMap>(
+	containerA: Container<M1>,
+	containerB: Container<M2>,
+): Container<M1 & M2> {
+	return new ContainerImpl({
+		...containerA.getFactories(),
+		...containerB.getFactories(),
+	} as ServiceFactoryMap<M1 & M2>) as Container<M1 & M2>
 }

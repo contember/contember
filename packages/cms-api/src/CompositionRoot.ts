@@ -41,7 +41,7 @@ import {
 	TimerMiddlewareFactory,
 } from './http'
 import { Config, ProjectWithS3 } from './config/config'
-import { S3SchemaFactory, S3Service } from '@contember/engine-s3-plugin'
+import { S3SchemaFactory, S3Service, S3ServiceFactory } from '@contember/engine-s3-plugin'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
@@ -252,11 +252,11 @@ class CompositionRoot {
 							new SchemaVersionBuilderInternal(migrationsResolver, schemaMigrator),
 						),
 				)
-				.addService('s3', ({ project }) => {
-					return new S3Service(project.s3)
+				.addService('s3Factory', () => {
+					return new S3ServiceFactory()
 				})
-				.addService('s3SchemaFactory', ({ s3 }) => {
-					return new S3SchemaFactory(graphqlObjectFactories, s3)
+				.addService('s3SchemaFactory', ({ s3Factory, project }) => {
+					return new S3SchemaFactory(graphqlObjectFactories, project.s3, s3Factory)
 				})
 				.addService(
 					'graphQlSchemaBuilderFactory',

@@ -21,6 +21,11 @@ const mutation = `mutation ($contentType: String!) {
 	generateUploadUrl(contentType: $contentType) {
 		url
 		publicUrl
+		method
+		headers {
+			key
+			value
+		}
 	}
 }`
 
@@ -66,16 +71,14 @@ export const uploadFile = (id: string, file: File): ActionCreator<any> => async 
 	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	const graphqlClient = services.contentClientFactory.create(state.request.project, state.request.stage)
 
-	let uploadUrl: string
-	let publicUrl: string
+	let signedUpload: { url: string; publicUrl: string; method: string; headers: { key: string; value: string }[] }
 	try {
 		const variables = {
 			contentType: file.type,
 		}
 		const result = await graphqlClient.request(mutation, variables, apiToken || undefined)
 
-		uploadUrl = result.generateUploadUrl.url
-		publicUrl = result.generateUploadUrl.publicUrl
+		signedUpload = result.generateUploadUrl
 	} catch (error) {
 		if (error instanceof GraphqlClient.GraphqlAuthenticationError) {
 			dispatch(pushRequest(loginRequest()))
@@ -88,15 +91,12 @@ export const uploadFile = (id: string, file: File): ActionCreator<any> => async 
 	const content = await readAsArrayBuffer(file)
 	dispatch(updateUploadProgress(id, 0))
 	try {
+		const headers = signedUpload.headers.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {})
 		await httpFetch(
-			uploadUrl,
+			signedUpload.url,
 			{
-				method: 'PUT',
-				headers: {
-					'Content-Type': file.type,
-					'Cache-Control': 'immutable',
-					'x-amz-acl': 'public-read',
-				},
+				method: signedUpload.method,
+				headers,
 				body: content,
 			},
 			{
@@ -109,6 +109,6 @@ export const uploadFile = (id: string, file: File): ActionCreator<any> => async 
 		dispatch(setUploadFailed(id, `An error has occurred while uploading a file`))
 		throw error
 	}
-	dispatch(finishUpload(id, publicUrl))
+	dispatch(finishUpload(id, signedUpload.publicUrl))
 	URL.revokeObjectURL(objectURL)
 }

@@ -1,8 +1,9 @@
-const sass = require('node-sass')
-const path = require('path')
-const fs = require('fs')
+import sass from 'node-sass'
+import path from 'path'
+import fs from 'fs'
+
 const result = sass.renderSync({
-	file: path.join(__dirname, '/../src/index.sass'),
+	file: path.join(process.cwd(), '/src/index.sass'),
 	importer: (url /*, prev */) => {
 		if (url.startsWith('~')) {
 			const path = process.cwd() + '/node_modules/' + url.slice(1)
@@ -13,8 +14,8 @@ const result = sass.renderSync({
 		}
 	},
 })
-fs.writeFileSync(path.join(__dirname, '/../dist/style.css'), result.css, function(err) {
+fs.writeFileSync(path.join(process.cwd(), '/dist/style.css'), result.css, function(err) {
 	if (err) {
 		throw err
 	}
-});
+})

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SortEndHandler } from 'react-sortable-hoc'
+import { Axis, SortEndHandler } from 'react-sortable-hoc'
 import {
 	Entity,
 	EntityListAccessor,
@@ -30,6 +30,8 @@ export interface RepeaterInnerProps
 
 	itemComponent?: React.ComponentType<RepeaterItemProps & any>
 	itemComponentExtraProps?: {}
+
+	unstable__sortAxis?: Axis
 }
 
 export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
@@ -77,8 +79,16 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 		)
 	}
 
+	const axis = props.unstable__sortAxis || 'y'
+
 	return (
-		<SortableRepeaterContainer lockAxis="y" lockToContainerEdges={true} useDragHandle={true} onSortEnd={onSortEnd}>
+		<SortableRepeaterContainer
+			axis={axis}
+			lockAxis={axis}
+			lockToContainerEdges={true}
+			useDragHandle={true}
+			onSortEnd={onSortEnd}
+		>
 			<Container {...props.containerComponentExtraProps} {...props} isEmpty={isEmpty} addNew={appendNew}>
 				{entities.map((entity, i) => (
 					<SortableRepeaterItem index={i} key={entity.getKey()} disabled={isMutating}>

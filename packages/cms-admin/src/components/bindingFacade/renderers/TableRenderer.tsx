@@ -1,7 +1,7 @@
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import * as React from 'react'
 import { AccessorContext, Component, EntityAccessor } from '../../../binding'
-import { RemoveButton } from '../buttons'
+import { RemoveEntityButton } from '../collections/helpers'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import {
 	EntityListWrapperProps,
@@ -42,7 +42,7 @@ export const TableRenderer = Component<TableRendererProps>(
 									{props.originalChildren}
 									{enableRemove && (
 										<TableCell shrunk>
-											<RemoveButton removeType={'delete'} immediatePersist={true} />
+											<RemoveEntityButton removalType="delete" immediatePersist={true} />
 										</TableCell>
 									)}
 								</TableRow>

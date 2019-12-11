@@ -2,16 +2,14 @@ import { Button, ButtonGroup, DropdownRenderProps } from '@contember/ui'
 import * as React from 'react'
 import {
 	EntityAccessor,
-	EntityListAccessor,
-	FieldAccessor,
 	getRelativeSingleField,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
 } from '../../../../binding'
 import { NormalizedBlockProps } from '../../blocks'
+import { AddNewEntityButtonProps } from '../helpers'
 
-export interface AddNewBlockButtonInnerProps extends DropdownRenderProps {
-	addNew: Exclude<EntityListAccessor['addNew'], undefined>
+export interface AddNewBlockButtonInnerProps extends DropdownRenderProps, AddNewEntityButtonProps {
 	normalizedBlockProps: NormalizedBlockProps[]
 	discriminationField: string | SugaredRelativeSingleField
 	isMutating: boolean
@@ -30,22 +28,13 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 					onClick={() => {
 						props.requestClose()
 						const targetValue = blockProps.discriminateBy
-						//if (filteredEntities.length === 1 && firstDiscriminationNull) {
-						//	return firstDiscrimination.updateValue && firstDiscrimination.updateValue(targetValue)
-						//}
-						props.addNew &&
-							props.addNew(getAccessor => {
-								const accessor = getAccessor()
-								const newlyAdded = accessor.entities[accessor.entities.length - 1]
-								if (!(newlyAdded instanceof EntityAccessor)) {
-									return
-								}
-								const discriminationField = getRelativeSingleField(newlyAdded, desugaredDiscriminationField)
-								if (!(discriminationField instanceof FieldAccessor) || !discriminationField.updateValue) {
-									return
-								}
-								discriminationField.updateValue(targetValue)
-							})
+
+						props.addNew?.((getAccessor, newIndex) => {
+							const accessor = getAccessor()
+							const newlyAdded = accessor.entities[newIndex] as EntityAccessor
+							const discriminationField = getRelativeSingleField(newlyAdded, desugaredDiscriminationField)
+							discriminationField.updateValue?.(targetValue)
+						})
 					}}
 				>
 					{!!blockProps.description && (

@@ -12,9 +12,9 @@ interface EntityOrder {
 
 export interface SortedEntities {
 	entities: EntityAccessor[]
-	prependNew: (preprocess?: (getAccessor: () => EntityListAccessor) => void) => void
-	appendNew: (preprocess?: (getAccessor: () => EntityListAccessor) => void) => void
-	addNewAtIndex: (index: number, preprocess?: (getAccessor: () => EntityListAccessor) => void) => void
+	prependNew: (preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void
+	appendNew: (preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void
+	addNewAtIndex: (index: number, preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void
 	moveEntity: (oldIndex: number, newIndex: number) => void
 }
 
@@ -133,7 +133,7 @@ export const useSortedEntities = (
 	}, [desugaredSortByField, entityList])
 
 	const addNewAtIndex = React.useCallback<SortedEntities['addNewAtIndex']>(
-		(index: number, preprocess?: (getAccessor: () => EntityListAccessor) => void) => {
+		(index: number, preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => {
 			if (!entityList.addNew) {
 				return throwNonWritableError(entityList)
 			}
@@ -165,7 +165,7 @@ export const useSortedEntities = (
 
 				reconcileOrderFields(accessor, desugaredSortByField, newIndex, index)
 
-				preprocess && preprocess(getListAccessor)
+				preprocess && preprocess(getListAccessor, newIndex)
 			})
 		},
 		[desugaredSortByField, entityList],

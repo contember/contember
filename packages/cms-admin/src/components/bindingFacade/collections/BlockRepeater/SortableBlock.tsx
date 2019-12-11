@@ -1,9 +1,9 @@
-import { Box } from '@contember/ui'
 import * as React from 'react'
 import { SugaredRelativeSingleField, useRelativeSingleField } from '../../../../binding'
 import { NormalizedBlockProps } from '../../blocks'
+import { RepeaterItem, RepeaterItemProps } from '../Repeater'
 
-export interface SortableBlockProps {
+export interface SortableBlockProps extends RepeaterItemProps {
 	discriminationField: string | SugaredRelativeSingleField
 	normalizedBlockProps: NormalizedBlockProps[]
 }
@@ -17,9 +17,9 @@ export const SortableBlock = React.memo<SortableBlockProps>(props => {
 	}
 
 	return (
-		<Box heading={selectedBlock.label} distinction="seamlessIfNested">
+		<RepeaterItem {...props} label={selectedBlock.label}>
 			{selectedBlock.children}
-		</Box>
+		</RepeaterItem>
 	)
 })
 SortableBlock.displayName = 'SortableBlock'

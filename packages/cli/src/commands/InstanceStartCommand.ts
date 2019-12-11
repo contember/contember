@@ -2,6 +2,7 @@ import Command from '../cli/Command'
 import CommandConfiguration from '../cli/CommandConfiguration'
 import { Input } from '../cli/Input'
 import {
+	getInstanceStatus,
 	printInstanceStatus,
 	resolveInstanceDockerConfig,
 	resolveInstanceEnvironmentFromInput,
@@ -51,6 +52,20 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			stdin: configYaml,
 		})
 
+		await new Promise(resolve => setTimeout(resolve, 2000))
+
+		const status = await getInstanceStatus({ instanceDirectory })
+		const notRunning = status.filter(it => !it.running)
+		if (notRunning.length > 0) {
+			const notRunningNames = notRunning.map(it => it.name)
+			console.error(`Following services failed to start: ${notRunningNames.join(', ')}`)
+			await execDockerCompose(['-f', '-', 'logs', ...notRunningNames], {
+				cwd: instanceDirectory,
+				stdin: configYaml,
+			})
+			return
+		}
+
 		if (!config.services.admin.environment.CONTEMBER_LOGIN_TOKEN) {
 			console.log('It seems that this is first run of this instance. Will try to execute a setup.')
 			console.log('If that is not true, please fill your login token to a docker-compose.override.yaml')
@@ -70,7 +85,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 			await execDockerCompose(['-f', '-', 'up', '-d', 'admin'], {
 				cwd: instanceDirectory,
-				stdin: configYaml,
+				stdin: dump(config),
 			})
 		}
 

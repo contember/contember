@@ -8,14 +8,16 @@ import {
 	useSortedEntities,
 } from '../../../../binding'
 import { RepeaterContainer, RepeaterContainerProps } from './RepeaterContainer'
+import { RepeaterHandle } from './RepeaterHandle'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
+import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
 
 // TODO alt content for collapsing
 export interface RepeaterInnerProps
 	extends Omit<RepeaterContainerProps, 'children' | 'entities' | 'addNew' | 'isEmpty'>,
-		Omit<RepeaterItemProps, 'children' | 'canBeRemoved'> {
+		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
 	entityList: EntityListAccessor
 	children: React.ReactNode
 
@@ -37,18 +39,28 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 		[moveEntity],
 	)
 
+	const Handle: React.ComponentType = props.dragHandleComponent || RepeaterHandle
 	const Item: React.ComponentType<RepeaterItemProps> = props.itemComponent || RepeaterItem
 	const Container: React.ComponentType<RepeaterContainerProps> = props.containerComponent || RepeaterContainer
 
 	const isEmpty = entities.length === 0
 	const itemRemovingEnabled = entities.length > 1 || !!props.enableRemovingLast
 
+	const sortableHandle = React.useCallback(
+		() => (
+			<SortableRepeaterItemHandle>
+				<Handle />
+			</SortableRepeaterItemHandle>
+		),
+		[],
+	)
+
 	if (props.sortableBy === undefined) {
 		return (
 			<Container {...props} isEmpty={isEmpty} addNew={appendNew}>
 				{entities.map(entity => (
 					<Entity accessor={entity} key={entity.getKey()}>
-						<Item removalType={props.removalType} canBeRemoved={itemRemovingEnabled}>
+						<Item removalType={props.removalType} canBeRemoved={itemRemovingEnabled} dragHandleComponent={undefined}>
 							{props.children}
 						</Item>
 					</Entity>
@@ -58,12 +70,16 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 	}
 
 	return (
-		<SortableRepeaterContainer lockAxis="y" lockToContainerEdges={true} onSortEnd={onSortEnd}>
+		<SortableRepeaterContainer lockAxis="y" lockToContainerEdges={true} useDragHandle={true} onSortEnd={onSortEnd}>
 			<Container {...props} isEmpty={isEmpty} addNew={appendNew}>
 				{entities.map((entity, i) => (
 					<SortableRepeaterItem index={i} key={entity.getKey()} disabled={isMutating}>
 						<Entity accessor={entity}>
-							<Item removalType={props.removalType} canBeRemoved={itemRemovingEnabled}>
+							<Item
+								removalType={props.removalType}
+								canBeRemoved={itemRemovingEnabled}
+								dragHandleComponent={sortableHandle}
+							>
 								{props.children}
 							</Item>
 						</Entity>

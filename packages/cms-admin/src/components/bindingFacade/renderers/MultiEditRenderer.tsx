@@ -7,29 +7,26 @@ export interface MultiEditRendererProps extends MutableContentLayoutRendererProp
 
 export const MultiEditRenderer = Component<MultiEditRendererProps>(
 	({
-		afterContent,
-		beforeContent,
 		children,
-		emptyMessage,
-		enableAddingNew,
-		enableRemove,
-		sortable,
-		wrapperComponent,
 
-		...layoutProps
+		side,
+		title,
+		navigation,
+		headingProps,
+		actions,
+		persistButtonComponent,
+
+		...entityListProps
 	}) => (
-		<MutableContentLayoutRenderer {...layoutProps}>
-			<MutableEntityListRenderer
-				afterContent={afterContent}
-				beforeContent={beforeContent}
-				emptyMessage={emptyMessage}
-				enableAddingNew={enableAddingNew}
-				enableRemove={enableRemove}
-				sortable={sortable}
-				wrapperComponent={wrapperComponent}
-			>
-				{children}
-			</MutableEntityListRenderer>
+		<MutableContentLayoutRenderer
+			side={side}
+			title={title}
+			navigation={navigation}
+			actions={actions}
+			persistButtonComponent={persistButtonComponent}
+			headingProps={headingProps}
+		>
+			<MutableEntityListRenderer {...entityListProps}>{children}</MutableEntityListRenderer>
 		</MutableContentLayoutRenderer>
 	),
 	'MultiEditRenderer',

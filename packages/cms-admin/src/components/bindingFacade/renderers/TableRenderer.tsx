@@ -1,13 +1,10 @@
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, Component, EntityAccessor } from '../../../binding'
+import { Component } from '../../../binding'
 import { RemoveEntityButton } from '../collections/helpers'
+import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeater'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
-import {
-	EntityListWrapperProps,
-	ImmutableEntityListRenderer,
-	ImmutableEntityListRendererProps,
-} from './ImmutableEntityListRenderer'
+import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 
 export interface TableRendererProps
 	extends ImmutableContentLayoutRendererProps,
@@ -19,47 +16,31 @@ export interface TableRendererProps
 
 export const TableRenderer = Component<TableRendererProps>(
 	({
+		enableRemove = true,
 		children,
-		beforeContent,
-		afterContent,
-		emptyMessage,
+		side,
+		title,
+		navigation,
+		headingProps,
+		actions,
 		tableProps,
 		tableRowProps,
-		enableRemove = true,
-		...layoutProps
+		...entityListProps
 	}) => {
-		const TableWrapper: React.ComponentType<EntityListWrapperProps> = props => {
-			if (props.isEmpty) {
-				return <>{props.children}</>
-			}
-			return (
-				<Table {...tableProps}>
-					{props.accessor.entities.map(entity =>
-						// TODO this check is wrong but likely necessary for the time being
-						entity instanceof EntityAccessor ? (
-							<AccessorContext.Provider value={entity} key={entity.getKey()}>
-								<TableRow {...tableRowProps}>
-									{props.originalChildren}
-									{enableRemove && (
-										<TableCell shrunk>
-											<RemoveEntityButton removalType="delete" immediatePersist={true} />
-										</TableCell>
-									)}
-								</TableRow>
-							</AccessorContext.Provider>
-						) : null,
-					)}
-				</Table>
-			)
-		}
-		TableWrapper.displayName = 'TableWrapper'
 		return (
-			<ImmutableContentLayoutRenderer {...layoutProps}>
+			<ImmutableContentLayoutRenderer
+				side={side}
+				title={title}
+				navigation={navigation}
+				actions={actions}
+				headingProps={headingProps}
+			>
 				<ImmutableEntityListRenderer
-					beforeContent={beforeContent}
-					afterContent={afterContent}
-					emptyMessage={emptyMessage}
-					wrapperComponent={TableWrapper}
+					{...entityListProps}
+					containerComponent={Container}
+					containerComponentExtraProps={tableProps}
+					itemComponent={Row}
+					itemComponentExtraProps={tableRowProps}
 				>
 					{children}
 				</ImmutableEntityListRenderer>
@@ -68,3 +49,20 @@ export const TableRenderer = Component<TableRendererProps>(
 	},
 	'TableRenderer',
 )
+
+const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => (
+	<Table {...props} />
+))
+Container.displayName = 'Container'
+
+const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemove?: boolean }) => (
+	<TableRow {...props}>
+		{props.children}
+		{props.enableRemove !== false && (
+			<TableCell shrunk>
+				<RemoveEntityButton removalType="delete" immediatePersist={true} />
+			</TableCell>
+		)}
+	</TableRow>
+))
+Row.displayName = 'Row'

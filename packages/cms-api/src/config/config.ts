@@ -150,10 +150,14 @@ function checkProjectStructure(json: unknown, path: string): ProjectWithS3 {
 	if (!hasArrayProperty(json, 'stages')) {
 		return error(`Property ${path}.stages should be an array in config file`)
 	}
+	if (json.dbCredentials) {
+		console.warn(`${path}.dbCredentials is deprecated, use ${path}.db instead`)
+		json.db = json.dbCredentials
+	}
 	return {
 		...json,
 		stages: json.stages.map((stage, i) => checkStageStructure(stage, `${path}.stages${i}`)),
-		dbCredentials: checkDatabaseCredentials(json.dbCredentials, `${path}.dbCredentials`),
+		db: checkDatabaseCredentials(json.db, `${path}.db`),
 		s3: checkS3Config(json.s3, `${path}.s3`),
 	}
 }

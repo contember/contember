@@ -217,18 +217,18 @@ class CompositionRoot {
 				.addService('connection', ({ project }) => {
 					return new Connection(
 						{
-							host: project.dbCredentials.host,
-							port: project.dbCredentials.port,
-							user: project.dbCredentials.user,
-							password: project.dbCredentials.password,
-							database: project.dbCredentials.database,
+							host: project.db.host,
+							port: project.db.port,
+							user: project.db.user,
+							password: project.db.password,
+							database: project.db.database,
 						},
 						{ timing: true },
 					)
 				})
 				.addService(
 					'systemDbMigrationsRunner',
-					() => new MigrationsRunner(project.dbCredentials, 'system', createSystemMigrationFilesManager().directory),
+					() => new MigrationsRunner(project.db, 'system', createSystemMigrationFilesManager().directory),
 				)
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),

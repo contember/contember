@@ -26,7 +26,7 @@ const createContainer = (debug: boolean) =>
 			projects: [
 				{
 					directory: './',
-					dbCredentials: dbCredentials(String(process.env.TEST_DB_NAME)),
+					db: dbCredentials(String(process.env.TEST_DB_NAME)),
 					name: 'test',
 					slug: 'test',
 					s3: {

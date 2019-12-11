@@ -13,11 +13,13 @@ export interface RepeaterContainerProps {
 	enableAddingNew?: boolean
 
 	emptyMessage?: React.ReactNode
-	emptyMessageComponent?: React.ComponentType<EmptyMessageProps> // This can override 'emptyMessage'
+	emptyMessageComponent?: React.ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
+	emptyMessageComponentExtraProps?: {}
 
 	addButtonText?: React.ReactNode
 	addButtonProps?: AddNewEntityButtonProps // Children here override 'addButtonText'
-	addButtonComponent?: React.ComponentType<AddNewEntityButtonProps> // This can override 'addButtonText' and 'addButtonProps'
+	addButtonComponent?: React.ComponentType<AddNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
+	addButtonComponentExtraProps?: {}
 }
 
 export const RepeaterContainer = React.memo(
@@ -25,10 +27,12 @@ export const RepeaterContainer = React.memo(
 		addNew,
 		children,
 		addButtonComponent: AddButton = AddNewEntityButton,
+		addButtonComponentExtraProps,
 		addButtonProps,
 		addButtonText = 'Add',
 		emptyMessage = 'There is nothing here. Try adding a new item.',
 		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
+		emptyMessageComponentExtraProps,
 		enableAddingNew = true,
 		isEmpty,
 		label,
@@ -36,7 +40,7 @@ export const RepeaterContainer = React.memo(
 		if (isEmpty) {
 			return (
 				<Box heading={label}>
-					<EmptyMessageComponent>{emptyMessage}</EmptyMessageComponent>
+					<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>
 				</Box>
 			)
 		}
@@ -46,7 +50,7 @@ export const RepeaterContainer = React.memo(
 				{children}
 				{enableAddingNew && (
 					<BoxSection heading={undefined}>
-						<AddButton children={addButtonText} {...addButtonProps} addNew={addNew} />
+						<AddButton {...addButtonComponentExtraProps} children={addButtonText} {...addButtonProps} addNew={addNew} />
 					</BoxSection>
 				)}
 			</Box>

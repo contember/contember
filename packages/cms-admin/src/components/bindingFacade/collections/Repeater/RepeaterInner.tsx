@@ -25,8 +25,11 @@ export interface RepeaterInnerProps
 
 	enableRemovingLast?: boolean
 
-	containerComponent?: React.ComponentType<RepeaterContainerProps>
-	itemComponent?: React.ComponentType<RepeaterItemProps>
+	containerComponent?: React.ComponentType<RepeaterContainerProps & any>
+	containerComponentExtraProps?: {}
+
+	itemComponent?: React.ComponentType<RepeaterItemProps & any>
+	itemComponentExtraProps?: {}
 }
 
 export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
@@ -57,10 +60,15 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 
 	if (props.sortableBy === undefined) {
 		return (
-			<Container {...props} isEmpty={isEmpty} addNew={appendNew}>
+			<Container {...props.containerComponentExtraProps} {...props} isEmpty={isEmpty} addNew={appendNew}>
 				{entities.map(entity => (
 					<Entity accessor={entity} key={entity.getKey()}>
-						<Item removalType={props.removalType} canBeRemoved={itemRemovingEnabled} dragHandleComponent={undefined}>
+						<Item
+							{...props.itemComponentExtraProps}
+							removalType={props.removalType}
+							canBeRemoved={itemRemovingEnabled}
+							dragHandleComponent={undefined}
+						>
 							{props.children}
 						</Item>
 					</Entity>
@@ -71,11 +79,12 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 
 	return (
 		<SortableRepeaterContainer lockAxis="y" lockToContainerEdges={true} useDragHandle={true} onSortEnd={onSortEnd}>
-			<Container {...props} isEmpty={isEmpty} addNew={appendNew}>
+			<Container {...props.containerComponentExtraProps} {...props} isEmpty={isEmpty} addNew={appendNew}>
 				{entities.map((entity, i) => (
 					<SortableRepeaterItem index={i} key={entity.getKey()} disabled={isMutating}>
 						<Entity accessor={entity}>
 							<Item
+								{...props.itemComponentExtraProps}
 								removalType={props.removalType}
 								canBeRemoved={itemRemovingEnabled}
 								dragHandleComponent={sortableHandle}

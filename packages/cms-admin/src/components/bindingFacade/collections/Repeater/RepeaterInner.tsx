@@ -85,6 +85,7 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 		<SortableRepeaterContainer
 			axis={axis}
 			lockAxis={axis}
+			helperClass="is-active"
 			lockToContainerEdges={true}
 			useDragHandle={true}
 			onSortEnd={onSortEnd}

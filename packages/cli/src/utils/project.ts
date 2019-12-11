@@ -7,8 +7,8 @@ import { InstanceEnvironment, validateInstanceName } from './instance'
 import { updateYaml } from './yaml'
 
 export const validateProjectName = (name: string) => {
-	if (!name.match(/^[a-z][a-z0-9]*$/)) {
-		throw new Error('Invalid project name. It can contain only alphanumeric letters and cannot start with a number')
+	if (!name.match(/^[a-z][-a-z0-9]*$/)) {
+		throw new Error('Invalid project name. It can contain only alphanumeric letters, dash and must start with a letter')
 	}
 }
 export const listProjects = async (args: { workspaceDirectory: string }) => {
@@ -28,6 +28,10 @@ export const createProject = async (args: { workspaceDirectory: string; projectN
 	}
 }
 
+const projectNameToEnvName = (projectName: string): string => {
+	return projectName.toUpperCase().replace(/-/g, '_')
+}
+
 export const registerProjectToInstance = async (
 	args: {
 		projectName: string
@@ -38,7 +42,7 @@ export const registerProjectToInstance = async (
 	const path = join(args.instanceDirectory, 'admin/src/projects.ts')
 	const code = `export { default as ${args.projectName} } from '../../../../projects/${args.projectName}/admin'\n`
 	await fs.appendFile(path, code, { encoding: 'utf8' })
-	const projectEnvName = args.projectName.toUpperCase()
+	const projectEnvName = projectNameToEnvName(args.projectName)
 
 	await updateYaml(join(args.instanceDirectory, 'api/config.yaml'), (config, { merge }) =>
 		merge(config, {
@@ -72,7 +76,8 @@ export const registerProjectToInstance = async (
 }
 
 export const getProjectDockerEnv = (projectName: string, s3Endpoint: string): Record<string, string> => {
-	const projectEnvName = projectName.toUpperCase()
+	validateProjectName(projectName)
+	const projectEnvName = projectNameToEnvName(projectName)
 	return {
 		[`${projectEnvName}_DB_HOST`]: 'db',
 		[`${projectEnvName}_DB_PORT`]: '5432',

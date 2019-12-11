@@ -29,8 +29,7 @@ export const Repeater = Component<RepeaterProps>(
 				initialEntityCount: props.initialRowCount === undefined ? 1 : props.initialRowCount,
 			}}
 		>
-			{props.sortableBy && <Field field={props.sortableBy} isNonbearing={true} />}
-			{props.children}
+			<RepeaterInner {...props} entityList={undefined as any} />
 		</HasMany>
 	),
 	'Repeater',

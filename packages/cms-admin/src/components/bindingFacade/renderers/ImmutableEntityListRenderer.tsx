@@ -1,6 +1,6 @@
-import { Box, Message } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '../../../binding'
+import { AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '../../../binding'
+import { RepeaterInner, RepeaterInnerProps } from '../collections/Repeater'
 
 export interface EntityListWrapperProps {
 	accessor: EntityListAccessor
@@ -9,22 +9,27 @@ export interface EntityListWrapperProps {
 	children: React.ReactNode
 }
 
-export interface ImmutableEntityListRendererProps {
+export interface ImmutableEntityListRendererProps
+	extends Omit<
+		RepeaterInnerProps,
+		| 'entityList'
+		| 'label'
+		| 'sortableBy'
+		| 'unstable__sortAxis'
+		| 'addButtonComponentExtraProps'
+		| 'addButtonText'
+		| 'addButtonProps'
+		| 'addButtonComponent'
+		| 'enableAddingNew'
+		| 'enableRemoving'
+		| 'enableRemovingLast'
+	> {
 	beforeContent?: React.ReactNode
 	afterContent?: React.ReactNode
-	emptyMessage?: React.ReactNode
-	wrapperComponent?: React.ComponentType<EntityListWrapperProps>
-	children: React.ReactNode
 }
 
 export const ImmutableEntityListRenderer = Component<ImmutableEntityListRendererProps>(
-	({
-		beforeContent,
-		afterContent,
-		emptyMessage = 'There is no data at the moment.',
-		wrapperComponent: Wrapper,
-		children,
-	}) => {
+	props => {
 		const accessorTreeState = React.useContext(AccessorTreeStateWithDataContext)
 
 		if (accessorTreeState === undefined) {
@@ -36,35 +41,11 @@ export const ImmutableEntityListRenderer = Component<ImmutableEntityListRenderer
 			return null
 		}
 
-		const entities = root.getFilteredEntities()
-		const isEmpty = !entities.length
-
-		const content = (
-			<>
-				{isEmpty ||
-					entities.map(entity => (
-						<AccessorContext.Provider value={entity} key={entity.getKey()}>
-							{children}
-						</AccessorContext.Provider>
-					))}
-				{isEmpty && (
-					<Box>
-						<Message flow="generousBlock">{emptyMessage}</Message>
-					</Box>
-				)}
-			</>
-		)
-
 		return (
 			<>
-				{beforeContent}
-				{!!Wrapper && (
-					<Wrapper isEmpty={isEmpty} accessor={root} originalChildren={children}>
-						{content}
-					</Wrapper>
-				)}
-				{!!Wrapper || content}
-				{afterContent}
+				{props.beforeContent}
+				<RepeaterInner entityList={root} label={undefined} enableAddingNew={false} enableRemoving={false} {...props} />
+				{props.afterContent}
 			</>
 		)
 	},
@@ -72,7 +53,7 @@ export const ImmutableEntityListRenderer = Component<ImmutableEntityListRenderer
 		// Deliberately omitting emptyMessage ‒ it's not supposed to be data-dependent.
 		<>
 			{props.beforeContent}
-			{props.children}
+			<RepeaterInner entityList={undefined as any} label={undefined} {...props} />
 			{props.afterContent}
 		</>
 	),

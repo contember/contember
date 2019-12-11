@@ -9,22 +9,22 @@ export const ListRenderer = Component<ListRendererProps>(
 	({
 		children,
 
-		beforeContent,
-		afterContent,
-		emptyMessage,
-		wrapperComponent,
+		side,
+		title,
+		navigation,
+		headingProps,
+		actions,
 
-		...layoutProps
+		...entityListProps
 	}) => (
-		<ImmutableContentLayoutRenderer {...layoutProps}>
-			<ImmutableEntityListRenderer
-				beforeContent={beforeContent}
-				afterContent={afterContent}
-				emptyMessage={emptyMessage}
-				wrapperComponent={wrapperComponent}
-			>
-				{children}
-			</ImmutableEntityListRenderer>
+		<ImmutableContentLayoutRenderer
+			side={side}
+			title={title}
+			navigation={navigation}
+			actions={actions}
+			headingProps={headingProps}
+		>
+			<ImmutableEntityListRenderer {...entityListProps}>{children}</ImmutableEntityListRenderer>
 		</ImmutableContentLayoutRenderer>
 	),
 	'ListRenderer',

@@ -2,7 +2,7 @@
 	"extends": "../../tsconfig.settings.json",
 	"compilerOptions": {
 		"jsx": "react",
-		"target": "esnext",
+		"target": "ES2018",
 		"module": "esnext"
 	}
 }

@@ -44,7 +44,7 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 		[moveEntity],
 	)
 
-	const Handle: React.ComponentType = props.dragHandleComponent || RepeaterHandle
+	const Handle: React.ComponentType<{ children: React.ReactNode }> = props.dragHandleComponent || React.Fragment
 	const Item: React.ComponentType<RepeaterItemProps> = props.itemComponent || RepeaterItem
 	const Container: React.ComponentType<RepeaterContainerProps> = props.containerComponent || RepeaterContainer
 
@@ -52,9 +52,9 @@ export const RepeaterInner = React.memo((props: RepeaterInnerProps) => {
 	const itemRemovingEnabled = entities.length > 1 || !!props.enableRemovingLast
 
 	const sortableHandle = React.useCallback(
-		() => (
+		({ children }) => (
 			<SortableRepeaterItemHandle>
-				<Handle />
+				<Handle>{children}</Handle>
 			</SortableRepeaterItemHandle>
 		),
 		[],

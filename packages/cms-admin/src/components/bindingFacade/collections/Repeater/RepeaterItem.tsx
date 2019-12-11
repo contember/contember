@@ -1,4 +1,4 @@
-import { BoxSection } from '@contember/ui'
+import { BoxSection, BoxSectionProps } from '@contember/ui'
 import * as React from 'react'
 import { RemovalType } from '../../../../binding'
 import { RemoveEntityButton } from '../helpers'
@@ -7,21 +7,15 @@ export interface RepeaterItemProps {
 	label?: React.ReactNode
 	children: React.ReactNode
 	canBeRemoved: boolean
-	dragHandleComponent?: React.ComponentType
+	dragHandleComponent?: BoxSectionProps['dragHandleComponent']
 	removalType?: RemovalType
 }
 
 export const RepeaterItem = React.memo(
-	({ children, canBeRemoved, label, removalType, dragHandleComponent: Handle }: RepeaterItemProps) => (
+	({ children, canBeRemoved, label, removalType, dragHandleComponent }: RepeaterItemProps) => (
 		<BoxSection
-			heading={
-				!!(label || Handle) && (
-					<>
-						{Handle && <Handle />}
-						{label}
-					</>
-				)
-			}
+			dragHandleComponent={dragHandleComponent}
+			heading={label}
 			actions={canBeRemoved ? <RemoveEntityButton removalType={removalType} /> : undefined}
 		>
 			{children}

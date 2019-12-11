@@ -13,6 +13,7 @@ import { InstanceStopCommand } from './commands/InstanceStopCommand'
 import { ProjectRegisterCommand } from './commands/ProjectRegisterCommand'
 import { InstanceReloadApiCommand } from './commands/InstanceReloadApiCommand'
 import { InstanceLogsCommand } from './commands/InstanceLogsCommand'
+import { InstanceValidateConfigCommand } from './commands/InstanceValidateConfigCommand'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -30,6 +31,7 @@ import { InstanceLogsCommand } from './commands/InstanceLogsCommand'
 		['instance:up']: () => new InstanceStartCommand(),
 		['instance:down']: () => new InstanceStopCommand(),
 		['instance:logs']: () => new InstanceLogsCommand(),
+		['instance:validate-config']: () => new InstanceValidateConfigCommand(),
 		['instance:reload:api']: () => new InstanceReloadApiCommand(),
 	})
 	const app = new Application(commandManager)

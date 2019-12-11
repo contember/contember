@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { CompositionRoot, run } from '@contember/api'
+import { CompositionRoot, readConfig, run } from '@contember/api'
 import * as path from 'path'
 import App from './projects/app/src/model'
 ;(async () => {
@@ -10,7 +10,7 @@ import App from './projects/app/src/model'
 		app: App,
 	}
 
-	await run(false, configFile, projectsDirectory, projects)
+	await run(false, await readConfig(configFile), projectsDirectory, projects)
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

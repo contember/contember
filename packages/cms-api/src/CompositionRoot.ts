@@ -41,7 +41,7 @@ import {
 	TimerMiddlewareFactory,
 } from './http'
 import { Config, ProjectWithS3 } from './config/config'
-import { S3SchemaFactory, S3Service, S3ServiceFactory } from '@contember/engine-s3-plugin'
+import { S3SchemaFactory, S3ServiceFactory } from '@contember/engine-s3-plugin'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
@@ -53,6 +53,7 @@ import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
 import { getArgumentValues } from 'graphql/execution/values'
+import { tuple } from '@contember/utils'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -67,13 +68,18 @@ class CompositionRoot {
 		projectsDirectory: string,
 		projectSchemas?: { [name: string]: Schema },
 	): MasterContainer {
-		const projectContainers = this.createProjectContainers(debug, config.projects, projectsDirectory, projectSchemas)
+		const projectContainers = this.createProjectContainers(
+			debug,
+			Object.values(config.projects),
+			projectsDirectory,
+			projectSchemas,
+		)
 
+		const containerList = Object.values(projectContainers)
 		const projectContainerResolver: ProjectContainerResolver = (slug, aliasFallback = false) =>
-			projectContainers.find(it => it.project.slug === slug) ||
+			projectContainers[slug] ||
 			(aliasFallback
-				? projectContainers.find(function(it) {
-						console.log(it.project.alias)
+				? containerList.find(function(it) {
 						return it.project.alias && it.project.alias.includes(slug)
 				  })
 				: undefined)
@@ -194,7 +200,7 @@ class CompositionRoot {
 			.addService(
 				'initializer',
 				({ tenantMigrationsRunner }) =>
-					new Initializer(tenantMigrationsRunner, tenantContainer.projectManager, projectContainers),
+					new Initializer(tenantMigrationsRunner, tenantContainer.projectManager, containerList),
 			)
 			.addService('serverRunner', ({ koa }) => new ServerRunner(koa, config))
 
@@ -208,8 +214,8 @@ class CompositionRoot {
 		projects: Array<ProjectWithS3>,
 		projectsDir: string,
 		schemas?: Record<string, Schema>,
-	): ProjectContainer[] {
-		return projects.map((project: ProjectWithS3) => {
+	): Record<string, ProjectContainer> {
+		const containers = Object.values(projects).map((project: ProjectWithS3) => {
 			const projectContainer = new Builder({})
 				.addService('providers', () => providers)
 				.addService('project', () => project)
@@ -323,11 +329,15 @@ class CompositionRoot {
 				'schemaVersionBuilder',
 			)
 
-			return mergeContainers(
-				mergeContainers(projectServices, systemIntermediateContainer),
-				systemContainer.pick('systemExecutionContainerFactory'),
+			return tuple(
+				project.slug,
+				mergeContainers(
+					mergeContainers(projectServices, systemIntermediateContainer),
+					systemContainer.pick('systemExecutionContainerFactory'),
+				),
 			)
 		})
+		return Object.fromEntries(containers)
 	}
 
 	createTenantContainer(

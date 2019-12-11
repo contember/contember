@@ -264,25 +264,20 @@ export const resolveInstanceDockerConfig = async ({
 	const projectConfig: any = await readYaml(join(instanceDirectory, 'api/config.yaml'))
 	const s3Endpoint = 'http://localhost:' + assignedPorts.s3
 	const env: Record<string, string> = {
-		SERVER_PORT: 4000,
-		TENANT_DB_HOST: 'db',
-		TENANT_DB_PORT: '5432',
-		TENANT_DB_USER: 'contember',
-		TENANT_DB_PASSWORD: 'contember',
+		SERVER_PORT: '4000',
 		TENANT_DB_NAME: 'tenant',
-		DB_HOST: 'db',
-		DB_PORT: '5432',
-		DB_USER: 'contember',
-		DB_PASSWORD: 'contember',
-		DB_NAME: 'contember',
-		S3_BUCKET: 'contember',
-		S3_PREFIX: '',
-		S3_REGION: '',
-		S3_ENDPOINT: s3Endpoint,
-		S3_KEY: 'contember',
-		S3_SECRET: 'contember',
-		...projectConfig.projects
-			.map((project: any): Record<string, string> => getProjectDockerEnv(project.slug, s3Endpoint))
+		DEFAULT_DB_HOST: 'db',
+		DEFAULT_DB_PORT: '5432',
+		DEFAULT_DB_USER: 'contember',
+		DEFAULT_DB_PASSWORD: 'contember',
+		DEFAULT_S3_BUCKET: 'contember',
+		DEFAULT_S3_REGION: '',
+		DEFAULT_S3_ENDPOINT: s3Endpoint,
+		DEFAULT_S3_KEY: 'contember',
+		DEFAULT_S3_SECRET: 'contember',
+		DEFAULT_S3_PROVIDER: 'minio',
+		...Object.keys(projectConfig.projects)
+			.map((slug: string): Record<string, string> => getProjectDockerEnv(slug))
 			.reduce((acc: Record<string, string>, it: Record<string, string>) => ({ ...acc, ...it }), {}),
 	}
 	config.services.api.environment = {

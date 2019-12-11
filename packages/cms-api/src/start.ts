@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { run } from './index'
+import { readConfig, run } from './index'
 import { Server } from 'net'
 ;(async () => {
 	const configFile = process.env['CONTEMBER_CONFIG_FILE']
@@ -32,7 +32,12 @@ import { Server } from 'net'
 		})
 	}
 	const debug = process.env.NODE_ENV === 'development'
-	server = await run(debug, configFile, projectsDir)
+	const config = await readConfig(configFile)
+
+	if (process.argv[2] === 'validate') {
+		process.exit(0)
+	}
+	server = await run(debug, config, projectsDir)
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

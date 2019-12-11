@@ -37,10 +37,16 @@ export const runCommand = (
 			if (exitCode === 0) {
 				resolve(stdout)
 			} else {
-				reject({ exitCode, stderr })
+				reject(new ChildProcessError(exitCode, stderr))
 			}
 		})
 	})
 
 	return { output, child }
+}
+
+export class ChildProcessError extends Error {
+	constructor(public readonly exitCode: number | null, public readonly stderr: string) {
+		super(`Command has failed(${exitCode}): ${stderr} `)
+	}
 }

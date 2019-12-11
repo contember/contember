@@ -1,13 +1,16 @@
 import * as React from 'react'
 import cn from 'classnames'
-import { IconName, IconSvgPaths16 } from '@blueprintjs/icons'
+import { IconName as BlueprintIconName, IconSvgPaths16 } from '@blueprintjs/icons'
 import { IconSize } from '../types'
 import { toEnumViewClass } from '../utils'
+
+// To be potentially extended later
+export type IconName = BlueprintIconName
 
 export interface IconProps {
 	children?: never
 	title?: string
-	blueprintIcon: IconName
+	blueprintIcon: BlueprintIconName
 	size?: IconSize
 	style?: React.CSSProperties
 }

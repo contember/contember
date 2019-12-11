@@ -1,16 +1,16 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, EntityAccessor, RemovalType, useMutationState } from '../../../binding'
-import { useTriggerPersistWithFeedback } from '../../ui'
+import { AccessorContext, EntityAccessor, RemovalType, useMutationState } from '../../../../binding'
+import { useTriggerPersistWithFeedback } from '../../../ui'
 
-export type RemoveButtonProps = ButtonProps & {
-	removeType?: RemovalType
+export type RemoveEntityButtonProps = ButtonProps & {
+	removalType?: RemovalType
 	immediatePersist?: true
 	children?: React.ReactNode
 }
 
-export const RemoveButton = React.memo((props: RemoveButtonProps) => {
-	const { removeType, children, immediatePersist, ...rest } = props
+export const RemoveEntityButton = React.memo((props: RemoveEntityButtonProps) => {
+	const { removalType, children, immediatePersist, ...rest } = props
 	const value = React.useContext(AccessorContext)
 	const triggerPersist = useTriggerPersistWithFeedback()
 	const isMutating = useMutationState()
@@ -21,25 +21,22 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		if (props.immediatePersist && !confirm('Really?')) {
 			return
 		}
-		value.remove(props.removeType || 'disconnect')
+		value.remove(props.removalType || 'disconnect')
 
 		if (props.immediatePersist && triggerPersist) {
 			triggerPersist().catch(() => {})
 		}
-	}, [triggerPersist, props.immediatePersist, props.removeType, value])
+	}, [triggerPersist, props.immediatePersist, props.removalType, value])
 
 	if (!(value instanceof EntityAccessor)) {
 		return null
 	}
 
-	let defaultProps: ButtonOwnProps = {}
-	if (!children) {
-		defaultProps = {
-			size: 'small',
-			flow: 'squarish',
-			distinction: 'seamless',
-			bland: true,
-		}
+	let defaultProps: ButtonOwnProps = {
+		size: 'small',
+		flow: 'squarish',
+		distinction: 'seamless',
+		bland: true,
 	}
 
 	return (
@@ -48,4 +45,4 @@ export const RemoveButton = React.memo((props: RemoveButtonProps) => {
 		</Button>
 	)
 })
-RemoveButton.displayName = 'RemoveButton'
+RemoveEntityButton.displayName = 'RemoveEntityButton'

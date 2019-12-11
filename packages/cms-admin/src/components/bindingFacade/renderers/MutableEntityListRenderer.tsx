@@ -1,8 +1,7 @@
 import { Box } from '@contember/ui'
 import * as React from 'react'
-import { Component } from '../../../binding'
-import { AddNewButton } from '../buttons'
-import { Repeater, Sortable, SortablePublicProps } from '../collections'
+import { Component, Entity } from '../../../binding'
+import { AddNewEntityButton } from '../collections/helpers'
 import {
 	EntityListWrapperProps,
 	ImmutableEntityListRenderer,
@@ -11,7 +10,8 @@ import {
 
 // TODO properly unify with repeaters
 export interface MutableEntityListRendererProps extends ImmutableEntityListRendererProps {
-	sortable?: Omit<SortablePublicProps, 'children'> // TODO this contains props that we don't want to set from here
+	//sortable?: Omit<SortablePublicProps, 'children'> // TODO this contains props that we don't want to set from here
+	sortable?: any // TODO TOOODOOOO!!!!
 	enableAddingNew?: boolean
 	enableRemove?: boolean
 }
@@ -32,7 +32,7 @@ export const MutableEntityListRenderer = Component<MutableEntityListRendererProp
 			(props: EntityListWrapperProps) => (
 				<Box>
 					{props.children}
-					{enableAddingNew && !sortable && <AddNewButton addNew={props.accessor.addNew} />}
+					{enableAddingNew && !sortable && <AddNewEntityButton addNew={props.accessor.addNew} />}
 				</Box>
 			),
 			[enableAddingNew, sortable],
@@ -41,28 +41,17 @@ export const MutableEntityListRenderer = Component<MutableEntityListRendererProp
 		const normalizedWrapper = React.useCallback(
 			(props: EntityListWrapperProps) => (
 				<Wrapper {...props}>
-					{sortable ? (
-						// Deliberately not using props.children
-						<Sortable {...sortable} entities={props.accessor} enableAddingNew={enableAddingNew}>
-							{children}
-						</Sortable>
-					) : (
-						<Repeater.Cloneable enableAddingNew={enableAddingNew}>
-							{props.accessor.entities.map(
-								entity =>
-									!!entity && ( // TODO this is temporary
-										<Box key={entity.getKey()}>
-											<Repeater.Item displayUnlinkButton={enableRemove} entity={entity} removeType="delete">
-												{children}
-											</Repeater.Item>
-										</Box>
-									),
-							)}
-						</Repeater.Cloneable>
+					{props.accessor.entities.map(
+						entity =>
+							!!entity && ( // TODO this is temporary
+								<Box key={entity.getKey()}>
+									<Entity accessor={entity}>{children}</Entity>
+								</Box>
+							),
 					)}
 				</Wrapper>
 			),
-			[children, enableAddingNew, enableRemove, sortable],
+			[children],
 		)
 
 		return (
@@ -89,8 +78,7 @@ export const MutableEntityListRenderer = Component<MutableEntityListRendererProp
 		emptyMessage,
 	}) => (
 		<ImmutableEntityListRenderer beforeContent={beforeContent} afterContent={afterContent} emptyMessage={emptyMessage}>
-			{sortable && <Sortable {...sortable}>{children}</Sortable>}
-			{sortable || children}
+			{children}
 		</ImmutableEntityListRenderer>
 	),
 	'MutableEntityListRenderer',

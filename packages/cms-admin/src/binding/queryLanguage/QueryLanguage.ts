@@ -135,7 +135,10 @@ export namespace QueryLanguage {
 	})
 
 	export const desugarUniqueWhere = preparePrimitiveEntryPoint(Parser.EntryPoint.UniqueWhere)
-	export const desugarFilter = preparePrimitiveEntryPoint(Parser.EntryPoint.Filter)
+	export const desugarFilter: (
+		input: string | Parser.ParserResult[Parser.EntryPoint.Filter],
+		environment: Environment,
+	) => Parser.ParserResult[Parser.EntryPoint.Filter] = preparePrimitiveEntryPoint(Parser.EntryPoint.Filter)
 	export const desugarOrderBy = preparePrimitiveEntryPoint(Parser.EntryPoint.OrderBy)
 
 	export const desugarUnconstrainedQualifiedEntityList = (

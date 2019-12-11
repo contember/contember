@@ -1,41 +1,35 @@
-import { ButtonProps } from '@contember/ui'
 import * as React from 'react'
-import {
-	Component,
-	Field,
-	HasMany,
-	HasManyProps,
-	SugaredRelativeSingleField,
-	useRelativeEntityList,
-	useSortedEntities,
-} from '../../../../binding'
+import { Component, DataBindingError, Field, HasMany, HasManyProps, useRelativeEntityList } from '../../../../binding'
+import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
-export interface RepeaterProps extends HasManyProps {
-	label: React.ReactNode
-
-	sortBy?: SugaredRelativeSingleField['field']
+export interface RepeaterProps extends HasManyProps, Omit<RepeaterInnerProps, 'entityList'> {
 	initialRowCount?: number
-
-	addButtonText?: React.ReactNode
-	addButtonProps?: ButtonProps
-	addButtonComponent?: React.ComponentType
 }
 
 export const Repeater = Component<RepeaterProps>(
 	props => {
-		const entityList = useRelativeEntityList(props)
-		const entities = useSortedEntities(entityList, props.sortBy)
+		if (process.env.NODE_ENV === 'development') {
+			if ('sortableBy' in props && 'orderBy' in props) {
+				throw new DataBindingError(
+					`Incorrect <Repeater /> use: cannot supply both the 'orderBy' and the 'sortableBy' properties.\n` +
+						`\tTo allow the user to interactively order the rows, use 'sortableBy'.\n` +
+						`\tTo control the order in which the items are automatically displayed, use 'orderBy'.`,
+				)
+			}
+		}
 
-		return null
+		const entityList = useRelativeEntityList(props)
+
+		return <RepeaterInner {...props} entityList={entityList} />
 	},
-	(props, environment) => (
+	props => (
 		<HasMany
 			{...props}
 			preferences={{
-				initialEntityCount: props.initialRowCount,
+				initialEntityCount: props.initialRowCount === undefined ? 1 : props.initialRowCount,
 			}}
 		>
-			{props.sortBy && <Field field={props.sortBy} isNonbearing={true} />}
+			{props.sortableBy && <Field field={props.sortableBy} isNonbearing={true} />}
 			{props.children}
 		</HasMany>
 	),

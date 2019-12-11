@@ -48,7 +48,7 @@ export const registerProjectToInstance = async (
 					name: args.projectName,
 					directory: `${args.projectName}/api`,
 					stages: [{ slug: 'live', name: 'Live' }],
-					dbCredentials: {
+					db: {
 						host: `%env.${projectEnvName}_DB_HOST%`,
 						port: `%env.${projectEnvName}_DB_PORT::number%`,
 						user: `%env.${projectEnvName}_DB_USER%`,

@@ -14,7 +14,7 @@ projects:
           - id: 01c8f908-6f48-4ef3-9751-9989931b42eb
             slug: prod
             name: Production
-      dbCredentials:
+      db:
         host: '%env.APP_DB_HOST%'
         port: '%env.APP_DB_PORT%'
         user: '%env.APP_DB_USER%'

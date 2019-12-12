@@ -39,13 +39,12 @@ export const SimpleRelativeSingleFieldProxy = React.memo((props: SimpleRelativeS
 	const environment = useEnvironment()
 	const field = useRelativeSingleField(props)
 
-	const normalizedLabel = React.useMemo(() => contextualizeNode(props.label, immediateParentEntity, environment), [
-		environment,
-		immediateParentEntity,
-		props.label,
-	])
+	const normalizedLabel = React.useMemo(
+		() => contextualizeNode(props.label, immediateParentEntity, environment, 'labelMiddleware'),
+		[environment, immediateParentEntity, props.label],
+	)
 	const normalizedLabelDescription = React.useMemo(
-		() => contextualizeNode(props.labelDescription, immediateParentEntity, environment, 'labelMiddleware'),
+		() => contextualizeNode(props.labelDescription, immediateParentEntity, environment),
 		[environment, immediateParentEntity, props.labelDescription],
 	)
 	const normalizedDescription = React.useMemo(

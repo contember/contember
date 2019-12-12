@@ -42,9 +42,9 @@ const normalizeOptions = (options: OptionallyVariableStaticOption[], environment
 		}),
 	)
 
-export const useStaticChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>(
-	props: StaticChoiceFieldProps<Arity>,
-): ChoiceFieldData.MetadataByArity[Arity] => {
+export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceArity>(
+	props: StaticChoiceFieldProps<StaticArity>,
+): ChoiceFieldData.MetadataByArity[StaticArity] => {
 	if (props.arity === 'multiple') {
 		throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
 	}

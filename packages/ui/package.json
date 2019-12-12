@@ -8,7 +8,7 @@
     "src"
   ],
   "scripts": {
-    "build": "rollup --config && node ./scripts/build-style.js",
+    "build": "rollup --config && node ./scripts/build-style.mjs",
     "storybook": "start-storybook --ci -p 9001 -c dist/storybook/config"
   },
   "typings": "dist/src/index.d.ts",

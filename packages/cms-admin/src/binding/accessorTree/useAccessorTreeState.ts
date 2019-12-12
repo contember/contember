@@ -50,6 +50,7 @@ export const useAccessorTreeState = ({
 	const isFirstRenderRef = React.useRef(true)
 	const isForcingRefreshRef = React.useRef(false) // This ref is described in detail below.
 
+	const queryRef = React.useRef(query)
 	const stateRef = React.useRef(state)
 	const queryStateRef = React.useRef(queryState)
 
@@ -186,6 +187,15 @@ export const useAccessorTreeState = ({
 		[accessorTreeGenerator, triggerPersist],
 	)
 
+	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions).
+	if (query !== queryRef.current) {
+		isForcingRefreshRef.current = true
+		dispatch({
+			type: AccessorTreeStateActionType.Uninitialize,
+		})
+	}
+	queryRef.current = query
+
 	React.useEffect(() => {
 		if (
 			isInitialized &&
@@ -248,17 +258,6 @@ export const useAccessorTreeState = ({
 			}
 		}
 	}, [markerTree, queryState, state])
-
-	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions). We don't want this effect
-	// to run during the initial render.
-	React.useEffect(() => {
-		if (!isFirstRenderRef.current) {
-			isForcingRefreshRef.current = true
-			dispatch({
-				type: AccessorTreeStateActionType.Uninitialize,
-			})
-		}
-	}, [query])
 
 	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {

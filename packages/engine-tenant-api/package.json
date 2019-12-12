@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-tenant-api",
-	"version": "0.2.12",
+	"version": "0.2.13",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
@@ -10,7 +10,7 @@
 	"dependencies": {
 		"@contember/authorization": "^0.2.5",
 		"@contember/database": "^0.2.12",
-		"@contember/dic": "^0.2.5",
+		"@contember/dic": "^0.2.13",
 		"@contember/engine-common": "^0.2.5",
 		"@contember/queryable": "^0.2.5",
 		"apollo-server-core": "^2.9.1",

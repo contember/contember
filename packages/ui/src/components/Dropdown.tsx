@@ -67,6 +67,7 @@ const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: 
 }
 
 export const DropdownContentContainerContext = React.createContext<HTMLElement | undefined>(undefined)
+DropdownContentContainerContext.displayName = 'DropdownContentContainerContext'
 
 export const Dropdown = React.memo((props: DropdownProps) => {
 	const suppliedButtonOnClickHandler = props.buttonProps && props.buttonProps.onClick

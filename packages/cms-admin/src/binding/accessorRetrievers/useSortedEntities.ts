@@ -138,6 +138,9 @@ export const useSortedEntities = (
 				return throwNonWritableError(entityList)
 			}
 			if (!desugaredSortByField) {
+				if (index === sortedEntities.length) {
+					return entityList.addNew()
+				}
 				return throwNoopError('addNewAtIndex')
 			}
 			entityList.addNew((getListAccessor, newIndex) => {
@@ -168,7 +171,7 @@ export const useSortedEntities = (
 				preprocess && preprocess(getListAccessor, newIndex)
 			})
 		},
-		[desugaredSortByField, entityList],
+		[desugaredSortByField, entityList, sortedEntities.length],
 	)
 	const prependNew = React.useCallback<SortedEntities['prependNew']>(
 		preprocess => {

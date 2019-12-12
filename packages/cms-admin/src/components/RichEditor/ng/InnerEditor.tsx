@@ -1,24 +1,31 @@
-import * as React from 'react'
-import { MutableRefObject, useCallback, useMemo, useRef, useState } from 'react'
-import { BlocksDefinitions, InlinesDefinitions, MarksDefinitions } from './types'
-import { EntityAccessor, EntityCollectionAccessor, FieldAccessor } from '../../../binding/dao'
-import { Block, Data, Document, Inline, Rules, Selection, Text, Value } from 'slate'
-import { Editor, EditorProps, OnChangeFn, Plugin } from 'slate-react'
 import { GraphQlBuilder } from '@contember/client'
 import { default as Immutable, List } from 'immutable'
+import * as React from 'react'
+import { MutableRefObject, useCallback, useMemo, useRef, useState } from 'react'
+import { Block, Data, Document, Inline, Rules, Selection, Text, Value } from 'slate'
+import { Editor, EditorProps, OnChangeFn, Plugin } from 'slate-react'
+import {
+	EntityAccessor,
+	EntityListAccessor,
+	FieldAccessor,
+	getRelativeSingleField,
+	HasManyProps,
+	SugaredRelativeSingleField,
+	useDesugaredRelativeSingleField,
+} from '../../../binding'
+import { generateUuid } from '../utils'
+import { HoverMenuManager } from './HoverMenuManager'
 import JsonBlockSerializer from './JsonBlockSerializer'
+import { createPastePlugin } from './onPastePlugin'
 import OperationProcessor from './OperationProcessor'
 import { createRenderBlockPlugin } from './renderBlock'
-import { createPastePlugin } from './onPastePlugin'
 import { createRenderInlinePlugin } from './renderInline'
 import { createPluginsFromMarks } from './renderMark'
-import { HoverMenuManager } from './HoverMenuManager'
-import { generateUuid } from '../utils'
+import { BlocksDefinitions, InlinesDefinitions, MarksDefinitions } from './types'
 
-export interface RTEProps {
-	sortBy: string
-	field: string
-	name: string
+export interface RTEProps extends HasManyProps {
+	sortBy: SugaredRelativeSingleField['field']
+	name: SugaredRelativeSingleField['field']
 	blocks: BlocksDefinitions
 	defaultBlock: string
 	marks: MarksDefinitions
@@ -26,7 +33,7 @@ export interface RTEProps {
 }
 
 interface RTEInnerProps extends RTEProps {
-	accessor: EntityCollectionAccessor
+	accessor: EntityListAccessor
 }
 
 export const InnerEditor: React.FC<RTEInnerProps> = props => {
@@ -34,24 +41,27 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 	const [docId] = useState(generateUuid())
 	const [valueData, setValueData] = useState<Data | undefined>()
 	const [selection, setSelection] = useState<Selection>()
-	const entityAccessors = useMemo(() => {
-		const fieldName = sortBy
-		return accessor.entities
-			.filter((t): t is EntityAccessor => t instanceof EntityAccessor)
-			.sort((a, b) => {
-				const [aField, bField] = [a.data.getField(fieldName), b.data.getField(fieldName)]
+	const nameField = useDesugaredRelativeSingleField(name)
+	const sortByField = useDesugaredRelativeSingleField(sortBy)
+	const entityAccessors = useMemo(
+		() =>
+			accessor.entities
+				.filter((t): t is EntityAccessor => t instanceof EntityAccessor)
+				.sort((a, b) => {
+					const [aField, bField] = [getRelativeSingleField(a, sortByField), getRelativeSingleField(b, sortByField)]
 
-				if (
-					aField instanceof FieldAccessor &&
-					bField instanceof FieldAccessor &&
-					typeof aField.currentValue === 'number' &&
-					typeof bField.currentValue === 'number'
-				) {
-					return aField.currentValue - bField.currentValue
-				}
-				return 0
-			})
-	}, [sortBy, accessor])
+					if (
+						aField instanceof FieldAccessor &&
+						bField instanceof FieldAccessor &&
+						typeof aField.currentValue === 'number' &&
+						typeof bField.currentValue === 'number'
+					) {
+						return aField.currentValue - bField.currentValue
+					}
+					return 0
+				}),
+		[accessor.entities, sortByField],
+	)
 	const [blockCache] = useState(() => new WeakMap<EntityAccessor, Block>())
 	const document = useMemo(() => {
 		const blockNodesSerializer = new JsonBlockSerializer()
@@ -62,7 +72,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 					return blockCache.get(entityAccessor)!
 				}
 
-				let type = (entityAccessor.data.getField(name) as FieldAccessor).currentValue
+				let type = getRelativeSingleField(entityAccessor, nameField).currentValue
 				if (type === null) {
 					type = props.defaultBlock
 				}
@@ -106,11 +116,11 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 				return slateBlock
 			}),
 		})
-	}, [docId, entityAccessors, blockCache, name, blocks, props.defaultBlock])
+	}, [docId, entityAccessors, blockCache, nameField, blocks, props.defaultBlock])
 
 	const onChange: OnChangeFn = useCallback(
 		({ value }) => {
-			const processor = new OperationProcessor(accessor, sortBy, name, blocks, defaultBlock)
+			const processor = new OperationProcessor(accessor, sortByField, nameField, blocks, defaultBlock)
 
 			processor.processValue(value)
 
@@ -127,7 +137,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 				setSelection(undefined)
 			}
 		},
-		[accessor, sortBy, name, blocks, defaultBlock],
+		[accessor, sortByField, nameField, blocks, defaultBlock],
 	)
 
 	const [schemaCache] = useState(() => new WeakMap<BlocksDefinitions, EditorProps['schema']>())

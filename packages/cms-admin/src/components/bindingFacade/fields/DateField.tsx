@@ -1,8 +1,12 @@
 import { SingleLineTextInputProps, TextInput } from '@contember/ui'
 import * as React from 'react'
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
-import { FieldAccessor, FieldMetadata } from '../../../binding'
-import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { FieldAccessor } from '../../../binding'
+import {
+	SimpleRelativeSingleField,
+	SimpleRelativeSingleFieldMetadata,
+	SimpleRelativeSingleFieldProps,
+} from '../auxiliary'
 
 export type DateFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState'> & {
@@ -14,8 +18,8 @@ export const DateField = SimpleRelativeSingleField<DateFieldProps, string>(
 	'DateField',
 )
 
-export interface DateFieldInnerProps extends Omit<DateFieldProps, 'name' | 'label'> {
-	fieldMetadata: FieldMetadata<string>
+export interface DateFieldInnerProps extends Omit<DateFieldProps, 'field' | 'label' | 'isNonbearing' | 'defaultValue'> {
+	fieldMetadata: SimpleRelativeSingleFieldMetadata<string>
 }
 
 export const DateFieldInner = React.memo(
@@ -48,9 +52,9 @@ export const DateFieldInner = React.memo(
 		return (
 			<DatePicker
 				selected={
-					props.fieldMetadata.data.currentValue !== null ? new Date(props.fieldMetadata.data.currentValue) : null
+					props.fieldMetadata.field.currentValue !== null ? new Date(props.fieldMetadata.field.currentValue) : null
 				}
-				onChange={generateOnChange(props.fieldMetadata.data)}
+				onChange={generateOnChange(props.fieldMetadata.field)}
 				readOnly={props.fieldMetadata.isMutating}
 				isClearable={true}
 				customInput={<UnderlyingTextInput />}

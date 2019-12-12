@@ -1,34 +1,29 @@
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import * as React from 'react'
-import { Component, Environment, ErrorAccessor, FieldName } from '../../../binding'
+import { Component, DataBindingError, ErrorAccessor } from '../../../binding'
 
-import { ChoiceField, ChoiceFieldData, ChoiceFieldProps } from './ChoiceField'
+import {
+	BaseDynamicChoiceFieldProps,
+	ChoiceField,
+	ChoiceFieldData,
+	DynamicSingleChoiceFieldProps,
+	StaticChoiceFieldProps,
+} from './ChoiceField'
 
-export interface SelectFieldPublicProps extends Omit<FormGroupProps, 'children'> {
-	name: FieldName
-	firstOptionCaption?: React.ReactNode
-	options: ChoiceFieldProps['options']
-	allowNull?: boolean
-	children?: ChoiceFieldProps['optionFieldFactory']
-}
-
-export type SelectFieldProps = SelectFieldPublicProps
+// TODO this is a bit of a mouthful. Express this more elegantly in order to avoid moving so much complexity to places like here.
+export type SelectFieldProps = SelectFieldInnerPublicProps &
+	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | (DynamicSingleChoiceFieldProps & BaseDynamicChoiceFieldProps))
 
 export const SelectField = Component<SelectFieldProps>(props => {
 	return (
-		<ChoiceField
-			name={props.name}
-			options={props.options}
-			arity={ChoiceFieldData.ChoiceArity.Single}
-			optionFieldFactory={props.children}
-		>
+		<ChoiceField {...(props as any)} arity="single">
 			{({
 				data,
 				currentValue,
 				onChange,
+				errors,
 				environment,
 				isMutating,
-				errors,
 			}: ChoiceFieldData.SingleChoiceFieldMetadata) => {
 				return (
 					<SelectFieldInner
@@ -48,12 +43,13 @@ export const SelectField = Component<SelectFieldProps>(props => {
 	)
 }, 'SelectField')
 
-export interface SelectFieldInnerProps
-	extends Omit<SelectFieldPublicProps, 'options' | 'name'>,
-		Omit<ChoiceFieldData.SingleChoiceFieldMetadata, 'fieldName'> {
-	environment: Environment
+export interface SelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
+	firstOptionCaption?: string
+	allowNull?: boolean
+}
+
+export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, SelectFieldInnerPublicProps {
 	errors: ErrorAccessor[]
-	isMutating: boolean
 }
 
 export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps> {
@@ -61,9 +57,12 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 		const options = Array<SelectOption>({
 			disabled: this.props.allowNull !== true,
 			value: -1,
-			label: this.props.firstOptionCaption || this.props.label || '',
+			label: this.props.firstOptionCaption || (typeof this.props.label === 'string' ? this.props.label : ''),
 		}).concat(
 			this.props.data.map(({ key, label }) => {
+				if (typeof label !== 'string') {
+					throw new DataBindingError(`The labels of <SelectField /> items must be strings!`)
+				}
 				return {
 					disabled: false,
 					value: key,

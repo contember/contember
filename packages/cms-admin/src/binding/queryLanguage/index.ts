@@ -1,4 +1,3 @@
-export * from './MarkerFactory'
 export * from './Parser'
 export * from './QueryLanguage'
 export * from './QueryLanguageError'

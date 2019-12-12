@@ -5,7 +5,7 @@ import { ChoiceFieldProps } from './ChoiceField'
 
 export interface RadioFieldPublicProps extends Omit<FormGroupProps, 'children'> {
 	inline?: boolean
-	name: RelativeSingleField
+	field: string
 }
 
 export interface RadioFieldInternalProps {

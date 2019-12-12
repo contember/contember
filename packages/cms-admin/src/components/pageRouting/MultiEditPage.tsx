@@ -1,6 +1,5 @@
-import { lcfirst } from '@contember/utils'
 import * as React from 'react'
-import { EntityListDataProvider } from '../../binding/coreComponents'
+import { EntityListDataProvider } from '../../binding'
 import { MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
@@ -10,20 +9,14 @@ export interface MultiEditPageProps extends EntityListPageProps {
 }
 
 const MultiEditPage: Partial<PageProvider<MultiEditPageProps>> & React.ComponentType<MultiEditPageProps> = React.memo(
-	(props: MultiEditPageProps) => (
-		<EntityListDataProvider
-			entityName={props.entityName}
-			orderBy={props.orderBy}
-			offset={props.offset}
-			limit={props.limit}
-			filter={props.filter}
-		>
-			<MultiEditRenderer {...props.rendererProps}>{props.children}</MultiEditRenderer>
+	({ pageName, rendererProps, children, ...entityListProps }: MultiEditPageProps) => (
+		<EntityListDataProvider {...entityListProps}>
+			<MultiEditRenderer {...rendererProps}>{children}</MultiEditRenderer>
 		</EntityListDataProvider>
 	),
 )
 
 MultiEditPage.displayName = 'MultiEditPage'
-MultiEditPage.getPageName = (props: MultiEditPageProps) => props.pageName || `multiEdit_${lcfirst(props.entityName)}`
+MultiEditPage.getPageName = (props: MultiEditPageProps) => props.pageName
 
 export { MultiEditPage }

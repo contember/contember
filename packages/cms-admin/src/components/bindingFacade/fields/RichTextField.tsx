@@ -1,6 +1,13 @@
 import { TextInputOwnProps } from '@contember/ui'
 import * as React from 'react'
-import { Component, Field, FieldAccessor, QueryLanguage } from '../../../binding'
+import {
+	Component,
+	Field,
+	FieldAccessor,
+	useEnvironment,
+	useMutationState,
+	useRelativeSingleField,
+} from '../../../binding'
 import RichEditor, { LineBreakBehavior, RichEditorProps } from '../../RichEditor'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 
@@ -13,29 +20,31 @@ export type RichTextFieldProps = SimpleRelativeSingleFieldProps &
 	}
 
 export const RichTextField = Component<RichTextFieldProps>(
+	props => {
+		const environment = useEnvironment()
+		const isMutating = useMutationState()
+		const field = useRelativeSingleField<string>(props)
+		const generateOnChange = React.useCallback(
+			(data: FieldAccessor<string>) => (val: string) => {
+				data.updateValue && data.updateValue(!val && data.persistedValue === null ? null : val)
+			},
+			[],
+		)
+		return (
+			<RichEditor
+				onChange={generateOnChange(field)}
+				value={field.currentValue || ''}
+				lineBreakBehavior={props.lineBreakBehavior}
+				label={environment.applySystemMiddleware('labelMiddleware', props.label)}
+				blocks={props.blocks}
+				readOnly={isMutating}
+				{...props}
+			/>
+		)
+	},
 	props => (
-		<Field<string> name={props.name} defaultValue={props.defaultValue}>
-			{fieldMetadata => {
-				const generateOnChange = (data: FieldAccessor<string>) => (val: string) => {
-					data.updateValue && data.updateValue(!val && data.persistedValue === null ? null : val)
-				}
-				return (
-					<RichEditor
-						onChange={generateOnChange(fieldMetadata.data)}
-						value={fieldMetadata.data.currentValue || ''}
-						lineBreakBehavior={props.lineBreakBehavior}
-						label={fieldMetadata.environment.applySystemMiddleware('labelMiddleware', props.label)}
-						blocks={props.blocks}
-						readOnly={fieldMetadata.isMutating}
-						{...props}
-					/>
-				)
-			}}
-		</Field>
-	),
-	(props, environment) => (
 		<>
-			{QueryLanguage.wrapRelativeSingleField(props.name, environment)}
+			<Field field={props.field} />
 			{props.label}
 			{props.labelDescription}
 			{props.description}

@@ -1,4 +1,4 @@
-import { AccessorTreeRoot } from '../dao'
+import { RootAccessor } from '../accessors'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'
@@ -13,7 +13,7 @@ export type AccessorTreeStateAction =
 	  }
 	| {
 			type: AccessorTreeStateActionType.SetData
-			data: AccessorTreeRoot
+			data: RootAccessor
 			triggerPersist: () => Promise<SuccessfulPersistResult>
 	  }
 	| {

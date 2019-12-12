@@ -1,12 +1,4 @@
 import * as React from 'react'
-import { AccessorTreeStateName } from './AccessorTreeState'
-import { AccessorTreeStateContext } from './AccessorTreeStateContext'
+import { DirtinessContext } from './DirtinessContext'
 
-export const useDirtinessState = () => {
-	const accessorTreeState = React.useContext(AccessorTreeStateContext)
-
-	return accessorTreeState.name === AccessorTreeStateName.Interactive ||
-		accessorTreeState.name === AccessorTreeStateName.Mutating
-		? accessorTreeState.isDirty
-		: false
-}
+export const useDirtinessState = () => React.useContext(DirtinessContext)

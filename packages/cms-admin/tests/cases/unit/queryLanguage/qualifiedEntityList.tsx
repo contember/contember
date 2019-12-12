@@ -11,7 +11,7 @@ describe('qualified entity list QueryLanguage parser', () => {
 		expect(parse('Author')).toEqual({
 			entityName: 'Author',
 			filter: undefined,
-			toOneProps: [],
+			hasOneRelationPath: [],
 		})
 	})
 
@@ -21,7 +21,10 @@ describe('qualified entity list QueryLanguage parser', () => {
 			filter: {
 				and: [{ age: { gt: 20 } }, { homeTown: { eq: 'Prague' } }],
 			},
-			toOneProps: [{ field: 'son' }, { field: 'sisters', reducedBy: { name: 'Jane' } }],
+			hasOneRelationPath: [
+				{ field: 'son', filter: undefined, reducedBy: undefined },
+				{ field: 'sisters', filter: undefined, reducedBy: { name: 'Jane' } },
+			],
 		})
 	})
 })

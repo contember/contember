@@ -1,39 +1,46 @@
-import { Value } from 'slate'
-import { EntityAccessor, EntityCollectionAccessor, EntityForRemovalAccessor, FieldAccessor } from '../../../binding/dao'
-import JsonBlockSerializer from './JsonBlockSerializer'
 import { GraphQlBuilder } from '@contember/client'
+import { Value } from 'slate'
+import {
+	EntityAccessor,
+	EntityForRemovalAccessor,
+	EntityListAccessor,
+	FieldAccessor,
+	getRelativeSingleField,
+	RelativeSingleField,
+} from '../../../binding'
+import JsonBlockSerializer from './JsonBlockSerializer'
 import { BlocksDefinitions } from './types'
 
-type GetCollectionAccessor = () => EntityCollectionAccessor
+type GetListAccessor = () => EntityListAccessor
 
 export default class OperationProcessor {
 	constructor(
-		private readonly accessor: EntityCollectionAccessor,
-		private readonly sortBy: string,
-		private readonly typeField: string,
+		private readonly accessor: EntityListAccessor,
+		private readonly sortBy: RelativeSingleField,
+		private readonly typeField: RelativeSingleField,
 		private readonly blocks: BlocksDefinitions,
 		private readonly defaultBlock: string,
 	) {}
 
 	private readonly blockNodesSerializer = new JsonBlockSerializer()
 
-	private getLastInCollection = (getCollectionAccessor: GetCollectionAccessor): EntityAccessor => {
-		const collectionAccessorAfterAddition = getCollectionAccessor()
-		const entity = collectionAccessorAfterAddition.entities[collectionAccessorAfterAddition.entities.length - 1]
+	private getLastInCollection = (getListAccessor: GetListAccessor): EntityAccessor => {
+		const listAccessorAfterAddition = getListAccessor()
+		const entity = listAccessorAfterAddition.entities[listAccessorAfterAddition.entities.length - 1]
 		if (!(entity instanceof EntityAccessor)) {
 			throw new Error('')
 		}
 		return entity
 	}
 
-	private addToEnd = (getCollectionAccessor: GetCollectionAccessor, type: string): EntityAccessor => {
-		const collectionAccessor = getCollectionAccessor()
-		if (collectionAccessor.addNew === undefined) {
+	private addToEnd = (getListAccessor: GetListAccessor, type: string): EntityAccessor => {
+		const listAccessor = getListAccessor()
+		if (listAccessor.addNew === undefined) {
 			throw new Error('')
 		}
-		collectionAccessor.addNew && collectionAccessor.addNew()
-		const entity = this.getLastInCollection(getCollectionAccessor)
-		const typeField = entity.data.getField(this.typeField)
+		listAccessor.addNew && listAccessor.addNew()
+		const entity = this.getLastInCollection(getListAccessor)
+		const typeField = getRelativeSingleField(entity, this.typeField)
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('')
 		}
@@ -41,7 +48,7 @@ export default class OperationProcessor {
 			throw new Error('')
 		}
 		typeField.updateValue(new GraphQlBuilder.Literal(type))
-		return this.getLastInCollection(getCollectionAccessor)
+		return this.getLastInCollection(getListAccessor)
 	}
 
 	processValue(value: Value) {
@@ -136,14 +143,14 @@ export default class OperationProcessor {
 					if (ea === undefined || ea instanceof EntityForRemovalAccessor) {
 						throw new Error('This should never happen')
 					}
-					ea.remove && ea.remove(EntityAccessor.RemovalType.Delete)
+					ea.remove && ea.remove('delete')
 					collection = getAccessor()
 				})
 			})
 	}
 
 	private getSortFieldAccessor = (entityAccessor: EntityAccessor): FieldAccessor => {
-		const sortFieldAccessor = entityAccessor.data.getField(this.sortBy)
+		const sortFieldAccessor = getRelativeSingleField(entityAccessor, this.sortBy)
 		if (!(sortFieldAccessor instanceof FieldAccessor)) {
 			throw new Error('Unable to find sort field.')
 		}
@@ -151,7 +158,7 @@ export default class OperationProcessor {
 	}
 
 	private getValueFieldAccessor = (entityAccessor: EntityAccessor): FieldAccessor => {
-		const typeField = entityAccessor.data.getField(this.typeField)
+		const typeField = getRelativeSingleField(entityAccessor, this.typeField)
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('Not found type field')
 		}

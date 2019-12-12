@@ -1,11 +1,16 @@
+import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
-import { Aether, Box } from '../../src'
+import { Aether, Box, BoxSection } from '../../src'
 
 const BoxStoryWrapper = React.memo(props => <Aether style={{ padding: '2em' }}>{props.children}</Aether>)
 
-const loremIpsum =
-	'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi consequatur dolor, doloribus esse expedita illum iste maxime, nam quam quos, ut veniam. Corporis dicta dignissimos eaque nam odio praesentium ut?'
+const loremIpsum = (
+	<span>
+		Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi consequatur dolor, doloribus esse expedita illum
+		iste maxime, nam quam quos, ut veniam. Corporis dicta dignissimos eaque nam odio praesentium ut?
+	</span>
+)
 
 storiesOf('Box', module)
 	.add('simple', () => (
@@ -17,6 +22,14 @@ storiesOf('Box', module)
 	.add('with a heading', () => (
 		<BoxStoryWrapper>
 			<Box heading="Lorem ipsum">{loremIpsum}</Box>
+		</BoxStoryWrapper>
+	))
+	.add('active', () => (
+		<BoxStoryWrapper>
+			<Box heading="Lorem ipsum" isActive={boolean('Is active', false)}>
+				{loremIpsum}
+			</Box>
+			<Box heading="Dolor sit">{loremIpsum}</Box>
 		</BoxStoryWrapper>
 	))
 	.add('nesting', () => (
@@ -42,6 +55,37 @@ storiesOf('Box', module)
 						</Box>
 					</Box>
 				</Box>
+			</Box>
+		</BoxStoryWrapper>
+	))
+	.add('with sections', () => (
+		<BoxStoryWrapper>
+			<Box>
+				<BoxSection heading="Boxes with">{loremIpsum}</BoxSection>
+				<BoxSection heading="Only sections">{loremIpsum}</BoxSection>
+				<BoxSection heading="Work just fine">{loremIpsum}</BoxSection>
+			</Box>
+			<Box heading="Lorem ipsum">
+				{loremIpsum}
+				<BoxSection heading="But there">{loremIpsum}</BoxSection>
+				<BoxSection heading="Can also be">{loremIpsum}</BoxSection>
+				<BoxSection heading="Top-level stuff">{loremIpsum}</BoxSection>
+			</Box>
+			<Box heading="Let us">
+				<BoxSection heading="Put the nesting">{loremIpsum}</BoxSection>
+				<Box heading="To the test">
+					<Box heading="And see">
+						<BoxSection heading="If all">{loremIpsum}</BoxSection>
+						<BoxSection heading="Combinations">{loremIpsum}</BoxSection>
+					</Box>
+					<BoxSection heading="Actually">{loremIpsum}</BoxSection>
+					<Box heading="Render">
+						<BoxSection heading="Without any">{loremIpsum}</BoxSection>
+						<BoxSection heading="Obvious flaws">{loremIpsum}</BoxSection>
+					</Box>
+				</Box>
+				<BoxSection heading="Because that would be">{loremIpsum}</BoxSection>
+				<BoxSection heading="Rather bad">{loremIpsum}</BoxSection>
 			</Box>
 		</BoxStoryWrapper>
 	))

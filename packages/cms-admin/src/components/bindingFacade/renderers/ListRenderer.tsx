@@ -1,35 +1,30 @@
 import * as React from 'react'
 import { Component } from '../../../binding'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
-import {
-	ImmutableEntityCollectionRenderer,
-	ImmutableEntityCollectionRendererProps,
-} from './ImmutableEntityCollectionRenderer'
+import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 
-export interface ListRendererProps
-	extends ImmutableContentLayoutRendererProps,
-		ImmutableEntityCollectionRendererProps {}
+export interface ListRendererProps extends ImmutableContentLayoutRendererProps, ImmutableEntityListRendererProps {}
 
 export const ListRenderer = Component<ListRendererProps>(
 	({
 		children,
 
-		beforeContent,
-		afterContent,
-		emptyMessage,
-		wrapperComponent,
+		side,
+		title,
+		navigation,
+		headingProps,
+		actions,
 
-		...layoutProps
+		...entityListProps
 	}) => (
-		<ImmutableContentLayoutRenderer {...layoutProps}>
-			<ImmutableEntityCollectionRenderer
-				beforeContent={beforeContent}
-				afterContent={afterContent}
-				emptyMessage={emptyMessage}
-				wrapperComponent={wrapperComponent}
-			>
-				{children}
-			</ImmutableEntityCollectionRenderer>
+		<ImmutableContentLayoutRenderer
+			side={side}
+			title={title}
+			navigation={navigation}
+			actions={actions}
+			headingProps={headingProps}
+		>
+			<ImmutableEntityListRenderer {...entityListProps}>{children}</ImmutableEntityListRenderer>
 		</ImmutableContentLayoutRenderer>
 	),
 	'ListRenderer',

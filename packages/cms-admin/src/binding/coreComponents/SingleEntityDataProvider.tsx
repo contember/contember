@@ -1,13 +1,11 @@
 import * as React from 'react'
-import { AccessorTreeStateContext, useAccessorTreeState } from '../accessorTree'
-import { EntityName, FieldName } from '../bindingTypes'
-import { MarkerFactory } from '../queryLanguage'
+import { AccessorTree, useAccessorTreeState } from '../accessorTree'
+import { MarkerFactory } from '../markers'
+import { SubTreeIdentifier, SugaredQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
 
-export interface SingleEntityDataProviderProps
-	extends Omit<MarkerFactory.SugaredSingleEntityTreeConstraints, 'whereType'> {
-	entityName: EntityName
-	associatedField?: FieldName
+export interface SingleEntityDataProviderProps extends SugaredQualifiedSingleEntity {
+	subTreeIdentifier?: SubTreeIdentifier
 	children: React.ReactNode
 }
 
@@ -21,22 +19,11 @@ export const SingleEntityDataProvider = Component<SingleEntityDataProviderProps>
 			nodeTree: children,
 		})
 
-		return (
-			<AccessorTreeStateContext.Provider value={accessorTreeState}>{props.children}</AccessorTreeStateContext.Provider>
-		)
+		return <AccessorTree state={accessorTreeState}>{props.children}</AccessorTree>
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerFactory.createSingleEntityMarkerTreeRoot(
-				environment,
-				props.entityName,
-				fields,
-				{
-					where: props.where,
-					whereType: 'unique',
-				},
-				props.associatedField,
-			),
+			MarkerFactory.createSingleEntityMarkerTreeRoot(environment, props, fields, props.subTreeIdentifier),
 	},
 	'SingleEntityDataProvider',
 )

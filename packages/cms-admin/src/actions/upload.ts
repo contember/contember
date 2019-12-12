@@ -21,11 +21,6 @@ const mutation = `mutation ($contentType: String!) {
 	generateUploadUrl(contentType: $contentType) {
 		url
 		publicUrl
-		method
-		headers {
-			key
-			value
-		}
 	}
 }`
 
@@ -71,7 +66,7 @@ export const uploadFile = (id: string, file: File): ActionCreator<any> => async 
 	const apiToken = state.auth.identity ? state.auth.identity.token : undefined
 	const graphqlClient = services.contentClientFactory.create(state.request.project, state.request.stage)
 
-	let signedUpload: { url: string; publicUrl: string; method: string; headers: { key: string; value: string }[] }
+	let signedUpload: { url: string; publicUrl: string }
 	try {
 		const variables = {
 			contentType: file.type,
@@ -91,12 +86,15 @@ export const uploadFile = (id: string, file: File): ActionCreator<any> => async 
 	const content = await readAsArrayBuffer(file)
 	dispatch(updateUploadProgress(id, 0))
 	try {
-		const headers = signedUpload.headers.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {})
 		await httpFetch(
 			signedUpload.url,
 			{
-				method: signedUpload.method,
-				headers,
+				method: 'PUT',
+				headers: {
+					'Content-Type': file.type,
+					'Cache-Control': 'immutable',
+					'X-Amz-Acl': 'public-read',
+				},
 				body: content,
 			},
 			{

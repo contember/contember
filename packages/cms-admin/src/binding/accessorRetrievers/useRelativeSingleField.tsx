@@ -1,27 +1,20 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { Scalar } from '../accessorTree'
-import { RelativeSingleField } from '../bindingTypes'
-import { Parser } from '../queryLanguage'
-import { getNestedField } from './getNestedField'
+import { Scalar, SugaredRelativeSingleField } from '../treeParameters'
+import { getRelativeSingleField } from './getRelativeSingleField'
+import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
 import { useEntityContext } from './useEntityContext'
-import { useEnvironment } from './useEnvironment'
 
 export const useRelativeSingleField = <
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
 	Produced extends Persisted = Persisted
 >(
-	field: RelativeSingleField,
+	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 ) => {
 	const entity = useEntityContext()
-	const environment = useEnvironment()
-	const expression = React.useMemo(
-		() => Parser.parseQueryLanguageExpression(field, Parser.EntryPoint.RelativeSingleField, environment),
-		[environment, field],
-	)
-	return React.useMemo(() => getNestedField<Persisted, Produced>(entity, expression.toOneProps, expression.fieldName), [
+	const relativeSingleField = useDesugaredRelativeSingleField(sugaredRelativeSingleField)
+	return React.useMemo(() => getRelativeSingleField<Persisted, Produced>(entity, relativeSingleField), [
 		entity,
-		expression.fieldName,
-		expression.toOneProps,
+		relativeSingleField,
 	])
 }

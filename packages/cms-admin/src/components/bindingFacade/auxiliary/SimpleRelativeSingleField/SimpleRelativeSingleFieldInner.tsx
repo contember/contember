@@ -1,43 +1,57 @@
-import { FormGroup } from '@contember/ui'
+import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, EntityAccessor, FieldMetadata } from '../../../../binding'
-import { SimpleRelativeSingleFieldProxyProps } from './SimpleRelativeSingleFieldProxy'
+import { FieldAccessor, useEnvironment, useMutationState } from '../../../../binding'
+import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
-export type SimpleRelativeSingleFieldInnerProps = SimpleRelativeSingleFieldProxyProps & {
-	immediateParentEntity: EntityAccessor
-	fieldMetadata: FieldMetadata
+export type SimpleRelativeSingleFieldInnerProps = Omit<FormGroupProps, 'children'> & {
+	render: undefined | ((fieldMetadata: SimpleRelativeSingleFieldMetadata<any, any>, props: any) => React.ReactNode)
+	field: FieldAccessor
 }
 
 export const SimpleRelativeSingleFieldInner = React.memo(
-	({ fieldMetadata, immediateParentEntity, render, ...props }: SimpleRelativeSingleFieldInnerProps) => {
-		if (!render) {
-			return null
-		}
+	({
+		render,
+		field,
+		label,
+		labelDescription,
+		labelPosition,
+		description,
+		...props
+	}: SimpleRelativeSingleFieldInnerProps) => {
+		const environment = useEnvironment()
+		const isMutating = useMutationState()
+
+		const fieldMetadata: SimpleRelativeSingleFieldMetadata = React.useMemo(
+			() => ({
+				field,
+				environment,
+				isMutating,
+			}),
+			[environment, field, isMutating],
+		)
+
+		const rendered = React.useMemo<React.ReactNode>(() => {
+			if (render === undefined) {
+				return null
+			}
+			return render(fieldMetadata, props)
+		}, [fieldMetadata, props, render])
+
 		return (
-			<FormGroup
-				label={
-					props.label && (
-						<AccessorContext.Provider value={immediateParentEntity}>
-							{fieldMetadata.environment.applySystemMiddleware('labelMiddleware', props.label)}
-						</AccessorContext.Provider>
-					)
-				}
-				size={props.size}
-				labelDescription={
-					props.labelDescription && (
-						<AccessorContext.Provider value={immediateParentEntity}>{props.labelDescription}</AccessorContext.Provider>
-					)
-				}
-				labelPosition={props.labelPosition}
-				description={
-					props.description && (
-						<AccessorContext.Provider value={immediateParentEntity}>{props.description}</AccessorContext.Provider>
-					)
-				}
-				errors={fieldMetadata.errors}
-			>
-				{render(fieldMetadata, props)}
-			</FormGroup>
+			<>
+				{rendered && (
+					<FormGroup
+						label={label}
+						size={props.size}
+						labelDescription={labelDescription}
+						labelPosition={labelPosition}
+						description={description}
+						errors={fieldMetadata.field.errors}
+					>
+						{rendered}
+					</FormGroup>
+				)}
+			</>
 		)
 	},
 )

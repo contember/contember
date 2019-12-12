@@ -1,13 +1,16 @@
-import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import {
+	Component,
 	DataBindingError,
 	Environment,
 	Field,
-	Scalar,
+	FieldValue,
+	OptionallyVariableFieldValue,
+	SugaredRelativeSingleField,
+	useEnvironment,
+	useMutationState,
+	useRelativeSingleField,
 	VariableInputTransformer,
-	VariableLiteral,
-	VariableScalar,
 } from '../../../../binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
@@ -16,79 +19,78 @@ export interface StaticOption {
 	description?: React.ReactNode
 }
 
-export interface ScalarStaticOption extends StaticOption {
-	value: Scalar | VariableScalar
-}
-
 export interface NormalizedStaticOption extends StaticOption {
-	value: GraphQlBuilder.Literal | Scalar
+	value: FieldValue
 }
 
-export interface LiteralStaticOption extends StaticOption {
-	value: VariableLiteral | GraphQlBuilder.Literal
+export interface OptionallyVariableStaticOption extends StaticOption {
+	value: OptionallyVariableFieldValue
 }
 
-export type StaticChoiceFieldProps = ChoiceFieldData.InnerBaseProps & {
-	options: ScalarStaticOption[] | LiteralStaticOption[]
+export interface StaticChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceFieldData.ChoiceArity>
+	extends SugaredRelativeSingleField {
+	options: OptionallyVariableStaticOption[]
+	arity: Arity
 }
 
-export class StaticChoiceField extends React.PureComponent<StaticChoiceFieldProps> {
-	public render() {
-		if (this.props.arity === ChoiceFieldData.ChoiceArity.Multiple) {
-			throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
-		}
+const normalizeOptions = (options: OptionallyVariableStaticOption[], environment: Environment) =>
+	options.map(
+		(options): NormalizedStaticOption => ({
+			value: VariableInputTransformer.transformValue(options.value, environment),
+			label: options.label,
+			description: options.description,
+		}),
+	)
 
-		const rawOptions = this.props.options
-		const children = this.props.children
-
-		if (rawOptions.length === 0) {
-			return null
-		}
-
-		const environment = this.props.environment
-		const options = this.normalizeOptions(rawOptions, environment)
-
-		return (
-			<Field name={this.props.fieldName}>
-				{({ data, ...otherMetadata }): React.ReactNode => {
-					if (this.props.arity === ChoiceFieldData.ChoiceArity.Multiple) {
-						throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
-					}
-
-					const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => {
-						return (
-							data.hasValue(value) ||
-							(value instanceof GraphQlBuilder.Literal &&
-								typeof data.currentValue === 'string' &&
-								value.value === data.currentValue)
-						)
-					}, null)
-
-					return children({
-						data: options.map(({ label, description, value: actualValue }, i) => ({
-							key: i,
-							description,
-							label,
-							actualValue,
-						})),
-						currentValue,
-						onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
-							data.updateValue && data.updateValue(options[newValue].value)
-						},
-						...otherMetadata,
-					})
-				}}
-			</Field>
-		)
+export const useStaticChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>(
+	props: StaticChoiceFieldProps<Arity>,
+): ChoiceFieldData.MetadataByArity[Arity] => {
+	if (props.arity === 'multiple') {
+		throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
 	}
 
-	private normalizeOptions(options: Array<ScalarStaticOption | LiteralStaticOption>, environment: Environment) {
-		return options.map(
-			(options): NormalizedStaticOption => ({
-				value: VariableInputTransformer.transformValue(options.value, environment),
-				label: options.label,
-				description: options.description,
-			}),
-		)
-	}
+	const environment = useEnvironment()
+	const isMutating = useMutationState()
+	const field = useRelativeSingleField(props)
+	const options = React.useMemo(() => normalizeOptions(props.options, environment), [environment, props.options])
+	const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => field.hasValue(value))
+	const data = React.useMemo(
+		() =>
+			options.map(({ label, description, value: actualValue }, i) => ({
+				key: i,
+				description,
+				label,
+				actualValue,
+			})),
+		[options],
+	)
+	const onChange = React.useCallback(
+		(newValue: ChoiceFieldData.ValueRepresentation) => {
+			field.updateValue && field.updateValue(options[newValue].value)
+		},
+		[field, options],
+	)
+	const metadata = React.useMemo<ChoiceFieldData.MetadataByArity['single']>(
+		() => ({
+			currentValue,
+			data,
+			onChange,
+			errors: field.errors,
+			environment,
+			isMutating,
+		}),
+		[currentValue, data, environment, field.errors, isMutating, onChange],
+	)
+
+	return metadata as any // TS… 🙁
 }
+
+export const StaticChoiceField = Component<StaticChoiceFieldProps<any> & ChoiceFieldData.MetadataPropsByArity>(
+	props => {
+		const metadata = useStaticChoiceField(props)
+
+		return props.children(metadata)
+	},
+	props => <Field {...props} />,
+	'StaticChoiceField',
+)

@@ -2,7 +2,7 @@ import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
 import { ApiRequestReadyState, useAuthToken, useContentApiRequest } from '../../apiClient'
 import { useEnvironment } from '../accessorRetrievers'
-import { AccessorTreeRoot } from '../dao'
+import { RootAccessor } from '../accessors'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
@@ -50,6 +50,7 @@ export const useAccessorTreeState = ({
 	const isFirstRenderRef = React.useRef(true)
 	const isForcingRefreshRef = React.useRef(false) // This ref is described in detail below.
 
+	const queryRef = React.useRef(query)
 	const stateRef = React.useRef(state)
 	const queryStateRef = React.useRef(queryState)
 
@@ -166,17 +167,17 @@ export const useAccessorTreeState = ({
 	const initializeAccessorTree = React.useCallback(
 		(
 			persistedData: ReceivedDataTree<undefined> | undefined,
-			initialData: AccessorTreeRoot | ReceivedDataTree<undefined> | undefined,
+			initialData: RootAccessor | ReceivedDataTree<undefined> | undefined,
 			errors?: MutationDataResponse,
 		) => {
 			accessorTreeGenerator.generateLiveTree(
 				persistedData,
 				initialData,
-				accessorTree => {
-					console.debug('data', accessorTree)
+				accessor => {
+					console.debug('data', accessor)
 					dispatch({
 						type: AccessorTreeStateActionType.SetData,
-						data: accessorTree,
+						data: accessor,
 						triggerPersist,
 					})
 				},
@@ -185,6 +186,15 @@ export const useAccessorTreeState = ({
 		},
 		[accessorTreeGenerator, triggerPersist],
 	)
+
+	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions).
+	if (query !== queryRef.current) {
+		isForcingRefreshRef.current = true
+		dispatch({
+			type: AccessorTreeStateActionType.Uninitialize,
+		})
+	}
+	queryRef.current = query
 
 	React.useEffect(() => {
 		if (
@@ -248,17 +258,6 @@ export const useAccessorTreeState = ({
 			}
 		}
 	}, [markerTree, queryState, state])
-
-	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions). We don't want this effect
-	// to run during the initial render.
-	React.useEffect(() => {
-		if (!isFirstRenderRef.current) {
-			isForcingRefreshRef.current = true
-			dispatch({
-				type: AccessorTreeStateActionType.Uninitialize,
-			})
-		}
-	}, [query])
 
 	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {

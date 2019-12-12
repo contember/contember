@@ -41,6 +41,7 @@ export const FeedbackRenderer = Component<FeedbackRendererProps>(
 				case RequestErrorType.NetworkError:
 					return <Message type="danger">Network error</Message> // TODO
 				case RequestErrorType.UnknownError:
+				default:
 					return <Message type="danger">Unknown error</Message> // TODO
 			}
 		}

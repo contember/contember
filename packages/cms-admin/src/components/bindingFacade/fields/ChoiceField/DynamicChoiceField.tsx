@@ -41,7 +41,7 @@ export type BaseDynamicChoiceFieldProps =
 export type DynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity
 export type DynamicMultipleChoiceFieldProps = SugaredRelativeEntityList
 
-export type DynamicChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceFieldData.ChoiceArity> = (
+export type DynamicChoiceFieldProps = (
 	| ({
 			arity: 'single'
 	  } & DynamicSingleChoiceFieldProps)
@@ -55,9 +55,9 @@ export type DynamicChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = 
 // TODO how to improve this though…? 🤔
 const computeSubTreeIdentifier = (field: DynamicChoiceFieldProps['field']) => JSON.stringify(field)
 
-export const useDynamicChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>(
-	props: DynamicChoiceFieldProps<Arity>,
-): ChoiceFieldData.MetadataByArity[Arity] => {
+export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.ChoiceArity>(
+	props: DynamicChoiceFieldProps,
+): ChoiceFieldData.MetadataByArity[DynamicArity] => {
 	const parentEntity = useEntityContext()
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
@@ -199,7 +199,7 @@ export const useDynamicChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>
 				}
 			},
 		}
-		return metadata as ChoiceFieldData.MetadataByArity[Arity]
+		return metadata as ChoiceFieldData.MetadataByArity[DynamicArity]
 	} else if (props.arity === 'multiple') {
 		const metadata: ChoiceFieldData.MultipleChoiceFieldMetadata = {
 			...baseMetadata,
@@ -224,7 +224,7 @@ export const useDynamicChoiceField = <Arity extends ChoiceFieldData.ChoiceArity>
 				}
 			},
 		}
-		return metadata as ChoiceFieldData.MetadataByArity[Arity]
+		return metadata as ChoiceFieldData.MetadataByArity[DynamicArity]
 	}
 	assertNever(props)
 }

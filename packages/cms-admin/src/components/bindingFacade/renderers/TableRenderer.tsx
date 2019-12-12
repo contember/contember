@@ -50,9 +50,7 @@ export const TableRenderer = Component<TableRendererProps>(
 	'TableRenderer',
 )
 
-const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => (
-	<Table {...props} />
-))
+const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => <Table {...props} />)
 Container.displayName = 'Container'
 
 const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemove?: boolean }) => (

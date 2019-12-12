@@ -1,4 +1,3 @@
-import { lcfirst } from '@contember/utils'
 import * as React from 'react'
 import { EntityListDataProvider } from '../../binding/coreComponents'
 import { TableRenderer, TableRendererProps } from '../bindingFacade'
@@ -10,20 +9,14 @@ export interface TablePageProps extends EntityListPageProps {
 }
 
 const TablePage: Partial<PageProvider<TablePageProps>> & React.ComponentType<TablePageProps> = React.memo(
-	(props: TablePageProps) => (
-		<EntityListDataProvider
-			entityName={props.entityName}
-			orderBy={props.orderBy}
-			offset={props.offset}
-			limit={props.limit}
-			filter={props.filter}
-		>
-			<TableRenderer {...props.rendererProps}>{props.children}</TableRenderer>
+	({ rendererProps, children, pageName, ...entityListProps }: TablePageProps) => (
+		<EntityListDataProvider {...entityListProps}>
+			<TableRenderer {...rendererProps}>{children}</TableRenderer>
 		</EntityListDataProvider>
 	),
 )
 
 TablePage.displayName = 'TablePage'
-TablePage.getPageName = (props: TablePageProps) => props.pageName || `table_${lcfirst(props.entityName)}`
+TablePage.getPageName = (props: TablePageProps) => props.pageName
 
 export { TablePage }

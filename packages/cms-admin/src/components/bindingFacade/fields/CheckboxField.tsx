@@ -11,10 +11,10 @@ export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps, boole
 	}
 	return (
 		<Checkbox
-			checked={!!fieldMetadata.data.currentValue}
-			onChange={generateOnChange(fieldMetadata.data)}
+			checked={!!fieldMetadata.field.currentValue}
+			onChange={generateOnChange(fieldMetadata.field)}
 			readOnly={fieldMetadata.isMutating}
-			errors={fieldMetadata.errors}
+			errors={fieldMetadata.field.errors}
 		>
 			{fieldMetadata.environment.applySystemMiddleware('labelMiddleware', props.label)}
 		</Checkbox>

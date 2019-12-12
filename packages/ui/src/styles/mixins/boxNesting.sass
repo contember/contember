@@ -1,10 +1,13 @@
-=boxNesting($maxdepth: 6)
-	@for $depth from 1 through $maxdepth
+=boxNesting($maxDepth: 6)
+	@for $depth from 1 through $maxDepth
 		$depthConfig: nth($cui-box-depths, $depth)
 
+		$background: map_get($depthConfig, background)
 		$separation: map_get($depthConfig, separation)
+		$separationColor: map_get($depthConfig, separationColor)
 		$paddingX: map_get($depthConfig, paddingX)
 		$paddingY: map_get($depthConfig, paddingY)
+		$boxShadow: map_get($depthConfig, boxShadow)
 
 		&.view-depth-#{$depth}
 			+box($depth)
@@ -12,8 +15,17 @@
 			--cui-boxNesting-paddingX: #{$paddingX}
 			--cui-boxNesting-paddingY: #{$paddingY}
 
-			& + &,
-			.formGroup + & // TODO this selector is not ideal. Solve this better.
+			&:not(:first-child)
 				margin-top: $separation
-		&.view-depth-#{$depth} &-heading + &-content
-			margin-top: $paddingY
+		&-section.view-depth-#{$depth}
+			background: $background
+			padding-left: $paddingX
+			padding-right: $paddingX
+			margin-left: -$paddingX
+			margin-right: -$paddingX
+		&-section.view-depth-#{$depth}:not(:first-child),
+		&.view-depth-#{$depth} > &-content:not(:first-child)
+			margin-top: $separation
+		&.view-depth-#{$depth} &-section:not(:first-child)
+			border-top: em(1px) solid $separationColor
+			padding-top: $separation

@@ -5,7 +5,7 @@
 	"type": "module",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"build": "rollup --config && node ./scripts/build-style.js",
+		"build": "rollup --config && node --experimental-modules ./scripts/build-style.mjs",
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {

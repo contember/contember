@@ -1,17 +1,16 @@
 import { CrudQueryBuilder } from '@contember/client'
-import { ucfirst } from '@contember/utils'
-import { assertNever } from '@contember/utils'
+import { assertNever, ucfirst } from '@contember/utils'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	ConnectionMarker,
 	EntityFields,
-	EntityListTreeConstraints,
 	FieldMarker,
 	Marker,
 	MarkerTreeRoot,
 	ReferenceMarker,
-	SingleEntityTreeConstraints,
-} from '../dao'
+	TaggedQualifiedEntityList,
+	TaggedQualifiedSingleEntity,
+} from '../markers'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
 
@@ -33,29 +32,29 @@ export class QueryGenerator {
 			baseQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		if (subTree.constraints === undefined) {
+		if (subTree.parameters.type === 'unconstrained') {
 			const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
 				baseQueryBuilder,
 				this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
 			)
 			return populatedBaseQueryBuilder
-		} else if (subTree.constraints.whereType === 'unique') {
-			return this.addGetQuery(baseQueryBuilder, subTree as MarkerTreeRoot<SingleEntityTreeConstraints>)
-		} else if (subTree.constraints.whereType === 'nonUnique') {
-			return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<EntityListTreeConstraints>)
+		} else if (subTree.parameters.type === 'unique') {
+			return this.addGetQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedQualifiedSingleEntity>)
+		} else if (subTree.parameters.type === 'nonUnique') {
+			return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedQualifiedEntityList>)
 		}
-		assertNever(subTree.constraints)
+		assertNever(subTree.parameters)
 	}
 
 	private addGetQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerTreeRoot<SingleEntityTreeConstraints>,
+		subTree: MarkerTreeRoot<TaggedQualifiedSingleEntity>,
 	): BaseQueryBuilder {
 		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerTreeRootQueries(
 			baseQueryBuilder,
 			this.registerQueryPart(
 				subTree.fields,
-				CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.constraints.where),
+				CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.where),
 			),
 		)
 
@@ -70,29 +69,29 @@ export class QueryGenerator {
 
 	private addListQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerTreeRoot<EntityListTreeConstraints>,
+		subTree: MarkerTreeRoot<TaggedQualifiedEntityList>,
 	): BaseQueryBuilder {
 		let finalBuilder: ReadBuilder
 
-		if (subTree.constraints) {
+		if (subTree.parameters) {
 			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter'
-			>> = subTree.constraints.filter
-				? CrudQueryBuilder.ReadBuilder.instantiate().filter(subTree.constraints.filter)
+			>> = subTree.parameters.filter
+				? CrudQueryBuilder.ReadBuilder.instantiate().filter(subTree.parameters.filter)
 				: CrudQueryBuilder.ReadBuilder.instantiate()
 
 			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter' | 'orderBy'
-			>> = subTree.constraints.orderBy ? withFilter.orderBy(subTree.constraints.orderBy) : withFilter
+			>> = subTree.parameters.orderBy ? withFilter.orderBy(subTree.parameters.orderBy) : withFilter
 
 			const withOffset: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter' | 'orderBy' | 'offset'
-			>> = subTree.constraints.offset === undefined ? withOrderBy : withOrderBy.offset(subTree.constraints.offset)
+			>> = subTree.parameters.offset === undefined ? withOrderBy : withOrderBy.offset(subTree.parameters.offset)
 
-			finalBuilder = subTree.constraints.limit === undefined ? withOffset : withOffset.limit(subTree.constraints.limit)
+			finalBuilder = subTree.parameters.limit === undefined ? withOffset : withOffset.limit(subTree.parameters.limit)
 		} else {
 			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
 		}

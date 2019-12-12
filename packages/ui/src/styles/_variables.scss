@@ -18,15 +18,16 @@ $cui-color-yellow: #FFC416 !default;
 $cui-color-red: #FF312E !default;
 
 $cui-color-white: #FFFFFF !default;
-$cui-color-gray-1: #FAFAFA !default;
-$cui-color-gray-2: #E6E6E6 !default;
-$cui-color-gray-3: #C7C7C7 !default;
-$cui-color-gray-4: #AEAEAE !default;
-$cui-color-gray-5: #9E9E9E !default;
-$cui-color-gray-6: #6A6A6A !default;
-$cui-color-gray-7: #404040 !default;
-$cui-color-gray-8: #343434 !default;
-$cui-color-gray-9: #222222 !default;
+$cui-color-gray-1: #F4F4F4 !default;
+$cui-color-gray-2: #E0E0E0 !default;
+$cui-color-gray-3: #C6C6C6 !default;
+$cui-color-gray-4: #A8A8A8 !default;
+$cui-color-gray-5: #8D8D8D !default;
+$cui-color-gray-6: #6F6F6F !default;
+$cui-color-gray-7: #525252 !default;
+$cui-color-gray-8: #393939 !default;
+$cui-color-gray-9: #262626 !default;
+$cui-color-gray-10: #161616 !default;
 $cui-color-black: #000000 !default;
 
 
@@ -406,47 +407,55 @@ $cui-heading-sizes: (
 );
 
 // Boxes
+$cui-box-active-color: $cui-control-view-default-distinction-color !default;
+
 $cui-box-depth-1-background: $cui-color-white !default;
 $cui-box-depth-1-separation: $cui-heading-1-fontSize-small !default;
+$cui-box-depth-1-separation-color: rgba($cui-color-gray-8, .15) !default;
 $cui-box-depth-1-border-radius: em(3px) !default;
 $cui-box-depth-1-padding-x: $cui-heading-1-fontSize-small * .85 !default;
 $cui-box-depth-1-padding-y: $cui-heading-1-fontSize-small * .85 !default;
 $cui-box-depth-1-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(3px) 0 rgba($cui-color-gray-8, .15) !default;
 
-$cui-box-depth-2-background: $cui-color-white !default;
+$cui-box-depth-2-background: darken($cui-box-depth-1-background, 1%) !default;
 $cui-box-depth-2-separation: $cui-heading-2-fontSize-small !default;
+$cui-box-depth-2-separation-color: rgba($cui-color-gray-8, .15) !default;
 $cui-box-depth-2-border-radius: em(2.5px) !default;
 $cui-box-depth-2-padding-x: $cui-heading-2-fontSize-small * .85 !default;
 $cui-box-depth-2-padding-y: $cui-heading-2-fontSize-small * .85 !default;
-$cui-box-depth-2-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2.5px) 0 rgba($cui-color-gray-8, .15) !default;
+$cui-box-depth-2-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2.75px) 0 rgba($cui-color-gray-8, .17) !default;
 
-$cui-box-depth-3-background: darken($cui-box-depth-2-background, 2%) !default;
+$cui-box-depth-3-background: darken($cui-box-depth-2-background, 1%) !default;
 $cui-box-depth-3-separation: $cui-heading-3-fontSize-small !default;
+$cui-box-depth-3-separation-color: rgba($cui-color-gray-8, .15) !default;
 $cui-box-depth-3-border-radius: em(2px) !default;
 $cui-box-depth-3-padding-x: $cui-heading-3-fontSize-small * .85 !default;
 $cui-box-depth-3-padding-y: $cui-heading-3-fontSize-small * .85 !default;
-$cui-box-depth-3-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2px) 0 rgba($cui-color-gray-8, .15) !default;
+$cui-box-depth-3-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2.5px) 0 rgba($cui-color-gray-8, .19) !default;
 
-$cui-box-depth-4-background: darken($cui-box-depth-3-background, 2%) !default;
+$cui-box-depth-4-background: darken($cui-box-depth-3-background, 1%) !default;
 $cui-box-depth-4-separation: $cui-heading-4-fontSize-small !default;
+$cui-box-depth-4-separation-color: rgba($cui-color-gray-8, .15) !default;
 $cui-box-depth-4-border-radius: em(1.75px) !default;
 $cui-box-depth-4-padding-x: $cui-heading-4-fontSize-small * .85 !default;
 $cui-box-depth-4-padding-y: $cui-heading-4-fontSize-small * .85 !default;
-$cui-box-depth-4-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(1.75px) 0 rgba($cui-color-gray-8, .15) !default;
+$cui-box-depth-4-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2px) 0 rgba($cui-color-gray-8, .21) !default;
 
-$cui-box-depth-5-background: darken($cui-box-depth-4-background, 2%) !default;
+$cui-box-depth-5-background: darken($cui-box-depth-4-background, 1%) !default;
 $cui-box-depth-5-separation: $cui-heading-5-fontSize-small !default;
+$cui-box-depth-5-separation-color: rgba($cui-color-gray-8, .15) !default;
 $cui-box-depth-5-border-radius: em(1.5px) !default;
 $cui-box-depth-5-padding-x: $cui-heading-5-fontSize-small * .85 !default;
 $cui-box-depth-5-padding-y: $cui-heading-5-fontSize-small * .85 !default;
-$cui-box-depth-5-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(1.5px) 0 rgba($cui-color-gray-8, .15) !default;
+$cui-box-depth-5-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(1.75px) 0 rgba($cui-color-gray-8, .23) !default;
 
-$cui-box-depth-6-background: darken($cui-box-depth-5-background, 2%) !default;
+$cui-box-depth-6-background: darken($cui-box-depth-5-background, 1%) !default;
 $cui-box-depth-6-separation: $cui-heading-6-fontSize-small !default;
+$cui-box-depth-6-separation-color: rgba($cui-color-gray-8, .15) !default;
 $cui-box-depth-6-border-radius: em(1.25px) !default;
 $cui-box-depth-6-padding-x: $cui-heading-6-fontSize-small * .85 !default;
 $cui-box-depth-6-padding-y: $cui-heading-6-fontSize-small * .85 !default;
-$cui-box-depth-6-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(1.25px) 0 rgba($cui-color-gray-8, .15) !default;
+$cui-box-depth-6-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(1.5px) 0 rgba($cui-color-gray-8, .25) !default;
 
 $cui-box-depths: (
 	(
@@ -455,6 +464,7 @@ $cui-box-depths: (
 		'borderRadius': $cui-box-depth-1-border-radius,
 		'paddingX': $cui-box-depth-1-padding-x,
 		'paddingY': $cui-box-depth-1-padding-y,
+		'separationColor': $cui-box-depth-1-separation-color,
 		'boxShadow': $cui-box-depth-1-boxShadow,
 	),
 	(
@@ -463,6 +473,7 @@ $cui-box-depths: (
 		'borderRadius': $cui-box-depth-2-border-radius,
 		'paddingX': $cui-box-depth-2-padding-x,
 		'paddingY': $cui-box-depth-2-padding-y,
+		'separationColor': $cui-box-depth-2-separation-color,
 		'boxShadow': $cui-box-depth-2-boxShadow,
 	),
 	(
@@ -471,6 +482,7 @@ $cui-box-depths: (
 		'borderRadius': $cui-box-depth-3-border-radius,
 		'paddingX': $cui-box-depth-3-padding-x,
 		'paddingY': $cui-box-depth-3-padding-y,
+		'separationColor': $cui-box-depth-3-separation-color,
 		'boxShadow': $cui-box-depth-3-boxShadow,
 	),
 	(
@@ -479,6 +491,7 @@ $cui-box-depths: (
 		'borderRadius': $cui-box-depth-4-border-radius,
 		'paddingX': $cui-box-depth-4-padding-x,
 		'paddingY': $cui-box-depth-4-padding-y,
+		'separationColor': $cui-box-depth-4-separation-color,
 		'boxShadow': $cui-box-depth-4-boxShadow,
 	),
 	(
@@ -487,6 +500,7 @@ $cui-box-depths: (
 		'borderRadius': $cui-box-depth-5-border-radius,
 		'paddingX': $cui-box-depth-5-padding-x,
 		'paddingY': $cui-box-depth-5-padding-y,
+		'separationColor': $cui-box-depth-5-separation-color,
 		'boxShadow': $cui-box-depth-5-boxShadow,
 	),
 	(
@@ -495,6 +509,7 @@ $cui-box-depths: (
 		'borderRadius': $cui-box-depth-6-border-radius,
 		'paddingX': $cui-box-depth-6-padding-x,
 		'paddingY': $cui-box-depth-6-padding-y,
+		'separationColor': $cui-box-depth-6-separation-color,
 		'boxShadow': $cui-box-depth-6-boxShadow,
 	),
 ) !default;
@@ -533,9 +548,9 @@ $cui-menu-caret-transition-duration: $cui-collapsible-transition-duration !defau
 
 
 // Spinner
-$cui-spinner-appearSpeed: .2s !default;
-$cui-spinner-color: currentColor !default;
-$cui-spinner-period: 1.5s !default;
+$cui-spinner-softColor: currentColor !default;
+$cui-spinner-accentColor: transparent !default;
+$cui-spinner-period: .6s !default;
 
 // Container spinner
 $cui-containerSpinner-default-size: 2.5em !default;

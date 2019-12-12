@@ -6,6 +6,6 @@ export type ClearFieldButtonProps = Omit<ClearFieldButtonInnerPublicProps, 'defa
 	SimpleRelativeSingleFieldProps
 
 export const ClearFieldButton = SimpleRelativeSingleField<ClearFieldButtonProps>(
-	(fieldMetadata, props) => <ClearFieldButtonInner field={fieldMetadata.data} isMutating={fieldMetadata.isMutating} />,
+	(fieldMetadata, props) => <ClearFieldButtonInner field={fieldMetadata.field} isMutating={fieldMetadata.isMutating} />,
 	'ClearFieldButton',
 )

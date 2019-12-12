@@ -1,41 +1,33 @@
 import * as React from 'react'
 import { Component } from '../../../binding'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
-import {
-	MutableEntityCollectionRenderer,
-	MutableEntityCollectionRendererProps,
-} from './MutableEntityCollectionRenderer'
+import { MutableEntityListRenderer, MutableEntityListRendererProps } from './MutableEntityListRenderer'
 
-export interface MultiEditRendererProps
-	extends MutableContentLayoutRendererProps,
-		MutableEntityCollectionRendererProps {}
+export interface MultiEditRendererProps extends MutableContentLayoutRendererProps, MutableEntityListRendererProps {}
 
 export const MultiEditRenderer = Component<MultiEditRendererProps>(
 	({
-		afterContent,
-		beforeContent,
 		children,
-		emptyMessage,
-		enableAddingNew,
-		enableRemove,
-		sortable,
-		wrapperComponent,
 
-		...layoutProps
+		side,
+		title,
+		navigation,
+		headingProps,
+		actions,
+		persistButtonComponent,
+
+		...entityListProps
 	}) => (
-		<MutableContentLayoutRenderer {...layoutProps}>
-			<MutableEntityCollectionRenderer
-				afterContent={afterContent}
-				beforeContent={beforeContent}
-				emptyMessage={emptyMessage}
-				enableAddingNew={enableAddingNew}
-				enableRemove={enableRemove}
-				sortable={sortable}
-				wrapperComponent={wrapperComponent}
-			>
-				{children}
-			</MutableEntityCollectionRenderer>
+		<MutableContentLayoutRenderer
+			side={side}
+			title={title}
+			navigation={navigation}
+			actions={actions}
+			persistButtonComponent={persistButtonComponent}
+			headingProps={headingProps}
+		>
+			<MutableEntityListRenderer {...entityListProps}>{children}</MutableEntityListRenderer>
 		</MutableContentLayoutRenderer>
 	),
-	'',
+	'MultiEditRenderer',
 )

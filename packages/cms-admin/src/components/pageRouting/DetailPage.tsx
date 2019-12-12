@@ -1,4 +1,3 @@
-import { lcfirst } from '@contember/utils'
 import * as React from 'react'
 import { SingleEntityDataProvider } from '../../binding/coreComponents'
 import { ImmutableSingleEntityRenderer, ImmutableSingleEntityRendererProps } from '../bindingFacade'
@@ -10,14 +9,14 @@ export interface DetailPageProps extends SingleEntityPageProps {
 }
 
 const DetailPage: Partial<PageProvider<DetailPageProps>> & React.ComponentType<DetailPageProps> = React.memo(
-	(props: DetailPageProps) => (
-		<SingleEntityDataProvider where={props.where} entityName={props.entityName}>
-			<ImmutableSingleEntityRenderer {...props.rendererProps}>{props.children}</ImmutableSingleEntityRenderer>
+	({ pageName, children, rendererProps, ...entityProps }: DetailPageProps) => (
+		<SingleEntityDataProvider {...entityProps}>
+			<ImmutableSingleEntityRenderer {...rendererProps}>{children}</ImmutableSingleEntityRenderer>
 		</SingleEntityDataProvider>
 	),
 )
 
 DetailPage.displayName = 'DetailPage'
-DetailPage.getPageName = (props: DetailPageProps) => props.pageName || `detail_${lcfirst(props.entityName)}`
+DetailPage.getPageName = (props: DetailPageProps) => props.pageName
 
 export { DetailPage }

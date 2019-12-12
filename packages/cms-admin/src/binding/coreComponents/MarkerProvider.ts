@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { ConnectionMarker, Environment, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../dao'
+import { Environment } from '../dao'
+import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 
 export interface NamedComponent {
 	displayName: string
@@ -9,12 +10,21 @@ export interface EnvironmentDeltaProvider<P extends {} = any> {
 	generateEnvironment: (props: P, oldEnvironment: Environment) => Environment
 }
 
+/*
+ * Components may also return EntityFields which serve as something of a Fragment on the Marker level.
+ */
+
 export interface FieldMarkerProvider<P extends {} = any> {
-	generateFieldMarker: (props: P, environment: Environment) => FieldMarker
+	// It may also return a ReferenceMarker so as to facilitate implementation of conditionally nested fields
+	generateFieldMarker: (props: P, environment: Environment) => FieldMarker | ReferenceMarker | EntityFields
 }
 
 export interface MarkerTreeRootProvider<P extends {} = any> {
-	generateMarkerTreeRoot: (props: P, fields: MarkerTreeRoot['fields'], environment: Environment) => MarkerTreeRoot
+	generateMarkerTreeRoot: (
+		props: P,
+		fields: MarkerTreeRoot['fields'],
+		environment: Environment,
+	) => MarkerTreeRoot | EntityFields
 }
 
 export interface ReferenceMarkerProvider<P extends {} = any> {
@@ -22,11 +32,12 @@ export interface ReferenceMarkerProvider<P extends {} = any> {
 		props: P,
 		fields: ReferenceMarker.Reference['fields'],
 		environment: Environment,
-	) => ReferenceMarker
+	) => ReferenceMarker | EntityFields
 }
 
 export interface ConnectionMarkerProvider<P extends {} = any> {
-	generateConnectionMarker: (props: P, environment: Environment) => ConnectionMarker
+	// It may also return a ReferenceMarker so as to facilitate implementation of conditionally nested connections
+	generateConnectionMarker: (props: P, environment: Environment) => ConnectionMarker | ReferenceMarker | EntityFields
 }
 
 export interface SyntheticChildrenProvider<P extends {} = any> {

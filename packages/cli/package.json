@@ -1,6 +1,6 @@
 {
 	"name": "@contember/cli",
-	"version": "0.2.12",
+	"version": "0.2.13",
 	"bin": {
 		"contember": "./dist/src/cli.js"
 	},
@@ -11,12 +11,12 @@
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
-		"@contember/config-loader": "^0.2.5",
-		"@contember/dic": "^0.2.5",
+		"@contember/config-loader": "^0.2.13",
+		"@contember/dic": "^0.2.13",
 		"@contember/engine-common": "^0.2.5",
 		"@contember/schema": "^0.2.12",
-		"@contember/schema-migrations": "^0.2.12",
 		"@contember/schema-definition": "^0.2.12",
+		"@contember/schema-migrations": "^0.2.13",
 		"@contember/schema-utils": "^0.2.12",
 		"fs-extra": "^8.1.0",
 		"get-port": "^5.0.0",

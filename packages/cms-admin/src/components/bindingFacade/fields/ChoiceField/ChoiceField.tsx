@@ -6,7 +6,7 @@ import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'
 
 export type ChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceFieldData.ChoiceArity> = (
 	| StaticChoiceFieldProps<Arity>
-	| DynamicChoiceFieldProps<Arity>
+	| DynamicChoiceFieldProps
 ) &
 	ChoiceFieldData.MetadataPropsByArity
 

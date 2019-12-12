@@ -19,7 +19,6 @@ import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
 export interface RepeaterInnerProps
 	extends Omit<RepeaterContainerProps, 'children' | 'entities' | 'addNew' | 'isEmpty'>,
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
-	entityList: EntityListAccessor
 	initialRowCount?: number
 	children: React.ReactNode
 

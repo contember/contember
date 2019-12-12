@@ -1,7 +1,6 @@
-import { Editor } from 'slate'
 import { RichEditorPluginConfig, simpleHtmlSerializerRule } from './utils'
 import * as React from 'react'
-import { RenderMarkProps } from 'slate-react'
+import { Editor, RenderMarkProps } from 'slate-react'
 
 export const LINK: RichEditorPluginConfig = {
 	node: 'mark',

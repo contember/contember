@@ -124,7 +124,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 				: props.serializer === RichEditorSerializer.JSON
 				? new JsonSerializer(this.htmlSerializer)
 				: assertNever(props.serializer)
-		this.plugins = configs.map(c => c.plugin)
+		this.plugins = configs.map((c): Plugin => c.plugin)
 		this.state = { value: this.serializer.deserialize(props.value) }
 	}
 
@@ -248,7 +248,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 			return this.onMarkClickCache
 				.set(config, () => {
 					if (this.coreEditor) {
-						return config.onToggle(this.coreEditor)
+						return config.onToggle((this.coreEditor as any) as Editor)
 					}
 				})
 				.get(config)!

@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Editor, Mark } from 'slate'
+import { Mark } from 'slate'
 import { Rule } from 'slate-html-serializer'
-import { Plugin } from 'slate-react'
+import { Editor, Plugin } from 'slate-react'
 import isKeyHotkey from 'is-hotkey'
 
 type NodeType = 'mark' | 'block'

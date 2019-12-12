@@ -20,7 +20,7 @@ install:
 
 build:
   stage: build
-  image: node:12
+  image: node:13
 
   script:
     - npm run build

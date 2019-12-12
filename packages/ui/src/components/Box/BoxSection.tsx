@@ -18,7 +18,14 @@ export const BoxSection = React.memo(({ actions, children, heading, dragHandleCo
 	const headingDepth = React.useContext(HeadingDepthContext)
 
 	return (
-		<div className={cn('box-section', toViewClass(`depth-${Math.max(boxDepth - 1, 1)}`, true))}>
+		<div
+			className={cn(
+				'box-section',
+				toViewClass(`depth-${Math.max(boxDepth - 1, 1)}`, true),
+				toViewClass('hasHeading', !!heading),
+				toViewClass('hasActions', !!actions),
+			)}
+		>
 			{Handle && (
 				<div className="box-section-handle">
 					<Handle>

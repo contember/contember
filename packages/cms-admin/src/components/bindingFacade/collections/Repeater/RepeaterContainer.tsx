@@ -4,6 +4,7 @@ import { EntityListAccessor } from '../../../../binding'
 import { AddNewEntityButton, AddNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
 export interface RepeaterContainerProps {
+	entityList: EntityListAccessor
 	isEmpty: boolean
 	label: React.ReactNode
 	addNew: (preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void

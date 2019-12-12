@@ -1,4 +1,4 @@
-import { Dropdown, FormGroup } from '@contember/ui'
+import { Dropdown, DropdownProps, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
 import { Icon } from '@contember/ui'
@@ -6,29 +6,32 @@ import { Icon } from '@contember/ui'
 export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
 
 export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
+	const buttonProps: DropdownProps['buttonProps'] = React.useMemo(
+		() => ({
+			children: (
+				<>
+					<Icon
+						blueprintIcon="add"
+						style={{
+							marginRight: '0.2em',
+							position: 'relative',
+							top: '-0.071em',
+						}}
+					/>
+					{'Add'}
+				</>
+			),
+			disabled: props.isMutating,
+			distinction: 'seamless',
+			flow: 'block',
+			justification: 'justifyStart',
+		}),
+		[props.isMutating],
+	)
+
 	return (
 		<FormGroup label={undefined}>
-			<Dropdown
-				buttonProps={{
-					children: (
-						<>
-							<Icon
-								blueprintIcon="add"
-								style={{
-									marginRight: '0.2em',
-									position: 'relative',
-									top: '-0.071em',
-								}}
-							/>
-							{'Add'}
-						</>
-					),
-					disabled: props.isMutating,
-					distinction: 'seamless',
-					flow: 'block',
-				}}
-				alignment="center"
-			>
+			<Dropdown buttonProps={buttonProps} alignment="center">
 				{({ requestClose }) => (
 					<AddNewBlockButtonInner
 						normalizedBlockProps={props.normalizedBlockProps}

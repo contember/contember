@@ -32,6 +32,7 @@ export const AddNewEntityButton = React.memo(
 					isLoading={isMutating}
 					distinction="seamless"
 					flow="block"
+					justification="justifyStart"
 					{...buttonProps}
 				>
 					<Icon {...defaultIconProps} {...iconProps} />

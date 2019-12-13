@@ -64,8 +64,8 @@
 			"modification": "createColumn",
 			"entityName": "Post",
 			"field": {
-				"name": "perex",
-				"columnName": "perex",
+				"name": "content",
+				"columnName": "content",
 				"nullable": false,
 				"type": "String",
 				"columnType": "text"
@@ -119,19 +119,19 @@
 									"create": {
 										"id": true,
 										"title": true,
-										"perex": true,
+										"content": true,
 										"image": true
 									},
 									"read": {
 										"id": true,
 										"title": true,
-										"perex": true,
+										"content": true,
 										"image": true
 									},
 									"update": {
 										"id": true,
 										"title": true,
-										"perex": true,
+										"content": true,
 										"image": true
 									},
 									"delete": true

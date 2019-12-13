@@ -10,7 +10,7 @@ export class ServerRunner {
 		const port = this.config.server.port
 		return this.koa.listen(port, () => {
 			console.log(success(`Tenant API running on http://localhost:${port}/tenant`))
-			this.config.projects.forEach(project => {
+			Object.values(this.config.projects).forEach(project => {
 				const url = `http://localhost:${port}/system/${project.slug}`
 				console.log(success(`System API for project ${project.slug} running on ${url}`))
 				project.stages.forEach(stage => {

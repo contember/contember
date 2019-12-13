@@ -4,7 +4,7 @@ import { copy, pathExists } from 'fs-extra'
 
 import { resourcesDir } from '../pathUtils'
 import { execDockerCompose, hasConfiguredPorts, readDefaultDockerComposeConfig } from './dockerCompose'
-import { execCommand } from './commands'
+import { runCommand } from './commands'
 import getPort from 'get-port'
 import { Input } from '../cli/Input'
 import { readYaml } from './yaml'
@@ -74,7 +74,7 @@ export const getInstanceStatus = async ({
 	}
 
 	const containerInfo = JSON.parse(
-		await execCommand('docker', ['inspect', ...runningContainers], { cwd: instanceDirectory }),
+		await runCommand('docker', ['inspect', ...runningContainers], { cwd: instanceDirectory }).output,
 	)
 	const statusList: ServiceStatus[] = []
 	for (const container of containerInfo) {
@@ -128,7 +128,7 @@ const parsePortMapping = (
 				...host.map(it => ({
 					containerPort: Number(containerPort.substr(0, containerPort.indexOf('/'))),
 					hostIp: it.HostIp,
-					hostPort: it.HostPort,
+					hostPort: Number(it.HostPort),
 				})),
 			],
 			[],
@@ -262,17 +262,22 @@ export const resolveInstanceDockerConfig = async ({
 	}
 
 	const projectConfig: any = await readYaml(join(instanceDirectory, 'api/config.yaml'))
+	const s3Endpoint = 'http://localhost:' + assignedPorts.s3
 	const env: Record<string, string> = {
-		[`TENANT_DB_HOST`]: 'db',
-		[`TENANT_DB_PORT`]: '5432',
-		[`TENANT_DB_USER`]: 'contember',
-		[`TENANT_DB_PASSWORD`]: 'contember',
-		[`TENANT_DB_NAME`]: 'tenant',
-		...projectConfig.projects
-			.map(
-				(project: any): Record<string, string> =>
-					getProjectDockerEnv(project.slug, 'http://localhost:' + assignedPorts.s3),
-			)
+		SERVER_PORT: '4000',
+		TENANT_DB_NAME: 'tenant',
+		DEFAULT_DB_HOST: 'db',
+		DEFAULT_DB_PORT: '5432',
+		DEFAULT_DB_USER: 'contember',
+		DEFAULT_DB_PASSWORD: 'contember',
+		DEFAULT_S3_BUCKET: 'contember',
+		DEFAULT_S3_REGION: '',
+		DEFAULT_S3_ENDPOINT: s3Endpoint,
+		DEFAULT_S3_KEY: 'contember',
+		DEFAULT_S3_SECRET: 'contember',
+		DEFAULT_S3_PROVIDER: 'minio',
+		...Object.keys(projectConfig.projects)
+			.map((slug: string): Record<string, string> => getProjectDockerEnv(slug))
 			.reduce((acc: Record<string, string>, it: Record<string, string>) => ({ ...acc, ...it }), {}),
 	}
 	config.services.api.environment = {

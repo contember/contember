@@ -1,43 +1,52 @@
-import { spawn } from 'child_process'
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { Readable, Writable } from 'stream'
 
-export const execCommand = (
+export type RunningCommand = { child: ChildProcessWithoutNullStreams; output: Promise<string> }
+export const runCommand = (
 	command: string,
 	args: string[],
 	options: { cwd: string; stdin?: Readable; stdout?: Writable; stderr?: Writable; env?: NodeJS.ProcessEnv },
-): Promise<string> => {
-	return new Promise((resolve, reject) => {
-		const child = spawn(command, args, {
-			cwd: options.cwd,
-			env: { ...process.env, ...(options.env || {}) },
-		})
-		if (options.stdin) {
-			options.stdin.pipe(child.stdin)
-		}
+): RunningCommand => {
+	const child = spawn(command, args, {
+		cwd: options.cwd,
+		env: { ...process.env, ...(options.env || {}) },
+	})
+	if (options.stdin) {
+		options.stdin.pipe(child.stdin)
+	}
 
-		let stdout = ''
-		let stderr = ''
+	let stdout = ''
+	let stderr = ''
 
-		child.stdout.on('data', (chunk): void => {
-			stdout += chunk.toString()
-		})
+	child.stdout.on('data', (chunk): void => {
+		stdout += chunk.toString()
+	})
 
-		child.stderr.on('data', (chunk): void => {
-			stderr += chunk.toString()
-		})
+	child.stderr.on('data', (chunk): void => {
+		stderr += chunk.toString()
+	})
+	if (options.stdout) {
+		child.stdout.pipe(options.stdout)
+	}
+	if (options.stderr) {
+		child.stderr.pipe(options.stderr)
+	}
 
+	const output = new Promise<string>((resolve, reject) => {
 		child.on('exit', (exitCode): void => {
 			if (exitCode === 0) {
 				resolve(stdout)
 			} else {
-				reject({ exitCode, stderr })
+				reject(new ChildProcessError(exitCode, stderr))
 			}
 		})
-		if (options.stdout) {
-			child.stdout.pipe(options.stdout)
-		}
-		if (options.stderr) {
-			child.stderr.pipe(options.stderr)
-		}
 	})
+
+	return { output, child }
+}
+
+export class ChildProcessError extends Error {
+	constructor(public readonly exitCode: number | null, public readonly stderr: string) {
+		super(`Command has failed(${exitCode}): ${stderr} `)
+	}
 }

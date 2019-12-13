@@ -1,9 +1,8 @@
 import { promises as fs } from 'fs'
-import jsyaml from 'js-yaml'
 import { pathExists } from 'fs-extra'
 import { join } from 'path'
 import { Merger } from '@contember/config-loader'
-import { execCommand } from './commands'
+import { runCommand, RunningCommand } from './commands'
 import { Readable, Writable } from 'stream'
 import { JsonUpdateCallback, readYaml, updateYaml } from './yaml'
 
@@ -46,13 +45,19 @@ export const hasConfiguredPorts = (config: any, service: string): boolean => {
 	const ports = config?.[service]?.ports
 	return ports && Array.isArray(ports) && ports.length > 0
 }
-
 export const execDockerCompose = async (
 	args: string[],
 	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv },
 ): Promise<string> => {
+	return await runDockerCompose(args, options).output
+}
+
+export const runDockerCompose = (
+	args: string[],
+	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv },
+): RunningCommand => {
 	const input = new Readable()
-	const command = execCommand('docker-compose', args, {
+	const command = runCommand('docker-compose', args, {
 		cwd: options.cwd,
 		stdout: options.stdout === false ? undefined : options.stdout || process.stdout,
 		stderr: process.stderr,
@@ -64,5 +69,5 @@ export const execDockerCompose = async (
 	})
 	input.push(options.stdin)
 	input.push(null)
-	return await command
+	return command
 }

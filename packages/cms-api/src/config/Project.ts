@@ -6,7 +6,7 @@ interface Project {
 	readonly directory?: string
 	readonly name: string
 	readonly stages: Array<Project.Stage>
-	readonly dbCredentials: DatabaseCredentials
+	readonly db: DatabaseCredentials
 	readonly ignoreMigrations?: boolean
 }
 

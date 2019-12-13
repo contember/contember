@@ -23,10 +23,10 @@ const createContainer = (debug: boolean) =>
 			tenant: {
 				db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
 			},
-			projects: [
-				{
+			projects: {
+				test: {
 					directory: './',
-					dbCredentials: dbCredentials(String(process.env.TEST_DB_NAME)),
+					db: dbCredentials(String(process.env.TEST_DB_NAME)),
 					name: 'test',
 					slug: 'test',
 					s3: {
@@ -40,7 +40,7 @@ const createContainer = (debug: boolean) =>
 					},
 					stages: [{ name: 'prod', slug: 'prod' }],
 				},
-			],
+			},
 			server: {
 				port: 0,
 			},

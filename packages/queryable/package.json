@@ -1,6 +1,6 @@
 {
 	"name": "@contember/queryable",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},

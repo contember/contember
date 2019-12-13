@@ -1,4 +1,4 @@
-import { isIt } from '@contember/utils'
+import { isIt } from '../../utils'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Input, Model } from '@contember/schema'
 import Path from './Path'

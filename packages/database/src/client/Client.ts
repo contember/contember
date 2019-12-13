@@ -3,13 +3,12 @@ import { DatabaseQueryable } from '../queryable'
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
 import { QueryHandler } from '@contember/queryable'
-import { Interface } from '@contember/utils'
 
 class Client<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike>
 	implements Connection.Queryable {
 	constructor(public readonly connection: ConnectionType, public readonly schema: string) {}
 
-	get eventManager(): Interface<EventManager> {
+	get eventManager(): EventManager {
 		return this.connection.eventManager
 	}
 

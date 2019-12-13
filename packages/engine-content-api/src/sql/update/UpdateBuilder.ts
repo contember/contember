@@ -1,4 +1,4 @@
-import { tuple } from '@contember/utils'
+import { tuple } from '../../utils'
 import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { resolveValue } from '../utils'
@@ -7,7 +7,6 @@ import { QueryBuilder } from '@contember/database'
 import { Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
 import Path from '../select/Path'
-import { ConditionBuilder } from '@contember/database'
 
 type ColumnValue = {
 	value: PromiseLike<Value.AtomicValue | undefined>

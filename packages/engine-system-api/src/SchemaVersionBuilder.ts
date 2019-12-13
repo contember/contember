@@ -1,5 +1,5 @@
 import { Schema } from '@contember/schema'
-import { tuple } from '@contember/utils'
+import { tuple } from './utils'
 import { emptySchema } from '@contember/schema-utils'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'

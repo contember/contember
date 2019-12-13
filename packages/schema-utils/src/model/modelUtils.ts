@@ -1,4 +1,4 @@
-import { isIt } from '@contember/utils'
+import { isIt } from '../utils'
 import { Model } from '@contember/schema'
 import { NamingHelper } from './NamingHelper'
 

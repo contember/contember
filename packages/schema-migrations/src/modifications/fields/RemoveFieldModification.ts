@@ -1,5 +1,5 @@
 import { acceptFieldVisitor, NamingHelper } from '@contember/schema-utils'
-import { isIt } from '@contember/utils'
+import { isIt } from '../../utils/isIt'
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'

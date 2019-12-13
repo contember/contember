@@ -7,9 +7,6 @@
 	"references": [
 		{
 			"path": "../../schema/src"
-		},
-		{
-			"path": "../../utils/src"
 		}
 	]
 }

@@ -1,4 +1,4 @@
-import { Client, Connection, EventManager } from '@contember/database'
+import { Client, Connection, EventManagerImpl } from '@contember/database'
 
 export interface ExpectedQuery {
 	sql: string
@@ -11,7 +11,7 @@ export const createConnectionMock = (
 	assertFunction: (expected: any, actual: any, message?: string) => void | never,
 ): Connection.TransactionLike & Connection.ClientFactory => {
 	return new (class implements Connection.TransactionLike {
-		public readonly eventManager = new EventManager()
+		public readonly eventManager = new EventManagerImpl()
 
 		query<Row extends Record<string, any>>(
 			sql: string,

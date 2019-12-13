@@ -1,9 +1,8 @@
 import { Input, Model } from '@contember/schema'
-import { isIt } from '@contember/utils'
+import { filterObject, isIt } from '../utils'
 import UpdateInputProcessor from './UpdateInputProcessor'
 import * as Context from './InputContext'
-import { filterObject } from '../utils/object'
-import { UserError } from '../graphQlResolver/UserError'
+import { UserError } from '../graphQlResolver'
 
 export default class UpdateInputVisitor<Result>
 	implements

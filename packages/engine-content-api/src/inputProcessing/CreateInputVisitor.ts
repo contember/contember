@@ -1,4 +1,4 @@
-import { isIt } from '@contember/utils'
+import { isIt } from '../utils'
 import { Input, Model } from '@contember/schema'
 import CreateInputProcessor from './CreateInputProcessor'
 import * as Context from './InputContext'

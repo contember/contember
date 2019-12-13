@@ -1,4 +1,4 @@
-import { Literal } from './Literal'
+import { Literal } from '../Literal'
 
 export const wrapIdentifier = (value: string) => '"' + value.replace(/"/g, '""') + '"'
 

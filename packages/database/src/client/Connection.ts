@@ -1,8 +1,7 @@
-import { Pool, PoolClient, PoolConfig } from 'pg'
-import { EventManager } from './EventManager'
+import { Pool, PoolConfig } from 'pg'
+import { EventManager, EventManagerImpl } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
-import { Interface } from '@contember/utils'
 import { executeQuery } from './execution'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory {
@@ -11,7 +10,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 	constructor(
 		public readonly config: PoolConfig,
 		private readonly queryConfig: Connection.QueryConfig,
-		public readonly eventManager: EventManager = new EventManager(),
+		public readonly eventManager: EventManager = new EventManagerImpl(),
 	) {
 		this.pool = new Pool(config)
 	}
@@ -25,7 +24,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 	): Promise<Result> {
 		const client = await this.pool.connect()
 		await client.query('BEGIN')
-		const transaction = new Transaction(client, new EventManager(this.eventManager), this.queryConfig)
+		const transaction = new Transaction(client, new EventManagerImpl(this.eventManager), this.queryConfig)
 		try {
 			const result = await callback(transaction)
 
@@ -73,7 +72,7 @@ namespace Connection {
 	}
 
 	export interface Queryable {
-		readonly eventManager: Interface<EventManager>
+		readonly eventManager: EventManager
 
 		query<Row extends Record<string, any>>(
 			sql: string,

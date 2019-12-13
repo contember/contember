@@ -32,7 +32,7 @@ Instead of `npm run bootstrap` you may also use `npm run bootstrap:hoist`. The h
 
 ### Running and debugging individual tests in PhpStorm
 
-Currently it is not possible to use a remote Node.js interpreter for Mocha tests so you need a local node interpreter. 
+Currently it is not possible to use a remote Node.js interpreter for Mocha tests so you need a local node interpreter.
 
 - Go to `Run / Edit configurations / Templates / Mocha`
 - Paste following ENV variables
@@ -42,10 +42,10 @@ TEST_DB_HOST=127.0.0.1
 TEST_DB_PASSWORD=contember
 TEST_DB_NAME=tests
 TEST_DB_PORT=4479
-TEST_CWD_SUFFIX=/packages/cms-api
+TEST_CWD_SUFFIX=/packages/engine-server
 NODE_ENV=development
 TEST_DB_USER=contember
 ```
 - This setup will use a database from docker-compose and also there is different tsconfig file optimized for test run.
 - set Extra mocha options to `--require ts-node/register --timeout 15000`
-- Go to test file and run or debug it  
+- Go to test file and run or debug it

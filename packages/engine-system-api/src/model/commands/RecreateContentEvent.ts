@@ -1,7 +1,7 @@
 import { UuidProvider } from '../../utils/uuid'
 import { Client } from '@contember/database'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../../utils'
 
 class RecreateContentEvent {
 	constructor(

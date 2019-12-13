@@ -129,10 +129,13 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 		await printInstanceStatus({ instanceDirectory })
 
-		const { child, output } = runDockerCompose(['-f', '-', 'logs', '-f', 'api', ...(nodeAdminRuntime ? [] : 'admin')], {
-			cwd: instanceDirectory,
-			stdin: configYaml,
-		})
+		const { child, output } = runDockerCompose(
+			['-f', '-', 'logs', '-f', 'api', ...(nodeAdminRuntime ? [] : ['admin'])],
+			{
+				cwd: instanceDirectory,
+				stdin: configYaml,
+			},
+		)
 		childs.push(child)
 		output.catch(e => {
 			console.error('Logs command has failed')

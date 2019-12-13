@@ -1,2 +1,2 @@
 export * from './assertNever'
-export * from './utils'
+export * from './sql'

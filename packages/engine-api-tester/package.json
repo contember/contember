@@ -14,7 +14,6 @@
 		"@contember/schema-definition": "^0.3.0",
 		"@contember/schema-migrations": "^0.3.0",
 		"@contember/schema-utils": "^0.3.0",
-		"@contember/utils": "^0.3.0",
 		"graphql": "^14.5.4",
 		"graphql-errors": "^2.1.0",
 		"graphql-tools": "^4.0.5",

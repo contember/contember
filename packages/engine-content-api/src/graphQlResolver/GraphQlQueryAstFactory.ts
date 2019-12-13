@@ -1,4 +1,4 @@
-import { isIt } from '@contember/utils'
+import { isIt } from '../utils'
 import {
 	FieldNode as GraphQlFieldNode,
 	FragmentSpreadNode,

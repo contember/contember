@@ -10,7 +10,6 @@
 		"@contember/engine-common": "^0.3.0",
 		"@contember/schema": "^0.3.0",
 		"@contember/schema-utils": "^0.3.0",
-		"@contember/utils": "^0.3.0",
 		"fast-deep-equal": "^2.0.1",
 		"node-pg-migrate": "^3.22.1",
 		"rfc6902": "^3.0.4"

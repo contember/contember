@@ -1,5 +1,5 @@
 import { Client, SelectBuilder } from '@contember/database'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import { Acl, Model, Schema } from '@contember/schema'
 import PermissionsByIdentityFactory from './PermissionsByIdentityFactory'
 import PredicateFactory from './PredicateFactory'

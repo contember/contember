@@ -1,6 +1,6 @@
 import { Model, Schema } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { isIt } from '@contember/utils'
+import { isIt } from './utils/isIt'
 import { SchemaMigrator } from './SchemaMigrator'
 import ModificationBuilder from './modifications/ModificationBuilder'
 import Migration from './Migration'

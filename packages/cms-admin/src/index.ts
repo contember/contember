@@ -1,6 +1,7 @@
 export * from './components/LayoutDefault'
 export * from './acl'
 export * from './binding'
+export * from './bootstrap'
 export * from './components'
 export * from './tenant'
 export { ProjectConfig } from './state/projectsConfigs'

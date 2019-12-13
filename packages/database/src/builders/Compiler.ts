@@ -1,5 +1,4 @@
-import { assertNever } from '@contember/utils'
-import { aliasLiteral, prependSchema, wrapIdentifier } from '../utils'
+import { assertNever, aliasLiteral, prependSchema, wrapIdentifier } from '../utils'
 import { SelectBuilder } from './SelectBuilder'
 import { Literal } from '../Literal'
 import { DeleteBuilder } from './DeleteBuilder'

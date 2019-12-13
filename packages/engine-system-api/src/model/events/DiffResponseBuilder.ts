@@ -1,6 +1,6 @@
 import { AnyEvent, EventType } from '@contember/engine-common'
 import { Event as ApiEvent, EventType as ApiEventType } from '../../schema'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../../utils'
 import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
 
 type EventWithMeta = AnyEvent & { dependencies: string[]; permission: EventsPermissionsVerifier.EventPermission }

@@ -1,4 +1,4 @@
-import { tuple } from '@contember/utils'
+import { tuple } from '../utils'
 import EntitySelector from './EntitySelector'
 import { Acl, Model } from '@contember/schema'
 import FieldSelector from './FieldSelector'

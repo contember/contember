@@ -31,7 +31,7 @@ export class InstanceLogsCommand extends Command<Args, Options> {
 			process.exit(0)
 		})
 
-		logsProcess = await runDockerCompose(['-f', '-', 'logs', '-f'], {
+		logsProcess = runDockerCompose(['-f', '-', 'logs', '-f'], {
 			cwd: instanceDirectory,
 			stdin: configYaml,
 		}).child

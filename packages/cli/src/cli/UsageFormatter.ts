@@ -6,13 +6,14 @@ class UsageFormatter {
 	public static format(args: Argument[], options: Option[]): string {
 		let parts = []
 		for (let arg of args) {
-			const name = arg.name + (arg.description ? ` ${arg.description}` : '')
+			const name = arg.name
+			const argDescription = arg.description ? ` (${arg.description})` : ''
 			if (arg.variadic) {
-				parts.push(`[...${name}]`)
+				parts.push(`[...${name}${argDescription}]`)
 			} else if (arg.optional) {
-				parts.push(`[${name}]`)
+				parts.push(`[${name}${argDescription}]`)
 			} else {
-				parts.push(`<${name}>`)
+				parts.push(`<${name}${argDescription}>`)
 			}
 		}
 		for (let opt of options) {
@@ -35,6 +36,9 @@ class UsageFormatter {
 			let optionDescription = `${name}${valueDescription}`
 			if (opt.mode === Option.Mode.VALUE_ARRAY) {
 				optionDescription = `${optionDescription} [... ${optionDescription}]`
+			}
+			if (opt.description) {
+				optionDescription += ` (${opt.description})`
 			}
 			if (!opt.required) {
 				optionDescription = `[${optionDescription}]`

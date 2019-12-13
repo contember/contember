@@ -72,7 +72,7 @@ module.exports = ({ production }) => ({
 		// https://github.com/webpack/webpack-dev-server/issues/60#issuecomment-103411179
 		fs: 'empty',
 		net: 'empty',
-		process: false
+		process: production
 	},
 	plugins: [
 		// new AssetsPlugin(),

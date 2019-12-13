@@ -5,10 +5,11 @@ import { promises as fs } from 'fs'
 import { listDirectories } from './fs'
 import { InstanceEnvironment, validateInstanceName } from './instance'
 import { updateYaml } from './yaml'
+import { projectNameToEnvName } from '@contember/engine-common'
 
 export const validateProjectName = (name: string) => {
-	if (!name.match(/^[a-z][a-z0-9]*$/)) {
-		throw new Error('Invalid project name. It can contain only alphanumeric letters and cannot start with a number')
+	if (!name.match(/^[a-z][-a-z0-9]*$/)) {
+		throw new Error('Invalid project name. It can contain only alphanumeric letters, dash and must start with a letter')
 	}
 }
 export const listProjects = async (args: { workspaceDirectory: string }) => {
@@ -38,52 +39,23 @@ export const registerProjectToInstance = async (
 	const path = join(args.instanceDirectory, 'admin/src/projects.ts')
 	const code = `export { default as ${args.projectName} } from '../../../../projects/${args.projectName}/admin'\n`
 	await fs.appendFile(path, code, { encoding: 'utf8' })
-	const projectEnvName = args.projectName.toUpperCase()
 
 	await updateYaml(join(args.instanceDirectory, 'api/config.yaml'), (config, { merge }) =>
 		merge(config, {
-			projects: [
-				{
-					slug: args.projectName,
-					name: args.projectName,
-					directory: `${args.projectName}/api`,
-					stages: [{ slug: 'live', name: 'Live' }],
-					dbCredentials: {
-						host: `%env.${projectEnvName}_DB_HOST%`,
-						port: `%env.${projectEnvName}_DB_PORT::number%`,
-						user: `%env.${projectEnvName}_DB_USER%`,
-						password: `%env.${projectEnvName}_DB_PASSWORD%`,
-						database: `%env.${projectEnvName}_DB_NAME%`,
-					},
-					s3: {
-						bucket: `%env.${projectEnvName}_S3_BUCKET%`,
-						prefix: `%env.${projectEnvName}_S3_PREFIX%`,
-						region: `%env.${projectEnvName}_S3_REGION%`,
-						endpoint: `%env.${projectEnvName}_S3_ENDPOINT%`,
-						credentials: {
-							key: `%env.${projectEnvName}_S3_KEY%`,
-							secret: `%env.${projectEnvName}_S3_SECRET%`,
-						},
-					},
+			projects: {
+				[args.projectName]: {
+					stages: { live: null },
 				},
-			],
+			},
 		}),
 	)
 }
 
-export const getProjectDockerEnv = (projectName: string, s3Endpoint: string): Record<string, string> => {
-	const projectEnvName = projectName.toUpperCase()
+export const getProjectDockerEnv = (projectName: string): Record<string, string> => {
+	validateProjectName(projectName)
+	const projectEnvName = projectNameToEnvName(projectName)
 	return {
-		[`${projectEnvName}_DB_HOST`]: 'db',
-		[`${projectEnvName}_DB_PORT`]: '5432',
-		[`${projectEnvName}_DB_USER`]: 'contember',
-		[`${projectEnvName}_DB_PASSWORD`]: 'contember',
 		[`${projectEnvName}_DB_NAME`]: projectName,
-		[`${projectEnvName}_S3_BUCKET`]: 'contember',
 		[`${projectEnvName}_S3_PREFIX`]: projectName,
-		[`${projectEnvName}_S3_REGION`]: '',
-		[`${projectEnvName}_S3_ENDPOINT`]: s3Endpoint,
-		[`${projectEnvName}_S3_KEY`]: 'contember',
-		[`${projectEnvName}_S3_SECRET`]: 'contember',
 	}
 }

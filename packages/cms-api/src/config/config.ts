@@ -1,8 +1,15 @@
 import Project from './Project'
-import { ConfigLoader, Merger } from '@contember/config-loader'
+import {
+	ConfigLoader,
+	createObjectParametersResolver,
+	Merger,
+	resolveParameters,
+	UndefinedParameterError,
+} from '@contember/config-loader'
 import { deprecated } from '../core/console/messages'
 import { DatabaseCredentials } from '@contember/engine-common'
 import { S3Config } from '@contember/engine-s3-plugin/dist/src/Config'
+import { tuple, ucfirst } from '@contember/utils'
 
 export type ProjectWithS3 = Project & { s3?: S3Config }
 
@@ -10,7 +17,7 @@ export interface Config {
 	tenant: {
 		db: DatabaseCredentials
 	}
-	projects: Array<ProjectWithS3>
+	projects: Record<string, ProjectWithS3>
 	server: {
 		port: number
 	}
@@ -122,38 +129,43 @@ function checkTenantStructure(json: unknown): Config['tenant'] {
 	return { db: checkDatabaseCredentials(json.db, 'tenant.db') }
 }
 
-function checkStageStructure(json: unknown, path: string): Project.Stage {
+function checkStageStructure(json: unknown, slug: string, path: string): Project.Stage {
+	json = json || {}
 	if (!isObject(json)) {
 		return typeError(path, json, 'object')
 	}
 
-	if (!hasStringProperty(json, 'slug')) {
-		return typeError(path + '.slug', json.slug, 'string')
-	}
-	if (!hasStringProperty(json, 'name')) {
+	if (json.name && !hasStringProperty(json, 'name')) {
 		return typeError(path + '.name', json.name, 'string')
 	}
-	return { ...json }
+	return { name: ucfirst(slug), ...json, slug }
 }
 
-function checkProjectStructure(json: unknown, path: string): ProjectWithS3 {
+function checkProjectStructure(json: unknown, slug: string, path: string): ProjectWithS3 {
 	if (!isObject(json)) {
 		return typeError(path, json, 'object')
 	}
 
-	if (!hasStringProperty(json, 'slug')) {
-		return typeError(path + '.slug', json.slug, 'string')
-	}
-	if (!hasStringProperty(json, 'name')) {
+	if (json.name && !hasStringProperty(json, 'name')) {
 		return typeError(path + '.name', json.name, 'string')
 	}
-	if (!hasArrayProperty(json, 'stages')) {
-		return error(`Property ${path}.stages should be an array in config file`)
+	if (!isObject(json.stages)) {
+		return error(`Property ${path}.stages should be an object in config file`)
 	}
+	if (json.dbCredentials) {
+		console.warn(`${path}.dbCredentials is deprecated, use ${path}.db instead`)
+		json.db = json.dbCredentials
+	}
+	const stages = Object.entries(json.stages).map(([slug, value]) =>
+		checkStageStructure(value, slug, `${path}.stages.${slug}`),
+	)
 	return {
+		name: ucfirst(slug).replace(/-/g, ' '),
+		directory: `${slug}/api`,
 		...json,
-		stages: json.stages.map((stage, i) => checkStageStructure(stage, `${path}.stages${i}`)),
-		dbCredentials: checkDatabaseCredentials(json.dbCredentials, `${path}.dbCredentials`),
+		slug,
+		stages: stages,
+		db: checkDatabaseCredentials(json.db, `${path}.db`),
 		s3: checkS3Config(json.s3, `${path}.s3`),
 	}
 }
@@ -182,29 +194,121 @@ function checkConfigStructure(json: unknown): Config {
 	if (!isObject(json)) {
 		return error('Invalid input type')
 	}
-	if (!hasArrayProperty(json, 'projects')) {
-		return error('Property projects should be an array in config file')
+	if (!isObject(json.projects)) {
+		return error('Property projects should be an object in config file')
 	}
 
+	const projects = Object.entries(json.projects).map(([slug, value]) =>
+		tuple(slug, checkProjectStructure(value, slug, `projects.${slug}`)),
+	)
 	return {
 		...json,
-		projects: json.projects.map((it, i) => checkProjectStructure(it, `projects[${i}]`)),
+		projects: Object.fromEntries(projects),
 		tenant: checkTenantStructure(json.tenant),
 		server: checkServerStructure(json.server),
 	}
 }
 
+const projectNameToEnvName = (projectName: string): string => {
+	return projectName.toUpperCase().replace(/-/g, '_')
+}
+
 export async function readConfig(...filenames: string[]): Promise<Config> {
 	const loader = new ConfigLoader()
 
-	const configs = await Promise.all(
-		filenames.map(it =>
-			loader.load(it, {
-				env: process.env,
-			}),
-		),
-	)
-	const config = Merger.merge(...configs)
+	const configs = await Promise.all(filenames.map(it => loader.load(it)))
+	const env: Record<string, string> = {
+		DEFAULT_DB_PORT: '5432',
+		DEFAULT_S3_PREFIX: '',
+		DEFAULT_S3_ENDPOINT: '',
+		DEFAULT_S3_REGION: 'us-east-1',
+		DEFAULT_S3_PROVIDER: 'aws',
+		...process.env,
+	}
+	const defaultConfig: any = {
+		tenant: {
+			db: {
+				host: `%tenant.env.DB_HOST%`,
+				port: `%tenant.env.DB_PORT::number%`,
+				user: `%tenant.env.DB_USER%`,
+				password: `%tenant.env.DB_PASSWORD%`,
+				database: `%tenant.env.DB_NAME%`,
+			},
+		},
+		projectDefaults: {
+			db: {
+				host: `%project.env.DB_HOST%`,
+				port: `%project.env.DB_PORT::number%`,
+				user: `%project.env.DB_USER%`,
+				password: `%project.env.DB_PASSWORD%`,
+				database: `%project.env.DB_NAME%`,
+			},
+		},
+		server: {
+			port: '%env.CONTEMBER_PORT::number%',
+		},
+	}
 
-	return checkConfigStructure(config)
+	const hasS3config = Object.keys(env).find(it => it.endsWith('_S3_KEY'))
+	if (hasS3config) {
+		defaultConfig.projectDefaults.s3 = {
+			bucket: `%project.env.S3_BUCKET%`,
+			prefix: `%project.env.S3_PREFIX%`,
+			region: `%project.env.S3_REGION%`,
+			endpoint: `%project.env.S3_ENDPOINT%`,
+			provider: '%project.env.S3_PROVIDER%',
+			credentials: {
+				key: `%project.env.S3_KEY%`,
+				secret: `%project.env.S3_SECRET%`,
+			},
+		}
+	}
+
+	let { projectDefaults, ...config } = Merger.merge(defaultConfig, ...configs)
+	if (typeof projectDefaults === 'object' && projectDefaults !== null && typeof config.projects === 'object') {
+		const projectsWithDefaults = Object.entries(config.projects).map(([slug, project]) =>
+			tuple(slug, Merger.merge(projectDefaults as any, project as any)),
+		)
+		config.projects = Object.fromEntries(projectsWithDefaults)
+	}
+	const parametersResolver = createObjectParametersResolver({ env })
+	config = resolveParameters(config, (parts, path, dataResolver) => {
+		if (parts[0] === 'project') {
+			if (path[0] !== 'projects' || typeof path[1] !== 'string') {
+				throw new Error(`Invalid use of ${parts.join('.')} variable in path ${path.join('.')}.`)
+			}
+			const projectSlug = path[1]
+			if (parts[1] === 'env') {
+				const envName = parts[2]
+				const projectEnvName = projectNameToEnvName(projectSlug)
+				const envValue = env[projectEnvName + '_' + envName] || env['DEFAULT_' + envName]
+				if (envValue === undefined) {
+					throw new UndefinedParameterError(`ENV variable "${projectEnvName + '_' + envName}" not found.`)
+				}
+				return envValue
+			} else if (parts[1] === 'slug') {
+				return projectSlug
+			}
+		}
+		if (parts[0] === 'tenant') {
+			if (path[0] !== 'tenant') {
+				throw new Error(`Invalid use of ${parts.join('.')} variable in path ${path.join('.')}.`)
+			}
+			if (parts[1] === 'env') {
+				const envName = parts[2]
+				const envValue = env['TENANT_' + envName] || env['DEFAULT_' + envName]
+				if (envValue === undefined) {
+					throw new UndefinedParameterError(`ENV variable "${'TENANT_' + envName}" not found.`)
+				}
+				return envValue
+			}
+			throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
+		}
+
+		return parametersResolver(parts, path, dataResolver)
+	})
+
+	const configValidated = checkConfigStructure(config)
+	console.dir(configValidated.projects.lmc)
+	return configValidated
 }

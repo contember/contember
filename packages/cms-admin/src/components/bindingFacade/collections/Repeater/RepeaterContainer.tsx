@@ -38,17 +38,10 @@ export const RepeaterContainer = React.memo(
 		isEmpty,
 		label,
 	}: RepeaterContainerProps) => {
-		if (isEmpty) {
-			return (
-				<Box heading={label}>
-					<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>
-				</Box>
-			)
-		}
-
 		return (
 			<Box heading={label}>
-				{children}
+				{isEmpty && <EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>}
+				{isEmpty || children}
 				{enableAddingNew && (
 					<BoxSection heading={undefined}>
 						<AddButton {...addButtonComponentExtraProps} children={addButtonText} {...addButtonProps} addNew={addNew} />

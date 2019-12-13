@@ -53,13 +53,6 @@ function hasNumberProperty<Input extends UnknownObject, Property extends string>
 	return typeof input[property] === 'number'
 }
 
-function hasArrayProperty<Input extends UnknownObject, Property extends string>(
-	input: Input,
-	property: Property,
-): input is Input & { [key in Property]: unknown[] } {
-	return Array.isArray(input[property])
-}
-
 function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredentials {
 	if (!isObject(json)) {
 		return error(`Property ${path} must be an object`)

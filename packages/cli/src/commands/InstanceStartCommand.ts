@@ -7,9 +7,11 @@ import {
 	resolveInstanceDockerConfig,
 	resolveInstanceEnvironmentFromInput,
 } from '../utils/instance'
-import { execDockerCompose, updateOverrideConfig } from '../utils/dockerCompose'
+import { execDockerCompose, runDockerCompose, updateOverrideConfig } from '../utils/dockerCompose'
 import { dump } from 'js-yaml'
 import { interactiveSetup } from '../utils/setup'
+import { runCommand } from '../utils/commands'
+import { ChildProcessWithoutNullStreams } from 'child_process'
 
 type Args = {
 	instanceName: string
@@ -17,6 +19,7 @@ type Args = {
 
 type Options = {
 	// ['host']: string
+	['admin-runtime']: 'node' | 'docker'
 }
 
 export class InstanceStartCommand extends Command<Args, Options> {
@@ -26,20 +29,38 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		// @todo
 		// configuration.option('host').valueRequired()
 		// @todo node vs docker
-		// configuration.option('admin-runtime').valueRequired()
+		configuration
+			.option('admin-runtime')
+			.valueRequired()
+			.description('"docker" or "node"')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput(input)
 		const config = await resolveInstanceDockerConfig({ instanceDirectory })
+		const adminEnv = config.services.admin.environment
+
+		const nodeAdminRuntime = input.getOption('admin-runtime') === 'node'
+		if (nodeAdminRuntime) {
+			delete config.services.admin
+		}
 
 		const configYaml = dump(config)
-		process.on('SIGINT', async () => {
+		let childs: ChildProcessWithoutNullStreams[] = []
+		const exit = async () => {
 			await execDockerCompose(['-f', '-', 'down'], {
 				cwd: instanceDirectory,
 				stdin: configYaml,
 			})
+			childs.forEach(it => {
+				if (!it.killed) {
+					it.kill('SIGINT')
+				}
+			})
 			process.exit(0)
+		}
+		process.on('SIGINT', async () => {
+			await exit()
 		})
 
 		await execDockerCompose(['-f', '-', 'pull', 'api'], {
@@ -66,11 +87,11 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			return
 		}
 
-		if (!config.services.admin.environment.CONTEMBER_LOGIN_TOKEN) {
+		if (!adminEnv.CONTEMBER_LOGIN_TOKEN) {
 			console.log('It seems that this is first run of this instance. Will try to execute a setup.')
 			console.log('If that is not true, please fill your login token to a docker-compose.override.yaml')
 
-			const { loginToken } = await interactiveSetup(config.services.admin.environment.CONTEMBER_API_SERVER)
+			const { loginToken } = await interactiveSetup(adminEnv.CONTEMBER_API_SERVER)
 			console.log('Superadmin account created.')
 
 			await updateOverrideConfig(instanceDirectory, (config, { merge }) =>
@@ -80,16 +101,43 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				}),
 			)
 
-			config.services.admin.environment.CONTEMBER_LOGIN_TOKEN = loginToken
+			adminEnv.CONTEMBER_LOGIN_TOKEN = loginToken
 			console.log('Login token and saved to your docker-compose.override.yaml: ' + loginToken)
 
-			await execDockerCompose(['-f', '-', 'up', '-d', 'admin'], {
-				cwd: instanceDirectory,
-				stdin: dump(config),
+			if (!nodeAdminRuntime) {
+				await execDockerCompose(['-f', '-', 'up', '-d', 'admin'], {
+					cwd: instanceDirectory,
+					stdin: dump(config),
+				})
+			}
+		}
+		if (nodeAdminRuntime) {
+			const { output, child } = runCommand('npm', ['run', 'start-admin'], {
+				env: adminEnv,
+				cwd: process.cwd(),
+				stderr: process.stderr,
+				stdout: process.stdout,
 			})
+			output.catch(async e => {
+				console.error('Admin failed to start')
+				console.error(e)
+				await exit()
+			})
+			childs.push(child)
+			console.log(`Admin dev server running on http://127.0.0.1:${adminEnv.CONTEMBER_PORT}`)
 		}
 
 		await printInstanceStatus({ instanceDirectory })
+
+		const { child, output } = runDockerCompose(['-f', '-', 'logs', '-f', 'api', ...(nodeAdminRuntime ? [] : 'admin')], {
+			cwd: instanceDirectory,
+			stdin: configYaml,
+		})
+		childs.push(child)
+		output.catch(e => {
+			console.error('Logs command has failed')
+		})
+
 		process.stdin.resume()
 
 		await new Promise(resolve => {

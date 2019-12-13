@@ -1,11 +1,12 @@
-import { Component, TextAreaField, TextField } from '@contember/admin'
+import { Component, ImageUploadField, TextAreaField, TextField } from '@contember/admin'
 import * as React from 'react'
 
 export const PostForm = Component(
 	() => (
 		<>
 			<TextField name="title" size="large" label={'Title'} />
-			<TextAreaField name="perex" label="Perex" />
+			<ImageUploadField name="image.url" label="Image" />
+			<TextAreaField name="content" label="Content" />
 		</>
 	),
 	'PostForm',

@@ -1,7 +1,7 @@
-import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
+import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import * as React from 'react'
-import { Component } from '../../../binding'
-import { RemoveEntityButton } from '../collections/helpers'
+import { Component, EntityAccessor } from '../../../binding'
+import { EmptyMessage, RemoveEntityButton } from '../collections/helpers'
 import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeater'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
@@ -50,7 +50,28 @@ export const TableRenderer = Component<TableRendererProps>(
 	'TableRenderer',
 )
 
-const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => <Table {...props} />)
+const EmptyTable = React.memo((props: { children: React.ReactNode }) => (
+	<Box>
+		<EmptyMessage>{props.children}</EmptyMessage>
+	</Box>
+))
+EmptyTable.displayName = 'EmptyTable'
+
+const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => {
+	// TODO solve this via preferences
+	const isEmpty = !props.entityList.entities.some(entity => entity instanceof EntityAccessor && entity.isPersisted())
+
+	if (isEmpty) {
+		const EmptyMessageComponent = props.emptyMessageComponent || EmptyTable
+		return (
+			<EmptyMessageComponent {...props.emptyMessageComponentExtraProps}>
+				{props.emptyMessage || 'There are no items to display.'}
+			</EmptyMessageComponent>
+		)
+	}
+
+	return <Table {...props} />
+})
 Container.displayName = 'Container'
 
 const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemove?: boolean }) => (

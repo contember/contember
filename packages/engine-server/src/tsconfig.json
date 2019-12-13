@@ -20,9 +20,6 @@
 			"path": "../../schema-definition/src"
 		},
 		{
-			"path": "../../utils/src"
-		},
-		{
 			"path": "../../authorization/src"
 		},
 		{

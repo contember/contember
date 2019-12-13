@@ -9,9 +9,6 @@
 		},
 		{
 			"path": "../../schema-utils/src"
-		},
-		{
-			"path": "../../utils/src"
 		}
 	]
 }

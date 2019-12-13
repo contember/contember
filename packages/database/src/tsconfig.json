@@ -6,9 +6,6 @@
 	"references": [
 		{
 			"path": "../../queryable/src"
-		},
-		{
-			"path": "../../utils/src"
 		}
 	]
 }

@@ -5,8 +5,7 @@
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
 	"dependencies": {
-		"@contember/schema": "^0.3.0",
-		"@contember/utils": "^0.3.0"
+		"@contember/schema": "^0.3.0"
 	},
 	"devDependencies": {
 		"@types/node": "^12.11.7",

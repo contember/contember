@@ -53,7 +53,7 @@ import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
 import { getArgumentValues } from 'graphql/execution/values'
-import { tuple } from '@contember/utils'
+import { tuple } from './utils'
 
 export interface MasterContainer {
 	initializer: Initializer

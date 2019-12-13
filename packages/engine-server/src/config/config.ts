@@ -9,7 +9,7 @@ import {
 import { deprecated } from '../core/console/messages'
 import { DatabaseCredentials } from '@contember/engine-common'
 import { S3Config } from '@contember/engine-s3-plugin/dist/src/Config'
-import { tuple, ucfirst } from '@contember/utils'
+import { tuple, upperCaseFirst } from '../utils'
 
 export type ProjectWithS3 = Project & { s3?: S3Config }
 
@@ -51,13 +51,6 @@ function hasNumberProperty<Input extends UnknownObject, Property extends string>
 	property: Property,
 ): input is Input & { [key in Property]: number } {
 	return typeof input[property] === 'number'
-}
-
-function hasArrayProperty<Input extends UnknownObject, Property extends string>(
-	input: Input,
-	property: Property,
-): input is Input & { [key in Property]: unknown[] } {
-	return Array.isArray(input[property])
 }
 
 function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredentials {
@@ -138,7 +131,7 @@ function checkStageStructure(json: unknown, slug: string, path: string): Project
 	if (json.name && !hasStringProperty(json, 'name')) {
 		return typeError(path + '.name', json.name, 'string')
 	}
-	return { name: ucfirst(slug), ...json, slug }
+	return { name: upperCaseFirst(slug), ...json, slug }
 }
 
 function checkProjectStructure(json: unknown, slug: string, path: string): ProjectWithS3 {
@@ -160,7 +153,7 @@ function checkProjectStructure(json: unknown, slug: string, path: string): Proje
 		checkStageStructure(value, slug, `${path}.stages.${slug}`),
 	)
 	return {
-		name: ucfirst(slug).replace(/-/g, ' '),
+		name: upperCaseFirst(slug).replace(/-/g, ' '),
 		directory: `${slug}/api`,
 		...json,
 		slug,

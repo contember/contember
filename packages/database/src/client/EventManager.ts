@@ -1,6 +1,6 @@
 import { Connection } from './Connection'
 
-class EventManager {
+export class EventManagerImpl {
 	private readonly listeners: EventManager.ListenersList = {
 		[EventManager.Event.queryStart]: [],
 		[EventManager.Event.queryEnd]: [],
@@ -26,6 +26,8 @@ class EventManager {
 		}
 	}
 }
+
+type EventManager = { [P in keyof EventManagerImpl]: EventManagerImpl[P] }
 
 namespace EventManager {
 	export enum Event {

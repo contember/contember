@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
-import { tuple } from '@contember/utils'
+import { tuple } from '../../utils'
 import { Interface } from './types'
 import NamingConventions from './NamingConventions'
 import FieldDefinition from './FieldDefinition'

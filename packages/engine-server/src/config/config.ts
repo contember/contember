@@ -301,7 +301,5 @@ export async function readConfig(...filenames: string[]): Promise<Config> {
 		return parametersResolver(parts, path, dataResolver)
 	})
 
-	const configValidated = checkConfigStructure(config)
-	console.dir(configValidated.projects.lmc)
-	return configValidated
+	return checkConfigStructure(config)
 }

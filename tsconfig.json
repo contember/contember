@@ -5,7 +5,7 @@
 		{ "path": "./packages/authorization" },
 		{ "path": "./packages/benchmark" },
 		{ "path": "./packages/cli" },
-		{ "path": "./packages/cms-api" },
+		{ "path": "./packages/engine-server" },
 		{ "path": "./packages/cms-admin" },
 		{ "path": "./packages/cms-client" },
 		{ "path": "./packages/cms-admin-server" },

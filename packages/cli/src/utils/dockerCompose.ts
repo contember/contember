@@ -41,8 +41,7 @@ export const readDefaultDockerComposeConfig = async (dir: string): Promise<any> 
 }
 
 export const hasConfiguredPorts = (config: any, service: string): boolean => {
-	// eslint-disable-next-line prettier/prettier
-	const ports = config?.[service]?.ports
+	const ports = config?.services?.[service]?.ports
 	return ports && Array.isArray(ports) && ports.length > 0
 }
 export const execDockerCompose = async (

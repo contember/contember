@@ -1,6 +1,6 @@
 {
 	"name": "@contember/cli",
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"bin": {
 		"contember": "./dist/src/cli.js"
 	},
@@ -11,13 +11,13 @@
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
-		"@contember/config-loader": "^0.3.2",
-		"@contember/dic": "^0.3.2",
-		"@contember/engine-common": "^0.3.2",
-		"@contember/schema": "^0.3.2",
-		"@contember/schema-definition": "^0.3.2",
-		"@contember/schema-migrations": "^0.3.2",
-		"@contember/schema-utils": "^0.3.2",
+		"@contember/config-loader": "^0.3.3",
+		"@contember/dic": "^0.3.3",
+		"@contember/engine-common": "^0.3.3",
+		"@contember/schema": "^0.3.3",
+		"@contember/schema-definition": "^0.3.3",
+		"@contember/schema-migrations": "^0.3.3",
+		"@contember/schema-utils": "^0.3.3",
 		"fs-extra": "^8.1.0",
 		"get-port": "^5.0.0",
 		"graphql-request": "^1.8.2",

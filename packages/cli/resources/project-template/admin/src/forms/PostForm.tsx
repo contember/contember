@@ -4,9 +4,9 @@ import * as React from 'react'
 export const PostForm = Component(
 	() => (
 		<>
-			<TextField name="title" size="large" label={'Title'} />
-			<ImageUploadField name="image.url" label="Image" />
-			<TextAreaField name="content" label="Content" />
+			<TextField field="title" size="large" label={'Title'} />
+			<ImageUploadField field="image.url" label="Image" />
+			<TextAreaField field="content" label="Content" />
 		</>
 	),
 	'PostForm',

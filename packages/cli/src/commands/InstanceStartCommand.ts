@@ -11,7 +11,6 @@ import { execDockerCompose, runDockerCompose, updateOverrideConfig } from '../ut
 import { dump } from 'js-yaml'
 import { interactiveSetup } from '../utils/setup'
 import { runCommand } from '../utils/commands'
-import { ChildProcessWithoutNullStreams } from 'child_process'
 
 type Args = {
 	instanceName: string
@@ -19,16 +18,19 @@ type Args = {
 
 type Options = {
 	// ['host']: string
-	['admin-runtime']: 'node' | 'docker'
+	['admin-runtime']?: 'node' | 'docker'
+	['admin-port']?: string
+	host?: string
+	// ['save-ports']?: boolean
 }
 
 export class InstanceStartCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration): void {
 		configuration.description('Starts Contember instance')
 		configuration.argument('instanceName').optional()
-		// @todo
-		// configuration.option('host').valueRequired()
-		// @todo node vs docker
+		configuration.option('host').valueRequired()
+		// configuration.option('save-ports').valueNone()
+		configuration.option('admin-port').valueRequired()
 		configuration
 			.option('admin-runtime')
 			.valueRequired()
@@ -37,7 +39,12 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput(input)
-		const config = await resolveInstanceDockerConfig({ instanceDirectory })
+		const config = await resolveInstanceDockerConfig({
+			instanceDirectory,
+			host: input.getOption('host'),
+			startPort: input.getOption('admin-port') ? Number(input.getOption('admin-port')) : undefined,
+			//savePortsMapping: input.getOption('save-ports'),
+		})
 		const adminEnv = config.services.admin.environment
 
 		const nodeAdminRuntime = input.getOption('admin-runtime') === 'node'
@@ -77,7 +84,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			cwd: instanceDirectory,
 			stdin: configYaml,
 		})
-		await execDockerCompose(['-f', '-', 'rm', ...mainServices], {
+		await execDockerCompose(['-f', '-', 'rm', '-f', ...mainServices], {
 			cwd: instanceDirectory,
 			stdin: configYaml,
 		})

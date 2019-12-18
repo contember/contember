@@ -132,6 +132,28 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				})
 			}
 		}
+		let timeoutRef: any = null
+		let start = Date.now()
+		const printNodeAdminStatus = () => {
+			if (!nodeAdminRuntime) {
+				return
+			}
+			console.log(`admin: running on http://127.0.0.1:${adminEnv.CONTEMBER_PORT}`)
+		}
+
+		const planPrintInstanceStatus = () => {
+			if (Date.now() - start > 60 * 1000) {
+				return
+			}
+			if (timeoutRef) {
+				clearTimeout(timeoutRef)
+			}
+			timeoutRef = setTimeout(async () => {
+				await printInstanceStatus({ instanceDirectory })
+				printNodeAdminStatus()
+			}, 2000)
+		}
+
 		if (nodeAdminRuntime) {
 			const { output, child } = runCommand('npm', ['run', 'start-admin'], {
 				env: adminEnv,
@@ -144,9 +166,12 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				console.error(e)
 				await exit()
 			})
-			console.log(`Admin dev server running on http://127.0.0.1:${adminEnv.CONTEMBER_PORT}`)
+			child.stdout.on('data', () => {
+				planPrintInstanceStatus()
+			})
 		}
 
+		printNodeAdminStatus()
 		await printInstanceStatus({ instanceDirectory })
 
 		const { child, output } = runDockerCompose(['-f', '-', 'logs', '-f', ...mainServices], {
@@ -154,22 +179,11 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			stdin: configYaml,
 		})
 
-		let timeoutRef: any = null
-		const planPrintInstanceStatus = () => {
-			if (timeoutRef) {
-				clearTimeout(timeoutRef)
-			}
-			timeoutRef = setTimeout(async () => {
-				await printInstanceStatus({ instanceDirectory })
-			}, 2000)
-		}
 		child.stdout.on('data', () => {
 			planPrintInstanceStatus()
 		})
 
-		output.catch(e => {
-			console.error('Logs command has failed')
-		})
+		output.catch(() => {})
 
 		process.stdin.resume()
 

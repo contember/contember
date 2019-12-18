@@ -3,7 +3,12 @@ import { listDirectories } from './fs'
 import { copy, pathExists } from 'fs-extra'
 
 import { resourcesDir } from '../pathUtils'
-import { execDockerCompose, hasConfiguredPorts, readDefaultDockerComposeConfig } from './dockerCompose'
+import {
+	execDockerCompose,
+	getConfiguredPorts,
+	readDefaultDockerComposeConfig,
+	updateOverrideConfig,
+} from './dockerCompose'
 import { runCommand } from './commands'
 import getPort from 'get-port'
 import { Input } from '../cli/Input'
@@ -48,11 +53,7 @@ export interface ServiceStatus {
 	name: string
 	status: string
 	running: boolean
-	ports: {
-		containerPort: number
-		hostIp: string
-		hostPort: number
-	}[]
+	ports: PortMapping[]
 }
 
 const instanceDirectoryToName = (instanceDirectory: string) =>
@@ -208,20 +209,14 @@ const verifyInstanceExists = async ({
 	}
 }
 
-export const resolveInstanceDockerConfig = async ({
-	instanceDirectory,
-}: {
+type ServicePortsMapping = Record<string, PortMapping[]>
+
+export const resolvePortsMapping = async (args: {
 	instanceDirectory: string
-}): Promise<any> => {
-	const instanceName = instanceDirectoryToName(instanceDirectory)
-
-	let config = await readDefaultDockerComposeConfig(instanceDirectory)
-	if (!config.services) {
-		throw new Error('docker-compose is not configured')
-	}
-
-	const runningServices = await getInstanceStatus({ instanceDirectory })
-
+	config: any
+	startPort?: number
+	host?: string
+}): Promise<ServicePortsMapping> => {
 	const exposedServices = [
 		{ service: 'admin', port: null },
 		{ service: 'api', port: 4000 },
@@ -229,29 +224,85 @@ export const resolveInstanceDockerConfig = async ({
 		{ service: 's3', port: null },
 		{ service: 'adminer', port: 8080 },
 	]
-	const assignedPorts: Record<string, number> = {}
-	let assignedPort = 1023
-	for (const { service, port: internalPort } of exposedServices) {
-		if (!hasConfiguredPorts(config, service)) {
-			const runningStatus = runningServices.find(it => it.name === service)
-			const runningPortMapping =
-				runningStatus && runningStatus.ports.find(it => !internalPort || it.containerPort === internalPort)
-			assignedPort = runningPortMapping
-				? runningPortMapping.hostPort
-				: await getPort({ port: getPort.makeRange(assignedPort + 1, 65535) })
-			assignedPorts[service] = assignedPort
-			config.services[service].ports = [`127.0.0.1:${assignedPort}:${internalPort || assignedPort}`]
+	const runningServices = await getInstanceStatus({ instanceDirectory: args.instanceDirectory })
+
+	let assignedPort = (args.startPort || 1024) - 1
+	const servicePortMapping: ServicePortsMapping = {}
+	for (const { service, port: containerPort } of exposedServices) {
+		const configuredPorts = getConfiguredPorts(args.config, service)
+		const configuredPortMapping = configuredPorts.find(it => !containerPort || it.containerPort === containerPort)
+		const otherConfiguredPorts = configuredPorts.filter(it => it !== configuredPortMapping)
+
+		const runningStatus = runningServices.find(it => it.name === service)
+		const runningPortMapping =
+			runningStatus && runningStatus.ports.find(it => !containerPort || it.containerPort === containerPort)
+
+		let assignedPortMapping = configuredPortMapping || runningPortMapping
+		if (!assignedPortMapping) {
+			assignedPort = await getPort({ port: getPort.makeRange(assignedPort + 1, 65535) })
+			assignedPortMapping = {
+				containerPort: containerPort || assignedPort,
+				hostPort: assignedPort,
+				hostIp: args.host || '127.0.0.1',
+			}
 		}
+
+		servicePortMapping[service] = [assignedPortMapping, ...otherConfiguredPorts]
 	}
+	return servicePortMapping
+}
+
+const serializePortMapping = (mapping: PortMapping) => `${mapping.hostIp}:${mapping.hostPort}:${mapping.containerPort}`
+
+export const resolveInstanceDockerConfig = async ({
+	instanceDirectory,
+	host,
+	savePortsMapping,
+	startPort,
+}: {
+	instanceDirectory: string
+	host?: string
+	savePortsMapping?: boolean
+	startPort?: number
+}): Promise<Readonly<any>> => {
+	const instanceName = instanceDirectoryToName(instanceDirectory)
+
+	let config = await readDefaultDockerComposeConfig(instanceDirectory)
+	if (!config.services) {
+		throw new Error('docker-compose is not configured')
+	}
+
+	const portMapping = await resolvePortsMapping({ instanceDirectory, config, host, startPort })
+	const updateConfigWithPorts = (config: any, portsMapping: ServicePortsMapping): any => {
+		const result = Object.entries(portsMapping).reduce(
+			(config, [service, mapping]) => ({
+				...config,
+				services: {
+					...config.services,
+					[service]: {
+						...config.services[service],
+						ports: mapping.map(serializePortMapping),
+					},
+				},
+			}),
+			config,
+		)
+		return result
+	}
+	config = updateConfigWithPorts(config, portMapping)
+	if (savePortsMapping) {
+		await updateOverrideConfig(instanceDirectory, config => updateConfigWithPorts(config, portMapping))
+	}
+
 	if (!config.services.admin.environment) {
 		config.services.admin.environment = {}
 	}
-	if (assignedPorts.admin) {
-		config.services.admin.environment.CONTEMBER_PORT = assignedPorts.admin
+	if (portMapping.admin[0].containerPort) {
+		config.services.admin.environment.CONTEMBER_PORT = portMapping.admin[0].containerPort
 	}
 	config.services.admin.environment.CONTEMBER_INSTANCE = instanceName
-	const apiServer = `http://127.0.0.1:${assignedPorts.api}`
-	if (!config.services.admin.environment.CONTEMBER_API_SERVER && assignedPorts.api) {
+	const apiServer = `http://127.0.0.1:${portMapping.api[0].hostPort}`
+	if (!config.services.admin.environment.CONTEMBER_API_SERVER) {
 		config.services.admin.environment.CONTEMBER_API_SERVER = apiServer
 	}
 	if (!config.services.admin.user) {
@@ -262,7 +313,7 @@ export const resolveInstanceDockerConfig = async ({
 	}
 
 	const projectConfig: any = await readYaml(join(instanceDirectory, 'api/config.yaml'))
-	const s3Endpoint = 'http://localhost:' + assignedPorts.s3
+	const s3Endpoint = 'http://localhost:' + portMapping.s3[0].hostPort
 	const env: Record<string, string> = {
 		SERVER_PORT: '4000',
 		TENANT_DB_NAME: 'tenant',
@@ -290,7 +341,7 @@ export const resolveInstanceDockerConfig = async ({
 	config.services.s3.command = `-c 'mkdir -p /data/contember && \\
 mkdir -p /data/.minio.sys/buckets/contember && \\
 echo "${bucketPolicy.replace(/"/g, '\\"')}" > /data/.minio.sys/buckets/contember/policy.json && \\
-/usr/bin/minio server --address :${assignedPorts.s3} /data'`
+/usr/bin/minio server --address :${portMapping.s3[0].containerPort} /data'`
 
 	return config
 }

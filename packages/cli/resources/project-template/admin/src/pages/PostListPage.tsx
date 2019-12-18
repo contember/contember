@@ -1,11 +1,11 @@
-import { FieldText, Literal, PageLinkButton, TableCell, TablePage } from '@contember/admin'
+import { Field, Literal, PageLinkButton, TableCell, TablePage } from '@contember/admin'
 import * as React from 'react'
 import { EditButton } from '../components/EditButton'
 
 export const PostListPage = (
 	<TablePage
 		pageName={'postList'}
-		entityName="Post"
+		entities="Post"
 		orderBy={[{ title: new Literal('desc') }]}
 		rendererProps={{
 			title: 'Posts',
@@ -17,7 +17,7 @@ export const PostListPage = (
 		}}
 	>
 		<TableCell>
-			<FieldText name="title" />
+			<Field field="title" />
 		</TableCell>
 		<TableCell shrunk>
 			<EditButton pageName="postEdit" />

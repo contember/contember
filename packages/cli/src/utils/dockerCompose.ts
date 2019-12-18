@@ -40,20 +40,47 @@ export const readDefaultDockerComposeConfig = async (dir: string): Promise<any> 
 	return Merger.merge(...configs)
 }
 
-export const hasConfiguredPorts = (config: any, service: string): boolean => {
-	const ports = config?.services?.[service]?.ports
-	return ports && Array.isArray(ports) && ports.length > 0
+export type PortsMapping = {
+	containerPort: number
+	hostPort: number
+	hostIp: string
 }
+
+export const getConfiguredPorts = (config: any, service: string): PortsMapping[] => {
+	const ports = config?.services?.[service]?.ports
+	if (!ports || !Array.isArray(ports) || ports.length === 0) {
+		return []
+	}
+	return ports
+		.map((it): PortsMapping | null => {
+			if (typeof it !== 'string') {
+				console.warn('Ports mapping in long syntax is not supported')
+				return null
+			}
+			const result = it.match(/^(?:(?:(?<host>\d+\.\d+\.\d+\.\d+):)?(?:(?<published>\d+):))?(?<target>\d+)$/)
+			if (!result || !result.groups) {
+				console.warn(`Ports mapping "${it} not recognized`)
+				return null
+			}
+			return {
+				containerPort: Number(result.groups.target),
+				hostPort: Number(result.groups.published || result.groups.target),
+				hostIp: result.groups.host || '0.0.0.0',
+			}
+		})
+		.filter((it): it is PortsMapping => it !== null)
+}
+
 export const execDockerCompose = async (
 	args: string[],
-	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv },
+	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv; detached?: boolean },
 ): Promise<string> => {
 	return await runDockerCompose(args, options).output
 }
 
 export const runDockerCompose = (
 	args: string[],
-	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv },
+	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv; detached?: boolean },
 ): RunningCommand => {
 	const input = new Readable()
 	const command = runCommand('docker-compose', args, {
@@ -65,6 +92,7 @@ export const runDockerCompose = (
 			// todo
 			CONTEMBER_VERSION: '0',
 		},
+		detached: options.detached,
 	})
 	input.push(options.stdin)
 	input.push(null)

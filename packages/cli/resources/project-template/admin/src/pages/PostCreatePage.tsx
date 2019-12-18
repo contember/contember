@@ -4,7 +4,7 @@ import { PostForm } from '../forms'
 
 export const PostCreatePage = (
 	<CreatePage
-		entityName="Post"
+		entity="Post"
 		pageName={'postCreate'}
 		rendererProps={{
 			title: 'Add a new post',

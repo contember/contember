@@ -139,6 +139,20 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				stdin: configYaml,
 			},
 		)
+
+		let timeoutRef: any = null
+		const planPrintInstanceStatus = () => {
+			if (timeoutRef) {
+				clearTimeout(timeoutRef)
+			}
+			timeoutRef = setTimeout(async () => {
+				await printInstanceStatus({ instanceDirectory })
+			}, 2000)
+		}
+		child.stdout.on('data', () => {
+			planPrintInstanceStatus()
+		})
+
 		output.catch(e => {
 			console.error('Logs command has failed')
 		})

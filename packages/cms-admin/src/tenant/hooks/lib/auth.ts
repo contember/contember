@@ -25,7 +25,16 @@ export const useAuthedContentQuery = <R, V>(query: string, variables: V): QueryR
 	const token = useAuthToken()
 	const client = useCurrentContentGraphQlClient()
 	if (client === undefined) {
-		throw new Error('Cannot get a tenant client - maybe missing config context?')
+		throw new Error('Cannot get a content client - maybe missing config context?')
 	}
 	return useQuery(client, query, variables, token)
+}
+
+export const useAuthedContentMutation = <R, V>(query: string): UseMutationReturn<R, V> => {
+	const token = useAuthToken()
+	const client = useCurrentContentGraphQlClient()
+	if (client === undefined) {
+		throw new Error('Cannot get a content client - maybe missing config context?')
+	}
+	return useMutation(client, query, token)
 }

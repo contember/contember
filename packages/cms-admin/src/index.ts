@@ -1,5 +1,6 @@
 export * from './components/LayoutDefault'
 export * from './acl'
+export * from './apiClient'
 export * from './binding'
 export * from './bootstrap'
 export * from './components'

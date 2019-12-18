@@ -5,11 +5,19 @@ export type RunningCommand = { child: ChildProcessWithoutNullStreams; output: Pr
 export const runCommand = (
 	command: string,
 	args: string[],
-	options: { cwd: string; stdin?: Readable; stdout?: Writable; stderr?: Writable; env?: NodeJS.ProcessEnv },
+	options: {
+		cwd: string
+		stdin?: Readable
+		stdout?: Writable
+		stderr?: Writable
+		env?: NodeJS.ProcessEnv
+		detached?: boolean
+	},
 ): RunningCommand => {
 	const child = spawn(command, args, {
 		cwd: options.cwd,
 		env: { ...process.env, ...(options.env || {}) },
+		detached: options.detached,
 	})
 	if (options.stdin) {
 		options.stdin.pipe(child.stdin)

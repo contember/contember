@@ -46,21 +46,25 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		}
 
 		const configYaml = dump(config)
-		let childs: ChildProcessWithoutNullStreams[] = []
 		const exit = async () => {
 			await execDockerCompose(['-f', '-', 'down'], {
 				cwd: instanceDirectory,
 				stdin: configYaml,
-			})
-			childs.forEach(it => {
-				if (!it.killed) {
-					it.kill('SIGINT')
-				}
+				detached: true,
 			})
 			process.exit(0)
 		}
+		let terminating = false
 		process.on('SIGINT', async () => {
-			await exit()
+			if (terminating) {
+				return
+			}
+			terminating = true
+			try {
+				await exit()
+			} catch (e) {
+				console.error(e)
+			}
 		})
 
 		await execDockerCompose(['-f', '-', 'pull', 'api'], {
@@ -123,7 +127,6 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				console.error(e)
 				await exit()
 			})
-			childs.push(child)
 			console.log(`Admin dev server running on http://127.0.0.1:${adminEnv.CONTEMBER_PORT}`)
 		}
 
@@ -136,7 +139,6 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				stdin: configYaml,
 			},
 		)
-		childs.push(child)
 		output.catch(e => {
 			console.error('Logs command has failed')
 		})

@@ -46,14 +46,14 @@ export const hasConfiguredPorts = (config: any, service: string): boolean => {
 }
 export const execDockerCompose = async (
 	args: string[],
-	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv },
+	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv; detached?: boolean },
 ): Promise<string> => {
 	return await runDockerCompose(args, options).output
 }
 
 export const runDockerCompose = (
 	args: string[],
-	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv },
+	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv; detached?: boolean },
 ): RunningCommand => {
 	const input = new Readable()
 	const command = runCommand('docker-compose', args, {
@@ -65,6 +65,7 @@ export const runDockerCompose = (
 			// todo
 			CONTEMBER_VERSION: '0',
 		},
+		detached: options.detached,
 	})
 	input.push(options.stdin)
 	input.push(null)

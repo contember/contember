@@ -11,7 +11,6 @@ import { execDockerCompose, runDockerCompose, updateOverrideConfig } from '../ut
 import { dump } from 'js-yaml'
 import { interactiveSetup } from '../utils/setup'
 import { runCommand } from '../utils/commands'
-import { ChildProcessWithoutNullStreams } from 'child_process'
 
 type Args = {
 	instanceName: string
@@ -19,16 +18,19 @@ type Args = {
 
 type Options = {
 	// ['host']: string
-	['admin-runtime']: 'node' | 'docker'
+	['admin-runtime']?: 'node' | 'docker'
+	['admin-port']?: string
+	host?: string
+	// ['save-ports']?: boolean
 }
 
 export class InstanceStartCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration): void {
 		configuration.description('Starts Contember instance')
 		configuration.argument('instanceName').optional()
-		// @todo
-		// configuration.option('host').valueRequired()
-		// @todo node vs docker
+		configuration.option('host').valueRequired()
+		// configuration.option('save-ports').valueNone()
+		configuration.option('admin-port').valueRequired()
 		configuration
 			.option('admin-runtime')
 			.valueRequired()
@@ -37,33 +39,52 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput(input)
-		const config = await resolveInstanceDockerConfig({ instanceDirectory })
+		const config = await resolveInstanceDockerConfig({
+			instanceDirectory,
+			host: input.getOption('host'),
+			startPort: input.getOption('admin-port') ? Number(input.getOption('admin-port')) : undefined,
+			//savePortsMapping: input.getOption('save-ports'),
+		})
 		const adminEnv = config.services.admin.environment
 
 		const nodeAdminRuntime = input.getOption('admin-runtime') === 'node'
 		if (nodeAdminRuntime) {
 			delete config.services.admin
 		}
+		const mainServices = ['api', ...(nodeAdminRuntime ? [] : ['admin'])]
 
 		const configYaml = dump(config)
-		let childs: ChildProcessWithoutNullStreams[] = []
 		const exit = async () => {
 			await execDockerCompose(['-f', '-', 'down'], {
 				cwd: instanceDirectory,
 				stdin: configYaml,
-			})
-			childs.forEach(it => {
-				if (!it.killed) {
-					it.kill('SIGINT')
-				}
+				detached: true,
 			})
 			process.exit(0)
 		}
+		let terminating = false
 		process.on('SIGINT', async () => {
-			await exit()
+			if (terminating) {
+				return
+			}
+			terminating = true
+			try {
+				await exit()
+			} catch (e) {
+				console.error(e)
+			}
 		})
 
 		await execDockerCompose(['-f', '-', 'pull', 'api'], {
+			cwd: instanceDirectory,
+			stdin: configYaml,
+		})
+
+		await execDockerCompose(['-f', '-', 'stop', ...mainServices], {
+			cwd: instanceDirectory,
+			stdin: configYaml,
+		})
+		await execDockerCompose(['-f', '-', 'rm', '-f', ...mainServices], {
 			cwd: instanceDirectory,
 			stdin: configYaml,
 		})
@@ -111,6 +132,28 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				})
 			}
 		}
+		let timeoutRef: any = null
+		let start = Date.now()
+		const printNodeAdminStatus = () => {
+			if (!nodeAdminRuntime) {
+				return
+			}
+			console.log(`admin: running on http://127.0.0.1:${adminEnv.CONTEMBER_PORT}`)
+		}
+
+		const planPrintInstanceStatus = () => {
+			if (Date.now() - start > 60 * 1000) {
+				return
+			}
+			if (timeoutRef) {
+				clearTimeout(timeoutRef)
+			}
+			timeoutRef = setTimeout(async () => {
+				await printInstanceStatus({ instanceDirectory })
+				printNodeAdminStatus()
+			}, 2000)
+		}
+
 		if (nodeAdminRuntime) {
 			const { output, child } = runCommand('npm', ['run', 'start-admin'], {
 				env: adminEnv,
@@ -123,23 +166,24 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				console.error(e)
 				await exit()
 			})
-			childs.push(child)
-			console.log(`Admin dev server running on http://127.0.0.1:${adminEnv.CONTEMBER_PORT}`)
+			child.stdout.on('data', () => {
+				planPrintInstanceStatus()
+			})
 		}
 
+		printNodeAdminStatus()
 		await printInstanceStatus({ instanceDirectory })
 
-		const { child, output } = runDockerCompose(
-			['-f', '-', 'logs', '-f', 'api', ...(nodeAdminRuntime ? [] : ['admin'])],
-			{
-				cwd: instanceDirectory,
-				stdin: configYaml,
-			},
-		)
-		childs.push(child)
-		output.catch(e => {
-			console.error('Logs command has failed')
+		const { child, output } = runDockerCompose(['-f', '-', 'logs', '-f', ...mainServices], {
+			cwd: instanceDirectory,
+			stdin: configYaml,
 		})
+
+		child.stdout.on('data', () => {
+			planPrintInstanceStatus()
+		})
+
+		output.catch(() => {})
 
 		process.stdin.resume()
 

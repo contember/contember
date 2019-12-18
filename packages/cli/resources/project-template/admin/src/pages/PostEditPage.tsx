@@ -4,8 +4,7 @@ import { PostForm } from '../forms'
 
 export const PostEditPage = (
 	<EditPage
-		entityName="Post"
-		where="(id = $id)"
+		entity="Post(id = $id)"
 		pageName={'postEdit'}
 		rendererProps={{
 			title: 'Edit post',

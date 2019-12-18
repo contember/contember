@@ -44,6 +44,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		if (nodeAdminRuntime) {
 			delete config.services.admin
 		}
+		const mainServices = ['api', ...(nodeAdminRuntime ? [] : ['admin'])]
 
 		const configYaml = dump(config)
 		const exit = async () => {
@@ -68,6 +69,15 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		})
 
 		await execDockerCompose(['-f', '-', 'pull', 'api'], {
+			cwd: instanceDirectory,
+			stdin: configYaml,
+		})
+
+		await execDockerCompose(['-f', '-', 'stop', ...mainServices], {
+			cwd: instanceDirectory,
+			stdin: configYaml,
+		})
+		await execDockerCompose(['-f', '-', 'rm', ...mainServices], {
 			cwd: instanceDirectory,
 			stdin: configYaml,
 		})
@@ -132,13 +142,10 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 		await printInstanceStatus({ instanceDirectory })
 
-		const { child, output } = runDockerCompose(
-			['-f', '-', 'logs', '-f', 'api', ...(nodeAdminRuntime ? [] : ['admin'])],
-			{
-				cwd: instanceDirectory,
-				stdin: configYaml,
-			},
-		)
+		const { child, output } = runDockerCompose(['-f', '-', 'logs', '-f', ...mainServices], {
+			cwd: instanceDirectory,
+			stdin: configYaml,
+		})
 
 		let timeoutRef: any = null
 		const planPrintInstanceStatus = () => {

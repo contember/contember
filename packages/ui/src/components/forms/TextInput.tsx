@@ -1,6 +1,7 @@
 import cn from 'classnames'
 import * as React from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
+import { useComponentClassName } from '../../auxiliary'
 import { ControlDistinction, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toEnumViewClass, toViewClass } from '../../utils'
 
@@ -35,7 +36,7 @@ export const TextInput = React.memo(
 	React.forwardRef(
 		({ size, distinction, validationState, withTopToolbar, ...otherProps }: TextInputProps, ref: React.Ref<any>) => {
 			const finalClassName = cn(
-				'input',
+				useComponentClassName('input'),
 				toEnumViewClass(size),
 				toEnumViewClass(distinction),
 				toEnumStateClass(validationState),

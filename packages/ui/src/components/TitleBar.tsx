@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useClassNamePrefix } from '../auxiliary'
 import { ButtonList } from './forms'
 import { Heading, HeadingProps } from './Heading'
 
@@ -10,19 +11,20 @@ export interface TitleBarProps {
 }
 
 export const TitleBar = React.memo(({ navigation, children, headingProps, actions }: TitleBarProps) => {
+	const prefix = useClassNamePrefix()
 	return (
-		<div className="titleBar">
+		<div className={`${prefix}titleBar`}>
 			{navigation && (
-				<nav className="titleBar-navigation">
+				<nav className={`${prefix}titleBar-navigation`}>
 					<ButtonList>{navigation}</ButtonList>
 				</nav>
 			)}
-			<div className="titleBar-in">
-				<div className="titleBar-heading">
+			<div className={`${prefix}titleBar-in`}>
+				<div className={`${prefix}titleBar-heading`}>
 					<Heading {...headingProps}>{children}</Heading>
 				</div>
 				{actions && (
-					<div className="titleBar-actions">
+					<div className={`${prefix}titleBar-actions`}>
 						<ButtonList>{actions}</ButtonList>
 					</div>
 				)}

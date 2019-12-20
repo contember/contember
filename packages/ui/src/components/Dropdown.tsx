@@ -1,7 +1,8 @@
-import { MouseEventHandler } from 'react'
 import * as React from 'react'
+import { MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
 import { Manager, Popper, Reference } from 'react-popper'
+import { useClassNamePrefix, useComponentClassName } from '../auxiliary'
 import { DropdownAlignment } from '../types/DropdownAlignment'
 import { assertNever } from '../utils'
 import { Collapsible } from './Collapsible'
@@ -87,12 +88,14 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 	const contentContainerFromContent = React.useContext(DropdownContentContainerContext)
 	const contentContainer = props.contentContainer || contentContainerFromContent || document.body
 
+	const prefix = useClassNamePrefix()
+
 	return (
 		<Manager>
-			<div className="dropdown">
+			<div className={`${prefix}dropdown`}>
 				<Reference>
 					{({ ref }) => (
-						<div className="dropdown-button" ref={ref}>
+						<div className={`${prefix}dropdown-button`} ref={ref}>
 							<Button ref={refs.buttonRef} {...props.buttonProps} onClick={onButtonClick} />
 						</div>
 					)}
@@ -100,9 +103,14 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 				{createPortal(
 					<Popper placement={alignmentToPlacement(props.alignment)}>
 						{({ ref, style, placement }) => (
-							<div ref={refs.contentRef} className="dropdown-content" style={style} data-placement={placement}>
+							<div
+								ref={refs.contentRef}
+								className={`${prefix}dropdown-content`}
+								style={style}
+								data-placement={placement}
+							>
 								<Collapsible expanded={isOpen} transition="fade">
-									<div ref={ref} className="dropdown-content-in">
+									<div ref={ref} className={`${prefix}dropdown-content-in`}>
 										{typeof props.children === 'function' ? props.children({ requestClose: close }) : props.children}
 									</div>
 								</Collapsible>
@@ -128,9 +136,10 @@ export const DropdownContentContainerProvider = React.memo((props: DropdownConta
 		// Run once ref is set
 		setContentContainer(contentContainerRef.current || undefined)
 	}, [])
+	const prefix = useClassNamePrefix()
 
 	return (
-		<div className="dropdown-contentContainer" ref={contentContainerRef}>
+		<div className={`${prefix}dropdown-contentContainer`} ref={contentContainerRef}>
 			<DropdownContentContainerContext.Provider value={contentContainer}>
 				{props.children}
 			</DropdownContentContainerContext.Provider>

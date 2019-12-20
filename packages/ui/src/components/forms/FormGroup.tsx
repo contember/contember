@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
+import { useClassNamePrefix } from '../../auxiliary'
 import { FormGroupLabelPosition, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 import { ErrorList, ErrorListProps } from './'
@@ -29,20 +30,21 @@ export const FormGroup = React.memo(
 		useLabelElement = true,
 	}: FormGroupProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
+		const prefix = useClassNamePrefix()
 		return (
-			<div className={cn('formGroup', toEnumViewClass(size), toEnumViewClass(labelPosition))}>
-				<LabelElement className="formGroup-label">
+			<div className={cn(`${prefix}formGroup`, toEnumViewClass(size), toEnumViewClass(labelPosition))}>
+				<LabelElement className={`${prefix}formGroup-label`}>
 					{(label || labelDescription) && (
-						<span className="formGroup-label-wrap">
-							{label && <span className="formGroup-label-text">{label}</span>}
-							{labelDescription && <span className="formGroup-labelDescription">{labelDescription}</span>}
+						<span className={`${prefix}formGroup-label-wrap`}>
+							{label && <span className={`${prefix}formGroup-label-text`}>{label}</span>}
+							{labelDescription && <span className={`${prefix}formGroup-labelDescription`}>{labelDescription}</span>}
 						</span>
 					)}
-					<span className="formGroup-field-wrap">{children}</span>
-					{description && <span className="formGroup-field-description">{description}</span>}
+					<span className={`${prefix}formGroup-field-wrap`}>{children}</span>
+					{description && <span className={`${prefix}formGroup-field-description`}>{description}</span>}
 				</LabelElement>
 				{!!(errors && errors.length) && (
-					<div className="formGroup-errors">
+					<div className={`${prefix}formGroup-errors`}>
 						<ErrorList errors={errors} size={size} />
 					</div>
 				)}

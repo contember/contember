@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
+import { useClassNamePrefix } from '../../auxiliary'
 import { ButtonDistinction, ButtonFlow, Intent, Justification, Size } from '../../types'
 import { toStateClass, toEnumViewClass, toViewClass } from '../../utils'
 import { Spinner } from '../Spinner'
@@ -55,11 +56,12 @@ export const Button = React.memo(
 		if (props.Component === 'button' || !props.Component) {
 			;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
 		}
+		const prefix = useClassNamePrefix()
 
 		const attrs = {
 			className: cn(
 				rest.className,
-				'button',
+				`${prefix}button`,
 				toEnumViewClass(intent),
 				toEnumViewClass(size),
 				toEnumViewClass(distinction),
@@ -73,9 +75,9 @@ export const Button = React.memo(
 		}
 		const content = (
 			<>
-				<div className="button-content">{children}</div>
+				<div className={`${prefix}button-content`}>{children}</div>
 				{isLoading && (
-					<span className="button-spinner">
+					<span className={`${prefix}button-spinner`}>
 						<Spinner />
 					</span>
 				)}

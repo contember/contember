@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useClassNamePrefix } from '../../../auxiliary'
 import { Dropdown } from '../../Dropdown'
 import { Button } from '../Button'
 import { ButtonGroup, ButtonGroupProps } from '../ButtonGroup'
@@ -41,6 +42,7 @@ export const MultiButton = React.memo(({ triggerFromDropdown = false, ...props }
 			}),
 		[augmentedButtons],
 	)
+	const prefix = useClassNamePrefix()
 	if (buttonFormGroupProps.length === 0) {
 		return null
 	}
@@ -60,7 +62,7 @@ export const MultiButton = React.memo(({ triggerFromDropdown = false, ...props }
 						isLoading: activeButtonFormGroupProps.buttonProps.isLoading,
 						bland: activeButtonFormGroupProps.buttonProps.bland,
 						children: <span style={{ fontSize: '.7em' }}>▼</span>,
-						className: 'button-group-last',
+						className: `${prefix}button-group-last`,
 					}}
 				>
 					{({ requestClose }) => (

@@ -1,8 +1,10 @@
-import * as React from 'react'
-import { Collapsible } from './Collapsible'
-import { Navigation } from '../Navigation'
 import cn from 'classnames'
+import * as React from 'react'
+import { useClassNamePrefix } from '../auxiliary'
+import { GlobalClassNamePrefixContext } from '../contexts'
+import { Navigation } from '../Navigation'
 import { isSpecialLinkClick } from '../utils'
+import { Collapsible } from './Collapsible'
 
 const DepthContext = React.createContext(0)
 
@@ -12,9 +14,13 @@ class Menu extends React.PureComponent<Menu.Props> {
 	public render() {
 		return (
 			<DepthContext.Provider value={0}>
-				<section className="menu">
-					<ul className="menu-list">{this.props.children}</ul>
-				</section>
+				<GlobalClassNamePrefixContext.Consumer>
+					{prefix => (
+						<section className={`${prefix}menu`}>
+							<ul className={`${prefix}menu-list`}>{this.props.children}</ul>
+						</section>
+					)}
+				</GlobalClassNamePrefixContext.Consumer>
 			</DepthContext.Provider>
 		)
 	}
@@ -68,10 +74,11 @@ namespace Menu {
 	function useTitle(options: TitleOptions) {
 		const Link = React.useContext(Navigation.MiddlewareContext)
 		const { to, external, suppressTo, onClick } = options
+		const prefix = useClassNamePrefix()
 
 		return (props: TitleProps) => {
 			const { children, ...otherProps } = props
-			const content = <div className="menu-titleContent">{children}</div>
+			const content = <div className={`${prefix}menu-titleContent`}>{children}</div>
 			if (to) {
 				return (
 					<Link
@@ -114,10 +121,11 @@ namespace Menu {
 
 	function GroupItem(props: ItemProps) {
 		const Title = useTitle({ to: props.to, external: props.external })
+		const prefix = useClassNamePrefix()
 		return (
-			<ItemWrapper className="menu-group" to={props.to}>
-				{props.title && <Title className="menu-group-title">{props.title}</Title>}
-				{props.children && <ul className="menu-group-list">{props.children}</ul>}
+			<ItemWrapper className={`${prefix}menu-group`} to={props.to}>
+				{props.title && <Title className={`${prefix}menu-group-title`}>{props.title}</Title>}
+				{props.children && <ul className={`${prefix}menu-group-list`}>{props.children}</ul>}
 			</ItemWrapper>
 		)
 	}
@@ -134,17 +142,18 @@ namespace Menu {
 			suppressTo: expanded,
 		}
 		const Title = useTitle(options)
+		const prefix = useClassNamePrefix()
 
 		return (
 			<ItemWrapper
-				className={cn('menu-subgroup', props.children && (expanded ? 'is-expanded' : 'is-collapsed'))}
+				className={cn(`${prefix}menu-subgroup`, props.children && (expanded ? 'is-expanded' : 'is-collapsed'))}
 				to={props.to}
 				suppressIsActive={!!props.children}
 			>
-				{props.title && <Title className="menu-subgroup-title">{props.title}</Title>}
+				{props.title && <Title className={`${prefix}menu-subgroup-title`}>{props.title}</Title>}
 				{props.children && (
 					<Collapsible expanded={expanded}>
-						<ul className="menu-subgroup-list">{props.children}</ul>
+						<ul className={`${prefix}menu-subgroup-list`}>{props.children}</ul>
 					</Collapsible>
 				)}
 			</ItemWrapper>
@@ -153,20 +162,22 @@ namespace Menu {
 
 	function ActionItem(props: ItemProps) {
 		const Title = useTitle({ to: props.to, external: props.external })
+		const prefix = useClassNamePrefix()
 		return (
-			<ItemWrapper className="menu-action" to={props.to}>
-				{props.title && <Title className="menu-action-title">{props.title}</Title>}
-				{props.children && <ul className="menu-action-list">{props.children}</ul>}
+			<ItemWrapper className={`${prefix}menu-action`} to={props.to}>
+				{props.title && <Title className={`${prefix}menu-action-title`}>{props.title}</Title>}
+				{props.children && <ul className={`${prefix}menu-action-list`}>{props.children}</ul>}
 			</ItemWrapper>
 		)
 	}
 
 	function TooDeepItem(props: ItemProps) {
 		const Title = useTitle({ to: props.to, external: props.external })
+		const prefix = useClassNamePrefix()
 		return (
-			<ItemWrapper className="menu-tooDeep" to={props.to}>
-				{props.title && <Title className="menu-tooDeep-title">{props.title}</Title>}
-				{props.children && <ul className="menu-tooDeep-list">{props.children}</ul>}
+			<ItemWrapper className={`${prefix}menu-tooDeep`} to={props.to}>
+				{props.title && <Title className={`${prefix}menu-tooDeep-title`}>{props.title}</Title>}
+				{props.children && <ul className={`${prefix}menu-tooDeep-list`}>{props.children}</ul>}
 			</ItemWrapper>
 		)
 	}

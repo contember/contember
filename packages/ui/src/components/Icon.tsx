@@ -1,6 +1,8 @@
 import * as React from 'react'
 import cn from 'classnames'
 import { IconName as BlueprintIconName, IconSvgPaths16 } from '@blueprintjs/icons'
+import { useClassNamePrefix } from '../auxiliary'
+import { useComponentClassName } from '../auxiliary/useComponentClassName'
 import { IconSize } from '../types'
 import { toEnumViewClass } from '../utils'
 
@@ -25,10 +27,11 @@ const renderSvgPaths = (iconName: IconName): JSX.Element[] | null => {
 
 export const Icon = React.memo((props: IconProps) => {
 	const svgPaths = React.useMemo(() => renderSvgPaths(props.blueprintIcon), [props.blueprintIcon])
+	const prefix = useClassNamePrefix()
 
 	return (
-		<div className={cn('icon', toEnumViewClass(props.size))} style={props.style}>
-			<svg viewBox="0 0 16 16" className="icon-blueprintSvg">
+		<div className={cn(`${prefix}icon`, toEnumViewClass(props.size))} style={props.style}>
+			<svg viewBox="0 0 16 16" className={`${prefix}icon-blueprintSvg`}>
 				{props.title && <desc>{props.title}</desc>}
 				{svgPaths}
 			</svg>

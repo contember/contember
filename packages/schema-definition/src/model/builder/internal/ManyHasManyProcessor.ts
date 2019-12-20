@@ -61,6 +61,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 			...(typeof options.inversedBy === 'undefined' ? {} : { inversedBy: options.inversedBy }),
 			target: options.target,
 			joiningTable: joiningTable,
+			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 		}
 	}
 }

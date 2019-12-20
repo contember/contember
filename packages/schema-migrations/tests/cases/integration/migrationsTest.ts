@@ -227,7 +227,8 @@ describe('Diff schemas', () => {
 					r
 						.target('PostLocale')
 						.ownerNotNull()
-						.ownedBy('post'),
+						.ownedBy('post')
+						.orderBy('title'),
 				),
 			)
 			.entity('PostLocale', e =>
@@ -298,6 +299,12 @@ describe('Diff schemas', () => {
 					type: Model.RelationType.OneHasMany,
 					target: 'PostLocale',
 					ownedBy: 'post',
+					orderBy: [
+						{
+							path: ['title'],
+							direction: 'asc',
+						},
+					],
 				},
 			},
 			{
@@ -1142,6 +1149,53 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL`ALTER TABLE "post" ALTER "category_id" SET NOT NULL;`
+		it('diff schemas', () => {
+			testDiffSchemas(originalSchema, updatedSchema, diff)
+		})
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
+	describe('set relation default order by', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Menu', e =>
+				e.oneHasMany('items', r =>
+					r
+						.ownedBy('menu')
+						.target('MenuItem', e => e.column('heading').column('order', c => c.type(Model.ColumnType.Int))),
+				),
+			)
+			.buildSchema()
+
+		const updatedSchema = new SchemaBuilder()
+			.entity('Menu', e =>
+				e.oneHasMany('items', r =>
+					r
+						.ownedBy('menu')
+						.orderBy('order')
+						.target('MenuItem', e => e.column('heading').column('order', c => c.type(Model.ColumnType.Int))),
+				),
+			)
+			.buildSchema()
+
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateRelationOrderBy',
+				entityName: 'Menu',
+				fieldName: 'items',
+				orderBy: [
+					{
+						path: ['order'],
+						direction: 'asc',
+					},
+				],
+			},
+		]
+		const sql = SQL``
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})

@@ -1,3 +1,5 @@
+import Input from './input'
+
 namespace Model {
 	export interface Entity {
 		name: string
@@ -215,7 +217,14 @@ namespace Model {
 		joiningTable: JoiningTable
 	}
 
-	export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InversedRelation
+	export import OrderDirection = Input.OrderDirection
+	export type OrderBy = { path: string[]; direction: OrderDirection }
+
+	export interface OrderableRelation {
+		orderBy?: OrderBy[]
+	}
+
+	export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InversedRelation & OrderableRelation
 	export type ManyHasOneRelation = Relation<RelationType.ManyHasOne> &
 		OwnerRelation &
 		JoiningColumnRelation &
@@ -225,8 +234,11 @@ namespace Model {
 		OwnerRelation &
 		JoiningColumnRelation &
 		NullableRelation
-	export type ManyHasManyInversedRelation = Relation<RelationType.ManyHasMany> & InversedRelation
-	export type ManyHasManyOwnerRelation = Relation<RelationType.ManyHasMany> & OwnerRelation & JoiningTableRelation
+	export type ManyHasManyInversedRelation = Relation<RelationType.ManyHasMany> & InversedRelation & OrderableRelation
+	export type ManyHasManyOwnerRelation = Relation<RelationType.ManyHasMany> &
+		OwnerRelation &
+		JoiningTableRelation &
+		OrderableRelation
 
 	export interface Schema {
 		enums: { [name: string]: string[] }

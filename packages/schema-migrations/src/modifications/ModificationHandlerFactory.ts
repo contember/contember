@@ -22,6 +22,7 @@ import PatchAclSchemaModification from './acl/PatchAclSchemaModification'
 import UpdateValidationSchemaModification from './validation/UpdateValidationSchemaModification'
 import PatchValidationSchemaModification from './validation/PatchValidationSchemaModification'
 import MakeRelationNotNullModification from './relations/MakeRelationNotNullModification'
+import UpdateRelationOrderByModification from './relations/UpdateRelationOrderByModification'
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: ModificationHandlerFactory.FactoryMap<any>) {}
@@ -65,6 +66,7 @@ namespace ModificationHandlerFactory {
 			new CreateRelationInverseSideModification(data, schema),
 		[CreateRelationModification.id]: ({ data, schema }) => new CreateRelationModification(data, schema),
 		[UpdateRelationOnDeleteModification.id]: ({ data, schema }) => new UpdateRelationOnDeleteModification(data, schema),
+		[UpdateRelationOrderByModification.id]: ({ data, schema }) => new UpdateRelationOrderByModification(data, schema),
 		[MakeRelationNotNullModification.id]: ({ data, schema }) => new MakeRelationNotNullModification(data, schema),
 
 		[UpdateValidationSchemaModification.id]: ({ data }) => new UpdateValidationSchemaModification(data),

@@ -1,5 +1,6 @@
-import * as React from 'react'
 import cn from 'classnames'
+import * as React from 'react'
+import { useClassNamePrefix } from '../auxiliary'
 import { CollapsibleTransition } from '../types'
 import { forceReflow, toEnumViewClass, toStateClass } from '../utils'
 
@@ -36,10 +37,12 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 		}
 	}, [delayedExpanded, props.expanded])
 
+	const prefix = useClassNamePrefix()
+
 	return (
 		<div
 			className={cn(
-				'collapsible',
+				`${prefix}collapsible`,
 				toEnumViewClass(props.transition, 'topInsert'),
 				toStateClass('expanded', delayedExpanded),
 				toStateClass('transitioning', isTransitioning),
@@ -52,7 +55,7 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 			aria-hidden={!props.expanded}
 			onTransitionEnd={onTransitionEnd}
 		>
-			<div className="collapsible-content" ref={contentRef}>
+			<div className={`${prefix}collapsible-content`} ref={contentRef}>
 				{props.children}
 			</div>
 		</div>

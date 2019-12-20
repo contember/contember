@@ -1,7 +1,8 @@
+import cn from 'classnames'
 import * as React from 'react'
+import { useComponentClassName } from '../auxiliary'
 import { HeadingDepthContext } from '../contexts'
 import { HeadingDepth, Size } from '../types'
-import cn from 'classnames'
 import { toEnumViewClass } from '../utils'
 
 export interface HeadingProps
@@ -18,7 +19,7 @@ export const Heading = React.memo(
 
 		return React.createElement(
 			headingElement,
-			{ ref, className: cn('heading', className, toEnumViewClass(size)), ...headingProps },
+			{ ref, className: cn(useComponentClassName('heading'), className, toEnumViewClass(size)), ...headingProps },
 			children,
 		)
 	}),

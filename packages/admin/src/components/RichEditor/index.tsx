@@ -196,7 +196,7 @@ export default class RichEditor extends React.Component<RichEditorProps, RichTex
 					<Editor
 						ref={this.ref}
 						className={cn(
-							'input',
+							'cui-input',
 							toEnumViewClass(this.props.size),
 							toEnumViewClass(this.props.distinction),
 							toEnumStateClass(this.props.validationState),

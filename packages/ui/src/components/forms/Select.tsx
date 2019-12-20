@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
+import { useClassNamePrefix } from '../../auxiliary'
 import { ControlDistinction, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'
 
@@ -26,19 +27,11 @@ export const Select = React.memo(
 			{ size, distinction, validationState, className, options, ...otherProps }: SelectProps,
 			ref: React.Ref<HTMLSelectElement>,
 		) => {
+			const prefix = useClassNamePrefix()
 			const baseClassName = cn(toEnumViewClass(size), toEnumViewClass(distinction), toEnumStateClass(validationState))
-			const selectClassName = cn('select', className, baseClassName)
-			const wrapperClassName = cn('select-wrapper', baseClassName)
+			const selectClassName = cn(`${prefix}select`, className, baseClassName)
+			const wrapperClassName = cn(`${prefix}select-wrapper`, baseClassName)
 
-			/*
-				This is a super ugly workaround to React's unfortunate limitation that all <option> contents must be just
-				strings, otherwise it will just call .toString() which, in our case, would result into '[object Object]'.
-
-				We, however, need to support JSX in order to allow for custom field formatting, and the like. It does,
-				of course, depend on people only attempting to render components that render just text but that is fine.
-
-				Relevant issue: https://github.com/facebook/react/issues/13586
-			*/
 			return (
 				<div className={wrapperClassName}>
 					<select className={selectClassName} {...otherProps} ref={ref}>

@@ -6,7 +6,7 @@
 		{ "path": "./packages/benchmark" },
 		{ "path": "./packages/cli" },
 		{ "path": "./packages/engine-server" },
-		{ "path": "./packages/cms-admin" },
+		{ "path": "./packages/admin"},
 		{ "path": "./packages/cms-client" },
 		{ "path": "./packages/cms-admin-server" },
 		{ "path": "./packages/config-loader" },

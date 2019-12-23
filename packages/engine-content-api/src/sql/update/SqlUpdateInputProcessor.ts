@@ -316,11 +316,13 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 		}),
 		create: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
 			return [
-				...(await this.mapper.update(
-					targetEntity,
-					{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-					{ [targetRelation.name]: { disconnect: true } },
-				)).filter(it => it.result !== MutationResultType.notFoundError),
+				...(
+					await this.mapper.update(
+						targetEntity,
+						{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
+						{ [targetRelation.name]: { disconnect: true } },
+					)
+				).filter(it => it.result !== MutationResultType.notFoundError),
 				...(await this.mapper.insert(targetEntity, {
 					...input,
 					[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },

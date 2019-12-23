@@ -4,6 +4,7 @@ import { promises as fs } from 'fs'
 import YAWN from 'yawn-yaml/cjs'
 import { Merger } from '@contember/config-loader'
 import jsyaml from 'js-yaml'
+import { join } from 'path'
 
 export type JsonUpdateCallback = (
 	data: JSONObject,
@@ -38,4 +39,21 @@ export const updateYaml = async (
 export const readYaml = async (path: string): Promise<JSONObject> => {
 	const content = await fs.readFile(path, { encoding: 'utf8' })
 	return jsyaml.load(content)
+}
+
+export const readMultipleYaml = async (paths: string[]): Promise<JSONObject> => {
+	const configs: any = []
+	for (const path of paths) {
+		const exists = await pathExists(path)
+		if (!exists) {
+			continue
+		}
+		const stats = await fs.lstat(path)
+		if (!stats.isFile()) {
+			continue
+		}
+		const config = await readYaml(path)
+		configs.push(config)
+	}
+	return Merger.merge(...configs)
 }

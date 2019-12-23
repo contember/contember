@@ -3,20 +3,16 @@ import Command from './Command'
 type CommandFactoryList = { [command: string]: () => Command<any, any> }
 
 export class CommandManager {
-	constructor(private readonly commands: CommandFactoryList) {}
+	constructor(public readonly commands: CommandFactoryList) {}
 
-	public getNames(): string[] {
-		return Object.keys(this.commands)
-	}
-
-	public createCommand(name: string): Command<any, any> {
+	public createCommand(name: string): [string, Command<any, any>] {
 		if (this.commands[name]) {
-			return this.commands[name]()
+			return [name, this.commands[name]()]
 		}
 		const pattern = new RegExp('^' + name.replace(/:/g, '\\w*\\:'))
 		const matchedCommands = Object.keys(this.commands).filter(it => it.match(pattern))
 		if (matchedCommands.length === 1) {
-			return this.commands[matchedCommands[0]]()
+			return [matchedCommands[0], this.commands[matchedCommands[0]]()]
 		}
 		if (matchedCommands.length === 0) {
 			throw new Error(`Command ${name} not found.`)

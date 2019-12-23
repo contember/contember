@@ -12,9 +12,10 @@ import {
 import { runCommand } from './commands'
 import getPort from 'get-port'
 import { Input } from '../cli/Input'
-import { readYaml } from './yaml'
+import { JsonUpdateCallback, readMultipleYaml, readYaml, updateYaml } from './yaml'
 import { getProjectDockerEnv } from './project'
 import { promises as fs } from 'fs'
+import { hasInstanceAdmin } from './workspace'
 
 export const validateInstanceName = (name: string) => {
 	if (!name.match(/^[a-z][a-z0-9]*$/)) {
@@ -42,7 +43,9 @@ export const createInstance = async (args: {
 	instanceName: string
 }): Promise<InstanceEnvironment> => {
 	validateInstanceName(args.instanceName)
-	await copy(join(resourcesDir, './instance-template'), getInstanceDir(args))
+	const withAdmin = await hasInstanceAdmin(args)
+	const template = withAdmin ? 'instance-template' : 'instance-no-admin-template'
+	await copy(join(resourcesDir, template), getInstanceDir(args))
 	return await resolveInstanceEnvironment({
 		workspaceDirectory: args.workspaceDirectory,
 		instanceName: args.instanceName,
@@ -229,6 +232,9 @@ export const resolvePortsMapping = async (args: {
 	let assignedPort = (args.startPort || 1024) - 1
 	const servicePortMapping: ServicePortsMapping = {}
 	for (const { service, port: containerPort } of exposedServices) {
+		if (!args.config.services[service]) {
+			continue
+		}
 		const configuredPorts = getConfiguredPorts(args.config, service)
 		const configuredPortMapping = configuredPorts.find(it => !containerPort || it.containerPort === containerPort)
 		const otherConfiguredPorts = configuredPorts.filter(it => it !== configuredPortMapping)
@@ -264,7 +270,7 @@ export const resolveInstanceDockerConfig = async ({
 	host?: string
 	savePortsMapping?: boolean
 	startPort?: number
-}): Promise<Readonly<any>> => {
+}): Promise<{ composeConfig: any; portsMapping: ServicePortsMapping }> => {
 	const instanceName = instanceDirectoryToName(instanceDirectory)
 
 	let config = await readDefaultDockerComposeConfig(instanceDirectory)
@@ -293,23 +299,25 @@ export const resolveInstanceDockerConfig = async ({
 	if (savePortsMapping) {
 		await updateOverrideConfig(instanceDirectory, config => updateConfigWithPorts(config, portMapping))
 	}
-
-	if (!config.services.admin.environment) {
-		config.services.admin.environment = {}
-	}
-	if (portMapping.admin[0].containerPort) {
-		config.services.admin.environment.CONTEMBER_PORT = portMapping.admin[0].containerPort
-	}
-	config.services.admin.environment.CONTEMBER_INSTANCE = instanceName
-	const apiServer = `http://127.0.0.1:${portMapping.api[0].hostPort}`
-	if (!config.services.admin.environment.CONTEMBER_API_SERVER) {
-		config.services.admin.environment.CONTEMBER_API_SERVER = apiServer
-	}
-	if (!config.services.admin.user) {
-		config.services.admin.user = String(process.getuid())
-	}
 	if (!config.services.api.user) {
 		config.services.api.user = String(process.getuid())
+	}
+
+	if (config.services.admin) {
+		if (!config.services.admin.environment) {
+			config.services.admin.environment = {}
+		}
+		if (portMapping.admin[0].containerPort) {
+			config.services.admin.environment.CONTEMBER_PORT = portMapping.admin[0].containerPort
+		}
+		config.services.admin.environment.CONTEMBER_INSTANCE = instanceName
+		const apiServer = `http://127.0.0.1:${portMapping.api[0].hostPort}`
+		if (!config.services.admin.environment.CONTEMBER_API_SERVER) {
+			config.services.admin.environment.CONTEMBER_API_SERVER = apiServer
+		}
+		if (!config.services.admin.user) {
+			config.services.admin.user = String(process.getuid())
+		}
 	}
 
 	const projectConfig: any = await readYaml(join(instanceDirectory, 'api/config.yaml'))
@@ -343,5 +351,24 @@ mkdir -p /data/.minio.sys/buckets/contember && \\
 echo "${bucketPolicy.replace(/"/g, '\\"')}" > /data/.minio.sys/buckets/contember/policy.json && \\
 /usr/bin/minio server --address :${portMapping.s3[0].containerPort} /data'`
 
-	return config
+	return { composeConfig: config, portsMapping: portMapping }
+}
+
+const INSTANCE_LOCAL_FILE = 'contember.instance.local.yaml'
+
+export interface InstanceConfig {
+	loginToken?: string
+}
+
+export const readInstanceConfig = async (args: { instanceDirectory: string }): Promise<InstanceConfig> => {
+	const paths = ['contember.instance.yaml', INSTANCE_LOCAL_FILE].map(it => join(args.instanceDirectory, it))
+	return await readMultipleYaml(paths)
+}
+
+export const updateInstanceLocalConfig = async (args: {
+	instanceDirectory: string
+	updater: JsonUpdateCallback
+}): Promise<void> => {
+	const path = join(args.instanceDirectory, INSTANCE_LOCAL_FILE)
+	return updateYaml(path, args.updater, { createMissing: true })
 }

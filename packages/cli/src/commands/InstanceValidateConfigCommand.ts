@@ -1,13 +1,8 @@
 import Command from '../cli/Command'
 import CommandConfiguration from '../cli/CommandConfiguration'
 import { Input } from '../cli/Input'
-import {
-	printInstanceStatus,
-	resolveInstanceDockerConfig,
-	resolveInstanceEnvironmentFromInput,
-} from '../utils/instance'
-import { execDockerCompose } from '../utils/dockerCompose'
-import { dump } from 'js-yaml'
+import { resolveInstanceDockerConfig, resolveInstanceEnvironmentFromInput } from '../utils/instance'
+import { DockerCompose } from '../utils/dockerCompose'
 import { ChildProcessError } from '../utils/commands'
 
 type Args = {
@@ -18,22 +13,17 @@ type Options = {}
 
 export class InstanceValidateConfigCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration): void {
-		configuration.description('Show status of local Contember instance')
+		configuration.description('Validates configuration of Contember instance')
 		configuration.argument('instanceName').optional()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput(input)
-		const config = await resolveInstanceDockerConfig({ instanceDirectory })
-		const configYaml = dump(config)
+		const { composeConfig } = await resolveInstanceDockerConfig({ instanceDirectory })
 		try {
-			await execDockerCompose(
-				['-f', '-', 'run', '--no-deps', '--rm', 'api', 'node', './dist/src/start.js', 'validate'],
-				{
-					cwd: instanceDirectory,
-					stdin: configYaml,
-				},
-			)
+			const dockerCompose = new DockerCompose(instanceDirectory, composeConfig)
+
+			await dockerCompose.run(['run', '--no-deps', '--rm', 'api', 'node', './dist/src/start.js', 'validate']).output
 			console.log('Configuration is valid')
 		} catch (e) {
 			if (e instanceof ChildProcessError) {

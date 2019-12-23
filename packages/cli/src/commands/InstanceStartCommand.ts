@@ -4,11 +4,12 @@ import { Input } from '../cli/Input'
 import {
 	getInstanceStatus,
 	printInstanceStatus,
+	readInstanceConfig,
 	resolveInstanceDockerConfig,
 	resolveInstanceEnvironmentFromInput,
+	updateInstanceLocalConfig,
 } from '../utils/instance'
-import { execDockerCompose, runDockerCompose, updateOverrideConfig } from '../utils/dockerCompose'
-import { dump } from 'js-yaml'
+import { DockerCompose, updateOverrideConfig } from '../utils/dockerCompose'
 import { interactiveSetup } from '../utils/setup'
 import { runCommand } from '../utils/commands'
 
@@ -39,27 +40,26 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput(input)
-		const config = await resolveInstanceDockerConfig({
+		const { composeConfig, portsMapping } = await resolveInstanceDockerConfig({
 			instanceDirectory,
 			host: input.getOption('host'),
 			startPort: input.getOption('admin-port') ? Number(input.getOption('admin-port')) : undefined,
 			//savePortsMapping: input.getOption('save-ports'),
 		})
-		const adminEnv = config.services.admin.environment
 
-		const nodeAdminRuntime = input.getOption('admin-runtime') === 'node'
+		let dockerCompose = new DockerCompose(instanceDirectory, composeConfig)
+
+		const withAdmin = !!composeConfig.services.admin
+		const adminEnv = !withAdmin ? {} : { ...composeConfig.services.admin.environment }
+
+		const nodeAdminRuntime = withAdmin && input.getOption('admin-runtime') === 'node'
 		if (nodeAdminRuntime) {
-			delete config.services.admin
+			delete composeConfig.services.admin
 		}
-		const mainServices = ['api', ...(nodeAdminRuntime ? [] : ['admin'])]
+		const mainServices = ['api', ...(!withAdmin || nodeAdminRuntime ? [] : ['admin'])]
 
-		const configYaml = dump(config)
 		const exit = async () => {
-			await execDockerCompose(['-f', '-', 'down'], {
-				cwd: instanceDirectory,
-				stdin: configYaml,
-				detached: true,
-			})
+			await dockerCompose.run(['down']).output
 			process.exit(0)
 		}
 		let terminating = false
@@ -75,24 +75,10 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			}
 		})
 
-		await execDockerCompose(['-f', '-', 'pull', 'api'], {
-			cwd: instanceDirectory,
-			stdin: configYaml,
-		})
-
-		await execDockerCompose(['-f', '-', 'stop', ...mainServices], {
-			cwd: instanceDirectory,
-			stdin: configYaml,
-		})
-		await execDockerCompose(['-f', '-', 'rm', '-f', ...mainServices], {
-			cwd: instanceDirectory,
-			stdin: configYaml,
-		})
-
-		await execDockerCompose(['-f', '-', 'up', '-d'], {
-			cwd: instanceDirectory,
-			stdin: configYaml,
-		})
+		await dockerCompose.run(['pull', 'api']).output
+		await dockerCompose.run(['stop', ...mainServices]).output
+		await dockerCompose.run(['rm', '-f', ...mainServices]).output
+		await dockerCompose.run(['up', '-d']).output
 
 		await new Promise(resolve => setTimeout(resolve, 2000))
 
@@ -101,35 +87,47 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		if (notRunning.length > 0) {
 			const notRunningNames = notRunning.map(it => it.name)
 			console.error(`Following services failed to start: ${notRunningNames.join(', ')}`)
-			await execDockerCompose(['-f', '-', 'logs', ...notRunningNames], {
-				cwd: instanceDirectory,
-				stdin: configYaml,
-			})
+			await dockerCompose.run(['logs', ...notRunningNames])
 			return
 		}
 
-		if (!adminEnv.CONTEMBER_LOGIN_TOKEN) {
+		const instanceConfig = await readInstanceConfig({ instanceDirectory })
+		const updateLocalConfigLoginToken = async (loginToken: string) =>
+			await updateInstanceLocalConfig({
+				instanceDirectory,
+				updater: data => ({ ...data, loginToken }),
+			})
+		if (!instanceConfig.loginToken && adminEnv.CONTEMBER_LOGIN_TOKEN) {
+			await updateLocalConfigLoginToken(adminEnv.CONTEMBER_LOGIN_TOKEN)
+			instanceConfig.loginToken = adminEnv.CONTEMBER_LOGIN_TOKEN
+		} else if (!instanceConfig.loginToken) {
 			console.log('It seems that this is first run of this instance. Will try to execute a setup.')
-			console.log('If that is not true, please fill your login token to a docker-compose.override.yaml')
+			console.log('If that is not true, please fill your login token to a contember.instance.local.yaml')
 
-			const { loginToken } = await interactiveSetup(adminEnv.CONTEMBER_API_SERVER)
+			const server = `http://127.0.0.1:${portsMapping.api[0].hostPort}`
+			const { loginToken } = await interactiveSetup(server)
 			console.log('Superadmin account created.')
 
-			await updateOverrideConfig(instanceDirectory, (config, { merge }) =>
-				merge(config, {
-					version: '3.7',
-					services: { admin: { environment: { CONTEMBER_LOGIN_TOKEN: loginToken } } },
-				}),
-			)
+			if (withAdmin) {
+				await updateOverrideConfig(instanceDirectory, (config, { merge }) =>
+					merge(config, {
+						version: '3.7',
+						services: { admin: { environment: { CONTEMBER_LOGIN_TOKEN: loginToken } } },
+					}),
+				)
+			}
+			await updateLocalConfigLoginToken(loginToken)
+			instanceConfig.loginToken = loginToken
 
 			adminEnv.CONTEMBER_LOGIN_TOKEN = loginToken
-			console.log('Login token and saved to your docker-compose.override.yaml: ' + loginToken)
+			console.log('Login token and saved to your contember.instance.local.yaml: ' + loginToken)
 
-			if (!nodeAdminRuntime) {
-				await execDockerCompose(['-f', '-', 'up', '-d', 'admin'], {
-					cwd: instanceDirectory,
-					stdin: dump(config),
+			if (withAdmin && !nodeAdminRuntime) {
+				dockerCompose = dockerCompose.withService('admin', {
+					...dockerCompose.config.services.admin,
+					environment: adminEnv,
 				})
+				await dockerCompose.run(['up', '-d', 'admin']).output
 			}
 		}
 		let timeoutRef: any = null
@@ -174,10 +172,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		printNodeAdminStatus()
 		await printInstanceStatus({ instanceDirectory })
 
-		const { child, output } = runDockerCompose(['-f', '-', 'logs', '-f', ...mainServices], {
-			cwd: instanceDirectory,
-			stdin: configYaml,
-		})
+		const { child, output } = dockerCompose.run(['logs', '-f', ...mainServices])
 
 		child.stdout.on('data', () => {
 			planPrintInstanceStatus()

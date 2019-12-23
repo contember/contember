@@ -14,6 +14,7 @@ import { ProjectRegisterCommand } from './commands/ProjectRegisterCommand'
 import { InstanceReloadApiCommand } from './commands/InstanceReloadApiCommand'
 import { InstanceLogsCommand } from './commands/InstanceLogsCommand'
 import { InstanceValidateConfigCommand } from './commands/InstanceValidateConfigCommand'
+import { InstanceCreateCommand } from './commands/InstanceCreateCommand'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -26,6 +27,7 @@ import { InstanceValidateConfigCommand } from './commands/InstanceValidateConfig
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),
+		['instance:create']: () => new InstanceCreateCommand(),
 		['instance:setup']: () => new SetupCommand(),
 		['instance:info']: () => new InstanceInfoCommand(),
 		['instance:up']: () => new InstanceStartCommand(),

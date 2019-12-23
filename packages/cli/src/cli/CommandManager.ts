@@ -3,11 +3,7 @@ import Command from './Command'
 type CommandFactoryList = { [command: string]: () => Command<any, any> }
 
 export class CommandManager {
-	constructor(private readonly commands: CommandFactoryList) {}
-
-	public getNames(): string[] {
-		return Object.keys(this.commands)
-	}
+	constructor(public readonly commands: CommandFactoryList) {}
 
 	public createCommand(name: string): [string, Command<any, any>] {
 		if (this.commands[name]) {

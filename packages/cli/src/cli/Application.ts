@@ -11,7 +11,11 @@ class Application {
 		const [name, ...rest] = commandArgs
 		if (!name || name === '--help') {
 			console.log(`Usage: <command> <command args>`)
-			for (let commandName of this.commandManager.getNames().sort((a, b) => a.localeCompare(b))) {
+			const commands = Object.entries(this.commandManager.commands)
+				.filter(([name, factory], index, commands) => commands.findIndex(it => it[1] === factory) === index)
+				.map(([name]) => name)
+				.sort((a, b) => a.localeCompare(b))
+			for (let commandName of commands) {
 				const [, command] = this.commandManager.createCommand(commandName)
 				const configuration = command.getConfiguration()
 				const usage = configuration.getUsage()

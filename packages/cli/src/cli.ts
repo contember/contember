@@ -21,9 +21,10 @@ import { InstanceCreateCommand } from './commands/InstanceCreateCommand'
 			experimentalDecorators: true,
 		},
 	})
+	const diffCommandFactory = () => new DiffCommand()
 	const commandManager = new CommandManager({
-		['diff']: () => new DiffCommand(),
-		['dry-run']: () => new DryRunCommand(),
+		['migrations:diff']: diffCommandFactory,
+		['migrations:dry-run']: () => new DryRunCommand(),
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),
@@ -35,6 +36,7 @@ import { InstanceCreateCommand } from './commands/InstanceCreateCommand'
 		['instance:logs']: () => new InstanceLogsCommand(),
 		['instance:validate-config']: () => new InstanceValidateConfigCommand(),
 		['instance:reload:api']: () => new InstanceReloadApiCommand(),
+		['diff']: diffCommandFactory,
 	})
 	const app = new Application(commandManager)
 	await app.run(process.argv)

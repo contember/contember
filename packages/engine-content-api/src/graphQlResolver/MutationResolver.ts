@@ -8,7 +8,7 @@ import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
 import { Client, Connection } from '@contember/database'
 import { MutationOperation, readMutationMeta } from '../graphQLSchema/MutationExtension'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultType, MutationResultList } from '../sql/Result'
 import { InputPreValidator } from '../input-validation/preValidation/InputPreValidator'
 

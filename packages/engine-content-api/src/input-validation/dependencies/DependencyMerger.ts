@@ -1,4 +1,4 @@
-import { tuple } from '../utils'
+import { tuple } from '../../utils'
 import DependencyCollector from './DependencyCollector'
 
 export default class DependencyMerger {

@@ -1,5 +1,5 @@
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
-import { tuple } from '@contember/utils'
+import { tuple } from '../../utils'
 import { Input, Model, Validation, Value } from '@contember/schema'
 import { InputValidation } from '@contember/schema-definition'
 import { CreateInputVisitor, UpdateInputVisitor } from '../../inputProcessing'

@@ -84,7 +84,7 @@ export class InputPreValidator {
 				return this.columnValueResolver.getDefaultValidationValue({ entity, column, input: value })
 			},
 			visitHasOne: (entity, relation) => {
-				const value = data[relation.name] as (Input.CreateOneRelationInput | undefined)
+				const value = data[relation.name] as Input.CreateOneRelationInput | undefined
 				return value ? true : null
 			},
 			// more complex validation on relations are not possible in pre-validation phase
@@ -105,7 +105,7 @@ export class InputPreValidator {
 				return data[column.name] as Input.ColumnValue | undefined
 			},
 			visitHasOne: (entity, relation) => {
-				const value = data[relation.name] as (Input.CreateOneRelationInput | Input.UpdateOneRelationInput | undefined)
+				const value = data[relation.name] as Input.CreateOneRelationInput | Input.UpdateOneRelationInput | undefined
 				if (value === undefined) {
 					return undefined
 				}

@@ -110,7 +110,13 @@ class Mapper {
 		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
-		const selectPromise = selector.select(this, entity, this.predicatesInjector.inject(entity, inputWithOrder), path, groupBy)
+		const selectPromise = selector.select(
+			this,
+			entity,
+			this.predicatesInjector.inject(entity, inputWithOrder),
+			path,
+			groupBy,
+		)
 		const rows = await selector.execute(this.db)
 		await selectPromise
 

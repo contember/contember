@@ -1,6 +1,6 @@
 import { Input, Model, Value } from '@contember/schema'
 import { convertError } from './ErrorUtils'
-import { tuple } from '@contember/utils'
+import { tuple } from '../utils'
 
 export enum MutationResultType {
 	ok = 'ok',

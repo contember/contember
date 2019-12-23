@@ -9,19 +9,34 @@ class Application {
 		const [{}, {}, ...commandArgs] = args
 
 		const [name, ...rest] = commandArgs
-		if (!name) {
+		if (!name || name === '--help') {
 			console.log(`Usage: <command> <command args>`)
 			for (let commandName of this.commandManager.getNames().sort((a, b) => a.localeCompare(b))) {
-				const command = this.commandManager.createCommand(commandName)
+				const [, command] = this.commandManager.createCommand(commandName)
 				const configuration = command.getConfiguration()
-				const commandUsage = configuration.getUsage() ? ' ' + configuration.getUsage() : ''
+				const usage = configuration.getUsage()
+				const commandUsage = usage ? ' ' + usage : ''
 				const description = configuration.getDescription() ? ` - ${configuration.getDescription()}` : ''
 				console.log(`\t${chalk.greenBright(commandName)}${chalk.green(commandUsage)}${description}`)
 			}
 			return process.exit(0)
 		}
 
-		const command = this.commandManager.createCommand(name)
+		const [fullName, command] = this.commandManager.createCommand(name)
+		if (rest[0] === '--help') {
+			console.log(chalk.greenBright(fullName))
+			const configuration = command.getConfiguration()
+			const commandDescription = configuration.getDescription()
+			if (commandDescription) {
+				console.log(commandDescription)
+			}
+			console.log('\nUsage:')
+			console.log(chalk.green(configuration.getUsage('short')))
+			console.log('\nArguments and options:')
+			console.log(configuration.getUsage('multiline'))
+
+			return process.exit(0)
+		}
 
 		try {
 			const result = await command.run(rest)

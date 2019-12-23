@@ -1,7 +1,7 @@
 import Argument from './Argument'
 import Option from './Option'
 import InputParser from './InputParser'
-import UsageFormatter from './UsageFormatter'
+import UsageFormatter, { UsageFormat } from './UsageFormatter'
 
 class CommandConfiguration {
 	private descriptionValue: string = ''
@@ -48,8 +48,8 @@ class CommandConfiguration {
 		return new InputParser(this.arguments, this.options)
 	}
 
-	public getUsage(): string {
-		return UsageFormatter.format(this.arguments, this.options)
+	public getUsage(format: UsageFormat = 'line'): string {
+		return UsageFormatter.format(this.arguments, this.options, format)
 	}
 }
 

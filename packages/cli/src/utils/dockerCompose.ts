@@ -1,10 +1,9 @@
-import { promises as fs } from 'fs'
 import { pathExists } from 'fs-extra'
 import { join } from 'path'
-import { Merger } from '@contember/config-loader'
 import { runCommand, RunningCommand } from './commands'
 import { Readable, Writable } from 'stream'
-import { JsonUpdateCallback, readYaml, updateYaml } from './yaml'
+import { JsonUpdateCallback, readMultipleYaml, updateYaml } from './yaml'
+import { dump } from 'js-yaml'
 
 const OVERRIDE_CONFIGS = ['docker-compose.override.yaml', 'docker-compose.override.yml']
 const MAIN_CONFIGS = ['docker-compose.yaml', 'docker-compose.yml']
@@ -23,21 +22,8 @@ export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallb
 
 export const readDefaultDockerComposeConfig = async (dir: string): Promise<any> => {
 	const candidates = [...MAIN_CONFIGS, ...OVERRIDE_CONFIGS]
-	const configs: any = []
-	for (const file of candidates) {
-		const path = join(dir, file)
-		const exists = await pathExists(path)
-		if (!exists) {
-			continue
-		}
-		const stats = await fs.lstat(path)
-		if (!stats.isFile()) {
-			continue
-		}
-		const config = await readYaml(path)
-		configs.push(config)
-	}
-	return Merger.merge(...configs)
+
+	return await readMultipleYaml(candidates.map(it => join(dir, it)))
 }
 
 export type PortsMapping = {
@@ -71,17 +57,18 @@ export const getConfiguredPorts = (config: any, service: string): PortsMapping[]
 		.filter((it): it is PortsMapping => it !== null)
 }
 
-export const execDockerCompose = async (
-	args: string[],
-	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv; detached?: boolean },
-): Promise<string> => {
+export type DockerComposeRunOptions = {
+	cwd: string
+	stdin?: string
+	stdout?: Writable | false
+	env?: NodeJS.ProcessEnv
+	detached?: boolean
+}
+export const execDockerCompose = async (args: string[], options: DockerComposeRunOptions): Promise<string> => {
 	return await runDockerCompose(args, options).output
 }
 
-export const runDockerCompose = (
-	args: string[],
-	options: { cwd: string; stdin?: string; stdout?: Writable | false; env?: NodeJS.ProcessEnv; detached?: boolean },
-): RunningCommand => {
+export const runDockerCompose = (args: string[], options: DockerComposeRunOptions): RunningCommand => {
 	const input = new Readable()
 	const command = runCommand('docker-compose', args, {
 		cwd: options.cwd,
@@ -97,4 +84,40 @@ export const runDockerCompose = (
 	input.push(options.stdin)
 	input.push(null)
 	return command
+}
+
+interface DockerComposeServiceConfig {
+	environment: Record<string, string>
+}
+
+interface DockerComposeConfig {
+	services: Record<string, DockerComposeServiceConfig>
+}
+
+export class DockerCompose {
+	private configYamlCache: string | null = null
+
+	get configYaml(): string {
+		if (this.configYamlCache === null) {
+			this.configYamlCache = dump(this.config)
+		}
+		return this.configYamlCache
+	}
+
+	constructor(private readonly cwd: string, public readonly config: DockerComposeConfig) {}
+
+	run(args: string[]): RunningCommand {
+		return runDockerCompose(['-f', '-', ...args], {
+			cwd: this.cwd,
+			stdin: this.configYaml,
+		})
+	}
+
+	public withConfig(config: DockerComposeConfig): DockerCompose {
+		return new DockerCompose(this.cwd, config)
+	}
+
+	public withService(service: string, serviceConfig: DockerComposeServiceConfig): DockerCompose {
+		return this.withConfig({ ...this.config, services: { ...this.config.services, [service]: serviceConfig } })
+	}
 }

@@ -1,0 +1,5 @@
+/dist
+/node_modules
+/instances/*/docker-compose.override.yaml
+/instances/*/api/config.yaml
+

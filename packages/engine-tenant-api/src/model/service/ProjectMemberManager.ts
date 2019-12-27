@@ -81,8 +81,14 @@ class ProjectMemberManager {
 		return this.queryHandler.fetch(new ProjectBySlugVariablesByIdentityQuery(projectSlug, identityId))
 	}
 
-	async getProjectMemberships(projectId: string, identityId: string): Promise<ProjectMembershipByIdentityQuery.Result> {
-		return this.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: projectId }, identityId))
+	async getProjectMemberships(
+		projectId: string,
+		identity: { id: string; roles?: string[] },
+	): Promise<ProjectMembershipByIdentityQuery.Result> {
+		if (identity.roles && identity.roles.includes(TenantRole.SUPER_ADMIN)) {
+			return [{ role: Identity.ProjectRole.ADMIN, variables: [] }]
+		}
+		return this.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: projectId }, identity.id))
 	}
 
 	async getProjectBySlugMemberships(
@@ -102,7 +108,7 @@ class ProjectMemberManager {
 		return await Promise.all(
 			members.map(async it => ({
 				identity: it,
-				memberships: await this.getProjectMemberships(projectId, it.id),
+				memberships: await this.getProjectMemberships(projectId, { id: it.id }),
 			})),
 		)
 	}

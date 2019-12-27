@@ -44,6 +44,11 @@ type Author {
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
 }
 
+type AuthorConnection {
+  pageInfo: PageInfo!
+  edges: [AuthorEdge!]
+}
+
 input AuthorCreateInput {
   name: String
   posts: [AuthorCreatePostsEntityRelationInput!]
@@ -67,6 +72,10 @@ type AuthorDeleteResult {
   ok: Boolean!
   node: Author
   errors: [_MutationError!]!
+}
+
+type AuthorEdge {
+  node: Author
 }
 
 type AuthorMeta {
@@ -144,6 +153,11 @@ type Category {
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
 }
 
+type CategoryConnection {
+  pageInfo: PageInfo!
+  edges: [CategoryEdge!]
+}
+
 input CategoryCreateInput {
   name: String
   posts: [CategoryCreatePostsEntityRelationInput!]
@@ -167,6 +181,10 @@ type CategoryDeleteResult {
   ok: Boolean!
   node: Category
   errors: [_MutationError!]!
+}
+
+type CategoryEdge {
+  node: Category
 }
 
 type CategoryMeta {
@@ -324,6 +342,10 @@ enum OrderDirection {
   desc
 }
 
+type PageInfo {
+  totalCount: Int!
+}
+
 type Post {
   _meta: PostMeta
   id: UUID!
@@ -333,6 +355,11 @@ type Post {
   author(filter: AuthorWhere): Author
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
   localesByLocale(by: PostLocalesByLocaleUniqueWhere, filter: PostLocaleWhere): PostLocale
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge!]
 }
 
 input PostCreateAuthorEntityRelationInput {
@@ -374,12 +401,21 @@ type PostDeleteResult {
   errors: [_MutationError!]!
 }
 
+type PostEdge {
+  node: Post
+}
+
 type PostLocale {
   _meta: PostLocaleMeta
   id: UUID!
   locale: Locale
   title: String
   post(filter: PostWhere): Post
+}
+
+type PostLocaleConnection {
+  pageInfo: PageInfo!
+  edges: [PostLocaleEdge!]
 }
 
 input PostLocaleCreateInput {
@@ -405,6 +441,10 @@ type PostLocaleDeleteResult {
   ok: Boolean!
   node: PostLocale
   errors: [_MutationError!]!
+}
+
+type PostLocaleEdge {
+  node: PostLocale
 }
 
 type PostLocaleMeta {
@@ -657,19 +697,23 @@ input PostWithoutLocalesUpdateInput {
 
 type Query {
   getCategory(by: CategoryUniqueWhere!): Category
-  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
   validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
   validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
   getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
-  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
   getPost(by: PostUniqueWhere!): Post
-  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
   validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
   getAuthor(by: AuthorUniqueWhere!): Author
-  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
   validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
   transaction: QueryTransaction
@@ -678,19 +722,23 @@ type Query {
 
 type QueryTransaction {
   getCategory(by: CategoryUniqueWhere!): Category
-  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
   validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
   validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
   getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
-  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
   getPost(by: PostUniqueWhere!): Post
-  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
   validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
   getAuthor(by: AuthorUniqueWhere!): Author
-  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
   validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
 }

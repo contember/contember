@@ -3,8 +3,6 @@ import VariableInjector from '../../../src/acl/VariableInjector'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import PredicatesInjector from '../../../src/acl/PredicatesInjector'
-import ObjectNode from '../../../src/graphQlResolver/ObjectNode'
-import FieldNode from '../../../src/graphQlResolver/FieldNode'
 import PredicateFactory from '../../../src/acl/PredicateFactory'
 
 describe('predicates injector', () => {
@@ -50,34 +48,9 @@ describe('predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
 		)
-		const obj: ObjectNode = new ObjectNode('PostLocale', 'PostLocale', [new FieldNode('id', 'id', {})], {}, {}, [])
-		const result = injector.inject(schema.entities['PostLocale'], obj)
+		const result = injector.inject(schema.entities['PostLocale'], {})
 
-		expect(result.args.filter).toEqual({
-			and: [
-				{
-					locale: { in: ['cs'] },
-				},
-			],
-		})
-	})
-
-	it('injects predicate and ignore duplicates', () => {
-		const injector = new PredicatesInjector(
-			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
-		)
-		const obj: ObjectNode = new ObjectNode(
-			'PostLocale',
-			'PostLocale',
-			[new FieldNode('id', 'id', {}), new FieldNode('title', 'title', {})],
-			{},
-			{},
-			[],
-		)
-		const result = injector.inject(schema.entities['PostLocale'], obj)
-
-		expect(result.args.filter).toEqual({
+		expect(result).toEqual({
 			and: [
 				{
 					locale: { in: ['cs'] },
@@ -91,19 +64,9 @@ describe('predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
 		)
-		const obj: ObjectNode = new ObjectNode(
-			'PostLocale',
-			'PostLocale',
-			[new FieldNode('id', 'id', {})],
-			{
-				filter: { id: { in: [1, 2] } },
-			},
-			{},
-			[],
-		)
-		const result = injector.inject(schema.entities['PostLocale'], obj)
+		const result = injector.inject(schema.entities['PostLocale'], { id: { in: [1, 2] } })
 
-		expect(result.args.filter).toEqual({
+		expect(result).toEqual({
 			and: [
 				{
 					and: [
@@ -129,19 +92,10 @@ describe('predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
 		)
-		const obj: ObjectNode = new ObjectNode(
-			'PostLocale',
-			'PostLocale',
-			[new FieldNode('id', 'id', {})],
-			{
-				filter: { title: { eq: 'abc' } },
-			},
-			{},
-			[],
-		)
-		const result = injector.inject(schema.entities['PostLocale'], obj)
 
-		expect(result.args.filter).toEqual({
+		const result = injector.inject(schema.entities['PostLocale'], { title: { eq: 'abc' } })
+
+		expect(result).toEqual({
 			and: [
 				{
 					and: [

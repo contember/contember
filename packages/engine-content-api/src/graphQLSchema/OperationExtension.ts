@@ -24,4 +24,5 @@ export const enum Operation {
 	delete = 'delete',
 	list = 'list',
 	get = 'get',
+	paginate = 'paginate',
 }

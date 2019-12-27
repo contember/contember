@@ -16,7 +16,6 @@ import UpdateEntityRelationInputFieldVisitor from './mutations/UpdateEntityRelat
 import UpdateEntityRelationInputProvider from './mutations/UpdateEntityRelationInputProvider'
 import UpdateEntityInputFieldVisitor from './mutations/UpdateEntityInputFieldVisitor'
 import EntityInputProvider from './mutations/EntityInputProvider'
-import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import UpdateEntityRelationAllowedOperationsVisitor from './mutations/UpdateEntityRelationAllowedOperationsVisitor'
 import CreateEntityRelationAllowedOperationsVisitor from './mutations/CreateEntityRelationAllowedOperationsVisitor'
 import OrderByTypeProvider from './OrderByTypeProvider'
@@ -25,14 +24,10 @@ import HasManyToHasOneRelationReducerFieldVisitor from '../extensions/hasManyToH
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
 import { CustomTypesProvider } from './CustomTypesProvider'
-import { ValidationSchemaTypeProvider } from './ValidationSchemaTypeProvider'
-import { getArgumentValues } from 'graphql/execution/values'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 
 export default class GraphQlSchemaBuilderFactory {
-	constructor(
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
-		private readonly argumentValuesResolver: typeof getArgumentValues,
-	) {}
+	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {}
 
 	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
 		const authorizator = new StaticAuthorizator(permissions)
@@ -76,14 +71,12 @@ export default class GraphQlSchemaBuilderFactory {
 		)
 		entityTypeProviderAccessor.set(entityTypeProvider)
 
-		const queryAstFactory = new GraphQlQueryAstFactory(this.argumentValuesResolver)
 		const queryProvider = new QueryProvider(
 			schema,
 			authorizator,
 			whereTypeProvider,
 			orderByTypeProvider,
 			entityTypeProvider,
-			queryAstFactory,
 			this.graphqlObjectFactories,
 		)
 
@@ -145,7 +138,7 @@ export default class GraphQlSchemaBuilderFactory {
 		)
 		updateEntityInputProviderAccessor.set(updateEntityInputProvider)
 
-		const validationSchemaTypeProvider = new ValidationSchemaTypeProvider(this.graphqlObjectFactories)
+		const resultSchemaTypeProvider = new ResultSchemaTypeProvider(this.graphqlObjectFactories)
 		const mutationProvider = new MutationProvider(
 			schema,
 			authorizator,
@@ -153,9 +146,8 @@ export default class GraphQlSchemaBuilderFactory {
 			entityTypeProvider,
 			createEntityInputProvider,
 			updateEntityInputProvider,
-			queryAstFactory,
 			this.graphqlObjectFactories,
-			validationSchemaTypeProvider,
+			resultSchemaTypeProvider,
 		)
 		const validationQueriesProvider = new ValidationQueriesProvider(
 			schema,
@@ -163,7 +155,7 @@ export default class GraphQlSchemaBuilderFactory {
 			createEntityInputProvider,
 			updateEntityInputProvider,
 			this.graphqlObjectFactories,
-			validationSchemaTypeProvider,
+			resultSchemaTypeProvider,
 		)
 
 		return new GraphQlSchemaBuilder(
@@ -172,6 +164,7 @@ export default class GraphQlSchemaBuilderFactory {
 			validationQueriesProvider,
 			mutationProvider,
 			this.graphqlObjectFactories,
+			resultSchemaTypeProvider,
 		)
 	}
 }

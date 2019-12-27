@@ -1,5 +1,5 @@
 import { AuthorizationScope } from '@contember/authorization'
-import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { Identity } from '@contember/engine-common'
 import { ProjectsQuery } from './ProjectsQuery'
 import { PermissionActions, PermissionContext } from '../authorization'
@@ -10,14 +10,13 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<ProjectsByIdentityQuery.Result> {
-		const identityResult = await queryable
-			.createSelectBuilder<{ roles: string[] }>()
+		const identityResult = await SelectBuilder.create<{ roles: string[] }>()
 			.from('identity')
 			.where({
 				id: this.identityId,
 			})
 			.select('roles')
-			.getResult()
+			.getResult(queryable.db)
 		const identityRow = this.fetchOneOrNull(identityResult)
 		if (!identityRow) {
 			return []
@@ -37,8 +36,7 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 			return await new ProjectsQuery().fetch(queryable)
 		}
 
-		const qb = queryable
-			.createSelectBuilder<ProjectsByIdentityQuery.Row>()
+		const qb = SelectBuilder.create<ProjectsByIdentityQuery.Row>()
 			.select(['project', 'id'])
 			.select(['project', 'name'])
 			.select(['project', 'slug'])
@@ -46,8 +44,7 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 			.where(where =>
 				where.in(
 					['project', 'id'],
-					queryable
-						.createSelectBuilder()
+					SelectBuilder.create()
 						.from('project_membership')
 						.select('project_id')
 						.where({
@@ -60,8 +57,7 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 			: qb.where(where =>
 					where.in(
 						['project', 'id'],
-						queryable
-							.createSelectBuilder()
+						SelectBuilder.create()
 							.from('project_membership')
 							.select('project_id')
 							.where({
@@ -70,7 +66,7 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 					),
 			  )
 
-		return await qbWithIdentityPermissions.getResult()
+		return await qbWithIdentityPermissions.getResult(queryable.db)
 	}
 }
 

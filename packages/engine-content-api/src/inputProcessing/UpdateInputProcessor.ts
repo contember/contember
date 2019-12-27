@@ -60,4 +60,4 @@ namespace UpdateInputProcessor {
 	}
 }
 
-export default UpdateInputProcessor
+export { UpdateInputProcessor }

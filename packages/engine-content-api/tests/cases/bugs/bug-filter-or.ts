@@ -37,17 +37,15 @@ it('Filter by "has one" multiple times with OR', async () => {
 		query: query,
 		queryVariables: { location: testUuid(1) },
 		executes: [
-			...sqlTransaction([
-				{
-					sql: SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name" 
+			{
+				sql: SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name" 
     from "public"."pub" as "root_" 
     left join "public"."location" as "root_location" on "root_"."location_id" = "root_location"."id" 
     left join "public"."location" as "root_location_parent" on "root_location"."parent_id" = "root_location_parent"."id" 
     where ("root_"."location_id" = ? or "root_location"."parent_id" = ? or "root_location_parent"."parent_id" = ?)`,
-					response: { rows: [{ root_id: testUuid(2), root_name: 'Foo' }] },
-					parameters: [testUuid(1), testUuid(1), testUuid(1)],
-				},
-			]),
+				response: { rows: [{ root_id: testUuid(2), root_name: 'Foo' }] },
+				parameters: [testUuid(1), testUuid(1), testUuid(1)],
+			},
 		],
 		return: {
 			data: {
@@ -68,16 +66,14 @@ it('Filter by "has one" multiple times with OR and with empty parameter', async 
 		query: query,
 		queryVariables: {},
 		executes: [
-			...sqlTransaction([
-				{
-					sql: SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name" 
+			{
+				sql: SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name" 
     from "public"."pub" as "root_" 
     left join "public"."location" as "root_location" on "root_"."location_id" = "root_location"."id" 
     left join "public"."location" as "root_location_parent" on "root_location"."parent_id" = "root_location_parent"."id"`,
-					response: { rows: [{ root_id: testUuid(2), root_name: 'Foo' }] },
-					parameters: [],
-				},
-			]),
+				response: { rows: [{ root_id: testUuid(2), root_name: 'Foo' }] },
+				parameters: [],
+			},
 		],
 		return: {
 			data: {

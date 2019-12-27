@@ -5,7 +5,6 @@ import { Context } from '../types'
 import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../acl/Authorizator'
-import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import OrderByTypeProvider from './OrderByTypeProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
 
@@ -16,7 +15,6 @@ export default class QueryProvider {
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
-		private readonly queryAstAFactory: GraphQlQueryAstFactory,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
@@ -39,8 +37,12 @@ export default class QueryProvider {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
 			},
-			resolve: (parent, args, context, info) =>
-				context.executionContainer.get('readResolver').resolveGetQuery(entity, this.queryAstAFactory.create(info)),
+			resolve: (parent, args, context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('readResolver').resolveGetQuery(entity, info)
+			},
 		}
 	}
 
@@ -59,8 +61,12 @@ export default class QueryProvider {
 				offset: { type: this.graphqlObjectFactories.int },
 				limit: { type: this.graphqlObjectFactories.int },
 			},
-			resolve: (parent, args, context, info) =>
-				context.executionContainer.get('readResolver').resolveListQuery(entity, this.queryAstAFactory.create(info)),
+			resolve: (parent, args, context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('readResolver').resolveListQuery(entity, info)
+			},
 		}
 	}
 }

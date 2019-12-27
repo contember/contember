@@ -1,11 +1,11 @@
 import { KoaMiddleware } from '../../core/koa'
-import { Client } from '@contember/database'
+import { Client, Connection } from '@contember/database'
 
 class DatabaseTransactionMiddlewareFactory {
 	public create(): KoaMiddleware<DatabaseTransactionMiddlewareFactory.KoaState> {
 		const databaseTransaction: KoaMiddleware<DatabaseTransactionMiddlewareFactory.KoaState> = async (ctx, next) => {
 			await ctx.state.db.transaction(async db => {
-				await db.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
+				await db.query(Connection.REPEATABLE_READ)
 
 				ctx.state.db = db
 				let planRollback = false

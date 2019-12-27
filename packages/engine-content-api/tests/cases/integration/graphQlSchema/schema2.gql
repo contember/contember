@@ -7,6 +7,20 @@ type _IndexPathFragment {
   alias: String
 }
 
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+}
+
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
 
 type _ValidationError {
@@ -35,6 +49,14 @@ type Info {
 type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  validation: _ValidationResult!
+  createTest(data: TestCreateInput!): TestCreateResult!
+  updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
 }
 
 enum OrderDirection {
@@ -47,6 +69,16 @@ type Query {
   listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
   validateCreateTest(data: TestCreateInput!): _ValidationResult!
   validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getTest(by: TestUniqueWhere!): Test
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test]
+  validateCreateTest(data: TestCreateInput!): _ValidationResult!
+  validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
   _info: Info
 }
 
@@ -80,6 +112,7 @@ input TestCreateInput {
 type TestCreateResult {
   ok: Boolean!
   node: Test
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -105,6 +138,7 @@ input TestUpdateInput {
 type TestUpdateResult {
   ok: Boolean!
   node: Test
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 

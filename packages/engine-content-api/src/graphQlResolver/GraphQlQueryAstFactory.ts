@@ -12,45 +12,20 @@ import { SelectionSetNode } from 'graphql/language/ast'
 import FieldNode from './FieldNode'
 import ObjectNode from './ObjectNode'
 import { getArgumentValues } from 'graphql/execution/values'
+import { ResolveInfoUtils } from '../utils/ResolveInfoUtils'
 
 type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 export default class GraphQlQueryAstFactory {
 	constructor(private readonly argumentValuesResolver: typeof getArgumentValues) {}
 
 	public create<Args = any>(info: GraphQLResolveInfo, filter?: NodeFilter): ObjectNode<Args> {
-		const node = this.mergeAllFieldNodes(info.fieldNodes)
+		const node = ResolveInfoUtils.extractFieldNode(info)
 		const parentType = info.parentType
 		if (!this.itIs<GraphQLObjectType>(parentType, 'GraphQLObjectType')) {
 			throw new Error(this.getValueType(parentType))
 		}
 
 		return this.createFromNode(info, parentType as GraphQLObjectType, node, [], filter || (() => true)) as ObjectNode
-	}
-
-	private mergeAllFieldNodes(fieldNodes: ReadonlyArray<GraphQlFieldNode>): GraphQlFieldNode {
-		const newGraphQlFieldNodes = [...fieldNodes]
-		while (newGraphQlFieldNodes.length > 1) {
-			newGraphQlFieldNodes.push(
-				this.mergeFieldNodes(
-					newGraphQlFieldNodes.pop() as GraphQlFieldNode,
-					newGraphQlFieldNodes.pop() as GraphQlFieldNode,
-				),
-			)
-		}
-		return newGraphQlFieldNodes[0]
-	}
-
-	private mergeFieldNodes(dest: GraphQlFieldNode, src: GraphQlFieldNode): GraphQlFieldNode {
-		return {
-			...dest,
-			selectionSet: {
-				...(dest.selectionSet as SelectionSetNode),
-				selections: [
-					...(dest.selectionSet ? dest.selectionSet.selections : []),
-					...(src.selectionSet ? src.selectionSet.selections : []),
-				],
-			},
-		}
 	}
 
 	private createFromNode(
@@ -107,12 +82,12 @@ export default class GraphQlQueryAstFactory {
 			} else if (isIt<FragmentSpreadNode>(subNode, 'kind', 'FragmentSpread')) {
 				const fragmentDefinition = info.fragments[subNode.name.value]
 				if (!fragmentDefinition) {
-					throw new Error(`Fragment definition ${subNode.name.value} not found`)
+					throw new Error(`GraphQlQueryAstFactory: Fragment definition ${subNode.name.value} not found`)
 				}
 				const typeName = fragmentDefinition.typeCondition.name.value
 				const subField = info.schema.getType(typeName)
 				if (!this.itIs<GraphQLObjectType>(subField, 'GraphQLObjectType')) {
-					throw new Error()
+					throw new Error('GraphQlQueryAstFactory: subfield is expected to be GraphQLObjectType')
 				}
 				fields.push(
 					...this.processSelectionSet(

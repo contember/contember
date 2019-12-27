@@ -7,6 +7,20 @@ type _IndexPathFragment {
   alias: String
 }
 
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+}
+
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
 
 type _ValidationError {
@@ -58,12 +72,14 @@ input FrontPageCreateIntroVideoEntityRelationInput {
 type FrontPageCreateResult {
   ok: Boolean!
   node: FrontPage
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type FrontPageDeleteResult {
   ok: Boolean!
   node: FrontPage
+  errors: [_MutationError!]!
 }
 
 input FrontPageInHouseVideosByFrontPageForIntroUniqueWhere {
@@ -123,6 +139,7 @@ input FrontPageUpdateIntroVideoEntityRelationInput {
 type FrontPageUpdateResult {
   ok: Boolean!
   node: FrontPage
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -182,6 +199,18 @@ type Mutation {
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  validation: _ValidationResult!
+  createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
+  deleteFrontPage(by: FrontPageUniqueWhere!): FrontPageDeleteResult!
+  updateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): FrontPageUpdateResult!
+  createVideo(data: VideoCreateInput!): VideoCreateResult!
+  deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
+  updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
 }
 
 enum One {
@@ -218,6 +247,20 @@ type Query {
   listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video]
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getFrontPage(by: FrontPageUniqueWhere!): FrontPage
+  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage]
+  validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
+  validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
+  getVideo(by: VideoUniqueWhere!): Video
+  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video]
+  validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
+  validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
   _info: Info
 }
 
@@ -283,12 +326,14 @@ input VideoCreateInput {
 type VideoCreateResult {
   ok: Boolean!
   node: Video
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type VideoDeleteResult {
   ok: Boolean!
   node: Video
+  errors: [_MutationError!]!
 }
 
 type VideoMeta {
@@ -338,6 +383,7 @@ input VideoUpdateInput {
 type VideoUpdateResult {
   ok: Boolean!
   node: Video
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 

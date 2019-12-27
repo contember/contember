@@ -4,14 +4,13 @@ import { Input, Model } from '@contember/schema'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
 import ConditionBuilder from './ConditionBuilder'
-import { Client, SelectBuilder, ConditionBuilder as SqlConditionBuilder, Operator } from '@contember/database'
+import { SelectBuilder, ConditionBuilder as SqlConditionBuilder, Operator } from '@contember/database'
 
 class WhereBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly conditionBuilder: ConditionBuilder,
-		private readonly db: Client,
 	) {}
 
 	public build<Filled extends keyof SelectBuilder.Options>(
@@ -126,7 +125,7 @@ class WhereBuilder {
 					return conditionBuilder.in(
 						[tableName, entity.primaryColumn],
 						this.createManyHasManySubquery(
-							this.db.selectBuilder(),
+							SelectBuilder.create(),
 							relationWhere,
 							targetEntity,
 							targetRelation.joiningTable,
@@ -144,7 +143,7 @@ class WhereBuilder {
 					return conditionBuilder.in(
 						[tableName, entity.primaryColumn],
 						this.createManyHasManySubquery(
-							this.db.selectBuilder(),
+							SelectBuilder.create(),
 							relationWhere,
 							targetEntity,
 							relation.joiningTable,
@@ -162,8 +161,7 @@ class WhereBuilder {
 					return conditionBuilder.in(
 						[tableName, entity.primaryColumn],
 						this.build(
-							this.db
-								.selectBuilder()
+							SelectBuilder.create()
 								.select(['root_', targetRelation.joiningColumn.columnName])
 								.from(targetEntity.tableName, 'root_'),
 							targetEntity,

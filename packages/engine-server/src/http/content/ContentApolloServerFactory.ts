@@ -4,11 +4,14 @@ import { ApolloError as ApolloCoreError } from 'apollo-server-core'
 import DbQueriesExtension from '../../core/graphql/DbQueriesExtension'
 import { Context, ExecutionContainerFactory, flattenVariables, UserError } from '@contember/engine-content-api'
 import ErrorHandlerExtension from '../../core/graphql/ErrorHandlerExtension'
-import { GraphQLError, GraphQLSchema } from 'graphql'
+import { GraphQLSchema, GraphQLError } from 'graphql'
 import { KoaContext } from '../../core/koa'
 import { DatabaseTransactionMiddlewareFactory, ProjectMemberMiddlewareFactory } from '../project-common'
 import { ContentApolloMiddlewareFactory } from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
+import { getArgumentValues } from 'graphql/execution/values'
+import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
+import { setupSystemVariables } from '@contember/engine-system-api'
 import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
 import { extractOriginalError } from '../../core/graphql/errorExtract'
 import uuid from 'uuid'
@@ -64,21 +67,28 @@ class ContentApolloServerFactory {
 					ProjectMemberMiddlewareFactory.KoaState &
 						DatabaseTransactionMiddlewareFactory.KoaState &
 						ContentApolloMiddlewareFactory.KoaState &
-						TimerMiddlewareFactory.KoaState
+						TimerMiddlewareFactory.KoaState &
+						AuthMiddlewareFactory.KoaState
 				>
 			}): Promise<Context> => {
 				const partialContext = {
 					db: ctx.state.db,
 					identityVariables: flattenVariables(ctx.state.projectMemberships),
 				}
-				const executionContainer = new ExecutionContainerFactory(ctx.state.schema, ctx.state.permissions, {
+				const providers = {
 					uuid: () => uuid.v4(),
 					now: () => new Date(),
-				}).create(partialContext)
+				}
+				const executionContainer = new ExecutionContainerFactory(
+					ctx.state.schema,
+					ctx.state.permissions,
+					providers,
+					getArgumentValues,
+					db => setupSystemVariables(db, ctx.state.authResult.identityId, providers),
+				).create(partialContext)
 				return {
 					...partialContext,
 					executionContainer,
-					errorHandler: ctx.state.planRollback,
 					timer: ctx.state.timer,
 				}
 			},

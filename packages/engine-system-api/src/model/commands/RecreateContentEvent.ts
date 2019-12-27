@@ -1,5 +1,5 @@
 import { UuidProvider } from '../../utils/uuid'
-import { Client } from '@contember/database'
+import { Client, InsertBuilder } from '@contember/database'
 import { ContentEvent, EventType } from '@contember/engine-common'
 import { assertNever } from '../../utils'
 
@@ -13,8 +13,7 @@ class RecreateContentEvent {
 
 	public async execute(db: Client) {
 		const id = this.providers.uuid()
-		await db
-			.insertBuilder()
+		await InsertBuilder.create()
 			.into('event')
 			.values({
 				id,
@@ -25,7 +24,7 @@ class RecreateContentEvent {
 				identity_id: this.event.identityId,
 				created_at: this.event.createdAt,
 			})
-			.execute()
+			.execute(db)
 		return id
 	}
 

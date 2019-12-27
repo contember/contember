@@ -4,22 +4,22 @@ import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
 import WhereBuilder from './WhereBuilder'
-import { SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import OrderByBuilder from './OrderByBuilder'
 import FieldsVisitorFactory from './handlers/FieldsVisitorFactory'
 import { LimitByGroupWrapper } from '@contember/database'
 import SelectExecutionHandler from './SelectExecutionHandler'
 import FieldNode from '../../graphQlResolver/FieldNode'
 import MetaHandler from './handlers/MetaHandler'
+import Mapper from '../Mapper'
 
 export default class SelectBuilder {
-	public readonly rows: PromiseLike<SelectHydrator.Rows>
+	private resolver: (value: SelectHydrator.Rows) => void = () => {
+		throw new Error('SelectBuilder: Resolver called too soon')
+	}
+	public readonly rows: Promise<SelectHydrator.Rows> = new Promise(resolve => (this.resolver = resolve))
 
 	private queryWrapper: LimitByGroupWrapper | null = null
-
-	private firer: () => void = () => {
-		throw new Error()
-	}
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -30,18 +30,27 @@ export default class SelectBuilder {
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },
+	) {}
+
+	public async execute(db: Client): Promise<SelectHydrator.Rows> {
+		let result: SelectHydrator.Rows
+		if (this.queryWrapper) {
+			result = await this.queryWrapper.getResult(this.qb, db)
+		} else {
+			result = await this.qb.getResult(db)
+		}
+		this.resolver(result)
+		return result
+	}
+
+	public async select(
+		mapper: Mapper,
+		entity: Model.Entity,
+		input: ObjectNode<Input.ListQueryInput>,
+		path: Path,
+		groupBy?: string,
 	) {
-		const blocker: Promise<void> = new Promise(resolve => (this.firer = resolve))
-		this.rows = this.createRowsPromise(blocker)
-	}
-
-	public async execute(): Promise<SelectHydrator.Rows> {
-		this.firer()
-		return await this.rows
-	}
-
-	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, path: Path, groupBy?: string) {
-		const promise = this.selectInternal(entity, path, input)
+		const promise = this.selectInternal(mapper, entity, path, input)
 		const where = input.args.filter
 		if (where) {
 			this.qb = this.whereBuilder.build(this.qb, entity, path, where)
@@ -73,7 +82,7 @@ export default class SelectBuilder {
 		await promise
 	}
 
-	private async selectInternal(entity: Model.Entity, path: Path, input: ObjectNode) {
+	private async selectInternal(mapper: Mapper, entity: Model.Entity, path: Path, input: ObjectNode) {
 		if (!input.fields.find(it => it.name === entity.primary && it.alias === entity.primary)) {
 			input = input.withField(new FieldNode(entity.primary, entity.primary, {}))
 		}
@@ -81,6 +90,7 @@ export default class SelectBuilder {
 		for (let field of input.fields) {
 			const fieldPath = path.for(field.alias)
 			const executionContext: SelectExecutionHandler.Context = {
+				mapper,
 				field: field,
 				addData: async (fieldName, cb, defaultValue = null) => {
 					const columnName = getColumnName(this.schema, entity, fieldName)
@@ -116,17 +126,9 @@ export default class SelectBuilder {
 				continue
 			}
 
-			const fieldVisitor = this.fieldsVisitorFactory.create(executionContext)
+			const fieldVisitor = this.fieldsVisitorFactory.create(mapper, executionContext)
 			acceptFieldVisitor(this.schema, entity, field.name, fieldVisitor)
 		}
-	}
-
-	private async createRowsPromise(blocker: PromiseLike<void>): Promise<SelectHydrator.Rows> {
-		await blocker
-		if (this.queryWrapper) {
-			return await this.queryWrapper.getResult(this.qb)
-		}
-		return await this.qb.getResult()
 	}
 
 	private async getColumnValues(columnPath: Path, columnName: string): Promise<Input.PrimaryValue[]> {

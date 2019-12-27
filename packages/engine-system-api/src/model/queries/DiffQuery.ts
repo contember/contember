@@ -8,7 +8,7 @@ class DiffQuery extends DatabaseQuery<AnyEvent[]> {
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<AnyEvent[]> {
-		const diff = await queryable.createWrapper().query<{
+		const diff = await queryable.db.query<{
 			id: string
 			type: EventType
 			data: any

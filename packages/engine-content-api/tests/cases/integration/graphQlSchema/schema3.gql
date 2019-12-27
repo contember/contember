@@ -7,6 +7,20 @@ type _IndexPathFragment {
   alias: String
 }
 
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+}
+
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
 
 type _ValidationError {
@@ -39,6 +53,18 @@ type Mutation {
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
   deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  validation: _ValidationResult!
+  createRoot(data: RootCreateInput!): RootCreateResult!
+  deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
+  updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
+  createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
+  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
 }
 
 type OneHasManyEntity {
@@ -62,12 +88,14 @@ input OneHasManyEntityCreateR2EntityRelationInput {
 type OneHasManyEntityCreateResult {
   ok: Boolean!
   node: OneHasManyEntity
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type OneHasManyEntityDeleteResult {
   ok: Boolean!
   node: OneHasManyEntity
+  errors: [_MutationError!]!
 }
 
 type OneHasManyEntityMeta {
@@ -104,6 +132,7 @@ input OneHasManyEntityUpdateR2EntityRelationInput {
 type OneHasManyEntityUpdateResult {
   ok: Boolean!
   node: OneHasManyEntity
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -145,6 +174,20 @@ type Query {
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
   validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
   validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getRoot(by: RootUniqueWhere!): Root
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root]
+  validateCreateRoot(data: RootCreateInput!): _ValidationResult!
+  validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
+  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
+  validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
+  validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
   _info: Info
 }
 
@@ -170,12 +213,14 @@ input RootCreateREntityRelationInput {
 type RootCreateResult {
   ok: Boolean!
   node: Root
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type RootDeleteResult {
   ok: Boolean!
   node: Root
+  errors: [_MutationError!]!
 }
 
 type RootMeta {
@@ -212,6 +257,7 @@ input RootUpdateREntityRelationInput {
 type RootUpdateResult {
   ok: Boolean!
   node: Root
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 

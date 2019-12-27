@@ -3,9 +3,9 @@ import { InputValidation as validation, SchemaBuilder } from '@contember/schema-
 import 'jasmine'
 import ObjectNode from '../../../src/graphQlResolver/ObjectNode'
 import FieldNode from '../../../src/graphQlResolver/FieldNode'
-import DependencyCollector from '../../../src/input-validation/DependencyCollector'
+import DependencyCollector from '../../../src/input-validation/dependencies/DependencyCollector'
 import QueryAstFactory from '../../../src/input-validation/QueryAstFactory'
-import DependencyMerger from '../../../src/input-validation/DependencyMerger'
+import DependencyMerger from '../../../src/input-validation/dependencies/DependencyMerger'
 import { evaluateValidation } from '../../../src/input-validation/ValidationEvaluation'
 import ValidationContext from '../../../src/input-validation/ValidationContext'
 
@@ -50,9 +50,7 @@ describe('input validation', () => {
 			r.on('published', r.equals(true)),
 		)
 
-		const collector = new DependencyCollector()
-
-		expect(collector.collect(validator)).toEqual({
+		expect(DependencyCollector.collect(validator)).toEqual({
 			books: {
 				deleted: {},
 				published: {},

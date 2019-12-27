@@ -1,4 +1,4 @@
-import { DatabaseQuery } from '@contember/database'
+import { DatabaseQuery, SelectBuilder } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
 
 class ProjectBySlugQuery extends DatabaseQuery<ProjectBySlugQuery.Result> {
@@ -6,9 +6,8 @@ class ProjectBySlugQuery extends DatabaseQuery<ProjectBySlugQuery.Result> {
 		super()
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<ProjectBySlugQuery.Result> {
-		const rows = await queryable
-			.createSelectBuilder<ProjectBySlugQuery.Row>()
+	async fetch({ db }: DatabaseQueryable): Promise<ProjectBySlugQuery.Result> {
+		const rows = await SelectBuilder.create<ProjectBySlugQuery.Row>()
 			.select('id')
 			.select('name')
 			.select('slug')
@@ -16,7 +15,7 @@ class ProjectBySlugQuery extends DatabaseQuery<ProjectBySlugQuery.Result> {
 			.where({
 				slug: this.projectSlug,
 			})
-			.getResult()
+			.getResult(db)
 
 		return this.fetchOneOrNull(rows)
 	}

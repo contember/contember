@@ -1,4 +1,4 @@
-import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { byProjectSlug } from './ProjectSlugSpecification'
 
 class ProjectBySlugVariablesByIdentityQuery extends DatabaseQuery<ProjectBySlugVariablesByIdentityQuery.Result> {
@@ -6,9 +6,8 @@ class ProjectBySlugVariablesByIdentityQuery extends DatabaseQuery<ProjectBySlugV
 		super()
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<ProjectBySlugVariablesByIdentityQuery.Result> {
-		const result: Array<any> = await queryable
-			.createSelectBuilder()
+	async fetch({ db }: DatabaseQueryable): Promise<ProjectBySlugVariablesByIdentityQuery.Result> {
+		const result: Array<any> = await SelectBuilder.create()
 			.select('variable')
 			.select('values')
 			.from('project_member_variable')
@@ -16,7 +15,7 @@ class ProjectBySlugVariablesByIdentityQuery extends DatabaseQuery<ProjectBySlugV
 				identity_id: this.identityId,
 			})
 			.match(byProjectSlug(this.projectSlug))
-			.getResult()
+			.getResult(db)
 
 		return result.reduce<ProjectBySlugVariablesByIdentityQuery.Result>(
 			(result, row) => ({ ...result, [row.variable]: row.values }),

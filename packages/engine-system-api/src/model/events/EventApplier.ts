@@ -2,7 +2,7 @@ import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } fr
 import { Stage } from '../dtos/Stage'
 import { EventType } from '@contember/engine-common'
 import { assertNever } from '../../utils'
-import { Client } from '@contember/database'
+import { Client, DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
 import { formatSchemaName } from '../helpers/stageHelpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
 import { MigrationsResolver } from '@contember/schema-migrations'
@@ -44,34 +44,28 @@ class EventApplier {
 	}
 
 	private async applyCreate(stage: Stage, event: CreateEvent): Promise<void> {
-		await this.db
-			.forSchema(formatSchemaName(stage))
-			.insertBuilder()
+		await InsertBuilder.create()
 			.into(event.tableName)
 			.values({ ...event.values, id: event.rowId })
-			.execute()
+			.execute(this.db.forSchema(formatSchemaName(stage)))
 	}
 
 	private async applyUpdate(stage: Stage, event: UpdateEvent): Promise<void> {
 		if (Object.values(event.values).length === 0) {
 			return
 		}
-		await this.db
-			.forSchema(formatSchemaName(stage))
-			.updateBuilder()
+		await UpdateBuilder.create()
 			.table(event.tableName)
 			.where({ id: event.rowId })
 			.values(event.values)
-			.execute()
+			.execute(this.db.forSchema(formatSchemaName(stage)))
 	}
 
 	private async applyDelete(stage: Stage, event: DeleteEvent): Promise<void> {
-		await this.db
-			.forSchema(formatSchemaName(stage))
-			.deleteBuilder()
+		await DeleteBuilder.create()
 			.from(event.tableName)
 			.where({ id: event.rowId })
-			.execute()
+			.execute(this.db.forSchema(formatSchemaName(stage)))
 	}
 
 	private async applyRunMigration(stage: Stage, event: RunMigrationEvent): Promise<void> {

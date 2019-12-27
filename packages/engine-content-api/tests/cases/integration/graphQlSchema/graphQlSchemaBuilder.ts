@@ -1,6 +1,5 @@
 import 'jasmine'
 import { graphql, printSchema } from 'graphql'
-import { getArgumentValues } from 'graphql/execution/values'
 import { Acl, Model } from '@contember/schema'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -23,7 +22,7 @@ interface Test {
 const testSchema = async (test: Test) => {
 	const schemaResult = test.schema(new SchemaBuilder())
 
-	const schemaFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories, getArgumentValues)
+	const schemaFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories)
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)

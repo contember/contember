@@ -1,5 +1,6 @@
 import { Command } from './Command'
 import { PersonRow } from '../queries'
+import { InsertBuilder } from '@contember/database'
 
 class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 	constructor(private readonly identityId: string, private readonly email: string, private readonly password: string) {}
@@ -8,8 +9,7 @@ class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 		const id = providers.uuid()
 
 		const password_hash = await providers.bcrypt(this.password)
-		await db
-			.insertBuilder()
+		await InsertBuilder.create()
 			.into('person')
 			.values({
 				id: id,
@@ -17,7 +17,7 @@ class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 				password_hash,
 				identity_id: this.identityId,
 			})
-			.execute()
+			.execute(db)
 
 		return { id, email: this.email, password_hash, identity_id: this.identityId }
 	}

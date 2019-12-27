@@ -1,5 +1,5 @@
 import { FileNameHelper } from '@contember/engine-common'
-import { Client } from '@contember/database'
+import { Client, SelectBuilder } from '@contember/database'
 import {
 	LatestMigrationByStageQuery,
 	MigrationsResolver,
@@ -31,11 +31,10 @@ export class TesterStageManager {
 	}
 
 	public async refreshCreatedStages(): Promise<Set<string>> {
-		const stages = await this.db
-			.selectBuilder<{ slug: string }>()
+		const stages = await SelectBuilder.create<{ slug: string }>()
 			.select('slug')
 			.from('stage')
-			.getResult()
+			.getResult(this.db)
 
 		this.createdStages = new Set(stages.map(it => it.slug))
 		if (stages.length > 0) {

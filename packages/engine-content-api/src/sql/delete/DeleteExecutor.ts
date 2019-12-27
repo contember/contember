@@ -1,40 +1,55 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { assertNever } from '../../utils'
-import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import WhereBuilder from '../select/WhereBuilder'
-import { Client } from '@contember/database'
+import { Client, DeleteBuilder, ForeignKeyViolationError, SelectBuilder } from '@contember/database'
 import Path from '../select/Path'
 import PredicateFactory from '../../acl/PredicateFactory'
-import Mapper from '../Mapper'
 import UpdateBuilderFactory from '../update/UpdateBuilderFactory'
-import { NoResultError } from '../NoResultError'
+import {
+	MutationNoResultError,
+	MutationEntryNotFoundError,
+	ModificationType,
+	MutationResultList,
+	MutationDeleteOk,
+} from '../Result'
+import Mapper from '../Mapper'
 
 type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwnerRelation]
 
 class DeleteExecutor {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly db: Client,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}
 
-	public async execute(entity: Model.Entity, where: Input.UniqueWhere): Promise<void> {
-		await this.db.query('SET CONSTRAINTS ALL DEFERRED')
-		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-		const result = await this.delete(entity, uniqueWhere)
-		if (result.length === 0) {
-			throw new NoResultError()
+	public async execute(mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {
+		const db = mapper.db
+		await db.query('SET CONSTRAINTS ALL DEFERRED')
+		const primaryValue = await mapper.getPrimaryValue(entity, where)
+		if (!primaryValue) {
+			return [new MutationEntryNotFoundError([], where)]
 		}
-		await this.executeCascade(entity, result)
+		const result = await this.delete(db, entity, { [entity.primary]: { eq: primaryValue } })
+		if (result.length === 0) {
+			return [new MutationNoResultError([])]
+		}
+		await this.executeCascade(db, entity, result)
 
-		await this.db.query('SET CONSTRAINTS ALL IMMEDIATE')
+		try {
+			await db.query('SET CONSTRAINTS ALL IMMEDIATE')
+			return [new MutationDeleteOk([], entity, primaryValue)]
+		} catch (e) {
+			if (e instanceof ForeignKeyViolationError) {
+				return [new MutationNoResultError([])]
+			}
+			throw e
+		}
 	}
 
-	private async executeCascade(entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
+	private async executeCascade(db: Client, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
 		await Promise.all(
 			this.findOwningRelations(entity).map(async ([owningEntity, relation]) => {
 				const relationWhere: Input.Where = { [relation.name]: { [entity.primary]: { in: values } } }
@@ -42,13 +57,13 @@ class DeleteExecutor {
 					case Model.OnDelete.restrict:
 						break
 					case Model.OnDelete.cascade:
-						const result = await this.delete(owningEntity, relationWhere)
+						const result = await this.delete(db, owningEntity, relationWhere)
 						if (result.length > 0) {
-							await this.executeCascade(owningEntity, result)
+							await this.executeCascade(db, owningEntity, result)
 						}
 						break
 					case Model.OnDelete.setNull:
-						await this.setNull(owningEntity, relation, relationWhere)
+						await this.setNull(db, owningEntity, relation, relationWhere)
 						break
 					default:
 						assertNever(relation.joiningColumn.onDelete)
@@ -57,24 +72,23 @@ class DeleteExecutor {
 		)
 	}
 
-	private async delete(entity: Model.Entity, where: Input.Where): Promise<string[]> {
+	private async delete(db: Client, entity: Model.Entity, where: Input.Where): Promise<string[]> {
 		const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-		const inQb = this.db
-			.selectBuilder()
+		const inQb = SelectBuilder.create()
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn])
 		const inQbWithWhere = this.whereBuilder.build(inQb, entity, new Path([]), { and: [where, predicate] })
 
-		const qb = this.db
-			.deleteBuilder()
+		const qb = DeleteBuilder.create()
 			.from(entity.tableName)
 			.where(condition => condition.in(entity.primaryColumn, inQbWithWhere))
 			.returning(entity.primaryColumn)
 
-		return (await qb.execute()) as string[]
+		return (await qb.execute(db)) as string[]
 	}
 
 	private async setNull(
+		db: Client,
 		entity: Model.Entity,
 		relation: Model.Relation & Model.JoiningColumnRelation,
 		where: Input.Where,
@@ -84,7 +98,7 @@ class DeleteExecutor {
 		updateBuilder.addOldWhere(predicateWhere)
 		updateBuilder.addNewWhere(predicateWhere)
 		updateBuilder.addFieldValue(relation.name, null)
-		await updateBuilder.execute()
+		await updateBuilder.execute(db)
 	}
 
 	private findOwningRelations(entity: Model.Entity): EntityRelationTuple[] {

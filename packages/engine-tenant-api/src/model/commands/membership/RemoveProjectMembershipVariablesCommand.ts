@@ -1,5 +1,6 @@
 import { Command } from '../Command'
 import { UpdateProjectMembershipVariablesCommand } from './UpdateProjectMembershipVariablesCommand'
+import { DeleteBuilder } from '@contember/database'
 
 class RemoveProjectMembershipVariablesCommand implements Command<void> {
 	constructor(
@@ -8,8 +9,7 @@ class RemoveProjectMembershipVariablesCommand implements Command<void> {
 	) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
-		await db
-			.deleteBuilder()
+		await DeleteBuilder.create()
 			.where({
 				membership_id: this.membershipId,
 			})
@@ -22,7 +22,7 @@ class RemoveProjectMembershipVariablesCommand implements Command<void> {
 				),
 			)
 			.from('project_membership_variable')
-			.execute()
+			.execute(db)
 	}
 }
 

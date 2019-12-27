@@ -92,7 +92,7 @@ errors {
         ... on _FieldPathFragment {
             field
         }
-    }    
+    }
 }`
 
 describe('Create validation queries', () => {
@@ -131,31 +131,31 @@ describe('Create validation queries', () => {
 		await testCreate({
 			entity: 'Post',
 			data: { title: 'Abc', content: 'Xyz' },
-			errors: ['Post author is required', 'Post tags are required'],
+			errors: ['Post author is required'],
 		})
 	})
-
-	it('Validate create post #2', async () => {
-		await testCreate({
-			entity: 'Post',
-			data: {
-				title: 'Abc',
-				content: 'Xyz',
-				author: { connect: { id: testUuid(1) } },
-				tags: [{ create: { label: 'test' } }],
-			},
-			executes: [
-				{
-					sql: 'select "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" = ?',
-					parameters: [testUuid(1)],
-					response: {
-						rows: [{ root_id: testUuid(1) }],
-					},
-				},
-			],
-			errors: ['Please fill at least two tags'],
-		})
-	})
+	//
+	// it('Validate create post #2', async () => {
+	// 	await testCreate({
+	// 		entity: 'Post',
+	// 		data: {
+	// 			title: 'Abc',
+	// 			content: 'Xyz',
+	// 			author: { connect: { id: testUuid(1) } },
+	// 			tags: [{ create: { label: 'test' } }],
+	// 		},
+	// 		executes: [
+	// 			{
+	// 				sql: 'select "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" = ?',
+	// 				parameters: [testUuid(1)],
+	// 				response: {
+	// 					rows: [{ root_id: testUuid(1) }],
+	// 				},
+	// 			},
+	// 		],
+	// 		errors: ['Please fill at least two tags'],
+	// 	})
+	// })
 
 	it('Validate create post #3', async () => {
 		await testCreate({
@@ -205,16 +205,16 @@ describe('Create validation queries', () => {
 				},
 			],
 			errors: [
-				{
-					message: {
-						text: 'Please fill at least two tags',
-					},
-					path: [
-						{
-							field: 'tags',
-						},
-					],
-				},
+				// {
+				// 	message: {
+				// 		text: 'Please fill at least two tags',
+				// 	},
+				// 	path: [
+				// 		{
+				// 			field: 'tags',
+				// 		},
+				// 	],
+				// },
 				{
 					message: {
 						text: 'Tag label is required',
@@ -265,39 +265,36 @@ describe('Update validation queries', () => {
 		})
 	})
 
-	it('update post', async () => {
-		await testUpdate({
-			entity: 'Post',
-			executes: [
-				{
-					sql:
-						'select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_" where "root_"."id" = ?',
-					parameters: [testUuid(1)],
-					response: {
-						rows: [{ root_id: testUuid(1) }],
-					},
-				},
-				{
-					sql: `select "junction_"."tag_id", "junction_"."post_id" from  "public"."post_tags" as "junction_"   where "junction_"."post_id" in (?)`,
-					parameters: [testUuid(1)],
-					response: {
-						rows: [
-							{ post_id: testUuid(1), tag_id: testUuid(10) },
-							{ post_id: testUuid(1), tag_id: testUuid(11) },
-						],
-					},
-				},
-				{
-					sql: `select "root_"."id" as "root_id" from  "public"."tag" as "root_"   where "root_"."id" in (?, ?)`,
-					parameters: [testUuid(10), testUuid(11)],
-					response: { rows: [{ root_id: testUuid(10) }, { root_id: testUuid(11) }] },
-				},
-			],
-			by: { id: testUuid(1) },
-			data: { tags: [{ disconnect: { id: testUuid(10) } }] },
-			errors: ['Please fill at least two tags'],
-		})
-	})
+	// it('update post', async () => {
+	// 	await testUpdate({
+	// 		entity: 'Post',
+	// 		executes: [
+	// 			{
+	// 				sql:
+	// 					'select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_" where "root_"."id" = ?',
+	// 				parameters: [testUuid(1)],
+	// 				response: {
+	// 					rows: [{ root_id: testUuid(1) }],
+	// 				},
+	// 			},
+	// 			{
+	// 				sql: `select "junction_"."tag_id", "junction_"."post_id" from  "public"."post_tags" as "junction_"   where "junction_"."post_id" in (?)`,
+	// 				parameters: [testUuid(1)],
+	// 				response: {
+	// 					rows: [{ post_id: testUuid(1), tag_id: testUuid(10) }, { post_id: testUuid(1), tag_id: testUuid(11) }],
+	// 				},
+	// 			},
+	// 			{
+	// 				sql: `select "root_"."id" as "root_id" from  "public"."tag" as "root_"   where "root_"."id" in (?, ?)`,
+	// 				parameters: [testUuid(10), testUuid(11)],
+	// 				response: { rows: [{ root_id: testUuid(10) }, { root_id: testUuid(11) }] },
+	// 			},
+	// 		],
+	// 		by: { id: testUuid(1) },
+	// 		data: { tags: [{ disconnect: { id: testUuid(10) } }] },
+	// 		errors: ['Please fill at least two tags'],
+	// 	})
+	// })
 
 	it('update post with alias on many update', async () => {
 		await testUpdate({
@@ -311,21 +308,18 @@ describe('Update validation queries', () => {
 						rows: [{ root_id: testUuid(1) }],
 					},
 				},
-				{
-					sql: `select "junction_"."tag_id", "junction_"."post_id" from  "public"."post_tags" as "junction_"   where "junction_"."post_id" in (?)`,
-					parameters: [testUuid(1)],
-					response: {
-						rows: [
-							{ post_id: testUuid(1), tag_id: testUuid(10) },
-							{ post_id: testUuid(1), tag_id: testUuid(11) },
-						],
-					},
-				},
-				{
-					sql: `select "root_"."id" as "root_id" from  "public"."tag" as "root_"   where "root_"."id" in (?, ?)`,
-					parameters: [testUuid(10), testUuid(11)],
-					response: { rows: [{ root_id: testUuid(10) }, { root_id: testUuid(11) }] },
-				},
+				// {
+				// 	sql: `select "junction_"."tag_id", "junction_"."post_id" from  "public"."post_tags" as "junction_"   where "junction_"."post_id" in (?)`,
+				// 	parameters: [testUuid(1)],
+				// 	response: {
+				// 		rows: [{ post_id: testUuid(1), tag_id: testUuid(10) }, { post_id: testUuid(1), tag_id: testUuid(11) }],
+				// 	},
+				// },
+				// {
+				// 	sql: `select "root_"."id" as "root_id" from  "public"."tag" as "root_"   where "root_"."id" in (?, ?)`,
+				// 	parameters: [testUuid(10), testUuid(11)],
+				// 	response: { rows: [{ root_id: testUuid(10) }, { root_id: testUuid(11) }] },
+				// },
 			],
 			by: { id: testUuid(1) },
 			data: { tags: [{ alias: 'foo', create: { label: '' } }] },

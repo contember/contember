@@ -59,7 +59,7 @@ describe('query builder', () => {
 							.raw('false'),
 					)
 
-				await qb.getResult()
+				await qb.getResult(wrapper)
 			},
 			sql: SQL`select *
                from "public"."foo"
@@ -92,7 +92,7 @@ describe('query builder', () => {
 									.compareColumns(['bar', 'e'], Operator.lte, ['bar', 'f']),
 							),
 					)
-				await qb.getResult()
+				await qb.getResult(wrapper)
 			},
 			sql: SQL`select "foo"."id"
                from "public"."foo"
@@ -114,7 +114,7 @@ describe('query builder', () => {
 						title: 'foo',
 						content: expr => expr.selectValue('bar'),
 					})
-				await builder.execute()
+				await builder.execute(wrapper)
 			},
 			sql: SQL`insert into "public"."author" ("id", "title", "content") values (?, ?, ?)`,
 			parameters: [1, 'foo', 'bar'],
@@ -142,7 +142,7 @@ describe('query builder', () => {
 					})
 					.returning('id')
 					.onConflict(ConflictActionType.doNothing)
-				await builder.execute()
+				await builder.execute(wrapper)
 			},
 			sql: SQL`
 				with "root_" as (select ? :: text as "title", ? :: int as "id", ? :: text as "content") 
@@ -171,7 +171,7 @@ describe('query builder', () => {
 						id: expr => expr.selectValue('123'),
 						title: expr => expr.select('title'),
 					})
-				await builder.execute()
+				await builder.execute(wrapper)
 			},
 			sql: SQL`insert into "public"."author" ("id", "title")
         select
@@ -193,7 +193,7 @@ describe('query builder', () => {
 						id: expr => expr.selectValue('123'),
 					})
 					.onConflict(ConflictActionType.doNothing, { constraint: 'bar' })
-				await builder.execute()
+				await builder.execute(wrapper)
 			},
 			sql: SQL`insert into "public"."author" ("id")
 			         values (?)
@@ -212,7 +212,7 @@ describe('query builder', () => {
 						title: 'Hello',
 					})
 					.where({ id: 12 })
-				await qb.execute()
+				await qb.execute(wrapper)
 			},
 			sql: SQL`update "public"."author"
       set "title" = ?
@@ -241,7 +241,7 @@ describe('query builder', () => {
 						return qb.from('root_').where({ foo: 'bar' })
 					})
 					.where({ id: 12 })
-				await qb.execute()
+				await qb.execute(wrapper)
 			},
 			sql: SQL`with "root_" as (select
                                   ? :: text as "title",
@@ -265,7 +265,7 @@ describe('query builder', () => {
 							),
 						'bar',
 					)
-				await qb.getResult()
+				await qb.getResult(wrapper)
 			},
 			sql: SQL`select ("foo" >= ? or "foo" <= ?) as "bar"`,
 			parameters: [1, 0],
@@ -282,7 +282,7 @@ describe('query builder', () => {
 					.using('data')
 					.where(cond => cond.compare(['data', 'a'], Operator.gte, 1))
 					.returning('xyz')
-				await qb.execute()
+				await qb.execute(wrapper)
 			},
 			sql: SQL`with "data" as 
 			(select * from "public"."abc") 
@@ -305,7 +305,7 @@ describe('query builder', () => {
 					),
 				)
 
-				await qb.getResult()
+				await qb.getResult(wrapper)
 			},
 			sql: SQL`select row_number()
       over(partition by "lorem"."ipsum"
@@ -327,7 +327,7 @@ describe('query builder', () => {
 					(orderable, qb) => [orderable.orderBy(['foo', 'ipsum']), qb],
 					1,
 					3,
-				).getResult(qb)
+				).getResult(qb, wrapper)
 			},
 			sql: SQL`with "data" as 
 			(select "foo"."bar", 
@@ -347,7 +347,7 @@ describe('query builder', () => {
 					.from('foo')
 					.lock(LockType.forNoKeyUpdate)
 
-				await qb.getResult()
+				await qb.getResult(wrapper)
 			},
 			sql: SQL`select "id" from "public"."foo" for no key update`,
 			parameters: [],

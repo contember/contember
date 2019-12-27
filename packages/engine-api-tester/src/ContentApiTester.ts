@@ -12,6 +12,7 @@ import { TesterStageManager } from './TesterStageManager'
 import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { createUuidGenerator } from './testUuid'
+import { getArgumentValues } from 'graphql/execution/values'
 export class ContentApiTester {
 	private trxUuidGenerator = createUuidGenerator('a453')
 	private uuidGenerator = createUuidGenerator()
@@ -33,10 +34,16 @@ export class ContentApiTester {
 		const gqlSchema = gqlSchemaBuilder.build()
 		const db = this.db.forSchema(formatSchemaName(stage))
 
-		const executionContainer = new ExecutionContainerFactory(schema, permissions, {
-			uuid: this.uuidGenerator,
-			now: () => new Date('2019-09-04 12:00'),
-		}).create({
+		const executionContainer = new ExecutionContainerFactory(
+			schema,
+			permissions,
+			{
+				uuid: this.uuidGenerator,
+				now: () => new Date('2019-09-04 12:00'),
+			},
+			getArgumentValues,
+			() => Promise.resolve(),
+		).create({
 			db,
 			identityVariables: {},
 		})
@@ -44,7 +51,6 @@ export class ContentApiTester {
 			db,
 			identityVariables: {},
 			executionContainer,
-			errorHandler: () => null,
 			timer: async (label, cb) => (cb ? await cb() : (undefined as any)),
 		}
 		const result = await graphql(gqlSchema, gql, null, context, variables)

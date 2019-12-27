@@ -1,11 +1,11 @@
 import { Model } from '@contember/schema'
-import { execute, SqlQuery } from '../../../src/test'
+import { execute, SqlQuery, sqlTransaction } from '../../../src/test'
 import { GQL, SQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { SchemaBuilder } from '@contember/schema-definition'
 import 'jasmine'
 
-const sqlTransaction = (sqls: SqlQuery[]) => sqls
+const noTransaction = (sqls: SqlQuery[]) => sqls
 
 describe('Queries', () => {
 	it('Post by id query', async () => {
@@ -20,7 +20,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
@@ -62,7 +62,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post_locale" as "root_"
@@ -94,7 +94,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."title" as "root_heading",
@@ -141,7 +141,7 @@ describe('Queries', () => {
         }
 			`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
@@ -219,7 +219,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`
               select
@@ -305,7 +305,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`
               select
@@ -348,7 +348,7 @@ describe('Queries', () => {
         }
       }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`
               select
@@ -443,7 +443,7 @@ describe('Queries', () => {
         }
       }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
@@ -544,7 +544,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
@@ -729,7 +729,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
@@ -879,7 +879,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id"
@@ -931,7 +931,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."author" as "root_"
@@ -983,7 +983,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
@@ -1035,7 +1035,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
@@ -1096,7 +1096,7 @@ describe('Queries', () => {
         }
 			`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
@@ -1169,7 +1169,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
@@ -1244,7 +1244,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id"
@@ -1284,7 +1284,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select
                        "root_"."id" as "root_id",
@@ -1367,7 +1367,7 @@ describe('Queries', () => {
             }
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select
                      "root_"."id" as "root_id",
@@ -1489,7 +1489,7 @@ describe('Queries', () => {
             }
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select
                      "root_"."id" as "root_id",
@@ -1574,7 +1574,7 @@ describe('Queries', () => {
             name
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select
                      "root_"."id" as "root_id",
@@ -1647,7 +1647,7 @@ describe('Queries', () => {
 	          }
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select
                      "root_"."id" as "root_idx",
@@ -1727,7 +1727,7 @@ describe('Queries', () => {
 	          ...AuthorWithPost
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select
                      "root_"."id" as "root_id",
@@ -1782,7 +1782,7 @@ describe('Queries', () => {
 						),
 				)
 				.buildSchema(),
-			query: GQL`				
+			query: GQL`
         query {
           listPost {
 	          id
@@ -1791,7 +1791,7 @@ describe('Queries', () => {
 	          }
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select
                      "root_"."id" as "root_id",
@@ -1846,7 +1846,7 @@ describe('Queries', () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
 						sql: SQL`select "root_"."published_at" as "root_publishedAt", "root_"."id" as "root_id"
                      from "public"."post" as "root_"
@@ -1883,12 +1883,12 @@ describe('Queries', () => {
         }
 			`,
 			executes: [
-				...sqlTransaction([
+				...noTransaction([
 					{
-						sql: SQL`select "root_"."id" as "root_id" 
-from "public"."post" as "root_" 
-where (("root_"."title" = ? or "root_"."title" = ?) 
-      or not("root_"."title" < ?) 
+						sql: SQL`select "root_"."id" as "root_id"
+from "public"."post" as "root_"
+where (("root_"."title" = ? or "root_"."title" = ?)
+      or not("root_"."title" < ?)
       or "root_"."title" is null and not("root_"."title" is null))`,
 						parameters: ['A', 'B', 'X'],
 						response: { rows: [{ root_id: testUuid(1) }] },
@@ -1919,7 +1919,7 @@ where (("root_"."title" = ? or "root_"."title" = ?)
 					),
 				)
 				.buildSchema(),
-			query: GQL`				
+			query: GQL`
         query {
           listMenu {
 	          id
@@ -1928,7 +1928,7 @@ where (("root_"."title" = ? or "root_"."title" = ?)
 	          }
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from  "public"."menu" as "root_"`,
 					parameters: [],
@@ -1937,8 +1937,8 @@ where (("root_"."title" = ? or "root_"."title" = ?)
 					},
 				},
 				{
-					sql: SQL`select "root_"."menu_id" as "__grouping_key", "root_"."heading" as "root_heading", "root_"."id" as "root_id" 
-from  "public"."menu_item" as "root_"   where "root_"."menu_id" in (?, ?)   
+					sql: SQL`select "root_"."menu_id" as "__grouping_key", "root_"."heading" as "root_heading", "root_"."id" as "root_id"
+from  "public"."menu_item" as "root_"   where "root_"."menu_id" in (?, ?)
 order by "root_"."order" asc, "root_"."id" asc`,
 					parameters: [testUuid(1), testUuid(2)],
 					response: {
@@ -1987,7 +1987,7 @@ order by "root_"."order" asc, "root_"."id" asc`,
 					),
 				)
 				.buildSchema(),
-			query: GQL`				
+			query: GQL`
         query {
           listPost {
 	          id
@@ -1996,7 +1996,7 @@ order by "root_"."order" asc, "root_"."id" asc`,
 	          }
           }
         }`,
-			executes: sqlTransaction([
+			executes: noTransaction([
 				{
 					sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from  "public"."post" as "root_"`,
 					parameters: [],
@@ -2005,8 +2005,8 @@ order by "root_"."order" asc, "root_"."id" asc`,
 					},
 				},
 				{
-					sql: SQL`select "junction_"."category_id", "junction_"."post_id" 
-from  "public"."post_categories" as "junction_"   
+					sql: SQL`select "junction_"."category_id", "junction_"."post_id"
+from  "public"."post_categories" as "junction_"
 where "junction_"."post_id" in (?, ?)   order by "root_"."name" asc, "root_"."id" asc`,
 					parameters: [testUuid(1), testUuid(2)],
 					response: {
@@ -2018,7 +2018,7 @@ where "junction_"."post_id" in (?, ?)   order by "root_"."name" asc, "root_"."id
 					},
 				},
 				{
-					sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id" 
+					sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id"
 from  "public"."category" as "root_"   where "root_"."id" in (?, ?)`,
 					parameters: [testUuid(12), testUuid(11)],
 					response: {
@@ -2052,6 +2052,56 @@ from  "public"."category" as "root_"   where "root_"."id" in (?, ?)`,
 							],
 						},
 					],
+				},
+			},
+		})
+	})
+
+	it('transactions', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Post', entity => entity.column('title', column => column.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`
+        query {
+          transaction {
+            post1: getPost(by: {id: "${testUuid(1)}"}) {
+              id
+            }
+            posts: listPost {
+              id
+          }
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+						         from "public"."post" as "root_"
+                     where "root_"."id" = ?`,
+						response: { rows: [{ root_id: testUuid(1) }] },
+						parameters: [testUuid(1)],
+					},
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+						         from "public"."post" as "root_"`,
+						response: { rows: [{ root_id: testUuid(2) }] },
+						parameters: [],
+					},
+				]),
+			],
+			return: {
+				data: {
+					transaction: {
+						post1: {
+							id: testUuid(1),
+						},
+						posts: [
+							{
+								id: testUuid(2),
+							},
+						],
+					},
 				},
 			},
 		})

@@ -7,7 +7,7 @@ import { GraphQLObjectType, GraphQLResolveInfo } from 'graphql'
 import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
 import { Client, Connection } from '@contember/database'
-import { MutationOperation, readMutationMeta } from '../graphQLSchema/MutationExtension'
+import { Operation, readOperationMeta } from '../graphQLSchema/OperationExtension'
 import { assertNever } from '../utils'
 import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultType, MutationResultList } from '../sql/Result'
 import { InputPreValidator } from '../input-validation/preValidation/InputPreValidator'
@@ -33,7 +33,7 @@ export default class MutationResolver {
 				path.length === 0
 			)
 		})
-		const fields = (info.returnType as GraphQLObjectType).getFields()
+		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
 
 		const prefixValidationErrors = (errors: Result.ValidationError[], field: string) =>
 			errors.map(it => ({
@@ -52,16 +52,19 @@ export default class MutationResolver {
 				if (!fieldConfig) {
 					throw new ImplementationException()
 				}
-				const meta = readMutationMeta(fieldConfig.extensions)
+				const meta = readOperationMeta(fieldConfig.extensions)
 
 				const result: Result.ValidationResult | null = await (() => {
 					switch (meta.operation) {
-						case MutationOperation.create:
+						case Operation.create:
 							return this.validateCreate(mapper, meta.entity, field)
-						case MutationOperation.update:
+						case Operation.update:
 							return this.validateUpdate(mapper, meta.entity, field)
-						case MutationOperation.delete:
+						case Operation.delete:
 							return null
+						case Operation.get:
+						case Operation.list:
+							throw new ImplementationException()
 					}
 					return assertNever(meta.operation)
 				})()
@@ -92,16 +95,19 @@ export default class MutationResolver {
 				if (!fieldConfig) {
 					throw new ImplementationException()
 				}
-				const meta = readMutationMeta(fieldConfig.extensions)
+				const meta = readOperationMeta(fieldConfig.extensions)
 
 				const result: { ok: boolean; validation?: Result.ValidationResult } = await (() => {
 					switch (meta.operation) {
-						case MutationOperation.create:
+						case Operation.create:
 							return this.resolveCreateInternal(mapper, meta.entity, field)
-						case MutationOperation.update:
+						case Operation.update:
 							return this.resolveUpdateInternal(mapper, meta.entity, field)
-						case MutationOperation.delete:
+						case Operation.delete:
 							return this.resolveDeleteInternal(mapper, meta.entity, field)
+						case Operation.get:
+						case Operation.list:
+							throw new ImplementationException()
 					}
 					return assertNever(meta.operation)
 				})()

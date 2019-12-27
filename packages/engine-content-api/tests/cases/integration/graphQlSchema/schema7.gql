@@ -320,8 +320,6 @@ type QueryTransaction {
   listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
 }
 
 input StringCondition {

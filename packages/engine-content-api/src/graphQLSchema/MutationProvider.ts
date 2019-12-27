@@ -10,9 +10,9 @@ import { filterObject } from '../utils/object'
 import { aliasAwareResolver, GqlTypeName } from './utils'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
-import { ExtensionKey, MutationMeta, MutationOperation } from './MutationExtension'
+import { ExtensionKey, OperationMeta, Operation } from './OperationExtension'
 
-type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
+type FieldConfig<TArgs> = GraphQLFieldConfig<any, Context, TArgs>
 
 export default class MutationProvider {
 	constructor(
@@ -47,10 +47,10 @@ export default class MutationProvider {
 			args: {
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.create, entity) },
+			extensions: { [ExtensionKey]: new OperationMeta(Operation.create, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				if (parent) {
-					return parent
+				if (parent && info.path) {
+					return parent[info.path.key]
 				}
 				return context.executionContainer.get('mutationResolver').resolveCreate(entity, info)
 			},
@@ -69,10 +69,10 @@ export default class MutationProvider {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
 			},
-			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.delete, entity) },
+			extensions: { [ExtensionKey]: new OperationMeta(Operation.delete, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				if (parent) {
-					return parent
+				if (parent && info.path) {
+					return parent[info.path.key]
 				}
 				return context.executionContainer.get('mutationResolver').resolveDelete(entity, info)
 			},
@@ -94,10 +94,10 @@ export default class MutationProvider {
 				},
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.update, entity) },
+			extensions: { [ExtensionKey]: new OperationMeta(Operation.update, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				if (parent) {
-					return parent
+				if (parent && info.path) {
+					return parent[info.path.key]
 				}
 				return context.executionContainer.get('mutationResolver').resolveUpdate(entity, info)
 			},

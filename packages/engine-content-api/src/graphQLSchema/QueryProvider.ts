@@ -7,6 +7,7 @@ import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../acl/Authorizator'
 import OrderByTypeProvider from './OrderByTypeProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
 
 export default class QueryProvider {
 	constructor(
@@ -37,9 +38,10 @@ export default class QueryProvider {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
 			},
+			extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
 			resolve: (parent, args, context, info) => {
-				if (parent) {
-					return parent
+				if (parent && info.path) {
+					return parent[info.path.key]
 				}
 				return context.executionContainer.get('readResolver').resolveGetQuery(entity, info)
 			},
@@ -61,9 +63,10 @@ export default class QueryProvider {
 				offset: { type: this.graphqlObjectFactories.int },
 				limit: { type: this.graphqlObjectFactories.int },
 			},
+			extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
 			resolve: (parent, args, context, info) => {
-				if (parent) {
-					return parent
+				if (parent && info.path) {
+					return parent[info.path.key]
 				}
 				return context.executionContainer.get('readResolver').resolveListQuery(entity, info)
 			},

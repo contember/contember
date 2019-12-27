@@ -120,10 +120,10 @@ describe('update', () => {
 						// 	response: { rows: [{ root_id: testUuid(2), root_author: null }] },
 						// },
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "name") 
-							insert into "public"."author" ("id", "name") 
-							select "root_"."id", "root_"."name" 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name")
+							insert into "public"."author" ("id", "name")
+							select "root_"."id", "root_"."name"
 							from "root_"
 							returning "id"`,
 							parameters: [testUuid(1), 'John'],
@@ -342,9 +342,9 @@ describe('update', () => {
 							},
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "name") 
-							insert into "public"."author" ("id", "name") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name")
+							insert into "public"."author" ("id", "name")
 							select "root_"."id", "root_"."name"
               from "root_"
 							returning "id"`,
@@ -554,9 +554,9 @@ describe('update', () => {
 						// 	response: { rows: [] },
 						// },
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") 
-							insert into "public"."post_locale" ("id", "title", "locale", "post_id") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id")
+							insert into "public"."post_locale" ("id", "title", "locale", "post_id")
 							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
               from "root_"
 							returning "id"`,
@@ -663,7 +663,7 @@ describe('update', () => {
                  "root_"."locale",
                  "root_"."post_id"
                from "public"."post_locale" as "root_"
-               where "root_"."locale" = ? and "root_"."post_id" = ?) 
+               where "root_"."locale" = ? and "root_"."post_id" = ?)
 							update "public"."post_locale"
               set "title" = "newData_"."title" from "newData_"
               where "post_locale"."id" = "newData_"."id"`,
@@ -710,9 +710,9 @@ describe('update', () => {
 							},
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") 
-							insert into "public"."post_locale" ("id", "title", "locale", "post_id") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id")
+							insert into "public"."post_locale" ("id", "title", "locale", "post_id")
 							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
               from "root_"
 							returning "id"`,
@@ -973,9 +973,9 @@ describe('update', () => {
 						// 	response: { rows: [{ root_id: testUuid(99) }] },
 						// },
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "url") 
-							insert into "public"."site_setting" ("id", "url") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "url")
+							insert into "public"."site_setting" ("id", "url")
 							select "root_"."id", "root_"."url"
               from "root_"
 							returning "id"`,
@@ -1318,9 +1318,9 @@ describe('update', () => {
 							},
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "url") 
-							insert into "public"."site_setting" ("id", "url") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "url")
+							insert into "public"."site_setting" ("id", "url")
 							select "root_"."id", "root_"."url"
               from "root_"
 							returning "id"`,
@@ -1538,9 +1538,9 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id") 
-							insert into "public"."site" ("id", "name", "setting_id") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id")
+							insert into "public"."site" ("id", "name", "setting_id")
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
 							returning "id"`,
@@ -1601,9 +1601,9 @@ describe('update', () => {
 							},
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id") 
-							insert into "public"."site" ("id", "name", "setting_id") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id")
+							insert into "public"."site" ("id", "name", "setting_id")
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
 							returning "id"`,
@@ -1754,9 +1754,9 @@ describe('update', () => {
 							},
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id") 
-							insert into "public"."site" ("id", "name", "setting_id") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id")
+							insert into "public"."site" ("id", "name", "setting_id")
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
 							returning "id"`,
@@ -2144,9 +2144,9 @@ describe('update', () => {
 						// 	},
 						// },
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "name") 
-							insert into "public"."category" ("id", "name") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name")
+							insert into "public"."category" ("id", "name")
 							select "root_"."id", "root_"."name"
               from "root_"
 							returning "id"`,
@@ -2403,9 +2403,9 @@ describe('update', () => {
 							response: { rows: [] },
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "name") 
-							insert into "public"."category" ("id", "name") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name")
+							insert into "public"."category" ("id", "name")
 							select "root_"."id", "root_"."name"
               from "root_"
 							returning "id"`,
@@ -2467,7 +2467,7 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id") 
+							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
 							values (?, ?, ?)
               on conflict do nothing`,
 							parameters: [testUuid(1), testUuid(1), testUuid(2)],
@@ -2520,9 +2520,9 @@ describe('update', () => {
 						// 	},
 						// },
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "title") 
-							insert into "public"."post" ("id", "title") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "title")
+							insert into "public"."post" ("id", "title")
 							select "root_"."id", "root_"."title"
               from "root_"
 							returning "id"`,
@@ -2775,9 +2775,9 @@ describe('update', () => {
 							response: { rows: [] },
 						},
 						{
-							sql: SQL`with "root_" as 
-							(select ? :: uuid as "id", ? :: text as "title") 
-							insert into "public"."post" ("id", "title") 
+							sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "title")
+							insert into "public"."post" ("id", "title")
 							select "root_"."id", "root_"."title"
               from "root_"
 							returning "id"`,
@@ -2981,11 +2981,11 @@ describe('update', () => {
 				},
 				query: GQL`mutation  {
           updatePost(by: {id: "${testUuid(1)}"}, data: {categories: [
-						{connect: {id: "${testUuid(2)}"}},          
-						{disconnect: {id: "${testUuid(3)}"}},          
+						{connect: {id: "${testUuid(2)}"}},
+						{disconnect: {id: "${testUuid(3)}"}},
           ]}) {
           ok
-        }	
+        }
 				}`,
 				executes: sqlTransaction([
 					{
@@ -3012,11 +3012,11 @@ describe('update', () => {
              from (values (null)) as "t" inner join "public"."post" as "owning" on true
                inner join "public"."category" as "inversed" on true
              where "owning"."name" in (?, ?) and "owning"."id" = ? and "inversed"."name" in (?, ?) and
-                   "inversed"."id" = ?), 
+                   "inversed"."id" = ?),
 								"insert" as
               (insert into "public"."post_categories" ("id", "post_id", "category_id")
                 select
-                  ?,     
+                  ?,
                   "data"."post_id",
                   "data"."category_id"
                 from "data"
@@ -3171,6 +3171,110 @@ describe('update', () => {
 							],
 							valid: false,
 						},
+					},
+				},
+			},
+		})
+	})
+
+	it('executes in a transaction', async () => {
+		await execute({
+			schema: new SchemaBuilder()
+				.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.buildSchema(),
+			query: GQL`mutation {
+        transaction {
+          ok
+          updateAuthor(
+              by: {id: "${testUuid(1)}"},
+              data: {name: "John"}
+            ) {
+            ok
+            author: node {
+              id
+            }
+          }
+          update2: updateAuthor(
+              by: {id: "${testUuid(2)}"},
+              data: {name: "Jack"}
+            ) {
+            ok
+            author: node {
+              id
+            }
+          }
+        }
+      }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+					{
+						sql: SQL`with "newData_" as (select
+                  ? :: text as "name",
+                  "root_"."id"
+                from "public"."author" as "root_"
+                where "root_"."id" = ?) update "public"."author"
+              set "name" = "newData_"."name" from "newData_"
+              where "author"."id" = "newData_"."id"`,
+						parameters: ['John', testUuid(1)],
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "public"."author" as "root_"
+                     where "root_"."id" = ?`,
+						response: {
+							rows: [{ root_id: testUuid(1) }],
+						},
+						parameters: [testUuid(1)],
+					},
+					{
+						sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
+						parameters: [testUuid(2)],
+						response: { rows: [{ id: testUuid(2) }] },
+					},
+					{
+						sql: SQL`with "newData_" as (select
+                  ? :: text as "name",
+                  "root_"."id"
+                from "public"."author" as "root_"
+                where "root_"."id" = ?) update "public"."author"
+              set "name" = "newData_"."name" from "newData_"
+              where "author"."id" = "newData_"."id"`,
+						parameters: ['Jack', testUuid(2)],
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select "root_"."id" as "root_id"
+                     from "public"."author" as "root_"
+                     where "root_"."id" = ?`,
+						response: {
+							rows: [{ root_id: testUuid(2) }],
+						},
+						parameters: [testUuid(2)],
+					},
+				]),
+			],
+			return: {
+				data: {
+					transaction: {
+						updateAuthor: {
+							ok: true,
+							author: {
+								id: testUuid(1),
+							},
+						},
+						update2: {
+							ok: true,
+							author: {
+								id: testUuid(2),
+							},
+						},
+						ok: true,
 					},
 				},
 			},

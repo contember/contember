@@ -693,8 +693,6 @@ type QueryTransaction {
   listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
   validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
 }
 
 input StringCondition {

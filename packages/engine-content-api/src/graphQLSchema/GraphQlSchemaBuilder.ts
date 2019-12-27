@@ -54,7 +54,7 @@ export default class GraphQlSchemaBuilder {
 		queries.transaction = {
 			type: this.graphqlObjectFactories.createObjectType({
 				name: 'QueryTransaction',
-				fields: queries,
+				fields: { ...queries },
 			}),
 			resolve: async (parent, args, context: Context, info) => {
 				return await context.executionContainer.readResolver.resolveTransaction(info)

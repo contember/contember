@@ -260,8 +260,6 @@ type QueryTransaction {
   listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video]
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
 }
 
 input StringCondition {

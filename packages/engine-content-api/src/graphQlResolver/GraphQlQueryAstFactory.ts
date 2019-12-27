@@ -21,8 +21,8 @@ export default class GraphQlQueryAstFactory {
 	public create<Args = any>(info: GraphQLResolveInfo, filter?: NodeFilter): ObjectNode<Args> {
 		const node = ResolveInfoUtils.extractFieldNode(info)
 		const parentType = info.parentType
-		if (!this.itIs<GraphQLObjectType>(parentType, 'GraphQLObjectType')) {
-			throw new Error(this.getValueType(parentType))
+		if (!GraphQlQueryAstFactory.itIs<GraphQLObjectType>(parentType, 'GraphQLObjectType')) {
+			throw new Error(GraphQlQueryAstFactory.getValueType(parentType))
 		}
 
 		return this.createFromNode(info, parentType as GraphQLObjectType, node, [], filter || (() => true)) as ObjectNode
@@ -45,7 +45,7 @@ export default class GraphQlQueryAstFactory {
 		}
 		const field = parentType.getFields()[name]
 		const type = field.type
-		const resolvedType = this.resolveObjectType(type)
+		const resolvedType = GraphQlQueryAstFactory.resolveObjectType(type)
 
 		const fields: (FieldNode | ObjectNode)[] = this.processSelectionSet(
 			info,
@@ -86,7 +86,7 @@ export default class GraphQlQueryAstFactory {
 				}
 				const typeName = fragmentDefinition.typeCondition.name.value
 				const subField = info.schema.getType(typeName)
-				if (!this.itIs<GraphQLObjectType>(subField, 'GraphQLObjectType')) {
+				if (!GraphQlQueryAstFactory.itIs<GraphQLObjectType>(subField, 'GraphQLObjectType')) {
 					throw new Error('GraphQlQueryAstFactory: subfield is expected to be GraphQLObjectType')
 				}
 				fields.push(
@@ -105,27 +105,27 @@ export default class GraphQlQueryAstFactory {
 		return fields
 	}
 
-	private resolveObjectType(type: GraphQLOutputType): GraphQLObjectType {
-		if (this.itIs<GraphQLObjectType>(type, 'GraphQLObjectType')) {
+	public static resolveObjectType(type: GraphQLOutputType): GraphQLObjectType {
+		if (GraphQlQueryAstFactory.itIs<GraphQLObjectType>(type, 'GraphQLObjectType')) {
 			return type
 		}
-		if (this.itIs<GraphQLList<any>>(type, 'GraphQLList')) {
-			return this.resolveObjectType(type.ofType)
+		if (GraphQlQueryAstFactory.itIs<GraphQLList<any>>(type, 'GraphQLList')) {
+			return GraphQlQueryAstFactory.resolveObjectType(type.ofType)
 		}
-		if (this.itIs<GraphQLNonNull<any>>(type, 'GraphQLNonNull')) {
-			return this.resolveObjectType(type.ofType)
+		if (GraphQlQueryAstFactory.itIs<GraphQLNonNull<any>>(type, 'GraphQLNonNull')) {
+			return GraphQlQueryAstFactory.resolveObjectType(type.ofType)
 		}
-		throw new Error(this.getValueType(type))
+		throw new Error(GraphQlQueryAstFactory.getValueType(type))
 	}
 
-	private getValueType(val: any): string {
+	private static getValueType(val: any): string {
 		if (typeof val === 'object' && val.constructor) {
 			return 'Object of type ' + val.constructor.name + ' is not supported'
 		}
 		return typeof val + ' is not supported'
 	}
 
-	private itIs<T>(val: any, name: string): val is T {
+	private static itIs<T>(val: any, name: string): val is T {
 		return typeof val === 'object' && val.constructor && val.constructor.name === name
 	}
 }

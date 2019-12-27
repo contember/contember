@@ -5,6 +5,8 @@ import { GraphQLObjectType, GraphQLResolveInfo } from 'graphql'
 import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
 import { Client, Connection } from '@contember/database'
+import { Operation, readOperationMeta } from '../graphQLSchema/OperationExtension'
+import { assertNever } from '../utils'
 
 export default class ReadResolver {
 	constructor(
@@ -28,23 +30,20 @@ export default class ReadResolver {
 					throw new ImplementationException()
 				}
 				const fieldConfig = fields[field.name]
-				const extra = fieldConfig.extensions || {}
-				if (!extra.operation || !extra.entity) {
-					throw new ImplementationException()
-				}
-
-				let result: any
-				switch (extra.operation) {
-					case 'list':
-						result = await mapper.select(extra.entity, field)
-						break
-					case 'get':
-						result = await mapper.selectUnique(extra.entity, field)
-						break
-					default:
-						throw new ImplementationException()
-				}
-				trxResult[field.alias] = result
+				const meta = readOperationMeta(fieldConfig.extensions)
+				trxResult[field.alias] = await (() => {
+					switch (meta.operation) {
+						case Operation.get:
+							return mapper.selectUnique(meta.entity, field)
+						case Operation.list:
+							return mapper.select(meta.entity, field)
+						case Operation.create:
+						case Operation.update:
+						case Operation.delete:
+							throw new ImplementationException()
+					}
+					return assertNever(meta.operation)
+				})()
 			}
 			return trxResult
 		})

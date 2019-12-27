@@ -151,8 +151,6 @@ type QueryTransaction {
   getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity]
   validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
 }
 
 type Root {

@@ -32,12 +32,13 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		if (parent.projects.length > 0) {
 			return parent.projects
 		}
+		const roles = parent.id === context.identity.id ? context.identity.roles : []
 		const projects = await this.projectManager.getProjectsByIdentity(parent.id, context.permissionContext)
 		return await Promise.all(
 			projects.map(
 				async (it): Promise<IdentityProjectRelation> => ({
 					project: { ...it, members: [], roles: [] },
-					memberships: await this.projectMemberManager.getProjectMemberships(it.id, parent.id),
+					memberships: await this.projectMemberManager.getProjectMemberships(it.id, { id: parent.id, roles }),
 				}),
 			),
 		)

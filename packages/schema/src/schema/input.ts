@@ -97,6 +97,13 @@ namespace Input {
 		limit?: number
 	}
 
+	export interface SelectQueryInput<E = never> {
+		filter?: Where<Condition<Value.FieldValue<E>>>
+		orderBy?: OrderBy[]
+		skip?: number
+		first?: number
+	}
+
 	export type UpdateOneRelationInput<E = never> =
 		| CreateRelationInput<E>
 		| ConnectRelationInput<E>

@@ -47,7 +47,7 @@ class OrderByBuilder {
 		} else {
 			const targetEntity = getTargetEntity(this.schema, entity, fieldName)
 			if (!targetEntity) {
-				throw new Error()
+				throw new Error(`OrderByBuilder: target entity for relation ${entity.name}::${fieldName} not found`)
 			}
 			const newPath = path.for(fieldName)
 			const prevQb: any = qb

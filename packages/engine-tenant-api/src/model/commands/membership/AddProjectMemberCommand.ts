@@ -2,6 +2,7 @@ import { Command } from '../Command'
 import { Membership } from '../../type/Membership'
 import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
+import { SelectBuilder } from '@contember/database'
 
 type CommandResponse = Response<undefined, AddProjectMemberCommandError>
 
@@ -13,15 +14,14 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 	) {}
 
 	async execute({ db, providers, bus }: Command.Args): Promise<CommandResponse> {
-		const result = await db
-			.selectBuilder()
+		const result = await SelectBuilder.create()
 			.select('id')
 			.from('project_membership')
 			.where({
 				project_id: this.projectId,
 				identity_id: this.identityId,
 			})
-			.getResult()
+			.getResult(db)
 		if (result.length > 0) {
 			return new ResponseError(AddProjectMemberCommandError.alreadyMember)
 		}

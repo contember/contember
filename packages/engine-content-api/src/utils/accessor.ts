@@ -1,9 +1,11 @@
+import { ImplementationException } from '../exception'
+
 export class Accessor<T> {
 	private val: T | undefined
 
 	get(): T {
 		if (!this.val) {
-			throw new Error()
+			throw new ImplementationException('Accessor value is not set')
 		}
 
 		return this.val

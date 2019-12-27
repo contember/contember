@@ -7,6 +7,20 @@ type _IndexPathFragment {
   alias: String
 }
 
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+}
+
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
 
 type _ValidationError {
@@ -45,12 +59,14 @@ input AuthorCreatePostsEntityRelationInput {
 type AuthorCreateResult {
   ok: Boolean!
   node: Author
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type AuthorDeleteResult {
   ok: Boolean!
   node: Author
+  errors: [_MutationError!]!
 }
 
 type AuthorMeta {
@@ -92,6 +108,7 @@ input AuthorUpdatePostsRelationInput {
 type AuthorUpdateResult {
   ok: Boolean!
   node: Author
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -142,12 +159,14 @@ input CategoryCreatePostsEntityRelationInput {
 type CategoryCreateResult {
   ok: Boolean!
   node: Category
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type CategoryDeleteResult {
   ok: Boolean!
   node: Category
+  errors: [_MutationError!]!
 }
 
 type CategoryMeta {
@@ -190,6 +209,7 @@ input CategoryUpdatePostsRelationInput {
 type CategoryUpdateResult {
   ok: Boolean!
   node: Category
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -279,6 +299,24 @@ type Mutation {
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): AuthorUpdateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  validation: _ValidationResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  deleteCategory(by: CategoryUniqueWhere!): CategoryDeleteResult!
+  updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): CategoryUpdateResult!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
+  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocaleDeleteResult!
+  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  deletePost(by: PostUniqueWhere!): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
+  createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
+  deleteAuthor(by: AuthorUniqueWhere!): AuthorDeleteResult!
+  updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): AuthorUpdateResult!
 }
 
 enum OrderDirection {
@@ -326,12 +364,14 @@ input PostCreateLocalesEntityRelationInput {
 type PostCreateResult {
   ok: Boolean!
   node: Post
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type PostDeleteResult {
   ok: Boolean!
   node: Post
+  errors: [_MutationError!]!
 }
 
 type PostLocale {
@@ -357,12 +397,14 @@ input PostLocaleCreatePostEntityRelationInput {
 type PostLocaleCreateResult {
   ok: Boolean!
   node: PostLocale
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
 type PostLocaleDeleteResult {
   ok: Boolean!
   node: PostLocale
+  errors: [_MutationError!]!
 }
 
 type PostLocaleMeta {
@@ -408,6 +450,7 @@ input PostLocaleUpdatePostEntityRelationInput {
 type PostLocaleUpdateResult {
   ok: Boolean!
   node: PostLocale
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -531,6 +574,7 @@ input PostUpdateLocalesRelationInput {
 type PostUpdateResult {
   ok: Boolean!
   node: Post
+  errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
@@ -628,6 +672,28 @@ type Query {
   listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
   validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getCategory(by: CategoryUniqueWhere!): Category
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category]
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
+  validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
+  getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
+  validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
+  getPost(by: PostUniqueWhere!): Post
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
+  getAuthor(by: AuthorUniqueWhere!): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author]
+  validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
+  validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
   _info: Info
 }
 

@@ -1,4 +1,4 @@
-import { Client } from '@contember/database'
+import { Client, InsertBuilder } from '@contember/database'
 import { EventType } from '@contember/engine-common'
 import { UuidProvider } from '../../utils/uuid'
 
@@ -12,8 +12,7 @@ class CreateEventCommand {
 
 	public async execute(db: Client): Promise<string> {
 		const id = this.providers.uuid()
-		await db
-			.insertBuilder()
+		await InsertBuilder.create()
 			.into('event')
 			.values({
 				id,
@@ -21,7 +20,7 @@ class CreateEventCommand {
 				data: this.data,
 				previous_id: this.previousId,
 			})
-			.execute()
+			.execute(db)
 		return id
 	}
 }

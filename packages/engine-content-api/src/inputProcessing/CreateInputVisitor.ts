@@ -1,11 +1,12 @@
 import { isIt } from '../utils'
 import { Input, Model } from '@contember/schema'
-import CreateInputProcessor from './CreateInputProcessor'
+import { CreateInputProcessor } from './CreateInputProcessor'
 import * as Context from './InputContext'
 import { filterObject } from '../utils/object'
-import { UserError } from '../graphQlResolver/UserError'
+import { UserError } from '../graphQlResolver'
+import { ImplementationException } from '../exception'
 
-export default class CreateInputVisitor<Result>
+export class CreateInputVisitor<Result>
 	implements
 		Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
 		Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>> {
@@ -147,7 +148,7 @@ export default class CreateInputVisitor<Result>
 		if (isIt<Input.CreateRelationInput>(input, 'create')) {
 			return processor.create({ ...context, input: input.create })
 		}
-		throw new Error()
+		throw new ImplementationException()
 	}
 
 	private processManyRelationInput<Context>(
@@ -180,7 +181,7 @@ export default class CreateInputVisitor<Result>
 
 	private verifyOperations(input: any) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
-		if (keys.length !== 1) {
+		if (keys.length !== 1 || !['create', 'connect'].includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new UserError(`Expected either "create" or "connect". ${found} found.`)
 		}

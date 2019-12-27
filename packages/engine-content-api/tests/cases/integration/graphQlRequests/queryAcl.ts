@@ -1,9 +1,11 @@
-import { execute, sqlTransaction } from '../../../src/test'
+import { execute, SqlQuery } from '../../../src/test'
 import { GQL, SQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import 'jasmine'
+
+const sqlTransaction = (sqls: SqlQuery[]) => sqls
 
 describe('Queries with acl', () => {
 	describe('Post + PostLocale with title restricted by locale', () => {

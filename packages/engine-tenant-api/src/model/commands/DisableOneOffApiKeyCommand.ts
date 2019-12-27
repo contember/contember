@@ -1,12 +1,12 @@
 import { Command } from './Command'
 import { ApiKey } from '../type'
+import { UpdateBuilder } from '@contember/database'
 
 class DisableOneOffApiKeyCommand implements Command<void> {
 	constructor(private readonly apiKeyId: string) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
-		const qb = db
-			.updateBuilder()
+		const qb = UpdateBuilder.create()
 			.table('api_key')
 			.where({
 				id: this.apiKeyId,
@@ -14,7 +14,7 @@ class DisableOneOffApiKeyCommand implements Command<void> {
 			})
 			.values({ disabled_at: new Date() })
 
-		await qb.execute()
+		await qb.execute(db)
 	}
 }
 

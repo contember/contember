@@ -76,7 +76,7 @@ export class ApiTester {
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const schemaMigrator = new SchemaMigrator(modificationHandlerFactory)
 		const schemaVersionBuilder = new SchemaVersionBuilder(migrationsResolver, schemaMigrator)
-		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories, getArgumentValues)
+		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories)
 
 		const systemContainerFactory = new SystemContainerFactory()
 		const systemContainer = systemContainerFactory.create({

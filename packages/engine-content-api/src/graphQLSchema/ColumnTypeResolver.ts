@@ -3,6 +3,7 @@ import { Model } from '@contember/schema'
 import EnumsProvider from './EnumsProvider'
 import { CustomTypesProvider } from './CustomTypesProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { ImplementationException } from '../exception'
 
 export default class ColumnTypeResolver {
 	private schema: Model.Schema
@@ -41,7 +42,7 @@ export default class ColumnTypeResolver {
 				throw new Error(`Undefined enum ${column.enumName}`)
 			default:
 				;(({}: never): never => {
-					throw new Error()
+					throw new ImplementationException('Invalid column type')
 				})(column)
 		}
 	}

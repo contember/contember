@@ -5,7 +5,7 @@ export class Author {
 	name = d.stringColumn()
 	@v.required('Contact is required')
 	contact: d.OneHasOneDefinition = d.oneHasOne(AuthorContact, 'author')
-	@v.optional()
+	// @v.optional()
 	posts: d.OneHasManyDefinition = d.oneHasMany(Post, 'author')
 }
 
@@ -26,8 +26,8 @@ export class Post {
 	content = d.stringColumn()
 	@v.required('Post author is required')
 	author = d.manyHasOne(Author, 'posts')
-	@v.required('Post tags are required')
-	@v.assertMinLength(2, 'Please fill at least two tags')
+	// @v.required('Post tags are required')
+	// @v.assertMinLength(2, 'Please fill at least two tags')
 	tags: d.ManyHasManyDefinition = d.manyHasMany(Tag, 'posts')
 }
 

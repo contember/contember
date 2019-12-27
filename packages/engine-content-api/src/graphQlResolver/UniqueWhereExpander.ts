@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { getTargetEntity } from '@contember/schema-utils'
+import { getTargetEntity, getUniqueConstraints } from '@contember/schema-utils'
 import { isUniqueWhere } from '../utils/inputUtils'
 
 export default class UniqueWhereExpander {
@@ -7,7 +7,7 @@ export default class UniqueWhereExpander {
 
 	expand(entity: Model.Entity, where: Input.UniqueWhere): Input.Where {
 		if (!isUniqueWhere(this.schema, entity, where)) {
-			throw new Error('Unique where is not unique: ' + JSON.stringify(where))
+			throw new UniqueWhereError(this.formatErrorMessage(entity, where))
 		}
 
 		const whereExpanded: Input.Where = {}
@@ -22,4 +22,18 @@ export default class UniqueWhereExpander {
 
 		return whereExpanded
 	}
+
+	private formatErrorMessage(entity: Model.Entity, where: Input.UniqueWhere): string {
+		return (
+			'Unique where is not unique: \nProvided value:' +
+			JSON.stringify(where) +
+			'\nKnown unique keys:\n' +
+			getUniqueConstraints(this.schema, entity)
+				.map(it => it.fields.join(', '))
+				.map(it => `\t - ${it}`)
+				.join('\n')
+		)
+	}
 }
+
+export class UniqueWhereError extends Error {}

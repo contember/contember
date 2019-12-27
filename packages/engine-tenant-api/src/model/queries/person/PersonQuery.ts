@@ -1,4 +1,4 @@
-import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
+import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
 import { MaybePersonRow, PersonRow } from './types'
 
 class PersonQuery extends DatabaseQuery<MaybePersonRow> {
@@ -18,9 +18,8 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 		return new PersonQuery({ identity_id })
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<MaybePersonRow> {
-		const rows = await queryable
-			.createSelectBuilder<PersonRow>()
+	async fetch({ db }: DatabaseQueryable): Promise<MaybePersonRow> {
+		const rows = await SelectBuilder.create<PersonRow>()
 			.select(['person', 'id'])
 			.select(['person', 'password_hash'])
 			.select(['person', 'identity_id'])
@@ -29,7 +28,7 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 			.from('person')
 			.join('identity', 'identity', expr => expr.columnsEq(['identity', 'id'], ['person', 'identity_id']))
 			.where(expr => this.applyCondition(expr))
-			.getResult()
+			.getResult(db)
 
 		return this.fetchOneOrNull(rows)
 	}

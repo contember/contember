@@ -2,5 +2,4 @@
 /node_modules
 /instances/*/admin/public
 /instances/*/docker-compose.override.yaml
-/instances/*/api/config.yaml
-
+/instances/*/contember.instance.local.yaml

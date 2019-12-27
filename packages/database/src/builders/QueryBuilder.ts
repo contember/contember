@@ -2,9 +2,10 @@ import { Literal } from '../Literal'
 import { Value } from '../types'
 import { ConditionBuilder } from './ConditionBuilder'
 import { ColumnExpressionFactory } from './ColumnExpressionFactory'
+import { Compiler } from './Compiler'
 
 interface QueryBuilder {
-	createQuery(): Literal
+	createQuery(context: Compiler.Context): Literal
 }
 
 namespace QueryBuilder {

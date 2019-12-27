@@ -22,6 +22,6 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 			return []
 		}
 
-		return await this.projectMemberManager.getProjectMemberships(project.id, args.identityId)
+		return await this.projectMemberManager.getProjectMemberships(project.id, { id: args.identityId })
 	}
 }

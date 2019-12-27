@@ -1,14 +1,19 @@
-import CreateInputProcessor from '../inputProcessing/CreateInputProcessor'
-import * as Context from '../inputProcessing/InputContext'
+import { CreateInputProcessor } from '../../inputProcessing'
+import * as Context from '../../inputProcessing/InputContext'
 import { Input, Model } from '@contember/schema'
-import InputValidator from './InputValidator'
-import { appendRelationToPath, ValidationPath } from './ValidationPath'
+import { appendRelationToPath, ValidationPath } from '../ValidationPath'
+import Mapper from '../../sql/Mapper'
+import { InputPreValidator } from './InputPreValidator'
 
 type Result = any
 const NoResult = () => Promise.resolve([])
 
-export default class CreateInputValidationProcessor implements CreateInputProcessor<Result> {
-	constructor(private readonly inputValidator: InputValidator, private readonly path: ValidationPath) {}
+export class CreateInputPreValidationProcessor implements CreateInputProcessor<Result> {
+	constructor(
+		private readonly inputValidator: InputPreValidator,
+		private readonly path: ValidationPath,
+		private readonly mapper: Mapper,
+	) {}
 
 	manyHasManyInversed: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInversedContext, Result> = {
 		connect: NoResult,
@@ -47,7 +52,13 @@ export default class CreateInputValidationProcessor implements CreateInputProces
 		alias?: string
 	}) {
 		const newPath = appendRelationToPath(this.path, context.relation.name, context)
-		return this.inputValidator.validateCreate(context.targetEntity, context.input, newPath, context.targetRelation)
+		return this.inputValidator.validateCreate({
+			mapper: this.mapper,
+			entity: context.targetEntity,
+			data: context.input,
+			path: newPath,
+			overRelation: context.targetRelation,
+		})
 	}
 
 	async column(context: Context.ColumnContext): Promise<Result> {

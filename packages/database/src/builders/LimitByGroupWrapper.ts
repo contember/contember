@@ -1,6 +1,7 @@
 import { QueryBuilder } from './QueryBuilder'
 import { SelectBuilder } from './SelectBuilder'
-import { ConditionBuilder, Operator } from './ConditionBuilder'
+import { Operator } from './ConditionBuilder'
+import { Client } from '../client'
 
 class LimitByGroupWrapper {
 	constructor(
@@ -15,7 +16,7 @@ class LimitByGroupWrapper {
 		private readonly limit: number | undefined,
 	) {}
 
-	public async getResult<R>(qb: SelectBuilder<R, any>): Promise<R[]> {
+	public async getResult<R>(qb: SelectBuilder<R, any>, db: Client): Promise<R[]> {
 		if (this.limit !== undefined || this.skip !== undefined) {
 			qb = qb.select(
 				expr =>
@@ -41,8 +42,7 @@ class LimitByGroupWrapper {
 				;[qb] = this.orderByCallback(qb, qb)
 			}
 
-			let wrapperQb: SelectBuilder<R, any> = qb.wrapper
-				.selectBuilder<R>()
+			let wrapperQb: SelectBuilder<R, any> = SelectBuilder.create<R>()
 				.with('data', qb)
 				.from('data')
 				.select(['data', '*'])
@@ -57,12 +57,12 @@ class LimitByGroupWrapper {
 				wrapperQb = wrapperQb.where(expr => expr.compare(['data', 'rowNumber_'], Operator.lte, start + limit))
 			}
 
-			return await wrapperQb.getResult()
+			return await wrapperQb.getResult(db)
 		} else if (this.orderByCallback) {
-			;[qb] = this.orderByCallback(qb, qb)
+			return await this.orderByCallback(qb, qb)[0].getResult(db)
 		}
 
-		return await qb.getResult()
+		return await qb.getResult(db)
 	}
 }
 

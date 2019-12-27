@@ -1,4 +1,4 @@
-import { ConflictActionType } from '@contember/database'
+import { ConflictActionType, InsertBuilder } from '@contember/database'
 import { Command } from './Command'
 import { Project } from '../type'
 
@@ -6,8 +6,7 @@ class CreateOrUpdateProjectCommand implements Command<void> {
 	constructor(private readonly project: Pick<Project, 'name' | 'slug'>) {}
 
 	public async execute({ db, providers }: Command.Args): Promise<void> {
-		await db
-			.insertBuilder()
+		await InsertBuilder.create()
 			.into('project')
 			.values({
 				id: providers.uuid(),
@@ -18,7 +17,7 @@ class CreateOrUpdateProjectCommand implements Command<void> {
 				name: this.project.name,
 				slug: this.project.slug,
 			})
-			.execute()
+			.execute(db)
 	}
 }
 

@@ -9,9 +9,9 @@ class StageBySlugQuery extends DatabaseQuery<StageBySlugQuery.Result> {
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<StageBySlugQuery.Result> {
-		let selectBuilder = prepareStageQueryBuilder(queryable).where({ slug: this.slug })
+		let selectBuilder = prepareStageQueryBuilder().where({ slug: this.slug })
 
-		const rows = await selectBuilder.getResult()
+		const rows = await selectBuilder.getResult(queryable.db)
 
 		return this.fetchOneOrNull(rows)
 	}

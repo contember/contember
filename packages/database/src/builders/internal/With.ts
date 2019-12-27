@@ -2,26 +2,31 @@ import { wrapIdentifier } from '../../utils'
 import { Literal } from '../../Literal'
 import { QueryBuilder } from '../QueryBuilder'
 import { SelectBuilder } from '../SelectBuilder'
-import { Client } from '../../client'
+import { Compiler } from '../Compiler'
+
+type LiteralFactory = (context: Compiler.Context) => Literal
 
 namespace With {
 	export class Statement {
-		constructor(public readonly ctes: { [alias: string]: Literal }) {}
+		constructor(public readonly ctes: { [alias: string]: LiteralFactory }) {}
 
-		public compile(): Literal {
+		public compile(context: Compiler.Context): [Literal, Compiler.Context] {
 			const ctes = Object.entries(this.ctes)
 			if (ctes.length === 0) {
-				return new Literal('')
+				return [new Literal(''), context]
 			}
-			return new Literal('with ').appendAll(
+			const literal = new Literal('with ').appendAll(
 				ctes.map(([alias, expr]) => {
-					return new Literal(wrapIdentifier(alias) + ' as (' + expr.sql + ')', expr.parameters)
+					const literal = expr(context)
+					context = context.withAlias(alias)
+					return new Literal(wrapIdentifier(alias) + ' as (' + literal.sql + ')', literal.parameters)
 				}),
 				', ',
 			)
+			return [literal, context]
 		}
 
-		public withCte(alias: string, expression: Literal): Statement {
+		public withCte(alias: string, expression: LiteralFactory): Statement {
 			return new Statement({ ...this.ctes, [alias]: expression })
 		}
 
@@ -44,13 +49,13 @@ namespace With {
 		with(alias: string, expression: Expression): any
 	}
 
-	export function createLiteral(wrapper: Client, expr: Expression): Literal {
+	export function createLiteral(expr: Expression): LiteralFactory {
 		if (typeof expr === 'function') {
-			return expr(wrapper.selectBuilder()).createQuery()
+			return ctx => expr(SelectBuilder.create()).createQuery(ctx)
 		} else if (((expr: any): expr is QueryBuilder => 'createQuery' in expr)(expr)) {
-			return expr.createQuery()
+			return ctx => expr.createQuery(ctx)
 		} else {
-			return expr
+			return () => expr
 		}
 	}
 }

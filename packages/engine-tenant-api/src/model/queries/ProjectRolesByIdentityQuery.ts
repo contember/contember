@@ -1,4 +1,4 @@
-import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { byProjectSlug } from './ProjectSlugSpecification'
 
 class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQuery.Result> {
@@ -6,9 +6,8 @@ class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQu
 		super()
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
-		let qb = queryable
-			.createSelectBuilder<{ role: string }>()
+	async fetch({ db }: DatabaseQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
+		let qb = SelectBuilder.create<{ role: string }>()
 			.select('role')
 			.from('project_membership')
 			.where({
@@ -20,7 +19,7 @@ class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQu
 						project_id: this.project.id,
 				  })
 				: qb.match(byProjectSlug(this.project.slug))
-		const result = await qbWithProjectWhere.getResult()
+		const result = await qbWithProjectWhere.getResult(db)
 
 		return { roles: result.map(it => it.role) }
 	}

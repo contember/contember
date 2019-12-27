@@ -6,11 +6,11 @@ import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../acl/Authorizator'
 import EntityInputProvider from './mutations/EntityInputProvider'
-import GraphQlQueryAstFactory from '../graphQlResolver/GraphQlQueryAstFactory'
 import { filterObject } from '../utils/object'
 import { aliasAwareResolver, GqlTypeName } from './utils'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
-import { ValidationSchemaTypeProvider } from './ValidationSchemaTypeProvider'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
+import { ExtensionKey, MutationMeta, MutationOperation } from './MutationExtension'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
 
@@ -22,9 +22,8 @@ export default class MutationProvider {
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.update>,
-		private readonly queryAstAFactory: GraphQlQueryAstFactory,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
-		private readonly validationSchemaTypeProvider: ValidationSchemaTypeProvider,
+		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
 	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {
@@ -48,14 +47,13 @@ export default class MutationProvider {
 			args: {
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveCreate(
-					entity,
-					args,
-					this.queryAstAFactory.create(info, (node, path) => {
-						return path.length !== 1 || node.name.value === 'node'
-					}),
-				),
+			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.create, entity) },
+			resolve: (parent, args, context: Context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('mutationResolver').resolveCreate(entity, info)
+			},
 		}
 	}
 
@@ -71,14 +69,13 @@ export default class MutationProvider {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
 			},
-			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveDelete(
-					entity,
-					args,
-					this.queryAstAFactory.create(info, (node, path) => {
-						return path.length !== 1 || node.name.value === 'node'
-					}),
-				),
+			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.delete, entity) },
+			resolve: (parent, args, context: Context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('mutationResolver').resolveDelete(entity, info)
+			},
 		}
 	}
 
@@ -97,14 +94,13 @@ export default class MutationProvider {
 				},
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
-			resolve: (parent, args, context: Context, info) =>
-				context.executionContainer.get('mutationResolver').resolveUpdate(
-					entity,
-					args,
-					this.queryAstAFactory.create(info, (node, path) => {
-						return path.length !== 1 || node.name.value === 'node'
-					}),
-				),
+			extensions: { [ExtensionKey]: new MutationMeta(MutationOperation.update, entity) },
+			resolve: (parent, args, context: Context, info) => {
+				if (parent) {
+					return parent
+				}
+				return context.executionContainer.get('mutationResolver').resolveUpdate(entity, info)
+			},
 		}
 	}
 
@@ -113,10 +109,11 @@ export default class MutationProvider {
 		const fields: GraphQLObjectTypeConfig<any, any>['fields'] = {
 			ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
 			node: { type: nodeType, resolve: aliasAwareResolver },
+			errors: { type: this.resultSchemaTypeProvider.errorListResultType },
 		}
 		if (operation !== 'delete') {
 			fields.validation = {
-				type: this.graphqlObjectFactories.createNotNull(this.validationSchemaTypeProvider.validationResultType),
+				type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 			}
 		}
 		return this.graphqlObjectFactories.createObjectType({

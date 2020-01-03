@@ -6,6 +6,7 @@ import { resourcesDir } from '../pathUtils'
 import {
 	execDockerCompose,
 	getConfiguredPorts,
+	getConfiguredPortsMap,
 	readDefaultDockerComposeConfig,
 	updateOverrideConfig,
 } from './dockerCompose'
@@ -229,15 +230,19 @@ export const resolvePortsMapping = async (args: {
 	]
 	const runningServices = await getInstanceStatus({ instanceDirectory: args.instanceDirectory })
 
-	let assignedPort = (args.startPort || 1024) - 1
+	const configuredPorts = getConfiguredPortsMap(args.config)
+	const occupiedPorts = Object.values(configuredPorts).flatMap(it => it.map(it => it.hostPort))
+	let startPort = args.startPort || 1024
 	const servicePortMapping: ServicePortsMapping = {}
 	for (const { service, port: containerPort } of exposedServices) {
 		if (!args.config.services[service]) {
 			continue
 		}
-		const configuredPorts = getConfiguredPorts(args.config, service)
-		const configuredPortMapping = configuredPorts.find(it => !containerPort || it.containerPort === containerPort)
-		const otherConfiguredPorts = configuredPorts.filter(it => it !== configuredPortMapping)
+		const serviceConfiguredPorts = configuredPorts[service] || []
+		const configuredPortMapping = serviceConfiguredPorts.find(
+			it => !containerPort || it.containerPort === containerPort,
+		)
+		const otherConfiguredPorts = serviceConfiguredPorts.filter(it => it !== configuredPortMapping)
 
 		const runningStatus = runningServices.find(it => it.name === service)
 		const runningPortMapping =
@@ -245,12 +250,18 @@ export const resolvePortsMapping = async (args: {
 
 		let assignedPortMapping = configuredPortMapping || runningPortMapping
 		if (!assignedPortMapping) {
-			assignedPort = await getPort({ port: getPort.makeRange(assignedPort + 1, 65535) })
+			let freePort
+			do {
+				freePort = await getPort({ port: getPort.makeRange(startPort, 65535) })
+			} while (occupiedPorts.includes(freePort))
+
+			occupiedPorts.push(freePort)
 			assignedPortMapping = {
-				containerPort: containerPort || assignedPort,
-				hostPort: assignedPort,
+				containerPort: containerPort || freePort,
+				hostPort: freePort,
 				hostIp: args.host || '127.0.0.1',
 			}
+			startPort = freePort + 1
 		}
 
 		servicePortMapping[service] = [assignedPortMapping, ...otherConfiguredPorts]

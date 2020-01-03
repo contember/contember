@@ -20,7 +20,7 @@ type Args = {
 type Options = {
 	// ['host']: string
 	['admin-runtime']?: 'node' | 'docker'
-	['admin-port']?: string
+	['ports']?: string
 	host?: string
 	// ['save-ports']?: boolean
 }
@@ -31,7 +31,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		configuration.argument('instanceName').optional()
 		configuration.option('host').valueRequired()
 		// configuration.option('save-ports').valueNone()
-		configuration.option('admin-port').valueRequired()
+		configuration.option('ports').valueRequired()
 		configuration
 			.option('admin-runtime')
 			.valueRequired()
@@ -43,7 +43,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		const { composeConfig, portsMapping } = await resolveInstanceDockerConfig({
 			instanceDirectory,
 			host: input.getOption('host'),
-			startPort: input.getOption('admin-port') ? Number(input.getOption('admin-port')) : undefined,
+			startPort: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
 			//savePortsMapping: input.getOption('save-ports'),
 		})
 
@@ -83,7 +83,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		await new Promise(resolve => setTimeout(resolve, 2000))
 
 		const status = await getInstanceStatus({ instanceDirectory })
-		const notRunning = status.filter(it => !it.running)
+		const notRunning = status.filter(it => it.name !== 'admin' || !nodeAdminRuntime).filter(it => !it.running)
 		if (notRunning.length > 0) {
 			const notRunningNames = notRunning.map(it => it.name)
 			console.error(`Following services failed to start: ${notRunningNames.join(', ')}`)

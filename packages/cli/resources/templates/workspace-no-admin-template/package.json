@@ -1,0 +1,17 @@
+{
+	"name": "@contember/template-workspace-no-admin",
+	"version": "0.3.5",
+	"scripts": {
+		"version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml",
+
+		"cli": "contember",
+		"__build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
+	},
+	"devDependencies": {
+		"typescript": "^3.7.2"
+	},
+	"dependencies": {
+		"@contember/schema": "^0.3.5",
+		"@contember/schema-definition": "^0.3.5"
+	}
+}

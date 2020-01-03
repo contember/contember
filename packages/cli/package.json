@@ -18,6 +18,7 @@
 		"@contember/schema-definition": "^0.3.5",
 		"@contember/schema-migrations": "^0.3.5",
 		"@contember/schema-utils": "^0.3.5",
+		"chalk": "^3.0.0",
 		"fs-extra": "^8.1.0",
 		"get-port": "^5.0.0",
 		"graphql-request": "^1.8.2",

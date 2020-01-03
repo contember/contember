@@ -2,7 +2,7 @@ import { copy, pathExists } from 'fs-extra'
 import { basename, join } from 'path'
 import { resourcesDir } from '../pathUtils'
 import { promises as fs } from 'fs'
-import { listDirectories } from './fs'
+import { listDirectories, replaceFileContent, tryUnlink } from './fs'
 import { InstanceEnvironment, validateInstanceName } from './instance'
 import { updateYaml } from './yaml'
 import { projectNameToEnvName } from '@contember/engine-common'
@@ -22,16 +22,17 @@ export const createProject = async (args: { workspaceDirectory: string; projectN
 	const projectDir = join(args.workspaceDirectory, 'projects', args.projectName)
 	const withAdmin = await hasInstanceAdmin(args)
 	const template = withAdmin ? 'project-template' : 'project-no-admin-template'
-	await copy(join(resourcesDir, template), projectDir)
+	await copy(join(resourcesDir, 'templates', template), projectDir)
+	await tryUnlink(join(projectDir, 'package.json'))
+	await tryUnlink(join(projectDir, 'tsconfig.json'))
+	await tryUnlink(join(projectDir, 'package-lock.json'))
 	if (!withAdmin) {
 		return
 	}
 	const filesToReplace = ['admin/index.ts']
 	for (const file of filesToReplace) {
 		const path = join(projectDir, file)
-		const content = await fs.readFile(path, { encoding: 'utf8' })
-		const newContent = content.replace('{projectName}', args.projectName)
-		await fs.writeFile(path, newContent, { encoding: 'utf8' })
+		await replaceFileContent(path, content => content.replace('{projectName}', args.projectName))
 	}
 }
 

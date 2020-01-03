@@ -1,13 +1,17 @@
 {
+	"name": "@contember/template-workspace",
+	"version": "0.3.6",
 	"scripts": {
+		"version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml",
+
 		"lint": "tsc --noEmit",
 		"cli": "contember",
 		"start-admin": "webpack-dev-server --env.development --history-api-fallback --display=minimal --hot --inline --colors --config instances/${CONTEMBER_INSTANCE}/admin/webpack.config.js",
-		"build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
+		"__build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
 	},
 	"devDependencies": {
 		"@contember/cli": "^0.3.5",
-		"@types/react": "^16.9.14",
+		"@types/react": "^16.9.17",
 		"@types/react-datepicker": "^2.9.5",
 		"@types/react-dom": "^16.9.4",
 		"@types/react-redux": "^7.1.5",

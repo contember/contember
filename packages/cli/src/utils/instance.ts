@@ -232,7 +232,7 @@ export const resolvePortsMapping = async (args: {
 
 	const configuredPorts = getConfiguredPortsMap(args.config)
 	const occupiedPorts = Object.values(configuredPorts).flatMap(it => it.map(it => it.hostPort))
-	let startPort = args.startPort || 1024
+	let startPort = args.startPort || 1480
 	const servicePortMapping: ServicePortsMapping = {}
 	for (const { service, port: containerPort } of exposedServices) {
 		if (!args.config.services[service]) {

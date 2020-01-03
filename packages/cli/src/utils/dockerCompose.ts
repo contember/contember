@@ -4,6 +4,7 @@ import { runCommand, RunningCommand } from './commands'
 import { Readable, Writable } from 'stream'
 import { JsonUpdateCallback, readMultipleYaml, updateYaml } from './yaml'
 import { dump } from 'js-yaml'
+import { tuple } from './tuple'
 
 const OVERRIDE_CONFIGS = ['docker-compose.override.yaml', 'docker-compose.override.yml']
 const MAIN_CONFIGS = ['docker-compose.yaml', 'docker-compose.yml']
@@ -32,7 +33,13 @@ export type PortsMapping = {
 	hostIp: string
 }
 
-export const getConfiguredPorts = (config: any, service: string): PortsMapping[] => {
+export const getConfiguredPortsMap = (config: DockerComposeConfig): Record<string, PortsMapping[]> => {
+	return Object.fromEntries(
+		Object.keys(config.services || {}).map(service => tuple(service, getConfiguredPorts(config, service))),
+	)
+}
+
+export const getConfiguredPorts = (config: DockerComposeConfig, service: string): PortsMapping[] => {
 	const ports = config?.services?.[service]?.ports
 	if (!ports || !Array.isArray(ports) || ports.length === 0) {
 		return []
@@ -88,6 +95,7 @@ export const runDockerCompose = (args: string[], options: DockerComposeRunOption
 
 interface DockerComposeServiceConfig {
 	environment: Record<string, string>
+	ports: (string | {})[] // todo long syntax
 }
 
 interface DockerComposeConfig {

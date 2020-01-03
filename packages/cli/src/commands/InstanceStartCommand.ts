@@ -83,7 +83,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		await new Promise(resolve => setTimeout(resolve, 2000))
 
 		const status = await getInstanceStatus({ instanceDirectory })
-		const notRunning = status.filter(it => !it.running)
+		const notRunning = status.filter(it => it.name !== 'admin' || !nodeAdminRuntime).filter(it => !it.running)
 		if (notRunning.length > 0) {
 			const notRunningNames = notRunning.map(it => it.name)
 			console.error(`Following services failed to start: ${notRunningNames.join(', ')}`)

@@ -42,7 +42,7 @@ export const runAdmin = (
 			}
 			config = JSON.parse(configEl.innerHTML)
 		}
-		if (!('apiSever' in config) || !('loginToken' in config)) {
+		if (!('apiServer' in config) || !('loginToken' in config)) {
 			throw new Error('Invalid Contember configuration, apiServer and loginToken must be present')
 		}
 		return config

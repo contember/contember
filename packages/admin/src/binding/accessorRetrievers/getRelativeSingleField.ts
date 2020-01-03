@@ -18,7 +18,7 @@ export const getRelativeSingleField = <
 		throw new DataBindingError(
 			`Trying to access the field '${field}'${
 				nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
-			}' but it does not exist.`,
+			} but it does not exist.`,
 		)
 	}
 	return (accessor as unknown) as FieldAccessor<Persisted, Produced>

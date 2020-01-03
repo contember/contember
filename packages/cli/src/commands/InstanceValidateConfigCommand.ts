@@ -29,7 +29,7 @@ export class InstanceValidateConfigCommand extends Command<Args, Options> {
 			if (e instanceof ChildProcessError) {
 				console.log('Configuration is NOT valid')
 			} else {
-				throw new e()
+				throw e
 			}
 		}
 	}

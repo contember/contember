@@ -145,7 +145,7 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 				const label = <Entity accessor={entity}>{props.labelFactory}</Entity>
 				let slugValue: string | undefined
 				if (props.slugField !== 'id') {
-					const slug = props.slugField === 'id' ? entity.primaryKey : entity.data.getField(props.slugField)
+					const slug = props.slugField === 'id' ? entity.primaryKey : entity.getField(props.slugField)
 					if (slug instanceof FieldAccessor && typeof slug.currentValue === 'string') {
 						slugValue = slug.currentValue
 					}

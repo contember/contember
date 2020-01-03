@@ -173,7 +173,7 @@ export default class OperationProcessor {
 		if (definition.renderBlock === undefined) {
 			throw new Error('Unable to get value block for custom field')
 		}
-		const valueFieldAccessor = entityAccessor.data.getField(definition.valueField)
+		const valueFieldAccessor = entityAccessor.getField(definition.valueField)
 		if (!(valueFieldAccessor instanceof FieldAccessor)) {
 			throw new Error(`Value field ${definition.valueField} is not field`)
 		}

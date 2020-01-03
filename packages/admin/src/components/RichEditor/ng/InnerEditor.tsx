@@ -87,7 +87,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 
 				let nodes: Immutable.List<Block | Text | Inline>
 				if (definition.renderBlock !== undefined) {
-					const fieldAccessor = entityAccessor.data.getField(definition.valueField)
+					const fieldAccessor = entityAccessor.getField(definition.valueField)
 					if (!(fieldAccessor instanceof FieldAccessor)) {
 						throw new Error('')
 					}

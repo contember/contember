@@ -12,7 +12,7 @@ export const getRelativeSingleField = <
 	{ field, hasOneRelationPath }: RelativeSingleField | DesugaredRelativeSingleField,
 ) => {
 	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
-	const accessor = nestedEntity.data.getField(field)
+	const accessor = nestedEntity.getField(field)
 
 	if (!(accessor instanceof FieldAccessor)) {
 		throw new DataBindingError(

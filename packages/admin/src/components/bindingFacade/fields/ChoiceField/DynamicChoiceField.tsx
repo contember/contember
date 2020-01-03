@@ -63,13 +63,13 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	const isMutating = useMutationState()
 	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])
 	const subTreeData = React.useMemo(() => {
-		const subTree = parentEntity.data.getTreeRoot(subTreeIdentifier)
+		const subTree = parentEntity.getTreeRoot(subTreeIdentifier)
 
 		if (!(subTree instanceof EntityListAccessor)) {
 			throw new DataBindingError(`Something went horribly wrong. The options of a dynamic choice field are not a list.`)
 		}
 		return subTree
-	}, [parentEntity.data, subTreeIdentifier])
+	}, [parentEntity, subTreeIdentifier])
 
 	const desugaredRelativePath = React.useMemo<RelativeSingleEntity | RelativeEntityList>(() => {
 		if (props.arity === 'single') {
@@ -156,7 +156,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 							)
 						}
 					} else if ('field' in desugaredOptionPath) {
-						const field = item.data.getField(desugaredOptionPath.field)
+						const field = item.getField(desugaredOptionPath.field)
 						label = field instanceof FieldAccessor && typeof field.currentValue === 'string' ? field.currentValue : ''
 					}
 

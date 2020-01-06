@@ -5,7 +5,7 @@ import { PostForm } from '../forms'
 export const PostEditPage = (
 	<EditPage
 		entity="Post(id = $id)"
-		pageName={'postEdit'}
+		pageName="postEdit"
 		rendererProps={{
 			title: 'Edit post',
 			navigation: <NavigateBackButton to="postList">Posts</NavigateBackButton>,

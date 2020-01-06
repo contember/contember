@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"noEmit": true
+	},
+	"references": [
+		{
+			"path": "../../../../schema-definition/src"
+		}, {
+			"path": "../../../../schema/src"
+		}
+	]
+}

@@ -1,5 +1,5 @@
 import { basename, join } from 'path'
-import { listDirectories } from './fs'
+import { listDirectories, replaceFileContent, tryUnlink } from './fs'
 import { copy, pathExists } from 'fs-extra'
 
 import { resourcesDir } from '../pathUtils'
@@ -46,7 +46,14 @@ export const createInstance = async (args: {
 	validateInstanceName(args.instanceName)
 	const withAdmin = await hasInstanceAdmin(args)
 	const template = withAdmin ? 'instance-template' : 'instance-no-admin-template'
-	await copy(join(resourcesDir, template), getInstanceDir(args))
+	const instanceDir = getInstanceDir(args)
+	await copy(join(resourcesDir, 'templates', template), instanceDir)
+	await tryUnlink(join(instanceDir, 'package.json'))
+	await tryUnlink(join(instanceDir, 'package-lock.json'))
+	await tryUnlink(join(instanceDir, 'tsconfig.json'))
+	if (withAdmin) {
+		await replaceFileContent(join(instanceDir, 'admin/src/projects.ts'), () => '')
+	}
 	return await resolveInstanceEnvironment({
 		workspaceDirectory: args.workspaceDirectory,
 		instanceName: args.instanceName,

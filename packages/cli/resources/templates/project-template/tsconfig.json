@@ -1,0 +1,18 @@
+{
+	"include": ["admin"],
+	"compilerOptions": {
+		"noEmit": true,
+		"jsx": "react"
+	},
+	"references": [
+		{
+			"path": "../../../../schema-definition/src"
+		},
+		{
+			"path": "../../../../schema/src"
+		},
+		{
+			"path": "../../../../admin/src"
+		}
+	]
+}

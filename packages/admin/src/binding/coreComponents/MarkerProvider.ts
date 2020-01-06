@@ -2,10 +2,6 @@ import * as React from 'react'
 import { Environment } from '../dao'
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 
-export interface NamedComponent {
-	displayName: string
-}
-
 export interface EnvironmentDeltaProvider<P extends {} = any> {
 	generateEnvironment: (props: P, oldEnvironment: Environment) => Environment
 }

@@ -26,6 +26,9 @@
 		{ "path": "./packages/schema-migrations" },
 		{ "path": "./packages/schema-utils" },
 		{ "path": "./packages/ui" },
-		{ "path": "./packages/utils" }
+		{ "path": "./packages/utils" },
+		{ "path": "./packages/cli/resources/templates/instance-template" },
+		{ "path": "./packages/cli/resources/templates/project-no-admin-template" },
+		{ "path": "./packages/cli/resources/templates/project-template" }
 	]
 }

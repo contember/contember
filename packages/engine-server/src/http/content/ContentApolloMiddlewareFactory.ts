@@ -45,10 +45,8 @@ class ContentApolloMiddlewareFactory {
 			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
 				projectRoles: ctx.state.projectMemberships.map(it => it.role),
 			})
-			ctx.state.schema = schema
-			ctx.state.permissions = permissions
 
-			const server = this.apolloServerFactory.create(dataSchema)
+			const server = this.apolloServerFactory.create(permissions, schema, dataSchema)
 
 			await ctx.state.timer('exec graphql', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
 		}
@@ -76,10 +74,7 @@ class ContentApolloMiddlewareFactory {
 }
 
 namespace ContentApolloMiddlewareFactory {
-	export interface KoaState {
-		schema: Schema
-		permissions: Acl.Permissions
-	}
+	export interface KoaState {}
 }
 
 export { ContentApolloMiddlewareFactory }

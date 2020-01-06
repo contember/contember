@@ -16,6 +16,7 @@ import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
 import { extractOriginalError } from '../../core/graphql/errorExtract'
 import uuid from 'uuid'
 import { GraphQLExtension } from 'graphql-extensions'
+import { Acl, Schema } from '@contember/schema'
 
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
@@ -24,7 +25,7 @@ class ContentApolloServerFactory {
 
 	constructor(private readonly debug: boolean) {}
 
-	public create(dataSchema: GraphQLSchema): ApolloServer {
+	public create(permissions: Acl.Permissions, schema: Schema, dataSchema: GraphQLSchema): ApolloServer {
 		const server = this.cache.get(dataSchema)
 		if (server) {
 			return server
@@ -80,8 +81,8 @@ class ContentApolloServerFactory {
 					now: () => new Date(),
 				}
 				const executionContainer = new ExecutionContainerFactory(
-					ctx.state.schema,
-					ctx.state.permissions,
+					schema,
+					permissions,
 					providers,
 					getArgumentValues,
 					db => setupSystemVariables(db, ctx.state.authResult.identityId, providers),

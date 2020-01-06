@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MarkerFactory } from '../markers'
+import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeSingleField, SugaredUniqueWhere } from '../treeParameters'
 import { Component } from './Component'
 

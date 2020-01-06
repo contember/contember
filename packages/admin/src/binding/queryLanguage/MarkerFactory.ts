@@ -1,5 +1,16 @@
 import { Environment } from '../dao'
-import { QueryLanguage } from '../queryLanguage'
+import {
+	ConnectionMarker,
+	EntityFields,
+	FieldMarker,
+	Marker,
+	MarkerTreeRoot,
+	PlaceholderGenerator,
+	ReferenceMarker,
+	TaggedQualifiedEntityList,
+	TaggedQualifiedSingleEntity,
+	TaggedUnconstrainedQualifiedEntityList,
+} from '../markers'
 import {
 	ExpectedEntityCount,
 	HasManyRelation,
@@ -14,18 +25,7 @@ import {
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUniqueWhere,
 } from '../treeParameters'
-import { ConnectionMarker } from './ConnectionMarker'
-import { EntityFields } from './EntityFields'
-import { FieldMarker } from './FieldMarker'
-import { Marker } from './Marker'
-import {
-	MarkerTreeRoot,
-	TaggedQualifiedEntityList,
-	TaggedQualifiedSingleEntity,
-	TaggedUnconstrainedQualifiedEntityList,
-} from './MarkerTreeRoot'
-import { PlaceholderGenerator } from './PlaceholderGenerator'
-import { ReferenceMarker } from './ReferenceMarker'
+import { QueryLanguage } from './QueryLanguage'
 
 export namespace MarkerFactory {
 	export const createSingleEntityMarkerTreeRoot = (

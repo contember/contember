@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { AccessorTree, useAccessorTreeState } from '../accessorTree'
-import { MarkerFactory } from '../markers'
+import { MarkerFactory } from '../queryLanguage'
 import { SubTreeIdentifier, SugaredQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
 

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useComponentClassName } from '../../auxiliary'
 import { Justification } from '../../types'
 import cn from 'classnames'
 import { toEnumViewClass } from '../../utils'
@@ -11,7 +12,7 @@ export interface TableRowProps {
 
 export const TableRow = React.memo((props: TableRowProps) => {
 	const useTableElement = React.useContext(UseTableElementContext)
-	const className = cn('table-row', toEnumViewClass(props.justification))
+	const className = cn(useComponentClassName('table-row'), toEnumViewClass(props.justification))
 
 	if (useTableElement) {
 		return <tr className={className}>{props.children}</tr>

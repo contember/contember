@@ -1,0 +1,12 @@
+{
+	"include": ["admin"],
+	"compilerOptions": {
+		"noEmit": true,
+		"jsx": "react"
+	},
+	"references": [
+		{
+			"path": "../../../../admin/src"
+		}
+	]
+}

@@ -4,6 +4,7 @@ import { resourcesDir } from '../pathUtils'
 import { createInstance } from './instance'
 import { createProject, registerProjectToInstance } from './project'
 import { readYaml } from './yaml'
+import { replaceFileContent, tryUnlink } from './fs'
 
 export const createWorkspace = async ({
 	workspaceDirectory,
@@ -13,7 +14,13 @@ export const createWorkspace = async ({
 	workspaceDirectory: string
 }) => {
 	const template = withAdmin ? 'workspace-template' : 'workspace-no-admin-template'
-	await copy(join(resourcesDir, template), workspaceDirectory)
+	await copy(join(resourcesDir, 'templates', template), workspaceDirectory)
+	await tryUnlink(join(workspaceDirectory, 'package-lock.json'))
+	await replaceFileContent(join(workspaceDirectory, 'package.json'), content => {
+		const { name, version, ...json } = JSON.parse(content)
+		const { __build, version: __null, ...scripts } = json.scripts
+		return JSON.stringify({ scripts: { ...scripts, build: __build }, ...json }, null, '  ')
+	})
 
 	const instance = await createInstance({ workspaceDirectory, instanceName: 'default' })
 	await createProject({ workspaceDirectory, projectName: 'sandbox' })

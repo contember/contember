@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useRelativeEntityList } from '../accessorRetrievers'
-import { MarkerFactory, ReferenceMarker } from '../markers'
+import { ReferenceMarker } from '../markers'
+import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeEntityList } from '../treeParameters'
 import { Component } from './Component'
 import { Entity } from './Entity'

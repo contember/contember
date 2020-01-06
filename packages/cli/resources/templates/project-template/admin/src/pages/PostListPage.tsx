@@ -6,14 +6,10 @@ export const PostListPage = (
 	<TablePage
 		pageName={'postList'}
 		entities="Post"
-		orderBy={[{ title: new Literal('desc') }]}
+		orderBy="title desc"
 		rendererProps={{
 			title: 'Posts',
-			actions: (
-				<>
-					<PageLinkButton to="postCreate">Add a new post</PageLinkButton>
-				</>
-			),
+			actions: <PageLinkButton to="postCreate">Add a new post</PageLinkButton>,
 		}}
 	>
 		<TableCell>

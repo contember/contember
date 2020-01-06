@@ -5,7 +5,7 @@ import { PostForm } from '../forms'
 export const PostCreatePage = (
 	<CreatePage
 		entity="Post"
-		pageName={'postCreate'}
+		pageName="postCreate"
 		rendererProps={{
 			title: 'Add a new post',
 			navigation: <NavigateBackButton to="postList">Posts</NavigateBackButton>,

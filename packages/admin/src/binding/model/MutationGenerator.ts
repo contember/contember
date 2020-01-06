@@ -113,7 +113,7 @@ export class MutationGenerator {
 				return builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
+					.by({ ...where, [PRIMARY_KEY_NAME]: entity.entityAccessor.primaryKey })
 			},
 			alias,
 		)
@@ -201,7 +201,7 @@ export class MutationGenerator {
 		entityFields: EntityFields,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		const allData = currentData.data.allFieldData
+		const allData = currentData.data
 		const nonbearingFields: Array<{
 			placeholderName: string
 			value: FieldValue
@@ -332,7 +332,7 @@ export class MutationGenerator {
 		persistedData: ReceivedEntityData<undefined>,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
-		const allData = currentData.data.allFieldData
+		const allData = currentData.data
 
 		for (const placeholderName in entityFields) {
 			const marker = entityFields[placeholderName]
@@ -470,9 +470,9 @@ export class MutationGenerator {
 								const removalType = accessor.removalType
 
 								if (removalType === 'delete') {
-									builder = builder.delete({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
+									builder = builder.delete({ [PRIMARY_KEY_NAME]: accessor.entityAccessor.primaryKey }, alias)
 								} else if (removalType === 'disconnect') {
-									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
+									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: accessor.entityAccessor.primaryKey }, alias)
 								} else {
 									assertNever(removalType)
 								}

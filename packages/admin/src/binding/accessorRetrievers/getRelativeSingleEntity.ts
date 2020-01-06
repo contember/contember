@@ -7,7 +7,7 @@ export const getRelativeSingleEntity = (
 	{ hasOneRelationPath }: RelativeSingleEntity | DesugaredRelativeSingleEntity,
 ) => {
 	for (const hasOneRelation of hasOneRelationPath) {
-		const field = relativeTo.data.getField(
+		const field = relativeTo.getField(
 			hasOneRelation.field,
 			ExpectedEntityCount.UpToOne,
 			hasOneRelation.filter,

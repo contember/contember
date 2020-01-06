@@ -12,13 +12,13 @@ export const getRelativeSingleField = <
 	{ field, hasOneRelationPath }: RelativeSingleField | DesugaredRelativeSingleField,
 ) => {
 	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
-	const accessor = nestedEntity.data.getField(field)
+	const accessor = nestedEntity.getField(field)
 
 	if (!(accessor instanceof FieldAccessor)) {
 		throw new DataBindingError(
 			`Trying to access the field '${field}'${
 				nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
-			}' but it does not exist.`,
+			} but it does not exist.`,
 		)
 	}
 	return (accessor as unknown) as FieldAccessor<Persisted, Produced>

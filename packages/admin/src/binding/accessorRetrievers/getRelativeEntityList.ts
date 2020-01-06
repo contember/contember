@@ -8,7 +8,7 @@ export const getRelativeEntityList = (
 	{ hasOneRelationPath, hasManyRelation }: RelativeEntityList | DesugaredRelativeEntityList,
 ): EntityListAccessor => {
 	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
-	const field = nestedEntity.data.getField(hasManyRelation.field)
+	const field = nestedEntity.getField(hasManyRelation.field)
 
 	if (!(field instanceof EntityListAccessor)) {
 		throw new DataBindingError(`Corrupted data`)

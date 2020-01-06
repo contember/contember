@@ -22,7 +22,6 @@ import {
 	PermissionsVerifier,
 } from '@contember/engine-content-api'
 import { makeExecutableSchema } from 'graphql-tools'
-import { maskErrors } from 'graphql-errors'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
@@ -96,11 +95,13 @@ export class ApiTester {
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
 			resolvers: systemContainer.get('systemResolvers') as any,
-		})
-		maskErrors(systemSchema, err => {
-			console.error(err)
-			process.exit(1)
-			return err
+			logger: {
+				log: err => {
+					console.error(err)
+					process.exit(1)
+					return err
+				},
+			},
 		})
 
 		const stageManager = new TesterStageManager(

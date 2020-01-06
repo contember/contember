@@ -29,7 +29,6 @@
 		"bcrypt": "^3.0.6",
 		"chalk": "^3.0.0",
 		"graphql": "^14.5.4",
-		"graphql-errors": "^2.1.0",
 		"graphql-extensions": "^0.5.7",
 		"graphql-tools": "^4.0.5",
 		"koa": "^2.8.1",

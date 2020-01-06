@@ -1,6 +1,5 @@
 export * from './Accessor'
 export * from './EntityAccessor'
-export * from './EntityData'
 export * from './EntityForRemovalAccessor'
 export * from './EntityListAccessor'
 export * from './Errorable'

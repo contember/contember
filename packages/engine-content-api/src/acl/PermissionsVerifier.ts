@@ -11,7 +11,6 @@ import { getColumnName } from '@contember/schema-utils'
 import ConditionBuilder from '../sql/select/ConditionBuilder'
 
 interface PermissionContext {
-	globalRoles: string[]
 	projectRoles: string[]
 	variables: Acl.VariablesMap
 }
@@ -79,7 +78,6 @@ export class PermissionsVerifier {
 		type: 'read' | 'write',
 	): Promise<PermissionsByTable> {
 		const { permissions } = this.permissionsByIdentityFactory.createPermissions(stageSlug, schema, {
-			globalRoles: permissionContext.globalRoles,
 			projectRoles: permissionContext.projectRoles,
 		})
 

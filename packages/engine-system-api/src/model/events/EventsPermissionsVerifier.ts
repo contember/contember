@@ -16,7 +16,6 @@ type ContentEventsByTable = { [tableName: string]: ContentEvent[] }
 
 interface Args {
 	permissionContext: {
-		globalRoles: string[]
 		projectRoles: string[]
 		variables: Acl.VariablesMap
 	}
@@ -80,7 +79,6 @@ class EventsPermissionsVerifier {
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
 		const permissionContext = {
-			globalRoles: context.identity.roles,
 			projectRoles: await context.identity.getProjectRoles(this.project.slug),
 			variables: context.variables,
 		}

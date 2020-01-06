@@ -44,7 +44,6 @@ class ContentApolloMiddlewareFactory {
 
 			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(stage.slug, schema, {
 				projectRoles: ctx.state.projectMemberships.map(it => it.role),
-				globalRoles: ctx.state.authResult.roles,
 			})
 			ctx.state.schema = schema
 			ctx.state.permissions = permissions

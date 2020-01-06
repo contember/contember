@@ -41,7 +41,6 @@ class PermissionsByIdentityFactory {
 
 namespace PermissionsByIdentityFactory {
 	export interface Identity {
-		globalRoles: string[]
 		projectRoles: string[]
 	}
 

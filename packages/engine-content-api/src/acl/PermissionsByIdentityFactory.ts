@@ -1,27 +1,20 @@
 import PermissionFactory from './PermissionFactory'
-import { arrayEquals } from '../utils/arrays'
+import { arrayEquals, filterObject } from '../utils'
 import { Acl, Schema } from '@contember/schema'
-import { filterObject } from '../utils/object'
 
 class PermissionsByIdentityFactory {
-	constructor(private readonly permissionFactories: PermissionsByIdentityFactory.PermissionFactory[]) {}
-
 	public createPermissions(
 		stageSlug: string,
 		schema: Schema,
 		identity: PermissionsByIdentityFactory.Identity,
 	): PermissionsByIdentityFactory.PermissionResult {
-		const permissionFactory = this.permissionFactories.find(it => it.isEligible(identity))
-		if (!permissionFactory) {
-			throw new Error('No suitable permission factory found')
+		return {
+			permissions: new PermissionFactory(schema.model).create(
+				this.extractAclForStage(schema.acl, stageSlug),
+				identity.projectRoles,
+			),
+			verifier: otherIdentity => arrayEquals(identity.projectRoles, otherIdentity.projectRoles),
 		}
-		return permissionFactory.createPermissions(
-			{
-				...schema,
-				acl: this.extractAclForStage(schema.acl, stageSlug),
-			},
-			identity,
-		)
 	}
 
 	private extractAclForStage(acl: Acl.Schema, stageSlug: string): Acl.Schema {
@@ -47,25 +40,6 @@ namespace PermissionsByIdentityFactory {
 	export interface PermissionResult {
 		permissions: Acl.Permissions
 		verifier: (identity: Identity) => boolean
-	}
-
-	export interface PermissionFactory {
-		isEligible(identity: Identity): boolean
-
-		createPermissions(schema: Schema, identity: Identity): PermissionResult
-	}
-
-	export class RoleBasedPermissionFactory implements PermissionFactory {
-		isEligible(identity: Identity): boolean {
-			return true
-		}
-
-		createPermissions(schema: Schema, identity: Identity): PermissionResult {
-			return {
-				permissions: new PermissionFactory(schema.model).create(schema.acl, identity.projectRoles),
-				verifier: otherIdentity => arrayEquals(identity.projectRoles, otherIdentity.projectRoles),
-			}
-		}
 	}
 }
 

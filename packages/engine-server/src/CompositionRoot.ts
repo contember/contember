@@ -265,7 +265,7 @@ class CompositionRoot {
 				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory(graphqlObjectFactories))
 				.addService(
 					'permissionsByIdentityFactory',
-					({}) => new PermissionsByIdentityFactory([new PermissionsByIdentityFactory.RoleBasedPermissionFactory()]),
+					({}) => new PermissionsByIdentityFactory(),
 				)
 				.addService(
 					'contentPermissionsVerifier',

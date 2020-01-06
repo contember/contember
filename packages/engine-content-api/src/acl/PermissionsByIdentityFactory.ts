@@ -1,34 +1,16 @@
 import PermissionFactory from './PermissionFactory'
-import { arrayEquals, filterObject } from '../utils'
+import { arrayEquals } from '../utils'
 import { Acl, Schema } from '@contember/schema'
 
 class PermissionsByIdentityFactory {
 	public createPermissions(
-		stageSlug: string,
 		schema: Schema,
 		identity: PermissionsByIdentityFactory.Identity,
 	): PermissionsByIdentityFactory.PermissionResult {
 		return {
-			permissions: new PermissionFactory(schema.model).create(
-				this.extractAclForStage(schema.acl, stageSlug),
-				identity.projectRoles,
-			),
+			permissions: new PermissionFactory(schema.model).create(schema.acl, identity.projectRoles),
 			verifier: otherIdentity => arrayEquals(identity.projectRoles, otherIdentity.projectRoles),
 		}
-	}
-
-	private extractAclForStage(acl: Acl.Schema, stageSlug: string): Acl.Schema {
-		return {
-			...acl,
-			roles: filterObject(
-				acl.roles,
-				(key, value) => value.stages === '*' || !!value.stages.find(pattern => this.matches(stageSlug, pattern)),
-			),
-		}
-	}
-
-	private matches(stageSlug: string, pattern: string): boolean {
-		return !!new RegExp(pattern).exec(stageSlug)
 	}
 }
 

@@ -25,7 +25,6 @@ class GraphQlSchemaFactory {
 	) {}
 
 	public create(
-		stageSlug: string,
 		schema: Schema,
 		identity: PermissionsByIdentityFactory.Identity,
 	): [GraphQLSchema, Acl.Permissions] {
@@ -43,7 +42,7 @@ class GraphQlSchemaFactory {
 			}
 		}
 
-		const { permissions, verifier } = this.permissionFactory.createPermissions(stageSlug, schema, identity)
+		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
 
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, permissions)
 		const contentSchemaFactory = new ContentSchemaFactory(schema)

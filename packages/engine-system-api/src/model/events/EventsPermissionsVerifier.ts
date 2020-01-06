@@ -19,7 +19,6 @@ interface Args {
 		projectRoles: string[]
 		variables: Acl.VariablesMap
 	}
-	stageSlug: string
 	db: Client
 	schema: Schema
 	eventsByTable: ContentEventsByTable
@@ -86,14 +85,12 @@ class EventsPermissionsVerifier {
 			db: this.db.forSchema(formatSchemaName(sourceStage)),
 			eventsByTable,
 			schema: await this.schemaVersionBuilder.buildSchemaForStage(sourceStage.slug),
-			stageSlug: sourceStage.slug,
 			permissionContext,
 		})
 		const writePermissions = await this.contentPermissionVerifier.verifyWritePermissions({
 			db: this.db.forSchema(formatSchemaName(targetStage)),
 			eventsByTable,
 			schema: await this.schemaVersionBuilder.buildSchemaForStage(targetStage.slug),
-			stageSlug: targetStage.slug,
 			permissionContext,
 		})
 

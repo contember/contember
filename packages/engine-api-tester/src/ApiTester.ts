@@ -10,8 +10,17 @@ import {
 	typeDefs as systemTypeDefs,
 	unnamedIdentity,
 } from '@contember/engine-system-api'
-import { MigrationsResolver, ModificationHandlerFactory, SchemaMigrator, SchemaVersionBuilder } from '@contember/schema-migrations'
-import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory, PermissionsVerifier } from '@contember/engine-content-api'
+import {
+	MigrationsResolver,
+	ModificationHandlerFactory,
+	SchemaMigrator,
+	SchemaVersionBuilder,
+} from '@contember/schema-migrations'
+import {
+	GraphQlSchemaBuilderFactory,
+	PermissionsByIdentityFactory,
+	PermissionsVerifier,
+} from '@contember/engine-content-api'
 import { makeExecutableSchema } from 'graphql-tools'
 import { maskErrors } from 'graphql-errors'
 import { ContentApiTester } from './ContentApiTester'
@@ -73,9 +82,7 @@ export class ApiTester {
 			project: { ...ApiTester.project, ...(options.project || {}) },
 			migrationsResolver: migrationsResolver,
 			migrationFilesManager: projectMigrationFilesManager,
-			contentPermissionsVerifier: new PermissionsVerifier(
-				new PermissionsByIdentityFactory(),
-			),
+			contentPermissionsVerifier: new PermissionsVerifier(new PermissionsByIdentityFactory()),
 			modificationHandlerFactory,
 			providers: { uuid: createUuidGenerator('a452') },
 		})

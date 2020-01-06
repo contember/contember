@@ -98,11 +98,13 @@ export namespace QueryLanguage {
 	})
 
 	const desugarHasOneRelationPath = (
-		input: SugarableHasOneRelation[] | SugarableHasOneRelation,
+		input: SugarableHasOneRelation[] | SugarableHasOneRelation | undefined,
 		lastRelation: UnsugarableHasOneRelation,
 		environment: Environment,
 	): HasOneRelation[] => {
-		if (!Array.isArray(input)) {
+		if (input === undefined) {
+			input = []
+		} else if (!Array.isArray(input)) {
 			input = [input]
 		}
 

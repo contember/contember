@@ -33,7 +33,7 @@ export interface SugarableQualifiedEntityList
 	extends SugarableEntityListParameters,
 		SugarableQualifiedEntityParameters,
 		SugarableEntityCreationParameters {
-	hasOneRelationPath: SugarableHasOneRelation[]
+	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableQualifiedEntityList

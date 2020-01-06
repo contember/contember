@@ -25,7 +25,7 @@ export interface UnconstrainedQualifiedEntityList extends QualifiedEntityParamet
 export interface SugarableUnconstrainedQualifiedEntityList
 	extends SugarableQualifiedEntityParameters,
 		SugarableEntityCreationParameters {
-	hasOneRelationPath: SugarableHasOneRelation[]
+	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableUnconstrainedQualifiedEntityList

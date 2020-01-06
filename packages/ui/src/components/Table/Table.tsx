@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useComponentClassName } from '../../auxiliary'
 import { Justification, Size } from '../../types'
 import cn from 'classnames'
 import { toEnumViewClass } from '../../utils'
@@ -15,7 +16,11 @@ export interface TableProps {
 }
 
 export const Table = React.memo(({ useTableElement = true, ...props }: TableProps) => {
-	const className = cn('table', toEnumViewClass(props.size), toEnumViewClass(props.justification, 'justifyStart'))
+	const className = cn(
+		useComponentClassName('table'),
+		toEnumViewClass(props.size),
+		toEnumViewClass(props.justification, 'justifyStart'),
+	)
 
 	return (
 		<UseTableElementContext.Provider value={useTableElement}>

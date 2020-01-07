@@ -1,16 +1,19 @@
 import * as React from 'react'
 import { ClientConfig, ClientConfigContext } from './config'
-import { ProjectAndStage, ProjectAndStageContext } from './project'
+import { ProjectSlugContext, StageSlugContext } from './project'
 
 export interface ClientProps {
 	children: React.ReactNode
 	config: ClientConfig
-	projectAndStage: ProjectAndStage | undefined
+	project?: string
+	stage?: string
 }
 
 export const Client = React.memo((props: ClientProps) => (
 	<ClientConfigContext.Provider value={props.config}>
-		<ProjectAndStageContext.Provider value={props.projectAndStage}>{props.children}</ProjectAndStageContext.Provider>
+		<ProjectSlugContext.Provider value={props.project}>
+			<StageSlugContext.Provider value={props.stage}>{props.children}</StageSlugContext.Provider>
+		</ProjectSlugContext.Provider>
 	</ClientConfigContext.Provider>
 ))
 Client.displayName = 'Client'

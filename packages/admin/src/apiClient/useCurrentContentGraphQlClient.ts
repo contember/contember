@@ -1,12 +1,13 @@
 import { ClientError } from './ClientError'
+import { useProjectSlug, useStageSlug } from './project'
 import { useContentGraphQlClient } from './useContentGraphQlClient'
-import { useProjectAndStage } from './project'
 
 export const useCurrentContentGraphQlClient = () => {
-	const projectAndStage = useProjectAndStage()
+	const project = useProjectSlug()
+	const stage = useStageSlug()
 
-	if (projectAndStage === undefined) {
+	if (project === undefined || stage === undefined) {
 		throw new ClientError()
 	}
-	return useContentGraphQlClient(projectAndStage.project, projectAndStage.stage)
+	return useContentGraphQlClient(project, stage)
 }

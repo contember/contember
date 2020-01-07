@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
+import { assertValidClientConfig, ClientConfig, ClientConfigContext } from '../apiClient'
 import { EnvironmentContext } from '../binding/accessorRetrievers'
 import { Environment } from '../binding/dao'
 import { Router } from '../containers/router'
@@ -13,14 +14,13 @@ import { PageRequest } from '../state/request'
 
 import { configureStore, Store } from '../store'
 import { Login } from './Login'
-import ProjectsList from './ProjectsList'
-import { Config, isValidConfig, ConfigContext, ConfigurationError } from '../config'
-import { Toaster } from './ui/Toaster'
 import { NavigationIsActiveProvider, NavigationProvider } from './NavigationProvider'
+import ProjectsList from './ProjectsList'
+import { Toaster } from './ui'
 
 export interface AdminProps {
 	configs: ProjectConfig[]
-	config: Config
+	clientConfig: ClientConfig
 }
 
 export default class Admin extends React.Component<AdminProps> {
@@ -29,11 +29,9 @@ export default class Admin extends React.Component<AdminProps> {
 	constructor(props: AdminProps) {
 		super(props)
 
-		if (!isValidConfig(props.config)) {
-			throw new ConfigurationError()
-		}
+		assertValidClientConfig(props.clientConfig)
 
-		this.store = configureStore(emptyState, props.config)
+		this.store = configureStore(emptyState, props.clientConfig)
 		this.store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => this.props.configs)())
 		this.store.dispatch(populateRequest(document.location!))
 		window.onpopstate = (e: PopStateEvent) => {
@@ -44,7 +42,7 @@ export default class Admin extends React.Component<AdminProps> {
 
 	render() {
 		return (
-			<ConfigContext.Provider value={this.props.config}>
+			<ClientConfigContext.Provider value={this.props.clientConfig}>
 				<Provider store={this.store}>
 					<NavigationProvider>
 						<NavigationIsActiveProvider>
@@ -111,7 +109,7 @@ export default class Admin extends React.Component<AdminProps> {
 						</NavigationIsActiveProvider>
 					</NavigationProvider>
 				</Provider>
-			</ConfigContext.Provider>
+			</ClientConfigContext.Provider>
 		)
 	}
 }

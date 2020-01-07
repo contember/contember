@@ -1,17 +1,17 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { Config } from '../config'
+import { assertValidClientConfig, ClientConfig } from '../apiClient/config'
 import { Admin } from '../components'
 import { ProjectConfig } from '../state/projectsConfigs'
 
-type ReactRootFactory = (config: Config, projects: ProjectConfig[]) => React.ReactElement
+type ReactRootFactory = (config: ClientConfig, projects: ProjectConfig[]) => React.ReactElement
 
 export const runAdmin = (
 	projects: Record<string, ProjectConfig[] | ProjectConfig>,
 	options: {
 		root?: HTMLElement | string
 		configElement?: HTMLElement | string
-		config?: Config
+		config?: ClientConfig
 		reactRoot?: ReactRootFactory
 	} = {},
 ) => {
@@ -27,9 +27,9 @@ export const runAdmin = (
 	}
 
 	const config = (() => {
-		let config: Config
+		let clientConfig: ClientConfig
 		if (options.config) {
-			config = options.config
+			clientConfig = options.config
 		} else {
 			let configEl: HTMLElement | null
 			if (options.configElement && options.configElement instanceof HTMLElement) {
@@ -40,16 +40,14 @@ export const runAdmin = (
 			if (!configEl) {
 				throw new Error('No Contember configuration found')
 			}
-			config = JSON.parse(configEl.innerHTML)
+			clientConfig = JSON.parse(configEl.innerHTML)
 		}
-		if (!('apiServer' in config) || !('loginToken' in config)) {
-			throw new Error('Invalid Contember configuration, apiServer and loginToken must be present')
-		}
-		return config
+		assertValidClientConfig(clientConfig)
+		return clientConfig
 	})()
 
 	const reactRoot: ReactRootFactory =
-		options.reactRoot || ((config, projectConfigs) => <Admin config={config} configs={projectConfigs} />)
+		options.reactRoot || ((config, projectConfigs) => <Admin clientConfig={config} configs={projectConfigs} />)
 
 	const projectConfigs = Object.values(projects)
 		.map(it => (Array.isArray(it) ? it : [it]))

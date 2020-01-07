@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { ApiClientError, useTenantApiRequest } from '../../apiClient'
+import { ApiClientError, useClientConfig, useTenantApiRequest } from '../../apiClient'
 import { ApiRequestState } from '../../apiClient/apiRequest/ApiRequestState'
-import { ConfigContext } from '../../config'
 import { invokeIfSupportsCredentials } from '../../utils/invokeIfSupportsCredentials'
 import { loginMutation } from './loginMutation'
 
 export const useLoginRequest = (): [ApiRequestState<any>, (email: string, password: string) => void] => {
 	const [requestState, sendRequest] = useTenantApiRequest<any>()
-	const config = React.useContext(ConfigContext)
+	const config = useClientConfig()
 
 	if (config === undefined) {
 		throw new ApiClientError('Config is undefined. Perhaps you forgot about ConfigContext?')

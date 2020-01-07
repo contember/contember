@@ -1,4 +1,3 @@
-export * from './DataBindingError'
 export * from './Environment'
 export * from './Literal'
 export * from './VariableLiteral'

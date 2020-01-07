@@ -2,7 +2,8 @@ import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@cont
 import { assertNever } from '../utils'
 import * as React from 'react'
 import { MarkerProvider } from '../coreComponents'
-import { DataBindingError, Environment } from '../dao'
+import { Environment } from '../dao'
+import { BindingError } from '../BindingError'
 import { ConnectionMarker, EntityFields, FieldMarker, Marker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
@@ -77,7 +78,7 @@ export class MarkerTreeGenerator {
 			} else if (fresh instanceof ReferenceMarker) {
 				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof MarkerTreeRoot) {
-				throw new DataBindingError('Merging fields and tree roots is an undefined operation.')
+				throw new BindingError('Merging fields and tree roots is an undefined operation.')
 			} else if (fresh instanceof ConnectionMarker) {
 				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
 			}
@@ -113,7 +114,7 @@ export class MarkerTreeGenerator {
 			} else if (fresh instanceof ConnectionMarker) {
 				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
 			} else if (fresh instanceof MarkerTreeRoot) {
-				throw new DataBindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
+				throw new BindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
 			}
 			assertNever(fresh)
 		} else if (original instanceof ConnectionMarker) {
@@ -132,9 +133,9 @@ export class MarkerTreeGenerator {
 				) {
 					return original
 				}
-				throw new DataBindingError('MarkerTreeGenerator merging: error code cc') // TODO msg
+				throw new BindingError('MarkerTreeGenerator merging: error code cc') // TODO msg
 			} else {
-				throw new DataBindingError('MarkerTreeGenerator merging: error code aa') // TODO msg
+				throw new BindingError('MarkerTreeGenerator merging: error code aa') // TODO msg
 			}
 		}
 		assertNever(original)
@@ -153,28 +154,26 @@ export class MarkerTreeGenerator {
 	private reportInvalidTreeError(markers: NodeResult[]): never {
 		if (markers.length) {
 			if (markers.length > 1) {
-				throw new DataBindingError(`Multi-root data trees are not supported.`) // TODO this is planned to chane
+				throw new BindingError(`Multi-root data trees are not supported.`) // TODO this is planned to chane
 			}
 			const marker = markers[0]
 
 			const kind =
 				marker instanceof FieldMarker ? 'field' : marker instanceof ReferenceMarker ? 'relation' : 'connection'
 
-			throw new DataBindingError(
+			throw new BindingError(
 				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
 			)
 		}
-		throw new DataBindingError('Empty data tree discovered. Try adding some fields…')
+		throw new BindingError('Empty data tree discovered. Try adding some fields…')
 	}
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {
-		throw new DataBindingError(`Cannot combine a relation with a scalar field '${fieldName}'.`)
+		throw new BindingError(`Cannot combine a relation with a scalar field '${fieldName}'.`)
 	}
 
 	private static rejectConnectionMarkerCombo(connectionMarker: ConnectionMarker): never {
-		throw new DataBindingError(
-			`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`,
-		)
+		throw new BindingError(`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`)
 	}
 
 	private static initializeChildrenAnalyzer(): ChildrenAnalyzer<Terminals, Nonterminals, Environment> {

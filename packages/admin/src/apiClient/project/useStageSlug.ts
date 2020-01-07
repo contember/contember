@@ -1,8 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux'
-import State from '../../state'
+import * as React from 'react'
+import { StageSlugContext } from './StageSlugContext'
 
-export const useStageSlug = () =>
-	useSelector<State, string | undefined>(state => {
-		const route = state.view.route
-		return route !== null && route.name === 'project_page' ? route.stage : undefined
-	}, shallowEqual)
+export const useStageSlug = () => React.useContext(StageSlugContext)

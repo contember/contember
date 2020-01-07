@@ -1,5 +1,4 @@
-export * from './ProjectAndStage'
-export * from './ProjectAndStageContext'
-export * from './useProjectAndStage'
+export * from './ProjectSlugContext'
+export * from './StageSlugContext'
 export * from './useProjectSlug'
 export * from './useStageSlug'

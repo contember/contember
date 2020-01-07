@@ -1,13 +1,8 @@
 import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
-import { useApiServer } from './useApiServer'
+import { useApiBaseUrl } from './config'
 
 export const useGraphQlClient = (path: string) => {
-	const apiServer = useApiServer()
-	return React.useMemo(() => {
-		if (apiServer !== undefined) {
-			return new GraphQlClient(apiServer + path)
-		}
-		return undefined
-	}, [apiServer, path])
+	const apiBaseUrl = useApiBaseUrl()
+	return React.useMemo(() => new GraphQlClient(apiBaseUrl + path), [apiBaseUrl, path])
 }

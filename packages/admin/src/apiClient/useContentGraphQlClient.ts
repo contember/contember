@@ -1,4 +1,5 @@
+import { formatContentApiRelativeUrl } from '@contember/client'
 import { useGraphQlClient } from './useGraphQlClient'
 
-export const useContentGraphQlClient = (project: string, stage: string) =>
-	useGraphQlClient(`/content/${project}/${stage}`)
+export const useContentGraphQlClient = (projectSlug: string, stageSlug: string) =>
+	useGraphQlClient(formatContentApiRelativeUrl(projectSlug, stageSlug))

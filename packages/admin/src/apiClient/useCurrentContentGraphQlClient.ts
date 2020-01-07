@@ -3,11 +3,14 @@ import { useProjectSlug, useStageSlug } from './project'
 import { useContentGraphQlClient } from './useContentGraphQlClient'
 
 export const useCurrentContentGraphQlClient = () => {
-	const project = useProjectSlug()
-	const stage = useStageSlug()
+	const projectSlug = useProjectSlug()
+	const stageSlug = useStageSlug()
 
-	if (project === undefined || stage === undefined) {
-		throw new ClientError()
+	if (projectSlug === undefined) {
+		throw new ClientError(`Cannot contact the content API: undefined project slug.`)
 	}
-	return useContentGraphQlClient(project, stage)
+	if (stageSlug === undefined) {
+		throw new ClientError(`Cannot contact the content API: undefined stage slug.`)
+	}
+	return useContentGraphQlClient(projectSlug, stageSlug)
 }

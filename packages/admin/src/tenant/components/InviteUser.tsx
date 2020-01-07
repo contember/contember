@@ -1,3 +1,4 @@
+import { getTenantErrorMessage } from '@contember/client'
 import {
 	Box,
 	Button,
@@ -11,7 +12,7 @@ import {
 } from '@contember/ui'
 import * as React from 'react'
 import { useEffect } from 'react'
-import { getTenantErrorMessage, useProjectSlug } from '../../apiClient'
+import { useProjectSlug } from '../../apiClient'
 import { NavigateBackButton } from '../../components/pageRouting'
 import { ToastType } from '../../state/toasts'
 import {

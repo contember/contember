@@ -3,12 +3,11 @@ import { Button, ErrorList, FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { createAction } from 'redux-actions'
-import { ApiRequestReadyState } from '../../apiClient'
+import { ApiRequestReadyState, useLoginRequest } from '../../apiClient'
 import { SET_IDENTITY } from '../../reducer/auth'
 import { AuthIdentity, Project } from '../../state/auth'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { useRedirect } from '../pageRouting'
-import { useLoginRequest } from './useLoginRequest'
 
 export const Login = React.memo(() => {
 	const [requestState, login] = useLoginRequest()

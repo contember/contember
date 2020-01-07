@@ -3,14 +3,13 @@
 	"version": "0.3.6",
 	"scripts": {
 		"version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml",
-
 		"lint": "tsc --noEmit",
 		"cli": "contember",
 		"start-admin": "webpack-dev-server --env.development --history-api-fallback --display=minimal --hot --inline --colors --config instances/${CONTEMBER_INSTANCE}/admin/webpack.config.js",
 		"__build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
 	},
 	"devDependencies": {
-		"@contember/cli": "^0.3.5",
+		"@contember/cli": "^0.3.6",
 		"@types/react": "^16.9.17",
 		"@types/react-datepicker": "^2.9.5",
 		"@types/react-dom": "^16.9.4",
@@ -36,9 +35,9 @@
 		"webpack-dev-server": "^3.9.0"
 	},
 	"dependencies": {
-		"@contember/admin": "^0.3.5",
-		"@contember/schema": "^0.3.5",
-		"@contember/schema-definition": "^0.3.5",
+		"@contember/admin": "^0.3.6",
+		"@contember/schema": "^0.3.6",
+		"@contember/schema-definition": "^0.3.6",
 		"react": "^16.12.0",
 		"react-dom": "^16.12.0"
 	}

@@ -3,7 +3,7 @@ import { createAction } from 'redux-actions'
 
 import thunk from 'redux-thunk'
 import { Dispatch } from '../actions/types'
-import { Config } from '../config'
+import { ClientConfig } from '@contember/react-client'
 import ContentClientFactory from '../model/ContentClientFactory'
 import GraphqlClient from '../model/GraphqlClient'
 import LocalStorageManager from '../model/LocalStorageManager'
@@ -17,14 +17,14 @@ export interface Services {
 	tenantClient: GraphqlClient
 	contentClientFactory: ContentClientFactory
 	systemClientFactory: SystemClientFactory
-	config: Config
+	config: ClientConfig
 }
 
-export function createServices(config: Config): Services {
+export function createServices(config: ClientConfig): Services {
 	const localStorageManager = new LocalStorageManager()
-	const tenantClient = new GraphqlClient(config.apiServer + '/tenant')
-	const contentClientFactory = new ContentClientFactory(config.apiServer)
-	const systemClientFactory = new SystemClientFactory(config.apiServer)
+	const tenantClient = new GraphqlClient(config.apiBaseUrl + '/tenant')
+	const contentClientFactory = new ContentClientFactory(config.apiBaseUrl)
+	const systemClientFactory = new SystemClientFactory(config.apiBaseUrl)
 	return {
 		localStorageManager,
 		tenantClient,
@@ -63,7 +63,7 @@ export function persistState(services: Services) {
 	}
 }
 
-export function configureStore(initialState: State, config: Config): Store {
+export function configureStore(initialState: State, config: ClientConfig): Store {
 	const composeEnhancers: typeof compose = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 	const services = createServices(config)
 	const middlewares: Middleware[] = [thunk.withExtraArgument(services)]

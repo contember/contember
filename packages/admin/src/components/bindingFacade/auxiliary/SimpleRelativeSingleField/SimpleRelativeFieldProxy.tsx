@@ -3,12 +3,12 @@ import {
 	Entity,
 	EntityAccessor,
 	Environment,
-	isScalar,
 	SugaredRelativeSingleField,
 	useEntityContext,
 	useEnvironment,
 	useRelativeSingleField,
 } from '../../../../binding'
+import { isScalar } from '../../../../utils'
 import { SimpleRelativeSingleFieldInner, SimpleRelativeSingleFieldInnerProps } from './SimpleRelativeSingleFieldInner'
 
 const contextualizeNode = (

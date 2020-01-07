@@ -11,7 +11,7 @@ export interface RelativeSingleField extends AnyField, LeafField {
 }
 
 export interface SugarableRelativeSingleField extends SugarableAnyField, SugarableLeafField {
-	hasOneRelationPath: SugarableHasOneRelation[]
+	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableRelativeSingleField extends UnsugarableAnyField, UnsugarableLeafField {

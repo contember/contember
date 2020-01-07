@@ -14,7 +14,7 @@ export interface RelativeSingleEntity {
 }
 
 export interface SugarableRelativeSingleEntity {
-	hasOneRelationPath: SugarableHasOneRelation[]
+	hasOneRelationPath: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableRelativeSingleEntity extends UnsugarableHasOneRelation {}

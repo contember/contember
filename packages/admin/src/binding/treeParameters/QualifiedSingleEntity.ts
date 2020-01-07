@@ -51,7 +51,7 @@ export interface SugarableQualifiedSingleEntity
 		SugarableSingleEntityParameters,
 		SugarableQualifiedEntityParameters,
 		SugarableEntityCreationParameters {
-	hasOneRelationPath: SugarableHasOneRelation[]
+	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableQualifiedSingleEntity

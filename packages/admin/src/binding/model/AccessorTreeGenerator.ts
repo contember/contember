@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from '@contember/client'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import {
 	Accessor,
 	EntityAccessor,
@@ -135,7 +135,7 @@ class AccessorTreeGenerator {
 						: undefined
 
 					if (fieldData instanceof FieldAccessor) {
-						throw new DataBindingError(
+						throw new BindingError(
 							`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`,
 						)
 					}
@@ -147,7 +147,7 @@ class AccessorTreeGenerator {
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
-							throw new DataBindingError(
+							throw new BindingError(
 								`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
 									`Perhaps you wanted to use a <Repeater />?`,
 							)
@@ -164,7 +164,7 @@ class AccessorTreeGenerator {
 								entityData,
 							)
 						} else {
-							throw new DataBindingError(
+							throw new BindingError(
 								`Received a scalar value for field '${field.fieldName}' where a single entity was expected.` +
 									`Perhaps you meant to use a variant of <Field />?`,
 							)
@@ -182,12 +182,12 @@ class AccessorTreeGenerator {
 						} else if (typeof fieldData === 'object') {
 							// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
 							// relation is unlinked, e.g. a Person does not have a linked Nationality.
-							throw new DataBindingError(
+							throw new BindingError(
 								`Received a referenced entity for field '${field.fieldName}' where a collection of entities was expected.` +
 									`Perhaps you wanted to use a <SingleReference />?`,
 							)
 						} else {
-							throw new DataBindingError(
+							throw new BindingError(
 								`Received a scalar value for field '${field.fieldName}' where a collection of entities was expected.` +
 									`Perhaps you meant to use a variant of <Field />?`,
 							)
@@ -209,12 +209,12 @@ class AccessorTreeGenerator {
 				) {
 					return this.rejectInvalidAccessorTree()
 				} else if (Array.isArray(fieldData)) {
-					throw new DataBindingError(
+					throw new BindingError(
 						`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
 							`Perhaps you wanted to use a <Repeater />?`,
 					)
 				} else if (!(fieldData instanceof FieldAccessor) && typeof fieldData === 'object' && fieldData !== null) {
-					throw new DataBindingError(
+					throw new BindingError(
 						`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
 							`Perhaps you wanted to use <HasOne />?`,
 					)
@@ -307,7 +307,7 @@ class AccessorTreeGenerator {
 				if (accessor instanceof EntityAccessor) {
 					return accessor
 				}
-				throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
+				throw new BindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
 			})
 			inBatchUpdateMode = false
 			if (accessorBeforeUpdates !== entityData[placeholderName]) {
@@ -328,7 +328,7 @@ class AccessorTreeGenerator {
 		],
 	): EntityListAccessor {
 		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
-			throw new DataBindingError(
+			throw new BindingError(
 				`The error tree structure does not correspond to the marker tree. This should never happen.`,
 			)
 		}
@@ -356,7 +356,7 @@ class AccessorTreeGenerator {
 		}
 		const onUpdateProxy = (i: number, newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			if (childInBatchUpdateMode[i] && !(newValue instanceof EntityAccessor)) {
-				throw new DataBindingError(`Removing entities while they are being batch updated is a no-op.`)
+				throw new BindingError(`Removing entities while they are being batch updated is a no-op.`)
 			}
 			listAccessor.entities[i] = newValue
 
@@ -373,7 +373,7 @@ class AccessorTreeGenerator {
 				if (entityAccessor instanceof EntityAccessor) {
 					onUpdateProxy(i, this.withUpdatedField(entityAccessor, updatedField, updatedData))
 				} else if (entityAccessor instanceof EntityForRemovalAccessor) {
-					throw new DataBindingError(`Updating entities for removal is currently not supported.`)
+					throw new BindingError(`Updating entities for removal is currently not supported.`)
 				}
 			}
 			const batchUpdates: BatchEntityUpdates = performUpdates => {
@@ -384,7 +384,7 @@ class AccessorTreeGenerator {
 					if (accessor instanceof EntityAccessor) {
 						return accessor
 					}
-					throw new DataBindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
+					throw new BindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
 				})
 				childInBatchUpdateMode[i] = false
 
@@ -412,7 +412,7 @@ class AccessorTreeGenerator {
 
 			if (typeof newEntity === 'function') {
 				if (!listAccessor.batchUpdates) {
-					throw new DataBindingError(`Internally inconsistent Accessor tree detected. This should never happen.`)
+					throw new BindingError(`Internally inconsistent Accessor tree detected. This should never happen.`)
 				}
 				listAccessor.batchUpdates(getAccessor => {
 					onUpdateProxy(newEntityIndex, newAccessor)
@@ -495,7 +495,7 @@ class AccessorTreeGenerator {
 	}
 
 	private rejectInvalidAccessorTree(): never {
-		throw new DataBindingError(
+		throw new BindingError(
 			`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`,
 		)
 	}

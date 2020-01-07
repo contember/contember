@@ -1,5 +1,6 @@
+import { getTenantErrorMessage } from '@contember/client'
 import * as React from 'react'
-import { getTenantErrorMessage, useProjectSlug } from '../../apiClient'
+import { useProjectSlug } from '@contember/react-client'
 import {
 	Membership,
 	useAddToast,

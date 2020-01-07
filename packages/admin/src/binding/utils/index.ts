@@ -1,3 +1,4 @@
+export * from './assertNever'
 export * from './Hashing'
-export * from './isScalar'
-export * from './reactNodeToElement'
+export * from './isEmptyObject'
+export * from './ucfirst'

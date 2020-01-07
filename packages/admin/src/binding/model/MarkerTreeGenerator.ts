@@ -1,5 +1,5 @@
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import * as React from 'react'
 import { MarkerProvider } from '../coreComponents'
 import { DataBindingError, Environment } from '../dao'

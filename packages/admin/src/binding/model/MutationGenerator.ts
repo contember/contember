@@ -1,6 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
-import { assertNever, isEmptyObject } from '@contember/utils'
 import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
 import { ReceivedData, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
@@ -14,6 +13,7 @@ import {
 	ReferenceMarker,
 } from '../markers'
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
+import { assertNever, isEmptyObject } from '../utils'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 

@@ -7,6 +7,7 @@ export * from './markers'
 export * from './model'
 export * from './queryLanguage'
 export * from './treeParameters'
-export * from './utils'
 
 export * from './bindingTypes'
+
+// Deliberately not exporting utils.

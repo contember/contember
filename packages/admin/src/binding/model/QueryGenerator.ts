@@ -1,5 +1,4 @@
 import { CrudQueryBuilder } from '@contember/client'
-import { assertNever, ucfirst } from '@contember/utils'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	ConnectionMarker,
@@ -11,6 +10,8 @@ import {
 	TaggedQualifiedEntityList,
 	TaggedQualifiedSingleEntity,
 } from '../markers'
+import { assertNever } from '../utils'
+import ucfirst from '../utils/ucfirst'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
 

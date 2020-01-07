@@ -1,4 +1,4 @@
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import { DataBindingError } from '../dao'
 import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
 import { EntityFields } from './EntityFields'

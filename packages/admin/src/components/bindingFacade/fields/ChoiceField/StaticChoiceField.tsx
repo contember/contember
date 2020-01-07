@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
 	Component,
-	DataBindingError,
+	BindingError,
 	Environment,
 	Field,
 	FieldValue,
@@ -46,7 +46,7 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 	props: StaticChoiceFieldProps<StaticArity>,
 ): ChoiceFieldData.MetadataByArity[StaticArity] => {
 	if (props.arity === 'multiple') {
-		throw new DataBindingError('Static multiple-choice choice fields are not supported yet.')
+		throw new BindingError('Static multiple-choice choice fields are not supported yet.')
 	}
 
 	const environment = useEnvironment()

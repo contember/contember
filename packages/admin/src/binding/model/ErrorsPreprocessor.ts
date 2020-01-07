@@ -1,4 +1,4 @@
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import { MutationDataResponse, MutationError, MutationResponse } from '../accessorTree'
 import { ErrorAccessor } from '../accessors'
 import { MutationGenerator } from './MutationGenerator'

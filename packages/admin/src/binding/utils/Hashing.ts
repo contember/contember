@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from '@contember/client'
-import { assertNever } from '@contember/utils'
 import { Input } from '@contember/schema'
 import { MarkerTreeParameters, ReferenceMarker } from '../markers'
 import { ExpectedEntityCount } from '../treeParameters'
+import { assertNever } from './assertNever'
 
 export class Hashing {
 	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {

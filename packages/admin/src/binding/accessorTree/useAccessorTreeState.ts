@@ -1,6 +1,6 @@
 import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
-import { ApiRequestReadyState, useAuthToken, useContentApiRequest } from '../../apiClient'
+import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { useEnvironment } from '../accessorRetrievers'
 import { RootAccessor } from '../accessors'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
@@ -28,7 +28,7 @@ export const useAccessorTreeState = ({
 	autoInitialize = true,
 }: AccessorTreeStateOptions): [AccessorTreeState, AccessorTreeStateMetadata] => {
 	const environment = useEnvironment()
-	const authToken = useAuthToken()
+	const sessionToken = useSessionToken()
 
 	const normalizedEnvironment = React.useMemo(() => {
 		let id = 0
@@ -92,7 +92,7 @@ export const useAccessorTreeState = ({
 			dispatch({
 				type: AccessorTreeStateActionType.InitializeMutation,
 			})
-			return sendMutation(mutation, {}, authToken)
+			return sendMutation(mutation, {}, sessionToken)
 				.catch(rejectFailedRequest)
 				.then(data => {
 					const normalizedData = data.data === null ? {} : data.data
@@ -130,7 +130,7 @@ export const useAccessorTreeState = ({
 						})
 					}
 
-					return sendQuery(query, {}, authToken)
+					return sendQuery(query, {}, sessionToken)
 						.then(queryData => {
 							accessorTreeGenerator.generateLiveTree(queryData.data, queryData.data, accessorTree => {
 								dispatch({
@@ -162,7 +162,7 @@ export const useAccessorTreeState = ({
 		return Promise.resolve<NothingToPersistPersistResult>({
 			type: PersistResultSuccessType.NothingToPersist,
 		})
-	}, [accessorTreeGenerator, authToken, markerTree, query, rejectFailedRequest, sendMutation, sendQuery])
+	}, [accessorTreeGenerator, sessionToken, markerTree, query, rejectFailedRequest, sendMutation, sendQuery])
 
 	const initializeAccessorTree = React.useCallback(
 		(
@@ -214,7 +214,7 @@ export const useAccessorTreeState = ({
 				dispatch({
 					type: AccessorTreeStateActionType.InitializeQuery,
 				})
-				sendQuery(query, {}, authToken)
+				sendQuery(query, {}, sessionToken)
 					.then(data => {
 						initializeAccessorTree(data.data, data.data)
 						return Promise.resolve()
@@ -227,7 +227,7 @@ export const useAccessorTreeState = ({
 			}
 		}
 	}, [
-		authToken,
+		sessionToken,
 		initializeAccessorTree,
 		isInitialized,
 		query,

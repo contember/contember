@@ -3,6 +3,14 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
+import {
+	assertValidClientConfig,
+	ClientConfig,
+	Client,
+	ProjectSlugContext,
+	StageSlugContext,
+	SessionTokenContext,
+} from '@contember/react-client'
 import { EnvironmentContext } from '../binding/accessorRetrievers'
 import { Environment } from '../binding/dao'
 import { Router } from '../containers/router'
@@ -13,105 +21,114 @@ import { PageRequest } from '../state/request'
 
 import { configureStore, Store } from '../store'
 import { Login } from './Login'
-import ProjectsList from './ProjectsList'
-import { Config, isValidConfig, ConfigContext, ConfigurationError } from '../config'
-import { Toaster } from './ui/Toaster'
 import { NavigationIsActiveProvider, NavigationProvider } from './NavigationProvider'
+import ProjectsList from './ProjectsList'
+import { Toaster } from './ui'
 
 export interface AdminProps {
 	configs: ProjectConfig[]
-	config: Config
+	clientConfig: ClientConfig
 }
 
-export default class Admin extends React.Component<AdminProps> {
-	store: Store
+export const Admin = React.memo((props: AdminProps) => {
+	const [] = React.useState(() => {
+		assertValidClientConfig(props.clientConfig)
+	})
+	const [store] = React.useState(() => {
+		const store: Store = configureStore(emptyState, props.clientConfig)
+		store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => props.configs)())
+		store.dispatch(populateRequest(document.location!))
 
-	constructor(props: AdminProps) {
-		super(props)
+		return store
+	})
 
-		if (!isValidConfig(props.config)) {
-			throw new ConfigurationError()
-		}
-
-		this.store = configureStore(emptyState, props.config)
-		this.store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => this.props.configs)())
-		this.store.dispatch(populateRequest(document.location!))
-		window.onpopstate = (e: PopStateEvent) => {
+	React.useEffect(() => {
+		const onPopState = (e: PopStateEvent) => {
 			e.preventDefault()
-			this.store.dispatch(populateRequest(document.location!))
+			store.dispatch(populateRequest(document.location!))
 		}
-	}
+		window.addEventListener('popstate', onPopState)
 
-	render() {
-		return (
-			<ConfigContext.Provider value={this.props.config}>
-				<Provider store={this.store}>
-					<NavigationProvider>
-						<NavigationIsActiveProvider>
-							<Router
-								routes={{
-									login: () => <Login />,
-									projects_list: () => <ProjectsList configs={this.props.configs} />,
-									project_page: (() => {
-										const normalizedConfigs: {
-											[project: string]: {
-												[stage: string]: ProjectConfig & {
-													lazyComponent: React.LazyExoticComponent<React.ComponentType<any>>
-													rootEnvironment: Environment
-												}
-											}
-										} = {}
+		return () => {
+			window.removeEventListener('popstate', onPopState)
+		}
+	}, [store])
 
-										for (const config of this.props.configs) {
-											if (!(config.project in normalizedConfigs)) {
-												normalizedConfigs[config.project] = {}
-											}
-											if (config.stage in normalizedConfigs[config.project]) {
-												throw new Error(
-													`Duplicate project-stage pair supplied for project '${config.project}' and stage '${config.stage}'`,
-												)
-											}
-											normalizedConfigs[config.project][config.stage] = {
-												...config,
-												lazyComponent: React.lazy(config.component),
-												rootEnvironment: Environment.create({
-													dimensions: config.defaultDimensions || {},
-												}),
+	return (
+		<Client config={props.clientConfig}>
+			<Provider store={store}>
+				<NavigationProvider>
+					<NavigationIsActiveProvider>
+						<Router
+							routes={{
+								login: () => <Login />,
+								projects_list: () => <ProjectsList configs={props.configs} />,
+								project_page: (() => {
+									const normalizedConfigs: {
+										[project: string]: {
+											[stage: string]: ProjectConfig & {
+												lazyComponent: React.LazyExoticComponent<React.ComponentType<any>>
+												rootEnvironment: Environment
 											}
 										}
+									} = {}
 
-										return ({ route }: { route: PageRequest<any> }) => {
-											const config = this.props.configs.find(
-												({ project, stage }) => project === route.project && stage === route.stage,
+									for (const config of props.configs) {
+										if (!(config.project in normalizedConfigs)) {
+											normalizedConfigs[config.project] = {}
+										}
+										if (config.stage in normalizedConfigs[config.project]) {
+											throw new Error(
+												`Duplicate project-stage pair supplied for project '${config.project}' and stage '${config.stage}'`,
 											)
-											const relevantConfig = normalizedConfigs[route.project][route.stage]
-											const Component = relevantConfig.lazyComponent
-
-											if (config) {
-												relevantConfig.rootEnvironment = relevantConfig.rootEnvironment
-													.updateDimensionsIfNecessary(route.dimensions, config.defaultDimensions || {})
-													.putDelta({
-														...route.parameters,
-													})
-												return (
-													<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
-														<React.Suspense fallback={<ContainerSpinner />}>
-															<Component />
-														</React.Suspense>
-													</EnvironmentContext.Provider>
-												)
-											} else {
-												return <>{`No such project or stage as ${route.project}/${route.stage}`}</>
-											}
 										}
-									})(),
-								}}
-							/>
-							<Toaster />
-						</NavigationIsActiveProvider>
-					</NavigationProvider>
-				</Provider>
-			</ConfigContext.Provider>
-		)
-	}
-}
+										normalizedConfigs[config.project][config.stage] = {
+											...config,
+											lazyComponent: React.lazy(config.component),
+											rootEnvironment: Environment.create({
+												dimensions: config.defaultDimensions || {},
+											}),
+										}
+									}
+
+									return ({ route }: { route: PageRequest<any> }) => {
+										const config = props.configs.find(
+											({ project, stage }) => project === route.project && stage === route.stage,
+										)
+										const relevantConfig = normalizedConfigs[route.project][route.stage]
+										const Component = relevantConfig.lazyComponent
+
+										if (config) {
+											relevantConfig.rootEnvironment = relevantConfig.rootEnvironment
+												.updateDimensionsIfNecessary(route.dimensions, config.defaultDimensions || {})
+												.putDelta({
+													...route.parameters,
+												})
+											return (
+												<SessionTokenContext.Provider value={store.getState().auth.identity?.token}>
+													<ProjectSlugContext.Provider value={route.project}>
+														<StageSlugContext.Provider value={route.stage}>
+															<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
+																<React.Suspense fallback={<ContainerSpinner />}>
+																	<Component />
+																</React.Suspense>
+															</EnvironmentContext.Provider>
+														</StageSlugContext.Provider>
+													</ProjectSlugContext.Provider>
+												</SessionTokenContext.Provider>
+											)
+										} else {
+											return <>{`No such project or stage as ${route.project}/${route.stage}`}</>
+										}
+									}
+								})(),
+							}}
+						/>
+						<Toaster />
+					</NavigationIsActiveProvider>
+				</NavigationProvider>
+			</Provider>
+		</Client>
+	)
+})
+Admin.displayName = 'Admin'

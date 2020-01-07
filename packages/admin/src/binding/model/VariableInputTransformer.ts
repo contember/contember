@@ -1,6 +1,7 @@
 import { GraphQlBuilder } from '@contember/client'
-import { assertNever } from '@contember/utils'
-import { DataBindingError, Environment, VariableLiteral, VariableScalar } from '../dao'
+import { assertNever } from '../utils'
+import { Environment, VariableLiteral, VariableScalar } from '../dao'
+import { BindingError } from '../BindingError'
 import {
 	FieldValue,
 	Filter,
@@ -80,7 +81,7 @@ export class VariableInputTransformer {
 		const value = environment.getValueOrElse(variableScalar.variable, undefined)
 
 		if (typeof value !== 'string' && typeof value !== 'boolean' && typeof value !== 'number' && value !== null) {
-			throw new DataBindingError(
+			throw new BindingError(
 				`The value of the '${variableScalar.variable}' must be a scalar or null, not '${typeof value}'.`,
 			)
 		}
@@ -101,9 +102,7 @@ export class VariableInputTransformer {
 		const value = environment.getValueOrElse(variableLiteral.variable, undefined)
 
 		if (typeof value !== 'string') {
-			throw new DataBindingError(
-				`The value of the '${variableLiteral.variable}' must be a string, not '${typeof value}'.`,
-			)
+			throw new BindingError(`The value of the '${variableLiteral.variable}' must be a string, not '${typeof value}'.`)
 		}
 
 		return new GraphQlBuilder.Literal(value)

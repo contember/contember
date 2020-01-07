@@ -9,6 +9,7 @@ npx lerna bootstrap \
   --ignore @contember/cli \
   --ignore @contember/database-tester \
   --ignore @contember/engine-api-tester \
+  --ignore @contember/react-client \
   --ignore @contember/react-multipass-rendering \
   --ignore @contember/ui \
   --ci -- --no-optional --production

@@ -2,7 +2,7 @@ import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import {
 	Component,
-	DataBindingError,
+	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
 	EntityListDataProvider,
@@ -66,7 +66,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 		const subTree = parentEntity.getTreeRoot(subTreeIdentifier)
 
 		if (!(subTree instanceof EntityListAccessor)) {
-			throw new DataBindingError(`Something went horribly wrong. The options of a dynamic choice field are not a list.`)
+			throw new BindingError(`Something went horribly wrong. The options of a dynamic choice field are not a list.`)
 		}
 		return subTree
 	}, [parentEntity, subTreeIdentifier])
@@ -151,7 +151,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 						if (props.renderOptionText) {
 							label = props.renderOptionText(item)
 						} else if (process.env.NODE_ENV === 'development') {
-							throw new DataBindingError(
+							throw new BindingError(
 								`Cannot use a ChoiceField with custom fields but without providing the 'renderOptionText' prop.`,
 							)
 						}

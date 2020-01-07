@@ -1,10 +1,9 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
-import { assertNever, isEmptyObject } from '@contember/utils'
 import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
 import { ReceivedData, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import {
 	ConnectionMarker,
 	EntityFields,
@@ -14,6 +13,7 @@ import {
 	ReferenceMarker,
 } from '../markers'
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
+import { assertNever, isEmptyObject } from '../utils'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
@@ -285,7 +285,7 @@ export class MutationGenerator {
 							)
 						}
 					} else {
-						throw new DataBindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
+						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
 					}
 				} else {
 					builder = builder.many(placeholderName, builder => {
@@ -443,7 +443,7 @@ export class MutationGenerator {
 							builder = builder.one(placeholderName, subBuilder)
 						}
 					} else {
-						throw new DataBindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
+						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
 					}
 				} else {
 					builder = builder.many(placeholderName, builder => {

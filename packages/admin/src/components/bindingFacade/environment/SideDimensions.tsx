@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-	DataBindingError,
+	BindingError,
 	EnforceSubtypeRelation,
 	Environment,
 	EnvironmentContext,
@@ -33,7 +33,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 	public static generateSyntheticChildren(props: SideDimensionsProps, environment: Environment): React.ReactNode {
 		if ((props.dimension === undefined) === (props.staticOptions === undefined)) {
-			throw new DataBindingError(
+			throw new BindingError(
 				`The SideDimensions component needs to be passed exactly one of its 'dimension' or 'staticOptions' props.`,
 			)
 		}
@@ -44,7 +44,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 			const selectedDimensions = environment.getAllDimensions()
 
 			if (!(props.dimension in selectedDimensions)) {
-				console.error(new DataBindingError(`The '${props.dimension}' dimension in undefined`))
+				console.error(new BindingError(`The '${props.dimension}' dimension in undefined`))
 				return
 			}
 

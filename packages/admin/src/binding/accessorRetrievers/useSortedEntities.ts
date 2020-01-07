@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import { QueryLanguage } from '../queryLanguage'
 import { FieldName, RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { getRelativeSingleField } from './getRelativeSingleField'
@@ -19,7 +19,7 @@ export interface SortedEntities {
 }
 
 const throwNoopError = (callbackName: keyof SortedEntities) => {
-	throw new DataBindingError(
+	throw new BindingError(
 		`Cannot invoke '${callbackName}' in non-sortable mode. The 'sortByField' parameter of the 'useSortedEntities' ` +
 			`hook is undefined.`,
 	)
@@ -27,9 +27,9 @@ const throwNoopError = (callbackName: keyof SortedEntities) => {
 
 const throwNonWritableError = (target: FieldName | EntityListAccessor) => {
 	if (target instanceof EntityListAccessor) {
-		throw new DataBindingError(`Trying to add a new entity to a list that is not writable.`)
+		throw new BindingError(`Trying to add a new entity to a list that is not writable.`)
 	}
-	throw new DataBindingError(`Trying to interactively sort by the '${target}' field but it is not writable.`)
+	throw new BindingError(`Trying to interactively sort by the '${target}' field but it is not writable.`)
 }
 
 const sortEntities = (entities: EntityAccessor[], sortByField: RelativeSingleField | undefined): EntityAccessor[] => {

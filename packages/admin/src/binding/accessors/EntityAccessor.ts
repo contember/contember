@@ -1,4 +1,4 @@
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import { MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { PlaceholderGenerator } from '../markers/PlaceholderGenerator'
 import { FieldName, RemovalType, SubTreeIdentifier } from '../treeParameters'
@@ -76,9 +76,9 @@ class EntityAccessor extends Accessor implements Errorable {
 	public getTreeRoot(identifier: SubTreeIdentifier | MarkerTreeRoot.TreeId): RootAccessor {
 		const root = this.data[PlaceholderGenerator.getMarkerTreePlaceholder(identifier)]
 		if (root === undefined) {
-			throw new DataBindingError(`Requesting an accessor tree '${identifier}' but it does not exist.`)
+			throw new BindingError(`Requesting an accessor tree '${identifier}' but it does not exist.`)
 		} else if (root instanceof FieldAccessor) {
-			throw new DataBindingError(`Requesting an accessor tree '${identifier}' but it resolves to a field.`)
+			throw new BindingError(`Requesting an accessor tree '${identifier}' but it resolves to a field.`)
 		}
 		return root
 	}

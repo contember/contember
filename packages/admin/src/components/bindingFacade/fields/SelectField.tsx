@@ -1,6 +1,6 @@
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import * as React from 'react'
-import { Component, DataBindingError, ErrorAccessor } from '../../../binding'
+import { Component, BindingError, ErrorAccessor } from '../../../binding'
 
 import {
 	BaseDynamicChoiceFieldProps,
@@ -61,7 +61,7 @@ export class SelectFieldInner extends React.PureComponent<SelectFieldInnerProps>
 		}).concat(
 			this.props.data.map(({ key, label }) => {
 				if (typeof label !== 'string') {
-					throw new DataBindingError(`The labels of <SelectField /> items must be strings!`)
+					throw new BindingError(`The labels of <SelectField /> items must be strings!`)
 				}
 				return {
 					disabled: false,

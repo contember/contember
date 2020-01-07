@@ -4,7 +4,6 @@ export * from './project'
 
 export * from './Client'
 export * from './ClientError'
-export * from './tenantErrorMessages'
 export * from './useAuthIdentity'
 export * from './useAuthToken'
 export * from './useContentApiRequest'

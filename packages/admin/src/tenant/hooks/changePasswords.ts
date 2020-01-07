@@ -1,4 +1,5 @@
-import { getTenantErrorMessage, useAuthIdentity } from '../../apiClient'
+import { getTenantErrorMessage } from '@contember/client'
+import { useAuthIdentity } from '../../apiClient'
 import { useAuthedTenantMutation } from './lib'
 import { useCallback, useMemo } from 'react'
 

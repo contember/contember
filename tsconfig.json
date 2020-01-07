@@ -2,12 +2,14 @@
 	"files": [],
 	"include": [],
 	"references": [
+		{ "path": "./packages/admin"},
 		{ "path": "./packages/authorization" },
 		{ "path": "./packages/benchmark" },
 		{ "path": "./packages/cli" },
-		{ "path": "./packages/engine-server" },
-		{ "path": "./packages/admin"},
-		{ "path": "./packages/cms-client" },
+		{ "path": "./packages/cli/resources/templates/instance-template" },
+		{ "path": "./packages/cli/resources/templates/project-no-admin-template" },
+		{ "path": "./packages/cli/resources/templates/project-template" },
+		{ "path": "./packages/client"},
 		{ "path": "./packages/cms-admin-server" },
 		{ "path": "./packages/config-loader" },
 		{ "path": "./packages/database" },
@@ -16,9 +18,10 @@
 		{ "path": "./packages/engine-api-tester" },
 		{ "path": "./packages/engine-common" },
 		{ "path": "./packages/engine-content-api" },
-		{ "path": "./packages/engine-tenant-api" },
 		{ "path": "./packages/engine-s3-plugin" },
+		{ "path": "./packages/engine-server" },
 		{ "path": "./packages/engine-system-api" },
+		{ "path": "./packages/engine-tenant-api" },
 		{ "path": "./packages/queryable" },
 		{ "path": "./packages/react-multipass-rendering"},
 		{ "path": "./packages/schema" },
@@ -26,9 +29,6 @@
 		{ "path": "./packages/schema-migrations" },
 		{ "path": "./packages/schema-utils" },
 		{ "path": "./packages/ui" },
-		{ "path": "./packages/utils" },
-		{ "path": "./packages/cli/resources/templates/instance-template" },
-		{ "path": "./packages/cli/resources/templates/project-no-admin-template" },
-		{ "path": "./packages/cli/resources/templates/project-template" }
+		{ "path": "./packages/utils" }
 	]
 }

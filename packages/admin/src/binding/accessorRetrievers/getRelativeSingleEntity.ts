@@ -1,5 +1,5 @@
 import { EntityAccessor } from '../accessors'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import { DesugaredRelativeSingleEntity, ExpectedEntityCount, RelativeSingleEntity } from '../treeParameters'
 
 export const getRelativeSingleEntity = (
@@ -17,7 +17,7 @@ export const getRelativeSingleEntity = (
 		if (field instanceof EntityAccessor) {
 			relativeTo = field
 		} else {
-			throw new DataBindingError('Corrupted data')
+			throw new BindingError('Corrupted data')
 		}
 	}
 	return relativeTo

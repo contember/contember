@@ -1,5 +1,5 @@
 import { assertNever } from '../utils'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
 import { EntityFields } from './EntityFields'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
@@ -53,10 +53,10 @@ class ReferenceMarker {
 				...preferences,
 			}
 			if (normalizedPreferences.initialEntityCount < 0 || !Number.isInteger(normalizedPreferences.initialEntityCount)) {
-				throw new DataBindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
+				throw new BindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
 			}
 			if (decider === ExpectedEntityCount.UpToOne && normalizedPreferences.initialEntityCount > 1) {
-				throw new DataBindingError(`A ToOne reference cannot prefer more than one entity!`)
+				throw new BindingError(`A ToOne reference cannot prefer more than one entity!`)
 			}
 
 			references = {
@@ -77,7 +77,7 @@ class ReferenceMarker {
 
 				if (fields.length !== 1) {
 					// TODO this will change in future
-					throw new DataBindingError(`A hasMany relation can only be reduced to a hasOne by exactly one field.`)
+					throw new BindingError(`A hasMany relation can only be reduced to a hasOne by exactly one field.`)
 				}
 			}
 		}

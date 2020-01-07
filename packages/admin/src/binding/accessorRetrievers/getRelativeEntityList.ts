@@ -1,5 +1,5 @@
 import { EntityAccessor, EntityListAccessor } from '../accessors'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import { DesugaredRelativeEntityList, RelativeEntityList } from '../treeParameters'
 import { getRelativeSingleEntity } from './getRelativeSingleEntity'
 
@@ -11,7 +11,7 @@ export const getRelativeEntityList = (
 	const field = nestedEntity.getField(hasManyRelation.field)
 
 	if (!(field instanceof EntityListAccessor)) {
-		throw new DataBindingError(`Corrupted data`)
+		throw new BindingError(`Corrupted data`)
 	}
 	return field
 }

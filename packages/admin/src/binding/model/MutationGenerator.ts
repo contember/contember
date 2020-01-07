@@ -3,7 +3,7 @@ import { Input } from '@contember/schema'
 import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
 import { ReceivedData, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import {
 	ConnectionMarker,
 	EntityFields,
@@ -285,7 +285,7 @@ export class MutationGenerator {
 							)
 						}
 					} else {
-						throw new DataBindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
+						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
 					}
 				} else {
 					builder = builder.many(placeholderName, builder => {
@@ -443,7 +443,7 @@ export class MutationGenerator {
 							builder = builder.one(placeholderName, subBuilder)
 						}
 					} else {
-						throw new DataBindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
+						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
 					}
 				} else {
 					builder = builder.many(placeholderName, builder => {

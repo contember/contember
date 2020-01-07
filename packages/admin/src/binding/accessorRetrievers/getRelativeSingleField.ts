@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import { EntityAccessor, FieldAccessor } from '../accessors'
-import { DataBindingError } from '../dao'
+import { BindingError } from '../BindingError'
 import { DesugaredRelativeSingleField, RelativeSingleField, Scalar } from '../treeParameters'
 import { getRelativeSingleEntity } from './getRelativeSingleEntity'
 
@@ -15,7 +15,7 @@ export const getRelativeSingleField = <
 	const accessor = nestedEntity.getField(field)
 
 	if (!(accessor instanceof FieldAccessor)) {
-		throw new DataBindingError(
+		throw new BindingError(
 			`Trying to access the field '${field}'${
 				nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
 			} but it does not exist.`,

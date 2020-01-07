@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DataBindingError, useEnvironment, VariableInputTransformer } from '../../../binding'
+import { BindingError, useEnvironment, VariableInputTransformer } from '../../../binding'
 import { BlockCommonProps, NormalizedBlockList, NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
 import { useBlockProps } from './useBlockProps'
 
@@ -36,7 +36,7 @@ export const useNormalizedBlockList = (children: React.ReactNode): NormalizedBlo
 			return staticBlockProps
 		}
 
-		throw new DataBindingError(
+		throw new BindingError(
 			`Detected a set of Block components of non-uniform discrimination methods. ` +
 				`They all have to use either 'discriminateBy' or 'discriminateByScalar'.`,
 		)

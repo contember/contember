@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-	DataBindingError,
+	BindingError,
 	EntityListDataProvider,
 	Field,
 	QueryLanguage,
@@ -25,12 +25,12 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 	const maxItems = props.maxItems === undefined ? 2 : props.maxItems
 
 	if (minItems > maxItems) {
-		throw new DataBindingError(
+		throw new BindingError(
 			`DimensionSwitcher: 'minItems' for dimension ${props.dimension} must be no greater than 'maxItems'.`,
 		)
 	}
 	if (minItems < 1) {
-		throw new DataBindingError(`DimensionSwitcher: 'minItems' for dimension ${props.dimension} must be at least 1.`)
+		throw new BindingError(`DimensionSwitcher: 'minItems' for dimension ${props.dimension} must be at least 1.`)
 	}
 
 	const environment = useEnvironment()

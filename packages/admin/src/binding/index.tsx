@@ -9,5 +9,6 @@ export * from './queryLanguage'
 export * from './treeParameters'
 
 export * from './bindingTypes'
+export * from './BindingError'
 
 // Deliberately not exporting utils.

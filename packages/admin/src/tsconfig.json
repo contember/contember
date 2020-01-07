@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{
-			"path": "../../../packages/cms-client/src"
+			"path": "../../client/src"
 		},
 		{
 			"path": "../../../packages/react-multipass-rendering/src"

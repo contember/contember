@@ -12,7 +12,7 @@ import {
 } from '@contember/ui'
 import * as React from 'react'
 import { useEffect } from 'react'
-import { useProjectSlug } from '../../apiClient'
+import { useProjectSlug } from '@contember/react-client'
 import { NavigateBackButton } from '../../components/pageRouting'
 import { ToastType } from '../../state/toasts'
 import {

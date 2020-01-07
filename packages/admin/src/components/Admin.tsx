@@ -10,7 +10,7 @@ import {
 	ProjectSlugContext,
 	StageSlugContext,
 	SessionTokenContext,
-} from '../apiClient'
+} from '@contember/react-client'
 import { EnvironmentContext } from '../binding/accessorRetrievers'
 import { Environment } from '../binding/dao'
 import { Router } from '../containers/router'

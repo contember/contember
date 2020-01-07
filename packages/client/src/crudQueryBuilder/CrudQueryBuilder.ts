@@ -1,4 +1,4 @@
-import { isEmptyObject } from '@contember/utils'
+import { isEmptyObject } from '../utils'
 import { QueryBuilder, RootObjectBuilder } from '../graphQlBuilder'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
 import { ReadBuilder } from './ReadBuilder'

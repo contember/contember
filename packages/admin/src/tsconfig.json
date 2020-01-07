@@ -6,10 +6,10 @@
 	},
 	"references": [
 		{
-			"path": "../../client/src"
+			"path": "../../../packages/react-multipass-rendering/src"
 		},
 		{
-			"path": "../../../packages/react-multipass-rendering/src"
+			"path": "../../../packages/react-client/src"
 		},
 		{
 			"path": "../../../packages/schema/src"

@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { DataBindingError } from '../dao'

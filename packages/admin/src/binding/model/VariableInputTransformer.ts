@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import { DataBindingError, Environment, VariableLiteral, VariableScalar } from '../dao'
 import {
 	FieldValue,

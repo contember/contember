@@ -1,4 +1,4 @@
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../utils'
 import * as React from 'react'
 import { Environment } from '../dao'
 import { MarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'

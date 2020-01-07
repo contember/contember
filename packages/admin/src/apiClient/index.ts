@@ -7,6 +7,4 @@ export * from './tenant'
 
 export * from './Client'
 export * from './ClientError'
-export * from './useAuthIdentity'
-export * from './useAuthToken'
 export * from './useGraphQlClient'

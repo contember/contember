@@ -1,6 +1,5 @@
 import { getTenantErrorMessage } from '@contember/client'
-import { useAuthIdentity } from '../../apiClient'
-import { useAuthedTenantMutation } from './lib'
+import { useAuthedTenantMutation, useAuthIdentity } from './lib'
 import { useCallback, useMemo } from 'react'
 
 const CHANGE_PASSWORD_MUTATION = `

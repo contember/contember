@@ -3,7 +3,14 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
-import { assertValidClientConfig, ClientConfig, Client, ProjectSlugContext, StageSlugContext } from '../apiClient'
+import {
+	assertValidClientConfig,
+	ClientConfig,
+	Client,
+	ProjectSlugContext,
+	StageSlugContext,
+	SessionTokenContext,
+} from '../apiClient'
 import { EnvironmentContext } from '../binding/accessorRetrievers'
 import { Environment } from '../binding/dao'
 import { Router } from '../containers/router'
@@ -98,15 +105,17 @@ export const Admin = React.memo((props: AdminProps) => {
 													...route.parameters,
 												})
 											return (
-												<ProjectSlugContext.Provider value={route.project}>
-													<StageSlugContext.Provider value={route.stage}>
-														<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
-															<React.Suspense fallback={<ContainerSpinner />}>
-																<Component />
-															</React.Suspense>
-														</EnvironmentContext.Provider>
-													</StageSlugContext.Provider>
-												</ProjectSlugContext.Provider>
+												<SessionTokenContext.Provider value={store.getState().auth.identity?.token}>
+													<ProjectSlugContext.Provider value={route.project}>
+														<StageSlugContext.Provider value={route.stage}>
+															<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
+																<React.Suspense fallback={<ContainerSpinner />}>
+																	<Component />
+																</React.Suspense>
+															</EnvironmentContext.Provider>
+														</StageSlugContext.Provider>
+													</ProjectSlugContext.Provider>
+												</SessionTokenContext.Provider>
 											)
 										} else {
 											return <>{`No such project or stage as ${route.project}/${route.stage}`}</>

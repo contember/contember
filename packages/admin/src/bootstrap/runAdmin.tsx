@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { assertValidClientConfig, ClientConfig } from '../apiClient/config'
+import { assertValidClientConfig, ClientConfig } from '@contember/react-client'
 import { Admin } from '../components'
 import { ProjectConfig } from '../state/projectsConfigs'
 

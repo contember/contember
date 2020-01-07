@@ -3,7 +3,7 @@ import { createAction } from 'redux-actions'
 
 import thunk from 'redux-thunk'
 import { Dispatch } from '../actions/types'
-import { ClientConfig } from '../apiClient/config'
+import { ClientConfig } from '@contember/react-client'
 import ContentClientFactory from '../model/ContentClientFactory'
 import GraphqlClient from '../model/GraphqlClient'
 import LocalStorageManager from '../model/LocalStorageManager'

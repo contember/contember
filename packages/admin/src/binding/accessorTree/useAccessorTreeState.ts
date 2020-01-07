@@ -1,6 +1,6 @@
 import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
-import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '../../apiClient'
+import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { useEnvironment } from '../accessorRetrievers'
 import { RootAccessor } from '../accessors'
 import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'

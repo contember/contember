@@ -1,5 +1,5 @@
 import { Input } from '@contember/schema'
-import { isEmptyObject } from '@contember/utils'
+import { isEmptyObject } from '../utils'
 import { Literal } from '../graphQlBuilder'
 import { WriteOperation } from './types'
 import { WriteManyRelationBuilder } from './WriteManyRelationBuilder'

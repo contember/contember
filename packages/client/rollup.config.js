@@ -13,10 +13,6 @@ export default {
 		resolve({
 			preferBuiltins: true,
 		}),
-		commonjs({
-			namedExports: {
-				['@contember/utils']: ['assertNever', 'arrayDifference', 'isEmptyObject', 'lcfirst', 'ucfirst'],
-			},
-		}),
+		commonjs(),
 	],
 }

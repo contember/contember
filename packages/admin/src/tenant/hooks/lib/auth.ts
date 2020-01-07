@@ -1,4 +1,4 @@
-import { useCurrentContentGraphQlClient, useSessionToken, useTenantGraphQlClient } from '../../../apiClient'
+import { useCurrentContentGraphQlClient, useSessionToken, useTenantGraphQlClient } from '@contember/react-client'
 import { useMutation, UseMutationReturn } from './mutation'
 import { useQuery } from './query'
 import { QueryRequestObject } from './requestState'

@@ -23,6 +23,7 @@
 		{ "path": "./packages/engine-system-api" },
 		{ "path": "./packages/engine-tenant-api" },
 		{ "path": "./packages/queryable" },
+		{ "path": "./packages/react-client"},
 		{ "path": "./packages/react-multipass-rendering"},
 		{ "path": "./packages/schema" },
 		{ "path": "./packages/schema-definition" },

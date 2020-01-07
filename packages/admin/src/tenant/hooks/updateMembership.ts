@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useProjectSlug } from '../../apiClient'
+import { useProjectSlug } from '@contember/react-client'
 import { MutationRequestState, useAuthedTenantMutation } from './lib'
 
 const UPDATE_MEMBERSHIP_QUERY = `

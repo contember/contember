@@ -1,4 +1,5 @@
 export * from './apiRequest'
+export * from './config'
 
 export * from './ApiClientError'
 export * from './tenantErrorMessages'

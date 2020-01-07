@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
-import { assertValidClientConfig, ClientConfig, ClientConfigContext } from '../apiClient'
+import { assertValidClientConfig, Client, ClientConfig } from '../apiClient'
 import { EnvironmentContext } from '../binding/accessorRetrievers'
 import { Environment } from '../binding/dao'
 import { Router } from '../containers/router'
@@ -42,7 +42,7 @@ export default class Admin extends React.Component<AdminProps> {
 
 	render() {
 		return (
-			<ClientConfigContext.Provider value={this.props.clientConfig}>
+			<Client config={this.props.clientConfig} projectAndStage={undefined}>
 				<Provider store={this.store}>
 					<NavigationProvider>
 						<NavigationIsActiveProvider>
@@ -109,7 +109,7 @@ export default class Admin extends React.Component<AdminProps> {
 						</NavigationIsActiveProvider>
 					</NavigationProvider>
 				</Provider>
-			</ClientConfigContext.Provider>
+			</Client>
 		)
 	}
 }

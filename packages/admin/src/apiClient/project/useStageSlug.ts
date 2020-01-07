@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux'
-import State from '../state'
+import State from '../../state'
 
 export const useStageSlug = () =>
 	useSelector<State, string | undefined>(state => {

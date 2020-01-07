@@ -3,7 +3,6 @@ export * from './config'
 
 export * from './ApiClientError'
 export * from './tenantErrorMessages'
-export * from './useApiServer'
 export * from './useAuthIdentity'
 export * from './useAuthToken'
 export * from './useContentApiRequest'

@@ -1,4 +1,6 @@
 export * from './assertValidClientConfig'
 export * from './ClientConfig'
 export * from './ClientConfigContext'
+export * from './useApiBaseUrl'
 export * from './useClientConfig'
+export * from './useLoginToken'

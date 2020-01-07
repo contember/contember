@@ -1,7 +1,11 @@
 class GraphQlClient {
 	constructor(private readonly apiUrl: string) {}
 
-	async sendRequest<T = any>(query: string, variables: GraphQlClient.Variables, apiToken?: string): Promise<T> {
+	async sendRequest<T = any>(
+		query: string,
+		variables: GraphQlClient.Variables,
+		apiToken: string | undefined,
+	): Promise<T> {
 		const headers: {
 			[header: string]: string
 		} = {

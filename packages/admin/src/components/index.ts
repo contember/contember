@@ -1,5 +1,5 @@
 export * from './bindingFacade'
-export { default as Admin, AdminProps } from './Admin'
+export * from './Admin'
 export { default as Dimensions } from './Dimensions'
 export * from './Link'
 export { default as LogoutLink } from './LogoutLink'

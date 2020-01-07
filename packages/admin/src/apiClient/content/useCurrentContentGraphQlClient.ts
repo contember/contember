@@ -1,5 +1,5 @@
-import { ClientError } from './ClientError'
-import { useProjectSlug, useStageSlug } from './project'
+import { ClientError } from '../ClientError'
+import { useProjectSlug, useStageSlug } from '../project'
 import { useContentGraphQlClient } from './useContentGraphQlClient'
 
 export const useCurrentContentGraphQlClient = () => {

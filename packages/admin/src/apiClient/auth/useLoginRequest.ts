@@ -2,7 +2,7 @@ import { loginMutation } from '@contember/client'
 import * as React from 'react'
 import { ApiRequestState } from '../apiRequest'
 import { useLoginToken } from '../config'
-import { useTenantApiRequest } from '../useTenantApiRequest'
+import { useTenantApiRequest } from '../tenant'
 import { invokeIfSupportsCredentials } from './invokeIfSupportsCredentials'
 
 export const useLoginRequest = (): [ApiRequestState<any>, (email: string, password: string) => void] => {

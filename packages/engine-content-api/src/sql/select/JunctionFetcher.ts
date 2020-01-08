@@ -34,7 +34,10 @@ class JunctionFetcher {
 			.select(['junction_', joiningTable.joiningColumn.columnName])
 			.where(clause => clause.in(['junction_', whereColumn], values))
 
-		const queryWithPredicates = this.predicateInjector.inject(targetEntity, object)
+		const queryWithPredicates = object.withArg(
+			'filter',
+			this.predicateInjector.inject(targetEntity, object.args.filter || {}),
+		)
 		const where = queryWithPredicates.args.filter
 		if (where && Object.keys(where).length > 0) {
 			const path = new Path([])

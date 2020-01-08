@@ -63,6 +63,7 @@ export default class MutationResolver {
 						case Operation.delete:
 							return null
 						case Operation.get:
+						case Operation.paginate:
 						case Operation.list:
 							throw new ImplementationException()
 					}
@@ -106,6 +107,7 @@ export default class MutationResolver {
 						case Operation.delete:
 							return this.resolveDeleteInternal(mapper, meta.entity, field)
 						case Operation.get:
+						case Operation.paginate:
 						case Operation.list:
 							throw new ImplementationException()
 					}

@@ -90,12 +90,21 @@ enum OrderDirection {
   desc
 }
 
+type PageInfo {
+  totalCount: Int!
+}
+
 type Post {
   _meta: PostMeta
   id: UUID!
   publishedAt: DateTime
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
   localesByLocale(by: PostLocalesByLocaleUniqueWhere, filter: PostLocaleWhere): PostLocale
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge!]
 }
 
 input PostCreateInput {
@@ -123,12 +132,21 @@ type PostDeleteResult {
   errors: [_MutationError!]!
 }
 
+type PostEdge {
+  node: Post
+}
+
 type PostLocale {
   _meta: PostLocaleMeta
   id: UUID!
   locale: String
   title: String
   post(filter: PostWhere): Post
+}
+
+type PostLocaleConnection {
+  pageInfo: PageInfo!
+  edges: [PostLocaleEdge!]
 }
 
 input PostLocaleCreateInput {
@@ -154,6 +172,10 @@ type PostLocaleDeleteResult {
   ok: Boolean!
   node: PostLocale
   errors: [_MutationError!]!
+}
+
+type PostLocaleEdge {
+  node: PostLocale
 }
 
 type PostLocaleMeta {
@@ -300,11 +322,13 @@ input PostWithoutLocalesUpdateInput {
 
 type Query {
   getPost(by: PostUniqueWhere!): Post
-  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
   validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
   getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
-  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
   transaction: QueryTransaction
@@ -313,11 +337,13 @@ type Query {
 
 type QueryTransaction {
   getPost(by: PostUniqueWhere!): Post
-  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post]
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
   validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
   getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
-  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale]
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]
+  paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
 }

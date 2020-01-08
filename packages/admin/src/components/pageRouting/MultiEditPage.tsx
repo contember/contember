@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { EntityListDataProvider } from '../../binding'
+import { EntityListDataProvider } from '@contember/binding'
 import { MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'

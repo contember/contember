@@ -7,7 +7,7 @@ import {
 	useEntityContext,
 	useEnvironment,
 	useRelativeSingleField,
-} from '../../../../binding'
+} from '@contember/binding'
 import { isScalar } from '../../../../utils'
 import { SimpleRelativeSingleFieldInner, SimpleRelativeSingleFieldInnerProps } from './SimpleRelativeSingleFieldInner'
 

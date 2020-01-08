@@ -1,6 +1,6 @@
 import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import * as React from 'react'
-import { Component, EntityAccessor } from '../../../binding'
+import { Component, EntityAccessor } from '@contember/binding'
 import { EmptyMessage, RemoveEntityButton } from '../collections/helpers'
 import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeater'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'

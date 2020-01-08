@@ -1,6 +1,6 @@
 import { Button, ButtonBasedButtonProps, FormGroup, Icon, IconProps } from '@contember/ui'
 import * as React from 'react'
-import { EntityListAccessor, useMutationState } from '../../../../binding'
+import { EntityListAccessor, useMutationState } from '@contember/binding'
 
 export type AddNewEntityButtonProps = ButtonBasedButtonProps & {
 	addNew: ((preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void) | undefined

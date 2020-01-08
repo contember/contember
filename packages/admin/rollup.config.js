@@ -1,4 +1,9 @@
 import replace from '@rollup/plugin-replace'
+//import analyzer from 'rollup-plugin-analyzer'
+import commonjs from 'rollup-plugin-commonjs'
+import resolve from 'rollup-plugin-node-resolve'
+//import { terser } from 'rollup-plugin-terser'
+import visualizer from 'rollup-plugin-visualizer'
 import { esreverExportedMembers } from '../../build/exportedMembers/esrever'
 import { immutableExportedMembers } from '../../build/exportedMembers/immutable'
 import { propTypesExportedMembers } from '../../build/exportedMembers/prop-types'
@@ -7,16 +12,13 @@ import { reactDomExportedMembers } from '../../build/exportedMembers/react-dom'
 import { reactDomServerExportedMembers } from '../../build/exportedMembers/react-dom-server'
 import { reactIsExportedMembers } from '../../build/exportedMembers/react-is'
 import { regexpToAstExportedMembers } from '../../build/exportedMembers/regexp-to-ast'
-//import analyzer from 'rollup-plugin-analyzer'
-import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
-//import { terser } from 'rollup-plugin-terser'
-import visualizer from 'rollup-plugin-visualizer'
+import { bindingExportedMembers } from '../binding/exportedMembers'
 import { reactClientMembers } from '../react-client/exportedMembers'
 import { utilsExportedMembers } from '../utils/exportedMembers'
 
 const commonJsConfig = {
 	namedExports: {
+		['@contember/binding']: bindingExportedMembers,
 		['@contember/utils']: utilsExportedMembers,
 		['@contember/react-client']: reactClientMembers,
 		react: reactExportedMembers,
@@ -35,7 +37,13 @@ const resolveConfig = {
 	dedupe: ['react', 'react-dom', 'react-is'],
 	customResolveOptions: {
 		packageFilter: packageJson => {
-			if (packageJson.name === '@contember/ui' || packageJson.name === '@contember/react-multipass-rendering') {
+			if (
+				packageJson.name === '@contember/ui' ||
+				packageJson.name === '@contember/react-multipass-rendering' ||
+				packageJson.name === '@contember/client' ||
+				packageJson.name === '@contember/react-client' ||
+				packageJson.name === '@contember/binding'
+			) {
 				return {
 					...packageJson,
 					main: 'dist/bundle.js',

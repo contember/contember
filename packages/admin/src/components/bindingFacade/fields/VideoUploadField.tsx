@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component, Field } from '../../../binding'
+import { Component, Field } from '@contember/binding'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { UploadField } from './UploadField'
 

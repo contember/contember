@@ -1,6 +1,6 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
-import { AccessorContext, EntityAccessor, RemovalType, useMutationState } from '../../../../binding'
+import { AccessorContext, EntityAccessor, RemovalType, useMutationState } from '@contember/binding'
 import { useTriggerPersistWithFeedback } from '../../../ui'
 
 export type RemoveEntityButtonProps = ButtonProps & {

@@ -6,6 +6,9 @@
 	},
 	"references": [
 		{
+			"path": "../../../packages/binding/src"
+		},
+		{
 			"path": "../../../packages/react-multipass-rendering/src"
 		},
 		{

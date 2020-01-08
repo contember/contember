@@ -8,7 +8,7 @@ import {
 	SugaredRelativeSingleField,
 	useMutationState,
 	useSortedEntities,
-} from '../../../../binding'
+} from '@contember/binding'
 import { RepeaterContainer, RepeaterContainerProps } from './RepeaterContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'

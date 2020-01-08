@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Environment, useEnvironment } from '../../../binding'
+import { Environment, useEnvironment } from '@contember/binding'
 
 interface VariableProps {
 	name: Environment.Name

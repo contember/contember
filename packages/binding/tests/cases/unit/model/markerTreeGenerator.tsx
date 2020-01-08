@@ -6,8 +6,8 @@ import {
 	HasMany,
 	HasOne,
 	SingleEntityDataProvider,
-} from '../../../../src/binding/coreComponents'
-import { MarkerTreeGenerator } from '../../../../src/binding/model'
+} from '../../../../src/coreComponents'
+import { MarkerTreeGenerator } from '../../../../src/model'
 
 describe('Marker tree generator', () => {
 	it('should reject empty trees', () => {

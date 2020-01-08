@@ -25,7 +25,7 @@ import {
 	useEntityContext,
 	useEnvironment,
 	useMutationState,
-} from '../../../../binding'
+} from '@contember/binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export type BaseDynamicChoiceFieldProps =

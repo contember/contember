@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { AccessorContext, EntityAccessor, useEntityContext } from '../../../binding'
+import { AccessorContext, EntityAccessor, useEntityContext } from '@contember/binding'
 import { InnerProps } from '../../Link'
 import PageLink, { PageConfig } from '../../pageRouting/PageLink'
 

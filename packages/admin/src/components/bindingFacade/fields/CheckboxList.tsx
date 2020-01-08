@@ -1,6 +1,6 @@
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { Component } from '../../../binding'
+import { Component } from '@contember/binding'
 import { Checkbox } from '../../ui'
 import {
 	BaseDynamicChoiceFieldProps,

@@ -11,7 +11,7 @@ import {
 	useEnvironment,
 	useMutationState,
 	useRelativeSingleField,
-} from '../../../binding'
+} from '@contember/binding'
 import State from '../../../state'
 import UploadState, { AnyUpload, UploadStatus } from '../../../state/upload'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'

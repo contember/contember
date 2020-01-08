@@ -1,6 +1,6 @@
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { FieldAccessor, useEnvironment, useMutationState } from '../../../../binding'
+import { FieldAccessor, useEnvironment, useMutationState } from '@contember/binding'
 import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 export type SimpleRelativeSingleFieldInnerProps = Omit<FormGroupProps, 'children'> & {

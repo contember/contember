@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FieldAccessor } from '../../../binding'
+import { FieldAccessor } from '@contember/binding'
 import { Checkbox } from '../../ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 

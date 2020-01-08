@@ -1,6 +1,6 @@
 import 'jasmine'
-import { Environment } from '../../../../src/binding/dao'
-import { Parser } from '../../../../src/binding/queryLanguage'
+import { Environment } from '../../../../src/dao'
+import { Parser } from '../../../../src/queryLanguage'
 
 const parse = (input: string) => {
 	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.QualifiedFieldList, new Environment())

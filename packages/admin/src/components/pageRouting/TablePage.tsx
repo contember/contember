@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { EntityListDataProvider } from '../../binding/coreComponents'
+import { EntityListDataProvider } from '@contember/binding'
 import { TableRenderer, TableRendererProps } from '../bindingFacade'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'

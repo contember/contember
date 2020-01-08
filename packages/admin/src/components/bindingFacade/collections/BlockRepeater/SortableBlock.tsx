@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SugaredRelativeSingleField, useRelativeSingleField } from '../../../../binding'
+import { SugaredRelativeSingleField, useRelativeSingleField } from '@contember/binding'
 import { NormalizedBlockProps } from '../../blocks'
 import { RepeaterItem, RepeaterItemProps } from '../Repeater'
 

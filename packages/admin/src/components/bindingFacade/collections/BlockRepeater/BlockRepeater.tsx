@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component, SugaredRelativeSingleField, useMutationState } from '../../../../binding'
+import { Component, SugaredRelativeSingleField, useMutationState } from '@contember/binding'
 import { DiscriminatedBlocks, NormalizedBlockProps } from '../../blocks'
 import { useNormalizedBlockList } from '../../blocks/useNormalizedBlockList'
 import { Repeater, RepeaterProps } from '../Repeater'

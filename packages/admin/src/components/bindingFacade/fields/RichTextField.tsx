@@ -7,7 +7,7 @@ import {
 	useEnvironment,
 	useMutationState,
 	useRelativeSingleField,
-} from '../../../binding'
+} from '@contember/binding'
 import RichEditor, { LineBreakBehavior, RichEditorProps } from '../../RichEditor'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 

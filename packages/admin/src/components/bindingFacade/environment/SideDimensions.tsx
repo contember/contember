@@ -9,7 +9,7 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 	SyntheticChildrenProvider,
-} from '../../../binding'
+} from '@contember/binding'
 
 export interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	dimension?: string

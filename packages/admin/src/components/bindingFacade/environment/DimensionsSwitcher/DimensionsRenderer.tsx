@@ -12,7 +12,7 @@ import {
 	Field,
 	FieldAccessor,
 	useEnvironment,
-} from '../../../../binding'
+} from '@contember/binding'
 import { RequestChange } from '../../../../state/request'
 import { Link } from '../../../Link'
 import { useRedirect } from '../../../pageRouting'

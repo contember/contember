@@ -6,9 +6,10 @@
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
 		"build": "rollup --config && node --experimental-modules ./scripts/build-style.mjs",
-		"test": "jasmine --config=jasmine.json"
+		"test": "echo \"There is nothing to do\" || jasmine --config=jasmine.json"
 	},
 	"dependencies": {
+		"@contember/binding": "^0.3.6",
 		"@contember/client": "^0.3.6",
 		"@contember/react-client": "^0.3.6",
 		"@contember/react-multipass-rendering": "^0.3.6",
@@ -18,7 +19,6 @@
 		"@mangoweb/sass-base": "0.0.5",
 		"@sindresorhus/slugify": "^0.9.1",
 		"blueimp-md5": "^2.12.0",
-		"chevrotain": "^6.5.0",
 		"classnames": "^2.2.6",
 		"immutable": "^3.8.2",
 		"is-url": "^1.2.4",

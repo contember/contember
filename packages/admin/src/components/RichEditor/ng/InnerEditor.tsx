@@ -12,7 +12,7 @@ import {
 	HasManyProps,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
-} from '../../../binding'
+} from '@contember/binding'
 import { generateUuid } from '../utils'
 import { HoverMenuManager } from './HoverMenuManager'
 import JsonBlockSerializer from './JsonBlockSerializer'

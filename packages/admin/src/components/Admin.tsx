@@ -11,8 +11,8 @@ import {
 	StageSlugContext,
 	SessionTokenContext,
 } from '@contember/react-client'
-import { EnvironmentContext } from '../binding/accessorRetrievers'
-import { Environment } from '../binding/dao'
+import { EnvironmentContext } from '@contember/binding'
+import { Environment } from '@contember/binding'
 import { Router } from '../containers/router'
 import { PROJECT_CONFIGS_REPLACE } from '../reducer/projectsConfigs'
 import { emptyState } from '../state'

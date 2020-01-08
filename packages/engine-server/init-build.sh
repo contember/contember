@@ -5,6 +5,7 @@ npx lerna bootstrap \
   --ignore @contember/admin \
   --ignore @contember/admin-server \
   --ignore @contember/benchmark \
+  --ignore @contember/binding \
   --ignore @contember/client \
   --ignore @contember/cli \
   --ignore @contember/database-tester \

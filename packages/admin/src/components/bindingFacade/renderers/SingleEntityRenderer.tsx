@@ -7,7 +7,7 @@ import {
 	EntityForRemovalAccessor,
 	EntityListAccessor,
 	RootAccessor,
-} from '../../../binding'
+} from '@contember/binding'
 
 export interface SingleEntityRendererProps {
 	children: React.ReactNode

@@ -1,6 +1,6 @@
 {
 	"spec_files": [
-		"dist/tests/bundle.js"
+		"dist/tests/bundle.cjs"
 	],
 	"stopSpecOnExpectationFailure": false,
 	"random": false

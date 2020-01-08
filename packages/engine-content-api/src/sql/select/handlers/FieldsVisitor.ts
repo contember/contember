@@ -99,7 +99,6 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 					objectNodeWithWhere,
 					relation.orderBy || [],
 				)
-				console.log(relation.orderBy)
 
 				return this.mapper.selectGrouped(targetEntity, objectNodeWithOrder, targetRelation)
 			},

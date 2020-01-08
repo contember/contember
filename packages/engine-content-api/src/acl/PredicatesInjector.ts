@@ -1,16 +1,13 @@
 import { Acl, Input, Model } from '@contember/schema'
-import ObjectNode from '../graphQlResolver/ObjectNode'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import PredicateFactory from './PredicateFactory'
 
 class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
-	public inject(entity: Model.Entity, objectNode: ObjectNode<Input.ListQueryInput>) {
-		const restrictedWhere = this.injectToWhere(objectNode.args.filter || {}, entity)
-		const where = this.createWhere(entity, [entity.primary], restrictedWhere)
-
-		return objectNode.withArg('filter', where)
+	public inject(entity: Model.Entity, where: Input.Where): Input.Where {
+		const restrictedWhere = this.injectToWhere(where, entity)
+		return this.createWhere(entity, [entity.primary], restrictedWhere)
 	}
 
 	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {

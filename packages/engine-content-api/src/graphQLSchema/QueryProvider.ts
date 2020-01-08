@@ -8,8 +8,16 @@ import Authorizator from '../acl/Authorizator'
 import OrderByTypeProvider from './OrderByTypeProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
 import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
+import { aliasAwareResolver, GqlTypeName } from './utils'
 
 export default class QueryProvider {
+	private PageInfo = this.graphqlObjectFactories.createObjectType({
+		name: 'PageInfo',
+		fields: {
+			totalCount: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.int) },
+		},
+	})
+
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
@@ -26,6 +34,7 @@ export default class QueryProvider {
 		return {
 			['get' + entityName]: this.getByUniqueQuery(entityName),
 			['list' + entityName]: this.getListQuery(entityName),
+			['paginate' + entityName]: this.getPaginationQuery(entityName),
 		}
 	}
 
@@ -52,7 +61,9 @@ export default class QueryProvider {
 		const entity = getEntity(this.schema, entityName)
 
 		return {
-			type: this.graphqlObjectFactories.createList(this.entityTypeProvider.getEntity(entityName)),
+			type: this.graphqlObjectFactories.createList(
+				this.graphqlObjectFactories.createNotNull(this.entityTypeProvider.getEntity(entityName)),
+			),
 			args: {
 				filter: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
 				orderBy: {
@@ -69,6 +80,54 @@ export default class QueryProvider {
 					return parent[info.path.key]
 				}
 				return context.executionContainer.get('readResolver').resolveListQuery(entity, info)
+			},
+		}
+	}
+
+	private getPaginationQuery(entityName: string): GraphQLFieldConfig<any, Context, Input.ListQueryInput> {
+		const entity = getEntity(this.schema, entityName)
+
+		return {
+			type: this.graphqlObjectFactories.createNotNull(
+				this.graphqlObjectFactories.createObjectType({
+					name: GqlTypeName`${entityName}Connection`,
+					fields: {
+						pageInfo: {
+							type: this.graphqlObjectFactories.createNotNull(this.PageInfo),
+						},
+						edges: {
+							type: this.graphqlObjectFactories.createList(
+								this.graphqlObjectFactories.createNotNull(
+									this.graphqlObjectFactories.createObjectType({
+										name: GqlTypeName`${entityName}Edge`,
+										fields: {
+											node: { type: this.entityTypeProvider.getEntity(entityName), resolve: aliasAwareResolver },
+										},
+									}),
+								),
+							),
+							resolve: aliasAwareResolver,
+						},
+					},
+				}),
+			),
+
+			args: {
+				filter: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
+				orderBy: {
+					type: this.graphqlObjectFactories.createList(
+						this.graphqlObjectFactories.createNotNull(this.orderByTypeProvider.getEntityOrderByType(entityName)),
+					),
+				},
+				skip: { type: this.graphqlObjectFactories.int },
+				first: { type: this.graphqlObjectFactories.int },
+			},
+			extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
+			resolve: (parent, args, context, info) => {
+				if (parent && info.path) {
+					return parent[info.path.key]
+				}
+				return context.executionContainer.get('readResolver').resolvePaginationQuery(entity, info)
 			},
 		}
 	}

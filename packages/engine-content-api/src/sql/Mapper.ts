@@ -11,10 +11,10 @@ import PredicatesInjector from '../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
 import DeleteExecutor from './delete/DeleteExecutor'
-import { ModificationType, MutationResultList } from './Result'
+import { MutationResultList } from './Result'
 import { Updater } from './update/Updater'
 import { Inserter } from './insert/Inserter'
-import { convertError, tryMutation } from './ErrorUtils'
+import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select/OrderByHelper'
 
 class Mapper {
@@ -113,7 +113,7 @@ class Mapper {
 		const selectPromise = selector.select(
 			this,
 			entity,
-			this.predicatesInjector.inject(entity, inputWithOrder),
+			inputWithOrder.withArg('filter', this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {})),
 			path,
 			groupBy,
 		)
@@ -121,6 +121,17 @@ class Mapper {
 		await selectPromise
 
 		return rows
+	}
+
+	public async count(entity: Model.Entity, filter: Input.Where) {
+		const path = new Path([])
+		const qb = SelectBuilder.create()
+			.from(entity.tableName, path.getAlias())
+			.select(expr => expr.raw('count(*)'), 'row_count')
+		const withPredicates = this.predicatesInjector.inject(entity, filter)
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
+		const result = await qbWithWhere.getResult(this.db)
+		return result[0].row_count
 	}
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<MutationResultList> {

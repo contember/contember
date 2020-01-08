@@ -37,6 +37,8 @@ export default class ReadResolver {
 							return mapper.selectUnique(meta.entity, field)
 						case Operation.list:
 							return mapper.select(meta.entity, field)
+						case Operation.paginate:
+							return this.doPaginate(mapper, meta.entity, field)
 						case Operation.create:
 						case Operation.update:
 						case Operation.delete:
@@ -57,5 +59,48 @@ export default class ReadResolver {
 	public async resolveGetQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
 		const queryAst: ObjectNode<Input.UniqueQueryInput> = this.queryAstFactory.create(info)
 		return await this.mapperFactory(this.db).selectUnique(entity, queryAst)
+	}
+
+	public async resolvePaginationQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
+		const queryAst: ObjectNode<Input.SelectQueryInput> = this.queryAstFactory.create(info)
+		const mapper = this.mapperFactory(this.db)
+		return await this.doPaginate(mapper, entity, queryAst)
+	}
+
+	private async doPaginate(mapper: Mapper, entity: Model.Entity, queryAst: ObjectNode<Input.SelectQueryInput>) {
+		const pageInfoField = queryAst.findFieldByName('pageInfo')
+		const result: any = {}
+
+		if (pageInfoField.length > 0) {
+			result.pageInfo = {
+				totalCount: await mapper.count(entity, queryAst.args.filter || {}),
+			}
+		}
+
+		const edges = queryAst.findFieldByName('edges')
+		if (edges.length > 1) {
+			throw new Error('You cannot fetch edges more than once')
+		}
+		for (const edgeField of edges) {
+			result[edgeField.alias] = {}
+			const nodes = (edgeField as ObjectNode).findFieldByName('node')
+			if (nodes.length > 1) {
+				throw new Error('You cannot fetch node more than once')
+			}
+			for (const nodeField of nodes) {
+				result[edgeField.alias] = (
+					await mapper.select(
+						entity,
+						(nodeField as ObjectNode).withArgs({
+							filter: queryAst.args.filter,
+							orderBy: queryAst.args.orderBy,
+							limit: queryAst.args.first,
+							offset: queryAst.args.skip,
+						}),
+					)
+				).map(it => ({ [nodeField.alias]: it }))
+			}
+		}
+		return result
 	}
 }

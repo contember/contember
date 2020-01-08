@@ -1,6 +1,6 @@
 import { BoxSection, BoxSectionProps } from '@contember/ui'
 import * as React from 'react'
-import { RemovalType } from '../../../../binding'
+import { RemovalType } from '@contember/binding'
 import { RemoveEntityButton } from '../helpers'
 
 export interface RepeaterItemProps {

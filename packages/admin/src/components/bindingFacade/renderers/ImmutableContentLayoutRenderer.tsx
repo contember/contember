@@ -6,7 +6,7 @@ import {
 	Component,
 	EntityAccessor,
 	EntityForRemovalAccessor,
-} from '../../../binding'
+} from '@contember/binding'
 import { LayoutInner, LayoutSide } from '../../LayoutInner'
 import { FeedbackRenderer, FeedbackRendererProps } from './FeedbackRenderer'
 

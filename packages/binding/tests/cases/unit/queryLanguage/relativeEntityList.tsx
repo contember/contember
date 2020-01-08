@@ -1,7 +1,7 @@
 import 'jasmine'
-import { Environment } from '../../../../src/binding/dao'
-import { Parser } from '../../../../src/binding/queryLanguage'
-import { DesugaredRelativeEntityList } from '../../../../src/binding/treeParameters'
+import { Environment } from '../../../../src/dao'
+import { Parser } from '../../../../src/queryLanguage'
+import { DesugaredRelativeEntityList } from '../../../../src/treeParameters'
 
 const parse = (input: string): DesugaredRelativeEntityList => {
 	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeEntityList, new Environment())

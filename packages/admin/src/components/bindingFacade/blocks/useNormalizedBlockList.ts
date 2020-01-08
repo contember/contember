@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BindingError, useEnvironment, VariableInputTransformer } from '../../../binding'
+import { BindingError, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import { BlockCommonProps, NormalizedBlockList, NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
 import { useBlockProps } from './useBlockProps'
 

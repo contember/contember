@@ -7,7 +7,7 @@ import {
 	FieldAccessor,
 	getRelativeSingleField,
 	RelativeSingleField,
-} from '../../../binding'
+} from '@contember/binding'
 import JsonBlockSerializer from './JsonBlockSerializer'
 import { BlocksDefinitions } from './types'
 

@@ -6,7 +6,7 @@ import {
 	QueryLanguage,
 	SugaredQualifiedFieldList,
 	useEnvironment,
-} from '../../../../binding'
+} from '@contember/binding'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps

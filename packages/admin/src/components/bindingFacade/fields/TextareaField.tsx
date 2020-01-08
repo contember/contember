@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component } from '../../../binding'
+import { Component } from '@contember/binding'
 import { TextField, TextFieldProps } from './TextField'
 
 export type TextareaFieldProps = TextFieldProps

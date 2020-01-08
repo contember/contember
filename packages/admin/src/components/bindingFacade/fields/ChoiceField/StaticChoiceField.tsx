@@ -11,7 +11,7 @@ import {
 	useMutationState,
 	useRelativeSingleField,
 	VariableInputTransformer,
-} from '../../../../binding'
+} from '@contember/binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {

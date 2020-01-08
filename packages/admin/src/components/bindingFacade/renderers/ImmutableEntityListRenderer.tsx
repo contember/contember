@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '../../../binding'
+import { AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '@contember/binding'
 import { RepeaterInner, RepeaterInnerProps } from '../collections/Repeater'
 
 export interface EntityListWrapperProps {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { EntityCreator, EntityCreatorProps } from '../../binding/coreComponents'
+import { EntityCreator, EntityCreatorProps } from '@contember/binding'
 import { RequestChange } from '../../state/request'
 import { MutableSingleEntityRenderer, MutableSingleEntityRendererProps } from '../bindingFacade'
 import { DynamicLink } from '../DynamicLink'

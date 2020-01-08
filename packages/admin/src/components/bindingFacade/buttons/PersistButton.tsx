@@ -1,6 +1,6 @@
 import { Button, ButtonProps, FormGroup } from '@contember/ui'
 import * as React from 'react'
-import { useDirtinessState, useMutationState } from '../../../binding'
+import { useDirtinessState, useMutationState } from '@contember/binding'
 import { useTriggerPersistWithFeedback } from '../../ui'
 
 export type PersistButtonProps = ButtonProps

@@ -5,7 +5,7 @@ import { AddBlockButton } from './AddBlockButton'
 import { BlocksDefinitions } from './types'
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { DragHandle } from '../../ui'
-import { AccessorContext } from '../../../binding/accessorRetrievers'
+import { AccessorContext } from '@contember/binding'
 
 const Handle = SortableHandle(() => (
 	<div className="richEditor-handle" contentEditable={false}>

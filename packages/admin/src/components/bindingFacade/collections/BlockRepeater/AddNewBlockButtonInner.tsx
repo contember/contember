@@ -5,7 +5,7 @@ import {
 	getRelativeSingleField,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
-} from '../../../../binding'
+} from '@contember/binding'
 import { NormalizedBlockProps } from '../../blocks'
 import { AddNewEntityButtonProps } from '../helpers'
 

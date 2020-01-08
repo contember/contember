@@ -6,7 +6,7 @@ import {
 	FieldAccessor,
 	FieldValue,
 	SugaredRelativeSingleField,
-} from '../../../../binding'
+} from '@contember/binding'
 
 export namespace ChoiceFieldData {
 	export type ChoiceArity = 'single' | 'multiple'

@@ -9,7 +9,7 @@ import {
 	FieldBasicProps,
 	Scalar,
 	SyntheticChildrenProvider,
-} from '../../../../binding'
+} from '@contember/binding'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FormGroupProps, 'children'>

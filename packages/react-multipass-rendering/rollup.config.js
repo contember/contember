@@ -25,7 +25,7 @@ export default [
 	{
 		input: 'dist/tests/index.js',
 		output: {
-			file: 'dist/tests/bundle.js',
+			file: 'dist/tests/bundle.cjs',
 			format: 'cjs',
 			sourcemap: false,
 		},

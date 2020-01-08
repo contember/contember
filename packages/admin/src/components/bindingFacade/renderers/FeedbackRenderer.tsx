@@ -7,7 +7,7 @@ import {
 	AccessorTreeStateWithDataContext,
 	Component,
 	RequestErrorType,
-} from '../../../binding'
+} from '@contember/binding'
 import { useRedirect } from '../../pageRouting'
 
 export interface FeedbackRendererProps {

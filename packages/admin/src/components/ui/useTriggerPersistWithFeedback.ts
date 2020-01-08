@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ErrorPersistResult, RequestErrorType, SuccessfulPersistResult, useTriggerPersist } from '../../binding'
+import { ErrorPersistResult, RequestErrorType, SuccessfulPersistResult, useTriggerPersist } from '@contember/binding'
 import { ToastType } from '../../state/toasts'
 import { useShowToastWithTimeout } from './useShowToastWithTimeout'
 

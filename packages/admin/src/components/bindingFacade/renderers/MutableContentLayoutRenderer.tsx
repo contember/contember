@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component } from '../../../binding'
+import { Component } from '@contember/binding'
 import { PersistButton } from '../buttons'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 

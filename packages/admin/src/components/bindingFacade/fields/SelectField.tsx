@@ -1,6 +1,6 @@
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import * as React from 'react'
-import { Component, BindingError, ErrorAccessor } from '../../../binding'
+import { Component, BindingError, ErrorAccessor } from '@contember/binding'
 
 import {
 	BaseDynamicChoiceFieldProps,

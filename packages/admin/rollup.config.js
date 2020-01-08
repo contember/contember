@@ -4,78 +4,34 @@ import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
 //import { terser } from 'rollup-plugin-terser'
 import visualizer from 'rollup-plugin-visualizer'
+import { esreverExportedMembers } from '../../build/exportedMembers/esrever'
+import { immutableExportedMembers } from '../../build/exportedMembers/immutable'
+import { propTypesExportedMembers } from '../../build/exportedMembers/prop-types'
+import { reactExportedMembers } from '../../build/exportedMembers/react'
+import { reactDomExportedMembers } from '../../build/exportedMembers/react-dom'
+import { reactDomServerExportedMembers } from '../../build/exportedMembers/react-dom-server'
+import { reactIsExportedMembers } from '../../build/exportedMembers/react-is'
+import { reactPopperExportedMembers } from '../../build/exportedMembers/react-popper'
+import { regexpToAstExportedMembers } from '../../build/exportedMembers/regexp-to-ast'
+import { bindingExportedMembers } from '../binding/exportedMembers'
+import { reactClientMembers } from '../react-client/exportedMembers'
+import { utilsExportedMembers } from '../utils/exportedMembers'
 
 const commonJsConfig = {
 	namedExports: {
-		['@contember/utils']: ['assertNever', 'arrayDifference', 'isEmptyObject', 'lcfirst', 'ucfirst'],
-		['@contember/react-client']: [
-			'ApiRequestReadyState',
-			'apiRequestReducer',
-			'assertValidClientConfig',
-			'Client',
-			'ClientConfigContext',
-			'ClientError',
-			'ProjectSlugContext',
-			'SessionTokenContext',
-			'StageSlugContext',
-			'useApiBaseUrl',
-			'useApiRequest',
-			'useClientConfig',
-			'useContentApiRequest',
-			'useContentGraphQlClient',
-			'useCurrentContentGraphQlClient',
-			'useGraphQlClient',
-			'useLoginRequest',
-			'useLoginToken',
-			'useProjectSlug',
-			'useSessionToken',
-			'useStageSlug',
-			'useTenantApiRequest',
-			'useTenantGraphQlClient',
-		],
-		react: [
-			'Children',
-			'cloneElement',
-			'Component',
-			'createContext',
-			'createElement',
-			'createFactory',
-			'createRef',
-			'forwardRef',
-			'Fragment',
-			'isValidElement',
-			'lazy',
-			'memo',
-			'Profiler',
-			'PureComponent',
-			'StrictMode',
-			'Suspense',
-			'useCallback',
-			'useContext',
-			'useDebugValue',
-			'useEffect',
-			'useImperativeHandle',
-			'useLayoutEffect',
-			'useMemo',
-			'useReducer',
-			'useRef',
-			'useState',
-		],
-		['react-is']: ['isValidElementType', 'isContextConsumer'],
-		['react-dom']: [
-			'createPortal',
-			'findDOMNode',
-			'render',
-			'unmountComponentAtNode',
-			'unstable_batchedUpdates',
-			'unstable_renderSubtreeIntoContainer',
-		],
-		['react-dom/server']: ['renderToStaticMarkup'],
-		['prop-types']: ['oneOfType', 'func', 'shape', 'any', 'number', 'object', 'bool', 'string'],
-		['../ui/node_modules/prop-types']: ['oneOfType', 'func', 'shape', 'any', 'number', 'object', 'bool', 'string'],
-		['regexp-to-ast']: ['RegExpParser', 'VERSION', 'BaseRegExpVisitor'],
-		immutable: ['List', 'Record', 'Map', 'Set', 'OrderedSet', 'is'],
-		esrever: ['reverse'],
+		['@contember/binding']: bindingExportedMembers,
+		['@contember/utils']: utilsExportedMembers,
+		['@contember/react-client']: reactClientMembers,
+		react: reactExportedMembers,
+		['react-is']: reactIsExportedMembers,
+		['react-dom']: reactDomExportedMembers,
+		['react-dom/server']: reactDomServerExportedMembers,
+		['prop-types']: propTypesExportedMembers,
+		['../ui/node_modules/react-popper']: reactPopperExportedMembers,
+		['../ui/node_modules/prop-types']: propTypesExportedMembers,
+		['regexp-to-ast']: regexpToAstExportedMembers,
+		immutable: immutableExportedMembers,
+		esrever: esreverExportedMembers,
 	},
 }
 const resolveConfig = {
@@ -83,10 +39,16 @@ const resolveConfig = {
 	dedupe: ['react', 'react-dom', 'react-is'],
 	customResolveOptions: {
 		packageFilter: packageJson => {
-			if (packageJson.name === '@contember/ui' || packageJson.name === '@contember/react-multipass-rendering') {
+			if (
+				packageJson.name === '@contember/ui' ||
+				packageJson.name === '@contember/react-multipass-rendering' ||
+				packageJson.name === '@contember/client' ||
+				packageJson.name === '@contember/react-client' ||
+				packageJson.name === '@contember/binding'
+			) {
 				return {
 					...packageJson,
-					main: 'dist/bundle.js',
+					main: 'dist/src/index.js',
 				}
 			}
 			return packageJson
@@ -125,7 +87,7 @@ export default [
 	{
 		input: 'dist/tests/index.js',
 		output: {
-			file: 'dist/tests/bundle.js',
+			file: 'dist/tests/bundle.cjs',
 			format: 'cjs',
 			sourcemap: false,
 		},

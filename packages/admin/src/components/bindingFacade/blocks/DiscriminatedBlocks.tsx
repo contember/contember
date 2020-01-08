@@ -1,6 +1,6 @@
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { Component, SugaredRelativeSingleField } from '../../../binding'
+import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import { NormalizedStaticOption, SelectFieldInner, StaticChoiceField, useStaticChoiceField } from '../fields'
 import { NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
 import { useNormalizedBlockList } from './useNormalizedBlockList'

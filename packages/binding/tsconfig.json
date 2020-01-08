@@ -1,0 +1,11 @@
+{
+	"files": [],
+	"include": [],
+	"references": [
+		{ "path": "./src" },
+		{ "path": "./tests" }
+	],
+	"compilerOptions": {
+		"jsx": "react"
+	}
+}

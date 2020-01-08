@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component } from '../../../../binding'
+import { Component } from '@contember/binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
 import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'

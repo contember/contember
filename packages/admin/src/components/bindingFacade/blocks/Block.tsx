@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { Component, Scalar, VariableLiteral } from '../../../binding'
+import { Component, Scalar, VariableLiteral } from '@contember/binding'
 
 export interface BlockCommonProps {
 	label?: React.ReactNode

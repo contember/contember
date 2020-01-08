@@ -10,7 +10,7 @@ import {
 	useEnvironment,
 	useMutationState,
 	useRelativeSingleField,
-} from '../../../binding'
+} from '@contember/binding'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 

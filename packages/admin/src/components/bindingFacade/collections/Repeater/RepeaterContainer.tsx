@@ -1,6 +1,6 @@
 import { Box, BoxSection } from '@contember/ui'
 import * as React from 'react'
-import { EntityListAccessor } from '../../../../binding'
+import { EntityListAccessor } from '@contember/binding'
 import { AddNewEntityButton, AddNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
 export interface RepeaterContainerProps {

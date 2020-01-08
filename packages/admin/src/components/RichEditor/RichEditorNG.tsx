@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { KeyUtils } from 'slate'
-import { Component, Field, HasMany, useRelativeEntityList } from '../../binding'
+import { Component, Field, HasMany, useRelativeEntityList } from '@contember/binding'
 import { InnerEditor, RTEProps } from './ng/InnerEditor'
 import { generateUuid } from './utils'
 

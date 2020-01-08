@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SingleEntityDataProvider } from '../../binding/coreComponents'
+import { SingleEntityDataProvider } from '@contember/binding'
 import { ImmutableSingleEntityRenderer, ImmutableSingleEntityRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 import { SingleEntityPageProps } from './SingleEntityPageProps'

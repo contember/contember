@@ -18,10 +18,14 @@ const resolveConfig = {
 	dedupe: ['react', 'react-dom'],
 	customResolveOptions: {
 		packageFilter: packageJson => {
-			if (packageJson.name === '@contember/react-multipass-rendering') {
+			if (
+				packageJson.name === '@contember/react-multipass-rendering' ||
+				packageJson.name === '@contember/client' ||
+				packageJson.name === '@contember/react-client'
+			) {
 				return {
 					...packageJson,
-					main: 'dist/bundle.js',
+					main: 'dist/src/index.js',
 				}
 			}
 			return packageJson

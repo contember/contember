@@ -11,6 +11,7 @@ import { reactExportedMembers } from '../../build/exportedMembers/react'
 import { reactDomExportedMembers } from '../../build/exportedMembers/react-dom'
 import { reactDomServerExportedMembers } from '../../build/exportedMembers/react-dom-server'
 import { reactIsExportedMembers } from '../../build/exportedMembers/react-is'
+import { reactPopperExportedMembers } from '../../build/exportedMembers/react-popper'
 import { regexpToAstExportedMembers } from '../../build/exportedMembers/regexp-to-ast'
 import { bindingExportedMembers } from '../binding/exportedMembers'
 import { reactClientMembers } from '../react-client/exportedMembers'
@@ -26,6 +27,7 @@ const commonJsConfig = {
 		['react-dom']: reactDomExportedMembers,
 		['react-dom/server']: reactDomServerExportedMembers,
 		['prop-types']: propTypesExportedMembers,
+		['../ui/node_modules/react-popper']: reactPopperExportedMembers,
 		['../ui/node_modules/prop-types']: propTypesExportedMembers,
 		['regexp-to-ast']: regexpToAstExportedMembers,
 		immutable: immutableExportedMembers,
@@ -46,7 +48,7 @@ const resolveConfig = {
 			) {
 				return {
 					...packageJson,
-					main: 'dist/bundle.js',
+					main: 'dist/src/index.js',
 				}
 			}
 			return packageJson

@@ -1,7 +1,8 @@
-import analyzer from 'rollup-plugin-analyzer'
 import replace from '@rollup/plugin-replace'
+import analyzer from 'rollup-plugin-analyzer'
 import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
+import { propTypesExportedMembers } from '../../build/exportedMembers/prop-types'
 //import { terser } from 'rollup-plugin-terser'
 
 export default {
@@ -23,7 +24,7 @@ export default {
 		}),
 		commonjs({
 			namedExports: {
-				['prop-types']: ['oneOfType', 'func', 'shape', 'any', 'number', 'object', 'bool', 'string'],
+				['prop-types']: propTypesExportedMembers,
 			},
 		}),
 		//terser({

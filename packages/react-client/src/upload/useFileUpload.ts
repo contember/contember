@@ -64,9 +64,10 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 			})
 			const parameters: GenerateUploadUrlMutationBuilder.MutationParameters = {}
 			const fileIds: FileId[] = []
+			const aliasPrefix = 'file'
 
 			for (const file of files) {
-				parameters[file.id] = {
+				parameters[`${aliasPrefix}${file.id}`] = {
 					contentType: file.file.type,
 					prefix: options?.filePrefix,
 					expiration: options?.fileExpiration,
@@ -85,7 +86,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 					fileIds,
 				})
 				for (const file of files) {
-					const datumBody = responseData[file.id]
+					const datumBody = responseData[`${aliasPrefix}${file.id}`]
 					const uploadRequestBody = await readAsArrayBuffer(file.file)
 					const xhr = new XMLHttpRequest()
 					uploadRequests.set(file.id, xhr)

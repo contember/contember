@@ -1,0 +1,4 @@
+type: instance
+remove:
+  - package.json
+  - package-lock.json

@@ -1,0 +1,7 @@
+type: project
+remove:
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+replaceVariables:
+  - admin/index.ts

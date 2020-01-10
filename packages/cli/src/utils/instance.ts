@@ -17,6 +17,7 @@ import { JsonUpdateCallback, readMultipleYaml, readYaml, updateYaml } from './ya
 import { getProjectDockerEnv } from './project'
 import { promises as fs } from 'fs'
 import { hasInstanceAdmin } from './workspace'
+import { installTemplate } from './template'
 
 export const validateInstanceName = (name: string) => {
 	if (!name.match(/^[a-z][a-z0-9]*$/)) {
@@ -45,15 +46,9 @@ export const createInstance = async (args: {
 }): Promise<InstanceEnvironment> => {
 	validateInstanceName(args.instanceName)
 	const withAdmin = await hasInstanceAdmin(args)
-	const template = withAdmin ? 'instance-template' : 'instance-no-admin-template'
+	const template = join(resourcesDir, 'templates', withAdmin ? 'template-instance-with-admin' : 'template-instance')
 	const instanceDir = getInstanceDir(args)
-	await copy(join(resourcesDir, 'templates', template), instanceDir)
-	await tryUnlink(join(instanceDir, 'package.json'))
-	await tryUnlink(join(instanceDir, 'package-lock.json'))
-	await tryUnlink(join(instanceDir, 'tsconfig.json'))
-	if (withAdmin) {
-		await replaceFileContent(join(instanceDir, 'admin/src/projects.ts'), () => '')
-	}
+	await installTemplate(template, instanceDir, 'instance')
 	return await resolveInstanceEnvironment({
 		workspaceDirectory: args.workspaceDirectory,
 		instanceName: args.instanceName,

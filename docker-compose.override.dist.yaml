@@ -2,10 +2,3 @@ version: '3.7'
 services:
   ts_watch:
     user: "1000"
-  db:
-    ports:
-      - "127.0.0.1:4485:5432"
-  storybook:
-    user: "1000"
-    ports:
-      - "0.0.0.0:9001:9001"

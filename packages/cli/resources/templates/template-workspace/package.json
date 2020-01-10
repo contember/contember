@@ -9,7 +9,7 @@
 		"build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
 	},
 	"devDependencies": {
-		"typescript": "^3.7.2"
+		"typescript": "^3.7.4"
 	},
 	"dependencies": {
 		"@contember/schema": "^0.3.10",

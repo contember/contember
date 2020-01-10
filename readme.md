@@ -27,9 +27,6 @@ npm ci && \
 npm run bootstrap
 ```
 
-Instead of `npm run bootstrap` you may also use `npm run bootstrap:hoist`. The hoist option deduplicates `node_modules` structure into one shared folder and per package differences. This makes the installation faster but the build is less reliable as it differs from CI. In case of broken symlinks you can run `lerna link` to restore them.
-
-
 ### Running and debugging individual tests in PhpStorm
 
 Currently it is not possible to use a remote Node.js interpreter for Mocha tests so you need a local node interpreter.

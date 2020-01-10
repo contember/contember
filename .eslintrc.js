@@ -7,15 +7,10 @@ module.exports =  {
 		'prettier/@typescript-eslint',
 		'plugin:prettier/recommended',
 	],
-	plugins: [
-		"react-hooks",
-	],
+	plugins: [],
 	parserOptions:  {
 		ecmaVersion:  2018,
 		sourceType:  'module',
-		ecmaFeatures:  {
-			jsx:  true,
-		},
 	},
 	rules: {
 		"@typescript-eslint/array-type": "off",
@@ -37,8 +32,6 @@ module.exports =  {
 		"@typescript-eslint/prefer-interface": "off",
 
 		"prefer-const": "off",
-		"react-hooks/rules-of-hooks": "error",
-		"react-hooks/exhaustive-deps": "error",
 	},
 	settings:  {
 		react:  {

@@ -27,7 +27,7 @@
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-koa": "^2.9.0",
 		"bcrypt": "^3.0.6",
-		"chalk": "^2.4.2",
+		"chalk": "^3.0.0",
 		"graphql": "^14.5.4",
 		"graphql-errors": "^2.1.0",
 		"graphql-extensions": "^0.5.7",
@@ -36,7 +36,7 @@
 		"koa-bodyparser": "^3.2.0",
 		"koa-compose": "^4.1.0",
 		"lru-cache": "^5.1.1",
-		"node-pg-migrate": "~3.22.1",
+		"node-pg-migrate": "^3.22.1",
 		"path-to-regexp": "^3.0.0",
 		"pg": "^7.12.1",
 		"uuid": "^3.3.3"
@@ -55,6 +55,6 @@
 		"@types/uuid": "^3.4.5",
 		"jasmine": "^3.5.0",
 		"supertest": "^4.0.2",
-		"typescript": "^3.7.2"
+		"typescript": "^3.7.4"
 	}
 }

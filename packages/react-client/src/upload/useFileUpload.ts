@@ -26,6 +26,8 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	const apiToken = useSessionToken()
 
 	const updateTimeoutRef = React.useRef<number | undefined>(undefined)
+	const isFirstRenderRef = React.useRef(true)
+
 	const [uploadRequests] = React.useState(() => new Map<FileId, XMLHttpRequest>())
 	const [multiTemporalState, dispatch] = React.useReducer(fileUploadReducer, undefined, initializeFileUploadState)
 
@@ -128,6 +130,9 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	)
 
 	React.useEffect(() => {
+		if (isFirstRenderRef.current) {
+			return
+		}
 		if (multiTemporalState.publicState !== multiTemporalState.liveState) {
 			const now = Date.now()
 			const timeDelta = now - multiTemporalState.lastUpdateTime
@@ -168,6 +173,11 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 		},
 		[multiTemporalState.liveState],
 	)
+
+	// For this to work, this effect must be the last one to run.
+	React.useEffect(() => {
+		isFirstRenderRef.current = false
+	}, [])
 
 	return [multiTemporalState.publicState, operations]
 }

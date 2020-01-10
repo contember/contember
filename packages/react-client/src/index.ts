@@ -4,6 +4,7 @@ export * from './config'
 export * from './content'
 export * from './project'
 export * from './tenant'
+export * from './upload'
 
 export * from './Client'
 export * from './ClientError'

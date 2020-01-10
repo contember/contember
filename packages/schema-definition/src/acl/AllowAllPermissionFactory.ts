@@ -30,7 +30,11 @@ export default class AllowAllPermissionFactory {
 					read: this.operations.includes(Acl.Operation.read) ? fieldPermissions : {},
 					update: this.operations.includes(Acl.Operation.update) ? fieldPermissions : {},
 					create: this.operations.includes(Acl.Operation.create) ? fieldPermissions : {},
-					delete: this.operations.includes(Acl.Operation.delete) ? true : undefined,
+					...(this.operations.includes(Acl.Operation.delete)
+						? {
+								delete: true,
+						  }
+						: {}),
 				},
 			}
 		}

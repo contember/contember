@@ -1,12 +1,12 @@
 {
 	"name": "@contember/database-tester",
-	"version": "0.3.7",
+	"version": "0.3.8",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"devDependencies": {
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
-		"@contember/database": "^0.3.7"
+		"@contember/database": "^0.3.8"
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-common",
-	"version": "0.3.7",
+	"version": "0.3.8",
 	"main": "dist/src/index.js",
 	"scripts": {},
 	"typings": "dist/src/index.d.ts",

@@ -39,6 +39,20 @@ namespace GenerateUploadUrlMutationBuilder {
 	export interface MutationParameters {
 		[alias: string]: FileParameters
 	}
+
+	export interface ResponseBody {
+		url: string
+		publicUrl: string
+		method: string
+		headers: Array<{
+			key: string
+			value: string
+		}>
+	}
+
+	export interface MutationResponse {
+		[alias: string]: ResponseBody
+	}
 }
 
 export { GenerateUploadUrlMutationBuilder }

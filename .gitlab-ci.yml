@@ -2,7 +2,8 @@ stages:
   - install
   - build
   - test
-  - publish
+  - publish:npm
+  - publish:docker
 variables:
   DOCKER_HOST: tcp://gitlab-prod-dind-svc:2375
 
@@ -56,9 +57,20 @@ eslint:
   script:
     - npm run eslint:lint
 
-build:docker:
+publish:npm:
+  image: node:12.13
+  stage: publish:npm
+  dependencies:
+    - build
+  only:
+    - tags
+  script:
+    - bash ./scripts/npm/setup.sh
+    - bash ./scripts/npm/publish.sh
+
+publish:docker:
   image: 831119889470.dkr.ecr.eu-central-1.amazonaws.com/mangoweb/docker-ecr:1.1
-  stage: publish
+  stage: publish:docker
   dependencies:
     - build
   only:
@@ -68,12 +80,3 @@ build:docker:
   script:
     - apk --no-cache add git
     - bash scripts/docker/build.sh
-
-publish:
-  image: node:12.13
-  stage: publish
-  only:
-    - tags
-  script:
-    - bash ./scripts/npm/setup.sh
-    - bash ./scripts/npm/publish.sh

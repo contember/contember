@@ -31,8 +31,29 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	const [uploadRequests] = React.useState(() => new Map<FileId, XMLHttpRequest>())
 	const [multiTemporalState, dispatch] = React.useReducer(fileUploadReducer, undefined, initializeFileUploadState)
 
+	const cancelUpload = React.useCallback<CancelUpload>(
+		fileIds => {
+			for (const fileId of fileIds) {
+				if (uploadRequests.has(fileId)) {
+					uploadRequests.get(fileId)!.abort()
+					uploadRequests.delete(fileId)
+				}
+			}
+			dispatch({
+				type: FileUploadActionType.Uninitialize,
+				fileIds,
+			})
+		},
+		[uploadRequests],
+	)
 	const startUpload = React.useCallback<StartUpload>(
 		async files => {
+			const existingIds: FileId[] = files.map(file => file.id).filter(id => id in multiTemporalState.liveState)
+
+			if (existingIds.length) {
+				cancelUpload(existingIds)
+			}
+
 			dispatch({
 				type: FileUploadActionType.Initialize,
 				filesWithMetadata: files.map(file => ({
@@ -103,22 +124,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				})
 			}
 		},
-		[apiToken, client, options, uploadRequests],
-	)
-	const cancelUpload = React.useCallback<CancelUpload>(
-		fileIds => {
-			for (const fileId of fileIds) {
-				if (uploadRequests.has(fileId)) {
-					uploadRequests.get(fileId)!.abort()
-					uploadRequests.delete(fileId)
-				}
-			}
-			dispatch({
-				type: FileUploadActionType.Uninitialize,
-				fileIds,
-			})
-		},
-		[uploadRequests],
+		[apiToken, cancelUpload, client, multiTemporalState.liveState, options, uploadRequests],
 	)
 
 	const operations = React.useMemo<FileUploadOperations>(

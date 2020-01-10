@@ -13,6 +13,7 @@ npx lerna bootstrap \
   --ignore @contember/react-client \
   --ignore @contember/react-multipass-rendering \
   --ignore @contember/ui \
+  --ignore @contember/template-* \
   --ci -- --no-optional --production
 
 

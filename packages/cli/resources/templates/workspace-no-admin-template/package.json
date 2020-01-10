@@ -2,7 +2,7 @@
 	"name": "@contember/template-workspace-no-admin",
 	"version": "0.3.6",
 	"scripts": {
-		"version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml",
+		"version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml && git add contember.workspace.yaml",
 		"cli": "contember",
 		"__build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
 	},

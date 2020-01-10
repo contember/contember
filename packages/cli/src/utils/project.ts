@@ -18,11 +18,12 @@ export const listProjects = async (args: { workspaceDirectory: string }) => {
 	return (await listDirectories(join(args.workspaceDirectory, 'projects'))).map(it => basename(it))
 }
 
-export const createProject = async (args: { workspaceDirectory: string; projectName: string }) => {
+export const createProject = async (args: { workspaceDirectory: string; projectName: string; template?: string }) => {
 	validateProjectName(args.projectName)
 	const projectDir = join(args.workspaceDirectory, 'projects', args.projectName)
 	const withAdmin = await hasInstanceAdmin(args)
-	const template = join(resourcesDir, 'templates', withAdmin ? 'template-project-with-admin' : 'template-project')
+	const template =
+		args.template || join(resourcesDir, 'templates', withAdmin ? 'template-project-with-admin' : 'template-project')
 	await installTemplate(template, projectDir, 'project', { projectName: args.projectName })
 }
 

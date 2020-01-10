@@ -9,11 +9,14 @@ import { resourcesDir } from '../pathUtils'
 export const createWorkspace = async ({
 	workspaceDirectory,
 	withAdmin,
+	template,
 }: {
 	withAdmin: boolean
 	workspaceDirectory: string
+	template: string
 }) => {
-	const template = join(resourcesDir, 'templates', withAdmin ? 'template-workspace-with-admin' : 'template-workspace')
+	template =
+		template || join(resourcesDir, 'templates', withAdmin ? 'template-workspace-with-admin' : 'template-workspace')
 	await installTemplate(template, workspaceDirectory, 'workspace')
 
 	const instance = await createInstance({ workspaceDirectory, instanceName: 'default' })

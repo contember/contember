@@ -1,12 +1,27 @@
-import { runCommand } from './commands'
+import getRegistryInfo from 'registry-info'
+import getPackageJson from 'get-package-json-from-registry'
+import npa from 'npm-package-arg'
+import downloadTarball from 'download-tarball'
+import { move, readdir, remove } from 'fs-extra'
+import { join } from 'path'
+import { tmpdir } from 'os'
 
-export const getTarball = async (packageRef: string): Promise<string> => {
-	const commandOut = await runCommand('npm', ['view', packageRef, 'dist.tarball'], { cwd: process.cwd() }).output
-	const tarBalls = commandOut.trim().split('\n')
-	if (tarBalls.length === 1) {
-		return tarBalls[0]
+export const downloadPackage = async (pkgName: string, dir: string): Promise<void> => {
+	const { scope } = npa(pkgName)
+	const { authorization } = getRegistryInfo(scope)
+	const headers = authorization ? { authorization } : {}
+
+	const pkg = await getPackageJson(pkgName)
+	const {
+		dist: { tarball },
+	} = pkg
+
+	const tmpDir = join(tmpdir(), 'contember-' + Math.random())
+	await downloadTarball({ url: tarball, gotOpts: { headers }, dir: tmpDir })
+	const dirContent = await readdir(tmpDir)
+	if (dirContent.length !== 1 || dirContent[0] !== 'package') {
+		throw new Error('Invalid NPM package')
 	}
-	const latest = tarBalls[tarBalls.length - 1]
-	const [, tarball] = latest.split(' ', 2)
-	return tarball.substring(1, tarball.length - 1)
+	await move(join(tmpDir, 'package'), dir)
+	await remove(tmpDir)
 }

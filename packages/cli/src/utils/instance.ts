@@ -1,11 +1,10 @@
 import { basename, join } from 'path'
-import { listDirectories, replaceFileContent, tryUnlink } from './fs'
-import { copy, pathExists } from 'fs-extra'
+import { listDirectories } from './fs'
+import { pathExists } from 'fs-extra'
 
 import { resourcesDir } from '../pathUtils'
 import {
 	execDockerCompose,
-	getConfiguredPorts,
 	getConfiguredPortsMap,
 	readDefaultDockerComposeConfig,
 	updateOverrideConfig,
@@ -43,10 +42,12 @@ export const getInstanceDir = (args: { workspaceDirectory: string; instanceName:
 export const createInstance = async (args: {
 	workspaceDirectory: string
 	instanceName: string
+	template?: string
 }): Promise<InstanceEnvironment> => {
 	validateInstanceName(args.instanceName)
 	const withAdmin = await hasInstanceAdmin(args)
-	const template = join(resourcesDir, 'templates', withAdmin ? 'template-instance-with-admin' : 'template-instance')
+	const template =
+		args.template || join(resourcesDir, 'templates', withAdmin ? 'template-instance-with-admin' : 'template-instance')
 	const instanceDir = getInstanceDir(args)
 	await installTemplate(template, instanceDir, 'instance')
 	return await resolveInstanceEnvironment({

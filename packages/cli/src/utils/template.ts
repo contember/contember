@@ -1,18 +1,8 @@
 import { join } from 'path'
 import { replaceFileContent, tryUnlink } from './fs'
-import { copy, pathExists, rename, rmdir } from 'fs-extra'
-import { getTarball } from './npm'
-import * as http from 'http'
-import { createGunzip } from 'zlib'
-import { extract } from 'tar-fs'
-import { Stream } from 'stream'
+import { copy, pathExists, remove, rename } from 'fs-extra'
 import { readYaml } from './yaml'
-
-const streamToPromise = async (stream: Stream): Promise<void> => {
-	return await new Promise((resolve, reject) => {
-		stream.on('end', resolve).on('error', reject)
-	})
-}
+import { downloadPackage } from './npm'
 
 export const installTemplate = async (
 	template: string,
@@ -32,16 +22,11 @@ export const installTemplate = async (
 			},
 		})
 	} else {
-		const tarBall = await getTarball(template)
-		const untarStream = http
-			.get(tarBall)
-			.pipe(createGunzip())
-			.pipe(extract(targetDir))
-		await streamToPromise(untarStream)
+		await downloadPackage(template, targetDir)
 	}
 	const templateConfigFile = join(targetDir, 'contember.template.yaml')
 	if (!(await pathExists(templateConfigFile))) {
-		await rmdir(targetDir)
+		await remove(targetDir)
 		throw new Error(`${template} is not a Contember template`)
 	}
 	const config = (await readYaml(templateConfigFile)) as {
@@ -52,7 +37,7 @@ export const installTemplate = async (
 		replaceVariables?: string[]
 	}
 	if (!config.type || config.type !== requiredTemplateType) {
-		await rmdir(targetDir)
+		await remove(targetDir)
 		throw new Error(`${template} is not a ${requiredTemplateType} template`)
 	}
 	await tryUnlink(templateConfigFile)

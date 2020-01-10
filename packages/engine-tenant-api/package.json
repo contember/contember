@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-tenant-api",
-	"version": "0.3.8",
+	"version": "0.3.9",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
@@ -8,18 +8,18 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/authorization": "^0.3.8",
-		"@contember/database": "^0.3.8",
-		"@contember/dic": "^0.3.8",
-		"@contember/engine-common": "^0.3.8",
-		"@contember/queryable": "^0.3.8",
+		"@contember/authorization": "^0.3.9",
+		"@contember/database": "^0.3.9",
+		"@contember/dic": "^0.3.9",
+		"@contember/engine-common": "^0.3.9",
+		"@contember/queryable": "^0.3.9",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-errors": "^2.3.1",
 		"graphql": "^14.5.4",
 		"graphql-tools": "^4.0.5"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.3.8",
+		"@contember/database-tester": "^0.3.9",
 		"@graphql-codegen/cli": "^1.5.0",
 		"@graphql-codegen/typescript": "^1.5.0",
 		"@graphql-codegen/typescript-operations": "^1.5.0",

@@ -1,6 +1,6 @@
 {
   "name": "@contember/react-multipass-rendering",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "main": "index.js",
   "module": "dist/src/index.js",
   "type": "module",

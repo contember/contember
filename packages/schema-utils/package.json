@@ -1,11 +1,11 @@
 {
 	"name": "@contember/schema-utils",
-	"version": "0.3.8",
+	"version": "0.3.9",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
 	"dependencies": {
-		"@contember/schema": "^0.3.8"
+		"@contember/schema": "^0.3.9"
 	},
 	"devDependencies": {
 		"@types/node": "^12.11.7",

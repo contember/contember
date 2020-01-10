@@ -1,15 +1,15 @@
 {
 	"name": "@contember/template-project",
-	"version": "0.3.9",
+	"version": "0.3.10",
 	"devDependencies": {
 		"@types/react": "^16.9.17",
 		"@types/react-dom": "^16.9.4",
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
-		"@contember/admin": "^0.3.9",
-		"@contember/schema": "^0.3.9",
-		"@contember/schema-definition": "^0.3.9",
+		"@contember/admin": "^0.3.10",
+		"@contember/schema": "^0.3.10",
+		"@contember/schema-definition": "^0.3.10",
 		"react": "^16.12.0",
 		"react-dom": "^16.12.0"
 	}

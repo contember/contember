@@ -1,6 +1,6 @@
 {
 	"name": "@contember/template-workspace-no-admin",
-	"version": "0.3.9",
+	"version": "0.3.10",
 	"scripts": {
 		"version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml && git add contember.workspace.yaml",
 		"cli": "contember",
@@ -10,7 +10,7 @@
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.3.9",
-		"@contember/schema-definition": "^0.3.9"
+		"@contember/schema": "^0.3.10",
+		"@contember/schema-definition": "^0.3.10"
 	}
 }

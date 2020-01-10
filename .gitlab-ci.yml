@@ -2,8 +2,7 @@ stages:
   - install
   - build
   - test
-  - publish:npm
-  - publish:docker
+  - publish
 variables:
   DOCKER_HOST: tcp://gitlab-prod-dind-svc:2375
 
@@ -59,7 +58,7 @@ eslint:
 
 publish:npm:
   image: node:12.13
-  stage: publish:npm
+  stage: publish
   dependencies:
     - build
   only:
@@ -70,7 +69,7 @@ publish:npm:
 
 publish:docker:
   image: 831119889470.dkr.ecr.eu-central-1.amazonaws.com/mangoweb/docker-ecr:1.1
-  stage: publish:docker
+  stage: publish
   dependencies:
     - build
   only:

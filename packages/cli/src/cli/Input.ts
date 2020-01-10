@@ -1,5 +1,5 @@
-export type Arguments = { [name: string]: string | string[] | undefined }
-export type Options = { [name: string]: string | boolean | string[] | undefined }
+export type Arguments = Record<string, string | string[] | undefined>
+export type Options = Record<string, string | boolean | string[] | undefined>
 
 export class Input<Args extends Arguments = Arguments, Opts extends Options = Options> {
 	constructor(private readonly args: Args, private readonly options: Opts, public readonly rest: string[]) {}

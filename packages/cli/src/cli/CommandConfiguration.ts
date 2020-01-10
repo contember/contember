@@ -2,8 +2,9 @@ import Argument from './Argument'
 import Option from './Option'
 import InputParser from './InputParser'
 import UsageFormatter, { UsageFormat } from './UsageFormatter'
+import { Arguments, Options } from './Input'
 
-class CommandConfiguration {
+class CommandConfiguration<Args extends Arguments, TOptions extends Options> {
 	private descriptionValue: string = ''
 
 	private arguments: Argument[] = []
@@ -13,13 +14,13 @@ class CommandConfiguration {
 		this.descriptionValue = description
 	}
 
-	public argument(name: string): Argument.Configuration {
+	public argument(name: Extract<keyof Args, string>): Argument.Configuration {
 		const options = { name, optional: false, variadic: false }
 		this.arguments.push(options)
 		return new Argument.Configuration(options)
 	}
 
-	public option(name: string): Option.Configuration {
+	public option(name: Extract<keyof TOptions, string>): Option.Configuration {
 		const option: Option = { name, required: false, mode: Option.Mode.VALUE_NONE }
 		this.options.push(option)
 		return new Option.Configuration(option)

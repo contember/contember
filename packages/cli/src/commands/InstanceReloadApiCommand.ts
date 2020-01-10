@@ -11,7 +11,7 @@ type Args = {
 type Options = {}
 
 export class InstanceReloadApiCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Reloads Contember API')
 		configuration.argument('instanceName').optional()
 	}

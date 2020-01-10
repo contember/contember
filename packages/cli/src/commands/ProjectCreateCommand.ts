@@ -15,7 +15,7 @@ type Options = {
 }
 
 export class ProjectCreateCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates a new Contember project')
 		configuration.argument('projectName')
 		configuration.option('instance').valueArray()

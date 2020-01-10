@@ -10,7 +10,7 @@ type Args = {
 type Options = {}
 
 export class InstanceCreateCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates a new Contember instance')
 		configuration.argument('instanceName')
 	}

@@ -15,7 +15,7 @@ type Options = {
 }
 
 export class ProjectRegisterCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Registers a project to an instance')
 		configuration.argument('projectName')
 		configuration.option('instance').valueArray()

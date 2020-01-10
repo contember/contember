@@ -12,15 +12,17 @@ type Options = {
 	['all-instances']: boolean
 	['instance']: string[]
 	['no-instance']: boolean
+	template: string
 }
 
 export class ProjectCreateCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates a new Contember project')
 		configuration.argument('projectName')
 		configuration.option('instance').valueArray()
 		configuration.option('all-instances').valueNone()
 		configuration.option('no-instance').valueNone()
+		configuration.option('template').valueRequired()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
@@ -30,7 +32,8 @@ export class ProjectCreateCommand extends Command<Args, Options> {
 
 		const instances = await resolveInstanceListEnvironmentFromInput({ input, workspaceDirectory })
 
-		await createProject({ workspaceDirectory, projectName })
+		const template = input.getOption('template')
+		await createProject({ workspaceDirectory, projectName, template })
 		for (const instance of instances) {
 			await registerProjectToInstance({ projectName, ...instance })
 		}

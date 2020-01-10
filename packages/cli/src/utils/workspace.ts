@@ -1,26 +1,23 @@
-import { copy, pathExists } from 'fs-extra'
+import { pathExists } from 'fs-extra'
 import { join } from 'path'
-import { resourcesDir } from '../pathUtils'
 import { createInstance } from './instance'
 import { createProject, registerProjectToInstance } from './project'
 import { readYaml } from './yaml'
-import { replaceFileContent, tryUnlink } from './fs'
+import { installTemplate } from './template'
+import { resourcesDir } from '../pathUtils'
 
 export const createWorkspace = async ({
 	workspaceDirectory,
 	withAdmin,
+	template,
 }: {
 	withAdmin: boolean
 	workspaceDirectory: string
+	template: string
 }) => {
-	const template = withAdmin ? 'workspace-template' : 'workspace-no-admin-template'
-	await copy(join(resourcesDir, 'templates', template), workspaceDirectory)
-	await tryUnlink(join(workspaceDirectory, 'package-lock.json'))
-	await replaceFileContent(join(workspaceDirectory, 'package.json'), content => {
-		const { name, version, ...json } = JSON.parse(content)
-		const { __build, version: __null, ...scripts } = json.scripts
-		return JSON.stringify({ scripts: { ...scripts, build: __build }, ...json }, null, '  ')
-	})
+	template =
+		template || join(resourcesDir, 'templates', withAdmin ? 'template-workspace-with-admin' : 'template-workspace')
+	await installTemplate(template, workspaceDirectory, 'workspace')
 
 	const instance = await createInstance({ workspaceDirectory, instanceName: 'default' })
 	await createProject({ workspaceDirectory, projectName: 'sandbox' })

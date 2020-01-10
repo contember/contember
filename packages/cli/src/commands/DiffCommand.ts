@@ -18,7 +18,7 @@ type Options = {
 }
 
 export class DiffCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates .json schema migration for given project')
 		configuration.argument('projectName')
 		configuration.argument('migrationName')

@@ -2,11 +2,11 @@ import CommandConfiguration from './CommandConfiguration'
 import { Arguments, Input, Options } from './Input'
 
 abstract class Command<Args extends Arguments, TOptions extends Options> {
-	private configuration: CommandConfiguration | undefined
+	private configuration: CommandConfiguration<Args, TOptions> | undefined
 
-	protected abstract configure(configuration: CommandConfiguration): void
+	protected abstract configure(configuration: CommandConfiguration<Args, TOptions>): void
 
-	public getConfiguration(): CommandConfiguration {
+	public getConfiguration(): CommandConfiguration<Args, TOptions> {
 		if (this.configuration === undefined) {
 			const configuration = new CommandConfiguration()
 			this.configure(configuration)

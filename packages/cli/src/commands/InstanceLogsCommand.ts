@@ -2,9 +2,7 @@ import Command from '../cli/Command'
 import CommandConfiguration from '../cli/CommandConfiguration'
 import { Input } from '../cli/Input'
 import { resolveInstanceDockerConfig, resolveInstanceEnvironmentFromInput } from '../utils/instance'
-import { DockerCompose, runDockerCompose } from '../utils/dockerCompose'
-import { dump } from 'js-yaml'
-import { ChildProcess } from 'child_process'
+import { DockerCompose } from '../utils/dockerCompose'
 
 type Args = {
 	instanceName: string
@@ -13,7 +11,7 @@ type Args = {
 type Options = {}
 
 export class InstanceLogsCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Show Contember instance logs')
 		configuration.argument('instanceName').optional()
 	}

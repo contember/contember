@@ -1,5 +1,5 @@
 {
-	"name": "@contember/template-project-no-admin",
+	"name": "@contember/template-project",
 	"version": "0.3.10",
 	"devDependencies": {
 		"typescript": "^3.7.2"

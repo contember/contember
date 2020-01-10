@@ -26,7 +26,7 @@ type Options = {
 }
 
 export class InstanceStartCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Starts Contember instance')
 		configuration.argument('instanceName').optional()
 		configuration.option('host').valueRequired()

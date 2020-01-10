@@ -2,11 +2,12 @@ import { copy, pathExists } from 'fs-extra'
 import { basename, join } from 'path'
 import { resourcesDir } from '../pathUtils'
 import { promises as fs } from 'fs'
-import { listDirectories, replaceFileContent, tryUnlink } from './fs'
+import { listDirectories, replaceFileContent } from './fs'
 import { InstanceEnvironment, validateInstanceName } from './instance'
 import { updateYaml } from './yaml'
 import { projectNameToEnvName } from '@contember/engine-common'
 import { hasInstanceAdmin } from './workspace'
+import { installTemplate } from './template'
 
 export const validateProjectName = (name: string) => {
 	if (!name.match(/^[a-z][-a-z0-9]*$/)) {
@@ -17,23 +18,13 @@ export const listProjects = async (args: { workspaceDirectory: string }) => {
 	return (await listDirectories(join(args.workspaceDirectory, 'projects'))).map(it => basename(it))
 }
 
-export const createProject = async (args: { workspaceDirectory: string; projectName: string }) => {
+export const createProject = async (args: { workspaceDirectory: string; projectName: string; template?: string }) => {
 	validateProjectName(args.projectName)
 	const projectDir = join(args.workspaceDirectory, 'projects', args.projectName)
 	const withAdmin = await hasInstanceAdmin(args)
-	const template = withAdmin ? 'project-template' : 'project-no-admin-template'
-	await copy(join(resourcesDir, 'templates', template), projectDir)
-	await tryUnlink(join(projectDir, 'package.json'))
-	await tryUnlink(join(projectDir, 'tsconfig.json'))
-	await tryUnlink(join(projectDir, 'package-lock.json'))
-	if (!withAdmin) {
-		return
-	}
-	const filesToReplace = ['admin/index.ts']
-	for (const file of filesToReplace) {
-		const path = join(projectDir, file)
-		await replaceFileContent(path, content => content.replace('{projectName}', args.projectName))
-	}
+	const template =
+		args.template || join(resourcesDir, 'templates', withAdmin ? 'template-project-with-admin' : 'template-project')
+	await installTemplate(template, projectDir, 'project', { projectName: args.projectName })
 }
 
 export const registerProjectToInstance = async (

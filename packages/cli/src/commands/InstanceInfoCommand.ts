@@ -10,7 +10,7 @@ type Args = {
 type Options = {}
 
 export class InstanceInfoCommand extends Command<Args, Options> {
-	protected configure(configuration: CommandConfiguration): void {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Show status of local Contember instance')
 		configuration.argument('instanceName').optional()
 	}

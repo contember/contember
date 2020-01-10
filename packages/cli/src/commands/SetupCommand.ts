@@ -7,13 +7,15 @@ type Args = {
 	apiUrl: string
 }
 
-class SetupCommand extends Command<Args, {}> {
-	protected configure(configuration: CommandConfiguration): void {
+type Options = {}
+
+class SetupCommand extends Command<Args, Options> {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates superadmin and login key')
 		configuration.argument('apiUrl').description('Contember API URL')
 	}
 
-	protected async execute(input: Input<Args, {}>): Promise<void> {
+	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const apiUrl = input.getArgument('apiUrl')
 
 		const { loginToken } = await interactiveSetup(apiUrl)

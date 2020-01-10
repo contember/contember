@@ -8,6 +8,7 @@
 	"devDependencies": {
 		"@types/fs-extra": "^8.0.1",
 		"@types/js-yaml": "^3.12.1",
+		"@types/npm-package-arg": "^6.1.0",
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
@@ -19,11 +20,15 @@
 		"@contember/schema-migrations": "^0.3.10",
 		"@contember/schema-utils": "^0.3.10",
 		"chalk": "^3.0.0",
+		"download-tarball": "^2.0.0",
 		"fs-extra": "^8.1.0",
+		"get-package-json-from-registry": "^2.2.2",
 		"get-port": "^5.0.0",
 		"graphql-request": "^1.8.2",
 		"js-yaml": "^3.13.1",
+		"npm-package-arg": "^8.0.0",
 		"prompts": "^2.2.1",
+		"registry-info": "^1.0.0",
 		"ts-node": "^8.4.1",
 		"typescript": "^3.7.2",
 		"yawn-yaml": "^1.4.0"

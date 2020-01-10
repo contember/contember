@@ -9,14 +9,16 @@ type Args = {
 	migration?: string
 }
 
-class DryRunCommand extends Command<Args, {}> {
-	protected configure(configuration: CommandConfiguration): void {
+type Options = {}
+
+class DryRunCommand extends Command<Args, Options> {
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Show SQL executed by a migration')
 		configuration.argument('project')
 		configuration.argument('migration').optional()
 	}
 
-	protected async execute(input: Input<Args, {}>): Promise<void> {
+	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const projectName = input.getArgument('project')
 
 		const { migrationsDir } = getProjectDirectories(projectName)

@@ -10,6 +10,7 @@ import { propTypesExportedMembers } from '../../build/exportedMembers/prop-types
 import { reactExportedMembers } from '../../build/exportedMembers/react'
 import { reactDomExportedMembers } from '../../build/exportedMembers/react-dom'
 import { reactDomServerExportedMembers } from '../../build/exportedMembers/react-dom-server'
+import { reactDropzoneExportedMembers } from '../../build/exportedMembers/react-dropzone'
 import { reactIsExportedMembers } from '../../build/exportedMembers/react-is'
 import { reactPopperExportedMembers } from '../../build/exportedMembers/react-popper'
 import { regexpToAstExportedMembers } from '../../build/exportedMembers/regexp-to-ast'
@@ -26,6 +27,7 @@ const commonJsConfig = {
 		['react-is']: reactIsExportedMembers,
 		['react-dom']: reactDomExportedMembers,
 		['react-dom/server']: reactDomServerExportedMembers,
+		['react-dropzone']: reactDropzoneExportedMembers,
 		['prop-types']: propTypesExportedMembers,
 		['../ui/node_modules/react-popper']: reactPopperExportedMembers,
 		['../ui/node_modules/prop-types']: propTypesExportedMembers,

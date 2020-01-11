@@ -1,9 +1,8 @@
+import { FileUploadReadyState, FileUploadState, useFileUpload } from '@contember/react-client'
 import { Box, Button, FormGroup } from '@contember/ui'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
-import Dropzone from 'react-dropzone'
-import { useDispatch, useSelector } from 'react-redux'
-import { uploadFile } from '../../../actions/upload'
+import { useDropzone } from 'react-dropzone'
 import {
 	Component,
 	Field,
@@ -12,13 +11,11 @@ import {
 	useMutationState,
 	useRelativeSingleField,
 } from '@contember/binding'
-import State from '../../../state'
-import UploadState, { AnyUpload, UploadStatus } from '../../../state/upload'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export interface UploadFieldMetadata {
 	accessor: FieldAccessor<string>
-	upload?: AnyUpload
+	uploadState: FileUploadState | undefined
 	emptyText?: React.ReactNode
 }
 
@@ -30,32 +27,36 @@ export type UploadFieldProps = SimpleRelativeSingleFieldProps & {
 
 export const UploadField = Component<UploadFieldProps>(
 	props => {
-		const [uploadId, setUploadId] = React.useState<undefined | string>(undefined)
-		const uploads = useSelector<State, UploadState['uploads']>(state => state.upload.uploads)
-		const dispatch = useDispatch()
+		const [uploadState, { startUpload }] = useFileUpload()
 		const environment = useEnvironment()
 		const isMutating = useMutationState()
-		const upload = uploadId ? uploads[uploadId] : undefined
-
 		const accessor = useRelativeSingleField<string>(props)
 
-		const handleStartUpload = React.useCallback(
+		const onDrop = React.useCallback(
 			async (files: File[]) => {
-				const uploadId = Math.random()
-					.toString(36)
-					.substring(2, 15)
-				setUploadId(uploadId)
-				dispatch(uploadFile(uploadId, files[0]))
+				startUpload([
+					{
+						id: 0,
+						file: files[0],
+					},
+				])
 			},
-			[dispatch],
+			[startUpload],
 		)
+		const { getRootProps, getInputProps, isDragActive } = useDropzone({
+			onDrop,
+			disabled: isMutating,
+			accept: props.accept,
+			multiple: false,
+			noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
+		})
 		const metadata: UploadFieldMetadata = React.useMemo(
 			() => ({
 				emptyText: props.emptyText,
-				upload,
+				uploadState: uploadState[0],
 				accessor,
 			}),
-			[accessor, props.emptyText, upload],
+			[accessor, props.emptyText, uploadState],
 		)
 
 		return (
@@ -66,11 +67,16 @@ export const UploadField = Component<UploadFieldProps>(
 				description={props.description}
 				errors={accessor.errors}
 			>
-				<Dropzone disabled={isMutating} onDrop={handleStartUpload} accept={props.accept} multiple={false} style={{}}>
+				<div
+					{...getRootProps({
+						style: {},
+					})}
+				>
+					<input {...getInputProps()} />
 					<Inner metadata={metadata} {...props}>
 						{props.children}
 					</Inner>
-				</Dropzone>
+				</div>
 			</FormGroup>
 		)
 	},
@@ -85,23 +91,28 @@ type InnerProps = SimpleRelativeSingleFieldProps & {
 }
 
 const Inner = React.memo((props: InnerProps) => {
-	const { upload, accessor, emptyText } = props.metadata
+	const { uploadState, accessor, emptyText } = props.metadata
 	React.useEffect(() => {
-		if (upload && upload.status === UploadStatus.FINISHED && upload.resultUrl !== accessor.currentValue) {
-			accessor.updateValue?.(upload.resultUrl)
+		if (
+			uploadState &&
+			uploadState.readyState === FileUploadReadyState.Success &&
+			uploadState.fileUrl !== accessor.currentValue
+		) {
+			accessor.updateValue?.(uploadState.fileUrl)
 		}
-	}, [upload, accessor])
+	}, [uploadState, accessor])
+
 	const renderPreview = () => {
-		if (upload && upload.status !== UploadStatus.FINISHED && upload.objectURL) {
-			return props.children(upload.objectURL)
+		if (uploadState && uploadState.readyState !== FileUploadReadyState.Uninitialized && uploadState.previewUrl) {
+			return props.children(uploadState.previewUrl)
 		}
 		if (accessor.currentValue) {
 			return props.children(accessor.currentValue)
 		}
 		return <span className="fileInput-empty">{emptyText}</span>
 	}
-	const renderUploadStatusMessage = (upload?: AnyUpload) => {
-		if (!upload) {
+	const renderUploadStatusMessage = (uploadState?: FileUploadState) => {
+		if (!uploadState || uploadState.readyState === FileUploadReadyState.Uninitialized) {
 			return (
 				<>
 					<Button size="small">Select a file to upload</Button>
@@ -109,24 +120,24 @@ const Inner = React.memo((props: InnerProps) => {
 				</>
 			)
 		}
-		switch (upload.status) {
-			case UploadStatus.PREPARING:
-				return `Starting upload of ${upload.name}`
-			case UploadStatus.UPLOADING:
-				return `Upload of ${upload.name}: ${upload.progress && upload.progress.toFixed()}%`
-			case UploadStatus.FAILED:
-				return `Upload failed: ${upload.reason}`
-			case UploadStatus.FINISHED:
+		switch (uploadState.readyState) {
+			case FileUploadReadyState.Initializing:
+				return `Starting upload`
+			case FileUploadReadyState.Uploading:
+				return `Upload progress: ${(uploadState.progress * 100).toFixed()}%`
+			case FileUploadReadyState.Error:
+				return `Upload failed`
+			case FileUploadReadyState.Success:
 				return `Upload has finished successfully`
 			default:
-				assertNever(upload)
+				assertNever(uploadState)
 		}
 	}
 	return (
 		<Box distinction="seamlessIfNested">
 			<span className="fileInput">
 				<span className="fileInput-preview">{renderPreview()}</span>
-				<span className="fileInput-message">{renderUploadStatusMessage(props.metadata.upload)}</span>
+				<span className="fileInput-message">{renderUploadStatusMessage(props.metadata.uploadState)}</span>
 			</span>
 		</Box>
 	)

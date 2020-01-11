@@ -1,6 +1,4 @@
 export * from './eventSourceReader'
-export * from './fileReader'
-export * from './httpFetch'
 export * from './isScalar'
 export * from './isUrlActive'
 export * from './stringifyDimensions'

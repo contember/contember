@@ -73,7 +73,11 @@ export class QueryCompiler {
 		if (typeof args === 'object') {
 			let result = ''
 			for (let key in args) {
-				result += `${key}: ${this.formatArgs(args[key], level + 1)}, `
+				const argValue = args[key]
+				if (argValue === undefined) {
+					continue
+				}
+				result += `${key}: ${this.formatArgs(argValue, level + 1)}, `
 			}
 			if (result.length > 0) {
 				result = result.substring(0, result.length - 2)

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-lernaupdate --non-interactive --dependency "@contember/cli@latest"
-lernaupdate --non-interactive --dependency "@contember/schema-definition@latest"
-lernaupdate --non-interactive --dependency "@contember/schema@latest"
+npx lernaupdate --non-interactive --dependency "@contember/cli@latest"
+npx lernaupdate --non-interactive --dependency "@contember/schema-definition@latest"
+npx lernaupdate --non-interactive --dependency "@contember/schema@latest"

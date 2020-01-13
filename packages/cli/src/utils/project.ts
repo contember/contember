@@ -23,7 +23,8 @@ export const createProject = async (args: { workspaceDirectory: string; projectN
 	const projectDir = join(args.workspaceDirectory, 'projects', args.projectName)
 	const withAdmin = await hasInstanceAdmin(args)
 	const template =
-		args.template || join(resourcesDir, 'templates', withAdmin ? 'template-project-with-admin' : 'template-project')
+		args.template ||
+		(withAdmin ? '@contember/template-project-with-admin' : join(resourcesDir, 'templates/template-project'))
 	await installTemplate(template, projectDir, 'project', { projectName: args.projectName })
 }
 

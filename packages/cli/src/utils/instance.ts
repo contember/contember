@@ -47,7 +47,8 @@ export const createInstance = async (args: {
 	validateInstanceName(args.instanceName)
 	const withAdmin = await hasInstanceAdmin(args)
 	const template =
-		args.template || join(resourcesDir, 'templates', withAdmin ? 'template-instance-with-admin' : 'template-instance')
+		args.template ||
+		(withAdmin ? '@contember/template-instance-with-admin' : join(resourcesDir, 'templates/template-instance'))
 	const instanceDir = getInstanceDir(args)
 	await installTemplate(template, instanceDir, 'instance')
 	return await resolveInstanceEnvironment({

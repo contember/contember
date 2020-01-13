@@ -16,7 +16,8 @@ export const createWorkspace = async ({
 	template: string
 }) => {
 	template =
-		template || join(resourcesDir, 'templates', withAdmin ? 'template-workspace-with-admin' : 'template-workspace')
+		template ||
+		(withAdmin ? '@contember/template-workspace-with-admin' : join(resourcesDir, 'templates/template-workspace'))
 	await installTemplate(template, workspaceDirectory, 'workspace')
 
 	const instance = await createInstance({ workspaceDirectory, instanceName: 'default' })

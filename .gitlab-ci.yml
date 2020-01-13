@@ -10,15 +10,14 @@ install:
   stage: install
   image: node:12.13
   script:
+    - bash ./scripts/npm/setup.sh
     - npm ci
     - npm run bootstrap
     - rm -rf packages/*/node_modules/typescript packages/*/node_modules/.bin/{tsc,tsserver}
-    - rm -rf packages/cli/resources/templates/*/node_modules/typescript packages/cli/resources/templates/*/node_modules/.bin/{tsc,tsserver}
   artifacts:
     paths:
       - "node_modules"
       - "packages/*/node_modules"
-      - "packages/cli/resources/templates/*/node_modules"
 
 build:
   stage: build
@@ -34,18 +33,6 @@ build:
 test:
   stage: test
   image: node:12.13
-  services:
-    - postgres:10
-  variables:
-    TEST_DB_HOST: 127.0.0.1
-    TEST_DB_PASSWORD: "123"
-    TEST_DB_USER: cms_test
-    TEST_DB_NAME: cms_test
-    TEST_DB_NAME_TENANT: cms_test_tenant
-    TEST_DB_PORT: 5432
-    POSTGRES_USER: cms_test
-    POSTGRES_DB: cms_test
-    POSTGRES_PASSWORD: "123"
 
   script:
     - npm run test

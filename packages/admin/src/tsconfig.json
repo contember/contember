@@ -18,9 +18,6 @@
 			"path": "../../../packages/react-client/src"
 		},
 		{
-			"path": "../../../packages/schema/src"
-		},
-		{
 			"path": "../../../packages/utils/src"
 		},
 		{

@@ -16,15 +16,3 @@ services:
         expose:
           - 9001
         command: npm run storybook
-
-    db:
-        image: postgres:10-alpine
-        restart: unless-stopped
-        environment:
-            POSTGRES_PASSWORD: contember
-            POSTGRES_USER: contember
-            POSTGRES_DB: contember
-        volumes:
-            - pgsql-data:/var/lib/postgresql/data
-volumes:
-    pgsql-data: ~

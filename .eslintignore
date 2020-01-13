@@ -2,4 +2,3 @@
 /node_modules
 /packages/*/dist
 /packages/*/node_modules
-/packages/cli/resources/templates/*/node_modules

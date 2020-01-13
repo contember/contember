@@ -12,7 +12,7 @@
 		"@contember/client": "^0.3.11",
 		"@contember/react-client": "^0.3.11",
 		"@contember/react-multipass-rendering": "^0.3.11",
-		"@contember/schema": "^0.3.11",
+		"@contember/schema": "^0.4.0",
 		"chevrotain": "^6.5.0"
 	},
 	"peerDependencies": {

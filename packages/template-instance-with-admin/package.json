@@ -3,8 +3,8 @@
 	"version": "0.3.10",
 	"dependencies": {
 		"@contember/admin": "^0.3.10",
-		"@contember/schema": "^0.3.10",
-		"@contember/schema-definition": "^0.3.10",
+		"@contember/schema": "^0.4.0",
+		"@contember/schema-definition": "^0.4.0",
 		"react": "^16.12.0",
 		"react-dom": "^16.12.0"
 	}

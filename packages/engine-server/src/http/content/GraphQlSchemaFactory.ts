@@ -45,7 +45,7 @@ class GraphQlSchemaFactory {
 		const contentSchemaFactory = new ContentSchemaFactory(schema)
 		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
 		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())
-		const s3schema = this.s3SchemaFactory ? this.s3SchemaFactory.create() : null
+		const s3schema = this.s3SchemaFactory ? this.s3SchemaFactory.create({ schema, identity }) : null
 		const graphQlSchema = mergeSchemas({ schemas: [dataSchema, contentSchema, ...(s3schema ? [s3schema] : [])] })
 		schemaCacheEntry.entries.push({ graphQlSchema, verifier, permissions })
 

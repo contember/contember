@@ -39,7 +39,7 @@ export class DiffCommand extends Command<Args, Options> {
 		const [validSchema, errors] = validator.validate(schema)
 
 		if (errors.length === 0 && !isDeepStrictEqual(validSchema, schema)) {
-			throw new Error('Something is wrong with a schema validator')
+			throw new Error('There is something wrong with a schema validator')
 		}
 		if (errors.length > 0) {
 			console.error('Schema is invalid:')

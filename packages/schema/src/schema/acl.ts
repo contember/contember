@@ -61,12 +61,12 @@ namespace Acl {
 	export type AnyStage = '*'
 	export type StagesDefinition = AnyStage | string[]
 
-	export interface RolePermissions {
+	export type RolePermissions = {
 		inherits?: string[]
 		variables: Acl.Variables
 		stages: StagesDefinition
 		entities: Permissions
-	}
+	} & Record<string, unknown>
 
 	export interface Permissions {
 		[entity: string]: EntityPermissions

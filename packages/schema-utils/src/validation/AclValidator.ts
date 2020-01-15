@@ -53,25 +53,31 @@ export class AclValidator {
 			errorBuilder.add('Must be an object')
 			return
 		}
-		const extra = checkExtraProperties(permissions, ['inherits', 'variables', 'stages', 'entities'])
-		if (extra.length) {
-			errorBuilder.add('Unsupported properties found: ' + extra.join(', '))
-		}
 
-		const inherits = this.validateInherits(permissions.inherits, roles, errorBuilder.for('inherits'))
-		const variables = this.validateVariables(permissions.variables, errorBuilder.for('variables'))
-		const stages = this.validateStagesDefinition(permissions.stages, errorBuilder.for('stages'))
+		const {
+			inherits: inheritsIn,
+			variables: variablesIn,
+			stages: stagesIn,
+			entities: entitiesIn,
+			...plugins
+		} = permissions
+
+		const inherits = this.validateInherits(inheritsIn, roles, errorBuilder.for('inherits'))
+		const variables = this.validateVariables(variablesIn, errorBuilder.for('variables'))
+		const stages = this.validateStagesDefinition(stagesIn, errorBuilder.for('stages'))
 		const entities = this.validatePermissions(
-			permissions.entities,
+			entitiesIn,
 			permissions.variables as Acl.Variables,
 			errorBuilder.for('entities'),
 		)
+		// todo: plugins validation
 
 		const result: Acl.RolePermissions = { variables, stages, entities }
 		if (inherits !== undefined) {
 			result.inherits = inherits
 		}
-		return result
+
+		return { ...plugins, ...result }
 	}
 
 	private validateInherits(

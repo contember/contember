@@ -2,6 +2,8 @@ import { S3 as AwsS3 } from 'aws-sdk'
 import uuid from 'uuid'
 import { extension } from 'mime-types'
 import { S3Config } from './Config'
+import { ObjectKeyVerifier } from './ObjectKeyVerifier'
+import { ForbiddenError } from 'apollo-server-errors'
 
 export enum S3Acl {
 	None = 'none',
@@ -43,10 +45,18 @@ export class S3Service {
 		this.endpoint = this.s3.config.endpoint!
 	}
 
-	public getSignedUploadUrl(contentType: string, acl?: S3Acl, expiration?: number, prefix?: string): SignedUploadUrl {
+	public getSignedUploadUrl(
+		contentType: string,
+		verifyKey: ObjectKeyVerifier,
+		acl?: S3Acl,
+		expiration?: number,
+		prefix?: string,
+	): SignedUploadUrl {
 		const ext = extension(contentType) || 'bin'
-		const objectKey =
-			(this.config.prefix ? this.config.prefix + '/' : '') + (prefix ? prefix + '/' : '') + `${uuid.v4()}.${ext}`
+		const localObjectKey = (prefix ? prefix + '/' : '') + `${uuid.v4()}.${ext}`
+		verifyKey(localObjectKey)
+		const objectKey = (this.config.prefix ? this.config.prefix + '/' : '') + localObjectKey
+
 		const bucket = this.config.bucket
 		if (acl && this.config.noAcl) {
 			throw new Error('ACL is not supported')
@@ -82,13 +92,20 @@ export class S3Service {
 		}
 	}
 
-	public getSignedReadUrl(objectKey: string, expiration?: number): SignedReadUrl {
+	public getSignedReadUrl(objectKey: string, verifyKey: ObjectKeyVerifier, expiration?: number): SignedReadUrl {
 		const bucket = this.config.bucket
 
 		const publicPrefix = this.formatPublicUrl('')
 		if (objectKey.startsWith(publicPrefix)) {
 			objectKey = objectKey.substr(publicPrefix.length)
 		}
+		if (this.config.prefix && !objectKey.startsWith(this.config.prefix)) {
+			throw new ForbiddenError(
+				`Given object key "${objectKey}" does not start with a project prefix "${this.config.prefix}"`,
+			)
+		}
+		objectKey = objectKey.substr(this.config.prefix.length + 1)
+		verifyKey(objectKey)
 
 		const url = this.s3.getSignedUrl('getObject', {
 			Bucket: bucket,

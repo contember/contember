@@ -1,17 +1,24 @@
+import {
+	Component,
+	EntityAccessor,
+	Field,
+	FieldAccessor,
+	useEntityContext,
+	useEnvironment,
+	useMutationState,
+	useRelativeSingleField,
+} from '@contember/binding'
 import { FileUploadReadyState, FileUploadState, useFileUpload } from '@contember/react-client'
 import { Box, Button, FormGroup } from '@contember/ui'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
-import {
-	Component,
-	Field,
-	FieldAccessor,
-	useEnvironment,
-	useMutationState,
-	useRelativeSingleField,
-} from '@contember/binding'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
+import {
+	AggregateUploadProps,
+	getAggregateFileMetadataFieldsPopulator,
+	useDesugaredAggregateUploadProps,
+} from '../upload'
 
 export interface UploadFieldMetadata {
 	accessor: FieldAccessor<string>
@@ -19,18 +26,24 @@ export interface UploadFieldMetadata {
 	emptyText?: React.ReactNode
 }
 
-export type UploadFieldProps = SimpleRelativeSingleFieldProps & {
+export type UploadFieldProps = {
 	accept?: string
 	children: (url: string) => React.ReactNode
 	emptyText?: React.ReactNode
-}
+} & SimpleRelativeSingleFieldProps &
+	AggregateUploadProps
 
 export const UploadField = Component<UploadFieldProps>(
 	props => {
 		const [uploadState, { startUpload }] = useFileUpload()
 		const environment = useEnvironment()
+		const entity = useEntityContext()
 		const isMutating = useMutationState()
 		const accessor = useRelativeSingleField<string>(props)
+		const aggregateUploadProps = useDesugaredAggregateUploadProps(props)
+		const entityRef = React.useRef<EntityAccessor>(entity)
+
+		entityRef.current = entity
 
 		const onDrop = React.useCallback(
 			async (files: File[]) => {
@@ -58,6 +71,37 @@ export const UploadField = Component<UploadFieldProps>(
 			}),
 			[accessor, props.emptyText, uploadState],
 		)
+		let file: File | undefined = undefined
+		let previewUrl: string | undefined = undefined
+
+		if (0 in uploadState) {
+			const state = uploadState[0]
+			if (state.file && state.previewUrl) {
+				file = state.file
+				previewUrl = state.previewUrl
+			}
+		}
+
+		React.useEffect(() => {
+			let isMounted = true
+			const createPopulator = async () => {
+				if (previewUrl && file) {
+					const populate = await getAggregateFileMetadataFieldsPopulator(
+						entityRef.current,
+						file,
+						previewUrl,
+						aggregateUploadProps,
+					)
+					if (isMounted) {
+						populate()
+					}
+				}
+			}
+			createPopulator()
+			return () => {
+				isMounted = false
+			}
+		}, [aggregateUploadProps, file, previewUrl])
 
 		return (
 			<FormGroup
@@ -80,7 +124,21 @@ export const UploadField = Component<UploadFieldProps>(
 			</FormGroup>
 		)
 	},
-	props => <Field field={props.field} />,
+	props => (
+		<>
+			<Field field={props.field} />
+
+			{props.sizeField && <Field field={props.sizeField} isNonbearing />}
+			{props.typeField && <Field field={props.typeField} isNonbearing />}
+			{props.fileNameField && <Field field={props.fileNameField} isNonbearing />}
+			{props.lastModifiedField && <Field field={props.lastModifiedField} isNonbearing />}
+
+			{props.widthField && <Field field={props.widthField} isNonbearing />}
+			{props.heightField && <Field field={props.heightField} isNonbearing />}
+
+			{props.durationField && <Field field={props.durationField} isNonbearing />}
+		</>
+	),
 	'UploadField',
 )
 

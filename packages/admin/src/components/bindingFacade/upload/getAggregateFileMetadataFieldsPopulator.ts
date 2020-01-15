@@ -8,18 +8,19 @@ import { populateGenericFileMetadataFields } from './populateGenericFileMetadata
 import { populateImageFileMetadataFields } from './populateImageFileMetadataFields'
 import { populateVideoFileMetadataFields } from './populateVideoFileMetadataFields'
 
+export type FileMetadataFieldsPopulator = (parentEntity: EntityAccessor) => void
+
 export const getAggregateFileMetadataFieldsPopulator = (
-	parentEntity: EntityAccessor,
 	file: File,
 	previewUrl: string,
 	props: DesugaredAggregateUploadProps,
-): Promise<() => void> => {
+): Promise<FileMetadataFieldsPopulator> => {
 	if (isImage(file)) {
 		if (props.heightField || props.widthField) {
 			return new Promise((resolve, reject) => {
 				const image = new Image()
 				image.addEventListener('load', () => {
-					resolve(() => {
+					resolve(parentEntity => {
 						parentEntity.batchUpdates?.(getAccessor => {
 							populateImageFileMetadataFields(getAccessor(), image, props)
 							populateGenericFileMetadataFields(getAccessor(), file, props)
@@ -37,7 +38,7 @@ export const getAggregateFileMetadataFieldsPopulator = (
 			return new Promise((resolve, reject) => {
 				const video = document.createElement('video')
 				video.addEventListener('canplay', () => {
-					resolve(() => {
+					resolve(parentEntity => {
 						parentEntity.batchUpdates?.(getAccessor => {
 							populateVideoFileMetadataFields(getAccessor(), video, props)
 							populateGenericFileMetadataFields(getAccessor(), file, props)
@@ -54,7 +55,7 @@ export const getAggregateFileMetadataFieldsPopulator = (
 		return new Promise((resolve, reject) => {
 			const audio = document.createElement('audio')
 			audio.addEventListener('canplay', () => {
-				resolve(() => {
+				resolve(parentEntity => {
 					parentEntity.batchUpdates?.(getAccessor => {
 						populateAudioFileMetadataFields(getAccessor(), audio, props)
 						populateGenericFileMetadataFields(getAccessor(), file, props)
@@ -68,7 +69,7 @@ export const getAggregateFileMetadataFieldsPopulator = (
 		})
 	}
 	return new Promise(resolve => {
-		resolve(() => {
+		resolve(parentEntity => {
 			populateGenericFileMetadataFields(parentEntity, file, props)
 		})
 	})

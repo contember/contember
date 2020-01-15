@@ -86,14 +86,9 @@ export const UploadField = Component<UploadFieldProps>(
 			let isMounted = true
 			const createPopulator = async () => {
 				if (previewUrl && file) {
-					const populate = await getAggregateFileMetadataFieldsPopulator(
-						entityRef.current,
-						file,
-						previewUrl,
-						aggregateUploadProps,
-					)
+					const populate = await getAggregateFileMetadataFieldsPopulator(file, previewUrl, aggregateUploadProps)
 					if (isMounted) {
-						populate()
+						populate(entityRef.current)
 					}
 				}
 			}

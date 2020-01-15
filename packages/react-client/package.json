@@ -1,6 +1,6 @@
 {
 	"name": "@contember/react-client",
-	"version": "0.4.1",
+	"version": "0.4.2",
 	"main": "index.js",
 	"type": "module",
 	"typings": "dist/src/index.d.ts",
@@ -8,7 +8,7 @@
 		"build": "rollup --config"
 	},
 	"dependencies": {
-		"@contember/client": "^0.4.1"
+		"@contember/client": "^0.4.2"
 	},
 	"peerDependencies": {
 		"react": "^16.12.0"

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import Server from './Server'
+import Server, { Configuration } from './Server'
 import { Server as HttpServer } from 'net'
 ;(async () => {
 	try {
 		const server = new Server()
-		const config = {
-			apiServer: String(process.env['CONTEMBER_API_SERVER']),
+		const config: Configuration = {
+			apiBaseUrl: String(process.env['CONTEMBER_API_SERVER']),
 			loginToken: String(process.env['CONTEMBER_LOGIN_TOKEN']),
 			port: Number(process.env['CONTEMBER_PORT']),
 			configPlaceholder: String(process.env['CONTEMBER_CONFIG_PLACEHOLDER']),

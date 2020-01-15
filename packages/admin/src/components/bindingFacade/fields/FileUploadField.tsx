@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { Component, Field } from '@contember/binding'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { GenericFileUploadProps } from '../upload'
 import { UploadField } from './UploadField'
 
-export type FileUploadFieldProps = SimpleRelativeSingleFieldProps
+export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileUploadProps
 
 // TODO this is super temporary
 export const FileUploadField = Component<FileUploadFieldProps>(
@@ -23,6 +24,13 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 			)}
 		</UploadField>
 	),
-	props => <Field field={props.field} />,
+	(props, environment) =>
+		UploadField.generateSyntheticChildren(
+			{
+				...props,
+				children: () => null,
+			},
+			environment,
+		),
 	'FileUploadField',
 )

@@ -1,6 +1,6 @@
 import { FileId } from './FileId'
 import { FileUploadActionType } from './FileUploadActionType'
-import { FileIdWithMetadata } from './FileIdWithMetadata'
+import { FileWithMetadata } from './FileWithMetadata'
 
 export type FileUploadAction =
 	| {
@@ -12,7 +12,7 @@ export type FileUploadAction =
 	  }
 	| {
 			type: FileUploadActionType.Initialize
-			filesWithMetadata: FileIdWithMetadata[]
+			filesWithMetadata: FileWithMetadata[]
 	  }
 	| {
 			type: FileUploadActionType.StartUploading

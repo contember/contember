@@ -1,14 +1,13 @@
-import * as React from 'react'
-import { Axis, SortEndHandler } from 'react-sortable-hoc'
 import {
 	Component,
 	Entity,
-	EntityListAccessor,
 	Field,
 	SugaredRelativeSingleField,
 	useMutationState,
 	useSortedEntities,
 } from '@contember/binding'
+import * as React from 'react'
+import { Axis, SortEndHandler } from 'react-sortable-hoc'
 import { RepeaterContainer, RepeaterContainerProps } from './RepeaterContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'

@@ -32,6 +32,7 @@ export const fileUploadReducer = (
 			for (const file of action.filesWithMetadata) {
 				relevantFiles[file.id] = {
 					readyState: FileUploadReadyState.Initializing,
+					file: file.file,
 					previewUrl: file.previewUrl,
 				}
 			}
@@ -49,6 +50,7 @@ export const fileUploadReducer = (
 				...previousState.liveState,
 				[action.fileId]: {
 					readyState: FileUploadReadyState.Success,
+					file: previousFileState.file,
 					previewUrl: previousFileState.previewUrl,
 					fileUrl: action.fileUrl,
 				},
@@ -63,6 +65,7 @@ export const fileUploadReducer = (
 						...previousState.liveState,
 						[action.fileId]: {
 							readyState: FileUploadReadyState.Uploading,
+							file: previousFileState.file,
 							previewUrl: previousFileState.previewUrl,
 							progress: action.progress,
 						},
@@ -80,6 +83,7 @@ export const fileUploadReducer = (
 			for (const fileId of fileIds) {
 				relevantFiles[fileId] = {
 					readyState: FileUploadReadyState.Error,
+					file: previousState.liveState[fileId].file,
 					previewUrl: previousState.liveState[fileId].previewUrl,
 				}
 			}
@@ -99,7 +103,8 @@ export const fileUploadReducer = (
 
 				relevantFiles[fileId] = {
 					readyState: FileUploadReadyState.Uploading,
-					previewUrl: previousFileState.previewUrl!,
+					file: previousFileState.file,
+					previewUrl: previousFileState.previewUrl,
 					progress: 0,
 				}
 			}

@@ -10,7 +10,10 @@ export interface SortableBlockProps extends RepeaterItemProps {
 
 export const SortableBlock = React.memo<SortableBlockProps>(props => {
 	const field = useRelativeSingleField(props.discriminationField)
-	const selectedBlock = props.normalizedBlockProps.find(block => field.hasValue(block.discriminateBy))
+	const selectedBlock = React.useMemo(
+		() => props.normalizedBlockProps.find(block => field.hasValue(block.discriminateBy)),
+		[field, props.normalizedBlockProps],
+	)
 
 	if (!selectedBlock) {
 		return null

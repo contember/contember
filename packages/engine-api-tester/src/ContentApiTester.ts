@@ -25,7 +25,7 @@ export class ContentApiTester {
 	) {}
 
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
-		await setupSystemVariables(this.db, '11111111-1111-1111-1111-111111111111', { uuid: this.trxUuidGenerator })
+		await setupSystemVariables(this.db, '00000000-0000-0000-0000-000000000000', { uuid: this.trxUuidGenerator })
 		const stage = this.stageManager.getStage(stageSlug)
 		const schema = await this.getSchema()
 		const model = schema.model

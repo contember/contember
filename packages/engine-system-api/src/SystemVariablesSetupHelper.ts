@@ -1,7 +1,7 @@
 import { Client } from '@contember/database'
 import { UuidProvider } from './utils/uuid'
 
-export const unnamedIdentity = '11111111-1111-1111-1111-111111111111'
+export const unnamedIdentity = '00000000-0000-0000-0000-000000000000'
 
 export async function setupSystemVariables(db: Client, identityId: string, providers: UuidProvider) {
 	await Promise.all([

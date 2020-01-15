@@ -6,16 +6,16 @@ import { Server as HttpServer } from 'net'
 
 const readFile = promisify(fs.readFile)
 
-interface Configuration {
+export interface Configuration {
 	port: number
 	indexFile: string
-	apiServer: string
+	apiBaseUrl: string
 	loginToken: string
 	configPlaceholder: string
 }
 
 export default class Server {
-	async run({ indexFile, apiServer, loginToken, configPlaceholder, port }: Configuration): Promise<HttpServer> {
+	async run({ indexFile, apiBaseUrl, loginToken, configPlaceholder, port }: Configuration): Promise<HttpServer> {
 		let file: string
 		const koa = new Koa()
 		koa.use(koaStatic(process.cwd() + '/public', { index: false }))
@@ -24,7 +24,7 @@ export default class Server {
 				if (!file) {
 					file = await readFile(indexFile, { encoding: 'utf8' })
 				}
-				ctx.body = file.replace(configPlaceholder, JSON.stringify({ apiServer, loginToken }))
+				ctx.body = file.replace(configPlaceholder, JSON.stringify({ apiBaseUrl, loginToken }))
 			} else {
 				await next()
 			}

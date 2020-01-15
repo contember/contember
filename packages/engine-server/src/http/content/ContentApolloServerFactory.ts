@@ -35,7 +35,7 @@ class ContentApolloServerFactory {
 			extensions.push(() => new DbQueriesExtension())
 		}
 		const newServer = new ApolloServer({
-			tracing: true,
+			tracing: this.debug,
 			introspection: true,
 			extensions: extensions,
 			formatError: (error: any) => {

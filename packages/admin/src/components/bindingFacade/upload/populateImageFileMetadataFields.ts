@@ -8,7 +8,7 @@ export const populateImageFileMetadataFields = (
 ) =>
 	parentEntity.batchUpdates?.(getAccessor => {
 		if (props.heightField) {
-			getRelativeSingleField<number>(getAccessor(), props.heightField).updateValue?.(image.naturalWidth)
+			getRelativeSingleField<number>(getAccessor(), props.heightField).updateValue?.(image.naturalHeight)
 		}
 		if (props.widthField) {
 			getRelativeSingleField<number>(getAccessor(), props.widthField).updateValue?.(image.naturalWidth)

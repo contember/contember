@@ -1,4 +1,21 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA "system";
+DO
+$BLOCK$
+    BEGIN
+        IF NOT EXISTS(
+          SELECT
+          FROM pg_proc
+                   JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+          WHERE pg_namespace.nspname = 'system' AND pg_proc.proname = 'uuid_generate_v4'
+            ) THEN
+            CREATE FUNCTION "system"."uuid_generate_v4"() RETURNS UUID
+            AS
+            $$
+            SELECT OVERLAY(OVERLAY(md5(random()::TEXT || ':' || clock_timestamp()::TEXT) PLACING '4' FROM 13) PLACING
+                           to_hex(floor(random() * (11 - 8 + 1) + 8)::INT)::TEXT FROM 17)::UUID;
+            $$ LANGUAGE SQL;
+            END IF;
+    END
+$BLOCK$;
 
 
 CREATE FUNCTION "system"."make_diff"(old jsonb, new jsonb) RETURNS jsonb AS $$

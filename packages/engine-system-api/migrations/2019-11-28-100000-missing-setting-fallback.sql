@@ -2,7 +2,7 @@ ALTER TABLE "system"."event"
     ALTER COLUMN "identity_id" SET DEFAULT
         coalesce(
             current_setting('tenant.identity_id', true)::uuid,
-            "system".uuid_nil()
+            '00000000-0000-0000-0000-000000000000'
         ),
 
     ALTER COLUMN "transaction_id" SET DEFAULT

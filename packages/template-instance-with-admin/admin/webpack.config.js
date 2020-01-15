@@ -91,7 +91,7 @@ module.exports = ({ production }) => ({
 				configuration: production
 					? '{configuration}'
 					: JSON.stringify({
-							apiServer: process.env.CONTEMBER_API_SERVER,
+							apiBaseUrl: process.env.CONTEMBER_API_SERVER,
 							loginToken: process.env.CONTEMBER_LOGIN_TOKEN,
 					  }),
 			},

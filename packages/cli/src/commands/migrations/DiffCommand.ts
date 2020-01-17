@@ -1,12 +1,10 @@
-import Command from '../cli/Command'
-import CommandConfiguration from '../cli/CommandConfiguration'
+import { Command, CommandConfiguration, Input } from '../../cli'
 import { SchemaValidator } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
 import { isDeepStrictEqual } from 'util'
-import { Input } from '../cli/Input'
-import { MigrationsContainerFactory } from '../MigrationsContainer'
-import { getProjectDirectories } from '../NamingHelper'
-import { listProjects } from '../utils/project'
+import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { getProjectDirectories } from '../../NamingHelper'
+import { listProjects } from '../../utils/project'
 
 type Args = {
 	projectName: string

@@ -1,9 +1,9 @@
-import Argument from './Argument'
-import Option from './Option'
+import { Argument } from './Argument'
+import { Option, OptionMode } from './Option'
 import { assertNever } from './assertNever'
 
 export type UsageFormat = 'line' | 'short' | 'multiline'
-class UsageFormatter {
+export class UsageFormatter {
 	public static format(args: Argument[], options: Option[], format: UsageFormat): string {
 		let parts = []
 		const isShort = format === 'short'
@@ -22,21 +22,21 @@ class UsageFormatter {
 			const name = `--${opt.name}` + (!isShort && opt.shortcut ? `|-${opt.shortcut}` : '')
 			let valueDescription
 			switch (opt.mode) {
-				case Option.Mode.VALUE_ARRAY:
-				case Option.Mode.VALUE_REQUIRED:
+				case OptionMode.VALUE_ARRAY:
+				case OptionMode.VALUE_REQUIRED:
 					valueDescription = ' <value>'
 					break
-				case Option.Mode.VALUE_OPTIONAL:
+				case OptionMode.VALUE_OPTIONAL:
 					valueDescription = ' [value]'
 					break
-				case Option.Mode.VALUE_NONE:
+				case OptionMode.VALUE_NONE:
 					valueDescription = ''
 					break
 				default:
 					assertNever(opt.mode)
 			}
 			let optionDescription = `${name}${valueDescription}`
-			if (opt.mode === Option.Mode.VALUE_ARRAY) {
+			if (opt.mode === OptionMode.VALUE_ARRAY) {
 				optionDescription = `${optionDescription} [... ${optionDescription}]`
 			}
 			if (!isShort && opt.description) {
@@ -53,5 +53,3 @@ class UsageFormatter {
 		return parts.join(' ')
 	}
 }
-
-export default UsageFormatter

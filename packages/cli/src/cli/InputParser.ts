@@ -1,8 +1,8 @@
-import Argument from './Argument'
-import Option from './Option'
+import { Argument } from './Argument'
+import { Option, OptionMode } from './Option'
 import { Arguments, Input, Options } from './Input'
 
-class InputParser {
+export class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}
 
 	parse<Args extends Arguments, Opts extends Options>(args: string[], allowRest: boolean): Input<Args, Opts> {
@@ -26,10 +26,10 @@ class InputParser {
 					i = args.length
 					break
 				}
-				throw new InputParser.InvalidInputError(`Unresolved argument for value "${value}"`)
+				throw new InvalidInputError(`Unresolved argument for value "${value}"`)
 			}
 			if (argument.validator && !argument.validator(value)) {
-				throw new InputParser.InvalidInputError(`Invalid value "${value}" for argument ${argument.name}`)
+				throw new InvalidInputError(`Invalid value "${value}" for argument ${argument.name}`)
 			}
 			if (argument.variadic) {
 				argumentValues[argument.name] = argumentValues[argument.name] || []
@@ -41,7 +41,7 @@ class InputParser {
 		}
 		for (; argumentNumber < this._arguments.length; argumentNumber++) {
 			if (!this._arguments[argumentNumber].optional) {
-				throw new InputParser.InvalidInputError(`Argument ${this._arguments[argumentNumber].name} is required`)
+				throw new InvalidInputError(`Argument ${this._arguments[argumentNumber].name} is required`)
 			} else {
 				argumentValues[this._arguments[argumentNumber].name] = undefined
 			}
@@ -52,23 +52,23 @@ class InputParser {
 			if (args[i].startsWith('--')) {
 				option = this.options.find(it => it.name === args[i].slice(2))
 				if (!option) {
-					throw new InputParser.InvalidInputError(`Undefined option ${args[i]}`)
+					throw new InvalidInputError(`Undefined option ${args[i]}`)
 				}
 			} else if (args[i].startsWith('-')) {
 				option = this.options.find(it => it.shortcut === args[i].slice(1))
 				if (!option) {
-					throw new InputParser.InvalidInputError(`Undefined option ${args[i]}`)
+					throw new InvalidInputError(`Undefined option ${args[i]}`)
 				}
 			}
 			if (!option) {
 				if (!allowRest) {
-					throw new InputParser.InvalidInputError(`Unexpected value "${args[i]}"`)
+					throw new InvalidInputError(`Unexpected value "${args[i]}"`)
 				} else {
 					rest = args.slice(i)
 				}
 			}
 			if (option) {
-				if (option.mode === Option.Mode.VALUE_NONE) {
+				if (option.mode === OptionMode.VALUE_NONE) {
 					options[option.name] = true
 					continue
 				}
@@ -76,18 +76,18 @@ class InputParser {
 				if (value !== undefined) {
 					i++
 				}
-				if (option.mode === Option.Mode.VALUE_ARRAY) {
+				if (option.mode === OptionMode.VALUE_ARRAY) {
 					if (value === undefined) {
-						throw new InputParser.InvalidInputError(`Undefined value for option --${option.name}`)
+						throw new InvalidInputError(`Undefined value for option --${option.name}`)
 					}
 					options[option.name] = options[option.name] || []
 					;(options[option.name] as Array<string>).push(value)
-				} else if (option.mode === Option.Mode.VALUE_REQUIRED) {
+				} else if (option.mode === OptionMode.VALUE_REQUIRED) {
 					if (value === undefined) {
-						throw new InputParser.InvalidInputError(`Undefined value for option --${option.name}`)
+						throw new InvalidInputError(`Undefined value for option --${option.name}`)
 					}
 					options[option.name] = value
-				} else if (option.mode === Option.Mode.VALUE_OPTIONAL) {
+				} else if (option.mode === OptionMode.VALUE_OPTIONAL) {
 					options[option.name] = value === undefined ? true : value
 				}
 			}
@@ -98,7 +98,7 @@ class InputParser {
 				continue
 			}
 			if (option.required) {
-				throw new InputParser.InvalidInputError(`Option --${option.name} is required`)
+				throw new InvalidInputError(`Option --${option.name} is required`)
 			} else {
 				options[option.name] = undefined
 			}
@@ -121,8 +121,4 @@ class InputParser {
 	}
 }
 
-namespace InputParser {
-	export class InvalidInputError extends Error {}
-}
-
-export default InputParser
+export class InvalidInputError extends Error {}

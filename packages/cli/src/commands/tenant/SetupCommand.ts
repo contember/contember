@@ -1,7 +1,5 @@
-import CommandConfiguration from '../cli/CommandConfiguration'
-import Command from '../cli/Command'
-import { Input } from '../cli/Input'
-import { interactiveSetup } from '../utils/setup'
+import { Command, CommandConfiguration, Input } from '../../cli'
+import { interactiveSetup } from '../../utils/tenant'
 
 type Args = {
 	apiUrl: string
@@ -9,13 +7,16 @@ type Args = {
 
 type Options = {}
 
-class SetupCommand extends Command<Args, Options> {
+export class SetupCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates superadmin and login key')
 		configuration.argument('apiUrl').description('Contember API URL')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
+		if (!process.stdin.isTTY) {
+			throw 'This command is interactive and requires TTY'
+		}
 		const apiUrl = input.getArgument('apiUrl')
 
 		const { loginToken } = await interactiveSetup(apiUrl)
@@ -23,5 +24,3 @@ class SetupCommand extends Command<Args, Options> {
 		console.log('Login token: ' + loginToken)
 	}
 }
-
-export default SetupCommand

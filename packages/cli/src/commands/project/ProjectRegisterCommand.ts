@@ -1,8 +1,6 @@
-import Command from '../cli/Command'
-import CommandConfiguration from '../cli/CommandConfiguration'
-import { Input } from '../cli/Input'
-import { resolveInstanceListEnvironmentFromInput } from '../utils/instance'
-import { registerProjectToInstance, validateProjectName } from '../utils/project'
+import { Command, CommandConfiguration, Input } from '../../cli'
+import { resolveInstanceListEnvironmentFromInput } from '../../utils/instance'
+import { registerProjectToInstance, validateProjectName } from '../../utils/project'
 
 type Args = {
 	projectName: string

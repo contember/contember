@@ -1,8 +1,6 @@
-import Command from '../cli/Command'
-import CommandConfiguration from '../cli/CommandConfiguration'
-import { Input } from '../cli/Input'
-import { resolveInstanceDockerConfig, resolveInstanceEnvironmentFromInput } from '../utils/instance'
-import { DockerCompose } from '../utils/dockerCompose'
+import { Command, CommandConfiguration, Input } from '../../cli'
+import { resolveInstanceDockerConfig, resolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { DockerCompose } from '../../utils/dockerCompose'
 
 type Args = {
 	instanceName: string

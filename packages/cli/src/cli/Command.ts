@@ -1,7 +1,7 @@
-import CommandConfiguration from './CommandConfiguration'
+import { CommandConfiguration } from './CommandConfiguration'
 import { Arguments, Input, Options } from './Input'
 
-abstract class Command<Args extends Arguments, TOptions extends Options> {
+export abstract class Command<Args extends Arguments, TOptions extends Options> {
 	private configuration: CommandConfiguration<Args, TOptions> | undefined
 
 	protected abstract configure(configuration: CommandConfiguration<Args, TOptions>): void
@@ -25,5 +25,3 @@ abstract class Command<Args extends Arguments, TOptions extends Options> {
 		return result || false
 	}
 }
-
-export default Command

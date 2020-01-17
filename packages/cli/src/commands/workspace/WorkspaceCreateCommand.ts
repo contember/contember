@@ -1,8 +1,6 @@
-import Command from '../cli/Command'
-import CommandConfiguration from '../cli/CommandConfiguration'
-import { Input } from '../cli/Input'
+import { Command, CommandConfiguration, Input } from '../../cli'
 import { join } from 'path'
-import { createWorkspace } from '../utils/workspace'
+import { createWorkspace } from '../../utils/workspace'
 
 type Args = {
 	workspaceName: string

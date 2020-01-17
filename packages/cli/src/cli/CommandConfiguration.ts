@@ -1,10 +1,10 @@
-import Argument from './Argument'
-import Option from './Option'
-import InputParser from './InputParser'
-import UsageFormatter, { UsageFormat } from './UsageFormatter'
+import { Argument, ArgumentConfiguration } from './Argument'
+import { Option, OptionConfiguration, OptionMode } from './Option'
+import { InputParser } from './InputParser'
+import { UsageFormat, UsageFormatter } from './UsageFormatter'
 import { Arguments, Options } from './Input'
 
-class CommandConfiguration<Args extends Arguments, TOptions extends Options> {
+export class CommandConfiguration<Args extends Arguments, TOptions extends Options> {
 	private descriptionValue: string = ''
 
 	private arguments: Argument[] = []
@@ -14,16 +14,16 @@ class CommandConfiguration<Args extends Arguments, TOptions extends Options> {
 		this.descriptionValue = description
 	}
 
-	public argument(name: Extract<keyof Args, string>): Argument.Configuration {
+	public argument(name: Extract<keyof Args, string>): ArgumentConfiguration {
 		const options = { name, optional: false, variadic: false }
 		this.arguments.push(options)
-		return new Argument.Configuration(options)
+		return new ArgumentConfiguration(options)
 	}
 
-	public option(name: Extract<keyof TOptions, string>): Option.Configuration {
-		const option: Option = { name, required: false, mode: Option.Mode.VALUE_NONE }
+	public option(name: Extract<keyof TOptions, string>): OptionConfiguration {
+		const option: Option = { name, required: false, mode: OptionMode.VALUE_NONE }
 		this.options.push(option)
-		return new Option.Configuration(option)
+		return new OptionConfiguration(option)
 	}
 
 	public validate() {
@@ -31,12 +31,10 @@ class CommandConfiguration<Args extends Arguments, TOptions extends Options> {
 		let hasOptional = false
 		for (let argument of this.arguments) {
 			if (hasOptional && !argument.optional) {
-				throw new CommandConfiguration.InvalidConfigurationError(
-					`Required argument ${argument.name} cannot follow an optional `,
-				)
+				throw new InvalidConfigurationError(`Required argument ${argument.name} cannot follow an optional `)
 			}
 			if (hasVariadic) {
-				throw new CommandConfiguration.InvalidConfigurationError(`A variadic argument must be the last`)
+				throw new InvalidConfigurationError(`A variadic argument must be the last`)
 			}
 		}
 	}
@@ -54,8 +52,4 @@ class CommandConfiguration<Args extends Arguments, TOptions extends Options> {
 	}
 }
 
-namespace CommandConfiguration {
-	export class InvalidConfigurationError extends Error {}
-}
-
-export default CommandConfiguration
+export class InvalidConfigurationError extends Error {}

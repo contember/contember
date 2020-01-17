@@ -7,6 +7,7 @@ import {
 	InstanceCreateCommand,
 	InstanceInfoCommand,
 	InstanceLogsCommand,
+	InstanceReloadAdminCommand,
 	InstanceReloadApiCommand,
 	InstanceStartCommand,
 	InstanceStopCommand,
@@ -37,6 +38,7 @@ import { Application } from './cli'
 		['instance:logs']: () => new InstanceLogsCommand(),
 		['instance:validate-config']: () => new InstanceValidateConfigCommand(),
 		['instance:reload:api']: () => new InstanceReloadApiCommand(),
+		['instance:reload:admin']: () => new InstanceReloadAdminCommand(),
 		['tenant:setup']: () => new SetupCommand(),
 		['diff']: diffCommandFactory,
 	})

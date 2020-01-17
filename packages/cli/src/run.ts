@@ -31,13 +31,13 @@ import { Application } from './cli'
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),
 		['instance:create']: () => new InstanceCreateCommand(),
-		['instance:setup']: () => new SetupCommand(),
 		['instance:info']: () => new InstanceInfoCommand(),
 		['instance:up']: () => new InstanceStartCommand(),
 		['instance:down']: () => new InstanceStopCommand(),
 		['instance:logs']: () => new InstanceLogsCommand(),
 		['instance:validate-config']: () => new InstanceValidateConfigCommand(),
 		['instance:reload:api']: () => new InstanceReloadApiCommand(),
+		['tenant:setup']: () => new SetupCommand(),
 		['diff']: diffCommandFactory,
 	})
 	const app = new Application(commandManager)

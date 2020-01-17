@@ -1,8 +1,8 @@
-import InputParser from './InputParser'
+import { InputParser, InvalidInputError } from './InputParser'
 import { CommandManager } from './CommandManager'
 import chalk from 'chalk'
 
-class Application {
+export class Application {
 	constructor(private readonly commandManager: CommandManager) {}
 
 	async run(args: string[]): Promise<void> {
@@ -48,7 +48,7 @@ class Application {
 				return process.exit(0)
 			}
 		} catch (e) {
-			if (e instanceof InputParser.InvalidInputError) {
+			if (e instanceof InvalidInputError) {
 				console.error(e.message)
 				return process.exit(1)
 			} else {
@@ -58,5 +58,3 @@ class Application {
 		}
 	}
 }
-
-export default Application

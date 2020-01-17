@@ -1,6 +1,4 @@
-import Command from '../cli/Command'
-import CommandConfiguration from '../cli/CommandConfiguration'
-import { Input } from '../cli/Input'
+import { Command, CommandConfiguration, Input } from '../../cli'
 import {
 	getInstanceStatus,
 	printInstanceStatus,
@@ -8,10 +6,10 @@ import {
 	resolveInstanceDockerConfig,
 	resolveInstanceEnvironmentFromInput,
 	updateInstanceLocalConfig,
-} from '../utils/instance'
-import { DockerCompose, updateOverrideConfig } from '../utils/dockerCompose'
-import { interactiveSetup } from '../utils/setup'
-import { runCommand } from '../utils/commands'
+} from '../../utils/instance'
+import { DockerCompose, updateOverrideConfig } from '../../utils/dockerCompose'
+import { interactiveSetup } from '../../utils/setup'
+import { runCommand } from '../../utils/commands'
 
 type Args = {
 	instanceName: string

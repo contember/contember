@@ -1,7 +1,5 @@
-import CommandConfiguration from '../cli/CommandConfiguration'
-import Command from '../cli/Command'
-import { Input } from '../cli/Input'
-import { interactiveSetup } from '../utils/setup'
+import { Command, CommandConfiguration, Input } from '../../cli'
+import { interactiveSetup } from '../../utils/setup'
 
 type Args = {
 	apiUrl: string
@@ -9,7 +7,7 @@ type Args = {
 
 type Options = {}
 
-class SetupCommand extends Command<Args, Options> {
+export class SetupCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates superadmin and login key')
 		configuration.argument('apiUrl').description('Contember API URL')
@@ -23,5 +21,3 @@ class SetupCommand extends Command<Args, Options> {
 		console.log('Login token: ' + loginToken)
 	}
 }
-
-export default SetupCommand

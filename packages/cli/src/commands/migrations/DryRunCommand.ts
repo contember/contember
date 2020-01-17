@@ -1,8 +1,6 @@
-import CommandConfiguration from '../cli/CommandConfiguration'
-import Command from '../cli/Command'
-import { Input } from '../cli/Input'
-import { MigrationsContainerFactory } from '../MigrationsContainer'
-import { getProjectDirectories } from '../NamingHelper'
+import { Command, CommandConfiguration, Input } from '../../cli'
+import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { getProjectDirectories } from '../../NamingHelper'
 
 type Args = {
 	project: string
@@ -11,7 +9,7 @@ type Args = {
 
 type Options = {}
 
-class DryRunCommand extends Command<Args, Options> {
+export class DryRunCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Show SQL executed by a migration')
 		configuration.argument('project')
@@ -32,5 +30,3 @@ class DryRunCommand extends Command<Args, Options> {
 		}
 	}
 }
-
-export default DryRunCommand

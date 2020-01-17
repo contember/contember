@@ -1,7 +1,5 @@
-import Command from '../cli/Command'
-import CommandConfiguration from '../cli/CommandConfiguration'
-import { Input } from '../cli/Input'
-import { createInstance, validateInstanceName } from '../utils/instance'
+import { Command, CommandConfiguration, Input } from '../../cli'
+import { createInstance, validateInstanceName } from '../../utils/instance'
 
 type Args = {
 	instanceName: string

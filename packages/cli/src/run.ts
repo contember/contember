@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 import { register } from 'ts-node'
 import { CommandManager } from './cli/CommandManager'
-import { DiffCommand } from './commands/DiffCommand'
-import Application from './cli/Application'
-import DryRunCommand from './commands/DryRunCommand'
-import SetupCommand from './commands/SetupCommand'
-import { WorkspaceCreateCommand } from './commands/WorkspaceCreateCommand'
-import { ProjectCreateCommand } from './commands/ProjectCreateCommand'
-import { InstanceStartCommand } from './commands/InstanceStartCommand'
-import { InstanceInfoCommand } from './commands/InstanceInfoCommand'
-import { InstanceStopCommand } from './commands/InstanceStopCommand'
-import { ProjectRegisterCommand } from './commands/ProjectRegisterCommand'
-import { InstanceReloadApiCommand } from './commands/InstanceReloadApiCommand'
-import { InstanceLogsCommand } from './commands/InstanceLogsCommand'
-import { InstanceValidateConfigCommand } from './commands/InstanceValidateConfigCommand'
-import { InstanceCreateCommand } from './commands/InstanceCreateCommand'
+import {
+	DiffCommand,
+	DryRunCommand,
+	InstanceCreateCommand,
+	InstanceInfoCommand,
+	InstanceLogsCommand,
+	InstanceReloadApiCommand,
+	InstanceStartCommand,
+	InstanceStopCommand,
+	InstanceValidateConfigCommand,
+	ProjectCreateCommand,
+	ProjectRegisterCommand,
+	SetupCommand,
+	WorkspaceCreateCommand,
+} from './commands'
+import { Application } from './cli'
 ;(async () => {
 	register({
 		compilerOptions: {

@@ -2,7 +2,7 @@
 	"name": "@contember/cli",
 	"version": "0.5.0",
 	"bin": {
-		"contember": "./dist/src/cli.js"
+		"contember": "./dist/src/run.js"
 	},
 	"scripts": {},
 	"devDependencies": {

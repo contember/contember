@@ -2,6 +2,7 @@
 import { register } from 'ts-node'
 import { CommandManager } from './cli/CommandManager'
 import {
+	CreateApiKeyCommand,
 	DiffCommand,
 	DryRunCommand,
 	InstanceCreateCommand,
@@ -15,6 +16,7 @@ import {
 	ProjectCreateCommand,
 	ProjectRegisterCommand,
 	SetupCommand,
+	SignInCommand,
 	WorkspaceCreateCommand,
 } from './commands'
 import { Application } from './cli'
@@ -40,6 +42,8 @@ import { Application } from './cli'
 		['instance:reload:api']: () => new InstanceReloadApiCommand(),
 		['instance:reload:admin']: () => new InstanceReloadAdminCommand(),
 		['tenant:setup']: () => new SetupCommand(),
+		['tenant:sign-in']: () => new SignInCommand(),
+		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
 		['diff']: diffCommandFactory,
 	})
 	const app = new Application(commandManager)

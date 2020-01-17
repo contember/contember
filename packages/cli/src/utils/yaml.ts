@@ -6,14 +6,14 @@ import { Merger } from '@contember/config-loader'
 import jsyaml from 'js-yaml'
 import { join } from 'path'
 
-export type JsonUpdateCallback = (
-	data: JSONObject,
+export type JsonUpdateCallback<Value = JSONObject> = (
+	data: Partial<Value>,
 	utils: { merge: (a: JSONObject, b: JSONObject) => JSONObject },
-) => JSONObject
+) => Value
 
-export const updateYaml = async (
+export const updateYaml = async <Value = JSONObject>(
 	path: string,
-	updater: JsonUpdateCallback,
+	updater: JsonUpdateCallback<Value>,
 	options: { createMissing?: boolean } = {},
 ) => {
 	let config = ''

@@ -373,6 +373,7 @@ const INSTANCE_LOCAL_FILE = 'contember.instance.local.yaml'
 
 export interface InstanceConfig {
 	loginToken?: string
+	apiToken?: string
 }
 
 export const readInstanceConfig = async (args: { instanceDirectory: string }): Promise<InstanceConfig> => {
@@ -382,8 +383,8 @@ export const readInstanceConfig = async (args: { instanceDirectory: string }): P
 
 export const updateInstanceLocalConfig = async (args: {
 	instanceDirectory: string
-	updater: JsonUpdateCallback
+	updater: JsonUpdateCallback<InstanceConfig>
 }): Promise<void> => {
 	const path = join(args.instanceDirectory, INSTANCE_LOCAL_FILE)
-	return updateYaml(path, args.updater, { createMissing: true })
+	return updateYaml<InstanceConfig>(path, args.updater, { createMissing: true })
 }

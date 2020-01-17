@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { interactiveSetup } from '../../utils/setup'
+import { interactiveSetup } from '../../utils/tenant'
 
 type Args = {
 	apiUrl: string
@@ -14,6 +14,9 @@ export class SetupCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
+		if (!process.stdin.isTTY) {
+			throw 'This command is interactive and requires TTY'
+		}
 		const apiUrl = input.getArgument('apiUrl')
 
 		const { loginToken } = await interactiveSetup(apiUrl)

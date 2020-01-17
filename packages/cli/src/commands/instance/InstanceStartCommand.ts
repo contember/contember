@@ -8,7 +8,7 @@ import {
 	updateInstanceLocalConfig,
 } from '../../utils/instance'
 import { DockerCompose, updateOverrideConfig } from '../../utils/dockerCompose'
-import { interactiveSetup } from '../../utils/setup'
+import { interactiveSetup } from '../../utils/tenant'
 import { runCommand } from '../../utils/commands'
 
 type Args = {

@@ -263,10 +263,7 @@ class CompositionRoot {
 					return new S3SchemaFactory(graphqlObjectFactories, project.s3, s3Factory)
 				})
 				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory(graphqlObjectFactories))
-				.addService(
-					'permissionsByIdentityFactory',
-					({}) => new PermissionsByIdentityFactory([new PermissionsByIdentityFactory.RoleBasedPermissionFactory()]),
-				)
+				.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
 				.addService(
 					'contentPermissionsVerifier',
 					({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),

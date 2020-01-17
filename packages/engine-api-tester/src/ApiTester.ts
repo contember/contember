@@ -11,9 +11,9 @@ import {
 	unnamedIdentity,
 } from '@contember/engine-system-api'
 import {
-	SchemaMigrator,
 	MigrationsResolver,
 	ModificationHandlerFactory,
+	SchemaMigrator,
 	SchemaVersionBuilder,
 } from '@contember/schema-migrations'
 import {
@@ -22,15 +22,13 @@ import {
 	PermissionsVerifier,
 } from '@contember/engine-content-api'
 import { makeExecutableSchema } from 'graphql-tools'
-import { maskErrors } from 'graphql-errors'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
 import { SequenceTester } from './SequenceTester'
-import { Client, Connection, wrapIdentifier } from '@contember/database'
+import { Client } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { graphqlObjectFactories } from './graphqlObjectFactories'
-import { getArgumentValues } from 'graphql/execution/values'
 import { project } from './project'
 import { migrate } from './migrationsRunner'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
@@ -83,9 +81,7 @@ export class ApiTester {
 			project: { ...ApiTester.project, ...(options.project || {}) },
 			migrationsResolver: migrationsResolver,
 			migrationFilesManager: projectMigrationFilesManager,
-			contentPermissionsVerifier: new PermissionsVerifier(
-				new PermissionsByIdentityFactory([new PermissionsByIdentityFactory.RoleBasedPermissionFactory()]),
-			),
+			contentPermissionsVerifier: new PermissionsVerifier(new PermissionsByIdentityFactory()),
 			modificationHandlerFactory,
 			providers: { uuid: createUuidGenerator('a452') },
 		})
@@ -99,11 +95,13 @@ export class ApiTester {
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
 			resolvers: systemContainer.get('systemResolvers') as any,
-		})
-		maskErrors(systemSchema, err => {
-			console.error(err)
-			process.exit(1)
-			return err
+			logger: {
+				log: err => {
+					console.error(err)
+					process.exit(1)
+					return err
+				},
+			},
 		})
 
 		const stageManager = new TesterStageManager(

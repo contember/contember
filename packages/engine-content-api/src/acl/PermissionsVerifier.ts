@@ -11,7 +11,6 @@ import { getColumnName } from '@contember/schema-utils'
 import ConditionBuilder from '../sql/select/ConditionBuilder'
 
 interface PermissionContext {
-	globalRoles: string[]
 	projectRoles: string[]
 	variables: Acl.VariablesMap
 }
@@ -39,7 +38,6 @@ type TableEvent =
 
 interface Args {
 	permissionContext: PermissionContext
-	stageSlug: string
 	db: Client
 	schema: Schema
 	eventsByTable: ContentEventsByTable
@@ -49,37 +47,21 @@ export class PermissionsVerifier {
 	constructor(private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory) {}
 
 	public async verifyReadPermissions(args: Args): Promise<PermissionsByTable> {
-		return this.verifyPermissions(
-			args.permissionContext,
-			args.stageSlug,
-			args.db,
-			args.schema,
-			args.eventsByTable,
-			'read',
-		)
+		return this.verifyPermissions(args.permissionContext, args.db, args.schema, args.eventsByTable, 'read')
 	}
 
 	public async verifyWritePermissions(args: Args): Promise<PermissionsByTable> {
-		return this.verifyPermissions(
-			args.permissionContext,
-			args.stageSlug,
-			args.db,
-			args.schema,
-			args.eventsByTable,
-			'write',
-		)
+		return this.verifyPermissions(args.permissionContext, args.db, args.schema, args.eventsByTable, 'write')
 	}
 
 	private async verifyPermissions(
 		permissionContext: PermissionContext,
-		stageSlug: string,
 		db: Client,
 		schema: Schema,
 		eventsByTable: ContentEventsByTable,
 		type: 'read' | 'write',
 	): Promise<PermissionsByTable> {
-		const { permissions } = this.permissionsByIdentityFactory.createPermissions(stageSlug, schema, {
-			globalRoles: permissionContext.globalRoles,
+		const { permissions } = this.permissionsByIdentityFactory.createPermissions(schema, {
 			projectRoles: permissionContext.projectRoles,
 		})
 

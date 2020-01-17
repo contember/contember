@@ -12,9 +12,12 @@
 	},
 	"dependencies": {
 		"@contember/engine-common": "^0.4.0",
+		"@contember/schema": "^0.4.0",
+		"apollo-server-errors": "^2.3.4",
 		"aws-sdk": "^2.520.0",
 		"graphql": "^14.5.4",
 		"mime-types": "^2.1.24",
+		"picomatch": "^2.2.1",
 		"uuid": "^3.3.3"
 	}
 }

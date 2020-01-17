@@ -24,11 +24,7 @@ class GraphQlSchemaFactory {
 		private readonly s3SchemaFactory?: S3SchemaFactory,
 	) {}
 
-	public create(
-		stageSlug: string,
-		schema: Schema,
-		identity: PermissionsByIdentityFactory.Identity,
-	): [GraphQLSchema, Acl.Permissions] {
+	public create(schema: Schema, identity: PermissionsByIdentityFactory.Identity): [GraphQLSchema, Acl.Permissions] {
 		let schemaCacheEntry = this.cache.find(it => it.schema.model === schema.model && it.schema.acl === schema.acl)
 		if (!schemaCacheEntry) {
 			schemaCacheEntry = {
@@ -43,13 +39,13 @@ class GraphQlSchemaFactory {
 			}
 		}
 
-		const { permissions, verifier } = this.permissionFactory.createPermissions(stageSlug, schema, identity)
+		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
 
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, permissions)
 		const contentSchemaFactory = new ContentSchemaFactory(schema)
 		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
 		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())
-		const s3schema = this.s3SchemaFactory ? this.s3SchemaFactory.create() : null
+		const s3schema = this.s3SchemaFactory ? this.s3SchemaFactory.create({ schema, identity }) : null
 		const graphQlSchema = mergeSchemas({ schemas: [dataSchema, contentSchema, ...(s3schema ? [s3schema] : [])] })
 		schemaCacheEntry.entries.push({ graphQlSchema, verifier, permissions })
 

@@ -20,7 +20,20 @@ export class SchemaVersionBuilder {
 			return emptySchema
 		}
 
-		return await this.buildSchema(currentVersion)
+		const schema = await this.buildSchema(currentVersion)
+
+		return {
+			...schema,
+			acl: {
+				...schema.acl,
+				roles: Object.fromEntries(
+					Object.entries(schema.acl.roles).filter(
+						([key, value]) =>
+							value.stages === '*' || !!value.stages.find(pattern => !!new RegExp(pattern).exec(stageSlug)),
+					),
+				),
+			},
+		}
 	}
 
 	async buildSchemaForEvent(eventId: string): Promise<[Schema, string | null]> {

@@ -16,11 +16,9 @@ type ContentEventsByTable = { [tableName: string]: ContentEvent[] }
 
 interface Args {
 	permissionContext: {
-		globalRoles: string[]
 		projectRoles: string[]
 		variables: Acl.VariablesMap
 	}
-	stageSlug: string
 	db: Client
 	schema: Schema
 	eventsByTable: ContentEventsByTable
@@ -80,7 +78,6 @@ class EventsPermissionsVerifier {
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
 		const permissionContext = {
-			globalRoles: context.identity.roles,
 			projectRoles: await context.identity.getProjectRoles(this.project.slug),
 			variables: context.variables,
 		}
@@ -88,14 +85,12 @@ class EventsPermissionsVerifier {
 			db: this.db.forSchema(formatSchemaName(sourceStage)),
 			eventsByTable,
 			schema: await this.schemaVersionBuilder.buildSchemaForStage(sourceStage.slug),
-			stageSlug: sourceStage.slug,
 			permissionContext,
 		})
 		const writePermissions = await this.contentPermissionVerifier.verifyWritePermissions({
 			db: this.db.forSchema(formatSchemaName(targetStage)),
 			eventsByTable,
 			schema: await this.schemaVersionBuilder.buildSchemaForStage(targetStage.slug),
-			stageSlug: targetStage.slug,
 			permissionContext,
 		})
 

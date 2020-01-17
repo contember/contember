@@ -2,17 +2,10 @@
 set -e
 
 npx lerna bootstrap \
-  --ignore @contember/admin \
-  --ignore @contember/admin-server \
   --ignore @contember/benchmark \
-  --ignore @contember/binding \
-  --ignore @contember/client \
   --ignore @contember/cli \
   --ignore @contember/database-tester \
   --ignore @contember/engine-api-tester \
-  --ignore @contember/react-client \
-  --ignore @contember/react-multipass-rendering \
-  --ignore @contember/ui \
   --ignore @contember/template-* \
   --ci -- --no-optional --production
 

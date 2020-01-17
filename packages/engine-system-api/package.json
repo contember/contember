@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-system-api",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
@@ -8,22 +8,22 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/authorization": "^0.4.0",
-		"@contember/database": "^0.4.0",
-		"@contember/dic": "^0.4.0",
-		"@contember/engine-common": "^0.4.0",
-		"@contember/queryable": "^0.4.0",
-		"@contember/schema": "^0.4.0",
-		"@contember/schema-migrations": "^0.4.0",
-		"@contember/schema-utils": "^0.4.0",
+		"@contember/authorization": "^0.5.0",
+		"@contember/database": "^0.5.0",
+		"@contember/dic": "^0.5.0",
+		"@contember/engine-common": "^0.5.0",
+		"@contember/queryable": "^0.5.0",
+		"@contember/schema": "^0.5.0",
+		"@contember/schema-migrations": "^0.5.0",
+		"@contember/schema-utils": "^0.5.0",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-errors": "^2.3.1",
 		"graphql": "^14.5.4",
 		"pg": "^7.12.1"
 	},
 	"devDependencies": {
-		"@contember/engine-api-tester": "^0.4.0",
-		"@contember/schema-definition": "^0.4.0",
+		"@contember/engine-api-tester": "^0.5.0",
+		"@contember/schema-definition": "^0.5.0",
 		"@graphql-codegen/cli": "^1.5.0",
 		"@graphql-codegen/typescript": "^1.5.0",
 		"@graphql-codegen/typescript-operations": "^1.5.0",

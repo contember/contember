@@ -1,6 +1,6 @@
 {
 	"name": "@contember/cli",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"bin": {
 		"contember": "./dist/src/cli.js"
 	},
@@ -12,13 +12,13 @@
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
-		"@contember/config-loader": "^0.4.0",
-		"@contember/dic": "^0.4.0",
-		"@contember/engine-common": "^0.4.0",
-		"@contember/schema": "^0.4.0",
-		"@contember/schema-definition": "^0.4.0",
-		"@contember/schema-migrations": "^0.4.0",
-		"@contember/schema-utils": "^0.4.0",
+		"@contember/config-loader": "^0.5.0",
+		"@contember/dic": "^0.5.0",
+		"@contember/engine-common": "^0.5.0",
+		"@contember/schema": "^0.5.0",
+		"@contember/schema-definition": "^0.5.0",
+		"@contember/schema-migrations": "^0.5.0",
+		"@contember/schema-utils": "^0.5.0",
 		"chalk": "^3.0.0",
 		"download-tarball": "^2.0.0",
 		"fs-extra": "^8.1.0",

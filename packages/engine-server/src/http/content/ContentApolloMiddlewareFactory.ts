@@ -4,7 +4,7 @@ import Project from '../../config/Project'
 import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import { ContentApolloServerFactory } from './ContentApolloServerFactory'
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
-import { Acl, Schema } from '@contember/schema'
+import { Schema } from '@contember/schema'
 import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
 import { ProjectMemberMiddlewareFactory } from '../project-common'
@@ -64,6 +64,12 @@ class ContentApolloMiddlewareFactory {
 							stages: '*',
 							variables: {},
 							entities: new AllowAllPermissionFactory().create(schema.model),
+							s3: {
+								'**': {
+									upload: true,
+									read: true,
+								},
+							},
 						},
 					},
 				},

@@ -1,4 +1,5 @@
 export * from './AccessorTreeGenerator'
+export * from './DirtinessChecker'
 export * from './ErrorsPreprocessor'
 export * from './MarkerTreeGenerator'
 export * from './MutationGenerator'

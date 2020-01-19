@@ -2,8 +2,14 @@ import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
 import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { useEnvironment } from '../accessorRetrievers'
-import { RootAccessor } from '../accessors'
-import { AccessorTreeGenerator, MarkerTreeGenerator, MutationGenerator, QueryGenerator } from '../model'
+import { Accessor, RootAccessor } from '../accessors'
+import {
+	AccessorTreeGenerator,
+	DirtinessChecker,
+	MarkerTreeGenerator,
+	MutationGenerator,
+	QueryGenerator,
+} from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
@@ -52,6 +58,7 @@ export const useAccessorTreeState = ({
 
 	const queryRef = React.useRef(query)
 	const stateRef = React.useRef(state)
+	const dirtinessCheckerRef = React.useRef<DirtinessChecker | undefined>(undefined)
 	const queryStateRef = React.useRef(queryState)
 
 	stateRef.current = state
@@ -183,8 +190,9 @@ export const useAccessorTreeState = ({
 				},
 				errors,
 			)
+			dirtinessCheckerRef.current = new DirtinessChecker(markerTree, persistedData)
 		},
-		[accessorTreeGenerator, triggerPersist],
+		[accessorTreeGenerator, markerTree, triggerPersist],
 	)
 
 	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions).
@@ -237,27 +245,18 @@ export const useAccessorTreeState = ({
 		state.name,
 	])
 
+	const rootAccessor = state.name === AccessorTreeStateName.Interactive ? state.data : undefined
 	React.useEffect(() => {
-		if (state.name === AccessorTreeStateName.Interactive) {
-			const generator = new MutationGenerator(
-				queryState.readyState === ApiRequestReadyState.Success ? queryState.data.data : undefined,
-				state.data,
-				markerTree,
-			)
+		const dirtinessChecker = dirtinessCheckerRef.current
+		if (rootAccessor && dirtinessChecker) {
+			const newIsDirty = dirtinessChecker.isDirty(rootAccessor)
 
-			// TODO this is not as bad as it's an effect, and thus it doesn't block but it should still go off the UI thread.
-			const persistMutation = generator.getPersistMutation()
-
-			const newIsDirty = persistMutation !== undefined
-
-			if (state.isDirty !== newIsDirty) {
-				dispatch({
-					type: AccessorTreeStateActionType.SetDirtiness,
-					isDirty: newIsDirty,
-				})
-			}
+			dispatch({
+				type: AccessorTreeStateActionType.SetDirtiness,
+				isDirty: newIsDirty,
+			})
 		}
-	}, [markerTree, queryState, state])
+	}, [rootAccessor])
 
 	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {

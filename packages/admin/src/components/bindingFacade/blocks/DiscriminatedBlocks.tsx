@@ -47,7 +47,7 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 	},
 	props => (
 		<>
-			<StaticChoiceField {...(props as any)} options={[]} arity="single" />
+			<StaticChoiceField {...(props as any)} options={[]} arity="single" isNonbearing={true} />
 			{props.children}
 		</>
 	),

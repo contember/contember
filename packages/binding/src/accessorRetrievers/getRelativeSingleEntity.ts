@@ -4,8 +4,18 @@ import { DesugaredRelativeSingleEntity, ExpectedEntityCount, RelativeSingleEntit
 
 export const getRelativeSingleEntity = (
 	relativeTo: EntityAccessor,
-	{ hasOneRelationPath }: RelativeSingleEntity | DesugaredRelativeSingleEntity,
+	entity: RelativeSingleEntity | DesugaredRelativeSingleEntity | string, // If this is a string, it *MUST NOT* make use of QL
 ) => {
+	const hasOneRelationPath: DesugaredRelativeSingleEntity['hasOneRelationPath'] =
+		typeof entity === 'string'
+			? [
+					{
+						field: entity,
+						reducedBy: undefined,
+						filter: undefined,
+					},
+			  ]
+			: entity.hasOneRelationPath
 	for (const hasOneRelation of hasOneRelationPath) {
 		const field = relativeTo.getField(
 			hasOneRelation.field,

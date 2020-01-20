@@ -9,10 +9,20 @@ export const getRelativeSingleField = <
 	Produced extends Persisted = Persisted
 >(
 	relativeTo: EntityAccessor,
-	{ field, hasOneRelationPath }: RelativeSingleField | DesugaredRelativeSingleField,
+	field: RelativeSingleField | DesugaredRelativeSingleField | string, // If this is a string, it *MUST NOT* make use of QL
 ) => {
-	const nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath })
-	const accessor = nestedEntity.getField(field)
+	let nestedEntity: EntityAccessor
+	let fieldName: string
+
+	if (typeof field === 'string') {
+		nestedEntity = relativeTo
+		fieldName = field
+	} else {
+		nestedEntity = getRelativeSingleEntity(relativeTo, { hasOneRelationPath: field.hasOneRelationPath })
+		fieldName = field.field
+	}
+
+	const accessor = nestedEntity.getField(fieldName)
 
 	if (!(accessor instanceof FieldAccessor)) {
 		throw new BindingError(

@@ -2,7 +2,6 @@ import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { FieldAccessor } from '../accessors'
 import { Scalar, SugaredRelativeSingleField } from '../treeParameters'
-import { getRelativeSingleField } from './getRelativeSingleField'
 import { useEntityContext } from './useEntityContext'
 import { useOptionalDesugaredRelativeSingleField } from './useOptionalDesugaredRelativeSingleField'
 
@@ -15,6 +14,6 @@ export const useOptionalRelativeSingleField = <
 	const entity = useEntityContext()
 	const relativeSingleField = useOptionalDesugaredRelativeSingleField(sugaredRelativeSingleField)
 	return React.useMemo(() => {
-		return relativeSingleField ? getRelativeSingleField<Persisted, Produced>(entity, relativeSingleField) : undefined
+		return relativeSingleField ? entity.getRelativeSingleField<Persisted, Produced>(relativeSingleField) : undefined
 	}, [entity, relativeSingleField])
 }

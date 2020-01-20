@@ -3,7 +3,6 @@ import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
 import { QueryLanguage } from '../queryLanguage'
 import { FieldName, RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
-import { getRelativeSingleField } from './getRelativeSingleField'
 import { useEnvironment } from './useEnvironment'
 
 interface EntityOrder {
@@ -37,8 +36,8 @@ const sortEntities = (entities: EntityAccessor[], sortByField: RelativeSingleFie
 		return entities
 	}
 	return entities.sort((a, b) => {
-		const aField = getRelativeSingleField<number>(a, sortByField)
-		const bField = getRelativeSingleField<number>(b, sortByField)
+		const aField = a.getRelativeSingleField<number>(sortByField)
+		const bField = b.getRelativeSingleField<number>(sortByField)
 
 		if (typeof aField.currentValue === 'number' && typeof bField.currentValue === 'number') {
 			return aField.currentValue - bField.currentValue
@@ -57,7 +56,7 @@ const computeNewEntityOrder = (
 
 	for (let i = 0, len = entities.length; i < len; i++) {
 		const entity = entities[i]
-		const orderField = getRelativeSingleField<number>(entity, sortByField)
+		const orderField = entity.getRelativeSingleField<number>(sortByField)
 
 		let targetValue
 
@@ -87,7 +86,7 @@ const getBatchUpdater = (order: EntityOrder, sortByField: RelativeSingleField) =
 			continue
 		}
 		const target = order[entity.getKey()]
-		const orderField = getRelativeSingleField<number>(entity, sortByField)
+		const orderField = entity.getRelativeSingleField<number>(sortByField)
 
 		if (target !== undefined) {
 			if (orderField.updateValue) {
@@ -151,7 +150,7 @@ export const useSortedEntities = (
 					return
 				}
 
-				const sortableField = getRelativeSingleField<number>(newlyAdded, desugaredSortByField)
+				const sortableField = newlyAdded.getRelativeSingleField<number>(desugaredSortByField)
 
 				if (sortableField.updateValue) {
 					sortableField.updateValue(newIndex)
@@ -205,7 +204,7 @@ export const useSortedEntities = (
 			let listAccessor: EntityListAccessor = getAccessor()
 			for (let i = 0, len = sortedEntities.length; i < len; i++) {
 				const entity = sortedEntities[i]
-				const orderField = getRelativeSingleField(entity, desugaredSortByField)
+				const orderField = entity.getRelativeSingleField(desugaredSortByField)
 
 				if (orderField.currentValue === null && orderField.updateValue) {
 					orderField.updateValue(i)

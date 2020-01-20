@@ -1,4 +1,4 @@
-import { EntityAccessor, getRelativeSingleField } from '@contember/binding'
+import { EntityAccessor } from '@contember/binding'
 import { DesugaredGenericFileUploadProps } from './GenericFileUploadProps'
 
 export const populateGenericFileMetadataFields = (
@@ -8,15 +8,23 @@ export const populateGenericFileMetadataFields = (
 ) =>
 	parentEntity.batchUpdates?.(getAccessor => {
 		if (props.fileNameField) {
-			getRelativeSingleField<string>(getAccessor(), props.fileNameField).updateValue?.(file.name)
+			getAccessor()
+				.getRelativeSingleField<string>(props.fileNameField)
+				.updateValue?.(file.name)
 		}
 		if (props.lastModifiedField) {
-			getRelativeSingleField<number>(getAccessor(), props.lastModifiedField).updateValue?.(file.lastModified)
+			getAccessor()
+				.getRelativeSingleField<number>(props.lastModifiedField)
+				.updateValue?.(file.lastModified)
 		}
 		if (props.sizeField) {
-			getRelativeSingleField<number>(getAccessor(), props.sizeField).updateValue?.(file.size)
+			getAccessor()
+				.getRelativeSingleField<number>(props.sizeField)
+				.updateValue?.(file.size)
 		}
 		if (props.typeField) {
-			getRelativeSingleField<string>(getAccessor(), props.typeField).updateValue?.(file.type)
+			getAccessor()
+				.getRelativeSingleField<string>(props.typeField)
+				.updateValue?.(file.type)
 		}
 	})

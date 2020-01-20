@@ -1,7 +1,19 @@
+import { GraphQlBuilder } from '@contember/client'
 import { BindingError } from '../BindingError'
-import { MarkerTreeRoot, ReferenceMarker } from '../markers'
-import { PlaceholderGenerator } from '../markers/PlaceholderGenerator'
-import { FieldName, RemovalType, SubTreeIdentifier } from '../treeParameters'
+import { MarkerTreeRoot, PlaceholderGenerator, ReferenceMarker } from '../markers'
+import {
+	DesugaredRelativeEntityList,
+	DesugaredRelativeSingleEntity,
+	DesugaredRelativeSingleField,
+	ExpectedEntityCount,
+	FieldName,
+	RelativeEntityList,
+	RelativeSingleEntity,
+	RelativeSingleField,
+	RemovalType,
+	Scalar,
+	SubTreeIdentifier,
+} from '../treeParameters'
 import { Accessor } from './Accessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { EntityListAccessor } from './EntityListAccessor'
@@ -81,6 +93,99 @@ class EntityAccessor extends Accessor implements Errorable {
 			throw new BindingError(`Requesting an accessor tree '${identifier}' but it resolves to a field.`)
 		}
 		return root
+	}
+
+	/**
+	 * If entity is a string, it *MUST NOT* make use of QL
+	 */
+	public getRelativeSingleEntity(
+		entity: RelativeSingleEntity | DesugaredRelativeSingleEntity | string,
+	): EntityAccessor {
+		let relativeTo: EntityAccessor = this
+		const hasOneRelationPath: DesugaredRelativeSingleEntity['hasOneRelationPath'] =
+			typeof entity === 'string'
+				? [
+						{
+							field: entity,
+							reducedBy: undefined,
+							filter: undefined,
+						},
+				  ]
+				: entity.hasOneRelationPath
+		for (const hasOneRelation of hasOneRelationPath) {
+			const field = relativeTo.getField(
+				hasOneRelation.field,
+				ExpectedEntityCount.UpToOne,
+				hasOneRelation.filter,
+				hasOneRelation.reducedBy,
+			)
+
+			if (field instanceof EntityAccessor) {
+				relativeTo = field
+			} else {
+				throw new BindingError('Corrupted data')
+			}
+		}
+		return relativeTo
+	}
+
+	/**
+	 * If field is a string, it *MUST NOT* make use of QL
+	 */
+	public getRelativeSingleField<
+		Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+		Produced extends Persisted = Persisted
+	>(field: RelativeSingleField | DesugaredRelativeSingleField | string): FieldAccessor<Persisted, Produced> {
+		let nestedEntity: EntityAccessor
+		let fieldName: string
+
+		if (typeof field === 'string') {
+			nestedEntity = this
+			fieldName = field
+		} else {
+			nestedEntity = this.getRelativeSingleEntity({ hasOneRelationPath: field.hasOneRelationPath })
+			fieldName = field.field
+		}
+
+		const accessor = nestedEntity.getField(fieldName)
+
+		if (!(accessor instanceof FieldAccessor)) {
+			throw new BindingError(
+				`Trying to access the field '${field}'${
+					nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
+				} but it does not exist.`,
+			)
+		}
+		return (accessor as unknown) as FieldAccessor<Persisted, Produced>
+	}
+
+	/**
+	 * If entityList is a string, it *MUST NOT* make use of QL
+	 */
+	public getRelativeEntityList(
+		entityList: RelativeEntityList | DesugaredRelativeEntityList | string,
+	): EntityListAccessor {
+		let nestedEntity: EntityAccessor
+		let fieldName: string
+
+		if (typeof entityList === 'string') {
+			nestedEntity = this
+			fieldName = entityList
+		} else {
+			nestedEntity = this.getRelativeSingleEntity({ hasOneRelationPath: entityList.hasOneRelationPath })
+			fieldName = entityList.hasManyRelation.field
+		}
+
+		const field = nestedEntity.getField(fieldName)
+
+		if (!(field instanceof EntityListAccessor)) {
+			throw new BindingError(
+				`Trying to access the entity list '${field}'${
+					nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
+				} but it does not exist.`,
+			)
+		}
+		return field
 	}
 
 	public get allFieldData(): EntityAccessor.EntityData {

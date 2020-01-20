@@ -8,8 +8,6 @@ import {
 	EntityListDataProvider,
 	Field,
 	FieldAccessor,
-	getRelativeEntityList,
-	getRelativeSingleEntity,
 	HasMany,
 	HasOne,
 	PRIMARY_KEY_NAME,
@@ -102,9 +100,9 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	const arity = props.arity
 	const currentValueEntity: EntityListAccessor | EntityAccessor = React.useMemo(() => {
 		if (arity === 'single') {
-			return getRelativeSingleEntity(parentEntity, desugaredRelativePath as RelativeSingleEntity)
+			return parentEntity.getRelativeSingleEntity(desugaredRelativePath as RelativeSingleEntity)
 		} else if (arity === 'multiple') {
-			return getRelativeEntityList(parentEntity, desugaredRelativePath as RelativeEntityList)
+			return parentEntity.getRelativeEntityList(desugaredRelativePath as RelativeEntityList)
 		}
 		assertNever(arity)
 	}, [parentEntity, desugaredRelativePath, arity])
@@ -114,7 +112,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	const optionEntities = React.useMemo(() => {
 		const entities: EntityAccessor[] = []
 		for (const entity of filteredOptions) {
-			entities.push(getRelativeSingleEntity(entity, desugaredOptionPath))
+			entities.push(entity.getRelativeSingleEntity(desugaredOptionPath))
 		}
 		return entities
 	}, [desugaredOptionPath, filteredOptions])

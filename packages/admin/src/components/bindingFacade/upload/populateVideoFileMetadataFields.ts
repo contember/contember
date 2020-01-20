@@ -1,4 +1,4 @@
-import { EntityAccessor, getRelativeSingleField } from '@contember/binding'
+import { EntityAccessor } from '@contember/binding'
 import { DesugaredVideoFileUploadProps } from './VideoFileUploadProps'
 
 export const populateVideoFileMetadataFields = (
@@ -8,12 +8,18 @@ export const populateVideoFileMetadataFields = (
 ) =>
 	parentEntity.batchUpdates?.(getAccessor => {
 		if (props.durationField) {
-			getRelativeSingleField<number>(getAccessor(), props.durationField).updateValue?.(video.duration)
+			getAccessor()
+				.getRelativeSingleField<number>(props.durationField)
+				.updateValue?.(video.duration)
 		}
 		if (props.heightField) {
-			getRelativeSingleField<number>(getAccessor(), props.heightField).updateValue?.(video.videoHeight)
+			getAccessor()
+				.getRelativeSingleField<number>(props.heightField)
+				.updateValue?.(video.videoHeight)
 		}
 		if (props.widthField) {
-			getRelativeSingleField<number>(getAccessor(), props.widthField).updateValue?.(video.videoWidth)
+			getAccessor()
+				.getRelativeSingleField<number>(props.widthField)
+				.updateValue?.(video.videoWidth)
 		}
 	})

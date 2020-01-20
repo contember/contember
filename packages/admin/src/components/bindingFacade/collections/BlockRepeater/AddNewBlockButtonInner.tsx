@@ -1,11 +1,6 @@
+import { EntityAccessor, SugaredRelativeSingleField, useDesugaredRelativeSingleField } from '@contember/binding'
 import { Button, ButtonGroup, DropdownRenderProps } from '@contember/ui'
 import * as React from 'react'
-import {
-	EntityAccessor,
-	getRelativeSingleField,
-	SugaredRelativeSingleField,
-	useDesugaredRelativeSingleField,
-} from '@contember/binding'
 import { NormalizedBlockProps } from '../../blocks'
 import { AddNewEntityButtonProps } from '../helpers'
 
@@ -32,7 +27,7 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 						props.addNew?.((getAccessor, newIndex) => {
 							const accessor = getAccessor()
 							const newlyAdded = accessor.entities[newIndex] as EntityAccessor
-							const discriminationField = getRelativeSingleField(newlyAdded, desugaredDiscriminationField)
+							const discriminationField = newlyAdded.getRelativeSingleField(desugaredDiscriminationField)
 							discriminationField.updateValue?.(targetValue)
 						})
 					}}

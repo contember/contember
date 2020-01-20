@@ -1,4 +1,4 @@
-import { EntityAccessor, getRelativeSingleField } from '@contember/binding'
+import { EntityAccessor } from '@contember/binding'
 import { DesugaredAudioFileUploadProps } from './AudioFileUploadProps'
 
 export const populateAudioFileMetadataFields = (
@@ -8,6 +8,8 @@ export const populateAudioFileMetadataFields = (
 ) =>
 	parentEntity.batchUpdates?.(getAccessor => {
 		if (props.durationField) {
-			getRelativeSingleField<number>(getAccessor(), props.durationField).updateValue?.(audio.duration)
+			getAccessor()
+				.getRelativeSingleField<number>(props.durationField)
+				.updateValue?.(audio.duration)
 		}
 	})

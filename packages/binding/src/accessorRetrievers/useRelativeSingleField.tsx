@@ -1,7 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
 import { Scalar, SugaredRelativeSingleField } from '../treeParameters'
-import { getRelativeSingleField } from './getRelativeSingleField'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
 import { useEntityContext } from './useEntityContext'
 
@@ -13,7 +12,7 @@ export const useRelativeSingleField = <
 ) => {
 	const entity = useEntityContext()
 	const relativeSingleField = useDesugaredRelativeSingleField(sugaredRelativeSingleField)
-	return React.useMemo(() => getRelativeSingleField<Persisted, Produced>(entity, relativeSingleField), [
+	return React.useMemo(() => entity.getRelativeSingleField<Persisted, Produced>(relativeSingleField), [
 		entity,
 		relativeSingleField,
 	])

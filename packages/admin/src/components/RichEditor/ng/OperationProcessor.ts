@@ -5,7 +5,6 @@ import {
 	EntityForRemovalAccessor,
 	EntityListAccessor,
 	FieldAccessor,
-	getRelativeSingleField,
 	RelativeSingleField,
 } from '@contember/binding'
 import JsonBlockSerializer from './JsonBlockSerializer'
@@ -40,7 +39,7 @@ export default class OperationProcessor {
 		}
 		listAccessor.addNew && listAccessor.addNew()
 		const entity = this.getLastInCollection(getListAccessor)
-		const typeField = getRelativeSingleField(entity, this.typeField)
+		const typeField = entity.getRelativeSingleField(this.typeField)
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('')
 		}
@@ -150,7 +149,7 @@ export default class OperationProcessor {
 	}
 
 	private getSortFieldAccessor = (entityAccessor: EntityAccessor): FieldAccessor => {
-		const sortFieldAccessor = getRelativeSingleField(entityAccessor, this.sortBy)
+		const sortFieldAccessor = entityAccessor.getRelativeSingleField(this.sortBy)
 		if (!(sortFieldAccessor instanceof FieldAccessor)) {
 			throw new Error('Unable to find sort field.')
 		}
@@ -158,7 +157,7 @@ export default class OperationProcessor {
 	}
 
 	private getValueFieldAccessor = (entityAccessor: EntityAccessor): FieldAccessor => {
-		const typeField = getRelativeSingleField(entityAccessor, this.typeField)
+		const typeField = entityAccessor.getRelativeSingleField(this.typeField)
 		if (!(typeField instanceof FieldAccessor)) {
 			throw new Error('Not found type field')
 		}

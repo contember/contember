@@ -8,7 +8,6 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	FieldAccessor,
-	getRelativeSingleField,
 	HasManyProps,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
@@ -48,7 +47,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 			accessor.entities
 				.filter((t): t is EntityAccessor => t instanceof EntityAccessor)
 				.sort((a, b) => {
-					const [aField, bField] = [getRelativeSingleField(a, sortByField), getRelativeSingleField(b, sortByField)]
+					const [aField, bField] = [a.getRelativeSingleField(sortByField), b.getRelativeSingleField(sortByField)]
 
 					if (
 						aField instanceof FieldAccessor &&
@@ -72,7 +71,7 @@ export const InnerEditor: React.FC<RTEInnerProps> = props => {
 					return blockCache.get(entityAccessor)!
 				}
 
-				let type = getRelativeSingleField(entityAccessor, nameField).currentValue
+				let type = entityAccessor.getRelativeSingleField(nameField).currentValue
 				if (type === null) {
 					type = props.defaultBlock
 				}

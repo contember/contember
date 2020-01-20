@@ -1,6 +1,7 @@
 import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
 import { ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { ExpectedEntityCount } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
@@ -18,7 +19,10 @@ export class DirtinessChecker {
 	public isDirty(accessorTree: RootAccessor): boolean {
 		const persistedData = this.persistedData ? this.persistedData[this.markerTree.id] : undefined
 
-		if (Array.isArray(persistedData)) {
+		if (
+			Array.isArray(persistedData) ||
+			(this.markerTree.parameters.type === 'unconstrained' && persistedData === undefined)
+		) {
 			if (accessorTree instanceof EntityListAccessor) {
 				return this.isEntityListDirty(this.markerTree.fields, persistedData, accessorTree)
 			}
@@ -44,6 +48,10 @@ export class DirtinessChecker {
 
 		let isEntityDirty = false
 		entityFields: for (const placeholderName in fields) {
+			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+				continue
+			}
+
 			const marker = fields[placeholderName]
 
 			if (marker instanceof FieldMarker) {

@@ -64,10 +64,18 @@ export class DirtinessChecker {
 				if (!(accessor instanceof FieldAccessor)) {
 					this.rejectInvalidTree()
 				}
-				const resolvedValue = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
+
+				let resolvedValue
+				if (marker.defaultValue === undefined) {
+					resolvedValue = accessor.currentValue
+				} else {
+					resolvedValue = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
+				}
+				const isPersisted = node.isPersisted()
+
 				if (
-					(persistedField !== resolvedValue && persistedField !== undefined && persistedField !== null) ||
-					(!node.isPersisted() && resolvedValue !== undefined && resolvedValue !== null)
+					(isPersisted && persistedField !== resolvedValue) ||
+					(!isPersisted && resolvedValue !== undefined && resolvedValue !== null)
 				) {
 					isEntityDirty = true
 					break

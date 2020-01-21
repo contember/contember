@@ -1,7 +1,0 @@
-export { RichEditorPluginConfig } from './utils'
-export { BOLD } from './bold'
-export { ITALIC } from './italic'
-export { UNDERLINED } from './underlined'
-export { LINK } from './link'
-export { PARAGRAPH } from './paragraph'
-export { HEADING } from './heading'

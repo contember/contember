@@ -1,5 +1,5 @@
 import replace from '@rollup/plugin-replace'
-import analyzer from 'rollup-plugin-analyzer'
+//import analyzer from 'rollup-plugin-analyzer'
 import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
 import { propTypesExportedMembers } from '../../build/exportedMembers/prop-types'
@@ -12,6 +12,7 @@ export default {
 		format: 'esm',
 		sourcemap: true,
 	},
+	dedupe: ['react', 'react-dom', 'react-is'],
 	external: ['react', 'react-dom'],
 	plugins: [
 		replace({
@@ -30,6 +31,6 @@ export default {
 		//terser({
 		//	sourcemap: true,
 		//}),
-		analyzer(),
+		//analyzer(),
 	],
 }

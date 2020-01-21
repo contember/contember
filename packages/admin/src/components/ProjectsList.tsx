@@ -1,7 +1,7 @@
 import { Button, ButtonList } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { MiscPageLayout } from '../components'
+import { MiscPageLayout } from './MiscPageLayout'
 import { pushRequest } from '../actions/request'
 import { Dispatch } from '../actions/types'
 import State from '../state'

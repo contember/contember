@@ -72,7 +72,7 @@ export default [
 			format: 'esm',
 			sourcemap: true,
 		},
-		external: ['react', 'react-dom'],
+		external: [/*'slate', 'slate-react', 'slate-html-serializer', */ 'react', 'react-dom'],
 		plugins: [
 			replace(getReplaceConfig(true)),
 			resolve(resolveConfig),

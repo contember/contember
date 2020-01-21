@@ -297,7 +297,7 @@ class AccessorTreeGenerator {
 			return this.rejectInvalidAccessorTree()
 		}
 		const onRemove = (removalType: RemovalType) => {
-			onUpdateProxy(this.removeEntity(entityData[placeholderName], removalType))
+			onUpdateProxy(this.removeEntity(persistedData, entityData[placeholderName], removalType))
 		}
 		const batchUpdates: BatchEntityUpdates = performUpdates => {
 			batchUpdateDepth++
@@ -320,7 +320,7 @@ class AccessorTreeGenerator {
 	private generateEntityListAccessor(
 		placeholderName: string,
 		entityFields: EntityFields,
-		fieldData: Array<ReceivedEntityData<undefined>> | EntityListAccessor | undefined,
+		fieldData: ReceivedEntityData<undefined>[] | EntityListAccessor | undefined,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
 		preferences: ReferenceMarker.ReferencePreferences = ReferenceMarker.defaultReferencePreferences[
@@ -401,7 +401,7 @@ class AccessorTreeGenerator {
 				return this.rejectInvalidAccessorTree()
 			}
 			const onRemove = (removalType: RemovalType) => {
-				onUpdateProxy(i, this.removeEntity(listAccessor.entities[i], removalType))
+				onUpdateProxy(i, this.removeEntity(sourceData[i], listAccessor.entities[i], removalType))
 			}
 
 			childBatchUpdateDepths[i] = 0
@@ -481,17 +481,19 @@ class AccessorTreeGenerator {
 	}
 
 	private removeEntity(
+		initialEntityData: AccessorTreeGenerator.InitialEntityData,
 		currentEntity: EntityAccessor.FieldData,
 		removalType: RemovalType,
 	): EntityForRemovalAccessor | undefined {
-		if (currentEntity instanceof EntityAccessor) {
-			const id = currentEntity.primaryKey
-
-			if (typeof id === 'string') {
-				return new EntityForRemovalAccessor(currentEntity, currentEntity.replaceWith, removalType)
-			}
+		if (
+			!initialEntityData ||
+			initialEntityData instanceof EntityForRemovalAccessor ||
+			!(currentEntity instanceof EntityAccessor)
+		) {
+			return undefined
 		}
-		return undefined
+
+		return new EntityForRemovalAccessor(currentEntity, currentEntity.replaceWith, removalType)
 	}
 
 	private rejectInvalidAccessorTree(): never {

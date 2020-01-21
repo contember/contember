@@ -1,3 +1,4 @@
+import { GraphQlBuilder } from '@contember/client'
 import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
 import { ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -42,6 +43,12 @@ export class DirtinessChecker {
 		if (node instanceof EntityForRemovalAccessor) {
 			return true
 		}
+		if (
+			(!persistedData && node.isPersisted()) ||
+			(persistedData && node.primaryKey !== persistedData[PRIMARY_KEY_NAME])
+		) {
+			return true
+		}
 		if (this.isDirtyCache.has(node)) {
 			return this.isDirtyCache.get(node)!
 		}
@@ -56,7 +63,7 @@ export class DirtinessChecker {
 
 			if (marker instanceof FieldMarker) {
 				const accessor = node.data[placeholderName]
-				const persistedField = persistedData ? persistedData[placeholderName] : undefined
+				const persistedValue = persistedData ? persistedData[placeholderName] : undefined
 
 				if (marker.isNonbearing) {
 					continue
@@ -71,10 +78,11 @@ export class DirtinessChecker {
 				} else {
 					resolvedValue = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
 				}
+				const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
 				const isPersisted = node.isPersisted()
 
 				if (
-					(isPersisted && persistedField !== resolvedValue) ||
+					(isPersisted && persistedValue !== normalizedValue) ||
 					(!isPersisted && resolvedValue !== undefined && resolvedValue !== null)
 				) {
 					isEntityDirty = true
@@ -86,16 +94,17 @@ export class DirtinessChecker {
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
 					const accessor = node.data[reference.placeholderName]
-					const persistedField = persistedData ? persistedData[reference.placeholderName] : undefined
+					const persistedValue = persistedData ? persistedData[reference.placeholderName] : undefined
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (
 							(accessor instanceof EntityAccessor || accessor instanceof EntityForRemovalAccessor) &&
-							((persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField)) ||
-								persistedField === undefined ||
-								persistedField === null)
+							((persistedValue !== null && typeof persistedValue === 'object' && !Array.isArray(persistedValue)) ||
+								persistedValue === undefined ||
+								persistedValue === null)
 						) {
-							const isDirty = this.isEntityDirty(reference.fields, persistedField || undefined, accessor)
+							const isDirty = this.isEntityDirty(reference.fields, persistedValue || undefined, accessor)
+
 							if (isDirty) {
 								isEntityDirty = true
 								break entityFields
@@ -104,9 +113,9 @@ export class DirtinessChecker {
 					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
 						if (
 							accessor instanceof EntityListAccessor &&
-							(Array.isArray(persistedField) || persistedField === undefined || persistedField === null)
+							(Array.isArray(persistedValue) || persistedValue === undefined || persistedValue === null)
 						) {
-							const isDirty = this.isEntityListDirty(reference.fields, persistedField, accessor)
+							const isDirty = this.isEntityListDirty(reference.fields, persistedValue, accessor)
 							if (isDirty) {
 								isEntityDirty = true
 								break entityFields
@@ -117,9 +126,14 @@ export class DirtinessChecker {
 					}
 				}
 			} else if (marker instanceof MarkerTreeRoot) {
-				// Do nothing
+				// Do nothing. For the time being, we don't support persisting these so there's nothing to be concluded from
+				// here. However, that will likely change in future.
 			} else if (marker instanceof ConnectionMarker) {
-				// Do nothing
+				if (!marker.isNonbearing) {
+					isEntityDirty = true
+					break
+				}
+				// Otherwise do nothing
 			} else {
 				assertNever(marker)
 			}

@@ -26,22 +26,24 @@ export default class GraphQlSchemaBuilder {
 				}
 			}, {}),
 		}
-		mutations.transaction = {
-			type: this.graphqlObjectFactories.createNotNull(
-				this.graphqlObjectFactories.createObjectType({
-					name: 'MutationTransaction',
-					fields: {
-						ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
-						validation: {
-							type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
+		if (Object.keys(mutations).length > 0) {
+			mutations.transaction = {
+				type: this.graphqlObjectFactories.createNotNull(
+					this.graphqlObjectFactories.createObjectType({
+						name: 'MutationTransaction',
+						fields: {
+							ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
+							validation: {
+								type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
+							},
+							...mutations,
 						},
-						...mutations,
-					},
-				}),
-			),
-			resolve: async (parent, args, context: Context, info) => {
-				return await context.executionContainer.mutationResolver.resolveTransaction(info)
-			},
+					}),
+				),
+				resolve: async (parent, args, context: Context, info) => {
+					return await context.executionContainer.mutationResolver.resolveTransaction(info)
+				},
+			}
 		}
 
 		const queries = Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
@@ -51,14 +53,16 @@ export default class GraphQlSchemaBuilder {
 				...queries,
 			}
 		}, {})
-		queries.transaction = {
-			type: this.graphqlObjectFactories.createObjectType({
-				name: 'QueryTransaction',
-				fields: { ...queries },
-			}),
-			resolve: async (parent, args, context: Context, info) => {
-				return await context.executionContainer.readResolver.resolveTransaction(info)
-			},
+		if (Object.keys(queries).length > 0) {
+			queries.transaction = {
+				type: this.graphqlObjectFactories.createObjectType({
+					name: 'QueryTransaction',
+					fields: { ...queries },
+				}),
+				resolve: async (parent, args, context: Context, info) => {
+					return await context.executionContainer.readResolver.resolveTransaction(info)
+				},
+			}
 		}
 
 		queries['_info'] = {

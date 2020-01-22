@@ -15,7 +15,8 @@ export class InstanceLogsCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput(input)
+		const workspaceDirectory = process.cwd()
+		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
 		const { composeConfig } = await resolveInstanceDockerConfig({ instanceDirectory })
 		const dockerCompose = new DockerCompose(instanceDirectory, composeConfig)
 

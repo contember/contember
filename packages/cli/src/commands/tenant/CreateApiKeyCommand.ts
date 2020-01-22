@@ -2,7 +2,8 @@ import { Command, CommandConfiguration, Input } from '../../cli'
 import {
 	interactiveCreateApiKey,
 	interactiveResolveApiToken,
-	resolveTenantInstanceEnvironmentFromInput,
+	interactiveResolveTenantInstanceEnvironmentFromInput,
+	TenantClient,
 } from '../../utils/tenant'
 
 type Args = {
@@ -24,9 +25,10 @@ export class CreateApiKeyCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await resolveTenantInstanceEnvironmentFromInput(input)
+		const instance = await interactiveResolveTenantInstanceEnvironmentFromInput(input)
 		const apiToken = await interactiveResolveApiToken({ instance })
-		const { id, token } = await interactiveCreateApiKey({ instance, apiToken })
+		const tenantClient = TenantClient.create(instance.url, apiToken)
+		const { id, token } = await interactiveCreateApiKey({ client: tenantClient })
 		console.log('API key created:')
 		console.log(`id: ${id}`)
 		console.log(`token: ${token}`)

@@ -2,9 +2,9 @@ import prompts from 'prompts'
 import { GraphQLClient } from 'graphql-request'
 import { Input } from '../cli'
 import {
-	getDefaultInstance,
 	getInstanceStatus,
 	InstanceEnvironment,
+	listInstances,
 	readInstanceConfig,
 	resolveInstanceEnvironment,
 } from './instance'
@@ -27,17 +27,32 @@ export const createTenantApiUrl = (url: string) => {
 	return url + '/tenant'
 }
 
-export const resolveTenantInstanceEnvironmentFromInput = async (
+export const interactiveResolveTenantInstanceEnvironmentFromInput = async (
 	inputCommand: Input<{
 		instance?: string
 	}>,
 ): Promise<TenantInstanceEnvironment> => {
 	const workspaceDirectory = process.cwd()
-	let [instanceName] = [
-		inputCommand.getArgument('instance') ||
-			process.env.CONTEMBER_INSTANCE ||
-			(await getDefaultInstance({ workspaceDirectory })),
-	]
+	let [instanceName] = [inputCommand.getArgument('instance') || process.env.CONTEMBER_INSTANCE]
+	if (!instanceName) {
+		const instances = await listInstances({ workspaceDirectory })
+		;({ instanceName } = await prompts({
+			type: 'select',
+			message: 'Instance',
+			name: 'instanceName',
+			choices: [...instances.map(it => ({ value: it, title: it })), { value: '__remote', title: 'Remote API' }],
+		}))
+		if (instanceName === '__remote') {
+			;({ instanceName } = await prompts({
+				type: 'text',
+				message: 'Remote API URL',
+				name: 'instanceName',
+			}))
+		}
+		if (!instanceName) {
+			throw 'Please specify an instance'
+		}
+	}
 	if (instanceName.includes('://')) {
 		return { type: 'remote', url: createTenantApiUrl(instanceName) }
 	}
@@ -69,7 +84,7 @@ export const interactiveResolveLoginToken = async (instance: TenantInstanceEnvir
 	return loginToken
 }
 
-const createClient = (url: string, token: string) =>
+const createClient = (url: string, token: string): GraphQLClient =>
 	new GraphQLClient(createTenantApiUrl(url), {
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -196,59 +211,13 @@ export const interactiveResolveApiToken = async ({
 
 	return token
 }
-interface Project {
-	slug: string
-	roles: {
-		name: string
-		variables: {
-			name: string
-		}[]
-	}[]
-}
 
-export const listProjects = async ({
-	instance,
-	apiToken,
-}: {
-	instance: TenantInstanceEnvironment
-	apiToken: string
-}): Promise<Project[]> => {
-	const client = createClient(instance.url, apiToken)
-	const response = await client.request(`query {
-  me {
-    projects {
-      project {
-        slug
-        roles {
-          name
-          variables {
-            name
-          }
-        }
-      }
-    }
-  }
-}`)
-
-	return response.me.projects.map((it: any) => it.project)
-}
-
-type MembershipVariable = {
-	name: string
-	values: string[]
-}
-type Membership = {
-	role: string
-	variables: MembershipVariable[]
-}
 export const interactiveCreateApiKey = async ({
-	instance,
-	apiToken,
+	client,
 }: {
-	instance: TenantInstanceEnvironment
-	apiToken: string
+	client: TenantClient
 }): Promise<{ id: string; token: string }> => {
-	const projects = await listProjects({ instance, apiToken })
+	const projects = await client.listProjects()
 	const { projectSlug } = await prompts({
 		type: 'select',
 		message: 'Project',
@@ -307,10 +276,40 @@ export const interactiveCreateApiKey = async ({
 		inactive: 'no, start again',
 	})
 	if (!ok) {
-		return await interactiveCreateApiKey({ instance, apiToken })
+		return await interactiveCreateApiKey({ client })
 	}
 
-	const query = `mutation($projectSlug: String!, $memberships: [MembershipInput!]!) {
+	return await client.createApiKey(project.slug, memberships)
+}
+
+type MembershipVariable = {
+	name: string
+	values: string[]
+}
+type Membership = {
+	role: string
+	variables: MembershipVariable[]
+}
+
+interface Project {
+	slug: string
+	roles: {
+		name: string
+		variables: {
+			name: string
+		}[]
+	}[]
+}
+
+export class TenantClient {
+	constructor(private readonly apiClient: GraphQLClient) {}
+
+	public static create(url: string, apiToken: string): TenantClient {
+		return new TenantClient(createClient(url, apiToken))
+	}
+
+	public async createApiKey(projectSlug: string, memberships: Membership[]): Promise<{ id: string; token: string }> {
+		const query = `mutation($projectSlug: String!, $memberships: [MembershipInput!]!) {
   createApiKey(projectSlug: $projectSlug, memberships: $memberships) {
     ok
     errors {
@@ -324,10 +323,30 @@ export const interactiveCreateApiKey = async ({
     }
   }
 }`
-	const client = createClient(instance.url, apiToken)
-	const response = await client.request(query, { projectSlug: project.slug, memberships })
-	if (!response.createApiKey.ok) {
-		throw response.createApiKey.errors.map((it: any) => it.code)
+		const response = await this.apiClient.request(query, { projectSlug, memberships })
+		if (!response.createApiKey.ok) {
+			throw response.createApiKey.errors.map((it: any) => it.code)
+		}
+		return response.createApiKey.result.apiKey
 	}
-	return response.createApiKey.result.apiKey
+
+	public async listProjects(): Promise<Project[]> {
+		const response = await this.apiClient.request(`query {
+  me {
+    projects {
+      project {
+        slug
+        roles {
+          name
+          variables {
+            name
+          }
+        }
+      }
+    }
+  }
+}`)
+
+		return response.me.projects.map((it: any) => it.project)
+	}
 }

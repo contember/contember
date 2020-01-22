@@ -9,14 +9,14 @@ import {
 	readDefaultDockerComposeConfig,
 	updateOverrideConfig,
 } from './dockerCompose'
-import { runCommand } from './commands'
 import getPort from 'get-port'
-import { Input } from '../cli/Input'
+import { Input } from '../cli'
 import { JsonUpdateCallback, readMultipleYaml, readYaml, updateYaml } from './yaml'
 import { getProjectDockerEnv } from './project'
 import { promises as fs } from 'fs'
-import { hasInstanceAdmin } from './workspace'
+import { workspaceHasAdmin } from './workspace'
 import { installTemplate } from './template'
+import { ContainerStatus, getContainersStatus, PortMapping } from './docker'
 
 export const validateInstanceName = (name: string) => {
 	if (!name.match(/^[a-z][a-z0-9]*$/)) {
@@ -45,7 +45,7 @@ export const createInstance = async (args: {
 	template?: string
 }): Promise<InstanceEnvironment> => {
 	validateInstanceName(args.instanceName)
-	const withAdmin = await hasInstanceAdmin(args)
+	const withAdmin = await workspaceHasAdmin(args)
 	const template =
 		args.template ||
 		(withAdmin ? '@contember/template-instance-with-admin' : join(resourcesDir, 'templates/template-instance'))
@@ -57,12 +57,7 @@ export const createInstance = async (args: {
 	})
 }
 
-export interface ServiceStatus {
-	name: string
-	status: string
-	running: boolean
-	ports: PortMapping[]
-}
+export type ServiceStatus = ContainerStatus
 
 const instanceDirectoryToName = (instanceDirectory: string) =>
 	basename(instanceDirectory)
@@ -74,7 +69,15 @@ export const getInstanceStatus = async ({
 	instanceDirectory: string
 }): Promise<ServiceStatus[]> => {
 	const instanceName = instanceDirectoryToName(instanceDirectory)
-	const runningContainers = (await execDockerCompose(['ps', '-q'], { cwd: instanceDirectory, stdout: false }))
+	const runningContainers = (
+		await execDockerCompose(['ps', '-q'], {
+			cwd: instanceDirectory,
+			stdout: false,
+			env: {
+				CONTEMBER_VERSION: 'latest',
+			},
+		})
+	)
 		.split('\n')
 		.filter(it => it.length > 0)
 
@@ -82,33 +85,9 @@ export const getInstanceStatus = async ({
 		return []
 	}
 
-	const containerInfo = JSON.parse(
-		await runCommand('docker', ['inspect', ...runningContainers], { cwd: instanceDirectory }).output,
-	)
-	const statusList: ServiceStatus[] = []
-	for (const container of containerInfo) {
-		const containerName = String(container.Name)
-		if (!containerName.startsWith('/' + instanceName + '_')) {
-			continue
-		}
-		const serviceName = containerName.substring(instanceName.length + 2, containerName.lastIndexOf('_'))
-
-		const status = container.State.Status
-		const running = container.State.Running
-		statusList.push({
-			name: serviceName,
-			running,
-			status,
-			ports: parsePortMapping(container.NetworkSettings.Ports),
-		})
-	}
-	return statusList
-}
-
-interface PortMapping {
-	containerPort: number
-	hostIp: string
-	hostPort: number
+	return (await getContainersStatus({ containers: runningContainers, cwd: instanceDirectory }))
+		.filter(it => it.name.startsWith(instanceName + '_'))
+		.map(it => ({ ...it, name: it.name.substring(instanceName.length + 1, it.name.lastIndexOf('_')) }))
 }
 
 export const printInstanceStatus = async (args: { instanceDirectory: string }) => {
@@ -124,24 +103,6 @@ export const printInstanceStatus = async (args: { instanceDirectory: string }) =
 		const addressInfo = it.running && addressStr.length > 0 ? ` on ${addressStr}` : ''
 		console.log(`${it.name}: ${it.status}${addressInfo}`)
 	})
-}
-
-const parsePortMapping = (
-	portsOutput: Record<string, null | Array<{ HostIp: string; HostPort: number }>>,
-): PortMapping[] => {
-	return Object.entries(portsOutput)
-		.filter((it): it is [string, Array<{ HostIp: string; HostPort: number }>] => !!it[1])
-		.reduce<PortMapping[]>(
-			(acc, [containerPort, host]) => [
-				...acc,
-				...host.map(it => ({
-					containerPort: Number(containerPort.substr(0, containerPort.indexOf('/'))),
-					hostIp: it.HostIp,
-					hostPort: Number(it.HostPort),
-				})),
-			],
-			[],
-		)
 }
 
 export const resolveInstanceEnvironment = async (args: {
@@ -191,14 +152,17 @@ export interface InstanceEnvironment {
 	instanceDirectory: string
 	instanceName: string
 }
-export const resolveInstanceEnvironmentFromInput = async (
-	inputCommand: Input<{
+export const resolveInstanceEnvironmentFromInput = async ({
+	input,
+	workspaceDirectory,
+}: {
+	input: Input<{
 		instanceName?: string
-	}>,
-): Promise<InstanceEnvironment> => {
-	const workspaceDirectory = process.cwd()
+	}>
+	workspaceDirectory: string
+}): Promise<InstanceEnvironment> => {
 	let [instanceName] = [
-		inputCommand.getArgument('instanceName') ||
+		input.getArgument('instanceName') ||
 			process.env.CONTEMBER_INSTANCE ||
 			(await getDefaultInstance({ workspaceDirectory })),
 	]
@@ -295,7 +259,7 @@ export const resolveInstanceDockerConfig = async ({
 
 	const portMapping = await resolvePortsMapping({ instanceDirectory, config, host, startPort })
 	const updateConfigWithPorts = (config: any, portsMapping: ServicePortsMapping): any => {
-		const result = Object.entries(portsMapping).reduce(
+		return Object.entries(portsMapping).reduce(
 			(config, [service, mapping]) => ({
 				...config,
 				services: {
@@ -308,7 +272,6 @@ export const resolveInstanceDockerConfig = async ({
 			}),
 			config,
 		)
-		return result
 	}
 	config = updateConfigWithPorts(config, portMapping)
 	if (savePortsMapping) {

@@ -2,7 +2,7 @@ import { Command, CommandConfiguration, Input } from '../../cli'
 import {
 	interactiveResolveLoginToken,
 	interactiveSignIn,
-	resolveTenantInstanceEnvironmentFromInput,
+	interactiveResolveTenantInstanceEnvironmentFromInput,
 } from '../../utils/tenant'
 import prompt from 'prompts'
 import { updateInstanceLocalConfig } from '../../utils/instance'
@@ -26,7 +26,7 @@ export class SignInCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await resolveTenantInstanceEnvironmentFromInput(input)
+		const instance = await interactiveResolveTenantInstanceEnvironmentFromInput(input)
 		const loginToken = await interactiveResolveLoginToken(instance)
 		const token = await interactiveSignIn({ apiUrl: instance.url, loginToken })
 		console.log('Session token:')

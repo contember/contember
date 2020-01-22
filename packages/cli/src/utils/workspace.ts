@@ -6,15 +6,18 @@ import { readYaml } from './yaml'
 import { installTemplate } from './template'
 import { resourcesDir } from '../pathUtils'
 
+interface WorkspaceDirectoryArgument {
+	workspaceDirectory: string
+}
+
 export const createWorkspace = async ({
 	workspaceDirectory,
 	withAdmin,
 	template,
 }: {
 	withAdmin: boolean
-	workspaceDirectory: string
 	template: string
-}) => {
+} & WorkspaceDirectoryArgument) => {
 	template =
 		template ||
 		(withAdmin ? '@contember/template-workspace-with-admin' : join(resourcesDir, 'templates/template-workspace'))
@@ -26,7 +29,9 @@ export const createWorkspace = async ({
 }
 
 export interface WorkspaceConfig {
-	version?: string
+	api?: {
+		version?: string
+	}
 	admin?: {
 		enabled?: boolean
 	}
@@ -34,9 +39,7 @@ export interface WorkspaceConfig {
 
 export const readWorkspaceConfig = async ({
 	workspaceDirectory,
-}: {
-	workspaceDirectory: string
-}): Promise<WorkspaceConfig> => {
+}: WorkspaceDirectoryArgument): Promise<WorkspaceConfig> => {
 	const configPath = join(workspaceDirectory, 'contember.workspace.yaml')
 	if (!(await pathExists(configPath))) {
 		return {}
@@ -44,7 +47,14 @@ export const readWorkspaceConfig = async ({
 	return await readYaml(configPath)
 }
 
-export const hasInstanceAdmin = async ({ workspaceDirectory }: { workspaceDirectory: string }): Promise<boolean> => {
+export const workspaceHasAdmin = async ({ workspaceDirectory }: WorkspaceDirectoryArgument): Promise<boolean> => {
 	const workspaceConfig = await readWorkspaceConfig({ workspaceDirectory })
 	return workspaceConfig?.admin?.enabled || false
+}
+
+export const getWorkspaceApiVersion = async ({
+	workspaceDirectory,
+}: WorkspaceDirectoryArgument): Promise<string | undefined> => {
+	const workspaceConfig = await readWorkspaceConfig({ workspaceDirectory })
+	return workspaceConfig?.api?.version || undefined
 }

@@ -83,8 +83,7 @@ export const runDockerCompose = (args: string[], options: DockerComposeRunOption
 		stderr: process.stderr,
 		stdin: input,
 		env: {
-			// todo
-			CONTEMBER_VERSION: '0',
+			...options.env,
 		},
 		detached: options.detached,
 	})
@@ -94,11 +93,14 @@ export const runDockerCompose = (args: string[], options: DockerComposeRunOption
 }
 
 interface DockerComposeServiceConfig {
-	environment: Record<string, string>
-	ports: (string | {})[] // todo long syntax
+	image?: string
+	command?: string
+	environment?: Record<string, string>
+	ports?: (string | {})[] // todo long syntax
 }
 
 interface DockerComposeConfig {
+	version?: string
 	services: Record<string, DockerComposeServiceConfig>
 }
 
@@ -112,17 +114,34 @@ export class DockerCompose {
 		return this.configYamlCache
 	}
 
-	constructor(private readonly cwd: string, public readonly config: DockerComposeConfig) {}
-
-	run(args: string[]): RunningCommand {
-		return runDockerCompose(['-f', '-', ...args], {
+	get options(): DockerComposeRunOptions {
+		return {
 			cwd: this.cwd,
 			stdin: this.configYaml,
+			...this._options,
+		}
+	}
+
+	constructor(
+		private readonly cwd: string,
+		public readonly config: DockerComposeConfig,
+		private readonly _options: Partial<DockerComposeRunOptions> = {},
+	) {}
+
+	run(args: string[], options: Partial<DockerComposeRunOptions> = {}): RunningCommand {
+		const thisOptions = this.options
+		return runDockerCompose(['-f', '-', ...args], {
+			...thisOptions,
+			...options,
+			env: {
+				...thisOptions.env,
+				...options.env,
+			},
 		})
 	}
 
 	public withConfig(config: DockerComposeConfig): DockerCompose {
-		return new DockerCompose(this.cwd, config)
+		return new DockerCompose(this.cwd, config, this._options)
 	}
 
 	public withService(service: string, serviceConfig: DockerComposeServiceConfig): DockerCompose {

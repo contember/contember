@@ -6,7 +6,7 @@ import { listDirectories, replaceFileContent } from './fs'
 import { InstanceEnvironment, validateInstanceName } from './instance'
 import { updateYaml } from './yaml'
 import { projectNameToEnvName } from '@contember/engine-common'
-import { hasInstanceAdmin } from './workspace'
+import { workspaceHasAdmin } from './workspace'
 import { installTemplate } from './template'
 
 export const validateProjectName = (name: string) => {
@@ -21,7 +21,7 @@ export const listProjects = async (args: { workspaceDirectory: string }) => {
 export const createProject = async (args: { workspaceDirectory: string; projectName: string; template?: string }) => {
 	validateProjectName(args.projectName)
 	const projectDir = join(args.workspaceDirectory, 'projects', args.projectName)
-	const withAdmin = await hasInstanceAdmin(args)
+	const withAdmin = await workspaceHasAdmin(args)
 	const template =
 		args.template ||
 		(withAdmin ? '@contember/template-project-with-admin' : join(resourcesDir, 'templates/template-project'))

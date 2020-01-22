@@ -10,6 +10,7 @@ import {
 import { DockerCompose, updateOverrideConfig } from '../../utils/dockerCompose'
 import { interactiveSetup } from '../../utils/tenant'
 import { runCommand } from '../../utils/commands'
+import { getWorkspaceApiVersion } from '../../utils/workspace'
 
 type Args = {
 	instanceName: string
@@ -37,15 +38,21 @@ export class InstanceStartCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput(input)
+		const workspaceDirectory = process.cwd()
+		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
 		const { composeConfig, portsMapping } = await resolveInstanceDockerConfig({
 			instanceDirectory,
 			host: input.getOption('host'),
 			startPort: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
 			//savePortsMapping: input.getOption('save-ports'),
 		})
+		const version = await getWorkspaceApiVersion({ workspaceDirectory })
 
-		let dockerCompose = new DockerCompose(instanceDirectory, composeConfig)
+		let dockerCompose = new DockerCompose(instanceDirectory, composeConfig, {
+			env: {
+				CONTEMBER_VERSION: version || '0',
+			},
+		})
 
 		const withAdmin = !!composeConfig.services.admin
 		const adminEnv = !withAdmin ? {} : { ...composeConfig.services.admin.environment }

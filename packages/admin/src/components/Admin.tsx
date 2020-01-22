@@ -1,6 +1,5 @@
 import { ContainerSpinner } from '@contember/ui'
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
 import {
@@ -20,6 +19,7 @@ import { ProjectConfig } from '../state/projectsConfigs'
 import { PageRequest } from '../state/request'
 
 import { configureStore, Store } from '../store'
+import { ReduxStoreProvider } from '../temporaryHacks'
 import { Login } from './Login'
 import { NavigationIsActiveProvider, NavigationProvider } from './NavigationProvider'
 import ProjectsList from './ProjectsList'
@@ -56,7 +56,7 @@ export const Admin = React.memo((props: AdminProps) => {
 
 	return (
 		<Client config={props.clientConfig}>
-			<Provider store={store}>
+			<ReduxStoreProvider store={store}>
 				<NavigationProvider>
 					<NavigationIsActiveProvider>
 						<Router
@@ -127,7 +127,7 @@ export const Admin = React.memo((props: AdminProps) => {
 						<Toaster />
 					</NavigationIsActiveProvider>
 				</NavigationProvider>
-			</Provider>
+			</ReduxStoreProvider>
 		</Client>
 	)
 })

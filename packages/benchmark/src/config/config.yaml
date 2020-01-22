@@ -1,30 +1,6 @@
-tenant:
-    db:
-        host: '%env.TENANT_DB_HOST%'
-        port: '%env.TENANT_DB_PORT%'
-        user: '%env.TENANT_DB_USER%'
-        password: '%env.TENANT_DB_PASSWORD%'
-        database: '%env.TENANT_DB_NAME%'
-
 projects:
-    app:
-      name: App
-      stages:
-          - id: 01c8f908-6f48-4ef3-9751-9989931b42eb
-            slug: prod
-            name: Production
-      db:
-        host: '%env.APP_DB_HOST%'
-        port: '%env.APP_DB_PORT%'
-        user: '%env.APP_DB_USER%'
-        password: '%env.APP_DB_PASSWORD%'
-        database: '%env.APP_DB_NAME%'
-      s3:
-        bucket: ''
-        prefix: 'dev'
-        region: 'eu-central-1'
-        credentials:
-          key: ''
-          secret: ''
-server:
-    port: '%env.SERVER_PORT%'
+  app:
+    name: App
+    directory: app
+    stages:
+      prod: ~

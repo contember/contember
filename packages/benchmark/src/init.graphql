@@ -1,10 +1,10 @@
 mutation {
   csLocale: createLocale(data: { slug: "cs", title: "Cestina" }) {
-    id
+    ok
   }
 
   enLocale: createLocale(data: { slug: "en", title: "Anglictina" }) {
-    id
+    ok
   }
 
   createFooter(
@@ -16,7 +16,7 @@ mutation {
       ]
     }
   ) {
-    id
+    ok
   }
 
   createContact(
@@ -46,7 +46,7 @@ mutation {
       ]
     }
   ) {
-    id
+    ok
   }
 
   createPage(
@@ -213,7 +213,7 @@ mutation {
       ]
     }
   ) {
-    id
+    ok
   }
 
   item1: createMenuItem(data: {
@@ -228,7 +228,7 @@ mutation {
       }
     ]
   }) {
-    id
+    ok
   }
 
   item2: createMenuItem(data: {
@@ -243,6 +243,6 @@ mutation {
       }
     ]
   }) {
-    id
+    ok
   }
 }

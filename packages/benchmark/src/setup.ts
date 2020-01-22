@@ -11,7 +11,7 @@ const setup = async (tenantEndpoint: string): Promise<string> => {
 		endpoint: tenantEndpoint,
 		authorizationToken: '12345123451234512345',
 		query: `mutation {
-  setup(superadmin: { email: "admin@example.com", password: "123" }) {
+  setup(superadmin: { email: "admin@example.com", password: "123456" }) {
     ok
     result {
       superadmin {
@@ -41,8 +41,11 @@ const login = async (tenantEndpoint: string, loginToken: string): Promise<string
 		endpoint: tenantEndpoint,
 		authorizationToken: loginToken,
 		query: `mutation {
-  signIn(email: "admin@example.com", password: "123") {
+  signIn(email: "admin@example.com", password: "123456") {
     ok
+    errors {
+      code
+    }
     result {
       token
       person {
@@ -56,6 +59,7 @@ const login = async (tenantEndpoint: string, loginToken: string): Promise<string
 	})
 
 	if (!loginResponse.data.signIn.ok) {
+		console.log(loginResponse.data.signIn)
 		throw new Error('Invalid login response')
 	}
 
@@ -72,7 +76,7 @@ const dataInit = async (contentEndpoint: string, accessToken: string) => {
 	})
 }
 ;(async () => {
-	const serverPort = process.env.SERVER_PORT
+	const serverPort = process.env.CONTEMBER_PORT
 	const tenantEndpoint = `http://localhost:${serverPort}/tenant`
 	const contentEndpoint = `http://localhost:${serverPort}/content/app/prod`
 

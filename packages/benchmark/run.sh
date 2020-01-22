@@ -1,13 +1,12 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -e
 
+export $(cat .env | xargs)
+
 echo "Cleaning"
-npm run console drop
-echo "Initializing database"
-npm run console engine:migrations:continue > /dev/null
-npm run console init > /dev/null
+npm run drop
 echo "Starting server"
-npm run console start > /dev/null &
+npm run start-server > /dev/null &
 PID=$!
 sleep 5
 

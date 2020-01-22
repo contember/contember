@@ -1,8 +1,20 @@
 version: '3.7'
 services:
-    ts_watch:
-        image: node:12
-        volumes:
-            - ./:/src:cached
-        working_dir: /src
-        command: npm run ts:watch
+  ts_watch:
+    image: node:12
+    volumes:
+      - ./:/src:cached
+    working_dir: /src
+    command: npm run ts:watch
+
+  db:
+    image: postgres:10-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: contember
+      POSTGRES_USER: contember
+      POSTGRES_DB: contember
+    volumes:
+    - pgsql-data:/var/lib/postgresql/data
+volumes:
+  pgsql-data: ~

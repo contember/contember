@@ -1,0 +1,1961 @@
+{
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "One",
+			"values": [
+				"One"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "State",
+			"values": [
+				"Draft",
+				"ToBePublished",
+				"Published"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "BlockType",
+			"values": [
+				"Heading",
+				"Text",
+				"Image",
+				"ImageGrid",
+				"People",
+				"Category"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Locale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Linkable",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "linkable",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Redirect",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "redirect",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Image",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Video",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "video",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Seo",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "seo",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ImageGrid",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "image_grid",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "BlockPerson",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "block_person",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Block",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "block",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "MenuItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "menu_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "MenuItemLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "menu_item_locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Footer",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "footer",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "FooterLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "footer_locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Person",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "person",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "PersonLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "person_locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Page",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "page",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "PageLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "page_locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "CategoryLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "category_locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Category",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "category",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Contact",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "contact",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ContactLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "contact_locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Locale",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Locale",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Linkable",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": false,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Image",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Video",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Seo",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Seo",
+			"field": {
+				"name": "description",
+				"columnName": "description",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Seo",
+			"field": {
+				"name": "ogTitle",
+				"columnName": "og_title",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Seo",
+			"field": {
+				"name": "ogDescription",
+				"columnName": "og_description",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BlockPerson",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": true,
+				"type": "Enum",
+				"columnType": "BlockType",
+				"enumName": "BlockType"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "text",
+				"columnName": "text",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "MenuItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "MenuItemLocale",
+			"field": {
+				"name": "label",
+				"columnName": "label",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Footer",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "One",
+				"enumName": "One"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FooterLocale",
+			"field": {
+				"name": "address",
+				"columnName": "address",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Person",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Person",
+			"field": {
+				"name": "email",
+				"columnName": "email",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PersonLocale",
+			"field": {
+				"name": "quote",
+				"columnName": "quote",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PersonLocale",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PersonLocale",
+			"field": {
+				"name": "position",
+				"columnName": "position",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PageLocale",
+			"field": {
+				"name": "state",
+				"columnName": "state",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "State",
+				"enumName": "State"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PageLocale",
+			"field": {
+				"name": "header",
+				"columnName": "header",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PageLocale",
+			"field": {
+				"name": "perex",
+				"columnName": "perex",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PageLocale",
+			"field": {
+				"name": "contactUs",
+				"columnName": "contact_us",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "CategoryLocale",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Contact",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "One",
+				"enumName": "One"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContactLocale",
+			"field": {
+				"name": "header",
+				"columnName": "header",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Redirect",
+			"owningSide": {
+				"name": "link",
+				"inversedBy": "redirect",
+				"nullable": false,
+				"type": "OneHasOne",
+				"target": "Linkable",
+				"joiningColumn": {
+					"columnName": "link_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "redirect",
+				"ownedBy": "link",
+				"target": "Redirect",
+				"type": "OneHasOne",
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Redirect",
+			"owningSide": {
+				"name": "target",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Linkable",
+				"joiningColumn": {
+					"columnName": "target_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Video",
+			"owningSide": {
+				"name": "poster",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "poster_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Seo",
+			"owningSide": {
+				"name": "ogImage",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "og_image_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ImageGrid",
+			"owningSide": {
+				"name": "imagePosition1",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "image_position1_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ImageGrid",
+			"owningSide": {
+				"name": "imagePosition2",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "image_position2_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ImageGrid",
+			"owningSide": {
+				"name": "imagePosition3",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "image_position3_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "BlockPerson",
+			"owningSide": {
+				"name": "person",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Person",
+				"joiningColumn": {
+					"columnName": "person_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "BlockPerson",
+			"owningSide": {
+				"name": "Block",
+				"target": "Block",
+				"inversedBy": "people",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "block_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "people",
+				"ownedBy": "Block",
+				"type": "OneHasMany",
+				"target": "BlockPerson"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Block",
+			"owningSide": {
+				"name": "imageGrid",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "ImageGrid",
+				"joiningColumn": {
+					"columnName": "image_grid_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Block",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Block",
+			"owningSide": {
+				"name": "category",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Category",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Block",
+			"owningSide": {
+				"name": "PageLocale",
+				"target": "PageLocale",
+				"inversedBy": "content",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "page_locale_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "content",
+				"ownedBy": "PageLocale",
+				"type": "OneHasMany",
+				"target": "Block"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "MenuItemLocale",
+			"owningSide": {
+				"name": "menuItem",
+				"target": "MenuItem",
+				"inversedBy": "locales",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "menu_item_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "menuItem",
+				"type": "OneHasMany",
+				"target": "MenuItemLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "MenuItemLocale",
+			"owningSide": {
+				"name": "target",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Linkable",
+				"joiningColumn": {
+					"columnName": "target_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "MenuItemLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "FooterLocale",
+			"owningSide": {
+				"name": "footer",
+				"target": "Footer",
+				"inversedBy": "locales",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "footer_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "footer",
+				"type": "OneHasMany",
+				"target": "FooterLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "FooterLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Person",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "PersonLocale",
+			"owningSide": {
+				"name": "person",
+				"target": "Person",
+				"inversedBy": "locales",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "person_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "person",
+				"type": "OneHasMany",
+				"target": "PersonLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "PersonLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Page",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Image",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Page",
+			"owningSide": {
+				"name": "category",
+				"inversedBy": "pages",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Category",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "set null"
+				}
+			},
+			"inverseSide": {
+				"name": "pages",
+				"ownedBy": "category",
+				"target": "Page",
+				"type": "OneHasMany"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "PageLocale",
+			"owningSide": {
+				"name": "page",
+				"target": "Page",
+				"inversedBy": "locales",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "page_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "page",
+				"type": "OneHasMany",
+				"target": "PageLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "PageLocale",
+			"owningSide": {
+				"name": "seo",
+				"nullable": false,
+				"type": "OneHasOne",
+				"target": "Seo",
+				"joiningColumn": {
+					"columnName": "seo_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "PageLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "PageLocale",
+			"owningSide": {
+				"name": "link",
+				"inversedBy": "page",
+				"nullable": false,
+				"type": "OneHasOne",
+				"target": "Linkable",
+				"joiningColumn": {
+					"columnName": "link_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "page",
+				"ownedBy": "link",
+				"target": "PageLocale",
+				"type": "OneHasOne",
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "CategoryLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "CategoryLocale",
+			"owningSide": {
+				"name": "category",
+				"target": "Category",
+				"inversedBy": "locales",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "category",
+				"type": "OneHasMany",
+				"target": "CategoryLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContactLocale",
+			"owningSide": {
+				"name": "contact",
+				"target": "Contact",
+				"inversedBy": "locales",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"joiningColumn": {
+					"columnName": "contact_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "contact",
+				"type": "OneHasMany",
+				"target": "ContactLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContactLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContactLocale",
+			"owningSide": {
+				"name": "seo",
+				"nullable": false,
+				"type": "OneHasOne",
+				"target": "Seo",
+				"joiningColumn": {
+					"columnName": "seo_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContactLocale",
+			"owningSide": {
+				"name": "link",
+				"inversedBy": "contact",
+				"nullable": false,
+				"type": "OneHasOne",
+				"target": "Linkable",
+				"joiningColumn": {
+					"columnName": "link_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "contact",
+				"ownedBy": "link",
+				"target": "ContactLocale",
+				"type": "OneHasOne",
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Locale",
+			"unique": {
+				"fields": [
+					"slug"
+				],
+				"name": "unique_Locale_slug_67d6fc"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Linkable",
+			"unique": {
+				"fields": [
+					"url"
+				],
+				"name": "unique_Linkable_url_f92092"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "MenuItemLocale",
+			"unique": {
+				"fields": [
+					"menuItem",
+					"locale"
+				],
+				"name": "unique_MenuItemLocale_menuItem_locale_9e2d51"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Footer",
+			"unique": {
+				"fields": [
+					"unique"
+				],
+				"name": "unique_Footer_unique_c0f335"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "FooterLocale",
+			"unique": {
+				"fields": [
+					"footer",
+					"locale"
+				],
+				"name": "unique_FooterLocale_footer_locale_95872c"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "PersonLocale",
+			"unique": {
+				"fields": [
+					"person",
+					"locale"
+				],
+				"name": "unique_PersonLocale_person_locale_8cb199"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "PageLocale",
+			"unique": {
+				"fields": [
+					"page",
+					"locale"
+				],
+				"name": "unique_PageLocale_page_locale_42ead3"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "CategoryLocale",
+			"unique": {
+				"fields": [
+					"category",
+					"locale"
+				],
+				"name": "unique_CategoryLocale_category_locale_7a1d47"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Contact",
+			"unique": {
+				"fields": [
+					"unique"
+				],
+				"name": "unique_Contact_unique_3eeed3"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "ContactLocale",
+			"unique": {
+				"fields": [
+					"contact",
+					"locale"
+				],
+				"name": "unique_ContactLocale_contact_locale_bd2875"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin",
+					"value": {
+						"variables": {},
+						"stages": "*",
+						"entities": {
+							"Locale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"slug": true,
+										"title": true
+									},
+									"update": {
+										"id": true,
+										"slug": true,
+										"title": true
+									},
+									"create": {
+										"id": true,
+										"slug": true,
+										"title": true
+									},
+									"delete": true
+								}
+							},
+							"Linkable": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"redirect": true,
+										"page": true,
+										"contact": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"redirect": true,
+										"page": true,
+										"contact": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"redirect": true,
+										"page": true,
+										"contact": true
+									},
+									"delete": true
+								}
+							},
+							"Redirect": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"link": true,
+										"target": true
+									},
+									"update": {
+										"id": true,
+										"link": true,
+										"target": true
+									},
+									"create": {
+										"id": true,
+										"link": true,
+										"target": true
+									},
+									"delete": true
+								}
+							},
+							"Image": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true
+									},
+									"update": {
+										"id": true,
+										"url": true
+									},
+									"create": {
+										"id": true,
+										"url": true
+									},
+									"delete": true
+								}
+							},
+							"Video": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"poster": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"poster": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"poster": true
+									},
+									"delete": true
+								}
+							},
+							"Seo": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"title": true,
+										"ogImage": true,
+										"description": true,
+										"ogTitle": true,
+										"ogDescription": true
+									},
+									"update": {
+										"id": true,
+										"title": true,
+										"ogImage": true,
+										"description": true,
+										"ogTitle": true,
+										"ogDescription": true
+									},
+									"create": {
+										"id": true,
+										"title": true,
+										"ogImage": true,
+										"description": true,
+										"ogTitle": true,
+										"ogDescription": true
+									},
+									"delete": true
+								}
+							},
+							"ImageGrid": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"imagePosition1": true,
+										"imagePosition2": true,
+										"imagePosition3": true
+									},
+									"update": {
+										"id": true,
+										"imagePosition1": true,
+										"imagePosition2": true,
+										"imagePosition3": true
+									},
+									"create": {
+										"id": true,
+										"imagePosition1": true,
+										"imagePosition2": true,
+										"imagePosition3": true
+									},
+									"delete": true
+								}
+							},
+							"BlockPerson": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"person": true,
+										"Block": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"person": true,
+										"Block": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"person": true,
+										"Block": true
+									},
+									"delete": true
+								}
+							},
+							"Block": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"type": true,
+										"text": true,
+										"imageGrid": true,
+										"image": true,
+										"category": true,
+										"people": true,
+										"PageLocale": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"type": true,
+										"text": true,
+										"imageGrid": true,
+										"image": true,
+										"category": true,
+										"people": true,
+										"PageLocale": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"type": true,
+										"text": true,
+										"imageGrid": true,
+										"image": true,
+										"category": true,
+										"people": true,
+										"PageLocale": true
+									},
+									"delete": true
+								}
+							},
+							"MenuItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"MenuItemLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"menuItem": true,
+										"id": true,
+										"label": true,
+										"target": true,
+										"locale": true
+									},
+									"update": {
+										"menuItem": true,
+										"id": true,
+										"label": true,
+										"target": true,
+										"locale": true
+									},
+									"create": {
+										"menuItem": true,
+										"id": true,
+										"label": true,
+										"target": true,
+										"locale": true
+									},
+									"delete": true
+								}
+							},
+							"Footer": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"FooterLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"footer": true,
+										"id": true,
+										"locale": true,
+										"address": true
+									},
+									"update": {
+										"footer": true,
+										"id": true,
+										"locale": true,
+										"address": true
+									},
+									"create": {
+										"footer": true,
+										"id": true,
+										"locale": true,
+										"address": true
+									},
+									"delete": true
+								}
+							},
+							"Person": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"order": true,
+										"image": true,
+										"email": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"order": true,
+										"image": true,
+										"email": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"order": true,
+										"image": true,
+										"email": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"PersonLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"person": true,
+										"id": true,
+										"locale": true,
+										"quote": true,
+										"name": true,
+										"position": true
+									},
+									"update": {
+										"person": true,
+										"id": true,
+										"locale": true,
+										"quote": true,
+										"name": true,
+										"position": true
+									},
+									"create": {
+										"person": true,
+										"id": true,
+										"locale": true,
+										"quote": true,
+										"name": true,
+										"position": true
+									},
+									"delete": true
+								}
+							},
+							"Page": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"locales": true,
+										"image": true,
+										"category": true
+									},
+									"update": {
+										"id": true,
+										"locales": true,
+										"image": true,
+										"category": true
+									},
+									"create": {
+										"id": true,
+										"locales": true,
+										"image": true,
+										"category": true
+									},
+									"delete": true
+								}
+							},
+							"PageLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"page": true,
+										"id": true,
+										"state": true,
+										"header": true,
+										"perex": true,
+										"content": true,
+										"contactUs": true,
+										"seo": true,
+										"locale": true,
+										"link": true
+									},
+									"update": {
+										"page": true,
+										"id": true,
+										"state": true,
+										"header": true,
+										"perex": true,
+										"content": true,
+										"contactUs": true,
+										"seo": true,
+										"locale": true,
+										"link": true
+									},
+									"create": {
+										"page": true,
+										"id": true,
+										"state": true,
+										"header": true,
+										"perex": true,
+										"content": true,
+										"contactUs": true,
+										"seo": true,
+										"locale": true,
+										"link": true
+									},
+									"delete": true
+								}
+							},
+							"CategoryLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"locale": true,
+										"category": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"locale": true,
+										"category": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"locale": true,
+										"category": true
+									},
+									"delete": true
+								}
+							},
+							"Category": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"pages": true,
+										"id": true,
+										"locales": true
+									},
+									"update": {
+										"pages": true,
+										"id": true,
+										"locales": true
+									},
+									"create": {
+										"pages": true,
+										"id": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"Contact": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"delete": true
+								}
+							},
+							"ContactLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"contact": true,
+										"id": true,
+										"locale": true,
+										"header": true,
+										"seo": true,
+										"link": true
+									},
+									"update": {
+										"contact": true,
+										"id": true,
+										"locale": true,
+										"header": true,
+										"seo": true,
+										"link": true
+									},
+									"create": {
+										"contact": true,
+										"id": true,
+										"locale": true,
+										"header": true,
+										"seo": true,
+										"link": true
+									},
+									"delete": true
+								}
+							}
+						}
+					}
+				}
+			]
+		}
+	]
+}

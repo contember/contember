@@ -37,7 +37,7 @@
 		"lru-cache": "^5.1.1",
 		"node-pg-migrate": "^3.22.1",
 		"path-to-regexp": "^3.0.0",
-		"pg": "^7.12.1",
+		"pg": "^7.17.1",
 		"uuid": "^3.3.3"
 	},
 	"devDependencies": {

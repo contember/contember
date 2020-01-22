@@ -16,21 +16,21 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 		await dirCreate(join(__dirname, '/../../results/', testName))
 	}
 
-	const serverPort = process.env.SERVER_PORT
+	const serverPort = process.env.CONTEMBER_PORT
 	const contentEndpoint = `http://localhost:${serverPort}/content/app/prod`
 	const accessToken = process.env.ACCESS_TOKEN!
 
 	const queryGql = await fileRead(join(__dirname, '/../../src/query.graphql'), { encoding: 'utf8' })
 
-	const queryResponse = await graphqlRequest({
-		endpoint: contentEndpoint,
-		query: queryGql,
-		authorizationToken: accessToken,
-	})
-	console.log('Query count: ' + queryResponse.extensions.dbQueries.length)
+	// const queryResponse = await graphqlRequest({
+	// 	endpoint: contentEndpoint,
+	// 	query: queryGql,
+	// 	authorizationToken: accessToken,
+	// })
+	// console.log('Query count: ' + queryResponse.extensions.dbQueries.length)
 
 	console.log('Warmup')
-	for (let i = 0; i < 300; i++) {
+	for (let i = 0; i < 100; i++) {
 		await Promise.all(
 			[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(() =>
 				graphqlRequest({
@@ -48,7 +48,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 		console.log('\n\n\nBenchmarking with concurrency ' + connections)
 		const instance = autocannon({
 			connections,
-			duration: 20,
+			duration: 10,
 			...createHttpOptions({
 				endpoint: contentEndpoint,
 				query: queryGql,

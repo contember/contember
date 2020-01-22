@@ -159,7 +159,7 @@ function checkProjectStructure(json: unknown, slug: string, path: string): Proje
 		slug,
 		stages: stages,
 		db: checkDatabaseCredentials(json.db, `${path}.db`),
-		s3: checkS3Config(json.s3, `${path}.s3`),
+		s3: json.s3 ? checkS3Config(json.s3, `${path}.s3`) : undefined,
 	}
 }
 

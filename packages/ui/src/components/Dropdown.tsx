@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { MouseEventHandler } from 'react'
-import { createPortal } from 'react-dom'
-import { Manager, Popper, Reference } from 'react-popper'
-import { useClassNamePrefix, useComponentClassName } from '../auxiliary'
+import { Manager, Popper, PopperProps, Reference } from 'react-popper'
+import { useClassNamePrefix } from '../auxiliary'
 import { DropdownAlignment } from '../types/DropdownAlignment'
 import { assertNever } from '../utils'
 import { Collapsible } from './Collapsible'
 import { Button, ButtonBasedButtonProps } from './forms'
+import { Portal } from './Portal'
 
 export interface DropdownRenderProps {
 	requestClose: () => void
@@ -90,6 +90,20 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 
 	const prefix = useClassNamePrefix()
 
+	const children = props.children
+	const popperRenderProp = React.useCallback<PopperProps['children']>(
+		({ ref, style, placement }) => (
+			<div ref={refs.contentRef} className={`${prefix}dropdown-content`} style={style} data-placement={placement}>
+				<Collapsible expanded={isOpen} transition="fade">
+					<div ref={ref} className={`${prefix}dropdown-content-in`}>
+						{typeof children === 'function' ? children({ requestClose: close }) : children}
+					</div>
+				</Collapsible>
+			</div>
+		),
+		[close, isOpen, prefix, children, refs.contentRef],
+	)
+
 	return (
 		<Manager>
 			<div className={`${prefix}dropdown`}>
@@ -100,25 +114,9 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 						</div>
 					)}
 				</Reference>
-				{createPortal(
-					<Popper placement={alignmentToPlacement(props.alignment)}>
-						{({ ref, style, placement }) => (
-							<div
-								ref={refs.contentRef}
-								className={`${prefix}dropdown-content`}
-								style={style}
-								data-placement={placement}
-							>
-								<Collapsible expanded={isOpen} transition="fade">
-									<div ref={ref} className={`${prefix}dropdown-content-in`}>
-										{typeof props.children === 'function' ? props.children({ requestClose: close }) : props.children}
-									</div>
-								</Collapsible>
-							</div>
-						)}
-					</Popper>,
-					contentContainer,
-				)}
+				<Portal to={contentContainer}>
+					<Popper placement={alignmentToPlacement(props.alignment)}>{popperRenderProp}</Popper>
+				</Portal>
 			</div>
 		</Manager>
 	)

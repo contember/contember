@@ -33,7 +33,9 @@
 		"react-table": "^6.8.6",
 		"redux": "^4.0.4",
 		"redux-actions": "^2.6.5",
-		"redux-thunk": "^2.3.0"
+		"redux-thunk": "^2.3.0",
+		"slate": "^0.57.1",
+		"slate-react": "^0.57.1"
 	},
 	"peerDependencies": {
 		"react": "^16.12.0",

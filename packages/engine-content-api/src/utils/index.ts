@@ -1,7 +1,6 @@
 export * from './accessor'
 export * from './arrays'
 export * from './assertNever'
-export * from './inputUtils'
 export * from './isIt'
 export * from './object'
 export * from './singletonFactory'

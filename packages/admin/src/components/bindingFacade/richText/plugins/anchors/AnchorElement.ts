@@ -1,7 +1,7 @@
-import { ArrayContents, BaseEditor, TextNode } from '../essentials'
+import { BaseEditor } from '../essentials'
 
 export interface AnchorElement {
 	type: 'anchor'
 	href: string
-	children: Array<ArrayContents<BaseEditor['children']> | AnchorElement | TextNode>
+	children: BaseEditor['children']
 }

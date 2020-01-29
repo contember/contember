@@ -1,6 +1,6 @@
-import { ArrayContents, BaseEditor, ElementNode, TextNode } from '../essentials'
+import { BaseEditor, ElementNode } from '../essentials'
 
 export interface ParagraphElement extends ElementNode {
 	type: 'paragraph'
-	children: Array<ArrayContents<BaseEditor['children']> | ParagraphElement | TextNode>
+	children: BaseEditor['children']
 }

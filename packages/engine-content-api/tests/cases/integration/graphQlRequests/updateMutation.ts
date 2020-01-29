@@ -761,7 +761,11 @@ describe('update', () => {
 								{
 									type: 'NonUniqueWhereInput',
 									message:
-										'Unique where is not unique: \nProvided value:{"post":{"id":"123e4567-e89b-12d3-a456-000000000002"}}\nKnown unique keys:\n\t - locale, post',
+										'Provided where is not unique for entity PostLocale:\n' +
+										'Provided value: {"post":{"id":"123e4567-e89b-12d3-a456-000000000002"}}\n' +
+										'Known unique key combinations:\n' +
+										'\t - id\n' +
+										'\t - locale, post',
 								},
 							],
 						},

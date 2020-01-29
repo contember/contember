@@ -54,7 +54,7 @@ class ContentApolloServerFactory {
 					return error
 				}
 				if (originalError instanceof UserError) {
-					return { message: error.message, locations: undefined, path: undefined }
+					return { message: error.message, locations: error.locations, path: error.path }
 				}
 				console.error(originalError || error)
 				return { message: 'Internal server error', locations: undefined, path: undefined }

@@ -1,16 +1,19 @@
 import React from 'react'
 import { createEditor } from 'slate'
+import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 import { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
 import { DefaultLeaf } from './DefaultLeaf'
+import { UnderlyingEditor } from './Node'
 
 export const createEditorWithEssentials = (): BaseEditor => {
-	const editor: Partial<BaseEditor> = withReact(createEditor())
+	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor()))
+	const editorWithEssentials: Partial<BaseEditor> = underlyingEditor
 
-	editor.formatVersion = '0.0.0'
-	editor.renderElement = props => React.createElement(DefaultElement, props)
-	editor.renderLeaf = props => React.createElement(DefaultLeaf, props)
+	editorWithEssentials.formatVersion = '0.0.0'
+	editorWithEssentials.renderElement = props => React.createElement(DefaultElement, props)
+	editorWithEssentials.renderLeaf = props => React.createElement(DefaultLeaf, props)
 
-	return editor as BaseEditor
+	return editorWithEssentials as BaseEditor
 }

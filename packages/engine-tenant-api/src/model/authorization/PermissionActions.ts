@@ -8,22 +8,23 @@ namespace PermissionActions {
 		apiKey = 'apiKey',
 	}
 
-	export const SYSTEM_SETUP: Authorizator.Action = [Resources.system, 'setup']
+	export const SYSTEM_SETUP = Authorizator.createAction(Resources.system, 'setup')
 
-	export const PERSON_SIGN_IN: Authorizator.Action = [Resources.person, 'signIn']
-	export const PERSON_SIGN_UP: Authorizator.Action = [Resources.person, 'signUp']
-	export const PERSON_SIGN_OUT: Authorizator.Action = [Resources.person, 'signOut']
-	export const PERSON_CHANGE_PASSWORD: Authorizator.Action = [Resources.person, 'changePassword']
+	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
+	export const PERSON_SIGN_UP = Authorizator.createAction(Resources.person, 'signUp')
+	export const PERSON_SIGN_OUT = Authorizator.createAction(Resources.person, 'signOut')
+	export const PERSON_CHANGE_PASSWORD = Authorizator.createAction(Resources.person, 'changePassword')
+	export const PERSON_INVITE = Authorizator.createAction(Resources.person, 'invite')
 
-	export const PROJECT_VIEW: Authorizator.Action = [Resources.project, 'view']
+	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
 
-	export const PROJECT_VIEW_MEMBERS: Authorizator.Action = [Resources.project, 'viewMembers']
-	export const PROJECT_ADD_MEMBER: Authorizator.Action = [Resources.project, 'addMember']
-	export const PROJECT_REMOVE_MEMBER: Authorizator.Action = [Resources.project, 'removeMember']
-	export const PROJECT_UPDATE_MEMBER: Authorizator.Action = [Resources.project, 'updateMember']
+	export const PROJECT_VIEW_MEMBERS = Authorizator.createAction(Resources.project, 'viewMembers')
+	export const PROJECT_ADD_MEMBER = Authorizator.createAction(Resources.project, 'addMember')
+	export const PROJECT_REMOVE_MEMBER = Authorizator.createAction(Resources.project, 'removeMember')
+	export const PROJECT_UPDATE_MEMBER = Authorizator.createAction(Resources.project, 'updateMember')
 
-	export const API_KEY_CREATE: Authorizator.Action = [Resources.apiKey, 'create']
-	export const API_KEY_DISABLE: Authorizator.Action = [Resources.apiKey, 'disable']
+	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
+	export const API_KEY_DISABLE = Authorizator.createAction(Resources.apiKey, 'disable')
 }
 
 export { PermissionActions }

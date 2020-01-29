@@ -9,7 +9,9 @@ interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Ide
 namespace Authorizator {
 	export type Resource = string
 	export type Privilege = string
-	export type Action = [Resource, Privilege]
+	export type Action = { resource: Resource; privilege: Privilege }
+
+	export const createAction = (resource: Resource, privilege: Privilege): Action => ({ resource, privilege })
 
 	export class Default<Identity extends Authorizator.Identity> implements Authorizator<Identity> {
 		constructor(private readonly accessEvaluator: AccessEvaluator) {}

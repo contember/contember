@@ -20,7 +20,7 @@ type Options = {
 	// ['host']: string
 	['admin-runtime']?: 'node' | 'docker'
 	['ports']?: string
-	host?: string
+	host?: string[]
 	['save-ports']?: boolean
 }
 
@@ -28,7 +28,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Starts Contember instance')
 		configuration.argument('instanceName').optional()
-		configuration.option('host').valueRequired()
+		configuration.option('host').valueArray()
 		configuration.option('save-ports').valueNone()
 		configuration.option('ports').valueRequired()
 		configuration

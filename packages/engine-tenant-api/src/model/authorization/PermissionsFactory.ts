@@ -18,6 +18,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_ADD_MEMBER)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_UPDATE_MEMBER)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_REMOVE_MEMBER)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE)
 
 		return permissions
 	}

@@ -21,7 +21,7 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
 		await context.requireAccess({
 			scope: new ProjectScope(project),
-			action: PermissionActions.PROJECT_ADD_MEMBER,
+			action: PermissionActions.PROJECT_REMOVE_MEMBER,
 			message: 'You are not allowed to add a project member',
 		})
 		if (!project) {

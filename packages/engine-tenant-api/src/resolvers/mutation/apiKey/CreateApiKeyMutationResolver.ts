@@ -20,8 +20,8 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
 		await context.requireAccess({
 			scope: new ProjectScope(project),
-			action: PermissionActions.PROJECT_ADD_MEMBER,
-			message: 'You are not allowed to add a project member',
+			action: PermissionActions.API_KEY_CREATE,
+			message: 'You are not allowed to create an API key for this project',
 		})
 		if (!project) {
 			return {

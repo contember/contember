@@ -112,11 +112,7 @@ class CompositionRoot {
 				return new DatabaseTransactionMiddlewareFactory()
 			})
 			.addService('tenantApolloServer', ({ tenantContainer }) =>
-				new TenantApolloServerFactory(
-					tenantContainer.resolvers,
-					tenantContainer.resolverContextFactory,
-					tenantContainer.errorFormatter,
-				).create(),
+				new TenantApolloServerFactory(tenantContainer.resolvers, tenantContainer.resolverContextFactory).create(),
 			)
 			.addService(
 				'tenantMiddlewareFactory',

@@ -35,13 +35,10 @@ import { ProjectQueryResolver } from './resolvers/query/ProjectQueryResolver'
 import { ProjectVariablesResolver } from './model/type'
 import { InviteMutationResolver } from './resolvers/mutation/person/InviteMutationResolver'
 import { InviteManager } from './model/service/InviteManager'
-import { GraphQLError, GraphQLFormattedError } from 'graphql'
-import { formatError } from './resolvers/ErrorFormatter'
 import { ProjectMembersQueryResolver } from './resolvers/query/ProjectMembersQueryResolver'
 import { PermissionContextFactory } from './model/authorization/PermissionContextFactory'
 import { IdentityFactory } from './model/authorization/IdentityFactory'
 import * as Schema from './schema'
-import { createMigrationFilesManager } from './utils'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -51,7 +48,6 @@ interface TenantContainer {
 	resolvers: Schema.Resolvers
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
-	errorFormatter: (error: GraphQLError) => GraphQLFormattedError
 }
 
 namespace TenantContainer {
@@ -71,7 +67,6 @@ namespace TenantContainer {
 					'resolvers',
 					'authorizator',
 					'resolverContextFactory',
-					'errorFormatter',
 				)
 		}
 
@@ -193,7 +188,6 @@ namespace TenantContainer {
 					({ permissionContextFactory }) => new ResolverContextFactory(permissionContextFactory),
 				)
 				.addService('resolvers', container => new ResolverFactory(container).create())
-				.addService('errorFormatter', () => formatError)
 		}
 	}
 }

@@ -36,7 +36,7 @@ const schema: DocumentNode = gql`
 			memberships: [MembershipInput!]!
 		): UpdateProjectMemberResponse
 
-		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!): CreateApiKeyResponse
+		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 	}
 

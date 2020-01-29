@@ -237,6 +237,7 @@ export type MutationUpdateProjectMemberArgs = {
 export type MutationCreateApiKeyArgs = {
 	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+	description: Scalars['String']
 }
 
 export type MutationDisableApiKeyArgs = {

@@ -266,6 +266,12 @@ export const interactiveCreateApiKey = async ({
 			another = false
 		}
 	} while (another)
+	const { description } = await prompts({
+		name: 'description',
+		type: 'text',
+		message: 'API key description (e.g. "a key for mobile app")',
+	})
+
 	console.log(`project: ${project.slug}`)
 	console.log('memberships:')
 	console.log(JSON.stringify(memberships, null, '  '))
@@ -279,7 +285,7 @@ export const interactiveCreateApiKey = async ({
 		return await interactiveCreateApiKey({ client })
 	}
 
-	return await client.createApiKey(project.slug, memberships)
+	return await client.createApiKey(project.slug, memberships, description)
 }
 
 type MembershipVariable = {
@@ -308,9 +314,13 @@ export class TenantClient {
 		return new TenantClient(createClient(url, apiToken))
 	}
 
-	public async createApiKey(projectSlug: string, memberships: Membership[]): Promise<{ id: string; token: string }> {
-		const query = `mutation($projectSlug: String!, $memberships: [MembershipInput!]!) {
-  createApiKey(projectSlug: $projectSlug, memberships: $memberships) {
+	public async createApiKey(
+		projectSlug: string,
+		memberships: Membership[],
+		description: string,
+	): Promise<{ id: string; token: string }> {
+		const query = `mutation($projectSlug: String!, $memberships: [MembershipInput!]!, $description: String!) {
+  createApiKey(projectSlug: $projectSlug, memberships: $memberships, description: $description) {
     ok
     errors {
       code
@@ -323,7 +333,7 @@ export class TenantClient {
     }
   }
 }`
-		const response = await this.apiClient.request(query, { projectSlug, memberships })
+		const response = await this.apiClient.request(query, { projectSlug, memberships, description })
 		if (!response.createApiKey.ok) {
 			throw response.createApiKey.errors.map((it: any) => it.code)
 		}

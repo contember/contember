@@ -13,7 +13,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createApiKey(
 		parent: any,
-		{ projectSlug, memberships }: MutationCreateApiKeyArgs,
+		{ projectSlug, memberships, description }: MutationCreateApiKeyArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
@@ -30,7 +30,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships)
+		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships, description)
 
 		if (!result.ok) {
 			return {

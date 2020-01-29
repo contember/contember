@@ -98,7 +98,7 @@ export const printInstanceStatus = async (args: { instanceDirectory: string }) =
 	}
 	console.log('Following services are running:')
 	statusList.forEach(it => {
-		const addressStr = it.ports.map(it => `http://${it.hostIp}:${it.hostPort}`)
+		const addressStr = it.ports.map(it => `http://${it.hostIp}:${it.hostPort}`).join(' ')
 
 		const addressInfo = it.running && addressStr.length > 0 ? ` on ${addressStr}` : ''
 		console.log(`${it.name}: ${it.status}${addressInfo}`)
@@ -187,7 +187,7 @@ export const resolvePortsMapping = async (args: {
 	instanceDirectory: string
 	config: any
 	startPort?: number
-	host?: string
+	host?: string[]
 }): Promise<ServicePortsMapping> => {
 	const exposedServices = [
 		{ service: 'admin', port: null },
@@ -207,32 +207,32 @@ export const resolvePortsMapping = async (args: {
 			continue
 		}
 		const serviceConfiguredPorts = configuredPorts[service] || []
-		const configuredPortMapping = serviceConfiguredPorts.find(
+		const configuredPortMapping = serviceConfiguredPorts.filter(
 			it => !containerPort || it.containerPort === containerPort,
 		)
-		const otherConfiguredPorts = serviceConfiguredPorts.filter(it => it !== configuredPortMapping)
+		const otherConfiguredPorts = serviceConfiguredPorts.filter(it => !configuredPortMapping.includes(it))
 
 		const runningStatus = runningServices.find(it => it.name === service)
 		const runningPortMapping =
-			runningStatus && runningStatus.ports.find(it => !containerPort || it.containerPort === containerPort)
+			runningStatus?.ports.filter(it => !containerPort || it.containerPort === containerPort) || []
 
-		let assignedPortMapping = configuredPortMapping || runningPortMapping
-		if (!assignedPortMapping) {
-			let freePort
+		let assignedPortMapping = configuredPortMapping.length > 0 ? configuredPortMapping : runningPortMapping
+		if (assignedPortMapping.length === 0) {
+			let freePort: number
 			do {
 				freePort = await getPort({ port: getPort.makeRange(startPort, 65535) })
 			} while (occupiedPorts.includes(freePort))
 
 			occupiedPorts.push(freePort)
-			assignedPortMapping = {
+			assignedPortMapping = (args.host || ['127.0.0.1']).map(host => ({
 				containerPort: containerPort || freePort,
 				hostPort: freePort,
-				hostIp: args.host || '127.0.0.1',
-			}
+				hostIp: host,
+			}))
 			startPort = freePort + 1
 		}
 
-		servicePortMapping[service] = [assignedPortMapping, ...otherConfiguredPorts]
+		servicePortMapping[service] = [...assignedPortMapping, ...otherConfiguredPorts]
 	}
 	return servicePortMapping
 }
@@ -246,7 +246,7 @@ export const resolveInstanceDockerConfig = async ({
 	startPort,
 }: {
 	instanceDirectory: string
-	host?: string
+	host?: string[]
 	savePortsMapping?: boolean
 	startPort?: number
 }): Promise<{ composeConfig: any; portsMapping: ServicePortsMapping }> => {

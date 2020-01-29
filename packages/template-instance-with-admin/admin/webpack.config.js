@@ -56,6 +56,7 @@ module.exports = ({ production }) => ({
 	devServer: {
 		contentBase: path.join(__dirname, './src'),
 		hot: true,
+		disableHostCheck: true,
 		host: '0.0.0.0',
 		port: process.env.CONTEMBER_PORT,
 		stats: {

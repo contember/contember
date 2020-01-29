@@ -21,7 +21,7 @@ type Options = {
 	['admin-runtime']?: 'node' | 'docker'
 	['ports']?: string
 	host?: string
-	// ['save-ports']?: boolean
+	['save-ports']?: boolean
 }
 
 export class InstanceStartCommand extends Command<Args, Options> {
@@ -29,7 +29,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		configuration.description('Starts Contember instance')
 		configuration.argument('instanceName').optional()
 		configuration.option('host').valueRequired()
-		// configuration.option('save-ports').valueNone()
+		configuration.option('save-ports').valueNone()
 		configuration.option('ports').valueRequired()
 		configuration
 			.option('admin-runtime')
@@ -44,7 +44,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			instanceDirectory,
 			host: input.getOption('host'),
 			startPort: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
-			//savePortsMapping: input.getOption('save-ports'),
+			savePortsMapping: input.getOption('save-ports'),
 		})
 		const version = await getWorkspaceApiVersion({ workspaceDirectory })
 

@@ -1,11 +1,11 @@
 import { Button, HoveringToolbar as UIToolbar, Icon } from '@contember/ui'
 import * as React from 'react'
-import { Editor, Range } from 'slate'
+import { Editor, Range as SlateRange } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { EditorNode, EditorWithBasicFormatting, EditorWithEssentials } from '../plugins'
 
 export interface HoveringToolbarProps {
-	selection: Range | undefined
+	selection: SlateRange | undefined
 	editor: EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>
 }
 
@@ -16,7 +16,7 @@ export const HoveringToolbar = React.memo(({ selection, editor }: HoveringToolba
 
 	if (selection) {
 		toolbarVisible =
-			ReactEditor.isFocused(editor) && Range.isExpanded(selection) && Editor.string(editor, selection) !== ''
+			ReactEditor.isFocused(editor) && SlateRange.isExpanded(selection) && Editor.string(editor, selection) !== ''
 	}
 
 	React.useLayoutEffect(() => {
@@ -44,17 +44,52 @@ export const HoveringToolbar = React.memo(({ selection, editor }: HoveringToolba
 		container.style.left = left
 	}, [selection, toolbarVisible])
 
-	return (
-		<UIToolbar isActive={toolbarVisible} ref={toolbarRef}>
-			<Button>
+	const isBold = editor.isBold(editor)
+	const toggleBold = React.useCallback(() => {
+		editor.toggleBold(editor)
+	}, [editor])
+	const boldButton = React.useMemo(
+		() => (
+			<Button key="bold" isActive={isBold} onClick={toggleBold}>
 				<Icon blueprintIcon="bold" />
 			</Button>
-			<Button>
+		),
+		[isBold, toggleBold],
+	)
+
+	const isStruckThrough = editor.isStruckThrough(editor)
+	const toggleStruckThrough = React.useCallback(() => {
+		editor.toggleStruckThrough(editor)
+	}, [editor])
+	const strikethroughButton = React.useMemo(
+		() => (
+			<Button key="strikethrough" isActive={isStruckThrough} onClick={toggleStruckThrough}>
 				<Icon blueprintIcon="strikethrough" />
 			</Button>
-			<Button>
+		),
+		[isStruckThrough, toggleStruckThrough],
+	)
+
+	// TODO
+	const linkButton = React.useMemo(
+		() => (
+			<Button key="link">
 				<Icon blueprintIcon="link" />
 			</Button>
+		),
+		[],
+	)
+
+	const buttons = React.useMemo(() => [boldButton, strikethroughButton, linkButton], [
+		boldButton,
+		//linkButton,
+		strikethroughButton,
+	])
+
+	// TODO use a container so that it doesn't break during resize.
+	return (
+		<UIToolbar isActive={toolbarVisible} ref={toolbarRef}>
+			{buttons}
 		</UIToolbar>
 	)
 })

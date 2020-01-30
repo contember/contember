@@ -31,7 +31,9 @@ export const TestWysiwyg = () => {
 					children: [{ text: 'links' }],
 					href: 'https://example.com',
 				},
-				{ text: ' and other cool stuff' },
+				{ text: ' and other ' },
+				{ text: 'cool', isBold: true },
+				{ text: ' stuff.' },
 			],
 		},
 		{

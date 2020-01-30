@@ -1,15 +1,23 @@
 import { Button, HoveringToolbar as UIToolbar, Icon } from '@contember/ui'
 import * as React from 'react'
 import { Editor, Range as SlateRange } from 'slate'
-import { ReactEditor } from 'slate-react'
-import { EditorNode, EditorWithBasicFormatting, EditorWithEssentials } from '../plugins'
+import { ReactEditor, useEditor } from 'slate-react'
+import { EditorNode, EditorWithBasicFormatting, EditorWithEssentials, RichTextBooleanMarkNames } from '../plugins'
 
 export interface HoveringToolbarProps {
 	selection: SlateRange | undefined
-	editor: EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>
 }
 
-export const HoveringToolbar = React.memo(({ selection, editor }: HoveringToolbarProps) => {
+const getToggleCallback = (
+	editor: EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>,
+	mark: RichTextBooleanMarkNames,
+) => (e: React.SyntheticEvent) => {
+	e.preventDefault() // This is crucial so that we don't unselect the selected text
+	editor.toggleRichTextNodeMark(editor, mark)
+}
+
+export const HoveringToolbar = React.memo(({ selection }: HoveringToolbarProps) => {
+	const editor = useEditor() as EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>
 	const toolbarRef = React.useRef<HTMLDivElement | null>(null)
 
 	let toolbarVisible = false
@@ -45,12 +53,10 @@ export const HoveringToolbar = React.memo(({ selection, editor }: HoveringToolba
 	}, [selection, toolbarVisible])
 
 	const isBold = editor.isBold(editor)
-	const toggleBold = React.useCallback(() => {
-		editor.toggleBold(editor)
-	}, [editor])
+	const toggleBold = React.useMemo(() => getToggleCallback(editor, 'isBold'), [editor])
 	const boldButton = React.useMemo(
 		() => (
-			<Button key="bold" isActive={isBold} onClick={toggleBold}>
+			<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
 				<Icon blueprintIcon="bold" />
 			</Button>
 		),
@@ -58,12 +64,10 @@ export const HoveringToolbar = React.memo(({ selection, editor }: HoveringToolba
 	)
 
 	const isStruckThrough = editor.isStruckThrough(editor)
-	const toggleStruckThrough = React.useCallback(() => {
-		editor.toggleStruckThrough(editor)
-	}, [editor])
+	const toggleStruckThrough = React.useMemo(() => getToggleCallback(editor, 'isStruckThrough'), [editor])
 	const strikethroughButton = React.useMemo(
 		() => (
-			<Button key="strikethrough" isActive={isStruckThrough} onClick={toggleStruckThrough}>
+			<Button key="strikethrough" isActive={isStruckThrough} onMouseDown={toggleStruckThrough}>
 				<Icon blueprintIcon="strikethrough" />
 			</Button>
 		),
@@ -80,11 +84,7 @@ export const HoveringToolbar = React.memo(({ selection, editor }: HoveringToolba
 		[],
 	)
 
-	const buttons = React.useMemo(() => [boldButton, strikethroughButton, linkButton], [
-		boldButton,
-		//linkButton,
-		strikethroughButton,
-	])
+	const buttons = React.useMemo(() => [boldButton, strikethroughButton], [boldButton, strikethroughButton])
 
 	// TODO use a container so that it doesn't break during resize.
 	return (

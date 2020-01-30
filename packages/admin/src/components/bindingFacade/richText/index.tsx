@@ -57,7 +57,7 @@ export const TestWysiwyg = () => {
 	const selectionForToolbar = selection && Range.isExpanded(selection) ? selection : undefined
 	return (
 		<Slate editor={editor} value={value} onChange={onChange}>
-			<HoveringToolbar selection={selectionForToolbar} editor={editor} />
+			<HoveringToolbar selection={selectionForToolbar} />
 			<Editable renderElement={editor.renderElement} renderLeaf={editor.renderLeaf} onSelect={onSelect} />
 		</Slate>
 	)

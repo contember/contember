@@ -2,22 +2,29 @@ import { Button, HoveringToolbar as UIToolbar, Icon } from '@contember/ui'
 import * as React from 'react'
 import { Editor, Range as SlateRange } from 'slate'
 import { ReactEditor, useEditor } from 'slate-react'
-import { EditorNode, EditorWithBasicFormatting, EditorWithEssentials, RichTextBooleanMarkNames } from '../plugins'
+import {
+	EditorNode,
+	EditorWithAnchors,
+	EditorWithBasicFormatting,
+	EditorWithEssentials,
+	RichTextBooleanMarkNames,
+} from '../plugins'
+
+type HoveringToolbarEditor = EditorWithAnchors<EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>>
 
 export interface HoveringToolbarProps {
 	selection: SlateRange | undefined
 }
 
-const getToggleCallback = (
-	editor: EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>,
-	mark: RichTextBooleanMarkNames,
-) => (e: React.SyntheticEvent) => {
+const getToggleCallback = (editor: HoveringToolbarEditor, mark: RichTextBooleanMarkNames) => (
+	e: React.SyntheticEvent,
+) => {
 	e.preventDefault() // This is crucial so that we don't unselect the selected text
 	editor.toggleRichTextNodeMark(editor, mark)
 }
 
 export const HoveringToolbar = React.memo(({ selection }: HoveringToolbarProps) => {
-	const editor = useEditor() as EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>
+	const editor = useEditor() as HoveringToolbarEditor
 	const toolbarRef = React.useRef<HTMLDivElement | null>(null)
 
 	let toolbarVisible = false
@@ -74,17 +81,31 @@ export const HoveringToolbar = React.memo(({ selection }: HoveringToolbarProps) 
 		[isStruckThrough, toggleStruckThrough],
 	)
 
-	// TODO
-	const linkButton = React.useMemo(
+	const toggleAnchor = React.useCallback(
+		(e: React.SyntheticEvent) => {
+			e.preventDefault()
+			const url = prompt('Insert the URL:')
+			if (!url) {
+				return
+			}
+			editor.wrapAnchor(editor, url)
+		},
+		[editor],
+	)
+	const anchorButton = React.useMemo(
 		() => (
-			<Button key="link">
+			<Button key="link" onMouseDown={toggleAnchor}>
 				<Icon blueprintIcon="link" />
 			</Button>
 		),
-		[],
+		[toggleAnchor],
 	)
 
-	const buttons = React.useMemo(() => [boldButton, strikethroughButton], [boldButton, strikethroughButton])
+	const buttons = React.useMemo(() => [boldButton, strikethroughButton, anchorButton], [
+		boldButton,
+		strikethroughButton,
+		anchorButton,
+	])
 
 	// TODO use a container so that it doesn't break during resize.
 	return (

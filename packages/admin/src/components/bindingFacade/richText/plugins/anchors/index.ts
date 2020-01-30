@@ -1,4 +1,5 @@
 export * from './AnchorElement'
 export * from './AnchorRenderer'
 export * from './EditorWithAnchors'
+export * from './isUrl'
 export * from './withAnchors'

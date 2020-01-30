@@ -5,6 +5,9 @@ import { AnchorRendererProps } from './AnchorRenderer'
 
 export interface WithAnchors<E extends WithAnotherNodeType<BaseEditor, AnchorElement>> {
 	isAnchor: (element: ElementNode) => element is AnchorElement
+	isAnchorActive: (editor: E) => boolean
+	wrapAnchor: (editor: E, url: string) => void
+	unwrapAnchor: (editor: E) => void
 	anchorRenderer: React.FunctionComponent<AnchorRendererProps>
 }
 

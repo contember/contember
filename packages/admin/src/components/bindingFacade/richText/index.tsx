@@ -58,7 +58,12 @@ export const TestWysiwyg = () => {
 	return (
 		<Slate editor={editor} value={value} onChange={onChange}>
 			<HoveringToolbar selection={selectionForToolbar} />
-			<Editable renderElement={editor.renderElement} renderLeaf={editor.renderLeaf} onSelect={onSelect} />
+			<Editable
+				renderElement={editor.renderElement}
+				renderLeaf={editor.renderLeaf}
+				onSelect={onSelect}
+				onKeyDown={editor.onKeyDown}
+			/>
 		</Slate>
 	)
 }

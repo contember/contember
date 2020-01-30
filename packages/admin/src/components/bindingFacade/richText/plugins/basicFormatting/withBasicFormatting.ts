@@ -2,11 +2,14 @@ import * as React from 'react'
 import { Editor } from 'slate'
 import { BaseEditor, WithAnotherNodeType } from '../essentials'
 import { EditorWithBasicFormatting, WithBasicFormatting } from './EditorWithBasicFormatting'
+import { hotKeys } from './hotKeys'
 import { RichTextBooleanMarkNames, RichTextNode } from './RichTextNode'
 import { RichTextNodeRenderer } from './RichTextNodeRenderer'
 
 export const withBasicFormatting = <E extends BaseEditor>(editor: E): EditorWithBasicFormatting<E> => {
 	const e: E & Partial<WithBasicFormatting<WithAnotherNodeType<E, RichTextNode>>> = editor
+
+	const { onKeyDown } = editor
 
 	const isRichTextNodeMarkActive = (e.isRichTextNodeMarkActive = (
 		editor: WithAnotherNodeType<E, RichTextNode>,
@@ -44,6 +47,16 @@ export const withBasicFormatting = <E extends BaseEditor>(editor: E): EditorWith
 	e.toggleUnderlined = editor => toggleRichTextNodeMark(editor, 'isUnderlined')
 
 	e.renderLeaf = props => React.createElement(RichTextNodeRenderer, props)
+
+	e.onKeyDown = event => {
+		for (const mark in hotKeys) {
+			if (hotKeys[mark as RichTextBooleanMarkNames](event.nativeEvent)) {
+				toggleRichTextNodeMark(e as EditorWithBasicFormatting<E>, mark as RichTextBooleanMarkNames)
+				event.preventDefault()
+			}
+		}
+		onKeyDown(event)
+	}
 
 	return e as EditorWithBasicFormatting<E>
 }

@@ -14,6 +14,7 @@ export const createEditorWithEssentials = (): BaseEditor => {
 	editorWithEssentials.formatVersion = '0.0.0'
 	editorWithEssentials.renderElement = props => React.createElement(DefaultElement, props)
 	editorWithEssentials.renderLeaf = props => React.createElement(DefaultLeaf, props)
+	editorWithEssentials.onKeyDown = () => {} // Just a noop function so that other plugins can safely bubble-call
 
 	return editorWithEssentials as BaseEditor
 }

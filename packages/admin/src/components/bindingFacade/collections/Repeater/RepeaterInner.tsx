@@ -89,6 +89,7 @@ export const RepeaterInner = Component<RepeaterInnerProps>(
 				lockAxis={axis}
 				helperClass="is-active"
 				lockToContainerEdges={true}
+				useWindowAsScrollContainer={true}
 				useDragHandle={true}
 				onSortEnd={onSortEnd}
 			>

@@ -1,6 +1,7 @@
 {
 	"name": "@contember/benchmark",
 	"version": "0.6.0",
+	"license": "Apache-2.0",
 	"scripts": {
 		"start-server": "node dist/src/start-server.js",
 		"drop": "node dist/src/drop.js",

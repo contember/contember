@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-ecr-login
-
 if [[ $VERSION =~ ^v((([0-9]+)\.([0-9]+))\.[0-9]+)$ ]]; then
   ALL_VERSIONS=( "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" )
   NEWER_MINOR=$((${BASH_REMATCH[4]} + 1))

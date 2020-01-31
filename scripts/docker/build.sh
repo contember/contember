@@ -17,7 +17,7 @@ else
 fi
 MAIN_VERSION=${ALL_VERSIONS[0]}
 
-REPO="contember/api"
+REPO="contember/contember"
 docker build -t "$REPO:$MAIN_VERSION" -f ./packages/engine-server/Dockerfile .
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do

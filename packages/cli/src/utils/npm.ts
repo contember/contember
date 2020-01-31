@@ -20,7 +20,7 @@ export const downloadPackage = async (pkgName: string, dir: string): Promise<voi
 	await downloadTarball({ url: tarball, gotOpts: { headers }, dir: tmpDir })
 	const dirContent = await readdir(tmpDir)
 	if (dirContent.length !== 1 || dirContent[0] !== 'package') {
-		throw new Error('Invalid NPM package')
+		throw 'Invalid NPM package'
 	}
 	await move(join(tmpDir, 'package'), dir)
 	await remove(tmpDir)

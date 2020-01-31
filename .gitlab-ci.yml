@@ -78,5 +78,6 @@ publish:docker:
   variables:
     VERSION: "$CI_COMMIT_REF_NAME"
   script:
+    - docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
     - apk --no-cache add git
     - bash scripts/docker/build.sh

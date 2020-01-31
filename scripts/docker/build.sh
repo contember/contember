@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-ECR="831119889470.dkr.ecr.eu-central-1.amazonaws.com"
-
 ecr-login
 
 if [[ $VERSION =~ ^v((([0-9]+)\.([0-9]+))\.[0-9]+)$ ]]; then
@@ -19,11 +17,11 @@ else
 fi
 MAIN_VERSION=${ALL_VERSIONS[0]}
 
-REPO="mangoweb/contember/api"
-docker build -t "$ECR/$REPO:$MAIN_VERSION" -f ./packages/engine-server/Dockerfile .
+REPO="contember/api"
+docker build -t "$REPO:$MAIN_VERSION" -f ./packages/engine-server/Dockerfile .
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do
-  docker tag "$ECR/$REPO:$MAIN_VERSION" "$ECR/$REPO:$VERSION"
+  docker tag "$REPO:$MAIN_VERSION" "$REPO:$VERSION"
 done
-docker push "$ECR/$REPO"
+docker push "$REPO"
 

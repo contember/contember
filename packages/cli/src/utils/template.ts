@@ -48,7 +48,9 @@ export const installTemplate = async (
 
 	if (config.patchPackageJson) {
 		await replaceFileContent(join(targetDir, 'package.json'), content => {
-			const { name, version, 'scripts-template': scripts, scripts: _nullScripts, ...json } = JSON.parse(content)
+			const { name, version, 'scripts-template': scripts, scripts: _nullScripts, license, ...json } = JSON.parse(
+				content,
+			)
 			return JSON.stringify({ scripts, ...json }, null, '  ')
 		})
 	}

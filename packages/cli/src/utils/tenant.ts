@@ -212,11 +212,67 @@ export const interactiveResolveApiToken = async ({
 	return token
 }
 
+export const interactiveInvite = async ({ client }: { client: TenantClient }): Promise<void> => {
+	const { project, memberships } = await interactiveResolveMemberships({ client })
+
+	const { email } = await prompts({
+		name: 'email',
+		type: 'text',
+		validate: (value: string) => (value.includes('@') ? true : 'Not a valid e-mail'),
+		message: 'User e-mail',
+	})
+
+	console.log(`email: ${email}`)
+	console.log(`project: ${project.slug}`)
+	console.log('memberships:')
+	console.log(JSON.stringify(memberships, null, '  '))
+	const { ok } = await prompts({
+		name: 'ok',
+		message: 'Are you sure you want to invite this user?',
+		type: 'confirm',
+		inactive: 'no, start again',
+	})
+	if (!ok) {
+		return await interactiveInvite({ client })
+	}
+
+	await client.invite(email, project.slug, memberships)
+}
+
 export const interactiveCreateApiKey = async ({
 	client,
 }: {
 	client: TenantClient
 }): Promise<{ id: string; token: string }> => {
+	const { project, memberships } = await interactiveResolveMemberships({ client })
+
+	const { description } = await prompts({
+		name: 'description',
+		type: 'text',
+		message: 'API key description (e.g. "a key for mobile app")',
+	})
+
+	console.log(`project: ${project.slug}`)
+	console.log('memberships:')
+	console.log(JSON.stringify(memberships, null, '  '))
+	const { ok } = await prompts({
+		name: 'ok',
+		message: 'Are you sure you want to create this API key?',
+		type: 'confirm',
+		inactive: 'no, start again',
+	})
+	if (!ok) {
+		return await interactiveCreateApiKey({ client })
+	}
+
+	return await client.createApiKey(project.slug, memberships, description)
+}
+
+const interactiveResolveMemberships = async ({
+	client,
+}: {
+	client: TenantClient
+}): Promise<{ project: Project; memberships: Membership[] }> => {
 	const projects = await client.listProjects()
 	const { projectSlug } = await prompts({
 		type: 'select',
@@ -266,26 +322,7 @@ export const interactiveCreateApiKey = async ({
 			another = false
 		}
 	} while (another)
-	const { description } = await prompts({
-		name: 'description',
-		type: 'text',
-		message: 'API key description (e.g. "a key for mobile app")',
-	})
-
-	console.log(`project: ${project.slug}`)
-	console.log('memberships:')
-	console.log(JSON.stringify(memberships, null, '  '))
-	const { ok } = await prompts({
-		name: 'ok',
-		message: 'Are you sure you want to create this API key?',
-		type: 'confirm',
-		inactive: 'no, start again',
-	})
-	if (!ok) {
-		return await interactiveCreateApiKey({ client })
-	}
-
-	return await client.createApiKey(project.slug, memberships, description)
+	return { project, memberships }
 }
 
 type MembershipVariable = {
@@ -338,6 +375,21 @@ export class TenantClient {
 			throw response.createApiKey.errors.map((it: any) => it.code)
 		}
 		return response.createApiKey.result.apiKey
+	}
+
+	public async invite(email: string, projectSlug: string, memberships: Membership[]): Promise<void> {
+		const query = `mutation($projectSlug: String!, $memberships: [MembershipInput!]!, $email: String!) {
+  invite(projectSlug: $projectSlug, memberships: $memberships, email: $email) {
+    ok
+    errors {
+      code
+    }
+  }
+}`
+		const response = await this.apiClient.request(query, { projectSlug, memberships, email })
+		if (!response.invite.ok) {
+			throw response.invite.errors.map((it: any) => it.code)
+		}
 	}
 
 	public async listProjects(): Promise<Project[]> {

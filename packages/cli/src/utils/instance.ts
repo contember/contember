@@ -220,7 +220,7 @@ export const resolvePortsMapping = async (args: {
 		if (assignedPortMapping.length === 0) {
 			let freePort: number
 			do {
-				freePort = await getPort({ port: getPort.makeRange(startPort, 65535) })
+				freePort = await getPort({ port: getPort.makeRange(startPort++, 65535) })
 			} while (occupiedPorts.includes(freePort))
 
 			occupiedPorts.push(freePort)

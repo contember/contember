@@ -69,7 +69,7 @@ publish:npm:
     - bash ./scripts/npm/publish.sh
 
 publish:docker:
-  image: 831119889470.dkr.ecr.eu-central-1.amazonaws.com/mangoweb/docker-ecr:1.1
+  image: docker:19
   stage: publish
   dependencies:
     - build

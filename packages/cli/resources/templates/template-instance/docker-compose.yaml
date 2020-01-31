@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   api:
-    image: 831119889470.dkr.ecr.eu-central-1.amazonaws.com/mangoweb/contember/api:$CONTEMBER_VERSION
+    image: contember/contember:$CONTEMBER_VERSION
     volumes:
       - ./api/config.yaml:/src/config.yaml:cached
       - ../../projects:/src/projects:cached

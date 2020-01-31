@@ -1,11 +1,11 @@
 {
 	"name": "@contember/template-project",
-	"version": "0.5.1",
+	"version": "0.6.0",
 	"devDependencies": {
 		"typescript": "^3.7.4"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.5.1",
-		"@contember/schema-definition": "^0.5.1"
+		"@contember/schema": "^0.6.0",
+		"@contember/schema-definition": "^0.6.0"
 	}
 }

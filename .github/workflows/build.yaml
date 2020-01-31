@@ -1,0 +1,49 @@
+name: Build
+
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+# postgresql will be probably ready after build
+#        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: "Install base deps"
+        run: npm ci
+      - name: "Run linter"
+        run: npm run eslint:lint
+      - name: "Install lerna deps"
+        run: npm run bootstrap
+      - name: "Build app"
+        run: npm run build
+#      - run: rm -rf packages/*/node_modules/typescript packages/*/node_modules/.bin/{tsc,tsserver}
+#      - run: rm -rf packages/cli/resources/templates/*/node_modules/typescript packages/cli/resources/templates/*/node_modules/.bin/
+      - name: "Run tests"
+        run: npm run test
+        env:
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_PASSWORD: postgres
+          TEST_DB_USER: postgres
+          TEST_DB_NAME: cms_test
+          TEST_DB_NAME_TENANT: cms_test_tenant
+          TEST_DB_PORT: 5432
+      - name: "Publish NPM"
+        if: startsWith(github.ref, 'refs/tags/')
+        run: bash ./scripts/npm/publish.sh
+      - name: "Publish Docker"
+        if: startsWith(github.ref, 'refs/tags/')
+        run: bash ./scripts/docker/publish.sh

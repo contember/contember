@@ -10,7 +10,6 @@ install:
   stage: install
   image: node:12.13
   script:
-    - bash ./scripts/npm/setup.sh
     - npm ci
     - npm run bootstrap
     - rm -rf packages/*/node_modules/typescript packages/*/node_modules/.bin/{tsc,tsserver}
@@ -65,7 +64,6 @@ publish:npm:
   only:
     - tags
   script:
-    - bash ./scripts/npm/setup.sh
     - bash ./scripts/npm/publish.sh
 
 publish:docker:

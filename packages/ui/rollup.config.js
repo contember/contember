@@ -10,7 +10,7 @@ export default {
 	output: {
 		file: 'dist/bundle.js',
 		format: 'esm',
-		sourcemap: true,
+		sourcemap: false,
 	},
 	dedupe: ['react', 'react-dom', 'react-is'],
 	external: ['react', 'react-dom'],
@@ -29,7 +29,7 @@ export default {
 			},
 		}),
 		//terser({
-		//	sourcemap: true,
+		//	sourcemap: false,
 		//}),
 		//analyzer(),
 	],

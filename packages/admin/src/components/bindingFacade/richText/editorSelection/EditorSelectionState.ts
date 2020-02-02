@@ -19,10 +19,12 @@ export type EditorSelectionState =
 			name: EditorSelectionStateName.EmergingPointerSelection
 			selection: Selection | undefined
 			startEvent: MouseEvent
+			finishEvent: MouseEvent | undefined
 	  }
 	| {
 			name: EditorSelectionStateName.ExpandedPointerSelection
 			selection: Selection
+			startEvent: MouseEvent
 			finishEvent: MouseEvent
 	  }
 	| {

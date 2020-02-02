@@ -9,10 +9,10 @@ export type EditorSelectionAction =
 			selection: Selection
 	  }
 	| {
-			type: EditorSelectionActionType.StartEmergingPointerSelection
+			type: EditorSelectionActionType.SetMousePointerSelectionStart
 			event: MouseEvent
 	  }
 	| {
-			type: EditorSelectionActionType.FinishEmergingPointerSelection
+			type: EditorSelectionActionType.SetMousePointerSelectionFinish
 			event: MouseEvent | undefined
 	  }

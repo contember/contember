@@ -22,8 +22,16 @@ export const editorSelectionReducer = (
 				}
 			} else if (action.selection.type === 'Range') {
 				if (previousState.name === EditorSelectionStateName.EmergingPointerSelection) {
+					if (!previousState.finishEvent) {
+						return {
+							...previousState,
+							selection: action.selection,
+						}
+					}
 					return {
-						...previousState,
+						name: EditorSelectionStateName.ExpandedPointerSelection,
+						startEvent: previousState.startEvent,
+						finishEvent: previousState.finishEvent,
 						selection: action.selection,
 					}
 				}
@@ -34,19 +42,23 @@ export const editorSelectionReducer = (
 			}
 			return previousState
 		}
-		case EditorSelectionActionType.StartEmergingPointerSelection: {
+		case EditorSelectionActionType.SetMousePointerSelectionStart: {
 			return {
 				name: EditorSelectionStateName.EmergingPointerSelection,
 				selection: undefined,
 				startEvent: action.event,
+				finishEvent: undefined,
 			}
 		}
-		case EditorSelectionActionType.FinishEmergingPointerSelection: {
+		case EditorSelectionActionType.SetMousePointerSelectionFinish: {
 			if (previousState.name === EditorSelectionStateName.EmergingPointerSelection) {
 				const selection = previousState.selection
 
 				if (!selection) {
-					return previousState
+					return {
+						...previousState,
+						finishEvent: action.event,
+					}
 				} else if (selection.type === 'Caret') {
 					return {
 						name: EditorSelectionStateName.CollapsedSelection,
@@ -56,6 +68,7 @@ export const editorSelectionReducer = (
 					if (action.event) {
 						return {
 							name: EditorSelectionStateName.ExpandedPointerSelection,
+							startEvent: previousState.startEvent,
 							finishEvent: action.event,
 							selection,
 						}

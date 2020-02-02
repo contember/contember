@@ -1,5 +1,6 @@
 import { debounce } from 'debounce'
 import * as React from 'react'
+import { Range as SlateRange } from 'slate'
 import { ReactEditor, useEditor } from 'slate-react'
 import { EditorSelectionActionType } from './EditorSelectionActionType'
 import { defaultEditorSelectionState, editorSelectionReducer } from './editorSelectionReducer'
@@ -18,6 +19,18 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 			const isRelevant = selection && selection.anchorNode && ReactEditor.hasDOMNode(editor, selection.anchorNode)
 
 			if (isRelevant) {
+				if (
+					selectionStateRef.current.name !== EditorSelectionStateName.Unfocused &&
+					selectionStateRef.current.selection &&
+					SlateRange.equals(
+						ReactEditor.toSlateRange(editor, selectionStateRef.current.selection),
+						ReactEditor.toSlateRange(editor, selection!),
+					)
+				) {
+					// We've likely just changed a mark or something. To the DOM, this *is* a selection change but as far as we're
+					// concerned they are the same.
+					//return
+				}
 				dispatch({
 					type: EditorSelectionActionType.SetSelection,
 					selection: selection!,
@@ -31,25 +44,24 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 		[],
 	)
 	const onMouseDown = React.useCallback(
-		(e: MouseEvent) =>
+		(e: MouseEvent) => {
 			e.target &&
-			e.target instanceof Node &&
-			ReactEditor.hasDOMNode(editor, e.target) &&
-			dispatch({
-				type: EditorSelectionActionType.StartEmergingPointerSelection,
-				event: e,
-			}),
+				e.target instanceof Node &&
+				ReactEditor.hasDOMNode(editor, e.target) &&
+				dispatch({
+					type: EditorSelectionActionType.SetMousePointerSelectionStart,
+					event: e,
+				})
+		},
 		[editor],
 	)
 	const onMouseUp = React.useCallback(
 		(e: MouseEvent) => {
-			if (selectionStateRef.current.name === EditorSelectionStateName.EmergingPointerSelection) {
-				const relevantTarget = !!e.target && e.target instanceof Node && ReactEditor.hasDOMNode(editor, e.target)
-				dispatch({
-					type: EditorSelectionActionType.FinishEmergingPointerSelection,
-					event: relevantTarget ? e : undefined,
-				})
-			}
+			const relevantTarget = !!e.target && e.target instanceof Node && ReactEditor.hasDOMNode(editor, e.target)
+			dispatch({
+				type: EditorSelectionActionType.SetMousePointerSelectionFinish,
+				event: relevantTarget ? e : undefined,
+			})
 		},
 		[editor],
 	)

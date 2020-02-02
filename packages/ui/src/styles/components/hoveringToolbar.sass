@@ -1,15 +1,24 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}hoveringToolbar
-	position: absolute
+	display: flex
+	justify-content: center
+	margin: 0 auto
 	z-index: 10
-	top: -1000vh
-	left: -1000vw
-	margin-top: -.75em
 	opacity: 0
 	visibility: hidden
 	transition-duration: .15s
 	transition-property: opacity, visibility
+
+	pointer-events: none
+	> *
+		pointer-events: all
+
+	&.view-contextual
+		position: absolute
+		top: -1000vh
+		left: -1000vw
+		margin: -.5em 0 0 0
 
 	&.is-active
 		visibility: visible

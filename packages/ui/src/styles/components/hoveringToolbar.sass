@@ -4,11 +4,13 @@
 	display: flex
 	justify-content: center
 	margin: 0 auto
-	z-index: 10
+	z-index: 2
 	opacity: 0
 	visibility: hidden
 	transition-duration: .15s
 	transition-property: opacity, visibility
+	position: sticky
+	bottom: 2em
 
 	pointer-events: none
 	> *
@@ -19,6 +21,7 @@
 		top: -1000vh
 		left: -1000vw
 		margin: -.5em 0 0 0
+		bottom: unset
 
 	&.is-active
 		visibility: visible

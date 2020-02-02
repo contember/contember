@@ -1,117 +1,70 @@
-import { Button, HoveringToolbar as UIToolbar, Icon } from '@contember/ui'
+import { HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
 import * as React from 'react'
-import { Editor, Range as SlateRange } from 'slate'
-import { ReactEditor, useEditor } from 'slate-react'
-import {
-	EditorNode,
-	EditorWithAnchors,
-	EditorWithBasicFormatting,
-	EditorWithEssentials,
-	RichTextBooleanMarkNames,
-} from '../plugins'
+import { EditorSelectionStateName, useEditorSelection } from '../editorSelection'
+import { BlockHoveringToolbarContents } from './BlockHoveringToolbarContents'
+import { InlineHoveringToolbarContents } from './InlineHoveringToolbarContents'
 
-type HoveringToolbarEditor = EditorWithAnchors<EditorWithBasicFormatting<EditorWithEssentials<EditorNode>>>
+export interface HoveringToolbarProps {}
 
-export interface HoveringToolbarProps {
-	selection: SlateRange | undefined
-}
+export const HoveringToolbar = React.memo((props: HoveringToolbarProps) => {
+	const selectionState = useEditorSelection()
+	const inlineToolbarRef = React.useRef<HTMLDivElement>(null)
 
-const getToggleCallback = (editor: HoveringToolbarEditor, mark: RichTextBooleanMarkNames) => (
-	e: React.SyntheticEvent,
-) => {
-	e.preventDefault() // This is crucial so that we don't unselect the selected text
-	editor.toggleRichTextNodeMark(editor, mark)
-}
-
-export const HoveringToolbar = React.memo(({ selection }: HoveringToolbarProps) => {
-	const editor = useEditor() as HoveringToolbarEditor
-	const toolbarRef = React.useRef<HTMLDivElement | null>(null)
-
-	let toolbarVisible = false
-
-	if (selection) {
-		toolbarVisible =
-			ReactEditor.isFocused(editor) && SlateRange.isExpanded(selection) && Editor.string(editor, selection) !== ''
-	}
+	const inlineToolbarActive =
+		selectionState.name === EditorSelectionStateName.ExpandedPointerSelection ||
+		selectionState.name === EditorSelectionStateName.ExpandedNonPointerSelection
+	const blockToolbarActive =
+		selectionState.name === EditorSelectionStateName.CollapsedSelection ||
+		selectionState.name === EditorSelectionStateName.EmergingPointerSelection
 
 	React.useLayoutEffect(() => {
-		const container = toolbarRef.current
+		const container = inlineToolbarRef.current
 
 		if (!container) {
 			return
 		}
 
-		const domSelection = getSelection()
-
 		let top, left
+		let domRangeRect: DOMRect | undefined
 
-		if (!toolbarVisible || !selection || !domSelection || !domSelection.rangeCount || domSelection.isCollapsed) {
+		if (selectionState.name === EditorSelectionStateName.ExpandedNonPointerSelection) {
+			domRangeRect = selectionState.selection.getRangeAt(0).getBoundingClientRect()
+		} else if (selectionState.name === EditorSelectionStateName.ExpandedPointerSelection) {
+			if (document.caretRangeFromPoint) {
+				domRangeRect = document
+					.caretRangeFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
+					.getBoundingClientRect()
+			} else {
+				domRangeRect =
+					document
+						.caretPositionFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
+						?.getClientRect() || undefined
+			}
+		}
+		if (domRangeRect) {
+			top = `${domRangeRect.top + window.pageYOffset - container.offsetHeight}px`
+			left = `${domRangeRect.left + window.pageXOffset - container.offsetWidth / 2 + domRangeRect.width / 2}px`
+		} else {
 			top = '-1000vh'
 			left = '-1000vw'
-		} else {
-			const domRange = domSelection.getRangeAt(0)
-			const rect = domRange.getBoundingClientRect()
-			top = `${rect.top + window.pageYOffset - container.offsetHeight}px`
-			left = `${rect.left + window.pageXOffset - container.offsetWidth / 2 + rect.width / 2}px`
 		}
 
 		container.style.top = top
 		container.style.left = left
-	}, [selection, toolbarVisible])
-
-	const isBold = editor.isBold(editor)
-	const toggleBold = React.useMemo(() => getToggleCallback(editor, 'isBold'), [editor])
-	const boldButton = React.useMemo(
-		() => (
-			<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
-				<Icon blueprintIcon="bold" />
-			</Button>
-		),
-		[isBold, toggleBold],
-	)
-
-	const isStruckThrough = editor.isStruckThrough(editor)
-	const toggleStruckThrough = React.useMemo(() => getToggleCallback(editor, 'isStruckThrough'), [editor])
-	const strikethroughButton = React.useMemo(
-		() => (
-			<Button key="strikethrough" isActive={isStruckThrough} onMouseDown={toggleStruckThrough}>
-				<Icon blueprintIcon="strikethrough" />
-			</Button>
-		),
-		[isStruckThrough, toggleStruckThrough],
-	)
-
-	const toggleAnchor = React.useCallback(
-		(e: React.SyntheticEvent) => {
-			e.preventDefault()
-			const url = prompt('Insert the URL:')
-			if (!url) {
-				return
-			}
-			editor.wrapAnchor(editor, url)
-		},
-		[editor],
-	)
-	const anchorButton = React.useMemo(
-		() => (
-			<Button key="link" onMouseDown={toggleAnchor}>
-				<Icon blueprintIcon="link" />
-			</Button>
-		),
-		[toggleAnchor],
-	)
-
-	const buttons = React.useMemo(() => [boldButton, strikethroughButton, anchorButton], [
-		boldButton,
-		strikethroughButton,
-		anchorButton,
-	])
+	}, [selectionState])
 
 	// TODO use a container so that it doesn't break during resize.
 	return (
-		<UIToolbar isActive={toolbarVisible} ref={toolbarRef}>
-			{buttons}
-		</UIToolbar>
+		<>
+			<Portal>
+				<UIToolbar isActive={inlineToolbarActive} ref={inlineToolbarRef} scope="contextual">
+					<InlineHoveringToolbarContents />
+				</UIToolbar>
+			</Portal>
+			<UIToolbar isActive={blockToolbarActive}>
+				<BlockHoveringToolbarContents />
+			</UIToolbar>
+		</>
 	)
 })
 HoveringToolbar.displayName = 'HoveringToolbar'

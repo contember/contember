@@ -1,26 +1,12 @@
+import { Box } from '@contember/ui'
 import * as React from 'react'
-import { Node, Range } from 'slate'
+import { Node } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from './plugins'
 import { HoveringToolbar } from './toolbars'
 
-export const TestWysiwyg = () => {
-	const [selection, setSelection] = React.useState<Range | undefined>(undefined)
-	const editor = React.useMemo(() => {
-		const editor = withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials())))
-		const originalApply = editor.apply
-		editor.apply = operation => {
-			if (
-				operation.type === 'set_selection' &&
-				(operation.newProperties === null ||
-					(Range.isRange(operation.newProperties) && Range.isCollapsed(operation.newProperties)))
-			) {
-				setSelection(undefined)
-			}
-			originalApply(operation)
-		}
-		return editor
-	}, [])
+export const TestWysiwyg: React.ComponentType = () => {
+	const editor = React.useMemo(() => withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials()))), [])
 	const [value, setValue] = React.useState<typeof editor['children']>([
 		{
 			type: 'paragraph',
@@ -44,26 +30,13 @@ export const TestWysiwyg = () => {
 	const onChange = React.useCallback((node: Node[]) => {
 		setValue(value => node as typeof value)
 	}, [])
-	const onSelect = React.useCallback(
-		(e: React.SyntheticEvent) => {
-			if (e.nativeEvent.type === 'selectionchange') {
-				// Ignore the keyboard for now
-				return
-			}
-			setSelection(editor.selection || undefined)
-		},
-		[editor.selection],
-	)
-	const selectionForToolbar = selection && Range.isExpanded(selection) ? selection : undefined
 	return (
-		<Slate editor={editor} value={value} onChange={onChange}>
-			<HoveringToolbar selection={selectionForToolbar} />
-			<Editable
-				renderElement={editor.renderElement}
-				renderLeaf={editor.renderLeaf}
-				onSelect={onSelect}
-				onKeyDown={editor.onKeyDown}
-			/>
-		</Slate>
+		<Box>
+			<Slate editor={editor} value={value} onChange={onChange}>
+				<Editable renderElement={editor.renderElement} renderLeaf={editor.renderLeaf} onKeyDown={editor.onKeyDown} />
+				<HoveringToolbar />
+			</Slate>
+		</Box>
 	)
 }
+TestWysiwyg.displayName = 'TestWysiwyg'

@@ -1,7 +1,13 @@
 import { PoolClient } from 'pg'
 import { EventManager } from './EventManager'
 import { Connection } from './Connection'
-import { ConnectionError, ForeignKeyViolationError, NotNullViolationError, UniqueViolationError } from './errors'
+import {
+	ConnectionError,
+	ForeignKeyViolationError,
+	NotNullViolationError,
+	SerializationFailureError,
+	UniqueViolationError,
+} from './errors'
 
 function prepareSql(sql: string) {
 	let parameterIndex = 0
@@ -55,6 +61,8 @@ export async function executeQuery<Row extends Record<string, any>>(
 				throw new ForeignKeyViolationError(sql, parameters, error)
 			case '23505':
 				throw new UniqueViolationError(sql, parameters, error)
+			case '40001':
+				throw new SerializationFailureError(sql, parameters, error)
 			default:
 				throw new ConnectionError(sql, parameters, error)
 		}

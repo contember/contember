@@ -6,7 +6,7 @@ import ValidationResolver from './ValidationResolver'
 import { GraphQLObjectType, GraphQLResolveInfo } from 'graphql'
 import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
-import { Client, Connection } from '@contember/database'
+import { Client, Connection, SerializationFailureError } from '@contember/database'
 import { Operation, readOperationMeta } from '../graphQLSchema/OperationExtension'
 import { assertNever } from '../utils'
 import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultType, MutationResultList } from '../sql/Result'
@@ -309,17 +309,33 @@ export default class MutationResolver {
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper, db: Client<Connection.TransactionLike>) => Promise<R>,
 	): Promise<R> {
-		return this.db.transaction(async trx => {
-			await trx.connection.query(Connection.REPEATABLE_READ)
-			await this.systemVariablesSetup(trx)
-			const mapper = this.mapperFactory(trx)
+		do {
+			let attempt = 0
+			try {
+				return await this.db.transaction(async trx => {
+					await trx.connection.query(Connection.REPEATABLE_READ)
+					await this.systemVariablesSetup(trx)
+					const mapper = this.mapperFactory(trx)
 
-			const result = await cb(mapper, trx)
-			if (!result.ok) {
-				await trx.connection.rollback()
+					const result = await cb(mapper, trx)
+					if (!result.ok) {
+						await trx.connection.rollback()
+					}
+					return result
+				})
+			} catch (e) {
+				if (!(e instanceof SerializationFailureError)) {
+					throw e
+				}
+				if (attempt++ >= 5) {
+					console.error('Serilization failure, aborting')
+					throw e
+				}
+
+				console.warn('Serilization failure, retrying')
+				await new Promise(resolve => setTimeout(resolve, Math.round(20 + Math.random() * 50)))
 			}
-			return result
-		})
+		} while (true)
 	}
 
 	private convertResultToErrors(result: MutationResultList): Result.ExecutionError[] {

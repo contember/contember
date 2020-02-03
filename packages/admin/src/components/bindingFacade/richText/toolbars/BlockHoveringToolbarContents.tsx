@@ -6,14 +6,14 @@ export interface BlockHoveringToolbarContentsProps {}
 export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringToolbarContentsProps) => {
 	return (
 		// TODO
-		<ButtonGroup>
-			<Button>
+		<ButtonGroup size="large">
+			<Button size="large">
 				<Icon blueprintIcon="media" />
 			</Button>
-			<Button>
+			<Button size="large">
 				<Icon blueprintIcon="properties" />
 			</Button>
-			<Button>
+			<Button size="large">
 				<Icon blueprintIcon="numbered-list" />
 			</Button>
 		</ButtonGroup>

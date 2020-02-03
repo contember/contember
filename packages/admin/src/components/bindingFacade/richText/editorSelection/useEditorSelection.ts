@@ -20,7 +20,9 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 
 			if (isRelevant) {
 				if (
-					selectionStateRef.current.name !== EditorSelectionStateName.Unfocused &&
+					(selectionStateRef.current.name === EditorSelectionStateName.ExpandedPointerSelection ||
+						selectionStateRef.current.name === EditorSelectionStateName.ExpandedNonPointerSelection) &&
+					!selection!.isCollapsed &&
 					selectionStateRef.current.selection &&
 					SlateRange.equals(
 						ReactEditor.toSlateRange(editor, selectionStateRef.current.selection),
@@ -29,7 +31,7 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 				) {
 					// We've likely just changed a mark or something. To the DOM, this *is* a selection change but as far as we're
 					// concerned they are the same.
-					//return
+					return
 				}
 				dispatch({
 					type: EditorSelectionActionType.SetSelection,

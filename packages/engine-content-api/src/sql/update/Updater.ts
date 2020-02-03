@@ -64,13 +64,22 @@ export class Updater {
 		db: Client,
 		okResultFactory: (values: RowValues) => MutationUpdateOk,
 	): Promise<MutationResultList> {
-		const result = await updateBuilder.execute(db)
-		if (!result.executed) {
-			return [new MutationNothingToDo([], NothingToDoReason.noData)]
+		try {
+			const result = await updateBuilder.execute(db)
+			if (!result.executed) {
+				return [new MutationNothingToDo([], NothingToDoReason.noData)]
+			}
+			if (result.affectedRows !== 1) {
+				return [new MutationNoResultError([])]
+			}
+			return [okResultFactory(rowDataToFieldValues(result.values))]
+		} catch (e) {
+			if (e instanceof AbortUpdate) {
+				return [new MutationNothingToDo([], NothingToDoReason.aborted)]
+			}
+			throw e
 		}
-		if (result.affectedRows !== 1) {
-			return [new MutationNoResultError([])]
-		}
-		return [okResultFactory(rowDataToFieldValues(result.values))]
 	}
 }
+
+export class AbortUpdate {}

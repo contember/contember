@@ -95,6 +95,7 @@ export enum NothingToDoReason {
 	noData = 'noData',
 	emptyRelation = 'emptyRelation',
 	alreadyExists = 'alreadyExists',
+	aborted = 'aborted',
 }
 
 export class MutationNothingToDo implements MutationResultInterface {
@@ -182,7 +183,10 @@ export const collectResults = async (
 	const results = await Promise.all(enrichedPromises)
 	const errored = results.map(([err]) => err).filter(it => !!it)
 	if (errored.length > 0) {
-		errored.slice(1).map(e => console.error(e))
+		if (errored.length > 1) {
+			console.error('Multiple error has occurred, printing them & rethrowing the first one')
+			errored.slice(1).map(e => console.error(e))
+		}
 		throw errored[0]
 	}
 

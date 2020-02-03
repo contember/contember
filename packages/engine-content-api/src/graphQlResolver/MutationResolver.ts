@@ -6,7 +6,7 @@ import ValidationResolver from './ValidationResolver'
 import { GraphQLObjectType, GraphQLResolveInfo } from 'graphql'
 import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
-import { Client, Connection } from '@contember/database'
+import { Client, Connection, SerializationFailureError } from '@contember/database'
 import { Operation, readOperationMeta } from '../graphQLSchema/OperationExtension'
 import { assertNever } from '../utils'
 import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultType, MutationResultList } from '../sql/Result'
@@ -309,17 +309,33 @@ export default class MutationResolver {
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper, db: Client<Connection.TransactionLike>) => Promise<R>,
 	): Promise<R> {
-		return this.db.transaction(async trx => {
-			await trx.connection.query(Connection.REPEATABLE_READ)
-			await this.systemVariablesSetup(trx)
-			const mapper = this.mapperFactory(trx)
+		do {
+			let attempt = 0
+			try {
+				return await this.db.transaction(async trx => {
+					await trx.connection.query(Connection.REPEATABLE_READ)
+					await this.systemVariablesSetup(trx)
+					const mapper = this.mapperFactory(trx)
 
-			const result = await cb(mapper, trx)
-			if (!result.ok) {
-				await trx.connection.rollback()
+					const result = await cb(mapper, trx)
+					if (!result.ok) {
+						await trx.connection.rollback()
+					}
+					return result
+				})
+			} catch (e) {
+				if (!(e instanceof SerializationFailureError)) {
+					throw e
+				}
+				if (attempt++ >= 5) {
+					console.error('Serilization failure, aborting')
+					throw e
+				}
+
+				console.warn('Serilization failure, retrying')
+				await new Promise(resolve => setTimeout(resolve, Math.round(20 + Math.random() * 50)))
 			}
-			return result
-		})
+		} while (true)
 	}
 
 	private convertResultToErrors(result: MutationResultList): Result.ExecutionError[] {
@@ -331,25 +347,29 @@ export default class MutationResolver {
 					),
 			)
 			.map(it => {
+				const path = it.path.map(it => ({
+					...it,
+					__typename: 'field' in it ? '_FieldPathFragment' : '_IndexPathFragment',
+				}))
 				switch (it.result) {
 					case MutationResultType.constraintViolationError:
 						switch (it.constraint) {
 							case ConstraintType.notNull:
-								return { path: it.path, type: Result.ExecutionErrorType.NotNullConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.NotNullConstraintViolation }
 							case ConstraintType.foreignKey:
-								return { path: it.path, type: Result.ExecutionErrorType.ForeignKeyConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.ForeignKeyConstraintViolation }
 							case ConstraintType.uniqueKey:
-								return { path: it.path, type: Result.ExecutionErrorType.UniqueConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.UniqueConstraintViolation }
 							default:
 								return assertNever(it.constraint)
 						}
 					case MutationResultType.noResultError:
 					case MutationResultType.notFoundError:
-						return { path: it.path, type: Result.ExecutionErrorType.NotFoundOrDenied }
+						return { path: path, type: Result.ExecutionErrorType.NotFoundOrDenied }
 					case MutationResultType.inputError:
 						switch (it.kind) {
 							case InputErrorKind.nonUniqueWhere:
-								return { path: it.path, type: Result.ExecutionErrorType.NonUniqueWhereInput, message: it.message }
+								return { path: path, type: Result.ExecutionErrorType.NonUniqueWhereInput, message: it.message }
 							default:
 								return assertNever(it.kind)
 						}

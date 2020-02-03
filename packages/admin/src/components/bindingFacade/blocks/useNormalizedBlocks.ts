@@ -1,39 +1,39 @@
-import * as React from 'react'
 import { BindingError, useEnvironment, VariableInputTransformer } from '@contember/binding'
-import { BlockCommonProps, NormalizedBlockList, NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
+import * as React from 'react'
+import { BlockCommonProps, NormalizedBlock, NormalizedLiteralBasedBlock, NormalizedScalarBasedBlock } from './Block'
 import { useBlockProps } from './useBlockProps'
 
-export const useNormalizedBlockList = (children: React.ReactNode): NormalizedBlockList => {
+export const useNormalizedBlocks = (children: React.ReactNode): NormalizedBlock[] => {
 	const environment = useEnvironment()
 	const propList = useBlockProps(children)
 	return React.useMemo(() => {
-		const staticBlockProps: NormalizedStaticBlockProps[] = []
-		const dynamicBlockProps: NormalizedDynamicBlockProps[] = []
+		const literalBased: NormalizedLiteralBasedBlock[] = []
+		const scalarBased: NormalizedScalarBasedBlock[] = []
 
 		if (propList.length === 0) {
-			return []
+			return literalBased
 		}
 
 		for (const props of propList) {
 			const commonProps: BlockCommonProps = props
 			if ('discriminateBy' in props) {
-				staticBlockProps.push({
+				literalBased.push({
 					...commonProps,
 					discriminateBy: VariableInputTransformer.transformVariableLiteral(props.discriminateBy, environment),
 				})
 			} else if ('discriminateByScalar' in props) {
-				dynamicBlockProps.push({
+				scalarBased.push({
 					...commonProps,
 					discriminateBy: VariableInputTransformer.transformVariableScalar(props.discriminateByScalar, environment),
 				})
 			}
 		}
 
-		if (dynamicBlockProps.length && staticBlockProps.length === 0) {
-			return dynamicBlockProps
+		if (scalarBased.length && literalBased.length === 0) {
+			return scalarBased
 		}
-		if (staticBlockProps.length && dynamicBlockProps.length === 0) {
-			return staticBlockProps
+		if (literalBased.length && scalarBased.length === 0) {
+			return literalBased
 		}
 
 		throw new BindingError(

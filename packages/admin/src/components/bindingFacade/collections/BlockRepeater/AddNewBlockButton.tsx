@@ -34,7 +34,7 @@ export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
 			<Dropdown buttonProps={buttonProps} alignment="center">
 				{({ requestClose }) => (
 					<AddNewBlockButtonInner
-						normalizedBlockProps={props.normalizedBlockProps}
+						normalizedBlocks={props.normalizedBlocks}
 						addNew={props.addNew}
 						isMutating={props.isMutating}
 						discriminationField={props.discriminationField}

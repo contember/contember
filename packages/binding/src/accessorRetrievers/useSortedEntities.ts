@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
-import { QueryLanguage } from '../queryLanguage'
 import { FieldName, RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
-import { useEnvironment } from './useEnvironment'
+import { useOptionalDesugaredRelativeSingleField } from './useOptionalDesugaredRelativeSingleField'
 
 interface EntityOrder {
 	[primaryKey: string]: number
@@ -121,11 +120,7 @@ export const useSortedEntities = (
 	entityList: EntityListAccessor,
 	sortByField: SugaredRelativeSingleField['field'] | undefined,
 ): SortedEntities => {
-	const environment = useEnvironment()
-	const desugaredSortByField = React.useMemo(
-		() => (sortByField ? QueryLanguage.desugarRelativeSingleField(sortByField, environment) : undefined),
-		[environment, sortByField],
-	)
+	const desugaredSortByField = useOptionalDesugaredRelativeSingleField(sortByField)
 	const sortedEntities = React.useMemo(() => {
 		const filteredEntities = entityList.getFilteredEntities()
 		return sortEntities(filteredEntities, desugaredSortByField)

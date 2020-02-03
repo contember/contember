@@ -46,6 +46,11 @@ import { Application } from './cli'
 		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
 		['diff']: diffCommandFactory,
 	})
+
+	const version = process.version.match(/^v?(\d+)\..+$/)
+	if (version && Number(version[1]) < 12) {
+		throw `Node >= 12 is required`
+	}
 	const app = new Application(commandManager)
 	await app.run(process.argv)
 })().catch(e => {

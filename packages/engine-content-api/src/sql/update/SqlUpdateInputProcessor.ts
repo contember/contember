@@ -14,26 +14,8 @@ import {
 	NothingToDoReason,
 	prependPath,
 } from '../Result'
-
-const hasManyProcessor = <Context extends { relation: Model.AnyRelation; index: number; alias?: string }>(
-	innerProcessor: (context: Context) => Promise<MutationResultList>,
-) => {
-	return async (context: Context): Promise<MutationResultList> => {
-		const { relation, index, alias } = context
-		const path = [{ field: relation.name }, { index, alias }]
-		return prependPath(path, await innerProcessor(context))
-	}
-}
-
-const hasOneProcessor = <Context extends { relation: Model.AnyRelation }>(
-	innerProcessor: (context: Context) => Promise<MutationResultList>,
-) => {
-	return async (context: Context): Promise<MutationResultList> => {
-		const { relation } = context
-		const path = [{ field: relation.name }]
-		return prependPath(path, await innerProcessor(context))
-	}
-}
+import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
+import { AbortUpdate } from './Updater'
 
 export default class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
 	constructor(
@@ -177,11 +159,15 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 
 	manyHasOne: UpdateInputProcessor<MutationResultList>['manyHasOne'] = {
 		connect: hasOneProcessor(async ({ targetEntity, input, relation }) => {
-			const primary = await this.updateBuilder.addFieldValue(
-				relation.name,
-				this.mapper.getPrimaryValue(targetEntity, input),
-			)
-			if (primary === undefined) {
+			const primaryValue = this.mapper.getPrimaryValue(targetEntity, input)
+			this.updateBuilder.addFieldValue(relation.name, async () => {
+				const value = await primaryValue
+				if (!value) {
+					throw new AbortUpdate()
+				}
+				return value
+			})
+			if (!(await primaryValue)) {
 				return [new MutationEntryNotFoundError([], input)]
 			}
 			return []
@@ -191,7 +177,11 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 			const insert = this.mapper.insert(targetEntity, input)
 			this.updateBuilder.addFieldValue(relation.name, async () => {
 				const insertResult = await insert
-				return getInsertPrimary(insertResult)
+				const value = getInsertPrimary(insertResult)
+				if (!value) {
+					throw new AbortUpdate()
+				}
+				return value
 			})
 			return await insert
 		}),
@@ -222,7 +212,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 					return insertPrimary
 				}
 				result.push(...insertResult)
-				return undefined
+				throw new AbortUpdate()
 			})
 
 			const inversedPrimary = await select
@@ -370,7 +360,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 				const relationPrimary = (await this.mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
 				if (!relationPrimary) {
 					result.push(new MutationEntryNotFoundError([], input))
-					return undefined
+					throw new AbortUpdate()
 				}
 
 				const currentOwner = await this.mapper.getPrimaryValue(entity, {
@@ -402,7 +392,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 				if (insertPrimary) {
 					return insertPrimary
 				}
-				return undefined
+				throw new AbortUpdate()
 			})
 			return await insert
 		}),
@@ -433,7 +423,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 					return insertPrimary
 				}
 				result.push(...insertResult)
-				return undefined
+				throw new AbortUpdate()
 			})
 
 			const inversedPrimary = await select

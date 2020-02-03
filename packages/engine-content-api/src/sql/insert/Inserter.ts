@@ -5,6 +5,8 @@ import {
 	ModificationType,
 	MutationResultList,
 	RowValues,
+	MutationNothingToDo,
+	NothingToDoReason,
 } from '../Result'
 import { CreateInputVisitor } from '../../inputProcessing'
 import SqlCreateInputProcessor from './SqlCreateInputProcessor'
@@ -62,11 +64,21 @@ export class Inserter {
 		okResultFactory: (primary: Value.PrimaryValue, values: RowValues) => MutationCreateOk,
 	): Promise<MutationResultList> {
 		return tryMutation(async () => {
-			const result = await insertBuilder.execute(db)
-			if (result.primaryValue === null) {
-				return [new MutationNoResultError([])]
+			try {
+				const result = await insertBuilder.execute(db)
+
+				if (result.primaryValue === null) {
+					return [new MutationNoResultError([])]
+				}
+				return [okResultFactory(result.primaryValue, rowDataToFieldValues(result.values))]
+			} catch (e) {
+				if (e instanceof AbortInsert) {
+					return [new MutationNothingToDo([], NothingToDoReason.aborted)]
+				}
+				throw e
 			}
-			return [okResultFactory(result.primaryValue, rowDataToFieldValues(result.values))]
 		})
 	}
 }
+
+export class AbortInsert {}

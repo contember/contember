@@ -331,25 +331,29 @@ export default class MutationResolver {
 					),
 			)
 			.map(it => {
+				const path = it.path.map(it => ({
+					...it,
+					__typename: 'field' in it ? '_FieldPathFragment' : '_IndexPathFragment',
+				}))
 				switch (it.result) {
 					case MutationResultType.constraintViolationError:
 						switch (it.constraint) {
 							case ConstraintType.notNull:
-								return { path: it.path, type: Result.ExecutionErrorType.NotNullConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.NotNullConstraintViolation }
 							case ConstraintType.foreignKey:
-								return { path: it.path, type: Result.ExecutionErrorType.ForeignKeyConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.ForeignKeyConstraintViolation }
 							case ConstraintType.uniqueKey:
-								return { path: it.path, type: Result.ExecutionErrorType.UniqueConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.UniqueConstraintViolation }
 							default:
 								return assertNever(it.constraint)
 						}
 					case MutationResultType.noResultError:
 					case MutationResultType.notFoundError:
-						return { path: it.path, type: Result.ExecutionErrorType.NotFoundOrDenied }
+						return { path: path, type: Result.ExecutionErrorType.NotFoundOrDenied }
 					case MutationResultType.inputError:
 						switch (it.kind) {
 							case InputErrorKind.nonUniqueWhere:
-								return { path: it.path, type: Result.ExecutionErrorType.NonUniqueWhereInput, message: it.message }
+								return { path: path, type: Result.ExecutionErrorType.NonUniqueWhereInput, message: it.message }
 							default:
 								return assertNever(it.kind)
 						}

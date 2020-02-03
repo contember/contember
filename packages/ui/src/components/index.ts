@@ -1,3 +1,4 @@
+export * from './editor'
 export * from './forms'
 
 export * from './Aether'
@@ -6,7 +7,6 @@ export * from './Collapsible'
 export * from './ContainerSpinner'
 export * from './Dropdown'
 export * from './Heading'
-export * from './HoveringToolbar'
 export * from './Icon'
 export * from './Menu'
 export * from './Portal'

@@ -1,9 +1,9 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { useComponentClassName } from '../auxiliary'
-import { HoveringToolbarScope } from '../types'
-import { toEnumViewClass, toStateClass } from '../utils'
-import { ButtonGroup } from './forms'
+import { useComponentClassName } from '../../auxiliary'
+import { HoveringToolbarScope } from '../../types'
+import { toEnumViewClass, toStateClass } from '../../utils'
+import { ButtonGroup } from '../forms'
 
 export interface HoveringToolbarProps {
 	isActive?: boolean

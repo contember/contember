@@ -74,6 +74,10 @@ export const createEditor = (options: CreateEditorOptions) => {
 			const refreshSortedEntities = () => {
 				sortedEntities = sortEntities(getAccessor().getFilteredEntities(), sortableByField)
 			}
+			const removeElementAt = (index: number) => {
+				sortedEntities[index].remove?.(removalType)
+				sortedEntities.splice(index, 1)
+			}
 
 			if (operation.type === 'set_selection') {
 				return apply(operation) // Nothing to do here
@@ -91,11 +95,11 @@ export const createEditor = (options: CreateEditorOptions) => {
 			switch (operation.type) {
 				case 'set_node':
 					apply(operation)
+					saveElementAt(topLevelIndex)
 					break
 				case 'merge_node': {
 					apply(operation)
-					sortedEntities[topLevelIndex].remove?.(removalType)
-					sortedEntities.splice(topLevelIndex, 1)
+					removeElementAt(topLevelIndex)
 					saveElementAt(topLevelIndex - 1)
 					return
 				}
@@ -134,8 +138,8 @@ export const createEditor = (options: CreateEditorOptions) => {
 					break
 				}
 				case 'remove_node': {
-					sortedEntities[topLevelIndex].remove?.(removalType)
-					sortedEntities.splice(topLevelIndex, 1)
+					apply(operation)
+					removeElementAt(topLevelIndex)
 					return
 				}
 				case 'move_node':

@@ -3,7 +3,7 @@ import { Model, Schema } from '@contember/schema'
 export type SchemaUpdater = (schema: Schema) => Schema
 type ModelUpdater = (model: Model.Schema) => Model.Schema
 type EntityUpdater = (entity: Model.Entity) => Model.Entity
-type FieldUpdater<T extends Model.AnyField> = (field: T) => Model.AnyField
+type FieldUpdater<T extends Model.AnyField> = (field: T, entity: Model.Entity) => Model.AnyField
 
 export const updateModel = (...modelUpdate: (ModelUpdater | undefined)[]): SchemaUpdater => schema => ({
 	...schema,
@@ -20,6 +20,11 @@ export const updateEntity = (name: string, entityUpdate: EntityUpdater): ModelUp
 	},
 })
 
+export const updateEveryEntity = (entityUpdate: EntityUpdater): ModelUpdater => model => ({
+	...model,
+	entities: Object.fromEntries(Object.entries(model.entities).map(([name, entity]) => [name, entityUpdate(entity)])),
+})
+
 export const updateField = <T extends Model.AnyField = Model.AnyField>(
 	name: string,
 	fieldUpdater: FieldUpdater<T>,
@@ -27,9 +32,15 @@ export const updateField = <T extends Model.AnyField = Model.AnyField>(
 	...entity,
 	fields: {
 		...entity.fields,
-		[name]: fieldUpdater(entity.fields[name] as T),
+		[name]: fieldUpdater(entity.fields[name] as T, entity),
 	},
 })
+
+export const updateEveryField = (fieldUpdater: FieldUpdater<Model.AnyField>): EntityUpdater => entity => ({
+	...entity,
+	fields: Object.fromEntries(Object.entries(entity.fields).map(([name, field]) => [name, fieldUpdater(field, entity)])),
+})
+
 export const addField = (field: Model.AnyField): EntityUpdater => entity => ({
 	...entity,
 	fields: {

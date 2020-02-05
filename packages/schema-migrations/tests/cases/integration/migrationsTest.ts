@@ -906,6 +906,39 @@ describe('Diff schemas', () => {
 		})
 	})
 
+	describe('rename relation', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
+			.entity('Author', e => e.column('name'))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Post', e =>
+				e.column('title').manyHasOne('author', r =>
+					r
+						.target('Author')
+						.inversedBy('posts')
+						.joiningColumn('user_id'),
+				),
+			)
+			.entity('Author', e => e.column('name'))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateFieldName',
+				entityName: 'Post',
+				fieldName: 'user',
+				newFieldName: 'author',
+			},
+		]
+		const sql = SQL``
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
 	describe('drop relation (many has one)', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))

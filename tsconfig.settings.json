@@ -6,6 +6,7 @@
 		"composite": true,
 		"noEmitOnError": true,
 		"experimentalDecorators": true,
+		"esModuleInterop": true,
 
 		"target": "es2018",
 		"moduleResolution": "node",

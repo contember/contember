@@ -4,8 +4,6 @@
 	"references": [
 		{ "path": "./packages/admin"},
 		{ "path": "./packages/binding" },
-		{ "path": "./packages/template-instance-with-admin" },
-		{ "path": "./packages/template-project-with-admin" },
 		{ "path": "./packages/client"},
 		{ "path": "./packages/cms-admin-server" },
 		{ "path": "./packages/react-client"},

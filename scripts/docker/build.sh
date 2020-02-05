@@ -23,3 +23,11 @@ do
 done
 docker push "$REPO"
 
+
+REPO="contember/cli"
+docker build -t "$REPO:$MAIN_VERSION" -f ./packages/cli/Dockerfile .
+for VERSION in "${ALL_VERSIONS[@]:1}"
+do
+  docker tag "$REPO:$MAIN_VERSION" "$REPO:$VERSION"
+done
+docker push "$REPO"

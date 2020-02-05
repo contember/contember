@@ -1,3 +1,4 @@
+export * from './editor'
 export * from './forms'
 
 export * from './Aether'
@@ -8,6 +9,7 @@ export * from './Dropdown'
 export * from './Heading'
 export * from './Icon'
 export * from './Menu'
+export * from './Portal'
 export * from './Spinner'
 export * from './Table'
 export * from './Tag'

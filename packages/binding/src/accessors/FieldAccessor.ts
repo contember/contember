@@ -1,13 +1,12 @@
 import { GraphQlBuilder } from '@contember/client'
-import { FieldName, Scalar } from '../treeParameters'
+import { FieldName, FieldValue } from '../treeParameters'
 import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
-export class FieldAccessor<
-	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
-	Produced extends Persisted = Persisted
-> extends Accessor implements Errorable {
+export class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>
+	extends Accessor
+	implements Errorable {
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted | null,

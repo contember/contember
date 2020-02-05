@@ -43,10 +43,8 @@ export class DirtinessChecker {
 		if (node instanceof EntityForRemovalAccessor) {
 			return true
 		}
-		if (
-			(!persistedData && node.isPersisted()) ||
-			(persistedData && node.primaryKey !== persistedData[PRIMARY_KEY_NAME])
-		) {
+		const isPersisted = node.isPersisted()
+		if ((!persistedData && isPersisted) || (persistedData && node.primaryKey !== persistedData[PRIMARY_KEY_NAME])) {
 			return true
 		}
 		if (this.isDirtyCache.has(node)) {
@@ -65,11 +63,11 @@ export class DirtinessChecker {
 				const accessor = node.data[placeholderName]
 				const persistedValue = persistedData ? persistedData[placeholderName] : undefined
 
-				if (marker.isNonbearing) {
-					continue
-				}
 				if (!(accessor instanceof FieldAccessor)) {
 					this.rejectInvalidTree()
+				}
+				if (!isPersisted && marker.isNonbearing) {
+					continue
 				}
 
 				let resolvedValue
@@ -79,7 +77,6 @@ export class DirtinessChecker {
 					resolvedValue = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
 				}
 				const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
-				const isPersisted = node.isPersisted()
 
 				if (
 					(isPersisted && persistedValue !== normalizedValue) ||

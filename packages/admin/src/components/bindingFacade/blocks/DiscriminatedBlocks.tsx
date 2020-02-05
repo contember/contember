@@ -1,9 +1,9 @@
+import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import { NormalizedStaticOption, SelectFieldInner, StaticChoiceField, useStaticChoiceField } from '../fields'
-import { NormalizedDynamicBlockProps, NormalizedStaticBlockProps } from './Block'
-import { useNormalizedBlockList } from './useNormalizedBlockList'
+import { NormalizedBlock } from './Block'
+import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children'>, SugaredRelativeSingleField {
 	children: React.ReactNode
@@ -12,10 +12,10 @@ export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children
 
 export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 	props => {
-		const normalizedBlockList = useNormalizedBlockList(props.children)
+		const normalizedBlockList = useNormalizedBlocks(props.children)
 		const transformedBlockList = React.useMemo<NormalizedStaticOption[]>(
 			() =>
-				(normalizedBlockList as Array<NormalizedStaticBlockProps | NormalizedDynamicBlockProps>).map(item => ({
+				(normalizedBlockList as NormalizedBlock[]).map(item => ({
 					...item,
 					label: item.label,
 					value: item.discriminateBy,

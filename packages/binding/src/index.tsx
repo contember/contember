@@ -1,5 +1,6 @@
 export * from './accessorRetrievers'
 export * from './accessors'
+export * from './accessorSorting'
 export * from './accessorTree'
 export * from './coreComponents'
 export * from './dao'

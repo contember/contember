@@ -4,6 +4,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
 //import { terser } from 'rollup-plugin-terser'
 import visualizer from 'rollup-plugin-visualizer'
+import { debounceExportedMembers } from '../../build/exportedMembers/debounce'
 import { esreverExportedMembers } from '../../build/exportedMembers/esrever'
 import { immutableExportedMembers } from '../../build/exportedMembers/immutable'
 import { propTypesExportedMembers } from '../../build/exportedMembers/prop-types'
@@ -23,6 +24,7 @@ const commonJsConfig = {
 		['@contember/binding']: bindingExportedMembers,
 		['@contember/utils']: utilsExportedMembers,
 		['@contember/react-client']: reactClientMembers,
+		['debounce']: debounceExportedMembers,
 		react: reactExportedMembers,
 		['react-is']: reactIsExportedMembers,
 		['react-dom']: reactDomExportedMembers,
@@ -70,7 +72,7 @@ export default [
 		output: {
 			file: 'dist/bundle.js',
 			format: 'esm',
-			sourcemap: true,
+			sourcemap: false,
 		},
 		external: [/*'slate', 'slate-react', 'slate-html-serializer', */ 'react', 'react-dom'],
 		plugins: [
@@ -78,11 +80,11 @@ export default [
 			resolve(resolveConfig),
 			commonjs(commonJsConfig),
 			//terser({
-			//	sourcemap: true,
+			//	sourcemap: false,
 			//}),
 			visualizer({
 				filename: 'dist/bundleStats.html',
-				sourcemap: true,
+				sourcemap: false,
 			}),
 		],
 	},

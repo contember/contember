@@ -1,11 +1,10 @@
-import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { Scalar, SugaredRelativeSingleField } from '../treeParameters'
+import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
 import { useEntityContext } from './useEntityContext'
 
 export const useRelativeSingleField = <
-	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+	Persisted extends FieldValue = FieldValue,
 	Produced extends Persisted = Persisted
 >(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,

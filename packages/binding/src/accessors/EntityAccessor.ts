@@ -1,4 +1,3 @@
-import { GraphQlBuilder } from '@contember/client'
 import { BindingError } from '../BindingError'
 import { MarkerTreeRoot, PlaceholderGenerator, ReferenceMarker } from '../markers'
 import {
@@ -7,11 +6,11 @@ import {
 	DesugaredRelativeSingleField,
 	ExpectedEntityCount,
 	FieldName,
+	FieldValue,
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
 	RemovalType,
-	Scalar,
 	SubTreeIdentifier,
 } from '../treeParameters'
 import { Accessor } from './Accessor'
@@ -132,10 +131,9 @@ class EntityAccessor extends Accessor implements Errorable {
 	/**
 	 * If field is a string, it *MUST NOT* make use of QL
 	 */
-	public getRelativeSingleField<
-		Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
-		Produced extends Persisted = Persisted
-	>(field: RelativeSingleField | DesugaredRelativeSingleField | string): FieldAccessor<Persisted, Produced> {
+	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+		field: RelativeSingleField | DesugaredRelativeSingleField | string,
+	): FieldAccessor<Persisted, Produced> {
 		let nestedEntity: EntityAccessor
 		let fieldName: string
 

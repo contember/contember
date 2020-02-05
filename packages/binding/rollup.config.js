@@ -45,7 +45,7 @@ export default [
 		output: {
 			file: 'dist/bundle.js',
 			format: 'esm',
-			sourcemap: true,
+			sourcemap: false,
 		},
 		external: ['react', 'react-dom'],
 		plugins: [
@@ -53,11 +53,11 @@ export default [
 			resolve(resolveConfig),
 			commonjs(commonJsConfig),
 			//terser({
-			//	sourcemap: true,
+			//	sourcemap: false,
 			//}),
 			visualizer({
 				filename: 'dist/bundleStats.html',
-				sourcemap: true,
+				sourcemap: false,
 			}),
 		],
 	},

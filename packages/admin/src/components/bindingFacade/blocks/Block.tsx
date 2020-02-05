@@ -8,24 +8,22 @@ export interface BlockCommonProps {
 	children: React.ReactNode
 }
 
-export interface StaticBlockProps extends BlockCommonProps {
+export interface LiteralBasedBlockProps extends BlockCommonProps {
 	discriminateBy: GraphQlBuilder.Literal | VariableLiteral | string
 }
-export interface DynamicBlockProps extends BlockCommonProps {
+export interface ScalarBasedBlockProps extends BlockCommonProps {
 	discriminateByScalar: Scalar
 }
 
-export type BlockProps = StaticBlockProps | DynamicBlockProps
+export type BlockProps = LiteralBasedBlockProps | ScalarBasedBlockProps
 
-export interface NormalizedStaticBlockProps extends BlockCommonProps {
+export interface NormalizedLiteralBasedBlock extends BlockCommonProps {
 	discriminateBy: GraphQlBuilder.Literal
 }
-export interface NormalizedDynamicBlockProps extends BlockCommonProps {
+export interface NormalizedScalarBasedBlock extends BlockCommonProps {
 	discriminateBy: Scalar
 }
 
-export type NormalizedBlockProps = NormalizedStaticBlockProps | NormalizedDynamicBlockProps
-
-export type NormalizedBlockList = NormalizedStaticBlockProps[] | NormalizedDynamicBlockProps[]
+export type NormalizedBlock = NormalizedLiteralBasedBlock | NormalizedScalarBasedBlock
 
 export const Block = Component<BlockProps>(props => <>{props.children}</>, 'Block')

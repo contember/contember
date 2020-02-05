@@ -9,7 +9,7 @@ export default [
 		output: {
 			file: 'dist/bundle.js',
 			format: 'esm',
-			sourcemap: true,
+			sourcemap: false,
 		},
 		external: ['react'],
 		plugins: [

@@ -1,7 +1,7 @@
-import { Aether, Box, BoxProps } from '@contember/ui'
+import { Aether, Box, BoxOwnProps } from '@contember/ui'
 import * as React from 'react'
 
-export interface MiscPageLayoutProps extends BoxProps {}
+export interface MiscPageLayoutProps extends BoxOwnProps {}
 
 export const MiscPageLayout = React.memo<MiscPageLayoutProps>(props => (
 	<Aether>

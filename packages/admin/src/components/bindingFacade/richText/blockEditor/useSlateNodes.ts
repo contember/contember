@@ -70,6 +70,11 @@ export const useSlateNodes = ({
 				entityKey,
 				blockType: selectedBlock.discriminateBy,
 			}
+			/*
+				TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
+				we're not expecting the user to create thousands and thousands of them so it's not that big of a deal but it's
+				still far from ideal. How do we fix this though? 🤔
+			 */
 			contemberBlockElementCache.set(entityKey, contemberBlock)
 			return contemberBlock
 		}

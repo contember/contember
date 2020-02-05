@@ -20,7 +20,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 	const selectedBlock = props.normalizedBlocks.find(block => discriminationField.hasValue(block.discriminateBy))
 
 	if (!selectedBlock) {
-		throw new BindingError()
+		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
 	}
 	return (
 		<div {...props.attributes}>

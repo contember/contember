@@ -11,7 +11,7 @@ import {
 import * as React from 'react'
 import { Element, Operation } from 'slate'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../plugins'
-import { contemberBlockElementType, isContemberBlockElement } from './ContemberBlockElement'
+import { ContemberBlockElement, contemberBlockElementType, isContemberBlockElement } from './ContemberBlockElement'
 
 export interface CreateEditorOptions {
 	entityListRef: React.MutableRefObject<EntityListAccessor>
@@ -56,27 +56,39 @@ export const createEditor = (options: CreateEditorOptions) => {
 		} = options
 
 		entityList.batchUpdates?.(getAccessor => {
-			const saveElementAt = (index: number) => {
+			const getEntityAt = (index: number): EntityAccessor => {
 				const oldEntityKey = sortedEntities[index].getKey()
 				const newEntity = getAccessor().entities.find(entity => entity?.getKey() === oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
-					console.log('WTF?', newEntity)
-					throw new BindingError(`WHAAAT?!`)
+					throw new BindingError(`Corrupted data`)
 				}
+				return newEntity
+			}
+			const saveTextElementAt = (index: number, entity: EntityAccessor = getEntityAt(index)) => {
 				const targetElement = editor.children[index]
-
 				if (!Element.isElement(targetElement)) {
 					throw new BindingError(`Corrupted data`)
 				}
-				elementCache.set(newEntity, targetElement)
-				newEntity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
-			}
-			const refreshSortedEntities = () => {
-				sortedEntities = sortEntities(getAccessor().getFilteredEntities(), sortableByField)
+				entity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
+				const updatedEntity = getEntityAt(index)
+				elementCache.set(updatedEntity, targetElement)
+				sortedEntities[index] = updatedEntity
 			}
 			const removeElementAt = (index: number) => {
 				sortedEntities[index].remove?.(removalType)
 				sortedEntities.splice(index, 1)
+			}
+			const addNewDiscriminatedEntityAt = (index: number, blockDiscriminant: FieldValue): EntityAccessor => {
+				addNewEntityAtIndex(getAccessor(), sortableByField, index, (getInnerAccessor, newEntityIndex) => {
+					const newEntity = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
+					newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
+					sortedEntities[index] = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
+				})
+				return sortedEntities[index]
+			}
+			const addNewTextElementAt = (index: number) => {
+				const newEntity = addNewDiscriminatedEntityAt(index, textBlockDiscriminant)
+				saveTextElementAt(index, newEntity)
 			}
 
 			if (operation.type === 'set_selection') {
@@ -88,19 +100,19 @@ export const createEditor = (options: CreateEditorOptions) => {
 
 			if (path.length > 1) {
 				apply(operation)
-				saveElementAt(topLevelIndex)
+				saveTextElementAt(topLevelIndex)
 				return // We only care about top-level operations from here.
 			}
 
 			switch (operation.type) {
 				case 'set_node':
 					apply(operation)
-					saveElementAt(topLevelIndex)
+					saveTextElementAt(topLevelIndex)
 					break
 				case 'merge_node': {
 					apply(operation)
 					removeElementAt(topLevelIndex)
-					saveElementAt(topLevelIndex - 1)
+					saveTextElementAt(topLevelIndex - 1)
 					return
 				}
 				case 'split_node': {
@@ -108,16 +120,8 @@ export const createEditor = (options: CreateEditorOptions) => {
 						throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 					}
 					apply(operation)
-					saveElementAt(topLevelIndex)
-					const newSortedIndex = topLevelIndex + 1
-
-					addNewEntityAtIndex(getAccessor(), sortableByField, newSortedIndex, (getInnerAccessor, newEntityIndex) => {
-						const newEntity = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
-						newEntity.getRelativeSingleField(discriminationField).updateValue?.(textBlockDiscriminant)
-						sortedEntities[newSortedIndex] = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
-					})
-					refreshSortedEntities()
-					saveElementAt(newSortedIndex)
+					saveTextElementAt(topLevelIndex)
+					addNewTextElementAt(topLevelIndex + 1)
 					return
 				}
 				case 'insert_text':
@@ -129,12 +133,28 @@ export const createEditor = (options: CreateEditorOptions) => {
 						throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 					}
 					apply(operation)
-					saveElementAt(topLevelIndex)
+					saveTextElementAt(topLevelIndex)
 					return
 				}
 
 				case 'insert_node': {
-					apply(operation) // TODO
+					let { node } = operation
+					if (!Element.isElement(node)) {
+						throw new BindingError()
+					}
+					let blockType: FieldValue
+
+					if (isContemberBlockElement(node)) {
+						blockType = node.blockType
+						const contemberNode: ContemberBlockElement = {
+							...node,
+							entity: 123 as any,
+						}
+						node = contemberNode
+					} else {
+						apply(operation)
+						addNewTextElementAt(topLevelIndex)
+					}
 					break
 				}
 				case 'remove_node': {
@@ -147,7 +167,6 @@ export const createEditor = (options: CreateEditorOptions) => {
 					apply(operation)
 					break
 			}
-			console.log('afterOp', sortedEntities)
 		})
 	}
 

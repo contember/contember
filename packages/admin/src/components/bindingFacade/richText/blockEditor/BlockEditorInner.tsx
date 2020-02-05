@@ -12,7 +12,7 @@ import {
 } from '@contember/binding'
 import { Box } from '@contember/ui'
 import * as React from 'react'
-import { Element, Node } from 'slate'
+import { Element } from 'slate'
 import { Editable, RenderElementProps, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { RepeaterProps } from '../../collections'
@@ -132,8 +132,6 @@ export const BlockEditorInner = React.memo(
 			entities,
 		})
 		const onChange = React.useCallback(() => {}, [])
-
-		console.log('\n\n\nnodes', nodes)
 
 		return (
 			<Slate editor={editor} value={nodes} onChange={onChange}>

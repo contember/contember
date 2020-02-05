@@ -80,7 +80,6 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			}
 		})
 
-		await dockerCompose.run(['pull', 'api']).output
 		await dockerCompose.run(['stop', ...mainServices]).output
 		await dockerCompose.run(['rm', '-f', ...mainServices]).output
 		await dockerCompose.run(['up', '-d']).output

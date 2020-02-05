@@ -1,4 +1,4 @@
-import { EntityAccessor, RelativeSingleField } from '@contember/binding'
+import { EntityAccessor, RelativeSingleField, RemovalType } from '@contember/binding'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
@@ -9,6 +9,7 @@ import { ContemberBlockElementRefreshContext } from './ContemberBlockElementRefr
 export interface BlockEditorElementRendererProps extends RenderElementProps {
 	normalizedBlocks: NormalizedBlock[]
 	discriminationField: RelativeSingleField
+	removalType: RemovalType
 	fallbackRenderer: (props: RenderElementProps) => React.ReactElement
 	getEntityByKey: (key: string) => EntityAccessor
 }
@@ -25,6 +26,7 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 						element={element}
 						entity={props.getEntityByKey(element.entityKey)}
 						normalizedBlocks={props.normalizedBlocks}
+						removalType={props.removalType}
 						discriminationField={props.discriminationField}
 					/>
 				)}

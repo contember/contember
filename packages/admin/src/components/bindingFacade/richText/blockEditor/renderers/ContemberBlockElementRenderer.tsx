@@ -1,13 +1,15 @@
-import { BindingError, Entity, EntityAccessor, RelativeSingleField } from '@contember/binding'
+import { BindingError, Entity, EntityAccessor, RelativeSingleField, RemovalType } from '@contember/binding'
 import { Box } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
+import { RemoveEntityButton } from '../../../collections/helpers'
 import { ContemberBlockElement } from '../ContemberBlockElement'
 
 export interface ContemberBlockElementRendererProps extends RenderElementProps {
 	element: ContemberBlockElement
 	entity: EntityAccessor
+	removalType: RemovalType
 	discriminationField: RelativeSingleField
 	normalizedBlocks: NormalizedBlock[]
 }
@@ -27,7 +29,11 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
 				<Entity accessor={props.entity}>
-					<Box heading={selectedBlock.label} isActive={selected}>
+					<Box
+						heading={selectedBlock.label}
+						isActive={selected}
+						actions={<RemoveEntityButton removalType={props.removalType} />}
+					>
 						{selectedBlock.children}
 					</Box>
 				</Entity>

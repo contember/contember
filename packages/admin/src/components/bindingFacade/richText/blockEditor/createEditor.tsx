@@ -55,6 +55,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 			<BlockEditorElementRenderer
 				normalizedBlocks={options.normalizedBlocksRef.current}
 				fallbackRenderer={renderElement}
+				removalType={removalType}
 				element={props.element}
 				attributes={props.attributes}
 				children={props.children}
@@ -71,7 +72,6 @@ export const createEditor = (options: CreateEditorOptions) => {
 	}
 
 	editor.apply = (operation: Operation) => {
-		console.log(operation)
 		if (options.isMutatingRef.current) {
 			return
 		}

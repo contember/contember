@@ -23,7 +23,7 @@ export const addNewEntityAtIndex = (
 		const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
 
 		if (sortableField.updateValue) {
-			sortableField.updateValue(newIndex)
+			sortableField.updateValue(index)
 		} else {
 			return throwNonWritableError(sortableField.fieldName)
 		}

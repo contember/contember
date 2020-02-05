@@ -40,3 +40,5 @@ export const TestWysiwyg: React.ComponentType = () => {
 	)
 }
 TestWysiwyg.displayName = 'TestWysiwyg'
+
+export * from './blockEditor'

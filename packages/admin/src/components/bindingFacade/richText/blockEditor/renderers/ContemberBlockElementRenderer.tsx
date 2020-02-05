@@ -1,24 +1,22 @@
-import { BindingError, Entity, RelativeSingleField } from '@contember/binding'
-import { Box, BoxSection } from '@contember/ui'
+import { BindingError, Entity, EntityAccessor, RelativeSingleField } from '@contember/binding'
+import { Box } from '@contember/ui'
 import * as React from 'react'
-import { RenderElementProps, useFocused, useSelected } from 'slate-react'
+import { RenderElementProps, useSelected } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
 import { ContemberBlockElement } from '../ContemberBlockElement'
 
 export interface ContemberBlockElementRendererProps extends RenderElementProps {
 	element: ContemberBlockElement
+	entity: EntityAccessor
 	discriminationField: RelativeSingleField
 	normalizedBlocks: NormalizedBlock[]
 }
 
-export const ContemberBlockElementRenderer: React.ComponentType<ContemberBlockElementRendererProps> = (
-	props: ContemberBlockElementRendererProps,
-) => {
+export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockElementRendererProps) => {
 	const selected = useSelected()
-	const focused = useFocused()
 
 	// TODO remove button, dragHandle, etc.
-	const discriminationField = props.element.entity.getRelativeSingleField(props.discriminationField)
+	const discriminationField = props.entity.getRelativeSingleField(props.discriminationField)
 	const selectedBlock = props.normalizedBlocks.find(block => discriminationField.hasValue(block.discriminateBy))
 
 	if (!selectedBlock) {
@@ -28,7 +26,7 @@ export const ContemberBlockElementRenderer: React.ComponentType<ContemberBlockEl
 		<div {...props.attributes}>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
-				<Entity accessor={props.element.entity}>
+				<Entity accessor={props.entity}>
 					<Box heading={selectedBlock.label} isActive={selected}>
 						{selectedBlock.children}
 					</Box>
@@ -37,5 +35,5 @@ export const ContemberBlockElementRenderer: React.ComponentType<ContemberBlockEl
 			{props.children}
 		</div>
 	)
-}
+})
 ContemberBlockElementRenderer.displayName = 'ContemberBlockElementRenderer'

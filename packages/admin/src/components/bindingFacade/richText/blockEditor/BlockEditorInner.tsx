@@ -18,7 +18,7 @@ import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } fr
 import { RepeaterProps } from '../../collections'
 import { HoveringToolbar } from '../toolbars'
 import { createEditor } from './createEditor'
-import { BlockEditorElementRenderer } from './renderers'
+import { BlockEditorElementRenderer, ContemberBlockElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
 
 export interface BlockEditorInnerPublicProps {
@@ -53,6 +53,8 @@ export const BlockEditorInner = React.memo(
 		textBlockDiscriminatedByScalar,
 		textBlockField,
 	}: BlockEditorInnerProps) => {
+		const renderCountRef = React.useRef(0)
+
 		const isMutating = useMutationState()
 		const environment = useEnvironment()
 
@@ -75,11 +77,13 @@ export const BlockEditorInner = React.memo(
 			)
 		}, [environment, textBlockDiscriminatedBy, textBlockDiscriminatedByScalar])
 		const normalizedBlocks = useNormalizedBlocks(children)
-		const [elementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
+		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
+		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
 
 		const entityListRef = React.useRef(entityList)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedEntitiesRef = React.useRef(entities)
+		const normalizedBlocksRef = React.useRef(normalizedBlocks)
 
 		entityListRef.current = entityList
 		isMutatingRef.current = isMutating
@@ -91,11 +95,12 @@ export const BlockEditorInner = React.memo(
 					entityListRef,
 					isMutatingRef,
 					sortedEntitiesRef,
+					normalizedBlocksRef,
 					textBlockDiscriminant,
 					discriminationField: desugaredDiscriminationField,
 					sortableByField: desugaredSortableByField,
 					textBlockField: desugaredTextBlockField,
-					elementCache,
+					textElementCache,
 					removalType,
 				}),
 			[
@@ -103,29 +108,16 @@ export const BlockEditorInner = React.memo(
 				desugaredDiscriminationField,
 				desugaredSortableByField,
 				desugaredTextBlockField,
-				elementCache,
 				removalType,
 				textBlockDiscriminant,
+				textElementCache,
 			],
-		)
-		const editorRenderElement = editor.renderElement
-		const renderElement = React.useCallback(
-			(props: RenderElementProps) => (
-				<BlockEditorElementRenderer
-					normalizedBlocks={normalizedBlocks}
-					fallbackRenderer={editorRenderElement}
-					element={props.element}
-					attributes={props.attributes}
-					children={props.children}
-					discriminationField={desugaredDiscriminationField}
-				/>
-			),
-			[desugaredDiscriminationField, editorRenderElement, normalizedBlocks],
 		)
 
 		const nodes = useSlateNodes({
 			discriminationField: desugaredDiscriminationField,
-			elementCache,
+			textElementCache,
+			contemberBlockElementCache,
 			textBlockField: desugaredTextBlockField,
 			blocks: normalizedBlocks,
 			textBlockDiscriminant,
@@ -134,12 +126,18 @@ export const BlockEditorInner = React.memo(
 		const onChange = React.useCallback(() => {}, [])
 
 		return (
-			<Slate editor={editor} value={nodes} onChange={onChange}>
-				<Box heading={label}>
-					<Editable renderElement={renderElement} renderLeaf={editor.renderLeaf} onKeyDown={editor.onKeyDown} />
-					<HoveringToolbar />
-				</Box>
-			</Slate>
+			<ContemberBlockElementRefreshContext.Provider value={renderCountRef.current++}>
+				<Slate editor={editor} value={nodes} onChange={onChange}>
+					<Box heading={label}>
+						<Editable
+							renderElement={editor.renderElement}
+							renderLeaf={editor.renderLeaf}
+							onKeyDown={editor.onKeyDown}
+						/>
+						<HoveringToolbar />
+					</Box>
+				</Slate>
+			</ContemberBlockElementRefreshContext.Provider>
 		)
 	},
 )

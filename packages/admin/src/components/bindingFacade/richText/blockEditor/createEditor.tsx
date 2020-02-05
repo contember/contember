@@ -10,18 +10,22 @@ import {
 } from '@contember/binding'
 import * as React from 'react'
 import { Element, Operation } from 'slate'
+import { RenderElementProps } from 'slate-react'
+import { NormalizedBlock } from '../../blocks'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../plugins'
 import { ContemberBlockElement, contemberBlockElementType, isContemberBlockElement } from './ContemberBlockElement'
+import { BlockEditorElementRenderer } from './renderers'
 
 export interface CreateEditorOptions {
 	entityListRef: React.MutableRefObject<EntityListAccessor>
 	isMutatingRef: React.MutableRefObject<boolean>
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
+	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
 	textBlockDiscriminant: FieldValue
 	discriminationField: RelativeSingleField
 	sortableByField: RelativeSingleField
 	textBlockField: RelativeSingleField
-	elementCache: WeakMap<EntityAccessor, Element>
+	textElementCache: WeakMap<EntityAccessor, Element>
 	removalType: RemovalType
 }
 
@@ -29,7 +33,16 @@ export const createEditor = (options: CreateEditorOptions) => {
 	// TODO configurable plugin set
 	const editor = withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials())))
 
-	const { isVoid, apply } = editor
+	const { isVoid, apply, renderElement } = editor
+
+	const {
+		discriminationField,
+		textElementCache,
+		removalType,
+		sortableByField,
+		textBlockDiscriminant,
+		textBlockField,
+	} = options
 
 	editor.isVoid = element => {
 		if (element.type === contemberBlockElementType) {
@@ -37,6 +50,26 @@ export const createEditor = (options: CreateEditorOptions) => {
 		}
 		return isVoid(element)
 	}
+	editor.renderElement = props => {
+		return (
+			<BlockEditorElementRenderer
+				normalizedBlocks={options.normalizedBlocksRef.current}
+				fallbackRenderer={renderElement}
+				element={props.element}
+				attributes={props.attributes}
+				children={props.children}
+				discriminationField={discriminationField}
+				getEntityByKey={key => {
+					const entity = options.entityListRef.current.entities.find(entity => entity?.getKey() === key)
+					if (!(entity instanceof EntityAccessor)) {
+						throw new BindingError(`Corrupted data.`)
+					}
+					return entity
+				}}
+			/>
+		)
+	}
+
 	editor.apply = (operation: Operation) => {
 		console.log(operation)
 		if (options.isMutatingRef.current) {
@@ -46,32 +79,23 @@ export const createEditor = (options: CreateEditorOptions) => {
 		const entityList = options.entityListRef.current
 		let sortedEntities = options.sortedEntitiesRef.current
 
-		const {
-			discriminationField,
-			elementCache,
-			removalType,
-			sortableByField,
-			textBlockDiscriminant,
-			textBlockField,
-		} = options
-
 		entityList.batchUpdates?.(getAccessor => {
-			const getEntityAt = (index: number): EntityAccessor => {
-				const oldEntityKey = sortedEntities[index].getKey()
+			const getFreshEntity = (sortedIndex: number): EntityAccessor => {
+				const oldEntityKey = sortedEntities[sortedIndex].getKey()
 				const newEntity = getAccessor().entities.find(entity => entity?.getKey() === oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}
 				return newEntity
 			}
-			const saveTextElementAt = (index: number, entity: EntityAccessor = getEntityAt(index)) => {
+			const saveTextElementAt = (index: number, entity: EntityAccessor = getFreshEntity(index)) => {
 				const targetElement = editor.children[index]
 				if (!Element.isElement(targetElement)) {
 					throw new BindingError(`Corrupted data`)
 				}
 				entity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
-				const updatedEntity = getEntityAt(index)
-				elementCache.set(updatedEntity, targetElement)
+				const updatedEntity = getFreshEntity(index)
+				textElementCache.set(updatedEntity, targetElement)
 				sortedEntities[index] = updatedEntity
 			}
 			const removeElementAt = (index: number) => {
@@ -146,11 +170,10 @@ export const createEditor = (options: CreateEditorOptions) => {
 
 					if (isContemberBlockElement(node)) {
 						blockType = node.blockType
-						const contemberNode: ContemberBlockElement = {
-							...node,
-							entity: 123 as any,
-						}
-						node = contemberNode
+						const entity = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
+						apply(operation)
+						// TODO cache?
+						sortedEntities[topLevelIndex] = entity
 					} else {
 						apply(operation)
 						addNewTextElementAt(topLevelIndex)

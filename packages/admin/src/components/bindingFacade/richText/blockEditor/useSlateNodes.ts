@@ -7,32 +7,39 @@ import { ContemberBlockElement, contemberBlockElementType } from './ContemberBlo
 export interface UseSlateNodesOptions {
 	blocks: NormalizedBlock[]
 	discriminationField: RelativeSingleField
-	elementCache: WeakMap<EntityAccessor, Element>
+	textElementCache: WeakMap<EntityAccessor, Element>
+	contemberBlockElementCache: Map<string, Element>
 	textBlockField: RelativeSingleField
 	textBlockDiscriminant: FieldValue
 	entities: EntityAccessor[]
 }
 
-// { "type": "paragraph", "children": [{ "text": "This is a sample paragraph." }] }
 const emptyChildren = [{ text: '' }]
 export const useSlateNodes = ({
 	blocks,
 	discriminationField,
-	elementCache,
+	textElementCache,
+	contemberBlockElementCache,
 	textBlockField,
 	textBlockDiscriminant,
 	entities,
 }: UseSlateNodesOptions): Element[] =>
 	entities.map(entity => {
-		if (elementCache.has(entity)) {
-			return elementCache.get(entity)!
+		if (textElementCache.has(entity)) {
+			return textElementCache.get(entity)!
 		}
-		let element: Element
+		const entityKey = entity.getKey()
+
+		if (contemberBlockElementCache.has(entityKey)) {
+			return contemberBlockElementCache.get(entityKey)!
+		}
+
 		const blockType = entity.getRelativeSingleField(discriminationField)
 
 		if (blockType.hasValue(textBlockDiscriminant)) {
 			// This is a text block
 			const textAccessor = entity.getRelativeSingleField(textBlockField)
+			let element: Element
 
 			if (textAccessor.currentValue === null || textAccessor.currentValue === '') {
 				const paragraphElement: ParagraphElement = {
@@ -49,6 +56,8 @@ export const useSlateNodes = ({
 					throw new BindingError(`BlockEditor: The 'textBlockField' contains invalid JSON.`)
 				}
 			}
+			textElementCache.set(entity, element)
+			return element
 		} else {
 			const selectedBlock = blocks.find(block => blockType.hasValue(block.discriminateBy))
 
@@ -58,12 +67,10 @@ export const useSlateNodes = ({
 			const contemberBlock: ContemberBlockElement = {
 				type: contemberBlockElementType,
 				children: emptyChildren,
-				entity,
+				entityKey,
 				blockType: selectedBlock.discriminateBy,
 			}
-			element = contemberBlock
+			contemberBlockElementCache.set(entityKey, contemberBlock)
+			return contemberBlock
 		}
-
-		elementCache.set(entity, element)
-		return element
 	})

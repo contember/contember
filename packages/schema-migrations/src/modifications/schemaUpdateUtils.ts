@@ -20,6 +20,11 @@ export const updateEntity = (name: string, entityUpdate: EntityUpdater): ModelUp
 	},
 })
 
+export const updateEveryEntity = (entityUpdate: EntityUpdater): ModelUpdater => model => ({
+	...model,
+	entities: Object.fromEntries(Object.entries(model.entities).map(([name, entity]) => [name, entityUpdate(entity)])),
+})
+
 export const updateField = <T extends Model.AnyField = Model.AnyField>(
 	name: string,
 	fieldUpdater: FieldUpdater<T>,
@@ -30,6 +35,12 @@ export const updateField = <T extends Model.AnyField = Model.AnyField>(
 		[name]: fieldUpdater(entity.fields[name] as T),
 	},
 })
+
+export const updateEveryField = (fieldUpdater: FieldUpdater<any>): EntityUpdater => entity => ({
+	...entity,
+	fields: Object.fromEntries(Object.entries(entity.fields).map(([name, field]) => [name, fieldUpdater(field)])),
+})
+
 export const addField = (field: Model.AnyField): EntityUpdater => entity => ({
 	...entity,
 	fields: {

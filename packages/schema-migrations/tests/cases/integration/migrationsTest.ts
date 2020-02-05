@@ -860,9 +860,11 @@ describe('Diff schemas', () => {
 	describe('rename entity', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Author', e => e.tableName('user').column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', e => e.column('title').manyHasOne('author', r => r.target('Author')))
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('User', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', e => e.column('title').manyHasOne('author', r => r.target('User')))
 			.buildSchema()
 		const diff: Migration.Modification[] = [
 			{

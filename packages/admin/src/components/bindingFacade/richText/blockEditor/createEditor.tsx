@@ -154,7 +154,11 @@ export const createEditor = (options: CreateEditorOptions) => {
 			const { path } = operation
 			const [topLevelIndex] = path
 
-			if (path.length > 1) {
+			if (path.length === 0) {
+				// Technically, the path could also be [], indicating that we're operating on the editor itself.
+				// This is branch is entirely speculative. I *THINK* it could feasibly happen but I don't know when or how.
+				return apply(operation) // ?!?!!???
+			} else if (path.length > 1) {
 				apply(operation)
 				saveTextElementAt(topLevelIndex)
 				return // We only care about top-level operations from here.

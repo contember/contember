@@ -9,7 +9,7 @@ import {
 	sortEntities,
 } from '@contember/binding'
 import * as React from 'react'
-import { Element, Operation, Text, Transforms } from 'slate'
+import { Element, Operation, Range as SlateRange, Text, Transforms } from 'slate'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../blocks'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../plugins'
@@ -33,7 +33,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 	// TODO configurable plugin set
 	const editor = withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials())))
 
-	const { isVoid, apply, renderElement, onFocus, onBlur } = editor
+	const { isVoid, apply, renderElement, onFocus, onBlur, insertNode } = editor
 
 	const {
 		discriminationField,
@@ -101,6 +101,22 @@ export const createEditor = (options: CreateEditorOptions) => {
 			}
 		}
 		onBlur(e)
+	}
+
+	editor.insertNode = node => {
+		if (!isContemberBlockElement(node)) {
+			return insertNode(node)
+		}
+
+		const selection = editor.selection
+
+		if (!selection || SlateRange.isExpanded(selection)) {
+			return
+		}
+		const [topLevelIndex] = selection.focus.path
+		Transforms.insertNodes(editor, node, {
+			at: [topLevelIndex + 1],
+		})
 	}
 
 	editor.apply = (operation: Operation) => {

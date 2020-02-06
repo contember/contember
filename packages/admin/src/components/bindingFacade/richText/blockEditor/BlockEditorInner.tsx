@@ -41,6 +41,7 @@ export interface BlockEditorInnerInternalProps {
 
 export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInnerInternalProps
 
+const noop = () => {}
 export const BlockEditorInner = React.memo(
 	({
 		entityList,
@@ -123,11 +124,10 @@ export const BlockEditorInner = React.memo(
 			textBlockDiscriminant,
 			entities,
 		})
-		const onChange = React.useCallback(() => {}, [])
 
 		return (
 			<ContemberBlockElementRefreshContext.Provider value={renderCountRef.current++}>
-				<Slate editor={editor} value={nodes} onChange={onChange}>
+				<Slate editor={editor} value={nodes} onChange={noop}>
 					<Box heading={label}>
 						<Editable
 							renderElement={editor.renderElement}

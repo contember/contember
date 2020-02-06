@@ -9,7 +9,7 @@ import {
 	sortEntities,
 } from '@contember/binding'
 import * as React from 'react'
-import { Element, Operation } from 'slate'
+import { Element, Operation, Range as SlateRange, Text, Transforms } from 'slate'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../blocks'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../plugins'
@@ -33,7 +33,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 	// TODO configurable plugin set
 	const editor = withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials())))
 
-	const { isVoid, apply, renderElement } = editor
+	const { isVoid, apply, renderElement, onFocus, onBlur, insertNode } = editor
 
 	const {
 		discriminationField,
@@ -69,6 +69,54 @@ export const createEditor = (options: CreateEditorOptions) => {
 				}}
 			/>
 		)
+	}
+	editor.onFocus = e => {
+		if (editor.children.length === 0) {
+			Transforms.insertNodes(
+				editor,
+				{
+					type: 'paragraph',
+					children: [{ text: '' }],
+				},
+				{
+					at: [0],
+				},
+			)
+		}
+		// TODO also handle the non-empty case. Find and set_selection to the nearest node.
+		onFocus(e)
+	}
+
+	editor.onBlur = e => {
+		if (editor.children.length === 1) {
+			const soleElement = editor.children[0] as Element
+			if (editor.isParagraph(soleElement) && soleElement.children.length === 1) {
+				const soleText = soleElement.children[0]
+
+				if (Text.isText(soleText) && soleText.text === '') {
+					Transforms.removeNodes(editor, {
+						at: [0],
+					})
+				}
+			}
+		}
+		onBlur(e)
+	}
+
+	editor.insertNode = node => {
+		if (!isContemberBlockElement(node)) {
+			return insertNode(node)
+		}
+
+		const selection = editor.selection
+
+		if (!selection || SlateRange.isExpanded(selection)) {
+			return
+		}
+		const [topLevelIndex] = selection.focus.path
+		Transforms.insertNodes(editor, node, {
+			at: [topLevelIndex + 1],
+		})
 	}
 
 	editor.apply = (operation: Operation) => {
@@ -122,7 +170,11 @@ export const createEditor = (options: CreateEditorOptions) => {
 			const { path } = operation
 			const [topLevelIndex] = path
 
-			if (path.length > 1) {
+			if (path.length === 0) {
+				// Technically, the path could also be [], indicating that we're operating on the editor itself.
+				// This is branch is entirely speculative. I *THINK* it could feasibly happen but I don't know when or how.
+				return apply(operation) // ?!?!!???
+			} else if (path.length > 1) {
 				apply(operation)
 				saveTextElementAt(topLevelIndex)
 				return // We only care about top-level operations from here.

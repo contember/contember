@@ -13,12 +13,12 @@ import {
 import { Box } from '@contember/ui'
 import * as React from 'react'
 import { Element } from 'slate'
-import { Editable, RenderElementProps, Slate } from 'slate-react'
+import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { RepeaterProps } from '../../collections'
-import { HoveringToolbar } from '../toolbars'
+import { HoveringToolbar, HoveringToolbarProps } from '../toolbars'
 import { createEditor } from './createEditor'
-import { BlockEditorElementRenderer, ContemberBlockElementRefreshContext } from './renderers'
+import { ContemberBlockElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
 
 export interface BlockEditorInnerPublicProps {
@@ -33,6 +33,8 @@ export interface BlockEditorInnerPublicProps {
 	textBlockDiscriminatedByScalar?: ScalarBasedBlockProps['discriminateByScalar']
 	// TODO configure marks
 	// TODO configure elements
+
+	blockButtons?: HoveringToolbarProps['blockButtons']
 }
 
 export interface BlockEditorInnerInternalProps {
@@ -41,6 +43,7 @@ export interface BlockEditorInnerInternalProps {
 
 export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInnerInternalProps
 
+const noop = () => {}
 export const BlockEditorInner = React.memo(
 	({
 		entityList,
@@ -52,6 +55,7 @@ export const BlockEditorInner = React.memo(
 		textBlockDiscriminatedBy,
 		textBlockDiscriminatedByScalar,
 		textBlockField,
+		blockButtons,
 	}: BlockEditorInnerProps) => {
 		const renderCountRef = React.useRef(0)
 
@@ -123,18 +127,19 @@ export const BlockEditorInner = React.memo(
 			textBlockDiscriminant,
 			entities,
 		})
-		const onChange = React.useCallback(() => {}, [])
 
 		return (
 			<ContemberBlockElementRefreshContext.Provider value={renderCountRef.current++}>
-				<Slate editor={editor} value={nodes} onChange={onChange}>
-					<Box heading={label}>
+				<Slate editor={editor} value={nodes} onChange={noop}>
+					<Box heading={label} distinction="seamlessIfNested">
 						<Editable
 							renderElement={editor.renderElement}
 							renderLeaf={editor.renderLeaf}
 							onKeyDown={editor.onKeyDown}
+							onFocusCapture={editor.onFocus}
+							onBlurCapture={editor.onBlur}
 						/>
-						<HoveringToolbar />
+						<HoveringToolbar blockButtons={blockButtons} />
 					</Box>
 				</Slate>
 			</ContemberBlockElementRefreshContext.Provider>

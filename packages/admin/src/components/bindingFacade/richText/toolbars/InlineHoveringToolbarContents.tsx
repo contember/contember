@@ -26,6 +26,24 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor, forceRender],
 	)
 
+	const isItalic = editor.isItalic(editor)
+	const toggleItalic = React.useCallback(
+		(e: React.MouseEvent) => {
+			toggleMark(editor, 'isItalic', e)
+			forceRender()
+		},
+		[editor, forceRender],
+	)
+
+	const isUnderlined = editor.isUnderlined(editor)
+	const toggleUnderlined = React.useCallback(
+		(e: React.MouseEvent) => {
+			toggleMark(editor, 'isUnderlined', e)
+			forceRender()
+		},
+		[editor, forceRender],
+	)
+
 	const isStruckThrough = editor.isStruckThrough(editor)
 	const toggleStruckThrough = React.useCallback(
 		(e: React.MouseEvent) => {
@@ -52,6 +70,12 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		<>
 			<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
 				<Icon blueprintIcon="bold" />
+			</Button>
+			<Button key="italic" isActive={isItalic} onMouseDown={toggleItalic}>
+				<Icon blueprintIcon="italic" />
+			</Button>
+			<Button key="underlined" isActive={isUnderlined} onMouseDown={toggleUnderlined}>
+				<Icon blueprintIcon="underline" />
 			</Button>
 			<Button key="strikethrough" isActive={isStruckThrough} onMouseDown={toggleStruckThrough}>
 				<Icon blueprintIcon="strikethrough" />

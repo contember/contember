@@ -14,7 +14,6 @@ export interface UseSlateNodesOptions {
 	entities: EntityAccessor[]
 }
 
-const emptyChildren = [{ text: '' }]
 export const useSlateNodes = ({
 	blocks,
 	discriminationField,
@@ -44,7 +43,7 @@ export const useSlateNodes = ({
 			if (textAccessor.currentValue === null || textAccessor.currentValue === '') {
 				const paragraphElement: ParagraphElement = {
 					type: 'paragraph',
-					children: emptyChildren,
+					children: [{ text: '' }],
 				}
 				element = paragraphElement
 			} else if (typeof textAccessor.currentValue !== 'string') {
@@ -66,7 +65,7 @@ export const useSlateNodes = ({
 			}
 			const contemberBlock: ContemberBlockElement = {
 				type: contemberBlockElementType,
-				children: emptyChildren,
+				children: [{ text: '' }],
 				entityKey,
 				blockType: selectedBlock.discriminateBy,
 			}

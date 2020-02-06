@@ -16,7 +16,7 @@ import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { RepeaterProps } from '../../collections'
-import { HoveringToolbar } from '../toolbars'
+import { HoveringToolbar, HoveringToolbarProps } from '../toolbars'
 import { createEditor } from './createEditor'
 import { ContemberBlockElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
@@ -33,6 +33,8 @@ export interface BlockEditorInnerPublicProps {
 	textBlockDiscriminatedByScalar?: ScalarBasedBlockProps['discriminateByScalar']
 	// TODO configure marks
 	// TODO configure elements
+
+	blockButtons?: HoveringToolbarProps['blockButtons']
 }
 
 export interface BlockEditorInnerInternalProps {
@@ -53,6 +55,7 @@ export const BlockEditorInner = React.memo(
 		textBlockDiscriminatedBy,
 		textBlockDiscriminatedByScalar,
 		textBlockField,
+		blockButtons,
 	}: BlockEditorInnerProps) => {
 		const renderCountRef = React.useRef(0)
 
@@ -128,7 +131,7 @@ export const BlockEditorInner = React.memo(
 		return (
 			<ContemberBlockElementRefreshContext.Provider value={renderCountRef.current++}>
 				<Slate editor={editor} value={nodes} onChange={noop}>
-					<Box heading={label}>
+					<Box heading={label} distinction="seamlessIfNested">
 						<Editable
 							renderElement={editor.renderElement}
 							renderLeaf={editor.renderLeaf}
@@ -136,7 +139,7 @@ export const BlockEditorInner = React.memo(
 							onFocusCapture={editor.onFocus}
 							onBlurCapture={editor.onBlur}
 						/>
-						<HoveringToolbar />
+						<HoveringToolbar blockButtons={blockButtons} />
 					</Box>
 				</Slate>
 			</ContemberBlockElementRefreshContext.Provider>

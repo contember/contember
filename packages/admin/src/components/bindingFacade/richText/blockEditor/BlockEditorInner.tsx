@@ -13,12 +13,12 @@ import {
 import { Box } from '@contember/ui'
 import * as React from 'react'
 import { Element } from 'slate'
-import { Editable, RenderElementProps, Slate } from 'slate-react'
+import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { RepeaterProps } from '../../collections'
 import { HoveringToolbar } from '../toolbars'
 import { createEditor } from './createEditor'
-import { BlockEditorElementRenderer, ContemberBlockElementRefreshContext } from './renderers'
+import { ContemberBlockElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
 
 export interface BlockEditorInnerPublicProps {
@@ -133,6 +133,8 @@ export const BlockEditorInner = React.memo(
 							renderElement={editor.renderElement}
 							renderLeaf={editor.renderLeaf}
 							onKeyDown={editor.onKeyDown}
+							onFocusCapture={editor.onFocus}
+							onBlurCapture={editor.onBlur}
 						/>
 						<HoveringToolbar />
 					</Box>

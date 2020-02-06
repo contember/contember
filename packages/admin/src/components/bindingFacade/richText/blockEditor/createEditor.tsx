@@ -9,7 +9,7 @@ import {
 	sortEntities,
 } from '@contember/binding'
 import * as React from 'react'
-import { Element, Operation } from 'slate'
+import { Element, Operation, Text, Transforms } from 'slate'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../blocks'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../plugins'
@@ -33,7 +33,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 	// TODO configurable plugin set
 	const editor = withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials())))
 
-	const { isVoid, apply, renderElement } = editor
+	const { isVoid, apply, renderElement, onFocus, onBlur } = editor
 
 	const {
 		discriminationField,
@@ -69,6 +69,38 @@ export const createEditor = (options: CreateEditorOptions) => {
 				}}
 			/>
 		)
+	}
+	editor.onFocus = e => {
+		if (editor.children.length === 0) {
+			Transforms.insertNodes(
+				editor,
+				{
+					type: 'paragraph',
+					children: [{ text: '' }],
+				},
+				{
+					at: [0],
+				},
+			)
+		}
+		// TODO also handle the non-empty case. Find and set_selection to the nearest node.
+		onFocus(e)
+	}
+
+	editor.onBlur = e => {
+		if (editor.children.length === 1) {
+			const soleElement = editor.children[0] as Element
+			if (editor.isParagraph(soleElement) && soleElement.children.length === 1) {
+				const soleText = soleElement.children[0]
+
+				if (Text.isText(soleText) && soleText.text === '') {
+					Transforms.removeNodes(editor, {
+						at: [0],
+					})
+				}
+			}
+		}
+		onBlur(e)
 	}
 
 	editor.apply = (operation: Operation) => {

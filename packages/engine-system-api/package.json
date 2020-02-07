@@ -5,7 +5,7 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"prebuild": "npx gql-gen --config graphql.codegen.yml",
+		"prebuild": "gql-gen --config graphql.codegen.yml",
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
@@ -25,10 +25,10 @@
 	"devDependencies": {
 		"@contember/engine-api-tester": "^0.6.5",
 		"@contember/schema-definition": "^0.6.5",
-		"@graphql-codegen/cli": "^1.5.0",
-		"@graphql-codegen/typescript": "^1.5.0",
-		"@graphql-codegen/typescript-operations": "^1.5.0",
-		"@graphql-codegen/typescript-resolvers": "^1.5.0",
+		"@graphql-codegen/cli": "^1.12.2",
+		"@graphql-codegen/typescript": "^1.12.2",
+		"@graphql-codegen/typescript-operations": "^1.12.2",
+		"@graphql-codegen/typescript-resolvers": "^1.12.2",
 		"@types/graphql": "^14.5.0",
 		"@types/jasmine": "^3.4.5",
 		"@types/node": "^12.11.7",

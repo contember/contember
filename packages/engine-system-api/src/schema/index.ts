@@ -102,6 +102,7 @@ export type RebaseAllResponse = {
 	readonly ok: Scalars['Boolean']
 }
 
+/** === release === */
 export enum ReleaseErrorCode {
 	MissingDependency = 'MISSING_DEPENDENCY',
 	Forbidden = 'FORBIDDEN',
@@ -198,6 +199,8 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
 	info: GraphQLResolveInfo,
 ) => Maybe<TTypes>
 
+export type isTypeOfResolverFn<T = {}> = (obj: T, info: GraphQLResolveInfo) => boolean
+
 export type NextResolverFn<T> = () => Promise<T>
 
 export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
@@ -263,6 +266,7 @@ export type CreateEventResolvers<
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type DeleteEventResolvers<
@@ -276,6 +280,7 @@ export type DeleteEventResolvers<
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type DiffResponseResolvers<
@@ -285,6 +290,7 @@ export type DiffResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['DiffErrorCode']>, ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['DiffResult']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type DiffResultResolvers<
@@ -294,6 +300,7 @@ export type DiffResultResolvers<
 	base?: Resolver<ResolversTypes['Stage'], ParentType, ContextType>
 	head?: Resolver<ResolversTypes['Stage'], ParentType, ContextType>
 	events?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type EventResolvers<
@@ -343,6 +350,7 @@ export type RebaseAllResponseResolvers<
 	ParentType extends ResolversParentTypes['RebaseAllResponse'] = ResolversParentTypes['RebaseAllResponse']
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type ReleaseResponseResolvers<
@@ -351,6 +359,7 @@ export type ReleaseResponseResolvers<
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ReleaseErrorCode']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type RunMigrationEventResolvers<
@@ -363,6 +372,7 @@ export type RunMigrationEventResolvers<
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type StageResolvers<
@@ -372,6 +382,7 @@ export type StageResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type UpdateEventResolvers<
@@ -386,6 +397,7 @@ export type UpdateEventResolvers<
 	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	fields?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type Resolvers<ContextType = any> = {

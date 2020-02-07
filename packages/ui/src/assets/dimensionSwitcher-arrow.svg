@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="7px" viewBox="0 0 12 7" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch Beta 63 (92437) - https://sketch.com -->
+    <title>Component/icon/ic_Chevron Down</title>
+    <desc>Created with Sketch Beta.</desc>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.2">
+        <g id="lista" transform="translate(-534.000000, -39.000000)" fill="#000000">
+            <g id="Group-13" transform="translate(0.000000, -0.000000)">
+                <g id="Component/icon/ic_Chevron-Down" transform="translate(534.000000, 39.000000)">
+                    <path d="M6,4.58578644 L10.2928932,0.292893219 C10.6834175,-0.0976310729 11.3165825,-0.0976310729 11.7071068,0.292893219 C12.0976311,0.683417511 12.0976311,1.31658249 11.7071068,1.70710678 L6.70710678,6.70710678 C6.31658249,7.09763107 5.68341751,7.09763107 5.29289322,6.70710678 L0.292893219,1.70710678 C-0.0976310729,1.31658249 -0.0976310729,0.683417511 0.292893219,0.292893219 C0.683417511,-0.0976310729 1.31658249,-0.0976310729 1.70710678,0.292893219 L6,4.58578644 Z" id="Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

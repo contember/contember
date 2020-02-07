@@ -1,0 +1,21 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}contemberLogo
+	font-size: inherit
+	display: inline-block
+
+	&-image
+		display: block
+		width: (431em / 401)
+		height: (401em / 401)
+		background: url(../../assets/contember-logo.svg) no-repeat left top
+		background-size: contain
+
+	&.view-logotyp &-image
+		width: (1871em / 206)
+		height: (206em / 206) * (414 / 206)
+		background: url(../../assets/contember-logotyp.svg) no-repeat left top
+		background-size: contain
+
+	&.view-logotyp.view-baseline &-image
+		margin-bottom: (206em / 206) - (206em / 206) * (414 / 206)

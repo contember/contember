@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch Beta 63 (92437) - https://sketch.com -->
+    <title>clock_L</title>
+    <desc>Created with Sketch Beta.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linejoin="bevel">
+        <g id="01-wysiwyg" transform="translate(-1400.000000, -96.000000)" fill="#FFFFFF" fill-rule="nonzero" stroke="#9C9C9C">
+            <g id="clock_L" transform="translate(1401.000000, 97.000000)">
+                <path d="M8,15.3333333 C3.95666667,15.3333333 0.666666667,12.0436667 0.666666667,8 C0.666666667,3.95633333 3.95666667,0.666666667 8,0.666666667 C12.0436667,0.666666667 15.3333333,3.95633333 15.3333333,8 C15.3333333,12.0436667 12.0436667,15.3333333 8,15.3333333 L8,15.3333333 L8,15.3333333 L8,15.3333333 Z M8,0 C3.582,0 0,3.582 0,8 C0,12.418 3.582,16 8,16 C12.418,16 16,12.418 16,8 C16,3.582 12.418,0 8,0 L8,0 Z M8,8.63933333 L4,8.63933333 L4,9.306 L8.66666667,9.306 L8.66666667,2.66666667 L8,2.66666667 L8,8.63933333"></path>
+            </g>
+        </g>
+    </g>
+</svg>

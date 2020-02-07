@@ -44,9 +44,7 @@ export class Application {
 
 		try {
 			const result = await command.run(rest)
-			if (!result) {
-				return process.exit(0)
-			}
+			return process.exit(result)
 		} catch (e) {
 			if (e instanceof InvalidInputError) {
 				console.error(e.message)

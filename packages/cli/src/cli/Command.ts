@@ -16,12 +16,12 @@ export abstract class Command<Args extends Arguments, TOptions extends Options> 
 		return this.configuration
 	}
 
-	protected abstract async execute(input: Input<Args, TOptions>): Promise<void | true>
+	protected abstract async execute(input: Input<Args, TOptions>): Promise<void | number>
 
-	public async run(args: string[]): Promise<boolean> {
+	public async run(args: string[]): Promise<number> {
 		const parser = this.getConfiguration().createParser()
 		const input = parser.parse<Args, TOptions>(args, false)
 		const result = await this.execute(input)
-		return result || false
+		return result || 0
 	}
 }

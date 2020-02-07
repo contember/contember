@@ -13,6 +13,7 @@ import {
 export interface MigrationsContainer {
 	migrationDiffCreator: MigrationDiffCreator
 	migrationDryRunner: MigrationSqlDryRunner
+	schemaVersionBuilder: SchemaVersionBuilder
 }
 
 export class MigrationsContainerFactory {
@@ -43,6 +44,6 @@ export class MigrationsContainerFactory {
 					new MigrationSqlDryRunner(migrationsResolver, modificationHandlerFactory, schemaVersionBuilder),
 			)
 			.build()
-			.pick('migrationDiffCreator', 'migrationDryRunner')
+			.pick('migrationDiffCreator', 'migrationDryRunner', 'schemaVersionBuilder')
 	}
 }

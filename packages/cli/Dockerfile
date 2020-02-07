@@ -18,7 +18,7 @@ RUN curl -Ls "https://download.docker.com/linux/debian/dists/stretch/pool/stable
 	curl -Ls "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
 	chmod +x /usr/local/bin/docker-compose
 
-COPY --from=builder /src/packages/cli/dist/src ./dist/src
-COPY --from=builder /src/packages/cli/node_modules ./node_modules
+COPY --from=builder /src/packages/cli/dist/src /opt/contember/dist/src
+COPY --from=builder /src/packages/cli/node_modules /opt/contember/node_modules
 
-ENTRYPOINT ["npx", "contember"]
+ENTRYPOINT ["node", "/opt/contember/dist/src/run.js"]

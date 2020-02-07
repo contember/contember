@@ -30,4 +30,5 @@ for VERSION in "${ALL_VERSIONS[@]:1}"
 do
   docker tag "$REPO:$MAIN_VERSION" "$REPO:$VERSION"
 done
+docker tag "$REPO:$MAIN_VERSION" "$REPO:latest"
 docker push "$REPO"

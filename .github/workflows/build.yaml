@@ -24,7 +24,7 @@ jobs:
           node-version: 12
       - name: Get the version
         if: startsWith(github.ref, 'refs/tags/')
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo ::set-env name=VERSION::$(echo ${GITHUB_REF:10})
       - name: "Show version"
         if: startsWith(github.ref, 'refs/tags/')
         run: echo ${VERSION}

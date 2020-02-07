@@ -1,5 +1,5 @@
 import { Model, Schema } from '@contember/schema'
-import { acceptFieldVisitor } from '@contember/schema-utils'
+import { acceptFieldVisitor, SchemaValidator, ValidationError } from '@contember/schema-utils'
 import { isIt } from './utils/isIt'
 import { SchemaMigrator } from './SchemaMigrator'
 import ModificationBuilder from './modifications/ModificationBuilder'
@@ -13,6 +13,15 @@ export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
 
 	diffSchemas(originalSchema: Schema, updatedSchema: Schema, checkRecreate: boolean = true): Migration.Modification[] {
+		const originalErrors = SchemaValidator.validate(originalSchema)
+		if (originalErrors.length > 0) {
+			throw new InvalidSchemaException('original schema is not valid', originalErrors)
+		}
+		const updatedErrors = SchemaValidator.validate(updatedSchema)
+		if (updatedErrors.length > 0) {
+			throw new InvalidSchemaException('updated schema is not valid', updatedErrors)
+		}
+
 		const builder = new ModificationBuilder(originalSchema, updatedSchema)
 
 		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
@@ -250,5 +259,11 @@ export class SchemaDiffer {
 		for (const uniqueName of originalUniqueNames) {
 			builder.removeUnique(updatedEntity.name, uniqueName)
 		}
+	}
+}
+
+export class InvalidSchemaException extends Error {
+	constructor(message: string, public readonly validationErrors: ValidationError[]) {
+		super(message)
 	}
 }

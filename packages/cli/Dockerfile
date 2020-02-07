@@ -20,5 +20,6 @@ RUN curl -Ls "https://download.docker.com/linux/debian/dists/stretch/pool/stable
 
 COPY --from=builder /src/packages/cli/dist/src /opt/contember/dist/src
 COPY --from=builder /src/packages/cli/node_modules /opt/contember/node_modules
+COPY --from=builder /src/packages/cli/run.sh /opt/contember/run.sh
 
-ENTRYPOINT ["node", "/opt/contember/dist/src/run.js"]
+ENTRYPOINT ["bash", "/opt/contember/run.sh"]

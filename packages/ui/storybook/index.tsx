@@ -3,6 +3,7 @@ import '../../storybook/index.sass'
 
 import './components/Aether'
 import './components/Box'
+import './components/Breadcrumbs'
 import './components/Button'
 import './components/ButtonGroup'
 import './components/ButtonList'

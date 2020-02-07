@@ -3,6 +3,7 @@ export * from './forms'
 
 export * from './Aether'
 export * from './Box'
+export * from './Breadcrumbs'
 export * from './Collapsible'
 export * from './ContainerSpinner'
 export * from './ContemberLogo'

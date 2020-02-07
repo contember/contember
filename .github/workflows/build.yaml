@@ -22,8 +22,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - name: "Show ref"
-        run: echo ${{github.ref}}
+      - name: Get the version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: "Show version"
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo ${VERSION}
       - name: "Install base deps"
         run: npm ci
       - name: "Run linter"

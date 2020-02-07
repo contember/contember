@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="11px" height="7px" viewBox="0 0 11 7" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch Beta 63 (92437) - https://sketch.com -->
+    <title>Rectangle</title>
+    <desc>Created with Sketch Beta.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="01-wysiwyg" transform="translate(-1135.000000, -75.000000)" fill="#FFFFFF">
+            <g id="Group-5-Copy" transform="translate(1051.000000, 54.000000)">
+                <path d="M86.8123475,19.649878 L92.1786237,23.9428989 C92.3942546,24.1154037 92.4292153,24.4300499 92.2567105,24.6456809 C92.2336447,24.6745132 92.207456,24.7007019 92.1786237,24.7237677 L86.8123475,29.0167886 C86.5967166,29.1892934 86.2820704,29.1543327 86.1095656,28.9387018 C86.0386404,28.8500452 86,28.73989 86,28.6263542 L86,20.0403124 C86,19.76417 86.2238576,19.5403124 86.5,19.5403124 C86.6135357,19.5403124 86.723691,19.5789528 86.8123475,19.649878 Z" id="Rectangle" transform="translate(89.333333, 24.333333) rotate(-270.000000) translate(-89.333333, -24.333333) "></path>
+            </g>
+        </g>
+    </g>
+</svg>

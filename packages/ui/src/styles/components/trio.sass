@@ -1,0 +1,15 @@
+.#{$cui-conf-globalPrefix}trio
+	display: flex
+	width: 100%
+	height: 100%
+	justify-content: space-between
+	align-items: center
+
+	> .#{$cui-conf-globalPrefix}trio-start,
+	> .#{$cui-conf-globalPrefix}trio-center,
+	> .#{$cui-conf-globalPrefix}trio-end,
+		padding: 0
+
+	&.view-column
+		flex-direction: column
+		align-items: stretch

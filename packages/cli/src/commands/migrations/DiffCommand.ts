@@ -1,10 +1,10 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { SchemaValidator } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
-import { isDeepStrictEqual } from 'util'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { getProjectDirectories } from '../../NamingHelper'
 import { listProjects } from '../../utils/project'
+import { printValidationErrors } from '../../utils/schema'
+import { InvalidSchemaException } from '@contember/schema-migrations'
 
 type Args = {
 	projectName: string
@@ -43,28 +43,21 @@ export class DiffCommand extends Command<Args, Options> {
 			const schema: Schema = require(projectDir).default
 
 			const container = new MigrationsContainerFactory(migrationsDir).create()
-			const validator = new SchemaValidator()
-			const [validSchema, errors] = validator.validate(schema)
-
-			if (errors.length === 0 && !isDeepStrictEqual(validSchema, schema)) {
-				throw new Error('There is something wrong with a schema validator')
-			}
-			if (errors.length > 0) {
-				console.group('Schema is invalid:')
-				for (const err of errors) {
-					console.error(err.path.join('.') + ': ' + err.message)
+			try {
+				const result = await container.migrationDiffCreator.createDiff(schema, migrationName)
+				if (result === null) {
+					console.log('Nothing to do')
+				} else {
+					console.log(`${result} created`)
 				}
-				console.groupEnd()
-				continue
+			} catch (e) {
+				if (e instanceof InvalidSchemaException) {
+					printValidationErrors(e.validationErrors, e.message)
+					continue
+				}
+				throw e
 			}
 
-			const result = await container.migrationDiffCreator.createDiff(schema, migrationName)
-
-			if (result === null) {
-				console.log('Nothing to do')
-			} else {
-				console.log(`${result} created`)
-			}
 			console.groupEnd()
 		}
 	}

@@ -61,7 +61,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 				children={props.children}
 				discriminationField={discriminationField}
 				getEntityByKey={key => {
-					const entity = options.entityListRef.current.entities.find(entity => entity?.getKey() === key)
+					const entity = options.entityListRef.current.getByKey(key)
 					if (!(entity instanceof EntityAccessor)) {
 						throw new BindingError(`Corrupted data.`)
 					}
@@ -130,7 +130,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 		entityList.batchUpdates?.(getAccessor => {
 			const getFreshEntity = (sortedIndex: number): EntityAccessor => {
 				const oldEntityKey = sortedEntities[sortedIndex].getKey()
-				const newEntity = getAccessor().entities.find(entity => entity?.getKey() === oldEntityKey)
+				const newEntity = getAccessor().getByKey(oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}

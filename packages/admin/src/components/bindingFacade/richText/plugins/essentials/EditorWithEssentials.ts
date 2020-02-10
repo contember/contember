@@ -6,6 +6,7 @@ export interface WithEssentials<E extends EditorNode> {
 	formatVersion: string
 
 	// <Editable> props
+	onDOMBeforeInput: (event: Event) => void
 	renderElement: (props: RenderElementProps) => React.ReactElement
 	renderLeaf: (props: RenderLeafProps) => React.ReactElement
 	onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void

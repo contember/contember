@@ -49,6 +49,7 @@ export const withBasicFormatting = <E extends BaseEditor>(editor: E): EditorWith
 	e.renderLeaf = props => React.createElement(RichTextNodeRenderer, props)
 
 	e.onKeyDown = event => {
+		// TODO use onDOMBeforeInput for this
 		for (const mark in hotKeys) {
 			if (hotKeys[mark as RichTextBooleanMarkNames](event.nativeEvent)) {
 				toggleRichTextNodeMark(e as EditorWithBasicFormatting<E>, mark as RichTextBooleanMarkNames)

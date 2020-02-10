@@ -138,6 +138,7 @@ export const BlockEditorInner = React.memo(
 							onKeyDown={editor.onKeyDown}
 							onFocusCapture={editor.onFocus}
 							onBlurCapture={editor.onBlur}
+							onDOMBeforeInput={editor.onDOMBeforeInput}
 						/>
 						<HoveringToolbar blockButtons={blockButtons} />
 					</Box>

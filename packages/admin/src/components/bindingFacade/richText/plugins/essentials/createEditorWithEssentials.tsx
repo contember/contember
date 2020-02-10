@@ -16,6 +16,7 @@ export const createEditorWithEssentials = (): BaseEditor => {
 	editorWithEssentials.renderLeaf = props => React.createElement(DefaultLeaf, props)
 
 	// Just noop functions so that other plugins can safely bubble-call
+	editorWithEssentials.onDOMBeforeInput = () => {}
 	editorWithEssentials.onKeyDown = () => {}
 	editorWithEssentials.onFocus = () => {}
 	editorWithEssentials.onBlur = () => {}

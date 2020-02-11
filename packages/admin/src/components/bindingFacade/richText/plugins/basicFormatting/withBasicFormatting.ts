@@ -26,7 +26,7 @@ export const withBasicFormatting = <E extends BaseEditor>(
 		editor: WithAnotherNodeType<E, RichTextNode>,
 		mark: RichTextBooleanMarkNames,
 	) => {
-		if (!enabledFormatting.includes(mark)) {
+		if (!canSetRichTextNodeMark(editor, mark)) {
 			return false // Do nothing
 		}
 
@@ -38,21 +38,30 @@ export const withBasicFormatting = <E extends BaseEditor>(
 		Editor.addMark(editor, mark, true)
 		return true
 	})
+	const canSetRichTextNodeMark = (e.canSetRichTextNodeMark = (
+		editor: WithAnotherNodeType<E, RichTextNode>,
+		mark: RichTextBooleanMarkNames,
+	) => (editor as EditorWithBasicFormatting<E>).enabledFormatting.includes(mark) || false)
 
 	e.isBold = editor => isRichTextNodeMarkActive(editor, 'isBold')
 	e.toggleBold = editor => toggleRichTextNodeMark(editor, 'isBold')
+	e.canSetBold = editor => canSetRichTextNodeMark(editor, 'isBold')
 
 	e.isCode = editor => isRichTextNodeMarkActive(editor, 'isCode')
 	e.toggleCode = editor => toggleRichTextNodeMark(editor, 'isCode')
+	e.canSetCode = editor => canSetRichTextNodeMark(editor, 'isCode')
 
 	e.isItalic = editor => isRichTextNodeMarkActive(editor, 'isItalic')
 	e.toggleItalic = editor => toggleRichTextNodeMark(editor, 'isItalic')
+	e.canSetItalic = editor => canSetRichTextNodeMark(editor, 'isItalic')
 
 	e.isStruckThrough = editor => isRichTextNodeMarkActive(editor, 'isStruckThrough')
 	e.toggleStruckThrough = editor => toggleRichTextNodeMark(editor, 'isStruckThrough')
+	e.canSetStruckThrough = editor => canSetRichTextNodeMark(editor, 'isStruckThrough')
 
 	e.isUnderlined = editor => isRichTextNodeMarkActive(editor, 'isUnderlined')
 	e.toggleUnderlined = editor => toggleRichTextNodeMark(editor, 'isUnderlined')
+	e.canSetUnderlined = editor => canSetRichTextNodeMark(editor, 'isUnderlined')
 
 	e.renderLeaf = props => React.createElement(RichTextNodeRenderer, props)
 
@@ -66,6 +75,7 @@ export const withBasicFormatting = <E extends BaseEditor>(
 		}
 		onKeyDown(event)
 	}
+	e.enabledFormatting = enabledFormatting
 
 	return e as EditorWithBasicFormatting<E>
 }

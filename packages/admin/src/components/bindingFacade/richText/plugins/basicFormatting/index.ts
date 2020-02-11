@@ -1,3 +1,4 @@
+export * from './BasicFormatting'
 export * from './EditorWithBasicFormatting'
 export * from './RichTextNode'
 export * from './RichTextNodeRenderer'

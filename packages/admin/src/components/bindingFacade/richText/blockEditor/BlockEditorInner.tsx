@@ -2,6 +2,7 @@ import {
 	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
+	FieldAccessor,
 	RemovalType,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
@@ -18,6 +19,7 @@ import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } fr
 import { RepeaterProps } from '../../collections'
 import { HoveringToolbar, HoveringToolbarProps } from '../toolbars'
 import { createEditor } from './createEditor'
+import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { ContemberBlockElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
 
@@ -38,6 +40,8 @@ export interface BlockEditorInnerPublicProps {
 }
 
 export interface BlockEditorInnerInternalProps {
+	leadingFieldBackedElements: NormalizedFieldBackedElement[]
+	trailingFieldBackedElements: NormalizedFieldBackedElement[]
 	entityList: EntityListAccessor
 }
 
@@ -56,6 +60,8 @@ export const BlockEditorInner = React.memo(
 		textBlockDiscriminatedByScalar,
 		textBlockField,
 		blockButtons,
+		leadingFieldBackedElements,
+		trailingFieldBackedElements,
 	}: BlockEditorInnerProps) => {
 		const renderCountRef = React.useRef(0)
 
@@ -81,6 +87,7 @@ export const BlockEditorInner = React.memo(
 			)
 		}, [environment, textBlockDiscriminatedBy, textBlockDiscriminatedByScalar])
 		const normalizedBlocks = useNormalizedBlocks(children)
+		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor, Element>())
 		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
 		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
 
@@ -88,10 +95,14 @@ export const BlockEditorInner = React.memo(
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedEntitiesRef = React.useRef(entities)
 		const normalizedBlocksRef = React.useRef(normalizedBlocks)
+		const normalizedLeadingFieldsRef = React.useRef(leadingFieldBackedElements)
+		const normalizedTrailingFieldsRef = React.useRef(trailingFieldBackedElements)
 
 		entityListRef.current = entityList
 		isMutatingRef.current = isMutating
 		sortedEntitiesRef.current = entities
+		normalizedLeadingFieldsRef.current = leadingFieldBackedElements
+		normalizedTrailingFieldsRef.current = trailingFieldBackedElements
 
 		const editor = React.useMemo(
 			() =>
@@ -100,6 +111,8 @@ export const BlockEditorInner = React.memo(
 					isMutatingRef,
 					sortedEntitiesRef,
 					normalizedBlocksRef,
+					normalizedLeadingFieldsRef,
+					normalizedTrailingFieldsRef,
 					textBlockDiscriminant,
 					discriminationField: desugaredDiscriminationField,
 					sortableByField: desugaredSortableByField,
@@ -121,11 +134,14 @@ export const BlockEditorInner = React.memo(
 		const nodes = useSlateNodes({
 			discriminationField: desugaredDiscriminationField,
 			textElementCache,
+			contemberFieldElementCache,
 			contemberBlockElementCache,
 			textBlockField: desugaredTextBlockField,
 			blocks: normalizedBlocks,
 			textBlockDiscriminant,
 			entities,
+			leadingFieldBackedElements,
+			trailingFieldBackedElements,
 		})
 
 		return (

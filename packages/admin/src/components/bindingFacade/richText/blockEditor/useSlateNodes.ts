@@ -1,29 +1,78 @@
-import { BindingError, EntityAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
+import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
 import { Element } from 'slate'
 import { NormalizedBlock } from '../../blocks'
-import { ParagraphElement } from '../plugins/paragraphs'
-import { ContemberBlockElement, contemberBlockElementType } from './ContemberBlockElement'
+import { ParagraphElement } from '../plugins'
+import {
+	ContemberBlockElement,
+	contemberBlockElementType,
+	ContemberFieldElement,
+	ContemberFieldElementPosition,
+	contemberFieldElementType,
+} from './elements'
+import { NormalizedFieldBackedElement } from './FieldBackedElement'
 
 export interface UseSlateNodesOptions {
 	blocks: NormalizedBlock[]
 	discriminationField: RelativeSingleField
+	contemberFieldElementCache: WeakMap<FieldAccessor, Element>
 	textElementCache: WeakMap<EntityAccessor, Element>
 	contemberBlockElementCache: Map<string, Element>
 	textBlockField: RelativeSingleField
 	textBlockDiscriminant: FieldValue
 	entities: EntityAccessor[]
+	leadingFieldBackedElements: NormalizedFieldBackedElement[]
+	trailingFieldBackedElements: NormalizedFieldBackedElement[]
 }
 
 export const useSlateNodes = ({
 	blocks,
 	discriminationField,
 	textElementCache,
+	contemberFieldElementCache,
 	contemberBlockElementCache,
 	textBlockField,
 	textBlockDiscriminant,
 	entities,
-}: UseSlateNodesOptions): Element[] =>
-	entities.map(entity => {
+	leadingFieldBackedElements,
+	trailingFieldBackedElements,
+}: UseSlateNodesOptions): Element[] => {
+	const adjacentAccessorsToElements = (
+		elements: NormalizedFieldBackedElement[],
+		position: ContemberFieldElementPosition,
+	): Element[] =>
+		elements.map((normalizedElement, index) => {
+			if (contemberFieldElementCache.has(normalizedElement.field)) {
+				return contemberFieldElementCache.get(normalizedElement.field)!
+			}
+			let element: Element
+			const fieldValue = normalizedElement.field.currentValue
+			if (typeof fieldValue !== 'string' && fieldValue !== null) {
+				throw new BindingError(
+					`BlockEditor: The ${position} field backed element at index '${index}' does not contain a string value.`,
+				)
+			}
+			if (fieldValue === null || fieldValue === '' || normalizedElement.format === 'plainText') {
+				const fieldElement: ContemberFieldElement = {
+					type: contemberFieldElementType,
+					children: [{ text: fieldValue || '' }],
+					position,
+					index,
+				}
+				element = fieldElement
+			} else {
+				try {
+					element = JSON.parse(fieldValue)
+				} catch (_) {
+					throw new BindingError(
+						`BlockEditor: The ${position} field backed element at index '${index}' contains invalid JSON.`,
+					)
+				}
+			}
+			contemberFieldElementCache.set(normalizedElement.field, element)
+			return element
+		})
+
+	const contentElements = entities.map(entity => {
 		if (textElementCache.has(entity)) {
 			return textElementCache.get(entity)!
 		}
@@ -78,3 +127,8 @@ export const useSlateNodes = ({
 			return contemberBlock
 		}
 	})
+	return adjacentAccessorsToElements(leadingFieldBackedElements, 'leading').concat(
+		contentElements,
+		adjacentAccessorsToElements(trailingFieldBackedElements, 'trailing'),
+	)
+}

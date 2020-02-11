@@ -2,9 +2,9 @@ import { EntityAccessor, RelativeSingleField, RemovalType } from '@contember/bin
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
-import { isContemberBlockElement } from '../ContemberBlockElement'
-import { ContemberBlockElementRenderer } from './ContemberBlockElementRenderer'
+import { isContemberBlockElement } from '../elements'
 import { ContemberBlockElementRefreshContext } from './ContemberBlockElementRefreshContext'
+import { ContemberBlockElementRenderer } from './ContemberBlockElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
 	normalizedBlocks: NormalizedBlock[]

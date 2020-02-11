@@ -6,14 +6,13 @@ import {
 	FieldValue,
 	RelativeSingleField,
 	RemovalType,
-	sortEntities,
 } from '@contember/binding'
 import * as React from 'react'
 import { Element, Operation, Range as SlateRange, Text, Transforms } from 'slate'
-import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../blocks'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../plugins'
-import { ContemberBlockElement, contemberBlockElementType, isContemberBlockElement } from './ContemberBlockElement'
+import { contemberBlockElementType, isContemberBlockElement } from './elements'
+import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { BlockEditorElementRenderer } from './renderers'
 
 export interface CreateEditorOptions {
@@ -21,6 +20,8 @@ export interface CreateEditorOptions {
 	isMutatingRef: React.MutableRefObject<boolean>
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
+	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
+	normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	textBlockDiscriminant: FieldValue
 	discriminationField: RelativeSingleField
 	sortableByField: RelativeSingleField

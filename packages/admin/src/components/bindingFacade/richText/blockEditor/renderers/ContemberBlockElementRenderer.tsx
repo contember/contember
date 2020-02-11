@@ -4,7 +4,7 @@ import * as React from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
 import { RemoveEntityButton } from '../../../collections/helpers'
-import { ContemberBlockElement } from '../ContemberBlockElement'
+import { ContemberBlockElement } from '../elements'
 
 export interface ContemberBlockElementRendererProps extends RenderElementProps {
 	element: ContemberBlockElement

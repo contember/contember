@@ -1,12 +1,16 @@
 import * as React from 'react'
 import { Editor } from 'slate'
 import { BaseEditor, WithAnotherNodeType } from '../essentials'
+import { BasicFormatting, defaultBasicFormatting } from './BasicFormatting'
 import { EditorWithBasicFormatting, WithBasicFormatting } from './EditorWithBasicFormatting'
 import { hotKeys } from './hotKeys'
 import { RichTextBooleanMarkNames, RichTextNode } from './RichTextNode'
 import { RichTextNodeRenderer } from './RichTextNodeRenderer'
 
-export const withBasicFormatting = <E extends BaseEditor>(editor: E): EditorWithBasicFormatting<E> => {
+export const withBasicFormatting = <E extends BaseEditor>(
+	editor: E,
+	enabledFormatting: BasicFormatting[] = defaultBasicFormatting,
+): EditorWithBasicFormatting<E> => {
 	const e: E & Partial<WithBasicFormatting<WithAnotherNodeType<E, RichTextNode>>> = editor
 
 	const { onKeyDown } = editor
@@ -22,6 +26,10 @@ export const withBasicFormatting = <E extends BaseEditor>(editor: E): EditorWith
 		editor: WithAnotherNodeType<E, RichTextNode>,
 		mark: RichTextBooleanMarkNames,
 	) => {
+		if (!enabledFormatting.includes(mark)) {
+			return false // Do nothing
+		}
+
 		const isActive = isRichTextNodeMarkActive(editor, mark)
 		if (isActive) {
 			Editor.removeMark(editor, mark)

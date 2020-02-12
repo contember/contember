@@ -1,26 +1,22 @@
 @import '../common'
 
-$breadcrumbs-text-color: #838383
-$breadcrumbs-link-color: #0094FF
-$breadcrumbs-sep-color: #444444
-
 .#{$cui-conf-globalPrefix}breadcrumbs
 	&-items
 		display: flex
 		flex-wrap: wrap
 
 	&-item
-		color: $breadcrumbs-text-color
+		color: $cui-breadcrumbs-text-color
 
 		&:before
 			content: '›'
 			display: inline-block
 			margin: 0 .5em
-			color: $breadcrumbs-sep-color
+			color: $cui-breadcrumbs-sep-color
 
 		&:first-child:before
 			display: none
 
 		a
 			text-decoration: underline
-			color: $breadcrumbs-link-color
+			color: $cui-breadcrumbs-link-color

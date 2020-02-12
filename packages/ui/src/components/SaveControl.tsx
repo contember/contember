@@ -10,12 +10,12 @@ export function SaveControl({}: SaveControlProps) {
 	const [open, setOpen] = React.useState(false)
 
 	const toggleOpen = React.useCallback(() => {
-		setOpen(!open)
-	}, [open, setOpen])
+		setOpen(open => !open)
+	}, [])
 
 	const close = React.useCallback(() => {
 		setOpen(false)
-	}, [setOpen])
+	}, [])
 
 	const ref = React.useRef(null)
 	useOnClickOutside(ref, close)

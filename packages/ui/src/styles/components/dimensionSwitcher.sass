@@ -1,20 +1,17 @@
 @import '../common'
 
-$dimensionSwitcher-border: solid 1px #E5E5E5
-$dimensionSwitcher-spacing: 1em
-
 .#{$cui-conf-globalPrefix}dimensionSwitcher
 	font-size: (12em / 16)
 
 	&-items
 		display: flex
-		margin: 0 -1 * $dimensionSwitcher-spacing
+		margin: 0 -1 * $cui-dimensionSwitcher-spacing
 
 	&-item
-		padding: .5em $dimensionSwitcher-spacing
+		padding: .5em $cui-dimensionSwitcher-spacing
 
 		&:not(:first-child)
-			border-left: $dimensionSwitcher-border
+			border-left: $cui-dimensionSwitcher-border
 
 		&-icon
 			margin-left: .5em

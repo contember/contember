@@ -184,7 +184,7 @@ class AccessorTreeGenerator {
 							// relation is unlinked, e.g. a Person does not have a linked Nationality.
 							throw new BindingError(
 								`Received a referenced entity for field '${field.fieldName}' where a collection of entities was expected.` +
-									`Perhaps you wanted to use a <SingleReference />?`,
+									`Perhaps you wanted to use a <HasOne />?`,
 							)
 						} else {
 							throw new BindingError(

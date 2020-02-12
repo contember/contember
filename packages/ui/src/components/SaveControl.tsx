@@ -1,7 +1,6 @@
 import * as React from 'react'
 import cn from 'classnames'
-import { useClassNamePrefix } from '../auxiliary'
-import useOnClickOutside from 'use-onclickoutside'
+import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
 
 export interface SaveControlProps {}
 
@@ -17,19 +16,18 @@ export function SaveControl({}: SaveControlProps) {
 		setOpen(false)
 	}, [])
 
-	const ref = React.useRef(null)
-	useOnClickOutside(ref, close)
+	const refs = useCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>(open, close)
 
 	return (
-		<div className={cn(`${prefix}saveControl`, open && 'view-open')} ref={ref}>
-			<div className={cn(`${prefix}saveControl-button`)}>
+		<div className={cn(`${prefix}saveControl`, open && 'view-open')}>
+			<div className={cn(`${prefix}saveControl-button`)} ref={refs.buttonRef}>
 				<button type="button" className={cn(`${prefix}saveControl-button-primary`)}>
 					<div className={cn(`${prefix}saveControl-button-label`)}>Save</div>
 				</button>
 				<button type="button" className={cn(`${prefix}saveControl-button-toggle`)} onClick={toggleOpen} />
 			</div>
 
-			<div className={cn(`${prefix}saveControl-window`)}>
+			<div className={cn(`${prefix}saveControl-window`)} ref={refs.contentRef}>
 				<div className={cn(`${prefix}saveControl-window-in`)}>
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer egestas tempor ipsum, sit amet pulvinar mi
 					hendrerit vel. Morbi suscipit turpis eu tincidunt interdum. Suspendisse potenti. Suspendisse sagittis aliquam

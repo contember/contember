@@ -1,13 +1,10 @@
 @import '../common'
 
-$layout-background: #FFFFFF
-$layout-border: solid 1px #E5E5EC
-$layout-sidebar-width: (260em / 16)
-
 .#{$cui-conf-globalPrefix}layout
+	$easing: cubic-bezier(0.77, 0, 0.175, 1)
 	display: flex
 	flex-direction: column
-	background: $layout-background
+	background: $cui-layout-background
 
 	width: 100%
 	height: 100%
@@ -15,14 +12,14 @@ $layout-sidebar-width: (260em / 16)
 
 	&-topBar
 		width: 100%
-		border-bottom: $layout-border
+		border-bottom: $cui-layout-border
 		min-height: 3em
 		display: flex
 		align-items: center
 
 		&-start
-			@media (min-width: 800px)
-				min-width: $layout-sidebar-width
+			@media (min-width: 50em)
+				min-width: $cui-layout-sidebar-width
 
 		&-end
 			margin-left: auto
@@ -40,11 +37,11 @@ $layout-sidebar-width: (260em / 16)
 		flex-direction: column
 		align-items: stretch
 		flex-grow: 0
-		width: $layout-sidebar-width
-		max-width: $layout-sidebar-width
-		border-right: $layout-border
+		width: $cui-layout-sidebar-width
+		max-width: $cui-layout-sidebar-width
+		border-right: $cui-layout-border
 		position: relative
-		transition: max-width cubic-bezier(0.77, 0, 0.175, 1) .5s
+		transition: max-width $easing .5s
 
 		&.view-collapsed
 			max-width: 4.45em
@@ -58,8 +55,8 @@ $layout-sidebar-width: (260em / 16)
 			width: 100%
 			overflow-x: hidden
 			overflow-y: auto
-			transition: opacity cubic-bezier(0.77, 0, 0.175, 1) .5s
-			background: $layout-background
+			transition: opacity $easing .5s
+			background: $cui-layout-background
 
 			&:after
 				content: ''
@@ -69,16 +66,16 @@ $layout-sidebar-width: (260em / 16)
 				right: 0
 				bottom: 0
 				width: 2em
-				background: linear-gradient(to right, rgba($layout-background, 0), rgba($layout-background, 1))
+				background: linear-gradient(to right, rgba($cui-layout-background, 0), rgba($cui-layout-background, 1))
 				transform: translateX(100%)
-				transition: transform cubic-bezier(0.77, 0, 0.175, 1) .5s
+				transition: transform $easing .5s
 
 			&-in
 				display: flex
 				flex-grow: 1
 				flex-direction: column
 				align-items: stretch
-				width: $layout-sidebar-width
+				width: $cui-layout-sidebar-width
 
 		&.view-collapsed &-in
 			opacity: .25
@@ -96,12 +93,12 @@ $layout-sidebar-width: (260em / 16)
 			display: inline-flex
 			width: $size
 			height: $size
-			background: $layout-background url(../../assets/layout-collapseButton-arrow.svg) no-repeat center center
+			background: $cui-layout-background url(../../assets/layout-collapseButton-arrow.svg) no-repeat center center
 			background-size: auto 50%
-			border: $layout-border
+			border: $cui-layout-border
 			border-radius: $size
 			outline: none
-			transition: transform cubic-bezier(0.77, 0, 0.175, 1) .5s
+			transition: transform $easing .5s
 
 			&-label
 				display: none
@@ -112,7 +109,7 @@ $layout-sidebar-width: (260em / 16)
 	&-main
 		width: 80%
 		flex-grow: 1
-		background: $layout-background
+		background: $cui-layout-background
 
 	&-mainActions
 		width: 100%

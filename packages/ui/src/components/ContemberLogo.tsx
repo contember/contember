@@ -15,7 +15,7 @@ export const ContemberLogo = ({ logotyp, baseline, size }: ContemberLogoProps) =
 			className={cn(`${prefix}contemberLogo`, logotyp && 'view-logotyp', baseline && 'view-baseline')}
 			style={{ fontSize: `${size ?? 1}em` }}
 		>
-			<span className={`${prefix}contemberLogo-image`}></span>
+			<span className={`${prefix}contemberLogo-image`} />
 		</span>
 	)
 }

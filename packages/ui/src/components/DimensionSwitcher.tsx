@@ -30,7 +30,7 @@ export function DimensionSwitcher({ dimensions }: DimensionSwitcherProps) {
 								</span>
 							))}
 						</span>
-						<span className={cn(`${prefix}dimensionSwitcher-item-icon`)}></span>
+						<span className={cn(`${prefix}dimensionSwitcher-item-icon`)} />
 					</div>
 				))}
 			</div>

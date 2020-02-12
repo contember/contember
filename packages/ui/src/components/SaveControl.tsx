@@ -26,7 +26,7 @@ export function SaveControl({}: SaveControlProps) {
 				<button type="button" className={cn(`${prefix}saveControl-button-primary`)}>
 					<div className={cn(`${prefix}saveControl-button-label`)}>Save</div>
 				</button>
-				<button type="button" className={cn(`${prefix}saveControl-button-toggle`)} onClick={toggleOpen}></button>
+				<button type="button" className={cn(`${prefix}saveControl-button-toggle`)} onClick={toggleOpen} />
 			</div>
 
 			<div className={cn(`${prefix}saveControl-window`)}>

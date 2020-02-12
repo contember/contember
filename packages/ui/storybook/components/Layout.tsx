@@ -14,7 +14,7 @@ import {
 
 storiesOf('Layout', module)
 	.add('large placeholders', () => {
-		return <Layout top="top" main="main" sideBar="sideBar" actions="actions"></Layout>
+		return <Layout top="top" main="main" sideBar="sideBar" actions="actions" />
 	})
 	.add('placeholders', () => {
 		return (
@@ -68,6 +68,6 @@ storiesOf('Layout', module)
 				mainCenter="mainCenter"
 				mainEnd="mainEnd"
 				actionsEnd={<SaveControl />}
-			></Layout>
+			/>
 		)
 	})

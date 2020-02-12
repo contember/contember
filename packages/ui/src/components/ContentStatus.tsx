@@ -9,7 +9,7 @@ export function ContentStatus({}: ContentStatusProps) {
 	return (
 		<div className={cn(`${prefix}contentStatus`)}>
 			<span className={`${prefix}contentStatus-label`}>Concept, unsaved</span>
-			<span className={`${prefix}contentStatus-icon`}></span>
+			<span className={`${prefix}contentStatus-icon`} />
 		</div>
 	)
 }

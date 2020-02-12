@@ -9,7 +9,7 @@ export function LayoutHeading({ label }: LayoutHeadingProps) {
 	return (
 		<div className={`${prefix}layoutHeading`}>
 			<div className={`${prefix}layoutHeading-logo`}>
-				<ContemberLogo size={label ? 2 : 1} logotype={!label} />
+				<ContemberLogo size="large" logotype={!label} />
 			</div>
 			{label && <div className={`${prefix}layoutHeading-label`}>{label}</div>}
 		</div>

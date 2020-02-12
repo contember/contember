@@ -15,12 +15,12 @@ export interface DimensionSwitcherProps {
 export function DimensionSwitcher({ dimensions }: DimensionSwitcherProps) {
 	const prefix = useClassNamePrefix()
 	return (
-		<div className={cn(`${prefix}dimensionSwitcher`)}>
-			<div className={cn(`${prefix}dimensionSwitcher-items`)}>
+		<div className={`${prefix}dimensionSwitcher`}>
+			<div className={`${prefix}dimensionSwitcher-items`}>
 				{dimensions.map(dimension => (
-					<div className={cn(`${prefix}dimensionSwitcher-item`)} key={dimension.key}>
-						<span className={cn(`${prefix}dimensionSwitcher-item-label`)}>{dimension.label}:</span>
-						<span className={cn(`${prefix}dimensionSwitcher-item-options`)}>
+					<div className={`${prefix}dimensionSwitcher-item`} key={dimension.key}>
+						<span className={`${prefix}dimensionSwitcher-item-label`}>{dimension.label}:</span>
+						<span className={`${prefix}dimensionSwitcher-item-options`}>
 							{dimension.options.map(option => (
 								<span
 									key={option.value}
@@ -30,7 +30,7 @@ export function DimensionSwitcher({ dimensions }: DimensionSwitcherProps) {
 								</span>
 							))}
 						</span>
-						<span className={cn(`${prefix}dimensionSwitcher-item-icon`)} />
+						<span className={`${prefix}dimensionSwitcher-item-icon`} />
 					</div>
 				))}
 			</div>

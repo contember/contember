@@ -5,7 +5,6 @@ import { Size } from '../types'
 
 export interface ContemberLogoProps {
 	logotype?: boolean
-	baseline?: boolean
 	size?: Size | number
 }
 
@@ -15,7 +14,7 @@ const logoSizes: { [key in Size]: number } = {
 	small: 0.75,
 }
 
-export const ContemberLogo = ({ logotype, baseline, size }: ContemberLogoProps) => {
+export const ContemberLogo = ({ logotype, size }: ContemberLogoProps) => {
 	const prefix = useClassNamePrefix()
 
 	let fontSize: string | undefined
@@ -29,10 +28,7 @@ export const ContemberLogo = ({ logotype, baseline, size }: ContemberLogoProps) 
 	}
 
 	return (
-		<span
-			className={cn(`${prefix}contemberLogo`, logotype && 'view-logotype', baseline && 'view-baseline')}
-			style={{ fontSize }}
-		>
+		<span className={cn(`${prefix}contemberLogo`, logotype && 'view-logotype')} style={{ fontSize }}>
 			<span className={`${prefix}contemberLogo-image`} />
 		</span>
 	)

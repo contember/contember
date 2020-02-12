@@ -3,19 +3,19 @@
 .#{$cui-conf-globalPrefix}contemberLogo
 	font-size: inherit
 	display: inline-block
+	vertical-align: middle
 
 	&-image
+		$ratio: 431 / 401
 		display: block
-		width: (431em / 401)
-		height: (401em / 401)
+		width: 1em * $ratio
+		height: 1em
 		background: url(../../assets/contember-logo.svg) no-repeat left top
 		background-size: contain
 
 	&.view-logotype &-image
-		width: (1871em / 206)
-		height: (206em / 206) * (414 / 206)
+		$ratio: 1871 / 414
+		width: 1em * $ratio
+		height: 1em
 		background: url(../../assets/contember-logotype.svg) no-repeat left top
 		background-size: contain
-
-	&.view-logotype.view-baseline &-image
-		margin-bottom: (206em / 206) - (206em / 206) * (414 / 206)

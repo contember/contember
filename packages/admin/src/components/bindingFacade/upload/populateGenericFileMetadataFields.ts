@@ -6,7 +6,7 @@ export const populateGenericFileMetadataFields = (
 	file: File,
 	props: DesugaredGenericFileUploadProps,
 ) =>
-	parentEntity.batchUpdates?.(getAccessor => {
+	parentEntity.batchUpdates(getAccessor => {
 		if (props.fileNameField) {
 			getAccessor()
 				.getRelativeSingleField<string>(props.fileNameField)

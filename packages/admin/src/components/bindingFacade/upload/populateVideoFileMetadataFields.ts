@@ -6,7 +6,7 @@ export const populateVideoFileMetadataFields = (
 	video: HTMLVideoElement,
 	props: DesugaredVideoFileUploadProps,
 ) =>
-	parentEntity.batchUpdates?.(getAccessor => {
+	parentEntity.batchUpdates(getAccessor => {
 		if (props.durationField) {
 			getAccessor()
 				.getRelativeSingleField<number>(props.durationField)

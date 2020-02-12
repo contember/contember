@@ -6,7 +6,7 @@ export const populateImageFileMetadataFields = (
 	image: HTMLImageElement,
 	props: DesugaredImageFileUploadProps,
 ) =>
-	parentEntity.batchUpdates?.(getAccessor => {
+	parentEntity.batchUpdates(getAccessor => {
 		if (props.heightField) {
 			getAccessor()
 				.getRelativeSingleField<number>(props.heightField)

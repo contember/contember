@@ -6,7 +6,7 @@ export const populateAudioFileMetadataFields = (
 	audio: HTMLAudioElement,
 	props: DesugaredAudioFileUploadProps,
 ) =>
-	parentEntity.batchUpdates?.(getAccessor => {
+	parentEntity.batchUpdates(getAccessor => {
 		if (props.durationField) {
 			getAccessor()
 				.getRelativeSingleField<number>(props.durationField)

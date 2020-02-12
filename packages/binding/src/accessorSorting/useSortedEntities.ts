@@ -65,7 +65,7 @@ export const useSortedEntities = (
 	)
 
 	React.useEffect(() => {
-		if (!entityList.batchUpdates || !desugaredSortableByField) {
+		if (!desugaredSortableByField) {
 			return
 		}
 		entityList.batchUpdates(getAccessor => {

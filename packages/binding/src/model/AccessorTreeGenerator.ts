@@ -18,8 +18,8 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 type OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => void
 type OnReplace = EntityAccessor['replaceWith']
 type OnUnlink = EntityAccessor['remove']
-type BatchEntityUpdates = Exclude<EntityAccessor['batchUpdates'], undefined>
-type BatchEntityListUpdates = Exclude<EntityListAccessor['batchUpdates'], undefined>
+type BatchEntityUpdates = EntityAccessor['batchUpdates']
+type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
 
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined
@@ -260,7 +260,7 @@ class AccessorTreeGenerator {
 			}
 		}
 
-		return new EntityAccessor(id, typename, entityData, errors ? errors.errors : [], onReplace, batchUpdates, onUnlink)
+		return new EntityAccessor(id, typename, entityData, errors ? errors.errors : [], batchUpdates, onReplace, onUnlink)
 	}
 
 	private generateEntityAccessor(
@@ -412,9 +412,6 @@ class AccessorTreeGenerator {
 			const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity, newEntityIndex)
 
 			if (typeof newEntity === 'function') {
-				if (!listAccessor.batchUpdates) {
-					throw new BindingError(`Internally inconsistent Accessor tree detected. This should never happen.`)
-				}
 				listAccessor.batchUpdates(getAccessor => {
 					onUpdateProxy(newEntityIndex, newAccessor)
 					newEntity(getAccessor, newEntityIndex)
@@ -456,8 +453,8 @@ class AccessorTreeGenerator {
 				[fieldPlaceholder]: newData,
 			},
 			original.errors,
-			original.replaceWith,
 			original.batchUpdates,
+			original.replaceWith,
 			original.remove,
 		)
 	}
@@ -474,8 +471,8 @@ class AccessorTreeGenerator {
 			blueprint.typename,
 			replacement.data,
 			blueprint.errors,
-			blueprint.replaceWith,
 			blueprint.batchUpdates,
+			blueprint.replaceWith,
 			onRemove || blueprint.remove,
 		)
 	}

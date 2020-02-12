@@ -15,9 +15,6 @@ export const moveEntity = (
 		oldIndex,
 		newIndex,
 	)
-	if (!entityList.batchUpdates) {
-		return throwNonWritableError(entityList)
-	}
 	entityList.batchUpdates((getAccessor: () => EntityListAccessor) => {
 		let listAccessor: EntityListAccessor = getAccessor()
 		for (const entity of listAccessor.entities) {

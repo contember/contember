@@ -4,6 +4,7 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	FieldValue,
+	RelativeEntityList,
 	RelativeSingleField,
 	RemovalType,
 } from '@contember/binding'
@@ -16,7 +17,9 @@ import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { BlockEditorElementRenderer } from './renderers'
 
 export interface CreateEditorOptions {
-	entityListRef: React.MutableRefObject<EntityListAccessor>
+	batchUpdates: EntityAccessor['batchUpdates']
+	desugaredEntityList: RelativeEntityList
+	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
 	isMutatingRef: React.MutableRefObject<boolean>
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
@@ -62,11 +65,22 @@ export const createEditor = (options: CreateEditorOptions) => {
 				children={props.children}
 				discriminationField={discriminationField}
 				getEntityByKey={key => {
-					const entity = options.entityListRef.current.getByKey(key)
+					const entity = options.entityListAccessorRef.current.getByKey(key)
 					if (!(entity instanceof EntityAccessor)) {
 						throw new BindingError(`Corrupted data.`)
 					}
 					return entity
+				}}
+				getNormalizedFieldBackedElement={element => {
+					let normalizedElements: NormalizedFieldBackedElement[]
+					if (element.position === 'leading') {
+						normalizedElements = options.normalizedLeadingFieldsRef.current
+					} else if (element.position === 'trailing') {
+						normalizedElements = options.normalizedTrailingFieldsRef.current
+					} else {
+						throw new BindingError(`Corrupted data.`)
+					}
+					return normalizedElements[element.index]
 				}}
 			/>
 		)
@@ -125,10 +139,10 @@ export const createEditor = (options: CreateEditorOptions) => {
 			return
 		}
 
-		const entityList = options.entityListRef.current
+		const entityList = options.entityListAccessorRef.current
 		let sortedEntities = options.sortedEntitiesRef.current
 
-		entityList.batchUpdates?.(getAccessor => {
+		entityList.batchUpdates(getAccessor => {
 			const getFreshEntity = (sortedIndex: number): EntityAccessor => {
 				const oldEntityKey = sortedEntities[sortedIndex].getKey()
 				const newEntity = getAccessor().getByKey(oldEntityKey)

@@ -8,4 +8,4 @@ import * as React from 'react'
  * stay referentially equal but still re-render. The value itself does not matter ‒ it is just something we can easily
  * change between renders.
  */
-export const ContemberBlockElementRefreshContext = React.createContext<number>(0)
+export const ContemberElementRefreshContext = React.createContext<number>(0)

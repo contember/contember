@@ -3,6 +3,7 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	FieldAccessor,
+	RelativeEntityList,
 	RemovalType,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
@@ -20,7 +21,7 @@ import { RepeaterProps } from '../../collections'
 import { HoveringToolbar, HoveringToolbarProps } from '../toolbars'
 import { createEditor } from './createEditor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
-import { ContemberBlockElementRefreshContext } from './renderers'
+import { ContemberElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
 
 export interface BlockEditorInnerPublicProps {
@@ -42,7 +43,9 @@ export interface BlockEditorInnerPublicProps {
 export interface BlockEditorInnerInternalProps {
 	leadingFieldBackedElements: NormalizedFieldBackedElement[]
 	trailingFieldBackedElements: NormalizedFieldBackedElement[]
-	entityList: EntityListAccessor
+	batchUpdates: EntityAccessor['batchUpdates']
+	desugaredEntityList: RelativeEntityList
+	entityListAccessor: EntityListAccessor
 }
 
 export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInnerInternalProps
@@ -50,7 +53,9 @@ export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInn
 const noop = () => {}
 export const BlockEditorInner = React.memo(
 	({
-		entityList,
+		batchUpdates,
+		desugaredEntityList,
+		entityListAccessor,
 		children,
 		discriminationField,
 		sortableBy,
@@ -72,7 +77,7 @@ export const BlockEditorInner = React.memo(
 		const desugaredTextBlockField = useDesugaredRelativeSingleField(textBlockField)
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 
-		const { entities, moveEntity, appendNew } = useSortedEntities(entityList, sortableBy)
+		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
 
 		const textBlockDiscriminant = React.useMemo(() => {
 			if (textBlockDiscriminatedBy !== undefined) {
@@ -91,14 +96,14 @@ export const BlockEditorInner = React.memo(
 		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
 		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
 
-		const entityListRef = React.useRef(entityList)
+		const entityListAccessorRef = React.useRef(entityListAccessor)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedEntitiesRef = React.useRef(entities)
 		const normalizedBlocksRef = React.useRef(normalizedBlocks)
 		const normalizedLeadingFieldsRef = React.useRef(leadingFieldBackedElements)
 		const normalizedTrailingFieldsRef = React.useRef(trailingFieldBackedElements)
 
-		entityListRef.current = entityList
+		entityListAccessorRef.current = entityListAccessor
 		isMutatingRef.current = isMutating
 		sortedEntitiesRef.current = entities
 		normalizedLeadingFieldsRef.current = leadingFieldBackedElements
@@ -107,7 +112,9 @@ export const BlockEditorInner = React.memo(
 		const editor = React.useMemo(
 			() =>
 				createEditor({
-					entityListRef,
+					batchUpdates,
+					desugaredEntityList,
+					entityListAccessorRef,
 					isMutatingRef,
 					sortedEntitiesRef,
 					normalizedBlocksRef,
@@ -122,6 +129,8 @@ export const BlockEditorInner = React.memo(
 				}),
 			[
 				// These are here just so that the linter is happy. In practice, they shouldn't change.
+				batchUpdates,
+				desugaredEntityList,
 				desugaredDiscriminationField,
 				desugaredSortableByField,
 				desugaredTextBlockField,
@@ -145,7 +154,7 @@ export const BlockEditorInner = React.memo(
 		})
 
 		return (
-			<ContemberBlockElementRefreshContext.Provider value={renderCountRef.current++}>
+			<ContemberElementRefreshContext.Provider value={renderCountRef.current++}>
 				<Slate editor={editor} value={nodes} onChange={noop}>
 					<Box heading={label} distinction="seamlessIfNested">
 						<Editable
@@ -159,7 +168,7 @@ export const BlockEditorInner = React.memo(
 						<HoveringToolbar blockButtons={blockButtons} />
 					</Box>
 				</Slate>
-			</ContemberBlockElementRefreshContext.Provider>
+			</ContemberElementRefreshContext.Provider>
 		)
 	},
 )

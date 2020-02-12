@@ -41,11 +41,11 @@ export const useSlateNodes = ({
 		position: ContemberFieldElementPosition,
 	): Element[] =>
 		elements.map((normalizedElement, index) => {
-			if (contemberFieldElementCache.has(normalizedElement.field)) {
-				return contemberFieldElementCache.get(normalizedElement.field)!
+			if (contemberFieldElementCache.has(normalizedElement.accessor)) {
+				return contemberFieldElementCache.get(normalizedElement.accessor)!
 			}
 			let element: Element
-			const fieldValue = normalizedElement.field.currentValue
+			const fieldValue = normalizedElement.accessor.currentValue
 			if (typeof fieldValue !== 'string' && fieldValue !== null) {
 				throw new BindingError(
 					`BlockEditor: The ${position} field backed element at index '${index}' does not contain a string value.`,
@@ -68,7 +68,7 @@ export const useSlateNodes = ({
 					)
 				}
 			}
-			contemberFieldElementCache.set(normalizedElement.field, element)
+			contemberFieldElementCache.set(normalizedElement.accessor, element)
 			return element
 		})
 

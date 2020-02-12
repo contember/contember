@@ -1,4 +1,4 @@
-import { FieldAccessor, SugaredRelativeSingleField } from '@contember/binding'
+import { FieldAccessor, RelativeSingleField, SugaredRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 
 export type FieldBackedElementEssentials = {
@@ -19,5 +19,6 @@ export type FieldBackedElement = FieldBackedElementEssentials & {
 }
 
 export type NormalizedFieldBackedElement = FieldBackedElementEssentials & {
-	field: FieldAccessor
+	field: RelativeSingleField
+	accessor: FieldAccessor
 }

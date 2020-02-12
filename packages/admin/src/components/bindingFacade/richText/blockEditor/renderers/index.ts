@@ -1,3 +1,3 @@
 export * from './BlockEditorElementRenderer'
-export * from './ContemberBlockElementRefreshContext'
+export * from './ContemberElementRefreshContext'
 export * from './ContemberBlockElementRenderer'

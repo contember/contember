@@ -19,7 +19,7 @@ import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { RepeaterProps } from '../../collections'
 import { HoveringToolbar, HoveringToolbarProps } from '../toolbars'
-import { createEditor } from './createEditor'
+import { createEditor } from './editor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { ContemberElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
@@ -115,6 +115,7 @@ export const BlockEditorInner = React.memo(
 					batchUpdates,
 					desugaredEntityList,
 					entityListAccessorRef,
+					fieldElementCache: contemberFieldElementCache,
 					isMutatingRef,
 					sortedEntitiesRef,
 					normalizedBlocksRef,
@@ -128,8 +129,9 @@ export const BlockEditorInner = React.memo(
 					removalType,
 				}),
 			[
-				// These are here just so that the linter is happy. In practice, they shouldn't change.
+				// These are here just so that the linter is happy. In practice, they shouldn't change. Ever.
 				batchUpdates,
+				contemberFieldElementCache,
 				desugaredEntityList,
 				desugaredDiscriminationField,
 				desugaredSortableByField,

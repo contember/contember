@@ -1,3 +1,4 @@
+export * from './assertNever'
 export * from './eventSourceReader'
 export * from './isScalar'
 export * from './isUrlActive'

@@ -76,10 +76,10 @@ export const BlockEditor = Component<BlockEditorProps>(
 		return (
 			<>
 				{(props.leadingFieldBackedElements || []).map((item, i) => (
-					<SugaredField field={item.field} key={i} />
+					<SugaredField field={item.field} key={`leading_${i}`} />
 				))}
 				{(props.trailingFieldBackedElements || []).map((item, i) => (
-					<SugaredField field={item.field} key={i} />
+					<SugaredField field={item.field} key={`trailing_${i}`} />
 				))}
 				<BlockRepeater {...props}>
 					{props.children}

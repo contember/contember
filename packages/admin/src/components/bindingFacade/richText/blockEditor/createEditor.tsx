@@ -9,28 +9,29 @@ import {
 	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
-import { Element, Operation, Range as SlateRange, Text, Transforms } from 'slate'
+import { Element, Node as SlateNode, Operation, Range as SlateRange, Transforms } from 'slate'
+import { assertNever } from '../../../../utils'
 import { NormalizedBlock } from '../../blocks'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../plugins'
-import { contemberBlockElementType, isContemberBlockElement } from './elements'
+import { isContemberBlockElement } from './elements'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { BlockEditorElementRenderer } from './renderers'
 
 export interface CreateEditorOptions {
 	batchUpdates: EntityAccessor['batchUpdates']
 	desugaredEntityList: RelativeEntityList
+	discriminationField: RelativeSingleField
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
 	isMutatingRef: React.MutableRefObject<boolean>
-	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	textBlockDiscriminant: FieldValue
-	discriminationField: RelativeSingleField
+	removalType: RemovalType
 	sortableByField: RelativeSingleField
+	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
+	textBlockDiscriminant: FieldValue
 	textBlockField: RelativeSingleField
 	textElementCache: WeakMap<EntityAccessor, Element>
-	removalType: RemovalType
 }
 
 export const createEditor = (options: CreateEditorOptions) => {
@@ -40,24 +41,30 @@ export const createEditor = (options: CreateEditorOptions) => {
 	const { isVoid, apply, renderElement, onFocus, onBlur, insertNode } = editor
 
 	const {
+		batchUpdates,
+		desugaredEntityList,
 		discriminationField,
-		textElementCache,
+		entityListAccessorRef,
+		isMutatingRef,
+		normalizedBlocksRef,
+		normalizedLeadingFieldsRef,
+		normalizedTrailingFieldsRef,
 		removalType,
 		sortableByField,
+		sortedEntitiesRef,
 		textBlockDiscriminant,
 		textBlockField,
+		textElementCache,
 	} = options
 
-	editor.isVoid = element => {
-		if (element.type === contemberBlockElementType) {
-			return true
-		}
-		return isVoid(element)
-	}
+	const getFirstContentIndex = () => normalizedLeadingFieldsRef.current.length
+
+	editor.isVoid = element => isContemberBlockElement(element) || isVoid(element)
+
 	editor.renderElement = props => {
 		return (
 			<BlockEditorElementRenderer
-				normalizedBlocks={options.normalizedBlocksRef.current}
+				normalizedBlocks={normalizedBlocksRef.current}
 				fallbackRenderer={renderElement}
 				removalType={removalType}
 				element={props.element}
@@ -65,7 +72,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 				children={props.children}
 				discriminationField={discriminationField}
 				getEntityByKey={key => {
-					const entity = options.entityListAccessorRef.current.getByKey(key)
+					const entity = entityListAccessorRef.current.getByKey(key)
 					if (!(entity instanceof EntityAccessor)) {
 						throw new BindingError(`Corrupted data.`)
 					}
@@ -74,11 +81,11 @@ export const createEditor = (options: CreateEditorOptions) => {
 				getNormalizedFieldBackedElement={element => {
 					let normalizedElements: NormalizedFieldBackedElement[]
 					if (element.position === 'leading') {
-						normalizedElements = options.normalizedLeadingFieldsRef.current
+						normalizedElements = normalizedLeadingFieldsRef.current
 					} else if (element.position === 'trailing') {
-						normalizedElements = options.normalizedTrailingFieldsRef.current
+						normalizedElements = normalizedTrailingFieldsRef.current
 					} else {
-						throw new BindingError(`Corrupted data.`)
+						return assertNever(element.position)
 					}
 					return normalizedElements[element.index]
 				}}
@@ -86,7 +93,12 @@ export const createEditor = (options: CreateEditorOptions) => {
 		)
 	}
 	editor.onFocus = e => {
-		if (editor.children.length === 0) {
+		if (
+			editor.children.length -
+				normalizedLeadingFieldsRef.current.length -
+				normalizedTrailingFieldsRef.current.length ===
+			0
+		) {
 			Transforms.insertNodes(
 				editor,
 				{
@@ -94,7 +106,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 					children: [{ text: '' }],
 				},
 				{
-					at: [0],
+					at: [getFirstContentIndex()],
 				},
 			)
 		}
@@ -103,14 +115,18 @@ export const createEditor = (options: CreateEditorOptions) => {
 	}
 
 	editor.onBlur = e => {
-		if (editor.children.length === 1) {
-			const soleElement = editor.children[0] as Element
+		if (
+			editor.children.length -
+				normalizedLeadingFieldsRef.current.length -
+				normalizedTrailingFieldsRef.current.length ===
+			1
+		) {
+			const firstContentIndex = getFirstContentIndex()
+			const soleElement = editor.children[firstContentIndex] as Element
 			if (editor.isParagraph(soleElement) && soleElement.children.length === 1) {
-				const soleText = soleElement.children[0]
-
-				if (Text.isText(soleText) && soleText.text === '') {
+				if (SlateNode.string(soleElement) === '') {
 					Transforms.removeNodes(editor, {
-						at: [0],
+						at: [firstContentIndex],
 					})
 				}
 			}
@@ -135,12 +151,12 @@ export const createEditor = (options: CreateEditorOptions) => {
 	}
 
 	editor.apply = (operation: Operation) => {
-		if (options.isMutatingRef.current) {
+		if (isMutatingRef.current) {
 			return
 		}
 
-		const entityList = options.entityListAccessorRef.current
-		let sortedEntities = options.sortedEntitiesRef.current
+		const entityList = entityListAccessorRef.current
+		let sortedEntities = sortedEntitiesRef.current
 
 		entityList.batchUpdates(getAccessor => {
 			const getFreshEntity = (sortedIndex: number): EntityAccessor => {

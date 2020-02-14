@@ -3,9 +3,9 @@
 .#{$cui-conf-globalPrefix}icon
 	display: inline-flex
 
-	&-blueprintSvg
-		width: 1em
-		height: 1em
+	&-blueprintSvg,
+	&-contemberSvg
+		+size(1em)
 		fill: currentColor
 
 	@each $name, $size in $cui-icon-sizes

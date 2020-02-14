@@ -1,5 +1,5 @@
 import { IconSvgPaths16 } from '@blueprintjs/icons'
-import { color, number, select } from '@storybook/addon-knobs'
+import { boolean, color, number, select } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import { BlueprintIconName, ContemberIconName, Icon } from '../../src'
@@ -15,11 +15,13 @@ const iconStory = (type: 'blueprint' | 'contember') => {
 	if (type === 'blueprint') {
 		const iconName = select<BlueprintIconName>('Blueprint icon name', blueprintIconNames, blueprintIconNames[0])
 		const size = iconSizeKnob()
-		icon = <Icon blueprintIcon={iconName} size={size} />
+		const alignWithLowercase = boolean('Align with lowercase', false)
+		icon = <Icon blueprintIcon={iconName} size={size} alignWithLowercase={alignWithLowercase} />
 	} else if (type === 'contember') {
 		const iconName = select<ContemberIconName>('Contember icon name', contemberIconNames, contemberIconNames[0])
 		const size = iconSizeKnob()
-		icon = <Icon contemberIcon={iconName} size={size} />
+		const alignWithLowercase = boolean('Align with lowercase', false)
+		icon = <Icon contemberIcon={iconName} size={size} alignWithLowercase={alignWithLowercase} />
 	}
 	const fontSize = number('Font size', 96, {
 		range: true,

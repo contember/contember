@@ -3,7 +3,7 @@ import cn from 'classnames'
 import * as React from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { IconSize } from '../../types'
-import { toEnumViewClass } from '../../utils'
+import { toEnumViewClass, toViewClass } from '../../utils'
 import * as ContemberIcons from './contemberIcons'
 
 // To be potentially extended later
@@ -15,6 +15,7 @@ export type IconProps = {
 	title?: string
 	size?: IconSize
 	style?: React.CSSProperties
+	alignWithLowercase?: boolean
 } & (
 	| {
 			blueprintIcon: BlueprintIconName
@@ -50,7 +51,14 @@ export const Icon = React.memo((props: IconProps) => {
 	const svgPaths = React.useMemo(() => renderSvgPaths(pathStrings), [pathStrings])
 
 	return (
-		<div className={cn(`${prefix}icon`, toEnumViewClass(props.size))} style={props.style}>
+		<div
+			className={cn(
+				`${prefix}icon`,
+				toEnumViewClass(props.size),
+				toViewClass('alignWithLowercase', props.alignWithLowercase),
+			)}
+			style={props.style}
+		>
 			<svg viewBox="0 0 16 16" className={svgClassName}>
 				{props.title && <desc>{props.title}</desc>}
 				{svgPaths}

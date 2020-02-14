@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MouseEventHandler } from 'react'
 import { Manager, Popper, PopperProps, Reference } from 'react-popper'
-import { useClassNamePrefix } from '../auxiliary'
+import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
 import { DropdownAlignment } from '../types/DropdownAlignment'
 import { assertNever } from '../utils'
 import { Collapsible } from './Collapsible'
@@ -29,42 +29,6 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 	} else {
 		return assertNever(alignment)
 	}
-}
-
-const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: boolean, close: () => void) => {
-	const buttonRef = React.useRef<T>(null)
-	const contentRef = React.useRef<K>(null)
-
-	React.useEffect(() => {
-		if (isOpen) {
-			const closeOnEscapeKey = (event: KeyboardEvent) => {
-				if (event.key === 'Escape') {
-					close()
-				}
-			}
-			const closeOnClickOutside = (event: MouseEvent) => {
-				if (
-					!(
-						buttonRef.current &&
-						contentRef.current &&
-						event.target instanceof Node &&
-						(buttonRef.current.contains(event.target) || contentRef.current.contains(event.target))
-					)
-				) {
-					close()
-				}
-			}
-
-			window.addEventListener('keydown', closeOnEscapeKey)
-			window.addEventListener('click', closeOnClickOutside)
-			return () => {
-				window.removeEventListener('keydown', closeOnEscapeKey)
-				window.removeEventListener('click', closeOnClickOutside)
-			}
-		}
-	}, [close, isOpen])
-
-	return { buttonRef, contentRef }
 }
 
 export const DropdownContentContainerContext = React.createContext<HTMLElement | undefined>(undefined)

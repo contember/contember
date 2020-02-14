@@ -1,0 +1,34 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}dimensionSwitcher
+	font-size: em(12px)
+
+	&-items
+		display: flex
+		margin: 0 -1 * $cui-dimensionSwitcher-spacing
+
+	&-item
+		padding: .5em $cui-dimensionSwitcher-spacing
+
+		&:not(:first-child)
+			border-left: $cui-dimensionSwitcher-border
+
+		&-icon
+			margin-left: .5em
+			display: inline-block
+			width: 1em
+			height: .75em
+			background: url(../../assets/dimensionSwitcher-arrow.svg) no-repeat center center
+			background-size: contain
+
+		&-options
+			display: inline-flex
+			margin-left: .5em
+
+		&-option
+			padding: .125em
+			opacity: .5
+
+			&.view-active
+				font-weight: bold
+				opacity: 1

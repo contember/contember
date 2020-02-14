@@ -1,0 +1,63 @@
+@import '../common'
+
+$saveControl-color: #0094FF
+$saveControl-color-alt: #FFFFFF
+
+.#{$cui-conf-globalPrefix}saveControl
+	position: relative
+	width: 16em
+
+	&-window-in
+		padding: 1em 1.5em
+
+	&-button-primary,
+	&-button-toggle
+		padding: .8em 1.5em
+
+	&-button,
+	&-window
+		border-radius: 1.5em
+
+	&-button
+		background: $saveControl-color
+		color: $saveControl-color-alt
+		display: inline-flex
+		line-height: 1
+		overflow: hidden
+
+		&-primary,
+		&-toggle
+			border: none
+			appearance: none
+			background: transparent
+			font-size: inherit
+			font-family: inherit
+			color: inherit
+			outline: none
+
+			&:hover
+				background-color: darken($saveControl-color, 2%)
+
+		&-label
+			font-size: (18em / 16)
+
+		&-toggle
+			border-left: solid 1px rgba($saveControl-color-alt, .2)
+			width: 2em
+			background: url(../../assets/saveControl-arrow.svg) no-repeat center center
+			background-size: .6em auto
+
+	&-window
+		position: absolute
+		top: 0
+		left: 0
+		right: 0
+		background: $saveControl-color
+		color: $saveControl-color-alt
+		display: none
+
+	&.view-open &-window
+		display: block
+
+	.#{$cui-conf-globalPrefix}layout-mainActions &
+		margin-right: 10em

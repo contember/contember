@@ -1,0 +1,27 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}userMiniControl
+	display: flex
+	flex-direction: column
+	padding-right: 2em
+	position: relative
+
+	&:after
+		$icon-size: (11em / 16)
+		content: ''
+		display: block
+		position: absolute
+		right: .5em
+		top: 50%
+		width: $icon-size
+		height: $icon-size
+		margin-top: -.5 * $icon-size
+		background: url(../../assets/userMiniControl-arrow.svg) no-repeat
+		background-size: contain
+
+	&-name
+		font-weight: bold
+
+	&-note
+		opacity: .5
+		font-size: (13em / 16)

@@ -1,0 +1,22 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}breadcrumbs
+	&-items
+		display: flex
+		flex-wrap: wrap
+
+	&-item
+		color: $cui-breadcrumbs-text-color
+
+		&:before
+			content: '›'
+			display: inline-block
+			margin: 0 .5em
+			color: $cui-breadcrumbs-sep-color
+
+		&:first-child:before
+			display: none
+
+		a
+			text-decoration: underline
+			color: $cui-breadcrumbs-link-color

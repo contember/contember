@@ -1,15 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="10px" height="8px" viewBox="0 0 10 8" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch Beta 63 (92437) - https://sketch.com -->
-    <title>ic_Dropdown</title>
-    <desc>Created with Sketch Beta.</desc>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="lista" transform="translate(-1408.000000, -37.000000)" fill="#92929D">
-            <g id="Group-13" transform="translate(0.000000, -0.000000)">
-                <g id="Component/icon/ic_Dropdown" transform="translate(1405.000000, 32.500000)">
-                    <path d="M5.47901419,3.98321135 L10.8452903,8.27623226 C11.0609213,8.44873704 11.095882,8.76338322 10.9233772,8.97901419 C10.9003113,9.00784654 10.8741227,9.03403519 10.8452903,9.05710107 L5.47901419,13.350122 C5.26338322,13.5226268 4.94873704,13.4876661 4.77623226,13.2720351 C4.70530704,13.1833786 4.66666667,13.0732233 4.66666667,12.9596876 L4.66666667,4.37364576 C4.66666667,4.09750338 4.89052429,3.87364576 5.16666667,3.87364576 C5.28020241,3.87364576 5.39035767,3.91228613 5.47901419,3.98321135 Z" id="Rectangle" transform="translate(8.000000, 8.666667) rotate(-270.000000) translate(-8.000000, -8.666667) "></path>
-                </g>
-            </g>
-        </g>
-    </g>
-</svg>
+<svg width="10" height="8" xmlns="http://www.w3.org/2000/svg"><path d="M9.68 1.65L5.4 7a.5.5 0 0 1-.78 0L.31 1.65a.5.5 0 0 1 .4-.82h8.58a.5.5 0 0 1 .4.82z" fill="#92929D" fill-rule="evenodd"/></svg>

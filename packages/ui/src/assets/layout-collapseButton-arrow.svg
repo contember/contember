@@ -1,13 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="8px" height="12px" viewBox="0 0 8 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch Beta 63 (92437) - https://sketch.com -->
-    <title>Path 225 Copy</title>
-    <desc>Created with Sketch Beta.</desc>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="01-wysiwyg-copy" transform="translate(-256.000000, -132.000000)" fill="#92929D">
-            <g id="Group-6" transform="translate(248.000000, 126.000000)">
-                <path d="M8.32387492,15.6917962 C7.91696183,16.0652131 7.88980782,16.6977955 8.26322472,17.1047086 C8.63664163,17.5116217 9.26922408,17.5387757 9.67613716,17.1653588 L14.8189943,12.4458502 C15.251143,12.049275 15.2507668,11.3676397 14.8181807,10.9715417 L9.67532356,6.26247892 C9.26799858,5.88951136 8.63544649,5.91736354 8.26247892,6.32468852 C7.88951136,6.7320135 7.91736354,7.36456559 8.32468852,7.73753316 L12.6629702,11.7098855 L8.32387492,15.6917962 Z" id="Path-225-Copy" transform="translate(11.571432, 11.714292) scale(-1, 1) translate(-11.571432, -11.714292) "></path>
-            </g>
-        </g>
-    </g>
-</svg>
+<svg width="8" height="12" xmlns="http://www.w3.org/2000/svg"><path d="M6.82 9.7a1 1 0 1 1-1.35 1.47L.32 6.45a1 1 0 0 1 0-1.48L5.47.27a1 1 0 0 1 1.35 1.47L2.48 5.7l4.34 3.98z" fill="#92929D" fill-rule="evenodd"/></svg>

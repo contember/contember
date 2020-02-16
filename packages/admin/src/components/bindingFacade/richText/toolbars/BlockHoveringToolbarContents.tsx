@@ -1,11 +1,11 @@
 import { FieldValue } from '@contember/binding'
-import { Button, ButtonGroup, Icon, IconName } from '@contember/ui'
+import { BlueprintIconName, Button, ButtonGroup, Icon } from '@contember/ui'
 import * as React from 'react'
 import { useEditor } from 'slate-react'
 import { contemberBlockElementType } from '../blockEditor'
 
 export type BlockHoveringToolbarConfig = {
-	blueprintIcon: IconName
+	blueprintIcon: BlueprintIconName
 	discriminateBy: FieldValue
 }
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
+import { Icon } from './Icon'
 
 export interface ContentStatusProps {}
 
@@ -9,7 +10,9 @@ export function ContentStatus({}: ContentStatusProps) {
 	return (
 		<div className={cn(`${prefix}contentStatus`)}>
 			<span className={`${prefix}contentStatus-label`}>Concept, unsaved</span>
-			<span className={`${prefix}contentStatus-icon`} />
+			<span className={`${prefix}contentStatus-icon`}>
+				<Icon contemberIcon="clock" alignWithLowercase />
+			</span>
 		</div>
 	)
 }

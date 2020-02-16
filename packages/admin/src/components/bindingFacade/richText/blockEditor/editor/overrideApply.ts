@@ -1,4 +1,6 @@
 import {
+	addNewEntityAtIndex,
+	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
 	FieldAccessor,
@@ -8,10 +10,10 @@ import {
 	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
-import { Element, Operation } from 'slate'
+import { Node as SlateNode, Editor, Element, Operation } from 'slate'
 import { NormalizedBlock } from '../../../blocks'
+import { isContemberBlockElement } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
-import { applyBlockOperation } from './applyBlockOperation'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
@@ -34,6 +36,26 @@ export interface OverrideApplyOptions {
 
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
 	const { apply } = editor
+	const {
+		batchUpdates,
+		desugaredEntityList,
+		discriminationField,
+		fieldElementCache,
+		normalizedLeadingFieldsRef,
+		normalizedTrailingFieldsRef,
+		removalType,
+		sortableByField,
+		sortedEntitiesRef,
+		textBlockDiscriminant,
+		textBlockField,
+		textElementCache,
+	} = options
+
+	const fieldBackedElementRefs = {
+		leading: normalizedLeadingFieldsRef,
+		trailing: normalizedTrailingFieldsRef,
+	}
+
 	editor.apply = (operation: Operation) => {
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
@@ -47,14 +69,156 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			return apply(operation) // ?!?!!???
 		}
 
-		const { path } = operation
-		const [topLevelIndex] = path
-		const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
+		batchUpdates(getAccessor => {
+			const { path } = operation
+			const [topLevelIndex] = path
+			const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
+			let sortedEntities = sortedEntitiesRef.current
 
-		// TODO also detect trailing from here
-		if (topLevelIndex < firstContentIndex) {
-			return
-		}
-		return applyBlockOperation(editor, apply, operation, options)
+			// TODO also handle trailing
+			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
+			const getFreshFieldAccessor = (position: keyof typeof fieldBackedElementRefs, normalizedFieldIndex: number) =>
+				getAccessor().getRelativeSingleField(fieldBackedElementRefs[position].current[normalizedFieldIndex].field)
+			const setFieldBackedElementValue = (
+				position: keyof typeof fieldBackedElementRefs,
+				normalizedFieldIndex: number,
+				newValue: string,
+			) => getFreshFieldAccessor(position, normalizedFieldIndex).updateValue?.(newValue)
+			const getFreshContentEntityAccessor = (sortedEntityIndex: number): EntityAccessor => {
+				const oldEntityKey = sortedEntities[sortedEntityIndex].getKey()
+				const newEntity = getAccessor()
+					.getRelativeEntityList(desugaredEntityList)
+					.getByKey(oldEntityKey)
+				if (!(newEntity instanceof EntityAccessor)) {
+					throw new BindingError(`Corrupted data`)
+				}
+				return newEntity
+			}
+			const saveElementAt = (elementIndex: number, entity?: EntityAccessor) => {
+				const targetElement = editor.children[elementIndex]
+				if (!Element.isElement(targetElement)) {
+					throw new BindingError(`Corrupted data`)
+				}
+				if (isLeadingElement(elementIndex)) {
+					const normalizedField = fieldBackedElementRefs.leading.current[elementIndex]
+					const targetValue =
+						normalizedField.format === 'editorJSON' ? JSON.stringify(targetElement) : SlateNode.string(targetElement)
+					getAccessor()
+						.getRelativeSingleField(normalizedField.field)
+						.updateValue?.(targetValue)
+					fieldElementCache.set(getAccessor().getRelativeSingleField(normalizedField.field), targetElement)
+				} else {
+					if (!entity) {
+						entity = getFreshContentEntityAccessor(elementIndex - firstContentIndex)
+					}
+					entity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
+					const sortedEntityIndex = elementIndex - firstContentIndex
+					const updatedEntity = getFreshContentEntityAccessor(sortedEntityIndex)
+					textElementCache.set(updatedEntity, targetElement)
+					sortedEntities[sortedEntityIndex] = updatedEntity
+				}
+			}
+			const removeElementAt = (elementIndex: number) => {
+				if (isLeadingElement(elementIndex)) {
+					setFieldBackedElementValue('leading', elementIndex, '')
+				} else {
+					const sortedEntityIndex = elementIndex - firstContentIndex
+					sortedEntities[sortedEntityIndex].remove?.(removalType)
+					sortedEntities.splice(sortedEntityIndex, 1)
+				}
+			}
+			const addNewDiscriminatedEntityAt = (elementIndex: number, blockDiscriminant: FieldValue): EntityAccessor => {
+				addNewEntityAtIndex(
+					getAccessor().getRelativeEntityList(desugaredEntityList),
+					sortableByField,
+					elementIndex,
+					(getInnerAccessor, newEntityIndex) => {
+						const newEntity = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
+						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
+						sortedEntities[elementIndex - firstContentIndex] = getInnerAccessor().entities[
+							newEntityIndex
+						] as EntityAccessor
+					},
+				)
+				return sortedEntities[elementIndex - firstContentIndex]
+			}
+			const addNewTextElementAt = (elementIndex: number) => {
+				const newEntity = addNewDiscriminatedEntityAt(elementIndex, textBlockDiscriminant)
+				saveElementAt(elementIndex, newEntity)
+			}
+
+			if (path.length > 1) {
+				apply(operation)
+				saveElementAt(topLevelIndex)
+				return // We only care about top-level operations from here.
+			}
+
+			switch (operation.type) {
+				case 'set_node':
+					apply(operation)
+					saveElementAt(topLevelIndex)
+					break
+				case 'merge_node': {
+					// TODO special checks for leading/trailing
+					apply(operation)
+					removeElementAt(topLevelIndex)
+					saveElementAt(topLevelIndex - 1)
+					return
+				}
+				case 'split_node': {
+					// TODO special checks for leading/trailing
+					if (isContemberBlockElement(editor.children[topLevelIndex])) {
+						throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
+					}
+					apply(operation)
+					saveElementAt(topLevelIndex)
+					addNewTextElementAt(topLevelIndex + 1)
+					return
+				}
+				case 'insert_text':
+				case 'remove_text': {
+					const {
+						path: [topLevelIndex],
+					} = operation
+					if (isContemberBlockElement(editor.children[topLevelIndex])) {
+						throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
+					}
+					apply(operation)
+					saveElementAt(topLevelIndex)
+					return
+				}
+
+				case 'insert_node': {
+					// TODO leading/trailing
+					let { node } = operation
+					if (!Element.isElement(node)) {
+						throw new BindingError()
+					}
+					let blockType: FieldValue
+
+					if (isContemberBlockElement(node)) {
+						blockType = node.blockType
+						const entity = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
+						apply(operation)
+						// TODO cache?
+						sortedEntities[topLevelIndex - firstContentIndex] = entity
+					} else {
+						apply(operation)
+						addNewTextElementAt(topLevelIndex)
+					}
+					break
+				}
+				case 'remove_node': {
+					// TODO leading/trailing
+					apply(operation)
+					removeElementAt(topLevelIndex)
+					return
+				}
+				case 'move_node':
+					// TODO Not even slate-react supports this at the moment
+					apply(operation)
+					break
+			}
+		})
 	}
 }

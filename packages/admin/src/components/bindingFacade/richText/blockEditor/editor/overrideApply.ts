@@ -87,7 +87,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			// TODO also handle trailing
 			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
 			const isTrailingElement = (elementIndex: number) =>
-				elementIndex >= options.normalizedLeadingFieldsRef.current.length + sortedEntities.length
+				elementIndex >= options.normalizedLeadingFieldsRef.current.length + Math.max(sortedEntities.length, 1)
 			const isFieldBackedElement = (elementIndex: number) =>
 				isLeadingElement(elementIndex) || isTrailingElement(elementIndex)
 			const getNormalizedFieldBackedElement = (elementIndex: number) => {
@@ -102,7 +102,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					type: 'set_node',
 					path: [elementIndex],
 					newProperties: { type },
-					// Only `newProperties` are actually used but apparently, these have to be here too.
 					properties: { type },
 				})
 			}
@@ -137,11 +136,11 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						.updateValue?.(targetValue)
 					fieldElementCache.set(getAccessor().getRelativeSingleField(normalizedField.field), targetElement)
 				} else {
+					const sortedEntityIndex = elementIndex - firstContentIndex
 					if (!entity) {
-						entity = getFreshContentEntityAccessor(elementIndex - firstContentIndex)
+						entity = getFreshContentEntityAccessor(sortedEntityIndex)
 					}
 					entity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
-					const sortedEntityIndex = elementIndex - firstContentIndex
 					const updatedEntity = getFreshContentEntityAccessor(sortedEntityIndex)
 					textElementCache.set(updatedEntity, targetElement)
 					sortedEntities[sortedEntityIndex] = updatedEntity
@@ -160,13 +159,15 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				addNewEntityAtIndex(
 					getAccessor().getRelativeEntityList(desugaredEntityList),
 					sortableByField,
-					elementIndex,
+					elementIndex - firstContentIndex,
 					(getInnerAccessor, newEntityIndex) => {
 						const newEntity = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
 						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
-						sortedEntities[elementIndex - firstContentIndex] = getInnerAccessor().entities[
-							newEntityIndex
-						] as EntityAccessor
+						sortedEntities.splice(
+							elementIndex - firstContentIndex,
+							0,
+							getInnerAccessor().entities[newEntityIndex] as EntityAccessor,
+						)
 					},
 				)
 				return sortedEntities[elementIndex - firstContentIndex]
@@ -202,9 +203,32 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						if (isContemberBlockElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
-						apply(operation)
-						saveElementAt(topLevelIndex)
-						addNewTextElementAt(topLevelIndex + 1)
+						if (isTrailingElement(topLevelIndex)) {
+							break // TODO what do we even do from here?!
+						}
+						if (isLeadingElement(topLevelIndex)) {
+							apply(operation)
+							for (let i = topLevelIndex; i < firstContentIndex; i++) {
+								apply({
+									type: 'set_node',
+									path: [i],
+									newProperties: { index: i },
+									properties: { index: i },
+								})
+								saveElementAt(i)
+							}
+							apply({
+								type: 'set_node',
+								path: [firstContentIndex],
+								newProperties: { type: 'paragraph', index: null, position: null },
+								properties: { type: 'paragraph', index: null, position: null },
+							})
+							addNewTextElementAt(firstContentIndex)
+						} else {
+							apply(operation)
+							saveElementAt(topLevelIndex)
+							addNewTextElementAt(topLevelIndex + 1)
+						}
 						break
 					}
 					case 'insert_text':

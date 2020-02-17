@@ -4,7 +4,8 @@ import { NormalizedBlock } from '../../blocks'
 import { ParagraphElement } from '../plugins'
 import {
 	ContemberBlockElement,
-	contemberBlockElementType, contemberContentPlaceholderType,
+	contemberBlockElementType,
+	contemberContentPlaceholderType,
 	ContemberFieldElement,
 	ContemberFieldElementPosition,
 	contemberFieldElementType,
@@ -120,10 +121,10 @@ export const useSlateNodes = ({
 						blockType: selectedBlock.discriminateBy,
 					}
 					/*
-				TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
-				we're not expecting the user to create thousands and thousands of them so it's not that big of a deal but it's
-				still far from ideal. How do we fix this though? 🤔
-			 */
+						TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
+						we're not expecting the user to create thousands and thousands of them so it's not that big of a deal but it's
+						still far from ideal. How do we fix this though? 🤔
+					 */
 					contemberBlockElementCache.set(entityKey, contemberBlock)
 					return contemberBlock
 				}

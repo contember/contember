@@ -12,7 +12,13 @@ import {
 import * as React from 'react'
 import { Node as SlateNode, Editor, Element, Operation } from 'slate'
 import { NormalizedBlock } from '../../../blocks'
-import { ContemberFieldElementPosition, isContemberBlockElement, isContemberFieldElement } from '../elements'
+import {
+	contemberContentPlaceholderType,
+	ContemberFieldElementPosition,
+	isContemberBlockElement,
+	isContemberContentPlaceholder,
+	isContemberFieldElement,
+} from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
@@ -65,7 +71,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (options.isMutatingRef.current) {
 			return
 		}
-		console.log('op', operation)
+		// console.log('op', operation)
 		if (operation.path.length === 0) {
 			// Technically, the path could also be [], indicating that we're operating on the editor itself.
 			// This is branch is entirely speculative. I *THINK* it could feasibly happen but I don't know when or how.
@@ -161,76 +167,108 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				saveElementAt(elementIndex, newEntity)
 			}
 
+			if (isContemberContentPlaceholder(editor.children[topLevelIndex])) {
+				apply({
+					type: 'set_node',
+					path: [topLevelIndex],
+					newProperties: {
+						type: 'paragraph',
+					},
+					properties: {
+						// Only `newProperties` are actually used but apparently, these have to be here too.
+						type: 'paragraph',
+					},
+				})
+				addNewTextElementAt(topLevelIndex)
+			}
+
 			if (path.length > 1) {
 				apply(operation)
 				saveElementAt(topLevelIndex)
-				return // We only care about top-level operations hereinafter.
+			} else {
+				switch (operation.type) {
+					case 'set_node':
+						apply(operation) // TODO for leading/trailing, if they're set to plaintext, do nothing here
+						saveElementAt(topLevelIndex)
+						break
+					case 'merge_node': {
+						// TODO special checks for leading/trailing
+						apply(operation)
+						removeElementAt(topLevelIndex)
+						saveElementAt(topLevelIndex - 1)
+						break
+					}
+					case 'split_node': {
+						// TODO special checks for leading/trailing
+						if (isContemberBlockElement(editor.children[topLevelIndex])) {
+							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
+						}
+						apply(operation)
+						saveElementAt(topLevelIndex)
+						addNewTextElementAt(topLevelIndex + 1)
+						break
+					}
+					case 'insert_text':
+					case 'remove_text': {
+						const {
+							path: [topLevelIndex],
+						} = operation
+						if (isContemberBlockElement(editor.children[topLevelIndex])) {
+							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
+						}
+						apply(operation)
+						saveElementAt(topLevelIndex)
+						break
+					}
+
+					case 'insert_node': {
+						// TODO leading/trailing
+						let { node } = operation
+						if (!Element.isElement(node)) {
+							throw new BindingError()
+						}
+						let blockType: FieldValue
+
+						if (isContemberBlockElement(node)) {
+							blockType = node.blockType
+							const entity = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
+							apply(operation)
+							// TODO cache?
+							sortedEntities[topLevelIndex - firstContentIndex] = entity
+						} else {
+							apply(operation)
+							addNewTextElementAt(topLevelIndex)
+						}
+						break
+					}
+					case 'remove_node': {
+						apply(operation)
+						removeElementAt(topLevelIndex)
+						break
+					}
+					case 'move_node':
+						// TODO Not even slate-react supports this at the moment
+						apply(operation)
+						break
+				}
 			}
+			if (sortedEntities.length === 1) {
+				const soleElement = editor.children[firstContentIndex] as Element
 
-			switch (operation.type) {
-				case 'set_node':
-					apply(operation) // TODO for leading/trailing, if they're set to plaintext, do nothing here
-					saveElementAt(topLevelIndex)
-					break
-				case 'merge_node': {
-					// TODO special checks for leading/trailing
-					apply(operation)
-					removeElementAt(topLevelIndex)
-					saveElementAt(topLevelIndex - 1)
-					return
+				if (editor.isParagraph(soleElement) && SlateNode.string(soleElement) === '') {
+					apply({
+						type: 'set_node',
+						path: [firstContentIndex],
+						newProperties: {
+							type: contemberContentPlaceholderType,
+						},
+						properties: {
+							// Only `newProperties` are actually used but apparently, these have to be here too.
+							type: contemberContentPlaceholderType,
+						},
+					})
+					removeElementAt(firstContentIndex)
 				}
-				case 'split_node': {
-					// TODO special checks for leading/trailing
-					if (isContemberBlockElement(editor.children[topLevelIndex])) {
-						throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
-					}
-					apply(operation)
-					saveElementAt(topLevelIndex)
-					addNewTextElementAt(topLevelIndex + 1)
-					return
-				}
-				case 'insert_text':
-				case 'remove_text': {
-					const {
-						path: [topLevelIndex],
-					} = operation
-					if (isContemberBlockElement(editor.children[topLevelIndex])) {
-						throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
-					}
-					apply(operation)
-					saveElementAt(topLevelIndex)
-					return
-				}
-
-				case 'insert_node': {
-					// TODO leading/trailing
-					let { node } = operation
-					if (!Element.isElement(node)) {
-						throw new BindingError()
-					}
-					let blockType: FieldValue
-
-					if (isContemberBlockElement(node)) {
-						blockType = node.blockType
-						const entity = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
-						apply(operation)
-						// TODO cache?
-						sortedEntities[topLevelIndex - firstContentIndex] = entity
-					} else {
-						apply(operation)
-						addNewTextElementAt(topLevelIndex)
-					}
-					break
-				}
-				case 'remove_node': {
-					apply(operation)
-					removeElementAt(topLevelIndex)
-					return
-				}
-				case 'move_node':
-					// TODO Not even slate-react supports this at the moment
-					apply(operation)
-					break
 			}
 		})
 	}

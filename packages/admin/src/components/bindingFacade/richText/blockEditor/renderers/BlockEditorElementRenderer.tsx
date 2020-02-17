@@ -2,7 +2,12 @@ import { EntityAccessor, RelativeSingleField, RemovalType } from '@contember/bin
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
-import { ContemberFieldElement, isContemberBlockElement, isContemberFieldElement } from '../elements'
+import {
+	ContemberFieldElement,
+	isContemberBlockElement,
+	isContemberContentPlaceholder,
+	isContemberFieldElement,
+} from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { ContemberBlockElementRenderer } from './ContemberBlockElementRenderer'
 import { ContemberElementRefreshContext } from './ContemberElementRefreshContext'
@@ -49,6 +54,13 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 					/>
 				)}
 			</ContemberElementRefreshContext.Consumer>
+		)
+	}
+	if (isContemberContentPlaceholder(props.element)) {
+		return (
+			<div {...props.attributes}>
+				<p>{props.children}</p>
+			</div>
 		)
 	}
 	return fallbackRenderer(props)

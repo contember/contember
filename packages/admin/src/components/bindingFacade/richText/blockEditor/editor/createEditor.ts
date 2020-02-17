@@ -1,17 +1,10 @@
-import * as React from 'react'
 import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../../plugins'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
-import { overrideOnBlur, OverrideOnBlurOptions } from './overrideOnBlur'
-import { overrideOnFocus, OverrideOnFocusOptions } from './overrideOnFocus'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 
-export interface CreateEditorOptions
-	extends OverrideApplyOptions,
-		OverrideRenderElementOptions,
-		OverrideOnFocusOptions,
-		OverrideOnBlurOptions {}
+export interface CreateEditorOptions extends OverrideApplyOptions, OverrideRenderElementOptions {}
 
 export const createEditor = (options: CreateEditorOptions) => {
 	// TODO configurable plugin set
@@ -55,8 +48,6 @@ export const createEditor = (options: CreateEditorOptions) => {
 
 	overrideApply(editor, options)
 	overrideRenderElement(editor, options)
-	overrideOnFocus(editor, options)
-	overrideOnBlur(editor, options)
 
 	return editor
 }

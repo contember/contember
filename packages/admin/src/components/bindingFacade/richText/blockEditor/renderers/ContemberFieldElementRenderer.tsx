@@ -16,6 +16,7 @@ const placeholderStyles: React.CSSProperties = {
 	whiteSpace: 'nowrap',
 	pointerEvents: 'none',
 	display: 'inline-block',
+	userSelect: 'none',
 }
 
 export const ContemberFieldElementRenderer = React.memo((props: ContemberFieldElementRendererProps) => {

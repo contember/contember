@@ -97,6 +97,15 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				}
 				return fieldBackedElementRefs[fieldBackedElement.position].current[fieldBackedElement.index]
 			}
+			const setTopLevelElementType = (elementIndex: number, type: string) => {
+				apply({
+					type: 'set_node',
+					path: [elementIndex],
+					newProperties: { type },
+					// Only `newProperties` are actually used but apparently, these have to be here too.
+					properties: { type },
+				})
+			}
 			const getFreshFieldAccessor = (position: ContemberFieldElementPosition, normalizedFieldIndex: number) =>
 				getAccessor().getRelativeSingleField(fieldBackedElementRefs[position].current[normalizedFieldIndex].field)
 			const setFieldBackedElementValue = (
@@ -168,17 +177,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			}
 
 			if (isContemberContentPlaceholder(editor.children[topLevelIndex])) {
-				apply({
-					type: 'set_node',
-					path: [topLevelIndex],
-					newProperties: {
-						type: 'paragraph',
-					},
-					properties: {
-						// Only `newProperties` are actually used but apparently, these have to be here too.
-						type: 'paragraph',
-					},
-				})
+				setTopLevelElementType(topLevelIndex, 'paragraph')
 				addNewTextElementAt(topLevelIndex)
 			}
 
@@ -242,6 +241,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						break
 					}
 					case 'remove_node': {
+						// TODO for leading/trailing, this makes the state inconsistent
 						apply(operation)
 						removeElementAt(topLevelIndex)
 						break
@@ -256,17 +256,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				const soleElement = editor.children[firstContentIndex] as Element
 
 				if (editor.isParagraph(soleElement) && SlateNode.string(soleElement) === '') {
-					apply({
-						type: 'set_node',
-						path: [firstContentIndex],
-						newProperties: {
-							type: contemberContentPlaceholderType,
-						},
-						properties: {
-							// Only `newProperties` are actually used but apparently, these have to be here too.
-							type: contemberContentPlaceholderType,
-						},
-					})
+					setTopLevelElementType(firstContentIndex, contemberContentPlaceholderType)
 					removeElementAt(firstContentIndex)
 				}
 			}

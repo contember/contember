@@ -27,6 +27,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 		insertFragment,
 		insertNode,
 		insertText,
+		normalizeNode,
 		redo,
 		removeMark,
 		undo,
@@ -42,6 +43,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 	editor.insertFragment = fragment => batchUpdates(() => insertFragment(fragment))
 	editor.insertNode = node => batchUpdates(() => insertNode(node))
 	editor.insertText = text => batchUpdates(() => insertText(text))
+	editor.normalizeNode = entry => batchUpdates(() => normalizeNode(entry))
 	editor.removeMark = key => batchUpdates(() => removeMark(key))
 
 	editor.insertData = data => batchUpdates(() => insertData(data))

@@ -1,6 +1,10 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorCanvas
+	// TODO don't use box
+	// TODO handle selection color systemically
+	// TODO proper spacing
+	// TODO less arbitrary styles of classic elements within the canvas (headings, lists, etc)
 	+box()
 	background: #FFFFFF
 	width: 100%
@@ -21,6 +25,12 @@
 			margin-top: 0
 		& > :last-child
 			margin-bottom: 0
+		a
+			color: #0094ff
+		code
+			font-family: monospace
+			background-color: $cui-color-gray-2
+			padding: em(2px) em(1px)
 
 		::selection
 			background-color: #BFE4FF

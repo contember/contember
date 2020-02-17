@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { IncreaseBoxDepth, useClassNamePrefix } from '../../auxiliary'
 
 export interface EditorCanvasProps<P extends React.TextareaHTMLAttributes<HTMLDivElement>> {
 	underlyingComponent: (props: P) => React.ReactElement
@@ -18,7 +18,9 @@ export const EditorCanvas = (<P extends React.TextareaHTMLAttributes<HTMLDivElem
 	const prefix = useClassNamePrefix()
 	return (
 		<div className={`${prefix}editorCanvas`}>
-			<Component {...props} className={cn(`${prefix}editorCanvas-canvas`, className)} />
+			<IncreaseBoxDepth currentDepth={1}>
+				<Component {...props} className={cn(`${prefix}editorCanvas-canvas`, className)} />
+			</IncreaseBoxDepth>
 			{children}
 		</div>
 	)

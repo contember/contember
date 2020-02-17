@@ -2,22 +2,26 @@
 
 .#{$cui-conf-globalPrefix}userMiniControl
 	display: flex
-	flex-direction: column
-	padding-right: 2em
-	position: relative
+	align-items: center
 
-	&:after
-		$icon-size: (11em / 16)
-		content: ''
-		display: block
-		position: absolute
-		right: .5em
-		top: 50%
-		width: $icon-size
-		height: $icon-size
-		margin-top: -.5 * $icon-size
-		background: url("data:image/svg+xml,%3Csvg width='10' height='8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.68 1.65L5.4 7a.5.5 0 0 1-.78 0L.31 1.65a.5.5 0 0 1 .4-.82h8.58a.5.5 0 0 1 .4.82z' fill='%2392929D' fill-rule='evenodd'/%3E%3C/svg%3E") no-repeat
-		background-size: contain
+	&-info
+		display: flex
+		flex-direction: column
+
+	&-avatar
+		$avatar-size: 3em
+		flex-grow: 0
+		flex-shrink: 0
+		width: $avatar-size
+		height: $avatar-size
+		border-radius: $avatar-size
+		overflow: hidden
+		margin-right: .5em
+		background: #eee
+
+		&-img
+			width: 100%
+			height: 100%
 
 	&-name
 		font-weight: bold

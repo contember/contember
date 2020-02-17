@@ -1,14 +1,14 @@
 import { storiesOf } from '@storybook/react'
 import * as React from 'react'
 import {
-	Button,
-	Layout,
-	LayoutHeading,
-	Trio,
 	Breadcrumbs,
 	ContentStatus,
-	SaveControl,
 	DimensionSwitcher,
+	Layout,
+	LayoutHeading,
+	SaveControl,
+	SeamlessDropdown,
+	Trio,
 	UserMiniControl,
 } from '../../src/components'
 
@@ -39,24 +39,49 @@ storiesOf('Layout', module)
 	.add('some components', () => {
 		return (
 			<Layout
-				topStart={<LayoutHeading label="My Admin" />}
-				topCenter={
-					<DimensionSwitcher
-						dimensions={[
-							{ key: 'site', label: 'Site', options: [{ value: 'cz', label: 'CZ', active: true }] },
-							{
-								key: 'lang',
-								label: 'Language',
-								options: [
-									{ value: 'cz', label: 'CZ', active: true },
-									{ value: 'en', label: 'EN', active: true },
-									{ value: 'de', label: 'DE', active: false },
-								],
-							},
-						]}
-					/>
+				topStart={
+					<SeamlessDropdown inline label={<LayoutHeading label="My Admin" />}>
+						content
+					</SeamlessDropdown>
 				}
-				topEnd={<UserMiniControl />}
+				topCenter={
+					<SeamlessDropdown
+						inline
+						label={
+							<DimensionSwitcher
+								dimensions={[
+									{ key: 'site', label: 'Site', options: [{ value: 'cz', label: 'CZ', active: true }] },
+									{
+										key: 'lang',
+										label: 'Language',
+										options: [
+											{ value: 'cz', label: 'CZ', active: true },
+											{ value: 'en', label: 'EN', active: true },
+											{ value: 'de', label: 'DE', active: false },
+										],
+									},
+								]}
+							/>
+						}
+					>
+						content
+					</SeamlessDropdown>
+				}
+				topEnd={
+					<SeamlessDropdown
+						caret
+						inline
+						label={
+							<UserMiniControl
+								avatarUrl="https://i.pravatar.cc/150?img=3"
+								name="Honza Sládek"
+								note="Superadministrator"
+							/>
+						}
+					>
+						content
+					</SeamlessDropdown>
+				}
 				sideBarStart="sideBarStart"
 				sideBarCenter="sideBarCenter"
 				sideBarEnd="sideBarEnd"

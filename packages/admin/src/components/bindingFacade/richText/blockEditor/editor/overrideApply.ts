@@ -12,7 +12,7 @@ import {
 import * as React from 'react'
 import { Node as SlateNode, Editor, Element, Operation } from 'slate'
 import { NormalizedBlock } from '../../../blocks'
-import { isContemberBlockElement } from '../elements'
+import { ContemberFieldElementPosition, isContemberBlockElement, isContemberFieldElement } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
@@ -51,7 +51,9 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		textElementCache,
 	} = options
 
-	const fieldBackedElementRefs = {
+	const fieldBackedElementRefs: {
+		[Key in ContemberFieldElementPosition]: React.MutableRefObject<NormalizedFieldBackedElement[]>
+	} = {
 		leading: normalizedLeadingFieldsRef,
 		trailing: normalizedTrailingFieldsRef,
 	}
@@ -63,6 +65,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (options.isMutatingRef.current) {
 			return
 		}
+		console.log('op', operation)
 		if (operation.path.length === 0) {
 			// Technically, the path could also be [], indicating that we're operating on the editor itself.
 			// This is branch is entirely speculative. I *THINK* it could feasibly happen but I don't know when or how.
@@ -77,7 +80,18 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 
 			// TODO also handle trailing
 			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
-			const getFreshFieldAccessor = (position: keyof typeof fieldBackedElementRefs, normalizedFieldIndex: number) =>
+			const isTrailingElement = (elementIndex: number) =>
+				elementIndex >= options.normalizedLeadingFieldsRef.current.length + sortedEntities.length
+			const isFieldBackedElement = (elementIndex: number) =>
+				isLeadingElement(elementIndex) || isTrailingElement(elementIndex)
+			const getNormalizedFieldBackedElement = (elementIndex: number) => {
+				const fieldBackedElement = editor.children[elementIndex]
+				if (!isContemberFieldElement(fieldBackedElement)) {
+					throw new BindingError(`Corrupted data`)
+				}
+				return fieldBackedElementRefs[fieldBackedElement.position].current[fieldBackedElement.index]
+			}
+			const getFreshFieldAccessor = (position: ContemberFieldElementPosition, normalizedFieldIndex: number) =>
 				getAccessor().getRelativeSingleField(fieldBackedElementRefs[position].current[normalizedFieldIndex].field)
 			const setFieldBackedElementValue = (
 				position: keyof typeof fieldBackedElementRefs,
@@ -99,8 +113,8 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				if (!Element.isElement(targetElement)) {
 					throw new BindingError(`Corrupted data`)
 				}
-				if (isLeadingElement(elementIndex)) {
-					const normalizedField = fieldBackedElementRefs.leading.current[elementIndex]
+				if (isLeadingElement(elementIndex) || isTrailingElement(elementIndex)) {
+					const normalizedField = getNormalizedFieldBackedElement(elementIndex)
 					const targetValue =
 						normalizedField.format === 'editorJSON' ? JSON.stringify(targetElement) : SlateNode.string(targetElement)
 					getAccessor()
@@ -119,7 +133,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				}
 			}
 			const removeElementAt = (elementIndex: number) => {
-				if (isLeadingElement(elementIndex)) {
+				if (isFieldBackedElement(elementIndex)) {
 					setFieldBackedElementValue('leading', elementIndex, '')
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
@@ -150,12 +164,12 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			if (path.length > 1) {
 				apply(operation)
 				saveElementAt(topLevelIndex)
-				return // We only care about top-level operations from here.
+				return // We only care about top-level operations hereinafter.
 			}
 
 			switch (operation.type) {
 				case 'set_node':
-					apply(operation)
+					apply(operation) // TODO for leading/trailing, if they're set to plaintext, do nothing here
 					saveElementAt(topLevelIndex)
 					break
 				case 'merge_node': {
@@ -209,7 +223,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					break
 				}
 				case 'remove_node': {
-					// TODO leading/trailing
 					apply(operation)
 					removeElementAt(topLevelIndex)
 					return

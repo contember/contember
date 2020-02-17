@@ -1,0 +1,26 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}editorCanvas
+	+box()
+	background: #FFFFFF
+	width: 100%
+	padding: 0
+
+	&::after
+		+size(100% 2em)
+		content: ''
+		display: block
+
+	&-canvas
+		min-height: 32em
+		padding: 2em
+
+		h1, h2, h3, h4
+			margin: 0
+		& > :first-child
+			margin-top: 0
+		& > :last-child
+			margin-bottom: 0
+
+		::selection
+			background-color: #BFE4FF

@@ -44,9 +44,9 @@ export const createEditor = (options: CreateEditorOptions) => {
 	editor.undo = () => batchUpdates(() => undo())
 
 	overrideIsVoid(editor)
-	overrideInsertNode(editor)
 
 	overrideApply(editor, options)
+	overrideInsertNode(editor, options)
 	overrideRenderElement(editor, options)
 
 	return editor

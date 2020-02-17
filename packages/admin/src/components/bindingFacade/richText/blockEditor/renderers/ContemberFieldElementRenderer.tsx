@@ -1,7 +1,7 @@
-import { CSSProperties } from 'react'
+import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
 import { Node as SlateNode } from 'slate'
-import { RenderElementProps, useEditor } from 'slate-react'
+import { RenderElementProps } from 'slate-react'
 import { ContemberFieldElement } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 
@@ -10,28 +10,16 @@ export interface ContemberFieldElementRendererProps extends RenderElementProps {
 	fieldBackedElement: NormalizedFieldBackedElement
 }
 
-const placeholderStyles: React.CSSProperties = {
-	opacity: 0.333,
-	width: '0',
-	whiteSpace: 'nowrap',
-	pointerEvents: 'none',
-	display: 'inline-block',
-	userSelect: 'none',
-}
-
 export const ContemberFieldElementRenderer = React.memo((props: ContemberFieldElementRendererProps) => {
 	const fieldString = SlateNode.string(props.element)
 	const shouldDisplayPlaceholder = fieldString === ''
 	return (
 		<div {...props.attributes}>
 			{props.fieldBackedElement.render({
+				isEmpty: shouldDisplayPlaceholder,
 				children: (
 					<>
-						{shouldDisplayPlaceholder && (
-							<span contentEditable={false} style={placeholderStyles}>
-								{props.fieldBackedElement.placeholder}
-							</span>
-						)}
+						{shouldDisplayPlaceholder && <EditorPlaceholder>{props.fieldBackedElement.placeholder}</EditorPlaceholder>}
 						{props.children}
 					</>
 				),

@@ -3,7 +3,7 @@ import * as React from 'react'
 
 export type FieldBackedElementEssentials = {
 	placeholder: React.ReactNode
-	render: (props: { children: React.ReactNode }) => React.ReactNode
+	render: (props: { isEmpty: boolean; children: React.ReactNode }) => React.ReactNode
 } & (
 	| {
 			format: 'editorJSON'

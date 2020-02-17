@@ -12,7 +12,7 @@ import {
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { Box } from '@contember/ui'
+import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
@@ -155,20 +155,23 @@ export const BlockEditorInner = React.memo(
 			trailingFieldBackedElements,
 		})
 
+		// TODO label?
 		return (
 			<ContemberElementRefreshContext.Provider value={renderCountRef.current++}>
 				<Slate editor={editor} value={nodes} onChange={noop}>
-					<Box heading={label} distinction="seamlessIfNested">
-						<Editable
-							renderElement={editor.renderElement}
-							renderLeaf={editor.renderLeaf}
-							onKeyDown={editor.onKeyDown}
-							onFocusCapture={editor.onFocus}
-							onBlurCapture={editor.onBlur}
-							onDOMBeforeInput={editor.onDOMBeforeInput}
-						/>
+					<EditorCanvas
+						underlyingComponent={Editable}
+						componentProps={{
+							renderElement: editor.renderElement,
+							renderLeaf: editor.renderLeaf,
+							onKeyDown: editor.onKeyDown,
+							onFocusCapture: editor.onFocus,
+							onBlurCapture: editor.onBlur,
+							onDOMBeforeInput: editor.onDOMBeforeInput,
+						}}
+					>
 						<HoveringToolbar blockButtons={blockButtons} />
-					</Box>
+					</EditorCanvas>
 				</Slate>
 			</ContemberElementRefreshContext.Provider>
 		)

@@ -12,7 +12,7 @@ import {
 	RootAccessor,
 } from '../accessors'
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
-import { ExpectedEntityCount, FieldName, RemovalType, Scalar } from '../treeParameters'
+import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => void
@@ -239,15 +239,17 @@ class AccessorTreeGenerator {
 							),
 						)
 					}
-					// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
-					// a new entity
+					let fieldValue: FieldValue
+					if (fieldData === undefined) {
+						// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
+						// a new entity
+						fieldValue = field.defaultValue === undefined ? null : field.defaultValue
+					} else {
+						fieldValue = fieldData instanceof FieldAccessor ? fieldData.currentValue : fieldData
+					}
 					entityData[placeholderName] = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 						placeholderName,
-						fieldData === undefined
-							? field.defaultValue || null
-							: fieldData instanceof FieldAccessor
-							? fieldData.currentValue
-							: fieldData,
+						fieldValue,
 						persistedValue,
 						fieldErrors,
 						onChange,

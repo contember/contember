@@ -2,6 +2,8 @@ import {
 	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
+	FieldAccessor,
+	RelativeEntityList,
 	RemovalType,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
@@ -10,15 +12,16 @@ import {
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { Box } from '@contember/ui'
+import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { RepeaterProps } from '../../collections'
 import { HoveringToolbar, HoveringToolbarProps } from '../toolbars'
-import { createEditor } from './createEditor'
-import { ContemberBlockElementRefreshContext } from './renderers'
+import { createEditor } from './editor'
+import { NormalizedFieldBackedElement } from './FieldBackedElement'
+import { ContemberElementRefreshContext } from './renderers'
 import { useSlateNodes } from './useSlateNodes'
 
 export interface BlockEditorInnerPublicProps {
@@ -38,7 +41,11 @@ export interface BlockEditorInnerPublicProps {
 }
 
 export interface BlockEditorInnerInternalProps {
-	entityList: EntityListAccessor
+	leadingFieldBackedElements: NormalizedFieldBackedElement[]
+	trailingFieldBackedElements: NormalizedFieldBackedElement[]
+	batchUpdates: EntityAccessor['batchUpdates']
+	desugaredEntityList: RelativeEntityList
+	entityListAccessor: EntityListAccessor
 }
 
 export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInnerInternalProps
@@ -46,7 +53,9 @@ export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInn
 const noop = () => {}
 export const BlockEditorInner = React.memo(
 	({
-		entityList,
+		batchUpdates,
+		desugaredEntityList,
+		entityListAccessor,
 		children,
 		discriminationField,
 		sortableBy,
@@ -56,6 +65,8 @@ export const BlockEditorInner = React.memo(
 		textBlockDiscriminatedByScalar,
 		textBlockField,
 		blockButtons,
+		leadingFieldBackedElements,
+		trailingFieldBackedElements,
 	}: BlockEditorInnerProps) => {
 		const renderCountRef = React.useRef(0)
 
@@ -66,7 +77,7 @@ export const BlockEditorInner = React.memo(
 		const desugaredTextBlockField = useDesugaredRelativeSingleField(textBlockField)
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 
-		const { entities, moveEntity, appendNew } = useSortedEntities(entityList, sortableBy)
+		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
 
 		const textBlockDiscriminant = React.useMemo(() => {
 			if (textBlockDiscriminatedBy !== undefined) {
@@ -81,25 +92,35 @@ export const BlockEditorInner = React.memo(
 			)
 		}, [environment, textBlockDiscriminatedBy, textBlockDiscriminatedByScalar])
 		const normalizedBlocks = useNormalizedBlocks(children)
+		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor, Element>())
 		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
 		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
 
-		const entityListRef = React.useRef(entityList)
+		const entityListAccessorRef = React.useRef(entityListAccessor)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedEntitiesRef = React.useRef(entities)
 		const normalizedBlocksRef = React.useRef(normalizedBlocks)
+		const normalizedLeadingFieldsRef = React.useRef(leadingFieldBackedElements)
+		const normalizedTrailingFieldsRef = React.useRef(trailingFieldBackedElements)
 
-		entityListRef.current = entityList
+		entityListAccessorRef.current = entityListAccessor
 		isMutatingRef.current = isMutating
 		sortedEntitiesRef.current = entities
+		normalizedLeadingFieldsRef.current = leadingFieldBackedElements
+		normalizedTrailingFieldsRef.current = trailingFieldBackedElements
 
 		const editor = React.useMemo(
 			() =>
 				createEditor({
-					entityListRef,
+					batchUpdates,
+					desugaredEntityList,
+					entityListAccessorRef,
+					fieldElementCache: contemberFieldElementCache,
 					isMutatingRef,
 					sortedEntitiesRef,
 					normalizedBlocksRef,
+					normalizedLeadingFieldsRef,
+					normalizedTrailingFieldsRef,
 					textBlockDiscriminant,
 					discriminationField: desugaredDiscriminationField,
 					sortableByField: desugaredSortableByField,
@@ -108,7 +129,10 @@ export const BlockEditorInner = React.memo(
 					removalType,
 				}),
 			[
-				// These are here just so that the linter is happy. In practice, they shouldn't change.
+				// These are here just so that the linter is happy. In practice, they shouldn't change. Ever.
+				batchUpdates,
+				contemberFieldElementCache,
+				desugaredEntityList,
 				desugaredDiscriminationField,
 				desugaredSortableByField,
 				desugaredTextBlockField,
@@ -121,28 +145,35 @@ export const BlockEditorInner = React.memo(
 		const nodes = useSlateNodes({
 			discriminationField: desugaredDiscriminationField,
 			textElementCache,
+			contemberFieldElementCache,
 			contemberBlockElementCache,
 			textBlockField: desugaredTextBlockField,
 			blocks: normalizedBlocks,
 			textBlockDiscriminant,
 			entities,
+			leadingFieldBackedElements,
+			trailingFieldBackedElements,
 		})
 
+		// TODO label?
 		return (
-			<ContemberBlockElementRefreshContext.Provider value={renderCountRef.current++}>
+			<ContemberElementRefreshContext.Provider value={renderCountRef.current++}>
 				<Slate editor={editor} value={nodes} onChange={noop}>
-					<Box heading={label} distinction="seamlessIfNested">
-						<Editable
-							renderElement={editor.renderElement}
-							renderLeaf={editor.renderLeaf}
-							onKeyDown={editor.onKeyDown}
-							onFocusCapture={editor.onFocus}
-							onBlurCapture={editor.onBlur}
-						/>
+					<EditorCanvas
+						underlyingComponent={Editable}
+						componentProps={{
+							renderElement: editor.renderElement,
+							renderLeaf: editor.renderLeaf,
+							onKeyDown: editor.onKeyDown,
+							onFocusCapture: editor.onFocus,
+							onBlurCapture: editor.onBlur,
+							onDOMBeforeInput: editor.onDOMBeforeInput,
+						}}
+					>
 						<HoveringToolbar blockButtons={blockButtons} />
-					</Box>
+					</EditorCanvas>
 				</Slate>
-			</ContemberBlockElementRefreshContext.Provider>
+			</ContemberElementRefreshContext.Provider>
 		)
 	},
 )

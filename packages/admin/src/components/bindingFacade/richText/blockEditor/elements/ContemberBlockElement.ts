@@ -1,4 +1,4 @@
-import { EntityAccessor, FieldValue } from '@contember/binding'
+import { FieldValue } from '@contember/binding'
 import { Element, Node } from 'slate'
 
 type ContemberBlockElementType = '__contember_block__'

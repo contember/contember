@@ -2,9 +2,16 @@ import { EntityAccessor, RelativeSingleField, RemovalType } from '@contember/bin
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
-import { isContemberBlockElement } from '../ContemberBlockElement'
+import {
+	ContemberFieldElement,
+	isContemberBlockElement,
+	isContemberContentPlaceholder,
+	isContemberFieldElement,
+} from '../elements'
+import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { ContemberBlockElementRenderer } from './ContemberBlockElementRenderer'
-import { ContemberBlockElementRefreshContext } from './ContemberBlockElementRefreshContext'
+import { ContemberElementRefreshContext } from './ContemberElementRefreshContext'
+import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
 	normalizedBlocks: NormalizedBlock[]
@@ -12,13 +19,14 @@ export interface BlockEditorElementRendererProps extends RenderElementProps {
 	removalType: RemovalType
 	fallbackRenderer: (props: RenderElementProps) => React.ReactElement
 	getEntityByKey: (key: string) => EntityAccessor
+	getNormalizedFieldBackedElement: (element: ContemberFieldElement) => NormalizedFieldBackedElement
 }
 
 export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: BlockEditorElementRendererProps) => {
 	if (isContemberBlockElement(props.element)) {
 		const element = props.element
 		return (
-			<ContemberBlockElementRefreshContext.Consumer>
+			<ContemberElementRefreshContext.Consumer>
 				{() => (
 					<ContemberBlockElementRenderer
 						attributes={props.attributes}
@@ -30,7 +38,29 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 						discriminationField={props.discriminationField}
 					/>
 				)}
-			</ContemberBlockElementRefreshContext.Consumer>
+			</ContemberElementRefreshContext.Consumer>
+		)
+	}
+	if (isContemberFieldElement(props.element)) {
+		const element = props.element
+		return (
+			<ContemberElementRefreshContext.Consumer>
+				{() => (
+					<ContemberFieldElementRenderer
+						attributes={props.attributes}
+						children={props.children}
+						element={element}
+						fieldBackedElement={props.getNormalizedFieldBackedElement(element)}
+					/>
+				)}
+			</ContemberElementRefreshContext.Consumer>
+		)
+	}
+	if (isContemberContentPlaceholder(props.element)) {
+		return (
+			<div {...props.attributes}>
+				<p>{props.children}</p>
+			</div>
 		)
 	}
 	return fallbackRenderer(props)

@@ -23,7 +23,8 @@ export const addNewEntityAtIndex = (
 		const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
 
 		if (sortableField.updateValue) {
-			sortableField.updateValue(index)
+			// Deliberately using `newIndex`, and not `index`. See the moveEntity call below
+			sortableField.updateValue(newIndex)
 		} else {
 			return throwNonWritableError(sortableField.fieldName)
 		}

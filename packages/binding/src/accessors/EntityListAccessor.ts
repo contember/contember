@@ -10,7 +10,7 @@ export class EntityListAccessor extends Accessor implements Errorable {
 	public constructor(
 		public readonly entities: Array<EntityAccessor | EntityForRemovalAccessor | undefined>, // Undefined is a "hole" after an non-persisted entity
 		public readonly errors: ErrorAccessor[],
-		public readonly batchUpdates?: (performUpdates: (getAccessor: () => EntityListAccessor) => void) => void,
+		public readonly batchUpdates: (performUpdates: (getAccessor: () => EntityListAccessor) => void) => void,
 		public readonly addNew?: (
 			newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newIndex: number) => void),
 		) => void,
@@ -31,7 +31,8 @@ export class EntityListAccessor extends Accessor implements Errorable {
 		return this._filteredEntities
 	}
 
-	public findByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
+	public getByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
+		// TODO we can quite easily introduce something like `entitiesByKey` and avoid this linear search.
 		return this.entities.find(e => e !== undefined && e.getKey() === key)
 	}
 }

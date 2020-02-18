@@ -2,7 +2,7 @@ import { Button, Icon } from '@contember/ui'
 import * as React from 'react'
 import { useEditor } from 'slate-react'
 import { useForceRender } from '../../../../utils'
-import { RichTextBooleanMarkNames } from '../plugins/basicFormatting'
+import { RichTextBooleanMarkNames } from '../plugins'
 import { HoveringToolbarEditor } from './HoveringToolbarEditor'
 
 export interface InlineHoveringToolbarContentsProps {}
@@ -66,23 +66,45 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor],
 	)
 
+	const isCode = editor.isCode(editor)
+	const toggleCode = React.useCallback(
+		(e: React.MouseEvent) => {
+			toggleMark(editor, 'isCode', e)
+			forceRender()
+		},
+		[editor, forceRender],
+	)
+
 	return (
 		<>
-			<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
-				<Icon blueprintIcon="bold" />
-			</Button>
-			<Button key="italic" isActive={isItalic} onMouseDown={toggleItalic}>
-				<Icon blueprintIcon="italic" />
-			</Button>
-			<Button key="underlined" isActive={isUnderlined} onMouseDown={toggleUnderlined}>
-				<Icon blueprintIcon="underline" />
-			</Button>
-			<Button key="strikethrough" isActive={isStruckThrough} onMouseDown={toggleStruckThrough}>
-				<Icon blueprintIcon="strikethrough" />
-			</Button>
+			{editor.canSetBold(editor) && (
+				<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
+					<Icon blueprintIcon="bold" />
+				</Button>
+			)}
+			{editor.canSetItalic(editor) && (
+				<Button key="italic" isActive={isItalic} onMouseDown={toggleItalic}>
+					<Icon blueprintIcon="italic" />
+				</Button>
+			)}
+			{editor.canSetUnderlined(editor) && (
+				<Button key="underlined" isActive={isUnderlined} onMouseDown={toggleUnderlined}>
+					<Icon blueprintIcon="underline" />
+				</Button>
+			)}
+			{editor.canSetStruckThrough(editor) && (
+				<Button key="strikethrough" isActive={isStruckThrough} onMouseDown={toggleStruckThrough}>
+					<Icon blueprintIcon="strikethrough" />
+				</Button>
+			)}
 			<Button key="link" isActive={isAnchor} onMouseDown={toggleAnchor}>
 				<Icon blueprintIcon="link" />
 			</Button>
+			{editor.canSetCode(editor) && (
+				<Button key="code" isActive={isCode} onMouseDown={toggleCode}>
+					<Icon blueprintIcon="code" />
+				</Button>
+			)}
 		</>
 	)
 })

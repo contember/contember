@@ -21,7 +21,7 @@ export const getAggregateFileMetadataFieldsPopulator = (
 				const image = new Image()
 				image.addEventListener('load', () => {
 					resolve(parentEntity => {
-						parentEntity.batchUpdates?.(getAccessor => {
+						parentEntity.batchUpdates(getAccessor => {
 							populateImageFileMetadataFields(getAccessor(), image, props)
 							populateGenericFileMetadataFields(getAccessor(), file, props)
 						})
@@ -39,7 +39,7 @@ export const getAggregateFileMetadataFieldsPopulator = (
 				const video = document.createElement('video')
 				video.addEventListener('canplay', () => {
 					resolve(parentEntity => {
-						parentEntity.batchUpdates?.(getAccessor => {
+						parentEntity.batchUpdates(getAccessor => {
 							populateVideoFileMetadataFields(getAccessor(), video, props)
 							populateGenericFileMetadataFields(getAccessor(), file, props)
 						})
@@ -56,7 +56,7 @@ export const getAggregateFileMetadataFieldsPopulator = (
 			const audio = document.createElement('audio')
 			audio.addEventListener('canplay', () => {
 				resolve(parentEntity => {
-					parentEntity.batchUpdates?.(getAccessor => {
+					parentEntity.batchUpdates(getAccessor => {
 						populateAudioFileMetadataFields(getAccessor(), audio, props)
 						populateGenericFileMetadataFields(getAccessor(), file, props)
 					})

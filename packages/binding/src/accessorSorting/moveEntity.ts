@@ -15,9 +15,6 @@ export const moveEntity = (
 		oldIndex,
 		newIndex,
 	)
-	if (!entityList.batchUpdates) {
-		return throwNonWritableError(entityList)
-	}
 	entityList.batchUpdates((getAccessor: () => EntityListAccessor) => {
 		let listAccessor: EntityListAccessor = getAccessor()
 		for (const entity of listAccessor.entities) {
@@ -59,9 +56,9 @@ const computeEntityOrder = (
 
 		if (i === oldIndex) {
 			targetValue = newIndex
-		} else if (oldIndex < newIndex && i > oldIndex && i <= newIndex) {
+		} else if (newIndex > oldIndex && oldIndex < i && i <= newIndex) {
 			targetValue = i - 1
-		} else if (oldIndex > newIndex && i >= newIndex && i < oldIndex) {
+		} else if (newIndex < oldIndex && newIndex <= i && i < oldIndex) {
 			targetValue = i + 1
 		} else {
 			targetValue = i

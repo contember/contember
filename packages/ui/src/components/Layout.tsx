@@ -1,5 +1,5 @@
-import cn from 'classnames'
 import * as React from 'react'
+import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
 import { Trio } from './Trio'
 
@@ -60,19 +60,37 @@ export const Layout = ({
 	)
 
 	return (
-		<div className={`${prefix}layout`}>
-			<div className={`${prefix}layout-topBar`}>
-				{top}
-				{(topStart || topCenter || topEnd) && (
-					<>
-						<div className={`${prefix}layout-topBar-start`}>{spaced(topStart)}</div>
-						<div className={`${prefix}layout-topBar-center`}>{spaced(topCenter)}</div>
-						<div className={`${prefix}layout-topBar-end`}>{spaced(topEnd)}</div>
-					</>
+		<div className={cn(`${prefix}layout`, collapsed && 'view-collapsed')}>
+			<div className={`${prefix}layout-top`}>
+				<div className={`${prefix}layout-topBar`}>
+					{top}
+					{(topStart || topCenter || topEnd) && (
+						<>
+							<div className={`${prefix}layout-topBar-start`}>{spaced(topStart)}</div>
+							<div className={`${prefix}layout-topBar-center`}>{spaced(topCenter)}</div>
+							<div className={`${prefix}layout-topBar-end`}>{spaced(topEnd)}</div>
+						</>
+					)}
+				</div>
+				{(actions || actionsStart || actionsCenter || actionsEnd) && (
+					<div className={`${prefix}layout-actionBar`}>
+						<div className={`${prefix}layout-actionBar-sideBar`}></div>
+						<div className={`${prefix}layout-actionBar-main`}>
+							<div className={`${prefix}layout-actionBar-main-in`}>
+								{actions}
+								<Trio
+									clickThroughSpace
+									start={spaced(actionsStart)}
+									center={spaced(actionsCenter)}
+									end={spaced(actionsEnd)}
+								/>
+							</div>
+						</div>
+					</div>
 				)}
 			</div>
 			<div className={`${prefix}layout-bottom`}>
-				<div className={cn(`${prefix}layout-sideBar`, collapsed && 'view-collapsed')}>
+				<div className={`${prefix}layout-sideBar`}>
 					<button type="button" className={`${prefix}layout-sideBar-collapseButton`} onClick={toggleCollapsed}>
 						<span className={`${prefix}layout-sideBar-collapseButton-label`}>Close</span>
 					</button>
@@ -84,14 +102,6 @@ export const Layout = ({
 					</div>
 				</div>
 				<div className={`${prefix}layout-main`}>
-					{(actions || actionsStart || actionsCenter || actionsEnd) && (
-						<div className={`${prefix}layout-mainActions-wrap`}>
-							<div className={`${prefix}layout-mainActions`}>
-								{actions}
-								<Trio start={spaced(actionsStart)} center={spaced(actionsCenter)} end={spaced(actionsEnd)} />
-							</div>
-						</div>
-					)}
 					{main}
 					<Trio
 						start={spaced(

@@ -5,7 +5,6 @@ $saveControl-color-alt: #FFFFFF
 
 .#{$cui-conf-globalPrefix}saveControl
 	position: relative
-	width: 16em
 
 	&-window-in
 		padding: 1em 1.5em
@@ -49,9 +48,10 @@ $saveControl-color-alt: #FFFFFF
 
 	&-window
 		position: absolute
+		z-index: 100
 		top: 0
 		left: 0
-		right: 0
+		width: 16em
 		background: $saveControl-color
 		color: $saveControl-color-alt
 		display: none

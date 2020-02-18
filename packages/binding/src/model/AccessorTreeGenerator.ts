@@ -435,7 +435,13 @@ class AccessorTreeGenerator {
 		}
 
 		for (let i = 0, len = sourceData.length; i < len; i++) {
-			listAccessor.entities.push(generateNewAccessor(sourceData[i], i))
+			// If fieldData is an accessor, we've already submitted. In that case, an undefined in the entities array
+			// signifies a "hole" after a previously removed entity. We don't want to create a new accessor for it.
+			listAccessor.entities.push(
+				fieldData instanceof EntityListAccessor && sourceData[i] === undefined
+					? undefined
+					: generateNewAccessor(sourceData[i], i),
+			)
 			childBatchUpdateDepths.push(0)
 		}
 

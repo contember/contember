@@ -156,18 +156,19 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				}
 			}
 			const addNewDiscriminatedEntityAt = (elementIndex: number, blockDiscriminant: FieldValue): EntityAccessor => {
+				const normalizedElementIndex = Math.max(
+					firstContentIndex,
+					Math.min(elementIndex - firstContentIndex, sortedEntities.length + firstContentIndex),
+				)
+				const sortedEntityIndex = normalizedElementIndex - firstContentIndex
 				addNewEntityAtIndex(
 					getAccessor().getRelativeEntityList(desugaredEntityList),
 					sortableByField,
-					elementIndex - firstContentIndex,
+					sortedEntityIndex,
 					(getInnerAccessor, newEntityIndex) => {
 						const newEntity = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
 						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
-						sortedEntities.splice(
-							elementIndex - firstContentIndex,
-							0,
-							getInnerAccessor().entities[newEntityIndex] as EntityAccessor,
-						)
+						sortedEntities.splice(sortedEntityIndex, 0, getInnerAccessor().entities[newEntityIndex] as EntityAccessor)
 					},
 				)
 				return sortedEntities[elementIndex - firstContentIndex]

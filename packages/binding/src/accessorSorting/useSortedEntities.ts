@@ -5,6 +5,7 @@ import { SugaredRelativeSingleField } from '../treeParameters'
 import { addNewEntityAtIndex } from './addNewEntityAtIndex'
 import { throwNonWritableError, throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
+import { repairEntitiesOrder } from './repairEntitiesOrder'
 import { sortEntities } from './sortEntities'
 
 export interface SortedEntities {
@@ -68,18 +69,7 @@ export const useSortedEntities = (
 		if (!desugaredSortableByField) {
 			return
 		}
-		entityList.batchUpdates(getAccessor => {
-			let listAccessor: EntityListAccessor = getAccessor()
-			for (let i = 0, len = sortedEntities.length; i < len; i++) {
-				const entity = sortedEntities[i]
-				const orderField = entity.getRelativeSingleField(desugaredSortableByField)
-
-				if (orderField.currentValue === null && orderField.updateValue) {
-					orderField.updateValue(i)
-					listAccessor = getAccessor()
-				}
-			}
-		})
+		repairEntitiesOrder(desugaredSortableByField, entityList, sortedEntities)
 	}, [desugaredSortableByField, entityList, sortedEntities])
 
 	return React.useMemo<SortedEntities>(

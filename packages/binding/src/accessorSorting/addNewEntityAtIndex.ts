@@ -1,7 +1,8 @@
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { RelativeSingleField } from '../treeParameters'
 import { throwNonWritableError } from './errors'
-import { moveEntity } from './moveEntity'
+import { repairEntitiesOrder } from './repairEntitiesOrder'
+import { sortEntities } from './sortEntities'
 
 export const addNewEntityAtIndex = (
 	entityList: EntityListAccessor,
@@ -12,9 +13,9 @@ export const addNewEntityAtIndex = (
 	if (!entityList.addNew) {
 		return throwNonWritableError(entityList)
 	}
+	const sortedEntities = sortEntities(entityList.getFilteredEntities(), sortableByField)
 	entityList.addNew((getListAccessor, newIndex) => {
-		let accessor = getListAccessor()
-		let newlyAdded = accessor.entities[newIndex]
+		let newlyAdded = getListAccessor().entities[newIndex]
 
 		if (!(newlyAdded instanceof EntityAccessor)) {
 			return
@@ -23,20 +24,18 @@ export const addNewEntityAtIndex = (
 		const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
 
 		if (sortableField.updateValue) {
-			// Deliberately using `newIndex`, and not `index`. See the moveEntity call below
-			sortableField.updateValue(newIndex)
+			sortableField.updateValue(index)
+			newlyAdded = getListAccessor().entities[newIndex]
+
+			if (!(newlyAdded instanceof EntityAccessor)) {
+				return
+			}
+
+			sortedEntities.splice(index, 0, newlyAdded)
+			repairEntitiesOrder(sortableByField, getListAccessor(), sortedEntities)
 		} else {
 			return throwNonWritableError(sortableField.fieldName)
 		}
-
-		accessor = getListAccessor()
-		newlyAdded = accessor.entities[newIndex]
-
-		if (!(newlyAdded instanceof EntityAccessor)) {
-			return
-		}
-
-		moveEntity(accessor, sortableByField, newIndex, index)
 
 		preprocess && preprocess(getListAccessor, newIndex)
 	})

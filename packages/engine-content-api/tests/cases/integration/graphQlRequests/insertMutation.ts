@@ -1,5 +1,5 @@
 import { Model, Validation } from '@contember/schema'
-import { execute, sqlTransaction } from '../../../src/test'
+import { execute, failedTransaction, sqlTransaction } from '../../../src/test'
 import { GQL, SQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { SchemaBuilder, InputValidation as v } from '@contember/schema-definition'
@@ -22,9 +22,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."author" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."author" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -89,9 +89,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."author" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."author" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						where "root_"."name" in (?, ?)
@@ -143,9 +143,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "url") 
-						insert into "public"."site_setting" ("id", "url") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "url")
+						insert into "public"."site_setting" ("id", "url")
 						select "root_"."id", "root_"."url"
             from "root_"
 						returning "id"`,
@@ -153,9 +153,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(2) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id") 
-						insert into "public"."site" ("id", "name", "setting_id") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id")
+						insert into "public"."site" ("id", "name", "setting_id")
 						select "root_"."id", "root_"."name", "root_"."setting_id"
             from "root_"
 						returning "id"`,
@@ -206,9 +206,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "url") 
-						insert into "public"."site_setting" ("id", "url") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "url")
+						insert into "public"."site_setting" ("id", "url")
 						select "root_"."id", "root_"."url"
             from "root_"
 						returning "id"`,
@@ -216,9 +216,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(1) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id") 
-						insert into "public"."site" ("id", "name", "setting_id") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id")
+						insert into "public"."site" ("id", "name", "setting_id")
 						select "root_"."id", "root_"."name", "root_"."setting_id"
             from "root_"
 						returning "id"`,
@@ -271,9 +271,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."author" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."author" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -281,9 +281,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(2) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: timestamp as "published_at", ? :: uuid as "author_id") 
-						insert into "public"."post" ("id", "published_at", "author_id") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: timestamp as "published_at", ? :: uuid as "author_id")
+						insert into "public"."post" ("id", "published_at", "author_id")
 						select "root_"."id", "root_"."published_at", "root_"."author_id"
             from "root_"
 						returning "id"`,
@@ -346,9 +346,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: timestamp as "published_at") 
-						insert into "public"."post" ("id", "published_at") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: timestamp as "published_at")
+						insert into "public"."post" ("id", "published_at")
 						select "root_"."id", "root_"."published_at"
             from "root_"
 						returning "id"`,
@@ -356,9 +356,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(1) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title") 
-						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title")
+						insert into "public"."post_locale" ("post_id", "id", "locale", "title")
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"
 						returning "id"`,
@@ -366,9 +366,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(2) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title") 
-						insert into "public"."post_locale" ("post_id", "id", "locale", "title") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title")
+						insert into "public"."post_locale" ("post_id", "id", "locale", "title")
 						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
             from "root_"
 						returning "id"`,
@@ -418,9 +418,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."post" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."post" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -428,9 +428,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(1) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."category" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."category" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -438,9 +438,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(2) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."category" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."category" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -506,9 +506,9 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."category" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."category" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -516,9 +516,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(1) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."post" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."post" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -526,9 +526,9 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(2) }] },
 					},
 					{
-						sql: SQL`with "root_" as 
-						(select ? :: uuid as "id", ? :: text as "name") 
-						insert into "public"."post" ("id", "name") 
+						sql: SQL`with "root_" as
+						(select ? :: uuid as "id", ? :: text as "name")
+						insert into "public"."post" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
@@ -569,6 +569,116 @@ describe('Insert mutation', () => {
 					},
 				},
 			},
+		})
+	})
+
+	describe('acl', () => {
+		it('update name', async () => {
+			await execute({
+				schema: new SchemaBuilder()
+					.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					.buildSchema(),
+				query: GQL`mutation {
+					createAuthor(
+						data: {name: "John"}
+					) {
+						ok
+					}
+				}`,
+				permissions: {
+					Author: {
+						predicates: {
+							name_predicate: { name: 'name_variable' },
+						},
+						operations: {
+							create: {
+								id: true,
+								name: 'name_predicate',
+							},
+							read: {
+								id: true,
+							},
+						},
+					},
+				},
+				variables: {
+					name_variable: ['John', 'Jack'],
+				},
+				executes: [
+					...sqlTransaction([
+						{
+							sql: SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "name")
+insert into "public"."author" ("id", "name")
+select "root_"."id", "root_"."name" from "root_" where "root_"."name" in (?, ?) returning "id"`,
+							parameters: [testUuid(1), 'John', 'John', 'Jack'],
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+					]),
+				],
+				return: {
+					data: {
+						createAuthor: {
+							ok: true,
+						},
+					},
+				},
+			})
+		})
+
+		it('update name - denied', async () => {
+			await execute({
+				schema: new SchemaBuilder()
+					.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					.buildSchema(),
+				query: GQL`mutation {
+        createAuthor(
+            data: {name: "Joe"}
+          ) {
+          ok
+          errors {
+            type
+          }
+        }
+      }`,
+				permissions: {
+					Author: {
+						predicates: {
+							name_predicate: { name: 'name_variable' },
+						},
+						operations: {
+							create: {
+								id: true,
+								name: 'name_predicate',
+							},
+							read: {
+								id: true,
+							},
+						},
+					},
+				},
+				variables: {
+					name_variable: ['John', 'Jack'],
+				},
+				executes: [
+					...failedTransaction([
+						{
+							sql: SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "name")
+insert into "public"."author" ("id", "name")
+select "root_"."id", "root_"."name" from "root_" where "root_"."name" in (?, ?) returning "id"`,
+							parameters: [testUuid(1), 'Joe', 'John', 'Jack'],
+							response: { rows: [] },
+						},
+					]),
+				],
+				return: {
+					data: {
+						createAuthor: {
+							ok: false,
+							errors: [{ type: 'NotFoundOrDenied' }],
+						},
+					},
+				},
+			})
 		})
 	})
 
@@ -680,7 +790,7 @@ describe('Insert mutation', () => {
 			executes: [
 				...sqlTransaction([
 					{
-						sql: `with "root_" as (select ? :: uuid as "id", ? :: text as "name") 
+						sql: `with "root_" as (select ? :: uuid as "id", ? :: text as "name")
 						insert into  "public"."book" ("id", "name") select "root_"."id", "root_"."name" from  "root_"   returning "id"`,
 						parameters: [testUuid(1), 'John'],
 						response: {
@@ -688,7 +798,7 @@ describe('Insert mutation', () => {
 						},
 					},
 					{
-						sql: `with "root_" as (select ? :: uuid as "book_id", ? :: uuid as "id", ? :: text as "label") 
+						sql: `with "root_" as (select ? :: uuid as "book_id", ? :: uuid as "id", ? :: text as "label")
 						insert into  "public"."tag" ("book_id", "id", "label") select "root_"."book_id", "root_"."id", "root_"."label" from  "root_"   returning "id"`,
 						parameters: [testUuid(1), testUuid(2), 'abcd'],
 						response: {
@@ -696,7 +806,7 @@ describe('Insert mutation', () => {
 						},
 					},
 					{
-						sql: `with "root_" as (select ? :: uuid as "book_id", ? :: uuid as "id", ? :: text as "label") 
+						sql: `with "root_" as (select ? :: uuid as "book_id", ? :: uuid as "id", ? :: text as "label")
 						insert into  "public"."tag" ("book_id", "id", "label") select "root_"."book_id", "root_"."id", "root_"."label" from  "root_"   returning "id"`,
 						parameters: [testUuid(1), testUuid(3), 'xyz'],
 						response: {

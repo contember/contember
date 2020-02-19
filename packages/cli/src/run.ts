@@ -13,6 +13,7 @@ import {
 	InstanceStartCommand,
 	InstanceStopCommand,
 	InstanceValidateConfigCommand,
+	InviteCommand,
 	ProjectCreateCommand,
 	ProjectRegisterCommand,
 	ProjectValidateCommand,
@@ -46,6 +47,7 @@ import { Application } from './cli'
 		['tenant:setup']: () => new SetupCommand(),
 		['tenant:sign-in']: () => new SignInCommand(),
 		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
+		['tenant:invite']: () => new InviteCommand(),
 		['diff']: diffCommandFactory,
 	})
 

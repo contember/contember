@@ -75,9 +75,10 @@ class ApiKeyManager {
 	async createProjectPermanentApiKey(
 		projectId: string,
 		memberships: readonly Membership[],
+		description: string,
 	): Promise<ApiKeyManager.CreateApiKeyResponse> {
 		return await this.commandBus.transaction(async bus => {
-			const identityId = await bus.execute(new CreateIdentityCommand([]))
+			const identityId = await bus.execute(new CreateIdentityCommand([], description))
 			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
 
 			const addMemberResult = await bus.execute(new AddProjectMemberCommand(projectId, identityId, memberships))

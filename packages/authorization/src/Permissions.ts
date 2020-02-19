@@ -1,7 +1,9 @@
+import Authorizator from './Authorizator'
+
 class Permissions {
 	private permissions: Permissions.PermissionsMap = {}
 
-	public allow(role: string, resource: string | typeof Permissions.ALL, privilege: string | typeof Permissions.ALL) {
+	public allow(role: string, { resource, privilege }: Authorizator.Action) {
 		if (!this.permissions[role]) {
 			this.permissions[role] = {}
 		}

@@ -13,15 +13,15 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createApiKey(
 		parent: any,
-		{ projectSlug, memberships }: MutationCreateApiKeyArgs,
+		{ projectSlug, memberships, description }: MutationCreateApiKeyArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
 		await context.requireAccess({
 			scope: new ProjectScope(project),
-			action: PermissionActions.PROJECT_ADD_MEMBER,
-			message: 'You are not allowed to add a project member',
+			action: PermissionActions.API_KEY_CREATE,
+			message: 'You are not allowed to create an API key for this project',
 		})
 		if (!project) {
 			return {
@@ -30,7 +30,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships)
+		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships, description)
 
 		if (!result.ok) {
 			return {

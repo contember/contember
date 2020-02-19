@@ -11,7 +11,7 @@ export const installTemplate = async (
 	variables: Record<string, string> = {},
 ) => {
 	if (await pathExists(targetDir)) {
-		throw new Error(`${targetDir} already exists`)
+		throw `${targetDir} already exists`
 	}
 	if (template.startsWith('/')) {
 		const nodeModulesDir = join(template, 'node_modules')
@@ -27,7 +27,7 @@ export const installTemplate = async (
 	const templateConfigFile = join(targetDir, 'contember.template.yaml')
 	if (!(await pathExists(templateConfigFile))) {
 		await remove(targetDir)
-		throw new Error(`${template} is not a Contember template`)
+		throw `${template} is not a Contember template`
 	}
 	const config = (await readYaml(templateConfigFile)) as {
 		type?: string
@@ -38,7 +38,7 @@ export const installTemplate = async (
 	}
 	if (!config.type || config.type !== requiredTemplateType) {
 		await remove(targetDir)
-		throw new Error(`${template} is not a ${requiredTemplateType} template`)
+		throw `${template} is not a ${requiredTemplateType} template`
 	}
 	await tryUnlink(templateConfigFile)
 

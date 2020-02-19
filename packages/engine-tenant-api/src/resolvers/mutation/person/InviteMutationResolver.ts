@@ -14,7 +14,7 @@ export class InviteMutationResolver implements MutationResolvers {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
 		await context.requireAccess({
 			scope: new ProjectScope(project),
-			action: PermissionActions.PROJECT_ADD_MEMBER,
+			action: PermissionActions.PERSON_INVITE,
 			message: 'You are not allowed to invite a person',
 		})
 		if (!project) {
@@ -24,7 +24,7 @@ export class InviteMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.inviteManager.invite(email, project.id, memberships)
+		const result = await this.inviteManager.invite(email, project, memberships)
 
 		if (!result.ok) {
 			return {
@@ -44,16 +44,10 @@ export class InviteMutationResolver implements MutationResolvers {
 		return {
 			ok: true,
 			errors: [],
-			result: result.generatedPassword
-				? {
-						__typename: 'InviteNewResult',
-						generatedPassword: result.generatedPassword,
-						person: person,
-				  }
-				: {
-						__typename: 'InviteExistingResult',
-						person: person,
-				  },
+			result: {
+				person,
+				isNew: result.isNew,
+			},
 		}
 	}
 }

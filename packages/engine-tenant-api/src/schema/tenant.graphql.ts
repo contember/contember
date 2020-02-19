@@ -36,7 +36,7 @@ const schema: DocumentNode = gql`
 			memberships: [MembershipInput!]!
 		): UpdateProjectMemberResponse
 
-		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!): CreateApiKeyResponse
+		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 	}
 
@@ -167,15 +167,9 @@ const schema: DocumentNode = gql`
 		ALREADY_MEMBER
 	}
 
-	union InviteResult = InviteExistingResult | InviteNewResult
-
-	type InviteExistingResult {
+	type InviteResult {
 		person: Person!
-	}
-
-	type InviteNewResult {
-		generatedPassword: String!
-		person: Person!
+		isNew: Boolean!
 	}
 
 	# === addProjectMember ===

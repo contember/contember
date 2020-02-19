@@ -1,6 +1,14 @@
 import 'jasmine'
 import { makeExecutableSchema } from 'graphql-tools'
-import { PermissionContext, ResolverContext, TenantContainer, typeDefs } from '../../../src'
+import {
+	Mailer,
+	PermissionContext,
+	ResolverContext,
+	SentInfo,
+	TenantContainer,
+	typeDefs,
+	MailMessage,
+} from '../../../src'
 import { executeGraphQlTest } from '../../src/testGraphql'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
@@ -12,6 +20,7 @@ export interface Test {
 	query: string
 	executes: ExpectedQuery[]
 	return: object
+	sentMails?: { subject: string }[]
 }
 
 export const createUuidGenerator = () => {
@@ -21,6 +30,7 @@ export const createUuidGenerator = () => {
 
 const now = new Date('2019-09-04 12:00')
 export const execute = async (test: Test) => {
+	const mails = (test.sentMails || []).reverse()
 	const tenantContainer = new TenantContainer.Factory()
 		.createBuilder(
 			{
@@ -30,6 +40,7 @@ export const execute = async (test: Test) => {
 				password: '123',
 				user: 'foo',
 			},
+			{},
 			{
 				bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 				bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
@@ -43,6 +54,20 @@ export const execute = async (test: Test) => {
 			createConnectionMock(test.executes, (expected, actual, message) => {
 				expect(actual).toEqual(expected, message)
 			}),
+		)
+		.replaceService(
+			'mailer',
+			() =>
+				new (class implements Mailer {
+					async send(message: MailMessage): Promise<SentInfo> {
+						const mail = mails.pop()
+						if (!mail) {
+							throw new Error(`Unexpected mail ${message.subject}`)
+						}
+						expect(message.subject).toEqual(mail.subject)
+						return {}
+					}
+				})(),
 		)
 		.build()
 
@@ -78,7 +103,7 @@ describe('tenant api', () => {
         }`,
 				executes: [
 					{
-						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
 from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
 						parameters: ['john@doe.com'],
 						response: { rows: [] },
@@ -88,8 +113,8 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 						response: { rowCount: 1 },
 					},
 					{
-						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles") values (?, ?, ?)`,
-						parameters: [testUuid(1), null, '["person"]'],
+						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles", "description", "created_at") values (?, ?, ?, ?, ?)`,
+						parameters: [testUuid(1), null, '["person"]', null, now],
 						response: { rowCount: 1 },
 					},
 					{
@@ -135,6 +160,111 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 			})
 		})
 
+		it('invite', async () => {
+			await execute({
+				query: GQL`mutation {
+          invite(email: "john@doe.com", projectSlug: "blog", memberships: [{role: "editor", variables: [{name: "language", values: ["cs"]}]}]) {
+            ok
+            result {
+              person {
+                id
+              }
+            }
+          }
+        }`,
+				executes: [
+					{
+						sql: SQL`select "id", "name", "slug" from "tenant"."project" where "slug" = ?`,
+						parameters: ['blog'],
+						response: { rows: [{ id: testUuid(5), name: 'blog', slug: 'blog' }] },
+					},
+					{
+						sql: SQL`BEGIN;`,
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
+from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
+						parameters: ['john@doe.com'],
+						response: { rows: [] },
+					},
+					{
+						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles", "description", "created_at") values (?, ?, ?, ?, ?)`,
+						parameters: [testUuid(1), null, '["person"]', null, now],
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`insert into "tenant"."person" ("id", "email", "password_hash", "identity_id") values (?, ?, ?, ?)`,
+						parameters: [testUuid(2), 'john@doe.com', 'BCRYPTED-AAAAAAAAAAAA', testUuid(1)],
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select "id" from "tenant"."project_membership" where "project_id" = ? and "identity_id" = ?`,
+						parameters: [testUuid(5), testUuid(1)],
+						response: {
+							rows: [],
+						},
+					},
+					{
+						sql: SQL`insert into "tenant"."project_membership" ("id", "project_id", "identity_id", "role")
+values (?, ?, ?, ?)
+on conflict ("project_id", "identity_id", "role") do update set "role" = ? returning "id"`,
+						parameters: [testUuid(3), testUuid(5), testUuid(1), 'editor', 'editor'],
+						response: {
+							rows: [{ id: testUuid(3) }],
+						},
+					},
+					{
+						sql: SQL`insert into  "tenant"."project_membership_variable" ("id", "membership_id", "variable", "value")
+				values  (?, ?, ?, ?) on conflict  ("membership_id", "variable") do update set  "value" =  ?`,
+						parameters: [testUuid(4), testUuid(3), 'language', JSON.stringify(['cs']), JSON.stringify(['cs'])],
+						response: {
+							rowCount: 1,
+						},
+					},
+					{
+						sql: SQL`COMMIT;`,
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`update "tenant"."api_key"
+            set "disabled_at" = ?
+            where "id" = ? and "type" = ?`,
+						parameters: [(val: any) => val instanceof Date, testUuid(998), 'one_off'],
+						response: { rowCount: 1 },
+					},
+					{
+						sql: SQL`select
+                       "project"."id",
+                       "project"."name",
+                       "project"."slug"
+                     from "tenant"."project"
+                       inner join "tenant"."project_member" as "project_member" on "project_member"."project_id" = "project"."id"
+                     where "project_member"."identity_id" = ?`,
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(3), name: 'foo', slug: 'foo' }] },
+					},
+				],
+				sentMails: [
+					{
+						subject: 'You have been invited to blog',
+					},
+				],
+				return: {
+					data: {
+						invite: {
+							ok: true,
+							result: {
+								person: {
+									id: testUuid(2),
+								},
+							},
+						},
+					},
+				},
+			})
+		})
+
 		it('signs up - email already registered', async () => {
 			await execute({
 				query: GQL`mutation {
@@ -152,7 +282,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
         }`,
 				executes: [
 					{
-						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
 from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
 						parameters: ['john@doe.com'],
 						response: { rows: [{ id: testUuid(1), password_hash: null, identity_id: null, roles: [] }] },
@@ -201,7 +331,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
         }`,
 				executes: [
 					{
-						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
 from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
 						parameters: ['john@doe.com'],
 						response: {
@@ -236,16 +366,16 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 						response: { rows: [{ roles: [] }] },
 					},
 					{
-						sql: SQL`select "project"."id", "project"."name", "project"."slug" 
-from "tenant"."project" 
-where "project"."id" in (select "project_id" from "tenant"."project_membership" where "identity_id" = ?) 
+						sql: SQL`select "project"."id", "project"."name", "project"."slug"
+from "tenant"."project"
+where "project"."id" in (select "project_id" from "tenant"."project_membership" where "identity_id" = ?)
       and "project"."id" in (select "project_id" from "tenant"."project_membership" where "identity_id" = ?)`,
 						parameters: [testUuid(2), testUuid(2)],
 						response: { rows: [{ id: testUuid(10), name: 'Foo', slug: 'foo' }] },
 					},
 					{
-						sql: SQL`with "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" group by "membership_id") 
-select "role", coalesce(variables, '[]'::json) as "variables" 
+						sql: SQL`with "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" group by "membership_id")
+select "role", coalesce(variables, '[]'::json) as "variables"
 from "tenant"."project_membership" left join "variables" on "project_membership"."id" = "variables"."membership_id" where "identity_id" = ? and "project_id" = ?`,
 						parameters: [testUuid(2), testUuid(10)],
 						response: { rows: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }] },
@@ -311,7 +441,7 @@ from "tenant"."project_membership" left join "variables" on "project_membership"
         }`,
 				executes: [
 					{
-						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
 from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."id" = ?`,
 						parameters: [testUuid(1)],
 						response: {
@@ -351,7 +481,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
         }`,
 				executes: [
 					{
-						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
 from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
@@ -388,7 +518,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
         }`,
 				executes: [
 					{
-						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
 from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
@@ -429,7 +559,7 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
         }`,
 				executes: [
 					{
-						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles" 
+						sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
 from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
 						parameters: [testUuid(999)],
 						response: {
@@ -456,8 +586,8 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 			await execute({
 				query: GQL`mutation {
           addProjectMember(
-          projectSlug: "blog", 
-          identityId: "${testUuid(6)}", 
+          projectSlug: "blog",
+          identityId: "${testUuid(6)}",
           memberships: [
           	{
           		role: "editor",
@@ -489,8 +619,8 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
 						},
 					},
 					{
-						sql: SQL`insert into "tenant"."project_membership" ("id", "project_id", "identity_id", "role") 
-values (?, ?, ?, ?) 
+						sql: SQL`insert into "tenant"."project_membership" ("id", "project_id", "identity_id", "role")
+values (?, ?, ?, ?)
 on conflict ("project_id", "identity_id", "role") do update set "role" = ? returning "id"`,
 						parameters: [testUuid(1), testUuid(5), testUuid(6), 'editor', 'editor'],
 						response: {
@@ -498,7 +628,7 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						},
 					},
 					{
-						sql: SQL`insert into  "tenant"."project_membership_variable" ("id", "membership_id", "variable", "value") 
+						sql: SQL`insert into  "tenant"."project_membership_variable" ("id", "membership_id", "variable", "value")
 				values  (?, ?, ?, ?) on conflict  ("membership_id", "variable") do update set  "value" =  ?`,
 						parameters: [testUuid(2), testUuid(1), 'language', JSON.stringify(['cs']), JSON.stringify(['cs'])],
 						response: {
@@ -551,8 +681,8 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						},
 					},
 					{
-						sql: SQL`insert into "tenant"."project_membership" ("id", "project_id", "identity_id", "role") 
-values (?, ?, ?, ?) 
+						sql: SQL`insert into "tenant"."project_membership" ("id", "project_id", "identity_id", "role")
+values (?, ?, ?, ?)
 on conflict ("project_id", "identity_id", "role") do update set "role" = ? returning "id"`,
 						parameters: [testUuid(1), testUuid(5), testUuid(6), 'editor', 'editor'],
 						response: {
@@ -560,7 +690,7 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						},
 					},
 					{
-						sql: SQL`insert into  "tenant"."project_membership_variable" ("id", "membership_id", "variable", "value") 
+						sql: SQL`insert into  "tenant"."project_membership_variable" ("id", "membership_id", "variable", "value")
 				values  (?, ?, ?, ?) on conflict  ("membership_id", "variable") do update set  "value" =  ?`,
 						parameters: [testUuid(2), testUuid(1), 'language', JSON.stringify(['cs']), JSON.stringify(['cs'])],
 						response: {
@@ -643,7 +773,7 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 		it('create api key', async () => {
 			await execute({
 				query: GQL`mutation {
-          createApiKey(projectSlug: "blog", memberships: [{role: "editor", variables: [{name: "language", values: ["cs"]}]}]) {
+          createApiKey(projectSlug: "blog", memberships: [{role: "editor", variables: [{name: "language", values: ["cs"]}]}], description: "test") {
             ok
 	          errors {
 		          code
@@ -659,7 +789,7 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 				              	role
 					            }
 				            }
-			          }	          
+			          }
 		          }
 	          }
           }
@@ -675,8 +805,8 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						response: { rowCount: 1 },
 					},
 					{
-						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles") values (?, ?, ?)`,
-						parameters: [testUuid(1), null, JSON.stringify([])],
+						sql: SQL`insert into "tenant"."identity" ("id", "parent_id", "roles", "description", "created_at") values (?, ?, ?, ?, ?)`,
+						parameters: [testUuid(1), null, JSON.stringify([]), 'test', now],
 						response: {
 							rowCount: 1,
 						},
@@ -705,8 +835,8 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						},
 					},
 					{
-						sql: SQL`insert into "tenant"."project_membership" ("id", "project_id", "identity_id", "role") 
-values (?, ?, ?, ?) 
+						sql: SQL`insert into "tenant"."project_membership" ("id", "project_id", "identity_id", "role")
+values (?, ?, ?, ?)
 on conflict ("project_id", "identity_id", "role") do update set "role" = ? returning "id"`,
 						parameters: [testUuid(3), testUuid(6), testUuid(1), 'editor', 'editor'],
 						response: {
@@ -714,7 +844,7 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						},
 					},
 					{
-						sql: SQL`insert into  "tenant"."project_membership_variable" ("id", "membership_id", "variable", "value") 
+						sql: SQL`insert into  "tenant"."project_membership_variable" ("id", "membership_id", "variable", "value")
 				values  (?, ?, ?, ?) on conflict  ("membership_id", "variable") do update set  "value" =  ?`,
 						parameters: [testUuid(4), testUuid(10), 'language', JSON.stringify(['cs']), JSON.stringify(['cs'])],
 						response: {
@@ -738,9 +868,9 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						},
 					},
 					{
-						sql: SQL`with "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" group by "membership_id") 
-select "role", coalesce(variables, '[]'::json) as "variables" 
-from "tenant"."project_membership" left join "variables" on "project_membership"."id" = "variables"."membership_id" 
+						sql: SQL`with "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" group by "membership_id")
+select "role", coalesce(variables, '[]'::json) as "variables"
+from "tenant"."project_membership" left join "variables" on "project_membership"."id" = "variables"."membership_id"
 where "identity_id" = ? and "project_id" = ?`,
 						parameters: [testUuid(1), testUuid(6)],
 						response: { rows: [{ role: 'editor', variables: [{ name: 'language', value: ['cs'] }] }] },

@@ -91,7 +91,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		if (notRunning.length > 0) {
 			const notRunningNames = notRunning.map(it => it.name)
 			console.error(`Following services failed to start: ${notRunningNames.join(', ')}`)
-			await dockerCompose.run(['logs', ...notRunningNames])
+			await dockerCompose.run(['logs', ...notRunningNames]).output
 			return
 		}
 

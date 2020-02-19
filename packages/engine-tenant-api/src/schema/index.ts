@@ -1,6 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
 	{ [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
@@ -136,17 +135,6 @@ export enum InviteErrorCode {
 	AlreadyMember = 'ALREADY_MEMBER',
 }
 
-export type InviteExistingResult = {
-	readonly __typename?: 'InviteExistingResult'
-	readonly person: Person
-}
-
-export type InviteNewResult = {
-	readonly __typename?: 'InviteNewResult'
-	readonly generatedPassword: Scalars['String']
-	readonly person: Person
-}
-
 export type InviteResponse = {
 	readonly __typename?: 'InviteResponse'
 	readonly ok: Scalars['Boolean']
@@ -154,7 +142,11 @@ export type InviteResponse = {
 	readonly result?: Maybe<InviteResult>
 }
 
-export type InviteResult = InviteExistingResult | InviteNewResult
+export type InviteResult = {
+	readonly __typename?: 'InviteResult'
+	readonly person: Person
+	readonly isNew: Scalars['Boolean']
+}
 
 export enum Member_Type {
 	ApiKey = 'API_KEY',
@@ -237,6 +229,7 @@ export type MutationUpdateProjectMemberArgs = {
 export type MutationCreateApiKeyArgs = {
 	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+	description: Scalars['String']
 }
 
 export type MutationDisableApiKeyArgs = {
@@ -549,14 +542,10 @@ export type ResolversTypes = {
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
-	InviteResponse: ResolverTypeWrapper<
-		Omit<InviteResponse, 'result'> & { result?: Maybe<ResolversTypes['InviteResult']> }
-	>
+	InviteResponse: ResolverTypeWrapper<InviteResponse>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
-	InviteResult: ResolversTypes['InviteExistingResult'] | ResolversTypes['InviteNewResult']
-	InviteExistingResult: ResolverTypeWrapper<InviteExistingResult>
-	InviteNewResult: ResolverTypeWrapper<InviteNewResult>
+	InviteResult: ResolverTypeWrapper<InviteResult>
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
 	AddProjectMemberError: ResolverTypeWrapper<AddProjectMemberError>
 	AddProjectMemberErrorCode: AddProjectMemberErrorCode
@@ -616,12 +605,10 @@ export type ResolversParentTypes = {
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
-	InviteResponse: Omit<InviteResponse, 'result'> & { result?: Maybe<ResolversParentTypes['InviteResult']> }
+	InviteResponse: InviteResponse
 	InviteError: InviteError
 	InviteErrorCode: InviteErrorCode
-	InviteResult: ResolversParentTypes['InviteExistingResult'] | ResolversParentTypes['InviteNewResult']
-	InviteExistingResult: InviteExistingResult
-	InviteNewResult: InviteNewResult
+	InviteResult: InviteResult
 	AddProjectMemberResponse: AddProjectMemberResponse
 	AddProjectMemberError: AddProjectMemberError
 	AddProjectMemberErrorCode: AddProjectMemberErrorCode
@@ -776,23 +763,6 @@ export type InviteErrorResolvers<
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
-export type InviteExistingResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['InviteExistingResult'] = ResolversParentTypes['InviteExistingResult']
-> = {
-	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
-	__isTypeOf?: isTypeOfResolverFn<ParentType>
-}
-
-export type InviteNewResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['InviteNewResult'] = ResolversParentTypes['InviteNewResult']
-> = {
-	generatedPassword?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
-	__isTypeOf?: isTypeOfResolverFn<ParentType>
-}
-
 export type InviteResponseResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['InviteResponse'] = ResolversParentTypes['InviteResponse']
@@ -807,7 +777,9 @@ export type InviteResultResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['InviteResult'] = ResolversParentTypes['InviteResult']
 > = {
-	__resolveType: TypeResolveFn<'InviteExistingResult' | 'InviteNewResult', ParentType, ContextType>
+	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+	isNew?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type MembershipResolvers<
@@ -876,7 +848,7 @@ export type MutationResolvers<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationCreateApiKeyArgs, 'projectSlug' | 'memberships'>
+		RequireFields<MutationCreateApiKeyArgs, 'projectSlug' | 'memberships' | 'description'>
 	>
 	disableApiKey?: Resolver<
 		Maybe<ResolversTypes['DisableApiKeyResponse']>,
@@ -1135,10 +1107,8 @@ export type Resolvers<ContextType = any> = {
 	Identity?: IdentityResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>
 	InviteError?: InviteErrorResolvers<ContextType>
-	InviteExistingResult?: InviteExistingResultResolvers<ContextType>
-	InviteNewResult?: InviteNewResultResolvers<ContextType>
 	InviteResponse?: InviteResponseResolvers<ContextType>
-	InviteResult?: InviteResultResolvers
+	InviteResult?: InviteResultResolvers<ContextType>
 	Membership?: MembershipResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
 	Person?: PersonResolvers<ContextType>

@@ -1,6 +1,7 @@
 export * from './ApiKeyHelper'
 export * from './ChangePasswordCommand'
 export * from './Command'
+export * from './CommandBus'
 export * from './CreateApiKeyCommand'
 export * from './CreateIdentityCommand'
 export * from './CreateOrUpdateProjectCommand'

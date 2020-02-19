@@ -11,7 +11,7 @@ import { installTemplate } from './template'
 
 export const validateProjectName = (name: string) => {
 	if (!name.match(/^[a-z][-a-z0-9]*$/)) {
-		throw new Error('Invalid project name. It can contain only alphanumeric letters, dash and must start with a letter')
+		throw 'Invalid project name. It can contain only alphanumeric letters, dash and must start with a letter'
 	}
 }
 export const listProjects = async (args: { workspaceDirectory: string }) => {

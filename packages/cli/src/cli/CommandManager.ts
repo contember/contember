@@ -15,10 +15,8 @@ export class CommandManager {
 			return [matchedCommands[0], this.commands[matchedCommands[0]]()]
 		}
 		if (matchedCommands.length === 0) {
-			throw new Error(`Command ${name} not found.`)
+			throw `Command ${name} not found.`
 		}
-		throw new Error(
-			`Command ${name} is ambiguous. Did you mean one of these?\n - ` + matchedCommands.join('\n - ') + '\n',
-		)
+		throw `Command ${name} is ambiguous. Did you mean one of these?\n - ` + matchedCommands.join('\n - ') + '\n'
 	}
 }

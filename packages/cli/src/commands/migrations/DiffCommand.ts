@@ -32,7 +32,7 @@ export class DiffCommand extends Command<Args, Options> {
 		const projectDirArg = input.getOption('project-dir')
 		const migrationsDirArg = input.getOption('migrations-dir')
 		if (allProjects && (projectDirArg || migrationsDirArg)) {
-			throw new Error('Migrations dir and project dir options are not allowed when using "*" as a project name')
+			throw 'Migrations dir and project dir options are not allowed when using "*" as a project name'
 		}
 		for (const projectName of projects) {
 			console.group(`Project ${projectName}:`)

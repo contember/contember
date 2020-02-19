@@ -5,12 +5,19 @@ import { Connection, DatabaseQueryable } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
 	ApiKeyManager,
+	CommandBus,
+	IdentityFactory,
+	InviteManager,
 	PasswordChangeManager,
+	PermissionContextFactory,
 	PermissionsFactory,
 	ProjectManager,
 	ProjectMemberManager,
+	ProjectVariablesResolver,
+	Providers,
 	SignInManager,
 	SignUpManager,
+	UserMailer,
 } from './model'
 import {
 	AddProjectMemberMutationResolver,
@@ -18,30 +25,22 @@ import {
 	CreateApiKeyMutationResolver,
 	DisableApiKeyMutationResolver,
 	IdentityTypeResolver,
+	InviteMutationResolver,
+	MeQueryResolver,
+	ProjectMembersQueryResolver,
+	ProjectQueryResolver,
+	ProjectTypeResolver,
 	RemoveProjectMemberMutationResolver,
+	ResolverContextFactory,
+	ResolverFactory,
 	SetupMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
-	MeQueryResolver,
-	ResolverContextFactory,
-	ResolverFactory,
 } from './resolvers'
-import { CommandBus } from './model/commands/CommandBus'
-import { Providers } from './model'
-import { ProjectTypeResolver } from './resolvers/types/ProjectTypeResolver'
-import { ProjectQueryResolver } from './resolvers/query/ProjectQueryResolver'
-import { ProjectVariablesResolver } from './model/type'
-import { InviteMutationResolver } from './resolvers/mutation/person/InviteMutationResolver'
-import { InviteManager } from './model/service/InviteManager'
-import { GraphQLError, GraphQLFormattedError } from 'graphql'
-import { formatError } from './resolvers/ErrorFormatter'
-import { ProjectMembersQueryResolver } from './resolvers/query/ProjectMembersQueryResolver'
-import { PermissionContextFactory } from './model/authorization/PermissionContextFactory'
-import { IdentityFactory } from './model/authorization/IdentityFactory'
 import * as Schema from './schema'
-import { createMigrationFilesManager } from './utils'
+import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -51,17 +50,17 @@ interface TenantContainer {
 	resolvers: Schema.Resolvers
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
-	errorFormatter: (error: GraphQLError) => GraphQLFormattedError
 }
 
 namespace TenantContainer {
 	export class Factory {
 		create(
 			tenantDbCredentials: DatabaseCredentials,
+			mailOptions: MailerOptions,
 			providers: Providers,
 			projectVariablesResolver: ProjectVariablesResolver,
 		): TenantContainer {
-			return this.createBuilder(tenantDbCredentials, providers, projectVariablesResolver)
+			return this.createBuilder(tenantDbCredentials, mailOptions, providers, projectVariablesResolver)
 				.build()
 				.pick(
 					'apiKeyManager',
@@ -71,12 +70,12 @@ namespace TenantContainer {
 					'resolvers',
 					'authorizator',
 					'resolverContextFactory',
-					'errorFormatter',
 				)
 		}
 
 		createBuilder(
 			tenantDbCredentials: DatabaseCredentials,
+			mailTransportParameters: MailerOptions,
 			providers: Providers,
 			projectVariablesResolver: ProjectVariablesResolver,
 		) {
@@ -85,6 +84,8 @@ namespace TenantContainer {
 					return new Connection(tenantDbCredentials, {})
 				})
 				.addService('db', ({ connection }) => connection.createClient('tenant'))
+				.addService('mailer', () => createMailer(mailTransportParameters))
+				.addService('templateRenderer', () => new TemplateRenderer())
 				.addService('providers', () => providers)
 				.addService('commandBus', ({ db, providers }) => new CommandBus(db, providers))
 				.addService('queryHandler', ({ db }) => {
@@ -104,6 +105,8 @@ namespace TenantContainer {
 				)
 				.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 
+				.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
+
 				.addService('apiKeyManager', ({ queryHandler, commandBus }) => new ApiKeyManager(queryHandler, commandBus))
 				.addService('signUpManager', ({ queryHandler, commandBus }) => new SignUpManager(queryHandler, commandBus))
 				.addService('passwordChangeManager', ({ commandBus }) => new PasswordChangeManager(commandBus))
@@ -121,7 +124,7 @@ namespace TenantContainer {
 					({ authorizator, identityFactory }) => new PermissionContextFactory(authorizator, identityFactory),
 				)
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
-				.addService('inviteManager', ({ db, providers }) => new InviteManager(db, providers))
+				.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
 				.addService(
 					'identityTypeResolver',
 					({ queryHandler, projectMemberManager, projectManager }) =>
@@ -193,7 +196,6 @@ namespace TenantContainer {
 					({ permissionContextFactory }) => new ResolverContextFactory(permissionContextFactory),
 				)
 				.addService('resolvers', container => new ResolverFactory(container).create())
-				.addService('errorFormatter', () => formatError)
 		}
 	}
 }

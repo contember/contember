@@ -20,7 +20,7 @@ import { ContainerStatus, getContainersStatus, PortMapping } from './docker'
 
 export const validateInstanceName = (name: string) => {
 	if (!name.match(/^[a-z][a-z0-9]*$/)) {
-		throw new Error('Invalid instance name. It can contain only alphanumeric letters and cannot start with a number')
+		throw 'Invalid instance name. It can contain only alphanumeric letters and cannot start with a number'
 	}
 }
 
@@ -31,7 +31,7 @@ export const listInstances = async (args: { workspaceDirectory: string }) => {
 export const getDefaultInstance = async ({ workspaceDirectory }: { workspaceDirectory: string }): Promise<string> => {
 	const instances = await listInstances({ workspaceDirectory })
 	if (instances.length > 1) {
-		throw new Error('Please specify an instance')
+		throw 'Please specify an instance'
 	}
 	return instances[0]
 }
@@ -177,7 +177,7 @@ const verifyInstanceExists = async ({
 	instanceName: string
 }) => {
 	if (!(await pathExists(instanceDirectory))) {
-		throw new Error(`Instance ${instanceName} not found.`)
+		throw `Instance ${instanceName} not found.`
 	}
 }
 
@@ -195,6 +195,7 @@ export const resolvePortsMapping = async (args: {
 		{ service: 'db', port: 5432 },
 		{ service: 's3', port: null },
 		{ service: 'adminer', port: 8080 },
+		{ service: 'mailhog', port: 8025 },
 	]
 	const runningServices = await getInstanceStatus({ instanceDirectory: args.instanceDirectory })
 
@@ -229,7 +230,6 @@ export const resolvePortsMapping = async (args: {
 				hostPort: freePort,
 				hostIp: host,
 			}))
-			startPort = freePort + 1
 		}
 
 		servicePortMapping[service] = [...assignedPortMapping, ...otherConfiguredPorts]
@@ -254,7 +254,7 @@ export const resolveInstanceDockerConfig = async ({
 
 	let config = await readDefaultDockerComposeConfig(instanceDirectory)
 	if (!config.services) {
-		throw new Error('docker-compose is not configured')
+		throw 'docker-compose is not configured'
 	}
 
 	const portMapping = await resolvePortsMapping({ instanceDirectory, config, host, startPort })
@@ -313,6 +313,9 @@ export const resolveInstanceDockerConfig = async ({
 		DEFAULT_S3_KEY: 'contember',
 		DEFAULT_S3_SECRET: 'contember',
 		DEFAULT_S3_PROVIDER: 'minio',
+		TENANT_MAILER_HOST: 'mailhog',
+		TENANT_MAILER_PORT: '1025',
+		TENANT_MAILER_FROM: 'contember@localhost',
 		...Object.keys(projectConfig.projects)
 			.map((slug: string): Record<string, string> => getProjectDockerEnv(slug))
 			.reduce((acc: Record<string, string>, it: Record<string, string>) => ({ ...acc, ...it }), {}),

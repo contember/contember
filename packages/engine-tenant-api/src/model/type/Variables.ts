@@ -1,4 +1,4 @@
-export type ProjectVariablesResolver = (projectSlug: string) => Promise<ProjectVariablesDefinition>
+export type ProjectVariablesResolver = (projectSlug: string) => Promise<ProjectVariablesDefinition | undefined>
 
 export interface ProjectVariablesDefinition {
 	roles: readonly RoleVariablesDefinition[]

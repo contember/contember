@@ -10,13 +10,17 @@ import { deprecated } from '../core/console/messages'
 import { DatabaseCredentials } from '@contember/engine-common'
 import { S3Config } from '@contember/engine-s3-plugin/dist/src/Config'
 import { tuple, upperCaseFirst } from '../utils'
+import { MailerOptions } from '@contember/engine-tenant-api'
 
 export type ProjectWithS3 = Project & { s3?: S3Config }
 
+export interface TenantConfig {
+	db: DatabaseCredentials
+	mailer: MailerOptions
+}
+
 export interface Config {
-	tenant: {
-		db: DatabaseCredentials
-	}
+	tenant: TenantConfig
 	projects: Record<string, ProjectWithS3>
 	server: {
 		port: number
@@ -85,6 +89,34 @@ function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredenti
 	return json
 }
 
+function checkMailerParameters(json: unknown, path: string): MailerOptions {
+	if (!isObject(json)) {
+		return error(`Property ${path} must be an object`)
+	}
+	const values = Object.fromEntries(Object.entries(json).filter(([, it]) => it !== undefined))
+	if ('from' in values && !hasStringProperty(values, 'from')) {
+		return typeError(path + '.from', values.from, 'string')
+	}
+	if ('host' in values && !hasStringProperty(values, 'host')) {
+		return typeError(path + '.host', values.host, 'string')
+	}
+	if ('port' in values && !hasNumberProperty(values, 'port')) {
+		return typeError(path + '.port', values.port, 'number')
+	}
+	if ('user' in values && !hasStringProperty(json, 'user')) {
+		return typeError(path + '.user', json.user, 'string')
+	}
+	if ('password' in values && !hasStringProperty(json, 'password')) {
+		return typeError(path + '.password', json.password, 'string')
+	}
+	return {
+		...values,
+		...('user' in values && 'password' in values
+			? { auth: { user: String(values.user), pass: String(values.password) } }
+			: {}),
+	}
+}
+
 function checkS3Config(json: unknown, path: string): S3Config {
 	if (!isObject(json)) {
 		return error(`Property ${path} must be an object`)
@@ -119,7 +151,10 @@ function checkTenantStructure(json: unknown): Config['tenant'] {
 	if (!isObject(json)) {
 		return typeError('tenant', json, 'object')
 	}
-	return { db: checkDatabaseCredentials(json.db, 'tenant.db') }
+	return {
+		db: checkDatabaseCredentials(json.db, 'tenant.db'),
+		mailer: checkMailerParameters(json.mailer, 'tenant.mailer'),
+	}
 }
 
 function checkStageStructure(json: unknown, slug: string, path: string): Project.Stage {
@@ -226,6 +261,14 @@ export async function readConfig(...filenames: string[]): Promise<Config> {
 				user: `%tenant.env.DB_USER%`,
 				password: `%tenant.env.DB_PASSWORD%`,
 				database: `%tenant.env.DB_NAME%`,
+			},
+			mailer: {
+				from: '%?tenant.env.MAILER_FROM%',
+				host: '%?tenant.env.MAILER_HOST::string%',
+				port: '%?tenant.env.MAILER_PORT::number%',
+				secure: '%?tenant.env.MAILER_SECURE::bool%',
+				user: '%?tenant.env.MAILER_USER%',
+				password: '%?tenant.env.MAILER_PASSWORD%',
 			},
 		},
 		projectDefaults: {

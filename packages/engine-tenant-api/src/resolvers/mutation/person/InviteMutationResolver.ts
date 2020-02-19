@@ -24,7 +24,7 @@ export class InviteMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.inviteManager.invite(email, project.id, memberships)
+		const result = await this.inviteManager.invite(email, project, memberships)
 
 		if (!result.ok) {
 			return {
@@ -44,16 +44,10 @@ export class InviteMutationResolver implements MutationResolvers {
 		return {
 			ok: true,
 			errors: [],
-			result: result.generatedPassword
-				? {
-						__typename: 'InviteNewResult',
-						generatedPassword: result.generatedPassword,
-						person: person,
-				  }
-				: {
-						__typename: 'InviteExistingResult',
-						person: person,
-				  },
+			result: {
+				person,
+				isNew: result.isNew,
+			},
 		}
 	}
 }

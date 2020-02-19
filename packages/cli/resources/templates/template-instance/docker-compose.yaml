@@ -37,13 +37,15 @@ services:
       ADMINER_AUTOLOGIN: 1
       ADMINER_NAME: Contember
   s3:
-     image: minio/minio
-     command: server /data
-     volumes:
-       - s3-data:/data
-     environment:
-       MINIO_ACCESS_KEY: contember
-       MINIO_SECRET_KEY: contember
+    image: minio/minio
+    command: server /data
+    volumes:
+      - s3-data:/data
+    environment:
+      MINIO_ACCESS_KEY: contember
+      MINIO_SECRET_KEY: contember
+  mailhog:
+    image: mailhog/mailhog
 volumes:
   pgsql-data: ~
   s3-data: ~

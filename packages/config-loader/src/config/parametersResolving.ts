@@ -48,22 +48,31 @@ const resolveParametersInternal = (
 		return data.map((it, index) => resolveParametersInternal(it, [...path, index], parametersResolver))
 	}
 	if (typeof data === 'string') {
-		const match = /^%(\w+(?:\.\w+)*)(?:::(\w+))?%$/.exec(data)
+		const match = /^%(\?)?(\w+(?:\.\w+)*)(?:::(\w+))?%$/.exec(data)
 		if (match) {
-			const [, parameter, cast] = match
+			const [, optional, parameter, cast] = match
 			const parts = parameter.split('.')
-			const value = parametersResolver(parts, path)
-			if (cast) {
-				switch (cast) {
-					case 'number':
-						return Number(value)
-					case 'string':
-						return String(value)
-					default:
-						throw new Error(`Unsupported cast to ${cast}`)
+			try {
+				const value = parametersResolver(parts, path)
+				if (cast) {
+					switch (cast) {
+						case 'number':
+							return Number(value)
+						case 'string':
+							return String(value)
+						case 'bool':
+							return value === 'true' || value === 'on' || value === '1'
+						default:
+							throw new Error(`Unsupported cast to ${cast}`)
+					}
 				}
+				return value
+			} catch (e) {
+				if (optional && e instanceof UndefinedParameterError) {
+					return undefined
+				}
+				throw e
 			}
-			return value
 		} else {
 			return data
 		}

@@ -1,4 +1,5 @@
 export * from './ApiKeyManager'
+export * from './InviteManager'
 export * from './PasswordChangeManager'
 export * from './ProjectManager'
 export * from './ProjectMemberManager'

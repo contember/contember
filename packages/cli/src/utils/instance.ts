@@ -195,6 +195,7 @@ export const resolvePortsMapping = async (args: {
 		{ service: 'db', port: 5432 },
 		{ service: 's3', port: null },
 		{ service: 'adminer', port: 8080 },
+		{ service: 'mailhog', port: 8025 },
 	]
 	const runningServices = await getInstanceStatus({ instanceDirectory: args.instanceDirectory })
 
@@ -229,7 +230,6 @@ export const resolvePortsMapping = async (args: {
 				hostPort: freePort,
 				hostIp: host,
 			}))
-			startPort = freePort + 1
 		}
 
 		servicePortMapping[service] = [...assignedPortMapping, ...otherConfiguredPorts]
@@ -313,6 +313,9 @@ export const resolveInstanceDockerConfig = async ({
 		DEFAULT_S3_KEY: 'contember',
 		DEFAULT_S3_SECRET: 'contember',
 		DEFAULT_S3_PROVIDER: 'minio',
+		TENANT_MAILER_HOST: 'mailhog',
+		TENANT_MAILER_PORT: '1025',
+		TENANT_MAILER_FROM: 'contember@localhost',
 		...Object.keys(projectConfig.projects)
 			.map((slug: string): Record<string, string> => getProjectDockerEnv(slug))
 			.reduce((acc: Record<string, string>, it: Record<string, string>) => ({ ...acc, ...it }), {}),

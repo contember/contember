@@ -1,6 +1,7 @@
 export * from './authorization'
 export * from './commands'
 export * from './queries'
+export * from './mailing'
 export * from './service'
 export * from './type'
 export * from './providers'

@@ -17,6 +17,7 @@ import {
 import { DatabaseCredentials, MigrationFilesManager } from '@contember/engine-common'
 import {
 	createMigrationFilesManager as createTenantMigrationFilesManager,
+	MailerOptions,
 	Providers as TenantProviders,
 	TenantContainer,
 } from '@contember/engine-tenant-api'
@@ -42,7 +43,7 @@ import {
 	TenantMiddlewareFactory,
 	TimerMiddlewareFactory,
 } from './http'
-import { Config, ProjectWithS3 } from './config/config'
+import { Config, ProjectWithS3, TenantConfig } from './config/config'
 import { S3SchemaFactory, S3ServiceFactory } from '@contember/engine-s3-plugin'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
@@ -86,7 +87,7 @@ class CompositionRoot {
 				  })
 				: undefined)
 
-		const tenantContainer = this.createTenantContainer(config.tenant.db, providers, projectContainerResolver)
+		const tenantContainer = this.createTenantContainer(config.tenant, providers, projectContainerResolver)
 
 		const masterContainer = new Builder({})
 			.addService('providers', () => providers)
@@ -329,12 +330,13 @@ class CompositionRoot {
 	}
 
 	createTenantContainer(
-		tenantDbCredentials: DatabaseCredentials,
+		tenantConfig: TenantConfig,
 		providers: TenantProviders,
 		projectContainerResolver: ProjectContainerResolver,
 	) {
 		return new TenantContainer.Factory().create(
-			tenantDbCredentials,
+			tenantConfig.db,
+			tenantConfig.mailer,
 			providers,
 			projectVariablesResolver(projectContainerResolver),
 		)

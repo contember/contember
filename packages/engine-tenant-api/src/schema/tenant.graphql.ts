@@ -167,15 +167,9 @@ const schema: DocumentNode = gql`
 		ALREADY_MEMBER
 	}
 
-	union InviteResult = InviteExistingResult | InviteNewResult
-
-	type InviteExistingResult {
+	type InviteResult {
 		person: Person!
-	}
-
-	type InviteNewResult {
-		generatedPassword: String!
-		person: Person!
+		isNew: Boolean!
 	}
 
 	# === addProjectMember ===

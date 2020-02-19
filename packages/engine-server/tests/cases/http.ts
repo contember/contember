@@ -22,6 +22,7 @@ const createContainer = (debug: boolean) =>
 		{
 			tenant: {
 				db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
+				mailer: {},
 			},
 			projects: {
 				test: {

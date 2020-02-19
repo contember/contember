@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useOptionalDesugaredRelativeSingleField } from '../accessorRetrievers'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
-import { SugaredRelativeSingleField } from '../treeParameters'
+import { RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { addNewEntityAtIndex } from './addNewEntityAtIndex'
 import { throwNonWritableError, throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
@@ -16,6 +16,26 @@ export interface SortedEntities {
 	moveEntity: (oldIndex: number, newIndex: number) => void
 }
 
+const addNewAtIndexImplementation = (
+	callbackName: keyof SortedEntities,
+	entityList: EntityListAccessor,
+	desugaredSortableByField: RelativeSingleField | undefined,
+	sortedEntitiesCount: number,
+	index: number,
+	preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void,
+) => {
+	if (!entityList.addNew) {
+		return throwNonWritableError(entityList)
+	}
+	if (!desugaredSortableByField) {
+		if (index === sortedEntitiesCount) {
+			return entityList.addNew()
+		}
+		return throwNoopError(callbackName)
+	}
+	addNewEntityAtIndex(entityList, desugaredSortableByField, index, preprocess)
+}
+
 export const useSortedEntities = (
 	entityList: EntityListAccessor,
 	sortableByField: SugaredRelativeSingleField['field'] | undefined,
@@ -28,32 +48,42 @@ export const useSortedEntities = (
 
 	const addNewAtIndex = React.useCallback<SortedEntities['addNewAtIndex']>(
 		(index: number, preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => {
-			if (!entityList.addNew) {
-				return throwNonWritableError(entityList)
-			}
-			if (!desugaredSortableByField) {
-				if (index === sortedEntities.length) {
-					return entityList.addNew()
-				}
-				return throwNoopError('addNewAtIndex')
-			}
-			addNewEntityAtIndex(entityList, desugaredSortableByField, index, preprocess)
+			addNewAtIndexImplementation(
+				'addNewAtIndex',
+				entityList,
+				desugaredSortableByField,
+				sortedEntities.length,
+				index,
+				preprocess,
+			)
 		},
 		[desugaredSortableByField, entityList, sortedEntities.length],
 	)
 	const prependNew = React.useCallback<SortedEntities['prependNew']>(
 		preprocess => {
-			// TODO this may throw a confusing error about addNewAtIndex
-			addNewAtIndex(0, preprocess)
+			addNewAtIndexImplementation(
+				'prependNew',
+				entityList,
+				desugaredSortableByField,
+				sortedEntities.length,
+				0,
+				preprocess,
+			)
 		},
-		[addNewAtIndex],
+		[desugaredSortableByField, entityList, sortedEntities.length],
 	)
 	const appendNew = React.useCallback<SortedEntities['appendNew']>(
 		preprocess => {
-			// TODO this may throw a confusing error about addNewAtIndex
-			addNewAtIndex(sortedEntities.length, preprocess)
+			addNewAtIndexImplementation(
+				'appendNew',
+				entityList,
+				desugaredSortableByField,
+				sortedEntities.length,
+				sortedEntities.length,
+				preprocess,
+			)
 		},
-		[addNewAtIndex, sortedEntities.length],
+		[desugaredSortableByField, entityList, sortedEntities.length],
 	)
 	const normalizedMoveEntity = React.useCallback<SortedEntities['moveEntity']>(
 		(oldIndex, newIndex) => {

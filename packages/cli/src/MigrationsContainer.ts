@@ -14,6 +14,7 @@ export interface MigrationsContainer {
 	migrationDiffCreator: MigrationDiffCreator
 	migrationDryRunner: MigrationSqlDryRunner
 	schemaVersionBuilder: SchemaVersionBuilder
+	schemaDiffer: SchemaDiffer
 }
 
 export class MigrationsContainerFactory {
@@ -44,6 +45,6 @@ export class MigrationsContainerFactory {
 					new MigrationSqlDryRunner(migrationsResolver, modificationHandlerFactory, schemaVersionBuilder),
 			)
 			.build()
-			.pick('migrationDiffCreator', 'migrationDryRunner', 'schemaVersionBuilder')
+			.pick('migrationDiffCreator', 'migrationDryRunner', 'schemaVersionBuilder', 'schemaDiffer')
 	}
 }

@@ -38,6 +38,12 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 			projectValid =
 				validateSchemaAndPrintErrors(builtSchema, 'Schema built from migrations is invalid:') && projectValid
 
+			const diff = await container.schemaDiffer.diffSchemas(builtSchema, schema)
+			if (diff.length > 0) {
+				console.error('Migrations are not in sync with a defined schema')
+				projectValid = false
+			}
+
 			if (projectValid) {
 				console.log('Project schema is valid')
 			}

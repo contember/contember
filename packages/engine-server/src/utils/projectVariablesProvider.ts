@@ -6,7 +6,7 @@ export const projectVariablesResolver = (
 ): ProjectVariablesResolver => async slug => {
 	const container = projectContainerResolver(slug)
 	if (!container) {
-		throw new Error(`Project ${slug} not found`)
+		return undefined
 	}
 	const schema = await container.schemaVersionBuilder.buildSchema()
 	return {

@@ -29,7 +29,11 @@ export class ProjectTypeResolver implements ProjectResolvers {
 	}
 
 	async roles(parent: Project) {
-		return (await this.projectVariablesResolver(parent.slug)).roles.map(it => ({
+		const project = await this.projectVariablesResolver(parent.slug)
+		if (!project) {
+			return []
+		}
+		return project.roles.map(it => ({
 			...it,
 			variables: it.variables.map(it => ({ ...it, __typename: 'RoleEntityVariableDefinition' })),
 		}))

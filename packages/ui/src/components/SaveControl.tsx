@@ -1,14 +1,16 @@
 import * as React from 'react'
 import cn from 'classnames'
 import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
+import { toViewClass } from '../utils'
 
 export interface SaveControlProps {
 	primaryAction?: React.ReactNode
+	isPrimaryDisabled?: boolean
 	onPrimary?: () => void
 	children?: React.ReactNode
 }
 
-export function SaveControl({ primaryAction, children, onPrimary }: SaveControlProps) {
+export function SaveControl({ primaryAction, children, onPrimary, isPrimaryDisabled }: SaveControlProps) {
 	const prefix = useClassNamePrefix()
 	const [open, setOpen] = React.useState(false)
 
@@ -23,8 +25,11 @@ export function SaveControl({ primaryAction, children, onPrimary }: SaveControlP
 	const refs = useCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>(open, close)
 
 	return (
-		<div className={cn(`${prefix}saveControl`, open && 'view-open')}>
-			<div className={cn(`${prefix}saveControl-button`)} ref={refs.buttonRef}>
+		<div className={cn(`${prefix}saveControl`, toViewClass('open', open))}>
+			<div
+				className={cn(`${prefix}saveControl-button`, toViewClass('disabled', isPrimaryDisabled))}
+				ref={refs.buttonRef}
+			>
 				<button type="button" className={cn(`${prefix}saveControl-button-primary`)} onClick={onPrimary}>
 					<div className={cn(`${prefix}saveControl-button-label`)}>{primaryAction || 'Save'}</div>
 				</button>

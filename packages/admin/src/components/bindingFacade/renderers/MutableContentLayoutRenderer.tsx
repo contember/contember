@@ -8,7 +8,8 @@ export interface MutableContentLayoutRendererProps extends ImmutableContentLayou
 }
 
 export const MutableContentLayoutRenderer = Component<MutableContentLayoutRendererProps>(
-	({ persistButtonComponent: PersistComponent = PersistButton, side, children, ...immutableProps }) => {
+	({ persistButtonComponent, side, children, ...immutableProps }) => {
+		const PersistComponent = persistButtonComponent || PersistButton
 		const augmentedSide = React.useMemo(
 			() => (
 				<>
@@ -24,11 +25,14 @@ export const MutableContentLayoutRenderer = Component<MutableContentLayoutRender
 			</ImmutableContentLayoutRenderer>
 		)
 	},
-	({ persistButtonComponent, children, ...immutableProps }) => (
-		<ImmutableContentLayoutRenderer {...immutableProps}>
-			{children}
-			{persistButtonComponent}
-		</ImmutableContentLayoutRenderer>
-	),
+	({ persistButtonComponent, children, ...immutableProps }) => {
+		const PersistComponent = persistButtonComponent || PersistButton
+		return (
+			<ImmutableContentLayoutRenderer {...immutableProps}>
+				{children}
+				<PersistComponent />
+			</ImmutableContentLayoutRenderer>
+		)
+	},
 	'MutableContentLayoutRenderer',
 )

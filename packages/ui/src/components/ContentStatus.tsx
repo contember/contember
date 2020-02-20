@@ -3,13 +3,15 @@ import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
 import { Icon } from './Icon'
 
-export interface ContentStatusProps {}
+export interface ContentStatusProps {
+	label?: React.ReactNode
+}
 
-export function ContentStatus({}: ContentStatusProps) {
+export function ContentStatus({ label }: ContentStatusProps) {
 	const prefix = useClassNamePrefix()
 	return (
 		<div className={cn(`${prefix}contentStatus`)}>
-			<span className={`${prefix}contentStatus-label`}>Concept, unsaved</span>
+			<span className={`${prefix}contentStatus-label`}>{label}</span>
 			<span className={`${prefix}contentStatus-icon`}>
 				<Icon contemberIcon="clock" alignWithLowercase />
 			</span>

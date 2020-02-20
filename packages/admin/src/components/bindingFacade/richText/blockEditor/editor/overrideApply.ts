@@ -182,18 +182,18 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				addNewTextElementAt(topLevelIndex)
 			}
 
+			apply(operation)
+
 			if (path.length > 1) {
-				apply(operation)
 				saveElementAt(topLevelIndex)
 			} else {
 				switch (operation.type) {
 					case 'set_node':
-						apply(operation) // TODO for leading/trailing, if they're set to plaintext, do nothing here
+						// TODO for leading/trailing, if they're set to plaintext, do nothing here
 						saveElementAt(topLevelIndex)
 						break
 					case 'merge_node': {
 						// TODO special checks for leading/trailing
-						apply(operation)
 						removeElementAt(topLevelIndex)
 						saveElementAt(topLevelIndex - 1)
 						break
@@ -207,7 +207,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							break // TODO what do we even do from here?!
 						}
 						if (isLeadingElement(topLevelIndex)) {
-							apply(operation)
 							for (let i = topLevelIndex; i < firstContentIndex; i++) {
 								apply({
 									type: 'set_node',
@@ -225,7 +224,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							})
 							addNewTextElementAt(firstContentIndex)
 						} else {
-							apply(operation)
 							saveElementAt(topLevelIndex)
 							addNewTextElementAt(topLevelIndex + 1)
 						}
@@ -239,7 +237,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						if (isContemberBlockElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
-						apply(operation)
 						saveElementAt(topLevelIndex)
 						break
 					}
@@ -254,25 +251,20 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 
 						if (isContemberBlockElement(node)) {
 							blockType = node.blockType
-							const entity = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
-							apply(operation)
 							// TODO cache?
-							sortedEntities[topLevelIndex - firstContentIndex] = entity
+							sortedEntities[topLevelIndex - firstContentIndex] = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
 						} else {
-							apply(operation)
 							addNewTextElementAt(topLevelIndex)
 						}
 						break
 					}
 					case 'remove_node': {
 						// TODO for leading/trailing, this makes the state inconsistent
-						apply(operation)
 						removeElementAt(topLevelIndex)
 						break
 					}
 					case 'move_node':
 						// TODO Not even slate-react supports this at the moment
-						apply(operation)
 						break
 				}
 			}

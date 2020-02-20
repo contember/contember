@@ -73,9 +73,8 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		}
 		// console.log('op', operation)
 		if (operation.path.length === 0) {
-			// Technically, the path could also be [], indicating that we're operating on the editor itself.
-			// This is branch is entirely speculative. I *THINK* it could feasibly happen but I don't know when or how.
-			return apply(operation) // ?!?!!???
+			// This is invalid.
+			return
 		}
 
 		batchUpdates(getAccessor => {

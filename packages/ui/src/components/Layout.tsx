@@ -1,6 +1,7 @@
-import * as React from 'react'
 import cn from 'classnames'
+import * as React from 'react'
 import { useClassNamePrefix } from '../auxiliary'
+import { toViewClass } from '../utils'
 import { Trio } from './Trio'
 
 interface LayoutProps {
@@ -60,7 +61,7 @@ export const Layout = ({
 	)
 
 	return (
-		<div className={cn(`${prefix}layout`, collapsed && 'view-collapsed')}>
+		<div className={cn(`${prefix}layout`, toViewClass('collapsed', collapsed))}>
 			<div className={`${prefix}layout-top`}>
 				<div className={`${prefix}layout-topBar`}>
 					{top}

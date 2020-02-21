@@ -1,10 +1,12 @@
 import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
-import { Element } from 'slate'
+import * as React from 'react'
+import { Element as SlateElement } from 'slate'
 import { NormalizedBlock } from '../../blocks'
-import { ParagraphElement } from '../plugins'
+import { createEditor } from './editor'
 import {
 	ContemberBlockElement,
 	contemberBlockElementType,
+	ContemberContentPlaceholder,
 	contemberContentPlaceholderType,
 	ContemberFieldElement,
 	ContemberFieldElementPosition,
@@ -13,19 +15,22 @@ import {
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 
 export interface UseSlateNodesOptions {
+	editor: ReturnType<typeof createEditor>
 	blocks: NormalizedBlock[]
 	discriminationField: RelativeSingleField
-	contemberFieldElementCache: WeakMap<FieldAccessor, Element>
-	textElementCache: WeakMap<EntityAccessor, Element>
-	contemberBlockElementCache: Map<string, Element>
+	contemberFieldElementCache: WeakMap<FieldAccessor, SlateElement>
+	textElementCache: WeakMap<EntityAccessor, SlateElement>
+	contemberBlockElementCache: Map<string, SlateElement>
 	textBlockField: RelativeSingleField
 	textBlockDiscriminant: FieldValue
 	entities: EntityAccessor[]
 	leadingFieldBackedElements: NormalizedFieldBackedElement[]
 	trailingFieldBackedElements: NormalizedFieldBackedElement[]
+	placeholder: React.ReactNode
 }
 
 export const useSlateNodes = ({
+	editor,
 	blocks,
 	discriminationField,
 	textElementCache,
@@ -36,16 +41,17 @@ export const useSlateNodes = ({
 	entities,
 	leadingFieldBackedElements,
 	trailingFieldBackedElements,
-}: UseSlateNodesOptions): Element[] => {
+	placeholder,
+}: UseSlateNodesOptions): SlateElement[] => {
 	const adjacentAccessorsToElements = (
 		elements: NormalizedFieldBackedElement[],
 		position: ContemberFieldElementPosition,
-	): Element[] =>
+	): SlateElement[] =>
 		elements.map((normalizedElement, index) => {
 			if (contemberFieldElementCache.has(normalizedElement.accessor)) {
 				return contemberFieldElementCache.get(normalizedElement.accessor)!
 			}
-			let element: Element
+			let element: SlateElement
 			const fieldValue = normalizedElement.accessor.currentValue
 			if (typeof fieldValue !== 'string' && fieldValue !== null) {
 				throw new BindingError(
@@ -89,14 +95,10 @@ export const useSlateNodes = ({
 				if (blockType.hasValue(textBlockDiscriminant)) {
 					// This is a text block
 					const textAccessor = entity.getRelativeSingleField(textBlockField)
-					let element: Element
+					let element: SlateElement
 
 					if (textAccessor.currentValue === null || textAccessor.currentValue === '') {
-						const paragraphElement: ParagraphElement = {
-							type: 'paragraph',
-							children: [{ text: '' }],
-						}
-						element = paragraphElement
+						element = editor.createDefaultElement([{ text: '' }])
 					} else if (typeof textAccessor.currentValue !== 'string') {
 						throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
 					} else {
@@ -133,7 +135,8 @@ export const useSlateNodes = ({
 				{
 					type: contemberContentPlaceholderType,
 					children: [{ text: '' }],
-				},
+					placeholder,
+				} as ContemberContentPlaceholder,
 		  ]
 	return adjacentAccessorsToElements(leadingFieldBackedElements, 'leading').concat(
 		contentElements,

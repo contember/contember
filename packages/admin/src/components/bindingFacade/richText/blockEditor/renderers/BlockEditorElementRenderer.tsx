@@ -1,4 +1,5 @@
 import { EntityAccessor, RelativeSingleField, RemovalType } from '@contember/binding'
+import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlock } from '../../../blocks'
@@ -59,7 +60,8 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 	if (isContemberContentPlaceholder(props.element)) {
 		return (
 			<div {...props.attributes}>
-				<p>{props.children}</p>
+				<EditorPlaceholder>{props.element.placeholder}</EditorPlaceholder>
+				{props.children}
 			</div>
 		)
 	}

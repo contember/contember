@@ -151,7 +151,7 @@ export class CreateInputVisitor<Result>
 		throw new ImplementationException()
 	}
 
-	private processManyRelationInput<Context>(
+	private async processManyRelationInput<Context>(
 		processor: CreateInputProcessor.HasManyRelationProcessor<Context, Result>,
 		context: Context,
 		input: Input.CreateManyRelationInput | undefined,
@@ -159,7 +159,7 @@ export class CreateInputVisitor<Result>
 		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
-		const promises: Array<Promise<Result>> = []
+		const results: Result[] = []
 		let i = 0
 		for (let element of input) {
 			const alias = element.alias
@@ -173,10 +173,10 @@ export class CreateInputVisitor<Result>
 				result = processor.create({ ...context, input: element.create, index: i++, alias })
 			}
 			if (result !== undefined) {
-				promises.push(result)
+				results.push(await result)
 			}
 		}
-		return Promise.all(promises)
+		return Promise.all(results)
 	}
 
 	private verifyOperations(input: any) {

@@ -1,4 +1,10 @@
-import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from '../../plugins'
+import {
+	createEditorWithEssentials,
+	paragraphElementType,
+	withAnchors,
+	withBasicFormatting,
+	withParagraphs,
+} from '../../plugins'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
@@ -8,7 +14,7 @@ export interface CreateEditorOptions extends OverrideApplyOptions, OverrideRende
 
 export const createEditor = (options: CreateEditorOptions) => {
 	// TODO configurable plugin set
-	const editor = withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials())))
+	const editor = withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials(paragraphElementType))))
 
 	const {
 		addMark,

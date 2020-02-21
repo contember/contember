@@ -2,11 +2,20 @@ import { Box } from '@contember/ui'
 import * as React from 'react'
 import { Node } from 'slate'
 import { Editable, Slate } from 'slate-react'
-import { createEditorWithEssentials, withAnchors, withBasicFormatting, withParagraphs } from './plugins'
+import {
+	createEditorWithEssentials,
+	paragraphElementType,
+	withAnchors,
+	withBasicFormatting,
+	withParagraphs,
+} from './plugins'
 import { HoveringToolbar } from './toolbars'
 
 export const TestWysiwyg: React.ComponentType = () => {
-	const editor = React.useMemo(() => withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials()))), [])
+	const editor = React.useMemo(
+		() => withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials(paragraphElementType)))),
+		[],
+	)
 	const [value, setValue] = React.useState<typeof editor['children']>([
 		{
 			type: 'paragraph',

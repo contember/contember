@@ -1,9 +1,12 @@
 import * as React from 'react'
+import { Element as SlateElement } from 'slate'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
 import { EditorNode } from './Node'
 
 export interface WithEssentials<E extends EditorNode> {
 	formatVersion: string
+	isDefaultElement: (element: SlateElement) => boolean
+	createDefaultElement: (children: SlateElement['children']) => SlateElement
 
 	// <Editable> props
 	onDOMBeforeInput: (event: Event) => void

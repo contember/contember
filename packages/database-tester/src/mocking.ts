@@ -13,7 +13,7 @@ export const createConnectionMock = (
 	return new (class implements Connection.TransactionLike {
 		public readonly eventManager = new EventManagerImpl()
 
-		query<Row extends Record<string, any>>(
+		async query<Row extends Record<string, any>>(
 			sql: string,
 			parameters?: any[],
 			meta?: any,
@@ -52,6 +52,7 @@ ${JSON.stringify(parameters)}
 					}
 				}
 			}
+			await new Promise(resolve => setTimeout(resolve, 1))
 
 			return expected.response as any
 		}

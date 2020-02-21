@@ -438,27 +438,27 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(2) }] },
 					},
 					{
+						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
+          values (?, ?, ?)
+          on conflict do nothing`,
+						parameters: [testUuid(3), testUuid(1), testUuid(2)],
+						response: 1,
+					},
+					{
 						sql: SQL`with "root_" as
 						(select ? :: uuid as "id", ? :: text as "name")
 						insert into "public"."category" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
-						parameters: [testUuid(3), 'Category 2'],
-						response: { rows: [{ id: testUuid(3) }] },
+						parameters: [testUuid(4), 'Category 2'],
+						response: { rows: [{ id: testUuid(4) }] },
 					},
 					{
 						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
           values (?, ?, ?)
           on conflict do nothing`,
-						parameters: [testUuid(4), testUuid(1), testUuid(2)],
-						response: 1,
-					},
-					{
-						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-          values (?, ?, ?)
-          on conflict do nothing`,
-						parameters: [testUuid(5), testUuid(1), testUuid(3)],
+						parameters: [testUuid(5), testUuid(1), testUuid(4)],
 						response: 1,
 					},
 					{
@@ -526,27 +526,27 @@ describe('Insert mutation', () => {
 						response: { rows: [{ id: testUuid(2) }] },
 					},
 					{
+						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
+          values (?, ?, ?)
+          on conflict do nothing`,
+						parameters: [testUuid(3), testUuid(2), testUuid(1)],
+						response: 1,
+					},
+					{
 						sql: SQL`with "root_" as
 						(select ? :: uuid as "id", ? :: text as "name")
 						insert into "public"."post" ("id", "name")
 						select "root_"."id", "root_"."name"
             from "root_"
 						returning "id"`,
-						parameters: [testUuid(3), 'Post 2'],
-						response: { rows: [{ id: testUuid(3) }] },
+						parameters: [testUuid(4), 'Post 2'],
+						response: { rows: [{ id: testUuid(4) }] },
 					},
 					{
 						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
           values (?, ?, ?)
           on conflict do nothing`,
-						parameters: [testUuid(4), testUuid(2), testUuid(1)],
-						response: 1,
-					},
-					{
-						sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-          values (?, ?, ?)
-          on conflict do nothing`,
-						parameters: [testUuid(5), testUuid(3), testUuid(1)],
+						parameters: [testUuid(5), testUuid(4), testUuid(1)],
 						response: 1,
 					},
 					{

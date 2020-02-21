@@ -147,7 +147,7 @@ export class UpdateInputVisitor<Result>
 		throw new ImplementationException()
 	}
 
-	private processManyRelationInput<Context>(
+	private async processManyRelationInput<Context>(
 		processor: UpdateInputProcessor.HasManyRelationInputProcessor<Context, Result>,
 		context: Context,
 		input: Input.UpdateManyRelationInput | undefined,
@@ -155,7 +155,7 @@ export class UpdateInputVisitor<Result>
 		if (input === undefined || input === null) {
 			return Promise.resolve(undefined)
 		}
-		const promises: Array<Promise<Result>> = []
+		const results: Array<Result> = []
 		let i = 0
 		for (let element of input) {
 			const alias = element.alias
@@ -192,10 +192,10 @@ export class UpdateInputVisitor<Result>
 			}
 
 			if (result !== undefined) {
-				promises.push(result)
+				results.push(await result)
 			}
 		}
-		return Promise.all(promises)
+		return results
 	}
 
 	private verifyOperations(input: any) {

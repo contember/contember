@@ -23,6 +23,7 @@ export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicPr
 	trailingFieldBackedElements?: FieldBackedElement[]
 }
 
+// TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
 export const BlockEditor = Component<BlockEditorProps>(
 	props => {
 		const entity = useEntityContext()

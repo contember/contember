@@ -64,6 +64,11 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		trailing: normalizedTrailingFieldsRef,
 	}
 
+	const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
+	//const firstContentElementPath = Editor.pathRef(editor, [firstContentIndex], {
+	//	affinity: 'backward',
+	//})
+
 	editor.apply = (operation: Operation) => {
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
@@ -71,7 +76,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (options.isMutatingRef.current) {
 			return
 		}
-		// console.log('op', operation)
+		//console.log('op', operation, firstContentElementPath.current)
 		if (operation.path.length === 0) {
 			// This is invalid.
 			return
@@ -79,9 +84,10 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 
 		batchUpdates(getAccessor => {
 			const { path } = operation
+			const sortedEntities = sortedEntitiesRef.current
 			const [topLevelIndex] = path
-			const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
-			let sortedEntities = sortedEntitiesRef.current
+
+			apply(operation)
 
 			// TODO also handle trailing
 			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
@@ -181,8 +187,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				setTopLevelElementType(topLevelIndex, 'paragraph')
 				addNewTextElementAt(topLevelIndex)
 			}
-
-			apply(operation)
 
 			if (path.length > 1) {
 				saveElementAt(topLevelIndex)

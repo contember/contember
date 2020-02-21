@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { GlobalClassNamePrefixContext } from '../contexts'
 import { Navigation } from '../Navigation'
-import { isSpecialLinkClick } from '../utils'
+import { isSpecialLinkClick, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
 
 const DepthContext = React.createContext(0)
@@ -16,7 +16,7 @@ class Menu extends React.PureComponent<Menu.Props> {
 			<DepthContext.Provider value={0}>
 				<GlobalClassNamePrefixContext.Consumer>
 					{prefix => (
-						<section className={`${prefix}menu`}>
+						<section className={cn(`${prefix}menu`, toViewClass('showCaret', this.props.showCaret))}>
 							<ul className={`${prefix}menu-list`}>{this.props.children}</ul>
 						</section>
 					)}
@@ -29,6 +29,7 @@ class Menu extends React.PureComponent<Menu.Props> {
 namespace Menu {
 	export interface Props {
 		children?: React.ReactNode
+		showCaret?: boolean
 	}
 
 	export interface ItemProps {
@@ -36,6 +37,7 @@ namespace Menu {
 		title?: string | React.ReactNode
 		to?: Navigation.MiddlewareProps['to']
 		external?: boolean
+		expandedByDefault?: boolean
 	}
 
 	interface TitleProps {
@@ -64,7 +66,7 @@ namespace Menu {
 			return <GroupItem {...props} />
 		} else if (depth === 2) {
 			return <SubGroupItem {...props} />
-		} else if (depth === 3) {
+		} else if (depth === 3 || depth === 4) {
 			return <ActionItem {...props} />
 		} else {
 			return <TooDeepItem {...props} />
@@ -131,7 +133,7 @@ namespace Menu {
 	}
 
 	function SubGroupItem(props: ItemProps) {
-		const [expanded, setExpanded] = React.useState(false)
+		const [expanded, setExpanded] = React.useState(!!props.expandedByDefault)
 		const onClick = React.useCallback(() => {
 			setExpanded(!expanded)
 		}, [setExpanded, expanded])

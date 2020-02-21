@@ -32,6 +32,7 @@
 			display: flex
 			align-items: center
 			width: 100%
+			transition: background-color ease-in-out .5s
 
 	&-titleContent
 		flex-grow: 1
@@ -42,7 +43,7 @@
 			font-size: $cui-menu-group-title-font-size
 			margin: (2 * $cui-menu-vertical-padding) 0 $cui-menu-vertical-padding
 			padding: 0 $cui-menu-horizontal-padding
-			font-weight: $fw-medium
+			font-weight: $fw-extraBold
 			text-transform: uppercase
 
 		&-list
@@ -59,14 +60,20 @@
 			border: none
 			background: transparent
 			text-transform: inherit
-			font-weight: $fw-medium
 			font-family: inherit
 
 		&-list
-			padding: ($cui-menu-vertical-padding / 2) 0 $cui-menu-vertical-padding
+			padding: ($cui-menu-vertical-padding / 2) 0 $cui-menu-vertical-padding * 2
 
-		&.is-expanded &,
-		&.is-collapsed &
+		&.is-collapsed &,
+		&.is-expanded &
+			&-title
+				font-weight: $fw-bold
+
+	&.view-showCaret &-subgroup
+
+		&.is-expanded .#{$cui-conf-globalPrefix}menu-subgroup,
+		&.is-collapsed .#{$cui-conf-globalPrefix}menu-subgroup
 			&-title::after
 				content: ''
 				display: inline-block
@@ -81,7 +88,7 @@
 				transform-origin: 70% 70%
 				transform: rotate(#{45deg + 180deg})
 
-		&.is-collapsed &
+		&.is-collapsed .#{$cui-conf-globalPrefix}menu-subgroup
 			&-title::after
 				transform: rotate(45deg)
 
@@ -93,7 +100,6 @@
 			color: $cui-menu-action-inactive-color
 			padding: rem(2px) $cui-menu-horizontal-padding rem(2px) (1.5 * $cui-menu-horizontal-padding)
 			text-decoration: none
-			font-weight: $fw-medium
 
 		&-list
 			padding: 0 0 ($cui-menu-vertical-padding / 2) ($cui-menu-horizontal-padding * 2)
@@ -111,7 +117,6 @@
 			color: $cui-menu-action-inactive-color
 			text-decoration: none
 			padding: rem(1px) $cui-menu-horizontal-padding rem(1px) 0
-			font-weight: $fw-medium
 
 		&-list
 			//
@@ -127,13 +132,9 @@
 		&-subgroup,
 		&-action,
 		&-tooDeep
-			&-title:hover
-				background-color: $cui-menu-hover-background
-
-		&-action,
-		&-tooDeep
-			&-title:hover
-				color: $cui-menu-action-active-color
+			&-title:focus
+				@extend %implementsCustomFocusEffects
+				background: $cui-menu-action-focus-color
 
 	&-subgroup,
 	&-action,
@@ -141,13 +142,13 @@
 		&.is-active > &-title
 			&,
 			&:hover
-				background-color: $cui-menu-active-background
+				color: $cui-menu-action-active-color
 
 	&-subgroup
 		&.is-active > &-title
 			&,
 			&:hover
-				color: $cui-menu-subgroup-active-color
+				color: $cui-menu-action-active-color
 
 	&-action,
 	&-tooDeep

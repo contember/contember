@@ -43,6 +43,7 @@ const createContainer = (debug: boolean) =>
 				},
 			},
 			server: {
+				logging: {},
 				port: 0,
 			},
 		},

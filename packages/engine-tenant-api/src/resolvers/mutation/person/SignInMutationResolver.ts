@@ -3,6 +3,7 @@ import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions, SignInManager } from '../../../model'
 import { PermissionContextFactory } from '../../../model/authorization/PermissionContextFactory'
 import { IdentityTypeResolver } from '../../types'
+import { createResolverContext } from '../../ResolverContextFactory'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(
@@ -31,7 +32,7 @@ export class SignInMutationResolver implements MutationResolvers {
 		const projects = await this.identityTypeResolver.projects(
 			{ id: identityId, projects: [] },
 			{},
-			new ResolverContext(context.apiKeyId, permissionContext),
+			createResolverContext(permissionContext, context.apiKeyId),
 		)
 		return {
 			ok: true,

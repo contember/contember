@@ -1,29 +1,38 @@
-import { Authorizator, AuthorizationScope } from '@contember/authorization'
+import { AuthorizationScope, Authorizator } from '@contember/authorization'
 import { Identity } from '@contember/engine-common'
 import { Acl } from '@contember/schema'
 import { SystemExecutionContainer } from '../SystemExecutionContainer'
 import { ForbiddenError } from 'apollo-server-errors'
 
-export class ResolverContext {
-	constructor(
-		public readonly identity: Identity,
-		public readonly variables: Acl.VariablesMap,
-		private readonly authorizator: Authorizator<Identity>,
-		public readonly container: SystemExecutionContainer,
-		public readonly errorHandler: (errors: readonly any[]) => void,
-	) {}
-
-	public async isAllowed(scope: AuthorizationScope<Identity>, action: Authorizator.Action): Promise<boolean> {
-		return await this.authorizator.isAllowed(this.identity, scope, action)
+export const createResolverContext = (
+	identity: Identity,
+	variables: Acl.VariablesMap,
+	authorizator: Authorizator<Identity>,
+	container: SystemExecutionContainer,
+): ResolverContext => {
+	return {
+		identity,
+		variables,
+		authorizator,
+		container,
+		isAllowed: async (scope, action) => await authorizator.isAllowed(identity, scope, action),
+		requireAccess: async (scope, action, message?) => {
+			if (!(await authorizator.isAllowed(identity, scope, action))) {
+				throw new ForbiddenError(message || 'Forbidden')
+			}
+		},
 	}
+}
 
-	public async requireAccess(
+export interface ResolverContext {
+	readonly identity: Identity
+	readonly variables: Acl.VariablesMap
+	readonly authorizator: Authorizator<Identity>
+	readonly container: SystemExecutionContainer
+	readonly isAllowed: (scope: AuthorizationScope<Identity>, action: Authorizator.Action) => Promise<boolean>
+	readonly requireAccess: (
 		scope: AuthorizationScope<Identity>,
 		action: Authorizator.Action,
 		message?: string,
-	): Promise<void> {
-		if (!(await this.isAllowed(scope, action))) {
-			throw new ForbiddenError(message || 'Forbidden')
-		}
-	}
+	) => Promise<void>
 }

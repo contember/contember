@@ -11,13 +11,10 @@ import {
 	SchemaMigrator,
 	SchemaVersionBuilder,
 	SystemContainerFactory,
-	SystemExecutionContainer,
-	Providers as SystemProviders,
 } from '@contember/engine-system-api'
-import { DatabaseCredentials, MigrationFilesManager } from '@contember/engine-common'
+import { MigrationFilesManager } from '@contember/engine-common'
 import {
 	createMigrationFilesManager as createTenantMigrationFilesManager,
-	MailerOptions,
 	Providers as TenantProviders,
 	TenantContainer,
 } from '@contember/engine-tenant-api'
@@ -55,7 +52,6 @@ import {
 import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
-import { getArgumentValues } from 'graphql/execution/values'
 import { tuple } from './utils'
 
 export interface MasterContainer {
@@ -270,7 +266,7 @@ class CompositionRoot {
 					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory }) =>
 						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory),
 				)
-				.addService('apolloServerFactory', () => new ContentApolloServerFactory(debug))
+				.addService('apolloServerFactory', ({ project }) => new ContentApolloServerFactory(project.slug, debug))
 				.addService(
 					'contentApolloMiddlewareFactory',
 					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory, schema }) =>
@@ -304,6 +300,7 @@ class CompositionRoot {
 							systemContainer.systemResolvers,
 							systemContainer.authorizator,
 							systemContainer.systemExecutionContainerFactory,
+							project.slug,
 						),
 				)
 				.build()

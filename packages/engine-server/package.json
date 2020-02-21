@@ -24,6 +24,7 @@
 		"@contember/schema-migrations": "^0.6.11",
 		"@contember/schema-utils": "^0.6.11",
 		"@koa/cors": "^2.2.3",
+		"@sentry/node": "^5.12.4",
 		"accepts": "^1.3.5",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-koa": "^2.9.0",

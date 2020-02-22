@@ -2,6 +2,9 @@
 
 .#{$cui-conf-globalPrefix}box
 	+boxNesting
+	display: grid
+	grid-template-columns: 1fr auto
+	grid-template-rows: auto auto
 
 	& & + &-section:not(:first-child)
 		border-top: none
@@ -15,9 +18,13 @@
 		border-radius: unset
 
 	&-heading
+		grid-row: 1
+
+	&-actions
+		grid-column: 2
 
 	&-content
-		//
+		grid-area: 2 / 1 / 3 / 3
 
 	&-section
 		//&.view-hasHeading,

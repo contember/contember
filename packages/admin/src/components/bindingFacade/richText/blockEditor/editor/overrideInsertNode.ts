@@ -30,7 +30,7 @@ export const overrideInsertNode = <E extends BlockSlateEditor>(editor: E, option
 					})
 				}
 				Transforms.insertNodes(editor, node, {
-					at: [topLevelIndex],
+					at: [topLevelIndex + 1],
 				})
 			})
 		})

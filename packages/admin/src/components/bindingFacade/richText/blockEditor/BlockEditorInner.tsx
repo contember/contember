@@ -143,6 +143,8 @@ export const BlockEditorInner = React.memo(
 		)
 
 		const nodes = useSlateNodes({
+			placeholder: label,
+			editor,
 			discriminationField: desugaredDiscriminationField,
 			textElementCache,
 			contemberFieldElementCache,

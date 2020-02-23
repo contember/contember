@@ -1,13 +1,19 @@
-import { FieldValue } from '@contember/binding'
-import { BlueprintIconName, Button, ButtonGroup, Icon } from '@contember/ui'
+import { FieldValue, Scalar, useEnvironment, VariableInputTransformer, VariableLiteral } from '@contember/binding'
+import { GraphQlBuilder } from '@contember/client'
+import { BlueprintIconName, Button, ButtonGroup, Icon, IconSourceSpecification } from '@contember/ui'
 import * as React from 'react'
 import { useEditor } from 'slate-react'
-import { contemberBlockElementType } from '../blockEditor'
+import { ContemberBlockElement, contemberBlockElementType } from '../blockEditor'
 
-export type BlockHoveringToolbarConfig = {
-	blueprintIcon: BlueprintIconName
-	discriminateBy: FieldValue
-}
+export type BlockHoveringToolbarConfig = IconSourceSpecification &
+	(
+		| {
+				discriminateBy: GraphQlBuilder.Literal | VariableLiteral | string
+		  }
+		| {
+				discriminateByScalar: Scalar
+		  }
+	)
 
 export interface BlockHoveringToolbarContentsProps {
 	blockButtons?: BlockHoveringToolbarConfig[]
@@ -15,6 +21,7 @@ export interface BlockHoveringToolbarContentsProps {
 
 export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringToolbarContentsProps) => {
 	const editor = useEditor()
+	const environment = useEnvironment()
 
 	if (!props.blockButtons || !props.blockButtons.length) {
 		return null
@@ -23,21 +30,30 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 	return (
 		// TODO
 		<ButtonGroup size="large">
-			{props.blockButtons.map(({ blueprintIcon, discriminateBy }, i) => {
+			{props.blockButtons.map((buttonProps, i) => {
 				return (
 					<Button
 						size="large"
 						key={i}
 						onClick={() => {
-							editor.insertNode({
+							const discriminateBy = VariableInputTransformer.transformValue(
+								'discriminateBy' in buttonProps ? buttonProps.discriminateBy : buttonProps.discriminateByScalar,
+								environment,
+							)
+							const contemberBlockElement: ContemberBlockElement = {
 								type: contemberBlockElementType,
 								blockType: discriminateBy,
 								entityKey: '', // Any string will do from here.
 								children: [{ text: '' }],
-							})
+							}
+							editor.insertNode(contemberBlockElement)
 						}}
 					>
-						<Icon blueprintIcon={blueprintIcon} />
+						<Icon
+							blueprintIcon={buttonProps.blueprintIcon}
+							contemberIcon={buttonProps.contemberIcon}
+							customIcon={buttonProps.customIcon}
+						/>
 					</Button>
 				)
 			})}

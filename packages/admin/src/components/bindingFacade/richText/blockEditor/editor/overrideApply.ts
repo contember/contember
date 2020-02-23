@@ -64,6 +64,11 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		trailing: normalizedTrailingFieldsRef,
 	}
 
+	const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
+	//const firstContentElementPath = Editor.pathRef(editor, [firstContentIndex], {
+	//	affinity: 'backward',
+	//})
+
 	editor.apply = (operation: Operation) => {
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
@@ -71,18 +76,18 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (options.isMutatingRef.current) {
 			return
 		}
-		// console.log('op', operation)
+		//console.log('op', operation, firstContentElementPath.current)
 		if (operation.path.length === 0) {
-			// Technically, the path could also be [], indicating that we're operating on the editor itself.
-			// This is branch is entirely speculative. I *THINK* it could feasibly happen but I don't know when or how.
-			return apply(operation) // ?!?!!???
+			// This is invalid.
+			return
 		}
 
 		batchUpdates(getAccessor => {
 			const { path } = operation
+			const sortedEntities = sortedEntitiesRef.current
 			const [topLevelIndex] = path
-			const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
-			let sortedEntities = sortedEntitiesRef.current
+
+			apply(operation)
 
 			// TODO also handle trailing
 			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
@@ -156,21 +161,22 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				}
 			}
 			const addNewDiscriminatedEntityAt = (elementIndex: number, blockDiscriminant: FieldValue): EntityAccessor => {
+				const normalizedElementIndex = Math.max(
+					firstContentIndex,
+					Math.min(elementIndex, sortedEntities.length + firstContentIndex),
+				)
+				const sortedEntityIndex = normalizedElementIndex - firstContentIndex
 				addNewEntityAtIndex(
 					getAccessor().getRelativeEntityList(desugaredEntityList),
 					sortableByField,
-					elementIndex - firstContentIndex,
+					sortedEntityIndex,
 					(getInnerAccessor, newEntityIndex) => {
 						const newEntity = getInnerAccessor().entities[newEntityIndex] as EntityAccessor
 						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
-						sortedEntities.splice(
-							elementIndex - firstContentIndex,
-							0,
-							getInnerAccessor().entities[newEntityIndex] as EntityAccessor,
-						)
+						sortedEntities.splice(sortedEntityIndex, 0, getInnerAccessor().entities[newEntityIndex] as EntityAccessor)
 					},
 				)
-				return sortedEntities[elementIndex - firstContentIndex]
+				return sortedEntities[sortedEntityIndex]
 			}
 			const addNewTextElementAt = (elementIndex: number) => {
 				const newEntity = addNewDiscriminatedEntityAt(elementIndex, textBlockDiscriminant)
@@ -183,17 +189,15 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			}
 
 			if (path.length > 1) {
-				apply(operation)
 				saveElementAt(topLevelIndex)
 			} else {
 				switch (operation.type) {
 					case 'set_node':
-						apply(operation) // TODO for leading/trailing, if they're set to plaintext, do nothing here
+						// TODO for leading/trailing, if they're set to plaintext, do nothing here
 						saveElementAt(topLevelIndex)
 						break
 					case 'merge_node': {
 						// TODO special checks for leading/trailing
-						apply(operation)
 						removeElementAt(topLevelIndex)
 						saveElementAt(topLevelIndex - 1)
 						break
@@ -207,7 +211,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							break // TODO what do we even do from here?!
 						}
 						if (isLeadingElement(topLevelIndex)) {
-							apply(operation)
 							for (let i = topLevelIndex; i < firstContentIndex; i++) {
 								apply({
 									type: 'set_node',
@@ -225,7 +228,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							})
 							addNewTextElementAt(firstContentIndex)
 						} else {
-							apply(operation)
 							saveElementAt(topLevelIndex)
 							addNewTextElementAt(topLevelIndex + 1)
 						}
@@ -239,7 +241,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						if (isContemberBlockElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
-						apply(operation)
 						saveElementAt(topLevelIndex)
 						break
 					}
@@ -254,25 +255,20 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 
 						if (isContemberBlockElement(node)) {
 							blockType = node.blockType
-							const entity = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
-							apply(operation)
 							// TODO cache?
-							sortedEntities[topLevelIndex - firstContentIndex] = entity
+							sortedEntities[topLevelIndex - firstContentIndex] = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
 						} else {
-							apply(operation)
 							addNewTextElementAt(topLevelIndex)
 						}
 						break
 					}
 					case 'remove_node': {
 						// TODO for leading/trailing, this makes the state inconsistent
-						apply(operation)
 						removeElementAt(topLevelIndex)
 						break
 					}
 					case 'move_node':
 						// TODO Not even slate-react supports this at the moment
-						apply(operation)
 						break
 				}
 			}

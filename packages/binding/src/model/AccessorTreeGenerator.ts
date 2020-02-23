@@ -12,7 +12,7 @@ import {
 	RootAccessor,
 } from '../accessors'
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
-import { ExpectedEntityCount, FieldName, RemovalType, Scalar } from '../treeParameters'
+import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => void
@@ -239,15 +239,17 @@ class AccessorTreeGenerator {
 							),
 						)
 					}
-					// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
-					// a new entity
+					let fieldValue: FieldValue
+					if (fieldData === undefined) {
+						// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
+						// a new entity
+						fieldValue = field.defaultValue === undefined ? null : field.defaultValue
+					} else {
+						fieldValue = fieldData instanceof FieldAccessor ? fieldData.currentValue : fieldData
+					}
 					entityData[placeholderName] = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 						placeholderName,
-						fieldData === undefined
-							? field.defaultValue || null
-							: fieldData instanceof FieldAccessor
-							? fieldData.currentValue
-							: fieldData,
+						fieldValue,
 						persistedValue,
 						fieldErrors,
 						onChange,
@@ -433,7 +435,13 @@ class AccessorTreeGenerator {
 		}
 
 		for (let i = 0, len = sourceData.length; i < len; i++) {
-			listAccessor.entities.push(generateNewAccessor(sourceData[i], i))
+			// If fieldData is an accessor, we've already submitted. In that case, an undefined in the entities array
+			// signifies a "hole" after a previously removed entity. We don't want to create a new accessor for it.
+			listAccessor.entities.push(
+				fieldData instanceof EntityListAccessor && sourceData[i] === undefined
+					? undefined
+					: generateNewAccessor(sourceData[i], i),
+			)
 			childBatchUpdateDepths.push(0)
 		}
 

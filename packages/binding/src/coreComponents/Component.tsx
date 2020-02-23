@@ -22,15 +22,17 @@ function Component<P extends {}>(
 	decider?: string | ((props: P, environment: Environment) => React.ReactNode) | MarkerProvider<P>,
 	displayName?: string,
 ) {
-	const augmentedRender: React.NamedExoticComponent<P> & MarkerProvider<P> = React.memo<P>(render)
+	let augmentedRender: React.NamedExoticComponent<P> & MarkerProvider<P>
 	if (decider === undefined || typeof decider === 'string') {
-		augmentedRender.displayName = decider
+		render.displayName = decider
+		augmentedRender = React.memo<P>(render)
 		augmentedRender.generateSyntheticChildren = render
 
 		return augmentedRender as React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
 	}
 
-	augmentedRender.displayName = displayName
+	render.displayName = displayName
+	augmentedRender = React.memo<P>(render)
 
 	if (typeof decider === 'function') {
 		augmentedRender.generateSyntheticChildren = decider

@@ -10,20 +10,18 @@ import * as ContemberIcons from './contemberIcons'
 export type BlueprintIconName = BPIconName
 export type ContemberIconName = keyof typeof ContemberIcons
 
-export type IconProps = {
-	children?: never
+export interface IconSourceSpecification {
+	blueprintIcon?: BlueprintIconName
+	contemberIcon?: ContemberIconName
+	customIcon?: React.ReactElement | string[]
+}
+
+export interface IconProps extends IconSourceSpecification {
 	title?: string
 	size?: IconSize
 	style?: React.CSSProperties
 	alignWithLowercase?: boolean
-} & (
-	| {
-			blueprintIcon: BlueprintIconName
-	  }
-	| {
-			contemberIcon: ContemberIconName
-	  }
-)
+}
 
 const renderSvgPaths = (pathStrings: string[] | undefined): JSX.Element[] | null => {
 	if (!pathStrings || !pathStrings.length) {
@@ -33,22 +31,32 @@ const renderSvgPaths = (pathStrings: string[] | undefined): JSX.Element[] | null
 }
 
 export const Icon = React.memo((props: IconProps) => {
-	let pathStrings: string[] | undefined
-	let svgClassName: string
-
 	const prefix = useClassNamePrefix()
-
-	if ('blueprintIcon' in props && props.blueprintIcon) {
-		pathStrings = IconSvgPaths16[props.blueprintIcon]
-		svgClassName = `${prefix}icon-blueprintSvg`
-	} else if ('contemberIcon' in props && props.contemberIcon) {
-		pathStrings = ContemberIcons[props.contemberIcon]
-		svgClassName = `${prefix}icon-contemberSvg`
-	} else {
-		return null
-	}
-
-	const svgPaths = React.useMemo(() => renderSvgPaths(pathStrings), [pathStrings])
+	const icon: React.ReactElement | null = React.useMemo(() => {
+		if (props.customIcon && !Array.isArray(props.customIcon)) {
+			return props.customIcon
+		}
+		let pathStrings: string[] | undefined
+		let svgClassName: string
+		if (props.blueprintIcon) {
+			pathStrings = IconSvgPaths16[props.blueprintIcon]
+			svgClassName = `${prefix}icon-blueprintSvg`
+		} else if (props.contemberIcon) {
+			pathStrings = ContemberIcons[props.contemberIcon]
+			svgClassName = `${prefix}icon-contemberSvg`
+		} else {
+			// TODO if __DEV__
+			console.warn('Icon: trying to render without an icon source.')
+			return null
+		}
+		const svgPaths = renderSvgPaths(pathStrings)
+		return (
+			<svg viewBox="0 0 16 16" className={svgClassName}>
+				{props.title && <desc>{props.title}</desc>}
+				{svgPaths}
+			</svg>
+		)
+	}, [prefix, props])
 
 	return (
 		<div
@@ -59,10 +67,7 @@ export const Icon = React.memo((props: IconProps) => {
 			)}
 			style={props.style}
 		>
-			<svg viewBox="0 0 16 16" className={svgClassName}>
-				{props.title && <desc>{props.title}</desc>}
-				{svgPaths}
-			</svg>
+			{icon}
 		</div>
 	)
 })

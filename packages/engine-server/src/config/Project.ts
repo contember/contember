@@ -1,6 +1,6 @@
 import { DatabaseCredentials } from '@contember/engine-common'
 
-interface Project {
+type Project = {
 	readonly slug: string
 	readonly alias?: string[]
 	readonly directory?: string
@@ -8,7 +8,7 @@ interface Project {
 	readonly stages: Array<Project.Stage>
 	readonly db: DatabaseCredentials
 	readonly ignoreMigrations?: boolean
-}
+} & Record<string, unknown>
 
 namespace Project {
 	export interface Stage {

@@ -1,4 +1,4 @@
-import { ProjectWithS3 } from './config/config'
+import Project from './config/Project'
 import { ContentApolloMiddlewareFactory, SystemApolloServerFactory } from './http'
 import { Container } from '@contember/dic'
 import { Client, Connection, DatabaseQueryable } from '@contember/database'
@@ -7,7 +7,7 @@ import { MigrationsRunner } from './bootstrap/MigrationsRunner'
 import { QueryHandler } from '@contember/queryable'
 
 export type ProjectContainer = Container<{
-	project: ProjectWithS3
+	project: Project
 	systemDbClient: Client
 	systemQueryHandler: QueryHandler<DatabaseQueryable>
 	systemApolloServerFactory: SystemApolloServerFactory

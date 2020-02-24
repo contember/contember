@@ -30,15 +30,6 @@ const createContainer = (debug: boolean) =>
 					db: dbCredentials(String(process.env.TEST_DB_NAME)),
 					name: 'test',
 					slug: 'test',
-					s3: {
-						bucket: '',
-						credentials: {
-							key: '',
-							secret: '',
-						},
-						prefix: '',
-						region: '',
-					},
 					stages: [{ name: 'prod', slug: 'prod' }],
 				},
 			},
@@ -48,6 +39,8 @@ const createContainer = (debug: boolean) =>
 			},
 		},
 		getExampleProjectDirectory(),
+		undefined,
+		[],
 	)
 
 const executeGraphql = (

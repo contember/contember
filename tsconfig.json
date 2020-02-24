@@ -13,6 +13,7 @@
 		{ "path": "./packages/engine-api-tester" },
 		{ "path": "./packages/engine-common" },
 		{ "path": "./packages/engine-content-api" },
+		{ "path": "./packages/engine-plugins" },
 		{ "path": "./packages/engine-s3-plugin" },
 		{ "path": "./packages/engine-server" },
 		{ "path": "./packages/engine-system-api" },

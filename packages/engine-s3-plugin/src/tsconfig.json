@@ -7,6 +7,9 @@
 	"references": [
 		{
 			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../engine-plugins/src"
 		}
 	]
 }

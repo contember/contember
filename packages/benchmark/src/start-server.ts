@@ -10,7 +10,7 @@ import App from './projects/app/src/model'
 		app: App,
 	}
 
-	await run(false, await readConfig(configFile), projectsDirectory, projects)
+	await run(false, await readConfig([configFile]), projectsDirectory, projects, [])
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

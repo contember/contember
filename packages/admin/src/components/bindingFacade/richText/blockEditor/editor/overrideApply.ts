@@ -87,8 +87,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			const sortedEntities = sortedEntitiesRef.current
 			const [topLevelIndex] = path
 
-			apply(operation)
-
 			// TODO also handle trailing
 			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
 			const isTrailingElement = (elementIndex: number) =>
@@ -187,6 +185,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				setTopLevelElementType(topLevelIndex, 'paragraph')
 				addNewTextElementAt(topLevelIndex)
 			}
+			apply(operation)
 
 			if (path.length > 1) {
 				saveElementAt(topLevelIndex)
@@ -271,13 +270,13 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						// TODO Not even slate-react supports this at the moment
 						break
 				}
-			}
-			if (sortedEntities.length === 1) {
-				const soleElement = editor.children[firstContentIndex] as Element
+				if (sortedEntities.length === 1) {
+					const soleElement = editor.children[firstContentIndex] as Element
 
-				if (editor.isParagraph(soleElement) && SlateNode.string(soleElement) === '') {
-					setTopLevelElementType(firstContentIndex, contemberContentPlaceholderType)
-					removeElementAt(firstContentIndex)
+					if (editor.isParagraph(soleElement) && SlateNode.string(soleElement) === '') {
+						setTopLevelElementType(firstContentIndex, contemberContentPlaceholderType)
+						removeElementAt(firstContentIndex)
+					}
 				}
 			}
 		})

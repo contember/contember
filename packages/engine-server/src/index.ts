@@ -3,6 +3,7 @@ import Project from './config/Project'
 import { Config, readConfig } from './config/config'
 import { Schema } from '@contember/schema'
 import { Server } from 'http'
+import { initSentry } from './utils/sentry'
 
 export { CompositionRoot, Project, readConfig }
 
@@ -14,5 +15,7 @@ export async function run(
 ): Promise<Server> {
 	const container = new CompositionRoot().createMasterContainer(debug, config, projectsDirectory, projectSchemas)
 	await container.initializer.initialize()
+	initSentry(config.server.logging.sentry?.dsn)
+
 	return await container.serverRunner.run()
 }

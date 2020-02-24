@@ -8,6 +8,7 @@ import {
 	TenantContainer,
 	typeDefs,
 	MailMessage,
+	createResolverContext,
 } from '../../../src'
 import { executeGraphQlTest } from '../../src/testGraphql'
 import { GQL, SQL } from '../../src/tags'
@@ -71,11 +72,11 @@ export const execute = async (test: Test) => {
 		)
 		.build()
 
-	const context: ResolverContext = new ResolverContext(
-		testUuid(998),
+	const context: ResolverContext = createResolverContext(
 		new PermissionContext(new Identity.StaticIdentity(testUuid(999), [], {}), {
 			isAllowed: () => Promise.resolve(true),
 		}),
+		testUuid(998),
 	)
 
 	const schema = makeExecutableSchema({ typeDefs: typeDefs, resolvers: tenantContainer.resolvers as any })

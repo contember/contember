@@ -24,6 +24,11 @@ export interface Config {
 	projects: Record<string, ProjectWithS3>
 	server: {
 		port: number
+		logging: {
+			sentry?: {
+				dsn: string
+			}
+		}
 	}
 }
 
@@ -215,7 +220,30 @@ function checkServerStructure(json: unknown): Config['server'] {
 	if (!hasNumberProperty(json, 'port')) {
 		throw new Error('impl error')
 	}
-	return json
+	return { ...json, logging: checkLoggingStructure(json.logging) }
+}
+
+function checkLoggingStructure(json: unknown): Config['server']['logging'] {
+	if (!json) {
+		return {}
+	}
+	if (!isObject(json)) {
+		return typeError('logging', json, 'object')
+	}
+	let sentry: Config['server']['logging']['sentry'] = undefined
+	if (json.sentry) {
+		if (!isObject(json.sentry)) {
+			return typeError('logging.sentry', json.sentry, 'object')
+		}
+		if (json.sentry.dsn) {
+			if (!hasStringProperty(json.sentry, 'dsn')) {
+				return typeError('logging.sentry.dsn', json.sentry.dsn, 'string')
+			}
+			sentry = { dsn: json.sentry.dsn }
+		}
+	}
+
+	return { sentry }
 }
 
 function checkConfigStructure(json: unknown): Config {
@@ -282,6 +310,11 @@ export async function readConfig(...filenames: string[]): Promise<Config> {
 		},
 		server: {
 			port: '%env.CONTEMBER_PORT::number%',
+			logging: {
+				sentry: {
+					dsn: '%?env.SENTRY_DSN%',
+				},
+			},
 		},
 	}
 

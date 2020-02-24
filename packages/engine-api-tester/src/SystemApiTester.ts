@@ -4,6 +4,7 @@ import { GQL } from './tags'
 import { Identity } from '@contember/engine-common'
 import { Client } from '@contember/database'
 import {
+	createResolverContext,
 	ResolverContext,
 	Schema,
 	setupSystemVariables,
@@ -34,7 +35,7 @@ export class SystemApiTester {
 		} = {},
 	): Promise<any> {
 		await setupSystemVariables(this.db, unnamedIdentity, { uuid: this.uuidGenerator })
-		const context: ResolverContext = new ResolverContext(
+		const context: ResolverContext = createResolverContext(
 			options.identity ||
 				new Identity.StaticIdentity(testUuid(888), options.roles || [], {
 					[project.slug]: options.projectRoles || [Identity.ProjectRole.ADMIN],
@@ -42,7 +43,6 @@ export class SystemApiTester {
 			{},
 			this.systemContainer.authorizator,
 			this.systemExecutionContainer,
-			() => null,
 		)
 
 		return await graphql(this.systemSchema, gql, null, context, variables)

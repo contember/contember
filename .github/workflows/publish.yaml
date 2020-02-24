@@ -1,0 +1,31 @@
+name: Publish
+on:
+  push:
+    tags:
+      - '**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Get the version
+        run: echo ::set-env name=VERSION::$(echo ${GITHUB_REF:10})
+      - name: "Install base deps"
+        run: npm ci
+      - name: "Install lerna deps"
+        run: npm run bootstrap
+      - name: "Build app"
+        run: npm run build
+      - name: "Publish NPM"
+        run: bash ./scripts/npm/publish.sh
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: "Publish Docker"
+        run: bash ./scripts/docker/publish.sh
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

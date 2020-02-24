@@ -1,6 +1,8 @@
 name: Build
-
-on: [push]
+on:
+  push:
+    tags-ignore:
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,21 +18,12 @@ jobs:
           POSTGRES_DB: postgres
         ports:
           - 5432:5432
-# postgresql will be probably ready after build
-#        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - uses: actions/checkout@v1
       - name: Setup node
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - name: Get the version
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo ::set-env name=VERSION::$(echo ${GITHUB_REF:10})
-      - name: "Show version"
-        if: startsWith(github.ref, 'refs/tags/')
-        run: echo ${VERSION}
       - name: "Install base deps"
         run: npm ci
       - name: "Run linter"
@@ -39,8 +32,6 @@ jobs:
         run: npm run bootstrap
       - name: "Build app"
         run: npm run build
-#      - run: rm -rf packages/*/node_modules/typescript packages/*/node_modules/.bin/{tsc,tsserver}
-#      - run: rm -rf packages/cli/resources/templates/*/node_modules/typescript packages/cli/resources/templates/*/node_modules/.bin/
       - name: "Run tests"
         run: npm run test
         env:
@@ -50,14 +41,3 @@ jobs:
           TEST_DB_NAME: cms_test
           TEST_DB_NAME_TENANT: cms_test_tenant
           TEST_DB_PORT: 5432
-      - name: "Publish NPM"
-        if: startsWith(github.ref, 'refs/tags/')
-        run: bash ./scripts/npm/publish.sh
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: "Publish Docker"
-        if: startsWith(github.ref, 'refs/tags/')
-        run: bash ./scripts/docker/publish.sh
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

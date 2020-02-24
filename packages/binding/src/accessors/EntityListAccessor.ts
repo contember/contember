@@ -28,7 +28,7 @@ export class EntityListAccessor extends Accessor implements Errorable {
 				return entity instanceof EntityAccessor
 			})
 		}
-		return this._filteredEntities
+		return [...this._filteredEntities]
 	}
 
 	public getByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {

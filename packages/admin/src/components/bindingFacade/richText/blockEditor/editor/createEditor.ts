@@ -6,6 +6,7 @@ import {
 	withParagraphs,
 } from '../../plugins'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
+import { overrideDeleteBackward } from './overrideDeleteBackward'
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
@@ -18,7 +19,6 @@ export const createEditor = (options: CreateEditorOptions) => {
 
 	const {
 		addMark,
-		deleteBackward,
 		deleteForward,
 		deleteFragment,
 		insertBreak,
@@ -35,7 +35,6 @@ export const createEditor = (options: CreateEditorOptions) => {
 	const { batchUpdates } = options
 
 	editor.addMark = (key, value) => batchUpdates(() => addMark(key, value))
-	editor.deleteBackward = unit => batchUpdates(() => deleteBackward(unit))
 	editor.deleteForward = unit => batchUpdates(() => deleteForward(unit))
 	editor.deleteFragment = () => batchUpdates(() => deleteFragment())
 	editor.insertBreak = () => batchUpdates(() => insertBreak())
@@ -52,6 +51,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 	overrideIsVoid(editor)
 
 	overrideApply(editor, options)
+	overrideDeleteBackward(editor, options)
 	overrideInsertNode(editor, options)
 	overrideRenderElement(editor, options)
 

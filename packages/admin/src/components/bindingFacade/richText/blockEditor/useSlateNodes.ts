@@ -6,7 +6,7 @@ import { createEditor } from './editor'
 import {
 	ContemberBlockElement,
 	contemberBlockElementType,
-	ContemberContentPlaceholder,
+	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
 	ContemberFieldElement,
 	ContemberFieldElementPosition,
@@ -136,7 +136,7 @@ export const useSlateNodes = ({
 					type: contemberContentPlaceholderType,
 					children: [{ text: '' }],
 					placeholder,
-				} as ContemberContentPlaceholder,
+				} as ContemberContentPlaceholderElement,
 		  ]
 	return adjacentAccessorsToElements(leadingFieldBackedElements, 'leading').concat(
 		contentElements,

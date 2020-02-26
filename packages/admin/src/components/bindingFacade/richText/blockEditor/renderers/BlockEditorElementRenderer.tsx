@@ -6,7 +6,7 @@ import { NormalizedBlock } from '../../../blocks'
 import {
 	ContemberFieldElement,
 	isContemberBlockElement,
-	isContemberContentPlaceholder,
+	isContemberContentPlaceholderElement,
 	isContemberFieldElement,
 } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
@@ -57,7 +57,7 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 			</ContemberElementRefreshContext.Consumer>
 		)
 	}
-	if (isContemberContentPlaceholder(props.element)) {
+	if (isContemberContentPlaceholderElement(props.element)) {
 		return (
 			<div {...props.attributes}>
 				<EditorPlaceholder>{props.element.placeholder}</EditorPlaceholder>

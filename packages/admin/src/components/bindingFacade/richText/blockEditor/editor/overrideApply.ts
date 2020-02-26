@@ -16,7 +16,7 @@ import {
 	contemberContentPlaceholderType,
 	ContemberFieldElementPosition,
 	isContemberBlockElement,
-	isContemberContentPlaceholder,
+	isContemberContentPlaceholderElement,
 	isContemberFieldElement,
 } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
@@ -181,7 +181,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				saveElementAt(elementIndex, newEntity)
 			}
 
-			if (isContemberContentPlaceholder(editor.children[topLevelIndex])) {
+			if (isContemberContentPlaceholderElement(editor.children[topLevelIndex])) {
 				setTopLevelElementType(topLevelIndex, 'paragraph')
 				addNewTextElementAt(topLevelIndex)
 			}

@@ -1,0 +1,22 @@
+import { Plugin, ProjectContainer } from '@contember/engine-plugins'
+import { VimeoConfigProcessor } from './VimeoConfigProcessor'
+import { VimeoSchemaContributor } from './VimeoSchemaContributor'
+import { VimeoServiceFactory } from './VimeoService'
+
+export * from './VimeoSchemaContributor'
+export * from './VimeoService'
+
+export default class VimeoPlugin implements Plugin {
+	getConfigProcessor() {
+		return new VimeoConfigProcessor()
+	}
+
+	getSchemaContributor(container: ProjectContainer) {
+		const projectConfig = container.project
+		if (!projectConfig.vimeo) {
+			return undefined
+		}
+		const vimeoServiceFactory = new VimeoServiceFactory()
+		return new VimeoSchemaContributor(container.graphqlObjectsFactory, projectConfig.vimeo, vimeoServiceFactory)
+	}
+}

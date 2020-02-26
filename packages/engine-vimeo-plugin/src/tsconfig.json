@@ -1,0 +1,15 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"outDir": "../dist/src"
+	},
+	"references": [
+		{
+			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../engine-plugins/src"
+		}
+	]
+}

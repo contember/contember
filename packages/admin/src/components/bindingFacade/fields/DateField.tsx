@@ -11,6 +11,7 @@ import {
 export type DateFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState'> & {
 		dateFormat?: ReactDatePickerProps['dateFormat']
+		showTimeSelect?: ReactDatePickerProps['showTimeSelect']
 	}
 
 export const DateField = SimpleRelativeSingleField<DateFieldProps, string>(
@@ -59,6 +60,7 @@ export const DateFieldInner = React.memo(
 				isClearable={true}
 				customInput={<UnderlyingTextInput />}
 				dateFormat={props.dateFormat}
+				showTimeSelect={props.showTimeSelect}
 			/>
 		)
 	}),

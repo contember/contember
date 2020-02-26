@@ -1,12 +1,13 @@
-import { FieldValue, Scalar, useEnvironment, VariableInputTransformer, VariableLiteral } from '@contember/binding'
+import { Scalar, useEnvironment, VariableInputTransformer, VariableLiteral } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
-import { BlueprintIconName, Button, ButtonGroup, Icon, IconSourceSpecification } from '@contember/ui'
+import { Button, ButtonGroup, Icon, IconSourceSpecification } from '@contember/ui'
 import * as React from 'react'
 import { useEditor } from 'slate-react'
 import { ContemberBlockElement, contemberBlockElementType } from '../blockEditor'
 
-export type BlockHoveringToolbarConfig = IconSourceSpecification &
-	(
+export type BlockHoveringToolbarConfig = IconSourceSpecification & {
+	title?: string
+} & (
 		| {
 				discriminateBy: GraphQlBuilder.Literal | VariableLiteral | string
 		  }
@@ -35,11 +36,12 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 					<Button
 						size="large"
 						key={i}
+						title={buttonProps.title}
 						onClick={() => {
-							const discriminateBy = VariableInputTransformer.transformValue(
-								'discriminateBy' in buttonProps ? buttonProps.discriminateBy : buttonProps.discriminateByScalar,
-								environment,
-							)
+							const discriminateBy =
+								'discriminateBy' in buttonProps
+									? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
+									: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
 							const contemberBlockElement: ContemberBlockElement = {
 								type: contemberBlockElementType,
 								blockType: discriminateBy,

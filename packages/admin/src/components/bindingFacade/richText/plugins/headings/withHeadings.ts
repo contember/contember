@@ -12,7 +12,6 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 	const isHeading = (element: SlateNode | ElementNode): element is HeadingElement => element.type === 'heading'
 
 	e.isHeading = isHeading
-	e.headingRenderer = HeadingRenderer
 
 	e.renderElement = props => {
 		if (isHeading(props.element)) {

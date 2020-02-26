@@ -38,10 +38,10 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 						key={i}
 						title={buttonProps.title}
 						onClick={() => {
-							const discriminateBy = VariableInputTransformer.transformValue(
-								'discriminateBy' in buttonProps ? buttonProps.discriminateBy : buttonProps.discriminateByScalar,
-								environment,
-							)
+							const discriminateBy =
+								'discriminateBy' in buttonProps
+									? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
+									: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
 							const contemberBlockElement: ContemberBlockElement = {
 								type: contemberBlockElementType,
 								blockType: discriminateBy,

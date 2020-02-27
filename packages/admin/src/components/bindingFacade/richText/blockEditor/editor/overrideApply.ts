@@ -10,7 +10,7 @@ import {
 	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
-import { Element, Node as SlateNode, Operation } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Operation } from 'slate'
 import { NormalizedBlock } from '../../../blocks'
 import { contemberContentPlaceholderType, ContemberFieldElementPosition } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
@@ -21,7 +21,7 @@ export interface OverrideApplyOptions {
 	desugaredEntityList: RelativeEntityList
 	discriminationField: RelativeSingleField
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
-	fieldElementCache: WeakMap<FieldAccessor, Element>
+	fieldElementCache: WeakMap<FieldAccessor, SlateElement>
 	isMutatingRef: React.MutableRefObject<boolean>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
@@ -31,7 +31,7 @@ export interface OverrideApplyOptions {
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
 	textBlockDiscriminant: FieldValue
 	textBlockField: RelativeSingleField
-	textElementCache: WeakMap<EntityAccessor, Element>
+	textElementCache: WeakMap<EntityAccessor, SlateElement>
 }
 
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
@@ -121,7 +121,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			}
 			const saveElementAt = (elementIndex: number, entity?: EntityAccessor) => {
 				const targetElement = editor.children[elementIndex]
-				if (!Element.isElement(targetElement)) {
+				if (!SlateElement.isElement(targetElement)) {
 					throw new BindingError(`Corrupted data`)
 				}
 				if (editor.isContemberContentPlaceholderElement(targetElement)) {
@@ -244,7 +244,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					case 'insert_node': {
 						// TODO leading/trailing
 						let { node } = operation
-						if (!Element.isElement(node)) {
+						if (!SlateElement.isElement(node)) {
 							throw new BindingError()
 						}
 						let blockType: FieldValue
@@ -269,7 +269,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				}
 			}
 			if (sortedEntities.length === 1) {
-				const soleElement = editor.children[firstContentIndex] as Element
+				const soleElement = editor.children[firstContentIndex] as SlateElement
 
 				if (editor.isDefaultElement(soleElement) && SlateNode.string(soleElement) === '') {
 					setTopLevelElementType(firstContentIndex, contemberContentPlaceholderType)

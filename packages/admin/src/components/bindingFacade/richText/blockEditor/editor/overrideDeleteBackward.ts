@@ -1,5 +1,5 @@
 import { EntityAccessor } from '@contember/binding'
-import { Editor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Range as SlateRange } from 'slate'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideDeleteBackwardOptions {

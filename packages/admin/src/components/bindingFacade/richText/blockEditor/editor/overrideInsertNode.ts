@@ -1,6 +1,5 @@
 import { EntityAccessor } from '@contember/binding'
 import { Editor, Node as SlateNode, Point, Range as SlateRange, Transforms } from 'slate'
-import { isContemberBlockElement } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertNodeOptions {
@@ -12,7 +11,7 @@ export const overrideInsertNode = <E extends BlockSlateEditor>(editor: E, option
 
 	editor.insertNode = node => {
 		options.batchUpdates(() => {
-			if (!isContemberBlockElement(node)) {
+			if (!editor.isContemberBlockElement(node)) {
 				return insertNode(node)
 			}
 

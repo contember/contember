@@ -10,15 +10,9 @@ import {
 	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
-import { Node as SlateNode, Editor, Element, Operation } from 'slate'
+import { Element, Node as SlateNode, Operation } from 'slate'
 import { NormalizedBlock } from '../../../blocks'
-import {
-	contemberContentPlaceholderType,
-	ContemberFieldElementPosition,
-	isContemberBlockElement,
-	isContemberContentPlaceholderElement,
-	isContemberFieldElement,
-} from '../elements'
+import { contemberContentPlaceholderType, ContemberFieldElementPosition } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
@@ -95,7 +89,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				isLeadingElement(elementIndex) || isTrailingElement(elementIndex)
 			const getNormalizedFieldBackedElement = (elementIndex: number) => {
 				const fieldBackedElement = editor.children[elementIndex]
-				if (!isContemberFieldElement(fieldBackedElement)) {
+				if (!editor.isContemberFieldElement(fieldBackedElement)) {
 					throw new BindingError(`Corrupted data`)
 				}
 				return fieldBackedElementRefs[fieldBackedElement.position].current[fieldBackedElement.index]
@@ -129,6 +123,9 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				const targetElement = editor.children[elementIndex]
 				if (!Element.isElement(targetElement)) {
 					throw new BindingError(`Corrupted data`)
+				}
+				if (editor.isContemberContentPlaceholderElement(targetElement)) {
+					return
 				}
 				if (isLeadingElement(elementIndex) || isTrailingElement(elementIndex)) {
 					const normalizedField = getNormalizedFieldBackedElement(elementIndex)
@@ -181,7 +178,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				saveElementAt(elementIndex, newEntity)
 			}
 
-			if (isContemberContentPlaceholderElement(editor.children[topLevelIndex])) {
+			if (editor.isContemberContentPlaceholderElement(editor.children[topLevelIndex])) {
 				setTopLevelElementType(topLevelIndex, 'paragraph')
 				addNewTextElementAt(topLevelIndex)
 			}
@@ -203,7 +200,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					}
 					case 'split_node': {
 						// TODO special checks for leading/trailing
-						if (isContemberBlockElement(editor.children[topLevelIndex])) {
+						if (editor.isContemberBlockElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
 						if (isTrailingElement(topLevelIndex)) {
@@ -237,7 +234,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						const {
 							path: [topLevelIndex],
 						} = operation
-						if (isContemberBlockElement(editor.children[topLevelIndex])) {
+						if (editor.isContemberBlockElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
 						saveElementAt(topLevelIndex)
@@ -252,7 +249,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						}
 						let blockType: FieldValue
 
-						if (isContemberBlockElement(node)) {
+						if (editor.isContemberBlockElement(node)) {
 							blockType = node.blockType
 							// TODO cache?
 							sortedEntities[topLevelIndex - firstContentIndex] = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
@@ -270,13 +267,13 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						// TODO Not even slate-react supports this at the moment
 						break
 				}
-				if (sortedEntities.length === 1) {
-					const soleElement = editor.children[firstContentIndex] as Element
+			}
+			if (sortedEntities.length === 1) {
+				const soleElement = editor.children[firstContentIndex] as Element
 
-					if (editor.isParagraph(soleElement) && SlateNode.string(soleElement) === '') {
-						setTopLevelElementType(firstContentIndex, contemberContentPlaceholderType)
-						removeElementAt(firstContentIndex)
-					}
+				if (editor.isDefaultElement(soleElement) && SlateNode.string(soleElement) === '') {
+					setTopLevelElementType(firstContentIndex, contemberContentPlaceholderType)
+					removeElementAt(firstContentIndex)
 				}
 			}
 		})

@@ -26,6 +26,7 @@ import { Application } from './cli'
 	register({
 		compilerOptions: {
 			experimentalDecorators: true,
+			module: 'commonjs',
 		},
 	})
 	const diffCommandFactory = () => new DiffCommand()

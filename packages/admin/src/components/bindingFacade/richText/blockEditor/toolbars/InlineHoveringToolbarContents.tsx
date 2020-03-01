@@ -1,20 +1,20 @@
 import { Button, Icon } from '@contember/ui'
 import * as React from 'react'
 import { useEditor } from 'slate-react'
-import { useForceRender } from '../../../../utils'
-import { RichTextBooleanMarkNames } from '../plugins'
-import { HoveringToolbarEditor } from './HoveringToolbarEditor'
+import { useForceRender } from '../../../../../utils'
+import { RichTextBooleanMarkNames } from '../../plugins'
+import { BlockSlateEditor } from '../editor'
 
 export interface InlineHoveringToolbarContentsProps {}
 
-const toggleMark = (editor: HoveringToolbarEditor, mark: RichTextBooleanMarkNames, e: React.MouseEvent) => {
+const toggleMark = (editor: BlockSlateEditor, mark: RichTextBooleanMarkNames, e: React.MouseEvent) => {
 	e.preventDefault() // This is crucial so that we don't unselect the selected text
 	e.nativeEvent.stopPropagation() // This is a bit of a hack ‒ so that we don't register this click as a start of a new selection
 	editor.toggleRichTextNodeMark(editor, mark)
 }
 
 export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringToolbarContentsProps) => {
-	const editor = useEditor() as HoveringToolbarEditor
+	const editor = useEditor() as BlockSlateEditor
 	const forceRender = useForceRender()
 
 	const isBold = editor.isBold(editor)

@@ -1,14 +1,17 @@
-import { HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
 import * as React from 'react'
-import { EditorSelectionStateName, useEditorSelection } from '../editorSelection'
-import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
-import { InlineHoveringToolbarContents } from './InlineHoveringToolbarContents'
+import { EditorSelectionStateName } from './EditorSelectionState'
+import { useEditorSelection } from './useEditorSelection'
 
-export interface HoveringToolbarProps extends BlockHoveringToolbarContentsProps {}
+export interface ToolbarsState {
+	inlineToolbarRef: React.RefObject<HTMLDivElement>
+	inlineToolbarActive: boolean
+	blockToolbarActive: boolean
+}
 
-export const HoveringToolbar = React.memo((props: HoveringToolbarProps) => {
-	const selectionState = useEditorSelection()
+// TODO use a container so that it doesn't break during resize.
+export const useToolbarState = (): ToolbarsState => {
 	const inlineToolbarRef = React.useRef<HTMLDivElement>(null)
+	const selectionState = useEditorSelection()
 
 	const inlineToolbarActive =
 		selectionState.name === EditorSelectionStateName.ExpandedPointerSelection ||
@@ -53,18 +56,9 @@ export const HoveringToolbar = React.memo((props: HoveringToolbarProps) => {
 		container.style.left = left
 	}, [selectionState])
 
-	// TODO use a container so that it doesn't break during resize.
-	return (
-		<>
-			<Portal>
-				<UIToolbar isActive={inlineToolbarActive} ref={inlineToolbarRef} scope="contextual">
-					<InlineHoveringToolbarContents />
-				</UIToolbar>
-			</Portal>
-			<UIToolbar isActive={blockToolbarActive}>
-				<BlockHoveringToolbarContents blockButtons={props.blockButtons} />
-			</UIToolbar>
-		</>
-	)
-})
-HoveringToolbar.displayName = 'HoveringToolbar'
+	return {
+		inlineToolbarRef,
+		blockToolbarActive,
+		inlineToolbarActive,
+	}
+}

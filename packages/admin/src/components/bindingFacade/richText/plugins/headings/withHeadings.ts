@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Editor as SlateEditor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
+import { Editor as SlateEditor, Range as SlateRange, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
 import { BaseEditor, ElementNode, WithAnotherNodeType } from '../essentials'
 import { EditorWithHeadings, WithHeadings } from './EditorWithHeadings'
@@ -10,40 +10,39 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
 	const { renderElement, insertBreak } = editor
 
-	const isHeading = (element: SlateNode | ElementNode): element is HeadingElement => element.type === headingElementType
-	const getClosestHeading = (level?: HeadingElement['level']) =>
-		SlateEditor.above(e, {
-			match: node => isHeading(node) && (level === undefined || node.level === level),
-		})
-	const ejectHeading = (heading: NodeEntry) => {
-		const [, path] = heading
-		ContemberEditor.ejectElement(e, path)
+	const isHeading = (element: SlateNode | ElementNode, level?: HeadingElement['level']): element is HeadingElement =>
+		element.type === headingElementType && (level === undefined || (element as HeadingElement).level === level)
+	const ejectHeading = (elementPath: SlatePath) => {
+		ContemberEditor.ejectElement(e, elementPath)
 		Transforms.setNodes(
 			e,
 			{
 				type: e.defaultElementType,
 			},
 			{
-				at: path,
+				at: elementPath,
 			},
 		)
 	}
 
 	e.isHeading = isHeading
-	e.isWithinHeading = level => getClosestHeading(level) !== undefined
+
+	// TODO in the following two functions, we need to conditionally trim the selection so that it doesn't potentially
+	// include empty strings at the edges of top-level elements.
+	e.isWithinHeading = level => Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => isHeading(node, level))
 	e.toggleHeading = level => {
 		SlateEditor.withoutNormalizing(e, () => {
-			const closestHeading = getClosestHeading(level)
-			if (closestHeading === undefined) {
-				// We manually filter out void nodes because it appears that Slate doesn't respect the voids setting from here.
-				// The combination of isElement and mode: 'highest' is really just a roundabout way of excluding the Editor.
-				const match = (node: SlateNode) => SlateElement.isElement(node) && !e.isVoid(node)
-				const nodes = SlateEditor.nodes(e, {
-					match,
-					mode: 'highest',
-					voids: false,
-				})
-				for (const [, path] of nodes) {
+			const topLevelNodes = Array.from(ContemberEditor.topLevelNodes(e))
+
+			if (topLevelNodes.every(([node]) => isHeading(node, level))) {
+				for (const [, path] of topLevelNodes) {
+					ejectHeading(path)
+				}
+			} else {
+				for (const [node, path] of topLevelNodes) {
+					if (isHeading(node, level)) {
+						continue
+					}
 					ContemberEditor.ejectElement(e, path)
 					const newProps: Partial<HeadingElement> = {
 						level,
@@ -53,8 +52,6 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 						at: path,
 					})
 				}
-			} else {
-				ejectHeading(closestHeading)
 			}
 		})
 	}
@@ -67,14 +64,22 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 	}
 
 	e.insertBreak = () => {
-		insertBreak()
+		SlateEditor.withoutNormalizing(e, () => {
+			insertBreak()
 
-		const closestHeading = getClosestHeading()
-		if (closestHeading === undefined) {
-			return
-		}
-		// TODO this is too naive. If the next sibling already was a heading, this will ruin it.
-		ejectHeading(closestHeading)
+			const { selection } = e
+
+			if (selection === null || SlateRange.isExpanded(selection)) {
+				return
+			}
+			const [topLevelElement, path] = SlateEditor.node(e, selection, {
+				depth: 1,
+			})
+			// TODO this is too naive. If the next sibling already was a heading, this will ruin it.
+			if (isHeading(topLevelElement)) {
+				ejectHeading(path)
+			}
+		})
 	}
 
 	return (e as unknown) as EditorWithHeadings<E>

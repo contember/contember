@@ -2,8 +2,8 @@ import { BaseEditor, ElementNode, WithAnotherNodeType } from '../essentials'
 import { HeadingElement } from './HeadingElement'
 
 export interface WithHeadings<E extends WithAnotherNodeType<BaseEditor, HeadingElement>> {
-	isHeading: (element: ElementNode) => element is HeadingElement
-	isWithinHeading: (level: HeadingElement['level']) => boolean
+	isHeading: (element: ElementNode, level?: HeadingElement['level']) => element is HeadingElement
+	isWithinHeading: (level?: HeadingElement['level']) => boolean
 	toggleHeading: (level: HeadingElement['level']) => void
 }
 

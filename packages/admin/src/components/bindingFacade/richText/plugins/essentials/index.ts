@@ -1,4 +1,3 @@
-export * from './ArrayContents'
 export * from './BaseEditor'
 export * from './createEditorWithEssentials'
 export * from './DefaultElement'

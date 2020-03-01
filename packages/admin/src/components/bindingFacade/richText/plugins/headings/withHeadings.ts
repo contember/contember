@@ -66,5 +66,16 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		return renderElement(props)
 	}
 
+	e.insertBreak = () => {
+		insertBreak()
+
+		const closestHeading = getClosestHeading()
+		if (closestHeading === undefined) {
+			return
+		}
+		// TODO this is too naive. If the next sibling already was a heading, this will ruin it.
+		ejectHeading(closestHeading)
+	}
+
 	return (e as unknown) as EditorWithHeadings<E>
 }

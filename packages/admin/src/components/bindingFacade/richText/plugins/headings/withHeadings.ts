@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Editor as SlateEditor, Node as SlateNode, NodeEntry, Path as SlatePath, Transforms } from 'slate'
-import { ReactEditor } from 'slate-react'
+import { Editor as SlateEditor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
 import { BaseEditor, ElementNode, WithAnotherNodeType } from '../essentials'
 import { EditorWithHeadings, WithHeadings } from './EditorWithHeadings'
@@ -32,26 +31,28 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 
 	e.isHeading = isHeading
 	e.isWithinHeading = level => getClosestHeading(level) !== undefined
-	e.toggleHeading = (level, matchRoot) => {
+	e.toggleHeading = level => {
 		SlateEditor.withoutNormalizing(e, () => {
 			const closestHeading = getClosestHeading(level)
 			if (closestHeading === undefined) {
-				const match = matchRoot ?? ((node: SlateNode) => ReactEditor.findPath(e, node).length === 1)
-				const root = SlateEditor.above(e, {
+				// We manually filter out void nodes because it appears that Slate doesn't respect the voids setting from here.
+				// The combination of isElement and mode: 'highest' is really just a roundabout way of excluding the Editor.
+				const match = (node: SlateNode) => SlateElement.isElement(node) && !e.isVoid(node)
+				const nodes = SlateEditor.nodes(e, {
 					match,
+					mode: 'highest',
+					voids: false,
 				})
-				if (root === undefined) {
-					return
+				for (const [, path] of nodes) {
+					ContemberEditor.ejectElement(e, path)
+					const newProps: Partial<HeadingElement> = {
+						level,
+						type: headingElementType,
+					}
+					Transforms.setNodes(e, newProps, {
+						at: path,
+					})
 				}
-				const [, path] = root
-				ContemberEditor.ejectElement(e, path)
-				const newProps: Partial<HeadingElement> = {
-					level,
-					type: headingElementType,
-				}
-				Transforms.setNodes(e, newProps, {
-					at: path,
-				})
 			} else {
 				ejectHeading(closestHeading)
 			}

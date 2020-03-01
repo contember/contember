@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Editor as SlateEditor, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
+import { Editor as SlateEditor, Node as SlateNode, NodeEntry, Path as SlatePath, Transforms } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { ContemberEditor } from '../../ContemberEditor'
 import { BaseEditor, ElementNode, WithAnotherNodeType } from '../essentials'
@@ -9,13 +9,26 @@ import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
 
 export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeadings<E> => {
 	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
-	const { renderElement } = editor
+	const { renderElement, insertBreak } = editor
 
 	const isHeading = (element: SlateNode | ElementNode): element is HeadingElement => element.type === headingElementType
-	const getClosestHeading = (level: HeadingElement['level']) =>
-		ContemberEditor.getClosestParent(e, {
-			match: node => isHeading(node) && node.level === level,
+	const getClosestHeading = (level?: HeadingElement['level']) =>
+		SlateEditor.above(e, {
+			match: node => isHeading(node) && (level === undefined || node.level === level),
 		})
+	const ejectHeading = (heading: NodeEntry) => {
+		const [, path] = heading
+		ContemberEditor.ejectElement(e, path)
+		Transforms.setNodes(
+			e,
+			{
+				type: e.defaultElementType,
+			},
+			{
+				at: path,
+			},
+		)
+	}
 
 	e.isHeading = isHeading
 	e.isWithinHeading = level => getClosestHeading(level) !== undefined
@@ -24,7 +37,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 			const closestHeading = getClosestHeading(level)
 			if (closestHeading === undefined) {
 				const match = matchRoot ?? ((node: SlateNode) => ReactEditor.findPath(e, node).length === 1)
-				const root = ContemberEditor.getClosestParent(e, {
+				const root = SlateEditor.above(e, {
 					match,
 				})
 				if (root === undefined) {
@@ -40,17 +53,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 					at: path,
 				})
 			} else {
-				const [, path] = closestHeading
-				ContemberEditor.ejectElement(e, path)
-				Transforms.setNodes(
-					e,
-					{
-						type: e.defaultElementType,
-					},
-					{
-						at: path,
-					},
-				)
+				ejectHeading(closestHeading)
 			}
 		})
 	}

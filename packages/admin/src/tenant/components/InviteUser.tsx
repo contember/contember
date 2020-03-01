@@ -272,13 +272,10 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 		}
 		const inviteResult = await invite(email, membershipsToSave)
 		if (inviteResult.invite.ok) {
-			const password = inviteResult.invite.result.generatedPassword
 			goToUsersList()
 			addToast({
 				type: ToastType.Success,
-				message: password
-					? `User can now log in with password: “${password}”.`
-					: `User now has access to this project. This user already has an account in Contember CMS.`,
+				message: `User has been invited to this project and credentials have been sent to the given email.`,
 			})
 		}
 	}, [addToast, email, goToUsersList, invite, memberships])

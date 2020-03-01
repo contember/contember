@@ -16,11 +16,6 @@ const INVITE_MUTATION = `
 			errors {
 				code
 			}
-			result {
-				...on InviteNewResult {
-					generatedPassword
-				}
-			}
 		}
 	}
 `
@@ -29,9 +24,6 @@ interface CreateUserMutationResult {
 	invite: {
 		ok: boolean
 		errors: { code: string }[]
-		result: {
-			generatedPassword?: string
-		}
 	}
 }
 

@@ -3,6 +3,7 @@ import {
 	BaseEditor,
 	EditorWithAnchors,
 	EditorWithBasicFormatting,
+	EditorWithHeadings,
 	EditorWithParagraphs,
 	WithAnotherNodeType,
 } from '../../plugins'
@@ -20,5 +21,5 @@ export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<
 	WithBlockElements<WithAnotherNodeType<E, BlockEditorElements>>
 
 export type BlockSlateEditor = EditorWithBlockElements<
-	EditorWithParagraphs<EditorWithAnchors<EditorWithBasicFormatting<BaseEditor>>>
+	EditorWithHeadings<EditorWithParagraphs<EditorWithAnchors<EditorWithBasicFormatting<BaseEditor>>>>
 >

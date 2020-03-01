@@ -12,6 +12,7 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 	const editorWithEssentials: Partial<BaseEditor> = underlyingEditor
 
 	editorWithEssentials.formatVersion = '0.0.0'
+	editorWithEssentials.defaultElementType = defaultElementType
 	editorWithEssentials.isDefaultElement = element => element.type === defaultElementType
 	editorWithEssentials.createDefaultElement = children => ({
 		type: defaultElementType,

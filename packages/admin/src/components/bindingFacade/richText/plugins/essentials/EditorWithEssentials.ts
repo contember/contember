@@ -5,6 +5,7 @@ import { EditorNode } from './Node'
 
 export interface WithEssentials<E extends EditorNode> {
 	formatVersion: string
+	defaultElementType: string
 	isDefaultElement: (element: SlateElement) => boolean
 	createDefaultElement: (children: SlateElement['children']) => SlateElement
 

@@ -3,6 +3,7 @@ import {
 	paragraphElementType,
 	withAnchors,
 	withBasicFormatting,
+	withHeadings,
 	withParagraphs,
 } from '../../plugins'
 import { isContemberBlockElement, isContemberContentPlaceholderElement, isContemberFieldElement } from '../elements'
@@ -18,8 +19,8 @@ export interface CreateEditorOptions extends OverrideApplyOptions, OverrideRende
 
 export const createEditor = (options: CreateEditorOptions) => {
 	// TODO configurable plugin set
-	const editor = withParagraphs(
-		withAnchors(withBasicFormatting(createEditorWithEssentials(paragraphElementType))),
+	const editor = withHeadings(
+		withParagraphs(withAnchors(withBasicFormatting(createEditorWithEssentials(paragraphElementType)))),
 	) as BlockSlateEditor
 
 	const {

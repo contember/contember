@@ -42,7 +42,6 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 	}
 
 	e.isAnchor = isAnchor
-	e.anchorRenderer = AnchorRenderer
 	e.isAnchorActive = isAnchorActive
 	e.wrapAnchor = wrapAnchor
 	e.unwrapAnchor = unwrapAnchor

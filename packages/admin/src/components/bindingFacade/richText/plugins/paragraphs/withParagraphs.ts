@@ -11,7 +11,6 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 	const isParagraph = (element: ElementNode): element is ParagraphElement => element.type === paragraphElementType
 
 	e.isParagraph = isParagraph
-	e.paragraphRenderer = ParagraphRenderer
 
 	e.renderElement = props => {
 		if (isParagraph(props.element)) {

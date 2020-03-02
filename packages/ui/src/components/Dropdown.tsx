@@ -26,6 +26,8 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 		return 'bottom-end'
 	} else if (alignment === 'center' || alignment === 'default' || alignment === undefined) {
 		return 'auto'
+	} else if (alignment === 'top') {
+		return 'top'
 	} else {
 		return assertNever(alignment)
 	}

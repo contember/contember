@@ -53,7 +53,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 					<Box
 						heading={selectedBlock.label}
 						isActive={selected}
-						actions={<RemoveEntityButton removalType={props.removalType} />}
+						actions={!selected && <RemoveEntityButton removalType={props.removalType} />}
 						onClick={onContainerClick}
 						style={{ margin: '0' }}
 					>

@@ -1,3 +1,3 @@
 import { Default } from './Default'
 
-export type DropdownAlignment = Default | 'center' | 'start' | 'end'
+export type DropdownAlignment = Default | 'center' | 'start' | 'end' | 'top'

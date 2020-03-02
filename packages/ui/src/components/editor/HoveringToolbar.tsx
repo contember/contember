@@ -3,7 +3,6 @@ import * as React from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass } from '../../utils'
-import { ButtonGroup } from '../forms'
 
 export interface HoveringToolbarProps {
 	isActive?: boolean
@@ -17,7 +16,7 @@ export const HoveringToolbar = React.memo(
 			className={cn(useComponentClassName('hoveringToolbar'), toStateClass('active', isActive), toEnumViewClass(scope))}
 			ref={ref}
 		>
-			<ButtonGroup>{children}</ButtonGroup>
+			{children}
 		</div>
 	)),
 )

@@ -2,8 +2,8 @@ import { GraphQLFieldConfig, GraphQLSchema } from 'graphql'
 import { GraphQLObjectsFactory } from '@contember/engine-common'
 import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
-import { Schema } from '@contember/schema'
 import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'
+import { SchemaContext, GraphQLSchemaContributor } from '@contember/engine-plugins'
 
 interface Identity {
 	projectRoles: string[]
@@ -17,7 +17,7 @@ type S3SchemaAcl = Record<
 	}
 >
 
-export class S3SchemaFactory {
+export class S3SchemaContributor implements GraphQLSchemaContributor {
 	private s3HeadersType: GraphQLFieldConfig<any, any> = {
 		type: this.objectsFactory.createNotNull(
 			this.objectsFactory.createList(
@@ -40,7 +40,13 @@ export class S3SchemaFactory {
 		private readonly s3Factory: S3ServiceFactory,
 	) {}
 
-	public create(context: { schema: Schema; identity: Identity }): undefined | GraphQLSchema {
+	getCacheKey(context: SchemaContext): string {
+		const roles = context.identity.projectRoles
+		roles.sort()
+		return roles.join('||')
+	}
+
+	createSchema(context: SchemaContext): GraphQLSchema | undefined {
 		if (!this.s3Config) {
 			return undefined
 		}

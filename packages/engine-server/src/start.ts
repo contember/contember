@@ -2,6 +2,8 @@
 
 import { readConfig, run } from './index'
 import { Server } from 'net'
+import loadPlugins from './loadPlugins'
+import { ConfigProcessor } from '@contember/engine-plugins'
 ;(async () => {
 	const configFile = process.env['CONTEMBER_CONFIG_FILE']
 	if (!configFile) {
@@ -32,12 +34,16 @@ import { Server } from 'net'
 		})
 	}
 	const debug = process.env.NODE_ENV === 'development'
-	const config = await readConfig(configFile)
+	const plugins = await loadPlugins()
+	const configProcessors = plugins
+		.map(it => (it.getConfigProcessor ? it.getConfigProcessor() : null))
+		.filter((it): it is ConfigProcessor => it !== null)
+	const config = await readConfig([configFile], configProcessors)
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
 	}
-	server = await run(debug, config, projectsDir)
+	server = await run(debug, config, projectsDir, undefined, plugins)
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

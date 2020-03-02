@@ -6,17 +6,17 @@
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
 	"devDependencies": {
-		"@types/graphql": "^14.5.0",
 		"@types/mime-types": "^2.1.0",
 		"@types/uuid": "^3.4.5",
 		"typescript": "^3.7.4"
 	},
 	"dependencies": {
 		"@contember/engine-common": "^0.7.1",
+		"@contember/engine-plugins": "^0.0.0",
 		"@contember/schema": "^0.7.1",
 		"apollo-server-errors": "^2.3.4",
 		"aws-sdk": "^2.520.0",
-		"graphql": "^14.5.4",
+		"graphql": "^14.6.0",
 		"mime-types": "^2.1.24",
 		"picomatch": "^2.2.1",
 		"uuid": "^3.3.3"

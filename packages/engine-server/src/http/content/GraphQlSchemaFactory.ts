@@ -6,11 +6,13 @@ import {
 	PermissionsByIdentityFactory,
 } from '@contember/engine-content-api'
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools'
-import { S3SchemaFactory } from '@contember/engine-s3-plugin'
+import { GraphQLSchemaContributor } from '@contember/engine-plugins'
 
+type Context = { schema: Schema; identity: PermissionsByIdentityFactory.Identity }
 class GraphQlSchemaFactory {
 	private cache: {
 		schema: Schema
+		cacheKey: string
 		entries: {
 			graphQlSchema: GraphQLSchema
 			permissions: Acl.Permissions
@@ -21,14 +23,22 @@ class GraphQlSchemaFactory {
 	constructor(
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly permissionFactory: PermissionsByIdentityFactory,
-		private readonly s3SchemaFactory?: S3SchemaFactory,
+		private readonly schemaContributors: GraphQLSchemaContributor[],
 	) {}
 
+	private getContributorsCacheKey(ctx: Context): string {
+		return JSON.stringify(this.schemaContributors.map(it => it.getCacheKey(ctx)))
+	}
+
 	public create(schema: Schema, identity: PermissionsByIdentityFactory.Identity): [GraphQLSchema, Acl.Permissions] {
-		let schemaCacheEntry = this.cache.find(it => it.schema.model === schema.model && it.schema.acl === schema.acl)
+		const contributorsCacheKey = this.getContributorsCacheKey({ schema, identity })
+		let schemaCacheEntry = this.cache.find(
+			it => it.schema.model === schema.model && it.schema.acl === schema.acl && contributorsCacheKey === it.cacheKey,
+		)
 		if (!schemaCacheEntry) {
 			schemaCacheEntry = {
 				schema,
+				cacheKey: contributorsCacheKey,
 				entries: [],
 			}
 			this.cache.push(schemaCacheEntry)
@@ -45,8 +55,11 @@ class GraphQlSchemaFactory {
 		const contentSchemaFactory = new ContentSchemaFactory(schema)
 		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
 		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())
-		const s3schema = this.s3SchemaFactory ? this.s3SchemaFactory.create({ schema, identity }) : null
-		const graphQlSchema = mergeSchemas({ schemas: [dataSchema, contentSchema, ...(s3schema ? [s3schema] : [])] })
+
+		const otherSchemas = this.schemaContributors
+			.map(it => it.createSchema({ schema, identity }))
+			.filter((it): it is GraphQLSchema => it !== undefined)
+		const graphQlSchema = mergeSchemas({ schemas: [dataSchema, contentSchema, ...otherSchemas] })
 		schemaCacheEntry.entries.push({ graphQlSchema, verifier, permissions })
 
 		return [graphQlSchema, permissions]

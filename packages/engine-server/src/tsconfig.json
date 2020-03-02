@@ -41,7 +41,13 @@
 			"path": "../../engine-content-api/src"
 		},
 		{
+			"path": "../../engine-plugins/src"
+		},
+		{
 			"path": "../../engine-s3-plugin/src"
+		},
+		{
+			"path": "../../engine-vimeo-plugin/src"
 		}
 	]
 }

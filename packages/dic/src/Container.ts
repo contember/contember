@@ -4,6 +4,7 @@ export type ServiceType = any
 export type ServiceTypeMap = { [N in ServiceName]: ServiceType | undefined }
 
 export type ServiceFactory<M extends ServiceTypeMap, T> = (accessors: Readonly<M>) => T
+export type ServiceSetup<M extends ServiceTypeMap, T> = (service: T, accessors: Readonly<M>) => T
 
 export type ServiceFactoryMap<M extends ServiceTypeMap> = { [N in keyof M]: ServiceFactory<M, M[N]> }
 
@@ -34,6 +35,20 @@ export class Builder<M extends ServiceTypeMap = {}> {
 		factory: ServiceFactory<M, T>,
 	): Builder<M> {
 		return new Builder({ ...this.factories, [name]: factory } as ServiceFactoryMap<M>)
+	}
+
+	setupService<N extends ServiceName, T extends { [P in keyof M[N]]: M[N][P] }>(
+		name: N extends keyof M ? N : 'Service with this name does not exist',
+		setup: ServiceSetup<M, T>,
+	): Builder<M> {
+		const currentFactory = this.factories[name]
+		return new Builder({
+			...this.factories,
+			[name]: accessor => {
+				const service = currentFactory(accessor)
+				return setup(service, accessor)
+			},
+		} as ServiceFactoryMap<M>)
 	}
 
 	build(): Container<M> {

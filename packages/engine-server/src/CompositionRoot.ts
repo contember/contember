@@ -40,8 +40,7 @@ import {
 	TenantMiddlewareFactory,
 	TimerMiddlewareFactory,
 } from './http'
-import { Config, ProjectWithS3, TenantConfig } from './config/config'
-import { S3SchemaFactory, S3ServiceFactory } from '@contember/engine-s3-plugin'
+import { Config, Project, TenantConfig } from './config/config'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
@@ -53,6 +52,7 @@ import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
 import { tuple } from './utils'
+import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -65,13 +65,15 @@ class CompositionRoot {
 		debug: boolean,
 		config: Config,
 		projectsDirectory: string,
-		projectSchemas?: { [name: string]: Schema },
+		projectSchemas: undefined | { [name: string]: Schema },
+		plugins: Plugin[],
 	): MasterContainer {
 		const projectContainers = this.createProjectContainers(
 			debug,
 			Object.values(config.projects),
 			projectsDirectory,
 			projectSchemas,
+			plugins,
 		)
 
 		const containerList = Object.values(projectContainers)
@@ -202,14 +204,16 @@ class CompositionRoot {
 
 	createProjectContainers(
 		debug: boolean,
-		projects: Array<ProjectWithS3>,
+		projects: Array<Project>,
 		projectsDir: string,
-		schemas?: Record<string, Schema>,
+		schemas: undefined | Record<string, Schema>,
+		plugins: Plugin[],
 	): Record<string, ProjectContainer> {
-		const containers = Object.values(projects).map((project: ProjectWithS3) => {
+		const containers = Object.values(projects).map((project: Project) => {
 			const projectContainer = new Builder({})
 				.addService('providers', () => providers)
 				.addService('project', () => project)
+				.addService('graphqlObjectsFactory', () => graphqlObjectFactories)
 				.addService('schema', ({ project }) => (schemas ? schemas[project.slug] : undefined))
 				.addService('connection', ({ project }) => {
 					return new Connection(
@@ -249,23 +253,22 @@ class CompositionRoot {
 							new SchemaVersionBuilderInternal(migrationsResolver, schemaMigrator),
 						),
 				)
-				.addService('s3Factory', () => {
-					return new S3ServiceFactory()
-				})
-				.addService('s3SchemaFactory', ({ s3Factory, project }) => {
-					return new S3SchemaFactory(graphqlObjectFactories, project.s3, s3Factory)
-				})
 				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory(graphqlObjectFactories))
 				.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
 				.addService(
 					'contentPermissionsVerifier',
 					({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),
 				)
-				.addService(
-					'graphQlSchemaFactory',
-					({ graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory }) =>
-						new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, s3SchemaFactory),
-				)
+				.addService('graphQlSchemaFactory', container => {
+					const contributors = plugins
+						.map(it => (it.getSchemaContributor ? it.getSchemaContributor(container) : null))
+						.filter((it): it is GraphQLSchemaContributor => !!it)
+					return new GraphQlSchemaFactory(
+						container.graphQlSchemaBuilderFactory,
+						container.permissionsByIdentityFactory,
+						contributors,
+					)
+				})
 				.addService('apolloServerFactory', ({ project }) => new ContentApolloServerFactory(project.slug, debug))
 				.addService(
 					'contentApolloMiddlewareFactory',

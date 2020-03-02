@@ -6,13 +6,13 @@ import {
 	resolveParameters,
 	UndefinedParameterError,
 } from '@contember/config-loader'
-import { deprecated } from '../core/console/messages'
 import { DatabaseCredentials } from '@contember/engine-common'
-import { S3Config } from '@contember/engine-s3-plugin/dist/src/Config'
 import { tuple, upperCaseFirst } from '../utils'
 import { MailerOptions } from '@contember/engine-tenant-api'
+import { ConfigProcessor } from '@contember/engine-plugins'
+import { isObject, typeConfigError, hasStringProperty, hasNumberProperty } from '@contember/engine-common'
 
-export type ProjectWithS3 = Project & { s3?: S3Config }
+export { Project }
 
 export interface TenantConfig {
 	db: DatabaseCredentials
@@ -21,7 +21,7 @@ export interface TenantConfig {
 
 export interface Config {
 	tenant: TenantConfig
-	projects: Record<string, ProjectWithS3>
+	projects: Record<string, Project>
 	server: {
 		port: number
 		logging: {
@@ -32,87 +32,57 @@ export interface Config {
 	}
 }
 
-class InvalidConfigError extends Error {}
-
-function error(err: string): never {
-	throw new InvalidConfigError(err)
-}
-
-function typeError(property: string, value: any, expectedType: string): never {
-	return error(`Invalid property ${property} in config file. ${expectedType} expected, ${typeof value} found`)
-}
-
-type UnknownObject = Record<string, unknown>
-
-function isObject(input: unknown): input is UnknownObject {
-	return typeof input === 'object' && input !== null
-}
-
-function hasStringProperty<Input extends UnknownObject, Property extends string>(
-	input: Input,
-	property: Property,
-): input is Input & { [key in Property]: string } {
-	return typeof input[property] === 'string'
-}
-
-function hasNumberProperty<Input extends UnknownObject, Property extends string>(
-	input: Input,
-	property: Property,
-): input is Input & { [key in Property]: number } {
-	return typeof input[property] === 'number'
-}
-
 function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredentials {
 	if (!isObject(json)) {
-		return error(`Property ${path} must be an object`)
+		return typeConfigError(path, json, 'object')
 	}
 	if (!hasStringProperty(json, 'host')) {
-		return typeError(path + '.host', json.host, 'string')
+		return typeConfigError(path + '.host', json.host, 'string')
 	}
 	if (!hasNumberProperty(json, 'port')) {
 		if (hasStringProperty({ ...json }, 'port')) {
 			console.warn(
-				deprecated(`Property ${path}.port must be a number, but string was found. Use ::number typecast in config.`),
+				`DEPRECATED: Property ${path}.port must be a number, but string was found. Use ::number typecast in config.`,
 			)
 			json.port = Number(json.port)
 		} else {
-			return typeError(path + '.port', json.port, 'number')
+			return typeConfigError(path + '.port', json.port, 'number')
 		}
 	}
 	if (!hasNumberProperty(json, 'port')) {
 		throw new Error('impl error')
 	}
 	if (!hasStringProperty(json, 'user')) {
-		return typeError(path + '.user', json.user, 'string')
+		return typeConfigError(path + '.user', json.user, 'string')
 	}
 	if (!hasStringProperty(json, 'password')) {
-		return typeError(path + '.password', json.password, 'string')
+		return typeConfigError(path + '.password', json.password, 'string')
 	}
 	if (!hasStringProperty(json, 'database')) {
-		return typeError(path + '.database', json.database, 'string')
+		return typeConfigError(path + '.database', json.database, 'string')
 	}
 	return json
 }
 
 function checkMailerParameters(json: unknown, path: string): MailerOptions {
 	if (!isObject(json)) {
-		return error(`Property ${path} must be an object`)
+		return typeConfigError(path, json, 'object')
 	}
 	const values = Object.fromEntries(Object.entries(json).filter(([, it]) => it !== undefined))
 	if ('from' in values && !hasStringProperty(values, 'from')) {
-		return typeError(path + '.from', values.from, 'string')
+		return typeConfigError(path + '.from', values.from, 'string')
 	}
 	if ('host' in values && !hasStringProperty(values, 'host')) {
-		return typeError(path + '.host', values.host, 'string')
+		return typeConfigError(path + '.host', values.host, 'string')
 	}
 	if ('port' in values && !hasNumberProperty(values, 'port')) {
-		return typeError(path + '.port', values.port, 'number')
+		return typeConfigError(path + '.port', values.port, 'number')
 	}
 	if ('user' in values && !hasStringProperty(json, 'user')) {
-		return typeError(path + '.user', json.user, 'string')
+		return typeConfigError(path + '.user', json.user, 'string')
 	}
 	if ('password' in values && !hasStringProperty(json, 'password')) {
-		return typeError(path + '.password', json.password, 'string')
+		return typeConfigError(path + '.password', json.password, 'string')
 	}
 	return {
 		...values,
@@ -122,39 +92,9 @@ function checkMailerParameters(json: unknown, path: string): MailerOptions {
 	}
 }
 
-function checkS3Config(json: unknown, path: string): S3Config {
-	if (!isObject(json)) {
-		return error(`Property ${path} must be an object`)
-	}
-	if (!hasStringProperty(json, 'bucket')) {
-		return typeError(path + '.bucket', json.bucket, 'string')
-	}
-	if (!hasStringProperty(json, 'prefix')) {
-		return typeError(path + '.prefix', json.prefix, 'string')
-	}
-	if (!hasStringProperty(json, 'region')) {
-		return typeError(path + '.region', json.region, 'string')
-	}
-
-	return { ...json, credentials: checkS3Credentials(json.credentials, `${path}.credentials`) }
-}
-
-function checkS3Credentials(json: unknown, path: string): S3Config['credentials'] {
-	if (!isObject(json)) {
-		return typeError(path, json, 'object')
-	}
-	if (!hasStringProperty(json, 'key')) {
-		return typeError(path + '.key', json.key, 'string')
-	}
-	if (!hasStringProperty(json, 'secret')) {
-		return typeError(path + '.secret', json.secret, 'string')
-	}
-	return json
-}
-
 function checkTenantStructure(json: unknown): Config['tenant'] {
 	if (!isObject(json)) {
-		return typeError('tenant', json, 'object')
+		return typeConfigError('tenant', json, 'object')
 	}
 	return {
 		db: checkDatabaseCredentials(json.db, 'tenant.db'),
@@ -165,25 +105,25 @@ function checkTenantStructure(json: unknown): Config['tenant'] {
 function checkStageStructure(json: unknown, slug: string, path: string): Project.Stage {
 	json = json || {}
 	if (!isObject(json)) {
-		return typeError(path, json, 'object')
+		return typeConfigError(path, json, 'object')
 	}
 
 	if (json.name && !hasStringProperty(json, 'name')) {
-		return typeError(path + '.name', json.name, 'string')
+		return typeConfigError(path + '.name', json.name, 'string')
 	}
 	return { name: upperCaseFirst(slug), ...json, slug }
 }
 
-function checkProjectStructure(json: unknown, slug: string, path: string): ProjectWithS3 {
+function checkProjectStructure(json: unknown, slug: string, path: string): Project {
 	if (!isObject(json)) {
-		return typeError(path, json, 'object')
+		return typeConfigError(path, json, 'object')
 	}
 
 	if (json.name && !hasStringProperty(json, 'name')) {
-		return typeError(path + '.name', json.name, 'string')
+		return typeConfigError(path + '.name', json.name, 'string')
 	}
 	if (!isObject(json.stages)) {
-		return error(`Property ${path}.stages should be an object in config file`)
+		return typeConfigError(`${path}.stages`, json.stages, 'object')
 	}
 	if (json.dbCredentials) {
 		console.warn(`${path}.dbCredentials is deprecated, use ${path}.db instead`)
@@ -199,22 +139,21 @@ function checkProjectStructure(json: unknown, slug: string, path: string): Proje
 		slug,
 		stages: stages,
 		db: checkDatabaseCredentials(json.db, `${path}.db`),
-		s3: json.s3 ? checkS3Config(json.s3, `${path}.s3`) : undefined,
 	}
 }
 
 function checkServerStructure(json: unknown): Config['server'] {
 	if (!isObject(json)) {
-		return typeError('server', json, 'object')
+		return typeConfigError('server', json, 'object')
 	}
 	if (!hasNumberProperty(json, 'port')) {
 		if (hasStringProperty({ ...json }, 'port')) {
 			console.warn(
-				deprecated(`Property server.port must be a number, but string was found. Use ::number typecast in config.`),
+				`DEPRECATED: Property server.port must be a number, but string was found. Use ::number typecast in config.`,
 			)
 			json.port = Number(json.port)
 		} else {
-			return typeError('server.port', json.port, 'number')
+			return typeConfigError('server.port', json.port, 'number')
 		}
 	}
 	if (!hasNumberProperty(json, 'port')) {
@@ -228,16 +167,16 @@ function checkLoggingStructure(json: unknown): Config['server']['logging'] {
 		return {}
 	}
 	if (!isObject(json)) {
-		return typeError('logging', json, 'object')
+		return typeConfigError('logging', json, 'object')
 	}
 	let sentry: Config['server']['logging']['sentry'] = undefined
 	if (json.sentry) {
 		if (!isObject(json.sentry)) {
-			return typeError('logging.sentry', json.sentry, 'object')
+			return typeConfigError('logging.sentry', json.sentry, 'object')
 		}
 		if (json.sentry.dsn) {
 			if (!hasStringProperty(json.sentry, 'dsn')) {
-				return typeError('logging.sentry.dsn', json.sentry.dsn, 'string')
+				return typeConfigError('logging.sentry.dsn', json.sentry.dsn, 'string')
 			}
 			sentry = { dsn: json.sentry.dsn }
 		}
@@ -248,10 +187,10 @@ function checkLoggingStructure(json: unknown): Config['server']['logging'] {
 
 function checkConfigStructure(json: unknown): Config {
 	if (!isObject(json)) {
-		return error('Invalid input type')
+		return typeConfigError('', json, 'object')
 	}
 	if (!isObject(json.projects)) {
-		return error('Property projects should be an object in config file')
+		return typeConfigError('project', json.projects, 'object')
 	}
 
 	const projects = Object.entries(json.projects).map(([slug, value]) =>
@@ -269,19 +208,15 @@ const projectNameToEnvName = (projectName: string): string => {
 	return projectName.toUpperCase().replace(/-/g, '_')
 }
 
-export async function readConfig(...filenames: string[]): Promise<Config> {
+export async function readConfig(filenames: string[], configProcessors: ConfigProcessor[] = []): Promise<Config> {
 	const loader = new ConfigLoader()
-
 	const configs = await Promise.all(filenames.map(it => loader.load(it)))
 	const env: Record<string, string> = {
-		DEFAULT_DB_PORT: '5432',
-		DEFAULT_S3_PREFIX: '',
-		DEFAULT_S3_ENDPOINT: '',
-		DEFAULT_S3_REGION: 'us-east-1',
-		DEFAULT_S3_PROVIDER: 'aws',
-		...process.env,
+		...configProcessors.reduce((acc, curr) => ({ ...acc, ...curr.getDefaultEnv() }), {}),
+		...Object.fromEntries(Object.entries(process.env).filter((it): it is [string, string] => it[1] !== undefined)),
 	}
-	const defaultConfig: any = {
+
+	const defaultTemplate: any = {
 		tenant: {
 			db: {
 				host: `%tenant.env.DB_HOST%`,
@@ -318,22 +253,12 @@ export async function readConfig(...filenames: string[]): Promise<Config> {
 		},
 	}
 
-	const hasS3config = Object.keys(env).find(it => it.endsWith('_S3_KEY'))
-	if (hasS3config) {
-		defaultConfig.projectDefaults.s3 = {
-			bucket: `%project.env.S3_BUCKET%`,
-			prefix: `%project.env.S3_PREFIX%`,
-			region: `%project.env.S3_REGION%`,
-			endpoint: `%project.env.S3_ENDPOINT%`,
-			provider: '%project.env.S3_PROVIDER%',
-			credentials: {
-				key: `%project.env.S3_KEY%`,
-				secret: `%project.env.S3_SECRET%`,
-			},
-		}
-	}
+	const template = configProcessors.reduce(
+		(tpl, processor) => processor.prepareConfigTemplate(tpl, { env }),
+		defaultTemplate,
+	)
 
-	let { projectDefaults, ...config } = Merger.merge(defaultConfig, ...configs)
+	let { projectDefaults, ...config } = Merger.merge(template, ...configs)
 	if (typeof projectDefaults === 'object' && projectDefaults !== null && typeof config.projects === 'object') {
 		const projectsWithDefaults = Object.entries(config.projects).map(([slug, project]) =>
 			tuple(slug, Merger.merge(projectDefaults as any, project as any)),
@@ -377,5 +302,8 @@ export async function readConfig(...filenames: string[]): Promise<Config> {
 		return parametersResolver(parts, path, dataResolver)
 	})
 
-	return checkConfigStructure(config)
+	return configProcessors.reduce<Config>(
+		(config, processor) => processor.processConfig(config, { env }),
+		checkConfigStructure(config),
+	)
 }

@@ -1,6 +1,6 @@
 import { Scalar, useEnvironment, VariableInputTransformer, VariableLiteral } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
-import { Button, ButtonGroup, Icon, IconSourceSpecification } from '@contember/ui'
+import { Button, ButtonGroup, Dropdown, Icon, IconSourceSpecification } from '@contember/ui'
 import * as React from 'react'
 import { useEditor } from 'slate-react'
 import { ContemberBlockElement, contemberBlockElementType } from '../elements'
@@ -17,7 +17,8 @@ export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	)
 
 export interface BlockHoveringToolbarContentsProps {
-	blockButtons?: BlockHoveringToolbarConfig[]
+	blockButtons?: BlockHoveringToolbarConfig[] | BlockHoveringToolbarConfig[][]
+	otherBlockButtons?: BlockHoveringToolbarConfig[]
 }
 
 export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringToolbarContentsProps) => {
@@ -28,14 +29,17 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 		return null
 	}
 
-	return (
-		// TODO
+	const mainSections = (Array.isArray(props.blockButtons[0])
+		? props.blockButtons
+		: [props.blockButtons]) as BlockHoveringToolbarConfig[][]
+
+	const renderSection = (section: BlockHoveringToolbarConfig[]) => (
 		<ButtonGroup size="large">
-			{props.blockButtons.map((buttonProps, i) => {
+			{section.map((buttonProps, j) => {
 				return (
 					<Button
 						size="large"
-						key={i}
+						key={j}
 						title={buttonProps.title}
 						onClick={() => {
 							const discriminateBy =
@@ -60,6 +64,25 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 				)
 			})}
 		</ButtonGroup>
+	)
+
+	return (
+		<>
+			{mainSections.map((section, i) => (
+				<React.Fragment key={i}>{renderSection(section)}</React.Fragment>
+			))}
+			{props.otherBlockButtons && (
+				<Dropdown
+					buttonProps={{
+						children: <Icon blueprintIcon="more" />,
+						size: 'large',
+					}}
+					alignment="top"
+				>
+					{renderSection(props.otherBlockButtons)}
+				</Dropdown>
+			)}
+		</>
 	)
 })
 BlockHoveringToolbarContents.displayName = 'BlockHoveringToolbarContents'

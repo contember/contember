@@ -38,6 +38,7 @@ export interface BlockEditorInnerPublicProps {
 	// TODO configure elements
 
 	blockButtons?: HoveringToolbarProps['blockButtons']
+	otherBlockButtons?: HoveringToolbarProps['otherBlockButtons']
 }
 
 export interface BlockEditorInnerInternalProps {
@@ -65,6 +66,7 @@ export const BlockEditorInner = React.memo(
 		textBlockDiscriminatedByScalar,
 		textBlockField,
 		blockButtons,
+		otherBlockButtons,
 		leadingFieldBackedElements,
 		trailingFieldBackedElements,
 	}: BlockEditorInnerProps) => {
@@ -172,7 +174,7 @@ export const BlockEditorInner = React.memo(
 							onDOMBeforeInput: editor.onDOMBeforeInput,
 						}}
 					>
-						<HoveringToolbar blockButtons={blockButtons} />
+						<HoveringToolbar blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
 					</EditorCanvas>
 				</Slate>
 			</ContemberElementRefreshContext.Provider>

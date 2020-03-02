@@ -1,4 +1,4 @@
-import { HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
+import { ButtonGroup, HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
 import * as React from 'react'
 import { useToolbarState } from '../../editorSelection'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
@@ -13,11 +13,13 @@ export const HoveringToolbar = React.memo((props: HoveringToolbarProps) => {
 		<>
 			<Portal>
 				<UIToolbar isActive={inlineToolbarActive} ref={inlineToolbarRef} scope="contextual">
-					<InlineHoveringToolbarContents />
+					<ButtonGroup>
+						<InlineHoveringToolbarContents />
+					</ButtonGroup>
 				</UIToolbar>
 			</Portal>
 			<UIToolbar isActive={blockToolbarActive}>
-				<BlockHoveringToolbarContents blockButtons={props.blockButtons} />
+				<BlockHoveringToolbarContents blockButtons={props.blockButtons} otherBlockButtons={props.otherBlockButtons} />
 			</UIToolbar>
 		</>
 	)

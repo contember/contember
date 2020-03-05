@@ -21,6 +21,8 @@
 		"cli": "node ./packages/cli/dist/src/cli.js",
 		"restart-api": "docker-compose up --force-recreate -d --no-deps api",
 		"ci-clean": "rm -rf packages/*/node_modules/typescript",
+		"clean:dist": "rm -rf packages/*/dist",
+		"clean:node-modules": "rm -rf node_modules/ packages/*/node_modules",
 		"clean": "rm -rf node_modules/ packages/*/{dist,node_modules}",
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",

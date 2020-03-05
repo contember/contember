@@ -3,10 +3,12 @@ import { Component } from '@contember/binding'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
 import { MutableEntityListRenderer, MutableEntityListRendererProps } from './MutableEntityListRenderer'
 
-export interface MultiEditRendererProps extends MutableContentLayoutRendererProps, MutableEntityListRendererProps {}
+export interface MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>
+	extends MutableContentLayoutRendererProps,
+		MutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps> {}
 
-export const MultiEditRenderer = Component<MultiEditRendererProps>(
-	({
+export const MultiEditRenderer = Component(
+	<ContainerExtraProps, ItemExtraProps>({
 		children,
 
 		side,
@@ -17,7 +19,7 @@ export const MultiEditRenderer = Component<MultiEditRendererProps>(
 		persistButtonComponent,
 
 		...entityListProps
-	}) => (
+	}: MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>) => (
 		<MutableContentLayoutRenderer
 			side={side}
 			title={title}
@@ -30,4 +32,6 @@ export const MultiEditRenderer = Component<MultiEditRendererProps>(
 		</MutableContentLayoutRenderer>
 	),
 	'MultiEditRenderer',
-)
+) as <ContainerExtraProps, ItemExtraProps>(
+	props: MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>,
+) => React.ReactElement

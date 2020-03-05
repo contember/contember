@@ -17,18 +17,17 @@ import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
-import { RepeaterProps } from '../../collections'
-import { HoveringToolbar, HoveringToolbarProps } from './toolbars'
 import { createEditor } from './editor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { ContemberElementRefreshContext } from './renderers'
+import { HoveringToolbar, HoveringToolbarProps } from './toolbars'
 import { useSlateNodes } from './useSlateNodes'
 
 export interface BlockEditorInnerPublicProps {
 	children: React.ReactNode
 	label: React.ReactNode
 	removalType?: RemovalType
-	sortableBy: Exclude<RepeaterProps['sortableBy'], undefined>
+	sortableBy: SugaredRelativeSingleField['field']
 
 	discriminationField: string | SugaredRelativeSingleField
 	textBlockField: string | SugaredRelativeSingleField

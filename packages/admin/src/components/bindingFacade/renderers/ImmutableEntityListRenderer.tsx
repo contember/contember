@@ -1,17 +1,10 @@
-import * as React from 'react'
 import { AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '@contember/binding'
+import * as React from 'react'
 import { RepeaterInner, RepeaterInnerProps } from '../collections/Repeater'
 
-export interface EntityListWrapperProps {
-	accessor: EntityListAccessor
-	isEmpty: boolean
-	originalChildren: React.ReactNode
-	children: React.ReactNode
-}
-
-export interface ImmutableEntityListRendererProps
+export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>
 	extends Omit<
-		RepeaterInnerProps,
+		RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>,
 		| 'entityList'
 		| 'label'
 		| 'sortableBy'
@@ -28,8 +21,10 @@ export interface ImmutableEntityListRendererProps
 	afterContent?: React.ReactNode
 }
 
-export const ImmutableEntityListRenderer = Component<ImmutableEntityListRendererProps>(
-	props => {
+export const ImmutableEntityListRenderer = Component(
+	<ContainerExtraProps, ItemExtraProps>(
+		props: ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
+	) => {
 		const accessorTreeState = React.useContext(AccessorTreeStateWithDataContext)
 
 		if (accessorTreeState === undefined) {
@@ -58,4 +53,6 @@ export const ImmutableEntityListRenderer = Component<ImmutableEntityListRenderer
 		</>
 	),
 	'ImmutableEntityListRenderer',
-)
+) as <ContainerExtraProps, ItemExtraProps>(
+	props: ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
+) => React.ReactElement

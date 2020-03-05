@@ -3,10 +3,12 @@ import { Component } from '@contember/binding'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 
-export interface ListRendererProps extends ImmutableContentLayoutRendererProps, ImmutableEntityListRendererProps {}
+export interface ListRendererProps<ContainerExtraProps, ItemExtraProps>
+	extends ImmutableContentLayoutRendererProps,
+		ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps> {}
 
-export const ListRenderer = Component<ListRendererProps>(
-	({
+export const ListRenderer = Component(
+	<ContainerExtraProps, ItemExtraProps>({
 		children,
 
 		side,
@@ -16,7 +18,7 @@ export const ListRenderer = Component<ListRendererProps>(
 		actions,
 
 		...entityListProps
-	}) => (
+	}: ListRendererProps<ContainerExtraProps, ItemExtraProps>) => (
 		<ImmutableContentLayoutRenderer
 			side={side}
 			title={title}
@@ -28,4 +30,6 @@ export const ListRenderer = Component<ListRendererProps>(
 		</ImmutableContentLayoutRenderer>
 	),
 	'ListRenderer',
-)
+) as <ContainerExtraProps, ItemExtraProps>(
+	props: ListRendererProps<ContainerExtraProps, ItemExtraProps>,
+) => React.ReactElement

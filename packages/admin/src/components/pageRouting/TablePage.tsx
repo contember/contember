@@ -4,19 +4,26 @@ import { TableRenderer, TableRendererProps } from '../bindingFacade'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
 
-export interface TablePageProps extends EntityListPageProps {
-	rendererProps?: Omit<TableRendererProps, 'children'>
+export interface TablePageProps<ContainerExtraProps, ItemExtraProps> extends EntityListPageProps {
+	rendererProps?: Omit<TableRendererProps<ContainerExtraProps, ItemExtraProps>, 'children'>
 }
 
-const TablePage: Partial<PageProvider<TablePageProps>> & React.ComponentType<TablePageProps> = React.memo(
-	({ rendererProps, children, pageName, ...entityListProps }: TablePageProps) => (
+const TablePage = React.memo(
+	<ContainerExtraProps, ItemExtraProps>({
+		rendererProps,
+		children,
+		pageName,
+		...entityListProps
+	}: TablePageProps<ContainerExtraProps, ItemExtraProps>) => (
 		<EntityListDataProvider {...entityListProps}>
 			<TableRenderer {...rendererProps}>{children}</TableRenderer>
 		</EntityListDataProvider>
 	),
-)
+) as (<ContainerExtraProps, ItemExtraProps>(
+	props: TablePageProps<ContainerExtraProps, ItemExtraProps>,
+) => React.ReactElement) &
+	Partial<PageProvider<TablePageProps<never, never>>>
 
-TablePage.displayName = 'TablePage'
-TablePage.getPageName = (props: TablePageProps) => props.pageName
+TablePage.getPageName = (props: TablePageProps<never, never>) => props.pageName
 
 export { TablePage }

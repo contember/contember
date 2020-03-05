@@ -4,19 +4,26 @@ import { ListRenderer, ListRendererProps } from '../bindingFacade'
 import { EntityListPageProps } from './EntityListPageProps'
 import { PageProvider } from './PageProvider'
 
-export interface ListPageProps extends EntityListPageProps {
-	rendererProps?: Omit<ListRendererProps, 'children'>
+export interface ListPageProps<ContainerExtraProps, ItemExtraProps> extends EntityListPageProps {
+	rendererProps?: Omit<ListRendererProps<ContainerExtraProps, ItemExtraProps>, 'children'>
 }
 
-const ListPage: Partial<PageProvider<ListPageProps>> & React.ComponentType<ListPageProps> = React.memo(
-	({ children, rendererProps, pageName, ...entityListProps }: ListPageProps) => (
+const ListPage = React.memo(
+	<ContainerExtraProps, ItemExtraProps>({
+		children,
+		rendererProps,
+		pageName,
+		...entityListProps
+	}: ListPageProps<ContainerExtraProps, ItemExtraProps>) => (
 		<EntityListDataProvider {...entityListProps}>
 			<ListRenderer {...rendererProps}>{children}</ListRenderer>
 		</EntityListDataProvider>
 	),
-)
+) as (<ContainerExtraProps, ItemExtraProps>(
+	props: ListPageProps<ContainerExtraProps, ItemExtraProps>,
+) => React.ReactElement) &
+	Partial<PageProvider<ListPageProps<never, never>>>
 
-ListPage.displayName = 'ListPage'
-ListPage.getPageName = (props: ListPageProps) => props.pageName
+ListPage.getPageName = (props: ListPageProps<never, never>) => props.pageName
 
 export { ListPage }

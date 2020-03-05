@@ -2,12 +2,14 @@ import * as React from 'react'
 import { Component, BindingError, Field, HasMany, HasManyProps, useRelativeEntityList } from '@contember/binding'
 import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
-export interface RepeaterProps extends HasManyProps, Omit<RepeaterInnerProps, 'entityList'> {
+export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>
+	extends HasManyProps,
+		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'entityList'> {
 	initialRowCount?: number
 }
 
-export const Repeater = Component<RepeaterProps>(
-	props => {
+export const Repeater = Component(
+	<ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => {
 		if (process.env.NODE_ENV === 'development') {
 			if ('sortableBy' in props && 'orderBy' in props) {
 				throw new BindingError(
@@ -33,4 +35,6 @@ export const Repeater = Component<RepeaterProps>(
 		</HasMany>
 	),
 	'Repeater',
-)
+) as <ContainerExtraProps, ItemExtraProps>(
+	props: RepeaterProps<ContainerExtraProps, ItemExtraProps>,
+) => React.ReactElement

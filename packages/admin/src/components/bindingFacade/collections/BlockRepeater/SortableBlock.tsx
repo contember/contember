@@ -3,10 +3,12 @@ import * as React from 'react'
 import { NormalizedBlock } from '../../blocks'
 import { RepeaterItem, RepeaterItemProps } from '../Repeater'
 
-export interface SortableBlockProps extends RepeaterItemProps {
+export interface SortableBlockOwnProps {
 	discriminationField: string | SugaredRelativeSingleField
 	normalizedBlocks: NormalizedBlock[]
 }
+
+export interface SortableBlockProps extends RepeaterItemProps, SortableBlockOwnProps {}
 
 export const SortableBlock = React.memo<SortableBlockProps>(props => {
 	const field = useRelativeSingleField(props.discriminationField)

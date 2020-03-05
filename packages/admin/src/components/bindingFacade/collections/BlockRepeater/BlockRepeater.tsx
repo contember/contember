@@ -1,24 +1,26 @@
-import { Component, SugaredRelativeSingleField, useMutationState } from '@contember/binding'
+import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { DiscriminatedBlocks, useNormalizedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../Repeater'
 import { AddNewBlockButton } from './AddNewBlockButton'
 import { SortableBlock } from './SortableBlock'
 
-export interface BlockRepeaterProps extends RepeaterProps {
+export interface BlockRepeaterProps
+	extends Omit<
+		RepeaterProps<unknown, unknown>,
+		'containerComponent' | 'containerComponentExtraProps' | 'itemComponent' | 'itemComponentExtraProps'
+	> {
 	discriminationField: string | SugaredRelativeSingleField
 }
 
 export const BlockRepeater = Component<BlockRepeaterProps>(
 	({ discriminationField, ...props }) => {
-		const isMutating = useMutationState()
 		const normalizedBlocks = useNormalizedBlocks(props.children)
 
 		const extraProps = {
 			normalizedBlocks: normalizedBlocks,
-			isMutating,
 			discriminationField,
-		}
+		} as const
 
 		return (
 			<Repeater

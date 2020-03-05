@@ -6,16 +6,23 @@ import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeat
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 
-export interface TableRendererProps
+export interface TableRendererProps<ContainerExtraProps, ItemExtraProps>
 	extends ImmutableContentLayoutRendererProps,
-		Omit<ImmutableEntityListRendererProps, 'wrapperComponent'> {
+		Omit<
+			ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
+			| 'wrapperComponent'
+			| 'itemComponent'
+			| 'itemComponentExtraProps'
+			| 'containerComponent'
+			| 'containerComponentExtraProps'
+		> {
 	tableProps?: Omit<TableProps, 'children'>
 	tableRowProps?: Omit<TableRowProps, 'children'>
 	enableRemove?: boolean
 }
 
-export const TableRenderer = Component<TableRendererProps>(
-	({
+export const TableRenderer = Component(
+	<ContainerExtraProps, ItemExtraProps>({
 		enableRemove = true,
 		children,
 		side,
@@ -26,7 +33,7 @@ export const TableRenderer = Component<TableRendererProps>(
 		tableProps,
 		tableRowProps,
 		...entityListProps
-	}) => {
+	}: any) => {
 		return (
 			<ImmutableContentLayoutRenderer
 				side={side}
@@ -48,7 +55,9 @@ export const TableRenderer = Component<TableRendererProps>(
 		)
 	},
 	'TableRenderer',
-)
+) as <ContainerExtraProps, ItemExtraProps>(
+	props: TableRendererProps<ContainerExtraProps, ItemExtraProps>,
+) => React.ReactElement
 
 const EmptyTable = React.memo((props: { children: React.ReactNode }) => (
 	<Box>

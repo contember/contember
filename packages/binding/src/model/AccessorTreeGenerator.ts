@@ -227,7 +227,10 @@ class AccessorTreeGenerator {
 							: []
 					const persistedValue =
 						fieldData instanceof FieldAccessor ? fieldData.persistedValue : fieldData === undefined ? null : fieldData
-					const onChange = (newValue: Scalar | GraphQlBuilder.Literal) => {
+					const onChange = function(this: FieldAccessor, newValue: Scalar | GraphQlBuilder.Literal) {
+						if (newValue === this.currentValue) {
+							return
+						}
 						onUpdate(
 							placeholderName,
 							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(

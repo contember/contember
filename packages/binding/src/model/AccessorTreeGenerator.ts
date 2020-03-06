@@ -237,6 +237,7 @@ class AccessorTreeGenerator {
 								placeholderName,
 								newValue,
 								persistedValue,
+								true,
 								fieldErrors,
 								onChange,
 							),
@@ -254,6 +255,7 @@ class AccessorTreeGenerator {
 						placeholderName,
 						fieldValue,
 						persistedValue,
+						false,
 						fieldErrors,
 						onChange,
 					)

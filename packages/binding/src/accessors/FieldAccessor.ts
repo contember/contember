@@ -11,6 +11,7 @@ export class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced e
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted | null,
 		public readonly persistedValue: Persisted | null,
+		public readonly isTouched: boolean,
 		public readonly errors: ErrorAccessor[],
 		public readonly updateValue: ((newValue: Produced | null) => void) | undefined,
 	) {
@@ -27,5 +28,9 @@ export class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced e
 		const right = candidate instanceof GraphQlBuilder.Literal ? candidate.value : candidate
 
 		return left === right
+	}
+
+	public get isDirty() {
+		return this.currentValue !== this.persistedValue
 	}
 }

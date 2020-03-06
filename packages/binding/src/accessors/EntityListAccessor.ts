@@ -11,9 +11,9 @@ export class EntityListAccessor extends Accessor implements Errorable {
 		public readonly entities: Array<EntityAccessor | EntityForRemovalAccessor | undefined>, // Undefined is a "hole" after an non-persisted entity
 		public readonly errors: ErrorAccessor[],
 		public readonly batchUpdates: (performUpdates: (getAccessor: () => EntityListAccessor) => void) => void,
-		public readonly addNew?: (
-			newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newIndex: number) => void),
-		) => void,
+		public readonly addNew:
+			| ((newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newIndex: number) => void)) => void)
+			| undefined,
 	) {
 		super()
 	}

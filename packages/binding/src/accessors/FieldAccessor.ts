@@ -12,7 +12,7 @@ export class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced e
 		public readonly currentValue: Persisted | null,
 		public readonly persistedValue: Persisted | null,
 		public readonly errors: ErrorAccessor[],
-		public readonly updateValue?: (newValue: Produced | null) => void,
+		public readonly updateValue: ((newValue: Produced | null) => void) | undefined,
 	) {
 		super()
 	}

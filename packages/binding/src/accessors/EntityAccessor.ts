@@ -30,8 +30,8 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly data: EntityAccessor.EntityData,
 		public readonly errors: ErrorAccessor[],
 		public readonly batchUpdates: (performUpdates: (getAccessor: () => EntityAccessor) => void) => void,
-		public readonly replaceBy?: (replacement: EntityAccessor) => void,
-		public readonly remove?: (removalType: RemovalType) => void,
+		public readonly replaceBy: ((replacement: EntityAccessor) => void) | undefined,
+		public readonly remove: ((removalType: RemovalType) => void) | undefined,
 	) {
 		super()
 		this.primaryKey = primaryKey || new EntityAccessor.UnpersistedEntityID()

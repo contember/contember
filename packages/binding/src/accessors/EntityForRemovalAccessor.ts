@@ -7,7 +7,7 @@ export class EntityForRemovalAccessor extends Accessor {
 
 	public constructor(
 		public readonly entityAccessor: EntityAccessor,
-		public readonly replaceWith: ((replacement: EntityAccessor) => void) | undefined,
+		public readonly replaceBy: ((replacement: EntityAccessor) => void) | undefined,
 		public readonly removalType: RemovalType,
 	) {
 		super()

@@ -16,7 +16,7 @@ import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from 
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => void
-type OnReplace = EntityAccessor['replaceWith']
+type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
 type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
@@ -462,7 +462,7 @@ class AccessorTreeGenerator {
 			},
 			original.errors,
 			original.batchUpdates,
-			original.replaceWith,
+			original.replaceBy,
 			original.remove,
 		)
 	}
@@ -480,7 +480,7 @@ class AccessorTreeGenerator {
 			replacement.data,
 			blueprint.errors,
 			blueprint.batchUpdates,
-			blueprint.replaceWith,
+			blueprint.replaceBy,
 			onRemove || blueprint.remove,
 		)
 	}
@@ -498,7 +498,7 @@ class AccessorTreeGenerator {
 			return undefined
 		}
 
-		return new EntityForRemovalAccessor(currentEntity, currentEntity.replaceWith, removalType)
+		return new EntityForRemovalAccessor(currentEntity, currentEntity.replaceBy, removalType)
 	}
 
 	private rejectInvalidAccessorTree(): never {

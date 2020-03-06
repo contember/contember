@@ -193,7 +193,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 						entity.remove('disconnect')
 					}
 				} else {
-					entity.replaceWith && entity.replaceWith(filteredOptions[newValue])
+					entity.replaceBy?.(filteredOptions[newValue])
 				}
 			},
 		}

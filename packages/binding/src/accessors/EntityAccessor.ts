@@ -29,7 +29,8 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly typename: string | undefined,
 		public readonly data: EntityAccessor.EntityData,
 		public readonly errors: ErrorAccessor[],
-		public readonly batchUpdates: (performUpdates: (getAccessor: () => EntityAccessor) => void) => void,
+		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
+		public readonly batchUpdates: (performUpdates: EntityAccessor.BatchUpdates) => void,
 		public readonly replaceBy: ((replacement: EntityAccessor) => void) | undefined,
 		public readonly remove: ((removalType: RemovalType) => void) | undefined,
 	) {
@@ -214,6 +215,16 @@ namespace EntityAccessor {
 		| RootAccessor
 
 	export type EntityData = { [placeholder in FieldName]: FieldData }
+
+	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
+
+	export interface EntityEventListenerMap {
+		beforeUpdate: BatchUpdates
+	}
+	export type EntityEventType = keyof EntityEventListenerMap
+	export interface AddEntityEventListener {
+		(type: EntityEventType & 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+	}
 }
 
 export { EntityAccessor }

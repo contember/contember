@@ -15,6 +15,7 @@ import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceM
 import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
+type AddEventListener = EntityAccessor['addEventListener']
 type OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => void
 type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
@@ -91,6 +92,7 @@ class AccessorTreeGenerator {
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		onUpdate: OnUpdate,
 		onReplace: OnReplace,
+		addEventListener: AddEventListener,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
@@ -267,7 +269,16 @@ class AccessorTreeGenerator {
 			}
 		}
 
-		return new EntityAccessor(id, typename, entityData, errors ? errors.errors : [], batchUpdates, onReplace, onUnlink)
+		return new EntityAccessor(
+			id,
+			typename,
+			entityData,
+			errors ? errors.errors : [],
+			addEventListener,
+			batchUpdates,
+			onReplace,
+			onUnlink,
+		)
 	}
 
 	private generateEntityAccessor(
@@ -278,16 +289,47 @@ class AccessorTreeGenerator {
 		parentOnUpdate: OnUpdate,
 		entityData: EntityAccessor.EntityData,
 	): EntityAccessor {
+		const eventListeners: {
+			[Type in EntityAccessor.EntityEventType]?: Set<EntityAccessor.EntityEventListenerMap[Type]>
+		} = {}
+
 		let batchUpdateDepth = 0
 		const performUpdate = () => {
 			parentOnUpdate(placeholderName, entityData[placeholderName])
 		}
-		const onUpdateProxy = (newValue: EntityAccessor.FieldData) => {
-			entityData[placeholderName] = newValue
+		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
+			batchUpdates(getAccessor => {
+				let latestData: EntityAccessor.FieldData = (entityData[placeholderName] = newValue)
 
-			if (batchUpdateDepth === 0) {
-				performUpdate()
-			}
+				if (eventListeners.beforeUpdate === undefined || eventListeners.beforeUpdate.size === 0) {
+					return
+				}
+
+				// If the listeners mutate the sub-tree, other listeners may want to respond to that, which in turn may trigger
+				// further responses, etc. We don't want the order of addition of event listeners to matter and we don't have
+				// the necessary information to perform some sort of a topological sort. We wouldn't want to do that anyway
+				// though.
+
+				// To get around all this, we just trigger all event listeners repeatedly until things settle and they stop
+				// mutating the entity. If, however, that doesn't happen until some number of iterations (I think the limit
+				// is actually fairly generous), we conclude that there is an infinite feedback loop and just shut things down.
+
+				// Notice also that we effectively shift the responsibility to check whether an update concerns them to the
+				// listeners.
+				for (let i = 0; i < 100; i++) {
+					for (const listener of eventListeners.beforeUpdate) {
+						listener(getAccessor)
+					}
+					if (entityData[placeholderName] === latestData) {
+						return
+					}
+					latestData = entityData[placeholderName]
+				}
+				throw new BindingError(
+					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
+						`This likely means an infinite feedback loop in your code.`,
+				)
+			})
 		}
 		const onUpdate: OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => {
 			const entityAccessor = entityData[placeholderName]
@@ -321,7 +363,34 @@ class AccessorTreeGenerator {
 				performUpdate()
 			}
 		}
-		return this.updateFields(persistedData, entityFields, errors, onUpdate, onReplace, batchUpdates, onRemove)
+		const addEventListener: EntityAccessor.AddEntityEventListener = (
+			type: EntityAccessor.EntityEventType,
+			listener: EntityAccessor.EntityEventListenerMap[typeof type],
+		) => {
+			if (eventListeners[type] === undefined) {
+				eventListeners[type] = new Set()
+			}
+			eventListeners[type]!.add(listener as any)
+			return () => {
+				if (eventListeners[type] === undefined) {
+					return // Throw an error? This REALLY should not happen.
+				}
+				eventListeners[type]!.delete(listener as any)
+				if (eventListeners[type]!.size === 0) {
+					eventListeners[type] = undefined
+				}
+			}
+		}
+		return this.updateFields(
+			persistedData,
+			entityFields,
+			errors,
+			onUpdate,
+			onReplace,
+			addEventListener,
+			batchUpdates,
+			onRemove,
+		)
 	}
 
 	private generateEntityListAccessor(
@@ -374,6 +443,12 @@ class AccessorTreeGenerator {
 				performUpdate()
 			}
 		}
+		const addEventListener = () => {
+			throw new BindingError(
+				`TODO: Not implemented. Entity events currently only work for hasOne relations, ` +
+					`and not directly within collections.`,
+			)
+		}
 		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData, i: number): EntityAccessor => {
 			const childErrors = errors && i in errors.children ? errors.children[i] : undefined
 			const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => {
@@ -412,7 +487,16 @@ class AccessorTreeGenerator {
 			}
 
 			childBatchUpdateDepths[i] = 0
-			return this.updateFields(datum, entityFields, childErrors, onUpdate, onReplace, batchUpdates, onRemove)
+			return this.updateFields(
+				datum,
+				entityFields,
+				childErrors,
+				onUpdate,
+				onReplace,
+				addEventListener,
+				batchUpdates,
+				onRemove,
+			)
 		}
 		let listAccessor = new EntityListAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
 			const newEntityIndex = listAccessor.entities.length
@@ -466,6 +550,7 @@ class AccessorTreeGenerator {
 				[fieldPlaceholder]: newData,
 			},
 			original.errors,
+			original.addEventListener,
 			original.batchUpdates,
 			original.replaceBy,
 			original.remove,
@@ -484,6 +569,7 @@ class AccessorTreeGenerator {
 			blueprint.typename,
 			replacement.data,
 			blueprint.errors,
+			blueprint.addEventListener,
 			blueprint.batchUpdates,
 			blueprint.replaceBy,
 			onRemove || blueprint.remove,

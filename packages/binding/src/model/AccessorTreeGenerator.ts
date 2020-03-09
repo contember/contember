@@ -22,6 +22,14 @@ type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
 type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
 
+interface InternalEntityState {
+	batchUpdateDepth: number
+	eventListeners: {
+		[Type in EntityAccessor.EntityEventType]?: Set<EntityAccessor.EntityEventListenerMap[Type]>
+	}
+	accessor: EntityAccessor | EntityForRemovalAccessor | undefined
+}
+
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined
 	private initialData: RootAccessor | ReceivedDataTree<undefined> | undefined
@@ -83,7 +91,7 @@ class AccessorTreeGenerator {
 		return (entityData[rootName] =
 			Array.isArray(data) || data === undefined || data instanceof EntityListAccessor
 				? this.generateEntityListAccessor(rootName, tree.fields, data, errorNode, onUpdate)
-				: this.generateEntityAccessor(rootName, tree.fields, data, errorNode, onUpdate, entityData))
+				: this.generateEntityAccessor(rootName, tree.fields, data, errorNode, onUpdate))
 	}
 
 	private updateFields(
@@ -163,7 +171,6 @@ class AccessorTreeGenerator {
 								fieldData || undefined,
 								referenceError,
 								onUpdate,
-								entityData,
 							)
 						} else {
 							throw new BindingError(
@@ -287,21 +294,19 @@ class AccessorTreeGenerator {
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
-		entityData: EntityAccessor.EntityData,
+		entityState: InternalEntityState = this.createEmptyEntityState(),
 	): EntityAccessor {
-		const eventListeners: {
-			[Type in EntityAccessor.EntityEventType]?: Set<EntityAccessor.EntityEventListenerMap[Type]>
-		} = {}
-
-		let batchUpdateDepth = 0
 		const performUpdate = () => {
-			parentOnUpdate(placeholderName, entityData[placeholderName])
+			parentOnUpdate(placeholderName, entityState.accessor)
 		}
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			batchUpdates(getAccessor => {
-				let latestData: EntityAccessor.FieldData = (entityData[placeholderName] = newValue)
+				let latestData: EntityAccessor.FieldData = (entityState.accessor = newValue)
 
-				if (eventListeners.beforeUpdate === undefined || eventListeners.beforeUpdate.size === 0) {
+				if (
+					entityState.eventListeners.beforeUpdate === undefined ||
+					entityState.eventListeners.beforeUpdate.size === 0
+				) {
 					return
 				}
 
@@ -317,13 +322,13 @@ class AccessorTreeGenerator {
 				// Notice also that we effectively shift the responsibility to check whether an update concerns them to the
 				// listeners.
 				for (let i = 0; i < 100; i++) {
-					for (const listener of eventListeners.beforeUpdate) {
+					for (const listener of entityState.eventListeners.beforeUpdate) {
 						listener(getAccessor)
 					}
-					if (entityData[placeholderName] === latestData) {
+					if (entityState.accessor === latestData) {
 						return
 					}
-					latestData = entityData[placeholderName]
+					latestData = entityState.accessor
 				}
 				throw new BindingError(
 					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
@@ -332,34 +337,34 @@ class AccessorTreeGenerator {
 			})
 		}
 		const onUpdate: OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => {
-			const entityAccessor = entityData[placeholderName]
+			const entityAccessor = entityState.accessor
 			if (entityAccessor instanceof EntityAccessor) {
 				return onUpdateProxy(this.withUpdatedField(entityAccessor, updatedField, updatedData))
 			}
 			return this.rejectInvalidAccessorTree()
 		}
 		const onReplace: OnReplace = replacement => {
-			const entityAccessor = entityData[placeholderName]
+			const entityAccessor = entityState.accessor
 			if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
 				return onUpdateProxy(this.asDifferentEntity(entityAccessor, replacement, onRemove))
 			}
 			return this.rejectInvalidAccessorTree()
 		}
 		const onRemove = (removalType: RemovalType) => {
-			onUpdateProxy(this.removeEntity(persistedData, entityData[placeholderName], removalType))
+			onUpdateProxy(this.removeEntity(persistedData, entityState.accessor, removalType))
 		}
 		const batchUpdates: BatchEntityUpdates = performUpdates => {
-			batchUpdateDepth++
-			const accessorBeforeUpdates = entityData[placeholderName]
+			entityState.batchUpdateDepth++
+			const accessorBeforeUpdates = entityState.accessor
 			performUpdates(() => {
-				const accessor = entityData[placeholderName]
+				const accessor = entityState.accessor
 				if (accessor instanceof EntityAccessor) {
 					return accessor
 				}
 				throw new BindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
 			})
-			batchUpdateDepth--
-			if (batchUpdateDepth === 0 && accessorBeforeUpdates !== entityData[placeholderName]) {
+			entityState.batchUpdateDepth--
+			if (entityState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityState.accessor) {
 				performUpdate()
 			}
 		}
@@ -367,21 +372,21 @@ class AccessorTreeGenerator {
 			type: EntityAccessor.EntityEventType,
 			listener: EntityAccessor.EntityEventListenerMap[typeof type],
 		) => {
-			if (eventListeners[type] === undefined) {
-				eventListeners[type] = new Set()
+			if (entityState.eventListeners[type] === undefined) {
+				entityState.eventListeners[type] = new Set()
 			}
-			eventListeners[type]!.add(listener as any)
+			entityState.eventListeners[type]!.add(listener as any)
 			return () => {
-				if (eventListeners[type] === undefined) {
+				if (entityState.eventListeners[type] === undefined) {
 					return // Throw an error? This REALLY should not happen.
 				}
-				eventListeners[type]!.delete(listener as any)
-				if (eventListeners[type]!.size === 0) {
-					eventListeners[type] = undefined
+				entityState.eventListeners[type]!.delete(listener as any)
+				if (entityState.eventListeners[type]!.size === 0) {
+					entityState.eventListeners[type] = undefined
 				}
 			}
 		}
-		return this.updateFields(
+		return (entityState.accessor = this.updateFields(
 			persistedData,
 			entityFields,
 			errors,
@@ -390,7 +395,7 @@ class AccessorTreeGenerator {
 			addEventListener,
 			batchUpdates,
 			onRemove,
-		)
+		))
 	}
 
 	private generateEntityListAccessor(
@@ -596,6 +601,14 @@ class AccessorTreeGenerator {
 		throw new BindingError(
 			`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`,
 		)
+	}
+
+	private createEmptyEntityState(): InternalEntityState {
+		return {
+			accessor: undefined,
+			batchUpdateDepth: 0,
+			eventListeners: {},
+		}
 	}
 }
 

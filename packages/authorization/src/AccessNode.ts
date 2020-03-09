@@ -30,7 +30,7 @@ namespace AccessNode {
 		constructor(private readonly nodes: AccessNode[]) {}
 
 		public async isAllowed(accessEvaluator: AccessEvaluator, action: Authorizator.Action): Promise<boolean> {
-			if (this.nodes.length) {
+			if (this.nodes.length === 0) {
 				return Promise.resolve(false)
 			}
 			for (let node of this.nodes) {

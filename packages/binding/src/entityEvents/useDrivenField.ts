@@ -30,7 +30,7 @@ export const useDrivenField = <DriverPersisted extends FieldValue = FieldValue>(
 			// This is tricky: we're deliberately getting the Entity, and not the field
 			const drivenHostEntity = getAccessor().getRelativeSingleEntity(desugaredDriven)
 
-			if (drivenHostEntity.isPersisted()) {
+			if (drivenHostEntity.isPersisted) {
 				return
 			}
 

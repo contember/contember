@@ -43,7 +43,7 @@ export class DirtinessChecker {
 		if (node instanceof EntityForRemovalAccessor) {
 			return true
 		}
-		const isPersisted = node.isPersisted()
+		const isPersisted = node.isPersisted
 		if ((!persistedData && isPersisted) || (persistedData && node.primaryKey !== persistedData[PRIMARY_KEY_NAME])) {
 			return true
 		}

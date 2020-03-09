@@ -67,7 +67,7 @@ export const RepeaterInner = Component(
 			return (
 				<Container {...props.containerComponentExtraProps!} {...props} isEmpty={isEmpty} addNew={appendNew}>
 					{entities.map(entity => (
-						<Entity accessor={entity} key={entity.getKey()}>
+						<Entity accessor={entity} key={entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
 								removalType={props.removalType}
@@ -96,7 +96,7 @@ export const RepeaterInner = Component(
 			>
 				<Container {...props.containerComponentExtraProps!} {...props} isEmpty={isEmpty} addNew={appendNew}>
 					{entities.map((entity, i) => (
-						<SortableRepeaterItem index={i} key={entity.getKey()} disabled={isMutating}>
+						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
 							<Entity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}

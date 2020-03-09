@@ -548,7 +548,7 @@ class AccessorTreeGenerator {
 		newData: EntityAccessor.FieldData,
 	): EntityAccessor {
 		return new EntityAccessor(
-			original.primaryKey,
+			original.runtimeId,
 			original.typename,
 			{
 				...original.data,
@@ -570,7 +570,7 @@ class AccessorTreeGenerator {
 		// TODO: we also need to update the callbacks inside replacement.data
 		const blueprint = original instanceof EntityAccessor ? original : original.entityAccessor
 		return new EntityAccessor(
-			replacement.primaryKey,
+			replacement.runtimeId,
 			blueprint.typename,
 			replacement.data,
 			blueprint.errors,

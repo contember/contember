@@ -33,6 +33,6 @@ export class EntityListAccessor extends Accessor implements Errorable {
 
 	public getByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
 		// TODO we can quite easily introduce something like `entitiesByKey` and avoid this linear search.
-		return this.entities.find(e => e !== undefined && e.getKey() === key)
+		return this.entities.find(e => e !== undefined && e.key === key)
 	}
 }

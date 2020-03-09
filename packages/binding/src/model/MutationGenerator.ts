@@ -54,7 +54,7 @@ export class MutationGenerator {
 		}
 
 		if (entity instanceof EntityAccessor) {
-			if (entity.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
+			if (!entity.isPersisted) {
 				queryBuilder = this.addCreateMutation(entity, entityFields, alias, parameters, queryBuilder)
 			} else if (data && !Array.isArray(data)) {
 				queryBuilder = this.addUpdateMutation(entity, entityFields, data, alias, parameters, queryBuilder)
@@ -113,7 +113,7 @@ export class MutationGenerator {
 				return builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ ...where, [PRIMARY_KEY_NAME]: entity.entityAccessor.primaryKey })
+					.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
 			},
 			alias,
 		)
@@ -131,9 +131,9 @@ export class MutationGenerator {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		const primaryKey = entity.primaryKey
+		const runtimeId = entity.runtimeId
 
-		if (primaryKey instanceof EntityAccessor.UnpersistedEntityID || !data) {
+		if (runtimeId instanceof EntityAccessor.UnpersistedEntityId || !data) {
 			return queryBuilder
 		}
 
@@ -147,7 +147,7 @@ export class MutationGenerator {
 
 				return builder
 					.data(builder => this.registerUpdateMutationPart(entity, entityFields, data, builder))
-					.by({ ...where, [PRIMARY_KEY_NAME]: primaryKey })
+					.by({ ...where, [PRIMARY_KEY_NAME]: runtimeId })
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.ok()
 					.validation()
@@ -269,7 +269,7 @@ export class MutationGenerator {
 						>()
 						const { accessor, reference } = accessorReference[0]
 
-						if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
+						if (!accessor.primaryKey) {
 							const createBuilder = createOneRelationBuilder.create(
 								this.registerCreateReferenceMutationPart(accessor, reference),
 							)
@@ -292,7 +292,7 @@ export class MutationGenerator {
 						for (const referencePair of accessorReference) {
 							const { alias, accessor, reference } = referencePair
 
-							if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
+							if (!accessor.primaryKey) {
 								builder = builder.create(this.registerCreateReferenceMutationPart(accessor, reference), alias)
 							} else {
 								builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
@@ -412,7 +412,7 @@ export class MutationGenerator {
 							const { accessor, reference, persistedField, alias } = accessorReference[0]
 
 							if (accessor instanceof EntityAccessor) {
-								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
+								if (!accessor.primaryKey) {
 									return builder.create(this.registerCreateReferenceMutationPart(accessor, reference))
 								} else {
 									const updated = builder.update(builder =>
@@ -451,7 +451,7 @@ export class MutationGenerator {
 							const { accessor, reference, persistedField, alias } = referencePair
 
 							if (accessor instanceof EntityAccessor) {
-								if (accessor.primaryKey instanceof EntityAccessor.UnpersistedEntityID) {
+								if (!accessor.primaryKey) {
 									builder = builder.create(this.registerCreateReferenceMutationPart(accessor, reference), alias)
 								} else {
 									builder = builder.update(
@@ -470,9 +470,9 @@ export class MutationGenerator {
 								const removalType = accessor.removalType
 
 								if (removalType === 'delete') {
-									builder = builder.delete({ [PRIMARY_KEY_NAME]: accessor.entityAccessor.primaryKey }, alias)
+									builder = builder.delete({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 								} else if (removalType === 'disconnect') {
-									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: accessor.entityAccessor.primaryKey }, alias)
+									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
 								} else {
 									assertNever(removalType)
 								}

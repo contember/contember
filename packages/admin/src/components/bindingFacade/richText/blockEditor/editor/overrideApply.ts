@@ -110,7 +110,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				newValue: string,
 			) => getFreshFieldAccessor(position, normalizedFieldIndex).updateValue?.(newValue)
 			const getFreshContentEntityAccessor = (sortedEntityIndex: number): EntityAccessor => {
-				const oldEntityKey = sortedEntities[sortedEntityIndex].getKey()
+				const oldEntityKey = sortedEntities[sortedEntityIndex].key
 				const newEntity = getAccessor()
 					.getRelativeEntityList(desugaredEntityList)
 					.getByKey(oldEntityKey)

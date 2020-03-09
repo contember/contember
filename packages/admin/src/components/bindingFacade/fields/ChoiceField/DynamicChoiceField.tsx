@@ -125,9 +125,9 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 
 		for (const entity of currentlyChosenEntities) {
 			if (entity instanceof EntityAccessor) {
-				const currentKey = entity.getKey()
+				const currentKey = entity.key
 				const index = filteredOptions.findIndex(entity => {
-					const key = entity.getPersistedKey()
+					const key = entity.primaryKey
 					return !!key && key === currentKey
 				})
 				if (index > -1) {
@@ -164,7 +164,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 
 						// We can get away with the "!" since this collection was created from filteredData above.
 						// If this is actually an unpersisted entity, we've got a huge problem.
-						actualValue: item.getPersistedKey()!,
+						actualValue: item.primaryKey!,
 					}
 				},
 			),
@@ -207,13 +207,13 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 					if (isChosen) {
 						currentValueEntity.addNew(optionEntities[optionKey])
 					} else {
-						const targetEntityId = optionEntities[optionKey].getPersistedKey()
+						const targetEntityId = optionEntities[optionKey].primaryKey
 
 						for (const searchedEntity of currentValueEntity.entities) {
 							if (!(searchedEntity instanceof EntityAccessor)) {
 								continue
 							}
-							if (searchedEntity.getPersistedKey() === targetEntityId) {
+							if (searchedEntity.primaryKey === targetEntityId) {
 								searchedEntity.remove && searchedEntity.remove('disconnect')
 								break
 							}

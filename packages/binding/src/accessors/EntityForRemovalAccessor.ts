@@ -18,16 +18,13 @@ export class EntityForRemovalAccessor extends Accessor {
 		return true
 	}
 
-	public getKey() {
-		return this.entityAccessor.primaryKey
-	}
-
-	public getPersistedKey() {
-		return this.entityAccessor.primaryKey
-	}
-
 	public get primaryKey() {
-		return this.entityAccessor.primaryKey
+		// The underlying entity is definitely persisted
+		return this.entityAccessor.primaryKey as string
+	}
+
+	public get key() {
+		return this.entityAccessor.key
 	}
 
 	public get typename() {

@@ -21,7 +21,7 @@ export const moveEntity = (
 			if (!(entity instanceof EntityAccessor)) {
 				continue
 			}
-			const target = order[entity.getKey()]
+			const target = order[entity.key]
 			const orderField = entity.getRelativeSingleField<number>(sortByField)
 
 			if (target !== undefined) {
@@ -65,7 +65,7 @@ const computeEntityOrder = (
 		}
 
 		if (typeof orderField.currentValue !== 'number' || orderField.currentValue !== targetValue) {
-			order[entity.getKey()] = targetValue
+			order[entity.key] = targetValue
 		}
 	}
 	return order

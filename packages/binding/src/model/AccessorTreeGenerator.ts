@@ -239,7 +239,17 @@ class AccessorTreeGenerator {
 							: []
 					const persistedValue =
 						fieldData instanceof FieldAccessor ? fieldData.persistedValue : fieldData === undefined ? null : fieldData
-					const onChange = function(this: FieldAccessor, newValue: Scalar | GraphQlBuilder.Literal) {
+					let touchLog: Map<string, boolean> | undefined
+					const isTouchedBy = (agent: string) => (touchLog === undefined ? false : touchLog.get(agent) || false)
+					const onChange = function(
+						this: FieldAccessor,
+						newValue: Scalar | GraphQlBuilder.Literal,
+						{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
+					) {
+						if (touchLog === undefined) {
+							touchLog = new Map()
+						}
+						touchLog.set(agent, true)
 						if (newValue === this.currentValue) {
 							return
 						}
@@ -249,7 +259,7 @@ class AccessorTreeGenerator {
 								placeholderName,
 								newValue,
 								persistedValue,
-								true,
+								isTouchedBy,
 								fieldErrors,
 								onChange,
 							),
@@ -267,7 +277,7 @@ class AccessorTreeGenerator {
 						placeholderName,
 						fieldValue,
 						persistedValue,
-						false,
+						isTouchedBy,
 						fieldErrors,
 						onChange,
 					)

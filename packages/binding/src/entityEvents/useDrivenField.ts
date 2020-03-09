@@ -15,6 +15,7 @@ export const useDrivenField = <DriverPersisted extends FieldValue = FieldValue>(
 	driverField: string | SugaredRelativeSingleField,
 	drivenField: string | SugaredRelativeSingleField,
 	transform: (driverValue: DriverPersisted | null) => DriverPersisted | null = identityFunction,
+	agent: string = 'drivenField',
 ) => {
 	const previousDriverValue = React.useRef<DriverPersisted | null | undefined>(undefined)
 	const desugaredDriver = useDesugaredRelativeSingleField(driverField)
@@ -37,15 +38,18 @@ export const useDrivenField = <DriverPersisted extends FieldValue = FieldValue>(
 			const drivenAccessor = getAccessor().getRelativeSingleField<DriverPersisted, DriverPersisted>(desugaredDriven)
 
 			if (drivenAccessor.isTouched) {
+				// Querying the user
 				return
 			}
 
 			const transformedValue = transform(driverAccessor.currentValue)
-			drivenAccessor.updateValue?.(transformedValue)
+			drivenAccessor.updateValue?.(transformedValue, {
+				agent,
+			})
 
 			previousDriverValue.current = driverAccessor.currentValue
 		},
-		[desugaredDriven, desugaredDriver, transform],
+		[agent, desugaredDriven, desugaredDriver, transform],
 	)
 
 	useEntityBeforeUpdate(onBeforeUpdate)

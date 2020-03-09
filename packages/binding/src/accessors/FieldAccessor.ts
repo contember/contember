@@ -4,16 +4,17 @@ import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
-export class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>
-	extends Accessor
+class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted> extends Accessor
 	implements Errorable {
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted | null,
 		public readonly persistedValue: Persisted | null,
-		public readonly isTouched: boolean,
+		public readonly isTouchedBy: (agent: string) => boolean,
 		public readonly errors: ErrorAccessor[],
-		public readonly updateValue: ((newValue: Produced | null) => void) | undefined,
+		public readonly updateValue:
+			| ((newValue: Produced | null, options?: FieldAccessor.UpdateOptions) => void)
+			| undefined,
 	) {
 		super()
 	}
@@ -33,4 +34,17 @@ export class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced e
 	public get isDirty() {
 		return this.currentValue !== this.persistedValue
 	}
+
+	public get isTouched() {
+		return this.isTouchedBy(FieldAccessor.userAgent)
+	}
 }
+namespace FieldAccessor {
+	export const userAgent = 'user'
+
+	export interface UpdateOptions {
+		agent?: string
+	}
+}
+
+export { FieldAccessor }

@@ -15,8 +15,9 @@ import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceM
 import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
-type AddEventListener = EntityAccessor['addEventListener']
-type OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => void
+type AddEntityEventListener = EntityAccessor['addEventListener']
+type AddEntityListEventListener = EntityListAccessor['addEventListener']
+type OnUpdate = (identifier: string, updatedData: EntityAccessor.FieldData) => void
 type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
@@ -76,7 +77,7 @@ class AccessorTreeGenerator {
 		const rootName = 'data'
 		const errorNode = errors === undefined ? undefined : errors[tree.id]
 
-		const onUpdate: OnUpdate = (updatedField, updatedData: EntityAccessor.FieldData) => {
+		const onUpdate: OnUpdate = (_, updatedData: EntityAccessor.FieldData) => {
 			if (
 				updatedData instanceof EntityAccessor ||
 				updatedData instanceof EntityForRemovalAccessor ||
@@ -100,12 +101,16 @@ class AccessorTreeGenerator {
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		onUpdate: OnUpdate,
 		onReplace: OnReplace,
-		addEventListener: AddEventListener,
+		addEventListener: AddEntityEventListener,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
 		const entityData: EntityAccessor.EntityData = {}
-		const id = data ? (data instanceof Accessor ? data.primaryKey : data[PRIMARY_KEY_NAME]) : undefined
+		const id = data
+			? data instanceof EntityAccessor || data instanceof EntityForRemovalAccessor
+				? data.runtimeId
+				: data[PRIMARY_KEY_NAME]
+			: new EntityAccessor.UnpersistedEntityId()
 		const typename = data ? (data instanceof Accessor ? data.typename : data[TYPENAME_KEY_NAME]) : undefined
 
 		for (const placeholderName in fields) {
@@ -289,7 +294,7 @@ class AccessorTreeGenerator {
 	}
 
 	private generateEntityAccessor(
-		placeholderName: string,
+		identifier: string,
 		entityFields: EntityFields,
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
@@ -297,7 +302,7 @@ class AccessorTreeGenerator {
 		entityState: InternalEntityState = this.createEmptyEntityState(),
 	): EntityAccessor {
 		const performUpdate = () => {
-			parentOnUpdate(placeholderName, entityState.accessor)
+			parentOnUpdate(identifier, entityState.accessor)
 		}
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			batchUpdates(getAccessor => {
@@ -399,7 +404,7 @@ class AccessorTreeGenerator {
 	}
 
 	private generateEntityListAccessor(
-		placeholderName: string,
+		identifier: string,
 		entityFields: EntityFields,
 		fieldData: ReceivedEntityData<undefined>[] | EntityListAccessor | undefined,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
@@ -408,24 +413,30 @@ class AccessorTreeGenerator {
 			ExpectedEntityCount.PossiblyMany
 		],
 	): EntityListAccessor {
-		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
+		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 			throw new BindingError(
 				`The error tree structure does not correspond to the marker tree. This should never happen.`,
 			)
 		}
 
 		let batchUpdateDepth = 0
-		const childBatchUpdateDepths: number[] = []
+		//const eventListeners: {
+		//	[Type in EntityListAccessor.EntityEventType]?: Set<EntityListAccessor.EntityEventListenerMap[Type]>
+		//} = {}
+		const childStates: Map<string, InternalEntityState> = new Map()
+		let listAccessor: EntityListAccessor
+
 		const updateAccessorInstance = () => {
 			return (listAccessor = new EntityListAccessor(
-				listAccessor.entities.slice(),
+				childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
 				listAccessor.errors,
+				listAccessor.addEventListener,
 				listAccessor.batchUpdates,
 				listAccessor.addNew,
 			))
 		}
 		const performUpdate = () => {
-			parentOnUpdate(placeholderName, updateAccessorInstance())
+			parentOnUpdate(identifier, updateAccessorInstance())
 		}
 		const batchUpdates: BatchEntityListUpdates = performUpdates => {
 			batchUpdateDepth++
@@ -436,13 +447,19 @@ class AccessorTreeGenerator {
 				performUpdate()
 			}
 		}
-		const onUpdateProxy = (i: number, newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
-			if (childBatchUpdateDepths[i] !== 0 && !(newValue instanceof EntityAccessor)) {
+		const onUpdateProxy = (key: string, newValue: EntityAccessor.FieldData) => {
+			const childState = childStates.get(key)
+			if (!childState || (childState.batchUpdateDepth !== 0 && !(newValue instanceof EntityAccessor))) {
 				throw new BindingError(`Removing entities while they are being batch updated is a no-op.`)
 			}
-			listAccessor.entities[i] = newValue
+			if (
+				!(newValue instanceof EntityAccessor || newValue instanceof EntityForRemovalAccessor || newValue === undefined)
+			) {
+				throw new BindingError(`Illegal entity list value.`)
+			}
+			childState.accessor = newValue
 
-			if (childBatchUpdateDepths[i] !== 0 || batchUpdateDepth !== 0) {
+			if (childState.batchUpdateDepth !== 0 || batchUpdateDepth !== 0) {
 				updateAccessorInstance()
 			} else {
 				performUpdate()
@@ -454,70 +471,42 @@ class AccessorTreeGenerator {
 					`and not directly within collections.`,
 			)
 		}
-		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData, i: number): EntityAccessor => {
-			const childErrors = errors && i in errors.children ? errors.children[i] : undefined
-			const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => {
-				const entityAccessor = listAccessor.entities[i]
-				if (entityAccessor instanceof EntityAccessor) {
-					onUpdateProxy(i, this.withUpdatedField(entityAccessor, updatedField, updatedData))
-				} else if (entityAccessor instanceof EntityForRemovalAccessor) {
-					throw new BindingError(`Updating entities for removal is currently not supported.`)
-				}
-			}
-			const batchUpdates: BatchEntityUpdates = performUpdates => {
-				const accessorBeforeUpdates = listAccessor.entities[i]
-				childBatchUpdateDepths[i]++
-				performUpdates(() => {
-					const accessor = listAccessor.entities[i]
-					if (accessor instanceof EntityAccessor) {
-						return accessor
-					}
-					throw new BindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
-				})
-				childBatchUpdateDepths[i]--
+		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData): EntityAccessor => {
+			const unpersistedId = new EntityAccessor.UnpersistedEntityId()
+			let key = unpersistedId.value // TODO
+			const entityState = this.createEmptyEntityState()
 
-				if (childBatchUpdateDepths[i] === 0 && accessorBeforeUpdates !== listAccessor.entities[i]) {
-					performUpdate()
-				}
-			}
-			const onReplace: OnReplace = replacement => {
-				const entityAccessor = listAccessor.entities[i]
-				if (entityAccessor instanceof EntityAccessor || entityAccessor instanceof EntityForRemovalAccessor) {
-					return onUpdateProxy(i, this.asDifferentEntity(entityAccessor, replacement, onRemove))
-				}
-				return this.rejectInvalidAccessorTree()
-			}
-			const onRemove = (removalType: RemovalType) => {
-				onUpdateProxy(i, this.removeEntity(sourceData[i], listAccessor.entities[i], removalType))
-			}
+			//const childErrors = errors && key in errors.children ? errors.children[key] : undefined
+			const childErrors = undefined // TODO
 
-			childBatchUpdateDepths[i] = 0
-			return this.updateFields(
-				datum,
-				entityFields,
-				childErrors,
-				onUpdate,
-				onReplace,
-				addEventListener,
-				batchUpdates,
-				onRemove,
-			)
+			const onUpdate: OnUpdate = (identifier, newValue) => onUpdateProxy(key, newValue)
+
+			const accessor = this.generateEntityAccessor('', entityFields, datum, childErrors, onUpdate, entityState)
+			key = accessor.key
+			childStates.set(key, entityState)
+
+			return accessor
 		}
-		let listAccessor = new EntityListAccessor([], errors ? errors.errors : [], batchUpdates, newEntity => {
-			const newEntityIndex = listAccessor.entities.length
-			const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity, newEntityIndex)
+		listAccessor = new EntityListAccessor(
+			childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
+			errors ? errors.errors : [],
+			addEventListener,
+			batchUpdates,
+			newEntity => {
+				const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity)
 
-			if (typeof newEntity === 'function') {
-				listAccessor.batchUpdates(getAccessor => {
-					onUpdateProxy(newEntityIndex, newAccessor)
-					newEntity(getAccessor, newEntityIndex)
-				})
-			} else {
-				onUpdateProxy(newEntityIndex, newAccessor)
-			}
-		})
+				if (typeof newEntity === 'function') {
+					listAccessor.batchUpdates(getAccessor => {
+						onUpdateProxy(newAccessor.key, newAccessor)
+						newEntity(getAccessor, newAccessor.key)
+					})
+				} else {
+					onUpdateProxy(newAccessor.key, newAccessor)
+				}
+			},
+		)
 
-		let sourceData = fieldData instanceof EntityListAccessor ? fieldData.entities : fieldData || [undefined]
+		let sourceData = fieldData instanceof EntityListAccessor ? Array.from(fieldData) : fieldData || []
 		if (
 			sourceData.length === 0 ||
 			sourceData.every(
@@ -529,14 +518,7 @@ class AccessorTreeGenerator {
 		}
 
 		for (let i = 0, len = sourceData.length; i < len; i++) {
-			// If fieldData is an accessor, we've already submitted. In that case, an undefined in the entities array
-			// signifies a "hole" after a previously removed entity. We don't want to create a new accessor for it.
-			listAccessor.entities.push(
-				fieldData instanceof EntityListAccessor && sourceData[i] === undefined
-					? undefined
-					: generateNewAccessor(sourceData[i], i),
-			)
-			childBatchUpdateDepths.push(0)
+			generateNewAccessor(sourceData[i])
 		}
 
 		return listAccessor

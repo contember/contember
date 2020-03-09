@@ -14,6 +14,10 @@ export class EntityForRemovalAccessor extends Accessor {
 		this.getField = this.entityAccessor.getField
 	}
 
+	public get runtimeId() {
+		return this.entityAccessor.runtimeId
+	}
+
 	public isPersisted(): boolean {
 		return true
 	}

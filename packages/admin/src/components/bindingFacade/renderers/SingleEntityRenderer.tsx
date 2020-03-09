@@ -24,7 +24,7 @@ export const SingleEntityRenderer = Component<SingleEntityRendererProps>(
 
 		if (root instanceof EntityListAccessor) {
 			// This can actually legitimately happen when creating ‒ it will be a list accessor
-			root = root.entities[0]
+			root = Array.from(root)[0]
 		}
 
 		if (root === undefined || (!(root instanceof EntityAccessor) && !(root instanceof EntityForRemovalAccessor))) {

@@ -135,7 +135,7 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 				}
 			})*/
 			}
-			const entities = treeState.data instanceof EntityListAccessor ? treeState.data.entities : [treeState.data]
+			const entities = treeState.data instanceof EntityListAccessor ? Array.from(treeState.data) : [treeState.data]
 			const normalized: StatefulDimensionDatum[] = []
 
 			for (const entity of entities) {

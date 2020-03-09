@@ -4,15 +4,19 @@ import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
-export class EntityListAccessor extends Accessor implements Errorable {
+class EntityListAccessor extends Accessor implements Errorable {
 	private _filteredEntities: EntityAccessor[] | undefined
 
 	public constructor(
-		public readonly entities: Array<EntityAccessor | EntityForRemovalAccessor | undefined>, // Undefined is a "hole" after an non-persisted entity
+		private readonly entities: Map<
+			string, // See EntityAccessor.key
+			EntityListAccessor.ChildWithMetadata
+		>,
 		public readonly errors: ErrorAccessor[],
-		public readonly batchUpdates: (performUpdates: (getAccessor: () => EntityListAccessor) => void) => void,
+		public readonly addEventListener: EntityListAccessor.AddEntityEventListener,
+		public readonly batchUpdates: (performUpdates: EntityListAccessor.BatchUpdates) => void,
 		public readonly addNew:
-			| ((newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newIndex: number) => void)) => void)
+			| ((newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newKey: string) => void)) => void)
 			| undefined,
 	) {
 		super()
@@ -24,15 +28,41 @@ export class EntityListAccessor extends Accessor implements Errorable {
 	 */
 	public getFilteredEntities(): EntityAccessor[] {
 		if (this._filteredEntities === undefined) {
-			this._filteredEntities = this.entities.filter((entity): entity is EntityAccessor => {
-				return entity instanceof EntityAccessor
-			})
+			this._filteredEntities = Array.from(this.entities, ([, { accessor }]) => accessor).filter(
+				(entity): entity is EntityAccessor => entity instanceof EntityAccessor,
+			)
 		}
 		return [...this._filteredEntities]
 	}
 
 	public getByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
-		// TODO we can quite easily introduce something like `entitiesByKey` and avoid this linear search.
-		return this.entities.find(e => e !== undefined && e.key === key)
+		return this.entities.get(key)?.accessor
+	}
+
+	public *[Symbol.iterator](): Generator<EntityAccessor | EntityForRemovalAccessor> {
+		for (const [, entity] of this.entities) {
+			if (entity.accessor === undefined) {
+				continue
+			}
+			yield entity.accessor
+		}
 	}
 }
+
+namespace EntityListAccessor {
+	export interface ChildWithMetadata {
+		readonly accessor: EntityAccessor | EntityForRemovalAccessor
+	}
+
+	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
+
+	export interface EntityEventListenerMap {
+		beforeUpdate: BatchUpdates
+	}
+	export type EntityEventType = keyof EntityEventListenerMap
+	export interface AddEntityEventListener {
+		(type: EntityEventType & 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+	}
+}
+
+export { EntityListAccessor }

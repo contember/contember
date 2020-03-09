@@ -63,26 +63,17 @@ export class MutationGenerator {
 			queryBuilder = this.addDeleteMutation(entity, alias, parameters, queryBuilder)
 		} else if (entity instanceof EntityListAccessor) {
 			if (Array.isArray(data) || data === undefined) {
-				const entityCount = entity.entities.length
-
-				for (let entityI = 0, dataI = 0; entityI < entityCount; entityI++) {
-					const currentEntity = entity.entities[entityI]
-
-					if (currentEntity instanceof EntityAccessor || currentEntity instanceof EntityForRemovalAccessor) {
-						queryBuilder = this.addSubMutation(
-							data ? data[dataI++] : undefined,
-							entityFields,
-							currentEntity,
-							`${alias}${MutationGenerator.ALIAS_SEPARATOR}${entityI}`,
-							parameters,
-							queryBuilder,
-						)
-					} else if (currentEntity === undefined) {
-						// Do nothing. This was a non-persisted entity that was subsequently deleted.
-						// No need to create it only to delete it again…
-					} else {
-						assertNever(currentEntity)
-					}
+				data = data || []
+				let i = 0
+				for (const currentEntity of entity) {
+					queryBuilder = this.addSubMutation(
+						data[i++], // Deliberately using that this may evaluate to undefined
+						entityFields,
+						currentEntity,
+						`${alias}${MutationGenerator.ALIAS_SEPARATOR}${i}`,
+						parameters,
+						queryBuilder,
+					)
 				}
 			}
 		} else {
@@ -250,10 +241,9 @@ export class MutationGenerator {
 						}
 					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
 						if (accessor instanceof EntityListAccessor) {
-							for (let i = 0, accessorCount = accessor.entities.length; i < accessorCount; i++) {
-								const innerAccessor = accessor.entities[i]
+							for (const innerAccessor of accessor) {
 								if (innerAccessor instanceof EntityAccessor) {
-									accessorReference.push({ accessor: innerAccessor, reference, alias: i.toString() })
+									accessorReference.push({ accessor: innerAccessor, reference, alias: innerAccessor.key })
 								}
 							}
 						}
@@ -386,17 +376,16 @@ export class MutationGenerator {
 							accessor instanceof EntityListAccessor &&
 							(Array.isArray(persistedField) || persistedField === undefined || persistedField === null)
 						) {
-							for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {
-								const innerAccessor = accessor.entities[i]
+							let i = 0
+							for (const innerAccessor of accessor) {
 								const innerField = persistedField ? persistedField[i] : undefined
-								if (innerAccessor) {
-									accessorReference.push({
-										accessor: innerAccessor,
-										reference,
-										persistedField: innerField,
-										alias: i.toString(),
-									})
-								}
+								accessorReference.push({
+									accessor: innerAccessor,
+									reference,
+									persistedField: innerField,
+									alias: innerAccessor.key,
+								})
+								i++
 							}
 						}
 					} else {

@@ -25,7 +25,7 @@ class EntityAccessor extends Accessor implements Errorable {
 	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
 
 	public constructor(
-		key: string | EntityAccessor.UnpersistedEntityId | undefined,
+		key: string | EntityAccessor.UnpersistedEntityId,
 		public readonly typename: string | undefined,
 		public readonly data: EntityAccessor.EntityData,
 		public readonly errors: ErrorAccessor[],

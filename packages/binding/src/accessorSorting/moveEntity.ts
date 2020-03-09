@@ -17,7 +17,7 @@ export const moveEntity = (
 	)
 	entityList.batchUpdates((getAccessor: () => EntityListAccessor) => {
 		let listAccessor: EntityListAccessor = getAccessor()
-		for (const entity of listAccessor.entities) {
+		for (const entity of listAccessor) {
 			if (!(entity instanceof EntityAccessor)) {
 				continue
 			}

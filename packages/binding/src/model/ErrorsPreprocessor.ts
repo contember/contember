@@ -34,13 +34,13 @@ class ErrorsPreprocessor {
 
 				if (!(treeId in treeRoot) || child === undefined) {
 					treeRoot[treeId] = {
-						nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
+						nodeType: ErrorsPreprocessor.ErrorNodeType.KeyIndexed,
 						children: {
 							[itemIndex]: processedResponse,
 						},
 						errors: [],
 					}
-				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
+				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 					child.children[itemIndex] = processedResponse
 				}
 			}
@@ -103,7 +103,7 @@ class ErrorsPreprocessor {
 						this.rejectCorruptData()
 					}
 				} else if (pathNode.__typename === '_IndexPathFragment') {
-					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
+					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 						const alias = pathNode.alias
 
 						if (alias === null) {
@@ -197,7 +197,7 @@ class ErrorsPreprocessor {
 
 				rootNode = {
 					errors: [],
-					nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
+					nodeType: ErrorsPreprocessor.ErrorNodeType.KeyIndexed,
 					children: {
 						[numericAlias]: rootNode,
 					},
@@ -223,11 +223,11 @@ namespace ErrorsPreprocessor {
 		nodeType: ErrorNodeType.Leaf
 	}
 
-	export interface NumberIndexedErrorNode {
+	export interface KeyIndexedErrorNode {
 		errors: ErrorAccessor[]
-		nodeType: ErrorNodeType.NumberIndexed
+		nodeType: ErrorNodeType.KeyIndexed
 		children: {
-			[index: number]: ErrorNode
+			[key: string]: ErrorNode
 		}
 	}
 
@@ -239,12 +239,12 @@ namespace ErrorsPreprocessor {
 		}
 	}
 
-	export type ErrorINode = NumberIndexedErrorNode | FieldIndexedErrorNode
+	export type ErrorINode = KeyIndexedErrorNode | FieldIndexedErrorNode
 	export type ErrorNode = ErrorINode | LeafErrorNode
 
 	export enum ErrorNodeType {
 		Leaf = 'Leaf',
-		NumberIndexed = 'NumberIndexed',
+		KeyIndexed = 'KeyIndexed',
 		FieldIndexed = 'FieldIndexed',
 	}
 

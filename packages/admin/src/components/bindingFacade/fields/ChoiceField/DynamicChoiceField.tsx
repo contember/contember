@@ -118,7 +118,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	}, [desugaredOptionPath, filteredOptions])
 
 	const currentlyChosenEntities =
-		currentValueEntity instanceof EntityListAccessor ? currentValueEntity.entities : [currentValueEntity]
+		currentValueEntity instanceof EntityListAccessor ? currentValueEntity.getFilteredEntities() : [currentValueEntity]
 
 	const currentValues = React.useMemo(() => {
 		const values: ChoiceFieldData.ValueRepresentation[] = []
@@ -209,12 +209,12 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 					} else {
 						const targetEntityId = optionEntities[optionKey].primaryKey
 
-						for (const searchedEntity of currentValueEntity.entities) {
+						for (const searchedEntity of currentValueEntity) {
 							if (!(searchedEntity instanceof EntityAccessor)) {
 								continue
 							}
 							if (searchedEntity.primaryKey === targetEntityId) {
-								searchedEntity.remove && searchedEntity.remove('disconnect')
+								searchedEntity.remove?.('disconnect')
 								break
 							}
 						}

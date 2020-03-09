@@ -7,7 +7,7 @@ export interface RepeaterContainerProps {
 	entityList: EntityListAccessor
 	isEmpty: boolean
 	label: React.ReactNode
-	addNew: (preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void
+	addNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
 
 	children: React.ReactNode
 

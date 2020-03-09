@@ -8,14 +8,14 @@ export const addNewEntityAtIndex = (
 	entityList: EntityListAccessor,
 	sortableByField: RelativeSingleField,
 	index: number,
-	preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void,
+	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
 ) => {
 	if (!entityList.addNew) {
 		return throwNonWritableError(entityList)
 	}
 	const sortedEntities = sortEntities(entityList.getFilteredEntities(), sortableByField)
-	entityList.addNew((getListAccessor, newIndex) => {
-		let newlyAdded = getListAccessor().entities[newIndex]
+	entityList.addNew((getListAccessor, newKey) => {
+		let newlyAdded = getListAccessor().getByKey(newKey)
 
 		if (!(newlyAdded instanceof EntityAccessor)) {
 			return
@@ -25,7 +25,7 @@ export const addNewEntityAtIndex = (
 
 		if (sortableField.updateValue) {
 			sortableField.updateValue(index)
-			newlyAdded = getListAccessor().entities[newIndex]
+			newlyAdded = getListAccessor().getByKey(newKey)
 
 			if (!(newlyAdded instanceof EntityAccessor)) {
 				return
@@ -37,6 +37,6 @@ export const addNewEntityAtIndex = (
 			return throwNonWritableError(sortableField.fieldName)
 		}
 
-		preprocess && preprocess(getListAccessor, newIndex)
+		preprocess && preprocess(getListAccessor, newKey)
 	})
 }

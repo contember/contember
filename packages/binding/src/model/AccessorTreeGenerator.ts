@@ -23,6 +23,19 @@ type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
 type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
 
+// If the listeners mutate the sub-tree, other listeners may want to respond to that, which in turn may trigger
+// further responses, etc. We don't want the order of addition of event listeners to matter and we don't have
+// the necessary information to perform some sort of a topological sort. We wouldn't want to do that anyway
+// though.
+
+// To get around all this, we just trigger all event listeners repeatedly until things settle and they stop
+// mutating the entity. If, however, that doesn't happen until some number of iterations (I think the limit
+// is actually fairly generous), we conclude that there is an infinite feedback loop and just shut things down.
+
+// Notice also that we effectively shift the responsibility to check whether an update concerns them to the
+// listeners.
+const BEFORE_UPDATE_SETTLE_LIMIT = 100
+
 interface InternalEntityState {
 	batchUpdateDepth: number
 	eventListeners: {
@@ -311,7 +324,7 @@ class AccessorTreeGenerator {
 		const performUpdate = () => parentOnUpdate(entityState.accessor)
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			batchUpdates(getAccessor => {
-				let latestData: EntityAccessor.FieldData = (entityState.accessor = newValue)
+				entityState.accessor = newValue
 
 				if (
 					entityState.eventListeners.beforeUpdate === undefined ||
@@ -320,25 +333,13 @@ class AccessorTreeGenerator {
 					return
 				}
 
-				// If the listeners mutate the sub-tree, other listeners may want to respond to that, which in turn may trigger
-				// further responses, etc. We don't want the order of addition of event listeners to matter and we don't have
-				// the necessary information to perform some sort of a topological sort. We wouldn't want to do that anyway
-				// though.
-
-				// To get around all this, we just trigger all event listeners repeatedly until things settle and they stop
-				// mutating the entity. If, however, that doesn't happen until some number of iterations (I think the limit
-				// is actually fairly generous), we conclude that there is an infinite feedback loop and just shut things down.
-
-				// Notice also that we effectively shift the responsibility to check whether an update concerns them to the
-				// listeners.
-				for (let i = 0; i < 100; i++) {
+				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
 					for (const listener of entityState.eventListeners.beforeUpdate) {
 						listener(getAccessor)
 					}
-					if (entityState.accessor === latestData) {
+					if (entityState.accessor === getAccessor()) {
 						return
 					}
-					latestData = entityState.accessor
 				}
 				throw new BindingError(
 					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
@@ -424,9 +425,9 @@ class AccessorTreeGenerator {
 		}
 
 		let batchUpdateDepth = 0
-		//const eventListeners: {
-		//	[Type in EntityListAccessor.EntityEventType]?: Set<EntityListAccessor.EntityEventListenerMap[Type]>
-		//} = {}
+		const eventListeners: {
+			[Type in EntityListAccessor.EntityEventType]?: Set<EntityListAccessor.EntityEventListenerMap[Type]>
+		} = {}
 		const childStates: Map<string, InternalEntityState> = new Map()
 		let listAccessor: EntityListAccessor
 
@@ -449,29 +450,58 @@ class AccessorTreeGenerator {
 				performUpdate()
 			}
 		}
-		const onUpdateProxy = (key: string, newValue: EntityAccessor.FieldData) => {
-			const childState = childStates.get(key)
-			if (!childState || (childState.batchUpdateDepth !== 0 && !(newValue instanceof EntityAccessor))) {
-				throw new BindingError(`Removing entities while they are being batch updated is a no-op.`)
-			}
-			if (
-				!(newValue instanceof EntityAccessor || newValue instanceof EntityForRemovalAccessor || newValue === undefined)
-			) {
-				throw new BindingError(`Illegal entity list value.`)
-			}
-			childState.accessor = newValue
 
-			if (childState.batchUpdateDepth !== 0 || batchUpdateDepth !== 0) {
+		const onUpdateProxy = (key: string, newValue: EntityAccessor.FieldData) => {
+			batchUpdates(getAccessor => {
+				const childState = childStates.get(key)
+				if (childState === undefined) {
+					this.rejectInvalidAccessorTree()
+				}
+
+				if (
+					!(
+						newValue instanceof EntityAccessor ||
+						newValue instanceof EntityForRemovalAccessor ||
+						newValue === undefined
+					)
+				) {
+					throw new BindingError(`Illegal entity list value.`)
+				}
+				childState.accessor = newValue
 				updateAccessorInstance()
-			} else {
-				performUpdate()
-			}
+
+				if (eventListeners.beforeUpdate === undefined || eventListeners.beforeUpdate.size === 0) {
+					return
+				}
+
+				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
+					for (const listener of eventListeners.beforeUpdate) {
+						listener(getAccessor)
+					}
+					if (listAccessor === getAccessor()) {
+						return
+					}
+				}
+				throw new BindingError(
+					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
+						`This likely means an infinite feedback loop in your code.`,
+				)
+			})
 		}
-		const addEventListener = () => {
-			throw new BindingError(
-				`TODO: Not implemented. Entity events currently only work for hasOne relations, ` +
-					`and not directly within collections.`,
-			)
+		const addEventListener: AddEntityListEventListener = (type, listener) => {
+			if (eventListeners[type] === undefined) {
+				eventListeners[type] = new Set()
+			}
+			eventListeners[type]!.add(listener as any)
+			return () => {
+				if (eventListeners[type] === undefined) {
+					return // Throw an error? This REALLY should not happen.
+				}
+				eventListeners[type]!.delete(listener as any)
+				if (eventListeners[type]!.size === 0) {
+					eventListeners[type] = undefined
+				}
+			}
 		}
 		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData): EntityAccessor => {
 			let key: string

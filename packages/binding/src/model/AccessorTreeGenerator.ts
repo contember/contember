@@ -17,7 +17,7 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type AddEntityEventListener = EntityAccessor['addEventListener']
 type AddEntityListEventListener = EntityListAccessor['addEventListener']
-type OnUpdate = (identifier: string, updatedData: EntityAccessor.FieldData) => void
+type OnUpdate = (updatedData: EntityAccessor.FieldData) => void
 type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
@@ -74,10 +74,9 @@ class AccessorTreeGenerator {
 		updateData: AccessorTreeGenerator.UpdateData,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot,
 	): RootAccessor {
-		const rootName = 'data'
 		const errorNode = errors === undefined ? undefined : errors[tree.id]
 
-		const onUpdate: OnUpdate = (_, updatedData: EntityAccessor.FieldData) => {
+		const onUpdate: OnUpdate = (updatedData: EntityAccessor.FieldData) => {
 			if (
 				updatedData instanceof EntityAccessor ||
 				updatedData instanceof EntityForRemovalAccessor ||
@@ -87,19 +86,17 @@ class AccessorTreeGenerator {
 			}
 			return this.rejectInvalidAccessorTree()
 		}
-		const entityData: EntityAccessor.EntityData = {}
 
-		return (entityData[rootName] =
-			Array.isArray(data) || data === undefined || data instanceof EntityListAccessor
-				? this.generateEntityListAccessor(rootName, tree.fields, data, errorNode, onUpdate)
-				: this.generateEntityAccessor(rootName, tree.fields, data, errorNode, onUpdate))
+		return Array.isArray(data) || data === undefined || data instanceof EntityListAccessor
+			? this.generateEntityListAccessor(tree.fields, data, errorNode, onUpdate)
+			: this.generateEntityAccessor(tree.fields, data, errorNode, onUpdate)
 	}
 
 	private updateFields(
 		data: AccessorTreeGenerator.InitialEntityData,
 		fields: EntityFields,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
-		onUpdate: OnUpdate,
+		onUpdate: (identifier: string, updatedData: EntityAccessor.FieldData) => void,
 		onReplace: OnReplace,
 		addEventListener: AddEntityEventListener,
 		batchUpdates: BatchEntityUpdates,
@@ -160,6 +157,9 @@ class AccessorTreeGenerator {
 							? errors.children[field.fieldName] || errors.children[referencePlaceholder] || undefined
 							: undefined
 
+					const getOnReferenceUpdate = (placeholderName: string) => (newValue: EntityAccessor.FieldData) => {
+						onUpdate(placeholderName, newValue)
+					}
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
 							throw new BindingError(
@@ -171,11 +171,10 @@ class AccessorTreeGenerator {
 							(fieldData === null || typeof fieldData === 'object' || fieldData === undefined)
 						) {
 							entityData[referencePlaceholder] = this.generateEntityAccessor(
-								referencePlaceholder,
 								reference.fields,
 								fieldData || undefined,
 								referenceError,
-								onUpdate,
+								getOnReferenceUpdate(referencePlaceholder),
 							)
 						} else {
 							throw new BindingError(
@@ -186,11 +185,10 @@ class AccessorTreeGenerator {
 					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
 						if (fieldData === undefined || Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
 							entityData[referencePlaceholder] = this.generateEntityListAccessor(
-								referencePlaceholder,
 								reference.fields,
 								fieldData,
 								referenceError,
-								onUpdate,
+								getOnReferenceUpdate(referencePlaceholder),
 								reference.preferences,
 							)
 						} else if (typeof fieldData === 'object') {
@@ -294,16 +292,13 @@ class AccessorTreeGenerator {
 	}
 
 	private generateEntityAccessor(
-		identifier: string,
 		entityFields: EntityFields,
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
 		entityState: InternalEntityState = this.createEmptyEntityState(),
 	): EntityAccessor {
-		const performUpdate = () => {
-			parentOnUpdate(identifier, entityState.accessor)
-		}
+		const performUpdate = () => parentOnUpdate(entityState.accessor)
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			batchUpdates(getAccessor => {
 				let latestData: EntityAccessor.FieldData = (entityState.accessor = newValue)
@@ -341,7 +336,7 @@ class AccessorTreeGenerator {
 				)
 			})
 		}
-		const onUpdate: OnUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => {
+		const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => {
 			const entityAccessor = entityState.accessor
 			if (entityAccessor instanceof EntityAccessor) {
 				return onUpdateProxy(this.withUpdatedField(entityAccessor, updatedField, updatedData))
@@ -404,7 +399,6 @@ class AccessorTreeGenerator {
 	}
 
 	private generateEntityListAccessor(
-		identifier: string,
 		entityFields: EntityFields,
 		fieldData: ReceivedEntityData<undefined>[] | EntityListAccessor | undefined,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
@@ -435,9 +429,7 @@ class AccessorTreeGenerator {
 				listAccessor.addNew,
 			))
 		}
-		const performUpdate = () => {
-			parentOnUpdate(identifier, updateAccessorInstance())
-		}
+		const performUpdate = () => parentOnUpdate(updateAccessorInstance())
 		const batchUpdates: BatchEntityListUpdates = performUpdates => {
 			batchUpdateDepth++
 			const accessorBeforeUpdates = listAccessor
@@ -472,16 +464,23 @@ class AccessorTreeGenerator {
 			)
 		}
 		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData): EntityAccessor => {
-			const unpersistedId = new EntityAccessor.UnpersistedEntityId()
-			let key = unpersistedId.value // TODO
+			let key: string
+			let childErrors
+
 			const entityState = this.createEmptyEntityState()
 
-			//const childErrors = errors && key in errors.children ? errors.children[key] : undefined
-			const childErrors = undefined // TODO
+			if (errors && datum) {
+				const errorKey =
+					datum instanceof EntityAccessor || datum instanceof EntityForRemovalAccessor
+						? datum.key
+						: datum[PRIMARY_KEY_NAME]
+				childErrors = errors.children[errorKey]
+			} else {
+				childErrors = undefined
+			}
 
-			const onUpdate: OnUpdate = (identifier, newValue) => onUpdateProxy(key, newValue)
-
-			const accessor = this.generateEntityAccessor('', entityFields, datum, childErrors, onUpdate, entityState)
+			const onUpdate: OnUpdate = newValue => onUpdateProxy(key, newValue)
+			const accessor = this.generateEntityAccessor(entityFields, datum, childErrors, onUpdate, entityState)
 			key = accessor.key
 			childStates.set(key, entityState)
 
@@ -517,8 +516,8 @@ class AccessorTreeGenerator {
 			sourceData = Array(preferences.initialEntityCount).map(() => undefined)
 		}
 
-		for (let i = 0, len = sourceData.length; i < len; i++) {
-			generateNewAccessor(sourceData[i])
+		for (const sourceDatum of sourceData) {
+			generateNewAccessor(sourceDatum)
 		}
 
 		return listAccessor

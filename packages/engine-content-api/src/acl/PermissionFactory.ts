@@ -6,13 +6,14 @@ import { prefixVariable } from './VariableUtils'
 export default class PermissionFactory {
 	constructor(private readonly schema: Model.Schema) {}
 
-	public create(acl: Acl.Schema, roles: string[]): Acl.Permissions {
+	public create(acl: Acl.Schema, roles: string[], prefix?: string): Acl.Permissions {
 		let result: Acl.Permissions = {}
 		for (let role of roles) {
 			const roleDefinition = acl.roles[role] || { entities: {} }
-			let rolePermissions: Acl.Permissions = this.prefixPredicatesWithRole(roleDefinition.entities, role)
+			let rolePermissions: Acl.Permissions = this.prefixPredicatesWithRole(roleDefinition.entities, prefix || role)
 			if (roleDefinition.inherits) {
-				rolePermissions = this.mergePermissions(this.create(acl, roleDefinition.inherits), rolePermissions)
+				const inheritedPermissions = this.create(acl, roleDefinition.inherits, prefix || role)
+				rolePermissions = this.mergePermissions(inheritedPermissions, rolePermissions)
 			}
 			result = this.mergePermissions(result, rolePermissions)
 		}

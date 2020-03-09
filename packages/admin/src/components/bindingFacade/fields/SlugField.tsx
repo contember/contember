@@ -1,16 +1,16 @@
-import { FormGroup, TextInput } from '@contember/ui'
-import slugify from '@sindresorhus/slugify'
-import * as React from 'react'
 import {
 	Component,
 	Environment,
 	Field,
 	SugaredRelativeSingleField,
-	useEntityContext,
+	useDrivenField,
 	useEnvironment,
 	useMutationState,
 	useRelativeSingleField,
 } from '@contember/binding'
+import { FormGroup, TextInput } from '@contember/ui'
+import slugify from '@sindresorhus/slugify'
+import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
@@ -25,35 +25,28 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 
 export const SlugField = Component<SlugFieldProps>(
 	({ buttonProps, concealTimeout, format, unpersistedHardPrefix, persistedHardPrefix, drivenBy, field, ...props }) => {
-		const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
-		const hostEntity = useEntityContext() // TODO this will fail for some QL uses
-		const slugField = useRelativeSingleField<string>(field)
-		const driverField = useRelativeSingleField<string>(drivenBy)
 		const environment = useEnvironment()
+		const transform = React.useCallback(
+			(driverFieldValue: string | null) => {
+				let slugValue = slugify(driverFieldValue || '')
+
+				if (format) {
+					slugValue = format(slugValue, environment)
+				}
+				if (persistedHardPrefix) {
+					slugValue = `${persistedHardPrefix}${slugValue}`
+				}
+				return slugValue
+			},
+			[environment, format, persistedHardPrefix],
+		)
+		useDrivenField<string>(drivenBy, field, transform)
+
+		const slugField = useRelativeSingleField<string>(field)
 		const isMutating = useMutationState()
 
-		let slugValue = slugField.currentValue || ''
-
-		if (!hasEditedSlug && !hostEntity.isPersisted()) {
-			slugValue = slugify(driverField.currentValue || '')
-
-			if (format) {
-				slugValue = format(slugValue, environment)
-			}
-			if (persistedHardPrefix) {
-				slugValue = `${persistedHardPrefix}${slugValue}`
-			}
-		}
-
-		React.useEffect(() => {
-			if (slugField.currentValue === slugValue || !slugField.updateValue) {
-				return
-			}
-			slugField.updateValue(slugValue)
-		}, [slugField, slugValue])
-
 		const completePrefix = `${unpersistedHardPrefix || ''}${persistedHardPrefix || ''}`
-		const presentedValue = `${unpersistedHardPrefix || ''}${slugValue}`
+		const presentedValue = `${unpersistedHardPrefix || ''}${slugField.currentValue || ''}`
 
 		return (
 			<ConcealableField
@@ -73,7 +66,6 @@ export const SlugField = Component<SlugFieldProps>(
 						<TextInput
 							value={presentedValue}
 							onChange={e => {
-								hasEditedSlug || setHasEditedSlug(true)
 								if (slugField.updateValue) {
 									const rawValue = e.target.value
 									const unprefixedValue = rawValue.substring(completePrefix.length)
@@ -95,7 +87,7 @@ export const SlugField = Component<SlugFieldProps>(
 	},
 	props => (
 		<>
-			<Field field={props.field} defaultValue={props.defaultValue} isNonbearing={true} />
+			<Field field={props.field} defaultValue={props.defaultValue} />
 			<Field field={props.drivenBy} />
 			{props.label}
 		</>

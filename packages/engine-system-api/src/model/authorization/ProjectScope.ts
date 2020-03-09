@@ -1,5 +1,5 @@
 import { AccessNode, AuthorizationScope } from '@contember/authorization'
-import { Identity } from '@contember/engine-common'
+import { Identity } from './Identity'
 
 export class ProjectScope implements AuthorizationScope<Identity> {
 	constructor(private readonly project: { slug: string } | null) {}
@@ -8,7 +8,6 @@ export class ProjectScope implements AuthorizationScope<Identity> {
 		if (!this.project) {
 			return new AccessNode.Roles([])
 		}
-		const roles = await identity.getProjectRoles(this.project.slug)
-		return new AccessNode.Roles(roles)
+		return new AccessNode.Roles(identity.projectRoles)
 	}
 }

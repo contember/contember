@@ -1,11 +1,12 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import { DatabaseCredentials, Identity } from '@contember/engine-common'
+import { DatabaseCredentials } from '@contember/engine-common'
 import { QueryHandler } from '@contember/queryable'
 import { Connection, DatabaseQueryable } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
 	ApiKeyManager,
 	CommandBus,
+	Identity,
 	IdentityFactory,
 	InviteManager,
 	PasswordChangeManager,
@@ -13,7 +14,7 @@ import {
 	PermissionsFactory,
 	ProjectManager,
 	ProjectMemberManager,
-	ProjectVariablesResolver,
+	ProjectSchemaResolver,
 	Providers,
 	SignInManager,
 	SignUpManager,
@@ -41,6 +42,9 @@ import {
 } from './resolvers'
 import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
+import { ProjectScopeFactory } from './model/authorization/ProjectScopeFactory'
+import { AclSchemaEvaluatorFactory } from './model/authorization/AclSchemaEvaluatorFactory'
+import { MembershipValidator } from './model/service/MembershipValidator'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -58,9 +62,9 @@ namespace TenantContainer {
 			tenantDbCredentials: DatabaseCredentials,
 			mailOptions: MailerOptions,
 			providers: Providers,
-			projectVariablesResolver: ProjectVariablesResolver,
+			projectSchemaResolver: ProjectSchemaResolver,
 		): TenantContainer {
-			return this.createBuilder(tenantDbCredentials, mailOptions, providers, projectVariablesResolver)
+			return this.createBuilder(tenantDbCredentials, mailOptions, providers, projectSchemaResolver)
 				.build()
 				.pick(
 					'apiKeyManager',
@@ -77,7 +81,7 @@ namespace TenantContainer {
 			tenantDbCredentials: DatabaseCredentials,
 			mailTransportParameters: MailerOptions,
 			providers: Providers,
-			projectVariablesResolver: ProjectVariablesResolver,
+			projectSchemaResolver: ProjectSchemaResolver,
 		) {
 			return new Builder({})
 				.addService('connection', (): Connection.ConnectionLike & Connection.ClientFactory => {
@@ -118,10 +122,16 @@ namespace TenantContainer {
 					'projectMemberManager',
 					({ queryHandler, commandBus }) => new ProjectMemberManager(queryHandler, commandBus),
 				)
+				.addService('membershipValidator', () => new MembershipValidator(projectSchemaResolver))
 				.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
 				.addService(
+					'projectScopeFactory',
+					() => new ProjectScopeFactory(projectSchemaResolver, new AclSchemaEvaluatorFactory()),
+				)
+				.addService(
 					'permissionContextFactory',
-					({ authorizator, identityFactory }) => new PermissionContextFactory(authorizator, identityFactory),
+					({ authorizator, identityFactory, projectScopeFactory }) =>
+						new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory),
 				)
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
 				.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
@@ -132,7 +142,7 @@ namespace TenantContainer {
 				)
 				.addService(
 					'projectTypeResolver',
-					({ projectMemberManager }) => new ProjectTypeResolver(projectMemberManager, projectVariablesResolver),
+					({ projectMemberManager }) => new ProjectTypeResolver(projectMemberManager, projectSchemaResolver),
 				)
 				.addService('meQueryResolver', () => new MeQueryResolver())
 				.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
@@ -161,12 +171,13 @@ namespace TenantContainer {
 				)
 				.addService(
 					'inviteMutationResolver',
-					({ inviteManager, projectManager }) => new InviteMutationResolver(inviteManager, projectManager),
+					({ inviteManager, projectManager, membershipValidator }) =>
+						new InviteMutationResolver(inviteManager, projectManager, membershipValidator),
 				)
 				.addService(
 					'addProjectMemberMutationResolver',
-					({ projectMemberManager, projectManager }) =>
-						new AddProjectMemberMutationResolver(projectMemberManager, projectManager),
+					({ projectMemberManager, projectManager, membershipValidator }) =>
+						new AddProjectMemberMutationResolver(projectMemberManager, projectManager, membershipValidator),
 				)
 				.addService(
 					'setupMutationResolver',
@@ -174,8 +185,8 @@ namespace TenantContainer {
 				)
 				.addService(
 					'updateProjectMemberMutationResolver',
-					({ projectMemberManager, projectManager }) =>
-						new UpdateProjectMemberMutationResolver(projectMemberManager, projectManager),
+					({ projectMemberManager, projectManager, membershipValidator }) =>
+						new UpdateProjectMemberMutationResolver(projectMemberManager, projectManager, membershipValidator),
 				)
 				.addService(
 					'removeProjectMemberMutationResolver',
@@ -184,7 +195,8 @@ namespace TenantContainer {
 				)
 				.addService(
 					'createApiKeyMutationResolver',
-					({ apiKeyManager, projectManager }) => new CreateApiKeyMutationResolver(apiKeyManager, projectManager),
+					({ apiKeyManager, projectManager, membershipValidator }) =>
+						new CreateApiKeyMutationResolver(apiKeyManager, projectManager, membershipValidator),
 				)
 				.addService(
 					'disableApiKeyMutationResolver',

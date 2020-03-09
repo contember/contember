@@ -1,7 +1,9 @@
+export interface MembershipVariable {
+	readonly name: string
+	readonly values: readonly string[]
+}
+
 export interface Membership {
-	role: string
-	variables: readonly {
-		name: string
-		values: readonly string[]
-	}[]
+	readonly role: string
+	readonly variables: readonly MembershipVariable[]
 }

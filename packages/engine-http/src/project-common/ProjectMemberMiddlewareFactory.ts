@@ -14,10 +14,14 @@ export const createProjectMemberMiddleware = (): KoaMiddleware<KoaState> => {
 	const projectMember: KoaMiddleware<KoaState> = async (ctx, next) => {
 		const project = ctx.state.project
 		const projectMemberships = await ctx.state.timer('MembershipFetch', () =>
-			ctx.state.projectMemberManager.getProjectBySlugMemberships(project.slug, {
+			ctx.state.projectMemberManager.getProjectMemberships(
+			{ slug: project.slug },
+				{
 				id: ctx.state.authResult.identityId,
 				roles: ctx.state.authResult.roles,
-			}),
+			},
+			undefined,
+		),
 		)
 		if (projectMemberships.length === 0) {
 			return ctx.state.fail.projectForbidden(project.slug)

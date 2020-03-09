@@ -49,7 +49,6 @@ class ReleaseExecutor {
 
 		const permissions = this.permissionsVerifier.verify(
 			db,
-			project,
 			permissionContext,
 			sourceStage,
 			targetStage,

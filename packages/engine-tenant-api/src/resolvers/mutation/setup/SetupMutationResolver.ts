@@ -3,8 +3,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import { ImplementationException } from '../../../exceptions'
 import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../model'
-import { Identity } from '@contember/engine-common'
-import { TenantRole } from '../../../model/authorization/Roles'
+import { TenantRole } from '../../../model/authorization'
 
 export class SetupMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}

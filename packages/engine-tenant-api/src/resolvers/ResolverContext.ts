@@ -1,5 +1,4 @@
-import { Identity } from '@contember/engine-common'
-import { PermissionContext } from '../model/authorization'
+import { Identity, PermissionContext } from '../model/authorization'
 
 export interface ResolverContext {
 	readonly apiKeyId: string

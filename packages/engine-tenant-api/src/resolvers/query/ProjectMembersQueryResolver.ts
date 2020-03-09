@@ -1,7 +1,7 @@
 import { Membership, QueryProjectMembershipsArgs, QueryResolvers } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
 import { ProjectManager, ProjectMemberManager } from '../../model/service'
-import { PermissionActions, ProjectScope } from '../../model/authorization'
+import { PermissionActions } from '../../model/authorization'
 
 export class ProjectMembersQueryResolver implements QueryResolvers {
 	constructor(
@@ -15,13 +15,18 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 		context: ResolverContext,
 	): Promise<readonly Membership[]> {
 		const project = await this.projectManager.getProjectBySlug(args.projectSlug)
+		const projectScope = await context.permissionContext.createProjectScope(project)
 		if (
 			!project ||
-			!(await context.isAllowed({ scope: new ProjectScope(project), action: PermissionActions.PROJECT_VIEW_MEMBERS }))
+			!(await context.isAllowed({
+				scope: projectScope,
+				action: PermissionActions.PROJECT_VIEW_MEMBER([]),
+			}))
 		) {
 			return []
 		}
+		const verifier = context.permissionContext.createAccessVerifier(projectScope)
 
-		return await this.projectMemberManager.getProjectMemberships(project.id, { id: args.identityId })
+		return await this.projectMemberManager.getProjectMemberships({ id: project.id }, { id: args.identityId }, verifier)
 	}
 }

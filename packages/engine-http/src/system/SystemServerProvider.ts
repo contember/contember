@@ -1,7 +1,6 @@
 import { Config } from 'apollo-server-core'
 import { ApolloServer } from 'apollo-server-koa'
-import { ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@contember/engine-system-api'
-import { Identity } from '@contember/engine-common'
+import { Identity, ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@contember/engine-system-api'
 import ErrorCallbackExtension from '../graphql/ErrorCallbackExtension'
 import { KoaContext } from '../koa'
 import { flattenVariables } from '@contember/engine-content-api'
@@ -40,9 +39,11 @@ class SystemServerProvider {
 	}
 
 	private createContext(ctx: InputKoaContext): ExtendedGraphqlContext {
-		const identity = new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {
-			[ctx.state.projectContainer.project.slug]: ctx.state.projectMemberships.map(it => it.role),
-		})
+		const identity = new Identity(
+			ctx.state.authResult.identityId,
+			ctx.state.authResult.roles,
+			ctx.state.projectMemberships.map(it => it.role),
+		)
 		const dbContextFactory = ctx.state.projectContainer.systemDatabaseContextFactory
 		const variables = flattenVariables(ctx.state.projectMemberships)
 		const systemContext = this.resolverContextFactory.create(

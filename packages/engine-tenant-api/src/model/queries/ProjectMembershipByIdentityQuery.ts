@@ -1,5 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { byProjectSlug } from './ProjectSlugSpecification'
+import { Membership } from '../type/Membership'
 
 class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipByIdentityQuery.Result> {
 	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string) {
@@ -47,7 +48,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 }
 
 namespace ProjectMembershipByIdentityQuery {
-	export type Row = { role: string; variables: readonly { name: string; values: readonly string[] }[] }
+	export type Row = Membership
 	export type Result = readonly Row[]
 }
 

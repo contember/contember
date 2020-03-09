@@ -1,19 +1,15 @@
 import { CommandBus } from '../commands/CommandBus'
 import { Client } from '@contember/database'
-import {
-	AddProjectMemberCommand,
-	AddProjectMemberCommandError,
-	CreateIdentityCommand,
-	CreatePersonCommand,
-} from '../commands'
+import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
 import { Membership } from '../type/Membership'
 import { InviteErrorCode } from '../../schema'
-import { ImplementationException } from '../../exceptions'
 import { TenantRole } from '../authorization/Roles'
 import { UserMailer } from '../mailing/UserMailer'
 import { Project } from '../type'
+import { createAppendMembershipVariables } from './membershipUtils'
+import { CreateOrUpdateProjectMembershipCommand } from '../commands/membership/CreateOrUpdateProjectMembershipCommand'
 
 export class InviteManager {
 	constructor(
@@ -33,23 +29,15 @@ export class InviteManager {
 				generatedPassword = (await this.providers.randomBytes(9)).toString('base64')
 				person = await bus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
 			}
-			const result = await bus.execute(new AddProjectMemberCommand(project.id, person.identity_id, memberships))
-			if (result.ok) {
-				if (isNew) {
-					await this.mailer.sendNewUserInvitedMail({ email, project: project.name, password: generatedPassword })
-				} else {
-					await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name })
-				}
-				return new InviteResponseOk(person, isNew)
+			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {
+				await bus.execute(new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate))
 			}
-			trx.connection.rollback()
-			switch (result.error) {
-				case AddProjectMemberCommandError.alreadyMember:
-					return new InviteResponseError([InviteErrorCode.AlreadyMember])
-				case AddProjectMemberCommandError.projectNotFound:
-				case AddProjectMemberCommandError.identityNotfound:
-					throw new ImplementationException()
+			if (isNew) {
+				await this.mailer.sendNewUserInvitedMail({ email, project: project.name, password: generatedPassword })
+			} else {
+				await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name })
 			}
+			return new InviteResponseOk(person, isNew)
 		})
 	}
 }

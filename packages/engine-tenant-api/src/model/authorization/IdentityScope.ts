@@ -1,6 +1,6 @@
 import { AuthorizationScope, AccessNode } from '@contember/authorization'
-import { Identity } from '@contember/engine-common'
 import { TenantRole } from './Roles'
+import { Identity } from './Identity'
 
 class IdentityScope implements AuthorizationScope<Identity> {
 	constructor(private readonly identityId: string) {}

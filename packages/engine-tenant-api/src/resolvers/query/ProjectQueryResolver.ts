@@ -1,7 +1,7 @@
 import { Maybe, Project, QueryProjectBySlugArgs, QueryResolvers } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
 import { ProjectManager } from '../../model/service'
-import { PermissionActions, ProjectScope } from '../../model/authorization'
+import { PermissionActions } from '../../model/authorization'
 
 export class ProjectQueryResolver implements QueryResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}
@@ -20,7 +20,10 @@ export class ProjectQueryResolver implements QueryResolvers {
 		const project = await this.projectManager.getProjectBySlug(args.slug)
 		if (
 			!project ||
-			!(await context.isAllowed({ scope: new ProjectScope(project), action: PermissionActions.PROJECT_VIEW }))
+			!(await context.isAllowed({
+				scope: await context.permissionContext.createProjectScope(project),
+				action: PermissionActions.PROJECT_VIEW,
+			}))
 		) {
 			return null
 		}

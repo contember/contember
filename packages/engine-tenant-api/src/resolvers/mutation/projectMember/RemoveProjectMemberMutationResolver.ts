@@ -5,7 +5,7 @@ import {
 	RemoveProjectMemberResponse,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../model'
+import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 
 export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -20,9 +20,9 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 	): Promise<RemoveProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
 		await context.requireAccess({
-			scope: new ProjectScope(project),
-			action: PermissionActions.PROJECT_REMOVE_MEMBER,
-			message: 'You are not allowed to add a project member',
+			scope: await context.permissionContext.createProjectScope(project),
+			action: PermissionActions.PROJECT_REMOVE_MEMBER([]),
+			message: 'You are not allowed to remove a project member',
 		})
 		if (!project) {
 			return {
@@ -30,6 +30,16 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 				errors: [{ code: RemoveProjectMemberErrorCode.ProjectNotFound }],
 			}
 		}
+		const memberships = await this.projectMemberManager.getProjectMemberships(
+			{ id: project.id },
+			{ id: identityId },
+			undefined,
+		)
+		await context.requireAccess({
+			scope: await context.permissionContext.createProjectScope(project),
+			action: PermissionActions.PROJECT_REMOVE_MEMBER(memberships),
+			message: 'You are not allowed to remove a project member',
+		})
 
 		const result = await this.projectMemberManager.removeProjectMember(project.id, identityId)
 

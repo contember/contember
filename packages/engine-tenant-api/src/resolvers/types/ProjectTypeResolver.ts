@@ -1,13 +1,14 @@
 import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
 import { ProjectMemberManager } from '../../model/service'
-import { PermissionActions, ProjectScope } from '../../model/authorization'
-import { Project, ProjectVariablesResolver } from '../../model/type'
+import { PermissionActions } from '../../model/authorization'
+import { Project, ProjectSchemaResolver, RoleVariablesDefinition, VariableDefinition } from '../../model/type'
+import { getRoleVariables } from '../../model/utils/schemaUtils'
 
 export class ProjectTypeResolver implements ProjectResolvers {
 	constructor(
 		private readonly projectMemberManager: ProjectMemberManager,
-		private readonly projectVariablesResolver: ProjectVariablesResolver,
+		private readonly projectSchemaResolver: ProjectSchemaResolver,
 	) {}
 
 	async members(
@@ -15,25 +16,38 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		args: ProjectMembersArgs,
 		context: ResolverContext,
 	): Promise<readonly ProjectIdentityRelation[]> {
-		if (
-			!(await context.isAllowed({ scope: new ProjectScope(parent), action: PermissionActions.PROJECT_VIEW_MEMBERS }))
-		) {
+		const projectScope = await context.permissionContext.createProjectScope(parent)
+		const verifier = context.permissionContext.createAccessVerifier(projectScope)
+		if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([])))) {
 			return []
 		}
 
 		// todo: filter by args
-		return (await this.projectMemberManager.getProjectMembers(parent.id)).map(it => ({
+		return (await this.projectMemberManager.getProjectMembers(parent.id, verifier)).map(it => ({
 			...it,
 			identity: { ...it.identity, projects: [] },
 		}))
 	}
 
 	async roles(parent: Project) {
-		const project = await this.projectVariablesResolver(parent.slug)
-		if (!project) {
+		const schema = await this.projectSchemaResolver(parent.slug)
+		if (!schema) {
 			return []
 		}
-		return project.roles.map(it => ({
+		const roles = Object.entries(schema.acl.roles).reduce<RoleVariablesDefinition[]>(
+			(acc, [role, def]) => [
+				...acc,
+				{
+					name: role,
+					variables: Object.entries(getRoleVariables(role, schema.acl)).reduce<VariableDefinition[]>(
+						(acc, [name, def]) => [...acc, { name, ...def } as VariableDefinition],
+						[],
+					),
+				},
+			],
+			[],
+		)
+		return roles.map(it => ({
 			...it,
 			variables: it.variables.map(it => ({ ...it, __typename: 'RoleEntityVariableDefinition' })),
 		}))

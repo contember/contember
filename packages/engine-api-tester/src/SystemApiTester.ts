@@ -1,18 +1,19 @@
 import { createUuidGenerator, testUuid } from './testUuid'
 import { graphql, GraphQLSchema } from 'graphql'
 import { GQL } from './tags'
-import { Identity } from '@contember/engine-common'
 import {
 	DatabaseContext,
 	ProjectConfig,
+	Identity,
 	Schema,
 	setupSystemVariables,
 	StageBySlugQuery,
 	SystemContainer,
 	unnamedIdentity,
+	ReleaseExecutor,
 } from '@contember/engine-system-api'
 import { project } from './project'
-import ReleaseExecutor from '@contember/engine-system-api/dist/src/model/events/ReleaseExecutor'
+import { ProjectRole } from '@contember/engine-common'
 
 export class SystemApiTester {
 	private readonly uuidGenerator = createUuidGenerator('a454')
@@ -37,9 +38,8 @@ export class SystemApiTester {
 		await setupSystemVariables(this.db.client, unnamedIdentity, { uuid: this.uuidGenerator })
 		const identity =
 			options.identity ||
-			new Identity.StaticIdentity(testUuid(888), options.roles || [], {
-				[project.slug]: options.projectRoles || [Identity.ProjectRole.ADMIN],
-			})
+			new Identity(testUuid(888), options.roles || [], options.projectRoles || [ProjectRole.ADMIN])
+
 		const context = this.systemContainer.resolverContextFactory.create(this.db, this.project, identity, {})
 
 		return await graphql(this.systemSchema, gql, null, context, variables)
@@ -103,9 +103,7 @@ export class SystemApiTester {
 			this.db,
 			this.project,
 			{
-				identity: new Identity.StaticIdentity(testUuid(666), [], {
-					[project.slug]: [Identity.ProjectRole.ADMIN],
-				}),
+				identity: new Identity(testUuid(666), [], [ProjectRole.ADMIN]),
 				variables: {},
 			},
 			baseStageObj!,

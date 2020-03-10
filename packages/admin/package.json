@@ -1,6 +1,6 @@
 {
 	"name": "@contember/admin",
-	"version": "0.4.16",
+	"version": "0.4.17",
 	"main": "index.js",
 	"type": "module",
 	"typings": "dist/src/index.d.ts",
@@ -10,13 +10,13 @@
 		"test": "echo \"There is nothing to do\" || jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/binding": "^0.4.16",
-		"@contember/client": "^0.4.16",
-		"@contember/react-client": "^0.4.16",
-		"@contember/react-multipass-rendering": "^0.4.16",
+		"@contember/binding": "^0.4.17",
+		"@contember/client": "^0.4.17",
+		"@contember/react-client": "^0.4.17",
+		"@contember/react-multipass-rendering": "^0.4.17",
 		"@contember/schema": "^0.4.0",
-		"@contember/ui": "^0.4.16",
-		"@contember/utils": "^0.4.16",
+		"@contember/ui": "^0.4.17",
+		"@contember/utils": "^0.4.17",
 		"@mangoweb/sass-base": "0.0.5",
 		"@sindresorhus/slugify": "^0.9.1",
 		"blueimp-md5": "^2.12.0",

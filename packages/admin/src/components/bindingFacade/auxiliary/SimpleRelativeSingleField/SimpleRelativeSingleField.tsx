@@ -28,9 +28,7 @@ export const SimpleRelativeSingleField = function<
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
 	Produced extends Persisted = Persisted
 >(
-	render:
-		| undefined
-		| ((fieldMetadata: SimpleRelativeSingleFieldMetadata<Persisted, Produced>, props: P) => React.ReactNode),
+	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Persisted, Produced>, props: P) => React.ReactNode,
 	displayName: string,
 	defaultProps?: Partial<P>,
 ): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P> {

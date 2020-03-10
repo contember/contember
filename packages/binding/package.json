@@ -1,6 +1,6 @@
 {
 	"name": "@contember/binding",
-	"version": "0.4.17",
+	"version": "0.4.18",
 	"main": "index.js",
 	"type": "module",
 	"typings": "dist/src/index.d.ts",
@@ -9,9 +9,9 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/client": "0.4.17",
-		"@contember/react-client": "0.4.17",
-		"@contember/react-multipass-rendering": "0.4.17",
+		"@contember/client": "^0.4.18",
+		"@contember/react-client": "^0.4.18",
+		"@contember/react-multipass-rendering": "^0.4.18",
 		"@contember/schema": "0.4.0",
 		"chevrotain": "6.5.0"
 	},

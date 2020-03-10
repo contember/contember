@@ -14,12 +14,11 @@ import {
 } from '../markers'
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
+import { AliasTransformer } from './AliasTransformer'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
 export class MutationGenerator {
-	public static readonly ALIAS_SEPARATOR = '__'
-
 	public constructor(
 		private persistedData: any,
 		private currentData: RootAccessor,
@@ -70,7 +69,7 @@ export class MutationGenerator {
 						data[i++], // Deliberately using that this may evaluate to undefined
 						entityFields,
 						currentEntity,
-						`${alias}${MutationGenerator.ALIAS_SEPARATOR}${i}`,
+						AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(currentEntity)),
 						parameters,
 						queryBuilder,
 					)
@@ -243,7 +242,11 @@ export class MutationGenerator {
 						if (accessor instanceof EntityListAccessor) {
 							for (const innerAccessor of accessor) {
 								if (innerAccessor instanceof EntityAccessor) {
-									accessorReference.push({ accessor: innerAccessor, reference, alias: innerAccessor.key })
+									accessorReference.push({
+										accessor: innerAccessor,
+										reference,
+										alias: AliasTransformer.entityToAlias(innerAccessor),
+									})
 								}
 							}
 						}
@@ -383,7 +386,7 @@ export class MutationGenerator {
 									accessor: innerAccessor,
 									reference,
 									persistedField: innerField,
-									alias: innerAccessor.key,
+									alias: AliasTransformer.entityToAlias(innerAccessor),
 								})
 								i++
 							}
@@ -525,9 +528,5 @@ export class MutationGenerator {
 			...dataBuilder.data,
 			...registerReductionFields(reference.reducedBy),
 		})
-	}
-
-	private primaryKeyToAlias(primaryKey: string): string {
-		return `_${primaryKey.replace(/-/g, '')}`
 	}
 }

@@ -10,9 +10,9 @@ import { sortEntities } from './sortEntities'
 
 export interface SortedEntities {
 	entities: EntityAccessor[]
-	prependNew: (preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void
-	appendNew: (preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void
-	addNewAtIndex: (index: number, preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void
+	prependNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
+	appendNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
+	addNewAtIndex: (index: number, preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
 	moveEntity: (oldIndex: number, newIndex: number) => void
 }
 
@@ -22,7 +22,7 @@ const addNewAtIndexImplementation = (
 	desugaredSortableByField: RelativeSingleField | undefined,
 	sortedEntitiesCount: number,
 	index: number,
-	preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void,
+	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
 ) => {
 	if (!entityList.addNew) {
 		return throwNonWritableError(entityList)
@@ -47,7 +47,7 @@ export const useSortedEntities = (
 	}, [desugaredSortableByField, entityList])
 
 	const addNewAtIndex = React.useCallback<SortedEntities['addNewAtIndex']>(
-		(index: number, preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => {
+		(index: number, preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => {
 			addNewAtIndexImplementation(
 				'addNewAtIndex',
 				entityList,

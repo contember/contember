@@ -3,7 +3,7 @@ import * as React from 'react'
 import { EntityListAccessor, useMutationState } from '@contember/binding'
 
 export type AddNewEntityButtonProps = ButtonBasedButtonProps & {
-	addNew: ((preprocess?: (getAccessor: () => EntityListAccessor, newIndex: number) => void) => void) | undefined
+	addNew: ((preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void) | undefined
 	iconProps?: IconProps
 }
 

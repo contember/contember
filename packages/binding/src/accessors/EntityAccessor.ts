@@ -22,31 +22,32 @@ import { FieldAccessor } from './FieldAccessor'
 import { RootAccessor } from './RootAccessor'
 
 class EntityAccessor extends Accessor implements Errorable {
-	public readonly primaryKey: string | EntityAccessor.UnpersistedEntityID
+	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
 
 	public constructor(
-		primaryKey: string | EntityAccessor.UnpersistedEntityID | undefined,
+		key: string | EntityAccessor.UnpersistedEntityId,
 		public readonly typename: string | undefined,
 		public readonly data: EntityAccessor.EntityData,
 		public readonly errors: ErrorAccessor[],
-		public readonly batchUpdates: (performUpdates: (getAccessor: () => EntityAccessor) => void) => void,
-		public readonly replaceWith?: (replacement: EntityAccessor) => void,
-		public readonly remove?: (removalType: RemovalType) => void,
+		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
+		public readonly batchUpdates: (performUpdates: EntityAccessor.BatchUpdates) => void,
+		public readonly replaceBy: ((replacement: EntityAccessor) => void) | undefined,
+		public readonly remove: ((removalType: RemovalType) => void) | undefined,
 	) {
 		super()
-		this.primaryKey = primaryKey || new EntityAccessor.UnpersistedEntityID()
+		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()
 	}
 
-	public isPersisted(): boolean {
-		return typeof this.primaryKey === 'string'
+	public get primaryKey(): string | undefined {
+		return typeof this.runtimeId === 'string' ? this.runtimeId : undefined
 	}
 
-	public getKey() {
-		return this.primaryKey instanceof EntityAccessor.UnpersistedEntityID ? this.primaryKey.value : this.primaryKey
+	public get isPersisted(): boolean {
+		return typeof this.runtimeId === 'string'
 	}
 
-	public getPersistedKey() {
-		return this.primaryKey instanceof EntityAccessor.UnpersistedEntityID ? undefined : this.primaryKey
+	public get key(): string {
+		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
 	public getField(fieldName: FieldName): EntityAccessor.FieldData
@@ -192,7 +193,7 @@ class EntityAccessor extends Accessor implements Errorable {
 }
 
 namespace EntityAccessor {
-	export class UnpersistedEntityID {
+	export class UnpersistedEntityId {
 		public readonly value: string
 
 		private static generateId = (() => {
@@ -201,7 +202,7 @@ namespace EntityAccessor {
 		})()
 
 		public constructor() {
-			this.value = `unpersistedEntity-${UnpersistedEntityID.generateId()}`
+			this.value = `unpersistedEntity-${UnpersistedEntityId.generateId()}`
 		}
 	}
 
@@ -214,6 +215,16 @@ namespace EntityAccessor {
 		| RootAccessor
 
 	export type EntityData = { [placeholder in FieldName]: FieldData }
+
+	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
+
+	export interface EntityEventListenerMap {
+		beforeUpdate: BatchUpdates
+	}
+	export type EntityEventType = keyof EntityEventListenerMap
+	export interface AddEntityEventListener {
+		(type: EntityEventType & 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+	}
 }
 
 export { EntityAccessor }

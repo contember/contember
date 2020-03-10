@@ -1,6 +1,7 @@
 import { assertNever } from '../utils'
 import { MutationDataResponse, MutationError, MutationResponse } from '../accessorTree'
 import { ErrorAccessor } from '../accessors'
+import { AliasTransformer } from './AliasTransformer'
 import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {
@@ -21,27 +22,27 @@ class ErrorsPreprocessor {
 				continue
 			}
 
-			const [treeId, itemNumber] = mutationAlias.split(MutationGenerator.ALIAS_SEPARATOR)
+			const [treeId, itemKeyAlias] = AliasTransformer.splitAliasSections(mutationAlias)
 
-			if (itemNumber === undefined) {
+			if (itemKeyAlias === undefined) {
 				if (treeId in treeRoot) {
 					return this.rejectCorruptData()
 				}
 				treeRoot[treeId] = processedResponse
 			} else {
-				const itemIndex = parseInt(itemNumber, 10)
+				const itemKey = AliasTransformer.aliasToEntityKey(itemKeyAlias)
 				const child = treeRoot[treeId]
 
 				if (!(treeId in treeRoot) || child === undefined) {
 					treeRoot[treeId] = {
-						nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
+						nodeType: ErrorsPreprocessor.ErrorNodeType.KeyIndexed,
 						children: {
-							[itemIndex]: processedResponse,
+							[itemKey]: processedResponse,
 						},
 						errors: [],
 					}
-				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
-					child.children[itemIndex] = processedResponse
+				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
+					child.children[itemKey] = processedResponse
 				}
 			}
 		}
@@ -103,7 +104,7 @@ class ErrorsPreprocessor {
 						this.rejectCorruptData()
 					}
 				} else if (pathNode.__typename === '_IndexPathFragment') {
-					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.NumberIndexed) {
+					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 						const alias = pathNode.alias
 
 						if (alias === null) {
@@ -112,21 +113,16 @@ class ErrorsPreprocessor {
 							)
 						}
 
-						const numericAlias = parseInt(alias, 10)
+						const aliasKey = AliasTransformer.aliasToEntityKey(alias)
 
-						if (isNaN(numericAlias)) {
-							// This case is handled above.
-							throw new ErrorsPreprocessor.ErrorsPreprocessorError(`Corrupt data: encountered a non-numeric alias.`)
-						}
-
-						if (!(numericAlias in currentNode.children)) {
-							currentNode.children[numericAlias] = this.getRootNode(mutationError, i + 1)
+						if (!(aliasKey in currentNode.children)) {
+							currentNode.children[aliasKey] = this.getRootNode(mutationError, i + 1)
 							if (i + 1 <= mutationError.path.length) {
 								// This path has been handled by getRootNode
 								continue errorLoop
 							}
 						}
-						currentNode = currentNode.children[numericAlias]
+						currentNode = currentNode.children[aliasKey]
 					} else {
 						this.rejectCorruptData()
 					}
@@ -197,7 +193,7 @@ class ErrorsPreprocessor {
 
 				rootNode = {
 					errors: [],
-					nodeType: ErrorsPreprocessor.ErrorNodeType.NumberIndexed,
+					nodeType: ErrorsPreprocessor.ErrorNodeType.KeyIndexed,
 					children: {
 						[numericAlias]: rootNode,
 					},
@@ -223,28 +219,28 @@ namespace ErrorsPreprocessor {
 		nodeType: ErrorNodeType.Leaf
 	}
 
-	export interface NumberIndexedErrorNode {
+	interface StringIndexedINode {
 		errors: ErrorAccessor[]
-		nodeType: ErrorNodeType.NumberIndexed
 		children: {
-			[index: number]: ErrorNode
+			[key: string]: ErrorNode
 		}
 	}
 
-	export interface FieldIndexedErrorNode {
-		errors: ErrorAccessor[]
+	export interface KeyIndexedErrorNode extends StringIndexedINode {
+		nodeType: ErrorNodeType.KeyIndexed
+	}
+
+	export interface FieldIndexedErrorNode extends StringIndexedINode {
 		nodeType: ErrorNodeType.FieldIndexed
-		children: {
-			[index: string]: ErrorNode
-		}
 	}
 
-	export type ErrorINode = NumberIndexedErrorNode | FieldIndexedErrorNode
+	// TODO we don't technically need two types of inodes anymore but the rewrite will have to come at a later time.
+	export type ErrorINode = KeyIndexedErrorNode | FieldIndexedErrorNode
 	export type ErrorNode = ErrorINode | LeafErrorNode
 
 	export enum ErrorNodeType {
 		Leaf = 'Leaf',
-		NumberIndexed = 'NumberIndexed',
+		KeyIndexed = 'KeyIndexed',
 		FieldIndexed = 'FieldIndexed',
 	}
 

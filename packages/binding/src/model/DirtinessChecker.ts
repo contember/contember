@@ -43,7 +43,7 @@ export class DirtinessChecker {
 		if (node instanceof EntityForRemovalAccessor) {
 			return true
 		}
-		const isPersisted = node.isPersisted()
+		const isPersisted = node.isPersisted
 		if ((!persistedData && isPersisted) || (persistedData && node.primaryKey !== persistedData[PRIMARY_KEY_NAME])) {
 			return true
 		}
@@ -144,15 +144,19 @@ export class DirtinessChecker {
 		persistedData: ReceivedEntityData<undefined>[] | undefined | null,
 		accessor: EntityListAccessor,
 	): boolean {
+		persistedData = persistedData || []
 		let isDirty = false
-		for (let i = 0, entityCount = accessor.entities.length; i < entityCount; i++) {
-			const innerAccessor = accessor.entities[i]
-			if (innerAccessor) {
-				isDirty = this.isEntityDirty(fields, persistedData ? persistedData[i] : undefined, innerAccessor)
-				if (isDirty) {
-					break
-				}
+		let entityIndex = 0
+		for (const innerAccessor of accessor) {
+			isDirty = this.isEntityDirty(
+				fields,
+				entityIndex in persistedData ? persistedData[entityIndex] : undefined, // Intentionally explicit & verbose
+				innerAccessor,
+			)
+			if (isDirty) {
+				break
 			}
+			entityIndex++
 		}
 		this.isDirtyCache.set(accessor, isDirty)
 		return isDirty

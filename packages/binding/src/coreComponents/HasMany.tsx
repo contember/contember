@@ -18,7 +18,7 @@ export const HasMany = Component<HasManyProps>(
 		return (
 			<>
 				{entity.getFilteredEntities().map(entity => (
-					<Entity key={entity.getKey()} accessor={entity}>
+					<Entity key={entity.key} accessor={entity}>
 						{props.children}
 					</Entity>
 				))}

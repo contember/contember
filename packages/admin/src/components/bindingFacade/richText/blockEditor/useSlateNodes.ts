@@ -84,7 +84,7 @@ export const useSlateNodes = ({
 				if (textElementCache.has(entity)) {
 					return textElementCache.get(entity)!
 				}
-				const entityKey = entity.getKey()
+				const entityKey = entity.key
 
 				if (contemberBlockElementCache.has(entityKey)) {
 					return contemberBlockElementCache.get(entityKey)!

@@ -1,59 +1,72 @@
-import { FormGroup, TextInput } from '@contember/ui'
-import slugify from '@sindresorhus/slugify'
-import * as React from 'react'
 import {
 	Component,
 	Environment,
 	Field,
 	SugaredRelativeSingleField,
-	useEntityContext,
+	useDrivenField,
 	useEnvironment,
 	useMutationState,
 	useRelativeSingleField,
 } from '@contember/binding'
+import { FormGroup, TextInput } from '@contember/ui'
+import slugify from '@sindresorhus/slugify'
+import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
 	SimpleRelativeSingleFieldProps & {
 		drivenBy: SugaredRelativeSingleField['field']
-		format?: (currentValue: string, environment: Environment) => string
-		unpersistedHardPrefix?: string
-		persistedHardPrefix?: string
+		unpersistedHardPrefix?: string | ((environment: Environment) => string)
+		persistedHardPrefix?: string | ((environment: Environment) => string)
+		persistedSoftPrefix?: string | ((environment: Environment) => string)
 		concealTimeout?: number
 	}
 
 export const SlugField = Component<SlugFieldProps>(
-	({ buttonProps, concealTimeout, format, unpersistedHardPrefix, persistedHardPrefix, drivenBy, field, ...props }) => {
-		const [hasEditedSlug, setHasEditedSlug] = React.useState(false)
-		const hostEntity = useEntityContext() // TODO this will fail for some QL uses
-		const slugField = useRelativeSingleField<string>(field)
-		const driverField = useRelativeSingleField<string>(drivenBy)
+	({
+		buttonProps,
+		concealTimeout,
+		unpersistedHardPrefix,
+		persistedHardPrefix,
+		persistedSoftPrefix,
+		drivenBy,
+		field,
+		...props
+	}) => {
 		const environment = useEnvironment()
+		const {
+			normalizedUnpersistedHardPrefix,
+			normalizedPersistedHardPrefix,
+			normalizedPersistedSoftPrefix,
+		} = React.useMemo(
+			() => ({
+				normalizedUnpersistedHardPrefix:
+					typeof unpersistedHardPrefix === 'function'
+						? unpersistedHardPrefix(environment)
+						: unpersistedHardPrefix || '',
+				normalizedPersistedHardPrefix:
+					typeof persistedHardPrefix === 'function' ? persistedHardPrefix(environment) : persistedHardPrefix || '',
+				normalizedPersistedSoftPrefix:
+					typeof persistedSoftPrefix === 'function' ? persistedSoftPrefix(environment) : persistedSoftPrefix || '',
+			}),
+			[environment, persistedHardPrefix, persistedSoftPrefix, unpersistedHardPrefix],
+		)
+		const transform = React.useCallback(
+			(driverFieldValue: string | null) => {
+				const slugValue = slugify(driverFieldValue || '')
+
+				return `${normalizedPersistedHardPrefix}${normalizedPersistedSoftPrefix}${slugValue}`
+			},
+			[normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix],
+		)
+		useDrivenField<string>(drivenBy, field, transform)
+
+		const slugField = useRelativeSingleField<string>(field)
 		const isMutating = useMutationState()
 
-		let slugValue = slugField.currentValue || ''
-
-		if (!hasEditedSlug && !hostEntity.isPersisted()) {
-			slugValue = slugify(driverField.currentValue || '')
-
-			if (format) {
-				slugValue = format(slugValue, environment)
-			}
-			if (persistedHardPrefix) {
-				slugValue = `${persistedHardPrefix}${slugValue}`
-			}
-		}
-
-		React.useEffect(() => {
-			if (slugField.currentValue === slugValue || !slugField.updateValue) {
-				return
-			}
-			slugField.updateValue(slugValue)
-		}, [slugField, slugValue])
-
-		const completePrefix = `${unpersistedHardPrefix || ''}${persistedHardPrefix || ''}`
-		const presentedValue = `${unpersistedHardPrefix || ''}${slugValue}`
+		const completeHardPrefix = `${normalizedUnpersistedHardPrefix}${normalizedPersistedHardPrefix}`
+		const presentedValue = `${normalizedUnpersistedHardPrefix}${slugField.currentValue || ''}`
 
 		return (
 			<ConcealableField
@@ -73,11 +86,10 @@ export const SlugField = Component<SlugFieldProps>(
 						<TextInput
 							value={presentedValue}
 							onChange={e => {
-								hasEditedSlug || setHasEditedSlug(true)
 								if (slugField.updateValue) {
 									const rawValue = e.target.value
-									const unprefixedValue = rawValue.substring(completePrefix.length)
-									slugField.updateValue(`${persistedHardPrefix || ''}${unprefixedValue}`)
+									const valueWithoutHardPrefix = rawValue.substring(completeHardPrefix.length)
+									slugField.updateValue(`${normalizedPersistedHardPrefix}${valueWithoutHardPrefix}`)
 								}
 							}}
 							readOnly={isMutating}
@@ -95,7 +107,7 @@ export const SlugField = Component<SlugFieldProps>(
 	},
 	props => (
 		<>
-			<Field field={props.field} defaultValue={props.defaultValue} isNonbearing={true} />
+			<Field field={props.field} defaultValue={props.defaultValue} />
 			<Field field={props.drivenBy} />
 			{props.label}
 		</>

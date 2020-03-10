@@ -3,6 +3,6 @@ import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../au
 
 export type HiddenFieldProps = SimpleRelativeSingleFieldProps
 
-export const HiddenField = SimpleRelativeSingleField<HiddenFieldProps>(undefined, 'HiddenField', {
+export const HiddenField = SimpleRelativeSingleField<HiddenFieldProps>(() => null, 'HiddenField', {
 	isNonbearing: true,
 })

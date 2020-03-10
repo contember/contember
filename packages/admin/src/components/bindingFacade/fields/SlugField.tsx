@@ -17,36 +17,56 @@ import { ConcealableField, ConcealableFieldProps } from '../ui'
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
 	SimpleRelativeSingleFieldProps & {
 		drivenBy: SugaredRelativeSingleField['field']
-		format?: (currentValue: string, environment: Environment) => string
-		unpersistedHardPrefix?: string
-		persistedHardPrefix?: string
+		unpersistedHardPrefix?: string | ((environment: Environment) => string)
+		persistedHardPrefix?: string | ((environment: Environment) => string)
+		persistedSoftPrefix?: string | ((environment: Environment) => string)
 		concealTimeout?: number
 	}
 
 export const SlugField = Component<SlugFieldProps>(
-	({ buttonProps, concealTimeout, format, unpersistedHardPrefix, persistedHardPrefix, drivenBy, field, ...props }) => {
+	({
+		buttonProps,
+		concealTimeout,
+		unpersistedHardPrefix,
+		persistedHardPrefix,
+		persistedSoftPrefix,
+		drivenBy,
+		field,
+		...props
+	}) => {
 		const environment = useEnvironment()
+		const {
+			normalizedUnpersistedHardPrefix,
+			normalizedPersistedHardPrefix,
+			normalizedPersistedSoftPrefix,
+		} = React.useMemo(
+			() => ({
+				normalizedUnpersistedHardPrefix:
+					typeof unpersistedHardPrefix === 'function'
+						? unpersistedHardPrefix(environment)
+						: unpersistedHardPrefix || '',
+				normalizedPersistedHardPrefix:
+					typeof persistedHardPrefix === 'function' ? persistedHardPrefix(environment) : persistedHardPrefix || '',
+				normalizedPersistedSoftPrefix:
+					typeof persistedSoftPrefix === 'function' ? persistedSoftPrefix(environment) : persistedSoftPrefix || '',
+			}),
+			[environment, persistedHardPrefix, persistedSoftPrefix, unpersistedHardPrefix],
+		)
 		const transform = React.useCallback(
 			(driverFieldValue: string | null) => {
-				let slugValue = slugify(driverFieldValue || '')
+				const slugValue = slugify(driverFieldValue || '')
 
-				if (format) {
-					slugValue = format(slugValue, environment)
-				}
-				if (persistedHardPrefix) {
-					slugValue = `${persistedHardPrefix}${slugValue}`
-				}
-				return slugValue
+				return `${normalizedPersistedHardPrefix}${normalizedPersistedSoftPrefix}${slugValue}`
 			},
-			[environment, format, persistedHardPrefix],
+			[normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix],
 		)
 		useDrivenField<string>(drivenBy, field, transform)
 
 		const slugField = useRelativeSingleField<string>(field)
 		const isMutating = useMutationState()
 
-		const completePrefix = `${unpersistedHardPrefix || ''}${persistedHardPrefix || ''}`
-		const presentedValue = `${unpersistedHardPrefix || ''}${slugField.currentValue || ''}`
+		const completeHardPrefix = `${normalizedUnpersistedHardPrefix}${normalizedPersistedHardPrefix}`
+		const presentedValue = `${normalizedUnpersistedHardPrefix}${slugField.currentValue || ''}`
 
 		return (
 			<ConcealableField
@@ -68,8 +88,8 @@ export const SlugField = Component<SlugFieldProps>(
 							onChange={e => {
 								if (slugField.updateValue) {
 									const rawValue = e.target.value
-									const unprefixedValue = rawValue.substring(completePrefix.length)
-									slugField.updateValue(`${persistedHardPrefix || ''}${unprefixedValue}`)
+									const valueWithoutHardPrefix = rawValue.substring(completeHardPrefix.length)
+									slugField.updateValue(`${normalizedPersistedHardPrefix}${valueWithoutHardPrefix}`)
 								}
 							}}
 							readOnly={isMutating}

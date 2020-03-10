@@ -32,7 +32,7 @@
     "@storybook/react": "^5.2.5",
     "@types/classnames": "^2.2.9",
     "@types/gravatar": "^1.8.0",
-    "@types/react": "^16.9.22",
+    "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
     "@types/react-sortable-hoc": "^0.6.6",
     "@types/react-textarea-autosize": "^4.3.5",

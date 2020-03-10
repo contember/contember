@@ -41,9 +41,6 @@ class EntityListAccessor extends Accessor implements Errorable {
 
 	public *[Symbol.iterator](): Generator<EntityAccessor | EntityForRemovalAccessor> {
 		for (const [, entity] of this.entities) {
-			if (entity.accessor === undefined) {
-				continue
-			}
 			yield entity.accessor
 		}
 	}

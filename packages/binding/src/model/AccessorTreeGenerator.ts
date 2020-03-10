@@ -362,6 +362,9 @@ class AccessorTreeGenerator {
 			return this.rejectInvalidAccessorTree()
 		}
 		const onRemove = (removalType: RemovalType) => {
+			if (entityState.batchUpdateDepth !== 0) {
+				throw new BindingError(`Removing entities that are being batch updated is a no-op.`)
+			}
 			onUpdateProxy(this.removeEntity(persistedData, entityState.accessor, removalType))
 		}
 		const batchUpdates: BatchEntityUpdates = performUpdates => {
@@ -467,7 +470,11 @@ class AccessorTreeGenerator {
 				) {
 					throw new BindingError(`Illegal entity list value.`)
 				}
-				childState.accessor = newValue
+				if (newValue === undefined) {
+					childStates.delete(key)
+				} else {
+					childState.accessor = newValue
+				}
 				updateAccessorInstance()
 
 				if (eventListeners.beforeUpdate === undefined || eventListeners.beforeUpdate.size === 0) {

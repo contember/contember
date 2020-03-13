@@ -13,9 +13,7 @@ export const HoveringToolbar = React.memo((props: HoveringToolbarProps) => {
 		<>
 			<Portal>
 				<UIToolbar isActive={inlineToolbarActive} ref={inlineToolbarRef} scope="contextual">
-					<ButtonGroup>
-						<InlineHoveringToolbarContents />
-					</ButtonGroup>
+					<InlineHoveringToolbarContents />
 				</UIToolbar>
 			</Portal>
 			<UIToolbar isActive={blockToolbarActive}>

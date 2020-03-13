@@ -1,5 +1,5 @@
 import { useForceRender } from '@contember/react-utils'
-import { Button, Icon } from '@contember/ui'
+import { Button, Icon, ButtonGroup } from '@contember/ui'
 import * as React from 'react'
 import { useSlate } from 'slate-react'
 
@@ -92,7 +92,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 	)
 
 	return (
-		<>
+		<ButtonGroup>
 			{editor.canToggleMarks({ isBold: true }) && (
 				<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
 					<Icon blueprintIcon="bold" />
@@ -127,7 +127,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 			<Button key="heading-2" isActive={isHeading2} onMouseDown={toggleHeading2}>
 				<Icon blueprintIcon="header-two" />
 			</Button>
-		</>
+		</ButtonGroup>
 	)
 })
 InlineHoveringToolbarContents.displayName = 'InlineHoveringToolbarContents'

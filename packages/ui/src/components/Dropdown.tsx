@@ -13,6 +13,11 @@ export interface DropdownRenderProps {
 }
 
 export interface DropdownProps {
+	renderToggle?: (props: {
+		ref: React.Ref<any>
+		onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+	}) => React.ReactNode
+	renderContent?: (props: { ref: React.Ref<any> }) => React.ReactNode
 	buttonProps?: ButtonBasedButtonProps
 	alignment?: DropdownAlignment
 	contentContainer?: HTMLElement
@@ -56,18 +61,22 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 
 	const prefix = useClassNamePrefix()
 
-	const children = props.children
+	const { children, renderContent, renderToggle } = props
 	const popperRenderProp = React.useCallback<PopperProps['children']>(
 		({ ref, style, placement }) => (
 			<div ref={refs.contentRef} className={`${prefix}dropdown-content`} style={style} data-placement={placement}>
 				<Collapsible expanded={isOpen} transition="fade">
-					<div ref={ref} className={`${prefix}dropdown-content-in`}>
-						{typeof children === 'function' ? children({ requestClose: close }) : children}
-					</div>
+					{renderContent ? (
+						renderContent({ ref: ref })
+					) : (
+						<div ref={ref} className={`${prefix}dropdown-content-in`}>
+							{typeof children === 'function' ? children({ requestClose: close }) : children}
+						</div>
+					)}
 				</Collapsible>
 			</div>
 		),
-		[close, isOpen, prefix, children, refs.contentRef],
+		[renderContent, close, isOpen, prefix, children, refs.contentRef],
 	)
 
 	return (
@@ -76,12 +85,16 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 				<Reference>
 					{({ ref }) => (
 						<div className={`${prefix}dropdown-button`} ref={ref}>
-							<Button ref={refs.buttonRef} {...props.buttonProps} onClick={onButtonClick} />
+							{renderToggle ? (
+								renderToggle({ ref: refs.buttonRef, onClick: onButtonClick })
+							) : (
+								<Button ref={refs.buttonRef} {...props.buttonProps} onClick={onButtonClick} />
+							)}
 						</div>
 					)}
 				</Reference>
 				<Portal to={contentContainer}>
-					<Popper placement={alignmentToPlacement(props.alignment)}>{popperRenderProp}</Popper>
+					<Popper placement={'top' || alignmentToPlacement(props.alignment)}>{popperRenderProp}</Popper>
 				</Portal>
 			</div>
 		</Manager>

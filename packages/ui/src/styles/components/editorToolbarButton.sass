@@ -1,11 +1,7 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorToolbarButton
-	display: inline-flex
-	flex-direction: column
-	max-width: em(90px)
-	min-width: em(40px)
-	padding: em(4px)
+	display: flex
 	align-items: center
 	text-align: center
 	border-radius: .25em
@@ -26,14 +22,28 @@
 		height: 1.5em
 
 	&-label
-		font-size: em(12px)
-		margin-top: em(4px, 12px)
 		display: none
-		max-width: 100%
-		overflow-x: hidden
 		line-height: 1.2
-		text-overflow: ellipsis
-		margin-bottom: -.25em
+
+	&.view-layout-grid
+		display: inline-flex
+		flex-direction: column
+		max-width: em(90px)
+		min-width: em(40px)
+		padding: em(4px)
+
+	&.view-layout-grid &
+		&-label
+			font-size: em(12px)
+			margin-top: em(4px, 12px)
+			overflow-x: hidden
+			max-width: 100%
+			text-overflow: ellipsis
+			margin-bottom: -.25em
+
+	&.view-layout-list &
+		&-icon
+			margin-right: .5em
 
 	&.view-showLabel &-label
 		display: block

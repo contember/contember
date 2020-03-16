@@ -24,7 +24,7 @@ interface WithPopupProps {
 	}
 }
 
-interface ToolbarGroup {
+export interface ToolbarGroup {
 	buttons: ToolbarButtonOrDropdown[]
 }
 
@@ -72,9 +72,10 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 			></Dropdown>
 		)
 	}
+	const { onClick, ...rest } = props
 	return (
 		<div className={cn(className)}>
-			<EditorToolbarButton {...props} />
+			<EditorToolbarButton onMouseDown={onClick} {...rest} />
 		</div>
 	)
 }
@@ -130,7 +131,7 @@ export const EditorToolbar = React.memo(
 									showLabel={showLabels}
 									popup={{
 										layout: EditorToolbarLayout.GRID,
-										showLabels: showLabels,
+										showLabels: true,
 										scope: scope,
 									}}
 								/>

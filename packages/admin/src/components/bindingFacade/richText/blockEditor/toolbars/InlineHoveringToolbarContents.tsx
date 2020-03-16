@@ -1,5 +1,6 @@
 import { useForceRender } from '@contember/react-utils'
-import { Button, Icon, ButtonGroup } from '@contember/ui'
+import { EditorToolbar } from '@contember/ui'
+import { ToolbarButton } from '@contember/ui/src/components/editor/EditorToolbarButton'
 import * as React from 'react'
 import { useSlate } from 'slate-react'
 
@@ -91,43 +92,74 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor],
 	)
 
-	return (
-		<ButtonGroup>
-			{editor.canToggleMarks({ isBold: true }) && (
-				<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
-					<Icon blueprintIcon="bold" />
-				</Button>
-			)}
-			{editor.canToggleMarks({ isItalic: true }) && (
-				<Button key="italic" isActive={isItalic} onMouseDown={toggleItalic}>
-					<Icon blueprintIcon="italic" />
-				</Button>
-			)}
-			{editor.canToggleMarks({ isUnderlined: true }) && (
-				<Button key="underlined" isActive={isUnderlined} onMouseDown={toggleUnderlined}>
-					<Icon blueprintIcon="underline" />
-				</Button>
-			)}
-			{editor.canToggleMarks({ isStruckThrough: true }) && (
-				<Button key="strikethrough" isActive={isStruckThrough} onMouseDown={toggleStruckThrough}>
-					<Icon blueprintIcon="strikethrough" />
-				</Button>
-			)}
-			<Button key="link" isActive={isAnchor} onMouseDown={toggleAnchor}>
-				<Icon blueprintIcon="link" />
-			</Button>
-			{editor.canToggleMarks({ isCode: true }) && (
-				<Button key="code" isActive={isCode} onMouseDown={toggleCode}>
-					<Icon blueprintIcon="code" />
-				</Button>
-			)}
-			<Button key="heading-1" isActive={isHeading1} onMouseDown={toggleHeading1}>
-				<Icon blueprintIcon="header-one" />
-			</Button>
-			<Button key="heading-2" isActive={isHeading2} onMouseDown={toggleHeading2}>
-				<Icon blueprintIcon="header-two" />
-			</Button>
-		</ButtonGroup>
-	)
+	const buttons: ToolbarButton[] = []
+
+	if (editor.canSetBold(editor)) {
+		buttons.push({
+			isActive: isBold,
+			onClick: toggleBold,
+			label: 'bold',
+			blueprintIcon: 'bold',
+		})
+	}
+
+	if (editor.canSetItalic(editor)) {
+		buttons.push({
+			isActive: isItalic,
+			onClick: toggleItalic,
+			label: 'italic',
+			blueprintIcon: 'italic',
+		})
+	}
+
+	if (editor.canSetUnderlined(editor)) {
+		buttons.push({
+			isActive: isUnderlined,
+			onClick: toggleUnderlined,
+			label: 'underlined',
+			blueprintIcon: 'underline',
+		})
+	}
+
+	if (editor.canSetStruckThrough(editor)) {
+		buttons.push({
+			isActive: isStruckThrough,
+			onClick: toggleStruckThrough,
+			label: 'strikethrough',
+			blueprintIcon: 'strikethrough',
+		})
+	}
+
+	buttons.push({
+		isActive: isAnchor,
+		onClick: toggleAnchor,
+		label: 'link',
+		blueprintIcon: 'link',
+	})
+
+	if (editor.canSetCode(editor)) {
+		buttons.push({
+			isActive: isCode,
+			onClick: toggleCode,
+			label: 'code',
+			blueprintIcon: 'code',
+		})
+	}
+
+	buttons.push({
+		isActive: isHeading1,
+		onClick: toggleHeading1,
+		label: 'header-one',
+		blueprintIcon: 'header-one',
+	})
+
+	buttons.push({
+		isActive: isHeading2,
+		onClick: toggleHeading2,
+		label: 'header-two',
+		blueprintIcon: 'header-two',
+	})
+
+	return <EditorToolbar scope="contextual" groups={[{ buttons }]} />
 })
 InlineHoveringToolbarContents.displayName = 'InlineHoveringToolbarContents'

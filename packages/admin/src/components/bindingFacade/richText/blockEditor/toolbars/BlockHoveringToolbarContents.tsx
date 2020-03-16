@@ -1,8 +1,8 @@
-import { Scalar, useEnvironment, VariableInputTransformer, VariableLiteral } from '@contember/binding'
+import { Environment, Scalar, useEnvironment, VariableInputTransformer, VariableLiteral } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
-import { Button, ButtonGroup, Dropdown, Icon, IconSourceSpecification } from '@contember/ui'
+import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import * as React from 'react'
-import { useEditor } from 'slate-react'
+import { ReactEditor, useEditor } from 'slate-react'
 import { ContemberBlockElement, contemberBlockElementType } from '../elements'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
@@ -21,6 +21,45 @@ export interface BlockHoveringToolbarContentsProps {
 	otherBlockButtons?: BlockHoveringToolbarConfig[]
 }
 
+function toToolbarGroups(
+	buttons: BlockHoveringToolbarContentsProps['blockButtons'],
+	environment: Environment,
+	editor: ReactEditor,
+): ToolbarGroup[] {
+	if (!buttons) {
+		return []
+	}
+
+	const sections = (Array.isArray(buttons[0]) ? buttons : [buttons]) as BlockHoveringToolbarConfig[][]
+
+	return sections.map(section => {
+		return {
+			buttons: section.map(buttonProps => {
+				const { title, ...rest } = buttonProps
+				return {
+					label: title,
+					...rest,
+					onClick: (e: React.MouseEvent) => {
+						e.nativeEvent.preventDefault()
+						e.nativeEvent.stopPropagation()
+						const discriminateBy =
+							'discriminateBy' in buttonProps
+								? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
+								: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
+						const contemberBlockElement: ContemberBlockElement = {
+							type: contemberBlockElementType,
+							blockType: discriminateBy,
+							entityKey: '', // Any string will do from here.
+							children: [{ text: '' }],
+						}
+						editor.insertNode(contemberBlockElement)
+					},
+				}
+			}),
+		}
+	})
+}
+
 export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringToolbarContentsProps) => {
 	const editor = useEditor()
 	const environment = useEnvironment()
@@ -29,60 +68,16 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 		return null
 	}
 
-	const mainSections = (Array.isArray(props.blockButtons[0])
-		? props.blockButtons
-		: [props.blockButtons]) as BlockHoveringToolbarConfig[][]
+	const { blockButtons, otherBlockButtons } = props
 
-	const renderSection = (section: BlockHoveringToolbarConfig[]) => (
-		<ButtonGroup size="large">
-			{section.map((buttonProps, j) => {
-				return (
-					<Button
-						size="large"
-						key={j}
-						title={buttonProps.title}
-						onClick={() => {
-							const discriminateBy =
-								'discriminateBy' in buttonProps
-									? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
-									: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
-							const contemberBlockElement: ContemberBlockElement = {
-								type: contemberBlockElementType,
-								blockType: discriminateBy,
-								entityKey: '', // Any string will do from here.
-								children: [{ text: '' }],
-							}
-							editor.insertNode(contemberBlockElement)
-						}}
-					>
-						<Icon
-							blueprintIcon={buttonProps.blueprintIcon}
-							contemberIcon={buttonProps.contemberIcon}
-							customIcon={buttonProps.customIcon}
-						/>
-					</Button>
-				)
-			})}
-		</ButtonGroup>
-	)
+	const groups = React.useMemo<ToolbarGroup[]>(() => {
+		return toToolbarGroups(blockButtons, environment, editor)
+	}, [blockButtons, environment, editor])
 
-	return (
-		<>
-			{mainSections.map((section, i) => (
-				<React.Fragment key={i}>{renderSection(section)}</React.Fragment>
-			))}
-			{props.otherBlockButtons && (
-				<Dropdown
-					buttonProps={{
-						children: <Icon blueprintIcon="more" />,
-						size: 'large',
-					}}
-					alignment="top"
-				>
-					{renderSection(props.otherBlockButtons)}
-				</Dropdown>
-			)}
-		</>
-	)
+	const restGroups = React.useMemo<ToolbarGroup[] | undefined>(() => {
+		return otherBlockButtons ? toToolbarGroups(otherBlockButtons, environment, editor) : undefined
+	}, [otherBlockButtons, environment, editor])
+
+	return <EditorToolbar isActive groups={groups} restGroups={restGroups} />
 })
 BlockHoveringToolbarContents.displayName = 'BlockHoveringToolbarContents'

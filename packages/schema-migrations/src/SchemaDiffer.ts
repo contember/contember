@@ -8,6 +8,7 @@ import { createPatch } from 'rfc6902'
 import deepEqual from 'fast-deep-equal'
 import deepCopy from './utils/deepCopy'
 import { ImplementationException } from './exceptions'
+import { VERSION_LATEST } from './modifications/ModificationVersions'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -23,24 +24,6 @@ export class SchemaDiffer {
 		}
 
 		const builder = new ModificationBuilder(originalSchema, updatedSchema)
-
-		if (!deepEqual(originalSchema.acl, updatedSchema.acl)) {
-			const patch = createPatch(originalSchema.acl, updatedSchema.acl)
-			if (patch.length <= 100) {
-				builder.patchAclSchema(patch)
-			} else {
-				builder.updateAclSchema(updatedSchema.acl)
-			}
-		}
-
-		if (!deepEqual(originalSchema.validation, updatedSchema.validation)) {
-			const patch = createPatch(originalSchema.validation, updatedSchema.validation)
-			if (patch.length <= 20) {
-				builder.patchValidationSchema(patch)
-			} else {
-				builder.updateValidationSchema(updatedSchema.validation)
-			}
-		}
 
 		const originalModel = originalSchema.model
 		const updatedModel = updatedSchema.model
@@ -219,12 +202,36 @@ export class SchemaDiffer {
 			builder.removeEnum(enumName)
 		}
 
+		const partiallyMigratedSchema = this.schemaMigrator.applyModifications(
+			originalSchema,
+			builder.getDiff(),
+			VERSION_LATEST,
+		)
+
+		if (!deepEqual(partiallyMigratedSchema.acl, updatedSchema.acl)) {
+			const patch = createPatch(partiallyMigratedSchema.acl, updatedSchema.acl)
+			if (patch.length <= 100) {
+				builder.patchAclSchema(patch)
+			} else {
+				builder.updateAclSchema(updatedSchema.acl)
+			}
+		}
+
+		if (!deepEqual(partiallyMigratedSchema.validation, updatedSchema.validation)) {
+			const patch = createPatch(partiallyMigratedSchema.validation, updatedSchema.validation)
+			if (patch.length <= 20) {
+				builder.patchValidationSchema(patch)
+			} else {
+				builder.updateValidationSchema(updatedSchema.validation)
+			}
+		}
+
 		const diff = builder.getDiff()
 
-		const appliedDiff = this.schemaMigrator.applyDiff(originalSchema, diff)
+		const schemaWithAppliedModifications = this.schemaMigrator.applyModifications(originalSchema, diff, VERSION_LATEST)
 
-		if (checkRecreate && !deepEqual(updatedSchema, appliedDiff)) {
-			const diff = createPatch(updatedSchema, appliedDiff)
+		if (checkRecreate && !deepEqual(updatedSchema, schemaWithAppliedModifications)) {
+			const diff = createPatch(updatedSchema, schemaWithAppliedModifications)
 			for (let item of diff) {
 				console.log(item)
 			}

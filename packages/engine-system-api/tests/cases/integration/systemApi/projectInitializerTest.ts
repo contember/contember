@@ -3,7 +3,7 @@ import { ApiTester, createCreateEvent, createRunMigrationEvent, GQL } from '@con
 import { createMock } from '../../../src/utils'
 import StageTree from '../../../../src/model/stages/StageTree'
 import { StageWithoutEvent } from '../../../../src/model/dtos/Stage'
-import { Migration } from '@contember/schema-migrations'
+import { Migration, VERSION_LATEST } from '@contember/schema-migrations'
 import { createMigrationResolver } from '@contember/engine-api-tester/dist/src/migrationResolver'
 import { TIMEOUT } from '../../../src/constants'
 
@@ -208,6 +208,7 @@ describe('project initializer', () => {
 
 			const migrations: Migration[] = [
 				{
+					formatVersion: VERSION_LATEST,
 					version: '2019-04-17-123500',
 					modifications: [
 						{
@@ -291,6 +292,7 @@ describe('project initializer', () => {
 			)
 
 			migrations.push({
+				formatVersion: VERSION_LATEST,
 				version: '2019-04-17-123600',
 				modifications: [
 					{

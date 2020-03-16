@@ -27,16 +27,16 @@ import UpdateRelationOrderByModification from './relations/UpdateRelationOrderBy
 class ModificationHandlerFactory {
 	constructor(private readonly map: ModificationHandlerFactory.FactoryMap<any>) {}
 
-	public create<D>(name: string, data: D, schema: Schema): Modification<D> {
+	public create<D>(name: string, data: D, schema: Schema, version: number): Modification<D> {
 		if (!this.map[name]) {
 			throw new Error(`Undefined modification handler for ${name}`)
 		}
-		return this.map[name]({ data, schema })
+		return this.map[name]({ data, schema, version })
 	}
 }
 
 namespace ModificationHandlerFactory {
-	export type FactoryDefinition<D> = (input: { schema: Schema; data: D }) => Modification<D>
+	export type FactoryDefinition<D> = (input: { schema: Schema; data: D; version: number }) => Modification<D>
 	export type FactoryMap<D> = { [modificationName: string]: FactoryDefinition<D> }
 
 	export const defaultFactoryMap: FactoryMap<any> = {
@@ -51,16 +51,18 @@ namespace ModificationHandlerFactory {
 		[RemoveUniqueConstraintModification.id]: ({ data, schema }) => new RemoveUniqueConstraintModification(data, schema),
 
 		[CreateEntityModification.id]: ({ data, schema }) => new CreateEntityModification(data, schema),
-		[RemoveEntityModification.id]: ({ data, schema }) => new RemoveEntityModification(data, schema),
-		[UpdateEntityNameModification.id]: ({ data, schema }) => new UpdateEntityNameModification(data, schema),
+		[RemoveEntityModification.id]: ({ data, schema, version }) => new RemoveEntityModification(data, schema, version),
+		[UpdateEntityNameModification.id]: ({ data, schema, version }) =>
+			new UpdateEntityNameModification(data, schema, version),
 		[UpdateEntityTableNameModification.id]: ({ data, schema }) => new UpdateEntityTableNameModification(data, schema),
 
 		[CreateEnumModification.id]: ({ data, schema }) => new CreateEnumModification(data, schema),
 		[RemoveEnumModification.id]: ({ data, schema }) => new RemoveEnumModification(data, schema),
 		[UpdateEnumModification.id]: ({ data, schema }) => new UpdateEnumModification(data, schema),
 
-		[RemoveFieldModification.id]: ({ data, schema }) => new RemoveFieldModification(data, schema),
-		[UpdateFieldNameModification.id]: ({ data, schema }) => new UpdateFieldNameModification(data, schema),
+		[RemoveFieldModification.id]: ({ data, schema, version }) => new RemoveFieldModification(data, schema, version),
+		[UpdateFieldNameModification.id]: ({ data, schema, version }) =>
+			new UpdateFieldNameModification(data, schema, version),
 
 		[CreateRelationInverseSideModification.id]: ({ data, schema }) =>
 			new CreateRelationInverseSideModification(data, schema),

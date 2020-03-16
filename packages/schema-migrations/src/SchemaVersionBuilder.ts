@@ -2,6 +2,7 @@ import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { SchemaMigrator } from './SchemaMigrator'
 import { MigrationsResolver } from './MigrationsResolver'
+import { VERSION_INITIAL } from './modifications/ModificationVersions'
 
 export class SchemaVersionBuilder {
 	constructor(
@@ -24,7 +25,10 @@ export class SchemaVersionBuilder {
 	private async doBuild(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
 		return (await this.migrationsResolver.getMigrations())
 			.filter(({ version }) => condition(version))
-			.map(({ modifications }) => modifications)
-			.reduce<Schema>((schema, modifications) => this.schemaMigrator.applyDiff(schema, modifications), initialSchema)
+			.reduce<Schema>(
+				(schema, { modifications, formatVersion }) =>
+					this.schemaMigrator.applyModifications(schema, modifications, formatVersion),
+				initialSchema,
+			)
 	}
 }

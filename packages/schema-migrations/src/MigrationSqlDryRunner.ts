@@ -3,6 +3,7 @@ import { FileNameHelper } from '@contember/engine-common'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { createMigrationBuilder } from './utils/pgMigrateHelpers'
+import { VERSION_INITIAL } from './modifications/ModificationVersions'
 
 export class MigrationSqlDryRunner {
 	constructor(
@@ -29,6 +30,7 @@ export class MigrationSqlDryRunner {
 				modification.modification,
 				modification,
 				schema,
+				migration.formatVersion,
 			)
 			await modificationHandler.createSql(builder)
 			schema = modificationHandler.getSchemaUpdater()(schema)

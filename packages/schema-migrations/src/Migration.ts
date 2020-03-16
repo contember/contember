@@ -1,5 +1,6 @@
 interface Migration {
 	version: string
+	formatVersion: number
 	modifications: Migration.Modification[]
 }
 

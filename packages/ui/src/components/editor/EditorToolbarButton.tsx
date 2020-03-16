@@ -26,9 +26,10 @@ export const EditorToolbarButton = React.memo(
 			ref,
 		) => {
 			return (
-				<div
+				<button
 					ref={ref}
 					role="button"
+					type="button"
 					tabIndex={0}
 					onMouseDown={onMouseDown}
 					onClick={onClick}
@@ -44,7 +45,7 @@ export const EditorToolbarButton = React.memo(
 						<Icon size="large" {...{ contemberIcon, customIcon, blueprintIcon }} />
 					</span>
 					<span className={cn(useComponentClassName('editorToolbarButton-label'))}>{label}</span>
-				</div>
+				</button>
 			)
 		},
 	),

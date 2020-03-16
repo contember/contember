@@ -130,9 +130,9 @@ export const Dropdown2 = React.memo((props: Dropdown2Props) => {
 	const { children, ButtonComponent } = props
 	const popperRenderProp = React.useCallback<PopperProps['children']>(
 		({ ref, style, placement }) => (
-			<div ref={refs.contentRef} className={`${prefix}dropdown2-content`} style={style} data-placement={placement}>
+			<div ref={refs.contentRef} className={`${prefix}dropdown-content`} style={style} data-placement={placement}>
 				<Collapsible expanded={isOpen} transition="fade">
-					<div ref={ref} className={`${prefix}dropdown-content-in`}>
+					<div ref={ref} className={`${prefix}dropdown-content-in view-unstyled`}>
 						{typeof children === 'function' ? children({ requestClose: close }) : children}
 					</div>
 				</Collapsible>
@@ -140,7 +140,6 @@ export const Dropdown2 = React.memo((props: Dropdown2Props) => {
 		),
 		[close, isOpen, prefix, children, refs.contentRef],
 	)
-
 	return (
 		<Manager>
 			<div className={`${prefix}dropdown`}>

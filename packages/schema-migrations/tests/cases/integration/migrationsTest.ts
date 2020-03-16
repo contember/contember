@@ -1,7 +1,6 @@
 import 'jasmine'
 import { Acl, Model } from '@contember/schema'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { SQL } from '@contember/engine-api-tester'
 import {
 	ModificationHandlerFactory,
 	Migration,
@@ -9,6 +8,7 @@ import {
 	createMigrationBuilder,
 	SchemaMigrator,
 } from '../../../src'
+import { SQL } from '../../src/tags'
 
 const emptyAcl = { roles: {} }
 

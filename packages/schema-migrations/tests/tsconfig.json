@@ -7,9 +7,6 @@
 	"references": [
 		{
 			"path": "../src"
-		},
-		{
-			"path": "../../engine-api-tester/src"
 		}
 	]
 }

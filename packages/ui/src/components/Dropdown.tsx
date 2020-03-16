@@ -144,7 +144,6 @@ export const Dropdown2 = React.memo((props: Dropdown2Props) => {
 	return (
 		<Manager>
 			<div className={`${prefix}dropdown`}>
-				Dp2
 				<Reference>
 					{({ ref }) => (
 						<div className={`${prefix}dropdown-button`} ref={ref}>

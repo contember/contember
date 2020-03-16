@@ -64,10 +64,6 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 	const editor = useEditor()
 	const environment = useEnvironment()
 
-	if (!props.blockButtons || !props.blockButtons.length) {
-		return null
-	}
-
 	const { blockButtons, otherBlockButtons } = props
 
 	const groups = React.useMemo<ToolbarGroup[]>(() => {
@@ -77,6 +73,10 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 	const restGroups = React.useMemo<ToolbarGroup[] | undefined>(() => {
 		return otherBlockButtons ? toToolbarGroups(otherBlockButtons, environment, editor) : undefined
 	}, [otherBlockButtons, environment, editor])
+
+	if (!props.blockButtons || !props.blockButtons.length) {
+		return null
+	}
 
 	return <EditorToolbar isActive groups={groups} restGroups={restGroups} />
 })

@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
-import { Dropdown } from '../Dropdown'
+import { Dropdown2 } from '../Dropdown'
 import { EditorToolbarButton, ToolbarButton, ToolbarButtonLayout } from './EditorToolbarButton'
 
 export enum EditorToolbarLayout {
@@ -41,35 +41,30 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 	const className = useComponentClassName('editorToolbar-button')
 	if (props.groups) {
 		return (
-			<Dropdown
-				renderToggle={({ ref, onClick }) => (
-					<span ref={ref}>
-						<EditorToolbarButton
-							layout={props.layout}
-							label={props.label}
-							showLabel={props.showLabel}
-							contemberIcon={props.contemberIcon}
-							blueprintIcon={props.blueprintIcon}
-							customIcon={props.customIcon}
-							onClick={onClick}
-						/>
-					</span>
-				)}
-				renderContent={({ ref }) => (
-					<span ref={ref}>
-						{props.groups && (
-							<EditorToolbar
-								isActive
-								groups={props.groups}
-								scope={props.popup.scope}
-								layout={props.popup.layout}
-								showLabels={props.popup.showLabels}
-							/>
-						)}
-					</span>
-				)}
+			<Dropdown2
+				ButtonComponent={EditorToolbarButton}
+				buttonProps={
+					{
+						layout: props.layout,
+						label: props.label,
+						showLabel: props.showLabel,
+						contemberIcon: props.contemberIcon,
+						blueprintIcon: props.blueprintIcon,
+						customIcon: props.customIcon,
+					} as any
+				}
 				alignment="center"
-			></Dropdown>
+			>
+				{props.groups && (
+					<EditorToolbar
+						isActive
+						groups={props.groups}
+						scope={props.popup.scope}
+						layout={props.popup.layout}
+						showLabels={props.popup.showLabels}
+					/>
+				)}
+			</Dropdown2>
 		)
 	}
 	const { onClick, ...rest } = props

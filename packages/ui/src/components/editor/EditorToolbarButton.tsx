@@ -20,36 +20,33 @@ export interface ToolbarButton extends IconSourceSpecification {
 }
 
 export const EditorToolbarButton = React.memo(
-	({
-		label,
-		title,
-		contemberIcon,
-		customIcon,
-		blueprintIcon,
-		showLabel,
-		isActive,
-		layout,
-		onClick,
-		onMouseDown,
-	}: ToolbarButton) => (
-		<div
-			role="button"
-			tabIndex={0}
-			onMouseDown={onMouseDown}
-			onClick={onClick}
-			title={title || String(label)}
-			className={cn(
-				useComponentClassName('editorToolbarButton'),
-				toViewClass('showLabel', showLabel),
-				toViewClass('active', isActive),
-				toViewClass(`layout-${layout || ToolbarButtonLayout.GRID}`, true),
-			)}
-		>
-			<span className={cn(useComponentClassName('editorToolbarButton-icon'))}>
-				<Icon size="large" {...{ contemberIcon, customIcon, blueprintIcon }} />
-			</span>
-			<span className={cn(useComponentClassName('editorToolbarButton-label'))}>{label}</span>
-		</div>
+	React.forwardRef<any, ToolbarButton>(
+		(
+			{ label, title, contemberIcon, customIcon, blueprintIcon, showLabel, isActive, layout, onClick, onMouseDown },
+			ref,
+		) => {
+			return (
+				<div
+					ref={ref}
+					role="button"
+					tabIndex={0}
+					onMouseDown={onMouseDown}
+					onClick={onClick}
+					title={title || String(label)}
+					className={cn(
+						useComponentClassName('editorToolbarButton'),
+						toViewClass('showLabel', showLabel),
+						toViewClass('active', isActive),
+						toViewClass(`layout-${layout || ToolbarButtonLayout.GRID}`, true),
+					)}
+				>
+					<span className={cn(useComponentClassName('editorToolbarButton-icon'))}>
+						<Icon size="large" {...{ contemberIcon, customIcon, blueprintIcon }} />
+					</span>
+					<span className={cn(useComponentClassName('editorToolbarButton-label'))}>{label}</span>
+				</div>
+			)
+		},
 	),
 )
 

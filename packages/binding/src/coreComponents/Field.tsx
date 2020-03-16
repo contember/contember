@@ -7,15 +7,17 @@ import { Component } from './Component'
 
 export interface FieldBasicProps extends SugaredRelativeSingleField {}
 
-export interface FieldRuntimeProps {
-	format?: (value: FieldValue) => React.ReactNode
+export interface FieldRuntimeProps<Persisted extends FieldValue = FieldValue> {
+	format?: (value: Persisted | null) => React.ReactNode
 }
 
-export interface FieldProps extends FieldBasicProps, FieldRuntimeProps {}
+export interface FieldProps<Persisted extends FieldValue = FieldValue>
+	extends FieldBasicProps,
+		FieldRuntimeProps<Persisted> {}
 
-export const Field = Component<FieldProps>(
-	props => {
-		const field = useRelativeSingleField(props)
+export const Field = Component(
+	<Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => {
+		const field = useRelativeSingleField<Persisted>(props)
 
 		if (props.format !== undefined) {
 			return <>{props.format(field.currentValue)}</>
@@ -34,4 +36,4 @@ export const Field = Component<FieldProps>(
 		generateFieldMarker: (props, environment) => MarkerFactory.createFieldMarker(props, environment),
 	},
 	'Field',
-)
+) as <Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => React.ReactElement

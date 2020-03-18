@@ -18,7 +18,7 @@
 		"@contember/schema-migrations": "^0.7.2",
 		"@contember/schema-utils": "^0.7.2",
 		"apollo-server-core": "^2.9.1",
-		"apollo-server-errors": "^2.3.1",
+		"apollo-server-errors": "^2.4.0",
 		"graphql": "^14.6.0",
 		"pg": "^7.17.1"
 	},

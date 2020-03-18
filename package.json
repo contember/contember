@@ -20,7 +20,9 @@
 		}
 	},
 	"lint-staged": {
-		"*.ts": ["eslint --fix"]
+		"*.ts": [
+			"eslint --fix"
+		]
 	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "^2.10.0",
@@ -31,7 +33,8 @@
 		"husky": "^4.2.0",
 		"jasmine": "^3.5.0",
 		"jasmine-ts": "^0.3.0",
-		"lerna": "^3.18.3",
+		"lerna": "^3.20.2",
+		"lerna-audit": "^1.1.1",
 		"lint-staged": "^10.0.2",
 		"prettier": "^1.18.2",
 		"ts-node": "^8.4.1",

@@ -1,20 +1,20 @@
 {
-  "name": "@contember/engine-plugins",
-  "license": "Apache-2.0",
-  "version": "0.7.2",
-  "main": "dist/src/index.js",
-  "scripts": {},
-  "typings": "dist/src/index.d.ts",
-  "dependencies": {
-    "@contember/dic": "^0.7.2",
-    "@contember/engine-common": "^0.7.2",
-    "@contember/schema": "^0.7.2"
-  },
-  "peerDependencies": {
-    "graphql": "14.6.0"
-  },
-  "devDependencies": {
-    "graphql": "^14.5.4",
-    "typescript": "^3.7.4"
-  }
+	"name": "@contember/engine-plugins",
+	"license": "Apache-2.0",
+	"version": "0.7.2",
+	"main": "dist/src/index.js",
+	"scripts": {},
+	"typings": "dist/src/index.d.ts",
+	"dependencies": {
+		"@contember/dic": "^0.7.2",
+		"@contember/engine-common": "^0.7.2",
+		"@contember/schema": "^0.7.2"
+	},
+	"peerDependencies": {
+		"graphql": "14.6.0"
+	},
+	"devDependencies": {
+		"graphql": "^14.5.4",
+		"typescript": "^3.7.4"
+	}
 }

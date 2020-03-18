@@ -15,7 +15,7 @@
 		"@contember/engine-common": "^0.7.2",
 		"@contember/queryable": "^0.7.2",
 		"apollo-server-core": "^2.9.1",
-		"apollo-server-errors": "^2.3.1",
+		"apollo-server-errors": "^2.4.0",
 		"graphql": "^14.6.0",
 		"graphql-tools": "^4.0.5",
 		"mustache": "^4.0.0",

@@ -3,7 +3,7 @@ import { Acl, Model, Schema } from '@contember/schema'
 type Updater<T> = (value: T) => T
 export type SchemaUpdater = Updater<Schema>
 type ModelUpdater = Updater<Model.Schema>
-type EntityUpdater = Updater<Model.Entity>
+export type EntityUpdater = Updater<Model.Entity>
 type FieldUpdater<T extends Model.AnyField> = (field: T, entity: Model.Entity) => Model.AnyField
 
 type AclUpdater = Updater<Acl.Schema>

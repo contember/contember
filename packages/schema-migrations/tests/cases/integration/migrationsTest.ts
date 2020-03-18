@@ -889,6 +889,53 @@ describe('Diff schemas', () => {
 		})
 	})
 
+	describe('rename entity with a table', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('User', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateEntityName',
+				entityName: 'Author',
+				newEntityName: 'User',
+				tableName: 'user',
+			},
+		]
+		const sql = SQL`ALTER TABLE "author" RENAME TO "user";`
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+	describe('rename entity with a unique constraint', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Author', e => e.column('slug', c => c.type(Model.ColumnType.String).unique()))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('User', e => e.tableName('author').column('slug', c => c.type(Model.ColumnType.String).unique()))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateEntityName',
+				entityName: 'Author',
+				newEntityName: 'User',
+			},
+		]
+		const sql = SQL`ALTER TABLE "author"
+			RENAME CONSTRAINT "unique_Author_slug_a645b0" TO "unique_User_slug_d61dea";`
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
 	describe('rename field', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String).columnName('name')))
@@ -905,6 +952,37 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL``
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+	describe('rename field with constraint', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Author', e => e.column('slug', c => c.type(Model.ColumnType.String).unique()))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Author', e =>
+				e.column('identifier', c =>
+					c
+						.type(Model.ColumnType.String)
+						.columnName('slug')
+						.unique(),
+				),
+			)
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateFieldName',
+				entityName: 'Author',
+				fieldName: 'slug',
+				newFieldName: 'identifier',
+			},
+		]
+		const sql = SQL`ALTER TABLE "author"
+			RENAME CONSTRAINT "unique_Author_slug_a645b0" TO "unique_Author_identifier_4eb9f2";`
 		it('apply diff', () => {
 			testApplyDiff(originalSchema, diff, updatedSchema)
 		})

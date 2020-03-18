@@ -15,74 +15,101 @@ import {
 	updateSchema,
 } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { acceptFieldVisitor, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { VERSION_ACL_PATCH } from '../ModificationVersions'
+import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
+import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
+import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
+import { changeValue } from '../utils/valueUtils'
 
 class UpdateFieldNameModification implements Modification<UpdateFieldNameModification.Data> {
 	constructor(
 		private readonly data: UpdateFieldNameModification.Data,
 		private readonly schema: Schema,
-		private readonly version: number,
+		private readonly formatVersion: number,
 	) {}
 
-	public createSql(builder: MigrationBuilder): void {}
+	public createSql(builder: MigrationBuilder): void {
+		if (this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
+			const entity = this.schema.model.entities[this.data.entityName]
+			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
+		}
+	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateSchema(
-			updateModel(
-				updateEveryEntity(
-					updateEveryField((field, entity) => {
-						const isUpdatedRelation = (entity: Model.Entity, relation: Model.AnyRelation | null) => {
-							return entity.name === this.data.entityName && relation && relation.name === this.data.fieldName
+		const updateConstraintName =
+			this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
+				? updateEntity(this.data.entityName, renameConstraintSchemaUpdater(this.getNewConstraintName.bind(this)))
+				: undefined
+		const updateConstraintFields =
+			this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
+				? updateEntity(this.data.entityName, entity => {
+						return {
+							...entity,
+							unique: Object.fromEntries(
+								Object.entries(entity.unique).map(([name, unique]) => [
+									name,
+									{
+										...unique,
+										fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
+									},
+								]),
+							),
 						}
+				  })
+				: undefined
 
-						return acceptFieldVisitor<Model.AnyField>(this.schema.model, entity, field, {
-							visitColumn: (entity, field) => field,
-							visitManyHasOne: (entity, relation, targetEntity, targetRelation) => {
-								return isUpdatedRelation(targetEntity, targetRelation)
-									? { ...relation, inversedBy: this.data.newFieldName }
-									: relation
-							},
-							visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
-								return isUpdatedRelation(targetEntity, targetRelation)
-									? { ...relation, ownedBy: this.data.newFieldName }
-									: relation
-							},
-							visitOneHasOneOwner: (entity, relation, targetEntity, targetRelation) => {
-								return isUpdatedRelation(targetEntity, targetRelation)
-									? { ...relation, inversedBy: this.data.newFieldName }
-									: relation
-							},
-							visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
-								return isUpdatedRelation(targetEntity, targetRelation)
-									? { ...relation, ownedBy: this.data.newFieldName }
-									: relation
-							},
-							visitManyHasManyOwner: (entity, relation, targetEntity, targetRelation) => {
-								return isUpdatedRelation(targetEntity, targetRelation)
-									? { ...relation, inversedBy: this.data.newFieldName }
-									: relation
-							},
-							visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
-								return isUpdatedRelation(targetEntity, targetRelation)
-									? { ...relation, ownedBy: this.data.newFieldName }
-									: relation
-							},
-						})
-					}),
-				),
-				updateEntity(this.data.entityName, entity => {
-					const { [this.data.fieldName]: updated, ...fields } = entity.fields
-					return {
-						...entity,
-						fields: {
-							...fields,
-							[this.data.newFieldName]: { ...updated, name: this.data.newFieldName },
-						},
-					}
-				}),
-			),
-			this.version >= VERSION_ACL_PATCH
+		const updateRelationReferences = updateEveryEntity(
+			updateEveryField((field, entity) => {
+				const isUpdatedRelation = (entity: Model.Entity, relation: Model.AnyRelation | null) => {
+					return entity.name === this.data.entityName && relation && relation.name === this.data.fieldName
+				}
+
+				return acceptFieldVisitor<Model.AnyField>(this.schema.model, entity, field, {
+					visitColumn: (entity, field) => field,
+					visitManyHasOne: (entity, relation, targetEntity, targetRelation) => {
+						return isUpdatedRelation(targetEntity, targetRelation)
+							? { ...relation, inversedBy: this.data.newFieldName }
+							: relation
+					},
+					visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
+						return isUpdatedRelation(targetEntity, targetRelation)
+							? { ...relation, ownedBy: this.data.newFieldName }
+							: relation
+					},
+					visitOneHasOneOwner: (entity, relation, targetEntity, targetRelation) => {
+						return isUpdatedRelation(targetEntity, targetRelation)
+							? { ...relation, inversedBy: this.data.newFieldName }
+							: relation
+					},
+					visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
+						return isUpdatedRelation(targetEntity, targetRelation)
+							? { ...relation, ownedBy: this.data.newFieldName }
+							: relation
+					},
+					visitManyHasManyOwner: (entity, relation, targetEntity, targetRelation) => {
+						return isUpdatedRelation(targetEntity, targetRelation)
+							? { ...relation, inversedBy: this.data.newFieldName }
+							: relation
+					},
+					visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
+						return isUpdatedRelation(targetEntity, targetRelation)
+							? { ...relation, ownedBy: this.data.newFieldName }
+							: relation
+					},
+				})
+			}),
+		)
+		const updateEntityName = updateEntity(this.data.entityName, entity => {
+			const { [this.data.fieldName]: updated, ...fields } = entity.fields
+			return {
+				...entity,
+				fields: {
+					...fields,
+					[this.data.newFieldName]: { ...updated, name: this.data.newFieldName },
+				},
+			}
+		})
+		const updateAclOp =
+			this.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
 						updateAclEveryRole(
 							updateAclEveryEntity(
@@ -116,12 +143,26 @@ class UpdateFieldNameModification implements Modification<UpdateFieldNameModific
 							),
 						),
 				  )
-				: undefined,
+				: undefined
+		return updateSchema(
+			updateModel(updateConstraintName, updateConstraintFields, updateRelationReferences, updateEntityName),
+			updateAclOp,
 		)
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
+	}
+
+	private getNewConstraintName(constraint: Model.UniqueConstraint): string | null {
+		const generatedName = NamingHelper.createUniqueConstraintName(this.data.entityName, constraint.fields)
+		const isGenerated = constraint.name === generatedName
+		if (!isGenerated) {
+			null
+		}
+		const newFieldNames = constraint.fields.map(changeValue(this.data.fieldName, this.data.newFieldName))
+		const newName = NamingHelper.createUniqueConstraintName(this.data.entityName, newFieldNames)
+		return newName === constraint.name ? null : newName
 	}
 }
 

@@ -117,7 +117,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}
-				return newEntity
+				return (sortedEntities[sortedEntityIndex] = newEntity)
 			}
 			const saveElementAt = (elementIndex: number, entity?: EntityAccessor) => {
 				const targetElement = editor.children[elementIndex]
@@ -143,7 +143,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					entity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
 					const updatedEntity = getFreshContentEntityAccessor(sortedEntityIndex)
 					textElementCache.set(updatedEntity, targetElement)
-					sortedEntities[sortedEntityIndex] = updatedEntity
 				}
 			}
 			const removeElementAt = (elementIndex: number) => {

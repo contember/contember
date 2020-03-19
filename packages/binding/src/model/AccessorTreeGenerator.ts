@@ -125,12 +125,10 @@ class AccessorTreeGenerator {
 			: new EntityAccessor.UnpersistedEntityId()
 		const typename = data ? (data instanceof Accessor ? data.typename : data[TYPENAME_KEY_NAME]) : undefined
 
-		for (const placeholderName in fields) {
+		for (const [placeholderName, field] of fields) {
 			if (placeholderName === PRIMARY_KEY_NAME) {
 				continue
 			}
-
-			const field = fields[placeholderName]
 
 			if (field instanceof MarkerTreeRoot) {
 				let initialData: ReceivedData<undefined> | RootAccessor

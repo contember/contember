@@ -52,12 +52,10 @@ export class DirtinessChecker {
 		}
 
 		let isEntityDirty = false
-		entityFields: for (const placeholderName in fields) {
+		entityFields: for (const [placeholderName, marker] of fields) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}
-
-			const marker = fields[placeholderName]
 
 			if (marker instanceof FieldMarker) {
 				const accessor = node.fieldData.get(placeholderName)

@@ -104,9 +104,10 @@ export namespace MarkerFactory {
 			entityFields,
 			preferences,
 		)
-		return wrapRelativeEntityFields(relativeEntityList.hasOneRelationPath, {
-			[hasManyRelationMarker.placeholderName]: hasManyRelationMarker,
-		})
+		return wrapRelativeEntityFields(
+			relativeEntityList.hasOneRelationPath,
+			new Map([[hasManyRelationMarker.placeholderName, hasManyRelationMarker]]),
+		)
 	}
 
 	export const createConnectionMarker = (
@@ -141,9 +142,10 @@ export namespace MarkerFactory {
 		const relativeSingleField = QueryLanguage.desugarRelativeSingleField(field, environment)
 		const placeholderName = PlaceholderGenerator.getFieldPlaceholder(relativeSingleField.field)
 
-		return wrapRelativeEntityFields(relativeSingleField.hasOneRelationPath, {
-			[placeholderName]: getMarker(relativeSingleField),
-		})
+		return wrapRelativeEntityFields(
+			relativeSingleField.hasOneRelationPath,
+			new Map([[placeholderName, getMarker(relativeSingleField)]]),
+		)
 	}
 
 	export const wrapRelativeEntityFields = (
@@ -152,9 +154,7 @@ export namespace MarkerFactory {
 	): EntityFields => {
 		for (let i = hasOneRelationPath.length - 1; i >= 0; i--) {
 			const marker = createHasOneRelationMarker(hasOneRelationPath[i], entityFields)
-			entityFields = {
-				[marker.placeholderName]: marker,
-			}
+			entityFields = new Map([[marker.placeholderName, marker]])
 		}
 		return entityFields
 	}

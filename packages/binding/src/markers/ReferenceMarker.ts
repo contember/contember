@@ -62,7 +62,7 @@ class ReferenceMarker {
 			references = {
 				[placeholderName]: Object.assign(constraints, {
 					placeholderName,
-					fields: fields || {},
+					fields: fields || new Map(),
 					preferences: normalizedPreferences,
 				}),
 			}

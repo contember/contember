@@ -198,9 +198,7 @@ export class MutationGenerator {
 		}> = []
 		const nonbearingConnections: ConnectionMarker[] = []
 
-		for (const placeholderName in entityFields) {
-			const marker = entityFields[placeholderName]
-
+		for (const [placeholderName, marker] of entityFields) {
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
 				if (accessor instanceof FieldAccessor) {
@@ -327,9 +325,7 @@ export class MutationGenerator {
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
 		const allData = currentData.fieldData
 
-		for (const placeholderName in entityFields) {
-			const marker = entityFields[placeholderName]
-
+		for (const [placeholderName, marker] of entityFields) {
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
 				const persistedField = persistedData ? persistedData[placeholderName] : undefined

@@ -191,7 +191,7 @@ export class MutationGenerator {
 		entityFields: EntityFields,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		const allData = currentData.data
+		const allData = currentData.fieldData
 		const nonbearingFields: Array<{
 			placeholderName: string
 			value: FieldValue
@@ -202,7 +202,7 @@ export class MutationGenerator {
 			const marker = entityFields[placeholderName]
 
 			if (marker instanceof FieldMarker) {
-				const accessor = allData[placeholderName]
+				const accessor = allData.get(placeholderName)
 				if (accessor instanceof FieldAccessor) {
 					const value = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
 
@@ -228,7 +228,7 @@ export class MutationGenerator {
 
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
-					const accessor = allData[reference.placeholderName]
+					const accessor = allData.get(reference.placeholderName)
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (accessor instanceof EntityAccessor) {
@@ -325,13 +325,13 @@ export class MutationGenerator {
 		persistedData: ReceivedEntityData<undefined>,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
-		const allData = currentData.data
+		const allData = currentData.fieldData
 
 		for (const placeholderName in entityFields) {
 			const marker = entityFields[placeholderName]
 
 			if (marker instanceof FieldMarker) {
-				const accessor = allData[placeholderName]
+				const accessor = allData.get(placeholderName)
 				const persistedField = persistedData ? persistedData[placeholderName] : undefined
 
 				if (
@@ -353,7 +353,7 @@ export class MutationGenerator {
 
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
-					const accessor = allData[reference.placeholderName]
+					const accessor = allData.get(reference.placeholderName)
 					const persistedField = persistedData ? persistedData[reference.placeholderName] : undefined
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {

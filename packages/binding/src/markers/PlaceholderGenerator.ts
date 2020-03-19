@@ -39,12 +39,10 @@ export class PlaceholderGenerator {
 	//
 
 	public static generateMarkerTreeRootPlaceholder(marker: MarkerTreeRoot): string {
-		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.subTreeIdentifier || marker.id)
+		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.id)
 	}
 
-	public static getMarkerTreePlaceholder(subTreeIdentifier: SubTreeIdentifier): string
-	public static getMarkerTreePlaceholder(id: MarkerTreeRoot.TreeId): string
-	public static getMarkerTreePlaceholder(identifier: SubTreeIdentifier | MarkerTreeRoot.TreeId): string {
-		return `root_${identifier}`
+	public static getMarkerTreePlaceholder(id: MarkerTreeRoot.TreeId): string {
+		return id
 	}
 }

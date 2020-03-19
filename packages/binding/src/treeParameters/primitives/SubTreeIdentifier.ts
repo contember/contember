@@ -1,1 +1,1 @@
-export type SubTreeIdentifier = string
+export type SubTreeIdentifier = unknown

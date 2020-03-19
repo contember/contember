@@ -17,7 +17,7 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type AddEntityEventListener = EntityAccessor['addEventListener']
 type AddEntityListEventListener = EntityListAccessor['addEventListener']
-type OnUpdate = (updatedData: EntityAccessor.FieldData) => void
+type OnUpdate = (updatedData: EntityAccessor.FieldDatum) => void
 type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
@@ -89,7 +89,7 @@ class AccessorTreeGenerator {
 	): RootAccessor {
 		const errorNode = errors === undefined ? undefined : errors[tree.id]
 
-		const onUpdate: OnUpdate = (updatedData: EntityAccessor.FieldData) => {
+		const onUpdate: OnUpdate = (updatedData: EntityAccessor.FieldDatum) => {
 			if (
 				updatedData instanceof EntityAccessor ||
 				updatedData instanceof EntityForRemovalAccessor ||
@@ -109,13 +109,15 @@ class AccessorTreeGenerator {
 		data: AccessorTreeGenerator.InitialEntityData,
 		fields: EntityFields,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
-		onUpdate: (identifier: string, updatedData: EntityAccessor.FieldData) => void,
+		onUpdate: (identifier: string, updatedData: EntityAccessor.FieldDatum) => void,
 		onReplace: OnReplace,
 		addEventListener: AddEntityEventListener,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
-		const entityData: EntityAccessor.EntityData = {}
+		const fieldData: EntityAccessor.FieldData = new Map()
+		// In the grand scheme of things, sub trees are actually fairly rare, and so we only initialize them if necessary
+		let subTreeData: EntityAccessor.SubTreeData | undefined = undefined
 		const id = data
 			? data instanceof EntityAccessor || data instanceof EntityForRemovalAccessor
 				? data.runtimeId
@@ -149,17 +151,24 @@ class AccessorTreeGenerator {
 					initialData = this.initialData[field.id]
 				}
 
-				entityData[placeholderName] = this.generateSubTree(field, initialData, () => undefined, undefined)
+				if (subTreeData === undefined) {
+					subTreeData = new Map()
+				}
+
+				subTreeData.set(
+					field.subTreeIdentifier || field.id,
+					this.generateSubTree(field, initialData, () => undefined, undefined),
+				)
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
 					const reference = field.references[referencePlaceholder]
-					const fieldData = data
+					const fieldDatum = data
 						? data instanceof Accessor
 							? data.getField(referencePlaceholder)
 							: data[referencePlaceholder]
 						: undefined
 
-					if (fieldData instanceof FieldAccessor) {
+					if (fieldDatum instanceof FieldAccessor) {
 						throw new BindingError(
 							`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`,
 						)
@@ -170,24 +179,27 @@ class AccessorTreeGenerator {
 							? errors.children[field.fieldName] || errors.children[referencePlaceholder] || undefined
 							: undefined
 
-					const getOnReferenceUpdate = (placeholderName: string) => (newValue: EntityAccessor.FieldData) => {
+					const getOnReferenceUpdate = (placeholderName: string) => (newValue: EntityAccessor.FieldDatum) => {
 						onUpdate(placeholderName, newValue)
 					}
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
-						if (Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
+						if (Array.isArray(fieldDatum) || fieldDatum instanceof EntityListAccessor) {
 							throw new BindingError(
 								`Received a collection of entities for field '${field.fieldName}' where a single entity was expected. ` +
 									`Perhaps you wanted to use a <Repeater />?`,
 							)
 						} else if (
-							!(fieldData instanceof FieldAccessor) &&
-							(fieldData === null || typeof fieldData === 'object' || fieldData === undefined)
+							!(fieldDatum instanceof FieldAccessor) &&
+							(fieldDatum === null || typeof fieldDatum === 'object' || fieldDatum === undefined)
 						) {
-							entityData[referencePlaceholder] = this.generateEntityAccessor(
-								reference.fields,
-								fieldData || undefined,
-								referenceError,
-								getOnReferenceUpdate(referencePlaceholder),
+							fieldData.set(
+								referencePlaceholder,
+								this.generateEntityAccessor(
+									reference.fields,
+									fieldDatum || undefined,
+									referenceError,
+									getOnReferenceUpdate(referencePlaceholder),
+								),
 							)
 						} else {
 							throw new BindingError(
@@ -196,16 +208,19 @@ class AccessorTreeGenerator {
 							)
 						}
 					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
-						if (fieldData === undefined || Array.isArray(fieldData) || fieldData instanceof EntityListAccessor) {
-							entityData[referencePlaceholder] = this.generateEntityListAccessor(
-								reference.fields,
-								fieldData,
-								referenceError,
-								getOnReferenceUpdate(referencePlaceholder),
-								reference.preferences,
+						if (fieldDatum === undefined || Array.isArray(fieldDatum) || fieldDatum instanceof EntityListAccessor) {
+							fieldData.set(
+								referencePlaceholder,
+								this.generateEntityListAccessor(
+									reference.fields,
+									fieldDatum,
+									referenceError,
+									getOnReferenceUpdate(referencePlaceholder),
+									reference.preferences,
+								),
 							)
-						} else if (typeof fieldData === 'object') {
-							// Intentionally allowing `fieldData === null` here as well since this should only happen when a *hasOne
+						} else if (typeof fieldDatum === 'object') {
+							// Intentionally allowing `fieldDatum === null` here as well since this should only happen when a *hasOne
 							// relation is unlinked, e.g. a Person does not have a linked Nationality.
 							throw new BindingError(
 								`Received a referenced entity for field '${field.fieldName}' where a collection of entities was expected.` +
@@ -222,23 +237,23 @@ class AccessorTreeGenerator {
 					}
 				}
 			} else if (field instanceof FieldMarker) {
-				const fieldData = data
+				const fieldDatum = data
 					? data instanceof Accessor
 						? data.getField(placeholderName)
 						: data[placeholderName]
 					: undefined
 				if (
-					fieldData instanceof EntityListAccessor ||
-					fieldData instanceof EntityAccessor ||
-					fieldData instanceof EntityForRemovalAccessor
+					fieldDatum instanceof EntityListAccessor ||
+					fieldDatum instanceof EntityAccessor ||
+					fieldDatum instanceof EntityForRemovalAccessor
 				) {
 					return this.rejectInvalidAccessorTree()
-				} else if (Array.isArray(fieldData)) {
+				} else if (Array.isArray(fieldDatum)) {
 					throw new BindingError(
 						`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
 							`Perhaps you wanted to use a <Repeater />?`,
 					)
-				} else if (!(fieldData instanceof FieldAccessor) && typeof fieldData === 'object' && fieldData !== null) {
+				} else if (!(fieldDatum instanceof FieldAccessor) && typeof fieldDatum === 'object' && fieldDatum !== null) {
 					throw new BindingError(
 						`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
 							`Perhaps you wanted to use <HasOne />?`,
@@ -251,7 +266,11 @@ class AccessorTreeGenerator {
 							? errors.children[field.fieldName].errors
 							: []
 					const persistedValue =
-						fieldData instanceof FieldAccessor ? fieldData.persistedValue : fieldData === undefined ? null : fieldData
+						fieldDatum instanceof FieldAccessor
+							? fieldDatum.persistedValue
+							: fieldDatum === undefined
+							? null
+							: fieldDatum
 					let touchLog: Map<string, boolean> | undefined
 					const isTouchedBy = (agent: string) => (touchLog === undefined ? false : touchLog.get(agent) || false)
 					const onChange = function(
@@ -279,20 +298,23 @@ class AccessorTreeGenerator {
 						)
 					}
 					let fieldValue: FieldValue
-					if (fieldData === undefined) {
-						// `fieldData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
+					if (fieldDatum === undefined) {
+						// `fieldDatum` will be `undefined` when a repeater creates a clone based on no data or when we're creating
 						// a new entity
 						fieldValue = field.defaultValue === undefined ? null : field.defaultValue
 					} else {
-						fieldValue = fieldData instanceof FieldAccessor ? fieldData.currentValue : fieldData
+						fieldValue = fieldDatum instanceof FieldAccessor ? fieldDatum.currentValue : fieldDatum
 					}
-					entityData[placeholderName] = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+					fieldData.set(
 						placeholderName,
-						fieldValue,
-						persistedValue,
-						isTouchedBy,
-						fieldErrors,
-						onChange,
+						new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+							placeholderName,
+							fieldValue,
+							persistedValue,
+							isTouchedBy,
+							fieldErrors,
+							onChange,
+						),
 					)
 				}
 			} else if (field instanceof ConnectionMarker) {
@@ -305,7 +327,8 @@ class AccessorTreeGenerator {
 		return new EntityAccessor(
 			id,
 			typename,
-			entityData,
+			fieldData,
+			subTreeData,
 			errors ? errors.errors : [],
 			addEventListener,
 			batchUpdates,
@@ -347,7 +370,7 @@ class AccessorTreeGenerator {
 				)
 			})
 		}
-		const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldData) => {
+		const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.FieldDatum) => {
 			const entityAccessor = entityState.accessor
 			if (entityAccessor instanceof EntityAccessor) {
 				return onUpdateProxy(this.withUpdatedField(entityAccessor, updatedField, updatedData))
@@ -454,7 +477,7 @@ class AccessorTreeGenerator {
 			}
 		}
 
-		const onUpdateProxy = (key: string, newValue: EntityAccessor.FieldData) => {
+		const onUpdateProxy = (key: string, newValue: EntityAccessor.FieldDatum) => {
 			batchUpdates(getAccessor => {
 				const childState = childStates.get(key)
 				if (childState === undefined) {
@@ -573,15 +596,14 @@ class AccessorTreeGenerator {
 	private withUpdatedField(
 		original: EntityAccessor,
 		fieldPlaceholder: string,
-		newData: EntityAccessor.FieldData,
+		newData: EntityAccessor.FieldDatum,
 	): EntityAccessor {
+		original.fieldData.set(fieldPlaceholder, newData)
 		return new EntityAccessor(
 			original.runtimeId,
 			original.typename,
-			{
-				...original.data,
-				[fieldPlaceholder]: newData,
-			},
+			original.fieldData,
+			original.subTreeData,
 			original.errors,
 			original.addEventListener,
 			original.batchUpdates,
@@ -600,7 +622,8 @@ class AccessorTreeGenerator {
 		return new EntityAccessor(
 			replacement.runtimeId,
 			blueprint.typename,
-			replacement.data,
+			replacement.fieldData,
+			replacement.subTreeData,
 			blueprint.errors,
 			blueprint.addEventListener,
 			blueprint.batchUpdates,
@@ -611,7 +634,7 @@ class AccessorTreeGenerator {
 
 	private removeEntity(
 		initialEntityData: AccessorTreeGenerator.InitialEntityData,
-		currentEntity: EntityAccessor.FieldData,
+		currentEntity: EntityAccessor.FieldDatum,
 		removalType: RemovalType,
 	): EntityForRemovalAccessor | undefined {
 		if (

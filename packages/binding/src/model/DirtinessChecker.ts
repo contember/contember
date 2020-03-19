@@ -60,7 +60,7 @@ export class DirtinessChecker {
 			const marker = fields[placeholderName]
 
 			if (marker instanceof FieldMarker) {
-				const accessor = node.data[placeholderName]
+				const accessor = node.fieldData.get(placeholderName)
 				const persistedValue = persistedData ? persistedData[placeholderName] : undefined
 
 				if (!(accessor instanceof FieldAccessor)) {
@@ -90,7 +90,7 @@ export class DirtinessChecker {
 
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
-					const accessor = node.data[reference.placeholderName]
+					const accessor = node.fieldData.get(reference.placeholderName)
 					const persistedValue = persistedData ? persistedData[reference.placeholderName] : undefined
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {

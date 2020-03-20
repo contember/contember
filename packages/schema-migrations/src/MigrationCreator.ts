@@ -35,6 +35,6 @@ export class MigrationCreator {
 	}
 
 	public static createContent(modifications: Migration.Modification[]): string {
-		return JSON.stringify({ formatVersion: VERSION_LATEST, modifications }, undefined, '\t')
+		return JSON.stringify({ formatVersion: VERSION_LATEST, modifications }, undefined, '\t') + '\n'
 	}
 }

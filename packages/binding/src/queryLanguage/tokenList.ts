@@ -5,6 +5,11 @@ export namespace TokenRegExps {
 	export const identifier = /[a-zA-Z]\w*/
 }
 
+const identifier = createToken({
+	name: 'Identifier',
+	pattern: TokenRegExps.identifier,
+})
+
 export const tokens = {
 	WhiteSpace: createToken({
 		name: 'WhiteSpace',
@@ -17,10 +22,7 @@ export const tokens = {
 		pattern: TokenRegExps.entityIdentifier,
 	}),
 
-	Identifier: createToken({
-		name: 'Identifier',
-		pattern: TokenRegExps.identifier,
-	}),
+	Identifier: identifier,
 
 	DollarSign: createToken({
 		name: 'DollarSign',
@@ -75,16 +77,19 @@ export const tokens = {
 	True: createToken({
 		name: 'True',
 		pattern: /true/,
+		longer_alt: identifier,
 	}),
 
 	False: createToken({
 		name: 'False',
 		pattern: /false/,
+		longer_alt: identifier,
 	}),
 
 	Null: createToken({
 		name: 'Null',
 		pattern: /null/,
+		longer_alt: identifier,
 	}),
 
 	Equals: createToken({

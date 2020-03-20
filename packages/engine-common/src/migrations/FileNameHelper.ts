@@ -6,6 +6,7 @@ export class FileNameHelper {
 	}
 
 	public static createFileName(name: string, extension: string): string {
+		name = FileNameHelper.normalizeMigrationLabel(name)
 		return `${FileNameHelper.createTimePrefix()}-${name}.${extension}`
 	}
 
@@ -31,5 +32,9 @@ export class FileNameHelper {
 			.padStart(2, '0')
 
 		return `${year}-${month}-${day}-${hours}${minutes}${seconds}`
+	}
+
+	private static normalizeMigrationLabel(name: string) {
+		return name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 	}
 }

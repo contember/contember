@@ -20,6 +20,7 @@ import {
 	SetupCommand,
 	SignInCommand,
 	WorkspaceCreateCommand,
+	MigrationsCreateCommand,
 } from './commands'
 import { Application } from './cli'
 ;(async () => {
@@ -34,6 +35,7 @@ import { Application } from './cli'
 	const commandManager = new CommandManager({
 		['migrations:diff']: diffCommandFactory,
 		['migrations:describe']: migrationsDescribeFactory,
+		['migrations:create']: () => new MigrationsCreateCommand(),
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),

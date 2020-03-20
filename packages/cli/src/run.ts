@@ -3,7 +3,7 @@ import { register } from 'ts-node'
 import { CommandManager } from './cli/CommandManager'
 import {
 	CreateApiKeyCommand,
-	DiffCommand,
+	MigrationsDiffCommand,
 	MigrationDescribeCommand,
 	InstanceCreateCommand,
 	InstanceInfoCommand,
@@ -29,7 +29,7 @@ import { Application } from './cli'
 			module: 'commonjs',
 		},
 	})
-	const diffCommandFactory = () => new DiffCommand()
+	const diffCommandFactory = () => new MigrationsDiffCommand()
 	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({
 		['migrations:diff']: diffCommandFactory,

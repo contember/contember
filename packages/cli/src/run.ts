@@ -4,7 +4,7 @@ import { CommandManager } from './cli/CommandManager'
 import {
 	CreateApiKeyCommand,
 	DiffCommand,
-	DryRunCommand,
+	MigrationDescribeCommand,
 	InstanceCreateCommand,
 	InstanceInfoCommand,
 	InstanceLogsCommand,
@@ -30,9 +30,10 @@ import { Application } from './cli'
 		},
 	})
 	const diffCommandFactory = () => new DiffCommand()
+	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({
 		['migrations:diff']: diffCommandFactory,
-		['migrations:dry-run']: () => new DryRunCommand(),
+		['migrations:describe']: migrationsDescribeFactory,
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),
@@ -49,6 +50,9 @@ import { Application } from './cli'
 		['tenant:sign-in']: () => new SignInCommand(),
 		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
 		['tenant:invite']: () => new InviteCommand(),
+
+		// deprecated
+		['migrations:dry-run']: migrationsDescribeFactory,
 		['diff']: diffCommandFactory,
 	})
 

@@ -9,9 +9,9 @@ type Args = {
 
 type Options = {}
 
-export class DryRunCommand extends Command<Args, Options> {
+export class MigrationDescribeCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
-		configuration.description('Show SQL executed by a migration')
+		configuration.description('Describes a migration')
 		configuration.argument('project')
 		configuration.argument('migration').optional()
 	}

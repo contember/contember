@@ -1,2 +1,2 @@
 export * from './DiffCommand'
-export * from './DryRunCommand'
+export * from './MigrationDescribeCommand'

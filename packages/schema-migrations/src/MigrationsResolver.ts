@@ -1,4 +1,4 @@
-import { MigrationFilesManager } from '@contember/engine-common'
+import { MigrationFilesManager } from './MigrationFilesManager'
 import Migration from './Migration'
 import { VERSION_INITIAL } from './modifications/ModificationVersions'
 

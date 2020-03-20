@@ -1,4 +1,3 @@
-import { FileNameHelper } from '@contember/engine-common'
 import { Client, SelectBuilder } from '@contember/database'
 import {
 	LatestMigrationByStageQuery,
@@ -7,7 +6,7 @@ import {
 	StageCreator,
 	StageConfig,
 } from '@contember/engine-system-api'
-import { Migration } from '@contember/schema-migrations'
+import { FileNameHelper, Migration } from '@contember/schema-migrations'
 
 export class TesterStageManager {
 	private createdStages = new Set<string>()

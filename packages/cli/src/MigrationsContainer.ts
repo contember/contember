@@ -1,5 +1,4 @@
 import { Builder } from '@contember/dic'
-import { MigrationFilesManager } from '@contember/engine-common/dist/src/migrations/MigrationFilesManager'
 import {
 	MigrationDiffCreator,
 	MigrationSqlDryRunner,
@@ -8,6 +7,7 @@ import {
 	SchemaDiffer,
 	SchemaMigrator,
 	SchemaVersionBuilder,
+	MigrationFilesManager,
 } from '@contember/schema-migrations'
 
 export interface MigrationsContainer {

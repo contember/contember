@@ -10,3 +10,5 @@ export { default as ModificationHandlerFactory } from './modifications/Modificat
 export * from './modifications/ModificationVersions'
 export * from './utils/pgMigrateHelpers'
 export * from './modifications/Modification'
+export * from './MigrationFilesManager'
+export * from './FileNameHelper'

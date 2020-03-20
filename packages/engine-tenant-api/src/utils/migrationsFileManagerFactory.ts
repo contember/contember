@@ -1,5 +1,1 @@
-import { MigrationFilesManager } from '@contember/engine-common'
-
-export const createMigrationFilesManager = (): MigrationFilesManager => {
-	return new MigrationFilesManager(__dirname + '/../../../migrations')
-}
+export const getTenantMigrationsDirectory = () => __dirname + '/../../../migrations'

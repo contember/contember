@@ -1,4 +1,4 @@
-import { MigrationFilesManager } from '@contember/engine-common'
+import { MigrationFilesManager } from './MigrationFilesManager'
 import { Schema } from '@contember/schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaDiffer } from './SchemaDiffer'

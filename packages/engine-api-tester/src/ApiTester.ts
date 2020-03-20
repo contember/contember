@@ -1,8 +1,7 @@
 import 'jasmine'
-import { MigrationFilesManager } from '@contember/engine-common'
 import {
 	CreateInitEventCommand,
-	createMigrationFilesManager,
+	getSystemMigrationsDirectory,
 	ProjectConfig,
 	setupSystemVariables,
 	SystemContainerFactory,
@@ -15,6 +14,7 @@ import {
 	ModificationHandlerFactory,
 	SchemaMigrator,
 	SchemaVersionBuilder,
+	MigrationFilesManager,
 } from '@contember/schema-migrations'
 import {
 	GraphQlSchemaBuilderFactory,
@@ -58,8 +58,7 @@ export class ApiTester {
 		const dbName = String(process.env.TEST_DB_NAME)
 		const connection = await recreateDatabase(dbName)
 
-		const systemMigrationsManager = createMigrationFilesManager()
-		await migrate({ db: dbCredentials(dbName), schema: 'system', dir: systemMigrationsManager.directory })
+		await migrate({ db: dbCredentials(dbName), schema: 'system', dir: getSystemMigrationsDirectory() })
 		await connection.end()
 
 		const projectConnection = createConnection(dbName)

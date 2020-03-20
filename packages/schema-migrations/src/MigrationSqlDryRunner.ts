@@ -1,5 +1,5 @@
 import { MigrationsResolver } from './MigrationsResolver'
-import { FileNameHelper } from '@contember/engine-common'
+import { FileNameHelper } from './FileNameHelper'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { createMigrationBuilder } from './utils/pgMigrateHelpers'

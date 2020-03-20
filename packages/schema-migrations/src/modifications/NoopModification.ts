@@ -13,4 +13,8 @@ export class NoopModification implements Modification<{}> {
 	transformEvents(events: ContentEvent[]): ContentEvent[] | Promise<ContentEvent[]> {
 		return events
 	}
+
+	describe() {
+		return { message: '[internal]' }
+	}
 }

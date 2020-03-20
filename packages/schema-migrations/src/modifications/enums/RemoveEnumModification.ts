@@ -24,6 +24,10 @@ class RemoveEnumModification implements Modification<RemoveEnumModification.Data
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: `Remove ${this.data.enumName}` }
+	}
 }
 
 namespace RemoveEnumModification {

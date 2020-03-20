@@ -1,9 +1,8 @@
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
+import { ContentEvent, EventType } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { EventType } from '@contember/engine-common'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnName, resolveDefaultValue } from '@contember/schema-utils'
 import { escapeValue } from '../..'
@@ -24,11 +23,11 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 		})
 		if (hasSeed) {
 			if (this.data.fillValue !== undefined) {
-				builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)} 
+				builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
 	  SET ${wrapIdentifier(column.columnName)} = ${escapeValue(this.data.fillValue)}`)
 			} else if (this.data.copyValue !== undefined) {
 				const copyFrom = getColumnName(this.schema.model, entity, this.data.copyValue)
-				builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)} 
+				builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
 	  SET ${wrapIdentifier(column.columnName)} = ${wrapIdentifier(copyFrom)}`)
 			} else {
 				throw new ImplementationException()
@@ -79,6 +78,16 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 				throw e
 			}
 		})
+	}
+
+	describe({ createdEntities }: { createdEntities: string[] }) {
+		const notNull = !this.data.field.nullable
+		const hasValue = this.data.fillValue !== undefined || this.data.copyValue !== undefined
+		const failureWarning =
+			notNull && !hasValue && !createdEntities.includes(this.data.entityName)
+				? 'May fail in runtime, because column is not-null. Consider setting fillValue or copyValue'
+				: undefined
+		return { message: `Add field ${this.data.entityName}.${this.data.field.name}`, failureWarning }
 	}
 }
 

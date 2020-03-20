@@ -4,6 +4,7 @@ import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaDiffer } from './SchemaDiffer'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
 import Migration from './Migration'
+import { MigrationVersionHelper } from './MigrationVersionHelper'
 
 export class MigrationCreator {
 	constructor(
@@ -16,22 +17,29 @@ export class MigrationCreator {
 		await this.migrationFilesManager.createDirIfNotExist()
 		const jsonDiff = MigrationCreator.createContent([])
 
-		return await this.migrationFilesManager.createFile(jsonDiff, migrationName, 'json')
+		const version = MigrationVersionHelper.createVersion(migrationName)
+		return await this.migrationFilesManager.createFile(jsonDiff, version, 'json')
 	}
 
-	async createDiff(newSchema: Schema, migrationName: string): Promise<string | null> {
+	async createDiff(
+		newSchema: Schema,
+		migrationName: string,
+	): Promise<{ migration: Migration; filename: string; initialSchema: Schema } | null> {
 		await this.migrationFilesManager.createDirIfNotExist()
 
-		const currentSchema = await this.schemaVersionBuilder.buildSchema()
+		const initialSchema = await this.schemaVersionBuilder.buildSchema()
 
-		const modifications = this.schemaDiffer.diffSchemas(currentSchema, newSchema)
+		const modifications = this.schemaDiffer.diffSchemas(initialSchema, newSchema)
 		if (modifications.length === 0) {
 			return null
 		}
 
 		const jsonDiff = MigrationCreator.createContent(modifications)
+		const version = MigrationVersionHelper.createVersion(migrationName)
+		const migration: Migration = { formatVersion: VERSION_LATEST, modifications, version }
 
-		return await this.migrationFilesManager.createFile(jsonDiff, migrationName, 'json')
+		const filename = await this.migrationFilesManager.createFile(jsonDiff, version, 'json')
+		return { filename, initialSchema, migration }
 	}
 
 	public static createContent(modifications: Migration.Modification[]): string {

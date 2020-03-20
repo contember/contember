@@ -34,6 +34,10 @@ class CreateEntityModification implements Modification<CreateEntityModification.
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: `Add entity ${this.data.entity.name}` }
+	}
 }
 
 namespace CreateEntityModification {

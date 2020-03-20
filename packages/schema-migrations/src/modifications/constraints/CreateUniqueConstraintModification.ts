@@ -57,6 +57,15 @@ class CreateUniqueConstraintModification implements Modification<CreateUniqueCon
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe({ createdEntities }: { createdEntities: string[] }) {
+		return {
+			message: `Create unique constraint (${this.data.unique.fields.join(', ')}) on entity ${this.data.entityName}`,
+			failureWarning: !createdEntities.includes(this.data.entityName)
+				? 'Make sure no conflicting rows exists, otherwise this may fail in runtime.'
+				: undefined,
+		}
+	}
 }
 
 namespace CreateUniqueConstraintModification {

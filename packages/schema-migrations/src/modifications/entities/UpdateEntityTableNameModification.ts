@@ -30,6 +30,10 @@ class UpdateEntityTableNameModification implements Modification<UpdateEntityTabl
 			return { ...it, tableName: this.data.tableName }
 		})
 	}
+
+	describe() {
+		return { message: `Change table name of entity ${this.data.entityName}` }
+	}
 }
 
 namespace UpdateEntityTableNameModification {

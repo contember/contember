@@ -116,6 +116,10 @@ class UpdateEntityNameModification implements Modification<UpdateEntityNameModif
 		}
 		return NamingHelper.createUniqueConstraintName(this.data.newEntityName, constraint.fields)
 	}
+
+	describe() {
+		return { message: `Change entity name from ${this.data.entityName} to ${this.data.newEntityName}` }
+	}
 }
 
 namespace UpdateEntityNameModification {

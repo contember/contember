@@ -3,7 +3,7 @@ import { listProjects } from '../../utils/project'
 import { getProjectDirectories } from '../../NamingHelper'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { printValidationErrors } from '../../utils/schema'
-import { MigrationCreator } from '@contember/schema-migrations'
+import { MigrationCreator, MigrationDescriber } from '@contember/schema-migrations'
 
 type Args = {
 	projectName: string
@@ -30,6 +30,7 @@ export const executeCreateMigrationCommand = async (
 		migrationsDir: string
 		projectName: string
 		migrationCreator: MigrationCreator
+		migrationDescriber: MigrationDescriber
 	}) => Promise<void>,
 ) => {
 	const [projectArg, migrationName] = [input.getArgument('projectName'), input.getArgument('migrationName')]
@@ -54,6 +55,7 @@ export const executeCreateMigrationCommand = async (
 			migrationName,
 			migrationsDir,
 			migrationCreator: container.migrationCreator,
+			migrationDescriber: container.migrationsDescriber,
 		})
 
 		console.groupEnd()

@@ -109,6 +109,10 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 			return { ...it, values }
 		})
 	}
+
+	describe() {
+		return { message: `Remove field ${this.data.entityName}.${this.data.fieldName}`, isDestructive: true }
+	}
 }
 
 namespace RemoveFieldModification {

@@ -19,6 +19,10 @@ class UpdateValidationSchemaModification implements Modification<UpdateValidatio
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: 'Update validation schema' }
+	}
 }
 
 namespace UpdateValidationSchemaModification {

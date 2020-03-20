@@ -19,6 +19,10 @@ class UpdateAclSchemaModification implements Modification<UpdateAclSchemaModific
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: 'Update ACL schema' }
+	}
 }
 
 namespace UpdateAclSchemaModification {

@@ -164,6 +164,10 @@ class UpdateFieldNameModification implements Modification<UpdateFieldNameModific
 		const newName = NamingHelper.createUniqueConstraintName(this.data.entityName, newFieldNames)
 		return newName === constraint.name ? null : newName
 	}
+
+	describe() {
+		return { message: `Change field name ${this.data.entityName}.${this.data.fieldName} to ${this.data.newFieldName}` }
+	}
 }
 
 namespace UpdateFieldNameModification {

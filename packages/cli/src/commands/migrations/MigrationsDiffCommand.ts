@@ -3,6 +3,7 @@ import { Schema } from '@contember/schema'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateMigrationHelper'
+import { printMigrationDescription } from '../../utils/migrations'
 
 type Args = {
 	projectName: string
@@ -21,22 +22,27 @@ export class MigrationsDiffCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		await executeCreateMigrationCommand(input, async ({ projectDir, migrationName, migrationCreator }) => {
-			const schema: Schema = require(projectDir).default
-			try {
-				const result = await migrationCreator.createDiff(schema, migrationName)
-				if (result === null) {
-					console.log('Nothing to do')
-				} else {
-					console.log(`${result} created`)
+		await executeCreateMigrationCommand(
+			input,
+			async ({ projectDir, migrationName, migrationCreator, migrationDescriber }) => {
+				const schema: Schema = require(projectDir).default
+				try {
+					const result = await migrationCreator.createDiff(schema, migrationName)
+					if (result === null) {
+						console.log('Nothing to do')
+					} else {
+						console.log(`${result.filename} created`)
+
+						await printMigrationDescription(migrationDescriber, result.initialSchema, result.migration, { noSql: true })
+					}
+				} catch (e) {
+					if (e instanceof InvalidSchemaException) {
+						printValidationErrors(e.validationErrors, e.message)
+						return
+					}
+					throw e
 				}
-			} catch (e) {
-				if (e instanceof InvalidSchemaException) {
-					printValidationErrors(e.validationErrors, e.message)
-					return
-				}
-				throw e
-			}
-		})
+			},
+		)
 	}
 }

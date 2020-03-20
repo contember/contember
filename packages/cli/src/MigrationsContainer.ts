@@ -1,8 +1,8 @@
 import { Builder } from '@contember/dic'
 import {
 	MigrationCreator,
+	MigrationDescriber,
 	MigrationFilesManager,
-	MigrationSqlDryRunner,
 	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaDiffer,
@@ -12,9 +12,10 @@ import {
 
 export interface MigrationsContainer {
 	migrationCreator: MigrationCreator
-	migrationDryRunner: MigrationSqlDryRunner
+	migrationsDescriber: MigrationDescriber
 	schemaVersionBuilder: SchemaVersionBuilder
 	schemaDiffer: SchemaDiffer
+	migrationsResolver: MigrationsResolver
 }
 
 export class MigrationsContainerFactory {
@@ -40,11 +41,10 @@ export class MigrationsContainerFactory {
 					new MigrationCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer),
 			)
 			.addService(
-				'migrationDryRunner',
-				({ migrationsResolver, modificationHandlerFactory, schemaVersionBuilder }) =>
-					new MigrationSqlDryRunner(migrationsResolver, modificationHandlerFactory, schemaVersionBuilder),
+				'migrationsDescriber',
+				({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory),
 			)
 			.build()
-			.pick('migrationCreator', 'migrationDryRunner', 'schemaVersionBuilder', 'schemaDiffer')
+			.pick('migrationCreator', 'migrationsDescriber', 'schemaVersionBuilder', 'schemaDiffer', 'migrationsResolver')
 	}
 }

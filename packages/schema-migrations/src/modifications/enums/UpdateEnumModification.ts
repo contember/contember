@@ -29,6 +29,16 @@ class UpdateEnumModification implements Modification<UpdateEnumModification.Data
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		const currentValues = this.schema.model.enums[this.data.enumName]
+		const missingValues = currentValues.filter(it => !this.data.values.includes(it))
+		const failureWarning =
+			missingValues.length > 0
+				? `Removing values (${missingValues.join(', ')}) from enum, this may fail in runtime`
+				: undefined
+		return { message: `Update enum ${this.data.enumName}`, failureWarning }
+	}
 }
 
 namespace UpdateEnumModification {

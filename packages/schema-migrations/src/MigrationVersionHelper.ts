@@ -1,13 +1,13 @@
-export class FileNameHelper {
+export class MigrationVersionHelper {
 	public static prefixLength = 'YYYY-MM-DD-HHIISS'.length
 
 	public static extractVersion(filename: string): string {
 		return filename.substring(0, this.prefixLength)
 	}
 
-	public static createFileName(name: string, extension: string): string {
-		name = FileNameHelper.normalizeMigrationLabel(name)
-		return `${FileNameHelper.createTimePrefix()}-${name}.${extension}`
+	public static createVersion(name: string): string {
+		name = MigrationVersionHelper.normalizeMigrationLabel(name)
+		return `${MigrationVersionHelper.createTimePrefix()}-${name}`
 	}
 
 	private static createTimePrefix(): string {

@@ -74,6 +74,10 @@ class RemoveEntityModification implements Modification<RemoveEntityModification.
 			return it.tableName !== entity.tableName
 		})
 	}
+
+	describe() {
+		return { message: `Remove entity ${this.data.entityName}`, isDestructive: true }
+	}
 }
 
 namespace RemoveEntityModification {

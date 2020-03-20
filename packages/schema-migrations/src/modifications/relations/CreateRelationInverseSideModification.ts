@@ -25,6 +25,10 @@ class CreateRelationInverseSideModification implements Modification<CreateRelati
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: `Add relation ${this.data.entityName}.${this.data.relation.name}` }
+	}
 }
 
 namespace CreateRelationInverseSideModification {

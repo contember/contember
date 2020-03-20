@@ -48,6 +48,13 @@ class MakeRelationNotNullModification implements Modification<MakeRelationNotNul
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return {
+			message: `Make relation ${this.data.entityName}.${this.data.fieldName} not-nullable`,
+			failureWarning: 'Changing to not-null may fail in runtime',
+		}
+	}
 }
 
 namespace MakeRelationNotNullModification {

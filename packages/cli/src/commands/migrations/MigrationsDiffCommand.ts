@@ -44,7 +44,7 @@ export class MigrationsDiffCommand extends Command<Args, Options> {
 
 			const container = new MigrationsContainerFactory(migrationsDir).create()
 			try {
-				const result = await container.migrationDiffCreator.createDiff(schema, migrationName)
+				const result = await container.migrationCreator.createDiff(schema, migrationName)
 				if (result === null) {
 					console.log('Nothing to do')
 				} else {

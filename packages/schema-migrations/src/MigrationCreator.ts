@@ -3,8 +3,9 @@ import { Schema } from '@contember/schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaDiffer } from './SchemaDiffer'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
+import Migration from './Migration'
 
-export class MigrationDiffCreator {
+export class MigrationCreator {
 	constructor(
 		private readonly migrationFilesManager: MigrationFilesManager,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
@@ -21,8 +22,12 @@ export class MigrationDiffCreator {
 			return null
 		}
 
-		const jsonDiff = JSON.stringify({ formatVersion: VERSION_LATEST, modifications }, undefined, '\t')
+		const jsonDiff = MigrationCreator.createContent(modifications)
 
 		return await this.migrationFilesManager.createFile(jsonDiff, migrationName, 'json')
+	}
+
+	public static createContent(modifications: Migration.Modification[]): string {
+		return JSON.stringify({ formatVersion: VERSION_LATEST, modifications }, undefined, '\t')
 	}
 }

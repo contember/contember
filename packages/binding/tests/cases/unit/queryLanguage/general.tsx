@@ -16,7 +16,7 @@ describe('query language parser', () => {
 		})
 		expect(
 			Parser.parseQueryLanguageExpression(
-				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = $x).foo',
+				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = truecolor).foo',
 				Parser.EntryPoint.RelativeSingleField,
 				environment,
 			),
@@ -36,7 +36,7 @@ describe('query language parser', () => {
 				{
 					field: 'x',
 					filter: undefined,
-					reducedBy: { x: 'x' },
+					reducedBy: { x: new GraphQlBuilder.Literal('truecolor') },
 				},
 			],
 		})

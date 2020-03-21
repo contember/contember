@@ -36,7 +36,7 @@ export class MarkerTreeGenerator {
 	}
 
 	private static mapNodeResultToEntityFields(result: RawNodeRepresentation<Terminals, Nonterminals>): EntityFields {
-		const fields: EntityFields = {}
+		const fields: EntityFields = new Map()
 
 		if (!result) {
 			return fields
@@ -55,14 +55,18 @@ export class MarkerTreeGenerator {
 			) {
 				const placeholderName = marker.placeholderName
 
-				fields[placeholderName] =
-					placeholderName in fields ? MarkerTreeGenerator.mergeMarkers(fields[placeholderName], marker) : marker
+				fields.set(
+					placeholderName,
+					fields.has(placeholderName) ? MarkerTreeGenerator.mergeMarkers(fields.get(placeholderName)!, marker) : marker,
+				)
 			} else {
-				for (const placeholderName in marker) {
-					fields[placeholderName] =
-						placeholderName in fields
-							? MarkerTreeGenerator.mergeMarkers(fields[placeholderName], marker[placeholderName])
-							: marker[placeholderName]
+				for (const [placeholderName, innerMarker] of marker) {
+					fields.set(
+						placeholderName,
+						fields.has(placeholderName)
+							? MarkerTreeGenerator.mergeMarkers(fields.get(placeholderName)!, innerMarker)
+							: innerMarker,
+					)
 				}
 			}
 		}
@@ -94,7 +98,7 @@ export class MarkerTreeGenerator {
 					if (!namePresentInOriginal) {
 						newReferences[placeholderName] = {
 							placeholderName,
-							fields: {},
+							fields: new Map(),
 							filter: fresh.references[placeholderName].filter,
 							reducedBy: fresh.references[placeholderName].reducedBy,
 							expectedCount: fresh.references[placeholderName].expectedCount,
@@ -142,11 +146,13 @@ export class MarkerTreeGenerator {
 	}
 
 	private static mergeEntityFields(original: EntityFields, fresh: EntityFields): EntityFields {
-		for (const placeholderName in fresh) {
-			original[placeholderName] =
-				placeholderName in original
-					? MarkerTreeGenerator.mergeMarkers(original[placeholderName], fresh[placeholderName])
-					: fresh[placeholderName]
+		for (const [placeholderName, freshMarker] of fresh) {
+			original.set(
+				placeholderName,
+				original.has(placeholderName)
+					? MarkerTreeGenerator.mergeMarkers(original.get(placeholderName)!, freshMarker)
+					: freshMarker,
+			)
 		}
 		return original
 	}

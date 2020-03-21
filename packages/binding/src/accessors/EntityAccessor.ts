@@ -27,7 +27,8 @@ class EntityAccessor extends Accessor implements Errorable {
 	public constructor(
 		key: string | EntityAccessor.UnpersistedEntityId,
 		public readonly typename: string | undefined,
-		public readonly data: EntityAccessor.EntityData,
+		public readonly fieldData: EntityAccessor.FieldData,
+		public readonly subTreeData: EntityAccessor.SubTreeData,
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: (performUpdates: EntityAccessor.BatchUpdates) => void,
@@ -50,24 +51,24 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
-	public getField(fieldName: FieldName): EntityAccessor.FieldData
+	public getField(fieldName: FieldName): EntityAccessor.FieldDatum
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
-	): EntityAccessor.FieldData
+	): EntityAccessor.FieldDatum | undefined
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.FieldData
+	): EntityAccessor.FieldDatum | undefined
 	public getField(
 		fieldName: FieldName,
 		expectedCount?: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter?: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.FieldData {
+	): EntityAccessor.FieldDatum | undefined {
 		let placeholder: FieldName
 
 		if (expectedCount !== undefined) {
@@ -80,19 +81,11 @@ class EntityAccessor extends Accessor implements Errorable {
 			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldName)
 		}
 
-		return this.data[placeholder]
+		return this.fieldData.get(placeholder)
 	}
 
-	public getTreeRoot(subTreeIdentifier: SubTreeIdentifier): RootAccessor
-	public getTreeRoot(id: MarkerTreeRoot.TreeId): RootAccessor
-	public getTreeRoot(identifier: SubTreeIdentifier | MarkerTreeRoot.TreeId): RootAccessor {
-		const root = this.data[PlaceholderGenerator.getMarkerTreePlaceholder(identifier)]
-		if (root === undefined) {
-			throw new BindingError(`Requesting an accessor tree '${identifier}' but it does not exist.`)
-		} else if (root instanceof FieldAccessor) {
-			throw new BindingError(`Requesting an accessor tree '${identifier}' but it resolves to a field.`)
-		}
-		return root
+	public getTreeRoot(identifier: SubTreeIdentifier): RootAccessor | undefined {
+		return this.subTreeData?.get(identifier)
 	}
 
 	/**
@@ -186,10 +179,6 @@ class EntityAccessor extends Accessor implements Errorable {
 		}
 		return field
 	}
-
-	public get allFieldData(): EntityAccessor.EntityData {
-		return this.data
-	}
 }
 
 namespace EntityAccessor {
@@ -206,15 +195,11 @@ namespace EntityAccessor {
 		}
 	}
 
-	export type FieldData =
-		| undefined
-		| EntityAccessor
-		| EntityForRemovalAccessor
-		| EntityListAccessor
-		| FieldAccessor
-		| RootAccessor
+	export type FieldDatum = undefined | EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
+	export type SubTreeDatum = RootAccessor
 
-	export type EntityData = { [placeholder in FieldName]: FieldData }
+	export type FieldData = Map<FieldName, FieldDatum>
+	export type SubTreeData = Map<SubTreeIdentifier, SubTreeDatum> | undefined
 
 	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
 

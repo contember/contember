@@ -113,9 +113,7 @@ export class QueryGenerator {
 		builder = builder.column(PRIMARY_KEY_NAME)
 		builder = builder.column(TYPENAME_KEY_NAME)
 
-		for (const placeholderName in fields) {
-			const fieldValue: Marker = fields[placeholderName]
-
+		for (const [, fieldValue] of fields) {
 			if (fieldValue instanceof FieldMarker) {
 				if (fieldValue.fieldName !== PRIMARY_KEY_NAME) {
 					builder = builder.column(fieldValue.fieldName)

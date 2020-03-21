@@ -1,5 +1,5 @@
 import { Marker } from './Marker'
 
-type EntityFields = { [placeholderName: string]: Marker }
+type EntityFields = Map<string, Marker>
 
 export { EntityFields }

@@ -14,7 +14,7 @@ export default [
 		external: ['react'],
 		plugins: [
 			replace({
-				//__DEV__: 'false',
+				__DEV_MODE__: JSON.stringify(false),
 				'process.env.NODE_ENV': 'production',
 			}),
 			resolve(),

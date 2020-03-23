@@ -62,7 +62,7 @@ const resolveConfig = {
 }
 
 const getReplaceConfig = isProd => ({
-	//__DEV__: JSON.stringify(isProd ? 'true' : 'false'),
+	__DEV_MODE__: JSON.stringify(!isProd),
 	'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
 })
 

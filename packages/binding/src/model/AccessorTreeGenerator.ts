@@ -276,7 +276,7 @@ class AccessorTreeGenerator {
 						errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
 						field.fieldName in errors.children
 							? errors.children[field.fieldName].errors
-							: []
+							: emptyArray
 					const persistedValue =
 						fieldDatum instanceof FieldAccessor
 							? fieldDatum.persistedValue
@@ -341,7 +341,7 @@ class AccessorTreeGenerator {
 			typename,
 			fieldData,
 			subTreeData,
-			errors ? errors.errors : [],
+			errors ? errors.errors : emptyArray,
 			addEventListener,
 			batchUpdates,
 			onReplace,
@@ -570,7 +570,7 @@ class AccessorTreeGenerator {
 		}
 		listAccessor = new EntityListAccessor(
 			childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
-			errors ? errors.errors : [],
+			errors ? errors.errors : emptyArray,
 			addEventListener,
 			batchUpdates,
 			newEntity => {

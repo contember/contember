@@ -2,6 +2,7 @@ export * from './ChoiceField'
 
 export * from './CheckboxField'
 export * from './CheckboxList'
+export * from './ColorField'
 export * from './DateField'
 export * from './DateTimeField'
 export * from './DrivenTextField'

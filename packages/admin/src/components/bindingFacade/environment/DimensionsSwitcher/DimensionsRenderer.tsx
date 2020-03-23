@@ -142,23 +142,13 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 				if (!(entity instanceof EntityAccessor)) {
 					continue
 				}
-				const label = <Entity accessor={entity}>{props.labelFactory}</Entity>
-				let slugValue: string | undefined
-				if (props.slugField !== 'id') {
-					const slug = props.slugField === 'id' ? entity.primaryKey : entity.getField(props.slugField)
-					if (slug instanceof FieldAccessor && typeof slug.currentValue === 'string') {
-						slugValue = slug.currentValue
-					}
-				} else {
-					if (typeof entity.primaryKey === 'string') {
-						slugValue = entity.primaryKey
-					}
-				}
-				if (slugValue !== undefined) {
+				const slugField = entity.getRelativeSingleField(props.slugField)
+				if (typeof slugField.currentValue === 'string') {
+					const slugValue = slugField.currentValue
 					normalized.push({
 						slug: slugValue,
 						isSelected: currentDimensions.indexOf(slugValue) !== -1,
-						label,
+						label: <Entity accessor={entity}>{props.labelFactory}</Entity>,
 					})
 				}
 			}

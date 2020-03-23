@@ -12,7 +12,7 @@ import {
 	useEnvironment,
 } from '@contember/binding'
 import * as React from 'react'
-import { useArrayMapMemo } from '../../../../utils'
+import { useArrayMapMemo, useConstantLengthInvariant } from '../../../../utils'
 import { Block } from '../../blocks'
 import { BlockRepeater } from '../../collections'
 import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInner'
@@ -28,6 +28,15 @@ export const BlockEditor = Component<BlockEditorProps>(
 	props => {
 		const entity = useEntityContext()
 		const environment = useEnvironment()
+
+		useConstantLengthInvariant(
+			props.leadingFieldBackedElements || [],
+			'The number of leadingFieldBackedElements must remain constant between renders.',
+		)
+		useConstantLengthInvariant(
+			props.trailingFieldBackedElements || [],
+			'The number of trailingFieldBackedElements must remain constant between renders.',
+		)
 
 		const desugaredEntityList = useDesugaredRelativeEntityList(props)
 		const entityListAccessor = React.useMemo(() => entity.getRelativeEntityList(desugaredEntityList), [

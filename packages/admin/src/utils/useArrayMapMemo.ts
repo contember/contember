@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useConstantLengthInvariant } from './useConstantLengthInvariant'
 
 /**
  * ⚠️ ONLY USE THIS IF YOU *REALLY* KNOW WHAT YOU'RE DOING! ⚠️
@@ -11,6 +12,8 @@ export const useArrayMapMemo = <Item, OutputItem>(
 	items: Item[],
 	map: (value: Item, index: number, array: Item[]) => OutputItem,
 ): OutputItem[] => {
+	useConstantLengthInvariant(items)
+
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	return React.useMemo(() => items.map(map), [map, ...items])
 }

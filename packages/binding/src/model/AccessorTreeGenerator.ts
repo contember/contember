@@ -1,4 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
+import { emptyArray, returnFalse } from '@contember/react-utils'
 import { assertNever } from '../utils'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
@@ -127,6 +128,19 @@ class AccessorTreeGenerator {
 
 		for (const [placeholderName, field] of fields) {
 			if (placeholderName === PRIMARY_KEY_NAME) {
+				// Falling back to null since that's what fields do. Arguably, we could also stringify the unpersisted entity id. Which is better?
+				const idValue = typeof id === 'string' ? id : null
+				fieldData.set(
+					placeholderName,
+					new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+						placeholderName,
+						idValue,
+						idValue,
+						returnFalse, // IDs cannot be updated, and thus they cannot be touched either
+						emptyArray, // There cannot be errors associated with the id, right? If so, we should probably handle them at the Entity level.
+						undefined, // IDs cannot be updated
+					),
+				)
 				continue
 			}
 

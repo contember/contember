@@ -3,6 +3,7 @@ import {
 	Component,
 	EntityAccessor,
 	Environment,
+	FieldAccessor,
 	HasManyProps,
 	QueryLanguage,
 	RelativeSingleField,
@@ -12,7 +13,7 @@ import {
 	useEnvironment,
 } from '@contember/binding'
 import * as React from 'react'
-import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
+import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import { Block } from '../../blocks'
 import { BlockRepeater } from '../../collections'
 import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInner'
@@ -44,11 +45,15 @@ export const BlockEditor = Component<BlockEditorProps>(
 			desugaredEntityList,
 		])
 
-		const leadingDesugared = useArrayMapMemo(props.leadingFieldBackedElements || [], item =>
-			QueryLanguage.desugarRelativeSingleField(item.field, environment),
+		const desugarFieldBackedElement = React.useCallback(
+			(element: FieldBackedElement) => QueryLanguage.desugarRelativeSingleField(element.field, environment),
+			[environment],
 		)
-		const trailingDesugared = useArrayMapMemo(props.trailingFieldBackedElements || [], item =>
-			QueryLanguage.desugarRelativeSingleField(item.field, environment),
+
+		const leadingDesugared = useArrayMapMemo(props.leadingFieldBackedElements || emptyArray, desugarFieldBackedElement)
+		const trailingDesugared = useArrayMapMemo(
+			props.trailingFieldBackedElements || emptyArray,
+			desugarFieldBackedElement,
 		)
 
 		const normalizedLeading = useNormalizedFieldBackedElements(
@@ -85,10 +90,10 @@ export const BlockEditor = Component<BlockEditorProps>(
 		const field = <SugaredField field={props.textBlockField} />
 		return (
 			<>
-				{(props.leadingFieldBackedElements || []).map((item, i) => (
+				{props.leadingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`leading_${i}`} />
 				))}
-				{(props.trailingFieldBackedElements || []).map((item, i) => (
+				{props.trailingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`trailing_${i}`} />
 				))}
 				<BlockRepeater {...props}>
@@ -110,14 +115,19 @@ const useNormalizedFieldBackedElements = (
 	desugaredOriginal: RelativeSingleField[] = [],
 	original: FieldBackedElement[] = [],
 ): NormalizedFieldBackedElement[] => {
-	const accessors = useArrayMapMemo(desugaredOriginal, item => entity.getRelativeSingleField(item))
-
-	return useArrayMapMemo(
-		accessors,
-		(value, index): NormalizedFieldBackedElement => ({
+	const getRelativeSingleFields = React.useCallback(
+		(item: RelativeSingleField) => entity.getRelativeSingleField(item),
+		[entity],
+	)
+	const accessors = useArrayMapMemo(desugaredOriginal, getRelativeSingleFields)
+	const normalizeFieldBackElement = React.useCallback(
+		(value: FieldAccessor, index: number): NormalizedFieldBackedElement => ({
 			...original[index],
 			field: desugaredOriginal[index],
 			accessor: accessors[index],
 		}),
+		[accessors, desugaredOriginal, original],
 	)
+
+	return useArrayMapMemo(accessors, normalizeFieldBackElement)
 }

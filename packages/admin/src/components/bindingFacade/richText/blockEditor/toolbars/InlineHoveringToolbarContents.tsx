@@ -1,7 +1,7 @@
 import { Button, Icon } from '@contember/ui'
 import * as React from 'react'
 import { useSlate } from 'slate-react'
-import { useForceRender } from '../../../../../utils'
+import { useForceRender } from '@contember/react-utils'
 import { RichTextBooleanMarkNames } from '../../plugins'
 import { BlockSlateEditor } from '../editor'
 

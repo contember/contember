@@ -12,7 +12,7 @@ import {
 	useEnvironment,
 } from '@contember/binding'
 import * as React from 'react'
-import { useArrayMapMemo, useConstantLengthInvariant } from '../../../../utils'
+import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import { Block } from '../../blocks'
 import { BlockRepeater } from '../../collections'
 import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInner'

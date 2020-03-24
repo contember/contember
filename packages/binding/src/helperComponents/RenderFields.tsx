@@ -1,4 +1,4 @@
-import { useArrayMapMemo } from '@contember/react-utils'
+import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useEntityContext, useEnvironment } from '../accessorRetrievers'
 import { FieldAccessor } from '../accessors'
@@ -25,6 +25,11 @@ type REN = React.ReactElement | null
 
 export const RenderFields = Component<RenderFieldsProps>(
 	({ fields, render, fallbackIfUnpersisted }) => {
+		useConstantLengthInvariant(
+			fields,
+			`The number of fields in the 'fields' prop of the 'RenderFields' must remain constant between renders!`,
+		)
+
 		const entityAccessor = useEntityContext()
 		const environment = useEnvironment()
 

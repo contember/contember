@@ -6,10 +6,12 @@ import resolve from 'rollup-plugin-node-resolve'
 import visualizer from 'rollup-plugin-visualizer'
 import { reactExportedMembers } from '../../build/exportedMembers/react'
 import { reactClientMembers } from '../react-client/exportedMembers'
+import { reactUtilsMembers } from '../react-utils/exportedMembers'
 
 const commonJsConfig = {
 	namedExports: {
 		['@contember/react-client']: reactClientMembers,
+		['@contember/react-utils']: reactUtilsMembers,
 		react: reactExportedMembers,
 	},
 }

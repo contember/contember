@@ -17,6 +17,7 @@ import { reactPopperExportedMembers } from '../../build/exportedMembers/react-po
 import { regexpToAstExportedMembers } from '../../build/exportedMembers/regexp-to-ast'
 import { bindingExportedMembers } from '../binding/exportedMembers'
 import { reactClientMembers } from '../react-client/exportedMembers'
+import { reactUtilsMembers } from '../react-utils/exportedMembers'
 import { utilsExportedMembers } from '../utils/exportedMembers'
 
 const commonJsConfig = {
@@ -24,6 +25,7 @@ const commonJsConfig = {
 		['@contember/binding']: bindingExportedMembers,
 		['@contember/utils']: utilsExportedMembers,
 		['@contember/react-client']: reactClientMembers,
+		['@contember/react-utils']: reactUtilsMembers,
 		['debounce']: debounceExportedMembers,
 		react: reactExportedMembers,
 		['react-is']: reactIsExportedMembers,

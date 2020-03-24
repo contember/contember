@@ -1,0 +1,5 @@
+export * from './emptyArray'
+export * from './identityFunction'
+export * from './noop'
+export * from './returnFalse'
+export * from './returnTrue'

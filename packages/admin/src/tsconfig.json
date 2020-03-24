@@ -18,6 +18,9 @@
 			"path": "../../../packages/react-client/src"
 		},
 		{
+			"path": "../../../packages/react-utils/src"
+		},
+		{
 			"path": "../../../packages/utils/src"
 		},
 		{

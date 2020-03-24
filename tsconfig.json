@@ -8,6 +8,7 @@
 		{ "path": "./packages/cms-admin-server" },
 		{ "path": "./packages/react-client"},
 		{ "path": "./packages/react-multipass-rendering"},
+		{ "path": "./packages/react-utils"},
 		{ "path": "./packages/ui" },
 		{ "path": "./packages/utils" }
 	]

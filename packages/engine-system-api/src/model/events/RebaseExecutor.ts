@@ -3,12 +3,13 @@ import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import DiffQuery from '../queries/DiffQuery'
-import { AnyEvent } from '@contember/engine-common'
+import { ContentEvent } from '@contember/engine-common'
 import DependencyBuilder from './DependencyBuilder'
 import EventApplier from './EventApplier'
 import EventsRebaser from './EventsRebaser'
 import StageTree from '../stages/StageTree'
 import { ImplementationException } from '../../utils/exceptions'
+import { assertEveryIsContentEvent } from './eventUtils'
 
 class RebaseExecutor {
 	constructor(
@@ -31,22 +32,25 @@ class RebaseExecutor {
 		eventsInfoMatrix: StageCommonEventsMatrixQuery.Result,
 		stage: StageWithoutEvent,
 		base: StageWithoutEvent,
-		prevEventsToApply: AnyEvent[] = [],
+		prevEventsToApply: ContentEvent[] = [],
 		newBase?: string,
 	) {
 		const eventsInfo = eventsInfoMatrix[base.slug][stage.slug]
 		let newHead: string = eventsInfo.stageBEventId
-		let eventsToApply: AnyEvent[] = []
+		let eventsToApply: ContentEvent[] = []
 		if (prevEventsToApply.length > 0 || eventsInfo.distance > 0) {
-			eventsToApply =
+			const tmpEventsToApply =
 				eventsInfo.distance > 0
 					? await this.queryHandler.fetch(new DiffQuery(eventsInfo.commonEventId, eventsInfo.stageAEventId))
 					: []
+			assertEveryIsContentEvent(tmpEventsToApply)
+			eventsToApply = tmpEventsToApply
 
 			const stageEvents =
 				eventsInfoMatrix[stage.slug][base.slug].distance > 0
 					? await this.queryHandler.fetch(new DiffQuery(eventsInfo.commonEventId, eventsInfo.stageBEventId))
 					: []
+			assertEveryIsContentEvent(stageEvents)
 
 			if (eventsToApply.length === 0 && prevEventsToApply.length === 0) {
 				throw new ImplementationException()
@@ -78,7 +82,7 @@ class RebaseExecutor {
 		}
 	}
 
-	private async verifyCrossDependency(eventsA: AnyEvent[], eventsB: AnyEvent[]): Promise<boolean> {
+	private async verifyCrossDependency(eventsA: ContentEvent[], eventsB: ContentEvent[]): Promise<boolean> {
 		const dependencies = await this.dependencyBuilder.build([...eventsA, ...eventsB])
 		const ids = new Set(eventsA.map(it => it.id))
 

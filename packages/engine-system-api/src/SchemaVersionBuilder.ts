@@ -53,8 +53,4 @@ export class SchemaVersionBuilder {
 	async buildSchemaUntil(targetVersion: string): Promise<Schema> {
 		return this.internalBuilder.buildSchemaUntil(targetVersion)
 	}
-
-	async continue(schema: Schema, previousVersion: string | null, targetVersion: string): Promise<Schema> {
-		return this.internalBuilder.continue(schema, previousVersion, targetVersion)
-	}
 }

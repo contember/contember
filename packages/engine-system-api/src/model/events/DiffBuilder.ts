@@ -7,6 +7,7 @@ import DiffCountQuery from '../queries/DiffCountQuery'
 import DiffQuery from '../queries/DiffQuery'
 import { DatabaseQueryable } from '@contember/database'
 import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
+import { assertEveryIsContentEvent } from './eventUtils'
 
 class DiffBuilder {
 	constructor(
@@ -34,6 +35,7 @@ class DiffBuilder {
 		}
 
 		const events = await this.queryHandler.fetch(new DiffQuery(baseStage.event_id, headStage.event_id))
+		assertEveryIsContentEvent(events)
 		const dependencies = await this.dependencyBuilder.build(events)
 		const permissions = await this.permissionsVerifier.verify(permissionContext, headStage, baseStage, events)
 

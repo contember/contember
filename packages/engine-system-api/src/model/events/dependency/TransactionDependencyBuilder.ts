@@ -1,4 +1,4 @@
-import { AnyEvent, EventType } from '@contember/engine-common'
+import { AnyEvent, ContentEvent } from '@contember/engine-common'
 import DependencyBuilder from '../DependencyBuilder'
 
 /**
@@ -10,15 +10,12 @@ import DependencyBuilder from '../DependencyBuilder'
  *
  */
 class TransactionDependencyBuilder implements DependencyBuilder {
-	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
 		let trxId = null
 		let eventsInTrx: AnyEvent[] = []
 		let dependencies: DependencyBuilder.Dependencies = {}
 
 		for (const event of events) {
-			if (event.type === EventType.runMigration) {
-				continue
-			}
 			if (trxId !== event.transactionId) {
 				if (eventsInTrx.length > 0) {
 					dependencies = { ...dependencies, ...this.buildTransactionReferences(eventsInTrx) }

@@ -1,4 +1,4 @@
-import { AnyEvent, EventType } from '@contember/engine-common'
+import { ContentEvent } from '@contember/engine-common'
 import DependencyBuilder from '../DependencyBuilder'
 
 /**
@@ -11,13 +11,10 @@ import DependencyBuilder from '../DependencyBuilder'
  *    ^-----^
  */
 class SameRowDependencyBuilder implements DependencyBuilder {
-	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
 		const rows: { [id: string]: string[] } = {}
 		const dependencies: DependencyBuilder.Dependencies = {}
 		for (const event of events) {
-			if (event.type === EventType.runMigration) {
-				continue
-			}
 			if (!rows[event.rowId]) {
 				rows[event.rowId] = []
 			}

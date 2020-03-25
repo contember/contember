@@ -10,6 +10,7 @@ import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import { Client } from '@contember/database'
 import StageTree from '../stages/StageTree'
 import StageBySlugQuery from '../queries/StageBySlugQuery'
+import { assertEveryIsContentEvent } from './eventUtils'
 
 class ReleaseExecutor {
 	constructor(
@@ -32,6 +33,7 @@ class ReleaseExecutor {
 			return
 		}
 		const allEvents = await this.queryHandler.fetch(new DiffQuery(targetStage.event_id, sourceStage.event_id))
+		assertEveryIsContentEvent(allEvents)
 		const allEventsIds = new Set(allEvents.map(it => it.id))
 		if (!this.allEventsExists(eventsToApply, allEventsIds)) {
 			throw new Error() //todo

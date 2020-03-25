@@ -6,7 +6,6 @@ import {
 	SchemaMigrator,
 	SchemaVersionBuilder as SchemaVersionBuilderInternal,
 } from '@contember/schema-migrations'
-import MigrationsDependencyBuilder from './model/events/dependency/MigrationsDependencyBuilder'
 import SameRowDependencyBuilder from './model/events/dependency/SameRowDependencyBuilder'
 import TransactionDependencyBuilder from './model/events/dependency/TransactionDependencyBuilder'
 import DeletedRowReferenceDependencyBuilder from './model/events/dependency/DeletedRowReferenceDependencyBuilder'
@@ -95,7 +94,6 @@ namespace SystemExecutionContainer {
 					'dependencyBuilder',
 					({ schemaVersionBuilder, tableReferencingResolver }) =>
 						new DependencyBuilder.DependencyBuilderList([
-							new MigrationsDependencyBuilder(),
 							new SameRowDependencyBuilder(),
 							new TransactionDependencyBuilder(),
 							new DeletedRowReferenceDependencyBuilder(schemaVersionBuilder, tableReferencingResolver),

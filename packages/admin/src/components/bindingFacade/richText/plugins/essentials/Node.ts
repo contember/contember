@@ -27,3 +27,5 @@ export type EditorNode = Omit<Pick<UnderlyingEditor, KnownKeys<UnderlyingEditor>
 }
 
 export type Node = EditorNode | ElementNode | TextNode
+
+export type ElementSpecifics<Element extends ElementNode> = Omit<Element, 'type' | 'children'>

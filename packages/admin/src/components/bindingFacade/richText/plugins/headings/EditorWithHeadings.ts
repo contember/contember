@@ -1,10 +1,11 @@
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../essentials'
+import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../essentials'
 import { HeadingElement } from './HeadingElement'
 
 export interface WithHeadings<E extends WithAnotherNodeType<BaseEditor, HeadingElement>> {
-	isHeading: (element: ElementNode, level?: HeadingElement['level']) => element is HeadingElement
-	isWithinHeading: (level?: HeadingElement['level']) => boolean
-	toggleHeading: (level: HeadingElement['level']) => void
+	isHeading: (element: ElementNode, suchThat?: Partial<ElementSpecifics<HeadingElement>>) => element is HeadingElement
+	isWithinHeading: (suchThat?: Partial<ElementSpecifics<HeadingElement>>) => boolean
+	toggleHeading: (suchThat?: Partial<ElementSpecifics<HeadingElement>>) => void
+	getNumberedHeadingSection: (element: HeadingElement) => number[]
 }
 
 export type EditorWithHeadings<E extends BaseEditor> = WithAnotherNodeType<E, HeadingElement> &

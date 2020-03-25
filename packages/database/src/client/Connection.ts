@@ -56,7 +56,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		const client = await this.pool.connect()
 		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
 		try {
-			const result = executeQuery<Row>(client, this.eventManager, query, {})
+			const result = await executeQuery<Row>(client, this.eventManager, query, {})
 			client.release()
 			return result
 		} catch (e) {

@@ -155,15 +155,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'projectMigrator',
-					({ db, stageTree, migrationsResolver, schemaVersionBuilder, modificationHandlerFactory, providers }) =>
-						new ProjectMigrator(
-							db,
-							stageTree,
-							migrationsResolver,
-							modificationHandlerFactory,
-							schemaVersionBuilder,
-							providers,
-						),
+					({ db, stageTree, schemaVersionBuilder, modificationHandlerFactory, providers }) =>
+						new ProjectMigrator(db, stageTree, modificationHandlerFactory, schemaVersionBuilder, providers),
 				)
 				.addService('stageCreator', ({ db, eventApplier, providers }) => new StageCreator(db, eventApplier, providers))
 				.addService(

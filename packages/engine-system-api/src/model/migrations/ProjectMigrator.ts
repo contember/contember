@@ -2,7 +2,6 @@ import StageTree from '../stages/StageTree'
 import {
 	createMigrationBuilder,
 	Migration,
-	MigrationsResolver,
 	Modification,
 	ModificationHandlerFactory,
 } from '@contember/schema-migrations'
@@ -28,7 +27,6 @@ export default class ProjectMigrator {
 	constructor(
 		private readonly db: Client,
 		private readonly stageTree: StageTree,
-		private readonly migrationsResolver: MigrationsResolver,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly providers: UuidProvider,

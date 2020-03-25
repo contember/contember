@@ -1,5 +1,6 @@
 import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
 import { MaybePersonRow, PersonRow } from './types'
+import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
 
 class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 	constructor(private readonly condition: { email: string } | { id: string } | { identity_id: string }) {
@@ -19,14 +20,7 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 	}
 
 	async fetch({ db }: DatabaseQueryable): Promise<MaybePersonRow> {
-		const rows = await SelectBuilder.create<PersonRow>()
-			.select(['person', 'id'])
-			.select(['person', 'password_hash'])
-			.select(['person', 'identity_id'])
-			.select(['person', 'email'])
-			.select(['identity', 'roles'])
-			.from('person')
-			.join('identity', 'identity', expr => expr.columnsEq(['identity', 'id'], ['person', 'identity_id']))
+		const rows = await PersonQueryBuilderFactory.createPersonQueryBuilder()
 			.where(expr => this.applyCondition(expr))
 			.getResult(db)
 

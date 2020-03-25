@@ -4,7 +4,6 @@ import {
 	AddProjectMemberCommand,
 	AddProjectMemberCommandError,
 	CommandBus,
-	MembershipInput,
 	MembershipUpdateInput,
 	RemoveProjectMemberCommand,
 	UpdateProjectMemberCommand,
@@ -16,7 +15,7 @@ import { AddProjectMemberErrorCode } from '../../schema'
 import { ProjectRolesByIdentityQuery } from '../queries'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
 import { ProjectRole } from '@contember/engine-common'
-import { notEmpty } from '../../utils/array'
+import { indexListBy, notEmpty } from '../../utils/array'
 import { createSetMembershipVariables } from './membershipUtils'
 
 class ProjectMemberManager {
@@ -84,11 +83,11 @@ class ProjectMemberManager {
 		project: { id: string } | { slug: string },
 		identity: { id: string; roles?: string[] },
 		verifier: AccessVerifier | undefined,
-	): Promise<ProjectMembershipByIdentityQuery.Result> {
+	): Promise<readonly Membership[]> {
 		if (identity.roles?.includes(TenantRole.SUPER_ADMIN)) {
 			return [{ role: ProjectRole.ADMIN, variables: [] }]
 		}
-		const memberships = await this.queryHandler.fetch(new ProjectMembershipByIdentityQuery(project, identity.id))
+		const memberships = await this.queryHandler.fetch(new ProjectMembershipByIdentityQuery(project, [identity.id]))
 		if (verifier === undefined) {
 			return memberships
 		}
@@ -100,24 +99,23 @@ class ProjectMemberManager {
 		accessVerifier: AccessVerifier,
 	): Promise<ProjectMemberManager.GetProjectMembersResponse> {
 		const members = await this.queryHandler.fetch(new ProjectMembersQuery(projectId))
-
-		return (
-			await Promise.all(
-				members.map(async it => {
-					const memberships = await this.getProjectMemberships({ id: projectId }, { id: it.id }, accessVerifier)
-					if (memberships.length === 0) {
-						return null
-					}
-					return {
-						identity: it,
-						memberships: memberships,
-					}
-				}),
-			)
-		).filter(notEmpty)
+		const memberships = await this.queryHandler.fetch(
+			new ProjectMembershipByIdentityQuery(
+				{ id: projectId },
+				members.map(it => it.id),
+			),
+		)
+		const filteredMemberships = await this.filterMemberships(memberships, accessVerifier)
+		const byIdentity = indexListBy(filteredMemberships, 'identityId')
+		return members
+			.map(it => (byIdentity[it.id] ? { identity: it, memberships: byIdentity[it.id] } : null))
+			.filter(notEmpty)
 	}
 
-	private async filterMemberships(memberships: readonly Membership[], verifier: AccessVerifier): Promise<Membership[]> {
+	private async filterMemberships<T extends Membership>(
+		memberships: readonly T[],
+		verifier: AccessVerifier,
+	): Promise<T[]> {
 		const filteredMemberships = await Promise.all(
 			memberships.map(async membership => {
 				if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([{ role: membership.role, variables: [] }])))) {
@@ -132,7 +130,7 @@ class ProjectMemberManager {
 				if (variables.find(it => it.values.length === 0)) {
 					return null
 				}
-				return { role: membership.role, variables }
+				return { ...membership, variables }
 			}),
 		)
 		return filteredMemberships.filter(notEmpty)

@@ -3,7 +3,7 @@ import { byProjectSlug } from './ProjectSlugSpecification'
 import { Membership } from '../type/Membership'
 
 class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipByIdentityQuery.Result> {
-	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string) {
+	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string[]) {
 		super()
 	}
 
@@ -16,9 +16,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 				qb
 					.select(['project_membership', 'id'])
 					.select(['project_membership', 'role'])
-					.where({
-						identity_id: this.identityId,
-					})
+					.where(expr => expr.in('identity_id', this.identityId))
 					.from('project_membership')
 					.match(qb =>
 						'id' in this.project
@@ -48,7 +46,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 }
 
 namespace ProjectMembershipByIdentityQuery {
-	export type Row = Membership
+	export type Row = Membership & { identityId: string }
 	export type Result = readonly Row[]
 }
 

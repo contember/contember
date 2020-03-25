@@ -79,20 +79,20 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor, forceRender],
 	)
 
-	const isHeading1 = editor.isWithinHeading(1)
+	const isHeading1 = editor.isWithinHeading({ level: 1 })
 	const toggleHeading1 = React.useCallback(
 		(e: React.MouseEvent) => {
 			onMouseDownCommon(e)
-			editor.toggleHeading(1)
+			editor.toggleHeading({ level: 1 })
 		},
 		[editor],
 	)
 
-	const isHeading2 = editor.isWithinHeading(2)
+	const isHeading2 = editor.isWithinHeading({ level: 2 })
 	const toggleHeading2 = React.useCallback(
 		(e: React.MouseEvent) => {
 			onMouseDownCommon(e)
-			editor.toggleHeading(2)
+			editor.toggleHeading({ level: 2 })
 		},
 		[editor],
 	)

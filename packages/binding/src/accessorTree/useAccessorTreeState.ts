@@ -119,6 +119,7 @@ export const useAccessorTreeState = ({
 							},
 							data.data,
 						)
+						dirtinessCheckerRef.current = new DirtinessChecker(markerTree, persistedData)
 						return Promise.reject({
 							type: MutationErrorType.InvalidInput,
 						})
@@ -146,6 +147,7 @@ export const useAccessorTreeState = ({
 									triggerPersist,
 								})
 							})
+							dirtinessCheckerRef.current = new DirtinessChecker(markerTree, queryData.data)
 							return Promise.resolve({
 								type: PersistResultSuccessType.JustSuccess,
 								persistedEntityIds,

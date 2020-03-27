@@ -112,7 +112,7 @@ export const useAccessorTreeState = ({
 		[accessorTreeGenerator, markerTree, triggerPersist],
 	)
 
-	triggerPersistRef.current = (): Promise<SuccessfulPersistResult> => {
+	triggerPersistRef.current = async (): Promise<SuccessfulPersistResult> => {
 		if (stateRef.current.name !== AccessorTreeStateName.Interactive) {
 			return Promise.resolve<NothingToPersistPersistResult>({
 				type: PersistResultSuccessType.NothingToPersist,
@@ -133,55 +133,55 @@ export const useAccessorTreeState = ({
 		dispatch({
 			type: AccessorTreeStateActionType.InitializeMutation,
 		})
-		return sendMutation(mutation, {}, sessionToken)
-			.catch(rejectFailedRequest)
-			.then(data => {
-				const normalizedData = data.data === null ? {} : data.data
-				const aliases = Object.keys(normalizedData)
-				const allSubMutationsOk = aliases.every(item => data.data[item].ok)
+		try {
+			const data = await sendMutation(mutation, {}, sessionToken)
+			const normalizedData = data.data === null ? {} : data.data
+			const aliases = Object.keys(normalizedData)
+			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
 
-				if (!allSubMutationsOk) {
-					initializeAccessorTree(persistedData, latestAccessorTree, data.data)
-					return Promise.reject({
-						type: MutationErrorType.InvalidInput,
-					})
-				}
-				const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
+			if (!allSubMutationsOk) {
+				initializeAccessorTree(persistedData, latestAccessorTree, data.data)
+				return Promise.reject({
+					type: MutationErrorType.InvalidInput,
+				})
+			}
+			const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
 
-				if (!query) {
-					dispatch({
-						type: AccessorTreeStateActionType.SetData,
-						data: latestAccessorTree,
-						triggerPersist,
-					})
-					return Promise.resolve({
-						type: PersistResultSuccessType.JustSuccess,
-						persistedEntityIds,
-					})
-				}
+			if (!query) {
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: latestAccessorTree,
+					triggerPersist,
+				})
+				return Promise.resolve({
+					type: PersistResultSuccessType.JustSuccess,
+					persistedEntityIds,
+				})
+			}
 
-				return sendQuery(query, {}, sessionToken)
-					.then(queryData => {
-						initializeAccessorTree(queryData.data, queryData.data)
-						return Promise.resolve({
-							type: PersistResultSuccessType.JustSuccess,
-							persistedEntityIds,
-						})
-					})
-					.catch(() => {
-						dispatch({
-							type: AccessorTreeStateActionType.SetData,
-							data: latestAccessorTree,
-							triggerPersist,
-						})
-						// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
-						// data made it successfully to the server. Thus we'll just resolve from here no matter what.
-						return Promise.resolve({
-							type: PersistResultSuccessType.JustSuccess,
-							persistedEntityIds,
-						})
-					})
-			})
+			try {
+				const queryData = await sendQuery(query, {}, sessionToken)
+				initializeAccessorTree(queryData.data, queryData.data)
+				return Promise.resolve({
+					type: PersistResultSuccessType.JustSuccess,
+					persistedEntityIds,
+				})
+			} catch {
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: latestAccessorTree,
+					triggerPersist,
+				})
+				// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
+				// data made it successfully to the server. Thus we'll just resolve from here no matter what.
+				return Promise.resolve({
+					type: PersistResultSuccessType.JustSuccess,
+					persistedEntityIds,
+				})
+			}
+		} catch (metadata) {
+			return rejectFailedRequest(metadata)
+		}
 	}
 
 	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions).

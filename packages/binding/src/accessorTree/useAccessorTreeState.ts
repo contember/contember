@@ -206,7 +206,7 @@ export const useAccessorTreeState = ({
 				(isForcingRefreshRef.current || queryStateRef.current.readyState === ApiRequestReadyState.Uninitialized)
 			) {
 				if (query === undefined) {
-					// We're creating
+					// We're creating AND there are no subqueries
 					initializeAccessorTree(undefined, undefined)
 					isForcingRefreshRef.current = false
 				} else {

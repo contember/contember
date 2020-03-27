@@ -136,6 +136,7 @@ class AccessorTreeGenerator {
 						placeholderName,
 						idValue,
 						idValue,
+						undefined,
 						returnFalse, // IDs cannot be updated, and thus they cannot be touched either
 						emptyArray, // There cannot be errors associated with the id, right? If so, we should probably handle them at the Entity level.
 						undefined, // IDs cannot be updated
@@ -303,6 +304,7 @@ class AccessorTreeGenerator {
 								placeholderName,
 								newValue,
 								persistedValue,
+								field.defaultValue,
 								isTouchedBy,
 								fieldErrors,
 								onChange,
@@ -323,6 +325,7 @@ class AccessorTreeGenerator {
 							placeholderName,
 							fieldValue,
 							persistedValue,
+							field.defaultValue,
 							isTouchedBy,
 							fieldErrors,
 							onChange,

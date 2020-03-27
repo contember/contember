@@ -10,6 +10,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted | null,
 		public readonly persistedValue: Persisted | null,
+		public readonly defaultValue: Persisted | undefined,
 		public readonly isTouchedBy: (agent: string) => boolean,
 		public readonly errors: ErrorAccessor[],
 		public readonly updateValue:
@@ -37,6 +38,13 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 
 	public get isTouched() {
 		return this.isTouchedBy(FieldAccessor.userAgent)
+	}
+
+	public get resolvedValue() {
+		if (this.defaultValue === undefined) {
+			return this.currentValue
+		}
+		return this.currentValue === null ? this.defaultValue : this.currentValue
 	}
 }
 namespace FieldAccessor {

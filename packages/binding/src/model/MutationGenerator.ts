@@ -2,7 +2,7 @@ import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
 import { ReceivedData, ReceivedEntityData } from '../accessorTree'
-import { PRIMARY_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { BindingError } from '../BindingError'
 import {
 	ConnectionMarker,
@@ -199,6 +199,9 @@ export class MutationGenerator {
 		const nonbearingConnections: ConnectionMarker[] = []
 
 		for (const [placeholderName, marker] of entityFields) {
+			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+				continue
+			}
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
 				if (accessor instanceof FieldAccessor) {
@@ -326,6 +329,9 @@ export class MutationGenerator {
 		const allData = currentData.fieldData
 
 		for (const [placeholderName, marker] of entityFields) {
+			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+				continue
+			}
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
 				const persistedValue = persistedData ? persistedData[placeholderName] : undefined

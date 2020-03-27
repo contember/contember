@@ -202,16 +202,16 @@ export class MutationGenerator {
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
 				if (accessor instanceof FieldAccessor) {
-					const value = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
+					const resolvedValue = accessor.resolvedValue
 
-					if (value !== undefined && value !== null) {
+					if (resolvedValue !== undefined && resolvedValue !== null) {
 						if (marker.isNonbearing) {
 							nonbearingFields.push({
-								value,
+								value: resolvedValue,
 								placeholderName,
 							})
 						} else {
-							builder = builder.set(placeholderName, value)
+							builder = builder.set(placeholderName, resolvedValue)
 						}
 					}
 				}
@@ -328,14 +328,13 @@ export class MutationGenerator {
 		for (const [placeholderName, marker] of entityFields) {
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
-				const persistedField = persistedData ? persistedData[placeholderName] : undefined
+				const persistedValue = persistedData ? persistedData[placeholderName] : undefined
 
-				if (
-					accessor instanceof FieldAccessor &&
-					persistedField !== accessor.currentValue &&
-					persistedField !== undefined
-				) {
-					builder = builder.set(placeholderName, accessor.currentValue)
+				if (accessor instanceof FieldAccessor && persistedValue !== undefined) {
+					const resolvedValue = accessor.resolvedValue
+					if (persistedValue !== resolvedValue) {
+						builder = builder.set(placeholderName, resolvedValue)
+					}
 				}
 			} else if (marker instanceof ReferenceMarker) {
 				let unreducedHasOnePresent = false

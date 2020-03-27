@@ -10,6 +10,8 @@ import EventsRebaser from './EventsRebaser'
 import StageTree from '../stages/StageTree'
 import { ImplementationException } from '../../utils/exceptions'
 import { assertEveryIsContentEvent } from './eventUtils'
+import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
+import { Schema } from '@contember/schema'
 
 class RebaseExecutor {
 	constructor(
@@ -18,6 +20,7 @@ class RebaseExecutor {
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
 		private readonly stageTree: StageTree,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async rebaseAll() {
@@ -38,6 +41,7 @@ class RebaseExecutor {
 		const eventsInfo = eventsInfoMatrix[base.slug][stage.slug]
 		let newHead: string = eventsInfo.stageBEventId
 		let eventsToApply: ContentEvent[] = []
+		const schema = await this.schemaVersionBuilder.buildSchema()
 		if (prevEventsToApply.length > 0 || eventsInfo.distance > 0) {
 			const tmpEventsToApply =
 				eventsInfo.distance > 0
@@ -57,7 +61,7 @@ class RebaseExecutor {
 			}
 
 			if (stageEvents.length > 0) {
-				if (!this.verifyCrossDependency(stageEvents, eventsToApply)) {
+				if (!this.verifyCrossDependency(schema, stageEvents, eventsToApply)) {
 					throw new Error('Cannot rebase, unresolvable dependencies')
 				}
 			}
@@ -82,8 +86,12 @@ class RebaseExecutor {
 		}
 	}
 
-	private async verifyCrossDependency(eventsA: ContentEvent[], eventsB: ContentEvent[]): Promise<boolean> {
-		const dependencies = await this.dependencyBuilder.build([...eventsA, ...eventsB])
+	private async verifyCrossDependency(
+		schema: Schema,
+		eventsA: ContentEvent[],
+		eventsB: ContentEvent[],
+	): Promise<boolean> {
+		const dependencies = await this.dependencyBuilder.build(schema, [...eventsA, ...eventsB])
 		const ids = new Set(eventsA.map(it => it.id))
 
 		return (

@@ -8,12 +8,14 @@ import DiffQuery from '../queries/DiffQuery'
 import { DatabaseQueryable } from '@contember/database'
 import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
 import { assertEveryIsContentEvent } from './eventUtils'
+import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 
 class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly permissionsVerifier: EventsPermissionsVerifier,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async build(
@@ -36,7 +38,8 @@ class DiffBuilder {
 
 		const events = await this.queryHandler.fetch(new DiffQuery(baseStage.event_id, headStage.event_id))
 		assertEveryIsContentEvent(events)
-		const dependencies = await this.dependencyBuilder.build(events)
+		const schema = await this.schemaVersionBuilder.buildSchema()
+		const dependencies = await this.dependencyBuilder.build(schema, events)
 		const permissions = await this.permissionsVerifier.verify(permissionContext, headStage, baseStage, events)
 
 		return {

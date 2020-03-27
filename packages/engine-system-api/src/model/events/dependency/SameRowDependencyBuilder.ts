@@ -1,5 +1,6 @@
 import { ContentEvent } from '@contember/engine-common'
 import DependencyBuilder from '../DependencyBuilder'
+import { Schema } from '@contember/schema'
 
 /**
  * Events on a same row are depending on each other. Meaning that
@@ -11,7 +12,7 @@ import DependencyBuilder from '../DependencyBuilder'
  *    ^-----^
  */
 class SameRowDependencyBuilder implements DependencyBuilder {
-	async build(events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
 		const rows: { [id: string]: string[] } = {}
 		const dependencies: DependencyBuilder.Dependencies = {}
 		for (const event of events) {

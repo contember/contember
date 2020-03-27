@@ -11,6 +11,7 @@ import { Client } from '@contember/database'
 import StageTree from '../stages/StageTree'
 import StageBySlugQuery from '../queries/StageBySlugQuery'
 import { assertEveryIsContentEvent } from './eventUtils'
+import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 
 class ReleaseExecutor {
 	constructor(
@@ -21,6 +22,7 @@ class ReleaseExecutor {
 		private readonly eventsRebaser: EventsRebaser,
 		private readonly stageTree: StageTree,
 		private readonly db: Client,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async execute(
@@ -38,7 +40,8 @@ class ReleaseExecutor {
 		if (!this.allEventsExists(eventsToApply, allEventsIds)) {
 			throw new Error() //todo
 		}
-		const dependencies = await this.dependencyBuilder.build(allEvents)
+		const schema = await this.schemaVersionBuilder.buildSchema()
+		const dependencies = await this.dependencyBuilder.build(schema, allEvents)
 		if (!this.verifyDependencies(eventsToApply, dependencies)) {
 			throw new Error() //todo
 		}

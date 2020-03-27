@@ -92,12 +92,12 @@ namespace SystemExecutionContainer {
 				.addService('tableReferencingResolver', () => new TableReferencingResolver())
 				.addService(
 					'dependencyBuilder',
-					({ schemaVersionBuilder, tableReferencingResolver }) =>
+					({ tableReferencingResolver }) =>
 						new DependencyBuilder.DependencyBuilderList([
 							new SameRowDependencyBuilder(),
 							new TransactionDependencyBuilder(),
-							new DeletedRowReferenceDependencyBuilder(schemaVersionBuilder, tableReferencingResolver),
-							new CreatedRowReferenceDependencyBuilder(schemaVersionBuilder, tableReferencingResolver),
+							new DeletedRowReferenceDependencyBuilder(tableReferencingResolver),
+							new CreatedRowReferenceDependencyBuilder(tableReferencingResolver),
 						]),
 				)
 				.addService(
@@ -113,8 +113,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'diffBuilder',
-					({ dependencyBuilder, queryHandler, permissionVerifier }) =>
-						new DiffBuilder(dependencyBuilder, queryHandler, permissionVerifier),
+					({ dependencyBuilder, queryHandler, permissionVerifier, schemaVersionBuilder }) =>
+						new DiffBuilder(dependencyBuilder, queryHandler, permissionVerifier, schemaVersionBuilder),
 				)
 				.addService(
 					'eventApplier',
@@ -125,12 +125,28 @@ namespace SystemExecutionContainer {
 				.addService('stageTree', ({ project }) => new StageTree.Factory().create(project))
 				.addService(
 					'rebaseExecutor',
-					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree }) =>
-						new RebaseExecutor(queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree),
+					({ queryHandler, dependencyBuilder, eventApplier, eventsRebaser, stageTree, schemaVersionBuilder }) =>
+						new RebaseExecutor(
+							queryHandler,
+							dependencyBuilder,
+							eventApplier,
+							eventsRebaser,
+							stageTree,
+							schemaVersionBuilder,
+						),
 				)
 				.addService(
 					'releaseExecutor',
-					({ queryHandler, dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, stageTree, db }) =>
+					({
+						queryHandler,
+						dependencyBuilder,
+						permissionVerifier,
+						eventApplier,
+						eventsRebaser,
+						stageTree,
+						db,
+						schemaVersionBuilder,
+					}) =>
 						new ReleaseExecutor(
 							queryHandler,
 							dependencyBuilder,
@@ -139,6 +155,7 @@ namespace SystemExecutionContainer {
 							eventsRebaser,
 							stageTree,
 							db,
+							schemaVersionBuilder,
 						),
 				)
 				.addService(

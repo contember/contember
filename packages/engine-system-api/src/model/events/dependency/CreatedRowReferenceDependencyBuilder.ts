@@ -2,6 +2,7 @@ import { AnyEvent, ContentEvent, EventType } from '@contember/engine-common'
 import DependencyBuilder from '../DependencyBuilder'
 import TableReferencingResolver from '../TableReferencingResolver'
 import { SchemaVersionBuilder } from '../../../SchemaVersionBuilder'
+import { Schema } from '@contember/schema'
 
 /**
  * Events that references a row depends on creation of such event (or its following update)
@@ -16,17 +17,13 @@ import { SchemaVersionBuilder } from '../../../SchemaVersionBuilder'
  *
  */
 class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
-	constructor(
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly tableReferencingResolver: TableReferencingResolver,
-	) {}
+	constructor(private readonly tableReferencingResolver: TableReferencingResolver) {}
 
-	async build(events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
 		if (events.length === 0) {
 			return {}
 		}
 
-		let [schema, schemaVersion] = await this.schemaVersionBuilder.buildSchemaForEvent(events[0].id)
 		let tableReferencing: TableReferencingResolver.Result | null = null
 
 		const dependencies: DependencyBuilder.Dependencies = {}

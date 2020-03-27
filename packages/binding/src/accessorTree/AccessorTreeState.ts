@@ -6,7 +6,7 @@ export enum AccessorTreeStateName {
 	Uninitialized = 'uninitialized',
 	Querying = 'querying',
 	RequestError = 'requestError',
-	Interactive = 'ready',
+	Interactive = 'interactive',
 	Mutating = 'mutating',
 }
 

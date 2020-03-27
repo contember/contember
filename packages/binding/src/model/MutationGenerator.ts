@@ -2,7 +2,7 @@ import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
 import { ReceivedData, ReceivedEntityData } from '../accessorTree'
-import { PRIMARY_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { BindingError } from '../BindingError'
 import {
 	ConnectionMarker,
@@ -199,19 +199,22 @@ export class MutationGenerator {
 		const nonbearingConnections: ConnectionMarker[] = []
 
 		for (const [placeholderName, marker] of entityFields) {
+			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+				continue
+			}
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
 				if (accessor instanceof FieldAccessor) {
-					const value = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
+					const resolvedValue = accessor.resolvedValue
 
-					if (value !== undefined && value !== null) {
+					if (resolvedValue !== undefined && resolvedValue !== null) {
 						if (marker.isNonbearing) {
 							nonbearingFields.push({
-								value,
+								value: resolvedValue,
 								placeholderName,
 							})
 						} else {
-							builder = builder.set(placeholderName, value)
+							builder = builder.set(placeholderName, resolvedValue)
 						}
 					}
 				}
@@ -326,16 +329,18 @@ export class MutationGenerator {
 		const allData = currentData.fieldData
 
 		for (const [placeholderName, marker] of entityFields) {
+			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+				continue
+			}
 			if (marker instanceof FieldMarker) {
 				const accessor = allData.get(placeholderName)
-				const persistedField = persistedData ? persistedData[placeholderName] : undefined
+				const persistedValue = persistedData ? persistedData[placeholderName] : undefined
 
-				if (
-					accessor instanceof FieldAccessor &&
-					persistedField !== accessor.currentValue &&
-					persistedField !== undefined
-				) {
-					builder = builder.set(placeholderName, accessor.currentValue)
+				if (accessor instanceof FieldAccessor && persistedValue !== undefined) {
+					const resolvedValue = accessor.resolvedValue
+					if (persistedValue !== resolvedValue) {
+						builder = builder.set(placeholderName, resolvedValue)
+					}
 				}
 			} else if (marker instanceof ReferenceMarker) {
 				let unreducedHasOnePresent = false

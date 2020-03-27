@@ -68,12 +68,7 @@ export class DirtinessChecker {
 					continue
 				}
 
-				let resolvedValue
-				if (marker.defaultValue === undefined) {
-					resolvedValue = accessor.currentValue
-				} else {
-					resolvedValue = accessor.currentValue === null ? marker.defaultValue : accessor.currentValue
-				}
+				const resolvedValue = accessor.resolvedValue
 				const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
 
 				if (

@@ -235,9 +235,10 @@ export namespace QueryLanguage {
 			connectTo: unsugarableFieldList.connectTo
 				? desugarUniqueWhere(unsugarableFieldList.connectTo, environment)
 				: undefined,
-			defaultValue: unsugarableFieldList.defaultValue
-				? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
-				: undefined,
+			defaultValue:
+				unsugarableFieldList.defaultValue !== undefined
+					? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
+					: undefined,
 			isNonbearing: unsugarableFieldList.isNonbearing,
 			...desugarEntityListParameters(
 				{
@@ -340,9 +341,10 @@ export namespace QueryLanguage {
 			hasOneRelationPath,
 			field: fieldName,
 			isNonbearing: unsugarableField.isNonbearing,
-			defaultValue: unsugarableField.defaultValue
-				? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)
-				: undefined,
+			defaultValue:
+				unsugarableField.defaultValue !== undefined
+					? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)
+					: undefined,
 		}
 	}
 

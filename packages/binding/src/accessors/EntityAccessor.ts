@@ -124,6 +124,9 @@ class EntityAccessor extends Accessor implements Errorable {
 
 	/**
 	 * If field is a string, it *MUST NOT* make use of QL
+	 *
+	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameters
+	 * are really just a way to succinctly write a type cast. Nothing more, really.
 	 */
 	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 		field: RelativeSingleField | DesugaredRelativeSingleField | string,

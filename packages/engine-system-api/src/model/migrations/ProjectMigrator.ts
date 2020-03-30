@@ -1,24 +1,20 @@
 import StageTree from '../stages/StageTree'
-import {
-	createMigrationBuilder,
-	Migration,
-	Modification,
-	ModificationHandlerFactory,
-} from '@contember/schema-migrations'
+import { Migration, Modification, ModificationHandlerFactory } from '@contember/schema-migrations'
+import { createMigrationBuilder } from '@contember/database-migrations'
 import { Client, DatabaseQueryable, wrapIdentifier } from '@contember/database'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
-import { formatSchemaName } from '../helpers/stageHelpers'
-import { emptySchema } from '@contember/schema-utils'
+import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
 import CreateEventCommand from '../commands/CreateEventCommand'
-import { ContentEvent, EventType, isContentEvent } from '@contember/engine-common'
+import { ContentEvent, EventType } from '@contember/engine-common'
 import { Stage, StageWithoutEvent } from '../dtos/Stage'
 import { QueryHandler } from '@contember/queryable'
-import DiffQuery from '../queries/DiffQuery'
+import { DiffQuery } from '../queries'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import RecreateContentEvent from '../commands/RecreateContentEvent'
 import { UuidProvider } from '../../utils/uuid'
+import { assertEveryIsContentEvent } from '../events/eventUtils'
+import { SaveMigrationCommand } from '../commands/SaveMigrationCommand'
 import { VERSION_INITIAL } from '@contember/schema-migrations/dist/src/modifications/ModificationVersions'
 
 type StageEventsMap = Record<string, ContentEvent[]>
@@ -28,19 +24,13 @@ export default class ProjectMigrator {
 		private readonly db: Client,
 		private readonly stageTree: StageTree,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly providers: UuidProvider,
 	) {}
 
-	public async migrate(
-		currentVersion: string | null,
-		migrationsToExecute: Migration[],
-		progressCb: (version: string) => void,
-	) {
+	public async migrate(schema: Schema, migrationsToExecute: Migration[], progressCb: (version: string) => void) {
 		const queryHandler = this.db.createQueryHandler()
 		const rootStage = this.stageTree.getRoot()
 		const commonEventsMatrix = await queryHandler.fetch(new StageCommonEventsMatrixQuery())
-		let schema = currentVersion ? await this.schemaVersionBuilder.buildSchema(currentVersion) : emptySchema
 		let stageEvents = await this.fetchStageEvents(queryHandler, commonEventsMatrix, rootStage)
 
 		let previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
@@ -60,6 +50,7 @@ export default class ProjectMigrator {
 				previousId,
 				this.providers,
 			).execute(this.db)
+			await new SaveMigrationCommand(migration).execute(this.db)
 		}
 
 		await new UpdateStageEventCommand(rootStage.slug, previousId).execute(this.db)
@@ -131,14 +122,11 @@ export default class ProjectMigrator {
 				eventsMatrix[child.slug][stage.slug].distance > 0
 					? await queryHandler.fetch(new DiffQuery(info.commonEventId, info.stageBEventId))
 					: []
-			for (const event of events) {
-				if (!isContentEvent(event)) {
-					throw new Error()
-				}
-			}
+			assertEveryIsContentEvent(events)
+
 			result = {
 				...result,
-				[child.slug]: events as ContentEvent[],
+				[child.slug]: events,
 				...(await this.fetchStageEvents(queryHandler, eventsMatrix, child)),
 			}
 		}

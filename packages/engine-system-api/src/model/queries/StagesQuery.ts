@@ -14,4 +14,4 @@ class StagesQuery extends DatabaseQuery<Stage[]> {
 	}
 }
 
-export default StagesQuery
+export { StagesQuery }

@@ -1,10 +1,10 @@
-import Project from './config/Project'
-import { ContentApolloMiddlewareFactory, SystemApolloServerFactory } from './http'
 import { Container } from '@contember/dic'
 import { Client, Connection, DatabaseQueryable } from '@contember/database'
+import { MigrationsRunner } from '@contember/database-migrations'
 import { SchemaVersionBuilder, SystemExecutionContainer } from '@contember/engine-system-api'
-import { MigrationsRunner } from './bootstrap/MigrationsRunner'
 import { QueryHandler } from '@contember/queryable'
+import Project from './config/Project'
+import { ContentApolloMiddlewareFactory, SystemApolloServerFactory } from './http'
 
 export type ProjectContainer = Container<{
 	project: Project

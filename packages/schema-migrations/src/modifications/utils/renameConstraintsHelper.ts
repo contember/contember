@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { MigrationBuilder } from 'node-pg-migrate'
+import { MigrationBuilder } from '@contember/database-migrations'
 import { EntityUpdater } from '../schemaUpdateUtils'
 
 type NameGenerator = (constraint: Model.UniqueConstraint) => string | null

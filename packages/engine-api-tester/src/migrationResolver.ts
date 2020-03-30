@@ -3,6 +3,9 @@ import { createMock } from './utils'
 
 export const createMigrationResolver = (migrations: Migration[]): MigrationsResolver =>
 	createMock<MigrationsResolver>({
+		get directory(): string {
+			return 'dummy'
+		},
 		getMigrations(): Promise<Migration[]> {
 			return Promise.resolve(migrations)
 		},

@@ -21,4 +21,4 @@ namespace StageBySlugQuery {
 	export type Result = null | StageWithId
 }
 
-export default StageBySlugQuery
+export { StageBySlugQuery }

@@ -1,48 +1,77 @@
 import { ProjectConfig } from '../../types'
-import LatestMigrationByStageQuery from '../queries/LatestMigrationByStageQuery'
-import { MigrationsResolver, Migration } from '@contember/schema-migrations'
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
+import { calculateMigrationChecksum, Migration, MigrationsResolver } from '@contember/schema-migrations'
+import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
+import { ExecutedMigration } from '../dtos/ExecutedMigration'
 
 class ProjectMigrationInfoResolver {
 	constructor(
-		private readonly migrationsDirectory: string,
 		private readonly project: ProjectConfig,
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 	) {}
 
 	public async getMigrationsInfo(): Promise<ProjectMigrationInfoResolver.Result> {
-		const stages = this.project.stages
-		const versions = (
-			await Promise.all(stages.map(stage => this.queryHandler.fetch(new LatestMigrationByStageQuery(stage.slug))))
-		).map(it => (it ? it.data.version : null))
-		if (stages.length > 1 && versions.filter(it => it === versions[0]).length !== versions.length) {
-			throw new Error(
-				'Stages in different versions found: \n' +
-					stages.map((stage, i) => `\t${stage.slug}: ${versions[i]}`).join('\n'),
-			)
-		}
-
-		const currentVersion = versions[0]
-
-		// todo check previously executed migrations
-
 		const allMigrations = await this.migrationsResolver.getMigrations()
-		const migrationsToExecute = allMigrations.filter(
-			({ version }) => currentVersion === null || version > currentVersion,
+		const executedMigrations = await this.executedMigrationsResolver.getMigrations()
+		const latestMigration = executedMigrations.reduce<string | null>(
+			(latest, migration) => (!latest || migration.version > latest ? migration.version : latest),
+			null,
+		)
+		const executedMigrationsMap = executedMigrations.reduce<Record<string, Migration>>(
+			(acc, migr) => ({ ...acc, [migr.version]: migr }),
+			{},
+		)
+		const allMigrationsMap = allMigrations.reduce<Record<string, Migration>>(
+			(acc, migr) => ({ ...acc, [migr.version]: migr }),
+			{},
 		)
 
-		return { migrationsDirectory: this.migrationsDirectory, currentVersion, migrationsToExecute, allMigrations }
+		const migrationsToExecute: Migration[] = []
+		const badMigrations: BadMigration[] = []
+		for (const migration of allMigrations) {
+			const shouldExecute = !latestMigration || latestMigration < migration.version
+			const isExecuted = !!executedMigrationsMap[migration.version]
+			if (!shouldExecute && !isExecuted) {
+				badMigrations.push({
+					...migration,
+					error: `New migration ${migration.name} must follow latest executed migration ${
+						executedMigrationsMap[latestMigration!].name
+					}`,
+				})
+			}
+			if (shouldExecute) {
+				migrationsToExecute.push(migration)
+			}
+		}
+		for (const migration of executedMigrations) {
+			const migrationSource = allMigrationsMap[migration.version]
+			if (!migrationSource) {
+				badMigrations.push({ ...migration, error: `Previously executed migration ${migration.name} is missing.` })
+			} else if (calculateMigrationChecksum(migrationSource) !== migration.checksum) {
+				badMigrations.push({ ...migration, error: `Previously executed migration ${migration.name} has been changed.` })
+			}
+		}
+
+		return {
+			migrationsDirectory: this.migrationsResolver.directory,
+			migrationsToExecute,
+			allMigrations,
+			currentVersion: latestMigration,
+			executedMigrations,
+			badMigrations,
+		}
 	}
 }
 
+type BadMigration = Migration & { error: string }
 namespace ProjectMigrationInfoResolver {
 	export interface Result {
 		migrationsDirectory: string
 		currentVersion: string | null
 		migrationsToExecute: Migration[]
 		allMigrations: Migration[]
+		executedMigrations: ExecutedMigration[]
+		badMigrations: BadMigration[]
 	}
 }
 

@@ -3,6 +3,7 @@ import {
 	CreateInitEventCommand,
 	getSystemMigrationsDirectory,
 	ProjectConfig,
+	SchemaVersionBuilder,
 	setupSystemVariables,
 	SystemContainerFactory,
 	SystemExecutionContainer,
@@ -10,11 +11,10 @@ import {
 	unnamedIdentity,
 } from '@contember/engine-system-api'
 import {
+	MigrationFilesManager,
 	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaMigrator,
-	SchemaVersionBuilder,
-	MigrationFilesManager,
 } from '@contember/schema-migrations'
 import {
 	GraphQlSchemaBuilderFactory,
@@ -32,6 +32,8 @@ import { graphqlObjectFactories } from './graphqlObjectFactories'
 import { project } from './project'
 import { migrate } from './migrationsRunner'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
+import { ExecutedMigrationsResolver } from '@contember/engine-system-api/dist/src/model/migrations/ExecutedMigrationsResolver'
+import { join } from 'path'
 
 export class ApiTester {
 	public static project = project
@@ -64,6 +66,7 @@ export class ApiTester {
 		const projectConnection = createConnection(dbName)
 		const projectDb = projectConnection.createClient('system')
 
+		const queryHandler = projectDb.createQueryHandler()
 		await setupSystemVariables(projectDb, unnamedIdentity, { uuid: createUuidGenerator('a450') })
 
 		await new CreateInitEventCommand({ uuid: createUuidGenerator('a451') }).execute(projectDb)
@@ -72,14 +75,14 @@ export class ApiTester {
 		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(projectMigrationFilesManager)
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const schemaMigrator = new SchemaMigrator(modificationHandlerFactory)
-		const schemaVersionBuilder = new SchemaVersionBuilder(migrationsResolver, schemaMigrator)
+		const executedMigrationsResolver = new ExecutedMigrationsResolver(queryHandler)
+		const schemaVersionBuilder = new SchemaVersionBuilder(executedMigrationsResolver, schemaMigrator)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories)
 
 		const systemContainerFactory = new SystemContainerFactory()
 		const systemContainer = systemContainerFactory.create({
+			projectsDir: ApiTester.getMigrationsDir(),
 			project: { ...ApiTester.project, ...(options.project || {}) },
-			migrationsResolver: migrationsResolver,
-			migrationFilesManager: projectMigrationFilesManager,
 			contentPermissionsVerifier: new PermissionsVerifier(new PermissionsByIdentityFactory()),
 			modificationHandlerFactory,
 			providers: { uuid: createUuidGenerator('a452') },
@@ -109,6 +112,7 @@ export class ApiTester {
 			systemExecutionContainer.stageCreator,
 			systemExecutionContainer.projectMigrator,
 			migrationsResolver,
+			schemaVersionBuilder,
 		)
 
 		const contentApiTester = new ContentApiTester(
@@ -138,7 +142,11 @@ export class ApiTester {
 		)
 	}
 
+	public static getMigrationsDir(): string {
+		return join(__dirname + '/../../src/example-project/migrations')
+	}
+
 	private static createProjectMigrationFilesManager(): MigrationFilesManager {
-		return new MigrationFilesManager(__dirname + '/../../src/example-project/migrations')
+		return new MigrationFilesManager(ApiTester.getMigrationsDir())
 	}
 }

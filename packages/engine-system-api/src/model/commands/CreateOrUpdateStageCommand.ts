@@ -1,6 +1,6 @@
 import { Client, ConflictActionType, InsertBuilder } from '@contember/database'
 import { formatSchemaName } from '../helpers/stageHelpers'
-import InitEventQuery from '../queries/InitEventQuery'
+import { InitEventQuery } from '../queries/InitEventQuery'
 import { wrapIdentifier } from '@contember/database'
 import { StageConfig } from '../../types'
 import { UuidProvider } from '../../utils/uuid'

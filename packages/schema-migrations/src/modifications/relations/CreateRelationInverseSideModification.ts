@@ -1,4 +1,4 @@
-import { MigrationBuilder } from 'node-pg-migrate'
+import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'

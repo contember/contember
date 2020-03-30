@@ -1,6 +1,6 @@
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
-import { createMigrationBuilder } from './utils/pgMigrateHelpers'
-import Migration from './Migration'
+import { createMigrationBuilder } from '@contember/database-migrations'
+import { Migration } from './Migration'
 import { Schema } from '@contember/schema'
 import { ModificationDescription } from './modifications/Modification'
 import CreateEntityModification from './modifications/entities/CreateEntityModification'

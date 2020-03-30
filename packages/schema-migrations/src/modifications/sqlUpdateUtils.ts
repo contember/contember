@@ -1,4 +1,4 @@
-import { MigrationBuilder } from 'node-pg-migrate'
+import { MigrationBuilder } from '@contember/database-migrations'
 
 export const createEventTrigger = (builder: MigrationBuilder, tableName: string) => {
 	builder.createTrigger(tableName, 'log_event', {

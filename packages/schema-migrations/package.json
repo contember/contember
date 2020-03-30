@@ -8,11 +8,11 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
+		"@contember/database-migrations": "^0.0.0",
 		"@contember/engine-common": "^0.7.4",
 		"@contember/schema": "^0.7.4",
 		"@contember/schema-utils": "^0.7.4",
 		"fast-deep-equal": "^2.0.1",
-		"node-pg-migrate": "^3.22.1",
 		"rfc6902": "^3.0.4"
 	},
 	"devDependencies": {

@@ -5,6 +5,9 @@
 	},
 	"references": [
 		{
+			"path": "../../database-migrations/src"
+		},
+		{
 			"path": "../../dic/src"
 		},
 		{

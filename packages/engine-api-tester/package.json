@@ -7,6 +7,7 @@
 	"scripts": {},
 	"dependencies": {
 		"@contember/database": "^0.7.4",
+		"@contember/database-migrations": "^0.0.0",
 		"@contember/engine-common": "^0.7.4",
 		"@contember/engine-content-api": "^0.7.4",
 		"@contember/engine-system-api": "^0.7.4",
@@ -18,7 +19,6 @@
 		"graphql": "^14.6.0",
 		"graphql-tools": "^4.0.5",
 		"jasmine": "^3.5.0",
-		"node-pg-migrate": "^3.22.1",
 		"pg": "^7.17.1",
 		"sinon": "^7.4.2",
 		"uuid": "^3.3.3"

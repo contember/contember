@@ -1,17 +1,15 @@
 import { Client, SelectBuilder } from '@contember/database'
 import {
-	LatestMigrationByStageQuery,
 	MigrationsResolver,
 	ProjectMigrator,
 	StageCreator,
 	StageConfig,
+	SchemaVersionBuilder,
 } from '@contember/engine-system-api'
 import { Migration, MigrationVersionHelper } from '@contember/schema-migrations'
 
 export class TesterStageManager {
 	private createdStages = new Set<string>()
-
-	private migrationVersion: string | null = null
 
 	constructor(
 		private readonly stages: StageConfig[],
@@ -19,6 +17,7 @@ export class TesterStageManager {
 		private readonly stageCreator: StageCreator,
 		private readonly projectMigrator: ProjectMigrator,
 		private readonly migrationResolver: MigrationsResolver,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public getStage(slug: string): StageConfig {
@@ -36,16 +35,8 @@ export class TesterStageManager {
 			.getResult(this.db)
 
 		this.createdStages = new Set(stages.map(it => it.slug))
-		if (stages.length > 0) {
-			const latestVersion = await this.db.createQueryHandler().fetch(new LatestMigrationByStageQuery(stages[0].slug))
-			this.migrationVersion = latestVersion ? latestVersion.data.version : null
-		}
 
 		return this.createdStages
-	}
-
-	public getMigrationVersion() {
-		return this.migrationVersion
 	}
 
 	public async createAll(): Promise<void> {
@@ -69,8 +60,8 @@ export class TesterStageManager {
 			}
 			migration = resolvedMigration
 		}
-		await this.projectMigrator.migrate(this.migrationVersion, [migration], () => null)
-		this.migrationVersion = MigrationVersionHelper.extractVersion(migration.version)
+		const schema = await this.schemaVersionBuilder.buildSchema()
+		await this.projectMigrator.migrate(schema, [migration], () => null)
 	}
 
 	private getStageInternal(slug: string): StageConfig {

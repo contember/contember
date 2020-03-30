@@ -210,6 +210,7 @@ describe('project initializer', () => {
 				{
 					formatVersion: VERSION_LATEST,
 					version: '2019-04-17-123500',
+					name: '2019-04-17-123500-foo',
 					modifications: [
 						{
 							modification: 'createEntity',
@@ -294,6 +295,7 @@ describe('project initializer', () => {
 			migrations.push({
 				formatVersion: VERSION_LATEST,
 				version: '2019-04-17-123600',
+				name: '2019-04-17-123600-foo',
 				modifications: [
 					{
 						modification: 'updateColumnName',

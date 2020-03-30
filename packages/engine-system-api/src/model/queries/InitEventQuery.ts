@@ -19,4 +19,4 @@ namespace InitEventQuery {
 	}
 }
 
-export default InitEventQuery
+export { InitEventQuery }

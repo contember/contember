@@ -6,6 +6,9 @@
 	},
 	"references": [
 		{
+			"path": "../../database-migrations/src"
+		},
+		{
 			"path": "../../queryable/src"
 		},
 		{

@@ -28,4 +28,4 @@ namespace StageByIdQuery {
 	export type Result = null | StageWithId
 }
 
-export default StageByIdQuery
+export { StageByIdQuery }

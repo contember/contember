@@ -1,11 +1,10 @@
-import { MigrationBuilder } from 'node-pg-migrate'
+import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent, EventType } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnName, resolveDefaultValue } from '@contember/schema-utils'
-import { escapeValue } from '../..'
 import { ImplementationException } from '../../exceptions'
 
 class CreateColumnModification implements Modification<CreateColumnModification.Data> {

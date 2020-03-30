@@ -118,9 +118,9 @@
 		{
 			"modification": "updateAclSchema",
 			"schema": {
-				"variables": {},
 				"roles": {
 					"viewer": {
+						"variables": {},
 						"stages": "*",
 						"entities": {
 							"Author": {

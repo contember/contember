@@ -2,11 +2,11 @@ import 'jasmine'
 import { Model } from '@contember/schema'
 import { createMock } from './utils'
 import {
-	SchemaMigrator,
 	Migration,
 	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaDiffer,
+	SchemaMigrator,
 	VERSION_LATEST,
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
@@ -35,8 +35,13 @@ export const executeDbTest = async (test: Test) => {
 	})
 
 	const migrationsResolver = createMock<MigrationsResolver>({
+		get directory(): string {
+			return ApiTester.getMigrationsDir()
+		},
 		getMigrations(): Promise<Migration[]> {
-			return Promise.resolve([{ version: '201907221000-init', modifications, formatVersion: VERSION_LATEST }])
+			return Promise.resolve([
+				{ version: '2019-01-01-100000', name: '2019-01-01-100000-init', formatVersion: VERSION_LATEST, modifications },
+			])
 		},
 	})
 
@@ -52,7 +57,7 @@ export const executeDbTest = async (test: Test) => {
 		},
 	})
 	await tester.stages.createAll()
-	await tester.stages.migrate('201907221000-init')
+	await tester.stages.migrate('2019-01-01-100000')
 	for (const { query, queryVariables } of test.seed) {
 		await tester.content.queryContent('prod', query, queryVariables)
 	}

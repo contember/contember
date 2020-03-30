@@ -1,6 +1,6 @@
 import { ProjectContainer } from '../ProjectContainer'
 import { ProjectManager } from '@contember/engine-tenant-api'
-import { MigrationsRunner } from './MigrationsRunner'
+import { MigrationsRunner } from '@contember/database-migrations'
 
 export class Initializer {
 	constructor(

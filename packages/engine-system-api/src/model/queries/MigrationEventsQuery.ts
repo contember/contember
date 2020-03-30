@@ -1,14 +1,14 @@
 import { DatabaseQuery } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
 
-class LatestMigrationByStageQuery extends DatabaseQuery<LatestMigrationByStageQuery.Result> {
+class MigrationEventsQuery extends DatabaseQuery<MigrationEventsQuery.Result> {
 	constructor(private readonly stageSlug: string) {
 		super()
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<LatestMigrationByStageQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<MigrationEventsQuery.Result> {
 		const rows = (
-			await queryable.db.query<LatestMigrationByStageQuery.Row>(
+			await queryable.db.query<MigrationEventsQuery.Row>(
 				`
 			WITH RECURSIVE recent_events(type, previous_id, data) AS (
 					SELECT type, previous_id, data
@@ -23,23 +23,22 @@ class LatestMigrationByStageQuery extends DatabaseQuery<LatestMigrationByStageQu
 			SELECT *
 			FROM recent_events
 			WHERE type = 'run_migration'
-			LIMIT 1
 		`,
 				[this.stageSlug],
 			)
 		).rows
 
-		return this.fetchOneOrNull(rows)
+		return rows.reverse()
 	}
 }
 
-namespace LatestMigrationByStageQuery {
+namespace MigrationEventsQuery {
 	export type Row = {
 		readonly type: string
 		readonly previous_id: string
 		readonly data: { version: string }
 	}
-	export type Result = null | Row
+	export type Result = Row[]
 }
 
-export default LatestMigrationByStageQuery
+export { MigrationEventsQuery }

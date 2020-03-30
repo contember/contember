@@ -1,5 +1,5 @@
 export * from './queries'
 export * from './commands'
 export * from './migrations'
-export * from './helpers/stageHelpers'
+export * from './helpers'
 export { default as StageCreator } from './stages/StageCreator'

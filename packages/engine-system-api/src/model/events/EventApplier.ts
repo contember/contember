@@ -1,21 +1,31 @@
-import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } from '@contember/engine-common'
+import {
+	AnyEvent,
+	ContentEvent,
+	CreateEvent,
+	DeleteEvent,
+	EventType,
+	RunMigrationEvent,
+	UpdateEvent,
+} from '@contember/engine-common'
 import { Stage } from '../dtos/Stage'
-import { EventType } from '@contember/engine-common'
 import { assertNever } from '../../utils'
 import { Client, DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
-import { formatSchemaName } from '../helpers/stageHelpers'
+import { formatSchemaName } from '../helpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
-import { MigrationsResolver } from '@contember/schema-migrations'
-import StageBySlugQuery from '../queries/StageBySlugQuery'
+import { StageBySlugQuery } from '../queries'
+import { ExecutedMigrationsResolver } from '../migrations/ExecutedMigrationsResolver'
+import { Schema } from '@contember/schema'
 
 class EventApplier {
 	constructor(
 		private readonly db: Client,
 		private readonly migrationExecutor: MigrationExecutor,
-		private readonly migrationResolver: MigrationsResolver,
+		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 	) {}
 
-	public async applyEvents(stage: Stage, events: AnyEvent[]): Promise<void> {
+	public async applyEvents(stage: Stage, events: ContentEvent[]): Promise<void>
+	public async applyEvents(stage: Stage, events: AnyEvent[], schema: Schema): Promise<void>
+	public async applyEvents(stage: Stage, events: AnyEvent[], schema?: Schema): Promise<void> {
 		let trxId: string | null = null
 		for (let event of events) {
 			if (event.transactionId !== trxId) {
@@ -23,12 +33,18 @@ class EventApplier {
 				await this.db.query('SET CONSTRAINTS ALL DEFERRED')
 				trxId = event.transactionId
 			}
-			await this.applyEvent(stage, event)
+			if (schema) {
+				schema = await this.applyEvent(stage, event, schema)
+			} else {
+				await this.applyEvent(stage, event as ContentEvent)
+			}
 		}
 		await this.db.query('SET CONSTRAINTS ALL IMMEDIATE')
 	}
 
-	private async applyEvent(stage: Stage, event: AnyEvent): Promise<void> {
+	private async applyEvent(stage: Stage, event: ContentEvent): Promise<undefined>
+	private async applyEvent(stage: Stage, event: AnyEvent, schema: Schema): Promise<Schema>
+	private async applyEvent(stage: Stage, event: AnyEvent, schema?: Schema) {
 		switch (event.type) {
 			case EventType.create:
 				return this.applyCreate(stage, event)
@@ -37,7 +53,7 @@ class EventApplier {
 			case EventType.delete:
 				return this.applyDelete(stage, event)
 			case EventType.runMigration:
-				return this.applyRunMigration(stage, event)
+				return this.applyRunMigration(schema!, stage, event)
 			default:
 				assertNever(event)
 		}
@@ -68,10 +84,13 @@ class EventApplier {
 			.execute(this.db.forSchema(formatSchemaName(stage)))
 	}
 
-	private async applyRunMigration(stage: Stage, event: RunMigrationEvent): Promise<void> {
+	private async applyRunMigration(schema: Schema, stage: Stage, event: RunMigrationEvent): Promise<Schema> {
 		const event_id = (await this.db.createQueryHandler().fetch(new StageBySlugQuery(stage.slug)))!.event_id
-		const files = (await this.migrationResolver.getMigrations()).filter(({ version }) => version === event.version)
-		await this.migrationExecutor.execute(this.db, { ...stage, event_id }, files, () => null)
+		const migration = await this.executedMigrationsResolver.getMigrationByVersion(event.version)
+		if (!migration) {
+			throw new Error(`Migration ${event.version} not found`)
+		}
+		return await this.migrationExecutor.execute(schema, this.db, { ...stage, event_id }, migration)
 	}
 }
 

@@ -124,10 +124,6 @@
 			"patch": [
 				{
 					"op": "remove",
-					"path": "/variables"
-				},
-				{
-					"op": "remove",
 					"path": "/roles/viewer"
 				}
 			]

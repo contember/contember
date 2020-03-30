@@ -1,13 +1,8 @@
 import 'jasmine'
 import { Acl, Model } from '@contember/schema'
 import { SchemaBuilder } from '@contember/schema-definition'
-import {
-	ModificationHandlerFactory,
-	Migration,
-	SchemaDiffer,
-	createMigrationBuilder,
-	SchemaMigrator,
-} from '../../../src'
+import { ModificationHandlerFactory, Migration, SchemaDiffer, SchemaMigrator } from '../../../src'
+import { createMigrationBuilder } from '@contember/database-migrations'
 import { SQL } from '../../src/tags'
 import { VERSION_LATEST } from '../../../src/modifications/ModificationVersions'
 

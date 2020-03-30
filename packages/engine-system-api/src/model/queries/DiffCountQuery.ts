@@ -45,4 +45,4 @@ namespace DiffCountQuery {
 	}
 }
 
-export default DiffCountQuery
+export { DiffCountQuery }

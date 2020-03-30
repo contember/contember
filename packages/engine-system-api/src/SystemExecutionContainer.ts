@@ -30,6 +30,7 @@ import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInf
 import ProjectMigrator from './model/migrations/ProjectMigrator'
 import StageCreator from './model/stages/StageCreator'
 import { UuidProvider } from './utils/uuid'
+import { ExecutedMigrationsResolver } from './model/migrations/ExecutedMigrationsResolver'
 
 interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
@@ -43,9 +44,8 @@ interface SystemExecutionContainer {
 namespace SystemExecutionContainer {
 	export class Factory {
 		constructor(
-			private readonly project: ProjectConfig,
-			private readonly migrationsResolver: MigrationsResolver,
-			private readonly migrationFilesManager: MigrationFilesManager,
+			private readonly projectsDir: string,
+			private readonly project: ProjectConfig & { directory?: string },
 			private readonly authorizator: Authorizator,
 			private readonly modificationHandlerFactory: ModificationHandlerFactory,
 			private readonly contentPermissionsVerifier: ContentPermissionVerifier,
@@ -62,13 +62,16 @@ namespace SystemExecutionContainer {
 			return new Builder({})
 				.addService('project', () => this.project)
 				.addService('providers', () => this.providers)
-				.addService('migrationFilesManager', ({}) => this.migrationFilesManager)
-				.addService('migrationsResolver', () => this.migrationsResolver)
+				.addService('migrationFilesManager', ({ project }) =>
+					MigrationFilesManager.createForProject(this.projectsDir, project.directory || project.slug),
+				)
+				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
 				.addService('modificationHandlerFactory', () => this.modificationHandlerFactory)
 				.addService('authorizator', () => this.authorizator)
 
 				.addService('db', () => db)
 				.addService('queryHandler', ({ db }) => db.createQueryHandler())
+				.addService('executedMigrationsResolver', ({ queryHandler }) => new ExecutedMigrationsResolver(queryHandler))
 				.addService(
 					'schemaMigrator',
 					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory),
@@ -80,8 +83,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'schemaVersionBuilder',
-					({ queryHandler, schemaVersionBuilderInternal }) =>
-						new SchemaVersionBuilder(queryHandler, schemaVersionBuilderInternal),
+					({ executedMigrationsResolver, schemaMigrator }) =>
+						new SchemaVersionBuilder(executedMigrationsResolver, schemaMigrator),
 				)
 				.addService(
 					'migrationExecutor',
@@ -118,8 +121,8 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'eventApplier',
-					({ db, migrationExecutor, migrationsResolver }) =>
-						new EventApplier(db, migrationExecutor, migrationsResolver),
+					({ db, migrationExecutor, executedMigrationsResolver }) =>
+						new EventApplier(db, migrationExecutor, executedMigrationsResolver),
 				)
 				.addService('eventsRebaser', ({ db }) => new EventsRebaser(db))
 				.addService('stageTree', ({ project }) => new StageTree.Factory().create(project))
@@ -160,18 +163,13 @@ namespace SystemExecutionContainer {
 				)
 				.addService(
 					'projectMigrationInfoResolver',
-					({ migrationFilesManager, queryHandler, migrationsResolver, project }) =>
-						new ProjectMigrationInfoResolver(
-							migrationFilesManager.directory,
-							project,
-							migrationsResolver,
-							queryHandler,
-						),
+					({ migrationsResolver, project, executedMigrationsResolver }) =>
+						new ProjectMigrationInfoResolver(project, migrationsResolver, executedMigrationsResolver),
 				)
 				.addService(
 					'projectMigrator',
-					({ db, stageTree, schemaVersionBuilder, modificationHandlerFactory, providers }) =>
-						new ProjectMigrator(db, stageTree, modificationHandlerFactory, schemaVersionBuilder, providers),
+					({ db, stageTree, modificationHandlerFactory, providers }) =>
+						new ProjectMigrator(db, stageTree, modificationHandlerFactory, providers),
 				)
 				.addService('stageCreator', ({ db, eventApplier, providers }) => new StageCreator(db, eventApplier, providers))
 				.addService(
@@ -184,17 +182,17 @@ namespace SystemExecutionContainer {
 						projectMigrationInfoResolver,
 						stageCreator,
 						providers,
-						project,
+						schemaVersionBuilder,
 					}) =>
 						new ProjectInitializer(
 							db,
-							project,
 							stageTree,
 							projectMigrator,
 							rebaseExecutor,
 							projectMigrationInfoResolver,
 							stageCreator,
 							providers,
+							schemaVersionBuilder,
 						),
 				)
 		}

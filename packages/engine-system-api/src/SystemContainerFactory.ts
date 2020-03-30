@@ -24,11 +24,10 @@ export interface SystemContainer {
 
 export class SystemContainerFactory {
 	public create(container: {
+		projectsDir: string
 		providers: UuidProvider
 		project: ProjectConfig
-		migrationFilesManager: MigrationFilesManager
 		contentPermissionsVerifier: ContentPermissionVerifier
-		migrationsResolver: MigrationsResolver
 		modificationHandlerFactory: ModificationHandlerFactory
 	}): Container<SystemContainer> {
 		return new Builder({})
@@ -59,9 +58,8 @@ export class SystemContainerFactory {
 				'systemExecutionContainerFactory',
 				({ authorizator, providers }) =>
 					new SystemExecutionContainer.Factory(
+						container.projectsDir,
 						container.project,
-						container.migrationsResolver,
-						container.migrationFilesManager,
 						authorizator,
 						container.modificationHandlerFactory,
 						container.contentPermissionsVerifier,

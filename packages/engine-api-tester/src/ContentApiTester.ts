@@ -1,18 +1,17 @@
-import { formatSchemaName, setupSystemVariables } from '@contember/engine-system-api'
-import { SchemaVersionBuilder } from '@contember/schema-migrations'
+import { formatSchemaName, SchemaVersionBuilder, setupSystemVariables } from '@contember/engine-system-api'
 import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import { Client } from '@contember/database'
 import {
 	Context as ContentContext,
-	GraphQlSchemaBuilderFactory,
 	ExecutionContainerFactory,
+	GraphQlSchemaBuilderFactory,
 } from '@contember/engine-content-api'
 import { graphql } from 'graphql'
 import { TesterStageManager } from './TesterStageManager'
 import { Schema } from '@contember/schema'
-import { emptySchema } from '@contember/schema-utils'
 import { createUuidGenerator } from './testUuid'
 import { getArgumentValues } from 'graphql/execution/values'
+
 export class ContentApiTester {
 	private trxUuidGenerator = createUuidGenerator('a453')
 	private uuidGenerator = createUuidGenerator()
@@ -61,7 +60,6 @@ export class ContentApiTester {
 	}
 
 	private async getSchema(): Promise<Schema> {
-		const version = this.stageManager.getMigrationVersion()
-		return version ? await this.schemaVersionBuilder.buildSchema(version) : emptySchema
+		return await this.schemaVersionBuilder.buildSchema()
 	}
 }

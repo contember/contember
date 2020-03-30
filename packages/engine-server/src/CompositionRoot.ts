@@ -48,11 +48,13 @@ import { Config, Project, TenantConfig } from './config/config'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
-import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
+import { Initializer, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
 import { tuple } from './utils'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
+import { ExecutedMigrationsResolver } from '@contember/engine-system-api/dist/src/model/migrations/ExecutedMigrationsResolver'
+import { MigrationsRunner } from '@contember/database-migrations'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -213,6 +215,7 @@ class CompositionRoot {
 			const projectContainer = new Builder({})
 				.addService('providers', () => providers)
 				.addService('project', () => project)
+				.addService('projectsDir', () => projectsDir)
 				.addService('graphqlObjectsFactory', () => graphqlObjectFactories)
 				.addService('schema', ({ project }) => (schemas ? schemas[project.slug] : undefined))
 				.addService('connection', ({ project }) => {
@@ -231,10 +234,7 @@ class CompositionRoot {
 					'systemDbMigrationsRunner',
 					() => new MigrationsRunner(project.db, 'system', getSystemMigrationsDirectory()),
 				)
-				.addService('migrationFilesManager', ({ project }) =>
-					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),
-				)
-				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
+
 				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
 				.addService('systemQueryHandler', ({ systemDbClient }) => systemDbClient.createQueryHandler())
 				.addService(
@@ -246,12 +246,13 @@ class CompositionRoot {
 					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory),
 				)
 				.addService(
+					'executedMigrationsResolver',
+					({ systemQueryHandler }) => new ExecutedMigrationsResolver(systemQueryHandler),
+				)
+				.addService(
 					'schemaVersionBuilder',
-					({ systemQueryHandler, migrationsResolver, schemaMigrator }) =>
-						new SchemaVersionBuilder(
-							systemQueryHandler,
-							new SchemaVersionBuilderInternal(migrationsResolver, schemaMigrator),
-						),
+					({ executedMigrationsResolver, schemaMigrator }) =>
+						new SchemaVersionBuilder(executedMigrationsResolver, schemaMigrator),
 				)
 				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory(graphqlObjectFactories))
 				.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
@@ -285,9 +286,8 @@ class CompositionRoot {
 
 			const systemContainer = new SystemContainerFactory().create(
 				projectContainer.pick(
+					'projectsDir',
 					'project',
-					'migrationsResolver',
-					'migrationFilesManager',
 					'contentPermissionsVerifier',
 					'modificationHandlerFactory',
 					'schemaVersionBuilder',

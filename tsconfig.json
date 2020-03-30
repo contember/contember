@@ -8,6 +8,7 @@
 		{ "path": "./packages/cli/resources/templates/template-project" },
 		{ "path": "./packages/config-loader" },
 		{ "path": "./packages/database" },
+		{ "path": "./packages/database-migrations" },
 		{ "path": "./packages/database-tester" },
 		{ "path": "./packages/dic" },
 		{ "path": "./packages/engine-api-tester" },

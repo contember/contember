@@ -1,6 +1,4 @@
-import { DatabaseCredentials } from '@contember/engine-common'
-import { Connection, wrapIdentifier } from '@contember/database'
-import pgMigrate from 'node-pg-migrate'
+import { DatabaseCredentials, Connection, wrapIdentifier } from '@contember/database'
 
 export class MigrationsRunner {
 	constructor(
@@ -11,7 +9,7 @@ export class MigrationsRunner {
 
 	public async migrate(log: boolean = true) {
 		await this.createDatabaseIfNotExists()
-
+		const pgMigrate = (await import('node-pg-migrate')).default
 		await pgMigrate({
 			databaseUrl: this.db,
 			dir: this.dir,

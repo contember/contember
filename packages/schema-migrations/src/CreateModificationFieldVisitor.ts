@@ -2,7 +2,7 @@ import { Model } from '@contember/schema'
 import CreateColumnModification from './modifications/columns/CreateColumnModification'
 import CreateRelationModification from './modifications/relations/CreateRelationModification'
 import CreateRelationInverseSideModification from './modifications/relations/CreateRelationInverseSideModification'
-import Migration from './Migration'
+import { Migration } from './Migration'
 import deepCopy from './utils/deepCopy'
 
 export default class CreateFieldVisitor

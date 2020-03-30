@@ -2,10 +2,11 @@ import { Client } from '@contember/database'
 import CreateOrUpdateStageCommand from '../commands/CreateOrUpdateStageCommand'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import EventApplier from '../events/EventApplier'
-import DiffQuery from '../queries/DiffQuery'
-import StageBySlugQuery from '../queries/StageBySlugQuery'
+import { DiffQuery, StageBySlugQuery } from '../queries'
 import { StageConfig } from '../../types'
 import { UuidProvider } from '../../utils/uuid'
+import { Schema } from '@contember/schema'
+import { emptySchema } from '@contember/schema-utils'
 
 class StageCreator {
 	constructor(
@@ -34,7 +35,7 @@ class StageCreator {
 		}
 
 		const events = await queryHandler.fetch(new DiffQuery(newStage.event_id, parentStage.event_id))
-		await this.eventApplier.applyEvents(newStage, events)
+		await this.eventApplier.applyEvents(newStage, events, emptySchema)
 
 		await new UpdateStageEventCommand(newStage.slug, parentStage.event_id).execute(this.db)
 

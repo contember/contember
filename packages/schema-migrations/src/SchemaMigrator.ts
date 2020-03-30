@@ -1,12 +1,11 @@
 import { Schema } from '@contember/schema'
 import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
-import Migration from './/Migration'
-import { VERSION_INITIAL } from './modifications/ModificationVersions'
+import { Migration } from './/Migration'
 
 export class SchemaMigrator {
 	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {}
 
-	public applyModifications(schema: Schema, diff: Migration.Modification[], formatVersion: number): Schema {
+	public applyModifications(schema: Schema, diff: readonly Migration.Modification[], formatVersion: number): Schema {
 		for (const modification of diff) {
 			const { modification: name, ...data } = modification
 			const modificationHandler = this.modificationHandlerFactory.create(name, data, schema, formatVersion)

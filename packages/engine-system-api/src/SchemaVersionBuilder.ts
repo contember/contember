@@ -1,24 +1,16 @@
 import { Schema } from '@contember/schema'
+import { SchemaMigrator } from '@contember/schema-migrations'
+import { ExecutedMigrationsResolver } from './model/migrations/ExecutedMigrationsResolver'
 import { emptySchema } from '@contember/schema-utils'
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
-import LatestMigrationByStageQuery from './model/queries/LatestMigrationByStageQuery'
-import { SchemaVersionBuilder as SchemaVersionBuilderInternal } from '@contember/schema-migrations'
 
 export class SchemaVersionBuilder {
 	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
-		private readonly internalBuilder: SchemaVersionBuilderInternal,
+		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
+		private readonly schemaMigrator: SchemaMigrator,
 	) {}
 
 	async buildSchemaForStage(stageSlug: string): Promise<Schema> {
-		const currentMigration = await this.queryHandler.fetch(new LatestMigrationByStageQuery(stageSlug))
-		const currentVersion = currentMigration ? currentMigration.data.version : null
-		if (!currentVersion) {
-			return emptySchema
-		}
-
-		const schema = await this.buildSchema(currentVersion)
+		const schema = await this.buildSchema()
 
 		return {
 			...schema,
@@ -34,11 +26,10 @@ export class SchemaVersionBuilder {
 		}
 	}
 
-	async buildSchema(targetVersion?: string): Promise<Schema> {
-		return this.internalBuilder.buildSchema(targetVersion)
-	}
-
-	async buildSchemaUntil(targetVersion: string): Promise<Schema> {
-		return this.internalBuilder.buildSchemaUntil(targetVersion)
+	async buildSchema(): Promise<Schema> {
+		return (await this.executedMigrationsResolver.getMigrations()).reduce(
+			(schema, migr) => this.schemaMigrator.applyModifications(schema, migr.modifications, migr.formatVersion),
+			emptySchema,
+		)
 	}
 }

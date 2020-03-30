@@ -1,18 +1,14 @@
-import { GraphQlBuilder } from '@contember/client'
-import { Input } from '@contember/schema'
 import { MarkerTreeParameters, ReferenceMarker } from '../markers'
-import { ExpectedEntityCount } from '../treeParameters'
+import { ExpectedEntityCount, Filter, UniqueWhere } from '../treeParameters'
 import { assertNever } from './assertNever'
 
 export class Hashing {
 	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
-		const where: Array<
-			| Input.Where<GraphQlBuilder.Literal>
-			| Input.UniqueWhere<GraphQlBuilder.Literal>
-			| Input.Where
-			| undefined
-			| ExpectedEntityCount
-		> = [constraints.filter, constraints.reducedBy, constraints.expectedCount]
+		const where: Array<Filter | UniqueWhere | ExpectedEntityCount | undefined> = [
+			constraints.filter,
+			constraints.reducedBy,
+			constraints.expectedCount,
+		]
 
 		return Hashing.hashArray(where)
 	}

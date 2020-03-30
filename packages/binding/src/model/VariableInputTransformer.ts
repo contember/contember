@@ -12,24 +12,8 @@ import {
 } from '../treeParameters'
 
 export class VariableInputTransformer {
-	public static transformFilter(
-		input: Filter | undefined,
-		environment: Environment,
-	): Filter<GraphQlBuilder.Literal> | undefined {
-		if (input === undefined) {
-			return undefined
-		}
-		return VariableInputTransformer.transformWhere(input, environment) as Filter<GraphQlBuilder.Literal>
-	}
-
-	public static transformBy(input: UniqueWhere | undefined, environment: Environment): UniqueWhere | undefined {
-		if (input === undefined) {
-			return undefined
-		}
-		return VariableInputTransformer.transformWhere(input, environment) as UniqueWhere
-	}
-
-	private static transformWhere(
+	// This is probably just dead code but I'll leave it for now.
+	/*private static transformWhere(
 		where: VariableInputTransformer.Where<VariableFieldValue> | UniqueWhere,
 		environment: Environment,
 	): VariableInputTransformer.Where<GraphQlBuilder.Literal> {
@@ -62,7 +46,7 @@ export class VariableInputTransformer {
 		}
 
 		return mapped
-	}
+	}*/
 
 	public static transformValue(value: OptionallyVariableFieldValue, environment: Environment): FieldValue {
 		if (value instanceof VariableScalar) {
@@ -110,7 +94,7 @@ export class VariableInputTransformer {
 }
 
 namespace VariableInputTransformer {
-	export type Where<T> = {
-		[name: string]: T | Scalar | undefined | Where<T> | Where<T>[]
-	}
+	//export type Where<T> = {
+	//	[name: string]: T | Scalar | undefined | Where<T> | Where<T>[]
+	//}
 }

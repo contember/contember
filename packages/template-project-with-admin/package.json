@@ -4,7 +4,7 @@
 	"devDependencies": {
 		"@types/react": "16.9.23",
 		"@types/react-dom": "16.9.5",
-		"typescript": "3.7.4"
+		"typescript": "3.8.3"
 	},
 	"dependencies": {
 		"@contember/admin": "^0.4.19",

@@ -1,4 +1,5 @@
 import { GraphQlClient } from '@contember/client'
+import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { useEnvironment } from '../accessorRetrievers'
@@ -32,6 +33,7 @@ const initialState: AccessorTreeState = {
 export const useAccessorTreeState = ({
 	nodeTree,
 	autoInitialize = true,
+	unstable_onSuccessfulPersist = noop,
 }: AccessorTreeStateOptions): [AccessorTreeState, AccessorTreeStateMetadata] => {
 	const environment = useEnvironment()
 	const sessionToken = useSessionToken()
@@ -85,9 +87,16 @@ export const useAccessorTreeState = ({
 
 	const triggerPersistRef = React.useRef<(() => Promise<SuccessfulPersistResult>) | undefined>(undefined)
 
-	const triggerPersist = React.useCallback(() => {
-		return triggerPersistRef.current!()
-	}, [])
+	// TODO re-think the whole onSuccessfulPersist API. This is more of a temporary hotfix
+	const triggerPersist = React.useCallback(async () => {
+		try {
+			const result = await triggerPersistRef.current!()
+			unstable_onSuccessfulPersist(result)
+			return Promise.resolve(result)
+		} catch (e) {
+			return Promise.reject(e)
+		}
+	}, [unstable_onSuccessfulPersist])
 
 	const initializeAccessorTree = React.useCallback(
 		(

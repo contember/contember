@@ -1,4 +1,5 @@
 import { GraphQlClient } from '@contember/client'
+import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { useEnvironment } from '../accessorRetrievers'
@@ -32,6 +33,7 @@ const initialState: AccessorTreeState = {
 export const useAccessorTreeState = ({
 	nodeTree,
 	autoInitialize = true,
+	unstable_onSuccessfulPersist = noop,
 }: AccessorTreeStateOptions): [AccessorTreeState, AccessorTreeStateMetadata] => {
 	const environment = useEnvironment()
 	const sessionToken = useSessionToken()
@@ -54,6 +56,7 @@ export const useAccessorTreeState = ({
 
 	// This ref is really just an implementation of the advice from https://reactjs.org/docs/hooks-faq.html#can-i-run-an-effect-only-on-updates
 	const isFirstRenderRef = React.useRef(true)
+	const isMountedRef = React.useRef(true)
 	const isForcingRefreshRef = React.useRef(false) // This ref is described in detail below.
 
 	const queryRef = React.useRef(query)
@@ -82,94 +85,18 @@ export const useAccessorTreeState = ({
 		return Promise.reject(error)
 	}, [])
 
-	const triggerPersist = React.useCallback((): Promise<SuccessfulPersistResult> => {
-		if (stateRef.current.name === AccessorTreeStateName.Interactive) {
-			const persistedData =
-				queryStateRef.current.readyState === ApiRequestReadyState.Success ? queryStateRef.current.data.data : undefined
+	const triggerPersistRef = React.useRef<(() => Promise<SuccessfulPersistResult>) | undefined>(undefined)
 
-			const latestAccessorTree = stateRef.current.data
-			const generator = new MutationGenerator(persistedData, latestAccessorTree, markerTree)
-			const mutation = generator.getPersistMutation()
-
-			if (mutation === undefined) {
-				return Promise.resolve<NothingToPersistPersistResult>({
-					type: PersistResultSuccessType.NothingToPersist,
-				})
-			}
-			dispatch({
-				type: AccessorTreeStateActionType.InitializeMutation,
-			})
-			return sendMutation(mutation, {}, sessionToken)
-				.catch(rejectFailedRequest)
-				.then(data => {
-					const normalizedData = data.data === null ? {} : data.data
-					const aliases = Object.keys(normalizedData)
-					const allSubMutationsOk = aliases.every(item => data.data[item].ok)
-
-					if (!allSubMutationsOk) {
-						accessorTreeGenerator.generateLiveTree(
-							persistedData,
-							latestAccessorTree,
-							accessorTree => {
-								dispatch({
-									type: AccessorTreeStateActionType.SetData,
-									data: accessorTree,
-									triggerPersist,
-								})
-							},
-							data.data,
-						)
-						return Promise.reject({
-							type: MutationErrorType.InvalidInput,
-						})
-					}
-					const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
-
-					if (!query) {
-						dispatch({
-							type: AccessorTreeStateActionType.SetData,
-							data: latestAccessorTree,
-							triggerPersist,
-						})
-						return Promise.resolve({
-							type: PersistResultSuccessType.JustSuccess,
-							persistedEntityIds,
-						})
-					}
-
-					return sendQuery(query, {}, sessionToken)
-						.then(queryData => {
-							accessorTreeGenerator.generateLiveTree(queryData.data, queryData.data, accessorTree => {
-								dispatch({
-									type: AccessorTreeStateActionType.SetData,
-									data: accessorTree,
-									triggerPersist,
-								})
-							})
-							return Promise.resolve({
-								type: PersistResultSuccessType.JustSuccess,
-								persistedEntityIds,
-							})
-						})
-						.catch(() => {
-							dispatch({
-								type: AccessorTreeStateActionType.SetData,
-								data: latestAccessorTree,
-								triggerPersist,
-							})
-							// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
-							// data made it successfully to the server. Thus we'll just resolve from here no matter what.
-							return Promise.resolve({
-								type: PersistResultSuccessType.JustSuccess,
-								persistedEntityIds,
-							})
-						})
-				})
+	// TODO re-think the whole onSuccessfulPersist API. This is more of a temporary hotfix
+	const triggerPersist = React.useCallback(async () => {
+		try {
+			const result = await triggerPersistRef.current!()
+			unstable_onSuccessfulPersist(result)
+			return Promise.resolve(result)
+		} catch (e) {
+			return Promise.reject(e)
 		}
-		return Promise.resolve<NothingToPersistPersistResult>({
-			type: PersistResultSuccessType.NothingToPersist,
-		})
-	}, [accessorTreeGenerator, sessionToken, markerTree, query, rejectFailedRequest, sendMutation, sendQuery])
+	}, [unstable_onSuccessfulPersist])
 
 	const initializeAccessorTree = React.useCallback(
 		(
@@ -195,6 +122,78 @@ export const useAccessorTreeState = ({
 		[accessorTreeGenerator, markerTree, triggerPersist],
 	)
 
+	triggerPersistRef.current = async (): Promise<SuccessfulPersistResult> => {
+		if (stateRef.current.name !== AccessorTreeStateName.Interactive) {
+			return Promise.resolve<NothingToPersistPersistResult>({
+				type: PersistResultSuccessType.NothingToPersist,
+			})
+		}
+		const persistedData =
+			queryStateRef.current.readyState === ApiRequestReadyState.Success ? queryStateRef.current.data.data : undefined
+
+		const latestAccessorTree = stateRef.current.data
+		const generator = new MutationGenerator(persistedData, latestAccessorTree, markerTree)
+		const mutation = generator.getPersistMutation()
+
+		if (mutation === undefined) {
+			return Promise.resolve<NothingToPersistPersistResult>({
+				type: PersistResultSuccessType.NothingToPersist,
+			})
+		}
+		dispatch({
+			type: AccessorTreeStateActionType.InitializeMutation,
+		})
+		try {
+			const data = await sendMutation(mutation, {}, sessionToken)
+			const normalizedData = data.data === null ? {} : data.data
+			const aliases = Object.keys(normalizedData)
+			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
+
+			if (!allSubMutationsOk) {
+				initializeAccessorTree(persistedData, latestAccessorTree, data.data)
+				return Promise.reject({
+					type: MutationErrorType.InvalidInput,
+				})
+			}
+			const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
+
+			if (!query) {
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: latestAccessorTree,
+					triggerPersist,
+				})
+				return Promise.resolve({
+					type: PersistResultSuccessType.JustSuccess,
+					persistedEntityIds,
+				})
+			}
+
+			try {
+				const queryData = await sendQuery(query, {}, sessionToken)
+				initializeAccessorTree(queryData.data, queryData.data)
+				return Promise.resolve({
+					type: PersistResultSuccessType.JustSuccess,
+					persistedEntityIds,
+				})
+			} catch {
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: latestAccessorTree,
+					triggerPersist,
+				})
+				// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
+				// data made it successfully to the server. Thus we'll just resolve from here no matter what.
+				return Promise.resolve({
+					type: PersistResultSuccessType.JustSuccess,
+					persistedEntityIds,
+				})
+			}
+		} catch (metadata) {
+			return rejectFailedRequest(metadata)
+		}
+	}
+
 	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions).
 	if (query !== queryRef.current) {
 		isForcingRefreshRef.current = true
@@ -205,45 +204,37 @@ export const useAccessorTreeState = ({
 	queryRef.current = query
 
 	React.useEffect(() => {
-		if (
-			isInitialized &&
-			state.name === AccessorTreeStateName.Uninitialized &&
-			// There can be updates while state.name is still AccessorTreeStateName.Uninitialized, and so that condition is
-			// not sufficient on its own. Thus we typically also enforce that queryStateRef.current.readyState is
-			// ApiRequestReadyState.Uninitialized. However, we may need to force a change even while both conditions hold,
-			// e.g. while a query is loading. For that we have a special ref which we always reset after we're done.
-			(isForcingRefreshRef.current || queryStateRef.current.readyState === ApiRequestReadyState.Uninitialized)
-		) {
-			if (query === undefined) {
-				// We're creating
-				initializeAccessorTree(undefined, undefined)
-				isForcingRefreshRef.current = false
-			} else {
-				dispatch({
-					type: AccessorTreeStateActionType.InitializeQuery,
-				})
-				sendQuery(query, {}, sessionToken)
-					.then(data => {
-						initializeAccessorTree(data.data, data.data)
-						return Promise.resolve()
+		const performEffect = async () => {
+			if (
+				isInitialized &&
+				state.name === AccessorTreeStateName.Uninitialized &&
+				// There can be updates while state.name is still AccessorTreeStateName.Uninitialized, and so that condition is
+				// not sufficient on its own. Thus we typically also enforce that queryStateRef.current.readyState is
+				// ApiRequestReadyState.Uninitialized. However, we may need to force a change even while both conditions hold,
+				// e.g. while a query is loading. For that we have a special ref which we always reset after we're done.
+				(isForcingRefreshRef.current || queryStateRef.current.readyState === ApiRequestReadyState.Uninitialized)
+			) {
+				if (query === undefined) {
+					// We're creating AND there are no subqueries
+					initializeAccessorTree(undefined, undefined)
+					isForcingRefreshRef.current = false
+				} else {
+					dispatch({
+						type: AccessorTreeStateActionType.InitializeQuery,
 					})
-					.catch(rejectFailedRequest)
-					.catch(() => {}) // Don't let any errors get out of this hook.
-					.finally(() => {
+					try {
+						const data = await sendQuery(query, {}, sessionToken)
+						isMountedRef.current && initializeAccessorTree(data.data, data.data)
+					} catch (metadata) {
+						rejectFailedRequest(metadata)
+					} finally {
 						isForcingRefreshRef.current = false
-					})
+					}
+				}
 			}
 		}
-	}, [
-		sessionToken,
-		initializeAccessorTree,
-		isInitialized,
-		query,
-		queryState.readyState,
-		rejectFailedRequest,
-		sendQuery,
-		state.name,
-	])
+		performEffect()
+	}, [initializeAccessorTree, isInitialized, query, rejectFailedRequest, sendQuery, sessionToken, state.name])
 
 	const rootAccessor = state.name === AccessorTreeStateName.Interactive ? state.data : undefined
 	React.useEffect(() => {
@@ -261,6 +252,10 @@ export const useAccessorTreeState = ({
 	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {
 		isFirstRenderRef.current = false
+
+		return () => {
+			isMountedRef.current = false
+		}
 	}, [])
 
 	return [state, stateMetadata]

@@ -1,44 +1,43 @@
+import {
+	EntityCreator,
+	EntityCreatorProps,
+	PersistResultSuccessType,
+	SuccessfulPersistResult,
+} from '@contember/binding'
 import * as React from 'react'
-import { EntityCreator, EntityCreatorProps } from '@contember/binding'
-import { RequestChange } from '../../state/request'
+import RequestState from '../../state/request'
 import { MutableSingleEntityRenderer, MutableSingleEntityRendererProps } from '../bindingFacade'
-import { DynamicLink } from '../DynamicLink'
 import { PageProvider } from './PageProvider'
+import { useRedirect } from './useRedirect'
 
 export interface CreatePageProps extends Omit<EntityCreatorProps, 'entities'> {
 	pageName: string
 	entity: EntityCreatorProps['entities']
-	redirectOnSuccess?: RequestChange // TODO we cannot really redirect to an edit page of the newly-created entity.
+	redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
 	rendererProps?: Omit<MutableSingleEntityRendererProps, 'children'>
 }
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<CreatePageProps> = React.memo(
 	(props: CreatePageProps) => {
-		if (!props.redirectOnSuccess) {
-			return (
-				<EntityCreator
-					{...props}
-					entities={props.entity}
-					//onSuccessfulPersist={onClick}
-				>
-					<MutableSingleEntityRenderer {...props.rendererProps}>{props.children}</MutableSingleEntityRenderer>
-				</EntityCreator>
-			)
-		}
+		const redirect = useRedirect()
+
+		const onSuccessfulPersist = React.useMemo(() => {
+			const redirectOnSuccess = props.redirectOnSuccess
+			if (!redirectOnSuccess) {
+				return undefined
+			}
+			return (result: SuccessfulPersistResult) => {
+				if (result.type === PersistResultSuccessType.NothingToPersist) {
+					return
+				}
+				redirect(request => redirectOnSuccess(request, result.persistedEntityIds[0]))
+			}
+		}, [props.redirectOnSuccess, redirect])
 
 		return (
-			<DynamicLink
-				requestChange={props.redirectOnSuccess}
-				Component={({ onClick }) => (
-					<EntityCreator
-						{...props}
-						entities={props.entity}
-						//onSuccessfulPersist={onClick}
-					>
-						<MutableSingleEntityRenderer {...props.rendererProps}>{props.children}</MutableSingleEntityRenderer>
-					</EntityCreator>
-				)}
-			/>
+			<EntityCreator {...props} entities={props.entity} onSuccessfulPersist={onSuccessfulPersist}>
+				<MutableSingleEntityRenderer {...props.rendererProps}>{props.children}</MutableSingleEntityRenderer>
+			</EntityCreator>
 		)
 	},
 )

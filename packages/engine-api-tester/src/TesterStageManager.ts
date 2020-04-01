@@ -53,7 +53,8 @@ export class TesterStageManager {
 	public async migrate(migration: string | Migration): Promise<void> {
 		if (typeof migration === 'string') {
 			const version = MigrationVersionHelper.extractVersion(migration)
-			const resolvedMigration = (await this.migrationResolver.getMigrations()).find(it => it.version === version)
+			const migrations = await this.migrationResolver.getMigrations()
+			const resolvedMigration = migrations.find(it => it.version === version)
 			if (!resolvedMigration) {
 				throw new Error(`Migration ${migration} not found`)
 			}

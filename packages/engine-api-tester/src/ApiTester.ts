@@ -131,6 +131,6 @@ export class ApiTester {
 	}
 
 	public static getMigrationsDir(): string {
-		return join(__dirname + '/../../src/example-project/migrations')
+		return join(__dirname + '/../../src')
 	}
 }

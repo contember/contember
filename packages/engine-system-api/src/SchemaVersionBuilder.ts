@@ -2,6 +2,9 @@ import { Schema } from '@contember/schema'
 import { SchemaMigrator } from '@contember/schema-migrations'
 import { ExecutedMigrationsResolver } from './model/migrations/ExecutedMigrationsResolver'
 import { emptySchema } from '@contember/schema-utils'
+import { DatabaseContext } from './model/database/DatabaseContext'
+
+export type VersionedSchema = Schema & { version: string }
 
 export class SchemaVersionBuilder {
 	constructor(
@@ -9,9 +12,19 @@ export class SchemaVersionBuilder {
 		private readonly schemaMigrator: SchemaMigrator,
 	) {}
 
-	async buildSchemaForStage(stageSlug: string): Promise<Schema> {
-		const schema = await this.buildSchema()
+	async buildSchemaForStage(db: DatabaseContext, stageSlug: string, after?: VersionedSchema): Promise<Schema> {
+		const schema = await this.buildSchema(db, after)
+		return this.filterSchemaByStage(schema, stageSlug)
+	}
 
+	async buildSchema(db: DatabaseContext, after?: VersionedSchema): Promise<Schema> {
+		return (await this.executedMigrationsResolver.getMigrations(db, after?.version)).reduce(
+			(schema, migr) => this.schemaMigrator.applyModifications(schema, migr.modifications, migr.formatVersion),
+			after || emptySchema,
+		)
+	}
+
+	private filterSchemaByStage(schema: Schema, stageSlug: string) {
 		return {
 			...schema,
 			acl: {
@@ -24,12 +37,5 @@ export class SchemaVersionBuilder {
 				),
 			},
 		}
-	}
-
-	async buildSchema(): Promise<Schema> {
-		return (await this.executedMigrationsResolver.getMigrations()).reduce(
-			(schema, migr) => this.schemaMigrator.applyModifications(schema, migr.modifications, migr.formatVersion),
-			emptySchema,
-		)
 	}
 }

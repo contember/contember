@@ -1,6 +1,4 @@
 import { StageWithoutEvent } from '../dtos/Stage'
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import { DiffQuery } from '../queries/DiffQuery'
 import { ContentEvent } from '@contember/engine-common'
@@ -12,10 +10,10 @@ import { ImplementationException } from '../../utils/exceptions'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { Schema } from '@contember/schema'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class RebaseExecutor {
 	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
@@ -23,15 +21,16 @@ class RebaseExecutor {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
-	public async rebaseAll() {
+	public async rebaseAll(db: DatabaseContext) {
 		const root = this.stageTree.getRoot()
-		const commonEvents = await this.queryHandler.fetch(new StageCommonEventsMatrixQuery())
+		const commonEvents = await db.queryHandler.fetch(new StageCommonEventsMatrixQuery())
 		for (const stage of this.stageTree.getChildren(root)) {
-			await this.rebase(commonEvents, stage, root)
+			await this.rebase(db, commonEvents, stage, root)
 		}
 	}
 
-	public async rebase(
+	private async rebase(
+		db: DatabaseContext,
 		eventsInfoMatrix: StageCommonEventsMatrixQuery.Result,
 		stage: StageWithoutEvent,
 		base: StageWithoutEvent,
@@ -41,18 +40,18 @@ class RebaseExecutor {
 		const eventsInfo = eventsInfoMatrix[base.slug][stage.slug]
 		let newHead: string = eventsInfo.stageBEventId
 		let eventsToApply: ContentEvent[] = []
-		const schema = await this.schemaVersionBuilder.buildSchema()
+		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		if (prevEventsToApply.length > 0 || eventsInfo.distance > 0) {
 			const tmpEventsToApply =
 				eventsInfo.distance > 0
-					? await this.queryHandler.fetch(new DiffQuery(eventsInfo.commonEventId, eventsInfo.stageAEventId))
+					? await db.queryHandler.fetch(new DiffQuery(eventsInfo.commonEventId, eventsInfo.stageAEventId))
 					: []
 			assertEveryIsContentEvent(tmpEventsToApply)
 			eventsToApply = tmpEventsToApply
 
 			const stageEvents =
 				eventsInfoMatrix[stage.slug][base.slug].distance > 0
-					? await this.queryHandler.fetch(new DiffQuery(eventsInfo.commonEventId, eventsInfo.stageBEventId))
+					? await db.queryHandler.fetch(new DiffQuery(eventsInfo.commonEventId, eventsInfo.stageBEventId))
 					: []
 			assertEveryIsContentEvent(stageEvents)
 
@@ -67,12 +66,13 @@ class RebaseExecutor {
 			}
 
 			const stageEventId = eventsInfoMatrix[stage.slug][stage.slug].stageAEventId
-			await this.eventApplier.applyEvents({ ...stage, event_id: stageEventId }, [
+			await this.eventApplier.applyEvents(db, { ...stage, event_id: stageEventId }, [
 				...prevEventsToApply,
 				...eventsToApply,
 			])
 
 			newHead = await this.eventsRebaser.rebaseStageEvents(
+				db,
 				stage.slug,
 				eventsInfo.stageBEventId,
 				eventsInfo.commonEventId,
@@ -82,7 +82,7 @@ class RebaseExecutor {
 		}
 
 		for (const childStage of this.stageTree.getChildren(stage)) {
-			await this.rebase(eventsInfoMatrix, childStage, stage, [...prevEventsToApply, ...eventsToApply], newHead)
+			await this.rebase(db, eventsInfoMatrix, childStage, stage, [...prevEventsToApply, ...eventsToApply], newHead)
 		}
 	}
 

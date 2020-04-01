@@ -2,27 +2,25 @@ import { createUuidGenerator, testUuid } from './testUuid'
 import { graphql, GraphQLSchema } from 'graphql'
 import { GQL } from './tags'
 import { Identity } from '@contember/engine-common'
-import { Client } from '@contember/database'
 import {
-	createResolverContext,
-	ResolverContext,
+	DatabaseContext,
 	Schema,
 	setupSystemVariables,
 	StageBySlugQuery,
 	SystemContainer,
-	SystemExecutionContainer,
 	unnamedIdentity,
 } from '@contember/engine-system-api'
 import { project } from './project'
+import ReleaseExecutor from '@contember/engine-system-api/dist/src/model/events/ReleaseExecutor'
 
 export class SystemApiTester {
 	private readonly uuidGenerator = createUuidGenerator('a454')
 
 	constructor(
-		private readonly db: Client,
+		private readonly db: DatabaseContext,
+		private readonly releaseExecutor: ReleaseExecutor,
 		private readonly systemSchema: GraphQLSchema,
 		private readonly systemContainer: SystemContainer,
-		private readonly systemExecutionContainer: SystemExecutionContainer,
 	) {}
 
 	public async querySystem(
@@ -34,16 +32,13 @@ export class SystemApiTester {
 			projectRoles?: string[]
 		} = {},
 	): Promise<any> {
-		await setupSystemVariables(this.db, unnamedIdentity, { uuid: this.uuidGenerator })
-		const context: ResolverContext = createResolverContext(
+		await setupSystemVariables(this.db.client, unnamedIdentity, { uuid: this.uuidGenerator })
+		const identity =
 			options.identity ||
-				new Identity.StaticIdentity(testUuid(888), options.roles || [], {
-					[project.slug]: options.projectRoles || [Identity.ProjectRole.ADMIN],
-				}),
-			{},
-			this.systemContainer.authorizator,
-			this.systemExecutionContainer,
-		)
+			new Identity.StaticIdentity(testUuid(888), options.roles || [], {
+				[project.slug]: options.projectRoles || [Identity.ProjectRole.ADMIN],
+			})
+		const context = this.systemContainer.resolverContextFactory.create(identity, {})
 
 		return await graphql(this.systemSchema, gql, null, context, variables)
 	}
@@ -98,11 +93,12 @@ export class SystemApiTester {
 		}
 
 		const [baseStageObj, headStageObj] = await Promise.all([
-			this.systemExecutionContainer.queryHandler.fetch(new StageBySlugQuery(baseStage)),
-			this.systemExecutionContainer.queryHandler.fetch(new StageBySlugQuery(headStage)),
+			this.db.queryHandler.fetch(new StageBySlugQuery(baseStage)),
+			this.db.queryHandler.fetch(new StageBySlugQuery(headStage)),
 		])
 
-		await this.systemExecutionContainer.releaseExecutor.execute(
+		await this.releaseExecutor.execute(
+			this.db,
 			{
 				identity: new Identity.StaticIdentity(testUuid(666), [], {
 					[project.slug]: [Identity.ProjectRole.ADMIN],

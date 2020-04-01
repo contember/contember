@@ -1,5 +1,4 @@
 import { KoaMiddleware } from '../../core/koa'
-import { SchemaVersionBuilder } from '@contember/engine-system-api'
 import Project from '../../config/Project'
 import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import { ContentApolloServerFactory } from './ContentApolloServerFactory'
@@ -10,16 +9,13 @@ import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
 import { ProjectMemberMiddlewareFactory } from '../project-common'
 import { Identity } from '@contember/engine-common'
 import { AllowAllPermissionFactory } from '@contember/schema-definition'
+import { ContentSchemaResolver } from './ContentSchemaResolver'
 
 class ContentApolloMiddlewareFactory {
-	private schemaCache: { [stage: string]: Schema } = {}
-
 	constructor(
-		private readonly project: Project,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly contentSchemaFactory: ContentSchemaResolver,
 		private readonly graphqlSchemaFactory: GraphQlSchemaFactory,
 		private readonly apolloServerFactory: ContentApolloServerFactory,
-		private readonly currentSchema?: Schema,
 	) {}
 
 	create(
@@ -31,16 +27,7 @@ class ContentApolloMiddlewareFactory {
 			ContentApolloMiddlewareFactory.KoaState
 	> {
 		return async (ctx, next) => {
-			if (!this.schemaCache[stage.slug]) {
-				if (this.project.ignoreMigrations && !this.currentSchema) {
-					throw new Error('Current schema was not provided, cannot use "ignoreMigrations" option')
-				}
-				const schema = this.project.ignoreMigrations
-					? this.currentSchema!
-					: await this.schemaVersionBuilder.buildSchemaForStage(stage.slug)
-				this.schemaCache[stage.slug] = this.modifySchema(schema)
-			}
-			const schema = this.schemaCache[stage.slug]
+			const schema = this.modifySchema(await this.contentSchemaFactory.getSchema(stage.slug))
 
 			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
 				projectRoles: ctx.state.projectMemberships.map(it => it.role),

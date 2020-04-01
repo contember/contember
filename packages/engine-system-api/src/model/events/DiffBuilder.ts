@@ -2,27 +2,26 @@ import DependencyBuilder from './DependencyBuilder'
 import { DiffErrorCode } from '../../schema'
 import { Stage } from '../dtos/Stage'
 import { AnyEvent } from '@contember/engine-common'
-import { QueryHandler } from '@contember/queryable'
 import { DiffCountQuery, DiffQuery } from '../queries'
-import { DatabaseQueryable } from '@contember/database'
 import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly permissionsVerifier: EventsPermissionsVerifier,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async build(
+		db: DatabaseContext,
 		permissionContext: EventsPermissionsVerifier.Context,
 		baseStage: Stage,
 		headStage: Stage,
 	): Promise<DiffBuilder.Response> {
-		const count = await this.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
+		const count = await db.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
 
 		if (count.ok === false) {
 			return count
@@ -35,11 +34,11 @@ class DiffBuilder {
 			}
 		}
 
-		const events = await this.queryHandler.fetch(new DiffQuery(baseStage.event_id, headStage.event_id))
+		const events = await db.queryHandler.fetch(new DiffQuery(baseStage.event_id, headStage.event_id))
 		assertEveryIsContentEvent(events)
-		const schema = await this.schemaVersionBuilder.buildSchema()
+		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		const dependencies = await this.dependencyBuilder.build(schema, events)
-		const permissions = await this.permissionsVerifier.verify(permissionContext, headStage, baseStage, events)
+		const permissions = await this.permissionsVerifier.verify(db, permissionContext, headStage, baseStage, events)
 
 		return {
 			ok: true,

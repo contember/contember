@@ -15,23 +15,28 @@ import RecreateContentEvent from '../commands/RecreateContentEvent'
 import { UuidProvider } from '../../utils/uuid'
 import { assertEveryIsContentEvent } from '../events/eventUtils'
 import { SaveMigrationCommand } from '../commands/SaveMigrationCommand'
+import RebaseExecutor from '../events/RebaseExecutor'
+import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
+import { DatabaseContext } from '../database/DatabaseContext'
 import { VERSION_INITIAL } from '@contember/schema-migrations/dist/src/modifications/ModificationVersions'
 
 type StageEventsMap = Record<string, ContentEvent[]>
 
 export default class ProjectMigrator {
 	constructor(
-		private readonly db: Client,
 		private readonly stageTree: StageTree,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
-		private readonly providers: UuidProvider,
+		private readonly rebaseExecutor: RebaseExecutor,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
-	public async migrate(schema: Schema, migrationsToExecute: Migration[], progressCb: (version: string) => void) {
-		const queryHandler = this.db.createQueryHandler()
+	public async migrate(db: DatabaseContext, migrationsToExecute: Migration[], progressCb: (version: string) => void) {
+		let schema = await this.schemaVersionBuilder.buildSchema(db)
+
+		await this.rebaseExecutor.rebaseAll(db)
 		const rootStage = this.stageTree.getRoot()
-		const commonEventsMatrix = await queryHandler.fetch(new StageCommonEventsMatrixQuery())
-		let stageEvents = await this.fetchStageEvents(queryHandler, commonEventsMatrix, rootStage)
+		const commonEventsMatrix = await db.queryHandler.fetch(new StageCommonEventsMatrixQuery())
+		let stageEvents = await this.fetchStageEvents(db.queryHandler, commonEventsMatrix, rootStage)
 
 		let previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
 		for (const migration of migrationsToExecute) {
@@ -39,26 +44,34 @@ export default class ProjectMigrator {
 			const formatVersion = migration.formatVersion
 
 			for (const modification of migration.modifications) {
-				;[schema, stageEvents] = await this.applyModification(schema, stageEvents, modification, formatVersion)
+				;[schema, stageEvents] = await this.applyModification(
+					db.client,
+					schema,
+					stageEvents,
+					modification,
+					formatVersion,
+				)
 			}
 
-			previousId = await new CreateEventCommand(
-				EventType.runMigration,
-				{
-					version: migration.version,
-				},
-				previousId,
-				this.providers,
-			).execute(this.db)
-			await new SaveMigrationCommand(migration).execute(this.db)
+			previousId = await db.commandBus.execute(
+				new CreateEventCommand(
+					EventType.runMigration,
+					{
+						version: migration.version,
+					},
+					previousId,
+				),
+			)
+			await db.commandBus.execute(new SaveMigrationCommand(migration))
 		}
 
-		await new UpdateStageEventCommand(rootStage.slug, previousId).execute(this.db)
+		await db.commandBus.execute(new UpdateStageEventCommand(rootStage.slug, previousId))
 
-		await this.reCreateEvents(this.db, { ...rootStage, event_id: previousId }, stageEvents)
+		await this.reCreateEvents(db, { ...rootStage, event_id: previousId }, stageEvents)
 	}
 
 	private async applyModification(
+		db: Client,
 		schema: Schema,
 		events: StageEventsMap,
 		modification: Migration.Modification,
@@ -74,9 +87,9 @@ export default class ProjectMigrator {
 		)
 		await modificationHandler.createSql(builder)
 		const sql = builder.getSql()
-		await this.executeOnStage(stage, sql)
+		await this.executeOnStage(db, stage, sql)
 
-		const newEvents = await this.applyOnChildren(stage, modificationHandler, events, sql)
+		const newEvents = await this.applyOnChildren(db, stage, modificationHandler, events, sql)
 
 		schema = modificationHandler.getSchemaUpdater()(schema)
 
@@ -84,6 +97,7 @@ export default class ProjectMigrator {
 	}
 
 	private async applyOnChildren(
+		db: Client,
 		stage: StageWithoutEvent,
 		modificationHandler: Modification<any>,
 		events: StageEventsMap,
@@ -96,15 +110,15 @@ export default class ProjectMigrator {
 			if (stageEvents !== transformedEvents) {
 				events = { ...events, [childStage.slug]: transformedEvents }
 			}
-			await this.executeOnStage(childStage, sql)
-			events = await this.applyOnChildren(childStage, modificationHandler, events, sql)
+			await this.executeOnStage(db, childStage, sql)
+			events = await this.applyOnChildren(db, childStage, modificationHandler, events, sql)
 		}
 		return events
 	}
 
-	private async executeOnStage(stage: StageWithoutEvent, sql: string) {
-		await this.db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
-		await this.db.query(sql)
+	private async executeOnStage(db: Client, stage: StageWithoutEvent, sql: string) {
+		await db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
+		await db.query(sql)
 	}
 
 	private async fetchStageEvents(
@@ -133,14 +147,14 @@ export default class ProjectMigrator {
 		return result
 	}
 
-	private async reCreateEvents(db: Client, stage: Stage, events: StageEventsMap): Promise<void> {
+	private async reCreateEvents(db: DatabaseContext, stage: Stage, events: StageEventsMap): Promise<void> {
 		for (const childStage of this.stageTree.getChildren(stage)) {
 			let previousId = stage.event_id
-			const transactionContext = new RecreateContentEvent.TransactionContext(this.providers)
+			const transactionContext = new RecreateContentEvent.TransactionContext()
 			for (const event of events[childStage.slug]) {
-				previousId = await new RecreateContentEvent(event, previousId, transactionContext, this.providers).execute(db)
+				previousId = await db.commandBus.execute(new RecreateContentEvent(event, previousId, transactionContext))
 			}
-			await new UpdateStageEventCommand(childStage.slug, previousId).execute(db)
+			await db.commandBus.execute(new UpdateStageEventCommand(childStage.slug, previousId))
 			await this.reCreateEvents(db, { ...childStage, event_id: previousId }, events)
 		}
 	}

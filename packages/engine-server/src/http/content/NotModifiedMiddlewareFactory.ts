@@ -15,7 +15,8 @@ export class NotModifiedMiddlewareFactory {
 			if (isMutation || requestRef === undefined) {
 				return await next()
 			}
-			const queryHandler = ctx.state.projectContainer.systemQueryHandler
+			const db = ctx.state.projectContainer.systemDatabaseContextFactory.create(undefined)
+			const queryHandler = db.queryHandler
 			const stageSlug = ctx.state.stage.slug
 			const latestEvent = await queryHandler.fetch(new LatestEventIdByStageQuery(stageSlug))
 			if (latestEvent === requestRef) {

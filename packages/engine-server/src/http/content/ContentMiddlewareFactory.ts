@@ -9,6 +9,10 @@ import { ProjectMemberMiddlewareFactory, ProjectResolveMiddlewareFactory } from 
 import { StageResolveMiddlewareFactory } from './StageResolveMiddlewareFactory'
 import { NotModifiedMiddlewareFactory } from './NotModifiedMiddlewareFactory'
 
+export interface AssignDbMiddlewareState {
+	db: Client
+}
+
 class ContentMiddlewareFactory {
 	constructor(
 		private readonly projectFindMiddlewareFactory: ProjectResolveMiddlewareFactory,

@@ -1,5 +1,3 @@
-import { Client, DatabaseQueryable } from '@contember/database'
-import { QueryHandler } from '@contember/queryable'
 import { Stage } from '../dtos/Stage'
 import { DiffQuery, StageBySlugQuery } from '../queries'
 import DependencyBuilder from './DependencyBuilder'
@@ -10,20 +8,20 @@ import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import StageTree from '../stages/StageTree'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class ReleaseExecutor {
 	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly permissionsVerifier: EventsPermissionsVerifier,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
 		private readonly stageTree: StageTree,
-		private readonly db: Client,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async execute(
+		db: DatabaseContext,
 		permissionContext: EventsPermissionsVerifier.Context,
 		targetStage: Stage,
 		sourceStage: Stage,
@@ -32,13 +30,13 @@ class ReleaseExecutor {
 		if (eventsToApply.length === 0) {
 			return
 		}
-		const allEvents = await this.queryHandler.fetch(new DiffQuery(targetStage.event_id, sourceStage.event_id))
+		const allEvents = await db.queryHandler.fetch(new DiffQuery(targetStage.event_id, sourceStage.event_id))
 		assertEveryIsContentEvent(allEvents)
 		const allEventsIds = new Set(allEvents.map(it => it.id))
 		if (!this.allEventsExists(eventsToApply, allEventsIds)) {
 			throw new Error() //todo
 		}
-		const schema = await this.schemaVersionBuilder.buildSchema()
+		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		const dependencies = await this.dependencyBuilder.build(schema, allEvents)
 		if (!this.verifyDependencies(eventsToApply, dependencies)) {
 			throw new Error() //todo
@@ -47,13 +45,13 @@ class ReleaseExecutor {
 		const eventsSet = new Set(eventsToApply)
 		const events = allEvents.filter(it => eventsSet.has(it.id))
 
-		const permissions = this.permissionsVerifier.verify(permissionContext, sourceStage, targetStage, events)
+		const permissions = this.permissionsVerifier.verify(db, permissionContext, sourceStage, targetStage, events)
 		if (Object.values(permissions).filter(it => !it).length) {
 			throw new Error() // todo
 		}
 
-		await this.eventApplier.applyEvents(targetStage, events)
-		const newBase = await this.queryHandler.fetch(new StageBySlugQuery(targetStage.slug))
+		await this.eventApplier.applyEvents(db, targetStage, events)
+		const newBase = await db.queryHandler.fetch(new StageBySlugQuery(targetStage.slug))
 		if (!newBase) {
 			throw new Error('should not happen')
 		}
@@ -63,14 +61,23 @@ class ReleaseExecutor {
 				allEvents.map(it => it.id),
 			)
 		) {
-			await new UpdateStageEventCommand(targetStage.slug, eventsToApply[eventsToApply.length - 1]).execute(this.db)
+			await db.commandBus.execute(
+				new UpdateStageEventCommand(targetStage.slug, eventsToApply[eventsToApply.length - 1]),
+			)
 		} else {
-			await this.rebaseRecursive(sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
+			await this.rebaseRecursive(db, sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
 		}
 	}
 
-	private async rebaseRecursive(rebasedStage: Stage, oldBase: string, newBase: string, droppedEvents: string[]) {
+	private async rebaseRecursive(
+		db: DatabaseContext,
+		rebasedStage: Stage,
+		oldBase: string,
+		newBase: string,
+		droppedEvents: string[],
+	) {
 		const newHead = await this.eventsRebaser.rebaseStageEvents(
+			db,
 			rebasedStage.slug,
 			rebasedStage.event_id,
 			oldBase,
@@ -78,8 +85,8 @@ class ReleaseExecutor {
 			droppedEvents,
 		)
 		for (const child of this.stageTree.getChildren(rebasedStage)) {
-			const childWithEvent = await this.queryHandler.fetch(new StageBySlugQuery(child.slug))
-			await this.rebaseRecursive(childWithEvent!, rebasedStage.event_id, newHead, [])
+			const childWithEvent = await db.queryHandler.fetch(new StageBySlugQuery(child.slug))
+			await this.rebaseRecursive(db, childWithEvent!, rebasedStage.event_id, newHead, [])
 		}
 	}
 

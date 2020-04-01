@@ -1,43 +1,26 @@
-import { Authorizator } from '@contember/authorization'
 import { Config } from 'apollo-server-core'
-import { ApolloServer, AuthenticationError } from 'apollo-server-koa'
-import {
-	ResolverContext,
-	Schema,
-	SystemExecutionContainer,
-	typeDefs,
-	createResolverContext,
-} from '@contember/engine-system-api'
+import { ApolloServer } from 'apollo-server-koa'
+import { ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@contember/engine-system-api'
 import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import { Identity } from '@contember/engine-common'
-import { ApolloError } from 'apollo-server-errors'
 import ErrorCallbackExtension from '../../core/graphql/ErrorCallbackExtension'
 import { KoaContext } from '../../core/koa'
-import {
-	DatabaseTransactionMiddlewareFactory,
-	ProjectMemberMiddlewareFactory,
-	ProjectResolveMiddlewareFactory,
-} from '../project-common'
+import { ProjectMemberMiddlewareFactory, ProjectResolveMiddlewareFactory } from '../project-common'
 import { flattenVariables } from '@contember/engine-content-api'
 import { ErrorContextProvider, ErrorHandlerExtension } from '../../core/graphql/ErrorHandlerExtension'
 
 type InputKoaContext = KoaContext<
-	DatabaseTransactionMiddlewareFactory.KoaState &
-		AuthMiddlewareFactory.KoaState &
-		ProjectMemberMiddlewareFactory.KoaState &
-		ProjectResolveMiddlewareFactory.KoaState
+	AuthMiddlewareFactory.KoaState & ProjectMemberMiddlewareFactory.KoaState & ProjectResolveMiddlewareFactory.KoaState
 >
 
 type ExtendedGraphqlContext = ResolverContext & {
-	errorHandler: (errors: readonly any[]) => void
 	errorContextProvider: ErrorContextProvider
 }
 
 class SystemApolloServerFactory {
 	constructor(
 		private readonly resolvers: Schema.Resolvers,
-		private readonly authorizator: Authorizator<Identity>,
-		private readonly executionContainerFactory: SystemExecutionContainer.Factory,
+		private readonly resolverContextFactory: ResolverContextFactory,
 		private readonly projectName: string,
 	) {}
 
@@ -51,17 +34,12 @@ class SystemApolloServerFactory {
 	}
 
 	private createContext(ctx: InputKoaContext): ExtendedGraphqlContext {
-		const systemContext = createResolverContext(
-			new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {
-				[ctx.state.projectContainer.project.slug]: ctx.state.projectMemberships.map(it => it.role),
-			}),
-			flattenVariables(ctx.state.projectMemberships),
-			this.authorizator,
-			this.executionContainerFactory.create(ctx.state.db),
-		)
+		const identity = new Identity.StaticIdentity(ctx.state.authResult.identityId, ctx.state.authResult.roles, {
+			[ctx.state.projectContainer.project.slug]: ctx.state.projectMemberships.map(it => it.role),
+		})
+		const systemContext = this.resolverContextFactory.create(identity, flattenVariables(ctx.state.projectMemberships))
 		return {
 			...systemContext,
-			errorHandler: ctx.state.planRollback,
 			errorContextProvider: () => ({
 				body: ctx.request.body,
 				url: ctx.request.originalUrl,

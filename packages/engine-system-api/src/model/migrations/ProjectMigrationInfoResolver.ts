@@ -2,6 +2,7 @@ import { ProjectConfig } from '../../types'
 import { calculateMigrationChecksum, Migration, MigrationsResolver } from '@contember/schema-migrations'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { ExecutedMigration } from '../dtos/ExecutedMigration'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class ProjectMigrationInfoResolver {
 	constructor(
@@ -10,9 +11,9 @@ class ProjectMigrationInfoResolver {
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 	) {}
 
-	public async getMigrationsInfo(): Promise<ProjectMigrationInfoResolver.Result> {
+	public async getMigrationsInfo(db: DatabaseContext): Promise<ProjectMigrationInfoResolver.Result> {
 		const allMigrations = await this.migrationsResolver.getMigrations()
-		const executedMigrations = await this.executedMigrationsResolver.getMigrations()
+		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
 		const latestMigration = executedMigrations.reduce<string | null>(
 			(latest, migration) => (!latest || migration.version > latest ? migration.version : latest),
 			null,

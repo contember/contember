@@ -19,10 +19,10 @@ export class MigrationsResolver {
 	}
 
 	private async createMigrations(): Promise<Migration[]> {
-		return (await this.migrationFilesManager.readFiles('json')).map(({ version, filename, content }) => {
+		return (await this.migrationFilesManager.readFiles('json')).map(({ filename, content }) => {
 			const parsed = JSON.parse(content)
 			return {
-				version,
+				version: MigrationVersionHelper.extractVersion(filename),
 				name: MigrationVersionHelper.extractName(filename),
 				formatVersion: parsed.formatVersion || VERSION_INITIAL,
 				modifications: parsed.modifications,

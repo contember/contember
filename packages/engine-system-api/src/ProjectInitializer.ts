@@ -1,49 +1,43 @@
 import CreateInitEventCommand from './model/commands/CreateInitEventCommand'
-import { setupSystemVariables, unnamedIdentity } from './SystemVariablesSetupHelper'
+import { unnamedIdentity } from './SystemVariablesSetupHelper'
 import { StageConfig } from './types'
-import { Client } from '@contember/database'
 import ProjectMigrator from './model/migrations/ProjectMigrator'
-import RebaseExecutor from './model/events/RebaseExecutor'
 import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
 import StageCreator from './model/stages/StageCreator'
 import StageTree from './model/stages/StageTree'
-import { UuidProvider } from './utils/uuid'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { Schema } from '@contember/schema'
 import { MigrationEventsQuery } from './model/queries'
 import { SaveMigrationCommand } from './model/commands/SaveMigrationCommand'
+import { DatabaseContext, DatabaseContextFactory } from './model'
 
-class ProjectInitializer {
+export class ProjectInitializer {
 	constructor(
-		private readonly systemDb: Client,
+		private readonly databaseContextFactory: DatabaseContextFactory,
 		private readonly stageTree: StageTree,
 		private readonly projectMigrator: ProjectMigrator,
-		private readonly rebaseExecutor: RebaseExecutor,
 		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver,
 		private readonly stageCreator: StageCreator,
-		private readonly providers: UuidProvider,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async initialize() {
-		await setupSystemVariables(this.systemDb, unnamedIdentity, this.providers)
-		await this.createInitEvent()
-		await this.initStages()
+		return this.databaseContextFactory.create(unnamedIdentity).transaction(async trx => {
+			await this.createInitEvent(trx)
+			await this.initStages(trx)
+		})
 	}
 
-	private async createInitEvent() {
-		const rowCount = new CreateInitEventCommand(this.providers).execute(this.systemDb)
+	private async createInitEvent(db: DatabaseContext) {
+		const rowCount = await db.commandBus.execute(new CreateInitEventCommand())
 		if (rowCount) {
 			console.log(`Created init event`)
 		}
 	}
 
-	private async initStages() {
+	private async initStages(db: DatabaseContext) {
 		const root = this.stageTree.getRoot()
-		await this.upgradeSchemaMigrations(root.slug)
+		await this.upgradeSchemaMigrations(db, root.slug)
 
 		const createStage = async (parent: StageConfig | null, stage: StageConfig) => {
-			const created = await this.stageCreator.createStage(parent, stage)
+			const created = await this.stageCreator.createStage(db, parent, stage)
 			if (created) {
 				console.log(`Created stage ${stage.slug} `)
 			} else {
@@ -61,19 +55,19 @@ class ProjectInitializer {
 		console.group(`Creating stages`)
 		await createRecursive(null, root)
 		console.groupEnd()
-		const schema = await this.schemaVersionBuilder.buildSchema()
+
 		console.group(`Executing project migrations`)
-		await this.runMigrations(schema)
+		await this.runMigrations(db)
 		console.groupEnd()
 	}
 
-	private async runMigrations(schema: Schema) {
+	private async runMigrations(db: DatabaseContext) {
 		const {
 			migrationsToExecute,
 			migrationsDirectory,
 			allMigrations,
 			badMigrations,
-		} = await this.projectMigrationInfoResolver.getMigrationsInfo()
+		} = await this.projectMigrationInfoResolver.getMigrationsInfo(db)
 
 		console.log(`Reading migrations from directory "${migrationsDirectory}"`)
 		for (const bad of badMigrations) {
@@ -90,15 +84,14 @@ class ProjectInitializer {
 			return
 		}
 
-		await this.rebaseExecutor.rebaseAll()
-		await this.projectMigrator.migrate(schema, migrationsToExecute, version =>
+		await this.projectMigrator.migrate(db, migrationsToExecute, version =>
 			console.log(`Executing migration ${version}`),
 		)
 	}
 
-	private async upgradeSchemaMigrations(stage: string) {
-		const migrationEvents = await this.systemDb.createQueryHandler().fetch(new MigrationEventsQuery(stage))
-		const { allMigrations, executedMigrations } = await this.projectMigrationInfoResolver.getMigrationsInfo()
+	private async upgradeSchemaMigrations(db: DatabaseContext, stage: string) {
+		const migrationEvents = await db.queryHandler.fetch(new MigrationEventsQuery(stage))
+		const { allMigrations, executedMigrations } = await this.projectMigrationInfoResolver.getMigrationsInfo(db)
 		if (executedMigrations.length > 0 || migrationEvents.length === 0) {
 			return
 		}
@@ -110,10 +103,8 @@ class ProjectInitializer {
 				console.warn(`Previously executed migration ${version} not found`)
 				continue
 			}
-			await new SaveMigrationCommand(migration).execute(this.systemDb)
+			await db.commandBus.execute(new SaveMigrationCommand(migration))
 		}
 		console.groupEnd()
 	}
 }
-
-export default ProjectInitializer

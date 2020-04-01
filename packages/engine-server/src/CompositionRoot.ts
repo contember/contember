@@ -5,18 +5,7 @@ import {
 	PermissionsByIdentityFactory,
 	PermissionsVerifier,
 } from '@contember/engine-content-api'
-import {
-	getSystemMigrationsDirectory,
-	MigrationsResolver,
-	SchemaMigrator,
-	SchemaVersionBuilder,
-	SystemContainerFactory,
-} from '@contember/engine-system-api'
-import {
-	MigrationFilesManager,
-	ModificationHandlerFactory,
-	SchemaVersionBuilder as SchemaVersionBuilderInternal,
-} from '@contember/schema-migrations'
+import { SystemContainerFactory } from '@contember/engine-system-api'
 import {
 	getTenantMigrationsDirectory,
 	Providers as TenantProviders,
@@ -29,14 +18,12 @@ import {
 	ContentApolloMiddlewareFactory,
 	ContentApolloServerFactory,
 	ContentMiddlewareFactory,
-	DatabaseTransactionMiddlewareFactory,
 	GraphQlSchemaFactory,
 	HomepageMiddlewareFactory,
 	MiddlewareStackFactory,
 	NotModifiedMiddlewareFactory,
 	ProjectMemberMiddlewareFactory,
 	ProjectResolveMiddlewareFactory,
-	SetupSystemVariablesMiddlewareFactory,
 	StageResolveMiddlewareFactory,
 	SystemApolloServerFactory,
 	SystemMiddlewareFactory,
@@ -48,13 +35,14 @@ import { Config, Project, TenantConfig } from './config/config'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
+import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
 import { tuple } from './utils'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
-import { ExecutedMigrationsResolver } from '@contember/engine-system-api/dist/src/model/migrations/ExecutedMigrationsResolver'
 import { MigrationsRunner } from '@contember/database-migrations'
+import { ContentSchemaResolver } from './http/content/ContentSchemaResolver'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -109,9 +97,6 @@ class CompositionRoot {
 				({ projectContainerResolver }) => new ProjectResolveMiddlewareFactory(projectContainerResolver),
 			)
 			.addService('stageResolveMiddlewareFactory', () => new StageResolveMiddlewareFactory())
-			.addService('databaseTransactionMiddlewareFactory', () => {
-				return new DatabaseTransactionMiddlewareFactory()
-			})
 			.addService('tenantApolloServer', ({ tenantContainer }) =>
 				new TenantApolloServerFactory(tenantContainer.resolvers, tenantContainer.resolverContextFactory).create(),
 			)
@@ -119,10 +104,6 @@ class CompositionRoot {
 				'tenantMiddlewareFactory',
 				({ tenantApolloServer, authMiddlewareFactory }) =>
 					new TenantMiddlewareFactory(tenantApolloServer, authMiddlewareFactory),
-			)
-			.addService(
-				'setupSystemVariablesMiddlewareFactory',
-				({ providers }) => new SetupSystemVariablesMiddlewareFactory(providers),
 			)
 			.addService('notModifiedMiddlewareFactory', () => new NotModifiedMiddlewareFactory())
 			.addService(
@@ -144,19 +125,11 @@ class CompositionRoot {
 			)
 			.addService(
 				'systemMiddlewareFactory',
-				({
-					projectResolveMiddlewareFactory,
-					authMiddlewareFactory,
-					projectMemberMiddlewareFactory,
-					databaseTransactionMiddlewareFactory,
-					setupSystemVariablesMiddlewareFactory,
-				}) =>
+				({ projectResolveMiddlewareFactory, authMiddlewareFactory, projectMemberMiddlewareFactory }) =>
 					new SystemMiddlewareFactory(
 						projectResolveMiddlewareFactory,
 						authMiddlewareFactory,
 						projectMemberMiddlewareFactory,
-						databaseTransactionMiddlewareFactory,
-						setupSystemVariablesMiddlewareFactory,
 					),
 			)
 			.addService('timerMiddlewareFactory', () => new TimerMiddlewareFactory())
@@ -211,7 +184,7 @@ class CompositionRoot {
 		schemas: undefined | Record<string, Schema>,
 		plugins: Plugin[],
 	): Record<string, ProjectContainer> {
-		const containers = Object.values(projects).map((project: Project) => {
+		const containers = Object.values(projects).map((project: Project): [string, ProjectContainer] => {
 			const projectContainer = new Builder({})
 				.addService('providers', () => providers)
 				.addService('project', () => project)
@@ -231,36 +204,42 @@ class CompositionRoot {
 					)
 				})
 				.addService(
-					'systemDbMigrationsRunner',
-					() => new MigrationsRunner(project.db, 'system', getSystemMigrationsDirectory()),
-				)
-
-				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
-				.addService('systemQueryHandler', ({ systemDbClient }) => systemDbClient.createQueryHandler())
-				.addService(
 					'modificationHandlerFactory',
 					() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
 				)
-				.addService(
-					'schemaMigrator',
-					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory),
-				)
-				.addService(
-					'executedMigrationsResolver',
-					({ systemQueryHandler }) => new ExecutedMigrationsResolver(systemQueryHandler),
-				)
-				.addService(
-					'schemaVersionBuilder',
-					({ executedMigrationsResolver, schemaMigrator }) =>
-						new SchemaVersionBuilder(executedMigrationsResolver, schemaMigrator),
-				)
+
 				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory(graphqlObjectFactories))
 				.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
 				.addService(
 					'contentPermissionsVerifier',
 					({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),
 				)
-				.addService('graphQlSchemaFactory', container => {
+
+				.build()
+
+			const systemContainer = new SystemContainerFactory().create(
+				projectContainer.pick(
+					'connection',
+					'projectsDir',
+					'project',
+					'contentPermissionsVerifier',
+					'modificationHandlerFactory',
+					'providers',
+				),
+			)
+
+			const httpContainer = new Builder({})
+				.addService(
+					'systemApolloServerFactory',
+					() =>
+						new SystemApolloServerFactory(
+							systemContainer.systemResolvers,
+							systemContainer.resolverContextFactory,
+							project.slug,
+						),
+				)
+				.addService('graphQlSchemaFactory', () => {
+					const container = projectContainer
 					const contributors = plugins
 						.map(it => (it.getSchemaContributor ? it.getSchemaContributor(container) : null))
 						.filter((it): it is GraphQLSchemaContributor => !!it)
@@ -270,61 +249,32 @@ class CompositionRoot {
 						contributors,
 					)
 				})
-				.addService('apolloServerFactory', ({ project }) => new ContentApolloServerFactory(project.slug, debug))
+				.addService('apolloServerFactory', () => new ContentApolloServerFactory(project.slug, debug))
+				.addService(
+					'contentSchemaResolver',
+					() =>
+						new ContentSchemaResolver(
+							systemContainer.schemaVersionBuilder,
+							systemContainer.systemDatabaseContextFactory.create(undefined),
+						),
+				)
 				.addService(
 					'contentApolloMiddlewareFactory',
-					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory, schema }) =>
-						new ContentApolloMiddlewareFactory(
-							project,
-							schemaVersionBuilder,
-							graphQlSchemaFactory,
-							apolloServerFactory,
-							schema,
-						),
+					({ contentSchemaResolver, graphQlSchemaFactory, apolloServerFactory }) =>
+						new ContentApolloMiddlewareFactory(contentSchemaResolver, graphQlSchemaFactory, apolloServerFactory),
 				)
 				.build()
 
-			const systemContainer = new SystemContainerFactory().create(
-				projectContainer.pick(
-					'projectsDir',
-					'project',
-					'contentPermissionsVerifier',
-					'modificationHandlerFactory',
-					'schemaVersionBuilder',
-					'providers',
-				),
-			)
-
-			const systemIntermediateContainer = new Builder({})
-				.addService(
-					'systemApolloServerFactory',
-					() =>
-						new SystemApolloServerFactory(
-							systemContainer.systemResolvers,
-							systemContainer.authorizator,
-							systemContainer.systemExecutionContainerFactory,
-							project.slug,
-						),
-				)
-				.build()
-
-			const projectServices = projectContainer.pick(
-				'project',
-				'contentApolloMiddlewareFactory',
-				'systemDbClient',
-				'systemQueryHandler',
-				'connection',
-				'systemDbMigrationsRunner',
+			const projectServices = projectContainer.pick('project', 'connection')
+			const systemServices = systemContainer.pick(
+				'systemDatabaseContextFactory',
 				'schemaVersionBuilder',
+				'projectInitializer',
+				'systemDbMigrationsRunner',
 			)
+			const httpServices = httpContainer.pick('contentApolloMiddlewareFactory', 'systemApolloServerFactory')
 
-			return tuple(
-				project.slug,
-				mergeContainers(
-					mergeContainers(projectServices, systemIntermediateContainer),
-					systemContainer.pick('systemExecutionContainerFactory'),
-				),
-			)
+			return tuple(project.slug, mergeContainers(mergeContainers(projectServices, systemServices), httpServices))
 		})
 		return Object.fromEntries(containers)
 	}

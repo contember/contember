@@ -1,10 +1,10 @@
-import { Client, SelectBuilder } from '@contember/database'
+import { SelectBuilder } from '@contember/database'
 import {
+	DatabaseContext,
 	MigrationsResolver,
 	ProjectMigrator,
-	StageCreator,
 	StageConfig,
-	SchemaVersionBuilder,
+	StageCreator,
 } from '@contember/engine-system-api'
 import { Migration, MigrationVersionHelper } from '@contember/schema-migrations'
 
@@ -13,11 +13,10 @@ export class TesterStageManager {
 
 	constructor(
 		private readonly stages: StageConfig[],
-		private readonly db: Client,
+		private readonly db: DatabaseContext,
 		private readonly stageCreator: StageCreator,
 		private readonly projectMigrator: ProjectMigrator,
 		private readonly migrationResolver: MigrationsResolver,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public getStage(slug: string): StageConfig {
@@ -32,7 +31,7 @@ export class TesterStageManager {
 		const stages = await SelectBuilder.create<{ slug: string }>()
 			.select('slug')
 			.from('stage')
-			.getResult(this.db)
+			.getResult(this.db.client)
 
 		this.createdStages = new Set(stages.map(it => it.slug))
 
@@ -47,7 +46,7 @@ export class TesterStageManager {
 
 	public async createStage(slug: string): Promise<void> {
 		const stage = this.getStageInternal(slug)
-		await this.stageCreator.createStage(stage.base ? this.getStage(stage.base) : null, stage)
+		await this.stageCreator.createStage(this.db, stage.base ? this.getStage(stage.base) : null, stage)
 		this.createdStages.add(slug)
 	}
 
@@ -60,8 +59,7 @@ export class TesterStageManager {
 			}
 			migration = resolvedMigration
 		}
-		const schema = await this.schemaVersionBuilder.buildSchema()
-		await this.projectMigrator.migrate(schema, [migration], () => null)
+		await this.projectMigrator.migrate(this.db, [migration], () => null)
 	}
 
 	private getStageInternal(slug: string): StageConfig {

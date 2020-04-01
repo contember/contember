@@ -8,7 +8,8 @@ export const projectVariablesResolver = (
 	if (!container) {
 		return undefined
 	}
-	const schema = await container.schemaVersionBuilder.buildSchema()
+	const db = container.systemDatabaseContextFactory.create(undefined)
+	const schema = await container.schemaVersionBuilder.buildSchema(db)
 	return {
 		roles: Object.entries(schema.acl.roles).reduce<RoleVariablesDefinition[]>(
 			(acc, [role, def]) => [

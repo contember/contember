@@ -1,18 +1,18 @@
 import { UuidProvider } from '../../utils/uuid'
 import { Client, InsertBuilder } from '@contember/database'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import { assertNever } from '../../utils'
+import { assertNever, Providers } from '../../utils'
+import { Command } from './Command'
 
-class RecreateContentEvent {
+class RecreateContentEvent implements Command<string> {
 	constructor(
 		private readonly event: ContentEvent,
 		private readonly previousId: string,
 		private readonly transactionContext: RecreateContentEvent.TransactionContext,
-		private readonly providers: UuidProvider,
 	) {}
 
-	public async execute(db: Client) {
-		const id = this.providers.uuid()
+	public async execute({ db, providers }: Command.Args) {
+		const id = providers.uuid()
 		await InsertBuilder.create()
 			.into('event')
 			.values({
@@ -20,7 +20,7 @@ class RecreateContentEvent {
 				type: this.event.type,
 				data: this.createData(),
 				previous_id: this.previousId,
-				transaction_id: this.transactionContext.getNewId(this.event.transactionId),
+				transaction_id: this.transactionContext.getNewId(this.event.transactionId, providers),
 				identity_id: this.event.identityId,
 				created_at: this.event.createdAt,
 			})
@@ -43,12 +43,11 @@ class RecreateContentEvent {
 
 namespace RecreateContentEvent {
 	export class TransactionContext {
-		constructor(private readonly providers: UuidProvider) {}
 		private idRemap: Record<string, string> = {}
 
-		public getNewId(oldId: string): string {
+		public getNewId(oldId: string, providers: Providers): string {
 			if (!this.idRemap[oldId]) {
-				this.idRemap[oldId] = this.providers.uuid()
+				this.idRemap[oldId] = providers.uuid()
 			}
 			return this.idRemap[oldId]
 		}

@@ -1,9 +1,10 @@
 import { Client, UpdateBuilder } from '@contember/database'
+import { Command } from './Command'
 
-class UpdateStageEventCommand {
+class UpdateStageEventCommand implements Command<void> {
 	constructor(private readonly stageSlug: string, private readonly eventId: string) {}
 
-	public async execute(db: Client) {
+	public async execute({ db }: Command.Args) {
 		await UpdateBuilder.create()
 			.table('stage')
 			.where({ slug: this.stageSlug })

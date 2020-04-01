@@ -1,4 +1,9 @@
-import { formatSchemaName, SchemaVersionBuilder, setupSystemVariables } from '@contember/engine-system-api'
+import {
+	DatabaseContext,
+	formatSchemaName,
+	SchemaVersionBuilder,
+	setupSystemVariables,
+} from '@contember/engine-system-api'
 import { AllowAllPermissionFactory } from '@contember/schema-definition'
 import { Client } from '@contember/database'
 import {
@@ -17,21 +22,21 @@ export class ContentApiTester {
 	private uuidGenerator = createUuidGenerator()
 
 	constructor(
-		private readonly db: Client,
+		private readonly db: DatabaseContext,
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly stageManager: TesterStageManager,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
-		await setupSystemVariables(this.db, '00000000-0000-0000-0000-000000000000', { uuid: this.trxUuidGenerator })
+		await setupSystemVariables(this.db.client, '00000000-0000-0000-0000-000000000000', { uuid: this.trxUuidGenerator })
 		const stage = this.stageManager.getStage(stageSlug)
 		const schema = await this.getSchema()
 		const model = schema.model
 		const permissions = new AllowAllPermissionFactory().create(model)
 		const gqlSchemaBuilder = this.graphqlSchemaBuilderFactory.create(model, permissions)
 		const gqlSchema = gqlSchemaBuilder.build()
-		const db = this.db.forSchema(formatSchemaName(stage))
+		const db = this.db.client.forSchema(formatSchemaName(stage))
 
 		const executionContainer = new ExecutionContainerFactory(
 			schema,
@@ -60,6 +65,6 @@ export class ContentApiTester {
 	}
 
 	private async getSchema(): Promise<Schema> {
-		return await this.schemaVersionBuilder.buildSchema()
+		return await this.schemaVersionBuilder.buildSchema(this.db)
 	}
 }

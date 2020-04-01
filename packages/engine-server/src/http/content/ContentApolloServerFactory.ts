@@ -3,7 +3,7 @@ import DbQueriesExtension from '../../core/graphql/DbQueriesExtension'
 import { Context, ExecutionContainerFactory, flattenVariables } from '@contember/engine-content-api'
 import { GraphQLSchema } from 'graphql'
 import { KoaContext } from '../../core/koa'
-import { DatabaseTransactionMiddlewareFactory, ProjectMemberMiddlewareFactory } from '../project-common'
+import { ProjectMemberMiddlewareFactory } from '../project-common'
 import { ContentApolloMiddlewareFactory } from './ContentApolloMiddlewareFactory'
 import LRUCache from 'lru-cache'
 import { getArgumentValues } from 'graphql/execution/values'
@@ -14,10 +14,11 @@ import uuid from 'uuid'
 import { GraphQLExtension } from 'graphql-extensions'
 import { Acl, Schema } from '@contember/schema'
 import { ErrorContextProvider, ErrorHandlerExtension } from '../../core/graphql/ErrorHandlerExtension'
+import { AssignDbMiddlewareState } from './ContentMiddlewareFactory'
 
 type InputKoaContext = KoaContext<
 	ProjectMemberMiddlewareFactory.KoaState &
-		DatabaseTransactionMiddlewareFactory.KoaState &
+		AssignDbMiddlewareState &
 		ContentApolloMiddlewareFactory.KoaState &
 		TimerMiddlewareFactory.KoaState &
 		AuthMiddlewareFactory.KoaState

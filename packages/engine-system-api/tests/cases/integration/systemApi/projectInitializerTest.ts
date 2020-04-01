@@ -30,12 +30,12 @@ describe('project initializer', () => {
 				project: {
 					stages: [prodStage],
 				},
-				systemExecutionContainerHook: container => {
+				systemContainerHook: container => {
 					return container.replaceService('stageTree', () => stageTree)
 				},
 			})
 
-			await tester.systemExecutionContainer.projectIntializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize()
 			const createdStagesA = await tester.stages.refreshCreatedStages()
 			expect(createdStagesA).toContain('prod')
 			expect(createdStagesA).not.toContain('preview')
@@ -58,7 +58,7 @@ describe('project initializer', () => {
 				},
 			]
 
-			await tester.systemExecutionContainer.projectIntializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize()
 			await tester.stages.refreshCreatedStages()
 
 			const createdStagesB = await tester.stages.refreshCreatedStages()
@@ -114,12 +114,12 @@ describe('project initializer', () => {
 				project: {
 					stages: [prodStage, previewStage],
 				},
-				systemExecutionContainerHook: container => {
+				systemContainerHook: container => {
 					return container.replaceService('stageTree', () => stageTree)
 				},
 			})
 
-			await tester.systemExecutionContainer.projectIntializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize()
 			const createdStagesA = await tester.stages.refreshCreatedStages()
 
 			expect(createdStagesA).toContain('prod')
@@ -163,7 +163,7 @@ describe('project initializer', () => {
 
 			stages['preview'] = [preview2Stage]
 
-			await tester.systemExecutionContainer.projectIntializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize()
 
 			await tester.stages.refreshCreatedStages()
 
@@ -262,12 +262,12 @@ describe('project initializer', () => {
 					stages: [prodStage, previewStage],
 				},
 				migrationsResolver,
-				systemExecutionContainerHook: container => {
+				systemContainerHook: container => {
 					return container.replaceService('stageTree', () => stageTree)
 				},
 			})
 
-			await tester.systemExecutionContainer.projectIntializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize()
 			await tester.stages.refreshCreatedStages()
 
 			const response = await tester.content.queryContent(
@@ -306,7 +306,7 @@ describe('project initializer', () => {
 				],
 			})
 
-			await tester.systemExecutionContainer.projectIntializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize()
 			await tester.stages.refreshCreatedStages()
 
 			await tester.sequences.verifySequence(

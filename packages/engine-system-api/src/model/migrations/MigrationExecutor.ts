@@ -7,18 +7,14 @@ import { Stage } from '../dtos/Stage'
 import CreateEventCommand from '../commands/CreateEventCommand'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import { formatSchemaName } from '../helpers/stageHelpers'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { UuidProvider } from '../../utils/uuid'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class MigrationExecutor {
-	constructor(
-		private readonly modificationHandlerFactory: ModificationHandlerFactory,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly providers: UuidProvider,
-	) {}
+	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {}
 
-	public async execute(schema: Schema, db: Client, stage: Stage, migration: Migration): Promise<Schema> {
-		await db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
+	public async execute(db: DatabaseContext, schema: Schema, stage: Stage, migration: Migration): Promise<Schema> {
+		await db.client.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
 
 		let previousId = stage.event_id
 
@@ -37,17 +33,18 @@ class MigrationExecutor {
 
 		const sql = builder.getSql()
 
-		await db.query(sql)
-		previousId = await new CreateEventCommand(
-			EventType.runMigration,
-			{
-				version: migration.version,
-			},
-			previousId,
-			this.providers,
-		).execute(db)
+		await db.client.query(sql)
+		previousId = await db.commandBus.execute(
+			new CreateEventCommand(
+				EventType.runMigration,
+				{
+					version: migration.version,
+				},
+				previousId,
+			),
+		)
 
-		await new UpdateStageEventCommand(stage.slug, previousId).execute(db)
+		await db.commandBus.execute(new UpdateStageEventCommand(stage.slug, previousId))
 		return schema
 	}
 }

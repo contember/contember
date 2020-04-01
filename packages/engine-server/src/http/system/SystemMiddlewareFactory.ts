@@ -3,23 +3,15 @@ import koaCompose from 'koa-compose'
 import corsMiddleware from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
-import { Client } from '@contember/database'
 import { KoaContext, route } from '../../core/koa'
 import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
-import {
-	SetupSystemVariablesMiddlewareFactory,
-	DatabaseTransactionMiddlewareFactory,
-	ProjectMemberMiddlewareFactory,
-	ProjectResolveMiddlewareFactory,
-} from '../project-common'
+import { ProjectMemberMiddlewareFactory, ProjectResolveMiddlewareFactory } from '../project-common'
 
 export class SystemMiddlewareFactory {
 	constructor(
 		private readonly projectResolveMiddlewareFactory: ProjectResolveMiddlewareFactory,
 		private readonly authMiddlewareFactory: AuthMiddlewareFactory,
 		private readonly projectMemberMiddlewareFactory: ProjectMemberMiddlewareFactory,
-		private readonly databaseTransactionMiddlewareFactory: DatabaseTransactionMiddlewareFactory,
-		private readonly setupSystemVariablesMiddlewareFactory: SetupSystemVariablesMiddlewareFactory,
 	) {}
 
 	create(): Koa.Middleware {
@@ -31,13 +23,6 @@ export class SystemMiddlewareFactory {
 				this.authMiddlewareFactory.create(),
 				this.projectResolveMiddlewareFactory.create(),
 				this.projectMemberMiddlewareFactory.create(),
-				(ctx: KoaContext<ProjectResolveMiddlewareFactory.KoaState & { db: Client }>, next) => {
-					const projectContainer = ctx.state.projectContainer
-					ctx.state.db = projectContainer.connection.createClient('system')
-					return next()
-				},
-				this.databaseTransactionMiddlewareFactory.create(),
-				this.setupSystemVariablesMiddlewareFactory.create(),
 
 				async (
 					ctx: KoaContext<

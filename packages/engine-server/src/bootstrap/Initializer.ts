@@ -30,12 +30,8 @@ export class Initializer {
 			await container.systemDbMigrationsRunner.migrate()
 			console.groupEnd()
 
-			await container.systemDbClient.transaction(async trx => {
-				const executionContainer = container.systemExecutionContainerFactory.create(trx)
-
-				const init = executionContainer.projectIntializer
-				await init.initialize()
-			})
+			const init = container.projectInitializer
+			await init.initialize()
 
 			console.groupEnd()
 		}

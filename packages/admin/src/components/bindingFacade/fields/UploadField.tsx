@@ -105,6 +105,10 @@ export const UploadField = Component<UploadFieldProps>(
 				labelPosition={props.labelPosition}
 				description={props.description}
 				errors={accessor.errors}
+				// Hotfix double browser window prompt. Apparently it's meant to be fixed already
+				// (https://github.com/react-dropzone/react-dropzone/issues/182) but it appears that their fix relies on the
+				// label being *inside* dropzone which, however, would ruin our margins. This will have to do for now.
+				useLabelElement={false}
 			>
 				<div
 					{...getRootProps({

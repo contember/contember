@@ -15,7 +15,7 @@
 		"@contember/react-client": "^0.4.19",
 		"@contember/react-multipass-rendering": "^0.4.19",
 		"@contember/react-utils": "^0.4.19",
-		"@contember/schema": "0.4.0",
+		"@contember/schema": "0.7.2",
 		"@contember/ui": "^0.4.19",
 		"@contember/utils": "^0.4.19",
 		"@mangoweb/sass-base": "0.0.5",

@@ -29,13 +29,13 @@ class MigrationExecutor {
 		await db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
 
 		let previousId = stage.event_id
-		for (const { version, modifications } of migrations) {
+		for (const { version, modifications, formatVersion } of migrations) {
 			progressCb(version)
 
 			const builder = createMigrationBuilder()
 
 			for (let { modification, ...data } of modifications) {
-				const modificationHandler = this.modificationHandlerFactory.create(modification, data, schema)
+				const modificationHandler = this.modificationHandlerFactory.create(modification, data, schema, formatVersion)
 				await modificationHandler.createSql(builder)
 				schema = modificationHandler.getSchemaUpdater()(schema)
 			}

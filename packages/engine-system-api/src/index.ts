@@ -1,4 +1,3 @@
-import { MigrationFilesManager } from '@contember/engine-common'
 import * as Schema from './schema'
 import { UuidProvider } from './utils/uuid'
 
@@ -16,6 +15,4 @@ export { Schema }
 
 export type Providers = UuidProvider
 
-export const createMigrationFilesManager = (): MigrationFilesManager => {
-	return new MigrationFilesManager(__dirname + '/../../migrations')
-}
+export const getSystemMigrationsDirectory = () => __dirname + '/../../migrations'

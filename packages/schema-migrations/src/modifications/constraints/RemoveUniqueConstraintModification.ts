@@ -27,6 +27,11 @@ class RemoveUniqueConstraintModification implements Modification<RemoveUniqueCon
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		const fields = this.schema.model.entities[this.data.entityName].unique[this.data.constraintName].fields
+		return { message: `Remove unique constraint (${fields.join(', ')}) on entity ${this.data.entityName}` }
+	}
 }
 
 namespace RemoveUniqueConstraintModification {

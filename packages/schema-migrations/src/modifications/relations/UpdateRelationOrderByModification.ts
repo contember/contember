@@ -25,6 +25,10 @@ class UpdateRelationOrderByModification implements Modification<UpdateRelationOr
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: `Update order-by of relation ${this.data.entityName}.${this.data.fieldName}` }
+	}
 }
 
 namespace UpdateRelationOrderByModification {

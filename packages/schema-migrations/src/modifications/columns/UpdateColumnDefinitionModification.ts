@@ -35,6 +35,17 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events // todo transform type
 	}
+
+	describe() {
+		const current = this.schema.model.entities[this.data.entityName].fields[this.data.fieldName] as Model.AnyColumn
+		const changingToNotNull = current.nullable && !this.data.definition.nullable
+		const failureWarning = changingToNotNull ? 'Changing to not-null may fail in runtime.' : undefined
+
+		return {
+			message: `Update column definition of field ${this.data.entityName}.${this.data.fieldName}`,
+			failureWarning,
+		}
+	}
 }
 
 namespace UpdateColumnDefinitionModification {

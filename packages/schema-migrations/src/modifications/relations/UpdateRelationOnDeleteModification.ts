@@ -25,6 +25,10 @@ class UpdateRelationOnDeleteModification implements Modification<UpdateRelationO
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: `Change on-delete policy of relation ${this.data.entityName}.${this.data.fieldName}` }
+	}
 }
 
 namespace UpdateRelationOnDeleteModification {

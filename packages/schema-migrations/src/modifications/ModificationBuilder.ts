@@ -125,7 +125,7 @@ class ModificationBuilder {
 
 	public removeEntity(entityName: string) {
 		this.modifications.push({
-			modification: 'removeEntity',
+			modification: RemoveEntityModification.id,
 			entityName: entityName,
 		})
 	}

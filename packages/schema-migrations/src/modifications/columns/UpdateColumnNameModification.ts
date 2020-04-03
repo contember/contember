@@ -1,8 +1,7 @@
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
+import { ContentEvent, EventType } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { EventType } from '@contember/engine-common'
 import { Modification } from '../Modification'
 
 class UpdateColumnNameModification implements Modification<UpdateColumnNameModification.Data> {
@@ -40,6 +39,10 @@ class UpdateColumnNameModification implements Modification<UpdateColumnNameModif
 			const { [oldColumnName]: value, ...values } = it.values
 			return { ...it, values: { ...values, [newColumnName]: value } }
 		})
+	}
+
+	describe() {
+		return { message: `Change column name of field ${this.data.entityName}.${this.data.fieldName}` }
 	}
 }
 

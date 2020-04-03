@@ -16,7 +16,6 @@
 		"rfc6902": "^3.0.4"
 	},
 	"devDependencies": {
-		"@contember/engine-api-tester": "^0.7.4",
 		"@contember/schema-definition": "^0.7.4",
 		"@types/jasmine": "^3.4.5",
 		"jasmine": "^3.5.0",

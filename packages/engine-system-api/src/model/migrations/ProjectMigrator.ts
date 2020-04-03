@@ -20,6 +20,7 @@ import DiffQuery from '../queries/DiffQuery'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import RecreateContentEvent from '../commands/RecreateContentEvent'
 import { UuidProvider } from '../../utils/uuid'
+import { VERSION_INITIAL } from '@contember/schema-migrations/dist/src/modifications/ModificationVersions'
 
 type StageEventsMap = Record<string, ContentEvent[]>
 
@@ -47,9 +48,10 @@ export default class ProjectMigrator {
 		let previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
 		for (const migration of migrationsToExecute) {
 			progressCb(migration.version)
+			const formatVersion = migration.formatVersion
 
 			for (const modification of migration.modifications) {
-				;[schema, stageEvents] = await this.applyModification(schema, stageEvents, modification)
+				;[schema, stageEvents] = await this.applyModification(schema, stageEvents, modification, formatVersion)
 			}
 
 			previousId = await new CreateEventCommand(
@@ -71,10 +73,16 @@ export default class ProjectMigrator {
 		schema: Schema,
 		events: StageEventsMap,
 		modification: Migration.Modification,
+		formatVersion: number,
 	): Promise<[Schema, StageEventsMap]> {
 		const stage = this.stageTree.getRoot()
 		const builder = createMigrationBuilder()
-		const modificationHandler = this.modificationHandlerFactory.create(modification.modification, modification, schema)
+		const modificationHandler = this.modificationHandlerFactory.create(
+			modification.modification,
+			modification,
+			schema,
+			formatVersion,
+		)
 		await modificationHandler.createSql(builder)
 		const sql = builder.getSql()
 		await this.executeOnStage(stage, sql)

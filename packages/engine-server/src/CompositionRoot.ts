@@ -6,15 +6,19 @@ import {
 	PermissionsVerifier,
 } from '@contember/engine-content-api'
 import {
-	createMigrationFilesManager as createSystemMigrationFilesManager,
+	getSystemMigrationsDirectory,
 	MigrationsResolver,
 	SchemaMigrator,
 	SchemaVersionBuilder,
 	SystemContainerFactory,
 } from '@contember/engine-system-api'
-import { MigrationFilesManager } from '@contember/engine-common'
 import {
-	createMigrationFilesManager as createTenantMigrationFilesManager,
+	MigrationFilesManager,
+	ModificationHandlerFactory,
+	SchemaVersionBuilder as SchemaVersionBuilderInternal,
+} from '@contember/schema-migrations'
+import {
+	getTenantMigrationsDirectory,
 	Providers as TenantProviders,
 	TenantContainer,
 } from '@contember/engine-tenant-api'
@@ -44,10 +48,6 @@ import { Config, Project, TenantConfig } from './config/config'
 import { providers } from './utils/providers'
 import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
 import { projectVariablesResolver } from './utils/projectVariablesProvider'
-import {
-	ModificationHandlerFactory,
-	SchemaVersionBuilder as SchemaVersionBuilderInternal,
-} from '@contember/schema-migrations'
 import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
 import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
@@ -188,7 +188,7 @@ class CompositionRoot {
 			})
 			.addService(
 				'tenantMigrationsRunner',
-				() => new MigrationsRunner(config.tenant.db, 'tenant', createTenantMigrationFilesManager().directory),
+				() => new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrationsDirectory()),
 			)
 			.addService(
 				'initializer',
@@ -229,7 +229,7 @@ class CompositionRoot {
 				})
 				.addService(
 					'systemDbMigrationsRunner',
-					() => new MigrationsRunner(project.db, 'system', createSystemMigrationFilesManager().directory),
+					() => new MigrationsRunner(project.db, 'system', getSystemMigrationsDirectory()),
 				)
 				.addService('migrationFilesManager', ({ project }) =>
 					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),

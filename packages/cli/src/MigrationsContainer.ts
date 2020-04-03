@@ -1,8 +1,8 @@
 import { Builder } from '@contember/dic'
-import { MigrationFilesManager } from '@contember/engine-common/dist/src/migrations/MigrationFilesManager'
 import {
-	MigrationDiffCreator,
-	MigrationSqlDryRunner,
+	MigrationCreator,
+	MigrationDescriber,
+	MigrationFilesManager,
 	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaDiffer,
@@ -11,10 +11,11 @@ import {
 } from '@contember/schema-migrations'
 
 export interface MigrationsContainer {
-	migrationDiffCreator: MigrationDiffCreator
-	migrationDryRunner: MigrationSqlDryRunner
+	migrationCreator: MigrationCreator
+	migrationsDescriber: MigrationDescriber
 	schemaVersionBuilder: SchemaVersionBuilder
 	schemaDiffer: SchemaDiffer
+	migrationsResolver: MigrationsResolver
 }
 
 export class MigrationsContainerFactory {
@@ -35,16 +36,15 @@ export class MigrationsContainerFactory {
 			)
 			.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
 			.addService(
-				'migrationDiffCreator',
+				'migrationCreator',
 				({ migrationFilesManager, schemaVersionBuilder, schemaDiffer }) =>
-					new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer),
+					new MigrationCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer),
 			)
 			.addService(
-				'migrationDryRunner',
-				({ migrationsResolver, modificationHandlerFactory, schemaVersionBuilder }) =>
-					new MigrationSqlDryRunner(migrationsResolver, modificationHandlerFactory, schemaVersionBuilder),
+				'migrationsDescriber',
+				({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory),
 			)
 			.build()
-			.pick('migrationDiffCreator', 'migrationDryRunner', 'schemaVersionBuilder', 'schemaDiffer')
+			.pick('migrationCreator', 'migrationsDescriber', 'schemaVersionBuilder', 'schemaDiffer', 'migrationsResolver')
 	}
 }

@@ -28,6 +28,10 @@ class PatchValidationSchemaModification implements Modification<PatchValidationS
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: 'Update validation schema' }
+	}
 }
 
 namespace PatchValidationSchemaModification {

@@ -3,8 +3,8 @@ import { register } from 'ts-node'
 import { CommandManager } from './cli/CommandManager'
 import {
 	CreateApiKeyCommand,
-	DiffCommand,
-	DryRunCommand,
+	MigrationsDiffCommand,
+	MigrationDescribeCommand,
 	InstanceCreateCommand,
 	InstanceInfoCommand,
 	InstanceLogsCommand,
@@ -20,6 +20,7 @@ import {
 	SetupCommand,
 	SignInCommand,
 	WorkspaceCreateCommand,
+	MigrationsCreateCommand,
 } from './commands'
 import { Application } from './cli'
 ;(async () => {
@@ -29,10 +30,12 @@ import { Application } from './cli'
 			module: 'commonjs',
 		},
 	})
-	const diffCommandFactory = () => new DiffCommand()
+	const diffCommandFactory = () => new MigrationsDiffCommand()
+	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({
 		['migrations:diff']: diffCommandFactory,
-		['migrations:dry-run']: () => new DryRunCommand(),
+		['migrations:describe']: migrationsDescribeFactory,
+		['migrations:create']: () => new MigrationsCreateCommand(),
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),
@@ -49,6 +52,9 @@ import { Application } from './cli'
 		['tenant:sign-in']: () => new SignInCommand(),
 		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
 		['tenant:invite']: () => new InviteCommand(),
+
+		// deprecated
+		['migrations:dry-run']: migrationsDescribeFactory,
 		['diff']: diffCommandFactory,
 	})
 

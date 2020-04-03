@@ -45,26 +45,44 @@ class PredicateDefinitionProcessor {
 				}
 			}
 
-			const fieldWhere = acceptFieldVisitor<WhereValue | Input.Where>(this.schema, entity, key, {
-				visitColumn: (entity, column) => {
-					return handler.handleColumn({ entity, column, value: value as Input.Condition | PredicateExtension, path })
+			const fieldWhere = acceptFieldVisitor<WhereValue | Input.Where | [string, WhereValue | Input.Where] | undefined>(
+				this.schema,
+				entity,
+				key,
+				{
+					visitColumn: (entity, column) => {
+						return handler.handleColumn({ entity, column, value: value as Input.Condition | PredicateExtension, path })
+					},
+					visitRelation: (entity, relation, targetEntity) => {
+						const processedValue = handler.handleRelation({
+							relation,
+							entity,
+							targetEntity,
+							value: value as Acl.PredicateVariable | PredicateExtension,
+							path,
+						})
+						if (
+							typeof processedValue === 'object' &&
+							'constructor' in processedValue &&
+							processedValue.constructor.name === 'Object'
+						) {
+							return this.processInternal(
+								targetEntity,
+								processedValue as Acl.PredicateDefinition<PredicateExtension>,
+								handler,
+								[...path, key],
+							)
+						}
+						return processedValue
+					},
 				},
-				visitRelation: (entity, relation, targetEntity) => {
-					if (typeof value === 'object' && 'constructor' in value && value.constructor.name === 'Object') {
-						return this.processInternal(targetEntity, value as Acl.PredicateDefinition<PredicateExtension>, handler, [
-							...path,
-							key,
-						])
-					}
-					return handler.handleRelation({
-						relation,
-						entity,
-						targetEntity,
-						value: value as Acl.PredicateVariable | PredicateExtension,
-						path,
-					})
-				},
-			})
+			)
+			if (fieldWhere === undefined) {
+				return result
+			}
+			if (Array.isArray(fieldWhere) && fieldWhere.length === 2) {
+				return { ...result, [fieldWhere[0]]: fieldWhere[1] }
+			}
 			return { ...result, [key]: fieldWhere }
 		}, {})
 	}
@@ -77,7 +95,7 @@ namespace PredicateDefinitionProcessor {
 			entity: Model.Entity
 			column: Model.AnyColumn
 			path: string[]
-		}): R | Input.Where
+		}): R | Input.Where | undefined | [string, R | Input.Where]
 
 		handleRelation(ctx: {
 			value: T | Acl.PredicateVariable
@@ -85,7 +103,7 @@ namespace PredicateDefinitionProcessor {
 			relation: Model.Relation
 			targetEntity: Model.Entity
 			path: string[]
-		}): R | Input.Where
+		}): R | Input.Where | undefined | [string, R | Input.Where]
 
 		handleUndefinedField?(ctx: {
 			entity: Model.Entity

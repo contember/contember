@@ -1,4 +1,4 @@
-import { FileNameHelper } from './FileNameHelper'
+import { MigrationVersionHelper } from './MigrationVersionHelper'
 import * as fs from 'fs'
 import { promisify } from 'util'
 import * as path from 'path'
@@ -13,12 +13,8 @@ const readDir = promisify(fs.readdir)
 class MigrationFilesManager {
 	constructor(public readonly directory: string) {}
 
-	public async createEmptyFile(name: string, extension: string): Promise<string> {
-		return await this.createFile('', name, extension)
-	}
-
-	public async createFile(content: string, name: string, extension: string): Promise<string> {
-		const filename = FileNameHelper.createFileName(name, extension)
+	public async createFile(content: string, version: string, extension: string): Promise<string> {
+		const filename = `${version}.${extension}`
 		const path = `${this.directory}/${filename}`
 		await fsWrite(path, content, { encoding: 'utf8' })
 		return await fsRealpath(path)
@@ -64,12 +60,12 @@ class MigrationFilesManager {
 	): Promise<MigrationFilesManager.MigrationFile[]> {
 		let files = await this.listFiles(extension)
 		if (predicate) {
-			files = files.filter(filename => predicate(FileNameHelper.extractVersion(filename)))
+			files = files.filter(filename => predicate(MigrationVersionHelper.extractVersion(filename)))
 		}
 		const filesWithContent = files.map(async filename => ({
 			filename: filename,
 			path: `${this.directory}/${filename}`,
-			version: FileNameHelper.extractVersion(filename),
+			version: MigrationVersionHelper.extractVersion(filename),
 			content: await readFile(`${this.directory}/${filename}`, { encoding: 'utf8' }),
 		}))
 

@@ -28,6 +28,10 @@ class PatchAclSchemaModification implements Modification<PatchAclSchemaModificat
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: 'Update ACL schema' }
+	}
 }
 
 namespace PatchAclSchemaModification {

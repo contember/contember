@@ -1,10 +1,11 @@
 import { Model, Schema } from '@contember/schema'
-import { NamingHelper, acceptRelationTypeVisitor } from '@contember/schema-utils'
+import { acceptRelationTypeVisitor, NamingHelper } from '@contember/schema-utils'
 import { MigrationBuilder } from 'node-pg-migrate'
 import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
 import { createEventTrigger } from '../sqlUpdateUtils'
+import { isIt } from '../../utils/isIt'
 
 const getPrimaryType = (entity: Model.Entity): string => {
 	const column = entity.fields[entity.primary] as Model.AnyColumn
@@ -119,6 +120,15 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events //todo fill
+	}
+
+	describe({ createdEntities }: { createdEntities: string[] }) {
+		const notNull = isIt<Model.NullableRelation>(this.data.owningSide, 'nullable') && !this.data.owningSide.nullable
+		const failureWarning =
+			notNull && !createdEntities.includes(this.data.entityName)
+				? `Mail fail in runtime, because relation is not-null`
+				: undefined
+		return { message: `Add relation ${this.data.entityName}.${this.data.owningSide.name}`, failureWarning }
 	}
 }
 

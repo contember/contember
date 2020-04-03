@@ -29,6 +29,10 @@ class CreateEnumModification implements Modification<CreateEnumModification.Data
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		return events
 	}
+
+	describe() {
+		return { message: `Add enum ${this.data.enumName}` }
+	}
 }
 
 namespace CreateEnumModification {

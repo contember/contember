@@ -1,4 +1,3 @@
-import { FileNameHelper } from '@contember/engine-common'
 import { Client, SelectBuilder } from '@contember/database'
 import {
 	LatestMigrationByStageQuery,
@@ -7,7 +6,7 @@ import {
 	StageCreator,
 	StageConfig,
 } from '@contember/engine-system-api'
-import { Migration } from '@contember/schema-migrations'
+import { Migration, MigrationVersionHelper } from '@contember/schema-migrations'
 
 export class TesterStageManager {
 	private createdStages = new Set<string>()
@@ -63,7 +62,7 @@ export class TesterStageManager {
 
 	public async migrate(migration: string | Migration): Promise<void> {
 		if (typeof migration === 'string') {
-			const version = FileNameHelper.extractVersion(migration)
+			const version = MigrationVersionHelper.extractVersion(migration)
 			const resolvedMigration = (await this.migrationResolver.getMigrations()).find(it => it.version === version)
 			if (!resolvedMigration) {
 				throw new Error(`Migration ${migration} not found`)
@@ -71,7 +70,7 @@ export class TesterStageManager {
 			migration = resolvedMigration
 		}
 		await this.projectMigrator.migrate(this.migrationVersion, [migration], () => null)
-		this.migrationVersion = FileNameHelper.extractVersion(migration.version)
+		this.migrationVersion = MigrationVersionHelper.extractVersion(migration.version)
 	}
 
 	private getStageInternal(slug: string): StageConfig {

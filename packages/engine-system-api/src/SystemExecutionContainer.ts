@@ -1,4 +1,11 @@
 import { Authorizator } from '@contember/authorization'
+import {
+	MigrationFilesManager,
+	MigrationsResolver,
+	ModificationHandlerFactory,
+	SchemaMigrator,
+	SchemaVersionBuilder as SchemaVersionBuilderInternal,
+} from '@contember/schema-migrations'
 import MigrationsDependencyBuilder from './model/events/dependency/MigrationsDependencyBuilder'
 import SameRowDependencyBuilder from './model/events/dependency/SameRowDependencyBuilder'
 import TransactionDependencyBuilder from './model/events/dependency/TransactionDependencyBuilder'
@@ -12,21 +19,11 @@ import { Builder } from '@contember/dic'
 import TableReferencingResolver from './model/events/TableReferencingResolver'
 import { Client, DatabaseQueryable } from '@contember/database'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { MigrationFilesManager } from '@contember/engine-common'
 import { ContentPermissionVerifier, EventsPermissionsVerifier } from './model/events/EventsPermissionsVerifier'
 import DependencyBuilder from './model/events/DependencyBuilder'
 import DiffBuilder from './model/events/DiffBuilder'
 import { QueryHandler } from '@contember/queryable'
 import { ProjectConfig } from './types'
-import {
-	MigrationDiffCreator,
-	MigrationSqlDryRunner,
-	MigrationsResolver,
-	ModificationHandlerFactory,
-	SchemaDiffer,
-	SchemaMigrator,
-	SchemaVersionBuilder as SchemaVersionBuilderInternal,
-} from '@contember/schema-migrations'
 import RebaseExecutor from './model/events/RebaseExecutor'
 import StageTree from './model/stages/StageTree'
 import ProjectInitializer from './ProjectInitializer'
@@ -39,10 +36,8 @@ interface SystemExecutionContainer {
 	releaseExecutor: ReleaseExecutor
 	rebaseExecutor: RebaseExecutor
 	diffBuilder: DiffBuilder
-	migrationDiffCreator: MigrationDiffCreator
 	queryHandler: QueryHandler<DatabaseQueryable>
 	projectIntializer: ProjectInitializer
-	migrationSqlDryRunner: MigrationSqlDryRunner
 	project: ProjectConfig
 }
 
@@ -61,16 +56,7 @@ namespace SystemExecutionContainer {
 		public create(db: Client): SystemExecutionContainer {
 			return this.createBuilder(db)
 				.build()
-				.pick(
-					'project',
-					'queryHandler',
-					'releaseExecutor',
-					'diffBuilder',
-					'rebaseExecutor',
-					'migrationDiffCreator',
-					'projectIntializer',
-					'migrationSqlDryRunner',
-				)
+				.pick('project', 'queryHandler', 'releaseExecutor', 'diffBuilder', 'rebaseExecutor', 'projectIntializer')
 		}
 
 		public createBuilder(db: Client) {
@@ -88,7 +74,6 @@ namespace SystemExecutionContainer {
 					'schemaMigrator',
 					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory),
 				)
-				.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
 				.addService(
 					'schemaVersionBuilderInternal',
 					({ schemaMigrator, migrationsResolver }) =>
@@ -159,11 +144,6 @@ namespace SystemExecutionContainer {
 						),
 				)
 				.addService(
-					'migrationDiffCreator',
-					({ schemaDiffer, migrationFilesManager, schemaVersionBuilderInternal }) =>
-						new MigrationDiffCreator(migrationFilesManager, schemaVersionBuilderInternal, schemaDiffer),
-				)
-				.addService(
 					'projectMigrationInfoResolver',
 					({ migrationFilesManager, queryHandler, migrationsResolver, project }) =>
 						new ProjectMigrationInfoResolver(
@@ -208,11 +188,6 @@ namespace SystemExecutionContainer {
 							stageCreator,
 							providers,
 						),
-				)
-				.addService(
-					'migrationSqlDryRunner',
-					({ schemaVersionBuilderInternal, modificationHandlerFactory, migrationsResolver }) =>
-						new MigrationSqlDryRunner(migrationsResolver, modificationHandlerFactory, schemaVersionBuilderInternal),
 				)
 		}
 	}

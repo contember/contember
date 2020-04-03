@@ -1,7 +1,6 @@
 import 'jasmine'
 import { Acl, Model } from '@contember/schema'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { SQL } from '@contember/engine-api-tester'
 import {
 	ModificationHandlerFactory,
 	Migration,
@@ -9,6 +8,8 @@ import {
 	createMigrationBuilder,
 	SchemaMigrator,
 } from '../../../src'
+import { SQL } from '../../src/tags'
+import { VERSION_LATEST } from '../../../src/modifications/ModificationVersions'
 
 const emptyAcl = { roles: {} }
 
@@ -27,7 +28,9 @@ function testDiffSchemas(
 		false,
 	)
 	expect(actual).toEqual(expectedDiff)
-	expect(schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl, validation: {} }, actual)).toEqual({
+	expect(
+		schemaMigrator.applyModifications({ model: originalSchema, acl: emptyAcl, validation: {} }, actual, VERSION_LATEST),
+	).toEqual({
 		model: updatedSchema,
 		acl: emptyAcl,
 		validation: {},
@@ -35,7 +38,11 @@ function testDiffSchemas(
 }
 
 function testApplyDiff(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSchema: Model.Schema) {
-	const actual = schemaMigrator.applyDiff({ model: originalSchema, acl: emptyAcl, validation: {} }, diff)
+	const actual = schemaMigrator.applyModifications(
+		{ model: originalSchema, acl: emptyAcl, validation: {} },
+		diff,
+		VERSION_LATEST,
+	)
 	expect(actual.model).toEqual(expectedSchema)
 }
 
@@ -43,7 +50,7 @@ function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Modificat
 	let schema = { model: originalSchema, acl: emptyAcl, validation: {} }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
-		const modificationHandler = modificationFactory.create(modification, data, schema)
+		const modificationHandler = modificationFactory.create(modification, data, schema, VERSION_LATEST)
 		modificationHandler.createSql(builder)
 		schema = modificationHandler.getSchemaUpdater()(schema)
 	}
@@ -882,6 +889,53 @@ describe('Diff schemas', () => {
 		})
 	})
 
+	describe('rename entity with a table', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('User', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateEntityName',
+				entityName: 'Author',
+				newEntityName: 'User',
+				tableName: 'user',
+			},
+		]
+		const sql = SQL`ALTER TABLE "author" RENAME TO "user";`
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+	describe('rename entity with a unique constraint', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Author', e => e.column('slug', c => c.type(Model.ColumnType.String).unique()))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('User', e => e.tableName('author').column('slug', c => c.type(Model.ColumnType.String).unique()))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateEntityName',
+				entityName: 'Author',
+				newEntityName: 'User',
+			},
+		]
+		const sql = SQL`ALTER TABLE "author"
+			RENAME CONSTRAINT "unique_Author_slug_a645b0" TO "unique_User_slug_d61dea";`
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
 	describe('rename field', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String).columnName('name')))
@@ -898,6 +952,37 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL``
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+	describe('rename field with constraint', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Author', e => e.column('slug', c => c.type(Model.ColumnType.String).unique()))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Author', e =>
+				e.column('identifier', c =>
+					c
+						.type(Model.ColumnType.String)
+						.columnName('slug')
+						.unique(),
+				),
+			)
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateFieldName',
+				entityName: 'Author',
+				fieldName: 'slug',
+				newFieldName: 'identifier',
+			},
+		]
+		const sql = SQL`ALTER TABLE "author"
+			RENAME CONSTRAINT "unique_Author_slug_a645b0" TO "unique_Author_identifier_4eb9f2";`
 		it('apply diff', () => {
 			testApplyDiff(originalSchema, diff, updatedSchema)
 		})
@@ -1242,6 +1327,271 @@ describe('Diff schemas', () => {
 		})
 	})
 
+	describe('update entity name with acl', () => {
+		const model = new SchemaBuilder()
+			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const acl: Acl.Schema = {
+			roles: {
+				admin: {
+					variables: {},
+					stages: '*',
+					entities: {
+						Site: {
+							predicates: {},
+							operations: {
+								read: {
+									id: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		const updatedModel = new SchemaBuilder()
+			.entity('Website', entity => entity.column('name', c => c.type(Model.ColumnType.String)).tableName('site'))
+			.buildSchema()
+
+		const updatedAcl: Acl.Schema = {
+			roles: {
+				admin: {
+					variables: {},
+					stages: '*',
+					entities: {
+						Website: {
+							predicates: {},
+							operations: {
+								read: {
+									id: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateEntityName',
+				entityName: 'Site',
+				newEntityName: 'Website',
+			},
+		]
+
+		it('apply diff', () => {
+			const actual = schemaMigrator.applyModifications({ model, acl, validation: {} }, diff, VERSION_LATEST)
+			expect(actual).toEqual({ model: updatedModel, acl: updatedAcl, validation: {} })
+		})
+	})
+
+	describe('remove entity with acl', () => {
+		const model = new SchemaBuilder()
+			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', entity => entity.column('title').manyHasOne('site', r => r.target('Site')))
+			.buildSchema()
+		const acl: Acl.Schema = {
+			roles: {
+				admin: {
+					variables: {
+						siteId: {
+							type: Acl.VariableType.entity,
+							entityName: 'Site',
+						},
+					},
+					stages: '*',
+					entities: {
+						Site: {
+							predicates: {},
+							operations: {
+								read: {
+									id: true,
+								},
+							},
+						},
+						Post: {
+							predicates: {
+								site: { site: { id: 'siteId' } },
+							},
+							operations: {
+								read: {
+									title: 'site',
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		const updatedModel = new SchemaBuilder().entity('Post', entity => entity.column('title')).buildSchema()
+
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'removeField',
+				entityName: 'Post',
+				fieldName: 'site',
+			},
+			{
+				modification: 'removeEntity',
+				entityName: 'Site',
+			},
+		]
+		const updatedAcl: Acl.Schema = {
+			roles: {
+				admin: {
+					variables: {},
+					stages: '*',
+					entities: {
+						Post: {
+							predicates: {
+								site: {},
+							},
+							operations: {
+								read: {
+									title: 'site',
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		const sql = SQL`ALTER TABLE "post"
+			DROP "site_id";
+		DROP TABLE "site";`
+		it('diff schemas', () => {
+			const actual = schemaDiffer.diffSchemas(
+				{ model, acl, validation: {} },
+				{
+					model: updatedModel,
+					acl: updatedAcl,
+					validation: {},
+				},
+			)
+			expect(actual).toEqual(diff)
+		})
+		it('apply diff', () => {
+			const actual = schemaMigrator.applyModifications({ model: model, acl, validation: {} }, diff, VERSION_LATEST)
+			expect(actual).toEqual({ model: updatedModel, acl: updatedAcl, validation: {} })
+		})
+		it('generate sql', () => {
+			testGenerateSql(model, diff, sql)
+		})
+	})
+
+	describe('rename relation with acl', () => {
+		const originalModel = new SchemaBuilder()
+			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
+			.entity('Comment', e => e.column('content').manyHasOne('post', r => r.target('Post')))
+			.entity('Author', e => e.column('name'))
+			.buildSchema()
+		const updatedModel = new SchemaBuilder()
+			.entity('Post', e =>
+				e.column('title').manyHasOne('author', r =>
+					r
+						.target('Author')
+						.inversedBy('posts')
+						.joiningColumn('user_id'),
+				),
+			)
+			.entity('Comment', e => e.column('content').manyHasOne('post', r => r.target('Post')))
+			.entity('Author', e => e.column('name'))
+			.buildSchema()
+
+		const originalAcl: Acl.Schema = {
+			roles: {
+				admin: {
+					variables: {
+						authorId: {
+							type: Acl.VariableType.entity,
+							entityName: 'Author',
+						},
+					},
+					stages: '*',
+					entities: {
+						Post: {
+							predicates: {
+								author: { user: { id: 'siteId' } },
+							},
+							operations: {
+								read: {
+									title: 'author',
+								},
+							},
+						},
+						Comment: {
+							predicates: {
+								postAuthor: { post: { user: { id: 'siteId' } } },
+							},
+							operations: {
+								read: {
+									title: 'postAuthor',
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		const updatedAcl: Acl.Schema = {
+			roles: {
+				admin: {
+					variables: {
+						authorId: {
+							type: Acl.VariableType.entity,
+							entityName: 'Author',
+						},
+					},
+					stages: '*',
+					entities: {
+						Post: {
+							predicates: {
+								author: { author: { id: 'siteId' } },
+							},
+							operations: {
+								read: {
+									title: 'author',
+								},
+							},
+						},
+						Comment: {
+							predicates: {
+								postAuthor: { post: { author: { id: 'siteId' } } },
+							},
+							operations: {
+								read: {
+									title: 'postAuthor',
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'updateFieldName',
+				entityName: 'Post',
+				fieldName: 'user',
+				newFieldName: 'author',
+			},
+		]
+		it('apply diff', () => {
+			const actual = schemaMigrator.applyModifications(
+				{ model: originalModel, acl: originalAcl, validation: {} },
+				diff,
+				VERSION_LATEST,
+			)
+			expect(actual).toEqual({ model: updatedModel, acl: updatedAcl, validation: {} })
+		})
+	})
+
 	describe('update ACL', () => {
 		const model = new SchemaBuilder()
 			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
@@ -1294,7 +1644,7 @@ describe('Diff schemas', () => {
 			expect(actual).toEqual(diff)
 		})
 		it('apply diff', () => {
-			const actual = schemaMigrator.applyDiff({ model, acl: emptyAcl, validation: {} }, diff)
+			const actual = schemaMigrator.applyModifications({ model, acl: emptyAcl, validation: {} }, diff, VERSION_LATEST)
 			expect(actual).toEqual({ model, acl, validation: {} })
 		})
 	})

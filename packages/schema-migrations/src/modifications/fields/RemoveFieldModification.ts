@@ -1,14 +1,29 @@
-import { acceptFieldVisitor, NamingHelper } from '@contember/schema-utils'
+import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { isIt } from '../../utils/isIt'
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { ContentEvent, EventType } from '@contember/engine-common'
+import {
+	SchemaUpdater,
+	updateAcl,
+	updateAclEveryEntity,
+	updateAclEveryPredicate,
+	updateAclEveryRole,
+	updateAclFieldPermissions,
+	updateEntity,
+	updateField,
+	updateModel,
+	updateSchema,
+} from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { EventType } from '@contember/engine-common'
+import { VERSION_ACL_PATCH } from '../ModificationVersions'
 
 class RemoveFieldModification implements Modification<RemoveFieldModification.Data> {
-	constructor(private readonly data: RemoveFieldModification.Data, private readonly schema: Schema) {}
+	constructor(
+		private readonly data: RemoveFieldModification.Data,
+		private readonly schema: Schema,
+		private readonly version: number,
+	) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		acceptFieldVisitor(this.schema.model, this.data.entityName, this.data.fieldName, {
@@ -35,15 +50,43 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 		const entity = this.schema.model.entities[this.data.entityName]
 		const field = entity.fields[this.data.fieldName]
 
-		return updateModel(
-			updateEntity(this.data.entityName, entity => {
-				const { [this.data.fieldName]: removed, ...fields } = entity.fields
-				return { ...entity, fields }
-			}),
-			isIt<Model.InversedRelation>(field, 'ownedBy')
-				? updateEntity(
-						field.target,
-						updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field),
+		return updateSchema(
+			updateModel(
+				updateEntity(this.data.entityName, entity => {
+					const { [this.data.fieldName]: removed, ...fields } = entity.fields
+					return { ...entity, fields }
+				}),
+				isIt<Model.InversedRelation>(field, 'ownedBy')
+					? updateEntity(
+							field.target,
+							updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field),
+					  )
+					: undefined,
+			),
+			this.version >= VERSION_ACL_PATCH
+				? updateAcl(
+						updateAclEveryRole(
+							updateAclEveryEntity(
+								updateAclFieldPermissions((permissions, entityName) => {
+									if (entityName !== this.data.entityName) {
+										return permissions
+									}
+									const { [this.data.fieldName]: field, ...other } = permissions
+									return {
+										...other,
+									}
+								}),
+								updateAclEveryPredicate((predicate, entityName) => {
+									const processor = new PredicateDefinitionProcessor(this.schema.model)
+									return processor.process(this.schema.model.entities[entityName], predicate, {
+										handleColumn: ctx =>
+											ctx.entity.name === entity.name && ctx.column.name === field.name ? undefined : ctx.value,
+										handleRelation: ctx =>
+											ctx.entity.name === entity.name && ctx.relation.name === field.name ? undefined : ctx.value,
+									})
+								}),
+							),
+						),
 				  )
 				: undefined,
 		)
@@ -65,6 +108,10 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 			const { [columnName]: value, ...values } = it.values
 			return { ...it, values }
 		})
+	}
+
+	describe() {
+		return { message: `Remove field ${this.data.entityName}.${this.data.fieldName}`, isDestructive: true }
 	}
 }
 

@@ -7,6 +7,7 @@ import {
 	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaDiffer,
+	VERSION_LATEST,
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { ApiTester } from './ApiTester'
@@ -35,7 +36,7 @@ export const executeDbTest = async (test: Test) => {
 
 	const migrationsResolver = createMock<MigrationsResolver>({
 		getMigrations(): Promise<Migration[]> {
-			return Promise.resolve([{ version: '201907221000-init', modifications }])
+			return Promise.resolve([{ version: '201907221000-init', modifications, formatVersion: VERSION_LATEST }])
 		},
 	})
 

@@ -19,8 +19,6 @@ export class SetupCommand extends Command<Args, Options> {
 		}
 		const apiUrl = input.getArgument('apiUrl')
 
-		const { loginToken } = await interactiveSetup(apiUrl)
-		console.log('Superadmin created.')
-		console.log('Login token: ' + loginToken)
+		await interactiveSetup(apiUrl)
 	}
 }

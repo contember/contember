@@ -63,9 +63,14 @@ export default class InsertBuilder {
 			})
 			.returning(this.entity.primaryColumn)
 
-		const returning = await qb.execute(db)
-		const result = returning.length === 1 ? returning[0] : null
-		this.resolver(result)
-		return { values: resolvedData, executed: true, primaryValue: result }
+		try {
+			const returning = await qb.execute(db)
+			const result = returning.length === 1 ? returning[0] : null
+			this.resolver(result)
+			return { values: resolvedData, executed: true, primaryValue: result }
+		} catch (e) {
+			this.resolver(null)
+			throw e
+		}
 	}
 }

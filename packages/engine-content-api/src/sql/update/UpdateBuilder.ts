@@ -105,8 +105,13 @@ export default class UpdateBuilder {
 				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
 				return qb
 			})
-		const result = await qb.execute(db)
-		this.resolver(result)
-		return { values: resolvedData, affectedRows: result, executed: true }
+		try {
+			const result = await qb.execute(db)
+			this.resolver(result)
+			return { values: resolvedData, affectedRows: result, executed: true }
+		} catch (e) {
+			this.resolver(null)
+			throw e
+		}
 	}
 }

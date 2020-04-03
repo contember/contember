@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-common",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"scripts": {},
@@ -9,6 +9,5 @@
 		"@types/node": "^12.11.7",
 		"graphql": "^14.6.0",
 		"typescript": "^3.7.4"
-	},
-	"dependencies": {}
+	}
 }

@@ -1,12 +1,12 @@
 {
 	"name": "@contember/template-project",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"license": "Apache-2.0",
 	"devDependencies": {
 		"typescript": "^3.7.4"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.7.2",
-		"@contember/schema-definition": "^0.7.2"
+		"@contember/schema": "^0.7.3",
+		"@contember/schema-definition": "^0.7.3"
 	}
 }

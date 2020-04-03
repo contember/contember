@@ -1,12 +1,11 @@
 {
 	"name": "@contember/authorization",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
 	"devDependencies": {
 		"typescript": "^3.7.4"
-	},
-	"dependencies": {}
+	}
 }

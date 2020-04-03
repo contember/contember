@@ -1,7 +1,5 @@
 {
 	"name": "@contember/template-instance",
-	"version": "0.7.2",
-	"license": "Apache-2.0",
-	"dependencies": {},
-	"devDependencies": {}
+	"version": "0.7.3",
+	"license": "Apache-2.0"
 }

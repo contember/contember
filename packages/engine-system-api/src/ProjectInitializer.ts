@@ -103,7 +103,7 @@ export class ProjectInitializer {
 				console.warn(`Previously executed migration ${version} not found`)
 				continue
 			}
-			await db.commandBus.execute(new SaveMigrationCommand(migration))
+			await db.commandBus.execute(new SaveMigrationCommand(migration, event.created_at))
 		}
 		console.groupEnd()
 	}

@@ -2,7 +2,7 @@ import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingle
 import * as React from 'react'
 import { Element as SlateElement } from 'slate'
 import { NormalizedBlock } from '../../blocks'
-import { BlockSlateEditor, createEditor } from './editor'
+import { BlockSlateEditor, createBlockEditor } from './editor'
 import {
 	ContemberBlockElement,
 	contemberBlockElementType,

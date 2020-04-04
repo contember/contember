@@ -12,13 +12,13 @@ const onMouseDownCommon = (e: React.MouseEvent) => {
 	e.nativeEvent.stopPropagation() // This is a bit of a hack ‒ so that we don't register this click as a start of a new selection
 }
 
-const toggleMark = (editor: BlockSlateEditor, mark: RichTextBooleanMarkNames, e: React.MouseEvent) => {
+const toggleMark = (editor: any, mark: RichTextBooleanMarkNames, e: React.MouseEvent) => {
 	onMouseDownCommon(e)
 	editor.toggleRichTextNodeMark(editor, mark)
 }
 
 export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringToolbarContentsProps) => {
-	const editor = useSlate() as BlockSlateEditor
+	const editor = useSlate() as any
 	const forceRender = useForceRender()
 
 	const isBold = editor.isBold(editor)

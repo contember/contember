@@ -1,2 +1,2 @@
 export * from './BlockSlateEditor'
-export * from './createEditor'
+export * from './createBlockEditor'

@@ -17,7 +17,7 @@ import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
-import { createEditor } from './editor'
+import { createBlockEditor } from './editor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { ContemberElementRefreshContext } from './renderers'
 import { HoveringToolbar, HoveringToolbarProps } from './toolbars'
@@ -117,7 +117,7 @@ export const BlockEditorInner = React.memo(
 		}) // Deliberately no deps array
 
 		const [editor] = React.useState(() =>
-			createEditor({
+			createBlockEditor({
 				desugaredEntityList,
 				entityListAccessorRef,
 				fieldElementCache: contemberFieldElementCache,

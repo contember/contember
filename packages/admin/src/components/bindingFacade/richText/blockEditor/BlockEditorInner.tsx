@@ -42,7 +42,7 @@ export interface BlockEditorInnerPublicProps {
 
 export interface BlockEditorInnerInternalProps {
 	leadingFieldBackedElements: NormalizedFieldBackedElement[]
-	trailingFieldBackedElements: NormalizedFieldBackedElement[]
+	//trailingFieldBackedElements: NormalizedFieldBackedElement[]
 	batchUpdates: EntityAccessor['batchUpdates']
 	desugaredEntityList: RelativeEntityList
 	entityListAccessor: EntityListAccessor
@@ -66,8 +66,8 @@ export const BlockEditorInner = React.memo(
 		textBlockField,
 		blockButtons,
 		otherBlockButtons,
+		//trailingFieldBackedElements
 		leadingFieldBackedElements,
-		trailingFieldBackedElements,
 	}: BlockEditorInnerProps) => {
 		const renderCountRef = React.useRef(0)
 
@@ -103,7 +103,7 @@ export const BlockEditorInner = React.memo(
 		const sortedEntitiesRef = React.useRef(entities)
 		const normalizedBlocksRef = React.useRef(normalizedBlocks)
 		const normalizedLeadingFieldsRef = React.useRef(leadingFieldBackedElements)
-		const normalizedTrailingFieldsRef = React.useRef(trailingFieldBackedElements)
+		//const normalizedTrailingFieldsRef = React.useRef(trailingFieldBackedElements)
 
 		React.useLayoutEffect(() => {
 			batchUpdatesRef.current = batchUpdates
@@ -111,7 +111,7 @@ export const BlockEditorInner = React.memo(
 			isMutatingRef.current = isMutating
 			sortedEntitiesRef.current = entities
 			normalizedLeadingFieldsRef.current = leadingFieldBackedElements
-			normalizedTrailingFieldsRef.current = trailingFieldBackedElements
+			//normalizedTrailingFieldsRef.current = trailingFieldBackedElements
 
 			renderCountRef.current++
 		}) // Deliberately no deps array
@@ -126,7 +126,7 @@ export const BlockEditorInner = React.memo(
 				sortedEntitiesRef,
 				normalizedBlocksRef,
 				normalizedLeadingFieldsRef,
-				normalizedTrailingFieldsRef,
+				//normalizedTrailingFieldsRef,
 				textBlockDiscriminant,
 				discriminationField: desugaredDiscriminationField,
 				sortableByField: desugaredSortableByField,
@@ -148,7 +148,7 @@ export const BlockEditorInner = React.memo(
 			textBlockDiscriminant,
 			entities,
 			leadingFieldBackedElements,
-			trailingFieldBackedElements,
+			//trailingFieldBackedElements,
 		})
 
 		// TODO label?

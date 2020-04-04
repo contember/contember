@@ -25,7 +25,7 @@ export interface UseSlateNodesOptions {
 	textBlockDiscriminant: FieldValue
 	entities: EntityAccessor[]
 	leadingFieldBackedElements: NormalizedFieldBackedElement[]
-	trailingFieldBackedElements: NormalizedFieldBackedElement[]
+	//trailingFieldBackedElements: NormalizedFieldBackedElement[]
 	placeholder: React.ReactNode
 }
 
@@ -40,7 +40,7 @@ export const useSlateNodes = ({
 	textBlockDiscriminant,
 	entities,
 	leadingFieldBackedElements,
-	trailingFieldBackedElements,
+	//trailingFieldBackedElements,
 	placeholder,
 }: UseSlateNodesOptions): SlateElement[] => {
 	const adjacentAccessorsToElements = (
@@ -140,6 +140,6 @@ export const useSlateNodes = ({
 		  ]
 	return adjacentAccessorsToElements(leadingFieldBackedElements, 'leading').concat(
 		contentElements,
-		adjacentAccessorsToElements(trailingFieldBackedElements, 'trailing'),
+		//adjacentAccessorsToElements(trailingFieldBackedElements, 'trailing'),
 	)
 }

@@ -21,7 +21,7 @@ import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedE
 
 export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicProps {
 	leadingFieldBackedElements?: FieldBackedElement[]
-	trailingFieldBackedElements?: FieldBackedElement[]
+	//trailingFieldBackedElements?: FieldBackedElement[]
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
@@ -31,13 +31,13 @@ export const BlockEditor = Component<BlockEditorProps>(
 		const environment = useEnvironment()
 
 		useConstantLengthInvariant(
-			props.leadingFieldBackedElements || [],
+			props.leadingFieldBackedElements || emptyArray,
 			'The number of leadingFieldBackedElements must remain constant between renders.',
 		)
-		useConstantLengthInvariant(
-			props.trailingFieldBackedElements || [],
-			'The number of trailingFieldBackedElements must remain constant between renders.',
-		)
+		//useConstantLengthInvariant(
+		//	props.trailingFieldBackedElements || emptyArray,
+		//	'The number of trailingFieldBackedElements must remain constant between renders.',
+		//)
 
 		const desugaredEntityList = useDesugaredRelativeEntityList(props)
 		const entityListAccessor = React.useMemo(() => entity.getRelativeEntityList(desugaredEntityList), [
@@ -51,10 +51,10 @@ export const BlockEditor = Component<BlockEditorProps>(
 		)
 
 		const leadingDesugared = useArrayMapMemo(props.leadingFieldBackedElements || emptyArray, desugarFieldBackedElement)
-		const trailingDesugared = useArrayMapMemo(
-			props.trailingFieldBackedElements || emptyArray,
-			desugarFieldBackedElement,
-		)
+		//const trailingDesugared = useArrayMapMemo(
+		//	props.trailingFieldBackedElements || emptyArray,
+		//	desugarFieldBackedElement,
+		//)
 
 		const normalizedLeading = useNormalizedFieldBackedElements(
 			entity,
@@ -62,12 +62,12 @@ export const BlockEditor = Component<BlockEditorProps>(
 			leadingDesugared,
 			props.leadingFieldBackedElements,
 		)
-		const normalizedTrailing = useNormalizedFieldBackedElements(
-			entity,
-			environment,
-			trailingDesugared,
-			props.trailingFieldBackedElements,
-		)
+		//const normalizedTrailing = useNormalizedFieldBackedElements(
+		//	entity,
+		//	environment,
+		//	trailingDesugared,
+		//	props.trailingFieldBackedElements,
+		//)
 
 		return (
 			<BlockEditorInner
@@ -76,7 +76,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 				desugaredEntityList={desugaredEntityList}
 				entityListAccessor={entityListAccessor}
 				leadingFieldBackedElements={normalizedLeading}
-				trailingFieldBackedElements={normalizedTrailing}
+				//trailingFieldBackedElements={normalizedTrailing}
 			/>
 		)
 	},
@@ -93,9 +93,9 @@ export const BlockEditor = Component<BlockEditorProps>(
 				{props.leadingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`leading_${i}`} />
 				))}
-				{props.trailingFieldBackedElements?.map((item, i) => (
+				{/*props.trailingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`trailing_${i}`} />
-				))}
+				))*/}
 				<BlockRepeater {...props}>
 					{props.children}
 					{props.textBlockDiscriminatedBy && <Block discriminateBy={props.textBlockDiscriminatedBy}>{field}</Block>}

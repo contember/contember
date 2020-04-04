@@ -25,7 +25,7 @@ export interface OverrideApplyOptions {
 	isMutatingRef: React.MutableRefObject<boolean>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
+	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	removalType: RemovalType
 	sortableByField: RelativeSingleField
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
@@ -42,7 +42,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		discriminationField,
 		fieldElementCache,
 		normalizedLeadingFieldsRef,
-		normalizedTrailingFieldsRef,
+		//normalizedTrailingFieldsRef,
 		removalType,
 		sortableByField,
 		sortedEntitiesRef,
@@ -55,7 +55,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		[Key in ContemberFieldElementPosition]: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	} = {
 		leading: normalizedLeadingFieldsRef,
-		trailing: normalizedTrailingFieldsRef,
+		//trailing: normalizedTrailingFieldsRef,
 	}
 
 	const firstContentIndex = options.normalizedLeadingFieldsRef.current.length

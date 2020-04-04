@@ -11,7 +11,7 @@ export interface OverrideRenderElementOptions {
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
+	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	removalType: RemovalType
 }
 
@@ -38,9 +38,9 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 				let normalizedElements: NormalizedFieldBackedElement[]
 				if (element.position === 'leading') {
 					normalizedElements = options.normalizedLeadingFieldsRef.current
-				} else if (element.position === 'trailing') {
+				} /*else if (element.position === 'trailing') {
 					normalizedElements = options.normalizedTrailingFieldsRef.current
-				} else {
+				} */ else {
 					return assertNever(element.position)
 				}
 				return normalizedElements[element.index]

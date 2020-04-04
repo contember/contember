@@ -1,24 +1,35 @@
 import { identityFunction } from '@contember/react-utils'
 import { BaseEditor, createEditorWithEssentials } from '../baseEditor'
-import { withAnchors } from '../plugins/element/anchors'
-import { withHeadings } from '../plugins/element/headings'
-import { withParagraphs } from '../plugins/element/paragraphs'
-import { withBasicFormatting } from '../plugins/text/basicFormatting'
+import {
+	withAnchors,
+	withBold,
+	withCode,
+	withHeadings,
+	withItalic,
+	withParagraphs,
+	withStrikeThrough,
+	withUnderline,
+} from '../plugins'
+import { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
+import { defaultEditorPluginPreset } from './presets'
 import { BatchUpdatesRef, withBatching } from './withBatching'
 
-export type BuiltinPlugin = 'anchor' | 'heading' | 'paragraph' | 'basicFormatting'
-
 const pluginAugmenters: {
-	[pluginName in BuiltinPlugin]: (editor: BaseEditor) => BaseEditor
+	[pluginName in BuiltinEditorPlugins]: (editor: BaseEditor) => BaseEditor
 } = {
 	anchor: withAnchors,
 	paragraph: withParagraphs,
 	heading: withHeadings,
-	basicFormatting: withBasicFormatting,
+
+	bold: withBold,
+	code: withCode,
+	italic: withItalic,
+	strikeThrough: withStrikeThrough,
+	underline: withUnderline,
 }
 
 export interface CreateEditorPublicOptions {
-	plugins?: BuiltinPlugin[]
+	plugins?: BuiltinEditorPlugins[]
 	augmentEditor?: (baseEditor: BaseEditor) => BaseEditor
 	augmentEditorBuiltins?: (editor: BaseEditor) => BaseEditor
 }
@@ -31,7 +42,7 @@ export interface CreateEditorOptions extends CreateEditorPublicOptions {
 
 export const createEditor = ({
 	batchUpdatesRef,
-	plugins = ['basicFormatting', 'anchor', 'paragraph', 'heading'],
+	plugins = defaultEditorPluginPreset,
 	defaultElementType,
 	augmentEditorBuiltins = identityFunction,
 	addEditorBuiltins,

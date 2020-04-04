@@ -112,11 +112,13 @@ export const BlockEditorInner = React.memo(
 		const normalizedLeadingFieldsRef = React.useRef(leadingFieldBackedElements)
 		const normalizedTrailingFieldsRef = React.useRef(trailingFieldBackedElements)
 
-		entityListAccessorRef.current = entityListAccessor
-		isMutatingRef.current = isMutating
-		sortedEntitiesRef.current = entities
-		normalizedLeadingFieldsRef.current = leadingFieldBackedElements
-		normalizedTrailingFieldsRef.current = trailingFieldBackedElements
+		React.useLayoutEffect(() => {
+			entityListAccessorRef.current = entityListAccessor
+			isMutatingRef.current = isMutating
+			sortedEntitiesRef.current = entities
+			normalizedLeadingFieldsRef.current = leadingFieldBackedElements
+			normalizedTrailingFieldsRef.current = trailingFieldBackedElements
+		}) // Deliberately no deps array
 
 		const editor = React.useMemo(
 			() =>

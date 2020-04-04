@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Editor } from 'slate'
-import { BaseEditor, WithAnotherNodeType } from '../essentials'
+import { BaseEditor, WithAnotherNodeType } from '../../essentials'
 import { BasicFormatting, defaultBasicFormatting } from './BasicFormatting'
 import { EditorWithBasicFormatting, WithBasicFormatting } from './EditorWithBasicFormatting'
 import { hotKeys } from './hotKeys'

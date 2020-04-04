@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode } from '../essentials'
+import { BaseEditor, ElementNode } from '../../essentials'
 
 export const headingElementType = 'heading' as const
 

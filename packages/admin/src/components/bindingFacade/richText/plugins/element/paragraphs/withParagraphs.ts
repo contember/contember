@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../essentials'
+import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../essentials'
 import { EditorWithParagraphs, WithParagraphs } from './EditorWithParagraphs'
 import { ParagraphElement, paragraphElementType } from './ParagraphElement'
 import { ParagraphRenderer, ParagraphRendererProps } from './ParagraphRenderer'

@@ -1,4 +1,4 @@
-import { BaseEditor, WithAnotherNodeType } from '../essentials'
+import { BaseEditor, WithAnotherNodeType } from '../../essentials'
 import { BasicFormatting } from './BasicFormatting'
 import { RichTextBooleanMarkNames, RichTextNode } from './RichTextNode'
 

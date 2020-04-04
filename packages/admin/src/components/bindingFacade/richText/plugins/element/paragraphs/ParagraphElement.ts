@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode } from '../essentials'
+import { BaseEditor, ElementNode } from '../../essentials'
 
 export const paragraphElementType = 'paragraph' as const
 

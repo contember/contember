@@ -1,7 +1,7 @@
 import { EditorNonEditable } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps, useSlate } from 'slate-react'
-import { BaseEditor } from '../essentials'
+import { BaseEditor } from '../../essentials'
 import { EditorWithHeadings } from './EditorWithHeadings'
 import { HeadingElement } from './HeadingElement'
 
